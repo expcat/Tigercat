@@ -9,7 +9,7 @@ const items: ScrollSpyItem[] = [
 export default function App() {
   return (
     <div className="space-y-4">
-      <ScrollSpy items={items} direction="horizontal" />
+      <ScrollSpy items={items} orientation="horizontal" />
       <div className="grid gap-4 md:grid-cols-[1fr_160px]">
         <div className="max-h-64 overflow-auto rounded border">
           <section id="spy-overview" className="min-h-[28rem] bg-blue-50 p-4">
@@ -19,7 +19,7 @@ export default function App() {
             工作流
           </section>
         </div>
-        <ScrollSpy items={items} sticky direction="vertical" />
+        <ScrollSpy items={items} sticky orientation="vertical" />
       </div>
     </div>
   )

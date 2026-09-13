@@ -162,7 +162,6 @@ export const arSA: TigerLocale = {
     signModeLabel: 'وضع التوقيع',
     actorLabel: 'المسؤول',
     actorPlaceholder: 'اسم المسؤول',
-    emptyText: 'لا توجد خطوات بعد. أضف عقدة بدء للبدء.',
     subpathEmpty: 'لا توجد شجرة فرعية في هذا المسار.',
     insertSibling: 'إدراج بعد',
     editPanelAriaLabel: 'إعدادات العقدة',
@@ -690,7 +689,8 @@ export const arSA: TigerLocale = {
   },
   signature: {
     ariaLabel: 'لوحة التوقيع',
-    undoText: 'تراجع'
+    undoText: 'تراجع',
+    clearText: 'مسح'
   },
   numberKeyboard: {
     ariaLabel: 'لوحة الأرقام',

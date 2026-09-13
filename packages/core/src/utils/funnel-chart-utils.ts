@@ -34,7 +34,7 @@ export interface LayoutFunnelOptions {
   gap?: number
   pinch?: boolean
   colors?: string[]
-  direction?: 'vertical' | 'horizontal'
+  orientation?: 'vertical' | 'horizontal'
 }
 
 /**
@@ -47,7 +47,7 @@ export function computeFunnelSegments(
 ): FunnelSegment[] {
   if (data.length === 0) return []
 
-  const { width, height, gap = 2, pinch = false, colors, direction = 'vertical' } = opts
+  const { width, height, gap = 2, pinch = false, colors, orientation = 'vertical' } = opts
   const safeWidth = Number.isFinite(width) ? Math.max(0, width) : 0
   const safeHeight = Number.isFinite(height) ? Math.max(0, height) : 0
   const safeGap = Number.isFinite(gap) ? Math.max(0, gap) : 0
@@ -82,7 +82,7 @@ export function computeFunnelSegments(
     }
   }
 
-  const horizontal = direction === 'horizontal'
+  const horizontal = orientation === 'horizontal'
   const main = horizontal ? safeWidth : safeHeight
   const cross = horizontal ? safeHeight : safeWidth
   const totalGap = Math.min(main, safeGap * (valid.length - 1))

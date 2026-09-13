@@ -79,8 +79,8 @@ export interface BaseFormControlProps<T = unknown> {
  * Covers: Space, Row/Col, Container, etc.
  */
 export interface BaseLayoutProps {
-  /** Layout direction */
-  direction?: 'horizontal' | 'vertical'
+  /** Flex orientation */
+  orientation?: 'horizontal' | 'vertical'
   /** Cross-axis alignment */
   align?: 'start' | 'end' | 'center' | 'baseline' | 'stretch'
   /** Main-axis justification */

@@ -58,7 +58,11 @@ interface CardItemProps {
   draggable: boolean
   dragHintText: string
   filterHit: boolean
-  renderCard?: (card: TaskBoardCard, columnId: string | number) => React.ReactNode
+  renderCard?: (ctx: {
+    card: TaskBoardCard
+    column: TaskBoardColumn
+    isDragging: boolean
+  }) => React.ReactNode
   dragCtrl: TaskBoardDragController
 }
 
@@ -106,7 +110,7 @@ const CardItem: React.FC<CardItemProps> = ({
         }
       }}>
       {renderCard ? (
-        renderCard(card, column.id)
+        renderCard({ card, column, isDragging })
       ) : (
         <>
           <div className="font-medium text-sm text-[var(--tiger-text,#1f2937)]">{card.title}</div>
@@ -130,7 +134,11 @@ interface ColumnItemProps {
   columnDraggable: boolean
   labels: ReturnType<typeof getTaskBoardLabels>
   filterText: string
-  renderCardProp?: (card: TaskBoardCard, columnId: string | number) => React.ReactNode
+  renderCardProp?: (ctx: {
+    card: TaskBoardCard
+    column: TaskBoardColumn
+    isDragging: boolean
+  }) => React.ReactNode
   renderColumnHeader?: (column: TaskBoardColumn) => React.ReactNode
   renderColumnFooter?: (column: TaskBoardColumn) => React.ReactNode
   renderEmptyColumn?: (column: TaskBoardColumn) => React.ReactNode
@@ -387,7 +395,11 @@ export interface TaskBoardProps
       'style' | 'renderCard' | 'renderColumnHeader' | 'renderColumnFooter' | 'renderEmptyColumn'
     >,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'style' | 'draggable'> {
-  renderCard?: (card: TaskBoardCard, columnId: string | number) => React.ReactNode
+  renderCard?: (ctx: {
+    card: TaskBoardCard
+    column: TaskBoardColumn
+    isDragging: boolean
+  }) => React.ReactNode
   renderColumnHeader?: (column: TaskBoardColumn) => React.ReactNode
   renderColumnFooter?: (column: TaskBoardColumn) => React.ReactNode
   renderEmptyColumn?: (column: TaskBoardColumn) => React.ReactNode

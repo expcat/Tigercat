@@ -32,7 +32,7 @@ export interface VueCheckboxGroupProps {
   defaultValue?: CheckboxGroupValue
   disabled?: boolean
   size?: ComponentSize
-  direction?: ChoiceGroupDirection
+  orientation?: ChoiceGroupDirection
   status?: InputStatus
   options?: CheckboxGroupOption[]
   className?: string
@@ -59,7 +59,7 @@ export const CheckboxGroup = markFormItemGroupControl(
         type: String as PropType<ComponentSize>,
         default: 'md' as ComponentSize
       },
-      direction: {
+      orientation: {
         type: String as PropType<ChoiceGroupDirection>,
         default: 'vertical' as ChoiceGroupDirection
       },
@@ -144,7 +144,7 @@ export const CheckboxGroup = markFormItemGroupControl(
             role: 'group',
             class: classNames(
               getChoiceGroupClasses({
-                direction: props.direction,
+                orientation: props.orientation,
                 className: classNames(props.className, coerceClassValue(attrs.class))
               })
             ),

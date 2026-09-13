@@ -13,13 +13,30 @@ import type {
   FormValues
 } from './form'
 import type { TigerLocaleSchemaForm } from './locale'
+import type { TreeNode } from './tree'
 
 /**
  * Built-in widgets SchemaForm can render. Unknown types need a field slot /
  * `renderField`. This is not a form designer.
  */
 export type SchemaFormWidgetType =
-  'input' | 'textarea' | 'number' | 'password' | 'select' | 'checkbox' | 'switch' | 'radio'
+  | 'input'
+  | 'textarea'
+  | 'number'
+  | 'password'
+  | 'select'
+  | 'checkbox'
+  | 'switch'
+  | 'radio'
+  | 'date'
+  | 'time'
+  | 'cascader'
+  | 'tree-select'
+  | 'slider'
+  | 'upload'
+  | 'color'
+  | 'rate'
+  | 'tags'
 
 /**
  * Select / radio option.
@@ -28,6 +45,7 @@ export interface SchemaFormOption {
   label: string
   value: string | number
   disabled?: boolean
+  children?: SchemaFormOption[]
 }
 
 /**
@@ -79,9 +97,17 @@ export interface SchemaFormField {
    */
   condition?: FormFieldCondition
   /**
-   * Options for `select` and `radio`.
+   * Options for `select`, `radio`, and `cascader`.
    */
   options?: SchemaFormOption[]
+  /**
+   * Tree data for `tree-select`.
+   */
+  treeData?: TreeNode[]
+  /**
+   * Range mode for `date` / `time` widgets.
+   */
+  range?: boolean
   /**
    * Column span inside the group's grid (1–3). Clamped to the group columns.
    * @default 1

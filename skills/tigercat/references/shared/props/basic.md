@@ -258,7 +258,7 @@ Note: `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener n
 
 ## Marquee
 
-`packages/core/src/types/marquee.ts` · `MarqueeProps` · 4/11 props
+`packages/core/src/types/marquee.ts` · `MarqueeProps` · 4/13 props
 
 Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。
 

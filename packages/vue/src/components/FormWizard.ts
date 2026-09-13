@@ -66,7 +66,7 @@ export const FormWizard = defineComponent({
       type: Boolean,
       default: false
     },
-    direction: {
+    orientation: {
       type: String as PropType<StepsDirection>,
       default: 'horizontal' as StepsDirection
     },
@@ -308,7 +308,7 @@ export const FormWizard = defineComponent({
             ? h('div', { class: getFormWizardHeaderClasses(props.bordered) }, [
                 h(Steps as unknown as Component, {
                   current: currentIndex.value,
-                  direction: props.direction,
+                  orientation: props.orientation,
                   size: props.size,
                   simple: props.simple,
                   clickable: props.clickable,

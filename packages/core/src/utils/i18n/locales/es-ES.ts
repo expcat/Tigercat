@@ -163,7 +163,6 @@ export const esES: TigerLocale = {
     signModeLabel: 'Modo de firma',
     actorLabel: 'Responsable',
     actorPlaceholder: 'Nombre del responsable',
-    emptyText: 'Aún no hay pasos. Añada un nodo de inicio.',
     subpathEmpty: 'No hay subárbol en esta ruta.',
     insertSibling: 'Insertar después',
     editPanelAriaLabel: 'Ajustes del nodo',
@@ -692,7 +691,8 @@ export const esES: TigerLocale = {
   },
   signature: {
     ariaLabel: 'Pad de firma',
-    undoText: 'Deshacer'
+    undoText: 'Deshacer',
+    clearText: 'Borrar'
   },
   numberKeyboard: {
     ariaLabel: 'Teclado numérico',

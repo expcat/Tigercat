@@ -30,7 +30,9 @@ import {
   type ChartPadding,
   type PieChartDatum,
   type PieChartProps as CorePieChartProps,
-  type DonutChartProps as CoreDonutChartProps
+  type DonutChartProps as CoreDonutChartProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
@@ -85,6 +87,8 @@ export const PieChart = defineComponent({
     },
     title: { type: String },
     desc: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
     borderWidth: { type: Number, default: 2 },
     borderColor: { type: String, default: 'var(--tiger-surface,#ffffff)' },
@@ -99,7 +103,8 @@ export const PieChart = defineComponent({
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const instance = getCurrentInstance()
     const interactive = computed(
       () =>

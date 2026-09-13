@@ -77,7 +77,7 @@ describe('Anchor', () => {
 
     it('should render with horizontal direction', () => {
       render(
-        <Anchor direction="horizontal" getContainer={() => scrollContainer} affix={false}>
+        <Anchor orientation="horizontal" getContainer={() => scrollContainer} affix={false}>
           <AnchorLink href="#section1" title="Link 1" />
         </Anchor>
       )
@@ -345,7 +345,7 @@ describe('Anchor', () => {
   describe('Context', () => {
     it('should provide context to AnchorLink children', () => {
       render(
-        <Anchor direction="horizontal" getContainer={() => scrollContainer}>
+        <Anchor orientation="horizontal" getContainer={() => scrollContainer}>
           <AnchorLink href="#section1" title="Link" />
         </Anchor>
       )

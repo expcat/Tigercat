@@ -440,7 +440,7 @@ describe('isValidDragHandle', () => {
 describe('getDefaultDragConfig', () => {
   it('returns vertical defaults with a matching Y lock', () => {
     const config = getDefaultDragConfig()
-    expect(config.direction).toBe('vertical')
+    expect(config.axis).toBe('vertical')
     expect(config.disabled).toBe(false)
     expect(config.lockAxis).toBe('y')
     expect(config.dragThreshold).toBeGreaterThan(0)
@@ -452,19 +452,19 @@ describe('getDefaultDragConfig', () => {
 
 describe('resolveDragConfig', () => {
   it('merges user config with defaults', () => {
-    const config = resolveDragConfig({ direction: 'horizontal', disabled: true })
-    expect(config.direction).toBe('horizontal')
+    const config = resolveDragConfig({ axis: 'horizontal', disabled: true })
+    expect(config.axis).toBe('horizontal')
     expect(config.disabled).toBe(true)
     expect(config.lockAxis).toBe('x')
   })
 
-  it('does not lock an axis when direction is both', () => {
-    const config = resolveDragConfig({ direction: 'both' })
+  it('does not lock an axis when axis is both', () => {
+    const config = resolveDragConfig({ axis: 'both' })
     expect(config.lockAxis).toBeUndefined()
   })
 
-  it('keeps an explicit lockAxis even when direction is both', () => {
-    const config = resolveDragConfig({ direction: 'both', lockAxis: 'x' })
+  it('keeps an explicit lockAxis even when axis is both', () => {
+    const config = resolveDragConfig({ axis: 'both', lockAxis: 'x' })
     expect(config.lockAxis).toBe('x')
   })
 

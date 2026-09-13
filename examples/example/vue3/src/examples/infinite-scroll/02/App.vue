@@ -23,7 +23,7 @@ const loadMore = () => {
       横向滚动到右侧边界，观察新卡片和结束状态。
     </p>
     <InfiniteScroll
-      direction="horizontal"
+      orientation="horizontal"
       :has-more="hasMore"
       :loading="loading"
       :height="176"

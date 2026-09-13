@@ -165,7 +165,7 @@ describe('Menu', () => {
     it('uses RTL arrows on a horizontal menubar', async () => {
       const user = userEvent.setup()
       render(
-        <ConfigProvider direction="rtl">
+        <ConfigProvider dir="rtl">
           <Menu mode="horizontal">
             <MenuItem itemKey="1">Item 1</MenuItem>
             <MenuItem itemKey="2">Item 2</MenuItem>

@@ -38,7 +38,7 @@ describe('FunnelChart (React)', () => {
   it('renders with horizontal direction', () => {
     const { container } = renderWithProps(FunnelChart, {
       data: sampleData,
-      direction: 'horizontal',
+      orientation: 'horizontal',
       ...defaultSize
     })
 

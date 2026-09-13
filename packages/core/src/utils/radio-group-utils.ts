@@ -6,16 +6,16 @@ export const choiceGroupHorizontalClasses = 'flex flex-row flex-wrap gap-2'
 export const radioGroupDefaultClasses = choiceGroupVerticalClasses
 
 export interface GetChoiceGroupClassesOptions {
-  direction?: ChoiceGroupDirection
+  orientation?: ChoiceGroupDirection
   className?: ClassValue
 }
 
 export function getChoiceGroupClasses({
-  direction = 'vertical',
+  orientation = 'vertical',
   className
 }: GetChoiceGroupClassesOptions = {}): string {
   return classNames(
-    direction === 'horizontal' ? choiceGroupHorizontalClasses : choiceGroupVerticalClasses,
+    orientation === 'horizontal' ? choiceGroupHorizontalClasses : choiceGroupVerticalClasses,
     className
   )
 }

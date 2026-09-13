@@ -33,7 +33,7 @@ export interface ScrollSpyProps {
   /** Alias of `offsetTop`. */
   targetOffset?: number
   bounds?: number
-  direction?: ScrollSpyDirection
+  orientation?: ScrollSpyDirection
   sticky?: boolean
   ariaLabel?: string
   className?: string

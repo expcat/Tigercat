@@ -23,7 +23,9 @@ import {
   type ChartLegendPosition,
   type ChartPadding,
   type FunnelChartDatum,
-  type FunnelChartProps as CoreFunnelChartProps
+  type FunnelChartProps as CoreFunnelChartProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
@@ -49,7 +51,7 @@ export const FunnelChart = defineComponent({
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: 24 },
     responsive: { type: Boolean, default: false },
     data: { type: Array as PropType<FunnelChartDatum[]>, required: true },
-    direction: { type: String as PropType<'vertical' | 'horizontal'>, default: 'vertical' },
+    orientation: { type: String as PropType<'vertical' | 'horizontal'>, default: 'vertical' },
     gap: { type: Number, default: 2 },
     pinch: { type: Boolean, default: false },
     colors: { type: Array as PropType<string[]> },
@@ -71,6 +73,8 @@ export const FunnelChart = defineComponent({
     },
     title: { type: String },
     desc: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
     onSegmentClick: {
       type: Function as PropType<(index: number, datum: FunnelChartDatum) => void>
@@ -79,7 +83,8 @@ export const FunnelChart = defineComponent({
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'segment-click', 'segment-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const interactive = computed(
       () => props.hoverable || props.selectable || typeof props.onSegmentClick === 'function'
     )
@@ -129,7 +134,7 @@ export const FunnelChart = defineComponent({
         gap: props.gap,
         pinch: props.pinch,
         colors: palette.value,
-        direction: props.direction
+        orientation: props.orientation
       })
     )
     const total = computed(() => segments.value.reduce((sum, segment) => sum + segment.value, 0))
@@ -202,8 +207,8 @@ export const FunnelChart = defineComponent({
                         gradientUnits: 'userSpaceOnUse',
                         x1: 0,
                         y1: 0,
-                        x2: props.direction === 'horizontal' ? innerRect.value.width : 0,
-                        y2: props.direction === 'horizontal' ? 0 : innerRect.value.height
+                        x2: props.orientation === 'horizontal' ? innerRect.value.width : 0,
+                        y2: props.orientation === 'horizontal' ? 0 : innerRect.value.height
                       },
                       [
                         h('stop', { offset: '0%', 'stop-color': seg.color, 'stop-opacity': '1' }),

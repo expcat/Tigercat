@@ -50,7 +50,7 @@ export const StepsContextKey = Symbol('StepsContext')
 export interface StepsContext {
   current: number
   status: StepStatus
-  direction: StepsDirection
+  orientation: StepsDirection
   size: StepSize
   simple: boolean
   clickable: boolean
@@ -68,7 +68,7 @@ type RawSlotsLike = { [name: string]: unknown; $stable?: boolean }
 export interface VueStepsProps {
   current?: number
   status?: StepStatus
-  direction?: StepsDirection
+  orientation?: StepsDirection
   size?: StepSize
   simple?: boolean
   clickable?: boolean
@@ -169,7 +169,7 @@ export const StepsItem = defineComponent({
 
     const itemClasses = computed(() => {
       return classNames(
-        getStepItemClasses(stepsContext.direction, props.isLast),
+        getStepItemClasses(stepsContext.orientation, props.isLast),
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -187,7 +187,7 @@ export const StepsItem = defineComponent({
 
     const tailClasses = computed(() => {
       return getStepTailClasses(
-        stepsContext.direction,
+        stepsContext.orientation,
         stepStatus.value,
         props.isLast,
         stepsContext.size,
@@ -196,7 +196,7 @@ export const StepsItem = defineComponent({
     })
 
     const contentClasses = computed(() => {
-      return getStepContentClasses(stepsContext.direction)
+      return getStepContentClasses(stepsContext.orientation)
     })
 
     const titleClasses = computed(() => {
@@ -281,7 +281,7 @@ export const StepsItem = defineComponent({
       const { class: _class, style: _style, ...restAttrs } = attrs as Record<string, unknown>
 
       const body =
-        stepsContext.direction === 'vertical'
+        stepsContext.orientation === 'vertical'
           ? [
               h(
                 'div',
@@ -326,7 +326,7 @@ export const StepsItem = defineComponent({
                 {
                   type: 'button',
                   class:
-                    stepsContext.direction === 'vertical'
+                    stepsContext.orientation === 'vertical'
                       ? 'flex w-full flex-row items-stretch bg-transparent p-0 text-start'
                       : 'flex w-full flex-col items-center bg-transparent p-0',
                   onClick: handleClick
@@ -361,10 +361,10 @@ export const Steps = defineComponent({
       default: 'process' as StepStatus
     },
     /**
-     * Steps direction/orientation
+     * Steps orientation/orientation
      * @default 'horizontal'
      */
-    direction: {
+    orientation: {
       type: String as PropType<StepsDirection>,
       default: 'horizontal' as StepsDirection
     },
@@ -420,7 +420,7 @@ export const Steps = defineComponent({
   setup(props, { slots, attrs, emit }) {
     const containerClasses = computed(() =>
       classNames(
-        getStepsContainerClasses(props.direction),
+        getStepsContainerClasses(props.orientation),
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -448,7 +448,7 @@ export const Steps = defineComponent({
       reactive({
         current: computed(() => clampStepCurrent(props.current, itemCount.value)),
         status: computed(() => props.status),
-        direction: computed(() => props.direction),
+        orientation: computed(() => props.orientation),
         size: computed(() => props.size),
         simple: computed(() => props.simple),
         clickable: computed(() => props.clickable),
@@ -509,7 +509,7 @@ export const Steps = defineComponent({
           class: containerClasses.value,
           style: mergedStyle.value,
           role: 'list',
-          'data-direction': props.direction,
+          'data-orientation': props.orientation,
           'data-tiger-step-size': getStepSizeDataValue(props.size, props.simple),
           'aria-label':
             typeof ariaLabelAttr === 'string' ? ariaLabelAttr : stepLabels.value.ariaLabel,

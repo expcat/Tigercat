@@ -5,7 +5,7 @@ import { Splitter } from '@expcat/tigercat-vue/Splitter'
 <template>
   <div class="min-w-0 flex flex-col gap-3">
     <Splitter
-      direction="vertical"
+      orientation="vertical"
       :sizes="['40%', '60%']"
       style="height: 220px; border: 1px solid var(--tiger-border, #e5e7eb); border-radius: 8px">
       <div class="p-4">上方面板</div>

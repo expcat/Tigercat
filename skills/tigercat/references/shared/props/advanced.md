@@ -60,12 +60,12 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 `packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 4/15 props
 
-| Prop         | Type                         | Default | Notes                                                      |
-| ------------ | ---------------------------- | ------- | ---------------------------------------------------------- |
-| `hasMore?`   | `boolean`                    | `-`     | Whether more data is available                             |
-| `loading?`   | `boolean`                    | `-`     | Whether a load is currently in progress                    |
-| `direction?` | `'vertical' \| 'horizontal'` | `-`     | Scroll direction                                           |
-| `inverse?`   | `boolean`                    | `-`     | Inverse scroll (load at the start edge, e.g. chat history) |
+| Prop        | Type      | Default | Notes                                                      |
+| ----------- | --------- | ------- | ---------------------------------------------------------- |
+| `hasMore?`  | `boolean` | `-`     | Whether more data is available                             |
+| `loading?`  | `boolean` | `-`     | Whether a load is currently in progress                    |
+| `inverse?`  | `boolean` | `-`     | Inverse scroll (load at the start edge, e.g. chat history) |
+| `disabled?` | `boolean` | `-`     | Disable the infinite scroll trigger                        |
 
 ## MarkdownEditor
 

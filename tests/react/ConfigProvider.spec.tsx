@@ -316,7 +316,7 @@ describe('ConfigProvider', () => {
 
     it('renders a config root with dir and lang for overlay portals', () => {
       const { getByText } = render(
-        <ConfigProvider direction="rtl" locale={{ locale: 'ar-SA' }}>
+        <ConfigProvider dir="rtl" locale={{ locale: 'ar-SA' }}>
           <span>child</span>
         </ConfigProvider>
       )
@@ -328,12 +328,12 @@ describe('ConfigProvider', () => {
 
     it('does not restore over a remaining sibling owner', () => {
       const first = render(
-        <ConfigProvider direction="rtl">
+        <ConfigProvider dir="rtl">
           <span>first</span>
         </ConfigProvider>
       )
       const second = render(
-        <ConfigProvider direction="ltr">
+        <ConfigProvider dir="ltr">
           <span>second</span>
         </ConfigProvider>
       )
@@ -384,7 +384,7 @@ describe('ConfigProvider', () => {
   describe('Accessibility', () => {
     it('has no accessibility violations on a labelled tree and writes dir plus lang', async () => {
       const { container } = render(
-        <ConfigProvider locale={{ locale: 'zh-CN' }} direction="ltr">
+        <ConfigProvider locale={{ locale: 'zh-CN' }} dir="ltr">
           <p>配置树</p>
         </ConfigProvider>
       )

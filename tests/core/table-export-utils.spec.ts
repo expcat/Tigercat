@@ -55,6 +55,25 @@ describe('exportTableToCsv', () => {
     const csv = exportTableToCsv(columns, [{ name: null, age: undefined, city: 'NYC' }] as never)
     expect(csv).toContain(',,NYC')
   })
+
+  it('skips render-only columns without a record field', () => {
+    const csv = exportTableToCsv(
+      [
+        ...columns,
+        { key: 'actions', title: 'Actions', render: () => 'edit' }
+      ],
+      data
+    )
+    expect(csv).toContain('姓名,Age,City')
+    expect(csv).not.toContain('Actions')
+  })
+
+  it('skips hiddenColumnKeys', () => {
+    const csv = exportTableToCsv(columns, data, { hiddenColumnKeys: ['age'] })
+    expect(csv).toContain('姓名,City')
+    expect(csv).not.toContain('Age')
+    expect(csv).toContain('Alice,New York')
+  })
 })
 
 describe('downloadCsv', () => {

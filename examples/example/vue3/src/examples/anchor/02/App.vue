@@ -9,7 +9,7 @@ import { AnchorLink } from '@expcat/tigercat-vue/AnchorLink'
       <section id="anchor-audit" class="h-52 bg-blue-50 p-4">审计</section>
       <section id="anchor-release" class="h-52 bg-green-50 p-4">发布</section>
     </div>
-    <Anchor :affix="false" get-container="#anchor-scroll-container" direction="horizontal">
+    <Anchor :affix="false" get-container="#anchor-scroll-container" orientation="horizontal">
       <AnchorLink href="#anchor-audit" title="审计" />
       <AnchorLink href="#anchor-release" title="发布" />
     </Anchor>

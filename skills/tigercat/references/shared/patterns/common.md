@@ -98,7 +98,7 @@ These are binding or seed differences, not two products. Compact Notes on each c
 
 Size **strings** are three families and are not interchangeable: Form/Rate `sm\|md\|lg`, Steps/Wizard `small\|default`, Pagination `small\|medium\|large`.
 
-Empty sentinels are per widget: Select unselected is `undefined` (multi `[]`); DatePicker range empty is `[null, null]`; TimePicker range empty is `null`; ImagePreview omit `open` is closed; Alert omit `open` is shown.
+Empty sentinels are per widget: text `''`; number `null`; date/time single `null`; date/time range empty `null` (partial range is a tuple); multi/path arrays `[]` controlled empty (omit/`undefined` uncontrolled); ColorPicker/CronEditor clear `null`; Rate clear `0`. ImagePreview omit `open` is closed; Alert omit `open` is shown.
 
 Kanban / DonutChart / ImageViewer remain importable aliases of TaskBoard / PieChart / ImagePreview.
 

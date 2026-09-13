@@ -17,7 +17,9 @@ import {
   type ChartPadding,
   type OrgChartLayoutNode,
   type OrgChartNode,
-  type OrgChartProps as CoreOrgChartProps
+  type OrgChartProps as CoreOrgChartProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { useTigerConfig } from './ConfigProvider'
@@ -41,7 +43,7 @@ export const OrgChart = defineComponent({
     nodeHeight: { type: Number, default: 72 },
     levelGap: { type: Number, default: 80 },
     siblingGap: { type: Number, default: 32 },
-    direction: { type: String as PropType<'vertical' | 'horizontal'>, default: 'vertical' },
+    orientation: { type: String as PropType<'vertical' | 'horizontal'>, default: 'vertical' },
     showAvatars: { type: Boolean, default: true },
     showSubtitles: { type: Boolean, default: true },
     hoverable: { type: Boolean, default: false },
@@ -56,13 +58,16 @@ export const OrgChart = defineComponent({
     title: { type: String },
     desc: { type: String },
     ariaLabel: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
     onNodeClick: { type: Function as PropType<(node: OrgChartNode) => void> }
   },
   emits: ['update:selectedId', 'node-click', 'node-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const innerSelectedId = ref<string | number | null>(null)
     const hoveredId = ref<string | number | null>(null)
     const resolvedSelectedId = computed(() =>
@@ -74,7 +79,7 @@ export const OrgChart = defineComponent({
         nodeHeight: props.nodeHeight,
         levelGap: props.levelGap,
         siblingGap: props.siblingGap,
-        direction: props.direction,
+        orientation: props.orientation,
         colors: props.colors
       })
     )

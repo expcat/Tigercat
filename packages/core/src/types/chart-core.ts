@@ -2,6 +2,8 @@
  * Chart primitives types and interfaces
  */
 
+import type { TigerLocale, TigerLocaleChart } from './locale'
+
 export type ChartScaleType = 'linear' | 'band' | 'point'
 
 export type ChartAxisOrientation = 'left' | 'right' | 'top' | 'bottom'
@@ -70,6 +72,11 @@ export interface BaseChartProps {
    * Additional CSS classes
    */
   className?: string
+
+  /** Locale object merged on top of ConfigProvider. */
+  locale?: Partial<TigerLocale>
+  /** Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`. */
+  labels?: Partial<TigerLocaleChart>
 }
 
 /**
@@ -180,9 +187,11 @@ export interface ChartLegendProps {
   interactive?: boolean
 
   /**
-   * Accessible name. Defaults to locale `chart.legendAriaLabel`.
+   * Accessible name. Overlay: dedicated `ariaLabel` → `labels` → `locale.chart`.
    */
   ariaLabel?: string
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleChart>
 
   /**
    * Additional CSS classes

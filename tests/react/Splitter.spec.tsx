@@ -65,7 +65,7 @@ describe('Splitter', () => {
       const { container } = renderSplitter()
       expect(container.querySelectorAll('[data-pane-index]')).toHaveLength(2)
       expect(container.querySelectorAll('[role="separator"]')).toHaveLength(1)
-      expect(container.firstElementChild).toHaveAttribute('data-direction', 'horizontal')
+      expect(container.firstElementChild).toHaveAttribute('data-orientation', 'horizontal')
     })
 
     it('flattens fragments and ignores blank text when counting panes', () => {
@@ -82,8 +82,8 @@ describe('Splitter', () => {
     })
 
     it('renders vertical direction', () => {
-      const { container } = renderSplitter({ direction: 'vertical' })
-      expect(container.firstElementChild).toHaveAttribute('data-direction', 'vertical')
+      const { container } = renderSplitter({ orientation: 'vertical' })
+      expect(container.firstElementChild).toHaveAttribute('data-orientation', 'vertical')
     })
   })
 

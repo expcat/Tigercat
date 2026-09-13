@@ -72,7 +72,7 @@ function flattenSplitterPanes(children: React.ReactNode): React.ReactNode[] {
 
 export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Splitter(
   {
-    direction = 'horizontal',
+    orientation = 'horizontal',
     sizes: controlledSizes,
     min = 0,
     max,
@@ -139,13 +139,13 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
   )
 
   const applyMeasure = useCallback(() => {
-    const size = measureSplitterContainer(containerRef.current, direction)
+    const size = measureSplitterContainer(containerRef.current, orientation)
     if (size > 0) setContainerSize(size)
-  }, [direction])
+  }, [orientation])
 
   useLayoutEffect(() => {
     applyMeasure()
-  }, [applyMeasure, paneCount, direction])
+  }, [applyMeasure, paneCount, orientation])
 
   useEffect(() => {
     const el = containerRef.current
@@ -195,7 +195,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
       if (disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
-      const liveSize = measureSplitterContainer(containerRef.current, direction)
+      const liveSize = measureSplitterContainer(containerRef.current, orientation)
       if (liveSize > 0 && liveSize !== containerSize) setContainerSize(liveSize)
       const startSizes = currentPixels(liveSize > 0 ? liveSize : containerSize)
       draggingRef.current = {
@@ -213,12 +213,12 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
         ownerDocument: e.currentTarget.ownerDocument,
         pointerId: e.pointerId,
         pointerTarget: e.currentTarget,
-        lockAxis: direction === 'horizontal' ? 'x' : 'y',
+        lockAxis: orientation === 'horizontal' ? 'x' : 'y',
         onMove: ({ currentX, currentY }) => {
           const drag = draggingRef.current
           if (!drag) return
           const delta = getSplitterPointerDelta(
-            direction,
+            orientation,
             drag.startX,
             drag.startY,
             currentX,
@@ -232,7 +232,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
           const drag = draggingRef.current
           if (drag) {
             const delta = getSplitterPointerDelta(
-              direction,
+              orientation,
               drag.startX,
               drag.startY,
               currentX,
@@ -251,7 +251,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
     },
     [
       disabled,
-      direction,
+      orientation,
       rtl,
       mins,
       maxes,
@@ -266,16 +266,16 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
   const handleKeyDown = useCallback(
     (gutterIdx: number, e: React.KeyboardEvent) => {
       if (disabled) return
-      const delta = getSplitterKeyboardDelta(e.key, direction, rtl)
+      const delta = getSplitterKeyboardDelta(e.key, orientation, rtl)
       if (delta == null) return
       e.preventDefault()
       const newSizes = resizePanes(currentPixels(), gutterIdx, delta, mins, maxes)
       if (newSizes) commitSizes(newSizes, gutterIdx, 'keyboard')
     },
-    [disabled, direction, rtl, mins, maxes, commitSizes, currentPixels]
+    [disabled, orientation, rtl, mins, maxes, commitSizes, currentPixels]
   )
 
-  const containerClasses = classNames(getSplitterContainerClasses(direction, className))
+  const containerClasses = classNames(getSplitterContainerClasses(orientation, className))
 
   return (
     <div
@@ -284,12 +284,12 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
       className={containerClasses}
       style={{ ...style, ...getSplitterGutterCssVars(gutterSize) }}
       dir={dir}
-      data-direction={direction}
+      data-orientation={orientation}
       aria-label={typeof ariaLabel === 'string' ? ariaLabel : undefined}
       aria-labelledby={typeof ariaLabelledby === 'string' ? ariaLabelledby : undefined}>
       {panes.map((child, i) => {
         const size = measured ? paneSizes[i] : null
-        const paneStyle = getPaneStyle(size, direction, {
+        const paneStyle = getPaneStyle(size, orientation, {
           ratio: ratios[i] ?? 0,
           measured
         })
@@ -307,9 +307,9 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
             </div>
             {i < panes.length - 1 && (
               <div
-                className={getSplitterGutterClasses(direction, !!isDragging, disabled)}
+                className={getSplitterGutterClasses(orientation, !!isDragging, disabled)}
                 role="separator"
-                aria-orientation={direction === 'horizontal' ? 'vertical' : 'horizontal'}
+                aria-orientation={orientation === 'horizontal' ? 'vertical' : 'horizontal'}
                 aria-controls={paneId}
                 aria-valuemin={0}
                 aria-valuemax={100}
@@ -322,7 +322,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
                 data-gutter-index={i}
                 onPointerDown={(e) => handlePointerDown(i, e)}
                 onKeyDown={(e) => handleKeyDown(i, e)}>
-                <div className={getSplitterGutterHandleClasses(direction)} aria-hidden="true" />
+                <div className={getSplitterGutterHandleClasses(orientation)} aria-hidden="true" />
               </div>
             )}
           </React.Fragment>

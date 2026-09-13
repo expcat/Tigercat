@@ -37,7 +37,7 @@ export function OrgChart({
   nodeHeight = 72,
   levelGap = 80,
   siblingGap = 32,
-  direction = 'vertical',
+  orientation = 'vertical',
   showAvatars = true,
   showSubtitles = true,
   hoverable = false,
@@ -49,13 +49,22 @@ export function OrgChart({
   title,
   desc,
   ariaLabel,
+  locale,
+  labels: labelsOverride,
   className,
   onNodeClick,
   onNodeHover,
   onSelectedIdChange
 }: OrgChartProps): React.ReactElement {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const [innerSelectedId, setInnerSelectedId] = useState<string | number | null>(null)
   const [hoveredId, setHoveredId] = useState<string | number | null>(null)
   const resolvedSelectedId = selectedId === undefined ? innerSelectedId : selectedId
@@ -66,10 +75,10 @@ export function OrgChart({
         nodeHeight,
         levelGap,
         siblingGap,
-        direction,
+        orientation,
         colors
       }),
-    [colors, data, direction, levelGap, nodeHeight, nodeWidth, siblingGap]
+    [colors, data, orientation, levelGap, nodeHeight, nodeWidth, siblingGap]
   )
   const resolvedPadding = normalizeChartPadding(padding)
   const plotWidth = Math.max(width, layout.width + resolvedPadding.left + resolvedPadding.right)

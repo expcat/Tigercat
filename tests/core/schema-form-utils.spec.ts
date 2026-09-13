@@ -129,5 +129,8 @@ describe('schema-form helpers', () => {
   it('falls unknown widget types back to input', () => {
     expect(resolveSchemaFormWidgetType({ name: 'x' })).toBe('input')
     expect(resolveSchemaFormWidgetType({ name: 'x', type: 'textarea' })).toBe('textarea')
+    expect(resolveSchemaFormWidgetType({ name: 'x', type: 'date' })).toBe('date')
+    expect(resolveSchemaFormWidgetType({ name: 'x', type: 'tree-select' })).toBe('tree-select')
+    expect(resolveSchemaFormWidgetType({ name: 'x', type: 'mentions' as never })).toBe('input')
   })
 })

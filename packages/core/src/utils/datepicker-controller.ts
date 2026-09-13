@@ -17,16 +17,16 @@ export function coerceDatePickerSingle(raw: unknown): Date | null {
   return toCalendarDate(raw as Date | string | null | undefined)
 }
 
-export function coerceDatePickerRange(raw: unknown): DatePickerRangeTuple {
-  if (raw == null) return [null, null]
+export function coerceDatePickerRange(raw: unknown): DatePickerRangeTuple | null {
+  if (raw == null) return null
   if (!Array.isArray(raw) || raw.length !== 2) {
     devWarn('DatePicker.range', 'range={true} expects a [start, end] tuple.')
-    return [null, null]
+    return null
   }
-  return [
-    toCalendarDate(raw[0] as Date | string | null),
-    toCalendarDate(raw[1] as Date | string | null)
-  ]
+  const start = toCalendarDate(raw[0] as Date | string | null)
+  const end = toCalendarDate(raw[1] as Date | string | null)
+  if (start == null && end == null) return null
+  return [start, end]
 }
 
 export function isDatePickerRangeComplete(value: DatePickerRangeTuple): boolean {
@@ -38,6 +38,7 @@ export function isDatePickerValueEmpty(
   value: Date | null | DatePickerRangeTuple
 ): boolean {
   if (range) {
+    if (value == null) return true
     const [start, end] = value as DatePickerRangeTuple
     return start == null && end == null
   }
@@ -53,6 +54,7 @@ export function formatDatePickerDisplay(
   if (!range) {
     return value ? formatDate(value as Date, format, locale) : ''
   }
+  if (value == null) return ''
   const [start, end] = value as DatePickerRangeTuple
   const startText = start ? formatDate(start, format, locale) : ''
   const endText = end ? formatDate(end, format, locale) : ''
@@ -96,7 +98,8 @@ export function commitDatePickerDay(input: {
     return { nextCommitted: picked, nextPreview: null, close: true }
   }
 
-  const current = input.preview ?? (input.committed as DatePickerRangeTuple)
+  const current =
+    input.preview ?? (Array.isArray(input.committed) ? input.committed : [null, null])
   const [start, end] = current
   if (!start || (start && end)) {
     return { nextCommitted: input.committed, nextPreview: [picked, null], close: false }
@@ -126,6 +129,7 @@ export function parseDatePickerShortcut(
     }
     const start = toCalendarDate(raw[0] as Date | string | null)
     const end = toCalendarDate(raw[1] as Date | string | null)
+    if (start == null && end == null) return null
     return [start, end]
   }
   if (raw == null) return null
@@ -147,7 +151,7 @@ export function parseTypedDatePickerValue(
   range: boolean
 ): Date | DatePickerRangeTuple | null {
   const trimmed = text.trim()
-  if (!trimmed) return range ? [null, null] : null
+  if (!trimmed) return null
   if (!range) return parseDate(trimmed, format)
   const parts = trimmed.split(/\s+-\s+/)
   if (parts.length === 1) return [parseDate(parts[0], format), null]
@@ -159,6 +163,7 @@ export function serializeDatePickerValue(
   value: Date | null | DatePickerRangeTuple
 ): string {
   if (!range) return value ? toIsoDate(value as Date) : ''
+  if (value == null) return '|'
   const [start, end] = value as DatePickerRangeTuple
   return `${start ? toIsoDate(start) : ''}|${end ? toIsoDate(end) : ''}`
 }
@@ -167,8 +172,8 @@ export function isSamePickerDate(a: Date | null, b: Date | null): boolean {
   return isSameDay(a, b)
 }
 
-export function emptyDatePickerValue(range: boolean): Date | null | DatePickerRangeTuple {
-  return range ? [null, null] : null
+export function emptyDatePickerValue(_range: boolean): Date | null | DatePickerRangeTuple {
+  return null
 }
 
 export function formDatePickerValue(
@@ -177,6 +182,6 @@ export function formDatePickerValue(
   preview: DatePickerRangeTuple | null
 ): Date | null | DatePickerRangeTuple {
   if (!range) return value
-  if (preview && !isDatePickerRangeComplete(preview)) return [null, null]
+  if (preview && !isDatePickerRangeComplete(preview)) return null
   return value
 }

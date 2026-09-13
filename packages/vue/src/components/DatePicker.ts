@@ -251,10 +251,16 @@ export const DatePicker = defineComponent({
     }
     const calendarValue = computed(() => {
       if (!props.range) return committed.value as Date | null
-      return previewRange.value?.[0] ?? (committed.value as RangeTuple)[0] ?? null
+      return (
+        previewRange.value?.[0] ??
+        (Array.isArray(committed.value) ? committed.value[0] : null) ??
+        null
+      )
     })
     const rangeHighlight = computed(() =>
-      props.range ? (previewRange.value ?? (committed.value as RangeTuple)) : undefined
+      props.range
+        ? (previewRange.value ?? (Array.isArray(committed.value) ? committed.value : undefined))
+        : undefined
     )
     const showClear = computed(
       () =>
@@ -354,7 +360,7 @@ export const DatePicker = defineComponent({
       const parsed = parseTypedDatePickerValue(draftText.value, props.format, props.range)
       writeCommitted(
         props.range
-          ? ((parsed as RangeTuple | null) ?? [null, null])
+          ? ((parsed as RangeTuple | null) ?? null)
           : ((parsed as Date | null) ?? null)
       )
       draftText.value = null

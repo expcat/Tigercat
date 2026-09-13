@@ -120,7 +120,7 @@ export const cardHoverClasses = classNames(
 export const cardClickableClasses =
   'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
 
-export const cardDirectionClasses: Record<NonNullable<BaseLayoutProps['direction']>, string> = {
+export const cardDirectionClasses: Record<NonNullable<BaseLayoutProps['orientation']>, string> = {
   vertical: 'flex flex-col',
   horizontal: 'tiger-flex-row flex'
 } as const

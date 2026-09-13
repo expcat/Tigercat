@@ -105,10 +105,19 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   labelAutoAlign = true,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const resolvedSeries = useMemo<RadarChartSeries[]>(
     () =>
       resolveSeriesData<RadarChartDatum, RadarChartSeries>(series, data, {

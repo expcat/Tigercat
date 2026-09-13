@@ -51,7 +51,7 @@ export interface CodeEditorHandle {
   textarea: HTMLTextAreaElement | null
 }
 
-export const CodeEditor = forwardRef<HTMLTextAreaElement, CodeEditorProps>(function CodeEditor(
+export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function CodeEditor(
   {
     value: controlledValue,
     defaultValue = '',
@@ -112,7 +112,12 @@ export const CodeEditor = forwardRef<HTMLTextAreaElement, CodeEditorProps>(funct
     [mergedLocale, labelsOverride]
   )
 
-  useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement)
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      textareaRef.current?.focus()
+    },
+    textarea: textareaRef.current
+  }))
 
   useLayoutEffect(() => {
     const pending = pendingSelection.current

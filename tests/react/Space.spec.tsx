@@ -34,7 +34,7 @@ describe('Space (React)', () => {
 
   it('supports vertical direction', () => {
     const { container } = render(
-      <Space direction="vertical">
+      <Space orientation="vertical">
         <span>Item</span>
       </Space>
     )

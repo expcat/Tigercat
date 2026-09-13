@@ -62,6 +62,8 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   tooltipFormatter,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
   onHoveredIndexChange,
   onSelectedIndexChange,
@@ -69,7 +71,14 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   onArcHover
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const interactive = hoverable || selectable || Boolean(onArcClick)
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
     width,

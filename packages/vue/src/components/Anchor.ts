@@ -49,7 +49,7 @@ export const AnchorContextKey = Symbol('AnchorContext')
 
 export interface AnchorContext {
   activeLink: string
-  direction: AnchorDirection
+  orientation: AnchorDirection
   registerLink: (href: string, node: Element) => void
   unregisterLink: (href: string, node: Element) => void
   handleLinkClick: (href: string, event: Event, targetAttr?: string) => void
@@ -64,7 +64,7 @@ export interface VueAnchorProps {
   targetOffset?: number
   getCurrentAnchor?: (activeLink: string) => string
   getContainer?: ScrollRootInput
-  direction?: AnchorDirection
+  orientation?: AnchorDirection
   className?: string
   style?: Record<string, unknown>
   locale?: Partial<TigerLocale>
@@ -203,7 +203,7 @@ export const Anchor = defineComponent({
       type: [String, Object, Function] as PropType<ScrollRootInput>,
       default: undefined
     },
-    direction: {
+    orientation: {
       type: String as PropType<AnchorDirection>,
       default: 'vertical'
     },
@@ -309,7 +309,7 @@ export const Anchor = defineComponent({
       const activeLinkElement = findAnchorLinkElement(anchorRef.value, activeLink.value)
       if (!activeLinkElement) return
       const next = getAnchorInkStyle(
-        props.direction,
+        props.orientation,
         activeLinkElement.getBoundingClientRect(),
         anchorRef.value.getBoundingClientRect()
       )
@@ -327,7 +327,7 @@ export const Anchor = defineComponent({
     watch(activeLink, () => {
       nextTick(updateInkPosition)
     })
-    watch(() => props.direction, updateInkPosition)
+    watch(() => props.orientation, updateInkPosition)
     watch([links, scrollOffset, resolvedKey, () => props.bounds], () => {
       nextTick(() => setupObserver())
     })
@@ -355,16 +355,16 @@ export const Anchor = defineComponent({
 
     const contextValue = reactive<AnchorContext>({
       activeLink: '',
-      direction: props.direction,
+      orientation: props.orientation,
       registerLink,
       unregisterLink,
       handleLinkClick,
       scrollTo
     })
 
-    watch([activeLink, () => props.direction], ([newActive, newDir]) => {
+    watch([activeLink, () => props.orientation], ([newActive, newDir]) => {
       contextValue.activeLink = newActive
-      contextValue.direction = newDir
+      contextValue.orientation = newDir
     })
 
     provide(AnchorContextKey, contextValue)
@@ -381,10 +381,10 @@ export const Anchor = defineComponent({
 
       const inkIndicator = showInk.value
         ? [
-            h('div', { class: getAnchorInkContainerClasses(props.direction) }, [
+            h('div', { class: getAnchorInkContainerClasses(props.orientation) }, [
               h('div', {
                 ref: inkRef,
-                class: getAnchorInkActiveClasses(props.direction)
+                class: getAnchorInkActiveClasses(props.orientation)
               })
             ])
           ]
@@ -401,7 +401,7 @@ export const Anchor = defineComponent({
         },
         [
           ...inkIndicator,
-          h('ul', { class: getAnchorLinkListClasses(props.direction) }, slots.default?.())
+          h('ul', { class: getAnchorLinkListClasses(props.orientation) }, slots.default?.())
         ]
       )
 

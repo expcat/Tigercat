@@ -275,8 +275,6 @@ export interface TigerLocaleWorkflowDesigner {
   actorLabel?: string
   /** Actor field placeholder */
   actorPlaceholder?: string
-  /** Empty root list copy */
-  emptyText?: string
   /** Empty / invalid subpath copy */
   subpathEmpty?: string
   /** Insert a sibling after the current node */
@@ -1094,6 +1092,8 @@ export interface TigerLocaleSignature {
   ariaLabel?: string
   /** Undo-last-stroke control */
   undoText?: string
+  /** Clear-pad control. Falls back to `common.clearText`. */
+  clearText?: string
 }
 
 export interface TigerLocaleNumberKeyboard {

@@ -63,8 +63,10 @@ import { useTigerConfig } from './ConfigProvider'
 
 type RawChildren = string | number | boolean | VNode | VNodeArrayChildren
 
-export interface VueListProps extends Omit<CoreListProps, 'header' | 'footer'> {
+export interface VueListProps extends CoreListProps {
   dataSource?: ListItem[]
+  header?: unknown
+  footer?: unknown
   className?: string
   style?: Record<string, string | number>
 }
@@ -109,7 +111,9 @@ export const List = defineComponent({
     hoverable: { type: Boolean, default: false },
     className: { type: String, default: undefined },
     style: { type: Object as PropType<Record<string, string | number>>, default: undefined },
-    draggable: { type: Boolean, default: false }
+    draggable: { type: Boolean, default: false },
+    header: { type: [String, Object, Number] as PropType<unknown>, default: undefined },
+    footer: { type: [String, Object, Number] as PropType<unknown>, default: undefined }
   },
   emits: ['item-click', 'page-change', 'reorder'],
   setup(props, { emit, slots, attrs }) {
@@ -448,8 +452,12 @@ export const List = defineComponent({
           style: mergeStyleValues(attrs.style, props.style)
         },
         [
-          slots.header
-            ? h('div', { class: getListHeaderFooterClasses(props.size, false) }, slots.header())
+          slots.header || props.header != null
+            ? h(
+                'div',
+                { class: getListHeaderFooterClasses(props.size, false) },
+                slots.header ? slots.header() : (props.header as RawChildren)
+              )
             : null,
           h('div', { class: 'relative', 'aria-busy': props.loading || undefined }, [
             renderItems(),
@@ -459,8 +467,12 @@ export const List = defineComponent({
                 ])
               : null
           ]),
-          slots.footer
-            ? h('div', { class: getListHeaderFooterClasses(props.size, true) }, slots.footer())
+          slots.footer || props.footer != null
+            ? h(
+                'div',
+                { class: getListHeaderFooterClasses(props.size, true) },
+                slots.footer ? slots.footer() : (props.footer as RawChildren)
+              )
             : null,
           renderPaginationBar()
         ]

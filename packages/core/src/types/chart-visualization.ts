@@ -41,7 +41,7 @@ export interface FunnelChartProps
    * Vertical or horizontal layout. Horizontal grows along x; height follows value.
    * @default 'vertical'
    */
-  direction?: 'vertical' | 'horizontal'
+  orientation?: 'vertical' | 'horizontal'
 
   /**
    * Gap between funnel segments in px

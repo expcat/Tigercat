@@ -64,8 +64,8 @@ export const CronEditor = markFormItemGroupControl(
     name: 'TigerCronEditor',
     inheritAttrs: false,
     props: {
-      modelValue: { type: String, default: undefined },
-      defaultValue: { type: String, default: undefined },
+      modelValue: { type: String as PropType<string | null>, default: undefined },
+      defaultValue: { type: String as PropType<string | null>, default: undefined },
       disabled: { type: Boolean, default: false },
       readonly: { type: Boolean, default: false },
       size: { type: String as PropType<CronEditorSize>, default: 'md' },
@@ -85,7 +85,9 @@ export const CronEditor = markFormItemGroupControl(
         FORM_ITEM_CONTROL_INJECTION_KEY,
         null
       )
-      const innerValue = ref(props.defaultValue ?? '')
+      const innerValue = ref<string | null>(
+        props.defaultValue != null && props.defaultValue !== '' ? props.defaultValue : null
+      )
       const expressionInput = ref<HTMLInputElement | null>(null)
       const stickyModes = reactive<Partial<Record<CronFieldKey, CronFieldMode>>>({})
       const drafts = reactive<Record<CronFieldKey, CronFieldDraft>>(
@@ -125,11 +127,11 @@ export const CronEditor = markFormItemGroupControl(
       const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
 
       const expression = computed(() => {
-        if (props.modelValue !== undefined) return props.modelValue
+        if (props.modelValue !== undefined) return props.modelValue ?? ''
         if (formItemControl?.value.value !== undefined) {
           return String(formItemControl.value.value ?? '')
         }
-        return innerValue.value
+        return innerValue.value ?? ''
       })
 
       watch(
@@ -147,17 +149,18 @@ export const CronEditor = markFormItemGroupControl(
       const fieldsReady = computed(() => isCronFieldCountValid(expression.value))
 
       function writeValue(nextValue: string) {
+        const stored = nextValue.trim() === '' ? null : nextValue
         const nextValidation = validateCronExpressionWithLabels(
-          nextValue,
+          stored ?? '',
           labels.value,
           fieldLabels.value
         )
-        if (props.modelValue === undefined) innerValue.value = nextValue
-        emit('update:modelValue', nextValue)
-        emit('input', nextValue)
-        emit('change', nextValue, nextValidation)
+        if (props.modelValue === undefined) innerValue.value = stored
+        emit('update:modelValue', stored)
+        emit('input', stored)
+        emit('change', stored, nextValidation)
         emit('validate', nextValidation)
-        formItemControl?.onChange(nextValue)
+        formItemControl?.onChange(stored)
       }
 
       function handleRawExpressionChange(nextValue: string) {

@@ -196,7 +196,7 @@ describe('Carousel', () => {
     it('moves with keyboard and reverses arrows in rtl', () => {
       const ltrChange = vi.fn()
       const ltr = render(
-        <ConfigProvider direction="ltr">
+        <ConfigProvider dir="ltr">
           <Carousel onChange={ltrChange}>{slides()}</Carousel>
         </ConfigProvider>
       )
@@ -210,7 +210,7 @@ describe('Carousel', () => {
 
       const rtlChange = vi.fn()
       const rtl = render(
-        <ConfigProvider direction="rtl">
+        <ConfigProvider dir="rtl">
           <Carousel onChange={rtlChange}>{slides()}</Carousel>
         </ConfigProvider>
       )

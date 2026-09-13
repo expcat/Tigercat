@@ -45,7 +45,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   padding = 24,
   responsive = false,
   data,
-  direction = 'vertical',
+  orientation = 'vertical',
   gap = 2,
   pinch = false,
   colors,
@@ -65,6 +65,8 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   tooltipFormatter,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
   onHoveredIndexChange,
   onSelectedIndexChange,
@@ -72,7 +74,14 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   onSegmentHover
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const interactive = hoverable || selectable || Boolean(onSegmentClick)
   const {
     tooltipPosition,
@@ -122,9 +131,9 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         gap,
         pinch,
         colors: palette,
-        direction
+        orientation
       }),
-    [data, innerRect.width, innerRect.height, gap, pinch, palette, direction]
+    [data, innerRect.width, innerRect.height, gap, pinch, palette, orientation]
   )
   const total = useMemo(() => segments.reduce((sum, segment) => sum + segment.value, 0), [segments])
   const stageName = useCallback(
@@ -195,10 +204,10 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               key={`grad-${seg.index}`}
               id={`${gradientPrefix}-${seg.index}`}
               gradientUnits="userSpaceOnUse"
-              x1={direction === 'horizontal' ? 0 : 0}
+              x1={orientation === 'horizontal' ? 0 : 0}
               y1={0}
-              x2={direction === 'horizontal' ? innerRect.width : 0}
-              y2={direction === 'horizontal' ? 0 : innerRect.height}>
+              x2={orientation === 'horizontal' ? innerRect.width : 0}
+              y2={orientation === 'horizontal' ? 0 : innerRect.height}>
               <stop offset="0%" stopColor={seg.color} stopOpacity={1} />
               <stop offset="100%" stopColor={seg.color} stopOpacity={0.55} />
             </linearGradient>

@@ -40,8 +40,8 @@ export type DragAxis = 'x' | 'y'
  * Configuration for drag behavior
  */
 export interface DragConfig {
-  /** Direction of drag — defaults to 'vertical' */
-  direction?: DragDirection
+  /** Axis of drag — defaults to 'vertical' */
+  axis?: DragDirection
   /** CSS selector for the drag handle (if omitted, the whole item is draggable) */
   handleSelector?: string
   /** Extra class appended to the dragged element */
@@ -50,15 +50,15 @@ export interface DragConfig {
   disabled?: boolean
   /** Whether to allow cross-container drag */
   crossContainer?: boolean
-  /** Lock axis — omit when `direction` is `'both'` */
+  /** Lock axis — omit when `axis` is `'both'` */
   lockAxis?: DragAxis
   /** Minimum distance (px) before a pointer session emits `onMove` */
   dragThreshold?: number
 }
 
-/** `DragConfig` with defaults applied. `lockAxis` stays unset for `direction: 'both'`. */
+/** `DragConfig` with defaults applied. `lockAxis` stays unset for `axis: 'both'`. */
 export interface ResolvedDragConfig {
-  direction: DragDirection
+  axis: DragDirection
   handleSelector: string
   dragClass: string
   disabled: boolean

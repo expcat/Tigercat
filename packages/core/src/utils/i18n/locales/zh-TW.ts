@@ -162,7 +162,6 @@ export const zhTW: TigerLocale = {
     signModeLabel: '簽核方式',
     actorLabel: '處理人',
     actorPlaceholder: '處理人姓名',
-    emptyText: '尚無步驟。新增發起節點開始設計。',
     subpathEmpty: '此路徑下沒有子樹。',
     insertSibling: '在後方插入',
     editPanelAriaLabel: '節點設定',
@@ -690,7 +689,8 @@ export const zhTW: TigerLocale = {
   },
   signature: {
     ariaLabel: '簽名板',
-    undoText: '復原'
+    undoText: '復原',
+    clearText: '清除'
   },
   numberKeyboard: {
     ariaLabel: '數字鍵盤',

@@ -82,10 +82,10 @@ export interface RadioGroupProps {
   size?: ComponentSize
 
   /**
-   * Layout direction
+   * Layout orientation
    * @default 'vertical'
    */
-  direction?: ChoiceGroupDirection
+  orientation?: ChoiceGroupDirection
 
   /**
    * Option list. Ignored when children / default slot are present.

@@ -6,7 +6,8 @@ import React, {
   useMemo,
   useContext,
   useCallback,
-  useId
+  useId,
+  useImperativeHandle
 } from 'react'
 import {
   applyImageLoadError,
@@ -94,7 +95,11 @@ const LoadingSpinner: React.FC = () => (
   </svg>
 )
 
-export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
+export interface ImageHandle {
+  img: HTMLImageElement | null
+}
+
+export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
   {
     src,
     alt = '',
@@ -130,10 +135,13 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
   const labels = useMemo(() => getImageLabels(config.locale), [config.locale])
   const [loadState, setLoadState] = useState(() => createImageLoadState(src, lazy))
   const [previewVisible, setPreviewVisible] = useState(false)
+  const imgRef = useRef<HTMLImageElement | null>(null)
   const containerRef = useRef<HTMLElement | null>(null)
   const inViewRef = useRef(!lazy)
   const group = useContext(ImageGroupContext)
   const instanceId = useId()
+
+  useImperativeHandle(forwardedRef, () => ({ img: imgRef.current }))
 
   const previewEnabled = resolveImagePreviewEnabled(preview, group?.preview)
   const hoverPreviewEnabled = isImageHoverPreviewEnabled(
@@ -307,7 +315,7 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
     content = (
       <>
         <img
-          ref={forwardedRef}
+          ref={imgRef}
           src={loadState.actualSrc}
           alt={previewEnabled ? '' : alt}
           className={imgClasses}

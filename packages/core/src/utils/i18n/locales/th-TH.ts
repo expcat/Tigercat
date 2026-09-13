@@ -162,7 +162,6 @@ export const thTH: TigerLocale = {
     signModeLabel: 'โหมดลงนาม',
     actorLabel: 'ผู้ดำเนินการ',
     actorPlaceholder: 'ชื่อผู้ดำเนินการ',
-    emptyText: 'ยังไม่มีขั้นตอน เพิ่มโหนดเริ่มต้นเพื่อเริ่มออกแบบ',
     subpathEmpty: 'ไม่มีต้นไม้ย่อยที่เส้นทางนี้',
     insertSibling: 'แทรกด้านหลัง',
     editPanelAriaLabel: 'การตั้งค่าโหนด',
@@ -690,7 +689,8 @@ export const thTH: TigerLocale = {
   },
   signature: {
     ariaLabel: 'แผ่นลายเซ็น',
-    undoText: 'เลิกทำ'
+    undoText: 'เลิกทำ',
+    clearText: 'ล้าง'
   },
   numberKeyboard: {
     ariaLabel: 'แป้นตัวเลข',

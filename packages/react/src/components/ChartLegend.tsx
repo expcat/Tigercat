@@ -23,13 +23,22 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
   gap = 8,
   interactive = false,
   ariaLabel,
+  locale,
+  labels: labelsOverride,
   className,
   onItemClick,
   onItemHover,
   onItemLeave
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const resolvedAriaLabel = ariaLabel ?? labels.legendAriaLabel
   const containerClasses = useMemo(
     () =>

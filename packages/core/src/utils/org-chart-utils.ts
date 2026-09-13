@@ -8,7 +8,7 @@ export interface OrgChartLayoutOptions {
   nodeHeight?: number
   levelGap?: number
   siblingGap?: number
-  direction?: OrgChartDirection
+  orientation?: OrgChartDirection
   colors?: string[]
 }
 
@@ -88,9 +88,9 @@ export function getOrgChartNodeAriaLabel(node: OrgChartNode): string {
 
 export function getOrgChartLinkPath(
   link: Omit<OrgChartLayoutLink, 'path'>,
-  direction: OrgChartDirection = 'vertical'
+  orientation: OrgChartDirection = 'vertical'
 ): string {
-  if (direction === 'horizontal') {
+  if (orientation === 'horizontal') {
     const midX = link.sourceX + (link.targetX - link.sourceX) / 2
     return `M ${link.sourceX} ${link.sourceY} L ${midX} ${link.sourceY} L ${midX} ${link.targetY} L ${link.targetX} ${link.targetY}`
   }
@@ -107,7 +107,7 @@ export function computeOrgChartLayout(
     nodeHeight = 72,
     levelGap = 80,
     siblingGap = 32,
-    direction = 'vertical',
+    orientation = 'vertical',
     colors = DEFAULT_CHART_COLORS
   } = options
   const roots = normalizeOrgChartData(data)
@@ -123,7 +123,7 @@ export function computeOrgChartLayout(
       nodeHeight,
       levelGap,
       siblingGap,
-      direction,
+      orientation,
       nextLeaf: () => nextLeaf,
       setNextLeaf: (next) => {
         nextLeaf = next
@@ -158,7 +158,7 @@ export function computeOrgChartLayout(
 
     item.children.forEach((child) => {
       const link =
-        direction === 'horizontal'
+        orientation === 'horizontal'
           ? {
               sourceId: item.node.id,
               targetId: child.node.id,
@@ -175,7 +175,7 @@ export function computeOrgChartLayout(
               targetX: child.x + nodeWidth / 2,
               targetY: child.y
             }
-      links.push({ ...link, path: getOrgChartLinkPath(link, direction) })
+      links.push({ ...link, path: getOrgChartLinkPath(link, orientation) })
       visit(child, indexRef)
     })
   }
@@ -185,13 +185,13 @@ export function computeOrgChartLayout(
 
   const leafSpan = nextLeaf - siblingGap
   const stackSpan =
-    (maxDepth + 1) * (direction === 'horizontal' ? nodeWidth : nodeHeight) + maxDepth * levelGap
+    (maxDepth + 1) * (orientation === 'horizontal' ? nodeWidth : nodeHeight) + maxDepth * levelGap
 
   return {
     nodes,
     links,
-    width: direction === 'horizontal' ? stackSpan : Math.max(0, leafSpan),
-    height: direction === 'horizontal' ? Math.max(0, leafSpan) : stackSpan,
+    width: orientation === 'horizontal' ? stackSpan : Math.max(0, leafSpan),
+    height: orientation === 'horizontal' ? Math.max(0, leafSpan) : stackSpan,
     depth: maxDepth + 1
   }
 }
@@ -207,7 +207,7 @@ function layoutSubtree(
     nodeHeight: number
     levelGap: number
     siblingGap: number
-    direction: OrgChartDirection
+    orientation: OrgChartDirection
     nextLeaf: () => number
     setNextLeaf: (next: number) => void
     setMaxDepth: (depth: number) => void
@@ -229,7 +229,7 @@ function layoutSubtree(
   context.setMaxDepth(depth)
   const children = node.children ?? []
   const alongStack =
-    context.direction === 'horizontal'
+    context.orientation === 'horizontal'
       ? depth * (context.nodeWidth + context.levelGap)
       : depth * (context.nodeHeight + context.levelGap)
 
@@ -237,15 +237,15 @@ function layoutSubtree(
     const alongSiblings = context.nextLeaf()
     context.setNextLeaf(
       alongSiblings +
-        (context.direction === 'horizontal' ? context.nodeHeight : context.nodeWidth) +
+        (context.orientation === 'horizontal' ? context.nodeHeight : context.nodeWidth) +
         context.siblingGap
     )
     context.visiting.delete(key)
     return {
       node,
       depth,
-      x: context.direction === 'horizontal' ? alongStack : alongSiblings,
-      y: context.direction === 'horizontal' ? alongSiblings : alongStack,
+      x: context.orientation === 'horizontal' ? alongStack : alongSiblings,
+      y: context.orientation === 'horizontal' ? alongSiblings : alongStack,
       parentId,
       children: []
     }
@@ -259,21 +259,21 @@ function layoutSubtree(
     const alongSiblings = context.nextLeaf()
     context.setNextLeaf(
       alongSiblings +
-        (context.direction === 'horizontal' ? context.nodeHeight : context.nodeWidth) +
+        (context.orientation === 'horizontal' ? context.nodeHeight : context.nodeWidth) +
         context.siblingGap
     )
     return {
       node,
       depth,
-      x: context.direction === 'horizontal' ? alongStack : alongSiblings,
-      y: context.direction === 'horizontal' ? alongSiblings : alongStack,
+      x: context.orientation === 'horizontal' ? alongStack : alongSiblings,
+      y: context.orientation === 'horizontal' ? alongSiblings : alongStack,
       parentId,
       children: []
     }
   }
   const first = childLayouts[0]
   const last = childLayouts[childLayouts.length - 1]
-  if (context.direction === 'horizontal') {
+  if (context.orientation === 'horizontal') {
     const y = first.y + (last.y - first.y) / 2
     return { node, depth, x: alongStack, y, parentId, children: childLayouts }
   }

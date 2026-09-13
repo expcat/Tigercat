@@ -14,7 +14,7 @@ export type SpaceProps = CoreSpaceProps &
 
 export const Space = forwardRef<HTMLDivElement, SpaceProps>(function Space(
   {
-    direction = 'horizontal',
+    orientation = 'horizontal',
     size = 'md',
     align = 'start',
     wrap = false,
@@ -32,7 +32,7 @@ export const Space = forwardRef<HTMLDivElement, SpaceProps>(function Space(
       {...props}
       ref={ref}
       data-tiger-space=""
-      className={getSpaceClasses({ direction, size, align, wrap }, className)}
+      className={getSpaceClasses({ orientation, size, align, wrap }, className)}
       style={gapStyle ? { ...gapStyle, ...style } : style}>
       {children}
     </div>

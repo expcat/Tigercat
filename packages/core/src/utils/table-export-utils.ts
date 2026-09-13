@@ -7,8 +7,16 @@
 
 import type { TableColumn } from '../types/table'
 import { getTableColumnDataKey } from './table-utils'
-import { escapeCsvValue, resolveDataExportFilename } from './data-export-value'
+import {
+  escapeCsvValue,
+  resolveDataExportColumns,
+  resolveDataExportFilename
+} from './data-export-value'
 import { downloadBrowserFile } from './file-utils'
+
+export interface TableCsvExportOptions {
+  hiddenColumnKeys?: Iterable<string>
+}
 
 export { escapeCsvValue }
 
@@ -21,13 +29,19 @@ function withCsvExtension(filename: string): string {
 /**
  * Export table data to a CSV string (UTF-8 BOM + CRLF).
  *
- * Cell values use `dataKey || key`. `filename` is ignored — pass it to
- * {@link downloadCsv}.
+ * Uses the same skip rules as DataExport: `hiddenColumnKeys` and render-only
+ * columns without a record field are omitted. Cell values use `dataKey || key`.
+ * `filename` is ignored — pass it to {@link downloadCsv}.
  */
-export function exportTableToCsv<T>(columns: TableColumn<T>[], data: T[]): string {
-  const headers = columns.map((col) => escapeCsvValue(col.title))
+export function exportTableToCsv<T>(
+  columns: TableColumn<T>[],
+  data: T[],
+  options?: TableCsvExportOptions
+): string {
+  const exportColumns = resolveDataExportColumns(columns, data, options?.hiddenColumnKeys)
+  const headers = exportColumns.map((col) => escapeCsvValue(col.title))
   const rows = data.map((record) =>
-    columns
+    exportColumns
       .map((col) => {
         const value = (record as Record<string, unknown>)[getTableColumnDataKey(col)]
         return escapeCsvValue(value)
@@ -38,8 +52,12 @@ export function exportTableToCsv<T>(columns: TableColumn<T>[], data: T[]): strin
   return `${CSV_BOM}${[headers.join(','), ...rows].join('\r\n')}`
 }
 
-export function exportTableData<T>(columns: TableColumn<T>[], data: T[]): string {
-  return exportTableToCsv(columns, data)
+export function exportTableData<T>(
+  columns: TableColumn<T>[],
+  data: T[],
+  options?: TableCsvExportOptions
+): string {
+  return exportTableToCsv(columns, data, options)
 }
 
 /**

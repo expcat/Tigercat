@@ -162,7 +162,6 @@ export const jaJP: TigerLocale = {
     signModeLabel: '承認方式',
     actorLabel: '担当者',
     actorPlaceholder: '担当者名',
-    emptyText: 'ステップがありません。開始ノードを追加してください。',
     subpathEmpty: 'このパスに部分ツリーはありません。',
     insertSibling: '後ろに挿入',
     editPanelAriaLabel: 'ノード設定',
@@ -690,7 +689,8 @@ export const jaJP: TigerLocale = {
   },
   signature: {
     ariaLabel: '署名パッド',
-    undoText: '元に戻す'
+    undoText: '元に戻す',
+    clearText: 'クリア'
   },
   numberKeyboard: {
     ariaLabel: '数字キーボード',

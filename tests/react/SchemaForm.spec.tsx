@@ -190,6 +190,18 @@ describe('SchemaForm (React)', () => {
     expect(screen.getByRole('button', { name: '重置' })).toBeInTheDocument()
   })
 
+  it('renders date widgets from the schema union', () => {
+    render(
+      <SchemaForm
+        schema={{
+          fields: [{ name: 'due', label: 'Due', type: 'date', placeholder: 'Pick a day' }]
+        }}
+        showActions={false}
+      />
+    )
+    expect(screen.getByPlaceholderText('Pick a day')).toBeInTheDocument()
+  })
+
   it('has no obvious a11y violations', async () => {
     const { container } = render(<SchemaForm schema={basicSchema} />)
     await expectNoA11yViolations(container)

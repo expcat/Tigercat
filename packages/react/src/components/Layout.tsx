@@ -25,14 +25,14 @@ function childrenHaveSider(children: React.ReactNode): boolean {
 }
 
 export const Layout = forwardRef<HTMLDivElement, ReactLayoutProps>(function Layout(
-  { className, children, hasSider, direction, fullHeight = false, style, ...props },
+  { className, children, hasSider, mode, fullHeight = false, style, ...props },
   ref
 ) {
   injectLayoutGridStyles()
   const parent = useContext(LayoutContext)
   const nested = parent != null
   const childIsSider = childrenHaveSider(children)
-  const resolvedHasSider = resolveLayoutHasSider({ hasSider, direction, childIsSider })
+  const resolvedHasSider = resolveLayoutHasSider({ hasSider, mode, childIsSider })
   const [siderCollapsed, setSiderCollapsedState] = useState(false)
   const [contentEl, setContentElState] = useState<HTMLElement | null>(null)
 

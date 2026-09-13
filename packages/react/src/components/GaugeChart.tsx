@@ -7,6 +7,8 @@ import {
   getStableChartGradientPrefix,
   chartAxisTickTextClasses,
   getCartesianChartShellClasses,
+  getChartLabels,
+  mergeTigerLocale,
   DEFAULT_GAUGE_END_ANGLE,
   DEFAULT_GAUGE_HEIGHT,
   DEFAULT_GAUGE_START_ANGLE,
@@ -17,6 +19,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface GaugeChartProps extends CoreGaugeChartProps {
   padding?: ChartPadding
@@ -46,8 +49,15 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   showTooltip = true,
   title: chartTitle,
   desc,
+  locale,
+  labels: labelsOverride,
   className
 }) => {
+  const config = useTigerConfig()
+  useMemo(
+    () => getChartLabels(mergeTigerLocale(config.locale, locale), labelsOverride),
+    [config.locale, locale, labelsOverride]
+  )
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
     width,
     height,

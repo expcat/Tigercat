@@ -128,7 +128,7 @@ const directionOptions = [
     :locale="locale"
     :theme="theme"
     :color-scheme="colorScheme"
-    :direction="direction">
+    :dir="direction">
     <div style="display: grid; gap: 16px; max-width: 560px">
       <p style="margin: 0; font-size: 13px; color: var(--tiger-text-secondary)">
         {{ copy.caption }}

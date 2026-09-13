@@ -2,6 +2,8 @@
  * Marquee component types and interfaces
  */
 
+import type { TigerLocale, TigerLocaleMarquee } from './locale'
+
 /**
  * Scroll direction. Horizontal `left` / `right` follow the inline axis
  * (`left` toward inline-start, `right` toward inline-end). `up` / `down`
@@ -104,10 +106,14 @@ export interface MarqueeProps {
   repeat?: number
 
   /**
-   * Accessible name for the region. Omitted or blank: not a landmark.
-   * Pass `aria-label` / `aria-labelledby` the same way.
+   * Accessible name for the region. Overlay: dedicated `ariaLabel` /
+   * `aria-label` → `labels` → `locale.marquee.ariaLabel`. Omitted or blank:
+   * not a landmark.
    */
   ariaLabel?: string
+  /** Locale object merged on top of ConfigProvider. */
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleMarquee>
 
   /**
    * Additional CSS classes on the root

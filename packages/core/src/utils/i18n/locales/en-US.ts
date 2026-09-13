@@ -161,7 +161,6 @@ export const enUS: TigerLocale = {
     signModeLabel: 'Sign mode',
     actorLabel: 'Actor',
     actorPlaceholder: 'Actor name',
-    emptyText: 'No steps yet. Add a start node to begin.',
     subpathEmpty: 'No subtree at this path.',
     insertSibling: 'Insert after',
     editPanelAriaLabel: 'Node settings',
@@ -690,7 +689,8 @@ export const enUS: TigerLocale = {
   },
   signature: {
     ariaLabel: 'Signature pad',
-    undoText: 'Undo'
+    undoText: 'Undo',
+    clearText: 'Clear'
   },
   numberKeyboard: {
     ariaLabel: 'Number keyboard',

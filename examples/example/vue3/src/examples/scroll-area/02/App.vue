@@ -10,7 +10,7 @@ const rows = Array.from({ length: 12 }, (_, row) => ({
 <template>
   <div class="w-full max-w-md">
     <ScrollArea
-      direction="both"
+      axis="both"
       scrollbar="always"
       scrollbar-size="lg"
       :max-height="200"

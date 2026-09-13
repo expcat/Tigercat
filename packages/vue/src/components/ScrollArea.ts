@@ -65,7 +65,7 @@ export const ScrollArea = defineComponent({
   name: 'TigerScrollArea',
   inheritAttrs: false,
   props: {
-    direction: {
+    axis: {
       type: String as PropType<ScrollAreaDirection>,
       default: 'vertical' as ScrollAreaDirection
     },
@@ -239,7 +239,7 @@ export const ScrollArea = defineComponent({
       window.clearTimeout(scrollTimer)
     })
     watch(
-      () => [props.direction, props.minThumbSize],
+      () => [props.axis, props.minThumbSize],
       () => {
         void nextTick(syncState)
       }
@@ -257,20 +257,20 @@ export const ScrollArea = defineComponent({
 
     function renderScrollbar(axis: ScrollAreaAxis) {
       const axisState = axis === 'y' ? scrollState.value.y : scrollState.value.x
-      if (!shouldRenderScrollAreaScrollbar(props.scrollbar, props.direction, axis, axisState)) {
+      if (!shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, axis, axisState)) {
         return null
       }
       const otherVisible =
         axis === 'y'
           ? shouldRenderScrollAreaScrollbar(
               props.scrollbar,
-              props.direction,
+              props.axis,
               'x',
               scrollState.value.x
             )
           : shouldRenderScrollAreaScrollbar(
               props.scrollbar,
-              props.direction,
+              props.axis,
               'y',
               scrollState.value.y
             )
@@ -304,13 +304,13 @@ export const ScrollArea = defineComponent({
     return () => {
       const visibleY = shouldRenderScrollAreaScrollbar(
         props.scrollbar,
-        props.direction,
+        props.axis,
         'y',
         scrollState.value.y
       )
       const visibleX = shouldRenderScrollAreaScrollbar(
         props.scrollbar,
-        props.direction,
+        props.axis,
         'x',
         scrollState.value.x
       )
@@ -339,7 +339,7 @@ export const ScrollArea = defineComponent({
         ...rootAttrs
       } = attrs as Record<string, unknown>
       const shadows = props.shadow
-        ? getScrollAreaShadowSides(scrollState.value, props.direction)
+        ? getScrollAreaShadowSides(scrollState.value, props.axis)
         : []
 
       const restRoot: Record<string, unknown> = {}
@@ -363,7 +363,7 @@ export const ScrollArea = defineComponent({
             'div',
             {
               ref: viewportRef,
-              class: getScrollAreaViewportClasses(props.direction, props.viewportClassName),
+              class: getScrollAreaViewportClasses(props.axis, props.viewportClassName),
               style: {
                 ...getScrollAreaBoxStyle(props),
                 ...getScrollAreaGutterStyle(props.scrollbarSize, visibleX, visibleY)
@@ -379,7 +379,7 @@ export const ScrollArea = defineComponent({
                 if (!viewport) return
                 const delta = computeScrollAreaKeyboardDelta(
                   event.key,
-                  props.direction,
+                  props.axis,
                   { width: viewport.clientWidth, height: viewport.clientHeight },
                   readInlineDirection(viewport)
                 )
@@ -411,7 +411,7 @@ export const ScrollArea = defineComponent({
                 'div',
                 {
                   ref: contentRef,
-                  class: getScrollAreaContentClasses(props.direction),
+                  class: getScrollAreaContentClasses(props.axis),
                   'data-scroll-area-content': ''
                 },
                 slots.default?.()

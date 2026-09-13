@@ -35,7 +35,7 @@ export interface OrgChartProps
    * `horizontal` is left-to-right. Cards keep `nodeWidth` × `nodeHeight`.
    * @default 'vertical'
    */
-  direction?: OrgChartDirection
+  orientation?: OrgChartDirection
   showAvatars?: boolean
   showSubtitles?: boolean
   colors?: string[]

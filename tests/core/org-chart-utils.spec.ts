@@ -90,7 +90,7 @@ describe('org-chart-utils', () => {
       nodeHeight: 40,
       levelGap: 60,
       siblingGap: 20,
-      direction: 'horizontal'
+      orientation: 'horizontal'
     })
 
     const ceo = layout.nodes.find((node) => node.id === 'ceo')!
@@ -102,8 +102,8 @@ describe('org-chart-utils', () => {
     expect(layout.links[0].targetX).toBe(eng.x)
   })
 
-  it('keeps default nodeWidth x nodeHeight when direction is horizontal', () => {
-    const layout = computeOrgChartLayout(orgData, { direction: 'horizontal' })
+  it('keeps default nodeWidth x nodeHeight when orientation is horizontal', () => {
+    const layout = computeOrgChartLayout(orgData, { orientation: 'horizontal' })
 
     expect(layout.nodes.every((node) => node.width === 160 && node.height === 72)).toBe(true)
     expect(layout.nodes.some((node) => node.width === 72 && node.height === 160)).toBe(false)

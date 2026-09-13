@@ -24,8 +24,8 @@ export interface InfiniteScrollProps {
   loadingText?: string
   /** Custom end text shown when !hasMore */
   endText?: string
-  /** Scroll direction */
-  direction?: 'vertical' | 'horizontal'
+  /** Scroll orientation */
+  orientation?: 'vertical' | 'horizontal'
   /** Inverse scroll (load at the start edge, e.g. chat history) */
   inverse?: boolean
   /** Disable the infinite scroll trigger */

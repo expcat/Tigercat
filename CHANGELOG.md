@@ -4,9 +4,9 @@
 
 ## 未发布
 
-## v3.0.0
+## v2.9.0
 
-v3.0.0：深检完美重审 breaking。不是 BPMN / Flowable / Camunda。Vue/React 对称。迁移见 [docs/MIGRATION.md](docs/MIGRATION.md#v300)。
+v2.9.0：深检完美重审 breaking（含此前 additive 补齐）。不是 BPMN / Flowable / Camunda。Vue/React 对称。迁移见 [docs/MIGRATION.md](docs/MIGRATION.md#v290)。
 
 - **Form / SchemaForm**：Vue 值对象改为 `modelValue`（`v-model`），删除 `model` / `update:model`。React 改为 `value` + `onChange`，删除 `model`。SchemaForm 非受控种子改为 `defaultValue`（原 `defaultModel`）。
 - **Input / Textarea（React）**：`onChange` 改为值（string/number），不再发 DOM 事件。原生事件走 `onInput`。
@@ -24,11 +24,17 @@ v3.0.0：深检完美重审 breaking。不是 BPMN / Flowable / Camunda。Vue/Re
 - **VirtualTable**：缺少 `id` 时回落到 dataSource 下标，选择仍可用。
 - **DataExport**：默认 formats 含 csv；下拉触发器绑定 `triggerAriaLabel`；`customExport` 可替换内置序列化。
 - **Popover（React）**：节点内容走 `content`，删除 `contentContent`。
-- **SchemaForm**：Vue 根就是 Form（`data-tiger-schema-form` 打在 form 上）；`source` 跑 `mapIn`。
+- **SchemaForm**：Vue 根就是 Form（`data-tiger-schema-form` 打在 form 上）；`source` 跑 `mapIn`。Widget 并集含 date/time/cascader/tree-select/slider/upload/color/rate/tags。
+- **空值**：DatePicker 空范围是 `null`；Cascader 受控空是 `[]`；ColorPicker / CronEditor 清空是 `null`。
+- **direction**：布局/步进/图用 `orientation`，Layout 用 `mode`，ScrollArea/Drag 用 `axis`，ConfigProvider 用 `dir`。Table 排序仍是 `direction: asc|desc`。
+- **Locale**：Marquee 读 `ariaLabel`；Designer 删除未绑定的 `emptyText`；Signature 增加 `clearText`。
+- **框架映射**：TaskBoard `renderCard` 上下文对象；Vue CollapsePanel `extra` 与 List `header`/`footer` 是 prop（slot 优先）；ConfigProvider 不再把 attrs 沉到 `div.contents`。
+- **图表**：全部公开图接受 `locale` / `labels`。
+- **ref**：Image / CodeEditor / CropUpload / Tour / Affix / Anchor 的 React ref 与 Vue expose 同一 handle。
+- **Masonry**：首屏宽度两侧都是 0，直到 ResizeObserver。
+- **Table CSV**：与 DataExport 相同的 skip 规则（render-only、hiddenColumnKeys）。
 
-## v2.9.0
-
-v2.9.0：深检 additive 补齐。无新必填 prop。公开别名仍可 import。不是 BPMN / Flowable / Camunda。Vue/React 对称。
+深检 additive 补齐（同轮）：无新必填 prop。公开别名在 breaking 删除前列仍可 import。
 
 - **文档**：compact Default 列补上运行时默认（Select `multiple` false、List 分页关、Table 分页开、ImagePreview `open` 关等）；PrintPageBreak Vue 不再写成纯透传。`COMPONENT_USAGE_NOTES` 收进审计 traps（FormItem 写而不读、Table/List 分页、Tree vs TreeSelect `checkStrictly`、DatePicker/TimePicker 空范围、size 三套字符串等）。`patterns/common.md` 增加框架差异表。
 - **示例**：WorkflowTimeline / Viewer / DetailShell playground 从 `timeline/04`–`06` 迁到 `workflow-timeline` / `workflow-viewer` / `workflow-detail-shell`。Timeline 01–03 仍是骨架时间线。Vue/React 对称。

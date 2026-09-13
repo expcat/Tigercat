@@ -4,7 +4,7 @@ export default function App() {
   return (
     <div className="flex flex-col gap-3">
       <Splitter
-        direction="vertical"
+        orientation="vertical"
         sizes={['40%', '60%']}
         style={{ height: 220, border: '1px solid var(--tiger-border, #e5e7eb)', borderRadius: 8 }}>
         <div className="p-4">上方面板</div>

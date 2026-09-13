@@ -28,14 +28,14 @@ export default function App() {
           封面走节点；点查看/分享不会点到卡片。
         </p>
       </Card>
-      <Card variant="bordered" direction="horizontal" cover={cover} coverAlt="">
+      <Card variant="bordered" orientation="horizontal" cover={cover} coverAlt="">
         <h3 className="font-semibold">横向布局</h3>
         <p className="text-sm text-gray-600 dark:text-gray-300">
           封面在 inline-start（LTR 左侧，RTL 右侧）。
         </p>
       </Card>
       <div dir="rtl" className="sm:col-span-2">
-        <Card variant="bordered" direction="horizontal" cover={cover} coverAlt="">
+        <Card variant="bordered" orientation="horizontal" cover={cover} coverAlt="">
           <h3 className="font-semibold">RTL</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">dir=rtl 时封面在右侧。</p>
         </Card>

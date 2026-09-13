@@ -12,7 +12,7 @@ describe('radio group helpers', () => {
   })
 
   it('switches to horizontal layout without dropping user class', () => {
-    const classes = getChoiceGroupClasses({ direction: 'horizontal', className: 'mt-4' })
+    const classes = getChoiceGroupClasses({ orientation: 'horizontal', className: 'mt-4' })
     expect(classes.split(/\s+/)).toEqual(
       expect.arrayContaining(['flex', 'flex-row', 'flex-wrap', 'gap-2', 'mt-4'])
     )

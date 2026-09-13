@@ -36,7 +36,7 @@ export interface ConfigProviderProps {
    * Explicit text direction. Wins over the locale object's `direction` and
    * over language-id inference.
    */
-  direction?: TigerLocaleDirection
+  dir?: TigerLocaleDirection
 
   /**
    * Built-in or registered theme name. Applied to the document by the

@@ -84,10 +84,10 @@ export interface CheckboxGroupProps {
   size?: ComponentSize
 
   /**
-   * Layout direction
+   * Layout orientation
    * @default 'vertical'
    */
-  direction?: ChoiceGroupDirection
+  orientation?: ChoiceGroupDirection
 
   /**
    * Validation status

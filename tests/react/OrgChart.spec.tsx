@@ -77,7 +77,7 @@ describe('OrgChart', () => {
   })
 
   it('supports horizontal direction', () => {
-    const { container } = render(<OrgChart data={data} direction="horizontal" />)
+    const { container } = render(<OrgChart data={data} orientation="horizontal" />)
 
     expect(container.querySelector('[data-series-type="org-chart"]')).toBeInTheDocument()
     const nodeRect = container.querySelector('[data-org-chart-nodes="true"] > g > rect')

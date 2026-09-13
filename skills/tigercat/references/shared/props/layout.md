@@ -27,12 +27,12 @@ Note: 根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `ove
 
 Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。
 
-| Prop         | Type                           | Default      | Notes                                                                                      |
-| ------------ | ------------------------------ | ------------ | ------------------------------------------------------------------------------------------ |
-| `hoverable?` | `boolean`                      | `false`      | Visual lift on hover. Does not make the card a control; pass `onClick` or `href` for that. |
-| `direction?` | `BaseLayoutProps['direction']` | `'vertical'` | Card layout direction                                                                      |
-| `cover?`     | `string`                       | `-`          | Cover image URL. Framework layers also accept a custom node / `#cover` slot.               |
-| `coverAlt?`  | `string`                       | `''`         | Accessible name for a URL cover. Empty by default (decorative).                            |
+| Prop         | Type      | Default | Notes                                                                                      |
+| ------------ | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `hoverable?` | `boolean` | `false` | Visual lift on hover. Does not make the card a control; pass `onClick` or `href` for that. |
+| `cover?`     | `string`  | `-`     | Cover image URL. Framework layers also accept a custom node / `#cover` slot.               |
+| `coverAlt?`  | `string`  | `''`    | Accessible name for a URL cover. Empty by default (decorative).                            |
+| `href?`      | `string`  | `-`     | When set, the root is a link (`<a>` unless nested actions force a role).                   |
 
 ## Carousel
 
@@ -126,11 +126,11 @@ Note: 未传 `height` 时默认 `h-16`，不写 inline height。`translucent` / 
 
 Note: 默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSider` / `direction="horizontal"`）时改横排。嵌套内层 `flex-1 min-h-0`，`fullHeight` 只作用在最外层。
 
-| Prop          | Type              | Default | Notes                                                                                      |
-| ------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `hasSider?`   | `boolean`         | `-`     | Treat this Layout as having a sider even if Sidebar is wrapped. Omit to detect a direct... |
-| `fullHeight?` | `boolean`         | `false` | Viewport-height app shell: `h-dvh overflow-hidden` so Content becomes the scroller. Nes... |
-| `direction?`  | `LayoutDirection` | `-`     | Force a horizontal shell (Sidebar beside Content). When omitted, a direct Sidebar child... |
+| Prop          | Type      | Default | Notes                                                                                      |
+| ------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `hasSider?`   | `boolean` | `-`     | Treat this Layout as having a sider even if Sidebar is wrapped. Omit to detect a direct... |
+| `fullHeight?` | `boolean` | `false` | Viewport-height app shell: `h-dvh overflow-hidden` so Content becomes the scroller. Nes... |
+| `className?`  | `string`  | `-`     | Additional CSS classes                                                                     |
 
 ## List
 
@@ -229,12 +229,12 @@ Note: `wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰
 
 Note: `wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基类。
 
-| Prop         | Type                           | Default        | Notes                                                  |
-| ------------ | ------------------------------ | -------------- | ------------------------------------------------------ |
-| `wrap?`      | `BaseLayoutProps['wrap']`      | `false`        | Whether to wrap items                                  |
-| `direction?` | `BaseLayoutProps['direction']` | `'horizontal'` | Space direction                                        |
-| `size?`      | `SpaceSize`                    | `'md'`         | Space size between items Can be a preset size ('sm' \\ | 'md' \\ | 'lg') or a custom number... |
-| `align?`     | `BaseLayoutProps['align']`     | `'start'`      | Align items in the space                               |
+| Prop           | Type                             | Default        | Notes                                                  |
+| -------------- | -------------------------------- | -------------- | ------------------------------------------------------ |
+| `wrap?`        | `BaseLayoutProps['wrap']`        | `false`        | Whether to wrap items                                  |
+| `size?`        | `SpaceSize`                      | `'md'`         | Space size between items Can be a preset size ('sm' \\ | 'md' \\ | 'lg') or a custom number... |
+| `align?`       | `BaseLayoutProps['align']`       | `'start'`      | Align items in the space                               |
+| `orientation?` | `BaseLayoutProps['orientation']` | `'horizontal'` | Space orientation                                      |
 
 ## Splitter
 
@@ -242,9 +242,9 @@ Note: `wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基
 
 Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值不会清拖拽）；百分比跟容器走。水平几何读 `dir`。gutter 是带名字的 `separator`。
 
-| Prop          | Type                   | Default        | Notes                                                                                      |
-| ------------- | ---------------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| `direction?`  | `SplitDirection`       | `'horizontal'` | Direction of the split                                                                     |
-| `sizes?`      | `(number \| string)[]` | `-`            | Pane sizes in pixels or percentage / px strings (`'30%'`, `'200px'`). Numbers are pixel... |
-| `min?`        | `number`               | `0`            | Minimum size of any pane in pixels. When `min * paneCount + gutters` exceeds the contai... |
-| `gutterSize?` | `number`               | `4`            | Width of the gutter/divider in pixels                                                      |
+| Prop          | Type                   | Default | Notes                                                                                      |
+| ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `sizes?`      | `(number \| string)[]` | `-`     | Pane sizes in pixels or percentage / px strings (`'30%'`, `'200px'`). Numbers are pixel... |
+| `min?`        | `number`               | `0`     | Minimum size of any pane in pixels. When `min * paneCount + gutters` exceeds the contai... |
+| `gutterSize?` | `number`               | `4`     | Width of the gutter/divider in pixels                                                      |
+| `disabled?`   | `boolean`              | `false` | Whether the splitter is disabled                                                           |

@@ -193,7 +193,7 @@ describe('Image', () => {
   })
 
   it('forwards ref to the inner img and lands srcSet on it', () => {
-    const ref = React.createRef<HTMLImageElement>()
+    const ref = React.createRef<{ img: HTMLImageElement | null }>()
     const onLoad = vi.fn()
     render(
       <Image
@@ -205,10 +205,10 @@ describe('Image', () => {
       />
     )
 
-    expect(ref.current).toBeInstanceOf(HTMLImageElement)
-    expect(ref.current).toHaveAttribute('srcset', '/test.jpg 1x, /test-2x.jpg 2x')
-    expect(typeof ref.current?.naturalWidth).toBe('number')
-    fireEvent.load(ref.current as HTMLImageElement)
+    expect(ref.current?.img).toBeInstanceOf(HTMLImageElement)
+    expect(ref.current?.img).toHaveAttribute('srcset', '/test.jpg 1x, /test-2x.jpg 2x')
+    expect(typeof ref.current?.img?.naturalWidth).toBe('number')
+    fireEvent.load(ref.current?.img as HTMLImageElement)
     expect(onLoad).toHaveBeenCalledTimes(1)
   })
 

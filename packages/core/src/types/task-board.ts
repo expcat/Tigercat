@@ -146,10 +146,14 @@ export interface TaskBoardProps {
    */
   onCardAdd?: (columnId: string | number) => void
   /**
-   * Custom card renderer (framework-agnostic signature — each framework
-   * layer narrows the return type to its own node type).
+   * Custom card renderer. Vue `#card` and React `renderCard` share this
+   * context object.
    */
-  renderCard?: (card: TaskBoardCard, columnId: string | number) => unknown
+  renderCard?: (ctx: {
+    card: TaskBoardCard
+    column: TaskBoardColumn
+    isDragging: boolean
+  }) => unknown
   /**
    * Custom column header renderer.
    */

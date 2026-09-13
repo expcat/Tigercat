@@ -9,7 +9,7 @@ const current = ref(1)
 
 <template>
   <div class="space-y-4">
-    <Steps v-model:current="current" direction="vertical" clickable>
+    <Steps v-model:current="current" orientation="vertical" clickable>
       <StepsItem title="创建订单" description="填写商品和地址" />
       <StepsItem title="确认支付" description="选择支付方式" status="error" />
       <StepsItem title="等待发货" description="查看物流进度" disabled />

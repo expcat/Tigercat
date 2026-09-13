@@ -68,6 +68,8 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   tooltipFormatter,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
   onHoveredIndexChange,
   onSelectedIndexChange,
@@ -75,7 +77,14 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   onNodeHover
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const interactive = hoverable || selectable || Boolean(onNodeClick)
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
     width,

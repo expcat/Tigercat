@@ -162,7 +162,6 @@ export const frFR: TigerLocale = {
     signModeLabel: 'Mode de signature',
     actorLabel: 'Intervenant',
     actorPlaceholder: "Nom de l'intervenant",
-    emptyText: 'Aucune étape. Ajoutez un nœud de départ.',
     subpathEmpty: 'Aucun sous-arbre sur ce chemin.',
     insertSibling: 'Insérer après',
     editPanelAriaLabel: 'Paramètres du nœud',
@@ -691,7 +690,8 @@ export const frFR: TigerLocale = {
   },
   signature: {
     ariaLabel: 'Pavé de signature',
-    undoText: 'Annuler'
+    undoText: 'Annuler',
+    clearText: 'Effacer'
   },
   numberKeyboard: {
     ariaLabel: 'Clavier numérique',

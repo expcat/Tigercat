@@ -46,7 +46,7 @@ export interface VueRadioGroupProps {
   name?: string
   disabled?: boolean
   size?: ComponentSize
-  direction?: ChoiceGroupDirection
+  orientation?: ChoiceGroupDirection
   status?: InputStatus
   options?: RadioGroupOption[]
   className?: string
@@ -75,7 +75,7 @@ export const RadioGroup = markFormItemGroupControl(
         type: String as PropType<ComponentSize>,
         default: 'md' as ComponentSize
       },
-      direction: {
+      orientation: {
         type: String as PropType<ChoiceGroupDirection>,
         default: 'vertical' as ChoiceGroupDirection
       },
@@ -192,7 +192,7 @@ export const RadioGroup = markFormItemGroupControl(
           {
             ...restAttrs,
             class: getChoiceGroupClasses({
-              direction: props.direction,
+              orientation: props.orientation,
               className: classNames(props.className, coerceClassValue(attrs.class))
             }),
             style: mergeStyleValues(attrs.style, props.style),

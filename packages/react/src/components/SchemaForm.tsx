@@ -43,6 +43,15 @@ import { Select } from './Select'
 import { Checkbox } from './Checkbox'
 import { Switch } from './Switch'
 import { RadioGroup } from './RadioGroup'
+import { DatePicker } from './DatePicker'
+import { TimePicker } from './TimePicker'
+import { Cascader } from './Cascader'
+import { TreeSelect } from './TreeSelect'
+import { Slider } from './Slider'
+import { Upload } from './Upload'
+import { ColorPicker } from './ColorPicker'
+import { Rate } from './Rate'
+import { TagsInput } from './TagsInput'
 import { Button } from './Button'
 
 export interface SchemaFormProps
@@ -86,6 +95,45 @@ function renderWidget(field: SchemaFormField): React.ReactNode {
   }
   if (type === 'radio') {
     return <RadioGroup disabled={disabled} options={field.options} />
+  }
+  if (type === 'date') {
+    return (
+      <DatePicker placeholder={placeholder} disabled={disabled} range={field.range === true} />
+    )
+  }
+  if (type === 'time') {
+    return (
+      <TimePicker placeholder={placeholder} disabled={disabled} range={field.range === true} />
+    )
+  }
+  if (type === 'cascader') {
+    return (
+      <Cascader
+        options={field.options ?? []}
+        placeholder={placeholder}
+        disabled={disabled}
+      />
+    )
+  }
+  if (type === 'tree-select') {
+    return (
+      <TreeSelect treeData={field.treeData} placeholder={placeholder} disabled={disabled} />
+    )
+  }
+  if (type === 'slider') {
+    return <Slider disabled={disabled} min={field.min} max={field.max} />
+  }
+  if (type === 'upload') {
+    return <Upload disabled={disabled} />
+  }
+  if (type === 'color') {
+    return <ColorPicker disabled={disabled} />
+  }
+  if (type === 'rate') {
+    return <Rate disabled={disabled} count={field.max} />
+  }
+  if (type === 'tags') {
+    return <TagsInput placeholder={placeholder} disabled={disabled} />
   }
   return <Input placeholder={placeholder} disabled={disabled} />
 }

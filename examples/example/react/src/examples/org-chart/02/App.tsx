@@ -62,7 +62,7 @@ export default function App() {
       </p>
       <OrgChart
         data={data}
-        direction="vertical"
+        orientation="vertical"
         width={760}
         height={500}
         nodeWidth={180}

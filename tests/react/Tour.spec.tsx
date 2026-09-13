@@ -405,10 +405,13 @@ describe('Tour', () => {
     expect(await screen.findByRole('dialog')).toHaveClass('my-custom-tour')
   })
 
-  it('forwards a ref to the dialog', async () => {
-    const ref = createRef<HTMLDivElement>()
-    render(<Tour ref={ref} steps={baseSteps} open />)
-    expect(await screen.findByRole('dialog')).toBe(ref.current)
+  it('exposes close() on the ref handle', async () => {
+    const onClose = vi.fn()
+    const ref = createRef<{ close: () => void }>()
+    render(<Tour ref={ref} steps={baseSteps} open onClose={onClose} />)
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    ref.current?.close()
+    expect(onClose).toHaveBeenCalled()
   })
 
   it('should render nothing if step does not exist (out-of-range current)', () => {

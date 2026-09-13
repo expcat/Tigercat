@@ -72,7 +72,7 @@ function peelA11y(rest: Record<string, unknown>): {
 
 export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(function ScrollArea(
   {
-    direction = 'vertical',
+    axis = 'vertical',
     scrollbar = 'auto',
     scrollbarSize = 'md',
     shadow = false,
@@ -259,12 +259,12 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
   useEffect(() => {
     syncState()
     return observeScrollAreaSize([viewportRef.current, contentRef.current], syncState)
-  }, [syncState, direction])
+  }, [syncState, axis])
 
   useEffect(() => () => dragSessionRef.current?.dispose(), [])
 
-  const visibleY = shouldRenderScrollAreaScrollbar(scrollbar, direction, 'y', state.y)
-  const visibleX = shouldRenderScrollAreaScrollbar(scrollbar, direction, 'x', state.x)
+  const visibleY = shouldRenderScrollAreaScrollbar(scrollbar, axis, 'y', state.y)
+  const visibleX = shouldRenderScrollAreaScrollbar(scrollbar, axis, 'x', state.x)
   const overflow = (visibleY && state.y.scrollable) || (visibleX && state.x.scrollable)
   const hasFocusable = scrollAreaHasFocusable(contentRef.current)
   const userTabIndex = a11y.tabIndex as number | undefined
@@ -284,7 +284,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     if (!viewport) return
     const delta = computeScrollAreaKeyboardDelta(
       event.key,
-      direction,
+      axis,
       { width: viewport.clientWidth, height: viewport.clientHeight },
       readInlineDirection(viewport)
     )
@@ -313,22 +313,22 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
   }
 
   const shadowSides = useMemo(
-    () => (shadow ? getScrollAreaShadowSides(state, direction) : []),
-    [shadow, state, direction]
+    () => (shadow ? getScrollAreaShadowSides(state, axis) : []),
+    [shadow, state, axis]
   )
 
-  const renderScrollbar = (axis: ScrollAreaAxis) => {
-    const axisState = axis === 'y' ? state.y : state.x
-    if (!shouldRenderScrollAreaScrollbar(scrollbar, direction, axis, axisState)) return null
-    const otherVisible = axis === 'y' ? visibleX : visibleY
+  const renderScrollbar = (barAxis: ScrollAreaAxis) => {
+    const axisState = barAxis === 'y' ? state.y : state.x
+    if (!shouldRenderScrollAreaScrollbar(scrollbar, axis, barAxis, axisState)) return null
+    const otherVisible = barAxis === 'y' ? visibleX : visibleY
     return (
       <div
-        className={getScrollAreaScrollbarClasses(axis, scrollbarSize, scrollbar)}
-        style={getScrollAreaScrollbarPlacementStyle(axis, scrollbarSize, otherVisible)}
-        data-scroll-area-scrollbar={axis}
-        data-dragging={draggingAxis === axis ? '' : undefined}
+        className={getScrollAreaScrollbarClasses(barAxis, scrollbarSize, scrollbar)}
+        style={getScrollAreaScrollbarPlacementStyle(barAxis, scrollbarSize, otherVisible)}
+        data-scroll-area-scrollbar={barAxis}
+        data-dragging={draggingAxis === barAxis ? '' : undefined}
         aria-hidden="true"
-        onPointerDown={(event) => handleTrackPointerDown(axis, event)}
+        onPointerDown={(event) => handleTrackPointerDown(barAxis, event)}
         onWheel={(event) => {
           const viewport = viewportRef.current
           if (!viewport) return
@@ -336,9 +336,9 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
           handleScroll()
         }}>
         <div
-          className={getScrollAreaThumbClasses(axis, draggingAxis === axis)}
-          style={getScrollAreaThumbStyle(axis, axisState)}
-          data-scroll-area-thumb={axis}
+          className={getScrollAreaThumbClasses(barAxis, draggingAxis === barAxis)}
+          style={getScrollAreaThumbStyle(barAxis, axisState)}
+          data-scroll-area-thumb={barAxis}
         />
       </div>
     )
@@ -353,7 +353,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
       data-scrolling={scrolling ? '' : undefined}>
       <div
         ref={viewportRef}
-        className={getScrollAreaViewportClasses(direction, viewportClassName)}
+        className={getScrollAreaViewportClasses(axis, viewportClassName)}
         style={{
           ...getScrollAreaBoxStyle({ height, maxHeight, width, maxWidth }),
           ...getScrollAreaGutterStyle(scrollbarSize, visibleX, visibleY)
@@ -371,7 +371,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
         onKeyDown={handleKeyDown}>
         <div
           ref={contentRef}
-          className={getScrollAreaContentClasses(direction)}
+          className={getScrollAreaContentClasses(axis)}
           data-scroll-area-content="">
           {children}
         </div>

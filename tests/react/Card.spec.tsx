@@ -135,7 +135,7 @@ describe('Card', () => {
   it('places a horizontal cover at inline-start, including rtl', () => {
     const { container } = render(
       <div dir="rtl">
-        <Card direction="horizontal" cover="https://example.com/image.jpg">
+        <Card orientation="horizontal" cover="https://example.com/image.jpg">
           Body
         </Card>
       </div>

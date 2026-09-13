@@ -45,10 +45,10 @@ export interface CardProps {
   hoverable?: boolean
 
   /**
-   * Card layout direction
+   * Card layout orientation
    * @default 'vertical'
    */
-  direction?: BaseLayoutProps['direction']
+  orientation?: BaseLayoutProps['orientation']
 
   /**
    * Visual header text. Slot / `header` node wins when both are set.

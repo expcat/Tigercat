@@ -27,7 +27,7 @@ describe('Space (Vue)', () => {
   it('supports vertical direction', () => {
     const { container } = renderWithProps(
       Space,
-      { direction: 'vertical' },
+      { orientation: 'vertical' },
       { slots: { default: ItemSlot } }
     )
     expect(getComputedStyle(getRoot(container)).flexDirection).toBe('column')

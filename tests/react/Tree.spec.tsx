@@ -821,7 +821,7 @@ describe('Tree', () => {
     it('swaps ArrowRight/Left in rtl', async () => {
       const user = userEvent.setup()
       render(
-        <ConfigProvider direction="rtl">
+        <ConfigProvider dir="rtl">
           <Tree treeData={sampleTreeData} />
         </ConfigProvider>
       )

@@ -22,7 +22,7 @@ import {
 export interface VueCardProps {
   variant?: CardVariant
   size?: CardSize
-  direction?: CoreCardProps['direction']
+  orientation?: CoreCardProps['orientation']
   hoverable?: boolean
   cover?: string
   coverAlt?: string
@@ -54,8 +54,8 @@ export const Card = defineComponent({
       type: Boolean,
       default: false
     },
-    direction: {
-      type: String as PropType<CoreCardProps['direction']>,
+    orientation: {
+      type: String as PropType<CoreCardProps['orientation']>,
       default: 'vertical'
     },
     cover: {
@@ -89,7 +89,7 @@ export const Card = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const paddingClass = computed(() => resolveCardPadding(props.size, props.padding))
-    const isHorizontal = computed(() => props.direction === 'horizontal')
+    const isHorizontal = computed(() => props.orientation === 'horizontal')
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
@@ -103,7 +103,7 @@ export const Card = defineComponent({
       })
       const cardClasses = classNames(
         getCardClasses(props.variant, props.hoverable, clickable),
-        cardDirectionClasses[props.direction],
+        cardDirectionClasses[props.orientation],
         !hasCover && paddingClass.value,
         props.className,
         coerceClassValue(attrsRecord.class)

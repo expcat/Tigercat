@@ -8,7 +8,7 @@ const items = ['项目一', '项目二', '项目三']
   <div class="space-y-6">
     <div>
       <p class="mb-2 text-sm text-gray-500">direction="vertical"</p>
-      <Space direction="vertical" size="md">
+      <Space orientation="vertical" size="md">
         <span
           v-for="t in items"
           :key="t"

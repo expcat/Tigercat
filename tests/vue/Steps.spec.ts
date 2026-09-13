@@ -54,7 +54,7 @@ describe('Steps', () => {
 
     it('should render vertical layout', () => {
       const { container } = render(Steps, {
-        props: { direction: 'vertical' },
+        props: { orientation: 'vertical' },
         slots: {
           default: () => [h(StepsItem, { title: 'Step 1' })]
         }
@@ -62,12 +62,12 @@ describe('Steps', () => {
 
       const stepsContainer = container.querySelector('.tiger-steps')
       expect(stepsContainer).toHaveClass('flex-col')
-      expect(stepsContainer).toHaveAttribute('data-direction', 'vertical')
+      expect(stepsContainer).toHaveAttribute('data-orientation', 'vertical')
     })
 
     it('should render a centered vertical tail with plugin class tokens', () => {
       const { container } = render(Steps, {
-        props: { direction: 'vertical', size: 'sm' },
+        props: { orientation: 'vertical', size: 'sm' },
         slots: {
           default: () => [h(StepsItem, { title: 'Step 1' }), h(StepsItem, { title: 'Step 2' })]
         }

@@ -85,7 +85,7 @@ describe('Anchor', () => {
 
     it('should render with horizontal direction', () => {
       render(Anchor, {
-        props: { direction: 'horizontal', getContainer: () => scrollContainer, affix: false },
+        props: { orientation: 'horizontal', getContainer: () => scrollContainer, affix: false },
         slots: {
           default: () => [h(AnchorLink, { href: '#section1', title: 'Link 1' })]
         }

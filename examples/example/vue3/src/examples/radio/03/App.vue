@@ -10,7 +10,7 @@ const lastValue = ref<string | number>('standard')
   <div class="space-y-2">
     <RadioGroup
       default-value="standard"
-      direction="horizontal"
+      orientation="horizontal"
       aria-label="配送方式"
       @change="lastValue = $event">
       <Radio value="standard">标准</Radio>

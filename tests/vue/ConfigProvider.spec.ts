@@ -366,7 +366,7 @@ describe('ConfigProvider', () => {
         defineComponent({
           setup() {
             return () =>
-              h(ConfigProvider, { direction: 'rtl', locale: { locale: 'ar-SA' } }, () =>
+              h(ConfigProvider, { dir: 'rtl', locale: { locale: 'ar-SA' } }, () =>
                 h('span', 'child')
               )
           }
@@ -382,14 +382,14 @@ describe('ConfigProvider', () => {
       const first = render(
         defineComponent({
           setup() {
-            return () => h(ConfigProvider, { direction: 'rtl' }, () => h('span', 'first'))
+            return () => h(ConfigProvider, { dir: 'rtl' }, () => h('span', 'first'))
           }
         })
       )
       const second = render(
         defineComponent({
           setup() {
-            return () => h(ConfigProvider, { direction: 'ltr' }, () => h('span', 'second'))
+            return () => h(ConfigProvider, { dir: 'ltr' }, () => h('span', 'second'))
           }
         })
       )
@@ -447,7 +447,7 @@ describe('ConfigProvider', () => {
         defineComponent({
           setup() {
             return () =>
-              h(ConfigProvider, { locale: { locale: 'zh-CN' }, direction: 'ltr' }, () =>
+              h(ConfigProvider, { locale: { locale: 'zh-CN' }, dir: 'ltr' }, () =>
                 h('p', '配置树')
               )
           }

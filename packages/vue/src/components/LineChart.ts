@@ -32,7 +32,9 @@ import {
   type ChartScaleValue,
   type LineChartDatum,
   type LineChartProps as CoreLineChartProps,
-  type LineChartSeries
+  type LineChartSeries,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartAxis } from './ChartAxis'
 import { ChartCanvas } from './ChartCanvas'
@@ -264,6 +266,8 @@ export const LineChart = defineComponent({
     desc: {
       type: String
     },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: {
       type: String
     },
@@ -283,7 +287,8 @@ export const LineChart = defineComponent({
   ],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
 
     // Unique gradient prefix for area fills
     const gradientPrefix = getStableChartGradientPrefix('line', useId())

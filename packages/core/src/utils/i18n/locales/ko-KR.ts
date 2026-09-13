@@ -162,7 +162,6 @@ export const koKR: TigerLocale = {
     signModeLabel: '결재 방식',
     actorLabel: '담당자',
     actorPlaceholder: '담당자 이름',
-    emptyText: '단계가 없습니다. 시작 노드를 추가하세요.',
     subpathEmpty: '이 경로에 하위 트리가 없습니다.',
     insertSibling: '뒤에 삽입',
     editPanelAriaLabel: '노드 설정',
@@ -690,7 +689,8 @@ export const koKR: TigerLocale = {
   },
   signature: {
     ariaLabel: '서명 패드',
-    undoText: '실행 취소'
+    undoText: '실행 취소',
+    clearText: '지우기'
   },
   numberKeyboard: {
     ariaLabel: '숫자 키보드',

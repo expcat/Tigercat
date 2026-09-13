@@ -9,7 +9,7 @@ export default function App() {
   return (
     <div className="w-full max-w-md">
       <ScrollArea
-        direction="both"
+        axis="both"
         scrollbar="always"
         scrollbarSize="lg"
         maxHeight={200}

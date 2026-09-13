@@ -37,7 +37,7 @@ export interface CheckboxGroupProps extends Omit<
   defaultValue?: CheckboxGroupValue
   disabled?: boolean
   size?: ComponentSize
-  direction?: ChoiceGroupDirection
+  orientation?: ChoiceGroupDirection
   status?: InputStatus
   onChange?: (value: CheckboxGroupValue) => void
   options?: CheckboxGroupOption[]
@@ -49,7 +49,7 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
   defaultValue = [],
   disabled = false,
   size = 'md',
-  direction = 'vertical',
+  orientation = 'vertical',
   status: statusProp,
   onChange,
   options,
@@ -104,7 +104,7 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
         aria-describedby={describedBy}
         aria-disabled={effectiveDisabled || undefined}
         aria-invalid={status === 'error' ? true : props['aria-invalid']}
-        className={getChoiceGroupClasses({ direction, className })}>
+        className={getChoiceGroupClasses({ orientation, className })}>
         {Children.count(children) > 0
           ? children
           : options?.map((option) => (

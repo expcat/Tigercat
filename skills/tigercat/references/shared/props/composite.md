@@ -115,7 +115,7 @@ Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`
 
 ## SchemaForm
 
-`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/28 props
+`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/29 props
 
 Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
 

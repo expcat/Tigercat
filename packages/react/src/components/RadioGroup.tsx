@@ -26,7 +26,7 @@ export interface RadioGroupProps
   options?: RadioGroupOption[]
   children?: React.ReactNode
   className?: string
-  direction?: ChoiceGroupDirection
+  orientation?: ChoiceGroupDirection
 }
 
 interface RadioGroupContextValue {
@@ -45,7 +45,7 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
   name,
   disabled = false,
   size = 'md',
-  direction = 'vertical',
+  orientation = 'vertical',
   status: statusProp,
   onChange,
   options,
@@ -136,7 +136,7 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
     <RadioGroupContext.Provider value={contextValue}>
       <div
         {...props}
-        className={getChoiceGroupClasses({ direction, className })}
+        className={getChoiceGroupClasses({ orientation, className })}
         role={role}
         aria-labelledby={labelledby}
         aria-describedby={describedBy}

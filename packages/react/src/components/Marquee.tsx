@@ -1,14 +1,16 @@
-import React, { forwardRef, useCallback, useLayoutEffect, useState } from 'react'
+import React, { forwardRef, useCallback, useLayoutEffect, useMemo, useState } from 'react'
 import {
   getMarqueeCloneAttributes,
   getMarqueeContentClasses,
   getMarqueeContentStyle,
+  getMarqueeLabels,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
   getMarqueeTrackStyle,
   injectMarqueeStyles,
   isMarqueeFocusInside,
   isMarqueePaused,
+  mergeTigerLocale,
   resolveMarqueeDirection,
   resolveMarqueePauseOnFocus,
   resolveMarqueePauseOnHover,
@@ -16,6 +18,7 @@ import {
   resolveMarqueeRepeat,
   type MarqueeProps as CoreMarqueeProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface MarqueeProps
   extends
@@ -36,6 +39,8 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       gap,
       repeat,
       ariaLabel,
+      locale,
+      labels: labelsOverride,
       className,
       style,
       children,
@@ -64,10 +69,28 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       hovered,
       focused
     })
+    const config = useTigerConfig()
+    const mergedLocale = useMemo(
+      () => mergeTigerLocale(config.locale, locale),
+      [config.locale, locale]
+    )
+    const labels = useMemo(
+      () => getMarqueeLabels(mergedLocale, labelsOverride),
+      [mergedLocale, labelsOverride]
+    )
     const { 'aria-label': ariaLabelAttr, 'aria-labelledby': ariaLabelledByAttr, ...domProps } = rest
+    const labelledBy =
+      typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined
+    const dedicatedAria =
+      typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel
     const region = resolveMarqueeRegion({
-      ariaLabel: typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel,
-      labelledBy: typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined
+      ariaLabel:
+        dedicatedAria !== undefined
+          ? dedicatedAria
+          : labelledBy
+            ? undefined
+            : labels.ariaLabel,
+      labelledBy
     })
 
     const handleMouseEnter = useCallback(

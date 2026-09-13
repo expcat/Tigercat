@@ -43,9 +43,9 @@ import { useControlledState } from '../hooks/useControlledState'
 import { useFormItemControlContext } from './FormItemContext'
 
 export interface CronEditorProps extends CoreCronEditorProps {
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string, validation: CronValidationResult) => void
+  value?: string | null
+  defaultValue?: string | null
+  onChange?: (value: string | null, validation: CronValidationResult) => void
   onValidate?: (validation: CronValidationResult) => void
   onBlur?: React.FocusEventHandler<HTMLElement>
   style?: React.CSSProperties
@@ -109,11 +109,16 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
   const effectiveName = name ?? formItemControl?.name
   const describedBy = mergeAriaDescribedBy(formItemControl?.describedBy, undefined)
   const labelledby = formItemControl?.labelId
-  const parsedValue = value !== undefined ? value : (formItemControl?.value as string | undefined)
+  const parsedValue = value !== undefined ? value : (formItemControl?.value as string | null | undefined)
 
-  const [expression, setExpression] = useControlledState<string, [CronValidationResult]>({
-    value: value !== undefined || formItemControl?.value !== undefined ? parsedValue : undefined,
-    defaultValue: defaultValue ?? '',
+  const [expression, setExpression] = useControlledState<string | null, [CronValidationResult]>({
+    value:
+      value !== undefined || formItemControl?.value !== undefined
+        ? isCronExpressionEmpty(parsedValue)
+          ? null
+          : (parsedValue as string)
+        : undefined,
+    defaultValue: isCronExpressionEmpty(defaultValue) ? null : (defaultValue ?? null),
     onChange: (next, validation) => {
       onChange?.(next, validation)
       onValidate?.(validation)
@@ -139,14 +144,14 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
   }, [currentExpression])
 
   function commit(nextValue: string) {
-    const nextValidation = validateCronExpressionWithLabels(nextValue, labels, fieldLabels)
-    setExpression(nextValue, nextValidation)
+    const stored = nextValue.trim() === '' ? null : nextValue
+    const nextValidation = validateCronExpressionWithLabels(stored ?? '', labels, fieldLabels)
+    setExpression(stored, nextValidation)
   }
 
   function handleRawExpressionChange(nextValue: string) {
     stickyModes.current = {}
-    const nextValidation = validateCronExpressionWithLabels(nextValue, labels, fieldLabels)
-    setExpression(nextValue, nextValidation)
+    commit(nextValue)
   }
 
   function writeField(meta: CronFieldMeta, draft: CronFieldDraft) {

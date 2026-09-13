@@ -8,7 +8,7 @@ export default function App() {
 
   return (
     <div className="space-y-4">
-      <Steps current={current} direction="vertical" clickable onChange={setCurrent}>
+      <Steps current={current} orientation="vertical" clickable onChange={setCurrent}>
         <StepsItem title="创建订单" description="填写商品和地址" />
         <StepsItem title="确认支付" description="选择支付方式" status="error" />
         <StepsItem title="等待发货" description="查看物流进度" disabled />

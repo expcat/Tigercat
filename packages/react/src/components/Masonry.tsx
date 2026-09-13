@@ -18,7 +18,6 @@ import {
   getMasonryPackedRootStyle,
   getMasonryRootClasses,
   hasMeasuredMasonryHeights,
-  isResponsiveMap,
   observeElementSize,
   observeScrollAreaSize,
   readMasonryItemHeight,
@@ -76,11 +75,9 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
 
   const childNodes = useMemo(() => Children.toArray(children), [children])
   const signature = childSignature(childNodes)
-  const isResponsive = isResponsiveMap(columns) || isResponsiveMap(gap)
-  const widthForResolve = isResponsive ? containerWidth : 1024
 
-  const columnCount = resolveMasonryColumnCount(columns, widthForResolve)
-  const gapPx = resolveMasonryGap(gap, widthForResolve)
+  const columnCount = resolveMasonryColumnCount(columns, containerWidth)
+  const gapPx = resolveMasonryGap(gap, containerWidth)
   const packed =
     hasMeasuredMasonryHeights(heights) && containerWidth > 0 && heights.length === childNodes.length
   const positions = packed

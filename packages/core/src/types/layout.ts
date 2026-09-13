@@ -19,7 +19,7 @@ export interface LayoutProps {
    * Force a horizontal shell (Sidebar beside Content).
    * When omitted, a direct Sidebar child (or `hasSider`) turns the root into a row.
    */
-  direction?: LayoutDirection
+  mode?: LayoutDirection
 
   /**
    * Treat this Layout as having a sider even if Sidebar is wrapped.

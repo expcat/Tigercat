@@ -57,6 +57,15 @@ import { Select } from './Select'
 import { Checkbox } from './Checkbox'
 import { Switch } from './Switch'
 import { RadioGroup } from './RadioGroup'
+import { DatePicker } from './DatePicker'
+import { TimePicker } from './TimePicker'
+import { Cascader } from './Cascader'
+import { TreeSelect } from './TreeSelect'
+import { Slider } from './Slider'
+import { Upload } from './Upload'
+import { ColorPicker } from './ColorPicker'
+import { Rate } from './Rate'
+import { TagsInput } from './TagsInput'
 import { Button } from './Button'
 
 export interface VueSchemaFormProps extends Omit<
@@ -94,6 +103,33 @@ function renderWidget(field: SchemaFormField): VNode {
   }
   if (type === 'radio') {
     return h(RadioGroup, { disabled, options: field.options })
+  }
+  if (type === 'date') {
+    return h(DatePicker, { placeholder, disabled, range: field.range === true })
+  }
+  if (type === 'time') {
+    return h(TimePicker, { placeholder, disabled, range: field.range === true })
+  }
+  if (type === 'cascader') {
+    return h(Cascader, { options: field.options ?? [], placeholder, disabled })
+  }
+  if (type === 'tree-select') {
+    return h(TreeSelect, { treeData: field.treeData, placeholder, disabled })
+  }
+  if (type === 'slider') {
+    return h(Slider, { disabled, min: field.min, max: field.max })
+  }
+  if (type === 'upload') {
+    return h(Upload, { disabled })
+  }
+  if (type === 'color') {
+    return h(ColorPicker, { disabled })
+  }
+  if (type === 'rate') {
+    return h(Rate, { disabled, count: field.max })
+  }
+  if (type === 'tags') {
+    return h(TagsInput, { placeholder, disabled })
   }
   return h(Input, { placeholder, disabled })
 }

@@ -82,6 +82,8 @@ export function Gantt({
   title,
   desc,
   ariaLabel,
+  locale,
+  labels: labelsOverride,
   className,
   onTaskClick,
   onTaskHover,
@@ -90,7 +92,14 @@ export function Gantt({
   onDataChange
 }: GanttProps): React.ReactElement {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const [innerSelectedId, setInnerSelectedId] = useState<string | number | null>(null)
   const [hoveredId, setHoveredId] = useState<string | number | null>(null)
   const [dragPreview, setDragPreview] = useState<{ id: string | number; deltaX: number } | null>(

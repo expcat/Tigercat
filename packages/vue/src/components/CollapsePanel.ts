@@ -30,6 +30,7 @@ import { CollapseContextKey, type CollapseContext } from './Collapse'
 export interface VueCollapsePanelProps {
   panelKey: string | number
   header?: string
+  extra?: unknown
   disabled?: boolean
   showArrow?: boolean
   className?: string
@@ -54,6 +55,10 @@ export const CollapsePanel = defineComponent({
      */
     header: {
       type: String,
+      default: undefined
+    },
+    extra: {
+      type: [String, Object, Number] as PropType<unknown>,
       default: undefined
     },
     /**
@@ -210,6 +215,7 @@ export const CollapsePanel = defineComponent({
     return () => {
       const headerSlot = slots.header?.()
       const extraSlot = slots.extra?.()
+      const extraContent = extraSlot && extraSlot.length ? extraSlot : props.extra
 
       const arrowIcon = h(
         'svg',
@@ -267,7 +273,10 @@ export const CollapsePanel = defineComponent({
         headerContent
       )
 
-      const extraNode = extraSlot ? h('span', { class: collapseExtraClasses }, extraSlot) : null
+      const extraNode =
+        extraContent != null && extraContent !== ''
+          ? h('span', { class: collapseExtraClasses }, extraContent as never)
+          : null
 
       const initialClass = controllerReady.value
         ? undefined

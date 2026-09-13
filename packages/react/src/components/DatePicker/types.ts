@@ -34,7 +34,7 @@ export interface DatePickerRangeProps extends DatePickerBaseProps {
   range: true
   value?: DatePickerRangeInputValue | null
   defaultValue?: DatePickerRangeInputValue | null
-  onChange?: (range: DatePickerRangeResolvedValue) => void
+  onChange?: (range: DatePickerRangeResolvedValue | null) => void
 }
 
 export type DatePickerProps = DatePickerSingleProps | DatePickerRangeProps

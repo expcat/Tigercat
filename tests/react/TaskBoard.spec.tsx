@@ -116,7 +116,7 @@ describe('TaskBoard (React)', () => {
       render(
         <TaskBoard
           columns={columns}
-          renderCard={(card) => <span data-testid="custom-card">Custom: {card.title}</span>}
+          renderCard={({ card }) => <span data-testid="custom-card">Custom: {card.title}</span>}
         />
       )
       expect(screen.getAllByTestId('custom-card').length).toBeGreaterThan(0)

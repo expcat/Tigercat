@@ -192,12 +192,12 @@ describe('ColorPicker', () => {
     expect(trigger(container)).toHaveAttribute('aria-label', '自定义颜色')
   })
 
-  it('emits empty string when Clear is clicked', () => {
+  it('emits null when Clear is clicked', () => {
     const onChange = vi.fn()
     const { container } = render(<ColorPicker value="#2563eb" onChange={onChange} />)
     open(container)
     fireEvent.click(document.body.querySelector('[data-tiger-colorpicker-clear]')!)
-    expect(onChange).toHaveBeenCalledWith('')
+    expect(onChange).toHaveBeenCalledWith(null)
   })
 
   it('does not treat opening the panel as a field blur', async () => {

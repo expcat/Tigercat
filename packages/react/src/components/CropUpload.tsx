@@ -50,7 +50,7 @@ export interface CropUploadRef {
   focus: () => void
 }
 
-export const CropUpload = forwardRef<HTMLLabelElement, CropUploadProps>(function CropUpload(
+export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function CropUpload(
   {
     locale,
     accept = 'image/*',
@@ -124,7 +124,15 @@ export const CropUpload = forwardRef<HTMLLabelElement, CropUploadProps>(function
   const session = sessionHolder.current
 
   useEffect(() => () => session.dispose(), [session])
-  useImperativeHandle(ref, () => triggerRef.current as HTMLLabelElement, [])
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () => {
+        triggerRef.current?.focus()
+      }
+    }),
+    []
+  )
 
   const handleFiles = useCallback(
     (file?: File | null) => {

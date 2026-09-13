@@ -14,7 +14,7 @@ import { LayoutContextKey, type LayoutContextValue } from '../utils/layout-conte
 
 export interface VueLayoutProps {
   className?: string
-  direction?: LayoutDirection
+  mode?: LayoutDirection
   hasSider?: boolean
   fullHeight?: boolean
   style?: Record<string, string | number>
@@ -34,7 +34,7 @@ export const Layout = defineComponent({
       type: String as PropType<string>,
       default: undefined
     },
-    direction: {
+    mode: {
       type: String as PropType<LayoutDirection>,
       default: undefined
     },
@@ -64,7 +64,7 @@ export const Layout = defineComponent({
     const hasSider = computed(() =>
       resolveLayoutHasSider({
         hasSider: props.hasSider,
-        direction: props.direction,
+        mode: props.mode,
         childIsSider: childIsSider.value
       })
     )

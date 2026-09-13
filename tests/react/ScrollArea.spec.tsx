@@ -102,7 +102,7 @@ describe('ScrollArea', () => {
 
     it('shows the horizontal scrollbar for a horizontal area', () => {
       const { container } = renderOverflowing(
-        { direction: 'horizontal' },
+        { axis: 'horizontal' },
         { scrollWidth: 800, clientWidth: 200, scrollHeight: 200, clientHeight: 200 }
       )
       expect(container.querySelector('[data-scroll-area-scrollbar="x"]')).not.toBeNull()

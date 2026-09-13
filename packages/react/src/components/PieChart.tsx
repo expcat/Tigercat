@@ -83,6 +83,8 @@ export const PieChart: React.FC<PieChartProps> = ({
   animated = false,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
   onHoveredIndexChange,
   onSelectedIndexChange,
@@ -90,7 +92,14 @@ export const PieChart: React.FC<PieChartProps> = ({
   onSliceHover
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const interactive = hoverable || selectable || Boolean(onSliceClick)
   const gradientId = useId()
   const gradientPrefix = useMemo(

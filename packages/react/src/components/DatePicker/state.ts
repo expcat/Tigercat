@@ -96,7 +96,7 @@ export function useDatePickerController(props: DatePickerProps) {
   const parsedValue = useMemo(() => {
     if (isRangeMode) {
       if (props.value === undefined) {
-        return coerceDatePickerRange(formItemControl?.value) as DatePickerRangeResolvedValue
+        return coerceDatePickerRange(formItemControl?.value)
       }
       return coerceDatePickerRange(props.value)
     }
@@ -150,10 +150,12 @@ export function useDatePickerController(props: DatePickerProps) {
   const now = props.now
 
   const calendarValue = isRangeMode
-    ? (previewRange?.[0] ?? (committed as DatePickerRangeResolvedValue)[0] ?? null)
+    ? (previewRange?.[0] ??
+      (Array.isArray(committed) ? committed[0] : null) ??
+      null)
     : (committed as Date | null)
   const rangeHighlight = isRangeMode
-    ? (previewRange ?? (committed as DatePickerRangeResolvedValue))
+    ? (previewRange ?? (Array.isArray(committed) ? committed : undefined))
     : undefined
   const rangeSelectingEnd = Boolean(
     isRangeMode && previewRange && previewRange[0] && !previewRange[1]
@@ -268,8 +270,7 @@ export function useDatePickerController(props: DatePickerProps) {
     if (draftText == null) return
     const parsed = parseTypedDatePickerValue(draftText, format, isRangeMode)
     if (isRangeMode) {
-      const tuple = (parsed as DatePickerRangeResolvedValue | null) ?? [null, null]
-      commit(tuple, null)
+      commit((parsed as DatePickerRangeResolvedValue | null) ?? null, null)
     } else {
       commit((parsed as Date | null) ?? null, null)
     }

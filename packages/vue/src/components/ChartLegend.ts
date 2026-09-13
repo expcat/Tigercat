@@ -8,7 +8,9 @@ import {
   mergeTigerLocale,
   type ChartLegendItem,
   type ChartLegendOrientation,
-  type ChartLegendProps
+  type ChartLegendProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -43,6 +45,8 @@ export const ChartLegend = defineComponent({
     ariaLabel: {
       type: String
     },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: {
       type: String
     }
@@ -50,7 +54,8 @@ export const ChartLegend = defineComponent({
   emits: ['item-click', 'item-hover', 'item-leave'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const resolvedAriaLabel = computed(() => props.ariaLabel ?? labels.value.legendAriaLabel)
     const containerClasses = computed(() =>
       classNames(

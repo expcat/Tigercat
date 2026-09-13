@@ -10,7 +10,7 @@ export default function App() {
       <RadioGroup
         defaultValue="standard"
         onChange={setLastValue}
-        direction="horizontal"
+        orientation="horizontal"
         aria-label="配送方式">
         <Radio value="standard">标准</Radio>
         <Radio value="express">加急</Radio>

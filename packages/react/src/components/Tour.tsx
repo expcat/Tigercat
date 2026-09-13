@@ -5,7 +5,8 @@ import React, {
   useRef,
   useCallback,
   useMemo,
-  useId
+  useId,
+  useImperativeHandle
 } from 'react'
 import {
   classNames,
@@ -51,7 +52,7 @@ import {
   useFocusTrap,
   useOverlayPortalTarget
 } from '../utils/overlay'
-import { composeRefs } from '../utils/overlay-trigger'
+
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -73,7 +74,11 @@ export interface TourProps
   renderFooter?: (ctx: TourStepContext) => React.ReactNode
 }
 
-export const Tour = React.forwardRef<HTMLDivElement, TourProps>(function Tour(
+export interface TourHandle {
+  close: () => void
+}
+
+export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   {
     steps,
     loadSteps,
@@ -230,6 +235,7 @@ export const Tour = React.forwardRef<HTMLDivElement, TourProps>(function Tour(
   const next = useCallback(() => applyNavEvents(tourNextEvents(nav)), [applyNavEvents, nav])
   const prev = useCallback(() => applyNavEvents(tourPrevEvents(nav)), [applyNavEvents, nav])
   const close = useCallback(() => applyNavEvents(tourCloseEvents()), [applyNavEvents])
+  useImperativeHandle(forwardedRef, () => ({ close }), [close])
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -306,7 +312,7 @@ export const Tour = React.forwardRef<HTMLDivElement, TourProps>(function Tour(
 
       <div
         {...dialogRest}
-        ref={composeRefs(forwardedRef, popoverRef)}
+        ref={popoverRef}
         className={classNames(tourPopoverClasses, className)}
         style={popoverStyle}
         role="dialog"

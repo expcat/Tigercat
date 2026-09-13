@@ -162,7 +162,6 @@ export const ptBR: TigerLocale = {
     signModeLabel: 'Modo de assinatura',
     actorLabel: 'Responsável',
     actorPlaceholder: 'Nome do responsável',
-    emptyText: 'Ainda não há etapas. Adicione um nó inicial.',
     subpathEmpty: 'Não há subárvore neste caminho.',
     insertSibling: 'Inserir depois',
     editPanelAriaLabel: 'Configurações do nó',
@@ -691,7 +690,8 @@ export const ptBR: TigerLocale = {
   },
   signature: {
     ariaLabel: 'Área de assinatura',
-    undoText: 'Desfazer'
+    undoText: 'Desfazer',
+    clearText: 'Limpar'
   },
   numberKeyboard: {
     ariaLabel: 'Teclado numérico',

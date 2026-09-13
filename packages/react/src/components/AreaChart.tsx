@@ -118,6 +118,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   legendFormatter,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
   onHoveredIndexChange,
   onSelectedIndexChange,
@@ -127,7 +129,14 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   onPointHover
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
 
   // Unique gradient prefix for area fills
   const gradientId = useId()

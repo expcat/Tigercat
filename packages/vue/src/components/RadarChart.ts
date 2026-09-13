@@ -30,7 +30,9 @@ import {
   type ChartPadding,
   type RadarChartDatum,
   type RadarChartProps as CoreRadarChartProps,
-  type RadarChartSeries
+  type RadarChartSeries,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
@@ -124,6 +126,8 @@ export const RadarChart = defineComponent({
     labelAutoAlign: { type: Boolean, default: true },
     title: { type: String },
     desc: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
     onSeriesClick: {
       type: Function as PropType<(index: number, series: RadarChartSeries) => void>
@@ -132,7 +136,8 @@ export const RadarChart = defineComponent({
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'series-click', 'series-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const resolvedSeries = computed(() =>
       resolveSeriesData<RadarChartDatum, RadarChartSeries>(props.series, props.data, {
         data: [] as RadarChartDatum[]

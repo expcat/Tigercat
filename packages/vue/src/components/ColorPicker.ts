@@ -78,8 +78,8 @@ export const ColorPicker = defineComponent({
   name: 'TigerColorPicker',
   inheritAttrs: false,
   props: {
-    modelValue: { type: String, default: undefined },
-    defaultValue: { type: String, default: undefined },
+    modelValue: { type: String as PropType<string | null>, default: undefined },
+    defaultValue: { type: String as PropType<string | null>, default: undefined },
     disabled: Boolean,
     size: { type: String as PropType<ComponentSize>, default: 'md' },
     showAlpha: Boolean,
@@ -202,7 +202,7 @@ export const ColorPicker = defineComponent({
 
     onBeforeUnmount(() => dragDispose?.())
 
-    function writeCommitted(next: string) {
+    function writeCommitted(next: string | null) {
       if (props.modelValue === undefined) innerValue.value = next
       emit('update:modelValue', next)
       emit('input', next)
@@ -238,7 +238,7 @@ export const ColorPicker = defineComponent({
         setOpenSafe(false)
       } else if ((event.key === 'Delete' || event.key === 'Backspace') && showClear.value) {
         event.preventDefault()
-        writeCommitted('')
+        writeCommitted(null)
         inputValue.value = ''
       }
     }
@@ -373,7 +373,7 @@ export const ColorPicker = defineComponent({
                           class: colorPickerClearButtonClasses,
                           'data-tiger-colorpicker-clear': '',
                           onClick: () => {
-                            writeCommitted('')
+                            writeCommitted(null)
                             inputValue.value = ''
                           }
                         },

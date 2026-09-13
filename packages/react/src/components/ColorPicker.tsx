@@ -58,9 +58,9 @@ import { FormItemControlProvider, useFormItemControlContext } from './FormItemCo
 import { ColorSwatch } from './ColorSwatch'
 
 export interface ColorPickerProps extends CoreColorPickerProps {
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string) => void
+  value?: string | null
+  defaultValue?: string | null
+  onChange?: (value: string | null) => void
   onOpenChange?: (open: boolean) => void
   onBlur?: React.FocusEventHandler<HTMLElement>
   style?: React.CSSProperties
@@ -122,14 +122,20 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
       typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
         ? props['aria-labelledby']
         : formItemControl?.labelId
-    const parsedValue = value !== undefined ? value : (formItemControl?.value as string | undefined)
+    const parsedValue =
+      value !== undefined ? value : (formItemControl?.value as string | null | undefined)
 
-    const [committed, setCommitted] = useControlledState<string | undefined>({
-      value: value !== undefined || formItemControl?.value !== undefined ? parsedValue : undefined,
-      defaultValue,
+    const [committed, setCommitted] = useControlledState<string | null>({
+      value:
+        value !== undefined || formItemControl?.value !== undefined
+          ? isColorPickerEmpty(parsedValue)
+            ? null
+            : (parsedValue as string)
+          : undefined,
+      defaultValue: defaultValue ?? null,
       onChange: (next) => {
-        onChange?.(next ?? '')
-        formItemControl?.onChange?.(next ?? '')
+        onChange?.(next)
+        formItemControl?.onChange?.(next)
       }
     })
     const [isOpen, setOpen] = useControlledState({
@@ -242,7 +248,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         setOpenSafe(false)
       } else if ((event.key === 'Delete' || event.key === 'Backspace') && showClear) {
         event.preventDefault()
-        setCommitted('')
+        setCommitted(null)
         setInputValue('')
       }
     }
@@ -338,7 +344,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
     }
 
     function handleClear() {
-      setCommitted('')
+      setCommitted(null)
       setInputValue('')
     }
 

@@ -91,10 +91,10 @@ export interface FormWizardProps {
    */
   clickable?: boolean
   /**
-   * Steps direction
+   * Steps orientation
    * @default 'horizontal'
    */
-  direction?: StepsDirection
+  orientation?: StepsDirection
   /**
    * Steps size
    * @default 'md'

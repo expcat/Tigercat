@@ -109,7 +109,7 @@ export default function ConfigProviderExample() {
       locale={packs[language]}
       theme={theme}
       colorScheme={colorScheme}
-      direction={direction}>
+      dir={direction}>
       <div style={{ display: 'grid', gap: 16, maxWidth: 560 }}>
         <p style={{ margin: 0, fontSize: 13, color: 'var(--tiger-text-secondary)' }}>
           {copy.caption}

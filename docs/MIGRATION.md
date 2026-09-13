@@ -4,9 +4,9 @@
 
 ## 未发布
 
-将作为 **v3.0.0**。Breaking map 见下方 v3.0.0。不是 BPMN。无 `file:` 双轨。
+本轮已收入 **v2.9.0**。Breaking map 见下方。不是 BPMN。无 `file:` 双轨。
 
-## v3.0.0
+## v2.9.0
 
 公开契约 breaking。Vue/React 对称。无新必填 prop（若干默认与 payload 翻转）。
 
@@ -33,14 +33,20 @@
 | Tree `filterValue`                                               | `searchValue`                                              |
 | VirtualTable 无 `id` 不可选                                      | 回落 dataSource 下标，可选                                 |
 | DataExport 默认 `xlsx+markdown`                                  | 默认 `xlsx+csv+markdown`；下拉触发器 `aria-label` 走 `triggerAriaLabel` |
+| DatePicker 空范围 `[null, null]`                                 | `null`（进行中的范围仍是元组）                                     |
+| Cascader `[]` 收成 `undefined`                                   | 受控空是 `[]`                                                  |
+| ColorPicker / CronEditor 清空 `''`                               | `null`                                                       |
+| Space/Card/Steps/… `direction`                                   | `orientation`（Layout 用 `mode`，ScrollArea/Drag 用 `axis`，ConfigProvider 用 `dir`） |
+| SchemaForm widget 仅 8 种                                        | 可写 `date` / `time` / `cascader` / `tree-select` / `slider` / `upload` / `color` / `rate` / `tags` |
+| React TaskBoard `renderCard(card, columnId)`                     | `renderCard({ card, column, isDragging })`                     |
+| Designer locale `emptyText`                                      | 删除；空根用 `emptyHint`                                       |
+| React Image/Tour/… ref 为 DOM 节点                               | 与 Vue 相同的 handle 对象（`{ img }` / `{ close }` 等）        |
 
 ScrollSpy 仍用 `onActiveKeyChange`（不是 Tabs）。Footer `size` 仍是 `default\|compact`。Modal/Drawer `size` 仍是面板宽度（含 `xl\|full`）。
 
 不是 BPMN / Flowable / Camunda。Admin 不要 `file:` 双轨。
 
-## v2.9.0
-
-v2.9.0 无 breaking change，无新必填 prop。公开别名仍可 import。Form / Mentions / TreeSelect / Rate / Signature 等 additive 别名与字段 props 见 [CHANGELOG.md](../CHANGELOG.md#v290)。不是 BPMN。
+Form / Mentions / TreeSelect / Rate / Signature 等 additive 别名与字段 props 见 [CHANGELOG.md](../CHANGELOG.md#v290)。
 
 **Steps 连接线**：竖/横 connector 几何改由 Tailwind plugin 注入（`.tiger-step-tail*`、`.tiger-step-icon-col*`）。消费者必须加载 `@plugin "@expcat/tigercat-core/tailwind"` 或 `/tailwind/modern`（Admin 已加载）。不要依赖 `inset-inline-start-*` / `left-1/2` JIT 类来画连线。
 

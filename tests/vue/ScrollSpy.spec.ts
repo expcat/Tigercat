@@ -76,7 +76,7 @@ describe('ScrollSpy', () => {
     })
 
     it('renders horizontal layout', () => {
-      const { container } = renderScrollSpy({ direction: 'horizontal' })
+      const { container } = renderScrollSpy({ orientation: 'horizontal' })
       expect(container.querySelector('ul')).toHaveClass('flex-wrap')
     })
 

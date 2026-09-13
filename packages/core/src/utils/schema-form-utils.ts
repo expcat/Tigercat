@@ -33,7 +33,16 @@ export const SCHEMA_FORM_WIDGET_TYPES: readonly SchemaFormWidgetType[] = [
   'select',
   'checkbox',
   'switch',
-  'radio'
+  'radio',
+  'date',
+  'time',
+  'cascader',
+  'tree-select',
+  'slider',
+  'upload',
+  'color',
+  'rate',
+  'tags'
 ]
 
 export const schemaFormRootClasses = 'tiger-schema-form w-full'

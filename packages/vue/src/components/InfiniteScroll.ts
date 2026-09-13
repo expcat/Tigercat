@@ -41,7 +41,7 @@ export const InfiniteScroll = defineComponent({
     loadingText: { type: String, default: undefined },
     endText: { type: String, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
-    direction: {
+    orientation: {
       type: String as PropType<'vertical' | 'horizontal'>,
       default: 'vertical'
     },
@@ -68,7 +68,7 @@ export const InfiniteScroll = defineComponent({
 
     const containerClasses = computed(() =>
       classNames(
-        getInfiniteScrollContainerClasses(props.direction, props.className),
+        getInfiniteScrollContainerClasses(props.orientation, props.className),
         coerceClassValue(attrs.class)
       )
     )
@@ -93,7 +93,7 @@ export const InfiniteScroll = defineComponent({
     function checkScroll() {
       const el = containerRef.value
       if (!el) return
-      if (shouldLoadMore(el, props.threshold, props.direction, props.inverse, dir.value)) {
+      if (shouldLoadMore(el, props.threshold, props.orientation, props.inverse, dir.value)) {
         requestLoad()
       }
     }
@@ -110,7 +110,7 @@ export const InfiniteScroll = defineComponent({
       const observerRoot = resolveObserverRoot()
       const teardown = createInfiniteScrollObserver(sentinel, {
         threshold: props.threshold,
-        direction: props.direction,
+        orientation: props.orientation,
         root: observerRoot,
         inverse: props.inverse,
         onLoadMore: requestLoad
@@ -149,7 +149,7 @@ export const InfiniteScroll = defineComponent({
         props.disabled,
         props.loading,
         props.threshold,
-        props.direction,
+        props.orientation,
         props.inverse,
         props.root
       ],
@@ -170,7 +170,7 @@ export const InfiniteScroll = defineComponent({
             ref: sentinelRef,
             class: infiniteScrollSentinelClasses,
             'aria-hidden': 'true',
-            style: getInfiniteScrollSentinelStyle(props.direction)
+            style: getInfiniteScrollSentinelStyle(props.orientation)
           })
         : null
 
@@ -178,7 +178,7 @@ export const InfiniteScroll = defineComponent({
         ? h(
             'div',
             {
-              class: getInfiniteScrollChromeClasses(props.direction, infiniteScrollLoaderClasses),
+              class: getInfiniteScrollChromeClasses(props.orientation, infiniteScrollLoaderClasses),
               role: 'status',
               'aria-live': 'polite'
             },
@@ -196,7 +196,7 @@ export const InfiniteScroll = defineComponent({
           ? h(
               'div',
               {
-                class: getInfiniteScrollChromeClasses(props.direction, infiniteScrollEndClasses),
+                class: getInfiniteScrollChromeClasses(props.orientation, infiniteScrollEndClasses),
                 'aria-live': 'polite'
               },
               slots.end?.() ??

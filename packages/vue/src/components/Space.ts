@@ -15,8 +15,8 @@ export const Space = defineComponent({
   name: 'TigerSpace',
   inheritAttrs: false,
   props: {
-    direction: {
-      type: String as PropType<SpaceProps['direction']>,
+    orientation: {
+      type: String as PropType<SpaceProps['orientation']>,
       default: 'horizontal'
     },
     size: {

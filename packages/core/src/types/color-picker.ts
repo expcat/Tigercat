@@ -2,7 +2,7 @@
  * ColorPicker shared types.
  *
  * Stored value is a CSS color string in `format` (`hex` / `rgb` / `hsl`).
- * Unselected is `undefined`. Clear writes `''`. Hex with alpha uses 8 digits.
+ * Unselected / clear is `null`. Omit `value` for uncontrolled. Hex with alpha uses 8 digits.
  */
 import type { ComponentSize } from './base'
 import type { InputStatus } from './input'
@@ -47,9 +47,9 @@ export interface ColorPickerProps {
   format?: ColorFormat
   /** Preset colors rendered with ColorSwatch */
   presets?: string[]
-  /** Controlled color. `undefined` is unselected; `''` is cleared. */
-  value?: string
-  defaultValue?: string
+  /** Controlled color. `null` is unselected / cleared. Omit for uncontrolled. */
+  value?: string | null
+  defaultValue?: string | null
   open?: boolean
   /**
    * @default false
@@ -77,7 +77,7 @@ export interface ColorPickerProps {
   offset?: number
   dropdownClassName?: string
   getPopupContainer?: () => HTMLElement | null
-  onChange?: (value: string) => void
+  onChange?: (value: string | null) => void
   onOpenChange?: (open: boolean) => void
   className?: string
 }

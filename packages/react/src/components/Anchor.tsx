@@ -7,7 +7,8 @@ import React, {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState
+  useState,
+  useImperativeHandle
 } from 'react'
 import {
   classNames,
@@ -41,7 +42,7 @@ import { useTigerConfig } from './ConfigProvider'
 
 export interface AnchorContextValue {
   activeLink: string
-  direction: AnchorDirection
+  orientation: AnchorDirection
   registerLink: (href: string, node: Element) => void
   unregisterLink: (href: string, node: Element) => void
   handleLinkClick: (href: string, event: React.MouseEvent, targetAttr?: string) => void
@@ -130,7 +131,11 @@ export interface AnchorProps extends Omit<CoreAnchorProps, 'style' | 'onClick'> 
   'aria-label'?: string
 }
 
-export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
+export interface AnchorHandle {
+  scrollTo: (href: string) => void
+}
+
+export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
   {
     affix = true,
     bounds = 5,
@@ -139,7 +144,7 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
     targetOffset,
     getCurrentAnchor,
     getContainer,
-    direction = 'vertical',
+    orientation = 'vertical',
     className,
     style,
     onClick,
@@ -265,7 +270,7 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
     const activeLinkElement = findAnchorLinkElement(root, activeLink)
     if (!activeLinkElement) return
     const next = getAnchorInkStyle(
-      direction,
+      orientation,
       activeLinkElement.getBoundingClientRect(),
       root.getBoundingClientRect()
     )
@@ -273,36 +278,36 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
     ink.style.height = next.height
     ink.style.insetInlineStart = next.insetInlineStart
     ink.style.width = next.width
-  }, [activeLink, direction, links])
+  }, [activeLink, orientation, links])
 
   const wrapperClasses = classNames(getAnchorWrapperClasses(className))
   const showInk = !affix || showInkInFixed
 
+  useImperativeHandle(ref, () => ({ scrollTo }), [scrollTo])
+
   const setNavRef = (node: HTMLElement | null) => {
     anchorRef.current = node
-    if (typeof ref === 'function') ref(node)
-    else if (ref) ref.current = node
   }
 
   const contextValue = useMemo<AnchorContextValue>(
     () => ({
       activeLink,
-      direction,
+      orientation,
       registerLink,
       unregisterLink,
       handleLinkClick
     }),
-    [activeLink, direction, registerLink, unregisterLink, handleLinkClick]
+    [activeLink, orientation, registerLink, unregisterLink, handleLinkClick]
   )
 
   const nav = (
     <nav ref={setNavRef} className={wrapperClasses} style={style} aria-label={navLabel}>
       {showInk && (
-        <div className={getAnchorInkContainerClasses(direction)}>
-          <div ref={inkRef} className={getAnchorInkActiveClasses(direction)} />
+        <div className={getAnchorInkContainerClasses(orientation)}>
+          <div ref={inkRef} className={getAnchorInkActiveClasses(orientation)} />
         </div>
       )}
-      <ul className={getAnchorLinkListClasses(direction)}>{children}</ul>
+      <ul className={getAnchorLinkListClasses(orientation)}>{children}</ul>
     </nav>
   )
 

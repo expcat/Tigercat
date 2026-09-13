@@ -63,7 +63,7 @@ const selectedId = ref<string | number | null>('product')
     </p>
     <OrgChart
       :data="data"
-      direction="vertical"
+      orientation="vertical"
       :width="760"
       :height="500"
       :node-width="180"

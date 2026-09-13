@@ -51,7 +51,7 @@ export interface AnchorProps {
    * Direction of the anchor navigation
    * @default 'vertical'
    */
-  direction?: AnchorDirection
+  orientation?: AnchorDirection
   /**
    * Additional CSS classes
    */

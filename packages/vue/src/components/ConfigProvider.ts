@@ -44,7 +44,7 @@ export const configProviderProps = {
     type: [Object, Function, Promise] as PropType<TigerLocaleInput>,
     default: undefined
   },
-  direction: {
+  dir: {
     type: String as PropType<TigerLocaleDirection>,
     default: undefined
   },
@@ -62,6 +62,7 @@ export type VueConfigProviderProps = ExtractPropTypes<typeof configProviderProps
 
 export const ConfigProvider = defineComponent({
   name: 'TigerConfigProvider',
+  inheritAttrs: false,
   props: configProviderProps,
   setup(props, { slots }) {
     const parentInjected = inject(TigerConfigKey, null)
@@ -120,7 +121,7 @@ export const ConfigProvider = defineComponent({
         locale: resolvedLocale.value,
         localeLoading: localeLoading.value,
         localeLoadError: localeLoadError.value,
-        direction: props.direction,
+        direction: props.dir,
         theme: props.theme,
         colorScheme: props.colorScheme,
         parent: parent.value

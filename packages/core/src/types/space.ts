@@ -12,12 +12,12 @@ export type SpaceSize = 'sm' | 'md' | 'lg' | number
 /**
  * Base space props interface
  */
-export interface SpaceProps extends Pick<BaseLayoutProps, 'direction' | 'align' | 'wrap'> {
+export interface SpaceProps extends Pick<BaseLayoutProps, 'orientation' | 'align' | 'wrap'> {
   /**
-   * Space direction
+   * Space orientation
    * @default 'horizontal'
    */
-  direction?: BaseLayoutProps['direction']
+  orientation?: BaseLayoutProps['orientation']
 
   /**
    * Space size between items

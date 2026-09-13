@@ -32,7 +32,7 @@ import { useTigerConfig } from './ConfigProvider'
 export interface StepsContextValue {
   current: number
   status: StepStatus
-  direction: StepsDirection
+  orientation: StepsDirection
   size: StepSize
   simple: boolean
   clickable: boolean
@@ -114,12 +114,12 @@ export const StepsItem: React.FC<StepsItemProps> = ({
 
   const isClickable = !!stepsContext.handleStepClick && !disabled
 
-  const itemClasses = classNames(getStepItemClasses(stepsContext.direction, isLast), className)
+  const itemClasses = classNames(getStepItemClasses(stepsContext.orientation, isLast), className)
 
   const iconClasses = getStepIconClasses(stepStatus, stepsContext.size, stepsContext.simple, !!icon)
 
   const tailClasses = getStepTailClasses(
-    stepsContext.direction,
+    stepsContext.orientation,
     stepStatus,
     isLast,
     stepsContext.size,
@@ -127,7 +127,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   )
   const iconColumnClasses = getStepIconColumnClasses(stepsContext.size, stepsContext.simple)
   const sizeDataValue = getStepSizeDataValue(stepsContext.size, stepsContext.simple)
-  const contentClasses = getStepContentClasses(stepsContext.direction)
+  const contentClasses = getStepContentClasses(stepsContext.orientation)
   const titleClasses = getStepTitleClasses(stepStatus, stepsContext.size, isClickable)
   const descriptionClasses = getStepDescriptionClasses(stepStatus, stepsContext.size)
 
@@ -174,7 +174,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
 
   const body = (
     <>
-      {stepsContext.direction === 'vertical' ? (
+      {stepsContext.orientation === 'vertical' ? (
         <div className={iconColumnClasses} data-tiger-step-size={sizeDataValue}>
           {renderIcon()}
           <div className={tailClasses} />
@@ -201,7 +201,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
         <button
           type="button"
           className={
-            stepsContext.direction === 'vertical'
+            stepsContext.orientation === 'vertical'
               ? 'flex w-full flex-row items-stretch bg-transparent p-0 text-start'
               : 'flex w-full flex-col items-center bg-transparent p-0'
           }
@@ -241,7 +241,7 @@ export interface StepsProps
 export const Steps: React.FC<StepsProps> = ({
   current = 0,
   status = 'process',
-  direction = 'horizontal',
+  orientation = 'horizontal',
   size = 'md',
   simple = false,
   clickable = false,
@@ -286,8 +286,8 @@ export const Steps: React.FC<StepsProps> = ({
   const clampedCurrent = clampStepCurrent(current, itemNodes.length)
 
   const containerClasses = useMemo(
-    () => classNames(getStepsContainerClasses(direction), className),
-    [direction, className]
+    () => classNames(getStepsContainerClasses(orientation), className),
+    [orientation, className]
   )
 
   const handleStepClick = useCallback(
@@ -302,14 +302,14 @@ export const Steps: React.FC<StepsProps> = ({
     () => ({
       current: clampedCurrent,
       status,
-      direction,
+      orientation,
       size,
       simple,
       clickable,
       labels: stepLabels,
       handleStepClick: clickable ? handleStepClick : undefined
     }),
-    [clampedCurrent, status, direction, size, simple, clickable, stepLabels, handleStepClick]
+    [clampedCurrent, status, orientation, size, simple, clickable, stepLabels, handleStepClick]
   )
 
   const stepsWithProps = itemNodes.map((child, index) => {
@@ -327,7 +327,7 @@ export const Steps: React.FC<StepsProps> = ({
         className={containerClasses}
         style={style}
         role="list"
-        data-direction={direction}
+        data-orientation={orientation}
         data-tiger-step-size={getStepSizeDataValue(size, simple)}
         aria-label={ariaLabelProp ?? stepLabels.ariaLabel}>
         {stepsWithProps}

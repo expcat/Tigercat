@@ -29,7 +29,7 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
         </div>
       </Col>
     </Row>
-    <ConfigProvider direction="rtl">
+    <ConfigProvider dir="rtl">
       <Row :gutter="16" dir="rtl">
         <Col :span="8" :offset="4">
           <div class="rounded border border-[var(--tiger-border)] p-3 text-sm">

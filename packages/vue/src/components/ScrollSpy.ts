@@ -68,7 +68,7 @@ export const ScrollSpy = defineComponent({
       type: Number,
       default: 5
     },
-    direction: {
+    orientation: {
       type: String as PropType<ScrollSpyDirection>,
       default: 'vertical'
     },
@@ -198,7 +198,7 @@ export const ScrollSpy = defineComponent({
     const renderItems = (items: ScrollSpyItem[], nested = false): VNode =>
       h(
         'ul',
-        { class: getScrollSpyListClasses(props.direction, nested), role: 'list' },
+        { class: getScrollSpyListClasses(props.orientation, nested), role: 'list' },
         items.map((item) => {
           const keyString = getScrollSpyKeyString(item.key)
           const isActive = keyString === activeKeyString.value

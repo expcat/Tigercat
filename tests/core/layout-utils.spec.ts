@@ -64,10 +64,10 @@ describe('layout root direction and height', () => {
     expect(getLayoutRootClasses({ fullHeight: true })).toContain('tiger-layout-full')
   })
 
-  it('resolves hasSider from the explicit prop, then direction, then child detection', () => {
+  it('resolves hasSider from the explicit prop, then mode, then child detection', () => {
     expect(resolveLayoutHasSider({ hasSider: false, childIsSider: true })).toBe(false)
-    expect(resolveLayoutHasSider({ direction: 'horizontal', childIsSider: false })).toBe(true)
-    expect(resolveLayoutHasSider({ direction: 'vertical', childIsSider: true })).toBe(false)
+    expect(resolveLayoutHasSider({ mode: 'horizontal', childIsSider: false })).toBe(true)
+    expect(resolveLayoutHasSider({ mode: 'vertical', childIsSider: true })).toBe(false)
     expect(resolveLayoutHasSider({ childIsSider: true })).toBe(true)
   })
 })

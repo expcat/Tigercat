@@ -12,7 +12,7 @@ export default function App() {
           发布
         </section>
       </div>
-      <Anchor affix={false} getContainer="#anchor-scroll-container" direction="horizontal">
+      <Anchor affix={false} getContainer="#anchor-scroll-container" orientation="horizontal">
         <AnchorLink href="#anchor-audit" title="审计" />
         <AnchorLink href="#anchor-release" title="发布" />
       </Anchor>

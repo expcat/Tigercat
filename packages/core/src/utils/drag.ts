@@ -289,18 +289,18 @@ export function toDragItems<T extends Record<string, unknown>>(
   }))
 }
 
-function lockAxisForDirection(direction: DragConfig['direction']): DragConfig['lockAxis'] {
-  if (direction === 'horizontal') return 'x'
-  if (direction === 'vertical') return 'y'
+function lockAxisForDirection(axis: DragConfig['axis']): DragConfig['lockAxis'] {
+  if (axis === 'horizontal') return 'x'
+  if (axis === 'vertical') return 'y'
   return undefined
 }
 
 /**
- * Default drag config. Vertical lists lock to Y; `direction: 'both'` does not lock.
+ * Default drag config. Vertical lists lock to Y; `axis: 'both'` does not lock.
  */
 export function getDefaultDragConfig(): ResolvedDragConfig {
   return {
-    direction: 'vertical',
+    axis: 'vertical',
     handleSelector: '',
     dragClass: 'tiger-drag-active',
     disabled: false,
@@ -312,17 +312,17 @@ export function getDefaultDragConfig(): ResolvedDragConfig {
 
 /**
  * Merge user config with defaults. Explicit `lockAxis` wins; otherwise it follows
- * `direction` (`both` leaves the axis unlocked).
+ * `axis` (`both` leaves the axis unlocked).
  */
 export function resolveDragConfig(config?: DragConfig): ResolvedDragConfig {
-  const direction = config?.direction ?? 'vertical'
+  const axis = config?.axis ?? 'vertical'
   return {
-    direction,
+    axis,
     handleSelector: config?.handleSelector ?? '',
     dragClass: config?.dragClass ?? 'tiger-drag-active',
     disabled: config?.disabled ?? false,
     crossContainer: config?.crossContainer ?? false,
-    lockAxis: config?.lockAxis ?? lockAxisForDirection(direction),
+    lockAxis: config?.lockAxis ?? lockAxisForDirection(axis),
     dragThreshold: config?.dragThreshold ?? 5
   }
 }

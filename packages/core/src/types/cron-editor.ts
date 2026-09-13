@@ -65,7 +65,8 @@ export interface CronPreset {
  *
  * Dialect is **5-field numeric unix cron** (minute hour day-of-month month day-of-week).
  * Sunday is `0` or `7`. Names (`MON`, `JAN`), Quartz (`?` `L` `W` `#`), seconds, and
- * years are invalid. Unselected is `undefined` / `''` — not `* * * * *`.
+ * years are invalid. Unselected / cleared empty is `null`. Omit for uncontrolled.
+ * Not `* * * * *`.
  */
 export interface CronEditorProps {
   /**
@@ -84,17 +85,17 @@ export interface CronEditorProps {
   ariaLabel?: string
   className?: string
   /**
-   * 5-field unix expression. `undefined` is unselected; `''` is cleared empty.
+   * 5-field unix expression. `null` is unselected / cleared empty.
    */
-  value?: string
-  defaultValue?: string
+  value?: string | null
+  defaultValue?: string | null
   /** Locale object merged on top of ConfigProvider. Do not pass a language id. */
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleCronEditor>
   status?: InputStatus
   name?: string
   id?: string
-  onChange?: (value: string, validation: CronValidationResult) => void
+  onChange?: (value: string | null, validation: CronValidationResult) => void
   onValidate?: (validation: CronValidationResult) => void
 }
 

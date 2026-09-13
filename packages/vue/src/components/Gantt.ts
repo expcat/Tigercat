@@ -24,7 +24,9 @@ import {
   type GanttLayoutTask,
   type GanttProps as CoreGanttProps,
   type GanttScale,
-  type GanttTask
+  type GanttTask,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { useTigerConfig } from './ConfigProvider'
@@ -92,6 +94,8 @@ export const Gantt = defineComponent({
     title: { type: String },
     desc: { type: String },
     ariaLabel: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
     onTaskClick: { type: Function as PropType<(task: GanttTask) => void> },
     onTaskChange: { type: Function as PropType<(task: GanttTask) => void> }
@@ -99,7 +103,8 @@ export const Gantt = defineComponent({
   emits: ['update:selectedId', 'task-click', 'task-hover', 'task-change', 'update:data'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const innerSelectedId = ref<string | number | null>(null)
     const hoveredId = ref<string | number | null>(null)
     const dragSession = ref<GanttBarDragSession | null>(null)

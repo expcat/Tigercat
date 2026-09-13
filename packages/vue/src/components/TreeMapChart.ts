@@ -26,7 +26,9 @@ import {
   type ChartLegendPosition,
   type ChartPadding,
   type TreeMapChartDatum,
-  type TreeMapChartProps as CoreTreeMapChartProps
+  type TreeMapChartProps as CoreTreeMapChartProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
@@ -74,6 +76,8 @@ export const TreeMapChart = defineComponent({
     },
     title: { type: String },
     desc: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
     onNodeClick: {
       type: Function as PropType<(index: number, datum: TreeMapChartDatum) => void>
@@ -82,7 +86,8 @@ export const TreeMapChart = defineComponent({
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'node-click', 'node-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const interactive = computed(
       () => props.hoverable || props.selectable || typeof props.onNodeClick === 'function'
     )

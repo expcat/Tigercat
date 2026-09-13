@@ -163,7 +163,6 @@ export const deDE: TigerLocale = {
     signModeLabel: 'Freigabemodus',
     actorLabel: 'Bearbeiter',
     actorPlaceholder: 'Name des Bearbeiters',
-    emptyText: 'Noch keine Schritte. Fügen Sie einen Startknoten hinzu.',
     subpathEmpty: 'Kein Teilbaum auf diesem Pfad.',
     insertSibling: 'Dahinter einfügen',
     editPanelAriaLabel: 'Knoteneinstellungen',
@@ -692,7 +691,8 @@ export const deDE: TigerLocale = {
   },
   signature: {
     ariaLabel: 'Unterschriftenfeld',
-    undoText: 'Rückgängig'
+    undoText: 'Rückgängig',
+    clearText: 'Löschen'
   },
   numberKeyboard: {
     ariaLabel: 'Ziffernblock',

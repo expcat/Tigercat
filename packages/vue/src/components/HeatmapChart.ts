@@ -27,7 +27,9 @@ import {
   DEFAULT_HEATMAP_CELL_GAP,
   type ChartPadding,
   type HeatmapChartDatum,
-  type HeatmapChartProps as CoreHeatmapChartProps
+  type HeatmapChartProps as CoreHeatmapChartProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
@@ -76,6 +78,8 @@ export const HeatmapChart = defineComponent({
     },
     title: { type: String },
     desc: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
     onCellClick: {
       type: Function as PropType<(index: number, datum: HeatmapChartDatum | null) => void>
@@ -84,7 +88,8 @@ export const HeatmapChart = defineComponent({
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'cell-click', 'cell-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
-    const labels = computed(() => getChartLabels(mergeTigerLocale(config.value.locale)))
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const interactive = computed(
       () => props.hoverable || props.selectable || typeof props.onCellClick === 'function'
     )

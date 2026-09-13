@@ -53,7 +53,8 @@ export interface DatePickerShortcut {
  * Dates are calendar days (local midnight). A UTC-midnight `Date` such as
  * `new Date('2024-01-15')` is that calendar day in every timezone.
  * `format` is used for both the input display and typed parse.
- * Empty range is `[null, null]`. `name` submits the formatted display string.
+ * Empty range is `null`. A partial range is a `[start, end]` tuple.
+ * `name` submits the formatted display string.
  */
 export interface DatePickerProps {
   /** Locale object merged on top of ConfigProvider. Do not pass a language id string. */

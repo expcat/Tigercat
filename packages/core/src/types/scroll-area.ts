@@ -158,7 +158,7 @@ export interface ScrollAreaProps {
    * Axes that may scroll
    * @default 'vertical'
    */
-  direction?: ScrollAreaDirection
+  axis?: ScrollAreaDirection
 
   /**
    * Custom scrollbar visibility strategy

@@ -830,19 +830,18 @@ export function getStepperLabels(
   return resolveLocaleSection(enSection('stepper'), locale?.stepper, overrides)
 }
 
-export interface SignatureResolvedLabels extends Required<TigerLocaleSignature> {
-  clearText: string
-}
-
 export function getSignatureLabels(
   locale?: Partial<TigerLocale>,
-  overrides?: Partial<TigerLocaleSignature> & { clearText?: string }
-): SignatureResolvedLabels {
+  overrides?: Partial<TigerLocaleSignature>
+): Required<TigerLocaleSignature> {
   const section = resolveLocaleSection(enSection('signature'), locale?.signature, overrides)
   const clearText =
     typeof overrides?.clearText === 'string' && overrides.clearText.trim()
       ? overrides.clearText
-      : (locale?.common?.clearText ?? enUS.common?.clearText ?? 'Clear')
+      : (section.clearText ||
+        locale?.common?.clearText ||
+        enUS.common?.clearText ||
+        'Clear')
   return {
     ...section,
     clearText

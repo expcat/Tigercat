@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## AreaChart
 
-`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 4/53 props
+`packages/core/src/types/chart-cartesian.ts` · `AreaChartProps` · 4/55 props
 
 | Prop          | Type                | Default | Notes                                                      |
 | ------------- | ------------------- | ------- | ---------------------------------------------------------- |
@@ -22,7 +22,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## BarChart
 
-`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 4/49 props
+`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 4/51 props
 
 | Prop          | Type              | Default                                        | Notes                                                                                   |
 | ------------- | ----------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -70,16 +70,16 @@ Events/callback props: `onResolvedSizeChange?`.
 
 ## ChartLegend
 
-`packages/core/src/types/chart-core.ts` · `ChartLegendProps` · 4/7 props
+`packages/core/src/types/chart-core.ts` · `ChartLegendProps` · 4/9 props
 
 Note: 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。
 
-| Prop           | Type                     | Default        | Notes                                                        |
-| -------------- | ------------------------ | -------------- | ------------------------------------------------------------ |
-| `items`        | `ChartLegendItem[]`      | `-`            | Legend items                                                 |
-| `orientation?` | `ChartLegendOrientation` | `'horizontal'` | Row vs column layout                                         |
-| `interactive?` | `boolean`                | `false`        | Whether items are buttons                                    |
-| `ariaLabel?`   | `string`                 | `-`            | Accessible name. Defaults to locale `chart.legendAriaLabel`. |
+| Prop           | Type                     | Default        | Notes                                                                        |
+| -------------- | ------------------------ | -------------- | ---------------------------------------------------------------------------- |
+| `items`        | `ChartLegendItem[]`      | `-`            | Legend items                                                                 |
+| `orientation?` | `ChartLegendOrientation` | `'horizontal'` | Row vs column layout                                                         |
+| `interactive?` | `boolean`                | `false`        | Whether items are buttons                                                    |
+| `ariaLabel?`   | `string`                 | `-`            | Accessible name. Overlay: dedicated `ariaLabel` → `labels` → `locale.chart`. |
 
 ## ChartSeries
 
@@ -106,18 +106,18 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## FunnelChart
 
-`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 4/26 props
+`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 4/28 props
 
-| Prop         | Type                         | Default      | Notes                                                                          |
-| ------------ | ---------------------------- | ------------ | ------------------------------------------------------------------------------ |
-| `data`       | `FunnelChartDatum[]`         | `-`          | Data items — ordered from widest to narrowest                                  |
-| `direction?` | `'vertical' \| 'horizontal'` | `'vertical'` | Vertical or horizontal layout. Horizontal grows along x; height follows value. |
-| `gap?`       | `number`                     | `2`          | Gap between funnel segments in px                                              |
-| `pinch?`     | `boolean`                    | `false`      | Whether the last segment tapers to a point                                     |
+| Prop        | Type                 | Default | Notes                                                                    |
+| ----------- | -------------------- | ------- | ------------------------------------------------------------------------ |
+| `data`      | `FunnelChartDatum[]` | `-`     | Data items — ordered from widest to narrowest                            |
+| `gap?`      | `number`             | `2`     | Gap between funnel segments in px                                        |
+| `pinch?`    | `boolean`            | `false` | Whether the last segment tapers to a point                               |
+| `gradient?` | `boolean`            | `false` | Render each segment with a vertical alpha gradient in funnel user space. |
 
 ## Gantt
 
-`packages/core/src/types/gantt.ts` · `GanttProps` · 4/31 props
+`packages/core/src/types/gantt.ts` · `GanttProps` · 4/33 props
 
 | Prop         | Type          | Default | Notes |
 | ------------ | ------------- | ------- | ----- |
@@ -128,7 +128,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## GaugeChart
 
-`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 4/24 props
+`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 4/26 props
 
 | Prop          | Type                                               | Default | Notes                                                                                      |
 | ------------- | -------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -139,7 +139,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## HeatmapChart
 
-`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 4/29 props
+`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 4/31 props
 
 | Prop        | Type                  | Default     | Notes                                                                                      |
 | ----------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
@@ -150,7 +150,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## LineChart
 
-`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 4/52 props
+`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 4/54 props
 
 | Prop          | Type                | Default    | Notes                               |
 | ------------- | ------------------- | ---------- | ----------------------------------- |
@@ -161,18 +161,18 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## OrgChart
 
-`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 4/24 props
+`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 4/26 props
 
-| Prop          | Type                             | Default      | Notes                                                                 |
-| ------------- | -------------------------------- | ------------ | --------------------------------------------------------------------- |
-| `data`        | `OrgChartNode \| OrgChartNode[]` | `-`          | -                                                                     |
-| `direction?`  | `OrgChartDirection`              | `'vertical'` | `horizontal` is left-to-right. Cards keep `nodeWidth` × `nodeHeight`. |
-| `nodeWidth?`  | `number`                         | `-`          | -                                                                     |
-| `nodeHeight?` | `number`                         | `-`          | -                                                                     |
+| Prop          | Type                             | Default | Notes |
+| ------------- | -------------------------------- | ------- | ----- |
+| `data`        | `OrgChartNode \| OrgChartNode[]` | `-`     | -     |
+| `nodeWidth?`  | `number`                         | `-`     | -     |
+| `nodeHeight?` | `number`                         | `-`     | -     |
+| `levelGap?`   | `number`                         | `-`     | -     |
 
 ## PieChart
 
-`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/39 props
+`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/41 props
 
 Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。
 
@@ -185,7 +185,7 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 
 ## RadarChart
 
-`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/55 props
+`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/57 props
 
 | Prop          | Type                 | Default        | Notes                        |
 | ------------- | -------------------- | -------------- | ---------------------------- |
@@ -207,7 +207,7 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 
 ## SunburstChart
 
-`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 4/24 props
+`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 4/26 props
 
 | Prop                | Type                   | Default | Notes                                                                                      |
 | ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -218,7 +218,7 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 
 ## TreeMapChart
 
-`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 4/26 props
+`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 4/28 props
 
 | Prop            | Type                  | Default | Notes                                                                    |
 | --------------- | --------------------- | ------- | ------------------------------------------------------------------------ |

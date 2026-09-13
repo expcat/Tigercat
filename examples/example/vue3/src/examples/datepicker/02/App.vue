@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 
-const range = ref<[Date | null, Date | null]>([null, null])
+const range = ref<[Date | null, Date | null] | null>(null)
 </script>
 
 <template>

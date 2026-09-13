@@ -162,7 +162,6 @@ export const viVN: TigerLocale = {
     signModeLabel: 'Cách ký duyệt',
     actorLabel: 'Người xử lý',
     actorPlaceholder: 'Tên người xử lý',
-    emptyText: 'Chưa có bước. Thêm nút khởi tạo để bắt đầu.',
     subpathEmpty: 'Không có cây con tại đường dẫn này.',
     insertSibling: 'Chèn phía sau',
     editPanelAriaLabel: 'Cài đặt nút',
@@ -690,7 +689,8 @@ export const viVN: TigerLocale = {
   },
   signature: {
     ariaLabel: 'Bảng chữ ký',
-    undoText: 'Hoàn tác'
+    undoText: 'Hoàn tác',
+    clearText: 'Xóa'
   },
   numberKeyboard: {
     ariaLabel: 'Bàn phím số',

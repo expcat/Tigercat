@@ -164,14 +164,14 @@ describe('ColorPicker', () => {
     expect(trigger(ja.container).getAttribute('aria-label')).toBe('色を選択')
   })
 
-  it('emits empty string when Clear is clicked', async () => {
+  it('emits null when Clear is clicked', async () => {
     const onChange = vi.fn()
     const { container } = render(ColorPicker, {
       props: { modelValue: '#2563eb', 'onUpdate:modelValue': onChange }
     })
     await fireEvent.click(trigger(container))
     await fireEvent.click(document.body.querySelector('[data-tiger-colorpicker-clear]')!)
-    expect(onChange).toHaveBeenCalledWith('')
+    expect(onChange).toHaveBeenCalledWith(null)
   })
 
   it('does not treat opening the panel as a field blur', async () => {

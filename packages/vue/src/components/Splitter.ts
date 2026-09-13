@@ -31,7 +31,7 @@ import { flattenElementVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueSplitterProps {
-  direction?: SplitDirection
+  orientation?: SplitDirection
   sizes?: (number | string)[]
   min?: number
   max?: number
@@ -45,7 +45,7 @@ export const Splitter = defineComponent({
   name: 'TigerSplitter',
   inheritAttrs: false,
   props: {
-    direction: {
+    orientation: {
       type: String as PropType<SplitDirection>,
       default: 'horizontal' as SplitDirection
     },
@@ -109,7 +109,7 @@ export const Splitter = defineComponent({
     }
 
     const applyMeasure = () => {
-      const size = measureSplitterContainer(containerRef.value, props.direction)
+      const size = measureSplitterContainer(containerRef.value, props.orientation)
       if (size > 0) containerSize.value = size
     }
 
@@ -129,7 +129,7 @@ export const Splitter = defineComponent({
 
     const containerClasses = computed(() =>
       classNames(
-        getSplitterContainerClasses(props.direction, props.className),
+        getSplitterContainerClasses(props.orientation, props.className),
         coerceClassValue(attrs.class)
       )
     )
@@ -180,7 +180,7 @@ export const Splitter = defineComponent({
       if (props.disabled || e.button !== 0) return
       e.preventDefault()
       cleanupDragSession()
-      const liveSize = measureSplitterContainer(containerRef.value, props.direction)
+      const liveSize = measureSplitterContainer(containerRef.value, props.orientation)
       if (liveSize > 0) containerSize.value = liveSize
       draggingIndex.value = index
       startPos.value = { x: e.clientX, y: e.clientY }
@@ -193,7 +193,7 @@ export const Splitter = defineComponent({
         ownerDocument: (e.currentTarget as HTMLElement | null)?.ownerDocument,
         pointerId: e.pointerId,
         pointerTarget: e.currentTarget instanceof Element ? e.currentTarget : null,
-        lockAxis: props.direction === 'horizontal' ? 'x' : 'y',
+        lockAxis: props.orientation === 'horizontal' ? 'x' : 'y',
         onMove: ({ currentX, currentY }) => {
           applyDragResize(currentX, currentY, 'move')
         },
@@ -208,7 +208,7 @@ export const Splitter = defineComponent({
     const applyDragResize = (currentX: number, currentY: number, phase: 'move' | 'end') => {
       if (draggingIndex.value < 0) return
       const delta = getSplitterPointerDelta(
-        props.direction,
+        props.orientation,
         startPos.value.x,
         startPos.value.y,
         currentX,
@@ -249,7 +249,7 @@ export const Splitter = defineComponent({
 
       panes.forEach((child, i) => {
         const size = measured ? pixels[i] : null
-        const paneStyle = getPaneStyle(size, props.direction, {
+        const paneStyle = getPaneStyle(size, props.orientation, {
           ratio: ratios[i] ?? 0,
           measured
         })
@@ -273,9 +273,9 @@ export const Splitter = defineComponent({
             h(
               'div',
               {
-                class: getSplitterGutterClasses(props.direction, isDragging, props.disabled),
+                class: getSplitterGutterClasses(props.orientation, isDragging, props.disabled),
                 role: 'separator',
-                'aria-orientation': props.direction === 'horizontal' ? 'vertical' : 'horizontal',
+                'aria-orientation': props.orientation === 'horizontal' ? 'vertical' : 'horizontal',
                 'aria-controls': `${instanceId}-pane-${i}`,
                 'aria-valuemin': 0,
                 'aria-valuemax': 100,
@@ -290,7 +290,7 @@ export const Splitter = defineComponent({
                 onPointerdown: (e: PointerEvent) => onPointerDown(i, e),
                 onKeydown: (e: KeyboardEvent) => {
                   if (props.disabled) return
-                  const delta = getSplitterKeyboardDelta(e.key, props.direction, rtl.value)
+                  const delta = getSplitterKeyboardDelta(e.key, props.orientation, rtl.value)
                   if (delta == null) return
                   e.preventDefault()
                   const newSizes = resizePanes(currentPixels(), i, delta, getMins(), getMaxes())
@@ -299,7 +299,7 @@ export const Splitter = defineComponent({
               },
               [
                 h('div', {
-                  class: getSplitterGutterHandleClasses(props.direction),
+                  class: getSplitterGutterHandleClasses(props.orientation),
                   'aria-hidden': 'true'
                 })
               ]
@@ -318,7 +318,7 @@ export const Splitter = defineComponent({
             ...props.style,
             ...getSplitterGutterCssVars(props.gutterSize)
           }),
-          'data-direction': props.direction
+          'data-orientation': props.orientation
         },
         nodes
       )

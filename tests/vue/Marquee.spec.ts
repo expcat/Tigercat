@@ -14,6 +14,7 @@ import {
   MARQUEE_STYLE_ID
 } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 function getRoot(container: HTMLElement): HTMLElement {
@@ -26,14 +27,14 @@ function getTrack(container: HTMLElement): HTMLElement {
 
 describe('Marquee', () => {
   describe('Rendering', () => {
-    it('duplicates the slot for a seamless loop without becoming a landmark', () => {
+    it('duplicates the slot for a seamless loop and names the region from locale', () => {
       const { container } = render(Marquee, {
         slots: { default: () => h('span', 'Vue React') }
       })
       const root = getRoot(container)
       expect(root.tagName).toBe('DIV')
-      expect(root).not.toHaveAttribute('role')
-      expect(root).not.toHaveAttribute('aria-label')
+      expect(root).toHaveAttribute('role', 'region')
+      expect(root).toHaveAttribute('aria-label', enUS.marquee?.ariaLabel)
       expect(root).toHaveAttribute('data-marquee-direction', 'left')
       expect(root).toHaveAttribute('data-marquee-paused', 'false')
       expect(root.querySelectorAll('[data-marquee-content]')).toHaveLength(2)
@@ -232,19 +233,19 @@ describe('Marquee', () => {
       expect(root.querySelectorAll('button')).toHaveLength(2)
       expect(screen.getAllByRole('button')).toHaveLength(1)
       expect(root.querySelector('[data-marquee-clone]')).toHaveAttribute('inert')
-      expect(screen.queryByRole('region')).not.toBeInTheDocument()
+      expect(screen.getByRole('region')).toHaveAttribute('aria-label', enUS.marquee?.ariaLabel)
       expect(screen.queryByRole('marquee')).not.toBeInTheDocument()
       await expectNoA11yViolationsIsolated(container)
     })
 
-    it('does not invent an English landmark under ConfigProvider zh-CN', () => {
+    it('reads ConfigProvider zh-CN marquee.ariaLabel', () => {
       const { container } = render({
         setup() {
           return () => h(ConfigProvider, { locale: zhCN }, () => h(Marquee, null, () => 'News'))
         }
       })
-      expect(screen.queryByRole('region')).not.toBeInTheDocument()
-      expect(getRoot(container)).not.toHaveAttribute('aria-label')
+      expect(screen.getByRole('region')).toHaveAttribute('aria-label', zhCN.marquee?.ariaLabel)
+      expect(getRoot(container)).toHaveAttribute('aria-label', zhCN.marquee?.ariaLabel)
     })
 
     it('injects reduced-motion CSS that freezes the track and hides clones', () => {

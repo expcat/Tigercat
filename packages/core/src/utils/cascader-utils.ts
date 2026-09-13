@@ -205,7 +205,8 @@ export function isCascaderValueEmpty(value: CascaderModelValue): boolean {
 }
 
 export function normalizeCascaderValue(value: CascaderModelValue): CascaderModelValue {
-  if (value === undefined || value.length === 0) return undefined
+  if (value === undefined) return undefined
+  if (value.length === 0) return []
   return value
 }
 

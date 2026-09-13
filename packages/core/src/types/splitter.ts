@@ -12,10 +12,10 @@ export type SplitDirection = 'horizontal' | 'vertical'
  */
 export interface SplitterProps {
   /**
-   * Direction of the split
+   * Orientation of the split (horizontal = left/right panes)
    * @default 'horizontal'
    */
-  direction?: SplitDirection
+  orientation?: SplitDirection
   /**
    * Pane sizes in pixels or percentage / px strings (`'30%'`, `'200px'`).
    * Numbers are pixels. `'30%'` is a percent of available space (container minus gutters).

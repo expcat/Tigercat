@@ -143,7 +143,8 @@ describe('cascader columns, flatten, and display', () => {
   it('treats undefined as empty and [] as empty', () => {
     expect(isCascaderValueEmpty(undefined)).toBe(true)
     expect(isCascaderValueEmpty([])).toBe(true)
-    expect(normalizeCascaderValue([])).toBeUndefined()
+    expect(normalizeCascaderValue([])).toEqual([])
+    expect(normalizeCascaderValue(undefined)).toBeUndefined()
     expect(isCascaderValueEmpty(['a'])).toBe(false)
   })
 

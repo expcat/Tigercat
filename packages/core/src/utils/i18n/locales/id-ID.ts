@@ -162,7 +162,6 @@ export const idID: TigerLocale = {
     signModeLabel: 'Mode tanda tangan',
     actorLabel: 'Pelaksana',
     actorPlaceholder: 'Nama pelaksana',
-    emptyText: 'Belum ada langkah. Tambah simpul awal untuk mulai.',
     subpathEmpty: 'Tidak ada subtree di jalur ini.',
     insertSibling: 'Sisipkan setelah',
     editPanelAriaLabel: 'Pengaturan simpul',
@@ -690,7 +689,8 @@ export const idID: TigerLocale = {
   },
   signature: {
     ariaLabel: 'Pad tanda tangan',
-    undoText: 'Urungkan'
+    undoText: 'Urungkan',
+    clearText: 'Hapus'
   },
   numberKeyboard: {
     ariaLabel: 'Papan tombol angka',

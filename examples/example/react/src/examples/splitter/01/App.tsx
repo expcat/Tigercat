@@ -6,7 +6,7 @@ export default function App() {
 
   return (
     <Splitter
-      direction="horizontal"
+      orientation="horizontal"
       sizes={sizes}
       gutterSize={6}
       onSizesChange={setSizes}

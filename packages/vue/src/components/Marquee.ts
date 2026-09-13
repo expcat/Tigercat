@@ -1,9 +1,10 @@
-import { defineComponent, h, onMounted, PropType, ref } from 'vue'
+import { computed, defineComponent, h, onMounted, PropType, ref } from 'vue'
 import {
   composeComponentClasses,
   getMarqueeCloneAttributes,
   getMarqueeContentClasses,
   getMarqueeContentStyle,
+  getMarqueeLabels,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
   getMarqueeTrackStyle,
@@ -11,14 +12,18 @@ import {
   isMarqueeFocusInside,
   isMarqueePaused,
   mergeStyleValues,
+  mergeTigerLocale,
   resolveMarqueeDirection,
   resolveMarqueePauseOnFocus,
   resolveMarqueePauseOnHover,
   resolveMarqueeRegion,
   resolveMarqueeRepeat,
   type MarqueeDirection,
-  type MarqueeGap
+  type MarqueeGap,
+  type TigerLocale,
+  type TigerLocaleMarquee
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueMarqueeProps {
   direction?: MarqueeDirection
@@ -29,6 +34,8 @@ export interface VueMarqueeProps {
   gap?: MarqueeGap
   repeat?: number
   ariaLabel?: string
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleMarquee>
   className?: string
   style?: Record<string, unknown>
 }
@@ -105,6 +112,14 @@ export const Marquee = defineComponent({
       type: String,
       default: undefined
     },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
+    },
+    labels: {
+      type: Object as PropType<Partial<TigerLocaleMarquee>>,
+      default: undefined
+    },
     /**
      * Additional CSS classes
      */
@@ -121,6 +136,9 @@ export const Marquee = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getMarqueeLabels(mergedLocale.value, props.labels))
     onMounted(() => {
       injectMarqueeStyles()
     })
@@ -154,8 +172,14 @@ export const Marquee = defineComponent({
         typeof attrsRecord['aria-labelledby'] === 'string'
           ? attrsRecord['aria-labelledby']
           : undefined
+      const dedicatedAria = attrAriaLabel ?? props.ariaLabel
       const region = resolveMarqueeRegion({
-        ariaLabel: attrAriaLabel ?? props.ariaLabel,
+        ariaLabel:
+          dedicatedAria !== undefined
+            ? dedicatedAria
+            : attrLabelledBy
+              ? undefined
+              : labels.value.ariaLabel,
         labelledBy: attrLabelledBy
       })
 

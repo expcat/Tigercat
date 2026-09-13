@@ -16,7 +16,7 @@ const data = [
       :data="data"
       :width="420"
       :height="280"
-      direction="vertical"
+      orientation="vertical"
       gradient
       :gap="3"
       show-tooltip

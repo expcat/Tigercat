@@ -71,6 +71,8 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   tooltipFormatter,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
   onHoveredIndexChange,
   onSelectedIndexChange,
@@ -78,7 +80,14 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   onCellHover
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const interactive = hoverable || selectable || Boolean(onCellClick)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(

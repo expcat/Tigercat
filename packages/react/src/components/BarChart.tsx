@@ -100,6 +100,8 @@ export const BarChart: React.FC<BarChartProps> = ({
   animated = false,
   title,
   desc,
+  locale,
+  labels: labelsOverride,
   className,
   onHoveredIndexChange,
   onSelectedIndexChange,
@@ -107,7 +109,14 @@ export const BarChart: React.FC<BarChartProps> = ({
   onBarHover
 }) => {
   const config = useTigerConfig()
-  const labels = useMemo(() => getChartLabels(mergeTigerLocale(config.locale)), [config.locale])
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(
+    () => getChartLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
   const gradientId = useId()
   const gradientPrefix = useMemo(
     () => getStableChartGradientPrefix('bar', gradientId),

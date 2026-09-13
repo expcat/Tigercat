@@ -120,7 +120,7 @@ describe('InfiniteScroll (React)', () => {
   })
 
   it('supports horizontal direction class', () => {
-    const { container } = render(<InfiniteScroll direction="horizontal" />)
+    const { container } = render(<InfiniteScroll orientation="horizontal" />)
     expect(container.firstElementChild?.className).toContain('flex-row')
   })
 
@@ -137,7 +137,7 @@ describe('InfiniteScroll (React)', () => {
   })
 
   it('gives a horizontal sentinel width and height', () => {
-    const { container } = render(<InfiniteScroll hasMore direction="horizontal" />)
+    const { container } = render(<InfiniteScroll hasMore orientation="horizontal" />)
     const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel') as HTMLElement
     expect(Number.parseInt(sentinel.style.width, 10)).toBeGreaterThan(0)
     expect(sentinel.style.height).toBe('100%')

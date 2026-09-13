@@ -1,4 +1,4 @@
-import React, { forwardRef, useLayoutEffect, useRef, useState, useMemo } from 'react'
+import React, { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState, useMemo } from 'react'
 import {
   classNames,
   createAffixController,
@@ -15,7 +15,11 @@ export interface AffixProps
   onChange?: (affixed: boolean) => void
 }
 
-export const Affix = forwardRef<HTMLDivElement, AffixProps>(function Affix(
+export interface AffixHandle {
+  getElement: () => HTMLElement | null
+}
+
+export const Affix = forwardRef<AffixHandle, AffixProps>(function Affix(
   {
     offsetTop = 0,
     offsetBottom,
@@ -77,10 +81,12 @@ export const Affix = forwardRef<HTMLDivElement, AffixProps>(function Affix(
     controllerRef.current?.observeFlow()
   })
 
+  useImperativeHandle(ref, () => ({
+    getElement: () => wrapperRef.current
+  }))
+
   const setContentRef = (node: HTMLDivElement | null) => {
     wrapperRef.current = node
-    if (typeof ref === 'function') ref(node)
-    else if (ref) ref.current = node
   }
 
   const wrapperClasses = useMemo(() => classNames(className), [className])

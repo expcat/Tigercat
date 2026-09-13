@@ -29,7 +29,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   threshold = 100,
   loadingText,
   endText,
-  direction = 'vertical',
+  orientation = 'vertical',
   inverse = false,
   disabled = false,
   height,
@@ -58,8 +58,8 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   const prevScrollHeightRef = useRef<number | null>(null)
 
   const containerClasses = useMemo(
-    () => getInfiniteScrollContainerClasses(direction, className),
-    [direction, className]
+    () => getInfiniteScrollContainerClasses(orientation, className),
+    [orientation, className]
   )
 
   const requestLoad = useCallback(() => {
@@ -82,8 +82,8 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   const checkScroll = useCallback(() => {
     const el = containerRef.current
     if (!el) return
-    if (shouldLoadMore(el, threshold, direction, inverse, dir)) requestLoad()
-  }, [threshold, direction, inverse, dir, requestLoad])
+    if (shouldLoadMore(el, threshold, orientation, inverse, dir)) requestLoad()
+  }, [threshold, orientation, inverse, dir, requestLoad])
 
   useEffect(() => {
     if (disabled || !hasMore) return
@@ -94,7 +94,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     const observerRoot = resolveObserverRoot()
     const teardown = createInfiniteScrollObserver(sentinel, {
       threshold,
-      direction,
+      orientation,
       root: observerRoot,
       inverse,
       onLoadMore: requestLoad
@@ -117,7 +117,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     loading,
     hasMore,
     threshold,
-    direction,
+    orientation,
     inverse,
     requestLoad,
     resolveObserverRoot,
@@ -139,13 +139,13 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
       ref={sentinelRef}
       className={infiniteScrollSentinelClasses}
       aria-hidden="true"
-      style={getInfiniteScrollSentinelStyle(direction)}
+      style={getInfiniteScrollSentinelStyle(orientation)}
     />
   ) : null
 
   const loaderEl = loading ? (
     <div
-      className={getInfiniteScrollChromeClasses(direction, infiniteScrollLoaderClasses)}
+      className={getInfiniteScrollChromeClasses(orientation, infiniteScrollLoaderClasses)}
       role="status"
       aria-live="polite">
       {loader ?? resolveLocaleText('Loading...', loadingText, mergedLocale?.common?.loadingText)}
@@ -155,7 +155,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   const endEl =
     !hasMore && !loading ? (
       <div
-        className={getInfiniteScrollChromeClasses(direction, infiniteScrollEndClasses)}
+        className={getInfiniteScrollChromeClasses(orientation, infiniteScrollEndClasses)}
         aria-live="polite">
         {end ?? resolveLocaleText('No more data', endText, mergedLocale?.common?.noMoreText)}
       </div>

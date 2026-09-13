@@ -24,7 +24,7 @@ export interface ConfigProviderProps extends CoreConfigProviderProps {
 
 export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   locale,
-  direction,
+  dir,
   theme,
   colorScheme,
   children
@@ -85,12 +85,12 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
         locale: resolvedLocale,
         localeLoading,
         localeLoadError,
-        direction,
+        direction: dir,
         theme,
         colorScheme,
         parent
       }),
-    [resolvedLocale, localeLoading, localeLoadError, direction, theme, colorScheme, parent]
+    [resolvedLocale, localeLoading, localeLoadError, dir, theme, colorScheme, parent]
   )
 
   if (!globalLocaleHandleRef.current) {

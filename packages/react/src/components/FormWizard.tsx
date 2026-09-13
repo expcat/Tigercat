@@ -58,7 +58,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     current,
     defaultCurrent = 0,
     clickable = false,
-    direction = 'horizontal',
+    orientation = 'horizontal',
     size = 'md',
     simple = false,
     bordered = true,
@@ -249,7 +249,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
         <div className={getFormWizardHeaderClasses(bordered)}>
           <Steps
             current={currentIndex}
-            direction={direction}
+            orientation={orientation}
             size={size}
             simple={simple}
             clickable={clickable}

@@ -8,6 +8,7 @@ import {
   coerceDatePickerSingle,
   commitDatePickerDay,
   commitDatePickerToday,
+  emptyDatePickerValue,
   formatDatePickerDisplay,
   parseTypedDatePickerValue,
   resolveDatePickerDisabled
@@ -20,7 +21,9 @@ describe('datepicker controller', () => {
   })
 
   it('warns and empties a non-tuple in range mode', () => {
-    expect(coerceDatePickerRange('2024-01-15')).toEqual([null, null])
+    expect(coerceDatePickerRange('2024-01-15')).toBeNull()
+    expect(coerceDatePickerRange(null)).toBeNull()
+    expect(coerceDatePickerRange([null, null])).toBeNull()
     expect(coerceDatePickerRange(['2024-01-01', '2024-01-10'])).toEqual([
       new Date(2024, 0, 1),
       new Date(2024, 0, 10)
@@ -45,7 +48,7 @@ describe('datepicker controller', () => {
     const first = commitDatePickerDay({
       range: true,
       picked: start,
-      committed: [null, null],
+      committed: null,
       preview: null
     })
     expect(first.nextPreview).toEqual([start, null])
@@ -84,6 +87,12 @@ describe('datepicker controller', () => {
         rangeSelectingEnd: true
       })
     ).toBe(false)
+  })
+
+  it('treats committed range empty as null', () => {
+    expect(emptyDatePickerValue(true)).toBeNull()
+    expect(emptyDatePickerValue(false)).toBeNull()
+    expect(parseTypedDatePickerValue('', 'yyyy-MM-dd', true)).toBeNull()
   })
 
   it('parses and formats the active format, including a typed range', () => {

@@ -26,12 +26,12 @@ Events/callback props: `onChange?`.
 
 `packages/core/src/types/anchor.ts` · `AnchorProps` · 4/14 props
 
-| Prop            | Type              | Default      | Notes                                                                                      |
-| --------------- | ----------------- | ------------ | ------------------------------------------------------------------------------------------ |
-| `getContainer?` | `ScrollRootInput` | `-`          | Scroll container for spy / scrollTo. Selector, Element, Window, or getter. When omitted... |
-| `direction?`    | `AnchorDirection` | `'vertical'` | Direction of the anchor navigation                                                         |
-| `targetOffset?` | `number`          | `-`          | Offset when scrolling to a target section                                                  |
-| `affix?`        | `boolean`         | `true`       | Whether to pin the anchor with Affix (placeholder + live geometry).                        |
+| Prop            | Type              | Default | Notes                                                                                      |
+| --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `getContainer?` | `ScrollRootInput` | `-`     | Scroll container for spy / scrollTo. Selector, Element, Window, or getter. When omitted... |
+| `targetOffset?` | `number`          | `-`     | Offset when scrolling to a target section                                                  |
+| `affix?`        | `boolean`         | `true`  | Whether to pin the anchor with Affix (placeholder + live geometry).                        |
+| `offsetTop?`    | `number`          | `0`     | Offset from top of the scroll root when Affix is on, and fallback scroll offset when `t... |
 
 Events/callback props: `onClick?`, `onChange?`.
 
@@ -316,12 +316,12 @@ Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默�
 
 `packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 4/13 props
 
-| Prop            | Type                 | Default | Notes                                                                                      |
-| --------------- | -------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `items?`        | `ScrollSpyItem[]`    | `-`     | Nav tree. Required for a useful TOC.                                                       |
-| `getContainer?` | `ScrollRootInput`    | `-`     | Scroll root: selector, element, window, or getter. When omitted, the nearest overflow a... |
-| `direction?`    | `ScrollSpyDirection` | `-`     | -                                                                                          |
-| `activeKey?`    | `ScrollSpyKey`       | `-`     | -                                                                                          |
+| Prop            | Type                   | Default | Notes                                                                                      |
+| --------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `items?`        | `ScrollSpyItem[]`      | `-`     | Nav tree. Required for a useful TOC.                                                       |
+| `getContainer?` | `ScrollRootInput`      | `-`     | Scroll root: selector, element, window, or getter. When omitted, the nearest overflow a... |
+| `activeKey?`    | `ScrollSpyKey`         | `-`     | -                                                                                          |
+| `locale?`       | `Partial<TigerLocale>` | `-`     | -                                                                                          |
 
 ## Spotlight
 
@@ -338,12 +338,12 @@ Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默�
 
 `packages/core/src/types/steps.ts` · `StepsProps` · 4/12 props
 
-| Prop         | Type             | Default        | Notes                                                                                      |
-| ------------ | ---------------- | -------------- | ------------------------------------------------------------------------------------------ |
-| `current?`   | `number`         | `0`            | Current step index (0-based)                                                               |
-| `clickable?` | `boolean`        | `false`        | Whether steps are clickable for navigation                                                 |
-| `status?`    | `StepStatus`     | `'process'`    | Step status (for current step)                                                             |
-| `direction?` | `StepsDirection` | `'horizontal'` | Steps direction/orientation. Vertical/horizontal connector geometry ships via the Tailw... |
+| Prop         | Type         | Default     | Notes                                                       |
+| ------------ | ------------ | ----------- | ----------------------------------------------------------- |
+| `current?`   | `number`     | `0`         | Current step index (0-based)                                |
+| `clickable?` | `boolean`    | `false`     | Whether steps are clickable for navigation                  |
+| `status?`    | `StepStatus` | `'process'` | Step status (for current step)                              |
+| `simple?`    | `boolean`    | `false`     | Whether to use simple style (no description, smaller icons) |
 
 ## StepsItem
 

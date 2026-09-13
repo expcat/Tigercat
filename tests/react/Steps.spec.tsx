@@ -50,19 +50,19 @@ describe('Steps', () => {
 
     it('should render vertical layout', () => {
       const { container } = render(
-        <Steps direction="vertical">
+        <Steps orientation="vertical">
           <StepsItem title="Step 1" />
         </Steps>
       )
 
       const stepsContainer = container.querySelector('.tiger-steps')
       expect(stepsContainer).toHaveClass('flex-col')
-      expect(stepsContainer).toHaveAttribute('data-direction', 'vertical')
+      expect(stepsContainer).toHaveAttribute('data-orientation', 'vertical')
     })
 
     it('should render a centered vertical tail with plugin class tokens', () => {
       const { container } = render(
-        <Steps direction="vertical" size="sm">
+        <Steps orientation="vertical" size="sm">
           <StepsItem title="Step 1" />
           <StepsItem title="Step 2" />
         </Steps>

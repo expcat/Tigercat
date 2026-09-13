@@ -56,13 +56,13 @@ const ALIGN_CLASS: Record<SpaceAlignValue, string> = {
  * Build all Tailwind classes for the Space component
  */
 export function getSpaceClasses(
-  { direction = 'horizontal', size = 'md', align = 'start', wrap = false }: SpaceProps = {},
+  { orientation = 'horizontal', size = 'md', align = 'start', wrap = false }: SpaceProps = {},
   className?: string
 ): string {
   injectSpaceStyles()
   return classNames(
     'tiger-space inline-flex',
-    direction === 'horizontal' ? 'tiger-flex-row' : 'flex-col',
+    orientation === 'horizontal' ? 'tiger-flex-row' : 'flex-col',
     ALIGN_CLASS[align],
     typeof size === 'string' ? SIZE_CLASS[size] : undefined,
     wrap && 'flex-wrap',

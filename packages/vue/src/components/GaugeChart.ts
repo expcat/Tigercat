@@ -9,17 +9,22 @@ import {
   getStableChartGradientPrefix,
   chartAxisTickTextClasses,
   getCartesianChartShellClasses,
+  getChartLabels,
+  mergeTigerLocale,
   DEFAULT_GAUGE_END_ANGLE,
   DEFAULT_GAUGE_HEIGHT,
   DEFAULT_GAUGE_START_ANGLE,
   DEFAULT_GAUGE_WIDTH,
   type GaugeAnimationController,
   type ChartPadding,
-  type GaugeChartProps as CoreGaugeChartProps
+  type GaugeChartProps as CoreGaugeChartProps,
+  type TigerLocale,
+  type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueGaugeChartProps extends CoreGaugeChartProps {
   padding?: ChartPadding
@@ -56,9 +61,13 @@ export const GaugeChart = defineComponent({
     animated: { type: Boolean, default: true },
     title: { type: String },
     desc: { type: String },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
+    labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String }
   },
   setup(props, { attrs }) {
+    const config = useTigerConfig()
+    computed(() => getChartLabels(mergeTigerLocale(config.value.locale, props.locale), props.labels))
     const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
       () => props.width,
       () => props.height,

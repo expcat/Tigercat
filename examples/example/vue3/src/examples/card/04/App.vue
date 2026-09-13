@@ -22,14 +22,14 @@ const cover = 'https://picsum.photos/seed/tiger-card/480/192'
         </div>
       </template>
     </Card>
-    <Card variant="bordered" direction="horizontal" :cover="cover" cover-alt="">
+    <Card variant="bordered" orientation="horizontal" :cover="cover" cover-alt="">
       <h3 class="font-semibold">横向布局</h3>
       <p class="text-sm text-gray-600 dark:text-gray-300">
         封面在 inline-start（LTR 左侧，RTL 右侧）。
       </p>
     </Card>
     <div dir="rtl" class="sm:col-span-2">
-      <Card variant="bordered" direction="horizontal" :cover="cover" cover-alt="">
+      <Card variant="bordered" orientation="horizontal" :cover="cover" cover-alt="">
         <h3 class="font-semibold">RTL</h3>
         <p class="text-sm text-gray-600 dark:text-gray-300">dir=rtl 时封面在右侧。</p>
       </Card>

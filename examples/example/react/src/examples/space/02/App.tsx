@@ -8,7 +8,7 @@ export default function App() {
     <div className="space-y-6">
       <div>
         <p className="mb-2 text-sm text-gray-500">direction=&quot;vertical&quot;</p>
-        <Space direction="vertical" size="md">
+        <Space orientation="vertical" size="md">
           {items.map((t) => (
             <span key={t} className={chip}>
               {t}

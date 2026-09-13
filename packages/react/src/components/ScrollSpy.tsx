@@ -54,7 +54,7 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
     offsetTop = 0,
     targetOffset,
     bounds = 5,
-    direction = 'vertical',
+    orientation = 'vertical',
     sticky = false,
     ariaLabel,
     getContainer,
@@ -154,7 +154,7 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
 
   function renderItems(list: ScrollSpyItem[], nested = false): React.ReactNode {
     return (
-      <ul className={getScrollSpyListClasses(direction, nested)} role="list">
+      <ul className={getScrollSpyListClasses(orientation, nested)} role="list">
         {list.map((item) => {
           const keyString = getScrollSpyKeyString(item.key)
           const isActive =

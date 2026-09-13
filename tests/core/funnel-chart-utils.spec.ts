@@ -134,11 +134,11 @@ describe('computeFunnelSegments', () => {
   })
 
   it('lays out a horizontal funnel on a different axis than vertical', () => {
-    const vertical = computeFunnelSegments(data, { width: 200, height: 300, direction: 'vertical' })
+    const vertical = computeFunnelSegments(data, { width: 200, height: 300, orientation: 'vertical' })
     const horizontal = computeFunnelSegments(data, {
       width: 200,
       height: 300,
-      direction: 'horizontal'
+      orientation: 'horizontal'
     })
     expect(horizontal).toHaveLength(3)
     expect(horizontal[0].path).not.toBe(vertical[0].path)

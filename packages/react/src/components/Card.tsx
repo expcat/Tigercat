@@ -55,7 +55,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   {
     variant = 'default',
     size = 'md',
-    direction = 'vertical',
+    orientation = 'vertical',
     hoverable = false,
     cover,
     coverAlt = '',
@@ -74,7 +74,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   },
   ref
 ) {
-  const isHorizontal = direction === 'horizontal'
+  const isHorizontal = orientation === 'horizontal'
   const hasCover = cover != null && cover !== false
   const nestedInteractive = actions != null
   const clickable = Boolean(onClick) || Boolean(href?.trim())
@@ -82,7 +82,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   const paddingClass = resolveCardPadding(size, padding)
   const cardClasses = classNames(
     getCardClasses(variant, hoverable, clickable),
-    cardDirectionClasses[direction],
+    cardDirectionClasses[orientation],
     !hasCover && paddingClass,
     className
   )

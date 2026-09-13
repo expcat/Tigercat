@@ -63,18 +63,18 @@ Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后�
 
 ## DataExport
 
-`packages/core/src/types/data-export.ts` · `DataExportProps` · 4/11 props
+`packages/core/src/types/data-export.ts` · `DataExportProps` · 4/12 props
 
 Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
 Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip）、CSV（UTF-8 BOM + CRLF）或 GFM Markdown。序列化在点击时才 `import('@expcat/tigercat-core/utils/data-export')`。默认 `formats` 是 xlsx+markdown 下拉（不含 csv）；单个值才是一颗按钮。列复用 `TableColumn`（`title` 与 `dataKey || key`，不跑 `render`）；操作列和无字段的 `render` 列默认跳过，隐藏列传 `hiddenColumnKeys`。`fileName` 已有后缀不会再拼。locale `triggerAriaLabel` 目前未接到触发器。
 
-| Prop         | Type                 | Default                | Notes                                                                                      |
-| ------------ | -------------------- | ---------------------- | ------------------------------------------------------------------------------------------ |
-| `columns`    | `TableColumn<T>[]`   | `-`                    | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
-| `dataSource` | `T[]`                | `-`                    | Records to export                                                                          |
-| `formats?`   | `DataExportFormat[]` | `['xlsx', 'markdown']` | Formats offered to the user. A single format renders a plain button, multiple formats r... |
-| `fileName?`  | `string`             | `'export'`             | Download file name. An existing matching suffix is kept; path characters are stripped....  |
+| Prop         | Type                 | Default                       | Notes                                                                                      |
+| ------------ | -------------------- | ----------------------------- | ------------------------------------------------------------------------------------------ |
+| `columns`    | `TableColumn<T>[]`   | `-`                           | Columns describing header titles and record keys. Reuses TableColumn so Table/DataTable... |
+| `dataSource` | `T[]`                | `-`                           | Records to export                                                                          |
+| `formats?`   | `DataExportFormat[]` | `['xlsx', 'csv', 'markdown']` | Formats offered to the user. A single format renders a plain button, multiple formats r... |
+| `fileName?`  | `string`             | `'export'`                    | Download file name. An existing matching suffix is kept; path characters are stripped....  |
 
 ## Table
 

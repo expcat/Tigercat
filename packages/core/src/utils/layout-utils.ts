@@ -11,12 +11,12 @@ export function isLayoutSiderTypeName(name: unknown): boolean {
 
 export function resolveLayoutHasSider(options: {
   hasSider?: boolean
-  direction?: LayoutDirection
+  mode?: LayoutDirection
   childIsSider: boolean
 }): boolean {
   if (options.hasSider !== undefined) return options.hasSider
-  if (options.direction === 'horizontal') return true
-  if (options.direction === 'vertical') return false
+  if (options.mode === 'horizontal') return true
+  if (options.mode === 'vertical') return false
   return options.childIsSider
 }
 

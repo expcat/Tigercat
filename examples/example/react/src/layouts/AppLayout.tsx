@@ -195,7 +195,7 @@ export const AppLayout: React.FC = () => {
                               sections.length > 0 ? (
                                 <Anchor
                                   affix={false}
-                                  direction="horizontal"
+                                  orientation="horizontal"
                                   getContainer={() => scrollContainerRef.current || window}
                                   onClick={handleAnchorClick}
                                   className="flex items-center justify-end">
