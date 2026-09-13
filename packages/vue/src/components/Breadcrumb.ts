@@ -236,7 +236,7 @@ export const Breadcrumb = defineComponent({
                   type: 'button',
                   class: breadcrumbEllipsisClasses,
                   'aria-label': labels.value.expandAriaLabel,
-                  'aria-expanded': 'false',
+                  'aria-expanded': expanded.value,
                   onClick: () => {
                     expanded.value = true
                   }

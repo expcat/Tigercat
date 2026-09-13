@@ -192,6 +192,7 @@ describe('Breadcrumb', () => {
         slots: { default: items }
       })
       expect(ellipsis(container)).toBeInTheDocument()
+      expect(ellipsis(container)).toHaveAttribute('aria-expanded', 'false')
       expect(container.querySelectorAll('li:not([aria-hidden])')).toHaveLength(4)
       expect(screen.getByText('Home')).toBeInTheDocument()
       expect(screen.getByText('C')).toBeInTheDocument()

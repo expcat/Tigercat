@@ -175,6 +175,16 @@ describe('RichTextEditor', () => {
       const wrapper = container.firstElementChild as HTMLElement
       expect(wrapper.style.height).toBe('50vh')
     })
+
+    it('merges leftover style with the height box', () => {
+      const { container } = renderEditor({
+        height: 320,
+        style: { marginTop: '8px' }
+      })
+      const wrapper = container.firstElementChild as HTMLElement
+      expect(wrapper.style.height).toBe('320px')
+      expect(wrapper.style.marginTop).toBe('8px')
+    })
   })
 
   describe('Events', () => {

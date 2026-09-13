@@ -93,8 +93,8 @@ These are binding or seed differences, not two products. Compact Notes on each c
 | Native `type` on Button     | attr `type`                                              | `htmlType` wins over `type`                               |
 | SchemaForm submit errors    | action Submit copies engine errors                       | native submit fills engine errors                         |
 | RichTextEditor FormItem     | seeds the engine from context                            | seeds the engine from FormItem when `value` is omitted    |
-| RichTextEditor `style`      | merges after height                                      | leftover `style` can replace height                       |
-| SplitButton `type`          | lands on the primary                                     | leftover `type` currently hits the group `div`            |
+| RichTextEditor `style`      | merges after height                                      | same merge on the height box                              |
+| SplitButton `type`          | lands on the primary                                     | `type` / `htmlType` land on the primary (`htmlType` wins) |
 
 Size **strings** are three families and are not interchangeable: Form/Rate `sm\|md\|lg`, Steps/Wizard `small\|default`, Pagination `small\|medium\|large`.
 

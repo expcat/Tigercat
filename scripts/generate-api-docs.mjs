@@ -90,6 +90,15 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '`htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。'
   },
+  SplitButton: {
+    uses: ['Button', 'Dropdown', 'DropdownMenu', 'DropdownItem'],
+    notes:
+      '主按钮吃 `htmlType` / `type`（htmlType 胜出），chevron 固定 `type="button"`。不要把 SplitButton 塞进 ButtonGroup。'
+  },
+  Breadcrumb: {
+    notes:
+      '`maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。'
+  },
   Modal: {
     notes:
       '`open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。默认页脚 OK 必关。关闭名走 `locale.modal`（en-US Close / OK / Cancel）。嵌套 Modal 进外层 overlay-host，Esc 先关里层。'

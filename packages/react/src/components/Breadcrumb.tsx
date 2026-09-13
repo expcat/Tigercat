@@ -211,7 +211,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
               type="button"
               className={breadcrumbEllipsisClasses}
               aria-label={labels.expandAriaLabel}
-              aria-expanded="false"
+              aria-expanded={expanded}
               onClick={() => setExpanded(true)}>
               ...
             </button>

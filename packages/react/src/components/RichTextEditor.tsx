@@ -81,6 +81,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       ariaLabel,
       name,
       id,
+      style,
       onRequestUrl,
       onFocus,
       onBlur,
@@ -237,9 +238,10 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
     const containerStyle: React.CSSProperties | undefined = useMemo(() => {
       const ht = parseHeight(height)
-      if (!ht) return undefined
-      return { height: ht }
-    }, [height])
+      const heightStyle = ht ? { height: ht } : undefined
+      if (!heightStyle && !style) return undefined
+      return { ...heightStyle, ...style }
+    }, [height, style])
 
     const hostRest: Record<string, unknown> = {}
     const containerRest: Record<string, unknown> = {}

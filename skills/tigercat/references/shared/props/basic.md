@@ -336,7 +336,11 @@ Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labell
 
 ## SplitButton
 
-`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 4/23 props
+`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 4/24 props
+
+Uses: `Button`, `Dropdown`, `DropdownMenu`, `DropdownItem`.
+
+Note: 主按钮吃 `htmlType` / `type`（htmlType 胜出），chevron 固定 `type="button"`。不要把 SplitButton 塞进 ButtonGroup。
 
 | Prop        | Type            | Default     | Notes                                                                             |
 | ----------- | --------------- | ----------- | --------------------------------------------------------------------------------- |

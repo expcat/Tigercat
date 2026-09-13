@@ -17,6 +17,9 @@
 - **Mentions**：补齐 Textarea 字段 props（`autoResize` / `maxLength` / `showCount` / `readonly` / `clearable`）。
 - **RadioGroup / CheckboxGroup**：可传 `options[]`；有 children / 默认插槽时忽略 options。SchemaForm radio 走同一路径。
 - **SchemaForm**：转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。
+- **RichTextEditor**：React 容器 `style` 与 `height` 合并（与 Vue 一致）。
+- **SplitButton**：React `type` / `htmlType` 打在主按钮上，不再落到 group `div`（`htmlType` 胜出）。
+- **Breadcrumb**：overflow 省略号 `aria-expanded` 跟随本地 expand 状态。
 
 ## v2.8.5
 

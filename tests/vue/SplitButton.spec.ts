@@ -79,6 +79,18 @@ describe('SplitButton', () => {
       expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument()
       expect(screen.getByText('CSV')).toBeInTheDocument()
     })
+
+    it('puts type and htmlType on the primary button, not the group', async () => {
+      const { container, rerender } = renderSplitButton({}, {})
+      await rerender({ type: 'submit' })
+      expect(getRoot(container)).not.toHaveAttribute('type')
+      expect(getPrimary(container)).toHaveAttribute('type', 'submit')
+      expect(getTrigger(container)).toHaveAttribute('type', 'button')
+
+      await rerender({ htmlType: 'reset', type: 'submit' })
+      expect(getPrimary(container)).toHaveAttribute('type', 'reset')
+      expect(getRoot(container)).not.toHaveAttribute('type')
+    })
   })
 
   describe('primary action vs menu', () => {

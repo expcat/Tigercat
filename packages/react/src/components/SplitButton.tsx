@@ -7,6 +7,7 @@ import {
   getSplitButtonTriggerClasses,
   resolveLocaleText,
   splitButtonDropdownClasses,
+  resolveButtonHtmlType,
   resolveSplitButtonSize,
   resolveSplitButtonTriggerAriaLabel,
   resolveSplitButtonVariant,
@@ -20,7 +21,8 @@ import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 export interface SplitButtonProps
   extends
     Omit<CoreSplitButtonProps, 'style'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick' | 'style'> {
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick' | 'style' | 'type'> {
+  type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type']
   style?: React.CSSProperties
   icon?: React.ReactNode
   loadingIcon?: React.ReactNode
@@ -102,7 +104,8 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
     loading = false,
     danger = false,
     block = false,
-    htmlType = 'button',
+    htmlType,
+    type,
     iconPosition = 'left',
     icon,
     loadingIcon,
@@ -149,7 +152,7 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
         disabled={disabled}
         loading={loading}
         danger={danger}
-        htmlType={htmlType}
+        htmlType={resolveButtonHtmlType(htmlType, type)}
         iconPosition={iconPosition}
         icon={icon}
         loadingIcon={loadingIcon}

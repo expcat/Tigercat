@@ -60,6 +60,8 @@ Events/callback props: `onClick?`, `onChange?`.
 
 `packages/core/src/types/breadcrumb.ts` · `BreadcrumbProps` · 4/8 props
 
+Note: `maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。
+
 | Prop         | Type                   | Default | Notes                                                                                      |
 | ------------ | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `separator?` | `BreadcrumbSeparator`  | `'/'`   | Custom separator between breadcrumb items                                                  |
