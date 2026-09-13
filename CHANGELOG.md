@@ -4,11 +4,15 @@
 
 ## 未发布
 
+## v2.9.0
+
+v2.9.0：深检 additive 补齐。无新必填 prop。公开别名仍可 import。不是 BPMN / Flowable / Camunda。Vue/React 对称。
+
 - **文档**：compact Default 列补上运行时默认（Select `multiple` false、List 分页关、Table 分页开、ImagePreview `open` 关等）；PrintPageBreak Vue 不再写成纯透传。`COMPONENT_USAGE_NOTES` 收进审计 traps（FormItem 写而不读、Table/List 分页、Tree vs TreeSelect `checkStrictly`、DatePicker/TimePicker 空范围、size 三套字符串等）。`patterns/common.md` 增加框架差异表。
 - **示例**：WorkflowTimeline / Viewer / DetailShell playground 从 `timeline/04`–`06` 迁到 `workflow-timeline` / `workflow-viewer` / `workflow-detail-shell`。Timeline 01–03 仍是骨架时间线。Vue/React 对称。
 - **FormItem**：Checkbox / CheckboxGroup / Switch / RadioGroup / Slider / Upload / Transfer 在省略公开 value 时读取 context（boolean/list/tuple 不会把 `''` 当成字符串）。Vue/React 对称。
-- **SchemaForm**：Vue action Submit 的 `errors` 与引擎一致（不再硬编码 `[]`）。
-- **RichTextEditor**：React 省略 `value` 时从 FormItem 播种引擎。
+- **SchemaForm**：Vue action Submit 的 `errors` 与引擎一致（不再硬编码 `[]`）。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。
+- **RichTextEditor**：React 省略 `value` 时从 FormItem 播种引擎；容器 `style` 与 `height` 合并。
 - **Slider**：`status` 接到视觉 / `aria-invalid` / shake。
 - **Input / Textarea**：Vue 增加非受控 `defaultValue`（有 `modelValue` 或 FormItem 值时忽略）。
 - **Rate / Signature / Mentions**：同时接受 `readonly` 与 `readOnly`；冲突时用 `readonly`。
@@ -16,8 +20,6 @@
 - **TreeSelect**：`listHeight` 是 overlay `height` 的别名（两者都传时 `listHeight` 胜出）。
 - **Mentions**：补齐 Textarea 字段 props（`autoResize` / `maxLength` / `showCount` / `readonly` / `clearable`）。
 - **RadioGroup / CheckboxGroup**：可传 `options[]`；有 children / 默认插槽时忽略 options。SchemaForm radio 走同一路径。
-- **SchemaForm**：转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。
-- **RichTextEditor**：React 容器 `style` 与 `height` 合并（与 Vue 一致）。
 - **SplitButton**：React `type` / `htmlType` 打在主按钮上，不再落到 group `div`（`htmlType` 胜出）。
 - **Breadcrumb**：overflow 省略号 `aria-expanded` 跟随本地 expand 状态。
 
