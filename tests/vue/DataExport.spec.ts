@@ -36,7 +36,7 @@ describe('DataExport', () => {
   it('renders a dropdown trigger with both format items by default', async () => {
     render(DataExport, { props: { columns, dataSource: data } })
 
-    const trigger = screen.getByRole('button', { name: 'Export' })
+    const trigger = screen.getByRole('button', { name: 'Export data' })
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
     await fireEvent.click(trigger)
@@ -54,7 +54,7 @@ describe('DataExport', () => {
 
   it('keeps a disabled trigger when formats is empty', () => {
     render(DataExport, { props: { columns, dataSource: data, formats: [] } })
-    expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Export data' })).toBeDisabled()
   })
 
   it('resolves labels from an official locale object', () => {
@@ -101,7 +101,7 @@ describe('DataExport', () => {
   it('exports the selected format from the opened menu', async () => {
     const { emitted } = render(DataExport, { props: { columns, dataSource: data } })
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Export data' }))
     await fireEvent.click(await screen.findByRole('menuitem', { name: 'Export Excel' }))
 
     await waitFor(() => expect(emitted().export).toBeTruthy())
@@ -161,7 +161,7 @@ describe('DataExport', () => {
     single.unmount()
 
     const dropdown = render(DataExport, { props: { columns, dataSource: data } })
-    await fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Export data' }))
     await screen.findByRole('menuitem', { name: 'Export Excel' })
     await expectNoA11yViolations(dropdown.container)
     dropdown.unmount()

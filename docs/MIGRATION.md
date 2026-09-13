@@ -32,6 +32,7 @@
 | Card leftover `title=` HTML tooltip                              | `title` 是可视标题；tooltip 用 `htmlTitle`                 |
 | Tree `filterValue`                                               | `searchValue`                                              |
 | VirtualTable 无 `id` 不可选                                      | 回落 dataSource 下标，可选                                 |
+| DataExport 默认 `xlsx+markdown`                                  | 默认 `xlsx+csv+markdown`；下拉触发器 `aria-label` 走 `triggerAriaLabel` |
 
 ScrollSpy 仍用 `onActiveKeyChange`（不是 Tabs）。Footer `size` 仍是 `default\|compact`。Modal/Drawer `size` 仍是面板宽度（含 `xl\|full`）。
 

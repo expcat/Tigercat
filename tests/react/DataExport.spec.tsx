@@ -37,7 +37,7 @@ describe('DataExport', () => {
   it('renders a dropdown trigger with both format items by default', async () => {
     render(<DataExport columns={columns} dataSource={data} />)
 
-    const trigger = screen.getByRole('button', { name: 'Export' })
+    const trigger = screen.getByRole('button', { name: 'Export data' })
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
     fireEvent.click(trigger)
@@ -56,7 +56,7 @@ describe('DataExport', () => {
 
   it('keeps a disabled trigger when formats is empty', () => {
     render(<DataExport columns={columns} dataSource={data} formats={[]} />)
-    const button = screen.getByRole('button', { name: 'Export' })
+    const button = screen.getByRole('button', { name: 'Export data' })
     expect(button).toBeDisabled()
   })
 
@@ -99,7 +99,7 @@ describe('DataExport', () => {
     const onExport = vi.fn()
     render(<DataExport columns={columns} dataSource={data} onExport={onExport} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Export data' }))
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Export Excel' }))
 
     await waitFor(() => expect(onExport).toHaveBeenCalledWith('xlsx'))
@@ -165,7 +165,7 @@ describe('DataExport', () => {
     single.unmount()
 
     const dropdown = render(<DataExport columns={columns} dataSource={data} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Export' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Export data' }))
     await screen.findByRole('menuitem', { name: 'Export Excel' })
     await expectNoA11yViolations(dropdown.container)
     dropdown.unmount()

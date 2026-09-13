@@ -14,7 +14,11 @@ function columnField<T>(column: TableColumn<T>): string {
 }
 
 export const DATA_EXPORT_FORMATS: readonly DataExportFormat[] = ['xlsx', 'markdown', 'csv']
-export const DEFAULT_DATA_EXPORT_FORMATS: readonly DataExportFormat[] = ['xlsx', 'markdown']
+export const DEFAULT_DATA_EXPORT_FORMATS: readonly DataExportFormat[] = [
+  'xlsx',
+  'csv',
+  'markdown'
+]
 export const DATA_EXPORT_SOFT_CELL_LIMIT = 100_000
 export const DATA_EXPORT_MAX_CELL_CHARS = 32_767
 export const DATA_EXPORT_FORMULA_PREFIX = /^[=+\-@]/

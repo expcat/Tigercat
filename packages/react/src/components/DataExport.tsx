@@ -68,6 +68,7 @@ function DataExportInner<T extends Record<string, unknown>>(
     style,
     onExport,
     onError,
+    customExport,
     ...rest
   }: DataExportProps<T>,
   ref: React.ForwardedRef<DataExportHandle>
@@ -104,16 +105,20 @@ function DataExportInner<T extends Record<string, unknown>>(
       setExportError(null)
       try {
         await yieldDataExportFrame()
-        const mod = await loadDataExportModule()
-        mod.runDataExport({
-          columns,
-          dataSource,
-          format,
-          fileName,
-          sheetName,
-          cellFormatter,
-          hiddenColumnKeys
-        })
+        if (customExport) {
+          await customExport({ format, columns, dataSource, fileName })
+        } else {
+          const mod = await loadDataExportModule()
+          mod.runDataExport({
+            columns,
+            dataSource,
+            format,
+            fileName,
+            sheetName,
+            cellFormatter,
+            hiddenColumnKeys
+          })
+        }
         onExport?.(format)
       } catch (error) {
         setExportError(resolvedLabels.errorText)
@@ -133,6 +138,7 @@ function DataExportInner<T extends Record<string, unknown>>(
       hiddenColumnKeys,
       onExport,
       onError,
+      customExport,
       resolvedLabels.errorText
     ]
   )
@@ -163,6 +169,11 @@ function DataExportInner<T extends Record<string, unknown>>(
         className
       )}
       disabled={triggerDisabled}
+      aria-label={
+        offeredFormats.length > 1 || formatsEmpty
+          ? resolvedLabels.triggerAriaLabel
+          : undefined
+      }
       aria-busy={exporting || undefined}
       onClick={
         offeredFormats.length === 1 && !formatsEmpty

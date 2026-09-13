@@ -90,6 +90,17 @@ export const DataExport = defineComponent({
       type: Boolean,
       default: false
     },
+    customExport: {
+      type: Function as PropType<
+        (info: {
+          format: DataExportFormat
+          columns: TableColumn[]
+          dataSource: Record<string, unknown>[]
+          fileName: string
+        }) => void | Promise<void>
+      >,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -133,16 +144,25 @@ export const DataExport = defineComponent({
       exportError.value = null
       try {
         await yieldDataExportFrame()
-        const mod = await loadDataExportModule()
-        mod.runDataExport({
-          columns: props.columns,
-          dataSource: props.dataSource,
-          format,
-          fileName: props.fileName,
-          sheetName: props.sheetName,
-          cellFormatter: props.cellFormatter,
-          hiddenColumnKeys: props.hiddenColumnKeys
-        })
+        if (props.customExport) {
+          await props.customExport({
+            format,
+            columns: props.columns,
+            dataSource: props.dataSource,
+            fileName: props.fileName
+          })
+        } else {
+          const mod = await loadDataExportModule()
+          mod.runDataExport({
+            columns: props.columns,
+            dataSource: props.dataSource,
+            format,
+            fileName: props.fileName,
+            sheetName: props.sheetName,
+            cellFormatter: props.cellFormatter,
+            hiddenColumnKeys: props.hiddenColumnKeys
+          })
+        }
         emit('export', format)
       } catch (error) {
         exportError.value = resolvedLabels.value.errorText
@@ -192,6 +212,10 @@ export const DataExport = defineComponent({
           style: mergeStyleValues(attrsStyle),
           disabled: triggerDisabled.value,
           'aria-busy': exporting.value || undefined,
+          'aria-label':
+            offeredFormats.value.length > 1 || formatsEmpty.value
+              ? resolvedLabels.value.triggerAriaLabel
+              : undefined,
           onClick:
             offeredFormats.value.length === 1 && !formatsEmpty.value
               ? () => void handleExport(offeredFormats.value[0])

@@ -55,7 +55,7 @@ export interface DataExportProps<T = Record<string, unknown>> extends DataExport
   /**
    * Formats offered to the user. A single format renders a plain button,
    * multiple formats render a dropdown menu.
-   * @default ['xlsx', 'markdown']
+   * @default ['xlsx', 'csv', 'markdown']
    */
   formats?: DataExportFormat[]
 
@@ -71,4 +71,13 @@ export interface DataExportProps<T = Record<string, unknown>> extends DataExport
    * @default false
    */
   disabled?: boolean
+  /**
+   * When set, replaces the built-in serializer for that click (no zip import).
+   */
+  customExport?: (info: {
+    format: DataExportFormat
+    columns: TableColumn<T>[]
+    dataSource: T[]
+    fileName: string
+  }) => void | Promise<void>
 }
