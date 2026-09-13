@@ -8,6 +8,8 @@ import userEvent from '@testing-library/user-event'
 import React, { useState } from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Transfer } from '@expcat/tigercat-react/Transfer'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils/react'
 
@@ -30,6 +32,17 @@ describe('Transfer', () => {
     it('should apply custom className', () => {
       const { container } = render(<Transfer dataSource={dataSource} className="custom-transfer" />)
       expect(container.querySelector('.custom-transfer')).toBeInTheDocument()
+    })
+
+    it('reads FormItem target keys when value is omitted', () => {
+      render(
+        <Form model={{ keys: ['2'] }}>
+          <FormItem name="keys" label="Move">
+            <Transfer dataSource={dataSource} />
+          </FormItem>
+        </Form>
+      )
+      expect(screen.getByRole('group', { name: 'Target' })).toHaveTextContent('Item 2')
     })
   })
 

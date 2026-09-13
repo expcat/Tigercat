@@ -162,6 +162,7 @@ export * from './form-dependency-utils'
 export * from './form-history-utils'
 export * from './form-control-utils'
 export * from './form-controller'
+export * from './form-item-value'
 export * from './upload-queue-utils'
 export * from './upload-controller'
 

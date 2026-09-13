@@ -9,6 +9,7 @@ import type {
 } from '@expcat/tigercat-core'
 import {
   applyTransferSelectAll,
+  coerceArrayFormValue,
   canMoveTransferItems,
   classNames,
   emptyTransferSelectedKeys,
@@ -24,6 +25,7 @@ import {
   mergeAriaDescribedBy,
   mergeTigerLocale,
   moveTransferItems,
+  resolveFormItemSeed,
   resolveLocaleText,
   resolveTransferTargetKeys,
   runShakeAnimation,
@@ -186,7 +188,12 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
   }, [resolved.conflict])
 
   const [targetValue, setTargetValue] = useControlledState<(string | number)[]>({
-    value: resolved.keys,
+    value: resolveFormItemSeed(
+      resolved.keys,
+      formItemControl?.name,
+      formItemControl?.value,
+      coerceArrayFormValue<string | number>
+    ),
     defaultValue: defaultValue ?? defaultTargetKeys ?? [],
     onChange: (next) => {
       formItemControl?.onChange?.(next)

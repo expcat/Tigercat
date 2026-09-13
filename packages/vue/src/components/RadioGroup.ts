@@ -12,12 +12,14 @@ import {
 import {
   callUnknownEventHandler,
   classNames,
+  coerceChoiceFormValue,
   coerceClassValue,
   collectRadioGroupInputs,
   getChoiceGroupClasses,
   getElementTextDirection,
   getRadioGroupKeyboardNextIndex,
   markFormItemGroupControl,
+  resolveFormItemSeed,
   mergeAriaDescribedBy,
   mergeStyleValues,
   type ChoiceGroupDirection,
@@ -95,10 +97,18 @@ export const RadioGroup = markFormItemGroupControl(
         null
       )
       const internalValue = ref<string | number | undefined>(props.defaultValue)
-      const isControlled = computed(() => props.modelValue !== undefined)
-      const currentValue = computed(() =>
-        isControlled.value ? props.modelValue : internalValue.value
+      const isControlled = computed(
+        () => props.modelValue !== undefined || Boolean(formItemControl?.name.value)
       )
+      const currentValue = computed(() => {
+        const seeded = resolveFormItemSeed(
+          props.modelValue,
+          formItemControl?.name.value,
+          formItemControl?.value.value,
+          coerceChoiceFormValue
+        )
+        return seeded !== undefined ? seeded : internalValue.value
+      })
       const generatedName = `tiger-radio-${useId()}`
       const groupName = computed(() => props.name || generatedName)
       const effectiveDisabled = computed(

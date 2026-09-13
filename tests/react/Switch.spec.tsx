@@ -7,6 +7,8 @@ import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Switch } from '@expcat/tigercat-react/Switch'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import {
   expectNoA11yViolations,
   expectNoA11yViolationsIsolated,
@@ -155,5 +157,16 @@ describe('Switch', () => {
       expect(el).toHaveAttribute('aria-label', 'Custom label')
       expect(el).toHaveAttribute('aria-labelledby', 'label-id')
     })
+  })
+
+  it('reads FormItem when checked is omitted', () => {
+    const { container } = render(
+      <Form model={{ on: true }}>
+        <FormItem name="on" label="On">
+          <Switch />
+        </FormItem>
+      </Form>
+    )
+    expect(getSwitch(container)).toHaveAttribute('aria-checked', 'true')
   })
 })

@@ -1,10 +1,12 @@
 import { defineComponent, computed, provide, ref, h, inject, type PropType } from 'vue'
 import {
   classNames,
+  coerceArrayFormValue,
   coerceClassValue,
   getChoiceGroupClasses,
   markFormItemGroupControl,
   mergeAriaDescribedBy,
+  resolveFormItemSeed,
   mergeStyleValues,
   toggleCheckboxGroupValue,
   type CheckboxGroupValue,
@@ -78,10 +80,18 @@ export const CheckboxGroup = markFormItemGroupControl(
         null
       )
       const internalValue = ref<CheckboxGroupValue>(props.defaultValue)
-      const isControlled = computed(() => props.modelValue !== undefined)
-      const value = computed(() =>
-        props.modelValue !== undefined ? props.modelValue : internalValue.value
+      const isControlled = computed(
+        () => props.modelValue !== undefined || Boolean(formItemControl?.name.value)
       )
+      const value = computed(() => {
+        const seeded = resolveFormItemSeed(
+          props.modelValue,
+          formItemControl?.name.value,
+          formItemControl?.value.value,
+          coerceArrayFormValue<CheckboxGroupValue[number]>
+        )
+        return seeded ?? internalValue.value
+      })
       const effectiveDisabled = computed(
         () => props.disabled || (formItemControl?.disabled.value ?? false)
       )

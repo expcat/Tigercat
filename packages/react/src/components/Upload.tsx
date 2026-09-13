@@ -10,6 +10,7 @@ import React, {
 } from 'react'
 import {
   classNames,
+  coerceArrayFormValue,
   createUploadController,
   createUploadPreviewUrlCache,
   formatFileSize,
@@ -24,6 +25,7 @@ import {
   interpolateUploadLabel,
   isImageUploadFile,
   mergeAriaDescribedBy,
+  resolveFormItemSeed,
   mergeTigerLocale,
   readUploadDropFiles,
   runShakeAnimation,
@@ -186,7 +188,12 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   const [previewSrc, setPreviewSrc] = useState<string | null>(null)
 
   const [fileList, setFileList] = useControlledState<UploadFile[], [UploadFile?]>({
-    value: fileListProp,
+    value: resolveFormItemSeed(
+      fileListProp,
+      formItemControl?.name,
+      formItemControl?.value,
+      coerceArrayFormValue<UploadFile>
+    ),
     defaultValue: defaultFileList ?? [],
     onChange: (nextList, file) => {
       if (file) onChange?.(file, nextList)

@@ -7,6 +7,8 @@ import { render, fireEvent } from '@testing-library/vue'
 import { nextTick, defineComponent, h, ref } from 'vue'
 import { Checkbox } from '@expcat/tigercat-vue/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-vue/CheckboxGroup'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { expectNoA11yViolationsIsolated, setThemeVariables, clearThemeVariables } from '../utils'
 
 const getBox = (container: HTMLElement) =>
@@ -335,6 +337,34 @@ describe('Checkbox', () => {
         </CheckboxGroup>
       `)
       await expectNoA11yViolationsIsolated(container)
+    })
+  })
+
+  describe('FormItem', () => {
+    it('reads FormItem when modelValue is omitted', () => {
+      const { container } = render({
+        components: { Form, FormItem, Checkbox },
+        template:
+          '<Form :model="{ agree: true }"><FormItem name="agree" label="Agree"><Checkbox>Agree</Checkbox></FormItem></Form>'
+      })
+      expect(getBox(container).checked).toBe(true)
+    })
+
+    it('reads FormItem array values on CheckboxGroup', () => {
+      const { container } = render({
+        components: { Form, FormItem, Checkbox, CheckboxGroup },
+        template: `<Form :model="{ tags: ['a'] }">
+          <FormItem name="tags" label="Tags">
+            <CheckboxGroup>
+              <Checkbox value="a">A</Checkbox>
+              <Checkbox value="b">B</Checkbox>
+            </CheckboxGroup>
+          </FormItem>
+        </Form>`
+      })
+      const boxes = getBoxes(container)
+      expect(boxes[0]?.checked).toBe(true)
+      expect(boxes[1]?.checked).toBe(false)
     })
   })
 })

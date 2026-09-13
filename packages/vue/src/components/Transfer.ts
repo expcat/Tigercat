@@ -24,6 +24,7 @@ import {
   checkboxIconViewBox,
   checkboxIndeterminatePathD,
   classNames,
+  coerceArrayFormValue,
   coerceClassValue,
   devWarn,
   emptyTransferSelectedKeys,
@@ -39,6 +40,7 @@ import {
   mergeAriaDescribedBy,
   mergeTigerLocale,
   moveTransferItems,
+  resolveFormItemSeed,
   resolveLocaleText,
   resolveTransferTargetKeys,
   runShakeAnimation,
@@ -191,7 +193,15 @@ export const Transfer = markFormItemGroupControl(
       const internalTarget = ref<(string | number)[]>([
         ...(props.defaultValue ?? props.defaultTargetKeys ?? [])
       ])
-      const targetValue = computed(() => resolved.value.keys ?? internalTarget.value)
+      const targetValue = computed(() => {
+        const seeded = resolveFormItemSeed(
+          resolved.value.keys,
+          formItemControl?.name.value,
+          formItemControl?.value.value,
+          coerceArrayFormValue<string | number>
+        )
+        return seeded ?? internalTarget.value
+      })
       const internalSelected = ref<TransferSelectedKeys>(
         props.defaultSelectedKeys ?? emptyTransferSelectedKeys()
       )

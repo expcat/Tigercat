@@ -1,7 +1,17 @@
-import { defineComponent, computed, ref, h, inject, onBeforeUnmount, type PropType } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  h,
+  inject,
+  onBeforeUnmount,
+  watch,
+  type PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
+  coerceSliderFormValue,
   callUnknownEventHandler,
   type ComponentSize,
   type InputStatus,
@@ -24,6 +34,8 @@ import {
   resolveSliderThumbName,
   getSliderLabels,
   mergeAriaDescribedBy,
+  resolveFormItemSeed,
+  runShakeAnimation,
   mergeStyleValues,
   createDocumentDragSession,
   getElementTextDirection,
@@ -113,7 +125,12 @@ export const Slider = defineComponent({
     const resolveBoundValue = (): number | [number, number] | undefined => {
       if (props.modelValue !== undefined) return props.modelValue
       if (props.value !== undefined) return props.value
-      return undefined
+      return resolveFormItemSeed(
+        undefined,
+        formItemControl?.name.value,
+        formItemControl?.value.value,
+        (raw) => coerceSliderFormValue(raw, props.range)
+      )
     }
 
     const isControlled = computed(() => resolveBoundValue() !== undefined)
@@ -143,6 +160,15 @@ export const Slider = defineComponent({
     const trackElement = ref<HTMLElement | null>(null)
     const rootElement = ref<HTMLElement | null>(null)
     const thumbElement = ref<HTMLElement | null>(null)
+
+    watch(
+      () => [status.value, formItemControl?.shakeTrigger.value] as const,
+      ([nextStatus], oldValue) => {
+        if (oldValue === undefined) return
+        if (nextStatus === 'error') runShakeAnimation(rootElement.value)
+      },
+      { flush: 'post' }
+    )
     let dragSession: DocumentDragSession | null = null
     let activeThumbLive: 'min' | 'max' | null = null
 
@@ -258,7 +284,8 @@ export const Slider = defineComponent({
       const thumbClasses = getSliderThumbClasses(
         props.size,
         effectiveDisabled.value,
-        isDragging.value
+        isDragging.value,
+        status.value
       )
       const tooltipClasses = getSliderTooltipClasses(props.size)
       const marksObj = sliderResolveMarks(props.marks, props.min, props.max, props.step)
@@ -294,6 +321,7 @@ export const Slider = defineComponent({
             'aria-valuemax': props.max,
             'aria-orientation': 'horizontal',
             'aria-disabled': effectiveDisabled.value || undefined,
+            'aria-invalid': status.value === 'error' || undefined,
             'aria-label': name.ariaLabel,
             'aria-labelledby': name.ariaLabelledby,
             'aria-describedby': describedBy,
@@ -395,7 +423,8 @@ export const Slider = defineComponent({
           class: getSliderRootClasses(
             effectiveDisabled.value,
             classNames(props.className, coerceClassValue(attrs.class)),
-            props.tooltip
+            props.tooltip,
+            status.value
           ),
           style: mergeStyleValues(attrs.style, props.style),
           'data-status': status.value === 'default' ? undefined : status.value

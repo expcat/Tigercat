@@ -3,6 +3,7 @@ import {
   type SliderProps as CoreSliderProps,
   sliderRangeClasses,
   sliderHitAreaClasses,
+  coerceSliderFormValue,
   getSliderRootClasses,
   getSliderTrackClasses,
   getSliderThumbClasses,
@@ -20,6 +21,8 @@ import {
   resolveSliderThumbName,
   getSliderLabels,
   mergeAriaDescribedBy,
+  resolveFormItemSeed,
+  runShakeAnimation,
   createDocumentDragSession,
   getElementTextDirection,
   type DocumentDragSession,
@@ -70,6 +73,7 @@ interface ThumbProps {
   ariaLabel?: string
   ariaLabelledby?: string
   ariaDescribedby?: string
+  ariaInvalid?: boolean
   id?: string
   thumbClasses: string
   tooltipClasses: string
@@ -98,6 +102,7 @@ const Thumb = memo<ThumbProps>(
     ariaLabel,
     ariaLabelledby,
     ariaDescribedby,
+    ariaInvalid,
     id,
     thumbClasses,
     tooltipClasses,
@@ -133,6 +138,7 @@ const Thumb = memo<ThumbProps>(
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledby}
         aria-describedby={ariaDescribedby}
+        aria-invalid={ariaInvalid || undefined}
         aria-valuetext={String(value)}
         onPointerDown={(e) => onPointerDown(e, thumbType)}
         onMouseEnter={() => onHoverChange(true)}
@@ -190,7 +196,12 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
       : formItemControl?.labelId
 
   const [internalValue, setInternalValue] = useControlledState<number | [number, number]>({
-    value: controlledValue,
+    value: resolveFormItemSeed(
+      controlledValue,
+      formItemControl?.name,
+      formItemControl?.value,
+      (raw) => coerceSliderFormValue(raw, range)
+    ),
     defaultValue: defaultValue ?? (range ? [min, max] : min),
     onChange: (next) => {
       onChange?.(next)
@@ -218,6 +229,10 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
       else if (ref) ref.current = node
     }
   }
+
+  useEffect(() => {
+    if (status === 'error') runShakeAnimation(rootRef.current)
+  }, [status, formItemControl?.shakeTrigger])
 
   const setSingleThumbRef = (node: HTMLDivElement | null) => {
     thumbRef.current = node
@@ -339,8 +354,8 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
   }, [range, displayed, getPercentage, rtl])
 
   const thumbClasses = useMemo(
-    () => getSliderThumbClasses(size, effectiveDisabled, isDragging),
-    [size, effectiveDisabled, isDragging]
+    () => getSliderThumbClasses(size, effectiveDisabled, isDragging, status),
+    [size, effectiveDisabled, isDragging, status]
   )
   const tooltipClasses = useMemo(() => getSliderTooltipClasses(size), [size])
   const marksObj = sliderResolveMarks(marks, min, max, step)
@@ -372,7 +387,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     <div
       {...divProps}
       ref={setRootRef}
-      className={getSliderRootClasses(effectiveDisabled, className, tooltip)}
+      className={getSliderRootClasses(effectiveDisabled, className, tooltip, status)}
       data-status={status === 'default' ? undefined : status}>
       <div className={sliderHitAreaClasses} onPointerDown={handleTrackPointerDown}>
         <div ref={trackRef} className={trackClasses} onPointerDown={handleTrackPointerDown}>
@@ -393,6 +408,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 ariaLabel={minNamed.ariaLabel}
                 ariaLabelledby={minNamed.ariaLabelledby}
                 ariaDescribedby={describedBy}
+                ariaInvalid={status === 'error'}
                 id={effectiveId}
                 thumbClasses={thumbClasses}
                 tooltipClasses={tooltipClasses}
@@ -423,6 +439,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 ariaLabel={maxNamed.ariaLabel}
                 ariaLabelledby={maxNamed.ariaLabelledby}
                 ariaDescribedby={describedBy}
+                ariaInvalid={status === 'error'}
                 thumbClasses={thumbClasses}
                 tooltipClasses={tooltipClasses}
                 rtl={rtl}
@@ -453,6 +470,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
               ariaLabel={named.ariaLabel}
               ariaLabelledby={named.ariaLabelledby}
               ariaDescribedby={describedBy}
+              ariaInvalid={status === 'error'}
               id={effectiveId}
               thumbClasses={thumbClasses}
               tooltipClasses={tooltipClasses}

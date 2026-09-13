@@ -5,6 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Switch } from '@expcat/tigercat-vue/Switch'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import {
   renderWithProps,
   expectNoA11yViolationsIsolated,
@@ -116,5 +118,14 @@ describe('Switch', () => {
       const { container } = render(Switch, { attrs: { 'aria-label': 'Toggle switch' } })
       await expectNoA11yViolationsIsolated(container)
     })
+  })
+
+  it('reads FormItem when modelValue is omitted', () => {
+    const { container } = render({
+      components: { Form, FormItem, Switch },
+      template:
+        '<Form :model="{ on: true }"><FormItem name="on" label="On"><Switch /></FormItem></Form>'
+    })
+    expect(getSwitch(container)).toHaveAttribute('aria-checked', 'true')
   })
 })

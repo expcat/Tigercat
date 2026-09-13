@@ -280,15 +280,6 @@ export const SchemaForm = defineComponent({
       emit('reset')
     }
 
-    const handleActionSubmit = async () => {
-      const valid = (await formRef.value?.validate()) ?? false
-      publishSubmit({
-        valid,
-        values: { ...formModel.value },
-        errors: []
-      })
-    }
-
     const renderField = (field: SchemaFormField, columns: 1 | 2 | 3): VNode => {
       const custom = slots.field?.({ field })
       const control: VNodeChild =
@@ -392,10 +383,9 @@ export const SchemaForm = defineComponent({
                       h(
                         Button,
                         {
-                          htmlType: 'button',
+                          htmlType: 'submit',
                           variant: 'primary',
-                          loading: props.loading,
-                          onClick: handleActionSubmit
+                          loading: props.loading
                         },
                         () => props.submitText ?? chromeLabels.value.submitText
                       )

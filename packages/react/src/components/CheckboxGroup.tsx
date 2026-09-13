@@ -1,7 +1,9 @@
 import React, { createContext, useContext } from 'react'
 import {
+  coerceArrayFormValue,
   getChoiceGroupClasses,
   markFormItemGroupControl,
+  resolveFormItemSeed,
   mergeAriaDescribedBy,
   toggleCheckboxGroupValue,
   type CheckboxGroupValue,
@@ -53,7 +55,12 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
 }) => {
   const formItemControl = useFormItemControlContext()
   const [value, setValue] = useControlledState({
-    value: controlledValue,
+    value: resolveFormItemSeed(
+      controlledValue,
+      formItemControl?.name,
+      formItemControl?.value,
+      coerceArrayFormValue<CheckboxGroupValue[number]>
+    ),
     defaultValue,
     onChange: (next) => {
       onChange?.(next)

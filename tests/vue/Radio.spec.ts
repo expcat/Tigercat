@@ -8,6 +8,8 @@ import userEvent from '@testing-library/user-event'
 import { ref, nextTick, defineComponent, h } from 'vue'
 import { Radio } from '@expcat/tigercat-vue/Radio'
 import { RadioGroup } from '@expcat/tigercat-vue/RadioGroup'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { expectNoA11yViolationsIsolated, setThemeVariables, clearThemeVariables } from '../utils'
 
 const getRadio = (container: HTMLElement) =>
@@ -365,5 +367,22 @@ describe('Radio', () => {
       await rerender({ value: 'option1', modelValue: false })
       expect(getRadio(container).checked).toBe(false)
     })
+  })
+
+  it('reads FormItem on RadioGroup when modelValue is omitted', () => {
+    const { container } = render({
+      components: { Form, FormItem, Radio, RadioGroup },
+      template: `<Form :model="{ choice: 'b' }">
+        <FormItem name="choice" label="Choice">
+          <RadioGroup>
+            <Radio value="a">A</Radio>
+            <Radio value="b">B</Radio>
+          </RadioGroup>
+        </FormItem>
+      </Form>`
+    })
+    const radios = getRadios(container)
+    expect(radios[0]?.checked).toBe(false)
+    expect(radios[1]?.checked).toBe(true)
   })
 })

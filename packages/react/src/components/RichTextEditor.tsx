@@ -103,7 +103,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         formItemControl?.onChange?.(next)
       }
     })
-    const isControlled = value !== undefined
+    const isControlled = value !== undefined || typeof formBoundValue === 'string'
     const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set())
     const [toolbarIndex, setToolbarIndex] = useState(0)
     const empty = isContentEmpty(currentContent)
@@ -128,7 +128,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
 
     const createOptionsRef = useRef({
       isControlled,
-      value,
+      value: resolvedValue,
       defaultValue,
       mode,
       readOnly,
@@ -140,7 +140,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     })
     createOptionsRef.current = {
       isControlled,
-      value,
+      value: resolvedValue,
       defaultValue,
       mode,
       readOnly,
@@ -157,7 +157,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       const factory = engine ?? builtinRichTextEngine
       const instance = factory.create({
         element: editorRef.current,
-        initialValue: options.isControlled ? options.value! : options.defaultValue,
+        initialValue: options.value ?? options.defaultValue ?? '',
         mode: options.mode,
         readOnly: options.readOnly,
         disabled: options.effectiveDisabled,
@@ -179,10 +179,10 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     }, [engine])
 
     useEffect(() => {
-      if (isControlled && engineRef.current && value !== undefined) {
-        engineRef.current.setValue(value)
+      if (isControlled && engineRef.current && resolvedValue !== undefined) {
+        engineRef.current.setValue(resolvedValue)
       }
-    }, [value, isControlled])
+    }, [resolvedValue, isControlled])
 
     useEffect(() => {
       engineRef.current?.setReadOnly(readOnly, effectiveDisabled)

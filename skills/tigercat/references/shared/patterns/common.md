@@ -81,20 +81,20 @@ Custom trigger state is available through Vue `#trigger="{ open }"` slots and Re
 
 These are binding or seed differences, not two products. Compact Notes on each component stay the source of traps.
 
-| Topic                       | Vue                                                                          | React                                                            |
-| --------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Field value                 | `v-model` / `modelValue`                                                     | `value` / `checked` + `onChange`                                 |
-| Input / Textarea `onChange` | emits the next string                                                        | DOM `ChangeEvent` (`event.target.value`)                         |
-| Form values                 | `model` / `v-model:model`                                                    | `model` + `onChange`                                             |
-| Overlay open                | `v-model:open`                                                               | `open` + `onOpenChange`                                          |
-| Named content               | slots (`#header`, `#content`)                                                | node / render props (`header`, `renderContent`)                  |
-| Uncontrolled seed           | most fields have `defaultValue`; Input/Textarea currently start at `''`      | Input/Textarea already have `defaultValue`                       |
-| Readonly spelling           | `readonly` on Input/Signature; Rate is `readOnly`                            | Input accepts both via `resolveReadOnlyFlag`; Rate is `readOnly` |
-| Native `type` on Button     | attr `type`                                                                  | `htmlType` wins over `type`                                      |
-| SchemaForm submit errors    | action-button path currently emits `errors: []`; Enter/Form submit is filled | native submit fills engine errors                                |
-| RichTextEditor FormItem     | seeds the engine from context                                                | FormItem-only value does not seed the engine yet                 |
-| RichTextEditor `style`      | merges after height                                                          | leftover `style` can replace height                              |
-| SplitButton `type`          | lands on the primary                                                         | leftover `type` currently hits the group `div`                   |
+| Topic                       | Vue                                                                     | React                                                            |
+| --------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Field value                 | `v-model` / `modelValue`                                                | `value` / `checked` + `onChange`                                 |
+| Input / Textarea `onChange` | emits the next string                                                   | DOM `ChangeEvent` (`event.target.value`)                         |
+| Form values                 | `model` / `v-model:model`                                               | `model` + `onChange`                                             |
+| Overlay open                | `v-model:open`                                                          | `open` + `onOpenChange`                                          |
+| Named content               | slots (`#header`, `#content`)                                           | node / render props (`header`, `renderContent`)                  |
+| Uncontrolled seed           | most fields have `defaultValue`; Input/Textarea currently start at `''` | Input/Textarea already have `defaultValue`                       |
+| Readonly spelling           | `readonly` on Input/Signature; Rate is `readOnly`                       | Input accepts both via `resolveReadOnlyFlag`; Rate is `readOnly` |
+| Native `type` on Button     | attr `type`                                                             | `htmlType` wins over `type`                                      |
+| SchemaForm submit errors    | action Submit copies engine errors                                      | native submit fills engine errors                                |
+| RichTextEditor FormItem     | seeds the engine from context                                           | seeds the engine from FormItem when `value` is omitted           |
+| RichTextEditor `style`      | merges after height                                                     | leftover `style` can replace height                              |
+| SplitButton `type`          | lands on the primary                                                    | leftover `type` currently hits the group `div`                   |
 
 Size **strings** are three families and are not interchangeable: Form/Rate `sm\|md\|lg`, Steps/Wizard `small\|default`, Pagination `small\|medium\|large`.
 

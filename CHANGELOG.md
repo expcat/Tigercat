@@ -6,6 +6,10 @@
 
 - **文档**：compact Default 列补上运行时默认（Select `multiple` false、List 分页关、Table 分页开、ImagePreview `open` 关等）；PrintPageBreak Vue 不再写成纯透传。`COMPONENT_USAGE_NOTES` 收进审计 traps（FormItem 写而不读、Table/List 分页、Tree vs TreeSelect `checkStrictly`、DatePicker/TimePicker 空范围、size 三套字符串等）。`patterns/common.md` 增加框架差异表。
 - **示例**：WorkflowTimeline / Viewer / DetailShell playground 从 `timeline/04`–`06` 迁到 `workflow-timeline` / `workflow-viewer` / `workflow-detail-shell`。Timeline 01–03 仍是骨架时间线。Vue/React 对称。
+- **FormItem**：Checkbox / CheckboxGroup / Switch / RadioGroup / Slider / Upload / Transfer 在省略公开 value 时读取 context（boolean/list/tuple 不会把 `''` 当成字符串）。Vue/React 对称。
+- **SchemaForm**：Vue action Submit 的 `errors` 与引擎一致（不再硬编码 `[]`）。
+- **RichTextEditor**：React 省略 `value` 时从 FormItem 播种引擎。
+- **Slider**：`status` 接到视觉 / `aria-invalid` / shake。
 
 ## v2.8.5
 

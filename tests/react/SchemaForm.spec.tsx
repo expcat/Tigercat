@@ -87,8 +87,21 @@ describe('SchemaForm (React)', () => {
       expect(screen.getByRole('alert')).toBeInTheDocument()
     })
     expect(onSubmit).toHaveBeenCalled()
-    const event = onSubmit.mock.calls.at(-1)?.[0] as { valid: boolean }
+    const event = onSubmit.mock.calls.at(-1)?.[0] as { valid: boolean; errors: unknown[] }
     expect(event.valid).toBe(false)
+    expect(event.errors.length).toBeGreaterThan(0)
+  })
+
+  it('paints a schema checkbox from defaultValue without a local value', () => {
+    render(
+      <SchemaForm
+        schema={{
+          fields: [{ name: 'agree', label: 'Agree', type: 'checkbox', defaultValue: true }]
+        }}
+        showActions={false}
+      />
+    )
+    expect(screen.getByRole('checkbox')).toBeChecked()
   })
 
   it('renders nested groups and dotted paths', async () => {

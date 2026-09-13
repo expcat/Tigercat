@@ -8,6 +8,8 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Checkbox } from '@expcat/tigercat-react/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import {
   expectNoA11yViolationsIsolated,
   setThemeVariables,
@@ -225,6 +227,35 @@ describe('Checkbox', () => {
         </CheckboxGroup>
       )
       await expectNoA11yViolationsIsolated(container)
+    })
+  })
+
+  describe('FormItem', () => {
+    it('reads FormItem when checked is omitted', () => {
+      const { container } = render(
+        <Form model={{ agree: true }}>
+          <FormItem name="agree" label="Agree">
+            <Checkbox>Agree</Checkbox>
+          </FormItem>
+        </Form>
+      )
+      expect(getBox(container).checked).toBe(true)
+    })
+
+    it('reads FormItem array values on CheckboxGroup', () => {
+      const { container } = render(
+        <Form model={{ tags: ['a'] }}>
+          <FormItem name="tags" label="Tags">
+            <CheckboxGroup>
+              <Checkbox value="a">A</Checkbox>
+              <Checkbox value="b">B</Checkbox>
+            </CheckboxGroup>
+          </FormItem>
+        </Form>
+      )
+      const boxes = getBoxes(container)
+      expect(boxes[0]?.checked).toBe(true)
+      expect(boxes[1]?.checked).toBe(false)
     })
   })
 })

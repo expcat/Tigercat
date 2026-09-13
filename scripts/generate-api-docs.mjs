@@ -136,7 +136,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   FormItem: {
     notes:
-      '具名 FormItem 注入 context。Input/Select/DatePicker/Signature 在省略公开 value 时从 model 取值。Checkbox/Switch/RadioGroup/Slider/Upload/Transfer 目前只写 `onChange`，不读 context——SchemaForm 的 checkbox/switch/radio 在点选前会画成未选。字段请用 RadioGroup，不要把单颗 Radio 当 field。'
+      '具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` 时从 model 取值（boolean/list/tuple 不会把 `\'\'` 当成字符串）。字段请用 RadioGroup，不要把单颗 Radio 当 field。'
   },
   Input: {
     notes:

@@ -15,6 +15,7 @@ import {
   checkboxIconViewBox,
   checkboxIndeterminatePathD,
   checkboxGroupIncludes,
+  coerceBooleanFormValue,
   coerceClassValue,
   callUnknownEventHandler,
   devWarn,
@@ -22,6 +23,7 @@ import {
   getCheckboxLabelTextClasses,
   getCheckboxVisualClasses,
   mergeAriaDescribedBy,
+  resolveFormItemSeed,
   mergeStyleValues,
   runShakeAnimation,
   type ComponentSize,
@@ -104,7 +106,9 @@ export const Checkbox = defineComponent({
     )
 
     const internalChecked = ref(props.defaultValue)
-    const isControlled = computed(() => props.modelValue !== undefined)
+    const isControlled = computed(
+      () => props.modelValue !== undefined || Boolean(!inGroup.value && formItemControl?.name.value)
+    )
 
     const effectiveSize = computed(() => props.size || groupContext.value?.size || 'md')
     const effectiveDisabled = computed(
@@ -129,7 +133,14 @@ export const Checkbox = defineComponent({
       if (groupContext.value && props.value !== undefined) {
         return checkboxGroupIncludes(groupContext.value.value, props.value)
       }
-      return isControlled.value ? props.modelValue === true : internalChecked.value
+      const seeded = resolveFormItemSeed(
+        props.modelValue,
+        formItemControl?.name.value,
+        formItemControl?.value.value,
+        coerceBooleanFormValue
+      )
+      if (seeded !== undefined) return seeded
+      return internalChecked.value
     })
 
     const checkboxRef = ref<HTMLInputElement | null>(null)

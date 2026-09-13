@@ -6,6 +6,8 @@ import {
   checkboxIconViewBox,
   checkboxIndeterminatePathD,
   checkboxGroupIncludes,
+  coerceBooleanFormValue,
+  resolveFormItemSeed,
   devWarn,
   getCheckboxLabelClasses,
   getCheckboxLabelTextClasses,
@@ -63,7 +65,14 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   }
 
   const [checkedState, setChecked] = useControlledState({
-    value: inGroup ? undefined : controlledChecked,
+    value: inGroup
+      ? undefined
+      : resolveFormItemSeed(
+          controlledChecked,
+          formItemControl?.name,
+          formItemControl?.value,
+          coerceBooleanFormValue
+        ),
     defaultValue: defaultChecked,
     onChange
   })

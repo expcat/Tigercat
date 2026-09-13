@@ -4,7 +4,9 @@ import {
   getSwitchRootClasses,
   getSwitchThumbClasses,
   getSwitchTrackClasses,
+  coerceBooleanFormValue,
   mergeAriaDescribedBy,
+  resolveFormItemSeed,
   runShakeAnimation,
   type InputStatus
 } from '@expcat/tigercat-core'
@@ -44,7 +46,12 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
 ) {
   const formItemControl = useFormItemControlContext()
   const [checked, setChecked] = useControlledState({
-    value: checkedProp,
+    value: resolveFormItemSeed(
+      checkedProp,
+      formItemControl?.name,
+      formItemControl?.value,
+      coerceBooleanFormValue
+    ),
     defaultValue: defaultChecked ?? false,
     onChange
   })

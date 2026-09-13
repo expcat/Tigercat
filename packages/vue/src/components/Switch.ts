@@ -3,11 +3,13 @@ import {
   type ComponentSize,
   type InputStatus,
   callUnknownEventHandler,
+  coerceBooleanFormValue,
   coerceClassValue,
   getSwitchRootClasses,
   getSwitchThumbClasses,
   getSwitchTrackClasses,
   mergeAriaDescribedBy,
+  resolveFormItemSeed,
   mergeStyleValues,
   runShakeAnimation
 } from '@expcat/tigercat-core'
@@ -72,10 +74,19 @@ export const Switch = defineComponent({
       null
     )
     const internalChecked = ref(props.defaultValue)
-    const isControlled = computed(() => props.modelValue !== undefined)
-    const checked = computed(() =>
-      isControlled.value ? props.modelValue === true : internalChecked.value
+    const isControlled = computed(
+      () => props.modelValue !== undefined || Boolean(formItemControl?.name.value)
     )
+    const checked = computed(() => {
+      const seeded = resolveFormItemSeed(
+        props.modelValue,
+        formItemControl?.name.value,
+        formItemControl?.value.value,
+        coerceBooleanFormValue
+      )
+      if (seeded !== undefined) return seeded
+      return internalChecked.value
+    })
     const effectiveDisabled = computed(
       () => props.disabled || (formItemControl?.disabled.value ?? false)
     )

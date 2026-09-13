@@ -7,6 +7,8 @@ import { render, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Slider } from '@expcat/tigercat-react/Slider'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import {
   expectNoA11yViolationsIsolated,
   setThemeVariables,
@@ -289,5 +291,21 @@ describe('Slider', () => {
       const { container } = render(<Slider value={50} aria-label="Volume" />)
       await expectNoA11yViolationsIsolated(container)
     })
+
+    it('sets aria-invalid when status is error', () => {
+      const { container } = render(<Slider status="error" value={10} aria-label="Volume" />)
+      expect(getThumb(container)).toHaveAttribute('aria-invalid', 'true')
+    })
+  })
+
+  it('reads FormItem when value is omitted', () => {
+    const { container } = render(
+      <Form model={{ volume: 42 }}>
+        <FormItem name="volume" label="Volume">
+          <Slider aria-label="Volume" />
+        </FormItem>
+      </Form>
+    )
+    expect(getThumb(container)).toHaveAttribute('aria-valuenow', '42')
   })
 })

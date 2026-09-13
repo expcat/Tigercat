@@ -5,6 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { Transfer } from '@expcat/tigercat-vue/Transfer'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { expectNoA11yViolations } from '../utils'
 
 const dataSource = [
@@ -32,6 +34,19 @@ describe('Transfer', () => {
 
       expect(getByText('Item 1')).toBeInTheDocument()
       expect(getByText('Item 2')).toBeInTheDocument()
+    })
+
+    it('reads FormItem target keys when modelValue is omitted', () => {
+      const { getByLabelText } = render({
+        components: { Form, FormItem, Transfer },
+        setup: () => ({ dataSource }),
+        template: `<Form :model="{ keys: ['2'] }">
+          <FormItem name="keys" label="Move">
+            <Transfer :data-source="dataSource" />
+          </FormItem>
+        </Form>`
+      })
+      expect(getByLabelText('Target').textContent).toContain('Item 2')
     })
   })
 

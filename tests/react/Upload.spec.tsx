@@ -8,6 +8,8 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Upload } from '@expcat/tigercat-react/Upload'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import type { UploadFile } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolations } from '../utils/react'
@@ -21,6 +23,20 @@ async function dispatchUploadEvent(action: () => Promise<boolean>): Promise<void
 
 describe('Upload', () => {
   describe('Rendering', () => {
+    it('reads FormItem fileList when the public list is omitted', () => {
+      const { getByText } = render(
+        <Form
+          model={{
+            files: [{ uid: '1', name: 'seeded.txt', status: 'success' }]
+          }}>
+          <FormItem name="files" label="Files">
+            <Upload />
+          </FormItem>
+        </Form>
+      )
+      expect(getByText('seeded.txt')).toBeInTheDocument()
+    })
+
     it('should render with default props', () => {
       const { container } = render(<Upload />)
 

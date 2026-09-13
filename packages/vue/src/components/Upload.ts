@@ -11,9 +11,11 @@ import {
 } from 'vue'
 import {
   classNames,
+  coerceArrayFormValue,
   coerceClassValue,
   mergeStyleValues,
   mergeAriaDescribedBy,
+  resolveFormItemSeed,
   mergeTigerLocale,
   getUploadLabels,
   interpolateUploadLabel,
@@ -181,11 +183,19 @@ export const Upload = defineComponent({
       )
     )
 
-    const isControlled = computed(() => props.fileList !== undefined)
-    const workingList = ref<UploadFile[]>([...(props.fileList ?? props.defaultFileList ?? [])])
-    const fileListValue = computed<UploadFile[]>(() =>
-      isControlled.value ? (props.fileList ?? workingList.value) : workingList.value
+    const isControlled = computed(
+      () => props.fileList !== undefined || Boolean(formItemControl?.name.value)
     )
+    const workingList = ref<UploadFile[]>([...(props.fileList ?? props.defaultFileList ?? [])])
+    const fileListValue = computed<UploadFile[]>(() => {
+      const seeded = resolveFormItemSeed(
+        props.fileList,
+        formItemControl?.name.value,
+        formItemControl?.value.value,
+        coerceArrayFormValue<UploadFile>
+      )
+      return seeded ?? workingList.value
+    })
 
     watch(
       () => props.fileList,

@@ -1,10 +1,12 @@
 import React, { useCallback, useId, useMemo } from 'react'
 import {
+  coerceChoiceFormValue,
   collectRadioGroupInputs,
   getChoiceGroupClasses,
   getElementTextDirection,
   getRadioGroupKeyboardNextIndex,
   markFormItemGroupControl,
+  resolveFormItemSeed,
   mergeAriaDescribedBy,
   type ChoiceGroupDirection,
   type ComponentSize,
@@ -50,7 +52,12 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
 }) => {
   const formItemControl = useFormItemControlContext()
   const [currentValue, setValue] = useControlledState<string | number | undefined>({
-    value,
+    value: resolveFormItemSeed(
+      value,
+      formItemControl?.name,
+      formItemControl?.value,
+      coerceChoiceFormValue
+    ),
     defaultValue,
     onChange: (next) => {
       if (next === undefined) return

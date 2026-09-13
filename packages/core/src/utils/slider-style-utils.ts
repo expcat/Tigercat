@@ -3,6 +3,7 @@
  */
 
 import type { ComponentSize } from '../types/base'
+import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
 
 export const sliderBaseClasses = 'relative w-full'
@@ -66,13 +67,16 @@ export function getSliderTrackClasses(
 export function getSliderThumbClasses(
   size: ComponentSize = 'md',
   disabled: boolean = false,
-  dragging: boolean = false
+  dragging: boolean = false,
+  status: InputStatus = 'default'
 ): string {
+  const error = status === 'error' && !disabled
   return classNames(
     sliderThumbClasses,
     sliderSizeClasses[size].thumb,
     dragging && sliderThumbDraggingClasses,
-    disabled && 'cursor-not-allowed'
+    disabled && 'cursor-not-allowed',
+    error && 'border-[var(--tiger-error,#dc2626)]'
   )
 }
 
@@ -80,15 +84,24 @@ export function getSliderTooltipClasses(size: ComponentSize = 'md'): string {
   return classNames(sliderTooltipClasses, sliderSizeClasses[size].tooltip)
 }
 
+export function getSliderStatusClasses(status: InputStatus = 'default'): string {
+  if (status === 'error') return 'ring-2 ring-[var(--tiger-error,#dc2626)] rounded-sm'
+  if (status === 'warning') return 'ring-2 ring-[var(--tiger-warning,#d97706)] rounded-sm'
+  if (status === 'success') return 'ring-2 ring-[var(--tiger-success,#16a34a)] rounded-sm'
+  return ''
+}
+
 export function getSliderRootClasses(
   disabled: boolean = false,
   className?: string,
-  tooltip: boolean = false
+  tooltip: boolean = false,
+  status: InputStatus = 'default'
 ): string {
   return classNames(
     sliderBaseClasses,
     disabled && sliderDisabledClasses,
     tooltip && sliderTooltipReserveClasses,
+    getSliderStatusClasses(status),
     className
   )
 }

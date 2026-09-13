@@ -6,12 +6,26 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Upload } from '@expcat/tigercat-vue/Upload'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { defineComponent, h } from 'vue'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 describe('Upload', () => {
   describe('Rendering', () => {
+    it('reads FormItem fileList when the public list is omitted', () => {
+      const { getByText } = render({
+        components: { Form, FormItem, Upload },
+        template: `<Form :model="{ files: [{ uid: '1', name: 'seeded.txt', status: 'success' }] }">
+          <FormItem name="files" label="Files">
+            <Upload />
+          </FormItem>
+        </Form>`
+      })
+      expect(getByText('seeded.txt')).toBeInTheDocument()
+    })
+
     it('should render with default props', () => {
       const { container } = render(Upload)
 

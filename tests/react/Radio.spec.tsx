@@ -8,6 +8,8 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Radio } from '@expcat/tigercat-react/Radio'
 import { RadioGroup } from '@expcat/tigercat-react/RadioGroup'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import {
   expectNoA11yViolations,
   expectNoA11yViolationsIsolated,
@@ -312,5 +314,21 @@ describe('Radio', () => {
       )
       await expectNoA11yViolations(container)
     })
+  })
+
+  it('reads FormItem on RadioGroup when value is omitted', () => {
+    const { container } = render(
+      <Form model={{ choice: 'b' }}>
+        <FormItem name="choice" label="Choice">
+          <RadioGroup>
+            <Radio value="a">A</Radio>
+            <Radio value="b">B</Radio>
+          </RadioGroup>
+        </FormItem>
+      </Form>
+    )
+    const radios = getRadios(container)
+    expect(radios[0]?.checked).toBe(false)
+    expect(radios[1]?.checked).toBe(true)
   })
 })

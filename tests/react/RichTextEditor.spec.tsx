@@ -7,6 +7,8 @@ import { render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { RichTextEditor } from '@expcat/tigercat-react/RichTextEditor'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -19,6 +21,17 @@ describe('RichTextEditor', () => {
     it('should render the component', () => {
       const { container } = renderEditor()
       expect(container.querySelector('[role="textbox"]')).toBeTruthy()
+    })
+
+    it('seeds the engine from FormItem when value is omitted', () => {
+      const { container } = render(
+        <Form model={{ bio: '<p>From form</p>' }}>
+          <FormItem name="bio" label="Bio">
+            <RichTextEditor />
+          </FormItem>
+        </Form>
+      )
+      expect(container.querySelector('[role="textbox"]')?.innerHTML).toContain('From form')
     })
 
     it('should render toolbar', () => {
