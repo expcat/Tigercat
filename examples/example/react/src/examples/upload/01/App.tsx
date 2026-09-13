@@ -8,7 +8,7 @@ export default function App() {
   const [model, setModel] = useState<{ files: UploadFile[] }>({ files: [] })
 
   return (
-    <Form model={model} onChange={setModel} labelPosition="top">
+    <Form value={model} onChange={setModel} labelPosition="top">
       <FormItem name="files" label="图片">
         <Upload
           fileList={model.files}

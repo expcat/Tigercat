@@ -20,7 +20,7 @@ describe('Form', () => {
   describe('Basic Functionality', () => {
     it('renders a semantic form element', () => {
       const { container } = render(Form, {
-        props: { model: {} },
+        props: { modelValue: {} },
         slots: { default: '<div>Content</div>' }
       })
 
@@ -31,7 +31,7 @@ describe('Form', () => {
 
     it('renders form with default classes', () => {
       const { container } = render(Form, {
-        props: { model: {} }
+        props: { modelValue: {} }
       })
 
       const form = container.querySelector('form')
@@ -45,7 +45,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model },
+              { modelValue: model },
               {
                 default: () =>
                   h(
@@ -71,7 +71,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model },
+              { modelValue: model },
               {
                 default: () =>
                   h(
@@ -99,7 +99,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, showRequiredAsterisk: false },
+              { modelValue: model, showRequiredAsterisk: false },
               {
                 default: () =>
                   h(
@@ -129,7 +129,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model },
+              { modelValue: model },
               {
                 default: () =>
                   h(
@@ -155,7 +155,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, labelPosition: 'left' },
+              { modelValue: model, labelPosition: 'left' },
               {
                 default: () =>
                   h(
@@ -181,7 +181,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, labelPosition: 'top' },
+              { modelValue: model, labelPosition: 'top' },
               {
                 default: () =>
                   h(
@@ -208,7 +208,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, labelPosition: 'top', labelAlign: 'right' },
+              { modelValue: model, labelPosition: 'top', labelAlign: 'right' },
               {
                 default: () =>
                   h(
@@ -234,7 +234,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, labelWidth: 120 },
+              { modelValue: model, labelWidth: 120 },
               {
                 default: () =>
                   h(
@@ -261,7 +261,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, labelWidth: 100 },
+              { modelValue: model, labelWidth: 100 },
               {
                 default: () =>
                   h(
@@ -297,7 +297,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 rules,
                 conditions: {
                   companyName: { showWhen: { field: 'accountType', value: 'company' } }
@@ -350,7 +350,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
                 }
@@ -393,7 +393,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model },
+              { modelValue: model },
               {
                 default: () => [
                   h(
@@ -442,7 +442,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () =>
                   h(
@@ -477,7 +477,7 @@ describe('Form', () => {
             h(ConfigProvider, { locale: zhCN }, () =>
               h(
                 Form,
-                { model, rules },
+                { modelValue: model, rules },
                 {
                   default: () =>
                     h(
@@ -509,7 +509,7 @@ describe('Form', () => {
               h(
                 Form,
                 {
-                  model,
+                  modelValue: model,
                   rules: { email: [{ required: true }] },
                   ref: (el) => {
                     formApi = (el as typeof formApi) ?? undefined
@@ -542,7 +542,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () =>
                   h(
@@ -581,7 +581,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model },
+              { modelValue: model },
               {
                 default: () => [
                   h(
@@ -625,7 +625,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () =>
                   h(
@@ -672,7 +672,7 @@ describe('Form', () => {
             return () =>
               h(
                 Form,
-                { model, rules, validateDebounce: 200, onValidate },
+                { modelValue: model, rules, validateDebounce: 200, onValidate },
                 {
                   default: () =>
                     h(
@@ -718,7 +718,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () =>
                   h(
@@ -767,7 +767,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, onSubmit },
+              { modelValue: model, onSubmit },
               {
                 default: () => [
                   h(
@@ -812,7 +812,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules, onSubmit },
+              { modelValue: model, rules, onSubmit },
               {
                 default: () => [
                   h(
@@ -863,7 +863,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
                 }
@@ -931,7 +931,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 rules,
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
@@ -982,7 +982,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 rules,
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
@@ -1036,7 +1036,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 rules,
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
@@ -1083,7 +1083,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 rules,
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
@@ -1142,7 +1142,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 rules,
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
@@ -1188,7 +1188,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
                 }
@@ -1235,7 +1235,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules, onValidate },
+              { modelValue: model, rules, onValidate },
               {
                 default: () =>
                   h(
@@ -1281,7 +1281,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () =>
                   h(
@@ -1318,7 +1318,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () => [
                   h(
@@ -1385,7 +1385,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, disabled: true },
+              { modelValue: model, disabled: true },
               {
                 default: () =>
                   h(
@@ -1416,7 +1416,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model },
+              { modelValue: model },
               {
                 default: () =>
                   h(
@@ -1453,7 +1453,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () =>
                   h(
@@ -1529,7 +1529,7 @@ describe('Form', () => {
             return () =>
               h(
                 Form,
-                { model, size },
+                { modelValue: model, size },
                 {
                   default: () =>
                     h(
@@ -1557,7 +1557,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, size: 'sm' },
+              { modelValue: model, size: 'sm' },
               {
                 default: () =>
                   h(
@@ -1585,7 +1585,7 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model, rules: { name: { required: true } } }, () =>
+            h(Form, { modelValue: model, rules: { name: { required: true } } }, () =>
               h(FormItem, { name: 'name', label: 'Name', required: true }, () => h(Input))
             )
         }
@@ -1601,7 +1601,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model },
+              { modelValue: model },
               {
                 default: () =>
                   h(
@@ -1635,7 +1635,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () =>
                   h(
@@ -1673,7 +1673,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model },
+              { modelValue: model },
               {
                 default: () =>
                   h(
@@ -1707,7 +1707,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model, rules },
+              { modelValue: model, rules },
               {
                 default: () =>
                   h(
@@ -1763,7 +1763,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 ref: (el: unknown) => {
                   formRef = el as typeof formRef
                 }
@@ -1792,7 +1792,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 rules,
                 ref: (el: unknown) => {
                   formRef = el as typeof formRef
@@ -1834,7 +1834,7 @@ describe('Form', () => {
               h(
                 Form,
                 {
-                  model,
+                  modelValue: model,
                   rules,
                   fieldDependencies: deps,
                   ref: (el: unknown) => {
@@ -1877,7 +1877,7 @@ describe('Form', () => {
               h(
                 Form,
                 {
-                  model,
+                  modelValue: model,
                   undoable: true,
                   ref: (el: unknown) => {
                     formRef = el as typeof formRef
@@ -1914,7 +1914,7 @@ describe('Form', () => {
               h(
                 Form,
                 {
-                  model,
+                  modelValue: model,
                   rules,
                   ref: (el: unknown) => {
                     formRef = el as typeof formRef
@@ -1956,7 +1956,7 @@ describe('Form', () => {
             h(
               Form,
               {
-                model,
+                modelValue: model,
                 rules: { name: { required: true, message: 'Required' } },
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
@@ -1984,7 +1984,7 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model }, () =>
+            h(Form, { modelValue: model }, () =>
               h(FormItem, { name: 'name', label: 'Name', rules: { required: true } }, () =>
                 h(Input, { 'aria-label': 'name' })
               )
@@ -2002,7 +2002,7 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model }, () =>
+            h(Form, { modelValue: model }, () =>
               h(FormItem, { name: 'name', label: 'Full Name' }, () =>
                 h(Space, () => h(Input, { 'aria-label': 'name' }))
               )

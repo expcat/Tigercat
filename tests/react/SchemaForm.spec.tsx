@@ -60,7 +60,7 @@ describe('SchemaForm (React)', () => {
       return (
         <SchemaForm
           schema={basicSchema}
-          model={model}
+          value={model}
           onChange={(values) => {
             setModel(values as { name: string; bio: string })
             onChange(values)

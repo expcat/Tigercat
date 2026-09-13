@@ -373,7 +373,7 @@ describe('Checkbox', () => {
       const { container } = render({
         components: { Form, FormItem, Checkbox },
         template:
-          '<Form :model="{ agree: true }"><FormItem name="agree" label="Agree"><Checkbox>Agree</Checkbox></FormItem></Form>'
+          '<Form :model-value="{ agree: true }"><FormItem name="agree" label="Agree"><Checkbox>Agree</Checkbox></FormItem></Form>'
       })
       expect(getBox(container).checked).toBe(true)
     })
@@ -381,7 +381,7 @@ describe('Checkbox', () => {
     it('reads FormItem array values on CheckboxGroup', () => {
       const { container } = render({
         components: { Form, FormItem, Checkbox, CheckboxGroup },
-        template: `<Form :model="{ tags: ['a'] }">
+        template: `<Form :model-value="{ tags: ['a'] }">
           <FormItem name="tags" label="Tags">
             <CheckboxGroup>
               <Checkbox value="a">A</Checkbox>

@@ -189,7 +189,7 @@ describe('Select', () => {
     const validator = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
     const { getByRole, queryByText } = render(
-      <Form model={{ city: undefined }} rules={{ city: [{ validator, trigger: 'change' }] }}>
+      <Form value={{ city: undefined }} rules={{ city: [{ validator, trigger: 'change' }] }}>
         <FormItem name="city" label="City">
           <Select options={[{ label: 'NYC', value: 42 }]} />
         </FormItem>

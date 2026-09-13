@@ -161,7 +161,7 @@ describe('Switch', () => {
 
   it('reads FormItem when checked is omitted', () => {
     const { container } = render(
-      <Form model={{ on: true }}>
+      <Form value={{ on: true }}>
         <FormItem name="on" label="On">
           <Switch />
         </FormItem>

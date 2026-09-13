@@ -11,7 +11,7 @@ const model = reactive<{ name: string; files: UploadFile[] }>({ name: '', files:
 
 <template>
   <div class="grid gap-4 md:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
-    <Form :model="model" label-position="top">
+    <Form :model-value="model" label-position="top">
       <FormItem name="name" label="名称">
         <Input placeholder="请输入名称" />
       </FormItem>

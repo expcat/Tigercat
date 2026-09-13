@@ -40,7 +40,7 @@ describe('Transfer', () => {
       const { getByLabelText } = render({
         components: { Form, FormItem, Transfer },
         setup: () => ({ dataSource }),
-        template: `<Form :model="{ keys: ['2'] }">
+        template: `<Form :model-value="{ keys: ['2'] }">
           <FormItem name="keys" label="Move">
             <Transfer :data-source="dataSource" />
           </FormItem>

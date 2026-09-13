@@ -373,7 +373,7 @@ describe('AutoComplete', () => {
     const validator = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
     const { getByRole, queryByText } = render(
-      <Form model={{ fruit: undefined }} rules={{ fruit: [{ validator, trigger: 'change' }] }}>
+      <Form value={{ fruit: undefined }} rules={{ fruit: [{ validator, trigger: 'change' }] }}>
         <FormItem name="fruit" label="Fruit">
           <AutoComplete options={options} />
         </FormItem>

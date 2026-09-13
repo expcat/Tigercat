@@ -57,8 +57,8 @@ describe('SchemaForm (Vue)', () => {
     render(SchemaForm, {
       props: {
         schema: basicSchema,
-        model,
-        'onUpdate:model': onUpdate,
+        modelValue: model,
+        'onUpdate:modelValue': onUpdate,
         onChange
       }
     })
@@ -178,7 +178,7 @@ describe('SchemaForm (Vue)', () => {
     render(SchemaForm, {
       props: {
         schema: groupSchema,
-        'onUpdate:model': onUpdate
+        'onUpdate:modelValue': onUpdate
       }
     })
 

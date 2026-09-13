@@ -124,7 +124,7 @@ describe('Switch', () => {
     const { container } = render({
       components: { Form, FormItem, Switch },
       template:
-        '<Form :model="{ on: true }"><FormItem name="on" label="On"><Switch /></FormItem></Form>'
+        '<Form :model-value="{ on: true }"><FormItem name="on" label="On"><Switch /></FormItem></Form>'
     })
     expect(getSwitch(container)).toHaveAttribute('aria-checked', 'true')
   })

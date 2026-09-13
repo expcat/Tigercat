@@ -141,7 +141,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Form: {
     notes:
-      '值对象是 `model`（Vue `v-model:model`），不是 `modelValue`。Wizard `onChange` 是步下标，不是表单 values。Form `size` 是 `sm|md|lg`，与 Steps/Wizard `small|default`、Pagination `small|medium|large` 不是同一套字符串。'
+      '值对象是 Vue `modelValue`（`v-model`）/ React `value`。Wizard 步下标走 `onStepChange`，不是表单 values。Form `size` 是 `sm|md|lg`。'
   },
   FormItem: {
     notes:
@@ -482,7 +482,7 @@ const COMPONENT_USAGE_NOTES = {
   SchemaForm: {
     uses: ['Form', 'FormItem', 'Input', 'Select', 'Button'],
     notes:
-      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `model` / `update:model`，React `model` + `onChange`。'
+      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。'
   },
   TaskBoard: {
     uses: ['ConfigProvider', 'task-board drag utilities'],

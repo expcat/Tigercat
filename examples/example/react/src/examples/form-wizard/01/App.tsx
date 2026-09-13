@@ -15,7 +15,7 @@ export default function App() {
   return (
     <div className="space-y-3">
       <Form
-        model={model}
+        value={model}
         rules={{ name: [{ required: true, message: '请输入姓名' }] }}
         onChange={setModel}
         onSubmit={({ valid }) => {

@@ -95,7 +95,7 @@ export default function App() {
             </span>
           </div>
         }
-        form={<SchemaForm schema={schema} model={model} onChange={setModel} showActions={false} />}
+        form={<SchemaForm schema={schema} value={model} onChange={setModel} showActions={false} />}
         tabs={
           <Tabs defaultActiveKey="timeline">
             <TabPane tabKey="timeline" label="进度">

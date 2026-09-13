@@ -15,7 +15,7 @@ export default function App() {
   const [model, setModel] = useState({ email: '', role: '' })
 
   return (
-    <Form model={model} onChange={setModel} rules={rules} className="max-w-sm">
+    <Form value={model} onChange={setModel} rules={rules} className="max-w-sm">
       <FormItem name="email" label="邮箱">
         <Space>
           <Input placeholder="不传 required，只靠 rules" />

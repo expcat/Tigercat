@@ -75,9 +75,12 @@ export const useFormContext = (): FormContextValue | null => useContext(FormCont
 
 export interface FormProps<T extends FormValues = FormValues>
   extends
-    Omit<CoreFormProps, 'controller' | 'model'>,
-    Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onChange' | 'onSubmit' | 'onReset'> {
-  model?: T
+    Omit<CoreFormProps, 'controller' | 'value'>,
+    Omit<
+      React.FormHTMLAttributes<HTMLFormElement>,
+      'onChange' | 'onSubmit' | 'onReset' | 'value'
+    > {
+  value?: T
   controller?: FormController
   children?: React.ReactNode
   onSubmit?: (event: FormSubmitEvent) => void
@@ -91,7 +94,7 @@ function isFormEngine(controller: FormController): controller is FormEngine {
 
 function FormInner<T extends FormValues>(
   {
-    model,
+    value,
     controller,
     rules,
     labelWidth,
@@ -145,7 +148,7 @@ function FormInner<T extends FormValues>(
   const ownedEngineRef = useRef<FormEngine | null>(null)
   if (!controller && ownedEngineRef.current === null) {
     ownedEngineRef.current = createFormEngine({
-      initialValues: model ?? {},
+      initialValues: value ?? {},
       undoable,
       maxHistorySize,
       getRules: () => optionsRef.current.rules,
@@ -165,8 +168,8 @@ function FormInner<T extends FormValues>(
     throw new Error('Form is missing a form engine')
   }
 
-  if (!controller && model !== undefined) {
-    engine.replaceValues(model, { emit: false })
+  if (!controller && value !== undefined) {
+    engine.replaceValues(value, { emit: false })
   }
 
   if (controller && isFormEngine(controller)) {

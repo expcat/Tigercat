@@ -85,7 +85,7 @@ These are binding or seed differences, not two products. Compact Notes on each c
 | --------------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
 | Field value                 | `v-model` / `modelValue`                                 | `value` / `checked` + `onChange`                          |
 | Input / Textarea `onChange` | emits the next string                                    | DOM `ChangeEvent` (`event.target.value`)                  |
-| Form values                 | `model` / `v-model:model`                                | `model` + `onChange`                                      |
+| Form values                 | `v-model` / `modelValue`                                 | `value` + `onChange`                                      |
 | Overlay open                | `v-model:open`                                           | `open` + `onOpenChange`                                   |
 | Named content               | slots (`#header`, `#content`)                            | node / render props (`header`, `renderContent`)           |
 | Uncontrolled seed           | Input/Textarea and other fields accept `defaultValue`    | Input/Textarea already have `defaultValue`                |

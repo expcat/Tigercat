@@ -124,7 +124,7 @@ describe('Select', () => {
       setup() {
         const model = ref({ city: undefined as number | undefined })
         return () =>
-          h(Form, { model: model.value, rules: { city: [{ validator, trigger: 'change' }] } }, () =>
+          h(Form, { modelValue: model.value, rules: { city: [{ validator, trigger: 'change' }] } }, () =>
             h(FormItem, { name: 'city', label: 'City' }, () =>
               h(Select, {
                 options: [{ label: 'NYC', value: 42 }],

@@ -61,9 +61,11 @@ import { Button } from './Button'
 
 export interface VueSchemaFormProps extends Omit<
   CoreSchemaFormProps,
-  'style' | 'onChange' | 'onSubmit' | 'onReset'
+  'style' | 'onChange' | 'onSubmit' | 'onReset' | 'value' | 'defaultValue'
 > {
   style?: Record<string, unknown>
+  modelValue?: FormValues
+  defaultValue?: FormValues
 }
 
 export type SchemaFormProps = VueSchemaFormProps
@@ -104,11 +106,11 @@ export const SchemaForm = defineComponent({
       type: Object as PropType<SchemaFormSchema>,
       required: true
     },
-    model: {
+    modelValue: {
       type: Object as PropType<FormValues>,
       default: undefined
     },
-    defaultModel: {
+    defaultValue: {
       type: Object as PropType<FormValues>,
       default: undefined
     },
@@ -206,7 +208,7 @@ export const SchemaForm = defineComponent({
     }
   },
   emits: {
-    'update:model': (_values: FormValues) => true,
+    'update:modelValue': (_values: FormValues) => true,
     change: (_values: FormValues) => true,
     submit: (_event: SchemaFormSubmitEvent) => true,
     reset: () => true,
@@ -216,11 +218,11 @@ export const SchemaForm = defineComponent({
   setup(props, { attrs, emit, slots, expose }) {
     const config = useTigerConfig()
     const formRef = ref<FormHandle | null>(null)
-    const innerModel = reactive<FormValues>(createSchemaFormModel(props.schema, props.defaultModel))
+    const innerModel = reactive<FormValues>(createSchemaFormModel(props.schema, props.defaultValue))
 
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const chromeLabels = computed(() => getSchemaFormLabels(mergedLocale.value, props.labels))
-    const formModel = computed(() => props.model ?? innerModel)
+    const formModel = computed(() => props.modelValue ?? innerModel)
     const formRules = computed(() => collectSchemaFormRules(props.schema, props.rules))
     const formConditions = computed(() =>
       collectSchemaFormConditions(props.schema, props.conditions)
@@ -267,7 +269,7 @@ export const SchemaForm = defineComponent({
     expose(handle)
 
     const handleModelUpdate = (values: FormValues) => {
-      emit('update:model', values)
+      emit('update:modelValue', values)
       emit('change', values)
     }
 
@@ -363,7 +365,7 @@ export const SchemaForm = defineComponent({
             Form,
             {
               ref: formRef,
-              model: formModel.value,
+              modelValue: formModel.value,
               rules: formRules.value,
               conditions: formConditions.value,
               labelWidth: props.labelWidth,
@@ -383,7 +385,7 @@ export const SchemaForm = defineComponent({
               onValidate: (fieldName: string, valid: boolean, error?: string | null) =>
                 emit('validate', fieldName, valid, error ?? undefined),
               'aria-label': props.ariaLabel ?? chromeLabels.value.ariaLabel,
-              'onUpdate:model': handleModelUpdate,
+              'onUpdate:modelValue': handleModelUpdate,
               onSubmit: publishSubmit
             },
             {

@@ -36,7 +36,7 @@ describe('Transfer', () => {
 
     it('reads FormItem target keys when value is omitted', () => {
       render(
-        <Form model={{ keys: ['2'] }}>
+        <Form value={{ keys: ['2'] }}>
           <FormItem name="keys" label="Move">
             <Transfer dataSource={dataSource} />
           </FormItem>

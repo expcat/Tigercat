@@ -179,7 +179,7 @@ export interface SchemaFormSubmitEvent extends FormSubmitEvent {
 }
 
 /**
- * Shared SchemaForm props. Vue binds `model` / `update:model` like Form.
+ * Shared SchemaForm props. Vue binds `modelValue` like Form; React binds `value`.
  */
 export interface SchemaFormProps extends Pick<
   FormProps,
@@ -204,12 +204,13 @@ export interface SchemaFormProps extends Pick<
   schema: SchemaFormSchema
   /**
    * Form values. Controlled when passed (including `{}`).
+   * Vue: `modelValue` / `v-model`. React: `value`.
    */
-  model?: FormValues
+  value?: FormValues
   /**
    * Uncontrolled initial values, merged over schema defaults.
    */
-  defaultModel?: FormValues
+  defaultValue?: FormValues
   /**
    * Extra rules merged over schema-derived rules (caller wins on conflict).
    */

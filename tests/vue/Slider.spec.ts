@@ -276,7 +276,7 @@ describe('Slider', () => {
     const { container } = render({
       components: { Form, FormItem, Slider },
       template:
-        '<Form :model="{ volume: 42 }"><FormItem name="volume" label="Volume"><Slider aria-label="Volume" /></FormItem></Form>'
+        '<Form :model-value="{ volume: 42 }"><FormItem name="volume" label="Volume"><Slider aria-label="Volume" /></FormItem></Form>'
     })
     expect(getThumb(container)).toHaveAttribute('aria-valuenow', '42')
   })

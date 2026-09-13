@@ -400,7 +400,7 @@ describe('Radio', () => {
   it('reads FormItem on RadioGroup when modelValue is omitted', () => {
     const { container } = render({
       components: { Form, FormItem, Radio, RadioGroup },
-      template: `<Form :model="{ choice: 'b' }">
+      template: `<Form :model-value="{ choice: 'b' }">
         <FormItem name="choice" label="Choice">
           <RadioGroup>
             <Radio value="a">A</Radio>

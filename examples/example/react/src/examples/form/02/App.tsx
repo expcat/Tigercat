@@ -16,7 +16,7 @@ export default function App() {
   const [model, setModel] = useState({ email: '' })
 
   return (
-    <Form model={model} onChange={setModel} rules={rules} className="max-w-sm">
+    <Form value={model} onChange={setModel} rules={rules} className="max-w-sm">
       <FormItem name="email" label="邮箱">
         <Input placeholder="name@example.com" />
       </FormItem>

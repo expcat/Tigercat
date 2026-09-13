@@ -346,7 +346,7 @@ describe('Radio', () => {
 
   it('reads FormItem on RadioGroup when value is omitted', () => {
     const { container } = render(
-      <Form model={{ choice: 'b' }}>
+      <Form value={{ choice: 'b' }}>
         <FormItem name="choice" label="Choice">
           <RadioGroup>
             <Radio value="a">A</Radio>

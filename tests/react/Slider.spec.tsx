@@ -300,7 +300,7 @@ describe('Slider', () => {
 
   it('reads FormItem when value is omitted', () => {
     const { container } = render(
-      <Form model={{ volume: 42 }}>
+      <Form value={{ volume: 42 }}>
         <FormItem name="volume" label="Volume">
           <Slider aria-label="Volume" />
         </FormItem>

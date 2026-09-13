@@ -75,7 +75,7 @@ describe('FormWizard (React)', () => {
       const [model, setModel] = useState({ name: '' })
       return (
         <Form
-          model={model}
+          value={model}
           rules={{ name: [{ required: true, message: 'Name is required' }] }}
           onChange={setModel}>
           <FormWizard

@@ -68,7 +68,7 @@ describe('interactive a11y regression coverage', () => {
       }
 
       return (
-        <ReactForm ref={formRef} model={model} rules={rules}>
+        <ReactForm ref={formRef} value={model} rules={rules}>
           <ReactFormItem label="Email" name="email">
             <input aria-label="email" />
           </ReactFormItem>

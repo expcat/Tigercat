@@ -4,6 +4,10 @@
 
 ## 未发布
 
+将作为 **v3.0.0** 发布（公开契约 breaking）。不是 BPMN。
+
+- **Form / SchemaForm**：Vue 值对象改为 `modelValue`（`v-model`），删除 `model` / `update:model`。React 改为 `value` + `onChange`，删除 `model`。SchemaForm 非受控种子改为 `defaultValue`（原 `defaultModel`）。
+
 ## v2.9.0
 
 v2.9.0：深检 additive 补齐。无新必填 prop。公开别名仍可 import。不是 BPMN / Flowable / Camunda。Vue/React 对称。

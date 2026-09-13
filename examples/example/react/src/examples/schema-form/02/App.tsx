@@ -63,7 +63,7 @@ export default function App() {
     <div className="space-y-3">
       <SchemaForm
         schema={schema}
-        model={model}
+        value={model}
         labelPosition="top"
         onChange={setModel}
         onSubmit={handleSubmit}

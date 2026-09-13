@@ -21,7 +21,7 @@ export default function App() {
   const [model, setModel] = useState({ username: '' })
 
   return (
-    <Form model={model} onChange={setModel} rules={rules} className="max-w-sm">
+    <Form value={model} onChange={setModel} rules={rules} className="max-w-sm">
       <FormItem name="username" label="用户名">
         <Input placeholder="输入 admin 观察异步错误" />
       </FormItem>

@@ -79,7 +79,7 @@ export function useFormContext(): ComputedRef<FormContext> | null {
 export type { FormHandle }
 
 export interface VueFormProps {
-  model?: FormValues
+  modelValue?: FormValues
   controller?: FormController
   rules?: FormRules
   labelWidth?: string | number
@@ -105,9 +105,9 @@ function isFormEngine(controller: FormController): controller is FormEngine {
 export const Form = defineComponent({
   name: 'TigerForm',
   props: {
-    model: {
+    modelValue: {
       type: Object as PropType<FormValues>,
-      default: () => ({})
+      default: undefined
     },
     controller: {
       type: Object as PropType<FormController>,
@@ -176,7 +176,7 @@ export const Form = defineComponent({
     submit: (_data: { valid: boolean; values: FormValues; errors: FormError[] }) => true,
     validate: (fieldName: string, isValid: boolean, _errorMessage?: string) =>
       typeof fieldName === 'string' && typeof isValid === 'boolean',
-    'update:model': (_values: FormValues) => true
+    'update:modelValue': (_values: FormValues) => true
   },
   setup(props, { slots, emit, expose }) {
     const config = useTigerConfig()
@@ -185,7 +185,7 @@ export const Form = defineComponent({
       props.controller && isFormEngine(props.controller)
         ? null
         : createFormEngine({
-            initialValues: props.model ?? {},
+            initialValues: props.modelValue ?? {},
             undoable: props.undoable,
             maxHistorySize: props.maxHistorySize,
             getRules: () => props.rules,
@@ -197,10 +197,10 @@ export const Form = defineComponent({
             onValidate: (fieldName, valid, error) =>
               emit('validate', fieldName, valid, error ?? undefined),
             onValuesChange: (next) => {
-              if (props.model) {
-                assignFormValues(props.model, next)
+              if (props.modelValue) {
+                assignFormValues(props.modelValue, next)
               }
-              emit('update:model', next)
+              emit('update:modelValue', next)
             }
           })
 
@@ -227,7 +227,7 @@ export const Form = defineComponent({
     })
 
     watch(
-      () => props.model,
+      () => props.modelValue,
       (next) => {
         if (props.controller || !next) return
         engine().replaceValues(next)

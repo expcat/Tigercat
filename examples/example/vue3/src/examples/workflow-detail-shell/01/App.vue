@@ -91,7 +91,7 @@ function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) 
         </div>
       </template>
       <template #form>
-        <SchemaForm :schema="schema" :model="model" :show-actions="false" />
+        <SchemaForm :schema="schema" :model-value="model" :show-actions="false" />
       </template>
       <template #tabs>
         <Tabs default-active-key="timeline">

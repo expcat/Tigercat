@@ -53,7 +53,7 @@ const handleSubmit = (event: SchemaFormSubmitEvent) => {
     <p class="text-sm text-[var(--tiger-text-muted,#6b7280)]">
       发起模式不套审批节点矩阵，字段都可编。审批人模式隐藏金额、原因只读、天数可改。只读模式不会把可编字段重新打开。
     </p>
-    <SchemaForm :schema="schema" :model="model" @submit="handleSubmit" />
+    <SchemaForm :schema="schema" :model-value="model" @submit="handleSubmit" />
     <p v-if="message" class="text-sm text-[var(--tiger-text-muted,#6b7280)]">{{ message }}</p>
   </div>
 </template>

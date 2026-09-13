@@ -102,7 +102,7 @@ describe('TreeSelect', () => {
     const validator = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
     const { getByRole, queryByText } = render(
-      <Form model={{ team: undefined }} rules={{ team: [{ validator, trigger: 'change' }] }}>
+      <Form value={{ team: undefined }} rules={{ team: [{ validator, trigger: 'change' }] }}>
         <FormItem name="team" label="Team">
           <TreeSelect treeData={treeData} defaultExpandAll />
         </FormItem>

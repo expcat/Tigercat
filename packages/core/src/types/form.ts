@@ -233,9 +233,9 @@ export type FormFieldDependencies = Map<string, string[]> | Record<string, strin
  */
 export interface FormProps {
   /**
-   * Form values
+   * Form values. Vue binds this as `modelValue` (`v-model`); React as `value`.
    */
-  model?: FormValues
+  value?: FormValues
 
   /**
    * Form validation rules
@@ -292,7 +292,7 @@ export interface FormProps {
   /**
    * Headless controller from `useFormController` / `createFormEngine`.
    * When set, the controller owns values, errors, validation, and history;
-   * `model` / `onChange` are not used as the store.
+   * `value` / `onChange` are not used as the store.
    */
   controller?: FormController
 

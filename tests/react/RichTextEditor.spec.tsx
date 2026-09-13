@@ -25,7 +25,7 @@ describe('RichTextEditor', () => {
 
     it('seeds the engine from FormItem when value is omitted', () => {
       const { container } = render(
-        <Form model={{ bio: '<p>From form</p>' }}>
+        <Form value={{ bio: '<p>From form</p>' }}>
           <FormItem name="bio" label="Bio">
             <RichTextEditor />
           </FormItem>

@@ -9,7 +9,7 @@ const model = reactive<{ files: UploadFile[] }>({ files: [] })
 </script>
 
 <template>
-  <Form :model="model" label-position="top">
+  <Form :model-value="model" label-position="top">
     <FormItem name="files" label="图片">
       <Upload
         v-model:file-list="model.files"

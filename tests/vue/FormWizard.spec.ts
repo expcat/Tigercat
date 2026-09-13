@@ -75,7 +75,7 @@ describe('FormWizard (Vue)', () => {
             {
               model: model.value,
               rules: { name: [{ required: true, message: 'Name is required' }] },
-              'onUpdate:model': (next: { name: string }) => {
+              'onUpdate:modelValue': (next: { name: string }) => {
                 model.value = next
               }
             },

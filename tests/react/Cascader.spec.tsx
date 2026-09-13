@@ -116,7 +116,7 @@ describe('Cascader', () => {
     const validator = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
     const { getByRole, queryByText } = render(
-      <Form model={{ region: undefined }} rules={{ region: [{ validator, trigger: 'change' }] }}>
+      <Form value={{ region: undefined }} rules={{ region: [{ validator, trigger: 'change' }] }}>
         <FormItem name="region" label="Region">
           <Cascader options={simpleOptions} />
         </FormItem>

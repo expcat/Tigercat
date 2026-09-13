@@ -10,7 +10,7 @@ export default function App() {
 
   return (
     <div className="grid gap-4 md:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
-      <Form model={model} onChange={setModel} labelPosition="top">
+      <Form value={model} onChange={setModel} labelPosition="top">
         <FormItem name="name" label="名称">
           <Input placeholder="请输入名称" />
         </FormItem>

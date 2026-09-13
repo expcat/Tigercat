@@ -14,7 +14,7 @@ export default function App() {
   const [model, setModel] = useState<{ team: (string | number)[] }>({ team: ['frontend'] })
 
   return (
-    <Form model={model} onChange={setModel} labelPosition="top">
+    <Form value={model} onChange={setModel} labelPosition="top">
       <FormItem name="team" label="团队">
         <Transfer
           dataSource={dataSource}

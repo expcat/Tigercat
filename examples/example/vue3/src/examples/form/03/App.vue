@@ -21,7 +21,7 @@ const rules: FormRules = {
 </script>
 
 <template>
-  <Form :model="model" :rules="rules" class="max-w-sm">
+  <Form :model-value="model" :rules="rules" class="max-w-sm">
     <FormItem name="username" label="用户名">
       <Input placeholder="输入 admin 观察异步错误" />
     </FormItem>

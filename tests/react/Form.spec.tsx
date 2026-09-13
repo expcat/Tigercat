@@ -22,7 +22,7 @@ describe('Form', () => {
   describe('Basic Functionality', () => {
     it('renders a semantic form element', () => {
       const { container } = render(
-        <Form model={{}}>
+        <Form value={{}}>
           <div>Content</div>
         </Form>
       )
@@ -34,7 +34,7 @@ describe('Form', () => {
 
     it('renders form with default classes', () => {
       const { container } = render(
-        <Form model={{}}>
+        <Form value={{}}>
           <div>Content</div>
         </Form>
       )
@@ -45,7 +45,7 @@ describe('Form', () => {
 
     it('applies custom className', () => {
       const { container } = render(
-        <Form model={{}} className="custom-class">
+        <Form value={{}} className="custom-class">
           <div>Content</div>
         </Form>
       )
@@ -55,7 +55,7 @@ describe('Form', () => {
 
     it('renders FormItem with label', () => {
       render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Name">
             <input type="text" />
           </FormItem>
@@ -67,7 +67,7 @@ describe('Form', () => {
 
     it('renders FormItem required asterisk when required prop is true', () => {
       const { container } = render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Name" required>
             <input type="text" />
           </FormItem>
@@ -81,7 +81,7 @@ describe('Form', () => {
 
     it('hides asterisk when showRequiredAsterisk is false', () => {
       const { container } = render(
-        <Form model={{}} showRequiredAsterisk={false}>
+        <Form value={{}} showRequiredAsterisk={false}>
           <FormItem label="Name" required>
             <input type="text" />
           </FormItem>
@@ -97,7 +97,7 @@ describe('Form', () => {
   describe('Layout Modes', () => {
     it('renders horizontal layout (label-left) by default', () => {
       const { container } = render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Name">
             <input type="text" />
           </FormItem>
@@ -109,7 +109,7 @@ describe('Form', () => {
 
     it('renders with label position left', () => {
       const { container } = render(
-        <Form model={{}} labelPosition="left">
+        <Form value={{}} labelPosition="left">
           <FormItem label="Name">
             <input type="text" />
           </FormItem>
@@ -121,7 +121,7 @@ describe('Form', () => {
 
     it('renders with label position top', () => {
       const { container } = render(
-        <Form model={{}} labelPosition="top">
+        <Form value={{}} labelPosition="top">
           <FormItem label="Name">
             <input type="text" />
           </FormItem>
@@ -134,7 +134,7 @@ describe('Form', () => {
 
     it('keeps explicit top label alignment', () => {
       const { container } = render(
-        <Form model={{}} labelPosition="top" labelAlign="right">
+        <Form value={{}} labelPosition="top" labelAlign="right">
           <FormItem label="Name">
             <input type="text" />
           </FormItem>
@@ -146,7 +146,7 @@ describe('Form', () => {
 
     it('applies custom label width', () => {
       const { container } = render(
-        <Form model={{}} labelWidth={120}>
+        <Form value={{}} labelWidth={120}>
           <FormItem label="Name">
             <input type="text" />
           </FormItem>
@@ -159,7 +159,7 @@ describe('Form', () => {
 
     it('FormItem labelWidth overrides Form labelWidth', () => {
       const { container } = render(
-        <Form model={{}} labelWidth={100}>
+        <Form value={{}} labelWidth={100}>
           <FormItem label="Name" labelWidth={150}>
             <input type="text" />
           </FormItem>
@@ -185,7 +185,7 @@ describe('Form', () => {
         return (
           <Form
             ref={formRef}
-            model={model}
+            value={model}
             rules={rules}
             conditions={{
               companyName: { showWhen: { field: 'accountType', value: 'company' } }
@@ -222,7 +222,7 @@ describe('Form', () => {
       const formRef = React.createRef<FormHandle>()
 
       render(
-        <Form ref={formRef} model={{ newsletter: true, locked: true, email: '' }}>
+        <Form ref={formRef} value={{ newsletter: true, locked: true, email: '' }}>
           <FormItem
             label="Email"
             name="email"
@@ -251,7 +251,7 @@ describe('Form', () => {
       function Demo() {
         const [model, setModel] = useState({ username: '' })
         return (
-          <Form ref={formRef} model={model}>
+          <Form ref={formRef} value={model}>
             <FormItem label="Username" name="username" rules={rules}>
               <input
                 aria-label="username"
@@ -290,7 +290,7 @@ describe('Form', () => {
         const rules: FormRules = { username: [{ required: true }] }
         return (
           <ConfigProvider locale={zhCN}>
-            <Form ref={formRef} model={model} rules={rules}>
+            <Form ref={formRef} value={model} rules={rules}>
               <FormItem label="Username" name="username">
                 <input aria-label="username" value={model.username} readOnly />
               </FormItem>
@@ -314,7 +314,7 @@ describe('Form', () => {
         const [model] = useState({ username: '' })
         return (
           <ConfigProvider locale={zhTW}>
-            <Form ref={formRef} model={model} rules={{ username: [{ required: true }] }}>
+            <Form ref={formRef} value={model} rules={{ username: [{ required: true }] }}>
               <FormItem label="Username" name="username">
                 <input aria-label="username" value={model.username} readOnly />
               </FormItem>
@@ -343,7 +343,7 @@ describe('Form', () => {
           email: [{ required: true, message: 'Email is required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Email" name="email">
               <input aria-label="email" />
             </FormItem>
@@ -367,7 +367,7 @@ describe('Form', () => {
           field: [{ required: true, message: 'Field is required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Field" name="field">
               <input aria-label="field" />
             </FormItem>
@@ -395,7 +395,7 @@ describe('Form', () => {
       function Demo() {
         const [model, setModel] = useState({ username: '' })
         return (
-          <Form model={model}>
+          <Form value={model}>
             <FormItem label="Username" name="username" rules={rules}>
               <input
                 aria-label="username"
@@ -428,7 +428,7 @@ describe('Form', () => {
           name: [{ required: true, message: 'Name is required', trigger: 'blur' }]
         }
         return (
-          <Form model={model} rules={rules}>
+          <Form value={model} rules={rules}>
             <FormItem label="Name" name="name">
               <input
                 aria-label="name"
@@ -462,7 +462,7 @@ describe('Form', () => {
           }
 
           return (
-            <Form model={model} rules={rules} validateDebounce={200} onValidate={onValidate}>
+            <Form value={model} rules={rules} validateDebounce={200} onValidate={onValidate}>
               <FormItem label="Name" name="name">
                 <input
                   aria-label="name"
@@ -499,7 +499,7 @@ describe('Form', () => {
           email: [{ required: true, message: 'Email is required' }]
         }
         return (
-          <Form model={model} rules={rules}>
+          <Form value={model} rules={rules}>
             <FormItem name="email" label="Email">
               <Input
                 aria-label="email"
@@ -529,7 +529,7 @@ describe('Form', () => {
           name: [{ required: true, message: 'Name is required' }]
         }
         return (
-          <Form model={model} rules={rules}>
+          <Form value={model} rules={rules}>
             <FormItem name="name" label="Name">
               <input
                 aria-label="name"
@@ -561,7 +561,7 @@ describe('Form', () => {
           email: [{ required: true, message: 'Email is required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem name="email" label="Email">
               <Input
                 aria-label="email"
@@ -599,7 +599,7 @@ describe('Form', () => {
           'user.email': [{ required: true, message: 'Email is required' }]
         }
         return (
-          <Form model={model} rules={rules}>
+          <Form value={model} rules={rules}>
             <FormItem name="user.email" label="Email">
               <input
                 aria-label="email"
@@ -632,7 +632,7 @@ describe('Form', () => {
           name: [{ required: true, message: 'Name is required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Name" name="name">
               <input
                 aria-label="name"
@@ -672,7 +672,7 @@ describe('Form', () => {
       function Demo() {
         const [model] = useState({ username: 'john', password: 'secret123' })
         return (
-          <Form model={model} onSubmit={onSubmit}>
+          <Form value={model} onSubmit={onSubmit}>
             <FormItem label="Username" name="username">
               <input aria-label="username" />
             </FormItem>
@@ -703,7 +703,7 @@ describe('Form', () => {
           username: [{ required: true, message: 'Username is required' }]
         }
         return (
-          <Form model={model} rules={rules} onSubmit={onSubmit}>
+          <Form value={model} rules={rules} onSubmit={onSubmit}>
             <FormItem label="Username" name="username">
               <input aria-label="username" />
             </FormItem>
@@ -732,7 +732,7 @@ describe('Form', () => {
       function Demo() {
         const [model, setModel] = useState({ username: '' })
         return (
-          <Form ref={formRef} model={model}>
+          <Form ref={formRef} value={model}>
             <div id="username-help">Helper text</div>
             <FormItem label="Username" name="username" rules={rules}>
               <input
@@ -784,7 +784,7 @@ describe('Form', () => {
           email: [{ required: true, message: 'Email required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Username" name="username">
               <input aria-label="username" />
             </FormItem>
@@ -817,7 +817,7 @@ describe('Form', () => {
           email: [{ required: true, message: 'Email required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Username" name="username">
               <input aria-label="username" />
             </FormItem>
@@ -854,7 +854,7 @@ describe('Form', () => {
           email: [{ required: true, message: 'Email required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Username" name="username">
               <input aria-label="username" />
             </FormItem>
@@ -891,7 +891,7 @@ describe('Form', () => {
           username: [{ required: true, message: 'Username required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Username" name="username">
               <input aria-label="username" />
             </FormItem>
@@ -921,7 +921,7 @@ describe('Form', () => {
       const Demo = () => {
         const [model, setModel] = React.useState({ username: 'initial' })
         return (
-          <Form ref={formRef} model={model} onChange={setModel}>
+          <Form ref={formRef} value={model} onChange={setModel}>
             <FormItem name="username" label="Username">
               <input
                 aria-label="username"
@@ -956,7 +956,7 @@ describe('Form', () => {
           username: [{ required: true, message: 'Username required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules} onValidate={onValidate}>
+          <Form ref={formRef} value={model} rules={rules} onValidate={onValidate}>
             <FormItem label="Username" name="username">
               <input aria-label="username" />
             </FormItem>
@@ -984,7 +984,7 @@ describe('Form', () => {
       ) as FormRules
 
       render(
-        <Form ref={formRef} model={model} rules={rules}>
+        <Form ref={formRef} value={model} rules={rules}>
           {fieldNames.map((field) => (
             <FormItem key={field} label={field} name={field}>
               <input aria-label={field} />
@@ -1021,7 +1021,7 @@ describe('Form', () => {
           'user.profile.name': [{ required: true, message: 'Name is required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Name" name="user.profile.name">
               <input aria-label="name" />
             </FormItem>
@@ -1047,7 +1047,7 @@ describe('Form', () => {
         }
 
         return (
-          <Form model={model} rules={rules}>
+          <Form value={model} rules={rules}>
             <FormItem label="Field 1" name="field1">
               <input aria-label="field1" />
             </FormItem>
@@ -1081,7 +1081,7 @@ describe('Form', () => {
 
     it('handles disabled form state', () => {
       const { container } = render(
-        <Form model={{}} disabled>
+        <Form value={{}} disabled>
           <FormItem label="Username" name="username">
             <input aria-label="username" />
           </FormItem>
@@ -1094,7 +1094,7 @@ describe('Form', () => {
 
     it('handles FormItem error prop (controlled error)', () => {
       render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Username" name="username" error="Custom error message">
             <input aria-label="username" />
           </FormItem>
@@ -1113,7 +1113,7 @@ describe('Form', () => {
           username: [{ required: true, message: 'Username required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Username" name="username" showMessage={false}>
               <input aria-label="username" />
             </FormItem>
@@ -1138,7 +1138,7 @@ describe('Form', () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       const { container } = render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Bio" error="Something went wrong" showMessage={false}>
             <Space>
               <input aria-label="bio" />
@@ -1164,7 +1164,7 @@ describe('Form', () => {
 
     it('hides the error surface when showMessage is false and still marks the control invalid', () => {
       render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Username" error="Username taken" showMessage={false}>
             <Input aria-label="username" />
           </FormItem>
@@ -1182,7 +1182,7 @@ describe('Form', () => {
       )
 
       render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Username" error="Username taken" showMessage={false}>
             <WrappedInput aria-label="username" />
           </FormItem>
@@ -1198,7 +1198,7 @@ describe('Form', () => {
 
       sizes.forEach((size) => {
         const { container, unmount } = render(
-          <Form model={{}} size={size}>
+          <Form value={{}} size={size}>
             <FormItem label="Name" name="name">
               <input type="text" />
             </FormItem>
@@ -1212,7 +1212,7 @@ describe('Form', () => {
 
     it('FormItem size overrides Form size', () => {
       const { container } = render(
-        <Form model={{}} size="sm">
+        <Form value={{}} size="sm">
           <FormItem label="Name" name="name" size="lg">
             <input type="text" />
           </FormItem>
@@ -1228,7 +1228,7 @@ describe('Form', () => {
   describe('Accessibility', () => {
     it('has no accessibility violations', async () => {
       const { container } = render(
-        <Form model={{ name: '' }} rules={{ name: { required: true } }}>
+        <Form value={{ name: '' }} rules={{ name: { required: true } }}>
           <FormItem name="name" label="Name" required>
             <Input />
           </FormItem>
@@ -1240,7 +1240,7 @@ describe('Form', () => {
 
     it('associates label with input field', () => {
       const { container } = render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Full Name" name="name">
             <input type="text" />
           </FormItem>
@@ -1264,7 +1264,7 @@ describe('Form', () => {
           name: [{ required: true, message: 'Required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Name" name="name">
               <input aria-label="name" />
             </FormItem>
@@ -1288,7 +1288,7 @@ describe('Form', () => {
 
     it('sets aria-required on required field', () => {
       render(
-        <Form model={{}}>
+        <Form value={{}}>
           <FormItem label="Name" name="name" required>
             <input aria-label="name" />
           </FormItem>
@@ -1308,7 +1308,7 @@ describe('Form', () => {
           name: [{ required: true, message: 'Name required' }]
         }
         return (
-          <Form ref={formRef} model={model} rules={rules}>
+          <Form ref={formRef} value={model} rules={rules}>
             <FormItem label="Name" name="name">
               <input aria-label="name" />
             </FormItem>
@@ -1350,7 +1350,7 @@ describe('Form', () => {
       const onChange = vi.fn()
 
       render(
-        <Form ref={formRef} model={{ name: 'Alice' }} onChange={onChange}>
+        <Form ref={formRef} value={{ name: 'Alice' }} onChange={onChange}>
           content
         </Form>
       )
@@ -1367,7 +1367,7 @@ describe('Form', () => {
       const onChange = vi.fn()
 
       render(
-        <Form ref={formRef} model={{ name: 'Alice', email: 'test@test.com' }} onChange={onChange}>
+        <Form ref={formRef} value={{ name: 'Alice', email: 'test@test.com' }} onChange={onChange}>
           content
         </Form>
       )
@@ -1391,7 +1391,7 @@ describe('Form', () => {
         const onChange = vi.fn()
 
         render(
-          <Form ref={formRef} model={{ name: 'Alice' }} undoable onChange={onChange}>
+          <Form ref={formRef} value={{ name: 'Alice' }} undoable onChange={onChange}>
             content
           </Form>
         )
@@ -1411,7 +1411,7 @@ describe('Form', () => {
         const rules: FormRules = { email: { required: true, message: 'Required' } }
 
         render(
-          <Form ref={formRef} model={{ email: '' }} rules={rules}>
+          <Form ref={formRef} value={{ email: '' }} rules={rules}>
             <FormItem name="email" label="Email" errorDisplayMode="block">
               <input />
             </FormItem>
@@ -1436,7 +1436,7 @@ describe('Form', () => {
         const rules: FormRules = { email: { required: true, message: 'Required' } }
 
         render(
-          <Form ref={formRef} model={{ email: '' }} rules={rules}>
+          <Form ref={formRef} value={{ email: '' }} rules={rules}>
             <FormItem name="email" label="Email" errorDisplayMode="popup">
               <input />
             </FormItem>
@@ -1485,7 +1485,7 @@ describe('Form', () => {
 
     it('marks required from rules without a required prop, and keeps aria-required when asterisks are hidden', () => {
       const { rerender } = render(
-        <Form model={{ name: '' }}>
+        <Form value={{ name: '' }}>
           <FormItem name="name" label="Name" rules={{ required: true }}>
             <Input aria-label="name" />
           </FormItem>
@@ -1496,7 +1496,7 @@ describe('Form', () => {
       expect(screen.getByLabelText('name')).toHaveAttribute('aria-required', 'true')
 
       rerender(
-        <Form model={{ name: '' }} showRequiredAsterisk={false}>
+        <Form value={{ name: '' }} showRequiredAsterisk={false}>
           <FormItem name="name" label="Name" rules={{ required: true }}>
             <Input aria-label="name" />
           </FormItem>
@@ -1509,7 +1509,7 @@ describe('Form', () => {
 
     it('associates the label with an Input wrapped in Space', () => {
       render(
-        <Form model={{ name: '' }}>
+        <Form value={{ name: '' }}>
           <FormItem name="name" label="Full Name">
             <Space>
               <Input aria-label="name" />

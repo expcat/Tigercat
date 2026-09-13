@@ -261,7 +261,7 @@ describe('Checkbox', () => {
   describe('FormItem', () => {
     it('reads FormItem when checked is omitted', () => {
       const { container } = render(
-        <Form model={{ agree: true }}>
+        <Form value={{ agree: true }}>
           <FormItem name="agree" label="Agree">
             <Checkbox>Agree</Checkbox>
           </FormItem>
@@ -272,7 +272,7 @@ describe('Checkbox', () => {
 
     it('reads FormItem array values on CheckboxGroup', () => {
       const { container } = render(
-        <Form model={{ tags: ['a'] }}>
+        <Form value={{ tags: ['a'] }}>
           <FormItem name="tags" label="Tags">
             <CheckboxGroup>
               <Checkbox value="a">A</Checkbox>

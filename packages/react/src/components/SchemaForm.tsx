@@ -48,7 +48,10 @@ import { Button } from './Button'
 export interface SchemaFormProps
   extends
     Omit<CoreSchemaFormProps, 'style' | 'onChange' | 'onSubmit' | 'onReset'>,
-    Omit<React.HTMLAttributes<HTMLFormElement>, 'onChange' | 'onSubmit' | 'onReset'> {
+    Omit<
+      React.HTMLAttributes<HTMLFormElement>,
+      'onChange' | 'onSubmit' | 'onReset' | 'value'
+    > {
   renderField?: (field: SchemaFormField) => React.ReactNode
   onChange?: (values: FormValues) => void
   onSubmit?: (event: SchemaFormSubmitEvent) => void
@@ -154,8 +157,8 @@ function SchemaFormGroupView({
 export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function SchemaForm(
   {
     schema,
-    model,
-    defaultModel,
+    value,
+    defaultValue,
     rules,
     conditions,
     labelWidth,
@@ -199,12 +202,12 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     [mergedLocale, labelsOverride]
   )
   const initialModel = useMemo(
-    () => createSchemaFormModel(schema, defaultModel),
-    [schema, defaultModel]
+    () => createSchemaFormModel(schema, defaultValue),
+    [schema, defaultValue]
   )
   const [innerModel, setInnerModel] = useState<FormValues>(initialModel)
-  const controlled = model !== undefined
-  const formModel = controlled ? model : innerModel
+  const controlled = value !== undefined
+  const formModel = controlled ? value : innerModel
   const formRules = useMemo(() => collectSchemaFormRules(schema, rules), [schema, rules])
   const formConditions = useMemo(
     () => collectSchemaFormConditions(schema, conditions),
@@ -232,9 +235,9 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
 
   const handleReset = useCallback(() => {
     formRef.current?.resetFields()
-    if (!controlled) setInnerModel(createSchemaFormModel(schema, defaultModel))
+    if (!controlled) setInnerModel(createSchemaFormModel(schema, defaultValue))
     onReset?.()
-  }, [controlled, defaultModel, onReset, schema])
+  }, [controlled, defaultValue, onReset, schema])
 
   useImperativeHandle(ref, () => ({
     validate: () => formRef.current?.validate() ?? Promise.resolve(false),
@@ -261,7 +264,7 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     <Form
       {...rest}
       ref={formRef}
-      model={formModel}
+      value={formModel}
       rules={formRules}
       conditions={formConditions}
       labelWidth={labelWidth}

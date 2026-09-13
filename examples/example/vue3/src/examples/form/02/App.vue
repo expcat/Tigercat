@@ -16,7 +16,7 @@ const rules: FormRules = {
 </script>
 
 <template>
-  <Form :model="model" :rules="rules" class="max-w-sm">
+  <Form :model-value="model" :rules="rules" class="max-w-sm">
     <FormItem name="email" label="邮箱">
       <Input placeholder="name@example.com" />
     </FormItem>

@@ -26,7 +26,7 @@ describe('Upload', () => {
     it('reads FormItem fileList when the public list is omitted', () => {
       const { getByText } = render(
         <Form
-          model={{
+          value={{
             files: [{ uid: '1', name: 'seeded.txt', status: 'success' }]
           }}>
           <FormItem name="files" label="Files">

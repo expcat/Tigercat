@@ -19,7 +19,7 @@ const handleChange = () => {
 <template>
   <div class="space-y-3">
     <Form
-      :model="model"
+      :model-value="model"
       :rules="{ name: [{ required: true, message: '请输入姓名' }] }"
       @submit="finished = $event.valid">
       <FormWizard

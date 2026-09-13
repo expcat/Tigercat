@@ -62,7 +62,7 @@ const handleSubmit = (event: SchemaFormSubmitEvent) => {
 
 <template>
   <div class="space-y-3">
-    <SchemaForm :schema="schema" :model="model" label-position="top" @submit="handleSubmit" />
+    <SchemaForm :schema="schema" :model-value="model" label-position="top" @submit="handleSubmit" />
     <p v-if="message" class="text-sm text-[var(--tiger-text-muted,#6b7280)]">{{ message }}</p>
   </div>
 </template>
