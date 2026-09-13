@@ -369,7 +369,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                     className="w-3.5 h-3.5 text-[var(--tiger-text-secondary,#6b7280)]"
                   />
                 }
-                onChange={(event) => handleSearchChange(String(event.currentTarget.value))}
+                onChange={(value) => handleSearchChange(String(value))}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') handleSearchSubmit()
                 }}

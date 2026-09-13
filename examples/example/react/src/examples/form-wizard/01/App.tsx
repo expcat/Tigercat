@@ -24,7 +24,7 @@ export default function App() {
         <FormWizard
           steps={steps}
           current={current}
-          onChange={(next) => {
+          onStepChange={(next) => {
             setCurrent(next)
             setFinished(false)
           }}

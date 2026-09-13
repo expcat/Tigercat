@@ -227,7 +227,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                       )}
                       placeholder={column.filter.placeholder || labels.filterPlaceholder}
                       draggable={false}
-                      onChange={(e) => ctx.handleFilter(column.key, e.target.value)}
+                      onChange={(value) => ctx.handleFilter(column.key, String(value))}
                     />
                   )}
                 </div>

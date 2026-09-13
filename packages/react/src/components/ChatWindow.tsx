@@ -338,7 +338,7 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
               disabled={disabled}
               maxLength={maxLength}
               aria-label={inputAriaLabel ?? resolvedPlaceholder}
-              onChange={(event) => handleValueChange(event.currentTarget.value)}
+              onChange={handleValueChange}
               onKeyDown={handleKeyDown}
             />
           ) : (
@@ -349,7 +349,7 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
               maxLength={maxLength}
               rows={inputRows}
               aria-label={inputAriaLabel ?? resolvedPlaceholder}
-              onChange={(event) => handleValueChange(event.currentTarget.value)}
+              onChange={handleValueChange}
               onKeyDown={handleKeyDown}
             />
           )}

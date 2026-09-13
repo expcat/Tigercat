@@ -7,7 +7,7 @@ export default function App() {
   return (
     <Textarea
       value={value}
-      onChange={(event) => setValue(event.target.value)}
+      onChange={setValue}
       status="error"
       errorMessage="请缩短说明"
       showCount

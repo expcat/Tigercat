@@ -149,11 +149,11 @@ const COMPONENT_USAGE_NOTES = {
   },
   Input: {
     notes:
-      'React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。'
+      'React `onChange` 是字符串/数字值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。'
   },
   Textarea: {
     notes:
-      'React `onChange` 是 DOM 事件（`event.target.value`）；Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。'
+      'React `onChange` 是字符串值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。'
   },
   Mentions: {
     notes:

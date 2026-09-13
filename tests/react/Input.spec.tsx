@@ -239,9 +239,9 @@ describe('Input', () => {
         return (
           <Input
             value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              handleChange(e)
+            onChange={(next) => {
+              setValue(next)
+              handleChange(next)
             }}
           />
         )
@@ -281,8 +281,8 @@ describe('Input', () => {
           <Input
             type="number"
             value={value}
-            onChange={(e) => {
-              const val = e.target.value
+            onChange={(val) => {
+              const _unused = val
               setValue(val === '' ? '' : Number(val))
             }}
           />
@@ -356,9 +356,9 @@ describe('Input', () => {
         return (
           <Input
             value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              handleChange(e)
+            onChange={(next) => {
+              setValue(next)
+              handleChange(next)
             }}
           />
         )
@@ -390,9 +390,9 @@ describe('Input', () => {
           <Input
             type="number"
             value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              handleChange(e)
+            onChange={(next) => {
+              setValue(next)
+              handleChange(next)
             }}
           />
         )
@@ -416,9 +416,9 @@ describe('Input', () => {
           <Input
             type="number"
             value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              handleChange(e)
+            onChange={(next) => {
+              setValue(next)
+              handleChange(next)
             }}
           />
         )

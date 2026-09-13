@@ -8,7 +8,7 @@ export default function App() {
     <div className="w-full max-w-md space-y-2">
       <Input
         value={value}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={setValue}
         clearable
         placeholder="输入后显示清除按钮"
       />

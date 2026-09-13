@@ -43,7 +43,10 @@ export interface FormWizardHandle {
 export interface FormWizardProps
   extends
     Omit<CoreFormWizardProps, 'style'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children' | 'style' | 'autoSave'> {
+    Omit<
+      React.HTMLAttributes<HTMLDivElement>,
+      'onChange' | 'children' | 'style' | 'autoSave'
+    > {
   renderStep?: (step: WizardStep, index: number) => React.ReactNode
   children?: React.ReactNode | ((step: WizardStep, index: number) => React.ReactNode)
   style?: React.CSSProperties
@@ -68,7 +71,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     labels: labelsOverride,
     beforeNext,
     autoSave,
-    onChange,
+    onStepChange,
     onFinish,
     renderStep,
     children,
@@ -99,7 +102,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     value: current,
     defaultValue: defaultCurrent,
     onChange: (next, prev?: number) => {
-      onChange?.(next, prev ?? next)
+      onStepChange?.(next, prev ?? next)
     },
     postState: (next) => clampStepIndex(next, totalCount)
   })
@@ -192,9 +195,12 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     () => ({
       next: () => handleNext(),
       prev: handlePrev,
-      finish: () => handleNext()
+      finish: async () => {
+        if (!isLast) return
+        await handleNext()
+      }
     }),
-    [handleNext, handlePrev]
+    [handleNext, handlePrev, isLast]
   )
 
   const contentNode = useMemo(() => {

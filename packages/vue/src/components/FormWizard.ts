@@ -127,7 +127,7 @@ export const FormWizard = defineComponent({
       default: undefined
     }
   },
-  emits: ['change', 'update:current', 'finish'],
+  emits: ['step-change', 'update:current', 'finish'],
   setup(props, { slots, attrs, emit, expose }) {
     const config = useTigerConfig()
     const formContext = useFormContext()
@@ -169,7 +169,7 @@ export const FormWizard = defineComponent({
       const prev = currentIndex.value
       if (props.current === undefined) innerCurrent.value = clamped
       emit('update:current', clamped)
-      emit('change', clamped, prev)
+      emit('step-change', clamped, prev)
       if (props.autoSave && props.steps[clamped]) {
         await props.autoSave(clamped, props.steps[clamped])
       }
@@ -253,7 +253,10 @@ export const FormWizard = defineComponent({
     expose({
       next: handleNext,
       prev: handlePrev,
-      finish: handleNext
+      finish: async () => {
+        if (!isLast.value) return
+        await handleNext()
+      }
     })
 
     const renderContent = (): VNodeChild => {

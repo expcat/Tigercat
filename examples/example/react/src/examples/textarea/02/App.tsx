@@ -7,7 +7,7 @@ export default function App() {
   return (
     <Textarea
       value={value}
-      onChange={(event) => setValue(event.target.value)}
+      onChange={setValue}
       autoResize
       minRows={2}
       maxRows={6}

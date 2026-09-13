@@ -84,7 +84,7 @@ These are binding or seed differences, not two products. Compact Notes on each c
 | Topic                       | Vue                                                      | React                                                     |
 | --------------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
 | Field value                 | `v-model` / `modelValue`                                 | `value` / `checked` + `onChange`                          |
-| Input / Textarea `onChange` | emits the next string                                    | DOM `ChangeEvent` (`event.target.value`)                  |
+| Input / Textarea `onChange` | emits the next string                                    | next string / number (not a DOM event)                    |
 | Form values                 | `v-model` / `modelValue`                                 | `value` + `onChange`                                      |
 | Overlay open                | `v-model:open`                                           | `open` + `onOpenChange`                                   |
 | Named content               | slots (`#header`, `#content`)                            | node / render props (`header`, `renderContent`)           |

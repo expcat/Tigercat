@@ -12,7 +12,7 @@ export default function App() {
         value={value}
         placeholder="手机号"
         inputMode="none"
-        onChange={(event) => setValue(event.target.value)}
+        onChange={setValue}
         onFocus={() => setOpen(true)}
       />
       <NumberKeyboard

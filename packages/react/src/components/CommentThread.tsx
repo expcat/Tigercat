@@ -411,7 +411,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   placeholder={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
                   className={commentThreadReplyTextareaClasses}
                   aria-label={resolveLocaleText(labels.replyText, replyText)}
-                  onChange={(event) => setReplyValue(event.target.value)}
+                  onChange={setReplyValue}
                 />
                 <div className="flex items-center gap-2 justify-end">
                   <Button
@@ -509,7 +509,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         placeholder={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
         className={commentThreadReplyTextareaClasses}
         aria-label={resolveLocaleText(labels.replyPlaceholder, replyPlaceholder)}
-        onChange={(event) => setComposerValue(event.target.value)}
+        onChange={setComposerValue}
       />
       <div className="flex items-center gap-2 justify-end">
         <Button

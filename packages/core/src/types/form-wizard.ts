@@ -147,9 +147,9 @@ export interface FormWizardProps {
    */
   beforeNext?: FormWizardValidator
   /**
-   * Step change callback
+   * Step index change. Not Form values.
    */
-  onChange?: (current: number, prev: number) => void
+  onStepChange?: (current: number, prev: number) => void
   /**
    * Finish callback. When the wizard sits in a Form, `values` is the current
    * model after a successful `validate` / submit.

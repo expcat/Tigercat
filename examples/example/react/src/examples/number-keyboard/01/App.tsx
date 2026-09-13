@@ -15,7 +15,7 @@ export default function App() {
           prefix="¥"
           placeholder="输入金额"
           inputMode="none"
-          onChange={(event) => setValue(event.target.value)}
+          onChange={setValue}
           onFocus={() => setOpen(true)}
         />
       </FormItem>

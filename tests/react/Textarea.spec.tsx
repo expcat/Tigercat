@@ -74,9 +74,9 @@ describe('Textarea', () => {
         return (
           <Textarea
             value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              handleChange(e)
+            onChange={(next) => {
+              setValue(next)
+              handleChange(next)
             }}
           />
         )
@@ -173,7 +173,7 @@ describe('Textarea', () => {
         return (
           <Textarea
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={setValue}
             showCount
             maxLength={10}
           />

@@ -26,7 +26,7 @@ export interface TextareaProps
       'size' | 'value' | 'defaultValue' | 'onInput' | 'onChange' | 'onFocus' | 'onBlur' | 'readOnly'
     > {
   onInput?: (event: React.FormEvent<HTMLTextAreaElement>) => void
-  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onChange?: (value: string) => void
   onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void
   onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void
   className?: string
@@ -149,7 +149,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      onChange?.(event)
+      const next = event.currentTarget.value
+      setValue(next)
+      formItemControl?.onChange?.(next)
+      onChange?.(next)
     }
 
     const handleBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {

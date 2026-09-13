@@ -47,7 +47,7 @@ export default function App() {
         steps={steps}
         current={current}
         beforeNext={validateBeforeNext}
-        onChange={(next) => {
+        onStepChange={(next) => {
           setCurrent(next)
           setFinished(false)
         }}
@@ -57,7 +57,7 @@ export default function App() {
             return (
               <Input
                 value={name}
-                onChange={(event) => setName(event.currentTarget.value)}
+                onChange={setName}
                 placeholder="请输入用户名"
               />
             )
@@ -66,7 +66,7 @@ export default function App() {
             return (
               <Input
                 value={team}
-                onChange={(event) => setTeam(event.currentTarget.value)}
+                onChange={setTeam}
                 placeholder="请输入团队名称"
               />
             )

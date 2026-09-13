@@ -11,7 +11,7 @@ export default function App() {
         value={value}
         placeholder="身份证号"
         inputMode="none"
-        onChange={(event) => setValue(event.target.value)}
+        onChange={setValue}
       />
       <NumberKeyboard mode="id-card" value={value} onChange={setValue} showConfirm={false} />
     </div>

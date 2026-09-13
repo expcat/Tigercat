@@ -26,7 +26,7 @@ const handleChange = () => {
         v-model:current="current"
         :steps="steps"
         :labels="{ prevText: '返回', nextText: '继续', finishText: '提交' }"
-        @change="handleChange"
+        @step-change="handleChange"
         @finish="finished = true">
         <template #step="{ index }">
           <FormItem v-if="index === 0" name="name" label="姓名">

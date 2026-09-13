@@ -270,7 +270,7 @@ export interface TabsProps {
   id?: string
   'aria-label'?: string
   'aria-labelledby'?: string
-  onActiveKeyChange?: (key: string | number) => void
+  onChange?: (key: string | number) => void
   onTabClick?: (key: string | number) => void
   onEdit?: (info: { targetKey?: string | number; action: 'add' | 'remove' }) => void
   children?: React.ReactNode
@@ -297,7 +297,7 @@ export const Tabs: React.FC<TabsProps> = ({
   style,
   locale,
   labels: labelsOverride,
-  onActiveKeyChange,
+  onChange,
   onTabClick,
   onEdit,
   children
@@ -396,9 +396,9 @@ export const Tabs: React.FC<TabsProps> = ({
       onTabClick?.(key)
       if (isKeyActive(key, activeKey)) return
       if (controlledActiveKey === undefined) setInternalActiveKey(key)
-      onActiveKeyChange?.(key)
+      onChange?.(key)
     },
-    [activeKey, controlledActiveKey, onActiveKeyChange, onTabClick]
+    [activeKey, controlledActiveKey, onChange, onTabClick]
   )
 
   const handleTabClose = useCallback(

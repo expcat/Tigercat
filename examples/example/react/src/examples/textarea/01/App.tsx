@@ -7,7 +7,7 @@ export default function App() {
   return (
     <Textarea
       value={value}
-      onChange={(event) => setValue(event.target.value)}
+      onChange={setValue}
       rows={4}
       size="lg"
       placeholder="请输入说明"

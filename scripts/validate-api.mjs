@@ -684,11 +684,6 @@ for (const [childComponent, parentComponent] of R16_NAVIGATION_CHILD_TARGETS) {
 
 const R16_REACT_FORBIDDEN_CALLBACKS = [
   {
-    relativePath: 'packages/react/src/components/Tabs.tsx',
-    label: 'Tabs onChange',
-    regex: /^  onChange\??\s*:/
-  },
-  {
     relativePath: 'packages/react/src/components/ScrollSpy.tsx',
     label: 'ScrollSpy onChange',
     regex: /^  onChange\??\s*:/
@@ -710,14 +705,14 @@ for (const { relativePath, label, regex } of R16_REACT_FORBIDDEN_CALLBACKS) {
         filepath,
         index + 1,
         'navigation-api',
-        `R16 Navigation React API must use onActiveKeyChange/onSearchChange or controlled keys callbacks instead of ${label}`
+        `R16 Navigation React API must use onChange (Tabs) / onActiveKeyChange (ScrollSpy) / onSearchChange or controlled keys callbacks instead of ${label}`
       )
     }
   })
 }
 
 const R16_REQUIRED_REACT_CALLBACKS = [
-  ['packages/react/src/components/Tabs.tsx', 'onActiveKeyChange'],
+  ['packages/react/src/components/Tabs.tsx', 'onChange'],
   ['packages/react/src/components/ScrollSpy.tsx', 'onActiveKeyChange'],
   ['packages/react/src/components/Menu/types.ts', 'onSelectedKeysChange'],
   ['packages/react/src/components/Menu/types.ts', 'onOpenKeysChange'],

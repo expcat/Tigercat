@@ -31,7 +31,7 @@ export default function App() {
   return (
     <Tabs
       activeKey={activeKey}
-      onActiveKeyChange={(key) => setActiveKey(String(key))}
+      onChange={(key) => setActiveKey(String(key))}
       type="editable-card"
       closable
       onEdit={handleEdit}>

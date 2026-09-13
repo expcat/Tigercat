@@ -43,7 +43,7 @@ export interface InputProps
       | 'prefix'
     > {
   onInput?: (event: React.FormEvent<HTMLInputElement>) => void
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (value: string | number) => void
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
   className?: string
@@ -165,7 +165,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     const next = parseInputValue(event.currentTarget, type)
     setInputValue(next)
     formItemControl?.onChange?.(next)
-    onChange?.(event)
+    onChange?.(next)
   }
 
   const focusInput = () => {
@@ -175,6 +175,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const handleClear = () => {
     setInputValue('')
     formItemControl?.onChange?.('')
+    onChange?.('')
     onClear?.()
     focusInput()
   }
