@@ -147,8 +147,8 @@ export { Image } from './components/Image'
 export type { VueImageProps } from './components/Image'
 export { ImageCompare } from './components/ImageCompare'
 export type { VueImageCompareProps } from './components/ImageCompare'
-export { ImagePreview, ImageViewer } from './components/ImagePreview'
-export type { VueImagePreviewProps, VueImageViewerProps } from './components/ImagePreview'
+export { ImagePreview } from './components/ImagePreview'
+export type { VueImagePreviewProps } from './components/ImagePreview'
 export { ImageGroup, IMAGE_GROUP_INJECTION_KEY } from './components/ImageGroup'
 export type { VueImageGroupProps, ImageGroupContext } from './components/ImageGroup'
 export { ImageCropper } from './components/ImageCropper'
@@ -332,13 +332,8 @@ export { BarChart } from './components/BarChart'
 export type { VueBarChartProps, BarChartProps } from './components/BarChart'
 export { ScatterChart } from './components/ScatterChart'
 export type { VueScatterChartProps, ScatterChartProps } from './components/ScatterChart'
-export { PieChart, DonutChart } from './components/PieChart'
-export type {
-  VuePieChartProps,
-  PieChartProps,
-  VueDonutChartProps,
-  DonutChartProps
-} from './components/PieChart'
+export { PieChart } from './components/PieChart'
+export type { VuePieChartProps, PieChartProps } from './components/PieChart'
 export { RadarChart } from './components/RadarChart'
 export type { VueRadarChartProps, RadarChartProps } from './components/RadarChart'
 export { LineChart } from './components/LineChart'
@@ -374,8 +369,8 @@ export type {
   AnchorContext
 } from './components/Anchor'
 export { AnchorContextKey } from './components/Anchor'
-export { TaskBoard, Kanban } from './components/TaskBoard'
-export type { VueTaskBoardProps, VueKanbanProps } from './components/TaskBoard'
+export { TaskBoard } from './components/TaskBoard'
+export type { VueTaskBoardProps } from './components/TaskBoard'
 
 // Phase 1B/1C components (v0.6.0+)
 export { Rate } from './components/Rate'
@@ -436,7 +431,7 @@ export { useDrag } from './composables/useDrag'
 export type { UseDragOptions, UseDragReturn } from './composables/useDrag'
 export { useFullscreen } from './composables/useFullscreen'
 export type { UseFullscreenOptions, UseFullscreenReturn } from './composables/useFullscreen'
-export { FullscreenButton, FullscreenButton as Fullscreen } from './components/FullscreenButton'
+export { FullscreenButton } from './components/FullscreenButton'
 export type { VueFullscreenButtonProps, FullscreenButtonProps } from './components/FullscreenButton'
 export { Drag } from './components/Drag'
 export type { VueDragProps, DragProps } from './components/Drag'

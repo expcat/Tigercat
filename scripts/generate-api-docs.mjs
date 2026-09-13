@@ -290,7 +290,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   ImagePreview: {
     notes:
-      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。ImageViewer 是配置别名（`minZoom`→`minScale`），新代码用 ImagePreview。'
+      '`images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。'
   },
   Alert: {
     notes:
@@ -309,23 +309,15 @@ const COMPONENT_USAGE_NOTES = {
   },
   Pagination: {
     notes:
-      '`size` 是 `small|medium|large`，不是 Form/Button 的 `sm|md|lg`。Table 内置分页默认开；List 默认关。'
+      '`size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默认开并跟随 Table `size`；List 默认关。'
   },
   Tree: {
     notes:
       '`checkStrictly` 默认 false（父子级联）。TreeSelect 默认 true（独立勾选）。`height` 是页面窗口，不是 overlay `listHeight`。'
   },
-  ImageViewer: {
-    notes:
-      'Compat alias of ImagePreview. Prefer ImagePreview + `minScale`/`maxScale`. `minZoom`/`maxZoom` still map. `showNav={false}` 键盘也不切图。'
-  },
   PieChart: {
     notes:
-      '`innerRadiusRatio` 做环形（0.6 即原 Donut）。`centerValue`/`centerLabel` 写在洞里。DonutChart 是默认 `innerRadiusRatio=0.6` 的别名，新代码用 PieChart。'
-  },
-  DonutChart: {
-    notes:
-      'Compat alias of PieChart with default `innerRadiusRatio` 0.6. Prefer PieChart + `innerRadiusRatio`.'
+      '`innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。'
   },
   ImageCompare: {
     notes:
@@ -487,12 +479,7 @@ const COMPONENT_USAGE_NOTES = {
   TaskBoard: {
     uses: ['ConfigProvider', 'task-board drag utilities'],
     notes:
-      '过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。Kanban 是默认值别名，新代码用 TaskBoard。'
-  },
-  Kanban: {
-    uses: ['TaskBoard'],
-    notes:
-      'Compat alias of TaskBoard with `showCardCount` / `allowAddCard` default true. Prefer TaskBoard. `swimlanes` 是列内按 `swimlaneField` 分组，不是跨列水平行。未分组桶走 locale。'
+      '过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。'
   }
 }
 

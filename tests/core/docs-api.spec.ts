@@ -126,12 +126,8 @@ describe('shouldUseFrameworkRuntimeProps', () => {
 })
 
 describe('DOC_COMPONENT_ALIASES', () => {
-  it('demotes only the three compat component names, not subpath-only aliases', () => {
-    expect(Object.fromEntries(DOC_COMPONENT_ALIASES)).toEqual({
-      ImageViewer: 'ImagePreview',
-      Kanban: 'TaskBoard',
-      DonutChart: 'PieChart'
-    })
+  it('has no first-class identity aliases', () => {
+    expect(Object.fromEntries(DOC_COMPONENT_ALIASES)).toEqual({})
     expect(DOC_COMPONENT_ALIASES.has('TabPane')).toBe(false)
     expect(DOC_COMPONENT_ALIASES.has('WorkflowActionBar')).toBe(false)
   })

@@ -6,7 +6,6 @@ import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
 import { render, fireEvent, waitFor, screen } from '@testing-library/vue'
 import { ImagePreview } from '@expcat/tigercat-vue/ImagePreview'
-import { ImageViewer } from '@expcat/tigercat-vue/ImageViewer'
 import { Modal } from '@expcat/tigercat-vue/Modal'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { getImageViewerLabels } from '@expcat/tigercat-core'
@@ -205,13 +204,13 @@ describe('ImagePreview', () => {
     await expectNoA11yViolationsIsolated(document.body)
   })
 
-  it('shares one dialog tree with ImageViewer', async () => {
-    const { emitted } = render(ImageViewer, {
+  it('hides nav and emits update:open on close', async () => {
+    const { emitted } = render(ImagePreview, {
       props: {
         open: true,
         images,
-        minZoom: 1,
-        maxZoom: 1,
+        minScale: 1,
+        maxScale: 1,
         showNav: false
       }
     })
@@ -221,6 +220,5 @@ describe('ImagePreview', () => {
     ).not.toBeInTheDocument()
     await fireEvent.click(screen.getByRole('button', { name: labels.closePreviewAriaLabel }))
     expect(emitted()['update:open']?.[0]).toEqual([false])
-    expect(emitted().close?.[0]).toEqual([])
   })
 })

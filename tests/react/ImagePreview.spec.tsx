@@ -6,7 +6,6 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent, waitFor, screen } from '@testing-library/react'
 import React, { useState } from 'react'
 import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
-import { ImageViewer } from '@expcat/tigercat-react/ImageViewer'
 import { Modal } from '@expcat/tigercat-react/Modal'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { getImageViewerLabels } from '@expcat/tigercat-core'
@@ -272,15 +271,15 @@ describe('ImagePreview', () => {
     await expectNoA11yViolationsIsolated(document.body)
   })
 
-  it('shares one dialog tree with ImageViewer, including minZoom mapping', () => {
+  it('disables zoom when minScale equals maxScale', () => {
     const onClose = vi.fn()
     const onOpenChange = vi.fn()
     render(
-      <ImageViewer
+      <ImagePreview
         open
         images={images}
-        minZoom={1}
-        maxZoom={1}
+        minScale={1}
+        maxScale={1}
         showNav={false}
         onClose={onClose}
         onOpenChange={onOpenChange}
@@ -293,6 +292,5 @@ describe('ImagePreview', () => {
     expect(screen.getByRole('button', { name: labels.zoomInAriaLabel })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: labels.closePreviewAriaLabel }))
     expect(onOpenChange).toHaveBeenCalledWith(false)
-    expect(onClose).toHaveBeenCalledTimes(1)
   })
 })

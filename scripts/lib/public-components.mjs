@@ -544,14 +544,10 @@ export const TIGERCAT_TOPIC_ROUTES = {
  * first-class usage in generated docs. Distinct from PACKAGE_EXPORT_TARGET_ALIASES,
  * which also maps subcomponents (TabPane → Tabs) and command roots.
  */
-export const DOC_COMPONENT_ALIASES = new Map([
-  ['ImageViewer', 'ImagePreview'],
-  ['Kanban', 'TaskBoard'],
-  ['DonutChart', 'PieChart']
-])
+export const DOC_COMPONENT_ALIASES = new Map([])
 
 const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
-  ['Fullscreen', 'FullscreenButton'],
+
   ['AnchorLink', 'Anchor'],
   ['BreadcrumbItem', 'Breadcrumb'],
   ['DropdownItem', 'Dropdown'],
@@ -575,9 +571,6 @@ const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['Message', 'MessageRoot'],
   ['LoadingBar', 'LoadingBarRoot'],
   ['WorkflowActionBar', 'WorkflowTimeline'],
-  ['ImageViewer', 'ImagePreview'],
-  ['Kanban', 'TaskBoard'],
-  ['DonutChart', 'PieChart']
 ])
 
 export const REQUIRED_CORE_PACKAGE_EXPORTS = [

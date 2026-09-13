@@ -170,9 +170,6 @@ export * from './rich-text-editor'
 // MarkdownEditor types (v1.6+)
 export * from './markdown-editor'
 
-// Kanban types (v0.8.0+)
-export * from './kanban'
-
 // VirtualTable types (v0.8.0+)
 export * from './virtual-table'
 
@@ -197,5 +194,4 @@ export * from './input-group'
 // PrintLayout types (v0.9.0+)
 export * from './print-layout'
 
-// ImageViewer types (v0.9.0+)
-export * from './image-viewer'
+

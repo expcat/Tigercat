@@ -9,7 +9,7 @@ import {
   UNASSIGNED_SWIMLANE_ID,
   type TaskBoardColumn,
   type TaskBoardCard,
-  type KanbanSwimlane
+  type TaskBoardSwimlane
 } from '@expcat/tigercat-core'
 
 // ─── Test data ────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ describe('filterColumns', () => {
 // ─── groupBySwimlane ──────────────────────────────────────────────
 
 describe('groupBySwimlane', () => {
-  const swimlanes: KanbanSwimlane[] = [
+  const swimlanes: TaskBoardSwimlane[] = [
     { id: 'bug', label: 'Bugs', color: 'red' },
     { id: 'feature', label: 'Features', color: 'blue' }
   ]
