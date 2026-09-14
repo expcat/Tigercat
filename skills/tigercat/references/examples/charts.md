@@ -9,37 +9,128 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 图表组件共享数据、series、legend、tooltip 和 axes 模式，细节看 chart 类型源。
 
-## Component Notes
+每个组件一节，供 MCP `tigercat_component` 按 `## {Component}` 抽取。绑定差异见 `shared/patterns/common.md`。
 
-| Component    | Uses | Notes                                                                                                                                                                          |
-| ------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ChartCanvas  | -    | `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。 |
-| ChartLegend  | -    | 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。                                      |
-| ChartTooltip | -    | `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。                                                                        |
-| PieChart     | -    | `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。                                                                                              |
+## AreaChart
 
-只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+Vue: `<AreaChart :data="data" />`
 
-| Component     | Vue                                                                                 | React                                                                          |
-| ------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| AreaChart     | `<AreaChart :data="data" />`                                                        | `<AreaChart data={data} />`                                                    |
-| BarChart      | `<BarChart :data="data" />`                                                         | `<BarChart data={data} />`                                                     |
-| ChartAxis     | `<ChartAxis :scale="xScale" orientation="bottom" label="Month" />`                  | `<ChartAxis scale={xScale} orientation="bottom" label="Month" />`              |
-| ChartCanvas   | `<ChartCanvas title="Sales" :width="320" :height="200"><slot /></ChartCanvas>`      | `<ChartCanvas title="Sales" width={320} height={200}>{plot}</ChartCanvas>`     |
-| ChartGrid     | `<ChartGrid :x-scale="xScale" :y-scale="yScale" show="both" line-style="dashed" />` | `<ChartGrid xScale={xScale} yScale={yScale} show="both" lineStyle="dashed" />` |
-| ChartLegend   | `<ChartLegend :items="items" />`                                                    | `<ChartLegend items={items} />`                                                |
-| ChartSeries   | `<ChartSeries :data="data" type="bar"><slot /></ChartSeries>`                       | `<ChartSeries data={data} type="bar">{marks}</ChartSeries>`                    |
-| ChartTooltip  | `<ChartTooltip :content="label" :open="open" :x="x" :y="y" />`                      | `<ChartTooltip content={label} open={open} x={x} y={y} />`                     |
-| FunnelChart   | `<FunnelChart :data="data" />`                                                      | `<FunnelChart data={data} />`                                                  |
-| Gantt         | `<Gantt :data="tasks" />`                                                           | `<Gantt data={tasks} />`                                                       |
-| GaugeChart    | `<GaugeChart :value="72" />`                                                        | `<GaugeChart value={72} />`                                                    |
-| HeatmapChart  | `<HeatmapChart :data="data" :x-labels="xLabels" :y-labels="yLabels" />`             | `<HeatmapChart data={data} xLabels={xLabels} yLabels={yLabels} />`             |
-| LineChart     | `<LineChart :data="data" />`                                                        | `<LineChart data={data} />`                                                    |
-| OrgChart      | `<OrgChart :data="nodes" />`                                                        | `<OrgChart data={nodes} />`                                                    |
-| PieChart      | `<PieChart :data="data" />`                                                         | `<PieChart data={data} />`                                                     |
-| RadarChart    | `<RadarChart :data="data" />`                                                       | `<RadarChart data={data} />`                                                   |
-| ScatterChart  | `<ScatterChart :data="data" />`                                                     | `<ScatterChart data={data} />`                                                 |
-| SunburstChart | `<SunburstChart :data="data" />`                                                    | `<SunburstChart data={data} />`                                                |
-| TreeMapChart  | `<TreeMapChart :data="data" />`                                                     | `<TreeMapChart data={data} />`                                                 |
+React: `<AreaChart data={data} />`
+
+## BarChart
+
+Vue: `<BarChart :data="data" />`
+
+React: `<BarChart data={data} />`
+
+## ChartAxis
+
+Vue: `<ChartAxis :scale="xScale" orientation="bottom" label="Month" />`
+
+React: `<ChartAxis scale={xScale} orientation="bottom" label="Month" />`
+
+## ChartCanvas
+
+Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。
+
+Vue: `<ChartCanvas title="Sales" :width="320" :height="200"><slot /></ChartCanvas>`
+
+React: `<ChartCanvas title="Sales" width={320} height={200}>{plot}</ChartCanvas>`
+
+## ChartGrid
+
+Vue: `<ChartGrid :x-scale="xScale" :y-scale="yScale" show="both" line-style="dashed" />`
+
+React: `<ChartGrid xScale={xScale} yScale={yScale} show="both" lineStyle="dashed" />`
+
+## ChartLegend
+
+Note: 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。
+
+Vue: `<ChartLegend :items="items" />`
+
+React: `<ChartLegend items={items} />`
+
+## ChartSeries
+
+Vue: `<ChartSeries :data="data" type="bar"><slot /></ChartSeries>`
+
+React: `<ChartSeries data={data} type="bar">{marks}</ChartSeries>`
+
+## ChartTooltip
+
+Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。
+
+Vue: `<ChartTooltip :content="label" :open="open" :x="x" :y="y" />`
+
+React: `<ChartTooltip content={label} open={open} x={x} y={y} />`
+
+## FunnelChart
+
+Vue: `<FunnelChart :data="data" />`
+
+React: `<FunnelChart data={data} />`
+
+## Gantt
+
+Vue: `<Gantt :data="tasks" />`
+
+React: `<Gantt data={tasks} />`
+
+## GaugeChart
+
+Vue: `<GaugeChart :value="72" />`
+
+React: `<GaugeChart value={72} />`
+
+## HeatmapChart
+
+Vue: `<HeatmapChart :data="data" :x-labels="xLabels" :y-labels="yLabels" />`
+
+React: `<HeatmapChart data={data} xLabels={xLabels} yLabels={yLabels} />`
+
+## LineChart
+
+Vue: `<LineChart :data="data" />`
+
+React: `<LineChart data={data} />`
+
+## OrgChart
+
+Vue: `<OrgChart :data="nodes" />`
+
+React: `<OrgChart data={nodes} />`
+
+## PieChart
+
+Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。
+
+Vue: `<PieChart :data="data" />`
+
+React: `<PieChart data={data} />`
+
+## RadarChart
+
+Vue: `<RadarChart :data="data" />`
+
+React: `<RadarChart data={data} />`
+
+## ScatterChart
+
+Vue: `<ScatterChart :data="data" />`
+
+React: `<ScatterChart data={data} />`
+
+## SunburstChart
+
+Vue: `<SunburstChart :data="data" />`
+
+React: `<SunburstChart data={data} />`
+
+## TreeMapChart
+
+Vue: `<TreeMapChart :data="data" />`
+
+React: `<TreeMapChart data={data} />`
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

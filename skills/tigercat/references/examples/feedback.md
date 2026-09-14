@@ -9,33 +9,100 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 弹层类组件通常使用 `open`/`update:open` 或 `open`/`onOpenChange`。
 
-## Component Notes
+每个组件一节，供 MCP `tigercat_component` 按 `## {Component}` 抽取。绑定差异见 `shared/patterns/common.md`。
 
-| Component | Uses | Notes                                                                                                                                                                                                                                                                                                                       |
-| --------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Alert     | -    | 省略 `open` 时展示；`open={false}` 才不渲染。关闭不会内部隐藏——父级卸载或设 `open={false}`。与 ImagePreview「省略即关」相反。                                                                                                                                                                                               |
-| Drawer    | -    | `bodyPadding`（`boolean \| string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。                                                                                                                                                                                                                                                |
-| Modal     | -    | `open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。默认页脚 OK 必关。关闭名走 `locale.modal`（en-US Close / OK / Cancel）。嵌套 Modal 进外层 overlay-host，Esc 先关里层。 |
-| Progress  | -    | 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。                                                                                                                                                                                                           |
-| Tour      | -    | `current` 是 `steps` 的原始下标，不是跳过之后的下标。非受控关后再开回到 0；受控时父级要自己归零。`closable={false}` 只藏 X，Esc / 点 mask 仍关，除非 `keyboard` / `maskClosable` 为 false。无标题仍有 locale dialog 名。`loadSteps` 出来的第一步也会量 target、挂陷阱。文案只读 `locale.tour`。                             |
+## Alert
 
-只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+Note: 省略 `open` 时展示；`open={false}` 才不渲染。关闭不会内部隐藏——父级卸载或设 `open={false}`。与 ImagePreview「省略即关」相反。
 
-| Component             | Vue                                                                     | React                                                                    |
-| --------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Alert                 | `<Alert type="info" title="Saved" />`                                   | `<Alert type="info" title="Saved" />`                                    |
-| Drawer                | `<Drawer :open="open" title="Title">Body</Drawer>`                      | `<Drawer open={open} title="Title">Body</Drawer>`                        |
-| Loading               | `<Loading :spinning="loading"><slot /></Loading>`                       | `<Loading spinning={loading}>{children}</Loading>`                       |
-| LoadingBar            | `LoadingBar.start()`                                                    | `LoadingBar.start()`                                                     |
-| LoadingBarContainer   | `<LoadingBarContainer :percentage="40" />`                              | `<LoadingBarContainer percentage={40} />`                                |
-| Message               | `Message.info('Saved')`                                                 | `Message.info('Saved')`                                                  |
-| MessageContainer      | `<MessageContainer :messages="messages" />`                             | `<MessageContainer messages={messages} />`                               |
-| Modal                 | `<Modal :open="open" title="Title">Body</Modal>`                        | `<Modal open={open} title="Title">Body</Modal>`                          |
-| NotificationContainer | `<NotificationContainer :notifications="items" />`                      | `<NotificationContainer notifications={items} />`                        |
-| Popconfirm            | `<Popconfirm @confirm="onConfirm"><button>Delete</button></Popconfirm>` | `<Popconfirm onConfirm={onConfirm}><button>Delete</button></Popconfirm>` |
-| Popover               | `<Popover content="Note"><button>Trigger</button></Popover>`            | `<Popover content="Note"><button>Trigger</button></Popover>`             |
-| Progress              | `<Progress :percentage="64" />`                                         | `<Progress percentage={64} />`                                           |
-| Tooltip               | `<Tooltip content="Hint"><button>Save</button></Tooltip>`               | `<Tooltip content="Hint"><button>Save</button></Tooltip>`                |
-| Tour                  | `<Tour v-model:open="open" :steps="steps" />`                           | `<Tour open={open} steps={steps} onOpenChange={setOpen} />`              |
+Vue: `<Alert type="info" title="Saved" />`
+
+React: `<Alert type="info" title="Saved" />`
+
+## Drawer
+
+Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。
+
+Vue: `<Drawer :open="open" title="Title">Body</Drawer>`
+
+React: `<Drawer open={open} title="Title">Body</Drawer>`
+
+## Loading
+
+Vue: `<Loading :spinning="loading"><slot /></Loading>`
+
+React: `<Loading spinning={loading}>{children}</Loading>`
+
+## LoadingBar
+
+Vue: `LoadingBar.start()`
+
+React: `LoadingBar.start()`
+
+## LoadingBarContainer
+
+Vue: `<LoadingBarContainer :percentage="40" />`
+
+React: `<LoadingBarContainer percentage={40} />`
+
+## Message
+
+Vue: `Message.info('Saved')`
+
+React: `Message.info('Saved')`
+
+## MessageContainer
+
+Vue: `<MessageContainer :messages="messages" />`
+
+React: `<MessageContainer messages={messages} />`
+
+## Modal
+
+Note: `open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。默认页脚 OK 必关。关闭名走 `locale.modal`（en-US Close / OK / Cancel）。嵌套 Modal 进外层 overlay-host，Esc 先关里层。
+
+Vue: `<Modal :open="open" title="Title">Body</Modal>`
+
+React: `<Modal open={open} title="Title">Body</Modal>`
+
+## NotificationContainer
+
+Vue: `<NotificationContainer :notifications="items" />`
+
+React: `<NotificationContainer notifications={items} />`
+
+## Popconfirm
+
+Vue: `<Popconfirm @confirm="onConfirm"><button>Delete</button></Popconfirm>`
+
+React: `<Popconfirm onConfirm={onConfirm}><button>Delete</button></Popconfirm>`
+
+## Popover
+
+Vue: `<Popover content="Note"><button>Trigger</button></Popover>`
+
+React: `<Popover content="Note"><button>Trigger</button></Popover>`
+
+## Progress
+
+Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。
+
+Vue: `<Progress :percentage="64" />`
+
+React: `<Progress percentage={64} />`
+
+## Tooltip
+
+Vue: `<Tooltip content="Hint"><button>Save</button></Tooltip>`
+
+React: `<Tooltip content="Hint"><button>Save</button></Tooltip>`
+
+## Tour
+
+Note: `current` 是 `steps` 的原始下标，不是跳过之后的下标。非受控关后再开回到 0；受控时父级要自己归零。`closable={false}` 只藏 X，Esc / 点 mask 仍关，除非 `keyboard` / `maskClosable` 为 false。无标题仍有 locale dialog 名。`loadSteps` 出来的第一步也会量 target、挂陷阱。文案只读 `locale.tour`。
+
+Vue: `<Tour v-model:open="open" :steps="steps" />`
+
+React: `<Tour open={open} steps={steps} onOpenChange={setOpen} />`
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

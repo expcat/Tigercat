@@ -55,6 +55,11 @@
   "aliases": {
     "Grid": ["Row", "Col"],
     "栅格": ["Row", "Col"],
+    "Kanban": ["TaskBoard"],
+    "看板": ["TaskBoard"],
+    "DonutChart": ["PieChart"],
+    "Donut": ["PieChart"],
+    "ImageViewer": ["ImagePreview"],
     "按钮": ["Button"],
     "按钮组": ["ButtonGroup"],
     "分裂按钮": ["SplitButton"],
@@ -99,6 +104,7 @@
     "滑块": ["Slider"],
     "评分": ["Rate"],
     "日期选择": ["DatePicker"],
+    "日期选择器": ["DatePicker"],
     "时间选择": ["TimePicker"],
     "级联选择": ["Cascader"],
     "树选择": ["TreeSelect"],
@@ -202,7 +208,6 @@
     "矩形树图": ["TreeMapChart"],
     "甘特图": ["Gantt"],
     "组织架构图": ["OrgChart"],
-    "看板": ["TaskBoard"],
     "任务看板": ["TaskBoard"],
     "全屏看图": ["ImagePreview"],
     "聊天窗口": ["ChatWindow"],
@@ -1112,7 +1117,7 @@
     },
     "ImagePreview": {
       "name": "ImagePreview",
-      "aliases": ["图片预览", "全屏看图"],
+      "aliases": ["ImageViewer", "图片预览", "全屏看图"],
       "category": "Basic",
       "slug": "basic",
       "testGroup": "basic",
@@ -1652,7 +1657,7 @@
     },
     "PieChart": {
       "name": "PieChart",
-      "aliases": ["饼图", "环形图"],
+      "aliases": ["DonutChart", "Donut", "饼图", "环形图"],
       "category": "Charts",
       "slug": "charts",
       "testGroup": "charts",
@@ -1892,7 +1897,7 @@
     },
     "TaskBoard": {
       "name": "TaskBoard",
-      "aliases": ["看板", "任务看板"],
+      "aliases": ["Kanban", "看板", "任务看板"],
       "category": "Composite",
       "slug": "composite",
       "testGroup": "composite",
@@ -2578,7 +2583,7 @@
     },
     "DatePicker": {
       "name": "DatePicker",
-      "aliases": ["日期选择"],
+      "aliases": ["日期选择", "日期选择器"],
       "category": "Form",
       "slug": "form",
       "testGroup": "form",

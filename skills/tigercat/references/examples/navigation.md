@@ -9,54 +9,226 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 受控导航组件优先维护当前项、页码或展开状态，再传给组件。
 
-## Component Notes
+每个组件一节，供 MCP `tigercat_component` 按 `## {Component}` 抽取。绑定差异见 `shared/patterns/common.md`。
 
-| Component  | Uses                           | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ---------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Breadcrumb | -                              | `maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。                                                                                                                                                                                                                                                                                                                                     |
-| Dropdown   | `DropdownMenu`, `DropdownItem` | 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-controls` 打在焦点那颗 button 上：文本触发器自渲 `<button type="button">`，`asChild` 或唯一原生 `button`/`a` 子节点则合并到该节点。菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider 根 → `document.body`）。`data-state="open" \| "closed"` 与 `aria-expanded` 同步。Vue `#trigger="{ open }"` / React `renderTrigger={({ open }) => …}`。SplitButton 与 DataExport 走 `asChild`。 |
-| Pagination | -                              | `size` 是 `sm\|md\|lg`（与 Form/Button 相同）。Table 内置分页默认开并跟随 Table `size`；List 默认关。                                                                                                                                                                                                                                                                                                                                                             |
-| Tree       | -                              | `checkStrictly` 默认 false（父子级联）。TreeSelect 默认 true（独立勾选）。`height` 是页面窗口，不是 overlay `listHeight`。                                                                                                                                                                                                                                                                                                                                        |
+## Affix
 
-只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+Vue: `<Affix :offset-top="0"><div>Header</div></Affix>`
 
-| Component             | Vue                                                                                                                                                                                                                                                                                              | React                                                                                                                                                                                                                                                                                            |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Affix                 | `<Affix :offset-top="0"><div>Header</div></Affix>`                                                                                                                                                                                                                                               | `<Affix offsetTop={0}><div>Header</div></Affix>`                                                                                                                                                                                                                                                 |
-| Anchor                | `<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>`                                                                                                                                                                                                                                    | `<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>`                                                                                                                                                                                                                                    |
-| AnchorLink            | `<AnchorLink href="#intro" title="Intro" />`                                                                                                                                                                                                                                                     | `<AnchorLink href="#intro" title="Intro" />`                                                                                                                                                                                                                                                     |
-| BackTop               | `<BackTop :visibility-height="400" />`                                                                                                                                                                                                                                                           | `<BackTop visibilityHeight={400} />`                                                                                                                                                                                                                                                             |
-| Breadcrumb            | `<Breadcrumb><BreadcrumbItem href="/">Home</BreadcrumbItem><BreadcrumbItem>Here</BreadcrumbItem></Breadcrumb>`                                                                                                                                                                                   | `<Breadcrumb><BreadcrumbItem href="/">Home</BreadcrumbItem><BreadcrumbItem>Here</BreadcrumbItem></Breadcrumb>`                                                                                                                                                                                   |
-| BreadcrumbItem        | `<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadcrumb>`                                                                                                                                                                                                                | `<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadcrumb>`                                                                                                                                                                                                                |
-| ContextMenu           | `<ContextMenu><button>Surface</button><ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu></ContextMenu>`                                                                                                                                                                  | `<ContextMenu><button>Surface</button><ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu></ContextMenu>`                                                                                                                                                                  |
-| ContextMenuItem       | `<ContextMenuItem>Copy</ContextMenuItem>`                                                                                                                                                                                                                                                        | `<ContextMenuItem>Copy</ContextMenuItem>`                                                                                                                                                                                                                                                        |
-| ContextMenuMenu       | `<ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu>`                                                                                                                                                                                                                     | `<ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu>`                                                                                                                                                                                                                     |
-| ContextMenuSub        | `<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>`                                                                                                                                                                                                         | `<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>`                                                                                                                                                                                                         |
-| Dropdown              | `<Dropdown><template #trigger>Open</template><DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu></Dropdown>`                                                                                                                                                                          | `<Dropdown renderTrigger={() => <button>Open</button>}><DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu></Dropdown>`                                                                                                                                                                |
-| DropdownItem          | `<DropdownItem>Item</DropdownItem>`                                                                                                                                                                                                                                                              | `<DropdownItem>Item</DropdownItem>`                                                                                                                                                                                                                                                              |
-| DropdownMenu          | `<DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu>`                                                                                                                                                                                                                                 | `<DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu>`                                                                                                                                                                                                                                 |
-| FloatButton           | `<FloatButton floating />`                                                                                                                                                                                                                                                                       | `<FloatButton floating />`                                                                                                                                                                                                                                                                       |
-| FloatButtonGroup      | `<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>`                                                                                                                                                                                                            | `<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>`                                                                                                                                                                                                            |
-| Menu                  | `<Menu :items="items" />`                                                                                                                                                                                                                                                                        | `<Menu items={items} />`                                                                                                                                                                                                                                                                         |
-| MenuItem              | `<Menu><MenuItem :item-key="itemKey">Home</MenuItem></Menu>`                                                                                                                                                                                                                                     | `<Menu><MenuItem itemKey={itemKey}>Home</MenuItem></Menu>`                                                                                                                                                                                                                                       |
-| MenuItemGroup         | `<Menu><MenuItemGroup title="Team"><MenuItem :item-key="a">A</MenuItem></MenuItemGroup></Menu>`                                                                                                                                                                                                  | `<Menu><MenuItemGroup title="Team"><MenuItem itemKey="a">A</MenuItem></MenuItemGroup></Menu>`                                                                                                                                                                                                    |
-| NavigationMenu        | `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenuList></NavigationMenu>` | `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenuList></NavigationMenu>` |
-| NavigationMenuContent | `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>`                                          | `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>`                                          |
-| NavigationMenuItem    | `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenu>`                                                                                                                                                     | `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenu>`                                                                                                                                                     |
-| NavigationMenuLink    | `<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>`                                                                                                                                                         | `<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>`                                                                                                                                                         |
-| NavigationMenuList    | `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenuList></NavigationMenu>`                                                                                                            | `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenuList></NavigationMenu>`                                                                                                            |
-| NavigationMenuTrigger | `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>`                                          | `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>`                                          |
-| PageHeader            | `<PageHeader title="订单详情" />`                                                                                                                                                                                                                                                                | `<PageHeader title="订单详情" />`                                                                                                                                                                                                                                                                |
-| Pagination            | `<Pagination :total="100" :current="1" />`                                                                                                                                                                                                                                                       | `<Pagination total={100} current={1} />`                                                                                                                                                                                                                                                         |
-| ScrollSpy             | `<ScrollSpy :items="items" />`                                                                                                                                                                                                                                                                   | `<ScrollSpy items={items} />`                                                                                                                                                                                                                                                                    |
-| Spotlight             | `<Spotlight :items="items" />`                                                                                                                                                                                                                                                                   | `<Spotlight items={items} />`                                                                                                                                                                                                                                                                    |
-| Steps                 | `<Steps :current="1"><StepsItem title="填写" /><StepsItem title="确认" /></Steps>`                                                                                                                                                                                                               | `<Steps current={1}><StepsItem title="填写" /><StepsItem title="确认" /></Steps>`                                                                                                                                                                                                                |
-| StepsItem             | `<Steps><StepsItem title="填写" /></Steps>`                                                                                                                                                                                                                                                      | `<Steps><StepsItem title="填写" /></Steps>`                                                                                                                                                                                                                                                      |
-| SubMenu               | `<Menu><SubMenu :item-key="itemKey" title="More"><MenuItem :item-key="a">A</MenuItem></SubMenu></Menu>`                                                                                                                                                                                          | `<Menu><SubMenu itemKey={itemKey} title="More"><MenuItem itemKey="a">A</MenuItem></SubMenu></Menu>`                                                                                                                                                                                              |
-| TabPane               | `<Tabs><TabPane tab-key="1" label="Overview">Panel</TabPane></Tabs>`                                                                                                                                                                                                                             | `<Tabs><TabPane tabKey="1" label="Overview">Panel</TabPane></Tabs>`                                                                                                                                                                                                                              |
-| Tabs                  | `<Tabs v-model:active-key="activeKey"><TabPane :tab-key="1" label="Overview">Panel</TabPane></Tabs>`                                                                                                                                                                                             | `<Tabs activeKey={activeKey}><TabPane tabKey={1} label="Overview">Panel</TabPane></Tabs>`                                                                                                                                                                                                        |
-| Tree                  | `<Tree :tree-data="treeData" />`                                                                                                                                                                                                                                                                 | `<Tree treeData={treeData} />`                                                                                                                                                                                                                                                                   |
+React: `<Affix offsetTop={0}><div>Header</div></Affix>`
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：FullscreenButton.
+## Anchor
+
+Vue: `<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>`
+
+React: `<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>`
+
+## AnchorLink
+
+Vue: `<AnchorLink href="#intro" title="Intro" />`
+
+React: `<AnchorLink href="#intro" title="Intro" />`
+
+## BackTop
+
+Vue: `<BackTop :visibility-height="400" />`
+
+React: `<BackTop visibilityHeight={400} />`
+
+## Breadcrumb
+
+Note: `maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。
+
+Vue: `<Breadcrumb><BreadcrumbItem href="/">Home</BreadcrumbItem><BreadcrumbItem>Here</BreadcrumbItem></Breadcrumb>`
+
+React: `<Breadcrumb><BreadcrumbItem href="/">Home</BreadcrumbItem><BreadcrumbItem>Here</BreadcrumbItem></Breadcrumb>`
+
+## BreadcrumbItem
+
+Vue: `<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadcrumb>`
+
+React: `<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadcrumb>`
+
+## ContextMenu
+
+Vue: `<ContextMenu><button>Surface</button><ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu></ContextMenu>`
+
+React: `<ContextMenu><button>Surface</button><ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu></ContextMenu>`
+
+## ContextMenuItem
+
+Vue: `<ContextMenuItem>Copy</ContextMenuItem>`
+
+React: `<ContextMenuItem>Copy</ContextMenuItem>`
+
+## ContextMenuMenu
+
+Vue: `<ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu>`
+
+React: `<ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu>`
+
+## ContextMenuSub
+
+Vue: `<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>`
+
+React: `<ContextMenuSub title="More"><ContextMenuItem>Share</ContextMenuItem></ContextMenuSub>`
+
+## Dropdown
+
+Uses: `DropdownMenu`, `DropdownItem`.
+
+Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-controls` 打在焦点那颗 button 上：文本触发器自渲 `<button type="button">`，`asChild` 或唯一原生 `button`/`a` 子节点则合并到该节点。菜单沿 overlay 目标链挂载（最近 overlay-host → ConfigProvider 根 → `document.body`）。`data-state="open" | "closed"` 与 `aria-expanded` 同步。Vue `#trigger="{ open }"` / React `renderTrigger={({ open }) => …}`。SplitButton 与 DataExport 走 `asChild`。
+
+Vue: `<Dropdown><template #trigger>Open</template><DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu></Dropdown>`
+
+React: `<Dropdown renderTrigger={() => <button>Open</button>}><DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu></Dropdown>`
+
+## DropdownItem
+
+Vue: `<DropdownItem>Item</DropdownItem>`
+
+React: `<DropdownItem>Item</DropdownItem>`
+
+## DropdownMenu
+
+Vue: `<DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu>`
+
+React: `<DropdownMenu><DropdownItem>Item</DropdownItem></DropdownMenu>`
+
+## FloatButton
+
+Vue: `<FloatButton floating />`
+
+React: `<FloatButton floating />`
+
+## FloatButtonGroup
+
+Vue: `<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>`
+
+React: `<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>`
+
+## FullscreenButton
+
+Vue: `<FullscreenButton />`
+
+React: `<FullscreenButton />`
+
+## Menu
+
+Vue: `<Menu :items="items" />`
+
+React: `<Menu items={items} />`
+
+## MenuItem
+
+Vue: `<Menu><MenuItem :item-key="itemKey">Home</MenuItem></Menu>`
+
+React: `<Menu><MenuItem itemKey={itemKey}>Home</MenuItem></Menu>`
+
+## MenuItemGroup
+
+Vue: `<Menu><MenuItemGroup title="Team"><MenuItem :item-key="a">A</MenuItem></MenuItemGroup></Menu>`
+
+React: `<Menu><MenuItemGroup title="Team"><MenuItem itemKey="a">A</MenuItem></MenuItemGroup></Menu>`
+
+## NavigationMenu
+
+Vue: `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenuList></NavigationMenu>`
+
+React: `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenuList></NavigationMenu>`
+
+## NavigationMenuContent
+
+Vue: `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>`
+
+React: `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>`
+
+## NavigationMenuItem
+
+Vue: `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenu>`
+
+React: `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenu>`
+
+## NavigationMenuLink
+
+Vue: `<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>`
+
+React: `<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>`
+
+## NavigationMenuList
+
+Vue: `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenuList></NavigationMenu>`
+
+React: `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger></NavigationMenuItem></NavigationMenuList></NavigationMenu>`
+
+## NavigationMenuTrigger
+
+Vue: `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>`
+
+React: `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenu>`
+
+## PageHeader
+
+Vue: `<PageHeader title="订单详情" />`
+
+React: `<PageHeader title="订单详情" />`
+
+## Pagination
+
+Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默认开并跟随 Table `size`；List 默认关。
+
+Vue: `<Pagination :total="100" :current="1" />`
+
+React: `<Pagination total={100} current={1} />`
+
+## ScrollSpy
+
+Vue: `<ScrollSpy :items="items" />`
+
+React: `<ScrollSpy items={items} />`
+
+## Spotlight
+
+Vue: `<Spotlight :items="items" />`
+
+React: `<Spotlight items={items} />`
+
+## Steps
+
+Vue: `<Steps :current="1"><StepsItem title="填写" /><StepsItem title="确认" /></Steps>`
+
+React: `<Steps current={1}><StepsItem title="填写" /><StepsItem title="确认" /></Steps>`
+
+## StepsItem
+
+Vue: `<Steps><StepsItem title="填写" /></Steps>`
+
+React: `<Steps><StepsItem title="填写" /></Steps>`
+
+## SubMenu
+
+Vue: `<Menu><SubMenu :item-key="itemKey" title="More"><MenuItem :item-key="a">A</MenuItem></SubMenu></Menu>`
+
+React: `<Menu><SubMenu itemKey={itemKey} title="More"><MenuItem itemKey="a">A</MenuItem></SubMenu></Menu>`
+
+## TabPane
+
+Vue: `<Tabs><TabPane tab-key="1" label="Overview">Panel</TabPane></Tabs>`
+
+React: `<Tabs><TabPane tabKey="1" label="Overview">Panel</TabPane></Tabs>`
+
+## Tabs
+
+Vue: `<Tabs v-model:active-key="activeKey"><TabPane :tab-key="1" label="Overview">Panel</TabPane></Tabs>`
+
+React: `<Tabs activeKey={activeKey}><TabPane tabKey={1} label="Overview">Panel</TabPane></Tabs>`
+
+## Tree
+
+Note: `checkStrictly` 默认 false（父子级联）。TreeSelect 默认 true（独立勾选）。`height` 是页面窗口，不是 overlay `listHeight`。
+
+Vue: `<Tree :tree-data="treeData" />`
+
+React: `<Tree treeData={treeData} />`
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

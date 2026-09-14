@@ -9,27 +9,78 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 高级组件通常需要受控数据、回调和性能边界，先看 props 再写示例。
 
-## Component Notes
+每个组件一节，供 MCP `tigercat_component` 按 `## {Component}` 抽取。绑定差异见 `shared/patterns/common.md`。
 
-| Component    | Uses                                                          | Notes                                                                                                                                                                                                                                                                             |
-| ------------ | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PrintLayout  | -                                                             | `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。                                                                                                                              |
-| VirtualTable | `TableColumn`, `virtual scroll range`, `fixed column offsets` | 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。 |
+## CodeEditor
 
-只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+Vue: `<CodeEditor v-model="code" language="javascript" />`
 
-| Component       | Vue                                                                                                                      | React                                                                                                  |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| CodeEditor      | `<CodeEditor v-model="code" language="javascript" />`                                                                    | `<CodeEditor value={code} onChange={setCode} language="javascript" />`                                 |
-| FileManager     | `<FileManager :files="files" />`                                                                                         | `<FileManager files={files} />`                                                                        |
-| ImageAnnotation | `<ImageAnnotation src="..." v-model="value" />`                                                                          | `<ImageAnnotation src="..." value={value} onChange={setValue} />`                                      |
-| InfiniteScroll  | `<InfiniteScroll :has-more="hasMore" :height="288" @load-more="loadMore">{{ items }}</InfiniteScroll>`                   | `<InfiniteScroll hasMore={hasMore} height={288} onLoadMore={loadMore}>{items}</InfiniteScroll>`        |
-| MarkdownEditor  | `<MarkdownEditor v-model="md" />`                                                                                        | `<MarkdownEditor value={md} onChange={setMd} />`                                                       |
-| PrintLayout     | `<PrintLayout page-size="A4" show-header header-text="Report"><slot /></PrintLayout>`                                    | `<PrintLayout pageSize="A4" showHeader headerText="Report">{children}</PrintLayout>`                   |
-| RichTextEditor  | `<RichTextEditor v-model="html" />`                                                                                      | `<RichTextEditor value={html} onChange={setHtml} />`                                                   |
-| VirtualList     | `<VirtualList :item-count="count" :item-height="40"><template #default="{ index }">{{ index }}</template></VirtualList>` | `<VirtualList itemCount={count} itemHeight={40} renderItem={({ index }) => <div>{index}</div>} />`     |
-| VirtualTable    | `<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />`           | `<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />` |
+React: `<CodeEditor value={code} onChange={setCode} language="javascript" />`
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：Drag, PrintPageBreak.
+## Drag
+
+Vue: `<Drag />`
+
+React: `<Drag />`
+
+## FileManager
+
+Vue: `<FileManager :files="files" />`
+
+React: `<FileManager files={files} />`
+
+## ImageAnnotation
+
+Vue: `<ImageAnnotation src="..." v-model="value" />`
+
+React: `<ImageAnnotation src="..." value={value} onChange={setValue} />`
+
+## InfiniteScroll
+
+Vue: `<InfiniteScroll :has-more="hasMore" :height="288" @load-more="loadMore">{{ items }}</InfiniteScroll>`
+
+React: `<InfiniteScroll hasMore={hasMore} height={288} onLoadMore={loadMore}>{items}</InfiniteScroll>`
+
+## MarkdownEditor
+
+Vue: `<MarkdownEditor v-model="md" />`
+
+React: `<MarkdownEditor value={md} onChange={setMd} />`
+
+## PrintLayout
+
+Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。
+
+Vue: `<PrintLayout page-size="A4" show-header header-text="Report"><slot /></PrintLayout>`
+
+React: `<PrintLayout pageSize="A4" showHeader headerText="Report">{children}</PrintLayout>`
+
+## PrintPageBreak
+
+Vue: `<PrintPageBreak />`
+
+React: `<PrintPageBreak />`
+
+## RichTextEditor
+
+Vue: `<RichTextEditor v-model="html" />`
+
+React: `<RichTextEditor value={html} onChange={setHtml} />`
+
+## VirtualList
+
+Vue: `<VirtualList :item-count="count" :item-height="40"><template #default="{ index }">{{ index }}</template></VirtualList>`
+
+React: `<VirtualList itemCount={count} itemHeight={40} renderItem={({ index }) => <div>{index}</div>} />`
+
+## VirtualTable
+
+Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
+
+Note: 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。
+
+Vue: `<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-height="40" :virtual-height="320" />`
+
+React: `<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />`
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

@@ -9,62 +9,226 @@ description: Compact Tigercat Form Vue and React usage routes
 
 Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
-## Component Notes
+每个组件一节，供 MCP `tigercat_component` 按 `## {Component}` 抽取。绑定差异见 `shared/patterns/common.md`。
 
-| Component      | Uses | Notes                                                                                                                                                                                                                                                                                                                                                           |
-| -------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AutoComplete   | -    | 打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。                                                                                                                                                       |
-| Cascader       | -    | value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。                                                                                                                                                                                                                               |
-| CheckboxGroup  | -    | 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。                                                                                                                                                                                                                                                                              |
-| DatePicker     | -    | 空范围是 `null`。进行中的范围才是元组。日期是本地日历日。                                                                                                                                                                                                                                                                        |
-| Form           | -    | 值对象是 Vue `modelValue`（`v-model`）/ React `value`。Wizard 步下标走 `onStepChange`，不是表单 values。Form `size` 是 `sm\|md\|lg`。                                                                                                                                                                                                                           |
-| FormItem       | -    | 具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` 时从 model 取值（boolean/list/tuple 不会把 `''` 当成字符串）。字段请用 RadioGroup，不要把单颗 Radio 当 field。                                                                                                                                                                                  |
-| Input          | -    | React `onChange` 是字符串/数字值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。                                                                                                                                          |
-| InputGroup     | -    | 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。                                                                                                                                                                            |
-| InputNumber    | -    | React `onChange` 收到 `number \| null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。                                                                                                                                                                                                                                     |
-| Mentions       | -    | 插入的是 `prefix + option.value + 空格`。字段 props 与 Textarea 对齐：`autoResize` / `maxLength` / `showCount` / `readonly`（`readOnly` 别名）/ `clearable`（默认 false）。不要把 `prefix` 当成 Input 的前缀槽。                                                                                                                                                |
-| NumberKeyboard | -    | 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。                                                                                                                                            |
-| RadioGroup     | -    | 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。字段请用 RadioGroup，不要把单颗 Radio 当 FormItem。                                                                                                                                                                                                                           |
-| Select         | -    | 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职是 `height`，也接受 `listHeight`。                                                      |
-| Signature      | -    | 受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）；可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。                                                                                                                              |
-| Textarea       | -    | React `onChange` 是字符串值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。                                                                                                                                                                                             |
-| TimePicker     | -    | 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空单值 `null`；空范围也是 `null`。`locale` 只收官方对象。                                                                                                                                                        |
-| TreeSelect     | -    | 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），`listHeight` 是同职别名（两者都传时 `listHeight` 胜出）。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。 |
+## AutoComplete
 
-只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+Note: 打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。
 
-| Component       | Vue                                                                                                         | React                                                                                                       |
-| --------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| AutoComplete    | `<AutoComplete v-model="value" :options="options" />`                                                       | `<AutoComplete value={value} options={options} onChange={(next) => setValue(next)} />`                      |
-| Cascader        | `<Cascader v-model="value" :options="options" />`                                                           | `<Cascader value={value} options={options} onChange={(next) => setValue(next)} />`                          |
-| Checkbox        | `<Checkbox v-model="checked">Label</Checkbox>`                                                              | `<Checkbox checked={checked} onChange={setChecked}>Label</Checkbox>`                                        |
-| CheckboxGroup   | `<CheckboxGroup v-model="values"><Checkbox value="a">A</Checkbox></CheckboxGroup>`                          | `<CheckboxGroup value={values} onChange={setValues}><Checkbox value="a">A</Checkbox></CheckboxGroup>`       |
-| ColorPicker     | `<ColorPicker v-model="value" />`                                                                           | `<ColorPicker value={value} onChange={setValue} />`                                                         |
-| ColorSwatch     | `<ColorSwatch v-model="value" :colors="colors" />`                                                          | `<ColorSwatch value={value} colors={colors} onChange={setValue} />`                                         |
-| CronEditor      | `<CronEditor v-model="value" />`                                                                            | `<CronEditor value={value} onChange={setValue} />`                                                          |
-| DatePicker      | `<DatePicker v-model="value" />`                                                                            | `<DatePicker value={date} onChange={setDate} />`                                                            |
-| Form            | `<Form :model="form"><FormItem name="name" label="Name"><Input /></FormItem></Form>`                        | `<Form model={form} onChange={setForm}><FormItem name="name" label="Name"><Input /></FormItem></Form>`      |
-| FormItem        | `<FormItem name="name" label="Name"><Input /></FormItem>`                                                   | `<FormItem name="name" label="Name"><Input /></FormItem>`                                                   |
-| Input           | `<Input v-model="value" />`                                                                                 | `<Input value={value} onChange={(event) => setValue(event.target.value)} />`                                |
-| InputGroup      | `<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>` | `<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>` |
-| InputGroupAddon | `<InputGroupAddon>https://</InputGroupAddon>`                                                               | `<InputGroupAddon>https://</InputGroupAddon>`                                                               |
-| InputNumber     | `<InputNumber v-model="value" />`                                                                           | `<InputNumber value={value} onChange={setValue} />`                                                         |
-| InputOTP        | `<InputOTP v-model="value" />`                                                                              | `<InputOTP value={value} onChange={setValue} />`                                                            |
-| MaskInput       | `<MaskInput v-model="value" mask="##/##/####" />`                                                           | `<MaskInput value={value} mask="##/##/####" onChange={(raw) => setValue(raw)} />`                           |
-| Mentions        | `<Mentions v-model="value" :options="options" />`                                                           | `<Mentions value={value} options={options} onChange={setValue} />`                                          |
-| NumberKeyboard  | `<NumberKeyboard v-model="value" />`                                                                        | `<NumberKeyboard value={value} onChange={setValue} />`                                                      |
-| Radio           | `<Radio v-model="checked" value="a">A</Radio>`                                                              | `<Radio checked={checked} onChange={setChecked} value="a">A</Radio>`                                        |
-| RadioGroup      | `<RadioGroup v-model="value"><Radio value="a">A</Radio></RadioGroup>`                                       | `<RadioGroup value={value} onChange={setValue}><Radio value="a">A</Radio></RadioGroup>`                     |
-| Select          | `<Select v-model="value" :options="options" />`                                                             | `<Select value={value} options={options} onChange={(next) => setValue(next)} />`                            |
-| Signature       | `<Signature v-model="value" />`                                                                             | `<Signature value={value} onChange={setValue} />`                                                           |
-| Slider          | `<Slider v-model="value" />`                                                                                | `<Slider value={value} onChange={setValue} />`                                                              |
-| Stepper         | `<Stepper v-model="value" />`                                                                               | `<Stepper value={value} onChange={setValue} />`                                                             |
-| Switch          | `<Switch v-model="checked">Label</Switch>`                                                                  | `<Switch checked={checked} onChange={setChecked}>Label</Switch>`                                            |
-| TagsInput       | `<TagsInput v-model="tags" />`                                                                              | `<TagsInput value={tags} onChange={setTags} />`                                                             |
-| Textarea        | `<Textarea v-model="value" :rows="4" />`                                                                    | `<Textarea value={value} onChange={(event) => setValue(event.target.value)} />`                             |
-| TimePicker      | `<TimePicker v-model="value" />`                                                                            | `<TimePicker value={value} onChange={setValue} />`                                                          |
-| Transfer        | `<Transfer v-model="targetKeys" :data-source="dataSource" />`                                               | `<Transfer value={targetKeys} dataSource={dataSource} onChange={setTargetKeys} />`                          |
-| TreeSelect      | `<TreeSelect v-model="value" :tree-data="treeData" />`                                                      | `<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />`                      |
-| Upload          | `<Upload v-model:file-list="fileList" />`                                                                   | `<Upload fileList={fileList} onChange={(file, next) => setFileList(next)} />`                               |
+Vue: `<AutoComplete v-model="value" :options="options" />`
+
+React: `<AutoComplete value={value} options={options} onChange={(next) => setValue(next)} />`
+
+## Cascader
+
+Note: value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。
+
+Vue: `<Cascader v-model="value" :options="options" />`
+
+React: `<Cascader value={value} options={options} onChange={(next) => setValue(next)} />`
+
+## Checkbox
+
+Vue: `<Checkbox v-model="checked">Label</Checkbox>`
+
+React: `<Checkbox checked={checked} onChange={setChecked}>Label</Checkbox>`
+
+## CheckboxGroup
+
+Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。
+
+Vue: `<CheckboxGroup v-model="values"><Checkbox value="a">A</Checkbox></CheckboxGroup>`
+
+React: `<CheckboxGroup value={values} onChange={setValues}><Checkbox value="a">A</Checkbox></CheckboxGroup>`
+
+## ColorPicker
+
+Vue: `<ColorPicker v-model="value" />`
+
+React: `<ColorPicker value={value} onChange={setValue} />`
+
+## ColorSwatch
+
+Vue: `<ColorSwatch v-model="value" :colors="colors" />`
+
+React: `<ColorSwatch value={value} colors={colors} onChange={setValue} />`
+
+## CronEditor
+
+Vue: `<CronEditor v-model="value" />`
+
+React: `<CronEditor value={value} onChange={setValue} />`
+
+## DatePicker
+
+Note: 空范围是 `null`。进行中的范围才是元组。不要用 `[null, null]` 表示空范围。日期是本地日历日。
+
+Vue: `<DatePicker v-model="value" />`
+
+React: `<DatePicker value={date} onChange={setDate} />`
+
+## Form
+
+Note: 值对象是 Vue `modelValue`（`v-model`）/ React `value`。Wizard 步下标走 `onStepChange`，不是表单 values。Form `size` 是 `sm|md|lg`。
+
+Vue: `<Form v-model="form"><FormItem name="name" label="Name"><Input /></FormItem></Form>`
+
+React: `<Form value={form} onChange={setForm}><FormItem name="name" label="Name"><Input /></FormItem></Form>`
+
+## FormItem
+
+Note: 具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` 时从 model 取值（boolean/list/tuple 不会把 `''` 当成字符串）。字段请用 RadioGroup，不要把单颗 Radio 当 field。
+
+Vue: `<FormItem name="name" label="Name"><Input /></FormItem>`
+
+React: `<FormItem name="name" label="Name"><Input /></FormItem>`
+
+## Input
+
+Note: React `onChange` 是字符串/数字值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。
+
+Vue: `<Input v-model="value" />`
+
+React: `<Input value={value} onChange={(next) => setValue(next)} />`
+
+## InputGroup
+
+Note: 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。
+
+Vue: `<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>`
+
+React: `<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>`
+
+## InputGroupAddon
+
+Vue: `<InputGroupAddon>https://</InputGroupAddon>`
+
+React: `<InputGroupAddon>https://</InputGroupAddon>`
+
+## InputNumber
+
+Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。
+
+Vue: `<InputNumber v-model="value" />`
+
+React: `<InputNumber value={value} onChange={setValue} />`
+
+## InputOTP
+
+Vue: `<InputOTP v-model="value" />`
+
+React: `<InputOTP value={value} onChange={setValue} />`
+
+## MaskInput
+
+Vue: `<MaskInput v-model="value" mask="##/##/####" />`
+
+React: `<MaskInput value={value} mask="##/##/####" onChange={(raw) => setValue(raw)} />`
+
+## Mentions
+
+Note: 插入的是 `prefix + option.value + 空格`。字段 props 与 Textarea 对齐：`autoResize` / `maxLength` / `showCount` / `readonly`（`readOnly` 别名）/ `clearable`（默认 false）。不要把 `prefix` 当成 Input 的前缀槽。
+
+Vue: `<Mentions v-model="value" :options="options" />`
+
+React: `<Mentions value={value} options={options} onChange={setValue} />`
+
+## NumberKeyboard
+
+Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。
+
+Vue: `<NumberKeyboard v-model="value" />`
+
+React: `<NumberKeyboard value={value} onChange={setValue} />`
+
+## Radio
+
+Vue: `<Radio v-model="checked" value="a">A</Radio>`
+
+React: `<Radio checked={checked} onChange={setChecked} value="a">A</Radio>`
+
+## RadioGroup
+
+Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。字段请用 RadioGroup，不要把单颗 Radio 当 FormItem。
+
+Vue: `<RadioGroup v-model="value"><Radio value="a">A</Radio></RadioGroup>`
+
+React: `<RadioGroup value={value} onChange={setValue}><Radio value="a">A</Radio></RadioGroup>`
+
+## Select
+
+Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职是 `height`，也接受 `listHeight`。
+
+Vue: `<Select v-model="value" :options="options" />`
+
+React: `<Select value={value} options={options} onChange={(next) => setValue(next)} />`
+
+## Signature
+
+Note: 受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）；可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。
+
+Vue: `<Signature v-model="value" />`
+
+React: `<Signature value={value} onChange={setValue} />`
+
+## Slider
+
+Vue: `<Slider v-model="value" />`
+
+React: `<Slider value={value} onChange={setValue} />`
+
+## Stepper
+
+Vue: `<Stepper v-model="value" />`
+
+React: `<Stepper value={value} onChange={setValue} />`
+
+## Switch
+
+Vue: `<Switch v-model="checked">Label</Switch>`
+
+React: `<Switch checked={checked} onChange={setChecked}>Label</Switch>`
+
+## TagsInput
+
+Vue: `<TagsInput v-model="tags" />`
+
+React: `<TagsInput value={tags} onChange={setTags} />`
+
+## Textarea
+
+Note: React `onChange` 是字符串值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。
+
+Vue: `<Textarea v-model="value" :rows="4" />`
+
+React: `<Textarea value={value} onChange={(next) => setValue(next)} />`
+
+## TimePicker
+
+Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空单值 `null`；空范围也是 `null`。DatePicker 空范围同样是 `null`，进行中才是元组。`locale` 只收官方对象。
+
+Vue: `<TimePicker v-model="value" />`
+
+React: `<TimePicker value={value} onChange={setValue} />`
+
+## Transfer
+
+Vue: `<Transfer v-model="targetKeys" :data-source="dataSource" />`
+
+React: `<Transfer value={targetKeys} dataSource={dataSource} onChange={setTargetKeys} />`
+
+## TreeSelect
+
+Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），`listHeight` 是同职别名（两者都传时 `listHeight` 胜出）。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。
+
+Vue: `<TreeSelect v-model="value" :tree-data="treeData" />`
+
+React: `<TreeSelect value={value} treeData={treeData} onChange={(next) => setValue(next)} />`
+
+## Upload
+
+Vue: `<Upload v-model:file-list="fileList" />`
+
+React: `<Upload fileList={fileList} onChange={(file, next) => setFileList(next)} />`
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

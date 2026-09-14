@@ -9,69 +9,238 @@ description: Compact Tigercat Basic Vue and React usage routes
 
 Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或透传 attrs。
 
-## Component Notes
+每个组件一节，供 MCP `tigercat_component` 按 `## {Component}` 抽取。绑定差异见 `shared/patterns/common.md`。
 
-| Component    | Uses                                                 | Notes                                                                                                                                                                                                                                                                                                        |
-| ------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Avatar       | -                                                    | `text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` 且有 `text` 时 `generateAvatarColor` 同名同色。`#`/`rgb()`/`var()` 走 style。组未传的 size/shape 跟组。                                                                                                                                             |
-| AvatarGroup  | -                                                    | `max` 是可见 Avatar 数，overflow 额外；`max={0}` 只出 +N。只计 Avatar 子节点。未传 `aria-label` 时组名来自 locale，可覆盖。                                                                                                                                                                                  |
-| Badge        | -                                                    | 无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。`right`/`left` 跟阅读方向。                                                                                                                                          |
-| Button       | -                                                    | `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。                                                                                                 |
-| ButtonGroup  | -                                                    | 直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。                                                                                                                                                                       |
-| Code         | -                                                    | `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。                                                                                                                                                                                                                             |
-| CropUpload   | -                                                    | FormItem 写入的是裁切后的 `File`，不是媒体 id。需要上传后的 id 时由宿主替换（Users 页模式）。                                                                                                                                                                                                                |
-| Divider      | -                                                    | 竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradient 也生效。子节点是居中标签。                                                                                                                                                                                                                |
-| Empty        | -                                                    | `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。自定义 `image` / 插槽不被 `showImage={false}` 丢掉。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。                                                                                                         |
-| Highlight    | -                                                    | 需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。                                                                                                                                                                  |
-| Icon         | -                                                    | 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。          |
-| Image        | -                                                    | 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。                                                                                            |
-| ImageCompare | -                                                    | 受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare`。不传宽高且 after 无内容时高度为 0。                                                                                                                                                                                                    |
-| ImageCropper | -                                                    | `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。                                                                                                                                                                                                                                   |
-| ImageGroup   | -                                                    | 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。                                                                                                                                                                                                                   |
-| ImagePreview | -                                                    | `images` 必填（`string \| { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。                                                                                                                                                   |
-| Kbd          | -                                                    | 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可读名。`variant` 的 default 是 Kbd 自己的底/边/字色，不是可点 Tag。                                                                                                                                                                               |
-| Link         | -                                                    | `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。                                                                                                                                                                    |
-| Marquee      | -                                                    | `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。 |
-| QRCode       | -                                                    | `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Refresh 仅在绑定 `onRefresh` / `@refresh` 时是 button。默认色走 `--tiger-text` / `--tiger-surface`。                                                                                                                                                 |
-| Rate         | -                                                    | `readOnly` 可聚焦不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。                                                                                                                                                                              |
-| Result       | -                                                    | 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTTP 状态画数字，不自动补 “Not Found”。无 title 时只有装饰图标或 HTTP 数字。需要播报时自己写 `role` / `aria-live`。                                                                                                                                |
-| Segmented    | -                                                    | 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labelledby`。空 `options` 不是完整控件。`icon` 渲染为装饰 SVG。指示条走逻辑边。                                                                                                                                                                  |
-| SplitButton  | `Button`, `Dropdown`, `DropdownMenu`, `DropdownItem` | 主按钮吃 `htmlType` / `type`（htmlType 胜出），chevron 固定 `type="button"`。不要把 SplitButton 塞进 ButtonGroup。                                                                                                                                                                                           |
-| Statistic    | -                                                    | `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat` + ConfigProvider locale。`animated` 在 mount 之后播；`prefers-reduced-motion` 直接终值。SSR 始终终值。                                                                                                                                       |
-| Tag          | -                                                    | 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。                                                                                                                                                                                    |
-| Text         | -                                                    | `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。                                                                                                                                       |
-| Watermark    | -                                                    | `gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。打印带 print-color-adjust。直子 overlay 被卸或覆盖样式被剥才重挂，自身绘制不重挂。                                                                                                                          |
+## Avatar
 
-只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+Note: `text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` 且有 `text` 时 `generateAvatarColor` 同名同色。`#`/`rgb()`/`var()` 走 style。组未传的 size/shape 跟组。
 
-| Component    | Vue                                                                                                  | React                                                                                                |
-| ------------ | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Avatar       | `<Avatar text="Jane" />`                                                                             | `<Avatar text="Jane" />`                                                                             |
-| AvatarGroup  | `<AvatarGroup :max="3"><Avatar text="A" /><Avatar text="B" /><Avatar text="C" /></AvatarGroup>`      | `<AvatarGroup max={3}><Avatar text="A" /><Avatar text="B" /><Avatar text="C" /></AvatarGroup>`       |
-| Badge        | `<Badge :content="5" />`                                                                             | `<Badge content={5} />`                                                                              |
-| Button       | `<Button html-type="submit">Save</Button>`                                                           | `<Button htmlType="submit">Save</Button>`                                                            |
-| ButtonGroup  | `<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>` | `<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>` |
-| Code         | `<Code code="const n = 1" />`                                                                        | `<Code code="const n = 1" />`                                                                        |
-| CropUpload   | `<CropUpload @crop-complete="onCropComplete" />`                                                     | `<CropUpload onCropComplete={onCropComplete} />`                                                     |
-| Highlight    | `<Highlight keywords="Vue">Learn Vue</Highlight>`                                                    | `<Highlight keywords="Vue">Learn Vue</Highlight>`                                                    |
-| Icon         | `<Icon name="search" />`                                                                             | `<Icon name="search" />`                                                                             |
-| Image        | `<Image src="..." alt="..." />`                                                                      | `<Image src="..." alt="..." />`                                                                      |
-| ImageCompare | `<ImageCompare :before-src="beforeSrc" :after-src="afterSrc" :width="480" :height="280" />`          | `<ImageCompare beforeSrc={beforeSrc} afterSrc={afterSrc} width={480} height={280} />`                |
-| ImageCropper | `<ImageCropper :src="src" />`                                                                        | `<ImageCropper src={src} />`                                                                         |
-| ImagePreview | `<ImagePreview :images="images" />`                                                                  | `<ImagePreview images={images} />`                                                                   |
-| Kbd          | `<Kbd :keys="['Ctrl', 'K']" />`                                                                      | `<Kbd keys={['Ctrl', 'K']} />`                                                                       |
-| Link         | `<Link href="/docs" target="_blank" rel="nofollow">Docs</Link>`                                      | `<Link href="/docs" target="_blank" rel="nofollow">Docs</Link>`                                      |
-| Marquee      | `<Marquee aria-label="News"><span>Item</span></Marquee>`                                             | `<Marquee aria-label="News"><span>Item</span></Marquee>`                                             |
-| QRCode       | `<QRCode value="..." />`                                                                             | `<QRCode value="..." />`                                                                             |
-| Rate         | `<Rate :default-value="3" />`                                                                        | `<Rate defaultValue={3} />`                                                                          |
-| Result       | `<Result status="success" title="提交成功" />`                                                       | `<Result status="success" title="提交成功" />`                                                       |
-| Segmented    | `<Segmented :options="options" aria-label="View" />`                                                 | `<Segmented options={options} aria-label="View" />`                                                  |
-| SplitButton  | `<SplitButton @click="onSave">Save<DropdownItem>Save as</DropdownItem></SplitButton>`                | `<SplitButton onClick={onSave}>Save<DropdownItem>Save as</DropdownItem></SplitButton>`               |
-| Statistic    | `<Statistic title="Users" :value="1234" />`                                                          | `<Statistic title="Users" value={1234} />`                                                           |
-| Tag          | `<Tag closable>标签</Tag>`                                                                           | `<Tag closable>标签</Tag>`                                                                           |
-| Text         | `<Text tag="h1" align="start">Title</Text>`                                                          | `<Text tag="h1" align="start">Title</Text>`                                                          |
-| Watermark    | `<Watermark content="机密" />`                                                                       | `<Watermark content="机密" />`                                                                       |
+Vue: `<Avatar text="Jane" />`
 
-标准用法 `<Component />`（Vue/React 同名，绑定差异见 `shared/patterns/common.md`）：ConfigProvider, Divider, Empty, ImageGroup.
+React: `<Avatar text="Jane" />`
+
+## AvatarGroup
+
+Note: `max` 是可见 Avatar 数，overflow 额外；`max={0}` 只出 +N。只计 Avatar 子节点。未传 `aria-label` 时组名来自 locale，可覆盖。
+
+Vue: `<AvatarGroup :max="3"><Avatar text="A" /><Avatar text="B" /><Avatar text="C" /></AvatarGroup>`
+
+React: `<AvatarGroup max={3}><Avatar text="A" /><Avatar text="B" /><Avatar text="C" /></AvatarGroup>`
+
+## Badge
+
+Note: 无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。`right`/`left` 跟阅读方向。
+
+Vue: `<Badge :content="5" />`
+
+React: `<Badge content={5} />`
+
+## Button
+
+Note: `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。
+
+Vue: `<Button html-type="submit">Save</Button>`
+
+React: `<Button htmlType="submit">Save</Button>`
+
+## ButtonGroup
+
+Note: 直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。
+
+Vue: `<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>`
+
+React: `<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>`
+
+## Code
+
+Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。
+
+Vue: `<Code code="const n = 1" />`
+
+React: `<Code code="const n = 1" />`
+
+## ConfigProvider
+
+Vue: `<ConfigProvider />`
+
+React: `<ConfigProvider />`
+
+## CropUpload
+
+Note: FormItem 写入的是裁切后的 `File`，不是媒体 id。需要上传后的 id 时由宿主替换（Users 页模式）。
+
+Vue: `<CropUpload @crop-complete="onCropComplete" />`
+
+React: `<CropUpload onCropComplete={onCropComplete} />`
+
+## Divider
+
+Note: 竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradient 也生效。子节点是居中标签。
+
+Vue: `<Divider />`
+
+React: `<Divider />`
+
+## Empty
+
+Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。自定义 `image` / 插槽不被 `showImage={false}` 丢掉。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。
+
+Vue: `<Empty />`
+
+React: `<Empty />`
+
+## Highlight
+
+Note: 需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。
+
+Vue: `<Highlight keywords="Vue">Learn Vue</Highlight>`
+
+React: `<Highlight keywords="Vue">Learn Vue</Highlight>`
+
+## Icon
+
+Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。
+
+Vue: `<Icon name="search" />`
+
+React: `<Icon name="search" />`
+
+## Image
+
+Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。
+
+Vue: `<Image src="..." alt="..." />`
+
+React: `<Image src="..." alt="..." />`
+
+## ImageCompare
+
+Note: 受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare`。不传宽高且 after 无内容时高度为 0。
+
+Vue: `<ImageCompare :before-src="beforeSrc" :after-src="afterSrc" :width="480" :height="280" />`
+
+React: `<ImageCompare beforeSrc={beforeSrc} afterSrc={afterSrc} width={480} height={280} />`
+
+## ImageCropper
+
+Note: `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。
+
+Vue: `<ImageCropper :src="src" />`
+
+React: `<ImageCropper src={src} />`
+
+## ImageGroup
+
+Note: 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。
+
+Vue: `<ImageGroup />`
+
+React: `<ImageGroup />`
+
+## ImagePreview
+
+Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。
+
+Vue: `<ImagePreview :images="images" />`
+
+React: `<ImagePreview images={images} />`
+
+## Kbd
+
+Note: 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可读名。`variant` 的 default 是 Kbd 自己的底/边/字色，不是可点 Tag。
+
+Vue: `<Kbd :keys="['Ctrl', 'K']" />`
+
+React: `<Kbd keys={['Ctrl', 'K']} />`
+
+## Link
+
+Note: `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。
+
+Vue: `<Link href="/docs" target="_blank" rel="nofollow">Docs</Link>`
+
+React: `<Link href="/docs" target="_blank" rel="nofollow">Docs</Link>`
+
+## Marquee
+
+Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。
+
+Vue: `<Marquee aria-label="News"><span>Item</span></Marquee>`
+
+React: `<Marquee aria-label="News"><span>Item</span></Marquee>`
+
+## QRCode
+
+Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Refresh 仅在绑定 `onRefresh` / `@refresh` 时是 button。默认色走 `--tiger-text` / `--tiger-surface`。
+
+Vue: `<QRCode value="..." />`
+
+React: `<QRCode value="..." />`
+
+## Rate
+
+Note: `readOnly` 与 `readonly` 是同一标志（冲突用 `readonly`）。可聚焦、不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。`size` 是 `sm|md|lg`（`RateSize` = `ComponentSize`）。
+
+Vue: `<Rate :default-value="3" />`
+
+React: `<Rate defaultValue={3} />`
+
+## Result
+
+Note: 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTTP 状态画数字，不自动补 “Not Found”。无 title 时只有装饰图标或 HTTP 数字。需要播报时自己写 `role` / `aria-live`。
+
+Vue: `<Result status="success" title="提交成功" />`
+
+React: `<Result status="success" title="提交成功" />`
+
+## Segmented
+
+Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labelledby`。空 `options` 不是完整控件。`icon` 渲染为装饰 SVG。指示条走逻辑边。
+
+Vue: `<Segmented :options="options" aria-label="View" />`
+
+React: `<Segmented options={options} aria-label="View" />`
+
+## SplitButton
+
+Uses: `Button`, `Dropdown`, `DropdownMenu`, `DropdownItem`.
+
+Note: 主按钮吃 `htmlType` / `type`（htmlType 胜出），chevron 固定 `type="button"`。不要把 SplitButton 塞进 ButtonGroup。
+
+Vue: `<SplitButton @click="onSave">Save<DropdownItem>Save as</DropdownItem></SplitButton>`
+
+React: `<SplitButton onClick={onSave}>Save<DropdownItem>Save as</DropdownItem></SplitButton>`
+
+## Statistic
+
+Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat` + ConfigProvider locale。`animated` 在 mount 之后播；`prefers-reduced-motion` 直接终值。SSR 始终终值。
+
+Vue: `<Statistic title="Users" :value="1234" />`
+
+React: `<Statistic title="Users" value={1234} />`
+
+## Tag
+
+Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。
+
+Vue: `<Tag closable>标签</Tag>`
+
+React: `<Tag closable>标签</Tag>`
+
+## Text
+
+Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。
+
+Vue: `<Text tag="h1" align="start">Title</Text>`
+
+React: `<Text tag="h1" align="start">Title</Text>`
+
+## Watermark
+
+Note: `gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。打印带 print-color-adjust。直子 overlay 被卸或覆盖样式被剥才重挂，自身绘制不重挂。
+
+Vue: `<Watermark content="机密" />`
+
+React: `<Watermark content="机密" />`
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.

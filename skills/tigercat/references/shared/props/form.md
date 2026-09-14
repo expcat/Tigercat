@@ -104,7 +104,7 @@ Events/callback props: `onChange?`, `onValidate?`.
 
 `packages/core/src/types/datepicker.ts` · `DatePickerProps` · 4/29 props
 
-Note: 空范围是 `null`。进行中的范围才是元组。日期是本地日历日。
+Note: 空范围是 `null`。进行中的范围才是元组。不要用 `[null, null]` 表示空范围。日期是本地日历日。
 
 | Prop            | Type                           | Default        | Notes |
 | --------------- | ------------------------------ | -------------- | ----- |
@@ -350,7 +350,7 @@ Note: React `onChange` 是字符串值，不是 DOM 事件。Vue 是 `update:mod
 
 `packages/core/src/types/timepicker.ts` · `TimePickerProps` · 4/31 props
 
-Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空单值 `null`；空范围也是 `null`。`locale` 只收官方对象。
+Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空单值 `null`；空范围也是 `null`。DatePicker 空范围同样是 `null`，进行中才是元组。`locale` 只收官方对象。
 
 | Prop            | Type                           | Default | Notes                                                    |
 | --------------- | ------------------------------ | ------- | -------------------------------------------------------- |

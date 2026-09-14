@@ -1120,8 +1120,8 @@ export const REQUIRED_USAGE_SNIPPETS = {
     LoadingBarContainer: '<LoadingBarContainer percentage={40} />',
     Splitter: '<Splitter sizes={sizes}><div>A</div><div>B</div></Splitter>',
     Resizable: '<Resizable defaultWidth={300} defaultHeight={150}>{children}</Resizable>',
-    Input: '<Input value={value} onChange={(event) => setValue(event.target.value)} />',
-    Textarea: '<Textarea value={value} onChange={(event) => setValue(event.target.value)} />',
+    Input: '<Input value={value} onChange={(next) => setValue(next)} />',
+    Textarea: '<Textarea value={value} onChange={(next) => setValue(next)} />',
     InputNumber: '<InputNumber value={value} onChange={setValue} />',
     InputGroup:
       '<InputGroup compact aria-label="Search"><InputGroupAddon>https://</InputGroupAddon><Input /></InputGroup>',

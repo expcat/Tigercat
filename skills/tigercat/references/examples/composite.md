@@ -9,41 +9,135 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 组合组件面向业务场景，优先按现有 props 接口配置，而不是拆开重写内部结构。
 
-## Component Notes
+每个组件一节，供 MCP `tigercat_component` 按 `## {Component}` 抽取。绑定差异见 `shared/patterns/common.md`。
 
-| Component            | Uses                                                                            | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| -------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ActivityFeed         | `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`                  | `groups` 一旦传入（含 `[]`）不再回落 `items`。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ChatWindow           | `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`                    | `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| CommentThread        | `Avatar`, `Tag`, `Button`, `Textarea`, `Text`                                   | `nodes` 一旦传入（含 `[]`）不再回落 `items`。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。                                                                                                                                                                                                                                                                                                                                                                                                              |
-| DataTableWithToolbar | `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`                     | 搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。                                                                                                                                |
-| FormWizard           | `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`                           | 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small\|default`，不是 Form 的 `sm\|md\|lg`。                                                                                                                                                                                                                                                          |
-| NotificationCenter   | `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`                     | 只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| SchemaForm           | `Form`, `FormItem`, `Input`, `Select`, `Button`                                 | 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。 |
-| TaskBoard            | `ConfigProvider`, `task-board drag utilities`                                   | 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。                                                                                                                                                                                                                                                                                                                                                                                                         |
-| WorkflowActionBar    | `Button`, `Popconfirm`, `Textarea`, `Dropdown`, `Radio`                         | 完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。`items={[]}` / 空数组回落到 `buttonPolicy`；要覆盖策略请传非空 `items`。                                                                                                                                                |
-| WorkflowDesigner     | -                                                                               | 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。                                                                                                                                                               |
-| WorkflowDetailShell  | `SchemaForm`, `Tabs`, `WorkflowTimeline`, `WorkflowViewer`, `WorkflowActionBar` | 可选详情布局配方，不是第二套 Timeline / 表单设计器。槽：header / form / tabs（Timeline\|Viewer）/ action（sticky ActionBar）。表单请先 `applyWorkflowFieldPermissions(schema, node.fieldPermissions, mode)`。给壳限定高度时 action 钉在底部、form/tabs 滚动。Admin 在后续切片接真页。                                                                                                                                                                                                                                                                                                                                     |
-| WorkflowTimeline     | `Timeline`, `Button`, `Tag`, `WorkflowActionBar`                                | 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。会签人用 `actors` 列在项内，不要把人做成 children。`actions` / `buttonPolicy` 是展示用操作条（同意/拒绝/转交/加签/退回/撤回/评论/退回修改），无 BPM 引擎。默认在当前步骤为 `active` 且有动作时显示操作条。退回 picker 与加签选人槽可转发到 ActionBar。                                                                                                                                                                                                                                                               |
-| WorkflowViewer       | `Tag`                                                                           | 只读钉钉风审批树，复用 `WorkflowTimelineStep`。children 是并行/抄送/条件分支 stub；会签人用 `actors` 或 `tasks` 列行，不要做成横向子卡。当前节点色点/「进行中」+ 路径图例；加签临时节点、退回目标、未走支可视化。无第二套时间线，无 BPM 引擎。                                                                                                                                                                                                                                                                                                                                                                            |
+## ActivityFeed
 
-只列出绑定/配置非平凡的组件；其余为标准 `<Component />`。
+Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 
-| Component            | Vue                                                                                                                                                            | React                                                                                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ActivityFeed         | `<ActivityFeed :items="items" />`                                                                                                                              | `<ActivityFeed items={items} />`                                                                                                                       |
-| ChatWindow           | `<ChatWindow :messages="messages" @send="onSend" />`                                                                                                           | `<ChatWindow messages={messages} onSend={onSend} />`                                                                                                   |
-| CommentThread        | `<CommentThread :nodes="nodes" @reply="onReply" />`                                                                                                            | `<CommentThread nodes={nodes} onReply={onReply} />`                                                                                                    |
-| DataTableWithToolbar | `<DataTableWithToolbar :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :toolbar="toolbar" />` | `<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} toolbar={toolbar} />` |
-| FormWizard           | `<FormWizard :steps="steps" :before-next="beforeNext" @finish="onFinish" />`                                                                                   | `<FormWizard steps={steps} beforeNext={beforeNext} onFinish={onFinish} />`                                                                             |
-| NotificationCenter   | `<NotificationCenter :items="items" />`                                                                                                                        | `<NotificationCenter items={items} />`                                                                                                                 |
-| SchemaForm           | `<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />`                                                                                            | `<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />`                                                                                     |
-| TaskBoard            | `<TaskBoard :columns="columns" />`                                                                                                                             | `<TaskBoard columns={columns} />`                                                                                                                      |
-| WorkflowActionBar    | `<WorkflowActionBar :items="actions" />`                                                                                                                       | `<WorkflowActionBar items={actions} />`                                                                                                                |
-| WorkflowDesigner     | `<WorkflowDesigner v-model="steps" />`                                                                                                                         | `<WorkflowDesigner value={steps} onChange={setSteps} />`                                                                                               |
-| WorkflowDetailShell  | `<WorkflowDetailShell><template #form /><template #tabs /><template #action /></WorkflowDetailShell>`                                                          | `<WorkflowDetailShell form={form} tabs={tabs} action={actions} />`                                                                                     |
-| WorkflowTimeline     | `<WorkflowTimeline :steps="steps" :actions="actions" />`                                                                                                       | `<WorkflowTimeline steps={steps} actions={actions} />`                                                                                                 |
-| WorkflowViewer       | `<WorkflowViewer :steps="steps" />`                                                                                                                            | `<WorkflowViewer steps={steps} />`                                                                                                                     |
+Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。
+
+Vue: `<ActivityFeed :items="items" />`
+
+React: `<ActivityFeed items={items} />`
+
+## ChatWindow
+
+Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
+
+Note: `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用。贴底才跟最新；`virtual` 时 VirtualList 是唯一 scroller，行高动态量。时间 `0` 合法。Vue `v-model` 只走 `update:modelValue`。
+
+Vue: `<ChatWindow :messages="messages" @send="onSend" />`
+
+React: `<ChatWindow messages={messages} onSend={onSend} />`
+
+## CommentThread
+
+Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
+
+Note: `nodes` 一旦传入（含 `[]`）不再回落 `items`。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。
+
+Vue: `<CommentThread :nodes="nodes" @reply="onReply" />`
+
+React: `<CommentThread nodes={nodes} onReply={onReply} />`
+
+## DataTableWithToolbar
+
+Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
+
+Note: 搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。
+
+Vue: `<DataTableWithToolbar :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :toolbar="toolbar" />`
+
+React: `<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} toolbar={toolbar} />`
+
+## FormWizard
+
+Uses: `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`.
+
+Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。
+
+Vue: `<FormWizard :steps="steps" :before-next="beforeNext" @finish="onFinish" />`
+
+React: `<FormWizard steps={steps} beforeNext={beforeNext} onFinish={onFinish} />`
+
+## NotificationCenter
+
+Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
+
+Note: 只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。
+
+Vue: `<NotificationCenter :items="items" />`
+
+React: `<NotificationCenter items={items} />`
+
+## SchemaForm
+
+Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
+
+Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。
+
+Vue: `<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />`
+
+React: `<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />`
+
+## TaskBoard
+
+Uses: `ConfigProvider`, `task-board drag utilities`.
+
+Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。
+
+Vue: `<TaskBoard :columns="columns" />`
+
+React: `<TaskBoard columns={columns} />`
+
+## WorkflowActionBar
+
+Uses: `Button`, `Popconfirm`, `Textarea`, `Dropdown`, `Radio`.
+
+Note: 完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。`items={[]}` / 空数组回落到 `buttonPolicy`；要覆盖策略请传非空 `items`。
+
+Vue: `<WorkflowActionBar :items="actions" />`
+
+React: `<WorkflowActionBar items={actions} />`
+
+## WorkflowDesigner
+
+Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。
+
+Vue: `<WorkflowDesigner v-model="steps" />`
+
+React: `<WorkflowDesigner value={steps} onChange={setSteps} />`
+
+## WorkflowDetailShell
+
+Uses: `SchemaForm`, `Tabs`, `WorkflowTimeline`, `WorkflowViewer`, `WorkflowActionBar`.
+
+Note: 可选详情布局配方，不是第二套 Timeline / 表单设计器。槽：header / form / tabs（Timeline|Viewer）/ action（sticky ActionBar）。表单请先 `applyWorkflowFieldPermissions(schema, node.fieldPermissions, mode)`。给壳限定高度时 action 钉在底部、form/tabs 滚动。Admin 在后续切片接真页。
+
+Vue: `<WorkflowDetailShell><template #form /><template #tabs /><template #action /></WorkflowDetailShell>`
+
+React: `<WorkflowDetailShell form={form} tabs={tabs} action={actions} />`
+
+## WorkflowTimeline
+
+Uses: `Timeline`, `Button`, `Tag`, `WorkflowActionBar`.
+
+Note: 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到现有 Timeline，不另起一套时间线。会签人用 `actors` 列在项内，不要把人做成 children。`actions` / `buttonPolicy` 是展示用操作条（同意/拒绝/转交/加签/退回/撤回/评论/退回修改），无 BPM 引擎。默认在当前步骤为 `active` 且有动作时显示操作条。退回 picker 与加签选人槽可转发到 ActionBar。
+
+Vue: `<WorkflowTimeline :steps="steps" :actions="actions" />`
+
+React: `<WorkflowTimeline steps={steps} actions={actions} />`
+
+## WorkflowViewer
+
+Uses: `Tag`.
+
+Note: 只读钉钉风审批树，复用 `WorkflowTimelineStep`。children 是并行/抄送/条件分支 stub；会签人用 `actors` 或 `tasks` 列行，不要做成横向子卡。当前节点色点/「进行中」+ 路径图例；加签临时节点、退回目标、未走支可视化。无第二套时间线，无 BPM 引擎。
+
+Vue: `<WorkflowViewer :steps="steps" />`
+
+React: `<WorkflowViewer steps={steps} />`
 
 Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
 

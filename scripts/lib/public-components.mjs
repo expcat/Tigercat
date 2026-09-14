@@ -297,6 +297,11 @@ const DOC_SECTION_ALIASES = new Map([
 export const COMPONENT_ROUTE_ALIASES = {
   Grid: ['Row', 'Col'],
   栅格: ['Row', 'Col'],
+  Kanban: ['TaskBoard'],
+  看板: ['TaskBoard'],
+  DonutChart: ['PieChart'],
+  Donut: ['PieChart'],
+  ImageViewer: ['ImagePreview'],
   按钮: ['Button'],
   按钮组: ['ButtonGroup'],
   分裂按钮: ['SplitButton'],
@@ -341,6 +346,7 @@ export const COMPONENT_ROUTE_ALIASES = {
   滑块: ['Slider'],
   评分: ['Rate'],
   日期选择: ['DatePicker'],
+  日期选择器: ['DatePicker'],
   时间选择: ['TimePicker'],
   级联选择: ['Cascader'],
   树选择: ['TreeSelect'],
@@ -547,7 +553,6 @@ export const TIGERCAT_TOPIC_ROUTES = {
 export const DOC_COMPONENT_ALIASES = new Map([])
 
 const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
-
   ['AnchorLink', 'Anchor'],
   ['BreadcrumbItem', 'Breadcrumb'],
   ['DropdownItem', 'Dropdown'],
@@ -570,7 +575,7 @@ const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['TabPane', 'Tabs'],
   ['Message', 'MessageRoot'],
   ['LoadingBar', 'LoadingBarRoot'],
-  ['WorkflowActionBar', 'WorkflowTimeline'],
+  ['WorkflowActionBar', 'WorkflowTimeline']
 ])
 
 export const REQUIRED_CORE_PACKAGE_EXPORTS = [
