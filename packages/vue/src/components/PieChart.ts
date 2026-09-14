@@ -24,7 +24,6 @@ import {
   PIE_BASE_SHADOW,
   PIE_EMPHASIS_SHADOW,
   getChartElementOpacity,
-  DEFAULT_DONUT_INNER_RADIUS_RATIO,
   type ChartLegendItem,
   type ChartLegendPosition,
   type ChartPadding,

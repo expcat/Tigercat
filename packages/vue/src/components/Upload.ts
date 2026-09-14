@@ -183,9 +183,6 @@ export const Upload = defineComponent({
       )
     )
 
-    const isControlled = computed(
-      () => props.fileList !== undefined || Boolean(formItemControl?.name.value)
-    )
     const workingList = ref<UploadFile[]>([...(props.fileList ?? props.defaultFileList ?? [])])
     const fileListValue = computed<UploadFile[]>(() => {
       const seeded = resolveFormItemSeed(

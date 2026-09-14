@@ -52,7 +52,6 @@ import {
   type GestureTransform,
   type ImageLightboxItem,
   type ImagePreviewProps as CoreImagePreviewProps,
-  type ImageViewerProps as CoreImageViewerProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'

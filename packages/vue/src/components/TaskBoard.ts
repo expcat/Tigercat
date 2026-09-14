@@ -7,8 +7,7 @@ import {
   PropType,
   onMounted,
   onBeforeUnmount,
-  getCurrentInstance,
-  type Component
+  getCurrentInstance
 } from 'vue'
 import {
   classNames,
