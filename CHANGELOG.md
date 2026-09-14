@@ -4,6 +4,10 @@
 
 ## 未发布
 
+## v2.9.1
+
+v2.9.1：修复 `list-reorder` 使用已更名的 `DragConfig.direction`（应为 `axis`），解除 core `tsc`/发布构建失败。产品内容与 2.9.0 深检收口一致。无新必填 prop。
+
 ## v2.9.0
 
 v2.9.0：深检完美重审 breaking（含此前 additive 补齐）。不是 BPMN / Flowable / Camunda。Vue/React 对称。迁移见 [docs/MIGRATION.md](docs/MIGRATION.md#v290)。

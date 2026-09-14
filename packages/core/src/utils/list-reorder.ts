@@ -97,8 +97,9 @@ function emit(): void {
 
 function resolveLockAxis(config: DragConfig): 'x' | 'y' | undefined {
   if (config.lockAxis) return config.lockAxis
-  if (config.direction === 'horizontal') return 'x'
-  if (config.direction === 'vertical') return 'y'
+  // DragConfig uses `axis` (DragDirection); legacy `direction` was renamed.
+  if (config.axis === 'horizontal') return 'x'
+  if (config.axis === 'vertical') return 'y'
   return undefined
 }
 
