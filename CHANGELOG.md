@@ -4,6 +4,10 @@
 
 ## 未发布
 
+## v2.9.2
+
+v2.9.2：修复发布构建类型错误（React ChatWindow `Input` onChange、InfiniteScroll `orientation` 观察者选项、Popover `aria-label`、SchemaForm 与 HTMLAttributes 交叉）。产品内容与 2.9.0/2.9.1 深检收口一致。
+
 ## v2.9.1
 
 v2.9.1：修复 `list-reorder` 使用已更名的 `DragConfig.direction`（应为 `axis`），解除 core `tsc`/发布构建失败。产品内容与 2.9.0 深检收口一致。无新必填 prop。

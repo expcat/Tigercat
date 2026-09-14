@@ -158,11 +158,12 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
   useImperativeHandle(ref, () => ({ scrollToBottom }), [scrollToBottom])
 
   const handleValueChange = useCallback(
-    (nextValue: string) => {
-      if (lastSentRef.current != null && nextValue !== lastSentRef.current) {
+    (nextValue: string | number) => {
+      const next = String(nextValue)
+      if (lastSentRef.current != null && next !== lastSentRef.current) {
         lastSentRef.current = null
       }
-      setInputValue(nextValue)
+      setInputValue(next)
     },
     [setInputValue]
   )

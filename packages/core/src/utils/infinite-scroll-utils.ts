@@ -84,8 +84,10 @@ export function getInfiniteScrollChromeClasses(
 export interface InfiniteScrollObserverOptions {
   /** Distance (px) before the sentinel enters the viewport to trigger load */
   threshold?: number
-  /** Scroll direction */
+  /** Scroll direction (legacy name; prefer `orientation`) */
   direction?: 'vertical' | 'horizontal'
+  /** Scroll orientation — alias of `direction` after the deep-audit rename */
+  orientation?: 'vertical' | 'horizontal'
   /** Scroll root element. `null` = the sentinel's nearest scrollable ancestor is determined by IO */
   root?: Element | null
   /** Whether the sentinel is placed at the start edge instead of the end edge */
@@ -114,11 +116,13 @@ export function createInfiniteScrollObserver(
 
   const {
     threshold = 100,
-    direction = 'vertical',
+    direction: directionOpt,
+    orientation,
     root = null,
     inverse = false,
     onLoadMore
   } = options
+  const direction = orientation ?? directionOpt ?? 'vertical'
 
   const rootMargin =
     direction === 'horizontal'

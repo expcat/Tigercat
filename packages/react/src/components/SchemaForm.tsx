@@ -59,7 +59,7 @@ export interface SchemaFormProps
     Omit<CoreSchemaFormProps, 'style' | 'onChange' | 'onSubmit' | 'onReset'>,
     Omit<
       React.HTMLAttributes<HTMLFormElement>,
-      'onChange' | 'onSubmit' | 'onReset' | 'value'
+      'onChange' | 'onSubmit' | 'onReset' | 'value' | 'defaultValue' | 'content'
     > {
   renderField?: (field: SchemaFormField) => React.ReactNode
   onChange?: (values: FormValues) => void

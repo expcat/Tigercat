@@ -94,7 +94,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     const observerRoot = resolveObserverRoot()
     const teardown = createInfiniteScrollObserver(sentinel, {
       threshold,
-      orientation,
+      direction: orientation,
       root: observerRoot,
       inverse,
       onLoadMore: requestLoad

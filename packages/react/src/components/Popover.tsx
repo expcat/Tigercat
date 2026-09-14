@@ -138,7 +138,15 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
               role="dialog"
               aria-modal="false"
               tabIndex={-1}
-              aria-label={hasTitle ? undefined : title || content || undefined}
+              aria-label={
+                hasTitle
+                  ? undefined
+                  : typeof title === 'string'
+                    ? title
+                    : typeof content === 'string'
+                      ? content
+                      : undefined
+              }
               aria-labelledby={hasTitle ? titleId : undefined}
               aria-describedby={hasContent ? contentId : undefined}
               className={contentClasses}
