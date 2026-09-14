@@ -66,6 +66,25 @@ describe('extractMarkdownSection', () => {
 
     expect(missing).toEqual([])
   })
+
+  it('finds an examples section for every indexed component', async () => {
+    const missing: string[] = []
+    const cache = new Map<string, string>()
+
+    for (const component of index.components.values()) {
+      const path = component.references.examples
+      let text = cache.get(path)
+      if (text === undefined) {
+        text = await readFile(join(REPO_ROOT, path), 'utf8')
+        cache.set(path, text)
+      }
+      if (extractMarkdownSection(text, component.name) === undefined) {
+        missing.push(`${component.name} (${path})`)
+      }
+    }
+
+    expect(missing).toEqual([])
+  })
 })
 
 describe('getTigercatComponent', () => {
@@ -94,6 +113,39 @@ describe('getTigercatComponent', () => {
     const result = await getTigercatComponent(index, { component: '日期选择' })
     expect(result.found).toBe(true)
     expect(result.matches.map((match) => match.component.name)).toContain('DatePicker')
+  })
+
+  it('resolves 日期选择器 and Kanban to keepers', async () => {
+    const datePicker = await getTigercatComponent(index, { component: '日期选择器' })
+    expect(datePicker.found).toBe(true)
+    expect(datePicker.matches.map((match) => match.component.name)).toContain('DatePicker')
+
+    const kanban = await getTigercatComponent(index, { component: 'Kanban' })
+    expect(kanban.found).toBe(true)
+    expect(kanban.matches.map((match) => match.component.name)).toContain('TaskBoard')
+  })
+
+  it('inlines the examples section for the requested component without truncating', async () => {
+    const result = await getTigercatComponent(index, { component: 'Input', framework: 'react' })
+    const examples = result.matches[0].sources.find(
+      (source) => source.path.includes('/examples/') && source.section === 'Input'
+    )
+    expect(examples?.truncated).toBe(false)
+    expect(examples?.text).toContain('## Input')
+    expect(examples?.text).toContain('onChange={(next) => setValue(next)}')
+    expect(examples?.text).not.toContain('event.target.value')
+    expect(JSON.stringify(result).length).toBeLessThan(COMPONENT_BUDGET_CHARS)
+  })
+
+  it('routes notification as a command API, not a missing component', async () => {
+    const result = await getTigercatComponent(index, { component: 'notification' })
+    expect(result.found).toBe(true)
+    expect(result.matches).toEqual([])
+    expect(result.commandApi?.name).toBe('notification')
+    expect(result.sources?.some((source) => source.path.endsWith('command-apis.md'))).toBe(true)
+    expect(result.sources?.some((source) => source.path.includes('shared/props/feedback.md'))).toBe(
+      false
+    )
   })
 })
 
@@ -158,6 +210,42 @@ describe('routeTigercatTask', () => {
     )
     expect(inlined.some((source) => source.path.includes('shared/props/feedback.md'))).toBe(false)
     expect(JSON.stringify(result).length).toBeLessThan(ROUTE_BUDGET_CHARS)
+  })
+
+  it('does not treat selection or row as Select/Row', async () => {
+    const result = await routeTigercatTask(index, {
+      task: 'table with pagination and row selection',
+      framework: 'vue'
+    })
+
+    const names = result.matches.map((match) => match.component.name)
+    expect(names).toContain('Table')
+    expect(names).toContain('Pagination')
+    expect(names).not.toContain('Select')
+    expect(names).not.toContain('Row')
+    expect(JSON.stringify(result).length).toBeLessThan(ROUTE_BUDGET_CHARS)
+  })
+
+  it('joins tree select into TreeSelect and drops Select', async () => {
+    const result = await routeTigercatTask(index, {
+      task: 'tree select cascading check',
+      framework: 'vue'
+    })
+
+    const names = result.matches.map((match) => match.component.name)
+    expect(names).toContain('TreeSelect')
+    expect(names).not.toContain('Select')
+  })
+
+  it('still routes explicit Grid / Row / Col names', async () => {
+    const result = await routeTigercatTask(index, {
+      task: 'Grid layout with Row Col',
+      framework: 'vue'
+    })
+
+    const names = result.matches.map((match) => match.component.name)
+    expect(names).toContain('Row')
+    expect(names).toContain('Col')
   })
 })
 

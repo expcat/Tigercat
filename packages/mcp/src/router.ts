@@ -60,6 +60,28 @@ export async function getTigercatComponent(
 
   const components = resolveComponentQuery(index, query)
   if (components.length === 0) {
+    const commandApi = resolveCommandApi(index, query)
+    if (commandApi) {
+      const sources = await Promise.all(
+        commandApi.references.map((path) =>
+          readReferenceSource(
+            index,
+            path,
+            `${commandApi.title}; not a public component.`,
+            input.maxBytes
+          )
+        )
+      )
+      return {
+        query,
+        found: true,
+        matches: [],
+        candidates: [],
+        commandApi,
+        sources
+      }
+    }
+
     return {
       query,
       found: false,
@@ -151,7 +173,11 @@ export async function createComponentRoute(
       reason: `${entry.name} props, events, methods, and type source.`,
       section: entry.name
     },
-    { path: entry.references.examples, reason: `${entry.name} compact Vue/React example routes.` },
+    {
+      path: entry.references.examples,
+      reason: `${entry.name} compact Vue/React example routes.`,
+      section: entry.name
+    },
     ...(framework
       ? [
           {
@@ -298,18 +324,82 @@ function resolveComponentQuery(index: SkillIndex, query: string): ComponentMetad
 
 function findMentionedComponents(index: SkillIndex, task: string): ComponentMetadata[] {
   const normalizedTask = normalizeName(task)
+  const tokens = asciiTokens(task)
+  const tokenSet = adjacentNormalizedTokens(tokens)
   const matches: ComponentMetadata[] = []
 
   for (const [alias, targets] of index.aliasTargetsByNormalizedName) {
-    if (!normalizedTask.includes(alias)) continue
+    if (isAsciiAlias(alias)) {
+      if (!tokenSet.has(alias)) continue
+    } else if (!normalizedTask.includes(alias)) {
+      continue
+    }
     matches.push(...resolveTargetNames(index, targets))
   }
 
   for (const [normalizedName, component] of index.componentsByNormalizedName) {
-    if (normalizedTask.includes(normalizedName)) matches.push(component)
+    if (
+      tokenSet.has(normalizedName) ||
+      (!isAsciiAlias(normalizedName) && normalizedTask.includes(normalizedName))
+    ) {
+      matches.push(component)
+    }
   }
 
-  return uniqueComponents(matches).sort((a, b) => b.name.length - a.name.length)
+  return dropSubstringMatches(filterSpuriousLayoutHits(task, uniqueComponents(matches))).sort(
+    (a, b) => b.name.length - a.name.length
+  )
+}
+
+function asciiTokens(task: string): string[] {
+  return [...task.matchAll(/[A-Za-z][A-Za-z0-9]*/g)].map((match) => match[0])
+}
+
+function adjacentNormalizedTokens(tokens: string[], maxParts = 4): Set<string> {
+  const normalized = tokens.map((token) => normalizeName(token)).filter(Boolean)
+  const out = new Set<string>()
+  for (let start = 0; start < normalized.length; start++) {
+    let acc = ''
+    for (let end = start; end < Math.min(normalized.length, start + maxParts); end++) {
+      acc += normalized[end]
+      out.add(acc)
+    }
+  }
+  return out
+}
+
+function isAsciiAlias(normalized: string): boolean {
+  return /^[a-z0-9]+$/.test(normalized)
+}
+
+function dropSubstringMatches(components: ComponentMetadata[]): ComponentMetadata[] {
+  const names = components.map((component) => normalizeName(component.name))
+  return components.filter((component) => {
+    const normalized = normalizeName(component.name)
+    return !names.some((other) => other !== normalized && other.includes(normalized))
+  })
+}
+
+function filterSpuriousLayoutHits(task: string, matches: ComponentMetadata[]): ComponentMetadata[] {
+  const hasGridAlias = /\bgrid\b/i.test(task) || task.includes('栅格')
+  const pascalRow = /(^|[^A-Za-z])Row([^A-Za-z]|$)/.test(task)
+  const pascalCol = /(^|[^A-Za-z])Col([^A-Za-z]|$)/.test(task)
+  return matches.filter((component) => {
+    if (component.name === 'Row') return hasGridAlias || pascalRow
+    if (component.name === 'Col') return hasGridAlias || pascalCol
+    return true
+  })
+}
+
+function resolveCommandApi(index: SkillIndex, query: string) {
+  const commandApis = index.context7.command_apis
+  if (!commandApis) return undefined
+
+  const normalizedQuery = normalizeName(query)
+  for (const entry of Object.values(commandApis)) {
+    if (normalizeName(entry.name) === normalizedQuery) return entry
+  }
+  return undefined
 }
 
 function findTopicMatches(index: SkillIndex, task: string): Array<{ slug: string; score: number }> {

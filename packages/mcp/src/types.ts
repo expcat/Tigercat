@@ -113,6 +113,10 @@ export interface ComponentLookupResult {
   found: boolean
   matches: ComponentRoute[]
   candidates: SearchResult[]
+  /** Set when the query is a command API (e.g. `notification`) rather than a component. */
+  commandApi?: CommandApiMetadata
+  /** Inlined command-API sources; component matches keep sources on each match. */
+  sources?: ReferenceSource[]
 }
 
 export interface SearchResult {
