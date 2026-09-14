@@ -11,13 +11,13 @@ export default function App() {
         <p className="text-sm text-gray-600 dark:text-gray-300">
           6 段表达式保持原样，五列禁用，不会被改写成每分钟。
         </p>
-        <CronEditor value={six} onChange={setSix} presets={[]} />
+        <CronEditor value={six} onChange={(v) => setSix(v ?? '')} presets={[]} />
       </div>
       <div className="space-y-2">
         <p className="text-sm text-gray-600 dark:text-gray-300">
           从 Any 切到 Custom 后可以输入 1,15,30。不认 MON / Quartz。
         </p>
-        <CronEditor value={custom} onChange={setCustom} presets={[]} />
+        <CronEditor value={custom} onChange={(v) => setCustom(v ?? '')} presets={[]} />
       </div>
     </div>
   )

@@ -51,7 +51,7 @@ export default function App() {
             <Input
               placeholder="请输入姓名"
               value={name}
-              onChange={setName}
+              onChange={(v) => setName(String(v ?? ''))}
             />
           </label>
           <label className="block space-y-1 text-sm">
@@ -77,7 +77,7 @@ export default function App() {
             <Input
               placeholder="name@example.com"
               value={email}
-              onChange={setEmail}
+              onChange={(v) => setEmail(String(v ?? ''))}
             />
           </label>
           {error ? (

@@ -12,13 +12,13 @@ export default function App() {
         value={value}
         placeholder="手机号"
         inputMode="none"
-        onChange={setValue}
+        onChange={(v) => setValue(String(v ?? ''))}
         onFocus={() => setOpen(true)}
       />
       <NumberKeyboard
         mode="phone"
         value={value}
-        onChange={setValue}
+        onChange={(v) => setValue(String(v ?? ''))}
         open={open}
         onOpenChange={setOpen}
         onConfirm={() => setOpen(false)}

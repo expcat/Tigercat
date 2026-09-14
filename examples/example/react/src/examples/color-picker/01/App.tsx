@@ -10,7 +10,7 @@ export default function App() {
       <div className="flex flex-wrap items-center gap-3">
         <ColorPicker
           value={color}
-          onChange={setColor}
+          onChange={(v) => setColor(v ?? '')}
           showAlpha
           format="rgb"
           presets={['#2563eb', '#0891b2', '#059669', '#dc2626']}

@@ -10,7 +10,6 @@ import {
   radioRootBaseClasses,
   resolveRadioInputName,
   runShakeAnimation,
-  SHAKE_CLASS,
   type RadioProps as CoreRadioProps
 } from '@expcat/tigercat-core'
 import { RadioGroupContext } from './RadioGroup'

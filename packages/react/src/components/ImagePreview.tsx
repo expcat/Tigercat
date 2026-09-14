@@ -46,8 +46,7 @@ import {
   zoomInIconPath,
   zoomOutIconPath,
   type GestureTransform,
-  type ImagePreviewProps as CoreImagePreviewProps,
-  type ImageViewerProps as CoreImageViewerProps
+  type ImagePreviewProps as CoreImagePreviewProps
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'

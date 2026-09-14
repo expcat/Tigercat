@@ -8,7 +8,7 @@ export default function App() {
     <div className="w-full max-w-md space-y-2">
       <Input
         value={value}
-        onChange={setValue}
+        onChange={(v) => setValue(String(v ?? ''))}
         type="search"
         size="lg"
         prefix="🔎"

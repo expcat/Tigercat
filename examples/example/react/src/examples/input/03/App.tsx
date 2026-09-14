@@ -11,7 +11,7 @@ export default function App() {
         showPassword
         clearable
         value={value}
-        onChange={setValue}
+        onChange={(v) => setValue(String(v ?? ''))}
         placeholder="密码"
       />
     </div>

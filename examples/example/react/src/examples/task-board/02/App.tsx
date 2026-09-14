@@ -55,7 +55,13 @@ const initialColumns: TaskBoardColumn[] = [
   }
 ]
 
-const renderCard = (card: TaskBoardCard) => (
+const renderCard = ({
+  card
+}: {
+  card: TaskBoardCard
+  column: TaskBoardColumn
+  isDragging: boolean
+}) => (
   <div className="space-y-2">
     <div className="font-medium">{card.title}</div>
     <p className="text-xs text-gray-500">{card.description}</p>

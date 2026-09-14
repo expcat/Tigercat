@@ -15,7 +15,7 @@ export default function App() {
           prefix="¥"
           placeholder="输入金额"
           inputMode="none"
-          onChange={setValue}
+          onChange={(v) => setValue(String(v ?? ''))}
           onFocus={() => setOpen(true)}
         />
       </FormItem>
@@ -23,7 +23,7 @@ export default function App() {
         mode="amount"
         precision={2}
         value={value}
-        onChange={setValue}
+        onChange={(v) => setValue(String(v ?? ''))}
         open={open}
         onOpenChange={setOpen}
         onConfirm={() => setOpen(false)}

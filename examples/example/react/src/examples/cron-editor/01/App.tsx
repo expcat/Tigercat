@@ -10,7 +10,7 @@ export default function App() {
   return (
     <ConfigProvider locale={zhTW}>
       <FormItem label="執行計畫">
-        <CronEditor value={value} onChange={setValue} />
+        <CronEditor value={value} onChange={(v) => setValue(v ?? '')} />
       </FormItem>
     </ConfigProvider>
   )

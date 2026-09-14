@@ -57,7 +57,7 @@ export default function App() {
             return (
               <Input
                 value={name}
-                onChange={setName}
+                onChange={(v) => setName(String(v ?? ''))}
                 placeholder="请输入用户名"
               />
             )
@@ -66,7 +66,7 @@ export default function App() {
             return (
               <Input
                 value={team}
-                onChange={setTeam}
+                onChange={(v) => setTeam(String(v ?? ''))}
                 placeholder="请输入团队名称"
               />
             )
