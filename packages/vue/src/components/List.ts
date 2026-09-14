@@ -456,7 +456,7 @@ export const List = defineComponent({
             ? h(
                 'div',
                 { class: getListHeaderFooterClasses(props.size, false) },
-                slots.header ? slots.header() : (props.header as RawChildren)
+                slots.header ? slots.header() : (props.header as unknown as RawChildren)
               )
             : null,
           h('div', { class: 'relative', 'aria-busy': props.loading || undefined }, [
@@ -471,7 +471,7 @@ export const List = defineComponent({
             ? h(
                 'div',
                 { class: getListHeaderFooterClasses(props.size, true) },
-                slots.footer ? slots.footer() : (props.footer as RawChildren)
+                slots.footer ? slots.footer() : (props.footer as unknown as RawChildren)
               )
             : null,
           renderPaginationBar()

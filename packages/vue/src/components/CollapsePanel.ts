@@ -273,8 +273,10 @@ export const CollapsePanel = defineComponent({
         headerContent
       )
 
-      const extraNode =
-        extraContent != null && extraContent !== ''
+      const hasExtra = Array.isArray(extraContent)
+        ? extraContent.length > 0
+        : extraContent != null && extraContent !== ''
+      const extraNode = hasExtra
           ? h('span', { class: collapseExtraClasses }, extraContent as never)
           : null
 
