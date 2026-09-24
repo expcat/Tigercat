@@ -7,6 +7,6 @@ import { Link } from '@expcat/tigercat-vue/Link'
     <Link href="https://github.com" target="_blank" rel="nofollow" variant="primary" size="lg">
       在新窗口打开 GitHub
     </Link>
-    <Link href="https://github.com/expcat/Tigercat" disabled> 禁用仍是链接 </Link>
+    <Link href="https://github.com/expcat/Tigercat" disabled> 禁用不带地址 </Link>
   </div>
 </template>

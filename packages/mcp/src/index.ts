@@ -6,12 +6,12 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import { createTigercatMcpServer } from './server'
 import { diagnoseTigercatMcp } from './skill-index'
-import { DEFAULT_REMOTE_BASE_URL } from './source'
+import { packagedSkillRoot } from './source'
 import type { TigercatMcpOptions } from './types'
 
 export { createTigercatMcpServer } from './server'
 export { diagnoseTigercatMcp, loadSkillIndex } from './skill-index'
-export { DEFAULT_REMOTE_BASE_URL } from './source'
+export { packagedSkillRoot } from './source'
 export {
   getCategoryComponents,
   getInventory,
@@ -122,18 +122,19 @@ function parseArgs(args: string[]): ParsedArgs {
   return { root, baseUrl, help, doctor }
 }
 
-// 优先级:--root > --base-url > TIGERCAT_MCP_BASE_URL > 官方 GitHub Pages 地址。
+// 优先级:--root > --base-url / TIGERCAT_MCP_BASE_URL > 本包技能快照。
 function resolveOptions(parsed: ParsedArgs): TigercatMcpOptions {
   if (parsed.root) {
     if (parsed.baseUrl) {
-      // stdout 是 MCP stdio 通道,警告只能走 stderr。
       console.error('tigercat-mcp: --root takes precedence over --base-url; ignoring --base-url.')
     }
     return { root: parsed.root }
   }
 
   const envBaseUrl = process.env.TIGERCAT_MCP_BASE_URL?.trim()
-  return { baseUrl: parsed.baseUrl ?? (envBaseUrl || undefined) ?? DEFAULT_REMOTE_BASE_URL }
+  const baseUrl = parsed.baseUrl ?? (envBaseUrl || undefined)
+  if (baseUrl) return { baseUrl }
+  return { root: packagedSkillRoot() }
 }
 
 function helpText(): string {
@@ -141,10 +142,10 @@ function helpText(): string {
     'Usage: tigercat-mcp [--root <repo-root>] [--base-url <skills-base-url>] [--doctor]',
     '',
     'Runs the Tigercat skill MCP server over stdio.',
-    `By default skill references are fetched from ${DEFAULT_REMOTE_BASE_URL} (GitHub Pages).`,
+    'By default skill references come from the snapshot shipped with this package.',
     '',
     '  --root <repo-root>       read skills from a local Tigercat checkout (dev/offline mode).',
-    '  --base-url <url>         fetch skills from a mirror of the /mcp/ Pages route.',
+    '  --base-url <https-url>   explicit https mirror. Version and file digests must match this package.',
     '  --doctor                 validate the skill inventory and exit without starting stdio.',
     '  TIGERCAT_MCP_BASE_URL    environment fallback for --base-url.',
     '',

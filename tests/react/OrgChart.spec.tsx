@@ -17,6 +17,18 @@ const data: OrgChartNode = {
 }
 
 describe('OrgChart', () => {
+  it('writes only allowlisted avatar addresses into svg image', () => {
+    const withAvatar: OrgChartNode = {
+      id: 'ceo',
+      label: 'Ada',
+      avatar: 'https://example.com/ada.png',
+      children: [{ id: 'bad', label: 'Eve', avatar: 'javascript:alert(1)' }]
+    }
+    const { container } = render(<OrgChart data={withAvatar} />)
+    const images = [...container.querySelectorAll('image')].map((node) => node.getAttribute('href'))
+    expect(images).toEqual(['https://example.com/ada.png'])
+  })
+
   it('renders svg nodes and links', () => {
     const { container } = render(<OrgChart data={data} />)
 
@@ -118,7 +130,7 @@ describe('OrgChart', () => {
     it('applies custom aria label to the chart image', () => {
       const { getByRole } = render(<OrgChart data={data} ariaLabel="Leadership chart" />)
 
-      expect(getByRole('img', { name: 'Leadership chart' })).toBeInTheDocument()
+      expect(getByRole('group', { name: 'Leadership chart' })).toBeInTheDocument()
     })
   })
 })

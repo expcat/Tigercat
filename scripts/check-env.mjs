@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { createRequire } from 'node:module'
 
 import { readJson } from './utils/files.mjs'
@@ -121,8 +122,8 @@ function main() {
     try {
       // Resolve from repo root node_modules
       const reactVersionInstalled = require('react/package.json').version
-      const reactRequiredMajor = extractMajor(reactRange)
-      if (!checkVersion('react', reactVersionInstalled, `${reactRequiredMajor || 0}.0.0`)) {
+      const reactMinimum = String(reactRange).match(/(\d+\.\d+\.\d+)/)?.[1] ?? '0.0.0'
+      if (!checkVersion('react', reactVersionInstalled, reactMinimum)) {
         console.log(`${c('yellow', 'ℹ')} Declared range: ${reactRange}`)
         hasErrors = true
       } else {
@@ -136,8 +137,8 @@ function main() {
 
     try {
       const vueVersionInstalled = require('vue/package.json').version
-      const vueRequiredMajor = extractMajor(vueRange)
-      if (!checkVersion('vue', vueVersionInstalled, `${vueRequiredMajor || 0}.0.0`)) {
+      const vueMinimum = String(vueRange).match(/(\d+\.\d+\.\d+)/)?.[1] ?? '0.0.0'
+      if (!checkVersion('vue', vueVersionInstalled, vueMinimum)) {
         console.log(`${c('yellow', 'ℹ')} Declared range: ${vueRange}`)
         hasErrors = true
       } else {
@@ -156,15 +157,29 @@ function main() {
   console.log('')
 
   console.log('Checking build artifacts...')
-  const built =
-    existsSync('packages/core/dist/index.js') &&
-    existsSync('packages/vue/dist/index.js') &&
-    existsSync('packages/react/dist/index.js')
+  const packageExportRoots = [
+    'packages/core/package.json',
+    'packages/vue/package.json',
+    'packages/react/package.json',
+    'packages/cli/package.json',
+    'packages/mcp/package.json'
+  ]
+  const missingArtifacts = []
+  for (const packageFile of packageExportRoots) {
+    const manifest = readJson(packageFile)
+    for (const [key, value] of Object.entries(manifest?.exports ?? {})) {
+      const spec = typeof value === 'string' ? value : value?.import || value?.default
+      if (typeof spec !== 'string' || spec.endsWith('.css') || spec.endsWith('.json')) continue
+      const file = join(packageFile, '..', spec)
+      if (!existsSync(file)) missingArtifacts.push(`${key} -> ${file}`)
+    }
+  }
 
-  if (built) {
-    console.log(`${c('green', '✓')} All packages are built`)
+  if (missingArtifacts.length === 0) {
+    console.log(`${c('green', '✓')} Package export targets exist`)
   } else {
-    console.log(`${c('yellow', '⚠')} Some packages are not built`)
+    console.log(`${c('red', '✗')} Package export targets are missing`)
+    for (const artifact of missingArtifacts) console.log(`  ${artifact}`)
     console.log(`${c('yellow', 'ℹ')} Run: pnpm build`)
     hasErrors = true
   }

@@ -2,7 +2,13 @@ import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { join, relative, resolve } from 'node:path'
 
-import { createFsSource, createHttpSource, DEFAULT_REMOTE_BASE_URL } from './source'
+import {
+  createFsSource,
+  createHttpSource,
+  normalizeRelativePath,
+  packagedSkillRoot
+} from './source'
+import { PACKAGE_VERSION } from './version'
 import type {
   ComponentMetadata,
   DoctorResult,
@@ -14,6 +20,22 @@ import type {
 } from './types'
 
 const DEFAULT_MAX_BYTES = 12_000
+export const MAX_BYTES_MIN = 200
+export const MAX_BYTES_MAX = 50_000
+export const RESULT_LIMIT_MIN = 1
+export const RESULT_LIMIT_MAX = 30
+
+export function clampMaxBytes(value: number | undefined): number | undefined {
+  if (value === undefined) return undefined
+  if (!Number.isFinite(value)) throw new Error('Expected number argument')
+  return Math.min(MAX_BYTES_MAX, Math.max(MAX_BYTES_MIN, Math.floor(value)))
+}
+
+export function clampResultLimit(value: number | undefined): number | undefined {
+  if (value === undefined) return undefined
+  if (!Number.isFinite(value)) throw new Error('Expected number argument')
+  return Math.min(RESULT_LIMIT_MAX, Math.max(RESULT_LIMIT_MIN, Math.floor(value)))
+}
 const REFERENCES_ROOT = 'skills/tigercat/references'
 const DEFAULT_COMPONENT_INDEX = 'skills/tigercat/references/component-index.md'
 const DEFAULT_REACT_REFERENCE = 'skills/tigercat/references/react/index.md'
@@ -28,7 +50,11 @@ export async function loadSkillIndex(
     return loadFsSkillIndex(resolve(resolved.root))
   }
 
-  return loadHttpSkillIndex(resolved.baseUrl ?? DEFAULT_REMOTE_BASE_URL, resolved.timeoutMs)
+  if (resolved.baseUrl) {
+    return loadHttpSkillIndex(resolved.baseUrl, resolved.timeoutMs)
+  }
+
+  return loadFsSkillIndex(packagedSkillRoot())
 }
 
 async function loadFsSkillIndex(resolvedRoot: string): Promise<SkillIndex> {
@@ -61,6 +87,7 @@ async function loadFsSkillIndex(resolvedRoot: string): Promise<SkillIndex> {
 
 async function loadHttpSkillIndex(baseUrl: string, timeoutMs?: number): Promise<SkillIndex> {
   const source = createHttpSource(baseUrl, { timeoutMs })
+  await assertRemoteMirror(source)
   const raw = await source.readText('context7.json')
 
   let context7: TigercatContext7
@@ -80,6 +107,32 @@ async function loadHttpSkillIndex(baseUrl: string, timeoutMs?: number): Promise<
   const allowedReferencePaths = retainMarkdownPaths(collectAllowedReferencePaths(context7))
 
   return buildSkillIndex(context7, source, allowedReferencePaths)
+}
+
+async function assertRemoteMirror(source: SkillSource): Promise<void> {
+  const version = JSON.parse(await source.readText('version.json')) as { version?: unknown }
+  if (version.version !== PACKAGE_VERSION) {
+    throw new Error(
+      `Remote skill version ${String(version.version)} does not match package ${PACKAGE_VERSION}`
+    )
+  }
+
+  const remote = JSON.parse(await source.readText('manifest.json')) as {
+    files?: Record<string, string>
+  }
+  const local = JSON.parse(await readFile(join(packagedSkillRoot(), 'manifest.json'), 'utf8')) as {
+    files?: Record<string, string>
+  }
+  const remoteFiles = remote.files ?? {}
+  const localFiles = local.files ?? {}
+  const remoteKeys = Object.keys(remoteFiles).sort()
+  const localKeys = Object.keys(localFiles).sort()
+  if (
+    remoteKeys.length !== localKeys.length ||
+    remoteKeys.some((key, index) => key !== localKeys[index] || remoteFiles[key] !== localFiles[key])
+  ) {
+    throw new Error('Remote skill digest does not match the packaged snapshot')
+  }
 }
 
 function collectAllowedReferencePaths(context7: TigercatContext7): Set<string> {
@@ -215,7 +268,7 @@ export async function readReferenceSource(
   }
 
   const text = await index.source.readText(normalizedPath)
-  const limit = Number.isFinite(maxBytes) && maxBytes > 0 ? Math.floor(maxBytes) : DEFAULT_MAX_BYTES
+  const limit = clampMaxBytes(maxBytes) ?? DEFAULT_MAX_BYTES
 
   if (section) {
     const extracted = extractMarkdownSection(text, section)
@@ -300,16 +353,7 @@ export function normalizeName(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9一-鿿]/g, '')
 }
 
-export function normalizeRelativePath(path: string): string {
-  const normalized = path.replaceAll('\\', '/').replace(/^\.?\//, '')
-  const parts = normalized.split('/').filter(Boolean)
-
-  if (parts.some((part) => part === '..')) {
-    throw new Error(`Reference path may not contain parent segments: ${path}`)
-  }
-
-  return parts.join('/')
-}
+export { normalizeRelativePath } from './source'
 
 function buildComponentMap(context7: TigercatContext7): Map<string, ComponentMetadata> {
   const components = new Map<string, ComponentMetadata>()

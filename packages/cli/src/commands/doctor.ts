@@ -2,7 +2,9 @@ import { Command } from 'commander'
 import pc from 'picocolors'
 import { dirname, join } from 'node:path'
 import { createRequire } from 'node:module'
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { existsSync, readFileSync } from 'node:fs'
+import { CLI_VERSION } from '../constants'
 import { logError, logInfo, logSuccess, logWarn } from '../utils/logger'
 import { readFileSafe } from '../utils/fs'
 
@@ -42,7 +44,7 @@ const MIN_PNPM_VERSION = { major: 11, minor: 9, patch: 0 } as const
 const MIN_NODE_RANGE = '22.13.0'
 const MIN_PNPM_RANGE = '11.9.0'
 const REQUIRED_TAILWIND_MAJOR = 4
-const REQUIRED_TIGERCAT_MAJOR = 1
+const REQUIRED_TIGERCAT_MAJOR = Number(CLI_VERSION.split('.')[0])
 
 /** Minimum supported major versions for framework peers, enforced by the compatibility matrix check. */
 const FRAMEWORK_PEER_RANGES: Record<Framework, { dep: string; major: number }[]> = {
@@ -53,14 +55,17 @@ const FRAMEWORK_PEER_RANGES: Record<Framework, { dep: string; major: number }[]>
   ]
 }
 
-/** Subpath exports @expcat/tigercat-core must continue to expose (see Roadmap Tailwind guard). */
-const REQUIRED_CORE_EXPORTS = [
-  '.',
-  './tailwind',
-  './tailwind/modern',
-  './tokens.css',
-  './figma-variables.json'
-]
+/** Subpath exports generated from the core entry table. */
+const REQUIRED_CORE_EXPORTS = JSON.parse(
+  readFileSync(resolveAdjacent('../required-core-exports.json'), 'utf8')
+) as string[]
+
+function resolveAdjacent(relativePath: string): string {
+  const meta = import.meta.url
+  if (meta.startsWith('file:')) return fileURLToPath(new URL(relativePath, meta))
+  if (meta.startsWith('/')) return join(dirname(meta), relativePath)
+  return fileURLToPath(new URL(relativePath, pathToFileURL(meta)))
+}
 
 const VERSION_COMPATIBILITY_MATRIX = [
   {
@@ -114,8 +119,8 @@ export function collectDoctorChecks(options: DoctorOptions = {}): DoctorCheck[] 
     return checks
   }
 
-  checks.push(createTailwindCheck(packageResult.packageJson))
-  checks.push(createPeerDepsCheck(packageResult.packageJson))
+  checks.push(createTailwindCheck(packageResult.packageJson, cwd))
+  checks.push(createPeerDepsCheck(packageResult.packageJson, cwd))
   checks.push(createTemplateCompatibilityCheck(packageResult.packageJson))
   checks.push(createCompatibilityMatrixCheck(packageResult.packageJson))
 
@@ -262,10 +267,10 @@ function createPnpmCheck(packageJson: ProjectPackage | null, env: NodeJS.Process
   }
 }
 
-function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
+function createTailwindCheck(packageJson: ProjectPackage, cwd: string): DoctorCheck {
   const allDeps = collectDependencies(packageJson)
-  const tailwindRange = allDeps.tailwindcss
-  const vitePluginRange = allDeps['@tailwindcss/vite']
+  const tailwindRange = unwrapCatalogRange(allDeps.tailwindcss, 'tailwindcss', cwd)
+  const vitePluginRange = unwrapCatalogRange(allDeps['@tailwindcss/vite'], '@tailwindcss/vite', cwd)
 
   if (!tailwindRange) {
     return {
@@ -333,7 +338,7 @@ function createTailwindCheck(packageJson: ProjectPackage): DoctorCheck {
   }
 }
 
-function createPeerDepsCheck(packageJson: ProjectPackage): DoctorCheck {
+function createPeerDepsCheck(packageJson: ProjectPackage, cwd: string): DoctorCheck {
   const allDeps = collectDependencies(packageJson)
   const frameworks = detectTigercatFrameworks(allDeps)
 
@@ -356,7 +361,9 @@ function createPeerDepsCheck(packageJson: ProjectPackage): DoctorCheck {
   const incompatible = frameworks.flatMap((framework) =>
     FRAMEWORK_REQUIREMENTS[framework].peers
       .filter((dependency) => dependency.startsWith('@expcat/tigercat-'))
-      .filter((dependency) => isOlderMajor(allDeps[dependency], REQUIRED_TIGERCAT_MAJOR))
+      .filter((dependency) =>
+        isDifferentMajor(unwrapCatalogRange(allDeps[dependency], dependency, cwd), REQUIRED_TIGERCAT_MAJOR)
+      )
       .map((dependency) => `${dependency}@${allDeps[dependency]}`)
   )
 
@@ -582,6 +589,51 @@ function getRangeMajor(range: string | undefined): number | null {
 function isOlderMajor(range: string | undefined, expectedMajor: number): boolean {
   const major = getRangeMajor(range)
   return major !== null && major < expectedMajor
+}
+
+function isDifferentMajor(range: string | undefined, expectedMajor: number): boolean {
+  const major = getRangeMajor(range)
+  return major !== null && major !== expectedMajor
+}
+
+function unwrapCatalogRange(
+  range: string | undefined,
+  packageName: string,
+  cwd: string
+): string | undefined {
+  if (!range || !range.startsWith('catalog:')) return range
+  const named = range.slice('catalog:'.length)
+  const catalog = loadPnpmCatalog(cwd)
+  return catalog[named || packageName]
+}
+
+function loadPnpmCatalog(start: string): Record<string, string> {
+  let dir = start
+  for (let hop = 0; hop < 8; hop += 1) {
+    const file = join(dir, 'pnpm-workspace.yaml')
+    if (existsSync(file)) return parsePnpmCatalog(readFileSync(file, 'utf8'))
+    const parent = dirname(dir)
+    if (parent === dir) break
+    dir = parent
+  }
+  return {}
+}
+
+function parsePnpmCatalog(yaml: string): Record<string, string> {
+  const catalog: Record<string, string> = {}
+  let inCatalog = false
+  for (const line of yaml.split('\n')) {
+    if (!inCatalog) {
+      if (/^catalog:\s*$/.test(line)) inCatalog = true
+      continue
+    }
+    if (line && !/^[\s#]/.test(line)) break
+    const match = /^\s+(?:'([^']+)'|"([^"]+)"|([A-Za-z0-9@/_.-]+))\s*:\s*(\S+)/.exec(line)
+    if (!match) continue
+    const key = match[1] || match[2] || match[3]
+    if (key) catalog[key] = match[4]
+  }
+  return catalog
 }
 
 function formatFramework(framework: Framework): string {

@@ -49,9 +49,9 @@ describe('Link (React)', () => {
       </Link>
     )
 
-    const link = screen.getByRole('link', { name: 'Disabled' })
+    const link = screen.getByText('Disabled')
     expect(link).toHaveAttribute('aria-disabled', 'true')
-    expect(link).toHaveAttribute('href', '/test')
+    expect(link).not.toHaveAttribute('href')
     expect(link).toHaveAttribute('tabindex', '-1')
 
     await user.click(link)

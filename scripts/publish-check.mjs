@@ -209,7 +209,7 @@ async function smokeExamples(tarballs) {
         '--no-audit',
         '--fund=false',
         // npm 10 arborist crashes on Nuxt 4's peer tree (`edgesOut` of null).
-        ...(example.name === 'nuxt example' ? ['--legacy-peer-deps'] : [])
+
       ],
       example.dir
     )
@@ -397,7 +397,7 @@ function rewriteTailwindEntry(filePath, frameworkPackageName) {
   const next = source
     .replace(
       /@plugin\s+['"][^'"]*packages\/core\/src\/tailwind-plugin\.ts['"]\s*;/,
-      '@plugin "@expcat/tigercat-core/tailwind/modern";'
+      '@plugin "@expcat/tigercat-core/tailwind";'
     )
     .replace(
       /@source\s+['"][^'"]*packages\/(?:vue|react)\/(?:src|dist)['"]\s*;/g,
@@ -881,25 +881,25 @@ async function verifyI18nTreeShaking(tempDir) {
       forbiddenMarkers: getFullLocaleBundleMarkers()
     },
     {
-      name: 'React DatePicker with zh-CN preset',
+      name: 'React DatePicker with zh-CN locale',
       source: `
         import { DatePicker } from '@expcat/tigercat-react/DatePicker';
-        import { ZH_CN_DATEPICKER_LOCALE } from '@expcat/tigercat-core/datepicker-locales/zh-CN';
-        export default { DatePicker, locale: ZH_CN_DATEPICKER_LOCALE };
+        import { zhCN } from '@expcat/tigercat-core/locales/zh-CN';
+        export default { DatePicker, locale: zhCN };
       `,
       externals: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
-      requiredMarkers: ['ZH_CN_DATEPICKER_LOCALE', '\\u4ECA\\u5929'],
+      requiredMarkers: ['\\u4ECA\\u5929'],
       forbiddenMarkers: getFullLocaleBundleMarkers({ allowZhCN: true })
     },
     {
-      name: 'Vue DatePicker with zh-CN preset',
+      name: 'Vue DatePicker with zh-CN locale',
       source: `
         import { DatePicker } from '@expcat/tigercat-vue/DatePicker';
-        import { ZH_CN_DATEPICKER_LOCALE } from '@expcat/tigercat-core/datepicker-locales/zh-CN';
-        export default { DatePicker, locale: ZH_CN_DATEPICKER_LOCALE };
+        import { zhCN } from '@expcat/tigercat-core/locales/zh-CN';
+        export default { DatePicker, locale: zhCN };
       `,
       externals: ['vue'],
-      requiredMarkers: ['ZH_CN_DATEPICKER_LOCALE', '\\u4ECA\\u5929'],
+      requiredMarkers: ['\\u4ECA\\u5929'],
       forbiddenMarkers: getFullLocaleBundleMarkers({ allowZhCN: true })
     }
   ]

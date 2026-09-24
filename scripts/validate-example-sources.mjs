@@ -2,8 +2,12 @@
 
 import { existsSync } from 'node:fs'
 import { basename, dirname, join, relative, resolve, sep } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { collectFiles, readJson, readText } from './utils/files.mjs'
 import { c } from './utils/term.mjs'
+import { getComponentPackageTarget, loadComponentRecords } from './lib/public-components.mjs'
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 const frameworks = [
   {
@@ -100,6 +104,15 @@ function isBareImport(value) {
 
 function isAllowedImport(value) {
   return allowedBareImports.some((prefix) => value === prefix || value.startsWith(prefix))
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function sourceReferencesComponent(source, name) {
+  const token = escapeRegExp(name)
+  return new RegExp(`import\\s*\\{[^}]*\\b${token}\\b|<${token}\\b`).test(source)
 }
 
 function relativeImportExists(importer, requested) {
@@ -210,9 +223,16 @@ for (const framework of frameworks) {
     framework.pages,
     framework.name === 'React' ? ['.tsx'] : ['.vue']
   )) {
-    const source = readText(page)
-    if (!source.includes('DemoPage')) continue
     const path = displayPath(page)
+    const source = readText(page)
+    if (!source.includes('DemoPage')) {
+      const base = basename(page)
+      if (base === 'Home.tsx' || base === 'Home.vue' || base === 'UseControlledStateDemo.vue') {
+        continue
+      }
+      failures.push(`${path}: example page must render DemoPage`)
+      continue
+    }
     if (!source.includes('getDemoModules')) {
       failures.push(`${path}: migrated page must use getDemoModules`)
     }
@@ -234,7 +254,29 @@ for (const framework of frameworks) {
     if (!pageRoutes.has(route)) failures.push(`${framework.name}: orphan demo route ${route}`)
   }
 
-  inventories.set(framework.key, { modules, count: metadataFiles.length })
+  const coveredSources = []
+  for (const [route, routeModules] of modulesByRoute) {
+    if (!pageRoutes.has(route)) continue
+    for (const routeModule of routeModules) {
+      const entryFile = join(dirname(routeModule.metadataFile), framework.entry)
+      if (existsSync(entryFile)) coveredSources.push(readText(entryFile))
+    }
+  }
+
+  inventories.set(framework.key, { modules, count: metadataFiles.length, coveredSources })
+}
+
+const componentRecords = loadComponentRecords(ROOT)
+for (const framework of frameworks) {
+  const corpus = (inventories.get(framework.key)?.coveredSources ?? []).join('\n')
+  for (const record of componentRecords) {
+    const names = [...new Set([record.component, getComponentPackageTarget(record.component)])]
+    if (!names.some((name) => sourceReferencesComponent(corpus, name))) {
+      failures.push(
+        `${framework.name}: public component ${record.component} has no DemoPage example`
+      )
+    }
+  }
 }
 
 const reactInventory = inventories.get('react')

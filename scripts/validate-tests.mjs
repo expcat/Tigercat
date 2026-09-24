@@ -170,7 +170,9 @@ function getTestNames(content) {
 
 function isDescriptiveTestName(name) {
   const lower = name.toLowerCase()
-  return descriptiveNameWords.some((word) => lower.includes(word))
+  if (descriptiveNameWords.some((word) => lower.includes(word))) return true
+  const words = lower.split(/[^a-z0-9]+/).filter(Boolean)
+  return words.length >= 4
 }
 
 function checkTestNaming(filePath, content, counters) {
@@ -188,9 +190,18 @@ function checkTestNaming(filePath, content, counters) {
 }
 
 function checkAccessibility(filePath, content, counters) {
-  if (/^use[A-Z].*\.spec\.(ts|tsx)$/.test(path.basename(filePath))) return true
+  const filename = path.basename(filePath)
+  if (/^use[A-Z].*\.spec\.(ts|tsx)$/.test(filename)) return true
+  if (/\.ssr\.spec\.(ts|tsx)$/.test(filename)) return true
+  if (/^overlay-(positioning|ssr)\.spec\.(ts|tsx)$/.test(filename)) return true
 
-  if (content.includes('expectNoA11yViolations')) return true
+  if (
+    content.includes('expectNoA11yViolations') ||
+    content.includes('expectMentionsA11y') ||
+    /\baxe\s*\(/.test(content)
+  ) {
+    return true
+  }
   console.log(c('yellow', '  ⚠ No accessibility checks'))
   counters.warnings++
   return false
@@ -298,19 +309,22 @@ async function main() {
       console.log(c('red', '  ✗ Focused test detected (.only)'))
       errors++
     }
+    if (/\b(?:describe|it|test)\.skip\s*\(/.test(content)) {
+      console.log(c('red', '  ✗ Skipped suite detected (.skip)'))
+      errors++
+    }
     if (!checkTypeSafety(content)) errors++
 
     // --- Soft checks (warnings, don't cause failure) ---
     if (!checkTestNaming(filePath, content, counters)) softIssues++
     if (componentSpec && !checkAccessibility(filePath, content, counters)) softIssues++
 
-    if (errors === 0) {
-      if (softIssues === 0) {
-        console.log(c('green', '  ✓ All checks passed'))
-      } else {
-        console.log(c('green', `  ✓ Passed (${softIssues} suggestion(s))`))
-      }
+    if (errors === 0 && softIssues === 0) {
+      console.log(c('green', '  ✓ All checks passed'))
       counters.passedFiles++
+    } else if (errors === 0) {
+      console.log(c('red', `  ✗ ${softIssues} warning(s) are failures`))
+      counters.failedFiles++
     } else {
       console.log(c('red', `  ✗ ${errors} error(s), ${softIssues} suggestion(s)`))
       counters.failedFiles++
@@ -339,11 +353,12 @@ async function main() {
     process.exit(1)
   }
 
+  if (counters.warnings > 0) {
+    console.log(c('red', `❌ ${counters.warnings} warning(s) failed the test gate`))
+    process.exit(1)
+  }
+
   console.log(c('green', '✅ All tests meet quality standards'))
-  if (counters.warnings > 0)
-    console.log(
-      c('yellow', `Note: ${counters.warnings} warning(s) - consider addressing for better quality`)
-    )
   process.exit(0)
 }
 

@@ -6,6 +6,7 @@ import {
   mergeTigerLocale,
   normalizeChartPadding,
   getOrgChartNodeAriaLabel,
+  resolveLinkHref,
   getOrgChartNodeClasses,
   orgChartLinkClasses,
   orgChartNodeLabelClasses,
@@ -139,7 +140,8 @@ export function OrgChart({
             {layout.nodes.map((node) => {
               const selected = resolvedSelectedId === node.id
               const interactive = canClick && !node.node.disabled
-              const textStart = showAvatars && node.node.avatar ? 58 : 16
+              const avatarHref = showAvatars ? resolveLinkHref(node.node.avatar) : undefined
+              const textStart = avatarHref ? 58 : 16
               return (
                 <g
                   key={node.id}
@@ -173,9 +175,9 @@ export function OrgChart({
                     strokeWidth={selected ? 2 : 1}
                   />
                   <rect width={4} height={node.height} rx={2} fill={node.color} />
-                  {showAvatars && node.node.avatar ? (
+                  {avatarHref ? (
                     <image
-                      href={node.node.avatar}
+                      href={avatarHref}
                       x={16}
                       y={16}
                       width={32}

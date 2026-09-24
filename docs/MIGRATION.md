@@ -2,9 +2,15 @@
 
 本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
+3.0 进行中，见 [MIGRATION-3.0.md](MIGRATION-3.0.md)。
+
 ## 未发布
 
 本轮已收入 **v2.9.0**。Breaking map 见下方。不是 BPMN。无 `file:` 双轨。
+
+## v2.9.4
+
+无 API 变化。2.9.3 的 tarball 不可安装，2.9.4 重发同一内容。
 
 ## v2.9.0
 

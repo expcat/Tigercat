@@ -8,6 +8,7 @@ import {
   mergeTigerLocale,
   normalizeChartPadding,
   getOrgChartNodeAriaLabel,
+  resolveLinkHref,
   getOrgChartNodeClasses,
   orgChartLinkClasses,
   orgChartNodeLabelClasses,
@@ -125,7 +126,6 @@ export const OrgChart = defineComponent({
         if (props.selectedId === undefined) innerSelectedId.value = nextId
         emit('update:selectedId', nextId)
       }
-      props.onNodeClick?.(node.node)
       emit('node-click', node.node)
     }
 
@@ -191,7 +191,10 @@ export const OrgChart = defineComponent({
                             props.selectable ||
                             typeof props.onNodeClick === 'function') &&
                           !node.node.disabled
-                        const textStart = props.showAvatars && node.node.avatar ? 58 : 16
+                        const avatarHref = props.showAvatars
+                          ? resolveLinkHref(node.node.avatar)
+                          : undefined
+                        const textStart = avatarHref ? 58 : 16
                         return h(
                           'g',
                           {
@@ -222,9 +225,9 @@ export const OrgChart = defineComponent({
                               strokeWidth: selected ? 2 : 1
                             }),
                             h('rect', { width: 4, height: node.height, rx: 2, fill: node.color }),
-                            props.showAvatars && node.node.avatar
+                            avatarHref
                               ? h('image', {
-                                  href: node.node.avatar,
+                                  href: avatarHref,
                                   x: 16,
                                   y: 16,
                                   width: 32,

@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process'
+import { execFileSync, execSync } from 'node:child_process'
 import { logError } from './logger'
 
 export interface RunCommandOptions {
@@ -20,6 +20,20 @@ export interface RunCommandOptions {
 export function runCommand(command: string, options: RunCommandOptions = {}): void {
   try {
     execSync(command, { cwd: options.cwd, stdio: 'inherit' })
+  } catch (error) {
+    if (options.allowFailure) return
+    if (options.failureMessage !== undefined) {
+      logError(options.failureMessage)
+      process.exit(1)
+    }
+    throw error
+  }
+}
+
+/** Run a command from an argument array so user text is not a shell string. */
+export function runArgv(file: string, args: string[], options: RunCommandOptions = {}): void {
+  try {
+    execFileSync(file, args, { cwd: options.cwd, stdio: 'inherit' })
   } catch (error) {
     if (options.allowFailure) return
     if (options.failureMessage !== undefined) {

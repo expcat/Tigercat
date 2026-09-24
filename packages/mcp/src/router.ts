@@ -11,7 +11,12 @@ import type {
   TigercatFramework,
   TopicRoute
 } from './types'
-import { createReferencePointer, normalizeName, readReferenceSource } from './skill-index'
+import {
+  clampResultLimit,
+  createReferencePointer,
+  normalizeName,
+  readReferenceSource
+} from './skill-index'
 
 interface RouteTaskInput {
   task: string
@@ -32,6 +37,9 @@ interface SearchInput {
   limit?: number
 }
 
+const MAX_ROUTE_COMPONENTS = 8
+const MAX_ROUTE_TOPICS = 8
+
 const SKILL_INDEX = 'skills/tigercat/SKILL.md'
 const SHARED_PATTERNS = 'skills/tigercat/references/shared/patterns/common.md'
 const SHARED_GLOSSARY = 'skills/tigercat/references/shared/glossary.md'
@@ -47,7 +55,7 @@ export async function searchTigercat(
   return {
     query,
     framework: input.framework,
-    results: findSearchResults(index, query, input.limit)
+    results: findSearchResults(index, query, clampResultLimit(input.limit))
   }
 }
 
@@ -109,8 +117,8 @@ export async function routeTigercatTask(
   const task = input.task?.trim()
   if (!task) throw new Error('tigercat_route requires a non-empty task')
 
-  const mentionedComponents = findMentionedComponents(index, task)
-  const topicMatches = findTopicMatches(index, task)
+  const mentionedComponents = findMentionedComponents(index, task).slice(0, MAX_ROUTE_COMPONENTS)
+  const topicMatches = findTopicMatches(index, task).slice(0, MAX_ROUTE_TOPICS)
   const matches = await Promise.all(
     mentionedComponents.map((entry) =>
       createComponentRoute(index, entry, input.framework, input.maxBytes)
@@ -149,7 +157,7 @@ export async function routeTigercatTask(
     intent: 'unknown',
     matches: [],
     topics: [],
-    candidates: findSearchResults(index, task, input.limit),
+    candidates: findSearchResults(index, task, clampResultLimit(input.limit)),
     sources: [
       await readReferenceSource(
         index,
@@ -545,6 +553,14 @@ function stripText(source: ReferenceSource): ReferenceSource {
 
 function keywordMatches(task: string, normalizedTask: string, keyword: string): boolean {
   const normalizedKeyword = normalizeName(keyword)
-  if (normalizedKeyword) return normalizedTask.includes(normalizedKeyword)
-  return task.toLowerCase().includes(keyword.toLowerCase())
+  if (!normalizedKeyword) return false
+  if (/^[a-z0-9]+$/.test(normalizedKeyword)) {
+    return new RegExp(`(^|[^a-z0-9])${escapeRegExp(normalizedKeyword)}([^a-z0-9]|$)`, 'i').test(task)
+  }
+  if (normalizedKeyword.length < 2) return false
+  return normalizedTask.includes(normalizedKeyword)
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }

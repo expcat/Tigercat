@@ -55,7 +55,7 @@ const requiredSizeLimitEntries = [
   ['React Masonry subpath', 'packages/react/dist/components/Masonry.mjs'],
   ['Vue AspectRatio subpath', 'packages/vue/dist/components/AspectRatio.mjs'],
   ['React AspectRatio subpath', 'packages/react/dist/components/AspectRatio.mjs'],
-  ['Core tailwind/modern subpath', 'packages/core/dist/tailwind/modern.js'],
+  ['Core tailwind subpath', 'packages/core/dist/tailwind.js'],
   ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js'],
   ['Core icons (common) subpath', 'packages/core/dist/icons/common.js']
 ]
@@ -84,17 +84,13 @@ function checkPackageVersions(packages) {
   return [...versions][0]
 }
 
-function checkSourceVersions(expectedVersion) {
+function checkSourceVersions() {
   for (const path of Object.values(sourceVersionFiles)) {
     const content = readText(path)
-    const match = content.match(/export const version = ['"]([^'"]+)['"]/)
-    check(match, `${path} must export a version constant`)
-    if (match) {
-      check(
-        match[1] === expectedVersion,
-        `${path} exports version ${match[1]}, expected ${expectedVersion}; run pnpm sync:version`
-      )
-    }
+    check(
+      !/export const version = ['"]/.test(content),
+      `${path} must not export a version constant; version lives in package.json`
+    )
   }
 }
 
@@ -115,7 +111,13 @@ function checkPackageExports(packages) {
       `@expcat/tigercat-${packageName} must use explicit component subpath exports`
     )
 
-    const expectedExports = buildFrameworkPackageExports(publicComponents[packageName], packageName)
+    const indexFile =
+      packageName === 'react' ? 'packages/react/src/index.tsx' : 'packages/vue/src/index.ts'
+    const expectedExports = buildFrameworkPackageExports(
+      publicComponents[packageName],
+      packageName,
+      readText(indexFile)
+    )
     const actualKeys = new Set(Object.keys(packageExports))
     const expectedKeys = new Set(Object.keys(expectedExports))
 
@@ -284,6 +286,22 @@ function checkPublishWorkflows() {
     '.github/workflows/publish.yml must not run pnpm quality:release; run the release gate locally before publishing'
   )
   check(
+    !manualPublishWorkflow.includes('--no-git-checks'),
+    '.github/workflows/publish.yml must not publish with --no-git-checks'
+  )
+  check(
+    !tagPublishWorkflow.includes('--no-git-checks'),
+    '.github/workflows/publish-on-tag.yml must not publish with --no-git-checks'
+  )
+  check(
+    !tagPublishWorkflow.includes('continue-on-error'),
+    '.github/workflows/publish-on-tag.yml must fail when an artifact download fails'
+  )
+  check(
+    !tagPublishWorkflow.includes('${{ inputs.tag }}'),
+    '.github/workflows/publish-on-tag.yml must not interpolate a tag into the shell script'
+  )
+  check(
     !/(^|\n)\s+(push|pull_request|schedule|workflow_run):/.test(manualPublishWorkflow),
     '.github/workflows/publish.yml must stay workflow_dispatch-only'
   )
@@ -365,12 +383,12 @@ function checkReleaseDocs(expectedVersion) {
   if (existsSync(join(root, cliConstantsPath))) {
     const cliConstants = readText(cliConstantsPath)
     check(
-      cliConstants.includes(`CLI_VERSION = '${expectedVersion}'`),
-      `${cliConstantsPath} must keep CLI_VERSION aligned with v${expectedVersion}`
+      cliConstants.includes('readCliPackageVersion'),
+      `${cliConstantsPath} must read CLI_VERSION from package.json`
     )
     check(
-      cliConstants.includes(`tigercat: '^${expectedVersion}'`),
-      `${cliConstantsPath} must keep TEMPLATE_VERSIONS.tigercat aligned with v${expectedVersion}`
+      cliConstants.includes('tigercat: `^${CLI_VERSION}`'),
+      `${cliConstantsPath} must pin template tigercat packages to CLI_VERSION`
     )
   }
 
@@ -400,7 +418,7 @@ const packages = Object.fromEntries(
 )
 const expectedVersion = checkPackageVersions(packages)
 
-checkSourceVersions(expectedVersion)
+checkSourceVersions()
 checkPackageExports(packages)
 checkFrameworkSideEffects(packages)
 checkEsmOnlyPackageSurface(packages)

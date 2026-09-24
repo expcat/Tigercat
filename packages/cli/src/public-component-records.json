@@ -1,0 +1,887 @@
+[
+  {
+    "component": "CodeEditor",
+    "testGroup": "advanced",
+    "packageSubpath": "./CodeEditor"
+  },
+  {
+    "component": "Drag",
+    "testGroup": "advanced",
+    "packageSubpath": "./Drag"
+  },
+  {
+    "component": "FileManager",
+    "testGroup": "advanced",
+    "packageSubpath": "./FileManager"
+  },
+  {
+    "component": "ImageAnnotation",
+    "testGroup": "advanced",
+    "packageSubpath": "./ImageAnnotation"
+  },
+  {
+    "component": "InfiniteScroll",
+    "testGroup": "advanced",
+    "packageSubpath": "./InfiniteScroll"
+  },
+  {
+    "component": "MarkdownEditor",
+    "testGroup": "advanced",
+    "packageSubpath": "./MarkdownEditor"
+  },
+  {
+    "component": "PrintLayout",
+    "testGroup": "advanced",
+    "packageSubpath": "./PrintLayout"
+  },
+  {
+    "component": "PrintPageBreak",
+    "testGroup": "advanced",
+    "packageSubpath": "./PrintPageBreak"
+  },
+  {
+    "component": "RichTextEditor",
+    "testGroup": "advanced",
+    "packageSubpath": "./RichTextEditor"
+  },
+  {
+    "component": "VirtualList",
+    "testGroup": "advanced",
+    "packageSubpath": "./VirtualList"
+  },
+  {
+    "component": "VirtualTable",
+    "testGroup": "advanced",
+    "packageSubpath": "./VirtualTable"
+  },
+  {
+    "component": "Avatar",
+    "testGroup": "basic",
+    "packageSubpath": "./Avatar"
+  },
+  {
+    "component": "AvatarGroup",
+    "testGroup": "basic",
+    "packageSubpath": "./AvatarGroup"
+  },
+  {
+    "component": "Badge",
+    "testGroup": "basic",
+    "packageSubpath": "./Badge"
+  },
+  {
+    "component": "Button",
+    "testGroup": "basic",
+    "packageSubpath": "./Button"
+  },
+  {
+    "component": "ButtonGroup",
+    "testGroup": "basic",
+    "packageSubpath": "./ButtonGroup"
+  },
+  {
+    "component": "Code",
+    "testGroup": "basic",
+    "packageSubpath": "./Code"
+  },
+  {
+    "component": "ConfigProvider",
+    "testGroup": "basic",
+    "packageSubpath": "./ConfigProvider"
+  },
+  {
+    "component": "CropUpload",
+    "testGroup": "basic",
+    "packageSubpath": "./CropUpload"
+  },
+  {
+    "component": "Divider",
+    "testGroup": "basic",
+    "packageSubpath": "./Divider"
+  },
+  {
+    "component": "Empty",
+    "testGroup": "basic",
+    "packageSubpath": "./Empty"
+  },
+  {
+    "component": "Highlight",
+    "testGroup": "basic",
+    "packageSubpath": "./Highlight"
+  },
+  {
+    "component": "Icon",
+    "testGroup": "basic",
+    "packageSubpath": "./Icon"
+  },
+  {
+    "component": "Image",
+    "testGroup": "basic",
+    "packageSubpath": "./Image"
+  },
+  {
+    "component": "ImageCompare",
+    "testGroup": "basic",
+    "packageSubpath": "./ImageCompare"
+  },
+  {
+    "component": "ImageCropper",
+    "testGroup": "basic",
+    "packageSubpath": "./ImageCropper"
+  },
+  {
+    "component": "ImageGroup",
+    "testGroup": "basic",
+    "packageSubpath": "./ImageGroup"
+  },
+  {
+    "component": "ImagePreview",
+    "testGroup": "basic",
+    "packageSubpath": "./ImagePreview"
+  },
+  {
+    "component": "Kbd",
+    "testGroup": "basic",
+    "packageSubpath": "./Kbd"
+  },
+  {
+    "component": "Link",
+    "testGroup": "basic",
+    "packageSubpath": "./Link"
+  },
+  {
+    "component": "Marquee",
+    "testGroup": "basic",
+    "packageSubpath": "./Marquee"
+  },
+  {
+    "component": "QRCode",
+    "testGroup": "basic",
+    "packageSubpath": "./QRCode"
+  },
+  {
+    "component": "Rate",
+    "testGroup": "basic",
+    "packageSubpath": "./Rate"
+  },
+  {
+    "component": "Result",
+    "testGroup": "basic",
+    "packageSubpath": "./Result"
+  },
+  {
+    "component": "Segmented",
+    "testGroup": "basic",
+    "packageSubpath": "./Segmented"
+  },
+  {
+    "component": "SplitButton",
+    "testGroup": "basic",
+    "packageSubpath": "./SplitButton"
+  },
+  {
+    "component": "Statistic",
+    "testGroup": "basic",
+    "packageSubpath": "./Statistic"
+  },
+  {
+    "component": "Tag",
+    "testGroup": "basic",
+    "packageSubpath": "./Tag"
+  },
+  {
+    "component": "Text",
+    "testGroup": "basic",
+    "packageSubpath": "./Text"
+  },
+  {
+    "component": "Watermark",
+    "testGroup": "basic",
+    "packageSubpath": "./Watermark"
+  },
+  {
+    "component": "AreaChart",
+    "testGroup": "charts",
+    "packageSubpath": "./AreaChart"
+  },
+  {
+    "component": "BarChart",
+    "testGroup": "charts",
+    "packageSubpath": "./BarChart"
+  },
+  {
+    "component": "ChartAxis",
+    "testGroup": "charts",
+    "packageSubpath": "./ChartAxis"
+  },
+  {
+    "component": "ChartCanvas",
+    "testGroup": "charts",
+    "packageSubpath": "./ChartCanvas"
+  },
+  {
+    "component": "ChartGrid",
+    "testGroup": "charts",
+    "packageSubpath": "./ChartGrid"
+  },
+  {
+    "component": "ChartLegend",
+    "testGroup": "charts",
+    "packageSubpath": "./ChartLegend"
+  },
+  {
+    "component": "ChartSeries",
+    "testGroup": "charts",
+    "packageSubpath": "./ChartSeries"
+  },
+  {
+    "component": "ChartTooltip",
+    "testGroup": "charts",
+    "packageSubpath": "./ChartTooltip"
+  },
+  {
+    "component": "FunnelChart",
+    "testGroup": "charts",
+    "packageSubpath": "./FunnelChart"
+  },
+  {
+    "component": "Gantt",
+    "testGroup": "charts",
+    "packageSubpath": "./Gantt"
+  },
+  {
+    "component": "GaugeChart",
+    "testGroup": "charts",
+    "packageSubpath": "./GaugeChart"
+  },
+  {
+    "component": "HeatmapChart",
+    "testGroup": "charts",
+    "packageSubpath": "./HeatmapChart"
+  },
+  {
+    "component": "LineChart",
+    "testGroup": "charts",
+    "packageSubpath": "./LineChart"
+  },
+  {
+    "component": "OrgChart",
+    "testGroup": "charts",
+    "packageSubpath": "./OrgChart"
+  },
+  {
+    "component": "PieChart",
+    "testGroup": "charts",
+    "packageSubpath": "./PieChart"
+  },
+  {
+    "component": "RadarChart",
+    "testGroup": "charts",
+    "packageSubpath": "./RadarChart"
+  },
+  {
+    "component": "ScatterChart",
+    "testGroup": "charts",
+    "packageSubpath": "./ScatterChart"
+  },
+  {
+    "component": "SunburstChart",
+    "testGroup": "charts",
+    "packageSubpath": "./SunburstChart"
+  },
+  {
+    "component": "TreeMapChart",
+    "testGroup": "charts",
+    "packageSubpath": "./TreeMapChart"
+  },
+  {
+    "component": "ActivityFeed",
+    "testGroup": "composite",
+    "packageSubpath": "./ActivityFeed"
+  },
+  {
+    "component": "ChatWindow",
+    "testGroup": "composite",
+    "packageSubpath": "./ChatWindow"
+  },
+  {
+    "component": "CommentThread",
+    "testGroup": "composite",
+    "packageSubpath": "./CommentThread"
+  },
+  {
+    "component": "DataTableWithToolbar",
+    "testGroup": "composite",
+    "packageSubpath": "./DataTableWithToolbar"
+  },
+  {
+    "component": "FormWizard",
+    "testGroup": "composite",
+    "packageSubpath": "./FormWizard"
+  },
+  {
+    "component": "NotificationCenter",
+    "testGroup": "composite",
+    "packageSubpath": "./NotificationCenter"
+  },
+  {
+    "component": "SchemaForm",
+    "testGroup": "composite",
+    "packageSubpath": "./SchemaForm"
+  },
+  {
+    "component": "TaskBoard",
+    "testGroup": "composite",
+    "packageSubpath": "./TaskBoard"
+  },
+  {
+    "component": "WorkflowActionBar",
+    "testGroup": "composite",
+    "packageSubpath": "./WorkflowActionBar"
+  },
+  {
+    "component": "WorkflowDesigner",
+    "testGroup": "composite",
+    "packageSubpath": "./WorkflowDesigner"
+  },
+  {
+    "component": "WorkflowDetailShell",
+    "testGroup": "composite",
+    "packageSubpath": "./WorkflowDetailShell"
+  },
+  {
+    "component": "WorkflowTimeline",
+    "testGroup": "composite",
+    "packageSubpath": "./WorkflowTimeline"
+  },
+  {
+    "component": "WorkflowViewer",
+    "testGroup": "composite",
+    "packageSubpath": "./WorkflowViewer"
+  },
+  {
+    "component": "Calendar",
+    "testGroup": "data",
+    "packageSubpath": "./Calendar"
+  },
+  {
+    "component": "Collapse",
+    "testGroup": "data",
+    "packageSubpath": "./Collapse"
+  },
+  {
+    "component": "CollapsePanel",
+    "testGroup": "data",
+    "packageSubpath": "./CollapsePanel"
+  },
+  {
+    "component": "Countdown",
+    "testGroup": "data",
+    "packageSubpath": "./Countdown"
+  },
+  {
+    "component": "DataExport",
+    "testGroup": "data",
+    "packageSubpath": "./DataExport"
+  },
+  {
+    "component": "Table",
+    "testGroup": "data",
+    "packageSubpath": "./Table"
+  },
+  {
+    "component": "Timeline",
+    "testGroup": "data",
+    "packageSubpath": "./Timeline"
+  },
+  {
+    "component": "Alert",
+    "testGroup": "feedback",
+    "packageSubpath": "./Alert"
+  },
+  {
+    "component": "Drawer",
+    "testGroup": "feedback",
+    "packageSubpath": "./Drawer"
+  },
+  {
+    "component": "Loading",
+    "testGroup": "feedback",
+    "packageSubpath": "./Loading"
+  },
+  {
+    "component": "LoadingBar",
+    "testGroup": "feedback",
+    "packageSubpath": "./LoadingBar"
+  },
+  {
+    "component": "LoadingBarContainer",
+    "testGroup": "feedback",
+    "packageSubpath": "./LoadingBarContainer"
+  },
+  {
+    "component": "Message",
+    "testGroup": "feedback",
+    "packageSubpath": "./Message"
+  },
+  {
+    "component": "MessageContainer",
+    "testGroup": "feedback",
+    "packageSubpath": "./MessageContainer"
+  },
+  {
+    "component": "Modal",
+    "testGroup": "feedback",
+    "packageSubpath": "./Modal"
+  },
+  {
+    "component": "NotificationContainer",
+    "testGroup": "feedback",
+    "packageSubpath": "./NotificationContainer"
+  },
+  {
+    "component": "Popconfirm",
+    "testGroup": "feedback",
+    "packageSubpath": "./Popconfirm"
+  },
+  {
+    "component": "Popover",
+    "testGroup": "feedback",
+    "packageSubpath": "./Popover"
+  },
+  {
+    "component": "Progress",
+    "testGroup": "feedback",
+    "packageSubpath": "./Progress"
+  },
+  {
+    "component": "Tooltip",
+    "testGroup": "feedback",
+    "packageSubpath": "./Tooltip"
+  },
+  {
+    "component": "Tour",
+    "testGroup": "feedback",
+    "packageSubpath": "./Tour"
+  },
+  {
+    "component": "AutoComplete",
+    "testGroup": "form",
+    "packageSubpath": "./AutoComplete"
+  },
+  {
+    "component": "Cascader",
+    "testGroup": "form",
+    "packageSubpath": "./Cascader"
+  },
+  {
+    "component": "Checkbox",
+    "testGroup": "form",
+    "packageSubpath": "./Checkbox"
+  },
+  {
+    "component": "CheckboxGroup",
+    "testGroup": "form",
+    "packageSubpath": "./CheckboxGroup"
+  },
+  {
+    "component": "ColorPicker",
+    "testGroup": "form",
+    "packageSubpath": "./ColorPicker"
+  },
+  {
+    "component": "ColorSwatch",
+    "testGroup": "form",
+    "packageSubpath": "./ColorSwatch"
+  },
+  {
+    "component": "CronEditor",
+    "testGroup": "form",
+    "packageSubpath": "./CronEditor"
+  },
+  {
+    "component": "DatePicker",
+    "testGroup": "form",
+    "packageSubpath": "./DatePicker"
+  },
+  {
+    "component": "Form",
+    "testGroup": "form",
+    "packageSubpath": "./Form"
+  },
+  {
+    "component": "FormItem",
+    "testGroup": "form",
+    "packageSubpath": "./FormItem"
+  },
+  {
+    "component": "Input",
+    "testGroup": "form",
+    "packageSubpath": "./Input"
+  },
+  {
+    "component": "InputGroup",
+    "testGroup": "form",
+    "packageSubpath": "./InputGroup"
+  },
+  {
+    "component": "InputGroupAddon",
+    "testGroup": "form",
+    "packageSubpath": "./InputGroupAddon"
+  },
+  {
+    "component": "InputNumber",
+    "testGroup": "form",
+    "packageSubpath": "./InputNumber"
+  },
+  {
+    "component": "InputOTP",
+    "testGroup": "form",
+    "packageSubpath": "./InputOTP"
+  },
+  {
+    "component": "MaskInput",
+    "testGroup": "form",
+    "packageSubpath": "./MaskInput"
+  },
+  {
+    "component": "Mentions",
+    "testGroup": "form",
+    "packageSubpath": "./Mentions"
+  },
+  {
+    "component": "NumberKeyboard",
+    "testGroup": "form",
+    "packageSubpath": "./NumberKeyboard"
+  },
+  {
+    "component": "Radio",
+    "testGroup": "form",
+    "packageSubpath": "./Radio"
+  },
+  {
+    "component": "RadioGroup",
+    "testGroup": "form",
+    "packageSubpath": "./RadioGroup"
+  },
+  {
+    "component": "Select",
+    "testGroup": "form",
+    "packageSubpath": "./Select"
+  },
+  {
+    "component": "Signature",
+    "testGroup": "form",
+    "packageSubpath": "./Signature"
+  },
+  {
+    "component": "Slider",
+    "testGroup": "form",
+    "packageSubpath": "./Slider"
+  },
+  {
+    "component": "Switch",
+    "testGroup": "form",
+    "packageSubpath": "./Switch"
+  },
+  {
+    "component": "TagsInput",
+    "testGroup": "form",
+    "packageSubpath": "./TagsInput"
+  },
+  {
+    "component": "Textarea",
+    "testGroup": "form",
+    "packageSubpath": "./Textarea"
+  },
+  {
+    "component": "TimePicker",
+    "testGroup": "form",
+    "packageSubpath": "./TimePicker"
+  },
+  {
+    "component": "Transfer",
+    "testGroup": "form",
+    "packageSubpath": "./Transfer"
+  },
+  {
+    "component": "TreeSelect",
+    "testGroup": "form",
+    "packageSubpath": "./TreeSelect"
+  },
+  {
+    "component": "Upload",
+    "testGroup": "form",
+    "packageSubpath": "./Upload"
+  },
+  {
+    "component": "AspectRatio",
+    "testGroup": "layout",
+    "packageSubpath": "./AspectRatio"
+  },
+  {
+    "component": "Card",
+    "testGroup": "layout",
+    "packageSubpath": "./Card"
+  },
+  {
+    "component": "Carousel",
+    "testGroup": "layout",
+    "packageSubpath": "./Carousel"
+  },
+  {
+    "component": "Col",
+    "testGroup": "layout",
+    "packageSubpath": "./Col"
+  },
+  {
+    "component": "Container",
+    "testGroup": "layout",
+    "packageSubpath": "./Container"
+  },
+  {
+    "component": "Content",
+    "testGroup": "layout",
+    "packageSubpath": "./Content"
+  },
+  {
+    "component": "Descriptions",
+    "testGroup": "layout",
+    "packageSubpath": "./Descriptions"
+  },
+  {
+    "component": "Footer",
+    "testGroup": "layout",
+    "packageSubpath": "./Footer"
+  },
+  {
+    "component": "Header",
+    "testGroup": "layout",
+    "packageSubpath": "./Header"
+  },
+  {
+    "component": "Layout",
+    "testGroup": "layout",
+    "packageSubpath": "./Layout"
+  },
+  {
+    "component": "List",
+    "testGroup": "layout",
+    "packageSubpath": "./List"
+  },
+  {
+    "component": "Masonry",
+    "testGroup": "layout",
+    "packageSubpath": "./Masonry"
+  },
+  {
+    "component": "Resizable",
+    "testGroup": "layout",
+    "packageSubpath": "./Resizable"
+  },
+  {
+    "component": "Row",
+    "testGroup": "layout",
+    "packageSubpath": "./Row"
+  },
+  {
+    "component": "ScrollArea",
+    "testGroup": "layout",
+    "packageSubpath": "./ScrollArea"
+  },
+  {
+    "component": "Sidebar",
+    "testGroup": "layout",
+    "packageSubpath": "./Sidebar"
+  },
+  {
+    "component": "Skeleton",
+    "testGroup": "layout",
+    "packageSubpath": "./Skeleton"
+  },
+  {
+    "component": "Space",
+    "testGroup": "layout",
+    "packageSubpath": "./Space"
+  },
+  {
+    "component": "Splitter",
+    "testGroup": "layout",
+    "packageSubpath": "./Splitter"
+  },
+  {
+    "component": "Affix",
+    "testGroup": "navigation",
+    "packageSubpath": "./Affix"
+  },
+  {
+    "component": "Anchor",
+    "testGroup": "navigation",
+    "packageSubpath": "./Anchor"
+  },
+  {
+    "component": "AnchorLink",
+    "testGroup": "navigation",
+    "packageSubpath": "./AnchorLink"
+  },
+  {
+    "component": "BackTop",
+    "testGroup": "navigation",
+    "packageSubpath": "./BackTop"
+  },
+  {
+    "component": "Breadcrumb",
+    "testGroup": "navigation",
+    "packageSubpath": "./Breadcrumb"
+  },
+  {
+    "component": "BreadcrumbItem",
+    "testGroup": "navigation",
+    "packageSubpath": "./BreadcrumbItem"
+  },
+  {
+    "component": "ContextMenu",
+    "testGroup": "navigation",
+    "packageSubpath": "./ContextMenu"
+  },
+  {
+    "component": "ContextMenuItem",
+    "testGroup": "navigation",
+    "packageSubpath": "./ContextMenuItem"
+  },
+  {
+    "component": "ContextMenuMenu",
+    "testGroup": "navigation",
+    "packageSubpath": "./ContextMenuMenu"
+  },
+  {
+    "component": "ContextMenuSub",
+    "testGroup": "navigation",
+    "packageSubpath": "./ContextMenuSub"
+  },
+  {
+    "component": "Dropdown",
+    "testGroup": "navigation",
+    "packageSubpath": "./Dropdown"
+  },
+  {
+    "component": "DropdownItem",
+    "testGroup": "navigation",
+    "packageSubpath": "./DropdownItem"
+  },
+  {
+    "component": "DropdownMenu",
+    "testGroup": "navigation",
+    "packageSubpath": "./DropdownMenu"
+  },
+  {
+    "component": "FloatButton",
+    "testGroup": "navigation",
+    "packageSubpath": "./FloatButton"
+  },
+  {
+    "component": "FloatButtonGroup",
+    "testGroup": "navigation",
+    "packageSubpath": "./FloatButtonGroup"
+  },
+  {
+    "component": "FullscreenButton",
+    "testGroup": "navigation",
+    "packageSubpath": "./FullscreenButton"
+  },
+  {
+    "component": "Menu",
+    "testGroup": "navigation",
+    "packageSubpath": "./Menu"
+  },
+  {
+    "component": "MenuItem",
+    "testGroup": "navigation",
+    "packageSubpath": "./MenuItem"
+  },
+  {
+    "component": "MenuItemGroup",
+    "testGroup": "navigation",
+    "packageSubpath": "./MenuItemGroup"
+  },
+  {
+    "component": "NavigationMenu",
+    "testGroup": "navigation",
+    "packageSubpath": "./NavigationMenu"
+  },
+  {
+    "component": "NavigationMenuContent",
+    "testGroup": "navigation",
+    "packageSubpath": "./NavigationMenuContent"
+  },
+  {
+    "component": "NavigationMenuItem",
+    "testGroup": "navigation",
+    "packageSubpath": "./NavigationMenuItem"
+  },
+  {
+    "component": "NavigationMenuLink",
+    "testGroup": "navigation",
+    "packageSubpath": "./NavigationMenuLink"
+  },
+  {
+    "component": "NavigationMenuList",
+    "testGroup": "navigation",
+    "packageSubpath": "./NavigationMenuList"
+  },
+  {
+    "component": "NavigationMenuTrigger",
+    "testGroup": "navigation",
+    "packageSubpath": "./NavigationMenuTrigger"
+  },
+  {
+    "component": "PageHeader",
+    "testGroup": "navigation",
+    "packageSubpath": "./PageHeader"
+  },
+  {
+    "component": "Pagination",
+    "testGroup": "navigation",
+    "packageSubpath": "./Pagination"
+  },
+  {
+    "component": "ScrollSpy",
+    "testGroup": "navigation",
+    "packageSubpath": "./ScrollSpy"
+  },
+  {
+    "component": "Spotlight",
+    "testGroup": "navigation",
+    "packageSubpath": "./Spotlight"
+  },
+  {
+    "component": "Steps",
+    "testGroup": "navigation",
+    "packageSubpath": "./Steps"
+  },
+  {
+    "component": "StepsItem",
+    "testGroup": "navigation",
+    "packageSubpath": "./StepsItem"
+  },
+  {
+    "component": "SubMenu",
+    "testGroup": "navigation",
+    "packageSubpath": "./SubMenu"
+  },
+  {
+    "component": "TabPane",
+    "testGroup": "navigation",
+    "packageSubpath": "./TabPane"
+  },
+  {
+    "component": "Tabs",
+    "testGroup": "navigation",
+    "packageSubpath": "./Tabs"
+  },
+  {
+    "component": "Tree",
+    "testGroup": "navigation",
+    "packageSubpath": "./Tree"
+  }
+]

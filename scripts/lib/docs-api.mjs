@@ -166,7 +166,7 @@ export const COMPONENT_PROP_PRIORITY = {
     'virtual?'
   ],
   ScrollArea: ['maxHeight?', 'height?', 'shadow?', 'ariaLabel?', 'direction?', 'scrollbar?'],
-  Masonry: ['columns?', 'gap?', 'columnClassName?', 'itemClassName?'],
+  Masonry: ['columns?', 'gap?', 'layout?', 'itemClassName?'],
   PrintLayout: [
     'pageSize?',
     'orientation?',
@@ -363,7 +363,6 @@ export const COMPONENT_PROP_PRIORITY = {
   RadioGroup: ['value?', 'defaultValue?', 'name?', 'disabled?', 'size?', 'direction?'],
   Switch: ['checked?', 'defaultChecked?', 'disabled?', 'size?'],
   Slider: ['value?', 'defaultValue?', 'min?', 'max?', 'step?', 'range?', 'marks?', 'disabled?'],
-  Stepper: ['value?', 'defaultValue?', 'min?', 'max?', 'step?', 'disabled?', 'size?', 'precision?'],
   Select: [
     'options?',
     'value?',
@@ -452,7 +451,7 @@ export const COMPONENT_PROP_PRIORITY = {
     'value?',
     'defaultValue?',
     'exportType?',
-    'readonly?',
+    'readOnly?',
     'clearable?',
     'disabled?',
     'penColor?',
@@ -468,7 +467,7 @@ export const COMPONENT_PROP_PRIORITY = {
     'precision?',
     'showConfirm?',
     'disabled?',
-    'readonly?'
+    'readOnly?'
   ],
   Mentions: ['options?', 'value?', 'prefix?', 'filterOption?', 'open?', 'disabled?', 'loading?'],
   MaskInput: ['mask', 'value?', 'tokens?', 'clearable?', 'disabled?', 'name?'],
@@ -482,9 +481,11 @@ export const COMPONENT_PROP_PRIORITY = {
     'action?',
     'autoUpload?',
     'disabled?',
-    'maxSize?'
+    'maxSize?',
+    'fileFieldName?',
+    'readOnly?'
   ],
-  Transfer: ['dataSource?', 'value?', 'targetKeys?', 'searchable?', 'disabled?'],
+  Transfer: ['dataSource?', 'value?', 'defaultValue?', 'searchable?', 'disabled?', 'readOnly?'],
   CropUpload: ['accept?', 'maxSize?', 'cropperProps?', 'onCropComplete?', 'disabled?'],
   VirtualList: [
     'itemCount?',
@@ -517,7 +518,7 @@ export const COMPONENT_PROP_PRIORITY = {
     'disabled?',
     'ariaLabel?'
   ],
-  CronEditor: ['value?', 'defaultValue?', 'presets?', 'disabled?', 'readonly?', 'size?', 'locale?'],
+  CronEditor: ['value?', 'defaultValue?', 'presets?', 'disabled?', 'readOnly?', 'size?', 'locale?'],
   TreeSelect: [
     'treeData?',
     'value?',
@@ -525,9 +526,11 @@ export const COMPONENT_PROP_PRIORITY = {
     'multiple?',
     'searchable?',
     'clearable?',
-    'virtual?',
+    'listHeight?',
     'defaultExpandAll?',
-    'open?'
+    'open?',
+    'readOnly?',
+    'checkStrategy?'
   ],
   Tree: [
     'treeData?',
@@ -993,7 +996,6 @@ export const REQUIRED_USAGE_SNIPPETS = {
     RadioGroup: '<RadioGroup v-model="value"><Radio value="a">A</Radio></RadioGroup>',
     Switch: '<Switch v-model="checked">Label</Switch>',
     Slider: '<Slider v-model="value" />',
-    Stepper: '<Stepper v-model="value" />',
     Select: '<Select v-model="value" :options="options" />',
     AutoComplete: '<AutoComplete v-model="value" :options="options" />',
     Cascader: '<Cascader v-model="value" :options="options" />',
@@ -1134,7 +1136,6 @@ export const REQUIRED_USAGE_SNIPPETS = {
       '<RadioGroup value={value} onChange={setValue}><Radio value="a">A</Radio></RadioGroup>',
     Switch: '<Switch checked={checked} onChange={setChecked}>Label</Switch>',
     Slider: '<Slider value={value} onChange={setValue} />',
-    Stepper: '<Stepper value={value} onChange={setValue} />',
     Select: '<Select value={value} options={options} onChange={(next) => setValue(next)} />',
     AutoComplete:
       '<AutoComplete value={value} options={options} onChange={(next) => setValue(next)} />',

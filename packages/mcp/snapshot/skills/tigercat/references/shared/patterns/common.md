@@ -1,0 +1,105 @@
+---
+name: tigercat-shared-patterns
+description: Common patterns and framework differences for Tigercat UI components
+---
+
+# Common Patterns
+
+框架共通模式与差异速查。术语表见 [glossary.md](../glossary.md)；组件定位先走 [component-index.md](../../component-index.md)。
+`Message` / `notification` / `LoadingBar` 是命令式 API，见 [command-apis.md](../../command-apis.md)。
+
+## State And Events
+
+| Vue                      | React                   | 示例                             |
+| ------------------------ | ----------------------- | -------------------------------- |
+| `v-model` / `modelValue` | `value` + `onChange`    | Input、Select、DatePicker        |
+| `v-model:open` / `open`  | `open` + `onOpenChange` | Modal、Drawer、Popover           |
+| `checked` / `modelValue` | `checked` / `value`     | Checkbox、Radio、Switch          |
+| `@event-name`            | `onEventName`           | `@close` -> `onClose`            |
+| `@update:*`              | `on*Change`             | `@update:open` -> `onOpenChange` |
+
+Use `open` for display state. Do not introduce new `visible` / `onVisibleChange` APIs.
+
+## Content And Styling
+
+| Need            | Vue                      | React                   |
+| --------------- | ------------------------ | ----------------------- |
+| Default content | default slot             | `children`              |
+| Named content   | named slot / scoped slot | node prop / render prop |
+| Class           | `class`                  | `className`             |
+| Native attrs    | undeclared attrs         | native props / `data-*` |
+| Style           | `style`                  | `style`                 |
+
+Root `class` / `className`, `style`, `data-*`, `aria-*`, `id`, and `title` are stable styling hooks and should pass through to the component root or equivalent native interaction element.
+
+## Compound Components
+
+Parent and child compound components live in the parent source file and are re-exported from the package entry. PascalCase package subpaths stay available through package exports.
+
+| Layer       | Convention                                                            |
+| ----------- | --------------------------------------------------------------------- |
+| Source file | `components/Steps.ts(x)` exports `Steps`, `StepsItem`, and types      |
+| Subpath     | `@expcat/tigercat-*/StepsItem` points to the parent output artifact   |
+| Internal    | Same-package imports use the parent file to avoid circular re-exports |
+
+Applies to `Steps` / `StepsItem`, `Breadcrumb` / `BreadcrumbItem`, `Tabs` / `TabPane`, `Anchor` / `AnchorLink`, and similar parent/child sets.
+
+## Floating And Overlay
+
+Tooltip, Popover, and Popconfirm share the floating-popup layer; Dropdown, Select, and combobox-style components follow the same open/trigger semantics.
+
+| Layer          | File                                 | Role                                    |
+| -------------- | ------------------------------------ | --------------------------------------- |
+| Core types     | `core/types/floating-popup.ts`       | shared props and trigger types          |
+| Core utils     | `core/utils/floating-popup-utils.ts` | ids and trigger handler maps            |
+| Vue composable | `vue/utils/use-popup.ts`             | binds refs and events to the core controller |
+| React hook     | `react/utils/use-popup.ts`           | binds refs and events to the core controller |
+
+Stable behavior:
+
+- Controlled and uncontrolled `open` modes.
+- Floating UI position state: `x`, `y`, `actualPlacement`, `floatingStyles`. Vue `placement` / `offset` are reactive after open.
+- Click-outside and Escape dismissal.
+- Trigger modes: `click`, `hover`, `focus`, `manual`. Dropdown defaults to `click`. Hover is co-joined with click (touch) and focus (keyboard). Popconfirm is click-only.
+- Overlay triggers are the focus node: `asChild` (or a unique native `button`/`a`) merges `ref`, click/keyboard, and `aria-haspopup` / `aria-expanded` / `aria-controls` / `data-state` onto that child. Otherwise the component renders `<button type="button">`. Do not put haspopup on a wrapping div.
+- Root trigger exposes `data-state="open" | "closed"` for CSS state styling.
+- Interactive triggers also expose `aria-expanded`. Tooltip writes `aria-describedby` on the focus node only while open.
+- Portal target chain: nearest `[data-tiger-overlay-host]` → `[data-tiger-config-root]` → `document.body`. Body portals wrap the same layer+host so nested overlays stay inside. The layer copies `dir` / `lang`.
+- Stacking: `OVERLAY_Z_INDEX` viewport (200) < overlay (1000) < modal/drawer/tour (1100) < fullscreen loading (1150) < message (1200) < loading-bar (1300).
+- Popup default placement `top` / offset `8`; pickers and dropdowns `bottom-start` / offset `4`.
+- Small-screen `fullscreen-sm` / `bottom-sheet-sm` switch to `fixed` and drop x/y via CSS.
+
+Custom trigger state is available through Vue `#trigger="{ open }"` slots and React render props such as Dropdown `renderTrigger={({ open }) => ...}`. Prefer these APIs over internal DOM selectors.
+
+## SSR And Runtime
+
+- Do not read `window`, `document`, `localStorage`, DOM size, or media queries at module top level.
+- Put client-only Vue work in `onMounted`; React work in `useEffect` or client components.
+- Portal / overlay: an open Modal, Drawer, Tour, or declarative message / notification container renders into the ConfigProvider outlet, which is in the server HTML. Imperative `Message` / `notification` do nothing on the server.
+
+## Framework deltas
+
+These are binding or seed differences, not two products. Compact Notes on each component stay the source of traps.
+
+| Topic                       | Vue                                                      | React                                                     |
+| --------------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
+| Field value                 | `v-model` / `modelValue`                                 | `value` / `checked` + `onChange`                          |
+| Input / Textarea `onChange` | emits the next string                                    | next string / number (not a DOM event)                    |
+| Form values                 | `v-model` / `modelValue`                                 | `value` + `onChange`                                      |
+| Overlay open                | `v-model:open`                                           | `open` + `onOpenChange`                                   |
+| Named content               | slots (`#header`, `#content`)                            | node / render props (`header`, `renderContent`)           |
+| Uncontrolled seed           | Input/Textarea and other fields accept `defaultValue`    | Input/Textarea already have `defaultValue`                |
+| Readonly spelling           | Rate/Signature/Mentions accept `readonly` and `readOnly` | same via `resolveReadOnlyFlag` (conflict uses `readonly`) |
+| Native `type` on Button     | attr `type`                                              | `htmlType` wins over `type`                               |
+| SchemaForm submit errors    | action Submit copies engine errors                       | native submit fills engine errors                         |
+| RichTextEditor FormItem     | seeds the engine from context                            | seeds the engine from FormItem when `value` is omitted    |
+| RichTextEditor `style`      | merges after height                                      | same merge on the height box                              |
+| SplitButton `type`          | lands on the primary                                     | `type` / `htmlType` land on the primary (`htmlType` wins) |
+
+Size **strings** are three families and are not interchangeable: Form/Rate `sm\|md\|lg`, Steps/Wizard `small\|default`, Pagination `small\|medium\|large`.
+
+Empty sentinels are per widget: text `''`; number `null`; date/time single `null`; date/time range empty `null` (partial range is a tuple); multi/path arrays `[]` controlled empty (omit/`undefined` uncontrolled); ColorPicker/CronEditor clear `null`; Rate clear `0`. ImagePreview omit `open` is closed; Alert omit `open` is shown.
+
+Kanban / DonutChart / ImageViewer remain importable aliases of TaskBoard / PieChart / ImagePreview.
+
+Next: [../glossary.md](../glossary.md) · [../../component-index.md](../../component-index.md) · [../../command-apis.md](../../command-apis.md)

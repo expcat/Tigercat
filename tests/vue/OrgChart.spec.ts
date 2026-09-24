@@ -100,7 +100,7 @@ describe('OrgChart', () => {
     it('applies custom aria label to the chart image', () => {
       const { getByRole } = render(OrgChart, { props: { data, ariaLabel: 'Leadership chart' } })
 
-      expect(getByRole('img', { name: 'Leadership chart' })).toBeInTheDocument()
+      expect(getByRole('group', { name: 'Leadership chart' })).toBeInTheDocument()
     })
   })
 })

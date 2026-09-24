@@ -29,16 +29,17 @@ describe('Highlight', () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument()
     })
 
-    it('keeps nested links when highlighting the default slot', () => {
+    it('highlights flattened slot text as one segment path', () => {
       const { container } = render(Highlight, {
         props: { keywords: 'Vue' },
         slots: {
           default: () => ['Learn ', h('a', { href: '/vue' }, 'Vue'), ' today']
         }
       })
-      const link = getRoot(container).querySelector('a')
-      expect(link).toHaveAttribute('href', '/vue')
-      expect(link?.querySelector('mark')).toHaveTextContent('Vue')
+      const root = getRoot(container)
+      expect(root.querySelector('a')).toBeNull()
+      expect(root).toHaveTextContent('Learn Vue today')
+      expect(root.querySelector('mark')).toHaveTextContent('Vue')
     })
 
     it('flattens text from nested component default slots', () => {
@@ -78,14 +79,19 @@ describe('Highlight', () => {
       expect(labels).toEqual(['Vue', 'React'])
     })
 
-    it('accepts a regular expression', () => {
+    it('matches string keywords literally and does not run a RegExp', () => {
       const { container } = render(Highlight, {
-        props: { text: 'Order #42 and #7', keywords: /#\d+/ }
+        props: { text: 'Order #42 and #7', keywords: ['#42', '#7'] }
       })
       const labels = [...getRoot(container).querySelectorAll('mark')].map(
         (node) => node.textContent
       )
       expect(labels).toEqual(['#42', '#7'])
+
+      const ignored = render(Highlight, {
+        props: { text: 'Order #42 and #7', keywords: /#\d+/ as unknown as string }
+      })
+      expect(ignored.container.querySelector('mark')).toBeNull()
     })
   })
 
@@ -176,7 +182,7 @@ describe('Highlight', () => {
         render: () =>
           h('div', [
             h(Highlight, { keywords: 'Esc' }, { default: () => 'Press Esc' }),
-            h(Highlight, { text: 'id-12', keywords: /\d+/ })
+            h(Highlight, { text: 'id-12', keywords: '12' })
           ])
       })
       await expectNoA11yViolationsIsolated(container)

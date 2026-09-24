@@ -1,12 +1,7 @@
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 
-import {
-  CATEGORIES,
-  CATEGORY_SLUGS,
-  loadPublicComponentExports,
-  pascalToKebab
-} from './public-components.mjs'
+import { CATEGORIES, CATEGORY_SLUGS, loadComponentRecords, pascalToKebab } from './public-components.mjs'
 import { collectFiles } from '../utils/files.mjs'
 
 export const TEST_GROUPS = Object.freeze([
@@ -34,79 +29,6 @@ const FRAMEWORK_EXTRAS = {
   advanced: ['DragEnhancements', 'useDrag'],
   composite: ['useControlledState']
 }
-
-const COMPONENT_GROUP_OVERRIDES = new Map(
-  Object.entries({
-    basic: [
-      'AvatarGroup',
-      'ButtonGroup',
-      'ConfigProvider',
-      'CropUpload',
-      'ImageCropper',
-      'ImageGroup',
-      'ImagePreview'
-    ],
-    form: ['CheckboxGroup', 'FormItem', 'InputGroupAddon', 'RadioGroup'],
-    layout: ['Col', 'Content', 'Footer', 'Header', 'Row', 'Sidebar'],
-    navigation: [
-      'AnchorLink',
-      'BreadcrumbItem',
-      'DropdownItem',
-      'DropdownMenu',
-      'ContextMenuItem',
-      'ContextMenuMenu',
-      'ContextMenuSub',
-      'NavigationMenuContent',
-      'NavigationMenuItem',
-      'NavigationMenuLink',
-      'NavigationMenuList',
-      'NavigationMenuTrigger',
-      'FloatButtonGroup',
-      'FullscreenButton',
-      'MenuItem',
-      'MenuItemGroup',
-      'StepsItem',
-      'SubMenu',
-      'TabPane'
-    ],
-    data: ['CollapsePanel'],
-    charts: [
-      'AreaChart',
-      'BarChart',
-      'ChartAxis',
-      'ChartCanvas',
-      'ChartGrid',
-      'ChartLegend',
-      'ChartSeries',
-      'ChartSubComponents',
-      'ChartTooltip',
-      'FunnelChart',
-      'GaugeChart',
-      'HeatmapChart',
-      'LineChart',
-      'PieChart',
-      'RadarChart',
-      'ScatterChart',
-      'SunburstChart',
-      'TreeMapChart'
-    ],
-    composite: [
-      'ActivityFeed',
-      'ChatWindow',
-      'CommentThread',
-      'DataTableWithToolbar',
-      'FormWizard',
-      'SchemaForm',
-      'NotificationCenter',
-      'TaskBoard',
-      'WorkflowActionBar',
-      'WorkflowTimeline',
-      'WorkflowViewer',
-      'WorkflowDesigner',
-      'WorkflowDetailShell'
-    ]
-  }).flatMap(([group, components]) => components.map((component) => [component, group]))
-)
 
 const CORE_EXTRAS = {
   basic: [
@@ -186,7 +108,6 @@ export const GROUP_FILTER_ALIASES = {
       'radio',
       'segmented',
       'slider',
-      'stepper',
       'switch',
       'textarea'
     ],
@@ -241,17 +162,11 @@ function getCategorySlugByTypeName() {
 }
 
 function buildComponentGroups(rootDir) {
-  const publicExports = loadPublicComponentExports(rootDir)
-  const groupByTypeName = getCategorySlugByTypeName()
   const groups = Object.fromEntries(TEST_GROUPS.map((group) => [group, new Set()]))
 
-  for (const component of publicExports.all) {
-    const group =
-      COMPONENT_GROUP_OVERRIDES.get(component) ||
-      groupByTypeName.get(pascalToKebab(component)) ||
-      groupByTypeName.get(pascalToKebab(component).replace(/-/g, '')) ||
-      'core'
-    groups[group].add(component)
+  for (const record of loadComponentRecords(rootDir)) {
+    const group = TEST_GROUPS.includes(record.testGroup) ? record.testGroup : 'core'
+    groups[group].add(record.component)
   }
 
   return groups

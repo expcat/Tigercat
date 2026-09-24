@@ -10,7 +10,7 @@
  */
 
 import { existsSync, statSync } from 'node:fs'
-import { dirname, join, relative, resolve } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { collectFiles, readText } from './utils/files.mjs'
@@ -89,11 +89,69 @@ function collectAnchors(filePath) {
   return anchors
 }
 
+function referenceId(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, ' ')
+}
+
+function unwrapDestination(destination) {
+  if (destination.startsWith('<') && destination.endsWith('>') && destination.length >= 2) {
+    return destination.slice(1, -1)
+  }
+  return destination
+}
+
+function inspectTarget(filePath, lineNumber, target, isImage) {
+  if (/^(https?:|mailto:|tel:)/i.test(target)) return
+  if (target.startsWith('<')) return
+
+  if (target.startsWith('#')) {
+    const anchor = decodeURIComponent(target.slice(1)).toLowerCase()
+    if (!collectAnchors(filePath).has(anchor)) {
+      addIssue(filePath, lineNumber, 'anchor', `页内锚点 "${target}" 无对应标题`)
+    }
+    return
+  }
+
+  const [rawPath, rawAnchor] = target.split('#')
+  const resolvedPath = resolve(dirname(filePath), decodeURIComponent(rawPath))
+  const relativeToRoot = relative(ROOT, resolvedPath)
+  if (relativeToRoot.startsWith('..') || isAbsolute(relativeToRoot)) {
+    addIssue(filePath, lineNumber, 'link', `链接目标离开仓库根："${target}"`)
+    return
+  }
+
+  if (!existsSync(resolvedPath)) {
+    addIssue(filePath, lineNumber, 'link', `链接目标不存在："${target}"`)
+    return
+  }
+
+  if (isImage || !rawAnchor) return
+
+  if (statSync(resolvedPath).isDirectory()) {
+    addIssue(filePath, lineNumber, 'anchor', `目录链接不能带锚点："${target}"`)
+    return
+  }
+
+  if (!resolvedPath.endsWith('.md')) return
+
+  const anchor = decodeURIComponent(rawAnchor).toLowerCase()
+  if (!collectAnchors(resolvedPath).has(anchor)) {
+    addIssue(
+      filePath,
+      lineNumber,
+      'anchor',
+      `"${relative(ROOT, resolvedPath)}" 中无锚点 "#${rawAnchor}"`
+    )
+  }
+}
+
 const markdownFiles = collectFiles(ROOT, ['.md'], { skip: SKIP_DIRS })
 
 for (const filePath of markdownFiles) {
   const lines = readText(filePath).split(/\r?\n/)
   let inFence = false
+  const definitions = new Map()
+  const referenceUses = []
 
   lines.forEach((rawLine, index) => {
     if (/^\s*```/.test(rawLine)) {
@@ -106,50 +164,38 @@ for (const filePath of markdownFiles) {
     // 行内代码里的链接不算引用
     const line = rawLine.replace(/`[^`]*`/g, '')
 
+    const definition = line.match(/^ {0,3}\[([^\]]+)\]:\s+(\S+)/)
+    if (definition) {
+      definitions.set(referenceId(definition[1]), {
+        target: unwrapDestination(definition[2]),
+        lineNumber
+      })
+    }
+
     for (const match of line.matchAll(/(!?)\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)) {
-      const isImage = match[1] === '!'
-      const target = match[2]
+      inspectTarget(filePath, lineNumber, match[2], match[1] === '!')
+    }
 
-      if (/^(https?:|mailto:|tel:)/i.test(target)) continue
-      if (target.startsWith('<')) continue
-
-      // 纯页内锚点
-      if (target.startsWith('#')) {
-        const anchor = decodeURIComponent(target.slice(1)).toLowerCase()
-        if (!collectAnchors(filePath).has(anchor)) {
-          addIssue(filePath, lineNumber, 'anchor', `页内锚点 "${target}" 无对应标题`)
-        }
-        continue
-      }
-
-      const [rawPath, rawAnchor] = target.split('#')
-      const resolvedPath = resolve(dirname(filePath), decodeURIComponent(rawPath))
-
-      if (!existsSync(resolvedPath)) {
-        addIssue(filePath, lineNumber, 'link', `链接目标不存在："${target}"`)
-        continue
-      }
-
-      if (isImage || !rawAnchor) continue
-
-      if (statSync(resolvedPath).isDirectory()) {
-        addIssue(filePath, lineNumber, 'anchor', `目录链接不能带锚点："${target}"`)
-        continue
-      }
-
-      if (!resolvedPath.endsWith('.md')) continue
-
-      const anchor = decodeURIComponent(rawAnchor).toLowerCase()
-      if (!collectAnchors(resolvedPath).has(anchor)) {
-        addIssue(
-          filePath,
-          lineNumber,
-          'anchor',
-          `"${relative(ROOT, resolvedPath)}" 中无锚点 "#${rawAnchor}"`
-        )
-      }
+    for (const match of line.matchAll(/(!?)\[([^\]]*)\]\[([^\]]*)\]/g)) {
+      referenceUses.push({
+        isImage: match[1] === '!',
+        text: match[2],
+        id: match[3],
+        lineNumber
+      })
     }
   })
+
+  for (const definition of definitions.values()) {
+    inspectTarget(filePath, definition.lineNumber, definition.target, false)
+  }
+
+  for (const use of referenceUses) {
+    const id = referenceId(use.id || use.text)
+    if (!id || !definitions.has(id)) {
+      addIssue(filePath, use.lineNumber, 'link', `引用式链接 "${use.text || use.id}" 没有定义`)
+    }
+  }
 }
 
 if (jsonMode) {

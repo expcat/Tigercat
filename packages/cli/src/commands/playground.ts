@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs'
 import { type TemplateName } from '../constants'
 import { logSuccess, logInfo, logStep } from '../utils/logger'
 import { ensureDir, writeFileSafe } from '../utils/fs'
-import { runCommand } from '../utils/exec'
+import { runArgv } from '../utils/exec'
 import { resolveTemplateOption } from '../utils/validate'
 import { getVue3Template } from '../templates/vue3'
 import { getReactTemplate } from '../templates/react'
@@ -35,16 +35,18 @@ export async function runPlayground(
   const tmpDir = resolve(process.cwd(), '.tigercat-playground')
   const projectDir = join(tmpDir, `playground-${template}`)
 
+  const files = template === 'vue3' ? getVue3Template('playground') : getReactTemplate('playground')
+
   if (dryRun) {
     const safePort = /^\d+$/.test(port) ? port : '3456'
     logInfo(`Dry run: would prepare ${template} playground in ${projectDir}.`)
     if (!existsSync(projectDir)) {
-      const files =
-        template === 'vue3' ? getVue3Template('playground') : getReactTemplate('playground')
       for (const filePath of Object.keys(files)) {
         console.log(`  ${filePath}`)
       }
       logInfo('Would run pnpm install')
+    } else {
+      logInfo('Would refresh package.json and the dependency lock from the current template')
     }
     logInfo(`Would start Vite on port ${safePort}${open ? ' and open the browser' : ''}`)
     return
@@ -52,9 +54,6 @@ export async function runPlayground(
 
   if (!existsSync(projectDir)) {
     logInfo(`Setting up ${template} playground...`)
-
-    const files =
-      template === 'vue3' ? getVue3Template('playground') : getReactTemplate('playground')
 
     ensureDir(projectDir)
     const totalSteps = Object.keys(files).length
@@ -64,18 +63,22 @@ export async function runPlayground(
       logStep(step, totalSteps, filePath)
       writeFileSafe(resolve(projectDir, filePath), content)
     }
-
-    logInfo('Installing dependencies...')
-    runCommand('pnpm install', {
-      cwd: projectDir,
-      failureMessage: 'Failed to install dependencies. Make sure pnpm is available.'
-    })
+  } else {
+    logInfo('Updating the playground lockfile from the current template...')
+    writeFileSafe(resolve(projectDir, 'package.json'), files['package.json'])
+    writeFileSafe(resolve(projectDir, '.gitignore'), files['.gitignore'])
   }
+
+  logInfo('Installing dependencies...')
+  runArgv('pnpm', ['install'], {
+    cwd: projectDir,
+    failureMessage: 'Failed to install dependencies. Make sure pnpm is available.'
+  })
 
   logSuccess(`Starting playground on port ${port}...\n`)
 
   const safePort = /^\d+$/.test(port) ? port : '3456'
-  const openFlag = open ? ' --open' : ''
-  // allowFailure: the dev server exits non-zero when the user stops it (Ctrl+C).
-  runCommand(`npx vite --port ${safePort}${openFlag}`, { cwd: projectDir, allowFailure: true })
+  const viteArgs = ['exec', 'vite', '--port', safePort]
+  if (open) viteArgs.push('--open')
+  runArgv('pnpm', viteArgs, { cwd: projectDir, allowFailure: true })
 }

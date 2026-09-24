@@ -2,10 +2,15 @@ import { Command } from 'commander'
 import { existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 import prompts from 'prompts'
-import { ALL_COMPONENTS } from '../constants'
+import {
+  ALL_COMPONENTS,
+  CLI_VERSION,
+  componentImportSpecifier,
+  resolveAddableComponents
+} from '../constants'
 import { logSuccess, logError, logInfo, logWarn } from '../utils/logger'
-import { readFileSafe, writeFileSafe } from '../utils/fs'
-import { runCommand } from '../utils/exec'
+import { assertInsideProject, readFileSafe, writeFileSafe } from '../utils/fs'
+import { runArgv } from '../utils/exec'
 import { isFramework, type Framework } from '../utils/validate'
 
 interface AddOptions {
@@ -35,8 +40,11 @@ function detectFramework(cwd: string): Framework | null {
   try {
     const parsed = JSON.parse(pkg)
     const allDeps = { ...parsed.dependencies, ...parsed.devDependencies }
-    if ('@expcat/tigercat-vue' in allDeps || 'vue' in allDeps) return 'vue3'
-    if ('@expcat/tigercat-react' in allDeps || 'react' in allDeps) return 'react'
+    const hasVue = '@expcat/tigercat-vue' in allDeps || 'vue' in allDeps
+    const hasReact = '@expcat/tigercat-react' in allDeps || 'react' in allDeps
+    if (hasVue && hasReact) return null
+    if (hasVue) return 'vue3'
+    if (hasReact) return 'react'
   } catch {
     // invalid JSON
   }
@@ -85,25 +93,45 @@ function detectPackageManager(cwd: string): 'pnpm' | 'yarn' | 'npm' {
   return 'npm'
 }
 
+function pinDependency(dependency: string): string {
+  return dependency.startsWith('@expcat/tigercat-') ? `${dependency}@${CLI_VERSION}` : dependency
+}
+
 function formatAddCommand(packageManager: 'pnpm' | 'yarn' | 'npm', dependencies: string[]): string {
-  const deps = dependencies.join(' ')
+  const deps = dependencies.map(pinDependency).join(' ')
   if (packageManager === 'yarn') return `yarn add ${deps}`
   if (packageManager === 'npm') return `npm install ${deps}`
   return `pnpm add ${deps}`
 }
 
-function validateComponents(names: string[]): { valid: string[]; invalid: string[] } {
+function installArgs(packageManager: 'pnpm' | 'yarn' | 'npm', dependencies: string[]): string[] {
+  const verb = packageManager === 'npm' ? 'install' : 'add'
+  return [verb, ...dependencies.map(pinDependency)]
+}
+
+function validateComponents(names: string[]): {
+  valid: string[]
+  invalid: string[]
+  commands: string[]
+} {
   const valid: string[] = []
   const invalid: string[] = []
+  const commands: string[] = []
   for (const name of names) {
-    const match = ALL_COMPONENTS.find((c) => c.toLowerCase() === name.toLowerCase())
-    if (match) {
-      valid.push(match)
-    } else {
+    const resolved = resolveAddableComponents(name)
+    if (resolved === null) {
       invalid.push(name)
+      continue
+    }
+    if (resolved.length === 0) {
+      commands.push(name)
+      continue
+    }
+    for (const component of resolved) {
+      if (!valid.includes(component)) valid.push(component)
     }
   }
-  return { valid, invalid }
+  return { valid, invalid, commands }
 }
 
 export async function runAdd(components: string[], options: AddOptions = {}) {
@@ -119,17 +147,25 @@ export async function runAdd(components: string[], options: AddOptions = {}) {
 
   if (!framework) {
     logError(
-      'Could not detect framework. Make sure you are in a project with @expcat/tigercat-vue or @expcat/tigercat-react installed.'
+      'Pass --framework vue3 or react. Detection stops when both Vue and React are installed, and when neither Tigercat package is present.'
     )
     process.exit(1)
   }
 
   const selectedComponents = await resolveComponents(components)
-  const { valid, invalid } = validateComponents(selectedComponents)
+  const { valid, invalid, commands } = validateComponents(selectedComponents)
 
   if (invalid.length > 0) {
     logWarn(`Unknown components: ${invalid.join(', ')}`)
     logInfo(`Available: ${ALL_COMPONENTS.join(', ')}`)
+  }
+
+  if (commands.length > 0) {
+    const pkgNameForCommand =
+      framework === 'vue3' ? '@expcat/tigercat-vue' : '@expcat/tigercat-react'
+    logInfo(
+      `Notification is the imperative API: import { notification } from '${componentImportSpecifier(pkgNameForCommand, 'notification')}'`
+    )
   }
 
   if (valid.length === 0) {
@@ -148,25 +184,38 @@ export async function runAdd(components: string[], options: AddOptions = {}) {
 
     if (options.install && !dryRun) {
       logInfo(`Installing missing dependencies: ${missingDeps.join(', ')}`)
-      runCommand(installCommand, { cwd })
+      runArgv(packageManager, installArgs(packageManager, missingDeps), {
+        cwd,
+        failureMessage: 'Failed to install dependencies.'
+      })
     } else {
       logInfo(`Missing dependencies detected. Run: ${installCommand}`)
     }
   }
 
-  const importLine = `import { ${valid.join(', ')} } from '${pkgName}'`
+  const importLine = valid
+    .map(
+      (component) =>
+        `import { ${component} } from '${componentImportSpecifier(pkgName, component)}'`
+    )
+    .join('\n')
 
   logSuccess(`Add this import to your project:\n`)
   console.log(`  ${importLine}\n`)
 
   if (options.snippet) {
     const snippetFile = resolve(cwd, options.snippet)
-    const snippet = generateImportSnippet(valid, pkgName)
-    if (dryRun) {
-      logInfo(`Would create import snippet ${snippetFile}`)
+    assertInsideProject(cwd, snippetFile)
+    if (existsSync(snippetFile)) {
+      logWarn(`${snippetFile} already exists, skipping`)
     } else {
-      writeFileSafe(snippetFile, snippet)
-      logSuccess(`Created import snippet ${snippetFile}`)
+      const snippet = generateImportSnippet(valid, pkgName)
+      if (dryRun) {
+        logInfo(`Would create import snippet ${snippetFile}`)
+      } else {
+        writeFileSafe(snippetFile, snippet)
+        logSuccess(`Created import snippet ${snippetFile}`)
+      }
     }
   }
 
@@ -214,7 +263,11 @@ export async function runAdd(components: string[], options: AddOptions = {}) {
 }
 
 function generateImportSnippet(components: string[], pkg: string): string {
-  return `import { ${components.join(', ')} } from '${pkg}'
+  return `${components
+    .map(
+      (component) => `import { ${component} } from '${componentImportSpecifier(pkg, component)}'`
+    )
+    .join('\n')}
 
 export const tigercatComponents = {
 ${components.map((component) => `  ${component}`).join(',\n')}
@@ -224,7 +277,7 @@ ${components.map((component) => `  ${component}`).join(',\n')}
 
 function generateVue3Demo(component: string, pkg: string): string {
   return `<script setup lang="ts">
-import { ${component} } from '${pkg}'
+import { ${component} } from '${componentImportSpecifier(pkg, component)}'
 </script>
 
 <template>
@@ -237,7 +290,7 @@ import { ${component} } from '${pkg}'
 }
 
 function generateReactDemo(component: string, pkg: string): string {
-  return `import { ${component} } from '${pkg}'
+  return `import { ${component} } from '${componentImportSpecifier(pkg, component)}'
 
 export default function ${component}Demo() {
   return (

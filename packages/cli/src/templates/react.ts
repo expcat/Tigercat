@@ -1,6 +1,7 @@
 export function getReactTemplate(projectName: string): Record<string, string> {
   return {
     'package.json': reactPackageJson(projectName),
+    '.gitignore': TEMPLATE_GITIGNORE,
     'tsconfig.json': reactTsconfig(),
     'tsconfig.node.json': reactTsconfigNode(),
     'vite.config.ts': reactViteConfig(),
@@ -11,7 +12,7 @@ export function getReactTemplate(projectName: string): Record<string, string> {
   }
 }
 
-import { TEMPLATE_VERSIONS as V } from '../constants'
+import { TEMPLATE_GITIGNORE, TEMPLATE_PACKAGE_MANAGER, TEMPLATE_VERSIONS as V } from '../constants'
 
 function reactPackageJson(name: string): string {
   return JSON.stringify(
@@ -20,6 +21,7 @@ function reactPackageJson(name: string): string {
       version: '0.0.1',
       private: true,
       type: 'module',
+      packageManager: TEMPLATE_PACKAGE_MANAGER,
       scripts: {
         dev: 'vite',
         build: 'tsc && vite build',
@@ -138,58 +140,49 @@ createRoot(document.getElementById('root')!).render(
 }
 
 function reactApp(): string {
-  return `import { useState, useCallback, useEffect } from 'react'
-import { Button, Alert, Switch } from '@expcat/tigercat-react'
+  return `import { useState, useCallback } from 'react'
+import { Button, Alert, Switch, ConfigProvider } from '@expcat/tigercat-react'
 
 export default function App() {
-  const [dark, setDark] = useState(false)
-  const [modern, setModern] = useState(true)
+  const [colorScheme, setColorScheme] = useState<'light' | 'dark'>('light')
+  const [theme, setTheme] = useState('modern')
 
-  useEffect(() => {
-    const root = document.documentElement
-    root.classList.toggle('dark', dark)
-    if (modern) {
-      root.setAttribute('data-tiger-style', 'modern')
-    } else {
-      root.removeAttribute('data-tiger-style')
-    }
-  }, [dark, modern])
-
-  const onDark = useCallback((v: boolean) => setDark(v), [])
-  const onModern = useCallback((v: boolean) => setModern(v), [])
+  const onDark = useCallback((v: boolean) => setColorScheme(v ? 'dark' : 'light'), [])
+  const onModern = useCallback((v: boolean) => setTheme(v ? 'modern' : 'default'), [])
 
   return (
-    <div className="min-h-screen bg-[var(--tiger-surface,#ffffff)] p-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[var(--tiger-text,#111827)]">
-          Tigercat + React
-        </h1>
-        <div className="flex items-center gap-4 text-sm text-[var(--tiger-text-muted,#6b7280)]">
-          <label className="flex items-center gap-2">
-            <span>Modern</span>
-            <Switch checked={modern} size="sm" onChange={onModern} />
-          </label>
-          <label className="flex items-center gap-2">
-            <span>Dark</span>
-            <Switch checked={dark} size="sm" onChange={onDark} />
-          </label>
+    <ConfigProvider theme={theme} colorScheme={colorScheme}>
+      <div className="min-h-screen bg-[var(--tiger-surface)] p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-[var(--tiger-text)]">
+            Tigercat + React
+          </h1>
+          <div className="flex items-center gap-4 text-sm text-[var(--tiger-text-secondary)]">
+            <label className="flex items-center gap-2">
+              <span>Modern</span>
+              <Switch checked={theme === 'modern'} size="sm" onChange={onModern} />
+            </label>
+            <label className="flex items-center gap-2">
+              <span>Dark</span>
+              <Switch checked={colorScheme === 'dark'} size="sm" onChange={onDark} />
+            </label>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Alert variant="info">
+            Welcome to your Tigercat project! Edit src/App.tsx to get started.
+            Toggle <code>Modern</code> to switch the theme preset.
+          </Alert>
+
+          <div className="flex gap-2">
+            <Button variant="primary">Primary</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="outline">Outline</Button>
+          </div>
         </div>
       </div>
-
-      <div className="space-y-4">
-        <Alert variant="info">
-          Welcome to your Tigercat project! Edit src/App.tsx to get started.
-          Toggle <code>Modern</code> to preview the opt-in modern visual style
-          (radius / shadow / motion tokens).
-        </Alert>
-
-        <div className="flex gap-2">
-          <Button variant="primary">Primary</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button variant="outline">Outline</Button>
-        </div>
-      </div>
-    </div>
+    </ConfigProvider>
   )
 }
 `
@@ -197,15 +190,13 @@ export default function App() {
 
 function commonStyleCss(): string {
   return `@import "tailwindcss";
-@plugin "@expcat/tigercat-core/tailwind/modern";
+@plugin "@expcat/tigercat-core/tailwind";
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * The tigercat tailwind plugin injects every --tiger-* design token for
- * both light (:root) and dark (.dark) modes, plus the opt-in modern
- * overrides activated by data-tiger-style="modern". The demo App toggles
- * dark mode via .dark on <html>; the rules below keep native controls in
- * sync with that explicit choice.
+ * The tigercat tailwind plugin injects the default preset's --tiger-* tokens
+ * for :root and .dark. ConfigProvider theme / colorScheme switches presets
+ * at runtime. The rules below keep native controls in sync with .dark.
  */
 
 html {

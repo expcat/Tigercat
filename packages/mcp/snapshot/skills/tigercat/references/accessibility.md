@@ -1,0 +1,66 @@
+---
+name: tigercat-accessibility
+description: Tigercat accessibility keyboard, screen reader, and PR validation checklist
+---
+
+# Accessibility
+
+Use automated tests for regressions and manual assistive-technology checks for complex interaction changes.
+
+Accessibility behavior is not exposed as a feature flag. Components that use focus management,
+keyboard handling, live regions, or ARIA attributes keep those semantics when imported; unused
+components and overlay/focus helpers remain tree-shakeable through normal subpath imports.
+
+## Keyboard Baseline
+
+Keyboard helpers read `event.key` only. Space is the `' '` key.
+
+- `Tab` / `Shift+Tab`: move between focusable controls.
+- `Enter`: activate buttons, links, menu items, highlighted options, or confirm actions.
+- `Space`: toggle checkbox, radio, switch, button, and selectable items.
+- `Esc`: close the current overlay, cancel temporary state, and restore focus to the trigger.
+
+## Focus scope and live regions
+
+- Modal, Drawer, and other traps share one stacked scope, `createFocusScope`. Tab cycles in sequential focus order (positive `tabindex` first), focus that leaves is pulled back, Escape reaches only the topmost scope, lower modals are `inert`, and closing restores focus and scroll. Toast layers use `data-tiger-toast` and stay interactive.
+- Announcements are caller-owned. `manageLiveRegion()` creates one region per caller; `destroy` removes that node and cancels a pending frame. `polite` is `role="status"`. `assertive` is `aria-live="assertive"` only. Components that are not live regions stay quiet until the caller sets `role` / `aria-live`.
+- Arrow keys: move within composite widgets.
+- `Home` / `End`: move to the first or last item in a composite widget.
+- `PageUp` / `PageDown`: page through date, time, pagination, or virtualized views.
+
+## Component Expectations
+
+- Forms: labels must be associated with controls; required, disabled, readonly, invalid, and error states must be announced.
+- Overlays: Modal, Drawer, Tour, Spotlight, and fullscreen Loading share one focus stack. They trap focus while open, restore it on close, inert the rest of the document, and still `preventDefault` Tab when the trap has no focusable nodes. Fullscreen Loading sits above modals. Popover and Popconfirm leave focus on the trigger and close when Tab leaves; a Popconfirm promise in progress cannot be dismissed. Nested Select/Dropdown portal into the current overlay-host so Tab cannot leave. Esc dismisses the topmost layer and restores trigger focus. Toast hosts carry `data-tiger-toast` so inert skips them without treating them as a modal.
+- Navigation: current, selected, expanded, and disabled states must be exposed through ARIA or semantic markup.
+- Tables and data views: headers, sorting, filtering, expanded rows, loading, and empty states must be perceivable.
+- Charts: provide a concise accessible name and keyboard access for interactive legends, tooltips, data points, export, zoom, or brush controls; color must not be the only information channel.
+- Advanced widgets: drag-and-drop, virtual scrolling, editors, and chat surfaces need keyboard paths or documented limitations.
+
+## Screen Reader Sampling
+
+Recommended matrix:
+
+| Platform | Screen reader | Browser       | Priority                            |
+| -------- | ------------- | ------------- | ----------------------------------- |
+| Windows  | NVDA          | Firefox       | Required                            |
+| Windows  | NVDA          | Chrome / Edge | Recommended                         |
+| macOS    | VoiceOver     | Safari        | Required                            |
+| macOS    | VoiceOver     | Chrome        | Recommended                         |
+| iOS      | VoiceOver     | Safari        | Required for touch-heavy components |
+
+Manual flow:
+
+1. Open the relevant example or minimal reproduction.
+2. Complete the main flow with keyboard only.
+3. Repeat with a screen reader enabled and verify role, name, state, announcement timing, and focus order.
+4. Check disabled, loading, error, empty, dark-mode, and 200% zoom states when relevant.
+5. Record blockers, acceptable differences, and follow-up automation ideas.
+
+## PR Checklist
+
+- Update tests for key keyboard paths and focus restoration.
+- Run `pnpm test:a11y` for affected components.
+- Add a manual screen-reader note when changing overlays, focus management, ARIA, form validation, notifications, virtual scrolling, drag-and-drop, chart interactions, or editor toolbars.
+
+Next: [ssr.md](ssr.md)

@@ -7,7 +7,7 @@ export default function App() {
         在新窗口打开 GitHub
       </Link>
       <Link href="https://github.com/expcat/Tigercat" disabled>
-        禁用仍是链接
+        禁用不带地址
       </Link>
     </div>
   )

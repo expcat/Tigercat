@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from 'node:fs'
-import { dirname } from 'node:path'
+import { dirname, isAbsolute, relative, resolve } from 'node:path'
 
 export function ensureDir(dir: string) {
   if (!existsSync(dir)) {
@@ -20,4 +20,14 @@ export function isDirEmpty(dir: string): boolean {
 export function readFileSafe(filePath: string): string | null {
   if (!existsSync(filePath)) return null
   return readFileSync(filePath, 'utf-8')
+}
+
+/** Refuse a write whose resolved path leaves the target project. */
+export function assertInsideProject(projectRoot: string, target: string): void {
+  const root = resolve(projectRoot)
+  const resolved = resolve(target)
+  const relativePath = relative(root, resolved)
+  if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
+    throw new Error(`Refusing to write outside the project: ${resolved}`)
+  }
 }

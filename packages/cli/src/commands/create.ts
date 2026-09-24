@@ -28,14 +28,17 @@ export async function runCreate(name: string, templateArg?: string, dryRun = fal
   }
 
   const template: TemplateName = await resolveTemplateOption(templateArg, 'Select a framework')
+  const files = template === 'vue3' ? getVue3Template(name) : getReactTemplate(name)
 
   const targetDir = resolve(process.cwd(), name)
 
   if (!dryRun && existsSync(targetDir) && !isDirEmpty(targetDir)) {
+    logInfo('These template files will be overwritten:')
+    for (const filePath of Object.keys(files)) console.log(`  ${filePath}`)
     const { overwrite } = await prompts({
       type: 'confirm',
       name: 'overwrite',
-      message: `Directory "${name}" is not empty. Overwrite conflicting template files? (other files are kept)`,
+      message: `Directory "${name}" is not empty. Overwrite the files listed above? Other files are kept.`,
       initial: false
     })
     if (!overwrite) {
@@ -45,8 +48,6 @@ export async function runCreate(name: string, templateArg?: string, dryRun = fal
   }
 
   logInfo(`Creating ${template} project in ${targetDir}...`)
-
-  const files = template === 'vue3' ? getVue3Template(name) : getReactTemplate(name)
 
   if (dryRun) {
     logInfo('Dry run: no files will be written.')
@@ -69,7 +70,7 @@ export async function runCreate(name: string, templateArg?: string, dryRun = fal
 
   logSuccess(`Project "${name}" created successfully!\n`)
   logInfo('Next steps:\n')
-  console.log(`  cd ${name}`)
+  console.log(`  cd "${name}"`)
   console.log('  pnpm install')
   console.log('  pnpm dev\n')
 }

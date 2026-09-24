@@ -3,11 +3,10 @@
  */
 
 /**
- * Keyword string(s) and/or regular expression(s) to highlight.
- * String keywords are escaped before matching. Regular expressions keep
- * their own flags except `global`, which follows the component option.
+ * Keyword string or strings to highlight. Matching is a linear scan.
+ * Regular expressions are not part of the public API.
  */
-export type HighlightKeywords = string | RegExp | readonly (string | RegExp)[]
+export type HighlightKeywords = string | readonly string[]
 
 /**
  * Inclusive-exclusive match range inside the source text.
@@ -32,7 +31,7 @@ export interface HighlightSegment {
  */
 export interface HighlightMatchOptions {
   /**
-   * Match case for string keywords. Regular expressions keep their own `i` flag.
+   * Match case for string keywords.
    * @default false
    */
   caseSensitive?: boolean
@@ -65,13 +64,12 @@ export interface HighlightProps {
   text?: string
 
   /**
-   * Keyword string(s) and/or regular expression(s) to highlight.
+   * Keyword string or strings to highlight. Matched literally.
    */
   keywords?: HighlightKeywords
 
   /**
-   * Match case for string keywords. Regular expressions keep their own `i` flag.
-   * @default false
+   * Match case. @default false
    */
   caseSensitive?: boolean
 

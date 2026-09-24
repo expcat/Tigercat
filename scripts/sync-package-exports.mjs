@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import {
-  REQUIRED_CORE_PACKAGE_EXPORTS,
+  buildCorePackageExports,
   buildFrameworkPackageExports,
   getComponentPackageTarget,
   loadPublicComponentExports
@@ -68,10 +68,19 @@ function assertComponentTargetsExist(framework, components, info) {
   }
 }
 
+function readFrameworkIndex(framework) {
+  const file = framework === 'react' ? 'packages/react/src/index.tsx' : 'packages/vue/src/index.ts'
+  return readFileSync(join(root, file), 'utf8')
+}
+
 function syncFrameworkPackage(framework, components, info) {
   const packagePath = join(root, info.packagePath)
   const packageJson = readJson(packagePath)
-  const expectedExports = buildFrameworkPackageExports(components, framework)
+  const expectedExports = buildFrameworkPackageExports(
+    components,
+    framework,
+    readFrameworkIndex(framework)
+  )
 
   assertComponentTargetsExist(framework, components, info)
 
@@ -84,15 +93,25 @@ function syncFrameworkPackage(framework, components, info) {
   writeJson(packagePath, packageJson)
 }
 
-function checkCorePackageExports() {
-  const packageJson = readJson(join(root, 'packages/core/package.json'))
-  const packageExports = packageJson.exports ?? {}
+function syncCorePackageExports() {
+  const packagePath = join(root, 'packages/core/package.json')
+  const packageJson = readJson(packagePath)
+  const expectedExports = buildCorePackageExports()
 
-  for (const exportName of REQUIRED_CORE_PACKAGE_EXPORTS) {
-    if (!(exportName in packageExports)) {
-      addIssue(`@expcat/tigercat-core missing required export ${exportName}`)
+  const keysPath = join(root, 'packages/cli/src/required-core-exports.json')
+  const keysJson = `${JSON.stringify(Object.keys(expectedExports), null, 2)}\n`
+
+  if (checkMode) {
+    assertSameExports('@expcat/tigercat-core', packageJson.exports ?? {}, expectedExports)
+    if (readFileSync(keysPath, 'utf8') !== keysJson) {
+      addIssue('packages/cli/src/required-core-exports.json drifted from the core entry table')
     }
+    return
   }
+
+  packageJson.exports = expectedExports
+  writeJson(packagePath, packageJson)
+  writeFileSync(keysPath, keysJson)
 }
 
 const publicComponents = loadPublicComponentExports(root)
@@ -100,7 +119,7 @@ const publicComponents = loadPublicComponentExports(root)
 for (const [framework, info] of Object.entries(frameworkPackages)) {
   syncFrameworkPackage(framework, publicComponents[framework], info)
 }
-checkCorePackageExports()
+syncCorePackageExports()
 
 if (issues.length > 0) {
   console.error('Package exports check failed:')

@@ -1,5 +1,6 @@
 import { classNames } from './class-names'
-import { DEFAULT_CHART_COLORS } from './chart-utils'
+import { DEFAULT_CHART_COLORS } from './chart/color'
+import { createChartTreeVisit } from './chart/tree-visit'
 import { devWarn } from './dev-warn'
 import type { OrgChartDirection, OrgChartNode } from '../types/org-chart'
 
@@ -10,6 +11,7 @@ export interface OrgChartLayoutOptions {
   siblingGap?: number
   orientation?: OrgChartDirection
   colors?: string[]
+  direction?: 'ltr' | 'rtl'
 }
 
 export interface OrgChartLayoutNode {
@@ -56,18 +58,18 @@ export const orgChartNodeClasses =
   'transition-[filter,opacity,stroke] motion-reduce:transition-none duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
 
 export const orgChartNodeRectClasses =
-  'stroke-[var(--tiger-border,#d1d5db)] fill-[var(--tiger-surface,#ffffff)] drop-shadow-sm'
+  'stroke-[var(--tiger-border)] fill-[var(--tiger-surface)] drop-shadow-sm'
 
 export const orgChartNodeLabelClasses =
-  'pointer-events-none select-none fill-[var(--tiger-text,#111827)] text-sm font-semibold'
+  'pointer-events-none select-none fill-[var(--tiger-text)] text-sm font-semibold'
 
 export const orgChartNodeTitleClasses =
-  'pointer-events-none select-none fill-[var(--tiger-text-secondary,#6b7280)] text-xs'
+  'pointer-events-none select-none fill-[var(--tiger-text-secondary)] text-xs'
 
 export const orgChartNodeSubtitleClasses =
-  'pointer-events-none select-none fill-[var(--tiger-text-secondary,#6b7280)] text-[11px]'
+  'pointer-events-none select-none fill-[var(--tiger-text-secondary)] text-[11px]'
 
-export const orgChartLinkClasses = 'fill-none stroke-[var(--tiger-border,#d1d5db)] stroke-2'
+export const orgChartLinkClasses = 'fill-none stroke-[var(--tiger-border)] stroke-2'
 
 export function normalizeOrgChartData(data: OrgChartNode | OrgChartNode[]): OrgChartNode[] {
   return Array.isArray(data) ? data : [data]
@@ -108,15 +110,15 @@ export function computeOrgChartLayout(
     levelGap = 80,
     siblingGap = 32,
     orientation = 'vertical',
-    colors = DEFAULT_CHART_COLORS
+    colors = DEFAULT_CHART_COLORS,
+    direction = 'ltr'
   } = options
   const roots = normalizeOrgChartData(data)
   if (roots.length === 0) return { nodes: [], links: [], width: 0, height: 0, depth: 0 }
 
   let nextLeaf = 0
   let maxDepth = 0
-  const seen = new Set<string>()
-  const visiting = new Set<string>()
+  const treeVisit = createChartTreeVisit()
   const internalRoots = roots.flatMap((root) => {
     const laid = layoutSubtree(root, 0, undefined, {
       nodeWidth,
@@ -131,8 +133,7 @@ export function computeOrgChartLayout(
       setMaxDepth: (depth) => {
         maxDepth = Math.max(maxDepth, depth)
       },
-      seen,
-      visiting
+      visit: treeVisit
     })
     return laid ? [laid] : []
   })
@@ -183,6 +184,21 @@ export function computeOrgChartLayout(
   const indexRef = { value: 0 }
   internalRoots.forEach((root) => visit(root, indexRef))
 
+  if (orientation === 'horizontal' && direction === 'rtl' && nodes.length > 0) {
+    const maxX = nodes.reduce((max, node) => Math.max(max, node.x + node.width), 0)
+    for (const node of nodes) node.x = maxX - node.x - node.width
+    for (const link of links) {
+      const source = nodes.find((node) => node.id === link.sourceId)
+      const target = nodes.find((node) => node.id === link.targetId)
+      if (!source || !target) continue
+      link.sourceX = source.x
+      link.sourceY = source.y + nodeHeight / 2
+      link.targetX = target.x + target.width
+      link.targetY = target.y + target.height / 2
+      link.path = getOrgChartLinkPath(link, orientation)
+    }
+  }
+
   const leafSpan = nextLeaf - siblingGap
   const stackSpan =
     (maxDepth + 1) * (orientation === 'horizontal' ? nodeWidth : nodeHeight) + maxDepth * levelGap
@@ -198,6 +214,54 @@ export function computeOrgChartLayout(
 
 export const layoutOrgChart = computeOrgChartLayout
 
+export function nextOrgChartNodeIndex(
+  index: number,
+  key: string,
+  nodes: readonly Pick<OrgChartLayoutNode, 'id' | 'parentId' | 'depth' | 'x' | 'y'>[],
+  orientation: OrgChartDirection = 'vertical',
+  direction: 'ltr' | 'rtl' = 'ltr'
+): number {
+  const current = nodes[index]
+  if (!current) return index
+  const parentKey = current.parentId === undefined ? null : String(current.parentId)
+  const children = nodes.filter((node) => String(node.parentId ?? '') === String(current.id))
+  const siblings = nodes.filter((node) => {
+    const parent = node.parentId === undefined ? null : String(node.parentId)
+    return parent === parentKey && node.depth === current.depth
+  })
+  const ordered = siblings
+    .slice()
+    .sort((a, b) => (orientation === 'horizontal' ? a.y - b.y : a.x - b.x))
+  const siblingIndex = ordered.findIndex((node) => node.id === current.id)
+  const previous = siblingIndex > 0 ? ordered[siblingIndex - 1] : undefined
+  const next = siblingIndex >= 0 ? ordered[siblingIndex + 1] : undefined
+  const firstChild = children
+    .slice()
+    .sort((a, b) => (orientation === 'horizontal' ? a.y - b.y : a.x - b.x))[0]
+  const parent = nodes.find((node) => String(node.id) === parentKey)
+
+  const towardParent =
+    orientation === 'horizontal' ? (direction === 'rtl' ? 'ArrowRight' : 'ArrowLeft') : 'ArrowUp'
+  const towardChild =
+    orientation === 'horizontal' ? (direction === 'rtl' ? 'ArrowLeft' : 'ArrowRight') : 'ArrowDown'
+  const towardPrevious = orientation === 'horizontal' ? 'ArrowUp' : 'ArrowLeft'
+  const towardNext = orientation === 'horizontal' ? 'ArrowDown' : 'ArrowRight'
+
+  const target =
+    key === towardParent
+      ? parent
+      : key === towardChild
+        ? firstChild
+        : key === towardPrevious
+          ? previous
+          : key === towardNext
+            ? next
+            : undefined
+  if (!target) return index
+  const nextIndex = nodes.findIndex((node) => node.id === target.id)
+  return nextIndex < 0 ? index : nextIndex
+}
+
 function layoutSubtree(
   node: OrgChartNode,
   depth: number,
@@ -211,21 +275,19 @@ function layoutSubtree(
     nextLeaf: () => number
     setNextLeaf: (next: number) => void
     setMaxDepth: (depth: number) => void
-    seen: Set<string>
-    visiting: Set<string>
+    visit: ReturnType<typeof createChartTreeVisit>
   }
 ): InternalLayoutNode | null {
   const key = String(node.id)
-  if (context.visiting.has(key)) {
-    devWarn('OrgChart.cycle', 'OrgChart skipped a cyclic parent/child link')
+  if (
+    !context.visit.enter(
+      key,
+      ['OrgChart.cycle', 'OrgChart skipped a cyclic parent/child link'],
+      ['OrgChart.duplicateId', 'OrgChart skipped a duplicate node id']
+    )
+  ) {
     return null
   }
-  if (context.seen.has(key)) {
-    devWarn('OrgChart.duplicateId', 'OrgChart skipped a duplicate node id')
-    return null
-  }
-  context.seen.add(key)
-  context.visiting.add(key)
   context.setMaxDepth(depth)
   const children = node.children ?? []
   const alongStack =
@@ -240,7 +302,7 @@ function layoutSubtree(
         (context.orientation === 'horizontal' ? context.nodeHeight : context.nodeWidth) +
         context.siblingGap
     )
-    context.visiting.delete(key)
+    context.visit.leave(key)
     return {
       node,
       depth,
@@ -254,7 +316,7 @@ function layoutSubtree(
   const childLayouts = children
     .map((child) => layoutSubtree(child, depth + 1, node.id, context))
     .filter((child): child is InternalLayoutNode => child !== null)
-  context.visiting.delete(key)
+  context.visit.leave(key)
   if (childLayouts.length === 0) {
     const alongSiblings = context.nextLeaf()
     context.setNextLeaf(

@@ -4,82 +4,44 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_run:
-    workflows: ['Create Release Tags']
-    types:
-      - completed
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Release tag to publish, for example v1.2.3'
-        required: true
-        type: string
 
 permissions:
-  actions: read
-  contents: write
+  contents: read
   id-token: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    environment: npm
     steps:
-      - name: Download release tag artifact
-        if: github.event_name == 'workflow_run'
-        uses: actions/download-artifact@v8
-        continue-on-error: true
-        with:
-          name: release-tag
-          path: .release
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ github.token }}
-
-      - name: Resolve release tag
-        id: release_tag
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          FOUND=true
-
-          if [[ "${GITHUB_EVENT_NAME}" == 'push' && "${GITHUB_REF_TYPE}" == 'tag' ]]; then
-            TAG="${GITHUB_REF_NAME}"
-          elif [[ "${GITHUB_EVENT_NAME}" == 'workflow_run' ]]; then
-            if [[ ! -s .release/release-tag.txt ]]; then
-              echo 'No release tag artifact found for the completed Create Release Tags run. Nothing to publish.'
-              FOUND=false
-              TAG=''
-            else
-              TAG=$(head -n 1 .release/release-tag.txt)
-            fi
-          else
-            TAG="${{ inputs.tag }}"
-          fi
-
-          if [[ "${FOUND}" == 'true' && ! "${TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            echo "Invalid release tag: ${TAG}" >&2
-            exit 1
-          fi
-
-          echo "found=${FOUND}" >> "$GITHUB_OUTPUT"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-
       - name: Checkout
-        if: steps.release_tag.outputs.found == 'true'
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          ref: ${{ steps.release_tag.outputs.tag }}
+          ref: ${{ github.ref }}
+
+      - name: Verify tag
+        env:
+          TAG: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid release tag" >&2
+            exit 1
+          fi
+          git fetch origin "$DEFAULT_BRANCH"
+          if ! git merge-base --is-ancestor "$TAG" "origin/$DEFAULT_BRANCH"; then
+            echo "Tag is not on the default branch" >&2
+            exit 1
+          fi
 
       - name: Setup pnpm
-        if: steps.release_tag.outputs.found == 'true'
         uses: pnpm/action-setup@v6
         with:
           version: 11.9.0
 
       - name: Setup Node.js
-        if: steps.release_tag.outputs.found == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: 22
@@ -87,19 +49,10 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
-        if: steps.release_tag.outputs.found == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Publish packages
-        if: steps.release_tag.outputs.found == 'true'
         run: pnpm release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-
-      - name: Create GitHub Release
-        if: steps.release_tag.outputs.found == 'true'
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ steps.release_tag.outputs.tag }}
-          generate_release_notes: true

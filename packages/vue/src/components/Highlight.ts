@@ -11,7 +11,8 @@ import {
   type VNodeChild
 } from 'vue'
 import {
-  composeComponentClasses,
+  classNames,
+  coerceClassValue,
   findHighlightRanges,
   getHighlightMarkClasses,
   getHighlightRootClasses,
@@ -140,14 +141,14 @@ export const Highlight = defineComponent({
       default: undefined
     },
     /**
-     * Keyword string(s) and/or regular expression(s) to highlight.
+     * Keyword string or strings to highlight. Matched literally.
      */
     keywords: {
-      type: [String, Array, RegExp] as PropType<HighlightKeywords>,
+      type: [String, Array] as PropType<HighlightKeywords>,
       default: undefined
     },
     /**
-     * Match case for string keywords. Regular expressions keep their own `i` flag.
+     * Match case for string keywords.
      * @default false
      */
     caseSensitive: {
@@ -202,30 +203,18 @@ export const Highlight = defineComponent({
       }
       const markClasses = getHighlightMarkClasses(props.highlightClassName)
       const markStyle = mergeStyleValues(props.highlightStyle)
-      let children: VNodeChild
-
-      if (props.text != null) {
-        const segments = getHighlightSegments(source, props.keywords, options)
-        children = segments.map((segment) =>
-          segment.highlighted ? renderMark(segment.text, markClasses, markStyle) : segment.text
-        )
-      } else {
-        children = highlightVueNode(
-          slotNodes,
-          findHighlightRanges(source, props.keywords, options),
-          { value: 0 },
-          markClasses,
-          markStyle
-        )
-      }
+      const segments = getHighlightSegments(source, props.keywords, options)
+      const children: VNodeChild = segments.map((segment) =>
+        segment.highlighted ? renderMark(segment.text, markClasses, markStyle) : segment.text
+      )
 
       return h(
         'span',
         {
           ...attrs,
-          class: composeComponentClasses(
+          class: classNames(
             getHighlightRootClasses(props.className),
-            attrsRecord.class
+            coerceClassValue(attrsRecord.class)
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
           'data-highlight': '',

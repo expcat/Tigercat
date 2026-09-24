@@ -26,37 +26,28 @@ export const highlightRootClasses = 'tiger-highlight'
  * readable in both color schemes, without Tag border or warning foreground.
  */
 export const highlightMarkClasses =
-  'tiger-highlight-mark rounded-[var(--tiger-radius-sm,0.375rem)] bg-[var(--tiger-warning,#d97706)]/20 px-0.5 text-inherit box-decoration-clone'
-
-const REGEXP_SPECIAL_CHARS = /[.*+?^${}()|[\]\\]/g
+  'tiger-highlight-mark rounded-[var(--tiger-radius-sm)] bg-[var(--tiger-warning)]/20 px-0.5 text-inherit box-decoration-clone'
 
 /**
- * Escape a string keyword so it is matched literally.
+ * Kept so callers that previously escaped keywords still compile.
+ * Matching itself is a literal scan and does not compile a pattern.
  */
 export function escapeHighlightKeyword(keyword: string): string {
-  return keyword.replace(REGEXP_SPECIAL_CHARS, '\\$&')
+  return keyword
 }
 
 /**
- * Normalize `keywords` into a list of string/RegExp queries.
- * Non-string, non-RegExp entries are ignored.
+ * Normalize `keywords` into string queries.
+ * Non-strings, including `RegExp`, are dropped and never executed.
  */
-export function normalizeHighlightKeywords(
-  keywords?: HighlightKeywords | null
-): Array<string | RegExp> {
+export function normalizeHighlightKeywords(keywords?: HighlightKeywords | null): string[] {
   if (keywords == null) return []
-
-  if (typeof keywords === 'string' || keywords instanceof RegExp) {
-    return [keywords]
-  }
-
+  if (typeof keywords === 'string') return [keywords]
   if (!Array.isArray(keywords)) return []
 
-  const result: Array<string | RegExp> = []
+  const result: string[] = []
   for (const item of keywords) {
-    if (typeof item === 'string' || item instanceof RegExp) {
-      result.push(item)
-    }
+    if (typeof item === 'string') result.push(item)
   }
   return result
 }
@@ -87,49 +78,6 @@ export function resolveHighlightText(text?: string | null, fallback?: string | n
   return ''
 }
 
-function cloneRegExp(source: RegExp, global: boolean): RegExp | null {
-  const withoutG = source.flags.replace(/g/g, '')
-  const flags = global ? `${withoutG}g` : withoutG
-  try {
-    return new RegExp(source.source, flags)
-  } catch {
-    return null
-  }
-}
-
-function collectRegExpRanges(text: string, pattern: RegExp, global: boolean): HighlightRange[] {
-  const ranges: HighlightRange[] = []
-  if (!text) return ranges
-
-  try {
-    if (!global) {
-      const match = pattern.exec(text)
-      if (match && match[0].length > 0) {
-        ranges.push({ start: match.index, end: match.index + match[0].length })
-      }
-      return ranges
-    }
-
-    pattern.lastIndex = 0
-    let match: RegExpExecArray | null
-    let steps = 0
-    const limit = text.length + 2
-    while ((match = pattern.exec(text)) !== null) {
-      if (++steps > limit) break
-      if (match[0].length === 0) {
-        pattern.lastIndex += 1
-        if (pattern.lastIndex > text.length) break
-        continue
-      }
-      ranges.push({ start: match.index, end: match.index + match[0].length })
-    }
-  } catch {
-    return []
-  }
-
-  return ranges
-}
-
 function collectStringRanges(
   text: string,
   keyword: string,
@@ -137,14 +85,20 @@ function collectStringRanges(
   global: boolean
 ): HighlightRange[] {
   if (!keyword) return []
-  const flags = `${global ? 'g' : ''}${caseSensitive ? '' : 'i'}`
-  let pattern: RegExp
-  try {
-    pattern = new RegExp(escapeHighlightKeyword(keyword), flags)
-  } catch {
-    return []
+  const source = caseSensitive ? text : text.toLowerCase()
+  const needle = caseSensitive ? keyword : keyword.toLowerCase()
+  if (!needle) return []
+
+  const ranges: HighlightRange[] = []
+  let from = 0
+  while (from <= source.length - needle.length) {
+    const index = source.indexOf(needle, from)
+    if (index === -1) break
+    ranges.push({ start: index, end: index + needle.length })
+    if (!global) break
+    from = index + needle.length
   }
-  return collectRegExpRanges(text, pattern, global)
+  return ranges
 }
 
 function sanitizeRange(range: HighlightRange, length: number): HighlightRange | null {
@@ -178,12 +132,9 @@ export function mergeHighlightRanges(ranges: readonly HighlightRange[]): Highlig
 }
 
 /**
- * Find stable match ranges for `text` against `keywords`.
+ * Find stable match ranges for `text` against string `keywords`.
  *
- * String keywords are escaped and honor `caseSensitive`/`global`.
- * Regular expressions keep their own flags except `g`, which follows `global`.
- * Empty keywords, zero-length matches, and invalid patterns are skipped.
- * The original RegExp `lastIndex` is not mutated.
+ * Matching is a linear scan. Keywords are literal. `RegExp` values are ignored.
  */
 export function findHighlightRanges(
   text: string,
@@ -198,14 +149,7 @@ export function findHighlightRanges(
   const collected: HighlightRange[] = []
 
   for (const query of queries) {
-    if (typeof query === 'string') {
-      collected.push(...collectStringRanges(text, query, caseSensitive, global))
-      continue
-    }
-
-    const pattern = cloneRegExp(query, global)
-    if (!pattern) continue
-    collected.push(...collectRegExpRanges(text, pattern, global))
+    collected.push(...collectStringRanges(text, query, caseSensitive, global))
   }
 
   const sanitized: HighlightRange[] = []

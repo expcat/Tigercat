@@ -25,13 +25,12 @@ const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)))
 const packageDir = join(repoRoot, config.packageDir)
 const sourcePath = join(packageDir, config.sourceFile)
 const distPath = join(packageDir, 'dist', 'index.mjs')
-const coreDistPath = join(repoRoot, 'packages/core/dist/index.js')
 
 const source = readFileSync(sourcePath, 'utf8')
 const lines = source.split(/\r?\n/)
 const output = []
 const localRuntimeExportNames = collectLocalRuntimeExportNames(lines)
-const coreRuntimeExportNames = await collectCoreRuntimeExportNames()
+void localRuntimeExportNames
 
 let isTypeExportBlock = false
 let wroteMessageRoot = false
@@ -343,11 +342,9 @@ for (let index = 0; index < lines.length; index += 1) {
 
   if (trimmed.startsWith('export * from ')) {
     if (trimmed === "export * from '@expcat/tigercat-core'") {
-      output.push(createCoreRuntimeExport())
-    } else {
-      output.push(trimmed.endsWith(';') ? trimmed : `${trimmed};`)
+      continue
     }
-
+    output.push(trimmed.endsWith(';') ? trimmed : `${trimmed};`)
     continue
   }
 

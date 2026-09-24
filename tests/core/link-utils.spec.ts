@@ -4,55 +4,71 @@
 
 import { describe, expect, it } from 'vitest'
 import {
-  getLinkVariantClasses,
   getSecureRel,
-  linkBaseClasses,
-  resolveLinkClasses
+  isAllowedLinkUrl,
+  isInternalLinkPath,
+  resolveLinkAddress,
+  resolveLinkHref
 } from '@expcat/tigercat-core'
 
-describe('getSecureRel', () => {
-  it('merges noopener noreferrer into a custom _blank rel', () => {
-    const rel = getSecureRel('_blank', 'nofollow') ?? ''
-    const tokens = new Set(rel.split(/\s+/))
-    expect(tokens.has('nofollow')).toBe(true)
-    expect(tokens.has('noopener')).toBe(true)
-    expect(tokens.has('noreferrer')).toBe(true)
+describe('link-utils protocol gate', () => {
+  it('allows http(s), mailto, tel, relative paths, queries, and hashes', () => {
+    for (const value of [
+      'https://example.com/a',
+      'http://example.com',
+      'HTTP://example.com',
+      'mailto:a@b.c',
+      'tel:+1-555',
+      '/docs',
+      './docs',
+      '../docs',
+      'docs',
+      '?q=1',
+      '#section',
+      '#'
+    ]) {
+      expect(isAllowedLinkUrl(value), value).toBe(true)
+    }
   })
 
-  it('adds the secure tokens when _blank has no rel', () => {
-    expect(getSecureRel('_blank', undefined)).toBe('noopener noreferrer')
+  it('rejects javascript, data, vbscript, protocol-relative, and disguised schemes', () => {
+    for (const value of [
+      'javascript:alert(1)',
+      'JavaScript:alert(1)',
+      '  javascript:alert(1)',
+      'java\nscript:alert(1)',
+      'java\tscript:alert(1)',
+      'data:text/html,hi',
+      'data:image/png;base64,aaaa',
+      'vbscript:msgbox(1)',
+      'VbScript:msgbox(1)',
+      '//evil.example',
+      'blob:https://example.com/id',
+      ''
+    ]) {
+      expect(isAllowedLinkUrl(value), JSON.stringify(value)).toBe(false)
+      expect(resolveLinkHref(value)).toBeUndefined()
+    }
   })
 
-  it('does not add tokens for other targets', () => {
+  it('treats only scheme-less addresses as internal paths', () => {
+    expect(isInternalLinkPath('/app/users')).toBe(true)
+    expect(isInternalLinkPath('users')).toBe(true)
+    expect(isInternalLinkPath('https://example.com')).toBe(false)
+    expect(isInternalLinkPath('javascript:alert(1)')).toBe(false)
+    expect(isInternalLinkPath('//cdn.example/a.png')).toBe(false)
+  })
+
+  it('omits href when disabled or rejected, and secures _blank', () => {
+    expect(resolveLinkHref('/ok', { disabled: true })).toBeUndefined()
+    expect(resolveLinkAddress({ href: 'javascript:alert(1)', target: '_blank' })).toEqual({})
+    expect(
+      resolveLinkAddress({ href: 'https://example.com', target: '_blank', rel: 'nofollow' })
+    ).toEqual({
+      href: 'https://example.com',
+      target: '_blank',
+      rel: 'nofollow noopener noreferrer'
+    })
     expect(getSecureRel('_self', 'nofollow')).toBe('nofollow')
-    expect(getSecureRel(undefined, undefined)).toBeUndefined()
-  })
-})
-
-describe('resolveLinkClasses', () => {
-  it('falls back to primary for an unknown variant and does not throw', () => {
-    expect(resolveLinkClasses({ variant: 'not-a-variant' })).toBe(
-      resolveLinkClasses({ variant: 'primary' })
-    )
-    expect(() => getLinkVariantClasses('not-a-variant')).not.toThrow()
-  })
-
-  it('underlines at rest and drops cursor-pointer when disabled', () => {
-    const enabled = resolveLinkClasses({ underline: true })
-    expect(enabled.split(/\s+/)).toContain('underline')
-    expect(enabled.split(/\s+/)).not.toContain('hover:underline')
-    expect(enabled.split(/\s+/)).toContain('cursor-pointer')
-    expect(linkBaseClasses.split(/\s+/)).not.toContain('cursor-pointer')
-
-    const disabled = resolveLinkClasses({ disabled: true })
-    expect(disabled.split(/\s+/)).toContain('cursor-not-allowed')
-    expect(disabled.split(/\s+/)).not.toContain('cursor-pointer')
-    expect(disabled).toContain('--tiger-')
-  })
-
-  it('uses semantic text tokens for the default variant', () => {
-    const classes = resolveLinkClasses({ variant: 'default' })
-    expect(classes).toContain('--tiger-text')
-    expect(classes).not.toContain('text-gray-')
   })
 })

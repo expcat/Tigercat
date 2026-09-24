@@ -52,9 +52,9 @@ describe('Link (Vue)', () => {
 
     const link = container.querySelector('a')
     expect(link).toHaveAttribute('aria-disabled', 'true')
-    expect(link).toHaveAttribute('href', '/test')
+    expect(link).not.toHaveAttribute('href')
     expect(link).toHaveAttribute('tabindex', '-1')
-    expect(screen.getByRole('link', { name: 'Disabled' })).toBe(link)
+    expect(screen.getByText('Disabled')).toBe(link)
 
     await fireEvent.click(screen.getByText('Disabled'))
     expect(onClick).not.toHaveBeenCalled()

@@ -23,10 +23,9 @@ import {
 
 describe('highlight-utils', () => {
   describe('escapeHighlightKeyword', () => {
-    it('escapes regex special characters so keywords match literally', () => {
-      expect(escapeHighlightKeyword('a+b')).toBe('a\\+b')
-      expect(escapeHighlightKeyword('(foo)')).toBe('\\(foo\\)')
-      expect(escapeHighlightKeyword('file.txt')).toBe('file\\.txt')
+    it('returns the keyword unchanged because matching does not compile a pattern', () => {
+      expect(escapeHighlightKeyword('a+b')).toBe('a+b')
+      expect(escapeHighlightKeyword('file.txt')).toBe('file.txt')
     })
   })
 
@@ -36,23 +35,21 @@ describe('highlight-utils', () => {
       expect(normalizeHighlightKeywords(null)).toEqual([])
     })
 
-    it('wraps a string or RegExp as a single query', () => {
+    it('wraps a string and drops RegExp', () => {
       expect(normalizeHighlightKeywords('Vue')).toEqual(['Vue'])
-      const pattern = /Vue/i
-      expect(normalizeHighlightKeywords(pattern)).toEqual([pattern])
+      expect(normalizeHighlightKeywords(/Vue/i as unknown as string)).toEqual([])
     })
 
-    it('keeps string and RegExp array entries and drops the rest', () => {
-      const pattern = /\d+/
+    it('keeps string array entries and drops RegExp and other values', () => {
       expect(
         normalizeHighlightKeywords([
           'Vue',
-          pattern,
+          /\\d+/ as unknown as string,
           '',
           1 as unknown as string,
           null as unknown as string
         ])
-      ).toEqual(['Vue', pattern, ''])
+      ).toEqual(['Vue', ''])
     })
   })
 
@@ -102,27 +99,17 @@ describe('highlight-utils', () => {
       expect(findHighlightRanges('a+b and aab', 'a+b')).toEqual([{ start: 0, end: 3 }])
     })
 
-    it('accepts a RegExp and does not mutate its lastIndex', () => {
+    it('does not execute a RegExp keyword', () => {
       const pattern = /#\d+/g
       pattern.lastIndex = 4
-      expect(findHighlightRanges('Order #42 and #7', pattern)).toEqual([
-        { start: 6, end: 9 },
-        { start: 14, end: 16 }
-      ])
+      expect(findHighlightRanges('Order #42 and #7', pattern as unknown as string)).toEqual([])
       expect(pattern.lastIndex).toBe(4)
     })
 
-    it('keeps a RegExp ignoreCase flag even when caseSensitive is true', () => {
-      expect(findHighlightRanges('Vue then vue', /Vue/i, { caseSensitive: true })).toEqual([
-        { start: 0, end: 3 },
-        { start: 9, end: 12 }
-      ])
-    })
-
-    it('skips empty keywords, empty matches, and empty text', () => {
+    it('skips empty keywords and empty text', () => {
       expect(findHighlightRanges('', 'a')).toEqual([])
       expect(findHighlightRanges('abc', '')).toEqual([])
-      expect(findHighlightRanges('abc', /(?:)/g)).toEqual([])
+      expect(findHighlightRanges('abc', /(?:)/g as unknown as string)).toEqual([])
     })
   })
 

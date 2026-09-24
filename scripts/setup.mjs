@@ -22,12 +22,9 @@ function main() {
   console.log(`✓ Node.js ${process.versions.node} detected`)
 
   if (!isPnpmAvailable()) {
-    console.log('Installing pnpm...')
-    const status = run('npm', ['install', '-g', 'pnpm@11.9.0'], {
-      shell: true
-    })
-    if (status !== 0) process.exit(status)
-    console.log('✓ pnpm installed')
+    console.error('pnpm is not installed.')
+    console.error('Install it with: corepack enable && corepack prepare pnpm@11.9.0 --activate')
+    process.exit(1)
   } else {
     const pnpmVersion = getPnpmVersion() ?? 'unknown'
     console.log(`✓ pnpm ${pnpmVersion} detected`)

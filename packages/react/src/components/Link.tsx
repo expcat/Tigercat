@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useMemo } from 'react'
 import {
-  getSecureRel,
+  resolveLinkAddress,
   resolveLinkClasses,
   type LinkProps as CoreLinkProps
 } from '@expcat/tigercat-core'
@@ -39,7 +39,10 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
     [variant, size, underline, disabled, className]
   )
 
-  const computedRel = useMemo(() => getSecureRel(target, rel), [target, rel])
+  const address = useMemo(
+    () => resolveLinkAddress({ href, target, rel, disabled }),
+    [href, target, rel, disabled]
+  )
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -70,9 +73,9 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
       {...props}
       ref={ref}
       className={linkClasses}
-      href={href}
-      target={target}
-      rel={computedRel}
+      href={address.href}
+      target={address.target}
+      rel={address.rel}
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : tabIndex}
       onClick={handleClick}

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 export const CATEGORIES = {
@@ -47,7 +47,6 @@ export const CATEGORIES = {
     'select',
     'signature',
     'slider',
-    'stepper',
     'switch',
     'textarea',
     'timepicker',
@@ -130,13 +129,14 @@ export const CATEGORIES = {
     'activity-feed',
     'chat',
     'comment-thread',
-    'composite',
     'form-wizard',
     'schema-form',
     'notification-center',
     'table-toolbar',
     'task-board',
     'workflow-timeline',
+    'workflow-action-bar',
+    'workflow-viewer',
     'workflow-detail-shell',
     'workflow-designer'
   ],
@@ -152,18 +152,6 @@ const CATEGORY_BY_TYPE_NAME = new Map(
     typeNames.map((typeName) => [typeName, category])
   )
 )
-
-const COMPONENT_ALIASES = {
-  AutoComplete: 'AutoComplete',
-  QRCode: 'QRCode',
-  DataTableWithToolbar: 'DataTableWithToolbar',
-  ChartCanvas: 'ChartCanvas',
-  ChartAxis: 'ChartAxis',
-  ChartGrid: 'ChartGrid',
-  ChartSeries: 'ChartSeries',
-  ChartLegend: 'ChartLegend',
-  ChartTooltip: 'ChartTooltip'
-}
 
 const NON_COMPONENT_TYPE_NAMES = new Set([
   'BaseChart',
@@ -261,36 +249,6 @@ export const FRAMEWORK_COMPONENTS = {
 }
 
 export const PUBLIC_PROPS_TYPE_EXCEPTIONS = new Map()
-
-const DOC_SECTION_ALIASES = new Map([
-  ['Header', 'Layout'],
-  ['Sidebar', 'Layout'],
-  ['Content', 'Layout'],
-  ['Footer', 'Layout'],
-  ['Row', 'Grid'],
-  ['Col', 'Grid'],
-  ['CollapsePanel', 'Collapse'],
-  ['MenuItem', 'Menu'],
-  ['SubMenu', 'Menu'],
-  ['MenuItemGroup', 'Menu'],
-  ['TabPane', 'Tabs'],
-  ['BreadcrumbItem', 'Breadcrumb'],
-  ['StepsItem', 'Steps'],
-  ['DropdownMenu', 'Dropdown'],
-  ['DropdownItem', 'Dropdown'],
-  ['ContextMenuMenu', 'ContextMenu'],
-  ['ContextMenuItem', 'ContextMenu'],
-  ['ContextMenuSub', 'ContextMenu'],
-  ['NavigationMenuItem', 'NavigationMenu'],
-  ['NavigationMenuTrigger', 'NavigationMenu'],
-  ['NavigationMenuContent', 'NavigationMenu'],
-  ['NavigationMenuLink', 'NavigationMenu'],
-  ['NavigationMenuList', 'NavigationMenu'],
-  ['FloatButtonGroup', 'FloatButton'],
-  ['InputGroupAddon', 'InputGroup'],
-  ['PrintPageBreak', 'PrintLayout'],
-  ['WorkflowActionBar', 'WorkflowTimeline']
-])
 
 // 别名经 MCP normalizeName 归一化后按子串匹配任务文本;中文别名须 ≥2 字且避免
 // 过泛词(如 选择器/提示/步骤/编辑器),否则会在无关任务里误命中组件。
@@ -397,7 +355,7 @@ export const COMPONENT_ROUTE_ALIASES = {
   面包屑: ['Breadcrumb'],
   菜单: ['Menu'],
   步骤条: ['Steps'],
-  步进器: ['Stepper'],
+  步进器: ['InputNumber'],
   分段控制器: ['Segmented'],
   锚点: ['Anchor'],
   回到顶部: ['BackTop'],
@@ -450,10 +408,8 @@ export const COMPONENT_ROUTE_ALIASES = {
   矩形树图: ['TreeMapChart'],
   甘特图: ['Gantt'],
   组织架构图: ['OrgChart'],
-  看板: ['TaskBoard'],
   任务看板: ['TaskBoard'],
   全屏看图: ['ImagePreview'],
-  图片预览: ['ImagePreview'],
   聊天窗口: ['ChatWindow'],
   评论: ['CommentThread'],
   活动流: ['ActivityFeed'],
@@ -546,12 +502,9 @@ export const TIGERCAT_TOPIC_ROUTES = {
 }
 
 /**
- * Compat public names that remain importable but should not be taught as
- * first-class usage in generated docs. Distinct from PACKAGE_EXPORT_TARGET_ALIASES,
- * which also maps subcomponents (TabPane → Tabs) and command roots.
+ * One alias map: subcomponents and command roots share the parent's file.
+ * There is no second identity-alias table.
  */
-export const DOC_COMPONENT_ALIASES = new Map([])
-
 const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['AnchorLink', 'Anchor'],
   ['BreadcrumbItem', 'Breadcrumb'],
@@ -578,14 +531,6 @@ const PACKAGE_EXPORT_TARGET_ALIASES = new Map([
   ['WorkflowActionBar', 'WorkflowTimeline']
 ])
 
-export const REQUIRED_CORE_PACKAGE_EXPORTS = [
-  '.',
-  './tailwind',
-  './tailwind/modern',
-  './tokens.css',
-  './figma-variables.json'
-]
-
 export const FRAMEWORK_ROOT_PACKAGE_EXPORT = {
   types: './dist/index.d.mts',
   import: './dist/index.mjs',
@@ -607,7 +552,7 @@ export function pascalToKebab(value) {
 }
 
 export function normalizeComponentName(name) {
-  return COMPONENT_ALIASES[name] || name
+  return name
 }
 
 export function propsInterfaceToComponentName(propsInterface) {
@@ -672,33 +617,171 @@ export function getComponentPackageExport(component) {
   }
 }
 
-function getFrameworkHookPackageExports(framework) {
-  const hookDir = framework === 'react' ? 'hooks' : 'composables'
-  const exports = {
-    './useDrag': {
-      types: `./dist/${hookDir}/useDrag.d.mts`,
-      import: `./dist/${hookDir}/useDrag.mjs`,
-      default: `./dist/${hookDir}/useDrag.mjs`
+const CORE_LOCALE_IDS = [
+  'en-US',
+  'zh-CN',
+  'zh-TW',
+  'ja-JP',
+  'ko-KR',
+  'th-TH',
+  'vi-VN',
+  'id-ID',
+  'es-ES',
+  'fr-FR',
+  'de-DE',
+  'pt-BR',
+  'ar-SA'
+]
+
+const CORE_ICON_GROUPS = ['common', 'picker', 'status', 'table', 'registry']
+
+function coreConditionalExport(types, importPath) {
+  return { types, import: importPath }
+}
+
+/**
+ * Single entry table for core package exports and the tsup entry map.
+ * Conditions are `types` + `import` only.
+ */
+export function buildCorePackageEntries() {
+  const entries = [
+    {
+      subpath: '.',
+      types: './dist/index.d.ts',
+      import: './dist/index.js',
+      source: 'src/index.ts'
     },
-    './useFullscreen': {
-      types: `./dist/${hookDir}/useFullscreen.d.mts`,
-      import: `./dist/${hookDir}/useFullscreen.mjs`,
-      default: `./dist/${hookDir}/useFullscreen.mjs`
-    }
+    {
+      subpath: './tailwind',
+      types: './dist/tailwind.d.ts',
+      import: './dist/tailwind.js',
+      source: 'src/tailwind-entry.ts'
+    },
+    { subpath: './tokens.css', target: './tokens/tokens.css' },
+    { subpath: './figma-variables.json', target: './tokens/figma-variables.json' }
+  ]
+
+  for (const id of CORE_LOCALE_IDS) {
+    entries.push({
+      subpath: `./locales/${id}`,
+      types: `./dist/locales/${id}.d.ts`,
+      import: `./dist/locales/${id}.js`,
+      source: `src/utils/i18n/locales/${id}.ts`
+    })
   }
 
-  if (framework === 'react') {
-    exports['./useControlledState'] = {
-      types: './dist/hooks/useControlledState.d.mts',
-      import: './dist/hooks/useControlledState.mjs',
-      default: './dist/hooks/useControlledState.mjs'
+  for (const group of CORE_ICON_GROUPS) {
+    entries.push({
+      subpath: `./icons/${group}`,
+      types: `./dist/icons/${group}.d.ts`,
+      import: `./dist/icons/${group}.js`,
+      source: `src/utils/icons/${group}.ts`
+    })
+  }
+
+  for (const [subpath, source] of [
+    ['./utils/table-export', 'src/utils/table-export.ts'],
+    ['./utils/data-export', 'src/utils/data-export.ts'],
+    ['./workflow-designer', 'src/workflow-designer.ts'],
+    ['./schema-form', 'src/schema-form.ts']
+  ]) {
+    const stem = source.replace(/^src\//, '').replace(/\.ts$/, '')
+    entries.push({
+      subpath,
+      types: `./dist/${stem}.d.ts`,
+      import: `./dist/${stem}.js`,
+      source
+    })
+  }
+
+  return entries
+}
+
+export function buildCorePackageExports() {
+  const exports = {}
+  for (const entry of buildCorePackageEntries()) {
+    exports[entry.subpath] = entry.target
+      ? entry.target
+      : coreConditionalExport(entry.types, entry.import)
+  }
+  return exports
+}
+
+export function buildCoreTsupEntries() {
+  return Object.fromEntries(
+    buildCorePackageEntries()
+      .filter((entry) => entry.source)
+      .map((entry) => [
+        entry.subpath === '.' ? 'index' : entry.subpath.replace(/^\.\//, ''),
+        entry.source
+      ])
+  )
+}
+
+export const REQUIRED_CORE_PACKAGE_EXPORTS = Object.keys(buildCorePackageExports())
+
+function frameworkFileExport(dir, file) {
+  return {
+    types: `./dist/${dir}/${file}.d.mts`,
+    import: `./dist/${dir}/${file}.mjs`,
+    default: `./dist/${dir}/${file}.mjs`
+  }
+}
+
+/**
+ * Hook subpaths come from `use*` exports of hooks/composables.
+ * Imperative APIs are the lowercase runtime exports (notification).
+ */
+export function collectFrameworkRuntimeSubpaths(indexContent, framework) {
+  const hookDir = framework === 'react' ? 'hooks' : 'composables'
+  const exports = {}
+  const exportRegex = /export\s+\{([^}]+)\}\s+from\s+['"](\.\/[^'"]+)['"]/g
+  let match
+
+  while ((match = exportRegex.exec(indexContent)) !== null) {
+    const source = match[2]
+    const file = source.split('/').pop()
+    const inHookDir = source.includes(`/${hookDir}/`)
+    const inComponents = source.includes('/components/')
+
+    for (const specifier of match[1].split(',')) {
+      const parts = specifier.trim().split(/\s+as\s+/)
+      if (!parts[0]) continue
+      const exported = (parts[1] || parts[0]).trim()
+      if (/^use[A-Z]/.test(exported) && inHookDir) {
+        exports[`./${exported}`] = frameworkFileExport(hookDir, file)
+        continue
+      }
+      if (/^[a-z]/.test(exported) && !exported.startsWith('use') && inComponents) {
+        exports[`./${exported}`] = frameworkFileExport('components', file)
+      }
     }
   }
 
   return exports
 }
 
-export function buildFrameworkPackageExports(components, framework) {
+export function buildFrameworkTsupEntries(components, framework, indexContent) {
+  const ext = framework === 'react' ? 'tsx' : 'ts'
+  const entries = new Set([framework === 'react' ? 'src/index.tsx' : 'src/index.ts'])
+
+  for (const component of components) {
+    entries.add(`src/components/${getComponentPackageTarget(component)}.${ext}`)
+  }
+
+  const hookDir = framework === 'react' ? 'hooks' : 'composables'
+  const runtime = collectFrameworkRuntimeSubpaths(indexContent, framework)
+  for (const [subpath, target] of Object.entries(runtime)) {
+    const file = target.import.split('/').pop().replace(/\.mjs$/, '')
+    const dir = target.import.includes(`/${hookDir}/`) ? hookDir : 'components'
+    const sourceExt = dir === 'components' ? ext : 'ts'
+    entries.add(`src/${dir}/${file}.${sourceExt}`)
+  }
+
+  return [...entries]
+}
+
+export function buildFrameworkPackageExports(components, framework, indexContent = '') {
   const exports = {
     '.': FRAMEWORK_ROOT_PACKAGE_EXPORT
   }
@@ -707,7 +790,7 @@ export function buildFrameworkPackageExports(components, framework) {
     exports[getComponentPackageSubpath(component)] = getComponentPackageExport(component)
   }
 
-  Object.assign(exports, getFrameworkHookPackageExports(framework))
+  Object.assign(exports, collectFrameworkRuntimeSubpaths(indexContent, framework))
 
   return exports
 }
@@ -737,6 +820,24 @@ export function loadPublicComponentExports(root) {
   }
 }
 
+export function loadComponentRecords(root) {
+  const typesDir = join(root, 'packages', 'core', 'src', 'types')
+  const fileInfoByName = new Map()
+
+  for (const fileName of readdirSync(typesDir)) {
+    if (!fileName.endsWith('.ts') || fileName === 'index.ts') continue
+    const content = readFileSync(join(typesDir, fileName), 'utf8')
+    const propsInterfaces = []
+    for (const match of content.matchAll(/export\s+interface\s+(\w*Props)\b/g)) {
+      propsInterfaces.push(match[1])
+    }
+    const typeName = fileName.replace(/\.ts$/, '')
+    fileInfoByName.set(typeName, { typeName, fileName, propsInterfaces })
+  }
+
+  return buildPublicComponentEntries(root, fileInfoByName, loadPublicComponentExports(root))
+}
+
 export function buildPublicComponentEntries(root, fileInfoByName, publicExports) {
   const publicComponentNames = new Set(publicExports.all)
   const entriesByComponent = new Map()
@@ -751,13 +852,18 @@ export function buildPublicComponentEntries(root, fileInfoByName, publicExports)
         continue
       }
 
+      const slug = componentSlug(component)
+      const testGroup = categoryTestGroup(category)
       entriesByComponent.set(component, {
         component,
         category,
+        slug,
+        testGroup,
+        typeModule: fileInfo.fileName.replace(/\.ts$/, ''),
         packageSubpath: getComponentPackageSubpath(component),
         packageTarget: getComponentPackageTarget(component),
-        props: `shared/props/${CATEGORY_SLUGS[category]}.md#${pascalToKebab(component)}`,
-        examples: `examples/${CATEGORY_SLUGS[category]}.md#${pascalToKebab(component)}`,
+        props: `shared/props/${testGroup}.md#${slug}`,
+        examples: `examples/${testGroup}.md#${slug}`,
         typeSource: `packages/core/src/types/${fileInfo.fileName}`,
         propsInterfaces: [propsInterface],
         sourceFiles: [`packages/core/src/types/${fileInfo.fileName}`]
@@ -770,13 +876,18 @@ export function buildPublicComponentEntries(root, fileInfoByName, publicExports)
     if (!frameworkInfo) continue
 
     const category = frameworkInfo.category
+    const slug = componentSlug(component)
+    const testGroup = categoryTestGroup(category)
     entriesByComponent.set(component, {
       component,
       category,
+      slug,
+      testGroup,
+      typeModule: frameworkInfo.typeSource,
       packageSubpath: getComponentPackageSubpath(component),
       packageTarget: getComponentPackageTarget(component),
-      props: `shared/props/${CATEGORY_SLUGS[category]}.md#${pascalToKebab(component)}`,
-      examples: `examples/${CATEGORY_SLUGS[category]}.md#${pascalToKebab(component)}`,
+      props: `shared/props/${testGroup}.md#${slug}`,
+      examples: `examples/${testGroup}.md#${slug}`,
       ...frameworkInfo
     })
   }
@@ -784,13 +895,17 @@ export function buildPublicComponentEntries(root, fileInfoByName, publicExports)
   for (const component of publicExports.all) {
     if (entriesByComponent.has(component)) continue
 
+    const slug = componentSlug(component)
     entriesByComponent.set(component, {
       component,
       category: 'Other',
+      slug,
+      testGroup: 'other',
+      typeModule: 'unknown',
       packageSubpath: getComponentPackageSubpath(component),
       packageTarget: getComponentPackageTarget(component),
-      props: `shared/props/other.md#${pascalToKebab(component)}`,
-      examples: `examples/other.md#${pascalToKebab(component)}`,
+      props: `shared/props/other.md#${slug}`,
+      examples: `examples/other.md#${slug}`,
       typeSource: 'unknown',
       propsInterfaces: []
     })
@@ -806,11 +921,12 @@ export function buildTigercatContext7(componentRows, skillFiles = []) {
   const componentIndex = {}
 
   for (const row of componentRows) {
-    const slug = CATEGORY_SLUGS[row.category] || row.category.toLowerCase()
+    const slug = row.slug || componentSlug(row.component)
+    const testGroup = row.testGroup || categoryTestGroup(row.category)
     const references = {
       componentIndex: 'skills/tigercat/references/component-index.md',
-      props: `skills/tigercat/references/shared/props/${slug}.md`,
-      examples: `skills/tigercat/references/examples/${slug}.md`,
+      props: row.docProps || `skills/tigercat/references/${row.props.split('#')[0]}`,
+      examples: row.docExamples || `skills/tigercat/references/${row.examples.split('#')[0]}`,
       react: 'skills/tigercat/references/react/index.md',
       vue: 'skills/tigercat/references/vue/index.md'
     }
@@ -822,7 +938,7 @@ export function buildTigercatContext7(componentRows, skillFiles = []) {
         .map(([alias]) => alias),
       category: row.category,
       slug,
-      testGroup: slug,
+      testGroup,
       packageSubpath: getComponentPackageSubpath(row.component),
       packageTarget: getComponentPackageTarget(row.component),
       typeSource: row.typeSource,
@@ -832,14 +948,14 @@ export function buildTigercatContext7(componentRows, skillFiles = []) {
       references
     }
 
-    componentIndex[slug] ??= {
-      props: references.props,
+    componentIndex[testGroup] ??= {
+      props: `skills/tigercat/references/shared/props/${testGroup}.md`,
       vue: references.vue,
       react: references.react,
       components: [],
-      examples: references.examples
+      examples: `skills/tigercat/references/examples/${testGroup}.md`
     }
-    componentIndex[slug].components.push(row.component)
+    componentIndex[testGroup].components.push(row.component)
   }
 
   for (const entry of Object.values(componentIndex)) {
@@ -899,5 +1015,23 @@ export function formatComponentIndexType(typeSource) {
 }
 
 export function getDocTarget(componentName) {
-  return DOC_SECTION_ALIASES.get(componentName) || componentName
+  return componentName
+}
+
+export function componentSlug(component) {
+  return pascalToKebab(component)
+}
+
+export function categoryTestGroup(category) {
+  return CATEGORY_SLUGS[category] || String(category || 'other').toLowerCase()
+}
+
+/**
+ * Names the CLI may resolve but must not offer as addable components.
+ * Grid is Row + Col. Notification is the imperative API. DonutChart is PieChart.
+ */
+export const CLI_ADD_RESOLUTIONS = {
+  Grid: ['Row', 'Col'],
+  Notification: [],
+  DonutChart: ['PieChart']
 }

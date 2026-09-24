@@ -1,6 +1,6 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
-  getSecureRel,
+  resolveLinkAddress,
   resolveLinkClasses,
   type LinkVariant,
   type LinkSize
@@ -70,7 +70,14 @@ export const Link = defineComponent({
       })
     )
 
-    const computedRel = computed(() => getSecureRel(props.target, props.rel))
+    const address = computed(() =>
+      resolveLinkAddress({
+        href: props.href,
+        target: props.target,
+        rel: props.rel,
+        disabled: props.disabled
+      })
+    )
 
     const handleClick = (event: MouseEvent) => {
       if (props.disabled) {
@@ -96,9 +103,9 @@ export const Link = defineComponent({
         {
           ...attrs,
           class: [linkClasses.value, attrs.class],
-          href: props.href,
-          target: props.target,
-          rel: computedRel.value,
+          href: address.value.href,
+          target: address.value.target,
+          rel: address.value.rel,
           'aria-disabled': props.disabled ? 'true' : undefined,
           tabindex: props.disabled ? -1 : attrs.tabindex,
           onClick: handleClick,

@@ -29,12 +29,12 @@ import {
 import {
   CATEGORIES,
   CATEGORY_SLUGS,
-  DOC_COMPONENT_ALIASES,
   buildTigercatContext7,
   buildPublicComponentEntries,
   formatComponentIndexType,
   getComponentPackageSubpath,
-  loadPublicComponentExports
+  loadPublicComponentExports,
+  pascalToKebab
 } from './lib/public-components.mjs'
 import { collectFiles } from './utils/files.mjs'
 
@@ -96,19 +96,38 @@ const COMPONENT_USAGE_NOTES = {
   },
   Breadcrumb: {
     notes:
-      '`maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。'
+      '`maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。`href` 走 `link-utils`，危险协议不输出地址。'
+  },
+  Anchor: {
+    notes: '`href` 走 `link-utils`。`javascript:`、`data:`、`vbscript:` 不输出地址。'
+  },
+  Menu: {
+    notes:
+      '项上的 `href` 和 schema 的 `path` / `href` / `iframeSrc` 走 `link-utils`。`path` 只作站内路径。危险协议和禁用项不输出 `href`。'
+  },
+  PageHeader: {
+    notes: '返回地址走 `Link`，因此同样只接受 `link-utils` 的协议。危险地址不输出 `href`。'
+  },
+  ScrollSpy: {
+    notes: '项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。'
+  },
+  NavigationMenu: {
+    notes: '链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferrer`。危险协议和禁用项不输出 `href`。'
+  },
+  ContextMenu: {
+    notes: '项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。'
   },
   Modal: {
     notes:
-      '`open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。默认页脚 OK 必关。关闭名走 `locale.modal`（en-US Close / OK / Cancel）。嵌套 Modal 进外层 overlay-host，Esc 先关里层。'
+      '`open` 当帧出 dialog。打开时焦点进对话框或 `initialFocus`，先读标题。确定可返回 Promise 或 `preventDefault`：进行中不可再点，拒绝则不关闭。层本身不滚动，只有正文滚动。拖拽时过渡时长为 0。离开回调等这一层过渡结束；减少动效或没有过渡时立刻发。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。关闭名走 `locale.modal`。嵌套 Modal 进外层 overlay-host，Esc 先关里层。'
   },
   Drawer: {
     notes:
-      '与 Modal 同一套在场/陷阱/关场。`placement` 含 `start`/`end`。swipe 关闭只在标题栏或对应轴滚到头时成立。`className` 打在 panel。关闭名走 `locale.drawer`（en-US Close）。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。'
+      '与 Modal 同一套在场、焦点栈和关场。打开时焦点进对话框或 `initialFocus`。`placement` 含 `start`/`end`，先换成物理边再决定滑动方向；`fullscreenOnMobile` 铺满后，关闭滑动跟铺满后的边。swipe 只在标题栏或对应轴滚到头时成立。面板类名只有 `className`。`bodyPadding={false}` 去掉默认内边距，自定义间距用 `bodyClassName`。离开回调等这一层过渡结束。关闭名走 `locale.drawer`。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。'
   },
   Tour: {
     notes:
-      '`current` 是 `steps` 的原始下标，不是跳过之后的下标。非受控关后再开回到 0；受控时父级要自己归零。`closable={false}` 只藏 X，Esc / 点 mask 仍关，除非 `keyboard` / `maskClosable` 为 false。无标题仍有 locale dialog 名。`loadSteps` 出来的第一步也会量 target、挂陷阱。文案只读 `locale.tour`。'
+      '`current` 是 `steps` 的原始下标。关掉后非受控下标回到第一个未跳过的步骤；受控时发出回到该下标。同一次打开只加载一次 `loadSteps`，失败有可见状态，不先闪 `steps`。只在打开和换步时把目标滚进视口一次。默认洞只是视觉，点击落在遮罩上，目标保持 inert；`interact` 才把该目标排除在 inert 之外。换步时焦点回到气泡。`start` / `end` 按书写方向，left / right 是物理边。`closable={false}` 只藏 X。无标题仍有 locale dialog 名。文案只读 `locale.tour`。'
   },
   ChartCanvas: {
     notes:
@@ -132,19 +151,27 @@ const COMPONENT_USAGE_NOTES = {
   },
   InputNumber: {
     notes:
-      'React `onChange` 收到 `number | null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。'
+      'React `onChange` 收到 `number | null`。值可以是有限数字或数字字符串，`null` 和 `\'\'` 是空。`controlsPosition="both"` 是两侧按钮；`snapToStep` 默认关闭，步长只约束按钮和方向键。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。可访问名来自标签或 `aria-label`。'
+  },
+  Slider: {
+    notes:
+      'Vue 只认 `modelValue` / `update:modelValue`。方向读最近的 `dir`，否则读 ConfigProvider。拖动松手才写入表单，键盘立即写入。`marks` 过密时只标两端。'
+  },
+  TagsInput: {
+    notes:
+      '只读用 `readOnly`。粘贴在光标处插入后再按分隔符切开。错误只走 FormItem。拒绝重复或超限时给一句实时说明。'
   },
   Signature: {
     notes:
-      "受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）；可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。"
+      "受控值是空，或当前笔画导出的 SVG。解析不了的字符串当空，不提交原文。单点在画布、受控值和 `toDataURL()` 里是同一笔。Escape 和 `pointercancel` 丢掉当前笔。一次落笔写一次。只读用 `readOnly`：可聚焦、可提交、不能画。`disabled` 才离开 Tab 序。读 FormItem；id/aria 在画板 widget 上。"
   },
   Form: {
     notes:
-      '值对象是 Vue `modelValue`（`v-model`）/ React `value`。Wizard 步下标走 `onStepChange`，不是表单 values。Form `size` 是 `sm|md|lg`。'
+      '值对象是 Vue `modelValue`（`v-model`）/ React `value`。父级要把 `update:modelValue` 写回自己的模型。`required` 会参与校验。一次 `validate()` 作废仍在飞的上一次。失败提交聚焦第一个可聚焦的无效控件。Wizard 步下标走 `onStepChange`。Form `size` 是 `sm|md|lg`。'
   },
   FormItem: {
     notes:
-      "具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` 时从 model 取值（boolean/list/tuple 不会把 `''` 当成字符串）。字段请用 RadioGroup，不要把单颗 Radio 当 field。"
+      "具名 FormItem 只把值和校验接到第一个控件。`required` 合并成一条规则。错误文本一直在文档里：字段校验是 `role=\"status\"`，提交失败是 `role=\"alert\"`。省略公开 value/`checked`/`fileList` 时从模型取值（boolean/list/tuple 不会把 `''` 当成字符串）。单颗 Radio 写入自己的选项值。"
   },
   Input: {
     notes:
@@ -156,42 +183,62 @@ const COMPONENT_USAGE_NOTES = {
   },
   Mentions: {
     notes:
-      '插入的是 `prefix + option.value + 空格`。字段 props 与 Textarea 对齐：`autoResize` / `maxLength` / `showCount` / `readonly`（`readOnly` 别名）/ `clearable`（默认 false）。不要把 `prefix` 当成 Input 的前缀槽。'
+      '插入读文本框当前值和选区。解析和插入共用同一套分隔符。搜索事件带上前缀。组合输入期间不插入。清除文案是 `common.clearText`。只读用 `readOnly`，不能从列表插入。不要把 `prefix` 当成 Input 的前缀槽。'
   },
   RadioGroup: {
     notes:
-      '可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。字段请用 RadioGroup，不要把单颗 Radio 当 FormItem。'
+      '可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。具名 FormItem 里的单颗 Radio 写入该选项的 `value`。'
   },
   CheckboxGroup: {
     notes: '可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。'
   },
   DatePicker: {
     notes:
-      '空范围是 `null`。进行中的范围才是元组。不要用 `[null, null]` 表示空范围。日期是本地日历日。'
+      '存储和 `name` 是公历日历日（`YYYY-MM-DD`，范围 `start|end`）。展示可以本地化，解析用生成这段文字的同一套历法和数字。点选、键入、快捷方式和确定走同一道禁用边界；结束早于开始会对调。区间第一次点选只预览，确定提交完整区间，未完成留在面板里。空是 `null`。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`，打开只有 `update:open`。'
   },
   NumberKeyboard: {
     notes:
-      '配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。'
+      '配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。打开后焦点在对话框里，当前键可见。进入的值先按模式收成合法串，收不干净当空。`phone` 默认 11 位，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。只读用 `readOnly`，只读键不可激活。'
   },
   Select: {
     notes:
-      "未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职是 `height`，也接受 `listHeight`。"
+      "单选未选是 `null`（`undefined` 表示非受控），多选未选是 `[]`。`''` 是合法选项值。Clear 发出 `null` 或 `[]`。创建项留在列表里，直到 `options` 接过去；完全相同才不算新建。小屏列表仍锚在触发器上。搜索防抖读最新回调。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）。列、返回和展开文案不在 Select 语言包。"
   },
   AutoComplete: {
     notes:
-      "打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。"
+      "关层（完成、点外面、受控关闭）提交或还原。原生 `name` 提交已提交的值，展示用提交时的标签。缺键、`null` 和 `''` 是未提交。空查询不命中 `value` 或 `label` 为 `''` 的选项。没有可选项时 Enter 提交查询。组合输入期间把键交给输入法。打开着的空列表 `aria-expanded` 仍是真。只读用 `readOnly`。"
   },
   Cascader: {
     notes:
-      'value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。'
+      "空路径是 `[]`。缺键、`null` 和 `''` 都是 `[]`。对不上的段保留原始键。浏览路径只在打开时初始化。懒加载的鼠标、Enter 和方向键走同一道。列、返回、展开文案在 `locale.cascader`，不在 `select`。只读用 `readOnly`。"
   },
   TreeSelect: {
     notes:
-      "选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），`listHeight` 是同职别名（两者都传时 `listHeight` 胜出）。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。"
+      "选中的是节点 `key`。空单选是 `null`，空多选是 `[]`。`''` 不是键，`0` 是合法键。勾选框表示级联，`checkStrategy` 只决定提交哪些键；`checkStrictly` 时不按策略过滤。搜索零命中是空列表。`defaultExpandAll` 只在树第一次有数据时生效。浮层高度只留 `listHeight`。文案在 `locale.treeSelect`。只读用 `readOnly`。"
   },
   TimePicker: {
     notes:
-      '值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空单值 `null`；空范围也是 `null`。DatePicker 空范围同样是 `null`，进行中才是元组。`locale` 只收官方对象。'
+      '值是 24h `HH:mm`；`showSeconds` 为真才留秒。此刻、键入和确定共用 `minTime` / `maxTime` / `disabledTime`。结束早于开始会对调。半截区间留在元组里，空单值是 `null`。桌面列和手机 select 同时在文档里，用 CSS 切换。`name` 提交同一套字符串。只读用 `readOnly`。`locale` 只收官方对象。'
+  },
+  ColorPicker: {
+    notes:
+      '文本在失焦或 Enter 时才按最终格式提交。解析失败留在草稿里并标成错误，不上屏，隐藏域提交空。饱和度、色相和透明度在拖动中只更新预览，松手再写入。触发按钮带 `aria-expanded`。只读用 `readOnly`。'
+  },
+  ColorSwatch: {
+    notes:
+      '选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex 与 `rgb()` 可以是同一支。解析不了的字符串不涂成颜色。只读用 `readOnly`。'
+  },
+  CronEditor: {
+    notes:
+      '提交给表单的值是空，或一份通过 5 段规则的表达式。非法文本留在草稿里，错误走 FormItem，输入过程用 `polite`。空值的字段显示空，不画成五个 `*`。只读用 `readOnly`：可以聚焦和提交，不能改值。'
+  },
+  Upload: {
+    notes:
+      '界面、进度、`submit` 和表单写入用同一份列表。`name` 是表单字段，`fileFieldName` 是请求里的文件字段。成功时写回可用地址；没有地址不把 uid 当结果。`multiple` 为假时拖拽也只留第一个。失败行用同一把在途锁重试。只读用 `readOnly`。'
+  },
+  Transfer: {
+    notes:
+      '目标只留 `value`，初始值只留 `defaultValue`。数据源按字符串键收成一条，`1` 和 `\'1\'` 是同一行。搜索、全选和移动只处理当前可见项。搜索框的 Enter 不提交外层表单。滤掉的已选项单独成条，可以一次清掉。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`。'
   },
   Icon: {
     notes:
@@ -199,11 +246,11 @@ const COMPONENT_USAGE_NOTES = {
   },
   Link: {
     notes:
-      '`href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。'
+      '地址只接受 `link-utils` 的协议（`http:`、`https:`、`mailto:`、`tel:` 和无协议的站内路径）。`javascript:`、`data:`、`vbscript:` 和禁用都不输出 `href`。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。'
   },
   Text: {
     notes:
-      '`tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。'
+      '`tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 只用 `start` / `center` / `end` / `justify`。`label` 需自备 `htmlFor`。'
   },
   Code: {
     notes: '`code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。'
@@ -214,11 +261,11 @@ const COMPONENT_USAGE_NOTES = {
   },
   Highlight: {
     notes:
-      '需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。'
+      '`keywords` 只收字符串，按字面量线性扫描，不执行正则。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。'
   },
   Marquee: {
     notes:
-      '`repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。'
+      '`repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。方向只用 `start` / `end` / `up` / `down`。'
   },
   Carousel: {
     notes:
@@ -252,12 +299,12 @@ const COMPONENT_USAGE_NOTES = {
   },
   WorkflowDesigner: {
     notes:
-      '简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。'
+      '简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。摘要按钮可聚焦，Enter 打开检查器。Inspector 标签用方向键移动。`onChange` 带上 `issues`。有阻塞项时发布按钮不可用，横幅是同一句话。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵，缺省权限与运行时是同一个更严默认。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。'
   },
   WorkflowDetailShell: {
     uses: ['SchemaForm', 'Tabs', 'WorkflowTimeline', 'WorkflowViewer', 'WorkflowActionBar'],
     notes:
-      '可选详情布局配方，不是第二套 Timeline / 表单设计器。槽：header / form / tabs（Timeline|Viewer）/ action（sticky ActionBar）。表单请先 `applyWorkflowFieldPermissions(schema, node.fieldPermissions, mode)`。给壳限定高度时 action 钉在底部、form/tabs 滚动。Admin 在后续切片接真页。'
+      '可选详情布局配方，不是第二套 Timeline / 表单设计器。槽：header / form / tabs（Timeline|Viewer）/ action（sticky ActionBar）。可访问名走 locale `workflowDetailShell.ariaLabel`。`submit()` 走 `mergeWorkflowFormValues`：隐藏和只读保留 `originalValues`，只覆盖可编辑路径。表单请先 `applyWorkflowFieldPermissions(schema, node.fieldPermissions, mode, kind)`。给壳限定高度时 action 钉在底部、form/tabs 滚动。Admin 在后续切片接真页。'
   },
   Countdown: {
     notes:
@@ -265,7 +312,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Progress: {
     notes:
-      '默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。'
+      '默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。'
   },
   Splitter: {
     notes:
@@ -289,10 +336,35 @@ const COMPONENT_USAGE_NOTES = {
   },
   Alert: {
     notes:
-      '省略 `open` 时展示；`open={false}` 才不渲染。关闭不会内部隐藏——父级卸载或设 `open={false}`。与 ImagePreview「省略即关」相反。'
+      '省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦点从关闭按钮移到后面下一个可聚焦元素。传入 `open` 时只发事件。父级重渲染不重置剩余时间。`error` 保持 `role="alert"`。首屏之后新插入的 success / info / warning 用组件自己的 `role="status"`；静态条文不加实时区域。与 ImagePreview「省略即关」相反。'
+  },
+  Tooltip: {
+    notes:
+      '悬停只跟指针。点击、Enter、Space 不会把悬停层关掉。焦点还在触发器上时，指针离开也保持打开。`disabled` 立刻关闭。内容只接受纯文本，可聚焦后代在开发期报错；要交互用 Popover。显示延迟默认 100ms。'
+  },
+  Popover: {
+    notes:
+      '打开时焦点留在触发器，Tab 离开即关闭。有标题时标题是名字，正文是描述。`width` 是有限正数像素，或一整条 CSS 长度；解析失败保持默认最大宽度。'
+  },
+  Popconfirm: {
+    notes:
+      '打开时焦点留在触发器，Tab 离开即关闭。确认返回的 Promise 在进行中时，Escape、点外面和再点触发器都关不掉；拒绝则留下。Vue 读返回值，不只看 `preventDefault`。'
+  },
+  Loading: {
+    notes:
+      '每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。'
+  },
+  LoadingBar: {
+    notes:
+      '`error` 和 `finish` 共用 `start` 计数。还有未结束的 `start` 时保持加载，全部结束再进入成功或失败然后隐藏。开始、失败、结束各说一次，百分比留在 `progressbar` 上。'
+  },
+  Message: {
+    notes:
+      '命令式调用只改当前 ConfigProvider 里的队列。默认可关闭。指针或焦点在条目上时暂停计时。`loading` 不自动关。负时长和 `NaN` 不自动关。同一个 `key` 替换那一条。'
   },
   Masonry: {
-    notes: '`columnClassName` 目前是 no-op（声明了但不打到列节点）。列数/缝用 `columns` / `gap`。'
+    notes:
+      '默认 `layout="source"` 用 CSS 多列保持源顺序。`layout="shortest"` 按最短列定位，容器说明视觉顺序与源顺序不同。'
   },
   PrintLayout: {
     notes:
@@ -308,10 +380,14 @@ const COMPONENT_USAGE_NOTES = {
   },
   Tree: {
     notes:
-      '`checkStrictly` 默认 false（父子级联）。TreeSelect 默认 true（独立勾选）。`height` 是页面窗口，不是 overlay `listHeight`。'
+      '`checkStrictly` 默认 false（父子级联）。勾选只在 `treeitem` 上用 `aria-checked`，勾选标记不另做一颗复选框。`posinset` / `setsize` 按同一父节点下的兄弟。搜索零命中是空列表。每棵树有自己的拖拽容器。`height` 是页面窗口，不是 overlay `listHeight`。'
   },
   PieChart: {
     notes: '`innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。'
+  },
+  OrgChart: {
+    notes:
+      '`avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`javascript:`、`data:`、`vbscript:` 不渲染 image。'
   },
   ImageCompare: {
     notes:
@@ -413,9 +489,6 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '`hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。'
   },
-  Drawer: {
-    notes: '`bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。'
-  },
   ChatWindow: {
     uses: ['Avatar', 'Textarea/Input', 'Button', 'VirtualList', 'Empty'],
     notes:
@@ -424,17 +497,17 @@ const COMPONENT_USAGE_NOTES = {
   ActivityFeed: {
     uses: ['Timeline', 'Avatar', 'Tag', 'Card', 'Text', 'Link', 'Loading'],
     notes:
-      '`groups` 一旦传入（含 `[]`）不再回落 `items`。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。'
+      '`groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`，时间线仍是 `list`，空态和加载态不自称 feed。已有条目时加载保留列表并写出加载说明。新的一条用组件自己的礼貌区域。`content` 只在标题和描述都空时当正文。默认显示时间时，首屏等客户端时区稳定后再写钟点。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。'
   },
   CommentThread: {
     uses: ['Avatar', 'Tag', 'Button', 'Textarea', 'Text'],
     notes:
-      '`nodes` 一旦传入（含 `[]`）不再回落 `items`。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。'
+      '`nodes` 一旦传入（含 `[]`）不再回落 `items`。输入框和空态在 feed 外面，文章是 feed 的直接子级，回复文章不嵌在父文章里。序号按整棵可见树，收起不改已经公告的位置。环和重复 id 给出可见错误，能挂上的节点留下。达到 `maxDepth` 不再提供回复。发送闩等到 `onReply` 的 Promise。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。'
   },
   NotificationCenter: {
     uses: ['Card', 'Tabs/TabPane', 'List', 'Text', 'Button', 'Loading'],
     notes:
-      '只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。'
+      '只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。筛选是有名字的单选，方向键移动，当前项才在 Tab 序里。打开一条是按钮。加载时列表 `inert`。未读变化和新的一条用组件自己的礼貌区域。全部已读只交出这一次未读的条目。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。'
   },
   List: {
     notes:
@@ -448,7 +521,7 @@ const COMPONENT_USAGE_NOTES = {
   DataTableWithToolbar: {
     uses: ['Table', 'Input', 'Select', 'Button', 'Popover', 'Checkbox'],
     notes:
-      "搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。"
+      "搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。`onFiltersChange` 带这一次要写的值。本地搜索和标量筛选把页码收到第 1 页，沿用表的分页回写。Vue 里让搜索框出现的那次监听也能点亮搜索按钮。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。"
   },
   Table: {
     uses: ['TableColumn', 'Pagination', 'row selection', 'expandable rows'],
@@ -463,17 +536,17 @@ const COMPONENT_USAGE_NOTES = {
   FormWizard: {
     uses: ['Steps/StepsItem', 'Button', 'Form', 'ConfigProvider'],
     notes:
-      '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。'
+      '包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没写 `fields` 就校验当前步挂上的项。Finish 再 `validate` + `submit`。`submit()` 返回 false 时不发 `finish`，也不跑 `autoSave`。父级直接改 `current` 时，`step-change` 的第三参 `{ skippedValidation: true }`。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。'
   },
   SchemaForm: {
     uses: ['Form', 'FormItem', 'Input', 'Select', 'Button'],
     notes:
-      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。'
+      '用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。FormItem 收到的规则是补过 `required` 的那一份。`disabled` 不跑必填。未知 `type` 留空，等 `renderField`。模型按路径合并，后写只盖同路径；`source` / `defaultValue` / `schema` 变化时，没编辑过的非受控字段跟新种子走。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。权限函数不从 `@expcat/tigercat-core/schema-form` 导出。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。'
   },
   TaskBoard: {
     uses: ['ConfigProvider', 'task-board drag utilities'],
     notes:
-      '过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。'
+      '放下下标和指示线是同一个插入点，末尾是源数组长度。每列一个键盘停靠点，方向键在卡片之间移动。抓取时播报源列、目标列和位置，句子走 locale。卡片里的按钮自己处理 Enter / Space。列 id 记在元素上。过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。'
   }
 }
 
@@ -488,7 +561,7 @@ Priority: SVG children > \`icon\` > \`name\`. Built-in \`name\` values live in \
 \`renderCard\` / \`cardClassName\` forward to Table. Vue \`#card\` wins over \`renderCard\`.
 `,
   NotificationContainer: `
-Imperative notification API supports inline toast actions via \`notification.info({ title, actions: [{ label, type, closeOnClick, onClick }] })\`. Action clicks do not trigger the whole-toast \`onClick\`; use \`closeOnClick\` or the callback context \`close()\` to dismiss that toast.
+Imperative \`notification\` renders inside the current ConfigProvider. Primary \`onClick\` is one button (\`actionLabel\`, default locale view text), not a click on the card. \`actions\` are separate buttons and do not fire that primary handler. Use \`closeOnClick\` or the callback \`close()\` to dismiss. The same \`key\` replaces the toast. Pointer or focus pauses the timer.
 `,
   Menu: `
 \`collapsed\` only applies to vertical/inline (horizontal \`devWarn\`s). Labels stay \`sr-only\`; text-only items show a first-letter glyph. \`popupPortal\` defaults true. Backend trees: \`MenuSchemaNode\` + \`filterMenuByPermission\` / \`menuSchemaToMenuItems\` / \`schemaToRouteRecords\` (schema-only fields stay off \`MenuItem\`; no \`addRoute\`).
@@ -1263,10 +1336,7 @@ function generateExamples(category, componentEntries, interfaceDetails) {
   markdownText +=
     '每个组件一节，供 MCP `tigercat_component` 按 `## {Component}` 抽取。绑定差异见 `shared/patterns/common.md`。\n\n'
 
-  const aliasComponents = components.filter((component) => DOC_COMPONENT_ALIASES.has(component))
-  const primaryComponents = components.filter((component) => !DOC_COMPONENT_ALIASES.has(component))
-
-  for (const component of primaryComponents) {
+  for (const component of components) {
     const requiredNames = getRequiredPropNames(
       entriesByComponent.get(component),
       interfaceDetails,
@@ -1280,17 +1350,8 @@ function generateExamples(category, componentEntries, interfaceDetails) {
     markdownText += `React: \`${codeText(react)}\`\n\n`
   }
 
-  if (aliasComponents.length > 0) {
-    markdownText +=
-      'Compat aliases (still importable; prefer the keeper in new code): ' +
-      aliasComponents
-        .map((component) => `\`${component}\` → \`${DOC_COMPONENT_ALIASES.get(component)}\``)
-        .join('; ') +
-      '. Public names remain; examples and new code use the keeper.\n\n'
-  }
-
   markdownText +=
-    'Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.\n'
+    'Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.\n'
   if (COMPONENT_EXAMPLE_EXTRA[category]) {
     markdownText += `\n${COMPONENT_EXAMPLE_EXTRA[category].trim()}\n`
   }
@@ -1401,16 +1462,115 @@ async function main() {
     const entries = entriesByCategory.get(category) || []
     if (entries.length === 0) continue
     const slug = CATEGORY_SLUGS[category]
-    await writeFile(
-      join(PROPS_DIR, `${slug}.md`),
-      await formatMarkdown(generatePublicPropsReference(category, entries, interfaceDetails)),
-      'utf8'
+    const propsMarkdown = await formatMarkdown(
+      generatePublicPropsReference(category, entries, interfaceDetails)
     )
-    await writeFile(
-      join(EXAMPLES_DIR, `${slug}.md`),
-      await formatMarkdown(generateExamples(category, entries, interfaceDetails)),
-      'utf8'
+    const examplesMarkdown = await formatMarkdown(
+      generateExamples(category, entries, interfaceDetails)
     )
+    const propsOverBudget = propsMarkdown.split('\n').length > 400
+    const examplesOverBudget = examplesMarkdown.split('\n').length > 400
+
+    const propsColliding = propsOverBudget
+      ? entries.filter((entry) => pascalToKebab(entry.component) === slug)
+      : []
+    if (!propsOverBudget) {
+      await writeFile(join(PROPS_DIR, `${slug}.md`), propsMarkdown, 'utf8')
+    } else {
+      const indexLinks = entries.map((entry) => {
+        const componentSlug = pascalToKebab(entry.component)
+        const target = componentSlug === slug ? `#${componentSlug}` : `./${componentSlug}.md`
+        return `- [${entry.component}](${target})`
+      })
+      const embeddedSource = propsColliding.length
+        ? generatePublicPropsReference(category, propsColliding, interfaceDetails)
+        : ''
+      const sectionStart = embeddedSource.search(/^## /m)
+      const embedded = sectionStart >= 0 ? embeddedSource.slice(sectionStart) : ''
+      const index = [
+        '---',
+        `name: tigercat-props-${slug}`,
+        `description: ${category} props split by component`,
+        '---',
+        '',
+        '<!-- generated by pnpm docs:api -->',
+        '',
+        `# ${category} Props`,
+        '',
+        'This category is split by component so each file stays within the line budget.',
+        '',
+        ...indexLinks,
+        '',
+        embedded
+      ].join('\n')
+      await writeFile(join(PROPS_DIR, `${slug}.md`), await formatMarkdown(index), 'utf8')
+    }
+    const examplesColliding = examplesOverBudget
+      ? entries.filter((entry) => pascalToKebab(entry.component) === slug)
+      : []
+    if (!examplesOverBudget) {
+      await writeFile(join(EXAMPLES_DIR, `${slug}.md`), examplesMarkdown, 'utf8')
+    } else {
+      const indexLinks = entries.map((entry) => {
+        const componentSlug = pascalToKebab(entry.component)
+        const target = componentSlug === slug ? `#${componentSlug}` : `./${componentSlug}.md`
+        return `- [${entry.component}](${target})`
+      })
+      const embeddedSource = examplesColliding.length
+        ? generateExamples(category, examplesColliding, interfaceDetails)
+        : ''
+      const sectionStart = embeddedSource.search(/^## /m)
+      const embedded = sectionStart >= 0 ? embeddedSource.slice(sectionStart) : ''
+      const index = [
+        '---',
+        `name: tigercat-examples-${slug}`,
+        `description: ${category} examples split by component`,
+        '---',
+        '',
+        '<!-- generated by pnpm docs:api -->',
+        '',
+        `# ${category} Examples`,
+        '',
+        'This category is split by component so each file stays within the line budget.',
+        '',
+        ...indexLinks,
+        '',
+        embedded
+      ].join('\n')
+      await writeFile(join(EXAMPLES_DIR, `${slug}.md`), await formatMarkdown(index), 'utf8')
+    }
+
+    for (const entry of entries) {
+      if (propsOverBudget) {
+        const file = `${pascalToKebab(entry.component)}.md`
+        if (pascalToKebab(entry.component) !== slug) {
+          await writeFile(
+            join(PROPS_DIR, file),
+            await formatMarkdown(
+              generatePublicPropsReference(category, [entry], interfaceDetails)
+            ),
+            'utf8'
+          )
+        }
+        entry.docProps = `skills/tigercat/references/shared/props/${file}`
+      } else {
+        entry.docProps = `skills/tigercat/references/shared/props/${slug}.md`
+      }
+
+      if (examplesOverBudget) {
+        const file = `${pascalToKebab(entry.component)}.md`
+        if (pascalToKebab(entry.component) !== slug) {
+          await writeFile(
+            join(EXAMPLES_DIR, file),
+            await formatMarkdown(generateExamples(category, [entry], interfaceDetails)),
+            'utf8'
+          )
+        }
+        entry.docExamples = `skills/tigercat/references/examples/${file}`
+      } else {
+        entry.docExamples = `skills/tigercat/references/examples/${slug}.md`
+      }
+    }
   }
 
   await writeFile(

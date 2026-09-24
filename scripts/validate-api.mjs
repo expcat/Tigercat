@@ -9,7 +9,8 @@
  * 用法：node scripts/validate-api.mjs [--json]
  */
 
-import { readFileSync, readdirSync, writeFileSync, existsSync, statSync } from 'fs'
+import { readFileSync, readdirSync, writeFileSync, existsSync, statSync, mkdtempSync } from 'fs'
+import { tmpdir } from 'os'
 import { join, basename, relative, sep } from 'path'
 import { fileURLToPath } from 'url'
 import {
@@ -28,6 +29,13 @@ const ROOT = join(__dirname, '..')
 const TYPES_DIR = join(ROOT, 'packages', 'core', 'src', 'types')
 const SKILL_REFERENCES_DIR = join(ROOT, 'skills', 'tigercat', 'references')
 const jsonMode = process.argv.includes('--json')
+
+function expectedSplitReference(dir, componentSlug, groupSlug) {
+  const componentPath = `skills/tigercat/references/${dir}/${componentSlug}.md`
+  const groupPath = `skills/tigercat/references/${dir}/${groupSlug}.md`
+  if (componentSlug !== groupSlug && existsSync(join(ROOT, componentPath))) return componentPath
+  return groupPath
+}
 
 // ----- Rules -----
 
@@ -929,7 +937,6 @@ if (existsSync(R19_NUMBER_KEYBOARD_FILE)) {
 
 const R19_VIEWER_FILES = [
   'packages/core/src/types/image.ts',
-  'packages/core/src/types/image-viewer.ts',
   'packages/react/src/components/ImagePreview.tsx',
   'packages/vue/src/components/ImagePreview.ts'
 ]
@@ -1343,7 +1350,8 @@ if (existsSync(context7Path)) {
 
   for (const entry of expectedComponentEntries) {
     const component = metadata[entry.component]
-    const slug = CATEGORY_SLUGS[entry.category] || entry.category.toLowerCase()
+    const slug = entry.slug
+    const testGroup = entry.testGroup || CATEGORY_SLUGS[entry.category] || entry.category.toLowerCase()
 
     if (!component) {
       addIssue('context7.json', 0, 'docs-route', `context7 缺少公开组件 "${entry.component}"`)
@@ -1352,8 +1360,8 @@ if (existsSync(context7Path)) {
 
     const expectedReferences = {
       componentIndex: 'skills/tigercat/references/component-index.md',
-      props: `skills/tigercat/references/shared/props/${slug}.md`,
-      examples: `skills/tigercat/references/examples/${slug}.md`,
+      props: expectedSplitReference('shared/props', slug, testGroup),
+      examples: expectedSplitReference('examples', slug, testGroup),
       react: 'skills/tigercat/references/react/index.md',
       vue: 'skills/tigercat/references/vue/index.md'
     }
@@ -1361,7 +1369,7 @@ if (existsSync(context7Path)) {
     const mismatches = []
     if (component.category !== entry.category) mismatches.push(`category=${component.category}`)
     if (component.slug !== slug) mismatches.push(`slug=${component.slug}`)
-    if (component.testGroup !== slug) mismatches.push(`testGroup=${component.testGroup}`)
+    if (component.testGroup !== testGroup) mismatches.push(`testGroup=${component.testGroup}`)
     if (component.packageSubpath !== getComponentPackageSubpath(entry.component)) {
       mismatches.push(`packageSubpath=${component.packageSubpath}`)
     }
@@ -1452,7 +1460,8 @@ if (jsonMode) {
   for (const issue of issues) {
     report.byRule[issue.rule] = (report.byRule[issue.rule] || 0) + 1
   }
-  const outPath = join(ROOT, 'api-consistency-report.json')
+  const outDir = mkdtempSync(join(tmpdir(), 'tigercat-validate-api-'))
+  const outPath = join(outDir, 'api-consistency-report.json')
   writeFileSync(outPath, JSON.stringify(report, null, 2))
   console.log(`Report written to ${outPath}`)
 } else {

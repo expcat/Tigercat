@@ -44,12 +44,19 @@ describe('Highlight', () => {
       expect(labels).toEqual(['Vue', 'React'])
     })
 
-    it('accepts a regular expression', () => {
-      const { container } = render(<Highlight text="Order #42 and #7" keywords={/#\d+/} />)
+    it('matches string keywords literally and does not run a RegExp', () => {
+      const { container } = render(
+        <Highlight text="Order #42 and #7" keywords={['#42', '#7']} />
+      )
       const labels = [...getRoot(container).querySelectorAll('mark')].map(
         (node) => node.textContent
       )
       expect(labels).toEqual(['#42', '#7'])
+
+      const ignored = render(
+        <Highlight text="Order #42 and #7" keywords={/#\d+/ as unknown as string} />
+      )
+      expect(ignored.container.querySelector('mark')).toBeNull()
     })
 
     it('forwards the ref to the root span', () => {
@@ -155,7 +162,7 @@ describe('Highlight', () => {
       const { container } = render(
         <>
           <Highlight keywords="Esc">Press Esc</Highlight>
-          <Highlight text="id-12" keywords={/\d+/} />
+          <Highlight text="id-12" keywords="12" />
         </>
       )
       await expectNoA11yViolationsIsolated(container)
