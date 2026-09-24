@@ -34,12 +34,18 @@ describe('drawer-utils', () => {
   })
 
   it('isDrawerSwipeCloseGesture follows the close axis', () => {
-    expect(isDrawerSwipeCloseGesture('bottom', swipe('down'))).toBe(true)
-    expect(isDrawerSwipeCloseGesture('bottom', swipe('up'))).toBe(false)
-    expect(isDrawerSwipeCloseGesture('right', swipe('right'))).toBe(true)
-    expect(isDrawerSwipeCloseGesture('left', swipe('left'))).toBe(true)
-    expect(isDrawerSwipeCloseGesture('top', swipe('up'))).toBe(true)
-    expect(isDrawerSwipeCloseGesture('bottom', null)).toBe(false)
+    expect(isDrawerSwipeCloseGesture({ placement: 'bottom' }, swipe('down'))).toBe(true)
+    expect(isDrawerSwipeCloseGesture({ placement: 'bottom' }, swipe('up'))).toBe(false)
+    expect(isDrawerSwipeCloseGesture({ placement: 'right' }, swipe('right'))).toBe(true)
+    expect(isDrawerSwipeCloseGesture({ placement: 'left' }, swipe('left'))).toBe(true)
+    expect(isDrawerSwipeCloseGesture({ placement: 'top' }, swipe('up'))).toBe(true)
+    expect(isDrawerSwipeCloseGesture({ placement: 'bottom' }, null)).toBe(false)
+    expect(
+      isDrawerSwipeCloseGesture({ placement: 'left', fullscreen: true, direction: 'ltr' }, swipe('right'))
+    ).toBe(true)
+    expect(
+      isDrawerSwipeCloseGesture({ placement: 'start', direction: 'rtl' }, swipe('right'))
+    ).toBe(true)
   })
 
   it('resolveDrawerPlacement maps start/end with direction', () => {

@@ -7,6 +7,7 @@ import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import { Loading } from '@expcat/tigercat-react/Loading'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('Loading (React)', () => {
   afterEach(() => {
@@ -22,10 +23,11 @@ describe('Loading (React)', () => {
     expect(status).not.toHaveAttribute('aria-live')
   })
 
-  it('hides the decorative indicator from the accessibility tree', () => {
+  it('hides the decorative indicator from the accessibility tree', async () => {
     const { container } = render(<Loading />)
     const hidden = container.querySelector('[aria-hidden="true"]')
     expect(hidden).toBeTruthy()
+    await expectNoA11yViolations(container)
   })
 
   it('renders text and uses it as aria-label', () => {

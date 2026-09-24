@@ -34,25 +34,43 @@ function mountProvider(locale: typeof zhCN) {
 }
 
 describe('notification (Vue)', () => {
+  let unmountProvider: (() => void) | undefined
+
+  function mountHost() {
+    const root = document.createElement('div')
+    document.body.append(root)
+    const app = createApp({
+      render: () => h(ConfigProvider, () => h('span', 'app'))
+    })
+    app.mount(root)
+    return () => {
+      app.unmount()
+      root.remove()
+    }
+  }
+
   beforeAll(async () => {
+    const unmount = mountHost()
     notification.info({ title: '__warmup__', duration: 0 })
     await vi.waitFor(() => {
       expect(document.querySelector('[data-tiger-notification]')).toBeTruthy()
     })
     notification.clear()
-    document.body.innerHTML = ''
+    await flushHost()
+    unmount()
   })
 
   beforeEach(async () => {
+    vi.useRealTimers()
+    unmountProvider = mountHost()
     notification.clear()
-    document.body.innerHTML = ''
     await flushHost()
   })
 
   afterEach(() => {
     vi.useRealTimers()
     notification.clear()
-    document.body.innerHTML = ''
+    unmountProvider?.()
   })
 
   it('renders three toasts on the same position from one turn', async () => {
@@ -83,17 +101,21 @@ describe('notification (Vue)', () => {
       title: 'Clickable',
       duration: 0,
       onClick,
+      actionLabel: 'Open',
       actions: [{ label: 'View', onClick: onAction }]
     })
     await flushHost()
-    const action = Array.from(document.querySelectorAll('button')).find(
-      (button) => button.textContent === 'View'
-    )
+    const buttons = Array.from(document.querySelectorAll('button'))
+    const action = buttons.find((button) => button.textContent === 'View')
+    const primary = buttons.find((button) => button.textContent === 'Open')
     expect(document.querySelector('[data-tiger-notification]')?.getAttribute('tabindex')).toBeNull()
     action?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     await flushHost()
     expect(onAction).toHaveBeenCalled()
     expect(onClick).not.toHaveBeenCalled()
+    primary?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await flushHost()
+    expect(onClick).toHaveBeenCalledTimes(1)
   })
 
   it('uses official locale close names and accepts a custom closeAriaLabel', async () => {

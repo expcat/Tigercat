@@ -1,11 +1,6 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef } from 'react'
 import {
   classNames,
-  closeIconViewBox,
-  closeIconPathD,
-  closeIconPathStrokeLinecap,
-  closeIconPathStrokeLinejoin,
-  closeIconPathStrokeWidth,
   getDrawerMaskClasses,
   getDrawerContainerClasses,
   getDrawerPanelClasses,
@@ -22,7 +17,8 @@ import {
   resolveSwipeGesture,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
-  scheduleOverlayLeave,
+  whenOverlayTransitionEnds,
+  isDrawerMobileFullscreen,
   canStartOverlaySwipeClose,
   OVERLAY_SWIPE_HANDLE_ATTR,
   shouldCloseOnMaskClick,
@@ -32,7 +28,14 @@ import {
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
 import {
-  renderOverlayPortal,
+  closeIconViewBox,
+  closeIconPathD,
+  closeIconPathStrokeLinecap,
+  closeIconPathStrokeLinejoin,
+  closeIconPathStrokeWidth
+} from '@expcat/tigercat-core/icons/common'
+import { OverlayPortal } from '../utils/overlay-outlet'
+import {
   useBodyScrollLock,
   useEscapeKey,
   useFocusTrap,
@@ -91,7 +94,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
     bodyPadding,
     destroyOnClose = false,
     fullscreenOnMobile = true,
-    panelClassName,
+    initialFocus,
     panelStyle,
     onClose,
     onOpenChange,
@@ -125,18 +128,14 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
       setHasOpened(true)
       setLeaving(false)
       wasOpenRef.current = true
-      return scheduleOverlayLeave({
-        onFinish: () => afterEnterRef.current?.()
-      })
+      return whenOverlayTransitionEnds(dialogRef.current, () => afterEnterRef.current?.())
     }
     if (!wasOpenRef.current) return
     wasOpenRef.current = false
     setLeaving(true)
-    return scheduleOverlayLeave({
-      onFinish: () => {
-        setLeaving(false)
-        afterCloseRef.current?.()
-      }
+    return whenOverlayTransitionEnds(dialogRef.current, () => {
+      setLeaving(false)
+      afterCloseRef.current?.()
     })
   }, [open])
 
@@ -197,16 +196,26 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
   const touchCurrentRef = useRef<GesturePoint | null>(null)
   const swipeAllowedRef = useRef(false)
 
-  const resolvedPlacement = resolveDrawerPlacement(
-    placement,
-    mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
-  )
+  const writingDirection = mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
+  const resolvedPlacement = resolveDrawerPlacement(placement, writingDirection)
 
   useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
 
   const resolvedCloseAriaLabel = drawerLabels.closeAriaLabel
 
-  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true, autoFocus: true })
+  const focusTargetRef = useRef<HTMLElement | null>(null)
+  useLayoutEffect(() => {
+    const root = dialogRef.current
+    const found = initialFocus && root ? root.querySelector(initialFocus) : null
+    focusTargetRef.current = found instanceof HTMLElement ? found : root
+  }, [open, initialFocus])
+  useFocusTrap({
+    enabled: open,
+    containerRef: rootRef,
+    inert: true,
+    autoFocus: true,
+    initialFocusRef: focusTargetRef
+  })
 
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null
@@ -222,13 +231,20 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
       swipeAllowedRef.current = canStartOverlaySwipeClose({
         target: event.target,
         scrollContainer: bodyRef.current,
-        closeDirection: getDrawerSwipeCloseDirection(resolvedPlacement)
+        closeDirection: getDrawerSwipeCloseDirection({
+          placement: resolvedPlacement,
+          direction: writingDirection,
+          fullscreen: isDrawerMobileFullscreen({
+            fullscreenOnMobile,
+            viewportWidth: window.innerWidth
+          })
+        })
       })
       const point = getGestureTouchPoint(event.touches)
       touchStartRef.current = point
       touchCurrentRef.current = point
     },
-    [dialogDivProps, open, resolvedPlacement]
+    [dialogDivProps, fullscreenOnMobile, open, resolvedPlacement, writingDirection]
   )
 
   const handleTouchMove = useCallback(
@@ -256,11 +272,24 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
       const allowed = swipeAllowedRef.current
       resetTouchGesture()
 
-      if (allowed && isDrawerSwipeCloseGesture(resolvedPlacement, gesture)) {
+      if (
+        allowed &&
+        isDrawerSwipeCloseGesture(
+          {
+            placement: resolvedPlacement,
+            direction: writingDirection,
+            fullscreen: isDrawerMobileFullscreen({
+              fullscreenOnMobile,
+              viewportWidth: window.innerWidth
+            })
+          },
+          gesture
+        )
+      ) {
         handleClose()
       }
     },
-    [dialogDivProps, handleClose, resolvedPlacement, resetTouchGesture]
+    [dialogDivProps, fullscreenOnMobile, handleClose, resolvedPlacement, resetTouchGesture, writingDirection]
   )
 
   const handleTouchCancel = useCallback(
@@ -277,8 +306,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
   const panelClasses = classNames(
     getDrawerPanelClasses(resolvedPlacement, open, size, fullscreenOnMobile),
     'flex flex-col',
-    className,
-    panelClassName
+    className
   )
 
   const headerClasses = getDrawerHeaderClasses()
@@ -376,7 +404,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
   return (
     <>
       {anchor}
-      {renderOverlayPortal(drawerContent, portalTarget)}
+      <OverlayPortal target={portalTarget}>{drawerContent}</OverlayPortal>
     </>
   )
 })

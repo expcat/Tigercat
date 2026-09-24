@@ -4,14 +4,20 @@
  * All durations are in milliseconds unless otherwise specified.
  */
 
+import { runtimeThemeLight } from '../tokens/tokens'
 import { isBrowser } from './env'
+
+function motionMs(value: string): number {
+  const parsed = Number.parseFloat(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
 
 // ============================================================================
 // Token-backed Motion Configuration
 // ============================================================================
 
-export type MotionDurationToken = 'instant' | 'quick' | 'base' | 'relaxed' | 'slow'
-export type MotionEasingToken = 'standard' | 'decelerate' | 'accelerate' | 'emphasized' | 'spring'
+export type MotionDurationToken = 'quick' | 'base' | 'slow'
+export type MotionEasingToken = 'standard'
 export type MotionDuration = MotionDurationToken | number | string
 export type MotionEasing = MotionEasingToken | string
 export type MotionDirection = 'none' | 'up' | 'down' | 'left' | 'right'
@@ -32,35 +38,13 @@ export interface ComponentMotionConfig {
 }
 
 export const MOTION_DURATION_TOKEN_VARS: Record<MotionDurationToken, string> = {
-  instant: '--tiger-motion-duration-instant',
   quick: '--tiger-motion-duration-quick',
   base: '--tiger-motion-duration-base',
-  relaxed: '--tiger-motion-duration-relaxed',
   slow: '--tiger-motion-duration-slow'
 }
 
-export const MOTION_DURATION_TOKEN_FALLBACKS: Record<MotionDurationToken, string> = {
-  instant: '80ms',
-  quick: '150ms',
-  base: '200ms',
-  relaxed: '300ms',
-  slow: '450ms'
-}
-
 export const MOTION_EASING_TOKEN_VARS: Record<MotionEasingToken, string> = {
-  standard: '--tiger-motion-ease-standard',
-  decelerate: '--tiger-motion-ease-decelerate',
-  accelerate: '--tiger-motion-ease-accelerate',
-  emphasized: '--tiger-motion-ease-emphasized',
-  spring: '--tiger-motion-ease-spring'
-}
-
-export const MOTION_EASING_TOKEN_FALLBACKS: Record<MotionEasingToken, string> = {
-  standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
-  decelerate: 'cubic-bezier(0, 0, 0.2, 1)',
-  accelerate: 'cubic-bezier(0.4, 0, 1, 1)',
-  emphasized: 'cubic-bezier(0.4, 0, 0.2, 1)',
-  spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+  standard: '--tiger-motion-ease-standard'
 }
 
 export const COMPONENT_MOTION_VARS = {
@@ -91,11 +75,11 @@ export function resolveMotionDuration(
   if (typeof duration === 'number') return `${duration}ms`
   if (duration && duration in MOTION_DURATION_TOKEN_VARS) {
     const token = duration as MotionDurationToken
-    return `var(${MOTION_DURATION_TOKEN_VARS[token]},${MOTION_DURATION_TOKEN_FALLBACKS[token]})`
+    return `var(${MOTION_DURATION_TOKEN_VARS[token]})`
   }
   if (typeof duration === 'string') return duration
 
-  return `var(${MOTION_DURATION_TOKEN_VARS[fallback]},${MOTION_DURATION_TOKEN_FALLBACKS[fallback]})`
+  return `var(${MOTION_DURATION_TOKEN_VARS[fallback]})`
 }
 
 export function resolveMotionEasing(
@@ -104,11 +88,11 @@ export function resolveMotionEasing(
 ): string {
   if (easing && easing in MOTION_EASING_TOKEN_VARS) {
     const token = easing as MotionEasingToken
-    return `var(${MOTION_EASING_TOKEN_VARS[token]},${MOTION_EASING_TOKEN_FALLBACKS[token]})`
+    return `var(${MOTION_EASING_TOKEN_VARS[token]})`
   }
   if (typeof easing === 'string') return easing
 
-  return `var(${MOTION_EASING_TOKEN_VARS[fallback]},${MOTION_EASING_TOKEN_FALLBACKS[fallback]})`
+  return `var(${MOTION_EASING_TOKEN_VARS[fallback]})`
 }
 
 export function shouldReduceMotion(
@@ -128,7 +112,7 @@ export function getComponentMotionStyle(
 
   return {
     [COMPONENT_MOTION_VARS.duration]: reduce ? '0ms' : resolveMotionDuration(config.duration),
-    [COMPONENT_MOTION_VARS.delay]: reduce ? '0ms' : resolveMotionDuration(config.delay, 'instant'),
+    [COMPONENT_MOTION_VARS.delay]: reduce ? '0ms' : resolveMotionDuration(config.delay, 'quick'),
     [COMPONENT_MOTION_VARS.easing]: resolveMotionEasing(config.easing),
     [COMPONENT_MOTION_VARS.translateX]: offset.x,
     [COMPONENT_MOTION_VARS.translateY]: offset.y
@@ -136,12 +120,12 @@ export function getComponentMotionStyle(
 }
 
 export function getComponentMotionTransition(
-  properties: string | string[] = 'all',
+  properties: string | string[] = 'color, background-color, border-color, outline-color, text-decoration-color, box-shadow, opacity, transform',
   config: ComponentMotionConfig = {}
 ): string {
   const props = Array.isArray(properties) ? properties : [properties]
   const duration = shouldReduceMotion(config) ? '0ms' : resolveMotionDuration(config.duration)
-  const delay = shouldReduceMotion(config) ? '0ms' : resolveMotionDuration(config.delay, 'instant')
+  const delay = shouldReduceMotion(config) ? '0ms' : resolveMotionDuration(config.delay, 'quick')
   const easing = resolveMotionEasing(config.easing)
 
   return props.map((prop) => `${prop} ${duration} ${easing} ${delay}`).join(', ')
@@ -269,8 +253,8 @@ export function getViewTransitionNameStyle(name: string): Record<string, string>
 export const VIEW_TRANSITION_CSS = `
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: var(--tiger-motion-duration-relaxed, 300ms);
-  animation-timing-function: var(--tiger-motion-ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
+  animation-duration: var(--tiger-motion-duration-slow);
+  animation-timing-function: var(--tiger-motion-ease-standard);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -307,19 +291,19 @@ export function injectViewTransitionStyles(): void {
  * Standard animation duration for most UI transitions (fade, slide, scale).
  * Used by: Modal, Drawer, Dropdown, Tooltip, Popover, Message, Notification
  */
-export const ANIMATION_DURATION_MS = 300
+export const ANIMATION_DURATION_MS = motionMs(runtimeThemeLight.motion.durationBase)
 
 /**
  * Fast animation duration for quick micro-interactions.
  * Used by: Hover effects, button states
  */
-export const ANIMATION_DURATION_FAST_MS = 200
+export const ANIMATION_DURATION_FAST_MS = motionMs(runtimeThemeLight.motion.durationFast)
 
 /**
  * Slow animation duration for emphasized transitions.
  * Used by: Page transitions, loading states
  */
-export const ANIMATION_DURATION_SLOW_MS = 500
+export const ANIMATION_DURATION_SLOW_MS = motionMs(runtimeThemeLight.motion.durationSlow)
 
 // ============================================================================
 // Tailwind Duration Classes
@@ -328,17 +312,17 @@ export const ANIMATION_DURATION_SLOW_MS = 500
 /**
  * Tailwind class for standard duration
  */
-export const DURATION_CLASS = 'duration-300'
+export const DURATION_CLASS = '[transition-duration:var(--tiger-motion-duration-base)]'
 
 /**
  * Tailwind class for fast duration
  */
-export const DURATION_FAST_CLASS = 'duration-200'
+export const DURATION_FAST_CLASS = '[transition-duration:var(--tiger-motion-duration-quick)]'
 
 /**
  * Tailwind class for slow duration
  */
-export const DURATION_SLOW_CLASS = 'duration-500'
+export const DURATION_SLOW_CLASS = '[transition-duration:var(--tiger-motion-duration-slow)]'
 
 // ============================================================================
 // Easing Functions
@@ -376,7 +360,7 @@ export const EASING_SMOOTH = 'cubic-bezier(0.25, 0.1, 0.25, 1)'
 /**
  * Standard transition class combining duration and easing
  */
-export const TRANSITION_BASE = `transition-all ${DURATION_CLASS} ${EASING_DEFAULT}`
+export const TRANSITION_BASE = `[transition-property:color,background-color,border-color,outline-color,text-decoration-color,box-shadow,opacity,transform] ${DURATION_CLASS} [transition-timing-function:var(--tiger-motion-ease-standard)]`
 
 /**
  * Transition for opacity changes (fade)
@@ -402,7 +386,7 @@ const SHAKE_ANIMATION_CSS = `
 }
 
 .tiger-animate-shake {
-  animation: tiger-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  animation: tiger-shake var(--tiger-motion-duration-base) var(--tiger-motion-ease-standard) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -484,7 +468,7 @@ export const SVG_PATH_ANIMATION_CSS = `
 }
 
 .tiger-animate-path-draw {
-  animation: tiger-path-draw var(--tiger-path-duration, 1s) ease-out forwards;
+  animation: tiger-path-draw var(--tiger-path-duration) ease-out forwards;
   stroke-dasharray: var(--tiger-path-length);
   stroke-dashoffset: var(--tiger-path-length);
 }
@@ -495,7 +479,7 @@ export const SVG_PATH_ANIMATION_CSS = `
 }
 
 .tiger-animate-fade-in {
-  animation: tiger-fade-in var(--tiger-fade-duration, 0.5s) ease-out forwards;
+  animation: tiger-fade-in var(--tiger-fade-duration) ease-out forwards;
 }
 
 @keyframes tiger-scale-in {
@@ -504,7 +488,7 @@ export const SVG_PATH_ANIMATION_CSS = `
 }
 
 .tiger-animate-scale-in {
-  animation: tiger-scale-in var(--tiger-scale-duration, 0.3s) ease-out forwards;
+  animation: tiger-scale-in var(--tiger-scale-duration) ease-out forwards;
 }
 
 @keyframes tiger-bar-grow {
@@ -514,7 +498,7 @@ export const SVG_PATH_ANIMATION_CSS = `
 
 .tiger-animate-bar-grow {
   transform-origin: bottom;
-  animation: tiger-bar-grow var(--tiger-bar-duration, 0.5s) ease-out forwards;
+  animation: tiger-bar-grow var(--tiger-bar-duration) ease-out forwards;
 }
 
 @keyframes tiger-pie-draw {
@@ -527,7 +511,7 @@ export const SVG_PATH_ANIMATION_CSS = `
 }
 
 .tiger-animate-pie-draw {
-  animation: tiger-pie-draw var(--tiger-pie-duration, 0.8s) ease-out forwards;
+  animation: tiger-pie-draw var(--tiger-pie-duration) ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

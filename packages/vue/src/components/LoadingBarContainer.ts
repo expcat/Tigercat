@@ -14,8 +14,7 @@ import {
   type LoadingBarContainerProps as CoreLoadingBarContainerProps,
   type LoadingBarStatus
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
-import { getGlobalTigerLocale } from '../utils/global-locale'
+import { useResolvedTigerLocale } from './ConfigProvider'
 
 export interface VueLoadingBarContainerProps extends CoreLoadingBarContainerProps {
   style?: Record<string, string | number>
@@ -54,18 +53,24 @@ export const LoadingBarContainer = /* @__PURE__ */ defineComponent({
     ariaLabel: {
       type: String,
       default: undefined
+    },
+    notice: {
+      type: String,
+      default: undefined
+    },
+    noticeToken: {
+      type: Number,
+      default: 0
     }
   },
   setup(props, { attrs }) {
-    const config = useTigerConfig()
+    const locale = useResolvedTigerLocale()
     const containerClasses = computed(() =>
       getLoadingBarContainerClasses(classNames(props.className, coerceClassValue(attrs.class)))
     )
     const fillClasses = computed(() => getLoadingBarFillClasses(props.status, props.color))
     const fillStyle = computed(() => getLoadingBarFillStyle(props.percentage, props.height))
-    const resolvedAriaLabel = computed(() =>
-      getLoadingLabel(config.value.locale ?? getGlobalTigerLocale(), props.ariaLabel)
-    )
+    const resolvedAriaLabel = computed(() => getLoadingLabel(locale.value, props.ariaLabel))
     const valueNow = computed(() => getLoadingBarProgressValue(props.percentage))
 
     return () => {
@@ -100,6 +105,13 @@ export const LoadingBarContainer = /* @__PURE__ */ defineComponent({
           'data-tiger-loading-bar-status': props.status
         },
         [
+          props.notice
+            ? h(
+                'span',
+                { key: props.noticeToken, class: 'sr-only', role: 'status' },
+                props.notice
+              )
+            : null,
           h('div', {
             class: fillClasses.value,
             style: fillStyle.value,

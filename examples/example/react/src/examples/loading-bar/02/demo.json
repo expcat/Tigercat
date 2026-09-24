@@ -1,7 +1,7 @@
 {
   "id": "loading-bar-02",
   "title": "错误状态",
-  "description": "请求失败时调用 error()，条变为危险色并拉满，随后自动隐藏。",
+  "description": "请求失败时调用 error()。还有未结束的 start 时保持加载；全部结束才变成失败并隐藏。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

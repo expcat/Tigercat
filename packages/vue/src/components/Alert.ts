@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, watch, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, computed, h, onMounted, ref, watch, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -18,7 +18,11 @@ import {
   alertCountdownContainerClasses,
   alertCountdownBarClasses,
   alertCountdownColorClasses,
-  resolveAlertRole,
+  createAlertCountdown,
+  focusAfterElement,
+  isAlertInsertedAfterPaint,
+  isBrowser,
+  resolveAlertLive,
   getAlertLabels,
   mergeTigerLocale,
   mergeStyleValues,
@@ -122,7 +126,7 @@ export const Alert = defineComponent({
     },
 
     /**
-     * When `false`, the alert is not rendered. Closing never hides internally.
+     * Controlled visibility. Omit it and the alert hides itself.
      */
     open: {
       type: Boolean,
@@ -202,44 +206,64 @@ export const Alert = defineComponent({
       )
     )
 
-    let autoCloseTimer: ReturnType<typeof setTimeout> | undefined
+    const dismissed = ref(false)
+    const ratio = ref(1)
+    const alertRef = ref<HTMLElement | null>(null)
+    const inserted = isAlertInsertedAfterPaint()
+    const shown = computed(() =>
+      props.open === false ? false : props.open === true ? true : !dismissed.value
+    )
 
-    const clearTimer = () => {
-      if (autoCloseTimer) {
-        clearTimeout(autoCloseTimer)
-        autoCloseTimer = undefined
-      }
-    }
-
-    const requestClose = (event: Event) => {
-      emit('close', event)
+    const requestClose = (fromCloseButton: boolean) => {
+      emit('close', new Event('close', { cancelable: true }))
       emit('update:open', false)
-      clearTimer()
+      if (props.open === undefined) dismissed.value = true
+      if (fromCloseButton) focusAfterElement(alertRef.value)
     }
 
     const handleClose = (event: MouseEvent) => {
       event.stopPropagation()
-      requestClose(event)
+      requestClose(true)
     }
 
+    const countdown = createAlertCountdown({
+      enabled: isBrowser(),
+      onElapsed: () => requestClose(false)
+    })
+    const stopCountdown = countdown.subscribe(() => {
+      ratio.value = countdown.getRatio()
+    })
+
+    const reducedMotion = ref(false)
+    let motionMedia: MediaQueryList | null = null
+    const syncMotion = () => {
+      reducedMotion.value = Boolean(motionMedia?.matches)
+    }
+    onMounted(() => {
+      if (typeof window.matchMedia !== 'function') return
+      motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)')
+      syncMotion()
+      motionMedia.addEventListener('change', syncMotion)
+    })
+    onBeforeUnmount(() => {
+      motionMedia?.removeEventListener('change', syncMotion)
+    })
+
     watch(
-      () => [props.duration, props.open] as const,
+      () => [props.duration, shown.value, reducedMotion.value] as const,
       () => {
-        clearTimer()
-        if (props.open === false) return
-        if (props.duration && props.duration > 0) {
-          autoCloseTimer = setTimeout(() => {
-            requestClose(new Event('close', { cancelable: true }))
-          }, props.duration)
-        }
+        countdown.sync(shown.value ? props.duration : undefined, reducedMotion.value)
       },
       { immediate: true }
     )
 
-    onBeforeUnmount(clearTimer)
+    onBeforeUnmount(() => {
+      stopCountdown()
+      countdown.dispose()
+    })
 
     return () => {
-      if (props.open === false) {
+      if (!shown.value) {
         return null
       }
 
@@ -323,23 +347,25 @@ export const Alert = defineComponent({
           h('div', { class: alertCountdownContainerClasses }, [
             h('div', {
               class: classNames(alertCountdownBarClasses, alertCountdownColorClasses[props.type]),
-              style: { animationDuration: `${props.duration}ms` }
+              style: { width: `${Math.max(0, Math.min(1, ratio.value)) * 100}%` }
             })
           ])
         )
       }
 
       const hasContent = hasTitle || hasDescription || hasDefault
-      const role =
-        typeof attrsRole === 'string' ? attrsRole : resolveAlertRole(props.type, hasContent)
+      const live = resolveAlertLive(props.type, hasContent, inserted)
+      const role = typeof attrsRole === 'string' ? attrsRole : live.role
 
       return h(
         'div',
         {
           ...attrs,
+          ref: alertRef,
           class: classNames(alertClasses.value, props.className, coerceClassValue(attrsClass)),
           style: mergeStyleValues(attrsStyle, props.style),
-          role
+          role,
+          'aria-live': live.ariaLive
         },
         children
       )

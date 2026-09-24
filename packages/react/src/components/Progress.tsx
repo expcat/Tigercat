@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import {
   calculateCirclePath,
   classNames,
@@ -7,7 +7,7 @@ import {
   getProgressLabels,
   getProgressStrokeClasses,
   getProgressTextColorClasses,
-  injectProgressStyles,
+
   progressCircleBaseClasses,
   progressCircleTextClasses,
   progressCircleTrackStrokeClasses,
@@ -48,10 +48,6 @@ export const Progress: React.FC<ProgressProps> = React.memo(
   }) => {
     const config = useTigerConfig()
     const widgetName = getProgressLabels(config.locale).ariaLabel
-
-    useLayoutEffect(() => {
-      injectProgressStyles()
-    }, [])
 
     const view = useMemo(
       () =>

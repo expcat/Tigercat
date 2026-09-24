@@ -4,7 +4,6 @@ import {
   defaultMessageThemeColors,
   getMessageCloseAriaLabel,
   getMessageIconPath,
-  getMessagePositionStyle,
   getMessageTypeClasses,
   getToastItemRole,
   messageBaseClasses,
@@ -19,9 +18,8 @@ import {
   type MessagePosition
 } from '@expcat/tigercat-core'
 import { createStatusIcon, createStatusIconWithLoading } from '../utils/icon-helpers'
-import { renderVueBodyTeleport } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
-import { getGlobalTigerLocale } from '../utils/global-locale'
+import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
+import { useResolvedTigerLocale } from './ConfigProvider'
 
 export interface VueMessageContainerProps {
   position?: MessagePosition
@@ -52,10 +50,9 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
       default: true
     }
   },
-  emits: ['close'],
+  emits: ['close', 'pause', 'resume'],
   setup(props, { emit }) {
-    const config = useTigerConfig()
-    const locale = computed(() => config.value.locale ?? getGlobalTigerLocale())
+    const locale = useResolvedTigerLocale()
     const containerClasses = computed(() =>
       classNames(messageContainerBaseClasses, messagePositionClasses[props.position])
     )
@@ -112,7 +109,23 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
           'aria-busy': message.type === 'loading' ? 'true' : undefined,
           'data-tiger-message': '',
           'data-tiger-message-type': message.type,
-          'data-tiger-message-id': String(message.id)
+          'data-tiger-message-id': String(message.id),
+          onPointerenter: () => emit('pause', message.id),
+          onPointerleave: () => emit('resume', message.id),
+          onFocusin: (event: FocusEvent) => {
+            const next = event.relatedTarget
+            if (next instanceof Node && event.currentTarget instanceof Node && event.currentTarget.contains(next)) {
+              return
+            }
+            emit('pause', message.id)
+          },
+          onFocusout: (event: FocusEvent) => {
+            const next = event.relatedTarget
+            if (next instanceof Node && event.currentTarget instanceof Node && event.currentTarget.contains(next)) {
+              return
+            }
+            emit('resume', message.id)
+          }
         },
         children
       )
@@ -123,13 +136,15 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
         'div',
         {
           class: containerClasses.value,
-          style: getMessagePositionStyle(props.position),
+          'data-tiger-toast': '',
           'data-tiger-message-position': props.position,
           'data-tiger-message-container': ''
         },
         props.messages.map(renderMessageItem)
       )
-      return props.portal ? renderVueBodyTeleport(node) : node
+      return props.portal
+        ? renderVueOverlayOutlet(`message-${props.position}`, node)
+        : node
     }
   }
 })

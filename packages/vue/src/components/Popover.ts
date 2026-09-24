@@ -1,16 +1,17 @@
-import { defineComponent, computed, h, nextTick, PropType, useId, watch } from 'vue'
+import { defineComponent, computed, h, PropType, useId, watch } from 'vue'
 import { usePopup } from '../utils/use-popup'
-import { renderVueOverlayTeleport, useVueFocusTrap } from '../utils/overlay'
+import { renderVueOverlayTeleport } from '../utils/overlay'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
   classNames,
   coerceClassValue,
-  getFocusableElements,
+  devWarn,
   getOverlayTriggerAria,
   getPopoverContainerClasses,
   getPopoverContentClasses,
   getPopoverContentStyle,
   getPopoverTriggerClasses,
+  resolvePopoverWidth,
   POPOVER_TITLE_CLASSES,
   POPOVER_TEXT_CLASSES,
   type PopoverTrigger,
@@ -47,6 +48,9 @@ export const Popover = defineComponent({
     placement: { type: String as PropType<FloatingPlacement>, default: 'top' as FloatingPlacement },
     disabled: { type: Boolean, default: false },
     width: { type: [Number, String], default: undefined },
+    ariaLabel: { type: String, default: undefined },
+    showDelay: { type: Number, default: undefined },
+    hideDelay: { type: Number, default: undefined },
     offset: { type: Number, default: 8 },
     asChild: { type: Boolean, default: false },
     className: { type: String, default: undefined },
@@ -68,19 +72,25 @@ export const Popover = defineComponent({
       triggerHandlers
     } = usePopup({ props, emit })
 
-    const trapEnabled = computed(() => currentVisible.value && props.trigger === 'click')
-    useVueFocusTrap({ enabled: trapEnabled, containerRef: floatingRef })
-
-    watch(currentVisible, (visible) => {
-      if (!visible || props.trigger !== 'click') return
-      nextTick(() => {
-        const root = floatingRef.value
-        if (!root) return
-        const dialog = root.querySelector<HTMLElement>('[role="dialog"]') ?? root
-        const first = getFocusableElements(dialog)[0] ?? dialog
-        first.focus()
-      })
-    })
+    watch(
+      () => [props.width, props.title, props.ariaLabel, slots.title] as const,
+      () => {
+        const resolved = resolvePopoverWidth(props.width)
+        if (resolved.invalid) {
+          devWarn(
+            'popover.width',
+            `[Tigercat] Popover width ${String(props.width)} is not a positive pixel count or a CSS length. The default max-width is used.`
+          )
+        }
+        if (!props.title && !slots.title && !props.ariaLabel) {
+          devWarn(
+            'popover.name',
+            '[Tigercat] Popover has no title or aria-label. Pass a short ariaLabel; the body is only the description.'
+          )
+        }
+      },
+      { immediate: true }
+    )
 
     const popoverId = `tiger-popover-${useId()}`
     const titleId = `${popoverId}-title`
@@ -151,8 +161,7 @@ export const Popover = defineComponent({
                         id: popoverId,
                         role: 'dialog',
                         'aria-modal': 'false',
-                        tabindex: -1,
-                        'aria-label': hasTitle ? undefined : props.title || props.content,
+                        'aria-label': hasTitle ? undefined : props.ariaLabel,
                         'aria-labelledby': hasTitle ? titleId : undefined,
                         'aria-describedby': hasContent ? contentId : undefined,
                         class: contentClasses.value,

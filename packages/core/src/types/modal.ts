@@ -126,4 +126,10 @@ export interface ModalProps {
    * Default Cancel button text. Defaults to `locale.modal.cancelText` (en-US `Cancel`).
    */
   cancelText?: string
+
+  /**
+   * Element to focus when the dialog opens. Defaults to the dialog itself,
+   * so the title is read before the close button.
+   */
+  initialFocus?: string
 }

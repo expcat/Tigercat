@@ -16,18 +16,18 @@ import { overlayZIndexClass } from './floating'
 export const tourMaskClasses = `fixed inset-0 ${overlayZIndexClass.modal} bg-black/45`
 
 /** Popover card — always viewport-fixed so body transform does not shift it. */
-export const tourPopoverClasses = `fixed ${overlayZIndexClass.modal} w-[min(20rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-surface-raised,#ffffff)] shadow-xl border border-[var(--tiger-border,#e5e7eb)] p-4`
+export const tourPopoverClasses = `fixed ${overlayZIndexClass.modal} w-[min(20rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-surface-raised)] shadow-xl border border-[var(--tiger-border)] p-4`
 
-export const tourTitleClasses = 'text-base font-semibold text-[var(--tiger-text,#111827)] mb-1'
+export const tourTitleClasses = 'text-base font-semibold text-[var(--tiger-text)] mb-1'
 
-export const tourDescriptionClasses = 'text-sm text-[var(--tiger-text-secondary,#6b7280)] mb-4'
+export const tourDescriptionClasses = 'text-sm text-[var(--tiger-text-secondary)] mb-4'
 
 export const tourFooterClasses = 'flex items-center justify-between'
 
-export const tourIndicatorClasses = 'text-xs text-[var(--tiger-text-disabled,#9ca3af)]'
+export const tourIndicatorClasses = 'text-xs text-[var(--tiger-text-disabled)]'
 
 export const tourCloseButtonClasses =
-  'absolute top-2 end-2 p-1 rounded-[var(--tiger-radius-md,0.5rem)] text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors'
+  'absolute top-2 end-2 p-1 rounded-[var(--tiger-radius-md)] text-[var(--tiger-text-secondary)] hover:bg-[var(--tiger-surface-muted)] transition-colors'
 
 export const tourPrevButtonGapClass = 'me-2'
 
@@ -70,6 +70,11 @@ export function getCurrentActiveTourStep(
     activeSteps.find((item) => item.index > current) ??
     activeSteps[activeSteps.length - 1]
   )
+}
+
+/** Original index of the first step that is not skipped. */
+export function getFirstTourStepIndex(steps: TourStep[]): number {
+  return getActiveTourSteps(steps)[0]?.index ?? 0
 }
 
 export function getActiveTourStepPosition(
@@ -244,6 +249,19 @@ export function getTourTargetRect(
   return getTourRectFromElement(el)
 }
 
+/**
+ * `start` / `end` follow the writing direction. Physical `left` / `right` stay put.
+ */
+export function resolveTourLogicalPlacement(
+  placement: TourPlacement,
+  direction: 'ltr' | 'rtl' = 'ltr'
+): TourPlacement {
+  if (direction !== 'rtl') return placement
+  if (placement.endsWith('-start')) return placement.replace(/-start$/, '-end') as TourPlacement
+  if (placement.endsWith('-end')) return placement.replace(/-end$/, '-start') as TourPlacement
+  return placement
+}
+
 export function getOppositeTourPlacement(placement: TourPlacement): TourPlacement {
   if (placement.startsWith('top')) return placement.replace('top', 'bottom') as TourPlacement
   if (placement.startsWith('bottom')) return placement.replace('bottom', 'top') as TourPlacement
@@ -387,12 +405,14 @@ export function getTourCenteredPosition(
 export function getTourPopoverStyle(
   targetRect: TourRect | undefined,
   popoverSize: TourSize | undefined,
-  placement: TourPlacement
+  placement: TourPlacement,
+  direction: 'ltr' | 'rtl' = 'ltr'
 ): Record<string, string> {
+  const resolved = resolveTourLogicalPlacement(placement, direction)
   const width = popoverSize?.width ?? 0
   const height = popoverSize?.height ?? 0
   const pos = targetRect
-    ? getTourPopoverPosition(targetRect, width, height, placement)
+    ? getTourPopoverPosition(targetRect, width, height, resolved)
     : getTourCenteredPosition(width, height)
   return {
     position: 'fixed',
@@ -414,9 +434,27 @@ function getTourMaskHoleRect(
 }
 
 /**
- * Clip-path that punches a hole over the target so a full-screen painted mask
- * stays clickable on the dimmed backdrop without covering the target.
- * `rect` is in viewport coordinates (same as `position: fixed`).
+ * Visual hole. `pointer-events: none` so the full-screen mask underneath
+ * still receives the click. `rect` is in viewport coordinates.
+ */
+export function getTourShadeStyle(rect: TourRect | undefined): Record<string, string> {
+  if (!rect) return { pointerEvents: 'none' }
+  const hole = getTourMaskHoleRect(rect, TOUR_MASK_HOLE_PADDING)
+  return {
+    pointerEvents: 'none',
+    position: 'fixed',
+    top: `${hole.top}px`,
+    left: `${hole.left}px`,
+    width: `${hole.width}px`,
+    height: `${hole.height}px`,
+    borderRadius: 'var(--tiger-radius-md)',
+    boxShadow: '0 0 0 9999px rgb(0 0 0 / 0.45)'
+  }
+}
+
+/**
+ * Clip-path used only when a step sets `interact`, so clicks in the hole
+ * reach the target. The default mask does not use this.
  */
 export function getTourMaskHoleStyle(
   rect: TourRect,

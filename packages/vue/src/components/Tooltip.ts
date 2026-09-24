@@ -1,10 +1,12 @@
-import { defineComponent, computed, h, PropType, useId } from 'vue'
+import { defineComponent, computed, h, PropType, useId, watch } from 'vue'
 import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
   classNames,
   coerceClassValue,
+  devWarn,
+  getFocusableElements,
   getOverlayTriggerAria,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
@@ -40,6 +42,8 @@ export const Tooltip = defineComponent({
     placement: { type: String as PropType<FloatingPlacement>, default: 'top' as FloatingPlacement },
     disabled: { type: Boolean, default: false },
     offset: { type: Number, default: 8 },
+    showDelay: { type: Number, default: undefined },
+    hideDelay: { type: Number, default: undefined },
     asChild: { type: Boolean, default: false },
     className: { type: String, default: undefined },
     style: { type: [String, Object, Array] as PropType<StyleValue>, default: undefined }
@@ -59,6 +63,17 @@ export const Tooltip = defineComponent({
       overlayTarget,
       triggerHandlers
     } = usePopup({ props, emit })
+
+    watch(currentVisible, (visible) => {
+      if (!visible) return
+      const root = floatingRef.value
+      if (root && getFocusableElements(root).length > 0) {
+        devWarn(
+          'tooltip.content',
+          '[Tigercat] Tooltip content is plain text. Use Popover for interactive content.'
+        )
+      }
+    })
 
     const tooltipId = `tiger-tooltip-${useId()}`
 
@@ -122,7 +137,7 @@ export const Tooltip = defineComponent({
                     h(
                       'div',
                       { id: tooltipId, role: 'tooltip', class: contentClasses.value },
-                      slots.content ? slots.content() : props.content
+                      props.content
                     )
                   ]
                 ),

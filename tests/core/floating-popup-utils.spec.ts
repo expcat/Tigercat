@@ -18,15 +18,15 @@ describe('createFloatingHoverDelayController', () => {
     vi.useRealTimers()
   })
 
-  it('exposes 0ms show delay and 100ms hide delay defaults', () => {
-    expect(DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS).toBe(0)
+  it('exposes a positive show delay and 100ms hide delay defaults', () => {
+    expect(DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS).toBe(100)
     expect(DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS).toBe(100)
   })
 
   it('does not hide immediately on leave', () => {
     const show = vi.fn()
     const hide = vi.fn()
-    const controller = createFloatingHoverDelayController({ show, hide })
+    const controller = createFloatingHoverDelayController({ show, hide, showDelay: 0 })
 
     controller.enter()
     expect(show).toHaveBeenCalledTimes(1)
@@ -38,7 +38,7 @@ describe('createFloatingHoverDelayController', () => {
   it('hides once after hideDelay', () => {
     const show = vi.fn()
     const hide = vi.fn()
-    const controller = createFloatingHoverDelayController({ show, hide })
+    const controller = createFloatingHoverDelayController({ show, hide, showDelay: 0 })
 
     controller.enter()
     controller.leave()
@@ -52,7 +52,7 @@ describe('createFloatingHoverDelayController', () => {
   it('cancels pending hide when enter happens before delay', () => {
     const show = vi.fn()
     const hide = vi.fn()
-    const controller = createFloatingHoverDelayController({ show, hide })
+    const controller = createFloatingHoverDelayController({ show, hide, showDelay: 0 })
 
     controller.enter()
     controller.leave()
@@ -67,7 +67,7 @@ describe('createFloatingHoverDelayController', () => {
   it('closeNow cancels pending hide and hides immediately', () => {
     const show = vi.fn()
     const hide = vi.fn()
-    const controller = createFloatingHoverDelayController({ show, hide })
+    const controller = createFloatingHoverDelayController({ show, hide, showDelay: 0 })
 
     controller.enter()
     controller.leave()
@@ -81,7 +81,7 @@ describe('createFloatingHoverDelayController', () => {
   it('dispose clears pending hide without hiding', () => {
     const show = vi.fn()
     const hide = vi.fn()
-    const controller = createFloatingHoverDelayController({ show, hide })
+    const controller = createFloatingHoverDelayController({ show, hide, showDelay: 0 })
 
     controller.enter()
     controller.leave()

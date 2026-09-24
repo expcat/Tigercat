@@ -1,16 +1,14 @@
-import { defineComponent, computed, h, nextTick, PropType, ref, useId, watch } from 'vue'
+import { defineComponent, computed, getCurrentInstance, h, PropType, ref, useId, watch } from 'vue'
 import { usePopup } from '../utils/use-popup'
-import { renderVueOverlayTeleport, useVueFocusTrap } from '../utils/overlay'
-import {
-  assignOverlayTriggerRef,
-  renderOverlayTrigger,
-  resolveOverlayTriggerElement
-} from '../utils/overlay-trigger'
+import { renderVueOverlayTeleport } from '../utils/overlay'
+import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 import {
   classNames,
   coerceClassValue,
+  createDismissActionEvent,
+  settleDismissAction,
   getArrowStyles,
   getOverlayTriggerAria,
   getPopconfirmIconPath,
@@ -99,16 +97,16 @@ export const Popconfirm = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const arrowRef = ref<HTMLElement | null>(null)
-    const cancelRef = ref<HTMLElement | null>(null)
     const confirming = ref(false)
+    const vueInstance = getCurrentInstance()
 
     const {
       currentVisible,
-      setVisible,
       containerRef,
       triggerRef,
       floatingRef,
       closeAndRestoreFocus,
+      triggerHandlers,
       floatingStyles,
       floatingClasses,
       positioned,
@@ -116,18 +114,18 @@ export const Popconfirm = defineComponent({
       actualPlacement,
       arrowX,
       arrowY
-    } = usePopup({ props, emit, multiTrigger: false, arrowRef })
-
-    useVueFocusTrap({ enabled: currentVisible, containerRef: floatingRef })
+    } = usePopup({
+      props,
+      emit,
+      multiTrigger: false,
+      arrowRef,
+      isDismissLocked: () => confirming.value,
+      restoreFocusOnDismiss: 'all',
+      onDismissed: () => emit('cancel')
+    })
 
     watch(currentVisible, (visible) => {
-      if (!visible) {
-        confirming.value = false
-        return
-      }
-      nextTick(() => {
-        resolveOverlayTriggerElement(cancelRef.value)?.focus()
-      })
+      if (!visible) confirming.value = false
     })
 
     const popconfirmId = `tiger-popconfirm-${useId()}`
@@ -148,14 +146,28 @@ export const Popconfirm = defineComponent({
       resolveLocaleText('Cancel', props.cancelText, config.value.locale?.common?.cancelText)
     )
 
-    const handleConfirm = () => {
-      let prevented = false
-      emit('confirm', {
-        preventDefault() {
-          prevented = true
-        }
-      })
-      if (!prevented) closeAndRestoreFocus()
+    const handleConfirm = async () => {
+      if (confirming.value) return
+      const event = createDismissActionEvent()
+      const propsRecord = vueInstance?.vnode.props as
+        | { onConfirm?: (event: ReturnType<typeof createDismissActionEvent>) => unknown }
+        | null
+      const handler = propsRecord?.onConfirm
+      let result: unknown
+      try {
+        result = handler?.(event)
+      } catch {
+        return
+      }
+      if (event.defaultPrevented) return
+      const pending =
+        typeof result === 'object' &&
+        result !== null &&
+        typeof (result as Promise<unknown>).then === 'function'
+      if (pending) confirming.value = true
+      const outcome = await settleDismissAction(result, event)
+      if (pending) confirming.value = false
+      if (outcome === 'close') closeAndRestoreFocus()
     }
 
     const handleCancel = () => {
@@ -216,12 +228,7 @@ export const Popconfirm = defineComponent({
         disabled: props.disabled,
         preventDefaultOnClick: true,
         aria: triggerAria,
-        handlers: {
-          onClick: () => {
-            if (props.disabled) return
-            setVisible(!currentVisible.value)
-          }
-        }
+        handlers: triggerHandlers.value
       })
 
       return h(
@@ -259,7 +266,6 @@ export const Popconfirm = defineComponent({
                       id: popconfirmId,
                       role: 'dialog',
                       'aria-modal': 'false',
-                      tabindex: -1,
                       'aria-labelledby': titleId,
                       'aria-describedby': describedBy,
                       class: contentClasses
@@ -290,7 +296,7 @@ export const Popconfirm = defineComponent({
                         h(
                           Button,
                           {
-                            ref: cancelRef,
+
                             size: 'sm',
                             variant: 'outline',
                             onClick: handleCancel

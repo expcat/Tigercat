@@ -102,9 +102,8 @@ export function getOverlayTriggerKeyboardAction(
 }
 
 /**
- * Hover also responds to click (touch) and focus (keyboard). Click stays
- * click-only; focus stays focus-only aside from the relatedTarget guard in
- * the hide handler.
+ * Hover listens to the pointer and to focus. Click on a hover trigger opens
+ * and stays; it does not toggle closed. Enter / Space stay on the trigger.
  */
 export function buildOverlayTriggerHandlerMap<H>(
   trigger: FloatingTrigger,
@@ -122,11 +121,11 @@ export function buildOverlayTriggerHandlerMap<H>(
 
   switch (trigger) {
     case 'click':
-      return { onClick: handlers.toggle }
+      return { onClick: handlers.toggle, [focusOut]: handlers.hide }
 
     case 'hover':
       return {
-        onClick: handlers.toggle,
+        onClick: handlers.show,
         [mouseEnter]: handlers.show,
         [mouseLeave]: handlers.hide,
         [focusIn]: handlers.show,

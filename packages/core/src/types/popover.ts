@@ -26,9 +26,16 @@ export interface PopoverProps extends BaseFloatingPopupProps {
   trigger?: PopoverTrigger
 
   /**
-   * Popover width in pixels. Custom width drops the default max-width cap.
+   * Width as a positive pixel number or one CSS length (`20rem`, `50%`).
+   * Invalid values keep the default max-width.
    */
   width?: number | string
+
+  /**
+   * Accessible name when there is no title. The body is the description,
+   * not a second copy of the name.
+   */
+  ariaLabel?: string
 
   /** Custom styles */
   style?: Record<string, string | number>

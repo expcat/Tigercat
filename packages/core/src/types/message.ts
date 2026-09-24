@@ -86,7 +86,7 @@ export interface MessageProps {
 
   /**
    * Whether the message can be closed manually
-   * @default false
+   * @default true
    */
   closable?: boolean
 
@@ -110,6 +110,12 @@ export interface MessageProps {
    * @default 'top'
    */
   position?: MessagePosition
+
+  /**
+   * Stable id. Calling again with the same key replaces that message and
+   * resets its timer.
+   */
+  key?: string | number
 
   /**
    * Close button aria-label when `closable` is true.

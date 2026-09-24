@@ -1,10 +1,13 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
+  captureRegionFocus,
   classNames,
+  createLoadingDelayGate,
   getLoadingIndicator,
   getLoadingLabel,
   getLoadingTextClasses,
   mergeTigerLocale,
+  restoreRegionFocus,
   DEFAULT_LOADING_BACKGROUND,
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
@@ -13,7 +16,8 @@ import {
   type LoadingIndicatorNode,
   type LoadingProps as CoreLoadingProps
 } from '@expcat/tigercat-core'
-import { renderBodyPortal, useBackgroundInert, useBodyScrollLock } from '../utils/overlay'
+import { useFocusTrap } from '../utils/overlay'
+import { OverlayPortal } from '../utils/overlay-outlet'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface LoadingProps
@@ -67,48 +71,46 @@ export const Loading: React.FC<LoadingProps> = ({
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const [visible, setVisible] = useState(delay <= 0)
-  const containerRef = useRef<HTMLDivElement | null>(null)
+  const gate = useRef(createLoadingDelayGate()).current
+  const [visible, setVisible] = useState(() => gate.isShown())
+  const regionRef = useRef<HTMLDivElement | null>(null)
+  const layerRef = useRef<HTMLDivElement | null>(null)
+  const rememberedFocus = useRef<HTMLElement | null>(null)
   const hasRegion = children != null && children !== false
-  const showIndicator = visible && spinning
-  const showFullscreen = fullscreen && showIndicator && !hasRegion
+  const showIndicator = visible
+  const showFullscreen = Boolean(fullscreen && showIndicator)
 
-  useBodyScrollLock({ enabled: showFullscreen && lockScroll })
-  useBackgroundInert({ enabled: showFullscreen, containerRef })
-
+  useEffect(() => gate.subscribe(() => setVisible(gate.isShown())), [gate])
   useEffect(() => {
-    if (delay <= 0) {
-      setVisible(true)
-      return
-    }
-    setVisible(false)
-    const timer = setTimeout(() => setVisible(true), delay)
-    return () => clearTimeout(timer)
-  }, [delay])
+    gate.sync(Boolean(spinning), delay)
+  }, [gate, spinning, delay])
+  useEffect(() => () => gate.dispose(), [gate])
+
+  const wasRegionMasked = useRef(false)
+  if (showIndicator && !showFullscreen && hasRegion && !wasRegionMasked.current) {
+    rememberedFocus.current = captureRegionFocus(regionRef.current)
+  }
+  wasRegionMasked.current = Boolean(showIndicator && !showFullscreen && hasRegion)
+  useLayoutEffect(() => {
+    if (wasRegionMasked.current || !hasRegion || showFullscreen) return
+    const remembered = rememberedFocus.current
+    rememberedFocus.current = null
+    restoreRegionFocus(regionRef.current, remembered)
+  }, [hasRegion, showFullscreen, showIndicator])
+
+  useFocusTrap({
+    enabled: showFullscreen,
+    containerRef: layerRef,
+    inert: true,
+    autoFocus: true,
+    initialFocusRef: layerRef,
+    lockScroll
+  })
 
   const indicator = useMemo(
     () => getLoadingIndicator({ variant, size, color, customColor }),
     [variant, size, color, customColor]
   )
-
-  const inlineStyle = useMemo<React.CSSProperties>(
-    () => ({
-      ...(customColor ? { color: customColor } : null),
-      ...(fullscreen ? { backgroundColor: background } : null),
-      ...style
-    }),
-    [customColor, fullscreen, background, style]
-  )
-
-  const overlayStyle = useMemo<React.CSSProperties>(
-    () => ({
-      ...(customColor ? { color: customColor } : null),
-      backgroundColor: background,
-      ...style
-    }),
-    [customColor, background, style]
-  )
-
   const label = getLoadingLabel(mergedLocale, text)
   const indicatorNode = renderIndicator(indicator)
   const textNode = text ? (
@@ -120,49 +122,69 @@ export const Loading: React.FC<LoadingProps> = ({
     props.role === 'presentation'
   const statusProps = decorative
     ? { role: 'presentation' as const, 'aria-hidden': true as const }
-    : { role: 'status' as const, 'aria-label': label, 'aria-busy': true as const }
+    : {
+        role: 'status' as const,
+        'aria-label': label,
+        ...(hasRegion ? {} : { 'aria-busy': true as const })
+      }
+
+  const fullscreenNode = showFullscreen ? (
+    <OverlayPortal>
+      <div
+        {...props}
+        ref={layerRef}
+        tabIndex={-1}
+        className={classNames(loadingFullscreenBaseClasses, className)}
+        style={{
+          ...(customColor ? { color: customColor } : null),
+          backgroundColor: background,
+          ...style
+        }}
+        {...statusProps}
+        data-tiger-overlay-layer="">
+        {indicatorNode}
+        {textNode}
+      </div>
+    </OverlayPortal>
+  ) : null
 
   if (hasRegion) {
     return (
-      <div className={classNames(loadingRegionBaseClasses, className)}>
-        <div inert={showIndicator || undefined}>{children}</div>
-        {showIndicator ? (
+      <div
+        ref={regionRef}
+        className={classNames(loadingRegionBaseClasses, !showFullscreen && className)}
+        aria-busy={showIndicator || undefined}>
+        <div inert={showIndicator && !showFullscreen ? true : undefined}>{children}</div>
+        {showIndicator && !showFullscreen ? (
           <div
             {...props}
-            ref={containerRef}
             className={loadingRegionOverlayClasses}
-            style={overlayStyle}
+            style={{
+              ...(customColor ? { color: customColor } : null),
+              backgroundColor: background,
+              ...style
+            }}
             {...statusProps}>
             {indicatorNode}
             {textNode}
           </div>
         ) : null}
+        {fullscreenNode}
       </div>
     )
   }
 
-  if (!showIndicator) {
-    return null
-  }
+  if (showFullscreen) return fullscreenNode
+  if (!showIndicator) return null
 
-  const loadingNode = (
+  return (
     <div
       {...props}
-      ref={containerRef}
-      className={classNames(
-        fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
-        className
-      )}
-      style={inlineStyle}
+      className={classNames(loadingContainerBaseClasses, className)}
+      style={{ ...(customColor ? { color: customColor } : null), ...style }}
       {...statusProps}>
       {indicatorNode}
       {textNode}
     </div>
   )
-
-  if (fullscreen) {
-    return renderBodyPortal(loadingNode)
-  }
-
-  return loadingNode
 }

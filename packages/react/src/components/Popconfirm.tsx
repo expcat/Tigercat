@@ -1,8 +1,8 @@
-import React, { forwardRef, useEffect, useId, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  createDismissActionEvent,
   getArrowStyles,
-  getFocusableElements,
   getOverlayTriggerAria,
   getPopconfirmIconPath,
   getPopconfirmContainerClasses,
@@ -19,12 +19,13 @@ import {
   popconfirmIconStrokeWidth,
   popconfirmIconViewBox,
   resolveLocaleText,
+  settleDismissAction,
   type PopconfirmProps as CorePopconfirmProps,
   type PopconfirmIconType,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { usePopup } from '../utils/use-popup'
-import { renderOverlayPortal, useFocusTrap } from '../utils/overlay'
+import { renderOverlayPortal } from '../utils/overlay'
 import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
@@ -103,12 +104,11 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
   const descriptionId = `${popconfirmId}-description`
   const describedBy = description || descriptionContent ? descriptionId : undefined
   const arrowRef = useRef<HTMLDivElement>(null)
-  const cancelRef = useRef<HTMLButtonElement>(null)
   const [confirming, setConfirming] = useState(false)
+  const confirmingRef = useRef(false)
 
   const {
     currentVisible,
-    setVisible,
     containerRef,
     triggerRef,
     floatingRef,
@@ -116,6 +116,7 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
     positioned,
     overlayTarget,
     closeAndRestoreFocus,
+    triggerHandlers,
     actualPlacement,
     floatingStyles: baseFloatingStyles,
     arrowX,
@@ -128,52 +129,36 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
     offset,
     multiTrigger: false,
     arrowRef,
-    onOpenChange
+    onOpenChange,
+    isDismissLocked: () => confirmingRef.current,
+    restoreFocusOnDismiss: 'all',
+    onDismissed: () => onCancel?.()
   })
 
-  useFocusTrap({ enabled: Boolean(currentVisible), containerRef: floatingRef })
-
-  useEffect(() => {
-    if (!currentVisible) {
-      setConfirming(false)
-      return
-    }
-    const frame = requestAnimationFrame(() => {
-      if (cancelRef.current) {
-        cancelRef.current.focus()
-        return
-      }
-      const root = floatingRef.current
-      if (!root) return
-      const first = getFocusableElements(root)[0]
-      first?.focus()
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [currentVisible, floatingRef])
-
   const handleConfirm = async () => {
-    let prevented = false
-    const result = onConfirm?.({
-      preventDefault() {
-        prevented = true
-      }
-    })
-    if (prevented) return
-    if (result && typeof (result as Promise<void>).then === 'function') {
-      setConfirming(true)
-      try {
-        await result
-        if (prevented) {
-          setConfirming(false)
-          return
-        }
-        closeAndRestoreFocus()
-      } catch {
-        setConfirming(false)
-      }
+    if (confirmingRef.current) return
+    const event = createDismissActionEvent()
+    let result: unknown
+    try {
+      result = onConfirm?.(event)
+    } catch {
       return
     }
-    closeAndRestoreFocus()
+    if (event.defaultPrevented) return
+    const pending =
+      typeof result === 'object' &&
+      result !== null &&
+      typeof (result as Promise<unknown>).then === 'function'
+    if (pending) {
+      confirmingRef.current = true
+      setConfirming(true)
+    }
+    const outcome = await settleDismissAction(result, event)
+    if (pending) {
+      confirmingRef.current = false
+      setConfirming(false)
+    }
+    if (outcome === 'close') closeAndRestoreFocus()
   }
 
   const handleCancel = () => {
@@ -222,12 +207,7 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
         disabled,
         preventDefaultOnClick: true,
         aria: triggerAria,
-        handlers: {
-          onClick: () => {
-            if (disabled) return
-            setVisible(!currentVisible)
-          }
-        }
+        handlers: triggerHandlers
       })}
 
       {renderOverlayPortal(
@@ -244,7 +224,6 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
               id={popconfirmId}
               role="dialog"
               aria-modal="false"
-              tabIndex={-1}
               aria-labelledby={titleId}
               aria-describedby={describedBy}
               className={contentClasses}>
@@ -266,7 +245,7 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
                 </div>
               </div>
               <div className={buttonsClasses}>
-                <Button ref={cancelRef} size="sm" variant="outline" onClick={handleCancel}>
+                <Button size="sm" variant="outline" onClick={handleCancel}>
                   {resolvedCancelText}
                 </Button>
                 <Button

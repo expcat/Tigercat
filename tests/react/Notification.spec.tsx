@@ -22,20 +22,38 @@ async function flushHost() {
 }
 
 describe('notification (React)', () => {
+  let unmountProvider: (() => void) | undefined
+
   beforeAll(async () => {
-    notification.info({ title: '__warmup__', duration: 0 })
+    const view = render(
+      <ConfigProvider>
+        <span>app</span>
+      </ConfigProvider>
+    )
+    await act(async () => {
+      notification.info({ title: '__warmup__', duration: 0 })
+      await Promise.resolve()
+    })
     await waitFor(() => {
       expect(document.querySelector('[data-tiger-notification]')).toBeTruthy()
     })
-    notification.clear()
-    document.body.innerHTML = ''
-  })
-
-  beforeEach(() => {
     act(() => {
       notification.clear()
     })
-    document.body.innerHTML = ''
+    view.unmount()
+  })
+
+  beforeEach(() => {
+    vi.useRealTimers()
+    const view = render(
+      <ConfigProvider>
+        <span>app</span>
+      </ConfigProvider>
+    )
+    unmountProvider = view.unmount
+    act(() => {
+      notification.clear()
+    })
   })
 
   afterEach(() => {
@@ -43,7 +61,7 @@ describe('notification (React)', () => {
     act(() => {
       notification.clear()
     })
-    document.body.innerHTML = ''
+    unmountProvider?.()
   })
 
   it('renders three toasts on the same position from one act', async () => {
@@ -80,16 +98,20 @@ describe('notification (React)', () => {
         title: 'Clickable',
         duration: 0,
         onClick,
+        actionLabel: 'Open',
         actions: [{ label: 'View', onClick: onAction }]
       })
     })
     const action = screen.getByRole('button', { name: 'View' })
+    const primary = screen.getByRole('button', { name: 'Open' })
     expect(document.querySelector('[data-tiger-notification]')?.getAttribute('tabindex')).toBeNull()
     action.focus()
     fireEvent.keyDown(action, { key: 'Enter' })
     fireEvent.click(action)
     expect(onAction).toHaveBeenCalled()
     expect(onClick).not.toHaveBeenCalled()
+    fireEvent.click(primary)
+    expect(onClick).toHaveBeenCalledTimes(1)
   })
 
   it('uses official locale close names', () => {

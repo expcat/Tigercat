@@ -6,6 +6,7 @@ import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
 import { Loading } from '@expcat/tigercat-vue/Loading'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { expectNoA11yViolations } from '../utils'
 
 describe('Loading (Vue)', () => {
   afterEach(() => {
@@ -21,9 +22,10 @@ describe('Loading (Vue)', () => {
     expect(status).not.toHaveAttribute('aria-live')
   })
 
-  it('hides the decorative indicator from the accessibility tree', () => {
+  it('hides the decorative indicator from the accessibility tree', async () => {
     const { container } = render(Loading)
     expect(container.querySelector('[aria-hidden="true"]')).toBeTruthy()
+    await expectNoA11yViolations(container)
   })
 
   it('renders text and uses it as aria-label', () => {

@@ -23,20 +23,38 @@ async function flushHost() {
 }
 
 describe('Message (React)', () => {
+  let unmountProvider: (() => void) | undefined
+
   beforeAll(async () => {
-    Message.info({ content: '__warmup__', duration: 0 })
+    const view = render(
+      <ConfigProvider>
+        <span>app</span>
+      </ConfigProvider>
+    )
+    await act(async () => {
+      Message.info({ content: '__warmup__', duration: 0 })
+      await Promise.resolve()
+    })
     await waitFor(() => {
       expect(document.querySelector('[data-tiger-message]')).toBeTruthy()
     })
-    Message.clear()
-    document.body.innerHTML = ''
-  })
-
-  beforeEach(() => {
     act(() => {
       Message.clear()
     })
-    document.body.innerHTML = ''
+    view.unmount()
+  })
+
+  beforeEach(() => {
+    vi.useRealTimers()
+    const view = render(
+      <ConfigProvider>
+        <span>app</span>
+      </ConfigProvider>
+    )
+    unmountProvider = view.unmount
+    act(() => {
+      Message.clear()
+    })
   })
 
   afterEach(() => {
@@ -44,7 +62,7 @@ describe('Message (React)', () => {
     act(() => {
       Message.clear()
     })
-    document.body.innerHTML = ''
+    unmountProvider?.()
   })
 
   it('renders three messages from one act without waiting', async () => {
@@ -158,7 +176,8 @@ describe('Message (React)', () => {
       '[data-tiger-message-container][data-tiger-message-position="top"]'
     ) as HTMLElement | null
     expect(host).toBeTruthy()
-    expect(host?.style.left).toBe('50%')
-    expect(host?.style.transform).toBe('translateX(-50%)')
+    expect(host?.className).toContain('inset-inline-0')
+    expect(host?.className).toContain('mx-auto')
+    expect(host?.style.transform).toBe('')
   })
 })

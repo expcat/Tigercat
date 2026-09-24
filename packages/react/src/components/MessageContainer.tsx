@@ -4,7 +4,6 @@ import {
   defaultMessageThemeColors,
   getMessageCloseAriaLabel,
   getMessageIconPath,
-  getMessagePositionStyle,
   getMessageTypeClasses,
   getToastItemRole,
   messageBaseClasses,
@@ -20,17 +19,19 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { StatusIcon, StatusIconWithLoading } from './shared/icons'
-import { useTigerConfig } from './ConfigProvider'
-import { getGlobalTigerLocale } from '../utils/global-locale'
-import { renderBodyPortal } from '../utils/overlay'
+import { useResolvedTigerLocale } from './ConfigProvider'
+
+import { OverlayPortal } from '../utils/overlay-outlet'
 
 interface MessageItemProps {
   message: MessageInstance
   locale?: Partial<TigerLocale>
   onClose?: (id: string | number) => void
+  onPause?: (id: string | number) => void
+  onResume?: (id: string | number) => void
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, locale, onClose }) => {
+const MessageItem: React.FC<MessageItemProps> = ({ message, locale, onClose, onPause, onResume }) => {
   const colorScheme = getMessageTypeClasses(message.type, defaultMessageThemeColors)
   const messageClasses = classNames(
     messageBaseClasses,
@@ -51,7 +52,17 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, locale, onClose }) =
       aria-busy={message.type === 'loading' || undefined}
       data-tiger-message
       data-tiger-message-type={message.type}
-      data-tiger-message-id={String(message.id)}>
+      data-tiger-message-id={String(message.id)}
+      onPointerEnter={() => onPause?.(message.id)}
+      onPointerLeave={() => onResume?.(message.id)}
+      onFocus={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget as Node)) return
+        onPause?.(message.id)
+      }}
+      onBlur={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget as Node)) return
+        onResume?.(message.id)
+      }}>
       <StatusIconWithLoading
         path={iconPath}
         className={iconClass}
@@ -83,9 +94,11 @@ export interface MessageContainerProps {
   position?: MessagePosition
   messages?: MessageInstance[]
   onClose?: (id: string | number) => void
+  onPause?: (id: string | number) => void
+  onResume?: (id: string | number) => void
   /**
-   * Portal through the overlay-host chain. Imperative hosts pass `false`
-   * because they are already mounted on that target.
+   * Render into the ConfigProvider overlay outlet. The imperative host passes
+   * `false` because it is already in that tree.
    * @default true
    */
   portal?: boolean
@@ -95,25 +108,33 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
   position = 'top',
   messages = [],
   onClose,
+  onPause,
+  onResume,
   portal = true
 }) => {
-  const config = useTigerConfig()
-  const locale = config.locale ?? getGlobalTigerLocale()
+  const locale = useResolvedTigerLocale()
   const containerClasses = classNames(messageContainerBaseClasses, messagePositionClasses[position])
 
   const node = (
     <div
       className={containerClasses}
-      style={getMessagePositionStyle(position)}
+      data-tiger-toast=""
       data-tiger-message-position={position}
       data-tiger-message-container>
       {messages.map((message) => (
-        <MessageItem key={message.id} message={message} locale={locale} onClose={onClose} />
+        <MessageItem
+          key={message.id}
+          message={message}
+          locale={locale}
+          onClose={onClose}
+          onPause={onPause}
+          onResume={onResume}
+        />
       ))}
     </div>
   )
 
-  return portal ? renderBodyPortal(node) : node
+  return portal ? <OverlayPortal>{node}</OverlayPortal> : node
 }
 
 export default MessageContainer

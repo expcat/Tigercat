@@ -4,7 +4,9 @@ import { createRoot, type Root } from 'react-dom/client'
 import {
   createImperativeHost,
   createLoadingBarController,
+  getLoadingBarNoticeText,
   isBrowser,
+  readDocumentOwnerLocale,
   type LoadingBarApi,
   type LoadingBarOptions,
   type LoadingBarRuntimeState
@@ -20,7 +22,8 @@ function getController(): ReturnType<typeof createLoadingBarController> {
   if (!controller) {
     controller = createLoadingBarController()
     controller.subscribe(() => {
-      if (controller?.getState().visible) return
+      const next = controller?.getState()
+      if (!next || next.visible || next.notice) return
       host.teardown()
     })
   }
@@ -55,7 +58,14 @@ function LoadingBarHost() {
     getLoadingBarSnapshot
   )
 
-  if (!state.visible) return null
+  const notice = getLoadingBarNoticeText(state.notice, readDocumentOwnerLocale() ?? undefined)
+  if (!state.visible) {
+    return notice ? (
+      <span className="sr-only" role="status">
+        {notice}
+      </span>
+    ) : null
+  }
 
   return (
     <LoadingBarContainer
@@ -66,6 +76,8 @@ function LoadingBarHost() {
       className={state.className}
       style={state.style}
       ariaLabel={state.ariaLabel}
+      notice={notice}
+      noticeToken={state.noticeToken}
     />
   )
 }

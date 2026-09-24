@@ -1,9 +1,11 @@
-import React, { forwardRef, useId, useMemo } from 'react'
+import React, { forwardRef, useEffect, useId, useMemo } from 'react'
 import { usePopup } from '../utils/use-popup'
 import { renderOverlayPortal } from '../utils/overlay'
 import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
   classNames,
+  devWarn,
+  getFocusableElements,
   getOverlayTriggerAria,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
@@ -18,7 +20,7 @@ export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'placement'> &
     'children' | 'className' | 'style' | 'content' | 'title'
   > & {
     children?: React.ReactNode
-    content?: React.ReactNode
+    content?: string
     className?: string
     style?: React.CSSProperties
     placement?: FloatingPlacement
@@ -36,6 +38,8 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
     placement = 'top',
     disabled = false,
     offset = 8,
+    showDelay,
+    hideDelay,
     asChild = false,
     className,
     style,
@@ -57,7 +61,28 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
     positioned,
     overlayTarget,
     triggerHandlers
-  } = usePopup({ open, defaultOpen, disabled, trigger, placement, offset, onOpenChange })
+  } = usePopup({
+    open,
+    defaultOpen,
+    disabled,
+    trigger,
+    placement,
+    offset,
+    showDelay,
+    hideDelay,
+    onOpenChange
+  })
+
+  useEffect(() => {
+    if (!currentVisible) return
+    const root = floatingRef.current
+    if (root && getFocusableElements(root).length > 0) {
+      devWarn(
+        'tooltip.content',
+        '[Tigercat] Tooltip content is plain text. Use Popover for interactive content.'
+      )
+    }
+  }, [currentVisible, floatingRef, content])
 
   const containerClasses = useMemo(
     () => classNames(getTooltipContainerClasses(), className),

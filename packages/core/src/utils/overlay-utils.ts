@@ -1,12 +1,19 @@
 import { isEscapeKey, isTabKey, type KeyLikeEvent } from './a11y-utils'
-import { ANIMATION_DURATION_MS } from './animation'
 import { isBrowser } from './env'
 import { prefersReducedMotion } from './transition'
 
 interface BodyScrollLockState {
   count: number
+  scrollX: number
+  scrollY: number
   previousOverflow: string
   previousPaddingRight: string
+  previousPosition: string
+  previousTop: string
+  previousLeft: string
+  previousRight: string
+  previousWidth: string
+  previousHtmlOverflow: string
 }
 
 const bodyScrollLocks = new WeakMap<Document, BodyScrollLockState>()
@@ -128,18 +135,71 @@ export function clampOverlayDragOffset(
   }
 }
 
-export function scheduleOverlayLeave(options: {
-  onFinish: () => void
-  durationMs?: number
+function cssTimeToMs(value: string): number {
+  const trimmed = value.trim()
+  if (!trimmed) return 0
+  if (trimmed.endsWith('ms')) return Number.parseFloat(trimmed) || 0
+  if (trimmed.endsWith('s')) return (Number.parseFloat(trimmed) || 0) * 1000
+  return 0
+}
+
+/** Longest transition-duration + delay on this element. 0 when nothing is transitioning. */
+export function readTransitionDurationMs(element: HTMLElement): number {
+  const view = element.ownerDocument.defaultView
+  if (!view || typeof view.getComputedStyle !== 'function') return 0
+  const style = view.getComputedStyle(element)
+  const durations = style.transitionDuration.split(',')
+  const delays = (style.transitionDelay || '0s').split(',')
+  let max = 0
+  durations.forEach((part, index) => {
+    const duration = cssTimeToMs(part)
+    if (duration <= 0) return
+    const delay = cssTimeToMs(delays[index] ?? delays[0] ?? '0s')
+    max = Math.max(max, duration + delay)
+  })
+  return max
+}
+
+/**
+ * Run `onFinish` when `element`'s own transition ends.
+ * Reduced motion, a missing element, or a 0ms transition finishes immediately.
+ */
+export function whenOverlayTransitionEnds(
+  element: HTMLElement | null | undefined,
+  onFinish: () => void,
   reducedMotion?: boolean
-}): () => void {
-  if (!isBrowser() || (options.reducedMotion ?? prefersReducedMotion())) {
-    options.onFinish()
+): () => void {
+  if (!element || !isBrowser() || (reducedMotion ?? prefersReducedMotion())) {
+    onFinish()
+    return () => undefined
+  }
+  const duration = readTransitionDurationMs(element)
+  if (duration <= 0) {
+    onFinish()
     return () => undefined
   }
 
-  const timer = window.setTimeout(options.onFinish, options.durationMs ?? ANIMATION_DURATION_MS)
-  return () => window.clearTimeout(timer)
+  let settled = false
+  let timer = 0
+  const finish = () => {
+    if (settled) return
+    settled = true
+    element.removeEventListener('transitionend', onEnd)
+    element.ownerDocument.defaultView?.clearTimeout(timer)
+    onFinish()
+  }
+  const onEnd = (event: TransitionEvent) => {
+    if (event.target !== element) return
+    finish()
+  }
+  element.addEventListener('transitionend', onEnd)
+  timer = element.ownerDocument.defaultView?.setTimeout(finish, duration) ?? 0
+  return () => {
+    if (settled) return
+    settled = true
+    element.removeEventListener('transitionend', onEnd)
+    element.ownerDocument.defaultView?.clearTimeout(timer)
+  }
 }
 
 export function isEventOutside(
@@ -177,6 +237,44 @@ function isInertElement(element: HTMLElement): boolean {
   return Boolean(element.inert) || element.hasAttribute('inert')
 }
 
+function isContentEditableHost(element: HTMLElement): boolean {
+  const value = element.getAttribute('contenteditable')
+  if (value === null) return false
+  const normalized = value.trim().toLowerCase()
+  return normalized === '' || normalized === 'true'
+}
+
+function tabIndexRank(element: HTMLElement): number {
+  const raw = element.getAttribute('tabindex')
+  if (raw === null || raw.trim() === '') return 0
+  const parsed = Number.parseInt(raw, 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0
+}
+
+function isSequentiallyTabbable(element: HTMLElement): boolean {
+  if (element.getAttribute('disabled') !== null) return false
+  const raw = element.getAttribute('tabindex')
+  if (raw !== null) {
+    const parsed = Number.parseInt(raw, 10)
+    if (Number.isFinite(parsed) && parsed < 0) return false
+  }
+  if (isContentEditableHost(element)) return true
+  return element.tabIndex >= 0
+}
+
+/** DOM order, with positive tabindex first (sequential focus navigation). */
+function sortByFocusNavigation(elements: HTMLElement[]): HTMLElement[] {
+  return elements
+    .map((element, index) => ({ element, index, tab: tabIndexRank(element) }))
+    .sort((a, b) => {
+      if (a.tab > 0 && b.tab > 0) return a.tab - b.tab || a.index - b.index
+      if (a.tab > 0) return -1
+      if (b.tab > 0) return 1
+      return a.index - b.index
+    })
+    .map((item) => item.element)
+}
+
 export function getFocusableElements(root: ParentNode): HTMLElement[] {
   const selectors = [
     'a[href]',
@@ -186,12 +284,13 @@ export function getFocusableElements(root: ParentNode): HTMLElement[] {
     'textarea:not([disabled])',
     'summary',
     '[tabindex]:not([tabindex="-1"])',
+    '[contenteditable=""]',
     '[contenteditable="true"]'
   ]
 
   const elements = Array.from(root.querySelectorAll<HTMLElement>(selectors.join(',')))
 
-  return elements.filter((el) => {
+  const visible = elements.filter((el) => {
     let current: HTMLElement | null = el
     while (current) {
       if (current.hidden || current.getAttribute('aria-hidden') === 'true') return false
@@ -205,10 +304,10 @@ export function getFocusableElements(root: ParentNode): HTMLElement[] {
       if (current === root) break
       current = current.parentElement
     }
-    if (el.getAttribute('disabled') !== null) return false
-    if (el.tabIndex < 0) return false
-    return true
+    return isSequentiallyTabbable(el)
   })
+
+  return sortByFocusNavigation(visible)
 }
 
 export interface FocusTrapNavigation {
@@ -318,6 +417,20 @@ export function registerEscapeDismiss(
   }
 }
 
+function restoreBodyScroll(resolvedDocument: Document, state: BodyScrollLockState): void {
+  const body = resolvedDocument.body
+  const root = resolvedDocument.documentElement
+  body.style.overflow = state.previousOverflow
+  body.style.paddingRight = state.previousPaddingRight
+  body.style.position = state.previousPosition
+  body.style.top = state.previousTop
+  body.style.left = state.previousLeft
+  body.style.right = state.previousRight
+  body.style.width = state.previousWidth
+  root.style.overflow = state.previousHtmlOverflow
+  resolvedDocument.defaultView?.scrollTo(state.scrollX, state.scrollY)
+}
+
 export function lockBodyScroll(targetDocument?: Document): () => void {
   if (!isBrowser()) return () => undefined
   const resolvedDocument = targetDocument ?? document
@@ -331,12 +444,28 @@ export function lockBodyScroll(targetDocument?: Document): () => void {
     const scrollbarWidth = view
       ? Math.max(0, view.innerWidth - resolvedDocument.documentElement.clientWidth)
       : 0
+    const scrollX = view?.scrollX ?? 0
+    const scrollY = view?.scrollY ?? 0
     state = {
       count: 0,
+      scrollX,
+      scrollY,
       previousOverflow: body.style.overflow,
-      previousPaddingRight: body.style.paddingRight
+      previousPaddingRight: body.style.paddingRight,
+      previousPosition: body.style.position,
+      previousTop: body.style.top,
+      previousLeft: body.style.left,
+      previousRight: body.style.right,
+      previousWidth: body.style.width,
+      previousHtmlOverflow: resolvedDocument.documentElement.style.overflow
     }
     body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.left = `-${scrollX}px`
+    body.style.right = '0'
+    body.style.width = '100%'
+    resolvedDocument.documentElement.style.overflow = 'hidden'
     if (scrollbarWidth > 0 && Number.isFinite(computedPadding)) {
       body.style.paddingRight = `${computedPadding + scrollbarWidth}px`
     }
@@ -353,8 +482,7 @@ export function lockBodyScroll(targetDocument?: Document): () => void {
     if (!current) return
     current.count = Math.max(0, current.count - 1)
     if (current.count > 0) return
-    body.style.overflow = current.previousOverflow
-    body.style.paddingRight = current.previousPaddingRight
+    restoreBodyScroll(resolvedDocument, current)
     bodyScrollLocks.delete(resolvedDocument)
   }
 }
@@ -370,21 +498,16 @@ export function resetBodyScrollLock(targetDocument?: Document): void {
   if (!resolvedDocument) return
   const state = bodyScrollLocks.get(resolvedDocument)
   if (!state) return
-  resolvedDocument.body.style.overflow = state.previousOverflow
-  resolvedDocument.body.style.paddingRight = state.previousPaddingRight
+  restoreBodyScroll(resolvedDocument, state)
   bodyScrollLocks.delete(resolvedDocument)
 }
 
 function isLiveRegionElement(element: HTMLElement): boolean {
-  return (
-    element.hasAttribute('aria-live') ||
-    element.id.startsWith('tigercat-live-region') ||
-    element.id.startsWith('tiger-live-region')
-  )
+  return element.hasAttribute('aria-live') || element.hasAttribute('data-tiger-live-region')
 }
 
-function isOverlayLayerElement(element: HTMLElement): boolean {
-  return element.hasAttribute('data-tiger-overlay-layer')
+function isToastLayerElement(element: HTMLElement): boolean {
+  return element.hasAttribute('data-tiger-toast')
 }
 
 /** True when focus sits in a different overlay layer than `container`. */
@@ -414,7 +537,7 @@ export function setBackgroundInert(overlayRoot: HTMLElement): () => void {
         child === current ||
         current.contains(child) ||
         isLiveRegionElement(child) ||
-        isOverlayLayerElement(child)
+        isToastLayerElement(child)
       ) {
         continue
       }
@@ -436,81 +559,334 @@ export function setBackgroundInert(overlayRoot: HTMLElement): () => void {
   }
 }
 
-export interface FocusTrapOptions {
+export const MODAL_LAYER_ATTRIBUTE = 'data-tiger-modal'
+export const TOAST_LAYER_ATTRIBUTE = 'data-tiger-toast'
+
+export interface FocusScopeOptions {
+  /** Inert the page and lower modal scopes, and lock scroll. */
+  modal?: boolean
+  /** Modal scopes lock scroll unless this is false. */
+  lockScroll?: boolean
+  /** Element to focus on activate. */
   initialFocus?: HTMLElement | null
-  returnFocusOnDeactivate?: boolean
-  escapeDeactivates?: boolean
+  /** Move focus into the scope when it activates. */
+  moveFocus?: boolean
+  /** Restore focus when the scope deactivates. */
+  returnFocus?: boolean
+  /** Focus to restore. Captured on activate when omitted and `returnFocus` is set. */
+  previouslyFocused?: HTMLElement | null
+  /** Registered on the shared escape stack. Only the topmost entry runs. */
   onEscape?: () => void
+  /**
+   * Outside element that stays active (a tour target the step asks the user to click).
+   * Ancestors of that element are not inert.
+   */
+  exempt?: () => HTMLElement | null | undefined
 }
 
-export interface FocusTrap {
+export interface FocusScope {
   activate: () => void
   deactivate: () => void
 }
 
-/** Thin wrapper around the overlay Tab cycle used by Modal / Drawer / Tour. */
-export function createFocusTrap(container: HTMLElement, options: FocusTrapOptions = {}): FocusTrap {
-  if (!isBrowser()) {
+interface FocusScopeEntry {
+  container: HTMLElement
+  modal: boolean
+  active: boolean
+  covered: boolean
+  returnFocus: boolean
+  previouslyFocused: HTMLElement | null
+  releaseInert: (() => void) | null
+  releaseScroll: (() => void) | null
+  releaseEscape: (() => void) | null
+  getExempt?: () => HTMLElement | null | undefined
+}
+
+const focusStacks = new WeakMap<Document, FocusScopeEntry[]>()
+
+interface FocusScopeListeners {
+  keydown: (event: KeyboardEvent) => void
+  focusin: (event: FocusEvent) => void
+}
+
+const focusListeners = new WeakMap<Document, FocusScopeListeners>()
+
+function topFocusScope(doc: Document): FocusScopeEntry | undefined {
+  const stack = focusStacks.get(doc)
+  if (!stack) return undefined
+  for (let index = stack.length - 1; index >= 0; index -= 1) {
+    if (stack[index].active) return stack[index]
+  }
+  return undefined
+}
+
+function ensureContainerFocusable(container: HTMLElement): HTMLElement {
+  if (container.getAttribute('tabindex') === null && container.tabIndex < 0) {
+    container.tabIndex = -1
+  }
+  return container
+}
+
+function focusScopeTarget(entry: FocusScopeEntry, initialFocus?: HTMLElement | null): void {
+  if (initialFocus) {
+    initialFocus.focus()
+    return
+  }
+  const focusables = getFocusableElements(entry.container)
+  const next = focusables[0] ?? ensureContainerFocusable(entry.container)
+  next.focus()
+}
+
+function isExemptFromFocusScope(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false
+  return Boolean(
+    target.closest('[data-tiger-toast]') || target.closest('[data-tiger-live-region]')
+  )
+}
+
+interface OwnedInert {
+  element: HTMLElement
+  wasInert: boolean
+}
+
+const ownedInert = new WeakMap<Document, OwnedInert[]>()
+
+function pickTopModal(modals: FocusScopeEntry[]): FocusScopeEntry | undefined {
+  return modals.reduce<FocusScopeEntry | undefined>((top, entry) => {
+    if (!top) return entry
+    if (top.container.contains(entry.container) && top.container !== entry.container) return entry
+    if (entry.container.contains(top.container)) return top
+    const position = top.container.compareDocumentPosition(entry.container)
+    if (position & Node.DOCUMENT_POSITION_FOLLOWING) return entry
+    return top
+  }, undefined)
+}
+
+function releaseOwnedInert(doc: Document): void {
+  const owned = ownedInert.get(doc)
+  if (!owned) return
+  for (const { element, wasInert } of owned) {
+    if (wasInert) continue
+    element.inert = false
+    element.removeAttribute('inert')
+  }
+  ownedInert.delete(doc)
+}
+
+function markInert(doc: Document, element: HTMLElement, owned: OwnedInert[]): void {
+  if (owned.some((item) => item.element === element)) return
+  owned.push({ element, wasInert: isInertElement(element) })
+  element.inert = true
+  element.setAttribute('inert', '')
+}
+
+/** Inert everything outside the top modal. Ancestors of that modal stay active. */
+function syncCoveredModals(doc: Document): void {
+  releaseOwnedInert(doc)
+  const stack = focusStacks.get(doc) ?? []
+  const modals = stack.filter((entry) => entry.active && entry.modal)
+  const top = pickTopModal(modals)
+  for (const entry of modals) entry.covered = false
+  if (!top) return
+
+  const owned: OwnedInert[] = []
+  const layer =
+    (top.container.closest('[data-tiger-overlay-layer]') as HTMLElement | null) ?? top.container
+  const exempt = top.getExempt?.() ?? null
+  for (const entry of modals) {
+    if (entry === top || layer.contains(entry.container) || entry.container.contains(layer)) {
+      entry.container.inert = false
+      entry.container.removeAttribute('inert')
+      continue
+    }
+    if (exempt && (entry.container === exempt || entry.container.contains(exempt))) continue
+    markInert(doc, entry.container, owned)
+    entry.covered = true
+  }
+
+  const skipInert = (child: HTMLElement): boolean => {
+    if (isLiveRegionElement(child) || isToastLayerElement(child)) return true
+    if (exempt && (child === exempt || exempt.contains(child))) return true
+    return false
+  }
+
+  const inertSiblings = (parent: HTMLElement, keep: HTMLElement): void => {
+    for (const child of Array.from(parent.children)) {
+      if (!(child instanceof HTMLElement) || child === keep) continue
+      if (child.contains(layer) || layer.contains(child)) continue
+      if (skipInert(child)) continue
+      if (exempt && child.contains(exempt)) {
+        inertSiblings(child, exempt)
+        continue
+      }
+      markInert(doc, child, owned)
+    }
+  }
+
+  let current: HTMLElement | null = layer
+  while (current && current !== doc.body) {
+    const parent: HTMLElement | null = current.parentElement
+    if (!parent) break
+    inertSiblings(parent, current)
+    if (parent === doc.body) break
+    current = parent
+  }
+  ownedInert.set(doc, owned)
+}
+
+/** Reapply inert after an exempt target appears or moves. */
+export function syncModalInert(targetDocument?: Document): void {
+  if (!isBrowser()) return
+  syncCoveredModals(targetDocument ?? document)
+}
+
+function isScopeExempt(entry: FocusScopeEntry, target: EventTarget | null): boolean {
+  if (!(target instanceof Node)) return false
+  const exempt = entry.getExempt?.()
+  if (!exempt) return false
+  return exempt === target || exempt.contains(target)
+}
+
+function onFocusScopeKeyDown(doc: Document, event: KeyboardEvent): void {
+  const entry = topFocusScope(doc)
+  if (!entry || !isTabKey(event)) return
+  const active = doc.activeElement
+  if (isScopeExempt(entry, active)) return
+  const focusables = getFocusableElements(entry.container)
+  const inside = active instanceof Node && entry.container.contains(active)
+  if (!inside) {
+    if (isExemptFromFocusScope(active)) return
+    event.preventDefault()
+    const next = event.shiftKey ? focusables[focusables.length - 1] : focusables[0]
+    ;(next ?? ensureContainerFocusable(entry.container)).focus()
+    return
+  }
+  const navigation = getFocusTrapNavigation(event, focusables, active)
+  if (!navigation.shouldHandle) return
+  event.preventDefault()
+  if (navigation.next) navigation.next.focus()
+  else ensureContainerFocusable(entry.container).focus()
+}
+
+function onFocusScopeFocusIn(doc: Document, event: FocusEvent): void {
+  const entry = topFocusScope(doc)
+  if (!entry) return
+  const target = event.target
+  if (!(target instanceof Node) || entry.container.contains(target)) return
+  if (isExemptFromFocusScope(target) || isScopeExempt(entry, target)) return
+  const focusables = getFocusableElements(entry.container)
+  const next = focusables[0] ?? ensureContainerFocusable(entry.container)
+  next.focus()
+}
+
+function ensureFocusScopeListeners(doc: Document): void {
+  if (focusListeners.has(doc)) return
+  const keydown = (event: KeyboardEvent) => onFocusScopeKeyDown(doc, event)
+  const focusin = (event: FocusEvent) => onFocusScopeFocusIn(doc, event)
+  doc.addEventListener('keydown', keydown, true)
+  doc.addEventListener('focusin', focusin, true)
+  focusListeners.set(doc, { keydown, focusin })
+}
+
+function releaseFocusScopeListeners(doc: Document): void {
+  if (topFocusScope(doc)) return
+  const listeners = focusListeners.get(doc)
+  if (!listeners) return
+  doc.removeEventListener('keydown', listeners.keydown, true)
+  doc.removeEventListener('focusin', listeners.focusin, true)
+  focusListeners.delete(doc)
+  focusStacks.delete(doc)
+}
+
+/**
+ * One stacked focus scope: Tab cycle, focus pull-back, topmost Escape,
+ * lower modals inert, and scroll lock for modal scopes.
+ */
+export function createFocusScope(
+  container: HTMLElement,
+  options: FocusScopeOptions = {}
+): FocusScope {
+  if (!isBrowser() || !container?.ownerDocument) {
     return {
       activate() {},
       deactivate() {}
     }
   }
 
-  const {
-    initialFocus = null,
-    returnFocusOnDeactivate = true,
-    escapeDeactivates = true,
-    onEscape
-  } = options
-
-  let previouslyFocused: HTMLElement | null = null
-  let active = false
-
-  function handleKeyDown(event: KeyboardEvent): void {
-    if (!active) return
-
-    if (escapeDeactivates && isEscapeKey(event)) {
-      event.preventDefault()
-      onEscape?.()
-      return
-    }
-
-    const focusables = getFocusableElements(container)
-    const navigation = getFocusTrapNavigation(
-      event,
-      focusables,
-      container.ownerDocument.activeElement
-    )
-    if (!navigation.shouldHandle) return
-
-    event.preventDefault()
-    navigation.next?.focus()
-  }
+  const doc = container.ownerDocument
+  let entry: FocusScopeEntry | null = null
 
   return {
     activate() {
-      if (active) return
-      active = true
-      previouslyFocused = container.ownerDocument.activeElement as HTMLElement | null
-      container.ownerDocument.addEventListener('keydown', handleKeyDown, true)
-
-      if (initialFocus) {
-        initialFocus.focus()
-        return
+      if (entry?.active) return
+      const returnFocus = options.returnFocus ?? false
+      const previouslyFocused =
+        options.previouslyFocused !== undefined
+          ? options.previouslyFocused
+          : returnFocus
+            ? (doc.activeElement as HTMLElement | null)
+            : null
+      entry = {
+        container,
+        modal: Boolean(options.modal),
+        active: true,
+        covered: false,
+        returnFocus,
+        previouslyFocused,
+        releaseInert: null,
+        releaseScroll: null,
+        releaseEscape: null,
+        getExempt: options.exempt
       }
-      const focusables = getFocusableElements(container)
-      focusables[0]?.focus()
+      let stack = focusStacks.get(doc)
+      if (!stack) {
+        stack = []
+        focusStacks.set(doc, stack)
+      }
+      stack.push(entry)
+      ensureFocusScopeListeners(doc)
+      if (entry.modal) {
+        container.setAttribute(MODAL_LAYER_ATTRIBUTE, '')
+        if (options.lockScroll !== false) entry.releaseScroll = lockBodyScroll(doc)
+      }
+      syncCoveredModals(doc)
+      if (options.onEscape) {
+        entry.releaseEscape = registerEscapeDismiss(doc, options.onEscape, () => container)
+      }
+      if (options.moveFocus || options.initialFocus) {
+        focusScopeTarget(entry, options.initialFocus)
+      }
     },
     deactivate() {
-      if (!active) return
-      active = false
-      container.ownerDocument.removeEventListener('keydown', handleKeyDown, true)
-
-      if (returnFocusOnDeactivate && previouslyFocused) {
-        previouslyFocused.focus()
-        previouslyFocused = null
+      if (!entry?.active) return
+      const current = entry
+      current.active = false
+      const stack = focusStacks.get(doc)
+      if (stack) {
+        const index = stack.lastIndexOf(current)
+        if (index >= 0) stack.splice(index, 1)
       }
+      if (current.covered) {
+        current.container.inert = false
+        current.container.removeAttribute('inert')
+        current.covered = false
+      }
+      current.releaseEscape?.()
+      current.releaseScroll?.()
+      syncCoveredModals(doc)
+      releaseFocusScopeListeners(doc)
+      if (current.returnFocus && current.previouslyFocused) {
+        const target = current.previouslyFocused
+        target.focus()
+        // Hiding the layer in the same turn can move focus again. A later turn
+        // puts it back, unless another scope is already open.
+        setTimeout(() => {
+          if (topFocusScope(doc)) return
+          if (!doc.contains(target)) return
+          target.focus()
+        }, 0)
+      }
+      entry = null
     }
   }
 }

@@ -1,11 +1,7 @@
-import React, { useEffect, useMemo, useCallback, useRef, useId } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useCallback, useRef, useId, useState } from 'react'
 import {
   classNames,
-  closeIconViewBox,
-  closeIconPathD,
-  closeIconPathStrokeLinecap,
-  closeIconPathStrokeLinejoin,
-  closeIconPathStrokeWidth,
+  createDismissActionEvent,
   getModalContentClasses,
   getGestureTouchPoint,
   isModalSheetSwipeCloseGesture,
@@ -17,10 +13,12 @@ import {
   modalTitleClasses,
   modalCloseButtonClasses,
   modalBodyClasses,
+  modalDragStyle,
   modalFooterClasses,
+  settleDismissAction,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
-  scheduleOverlayLeave,
+  whenOverlayTransitionEnds,
   canStartOverlaySwipeClose,
   isOverlayDragHandleEvent,
   clampOverlayDragOffset,
@@ -35,12 +33,19 @@ import {
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
 import {
-  renderOverlayPortal,
+  closeIconViewBox,
+  closeIconPathD,
+  closeIconPathStrokeLinecap,
+  closeIconPathStrokeLinejoin,
+  closeIconPathStrokeWidth
+} from '@expcat/tigercat-core/icons/common'
+import {
   useBodyScrollLock,
   useEscapeKey,
   useFocusTrap,
   useOverlayPortalTarget
 } from '../utils/overlay'
+import { OverlayPortal } from '../utils/overlay-outlet'
 import { composeRefs } from '../utils/overlay-trigger'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
@@ -88,7 +93,7 @@ export interface ModalProps
   /**
    * Callback when OK button is clicked
    */
-  onOk?: () => void
+  onOk?: (event: { preventDefault(): void }) => void | Promise<void>
 }
 
 export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal(
@@ -118,6 +123,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
     showDefaultFooter = false,
     okText,
     cancelText,
+    initialFocus,
     locale,
     labels,
     style,
@@ -157,11 +163,9 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
     if (!wasOpenRef.current) return
     wasOpenRef.current = false
     setLeaving(true)
-    return scheduleOverlayLeave({
-      onFinish: () => {
-        setLeaving(false)
-        afterCloseRef.current?.()
-      }
+    return whenOverlayTransitionEnds(dialogRef.current, () => {
+      setLeaving(false)
+      afterCloseRef.current?.()
     })
   }, [open, cleanupDragSession])
 
@@ -219,11 +223,28 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
     onClose?.()
   }, [onCancel, onOpenChange, onClose])
 
-  const handleOk = useCallback(() => {
-    onOk?.()
+  const [confirming, setConfirming] = useState(false)
+  const handleOk = useCallback(async () => {
+    if (confirming) return
+    const event = createDismissActionEvent()
+    let result: unknown
+    try {
+      result = onOk?.(event)
+    } catch {
+      return
+    }
+    if (event.defaultPrevented) return
+    const pending =
+      typeof result === 'object' &&
+      result !== null &&
+      typeof (result as Promise<unknown>).then === 'function'
+    if (pending) setConfirming(true)
+    const outcome = await settleDismissAction(result, event)
+    if (pending) setConfirming(false)
+    if (outcome !== 'close') return
     onOpenChange?.(false)
     onClose?.()
-  }, [onOk, onOpenChange, onClose])
+  }, [confirming, onOk, onOpenChange, onClose])
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -244,8 +265,20 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
   const modalLabels = getModalLabels(mergedLocale, {
     ...labels,
     ...(closeAriaLabel ? { closeAriaLabel } : {}),
-    ...(okText ? { okText } : {}),
-    ...(cancelText ? { cancelText } : {})
+    ...(okText
+      ? { okText }
+      : locale?.modal?.okText
+        ? { okText: locale.modal.okText }
+        : locale?.common?.okText
+          ? { okText: locale.common.okText }
+          : {}),
+    ...(cancelText
+      ? { cancelText }
+      : locale?.modal?.cancelText
+        ? { cancelText: locale.modal.cancelText }
+        : locale?.common?.cancelText
+          ? { cancelText: locale.common.cancelText }
+          : {})
   })
   const resolvedCloseAriaLabel = modalLabels.closeAriaLabel
   const resolvedCancelText = modalLabels.cancelText
@@ -284,7 +317,19 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
 
   useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
   useBodyScrollLock({ enabled: open })
-  useFocusTrap({ enabled: open, containerRef: rootRef, inert: true, autoFocus: true })
+  const focusTargetRef = useRef<HTMLElement | null>(null)
+  useLayoutEffect(() => {
+    const root = dialogRef.current
+    const found = initialFocus && root ? root.querySelector(initialFocus) : null
+    focusTargetRef.current = found instanceof HTMLElement ? found : root
+  }, [open, initialFocus])
+  useFocusTrap({
+    enabled: open,
+    containerRef: rootRef,
+    inert: true,
+    autoFocus: true,
+    initialFocusRef: focusTargetRef
+  })
 
   const resetTouchGesture = useCallback(() => {
     touchStartRef.current = null
@@ -403,7 +448,8 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
               : undefined),
             ...(isDraggable && (dragOffset.x !== 0 || dragOffset.y !== 0)
               ? { transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)` }
-              : undefined)
+              : undefined),
+            ...(dragging ? modalDragStyle : null)
           }}
           {...dialogDivProps}
           role="dialog"
@@ -473,7 +519,9 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
               <Button variant="secondary" onClick={handleClose}>
                 {resolvedCancelText}
               </Button>
-              <Button onClick={handleOk}>{resolvedOkText}</Button>
+              <Button onClick={handleOk} loading={confirming} disabled={confirming}>
+                {resolvedOkText}
+              </Button>
             </div>
           ) : null}
         </div>
@@ -485,7 +533,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
   return (
     <>
       {anchor}
-      {renderOverlayPortal(modalContent, portalTarget)}
+      <OverlayPortal target={portalTarget}>{modalContent}</OverlayPortal>
     </>
   )
 })

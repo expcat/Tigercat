@@ -18,23 +18,30 @@ import {
   notificationIconClasses,
   notificationPositionClasses,
   notificationTitleClasses,
-  shouldHandleToastSurfaceEvent,
   type NotificationInstance,
   type NotificationPosition,
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
-import { useTigerConfig } from './ConfigProvider'
-import { getGlobalTigerLocale } from '../utils/global-locale'
-import { renderBodyPortal } from '../utils/overlay'
+import { useResolvedTigerLocale } from './ConfigProvider'
+
+import { OverlayPortal } from '../utils/overlay-outlet'
 
 interface NotificationItemProps {
   notification: NotificationInstance
   locale?: Partial<TigerLocale>
   onClose?: (id: string | number) => void
+  onPause?: (id: string | number) => void
+  onResume?: (id: string | number) => void
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification, locale, onClose }) => {
+const NotificationItem: React.FC<NotificationItemProps> = ({
+  notification,
+  locale,
+  onClose,
+  onPause,
+  onResume
+}) => {
   const colorScheme = getNotificationTypeClasses(notification.type)
   const notificationClasses = classNames(
     notificationBaseClasses,
@@ -52,15 +59,19 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, local
     <div
       className={notificationClasses}
       role={a11yRole}
-      onClick={(event) => {
-        if (!notification.onClick) return
-        if (!shouldHandleToastSurfaceEvent(event)) return
-        notification.onClick()
-      }}
-      style={notification.onClick ? { cursor: 'pointer' } : undefined}
       data-tiger-notification=""
       data-tiger-notification-type={notification.type}
-      data-tiger-notification-id={String(notification.id)}>
+      data-tiger-notification-id={String(notification.id)}
+      onPointerEnter={() => onPause?.(notification.id)}
+      onPointerLeave={() => onResume?.(notification.id)}
+      onFocus={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget as Node)) return
+        onPause?.(notification.id)
+      }}
+      onBlur={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget as Node)) return
+        onResume?.(notification.id)
+      }}>
       <StatusIcon path={iconPath} className={iconClass} aria-hidden="true" focusable="false" />
       <div className={notificationContentClasses}>
         <div className={classNames(notificationTitleClasses, colorScheme.titleText)}>
@@ -71,9 +82,20 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, local
             {notification.description}
           </div>
         )}
-        {notification.actions && notification.actions.length > 0 && (
+        {(notification.onClick || (notification.actions && notification.actions.length > 0)) && (
           <div className={notificationActionsClasses}>
-            {notification.actions.map((action) => (
+            {notification.onClick ? (
+              <button
+                type="button"
+                className={classNames(
+                  notificationActionButtonClasses,
+                  notificationActionButtonTypeClasses.primary
+                )}
+                onClick={() => notification.onClick?.()}>
+                {notification.actionLabel || locale?.common?.viewText || 'View'}
+              </button>
+            ) : null}
+            {notification.actions?.map((action) => (
               <button
                 key={action.key ?? action.label}
                 className={classNames(
@@ -121,6 +143,8 @@ export interface NotificationContainerProps {
   position?: NotificationPosition
   notifications?: NotificationInstance[]
   onClose?: (id: string | number) => void
+  onPause?: (id: string | number) => void
+  onResume?: (id: string | number) => void
   className?: string
   /**
    * Portal through the overlay-host chain. Imperative hosts pass `false`.
@@ -133,11 +157,12 @@ export const NotificationContainer: React.FC<NotificationContainerProps> = ({
   position = 'top-right',
   notifications = [],
   onClose,
+  onPause,
+  onResume,
   className,
   portal = true
 }) => {
-  const config = useTigerConfig()
-  const locale = config.locale ?? getGlobalTigerLocale()
+  const locale = useResolvedTigerLocale()
   const containerClasses = classNames(
     notificationContainerBaseClasses,
     notificationPositionClasses[position],
@@ -147,6 +172,7 @@ export const NotificationContainer: React.FC<NotificationContainerProps> = ({
   const node = (
     <div
       className={containerClasses}
+      data-tiger-toast=""
       data-tiger-notification-container=""
       data-tiger-notification-position={position}>
       {notifications.map((notification) => (
@@ -155,12 +181,14 @@ export const NotificationContainer: React.FC<NotificationContainerProps> = ({
           notification={notification}
           locale={locale}
           onClose={onClose}
+          onPause={onPause}
+          onResume={onResume}
         />
       ))}
     </div>
   )
 
-  return portal ? renderBodyPortal(node) : node
+  return portal ? <OverlayPortal>{node}</OverlayPortal> : node
 }
 
 export default NotificationContainer

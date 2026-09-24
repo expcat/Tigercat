@@ -102,6 +102,17 @@ describe('Alert', () => {
     await user.click(screen.getByRole('button', { name: 'Close alert' }))
 
     expect(onClose).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText('Closable')).not.toBeInTheDocument()
+  })
+
+  it('keeps a controlled alert mounted until open becomes false', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(<Alert title="Closable" closable open onOpenChange={onOpenChange} />)
+
+    await user.click(screen.getByRole('button', { name: 'Close alert' }))
+
+    expect(onOpenChange).toHaveBeenCalledWith(false)
     expect(screen.getByText('Closable')).toBeInTheDocument()
   })
 
@@ -179,7 +190,7 @@ describe('Alert', () => {
       })
       expect(onClose).toHaveBeenCalledTimes(1)
       expect(onClose.mock.calls[0][0]).toBeInstanceOf(Event)
-      expect(screen.getByText('Auto-close Alert')).toBeInTheDocument()
+      expect(screen.queryByText('Auto-close Alert')).not.toBeInTheDocument()
       vi.useRealTimers()
     })
 
@@ -214,7 +225,7 @@ describe('Alert', () => {
 
     it('shows a countdown bar without closable', () => {
       const { container } = render(<Alert title="Ticking" duration={5000} showCountdown />)
-      expect(container.querySelector('[style*="animation-duration"]')).toBeInTheDocument()
+      expect(container.querySelector('[style*="width"]')).toBeInTheDocument()
     })
   })
 

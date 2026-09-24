@@ -2,7 +2,9 @@ import { createApp, defineComponent, h, onBeforeUnmount, shallowRef, type App } 
 import {
   createImperativeHost,
   createLoadingBarController,
+  getLoadingBarNoticeText,
   isBrowser,
+  readDocumentOwnerLocale,
   type LoadingBarApi,
   type LoadingBarOptions,
   type LoadingBarRuntimeState
@@ -18,7 +20,8 @@ function getController(): ReturnType<typeof createLoadingBarController> {
   if (!controller) {
     controller = createLoadingBarController()
     controller.subscribe(() => {
-      if (controller?.getState().visible) return
+      const next = controller?.getState()
+      if (!next || next.visible || next.notice) return
       host.teardown()
     })
   }
@@ -47,7 +50,13 @@ const LoadingBarHost = /* @__PURE__ */ defineComponent({
 
     return () => {
       const current = state.value
-      if (!current.visible) return null
+      const notice = getLoadingBarNoticeText(
+        current.notice,
+        readDocumentOwnerLocale() ?? undefined
+      )
+      if (!current.visible) {
+        return notice ? h('span', { class: 'sr-only', role: 'status' }, notice) : null
+      }
       return h(LoadingBarContainer, {
         percentage: current.percentage,
         status: current.status,
@@ -55,7 +64,9 @@ const LoadingBarHost = /* @__PURE__ */ defineComponent({
         height: current.height,
         className: current.className,
         style: current.style,
-        ariaLabel: current.ariaLabel
+        ariaLabel: current.ariaLabel,
+        notice,
+        noticeToken: current.noticeToken
       })
     }
   }

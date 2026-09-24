@@ -3,6 +3,7 @@
  */
 
 import type { MessageType, MessagePosition } from '../types/message'
+import { devWarn } from './dev-warn'
 import { overlayZIndexClass } from './floating'
 
 import { closeIconPathD } from './icons/common'
@@ -21,41 +22,24 @@ export const messageContainerBaseClasses = `fixed ${overlayZIndexClass.message} 
 /**
  * Get position classes for message container
  */
+/**
+ * One placement: logical insets and auto margins. Centered top / bottom do
+ * not add a translate.
+ */
 export const messagePositionClasses: Record<MessagePosition, string> = {
-  top: 'top-6 w-max max-w-[min(100vw-2rem,36rem)]',
+  top: 'top-6 inset-inline-0 mx-auto w-max max-w-[min(100vw-2rem,36rem)]',
   'top-left': 'top-6 inset-inline-start-6',
   'top-right': 'top-6 inset-inline-end-6',
-  bottom: 'bottom-6 w-max max-w-[min(100vw-2rem,36rem)]',
+  bottom: 'bottom-6 inset-inline-0 mx-auto w-max max-w-[min(100vw-2rem,36rem)]',
   'bottom-left': 'bottom-6 inset-inline-start-6',
   'bottom-right': 'bottom-6 inset-inline-end-6'
-}
-
-/**
- * Inline placement so `top` / `bottom` stay centered even when Tailwind
- * never emits `inset-inline-0` (host apps that do not scan core source).
- */
-export function getMessagePositionStyle(position: MessagePosition): Record<string, string> {
-  switch (position) {
-    case 'top':
-      return { top: '1.5rem', left: '50%', transform: 'translateX(-50%)' }
-    case 'bottom':
-      return { bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)' }
-    case 'top-left':
-      return { top: '1.5rem', insetInlineStart: '1.5rem' }
-    case 'top-right':
-      return { top: '1.5rem', insetInlineEnd: '1.5rem' }
-    case 'bottom-left':
-      return { bottom: '1.5rem', insetInlineStart: '1.5rem' }
-    case 'bottom-right':
-      return { bottom: '1.5rem', insetInlineEnd: '1.5rem' }
-  }
 }
 
 /**
  * Base message item classes
  */
 export const messageBaseClasses =
-  'flex items-center gap-3 px-4 py-3 rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg border pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))]'
+  'flex items-center gap-3 px-4 py-3 rounded-[var(--tiger-radius-lg)] shadow-lg border pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base)]'
 
 /**
  * Message type color schemes
@@ -72,34 +56,34 @@ export interface MessageColorScheme {
  */
 export const defaultMessageThemeColors: Record<MessageType, MessageColorScheme> = {
   info: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    text: 'text-[var(--tiger-info,#3b82f6)]',
-    icon: 'text-[var(--tiger-info,#3b82f6)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    text: 'text-[var(--tiger-info)]',
+    icon: 'text-[var(--tiger-info)]'
   },
   success: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    text: 'text-[var(--tiger-success,#16a34a)]',
-    icon: 'text-[var(--tiger-success,#16a34a)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    text: 'text-[var(--tiger-success)]',
+    icon: 'text-[var(--tiger-success)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    text: 'text-[var(--tiger-warning,#d97706)]',
-    icon: 'text-[var(--tiger-warning,#d97706)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    text: 'text-[var(--tiger-warning)]',
+    icon: 'text-[var(--tiger-warning)]'
   },
   error: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    text: 'text-[var(--tiger-error,#dc2626)]',
-    icon: 'text-[var(--tiger-error,#dc2626)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    text: 'text-[var(--tiger-error)]',
+    icon: 'text-[var(--tiger-error)]'
   },
   loading: {
-    bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    text: 'text-[var(--tiger-text,#111827)]',
-    icon: 'text-[var(--tiger-text-muted,#6b7280)]'
+    bg: 'bg-[var(--tiger-surface-muted)]',
+    border: 'border-[var(--tiger-border)]',
+    text: 'text-[var(--tiger-text)]',
+    icon: 'text-[var(--tiger-text-secondary)]'
   }
 }
 
@@ -145,7 +129,7 @@ export const messageCloseIconPath = closeIconPathD
  * Message close button classes
  */
 export const messageCloseButtonClasses =
-  'ms-auto p-1 rounded hover:bg-[var(--tiger-surface-muted,#e5e7eb)] tiger-motion-aware transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]'
+  'ms-auto p-1 rounded hover:bg-[var(--tiger-surface-muted)] tiger-motion-aware transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary)]'
 
 /**
  * Message icon classes
@@ -163,7 +147,23 @@ export const messageContentClasses = 'flex-1 text-sm font-medium'
 export const messageLoadingSpinnerClasses =
   'tiger-motion-aware animate-spin motion-reduce:animate-none'
 
+/** Negative and non-finite durations do not auto-close. */
+export function normalizeAutoCloseDuration(
+  duration: number | undefined,
+  fallback: number,
+  warnKey: string
+): number {
+  const value = duration === undefined ? fallback : duration
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+    devWarn(
+      warnKey,
+      `[Tigercat] Duration ${String(duration)} does not auto-close. Pass a finite number >= 0.`
+    )
+    return 0
+  }
+  return value
+}
+
 export function resolveMessageDuration(type: MessageType, duration?: number): number {
-  if (duration !== undefined) return duration
-  return type === 'loading' ? 0 : 3000
+  return normalizeAutoCloseDuration(duration, type === 'loading' ? 0 : 3000, 'message.duration')
 }

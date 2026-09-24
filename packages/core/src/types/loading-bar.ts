@@ -102,6 +102,12 @@ export interface LoadingBarContainerProps {
    * @default locale `common.loadingText` (`'Loading...'`)
    */
   ariaLabel?: string
+
+  /** Spoken once for start, failure, or finish. Not the percentage. */
+  notice?: string
+
+  /** Changes when a new notice should be read again. */
+  noticeToken?: number
 }
 
 /**

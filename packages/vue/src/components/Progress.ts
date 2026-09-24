@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, onMounted, PropType } from 'vue'
+import { computed, defineComponent, h, PropType } from 'vue'
 import {
   calculateCirclePath,
   classNames,
@@ -8,7 +8,6 @@ import {
   getProgressLabels,
   getProgressStrokeClasses,
   getProgressTextColorClasses,
-  injectProgressStyles,
   progressCircleBaseClasses,
   progressCircleTextClasses,
   progressCircleTrackStrokeClasses,
@@ -68,10 +67,6 @@ export const Progress = defineComponent({
   },
   setup(props, { attrs }) {
     const config = useTigerConfig()
-
-    onMounted(() => {
-      injectProgressStyles()
-    })
 
     const view = computed(() => {
       const { ariaLabel, ariaLabelledby } = pickAria(attrs as Record<string, unknown>)

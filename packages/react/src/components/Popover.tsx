@@ -1,15 +1,16 @@
 import React, { forwardRef, useEffect, useId, useMemo } from 'react'
 import { usePopup } from '../utils/use-popup'
-import { renderOverlayPortal, useFocusTrap } from '../utils/overlay'
+import { renderOverlayPortal } from '../utils/overlay'
 import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
   classNames,
-  getFocusableElements,
+  devWarn,
   getOverlayTriggerAria,
   getPopoverContainerClasses,
   getPopoverContentClasses,
   getPopoverContentStyle,
   getPopoverTriggerClasses,
+  resolvePopoverWidth,
   POPOVER_TITLE_CLASSES,
   POPOVER_TEXT_CLASSES,
   type PopoverProps as CorePopoverProps,
@@ -42,6 +43,9 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     placement = 'top',
     disabled = false,
     width,
+    ariaLabel,
+    showDelay,
+    hideDelay,
     offset = 8,
     asChild = false,
     className,
@@ -67,22 +71,33 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     positioned,
     overlayTarget,
     triggerHandlers
-  } = usePopup({ open, defaultOpen, disabled, trigger, placement, offset, onOpenChange })
-
-  const trapEnabled = Boolean(currentVisible && trigger === 'click')
-  useFocusTrap({ enabled: trapEnabled, containerRef: floatingRef })
+  } = usePopup({
+    open,
+    defaultOpen,
+    disabled,
+    trigger,
+    placement,
+    offset,
+    showDelay,
+    hideDelay,
+    onOpenChange
+  })
 
   useEffect(() => {
-    if (!currentVisible || trigger !== 'click') return
-    const frame = requestAnimationFrame(() => {
-      const root = floatingRef.current
-      if (!root) return
-      const dialog = root.querySelector<HTMLElement>('[role="dialog"]') ?? root
-      const first = getFocusableElements(dialog)[0] ?? dialog
-      first.focus()
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [currentVisible, trigger, floatingRef])
+    const resolved = resolvePopoverWidth(width)
+    if (resolved.invalid) {
+      devWarn(
+        'popover.width',
+        `[Tigercat] Popover width ${String(width)} is not a positive pixel count or a CSS length. The default max-width is used.`
+      )
+    }
+    if (!title && !titleContent && !ariaLabel) {
+      devWarn(
+        'popover.name',
+        '[Tigercat] Popover has no title or aria-label. Pass a short ariaLabel; the body is only the description.'
+      )
+    }
+  }, [width, title, titleContent, ariaLabel])
 
   const containerClasses = useMemo(
     () => classNames(getPopoverContainerClasses(), className),
@@ -137,16 +152,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
               id={popoverId}
               role="dialog"
               aria-modal="false"
-              tabIndex={-1}
-              aria-label={
-                hasTitle
-                  ? undefined
-                  : typeof title === 'string'
-                    ? title
-                    : typeof content === 'string'
-                      ? content
-                      : undefined
-              }
+              aria-label={hasTitle ? undefined : ariaLabel}
               aria-labelledby={hasTitle ? titleId : undefined}
               aria-describedby={hasContent ? contentId : undefined}
               className={contentClasses}

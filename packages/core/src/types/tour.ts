@@ -66,6 +66,14 @@ export interface TourStep {
    * `loadSteps` identity changes).
    */
   skipWhen?: boolean | TourStepSkipPredicate
+
+  /**
+   * Let the user click the highlighted target. The hole then passes pointer
+   * events and that target is excluded from inert. Otherwise the hole is
+   * visual and clicks land on the mask.
+   * @default false
+   */
+  interact?: boolean
 }
 
 /** Slot / render-prop context for the current visible step. */
@@ -101,8 +109,8 @@ export interface TourProps {
 
   /**
    * Current step index (controlled). This is the **original** index in
-   * `steps`, not the index among non-skipped steps. The parent must reset it
-   * to `0` when reopening if the tour is controlled.
+   * `steps`, not the index among non-skipped steps. Closing emits the first
+   * non-skipped index. The tour keeps the controlled value if the parent ignores it.
    */
   current?: number
 
@@ -158,4 +166,10 @@ export interface TourProps {
    * Additional CSS class name
    */
   className?: string
+
+  /**
+   * CSS selector for the node to focus when the tour opens.
+   * Defaults to the step bubble.
+   */
+  initialFocus?: string
 }

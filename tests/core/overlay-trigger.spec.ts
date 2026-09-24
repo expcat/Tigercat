@@ -73,14 +73,14 @@ describe('overlay-trigger', () => {
     ).toBe('open')
   })
 
-  it('co-joins hover with click and focus', () => {
+  it('keeps hover on pointer and focus, and does not toggle closed on click', () => {
     const hover = buildOverlayTriggerHandlerMap(
       'hover',
       { toggle: 'toggle', show: 'show', hide: 'hide' },
       'react'
     )
     expect(hover).toMatchObject({
-      onClick: 'toggle',
+      onClick: 'show',
       onMouseEnter: 'show',
       onMouseLeave: 'hide',
       onFocus: 'show',
@@ -92,6 +92,6 @@ describe('overlay-trigger', () => {
       { toggle: 'toggle', show: 'show', hide: 'hide' },
       'vue'
     )
-    expect(click).toEqual({ onClick: 'toggle' })
+    expect(click).toEqual({ onClick: 'toggle', onFocusout: 'hide' })
   })
 })

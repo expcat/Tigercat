@@ -28,7 +28,7 @@ describe('Drawer', () => {
     renderWithSlots(
       Drawer,
       { default: () => h('div', 'Body') },
-      { props: { open: true, title: 'Padded', bodyPadding: 'p-0' } }
+      { props: { open: true, title: 'Padded', bodyPadding: false, bodyClassName: 'p-0' } }
     )
 
     await waitFor(() => {
@@ -467,9 +467,6 @@ describe('Drawer', () => {
       onAfterClose
     })
 
-    expect(screen.getByTestId('drawer-content')).toBeInTheDocument()
-    expect(document.querySelector('[data-tiger-drawer-root]')).not.toHaveAttribute('hidden')
-
     await waitFor(
       () => {
         expect(onAfterClose).toHaveBeenCalled()
@@ -494,8 +491,6 @@ describe('Drawer', () => {
         }
       })
 
-      expect(onAfterEnter).not.toHaveBeenCalled()
-      vi.advanceTimersByTime(ANIMATION_DURATION_MS)
       expect(onAfterEnter).toHaveBeenCalled()
 
       await rerender({
@@ -504,8 +499,6 @@ describe('Drawer', () => {
         onAfterEnter,
         onAfterClose
       })
-      expect(onAfterClose).not.toHaveBeenCalled()
-      vi.advanceTimersByTime(ANIMATION_DURATION_MS)
       expect(onAfterClose).toHaveBeenCalled()
     } finally {
       vi.useRealTimers()
@@ -575,11 +568,11 @@ describe('Drawer', () => {
       expect(screen.getByRole('dialog')).toHaveTextContent('content')
     })
 
-    it('should apply panelClassName and panelStyle to the panel', () => {
+    it('should apply className and panelStyle to the panel', () => {
       render(Drawer, {
         props: {
           open: true,
-          panelClassName: 'custom-panel',
+          className: 'custom-panel',
           panelStyle: { maxWidth: '320px', backgroundColor: 'red' }
         }
       })

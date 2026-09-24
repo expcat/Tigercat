@@ -33,11 +33,11 @@ export function getPopconfirmContentClasses(): string {
     'min-w-[280px]',
     'max-w-[320px]',
     'p-4',
-    'bg-[var(--tiger-surface,#ffffff)]',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
+    'bg-[var(--tiger-surface)]',
+    'rounded-[var(--tiger-radius-md)]',
     'shadow-lg',
     'border',
-    'border-[var(--tiger-border,#e5e7eb)]'
+    'border-[var(--tiger-border)]'
   )
 }
 
@@ -50,8 +50,8 @@ export function getPopconfirmArrowClasses(): string {
     'w-2',
     'h-2',
     'rotate-45',
-    'bg-[var(--tiger-surface,#ffffff)]',
-    'border border-[var(--tiger-border,#e5e7eb)]',
+    'bg-[var(--tiger-surface)]',
+    'border border-[var(--tiger-border)]',
     'pointer-events-none'
   )
 }
@@ -64,7 +64,7 @@ export function getPopconfirmTitleClasses(): string {
     'tiger-popconfirm-title',
     'text-sm',
     'font-medium',
-    'text-[var(--tiger-text,#111827)]',
+    'text-[var(--tiger-text)]',
     'mb-2'
   )
 }
@@ -76,7 +76,7 @@ export function getPopconfirmDescriptionClasses(): string {
   return classNames(
     'tiger-popconfirm-description',
     'text-xs',
-    'text-[var(--tiger-text-muted,#6b7280)]',
+    'text-[var(--tiger-text-secondary)]',
     'mb-3'
   )
 }
@@ -86,11 +86,11 @@ export function getPopconfirmDescriptionClasses(): string {
  */
 export function getPopconfirmIconClasses(iconType: PopconfirmIconType): string {
   const iconColorMap: Record<PopconfirmIconType, string> = {
-    warning: 'text-[var(--tiger-warning,#eab308)]',
-    info: 'text-[var(--tiger-info,#3b82f6)]',
-    error: 'text-[var(--tiger-error,#ef4444)]',
-    success: 'text-[var(--tiger-success,#22c55e)]',
-    question: 'text-[var(--tiger-text-muted,#6b7280)]'
+    warning: 'text-[var(--tiger-warning)]',
+    info: 'text-[var(--tiger-info)]',
+    error: 'text-[var(--tiger-error)]',
+    success: 'text-[var(--tiger-success)]',
+    question: 'text-[var(--tiger-text-secondary)]'
   }
 
   return classNames(
@@ -126,7 +126,7 @@ export function getPopconfirmButtonBaseClasses(): string {
     'py-1.5',
     'text-xs',
     'font-medium',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
+    'rounded-[var(--tiger-radius-md)]',
     'transition-colors',
     'focus:outline-none',
     'focus:ring-2',
@@ -140,12 +140,12 @@ export function getPopconfirmButtonBaseClasses(): string {
 export function getPopconfirmCancelButtonClasses(): string {
   return classNames(
     getPopconfirmButtonBaseClasses(),
-    'bg-[var(--tiger-surface,#ffffff)]',
-    'text-[var(--tiger-text,#374151)]',
+    'bg-[var(--tiger-surface)]',
+    'text-[var(--tiger-text)]',
     'border',
-    'border-[var(--tiger-border,#d1d5db)]',
-    'hover:bg-[var(--tiger-surface-muted,#f3f4f6)]',
-    'focus:ring-[var(--tiger-text-muted,#6b7280)]'
+    'border-[var(--tiger-border)]',
+    'hover:bg-[var(--tiger-surface-muted)]',
+    'focus:ring-[var(--tiger-text-secondary)]'
   )
 }
 
@@ -156,16 +156,16 @@ export function getPopconfirmOkButtonClasses(okType: 'primary' | 'danger'): stri
   const typeClasses =
     okType === 'danger'
       ? classNames(
-          'bg-[var(--tiger-error,#ef4444)]',
+          'bg-[var(--tiger-error)]',
           'text-white',
-          'hover:bg-[var(--tiger-error-hover,#dc2626)]',
-          'focus:ring-[var(--tiger-error,#ef4444)]'
+          'hover:bg-[var(--tiger-error-hover)]',
+          'focus:ring-[var(--tiger-error)]'
         )
       : classNames(
-          'bg-[var(--tiger-primary,#2563eb)]',
+          'bg-[var(--tiger-primary)]',
           'text-white',
-          'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]',
-          'focus:ring-[var(--tiger-primary,#2563eb)]'
+          'hover:bg-[var(--tiger-primary-hover)]',
+          'focus:ring-[var(--tiger-primary)]'
         )
 
   return classNames(getPopconfirmButtonBaseClasses(), typeClasses)

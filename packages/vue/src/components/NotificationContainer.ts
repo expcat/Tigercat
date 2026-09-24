@@ -19,14 +19,12 @@ import {
   notificationIconClasses,
   notificationPositionClasses,
   notificationTitleClasses,
-  shouldHandleToastSurfaceEvent,
   type NotificationInstance,
   type NotificationPosition
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
-import { renderVueBodyTeleport } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
-import { getGlobalTigerLocale } from '../utils/global-locale'
+import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
+import { useResolvedTigerLocale } from './ConfigProvider'
 
 type HArrayChildren = Extract<NonNullable<Parameters<typeof h>[2]>, unknown[]>
 
@@ -64,10 +62,9 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
       default: true
     }
   },
-  emits: ['close'],
+  emits: ['close', 'pause', 'resume'],
   setup(props, { attrs, emit }) {
-    const config = useTigerConfig()
-    const locale = computed(() => config.value.locale ?? getGlobalTigerLocale())
+    const locale = useResolvedTigerLocale()
     const containerClasses = computed(() =>
       classNames(
         notificationContainerBaseClasses,
@@ -109,36 +106,50 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
         )
       }
 
-      if (notification.actions?.length) {
-        contentChildren.push(
-          h(
-            'div',
-            { class: notificationActionsClasses },
-            notification.actions.map((action) =>
-              h(
-                'button',
-                {
-                  key: action.key ?? action.label,
-                  class: classNames(
-                    notificationActionButtonClasses,
-                    notificationActionButtonTypeClasses[action.type ?? 'default']
-                  ),
-                  type: 'button',
-                  disabled: action.disabled,
-                  onClick: (event: MouseEvent) => {
-                    event.stopPropagation()
-                    action.onClick?.({
-                      id: notification.id,
-                      close
-                    })
-                    if (action.closeOnClick) close()
-                  }
-                },
-                action.label
-              )
+      if (notification.onClick || notification.actions?.length) {
+        const actionButtons = []
+        if (notification.onClick) {
+          actionButtons.push(
+            h(
+              'button',
+              {
+                type: 'button',
+                class: classNames(
+                  notificationActionButtonClasses,
+                  notificationActionButtonTypeClasses.primary
+                ),
+                onClick: () => notification.onClick?.()
+              },
+              notification.actionLabel || locale.value?.common?.viewText || 'View'
             )
           )
-        )
+        }
+        notification.actions?.forEach((action) => {
+          actionButtons.push(
+            h(
+              'button',
+              {
+                key: action.key ?? action.label,
+                class: classNames(
+                  notificationActionButtonClasses,
+                  notificationActionButtonTypeClasses[action.type ?? 'default']
+                ),
+                type: 'button',
+                disabled: action.disabled,
+                onClick: (event: MouseEvent) => {
+                  event.stopPropagation()
+                  action.onClick?.({
+                    id: notification.id,
+                    close
+                  })
+                  if (action.closeOnClick) close()
+                }
+              },
+              action.label
+            )
+          )
+        })
+        contentChildren.push(h('div', { class: notificationActionsClasses }, actionButtons))
       }
 
       const children: HArrayChildren = [
@@ -173,12 +184,30 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
           key: notification.id,
           class: notificationClasses,
           role: a11yRole,
-          onClick: (event: MouseEvent) => {
-            if (!notification.onClick) return
-            if (!shouldHandleToastSurfaceEvent(event)) return
-            notification.onClick()
+          onPointerenter: () => emit('pause', notification.id),
+          onPointerleave: () => emit('resume', notification.id),
+          onFocusin: (event: FocusEvent) => {
+            const next = event.relatedTarget
+            if (
+              next instanceof Node &&
+              event.currentTarget instanceof Node &&
+              event.currentTarget.contains(next)
+            ) {
+              return
+            }
+            emit('pause', notification.id)
           },
-          style: notification.onClick ? 'cursor: pointer;' : undefined,
+          onFocusout: (event: FocusEvent) => {
+            const next = event.relatedTarget
+            if (
+              next instanceof Node &&
+              event.currentTarget instanceof Node &&
+              event.currentTarget.contains(next)
+            ) {
+              return
+            }
+            emit('resume', notification.id)
+          },
           'data-tiger-notification': '',
           'data-tiger-notification-type': notification.type,
           'data-tiger-notification-id': String(notification.id)
@@ -193,12 +222,15 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
         {
           ...attrs,
           class: containerClasses.value,
+          'data-tiger-toast': '',
           'data-tiger-notification-container': '',
           'data-tiger-notification-position': props.position
         },
         props.notifications.map(renderNotificationItem)
       )
-      return props.portal ? renderVueBodyTeleport(node) : node
+      return props.portal
+        ? renderVueOverlayOutlet(`notification-${props.position}`, node)
+        : node
     }
   }
 })

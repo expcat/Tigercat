@@ -5,7 +5,10 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import { act, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS } from '@expcat/tigercat-core'
+import {
+  DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS,
+  DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS
+} from '@expcat/tigercat-core'
 import { Tooltip } from '@expcat/tigercat-react/Tooltip'
 import { renderWithProps, renderWithChildren, expectNoA11yViolationsIsolated } from '../utils/react'
 import React from 'react'
@@ -67,6 +70,9 @@ describe('Tooltip', () => {
 
       const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
       fireEvent.mouseEnter(trigger)
+      act(() => {
+        vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS)
+      })
       expect(getByText('Tooltip content')).toBeVisible()
 
       fireEvent.mouseLeave(trigger)
@@ -92,6 +98,9 @@ describe('Tooltip', () => {
 
       const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
       fireEvent.mouseEnter(trigger)
+      act(() => {
+        vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS)
+      })
       expect(getByText('Tooltip content')).toBeVisible()
 
       fireEvent.mouseLeave(trigger)

@@ -14,17 +14,19 @@ import {
   type Placement,
   type Middleware,
   type ComputePositionReturn,
-  type MiddlewareData
+  type MiddlewareData,
+  type ReferenceElement
 } from '@floating-ui/dom'
 
 /**
  * Shared stacking scale for overlays.
- * viewport chrome < anchored overlay < modal/drawer/tour < message < loading-bar
+ * viewport chrome < anchored overlay < modal/drawer/tour < fullscreen loading < message < loading-bar
  */
 export const OVERLAY_Z_INDEX = {
   viewport: 200,
   overlay: 1000,
   modal: 1100,
+  loading: 1150,
   message: 1200,
   loadingBar: 1300
 } as const
@@ -33,6 +35,7 @@ export const overlayZIndexClass = {
   viewport: 'z-[200]',
   overlay: 'z-[1000]',
   modal: 'z-[1100]',
+  loading: 'z-[1150]',
   message: 'z-[1200]',
   loadingBar: 'z-[1300]'
 } as const
@@ -192,6 +195,10 @@ export function getFloatingMiddleware(options: FloatingMiddlewareOptions = {}): 
     const cachedMiddleware = floatingMiddlewareCache.get(cacheKey)
     if (cachedMiddleware) return cachedMiddleware
 
+    if (floatingMiddlewareCache.size >= 64) {
+      const oldest = floatingMiddlewareCache.keys().next().value
+      if (oldest !== undefined) floatingMiddlewareCache.delete(oldest)
+    }
     const middleware = createFloatingMiddleware(normalizedOptions)
     floatingMiddlewareCache.set(cacheKey, middleware)
     return middleware
@@ -261,7 +268,7 @@ export interface FloatingResult {
  * ```
  */
 export async function computeFloatingPosition(
-  reference: HTMLElement,
+  reference: ReferenceElement,
   floating: HTMLElement,
   options: FloatingOptions = {}
 ): Promise<FloatingResult> {
@@ -328,7 +335,7 @@ export type FloatingCleanup = () => void
  * ```
  */
 export function autoUpdateFloating(
-  reference: HTMLElement,
+  reference: ReferenceElement,
   floating: HTMLElement,
   update: () => void
 ): FloatingCleanup {

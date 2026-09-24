@@ -19,8 +19,8 @@ export interface TooltipProps extends BaseFloatingPopupProps {
   content?: string
 
   /**
-   * Trigger type. Default hover is co-joined with focus and click so keyboard
-   * and touch can open the tooltip.
+   * Trigger type. Hover listens to the pointer and to focus. A click opens
+   * and stays; it does not close the tooltip.
    * @default 'hover'
    */
   trigger?: TooltipTrigger

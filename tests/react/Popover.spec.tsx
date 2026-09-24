@@ -5,7 +5,10 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS } from '@expcat/tigercat-core'
+import {
+  DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS,
+  DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS
+} from '@expcat/tigercat-core'
 import { Popover } from '@expcat/tigercat-react/Popover'
 import { Select } from '@expcat/tigercat-react/Select'
 import {
@@ -266,6 +269,9 @@ describe('Popover', () => {
 
         const trigger = container.querySelector('.tiger-popover-trigger') as HTMLElement
         fireEvent.mouseEnter(trigger)
+        act(() => {
+          vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS)
+        })
         expect(getByText('Hover content')).toBeVisible()
 
         fireEvent.mouseLeave(trigger)
@@ -291,6 +297,9 @@ describe('Popover', () => {
 
         const trigger = container.querySelector('.tiger-popover-trigger') as HTMLElement
         fireEvent.mouseEnter(trigger)
+        act(() => {
+          vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS)
+        })
         expect(getByText('Hover content')).toBeVisible()
 
         fireEvent.mouseLeave(trigger)

@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo, useCallback, useEffect, useRef } from 'react'
+import React, { forwardRef, useMemo, useCallback, useEffect, useRef, useState } from 'react'
 import {
   classNames,
   getAlertTypeClasses,
@@ -17,7 +17,10 @@ import {
   alertCountdownContainerClasses,
   alertCountdownBarClasses,
   alertCountdownColorClasses,
-  resolveAlertRole,
+  createAlertCountdown,
+  focusAfterElement,
+  isAlertInsertedAfterPaint,
+  resolveAlertLive,
   getAlertLabels,
   mergeTigerLocale,
   type AlertProps as CoreAlertProps
@@ -43,8 +46,7 @@ export interface AlertProps
   descriptionSlot?: React.ReactNode
 
   /**
-   * Close request. Click and auto-close both pass an event.
-   * Closing never hides internally — unmount or set `open={false}`.
+   * Close request. Omit `open` and the alert hides itself.
    */
   onClose?: (event: Event) => void
 }
@@ -81,6 +83,21 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   )
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
+  const onOpenChangeRef = useRef(onOpenChange)
+  onOpenChangeRef.current = onOpenChange
+  const openRef = useRef(open)
+  openRef.current = open
+  const [dismissed, setDismissed] = useState(false)
+  const [ratio, setRatio] = useState(1)
+  const alertRef = useRef<HTMLDivElement>(null)
+  const inserted = useRef(isAlertInsertedAfterPaint()).current
+  const countdown = useRef(
+    createAlertCountdown({
+      enabled: typeof document !== 'undefined',
+      onElapsed: () => requestCloseRef.current(false)
+    })
+  ).current
+  const requestCloseRef = useRef<(fromCloseButton: boolean) => void>(() => undefined)
 
   const colorScheme = useMemo(() => getAlertTypeClasses(type, defaultAlertThemeColors), [type])
 
@@ -120,43 +137,39 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
     [colorScheme]
   )
 
-  const clearTimerRef = useRef<(() => void) | undefined>(undefined)
+  const shown = open === false ? false : open === true ? true : !dismissed
 
-  const requestClose = useCallback(
-    (event: Event) => {
-      onCloseRef.current?.(event)
-      onOpenChange?.(false)
-      clearTimerRef.current?.()
-    },
-    [onOpenChange]
-  )
+  const requestClose = useCallback((fromCloseButton: boolean) => {
+    onCloseRef.current?.(new Event('close', { cancelable: true }))
+    onOpenChangeRef.current?.(false)
+    if (openRef.current === undefined) setDismissed(true)
+    if (fromCloseButton) focusAfterElement(alertRef.current)
+  }, [])
+  requestCloseRef.current = requestClose
 
   const handleClose = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
-      requestClose(event.nativeEvent)
+      requestClose(true)
     },
     [requestClose]
   )
 
   useEffect(() => {
-    if (open === false || !(duration && duration > 0)) {
-      return
-    }
-    const timer = window.setTimeout(() => {
-      requestClose(new Event('close', { cancelable: true }))
-    }, duration)
-    const clear = () => window.clearTimeout(timer)
-    clearTimerRef.current = clear
-    return () => {
-      clear()
-      if (clearTimerRef.current === clear) {
-        clearTimerRef.current = undefined
-      }
-    }
-  }, [duration, open, requestClose])
+    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    const sync = () => countdown.sync(shown ? duration : undefined, Boolean(media?.matches))
+    sync()
+    media?.addEventListener?.('change', sync)
+    return () => media?.removeEventListener?.('change', sync)
+  }, [countdown, duration, shown])
 
-  if (open === false) {
+  useEffect(() => {
+    return countdown.subscribe(() => setRatio(countdown.getRatio()))
+  }, [countdown])
+
+  useEffect(() => () => countdown.dispose(), [countdown])
+
+  if (!shown) {
     return null
   }
 
@@ -166,10 +179,20 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   const hasDescription = !!(description || descriptionSlot)
   const hasChildren = children != null && children !== false
   const hasContent = hasTitle || hasDescription || hasChildren
-  const role = roleProp ?? resolveAlertRole(type, hasContent)
+  const live = resolveAlertLive(type, hasContent, inserted)
+  const role = roleProp ?? live.role
 
   return (
-    <div {...props} ref={ref} className={alertClasses} role={role}>
+    <div
+      {...props}
+      ref={(node) => {
+        alertRef.current = node
+        if (typeof ref === 'function') ref(node)
+        else if (ref) ref.current = node
+      }}
+      className={alertClasses}
+      role={role}
+      aria-live={live.ariaLive}>
       {showIcon && (
         <div className={alertIconContainerClasses}>
           <StatusIcon
@@ -210,11 +233,11 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
         </button>
       )}
 
-      {showCountdown && duration && duration > 0 && (
+      {showCountdown && duration && duration > 0 && shown && (
         <div className={alertCountdownContainerClasses}>
           <div
             className={classNames(alertCountdownBarClasses, alertCountdownColorClasses[type])}
-            style={{ animationDuration: `${duration}ms` }}
+            style={{ width: `${Math.max(0, Math.min(1, ratio)) * 100}%` }}
           />
         </div>
       )}

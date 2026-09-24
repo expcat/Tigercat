@@ -4,6 +4,7 @@
 
 import type { NotificationType, NotificationPosition } from '../types/notification'
 import { overlayZIndexClass } from './floating'
+import { normalizeAutoCloseDuration } from './message-utils'
 
 import { closeIconPathD } from './icons/common'
 import {
@@ -16,7 +17,7 @@ import {
 /**
  * Base notification container classes
  */
-export const notificationContainerBaseClasses = `fixed ${overlayZIndexClass.message} flex flex-col gap-3 pointer-events-none w-[var(--tiger-component-notification-width,24rem)] max-w-[calc(100vw-2rem)]`
+export const notificationContainerBaseClasses = `fixed ${overlayZIndexClass.message} flex flex-col gap-3 pointer-events-none w-[var(--tiger-component-notification-width)] max-w-[calc(100vw-2rem)]`
 
 /**
  * Get position classes for notification container
@@ -32,7 +33,7 @@ export const notificationPositionClasses: Record<NotificationPosition, string> =
  * Base notification item classes
  */
 export const notificationBaseClasses =
-  'flex gap-3 p-[var(--tiger-component-notification-padding,1rem)] rounded-[var(--tiger-component-notification-border-radius,var(--tiger-radius-lg,0.75rem))] shadow-[var(--tiger-component-notification-shadow,0_10px_15px_-3px_rgb(0_0_0_/_0.1))] border pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))]'
+  'flex gap-3 p-[var(--tiger-component-notification-padding)] rounded-[var(--tiger-component-notification-border-radius)] shadow-[var(--tiger-component-notification-shadow)] border pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base)]'
 
 /**
  * Notification type color schemes
@@ -50,32 +51,32 @@ export interface NotificationColorScheme {
  */
 export const defaultNotificationThemeColors: Record<NotificationType, NotificationColorScheme> = {
   info: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    icon: 'text-[var(--tiger-info,#3b82f6)]',
-    titleText: 'text-[var(--tiger-text,#111827)]',
-    descriptionText: 'text-[var(--tiger-text-muted,#6b7280)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    icon: 'text-[var(--tiger-info)]',
+    titleText: 'text-[var(--tiger-text)]',
+    descriptionText: 'text-[var(--tiger-text-secondary)]'
   },
   success: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    icon: 'text-[var(--tiger-success,#16a34a)]',
-    titleText: 'text-[var(--tiger-text,#111827)]',
-    descriptionText: 'text-[var(--tiger-text-muted,#6b7280)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    icon: 'text-[var(--tiger-success)]',
+    titleText: 'text-[var(--tiger-text)]',
+    descriptionText: 'text-[var(--tiger-text-secondary)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    icon: 'text-[var(--tiger-warning,#d97706)]',
-    titleText: 'text-[var(--tiger-text,#111827)]',
-    descriptionText: 'text-[var(--tiger-text-muted,#6b7280)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    icon: 'text-[var(--tiger-warning)]',
+    titleText: 'text-[var(--tiger-text)]',
+    descriptionText: 'text-[var(--tiger-text-secondary)]'
   },
   error: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    icon: 'text-[var(--tiger-error,#dc2626)]',
-    titleText: 'text-[var(--tiger-text,#111827)]',
-    descriptionText: 'text-[var(--tiger-text-muted,#6b7280)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    icon: 'text-[var(--tiger-error)]',
+    titleText: 'text-[var(--tiger-text)]',
+    descriptionText: 'text-[var(--tiger-text-secondary)]'
   }
 }
 
@@ -115,13 +116,13 @@ export const notificationCloseIconPath = closeIconPathD
  * Notification close button classes
  */
 export const notificationCloseButtonClasses =
-  'ms-auto p-1 rounded-[var(--tiger-radius-md,0.5rem)] hover:bg-[var(--tiger-surface-muted,#e5e7eb)] tiger-motion-aware transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 flex-shrink-0'
+  'ms-auto p-1 rounded-[var(--tiger-radius-md)] hover:bg-[var(--tiger-surface-muted)] tiger-motion-aware transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary)]/40 flex-shrink-0'
 
 /**
  * Notification close icon classes
  */
 export const notificationCloseIconClasses =
-  'w-5 h-5 text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]'
+  'w-5 h-5 text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-text)]'
 
 /**
  * Notification icon classes
@@ -132,7 +133,7 @@ export const notificationIconClasses = 'w-6 h-6 flex-shrink-0 mt-0.5'
  * Notification title classes
  */
 export const notificationTitleClasses =
-  '[font-size:var(--tiger-component-notification-title-font-size,1rem)] [font-weight:var(--tiger-component-notification-title-font-weight,500)]'
+  '[font-size:var(--tiger-component-notification-title-font-size)] [font-weight:var(--tiger-component-notification-title-font-weight)]'
 
 /**
  * Notification description classes
@@ -153,107 +154,18 @@ export const notificationActionsClasses = 'mt-3 flex flex-wrap items-center gap-
  * Notification action button base classes
  */
 export const notificationActionButtonClasses =
-  'rounded-[var(--tiger-radius-md,0.5rem)] px-2.5 py-1 text-xs font-medium tiger-motion-aware transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 disabled:cursor-not-allowed disabled:opacity-50'
+  'rounded-[var(--tiger-radius-md)] px-2.5 py-1 text-xs font-medium tiger-motion-aware transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary)]/40 disabled:cursor-not-allowed disabled:opacity-50'
 
 /**
  * Notification action button type classes
  */
 export const notificationActionButtonTypeClasses = {
   primary:
-    'bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] disabled:hover:bg-[var(--tiger-primary,#2563eb)]',
+    'bg-[var(--tiger-primary)] text-white hover:bg-[var(--tiger-primary-hover)] disabled:hover:bg-[var(--tiger-primary)]',
   default:
-    'border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-surface-muted,#f3f4f6)]'
+    'border border-[var(--tiger-border)] bg-[var(--tiger-surface)] text-[var(--tiger-text)] hover:bg-[var(--tiger-surface-muted)]'
 }
 
-export type NotificationStackFrameCallback = (timestamp: number) => void
-
-export type NotificationStackFrameRequest = (callback: NotificationStackFrameCallback) => number
-
-export type NotificationStackFrameCancel = (handle: number) => void
-
-export type NotificationStackUpdateCallback = () => void
-
-export interface NotificationStackUpdateSchedulerOptions {
-  requestFrame?: NotificationStackFrameRequest
-  cancelFrame?: NotificationStackFrameCancel
-}
-
-export interface NotificationStackUpdateScheduler {
-  schedule: (position: NotificationPosition, callback: NotificationStackUpdateCallback) => void
-  flush: () => void
-  cancel: (position?: NotificationPosition) => void
-  isPending: () => boolean
-}
-
-function requestDefaultNotificationFrame(callback: NotificationStackFrameCallback): number {
-  if (globalThis.requestAnimationFrame) {
-    return globalThis.requestAnimationFrame(callback)
-  }
-
-  return globalThis.setTimeout(() => callback(globalThis.performance?.now?.() ?? Date.now()), 16)
-}
-
-function cancelDefaultNotificationFrame(handle: number): void {
-  if (globalThis.cancelAnimationFrame) {
-    globalThis.cancelAnimationFrame(handle)
-    return
-  }
-
-  globalThis.clearTimeout(handle)
-}
-
-export function createNotificationStackUpdateScheduler(
-  options: NotificationStackUpdateSchedulerOptions = {}
-): NotificationStackUpdateScheduler {
-  const requestFrame = options.requestFrame ?? requestDefaultNotificationFrame
-  const cancelFrame = options.cancelFrame ?? cancelDefaultNotificationFrame
-  const pendingCallbacks = new Map<NotificationPosition, NotificationStackUpdateCallback>()
-  let frameHandle: number | undefined
-
-  function applyPending(): void {
-    frameHandle = undefined
-    if (pendingCallbacks.size === 0) return
-
-    const callbacks = [...pendingCallbacks.values()]
-    pendingCallbacks.clear()
-    callbacks.forEach((callback) => callback())
-  }
-
-  function schedule(
-    position: NotificationPosition,
-    callback: NotificationStackUpdateCallback
-  ): void {
-    pendingCallbacks.set(position, callback)
-    if (frameHandle !== undefined) return
-
-    frameHandle = requestFrame(applyPending)
-  }
-
-  function flush(): void {
-    if (frameHandle !== undefined) {
-      cancelFrame(frameHandle)
-    }
-
-    applyPending()
-  }
-
-  function cancel(position?: NotificationPosition): void {
-    if (position) {
-      pendingCallbacks.delete(position)
-    } else {
-      pendingCallbacks.clear()
-    }
-
-    if (pendingCallbacks.size > 0 || frameHandle === undefined) return
-
-    cancelFrame(frameHandle)
-    frameHandle = undefined
-  }
-
-  return {
-    schedule,
-    flush,
-    cancel,
-    isPending: () => frameHandle !== undefined
-  }
+export function resolveNotificationDuration(duration?: number): number {
+  return normalizeAutoCloseDuration(duration, 4500, 'notification.duration')
 }

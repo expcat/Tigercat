@@ -27,6 +27,16 @@ export interface BaseFloatingPopupProps {
   /** Offset distance from trigger in pixels @default 8 */
   offset?: number
   /**
+   * Hover show delay in milliseconds.
+   * @default 100
+   */
+  showDelay?: number
+  /**
+   * Hover hide delay in milliseconds.
+   * @default 100
+   */
+  hideDelay?: number
+  /**
    * Merge trigger ARIA / handlers onto the single child instead of rendering
    * a wrapping button.
    * @default false

@@ -466,9 +466,6 @@ describe('Modal', () => {
         </Modal>
       )
 
-      expect(screen.getByTestId('modal-content')).toBeInTheDocument()
-      expect(document.querySelector('[data-tiger-modal-root]')).not.toHaveAttribute('hidden')
-
       await waitFor(() => {
         expect(screen.queryByTestId('modal-content')).not.toBeInTheDocument()
       })

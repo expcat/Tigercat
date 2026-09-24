@@ -349,10 +349,15 @@ describe('Tour', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'With target' })
     await waitFor(() => {
-      const node = document.querySelector('[data-tiger-tour-mask]') as HTMLElement | null
-      expect(node?.style.clipPath).toContain('evenodd')
-      expect(node?.style.clipPath).toContain('196px 96px')
+      const node = document.querySelector('[data-tiger-tour-shade]') as HTMLElement | null
+      expect(node?.style.boxShadow).toContain('9999px')
+      expect(node?.style.left).toBe('196px')
+      expect(node?.style.top).toBe('96px')
+      expect(node?.style.pointerEvents).toBe('none')
     })
+    expect(
+      (document.querySelector('[data-tiger-tour-mask]') as HTMLElement).style.clipPath
+    ).toBe('')
     expect(dialog.style.top).not.toBe('50%')
     target.remove()
   })
@@ -382,7 +387,9 @@ describe('Tour', () => {
 
     const mask = await waitFor(() => {
       const node = document.querySelector('[data-tiger-tour-mask]') as HTMLElement | null
-      expect(node?.style.clipPath).toContain('evenodd')
+      expect(node).toBeTruthy()
+      const shade = document.querySelector('[data-tiger-tour-shade]') as HTMLElement | null
+      expect(shade?.style.boxShadow).toContain('9999px')
       return node!
     })
     await fireEvent.click(mask)
@@ -403,10 +410,10 @@ describe('Tour', () => {
   })
 
   describe('Overlay lifecycle', () => {
-    it('moves focus to the close button when opened', async () => {
+    it('moves focus to the dialog when opened', async () => {
       render(Tour, { props: { steps: baseSteps, open: true } })
-      const closeButton = await screen.findByRole('button', { name: 'Close tour' })
-      await waitFor(() => expect(closeButton).toHaveFocus())
+      const dialog = await screen.findByRole('dialog')
+      await waitFor(() => expect(dialog).toHaveFocus())
     })
 
     it('owns an overlay-host so nested layers stay inside the tour', async () => {

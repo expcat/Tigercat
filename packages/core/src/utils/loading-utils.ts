@@ -30,13 +30,13 @@ export const loadingTextSizeClasses: Record<LoadingSize, string> = {
  * Loading color classes using CSS variables
  */
 export const loadingColorClasses: Record<LoadingColor, string> = {
-  primary: 'text-[var(--tiger-primary,#2563eb)]',
-  secondary: 'text-[var(--tiger-secondary,#4b5563)]',
-  success: 'text-[var(--tiger-success,#16a34a)]',
-  warning: 'text-[var(--tiger-warning,#ca8a04)]',
-  danger: 'text-[var(--tiger-error,#dc2626)]',
-  info: 'text-[var(--tiger-info,#3b82f6)]',
-  default: 'text-[var(--tiger-text-muted,#6b7280)]'
+  primary: 'text-[var(--tiger-primary)]',
+  secondary: 'text-[var(--tiger-secondary)]',
+  success: 'text-[var(--tiger-success)]',
+  warning: 'text-[var(--tiger-warning)]',
+  danger: 'text-[var(--tiger-error)]',
+  info: 'text-[var(--tiger-info)]',
+  default: 'text-[var(--tiger-text-secondary)]'
 }
 
 /**
@@ -47,7 +47,7 @@ export const loadingContainerBaseClasses = 'inline-flex flex-col items-center ju
 /**
  * Base classes for fullscreen loading
  */
-export const loadingFullscreenBaseClasses = `fixed inset-0 ${overlayZIndexClass.modal} flex items-center justify-center`
+export const loadingFullscreenBaseClasses = `fixed inset-0 ${overlayZIndexClass.loading} flex items-center justify-center`
 
 /**
  * Relative wrapper for the region overlay (children + mask).
@@ -58,13 +58,13 @@ export const loadingRegionBaseClasses = 'relative'
  * In-place overlay that covers the region content.
  */
 export const loadingRegionOverlayClasses =
-  'absolute inset-0 z-10 flex items-center justify-center bg-[color-mix(in_srgb,var(--tiger-surface,#ffffff)_85%,transparent)]'
+  'absolute inset-0 z-10 flex items-center justify-center bg-[color-mix(in_srgb,var(--tiger-surface)_85%,transparent)]'
 
 /**
  * Default fullscreen / region mask: 90% of `--tiger-surface`.
  */
 export const DEFAULT_LOADING_BACKGROUND =
-  'color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent)'
+  'color-mix(in srgb, var(--tiger-surface) 90%, transparent)'
 
 /**
  * Base classes for spinner animation
@@ -350,13 +350,117 @@ export const loadingAnimationBaseStyles = {
   },
   '.animate-bounce-dot': {
     animation:
-      'tiger-bounce-dot var(--tiger-motion-duration-slow,0.6s) var(--tiger-motion-ease-standard,ease-in-out) infinite'
+      'tiger-bounce-dot var(--tiger-motion-duration-slow) var(--tiger-motion-ease-standard) infinite'
   },
   '.animate-scale-bar': {
     animation:
-      'tiger-scale-bar var(--tiger-motion-duration-slow,0.6s) var(--tiger-motion-ease-standard,ease-in-out) infinite'
+      'tiger-scale-bar var(--tiger-motion-duration-slow) var(--tiger-motion-ease-standard) infinite'
   },
-  '.animation-delay-0': { animationDelay: '0s' },
-  '.animation-delay-150': { animationDelay: '0.15s' },
-  '.animation-delay-300': { animationDelay: '0.3s' }
+  '.animation-delay-0': { animationDelay: '0ms' },
+  '.animation-delay-150': { animationDelay: 'var(--tiger-motion-duration-quick)' },
+  '.animation-delay-300': { animationDelay: 'var(--tiger-motion-duration-slow)' }
 } as const
+
+export interface LoadingDelayGate {
+  isShown(): boolean
+  subscribe(listener: () => void): () => void
+  /** Each rising edge of `spinning` waits `delay` again. A fall before then cancels. */
+  sync(spinning: boolean, delay: number): void
+  dispose(): void
+}
+
+export function createLoadingDelayGate(hooks?: {
+  setTimeout?: (handler: () => void, timeout: number) => ReturnType<typeof setTimeout>
+  clearTimeout?: (id: ReturnType<typeof setTimeout>) => void
+}): LoadingDelayGate {
+  const listeners = new Set<() => void>()
+  const schedule = hooks?.setTimeout ?? ((handler, timeout) => setTimeout(handler, timeout))
+  const cancel = hooks?.clearTimeout ?? ((id) => clearTimeout(id))
+  let shown = false
+  let spinning = false
+  let timer: ReturnType<typeof setTimeout> | null = null
+
+  function emit(): void {
+    listeners.forEach((listener) => listener())
+  }
+
+  function clearTimer(): void {
+    if (timer === null) return
+    cancel(timer)
+    timer = null
+  }
+
+  return {
+    isShown: () => shown,
+    subscribe(listener) {
+      listeners.add(listener)
+      return () => listeners.delete(listener)
+    },
+    sync(nextSpinning, delay) {
+      const wait = Number.isFinite(delay) && delay > 0 ? delay : 0
+      const rising = nextSpinning && !spinning
+      spinning = nextSpinning
+      if (!nextSpinning) {
+        clearTimer()
+        if (shown) {
+          shown = false
+          emit()
+        }
+        return
+      }
+      if (!rising && shown) return
+      if (!rising && timer !== null) return
+      clearTimer()
+      if (wait <= 0) {
+        if (!shown) {
+          shown = true
+          emit()
+        }
+        return
+      }
+      if (shown) {
+        shown = false
+        emit()
+      }
+      timer = schedule(() => {
+        timer = null
+        if (!spinning) return
+        shown = true
+        emit()
+      }, wait)
+    },
+    dispose() {
+      clearTimer()
+      listeners.clear()
+    }
+  }
+}
+
+/**
+ * Remember focus inside a region that is about to be inert.
+ * Restore it only when the user has not moved to another control.
+ */
+export function captureRegionFocus(region: HTMLElement | null): HTMLElement | null {
+  if (!region) return null
+  const active = region.ownerDocument.activeElement
+  if (active instanceof HTMLElement && region.contains(active)) return active
+  return null
+}
+
+export function restoreRegionFocus(
+  region: HTMLElement | null,
+  remembered: HTMLElement | null
+): boolean {
+  if (!region || !remembered || !remembered.isConnected) return false
+  const active = region.ownerDocument.activeElement
+  if (active === remembered) return false
+  if (
+    active instanceof HTMLElement &&
+    active !== region.ownerDocument.body &&
+    !region.contains(active)
+  ) {
+    return false
+  }
+  remembered.focus()
+  return true
+}

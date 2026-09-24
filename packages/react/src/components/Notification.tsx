@@ -1,127 +1,45 @@
-import { useSyncExternalStore } from 'react'
-import { flushSync } from 'react-dom'
-import { createRoot, type Root } from 'react-dom/client'
 import {
-  createImperativeHost,
-  createToastQueue,
-  isBrowser,
-  normalizeStringOption,
-  type NotificationConfig,
-  type NotificationInstance,
+  clearNotifications,
+  enqueueNotification,
+  getActiveFeedbackScope,
   type NotificationOptions,
   type NotificationPosition
 } from '@expcat/tigercat-core'
-import { NotificationContainer } from './NotificationContainer'
 
 export { NotificationContainer } from './NotificationContainer'
 export type { NotificationContainerProps } from './NotificationContainer'
 
-const NOTIFICATION_POSITIONS: NotificationPosition[] = [
-  'top-left',
-  'top-right',
-  'bottom-left',
-  'bottom-right'
-]
-
-const notificationQueue = createToastQueue<NotificationInstance>()
-const host = createImperativeHost<Root>({
-  mount(element) {
-    const root = createRoot(element)
-    flushSync(() => {
-      root.render(<NotificationHost />)
-    })
-    return root
-  },
-  unmount(root) {
-    root.unmount()
-  }
-})
-
-notificationQueue.subscribe(() => {
-  if (notificationQueue.getSnapshot().length > 0) return
-  queueMicrotask(() => {
-    if (notificationQueue.getSnapshot().length === 0) host.teardown()
-  })
-})
-
-function NotificationHost() {
-  const notifications = useSyncExternalStore(
-    notificationQueue.subscribe,
-    notificationQueue.getSnapshot,
-    notificationQueue.getServerSnapshot
-  )
-
-  return (
-    <>
-      {NOTIFICATION_POSITIONS.map((position) => {
-        const positioned = notifications.filter((item) => item.position === position)
-        if (positioned.length === 0) return null
-        return (
-          <NotificationContainer
-            key={position}
-            position={position}
-            notifications={[...positioned]}
-            onClose={(id) => notificationQueue.remove(id)}
-            portal={false}
-          />
-        )
-      })}
-    </>
-  )
-}
-
-function addNotification(config: NotificationConfig): () => void {
-  if (!isBrowser()) return () => undefined
-
-  const instance = notificationQueue.add({
-    type: config.type || 'info',
-    title: config.title,
-    description: config.description,
-    duration: config.duration !== undefined ? config.duration : 4500,
-    closable: config.closable !== undefined ? config.closable : true,
-    onClose: config.onClose,
-    onClick: config.onClick,
-    actions: config.actions,
-    icon: config.icon,
-    className: config.className,
-    closeAriaLabel: config.closeAriaLabel,
-    position: config.position || 'top-right'
-  })
-
-  if (!instance) return () => undefined
-  host.ensure()
-  return () => {
-    notificationQueue.remove(instance.id)
-  }
-}
-
-function normalizeOptions(options: NotificationOptions): NotificationConfig {
-  return normalizeStringOption<NotificationConfig>(options, 'title')
+function open(
+  type: 'info' | 'success' | 'warning' | 'error',
+  options: NotificationOptions
+): () => void {
+  return enqueueNotification(getActiveFeedbackScope(), options, type)
 }
 
 export const notification = {
   info(options: NotificationOptions): () => void {
-    return addNotification({ ...normalizeOptions(options), type: 'info' })
+    return open('info', options)
   },
   success(options: NotificationOptions): () => void {
-    return addNotification({ ...normalizeOptions(options), type: 'success' })
+    return open('success', options)
   },
   warning(options: NotificationOptions): () => void {
-    return addNotification({ ...normalizeOptions(options), type: 'warning' })
+    return open('warning', options)
   },
   error(options: NotificationOptions): () => void {
-    return addNotification({ ...normalizeOptions(options), type: 'error' })
+    return open('error', options)
   },
   clear(position?: NotificationPosition) {
-    if (position) {
-      notificationQueue
-        .getSnapshot()
-        .filter((item) => item.position === position)
-        .forEach((item) => notificationQueue.remove(item.id))
+    const scope = getActiveFeedbackScope()
+    if (!scope) return
+    if (!position) {
+      clearNotifications(scope)
       return
     }
-    notificationQueue.clear()
-    host.teardown()
+    scope.notifications
+      .getSnapshot()
+      .filter((item) => item.position === position)
+      .forEach((item) => scope.notifications.remove(item.id))
   }
 }
 

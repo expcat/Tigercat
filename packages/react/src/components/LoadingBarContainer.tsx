@@ -9,8 +9,7 @@ import {
   getLoadingLabel,
   type LoadingBarContainerProps as CoreLoadingBarContainerProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
-import { getGlobalTigerLocale } from '../utils/global-locale'
+import { useResolvedTigerLocale } from './ConfigProvider'
 
 export interface LoadingBarContainerProps
   extends
@@ -25,10 +24,11 @@ export const LoadingBarContainer: React.FC<LoadingBarContainerProps> = ({
   className,
   style,
   ariaLabel,
+  notice,
+  noticeToken = 0,
   ...rest
 }) => {
-  const config = useTigerConfig()
-  const locale = config.locale ?? getGlobalTigerLocale()
+  const locale = useResolvedTigerLocale()
   const isBusy = status === 'loading'
   const resolvedAriaLabel = getLoadingLabel(locale, ariaLabel)
   const valueNow = getLoadingBarProgressValue(percentage)
@@ -56,6 +56,11 @@ export const LoadingBarContainer: React.FC<LoadingBarContainerProps> = ({
       aria-busy={isBusy || undefined}
       data-tiger-loading-bar-container=""
       data-tiger-loading-bar-status={status}>
+      {notice ? (
+        <span key={noticeToken} className="sr-only" role="status">
+          {notice}
+        </span>
+      ) : null}
       <div
         className={getLoadingBarFillClasses(status, color)}
         style={getLoadingBarFillStyle(percentage, height)}

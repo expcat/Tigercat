@@ -1,8 +1,6 @@
 import {
-  getFocusTrapNavigation,
-  getFocusableElements,
+  createFocusScope,
   isEventOutside,
-  isFocusInForeignOverlay,
   lockBodyScroll,
   setBackgroundInert,
   computeFloatingPosition,
@@ -16,7 +14,6 @@ import {
   getTransformOrigin,
   restoreFocus,
   captureActiveElement,
-  focusFirst,
   registerEscapeDismiss,
   type AnchoredOverlayLayout,
   type FloatingPlacement,
@@ -199,34 +196,32 @@ export interface UseVueFocusTrapOptions {
   inert?: Ref<boolean> | boolean
   /** Capture the active element, focus the trap, and restore on disable or unmount. */
   autoFocus?: boolean
+  /** Focus this node instead of the first tabbable control. */
+  initialFocusRef?: Ref<HTMLElement | null>
+  /** Outside node that stays active (interactive tour target). */
+  exemptRef?: Ref<HTMLElement | null>
+  /** Modal scopes lock scroll unless this is false. */
+  lockScroll?: Ref<boolean> | boolean
 }
 
 export function useVueFocusTrap({
   enabled,
   containerRef,
   inert = false,
-  autoFocus = false
+  autoFocus = false,
+  initialFocusRef,
+  exemptRef,
+  lockScroll = true
 }: UseVueFocusTrapOptions): void {
-  let releaseInert: (() => void) | undefined
-  let detachTrap: (() => void) | undefined
+  let scope: { activate: () => void; deactivate: () => void } | undefined
   let restoreTarget: HTMLElement | null = null
+  let activeContainer: HTMLElement | null = null
+  let activeModal = false
 
-  const detach = () => {
-    detachTrap?.()
-    detachTrap = undefined
-    releaseInert?.()
-    releaseInert = undefined
-  }
-
-  const restore = () => {
-    if (!autoFocus) return
-    restoreFocus(restoreTarget)
-    restoreTarget = null
-  }
-
-  const teardown = () => {
-    detach()
-    restore()
+  const deactivate = () => {
+    scope?.deactivate()
+    scope = undefined
+    activeContainer = null
   }
 
   watch(
@@ -235,7 +230,10 @@ export function useVueFocusTrap({
       if (autoFocus && isEnabled && !restoreTarget) {
         restoreTarget = captureActiveElement()
       }
-      if (!isEnabled || !isBrowser()) teardown()
+      if (!isEnabled) {
+        deactivate()
+        restoreTarget = null
+      }
     },
     { flush: 'sync', immediate: true }
   )
@@ -243,52 +241,61 @@ export function useVueFocusTrap({
   watch(
     [enabled, containerRef, () => toValue(inert)],
     ([isEnabled, container, inertEnabled]) => {
-      detach()
+      if (
+        isEnabled &&
+        container &&
+        scope &&
+        activeContainer === container &&
+        activeModal === inertEnabled
+      ) {
+        return
+      }
+      deactivate()
       if (!isEnabled || !container || !isBrowser()) return
-      const ownerDocument = container.ownerDocument
-      releaseInert = inertEnabled ? setBackgroundInert(container) : undefined
-      if (autoFocus) {
-        const focusables = getFocusableElements(container)
-        focusFirst([...focusables, container])
+      const active = captureActiveElement()
+      if (autoFocus && active && !container.contains(active)) {
+        restoreTarget = active
       }
-
-      const handler = (event: KeyboardEvent) => {
-        const focusables = getFocusableElements(container)
-        const activeElement = ownerDocument.activeElement
-        const inside = activeElement instanceof Node && container.contains(activeElement)
-        if (!inside) {
-          if (event.key !== 'Tab') return
-          if (isFocusInForeignOverlay(container, activeElement)) return
-          event.preventDefault()
-          const next = event.shiftKey ? focusables[focusables.length - 1] : focusables[0]
-          next?.focus()
-          return
-        }
-        const navigation = getFocusTrapNavigation(event, focusables, activeElement)
-        if (!navigation.shouldHandle) return
-
-        event.preventDefault()
-        navigation.next?.focus()
-      }
-
-      ownerDocument.addEventListener('keydown', handler, true)
-      detachTrap = () => ownerDocument.removeEventListener('keydown', handler, true)
+      activeContainer = container
+      activeModal = inertEnabled
+      scope = createFocusScope(container, {
+        modal: inertEnabled,
+        moveFocus: autoFocus || Boolean(initialFocusRef?.value),
+        initialFocus: initialFocusRef?.value ?? null,
+        returnFocus: autoFocus,
+        previouslyFocused: autoFocus ? (restoreTarget ?? undefined) : null,
+        lockScroll: toValue(lockScroll) !== false,
+        exempt: exemptRef ? () => exemptRef.value : undefined
+      })
+      scope.activate()
     },
     { immediate: true, flush: 'post' }
   )
 
-  onBeforeUnmount(teardown)
+  onBeforeUnmount(() => {
+    deactivate()
+    restoreTarget = null
+  })
 }
 
 // ============================================================================
 // Floating UI positioning composable
 // ============================================================================
 
+export type VueFloatingReference =
+  | HTMLElement
+  | {
+      getBoundingClientRect: () => { width: number; height?: number }
+      contextElement?: Element
+    }
+
 export interface UseVueFloatingOptions {
   /**
-   * Reference element (trigger)
+   * Reference element (trigger) or a virtual rect.
    */
-  referenceRef: Ref<HTMLElement | null>
+  referenceRef: Ref<VueFloatingReference | null>
+  /** Reposition when this value changes (virtual point). */
+  revision?: Ref<unknown>
   /**
    * Floating element (popup/tooltip)
    */
@@ -416,7 +423,7 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
       return
     }
 
-    referenceWidth.value = reference.getBoundingClientRect().width
+    referenceWidth.value = Number(reference.getBoundingClientRect().width) || 0
     x.value = result.x
     y.value = result.y
 
@@ -440,7 +447,8 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
         floatingRef.value,
         requestedPlacement(),
         requestedOffset(),
-        requestedArrow()
+        requestedArrow(),
+        options.revision?.value
       ] as const,
     ([isEnabled, reference, floating]) => {
       updateRequest += 1
@@ -487,6 +495,8 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
 export interface UseVueAnchoredOverlayOptions {
   enabled: Ref<boolean>
   referenceRef: Ref<HTMLElement | null>
+  positionReferenceRef?: Ref<VueFloatingReference | null>
+  revision?: Ref<unknown>
   floatingRef: Ref<HTMLElement | null>
   containerRef?: Ref<HTMLElement | null>
   outsideRefs?: Array<Ref<HTMLElement | null> | undefined>
@@ -544,7 +554,8 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
   )
 
   const floating = useVueFloating({
-    referenceRef: options.referenceRef,
+    referenceRef: options.positionReferenceRef ?? options.referenceRef,
+    revision: options.revision,
     floatingRef: options.floatingRef,
     enabled: options.enabled,
     placement: () => toValue(options.placement) ?? 'bottom-start',

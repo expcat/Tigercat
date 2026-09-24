@@ -133,7 +133,7 @@ describe('Alert', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Close alert' }))
 
     expect(onClose).toHaveBeenCalledTimes(1)
-    expect(screen.getByText('Closable Alert')).toBeInTheDocument()
+    expect(screen.queryByText('Closable Alert')).not.toBeInTheDocument()
   })
 
   it('hides when open is false', async () => {
@@ -216,7 +216,7 @@ describe('Alert', () => {
         expect(onClose).toHaveBeenCalledTimes(1)
       })
       expect(onClose.mock.calls[0][0]).toBeInstanceOf(Event)
-      expect(screen.getByText('Auto-close Alert')).toBeInTheDocument()
+      expect(screen.queryByText('Auto-close Alert')).not.toBeInTheDocument()
       vi.useRealTimers()
     })
 

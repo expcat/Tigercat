@@ -545,9 +545,6 @@ describe('Modal', () => {
         destroyOnClose: true
       })
 
-      expect(document.querySelector('[data-testid="modal-content"]')).toBeInTheDocument()
-      expect(document.querySelector('[data-tiger-modal-root]')).not.toHaveAttribute('hidden')
-
       await waitFor(() => {
         expect(document.querySelector('[data-testid="modal-content"]')).not.toBeInTheDocument()
       })

@@ -22,23 +22,51 @@ export function getPopoverContentClasses(hasCustomWidth = false): string {
   return classNames(
     'tiger-popover-content',
     hasCustomWidth ? undefined : 'min-w-[200px]',
-    hasCustomWidth ? undefined : 'max-w-[var(--tiger-component-popover-max-width,400px)]',
-    'p-[var(--tiger-component-popover-padding,0.75rem)]',
-    'bg-[var(--tiger-surface,#ffffff)]',
-    'rounded-[var(--tiger-component-popover-border-radius,var(--tiger-radius-lg,0.75rem))]',
-    'shadow-[var(--tiger-component-popover-shadow,var(--tw-shadow,0_10px_15px_-3px_rgb(0_0_0_/_0.1)))]',
+    hasCustomWidth ? undefined : 'max-w-[var(--tiger-component-popover-max-width)]',
+    'p-[var(--tiger-component-popover-padding)]',
+    'bg-[var(--tiger-surface)]',
+    'rounded-[var(--tiger-component-popover-border-radius)]',
+    'shadow-[var(--tiger-component-popover-shadow)]',
     'border',
-    'border-[var(--tiger-border,#e5e7eb)]'
+    'border-[var(--tiger-border)]'
   )
+}
+
+const CSS_LENGTH =
+  /^(?:0|[+-]?(?:\d+|\d*\.\d+)(?:px|rem|em|%|vw|vh|dvh|dvw|svh|svw|lvh|lvw|ch|ex|cap|lh|rlh|cqw|cqh|cqi|cqb|vmin|vmax|cm|mm|in|pt|pc))$/i
+
+export interface PopoverWidthResolution {
+  /** Present when the value is a finite positive pixel count or one CSS length. */
+  width?: string
+  invalid: boolean
+}
+
+/**
+ * One width: a positive pixel number, or one CSS length written as `width`.
+ * Anything else is invalid and the default max-width stays.
+ */
+export function resolvePopoverWidth(width?: number | string): PopoverWidthResolution {
+  if (width == null || width === '') return { invalid: false }
+  if (typeof width === 'number') {
+    if (!Number.isFinite(width) || width <= 0) return { invalid: true }
+    return { width: `${width}px`, invalid: false }
+  }
+  const trimmed = width.trim()
+  if (/^\d+(\.\d+)?$/.test(trimmed)) {
+    const pixels = Number(trimmed)
+    if (!Number.isFinite(pixels) || pixels <= 0) return { invalid: true }
+    return { width: `${pixels}px`, invalid: false }
+  }
+  if (CSS_LENGTH.test(trimmed)) return { width: trimmed, invalid: false }
+  return { invalid: true }
 }
 
 export function getPopoverContentStyle(
   width?: number | string
 ): Record<string, string> | undefined {
-  if (width == null || width === '') return undefined
-  const pixels = typeof width === 'number' ? width : Number(width)
-  if (!Number.isFinite(pixels) || pixels <= 0) return undefined
-  return { width: `${pixels}px`, maxWidth: `${pixels}px` }
+  const resolved = resolvePopoverWidth(width)
+  if (!resolved.width) return undefined
+  return { width: resolved.width }
 }
 
 /** Popover title classes (static) */
@@ -46,10 +74,10 @@ export const POPOVER_TITLE_CLASSES = classNames(
   'tiger-popover-title',
   'text-sm',
   'font-semibold',
-  'text-[var(--tiger-text,#111827)]',
+  'text-[var(--tiger-text)]',
   'mb-2',
   'border-b',
-  'border-[var(--tiger-border,#e5e7eb)]',
+  'border-[var(--tiger-border)]',
   'pb-2'
 )
 
@@ -57,5 +85,5 @@ export const POPOVER_TITLE_CLASSES = classNames(
 export const POPOVER_TEXT_CLASSES = classNames(
   'tiger-popover-text',
   'text-sm',
-  'text-[var(--tiger-text-muted,#374151)]'
+  'text-[var(--tiger-text-secondary)]'
 )

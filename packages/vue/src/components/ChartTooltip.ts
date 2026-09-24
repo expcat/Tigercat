@@ -1,10 +1,12 @@
-import { defineComponent, h, computed, ref, watch } from 'vue'
+import { defineComponent, h, computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import {
   classNames,
   coerceClassValue,
   chartTooltipBaseClasses,
+  chartTooltipLines,
   getChartTooltipTransform,
   isBrowser,
+  registerEscapeDismiss,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueOverlayPortalTarget } from '../utils/overlay'
@@ -39,12 +41,22 @@ export const ChartTooltip = defineComponent({
     },
     className: {
       type: String
+    },
+    id: {
+      type: String
     }
   },
-  setup(props, { slots, attrs }) {
+  emits: ['dismiss'],
+  setup(props, { slots, attrs, emit }) {
     const tooltipRef = ref<HTMLDivElement | null>(null)
     const { anchorRef, target } = useVueOverlayPortalTarget()
     const adjustedPosition = ref({ x: props.x, y: props.y })
+    const mounted = ref(false)
+    let releaseEscape: (() => void) | undefined
+
+    onMounted(() => {
+      mounted.value = true
+    })
 
     watch(
       () => [props.x, props.y, props.open, props.content] as const,
@@ -76,19 +88,46 @@ export const ChartTooltip = defineComponent({
       { immediate: true }
     )
 
+    watch(
+      () => props.open,
+      (open) => {
+        releaseEscape?.()
+        releaseEscape = undefined
+        if (!open || !isBrowser()) return
+        releaseEscape = registerEscapeDismiss(
+          document,
+          () => emit('dismiss'),
+          () => tooltipRef.value
+        )
+      },
+      { immediate: true }
+    )
+    onBeforeUnmount(() => releaseEscape?.())
+
     const tooltipClasses = computed(() =>
       classNames(chartTooltipBaseClasses, coerceClassValue(attrs.class), props.className)
     )
 
     return () => {
       const slotContent = slots.default?.()
-      const body = slotContent && slotContent.length > 0 ? slotContent : props.content
+      const lines = chartTooltipLines(props.content)
+      const body =
+        slotContent && slotContent.length > 0
+          ? slotContent
+          : lines.length > 1
+            ? h(
+                'ul',
+                { class: 'm-0 list-none whitespace-pre-line p-0' },
+                lines.map((line, index) => h('li', { key: index }, line))
+              )
+            : props.content
       const tooltip =
         props.open && body
           ? h(
               'div',
               {
                 ref: tooltipRef,
+                id: props.id,
                 class: tooltipClasses.value,
                 style: {
                   transform: getChartTooltipTransform(adjustedPosition.value)
@@ -102,7 +141,9 @@ export const ChartTooltip = defineComponent({
 
       return [
         h('span', { ref: anchorRef, hidden: true }),
-        tooltip ? renderVueOverlayTeleport(tooltip, target.value) : null
+        tooltip
+          ? renderVueOverlayTeleport(tooltip, mounted.value ? target.value : null)
+          : null
       ]
     }
   }

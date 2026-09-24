@@ -79,22 +79,19 @@ export interface DrawerProps {
   zIndex?: number
 
   /**
-   * Additional CSS class for the drawer panel (same node as `panelClassName`)
+   * Additional CSS class for the drawer panel.
    */
   className?: string
 
   /**
-   * Additional CSS class for the drawer body
+   * Additional CSS class for the drawer body. Custom spacing goes here.
    */
   bodyClassName?: string
 
   /**
-   * Padding override for the drawer body.
-   * - `false` removes the built-in padding entirely.
-   * - a string supplies a custom padding utility class (e.g. `'p-0'`, `'px-8 py-6'`).
-   * - omitted / `true` keeps the default `px-6 py-4`.
+   * `false` removes the default body padding. Omit or pass `true` for `px-6 py-4`.
    */
-  bodyPadding?: boolean | string
+  bodyPadding?: boolean
 
   /**
    * Whether to destroy content on close
@@ -125,9 +122,10 @@ export interface DrawerProps {
   closeAriaLabel?: string
 
   /**
-   * Additional CSS class for the drawer panel.
+   * CSS selector for the node to focus when the drawer opens.
+   * Defaults to the dialog element.
    */
-  panelClassName?: string
+  initialFocus?: string
 
   /**
    * Custom inline style for the drawer panel.

@@ -26,8 +26,11 @@ import {
   scrollTourTargetIntoView,
   getTourRectFromElement,
   getTourSizeFromElement,
+  getFirstTourStepIndex,
   getTourPopoverStyle,
+  getTourShadeStyle,
   getTourMaskHoleStyle,
+  syncModalInert,
   resolveTourNav,
   getTourStepContext,
   shouldLockTourOverlay,
@@ -36,7 +39,6 @@ import {
   tourCloseEvents,
   shouldCloseOnMaskClick,
   getTourLabels,
-  closeIconPathD,
   type TourProps as CoreTourProps,
   type TourPlacement,
   type TourRect,
@@ -44,9 +46,10 @@ import {
   type TourStepContext,
   type TourNavEvent
 } from '@expcat/tigercat-core'
+import { closeIconPathD } from '@expcat/tigercat-core/icons/common'
 import { StatusIcon } from './shared/icons'
+import { OverlayPortal } from '../utils/overlay-outlet'
 import {
-  renderOverlayPortal,
   useBodyScrollLock,
   useEscapeKey,
   useFocusTrap,
@@ -91,6 +94,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
     maskClosable = true,
     keyboard = true,
     showIndicators = true,
+    initialFocus,
     locale,
     className,
     style,
@@ -116,9 +120,20 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
     [finishText, mergedLocale, nextText, prevText]
   )
   const [internalStep, setInternalStep] = useState(0)
-  const [resolvedSteps, setResolvedSteps] = useState(steps)
+  const [resolvedSteps, setResolvedSteps] = useState<typeof steps>([])
+  const [loadPhase, setLoadPhase] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
+  const loadStepsRef = useRef(loadSteps)
+  loadStepsRef.current = loadSteps
+  const hasLoader = typeof loadSteps === 'function'
+  const stepsRef = useRef(steps)
+  stepsRef.current = steps
+  const resolvedStepsRef = useRef(resolvedSteps)
+  resolvedStepsRef.current = resolvedSteps
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
   const currentStep = controlledCurrent ?? internalStep
-  const nav = resolveTourNav(resolvedSteps, currentStep)
+  const displayedSteps = loadSteps ? resolvedSteps : steps
+  const nav = resolveTourNav(displayedSteps, currentStep)
   const ctx = getTourStepContext(nav)
   const step = ctx?.step
   const visible = shouldLockTourOverlay(open, Boolean(step))
@@ -129,6 +144,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const wasOpenRef = useRef(false)
+  const didOpenRef = useRef(false)
 
   if (open && !wasOpenRef.current) {
     previousActiveElementRef.current = captureActiveElement()
@@ -137,33 +153,51 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   const reactId = useId()
   const titleId = `tiger-tour-${reactId}-title`
   const descriptionId = `tiger-tour-${reactId}-description`
-  const { anchorRef, target: portalTarget } = useOverlayPortalTarget()
+  const { anchorRef } = useOverlayPortalTarget()
+  const targetExemptRef = useRef<HTMLElement | null>(null)
 
-  useEffect(() => {
-    if (!loadSteps) {
-      setResolvedSteps(steps)
+  useLayoutEffect(() => {
+    if (!open) {
+      setLoadPhase('idle')
       return
     }
-    if (!open) return
-
+    const loader = loadStepsRef.current
+    if (!loader) {
+      setLoadPhase('ready')
+      return
+    }
     let cancelled = false
-    Promise.resolve(loadSteps())
+    setLoadPhase('loading')
+    setResolvedSteps([])
+    Promise.resolve(loader())
       .then((nextSteps) => {
-        if (!cancelled) setResolvedSteps(nextSteps)
+        if (cancelled) return
+        setResolvedSteps(nextSteps)
+        setLoadPhase('ready')
       })
-      .catch(() => undefined)
-
+      .catch(() => {
+        if (!cancelled) setLoadPhase('error')
+      })
     return () => {
       cancelled = true
     }
-  }, [loadSteps, open, steps])
+  }, [open, hasLoader])
 
   useLayoutEffect(() => {
-    if (open) return
+    if (open) {
+      didOpenRef.current = true
+      return
+    }
+    if (!didOpenRef.current) return
+    didOpenRef.current = false
     restoreFocus(previousActiveElementRef.current)
     previousActiveElementRef.current = null
-    setInternalStep(0)
-  }, [open])
+    const first = getFirstTourStepIndex(
+      loadStepsRef.current ? resolvedStepsRef.current : stepsRef.current
+    )
+    setInternalStep(first)
+    if (controlledCurrent !== undefined) onChangeRef.current?.(first)
+  }, [open, controlledCurrent])
 
   useLayoutEffect(() => {
     return () => {
@@ -173,29 +207,40 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
     }
   }, [])
 
-  const measure = useCallback(() => {
+  const measure = useCallback((shouldScroll: boolean) => {
     if (!open || !step) {
       setTargetRect(undefined)
+      targetExemptRef.current = null
       return
     }
     const targetEl = resolveTourTarget(step.target)
+    targetExemptRef.current = step.interact ? (targetEl ?? null) : null
     if (targetEl) {
-      scrollTourTargetIntoView(targetEl)
+      if (shouldScroll) scrollTourTargetIntoView(targetEl)
       setTargetRect(getTourRectFromElement(targetEl))
     } else {
       setTargetRect(undefined)
     }
     const size = getTourSizeFromElement(popoverRef.current)
     if (size) setPopoverSize(size)
+    syncModalInert()
   }, [open, step])
 
+  const scrolledKeyRef = useRef('')
   useLayoutEffect(() => {
-    if (visible) measure()
-  }, [visible, measure])
+    if (!visible) {
+      scrolledKeyRef.current = ''
+      return
+    }
+    const key = `${currentStep}`
+    const shouldScroll = scrolledKeyRef.current !== key
+    scrolledKeyRef.current = key
+    measure(shouldScroll)
+  }, [visible, currentStep, measure])
 
   useEffect(() => {
     if (!visible) return
-    const handler = () => measure()
+    const handler = () => measure(false)
     const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(handler) : undefined
     if (popoverRef.current) observer?.observe(popoverRef.current)
     const targetEl = resolveTourTarget(step?.target)
@@ -209,10 +254,25 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
     }
   }, [visible, measure, step?.target])
 
+  const focusKeyRef = useRef('')
   useLayoutEffect(() => {
-    if (!visible) return
-    focusFirst([closeButtonRef.current, popoverRef.current])
-  }, [visible])
+    if (!visible) {
+      focusKeyRef.current = ''
+      return
+    }
+    const root = popoverRef.current
+    if (!root) return
+    const opened = focusKeyRef.current === ''
+    focusKeyRef.current = `${currentStep}`
+    if (opened && initialFocus) {
+      const specified = root.querySelector(initialFocus)
+      if (specified instanceof HTMLElement) {
+        specified.focus()
+        return
+      }
+    }
+    root.focus()
+  }, [visible, currentStep, initialFocus])
 
   const applyNavEvents = useCallback(
     (events: TourNavEvent[]) => {
@@ -244,9 +304,18 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
     [close, maskClosable]
   )
 
-  useEscapeKey({ enabled: visible && keyboard, onEscape: close, layerRef: rootRef })
-  useBodyScrollLock({ enabled: visible })
-  useFocusTrap({ enabled: visible, containerRef: rootRef, inert: true })
+  const showError = open && loadPhase === 'error'
+  const overlayActive = visible || showError
+  useEscapeKey({ enabled: overlayActive && keyboard, onEscape: close, layerRef: rootRef })
+  useBodyScrollLock({ enabled: overlayActive })
+  useFocusTrap({
+    enabled: overlayActive,
+    containerRef: rootRef,
+    inert: true,
+    autoFocus: true,
+    initialFocusRef: popoverRef,
+    exemptRef: step?.interact ? targetExemptRef : undefined
+  })
 
   const {
     ['aria-labelledby']: ariaLabelledbyFromRest,
@@ -258,12 +327,42 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   } = rest
 
   const anchor = <span ref={anchorRef} hidden />
+  if (showError) {
+    return (
+      <>
+        {anchor}
+        <OverlayPortal>
+          <div ref={rootRef} className="contents" data-tiger-overlay-layer="" data-tiger-tour-root="">
+            <div
+              ref={popoverRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label={labels.loadErrorText}
+              className={tourPopoverClasses}
+              tabIndex={-1}
+              data-tiger-tour="">
+              <p>{labels.loadErrorText}</p>
+              <Button type="button" size="sm" onClick={close}>
+                {labels.closeAriaLabel}
+              </Button>
+            </div>
+            <div className="contents" data-tiger-overlay-host="" />
+          </div>
+        </OverlayPortal>
+      </>
+    )
+  }
   if (!visible || !step || !ctx) return anchor
 
   const placement: TourPlacement = step.placement ?? 'bottom'
   const showMask = step.mask !== false
   const popoverStyle = {
-    ...getTourPopoverStyle(targetRect, popoverSize, placement),
+    ...getTourPopoverStyle(
+      targetRect,
+      popoverSize,
+      placement,
+      mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
+    ),
     ...style
   } as React.CSSProperties
   const hasTitle = Boolean(renderTitle || step.title)
@@ -276,7 +375,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   ) : (
     <div className={tourFooterClasses}>
       {showIndicators && (
-        <span className={tourIndicatorClasses} aria-live="polite">
+        <span className={tourIndicatorClasses}>
           {ctx.position + 1} / {ctx.total}
         </span>
       )}
@@ -301,13 +400,29 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   const overlay = (
     <div ref={rootRef} className="contents" data-tiger-overlay-layer="" data-tiger-tour-root="">
       {showMask && (
-        <div
-          className={tourMaskClasses}
-          data-tiger-tour-mask=""
-          aria-hidden="true"
-          style={targetRect ? (getTourMaskHoleStyle(targetRect) as React.CSSProperties) : undefined}
-          onClick={handleMaskClick}
-        />
+        <>
+          <div
+            className={classNames(tourMaskClasses, 'bg-transparent')}
+            data-tiger-tour-mask=""
+            aria-hidden="true"
+            style={
+              {
+                ...(step.interact && targetRect ? getTourMaskHoleStyle(targetRect) : null),
+                ...(targetRect && !step.interact ? { backgroundColor: 'transparent' } : null)
+              } as React.CSSProperties
+            }
+            onClick={handleMaskClick}
+          />
+          <div
+            className="pointer-events-none"
+            data-tiger-tour-shade=""
+            style={
+              targetRect
+                ? (getTourShadeStyle(targetRect) as React.CSSProperties)
+                : { pointerEvents: 'none' }
+            }
+          />
+        </>
       )}
 
       <div
@@ -358,7 +473,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   return (
     <>
       {anchor}
-      {renderOverlayPortal(overlay, portalTarget)}
+      <OverlayPortal>{overlay}</OverlayPortal>
     </>
   )
 })

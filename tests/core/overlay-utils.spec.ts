@@ -13,7 +13,7 @@ import {
   shouldCloseOnMaskClick,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
-  scheduleOverlayLeave,
+  whenOverlayTransitionEnds,
   canStartOverlaySwipeClose,
   isOverlayDragHandleEvent,
   clampOverlayDragOffset
@@ -154,9 +154,9 @@ describe('overlay-utils (core)', () => {
     expect(next.y).toBe(600 - 48 - 80)
   })
 
-  it('scheduleOverlayLeave finishes immediately when motion is reduced', () => {
+  it('whenOverlayTransitionEnds finishes immediately when motion is reduced', () => {
     const onFinish = vi.fn()
-    const cancel = scheduleOverlayLeave({ onFinish, reducedMotion: true })
+    const cancel = whenOverlayTransitionEnds(document.createElement('div'), onFinish, true)
     expect(onFinish).toHaveBeenCalledTimes(1)
     cancel()
   })
@@ -258,18 +258,24 @@ describe('overlay-utils (core)', () => {
     expect(app.hasAttribute('inert')).toBe(false)
   })
 
-  it('setBackgroundInert leaves sibling overlay layers interactive', () => {
+  it('setBackgroundInert inerts sibling modal layers and leaves toasts interactive', () => {
     const app = document.createElement('div')
-    const outer = document.createElement('div')
-    outer.setAttribute('data-tiger-overlay-layer', '')
-    const inner = document.createElement('div')
-    inner.setAttribute('data-tiger-overlay-layer', '')
-    document.body.append(app, outer, inner)
+    const modal = document.createElement('div')
+    modal.setAttribute('data-tiger-modal', '')
+    const toast = document.createElement('div')
+    toast.setAttribute('data-tiger-toast', '')
+    const top = document.createElement('div')
+    document.body.append(app, modal, toast, top)
 
-    const release = setBackgroundInert(outer)
+    const release = setBackgroundInert(top)
     expect(app.hasAttribute('inert')).toBe(true)
-    expect(inner.hasAttribute('inert')).toBe(false)
+    expect(modal.hasAttribute('inert')).toBe(true)
+    expect(toast.hasAttribute('inert')).toBe(false)
     release()
+    app.remove()
+    modal.remove()
+    toast.remove()
+    top.remove()
   })
 
   it('isFocusInForeignOverlay is true only for a different overlay layer', () => {

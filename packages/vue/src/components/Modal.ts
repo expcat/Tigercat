@@ -7,17 +7,13 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
-  useId
+  useId,
+  getCurrentInstance
 } from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
-  closeIconViewBox,
-  closeIconPathD,
-  closeIconPathStrokeLinecap,
-  closeIconPathStrokeLinejoin,
-  closeIconPathStrokeWidth,
   getModalContentClasses,
   getGestureTouchPoint,
   isModalSheetSwipeCloseGesture,
@@ -28,14 +24,18 @@ import {
   modalTitleClasses,
   modalCloseButtonClasses,
   modalBodyClasses,
+  modalDragStyle,
   modalFooterClasses,
+  createDismissActionEvent,
+  settleDismissAction,
+  type DismissActionEvent,
   getModalLabels,
   mergeTigerLocale,
   shouldCloseOnMaskClick,
   resolveSwipeGesture,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
-  scheduleOverlayLeave,
+  whenOverlayTransitionEnds,
   canStartOverlaySwipeClose,
   isOverlayDragHandleEvent,
   clampOverlayDragOffset,
@@ -48,11 +48,18 @@ import {
   type ModalSize,
   OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
+import {
+  closeIconViewBox,
+  closeIconPathD,
+  closeIconPathStrokeLinecap,
+  closeIconPathStrokeLinejoin,
+  closeIconPathStrokeWidth
+} from '@expcat/tigercat-core/icons/common'
 
 import { Button } from './Button'
+import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 import { useTigerConfig } from './ConfigProvider'
 import {
-  renderVueOverlayTeleport,
   useVueBodyScrollLock,
   useVueEscapeKey,
   useVueFocusTrap,
@@ -79,6 +86,7 @@ export interface VueModalProps {
   cancelText?: string
   showDefaultFooter?: boolean
   draggable?: boolean
+  initialFocus?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleModal>
 }
@@ -190,6 +198,10 @@ export const Modal = defineComponent({
       type: String,
       default: undefined
     },
+    initialFocus: {
+      type: String,
+      default: undefined
+    },
 
     /**
      * Custom inline style
@@ -264,8 +276,20 @@ export const Modal = defineComponent({
       getModalLabels(mergedLocale.value, {
         ...props.labels,
         ...(props.closeAriaLabel ? { closeAriaLabel: props.closeAriaLabel } : {}),
-        ...(props.okText ? { okText: props.okText } : {}),
-        ...(props.cancelText ? { cancelText: props.cancelText } : {})
+        ...(props.okText
+          ? { okText: props.okText }
+          : props.locale?.modal?.okText
+            ? { okText: props.locale.modal.okText }
+            : props.locale?.common?.okText
+              ? { okText: props.locale.common.okText }
+              : {}),
+        ...(props.cancelText
+          ? { cancelText: props.cancelText }
+          : props.locale?.modal?.cancelText
+            ? { cancelText: props.locale.modal.cancelText }
+            : props.locale?.common?.cancelText
+              ? { cancelText: props.locale.common.cancelText }
+              : {})
       })
     )
 
@@ -344,8 +368,33 @@ export const Modal = defineComponent({
       emit('close')
     }
 
-    const handleOk = () => {
-      emit('ok')
+    const confirming = ref(false)
+    const vueInstance = getCurrentInstance()
+    const handleOk = async () => {
+      if (confirming.value) return
+      const event = createDismissActionEvent()
+      const raw = (vueInstance?.vnode.props as { onOk?: unknown } | null)?.onOk
+      const handlers = (Array.isArray(raw) ? raw : raw ? [raw] : []).filter(
+        (handler): handler is (event: DismissActionEvent) => unknown => typeof handler === 'function'
+      )
+      let result: unknown
+      try {
+        for (const handler of handlers) {
+          const value = handler(event)
+          if (result === undefined) result = value
+        }
+      } catch {
+        return
+      }
+      if (event.defaultPrevented) return
+      const pending =
+        typeof result === 'object' &&
+        result !== null &&
+        typeof (result as Promise<unknown>).then === 'function'
+      if (pending) confirming.value = true
+      const outcome = await settleDismissAction(result, event)
+      if (pending) confirming.value = false
+      if (outcome !== 'close') return
       emit('update:open', false)
       emit('close')
     }
@@ -416,7 +465,23 @@ export const Modal = defineComponent({
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(overlayOpen)
-    useVueFocusTrap({ enabled: overlayOpen, containerRef: rootRef, inert: true, autoFocus: true })
+    const focusTarget = ref<HTMLElement | null>(null)
+    watch(
+      [() => props.open, () => props.initialFocus, dialogRef],
+      () => {
+        const root = dialogRef.value
+        const found = props.initialFocus && root ? root.querySelector(props.initialFocus) : null
+        focusTarget.value = found instanceof HTMLElement ? found : root
+      },
+      { flush: 'post', immediate: true }
+    )
+    useVueFocusTrap({
+      enabled: overlayOpen,
+      containerRef: rootRef,
+      inert: true,
+      autoFocus: true,
+      initialFocusRef: focusTarget
+    })
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
@@ -444,11 +509,9 @@ export const Modal = defineComponent({
         if (!previousVisible) return
         leaving.value = true
         onCleanup(
-          scheduleOverlayLeave({
-            onFinish: () => {
-              leaving.value = false
-              emit('after-close')
-            }
+          whenOverlayTransitionEnds(dialogRef.value, () => {
+            leaving.value = false
+            emit('after-close')
           })
         )
       }
@@ -520,7 +583,11 @@ export const Modal = defineComponent({
         props.draggable && (dragOffset.value.x !== 0 || dragOffset.value.y !== 0)
           ? { transform: `translate(${dragOffset.value.x}px, ${dragOffset.value.y}px)` }
           : undefined
-      const finalStyle = mergeStyleValues(mergedStyle, dragStyle)
+      const finalStyle = mergeStyleValues(
+        mergedStyle,
+        dragStyle,
+        dragging.value ? modalDragStyle : undefined
+      )
 
       const header =
         props.title || slots.title || props.closable
@@ -592,7 +659,7 @@ export const Modal = defineComponent({
               ),
               h(
                 Button,
-                { onClick: handleOk },
+                { onClick: handleOk, loading: confirming.value, disabled: confirming.value },
                 {
                   default: () => modalLabels.value.okText
                 }
@@ -657,7 +724,10 @@ export const Modal = defineComponent({
         ]
       )
 
-      return [anchor, renderVueOverlayTeleport([renderedWrapper], portalTarget.value)]
+      return [
+        anchor,
+        renderVueOverlayOutlet(instanceId.value, renderedWrapper, portalTarget.value)
+      ]
     }
   }
 })

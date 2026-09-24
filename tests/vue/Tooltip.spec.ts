@@ -6,7 +6,10 @@ import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import { fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { nextTick } from 'vue'
-import { DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS } from '@expcat/tigercat-core'
+import {
+  DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS,
+  DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS
+} from '@expcat/tigercat-core'
 import { Tooltip } from '@expcat/tigercat-vue/Tooltip'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
@@ -95,6 +98,8 @@ describe('Tooltip', () => {
 
       const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
       await fireEvent.mouseEnter(trigger)
+      vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS)
+      await nextTick()
       expect(getByText('Tooltip content')).toBeVisible()
 
       await fireEvent.mouseLeave(trigger)
@@ -118,6 +123,8 @@ describe('Tooltip', () => {
 
       const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
       await fireEvent.mouseEnter(trigger)
+      vi.advanceTimersByTime(DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS)
+      await nextTick()
       expect(getByText('Tooltip content')).toBeVisible()
 
       await fireEvent.mouseLeave(trigger)
@@ -138,15 +145,14 @@ describe('Tooltip', () => {
     })
   })
 
-  it('supports content slot', async () => {
+  it('renders plain text content', async () => {
     const user = userEvent.setup()
     const { getByText, container } = renderWithSlots(
       Tooltip,
       {
-        default: '<button>Trigger</button>',
-        content: '<strong>Custom content</strong>'
+        default: '<button>Trigger</button>'
       },
-      { trigger: 'hover' }
+      { trigger: 'hover', content: 'Custom content' }
     )
 
     const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement

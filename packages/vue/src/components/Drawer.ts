@@ -12,11 +12,6 @@ import {
 import {
   classNames,
   coerceClassValue,
-  closeIconViewBox,
-  closeIconPathD,
-  closeIconPathStrokeLinecap,
-  closeIconPathStrokeLinejoin,
-  closeIconPathStrokeWidth,
   getDrawerLabels,
   mergeTigerLocale,
   mergeStyleValues,
@@ -35,7 +30,8 @@ import {
   resolveSwipeGesture,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,
-  scheduleOverlayLeave,
+  whenOverlayTransitionEnds,
+  isDrawerMobileFullscreen,
   canStartOverlaySwipeClose,
   OVERLAY_SWIPE_HANDLE_ATTR,
   resolveDrawerPlacement,
@@ -48,7 +44,14 @@ import {
   OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
 import {
-  renderVueOverlayTeleport,
+  closeIconViewBox,
+  closeIconPathD,
+  closeIconPathStrokeLinecap,
+  closeIconPathStrokeLinejoin,
+  closeIconPathStrokeWidth
+} from '@expcat/tigercat-core/icons/common'
+import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
+import {
   useVueBodyScrollLock,
   useVueEscapeKey,
   useVueFocusTrap,
@@ -69,12 +72,12 @@ export interface VueDrawerProps {
   zIndex?: number
   className?: string
   bodyClassName?: string
-  bodyPadding?: boolean | string
+  bodyPadding?: boolean
   destroyOnClose?: boolean
   fullscreenOnMobile?: boolean
-  panelClassName?: string
   panelStyle?: StyleValue
   closeAriaLabel?: string
+  initialFocus?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleDrawer>
 }
@@ -164,9 +167,13 @@ export const Drawer = defineComponent({
       default: OVERLAY_Z_INDEX.modal
     },
     /**
-     * Additional CSS class for the drawer panel (same node as panelClassName)
+     * Additional CSS class for the drawer panel.
      */
     className: {
+      type: String,
+      default: undefined
+    },
+    initialFocus: {
       type: String,
       default: undefined
     },
@@ -178,11 +185,10 @@ export const Drawer = defineComponent({
       default: undefined
     },
     /**
-     * Padding override for the drawer body. `false` removes the built-in
-     * padding; a string supplies a custom padding utility class.
+     * `false` removes the default body padding.
      */
     bodyPadding: {
-      type: [Boolean, String] as PropType<boolean | string>,
+      type: Boolean,
       default: undefined
     },
     /**
@@ -201,14 +207,6 @@ export const Drawer = defineComponent({
     fullscreenOnMobile: {
       type: Boolean,
       default: true
-    },
-
-    /**
-     * Additional CSS class for drawer panel.
-     */
-    panelClassName: {
-      type: String,
-      default: undefined
     },
 
     /**
@@ -266,11 +264,11 @@ export const Drawer = defineComponent({
     let touchStartPoint: GesturePoint | null = null
     let touchCurrentPoint: GesturePoint | null = null
     let swipeAllowed = false
+    const writingDirection = computed<'ltr' | 'rtl'>(() =>
+      mergedLocale.value?.direction === 'rtl' ? 'rtl' : 'ltr'
+    )
     const resolvedPlacement = computed(() =>
-      resolveDrawerPlacement(
-        props.placement,
-        mergedLocale.value?.direction === 'rtl' ? 'rtl' : 'ltr'
-      )
+      resolveDrawerPlacement(props.placement, writingDirection.value)
     )
 
     const titleId = computed(() => `${instanceId.value}-title`)
@@ -312,7 +310,14 @@ export const Drawer = defineComponent({
       swipeAllowed = canStartOverlaySwipeClose({
         target: event.target,
         scrollContainer: bodyRef.value,
-        closeDirection: getDrawerSwipeCloseDirection(resolvedPlacement.value)
+        closeDirection: getDrawerSwipeCloseDirection({
+          placement: resolvedPlacement.value,
+          direction: writingDirection.value,
+          fullscreen: isDrawerMobileFullscreen({
+            fullscreenOnMobile: props.fullscreenOnMobile,
+            viewportWidth: window.innerWidth
+          })
+        })
       })
       const point = getGestureTouchPoint(event.touches)
       touchStartPoint = point
@@ -340,7 +345,20 @@ export const Drawer = defineComponent({
       const allowed = swipeAllowed
       resetTouchGesture()
 
-      if (allowed && isDrawerSwipeCloseGesture(resolvedPlacement.value, gesture)) {
+      if (
+        allowed &&
+        isDrawerSwipeCloseGesture(
+          {
+            placement: resolvedPlacement.value,
+            direction: writingDirection.value,
+            fullscreen: isDrawerMobileFullscreen({
+              fullscreenOnMobile: props.fullscreenOnMobile,
+              viewportWidth: window.innerWidth
+            })
+          },
+          gesture
+        )
+      ) {
         handleClose()
       }
     }
@@ -355,11 +373,22 @@ export const Drawer = defineComponent({
     let cleanupEscape: (() => void) | undefined
 
     useVueBodyScrollLock(overlayOpen)
+    const focusTarget = ref<HTMLElement | null>(null)
+    watch(
+      [() => props.open, () => props.initialFocus, dialogRef],
+      () => {
+        const root = dialogRef.value
+        const found = props.initialFocus && root ? root.querySelector(props.initialFocus) : null
+        focusTarget.value = found instanceof HTMLElement ? found : root
+      },
+      { flush: 'post', immediate: true }
+    )
     useVueFocusTrap({
       enabled: overlayOpen,
       containerRef: rootRef,
       inert: true,
-      autoFocus: true
+      autoFocus: true,
+      initialFocusRef: focusTarget
     })
 
     onMounted(() => {
@@ -381,20 +410,16 @@ export const Drawer = defineComponent({
           hasOpened.value = true
           leaving.value = false
           onCleanup(
-            scheduleOverlayLeave({
-              onFinish: () => emit('after-enter')
-            })
+            whenOverlayTransitionEnds(dialogRef.value, () => emit('after-enter'))
           )
           return
         }
         if (prevVisible !== true) return
         leaving.value = true
         onCleanup(
-          scheduleOverlayLeave({
-            onFinish: () => {
-              leaving.value = false
-              emit('after-close')
-            }
+          whenOverlayTransitionEnds(dialogRef.value, () => {
+            leaving.value = false
+            emit('after-close')
           })
         )
       },
@@ -436,7 +461,7 @@ export const Drawer = defineComponent({
         ),
         'flex flex-col',
         props.className,
-        props.panelClassName,
+
         coerceClassValue(attrs.class)
       )
 
@@ -566,7 +591,7 @@ export const Drawer = defineComponent({
         ]
       )
 
-      return [anchor, renderVueOverlayTeleport([root], portalTarget.value)]
+      return [anchor, renderVueOverlayOutlet(instanceId.value, root, portalTarget.value)]
     }
   }
 })

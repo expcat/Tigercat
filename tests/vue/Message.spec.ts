@@ -35,25 +35,43 @@ function mountProvider(locale: typeof zhCN) {
 }
 
 describe('Message (Vue)', () => {
+  let unmountProvider: (() => void) | undefined
+
+  function mountHost() {
+    const root = document.createElement('div')
+    document.body.append(root)
+    const app = createApp({
+      render: () => h(ConfigProvider, () => h('span', 'app'))
+    })
+    app.mount(root)
+    return () => {
+      app.unmount()
+      root.remove()
+    }
+  }
+
   beforeAll(async () => {
+    const unmount = mountHost()
     Message.info({ content: '__warmup__', duration: 0 })
     await vi.waitFor(() => {
       expect(document.querySelector('[data-tiger-message]')).toBeTruthy()
     })
     Message.clear()
-    document.body.innerHTML = ''
+    await flushHost()
+    unmount()
   })
 
   beforeEach(async () => {
+    vi.useRealTimers()
+    unmountProvider = mountHost()
     Message.clear()
-    document.body.innerHTML = ''
     await flushHost()
   })
 
   afterEach(() => {
     vi.useRealTimers()
     Message.clear()
-    document.body.innerHTML = ''
+    unmountProvider?.()
   })
 
   it('renders three messages from one turn without waitFor', async () => {

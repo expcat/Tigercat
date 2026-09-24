@@ -3,14 +3,14 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { resolveAlertRole } from '@expcat/tigercat-core'
+import { resolveAlertLive } from '@expcat/tigercat-core'
 
 describe('Alert live role', () => {
-  it('is alert only for error content, never for an empty shell', () => {
-    expect(resolveAlertRole('error', true)).toBe('alert')
-    expect(resolveAlertRole('error', false)).toBeUndefined()
-    expect(resolveAlertRole('info', true)).toBeUndefined()
-    expect(resolveAlertRole('success', true)).toBeUndefined()
-    expect(resolveAlertRole('warning', true)).toBeUndefined()
+  it('keeps error as alert and announces inserted non-error status', () => {
+    expect(resolveAlertLive('error', true, false)).toEqual({ role: 'alert' })
+    expect(resolveAlertLive('error', false, true)).toEqual({})
+    expect(resolveAlertLive('info', true, false)).toEqual({})
+    expect(resolveAlertLive('success', true, true)).toEqual({ role: 'status', ariaLive: 'polite' })
+    expect(resolveAlertLive('warning', true, true)).toEqual({ role: 'status', ariaLive: 'polite' })
   })
 })

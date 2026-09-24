@@ -74,7 +74,7 @@ export interface LoadingProps {
 
   /**
    * Custom background color (for fullscreen / region overlay)
-   * @default 'color-mix(in srgb, var(--tiger-surface, #ffffff) 90%, transparent)'
+   * @default 'color-mix(in srgb, var(--tiger-surface) 90%, transparent)'
    */
   background?: string
 

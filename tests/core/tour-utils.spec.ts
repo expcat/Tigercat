@@ -9,6 +9,8 @@ import {
   getCurrentActiveTourStep,
   getTourCenteredPosition,
   getTourMaskHoleStyle,
+  getTourShadeStyle,
+  resolveTourLogicalPlacement,
   getTourPopoverPosition,
   getOppositeTourPlacement,
   resolveTourNav,
@@ -123,16 +125,27 @@ describe('tour utilities', () => {
     expect(position.top).toBe(150)
   })
 
-  it('builds a clip-path hole whose pixels match the viewport rect', () => {
+  it('builds a visual shade that does not receive pointer events', () => {
     const rect = { top: 100, left: 200, width: 50, height: 30 }
-    const style = getTourMaskHoleStyle(rect)
+    const style = getTourShadeStyle(rect)
     const padding = 4
 
-    expect(style.clipPath).toContain('evenodd')
-    expect(style.clipPath).toContain(`${rect.left - padding}px ${rect.top - padding}px`)
-    expect(style.clipPath).toContain(
-      `${rect.left + rect.width + padding}px ${rect.top + rect.height + padding}px`
-    )
+    expect(style.pointerEvents).toBe('none')
+    expect(style.top).toBe(`${rect.top - padding}px`)
+    expect(style.left).toBe(`${rect.left - padding}px`)
+    expect(style.boxShadow).toContain('9999px')
+  })
+
+  it('keeps the interactive clip-path for steps that pass clicks through', () => {
+    const rect = { top: 100, left: 200, width: 50, height: 30 }
+    expect(getTourMaskHoleStyle(rect).clipPath).toContain('evenodd')
+  })
+
+  it('maps start and end with writing direction and keeps physical sides', () => {
+    expect(resolveTourLogicalPlacement('top-start', 'rtl')).toBe('top-end')
+    expect(resolveTourLogicalPlacement('bottom-end', 'rtl')).toBe('bottom-start')
+    expect(resolveTourLogicalPlacement('left', 'rtl')).toBe('left')
+    expect(resolveTourLogicalPlacement('right-start', 'ltr')).toBe('right-start')
   })
 
   it('resolves an element target and swallows illegal selectors', () => {

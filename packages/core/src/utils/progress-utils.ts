@@ -5,65 +5,43 @@ import type {
   ProgressType,
   ProgressVariant
 } from '../types/progress'
-import { isBrowser } from './env'
 import { getProgressTextColorClasses, getProgressVariantClasses } from './theme-colors'
 
-export const PROGRESS_STYLE_ID = 'tiger-ui-progress-styles'
-
-export const PROGRESS_CSS = `
-@keyframes tiger-progress-stripes {
-  from { background-position: 1rem 0; }
-  to { background-position: 0 0; }
-}
-
-.tiger-progress-fill {
-  transition: width 300ms ease-in-out, stroke-dashoffset 300ms ease;
-}
-
-.tiger-progress-striped {
-  background-image: linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.2) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.2) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 1rem 1rem;
-}
-
-.tiger-progress-striped-animated {
-  animation: tiger-progress-stripes 1s linear infinite;
-}
-
-.tiger-progress-paused .tiger-progress-striped-animated,
-.tiger-progress-striped-animated.tiger-progress-paused {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tiger-progress-fill {
-    transition: none;
+/** Stripes, fill transition, and reduced motion. Mounted components do not write to document.head. */
+export const progressBaseStyles = {
+  '@keyframes tiger-progress-stripes': {
+    from: { backgroundPosition: '1rem 0' },
+    to: { backgroundPosition: '0 0' }
+  },
+  '.tiger-progress-fill': {
+    transitionProperty: 'width, stroke-dashoffset',
+    transitionDuration: 'var(--tiger-motion-duration-slow)',
+    transitionTimingFunction: 'var(--tiger-motion-ease-standard)'
+  },
+  '.tiger-progress-striped': {
+    backgroundImage:
+      'linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent)',
+    backgroundSize: '1rem 1rem'
+  },
+  '.tiger-progress-striped-animated': {
+    animation: 'tiger-progress-stripes var(--tiger-motion-duration-slow) linear infinite'
+  },
+  '.tiger-progress-paused .tiger-progress-striped-animated, .tiger-progress-striped-animated.tiger-progress-paused':
+    {
+      animationPlayState: 'paused'
+    },
+  '@media (prefers-reduced-motion: reduce)': {
+    '.tiger-progress-fill': {
+      transition: 'none'
+    },
+    '.tiger-progress-striped-animated': {
+      animation: 'none'
+    }
   }
-  .tiger-progress-striped-animated {
-    animation: none;
-  }
-}
-`
-
-export function injectProgressStyles(): void {
-  if (!isBrowser()) return
-  if (document.getElementById(PROGRESS_STYLE_ID)) return
-  const style = document.createElement('style')
-  style.id = PROGRESS_STYLE_ID
-  style.textContent = PROGRESS_CSS
-  document.head.appendChild(style)
-}
+} as const
 
 export const progressLineBaseClasses =
-  'relative overflow-hidden rounded-[var(--tiger-component-progress-border-radius,9999px)]'
+  'relative overflow-hidden rounded-[var(--tiger-component-progress-border-radius)]'
 
 export const progressLineInnerClasses = 'tiger-progress-fill h-full rounded-[inherit]'
 
@@ -72,9 +50,9 @@ export const progressTextBaseClasses = 'font-medium ms-2'
 export const progressCircleBaseClasses = 'relative inline-flex items-center justify-center'
 
 export const progressLineSizeClasses: Record<ProgressSize, string> = {
-  sm: 'h-[var(--tiger-component-progress-height-sm,4px)]',
-  md: 'h-[var(--tiger-component-progress-height-md,8px)]',
-  lg: 'h-[var(--tiger-component-progress-height-lg,12px)]'
+  sm: 'h-[var(--tiger-component-progress-height-sm)]',
+  md: 'h-[var(--tiger-component-progress-height-md)]',
+  lg: 'h-[var(--tiger-component-progress-height-lg)]'
 } as const
 
 export const progressCircleSizeClasses: Record<ProgressSize, number> = {
@@ -164,11 +142,11 @@ export function getCircleSize(
   return { width, height, radius, cx, cy, strokeWidth: safeStroke }
 }
 
-export const progressTrackBgClasses = 'bg-[color:var(--tiger-border,#e5e7eb)]'
+export const progressTrackBgClasses = 'bg-[color:var(--tiger-border)]'
 
 export const progressCircleTextClasses = 'absolute inset-0 flex items-center justify-center'
 
-export const progressCircleTrackStrokeClasses = 'text-[color:var(--tiger-border,#e5e7eb)]'
+export const progressCircleTrackStrokeClasses = 'text-[color:var(--tiger-border)]'
 
 export interface ProgressViewInput {
   percentage?: number

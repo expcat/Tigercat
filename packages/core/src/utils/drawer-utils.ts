@@ -5,13 +5,14 @@
 import { classNames } from './class-names'
 import type { DrawerPlacement, DrawerSize } from '../types/drawer'
 import type { SwipeGesture, SwipeDirection } from './gesture-utils'
+import { RESPONSIVE_BREAKPOINT_FALLBACK_PX } from './responsive'
 
 /**
  * Get mask/backdrop classes
  */
 export function getDrawerMaskClasses(visible: boolean): string {
   return classNames(
-    'fixed inset-0 bg-[var(--tiger-component-drawer-overlay-bg,rgba(0,0,0,0.45))] backdrop-blur-[2px] tiger-motion-aware [transition:var(--tiger-transition-base,opacity_300ms_ease)]',
+    'fixed inset-0 bg-[var(--tiger-component-drawer-overlay-bg)] backdrop-blur-[2px] tiger-motion-aware [transition:var(--tiger-transition-base)]',
     visible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
   )
 }
@@ -33,24 +34,24 @@ export function getDrawerPanelClasses(
   fullscreenOnMobile: boolean = true
 ): string {
   const baseClasses =
-    'absolute bg-[var(--tiger-surface,#ffffff)] shadow-xl pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base,transform_300ms_ease)]'
+    'absolute bg-[var(--tiger-surface)] shadow-xl pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base)]'
   const mobileFullscreenClasses = 'max-md:inset-0 max-md:!w-screen max-md:!h-[100dvh]'
 
   const sizeMap: Record<DrawerSize, { width: string; height: string }> = {
     sm: {
-      width: 'w-[var(--tiger-component-drawer-width-sm,256px)]',
+      width: 'w-[var(--tiger-component-drawer-width-sm)]',
       height: 'h-48'
     },
     md: {
-      width: 'w-[var(--tiger-component-drawer-width-md,378px)]',
+      width: 'w-[var(--tiger-component-drawer-width-md)]',
       height: 'h-64'
     },
     lg: {
-      width: 'w-[var(--tiger-component-drawer-width-lg,520px)]',
+      width: 'w-[var(--tiger-component-drawer-width-lg)]',
       height: 'h-96'
     },
     xl: {
-      width: 'w-[var(--tiger-component-drawer-width-xl,680px)]',
+      width: 'w-[var(--tiger-component-drawer-width-xl)]',
       height: 'h-[32rem]'
     },
     full: { width: 'w-full', height: 'h-full' }
@@ -96,39 +97,60 @@ export function resolveDrawerPlacement(
   return placement
 }
 
-export function getDrawerSwipeCloseDirection(
-  placement: Exclude<DrawerPlacement, 'start' | 'end'>
-): SwipeDirection {
+export interface DrawerSwipeCloseOptions {
+  placement: DrawerPlacement
+  /** Writing direction. `start` / `end` become a physical edge before the swipe axis. */
+  direction?: 'ltr' | 'rtl'
+  /**
+   * Panel is full-bleed. The close swipe then follows the reading direction
+   * outward (LTR right, RTL left) instead of the edge the panel came from.
+   */
+  fullscreen?: boolean
+}
+
+export function isDrawerMobileFullscreen(options: {
+  fullscreenOnMobile: boolean
+  viewportWidth: number
+  mdMinWidth?: number
+}): boolean {
+  if (!options.fullscreenOnMobile) return false
+  const md = options.mdMinWidth ?? RESPONSIVE_BREAKPOINT_FALLBACK_PX.md
+  return options.viewportWidth < md
+}
+
+export function getDrawerSwipeCloseDirection(options: DrawerSwipeCloseOptions): SwipeDirection {
+  const writing = options.direction ?? 'ltr'
+  if (options.fullscreen) return writing === 'rtl' ? 'left' : 'right'
+  const physical = resolveDrawerPlacement(options.placement, writing)
   const directionMap: Record<Exclude<DrawerPlacement, 'start' | 'end'>, SwipeDirection> = {
     left: 'left',
     right: 'right',
     top: 'up',
     bottom: 'down'
   }
-
-  return directionMap[placement]
+  return directionMap[physical]
 }
 
 export function isDrawerSwipeCloseGesture(
-  placement: Exclude<DrawerPlacement, 'start' | 'end'>,
+  options: DrawerSwipeCloseOptions,
   gesture: SwipeGesture | null | undefined
 ): boolean {
-  return Boolean(gesture && gesture.direction === getDrawerSwipeCloseDirection(placement))
+  return Boolean(gesture && gesture.direction === getDrawerSwipeCloseDirection(options))
 }
 
 /**
  * Get drawer header classes
  */
 export function getDrawerHeaderClasses(): string {
-  return 'flex items-center justify-between px-6 py-4 border-b border-[var(--tiger-border,#e5e7eb)]'
+  return 'flex items-center justify-between px-6 py-4 border-b border-[var(--tiger-border)]'
 }
 
 /**
  * Get drawer body classes
  */
-export function getDrawerBodyClasses(customClass?: string, bodyPadding?: boolean | string): string {
-  const padding =
-    bodyPadding === false ? undefined : typeof bodyPadding === 'string' ? bodyPadding : 'px-6 py-4'
+/** `false` removes the default padding. Custom spacing belongs on `bodyClassName`. */
+export function getDrawerBodyClasses(customClass?: string, bodyPadding?: boolean): string {
+  const padding = bodyPadding === false ? undefined : 'px-6 py-4'
   return classNames('flex-1 overflow-y-auto', padding, customClass)
 }
 
@@ -136,7 +158,7 @@ export function getDrawerBodyClasses(customClass?: string, bodyPadding?: boolean
  * Get drawer footer classes
  */
 export function getDrawerFooterClasses(): string {
-  return 'px-6 py-4 border-t border-[var(--tiger-border,#e5e7eb)]'
+  return 'px-6 py-4 border-t border-[var(--tiger-border)]'
 }
 
 /**
@@ -145,10 +167,10 @@ export function getDrawerFooterClasses(): string {
 export function getDrawerCloseButtonClasses(): string {
   return classNames(
     'inline-flex items-center justify-center',
-    'w-8 h-8 rounded-[var(--tiger-radius-md,0.5rem)]',
-    'text-[var(--tiger-text-muted,#9ca3af)] hover:text-[var(--tiger-text-muted,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
+    'w-8 h-8 rounded-[var(--tiger-radius-md)]',
+    'text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-text-secondary)] hover:bg-[var(--tiger-surface-muted)]',
     'transition-colors duration-200',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 focus:ring-offset-2'
+    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary)]/40 focus:ring-offset-2'
   )
 }
 
@@ -156,5 +178,5 @@ export function getDrawerCloseButtonClasses(): string {
  * Get drawer title classes
  */
 export function getDrawerTitleClasses(): string {
-  return 'text-lg font-semibold text-[var(--tiger-text,#111827)]'
+  return 'text-lg font-semibold text-[var(--tiger-text)]'
 }

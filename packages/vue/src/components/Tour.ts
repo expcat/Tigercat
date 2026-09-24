@@ -5,7 +5,6 @@ import {
   ref,
   watch,
   nextTick,
-  onMounted,
   onBeforeUnmount,
   onUnmounted,
   useId,
@@ -27,8 +26,11 @@ import {
   scrollTourTargetIntoView,
   getTourRectFromElement,
   getTourSizeFromElement,
+  getFirstTourStepIndex,
   getTourPopoverStyle,
+  getTourShadeStyle,
   getTourMaskHoleStyle,
+  syncModalInert,
   resolveTourNav,
   getTourStepContext,
   shouldLockTourOverlay,
@@ -37,10 +39,8 @@ import {
   tourCloseEvents,
   shouldCloseOnMaskClick,
   getTourLabels,
-  closeIconPathD,
   mergeTigerLocale,
   captureActiveElement,
-  focusFirst,
   restoreFocus,
   type TourStep,
   type TourStepLoader,
@@ -51,14 +51,15 @@ import {
   type TourNavEvent,
   type TigerLocale
 } from '@expcat/tigercat-core'
+import { closeIconPathD } from '@expcat/tigercat-core/icons/common'
 import { createStatusIcon } from '../utils/icon-helpers'
 import {
-  renderVueOverlayTeleport,
   useVueBodyScrollLock,
   useVueEscapeKey,
   useVueFocusTrap,
   useVueOverlayPortalTarget
 } from '../utils/overlay'
+import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -74,6 +75,11 @@ export interface VueTourProps {
   maskClosable?: boolean
   keyboard?: boolean
   showIndicators?: boolean
+  /**
+   * CSS selector for the node inside the bubble to focus when the step opens.
+   * Defaults to the bubble itself.
+   */
+  initialFocus?: string
   locale?: Partial<TigerLocale>
   className?: string
   style?: Record<string, unknown>
@@ -108,6 +114,7 @@ export const Tour = defineComponent({
     maskClosable: { type: Boolean, default: true },
     keyboard: { type: Boolean, default: true },
     showIndicators: { type: Boolean, default: true },
+    initialFocus: { type: String, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     className: { type: String, default: undefined },
     style: { type: Object as PropType<Record<string, unknown>>, default: undefined }
@@ -123,129 +130,171 @@ export const Tour = defineComponent({
         finishText: props.finishText
       })
     )
+    const direction = computed<'ltr' | 'rtl'>(() =>
+      config.value.direction === 'rtl' || mergedLocale.value?.direction === 'rtl' ? 'rtl' : 'ltr'
+    )
     const internalStep = ref(0)
-    const resolvedSteps = ref<TourStep[]>(props.steps)
+    const resolvedSteps = ref<TourStep[]>([])
+    const loadPhase = ref<'idle' | 'loading' | 'ready' | 'error'>('idle')
+    const displayedSteps = computed(() => (props.loadSteps ? resolvedSteps.value : props.steps))
     const currentStep = computed(() => props.current ?? internalStep.value)
-    const nav = computed(() => resolveTourNav(resolvedSteps.value, currentStep.value))
+    const nav = computed(() => resolveTourNav(displayedSteps.value, currentStep.value))
     const ctx = computed((): TourStepContext | undefined => getTourStepContext(nav.value))
     const step = computed(() => ctx.value?.step)
     const visible = computed(() => shouldLockTourOverlay(props.open, Boolean(step.value)))
+    const showError = computed(() => props.open && loadPhase.value === 'error')
+    const overlayActive = computed(() => visible.value || showError.value)
     const targetRect = ref<TourRect | undefined>()
     const popoverSize = ref<TourSize | undefined>()
     const rootRef = ref<HTMLElement | null>(null)
     const popoverRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
+    const targetExemptRef = ref<HTMLElement | null>(null)
     const { anchorRef, target: portalTarget } = useVueOverlayPortalTarget()
     const instanceId = `tiger-tour-${useId()}`
     const titleId = `${instanceId}-title`
     const descriptionId = `${instanceId}-description`
     let previousActiveElement: HTMLElement | null = null
-    let loadGeneration = 0
+    let loadToken = 0
+    let openedOnce = false
     let resizeObserver: ResizeObserver | undefined
+    const scrolledKey = ref('')
 
-    const updateRect = () => {
-      if (!props.open || !step.value) {
+    const measure = (shouldScroll: boolean) => {
+      const current = step.value
+      if (!props.open || !current) {
         targetRect.value = undefined
+        targetExemptRef.value = null
+        syncModalInert()
         return
       }
-      const targetEl = resolveTourTarget(step.value.target)
+      const targetEl = resolveTourTarget(current.target)
+      targetExemptRef.value = current.interact ? (targetEl ?? null) : null
       if (targetEl) {
-        scrollTourTargetIntoView(targetEl)
+        if (shouldScroll) scrollTourTargetIntoView(targetEl)
         targetRect.value = getTourRectFromElement(targetEl)
       } else {
         targetRect.value = undefined
       }
       const size = getTourSizeFromElement(popoverRef.value)
       if (size) popoverSize.value = size
-    }
-
-    const loadResolvedSteps = async () => {
-      const generation = ++loadGeneration
-      if (!props.loadSteps) {
-        resolvedSteps.value = props.steps
-        return
-      }
-      try {
-        const next = await props.loadSteps()
-        if (generation === loadGeneration) resolvedSteps.value = next
-      } catch {
-        /* keep the previous list */
-      }
+      syncModalInert()
     }
 
     watch(
-      () => props.steps,
-      (next) => {
-        if (!props.loadSteps) resolvedSteps.value = next
-      }
-    )
-
-    watch(
-      () => props.open,
-      (open) => {
-        if (open) {
-          if (props.current === undefined) internalStep.value = 0
-          previousActiveElement = captureActiveElement()
-          void loadResolvedSteps()
-        } else {
-          restoreFocus(previousActiveElement)
-          previousActiveElement = null
-          internalStep.value = 0
+      [() => props.open, () => typeof props.loadSteps === 'function'],
+      ([open]) => {
+        const token = ++loadToken
+        if (!open) {
+          if (openedOnce) {
+            restoreFocus(previousActiveElement)
+            previousActiveElement = null
+            const source = props.loadSteps ? resolvedSteps.value : props.steps
+            const first = getFirstTourStepIndex(source)
+            internalStep.value = first
+            if (props.current !== undefined) emit('update:current', first)
+          }
+          openedOnce = false
+          loadPhase.value = 'idle'
+          scrolledKey.value = ''
+          return
         }
+        openedOnce = true
+        previousActiveElement = captureActiveElement()
+        const loader = props.loadSteps
+        if (!loader) {
+          loadPhase.value = 'ready'
+          return
+        }
+        loadPhase.value = 'loading'
+        resolvedSteps.value = []
+        void Promise.resolve(loader())
+          .then((next) => {
+            if (token !== loadToken) return
+            resolvedSteps.value = next
+            loadPhase.value = 'ready'
+          })
+          .catch(() => {
+            if (token !== loadToken) return
+            loadPhase.value = 'error'
+          })
       },
       { immediate: true }
     )
 
     watch(
-      () => [props.open, currentStep.value, step.value, step.value?.target] as const,
+      [visible, currentStep, () => step.value?.target],
       () => {
-        if (props.open) updateRect()
+        if (!visible.value) return
+        const key = String(currentStep.value)
+        const shouldScroll = scrolledKey.value !== key
+        scrolledKey.value = key
+        nextTick(() => measure(shouldScroll))
       },
-      { immediate: true }
+      { immediate: true, flush: 'post' }
     )
-
-    const bindObservers = () => {
-      resizeObserver?.disconnect()
-      resizeObserver = undefined
-      if (!visible.value || typeof ResizeObserver !== 'function') return
-      resizeObserver = new ResizeObserver(() => updateRect())
-      if (popoverRef.value) resizeObserver.observe(popoverRef.value)
-      const targetEl = resolveTourTarget(step.value?.target)
-      if (targetEl) resizeObserver.observe(targetEl)
-    }
 
     const onViewportChange = () => {
-      if (props.open) updateRect()
+      if (props.open) measure(false)
     }
 
-    onMounted(() => {
-      window.addEventListener('resize', onViewportChange)
-      window.addEventListener('scroll', onViewportChange, true)
-      bindObservers()
-    })
+    watch(
+      visible,
+      (isVisible) => {
+        resizeObserver?.disconnect()
+        resizeObserver = undefined
+        window.removeEventListener('resize', onViewportChange)
+        window.removeEventListener('scroll', onViewportChange, true)
+        if (!isVisible || typeof window === 'undefined') return
+        window.addEventListener('resize', onViewportChange)
+        window.addEventListener('scroll', onViewportChange, true)
+        if (typeof ResizeObserver !== 'function') return
+        resizeObserver = new ResizeObserver(() => measure(false))
+        if (popoverRef.value) resizeObserver.observe(popoverRef.value)
+        const targetEl = resolveTourTarget(step.value?.target)
+        if (targetEl) resizeObserver.observe(targetEl)
+      },
+      { immediate: true, flush: 'post' }
+    )
+
+    const focusKey = ref('')
+    watch(
+      [visible, currentStep, () => props.initialFocus],
+      () => {
+        if (!visible.value) {
+          focusKey.value = ''
+          return
+        }
+        nextTick(() => {
+          const root = popoverRef.value
+          if (!root) return
+          const opened = focusKey.value === ''
+          focusKey.value = String(currentStep.value)
+          if (opened && props.initialFocus) {
+            const specified = root.querySelector(props.initialFocus)
+            if (specified instanceof HTMLElement) {
+              specified.focus()
+              return
+            }
+          }
+          root.focus()
+        })
+      },
+      { immediate: true, flush: 'post' }
+    )
+
     onBeforeUnmount(() => {
-      loadGeneration += 1
+      loadToken += 1
       resizeObserver?.disconnect()
-      window.removeEventListener('resize', onViewportChange)
-      window.removeEventListener('scroll', onViewportChange, true)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', onViewportChange)
+        window.removeEventListener('scroll', onViewportChange, true)
+      }
     })
     onUnmounted(() => {
       restoreFocus(previousActiveElement)
       previousActiveElement = null
     })
-
-    watch(
-      visible,
-      (isVisible) => {
-        if (!isVisible) return
-        nextTick(() => {
-          updateRect()
-          bindObservers()
-          focusFirst([closeButtonRef.value, popoverRef.value])
-        })
-      },
-      { immediate: true, flush: 'post' }
-    )
 
     const applyNavEvents = (events: TourNavEvent[]) => {
       for (const event of events) {
@@ -267,28 +316,75 @@ export const Tour = defineComponent({
     const prev = () => applyNavEvents(tourPrevEvents(nav.value))
     const close = () => applyNavEvents(tourCloseEvents())
 
-    const overlayEnabled = computed(() => visible.value)
-    const escapeEnabled = computed(() => visible.value && props.keyboard)
+    const escapeEnabled = computed(() => overlayActive.value && props.keyboard)
     const detachEscape = useVueEscapeKey({
       enabled: escapeEnabled,
       onEscape: close,
       layerRef: rootRef
     })
     onBeforeUnmount(detachEscape)
-    useVueBodyScrollLock(overlayEnabled)
-    useVueFocusTrap({ enabled: overlayEnabled, containerRef: rootRef, inert: true })
+    useVueBodyScrollLock(overlayActive)
+    useVueFocusTrap({
+      enabled: overlayActive,
+      containerRef: rootRef,
+      inert: true,
+      autoFocus: true,
+      initialFocusRef: popoverRef,
+      exemptRef: targetExemptRef
+    })
 
     expose({ close })
 
+    const renderLayer = (children: unknown[]) =>
+      h(
+        'div',
+        {
+          ref: rootRef,
+          class: 'contents',
+          'data-tiger-overlay-layer': '',
+          'data-tiger-tour-root': ''
+        },
+        children as never
+      )
+
     return () => {
       const anchor = h('span', { ref: anchorRef, hidden: true })
-      if (!visible.value || !step.value || !ctx.value) return anchor
+      if (showError.value) {
+        const errorDialog = renderLayer([
+          h(
+            'div',
+            {
+              ref: popoverRef,
+              class: tourPopoverClasses,
+              role: 'dialog',
+              'aria-modal': 'true',
+              'aria-label': labels.value.loadErrorText,
+              tabindex: -1,
+              'data-tiger-tour': ''
+            },
+            [
+              h('p', labels.value.loadErrorText),
+              h(
+                Button,
+                { type: 'button', size: 'sm', onClick: close },
+                { default: () => labels.value.closeAriaLabel }
+              )
+            ]
+          ),
+          h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
+        ])
+        return [anchor, renderVueOverlayOutlet(instanceId, errorDialog, portalTarget.value)]
+      }
+
+      if (!visible.value || !step.value || !ctx.value) {
+        return [anchor, renderVueOverlayOutlet(instanceId, null)]
+      }
 
       const current = ctx.value
       const placement: TourPlacement = current.step.placement ?? 'bottom'
       const showMask = current.step.mask !== false
       const popoverStyle = mergeStyleValues(
-        getTourPopoverStyle(targetRect.value, popoverSize.value, placement),
+        getTourPopoverStyle(targetRect.value, popoverSize.value, placement, direction.value),
         attrs.style,
         props.style
       )
@@ -310,13 +406,27 @@ export const Tour = defineComponent({
       if (showMask) {
         children.push(
           h('div', {
-            class: tourMaskClasses,
+            class: classNames(tourMaskClasses, 'bg-transparent'),
             'data-tiger-tour-mask': '',
             'aria-hidden': 'true',
-            style: targetRect.value ? getTourMaskHoleStyle(targetRect.value) : undefined,
+            style: {
+              ...(current.step.interact && targetRect.value
+                ? getTourMaskHoleStyle(targetRect.value)
+                : null),
+              ...(targetRect.value && !current.step.interact
+                ? { backgroundColor: 'transparent' }
+                : null)
+            },
             onClick: (event: MouseEvent) => {
               if (shouldCloseOnMaskClick(event, props.maskClosable)) close()
             }
+          })
+        )
+        children.push(
+          h('div', {
+            class: 'pointer-events-none',
+            'data-tiger-tour-shade': '',
+            style: targetRect.value ? getTourShadeStyle(targetRect.value) : { pointerEvents: 'none' }
           })
         )
       }
@@ -363,7 +473,7 @@ export const Tour = defineComponent({
           footerChildren.push(
             h(
               'span',
-              { class: tourIndicatorClasses, 'aria-live': 'polite' },
+              { class: tourIndicatorClasses },
               `${current.position + 1} / ${current.total}`
             )
           )
@@ -428,19 +538,7 @@ export const Tour = defineComponent({
 
       return [
         anchor,
-        renderVueOverlayTeleport(
-          h(
-            'div',
-            {
-              ref: rootRef,
-              class: 'contents',
-              'data-tiger-overlay-layer': '',
-              'data-tiger-tour-root': ''
-            },
-            children
-          ),
-          portalTarget.value
-        )
+        renderVueOverlayOutlet(instanceId, renderLayer(children), portalTarget.value)
       ]
     }
   }

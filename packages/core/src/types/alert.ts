@@ -71,9 +71,8 @@ export interface AlertProps {
   closeAriaLabel?: string
 
   /**
-   * When `false`, the alert is not rendered. Closing never hides internally —
-   * the parent unmounts or sets `open={false}`. Omit to show the alert (unlike ImagePreview, which stays closed when `open` is omitted).
-   * @default true
+   * Controlled visibility. Omit `open` and the alert hides itself on close
+   * and when `duration` elapses. Pass `open` to only receive the close event.
    */
   open?: boolean
   onOpenChange?: (open: boolean) => void

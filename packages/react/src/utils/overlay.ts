@@ -9,10 +9,8 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  getFocusTrapNavigation,
-  getFocusableElements,
+  createFocusScope,
   isEventOutside,
-  isFocusInForeignOverlay,
   lockBodyScroll,
   setBackgroundInert,
   isBrowser,
@@ -26,7 +24,6 @@ import {
   getTransformOrigin,
   restoreFocus,
   captureActiveElement,
-  focusFirst,
   registerEscapeDismiss,
   type AnchoredOverlayLayout,
   type FloatingPlacement,
@@ -176,13 +173,22 @@ export interface UseFocusTrapOptions {
   inert?: boolean
   /** Capture the active element, focus the trap, and restore on disable or unmount. */
   autoFocus?: boolean
+  /** Focus this node instead of the first tabbable control. */
+  initialFocusRef?: React.RefObject<HTMLElement | null>
+  /** Outside node that stays active (interactive tour target). */
+  exemptRef?: React.RefObject<HTMLElement | null>
+  /** Modal scopes lock scroll unless this is false. */
+  lockScroll?: boolean
 }
 
 export function useFocusTrap({
   enabled,
   containerRef,
   inert = false,
-  autoFocus = false
+  autoFocus = false,
+  initialFocusRef,
+  exemptRef,
+  lockScroll = true
 }: UseFocusTrapOptions): void {
   const restoreTargetRef = useRef<HTMLElement | null>(null)
   const wasEnabledRef = useRef(false)
@@ -193,67 +199,45 @@ export function useFocusTrap({
   wasEnabledRef.current = enabled
 
   useLayoutEffect(() => {
-    if (!enabled) {
-      if (autoFocus) {
-        restoreFocus(restoreTargetRef.current)
-        restoreTargetRef.current = null
-      }
-      return
-    }
-
+    if (!enabled) return
     const container = containerRef.current
     if (!container) return
-    const ownerDocument = container.ownerDocument
-    const releaseInert = inert ? setBackgroundInert(container) : undefined
-    if (autoFocus) {
-      const focusables = getFocusableElements(container)
-      focusFirst([...focusables, container])
+    const active = captureActiveElement()
+    if (autoFocus && active && !container.contains(active)) {
+      restoreTargetRef.current = active
     }
-
-    const handler = (event: KeyboardEvent) => {
-      const focusables = getFocusableElements(container)
-      const activeElement = ownerDocument.activeElement
-      const inside = activeElement instanceof Node && container.contains(activeElement)
-      if (!inside) {
-        if (event.key !== 'Tab') return
-        if (isFocusInForeignOverlay(container, activeElement)) return
-        event.preventDefault()
-        const next = event.shiftKey ? focusables[focusables.length - 1] : focusables[0]
-        next?.focus()
-        return
-      }
-      const nav = getFocusTrapNavigation(event, focusables, activeElement)
-      if (!nav.shouldHandle) return
-
-      event.preventDefault()
-      nav.next?.focus()
-    }
-
-    ownerDocument.addEventListener('keydown', handler, true)
+    const scope = createFocusScope(container, {
+      modal: inert,
+      moveFocus: autoFocus || Boolean(initialFocusRef?.current),
+      initialFocus: initialFocusRef?.current ?? null,
+      returnFocus: autoFocus,
+      previouslyFocused: autoFocus ? (restoreTargetRef.current ?? undefined) : null,
+      lockScroll,
+      exempt: exemptRef ? () => exemptRef.current : undefined
+    })
+    scope.activate()
     return () => {
-      ownerDocument.removeEventListener('keydown', handler, true)
-      releaseInert?.()
+      scope.deactivate()
     }
-  }, [enabled, containerRef, inert, autoFocus])
-
-  useLayoutEffect(() => {
-    return () => {
-      if (!autoFocus) return
-      restoreFocus(restoreTargetRef.current)
-      restoreTargetRef.current = null
-    }
-  }, [autoFocus])
+  }, [enabled, containerRef, inert, autoFocus, initialFocusRef, exemptRef, lockScroll])
 }
 
 // ============================================================================
 // Floating UI positioning hook
 // ============================================================================
 
+export type FloatingReference =
+  | HTMLElement
+  | {
+      getBoundingClientRect: () => DOMRect | DOMRectReadOnly | Record<string, number>
+      contextElement?: Element
+    }
+
 export interface UseFloatingOptions {
   /**
-   * Reference element (trigger)
+   * Reference element (trigger) or a virtual rect.
    */
-  referenceRef: React.RefObject<HTMLElement | null>
+  referenceRef: React.RefObject<FloatingReference | null>
   /**
    * Floating element (popup/tooltip)
    */
@@ -280,7 +264,7 @@ export interface UseFloatingOptions {
    * Callback when placement changes (due to collision)
    */
   onPlacementChange?: (placement: FloatingPlacement) => void
-  /** Recreate positioning when the portal target changes. */
+  /** Recreate positioning when the portal target or virtual point changes. */
   context?: unknown
 }
 
@@ -391,7 +375,8 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
       return
     }
 
-    setReferenceWidth(reference.getBoundingClientRect().width)
+    const rect = reference.getBoundingClientRect()
+    setReferenceWidth('width' in rect ? Number(rect.width) : 0)
     setX(result.x)
     setY(result.y)
     setPlacement((prev) => {
@@ -446,6 +431,8 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
 export interface UseAnchoredOverlayOptions {
   enabled: boolean
   referenceRef: React.RefObject<HTMLElement | null>
+  /** Positioning reference when it is not the trigger (context-menu pointer). */
+  positionReferenceRef?: React.RefObject<FloatingReference | null>
   floatingRef: React.RefObject<HTMLElement | null>
   containerRef?: React.RefObject<HTMLElement | null>
   outsideRefs?: Array<React.RefObject<HTMLElement | null> | undefined>
@@ -460,6 +447,8 @@ export interface UseAnchoredOverlayOptions {
   restoreFocusOnDismiss?: boolean
   arrowRef?: React.RefObject<HTMLElement | null>
   onDismiss?: (reason: AnchoredOverlayDismissReason) => void
+  /** Bust positioning when a virtual reference moves without changing identity. */
+  revision?: unknown
 }
 
 export type AnchoredOverlayDismissReason = 'outside' | 'escape'
@@ -486,6 +475,7 @@ function resolveOverlayPortalTarget(
 export function useAnchoredOverlay({
   enabled,
   referenceRef,
+  positionReferenceRef,
   floatingRef,
   containerRef,
   outsideRefs = [],
@@ -499,7 +489,8 @@ export function useAnchoredOverlay({
   dismissOnEscape = false,
   restoreFocusOnDismiss = false,
   arrowRef,
-  onDismiss
+  onDismiss,
+  revision
 }: UseAnchoredOverlayOptions): UseAnchoredOverlayReturn {
   const [target, setTarget] = useState<HTMLElement | null>(null)
   const floatingLayerRef = useMemo<React.RefObject<HTMLElement | null>>(
@@ -537,13 +528,13 @@ export function useAnchoredOverlay({
     arrowX,
     arrowY
   } = useFloating({
-    referenceRef,
+    referenceRef: positionReferenceRef ?? referenceRef,
     floatingRef,
     enabled,
     placement,
     offset,
     arrowRef,
-    context: effectiveTarget
+    context: revision ?? effectiveTarget
   })
 
   const dismiss = useCallback(

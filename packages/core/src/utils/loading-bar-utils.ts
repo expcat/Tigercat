@@ -32,12 +32,14 @@ export const loadingBarFillBaseClasses =
   'block w-full origin-left rtl:origin-right tiger-motion-aware transition-transform duration-200 ease-out motion-reduce:transition-none'
 
 export const loadingBarColorClasses: Record<LoadingBarColor, string> = {
-  primary: 'bg-[color:var(--tiger-primary,#2563eb)]',
-  success: 'bg-[color:var(--tiger-success,#16a34a)]',
-  warning: 'bg-[color:var(--tiger-warning,#f59e0b)]',
-  danger: 'bg-[color:var(--tiger-error,#dc2626)]',
-  info: 'bg-[color:var(--tiger-info,#0ea5e9)]'
+  primary: 'bg-[color:var(--tiger-primary)]',
+  success: 'bg-[color:var(--tiger-success)]',
+  warning: 'bg-[color:var(--tiger-warning)]',
+  danger: 'bg-[color:var(--tiger-error)]',
+  info: 'bg-[color:var(--tiger-info)]'
 }
+
+export type LoadingBarNotice = 'loading' | 'success' | 'error' | null
 
 export interface LoadingBarRuntimeState extends Required<
   Pick<LoadingBarContainerProps, 'percentage' | 'status' | 'color' | 'height'>
@@ -48,6 +50,9 @@ export interface LoadingBarRuntimeState extends Required<
   ariaLabel?: string
   container?: string | HTMLElement
   startedCount: number
+  /** Spoken once when a load starts, fails, or finishes. Percentage stays on the progressbar. */
+  notice: LoadingBarNotice
+  noticeToken: number
 }
 
 export function createInitialLoadingBarState(): LoadingBarRuntimeState {
@@ -57,8 +62,26 @@ export function createInitialLoadingBarState(): LoadingBarRuntimeState {
     status: 'idle',
     color: DEFAULT_LOADING_BAR_COLOR,
     height: DEFAULT_LOADING_BAR_HEIGHT,
-    startedCount: 0
+    startedCount: 0,
+    notice: null,
+    noticeToken: 0
   }
+}
+
+export function getLoadingBarNoticeText(
+  notice: LoadingBarNotice,
+  locale?: {
+    common?: {
+      loadingText?: string
+      loadingFinishedText?: string
+      loadingFailedText?: string
+    }
+  }
+): string {
+  if (notice === 'loading') return locale?.common?.loadingText || 'Loading...'
+  if (notice === 'success') return locale?.common?.loadingFinishedText || 'Loading finished'
+  if (notice === 'error') return locale?.common?.loadingFailedText || 'Loading failed'
+  return ''
 }
 
 export function clampLoadingBarPercentage(percentage: number): number {
@@ -188,6 +211,7 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
   const listeners = new Set<() => void>()
   let trickleTimer: LoadingBarTimeoutId | undefined
   let hideTimer: LoadingBarTimeoutId | undefined
+  let sawError = false
 
   const schedule =
     hooks.setTimeout ?? ((handler, timeout) => globalThis.setTimeout(handler, timeout))
@@ -217,22 +241,40 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
     hideTimer = undefined
   }
 
-  function hideNow(): void {
+  function hideNow(keepNotice = false): void {
     stopTrickle()
     stopHide()
+    sawError = false
+    const notice = state.notice
+    const noticeToken = state.noticeToken
     state = createInitialLoadingBarState()
+    if (keepNotice && notice) {
+      state = { ...state, notice, noticeToken }
+    }
     emit()
+    if (!keepNotice || !notice) return
+    const token = noticeToken
+    hideTimer = schedule(() => {
+      hideTimer = undefined
+      if (state.noticeToken !== token || state.visible) return
+      state = { ...state, notice: null }
+      emit()
+    }, 0)
+  }
+
+  function announce(notice: Exclude<LoadingBarNotice, null>): void {
+    state = { ...state, notice, noticeToken: state.noticeToken + 1 }
   }
 
   function scheduleHide(): void {
     stopHide()
     if (reduceMotion() || (!isBrowser() && !hooks.setTimeout)) {
-      hideNow()
+      hideNow(true)
       return
     }
     hideTimer = schedule(() => {
       hideTimer = undefined
-      hideNow()
+      hideNow(false)
     }, LOADING_BAR_FINISH_HIDE_DELAY_MS)
   }
 
@@ -269,6 +311,10 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
       status: 'loading',
       startedCount: nextCount,
       percentage: isFresh ? LOADING_BAR_START_PERCENTAGE : state.percentage
+    }
+    if (isFresh) {
+      sawError = false
+      announce('loading')
     }
     emit()
 
@@ -310,19 +356,45 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
     }
 
     stopTrickle()
+    const status = sawError ? 'error' : 'success'
     state = {
       ...state,
       visible: true,
       startedCount: 0,
       percentage: 100,
-      status: 'success'
+      status
     }
+    announce(status)
+    sawError = false
     emit()
     scheduleHide()
   }
 
   function error(): void {
     if (!canMutate()) return
+    if (state.startedCount <= 0 && state.status !== 'loading') {
+      stopTrickle()
+      state = {
+        ...state,
+        visible: true,
+        startedCount: 0,
+        percentage: 100,
+        status: 'error'
+      }
+      announce('error')
+      emit()
+      scheduleHide()
+      return
+    }
+
+    sawError = true
+    const nextCount = Math.max(0, state.startedCount - 1)
+    if (nextCount > 0) {
+      state = { ...state, startedCount: nextCount, status: 'loading', visible: true }
+      emit()
+      return
+    }
+
     stopTrickle()
     state = {
       ...state,
@@ -331,6 +403,8 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
       percentage: 100,
       status: 'error'
     }
+    announce('error')
+    sawError = false
     emit()
     scheduleHide()
   }
@@ -339,6 +413,7 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
     if (!canMutate()) return
     stopTrickle()
     stopHide()
+    sawError = false
     state = createInitialLoadingBarState()
     emit()
   }

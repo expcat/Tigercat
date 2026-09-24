@@ -105,9 +105,14 @@ export interface NotificationInstance {
   onClose?: () => void
 
   /**
-   * Callback when notification is clicked
+   * Primary action. Rendered as a button, not a click on the card.
    */
   onClick?: () => void
+
+  /**
+   * Label for the primary action button.
+   */
+  actionLabel?: string
 
   /**
    * Inline action buttons rendered inside the notification.
@@ -173,9 +178,19 @@ export interface NotificationProps {
   onClose?: () => void
 
   /**
-   * Callback when notification is clicked
+   * Primary action. Rendered as a button, not a click on the card.
    */
   onClick?: () => void
+
+  /**
+   * Label for the primary action button. Defaults to locale `common.viewText`.
+   */
+  actionLabel?: string
+
+  /**
+   * Stable id. Calling again with the same key replaces that notification.
+   */
+  key?: string | number
 
   /**
    * Inline action buttons rendered inside the notification.

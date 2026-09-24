@@ -1,7 +1,9 @@
-import { defineComponent, computed, h, PropType, ref, watch, onUnmounted } from 'vue'
+import { defineComponent, computed, h, nextTick, PropType, ref, useId, watch, onUnmounted } from 'vue'
 import {
+  captureRegionFocus,
   classNames,
   coerceClassValue,
+  createLoadingDelayGate,
   getLoadingIndicator,
   getLoadingLabel,
   getLoadingTextClasses,
@@ -13,6 +15,7 @@ import {
   mergeStyleValues,
   mergeTigerLocale,
   normalizeSvgAttrs,
+  restoreRegionFocus,
   type LoadingIndicatorNode,
   type LoadingProps,
   type LoadingVariant,
@@ -20,11 +23,8 @@ import {
   type LoadingColor,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import {
-  renderVueBodyTeleport,
-  useVueBackgroundInert,
-  useVueBodyScrollLock
-} from '../utils/overlay'
+import { useVueFocusTrap } from '../utils/overlay'
+import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueLoadingProps extends LoadingProps {
@@ -119,46 +119,48 @@ export const Loading = defineComponent({
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
 
     const visible = ref(false)
-    const containerRef = ref<HTMLElement | null>(null)
-    let timer: ReturnType<typeof setTimeout> | null = null
+    const regionRef = ref<HTMLElement | null>(null)
+    const layerRef = ref<HTMLElement | null>(null)
+    const gate = createLoadingDelayGate()
+    const stopGate = gate.subscribe(() => {
+      visible.value = gate.isShown()
+    })
+    let rememberedFocus: HTMLElement | null = null
+    let regionMasked = false
+    const fullscreenId = `loading-fullscreen-${useId()}`
 
     const hasRegion = computed(() => !!slots.default)
-    const showIndicator = computed(() => visible.value && props.spinning)
-    const showFullscreen = computed(
-      () => props.fullscreen && showIndicator.value && !hasRegion.value
-    )
-    const shouldLockBodyScroll = computed(() => showFullscreen.value && props.lockScroll)
+    const showIndicator = computed(() => visible.value)
+    const showFullscreen = computed(() => props.fullscreen && showIndicator.value)
 
-    useVueBodyScrollLock(shouldLockBodyScroll)
-    useVueBackgroundInert(showFullscreen, containerRef)
-
-    const clearTimer = () => {
-      if (timer) {
-        clearTimeout(timer)
-        timer = null
-      }
-    }
+    useVueFocusTrap({
+      enabled: showFullscreen,
+      containerRef: layerRef,
+      inert: true,
+      autoFocus: true,
+      initialFocusRef: layerRef,
+      lockScroll: computed(() => props.lockScroll)
+    })
 
     watch(
-      () => props.delay,
-      (delay) => {
-        clearTimer()
-
-        if (delay <= 0) {
-          visible.value = true
-          return
-        }
-
-        visible.value = false
-        timer = setTimeout(() => {
-          visible.value = true
-        }, delay)
+      () => [props.spinning, props.delay] as const,
+      ([spinning, delay]) => {
+        gate.sync(Boolean(spinning), delay)
       },
       { immediate: true }
     )
 
+    watch(showIndicator, (showing) => {
+      if (showing || !hasRegion.value || props.fullscreen) return
+      const remembered = rememberedFocus
+      rememberedFocus = null
+      regionMasked = false
+      nextTick(() => restoreRegionFocus(regionRef.value, remembered))
+    })
+
     onUnmounted(() => {
-      clearTimer()
+      stopGate()
+      gate.dispose()
     })
 
     const indicator = computed(() =>
@@ -191,6 +193,10 @@ export const Loading = defineComponent({
     const label = computed(() => getLoadingLabel(mergedLocale.value, props.text))
 
     return () => {
+      if (showIndicator.value && !showFullscreen.value && hasRegion.value && !regionMasked) {
+        rememberedFocus = captureRegionFocus(regionRef.value)
+        regionMasked = true
+      }
       const indicatorNode = renderIndicator(indicator.value)
       const children = [indicatorNode]
       if (props.text) {
@@ -203,39 +209,72 @@ export const Loading = defineComponent({
         attrs.role === 'presentation'
       const statusProps = decorative
         ? { role: 'presentation', 'aria-hidden': true }
-        : { role: 'status', 'aria-label': label.value, 'aria-busy': true }
+        : {
+            role: 'status',
+            'aria-label': label.value,
+            ...(hasRegion.value ? {} : { 'aria-busy': true })
+          }
+
+      const fullscreenNode = renderVueOverlayOutlet(
+        fullscreenId,
+        showFullscreen.value
+          ? h(
+              'div',
+              {
+                ...attrs,
+                ref: layerRef,
+                tabindex: -1,
+                class: classNames(
+                  loadingFullscreenBaseClasses,
+                  props.className,
+                  coerceClassValue(attrs.class)
+                ),
+                style: overlayStyle.value,
+                ...statusProps,
+                'data-tiger-overlay-layer': ''
+              },
+              children
+            )
+          : null
+      )
 
       if (hasRegion.value) {
         const content = slots.default?.()
-        return h('div', { class: classNames(loadingRegionBaseClasses, props.className) }, [
-          h('div', { inert: showIndicator.value || undefined }, content),
-          showIndicator.value
-            ? h(
-                'div',
-                {
-                  ...attrs,
-                  ref: containerRef,
-                  class: classNames(loadingRegionOverlayClasses, coerceClassValue(attrs.class)),
-                  style: overlayStyle.value,
-                  ...statusProps
-                },
-                children
-              )
-            : null
-        ])
+        return h(
+          'div',
+          {
+            ref: regionRef,
+            class: classNames(loadingRegionBaseClasses, props.className),
+            'aria-busy': showIndicator.value ? 'true' : undefined
+          },
+          [
+            h('div', { inert: showIndicator.value && !showFullscreen.value ? true : undefined }, content),
+            showIndicator.value && !showFullscreen.value
+              ? h(
+                  'div',
+                  {
+                    ...attrs,
+                    class: classNames(loadingRegionOverlayClasses, coerceClassValue(attrs.class)),
+                    style: overlayStyle.value,
+                    ...statusProps
+                  },
+                  children
+                )
+              : null,
+            fullscreenNode
+          ]
+        )
       }
 
-      if (!showIndicator.value) {
-        return null
-      }
+      if (showFullscreen.value) return fullscreenNode
+      if (!showIndicator.value) return null
 
-      const loadingNode = h(
+      return h(
         'div',
         {
           ...attrs,
-          ref: containerRef,
           class: classNames(
-            props.fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
+            loadingContainerBaseClasses,
             props.className,
             coerceClassValue(attrs.class)
           ),
@@ -244,12 +283,6 @@ export const Loading = defineComponent({
         },
         children
       )
-
-      if (props.fullscreen) {
-        return renderVueBodyTeleport([loadingNode])
-      }
-
-      return loadingNode
     }
   }
 })
