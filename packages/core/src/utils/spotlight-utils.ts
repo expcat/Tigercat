@@ -1,5 +1,6 @@
 import type { SpotlightItem, SpotlightItemFilter } from '../types/spotlight'
 import { classNames } from './class-names'
+import { getIconDefinition } from './icons/registry'
 
 export interface SpotlightSearchResult {
   item: SpotlightItem
@@ -35,39 +36,54 @@ export const spotlightRootClasses =
 export const spotlightMaskClasses = 'absolute inset-0 bg-black/35'
 
 export const spotlightPanelClasses =
-  'relative z-10 flex w-full max-w-2xl flex-col overflow-hidden rounded-[var(--tiger-radius-lg,0.75rem)] border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-surface,#ffffff)] shadow-2xl'
+  'relative z-10 flex w-full max-w-2xl flex-col overflow-hidden rounded-[var(--tiger-radius-lg)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] shadow-2xl'
 
-export const spotlightHeaderClasses = 'border-b border-[var(--tiger-border,#d1d5db)] px-4 py-3'
+export const spotlightHeaderClasses = 'border-b border-[var(--tiger-border)] px-4 py-3'
 
-export const spotlightTitleClasses = 'mb-2 text-sm font-semibold text-[var(--tiger-text,#111827)]'
+export const spotlightTitleClasses = 'mb-2 text-sm font-semibold text-[var(--tiger-text)]'
 
 export const spotlightInputClasses =
-  'w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2 text-base text-[var(--tiger-text,#111827)] outline-none focus:border-[var(--tiger-primary,#2563eb)] focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/20'
+  'w-full rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2 text-base text-[var(--tiger-text)] outline-none focus:border-[var(--tiger-primary)] focus:ring-2 focus:ring-[var(--tiger-primary)]/20'
 
 export const spotlightListClasses = 'max-h-[min(28rem,60vh)] overflow-y-auto p-2'
 
 export const spotlightGroupClasses = 'py-1'
 
 export const spotlightGroupLabelClasses =
-  'px-2 pb-1 pt-2 text-xs font-semibold uppercase text-[var(--tiger-text-muted,#6b7280)]'
+  'px-2 pb-1 pt-2 text-xs font-semibold uppercase text-[var(--tiger-text-secondary)]'
 
 export const spotlightEmptyClasses =
-  'px-4 py-8 text-center text-sm text-[var(--tiger-text-muted,#6b7280)]'
+  'px-4 py-8 text-center text-sm text-[var(--tiger-text-secondary)]'
 
 export const spotlightItemDescriptionClasses =
-  'block truncate text-xs text-[var(--tiger-text-muted,#6b7280)]'
+  'block truncate text-xs text-[var(--tiger-text-secondary)]'
 
 export const spotlightShortcutClasses =
-  'shrink-0 rounded border border-[var(--tiger-border,#d1d5db)] px-1.5 py-0.5 text-xs text-[var(--tiger-text-muted,#6b7280)]'
+  'shrink-0 rounded border border-[var(--tiger-border)] px-1.5 py-0.5 text-xs text-[var(--tiger-text-secondary)]'
+
+export type SpotlightIconKind = 'name' | 'text' | 'node' | 'none'
+
+/** Same icon contract on Vue and React: registered name, text, framework node, or nothing. */
+export function resolveSpotlightIconKind(icon: unknown): SpotlightIconKind {
+  if (icon == null || icon === false) return 'none'
+  if (typeof icon === 'number') return 'text'
+  if (typeof icon === 'string') return getIconDefinition(icon) ? 'name' : 'text'
+  if (typeof icon === 'object') {
+    const record = icon as { $$typeof?: unknown; __v_isVNode?: boolean; type?: unknown; props?: unknown }
+    if (record.$$typeof != null || record.__v_isVNode) return 'node'
+    if ('type' in record && 'props' in record) return 'node'
+  }
+  return 'none'
+}
 
 export function getSpotlightOptionClasses(active: boolean, disabled: boolean): string {
   return classNames(
-    'flex w-full items-center gap-3 rounded-[var(--tiger-radius-md,0.5rem)] px-3 py-2 text-start outline-none',
+    'flex w-full items-center gap-3 rounded-[var(--tiger-radius-md)] px-3 py-2 text-start outline-none',
     disabled
-      ? 'cursor-not-allowed text-[var(--tiger-text-muted,#9ca3af)] opacity-60'
+      ? 'cursor-not-allowed text-[var(--tiger-text-secondary)] opacity-60'
       : active
-        ? 'cursor-pointer bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)]'
-        : 'cursor-pointer text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]'
+        ? 'cursor-pointer bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)]'
+        : 'cursor-pointer text-[var(--tiger-text)] hover:bg-[var(--tiger-outline-bg-hover)]'
   )
 }
 
@@ -248,13 +264,61 @@ export function matchesSpotlightShortcut(
   )
 }
 
+/** Global toggle is off unless the caller opts in. */
+export function isSpotlightHotkeyEnabled(hotkey: boolean | string | undefined): boolean {
+  return hotkey !== undefined && hotkey !== false
+}
+
+const EDITABLE_INPUT_TYPES = new Set([
+  'text',
+  'search',
+  'email',
+  'url',
+  'tel',
+  'password',
+  'number',
+  'date',
+  'time',
+  'datetime-local'
+])
+
+export function isSpotlightEditableTarget(target: EventTarget | null): boolean {
+  if (!target || typeof target !== 'object') return false
+  const element = target as {
+    tagName?: string
+    isContentEditable?: boolean
+    getAttribute?: (name: string) => string | null
+  }
+  if (element.isContentEditable) return true
+  const tag = element.tagName
+  if (tag === 'TEXTAREA' || tag === 'SELECT') return true
+  if (tag !== 'INPUT') return false
+  const type = (element.getAttribute?.('type') ?? 'text').toLowerCase()
+  return EDITABLE_INPUT_TYPES.has(type)
+}
+
+let spotlightHotkeyOwner: object | null = null
+
+/** The same chord belongs to one mounted instance. */
+export function claimSpotlightHotkey(owner: object): boolean {
+  if (spotlightHotkeyOwner != null && spotlightHotkeyOwner !== owner) return false
+  spotlightHotkeyOwner = owner
+  return true
+}
+
+export function releaseSpotlightHotkey(owner: object): void {
+  if (spotlightHotkeyOwner === owner) spotlightHotkeyOwner = null
+}
+
 export function isSpotlightToggleHotkey(
   event: KeyboardEvent,
   hotkey: boolean | string | undefined
 ): boolean {
-  if (hotkey === false) return false
+  if (!isSpotlightHotkeyEnabled(hotkey)) return false
   if (event.defaultPrevented) return false
-  if (hotkey === true || hotkey === undefined) {
+  if (event.repeat) return false
+  if (isSpotlightEditableTarget(event.target)) return false
+  if (hotkey === true) {
     return (
       (event.metaKey || event.ctrlKey) &&
       !event.altKey &&
@@ -262,6 +326,7 @@ export function isSpotlightToggleHotkey(
       event.key.toLowerCase() === 'k'
     )
   }
+  if (typeof hotkey !== 'string') return false
   return matchesSpotlightShortcut(event, hotkey)
 }
 

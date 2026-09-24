@@ -7,12 +7,12 @@ import { defineComponent, h, ref } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Tag } from '@expcat/tigercat-vue/Tag'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
-import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils'
 
 describe('Tag', () => {
-  it('renders content without a live region', () => {
+  it('renders content without a live region', async () => {
     const { container } = render(Tag, {
       slots: {
         default: 'Test Tag'
@@ -21,6 +21,7 @@ describe('Tag', () => {
 
     expect(screen.getByText('Test Tag')).toBeInTheDocument()
     expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
+    await expectNoA11yViolations(container)
   })
 
   it('lets a user role override the root', () => {
@@ -49,20 +50,6 @@ describe('Tag', () => {
     expect(container.firstElementChild).toHaveClass('from-attrs')
   })
 
-  it('warns when color is passed instead of variant', () => {
-    resetDevWarnCache()
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-
-    render(Tag, {
-      attrs: { color: 'green' },
-      slots: { default: 'Color prop' }
-    })
-
-    expect(screen.getByText('Color prop')).toBeInTheDocument()
-    expect(warn).toHaveBeenCalledWith('[Tigercat] Tag does not support color. Use variant instead.')
-    warn.mockRestore()
-  })
-
   it('does not render close button when closable=false', () => {
     const { container } = render(Tag, {
       props: {
@@ -89,7 +76,7 @@ describe('Tag', () => {
       }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Close tag' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Close Closable Tag' }))
     expect(onClose).toHaveBeenCalledTimes(1)
     expect(screen.getByText('Closable Tag')).toBeInTheDocument()
   })
@@ -116,7 +103,7 @@ describe('Tag', () => {
     })
 
     render(Host)
-    await fireEvent.click(screen.getAllByRole('button', { name: 'Close tag' })[0])
+    await fireEvent.click(screen.getByRole('button', { name: 'Close Alpha' }))
     expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
     expect(screen.getByText('Beta')).toBeInTheDocument()
   })
@@ -136,7 +123,7 @@ describe('Tag', () => {
       }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Close tag' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Close Closable Tag' }))
     expect(onTagClick).not.toHaveBeenCalled()
   })
 

@@ -14,13 +14,19 @@ import {
   getTableResponsiveTableClasses,
   getTableVirtualRecommendation,
   getTableVirtualWindow,
+  devWarn,
+  resolveScrollportViewport,
   getTableCardSortValue,
   parseTableCardSortValue,
   subscribeTableCardViewport,
   TABLE_CARD_SORT_NONE,
   tableCardListVisibleClasses,
   formatTableSelectRowAriaLabel,
+  formatTableSelectionCount,
+  formatTableSortAnnouncement,
   formatTableSortByText,
+  manageLiveRegion,
+  tableRowKeyId,
   getTableLabels,
   isActivationKey,
   tableBaseClasses,
@@ -105,8 +111,12 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   summaryRow,
   groupBy,
   exportable = false,
-  exportFormat = 'csv',
+  exportScope = 'all',
   exportFilename = 'export',
+  columnOrder,
+  columnFixed,
+  cardViewport,
+  ariaLabel,
   onChange,
   onRowClick,
   onSelectionChange,
@@ -120,6 +130,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   onColumnFixedChange,
   onRowOrderChange,
   onExport,
+  onSelectLoaded,
   className,
   ...props
 }: TableProps<T>) {
@@ -129,7 +140,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const [measuredColumnWidths, setMeasuredColumnWidths] = useState<Record<string, number>>({})
   const [measuredRowHeights, setMeasuredRowHeights] = useState<Record<number, number>>({})
   const [measuredContainerSize, setMeasuredContainerSize] = useState({ width: 0, height: 0 })
-  const [isCardViewport, setIsCardViewport] = useState(false)
+  const [uncontrolledCardViewport, setUncontrolledCardViewport] = useState(false)
+  const [activeRowIndex, setActiveRowIndex] = useState(0)
+  const cardViewportControlled = cardViewport !== undefined
+  const isCardViewport = cardViewportControlled ? Boolean(cardViewport) : uncontrolledCardViewport
   const selectionGroupName = useId()
   const internalRowSelection = rowSelection as
     RowSelectionConfig<Record<string, unknown>> | undefined
@@ -241,8 +255,12 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     filterMode,
     advancedFilterRules,
     groupBy,
-    exportFormat,
+    exportScope,
     exportFilename,
+    columnOrder,
+    columnFixed,
+    sortLocale: tableLocale?.locale,
+    rowDraggable,
     measuredColumnWidths,
     containerWidth: measuredContainerSize.width,
     onChange,
@@ -264,7 +282,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     onColumnOrderChange: onColumnOrderChange as ((columns: TableColumn[]) => void) | undefined,
     onColumnFixedChange: onColumnFixedChange as TableProps['onColumnFixedChange'],
     onRowOrderChange: onRowOrderChange as ((rows: Record<string, unknown>[]) => void) | undefined,
-    onExport
+    onExport,
+    onSelectLoaded
   })
 
   const cardLayoutMap = useMemo(() => {
@@ -286,56 +305,125 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       getTableVirtualRecommendation({
         virtual,
         autoVirtual,
-        dataLength: ctx.processedData.length,
+        dataLength: ctx.paginatedData.length,
         threshold: virtualThreshold
       }),
-    [autoVirtual, ctx.processedData.length, virtual, virtualThreshold]
+    [autoVirtual, ctx.paginatedData.length, virtual, virtualThreshold]
   )
 
   const virtualAllowed = canUseTableVirtualWindow({ expandable: internalExpandable, groupBy })
-  const effectiveVirtual = virtualRecommendation.enabled && virtualAllowed
+  if (virtualRecommendation.enabled && !virtualAllowed) {
+    devWarn(
+      'Table.virtual',
+      'Table virtual window is off because expanded rows or groups do not have one fixed height'
+    )
+  }
   const showCardTree = responsiveMode === 'card' && isCardViewport
   const showTableTree = !showCardTree
 
+  const liveRegion = useRef<ReturnType<typeof manageLiveRegion> | null>(null)
   useEffect(() => {
-    if (responsiveMode !== 'card') {
-      setIsCardViewport(false)
+    const region = manageLiveRegion('polite')
+    liveRegion.current = region
+    return () => {
+      region.destroy()
+      liveRegion.current = null
+    }
+  }, [])
+  const announcedRef = useRef<{ count: number; sort: string } | null>(null)
+  const selectedCount = ctx.selectedRowKeySet.size
+  const sortSignature = `${ctx.sortState.key ?? ''}:${ctx.sortState.direction ?? ''}`
+  useEffect(() => {
+    const previous = announcedRef.current
+    announcedRef.current = { count: selectedCount, sort: sortSignature }
+    if (!previous || !liveRegion.current) return
+    if (previous.count !== selectedCount) {
+      liveRegion.current.announce(
+        formatTableSelectionCount(tableLabels.selectionCountText, selectedCount, tableLocale?.locale)
+      )
+    }
+    if (previous.sort !== sortSignature && ctx.sortState.key && ctx.sortState.direction) {
+      const column = ctx.displayColumns.find((item) => item.key === ctx.sortState.key)
+      liveRegion.current.announce(
+        formatTableSortAnnouncement(
+          tableLabels.sortAnnouncementText,
+          String(column?.title ?? ctx.sortState.key),
+          ctx.sortState.direction === 'asc'
+            ? tableLabels.sortAscendingText
+            : tableLabels.sortDescendingText
+        )
+      )
+    }
+  }, [
+    ctx.displayColumns,
+    ctx.sortState.direction,
+    ctx.sortState.key,
+    selectedCount,
+    sortSignature,
+    tableLabels.selectionCountText,
+    tableLabels.sortAnnouncementText,
+    tableLabels.sortAscendingText,
+    tableLabels.sortDescendingText,
+    tableLocale?.locale
+  ])
+
+  useEffect(() => {
+    if (cardViewportControlled || responsiveMode !== 'card') {
+      if (!cardViewportControlled) setUncontrolledCardViewport(false)
       return undefined
     }
-    return subscribeTableCardViewport(cardBreakpoint, setIsCardViewport)
-  }, [responsiveMode, cardBreakpoint])
-  const shouldObserveGeometry =
-    effectiveVirtual ||
-    columnLockable ||
-    ctx.displayColumns.some((column) => column.fixed === 'left' || column.fixed === 'right')
+    return subscribeTableCardViewport(cardBreakpoint, setUncontrolledCardViewport)
+  }, [cardViewportControlled, responsiveMode, cardBreakpoint])
 
   // Row windowing: track the scroll position and compute the visible slice.
   const [virtualScrollTop, setVirtualScrollTop] = useState(0)
-  const measuredItemHeight = Object.values(measuredRowHeights)[0]
+  const virtualScrollerRef = useRef<HTMLDivElement>(null)
+  const [virtualClientHeight, setVirtualClientHeight] = useState(0)
+  const declaredRowHeight = virtualItemHeight
+  const unevenRows = Object.values(measuredRowHeights).some(
+    (height) => Math.abs(height - declaredRowHeight) > 1
+  )
+  if (virtualRecommendation.enabled && virtualAllowed && unevenRows) {
+    devWarn(
+      'Table.virtual.rowHeight',
+      'Table virtual window is off because a measured row does not match virtualItemHeight'
+    )
+  }
+  const virtualViewport = resolveScrollportViewport(
+    virtualClientHeight,
+    typeof virtualHeight === 'number' ? virtualHeight : 0
+  )
+  const pageFits =
+    virtualViewport > 0 && ctx.paginatedData.length * declaredRowHeight <= virtualViewport
+  const effectiveVirtual =
+    virtualRecommendation.enabled && virtualAllowed && !unevenRows && !pageFits && !showCardTree
   const virtualWindow = useMemo(
     () =>
       effectiveVirtual
         ? getTableVirtualWindow(
             virtualScrollTop,
-            measuredContainerSize.height > 0
-              ? measuredContainerSize.height
-              : typeof virtualHeight === 'number'
-                ? virtualHeight
-                : 400,
-            measuredItemHeight > 0 ? measuredItemHeight : virtualItemHeight,
+            virtualViewport,
+            declaredRowHeight,
             ctx.paginatedData.length
           )
         : undefined,
     [
       effectiveVirtual,
       virtualScrollTop,
-      virtualHeight,
-      virtualItemHeight,
-      ctx.paginatedData.length,
-      measuredContainerSize.height,
-      measuredItemHeight
+      virtualViewport,
+      declaredRowHeight,
+      ctx.paginatedData.length
     ]
   )
+  const shouldObserveGeometry =
+    effectiveVirtual ||
+    columnLockable ||
+    ctx.displayColumns.some((column) => column.fixed === 'start' || column.fixed === 'end')
+
+  useEffect(() => {
+    setVirtualScrollTop(0)
+    if (virtualScrollerRef.current) virtualScrollerRef.current.scrollTop = 0
+  }, [ctx.currentPage])
 
   const wrapperStyle = useMemo(() => {
     return maxHeight
@@ -368,6 +456,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             ? prev
             : { width: snapshot.containerWidth, height: snapshot.containerHeight }
         )
+        const scroller = virtualScrollerRef.current
+        if (scroller) {
+          const next = scroller.clientHeight
+          setVirtualClientHeight((current) => (current === next ? current : next))
+        }
       }
     })
 
@@ -387,6 +480,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         className
       )}
       {...props}
+      aria-label={ariaLabel || tableLabels.tableAriaLabel}
       style={
         ctx.fixedColumnsInfo.hasFixedColumns && ctx.fixedColumnsInfo.minTableWidth
           ? {
@@ -421,7 +515,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         lockColumnAriaLabel: tableLabels.lockColumnAriaLabel,
         unlockColumnAriaLabel: tableLabels.unlockColumnAriaLabel,
         labels: tableLabels,
-        selectionName: selectionGroupName
+        selectionName: selectionGroupName,
+        filterMode
       })}
       {renderTableBody(ctx, {
         size,
@@ -436,7 +531,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         rowDraggable,
         interactiveRows: !!onRowClick || !!internalRowSelection,
         virtualWindow,
-        selectionName: selectionGroupName
+        selectionName: selectionGroupName,
+        activeRowIndex,
+        onActiveRowIndex: setActiveRowIndex
       })}
       {renderSummaryRow(ctx, {
         size,
@@ -456,6 +553,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     showTableTree &&
     (effectiveVirtual ? (
       <div
+        ref={virtualScrollerRef}
         style={virtualScrollerStyle}
         onScroll={(e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)}>
         {tableInner}
@@ -474,7 +572,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       data-tiger-virtual-threshold={
         virtualRecommendation.recommended ? virtualRecommendation.threshold : undefined
       }
-      data-tiger-measured-row-height={measuredItemHeight || undefined}
+      data-tiger-measured-row-height={Object.values(measuredRowHeights)[0] || undefined}
       data-tiger-table-layout={showCardTree ? 'card' : 'table'}
       aria-busy={loading}>
       {exportable && (
@@ -495,19 +593,13 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       {showCardTree && (
         <div
           className={tableCardListVisibleClasses}
-          data-tiger-table-mobile="card"
-          style={effectiveVirtual ? virtualScrollerStyle : undefined}
-          onScroll={
-            effectiveVirtual
-              ? (e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)
-              : undefined
-          }>
+          data-tiger-table-mobile="card">
           {internalRowSelection?.type !== 'radio' &&
           internalRowSelection?.showCheckbox !== false &&
           internalRowSelection &&
           !loading &&
           ctx.paginatedData.length > 0 ? (
-            <div className="flex items-center justify-between rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2">
+            <div className="flex items-center justify-between rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2">
               <Checkbox
                 size="sm"
                 checked={ctx.allSelected}
@@ -518,7 +610,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             </div>
           ) : null}
           {ctx.displayColumns.some((column) => column.sortable) ? (
-            <div className="rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-2">
+            <div className="rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2">
               <Select
                 size="sm"
                 aria-label={tableLabels.sortMenuAriaLabel}
@@ -546,7 +638,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             </div>
           ) : null}
           {loading ? null : ctx.paginatedData.length === 0 ? (
-            <div className={getTableResponsiveCardClasses(cardPadding)}>
+            <div className={getTableResponsiveCardClasses(cardPadding)} role="status" aria-live="polite">
               <Empty showImage={false} description={tableLabels.emptyText} />
             </div>
           ) : (
@@ -566,8 +658,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                     (effectiveVirtual && virtualWindow ? virtualWindow.startIndex : 0) + offset
                   const sourceIndex = ctx.pageSourceIndices[index] ?? index
                   const key = ctx.pageRowKeys[index]
-                  const isExpanded = ctx.expandedRowKeySet.has(key)
-                  const isSelected = ctx.selectedRowKeySet.has(key)
+                  const isExpanded = ctx.expandedRowKeySet.has(tableRowKeyId(key))
+                  const isSelected = ctx.selectedRowKeySet.has(tableRowKeyId(key))
                   const isRowExpandable = internalExpandable
                     ? internalExpandable.rowExpandable
                       ? internalExpandable.rowExpandable(record)
@@ -629,7 +721,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                         {internalExpandable && isRowExpandable && (
                           <button
                             type="button"
-                            className="text-sm text-[var(--tiger-primary,#2563eb)]"
+                            className="text-sm text-[var(--tiger-primary)]"
                             aria-expanded={isExpanded}
                             onClick={(event) => {
                               event.stopPropagation()
@@ -713,7 +805,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                                             className={classNames(
                                               gridInfo.className,
                                               gridInfo.divider &&
-                                                'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                                'border-t border-[var(--tiger-border)] pt-3'
                                             )}>
                                             {renderCellContent(column)}
                                           </div>
@@ -727,18 +819,18 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                                             className={classNames(
                                               gridInfo.className,
                                               gridInfo.divider &&
-                                                'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                                'border-t border-[var(--tiger-border)] pt-3'
                                             )}>
                                             <div
                                               className={classNames(
-                                                'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] mb-1',
+                                                'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-secondary)] mb-1',
                                                 gridInfo.labelClassName
                                               )}>
                                               {column.title}
                                             </div>
                                             <div
                                               className={classNames(
-                                                'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
+                                                'min-w-0 text-sm text-[var(--tiger-text)] break-words',
                                                 gridInfo.valueClassName
                                               )}>
                                               {renderCellContent(column)}
@@ -754,18 +846,18 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                                             gridInfo.className,
                                             'grid grid-cols-[auto_1fr] gap-2 items-baseline',
                                             gridInfo.divider &&
-                                              'border-t border-[var(--tiger-border,#e5e7eb)] pt-3'
+                                              'border-t border-[var(--tiger-border)] pt-3'
                                           )}>
                                           <div
                                             className={classNames(
-                                              'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)] shrink-0',
+                                              'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-secondary)] shrink-0',
                                               gridInfo.labelClassName
                                             )}>
                                             {column.title}
                                           </div>
                                           <div
                                             className={classNames(
-                                              'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words',
+                                              'min-w-0 text-sm text-[var(--tiger-text)] break-words',
                                               gridInfo.valueClassName
                                             )}>
                                             {renderCellContent(column)}
@@ -815,7 +907,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                           })()}
 
                           {expandedNode && (
-                            <div className="mt-3 border-t border-[var(--tiger-border,#e5e7eb)] pt-3">
+                            <div className="mt-3 border-t border-[var(--tiger-border)] pt-3">
                               {expandedNode}
                             </div>
                           )}

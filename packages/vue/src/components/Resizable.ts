@@ -190,16 +190,23 @@ export const Resizable = defineComponent({
           )
           commitSize(next, handle, startWidth.value, startHeight.value, 'move')
         },
-        onEnd: ({ currentX, currentY }) => {
-          const next = applyResizeSize(
-            handle,
-            startWidth.value,
-            startHeight.value,
-            currentX - startMouseX.value,
-            currentY - startMouseY.value,
-            props.axis,
-            resizeOptions()
-          )
+        onEnd: ({ currentX, currentY, cancelled }) => {
+          const next = cancelled
+            ? {
+                width: startWidth.value,
+                height: startHeight.value,
+                offsetX: 0,
+                offsetY: 0
+              }
+            : applyResizeSize(
+                handle,
+                startWidth.value,
+                startHeight.value,
+                currentX - startMouseX.value,
+                currentY - startMouseY.value,
+                props.axis,
+                resizeOptions()
+              )
           commitSize(next, handle, startWidth.value, startHeight.value, 'end')
           draggingHandle.value = null
           dragSession = null
@@ -247,21 +254,19 @@ export const Resizable = defineComponent({
     return () => {
       const labelledby = attrs['aria-labelledby']
       const handleNodes = visibleHandles.value.map((pos) => {
-        const corner = isCornerResizeHandle(pos)
         const usesHeight = pos === 'top' || pos === 'bottom'
         const valueNow = Math.round((usesHeight ? height.value : width.value) ?? 0)
         const handleName = formatResizableHandleLabel(labels.value.handleAriaLabel, pos)
         return h('div', {
           class: getResizableHandleClasses(pos, draggingHandle.value === pos, props.disabled),
           'data-handle': pos,
-          role: corner ? undefined : 'separator',
-          'aria-hidden': corner ? 'true' : undefined,
-          'aria-label': corner || typeof labelledby === 'string' ? undefined : handleName,
-          'aria-orientation': corner ? undefined : getResizeHandleOrientation(pos),
-          'aria-valuenow': corner ? undefined : valueNow,
-          'aria-valuemin': corner ? undefined : usesHeight ? props.minHeight : props.minWidth,
-          'aria-valuemax': corner ? undefined : usesHeight ? props.maxHeight : props.maxWidth,
-          tabindex: props.disabled || corner ? -1 : 0,
+          role: 'separator',
+          'aria-label': typeof labelledby === 'string' ? undefined : handleName,
+          'aria-orientation': getResizeHandleOrientation(pos),
+          'aria-valuenow': valueNow,
+          'aria-valuemin': usesHeight ? props.minHeight : props.minWidth,
+          'aria-valuemax': usesHeight ? props.maxHeight : props.maxWidth,
+          tabindex: props.disabled ? -1 : 0,
           onPointerdown: (e: PointerEvent) => onPointerDown(pos, e),
           onKeydown: (e: KeyboardEvent) => onKeyDown(pos, e)
         })

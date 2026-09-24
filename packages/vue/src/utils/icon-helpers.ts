@@ -8,10 +8,10 @@ import {
   icon24ViewBox,
   icon24StrokeWidth,
   icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  icon20ViewBox,
-  classNames
-} from '@expcat/tigercat-core'
+  icon24PathStrokeLinejoin
+} from '@expcat/tigercat-core/icons/common'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
+import { classNames } from '@expcat/tigercat-core'
 
 /**
  * Create a 20×20 filled SVG icon (e.g. DatePicker, TimePicker).

@@ -67,7 +67,7 @@ async function drawBox(
 
 const renderLoadedAnnotation = async (options: Parameters<typeof render>[1]) => {
   const result = render(ImageAnnotation, options)
-  await waitFor(() => expect(result.getByLabelText('Image annotation canvas')).toBeInTheDocument())
+  await waitFor(() => expect(result.getByLabelText(/Image annotation canvas/)).toBeInTheDocument())
   return result
 }
 
@@ -83,7 +83,7 @@ describe('ImageAnnotation', () => {
     })
 
     expect(getByRole('button', { name: 'Rectangle' })).toHaveAttribute('aria-pressed', 'false')
-    expect(getByLabelText('Image annotation canvas')).toBeInTheDocument()
+    expect(getByLabelText(/Image annotation canvas/)).toBeInTheDocument()
   })
 
   it('switches drawing tools', async () => {
@@ -101,7 +101,7 @@ describe('ImageAnnotation', () => {
     })
 
     await fireEvent.click(getByRole('button', { name: 'Rectangle' }))
-    const canvas = getByLabelText('Image annotation canvas')
+    const canvas = getByLabelText(/Image annotation canvas/)
     await drawBox(canvas, { x: 80, y: 60 }, { x: 240, y: 180 })
 
     const [annotations, meta] = emitted().change.at(-1) as [CoreImageAnnotation[], unknown]
@@ -225,11 +225,12 @@ describe('ImageAnnotation', () => {
     })
 
     it('renders custom image alt text', async () => {
-      const { getByAltText } = await renderLoadedAnnotation({
+      const { getByLabelText, container } = await renderLoadedAnnotation({
         props: { src: '/scene.jpg', alt: 'Floor plan' }
       })
 
-      expect(getByAltText('Floor plan')).toBeInTheDocument()
+      expect(getByLabelText(/Floor plan/)).toBeInTheDocument()
+      expect(container.querySelector('img')).toHaveAttribute('aria-hidden', 'true')
     })
 
     it('disables tools and delete when disabled', async () => {
@@ -258,7 +259,7 @@ describe('ImageAnnotation', () => {
       })
 
       await fireEvent.click(getByRole('button', { name: 'Rectangle' }))
-      const canvas = getByLabelText('Image annotation canvas')
+      const canvas = getByLabelText(/Image annotation canvas/)
       await drawBox(canvas, { x: 80, y: 60 }, { x: 82, y: 62 })
 
       expect(emitted().change).toBeUndefined()
@@ -270,7 +271,7 @@ describe('ImageAnnotation', () => {
       })
 
       await fireEvent.click(getByRole('button', { name: 'Polygon' }))
-      const canvas = getByLabelText('Image annotation canvas')
+      const canvas = getByLabelText(/Image annotation canvas/)
       await fireEvent.click(canvas, { clientX: 80, clientY: 60 })
       await fireEvent.click(canvas, { clientX: 240, clientY: 60 })
       await fireEvent.click(canvas, { clientX: 240, clientY: 180 })
@@ -284,7 +285,7 @@ describe('ImageAnnotation', () => {
         props: { src: '/scene.jpg', readonly: true, tool: 'rectangle' }
       })
 
-      const canvas = getByLabelText('Image annotation canvas')
+      const canvas = getByLabelText(/Image annotation canvas/)
       await drawBox(canvas, { x: 80, y: 60 }, { x: 240, y: 180 })
 
       expect(emitted().change).toBeUndefined()
@@ -296,7 +297,7 @@ describe('ImageAnnotation', () => {
       })
       await fireEvent.click(getByRole('button', { name: 'Ellipse' }))
       await drawBox(
-        getByLabelText('Image annotation canvas'),
+        getByLabelText(/Image annotation canvas/),
         { x: 160, y: 120 },
         { x: 320, y: 240 }
       )
@@ -315,7 +316,7 @@ describe('ImageAnnotation', () => {
         props: { src: '/scene.jpg', defaultValue: existing }
       })
       await fireEvent.click(getByRole('button', { name: 'Rectangle' }))
-      await drawBox(getByLabelText('Image annotation canvas'), { x: 80, y: 60 }, { x: 240, y: 180 })
+      await drawBox(getByLabelText(/Image annotation canvas/), { x: 80, y: 60 }, { x: 240, y: 180 })
       const next = emitted().change.at(-1)?.[0] as CoreImageAnnotation[]
       expect(next[1]?.id).not.toBe('rectangle-1')
       expect(next).toHaveLength(2)
@@ -348,7 +349,9 @@ describe('ImageAnnotation', () => {
           h(ConfigProvider, { locale: zhCN }, () => h(ImageAnnotation, { src: '/scene.jpg' }))
       })
       await waitFor(() =>
-        expect(getByLabelText(zhCN.imageEditor!.annotationCanvasAriaLabel!)).toBeInTheDocument()
+        expect(
+          getByLabelText(new RegExp(zhCN.imageEditor!.annotationCanvasAriaLabel!))
+        ).toBeInTheDocument()
       )
     })
   })

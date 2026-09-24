@@ -42,7 +42,7 @@ export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function Back
   {
     visibilityHeight = 400,
     target,
-    duration,
+    behavior,
     position = 'auto',
     placement = 'bottom-right',
     offset,
@@ -108,10 +108,10 @@ export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function Back
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const root = resolveScrollRoot(target, { from: hostRef.current })
-      if (root.target) scrollToTop(root.target as HTMLElement | Window, duration)
+      if (root.target) scrollToTop(root.target as HTMLElement | Window, behavior)
       onClick?.(event)
     },
-    [target, duration, onClick]
+    [target, behavior, onClick]
   )
 
   const buttonClasses = useMemo(

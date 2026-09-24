@@ -15,9 +15,11 @@ import {
   getMasonryFlowRootStyle,
   getMasonryItemClasses,
   getMasonryItemPositionStyle,
+  getMasonryLabels,
   getMasonryPackedRootStyle,
   getMasonryRootClasses,
   hasMeasuredMasonryHeights,
+  masonryLayoutColumnHeights,
   observeElementSize,
   observeScrollAreaSize,
   readMasonryItemHeight,
@@ -29,6 +31,7 @@ import {
   type MasonryLayoutDetail,
   type MasonryProps as CoreMasonryProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface MasonryProps
   extends CoreMasonryProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {
@@ -54,8 +57,8 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
   {
     columns = MASONRY_DEFAULT_COLUMNS,
     gap = MASONRY_DEFAULT_GAP,
+    layout = 'source',
     className,
-    columnClassName: _columnClassName,
     itemClassName,
     children,
     onLayout,
@@ -76,27 +79,33 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
   const childNodes = useMemo(() => Children.toArray(children), [children])
   const signature = childSignature(childNodes)
 
+  const config = useTigerConfig()
+  const orderNoteId = React.useId()
   const columnCount = resolveMasonryColumnCount(columns, containerWidth)
   const gapPx = resolveMasonryGap(gap, containerWidth)
+  const shortest = layout === 'shortest'
   const packed =
-    hasMeasuredMasonryHeights(heights) && containerWidth > 0 && heights.length === childNodes.length
+    shortest &&
+    hasMeasuredMasonryHeights(heights) &&
+    containerWidth > 0 &&
+    heights.length === childNodes.length
   const positions = packed
     ? computeMasonryPositions(heights, columnCount, gapPx, containerWidth)
     : []
 
   const emitLayout = useCallback(
     (nextHeights: number[]) => {
-      const packedPositions = hasMeasuredMasonryHeights(nextHeights)
-        ? computeMasonryPositions(nextHeights, columnCount, gapPx, containerWidth)
-        : []
-      const columnHeights = Array.from({ length: columnCount }, () => 0)
-      packedPositions.forEach((position, index) => {
-        const bottom = position.top + (nextHeights[index] || 0)
-        if (bottom > columnHeights[position.column]) columnHeights[position.column] = bottom
+      onLayoutRef.current?.({
+        columnCount,
+        columnHeights: masonryLayoutColumnHeights(
+          nextHeights,
+          columnCount,
+          gapPx,
+          shortest ? 'shortest' : 'source'
+        )
       })
-      onLayoutRef.current?.({ columnCount, columnHeights })
     },
-    [columnCount, containerWidth, gapPx]
+    [columnCount, gapPx, shortest]
   )
 
   const measure = useCallback(() => {
@@ -129,19 +138,25 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
 
   useEffect(() => {
     if (childNodes.length === 0) return undefined
+    let alive = true
     const items = Array.from(itemRefs.current.values())
-    const stopRo = observeScrollAreaSize(items, measure)
+    const stopRo = observeScrollAreaSize(items, () => {
+      if (alive) measure()
+    })
     const medias = items.flatMap((el) => Array.from(el.querySelectorAll('img, video')))
-    const onLoad = () => measure()
+    const onMedia = (): void => {
+      if (alive) measure()
+    }
     for (const media of medias) {
-      media.addEventListener('load', onLoad)
-      media.addEventListener('error', onLoad)
+      media.addEventListener('load', onMedia)
+      media.addEventListener('error', onMedia)
     }
     return () => {
+      alive = false
       stopRo()
       for (const media of medias) {
-        media.removeEventListener('load', onLoad)
-        media.removeEventListener('error', onLoad)
+        media.removeEventListener('load', onMedia)
+        media.removeEventListener('error', onMedia)
       }
     }
   }, [signature, measure, childNodes.length])
@@ -164,6 +179,9 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
     : { ...getMasonryFlowRootStyle(columnCount, gapPx), ...style }
 
   const labelled = Boolean(rest['aria-label'] || rest['aria-labelledby'])
+  const describedBy = [rest['aria-describedby'], shortest ? orderNoteId : undefined]
+    .filter((value) => typeof value === 'string' && value.length > 0)
+    .join(' ')
 
   return (
     <div
@@ -172,7 +190,14 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
       role={labelled ? 'list' : rest.role}
       className={classNames(getMasonryRootClasses(className))}
       style={rootStyle}
-      data-masonry="">
+      data-masonry=""
+      data-masonry-order={shortest ? 'visual' : undefined}
+      aria-describedby={describedBy || undefined}>
+      {shortest ? (
+        <span id={orderNoteId} className="sr-only">
+          {getMasonryLabels(config.locale).visualOrderText}
+        </span>
+      ) : null}
       {childNodes.map((child, index) => {
         const key =
           typeof child === 'object' && child !== null && 'key' in child && child.key != null

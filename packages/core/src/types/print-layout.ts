@@ -71,6 +71,13 @@ export interface PrintLayoutProps {
   showPageBreaks?: boolean
 
   /**
+   * Whether a page-break marker forces a printed page break.
+   * Independent of the on-screen mark.
+   * @default true
+   */
+  printBreaks?: boolean
+
+  /**
    * Custom page width (CSS length, or a number in mm). Used with `pageHeight`
    * when no named `pageSize` preset should apply.
    */

@@ -24,9 +24,9 @@ describe('QRCode', () => {
     expect(svg).toHaveAttribute('height', '200')
   })
 
-  it('names the active code with the encoded value', () => {
+  it('names the active code without the encoded value', () => {
     render(<QRCode value="https://tigercat.dev" />)
-    expect(screen.getByRole('img', { name: /https:\/\/tigercat\.dev/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'QR Code' })).toBeInTheDocument()
   })
 
   it('forwards ref and root attributes', () => {
@@ -49,7 +49,7 @@ describe('QRCode', () => {
   it('applies background and module colors', () => {
     const { container } = render(<QRCode value="test" bgColor="#eeeeee" color="#ff0000" />)
     expect(container.querySelector('svg > rect')).toHaveAttribute('fill', '#eeeeee')
-    expect(container.querySelectorAll('svg rect[fill="#ff0000"]').length).toBeGreaterThan(0)
+    expect(container.querySelector('svg path')).toHaveAttribute('fill', '#ff0000')
   })
 
   it('does not paint a refresh control without a handler', () => {
@@ -70,11 +70,11 @@ describe('QRCode', () => {
       <QRCode value="test" status="expired" onRefresh={() => undefined} />
     )
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
-    expect(screen.getByRole('status', { name: /QR code expired/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /QR code expired/ })).toBeInTheDocument()
 
     rerender(<QRCode value="test" status="loading" />)
     expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
-    expect(screen.getByRole('status', { name: /Loading/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /Loading/ })).toBeInTheDocument()
   })
 
   it('uses official locale objects for aria and status text', () => {

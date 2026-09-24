@@ -266,7 +266,8 @@ describe('scroll-area-utils', () => {
 
     it('hides the native scrollbar and appends a custom class', () => {
       const classes = getScrollAreaViewportClasses('vertical', 'custom-viewport')
-      expect(classes).toContain('[&::-webkit-scrollbar]:hidden')
+      expect(classes).toContain('tiger-scroll-area-viewport')
+      expect(classes).toContain('custom-viewport')
       expect(classes).toContain('custom-viewport')
     })
 
@@ -357,7 +358,7 @@ describe('scroll-area-utils', () => {
 
       expect(observe).toHaveBeenCalledTimes(2)
       teardown()
-      expect(disconnect).toHaveBeenCalledTimes(1)
+      expect(disconnect).toHaveBeenCalledTimes(2)
       vi.unstubAllGlobals()
     })
 

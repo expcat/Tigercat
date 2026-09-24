@@ -110,7 +110,7 @@ const rows = flattenRecords(schemaToRouteRecords(backendSchema))
 
 <template>
   <div class="space-y-3">
-    <p class="text-sm text-[var(--tiger-text-muted)]">
+    <p class="text-sm text-[var(--tiger-text-secondary)]">
       侧栏走 Menu；表是 schemaToRouteRecords 的纯数据，宿主自己 addRoute。
     </p>
     <Layout class="h-80 overflow-hidden rounded border border-[var(--tiger-border)]">

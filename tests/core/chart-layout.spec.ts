@@ -48,7 +48,7 @@ describe('layoutBarRects', () => {
     expect(bars[1].y + bars[1].height).toBeGreaterThan(yScale.map(0))
   })
 
-  it('skips non-finite y and duplicate category x', () => {
+  it('skips non-finite y and groups duplicate category x', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const bars = layoutBarRects(
       [
@@ -61,8 +61,8 @@ describe('layoutBarRects', () => {
       { palette: ['#111'], innerWidth: 100 }
     )
 
-    expect(bars).toHaveLength(1)
-    expect(bars[0].datum.y).toBe(10)
+    expect(bars).toHaveLength(2)
+    expect(bars.map((bar) => bar.datum.y)).toEqual([10, 4])
     warn.mockRestore()
   })
 
@@ -78,12 +78,13 @@ describe('layoutBarRects', () => {
     expect(bars[0].height).toBeGreaterThanOrEqual(6)
   })
 
-  it('skips exact-zero bars when min height is off', () => {
+  it('keeps exact-zero bars in the hit order when min height is off', () => {
     const bars = layoutBarRects([{ x: 'A', y: 0 }], xScale, yScale, {
       palette: ['#111'],
       innerWidth: 100
     })
-    expect(bars).toHaveLength(0)
+    expect(bars).toHaveLength(1)
+    expect(bars[0].height).toBe(0)
   })
 })
 
@@ -461,8 +462,8 @@ describe('layoutRadar', () => {
     )
     expect(laid.angles).toHaveLength(5)
     expect(laid.series[0].points).toHaveLength(5)
-    expect(laid.series[1].points).toHaveLength(3)
-    expect(laid.series[1].points.map((point) => point.index)).toEqual([0, 2, 4])
+    expect(laid.series[1].points).toHaveLength(5)
+    expect(laid.series[1].points.map((point) => point.index)).toEqual([0, 1, 2, 3, 4])
   })
 
   it('omits non-finite and negative vertices from the polygon', () => {
@@ -478,7 +479,7 @@ describe('layoutRadar', () => {
         palette: ['#111']
       }
     )
-    expect(laid.series[0].points).toHaveLength(2)
+    expect(laid.series[0].points).toHaveLength(4)
     expect(laid.series[0].path).not.toContain('NaN')
     warn.mockRestore()
   })

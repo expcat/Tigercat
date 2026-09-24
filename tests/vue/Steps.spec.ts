@@ -198,7 +198,7 @@ describe('Steps', () => {
       })
 
       const icons = container.querySelectorAll('.tiger-step-icon')
-      expect(icons[1]).toHaveClass('text-[var(--tiger-error,#ef4444)]')
+      expect(icons[1]).toHaveClass('text-[var(--tiger-error)]')
     })
   })
 

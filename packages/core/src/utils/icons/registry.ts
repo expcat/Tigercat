@@ -206,46 +206,55 @@ export type IconName = keyof typeof iconRegistry
  */
 export const iconNames = Object.keys(iconRegistry) as IconName[]
 
-const customIconRegistry = new Map<string, IconDefinition>()
+const builtInIcons = iconRegistry as Record<string, IconDefinition>
 
-/**
- * Look up a built-in or {@link registerIcon registered} icon definition.
- * Returns `undefined` for unknown names so callers can fall back gracefully.
- * Built-in names win over custom registrations.
- */
-export function getIconDefinition(name: string): IconDefinition | undefined {
-  return (iconRegistry as Record<string, IconDefinition>)[name] ?? customIconRegistry.get(name)
+export interface IconRegistry {
+  register(name: string, definition: IconDefinition): void
+  registerMany(icons: Record<string, IconDefinition>): void
+  get(name: string): IconDefinition | undefined
+  unregister(name: string): void
+  customNames(): string[]
+  dispose(): void
 }
 
 /**
- * Register an application-level icon name. Unknown `Icon name="…"` lookups
- * resolve through this map. Built-in names are not overwritten. Importing
- * this function from `@expcat/tigercat-core/icons/registry` keeps unused
- * glyphs tree-shakeable.
+ * Application-owned custom icons. Built-in names cannot be overwritten.
+ * Call `dispose` when the app unmounts.
  */
-export function registerIcon(name: string, definition: IconDefinition): void {
-  const trimmed = name.trim()
-  if (!trimmed) return
-  if ((iconRegistry as Record<string, IconDefinition>)[trimmed]) return
-  customIconRegistry.set(trimmed, definition)
-}
-
-export function registerIcons(icons: Record<string, IconDefinition>): void {
-  for (const [name, definition] of Object.entries(icons)) {
-    registerIcon(name, definition)
+export function createIconRegistry(): IconRegistry {
+  const custom = new Map<string, IconDefinition>()
+  return {
+    register(name, definition) {
+      const trimmed = name.trim()
+      if (!trimmed || builtInIcons[trimmed]) return
+      custom.set(trimmed, definition)
+    },
+    registerMany(icons) {
+      for (const [name, definition] of Object.entries(icons)) this.register(name, definition)
+    },
+    get(name) {
+      return custom.get(name) ?? builtInIcons[name]
+    },
+    unregister(name) {
+      custom.delete(name)
+    },
+    customNames() {
+      return Array.from(custom.keys())
+    },
+    dispose() {
+      custom.clear()
+    }
   }
 }
 
-export function unregisterIcon(name: string): void {
-  customIconRegistry.delete(name)
-}
-
-export function clearRegisteredIcons(): void {
-  customIconRegistry.clear()
-}
-
-export function registeredIconNames(): string[] {
-  return Array.from(customIconRegistry.keys())
+/**
+ * Built-in icons win. Custom icons resolve only through the registry passed in.
+ */
+export function getIconDefinition(
+  name: string,
+  registry?: IconRegistry | null
+): IconDefinition | undefined {
+  return registry?.get(name) ?? builtInIcons[name]
 }
 
 // ---------------------------------------------------------------------------

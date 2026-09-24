@@ -90,19 +90,21 @@ export const ChartAxis = defineComponent({
           ...attrs,
           class: axisClasses.value,
           transform: `translate(${props.x}, ${props.y})`,
-          'aria-hidden': 'true'
+          'data-axis-orientation': props.orientation
         },
         [
           h('line', {
             ...next.axisLine,
             class: chartAxisLineClasses,
-            'data-axis-line': 'true'
+            'data-axis-line': 'true',
+            'aria-hidden': 'true'
           }),
           ...next.ticks.map((tick) =>
             h('g', { key: tick.key, 'data-axis-tick': 'true' }, [
               h('line', {
                 ...tick.line,
-                class: chartAxisTickLineClasses
+                class: chartAxisTickLineClasses,
+                'aria-hidden': 'true'
               }),
               h(
                 'text',

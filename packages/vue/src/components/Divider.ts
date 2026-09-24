@@ -75,8 +75,9 @@ export const Divider = defineComponent({
           style: labeled
             ? mergeStyleValues(attrsRecord.style, props.style)
             : mergeStyleValues(lineStyleObj, attrsRecord.style, props.style),
-          role: 'separator',
-          'aria-orientation': props.orientation,
+          role: labeled ? 'separator' : undefined,
+          'aria-orientation': labeled ? props.orientation : undefined,
+          'aria-hidden': labeled ? undefined : 'true',
           'data-tiger-divider': ''
         },
         labeled

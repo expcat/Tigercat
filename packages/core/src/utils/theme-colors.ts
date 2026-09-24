@@ -74,6 +74,10 @@ export interface ThemeColors {
    * Link button theme (text-only appearance)
    */
   link: ButtonColorScheme
+  danger: ButtonColorScheme
+  dangerOutline: ButtonColorScheme
+  dangerGhost: ButtonColorScheme
+  dangerLink: ButtonColorScheme
 }
 
 /**
@@ -82,48 +86,78 @@ export interface ThemeColors {
  */
 export const defaultThemeColors: ThemeColors = {
   primary: {
-    bg: 'bg-[var(--tiger-primary,#2563eb)]',
-    bgHover: 'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]',
-    text: 'text-[var(--tiger-primary-foreground,#ffffff)]',
-    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
-    disabled: 'disabled:bg-[var(--tiger-primary-disabled,#93c5fd)]'
+    bg: 'bg-[var(--tiger-primary)]',
+    bgHover: 'hover:bg-[var(--tiger-primary-hover)]',
+    text: 'text-[var(--tiger-primary-foreground)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
+    disabled: 'disabled:bg-[var(--tiger-primary-disabled)]'
   },
   secondary: {
-    bg: 'bg-[var(--tiger-secondary,#4b5563)]',
-    bgHover: 'hover:bg-[var(--tiger-secondary-hover,#374151)]',
-    text: 'text-[var(--tiger-secondary-foreground,#ffffff)]',
-    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-secondary,#4b5563))]',
-    disabled: 'disabled:bg-[var(--tiger-secondary-disabled,#9ca3af)]'
+    bg: 'bg-[var(--tiger-secondary)]',
+    bgHover: 'hover:bg-[var(--tiger-secondary-hover)]',
+    text: 'text-[var(--tiger-secondary-foreground)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
+    disabled: 'disabled:bg-[var(--tiger-secondary-disabled)]'
   },
   outline: {
     bg: 'bg-transparent',
-    bgHover: 'hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
-    text: 'text-[var(--tiger-primary,#2563eb)]',
-    border: 'border-2 border-[var(--tiger-primary,#2563eb)]',
-    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+    bgHover: 'hover:bg-[var(--tiger-outline-bg-hover)]',
+    text: 'text-[var(--tiger-primary)]',
+    border: 'border-2 border-[var(--tiger-primary)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
     disabled:
-      'disabled:border-[var(--tiger-primary-disabled,#93c5fd)] disabled:text-[var(--tiger-primary-disabled,#93c5fd)]'
+      'disabled:border-[var(--tiger-primary-disabled)] disabled:text-[var(--tiger-primary-disabled)]'
   },
   ghost: {
     bg: 'bg-transparent',
-    bgHover: 'hover:bg-[var(--tiger-ghost-bg-hover,#eff6ff)]',
-    text: 'text-[var(--tiger-primary,#2563eb)]',
-    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
-    disabled: 'disabled:text-[var(--tiger-primary-disabled,#93c5fd)]'
+    bgHover: 'hover:bg-[var(--tiger-ghost-bg-hover)]',
+    text: 'text-[var(--tiger-primary)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
+    disabled: 'disabled:text-[var(--tiger-primary-disabled)]'
   },
   link: {
     bg: 'bg-transparent',
     bgHover: 'hover:underline',
-    text: 'text-[var(--tiger-primary,#2563eb)]',
-    focus: 'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
-    disabled: 'disabled:text-[var(--tiger-primary-disabled,#93c5fd)]'
+    text: 'text-[var(--tiger-primary)]',
+    focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
+    disabled: 'disabled:text-[var(--tiger-primary-disabled)]'
+  },
+  danger: {
+    bg: 'bg-[var(--tiger-error)]',
+    bgHover: 'hover:bg-[var(--tiger-error-hover)]',
+    text: 'text-[var(--tiger-error-foreground)]',
+    focus: 'focus-visible:ring-[var(--tiger-error)]',
+    disabled: 'disabled:bg-[var(--tiger-error-disabled)]'
+  },
+  dangerOutline: {
+    bg: 'bg-transparent',
+    bgHover: 'hover:bg-[var(--tiger-error-bg-hover)]',
+    text: 'text-[var(--tiger-error)]',
+    border: 'border-2 border-[var(--tiger-error)]',
+    focus: 'focus-visible:ring-[var(--tiger-error)]',
+    disabled:
+      'disabled:border-[var(--tiger-error-disabled)] disabled:text-[var(--tiger-error-disabled)]'
+  },
+  dangerGhost: {
+    bg: 'bg-transparent',
+    bgHover: 'hover:bg-[var(--tiger-error-bg-hover)]',
+    text: 'text-[var(--tiger-error)]',
+    focus: 'focus-visible:ring-[var(--tiger-error)]',
+    disabled: 'disabled:text-[var(--tiger-error-disabled)]'
+  },
+  dangerLink: {
+    bg: 'bg-transparent',
+    bgHover: 'hover:underline',
+    text: 'text-[var(--tiger-error)]',
+    focus: 'focus-visible:ring-[var(--tiger-error)]',
+    disabled: 'disabled:text-[var(--tiger-error-disabled)]'
   }
 }
 
 /**
  * Get button variant classes based on theme colors.
- * Unknown variants fall back to primary (does not throw). Keyboard ring lives
- * on `buttonBaseClasses` (`focus-visible`); `scheme.focus` is not joined.
+ * Unknown variants fall back to primary (does not throw). `scheme.focus` is part
+ * of the same recipe as the color classes.
  */
 export function getButtonVariantClasses(
   variant?: string,
@@ -137,6 +171,7 @@ export function getButtonVariantClasses(
     scheme.text,
     scheme.border,
     scheme.borderHover,
+    scheme.focus,
     scheme.disabled
   ].filter(Boolean)
 
@@ -188,13 +223,13 @@ export interface RadioColorScheme {
  * Default radio color scheme using Tailwind CSS classes
  */
 export const defaultRadioColors: RadioColorScheme = {
-  border: 'border-[var(--tiger-border,#d1d5db)]',
-  borderChecked: 'border-[var(--tiger-primary,#2563eb)]',
-  bg: 'bg-[var(--tiger-surface,#ffffff)]',
-  bgChecked: 'bg-[var(--tiger-primary,#2563eb)]',
-  innerDot: 'bg-[var(--tiger-surface,#ffffff)]',
-  disabled: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#d1d5db)]',
-  textDisabled: 'text-[var(--tiger-text-disabled,#d1d5db)]'
+  border: 'border-[var(--tiger-border)]',
+  borderChecked: 'border-[var(--tiger-primary)]',
+  bg: 'bg-[var(--tiger-surface)]',
+  bgChecked: 'bg-[var(--tiger-primary)]',
+  innerDot: 'bg-[var(--tiger-surface)]',
+  disabled: 'bg-[var(--tiger-surface-muted)] border-[var(--tiger-border)]',
+  textDisabled: 'text-[var(--tiger-text-disabled)]'
 }
 
 /**
@@ -248,22 +283,22 @@ export interface LinkThemeColors {
  */
 export const defaultLinkThemeColors: LinkThemeColors = {
   primary: {
-    text: 'text-[var(--tiger-primary,#2563eb)]',
-    textHover: 'hover:text-[var(--tiger-primary-hover,#1d4ed8)]',
-    focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
-    disabled: 'text-[var(--tiger-primary-disabled,#93c5fd)]'
+    text: 'text-[var(--tiger-primary)]',
+    textHover: 'hover:text-[var(--tiger-primary-hover)]',
+    focus: 'focus:ring-[var(--tiger-primary)]',
+    disabled: 'text-[var(--tiger-primary-disabled)]'
   },
   secondary: {
-    text: 'text-[var(--tiger-secondary,#4b5563)]',
-    textHover: 'hover:text-[var(--tiger-secondary-hover,#374151)]',
-    focus: 'focus:ring-[var(--tiger-secondary,#4b5563)]',
-    disabled: 'text-[var(--tiger-secondary-disabled,#9ca3af)]'
+    text: 'text-[var(--tiger-secondary)]',
+    textHover: 'hover:text-[var(--tiger-secondary-hover)]',
+    focus: 'focus:ring-[var(--tiger-secondary)]',
+    disabled: 'text-[var(--tiger-secondary-disabled)]'
   },
   default: {
-    text: 'text-[var(--tiger-text,#111827)]',
-    textHover: 'hover:text-[var(--tiger-text-secondary,#6b7280)]',
-    focus: 'focus:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
-    disabled: 'text-[var(--tiger-text-disabled,#d1d5db)]'
+    text: 'text-[var(--tiger-text)]',
+    textHover: 'hover:text-[var(--tiger-text-secondary)]',
+    focus: 'focus:ring-[var(--tiger-focus-ring)]',
+    disabled: 'text-[var(--tiger-text-disabled)]'
   }
 }
 
@@ -332,13 +367,13 @@ export const textAlignClasses = {
  * Text color classes mapping
  */
 export const textColorClasses = {
-  default: 'text-[var(--tiger-text,#111827)]',
-  primary: 'text-[var(--tiger-primary,#2563eb)]',
-  secondary: 'text-[var(--tiger-secondary,#4b5563)]',
-  success: 'text-[var(--tiger-success,#16a34a)]',
-  warning: 'text-[var(--tiger-warning,#ca8a04)]',
-  danger: 'text-[var(--tiger-error,#dc2626)]',
-  muted: 'text-[var(--tiger-text-muted,#6b7280)]'
+  default: 'text-[var(--tiger-text)]',
+  primary: 'text-[var(--tiger-primary)]',
+  secondary: 'text-[var(--tiger-secondary)]',
+  success: 'text-[var(--tiger-success)]',
+  warning: 'text-[var(--tiger-warning)]',
+  danger: 'text-[var(--tiger-error)]',
+  muted: 'text-[var(--tiger-text-secondary)]'
 } as const
 
 /**
@@ -417,40 +452,40 @@ export interface TagThemeColors {
  */
 export const defaultTagThemeColors: TagThemeColors = {
   default: {
-    bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
-    text: 'text-[var(--tiger-text,#111827)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    closeBgHover: 'hover:bg-[var(--tiger-border,#e5e7eb)]'
+    bg: 'bg-[var(--tiger-surface-muted)]',
+    text: 'text-[var(--tiger-text)]',
+    border: 'border-[var(--tiger-border)]',
+    closeBgHover: 'hover:bg-[var(--tiger-border)]'
   },
   primary: {
-    bg: 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
+    bg: 'bg-[var(--tiger-outline-bg-hover)]',
     text: mixStatusTowardTextClass('text', '--tiger-primary', '#2563eb'),
-    border: 'border-[var(--tiger-primary-disabled,#93c5fd)]',
-    closeBgHover: 'hover:bg-[var(--tiger-primary-disabled,#93c5fd)]'
+    border: 'border-[var(--tiger-primary-disabled)]',
+    closeBgHover: 'hover:bg-[var(--tiger-primary-disabled)]'
   },
   success: {
-    bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
+    bg: 'bg-[var(--tiger-surface-muted)]',
     text: mixStatusTowardTextClass('text', '--tiger-success', '#16a34a'),
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    closeBgHover: 'hover:bg-[var(--tiger-border,#e5e7eb)]'
+    border: 'border-[var(--tiger-border)]',
+    closeBgHover: 'hover:bg-[var(--tiger-border)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-surface-muted,#f9fafb)]',
+    bg: 'bg-[var(--tiger-surface-muted)]',
     text: mixStatusTowardTextClass('text', '--tiger-warning', '#d97706'),
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    closeBgHover: 'hover:bg-[var(--tiger-border,#e5e7eb)]'
+    border: 'border-[var(--tiger-border)]',
+    closeBgHover: 'hover:bg-[var(--tiger-border)]'
   },
   danger: {
-    bg: 'bg-[var(--tiger-error-bg-hover,#fef2f2)]',
+    bg: 'bg-[var(--tiger-error-bg-hover)]',
     text: mixStatusTowardTextClass('text', '--tiger-error', '#dc2626'),
-    border: 'border-[var(--tiger-error-disabled,#fca5a5)]',
-    closeBgHover: 'hover:bg-[var(--tiger-error-disabled,#fca5a5)]'
+    border: 'border-[var(--tiger-error-disabled)]',
+    closeBgHover: 'hover:bg-[var(--tiger-error-disabled)]'
   },
   info: {
-    bg: 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
+    bg: 'bg-[var(--tiger-outline-bg-hover)]',
     text: mixStatusTowardTextClass('text', '--tiger-info', '#3b82f6'),
-    border: 'border-[var(--tiger-primary-disabled,#93c5fd)]',
-    closeBgHover: 'hover:bg-[var(--tiger-primary-disabled,#93c5fd)]'
+    border: 'border-[var(--tiger-primary-disabled)]',
+    closeBgHover: 'hover:bg-[var(--tiger-primary-disabled)]'
   }
 }
 
@@ -497,28 +532,28 @@ export interface BadgeThemeColors {
  */
 export const defaultBadgeThemeColors: BadgeThemeColors = {
   default: {
-    bg: mixStatusTowardTextClass('bg', '--tiger-text-muted', '#6b7280'),
-    text: 'text-[var(--tiger-secondary-foreground,#ffffff)]'
+    bg: mixStatusTowardTextClass('bg', '--tiger-text-secondary', '#6b7280'),
+    text: 'text-[var(--tiger-secondary-foreground)]'
   },
   primary: {
-    bg: 'bg-[var(--tiger-primary,#2563eb)]',
-    text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
+    bg: 'bg-[var(--tiger-primary)]',
+    text: 'text-[var(--tiger-primary-foreground)]'
   },
   success: {
     bg: mixStatusTowardTextClass('bg', '--tiger-success', '#16a34a'),
-    text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
+    text: 'text-[var(--tiger-primary-foreground)]'
   },
   warning: {
     bg: mixStatusTowardTextClass('bg', '--tiger-warning', '#d97706'),
-    text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
+    text: 'text-[var(--tiger-primary-foreground)]'
   },
   danger: {
     bg: mixStatusTowardTextClass('bg', '--tiger-error', '#dc2626'),
-    text: 'text-[var(--tiger-error-foreground,#ffffff)]'
+    text: 'text-[var(--tiger-error-foreground)]'
   },
   info: {
     bg: mixStatusTowardTextClass('bg', '--tiger-info', '#3b82f6'),
-    text: 'text-[var(--tiger-primary-foreground,#ffffff)]'
+    text: 'text-[var(--tiger-primary-foreground)]'
   }
 }
 
@@ -589,28 +624,28 @@ export interface ProgressThemeColors {
  */
 export const defaultProgressThemeColors: ProgressThemeColors = {
   default: {
-    bg: 'bg-[color:var(--tiger-text-muted,#6b7280)]',
-    text: 'text-[color:var(--tiger-text,#374151)]'
+    bg: 'bg-[color:var(--tiger-text-secondary)]',
+    text: 'text-[color:var(--tiger-text)]'
   },
   primary: {
-    bg: 'bg-[color:var(--tiger-primary,#2563eb)]',
-    text: 'text-[color:var(--tiger-primary,#2563eb)]'
+    bg: 'bg-[color:var(--tiger-primary)]',
+    text: 'text-[color:var(--tiger-primary)]'
   },
   success: {
-    bg: 'bg-[color:var(--tiger-success,#16a34a)]',
-    text: 'text-[color:var(--tiger-success,#16a34a)]'
+    bg: 'bg-[color:var(--tiger-success)]',
+    text: 'text-[color:var(--tiger-success)]'
   },
   warning: {
-    bg: 'bg-[color:var(--tiger-warning,#d97706)]',
-    text: 'text-[color:var(--tiger-warning,#d97706)]'
+    bg: 'bg-[color:var(--tiger-warning)]',
+    text: 'text-[color:var(--tiger-warning)]'
   },
   danger: {
-    bg: 'bg-[color:var(--tiger-error,#dc2626)]',
-    text: 'text-[color:var(--tiger-error,#dc2626)]'
+    bg: 'bg-[color:var(--tiger-error)]',
+    text: 'text-[color:var(--tiger-error)]'
   },
   info: {
-    bg: 'bg-[color:var(--tiger-info,#3b82f6)]',
-    text: 'text-[color:var(--tiger-info,#3b82f6)]'
+    bg: 'bg-[color:var(--tiger-info)]',
+    text: 'text-[color:var(--tiger-info)]'
   }
 }
 
@@ -639,7 +674,7 @@ export function getProgressTextColorClasses(
   colors: ProgressThemeColors = defaultProgressThemeColors
 ): string {
   const scheme = colors[variant]
-  return scheme.text || 'text-[var(--tiger-text,#374151)]'
+  return scheme.text || 'text-[var(--tiger-text)]'
 }
 
 /**
@@ -718,44 +753,44 @@ export interface AlertThemeColors {
  */
 export const defaultAlertThemeColors: AlertThemeColors = {
   success: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    icon: 'text-[var(--tiger-success,#16a34a)]',
-    title: 'text-[var(--tiger-success,#16a34a)]',
-    description: 'text-[var(--tiger-text-secondary,#6b7280)]',
-    closeButton: 'text-[var(--tiger-success,#16a34a)]',
-    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
-    focus: 'focus:ring-[color:var(--tiger-success,#16a34a)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    icon: 'text-[var(--tiger-success)]',
+    title: 'text-[var(--tiger-success)]',
+    description: 'text-[var(--tiger-text-secondary)]',
+    closeButton: 'text-[var(--tiger-success)]',
+    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted)]',
+    focus: 'focus:ring-[color:var(--tiger-success)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    icon: 'text-[var(--tiger-warning,#d97706)]',
-    title: 'text-[var(--tiger-warning,#d97706)]',
-    description: 'text-[var(--tiger-text-secondary,#6b7280)]',
-    closeButton: 'text-[var(--tiger-warning,#d97706)]',
-    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
-    focus: 'focus:ring-[color:var(--tiger-warning,#d97706)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    icon: 'text-[var(--tiger-warning)]',
+    title: 'text-[var(--tiger-warning)]',
+    description: 'text-[var(--tiger-text-secondary)]',
+    closeButton: 'text-[var(--tiger-warning)]',
+    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted)]',
+    focus: 'focus:ring-[color:var(--tiger-warning)]'
   },
   error: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    icon: 'text-[var(--tiger-error,#dc2626)]',
-    title: 'text-[var(--tiger-error,#dc2626)]',
-    description: 'text-[var(--tiger-text-secondary,#6b7280)]',
-    closeButton: 'text-[var(--tiger-error,#dc2626)]',
-    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
-    focus: 'focus:ring-[color:var(--tiger-error,#dc2626)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    icon: 'text-[var(--tiger-error)]',
+    title: 'text-[var(--tiger-error)]',
+    description: 'text-[var(--tiger-text-secondary)]',
+    closeButton: 'text-[var(--tiger-error)]',
+    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted)]',
+    focus: 'focus:ring-[color:var(--tiger-error)]'
   },
   info: {
-    bg: 'bg-[var(--tiger-surface,#ffffff)]',
-    border: 'border-[var(--tiger-border,#e5e7eb)]',
-    icon: 'text-[var(--tiger-info,#3b82f6)]',
-    title: 'text-[var(--tiger-info,#3b82f6)]',
-    description: 'text-[var(--tiger-text-secondary,#6b7280)]',
-    closeButton: 'text-[var(--tiger-info,#3b82f6)]',
-    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
-    focus: 'focus:ring-[color:var(--tiger-info,#3b82f6)]'
+    bg: 'bg-[var(--tiger-surface)]',
+    border: 'border-[var(--tiger-border)]',
+    icon: 'text-[var(--tiger-info)]',
+    title: 'text-[var(--tiger-info)]',
+    description: 'text-[var(--tiger-text-secondary)]',
+    closeButton: 'text-[var(--tiger-info)]',
+    closeButtonHover: 'hover:bg-[var(--tiger-surface-muted)]',
+    focus: 'focus:ring-[color:var(--tiger-info)]'
   }
 }
 

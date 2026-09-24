@@ -43,5 +43,10 @@ export function useFormController(options: FormControllerOptions = {}): FormCont
     }
   }, [])
 
+  useEffect(() => {
+    const next = options.initialValues
+    if (next) engineRef.current?.setInitialValues(next)
+  }, [options.initialValues])
+
   return engineRef.current
 }

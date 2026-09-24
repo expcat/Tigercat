@@ -70,50 +70,50 @@ export const transitionPresets: Record<TransitionType, TransitionClasses> = {
   },
   'slide-up': {
     enterFrom: 'opacity-0 translate-y-2',
-    enterActive: `transition-all duration-300 ${EASING_ENTER}`,
+    enterActive: `[transition:var(--tiger-transition-base)] ${EASING_ENTER}`,
     enterTo: 'opacity-100 translate-y-0',
     leaveFrom: 'opacity-100 translate-y-0',
-    leaveActive: `transition-all duration-300 ${EASING_LEAVE}`,
+    leaveActive: `[transition:var(--tiger-transition-base)] ${EASING_LEAVE}`,
     leaveTo: 'opacity-0 translate-y-2'
   },
   'slide-down': {
     enterFrom: 'opacity-0 -translate-y-2',
-    enterActive: `transition-all duration-300 ${EASING_ENTER}`,
+    enterActive: `[transition:var(--tiger-transition-base)] ${EASING_ENTER}`,
     enterTo: 'opacity-100 translate-y-0',
     leaveFrom: 'opacity-100 translate-y-0',
-    leaveActive: `transition-all duration-300 ${EASING_LEAVE}`,
+    leaveActive: `[transition:var(--tiger-transition-base)] ${EASING_LEAVE}`,
     leaveTo: 'opacity-0 -translate-y-2'
   },
   'slide-left': {
     enterFrom: 'opacity-0 -translate-x-full',
-    enterActive: `transition-all duration-300 ${EASING_ENTER}`,
+    enterActive: `[transition:var(--tiger-transition-base)] ${EASING_ENTER}`,
     enterTo: 'opacity-100 translate-x-0',
     leaveFrom: 'opacity-100 translate-x-0',
-    leaveActive: `transition-all duration-300 ${EASING_LEAVE}`,
+    leaveActive: `[transition:var(--tiger-transition-base)] ${EASING_LEAVE}`,
     leaveTo: 'opacity-0 -translate-x-full'
   },
   'slide-right': {
     enterFrom: 'opacity-0 translate-x-full',
-    enterActive: `transition-all duration-300 ${EASING_ENTER}`,
+    enterActive: `[transition:var(--tiger-transition-base)] ${EASING_ENTER}`,
     enterTo: 'opacity-100 translate-x-0',
     leaveFrom: 'opacity-100 translate-x-0',
-    leaveActive: `transition-all duration-300 ${EASING_LEAVE}`,
+    leaveActive: `[transition:var(--tiger-transition-base)] ${EASING_LEAVE}`,
     leaveTo: 'opacity-0 translate-x-full'
   },
   scale: {
     enterFrom: 'opacity-0 scale-95',
-    enterActive: `transition-all duration-200 ${EASING_ENTER}`,
+    enterActive: `[transition:var(--tiger-transition-quick)] ${EASING_ENTER}`,
     enterTo: 'opacity-100 scale-100',
     leaveFrom: 'opacity-100 scale-100',
-    leaveActive: `transition-all duration-200 ${EASING_LEAVE}`,
+    leaveActive: `[transition:var(--tiger-transition-quick)] ${EASING_LEAVE}`,
     leaveTo: 'opacity-0 scale-95'
   },
   collapse: {
     enterFrom: 'opacity-0 max-h-0 overflow-hidden',
-    enterActive: `transition-all duration-300 ${EASING_ENTER}`,
-    enterTo: 'opacity-100 max-h-[var(--tiger-collapse-height,1000px)]',
-    leaveFrom: 'opacity-100 max-h-[var(--tiger-collapse-height,1000px)]',
-    leaveActive: `transition-all duration-300 ${EASING_LEAVE}`,
+    enterActive: `[transition:var(--tiger-transition-base)] ${EASING_ENTER}`,
+    enterTo: 'opacity-100 max-h-[var(--tiger-collapse-height)]',
+    leaveFrom: 'opacity-100 max-h-[var(--tiger-collapse-height)]',
+    leaveActive: `[transition:var(--tiger-transition-base)] ${EASING_LEAVE}`,
     leaveTo: 'opacity-0 max-h-0 overflow-hidden'
   }
 }
@@ -141,12 +141,12 @@ export function getTransitionClasses(
   return {
     enterFrom: preset.enterFrom,
     enterActive: durationClass
-      ? `transition-all ${durationClass} ${enterEasing}`
+      ? `[transition-property:color,background-color,border-color,outline-color,text-decoration-color,box-shadow,opacity,transform] ${durationClass} ${enterEasing}`
       : preset.enterActive,
     enterTo: preset.enterTo,
     leaveFrom: preset.leaveFrom,
     leaveActive: durationClass
-      ? `transition-all ${durationClass} ${leaveEasing}`
+      ? `[transition-property:color,background-color,border-color,outline-color,text-decoration-color,box-shadow,opacity,transform] ${durationClass} ${leaveEasing}`
       : preset.leaveActive,
     leaveTo: preset.leaveTo
   }
@@ -183,9 +183,29 @@ export function getComponentTransition(componentName: string): TransitionClasses
  * Check if the user prefers reduced motion.
  * Returns false in SSR environments.
  */
+export const PREFERS_REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+
 export function prefersReducedMotion(): boolean {
   if (!isBrowser() || typeof window.matchMedia !== 'function') return false
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  return window.matchMedia(PREFERS_REDUCED_MOTION_QUERY).matches
+}
+
+/**
+ * Listen for reduced-motion changes. Does not emit the current value, so the
+ * first paint can match the server (autoplay decided after subscribe).
+ */
+export function subscribePrefersReducedMotion(onChange: (reduced: boolean) => void): () => void {
+  if (!isBrowser() || typeof window.matchMedia !== 'function') return () => undefined
+  const media = window.matchMedia(PREFERS_REDUCED_MOTION_QUERY)
+  const emit = (): void => {
+    onChange(media.matches)
+  }
+  if (typeof media.addEventListener === 'function') {
+    media.addEventListener('change', emit)
+    return () => media.removeEventListener('change', emit)
+  }
+  media.addListener(emit)
+  return () => media.removeListener(emit)
 }
 
 /**

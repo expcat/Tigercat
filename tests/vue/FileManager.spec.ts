@@ -122,10 +122,11 @@ describe('FileManager (Vue)', () => {
   })
 
   it('shows loading overlay', () => {
-    const { getByRole } = render(FileManager, {
+    const { getByRole, getByText, container } = render(FileManager, {
       props: { files, loading: true }
     })
-    expect(getByRole('status')).toBeTruthy()
+    expect(container.querySelector('[role="status"]')).toBeNull()
+    expect(getByText('Loading...')).toBeTruthy()
     expect(getByRole('listbox')).toHaveAttribute('aria-disabled', 'true')
   })
 
@@ -355,14 +356,16 @@ describe('FileManager (Vue)', () => {
     const wrapper = render(FileManager, {
       props: { files: tree, currentPath: ['src'], draggable: true }
     })
-    const dataTransfer = { setData: vi.fn(), effectAllowed: 'none', dropEffect: 'none' }
-    await fireEvent.dragStart(wrapper.getByText('c.ts').closest('[role="option"]')!, {
-      dataTransfer
-    })
-    await fireEvent.dragOver(wrapper.getByText('a.ts').closest('[role="option"]')!, {
-      dataTransfer
-    })
-    await fireEvent.drop(wrapper.getByText('a.ts').closest('[role="option"]')!, { dataTransfer })
+    const source = wrapper.getByText('c.ts').closest('[role="option"]')!
+    const target = wrapper.getByText('a.ts').closest('[role="option"]')!
+    expect(source).not.toHaveAttribute('draggable', 'true')
+    expect(source.getAttribute('data-drag-container')).not.toBe('files')
+    const original = document.elementFromPoint.bind(document)
+    document.elementFromPoint = () => target
+    await fireEvent.pointerDown(source, { clientX: 0, clientY: 0, button: 0, pointerId: 1 })
+    await fireEvent.pointerMove(document, { clientX: 24, clientY: 0, pointerId: 1 })
+    await fireEvent.pointerUp(document, { clientX: 24, clientY: 0, pointerId: 1 })
+    document.elementFromPoint = original
     const next = wrapper.emitted('update:files')?.[0]?.[0] as FileItem[]
     expect(next[0]?.children?.map((item) => item.name)).toEqual(['c.ts', 'a.ts', 'b.ts'])
     expect(next[1]?.name).toBe('README.md')

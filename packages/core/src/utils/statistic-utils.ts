@@ -1,5 +1,5 @@
 import { classNames } from './class-names'
-import { isBrowser } from './env'
+import { prefersReducedMotion } from './transition'
 import { formatIntlNumber } from './locale-utils'
 import type { ComponentSize } from '../types/base'
 
@@ -36,19 +36,18 @@ const valueSize: Record<ComponentSize, string> = {
 }
 
 export function getStatisticTitleClasses(size: ComponentSize): string {
-  return classNames(titleSize[size], 'text-[var(--tiger-text-muted,#6b7280)] mb-1')
+  return classNames(titleSize[size], 'text-[var(--tiger-text-secondary)] mb-1')
 }
 
 export function getStatisticValueClasses(size: ComponentSize): string {
-  return classNames(valueSize[size], 'text-[var(--tiger-text,#111827)]')
+  return classNames(valueSize[size], 'tabular-nums text-[var(--tiger-text)]')
 }
 
-export const statisticPrefixClasses = 'me-1 text-[var(--tiger-text,#111827)]'
-export const statisticSuffixClasses = 'ms-1 text-[var(--tiger-text-muted,#6b7280)]'
+export const statisticPrefixClasses = 'me-1 text-[var(--tiger-text)]'
+export const statisticSuffixClasses = 'ms-1 text-[var(--tiger-text-secondary)]'
 
 export function statisticPrefersReducedMotion(): boolean {
-  if (!isBrowser() || typeof window.matchMedia !== 'function') return false
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  return prefersReducedMotion()
 }
 
 /* ------------------------------------------------------------------ */
@@ -85,8 +84,10 @@ export function createStatisticNumberAnimation(
       ? globalThis.cancelAnimationFrame.bind(globalThis)
       : undefined)
 
+  options.onUpdate(options.from)
+
   if (!requestFrame || duration <= 0 || options.from === options.to) {
-    options.onUpdate(options.to)
+    if (options.from !== options.to) options.onUpdate(options.to)
     options.onComplete?.()
     return { stop: () => undefined }
   }

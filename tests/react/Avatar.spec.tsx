@@ -99,7 +99,7 @@ describe('AvatarGroup', () => {
         <Avatar text="D" />
       </AvatarGroup>
     )
-    expect(screen.getByRole('img', { name: '2 more' })).toHaveTextContent('+2')
+    expect(screen.getByRole('button', { name: '2 more' })).toHaveTextContent('+2')
   })
 
   it('ignores non-avatar children when counting max', () => {
@@ -111,8 +111,8 @@ describe('AvatarGroup', () => {
         <Avatar text="B" />
       </AvatarGroup>
     )
-    expect(screen.getByRole('img', { name: '1 more' })).toBeInTheDocument()
-    expect(screen.queryByText('not-avatar')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '1 more' })).toBeInTheDocument()
+    expect(screen.getByText('not-avatar')).toBeInTheDocument()
   })
 
   it('applies group shape to overflow', () => {
@@ -122,7 +122,7 @@ describe('AvatarGroup', () => {
         <Avatar text="B" />
       </AvatarGroup>
     )
-    const overflow = screen.getByRole('img', { name: '2 more' })
+    const overflow = screen.getByRole('button', { name: '2 more' })
     expect(overflow.className).toContain('--tiger-radius-md')
     expect(overflow.className).not.toContain('-ms-2')
   })
@@ -167,7 +167,7 @@ describe('AvatarGroup', () => {
         </AvatarGroup>
       </ConfigProvider>
     )
-    expect(screen.getByRole('img', { name: '还有 1 位' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '还有 1 位' })).toBeInTheDocument()
     await expectNoA11yViolationsIsolated(container)
   })
 })

@@ -42,9 +42,8 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 ```
 
 Apps that only need custom wording can use `defineText(...)`; it does not import Tigercat locale
-packs. Runtime DatePicker string lookup lives behind
-`@expcat/tigercat-core/datepicker-locales/registry` and should be imported only when all built-in
-DatePicker presets are intentionally needed.
+packs. DatePicker copy lives on `locale.datePicker`. Read it with `getDatePickerLabels` from
+`@expcat/tigercat-core`. There is no `datepicker-locales` package subpath.
 
 Run `pnpm build` and `pnpm size` after changing shared utils, chart code, exports, or component dependencies.
 

@@ -245,9 +245,9 @@ describe('DataTableWithToolbar (Vue)', () => {
         columns,
         dataSource: [],
         toolbar: {
-          bulkActions: [{ key: 'export', label: '导出' }],
-          selectedKeys: [1, 2]
+          bulkActions: [{ key: 'export', label: '导出' }]
         },
+        rowSelection: { selectedRowKeys: [1, 2] },
         pagination: false
       }
     })
@@ -269,9 +269,9 @@ describe('DataTableWithToolbar (Vue)', () => {
         },
         toolbar: {
           bulkActions: [{ key: 'export', label: 'Export' }],
-          selectedKeys: [1],
           defaultSearchValue: ''
         },
+        rowSelection: { selectedRowKeys: [1] },
         pagination: false
       },
       attrs: { onSearch: vi.fn() }
@@ -290,11 +290,11 @@ describe('DataTableWithToolbar (Vue)', () => {
         labels: { searchButtonText: 'Find', selectedText: 'Chosen' },
         toolbar: {
           bulkActions: [{ key: 'export', label: 'Export' }],
-          selectedKeys: [1],
           defaultSearchValue: '',
           searchButtonText: 'Go',
           bulkActionsLabel: 'Picked'
         },
+        rowSelection: { selectedRowKeys: [1] },
         pagination: false
       },
       attrs: { onSearch: vi.fn() }
@@ -393,9 +393,9 @@ describe('DataTableWithToolbar (Vue)', () => {
             dataSource: [],
             toolbar: {
               bulkActions: [{ key: 'export', label: '导出' }],
-              selectedKeys: [1],
               defaultSearchValue: ''
             },
+            rowSelection: { selectedRowKeys: [1] },
             pagination: false,
             onSearch: vi.fn()
           })
@@ -459,8 +459,8 @@ describe('DataTableWithToolbar (Vue)', () => {
               total: 20,
               showTotal: true,
               locale: false,
-              prevText: 'Back',
-              nextText: 'Forward',
+              prevAriaLabel: 'Back',
+              nextAriaLabel: 'Forward',
               pageIndicatorText: (cur: number, tot: number) => `P.${cur}/${tot}`,
               pageSizeText: (size: number) => `${size} items/page`
             }

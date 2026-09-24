@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { StatisticProps as CoreStatisticProps } from '@expcat/tigercat-core'
 import {
   statisticBaseClasses,
@@ -48,11 +48,13 @@ export const Statistic = forwardRef<HTMLDivElement, StatisticProps>(function Sta
     [config.locale, locale]
   )
   const localeId = mergedLocale?.locale
-  const [displayValue, setDisplayValue] = useState<string | number | undefined>(value)
+  const [displayValue, setDisplayValue] = useState<string | number | undefined>(() =>
+    animated && canAnimateStatisticValue(value) ? 0 : value
+  )
   const currentNumberRef = useRef(canAnimateStatisticValue(value) ? value : 0)
   const hasPlayedRef = useRef(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!animated || !canAnimateStatisticValue(value) || statisticPrefersReducedMotion()) {
       setDisplayValue(value)
       if (canAnimateStatisticValue(value)) currentNumberRef.current = value

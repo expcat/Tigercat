@@ -8,6 +8,10 @@ import { h } from 'vue'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-vue/Dropdown'
 import { expectNoA11yViolations } from '../utils'
 
+function dropdownMenu(): HTMLElement | null {
+  return document.querySelector('[data-tiger-dropdown-menu]')
+}
+
 describe('Dropdown', () => {
   it('renders trigger and menu content', () => {
     render(Dropdown, {
@@ -23,8 +27,8 @@ describe('Dropdown', () => {
     })
 
     expect(screen.getByText('Trigger')).toBeInTheDocument()
-    expect(screen.getByText('Item 1')).toBeInTheDocument()
-    expect(screen.getByText('Item 2')).toBeInTheDocument()
+    expect(screen.queryByText('Item 1')).not.toBeInTheDocument()
+    expect(screen.queryByText('Item 2')).not.toBeInTheDocument()
   })
 
   it('exposes data-state on the trigger reflecting open state', async () => {
@@ -69,14 +73,12 @@ describe('Dropdown', () => {
       }
     })
 
-    // Floating UI uses `hidden` attribute now
-    const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
-    expect(wrapper).toHaveAttribute('hidden')
+    expect(document.querySelector('[data-tiger-dropdown-menu]')).toBeNull()
   })
 
   it('supports offset prop', () => {
     render(Dropdown, {
-      props: { placement: 'top-end', offset: 12 },
+      props: { placement: 'top-end', offset: 12, defaultOpen: true },
       slots: {
         default: () => [
           h('button', null, 'Trigger'),
@@ -104,31 +106,28 @@ describe('Dropdown', () => {
       }
     })
 
-    // Floating UI uses `hidden` attribute now
-    const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
-    expect(wrapper).toHaveAttribute('hidden')
+    const menu = () => document.querySelector('[data-tiger-dropdown-menu]')
+    expect(menu()).toBeNull()
 
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveAttribute('hidden')
+    expect(menu()).toBeTruthy()
 
     await fireEvent.click(screen.getByText('Item 1'))
-    expect(wrapper).toHaveAttribute('hidden')
+    expect(menu()).toBeNull()
 
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveAttribute('hidden')
+    expect(menu()).toBeTruthy()
     await fireEvent.click(screen.getByText('Disabled Item'))
-    expect(wrapper).not.toHaveAttribute('hidden')
+    expect(menu()).toBeTruthy()
 
-    // Close via outside click - note: defer mode requires setTimeout(0) timing
-    // In test environment, we use a small delay to let event listeners attach
     await new Promise((r) => setTimeout(r, 10))
     await fireEvent.click(document.body)
-    expect(wrapper).toHaveAttribute('hidden')
+    expect(menu()).toBeNull()
 
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveAttribute('hidden')
+    expect(menu()).toBeTruthy()
     await fireEvent.keyDown(document, { key: 'Escape' })
-    expect(wrapper).toHaveAttribute('hidden')
+    expect(menu()).toBeNull()
   })
 
   it('renders chevron indicator by default on a self-rendered button', () => {
@@ -270,8 +269,7 @@ describe('Dropdown', () => {
       })
 
       await fireEvent.click(screen.getByText('Trigger'))
-      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
-      expect(wrapper).toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeNull()
     })
   })
 
@@ -399,12 +397,11 @@ describe('Dropdown', () => {
         }
       })
 
-      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
       await fireEvent.click(screen.getByText('Trigger'))
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
 
       await fireEvent.click(screen.getByText('Item 1'))
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
     })
 
     it('closes on item click after closeOnClick is toggled from false to true', async () => {
@@ -418,15 +415,13 @@ describe('Dropdown', () => {
         }
       })
 
-      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
       await fireEvent.click(screen.getByText('Trigger'))
       await fireEvent.click(screen.getByText('Item 1'))
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
 
-      // Reactively flip closeOnClick to true; the item must see the live value
       await rerender({ trigger: 'click', closeOnClick: true })
       await fireEvent.click(screen.getByText('Item 1'))
-      expect(wrapper).toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeNull()
     })
 
     it('keeps the menu open when an item sets closeOnClick false under parent default true', async () => {
@@ -443,15 +438,14 @@ describe('Dropdown', () => {
         }
       })
 
-      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
       await fireEvent.click(screen.getByText('Trigger'))
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
 
       await fireEvent.click(screen.getByText('Stay open'))
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
 
       await fireEvent.click(screen.getByText('Close sibling'))
-      expect(wrapper).toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeNull()
     })
 
     it('closes when an item sets closeOnClick true under parent closeOnClick false', async () => {
@@ -468,15 +462,14 @@ describe('Dropdown', () => {
         }
       })
 
-      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
       await fireEvent.click(screen.getByText('Trigger'))
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
 
       await fireEvent.click(screen.getByText('Inherit stay'))
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
 
       await fireEvent.click(screen.getByText('Force close'))
-      expect(wrapper).toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeNull()
     })
 
     it('does not emit or close when a disabled item sets closeOnClick false', async () => {
@@ -497,13 +490,12 @@ describe('Dropdown', () => {
         }
       })
 
-      const wrapper = document.querySelector('[data-tiger-dropdown-menu]')
       await fireEvent.click(screen.getByText('Trigger'))
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
 
       await fireEvent.click(screen.getByText('Disabled stay'))
       expect(onClick).not.toHaveBeenCalled()
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(dropdownMenu()).toBeTruthy()
     })
 
     it('emits open-change event', async () => {

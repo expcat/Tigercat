@@ -15,6 +15,9 @@ import {
   getChartLabels,
   mergeTigerLocale,
   funnelStageDisplayLabel,
+  chartLabelFill,
+  resolveChartWritingDirection,
+  readPageWritingDirection,
   funnelSegmentTransitionClasses,
   pieSliceLabelInsideClasses,
   DEFAULT_FUNNEL_HEIGHT,
@@ -43,7 +46,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   width = 320,
   height = DEFAULT_FUNNEL_HEIGHT,
   padding = 24,
-  responsive = false,
+  responsive = true,
   data,
   orientation = 'vertical',
   gap = 2,
@@ -77,6 +80,10 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
+  )
+  const direction = useMemo(
+    () => resolveChartWritingDirection(config.direction, readPageWritingDirection()),
+    [config.direction]
   )
   const labels = useMemo(
     () => getChartLabels(mergedLocale, labelsOverride),
@@ -131,9 +138,10 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         gap,
         pinch,
         colors: palette,
-        orientation
+        orientation,
+        direction
       }),
-    [data, innerRect.width, innerRect.height, gap, pinch, palette, orientation]
+    [data, innerRect.width, innerRect.height, gap, pinch, palette, orientation, direction]
   )
   const total = useMemo(() => segments.reduce((sum, segment) => sum + segment.value, 0), [segments])
   const stageName = useCallback(
@@ -149,14 +157,15 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
       buildChartLegendItems({
-        data,
+        data: segments,
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
-        getLabel: (d, i) => stageName(d, i),
-        getColor: (d, i) => d.color ?? palette[i % palette.length]
+        getIndex: (segment) => segment.index,
+        getLabel: (segment) => stageName(data[segment.index], segment.index),
+        getColor: (segment) => segment.color
       }),
-    [data, palette, activeIndex, resolvedSelectedIndex, stageName]
+    [segments, data, palette, activeIndex, resolvedSelectedIndex, stageName]
   )
   const tooltipContent = useMemo(
     () =>
@@ -196,6 +205,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
       responsive={responsive}
       title={title}
       desc={desc}
+      aria-label={title ? undefined : labels.funnelChartAriaLabel}
       onResolvedSizeChange={onResolvedSizeChange}>
       {gradient && (
         <defs>
@@ -239,6 +249,11 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               }
               role={interactive ? 'button' : undefined}
               aria-hidden={interactive ? undefined : true}
+              aria-label={
+                interactive
+                  ? `${stageName(data[seg.index] ?? { value: seg.value, label: seg.label }, seg.index)}: ${seg.value} (${total > 0 ? ((seg.value / total) * 100).toFixed(1) : '0'}%)`
+                  : undefined
+              }
               onMouseEnter={(e) => handleMouseEnter(seg.index, e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
@@ -258,7 +273,8 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
             className={pieSliceLabelInsideClasses}
             textAnchor="middle"
             dominantBaseline="middle"
-            aria-hidden="true">
+            fill={chartLabelFill(seg.color)}
+            aria-hidden={interactive ? true : undefined}>
             {stageName(data[seg.index] ?? { value: seg.value, label: seg.label }, seg.index)}
           </text>
         ))}

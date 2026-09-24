@@ -6,10 +6,7 @@ import type { Align, Justify, GutterSize, ColSpan, Breakpoint } from '../types/g
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
 import {
-  GRID_BREAKPOINT_ORDER,
-  ensureGridBreakpointSync,
-  injectLayoutGridStyles
-} from './layout-grid-styles'
+  GRID_BREAKPOINT_ORDER } from './layout-grid-styles'
 
 export { GRID_BREAKPOINT_ORDER }
 
@@ -27,22 +24,6 @@ const JUSTIFY_CSS: Record<Justify, string> = {
   'space-around': 'space-around',
   'space-between': 'space-between',
   'space-evenly': 'space-evenly'
-}
-
-const ALIGN_MAP: Record<Align, string> = {
-  top: 'items-start',
-  middle: 'items-center',
-  bottom: 'items-end',
-  stretch: 'items-stretch'
-}
-
-const JUSTIFY_MAP: Record<Justify, string> = {
-  start: 'justify-start',
-  end: 'justify-end',
-  center: 'justify-center',
-  'space-around': 'justify-around',
-  'space-between': 'justify-between',
-  'space-evenly': 'justify-evenly'
 }
 
 type ColOffset = number | Partial<Record<Breakpoint, number>>
@@ -107,17 +88,7 @@ export function getRowClasses(
     className?: string
   } = {}
 ): string {
-  injectLayoutGridStyles()
-  ensureGridBreakpointSync()
   return classNames('tiger-row', options.wrap === false && 'tiger-row-nowrap', options.className)
-}
-
-export function getAlignClasses(align: Align): string {
-  return ALIGN_MAP[align] || 'items-start'
-}
-
-export function getJustifyClasses(justify: Justify): string {
-  return JUSTIFY_MAP[justify] || 'justify-start'
 }
 
 function setSpanVars(vars: Record<string, string>, span: ColSpan): void {
@@ -200,7 +171,16 @@ export function getColMergedStyleVars(
   if (flex === undefined && span !== undefined && span !== null) setSpanVars(vars, span)
   if (offset !== undefined && offset !== null) setOffsetVars(vars, offset)
   if (order !== undefined && order !== null) setOrderVars(vars, order)
-  if (flex !== undefined) vars['--tiger-col-flex'] = String(flex).replace(/_/g, ' ')
+  if (flex !== undefined) {
+    const text = String(flex)
+    if (text.includes('_')) {
+      devWarn(
+        'Col.flex',
+        `Col flex must be a CSS value such as "1 1 auto", not "${text}". Underscores are not rewritten.`
+      )
+    }
+    vars['--tiger-col-flex'] = text
+  }
   return vars
 }
 
@@ -216,33 +196,5 @@ export function getColOrderStyleVars(order?: ColOrder): Record<string, string> {
 export function getColClasses(
   options: { flex?: string | number; className?: string } = {}
 ): string {
-  injectLayoutGridStyles()
-  ensureGridBreakpointSync()
   return classNames('tiger-col', options.flex !== undefined && 'tiger-col-flex', options.className)
-}
-
-export function getSpanClasses(span: ColSpan | undefined): string {
-  if (span === undefined || span === null) return ''
-  return 'tiger-col'
-}
-
-export function getOffsetClasses(
-  _offset: number | Partial<Record<Breakpoint, number>> | undefined
-): string {
-  return ''
-}
-
-export function getOrderClasses(
-  _order: number | Partial<Record<Breakpoint, number>> | undefined
-): string {
-  return ''
-}
-
-export function getFlexClasses(flex: string | number | undefined): string {
-  if (flex === undefined) return ''
-  return 'tiger-col-flex'
-}
-
-export function getRowGutterClasses(_gutter: GutterSize): string {
-  return ''
 }

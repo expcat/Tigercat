@@ -6,6 +6,7 @@ import type { BackTopPosition } from '../types/back-top'
 import type { ViewportOffset, ViewportPlacement } from '../types/viewport'
 import { classNames } from './class-names'
 import { isBrowser } from './env'
+import { prefersReducedMotion } from './transition'
 import { overlayZIndexClass } from './floating'
 import {
   getViewportOffsetStyle,
@@ -60,11 +61,14 @@ export function resolveBackTopVisibilityHeight(value: number | undefined): numbe
   return typeof value === 'number' && Number.isFinite(value) ? value : DEFAULT_VISIBILITY_HEIGHT
 }
 
-export function resolveBackTopScrollBehavior(duration: number | undefined): ScrollBehavior {
-  if (typeof duration === 'number' && Number.isFinite(duration) && duration <= 0) {
-    return 'auto'
-  }
-  return 'smooth'
+export type BackTopScrollBehavior = 'auto' | 'smooth'
+
+/** `behavior` is `auto` or `smooth`. Reduced motion forces instant scroll. */
+export function resolveBackTopScrollBehavior(
+  behavior: BackTopScrollBehavior | undefined
+): ScrollBehavior {
+  if (prefersReducedMotion()) return 'auto'
+  return behavior === 'auto' ? 'auto' : 'smooth'
 }
 
 /**
@@ -87,16 +91,19 @@ export function shouldShowBackTop(
 /**
  * Scroll to top. `duration <= 0` is instant; any positive value is native smooth.
  */
-export function scrollToTop(target: HTMLElement | Window, duration?: number): void {
-  const behavior = resolveBackTopScrollBehavior(duration)
+export function scrollToTop(
+  target: HTMLElement | Window,
+  behavior?: BackTopScrollBehavior
+): void {
+  const resolved = resolveBackTopScrollBehavior(behavior)
 
   if (isWindowTarget(target)) {
-    target.scrollTo({ top: 0, behavior })
+    target.scrollTo({ top: 0, behavior: resolved })
     return
   }
 
   if (typeof target.scrollTo === 'function') {
-    target.scrollTo({ top: 0, behavior })
+    target.scrollTo({ top: 0, behavior: resolved })
     return
   }
 
@@ -136,7 +143,7 @@ export function createBackTopVisibilityController(
 /**
  * Base CSS classes for the BackTop button (without positioning)
  */
-export const backTopBaseClasses = `${overlayZIndexClass.viewport} tiger-motion-aware flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary,#2563eb)] text-white shadow-lg transition-opacity duration-300 motion-reduce:duration-0 hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2`
+export const backTopBaseClasses = `${overlayZIndexClass.viewport} tiger-motion-aware flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary)] text-white shadow-lg transition-opacity duration-300 hover:bg-[var(--tiger-primary-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)] focus-visible:ring-offset-2`
 
 export const backTopStickyClasses = `sticky bottom-4 ms-auto me-4 ${backTopBaseClasses}`
 

@@ -1,24 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import {
-  prefersReducedMotion,
-  getAccessibleTransitionClasses,
-  createTigercatPlugin,
-  MODERN_REDUCED_MOTION_TOKENS
-} from '@expcat/tigercat-core'
+import { prefersReducedMotion, getAccessibleTransitionClasses, themeTransitionValue } from '@expcat/tigercat-core'
+import { createTigercatPlugin } from '../../packages/core/src/tailwind-plugin'
 
 /**
- * Phase 1C — reduced motion regression suite.
- *
- * Verifies the three layers that must respect
- * `prefers-reduced-motion: reduce`:
- *
- *  1. `prefersReducedMotion()` runtime helper reads the media query.
- *  2. `getAccessibleTransitionClasses()` collapses to a duration-0 fade
- *     when the user opts out of motion.
- *  3. `createTigercatPlugin()` emits a
- *     `@media (prefers-reduced-motion: reduce)` block that pins every
- *     `--tiger-motion-duration-*` token to `0ms`, for both `:root` and
- *     `[data-tiger-style="modern"]`.
+ * Reduced motion uses one switch: `prefers-reduced-motion: reduce` pins
+ * duration variables to `0ms` and zeroes animations that opt into
+ * `.tiger-motion-aware` / `[data-tiger-motion]`.
  */
 
 type MatchMediaImpl = (query: string) => MediaQueryList
@@ -121,18 +108,30 @@ describe('createTigercatPlugin() — reduced-motion CSS block', () => {
     p.handler({
       addBase: (rule) => {
         for (const [sel, body] of Object.entries(rule)) {
-          ;(rules as Record<string, unknown>)[sel] = body as CssBlock
+          const previous = rules[sel]
+          if (
+            sel.startsWith('@') &&
+            previous &&
+            typeof previous === 'object' &&
+            body &&
+            typeof body === 'object'
+          ) {
+            rules[sel] = { ...(previous as object), ...(body as object) } as Record<string, CssBlock>
+          } else {
+            rules[sel] = body as CssBlock
+          }
         }
       }
     })
     return rules
   }
 
-  it('emits @media (prefers-reduced-motion: reduce) targeting :root + modern subtree', () => {
+  it('emits one reduced-motion block for :root, .dark, and motion-aware animations', () => {
     const rules = captureRules(createTigercatPlugin() as PluginInstance)
     const mediaRule = rules['@media (prefers-reduced-motion: reduce)'] as Record<string, CssBlock>
     expect(mediaRule).toBeDefined()
-    expect(mediaRule[':root, [data-tiger-style="modern"]']).toBeDefined()
+    expect(mediaRule[':root, .dark']).toBeDefined()
+    expect(mediaRule[':root, [data-tiger-style="modern"]']).toBeUndefined()
     expect(
       mediaRule[
         '.tiger-motion-aware, .tiger-motion-aware::before, .tiger-motion-aware::after, [data-tiger-motion]'
@@ -140,29 +139,18 @@ describe('createTigercatPlugin() — reduced-motion CSS block', () => {
     ).toBeDefined()
   })
 
-  it('every motion-duration token is pinned to 0ms inside the media block', () => {
+  it('pins duration tokens to 0ms and does not use transition: all', () => {
     const rules = captureRules(createTigercatPlugin() as PluginInstance)
     const inner = (rules['@media (prefers-reduced-motion: reduce)'] as Record<string, CssBlock>)[
-      ':root, [data-tiger-style="modern"]'
+      ':root, .dark'
     ]
-    for (const [key, value] of Object.entries(MODERN_REDUCED_MOTION_TOKENS)) {
-      expect(inner[key]).toBe(value)
-      if (key.includes('duration')) {
-        expect(value).toBe('0ms')
-      }
-    }
-  })
-
-  it('still emits modern override tokens separately when modern flag is on', () => {
-    const rules = captureRules(createTigercatPlugin({ modern: true }) as PluginInstance)
-    expect(rules['[data-tiger-style="modern"]']).toBeDefined()
-    expect(rules['@media (prefers-reduced-motion: reduce)']).toBeDefined()
-  })
-
-  it('reduced-motion covers the --tiger-transition-* names components read', () => {
-    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-transition-base']).toBe('all 0ms linear')
-    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-transition-quick']).toBe('all 0ms linear')
-    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-motion-duration-base']).toBe('0ms')
+    expect(inner['--tiger-motion-duration-quick']).toBe('0ms')
+    expect(inner['--tiger-motion-duration-base']).toBe('0ms')
+    expect(inner['--tiger-motion-duration-slow']).toBe('0ms')
+    expect(inner['--tiger-transition-base']).toBe(themeTransitionValue('0ms', 'linear'))
+    expect(inner['--tiger-transition-quick']).toBe(themeTransitionValue('0ms', 'linear'))
+    expect(inner['--tiger-transition-emphasized']).toBe(themeTransitionValue('0ms', 'linear'))
+    expect(inner['--tiger-transition-base']).not.toContain('all ')
   })
 })
 

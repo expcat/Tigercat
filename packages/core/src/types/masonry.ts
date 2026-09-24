@@ -10,6 +10,12 @@ import type { ResponsiveBreakpoint } from '../utils/responsive'
 export type MasonryResponsiveValue = number | Partial<Record<ResponsiveBreakpoint, number>>
 
 /**
+ * `source` keeps DOM order with CSS columns (inline start).
+ * `shortest` packs by column height and is not source order.
+ */
+export type MasonryLayout = 'source' | 'shortest'
+
+/**
  * Base Masonry props interface.
  */
 export interface MasonryProps {
@@ -27,14 +33,16 @@ export interface MasonryProps {
   gap?: MasonryResponsiveValue
 
   /**
+   * `source` (default) follows source order. `shortest` packs into the
+   * shortest column and the container says visual order differs.
+   * @default 'source'
+   */
+  layout?: MasonryLayout
+
+  /**
    * Additional CSS class name for the root element
    */
   className?: string
-
-  /**
-   * Additional CSS class name for every column element
-   */
-  columnClassName?: string
 
   /**
    * Additional CSS class name for every item wrapper element

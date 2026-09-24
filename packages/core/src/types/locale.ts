@@ -25,6 +25,12 @@ export interface TigerLocaleCommon {
   moreOptionsText?: string
   /** Default Popconfirm title when none is passed */
   confirmTitle?: string
+  /** Spoken when a top loading bar finishes */
+  loadingFinishedText?: string
+  /** Spoken when a top loading bar fails */
+  loadingFailedText?: string
+  /** Notification primary-action button when `onClick` has no label */
+  viewText?: string
 }
 
 export interface TigerLocaleEmpty {
@@ -58,6 +64,8 @@ export interface TigerLocaleQRCode {
   expiredText?: string
   refreshText?: string
   loadingText?: string
+  /** Shown when the value is empty or too long to encode */
+  errorText?: string
 }
 
 export interface TigerLocaleMarquee {
@@ -72,11 +80,19 @@ export interface TigerLocaleImage {
   previewFallbackAlt?: string
   /** Accessible name for ImageGroup */
   groupAriaLabel?: string
+  /** Visible text when the bitmap fails to load */
+  loadErrorText?: string
 }
 
 export interface TigerLocaleImageCompare {
   /** Accessible name for the comparison slider handle */
   ariaLabel?: string
+  /** Alt text for the starting image */
+  beforeAlt?: string
+  /** Alt text for the ending image */
+  afterAlt?: string
+  /** Slider value. Template: supports {percent} */
+  valueText?: string
 }
 
 export interface TigerLocaleDescriptions {
@@ -91,6 +107,11 @@ export interface TigerLocaleList {
   dragHandleAriaLabel?: string
 }
 
+export interface TigerLocaleMasonry {
+  /** Spoken when shortest-column layout is not source order */
+  visualOrderText?: string
+}
+
 export interface TigerLocaleScrollArea {
   /** Accessible name when the viewport is a tab stop without a user label */
   ariaLabel?: string
@@ -103,6 +124,8 @@ export interface TigerLocalePrintLayout {
 
 export interface TigerLocaleTimeline {
   pendingText?: string
+  /** Announced when a pending item is replaced or cleared. */
+  pendingReplacedText?: string
 }
 
 export interface TigerLocaleWorkflowTimeline {
@@ -315,6 +338,12 @@ export interface TigerLocaleWorkflowDesigner {
   validationMissingBranches?: string
   /** Every buttonPolicy row is disabled */
   validationButtonsAllDisabled?: string
+  /** Duplicate node key */
+  validationDuplicateKey?: string
+  /** Publish action. Disabled while blocking issues remain. */
+  publishText?: string
+  /** Accessible name for a branch operator select */
+  branchOperatorLabel?: string
   /** Approver source strategy */
   sourceLabel?: string
   /** Specified members */
@@ -462,7 +491,12 @@ export interface TigerLocaleTable {
   loadingText?: string
   expandText?: string
   collapseText?: string
+  /** Current page only. Loaded-row select-all is `selectLoadedText`. */
   selectAllText?: string
+  /** Select every loaded row. Remote mode only emits an event. */
+  selectLoadedText?: string
+  /** Accessible name for `<table>` when the caller omits one. */
+  tableAriaLabel?: string
   /** Template: supports {row} */
   selectRowAriaLabel?: string
   /** Template: supports {column} */
@@ -484,9 +518,16 @@ export interface TigerLocaleTable {
   allText?: string
   filterPlaceholder?: string
   exportCsvText?: string
-  exportExcelText?: string
   exportCsvAriaLabel?: string
-  exportExcelAriaLabel?: string
+  /** Template: supports {count} */
+  selectionCountText?: string
+  /** Template: supports {column} and {direction} */
+  sortAnnouncementText?: string
+  sortAscendingText?: string
+  sortDescendingText?: string
+  sortNoneText?: string
+  /** Template: supports {row} */
+  dragRowAriaLabel?: string
   expandRowAriaLabel?: string
   collapseRowAriaLabel?: string
   /** Accessible name for the card-layout sort Select */
@@ -539,6 +580,7 @@ export interface TigerLocaleTour {
   finishText?: string
   closeAriaLabel?: string
   dialogAriaLabel?: string
+  loadErrorText?: string
 }
 
 export interface TigerLocaleCalendar {
@@ -548,6 +590,10 @@ export interface TigerLocaleCalendar {
   nextYear?: string
   /** `{n}` is replaced with the event count for the date-cell aria-label. */
   eventCountText?: string
+  /** Title button name while the month grid is showing. */
+  switchToYear?: string
+  /** Title button name while the year grid is showing. */
+  switchToMonth?: string
 }
 
 export interface TigerLocaleFullscreen {
@@ -561,6 +607,8 @@ export interface TigerLocaleFileManager {
   listboxAriaLabel?: string
   searchAriaLabel?: string
   emptyText?: string
+  /** Result count. Template: supports {count} */
+  resultCountText?: string
 }
 
 export interface TigerLocaleImageViewer {
@@ -597,6 +645,8 @@ export interface TigerLocaleImageEditor {
   resizeHandleS?: string
   resizeHandleSw?: string
   resizeHandleW?: string
+  /** Live announcement of the crop box. Template: supports {width} and {height} */
+  cropSizeText?: string
   loadingCropImageAriaLabel?: string
   loadErrorAriaLabel?: string
   /** Template: supports {maxSize} */
@@ -616,6 +666,14 @@ export interface TigerLocaleImageEditor {
   polygonToolText?: string
   freehandToolText?: string
   deleteText?: string
+  /** Visible sentence when the annotation image fails to load */
+  annotationLoadFailedText?: string
+  /** Retry control after a failed annotation image load */
+  annotationRetryText?: string
+  /** Announced when a shape is smaller than `minSize` */
+  annotationTooSmallText?: string
+  /** Announced when a polygon has fewer than 3 points */
+  annotationPolygonIncompleteText?: string
 }
 
 export interface TigerLocaleStatus {
@@ -645,6 +703,10 @@ export interface TigerLocaleTaskBoard {
   dragHintText?: string
   /** Aria label for the board root region */
   boardAriaLabel?: string
+  /**
+   * Grab announcement. Supports {card}, {from}, {to}, {position}, {count}.
+   */
+  grabAnnouncementText?: string
 }
 
 export interface TigerLocaleChatWindow {
@@ -662,6 +724,24 @@ export interface TigerLocaleCode {
   copyLabel?: string
   copiedLabel?: string
   copyFailedLabel?: string
+  /** Accessible name for a scrollable code block */
+  scrollLabel?: string
+}
+
+export interface TigerLocaleText {
+  copyLabel?: string
+  copiedLabel?: string
+  copyFailedLabel?: string
+}
+
+export interface TigerLocaleWatermark {
+  /** Visible text when the watermark image fails to load */
+  imageErrorText?: string
+}
+
+export interface TigerLocaleSegmented {
+  /** Accessible name for the radio group */
+  ariaLabel?: string
 }
 
 export interface TigerLocaleCommentThread {
@@ -685,6 +765,10 @@ export interface TigerLocaleCommentThread {
   remainingRepliesText?: string
   /** Shown when `maxDepth` has clipped nested replies */
   maxDepthReachedText?: string
+  /** Duplicate id error. Supports {id}. */
+  duplicateIdText?: string
+  /** Cycle error. Supports {id}. */
+  cycleText?: string
 }
 
 export interface TigerLocaleActivityFeed {
@@ -694,6 +778,8 @@ export interface TigerLocaleActivityFeed {
   listAriaLabel?: string
   /** Fallback group title when `groupBy` returns an empty key */
   otherGroupTitle?: string
+  /** Polite announcement for a new item. Supports {title}. */
+  newItemText?: string
 }
 
 export interface TigerLocaleNotificationCenter {
@@ -710,6 +796,17 @@ export interface TigerLocaleNotificationCenter {
   defaultGroupTitle?: string
   /** Unread badge accessible name. Template: supports {count} */
   unreadCountText?: string
+  /** Accessible name for the read-state radiogroup */
+  filterAriaLabel?: string
+  /** Polite announcement after marking items read. Supports {count}. */
+  markedReadText?: string
+  /** Polite announcement for a new item. Supports {title}. */
+  newItemText?: string
+}
+
+export interface TigerLocaleWorkflowDetailShell {
+  /** Accessible name for the detail region */
+  ariaLabel?: string
 }
 
 export interface TigerLocaleSelect {
@@ -729,6 +826,26 @@ export interface TigerLocaleSelect {
   moreCountText?: string
   /** Remote-loading copy shown in the panel */
   loadingText?: string
+}
+
+/**
+ * Cascader column copy. Not part of Select — flat Select must not read these.
+ */
+export interface TigerLocaleCascader {
+  /** Column accessible name. Template: supports {level} */
+  levelLabel?: string
+  /** Small-screen drill-down back control */
+  backText?: string
+  /** Expand-parent control accessible name */
+  expandAriaLabel?: string
+  /** Collapse-parent control accessible name */
+  collapseAriaLabel?: string
+}
+
+/**
+ * TreeSelect trigger copy. Same four strings as Cascader, kept off Select.
+ */
+export interface TigerLocaleTreeSelect {
   /** Column accessible name. Template: supports {level} */
   levelLabel?: string
   /** Small-screen drill-down back control */
@@ -890,6 +1007,22 @@ export interface TigerLocaleChart {
   ganttAriaLabel?: string
   /** Template: supports {label}, {start}, {end}, {progress} */
   ganttTaskAriaLabel?: string
+  ganttTodayAriaLabel?: string
+  ganttUnknownDate?: string
+  chartAriaLabel?: string
+  lineChartAriaLabel?: string
+  areaChartAriaLabel?: string
+  barChartAriaLabel?: string
+  scatterChartAriaLabel?: string
+  pieChartAriaLabel?: string
+  radarChartAriaLabel?: string
+  heatmapChartAriaLabel?: string
+  /** Template: supports {rows}, {columns} */
+  heatmapSummary?: string
+  funnelChartAriaLabel?: string
+  sunburstChartAriaLabel?: string
+  treemapChartAriaLabel?: string
+  gaugeChartAriaLabel?: string
 }
 
 export interface TigerLocaleCodeEditor {
@@ -904,6 +1037,10 @@ export interface TigerLocaleMarkdownEditor {
   editModeLabel?: string
   splitModeLabel?: string
   previewModeLabel?: string
+  /** Narrow split view: show the editor */
+  showEditorText?: string
+  /** Narrow split view: show the preview */
+  showPreviewText?: string
   bold?: string
   italic?: string
   strikethrough?: string
@@ -1050,6 +1187,10 @@ export interface TigerLocaleTagsInput {
   removeTagLabel?: string
   /** Clear-all button aria-label */
   clearAllLabel?: string
+  /** Spoken when a duplicate tag is rejected */
+  duplicateText?: string
+  /** Spoken when another tag would pass the limit */
+  limitText?: string
 }
 
 /** Input trailing-button labels. */
@@ -1075,16 +1216,6 @@ export interface TigerLocaleSlider {
   minAriaLabel?: string
   /** Range thumb name for the upper value */
   maxAriaLabel?: string
-}
-
-/** Stepper group / spinbutton / step-button labels. */
-export interface TigerLocaleStepper {
-  /** Accessible name for the control group */
-  ariaLabel?: string
-  /** Accessible name for the value spinbutton */
-  valueAriaLabel?: string
-  incrementAriaLabel?: string
-  decrementAriaLabel?: string
 }
 
 export interface TigerLocaleSignature {
@@ -1129,13 +1260,18 @@ export interface TigerLocale {
   marquee?: TigerLocaleMarquee
   image?: TigerLocaleImage
   imageCompare?: TigerLocaleImageCompare
+  text?: TigerLocaleText
+  watermark?: TigerLocaleWatermark
+  segmented?: TigerLocaleSegmented
   descriptions?: TigerLocaleDescriptions
   list?: TigerLocaleList
+  masonry?: TigerLocaleMasonry
   scrollArea?: TigerLocaleScrollArea
   printLayout?: TigerLocalePrintLayout
   timeline?: TigerLocaleTimeline
   workflowTimeline?: TigerLocaleWorkflowTimeline
   workflowDesigner?: TigerLocaleWorkflowDesigner
+  workflowDetailShell?: TigerLocaleWorkflowDetailShell
   progress?: TigerLocaleProgress
   splitter?: TigerLocaleSplitter
   resizable?: TigerLocaleResizable
@@ -1161,6 +1297,8 @@ export interface TigerLocale {
   activityFeed?: TigerLocaleActivityFeed
   notificationCenter?: TigerLocaleNotificationCenter
   select?: TigerLocaleSelect
+  cascader?: TigerLocaleCascader
+  treeSelect?: TigerLocaleTreeSelect
   colorPicker?: TigerLocaleColorPicker
   tabs?: TigerLocaleTabs
   breadcrumb?: TigerLocaleBreadcrumb
@@ -1186,7 +1324,6 @@ export interface TigerLocale {
   input?: TigerLocaleInputLabels
   inputNumber?: TigerLocaleInputNumber
   slider?: TigerLocaleSlider
-  stepper?: TigerLocaleStepper
   signature?: TigerLocaleSignature
   numberKeyboard?: TigerLocaleNumberKeyboard
   tree?: TigerLocaleTree

@@ -164,7 +164,7 @@ describe('CodeEditor', () => {
       })
       const textarea = container.querySelector('textarea') as HTMLTextAreaElement
       expect(textarea.placeholder).toBe('Type code...')
-      expect(textarea.className).toContain('--tiger-text-muted')
+      expect(textarea.className).toContain('--tiger-text-secondary')
     })
   })
 

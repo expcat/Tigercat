@@ -5,6 +5,12 @@ import {
   coerceClassValue,
   addImageAnnotationPolygonPoint,
   clampImageAnnotationShapeIndex,
+  stepImageAnnotationShapeIndex,
+  createAnnotationFrameCoalescer,
+  getImageAnnotationStageStyle,
+  imageAnnotationDrawingClasses,
+  manageLiveRegion,
+  nextToolbarRovingIndex,
   commitImageAnnotationPolygon,
   createCropperImageLoader,
   createDocumentDragSession,
@@ -177,6 +183,12 @@ export const ImageAnnotation = defineComponent({
       resizeObserver.observe(host)
     }
 
+    const drawingStroke = ref(false)
+    const loadAttempt = ref(0)
+    const toolIndex = ref(0)
+    const shapeEls: Array<SVGElement | null> = []
+    const live = manageLiveRegion('polite')
+
     const loadImage = () => {
       status.value = 'loading'
       draft.value = null
@@ -202,7 +214,7 @@ export const ImageAnnotation = defineComponent({
     }
 
     onMounted(loadImage)
-    watch(() => props.src, loadImage)
+    watch([() => props.src, loadAttempt], loadImage)
     onBeforeUnmount(() => {
       loader.dispose()
       dragSession?.dispose()
@@ -250,12 +262,18 @@ export const ImageAnnotation = defineComponent({
       selectAnnotation(annotation)
     }
 
+    onBeforeUnmount(() => live.destroy())
+    const isRtl = computed(() => mergedLocale.value?.direction === 'rtl')
+
     const commitPolygon = () => {
       if (!drawing.value) return
       const annotation = commitImageAnnotationPolygon(drawing.value, nextId('polygon'))
-      if (!annotation) return
       drawing.value = null
       draft.value = null
+      if (!annotation) {
+        live.announce(labels.value.annotationPolygonIncompleteText)
+        return
+      }
       swallowClick.value = true
       commitAnnotation(annotation)
     }
@@ -273,7 +291,18 @@ export const ImageAnnotation = defineComponent({
       event.preventDefault()
       const point = getPointFromEvent(event.clientX, event.clientY)
       drawing.value = startImageAnnotationDraw(resolvedTool.value, point)
+      drawingStroke.value = true
       dragSession?.dispose()
+      const frames = createAnnotationFrameCoalescer(
+        (payload: { currentX: number; currentY: number }) => {
+          if (!drawing.value) return
+          drawing.value = moveImageAnnotationDraw(
+            drawing.value,
+            getPointFromEvent(payload.currentX, payload.currentY)
+          )
+          draft.value = draftImageAnnotationFromDraw(drawing.value)
+        }
+      )
       dragSession = createDocumentDragSession({
         startX: event.clientX,
         startY: event.clientY,
@@ -281,14 +310,11 @@ export const ImageAnnotation = defineComponent({
         pointerTarget: event.currentTarget as Element,
         dragThreshold: 0,
         onMove: (payload) => {
-          if (!drawing.value) return
-          drawing.value = moveImageAnnotationDraw(
-            drawing.value,
-            getPointFromEvent(payload.currentX, payload.currentY)
-          )
-          draft.value = draftImageAnnotationFromDraw(drawing.value)
+          frames.push(payload)
         },
         onEnd: (payload) => {
+          frames.cancel()
+          drawingStroke.value = false
           const current = drawing.value
           drawing.value = null
           dragSession = null
@@ -306,7 +332,9 @@ export const ImageAnnotation = defineComponent({
           if (annotation) {
             swallowClick.value = true
             commitAnnotation(annotation)
+            return
           }
+          live.announce(labels.value.annotationTooSmallText)
         }
       })
     }
@@ -353,8 +381,41 @@ export const ImageAnnotation = defineComponent({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        drawing.value = null
-        draft.value = null
+        if (drawing.value || draft.value) {
+          event.preventDefault()
+          event.stopPropagation()
+          dragSession?.dispose()
+          dragSession = null
+          drawing.value = null
+          draft.value = null
+          drawingStroke.value = false
+        }
+        return
+      }
+      if (
+        (event.key === 'ArrowRight' ||
+          event.key === 'ArrowLeft' ||
+          event.key === 'ArrowDown' ||
+          event.key === 'ArrowUp') &&
+        isCanvasTarget(event.target) &&
+        annotations.value.length > 0
+      ) {
+        event.preventDefault()
+        const delta =
+          event.key === 'ArrowRight' || event.key === 'ArrowDown'
+            ? isRtl.value
+              ? -1
+              : 1
+            : isRtl.value
+              ? 1
+              : -1
+        const focused = clampImageAnnotationShapeIndex(
+          focusedShape.value,
+          annotations.value.length
+        )
+        const next = stepImageAnnotationShapeIndex(focused, annotations.value.length, delta)
+        focusedShape.value = next
+        shapeEls[next]?.focus()
         return
       }
 
@@ -370,14 +431,14 @@ export const ImageAnnotation = defineComponent({
     }
 
     const handleToolbarKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-        event.preventDefault()
-        const next =
-          event.key === 'ArrowRight'
-            ? getNextImageAnnotationTool(resolvedTool.value, props.tools)
-            : getPreviousImageAnnotationTool(resolvedTool.value, props.tools)
-        setActiveTool(next)
-      }
+      const count = props.tools.length + 1
+      const next = nextToolbarRovingIndex(toolIndex.value, count, event.key, isRtl.value)
+      if (next === null) return
+      event.preventDefault()
+      toolIndex.value = next
+      const buttons = (event.currentTarget as HTMLElement).querySelectorAll('button')
+      buttons[next]?.focus()
+      if (next < props.tools.length) setActiveTool(props.tools[next])
     }
 
     const renderAnnotation = (annotation: CoreImageAnnotation, isDraft = false) => {
@@ -392,7 +453,10 @@ export const ImageAnnotation = defineComponent({
         fill: stroke,
         fillOpacity,
         role: 'option',
-        tabindex: isDraft || props.disabled ? -1 : index === focused ? 0 : -1,
+        tabindex: -1,
+        ref: (node: unknown) => {
+          if (!isDraft && index >= 0) shapeEls[index] = node as SVGElement | null
+        },
         'aria-label': getImageAnnotationShapeAriaLabel(annotation, labels.value),
         'aria-selected': selected,
         'aria-disabled': props.disabled || undefined,
@@ -410,16 +474,24 @@ export const ImageAnnotation = defineComponent({
           ? undefined
           : (event: KeyboardEvent) => {
               if (props.disabled) return
-              if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+              if (
+                event.key === 'ArrowRight' ||
+                event.key === 'ArrowDown' ||
+                event.key === 'ArrowLeft' ||
+                event.key === 'ArrowUp'
+              ) {
                 event.preventDefault()
-                focusedShape.value = (index + 1) % Math.max(annotations.value.length, 1)
-                return
-              }
-              if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-                event.preventDefault()
-                focusedShape.value =
-                  (index - 1 + Math.max(annotations.value.length, 1)) %
-                  Math.max(annotations.value.length, 1)
+                const delta =
+                  event.key === 'ArrowRight' || event.key === 'ArrowDown'
+                    ? isRtl.value
+                      ? -1
+                      : 1
+                    : isRtl.value
+                      ? 1
+                      : -1
+                const next = stepImageAnnotationShapeIndex(index, annotations.value.length, delta)
+                focusedShape.value = next
+                shapeEls[next]?.focus()
                 return
               }
               if (isActivationKey(event)) {
@@ -548,7 +620,7 @@ export const ImageAnnotation = defineComponent({
           onKeydown: handleToolbarKeyDown
         },
         [
-          ...props.tools.map((item) =>
+          ...props.tools.map((item, index) =>
             h(
               'button',
               {
@@ -557,7 +629,11 @@ export const ImageAnnotation = defineComponent({
                 class: getImageAnnotationToolButtonClasses(resolvedTool.value === item),
                 disabled: props.disabled || props.readonly,
                 'aria-pressed': resolvedTool.value === item,
-                onClick: () => setActiveTool(item)
+                tabindex: index === toolIndex.value ? 0 : -1,
+                onClick: () => {
+                  toolIndex.value = index
+                  setActiveTool(item)
+                }
               },
               getImageAnnotationToolTypeLabel(item, labels.value)
             )
@@ -568,6 +644,7 @@ export const ImageAnnotation = defineComponent({
               type: 'button',
               class: imageAnnotationDeleteButtonClasses,
               disabled: !canEdit.value || !activeSelectedId.value,
+              tabindex: toolIndex.value === props.tools.length ? 0 : -1,
               onClick: removeSelectedAnnotation
             },
             labels.value.deleteText
@@ -586,13 +663,34 @@ export const ImageAnnotation = defineComponent({
                     status.value === 'error' && imageErrorClasses
                   )
                 },
-                [status.value === 'error' ? errorIcon() : spinner()]
+                status.value === 'error'
+                  ? [
+                      errorIcon(),
+                      h(
+                        'p',
+                        { class: 'text-sm text-[var(--tiger-text)]' },
+                        labels.value.annotationLoadFailedText
+                      ),
+                      h(
+                        'button',
+                        {
+                          type: 'button',
+                          class: getImageAnnotationToolButtonClasses(false),
+                          onClick: () => {
+                            loadAttempt.value += 1
+                          }
+                        },
+                        labels.value.annotationRetryText
+                      )
+                    ]
+                  : [spinner()]
               )
             ]
           : [
               h('img', {
                 src: props.src,
-                alt: imageAlt.value,
+                alt: '',
+                'aria-hidden': 'true',
                 class: imageAnnotationImageClasses,
                 style: { width: `${displayWidth.value}px`, height: `${displayHeight.value}px` },
                 draggable: false
@@ -613,7 +711,7 @@ export const ImageAnnotation = defineComponent({
                   tabindex: props.disabled ? -1 : 0,
                   role: 'listbox',
                   'aria-multiselectable': false,
-                  'aria-label': labels.value.annotationCanvasAriaLabel,
+                  'aria-label': `${labels.value.annotationCanvasAriaLabel}: ${imageAlt.value}`,
                   onPointerdown: handleStagePointerDown,
                   onClick: handleStageClick,
                   onDblclick: commitPolygon
@@ -638,6 +736,8 @@ export const ImageAnnotation = defineComponent({
                               y: center.y,
                               textAnchor: 'middle',
                               dominantBaseline: 'middle',
+                              fill: getImageAnnotationStrokeColor(annotation),
+                              'aria-hidden': 'true',
                               class: imageAnnotationLabelClasses
                             },
                             annotation.label
@@ -662,7 +762,11 @@ export const ImageAnnotation = defineComponent({
             'div',
             {
               ref: sizeHostRef,
-              class: imageAnnotationStageClasses,
+              class: classNames(
+                imageAnnotationStageClasses,
+                drawingStroke.value && imageAnnotationDrawingClasses
+              ),
+              style: getImageAnnotationStageStyle(),
               'data-tiger-annotation-stage': '',
               role: 'group',
               'aria-label': stageLabel

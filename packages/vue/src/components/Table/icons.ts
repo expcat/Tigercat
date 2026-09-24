@@ -1,17 +1,15 @@
 import { h, type VNodeChild } from 'vue'
+import { icon24ViewBox } from '@expcat/tigercat-core/icons/common'
+import { getSortIconClasses, getExpandIconClasses, type SortDirection } from '@expcat/tigercat-core'
 import {
-  getSortIconClasses,
-  getExpandIconClasses,
   icon16ViewBox,
-  icon24ViewBox,
   sortAscIcon16PathD,
   sortDescIcon16PathD,
   sortBothIcon16PathD,
   expandChevronIcon16PathD,
   lockClosedIcon24PathD,
-  lockOpenIcon24PathD,
-  type SortDirection
-} from '@expcat/tigercat-core'
+  lockOpenIcon24PathD
+} from '@expcat/tigercat-core/icons/table'
 
 export const SortIcon = (direction: SortDirection): VNodeChild => {
   const active = direction !== null

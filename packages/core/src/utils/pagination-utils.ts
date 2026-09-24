@@ -4,8 +4,8 @@ import type {
   PaginationQuickJumperValidationOptions
 } from '../types/pagination'
 import { classNames } from './class-names'
-import { formatPaginationTotal } from './locale-utils'
-import { enUS } from './i18n/locales/en-US'
+import { formatPaginationTotal, getPaginationLabels } from './locale-utils'
+
 
 type IdleCallbackHandle = number
 type IdleCallbackScheduler = (
@@ -168,6 +168,20 @@ export function getPageRange(current: number, pageSize: number, total: number): 
  * Clamp `current` to a finite page in `[1, totalPages]`.
  * Non-finite values become 1. Display always uses this value; events never emit NaN.
  */
+export function formatPaginationLiveText(
+  template: string,
+  current: number,
+  totalPages: number
+): string {
+  return template
+    .split('{current}')
+    .join(String(current))
+    .split('{total}')
+    .join(String(totalPages))
+    .split('{page}')
+    .join(String(current))
+}
+
 export function validateCurrentPage(current: number, totalPages: number): number {
   const pages = Number.isFinite(totalPages) ? Math.max(0, Math.trunc(totalPages)) : 0
   if (pages <= 0) return 1
@@ -214,11 +228,8 @@ export function getPageNumbers(
   return tokens
 }
 
-/**
- * Default total text: English `enUS.pagination.totalText` via formatPaginationTotal.
- */
 export function defaultTotalText(total: number, range: [number, number]): string {
-  return formatPaginationTotal(enUS.pagination!.totalText!, total, range)
+  return formatPaginationTotal(getPaginationLabels().totalText, total, range)
 }
 
 /**
@@ -303,17 +314,17 @@ export function getPaginationButtonBaseClasses(
   const colorClasses = active
     ? getPaginationButtonActiveClasses()
     : classNames(
-        'border-[var(--tiger-border,#d1d5db)]',
-        'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#374151)]',
-        'hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)]',
-        'disabled:hover:border-[var(--tiger-border,#d1d5db)] disabled:hover:text-[var(--tiger-text,#374151)]'
+        'border-[var(--tiger-border)]',
+        'bg-[var(--tiger-surface)] text-[var(--tiger-text)]',
+        'hover:border-[var(--tiger-primary)] hover:text-[var(--tiger-primary)]',
+        'disabled:hover:border-[var(--tiger-border)] disabled:hover:text-[var(--tiger-text)]'
       )
 
   return classNames(
     'inline-flex items-center justify-center',
-    'rounded-[var(--tiger-radius-md,0.5rem)] border',
+    'rounded-[var(--tiger-radius-md)] border',
     'transition-colors duration-200 motion-reduce:transition-none',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40',
+    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary)]/40',
     'disabled:cursor-not-allowed disabled:opacity-50',
     colorClasses,
     sizeClasses[size]
@@ -325,10 +336,10 @@ export function getPaginationButtonBaseClasses(
  */
 export function getPaginationButtonActiveClasses(): string {
   return classNames(
-    'border-[var(--tiger-primary,#2563eb)]',
-    'bg-[var(--tiger-primary,#2563eb)]',
+    'border-[var(--tiger-primary)]',
+    'bg-[var(--tiger-primary)]',
     'text-white',
-    'hover:border-[var(--tiger-primary-hover,#1d4ed8)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] hover:text-white'
+    'hover:border-[var(--tiger-primary-hover)] hover:bg-[var(--tiger-primary-hover)] hover:text-white'
   )
 }
 
@@ -344,7 +355,7 @@ export function getPaginationEllipsisClasses(size: PaginationSize = 'md'): strin
 
   return classNames(
     'inline-flex items-center justify-center',
-    'text-[var(--tiger-text-muted,#6b7280)] cursor-default',
+    'text-[var(--tiger-text-secondary)] cursor-default',
     sizeClasses[size]
   )
 }
@@ -362,11 +373,11 @@ export function getQuickJumperInputClasses(size: PaginationSize = 'md'): string 
   return classNames(
     'inline-block',
     'px-2 py-1',
-    'rounded border border-[var(--tiger-border,#d1d5db)]',
+    'rounded border border-[var(--tiger-border)]',
     'text-center',
     'transition-colors duration-200 motion-reduce:transition-none',
-    'hover:border-[var(--tiger-primary,#2563eb)]',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
+    'hover:border-[var(--tiger-primary)]',
+    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary)] focus:ring-opacity-50',
     'disabled:cursor-not-allowed disabled:opacity-50',
     sizeClasses[size]
   )
@@ -385,11 +396,11 @@ export function getPageSizeSelectorClasses(size: PaginationSize = 'md'): string 
   return classNames(
     'inline-block',
     'px-2 py-1',
-    'rounded border border-[var(--tiger-border,#d1d5db)]',
-    'bg-[var(--tiger-surface,#ffffff)]',
+    'rounded border border-[var(--tiger-border)]',
+    'bg-[var(--tiger-surface)]',
     'transition-colors duration-200 motion-reduce:transition-none',
-    'hover:border-[var(--tiger-primary,#2563eb)]',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
+    'hover:border-[var(--tiger-primary)]',
+    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary)] focus:ring-opacity-50',
     'disabled:cursor-not-allowed disabled:opacity-50',
     sizeClasses[size]
   )
@@ -411,7 +422,7 @@ export function getSizeTextClasses(size: PaginationSize = 'md'): string {
  * Get total text classes
  */
 export function getTotalTextClasses(size: PaginationSize = 'md'): string {
-  return classNames('text-[var(--tiger-text-muted,#6b7280)]', 'me-2', getSizeTextClasses(size))
+  return classNames('text-[var(--tiger-text-secondary)]', 'me-2', getSizeTextClasses(size))
 }
 
 export function getQuickJumperPrefixClasses(size: PaginationSize = 'md'): string {
@@ -446,5 +457,5 @@ export function resolvePageSizeOptions(
  * Wraps a Pagination component below the data area.
  */
 export function getBuiltInPaginationContainerClasses(): string {
-  return classNames('px-4 py-3', 'border-t border-[var(--tiger-border,#e5e7eb)]')
+  return classNames('px-4 py-3', 'border-t border-[var(--tiger-border)]')
 }

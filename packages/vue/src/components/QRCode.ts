@@ -6,6 +6,8 @@ import {
   mergeTigerLocale,
   getQRCodeLabels,
   generateQRMatrix,
+  resolveQRMatrix,
+  qrDarkModulesPath,
   qrcodeContainerClasses,
   qrcodeOverlayClasses,
   qrcodeStatusTextClasses,
@@ -48,44 +50,35 @@ export const QRCode = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getQRCodeLabels(mergedLocale.value))
-    const matrix = computed(() => generateQRMatrix(props.value ?? ''))
+    const encoded = computed(() => resolveQRMatrix(props.value))
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
-      const modules = matrix.value
-      const viewBox = qrViewBoxSize(modules.length)
-      const overlay = props.status === 'expired' || props.status === 'loading'
-      const namedValue = props.value ? ` (${props.value})` : ''
-      const imgLabel =
-        props.status === 'expired'
-          ? `${labels.value.expiredText}${namedValue}`
+      const result = encoded.value
+      const failed = !result.ok
+      const modules = result.ok ? result.matrix : []
+      const viewBox = qrViewBoxSize(modules.length || 1)
+      const overlay = failed || props.status === 'expired' || props.status === 'loading'
+      const statusText = failed
+        ? labels.value.errorText
+        : props.status === 'expired'
+          ? labels.value.expiredText
           : props.status === 'loading'
-            ? `${labels.value.loadingText}${namedValue}`
-            : `${labels.value.ariaLabel}${namedValue}`
+            ? labels.value.loadingText
+            : ''
+      const imgLabel = statusText
+        ? `${labels.value.ariaLabel}, ${statusText}`
+        : labels.value.ariaLabel
+      const scheme = config.value.colorScheme === 'dark' ? 'dark' : 'light'
 
-      if (qrNeedsContrastWarning(props.color, props.bgColor)) {
+      if (qrNeedsContrastWarning(props.color, props.bgColor, scheme)) {
         devWarn(
           'QRCode.contrast',
           'QRCode: `color` and `bgColor` are under 3:1 contrast; scanners may fail.'
         )
       }
 
-      const rects = modules.flatMap((row, r) =>
-        row
-          .map((cell, c) =>
-            cell
-              ? h('rect', {
-                  key: `${r}-${c}`,
-                  x: c + QR_QUIET_ZONE,
-                  y: r + QR_QUIET_ZONE,
-                  width: 1,
-                  height: 1,
-                  fill: props.color
-                })
-              : null
-          )
-          .filter(Boolean)
-      )
+      const darkPath = result.ok ? qrDarkModulesPath(modules) : ''
 
       const svg = h(
         'svg',
@@ -94,18 +87,27 @@ export const QRCode = defineComponent({
           height: props.size,
           viewBox: `0 0 ${viewBox} ${viewBox}`,
           xmlns: 'http://www.w3.org/2000/svg',
-          role: overlay ? undefined : 'img',
-          'aria-hidden': overlay ? 'true' : undefined,
-          'aria-label': overlay ? undefined : imgLabel,
+          'aria-hidden': 'true',
           class: 'block h-full w-full'
         },
-        [h('rect', { width: viewBox, height: viewBox, fill: props.bgColor }), ...rects]
+        [
+          h('rect', { width: viewBox, height: viewBox, fill: props.bgColor }),
+          darkPath ? h('path', { d: darkPath, fill: props.color }) : null
+        ]
       )
 
       const children: Array<ReturnType<typeof h>> = [svg]
       const hasRefresh = Boolean(getCurrentInstance()?.vnode.props?.onRefresh)
 
-      if (props.status === 'expired') {
+      if (failed) {
+        children.push(
+          h('div', { class: qrcodeOverlayClasses, role: 'status' }, [
+            h('span', { class: qrcodeStatusTextClasses }, labels.value.errorText)
+          ])
+        )
+      }
+
+      if (!failed && props.status === 'expired') {
         const refreshKids = [
           h('span', { class: qrcodeStatusTextClasses }, labels.value.expiredText)
         ]
@@ -125,15 +127,15 @@ export const QRCode = defineComponent({
         children.push(
           h(
             'div',
-            { class: qrcodeOverlayClasses, role: 'status', 'aria-label': imgLabel },
+            { class: qrcodeOverlayClasses, role: 'status' },
             refreshKids
           )
         )
       }
 
-      if (props.status === 'loading') {
+      if (!failed && props.status === 'loading') {
         children.push(
-          h('div', { class: qrcodeOverlayClasses, role: 'status', 'aria-label': imgLabel }, [
+          h('div', { class: qrcodeOverlayClasses, role: 'status' }, [
             h('span', { class: qrcodeStatusTextClasses }, labels.value.loadingText)
           ])
         )
@@ -151,7 +153,9 @@ export const QRCode = defineComponent({
           style: mergeStyleValues(attrsRecord.style, {
             width: `${props.size}px`,
             height: `${props.size}px`
-          })
+          }),
+          role: 'img',
+          'aria-label': imgLabel
         },
         children
       )

@@ -3,7 +3,7 @@ import {
   classNames,
   coerceClassValue,
   getCollapseContainerClasses,
-  getNextAccordionHeaderIndex,
+  getCollapseHeaderTarget,
   normalizeActiveKeys,
   togglePanelKey,
   type CollapseHeaderFocusAction,
@@ -19,10 +19,9 @@ export interface CollapseContext {
   expandIconPosition: ExpandIconPosition
   bordered: boolean
   ghost: boolean
+  headingLevel: 1 | 2 | 3 | 4 | 5 | 6
   handlePanelClick: (key: string | number) => void
-  registerHeader: (record: CollapseHeaderRecord) => void
-  unregisterHeader: (key: string) => void
-  moveHeaderFocus: (currentKey: string, action: CollapseHeaderFocusAction) => void
+  moveHeaderFocus: (current: HTMLButtonElement, action: CollapseHeaderFocusAction) => void
 }
 
 export function useCollapseContext(): CollapseContext | undefined {
@@ -94,6 +93,10 @@ export const Collapse = defineComponent({
       type: Boolean,
       default: false
     },
+    headingLevel: {
+      type: Number as PropType<1 | 2 | 3 | 4 | 5 | 6>,
+      default: 3
+    },
     /**
      * Additional CSS classes
      */
@@ -114,7 +117,7 @@ export const Collapse = defineComponent({
     const internalActiveKeys = ref<(string | number)[]>(
       normalizeActiveKeys(props.defaultActiveKey, { accordion: props.accordion })
     )
-    const headers = ref<CollapseHeaderRecord[]>([])
+    const rootRef = ref<HTMLElement | null>(null)
 
     const currentActiveKeys = computed(() => {
       return props.activeKey !== undefined
@@ -133,24 +136,19 @@ export const Collapse = defineComponent({
       emit('change', newKeys)
     }
 
-    const registerHeader = (record: CollapseHeaderRecord) => {
-      const index = headers.value.findIndex((header) => header.key === record.key)
-      if (index >= 0) {
-        headers.value[index] = record
-      } else {
-        headers.value.push(record)
-      }
-    }
-
-    const unregisterHeader = (key: string) => {
-      headers.value = headers.value.filter((header) => header.key !== key)
-    }
-
-    const moveHeaderFocus = (currentKey: string, action: CollapseHeaderFocusAction) => {
-      const next = getNextAccordionHeaderIndex(headers.value, currentKey, action)
-      if (next >= 0) {
-        headers.value[next]?.el.focus()
-      }
+    const moveHeaderFocus = (current: HTMLButtonElement, action: CollapseHeaderFocusAction) => {
+      const root = rootRef.value
+      if (!root) return
+      const buttons = Array.from(
+        root.querySelectorAll<HTMLButtonElement>('[data-tiger-collapse-header]')
+      ).filter((button) => !button.disabled && button.getAttribute('aria-disabled') !== 'true')
+      const index = buttons.indexOf(current)
+      const next = getCollapseHeaderTarget(
+        buttons.map(() => ({ disabled: false })),
+        index,
+        action
+      )
+      if (next >= 0) buttons[next]?.focus()
     }
 
     const containerClasses = computed(() => {
@@ -176,9 +174,10 @@ export const Collapse = defineComponent({
       get ghost() {
         return props.ghost
       },
+      get headingLevel() {
+        return props.headingLevel
+      },
       handlePanelClick,
-      registerHeader,
-      unregisterHeader,
       moveHeaderFocus
     })
 
@@ -191,8 +190,10 @@ export const Collapse = defineComponent({
         'div',
         {
           ...attrs,
+          ref: rootRef,
           class: containerClasses.value,
-          style: props.style
+          style: props.style,
+          'data-tiger-collapse': ''
         },
         children
       )

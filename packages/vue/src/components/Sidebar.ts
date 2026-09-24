@@ -1,27 +1,18 @@
-import {
-  defineComponent,
-  h,
-  PropType,
-  computed,
-  inject,
-  watch,
-  onBeforeUnmount,
-  provide
-} from 'vue'
+import { defineComponent, h, PropType, computed, provide } from 'vue'
 import {
   classNames,
   coerceClassValue,
   getLayoutSidebarClasses,
   getSidebarAriaLabel,
   getSidebarStyle,
-  injectLayoutGridStyles,
   isSidebarFullyHidden,
   mergeStyleValues,
   resolveSidebarAriaProps,
-  type LayoutSiderSide
+  type LayoutSiderSide,
+  type SidebarLandmark
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
-import { LayoutContextKey, SidebarContextKey } from '../utils/layout-context'
+import { SidebarContextKey } from '../utils/layout-context'
 
 export interface VueSidebarProps {
   className?: string
@@ -29,6 +20,7 @@ export interface VueSidebarProps {
   collapsedWidth?: string
   collapsed?: boolean
   side?: LayoutSiderSide
+  landmark?: SidebarLandmark
   style?: Record<string, string | number>
 }
 
@@ -56,22 +48,21 @@ export const Sidebar = defineComponent({
       type: String as PropType<LayoutSiderSide>,
       default: 'start'
     },
+    landmark: {
+      type: String as PropType<SidebarLandmark>,
+      default: 'default'
+    },
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     }
   },
   setup(props, { slots, attrs }) {
-    injectLayoutGridStyles()
-    const layout = inject(LayoutContextKey, null)
     const config = useTigerConfig()
     const fallbackName = computed(() => getSidebarAriaLabel(config.value.locale))
     const collapsedRef = computed(() => props.collapsed)
 
     provide(SidebarContextKey, { collapsed: collapsedRef })
-
-    watch(collapsedRef, (value) => layout?.setSiderCollapsed(value), { immediate: true })
-    onBeforeUnmount(() => layout?.setSiderCollapsed(false))
 
     const fullyHidden = computed(() => isSidebarFullyHidden(props.collapsed, props.collapsedWidth))
 
@@ -97,14 +88,17 @@ export const Sidebar = defineComponent({
       const ariaLabelledby = restAttrs['aria-labelledby']
       delete restAttrs['aria-label']
       delete restAttrs['aria-labelledby']
-      const aria = resolveSidebarAriaProps({
-        ariaLabel,
-        ariaLabelledby,
-        fallback: fallbackName.value
-      })
+      const aria =
+        props.landmark === 'plain'
+          ? {}
+          : resolveSidebarAriaProps({
+              ariaLabel,
+              ariaLabelledby,
+              fallback: props.landmark === 'default' ? fallbackName.value : ''
+            })
 
       return h(
-        'aside',
+        props.landmark === 'plain' ? 'div' : 'aside',
         {
           ...restAttrs,
           class: sidebarClasses.value,

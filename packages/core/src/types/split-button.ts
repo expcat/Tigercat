@@ -64,11 +64,11 @@ export interface SplitButtonProps {
    * HTML button type for the primary action
    * @default 'button'
    */
-  htmlType?: ButtonHtmlType
+  type?: ButtonHtmlType
 
   /**
    * Position of the icon relative to the primary action text
-   * @default 'left'
+   * @default 'start'
    */
   iconPosition?: ButtonIconPosition
 

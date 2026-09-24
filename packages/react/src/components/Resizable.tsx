@@ -212,25 +212,27 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
             'move'
           )
         },
-        onEnd: ({ currentX, currentY }) => {
+        onEnd: ({ currentX, currentY, cancelled }) => {
           const drag = dragRef.current
           if (drag) {
-            const next = applyResizeSize(
-              drag.handle,
-              drag.startW,
-              drag.startH,
-              currentX - drag.startX,
-              currentY - drag.startY,
-              axis,
-              {
-                rtl,
-                lockAspectRatio,
-                minWidth,
-                minHeight,
-                maxWidth,
-                maxHeight
-              }
-            )
+            const next = cancelled
+              ? { width: drag.startW, height: drag.startH, offsetX: 0, offsetY: 0 }
+              : applyResizeSize(
+                  drag.handle,
+                  drag.startW,
+                  drag.startH,
+                  currentX - drag.startX,
+                  currentY - drag.startY,
+                  axis,
+                  {
+                    rtl,
+                    lockAspectRatio,
+                    minWidth,
+                    minHeight,
+                    maxWidth,
+                    maxHeight
+                  }
+                )
             commitSize(
               next,
               drag.handle,
@@ -333,7 +335,6 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       aria-labelledby={typeof ariaLabelledby === 'string' ? ariaLabelledby : undefined}>
       {children}
       {visibleHandles.map((pos) => {
-        const corner = isCornerResizeHandle(pos)
         const usesHeight = pos === 'top' || pos === 'bottom'
         const valueNow = Math.round((usesHeight ? height : width) ?? 0)
         const valueMin = usesHeight ? minHeight : minWidth
@@ -344,14 +345,13 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
             key={pos}
             className={getResizableHandleClasses(pos, draggingHandle === pos, disabled)}
             data-handle={pos}
-            role={corner ? undefined : 'separator'}
-            aria-hidden={corner ? true : undefined}
-            aria-label={corner || ariaLabelledby ? undefined : handleName}
-            aria-orientation={corner ? undefined : getResizeHandleOrientation(pos)}
-            aria-valuenow={corner ? undefined : valueNow}
-            aria-valuemin={corner ? undefined : valueMin}
-            aria-valuemax={corner ? undefined : valueMax}
-            tabIndex={disabled || corner ? -1 : 0}
+            role="separator"
+            aria-label={ariaLabelledby ? undefined : handleName}
+            aria-orientation={getResizeHandleOrientation(pos)}
+            aria-valuenow={valueNow}
+            aria-valuemin={valueMin}
+            aria-valuemax={valueMax}
+            tabIndex={disabled ? -1 : 0}
             onPointerDown={(e) => handlePointerDown(pos, e)}
             onKeyDown={(e) => handleKeyDown(pos, e)}
           />

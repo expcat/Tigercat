@@ -39,7 +39,7 @@ key-terms: slot/children, emit/callback, attrs/props, v-model/controlled, open, 
 | Theme Token  | CSS 变量形式的设计 token，命名以 `--tiger-*` 开头。                 |
 | Preset       | 主题预设，由 core theme helpers 或 Tailwind plugin 注入。           |
 | Dark Mode    | 通过 `.dark` 或主题变量切换暗色模式。                               |
-| Modern Style | 通过 `data-tiger-style="modern"` 启用的现代视觉样式。               |
+| Modern Style | 主题预设 `theme="modern"`。不是第二套 CSS 层。                      |
 
 ---
 

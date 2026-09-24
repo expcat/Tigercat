@@ -1,9 +1,9 @@
-import { defineComponent, h, PropType, computed, inject, onBeforeUnmount, ref } from 'vue'
+import { defineComponent, h, PropType, computed, inject } from 'vue'
 import {
   classNames,
   coerceClassValue,
   getLayoutContentClasses,
-  injectLayoutGridStyles
+  resolveLayoutSectionTag
 } from '@expcat/tigercat-core'
 import { LayoutContextKey } from '../utils/layout-context'
 
@@ -24,7 +24,7 @@ export const Content = defineComponent({
     },
     as: {
       type: String as PropType<string>,
-      default: 'main'
+      default: undefined
     },
     padding: {
       type: [Boolean, String] as PropType<boolean | string>,
@@ -36,11 +36,7 @@ export const Content = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    injectLayoutGridStyles()
     const layout = inject(LayoutContextKey, null)
-    const rootRef = ref<HTMLElement | null>(null)
-
-    onBeforeUnmount(() => layout?.setContentEl(null))
 
     const contentClasses = computed(() =>
       classNames(
@@ -52,14 +48,13 @@ export const Content = defineComponent({
 
     return () =>
       h(
-        props.as || 'main',
+        resolveLayoutSectionTag({
+          kind: 'content',
+          nested: Boolean(layout?.nested.value),
+          explicit: props.as
+        }),
         {
           ...attrs,
-          ref: (el: unknown) => {
-            const node = el as HTMLElement | null
-            rootRef.value = node
-            layout?.setContentEl(node)
-          },
           class: contentClasses.value,
           style: props.style
         },

@@ -51,7 +51,7 @@ export const SunburstChart = defineComponent({
       type: [Number, Object] as PropType<ChartPadding>,
       default: DEFAULT_SUNBURST_PADDING
     },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: { type: Array as PropType<SunburstChartDatum[]>, required: true },
     innerRadiusRatio: { type: Number, default: 0 },
     showLabels: { type: Boolean, default: true },
@@ -138,7 +138,6 @@ export const SunburstChart = defineComponent({
       onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       onHover: (index, datum) => emit('arc-hover', index, datum),
       onClick: (index, datum) => {
-        if (datum) props.onArcClick?.(index, datum)
         emit('arc-click', index, datum)
       }
     })
@@ -238,7 +237,7 @@ export const SunburstChart = defineComponent({
                     activeOpacity: props.activeOpacity,
                     inactiveOpacity: props.inactiveOpacity
                   }),
-                  stroke: 'var(--tiger-surface,#ffffff)',
+                  stroke: 'var(--tiger-surface)',
                   'stroke-width': 1,
                   'data-sunburst-arc': '',
                   'data-index': arc.index,

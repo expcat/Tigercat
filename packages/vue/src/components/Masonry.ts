@@ -7,6 +7,7 @@ import {
   onMounted,
   ref,
   shallowRef,
+  useId,
   watch,
   type PropType,
   type VNode
@@ -18,10 +19,12 @@ import {
   getMasonryFlowRootStyle,
   getMasonryItemClasses,
   getMasonryItemPositionStyle,
+  getMasonryLabels,
   getMasonryPackedRootStyle,
   getMasonryRootClasses,
   hasMeasuredMasonryHeights,
   isResponsiveMap,
+  masonryLayoutColumnHeights,
   mergeStyleValues,
   observeElementSize,
   observeScrollAreaSize,
@@ -31,11 +34,13 @@ import {
   MASONRY_DEFAULT_COLUMNS,
   MASONRY_DEFAULT_GAP,
   type MasonryInstance,
+  type MasonryLayout,
   type MasonryLayoutDetail,
   type MasonryProps as CoreMasonryProps,
   type MasonryResponsiveValue
 } from '@expcat/tigercat-core'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueMasonryProps extends CoreMasonryProps {}
 
@@ -63,13 +68,18 @@ export const Masonry = defineComponent({
       type: [Number, Object] as PropType<MasonryResponsiveValue>,
       default: MASONRY_DEFAULT_GAP
     },
+    layout: {
+      type: String as PropType<MasonryLayout>,
+      default: 'source' as MasonryLayout
+    },
     className: { type: String, default: undefined },
-    columnClassName: { type: String, default: undefined },
     itemClassName: { type: String, default: undefined }
   },
   emits: ['layout'],
   setup(props, { slots, emit, attrs, expose }) {
+    const config = useTigerConfig()
     const rootRef = ref<HTMLElement | null>(null)
+    let alive = true
     const itemElements = new Map<number, HTMLElement>()
     const heights = shallowRef<number[]>([])
     const containerWidth = ref(0)
@@ -81,8 +91,11 @@ export const Masonry = defineComponent({
       resolveMasonryColumnCount(props.columns, containerWidth.value)
     )
     const gapPx = computed(() => resolveMasonryGap(props.gap, containerWidth.value))
+    const orderNoteId = useId()
+    const shortest = computed(() => props.layout === 'shortest')
     const packed = computed(
       () =>
+        shortest.value &&
         hasMeasuredMasonryHeights(heights.value) &&
         containerWidth.value > 0 &&
         heights.value.length === collectChildren().length
@@ -103,17 +116,14 @@ export const Masonry = defineComponent({
     }
 
     function emitLayout(nextHeights: number[]): void {
-      const packedPositions = hasMeasuredMasonryHeights(nextHeights)
-        ? computeMasonryPositions(nextHeights, columnCount.value, gapPx.value, containerWidth.value)
-        : []
-      const columnHeights = Array.from({ length: columnCount.value }, () => 0)
-      packedPositions.forEach((position, index) => {
-        const bottom = position.top + (nextHeights[index] || 0)
-        if (bottom > columnHeights[position.column]) columnHeights[position.column] = bottom
-      })
       emit('layout', {
         columnCount: columnCount.value,
-        columnHeights
+        columnHeights: masonryLayoutColumnHeights(
+          nextHeights,
+          columnCount.value,
+          gapPx.value,
+          shortest.value ? 'shortest' : 'source'
+        )
       } satisfies MasonryLayoutDetail)
     }
 
@@ -151,20 +161,24 @@ export const Masonry = defineComponent({
 
     function bindItems(): void {
       stopItems?.()
+      stopItems = null
       const items = Array.from(itemElements.values())
-      stopItems = observeScrollAreaSize(items, measure)
+      const stopSize = observeScrollAreaSize(items, () => {
+        if (alive) measure()
+      })
       const medias = items.flatMap((el) => Array.from(el.querySelectorAll('img, video')))
-      const onLoad = () => measure()
+      const onMedia = (): void => {
+        if (alive) measure()
+      }
       for (const media of medias) {
-        media.addEventListener('load', onLoad)
-        media.addEventListener('error', onLoad)
+        media.addEventListener('load', onMedia)
+        media.addEventListener('error', onMedia)
       }
       stopItems = () => {
-        stopItems = null
-        observeScrollAreaSize(items, measure)()
+        stopSize()
         for (const media of medias) {
-          media.removeEventListener('load', onLoad)
-          media.removeEventListener('error', onLoad)
+          media.removeEventListener('load', onMedia)
+          media.removeEventListener('error', onMedia)
         }
       }
     }
@@ -177,11 +191,17 @@ export const Masonry = defineComponent({
       })
     })
     onBeforeUnmount(() => {
+      alive = false
       stopRoot?.()
       stopItems?.()
+      stopItems = null
     })
 
-    watch([columnCount, gapPx, containerWidth], () => nextTick(() => measure()))
+    watch([columnCount, gapPx, containerWidth], () =>
+      nextTick(() => {
+        if (alive) measure()
+      })
+    )
     watch(
       () => [isResponsiveMap(props.columns), isResponsiveMap(props.gap)] as const,
       () => bindRoot()
@@ -210,6 +230,16 @@ export const Masonry = defineComponent({
         ? getMasonryPackedRootStyle(packedHeight)
         : getMasonryFlowRootStyle(columnCount.value, gapPx.value)
       const labelled = Boolean(attrs['aria-label'] || attrs['aria-labelledby'])
+      const visualOrder = shortest.value
+        ? h(
+            'span',
+            { id: orderNoteId, class: 'sr-only' },
+            getMasonryLabels(config.value.locale).visualOrderText
+          )
+        : null
+      const describedBy = [attrs['aria-describedby'], visualOrder ? orderNoteId : undefined]
+        .filter((value) => typeof value === 'string' && value.length > 0)
+        .join(' ')
 
       return h(
         'div',
@@ -219,25 +249,30 @@ export const Masonry = defineComponent({
           role: labelled ? 'list' : (attrs.role as string | undefined),
           class: classNames(getMasonryRootClasses(props.className), coerceClassValue(attrs.class)),
           style: mergeStyleValues(rootStyle, attrs.style),
-          'data-masonry': ''
+          'data-masonry': '',
+          'data-masonry-order': shortest.value ? 'visual' : undefined,
+          'aria-describedby': describedBy || undefined
         },
-        childNodes.map((child, index) =>
-          h(
-            'div',
-            {
-              key: child.key ?? `item-${index}`,
-              role: labelled ? 'listitem' : undefined,
-              class: getMasonryItemClasses(props.itemClassName),
-              style:
-                packedNow && positions.value[index]
-                  ? getMasonryItemPositionStyle(positions.value[index])
-                  : undefined,
-              'data-masonry-item': index,
-              ref: (el) => setItemRef(index, el instanceof Element ? el : null)
-            },
-            [child]
+        [
+          visualOrder,
+          ...childNodes.map((child, index) =>
+            h(
+              'div',
+              {
+                key: child.key ?? `item-${index}`,
+                role: labelled ? 'listitem' : undefined,
+                class: getMasonryItemClasses(props.itemClassName),
+                style:
+                  packedNow && positions.value[index]
+                    ? getMasonryItemPositionStyle(positions.value[index])
+                    : undefined,
+                'data-masonry-item': index,
+                ref: (el) => setItemRef(index, el instanceof Element ? el : null)
+              },
+              [child]
+            )
           )
-        )
+        ]
       )
     }
   }

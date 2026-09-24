@@ -9,7 +9,7 @@ export default function App() {
   return (
     <div className="flex flex-col gap-3">
       <Button onClick={() => setPaused((value) => !value)}>{paused ? 'Play' : 'Pause'}</Button>
-      <Marquee direction="right" duration={18000} paused={paused} aria-label="Release ticker">
+      <Marquee direction="end" duration={18000} paused={paused} aria-label="Release ticker">
         <Tag>News</Tag>
         <Tag variant="primary">Release</Tag>
         <Button>Docs</Button>

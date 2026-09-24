@@ -10,8 +10,8 @@ import type { PaginationPageSizeOptionItem } from './pagination'
  */
 export type TableSize = 'sm' | 'md' | 'lg'
 
-/** Built-in Table export is CSV only. Use DataExport for `.xlsx`. */
-export type TableExportFormat = 'csv'
+/** Which loaded rows the CSV button writes. Remote pages that are not loaded are not invented. */
+export type TableExportScope = 'page' | 'selected' | 'all'
 
 export type TableResponsiveMode = 'card' | 'scroll'
 
@@ -23,7 +23,8 @@ export type TableCardSelectionPosition = 'controls-row' | 'title-inline'
  */
 export type TableCardBreakpoint = 'sm' | 'md' | 'lg'
 
-export type TableFixedPosition = 'left' | 'right'
+/** Logical inline edge. `start` follows the reading direction; it is not physical left. */
+export type TableFixedPosition = 'start' | 'end'
 
 /**
  * Sort direction
@@ -121,6 +122,11 @@ export interface ColumnFilter {
    * @returns Whether the row should be shown
    */
   filterFn?: (value: unknown, filterValue: unknown) => boolean
+
+  /**
+   * Custom filter UI. `type: 'custom'` without this render function draws nothing.
+   */
+  render?: () => unknown
 }
 
 export type TableCardColSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
@@ -383,14 +389,14 @@ export interface PaginationConfig {
   locale?: TigerLocaleInput | false
 
   /**
-   * Custom text for 'Previous' button
+   * Accessible name for the previous-page button. Pagination draws an icon, not this string.
    */
-  prevText?: string
+  prevAriaLabel?: string
 
   /**
-   * Custom text for 'Next' button
+   * Accessible name for the next-page button. Pagination draws an icon, not this string.
    */
-  nextText?: string
+  nextAriaLabel?: string
 
   /**
    * Custom text template for page indicator
@@ -420,11 +426,15 @@ export interface RowSelectionConfig<T = Record<string, unknown>> {
 
   /**
    * Function to get row key. Shares Table `rowKey` when both are set
-   * (`getRowKey` wins). Missing keys fall back to the dataSource index, never
-   * a page offset.
-   * @default (record) => record.id
+   * (`getRowKey` wins). `0` and `'0'` are keys. An empty return falls back to
+   * a key that is not a dataSource index.
    */
   getRowKey?: (record: T) => string | number
+
+  /**
+   * Accessible name for a row. Used instead of the visible index when set.
+   */
+  getRowLabel?: (record: T, visibleIndex: number) => string
 
   /**
    * Whether to show checkbox column
@@ -833,16 +843,39 @@ export interface TableProps<T = Record<string, unknown>> {
   exportable?: boolean
 
   /**
-   * Built-in export format. Table only serializes CSV; use DataExport for xlsx.
-   * @default 'csv'
+   * Rows the CSV button writes: the current page, selected keys that are loaded,
+   * or every loaded row after filter and sort.
+   * @default 'all'
    */
-  exportFormat?: TableExportFormat
+  exportScope?: TableExportScope
 
   /**
    * Export filename. A trailing `.csv` is not duplicated.
    * @default 'export'
    */
   exportFilename?: string
+
+  /**
+   * Column key order. Omitted is uncontrolled. An array (including `[]`) is controlled.
+   */
+  columnOrder?: string[]
+
+  /**
+   * Per-column lock overrides. Omitted is uncontrolled. A map is controlled.
+   * Keys absent from the map keep `columns[].fixed`.
+   */
+  columnFixed?: Record<string, TableFixedPosition | false>
+
+  /**
+   * When the caller already knows the card viewport, pass it.
+   * Omitted: the first render is a table and `matchMedia` subscribes after mount.
+   */
+  cardViewport?: boolean
+
+  /**
+   * Accessible name for the `<table>`. Defaults to the table locale name.
+   */
+  ariaLabel?: string
 
   onChange?: (params: {
     sort: SortState
@@ -858,8 +891,16 @@ export interface TableProps<T = Record<string, unknown>> {
   onExpandChange?: (expandedKeys: (string | number)[], record: T, expanded: boolean) => void
   /**
    * Cell commit. `rowIndex` is the **dataSource** index.
+   * `nextData` is the next source. The table does not keep it if the parent
+   * does not pass a new `dataSource`.
    */
-  onCellChange?: (rowIndex: number, columnKey: string, newValue: string) => void
+  onCellChange?: (rowIndex: number, columnKey: string, newValue: unknown, nextData: T[]) => void
+
+  /**
+   * Select every loaded selectable row. Remote mode emits this and does not
+   * invent keys for pages that are not loaded.
+   */
+  onSelectLoaded?: () => void
   onColumnOrderChange?: (columns: TableColumn<T>[]) => void
   onColumnFixedChange?: (
     columnKey: string,

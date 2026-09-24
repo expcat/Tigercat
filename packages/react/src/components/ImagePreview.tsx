@@ -8,7 +8,6 @@ import React, {
 } from 'react'
 import {
   applyWheelZoom,
-  captureActiveElement,
   classNames,
   createDefaultTransform,
   createLightboxGestureSession,
@@ -42,7 +41,6 @@ import {
   resolveLightboxKeyAction,
   resolveLightboxNavIndex,
   resolveLightboxScaleRange,
-  restoreFocus,
   zoomInIconPath,
   zoomOutIconPath,
   type GestureTransform,
@@ -116,7 +114,6 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
-  const previousActiveRef = useRef<HTMLElement | null>(null)
   const transformRef = useRef(transform)
   const indexRef = useRef(index)
   const resolvedRef = useRef(resolved)
@@ -152,7 +149,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   }, [isOpen, currentIndex, resolved.length, resetTransform])
 
   useBodyScrollLock({ enabled: shouldRender })
-  useFocusTrap({ enabled: shouldRender, containerRef: rootRef, inert: true })
+  useFocusTrap({ enabled: shouldRender, containerRef: rootRef, inert: true, autoFocus: true })
 
   const handleClose = useCallback(() => {
     onOpenChange?.(false)
@@ -209,30 +206,21 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     setTransform((current) => ({ ...current, rotation: normalizeRotation(current.rotation + 90) }))
   }, [])
 
-  useEffect(() => {
-    if (!shouldRender) return
-    previousActiveRef.current = captureActiveElement()
-    const timer = window.setTimeout(() => {
-      focusFirst([closeButtonRef.current, rootRef.current])
-    }, 0)
-    return () => {
-      window.clearTimeout(timer)
-      restoreFocus(previousActiveRef.current)
-    }
-  }, [shouldRender])
-
-  useEffect(() => {
-    if (!shouldRender) return
-    const handler = (event: KeyboardEvent) => {
-      const action = resolveLightboxKeyAction(event.key, {
-        canNavigate: showNav && resolvedRef.current.length > 1,
-        zoomable,
-        rotatable,
-        rtl: config.direction === 'rtl'
-      })
-      if (!action) return
-      event.preventDefault()
-      switch (action) {
+  const handleDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(event)
+    if (event.defaultPrevented) return
+    const action = resolveLightboxKeyAction(event.key, {
+      canNavigate: showNav && resolvedRef.current.length > 1,
+      zoomable,
+      rotatable,
+      rtl: config.direction === 'rtl',
+      altKey: event.altKey,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey
+    })
+    if (!action) return
+    event.preventDefault()
+    switch (action) {
         case 'prev':
           handlePrev()
           break
@@ -255,23 +243,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           handleReset()
           break
       }
-    }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [
-    config.direction,
-    handleNext,
-    handlePrev,
-    handleReset,
-    handleRotateLeft,
-    handleRotateRight,
-    handleZoomIn,
-    handleZoomOut,
-    rotatable,
-    shouldRender,
-    showNav,
-    zoomable
-  ])
+  }
 
   useEffect(() => {
     if (!shouldRender) return
@@ -279,8 +251,10 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     if (!root) return
     const handler = (event: WheelEvent) => {
       if (!zoomable) return
+      const current = transformRef.current.scale
+      const next = applyWheelZoom(current, event.deltaY, scaleRange)
+      if (Math.abs(next - current) < 1e-6) return
       event.preventDefault()
-      const next = applyWheelZoom(transformRef.current.scale, event.deltaY, scaleRange)
       setScale(next)
     }
     root.addEventListener('wheel', handler, { passive: false })
@@ -305,6 +279,17 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       swipeable: touchSwipeable,
       swipeThreshold: touchSwipeThreshold,
       imageCount: resolved.length,
+      rtl: config.direction === 'rtl',
+      getPanLimits: () => {
+        const img = rootRef.current?.querySelector('img')
+        const root = rootRef.current
+        if (!img || !root) return { maxX: 0, maxY: 0 }
+        const scale = transformRef.current.scale
+        return {
+          maxX: Math.max(0, (img.offsetWidth * scale - root.clientWidth) / 2),
+          maxY: Math.max(0, (img.offsetHeight * scale - root.clientHeight) / 2)
+        }
+      },
       onTransform: (next) => {
         setTransform((current) => ({ ...current, ...next }))
         if (next.scale != null) onScaleChangeRef.current?.(next.scale)
@@ -329,7 +314,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     shouldRender,
     touchSwipeThreshold,
     touchSwipeable,
-    zoomable
+    zoomable,
+    config.direction
   ])
 
   const displayIndex = clampLightboxIndex(index, resolved.length)
@@ -371,7 +357,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
       tabIndex={-1}
       data-tiger-overlay-host=""
       data-tiger-image-preview=""
-      onKeyDown={onKeyDown}>
+      onKeyDown={handleDialogKeyDown}>
       <div className={imagePreviewMaskClasses} aria-hidden="true" onClick={handleMaskClick} />
       <img
         src={current.src}
@@ -396,7 +382,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           disabled={!navState.hasPrev}
           aria-label={labels.previousImageAriaLabel}
           type="button">
-          <SvgIcon d={prevIconPath} />
+          <SvgIcon d={config.direction === 'rtl' ? nextIconPath : prevIconPath} />
         </button>
       )}
       {showNavigation && (
@@ -406,7 +392,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           disabled={!navState.hasNext}
           aria-label={labels.nextImageAriaLabel}
           type="button">
-          <SvgIcon d={nextIconPath} />
+          <SvgIcon d={config.direction === 'rtl' ? prevIconPath : nextIconPath} />
         </button>
       )}
       {(zoomable || rotatable || showCount) && (

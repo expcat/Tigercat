@@ -362,13 +362,14 @@ function drawFormat(modules: Grid, ecc: QREccLevel, mask: number): void {
   }
   const bits = ((data << 10) | rem) ^ 0b101010000010010
   const n = modules.length
-  for (let i = 0; i <= 5; i++) modules[8][i] = ((bits >> i) & 1) === 1
-  modules[8][7] = ((bits >> 6) & 1) === 1
+  // ISO/IEC 18004: low bits run down column 8; the second copy runs along row 8 on the right.
+  for (let i = 0; i <= 5; i++) modules[i][8] = ((bits >> i) & 1) === 1
+  modules[7][8] = ((bits >> 6) & 1) === 1
   modules[8][8] = ((bits >> 7) & 1) === 1
-  modules[7][8] = ((bits >> 8) & 1) === 1
-  for (let i = 9; i < 15; i++) modules[14 - i][8] = ((bits >> i) & 1) === 1
-  for (let i = 0; i < 8; i++) modules[n - 1 - i][8] = ((bits >> i) & 1) === 1
-  for (let i = 8; i < 15; i++) modules[8][n - 15 + i] = ((bits >> i) & 1) === 1
+  modules[8][7] = ((bits >> 8) & 1) === 1
+  for (let i = 9; i < 15; i++) modules[8][14 - i] = ((bits >> i) & 1) === 1
+  for (let i = 0; i < 8; i++) modules[8][n - 1 - i] = ((bits >> i) & 1) === 1
+  for (let i = 8; i < 15; i++) modules[n - 15 + i][8] = ((bits >> i) & 1) === 1
 }
 
 function drawVersion(modules: Grid, version: number): void {
@@ -515,11 +516,11 @@ export function decodeQRMatrixBytes(modules: boolean[][]): string {
 
   const readFormat = (): { ecc: QREccLevel; mask: number } => {
     let bits = 0
-    for (let i = 0; i < 6; i++) if (modules[8][i]) bits |= 1 << i
-    if (modules[8][7]) bits |= 1 << 6
+    for (let i = 0; i < 6; i++) if (modules[i][8]) bits |= 1 << i
+    if (modules[7][8]) bits |= 1 << 6
     if (modules[8][8]) bits |= 1 << 7
-    if (modules[7][8]) bits |= 1 << 8
-    for (let i = 9; i < 15; i++) if (modules[14 - i][8]) bits |= 1 << i
+    if (modules[8][7]) bits |= 1 << 8
+    for (let i = 9; i < 15; i++) if (modules[8][14 - i]) bits |= 1 << i
     bits ^= 0b101010000010010
     const data = bits >> 10
     const eccBits = data >> 3

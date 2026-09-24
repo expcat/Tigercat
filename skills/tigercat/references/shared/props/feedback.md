@@ -13,7 +13,7 @@ description: Compact generated Tigercat Feedback props reference
 
 `packages/core/src/types/alert.ts` · `AlertProps` · 4/17 props
 
-Note: 省略 `open` 时展示；`open={false}` 才不渲染。关闭不会内部隐藏——父级卸载或设 `open={false}`。与 ImagePreview「省略即关」相反。
+Note: 省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦点从关闭按钮移到后面下一个可聚焦元素。传入 `open` 时只发事件。父级重渲染不重置剩余时间。`error` 保持 `role="alert"`。首屏之后新插入的 success / info / warning 用组件自己的 `role="status"`；静态条文不加实时区域。与 ImagePreview「省略即关」相反。
 
 | Prop        | Type        | Default  | Notes                                                                                      |
 | ----------- | ----------- | -------- | ------------------------------------------------------------------------------------------ |
@@ -28,7 +28,7 @@ Events/callback props: `onOpenChange?`.
 
 `packages/core/src/types/drawer.ts` · `DrawerProps` · 4/23 props
 
-Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边距 `px-6 py-4`。
+Note: 与 Modal 同一套在场、焦点栈和关场。打开时焦点进对话框或 `initialFocus`。`placement` 含 `start`/`end`，先换成物理边再决定滑动方向；`fullscreenOnMobile` 铺满后，关闭滑动跟铺满后的边。swipe 只在标题栏或对应轴滚到头时成立。面板类名只有 `className`。`bodyPadding={false}` 去掉默认内边距，自定义间距用 `bodyClassName`。离开回调等这一层过渡结束。关闭名走 `locale.drawer`。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。
 
 | Prop            | Type              | Default   | Notes                                   |
 | --------------- | ----------------- | --------- | --------------------------------------- |
@@ -41,6 +41,8 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 
 `packages/core/src/types/loading.ts` · `LoadingProps` · 4/14 props
 
+Note: 每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。
+
 | Prop          | Type      | Default | Notes                                                                                      |
 | ------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
 | `text?`       | `string`  | `-`     | Custom text to display below the spinner                                                   |
@@ -52,6 +54,8 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 
 `packages/core/src/types/loading-bar.ts` · `LoadingBarProps` · 4/6 props
 
+Note: `error` 和 `finish` 共用 `start` 计数。还有未结束的 `start` 时保持加载，全部结束再进入成功或失败然后隐藏。开始、失败、结束各说一次，百分比留在 `progressbar` 上。
+
 | Prop         | Type                    | Default                                            | Notes                                                                                      |
 | ------------ | ----------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `container?` | `string \| HTMLElement` | `-`                                                | Mount parent for the host container. CSS selector or element. Defaults to the overlay t... |
@@ -61,7 +65,7 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 
 ## LoadingBarContainer
 
-`packages/core/src/types/loading-bar.ts` · `LoadingBarContainerProps` · 4/7 props
+`packages/core/src/types/loading-bar.ts` · `LoadingBarContainerProps` · 4/9 props
 
 | Prop          | Type               | Default                                            | Notes                                       |
 | ------------- | ------------------ | -------------------------------------------------- | ------------------------------------------- |
@@ -72,13 +76,15 @@ Note: `bodyPadding`（`boolean | string`）可覆写抽屉主体的默认内边�
 
 ## Message
 
-`packages/core/src/types/message.ts` · `MessageProps` · 4/8 props
+`packages/core/src/types/message.ts` · `MessageProps` · 4/9 props
+
+Note: 命令式调用只改当前 ConfigProvider 里的队列。默认可关闭。指针或焦点在条目上时暂停计时。`loading` 不自动关。负时长和 `NaN` 不自动关。同一个 `key` 替换那一条。
 
 | Prop        | Type              | Default  | Notes                                      |
 | ----------- | ----------------- | -------- | ------------------------------------------ |
 | `type?`     | `MessageType`     | `'info'` | Message type                               |
 | `content?`  | `string`          | `-`      | Message content                            |
-| `closable?` | `boolean`         | `false`  | Whether the message can be closed manually |
+| `closable?` | `boolean`         | `true`   | Whether the message can be closed manually |
 | `position?` | `MessagePosition` | `'top'`  | Message position on screen                 |
 
 Events/callback props: `onClose?`.
@@ -91,15 +97,15 @@ Events/callback props: `onClose?`.
 | ----------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `position?` | `MessagePosition`   | `-`     | -                                                                                          |
 | `messages?` | `MessageInstance[]` | `-`     | -                                                                                          |
-| `portal?`   | `boolean`           | `true`  | Portal through the overlay-host chain. Imperative hosts pass `false` because they are a... |
+| `portal?`   | `boolean`           | `true`  | Render into the ConfigProvider overlay outlet. The imperative host passes `false` becau... |
 
-Events/callback props: `onClose?`.
+Events/callback props: `onClose?`, `onPause?`, `onResume?`.
 
 ## Modal
 
-`packages/core/src/types/modal.ts` · `ModalProps` · 4/24 props
+`packages/core/src/types/modal.ts` · `ModalProps` · 4/25 props
 
-Note: `open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。默认页脚 OK 必关。关闭名走 `locale.modal`（en-US Close / OK / Cancel）。嵌套 Modal 进外层 overlay-host，Esc 先关里层。
+Note: `open` 当帧出 dialog。打开时焦点进对话框或 `initialFocus`，先读标题。确定可返回 Promise 或 `preventDefault`：进行中不可再点，拒绝则不关闭。层本身不滚动，只有正文滚动。拖拽时过渡时长为 0。离开回调等这一层过渡结束；减少动效或没有过渡时立刻发。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。关闭名走 `locale.modal`。嵌套 Modal 进外层 overlay-host，Esc 先关里层。
 
 | Prop              | Type      | Default | Notes                                                                             |
 | ----------------- | --------- | ------- | --------------------------------------------------------------------------------- |
@@ -118,13 +124,15 @@ Note: `open` 当帧出 dialog。默认关场会播过渡再 hidden/卸；`destro
 | `notifications?` | `NotificationInstance[]` | `-`     | -     |
 | `className?`     | `string`                 | `-`     | -     |
 
-Events/callback props: `onClose?`.
+Events/callback props: `onClose?`, `onPause?`, `onResume?`.
 
-Imperative notification API supports inline toast actions via `notification.info({ title, actions: [{ label, type, closeOnClick, onClick }] })`. Action clicks do not trigger the whole-toast `onClick`; use `closeOnClick` or the callback context `close()` to dismiss that toast.
+Imperative `notification` renders inside the current ConfigProvider. Primary `onClick` is one button (`actionLabel`, default locale view text), not a click on the card. `actions` are separate buttons and do not fire that primary handler. Use `closeOnClick` or the callback `close()` to dismiss. The same `key` replaces the toast. Pointer or focus pauses the timer.
 
 ## Popconfirm
 
-`packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 4/16 props
+`packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 4/18 props
+
+Note: 打开时焦点留在触发器，Tab 离开即关闭。确认返回的 Promise 在进行中时，Escape、点外面和再点触发器都关不掉；拒绝则留下。Vue 读返回值，不只看 `preventDefault`。
 
 | Prop           | Type     | Default | Notes                                                                     |
 | -------------- | -------- | ------- | ------------------------------------------------------------------------- |
@@ -137,7 +145,9 @@ Events/callback props: `onConfirm?`, `onCancel?`.
 
 ## Popover
 
-`packages/core/src/types/popover.ts` · `PopoverProps` · 4/12 props
+`packages/core/src/types/popover.ts` · `PopoverProps` · 4/15 props
+
+Note: 打开时焦点留在触发器，Tab 离开即关闭。有标题时标题是名字，正文是描述。`width` 是有限正数像素，或一整条 CSS 长度；解析失败保持默认最大宽度。
 
 | Prop         | Type                | Default   | Notes                                                         |
 | ------------ | ------------------- | --------- | ------------------------------------------------------------- |
@@ -150,7 +160,7 @@ Events/callback props: `onConfirm?`, `onCancel?`.
 
 `packages/core/src/types/progress.ts` · `ProgressProps` · 4/15 props
 
-Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。
+Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。
 
 | Prop          | Type             | Default                           | Notes                                                                        |
 | ------------- | ---------------- | --------------------------------- | ---------------------------------------------------------------------------- |
@@ -161,20 +171,22 @@ Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`form
 
 ## Tooltip
 
-`packages/core/src/types/tooltip.ts` · `TooltipProps` · 4/10 props
+`packages/core/src/types/tooltip.ts` · `TooltipProps` · 4/12 props
+
+Note: 悬停只跟指针。点击、Enter、Space 不会把悬停层关掉。焦点还在触发器上时，指针离开也保持打开。`disabled` 立刻关闭。内容只接受纯文本，可聚焦后代在开发期报错；要交互用 Popover。显示延迟默认 100ms。
 
 | Prop         | Type                | Default   | Notes                                                                                      |
 | ------------ | ------------------- | --------- | ------------------------------------------------------------------------------------------ |
 | `content?`   | `string`            | `-`       | Tooltip content. Interactive descendants are not allowed (`role="tooltip"`).               |
-| `trigger?`   | `TooltipTrigger`    | `'hover'` | Trigger type. Default hover is co-joined with focus and click so keyboard and touch can... |
+| `trigger?`   | `TooltipTrigger`    | `'hover'` | Trigger type. Hover listens to the pointer and to focus. A click opens and stays; it do... |
 | `placement?` | `FloatingPlacement` | `'top'`   | Placement relative to trigger                                                              |
 | `open?`      | `boolean`           | `-`       | Whether the popup is open (controlled mode)                                                |
 
 ## Tour
 
-`packages/core/src/types/tour.ts` · `TourProps` · 4/18 props
+`packages/core/src/types/tour.ts` · `TourProps` · 4/19 props
 
-Note: `current` 是 `steps` 的原始下标，不是跳过之后的下标。非受控关后再开回到 0；受控时父级要自己归零。`closable={false}` 只藏 X，Esc / 点 mask 仍关，除非 `keyboard` / `maskClosable` 为 false。无标题仍有 locale dialog 名。`loadSteps` 出来的第一步也会量 target、挂陷阱。文案只读 `locale.tour`。
+Note: `current` 是 `steps` 的原始下标。关掉后非受控下标回到第一个未跳过的步骤；受控时发出回到该下标。同一次打开只加载一次 `loadSteps`，失败有可见状态，不先闪 `steps`。只在打开和换步时把目标滚进视口一次。默认洞只是视觉，点击落在遮罩上，目标保持 inert；`interact` 才把该目标排除在 inert 之外。换步时焦点回到气泡。`start` / `end` 按书写方向，left / right 是物理边。`closable={false}` 只藏 X。无标题仍有 locale dialog 名。文案只读 `locale.tour`。
 
 | Prop        | Type         | Default | Notes                                                                                      |
 | ----------- | ------------ | ------- | ------------------------------------------------------------------------------------------ |

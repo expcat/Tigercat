@@ -316,17 +316,21 @@ describe('Code (React)', () => {
       await expectNoA11yViolationsIsolated(container)
     })
 
-    it('injects highlighter HTML when language and highlighter are set', () => {
+    it('draws highlighter tokens as text nodes', () => {
       const { container } = render(
         <Code
-          code="const x = 1"
+          code={'const x = 1\n<img onerror="alert(1)">'}
           language="javascript"
           highlighter={{
-            highlightCode: (code, language) => `<span data-lang="${language}">${code}</span>`
+            highlightCode: (code) =>
+              code.split('\n').map((line) => [{ text: line, className: 'lang-javascript' }])
           }}
         />
       )
-      expect(container.querySelector('[data-lang="javascript"]')).toHaveTextContent('const x = 1')
+      const codeEl = container.querySelector('code')
+      expect(codeEl?.querySelector('.lang-javascript')).toHaveTextContent('const x = 1')
+      expect(codeEl?.querySelector('img')).toBeNull()
+      expect(codeEl?.textContent).toContain('<img onerror="alert(1)">')
     })
   })
 

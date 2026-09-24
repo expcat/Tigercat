@@ -1,7 +1,9 @@
-import { computed, defineComponent, h, PropType } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, PropType, watch } from 'vue'
 import {
+  bindDragContainerItems,
   classNames,
   coerceClassValue,
+  commitCrossContainerDrop,
   reorderSequence,
   type DragConfig,
   type DragDropEvent,
@@ -52,6 +54,10 @@ export const Drag = defineComponent({
       onDragEnd: (event: DragEndEvent) => emit('drag-end', event),
       onDrop: (event: DragDropEvent) => {
         emit('drop', event)
+        if (event.fromContainerId !== event.toContainerId) {
+          commitCrossContainerDrop(event)
+          return
+        }
         if (event.fromIndex === event.toIndex) return
         const next = reorderSequence(props.items, event.fromIndex, event.toIndex).map(
           (item, index) => ({ ...item, index })
@@ -60,6 +66,28 @@ export const Drag = defineComponent({
         emit('items-change', next)
       }
     }))
+
+    let unbindItems = bindDragContainerItems(drag.containerId, {
+      getItems: () => props.items,
+      commit: (next) => {
+        emit('update:items', next)
+        emit('items-change', next)
+      }
+    })
+    watch(
+      () => drag.containerId,
+      (id) => {
+        unbindItems()
+        unbindItems = bindDragContainerItems(id, {
+          getItems: () => props.items,
+          commit: (next) => {
+            emit('update:items', next)
+            emit('items-change', next)
+          }
+        })
+      }
+    )
+    onBeforeUnmount(() => unbindItems())
 
     const rootClass = computed(() =>
       classNames(

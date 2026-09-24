@@ -59,8 +59,8 @@ export const BackTop = defineComponent({
       type: [String, Object, Function] as PropType<ScrollRootInput>,
       default: undefined
     },
-    duration: {
-      type: Number,
+    behavior: {
+      type: String as PropType<'auto' | 'smooth'>,
       default: undefined
     },
     position: {
@@ -141,7 +141,7 @@ export const BackTop = defineComponent({
         emit('click', event)
         return
       }
-      scrollToTop(root.target as HTMLElement | Window, props.duration)
+      scrollToTop(root.target as HTMLElement | Window, props.behavior)
       emit('click', event)
     }
 

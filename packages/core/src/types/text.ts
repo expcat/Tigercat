@@ -32,7 +32,7 @@ export type TextWeight =
   'thin' | 'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold' | 'black'
 
 /**
- * Text alignment types. Physical `left`/`right` map to `start`/`end` at runtime.
+ * Text alignment. Logical values only.
  */
 export type TextAlign = 'start' | 'center' | 'end' | 'justify'
 

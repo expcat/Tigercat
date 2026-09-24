@@ -2,7 +2,7 @@
  * Theme configuration for Switch component
  */
 
-import { classNames } from './class-names'
+import { classNames, type ClassValue } from './class-names'
 import { composeComponentClasses, type ComposableClassInput } from './compose-classes'
 import type { ComponentSize } from '../types/base'
 import type { InputStatus } from '../types/input'
@@ -10,7 +10,7 @@ import type { InputStatus } from '../types/input'
 export const switchRootBaseClasses = 'inline-flex items-center gap-2'
 
 export const switchTrackBaseClasses =
-  'relative inline-flex items-center rounded-full tiger-motion-aware [transition:var(--tiger-transition-base,background-color_150ms_ease)] peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+  'relative inline-flex items-center rounded-full tiger-motion-aware [transition:var(--tiger-transition-base)] peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring)] peer-focus-visible:ring-offset-[var(--tiger-surface)]'
 
 export const switchSizeClasses: Record<ComponentSize, string> = {
   sm: 'h-5 w-9',
@@ -33,9 +33,9 @@ export const switchThumbCheckedInsetClasses: Record<ComponentSize, string> = {
 
 export function getSwitchRootClasses(
   disabled: boolean = false,
-  ...classes: ComposableClassInput[]
+  ...classes: ClassValue[]
 ): string {
-  return composeComponentClasses(
+  return classNames(
     switchRootBaseClasses,
     disabled ? 'cursor-not-allowed' : 'cursor-pointer',
     ...classes
@@ -51,9 +51,9 @@ export function getSwitchTrackClasses(
   return classNames(
     switchTrackBaseClasses,
     switchSizeClasses[size],
-    checked ? 'bg-[var(--tiger-primary,#2563eb)]' : 'bg-[var(--tiger-surface-muted,#e5e7eb)]',
+    checked ? 'bg-[var(--tiger-primary)]' : 'bg-[var(--tiger-surface-muted)]',
     disabled && 'opacity-50',
-    status === 'error' && !disabled && 'ring-1 ring-[var(--tiger-error,#dc2626)]'
+    status === 'error' && !disabled && 'ring-1 ring-[var(--tiger-error)]'
   )
 }
 
@@ -75,7 +75,7 @@ export function getSwitchThumbClasses(
   checked: boolean = false
 ): string {
   return classNames(
-    'absolute top-1/2 -translate-y-1/2 inline-block rounded-full bg-[var(--tiger-surface,#ffffff)] shadow-[var(--tiger-shadow-sm,0_1px_2px_rgb(0_0_0_/_0.1))] tiger-motion-aware [transition:var(--tiger-transition-base,inset-inline-start_150ms_ease)]',
+    'absolute top-1/2 -translate-y-1/2 inline-block rounded-full bg-[var(--tiger-surface)] shadow-[var(--tiger-shadow-sm)] tiger-motion-aware [transition:var(--tiger-transition-base)]',
     switchThumbSizeClasses[size],
     checked ? switchThumbCheckedInsetClasses[size] : 'inset-inline-start-0.5'
   )

@@ -49,9 +49,15 @@ export async function requestElementFullscreen(target: Element): Promise<void> {
   throw new Error('Fullscreen is not supported')
 }
 
-export async function exitElementFullscreen(): Promise<void> {
+/**
+ * Leave fullscreen only when `target` is the current fullscreen element.
+ * Omit `target` to exit whatever is fullscreen. A different target is a no-op.
+ */
+export async function exitElementFullscreen(target?: Element | null): Promise<void> {
   if (!isBrowser()) return
-  if (!getFullscreenElement()) return
+  const current = getFullscreenElement()
+  if (!current) return
+  if (target != null && current !== target) return
   const doc = document as FullscreenDocument
   if (typeof document.exitFullscreen === 'function') {
     await document.exitFullscreen()
@@ -87,4 +93,4 @@ export function resolveFullscreenTarget(
 }
 
 export const fullscreenButtonClasses =
-  'inline-flex items-center justify-center min-h-9 min-w-9 rounded-[var(--tiger-radius-md,0.5rem)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-surface-muted,#f3f4f6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 disabled:opacity-50 disabled:cursor-not-allowed'
+  'inline-flex items-center justify-center min-h-9 min-w-9 rounded-[var(--tiger-radius-md)] text-[var(--tiger-text)] hover:bg-[var(--tiger-surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 disabled:opacity-50 disabled:cursor-not-allowed'

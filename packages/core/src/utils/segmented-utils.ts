@@ -19,8 +19,8 @@ export function getSegmentedContainerClasses(size: ComponentSize, block: boolean
   }
 
   return classNames(
-    'relative inline-grid rounded-[var(--tiger-radius-md,0.5rem)]',
-    'bg-[var(--tiger-surface-muted,#f9fafb)]',
+    'relative inline-grid rounded-[var(--tiger-radius-md)]',
+    'bg-[var(--tiger-surface-muted)]',
     sizeClasses[size],
     block ? 'w-full' : ''
   )
@@ -40,15 +40,15 @@ export function getSegmentedIndicatorClasses(size: ComponentSize): string {
   }
 
   return classNames(
-    'pointer-events-none absolute z-0 rounded-[var(--tiger-radius-md,0.5rem)]',
-    'bg-[var(--tiger-surface-raised,#ffffff)] shadow-sm',
-    'transition-[inset-inline-start,width] duration-200 ease-out',
+    'pointer-events-none absolute z-0 rounded-[var(--tiger-radius-md)]',
+    'bg-[var(--tiger-surface-raised)] shadow-sm',
+    'tiger-motion-aware transition-[inset-inline-start,width] duration-[var(--tiger-motion-duration-base)] ease-[var(--tiger-motion-ease-standard)]',
     insetClasses[size]
   )
 }
 
 export function getSegmentedTrackClasses(): string {
-  return 'pointer-events-none absolute inset-0 overflow-hidden rounded-[var(--tiger-radius-md,0.5rem)]'
+  return 'pointer-events-none absolute inset-0 overflow-hidden rounded-[var(--tiger-radius-md)]'
 }
 
 export function getSegmentedIndicatorStyle(
@@ -84,17 +84,30 @@ export function getSegmentedOptionClasses(
   }
 
   return classNames(
-    'relative z-10 inline-flex items-center justify-center gap-1 rounded-[var(--tiger-radius-md,0.5rem)] font-medium transition-colors duration-200 whitespace-nowrap',
+    'relative z-10 inline-flex items-center justify-center gap-1 rounded-[var(--tiger-radius-md)] font-medium transition-colors duration-200 whitespace-nowrap',
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-    'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
+    'focus-visible:ring-[var(--tiger-focus-ring)]/40',
     sizePad[size],
     isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
     isSelected
-      ? 'text-[var(--tiger-text,#111827)]'
+      ? 'text-[var(--tiger-text)]'
       : isDisabled
-        ? 'text-[var(--tiger-text-muted,#6b7280)]'
-        : 'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]'
+        ? 'text-[var(--tiger-text-secondary)]'
+        : 'text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-text)]'
   )
+}
+
+/**
+ * Tab stop is the selected option when it is enabled, otherwise the first
+ * enabled option. `-1` when every option is disabled.
+ */
+export function getSegmentedRovingIndex(
+  selectedIndex: number,
+  enabledIndexes: readonly number[]
+): number {
+  if (enabledIndexes.length === 0) return -1
+  if (enabledIndexes.includes(selectedIndex)) return selectedIndex
+  return enabledIndexes[0]
 }
 
 export function getSegmentedKeyboardTarget(

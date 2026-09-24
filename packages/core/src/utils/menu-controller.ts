@@ -60,20 +60,23 @@ export function isSubmenuPopup(mode: MenuMode, collapsed: boolean): boolean {
 }
 
 export function nextSelectedKeys(current: readonly MenuKey[], key: MenuKey): MenuKey[] {
-  if (isKeySelected(key, current)) return []
+  if (isKeySelected(key, current)) {
+    const kept = current.find((item) => sameMenuKey(item, key))
+    return [kept ?? key]
+  }
   return [key]
 }
 
 export function nextOpenKeys(options: {
   current: readonly MenuKey[]
   key: MenuKey
-  multiple: boolean
+  openMultiple: boolean
   open?: boolean
 }): MenuKey[] {
   const isOpen = isKeyOpen(options.key, options.current)
   const shouldOpen = options.open ?? !isOpen
   if (shouldOpen) {
-    if (options.multiple) {
+    if (options.openMultiple) {
       return isOpen
         ? uniqueMenuKeys(options.current)
         : uniqueMenuKeys([...options.current, options.key])
@@ -110,6 +113,15 @@ export function resolveSearchFilter(options: {
   }
 }
 
+/** Ancestors search must open, shown before the parent writes `openKeys` back. */
+export function resolveDisplayedOpenKeys(options: {
+  openKeys: readonly MenuKey[]
+  searchExpandKeys: readonly MenuKey[]
+}): MenuKey[] {
+  if (options.searchExpandKeys.length === 0) return uniqueMenuKeys(options.openKeys)
+  return uniqueMenuKeys([...options.openKeys, ...options.searchExpandKeys])
+}
+
 export function warnControlledSearchOpenKeys(options: {
   controlled: boolean
   openKeys: readonly MenuKey[]
@@ -120,6 +132,6 @@ export function warnControlledSearchOpenKeys(options: {
   if (missing.length === 0) return
   devWarn(
     'Menu.searchOpenKeys',
-    'Menu: search found nested items but `openKeys` is controlled and did not include the ancestor keys. Write back `onOpenKeysChange` / `update:openKeys` so matches stay visible.'
+    'Menu: search opened ancestor keys before `openKeys` was written back. Accept `onOpenKeysChange` / `update:openKeys`.'
   )
 }

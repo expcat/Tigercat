@@ -1,5 +1,5 @@
 import { type ClassValue, classNames } from './class-names'
-import { enUS } from './i18n/locales/en-US'
+
 import {
   avatarGroupBaseClasses,
   avatarGroupItemClasses,
@@ -75,7 +75,7 @@ export function getAvatarGroupOverflowClasses(
 
 export function getAvatarGroupOverflowLabel(
   overflowCount: number,
-  template = enUS.avatarGroup!.overflowAriaLabel!
+  template = '{count} more'
 ): string {
   return template.replace('{count}', String(overflowCount))
 }

@@ -18,7 +18,7 @@ import { Resizable } from '@expcat/tigercat-vue/Resizable'
     </Resizable>
     <Resizable :default-width="160" :default-height="80" disabled>
       <div
-        class="flex h-full w-full items-center justify-center rounded border bg-[var(--tiger-surface-muted,#f9fafb)] text-sm">
+        class="flex h-full w-full items-center justify-center rounded border bg-[var(--tiger-surface-muted)] text-sm">
         disabled
       </div>
     </Resizable>

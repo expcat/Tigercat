@@ -48,7 +48,9 @@ export const Statistic = defineComponent({
   setup(props, { attrs, slots }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const displayValue = ref<string | number | undefined>(props.value)
+    const displayValue = ref<string | number | undefined>(
+      props.animated && canAnimateStatisticValue(props.value) ? 0 : props.value
+    )
     const currentNumber = ref(canAnimateStatisticValue(props.value) ? props.value : 0)
     let controller: StatisticNumberAnimationController | null = null
     let hasPlayed = false

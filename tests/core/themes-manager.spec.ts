@@ -4,13 +4,13 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
+  createTigerThemeScope,
   defaultTheme,
-  registerBuiltInThemes,
   themeConfigToCssVars,
-  ThemeManager,
   setCssVarsCached,
   removeCssVarsCached,
-  type ThemeChangeEvent
+  type ThemeChangeEvent,
+  type TigerThemeScope
 } from '@expcat/tigercat-core'
 import type { ThemePreset } from '@expcat/tigercat-core'
 
@@ -36,15 +36,22 @@ function clearAllInlineVars(): void {
   document.documentElement.classList.remove('dark')
 }
 
-describe('themes/manager — ThemeManager', () => {
+describe('themes/manager — theme scope', () => {
+  let ThemeManager: TigerThemeScope
+
   beforeEach(() => {
-    // Reset to known state before every test.
+    clearAllInlineVars()
+    ThemeManager = createTigerThemeScope({
+      root: document.documentElement,
+      theme: 'default',
+      colorScheme: 'light'
+    })
     ThemeManager.setColorScheme('light')
     ThemeManager.setTheme('default')
-    clearAllInlineVars()
   })
 
   afterEach(() => {
+    ThemeManager.dispose()
     clearAllInlineVars()
   })
 
@@ -54,7 +61,7 @@ describe('themes/manager — ThemeManager', () => {
 
   describe('built-in presets', () => {
     it('auto-registers all built-in presets', () => {
-      registerBuiltInThemes()
+      ThemeManager.getAvailableThemes()
       const names = ThemeManager.getAvailableThemes()
       expect(names).toEqual(
         expect.arrayContaining([
@@ -182,12 +189,13 @@ describe('themes/manager — ThemeManager', () => {
       )
     })
 
-    it('setTheme("modern") writes modern tokens and data-tiger-style', () => {
+    it('setTheme("modern") writes the modern preset on the scope root', () => {
       ThemeManager.setTheme('modern')
-      expect(document.documentElement.getAttribute('data-tiger-style')).toBe('modern')
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('modern')
+      expect(document.documentElement.getAttribute('data-tiger-style')).toBeNull()
       expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe('12px')
       ThemeManager.setTheme('default')
-      expect(document.documentElement.getAttribute('data-tiger-style')).toBeNull()
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('default')
       expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
         defaultTheme.light.radius?.md
       )
@@ -215,15 +223,13 @@ describe('themes/manager — ThemeManager', () => {
         })
       ).toEqual(
         expect.objectContaining({
-          '--tiger-text-muted': 'var(--tiger-text-secondary)',
-          '--tiger-fill': 'var(--tiger-surface-muted)',
-          '--tiger-bg': 'var(--tiger-surface)',
           '--tiger-font-family': 'Inter, sans-serif',
           '--tiger-radius-md': '0.75rem',
           '--tiger-shadow-md': '0 8px 16px rgb(0 0 0 / 0.2)',
           '--tiger-spacing-md': '1rem',
           '--tiger-motion-duration-base': '240ms',
-          '--tiger-transition-base': 'all 240ms cubic-bezier(0.4, 0, 0.2, 1)',
+          '--tiger-transition-base':
+            'color, background-color, border-color, outline-color, text-decoration-color, box-shadow, opacity, transform 240ms cubic-bezier(0.4, 0, 0.2, 1)',
           '--tiger-breakpoint-md': '768px'
         })
       )
@@ -328,38 +334,25 @@ describe('themes/manager — ThemeManager', () => {
       expect(document.documentElement.classList.contains('dark')).toBe(false)
     })
 
-    it('resolves to dark when prefers-color-scheme: dark is matched', () => {
+    it('does not stamp .dark from prefers-color-scheme while auto', () => {
       currentMatches = true
       ThemeManager.setColorScheme('auto')
-      expect(ThemeManager.getResolvedColorScheme()).toBe('dark')
-      expect(document.documentElement.classList.contains('dark')).toBe(true)
-    })
-
-    it('reacts to a media query change event while in auto mode', () => {
-      currentMatches = false
-      ThemeManager.setColorScheme('auto')
       expect(ThemeManager.getResolvedColorScheme()).toBe('light')
-
-      // Simulate the OS flipping to dark.
-      for (const listener of mediaListeners) {
-        listener({ matches: true } as MediaQueryListEvent)
-      }
-      expect(ThemeManager.getResolvedColorScheme()).toBe('dark')
-      expect(document.documentElement.classList.contains('dark')).toBe(true)
+      expect(document.documentElement.classList.contains('dark')).toBe(false)
+      expect(document.documentElement.hasAttribute('data-tiger-color-scheme')).toBe(false)
     })
 
-    it('stops listening to the media query after switching back to a fixed scheme', () => {
+    it('reads an existing html dark class when the scheme is auto', () => {
+      document.documentElement.classList.add('dark')
       ThemeManager.setColorScheme('auto')
-      expect(mediaListeners.length).toBeGreaterThan(0)
+      expect(ThemeManager.getResolvedColorScheme()).toBe('dark')
+    })
+
+    it('does not subscribe a matchMedia listener for auto', () => {
+      ThemeManager.setColorScheme('auto')
+      expect(mediaListeners.length).toBe(0)
       ThemeManager.setColorScheme('light')
       expect(mediaListeners.length).toBe(0)
-    })
-
-    it('does not double-subscribe when setColorScheme("auto") is called twice', () => {
-      ThemeManager.setColorScheme('auto')
-      const firstCount = mediaListeners.length
-      ThemeManager.setColorScheme('auto')
-      expect(mediaListeners.length).toBe(firstCount)
     })
   })
 

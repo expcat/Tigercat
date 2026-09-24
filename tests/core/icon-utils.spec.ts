@@ -3,11 +3,10 @@
  */
 
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
+import { icon24StrokeWidth, closeIconPathStrokeWidth } from '@expcat/tigercat-core/icons/common'
 import {
   ICON_STROKE_WIDTH,
-  closeIconPathStrokeWidth,
   getSvgDefaultAttrs,
-  icon24StrokeWidth,
   iconSvgDefaultStrokeWidth,
   mergeChildSvgAttrs,
   resolveIconPaintMode,

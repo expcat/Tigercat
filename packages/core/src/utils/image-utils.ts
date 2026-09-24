@@ -6,13 +6,7 @@
 import { classNames } from './class-names'
 import { isBrowser } from './env'
 import { overlayZIndexClass } from './floating'
-import type {
-  ImageFit,
-  ImagePreviewTrigger,
-  CropRect,
-  CropHandle,
-  PreviewNavState
-} from '../types/image'
+import type { ImageFit, CropRect, CropHandle, PreviewNavState } from '../types/image'
 
 // ============================================================================
 // Image component styles
@@ -30,7 +24,7 @@ export const imageFrameClasses = 'relative block h-full w-full overflow-hidden'
  * Real preview control host. Ring is outside overflow-hidden via ring-offset.
  */
 export const imagePreviewHostClasses =
-  'relative inline-block p-0 m-0 border-0 bg-transparent appearance-none align-top text-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'relative inline-block p-0 m-0 border-0 bg-transparent appearance-none align-top text-start cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
 /**
  * Classes for the <img> element based on fit
@@ -50,19 +44,19 @@ export function getImageImgClasses(fit: ImageFit): string {
  * Classes for the error placeholder
  */
 export const imageErrorClasses =
-  'flex items-center justify-center w-full h-full bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-secondary,#4b5563)]'
+  'flex items-center justify-center w-full h-full bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
 
 /**
  * In-flow loading placeholder (lazy, no src yet)
  */
 export const imageLoadingClasses =
-  'flex items-center justify-center w-full h-full bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-secondary,#4b5563)]'
+  'flex items-center justify-center w-full h-full bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
 
 /**
  * Overlay on top of a bitmap that has not fired load
  */
 export const imageLoadingOverlayClasses =
-  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-secondary,#4b5563)]'
+  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
 
 /**
  * Cursor class when preview is enabled
@@ -70,16 +64,13 @@ export const imageLoadingOverlayClasses =
 export const imagePreviewCursorClass = 'cursor-pointer'
 
 export function resolveImagePreviewEnabled(preview: boolean, groupPreview?: boolean): boolean {
+  if (preview === false) return false
   if (groupPreview === false) return false
-  return preview
+  return preview || groupPreview === true
 }
 
-export function isImageHoverPreviewEnabled(
-  previewEnabled: boolean,
-  previewTrigger: ImagePreviewTrigger,
-  inGroup: boolean
-): boolean {
-  return previewEnabled && previewTrigger === 'hover' && !inGroup
+export function isImageHoverPreviewEnabled(zoomOnHover: boolean, inGroup: boolean): boolean {
+  return zoomOnHover && !inGroup
 }
 
 export function resolveImageHoverPlacement(direction?: string): 'left' | 'right' {
@@ -101,25 +92,30 @@ export interface ImageLoadState {
   loading: boolean
 }
 
-export function createImageLoadState(src: string | undefined, lazy: boolean): ImageLoadState {
+export function createImageLoadState(src: string | undefined, _lazy = false): ImageLoadState {
   return {
-    actualSrc: lazy ? '' : (src ?? ''),
+    actualSrc: src ?? '',
     error: false,
-    loading: true
+    loading: Boolean(src)
   }
 }
 
 export function resetImageLoadState(
   src: string | undefined,
-  lazy: boolean,
-  inView: boolean
+  _lazy = false,
+  _inView = true
 ): ImageLoadState {
-  const shouldLoad = !lazy || inView
-  return {
-    actualSrc: shouldLoad ? (src ?? '') : '',
-    error: false,
-    loading: true
-  }
+  return createImageLoadState(src)
+}
+
+/** Mask ends when the element has already finished, including a failed decode. */
+export function imageLoadStateFromElement(
+  img: { complete: boolean; naturalWidth: number },
+  src: string | undefined
+): ImageLoadState | null {
+  if (!img.complete || !src) return null
+  if (img.naturalWidth > 0) return { actualSrc: src, error: false, loading: false }
+  return { actualSrc: src, error: true, loading: false }
 }
 
 export function applyImageLoadSuccess(state: ImageLoadState): ImageLoadState {
@@ -153,7 +149,7 @@ export const imageErrorIconPath =
 export const imageLoadingSpinnerPath =
   'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
 
-export const imageLoadingSpinnerClasses = 'w-8 h-8 animate-spin'
+export const imageLoadingSpinnerClasses = 'tiger-motion-aware w-8 h-8 animate-spin'
 
 /** Zoom in icon path */
 export const zoomInIconPath = 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7'
@@ -195,7 +191,8 @@ export const imagePreviewImgClasses =
   'max-h-[90vh] max-w-[90vw] select-none cursor-grab active:cursor-grabbing touch-none'
 
 /** Applied while the bitmap is not being panned or pinched. */
-export const imagePreviewImgMotionClasses = 'transition-transform duration-150 ease-out'
+export const imagePreviewImgMotionClasses =
+  'tiger-motion-aware transition-transform duration-[var(--tiger-motion-duration-quick)] ease-[var(--tiger-motion-ease-standard)]'
 
 /**
  * Preview toolbar classes
@@ -263,32 +260,16 @@ export const imageViewerIcons = {
 // ImageCropper styles
 // ============================================================================
 
-const CROPPER_STYLE_ID = 'tiger-image-cropper-styles'
-
-const CROPPER_CSS = `.tiger-image-cropper-checkerboard {
-  background-color: var(--tiger-surface, #ffffff);
-  background-image:
-    linear-gradient(45deg, var(--tiger-surface-muted, #e5e7eb) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--tiger-surface-muted, #e5e7eb) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--tiger-surface-muted, #e5e7eb) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--tiger-surface-muted, #e5e7eb) 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
-}`
-
-/**
- * Inject checkerboard rules if the style node is missing. Presence in the
- * document is the only guard — a sticky module flag would skip re-inject
- * after the node is removed.
- */
-export function injectImageCropperStyles(): void {
-  if (!isBrowser()) return
-  if (document.getElementById(CROPPER_STYLE_ID)) return
-  const style = document.createElement('style')
-  style.id = CROPPER_STYLE_ID
-  style.textContent = CROPPER_CSS
-  document.head.appendChild(style)
-}
+/** Checkerboard behind the crop stage. Wired by the Tailwind plugin. */
+export const imageCropperBaseStyles = {
+  '.tiger-image-cropper-checkerboard': {
+    backgroundColor: 'var(--tiger-surface)',
+    backgroundImage:
+      'linear-gradient(45deg, var(--tiger-surface-muted) 25%, transparent 25%), linear-gradient(-45deg, var(--tiger-surface-muted) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--tiger-surface-muted) 75%), linear-gradient(-45deg, transparent 75%, var(--tiger-surface-muted) 75%)',
+    backgroundSize: '16px 16px',
+    backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0'
+  }
+} as const
 
 /**
  * Observed size host. Width comes from the parent (`w-full`); never write the
@@ -301,7 +282,7 @@ export const imageCropperSizeHostClasses = 'relative flex w-full max-w-full just
  * handles and their focus rings stay visible at 0/100%.
  */
 export const imageCropperContainerClasses =
-  'relative select-none touch-none rounded-[var(--tiger-radius-lg,0.75rem)] shadow-inner border border-[var(--tiger-border,#e5e7eb)] tiger-image-cropper-checkerboard'
+  'relative select-none touch-none rounded-[var(--tiger-radius-lg)] shadow-inner border border-[var(--tiger-border)] tiger-image-cropper-checkerboard'
 
 /** Bitmap + mask clip layer */
 export const imageCropperFrameClasses = 'relative overflow-hidden'
@@ -334,7 +315,7 @@ export const imageCropperGuideClasses = 'absolute border-white/25 pointer-events
  * Cropper drag area classes (inside the crop box, handles moving)
  */
 export const imageCropperDragAreaClasses =
-  'absolute cursor-move outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'absolute cursor-move outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 
 const CROPPER_HANDLE_CURSORS: Record<CropHandle, string> = {
   nw: 'cursor-nw-resize',
@@ -353,7 +334,7 @@ const CROPPER_HANDLE_CURSORS: Record<CropHandle, string> = {
  */
 export function getCropperHandleClasses(handle: CropHandle): string {
   return classNames(
-    'absolute w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--tiger-primary,#2563eb)] shadow-md hover:scale-125 hover:bg-[var(--tiger-primary,#2563eb)] hover:border-white transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+    'absolute w-3.5 h-3.5 rounded-full bg-white border-2 border-[var(--tiger-primary)] shadow-md hover:scale-125 hover:bg-[var(--tiger-primary)] hover:border-white transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]',
     CROPPER_HANDLE_CURSORS[handle]
   )
 }
@@ -750,8 +731,8 @@ export interface CropperImageLoader {
 }
 
 /**
- * Load an image for crop geometry. Does not set CORS — display is a separate
- * `<img>`. Changing `src` aborts the previous load.
+ * Load an image for crop geometry. `crossOrigin` lets `toBlob` read pixels.
+ * Changing `src` aborts the previous load.
  */
 export function createCropperImageLoader(): CropperImageLoader {
   let generation = 0
@@ -775,6 +756,7 @@ export function createCropperImageLoader(): CropperImageLoader {
         return
       }
       const img = new window.Image()
+      img.crossOrigin = 'anonymous'
       current = img
       img.onload = () => {
         if (gen !== generation) return
@@ -815,18 +797,21 @@ export function getCropperHandleName(handle: CropHandle, labels: Record<string, 
   return labels[CROPPER_HANDLE_LABEL_KEYS[handle]] ?? handle
 }
 
+/** Longest output edge from `cropCanvas`. Larger sources are scaled down. */
+export const CROP_OUTPUT_MAX_EDGE = 4096
+
 /**
- * Perform canvas cropping and return the cropped canvas + dataUrl.
- * Note: Call canvas.toBlob() asynchronously in the component layer for the Blob.
+ * Crop to a blob. Output width and height are each at most
+ * {@link CROP_OUTPUT_MAX_EDGE}. There is no synchronous data URL.
  */
-export function cropCanvas(
+export async function cropCanvas(
   image: HTMLImageElement,
   cropRect: CropRect,
   displayWidth: number,
   displayHeight: number,
   outputType: string = 'image/png',
   quality: number = 0.92
-): { canvas: HTMLCanvasElement; dataUrl: string } {
+): Promise<Blob> {
   if (!isBrowser()) {
     throw new Error('Image canvas cropping is only available in the browser')
   }
@@ -849,13 +834,14 @@ export function cropCanvas(
   const sy = cropRect.y * scaleY
   const sw = cropRect.width * scaleX
   const sh = cropRect.height * scaleY
+  const rawW = Math.max(1, Math.round(sw))
+  const rawH = Math.max(1, Math.round(sh))
+  const longest = Math.max(rawW, rawH)
+  const scaleDown = longest > CROP_OUTPUT_MAX_EDGE ? CROP_OUTPUT_MAX_EDGE / longest : 1
 
   const canvas = document.createElement('canvas')
-  canvas.width = Math.round(sw)
-  canvas.height = Math.round(sh)
-  if (canvas.width <= 0 || canvas.height <= 0) {
-    throw new Error('Image canvas cropping produced an empty canvas')
-  }
+  canvas.width = Math.max(1, Math.round(rawW * scaleDown))
+  canvas.height = Math.max(1, Math.round(rawH * scaleDown))
 
   const ctx = canvas.getContext('2d')
   if (!ctx) {
@@ -863,8 +849,46 @@ export function cropCanvas(
   }
   ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height)
 
-  const dataUrl = canvas.toDataURL(outputType, quality)
-  return { canvas, dataUrl }
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob((value) => resolve(value), outputType, quality)
+  })
+  if (!blob) throw new Error('Image canvas cropping failed to create a blob')
+  return blob
+}
+
+const CROP_NUDGE_HANDLES = new Set<CropHandle>(['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'])
+
+/**
+ * Arrow keys move the edge that handle owns. North/south ignore horizontal
+ * keys; east/west ignore vertical keys.
+ */
+export function nudgeCropHandle(
+  rect: CropRect,
+  handle: CropHandle,
+  key: string,
+  step: number,
+  imageWidth: number,
+  imageHeight: number,
+  aspectRatio?: number,
+  minW = 20,
+  minH = 20
+): CropRect | null {
+  if (!CROP_NUDGE_HANDLES.has(handle)) return null
+  const horizontal = key === 'ArrowLeft' || key === 'ArrowRight'
+  const vertical = key === 'ArrowUp' || key === 'ArrowDown'
+  if (!horizontal && !vertical) return null
+  if (horizontal && (handle === 'n' || handle === 's')) return null
+  if (vertical && (handle === 'e' || handle === 'w')) return null
+  const amount = Number.isFinite(step) && step > 0 ? step : 1
+  const dx = key === 'ArrowLeft' ? -amount : key === 'ArrowRight' ? amount : 0
+  const dy = key === 'ArrowUp' ? -amount : key === 'ArrowDown' ? amount : 0
+  return resizeCropRect(rect, handle, dx, dy, imageWidth, imageHeight, aspectRatio, minW, minH)
+}
+
+export function formatCropSizeText(template: string, width: number, height: number): string {
+  return template
+    .replace('{width}', String(Math.max(0, Math.round(width))))
+    .replace('{height}', String(Math.max(0, Math.round(height))))
 }
 
 /** Minimal touch-point shape for distance calculations. */
@@ -961,11 +985,23 @@ export interface PanResult {
   translateY: number
 }
 
-export function movePan(pan: PanState, clientX: number, clientY: number): PanResult {
-  return {
-    translateX: pan.startTranslateX + (clientX - pan.startX),
-    translateY: pan.startTranslateY + (clientY - pan.startY)
+export function movePan(
+  pan: PanState,
+  clientX: number,
+  clientY: number,
+  limits?: { maxX: number; maxY: number } | null
+): PanResult {
+  let translateX = pan.startTranslateX + (clientX - pan.startX)
+  let translateY = pan.startTranslateY + (clientY - pan.startY)
+  if (limits) {
+    const clamp = (value: number, max: number) => {
+      const bound = Number.isFinite(max) && max > 0 ? max : 0
+      return Math.min(bound, Math.max(-bound, value))
+    }
+    translateX = clamp(translateX, limits.maxX)
+    translateY = clamp(translateY, limits.maxY)
   }
+  return { translateX, translateY }
 }
 
 export interface PinchState {

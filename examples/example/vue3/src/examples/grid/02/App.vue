@@ -9,12 +9,12 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
     <Row :gutter="16">
       <Col :span="{ xs: 24, md: 12, lg: 8 }">
         <div
-          class="rounded bg-[var(--tiger-primary)] p-4 text-center text-[var(--tiger-primary-foreground,#fff)]">
+          class="rounded bg-[var(--tiger-primary)] p-4 text-center text-[var(--tiger-primary-foreground)]">
           xs-24 md-12 lg-8 · 数字 gutter 只开横缝
         </div>
       </Col>
       <Col :span="{ xs: 24, md: 12, lg: 16 }" :offset="{ md: 0 }">
-        <div class="rounded bg-[var(--tiger-secondary,#0d9488)] p-4 text-center text-white">
+        <div class="rounded bg-[var(--tiger-secondary)] p-4 text-center text-white">
           xs-24 md-12 lg-16
         </div>
       </Col>

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
@@ -30,39 +30,23 @@ describe('Button', () => {
     expect(button).toHaveAttribute('aria-label', 'Custom label')
   })
 
-  it('warns when color is passed instead of variant', () => {
-    // devWarn dedupes per key process-wide, so drop any earlier hit first.
-    resetDevWarnCache()
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-
-    render(<Button color="primary">Color prop</Button>)
-
-    const button = screen.getByRole('button', { name: 'Color prop' })
-    expect(button).toBeInTheDocument()
-    expect(button).not.toHaveAttribute('color')
-    expect(warn).toHaveBeenCalledWith(
-      '[Tigercat] Button does not support color. Use variant instead.'
-    )
-    warn.mockRestore()
-  })
-
-  it('respects htmlType prop (submit/reset/button)', () => {
-    const { rerender } = render(<Button htmlType="submit">Submit</Button>)
+  it('respects type prop (submit/reset/button)', () => {
+    const { rerender } = render(<Button type="submit">Submit</Button>)
     expect(screen.getByRole('button')).toHaveAttribute('type', 'submit')
 
-    rerender(<Button htmlType="reset">Reset</Button>)
+    rerender(<Button type="reset">Reset</Button>)
     expect(screen.getByRole('button')).toHaveAttribute('type', 'reset')
 
     rerender(<Button>Button</Button>)
     expect(screen.getByRole('button')).toHaveAttribute('type', 'button')
   })
 
-  it('treats native type as the same attribute as htmlType', () => {
+  it('treats native type as the same attribute as type', () => {
     const { rerender } = render(<Button type="submit">Submit</Button>)
     expect(screen.getByRole('button')).toHaveAttribute('type', 'submit')
 
     rerender(
-      <Button type="reset" htmlType="submit">
+      <Button type="reset" type="submit">
         Submit
       </Button>
     )
@@ -84,13 +68,13 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: 'Fallback' })).toBeInTheDocument()
   })
 
-  it('submits a form when htmlType is submit', async () => {
+  it('submits a form when type is submit', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault())
 
     render(
       <form onSubmit={onSubmit}>
-        <Button htmlType="submit">Save</Button>
+        <Button type="submit">Save</Button>
       </form>
     )
 
@@ -133,15 +117,13 @@ describe('Button', () => {
       </Button>
     )
 
-    const button = screen.getByRole('button', { name: 'Loading' })
-    expect(button).not.toBeDisabled()
+    const button = screen.getByRole('button', { name: /Loading/ })
+    expect(button).toBeDisabled()
     expect(button).toHaveAttribute('aria-busy', 'true')
-    expect(button).not.toHaveAttribute('aria-disabled', 'true')
+    expect(button).toHaveAttribute('aria-disabled', 'true')
     expect(container.querySelector('svg.animate-spin')).toBeInTheDocument()
     expect(container.querySelector('svg.animate-spin')).toHaveAttribute('aria-hidden', 'true')
 
-    button.focus()
-    expect(button).toHaveFocus()
     await user.click(button)
     expect(onClick).not.toHaveBeenCalled()
   })
@@ -163,7 +145,7 @@ describe('Button', () => {
     // but let's check if we can find it by generic role first.
     // Ideally we want to ensure the custom icon is there.
     const button = screen.getByRole('button')
-    expect(button).not.toBeDisabled()
+    expect(button).toBeDisabled()
     expect(button).toHaveAttribute('aria-busy', 'true')
     expect(screen.getByTestId('custom-spinner')).toBeInTheDocument()
     // Default spinner should not be present
@@ -184,8 +166,7 @@ describe('Button', () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
-  it('does not activate via keyboard when loading', async () => {
-    const user = userEvent.setup()
+  it('does not activate via keyboard when loading', () => {
     const onClick = vi.fn()
 
     render(
@@ -194,11 +175,9 @@ describe('Button', () => {
       </Button>
     )
 
-    const button = screen.getByRole('button', { name: 'Loading' })
-    expect(button).not.toBeDisabled()
-
-    button.focus()
-    await user.keyboard('{Enter}')
+    const button = screen.getByRole('button', { name: /Loading/ })
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
     expect(onClick).not.toHaveBeenCalled()
   })
 
@@ -233,16 +212,16 @@ describe('Button', () => {
       expect(iconSpan.className).not.toContain('order-1')
     })
 
-    it('renders loading spinner after the label when iconPosition is right', () => {
+    it('renders loading spinner after the label when iconPosition is end', () => {
       const { container } = render(
-        <Button loading iconPosition="right">
+        <Button loading iconPosition="end">
           Loading
         </Button>
       )
-      const button = screen.getByRole('button', { name: 'Loading' })
-      const spinnerSpan = container.querySelector('svg.animate-spin')!.parentElement!
-      expect(button.lastElementChild).toBe(spinnerSpan)
-      expect(spinnerSpan.className).toContain('ms-2')
+      const button = container.querySelector('button')!
+      const spinner = container.querySelector('svg.animate-spin')!
+      expect(button.lastElementChild).toContain(spinner)
+      expect(button.lastElementChild!.className).toContain('ms-2')
     })
 
     it('warns when an icon-only button has no accessible name', () => {

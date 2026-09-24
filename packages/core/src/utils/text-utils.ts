@@ -21,6 +21,12 @@ import {
 
 const TEXT_TAG_SET: ReadonlySet<string> = new Set(TEXT_TAGS)
 
+/** Copyable text cannot use a paragraph, because a button is not valid inside `p`. */
+export function resolveCopyableTextTag(tag?: string | null): 'div' | 'span' {
+  if (tag === 'div') return 'div'
+  return 'span'
+}
+
 export function resolveTextTag(tag?: string | null): TextTag {
   if (tag && TEXT_TAG_SET.has(tag)) return tag as TextTag
   if (tag) {
@@ -44,19 +50,9 @@ export function resolveTextColor(color?: string | null): TextColor {
   return 'default'
 }
 
-/**
- * Logical alignment. Physical `left`/`right` map to `start`/`end`.
- */
+/** Logical alignment only. Physical `left` / `right` are not accepted. */
 export function resolveTextAlign(align?: string | null): TextAlign | undefined {
   if (!align) return undefined
-  if (align === 'left') {
-    devWarn('Text.align.left', '[Tigercat] Text align "left" is a physical alias; use "start".')
-    return 'start'
-  }
-  if (align === 'right') {
-    devWarn('Text.align.right', '[Tigercat] Text align "right" is a physical alias; use "end".')
-    return 'end'
-  }
   if (align === 'start' || align === 'center' || align === 'end' || align === 'justify') {
     return align
   }
@@ -109,5 +105,5 @@ export function resolveTextCopyContent(
 export const textCopyableRootClasses = 'inline-flex max-w-full items-center gap-1'
 export const textCopyableBodyClasses = 'min-w-0'
 export const textCopyableButtonClasses =
-  'inline-flex shrink-0 items-center justify-center min-h-6 min-w-6 rounded-[var(--tiger-radius-md,0.5rem)] text-[var(--tiger-text-muted,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f3f4f6)] hover:text-[var(--tiger-text,#111827)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'inline-flex shrink-0 items-center justify-center min-h-6 min-w-6 rounded-[var(--tiger-radius-md)] text-[var(--tiger-text-secondary)] hover:bg-[var(--tiger-surface-muted)] hover:text-[var(--tiger-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 export const textCopyableLiveClasses = 'sr-only'

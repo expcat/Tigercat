@@ -20,6 +20,26 @@ describe('CodeEditor', () => {
       expect(textarea).toBeTruthy()
     })
 
+    it('does not write value back during composition', () => {
+      const onChange = vi.fn()
+      const { container } = renderCodeEditor({ onChange })
+      const textarea = container.querySelector('textarea') as HTMLTextAreaElement
+      fireEvent.compositionStart(textarea)
+      fireEvent.change(textarea, { target: { value: 'const x = 1中' } })
+      expect(onChange).not.toHaveBeenCalled()
+      expect(textarea.value).toBe('const x = 1中')
+      fireEvent.compositionEnd(textarea, { target: { value: 'const x = 1中' } })
+      expect(onChange).toHaveBeenCalledWith('const x = 1中')
+    })
+
+    it('follows the document color scheme when theme is omitted', () => {
+      document.documentElement.setAttribute('data-tiger-color-scheme', 'dark')
+      const { container } = render(<CodeEditor value="a" />)
+      expect(container.firstElementChild?.getAttribute('data-theme')).toBe('dark')
+      expect(container.firstElementChild?.getAttribute('style') ?? '').not.toMatch(/#(?:[0-9a-f]{3,8})/i)
+      document.documentElement.removeAttribute('data-tiger-color-scheme')
+    })
+
     it('should render with code value', () => {
       const { container } = renderCodeEditor()
       const textarea = container.querySelector('textarea') as HTMLTextAreaElement
@@ -161,7 +181,7 @@ describe('CodeEditor', () => {
       })
       const textarea = container.querySelector('textarea') as HTMLTextAreaElement
       expect(textarea.placeholder).toBe('Type code...')
-      expect(textarea.className).toContain('--tiger-text-muted')
+      expect(textarea.className).toContain('--tiger-text-secondary')
     })
   })
 

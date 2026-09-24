@@ -232,7 +232,7 @@ describe('menu-utils classes', () => {
   const LIGHT_TOKEN_LOCKS = [
     '[--tiger-surface:#ffffff]',
     '[--tiger-text:#111827]',
-    '[--tiger-text-muted:#6b7280]',
+    '[--tiger-text-secondary:#6b7280]',
     '[--tiger-border:#e5e7eb]',
     '[--tiger-surface-muted:#f9fafb]'
   ] as const
@@ -259,9 +259,9 @@ describe('menu-utils classes', () => {
     for (const classes of [inline, vertical]) {
       expect(classes).toContain(menuBaseClasses)
       expect(classes).toContain('--tiger-surface')
-      expect(classes).toContain('bg-[var(--tiger-surface,#ffffff)]')
-      expect(classes).toContain('text-[var(--tiger-text,#111827)]')
-      expect(classes).toContain('border-[var(--tiger-border,#e5e7eb)]')
+      expect(classes).toContain('bg-[var(--tiger-surface)]')
+      expect(classes).toContain('text-[var(--tiger-text)]')
+      expect(classes).toContain('border-[var(--tiger-border)]')
 
       for (const lock of LIGHT_TOKEN_LOCKS) {
         expect(classes).not.toContain(lock)
@@ -272,9 +272,10 @@ describe('menu-utils classes', () => {
   it('keeps explicit dark theme as a forced chrome lock', () => {
     const classes = getMenuClasses('inline', 'dark')
 
-    expect(menuDarkThemeClasses).toContain('[--tiger-surface:#111827]')
+    expect(menuDarkThemeClasses).toBe('dark')
+    expect(menuDarkThemeClasses).not.toMatch(/#[0-9a-fA-F]{3,8}/)
     expect(classes).toContain(menuDarkThemeClasses)
-    expect(classes).toContain('[--tiger-surface:#111827]')
+    expect(classes).not.toMatch(/#[0-9a-fA-F]{3,8}/)
   })
 
   it('uses logical icon spacing instead of physical right margin', () => {

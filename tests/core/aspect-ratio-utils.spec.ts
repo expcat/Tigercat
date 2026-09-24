@@ -86,10 +86,9 @@ describe('aspect-ratio-utils', () => {
   })
 
   describe('class helpers', () => {
-    it('clips the ratio box by default', () => {
-      expect(aspectRatioRootClasses).toContain('overflow-hidden')
-      expect(aspectRatioContentClasses).toContain('absolute')
-      expect(aspectRatioContentClasses).toContain('inset-0')
+    it('does not clip the ratio box by default', () => {
+      expect(aspectRatioRootClasses).toContain('overflow-visible')
+      expect(aspectRatioRootClasses).not.toContain('overflow-hidden')
     })
 
     it('appends extra class names after the base classes', () => {

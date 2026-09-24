@@ -29,7 +29,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   width = DEFAULT_GAUGE_WIDTH,
   height = DEFAULT_GAUGE_HEIGHT,
   padding = 24,
-  responsive = false,
+  responsive = true,
   value,
   min = 0,
   max = 100,
@@ -42,10 +42,10 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   tooltipFormatter,
   label,
   segments,
-  trackColor = 'var(--tiger-border,#e5e7eb)',
-  color = 'var(--tiger-primary,#2563eb)',
+  trackColor = 'var(--tiger-border)',
+  color = 'var(--tiger-primary)',
   gradient = false,
-  animated = true,
+  animated = false,
   showTooltip = true,
   title: chartTitle,
   desc,
@@ -54,7 +54,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   className
 }) => {
   const config = useTigerConfig()
-  useMemo(
+  const labels = useMemo(
     () => getChartLabels(mergeTigerLocale(config.locale, locale), labelsOverride),
     [config.locale, locale, labelsOverride]
   )
@@ -179,6 +179,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
         responsive={responsive}
         title={chartTitle}
         desc={desc}
+        aria-label={chartTitle ? undefined : labels.gaugeChartAriaLabel}
         onResolvedSizeChange={onResolvedSizeChange}>
         {gradient && valuePath && (
           <defs>
@@ -219,7 +220,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
               y1={tick.y1}
               x2={tick.x2}
               y2={tick.y2}
-              stroke="var(--tiger-text-secondary,#6b7280)"
+              stroke="var(--tiger-text-secondary)"
               strokeWidth={1}
               aria-hidden="true"
             />
@@ -235,18 +236,18 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
             </text>
           </React.Fragment>
         ))}
-        <path d={needlePath} fill="var(--tiger-text,#374151)" aria-hidden="true" />
+        <path d={needlePath} fill="var(--tiger-text)" aria-hidden="true" />
         <circle
           cx={geometry.cx}
           cy={geometry.cy}
           r={5}
-          fill="var(--tiger-text,#374151)"
+          fill="var(--tiger-text)"
           aria-hidden="true"
         />
         <text
           x={geometry.valueText.x}
           y={geometry.valueText.y}
-          className="fill-[color:var(--tiger-text,#374151)] text-lg font-semibold tabular-nums"
+          className="fill-[color:var(--tiger-text)] text-lg font-semibold tabular-nums"
           textAnchor="middle"
           dominantBaseline="middle"
           aria-hidden="true">

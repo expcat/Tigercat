@@ -1,7 +1,8 @@
-import { defineComponent, h, PropType, type VNode } from 'vue'
+import { defineComponent, h, provide, PropType, type VNode } from 'vue'
 import {
   DROPDOWN_CHEVRON_PATH,
-  composeComponentClasses,
+  classNames,
+  coerceClassValue,
   getDropdownChevronClasses,
   getSplitButtonPrimaryClasses,
   getSplitButtonRootClasses,
@@ -11,6 +12,7 @@ import {
   resolveLocaleText,
   resolveSplitButtonSize,
   resolveSplitButtonTriggerAriaLabel,
+  resolveButtonType,
   resolveSplitButtonVariant,
   type ButtonHtmlType,
   type ButtonIconPosition,
@@ -20,6 +22,7 @@ import {
 } from '@expcat/tigercat-core'
 import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { Button } from './Button'
+import { BUTTON_GROUP_INJECTION_KEY } from './ButtonGroup'
 import { useTigerConfig } from './ConfigProvider'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 
@@ -30,7 +33,7 @@ export interface VueSplitButtonProps {
   loading?: boolean
   danger?: boolean
   block?: boolean
-  htmlType?: ButtonHtmlType
+  type?: ButtonHtmlType
   iconPosition?: ButtonIconPosition
   open?: boolean
   defaultOpen?: boolean
@@ -115,13 +118,13 @@ export const SplitButton = defineComponent({
     loading: Boolean,
     danger: Boolean,
     block: Boolean,
-    htmlType: {
+    type: {
       type: String as PropType<ButtonHtmlType>,
       default: undefined
     },
     iconPosition: {
       type: String as PropType<ButtonIconPosition>,
-      default: 'left'
+      default: 'start'
     },
     open: {
       type: Boolean as PropType<boolean | undefined>,
@@ -167,6 +170,7 @@ export const SplitButton = defineComponent({
   emits: ['click', 'update:open', 'open-change'],
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
+    provide(BUTTON_GROUP_INJECTION_KEY, {})
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
@@ -187,7 +191,7 @@ export const SplitButton = defineComponent({
         props.triggerAriaLabel,
         resolveLocaleText('More options', config.value.locale?.common?.moreOptionsText)
       )
-      const htmlType = props.htmlType ?? (attrType as ButtonHtmlType | undefined) ?? 'button'
+      const buttonType = resolveButtonType(props.type ?? attrType)
 
       const partitioned = partitionDefaultSlot(slots.default?.())
       const menuNode = wrapMenu(slots.menu?.()) ?? partitioned.menu
@@ -197,10 +201,10 @@ export const SplitButton = defineComponent({
         {
           variant,
           size,
-          disabled: props.disabled,
+          disabled: props.disabled || props.loading,
           loading: props.loading,
           danger: props.danger,
-          htmlType,
+          type: buttonType,
           iconPosition: props.iconPosition,
           className: getSplitButtonPrimaryClasses({ block: props.block }),
           'aria-label': props.primaryAriaLabel,
@@ -222,7 +226,7 @@ export const SplitButton = defineComponent({
               trigger: 'click' as const,
               showArrow: false,
               asChild: true,
-              disabled: props.disabled,
+              disabled: props.disabled || props.loading,
               open: props.open,
               defaultOpen: props.defaultOpen,
               closeOnClick: props.closeOnClick,
@@ -245,9 +249,9 @@ export const SplitButton = defineComponent({
                   {
                     variant,
                     size,
-                    disabled: props.disabled,
+                    disabled: props.disabled || props.loading,
                     danger: props.danger,
-                    htmlType: 'button',
+                    type: 'button',
                     className: getSplitButtonTriggerClasses({ size }),
                     'aria-label': triggerLabel,
                     'aria-disabled': props.loading || undefined,
@@ -269,12 +273,12 @@ export const SplitButton = defineComponent({
         'div',
         {
           ...restAttrs,
-          class: composeComponentClasses(
+          class: classNames(
             getSplitButtonRootClasses({
               block: props.block,
               className: props.className
             }),
-            attrsRecord.class
+            coerceClassValue(attrsRecord.class)
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
           role: 'group',

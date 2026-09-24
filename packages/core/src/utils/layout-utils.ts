@@ -1,12 +1,56 @@
-import { overlayZIndexClass } from './floating'
 import { classNames } from './class-names'
-import { injectLayoutGridStyles } from './layout-grid-styles'
+import { devWarn } from './dev-warn'
 import type { HeaderVariant, LayoutDirection, LayoutSiderSide } from '../types/layout'
 
 export const LAYOUT_SIDER_NAME = 'TigerSidebar'
 
 export function isLayoutSiderTypeName(name: unknown): boolean {
-  return name === LAYOUT_SIDER_NAME || name === 'Sidebar'
+  return name === LAYOUT_SIDER_NAME
+}
+
+/**
+ * Wrapped sidebars are not a direct `TigerSidebar`. Warn once when the caller
+ * also omitted `hasSider`. Ordinary header/content children do not warn.
+ */
+export function warnIfLayoutSiderMissed(options: {
+  hasSider?: boolean
+  childNames: Array<string | null | undefined>
+}): void {
+  if (options.hasSider !== undefined) return
+  if (options.childNames.some((name) => name === LAYOUT_SIDER_NAME)) return
+  const wrapped = options.childNames.some(
+    (name) => typeof name === 'string' && name !== LAYOUT_SIDER_NAME && /sider|sidebar/i.test(name)
+  )
+  if (!wrapped) return
+  devWarn(
+    'Layout.hasSider',
+    'Layout could not see a direct TigerSidebar. Pass hasSider when the sidebar is wrapped.'
+  )
+}
+
+export type LayoutSectionKind = 'header' | 'content' | 'footer'
+export type SidebarLandmark = 'default' | 'own' | 'plain'
+
+export function resolveLayoutSectionTag(options: {
+  kind: LayoutSectionKind
+  nested: boolean
+  explicit?: string | null
+}): string {
+  if (typeof options.explicit === 'string' && options.explicit.trim()) return options.explicit.trim()
+  if (options.nested) return 'div'
+  if (options.kind === 'header') return 'header'
+  if (options.kind === 'footer') return 'footer'
+  return 'main'
+}
+
+/** Second unnamed sidebar is not another complementary landmark. */
+export function resolveSidebarLandmark(options: {
+  hasOwnName: boolean
+  namedSidebarClaimed: boolean
+}): SidebarLandmark {
+  if (options.hasOwnName) return 'own'
+  if (options.namedSidebarClaimed) return 'plain'
+  return 'default'
 }
 
 export function resolveLayoutHasSider(options: {
@@ -27,7 +71,6 @@ export function getLayoutRootClasses(
     fullHeight?: boolean
   } = {}
 ): string {
-  injectLayoutGridStyles()
   return classNames(
     'tiger-layout',
     options.hasSider ? 'tiger-flex-row' : undefined,
@@ -39,15 +82,25 @@ export function getLayoutRootClasses(
 /** Default column shell (no sider, not nested, not fullHeight). */
 export const layoutRootClasses = getLayoutRootClasses()
 
-export function getLayoutHeaderClasses(variant: HeaderVariant = 'default'): string {
-  injectLayoutGridStyles()
+export function resolveHeaderSticky(options: {
+  sticky?: boolean
+  fullHeightShell?: boolean
+}): boolean {
+  if (options.fullHeightShell) return false
+  return options.sticky === true
+}
+
+export function getLayoutHeaderClasses(
+  variant: HeaderVariant = 'default',
+  options: { sticky?: boolean } = {}
+): string {
   const variantClass =
     variant === 'translucent'
-      ? classNames('tiger-header-translucent', overlayZIndexClass.viewport)
+      ? 'tiger-header-translucent'
       : variant === 'blur'
-        ? classNames('tiger-header-blur', overlayZIndexClass.viewport)
+        ? 'tiger-header-blur'
         : 'tiger-header-default'
-  return classNames('tiger-header', variantClass)
+  return classNames('tiger-header', variantClass, options.sticky && 'tiger-header-sticky')
 }
 
 export const layoutHeaderClasses = getLayoutHeaderClasses('default')
@@ -59,7 +112,6 @@ export function getLayoutSidebarClasses(
     widthProvided?: boolean
   } = {}
 ): string {
-  injectLayoutGridStyles()
   const side = options.side ?? 'start'
   return classNames(
     'tiger-sidebar tiger-motion-aware',
@@ -116,12 +168,10 @@ export function resolveSidebarAriaProps(options: {
   return { 'aria-label': options.fallback }
 }
 
-/** Content fill: optional `--tiger-layout-content-bg`, then registered `--tiger-surface-muted`. */
-export const layoutContentClasses =
-  'tiger-content bg-[var(--tiger-layout-content-bg,var(--tiger-surface-muted,#f9fafb))]'
+/** Content fill uses the surface-muted token. */
+export const layoutContentClasses = 'tiger-content bg-[var(--tiger-surface-muted)]'
 
 export function getLayoutContentClasses(padding: boolean | string = true): string {
-  injectLayoutGridStyles()
   return classNames(
     layoutContentClasses,
     padding === false ? undefined : typeof padding === 'string' ? padding : 'p-6'
@@ -132,7 +182,6 @@ export const layoutFooterClasses = 'tiger-footer'
 export const layoutFooterCompactClasses = 'tiger-footer-compact'
 
 export function getLayoutFooterClasses(size: 'default' | 'compact' = 'default'): string {
-  injectLayoutGridStyles()
   return classNames(layoutFooterClasses, size === 'compact' && layoutFooterCompactClasses)
 }
 

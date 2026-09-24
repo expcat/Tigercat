@@ -7,6 +7,7 @@
  */
 
 import type { ChartCurveType } from '../../types/chart'
+import { scanFiniteExtent } from './scale'
 
 // ============================================================================
 // Polar primitives
@@ -73,8 +74,8 @@ export function getPieArcs<T extends { value: number }>(
     padAngle?: number
   } = {}
 ): PieArcDatum<T>[] {
-  const startAngle = options.startAngle ?? 0
-  const endAngle = options.endAngle ?? Math.PI * 2
+  const startAngle = options.startAngle ?? -Math.PI / 2
+  const endAngle = options.endAngle ?? startAngle + Math.PI * 2
   const padAngle = Math.max(0, options.padAngle ?? 0)
   const valid: Array<{ item: T; index: number; value: number }> = []
   data.forEach((item, index) => {
@@ -289,11 +290,8 @@ export function getRadarPoints<T extends { value: number }>(
   if (data.length === 0) return []
 
   const startAngle = options.startAngle ?? -Math.PI / 2
-  const finiteValues = data.map((datum) => datum.value).filter((value) => Number.isFinite(value))
-  const maxValue = Math.max(
-    0,
-    options.maxValue ?? (finiteValues.length > 0 ? Math.max(...finiteValues) : 0)
-  )
+  const finiteExtent = scanFiniteExtent(data.map((datum) => datum.value))
+  const maxValue = Math.max(0, options.maxValue ?? finiteExtent?.max ?? 0)
   const resolvedMax = maxValue > 0 ? maxValue : 1
   const count = options.angles && options.angles.length > 0 ? options.angles.length : data.length
   const step = (Math.PI * 2) / count
@@ -317,6 +315,30 @@ export function getRadarPoints<T extends { value: number }>(
     })
   })
   return points
+}
+
+/**
+ * Radar outline. `center` draws a missing measure at the origin so neighbors
+ * are not joined by a chord. `gap` lifts the pen instead.
+ */
+export function createRadarSeriesPath(
+  points: Array<{ x: number; y: number; missing?: boolean }>,
+  missing: 'center' | 'gap'
+): string {
+  if (points.length === 0) return ''
+  if (missing === 'center') return createPolygonPath(points)
+  const commands: string[] = []
+  let drawing = false
+  for (const point of points) {
+    if (point.missing) {
+      drawing = false
+      continue
+    }
+    commands.push(`${drawing ? 'L' : 'M'} ${point.x} ${point.y}`)
+    drawing = true
+  }
+  if (commands.length > 2 && points.every((point) => !point.missing)) commands.push('Z')
+  return commands.join(' ')
 }
 
 export function createPolygonPath(points: Array<{ x: number; y: number }>): string {

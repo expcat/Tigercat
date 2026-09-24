@@ -2,8 +2,7 @@ import { classNames } from './class-names'
 import {
   DROPDOWN_ENTER_CLASS,
   getDropdownItemClasses,
-  getDropdownMenuClasses,
-  injectDropdownStyles
+  getDropdownMenuClasses
 } from './dropdown-utils'
 import type { ContextMenuPoint } from '../types/context-menu'
 import type { FloatingPlacement } from './floating'
@@ -32,12 +31,55 @@ export function getContextMenuSubPlacement(dir?: string | null): FloatingPlaceme
   return dir === 'rtl' ? 'left-start' : 'right-start'
 }
 
+/** Title opens toward inline-end. The submenu closes toward inline-start. */
+export function getContextMenuSubKeys(dir?: string | null): {
+  openKey: 'ArrowLeft' | 'ArrowRight'
+  closeKey: 'ArrowLeft' | 'ArrowRight'
+} {
+  const rtl = dir === 'rtl'
+  return {
+    openKey: rtl ? 'ArrowLeft' : 'ArrowRight',
+    closeKey: rtl ? 'ArrowRight' : 'ArrowLeft'
+  }
+}
+
+export interface ContextMenuVirtualReference {
+  getBoundingClientRect: () => {
+    x: number
+    y: number
+    top: number
+    left: number
+    right: number
+    bottom: number
+    width: number
+    height: number
+    toJSON: () => Record<string, number>
+  }
+  contextElement?: Element
+  setPoint: (point: ContextMenuPoint) => void
+}
+
 /**
- * Inject context menu animation styles. Delegates to dropdown styles so both
- * surfaces share a single stylesheet.
+ * Viewport point used as a floating reference. Not a DOM node, so an ancestor
+ * transform does not become the containing block.
  */
-export function injectContextMenuStyles(): void {
-  injectDropdownStyles()
+export function createContextMenuVirtualReference(
+  point: ContextMenuPoint,
+  contextElement?: Element | null
+): ContextMenuVirtualReference {
+  let current = point
+  return {
+    setPoint(next) {
+      current = next
+    },
+    getBoundingClientRect() {
+      const x = current.x
+      const y = current.y
+      const rect = { x, y, top: y, left: x, right: x, bottom: y, width: 0, height: 0 }
+      return { ...rect, toJSON: () => rect }
+    },
+    contextElement: contextElement ?? undefined
+  }
 }
 
 /**
@@ -86,7 +128,7 @@ export function getContextMenuSubChevronClasses(): string {
   return classNames(
     'tiger-context-menu-sub-chevron',
     'w-3.5 h-3.5 shrink-0 rtl:-scale-x-100',
-    'text-[var(--tiger-text-muted,#9ca3af)]'
+    'text-[var(--tiger-text-secondary)]'
   )
 }
 

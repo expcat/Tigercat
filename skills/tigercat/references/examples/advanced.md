@@ -83,4 +83,4 @@ Vue: `<VirtualTable :data-source="rows" :columns="fixedColumns" :virtual-item-he
 
 React: `<VirtualTable dataSource={rows} columns={fixedColumns} virtualItemHeight={40} virtualHeight={320} />`
 
-Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
+Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.

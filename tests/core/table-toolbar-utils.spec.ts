@@ -61,10 +61,9 @@ describe('table-toolbar-utils', () => {
     )
   })
 
-  it('treats toolbar.selectedKeys as an override of table selection', () => {
-    expect(resolveToolbarSelectedKeys([9], [1], [2])).toEqual([9])
-    expect(resolveToolbarSelectedKeys(undefined, [1], [2])).toEqual([1])
-    expect(resolveToolbarSelectedKeys(undefined, undefined, [2])).toEqual([2])
+  it('uses row selection as the only controlled key list', () => {
+    expect(resolveToolbarSelectedKeys([1], [2])).toEqual([1])
+    expect(resolveToolbarSelectedKeys(undefined, [2])).toEqual([2])
   })
 
   it('fires page-size independently of page-index changes', () => {

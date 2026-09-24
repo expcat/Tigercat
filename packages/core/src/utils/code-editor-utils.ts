@@ -6,7 +6,13 @@
  * Not a full parser — provides basic keyword/string/comment/number highlighting.
  */
 
-import type { CodeHighlighter, CodeLanguage, CodeEditorTheme } from '../types/code-editor'
+import type {
+  CodeHighlighter,
+  CodeLanguage,
+  CodeEditorTheme,
+  HighlightToken
+} from '../types/code-editor'
+import { isBrowser } from './env'
 
 export const CODE_EDITOR_LINE_HEIGHT_REM = 1.625
 export const CODE_EDITOR_PADDING_Y_REM = 1.5
@@ -14,70 +20,76 @@ export const CODE_EDITOR_PADDING_Y_REM = 1.5
 // ─── Style Constants ────────────────────────────────────────────────
 
 export const codeEditorBaseClasses =
-  'relative font-mono text-sm leading-[1.625rem] border rounded overflow-hidden'
+  'relative flex min-h-0 flex-col font-mono text-sm leading-[1.625rem] border rounded'
 
-/** Shared chrome; `theme="dark"` remaps the same variables on the host. */
+/** Shared chrome. Dark follows semantic tokens; the host does not get hex colors. */
 export const codeEditorChromeClasses =
-  'bg-[var(--tiger-surface,#ffffff)] border-[var(--tiger-border,#d1d5db)] text-[var(--tiger-text,#111827)]'
-
-export const codeEditorLightClasses = codeEditorChromeClasses
-
-export const codeEditorDarkClasses = codeEditorChromeClasses
-
-export const codeEditorDarkThemeVars: Record<string, string> = {
-  '--tiger-surface': '#111827',
-  '--tiger-text': '#f3f4f6',
-  '--tiger-border': '#374151',
-  '--tiger-text-muted': '#9ca3af',
-  '--tiger-surface-muted': '#1f2937'
-}
+  'bg-[var(--tiger-surface)] border-[var(--tiger-border)] text-[var(--tiger-text)]'
 
 export const codeEditorDisabledClasses = 'opacity-60 cursor-not-allowed'
 
-export const codeEditorScrollerClasses = 'flex h-full overflow-auto'
+/** The only scrollport. `maxLines` and a parent height constrain this box. */
+export const codeEditorScrollerClasses = 'relative min-h-0 flex-1 overflow-auto'
 
 export const codeEditorTextareaClasses =
-  'absolute inset-0 w-full h-full resize-none outline-none bg-transparent text-transparent caret-[var(--tiger-text,#111827)] p-3 font-mono text-sm leading-[1.625rem] overflow-hidden placeholder:text-[var(--tiger-text-muted,#6b7280)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary,#2563eb)]'
+  'absolute inset-0 w-full h-full resize-none outline-none bg-transparent text-transparent caret-[var(--tiger-text)] p-3 font-mono text-sm leading-[1.625rem] overflow-hidden placeholder:text-[var(--tiger-text-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary)]'
 
 export const codeEditorHighlightClasses =
   'p-3 font-mono text-sm leading-[1.625rem] pointer-events-none'
 
 export const codeEditorLineNumberClasses =
-  'select-none text-right pr-3 pl-2 py-3 border-r min-w-[3rem] flex-shrink-0 text-[var(--tiger-text-muted,#9ca3af)] bg-[var(--tiger-surface-muted,#f9fafb)] border-[var(--tiger-border,#d1d5db)]'
+  'sticky start-0 z-[1] box-border select-none self-stretch text-end pe-3 ps-2 border-e min-w-[3rem] text-[var(--tiger-text-secondary)] bg-[var(--tiger-surface-muted)] border-[var(--tiger-border)]'
 
-export const codeEditorLineNumberLightClasses = codeEditorLineNumberClasses
-
-export const codeEditorLineNumberDarkClasses = codeEditorLineNumberClasses
-
-/** Active-line highlight background */
-export const codeEditorActiveLineLightClasses = 'bg-[var(--tiger-surface-muted,#f3f4f6)]'
-
-/** Active-line highlight background (dark theme uses the same token) */
-export const codeEditorActiveLineDarkClasses = 'bg-[var(--tiger-surface-muted,#1f2937)]'
+/** Active-line marker. It does not retokenize the document. */
+export const codeEditorActiveLineClasses = 'bg-[var(--tiger-surface-muted)]'
 
 /**
  * Background class for the active (caret) line, or '' when no highlight applies.
  */
-export function getCodeEditorActiveLineClasses(theme: CodeEditorTheme): string {
-  return theme === 'dark' ? codeEditorActiveLineDarkClasses : codeEditorActiveLineLightClasses
-}
-
-/**
- * Caret (text-cursor) color for the editable textarea, matched to the
- * theme's text color. This must be set explicitly: the textarea uses
- * `text-transparent` to reveal the highlight layer beneath it, which turns
- * `currentColor` transparent — so a `caret-current` caret is invisible.
- */
-export function getCodeEditorCaretClasses(_theme: CodeEditorTheme): string {
-  return ''
+export function getCodeEditorActiveLineClasses(_theme?: CodeEditorTheme): string {
+  return codeEditorActiveLineClasses
 }
 
 export function getCodeEditorWrapClass(wordWrap: boolean): string {
   return wordWrap ? 'whitespace-pre-wrap' : 'whitespace-pre'
 }
 
-export function getCodeEditorThemeVars(theme: CodeEditorTheme): Record<string, string> | undefined {
-  return theme === 'dark' ? codeEditorDarkThemeVars : undefined
+/**
+ * `undefined` follows the document color scheme (`data-tiger-color-scheme`,
+ * `.dark`, then `prefers-color-scheme`).
+ */
+export function resolveCodeEditorTheme(
+  theme: CodeEditorTheme | 'auto' | undefined,
+  root?: { classList?: { contains(name: string): boolean }; getAttribute?(name: string): string | null } | null
+): CodeEditorTheme {
+  if (theme === 'light' || theme === 'dark') return theme
+  const host = root ?? (isBrowser() ? document.documentElement : null)
+  if (!host) return 'light'
+  const explicit = host.getAttribute?.('data-tiger-color-scheme')
+  if (explicit === 'dark' || explicit === 'light') return explicit
+  if (host.classList?.contains('dark')) return 'dark'
+  if (
+    isBrowser() &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  ) {
+    return 'dark'
+  }
+  return 'light'
+}
+
+/** Do not write `value` onto the textarea between composition start and end. */
+export function shouldCommitEditorValue(isComposing: boolean): boolean {
+  return !isComposing
+}
+
+export function syncEditorTextareaValue(
+  textarea: HTMLTextAreaElement | null,
+  value: string,
+  isComposing: boolean
+): void {
+  if (!textarea || isComposing) return
+  if (textarea.value !== value) textarea.value = value
 }
 
 /**
@@ -105,18 +117,26 @@ export interface Token {
  * CSS classes for token types (light theme)
  */
 export const tokenClassesLight: Record<TokenType, string> = {
-  keyword: 'text-[var(--tiger-primary,#7c3aed)] font-semibold',
-  string: 'text-[var(--tiger-success,#16a34a)]',
-  comment: 'text-[var(--tiger-text-muted,#9ca3af)] italic',
-  number: 'text-[var(--tiger-info,#2563eb)]',
-  punctuation: 'text-[var(--tiger-text-muted,#6b7280)]',
+  keyword: 'text-[var(--tiger-primary)] font-semibold',
+  string: 'text-[var(--tiger-success)]',
+  comment: 'text-[var(--tiger-text-secondary)] italic',
+  number: 'text-[var(--tiger-info)]',
+  punctuation: 'text-[var(--tiger-text-secondary)]',
   plain: ''
 }
 
 /**
- * CSS classes for token types (dark theme uses the same tokens)
+ * Dark syntax uses a different semantic token than the light pair.
+ * No hex colors are written on the host.
  */
-export const tokenClassesDark: Record<TokenType, string> = tokenClassesLight
+export const tokenClassesDark: Record<TokenType, string> = {
+  keyword: 'text-[var(--tiger-info)] font-semibold',
+  string: 'text-[var(--tiger-success)]',
+  comment: 'text-[var(--tiger-text-secondary)] italic',
+  number: 'text-[var(--tiger-warning)]',
+  punctuation: 'text-[var(--tiger-text)]',
+  plain: 'text-[var(--tiger-text)]'
+}
 
 /**
  * Language keywords map
@@ -520,8 +540,9 @@ export function tokenizeLine(line: string, language: CodeLanguage): Token[] {
 /**
  * Get token CSS classes by theme
  */
-export function getTokenClasses(type: TokenType, _theme?: CodeEditorTheme): string {
-  return tokenClassesLight[type]
+export function getTokenClasses(type: TokenType, theme?: CodeEditorTheme): string {
+  const table = theme === 'dark' ? tokenClassesDark : tokenClassesLight
+  return table[type]
 }
 
 /**
@@ -640,8 +661,41 @@ export interface CodeEditorLineModel {
   index: number
   text: string
   isActive: boolean
-  html: string | null
-  tokens: Token[] | null
+  tokens: HighlightToken[]
+}
+
+function toHighlightTokens(
+  tokens: Token[],
+  theme: CodeEditorTheme
+): HighlightToken[] {
+  return tokens.map((token) => {
+    const className = getTokenClasses(token.type, theme)
+    return className ? { text: token.value, className } : { text: token.value }
+  })
+}
+
+let tokenCacheKey = ''
+let tokenCacheRows: HighlightToken[][] = []
+
+function rowsFromHighlighter(
+  value: string,
+  language: CodeLanguage,
+  theme: CodeEditorTheme,
+  highlighter?: CodeHighlighter
+): HighlightToken[][] {
+  const lines = value.split('\n')
+  if (highlighter?.highlightLine) {
+    return lines.map((text) => highlighter.highlightLine!(text, language, theme))
+  }
+  if (highlighter?.highlightCode) {
+    const rows = highlighter.highlightCode(value, language, theme)
+    if (Array.isArray(rows)) {
+      return lines.map((text, index) =>
+        Array.isArray(rows[index]) ? rows[index] : [{ text }]
+      )
+    }
+  }
+  return lines.map((text) => toHighlightTokens(tokenizeLine(text, language), theme))
 }
 
 export function buildCodeEditorLineModels(options: {
@@ -652,46 +706,44 @@ export function buildCodeEditorLineModels(options: {
   highlightActiveLine: boolean
   disabled: boolean
   highlighter?: CodeHighlighter
-}): { lines: CodeEditorLineModel[]; blockHtml: string | null } {
+}): { lines: CodeEditorLineModel[] } {
   const lines = options.value.split('\n')
   const showActive = options.highlightActiveLine && !options.disabled
-  const highlighter = options.highlighter
-  if (highlighter && !highlighter.highlightLine && highlighter.highlightCode) {
-    return {
-      blockHtml: highlighter.highlightCode(options.value, options.language, options.theme),
-      lines: lines.map((text, index) => ({
-        index,
-        text,
-        isActive: showActive && index === options.activeLine,
-        html: null,
-        tokens: null
-      }))
-    }
+  const key = `${options.language}\0${options.theme}\0${options.highlighter?.name ?? ''}\0${options.value}`
+  if (key !== tokenCacheKey) {
+    tokenCacheKey = key
+    tokenCacheRows = rowsFromHighlighter(
+      options.value,
+      options.language,
+      options.theme,
+      options.highlighter
+    )
   }
-
   return {
-    blockHtml: null,
-    lines: lines.map((text, index) => {
-      const isActive = showActive && index === options.activeLine
-      if (highlighter?.highlightLine) {
-        return {
-          index,
-          text,
-          isActive,
-          html:
-            highlighter.highlightLine(text, options.language, options.theme) ||
-            (text === '' ? '\n' : ''),
-          tokens: null
-        }
-      }
-      return {
-        index,
-        text,
-        isActive,
-        html: null,
-        tokens: tokenizeLine(text, options.language)
-      }
-    })
+    lines: lines.map((text, index) => ({
+      index,
+      text,
+      isActive: showActive && index === options.activeLine,
+      tokens: tokenCacheRows[index] ?? [{ text }]
+    }))
+  }
+}
+
+/** Scroll the shared port so the caret line stays visible. */
+export function scrollCodeEditorCaretIntoView(
+  textarea: HTMLTextAreaElement | null,
+  scroller: HTMLElement | null
+): void {
+  if (!textarea || !scroller) return
+  const style = getComputedStyle(textarea)
+  const lineHeight = Number.parseFloat(style.lineHeight) || 26
+  const paddingTop = Number.parseFloat(style.paddingTop) || 0
+  const line = getActiveLineIndex(textarea.value, textarea.selectionStart)
+  const caretTop = paddingTop + line * lineHeight
+  const caretBottom = caretTop + lineHeight
+  if (caretTop < scroller.scrollTop) scroller.scrollTop = caretTop
+  else if (caretBottom > scroller.scrollTop + scroller.clientHeight) {
+    scroller.scrollTop = caretBottom - scroller.clientHeight
   }
 }
 

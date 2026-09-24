@@ -296,6 +296,6 @@ describe('server surface', () => {
 
     const tagBlock = blocks.find((block) => block.text.includes('§ Tag'))
     expect(tagBlock?.text).toContain('TagProps')
-    expect(tagBlock?.text.startsWith('===== source:')).toBe(true)
+    expect(tagBlock?.text.startsWith('===== reference material:')).toBe(true)
   })
 })

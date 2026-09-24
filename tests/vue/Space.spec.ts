@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Space } from '@expcat/tigercat-vue/Space'
 import { h } from 'vue'
-import { renderWithProps, renderWithSlots } from '../utils'
+import { expectNoA11yViolations, renderWithProps, renderWithSlots } from '../utils'
 
 function getRoot(container: HTMLElement): HTMLElement {
   return container.querySelector('[data-tiger-space]') as HTMLElement
@@ -19,9 +19,14 @@ describe('Space (Vue)', () => {
   it('renders defaults and children', () => {
     const { container } = renderWithSlots(Space, { default: ItemSlot })
     const el = getRoot(container)
-    expect(getComputedStyle(el).display).toBe('inline-flex')
-    expect(getComputedStyle(el).flexDirection).toBe('row')
+    expect(el.className).toContain('tiger-space')
+    expect(el.className).toContain('tiger-flex-row')
     expect(screen.getByText('Item')).toBeInTheDocument()
+  })
+
+  it('has no accessibility violations on the default row', async () => {
+    const { container } = renderWithSlots(Space, { default: ItemSlot })
+    await expectNoA11yViolations(container)
   })
 
   it('supports vertical direction', () => {
@@ -30,7 +35,7 @@ describe('Space (Vue)', () => {
       { orientation: 'vertical' },
       { slots: { default: ItemSlot } }
     )
-    expect(getComputedStyle(getRoot(container)).flexDirection).toBe('column')
+    expect(getRoot(container).className).toContain('flex-col')
   })
 
   it('reverses the inline axis under rtl', () => {
@@ -38,7 +43,9 @@ describe('Space (Vue)', () => {
       template: '<div dir="rtl"><Space><span>A</span><span>B</span></Space></div>',
       components: { Space }
     })
-    expect(getComputedStyle(getRoot(container)).flexDirection).toBe('row-reverse')
+    const root = getRoot(container)
+    expect(root.className).toContain('tiger-flex-row')
+    expect(root.className).not.toContain('flex-row-reverse')
   })
 
   it('supports numeric size via inline gap', () => {
@@ -53,7 +60,7 @@ describe('Space (Vue)', () => {
       components: { Space }
     })
     const root = getRoot(container)
-    expect(getComputedStyle(root).flexWrap).toBe('wrap')
+    expect(root.className).toContain('flex-wrap')
   })
 
   it('merges className without replacing base classes', () => {

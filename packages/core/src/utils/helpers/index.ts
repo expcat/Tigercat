@@ -4,22 +4,18 @@
  * Organized by responsibility:
  * - Class: class name composition and coercion
  * - DOM: environment detection, clipboard, style values
- * - Motion: animation constants (re-exported from motion/)
  * - Component: imperative API, slider math, back-top helpers
+ * Motion constants live in `motion/`, not here.
  */
 
 // --- Class ---
 export * from '../class-names'
 export * from '../coerce-class-value'
-export * from '../compose-classes'
 
 // --- DOM ---
 export * from '../env'
 export * from '../style-values'
 export * from '../copy-text'
-
-// --- Motion (compat re-export; prefer importing from motion/) ---
-export * from '../animation'
 
 // --- Component helpers ---
 export * from './slider-utils'

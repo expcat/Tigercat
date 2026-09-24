@@ -8,6 +8,7 @@ import {
   getImmediateTigerLocale,
   getTableLabels,
   isLazyTigerLocale,
+  isToolbarScalarFilter,
   isToolbarSearchRemote,
   mergeTigerLocale,
   resolveTigerLocale,
@@ -16,6 +17,7 @@ import {
   resolveToolbarSelectedKeys,
   seedToolbarFilterState,
   splitCompositeHostAttrs,
+  toolbarFilterMapAfterWrite,
   toggleHiddenColumnKey,
   toolbarHasSearch,
   type TableToolbarAction,
@@ -196,11 +198,29 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   }, [columns, dataSource, resolvedFilters, searchValue, toolbar])
 
   const selectedKeys = resolveToolbarSelectedKeys(
-    toolbar?.selectedKeys,
     rowSelection?.selectedRowKeys,
     internalSelectedKeys
   )
-  const selectedCount = toolbar?.selectedCount ?? selectedKeys.length
+  const selectedCount = selectedKeys.length
+  const paginationConfig = pagination && typeof pagination === 'object' ? pagination : null
+  const pageControlled = paginationConfig?.current != null
+  const [uncontrolledPage, setUncontrolledPage] = useState(paginationConfig?.defaultCurrent ?? 1)
+  const pageSize =
+    paginationConfig?.pageSize ??
+    paginationConfig?.defaultPageSize ??
+    previousPageSizeRef.current ??
+    10
+  const pageCurrent = pageControlled ? (paginationConfig?.current ?? 1) : uncontrolledPage
+  const tablePagination =
+    pagination === false || !paginationConfig
+      ? pagination
+      : { ...paginationConfig, current: pageCurrent }
+  const resetPageToFirst = () => {
+    if (pagination === false || !paginationConfig) return
+    if (pageCurrent === 1) return
+    if (!pageControlled) setUncontrolledPage(1)
+    onPageChange?.({ current: 1, pageSize })
+  }
   const bulkLabel = toolbar?.bulkActionsLabel ?? tableLabels.selectedText
 
   const handleHiddenColumnsChange = (nextHiddenKeys: string[]) => {
@@ -213,10 +233,12 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value)
+    if (!isToolbarSearchRemote(toolbar)) resetPageToFirst()
   }
 
   const handleSearchSubmit = () => {
     toolbar?.onSearch?.(searchValue ?? '')
+    resetPageToFirst()
   }
 
   const setFilterValue = (
@@ -234,21 +256,19 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         [key]: value
       }))
     }
+    const keys = inDefs
+      ? extraFilterKeys
+      : extraFilterKeys.includes(key)
+        ? extraFilterKeys
+        : [...extraFilterKeys, key]
     toolbar?.onFiltersChange?.(
-      resolveToolbarFilterMap(
-        toolbar?.filters,
-        { ...internalFilters, [key]: value },
-        inDefs
-          ? extraFilterKeys
-          : extraFilterKeys.includes(key)
-            ? extraFilterKeys
-            : [...extraFilterKeys, key]
-      )
+      toolbarFilterMapAfterWrite(toolbar?.filters, { ...internalFilters, [key]: value }, keys, key, value)
     )
+    if (isToolbarSearchRemote(toolbar) || isToolbarScalarFilter(value)) resetPageToFirst()
   }
 
   const handleSelectionChange = (keys: (string | number)[]) => {
-    if (toolbar?.selectedKeys === undefined && rowSelection?.selectedRowKeys === undefined) {
+    if (rowSelection?.selectedRowKeys === undefined) {
       setInternalSelectedKeys(keys)
     }
     onSelectionChange?.(keys)
@@ -262,6 +282,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   const handleTablePageChange = (page: { current: number; pageSize: number }) => {
     const result = resolveToolbarPageChange(page, previousPageSizeRef.current)
     previousPageSizeRef.current = page.pageSize
+    if (!pageControlled) setUncontrolledPage(page.current)
     if (result.kind === 'size') onPageSizeChange?.(page)
     else onPageChange?.(page)
   }
@@ -364,10 +385,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 placeholder={toolbar?.searchPlaceholder ?? tableLabels.searchPlaceholder}
                 aria-label={toolbar?.searchPlaceholder ?? tableLabels.searchPlaceholder}
                 prefix={
-                  <Icon
-                    name="search"
-                    className="w-3.5 h-3.5 text-[var(--tiger-text-secondary,#6b7280)]"
-                  />
+                  <Icon name="search" className="w-3.5 h-3.5 text-[var(--tiger-text-secondary)]" />
                 }
                 onChange={(value) => handleSearchChange(String(value))}
                 onKeyDown={(event) => {
@@ -378,7 +396,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 <Button
                   size="sm"
                   variant="primary"
-                  className="whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3"
+                  className="whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md)] px-3"
                   onClick={handleSearchSubmit}
                   disabled={!canSubmitToolbarSearch(toolbar)}>
                   {toolbar?.searchButtonText ?? tableLabels.searchButtonText}
@@ -443,16 +461,14 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
 
         {hasBulkActions ? (
           <div className="flex items-center gap-2.5 flex-wrap ml-auto shrink-0">
-            {selectedCount > 0 ? (
-              <div
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)] text-xs font-medium border border-[var(--tiger-primary,#2563eb)]/15 shrink-0"
-                aria-live="polite">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] animate-pulse motion-reduce:animate-none" />
-                <span>
-                  {bulkLabel} {selectedCount} {tableLabels.selectedItemsText}
-                </span>
-              </div>
-            ) : null}
+            <div
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary)]/10 text-[var(--tiger-primary)] text-xs font-medium border border-[var(--tiger-primary)]/15 shrink-0"
+              aria-live="polite">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary)] animate-pulse motion-reduce:animate-none" />
+              <span>
+                {bulkLabel} {selectedCount} {tableLabels.selectedItemsText}
+              </span>
+            </div>
             {toolbar?.bulkActions?.map((action) => (
               <Button
                 key={action.key}
@@ -490,7 +506,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         bordered={bordered}
         rowSelection={rowSelection ? { ...rowSelection, selectedRowKeys: selectedKeys } : undefined}
         hiddenColumnKeys={resolvedHiddenKeys}
-        pagination={pagination}
+        pagination={tablePagination}
         className={classNames(tableClassName, bordered && 'border-none rounded-none shadow-none')}
         onSelectionChange={handleSelectionChange}
         onPageChange={handleTablePageChange}

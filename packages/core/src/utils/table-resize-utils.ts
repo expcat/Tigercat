@@ -5,20 +5,11 @@
  * repeated synchronous column/row reads.
  */
 
-import { isBrowser } from './env'
+import { observeSize } from './responsive'
 
 export type TableResizeFrameCallback = (timestamp: number) => void
 export type TableResizeFrameRequest = (callback: TableResizeFrameCallback) => number
 export type TableResizeFrameCancel = (handle: number) => void
-
-export interface TableResizeObserverLike {
-  observe: (target: Element) => void
-  disconnect: () => void
-}
-
-export type TableResizeObserverFactory = (
-  callback: ResizeObserverCallback
-) => TableResizeObserverLike
 
 export interface TableResizeSnapshot {
   containerWidth: number
@@ -34,7 +25,6 @@ export interface TableResizeObserverControllerOptions {
   onResize: (snapshot: TableResizeSnapshot) => void
   requestFrame?: TableResizeFrameRequest
   cancelFrame?: TableResizeFrameCancel
-  createResizeObserver?: TableResizeObserverFactory
 }
 
 export interface TableResizeObserverController {
@@ -57,16 +47,6 @@ function cancelDefaultFrame(handle: number): void {
   }
 
   clearTimeout(handle)
-}
-
-function createDefaultResizeObserver(callback: ResizeObserverCallback): TableResizeObserverLike {
-  if (!isBrowser() || typeof ResizeObserver === 'undefined') {
-    return {
-      observe() {},
-      disconnect() {}
-    }
-  }
-  return new ResizeObserver(callback)
 }
 
 function readElementSize(element?: Element | null): { width: number; height: number } {
@@ -119,11 +99,10 @@ export function createTableResizeObserverController(
 ): TableResizeObserverController {
   const requestFrame = options.requestFrame ?? requestDefaultFrame
   const cancelFrame = options.cancelFrame ?? cancelDefaultFrame
-  const createResizeObserver = options.createResizeObserver ?? createDefaultResizeObserver
 
   let container: HTMLElement | undefined
   let table: HTMLTableElement | null | undefined
-  let observer: TableResizeObserverLike | undefined
+  let stopObserving: Array<() => void> = []
   let frameHandle: number | undefined
 
   function flush() {
@@ -144,8 +123,8 @@ export function createTableResizeObserverController(
   }
 
   function disconnect() {
-    observer?.disconnect()
-    observer = undefined
+    for (const stop of stopObserving) stop()
+    stopObserving = []
 
     if (frameHandle !== undefined) {
       cancelFrame(frameHandle)
@@ -162,11 +141,9 @@ export function createTableResizeObserverController(
 
     container = nextContainer
     table = nextTable ?? nextContainer.querySelector('table')
-    observer = createResizeObserver(schedule)
-    observer.observe(nextContainer)
-
+    stopObserving = [observeSize(nextContainer, () => schedule())]
     if (table && table !== nextContainer) {
-      observer.observe(table)
+      stopObserving.push(observeSize(table, () => schedule()))
     }
 
     schedule()

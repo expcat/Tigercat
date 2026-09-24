@@ -1,10 +1,9 @@
-import { defineComponent, h, ref, computed, watch, inject, PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, inject, onMounted, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
   getCodeEditorContainerClasses,
   getLineNumberClasses,
-  getTokenClasses,
   generateLineNumbers,
   handleTabKey,
   getActiveLineIndex,
@@ -13,7 +12,11 @@ import {
   codeEditorHighlightClasses,
   codeEditorScrollerClasses,
   getCodeEditorWrapClass,
-  getCodeEditorThemeVars,
+  resolveCodeEditorTheme,
+  scrollCodeEditorCaretIntoView,
+  shouldCommitEditorValue,
+  syncEditorTextareaValue,
+  clampTabSize,
   getCodeEditorHeightStyle,
   buildCodeEditorLineModels,
   resolveEditorTabAction,
@@ -44,10 +47,7 @@ export interface VueCodeEditorProps {
   disabled?: boolean
   className?: string
   style?: Record<string, string | number>
-  /**
-   * Optional pluggable highlighter. Output is TRUSTED HTML — sanitise
-   * inside the engine if the source is untrusted.
-   */
+  /** Optional pluggable highlighter. Returns tokens drawn as text. */
   highlighter?: CodeHighlighter
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleCodeEditor>
@@ -67,8 +67,8 @@ export const CodeEditor = defineComponent({
       default: 'plain' as CodeLanguage
     },
     theme: {
-      type: String as PropType<CodeEditorTheme>,
-      default: 'light' as CodeEditorTheme
+      type: String as PropType<CodeEditorTheme | 'auto'>,
+      default: undefined
     },
     readOnly: { type: Boolean, default: false },
     lineNumbers: { type: Boolean, default: true },
@@ -103,6 +103,9 @@ export const CodeEditor = defineComponent({
     )
     const internalValue = ref(props.defaultValue || '')
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
+    const scrollerRef = ref<HTMLElement | null>(null)
+    const gutterRef = ref<HTMLElement | null>(null)
+    const composing = ref(false)
     const activeLine = ref(0)
     const allowTabExit = ref(false)
     const pendingSelection = ref<{ start: number; end: number } | null>(null)
@@ -127,6 +130,10 @@ export const CodeEditor = defineComponent({
       textarea: textareaRef
     })
 
+    onMounted(() => {
+      syncEditorTextareaValue(textareaRef.value, code.value, false)
+    })
+
     const updateActiveLine = () => {
       const ta = textareaRef.value
       if (!ta) return
@@ -142,9 +149,10 @@ export const CodeEditor = defineComponent({
 
     watch(
       code,
-      () => {
+      (value) => {
+        syncEditorTextareaValue(textareaRef.value, value, composing.value)
         const pending = pendingSelection.value
-        if (!pending) return
+        if (!pending || composing.value) return
         pendingSelection.value = null
         const ta = textareaRef.value
         if (!ta) return
@@ -158,7 +166,7 @@ export const CodeEditor = defineComponent({
       buildCodeEditorLineModels({
         value: code.value,
         language: props.language,
-        theme: props.theme,
+        theme: resolveCodeEditorTheme(props.theme),
         activeLine: activeLine.value,
         highlightActiveLine: props.highlightActiveLine,
         disabled: effectiveDisabled.value,
@@ -167,24 +175,23 @@ export const CodeEditor = defineComponent({
     )
 
     const lineNums = computed(() => generateLineNumbers(lineModel.value.lines.length))
+    const resolvedTheme = computed(() => resolveCodeEditorTheme(props.theme))
 
     const containerClasses = computed(() =>
       classNames(
-        getCodeEditorContainerClasses(props.theme, effectiveDisabled.value, props.className),
+        getCodeEditorContainerClasses(resolvedTheme.value, effectiveDisabled.value, props.className),
         coerceClassValue(attrs.class)
       )
     )
-
-    const containerStyle = computed(() => {
-      const height = getCodeEditorHeightStyle(props.minLines, props.maxLines)
-      const themeVars = getCodeEditorThemeVars(props.theme)
-      return {
-        ...height,
-        ...themeVars,
-        ...(props.style as Record<string, string> | undefined),
-        ...(attrs.style as Record<string, string> | undefined)
-      }
-    })
+    const scrollStyle = computed(() => ({
+      ...getCodeEditorHeightStyle(props.minLines, props.maxLines),
+      tabSize: clampTabSize(props.tabSize),
+      flex: '1 1 auto'
+    }))
+    const containerStyle = computed(() => ({
+      ...(props.style as Record<string, string> | undefined),
+      ...(attrs.style as Record<string, string> | undefined)
+    }))
 
     function commitValue(val: string) {
       if (props.modelValue === undefined) internalValue.value = val
@@ -193,13 +200,33 @@ export const CodeEditor = defineComponent({
       formItemControl?.onChange(val)
     }
 
+    const revealCaret = () => {
+      scrollCodeEditorCaretIntoView(textareaRef.value, scrollerRef.value)
+    }
+
     const onInput = (e: Event) => {
+      const target = e.target as HTMLTextAreaElement
+      const native = e as InputEvent
+      if (!shouldCommitEditorValue(composing.value || native.isComposing)) return
+      commitValue(target.value)
+      activeLine.value = getActiveLineIndex(target.value, target.selectionStart)
+      revealCaret()
+    }
+
+    const onCompositionStart = () => {
+      composing.value = true
+    }
+
+    const onCompositionEnd = (e: CompositionEvent) => {
+      composing.value = false
       const target = e.target as HTMLTextAreaElement
       commitValue(target.value)
       activeLine.value = getActiveLineIndex(target.value, target.selectionStart)
+      revealCaret()
     }
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if (composing.value) return
       const action = resolveEditorTabAction(e, {
         readOnly: props.readOnly,
         disabled: effectiveDisabled.value,
@@ -229,64 +256,59 @@ export const CodeEditor = defineComponent({
       const { class: _attrClass, style: _attrStyle, ...restAttrs } = attrs
       const model = lineModel.value
 
-      const gutterNode = props.lineNumbers
-        ? h(
-            'div',
-            {
-              class: getLineNumberClasses(props.theme),
-              'aria-hidden': 'true'
-            },
-            lineNums.value.map((n) => h('div', { key: n, class: 'min-h-[1.625rem]' }, String(n)))
-          )
-        : null
-
-      const highlightNode =
-        model.blockHtml !== null
-          ? h('div', {
-              class: classNames(codeEditorHighlightClasses, wrapClass),
-              'aria-hidden': 'true',
-              innerHTML: model.blockHtml
-            })
-          : h(
-              'div',
-              { class: classNames(codeEditorHighlightClasses, wrapClass), 'aria-hidden': 'true' },
-              model.lines.map((line) => {
-                const lineClass = classNames(
-                  'min-h-[1.625rem]',
-                  line.isActive && getCodeEditorActiveLineClasses(props.theme)
-                )
-                if (line.html !== null) {
-                  return h('div', {
-                    key: line.index,
-                    class: lineClass,
-                    'data-active-line': line.isActive ? '' : undefined,
-                    innerHTML: line.html
-                  })
-                }
-                const spans = (line.tokens ?? []).map((token, ti) => {
-                  const cls = getTokenClasses(token.type, props.theme)
-                  return cls ? h('span', { class: cls, key: ti }, token.value) : token.value
-                })
-                return h(
-                  'div',
-                  {
-                    key: line.index,
-                    class: lineClass,
-                    'data-active-line': line.isActive ? '' : undefined
-                  },
-                  [...spans, line.text === '' ? '\n' : null]
-                )
-              })
-            )
+      const themeName = resolvedTheme.value
+      const tabWidth = clampTabSize(props.tabSize)
+      const gridChildren = model.lines.flatMap((line, lineIndex) => {
+        const lineClass = classNames(
+          'min-h-[1.625rem] px-3',
+          line.isActive && getCodeEditorActiveLineClasses(themeName)
+        )
+        const spans = line.tokens.map((token, ti) =>
+          token.className ? h('span', { class: token.className, key: ti }, token.text) : token.text
+        )
+        const codeCell = h(
+          'div',
+          {
+            key: `code-${line.index}`,
+            class: lineClass,
+            'data-active-line': line.isActive ? '' : undefined
+          },
+          [...spans, line.text === '' ? '\n' : null]
+        )
+        if (!props.lineNumbers) return [codeCell]
+        const numberCell = h(
+          'div',
+          {
+            key: `n-${line.index}`,
+            ref: lineIndex === 0 ? gutterRef : undefined,
+            class: classNames(getLineNumberClasses(themeName), 'min-h-[1.625rem]')
+          },
+          String(lineNums.value[lineIndex] ?? line.index + 1)
+        )
+        return [numberCell, codeCell]
+      })
 
       const textareaNode = h('textarea', {
         ...restAttrs,
         ref: textareaRef,
         class: classNames(codeEditorTextareaClasses, wrapClass),
-        value: code.value,
+        style: {
+          insetInlineStart: '0',
+          width: '100%',
+          height: '100%',
+          paddingInlineStart: props.lineNumbers
+            ? 'calc(var(--tiger-code-gutter, 3rem) + 0.75rem)'
+            : '0.75rem',
+          tabSize: String(tabWidth)
+        },
         onInput,
+        onCompositionstart: onCompositionStart,
+        onCompositionend: onCompositionEnd,
         onKeydown: onKeyDown,
-        onSelect: updateActiveLine,
+        onSelect: () => {
+          updateActiveLine()
+          revealCaret()
+        },
         onClick: updateActiveLine,
         onKeyup: updateActiveLine,
         onBlur: () => formItemControl?.onBlur(),
@@ -316,13 +338,45 @@ export const CodeEditor = defineComponent({
           class: containerClasses.value,
           style: containerStyle.value,
           'data-language': props.language,
-          'data-theme': props.theme
+          'data-theme': themeName
         },
         [
-          h('div', { class: codeEditorScrollerClasses, 'data-tiger-code-scroller': '' }, [
-            gutterNode,
-            h('div', { class: 'relative flex-1' }, [highlightNode, textareaNode])
-          ])
+          h(
+            'div',
+            {
+              ref: (el: unknown) => {
+                const node = el as HTMLElement | null
+                scrollerRef.value = node
+                const gutter = gutterRef.value
+                if (node && gutter) node.style.setProperty('--tiger-code-gutter', `${gutter.offsetWidth}px`)
+              },
+              class: codeEditorScrollerClasses,
+              style: scrollStyle.value,
+              'data-tiger-code-scroller': ''
+            },
+            [
+              h(
+                'div',
+                { class: 'relative min-w-full', style: { tabSize: String(tabWidth) } },
+                [
+                  h(
+                    'div',
+                    {
+                      class: classNames('grid py-3', wrapClass),
+                      style: {
+                        gridTemplateColumns: props.lineNumbers
+                          ? 'auto minmax(0, 1fr)'
+                          : 'minmax(0, 1fr)'
+                      },
+                      'aria-hidden': 'true'
+                    },
+                    gridChildren
+                  ),
+                  textareaNode
+                ]
+              )
+            ]
+          )
         ]
       )
     }

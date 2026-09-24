@@ -15,7 +15,9 @@ import {
   getImageComparePositionFromPointer,
   getImageCompareRootClasses,
   getImageCompareRootStyle,
-  isImageCompareInteractiveTarget,
+  isImageCompareHandleTarget,
+  resolveImageCompareAlt,
+  formatImageCompareValueText,
   isImageCompareVertical,
   resolveImageCompareAriaLabel,
   resolveImageCompareFit,
@@ -65,8 +67,8 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
     {
       beforeSrc,
       afterSrc,
-      beforeAlt = '',
-      afterAlt = '',
+      beforeAlt,
+      afterAlt,
       fit,
       position: controlledPosition,
       defaultPosition,
@@ -165,7 +167,7 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
         if (event.defaultPrevented) return
         if (disabled) return
         if (event.button !== 0) return
-        if (isImageCompareInteractiveTarget(event.target, handleRef.current)) return
+        if (!isImageCompareHandleTarget(event.target, handleRef.current)) return
 
         event.preventDefault()
         const point = getImageComparePointerClientPoint(event)
@@ -238,13 +240,13 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
         }}
         onPointerDown={handlePointerDown}>
         <div className={getImageCompareAfterClasses()} data-image-compare-after="">
-          {renderPaneContent(after, afterSrc, afterAlt, fit)}
+          {renderPaneContent(after, afterSrc, resolveImageCompareAlt(afterAlt, labels.afterAlt), fit)}
         </div>
         <div
           className={getImageCompareBeforeClasses()}
           style={getImageCompareClipStyle(current, resolvedOrientation, resolvedStep, rtl)}
           data-image-compare-before="">
-          {renderPaneContent(before, beforeSrc, beforeAlt, fit)}
+          {renderPaneContent(before, beforeSrc, resolveImageCompareAlt(beforeAlt, labels.beforeAlt), fit)}
         </div>
         <div
           ref={handleRef}
@@ -262,7 +264,7 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={current}
-          aria-valuetext={`${current}%`}
+          aria-valuetext={formatImageCompareValueText(labels.valueText, current)}
           aria-orientation={vertical ? 'vertical' : 'horizontal'}
           aria-disabled={disabled}
           onKeyDown={handleKeyDown}>

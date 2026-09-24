@@ -20,6 +20,7 @@ import {
   resolveCartesianSeriesScales,
   CHART_SURFACE_FILL,
   AREA_DRAW_CLASS,
+  chartHoverShadowStyle,
   getChartLabels,
   mergeTigerLocale,
   formatChartTemplate,
@@ -69,12 +70,12 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   width = 320,
   height = 200,
   padding = DEFAULT_CHART_PADDING,
-  responsive = false,
+  responsive = true,
   data,
   series,
   xScale: xScaleProp,
   yScale: yScaleProp,
-  areaColor = 'var(--tiger-primary,#2563eb)',
+  areaColor = 'var(--tiger-primary)',
   strokeWidth = 2,
   fillOpacity = 0.2,
   curve = 'linear',
@@ -307,9 +308,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   const handlePointClick = useCallback(
     (seriesIndex: number, pointIndex: number) => {
       onPointClick?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
-      handleSeriesSelect(seriesIndex)
     },
-    [onPointClick, resolvedSeries, handleSeriesSelect]
+    [onPointClick, resolvedSeries]
   )
 
   const pointClickable = Boolean(onPointClick)
@@ -442,16 +442,6 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           label={yAxisLabel}
         />
       )}
-      {trackPointHover ? (
-        <rect
-          width={innerRect.width}
-          height={innerRect.height}
-          fill="transparent"
-          data-plot-hit=""
-          onMouseMove={handlePlotMouseMove}
-          onMouseLeave={handlePointMouseLeave}
-        />
-      ) : null}
       {reversedSeriesData.map((sd) => {
         const canAnimateStroke = animated && !sd.strokeDasharray
         return (
@@ -475,7 +465,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
               fill={gradient ? `url(#${gradientPrefix}-${sd.seriesKey})` : sd.fillColor}
               fillOpacity={gradient ? 1 : sd.fillOpacity}
               stroke="none"
-              className="transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]"
+              className="transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]"
               data-area-series={sd.seriesIndex}
               data-series-key={sd.seriesKey}
             />
@@ -492,7 +482,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
               className={classNames(
                 canAnimateStroke
                   ? AREA_DRAW_CLASS
-                  : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
+                  : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
               )}
             />
           </ChartSeries>
@@ -529,7 +519,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                       animated ? linePointTransitionClasses : undefined,
                       pointInteractive && 'cursor-pointer'
                     )}
-                    style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
+                    style={isHovered ? chartHoverShadowStyle(sd.color) : undefined}
                     role={pointInteractive ? 'button' : undefined}
                     aria-hidden={pointInteractive ? undefined : true}
                     aria-label={
@@ -587,6 +577,16 @@ export const AreaChart: React.FC<AreaChartProps> = ({
             </g>
           )
       )}
+      {trackPointHover ? (
+        <rect
+          width={innerRect.width}
+          height={innerRect.height}
+          fill="transparent"
+          data-plot-hit=""
+          onMouseMove={handlePlotMouseMove}
+          onMouseLeave={handlePointMouseLeave}
+        />
+      ) : null}
     </ChartCanvas>
   )
 

@@ -193,11 +193,11 @@ describe('Spotlight (Vue)', () => {
     await expectNoA11yViolations(document.body)
   })
 
-  it('opens from the default hotkey', async () => {
+  it('does not open from a hotkey unless one is set', async () => {
     render(Spotlight, { props: { items } })
     expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
     await fireEvent.keyDown(document, { key: 'k', metaKey: true })
-    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
   })
 
   it('selects an item from its shortcut while open', async () => {
@@ -212,13 +212,13 @@ describe('Spotlight (Vue)', () => {
     render({
       setup: () => () =>
         h(ConfigProvider, { locale: zhCN }, () =>
-          h(Spotlight, { open: true, items, hotkey: false })
+          h(Spotlight, { open: true, items, hotkey: false, query: 'zzzzzzz' })
         )
     })
     expect(document.querySelector('[role="dialog"]')).toHaveAccessibleName('命令面板')
-    await fireEvent.update(document.querySelector('input')!, 'zzzz')
     expect(document.querySelector('[role="listbox"]')).toBeInTheDocument()
-    expect(document.body).toHaveTextContent('暂无结果')
+    expect(document.querySelector('[role="status"]')).toHaveTextContent('暂无结果')
+    expect(document.body).not.toHaveTextContent('Open Dashboard')
   })
 
   it('hosts nested overlays on the trap root', () => {

@@ -22,6 +22,7 @@ export interface MenuContextValue {
   handleSelect: (key: MenuKey) => void
   handleOpenChange: (key: MenuKey, open?: boolean) => void
   tabStopKey?: MenuKey
+  setTabStopKey: (key: MenuKey) => void
 }
 
 export interface SubMenuScopeValue {
@@ -29,6 +30,8 @@ export interface SubMenuScopeValue {
   popup: boolean
   titleRef: React.RefObject<HTMLElement | null>
   close: () => void
+  tabStopKey?: MenuKey
+  setTabStopKey: (key: MenuKey) => void
 }
 
 export interface MenuProps

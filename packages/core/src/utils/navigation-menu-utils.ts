@@ -4,9 +4,9 @@ import {
   DROPDOWN_ENTER_CLASS,
   getDropdownChevronClasses,
   getDropdownItemClasses,
-  getDropdownMenuClasses,
-  injectDropdownStyles
+  getDropdownMenuClasses
 } from './dropdown-utils'
+import { typedKeyId } from './focus-utils'
 import type { NavigationMenuValue } from '../types/navigation-menu'
 
 export const NAVIGATION_MENU_ITEM_VALUE_ATTR = 'data-tiger-navigation-menu-value'
@@ -42,21 +42,14 @@ export const NAVIGATION_MENU_CHEVRON_PATH = DROPDOWN_CHEVRON_PATH
 export const NAVIGATION_MENU_BAR_ITEM_ATTR = 'data-tiger-navigation-menu-bar-item'
 
 /**
- * Inject navigation menu animation styles. Delegates to dropdown styles so both
- * surfaces share a single stylesheet.
- */
-export function injectNavigationMenuStyles(): void {
-  injectDropdownStyles()
-}
-
-/**
- * Normalize an item key so `1` and `'1'` match.
+ * Item keys keep their type. `1` and `'1'` are different panels.
+ * `null`, `undefined`, and `''` are closed.
  */
 export function navigationMenuValueId(
   value: NavigationMenuValue | null | undefined
 ): string | null {
   if (value == null || value === '') return null
-  return String(value)
+  return typedKeyId(value)
 }
 
 /**
@@ -96,10 +89,8 @@ export function isNavigationMenuOpen(openValue: NavigationMenuValue | null | und
 export function resolveNavigationMenuOpenValue(options: {
   value?: NavigationMenuValue | null
   internalValue: NavigationMenuValue | null
-  open?: boolean
 }): NavigationMenuValue | null {
   const next = options.value !== undefined ? options.value : options.internalValue
-  if (options.open === false) return null
   if (!isNavigationMenuOpen(next)) return null
   return next as NavigationMenuValue
 }
@@ -185,17 +176,17 @@ export function getNavigationMenuTriggerClasses(disabled: boolean, open: boolean
     'tiger-navigation-menu-trigger',
     'inline-flex items-center gap-1.5',
     'px-3 py-2',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
-    'text-sm font-medium text-[var(--tiger-text,#374151)]',
+    'rounded-[var(--tiger-radius-md)]',
+    'text-sm font-medium text-[var(--tiger-text)]',
     'bg-transparent border-0',
     'select-none appearance-none',
     'transition-colors duration-150',
     'focus:outline-none',
-    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
+    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40',
     disabled
       ? 'cursor-not-allowed opacity-50 pointer-events-none'
-      : 'cursor-pointer hover:bg-[var(--tiger-surface-muted,#f3f4f6)]',
-    open && 'bg-[var(--tiger-surface-muted,#f3f4f6)]'
+      : 'cursor-pointer hover:bg-[var(--tiger-surface-muted)]',
+    open && 'bg-[var(--tiger-surface-muted)]'
   )
 }
 
@@ -230,7 +221,7 @@ export function getNavigationMenuLinkClasses(
       'tiger-navigation-menu-link',
       getDropdownItemClasses(disabled, false),
       disabled && 'pointer-events-none',
-      active && 'bg-[var(--tiger-surface-muted,#f3f4f6)] font-medium'
+      active && 'bg-[var(--tiger-surface-muted)] font-medium'
     )
   }
 

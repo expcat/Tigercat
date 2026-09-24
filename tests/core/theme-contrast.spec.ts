@@ -24,10 +24,9 @@ import type { ThemePreset, ThemeSemanticColors } from '@expcat/tigercat-core'
  *  - secondary text on surface      → ≥ 4.5  (we treat secondary as body text)
  *  - focus ring on surface          → ≥ 3.0  (WCAG 2.4.11 focus appearance)
  *  - primary / error accents        → ≥ 3.0  (WCAG 1.4.11 non-text contrast)
- *  - status hues (success/warning/info) → ≥ 2.0  (regression guard only;
- *    these are decorative fills typically paired with text labels in our
- *    components, so we hold the line at "perceptibly distinct" rather than
- *    full 1.4.11 to avoid forcing palette changes that hurt brand clarity)
+ *  - status hues used as text (success/warning/info) → ≥ 4.5
+ *  - borders and focus rings → ≥ 3
+ *  - textDisabled stays exempt (inactive controls)
  */
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -104,9 +103,14 @@ const ON_COLOR_CHECKS: ContrastCheck[] = [
 ]
 
 const STATUS_HUE_CHECKS: ContrastCheck[] = [
-  { fgKey: 'success', bgKey: 'surface', min: 2.0, label: 'success ↔ surface' },
-  { fgKey: 'warning', bgKey: 'surface', min: 2.0, label: 'warning ↔ surface' },
-  { fgKey: 'info', bgKey: 'surface', min: 2.0, label: 'info ↔ surface' }
+  { fgKey: 'success', bgKey: 'surface', min: 4.5, label: 'success ↔ surface' },
+  { fgKey: 'warning', bgKey: 'surface', min: 4.5, label: 'warning ↔ surface' },
+  { fgKey: 'info', bgKey: 'surface', min: 4.5, label: 'info ↔ surface' }
+]
+
+const BORDER_CHECKS: ContrastCheck[] = [
+  { fgKey: 'border', bgKey: 'surface', min: 3, label: 'border ↔ surface' },
+  { fgKey: 'borderStrong', bgKey: 'surface', min: 3, label: 'borderStrong ↔ surface' }
 ]
 
 const PRESETS: { name: string; preset: ThemePreset }[] = [
@@ -159,13 +163,28 @@ describe('Theme contrast — WCAG AA', () => {
         runChecks('dark', preset.dark?.colors, ACCENT_CHECKS)
       })
 
-      it('light scheme: status hues on surface stay ≥ 2.0 (regression guard)', () => {
+      it('light scheme: status hues used as text meet 4.5:1', () => {
         runChecks('light', preset.light?.colors, STATUS_HUE_CHECKS)
       })
 
-      it('dark scheme: status hues on surface stay ≥ 2.0 (regression guard)', () => {
+      it('dark scheme: status hues used as text meet 4.5:1', () => {
         runChecks('dark', preset.dark?.colors, STATUS_HUE_CHECKS)
       })
+
+      it('light scheme: borders meet 3:1', () => {
+        runChecks('light', preset.light?.colors, BORDER_CHECKS)
+      })
+
+      it('dark scheme: borders meet 3:1', () => {
+        runChecks('dark', preset.dark?.colors, BORDER_CHECKS)
+      })
+
+      if (name === 'high-contrast') {
+        it('keeps textSecondary distinct from text', () => {
+          expect(preset.light?.colors?.textSecondary).not.toBe(preset.light?.colors?.text)
+          expect(preset.dark?.colors?.textSecondary).not.toBe(preset.dark?.colors?.text)
+        })
+      }
 
       it('light scheme: accent fill ↔ on-color meets 4.5:1', () => {
         runChecks('light', preset.light?.colors, ON_COLOR_CHECKS)

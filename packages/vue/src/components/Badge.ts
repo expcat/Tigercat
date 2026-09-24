@@ -10,7 +10,11 @@ import {
   badgeTypeClasses,
   badgeWrapperClasses,
   badgePositionClasses,
+  formatBadgeCountLabel,
+  getStatusLabels,
+  mergeTigerLocale,
   resolveBadgeContent,
+  resolveBadgePosition,
   warnStandaloneBadgeChildren,
   type BadgeProps,
   type BadgeVariant,
@@ -19,6 +23,7 @@ import {
   type BadgePosition,
   type TigerLocale
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueBadgeProps extends BadgeProps {
   style?: Record<string, string | number>
@@ -58,7 +63,7 @@ export const Badge = defineComponent({
     },
     position: {
       type: String as PropType<BadgePosition>,
-      default: 'top-right'
+      default: 'top-end'
     },
     standalone: {
       type: Boolean,
@@ -74,6 +79,10 @@ export const Badge = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    const config = useTigerConfig()
+    const statusLabels = computed(() =>
+      getStatusLabels(mergeTigerLocale(config.value.locale, props.locale))
+    )
     const resolved = computed(() =>
       resolveBadgeContent({
         type: props.type,
@@ -91,7 +100,7 @@ export const Badge = defineComponent({
         getBadgeVariantClasses(props.variant),
         isDot.value ? dotSizeClasses[props.size] : badgeSizeClasses[props.size],
         badgeTypeClasses[props.type],
-        !props.standalone && badgePositionClasses[props.position]
+        !props.standalone && badgePositionClasses[resolveBadgePosition(props.position)]
       )
     )
 
@@ -145,7 +154,27 @@ export const Badge = defineComponent({
           class: classNames(badgeWrapperClasses, props.className, coerceClassValue(attrsClass)),
           style: mergeStyleValues(attrsStyle, props.style)
         },
-        [...defaultSlot, badgeElement]
+        [
+          ...defaultSlot,
+          badgeElement,
+          isHidden.value
+            ? null
+            : h(
+                'span',
+                { class: 'sr-only' },
+                isDot.value
+                  ? statusLabels.value.badgeLabel
+                  : typeof props.content === 'number'
+                    ? formatBadgeCountLabel(
+                        statusLabels.value.badgeCountLabel,
+                        props.content,
+                        config.value.locale?.locale
+                      )
+                    : resolved.value.kind === 'text'
+                      ? resolved.value.value
+                      : statusLabels.value.badgeLabel
+              )
+        ]
       )
     }
   }

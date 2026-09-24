@@ -32,7 +32,7 @@ function renderDataItem(item: CoreMenuItem): React.ReactNode {
       <li
         key={item.key ?? `divider-${item.label}`}
         role="separator"
-        className="my-1 border-t border-[var(--tiger-border,#e5e7eb)]"
+        className="my-1 border-t border-[var(--tiger-border)]"
       />
     )
   }

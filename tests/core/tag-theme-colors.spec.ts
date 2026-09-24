@@ -15,8 +15,8 @@ describe('Tag / Kbd default theme pair', () => {
     const { bg, text } = defaultTagThemeColors.default
     const classes = getTagVariantClasses('default')
 
-    expect(bg).toBe('bg-[var(--tiger-surface-muted,#f9fafb)]')
-    expect(text).toBe('text-[var(--tiger-text,#111827)]')
+    expect(bg).toBe('bg-[var(--tiger-surface-muted)]')
+    expect(text).toBe('text-[var(--tiger-text)]')
 
     expect(bg).toContain('--tiger-surface-muted')
     expect(bg).not.toContain('--tiger-fill')

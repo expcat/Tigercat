@@ -39,7 +39,6 @@ const CheckboxDemo = lazy(() => import('./pages/CheckboxDemo'))
 const RadioDemo = lazy(() => import('./pages/RadioDemo'))
 const SwitchDemo = lazy(() => import('./pages/SwitchDemo'))
 const SliderDemo = lazy(() => import('./pages/SliderDemo'))
-const StepperDemo = lazy(() => import('./pages/StepperDemo'))
 const SelectDemo = lazy(() => import('./pages/SelectDemo'))
 const AutoCompleteDemo = lazy(() => import('./pages/AutoCompleteDemo'))
 const CascaderDemo = lazy(() => import('./pages/CascaderDemo'))
@@ -203,7 +202,6 @@ const router = createHashRouter([
       { path: 'radio', element: <RadioDemo /> },
       { path: 'switch', element: <SwitchDemo /> },
       { path: 'slider', element: <SliderDemo /> },
-      { path: 'stepper', element: <StepperDemo /> },
       { path: 'select', element: <SelectDemo /> },
       { path: 'auto-complete', element: <AutoCompleteDemo /> },
       { path: 'cascader', element: <CascaderDemo /> },

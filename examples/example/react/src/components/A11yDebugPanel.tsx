@@ -88,7 +88,7 @@ export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({ lang = 'zh-CN' }
         type="button"
         aria-label={t('A11y 调试面板', 'A11y debug panel')}
         aria-expanded={open}
-        className="size-11 rounded-full shadow-lg bg-[var(--tiger-primary,#2563eb)] text-white font-bold text-base hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--tiger-primary,#2563eb)]"
+        className="size-11 rounded-full shadow-lg bg-[var(--tiger-primary)] text-white font-bold text-base hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--tiger-primary)]"
         onClick={() => setOpen(true)}>
         ♿
       </button>

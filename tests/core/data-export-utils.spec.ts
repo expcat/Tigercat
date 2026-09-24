@@ -10,13 +10,11 @@ import {
   exportDataToCsv,
   exportDataToMarkdown,
   exportDataToXlsx,
-  downloadDataExport
-} from '@expcat/tigercat-core/utils/data-export'
-import {
+  downloadDataExport,
   resolveDataExportFilename,
   resolveDataExportColumns,
   formatDataExportCellValue
-} from '@expcat/tigercat-core'
+} from '@expcat/tigercat-core/utils/data-export'
 import type { TableColumn } from '@expcat/tigercat-core'
 
 const columns: TableColumn[] = [
@@ -151,7 +149,7 @@ describe('exportDataToMarkdown', () => {
   it('escapes pipes, backslashes and newlines', () => {
     const markdown = exportDataToMarkdown(columns, [{ name: 'A|B', age: 1, city: 'line1\nline2' }])
     expect(markdown).toContain('A\\|B')
-    expect(markdown).toContain('line1<br>line2')
+    expect(markdown).toContain('line1 line2')
 
     const withBackslash = exportDataToMarkdown(columns, [{ name: 'a\\b', age: 1, city: '' }])
     expect(withBackslash).toContain('a\\\\b')
@@ -220,7 +218,7 @@ describe('downloadDataExport', () => {
     ['xlsx' as const, 'report.xlsx'],
     ['markdown' as const, 'report.md'],
     ['csv' as const, 'report.csv']
-  ])('creates and clicks a link for %s downloads', (format, expectedName) => {
+  ])('creates and clicks a link for %s downloads', async (format, expectedName) => {
     const clickSpy = vi.fn()
     const link = { href: '', download: '', style: { display: '' }, click: clickSpy }
     const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(link as never)
@@ -237,6 +235,8 @@ describe('downloadDataExport', () => {
     expect(createElementSpy).toHaveBeenCalledWith('a')
     expect(link.download).toBe(expectedName)
     expect(clickSpy).toHaveBeenCalled()
+    expect(revokeURL).not.toHaveBeenCalled()
+    await new Promise((resolve) => setTimeout(resolve, 0))
     expect(revokeURL).toHaveBeenCalled()
 
     createElementSpy.mockRestore()

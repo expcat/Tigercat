@@ -111,7 +111,7 @@ export default function App() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-[var(--tiger-text-muted)]">
+      <p className="text-sm text-[var(--tiger-text-secondary)]">
         侧栏走 Menu；表是 schemaToRouteRecords 的纯数据，宿主自己 addRoute。
       </p>
       <Layout className="h-80 overflow-hidden rounded border border-[var(--tiger-border)]">

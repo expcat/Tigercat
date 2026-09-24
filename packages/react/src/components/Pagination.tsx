@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef, useId } from 'react'
+import React, { useState, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useId } from 'react'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
   classNames,
   getTotalPages,
@@ -11,8 +12,6 @@ import {
   normalizePaginationPageSize,
   resolvePageSizeOptions,
   getQuickJumperPrefixClasses,
-  chevronLeftSolidIcon20PathD,
-  icon20ViewBox,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
   getPaginationEllipsisClasses,
@@ -21,19 +20,16 @@ import {
   getTotalTextClasses,
   getSizeTextClasses,
   getPaginationLabels,
-  getLocaleDirection,
-  createPaginationIdleValidationScheduler,
   getImmediateTigerLocale,
   getPaginationJumperPage,
-  getValidatedPaginationJumperValue,
   isLazyTigerLocale,
   resolveTigerLocale,
   mergeTigerLocale,
   type PaginationProps as CorePaginationProps,
-  type PaginationIdleValidationScheduler,
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
+import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface PaginationProps
@@ -124,27 +120,15 @@ export const Pagination: React.FC<PaginationProps> = ({
     [mergedLocale, labelsOverride]
   )
   const localeCode = mergedLocale?.locale
-  const isRtl = getLocaleDirection(mergedLocale) === 'rtl'
 
   // Internal state for uncontrolled mode
   const [internalCurrent, setInternalCurrent] = useState<number>(defaultCurrent)
   const [internalPageSize, setInternalPageSize] = useState<number>(defaultPageSize)
   const [quickJumperValue, setQuickJumperValue] = useState<string>('')
-  const quickJumperValidationSchedulerRef = useRef<PaginationIdleValidationScheduler | null>(null)
-
-  if (quickJumperValidationSchedulerRef.current === null) {
-    quickJumperValidationSchedulerRef.current =
-      createPaginationIdleValidationScheduler(quickJumperValidation)
-  }
-
-  useEffect(() => {
-    quickJumperValidationSchedulerRef.current =
-      createPaginationIdleValidationScheduler(quickJumperValidation)
-
-    return () => {
-      quickJumperValidationSchedulerRef.current?.cancel()
-    }
-  }, [quickJumperValidation])
+  const focusIntent = useRef<'prev' | 'next' | 'page' | null>(null)
+  const prevRef = useRef<HTMLButtonElement>(null)
+  const nextRef = useRef<HTMLButtonElement>(null)
+  const currentRef = useRef<HTMLButtonElement>(null)
 
   const currentPage = controlledCurrent !== undefined ? controlledCurrent : internalCurrent
   const rawPageSize = controlledPageSize !== undefined ? controlledPageSize : internalPageSize
@@ -156,19 +140,35 @@ export const Pagination: React.FC<PaginationProps> = ({
   const pageRange = getPageRange(validatedCurrentPage, currentPageSize, itemTotal)
 
   const handlePageChange = useCallback(
-    (page: number) => {
+    (page: number, source: 'prev' | 'next' | 'page' = 'page') => {
       if (disabled) return
       const next = validateCurrentPage(page, totalPages)
-      if (next === validatedCurrentPage) return
+      focusIntent.current = source
+      if (next === validatedCurrentPage && controlledCurrent === next) return
 
       if (controlledCurrent === undefined) {
         setInternalCurrent(next)
       }
 
-      onChange?.(next, currentPageSize)
+      if (next !== controlledCurrent) onChange?.(next, currentPageSize)
     },
     [disabled, validatedCurrentPage, totalPages, controlledCurrent, onChange, currentPageSize]
   )
+
+  useEffect(() => {
+    if (controlledCurrent === undefined || !Number.isFinite(controlledCurrent)) return
+    const next = validateCurrentPage(controlledCurrent, totalPages)
+    if (next !== controlledCurrent) onChange?.(next, currentPageSize)
+  }, [controlledCurrent, currentPageSize, onChange, totalPages])
+
+  useLayoutEffect(() => {
+    const intent = focusIntent.current
+    if (!intent) return
+    focusIntent.current = null
+    const target =
+      intent === 'prev' ? prevRef.current : intent === 'next' ? nextRef.current : currentRef.current
+    target?.focus()
+  })
 
   // Handle page size change
   const handlePageSizeChange = useCallback(
@@ -209,7 +209,6 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   // Handle quick jumper submit
   const handleQuickJumperSubmit = useCallback(() => {
-    quickJumperValidationSchedulerRef.current?.cancel()
     const page = getPaginationJumperPage(quickJumperValue, totalPages)
     if (page !== null) {
       handlePageChange(page)
@@ -217,15 +216,9 @@ export const Pagination: React.FC<PaginationProps> = ({
     setQuickJumperValue('')
   }, [quickJumperValue, totalPages, handlePageChange])
 
-  const handleQuickJumperChange = useCallback(
-    (value: string) => {
-      setQuickJumperValue(value)
-      quickJumperValidationSchedulerRef.current?.schedule(() => {
-        setQuickJumperValue(getValidatedPaginationJumperValue(value, totalPages))
-      })
-    },
-    [totalPages]
-  )
+  const handleQuickJumperChange = useCallback((value: string) => {
+    setQuickJumperValue(value)
+  }, [])
 
   // Handle quick jumper keypress
   const handleQuickJumperKeyPress = useCallback(
@@ -266,10 +259,11 @@ export const Pagination: React.FC<PaginationProps> = ({
   elements.push(
     <button
       key="prev"
+      ref={prevRef}
       type="button"
       className={getPaginationButtonBaseClasses(size)}
       disabled={prevDisabled}
-      onClick={() => handlePageChange(validatedCurrentPage - 1)}
+      onClick={() => handlePageChange(validatedCurrentPage - 1, 'prev')}
       aria-label={labels.prevPageAriaLabel}>
       <svg
         className="h-4 w-4 rtl:-scale-x-100"
@@ -314,7 +308,8 @@ export const Pagination: React.FC<PaginationProps> = ({
             type="button"
             className={getPaginationButtonBaseClasses(size, isActive)}
             disabled={disabled}
-            onClick={() => handlePageChange(pageNum)}
+            ref={isActive ? currentRef : undefined}
+            onClick={() => handlePageChange(pageNum, 'page')}
             aria-current={isActive ? 'page' : undefined}
             aria-label={labels.pageAriaLabel.replace('{page}', String(pageNum))}>
             {String(pageNum)}
@@ -328,10 +323,11 @@ export const Pagination: React.FC<PaginationProps> = ({
   elements.push(
     <button
       key="next"
+      ref={nextRef}
       type="button"
       className={getPaginationButtonBaseClasses(size)}
       disabled={nextDisabled}
-      onClick={() => handlePageChange(validatedCurrentPage + 1)}
+      onClick={() => handlePageChange(validatedCurrentPage + 1, 'next')}
       aria-label={labels.nextPageAriaLabel}>
       <svg
         className="h-4 w-4 -scale-x-100 rtl:scale-x-100"
@@ -400,10 +396,19 @@ export const Pagination: React.FC<PaginationProps> = ({
     <nav
       className={containerClasses}
       {...navProps}
-      dir={isRtl ? 'rtl' : 'ltr'}
       aria-label={ariaLabelProp ?? (ariaLabelledbyProp ? undefined : labels.paginationAriaLabel)}
       aria-labelledby={ariaLabelledbyProp}
       style={style}>
+      {!simple ? (
+        <span className="sr-only" aria-live="polite">
+          {formatPaginationPageIndicator(
+            labels.pageIndicatorText,
+            validatedCurrentPage,
+            totalPages,
+            localeCode
+          )}
+        </span>
+      ) : null}
       {elements}
     </nav>
   )

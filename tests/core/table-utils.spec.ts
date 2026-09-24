@@ -37,7 +37,9 @@ describe('table-utils', () => {
   describe('getRowKey', () => {
     it('returns explicit property keys before falling back to index', () => {
       expect(getRowKey({ id: 42 }, 'id', 3)).toBe(42)
-      expect(getRowKey({ name: 'missing id' }, 'id', 3)).toBe(3)
+      expect(getRowKey({ id: 0 }, 'id', 0)).toBe(0)
+      expect(getRowKey({ name: 'missing id' }, 'id', 0)).toBe('tiger-row:0')
+      expect(getRowKey({ name: 'missing id' }, 'id', 3)).toBe('tiger-row:3')
     })
 
     it('returns keys from rowKey functions', () => {
@@ -70,28 +72,29 @@ describe('table-utils', () => {
       const record = { name: 'No id' }
       const cache = createTableRowKeyCache<typeof record>('id')
 
-      expect(cache.get(record, 0)).toBe(0)
-      expect(cache.get(record, 5)).toBe(5)
+      expect(cache.get(record, 0)).toBe('tiger-row:0')
+      expect(cache.get(record, 5)).toBe('tiger-row:5')
     })
 
     it('creates key lists with an index offset', () => {
       const cache = createTableRowKeyCache<{ id?: number }>('id')
 
-      expect(cache.getMany([{ id: 8 }, {}, { id: 10 }], 20)).toEqual([8, 21, 10])
+      expect(cache.getMany([{ id: 8 }, {}, { id: 10 }], 20)).toEqual([8, 'tiger-row:21', 10])
+      expect(cache.getMany([{ id: 0 }, {}], 0)).toEqual([0, 'tiger-row:1'])
     })
   })
 
   describe('getFixedColumnOffsets', () => {
     it('calculates fixed column offsets and min table width', () => {
       const columns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 120, fixed: 'left' },
+        { key: 'name', title: 'Name', width: 120, fixed: 'start' },
         { key: 'age', title: 'Age', width: 80 },
-        { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+        { key: 'actions', title: 'Actions', width: 100, fixed: 'end' }
       ]
 
       expect(getFixedColumnOffsets(columns)).toEqual({
-        leftOffsets: { name: 0 },
-        rightOffsets: { actions: 0 },
+        startOffsets: { name: 0 },
+        endOffsets: { actions: 0 },
         minTableWidth: 300,
         hasFixedColumns: true
       })
@@ -99,12 +102,12 @@ describe('table-utils', () => {
 
     it('resolves percent widths against the container so left offsets do not collapse', () => {
       const columns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: '20%', fixed: 'left' },
-        { key: 'age', title: 'Age', width: '20%', fixed: 'left' }
+        { key: 'name', title: 'Name', width: '20%', fixed: 'start' },
+        { key: 'age', title: 'Age', width: '20%', fixed: 'start' }
       ]
       expect(getFixedColumnOffsets(columns, {}, 500)).toEqual({
-        leftOffsets: { name: 0, age: 100 },
-        rightOffsets: {},
+        startOffsets: { name: 0, age: 100 },
+        endOffsets: {},
         minTableWidth: 200,
         hasFixedColumns: true
       })
@@ -121,14 +124,14 @@ describe('table-utils', () => {
 
     it('uses measured column widths before declared widths for fixed offsets', () => {
       const columns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 120, fixed: 'left' },
+        { key: 'name', title: 'Name', width: 120, fixed: 'start' },
         { key: 'age', title: 'Age', width: 80 },
-        { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+        { key: 'actions', title: 'Actions', width: 100, fixed: 'end' }
       ]
 
       expect(getFixedColumnOffsets(columns, { name: 150, age: 90, actions: 110 })).toEqual({
-        leftOffsets: { name: 0 },
-        rightOffsets: { actions: 0 },
+        startOffsets: { name: 0 },
+        endOffsets: { actions: 0 },
         minTableWidth: 350,
         hasFixedColumns: true
       })
@@ -136,17 +139,17 @@ describe('table-utils', () => {
 
     it('keeps non-contiguous fixed offsets compact', () => {
       const columns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 120, fixed: 'left' },
+        { key: 'name', title: 'Name', width: 120, fixed: 'start' },
         { key: 'email', title: 'Email', width: 400 },
-        { key: 'age', title: 'Age', width: 80, fixed: 'left' },
-        { key: 'role', title: 'Role', width: 140, fixed: 'right' },
+        { key: 'age', title: 'Age', width: 80, fixed: 'start' },
+        { key: 'role', title: 'Role', width: 140, fixed: 'end' },
         { key: 'status', title: 'Status', width: 100 },
-        { key: 'actions', title: 'Actions', width: 60, fixed: 'right' }
+        { key: 'actions', title: 'Actions', width: 60, fixed: 'end' }
       ]
 
       expect(getFixedColumnOffsets(columns)).toEqual({
-        leftOffsets: { name: 0, age: 120 },
-        rightOffsets: { actions: 0, role: 60 },
+        startOffsets: { name: 0, age: 120 },
+        endOffsets: { actions: 0, role: 60 },
         minTableWidth: 900,
         hasFixedColumns: true
       })
@@ -154,24 +157,24 @@ describe('table-utils', () => {
 
     it('resolves fixed column position and sticky styles', () => {
       const columns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 120, fixed: 'left' },
+        { key: 'name', title: 'Name', width: 120, fixed: 'start' },
         { key: 'age', title: 'Age', width: 80 },
-        { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+        { key: 'actions', title: 'Actions', width: 100, fixed: 'end' }
       ]
       const fixedInfo = getFixedColumnOffsets(columns)
 
-      expect(getFixedColumnPosition(columns[0], fixedInfo)).toBe('left')
-      expect(getFixedColumnPosition(columns[2], fixedInfo)).toBe('right')
+      expect(getFixedColumnPosition(columns[0], fixedInfo)).toBe('start')
+      expect(getFixedColumnPosition(columns[2], fixedInfo)).toBe('end')
       expect(getFixedColumnPosition(columns[1], fixedInfo)).toBeUndefined()
 
       expect(getFixedColumnStyle(columns[0], fixedInfo, 15)).toEqual({
         position: 'sticky',
-        left: '0px',
+        insetInlineStart: '0px',
         zIndex: 15
       })
       expect(getFixedColumnStyle(columns[2], fixedInfo, 12)).toEqual({
         position: 'sticky',
-        right: '0px',
+        insetInlineEnd: '0px',
         zIndex: 12
       })
     })
@@ -194,7 +197,7 @@ describe('table-utils', () => {
     const columns: TableColumn[] = [
       { key: 'name', title: 'Name' },
       { key: 'age', title: 'Age', width: 80 },
-      { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+      { key: 'actions', title: 'Actions', width: 100, fixed: 'end' }
     ]
 
     it('emits one entry per data column with resolved widths', () => {
@@ -323,10 +326,10 @@ describe('table-utils', () => {
 
   describe('filterHiddenColumns', () => {
     const columns: TableColumn[] = [
-      { key: 'name', title: 'Name', width: 120, fixed: 'left' },
-      { key: 'age', title: 'Age', width: 80, fixed: 'left' },
+      { key: 'name', title: 'Name', width: 120, fixed: 'start' },
+      { key: 'age', title: 'Age', width: 80, fixed: 'start' },
       { key: 'email', title: 'Email', width: 200 },
-      { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+      { key: 'actions', title: 'Actions', width: 100, fixed: 'end' }
     ]
 
     it('returns the same array reference when no keys are hidden', () => {
@@ -354,10 +357,10 @@ describe('table-utils', () => {
     it('orders fixed columns around normal columns after hidden columns are filtered', () => {
       const visible = filterHiddenColumns(
         [
-          { key: 'name', title: 'Name', fixed: 'left' },
+          { key: 'name', title: 'Name', fixed: 'start' },
           { key: 'email', title: 'Email' },
-          { key: 'age', title: 'Age', fixed: 'left' },
-          { key: 'actions', title: 'Actions', fixed: 'right' },
+          { key: 'age', title: 'Age', fixed: 'start' },
+          { key: 'actions', title: 'Actions', fixed: 'end' },
           { key: 'status', title: 'Status' }
         ],
         ['email']
@@ -374,8 +377,8 @@ describe('table-utils', () => {
     it('shrinks fixed column offsets when a fixed column is hidden', () => {
       const visible = filterHiddenColumns(columns, ['name'])
       expect(getFixedColumnOffsets(visible)).toEqual({
-        leftOffsets: { age: 0 },
-        rightOffsets: { actions: 0 },
+        startOffsets: { age: 0 },
+        endOffsets: { actions: 0 },
         minTableWidth: 380,
         hasFixedColumns: true
       })
@@ -388,7 +391,8 @@ describe('table-utils', () => {
         {
           key: 'name',
           title: 'Name',
-          fixed: 'left',
+          width: 120,
+          fixed: 'start',
           fixedClassName: ({ view, fixed, rowIndex, selected }) =>
             selected ? `selected-${view}-${fixed}-${rowIndex}` : 'plain-fixed'
         }
@@ -415,7 +419,7 @@ describe('table-utils', () => {
       expect(tableFixedCellStripedClasses).not.toContain('/50')
       expect(classes).toContain(tableRowGroupHoverClasses)
       expect(classes).toContain('selected-row-bg')
-      expect(classes).toContain('selected-table-left-0')
+      expect(classes).toContain('selected-table-start-0')
       expect(
         getTableFixedCellClasses({
           view: 'table',

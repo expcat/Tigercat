@@ -8,6 +8,7 @@
 import type { TableColumn } from '../types/table'
 import { getTableColumnDataKey } from './table-utils'
 import {
+  assertDataExportCellCount,
   escapeCsvValue,
   resolveDataExportColumns,
   resolveDataExportFilename
@@ -39,6 +40,7 @@ export function exportTableToCsv<T>(
   options?: TableCsvExportOptions
 ): string {
   const exportColumns = resolveDataExportColumns(columns, data, options?.hiddenColumnKeys)
+  assertDataExportCellCount(exportColumns.length, data.length)
   const headers = exportColumns.map((col) => escapeCsvValue(col.title))
   const rows = data.map((record) =>
     exportColumns
@@ -76,4 +78,4 @@ export function downloadTableExport(content: string, filename: string = 'export'
  * Get export button classes
  */
 export const tableExportButtonClasses =
-  'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] bg-[var(--tiger-surface,#ffffff)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors'
+  'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] text-[var(--tiger-text)] bg-[var(--tiger-surface)] hover:bg-[var(--tiger-surface-muted)] transition-colors'

@@ -40,7 +40,7 @@ describe('Menu', () => {
       )
 
       expect(screen.getByRole('navigation', { name: 'Site' })).toBeInTheDocument()
-      expect(container.querySelector('[data-tiger-menu-root]')).not.toHaveAttribute('role', 'menu')
+      expect(container.querySelector('[data-tiger-menu-root]')).toHaveAttribute('role', 'menu')
       expect(getItem('Item 1')).toBeInTheDocument()
     })
 
@@ -66,7 +66,7 @@ describe('Menu', () => {
         />
       )
 
-      expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/home')
+      expect(screen.getByRole('menuitem', { name: 'Home' })).toHaveAttribute('href', '/home')
       expect(screen.getByText('Team')).toBeInTheDocument()
       expect(getItem('Users')).toBeInTheDocument()
     })
@@ -113,11 +113,11 @@ describe('Menu', () => {
   })
 
   describe('Selection', () => {
-    it('treats 1 and "1" as the same key and deselects on a second click', async () => {
+    it('keeps the selected item selected when it is clicked again', async () => {
       const user = userEvent.setup()
       const onSelect = vi.fn()
       render(
-        <Menu defaultSelectedKeys={[1]} onSelect={onSelect}>
+        <Menu defaultSelectedKeys={['1']} onSelect={onSelect}>
           <MenuItem itemKey="1">One</MenuItem>
           <MenuItem itemKey="2">Two</MenuItem>
         </Menu>
@@ -125,7 +125,8 @@ describe('Menu', () => {
 
       expect(getItem('One')).toHaveAttribute('data-tiger-selected', 'true')
       await user.click(getItem('One'))
-      expect(onSelect).toHaveBeenCalledWith('1', { selectedKeys: [] })
+      expect(onSelect).toHaveBeenCalledWith('1', { selectedKeys: ['1'] })
+      expect(getItem('One')).toHaveAttribute('data-tiger-selected', 'true')
     })
 
     it('puts aria-current=page only on selected links', () => {
@@ -138,13 +139,13 @@ describe('Menu', () => {
         </Menu>
       )
 
-      expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page')
+      expect(screen.getByRole('menuitem', { name: 'Home' })).toHaveAttribute('aria-current', 'page')
       expect(getItem('Tasks')).not.toHaveAttribute('aria-current')
     })
   })
 
   describe('Keyboard', () => {
-    it('moves between vertical items with arrows and leaves every item in the tab order', async () => {
+    it('keeps one tab stop on a vertical menu and moves it with arrows', async () => {
       const user = userEvent.setup()
       render(
         <Menu>
@@ -155,11 +156,15 @@ describe('Menu', () => {
 
       const item1 = getItem('Item 1')
       const item2 = getItem('Item 2')
+      const root = item1.closest('[role="menu"]')
+      expect(root).toBeTruthy()
       expect(item1).toHaveAttribute('tabindex', '0')
-      expect(item2).toHaveAttribute('tabindex', '0')
+      expect(item2).toHaveAttribute('tabindex', '-1')
       item1.focus()
       await user.keyboard('{ArrowDown}')
       expect(item2).toHaveFocus()
+      expect(item2).toHaveAttribute('tabindex', '0')
+      expect(item1).toHaveAttribute('tabindex', '-1')
     })
 
     it('uses RTL arrows on a horizontal menubar', async () => {
@@ -200,7 +205,7 @@ describe('Menu', () => {
     it('toggles from click and shares openKeys for popup mode', async () => {
       const user = userEvent.setup()
       render(
-        <Menu mode="horizontal" multiple={false}>
+        <Menu mode="horizontal" openMultiple={false}>
           <SubMenu itemKey="a" title="First">
             <MenuItem itemKey="1">One</MenuItem>
           </SubMenu>

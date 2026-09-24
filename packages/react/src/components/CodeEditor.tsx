@@ -11,7 +11,6 @@ import {
   classNames,
   getCodeEditorContainerClasses,
   getLineNumberClasses,
-  getTokenClasses,
   generateLineNumbers,
   handleTabKey,
   getActiveLineIndex,
@@ -20,14 +19,17 @@ import {
   codeEditorHighlightClasses,
   codeEditorScrollerClasses,
   getCodeEditorWrapClass,
-  getCodeEditorThemeVars,
+  resolveCodeEditorTheme,
+  scrollCodeEditorCaretIntoView,
+  shouldCommitEditorValue,
+  syncEditorTextareaValue,
+  clampTabSize,
   getCodeEditorHeightStyle,
   buildCodeEditorLineModels,
   resolveEditorTabAction,
   getCodeEditorLabels,
   mergeTigerLocale,
   type CodeEditorProps as CoreCodeEditorProps,
-  type Token,
   type CodeHighlighter
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
@@ -37,10 +39,7 @@ import { useFormItemControlContext } from './FormItemContext'
 export interface CodeEditorProps extends Omit<CoreCodeEditorProps, 'style'> {
   onChange?: (value: string) => void
   style?: React.CSSProperties
-  /**
-   * Optional pluggable highlighter. Output is TRUSTED HTML — sanitise
-   * inside the engine if the source is untrusted.
-   */
+  /** Optional pluggable highlighter. Returns tokens drawn as text. */
   highlighter?: CodeHighlighter
   name?: string
   id?: string
@@ -56,7 +55,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
     value: controlledValue,
     defaultValue = '',
     language = 'plain',
-    theme = 'light',
+    theme,
     readOnly = false,
     lineNumbers = true,
     tabSize = 2,
@@ -99,7 +98,12 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
   const [activeLine, setActiveLine] = useState(0)
   const [allowTabExit, setAllowTabExit] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const gutterRef = useRef<HTMLDivElement>(null)
   const pendingSelection = useRef<{ start: number; end: number } | null>(null)
+  const composingRef = useRef(false)
+  const [composing, setComposing] = useState(false)
+  const resolvedTheme = resolveCodeEditorTheme(theme)
   const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
   const effectiveId = id ?? formItemControl?.id
   const effectiveName = name ?? formItemControl?.name
@@ -120,11 +124,22 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
   }))
 
   useLayoutEffect(() => {
+    syncEditorTextareaValue(textareaRef.current, code, composingRef.current || composing)
     const pending = pendingSelection.current
-    if (!pending || !textareaRef.current) return
+    if (!pending || !textareaRef.current || composingRef.current) return
     pendingSelection.current = null
     textareaRef.current.selectionStart = pending.start
     textareaRef.current.selectionEnd = pending.end
+  })
+
+  useLayoutEffect(() => {
+    const gutter = gutterRef.current
+    const scroller = scrollerRef.current
+    if (!gutter || !scroller) {
+      scroller?.style.removeProperty('--tiger-code-gutter')
+      return
+    }
+    scroller.style.setProperty('--tiger-code-gutter', `${gutter.offsetWidth}px`)
   })
 
   const model = useMemo(
@@ -132,26 +147,25 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
       buildCodeEditorLineModels({
         value: code,
         language,
-        theme,
+        theme: resolvedTheme,
         activeLine,
         highlightActiveLine,
         disabled: effectiveDisabled,
         highlighter
       }),
-    [code, language, theme, activeLine, highlightActiveLine, effectiveDisabled, highlighter]
+    [code, language, resolvedTheme, activeLine, highlightActiveLine, effectiveDisabled, highlighter]
   )
   const lineNums = useMemo(() => generateLineNumbers(model.lines.length), [model.lines.length])
 
   const containerClasses = useMemo(
-    () => getCodeEditorContainerClasses(theme, effectiveDisabled, className),
-    [theme, effectiveDisabled, className]
+    () => getCodeEditorContainerClasses(resolvedTheme, effectiveDisabled, className),
+    [resolvedTheme, effectiveDisabled, className]
   )
 
-  const containerStyle = useMemo<React.CSSProperties>(() => {
+  const scrollStyle = useMemo<React.CSSProperties>(() => {
     const height = getCodeEditorHeightStyle(minLines, maxLines)
-    const themeVars = getCodeEditorThemeVars(theme)
-    return { ...height, ...themeVars, ...style }
-  }, [minLines, maxLines, theme, style])
+    return { ...height, tabSize: clampTabSize(tabSize), flex: '1 1 auto' }
+  }, [minLines, maxLines, tabSize])
 
   const updateActiveLine = useCallback(() => {
     const ta = textareaRef.current
@@ -159,13 +173,20 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
     setActiveLine(getActiveLineIndex(ta.value, ta.selectionStart))
   }, [])
 
+  const revealCaret = useCallback(() => {
+    scrollCodeEditorCaretIntoView(textareaRef.current, scrollerRef.current)
+  }, [])
+
   const handleInput = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const native = e.nativeEvent as InputEvent
+      if (!shouldCommitEditorValue(composingRef.current || native.isComposing)) return
       const val = e.target.value
       setCode(val)
       setActiveLine(getActiveLineIndex(val, e.target.selectionStart))
+      revealCaret()
     },
-    [setCode]
+    [revealCaret, setCode]
   )
 
   const handleKeyDown = useCallback(
@@ -175,6 +196,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
         disabled: effectiveDisabled,
         allowTabExit
       })
+      if (composingRef.current) return
       if (action === 'arm-exit') {
         setAllowTabExit(true)
         return
@@ -200,7 +222,8 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
   )
 
   const wrapClass = getCodeEditorWrapClass(wordWrap)
-  const activeLineClass = getCodeEditorActiveLineClasses(theme)
+  const activeLineClass = getCodeEditorActiveLineClasses(resolvedTheme)
+  const tabWidth = clampTabSize(tabSize)
 
   const {
     id: _ignoredId,
@@ -228,74 +251,90 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
     }
   }
 
-  const renderToken = (token: Token, idx: number) => {
-    const cls = getTokenClasses(token.type, theme)
-    return cls ? (
-      <span key={idx} className={cls}>
-        {token.value}
+  const renderToken = (token: { text: string; className?: string }, idx: number) => {
+    return token.className ? (
+      <span key={idx} className={token.className}>
+        {token.text}
       </span>
     ) : (
-      <React.Fragment key={idx}>{token.value}</React.Fragment>
+      <React.Fragment key={idx}>{token.text}</React.Fragment>
     )
   }
 
   return (
     <div
       className={containerClasses}
-      style={containerStyle}
+      style={style}
       data-language={language}
-      data-theme={theme}
+      data-theme={resolvedTheme}
       {...extraContainer}>
-      <div className={codeEditorScrollerClasses} data-tiger-code-scroller="">
-        {lineNumbers && (
-          <div className={getLineNumberClasses(theme)} aria-hidden="true">
-            {lineNums.map((n) => (
-              <div key={n} className="min-h-[1.625rem]">
-                {n}
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="relative flex-1">
-          {model.blockHtml !== null ? (
-            <div
-              className={classNames(codeEditorHighlightClasses, wrapClass)}
-              aria-hidden="true"
-              dangerouslySetInnerHTML={{ __html: model.blockHtml }}
-            />
-          ) : (
-            <div className={classNames(codeEditorHighlightClasses, wrapClass)} aria-hidden="true">
-              {model.lines.map((line) => {
-                const lineClass = classNames('min-h-[1.625rem]', line.isActive && activeLineClass)
-                if (line.html !== null) {
-                  return (
+      <div
+        ref={scrollerRef}
+        className={codeEditorScrollerClasses}
+        style={scrollStyle}
+        data-tiger-code-scroller="">
+        <div className="relative min-w-full" style={{ tabSize: tabWidth }}>
+          <div
+            className={classNames('grid py-3', wrapClass)}
+            style={{
+              gridTemplateColumns: lineNumbers ? 'auto minmax(0, 1fr)' : 'minmax(0, 1fr)'
+            }}
+            aria-hidden="true">
+            {model.lines.map((line, lineIndex) => {
+              const lineClass = classNames(
+                'min-h-[1.625rem] px-3',
+                line.isActive && activeLineClass
+              )
+              return (
+                <React.Fragment key={line.index}>
+                  {lineNumbers ? (
                     <div
-                      key={line.index}
-                      className={lineClass}
-                      data-active-line={line.isActive ? '' : undefined}
-                      dangerouslySetInnerHTML={{ __html: line.html }}
-                    />
-                  )
-                }
-                return (
+                      ref={lineIndex === 0 ? gutterRef : undefined}
+                      className={classNames(getLineNumberClasses(resolvedTheme), 'min-h-[1.625rem]')}>
+                      {lineNums[lineIndex]}
+                    </div>
+                  ) : null}
                   <div
-                    key={line.index}
                     className={lineClass}
                     data-active-line={line.isActive ? '' : undefined}>
-                    {(line.tokens ?? []).map(renderToken)}
+                    {line.tokens.map(renderToken)}
                     {line.text === '' ? '\n' : null}
                   </div>
-                )
-              })}
-            </div>
-          )}
+                </React.Fragment>
+              )
+            })}
+          </div>
           <textarea
             ref={textareaRef}
             className={classNames(codeEditorTextareaClasses, wrapClass)}
-            value={code}
+            style={{
+              insetInlineStart: 0,
+              width: '100%',
+              height: '100%',
+              paddingInlineStart: lineNumbers
+                ? 'calc(var(--tiger-code-gutter, 3rem) + 0.75rem)'
+                : '0.75rem',
+              tabSize: tabWidth
+            }}
+            defaultValue={code}
             onChange={handleInput}
+            onCompositionStart={() => {
+              composingRef.current = true
+              setComposing(true)
+            }}
+            onCompositionEnd={(event) => {
+              composingRef.current = false
+              setComposing(false)
+              const val = event.currentTarget.value
+              setCode(val)
+              setActiveLine(getActiveLineIndex(val, event.currentTarget.selectionStart))
+              revealCaret()
+            }}
             onKeyDown={handleKeyDown}
-            onSelect={updateActiveLine}
+            onSelect={() => {
+              updateActiveLine()
+              revealCaret()
+            }}
             onClick={updateActiveLine}
             onKeyUp={updateActiveLine}
             onFocus={onFocus as React.FocusEventHandler<HTMLTextAreaElement> | undefined}

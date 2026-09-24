@@ -14,6 +14,9 @@ export const deDE: TigerLocale = {
     cancelText: 'Abbrechen',
     closeText: 'Schließen',
     loadingText: 'Wird geladen...',
+    loadingFinishedText: 'Laden abgeschlossen',
+    loadingFailedText: 'Laden fehlgeschlagen',
+    viewText: 'Anzeigen',
     emptyText: 'Keine Daten',
     noMoreText: 'Keine weiteren Daten',
     searchPlaceholder: 'Suchen',
@@ -47,7 +50,8 @@ export const deDE: TigerLocale = {
     ariaLabel: 'QR-Code',
     expiredText: 'QR-Code ist abgelaufen',
     refreshText: 'Aktualisieren',
-    loadingText: 'Wird geladen...'
+    loadingText: 'Wird geladen...',
+    errorText: 'QR-Code konnte nicht erstellt werden'
   },
   marquee: {
     ariaLabel: 'Laufender Inhalt'
@@ -55,10 +59,25 @@ export const deDE: TigerLocale = {
   image: {
     previewAriaLabel: 'Vorschau von {alt}',
     previewFallbackAlt: 'Bild',
-    groupAriaLabel: 'Bildgruppe'
+    groupAriaLabel: 'Bildgruppe',
+    loadErrorText: 'Bild konnte nicht geladen werden'
   },
   imageCompare: {
-    ariaLabel: 'Bildvergleich'
+    ariaLabel: 'Bildvergleich',
+    beforeAlt: 'Vorher',
+    afterAlt: 'Nachher',
+    valueText: '{percent}% der Vorher-Seite sind sichtbar'
+  },
+  text: {
+    copyLabel: 'Kopieren',
+    copiedLabel: 'Kopiert',
+    copyFailedLabel: 'Kopieren fehlgeschlagen',
+  },
+  watermark: {
+    imageErrorText: 'Wasserzeichenbild konnte nicht geladen werden'
+  },
+  segmented: {
+    ariaLabel: 'Optionen'
   },
   descriptions: {
     colon: ':'
@@ -67,6 +86,9 @@ export const deDE: TigerLocale = {
     avatarAlt: 'Profilbild',
     dragHandleAriaLabel: 'Neu anordnen'
   },
+  masonry: {
+    visualOrderText: 'Die sichtbare Reihenfolge weicht von der Quellreihenfolge ab'
+  },
   scrollArea: {
     ariaLabel: 'Scrollbereich'
   },
@@ -74,7 +96,8 @@ export const deDE: TigerLocale = {
     pageBreak: 'Seitenumbruch'
   },
   timeline: {
-    pendingText: 'Wird geladen...'
+    pendingText: 'Wird geladen...',
+    pendingReplacedText: 'Aktualisierung abgeschlossen'
   },
   workflowTimeline: {
     pending: 'Ausstehend',
@@ -217,7 +240,11 @@ export const deDE: TigerLocale = {
     branchExpression: 'Ausdruck',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: 'Für diesen Knotentyp nicht verwendet',
+    publishText: 'Veröffentlichen',
     publishBlocked: 'Veröffentlichung blockiert, bis dies behoben ist'
+  },
+  workflowDetailShell: {
+    ariaLabel: 'Workflow-Details'
   },
   progress: {
     ariaLabel: 'Fortschritt'
@@ -260,7 +287,9 @@ export const deDE: TigerLocale = {
     loadingText: 'Wird geladen',
     expandText: 'Erweitern',
     collapseText: 'Reduzieren',
-    selectAllText: 'Alle auswählen',
+    selectAllText: 'Alle auf dieser Seite auswählen',
+    selectLoadedText: 'Alle geladenen Zeilen auswählen',
+    tableAriaLabel: 'Datentabelle',
     selectRowAriaLabel: 'Zeile {row} auswählen',
     sortByText: 'Nach {column} sortieren',
     clearSortText: 'Sortierung löschen',
@@ -276,9 +305,13 @@ export const deDE: TigerLocale = {
     allText: 'Alle',
     filterPlaceholder: 'Filtern...',
     exportCsvText: 'CSV exportieren',
-    exportExcelText: 'Excel exportieren',
     exportCsvAriaLabel: 'Als CSV exportieren',
-    exportExcelAriaLabel: 'Als Excel exportieren',
+    selectionCountText: '{count} ausgewählt',
+    sortAnnouncementText: 'Sortiert nach {column}, {direction}',
+    sortAscendingText: 'aufsteigend',
+    sortDescendingText: 'absteigend',
+    sortNoneText: 'unsortiert',
+    dragRowAriaLabel: 'Zeile {row} ziehen',
     expandRowAriaLabel: 'Zeile erweitern',
     collapseRowAriaLabel: 'Zeile reduzieren',
     sortMenuAriaLabel: 'Sortieren',
@@ -326,14 +359,17 @@ export const deDE: TigerLocale = {
     nextText: 'Weiter',
     finishText: 'Fertigstellen',
     closeAriaLabel: 'Tour schließen',
-    dialogAriaLabel: 'Rundgang'
+    dialogAriaLabel: 'Rundgang',
+    loadErrorText: 'Diese Tour konnte nicht geladen werden.',
   },
   calendar: {
     previousMonth: 'Vorheriger Monat',
     nextMonth: 'Nächster Monat',
     previousYear: 'Vorheriges Jahr',
     nextYear: 'Nächstes Jahr',
-    eventCountText: '{n} Termine'
+    eventCountText: '{n} Termine',
+    switchToYear: 'Zur Jahresansicht wechseln',
+    switchToMonth: 'Zur Monatsansicht wechseln'
   },
   fullscreen: {
     enterAriaLabel: 'Vollbild',
@@ -344,7 +380,8 @@ export const deDE: TigerLocale = {
     pathAriaLabel: 'Dateipfad',
     listboxAriaLabel: 'Dateien',
     searchAriaLabel: 'Dateien suchen',
-    emptyText: 'Leerer Ordner'
+    emptyText: 'Leerer Ordner',
+    resultCountText: '{count} Elemente'
   },
   imageViewer: {
     dialogAriaLabel: 'Bildbetrachter',
@@ -378,6 +415,7 @@ export const deDE: TigerLocale = {
     resizeHandleS: 'unten',
     resizeHandleSw: 'unten links',
     resizeHandleW: 'links',
+    cropSizeText: '{width} mal {height}',
     loadingCropImageAriaLabel: 'Bild zum Zuschneiden wird geladen',
     loadErrorAriaLabel: 'Bild zum Zuschneiden konnte nicht geladen werden',
     fileTooLargeText: 'Die Datei überschreitet {maxSize}',
@@ -395,10 +433,14 @@ export const deDE: TigerLocale = {
     ellipseToolText: 'Ellipsenform',
     polygonToolText: 'Vieleck',
     freehandToolText: 'Freihand',
-    deleteText: 'Löschen'
+    deleteText: 'Löschen',
+    annotationLoadFailedText: 'Bild konnte nicht geladen werden.',
+    annotationRetryText: 'Erneut versuchen',
+    annotationTooSmallText: 'Markierung ist zu klein.',
+    annotationPolygonIncompleteText: 'Ein Polygon braucht mindestens 3 Punkte.'
   },
   status: {
-    tagCloseAriaLabel: 'Tag schließen',
+    tagCloseAriaLabel: '{label} schließen',
     badgeLabel: 'Benachrichtigung',
     badgeCountLabel: '{count} Benachrichtigungen'
   },
@@ -411,6 +453,7 @@ export const deDE: TigerLocale = {
     unassignedSwimlaneText: 'Nicht zugewiesen',
     wipLimitText: 'WIP-Limit: {limit}',
     dragHintText: 'Zum Verschieben ziehen',
+    grabAnnouncementText: '{card}. Von {from} nach {to}. Position {position} von {count}.',
     boardAriaLabel: 'Aufgabenboard'
   },
   chatWindow: {
@@ -425,7 +468,8 @@ export const deDE: TigerLocale = {
   code: {
     copyLabel: 'Kopieren',
     copiedLabel: 'Kopiert',
-    copyFailedLabel: 'Kopieren fehlgeschlagen'
+    copyFailedLabel: 'Kopieren fehlgeschlagen',
+    scrollLabel: 'Code'
   },
   commentThread: {
     emptyText: 'Keine Kommentare',
@@ -442,12 +486,15 @@ export const deDE: TigerLocale = {
     listAriaLabel: 'Kommentarverlauf',
     replySubmitText: 'Antwort senden',
     remainingRepliesText: '{count} weitere anzeigen',
+    duplicateIdText: 'Doppelte Kommentar-ID {id}',
+    cycleText: 'Kommentarkreis bei {id}',
     maxDepthReachedText: 'Maximale Antworttiefe erreicht'
   },
   activityFeed: {
     emptyText: 'Keine Aktivität',
     loadingText: 'Wird geladen...',
     listAriaLabel: 'Aktivität',
+    newItemText: 'Neue Aktivität: {title}',
     otherGroupTitle: 'Sonstiges'
   },
   notificationCenter: {
@@ -461,6 +508,9 @@ export const deDE: TigerLocale = {
     markReadText: 'Als gelesen markieren',
     markUnreadText: 'Als ungelesen markieren',
     defaultGroupTitle: 'Standard',
+    filterAriaLabel: 'Lesestatus',
+    markedReadText: '{count} als gelesen markiert',
+    newItemText: 'Neue Benachrichtigung: {title}',
     unreadCountText: '{count} ungelesen'
   },
   select: {
@@ -471,7 +521,15 @@ export const deDE: TigerLocale = {
     clearAriaLabel: 'Auswahl löschen',
     createOptionLabel: '"{label}" erstellen',
     moreCountText: '+{count} weitere',
-    loadingText: 'Wird geladen...',
+    loadingText: 'Wird geladen...'
+  },
+  cascader: {
+    levelLabel: 'Ebene {level}',
+    backText: 'Zurück',
+    expandAriaLabel: 'Erweitern',
+    collapseAriaLabel: 'Einklappen'
+  },
+  treeSelect: {
     levelLabel: 'Ebene {level}',
     backText: 'Zurück',
     expandAriaLabel: 'Erweitern',
@@ -542,7 +600,22 @@ export const deDE: TigerLocale = {
     sunburstTooltip: '{label}: {value} ({percent} %)',
     orgChartAriaLabel: 'Organigramm',
     ganttAriaLabel: 'Gantt-Diagramm',
-    ganttTaskAriaLabel: '{label}, {start} bis {end}{progress}'
+    ganttTaskAriaLabel: '{label}, {start} bis {end}{progress}',
+    ganttTodayAriaLabel: 'Heute',
+    ganttUnknownDate: 'unbekanntes Datum',
+    chartAriaLabel: 'Diagramm',
+    lineChartAriaLabel: 'Liniendiagramm',
+    areaChartAriaLabel: 'Flächendiagramm',
+    barChartAriaLabel: 'Balkendiagramm',
+    scatterChartAriaLabel: 'Streudiagramm',
+    pieChartAriaLabel: 'Kreisdiagramm',
+    radarChartAriaLabel: 'Netzdiagramm',
+    heatmapChartAriaLabel: 'Heatmap',
+    heatmapSummary: '{rows} Zeilen und {columns} Spalten',
+    funnelChartAriaLabel: 'Trichterdiagramm',
+    sunburstChartAriaLabel: 'Sunburst-Diagramm',
+    treemapChartAriaLabel: 'Treemap',
+    gaugeChartAriaLabel: 'Messgerät'
   },
   codeEditor: {
     editorAriaLabel: 'Code-Editor'
@@ -556,6 +629,8 @@ export const deDE: TigerLocale = {
     editModeLabel: 'Bearbeiten',
     splitModeLabel: 'Geteilt',
     previewModeLabel: 'Vorschau',
+    showEditorText: 'Bearbeiten',
+    showPreviewText: 'Vorschau',
     bold: 'Fett',
     italic: 'Kursiv',
     strikethrough: 'Durchgestrichen',
@@ -666,7 +741,9 @@ export const deDE: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: '{tag} entfernen',
-    clearAllLabel: 'Alle Tags löschen'
+    clearAllLabel: 'Alle Tags löschen',
+    duplicateText: 'Bereits hinzugefügt',
+    limitText: 'Tag-Limit erreicht'
   },
   input: {
     clearAriaLabel: 'Eingabe löschen',
@@ -682,12 +759,6 @@ export const deDE: TigerLocale = {
     ariaLabel: 'Schieberegler',
     minAriaLabel: 'Mindestwert',
     maxAriaLabel: 'Höchstwert'
-  },
-  stepper: {
-    ariaLabel: 'Schrittwähler',
-    valueAriaLabel: 'Wert',
-    incrementAriaLabel: 'Erhöhen',
-    decrementAriaLabel: 'Verringern'
   },
   signature: {
     ariaLabel: 'Unterschriftenfeld',

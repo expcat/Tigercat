@@ -25,7 +25,7 @@ export interface ChartCanvasProps
 export const ChartCanvas: React.FC<ChartCanvasProps> = ({
   width = DEFAULT_CHART_SIZE.width,
   height = DEFAULT_CHART_SIZE.height,
-  responsive = false,
+  responsive = true,
   padding = DEFAULT_CHART_PADDING,
   className,
   title,
@@ -54,7 +54,8 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
   const svgClasses = useMemo(() => classNames(chartCanvasBaseClasses, className), [className])
   const titleId = title ? `${labelId}-title` : undefined
   const descId = desc ? `${labelId}-desc` : undefined
-  const named = Boolean(title || props['aria-label'])
+  const accessibleName = props['aria-label'] || title
+  const plotReady = innerRect.width > 0 && innerRect.height > 0
 
   useEffect(() => {
     const controller = resizeControllerRef.current
@@ -88,19 +89,24 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
       : children
 
   return (
-    <div ref={hostRef} className={chartCanvasHostClasses} data-chart-canvas-host="">
+    <div
+      ref={hostRef}
+      className={classNames(chartCanvasHostClasses, 'relative', responsive && 'h-full')}
+      data-chart-canvas-host="">
       <svg
         {...props}
         width={resolvedSize.width}
         height={resolvedSize.height}
         viewBox={`0 0 ${resolvedSize.width} ${resolvedSize.height}`}
         className={svgClasses}
-        role={named ? 'img' : undefined}
+        role="group"
+        aria-label={accessibleName}
         aria-labelledby={titleId}
-        aria-describedby={descId}>
+        aria-describedby={descId}
+        data-chart-plot={plotReady ? 'ready' : 'empty'}>
         {title ? <title id={titleId}>{title}</title> : null}
         {desc ? <desc id={descId}>{desc}</desc> : null}
-        <g transform={`translate(${innerRect.x}, ${innerRect.y})`}>{content}</g>
+        {plotReady ? <g transform={`translate(${innerRect.x}, ${innerRect.y})`}>{content}</g> : null}
       </svg>
     </div>
   )

@@ -39,7 +39,7 @@ export const GaugeChart = defineComponent({
     width: { type: Number, default: DEFAULT_GAUGE_WIDTH },
     height: { type: Number, default: DEFAULT_GAUGE_HEIGHT },
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: 24 },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     value: { type: Number, required: true },
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
@@ -55,10 +55,10 @@ export const GaugeChart = defineComponent({
     segments: {
       type: Array as PropType<Array<{ range: [number, number]; color: string }>>
     },
-    trackColor: { type: String, default: 'var(--tiger-border,#e5e7eb)' },
-    color: { type: String, default: 'var(--tiger-primary,#2563eb)' },
+    trackColor: { type: String, default: 'var(--tiger-border)' },
+    color: { type: String, default: 'var(--tiger-primary)' },
     gradient: { type: Boolean, default: false },
-    animated: { type: Boolean, default: true },
+    animated: { type: Boolean, default: false },
     title: { type: String },
     desc: { type: String },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
@@ -67,7 +67,9 @@ export const GaugeChart = defineComponent({
   },
   setup(props, { attrs }) {
     const config = useTigerConfig()
-    computed(() => getChartLabels(mergeTigerLocale(config.value.locale, props.locale), props.labels))
+    const labels = computed(() =>
+      getChartLabels(mergeTigerLocale(config.value.locale, props.locale), props.labels)
+    )
     const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
       () => props.width,
       () => props.height,
@@ -181,6 +183,7 @@ export const GaugeChart = defineComponent({
               responsive: props.responsive,
               title: props.title,
               desc: props.desc,
+              'aria-label': props.title ? undefined : labels.value.gaugeChartAriaLabel,
               onResolvedSizeChange
             },
             {
@@ -235,7 +238,7 @@ export const GaugeChart = defineComponent({
                     y1: tick.y1,
                     x2: tick.x2,
                     y2: tick.y2,
-                    stroke: 'var(--tiger-text-secondary,#6b7280)',
+                    stroke: 'var(--tiger-text-secondary)',
                     'stroke-width': 1
                   }),
                   h(
@@ -252,20 +255,19 @@ export const GaugeChart = defineComponent({
                     tick.label
                   )
                 ]),
-                h('path', { d: needlePath.value, fill: 'var(--tiger-text,#374151)' }),
+                h('path', { d: needlePath.value, fill: 'var(--tiger-text)' }),
                 h('circle', {
                   cx: geo.cx,
                   cy: geo.cy,
                   r: 5,
-                  fill: 'var(--tiger-text,#374151)'
+                  fill: 'var(--tiger-text)'
                 }),
                 h(
                   'text',
                   {
                     x: geo.valueText.x,
                     y: geo.valueText.y,
-                    class:
-                      'fill-[color:var(--tiger-text,#374151)] text-lg font-semibold tabular-nums',
+                    class: 'fill-[color:var(--tiger-text)] text-lg font-semibold tabular-nums',
                     'text-anchor': 'middle',
                     'dominant-baseline': 'middle'
                   },

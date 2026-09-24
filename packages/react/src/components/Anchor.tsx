@@ -28,6 +28,7 @@ import {
   replaceAnchorHash,
   resolveActiveAnchorHref,
   resolveAnchorScrollContainer,
+  resolveLinkAddress,
   resolveScrollRoot,
   scrollToAnchor,
   shouldHandleAnchorClick,
@@ -78,22 +79,25 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
   const register = anchorContext?.registerLink
   const unregister = anchorContext?.unregisterLink
 
+  const address = resolveLinkAddress({ href, target })
+  const safeHref = address.href
+
   useLayoutEffect(() => {
     const node = nodeRef.current
-    if (!href || !node || !register) return undefined
-    register(href, node)
+    if (!safeHref || !node || !register) return undefined
+    register(safeHref, node)
     return () => {
-      unregister?.(href, node)
+      unregister?.(safeHref, node)
     }
-  }, [href, register, unregister])
+  }, [safeHref, register, unregister])
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event)
-    if (!anchorContext) return
-    anchorContext.handleLinkClick(href, event, target)
+    if (!anchorContext || !safeHref) return
+    anchorContext.handleLinkClick(safeHref, event, address.target)
   }
 
-  const isActive = anchorContext?.activeLink === href
+  const isActive = anchorContext?.activeLink === safeHref
   const linkClasses = classNames(getAnchorLinkClasses(Boolean(isActive), className))
   const nested = title != null && children != null
 
@@ -101,10 +105,11 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
     <a
       {...props}
       ref={nodeRef}
-      href={href}
-      target={target}
+      href={safeHref}
+      target={safeHref ? address.target : undefined}
+      rel={safeHref ? address.rel : undefined}
       className={linkClasses}
-      data-anchor-href={href}
+      data-anchor-href={safeHref}
       aria-current={isActive ? 'location' : undefined}
       onClick={handleClick}>
       {nested ? title : (title ?? children)}

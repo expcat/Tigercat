@@ -1,5 +1,6 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useId, useMemo } from 'react'
 import type { SegmentedProps as CoreSegmentedProps, SegmentedOption } from '@expcat/tigercat-core'
+import { icon24ViewBox } from '@expcat/tigercat-core/icons/common'
 import {
   getSegmentedContainerClasses,
   getSegmentedContainerStyle,
@@ -8,10 +9,12 @@ import {
   getSegmentedOptionClasses,
   getSegmentedTrackClasses,
   getSegmentedKeyboardTarget,
+  getSegmentedRovingIndex,
+  getSegmentedLabels,
   classNames,
   getLocaleDirection,
   devWarn,
-  icon24ViewBox
+  mergeTigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import { useControlledState } from '../hooks/useControlledState'
@@ -42,7 +45,12 @@ export const Segmented = forwardRef<
   ref
 ) {
   const config = useTigerConfig()
+  const autoName = useId()
   const rtl = getLocaleDirection(config.locale) === 'rtl'
+  const groupLabels = useMemo(
+    () => getSegmentedLabels(mergeTigerLocale(config.locale)),
+    [config.locale]
+  )
   const [currentValue, setCurrentValue] = useControlledState<string | number | undefined>({
     value,
     defaultValue,
@@ -61,12 +69,11 @@ export const Segmented = forwardRef<
   }
 
   const selectedIndex = options.findIndex((opt) => opt.value === currentValue)
-  const firstEnabledIndex = options.findIndex((opt) => !opt.disabled)
-  const rovingIndex = selectedIndex >= 0 ? selectedIndex : firstEnabledIndex
   const enabledIdxs = options.reduce<number[]>((acc, opt, i) => {
-    if (!opt.disabled) acc.push(i)
+    if (!opt.disabled && !disabled) acc.push(i)
     return acc
   }, [])
+  const rovingIndex = getSegmentedRovingIndex(selectedIndex, enabledIdxs)
 
   function focusOption(container: HTMLElement | null, index: number) {
     if (!container) return
@@ -96,8 +103,9 @@ export const Segmented = forwardRef<
       className={classNames(getSegmentedContainerClasses(size, block), className)}
       style={{ ...style, ...getSegmentedContainerStyle(options.length) }}
       role="radiogroup"
+      aria-label={rest['aria-labelledby'] ? undefined : rest['aria-label'] || groupLabels.ariaLabel}
       aria-disabled={disabled || undefined}>
-      {name != null ? <input type="hidden" name={name} value={currentValue ?? ''} /> : null}
+      <input type="hidden" name={name || autoName} value={currentValue ?? ''} />
       <div className={getSegmentedTrackClasses()} aria-hidden="true">
         <div
           data-tiger-segmented-indicator="true"

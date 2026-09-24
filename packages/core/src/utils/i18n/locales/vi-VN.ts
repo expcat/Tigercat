@@ -14,6 +14,9 @@ export const viVN: TigerLocale = {
     cancelText: 'Hủy',
     closeText: 'Đóng',
     loadingText: 'Đang tải...',
+    loadingFinishedText: 'Đã tải xong',
+    loadingFailedText: 'Tải thất bại',
+    viewText: 'Xem',
     emptyText: 'Không có dữ liệu',
     noMoreText: 'Không còn dữ liệu',
     searchPlaceholder: 'Tìm kiếm',
@@ -47,7 +50,8 @@ export const viVN: TigerLocale = {
     ariaLabel: 'Mã QR',
     expiredText: 'Mã QR đã hết hạn',
     refreshText: 'Làm mới',
-    loadingText: 'Đang tải...'
+    loadingText: 'Đang tải...',
+    errorText: 'Không thể tạo mã QR'
   },
   marquee: {
     ariaLabel: 'Nội dung cuộn'
@@ -55,10 +59,25 @@ export const viVN: TigerLocale = {
   image: {
     previewAriaLabel: 'Xem trước {alt}',
     previewFallbackAlt: 'hình ảnh',
-    groupAriaLabel: 'Nhóm hình ảnh'
+    groupAriaLabel: 'Nhóm hình ảnh',
+    loadErrorText: 'Không tải được ảnh'
   },
   imageCompare: {
-    ariaLabel: 'So sánh hình ảnh'
+    ariaLabel: 'So sánh hình ảnh',
+    beforeAlt: 'Trước',
+    afterAlt: 'Sau',
+    valueText: 'Đã lộ {percent}% phía trước'
+  },
+  text: {
+    copyLabel: 'Sao chép',
+    copiedLabel: 'Đã sao chép',
+    copyFailedLabel: 'Sao chép thất bại',
+  },
+  watermark: {
+    imageErrorText: 'Không tải được ảnh watermark'
+  },
+  segmented: {
+    ariaLabel: 'Tùy chọn'
   },
   descriptions: {
     colon: ':'
@@ -67,6 +86,9 @@ export const viVN: TigerLocale = {
     avatarAlt: 'Ảnh đại diện',
     dragHandleAriaLabel: 'Sắp xếp lại'
   },
+  masonry: {
+    visualOrderText: 'Thứ tự hiển thị khác với thứ tự nguồn'
+  },
   scrollArea: {
     ariaLabel: 'Vùng cuộn'
   },
@@ -74,7 +96,8 @@ export const viVN: TigerLocale = {
     pageBreak: 'Ngắt trang'
   },
   timeline: {
-    pendingText: 'Đang tải...'
+    pendingText: 'Đang tải...',
+    pendingReplacedText: 'Đã cập nhật xong'
   },
   workflowTimeline: {
     pending: 'Đang chờ',
@@ -216,7 +239,11 @@ export const viVN: TigerLocale = {
     branchExpression: 'Biểu thức',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: 'Không dùng cho loại nút này',
+    publishText: 'Phát hành',
     publishBlocked: 'Không thể phát hành cho đến khi sửa các mục chặn'
+  },
+  workflowDetailShell: {
+    ariaLabel: 'Chi tiết quy trình'
   },
   progress: {
     ariaLabel: 'Tiến độ'
@@ -259,7 +286,9 @@ export const viVN: TigerLocale = {
     loadingText: 'Đang tải',
     expandText: 'Mở rộng',
     collapseText: 'Thu gọn',
-    selectAllText: 'Chọn tất cả',
+    selectAllText: 'Chọn tất cả trang này',
+    selectLoadedText: 'Chọn mọi hàng đã tải',
+    tableAriaLabel: 'Bảng dữ liệu',
     selectRowAriaLabel: 'Chọn hàng {row}',
     sortByText: 'Sắp xếp theo {column}',
     clearSortText: 'Bỏ sắp xếp',
@@ -275,9 +304,13 @@ export const viVN: TigerLocale = {
     allText: 'Tất cả',
     filterPlaceholder: 'Lọc...',
     exportCsvText: 'Xuất CSV',
-    exportExcelText: 'Xuất Excel',
     exportCsvAriaLabel: 'Xuất sang CSV',
-    exportExcelAriaLabel: 'Xuất sang Excel',
+    selectionCountText: 'Đã chọn {count}',
+    sortAnnouncementText: 'Đã sắp xếp theo {column}, {direction}',
+    sortAscendingText: 'tăng dần',
+    sortDescendingText: 'giảm dần',
+    sortNoneText: 'chưa sắp xếp',
+    dragRowAriaLabel: 'Kéo hàng {row}',
     expandRowAriaLabel: 'Mở rộng hàng',
     collapseRowAriaLabel: 'Thu gọn hàng',
     sortMenuAriaLabel: 'Sắp xếp',
@@ -325,14 +358,17 @@ export const viVN: TigerLocale = {
     nextText: 'Tiếp',
     finishText: 'Hoàn thành',
     closeAriaLabel: 'Đóng hướng dẫn',
-    dialogAriaLabel: 'Hướng dẫn'
+    dialogAriaLabel: 'Hướng dẫn',
+    loadErrorText: 'Không tải được hướng dẫn này.',
   },
   calendar: {
     previousMonth: 'Tháng trước',
     nextMonth: 'Tháng sau',
     previousYear: 'Năm trước',
     nextYear: 'Năm sau',
-    eventCountText: '{n} sự kiện'
+    eventCountText: '{n} sự kiện',
+    switchToYear: 'Chuyển sang xem năm',
+    switchToMonth: 'Chuyển sang xem tháng'
   },
   fullscreen: {
     enterAriaLabel: 'Vào toàn màn hình',
@@ -343,7 +379,8 @@ export const viVN: TigerLocale = {
     pathAriaLabel: 'Đường dẫn tệp',
     listboxAriaLabel: 'Tệp',
     searchAriaLabel: 'Tìm tệp',
-    emptyText: 'Thư mục trống'
+    emptyText: 'Thư mục trống',
+    resultCountText: '{count} mục'
   },
   imageViewer: {
     dialogAriaLabel: 'Trình xem ảnh',
@@ -377,6 +414,7 @@ export const viVN: TigerLocale = {
     resizeHandleS: 'dưới',
     resizeHandleSw: 'dưới-trái',
     resizeHandleW: 'trái',
+    cropSizeText: '{width} x {height}',
     loadingCropImageAriaLabel: 'Đang tải ảnh để cắt',
     loadErrorAriaLabel: 'Không tải được ảnh để cắt',
     fileTooLargeText: 'Kích thước tệp vượt quá {maxSize}',
@@ -394,10 +432,14 @@ export const viVN: TigerLocale = {
     ellipseToolText: 'Hình elip',
     polygonToolText: 'Đa giác',
     freehandToolText: 'Vẽ tự do',
-    deleteText: 'Xóa'
+    deleteText: 'Xóa',
+    annotationLoadFailedText: 'Không tải được hình ảnh.',
+    annotationRetryText: 'Thử lại',
+    annotationTooSmallText: 'Chú thích quá nhỏ.',
+    annotationPolygonIncompleteText: 'Đa giác cần ít nhất 3 điểm.'
   },
   status: {
-    tagCloseAriaLabel: 'Đóng thẻ',
+    tagCloseAriaLabel: 'Đóng {label}',
     badgeLabel: 'thông báo',
     badgeCountLabel: '{count} thông báo'
   },
@@ -410,6 +452,7 @@ export const viVN: TigerLocale = {
     unassignedSwimlaneText: 'Chưa gán',
     wipLimitText: 'Giới hạn WIP: {limit}',
     dragHintText: 'Kéo để di chuyển',
+    grabAnnouncementText: '{card}. Từ {from} đến {to}. Vị trí {position} trên {count}.',
     boardAriaLabel: 'Bảng nhiệm vụ'
   },
   chatWindow: {
@@ -424,7 +467,8 @@ export const viVN: TigerLocale = {
   code: {
     copyLabel: 'Sao chép',
     copiedLabel: 'Đã sao chép',
-    copyFailedLabel: 'Sao chép thất bại'
+    copyFailedLabel: 'Sao chép thất bại',
+    scrollLabel: 'Mã'
   },
   commentThread: {
     emptyText: 'Không có bình luận',
@@ -441,12 +485,15 @@ export const viVN: TigerLocale = {
     listAriaLabel: 'Danh sách bình luận',
     replySubmitText: 'Gửi trả lời',
     remainingRepliesText: 'Hiện {count} còn lại',
+    duplicateIdText: 'Id bình luận trùng {id}',
+    cycleText: 'Vòng bình luận tại {id}',
     maxDepthReachedText: 'Đã đến độ sâu trả lời tối đa'
   },
   activityFeed: {
     emptyText: 'Không có hoạt động',
     loadingText: 'Đang tải...',
     listAriaLabel: 'Hoạt động',
+    newItemText: 'Hoạt động mới: {title}',
     otherGroupTitle: 'Khác'
   },
   notificationCenter: {
@@ -460,6 +507,9 @@ export const viVN: TigerLocale = {
     markReadText: 'Đánh dấu đã đọc',
     markUnreadText: 'Đánh dấu chưa đọc',
     defaultGroupTitle: 'Mặc định',
+    filterAriaLabel: 'Trạng thái đọc',
+    markedReadText: 'Đã đánh dấu {count} là đã đọc',
+    newItemText: 'Thông báo mới: {title}',
     unreadCountText: '{count} chưa đọc'
   },
   select: {
@@ -470,7 +520,15 @@ export const viVN: TigerLocale = {
     clearAriaLabel: 'Xóa lựa chọn',
     createOptionLabel: 'Tạo "{label}"',
     moreCountText: '+{count} nữa',
-    loadingText: 'Đang tải...',
+    loadingText: 'Đang tải...'
+  },
+  cascader: {
+    levelLabel: 'Cấp {level}',
+    backText: 'Quay lại',
+    expandAriaLabel: 'Mở rộng',
+    collapseAriaLabel: 'Thu gọn'
+  },
+  treeSelect: {
     levelLabel: 'Cấp {level}',
     backText: 'Quay lại',
     expandAriaLabel: 'Mở rộng',
@@ -541,7 +599,22 @@ export const viVN: TigerLocale = {
     sunburstTooltip: '{label}: {value} ({percent} %)',
     orgChartAriaLabel: 'Sơ đồ tổ chức',
     ganttAriaLabel: 'Biểu đồ Gantt',
-    ganttTaskAriaLabel: '{label}, {start} đến {end}{progress}'
+    ganttTaskAriaLabel: '{label}, {start} đến {end}{progress}',
+    ganttTodayAriaLabel: 'Hôm nay',
+    ganttUnknownDate: 'ngày không xác định',
+    chartAriaLabel: 'Biểu đồ',
+    lineChartAriaLabel: 'Biểu đồ đường',
+    areaChartAriaLabel: 'Biểu đồ vùng',
+    barChartAriaLabel: 'Biểu đồ cột',
+    scatterChartAriaLabel: 'Biểu đồ phân tán',
+    pieChartAriaLabel: 'Biểu đồ tròn',
+    radarChartAriaLabel: 'Biểu đồ radar',
+    heatmapChartAriaLabel: 'Bản đồ nhiệt',
+    heatmapSummary: '{rows} hàng và {columns} cột',
+    funnelChartAriaLabel: 'Biểu đồ phễu',
+    sunburstChartAriaLabel: 'Biểu đồ sunburst',
+    treemapChartAriaLabel: 'Biểu đồ cây',
+    gaugeChartAriaLabel: 'Đồng hồ đo'
   },
   codeEditor: {
     editorAriaLabel: 'Trình soạn mã'
@@ -555,6 +628,8 @@ export const viVN: TigerLocale = {
     editModeLabel: 'Sửa',
     splitModeLabel: 'Chia',
     previewModeLabel: 'Xem trước',
+    showEditorText: 'Sửa',
+    showPreviewText: 'Xem trước',
     bold: 'Đậm',
     italic: 'Nghiêng',
     strikethrough: 'Gạch ngang',
@@ -664,7 +739,9 @@ export const viVN: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: 'Xóa {tag}',
-    clearAllLabel: 'Xóa tất cả thẻ'
+    clearAllLabel: 'Xóa tất cả thẻ',
+    duplicateText: 'Đã được thêm',
+    limitText: 'Đã đạt giới hạn thẻ'
   },
   input: {
     clearAriaLabel: 'Xóa nội dung',
@@ -680,12 +757,6 @@ export const viVN: TigerLocale = {
     ariaLabel: 'Thanh trượt',
     minAriaLabel: 'Giá trị tối thiểu',
     maxAriaLabel: 'Giá trị tối đa'
-  },
-  stepper: {
-    ariaLabel: 'Bộ đếm bước',
-    valueAriaLabel: 'Giá trị',
-    incrementAriaLabel: 'Tăng',
-    decrementAriaLabel: 'Giảm'
   },
   signature: {
     ariaLabel: 'Bảng chữ ký',

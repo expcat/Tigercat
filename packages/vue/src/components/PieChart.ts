@@ -29,7 +29,7 @@ import {
   type ChartPadding,
   type PieChartDatum,
   type PieChartProps as CorePieChartProps,
-  type DonutChartProps as CoreDonutChartProps,
+
   type TigerLocale,
   type TigerLocaleChart
 } from '@expcat/tigercat-core'
@@ -54,13 +54,13 @@ export const PieChart = defineComponent({
     width: { type: Number, default: 320 },
     height: { type: Number, default: 200 },
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: 24 },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: { type: Array as PropType<PieChartDatum[]>, required: true },
     innerRadius: { type: Number },
     innerRadiusRatio: { type: Number },
     outerRadius: { type: Number },
     startAngle: { type: Number, default: DEFAULT_PIE_START_ANGLE },
-    endAngle: { type: Number, default: Math.PI * 2 },
+    endAngle: { type: Number, default: undefined },
     padAngle: { type: Number, default: 0 },
     colors: { type: Array as PropType<string[]> },
     showLabels: { type: Boolean, default: false },
@@ -90,7 +90,7 @@ export const PieChart = defineComponent({
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
     borderWidth: { type: Number, default: 2 },
-    borderColor: { type: String, default: 'var(--tiger-surface,#ffffff)' },
+    borderColor: { type: String, default: 'var(--tiger-surface)' },
     hoverOffset: { type: Number, default: 8 },
     labelPosition: { type: String as PropType<'inside' | 'outside'>, default: 'inside' },
     shadow: { type: Boolean, default: false },
@@ -106,10 +106,7 @@ export const PieChart = defineComponent({
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const instance = getCurrentInstance()
     const interactive = computed(
-      () =>
-        props.hoverable ||
-        props.selectable ||
-        Boolean(instance?.vnode.props?.onSliceClick)
+      () => props.hoverable || props.selectable || Boolean(instance?.vnode.props?.onSliceClick)
     )
     const gradientPrefix = getStableChartGradientPrefix('pie', useId())
 
@@ -183,12 +180,16 @@ export const PieChart = defineComponent({
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
-        data: slices.value.map((slice) => slice.datum),
+        data: slices.value,
         palette: palette.value,
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
-        getLabel: (d, i) => (props.legendFormatter ? props.legendFormatter(d, i) : sliceName(d, i)),
-        getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
+        getIndex: (slice) => slice.index,
+        getLabel: (slice) =>
+          props.legendFormatter
+            ? props.legendFormatter(slice.datum, slice.index)
+            : sliceName(slice.datum, slice.index),
+        getColor: (slice) => slice.color
       })
     )
     const tooltipContent = computed(() =>
@@ -241,6 +242,7 @@ export const PieChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: resolvedDesc || undefined,
+          'aria-label': props.title ? undefined : labels.value.pieChartAriaLabel,
           className: props.animated ? DONUT_ENTRANCE_CLASS : undefined,
           onResolvedSizeChange
         },
@@ -342,7 +344,13 @@ export const PieChart = defineComponent({
                     const text = props.labelFormatter
                       ? props.labelFormatter(slice.value, slice.datum, slice.index)
                       : `${sliceName(slice.datum, slice.index)} ${slice.percent.toFixed(1)}%`
-                    return h('g', { key: `label-group-${slice.index}`, 'aria-hidden': 'true' }, [
+                    return h(
+                      'g',
+                      {
+                        key: `label-group-${slice.index}`,
+                        'aria-hidden': interactive.value ? 'true' : undefined
+                      },
+                      [
                       h('polyline', {
                         points: slice.outside?.points,
                         fill: 'none',
@@ -357,7 +365,7 @@ export const PieChart = defineComponent({
                           y: slice.outside?.y,
                           'text-anchor': slice.outside?.textAnchor,
                           'dominant-baseline': 'middle',
-                          class: 'fill-[color:var(--tiger-text,#1f2937)] text-xs'
+                          class: 'fill-[color:var(--tiger-text)] text-xs'
                         },
                         text
                       )
@@ -377,9 +385,10 @@ export const PieChart = defineComponent({
                         x: slice.labelX,
                         y: slice.labelY,
                         class: pieSliceLabelInsideClasses,
+                        fill: slice.labelFill,
                         'text-anchor': 'middle',
                         'dominant-baseline': 'middle',
-                        'aria-hidden': 'true'
+                        'aria-hidden': interactive.value ? 'true' : undefined
                       },
                       text
                     )
@@ -403,7 +412,7 @@ export const PieChart = defineComponent({
                               y: props.centerLabel !== undefined ? r.cy - 8 : r.cy,
                               'text-anchor': 'middle',
                               'dominant-baseline': 'middle',
-                              class: 'fill-[color:var(--tiger-text,#1f2937)] text-xl font-semibold'
+                              class: 'fill-[color:var(--tiger-text)] text-xl font-semibold'
                             },
                             `${props.centerValue}`
                           )
@@ -416,7 +425,7 @@ export const PieChart = defineComponent({
                               y: props.centerValue !== undefined ? r.cy + 12 : r.cy,
                               'text-anchor': 'middle',
                               'dominant-baseline': 'middle',
-                              class: 'fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs'
+                              class: 'fill-[color:var(--tiger-text-secondary)] text-xs'
                             },
                             props.centerLabel
                           )
@@ -480,8 +489,3 @@ export const PieChart = defineComponent({
 })
 
 export default PieChart
-
-export interface VueDonutChartProps extends CoreDonutChartProps {
-  data: PieChartDatum[]
-  padding?: ChartPadding
-}

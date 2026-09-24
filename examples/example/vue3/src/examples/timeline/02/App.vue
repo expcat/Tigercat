@@ -10,7 +10,7 @@ const items = [
 <template>
   <Timeline :items="items">
     <template #dot="{ item }">
-      <span class="block h-3 w-3 rounded-full bg-[var(--tiger-primary,#2563eb)]">
+      <span class="block h-3 w-3 rounded-full bg-[var(--tiger-primary)]">
         <span class="sr-only">{{ item.label }}</span>
       </span>
     </template>

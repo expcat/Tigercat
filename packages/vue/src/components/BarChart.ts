@@ -73,7 +73,7 @@ export const BarChart = defineComponent({
       type: [Number, Object] as PropType<ChartPadding>,
       default: () => ({ ...DEFAULT_CHART_PADDING })
     },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: {
       type: Array as PropType<BarChartDatum[]>,
       required: true
@@ -86,7 +86,7 @@ export const BarChart = defineComponent({
     },
     barColor: {
       type: String,
-      default: 'var(--tiger-primary,#2563eb)'
+      default: 'var(--tiger-primary)'
     },
     barRadius: {
       type: Number
@@ -281,7 +281,6 @@ export const BarChart = defineComponent({
       getData: (index) => props.data[index],
       onHover: (index, datum) => emit('bar-hover', index, datum),
       onClick: (index, datum) => {
-        props.onBarClick?.(index, datum as BarChartDatum)
         emit('bar-click', index, datum)
       }
     })
@@ -293,7 +292,17 @@ export const BarChart = defineComponent({
       () => props.responsive
     )
 
-    const xDomain = computed(() => props.data.map((item) => String(item.x)))
+    const xDomain = computed(() => {
+      const seen = new Set<string>()
+      const domain: string[] = []
+      for (const item of props.data) {
+        const key = String(item.x)
+        if (seen.has(key)) continue
+        seen.add(key)
+        domain.push(key)
+      }
+      return domain
+    })
     const yValues = computed(() =>
       props.data.map((item) => item.y).filter((value) => Number.isFinite(value))
     )

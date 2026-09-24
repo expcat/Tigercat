@@ -13,6 +13,7 @@ export interface VueFormItemControlContext {
   value: ComputedRef<unknown>
   onChange: (value: unknown) => void
   onBlur: () => void
+  setError: (message: string | null) => void
 }
 
 export const FORM_ITEM_CONTROL_INJECTION_KEY: InjectionKey<VueFormItemControlContext | null> =

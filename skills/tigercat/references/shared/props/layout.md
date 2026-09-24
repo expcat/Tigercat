@@ -11,19 +11,19 @@ description: Compact generated Tigercat Layout props reference
 
 ## AspectRatio
 
-`packages/core/src/types/aspect-ratio.ts` · `AspectRatioProps`
+`packages/core/src/types/aspect-ratio.ts` · `AspectRatioProps` · 3/4 props
 
 Note: 根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `overflow-hidden`。
 
-| Prop                | Type               | Default  | Notes                                                                   |
-| ------------------- | ------------------ | -------- | ----------------------------------------------------------------------- |
-| `ratio?`            | `AspectRatioValue` | `'16/9'` | Width-to-height ratio                                                   |
-| `className?`        | `string`           | `-`      | Additional CSS class name for the root element                          |
-| `contentClassName?` | `string`           | `-`      | Additional CSS class name for the absolutely positioned content wrapper |
+| Prop         | Type               | Default  | Notes                                                       |
+| ------------ | ------------------ | -------- | ----------------------------------------------------------- |
+| `ratio?`     | `AspectRatioValue` | `'16/9'` | Width-to-height ratio. `16/9` and `16:9` are both accepted. |
+| `fit?`       | `AspectRatioFit`   | `-`      | How replaced children fill the box. Omitted does not crop.  |
+| `className?` | `string`           | `-`      | Additional CSS class name for the root element              |
 
 ## Card
 
-`packages/core/src/types/card.ts` · `CardProps` · 4/16 props
+`packages/core/src/types/card.ts` · `CardProps` · 4/18 props
 
 Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。
 
@@ -110,14 +110,14 @@ Note: 未传 `height` 不写 inline height。预览/嵌套用 `as="div"`，避�
 
 ## Header
 
-`packages/core/src/types/layout.ts` · `HeaderProps` · 3/4 props
+`packages/core/src/types/layout.ts` · `HeaderProps` · 3/6 props
 
 Note: 未传 `height` 时默认 `h-16`，不写 inline height。`translucent` / `blur` 替换不透明底并 `sticky`，z 走 `OVERLAY_Z_INDEX.viewport`。
 
 | Prop         | Type            | Default     | Notes                                                                                      |
 | ------------ | --------------- | ----------- | ------------------------------------------------------------------------------------------ |
 | `variant?`   | `HeaderVariant` | `'default'` | Header visual style.                                                                       |
-| `height?`    | `string`        | `-`         | Header height. When omitted, default height is `h-16` via class so caller `style.height... |
+| `height?`    | `string`        | `-`         | Header height. When omitted, the stylesheet height is `4rem` for every surface so calle... |
 | `className?` | `string`        | `-`         | Additional CSS classes                                                                     |
 
 ## Layout
@@ -149,14 +149,14 @@ Note: 分页默认关（与 Table 默认开、`pageSize` 10 相反）。传入 `
 
 `packages/core/src/types/masonry.ts` · `MasonryProps` · 4/5 props
 
-Note: `columnClassName` 目前是 no-op（声明了但不打到列节点）。列数/缝用 `columns` / `gap`。
+Note: 默认 `layout="source"` 用 CSS 多列保持源顺序。`layout="shortest"` 按最短列定位，容器说明视觉顺序与源顺序不同。
 
-| Prop               | Type                     | Default | Notes                                                                            |
-| ------------------ | ------------------------ | ------- | -------------------------------------------------------------------------------- |
-| `columns?`         | `MasonryResponsiveValue` | `3`     | Column count. Pass a breakpoint map for responsive columns.                      |
-| `gap?`             | `MasonryResponsiveValue` | `16`    | Gap between columns and items in px. Pass a breakpoint map for a responsive gap. |
-| `columnClassName?` | `string`                 | `-`     | Additional CSS class name for every column element                               |
-| `itemClassName?`   | `string`                 | `-`     | Additional CSS class name for every item wrapper element                         |
+| Prop             | Type                     | Default    | Notes                                                                                     |
+| ---------------- | ------------------------ | ---------- | ----------------------------------------------------------------------------------------- |
+| `columns?`       | `MasonryResponsiveValue` | `3`        | Column count. Pass a breakpoint map for responsive columns.                               |
+| `gap?`           | `MasonryResponsiveValue` | `16`       | Gap between columns and items in px. Pass a breakpoint map for a responsive gap.          |
+| `layout?`        | `MasonryLayout`          | `'source'` | `source` (default) follows source order. `shortest` packs into the shortest column and... |
+| `itemClassName?` | `string`                 | `-`        | Additional CSS class name for every item wrapper element                                  |
 
 ## Resizable
 
@@ -199,7 +199,7 @@ Events/callback props: `onScroll?`.
 
 ## Sidebar
 
-`packages/core/src/types/layout.ts` · `SidebarProps` · 4/6 props
+`packages/core/src/types/layout.ts` · `SidebarProps` · 4/7 props
 
 Note: `collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开 Tab。边框是 `border-inline-end`。未传 `width` 时默认宽走 class。未传名时 landmark 走 locale。内层未传 `collapsed` 的 Menu 跟随侧栏。
 
@@ -245,6 +245,6 @@ Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值
 | Prop          | Type                   | Default | Notes                                                                                      |
 | ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `sizes?`      | `(number \| string)[]` | `-`     | Pane sizes in pixels or percentage / px strings (`'30%'`, `'200px'`). Numbers are pixel... |
-| `min?`        | `number`               | `0`     | Minimum size of any pane in pixels. When `min * paneCount + gutters` exceeds the contai... |
+| `min?`        | `number \| number[]`   | `0`     | Minimum pane size in pixels. A number applies to every pane. An array is per pane (miss... |
 | `gutterSize?` | `number`               | `4`     | Width of the gutter/divider in pixels                                                      |
 | `disabled?`   | `boolean`              | `false` | Whether the splitter is disabled                                                           |

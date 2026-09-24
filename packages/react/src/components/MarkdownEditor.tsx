@@ -1,4 +1,13 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState, forwardRef } from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  forwardRef
+} from 'react'
 import { useControlledState } from '../hooks/useControlledState'
 import {
   applyMarkdownToolbarAction,
@@ -6,6 +15,11 @@ import {
   createDefaultMarkdownToolbar,
   findMarkdownHotkeyMatch,
   getMarkdownBodyClasses,
+  resolveMarkdownPanes,
+  isMarkdownNarrowViewport,
+  subscribeMarkdownNarrow,
+  shouldCommitEditorValue,
+  syncEditorTextareaValue,
   getMarkdownContainerClasses,
   getMarkdownToolbarButtonClasses,
   isMarkdownToolbarSeparator,
@@ -96,6 +110,9 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
     const formItemControl = useFormItemControlContext()
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const pendingSelection = useRef<{ start: number; end: number } | null>(null)
+    const composingRef = useRef(false)
+    const narrow = useSyncExternalStore(subscribeMarkdownNarrow, isMarkdownNarrowViewport, () => false)
+    const [narrowPane, setNarrowPane] = useState<'edit' | 'preview'>('edit')
     const [allowTabExit, setAllowTabExit] = useState(false)
     const [formatToolbarIndex, setFormatToolbarIndex] = useState(0)
     const formBoundValue = formItemControl?.value
@@ -130,25 +147,32 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
     const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
     const effectiveId = id ?? formItemControl?.id
     const effectiveName = name ?? formItemControl?.name
-    const canEdit = currentMode === 'edit' || currentMode === 'split'
+    const panes = resolveMarkdownPanes(currentMode, narrow, narrowPane)
+    const canEdit = panes.edit
     const showFormattingToolbar = toolbar !== false && canEdit && !readOnly
-    const showTopbar = showFormattingToolbar || showModeSwitch
-    const showEditor = canEdit
-    const showPreview = currentMode === 'preview' || currentMode === 'split'
+    const showTopbar = showFormattingToolbar || showModeSwitch || (narrow && currentMode === 'split')
+    const showEditor = panes.edit
+    const showPreview = panes.preview
 
     useLayoutEffect(() => {
+      syncEditorTextareaValue(textareaRef.current, currentValue, composingRef.current)
       const pending = pendingSelection.current
-      if (!pending || !textareaRef.current) return
+      if (!pending || !textareaRef.current || composingRef.current) return
       pendingSelection.current = null
       textareaRef.current.selectionStart = pending.start
       textareaRef.current.selectionEnd = pending.end
       textareaRef.current.focus()
     })
 
-    const previewHtml = useMemo(
-      () => renderMarkdownToHtml(currentValue, renderer),
-      [currentValue, renderer]
+    const [previewHtml, setPreviewHtml] = useState(() =>
+      renderMarkdownToHtml(currentValue, renderer)
     )
+    useEffect(() => {
+      const handle = window.setTimeout(() => {
+        setPreviewHtml(renderMarkdownToHtml(currentValue, renderer))
+      }, 200)
+      return () => window.clearTimeout(handle)
+    }, [currentValue, renderer])
 
     const containerStyle = useMemo<React.CSSProperties>(() => {
       const parsedHeight = parseMarkdownHeight(height)
@@ -211,7 +235,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
         }
         if (event.key !== 'Tab') setAllowTabExit(false)
 
-        if (readOnly || effectiveDisabled) return
+        if (readOnly || effectiveDisabled || composingRef.current) return
         const match = findMarkdownHotkeyMatch(toolbarItems, event.nativeEvent)
         if (match) {
           event.preventDefault()
@@ -246,15 +270,17 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
       }
     }
 
+    const previewName = labels.previewAriaLabel?.trim() ?? ''
     const previewNode = (
       <div
         className={classNames(
           markdownEditorPreviewClasses,
-          currentMode === 'split' ? markdownEditorSplitDividerClasses : undefined,
+          currentMode === 'split' && !narrow ? markdownEditorSplitDividerClasses : undefined,
           !currentValue ? markdownEditorEmptyPreviewClasses : undefined
         )}
-        role="region"
-        aria-label={labels.previewAriaLabel}
+        tabIndex={0}
+        role={previewName ? 'region' : undefined}
+        aria-label={previewName || undefined}
         {...(currentValue ? { dangerouslySetInnerHTML: { __html: previewHtml } } : {})}>
         {currentValue ? null : placeholder}
       </div>
@@ -309,7 +335,13 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
                       onMouseDown={(event) => event.preventDefault()}
                       onClick={() => applyToolbarButton(item)}>
                       {item.icon ? (
-                        <span dangerouslySetInnerHTML={{ __html: item.icon }} />
+                        <svg
+                          viewBox={item.icon.viewBox ?? '0 0 24 24'}
+                          width="16"
+                          height="16"
+                          aria-hidden="true">
+                          <path d={item.icon.path} fill="currentColor" />
+                        </svg>
                       ) : (
                         item.label
                       )}
@@ -343,7 +375,24 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
           </div>
         )}
 
-        <div className={getMarkdownBodyClasses(currentMode)}>
+        {narrow && currentMode === 'split' ? (
+          <div className={markdownEditorToolbarGroupClasses}>
+            <button
+              type="button"
+              className={getMarkdownToolbarButtonClasses(narrowPane === 'edit')}
+              onClick={() => setNarrowPane('edit')}>
+              {labels.showEditorText}
+            </button>
+            <button
+              type="button"
+              className={getMarkdownToolbarButtonClasses(narrowPane === 'preview')}
+              onClick={() => setNarrowPane('preview')}>
+              {labels.showPreviewText}
+            </button>
+          </div>
+        ) : null}
+
+        <div className={getMarkdownBodyClasses(showEditor && showPreview)}>
           {showEditor && (
             <textarea
               ref={(node) => {
@@ -352,8 +401,19 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
                 else if (ref) ref.current = node
               }}
               className={markdownEditorTextareaClasses}
-              value={currentValue}
-              onChange={(event) => commitValue(event.target.value)}
+              defaultValue={currentValue}
+              onCompositionStart={() => {
+                composingRef.current = true
+              }}
+              onCompositionEnd={(event) => {
+                composingRef.current = false
+                commitValue(event.currentTarget.value)
+              }}
+              onChange={(event) => {
+                const native = event.nativeEvent as InputEvent
+                if (!shouldCommitEditorValue(composingRef.current || native.isComposing)) return
+                commitValue(event.target.value)
+              }}
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               onBlur={(event) => {

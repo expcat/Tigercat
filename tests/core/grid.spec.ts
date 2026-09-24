@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
-  getAlignClasses,
   getColMergedStyleVars,
   getColOrderStyleVars,
   getColStyleVars,
-  getJustifyClasses,
+  getRowAlignJustifyVars,
   getRowGutterStyleVars,
   hasGutter,
   resetDevWarnCache,
@@ -92,9 +91,13 @@ describe('grid col css variable helpers', () => {
       '--tiger-col-offset': '0',
       '--tiger-col-flex': '120px'
     })
+    resetDevWarnCache()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     expect(getColMergedStyleVars(undefined, undefined, undefined, '1_1_auto')).toEqual({
-      '--tiger-col-flex': '1 1 auto'
+      '--tiger-col-flex': '1_1_auto'
     })
+    expect(warn).toHaveBeenCalled()
+    warn.mockRestore()
   })
 
   it('creates order variables for numeric and responsive values', () => {
@@ -109,17 +112,16 @@ describe('grid col css variable helpers', () => {
 })
 
 describe('grid row alignment helpers', () => {
-  it('maps align and justify values to Tailwind classes', () => {
-    expect(getAlignClasses('top')).toBe('items-start')
-    expect(getAlignClasses('middle')).toBe('items-center')
-    expect(getAlignClasses('bottom')).toBe('items-end')
-    expect(getAlignClasses('stretch')).toBe('items-stretch')
-    expect(getJustifyClasses('start')).toBe('justify-start')
-    expect(getJustifyClasses('end')).toBe('justify-end')
-    expect(getJustifyClasses('center')).toBe('justify-center')
-    expect(getJustifyClasses('space-around')).toBe('justify-around')
-    expect(getJustifyClasses('space-between')).toBe('justify-between')
-    expect(getJustifyClasses('space-evenly')).toBe('justify-evenly')
+  it('maps align and justify onto row CSS variables', () => {
+    expect(getRowAlignJustifyVars('top', 'start')).toEqual({
+      '--tiger-row-align': 'flex-start',
+      '--tiger-row-justify': 'flex-start'
+    })
+    expect(getRowAlignJustifyVars('middle', 'center')['--tiger-row-align']).toBe('center')
+    expect(getRowAlignJustifyVars('bottom', 'end')['--tiger-row-align']).toBe('flex-end')
+    expect(getRowAlignJustifyVars('stretch', 'space-between')['--tiger-row-justify']).toBe(
+      'space-between'
+    )
   })
 })
 

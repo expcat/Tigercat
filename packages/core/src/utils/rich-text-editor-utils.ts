@@ -12,7 +12,7 @@ import type {
   ToolbarSeparator
 } from '../types/rich-text-editor'
 import type { TigerLocaleRichTextEditor } from '../types/locale'
-import { enUS } from './i18n/locales/en-US'
+
 
 // ─── Toolbar item helpers ─────────────────────────────────────────
 
@@ -22,6 +22,49 @@ export function isToolbarSeparator(item: ToolbarItem): item is ToolbarSeparator 
 }
 
 /** Extract only ToolbarButton items (for hotkey matching, etc.) */
+const MARKDOWN_ROUND_TRIP_ACTIONS = new Set([
+  'bold',
+  'italic',
+  'heading1',
+  'heading2',
+  'heading3',
+  'bulletList',
+  'orderedList',
+  'blockquote',
+  'codeBlock',
+  'link',
+  'image',
+  'horizontalRule',
+  'undo',
+  'redo',
+  'clear'
+])
+
+/** Drop formats that the active mode cannot serialize back onto the toolbar. */
+export function toolbarForRichTextMode(
+  items: ToolbarItem[],
+  mode: RichTextEditorMode
+): ToolbarItem[] {
+  if (mode === 'plain') return []
+  if (mode !== 'markdown') return items
+  const filtered = items.filter(
+    (item) => isToolbarSeparator(item) || MARKDOWN_ROUND_TRIP_ACTIONS.has(item.name)
+  )
+  const collapsed: ToolbarItem[] = []
+  for (const item of filtered) {
+    if (isToolbarSeparator(item)) {
+      if (collapsed.length === 0 || isToolbarSeparator(collapsed[collapsed.length - 1])) continue
+      collapsed.push(item)
+      continue
+    }
+    collapsed.push(item)
+  }
+  while (collapsed.length > 0 && isToolbarSeparator(collapsed[collapsed.length - 1])) {
+    collapsed.pop()
+  }
+  return collapsed
+}
+
 export function getToolbarButtons(items: ToolbarItem[]): ToolbarButton[] {
   return items.filter((item): item is ToolbarButton => !isToolbarSeparator(item))
 }
@@ -87,35 +130,35 @@ export function createDefaultRichTextToolbar(
 }
 
 export const defaultToolbar: ToolbarItem[] = createDefaultRichTextToolbar(
-  enUS.richTextEditor as Required<TigerLocaleRichTextEditor>
+  {} as Required<TigerLocaleRichTextEditor>
 )
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
 /** Container fill: optional `--tiger-rte-bg`, then registered `--tiger-surface`. */
 export const richTextContainerBase =
-  'flex flex-col border border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-rte-bg,var(--tiger-surface,#ffffff))]'
+  'flex flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-rte-bg)]'
 
-export const richTextContainerDisabled = 'opacity-50 cursor-not-allowed pointer-events-none'
+export const richTextContainerDisabled = 'opacity-50 cursor-not-allowed'
 
 /** Toolbar fill: optional `--tiger-rte-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const richTextToolbarClasses =
-  'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-rte-toolbar-bg,var(--tiger-surface-muted,#f9fafb))]'
+  'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-[var(--tiger-border)] bg-[var(--tiger-rte-toolbar-bg)]'
 
 export const richTextToolbarButtonBase =
-  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-outline-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--tiger-primary,#2563eb)]'
+  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary)] hover:bg-[var(--tiger-outline-bg-hover)] hover:text-[var(--tiger-text)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--tiger-primary)]'
 
 export const richTextToolbarButtonActive =
-  'bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)]'
+  'bg-[var(--tiger-primary)]/10 text-[var(--tiger-primary)]'
 
-export const richTextToolbarSeparatorClasses = 'w-px h-5 mx-1 bg-[var(--tiger-border,#d1d5db)]'
+export const richTextToolbarSeparatorClasses = 'w-px h-5 mx-1 bg-[var(--tiger-border)]'
 
 export const richTextEditorAreaBase =
-  'flex-1 p-4 outline-none text-[var(--tiger-text,#111827)] text-sm leading-relaxed overflow-y-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary,#2563eb)]'
+  'flex-1 p-4 outline-none text-[var(--tiger-text)] text-sm leading-relaxed overflow-y-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary)]'
 
 export const richTextEditorAreaReadOnly = 'cursor-default'
 
-export const richTextPlaceholderClasses = 'text-[var(--tiger-text-muted,#9ca3af)]'
+export const richTextPlaceholderClasses = 'text-[var(--tiger-text-secondary)]'
 
 // ─── Class generators ─────────────────────────────────────────────
 
@@ -368,13 +411,37 @@ export function isDangerousUrl(url: string): boolean {
 }
 
 /**
+ * Noise-stripped URL that is safe to write, or null when it must be dropped.
+ * Judgment and the written value use this same string.
+ */
+export const RICH_TEXT_PASTE_IMAGE_MAX_BYTES = 1_500_000
+
+const BITMAP_DATA_URL = /^data:image\/(png|jpeg|jpg|gif|webp);base64,([a-z0-9+/=]+)$/i
+
+/** Keep a pasted bitmap only when the decoded payload is under the size cap. */
+export function cappedBitmapDataUrl(url: string): string | null {
+  const compact = stripUrlNoise(url).replace(/\s+/g, '')
+  const match = BITMAP_DATA_URL.exec(compact)
+  if (!match) return null
+  const payload = match[2]
+  const bytes = Math.floor((payload.length * 3) / 4)
+  if (bytes <= 0 || bytes > RICH_TEXT_PASTE_IMAGE_MAX_BYTES) return null
+  const subtype = match[1].toLowerCase() === 'jpg' ? 'jpeg' : match[1].toLowerCase()
+  return `data:image/${subtype};base64,${payload}`
+}
+
+export function canonicalizeUrl(url: string): string | null {
+  const normalized = stripUrlNoise(url).replace(/\\+/g, '').trim()
+  if (!normalized || isDangerousUrl(normalized)) return null
+  return normalized
+}
+
+/**
  * Allow http(s), mailto, in-document hash, and same-origin relative paths.
  * Reject javascript/data/vbscript and protocol-relative `//` URLs.
  */
 export function isValidUrl(url: string): boolean {
-  const trimmed = url.trim()
-  if (!trimmed) return false
-  return !isDangerousUrl(trimmed)
+  return canonicalizeUrl(url) !== null
 }
 
 function findRawClosingTag(html: string, from: number, name: string): number {
@@ -443,8 +510,11 @@ function sanitizeClassValue(value: string): string | null {
 function serializeAllowedAttrs(tag: string, attrs: Array<[string, string]>): string {
   const allowed = ALLOWED_ATTRS_BY_TAG[tag]
   if (!allowed) return ''
+  let targetBlank = false
   let out = ''
-  let relForced = false
+  for (const [rawName, rawValue] of attrs) {
+    if (rawName === 'target' && rawValue.trim() === '_blank') targetBlank = true
+  }
   for (const [rawName, rawValue] of attrs) {
     if (rawName.startsWith('on')) continue
     if (!allowed.has(rawName)) continue
@@ -455,27 +525,26 @@ function serializeAllowedAttrs(tag: string, attrs: Array<[string, string]>): str
       continue
     }
     if (rawName === 'target') {
-      if (rawValue.trim() !== '_blank') continue
-      out += ' target="_blank"'
-      if (!relForced) {
-        out += ' rel="noreferrer noopener"'
-        relForced = true
-      }
+      if (!targetBlank || rawValue.trim() !== '_blank') continue
+      out += ' target="_blank" rel="noreferrer noopener"'
+      targetBlank = false
       continue
     }
     if (rawName === 'rel') {
-      if (relForced) continue
+      if (attrs.some(([name, value]) => name === 'target' && value.trim() === '_blank')) continue
       out += ` rel="${escapeHtml(rawValue)}"`
-      relForced = true
       continue
     }
     if (URL_ATTR_NAMES.has(rawName)) {
-      if (!isValidUrl(rawValue)) continue
-      out += ` ${rawName}="${escapeHtml(rawValue.trim())}"`
+      const canonical =
+        canonicalizeUrl(rawValue) ?? (tag === 'img' && rawName === 'src' ? cappedBitmapDataUrl(rawValue) : null)
+      if (!canonical) continue
+      out += ` ${rawName}="${escapeHtml(canonical)}"`
       continue
     }
     out += ` ${rawName}="${escapeHtml(rawValue)}"`
   }
+  if (targetBlank) out += ' target="_blank" rel="noreferrer noopener"'
   return out
 }
 
@@ -483,8 +552,7 @@ function serializeAllowedAttrs(tag: string, attrs: Array<[string, string]>): str
  * Whitelist HTML sanitizer used by RichTextEditor (paste / initial value)
  * and MarkdownEditor preview. Not a regex stripper: unknown tags unwrap,
  * forbidden tags drop, event names / javascript: / data: / style urls
- * never survive. Custom `engine` / `renderer` / toolbar `icon` HTML is
- * still TRUSTED and must be sanitised by the caller if untrusted.
+ * never survive. Toolbar icons are path data, not HTML.
  */
 export function sanitizeHtml(html: string): string {
   if (!html) return ''
@@ -617,9 +685,10 @@ function inlineMarkdownToHtml(value: string): string {
     .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_m, alt, src) =>
       isValidUrl(src) ? `<img src="${src}" alt="${alt}">` : _m
     )
-    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_m, text, href) =>
-      isValidUrl(href) ? `<a href="${href}">${text}</a>` : text
-    )
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_m, text, href) => {
+      const canonical = canonicalizeUrl(href)
+      return canonical ? `<a href="${escapeHtml(canonical)}">${text}</a>` : text
+    })
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')

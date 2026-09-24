@@ -10,7 +10,7 @@ const paused = ref(false)
 <template>
   <div class="flex flex-col gap-3">
     <Button @click="paused = !paused">{{ paused ? 'Play' : 'Pause' }}</Button>
-    <Marquee direction="right" :duration="18000" :paused="paused" aria-label="Release ticker">
+    <Marquee direction="end" :duration="18000" :paused="paused" aria-label="Release ticker">
       <Tag>News</Tag>
       <Tag variant="primary">Release</Tag>
       <Button>Docs</Button>

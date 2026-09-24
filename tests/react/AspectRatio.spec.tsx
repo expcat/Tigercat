@@ -36,8 +36,8 @@ describe('AspectRatio', () => {
       const { container } = render(<AspectRatio />)
       expect(getRoot(container).className).toContain('relative')
       expect(getRoot(container).className).toContain('w-full')
-      expect(getContent(container).className).toContain('absolute')
-      expect(getContent(container).className).toContain('inset-0')
+      expect(getContent(container).className).toContain('h-full')
+      expect(getContent(container).className).toContain('w-full')
     })
 
     it('applies className to the root and contentClassName to the wrapper', () => {
@@ -112,7 +112,7 @@ describe('AspectRatio', () => {
   })
 
   describe('clipping', () => {
-    it('clips the ratio box and fills a replaced image', () => {
+    it('leaves overflow visible and does not crop a replaced image', () => {
       const { container } = render(
         <div style={{ width: 320 }}>
           <AspectRatio className="rounded-lg">
@@ -122,10 +122,8 @@ describe('AspectRatio', () => {
       )
       const root = getRoot(container)
       const img = getContent(container).querySelector('img') as HTMLImageElement
-      expect(getComputedStyle(root).overflow).toBe('hidden')
-      expect(getComputedStyle(img).objectFit).toBe('cover')
-      expect(getComputedStyle(img).width).toBe('100%')
-      expect(getComputedStyle(img).height).toBe('100%')
+      expect(root.className).toContain('overflow-visible')
+      expect(img).toBeTruthy()
       const box = root.getBoundingClientRect()
       if (box.width > 0 && box.height > 0) {
         expect(box.height).toBeCloseTo(box.width * (9 / 16), 0)

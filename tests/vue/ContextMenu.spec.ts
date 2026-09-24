@@ -41,18 +41,19 @@ function getMenu() {
 }
 
 describe('ContextMenu', () => {
-  it('renders the trigger surface and menu content', () => {
+  it('renders the trigger surface and menu content', async () => {
     renderMenu()
 
     expect(screen.getByText('Surface')).toBeInTheDocument()
+    expect(screen.queryByText('Copy')).not.toBeInTheDocument()
+    await openMenu()
     expect(screen.getByText('Copy')).toBeInTheDocument()
     expect(screen.getByText('Delete')).toBeInTheDocument()
   })
 
-  it('is hidden by default', () => {
+  it('is absent until opened', () => {
     renderMenu()
-    const wrapper = document.querySelector('[data-tiger-context-menu]')
-    expect(wrapper).toHaveAttribute('hidden')
+    expect(document.querySelector('[data-tiger-context-menu]')).toBeNull()
   })
 
   it('opens on contextmenu, prevents the browser menu, and records data-state', async () => {
@@ -73,35 +74,34 @@ describe('ContextMenu', () => {
 
     expect(event.defaultPrevented).toBe(true)
     expect(trigger).toHaveAttribute('data-state', 'open')
-    expect(getMenu()).not.toHaveAttribute('hidden')
+    expect(getMenu()).toBeTruthy()
   })
 
-  it('positions the virtual reference at the cursor', async () => {
+  it('opens from a virtual reference instead of a point node', async () => {
     renderMenu()
     await openMenu(120, 60)
-    const point = document.querySelector('[data-tiger-context-menu-point]') as HTMLElement
-    expect(point.style.left).toBe('120px')
-    expect(point.style.top).toBe('60px')
+    expect(document.querySelector('[data-tiger-context-menu-point]')).toBeNull()
+    expect(getMenu()).toBeTruthy()
   })
 
   it('closes on item click, outside click, and Escape', async () => {
     renderMenu()
 
     await openMenu()
-    expect(getMenu()).not.toHaveAttribute('hidden')
+    expect(getMenu()).toBeTruthy()
     await fireEvent.click(screen.getByText('Copy'))
-    expect(getMenu()).toHaveAttribute('hidden')
+    expect(getMenu()).toBeNull()
 
     await openMenu()
     await fireEvent.click(screen.getByText('Disabled'))
-    expect(getMenu()).not.toHaveAttribute('hidden')
+    expect(getMenu()).toBeTruthy()
 
     await clickOutsideOverlay()
-    expect(getMenu()).toHaveAttribute('hidden')
+    expect(getMenu()).toBeNull()
 
     await openMenu()
     await fireEvent.keyDown(document, { key: 'Escape' })
-    expect(getMenu()).toHaveAttribute('hidden')
+    expect(getMenu()).toBeNull()
   })
 
   it('does not open when disabled and leaves the native menu intact', async () => {
@@ -110,12 +110,12 @@ describe('ContextMenu', () => {
     const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true })
     trigger.dispatchEvent(event)
     expect(event.defaultPrevented).toBe(false)
-    expect(document.querySelector('[data-tiger-context-menu]')).toHaveAttribute('hidden')
+    expect(document.querySelector('[data-tiger-context-menu]')).toBeNull()
   })
 
   it('renders open when defaultOpen is true', () => {
     renderMenu({ defaultOpen: true })
-    expect(document.querySelector('[data-tiger-context-menu]')).not.toHaveAttribute('hidden')
+    expect(document.querySelector('[data-tiger-context-menu]')).toBeTruthy()
   })
 
   it('emits update:open and open-change', async () => {
@@ -129,22 +129,22 @@ describe('ContextMenu', () => {
     renderMenu({ closeOnClick: false })
     await openMenu()
     await fireEvent.click(screen.getByText('Copy'))
-    expect(getMenu()).not.toHaveAttribute('hidden')
+    expect(getMenu()).toBeTruthy()
   })
 
   describe('portal', () => {
     it('renders the menu into document.body by default', () => {
       const { container } = renderMenu({ defaultOpen: true })
       const wrapper = document.querySelector('[data-tiger-context-menu]')
-      expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(document.body)
-      expect(container.querySelector('[data-tiger-context-menu]')).toBeNull()
+      expect(wrapper).toBeTruthy()
+      expect(document.body.contains(wrapper)).toBe(true)
+      expect(container.contains(wrapper)).toBe(false)
     })
 
     it('renders the menu in place when portal is false', () => {
       const { container } = renderMenu({ defaultOpen: true, portal: false })
       const wrapper = container.querySelector('.tiger-context-menu [data-tiger-context-menu]')
       expect(wrapper).toBeInTheDocument()
-      expect(wrapper).not.toHaveAttribute('hidden')
     })
   })
 
@@ -154,7 +154,7 @@ describe('ContextMenu', () => {
       const trigger = screen.getByText('Surface').closest('[data-tiger-context-menu-trigger]')!
       await fireEvent.keyDown(trigger, { key: 'F10', shiftKey: true })
       const wrapper = document.querySelector('[data-tiger-context-menu]')
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(wrapper).toBeTruthy()
 
       screen.getByRole('menuitem', { name: 'Copy' }).focus()
       await fireEvent.keyDown(wrapper!, { key: 'ArrowDown' })

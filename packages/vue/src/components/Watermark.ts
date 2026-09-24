@@ -1,4 +1,5 @@
 import { defineComponent, computed, h, onMounted, onBeforeUnmount, ref, watch, PropType } from 'vue'
+import { useTigerConfig } from './ConfigProvider'
 import {
   classNames,
   coerceClassValue,
@@ -7,7 +8,11 @@ import {
   watermarkWrapperClasses,
   resolveWatermarkFont,
   createWatermarkRenderController,
+  getWatermarkLabels,
   getWatermarkOverlayStyle,
+  mergeTigerLocale,
+  paintWatermark,
+  watermarkOverlayClasses,
   type WatermarkRenderController,
   type WatermarkFont
 } from '@expcat/tigercat-core'
@@ -60,7 +65,8 @@ export const Watermark = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const base64 = ref<string | undefined>()
-    const overlayKey = ref(0)
+    const imageFailed = ref(false)
+    const config = useTigerConfig()
     const wrapperRef = ref<HTMLElement | null>(null)
     let renderController: WatermarkRenderController | undefined
 
@@ -78,11 +84,13 @@ export const Watermark = defineComponent({
           rotate: props.rotate,
           font: resolveWatermarkFont(props.font)
         }),
+        render: async (options) => {
+          const painted = await paintWatermark(options)
+          imageFailed.value = painted.imageFailed
+          return painted.url
+        },
         onRender: (base64Url) => {
           base64.value = base64Url
-        },
-        onTamper: () => {
-          overlayKey.value += 1
         }
       })
       renderController.observe(wrapperRef.value)
@@ -143,11 +151,18 @@ export const Watermark = defineComponent({
         [
           slots.default?.(),
           h('div', {
-            key: overlayKey.value,
             'data-watermark': 'true',
+            class: watermarkOverlayClasses,
             'aria-hidden': 'true',
             style: overlayStyle.value
-          })
+          }),
+          imageFailed.value
+            ? h(
+                'p',
+                { class: 'text-sm text-[var(--tiger-text-secondary)]' },
+                getWatermarkLabels(mergeTigerLocale(config.value.locale)).imageErrorText
+              )
+            : null
         ]
       )
     }

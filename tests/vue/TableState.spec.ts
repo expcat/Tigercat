@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { effectScope, nextTick, reactive } from 'vue'
 import { useTableState } from '../../packages/vue/src/components/Table/state'
 import type { TableEmitFn, TableInternalProps } from '../../packages/vue/src/components/Table/types'
+import { tableRowKeyId } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const columns = [
@@ -55,7 +56,7 @@ describe('Vue useTableState', () => {
 
     expect(context.processedData.value.map((row) => row.name)).toEqual(['Bob', 'Carol'])
     expect(context.paginatedRowKeys.value).toEqual([3, 1])
-    expect([...(context.groupedData.value?.keys() ?? [])]).toEqual(['enabled'])
+    expect(context.groupBlocks.value?.map((block) => block.key)).toEqual(['enabled'])
     expect(context.totalColumnCount.value).toBe(5)
     expect(context.paginationInfo.value?.totalPages).toBe(1)
     scope.stop()
@@ -100,8 +101,8 @@ describe('Vue useTableState', () => {
     })
 
     expect(context.currentPage.value).toBe(2)
-    expect(context.selectedRowKeySet.value.has(1)).toBe(true)
-    expect(context.expandedRowKeySet.value.has(3)).toBe(true)
+    expect(context.selectedRowKeySet.value.has(tableRowKeyId(1))).toBe(true)
+    expect(context.expandedRowKeySet.value.has(tableRowKeyId(3))).toBe(true)
 
     props.sort = { key: 'name', direction: 'asc' }
     props.filters = { status: 'disabled' }
@@ -111,8 +112,8 @@ describe('Vue useTableState', () => {
     await nextTick()
 
     expect(context.processedData.value.map((row) => row.name)).toEqual(['Alice', 'Dora'])
-    expect(context.selectedRowKeySet.value.has(4)).toBe(true)
-    expect(context.expandedRowKeySet.value.has(4)).toBe(true)
+    expect(context.selectedRowKeySet.value.has(tableRowKeyId(4))).toBe(true)
+    expect(context.expandedRowKeySet.value.has(tableRowKeyId(4))).toBe(true)
     scope.stop()
   })
 
@@ -179,7 +180,7 @@ describe('Vue useTableState', () => {
     expect(context.editingValue.value).toBe('')
     context.editingValue.value = 'Ada'
     context.commitEdit()
-    expect(emit).toHaveBeenCalledWith('cell-change', 0, 'name', 'Ada')
+    expect(emit).toHaveBeenCalledWith('cell-change', 0, 'name', 'Ada', expect.any(Array))
     expect(context.editingCell.value).toBeNull()
 
     context.startEditing(0, 'name', 'Grace')
@@ -191,7 +192,7 @@ describe('Vue useTableState', () => {
   it('handles column lock, drag ordering, and advanced filters', () => {
     const { context, emit, scope } = createState({
       columns: [
-        { key: 'name', title: 'Name', fixed: 'left' },
+        { key: 'name', title: 'Name', fixed: 'start' },
         { key: 'age', title: 'Age' },
         { key: 'status', title: 'Status' }
       ],
@@ -208,7 +209,7 @@ describe('Vue useTableState', () => {
       'name',
       'status'
     ])
-    expect(context.displayColumns.value[0].fixed).toBe('left')
+    expect(context.displayColumns.value[0].fixed).toBe('start')
 
     context.handleDrop('age')
     expect(emit.mock.calls.some(([event]) => event === 'column-order-change')).toBe(false)
@@ -319,8 +320,8 @@ describe('Vue useTableState', () => {
     it('derives expanded row state used by disclosure controls', () => {
       const { context, scope } = createState({ expandable: { defaultExpandedRowKeys: [1] } })
 
-      expect(context.expandedRowKeySet.value.has(1)).toBe(true)
-      expect(context.expandedRowKeySet.value.has(2)).toBe(false)
+      expect(context.expandedRowKeySet.value.has(tableRowKeyId(1))).toBe(true)
+      expect(context.expandedRowKeySet.value.has(tableRowKeyId(2))).toBe(false)
       scope.stop()
     })
   })

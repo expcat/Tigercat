@@ -5,6 +5,7 @@ import {
   getNumberExtent,
   getStableChartGradientPrefix,
   getScatterHoverShadow,
+  chartSeriesColorStyle,
   scatterPointTransitionClasses,
   SCATTER_ENTRANCE_CLASS,
   layoutScatterPoints,
@@ -80,12 +81,12 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   width = 320,
   height = 200,
   padding = DEFAULT_CHART_PADDING,
-  responsive = false,
+  responsive = true,
   data,
   xScale,
   yScale,
   pointSize = 6,
-  pointColor = 'var(--tiger-primary,#2563eb)',
+  pointColor = 'var(--tiger-primary)',
   pointOpacity,
   pointStyle = 'circle',
   gradient = false,
@@ -338,7 +339,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       )}
       <ChartSeries data={data} type="scatter">
         {points.map((point, visualIndex) => {
-          const filterStyle = point.isHovered ? getScatterHoverShadow(point.color) : undefined
+          const filterStyle = point.isHovered ? getScatterHoverShadow() : undefined
           const animDelay =
             animated && mounted
               ? `${Math.min(visualIndex * SCATTER_ENTRANCE_STAGGER_MS, SCATTER_ENTRANCE_STAGGER_MAX_MS)}ms`
@@ -355,6 +356,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
               interactive && 'cursor-pointer'
             ),
             style: {
+              ...chartSeriesColorStyle(point.color),
               ...(filterStyle ? { filter: filterStyle } : {}),
               ...(animDelay ? { animationDelay: animDelay } : {})
             } as React.CSSProperties,

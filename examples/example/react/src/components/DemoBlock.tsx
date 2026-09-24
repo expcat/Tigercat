@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { CodeEditor } from '@expcat/tigercat-react/CodeEditor'
-import { copyTextToClipboard, ThemeManager } from '@expcat/tigercat-core'
+import { copyTextToClipboard, readTigerDocumentTheme } from '@expcat/tigercat-core'
 import { collectTigerCssVars } from '@demo-shared/themes'
 import runtimeUrlsValue from 'virtual:tigercat-playground-runtime'
 import type {
@@ -117,7 +117,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
     const observer = new MutationObserver(() => setThemeVersion((value) => value + 1))
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class', 'data-tiger-style', 'style']
+      attributeFilter: ['class', 'data-tiger-theme', 'data-tiger-color-scheme', 'style']
     })
     return () => observer.disconnect()
   }, [])
@@ -143,8 +143,8 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
           stylesheetUrl: new URL(stylesheetUrl, window.location.origin).href,
           channelId,
           lang,
-          theme: ThemeManager.getCurrentTheme(),
-          colorScheme: ThemeManager.getResolvedColorScheme(),
+          theme: readTigerDocumentTheme().theme,
+          colorScheme: readTigerDocumentTheme().colorScheme,
           cssVars: collectTigerCssVars(document.documentElement),
           modules: result.modules,
           enableTailwindJit: isDirty

@@ -44,7 +44,7 @@ describe('Layout Sections', () => {
       }
     })
     const shell = screen.getByTestId('shell')
-    expect(getComputedStyle(shell).flexDirection).toBe('row')
+    expect(shell.className).toContain('tiger-flex-row')
     expect(container.querySelector('aside')).toBeTruthy()
     expect(container.querySelector('.tiger-content')).toBeTruthy()
   })
@@ -67,7 +67,7 @@ describe('Layout Sections', () => {
     expect(outer.className).toContain('tiger-layout-full')
     expect(inner.className).toContain('tiger-layout-nested')
     expect(inner.className).not.toContain('tiger-layout-full')
-    expect(getComputedStyle(inner).flexDirection).toBe('row')
+    expect(inner.className).toContain('tiger-flex-row')
   })
 
   it('lets caller style.height win when Header height is omitted', () => {
@@ -94,16 +94,13 @@ describe('Layout Sections', () => {
     const { container } = render(Header, { slots: { default: () => 'Header' } })
     const header = container.querySelector('header') as HTMLElement
     expect(header.className).toContain('tiger-header-default')
-    const defaultBg = getComputedStyle(header).backgroundColor
-
     const glass = render(Header, {
       props: { variant: 'translucent' },
       slots: { default: () => 'Header' }
     })
     const glassHeader = glass.container.querySelector('header') as HTMLElement
     expect(glassHeader.className).toContain('tiger-header-translucent')
-    expect(getComputedStyle(glassHeader).position).toBe('sticky')
-    expect(getComputedStyle(glassHeader).backgroundColor).not.toBe(defaultBg)
+    expect(glassHeader.className).not.toContain('tiger-header-sticky')
   })
 
   it('Sidebar collapsed 0-width is inert and out of tab order', async () => {

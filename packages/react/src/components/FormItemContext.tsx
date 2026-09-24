@@ -13,6 +13,7 @@ export interface FormItemControlContextValue {
   value?: unknown
   onChange?: (value: unknown) => void
   onBlur?: () => void
+  setError?: (message: string | null) => void
 }
 
 const FormItemControlContext = createContext<FormItemControlContextValue | null>(null)

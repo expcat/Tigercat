@@ -11,7 +11,6 @@ import {
   getEmptyIllustration,
   resolveEmptyImageMode,
   mergeTigerLocale,
-  devWarn,
   type TigerLocale,
   type EmptyPreset
 } from '@expcat/tigercat-core'
@@ -71,13 +70,6 @@ export const Empty = defineComponent({
         preset: props.preset
       })
       const illustration = imageMode === 'builtin' ? getEmptyIllustration(props.preset) : null
-
-      if (props.showImage === false && hasCustomImage) {
-        devWarn(
-          'Empty.showImage.custom',
-          'Empty: the image slot still renders when `showImage` is false. Omit the slot to hide the illustration.'
-        )
-      }
 
       const children = []
 

@@ -3,7 +3,8 @@ import {
   classNames,
   copyTextToClipboard,
   createCopyStatusReset,
-  getCodeLabels,
+  getTextLabels,
+  resolveCopyableTextTag,
   getIconDefinition,
   getTextClasses,
   isTextCopyable,
@@ -94,7 +95,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const labels = useMemo(() => getCodeLabels(mergedLocale), [mergedLocale])
+  const labels = useMemo(() => getTextLabels(mergedLocale), [mergedLocale])
   const idleLabel = resolveLocaleText(labels.copyLabel, copyOptions?.tooltip)
   const [copyStatus, setCopyStatus] = useState<CodeCopyButtonStatus>('idle')
   const resetRef = useRef<ReturnType<typeof createCopyStatusReset> | null>(null)
@@ -133,7 +134,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
   }
 
   return React.createElement(
-    resolvedTag,
+    resolveCopyableTextTag(tag),
     { ...props, ref, className: classNames(textCopyableRootClasses, className) },
     <span
       ref={bodyRef}

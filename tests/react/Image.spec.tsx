@@ -27,7 +27,7 @@ describe('Image', () => {
   it('uses a real preview button, empty img alt, and locale name by default', () => {
     render(
       <ConfigProvider locale={enUS}>
-        <Image src="/test.jpg" alt="Harbor" />
+        <Image src="/test.jpg" alt="Harbor" preview />
       </ConfigProvider>
     )
 
@@ -39,14 +39,14 @@ describe('Image', () => {
   it('names an untitled preview from locale, including zh-CN', () => {
     const { rerender } = render(
       <ConfigProvider locale={enUS}>
-        <Image src="/test.jpg" />
+        <Image src="/test.jpg" preview />
       </ConfigProvider>
     )
     expect(screen.getByRole('button', { name: 'Preview image' })).toBeInTheDocument()
 
     rerender(
       <ConfigProvider locale={zhCN}>
-        <Image src="/test.jpg" />
+        <Image src="/test.jpg" preview />
       </ConfigProvider>
     )
     expect(screen.getByRole('button', { name: '预览 图片' })).toBeInTheDocument()
@@ -162,7 +162,7 @@ describe('Image', () => {
 
   it('calls onPreviewOpenChange when preview opens', () => {
     const onPreviewOpenChange = vi.fn()
-    render(<Image src="/test.jpg" onPreviewOpenChange={onPreviewOpenChange} />)
+    render(<Image src="/test.jpg" preview onPreviewOpenChange={onPreviewOpenChange} />)
 
     fireEvent.click(screen.getByRole('button'))
     expect(onPreviewOpenChange).toHaveBeenCalledWith(true)
@@ -173,6 +173,7 @@ describe('Image', () => {
     render(
       <Image
         src="/test.jpg"
+        preview
         onClick={(event) => event.preventDefault()}
         onPreviewOpenChange={onPreviewOpenChange}
       />
@@ -184,7 +185,7 @@ describe('Image', () => {
 
   it('calls onPreviewOpenChange when standalone preview closes', () => {
     const onPreviewOpenChange = vi.fn()
-    render(<Image src="/test.jpg" onPreviewOpenChange={onPreviewOpenChange} />)
+    render(<Image src="/test.jpg" preview onPreviewOpenChange={onPreviewOpenChange} />)
 
     fireEvent.click(screen.getByRole('button'))
     fireEvent.click(document.querySelector('[aria-label="Close preview"]') as HTMLElement)
@@ -215,7 +216,7 @@ describe('Image', () => {
   it('opens a hover overlay on focus as well as pointer enter', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     try {
-      render(<Image src="/hover.jpg" alt="Hover" previewTrigger="hover" />)
+      render(<Image src="/hover.jpg" alt="Hover" preview zoomOnHover />)
       const button = screen.getByRole('button')
 
       fireEvent.focus(button)
@@ -234,7 +235,7 @@ describe('Image', () => {
 
   it('uses the successful fallback url for hover and click preview', async () => {
     render(
-      <Image src="/broken.jpg" fallbackSrc="/fallback.jpg" alt="Harbor" previewTrigger="hover" />
+      <Image src="/broken.jpg" fallbackSrc="/fallback.jpg" alt="Harbor" preview zoomOnHover />
     )
     const button = screen.getByRole('button')
     fireEvent.error(button.querySelector('img') as Element)
@@ -258,7 +259,7 @@ describe('Image', () => {
   it('passes accessibility checks for an untitled default preview', async () => {
     const { container } = render(
       <ConfigProvider locale={zhCN}>
-        <Image src="/test.jpg" />
+        <Image src="/test.jpg" preview />
       </ConfigProvider>
     )
     await expectNoA11yViolationsIsolated(container)
@@ -297,14 +298,7 @@ describe('Image lazy loading', () => {
       />
     )
 
-    await waitFor(() => expect(MockIntersectionObserver.instances.length).toBeGreaterThan(0))
-    act(() => {
-      MockIntersectionObserver.instances[0]?.trigger({
-        isIntersecting: true,
-        intersectionRatio: 1
-      })
-    })
-    await waitFor(() => expect(container.querySelector('img')).toBeTruthy())
+    expect(container.querySelector('img')).toHaveAttribute('loading', 'lazy')
 
     fireEvent.error(container.querySelector('img') as Element)
     expect(screen.getByTestId('err')).toBeInTheDocument()

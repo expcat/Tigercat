@@ -24,6 +24,7 @@ import {
   layoutRadar,
   findNearestPointIndex,
   polarToCartesian,
+  createChartFrameCoalescer,
   DEFAULT_POLAR_CHART_PADDING,
   type ChartGridLineStyle,
   type ChartLegendPosition,
@@ -60,13 +61,14 @@ export const RadarChart = defineComponent({
       type: [Number, Object] as PropType<ChartPadding>,
       default: DEFAULT_POLAR_CHART_PADDING
     },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: { type: Array as PropType<RadarChartDatum[]> },
     series: { type: Array as PropType<RadarChartSeries[]> },
     indicators: { type: Array as PropType<string[]> },
     maxValue: { type: Number },
     startAngle: { type: Number, default: -Math.PI / 2 },
     levels: { type: Number, default: 5 },
+    missing: { type: String as PropType<'center' | 'gap'>, default: 'center' },
     showLevelLabels: { type: Boolean, default: false },
     showGrid: { type: Boolean, default: true },
     showAxis: { type: Boolean, default: true },
@@ -121,7 +123,7 @@ export const RadarChart = defineComponent({
     splitAreaOpacity: { type: Number, default: 0.06 },
     splitAreaColors: { type: Array as PropType<string[]> },
     pointBorderWidth: { type: Number, default: 2 },
-    pointBorderColor: { type: String, default: 'var(--tiger-surface,#ffffff)' },
+    pointBorderColor: { type: String, default: 'var(--tiger-surface)' },
     pointHoverSize: { type: Number },
     labelAutoAlign: { type: Boolean, default: true },
     title: { type: String },
@@ -183,7 +185,6 @@ export const RadarChart = defineComponent({
       onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       onClick: (index, item) => {
         if (item) {
-          props.onSeriesClick?.(index, item)
           emit('series-click', index, item)
         }
       }
@@ -195,6 +196,16 @@ export const RadarChart = defineComponent({
       () => props.padding,
       () => props.responsive
     )
+    let onAreaFrame: (sample: {
+      seriesIndex: number
+      x: number
+      y: number
+      clientX: number
+      clientY: number
+    }) => void = () => undefined
+    const areaScan = createChartFrameCoalescer({
+      onFrame: (sample) => onAreaFrame(sample)
+    })
     const palette = computed(() => resolveChartPalette(props.colors))
     const laid = computed(() =>
       layoutRadar(resolvedSeries.value, {
@@ -203,6 +214,7 @@ export const RadarChart = defineComponent({
         startAngle: props.startAngle,
         maxValue: props.maxValue,
         levels: props.levels,
+        missing: props.missing,
         gridShape: props.gridShape,
         palette: palette.value,
         gradient: props.gradient,
@@ -289,6 +301,18 @@ export const RadarChart = defineComponent({
         hoveredPoint.value = null
         handleHoverLeave()
       }
+      onAreaFrame = (sample) => {
+        if (!trackPointer.value) return
+        const axisPoints = layout.angles.map((angle) =>
+          polarToCartesian(layout.cx, layout.cy, layout.radius, angle)
+        )
+        const pointIndex = findNearestPointIndex(axisPoints, sample.x, sample.y)
+        if (pointIndex === null) return
+        hoveredPoint.value = { seriesIndex: sample.seriesIndex, pointIndex }
+        const event = { clientX: sample.clientX, clientY: sample.clientY } as MouseEvent
+        handleHoverEnter(sample.seriesIndex, event)
+        handleMouseMove(event)
+      }
       const handleAreaMove = (seriesIndex: number, event: MouseEvent) => {
         if (!trackPointer.value) return
         const path = event.currentTarget as SVGPathElement
@@ -300,14 +324,13 @@ export const RadarChart = defineComponent({
         pt.x = event.clientX
         pt.y = event.clientY
         const loc = pt.matrixTransform(ctm.inverse())
-        const axisPoints = layout.angles.map((angle) =>
-          polarToCartesian(layout.cx, layout.cy, layout.radius, angle)
-        )
-        const pointIndex = findNearestPointIndex(axisPoints, loc.x, loc.y)
-        if (pointIndex === null) return
-        hoveredPoint.value = { seriesIndex, pointIndex }
-        handleHoverEnter(seriesIndex, event)
-        handleMouseMove(event)
+        areaScan.schedule({
+          seriesIndex,
+          x: loc.x,
+          y: loc.y,
+          clientX: event.clientX,
+          clientY: event.clientY
+        })
       }
       const handlePointKeyDown = (
         event: KeyboardEvent,
@@ -358,7 +381,7 @@ export const RadarChart = defineComponent({
                         }),
                         h('stop', {
                           offset: '100%',
-                          'stop-color': `color-mix(in oklab, var(--tiger-bg,#ffffff) 35%, ${item.color})`,
+                          'stop-color': `color-mix(in oklab, var(--tiger-surface) 35%, ${item.color})`,
                           'stop-opacity': '0.02'
                         })
                       ]
@@ -380,12 +403,12 @@ export const RadarChart = defineComponent({
                       [
                         h('stop', {
                           offset: '0%',
-                          'stop-color': `color-mix(in oklab, var(--tiger-bg,#ffffff) 20%, ${item.stroke})`
+                          'stop-color': `color-mix(in oklab, var(--tiger-surface) 20%, ${item.stroke})`
                         }),
                         h('stop', { offset: '50%', 'stop-color': item.stroke }),
                         h('stop', {
                           offset: '100%',
-                          'stop-color': `color-mix(in oklab, var(--tiger-text,#111827) 12%, ${item.stroke})`
+                          'stop-color': `color-mix(in oklab, var(--tiger-text) 12%, ${item.stroke})`
                         })
                       ]
                     )
@@ -396,7 +419,7 @@ export const RadarChart = defineComponent({
                     h('radialGradient', { id: `${gradientPrefix}-point-${item.seriesKey}` }, [
                       h('stop', {
                         offset: '0%',
-                        'stop-color': `color-mix(in oklab, var(--tiger-bg,#ffffff) 30%, ${item.color})`
+                        'stop-color': `color-mix(in oklab, var(--tiger-surface) 30%, ${item.color})`
                       }),
                       h('stop', { offset: '100%', 'stop-color': item.color })
                     ])
@@ -465,7 +488,6 @@ export const RadarChart = defineComponent({
                 y2: line.y2,
                 class: chartGridLineClasses,
                 'stroke-width': props.gridStrokeWidth,
-                'stroke-dasharray': dasharray,
                 'aria-hidden': 'true'
               })
             ),
@@ -530,7 +552,15 @@ export const RadarChart = defineComponent({
                       cy: point.y,
                       r: 8,
                       fill: 'transparent',
-                      'aria-hidden': 'true',
+                      'aria-hidden': focusableMarks ? undefined : true,
+                      role: focusableMarks ? 'button' : undefined,
+                      'aria-label': focusableMarks
+                        ? formatChartTemplate(labels.value.pointAriaLabel, {
+                            index: point.index + 1,
+                            x: seriesName(item.series, item.seriesIndex),
+                            y: point.value
+                          })
+                        : undefined,
                       tabindex: focusableMarks
                         ? chartPointTabIndex(
                             item.seriesIndex,

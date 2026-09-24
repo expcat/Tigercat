@@ -52,8 +52,8 @@ Tooltip, Popover, and Popconfirm share the floating-popup layer; Dropdown, Selec
 | -------------- | ------------------------------------ | --------------------------------------- |
 | Core types     | `core/types/floating-popup.ts`       | shared props and trigger types          |
 | Core utils     | `core/utils/floating-popup-utils.ts` | ids and trigger handler maps            |
-| Vue composable | `vue/utils/use-popup.ts`             | open state, floating, dismiss, trigger  |
-| React hook     | `react/utils/use-popup.ts`           | React counterpart for the same behavior |
+| Vue composable | `vue/utils/use-popup.ts`             | binds refs and events to the core controller |
+| React hook     | `react/utils/use-popup.ts`           | binds refs and events to the core controller |
 
 Stable behavior:
 
@@ -65,7 +65,7 @@ Stable behavior:
 - Root trigger exposes `data-state="open" | "closed"` for CSS state styling.
 - Interactive triggers also expose `aria-expanded`. Tooltip writes `aria-describedby` on the focus node only while open.
 - Portal target chain: nearest `[data-tiger-overlay-host]` → `[data-tiger-config-root]` → `document.body`. Body portals wrap the same layer+host so nested overlays stay inside. The layer copies `dir` / `lang`.
-- Stacking: `OVERLAY_Z_INDEX` viewport (200) < overlay (1000) < modal/tour (1100) < message (1200) < loading-bar (1300).
+- Stacking: `OVERLAY_Z_INDEX` viewport (200) < overlay (1000) < modal/drawer/tour (1100) < fullscreen loading (1150) < message (1200) < loading-bar (1300).
 - Popup default placement `top` / offset `8`; pickers and dropdowns `bottom-start` / offset `4`.
 - Small-screen `fullscreen-sm` / `bottom-sheet-sm` switch to `fixed` and drop x/y via CSS.
 
@@ -75,7 +75,7 @@ Custom trigger state is available through Vue `#trigger="{ open }"` slots and Re
 
 - Do not read `window`, `document`, `localStorage`, DOM size, or media queries at module top level.
 - Put client-only Vue work in `onMounted`; React work in `useEffect` or client components.
-- Portal / overlay: stable placeholder outside the browser. React renders the layer in place; Vue Teleport is `disabled`.
+- Portal / overlay: an open Modal, Drawer, Tour, or declarative message / notification container renders into the ConfigProvider outlet, which is in the server HTML. Imperative `Message` / `notification` do nothing on the server.
 
 ## Framework deltas
 

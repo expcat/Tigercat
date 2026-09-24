@@ -4,19 +4,16 @@
 
 import { describe, expect, it } from 'vitest'
 import {
-  announceToScreenReader,
   captureActiveElement,
   builtinRichTextEngine,
   createAnchorObserver,
-  createFocusTrap,
+  createFocusScope,
   cropCanvas,
   downloadChartPng,
   downloadChartSvg,
   createTableResizeObserverController,
   downloadBrowserFile,
   downloadChartBlob,
-  downloadCsv,
-  downloadTableExport,
   exportChartPng,
   findActiveAnchor,
   getAnchorTargetElement,
@@ -27,6 +24,7 @@ import {
   manageLiveRegion,
   scrollToAnchor
 } from '@expcat/tigercat-core'
+import { downloadCsv, downloadTableExport } from '@expcat/tigercat-core/utils/table-export'
 
 function createRichTextHost() {
   const listeners = new Map<string, EventListener>()
@@ -45,16 +43,14 @@ function createRichTextHost() {
 
 describe('browser-only utility guards', () => {
   it('no-ops browser side effects when document/window are unavailable', async () => {
-    expect(() => announceToScreenReader('Saved')).not.toThrow()
-
     const liveRegion = manageLiveRegion()
     expect(() => liveRegion.announce('Saved')).not.toThrow()
     expect(() => liveRegion.clear()).not.toThrow()
     expect(() => liveRegion.destroy()).not.toThrow()
 
-    const focusTrap = createFocusTrap({} as HTMLElement)
-    expect(() => focusTrap.activate()).not.toThrow()
-    expect(() => focusTrap.deactivate()).not.toThrow()
+    const focusScope = createFocusScope({} as HTMLElement)
+    expect(() => focusScope.activate()).not.toThrow()
+    expect(() => focusScope.deactivate()).not.toThrow()
 
     expect(() => downloadCsv('name\nAda')).not.toThrow()
     expect(() => downloadTableExport('name\nAda')).not.toThrow()

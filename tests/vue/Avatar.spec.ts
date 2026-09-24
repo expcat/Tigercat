@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { defineComponent, h, Comment } from 'vue'
+import { defineComponent, h } from 'vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { Avatar } from '@expcat/tigercat-vue/Avatar'
 import { AvatarGroup } from '@expcat/tigercat-vue/AvatarGroup'
@@ -105,7 +105,7 @@ describe('AvatarGroup', () => {
         </AvatarGroup>
       `
     })
-    expect(screen.getByRole('img', { name: '2 more' })).toHaveTextContent('+2')
+    expect(screen.getByRole('button', { name: '2 more' })).toHaveTextContent('+2')
   })
 
   it('ignores v-if false placeholders when counting max', () => {
@@ -114,13 +114,14 @@ describe('AvatarGroup', () => {
         return () =>
           h(AvatarGroup, { max: 1 }, () => [
             h(Avatar, { text: 'A' }),
-            h(Comment),
+            h('span', 'keep-me'),
             h(Avatar, { text: 'B' })
           ])
       }
     })
     render(Host)
-    expect(screen.getByRole('img', { name: '1 more' })).toBeInTheDocument()
+    expect(screen.getByText('keep-me')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '1 more' })).toBeInTheDocument()
   })
 
   it('applies group shape to overflow', () => {
@@ -133,7 +134,7 @@ describe('AvatarGroup', () => {
         </AvatarGroup>
       `
     })
-    const overflow = screen.getByRole('img', { name: '2 more' })
+    const overflow = screen.getByRole('button', { name: '2 more' })
     expect(overflow.className).toContain('--tiger-radius-md')
     expect(overflow.className).not.toContain('-ms-2')
   })
@@ -162,7 +163,7 @@ describe('AvatarGroup', () => {
       `
     })
     expect(screen.getByRole('group', { name: '頭像組' })).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: '還有 1 位' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '還有 1 位' })).toBeInTheDocument()
   })
 
   it('lets an explicit avatar size override the group size', () => {
@@ -192,7 +193,7 @@ describe('AvatarGroup', () => {
         </ConfigProvider>
       `
     })
-    expect(screen.getByRole('img', { name: '还有 1 位' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '还有 1 位' })).toBeInTheDocument()
     await expectNoA11yViolationsIsolated(container)
   })
 })

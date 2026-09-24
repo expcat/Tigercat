@@ -1,21 +1,51 @@
 /**
- * Core Utils - Re-export organized modules
+ * Core utils barrel.
  *
- * This barrel file provides both:
- * 1. Grouped exports via sub-modules (helpers/, icons/, a11y/, i18n/, styles/, motion/)
- * 2. Flat exports for backward compatibility
- *
- * Named imports from `@expcat/tigercat-core` are the supported public path.
- * Group folders (`helpers/`, `styles/`, …) organize source; they are not
- * package subpath exports.
+ * Each public name is exported from one module. `styles/` contributes class
+ * strings; reducers and controllers are exported from their own modules.
+ * Group folders are source layout, not package subpath exports.
  */
 
 // Re-export all from organized sub-modules
 export * from './helpers'
-export * from './icons'
+export {
+  createIconRegistry,
+  getIconDefinition,
+  iconNames,
+  iconRegistry,
+  type IconDefinition,
+  type IconName,
+  type IconRegistry
+} from './icons/registry'
+export {
+  ICON_STROKE_LINECAP,
+  ICON_STROKE_LINEJOIN,
+  ICON_STROKE_WIDTH,
+  SVG_DEFAULT_VIEWBOX_20,
+  SVG_DEFAULT_VIEWBOX_24,
+  getSvgDefaultAttrs,
+  mergeChildSvgAttrs,
+  normalizeSvgAttrs,
+  resolveIconPaintMode,
+  resolveIconSvgAttrs,
+  toVueSvgAttrs
+} from './svg-attrs'
 export * from './a11y'
 export * from './i18n'
 export * from './styles'
+export * from './form-validation'
+export * from './date-utils'
+export * from './time-utils'
+export * from './workflow-condition'
+export * from './workflow-runtime'
+export * from './tree-utils'
+export * from './tree-controller'
+export * from './menu-schema-utils'
+export * from './menu-controller'
+export * from './pagination-utils'
+export * from './navigation-menu-controller'
+export * from './container-utils'
+export * from './layout-grid-styles'
 
 // Motion utilities (animation + transition, consolidated)
 export * from './motion'
@@ -43,12 +73,11 @@ export {
   activityItemActionsClasses,
   sortActivityGroups,
   buildActivityGroups,
+  resolveActivityCopy,
   toActivityTimelineItems
 } from './activity-feed-utils'
 export type { ActivityTimelineItem } from './activity-feed-utils'
-export * from '../internal/activity-feed-styles'
-export * from '../internal/comment-thread-styles'
-export * from '../internal/notification-center-styles'
+
 
 // NotificationCenter utilities
 export {
@@ -56,7 +85,10 @@ export {
   EMPTY_NOTIFICATION_GROUPS,
   sortNotificationGroups,
   buildNotificationGroups,
-  shouldUseNotificationTabs
+  shouldUseNotificationTabs,
+  notificationItemKey,
+  moveNotificationReadFilter,
+  notificationItemsPendingRead
 } from './notification-center-utils'
 
 // CommentThread utilities
@@ -68,6 +100,9 @@ export {
   getCommentRepliesView,
   nextCommentRevealedCount,
   canSubmitCommentReply,
+  commentIdKey,
+  commentNodeAcceptsReply,
+  formatCommentTreeError,
   resolveCommentLikeState,
   nextCommentLikeState,
   writeCommentLikeOverlay
@@ -76,11 +111,15 @@ export type {
   CommentLikeOverlay,
   CommentLikeState,
   CommentLoadMoreKind,
-  CommentRepliesView
+  CommentRepliesView,
+  CommentTreeBuild,
+  CommentTreeError,
+  CommentTreeErrorCode
 } from './comment-thread-utils'
 
 // Composite time helpers
 export * from './composite-time-utils'
+export * from './composite-list-utils'
 
 // Countdown utilities
 export * from './countdown-utils'
@@ -140,22 +179,20 @@ export * from './statistic-utils'
 export * from './color-picker-utils'
 export * from './color-swatch-utils'
 export * from './virtual-list-utils'
-export * from './stepper-utils'
 export * from './calendar-utils'
 export * from './calendar-controller'
+export * from './caller-clock'
 export * from './datepicker-controller'
 export * from './timepicker-controller'
 export * from './mentions-utils'
 export * from './qrcode-utils'
 
 // Table v0.6.0 upgrades
-export * from './table-utils'
 export * from './table-controller'
 export * from './table-filter-utils'
 export * from './table-group-utils'
 export * from './table-resize-utils'
-export * from './table-export-utils'
-export * from './data-export-value'
+
 
 // Form v0.6.0 upgrades
 export * from './form-dependency-utils'
@@ -201,9 +238,6 @@ export * from './markdown-editor-utils'
 // RichTextEditor engine (PR-17)
 export * from './rich-text-engine'
 
-// Kanban helpers (v0.8.0+) now live on task-board-view (same public names).
-// `kanban-utils.ts` remains a re-export for deep source imports.
-
 // VirtualTable utilities (v0.8.0+)
 export * from './virtual-table-utils'
 
@@ -234,25 +268,18 @@ export * from './group-utils'
 
 // Chart resize utilities (v0.9.0+)
 export * from './chart-resize-utils'
-export * from './chart-export-utils'
 export * from './chart-interaction'
 
-// SVG chart utilities
-export * from './chart'
+// Chart symbols reach this barrel once, through `styles` → `chart/`.
 
 // PrintLayout utilities (v0.9.0+)
 export * from './print-layout-utils'
 
-// ImageViewer utilities live in image-utils (same public names).
-// `image-viewer-utils.ts` remains a re-export for deep source imports.
 export * from './image-lightbox'
 
 // Composite shared helpers (FormWizard / CropUpload navigation + file pipeline)
 export * from './form-wizard-utils'
-export * from './schema-form-utils'
-export * from './workflow-field-permissions'
 export * from './workflow-detail-shell-utils'
-export * from './workflow-designer-utils'
 export * from './table-toolbar-utils'
 export * from './crop-upload-utils'
 
@@ -262,8 +289,30 @@ export * from './aspect-ratio-utils'
 // Masonry utilities (v2.1.0+)
 export * from './masonry-utils'
 
+export * from './compose-classes'
+export * from './chart-export-utils'
+export * from './workflow-field-permissions'
+
 export { resolveConfigDirection, resolveTigerConfig } from './config-provider-utils'
 export type { ResolveTigerConfigInput } from './config-provider-utils'
 
-export { createDocumentConfigHandle, resetDocumentConfigScope } from './document-config'
+export { createDocumentConfigHandle, readDocumentOwnerLocale } from './document-config'
 export type { DocumentConfigHandle, DocumentConfigValues } from './document-config'
+
+export { createRenderOutlet } from './overlay-outlet'
+export type { RenderOutlet, RenderOutletItem } from './overlay-outlet'
+
+export { createDismissActionEvent, settleDismissAction } from './confirm-action'
+export type { DismissActionEvent } from './confirm-action'
+
+export {
+  FEEDBACK_SCOPE_STACK,
+  activateFeedbackScope,
+  clearMessages,
+  clearNotifications,
+  createFeedbackScope,
+  enqueueMessage,
+  enqueueNotification,
+  getActiveFeedbackScope
+} from './feedback-scope'
+export type { FeedbackScope, MessageQueueItem } from './feedback-scope'

@@ -5,6 +5,7 @@
 
 import type { AnchorDirection } from '../types/anchor'
 import { isBrowser } from './env'
+import { prefersReducedMotion } from './transition'
 import { resolveScrollRoot, type ScrollRootInput } from './scroll-root'
 
 /**
@@ -16,25 +17,25 @@ export const anchorBaseClasses = 'relative'
  * Anchor ink container classes (vertical)
  */
 export const anchorInkContainerVerticalClasses =
-  'absolute start-0 top-0 bottom-0 w-0.5 bg-[var(--tiger-border,#e5e7eb)] rounded-full'
+  'absolute start-0 top-0 bottom-0 w-0.5 bg-[var(--tiger-border)] rounded-full'
 
 /**
  * Anchor ink container classes (horizontal)
  */
 export const anchorInkContainerHorizontalClasses =
-  'absolute start-0 end-0 bottom-0 h-0.5 bg-[var(--tiger-border,#e5e7eb)] rounded-full'
+  'absolute start-0 end-0 bottom-0 h-0.5 bg-[var(--tiger-border)] rounded-full'
 
 /**
  * Active ink indicator classes (vertical)
  */
 export const anchorInkActiveVerticalClasses =
-  'absolute w-0.5 bg-[var(--tiger-primary,#2563eb)] rounded-full transition-[top,height] duration-200 ease-in-out motion-reduce:transition-none'
+  'absolute w-0.5 bg-[var(--tiger-primary)] rounded-full transition-[top,height] duration-200 ease-in-out motion-reduce:transition-none'
 
 /**
  * Active ink indicator classes (horizontal)
  */
 export const anchorInkActiveHorizontalClasses =
-  'absolute h-0.5 bg-[var(--tiger-primary,#2563eb)] rounded-full transition-[inset-inline-start,width] duration-200 ease-in-out motion-reduce:transition-none'
+  'absolute h-0.5 bg-[var(--tiger-primary)] rounded-full transition-[inset-inline-start,width] duration-200 ease-in-out motion-reduce:transition-none'
 
 /**
  * Anchor link list classes (vertical)
@@ -52,12 +53,12 @@ export const anchorNestedListClasses = 'ps-3 mt-1 space-y-1'
  * Anchor link base classes
  */
 export const anchorLinkBaseClasses =
-  'block text-sm text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-primary,#2563eb)] transition-colors duration-200 motion-reduce:transition-none whitespace-nowrap'
+  'block text-sm text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-primary)] transition-colors duration-200 motion-reduce:transition-none whitespace-nowrap'
 
 /**
  * Anchor link active classes
  */
-export const anchorLinkActiveClasses = 'text-[var(--tiger-primary,#2563eb)] font-medium'
+export const anchorLinkActiveClasses = 'text-[var(--tiger-primary)] font-medium'
 
 /**
  * Get anchor nav classes. Affix is a real Affix wrapper, not a naked `fixed`.
@@ -207,8 +208,9 @@ export function findAnchorLinkElement(root: Element, href: string): HTMLElement 
 
 export function getAnchorInkStyle(
   direction: AnchorDirection,
-  linkRect: { top: number; left: number; width: number; height: number },
-  rootRect: { top: number; left: number }
+  linkRect: { top: number; left: number; right: number; width: number; height: number },
+  rootRect: { top: number; left: number; right: number },
+  dir: 'ltr' | 'rtl' = 'ltr'
 ): Record<string, string> {
   if (direction === 'vertical') {
     return {
@@ -218,8 +220,10 @@ export function getAnchorInkStyle(
       width: ''
     }
   }
+  const inlineStart =
+    dir === 'rtl' ? rootRect.right - linkRect.right : linkRect.left - rootRect.left
   return {
-    insetInlineStart: `${linkRect.left - rootRect.left}px`,
+    insetInlineStart: `${inlineStart}px`,
     width: `${linkRect.width}px`,
     top: '',
     height: ''
@@ -262,7 +266,8 @@ export function scrollToAnchor(
 
   const top = getElementOffsetTop(element, container) - targetOffset
   const scrollTarget = container === window ? window : (container as HTMLElement)
-  scrollTarget.scrollTo({ top, behavior: 'smooth' })
+  const behavior: ScrollBehavior = prefersReducedMotion() ? 'auto' : 'smooth'
+  scrollTarget.scrollTo({ top, behavior })
 }
 
 /**
@@ -374,6 +379,7 @@ export function createProgrammaticScrollLock(
   }
 
   const onScroll = (): void => {
+    if (listeningScrollEnd) return
     scheduleIdle()
   }
 
@@ -425,11 +431,11 @@ export function createProgrammaticScrollLock(
       }
     }
 
-    scheduleIdle()
     safetyTimer = setTimeout(() => {
       safetyTimer = null
       unlock()
     }, timeoutMs)
+    if (!listeningScrollEnd) scheduleIdle()
   }
 
   return {
@@ -525,6 +531,7 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
     for (const href of links) {
       const el = getAnchorTargetElement(href)
       if (!el) continue
+      if (root && !root.contains(el)) continue
       found.add(el)
       if (!observed.has(el)) {
         io.observe(el)
@@ -548,12 +555,12 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
   }
 
   let mo: MutationObserver | undefined
-  if (typeof MutationObserver !== 'undefined') {
+  if (root && typeof MutationObserver !== 'undefined') {
     mo = new MutationObserver(() => {
       syncTargets()
       gatedEmit()
     })
-    mo.observe(root ?? document.documentElement, { childList: true, subtree: true })
+    mo.observe(root, { childList: true, subtree: true })
   }
 
   scrollTarget.addEventListener('scroll', onUserScroll, { passive: true })

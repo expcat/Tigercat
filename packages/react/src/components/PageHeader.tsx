@@ -1,7 +1,7 @@
 import React, { forwardRef, useCallback, useId, useMemo } from 'react'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
-  chevronLeftSolidIcon20PathD,
-  composeComponentClasses,
+  classNames,
   getPageHeaderBackButtonClasses,
   getPageHeaderRootClasses,
   hasPageHeaderHeadingContent,
@@ -9,7 +9,6 @@ import {
   resolvePageHeaderHeadingTag,
   mergeTigerLocale,
   getPageHeaderLabels,
-  icon20ViewBox,
   pageHeaderActionsClasses,
   pageHeaderBackIconClasses,
   pageHeaderBackWrapClasses,
@@ -26,6 +25,7 @@ import {
   type TigerLocale,
   type TigerLocalePageHeader
 } from '@expcat/tigercat-core'
+import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { Button } from './Button'
 import { Link } from './Link'
 import { useTigerConfig } from './ConfigProvider'
@@ -137,10 +137,7 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
       headerLabels.backAriaLabel
     )
     const TitleTag = resolvePageHeaderHeadingTag(headingLevel)
-    const rootClasses = useMemo(
-      () => composeComponentClasses(getPageHeaderRootClasses(className)),
-      [className]
-    )
+    const rootClasses = useMemo(() => classNames(getPageHeaderRootClasses(className)), [className])
     const backButtonClasses = useMemo(() => getPageHeaderBackButtonClasses(), [])
 
     const handleBack = useCallback(

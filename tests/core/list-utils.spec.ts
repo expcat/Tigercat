@@ -47,7 +47,7 @@ describe('list-utils', () => {
   })
 
   it('defaults virtual item height from size', () => {
-    expect(resolveListVirtualItemHeight('md')).toBe(52)
+    expect(resolveListVirtualItemHeight('md')).toBe(72)
     expect(resolveListVirtualItemHeight('md', 80)).toBe(80)
     expect(getListGridColumnClass(3)).toBe('grid-cols-3')
   })

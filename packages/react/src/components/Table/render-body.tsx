@@ -6,6 +6,7 @@ import {
   getTableCellClasses,
   getTableFixedCellClasses,
   getFixedColumnStyle,
+  TABLE_FIXED_CELL_Z_INDEX,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   getExpandedRowClasses,
@@ -20,6 +21,9 @@ import {
   resolveTableExpandSlot,
   formatTableSelectRowAriaLabel,
   formatTableGroupHeaderText,
+  isEscapeKey,
+  tableRowDragHandleClasses,
+  tableRowKeyId,
   tableVirtualSpacerCellClasses,
   type RowSelectionConfig,
   type ExpandableConfig,
@@ -48,6 +52,8 @@ export interface RenderBodyViewProps {
   /** When set, only the windowed row slice is rendered (virtual scrolling). */
   virtualWindow?: TableVirtualWindow
   selectionName?: string
+  activeRowIndex?: number
+  onActiveRowIndex?: (index: number) => void
 }
 
 export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): React.ReactNode {
@@ -64,7 +70,9 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     rowDraggable,
     interactiveRows,
     virtualWindow,
-    selectionName
+    selectionName,
+    activeRowIndex = 0,
+    onActiveRowIndex
   } = view
   const hasRowControls = hasTableSelectionColumn(rowSelection) || Boolean(expandable)
   const chrome = getTableChromeSlots({
@@ -140,8 +148,8 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
   function renderDataRow(record: Record<string, unknown>, index: number): React.ReactNode {
     const sourceIndex = ctx.pageSourceIndices[index] ?? index
     const key = ctx.pageRowKeys[index]
-    const isSelected = ctx.selectedRowKeySet.has(key)
-    const isExpanded = ctx.expandedRowKeySet.has(key)
+    const isSelected = ctx.selectedRowKeySet.has(tableRowKeyId(key))
+    const isExpanded = ctx.expandedRowKeySet.has(tableRowKeyId(key))
     const isRowExpandable = expandable
       ? expandable.rowExpandable
         ? expandable.rowExpandable(record)
@@ -177,7 +185,10 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
             value={key}
             checked={isSelected}
             disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
-            aria-label={formatTableSelectRowAriaLabel(labels.selectRowAriaLabel, sourceIndex + 1)}
+            aria-label={
+              rowSelection?.getRowLabel?.(record, index + 1) ??
+              formatTableSelectRowAriaLabel(labels.selectRowAriaLabel, index + 1)
+            }
             onChange={(checked) => {
               if (checked) ctx.handleSelectRow(key, true)
             }}
@@ -187,7 +198,10 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
             size="sm"
             checked={isSelected}
             disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
-            aria-label={formatTableSelectRowAriaLabel(labels.selectRowAriaLabel, sourceIndex + 1)}
+            aria-label={
+              rowSelection?.getRowLabel?.(record, index + 1) ??
+              formatTableSelectRowAriaLabel(labels.selectRowAriaLabel, index + 1)
+            }
             onChange={(checked) => ctx.handleSelectRow(key, checked)}
           />
         )}
@@ -207,19 +221,45 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           ctx.fixedColumnsInfo.hasFixedColumns && 'group'
         )}
         aria-selected={rowSelection ? isSelected : undefined}
-        tabIndex={interactiveRows && !hasRowControls ? 0 : undefined}
+        tabIndex={hasRowControls ? undefined : index === activeRowIndex ? 0 : -1}
         onKeyDown={
-          interactiveRows && !hasRowControls
-            ? (e) => {
+          hasRowControls
+            ? undefined
+            : (e) => {
                 if (e.target !== e.currentTarget) return
-                if (isActivationKey(e)) {
+                if (isActivationKey(e) && interactiveRows) {
                   e.preventDefault()
                   ctx.handleRowClick(record, sourceIndex, key)
+                  return
+                }
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                  e.preventDefault()
+                  const next = e.key === 'ArrowDown' ? index + 1 : index - 1
+                  if (next < 0 || next >= ctx.paginatedData.length) return
+                  onActiveRowIndex?.(next)
+                  const row = (e.currentTarget.parentElement?.querySelector(
+                    `tr[data-tiger-table-page-index="${next}"]`
+                  ) ?? null) as HTMLTableRowElement | null
+                  row?.focus()
                 }
               }
-            : undefined
         }
-        draggable={rowDraggable ? true : undefined}>
+        data-tiger-table-page-index={index}>
+        {rowDraggable ? (
+          <td className={getCheckboxCellClasses(size)}>
+            <button
+              type="button"
+              className={tableRowDragHandleClasses}
+              draggable
+              aria-label={formatTableSelectRowAriaLabel(labels.dragRowAriaLabel, index + 1)}
+              onDragStart={(event) => {
+                event.stopPropagation()
+                ctx.handleRowDragStart(key)
+              }}>
+              ::
+            </button>
+          </td>
+        ) : null}
         {chrome.leading.map((slot) => (
           <React.Fragment key={slot}>{renderChromeTd(slot)}</React.Fragment>
         ))}
@@ -228,7 +268,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           const dataKey = column.dataKey || column.key
           const cellValue = record[dataKey]
 
-          const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, 10)
+          const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, TABLE_FIXED_CELL_Z_INDEX)
 
           const widthStyle = column.width
             ? {
@@ -276,7 +316,12 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
                   onBlur={ctx.commitEdit}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') ctx.commitEdit()
-                    if (e.key === 'Escape') ctx.cancelEdit()
+                    if (isEscapeKey(e)) {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      e.nativeEvent.stopImmediatePropagation()
+                      ctx.cancelEdit()
+                    }
                   }}
                   autoFocus
                 />
@@ -315,26 +360,33 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     return rowNode
   }
 
-  if (ctx.groupedData) {
+  if (ctx.groupBlocks) {
+    let rowCursor = 0
     return (
       <tbody
         onClick={handleBodyClick}
-        onDragStart={rowDraggable ? handleBodyDragStart : undefined}
         onDragOver={rowDraggable ? handleBodyDragOver : undefined}
         onDrop={rowDraggable ? handleBodyDrop : undefined}>
-        {Array.from(ctx.groupedData.entries()).map(([groupKey, groupItems]) => (
-          <React.Fragment key={`group-${groupKey}`}>
-            <tr className={tableGroupHeaderClasses}>
-              <td colSpan={ctx.totalColumnCount} className={getGroupHeaderCellClasses(size)}>
-                {formatTableGroupHeaderText(labels.groupHeaderText, groupKey, groupItems.length)}
-              </td>
-            </tr>
-            {groupItems.map((record, idx) => {
-              const globalIndex = ctx.paginatedData.indexOf(record)
-              return renderDataRow(record, globalIndex >= 0 ? globalIndex : idx)
-            })}
-          </React.Fragment>
-        ))}
+        {ctx.groupBlocks.map((block) => {
+          const rows = block.records.map((record) => {
+            const pageIndex = ctx.paginatedData.indexOf(record, rowCursor)
+            const index = pageIndex >= 0 ? pageIndex : rowCursor
+            rowCursor = index + 1
+            return renderDataRow(record, index)
+          })
+          return (
+            <React.Fragment key={`group-${block.key}-${block.continued ? 'cont' : 'new'}`}>
+              {block.continued ? null : (
+                <tr className={tableGroupHeaderClasses}>
+                  <td colSpan={ctx.totalColumnCount} className={getGroupHeaderCellClasses(size)}>
+                    {formatTableGroupHeaderText(labels.groupHeaderText, block.key, block.count)}
+                  </td>
+                </tr>
+              )}
+              {rows}
+            </React.Fragment>
+          )
+        })}
       </tbody>
     )
   }

@@ -27,9 +27,9 @@ import {
   getNavigationMenuItemValue,
   getNavigationMenuRovingTabIndex,
   getNavigationMenuTabExitTarget,
-  getSecureRel,
+  resolveLinkAddress,
+  getOpenPanelFromMenubar,
   handleMenubarNavigation,
-  injectNavigationMenuStyles,
   isFocusInsideNavigationMenu,
   isNavigationMenuOpen,
   isNavigationMenuTriggerOpenKey,
@@ -44,7 +44,7 @@ import {
   resolveElementDir,
   resolveNavigationMenuOpenValue,
   resolveNavigationMenuTabStopValue,
-  warnNavigationMenuOpenWithoutValue,
+  shouldKeepNavigationMenuOpen,
   type NavigationMenuValue,
   type NavigationMenuProps as CoreNavigationMenuProps,
   type NavigationMenuItemProps as CoreNavigationMenuItemProps,
@@ -53,7 +53,8 @@ import {
   type NavigationMenuLinkProps as CoreNavigationMenuLinkProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
+import { useAnchoredOverlay } from '../utils/overlay'
+import { OverlayPortal } from '../utils/overlay-outlet'
 import { composeRefs } from '../utils/overlay-trigger'
 
 export interface NavigationMenuContextValue {
@@ -187,8 +188,7 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
       getNavigationMenuLinkClasses(isDisabled, inPanel, active),
       className
     )
-    const computedRel =
-      href && !isDisabled ? getSecureRel(target as '_blank' | undefined, rel) : undefined
+    const address = resolveLinkAddress({ href, target, rel, disabled: isDisabled })
     const shared = {
       ...rest,
       className: linkClasses,
@@ -206,20 +206,20 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
       onKeyDown: handleKeyDown
     }
 
-    if (href && !isDisabled) {
+    if (address.href) {
       return (
         <a
           ref={forwardedRef as React.Ref<HTMLAnchorElement>}
-          href={href}
-          target={target}
-          rel={computedRel}
+          href={address.href}
+          target={address.target}
+          rel={address.rel}
           {...shared}>
           {children}
         </a>
       )
     }
 
-    if (href && isDisabled) {
+    if (href) {
       return (
         <span ref={forwardedRef as React.Ref<HTMLSpanElement>} {...shared}>
           {children}
@@ -406,7 +406,12 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
     const panel = contentRef.current
     if (!panel || !item || !root) return
     const dir = resolveElementDir(root.rootRef.current ?? root.menubarRef.current)
-    const action = applyNavigationMenuPanelKey({ event: event.nativeEvent, panel, dir })
+    const action = applyNavigationMenuPanelKey({
+      event: event.nativeEvent,
+      panel,
+      dir,
+      mode: mega ? 'mega' : 'menu'
+    })
     if (!action || action === 'menu-nav') return
 
     event.stopPropagation()
@@ -445,7 +450,7 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
       style={overlay.floatingStyles}
       data-positioned={overlay.positioned}
       data-tiger-navigation-menu-content=""
-      hidden={!isOpen}
+      hidden={isOpen ? undefined : true}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onBlur={handleFocusOut}
@@ -455,7 +460,7 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
         id={item.contentId}
         className={classNames(getNavigationMenuContentClasses(mega), className)}
         style={mega ? { minWidth: '28rem', ...style } : style}
-        role="menu">
+        role={mega ? undefined : 'menu'}>
         {children}
       </div>
     </div>
@@ -463,7 +468,11 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
 
   return (
     <NavigationMenuContentContext.Provider value={{ inPanel: true }}>
-      {renderOverlayPortal(popup, overlay.target, !portalEnabled)}
+      {isOpen && portalEnabled ? (
+        <OverlayPortal target={overlay.target}>{popup}</OverlayPortal>
+      ) : (
+        popup
+      )}
     </NavigationMenuContentContext.Provider>
   )
 }
@@ -644,8 +653,6 @@ export interface NavigationMenuProps
 export const NavigationMenu: React.FC<NavigationMenuProps> = ({
   value: controlledValue,
   defaultValue,
-  open: controlledOpen,
-  defaultOpen = false,
   openOnHover = false,
   disabled = false,
   closeOnClick = true,
@@ -662,7 +669,7 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
   children,
   ...navProps
 }) => {
-  const initialValue = defaultValue ?? (defaultOpen ? (controlledValue ?? null) : null)
+  const initialValue = defaultValue ?? null
   const [internalValue, setInternalValue] = useState<NavigationMenuValue | null>(
     isNavigationMenuOpen(initialValue) ? (initialValue as NavigationMenuValue) : null
   )
@@ -673,8 +680,7 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
 
   const currentValue = resolveNavigationMenuOpenValue({
     value: controlledValue,
-    internalValue,
-    open: controlledOpen
+    internalValue
   })
   const currentValueRef = useRef(currentValue)
   currentValueRef.current = currentValue
@@ -695,20 +701,15 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
       getSkipDelayDuration: () => skipDelayDurationRef.current,
       getValue: () => currentValueRef.current,
       setValue: (next) => setValueRef.current(next),
-      isDisabled: () => disabledRef.current
+      isDisabled: () => disabledRef.current,
+      shouldStayOpen: () =>
+        shouldKeepNavigationMenuOpen({
+          nav: rootRef.current,
+          panel: getOpenPanelFromMenubar(menubarRef.current),
+          active: document.activeElement
+        })
     })
   }
-
-  useEffect(() => {
-    injectNavigationMenuStyles()
-  }, [])
-
-  useEffect(() => {
-    warnNavigationMenuOpenWithoutValue(
-      controlledOpen,
-      isNavigationMenuOpen(controlledValue ?? defaultValue ?? internalValue)
-    )
-  }, [controlledOpen, controlledValue, defaultValue, internalValue])
 
   const setValue = useCallback(
     (next: NavigationMenuValue | null, options?: { restoreFocus?: boolean }) => {

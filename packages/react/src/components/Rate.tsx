@@ -9,16 +9,15 @@ import {
   rateInactiveColor,
   rateHoverColor,
   rateIsInlineStartHalf,
+  resolveRateCount,
+  rateKeyboardValue,
   starPathD,
   starViewBox,
   classNames,
   mergeTigerLocale,
   getRateLabels,
   formatRateValueText,
-  resolveReadOnlyFlag,
-  sliderGetKeyboardValue,
   sliderNormalizeValue,
-  getLocaleDirection,
   type TigerLocale,
   type TigerLocaleRate
 } from '@expcat/tigercat-core'
@@ -42,11 +41,10 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
   {
     value,
     defaultValue = 0,
-    count = 5,
+    count: countProp = 5,
     allowHalf = false,
     disabled = false,
-    readOnly,
-    readonly,
+    readOnly = false,
     size = 'md',
     allowClear = true,
     character,
@@ -76,8 +74,8 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
     () => getRateLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
-  const rtl = getLocaleDirection(mergedLocale) === 'rtl'
-  const isReadOnly = resolveReadOnlyFlag(readonly, readOnly)
+  const count = resolveRateCount(countProp)
+  const isReadOnly = readOnly
   const locked = disabled || isReadOnly
   const step = allowHalf ? 0.5 : 1
   const normalized = sliderNormalizeValue(currentValue, 0, count, step)
@@ -94,6 +92,7 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
     )
 
   const hitValue = (index: number, clientX: number, el: HTMLElement) => {
+    const rtl = getComputedStyle(el).direction === 'rtl'
     const half = allowHalf && rateIsInlineStartHalf(clientX, el.getBoundingClientRect(), rtl)
     return half ? index + 0.5 : index + 1
   }
@@ -136,6 +135,7 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
           if (locked) return
           const val = hitValue(i, e.clientX, e.currentTarget)
           commit(allowClear && val === normalized ? 0 : val)
+          e.currentTarget.parentElement?.focus()
         }}
         onMouseMove={(e) => {
           if (locked) return
@@ -175,7 +175,8 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
       onKeyDown={(e) => {
         onKeyDown?.(e)
         if (e.defaultPrevented || locked) return
-        const next = sliderGetKeyboardValue(e.key, normalized, 0, count, step, undefined, rtl)
+        const rtl = getComputedStyle(e.currentTarget).direction === 'rtl'
+        const next = rateKeyboardValue(e.key, normalized, count, step, rtl)
         if (next == null) return
         e.preventDefault()
         commit(next)

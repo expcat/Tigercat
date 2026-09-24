@@ -56,8 +56,9 @@ export const Divider = forwardRef<HTMLDivElement, DividerProps>(function Divider
       ref={ref}
       className={classes}
       style={labeled ? styleProp : style}
-      role="separator"
-      aria-orientation={orientation}
+      role={labeled ? 'separator' : undefined}
+      aria-orientation={labeled ? orientation : undefined}
+      aria-hidden={labeled ? undefined : true}
       data-tiger-divider="">
       {labeled ? (
         <>

@@ -5,6 +5,7 @@
  */
 
 import type { MenuItem, MenuRouteMeta, MenuRouteRecord, MenuSchemaNode } from '../types/menu'
+import { isInternalLinkPath, resolveLinkHref } from './link-utils'
 
 export type MenuPermissionChecker = (code: string) => boolean
 
@@ -111,8 +112,18 @@ export function filterMenuByPermission(
   return result
 }
 
-function schemaHref(node: MenuSchemaNode): string | undefined {
-  return node.href ?? node.path
+function safeInternalPath(value: string | undefined): string | undefined {
+  if (!isInternalLinkPath(value)) return undefined
+  return value!.trim()
+}
+
+/**
+ * Menu links use `href` for an external or explicit address.
+ * `path` is only a site-internal route and is not treated as an external URL.
+ */
+function schemaMenuHref(node: MenuSchemaNode): string | undefined {
+  if (node.href != null) return resolveLinkHref(node.href)
+  return safeInternalPath(node.path)
 }
 
 function schemaNodeToMenuItem(node: MenuSchemaNode): MenuItem {
@@ -121,7 +132,7 @@ function schemaNodeToMenuItem(node: MenuSchemaNode): MenuItem {
   if (node.label != null) item.label = node.label
   if (isGroupNode(node) && node.label != null) item.title = node.label
   if (node.icon != null) item.icon = node.icon
-  const href = schemaHref(node)
+  const href = schemaMenuHref(node)
   if (href != null) item.href = href
   if (node.children && node.children.length > 0) {
     item.children = menuSchemaToMenuItems(node.children)
@@ -131,7 +142,9 @@ function schemaNodeToMenuItem(node: MenuSchemaNode): MenuItem {
 
 /**
  * Convert schema nodes to {@link MenuItem} trees.
- * Icon stays a registered name string; `path` maps to `href` when `href` is omitted.
+ * Icon stays a registered name string. An internal `path` becomes the menu
+ * href only when `href` is omitted. An explicit `href` is gated on its own
+ * and does not fall back to `path` when it is rejected.
  * Schema-only fields (`permission`, `hideInMenu`, `hideInBreadcrumb`, `flatMenu`,
  * `badge`, `iframeSrc`) are not copied onto {@link MenuItem}.
  */
@@ -145,20 +158,22 @@ function isNonEmptyString(value: string | undefined): value is string {
 
 function isRoutableNode(node: MenuSchemaNode): boolean {
   if (isDividerNode(node) || isGroupNode(node)) return false
-  return isNonEmptyString(node.path) || isNonEmptyString(node.iframeSrc)
+  return safeInternalPath(node.path) != null || resolveLinkHref(node.iframeSrc) != null
 }
 
 function schemaNodeToRouteMeta(node: MenuSchemaNode): MenuRouteMeta {
   const meta: MenuRouteMeta = { key: node.key }
   if (node.label != null) meta.title = node.label
   if (node.icon != null) meta.icon = node.icon
-  if (node.href != null) meta.href = node.href
+  const href = resolveLinkHref(node.href)
+  if (href != null) meta.href = href
   if (node.permission != null) meta.permission = node.permission
   if (node.hideInMenu != null) meta.hideInMenu = node.hideInMenu
   if (node.hideInBreadcrumb != null) meta.hideInBreadcrumb = node.hideInBreadcrumb
   if (node.flatMenu != null) meta.flatMenu = node.flatMenu
   if (node.badge != null) meta.badge = node.badge
-  if (node.iframeSrc != null) meta.iframeSrc = node.iframeSrc
+  const iframeSrc = resolveLinkHref(node.iframeSrc)
+  if (iframeSrc != null) meta.iframeSrc = iframeSrc
   if (node.type != null) meta.type = node.type
   return meta
 }
@@ -169,7 +184,7 @@ function schemaNodeToRouteRecord(
 ): MenuRouteRecord {
   const record: MenuRouteRecord = {
     name: node.key,
-    path: node.path ?? '',
+    path: safeInternalPath(node.path) ?? '',
     meta: schemaNodeToRouteMeta(node)
   }
   if (children && children.length > 0) record.children = children

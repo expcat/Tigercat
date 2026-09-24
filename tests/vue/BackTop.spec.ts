@@ -133,7 +133,7 @@ describe('BackTop', () => {
     const { container } = render(BackTop, {
       props: {
         visibilityHeight: 0,
-        duration: 0,
+        behavior: 'auto',
         target: () => scrollContainer,
         position: 'fixed',
         placement: 'bottom-left',

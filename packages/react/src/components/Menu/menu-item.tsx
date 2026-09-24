@@ -1,13 +1,18 @@
 import React, { useCallback } from 'react'
 import {
   classNames,
+  getSecureRel,
+  resolveLinkHref,
   focusMenuEdge,
+  getMenuButtons,
   getMenuItemClasses,
   getMenuItemIndent,
   getMenuNavigationKeys,
   isKeySelected,
   isMenuRoving,
-  moveFocusInMenu,
+  menuKeyId,
+  nextMenuRovingKey,
+  parseMenuKeyId,
   sameMenuKey,
   shouldIndentMenuItem
 } from '@expcat/tigercat-core'
@@ -36,19 +41,11 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   const isSelected = !!menuContext && isKeySelected(itemKey, menuContext.selectedKeys)
   const effectiveCollapsed = collapsedOverride ?? (menuContext ? menuContext.collapsed : false)
   const inPopup = Boolean(submenuScope?.popup)
-  const usesMenuRole = inPopup || menuContext?.mode === 'horizontal'
-  const roving = Boolean(
-    menuContext &&
-    isMenuRoving(menuContext.mode, {
-      popup: inPopup,
-      isRoot: !submenuScope
-    })
-  )
-  const isTabStop =
-    !disabled &&
-    (!roving ||
-      (menuContext?.tabStopKey != null && sameMenuKey(itemKey, menuContext.tabStopKey)) ||
-      (inPopup && false))
+  const usesMenuRole = Boolean(menuContext)
+  const roving = Boolean(menuContext && isMenuRoving(menuContext.mode, { popup: inPopup, isRoot: !submenuScope }))
+  const layerStop = submenuScope?.tabStopKey ?? menuContext?.tabStopKey
+  const setLayerStop = submenuScope?.setTabStopKey ?? menuContext?.setTabStopKey
+  const isTabStop = !disabled && (!roving || (layerStop != null && sameMenuKey(itemKey, layerStop)))
 
   const itemClasses = classNames(
     menuContext
@@ -80,27 +77,43 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         menuContext.dir
       )
 
+      const move = (delta: 1 | -1 | 'start' | 'end') => {
+        const list = current.closest<HTMLElement>('ul[data-tiger-menu-list]')
+        if (!list || !setLayerStop) return
+        const keys = getMenuButtons(list)
+          .map((button) => button.getAttribute('data-tiger-menuitem-key'))
+          .filter((value): value is string => Boolean(value))
+          .map(parseMenuKeyId)
+        const next = nextMenuRovingKey({ itemKeys: keys, current: itemKey, delta })
+        if (next == null) return
+        setLayerStop(next)
+        const id = menuKeyId(next)
+        requestAnimationFrame(() => {
+          list.querySelector<HTMLElement>(`[data-tiger-menuitem-key="${id}"]`)?.focus()
+        })
+      }
+
       if (event.key === nextKey) {
         event.preventDefault()
-        moveFocusInMenu(current, 1)
+        move(1)
         return
       }
 
       if (event.key === prevKey) {
         event.preventDefault()
-        moveFocusInMenu(current, -1)
+        move(-1)
         return
       }
 
       if (event.key === 'Home') {
         event.preventDefault()
-        focusMenuEdge(current, 'start')
+        move('start')
         return
       }
 
       if (event.key === 'End') {
         event.preventDefault()
-        focusMenuEdge(current, 'end')
+        move('end')
         return
       }
 
@@ -125,27 +138,32 @@ export const MenuItem: React.FC<MenuItemProps> = ({
     </>
   )
 
+  const { target, rel, ...itemRest } = rest as React.AnchorHTMLAttributes<HTMLAnchorElement>
+  const safeHref = resolveLinkHref(href, { disabled })
   const shared = {
     className: itemClasses,
     style: indentStyle,
     'data-tiger-menuitem': 'true' as const,
+    'data-tiger-menuitem-key': menuKeyId(itemKey),
     'data-tiger-selected': isSelected ? 'true' : 'false',
     'aria-disabled': disabled ? true : undefined,
     tabIndex: disabled ? -1 : roving ? (isTabStop ? 0 : -1) : 0,
     onClick: handleClick,
     onKeyDown: handleKeyDown,
-    ...rest
+    ...itemRest
   }
 
   const role = usesMenuRole ? ('menuitem' as const) : undefined
   const wrapperRole = usesMenuRole ? ('none' as const) : undefined
 
-  if (href) {
+  if (safeHref) {
     return (
       <li role={wrapperRole}>
         <a
           {...shared}
-          href={disabled ? undefined : href}
+          href={safeHref}
+          target={target}
+          rel={getSecureRel(target, rel)}
           role={role}
           aria-current={isSelected ? 'page' : undefined}
           aria-disabled={disabled ? true : undefined}>
@@ -157,7 +175,11 @@ export const MenuItem: React.FC<MenuItemProps> = ({
 
   return (
     <li role={wrapperRole}>
-      <button {...shared} type="button" role={role} disabled={disabled}>
+      <button
+        {...(shared as unknown as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+        type="button"
+        role={role}
+        disabled={disabled}>
         {content}
       </button>
     </li>

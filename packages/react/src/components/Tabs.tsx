@@ -7,12 +7,11 @@ import React, {
   useId,
   useRef,
   useLayoutEffect,
+  useEffect,
   ReactElement
 } from 'react'
 import {
   classNames,
-  closeIconPathD,
-  closeIconViewBox,
   getTabsContainerClasses,
   getTabItemClasses,
   getTabNavClasses,
@@ -40,7 +39,6 @@ import {
   readTabPaneKey,
   mergeTigerLocale,
   getTabsLabels,
-  getLocaleDirection,
   type TabRecord,
   type TabIndicatorStyle,
   type TigerLocale,
@@ -49,6 +47,7 @@ import {
   type TabSize,
   type TabPosition
 } from '@expcat/tigercat-core'
+import { closeIconPathD, closeIconViewBox } from '@expcat/tigercat-core/icons/common'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface TabsContextValue {
@@ -62,7 +61,7 @@ export interface TabsContextValue {
   swipeable: boolean
   idBase: string
   labels: Required<TigerLocaleTabs>
-  handleTabClick: (key: string | number) => void
+  handleTabClick: (key: string | number, options?: { focus?: boolean }) => void
   handleTabClose: (key: string | number, event: React.SyntheticEvent) => void
 }
 
@@ -178,11 +177,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
           : getAdjacentEnabledKey(records, tabKey, delta)
     if (nextKey === undefined) return
 
-    const nextButton = tabButtons.find((button) =>
-      isKeyActive(parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id, nextKey)
-    )
-    nextButton?.focus()
-    tabsContext.handleTabClick(nextKey)
+    tabsContext.handleTabClick(nextKey, { focus: true })
   }
 
   const handleClose = (event: React.MouseEvent) => {
@@ -196,26 +191,26 @@ export const TabPane: React.FC<TabPaneProps> = ({
 
   if (renderMode === 'tab') {
     return (
-      <button
-        type="button"
+      <div
         className={tabItemClasses}
         role="tab"
         id={tabId}
         aria-controls={panelMounted ? panelId : undefined}
         aria-selected={isActive}
         aria-disabled={disabled || undefined}
-        aria-label={label}
+        aria-labelledby={`${tabId}-label`}
         tabIndex={disabled ? -1 : isActive ? 0 : -1}
         data-tiger-tabs-id={tabsContext.idBase}
         data-tiger-tab-key={formatTabKey(tabKey)}
         onClick={handleClick}
         onKeyDown={handleKeyDown}>
         {icon && <span className="flex items-center">{icon}</span>}
-        <span aria-hidden="true">{label}</span>
+        <span id={`${tabId}-label`}>{label}</span>
         {isClosable && (
-          <span
+          <button
+            type="button"
             className={tabCloseButtonClasses}
-            aria-hidden="true"
+            aria-label={tabsContext.labels.closeTabAriaLabel.replace('{label}', String(label))}
             onClick={handleClose}
             onKeyDown={(event) => event.stopPropagation()}>
             <svg
@@ -231,9 +226,9 @@ export const TabPane: React.FC<TabPaneProps> = ({
                 d={closeIconPathD}
               />
             </svg>
-          </span>
+          </button>
         )}
-      </button>
+      </div>
     )
   }
 
@@ -288,7 +283,7 @@ export const Tabs: React.FC<TabsProps> = ({
   closable = false,
   centered = false,
   destroyInactiveTabPane = false,
-  lazy = false,
+  lazy = true,
   swipeable = false,
   className,
   id,
@@ -313,14 +308,14 @@ export const Tabs: React.FC<TabsProps> = ({
     () => getTabsLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
-  const dir = getLocaleDirection(mergedLocale)
+  const dir: 'ltr' | 'rtl' = config.direction === 'rtl' ? 'rtl' : 'ltr'
 
   const [internalActiveKey, setInternalActiveKey] = useState<string | number | undefined>(
     defaultActiveKey
   )
   const swipeStartRef = useRef<ReturnType<typeof getGestureTouchPoint> | null>(null)
   const tabListRef = useRef<HTMLDivElement>(null)
-  const [indicatorBox, setIndicatorBox] = useState<TabIndicatorStyle>({ opacity: '0' })
+  const indicatorRef = useRef<HTMLDivElement>(null)
 
   const containerClasses = classNames(getTabsContainerClasses(tabPosition), className)
   const tabNavClasses = getTabNavClasses(tabPosition, type)
@@ -344,8 +339,8 @@ export const Tabs: React.FC<TabsProps> = ({
             : closable && type === 'editable-card',
         label: child.props.label
       })
-      const tabId = `${idBase}-tab-${String(key)}`
-      const panelId = `${idBase}-panel-${String(key)}`
+      const tabId = `${idBase}-tab-${formatTabKey(key)}`
+      const panelId = `${idBase}-panel-${formatTabKey(key)}`
       items.push(
         React.cloneElement(child, {
           key: `tab-${String(key)}`,
@@ -368,32 +363,46 @@ export const Tabs: React.FC<TabsProps> = ({
   }, [children, idBase, closable, type])
 
   const requestedKey = controlledActiveKey !== undefined ? controlledActiveKey : internalActiveKey
-  const activeKey = resolveDisplayedActiveKey(requestedKey, tabRecords)
+  const activeKey = resolveDisplayedActiveKey(requestedKey, tabRecords, {
+    controlled: controlledActiveKey !== undefined
+  })
 
-  useLayoutEffect(() => {
+  const updateIndicator = useCallback(() => {
+    const ink = indicatorRef.current
     const list = tabListRef.current
+    if (!ink) return
     if (!list || type !== 'line') {
-      setIndicatorBox({ opacity: '0' })
+      ink.style.opacity = '0'
       return
     }
+    const tab = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
+    const computedDir = getComputedStyle(list).direction === 'rtl' ? 'rtl' : 'ltr'
+    const box = measureTabIndicatorBox(list, tab, tabPosition, computedDir)
+    const style = getTabIndicatorStyleFromBox(box, tabPosition)
+    ink.style.width = style.width ?? ''
+    ink.style.height = style.height ?? ''
+    ink.style.insetInlineStart = style.insetInlineStart ?? ''
+    ink.style.insetBlockStart = style.insetBlockStart ?? ''
+    ink.style.opacity = style.opacity
+  }, [tabPosition, type])
 
-    const update = () => {
-      const tab = list.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')
-      const computedDir = getComputedStyle(list).direction === 'rtl' ? 'rtl' : dir
-      const box = measureTabIndicatorBox(list, tab, tabPosition, computedDir)
-      setIndicatorBox(getTabIndicatorStyleFromBox(box, tabPosition))
-    }
+  useLayoutEffect(() => {
+    updateIndicator()
+  }, [updateIndicator, activeKey, tabRecords])
 
-    update()
-    const observer = new ResizeObserver(update)
+  useEffect(() => {
+    const list = tabListRef.current
+    if (!list || type !== 'line' || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() => updateIndicator())
     observer.observe(list)
-    Array.from(list.querySelectorAll('[role="tab"]')).forEach((node) => observer.observe(node))
     return () => observer.disconnect()
-  }, [activeKey, tabRecords, tabPosition, dir, type, tabItems])
+  }, [type, updateIndicator])
 
+  const pendingFocusKey = useRef<string | number | null>(null)
   const handleTabClick = useCallback(
-    (key: string | number) => {
+    (key: string | number, options?: { focus?: boolean }) => {
       onTabClick?.(key)
+      if (options?.focus) pendingFocusKey.current = key
       if (isKeyActive(key, activeKey)) return
       if (controlledActiveKey === undefined) setInternalActiveKey(key)
       onChange?.(key)
@@ -401,11 +410,27 @@ export const Tabs: React.FC<TabsProps> = ({
     [activeKey, controlledActiveKey, onChange, onTabClick]
   )
 
+  useLayoutEffect(() => {
+    const pending = pendingFocusKey.current
+    if (pending == null || !isKeyActive(pending, activeKey)) {
+      if (pending != null && !isKeyActive(pending, activeKey)) pendingFocusKey.current = null
+      return
+    }
+    pendingFocusKey.current = null
+    const id = `${idBase}-tab-${formatTabKey(pending)}`
+    tabListRef.current?.querySelector<HTMLElement>(`#${CSS.escape(id)}`)?.focus()
+  }, [activeKey, idBase])
+
   const handleTabClose = useCallback(
     (key: string | number, event: React.SyntheticEvent) => {
       event.stopPropagation()
-      if (controlledActiveKey === undefined && isKeyActive(key, activeKey)) {
-        setInternalActiveKey(getNextActiveKey(key, activeKey, tabRecords))
+      if (isKeyActive(key, activeKey)) {
+        const next = getNextActiveKey(key, activeKey, tabRecords)
+        if (next !== undefined) {
+          pendingFocusKey.current = next
+          if (controlledActiveKey === undefined) setInternalActiveKey(next)
+          onChange?.(next)
+        }
       }
       onEdit?.({ targetKey: key, action: 'remove' })
     },
@@ -490,7 +515,6 @@ export const Tabs: React.FC<TabsProps> = ({
         className={tabNavListClasses}
         role="tablist"
         id={id}
-        dir={dir}
         aria-label={ariaLabel ?? (ariaLabelledby ? undefined : labels.tablistAriaLabel)}
         aria-labelledby={ariaLabelledby}
         aria-orientation={
@@ -498,26 +522,14 @@ export const Tabs: React.FC<TabsProps> = ({
         }>
         {type === 'line' && (
           <div
+            ref={indicatorRef}
             data-tiger-tabs-indicator="true"
             aria-hidden="true"
             className={getTabIndicatorClasses(type, tabPosition)}
-            style={indicatorBox}
           />
         )}
         {tabItems}
       </div>
-      {tabRecords.map((tab) =>
-        tab.closable && !tab.disabled ? (
-          <button
-            key={`close-${String(tab.key)}`}
-            type="button"
-            className="sr-only"
-            aria-label={labels.closeTabAriaLabel.replace('{label}', String(tab.label ?? tab.key))}
-            onClick={(event) => handleTabClose(tab.key, event)}>
-            {labels.closeTabAriaLabel.replace('{label}', String(tab.label ?? tab.key))}
-          </button>
-        ) : null
-      )}
       {type === 'editable-card' && (
         <button
           type="button"

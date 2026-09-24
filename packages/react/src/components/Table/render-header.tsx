@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   classNames,
+  createTableTextFilterCoalescer,
   formatTableFilterColumnAriaLabel,
+  formatTableSortButtonName,
   formatTableSortByText,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   getFixedColumnStyle,
+  TABLE_FIXED_HEADER_Z_INDEX,
   getInputClasses,
   getTableChromeSlots,
   getTableFixedHeaderCellClasses,
@@ -35,6 +38,7 @@ export interface RenderHeaderViewProps {
   unlockColumnAriaLabel: string
   labels: Required<TigerLocaleTable>
   selectionName?: string
+  filterMode?: 'basic' | 'advanced'
 }
 
 function isHeaderSortClickTarget(target: EventTarget | null): boolean {
@@ -52,7 +56,8 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
     columnDraggable,
     lockColumnAriaLabel,
     unlockColumnAriaLabel,
-    labels
+    labels,
+    filterMode = 'basic'
   } = view
   const chrome = getTableChromeSlots({
     hasSelectionColumn: hasTableSelectionColumn(rowSelection),
@@ -98,7 +103,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                 : 'none'
             : undefined
 
-          const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, 15)
+          const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, TABLE_FIXED_HEADER_Z_INDEX)
 
           const widthStyle = column.width
             ? {
@@ -154,7 +159,15 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                     type="button"
                     data-tiger-table-sort=""
                     className={tableSortButtonClasses}
-                    aria-label={formatTableSortByText(labels.sortByText, String(column.title))}
+                    aria-label={formatTableSortButtonName(
+                      labels.sortByText,
+                      String(column.title),
+                      sortDirection === 'asc'
+                        ? labels.sortAscendingText
+                        : sortDirection === 'desc'
+                          ? labels.sortDescendingText
+                          : labels.sortNoneText
+                    )}
                     onClick={(event) => {
                       event.stopPropagation()
                       ctx.handleSort(column.key)
@@ -170,27 +183,29 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                   <button
                     type="button"
                     aria-label={formatTableSortByText(
-                      column.fixed === 'left' || column.fixed === 'right'
+                      column.fixed === 'start' || column.fixed === 'end'
                         ? unlockColumnAriaLabel
                         : lockColumnAriaLabel,
                       String(column.title)
                     )}
                     className={classNames(
                       'inline-flex items-center',
-                      column.fixed === 'left' || column.fixed === 'right'
-                        ? 'text-[var(--tiger-primary,#2563eb)]'
-                        : 'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]'
+                      column.fixed === 'start' || column.fixed === 'end'
+                        ? 'text-[var(--tiger-primary)]'
+                        : 'text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-text)]'
                     )}
                     onClick={(e) => {
                       e.stopPropagation()
                       ctx.toggleColumnLock(column.key)
                     }}>
-                    <LockIcon locked={column.fixed === 'left' || column.fixed === 'right'} />
+                    <LockIcon locked={column.fixed === 'start' || column.fixed === 'end'} />
                   </button>
                 )}
               </div>
 
-              {column.filter && (
+              {filterMode !== 'advanced' &&
+              column.filter &&
+              (column.filter.type !== 'custom' || column.filter.render) ? (
                 <div
                   className="mt-2"
                   data-tiger-table-filter=""
@@ -200,7 +215,9 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                     e.preventDefault()
                     e.stopPropagation()
                   }}>
-                  {column.filter.type === 'select' && column.filter.options ? (
+                  {column.filter.type === 'custom' && column.filter.render ? (
+                    column.filter.render() as React.ReactNode
+                  ) : column.filter.type === 'select' && column.filter.options ? (
                     <select
                       className={getInputClasses({ size: 'sm' })}
                       aria-label={formatTableFilterColumnAriaLabel(
@@ -218,20 +235,18 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                       ))}
                     </select>
                   ) : (
-                    <Input
-                      size="sm"
+                    <TableTextFilter
                       value={filterText}
-                      aria-label={formatTableFilterColumnAriaLabel(
+                      label={formatTableFilterColumnAriaLabel(
                         labels.filterColumnAriaLabel,
                         String(column.title)
                       )}
                       placeholder={column.filter.placeholder || labels.filterPlaceholder}
-                      draggable={false}
-                      onChange={(value) => ctx.handleFilter(column.key, String(value))}
+                      onCommit={(value) => ctx.handleFilter(column.key, value)}
                     />
                   )}
                 </div>
-              )}
+              ) : null}
             </th>
           )
         })}
@@ -241,5 +256,41 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
         ))}
       </tr>
     </thead>
+  )
+}
+
+function TableTextFilter({
+  value,
+  label,
+  placeholder,
+  onCommit
+}: {
+  value: string
+  label: string
+  placeholder: string
+  onCommit: (value: string) => void
+}) {
+  const [draft, setDraft] = useState(value)
+  const commitRef = useRef(onCommit)
+  commitRef.current = onCommit
+  const coalescer = useRef<ReturnType<typeof createTableTextFilterCoalescer> | null>(null)
+  if (!coalescer.current) {
+    coalescer.current = createTableTextFilterCoalescer((next) => commitRef.current(next))
+  }
+  useEffect(() => setDraft(value), [value])
+  useEffect(() => () => coalescer.current?.cancel(), [])
+  return (
+    <Input
+      size="sm"
+      value={draft}
+      aria-label={label}
+      placeholder={placeholder}
+      draggable={false}
+      onChange={(next) => {
+        const text = String(next)
+        setDraft(text)
+        coalescer.current?.push(text)
+      }}
+    />
   )
 }

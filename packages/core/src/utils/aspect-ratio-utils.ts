@@ -10,9 +10,9 @@
  * adding `overflow-hidden`.
  */
 
-import type { AspectRatioStyle, AspectRatioValue } from '../types/aspect-ratio'
+import type { AspectRatioFit, AspectRatioStyle, AspectRatioValue } from '../types/aspect-ratio'
 import { classNames } from './class-names'
-import { isBrowser } from './env'
+import { devWarn } from './dev-warn'
 
 /** Ratio applied when ratio is omitted or invalid */
 export const ASPECT_RATIO_DEFAULT = '16/9'
@@ -23,46 +23,60 @@ const ASPECT_RATIO_DEFAULT_NUMERIC = 16 / 9
 /** Style for the default ratio (fraction form keeps full precision) */
 const ASPECT_RATIO_DEFAULT_STYLE: AspectRatioStyle = { aspectRatio: '16 / 9' }
 
-/** Fraction string such as 16/9 or 1.5 / 2 */
-const ASPECT_RATIO_FRACTION_PATTERN = /^\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)\s*$/
+/** Fraction string such as 16/9, 16:9, or 1.5 / 2 */
+const ASPECT_RATIO_FRACTION_PATTERN = new RegExp(
+  '^\\s*(\\d+(?:\\.\\d+)?)\\s*[/:]\\s*(\\d+(?:\\.\\d+)?)\\s*$'
+)
 
-export const ASPECT_RATIO_STYLE_ID = 'tiger-ui-aspect-ratio-styles'
-
-export const ASPECT_RATIO_CSS = `
-.tiger-aspect-ratio {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-.tiger-aspect-ratio-content {
-  position: absolute;
-  inset: 0;
-}
-.tiger-aspect-ratio-content > img,
-.tiger-aspect-ratio-content > video,
-.tiger-aspect-ratio-content > iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: 0;
-}
-`
-
-export function injectAspectRatioStyles(): void {
-  if (!isBrowser()) return
-  if (document.getElementById(ASPECT_RATIO_STYLE_ID)) return
-  const style = document.createElement('style')
-  style.id = ASPECT_RATIO_STYLE_ID
-  style.textContent = ASPECT_RATIO_CSS
-  document.head.appendChild(style)
-}
+/** Ratio box. No runtime `<style>`. Default does not crop media. */
+export const aspectRatioBaseStyles = {
+  '.tiger-aspect-ratio': {
+    position: 'relative',
+    width: '100%',
+    overflow: 'visible'
+  },
+  '.tiger-aspect-ratio-content': {
+    width: '100%',
+    height: '100%',
+    minWidth: '0',
+    minHeight: '0'
+  },
+  '.tiger-aspect-ratio-fit-contain > img, .tiger-aspect-ratio-fit-contain > video, .tiger-aspect-ratio-fit-contain > iframe':
+    {
+      objectFit: 'contain',
+      width: '100%',
+      height: '100%'
+    },
+  '.tiger-aspect-ratio-fit-cover > img, .tiger-aspect-ratio-fit-cover > video, .tiger-aspect-ratio-fit-cover > iframe':
+    {
+      objectFit: 'cover',
+      width: '100%',
+      height: '100%'
+    },
+  '.tiger-aspect-ratio-fit-fill > img, .tiger-aspect-ratio-fit-fill > video, .tiger-aspect-ratio-fit-fill > iframe':
+    {
+      objectFit: 'fill',
+      width: '100%',
+      height: '100%'
+    }
+} as const
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
-export const aspectRatioRootClasses = 'tiger-aspect-ratio relative w-full overflow-hidden'
+export const aspectRatioRootClasses = 'tiger-aspect-ratio relative w-full overflow-visible'
 
-export const aspectRatioContentClasses = 'tiger-aspect-ratio-content absolute inset-0'
+export const aspectRatioContentClasses = 'tiger-aspect-ratio-content h-full w-full min-h-0 min-w-0'
+
+const ASPECT_FIT_CLASSES: Record<Exclude<AspectRatioFit, 'none'>, string> = {
+  contain: 'tiger-aspect-ratio-fit-contain',
+  cover: 'tiger-aspect-ratio-fit-cover',
+  fill: 'tiger-aspect-ratio-fit-fill'
+}
+
+export function getAspectRatioFitClasses(fit?: AspectRatioFit | null): string | undefined {
+  if (!fit || fit === 'none') return undefined
+  return ASPECT_FIT_CLASSES[fit]
+}
 
 /**
  * Validate a parsed ratio candidate.
@@ -102,7 +116,9 @@ export function parseAspectRatio(
   fallback: number = ASPECT_RATIO_DEFAULT_NUMERIC
 ): number {
   if (typeof ratio === 'number') {
-    return isValidAspectRatio(ratio) ? ratio : fallback
+    if (isValidAspectRatio(ratio)) return ratio
+    devWarn('AspectRatio.ratio', `Invalid aspect ratio "${ratio}". Falling back to 16/9.`)
+    return fallback
   }
 
   if (typeof ratio === 'string') {
@@ -112,9 +128,14 @@ export function parseAspectRatio(
     }
 
     const numeric = Number(ratio.trim())
-    return isValidAspectRatio(numeric) ? numeric : fallback
+    if (isValidAspectRatio(numeric)) return numeric
+    devWarn('AspectRatio.ratio', `Invalid aspect ratio "${ratio}". Falling back to 16/9.`)
+    return fallback
   }
 
+  if (ratio != null) {
+    devWarn('AspectRatio.ratio', `Invalid aspect ratio "${String(ratio)}". Falling back to 16/9.`)
+  }
   return fallback
 }
 
@@ -136,6 +157,7 @@ export function getAspectRatioStyle(ratio?: AspectRatioValue): AspectRatioStyle 
       return { aspectRatio: String(numeric) }
     }
 
+    devWarn('AspectRatio.ratio', `Invalid aspect ratio "${ratio}". Falling back to 16/9.`)
     return ASPECT_RATIO_DEFAULT_STYLE
   }
 
@@ -143,21 +165,22 @@ export function getAspectRatioStyle(ratio?: AspectRatioValue): AspectRatioStyle 
     return { aspectRatio: String(ratio) }
   }
 
+  if (ratio != null) {
+    devWarn('AspectRatio.ratio', `Invalid aspect ratio "${String(ratio)}". Falling back to 16/9.`)
+  }
   return ASPECT_RATIO_DEFAULT_STYLE
 }
 
 /**
  * Classes for the root ratio box.
  */
-export function getAspectRatioRootClasses(className?: string): string {
-  injectAspectRatioStyles()
-  return classNames(aspectRatioRootClasses, className)
+export function getAspectRatioRootClasses(className?: string, fit?: AspectRatioFit | null): string {
+  return classNames(aspectRatioRootClasses, getAspectRatioFitClasses(fit), className)
 }
 
 /**
  * Classes for the content wrapper that fills the ratio box.
  */
 export function getAspectRatioContentClasses(className?: string): string {
-  injectAspectRatioStyles()
   return classNames(aspectRatioContentClasses, className)
 }

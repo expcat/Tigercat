@@ -15,6 +15,7 @@ import {
   captureActiveElement,
   classNames,
   coerceClassValue,
+  claimSpotlightHotkey,
   findSpotlightShortcutItem,
   focusFirst,
   getEmptyLabels,
@@ -28,7 +29,10 @@ import {
   getSpotlightOptionClasses,
   getSpotlightSearchState,
   getSpotlightShortcutLabel,
+  isSpotlightHotkeyEnabled,
   isSpotlightToggleHotkey,
+  releaseSpotlightHotkey,
+  resolveSpotlightIconKind,
   mergeStyleValues,
   mergeTigerLocale,
   restoreFocus,
@@ -51,12 +55,8 @@ import {
   OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
-import {
-  renderVueBodyTeleport,
-  useVueBodyScrollLock,
-  useVueEscapeKey,
-  useVueFocusTrap
-} from '../utils/overlay'
+import { useVueBodyScrollLock, useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
+import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 
 export type VueSpotlightProps = InstanceType<typeof Spotlight>['$props']
 export type SpotlightProps = VueSpotlightProps
@@ -143,7 +143,7 @@ export const Spotlight = defineComponent({
     },
     hotkey: {
       type: [Boolean, String] as PropType<boolean | string>,
-      default: true
+      default: false
     },
     style: {
       type: Object as PropType<Record<string, unknown>>,
@@ -260,14 +260,19 @@ export const Spotlight = defineComponent({
     useVueFocusTrap({ enabled: resolvedOpen, containerRef: rootRef, inert: true })
     let cleanupEscape: (() => void) | undefined
 
+    const hotkeyOwner = {}
+    let hotkeyClaimed = false
     const onDocumentKeyDown = (event: KeyboardEvent) => {
-      if (isSpotlightToggleHotkey(event, props.hotkey)) {
+      if (hotkeyClaimed && isSpotlightToggleHotkey(event, props.hotkey)) {
         event.preventDefault()
         toggleSpotlight()
         return
       }
       if (!resolvedOpen.value) return
-      const item = findSpotlightShortcutItem(event, props.items)
+      const item = findSpotlightShortcutItem(
+        event,
+        searchState.value.flatResults.map((result) => result.item)
+      )
       if (!item) return
       event.preventDefault()
       selectItem(item)
@@ -279,12 +284,16 @@ export const Spotlight = defineComponent({
         onEscape: closeSpotlight,
         layerRef: rootRef
       })
+      if (isSpotlightHotkeyEnabled(props.hotkey) && claimSpotlightHotkey(hotkeyOwner)) {
+        hotkeyClaimed = true
+      }
       document.addEventListener('keydown', onDocumentKeyDown)
     })
 
     onBeforeUnmount(() => {
       cleanupEscape?.()
       document.removeEventListener('keydown', onDocumentKeyDown)
+      if (hotkeyClaimed) releaseSpotlightHotkey(hotkeyOwner)
     })
 
     watch(
@@ -335,9 +344,12 @@ export const Spotlight = defineComponent({
       const renderOption = (result: (typeof state.flatResults)[number]) => {
         const active = result.flatIndex === activeIndex.value
         const shortcutLabel = getSpotlightShortcutLabel(result.item.shortcut)
+        const iconKind = resolveSpotlightIconKind(result.item.icon)
         const iconNode = slots.icon
           ? slots.icon({ item: result.item })
-          : (result.item.icon as VNodeChild | undefined)
+          : iconKind === 'none'
+            ? undefined
+            : (result.item.icon as VNodeChild | undefined)
 
         return h(
           'div',
@@ -345,7 +357,7 @@ export const Spotlight = defineComponent({
             key: String(result.item.key),
             id: getPickerOptionId(listboxId, result.flatIndex),
             ...getPickerOptionAria({
-              selected: false,
+              selected: active,
               disabled: result.item.disabled
             }),
             class: getSpotlightOptionClasses(active, result.item.disabled === true),
@@ -463,7 +475,11 @@ export const Spotlight = defineComponent({
                 })
               ),
               state.flatResults.length === 0
-                ? h('div', { class: spotlightEmptyClasses }, emptyMessage.value)
+                ? h(
+                    'div',
+                    { class: spotlightEmptyClasses, role: 'status', 'aria-live': 'polite' },
+                    emptyMessage.value
+                  )
                 : null
             ]
           ),
@@ -471,7 +487,7 @@ export const Spotlight = defineComponent({
         ]
       )
 
-      return renderVueBodyTeleport(content)
+      return renderVueOverlayOutlet(dialogId, content)
     }
   }
 })

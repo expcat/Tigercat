@@ -149,6 +149,11 @@ describe('ImagePreview', () => {
   it('keeps panning after the pointer leaves the bitmap', async () => {
     render(ImagePreview, { props: { open: true, images: ['/solo.jpg'] } })
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    const dialog = img.closest('[role="dialog"]') as HTMLElement
+    Object.defineProperty(img, 'offsetWidth', { configurable: true, value: 400 })
+    Object.defineProperty(img, 'offsetHeight', { configurable: true, value: 400 })
+    Object.defineProperty(dialog, 'clientWidth', { configurable: true, value: 200 })
+    Object.defineProperty(dialog, 'clientHeight', { configurable: true, value: 200 })
     await fireEvent.pointerDown(img, {
       pointerId: 1,
       button: 0,

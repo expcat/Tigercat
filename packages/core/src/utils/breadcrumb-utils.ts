@@ -21,9 +21,9 @@ export const breadcrumbItemBaseClasses = 'inline-flex items-center gap-2'
  * Breadcrumb link classes
  */
 export const breadcrumbLinkClasses = classNames(
-  'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-primary,#2563eb)]',
+  'text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-primary)]',
   'transition-colors duration-200 motion-reduce:transition-none',
-  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-1 focus:ring-offset-[var(--tiger-surface,#fff)] rounded',
+  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary)] focus:ring-offset-1 focus:ring-offset-[var(--tiger-surface)] rounded',
   'cursor-pointer'
 )
 
@@ -31,14 +31,14 @@ export const breadcrumbLinkClasses = classNames(
  * Breadcrumb current item classes (last item, not clickable)
  */
 export const breadcrumbCurrentClasses = classNames(
-  'text-[var(--tiger-text,#111827)] font-medium',
+  'text-[var(--tiger-text)] font-medium',
   'cursor-default'
 )
 
 /**
  * Breadcrumb separator base classes
  */
-export const breadcrumbSeparatorBaseClasses = 'text-[var(--tiger-text-muted,#9ca3af)] select-none'
+export const breadcrumbSeparatorBaseClasses = 'text-[var(--tiger-text-secondary)] select-none'
 
 /**
  * Get breadcrumb item classes
@@ -85,9 +85,9 @@ export function getBreadcrumbSeparatorClasses(className?: string): string {
  * @since 0.9.0
  */
 export const breadcrumbEllipsisClasses = classNames(
-  'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-primary,#2563eb)]',
+  'text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-primary)]',
   'transition-colors duration-200 motion-reduce:transition-none cursor-pointer',
-  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-1 focus:ring-offset-[var(--tiger-surface,#fff)] rounded',
+  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary)] focus:ring-offset-1 focus:ring-offset-[var(--tiger-surface)] rounded',
   'px-1'
 )
 

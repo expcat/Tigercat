@@ -6,6 +6,8 @@ import {
   getChartElementOpacity,
   getStableChartGradientPrefix,
   resolveChartPalette,
+  resolveChartWritingDirection,
+  readPageWritingDirection,
   buildChartLegendItems,
   chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
@@ -16,6 +18,7 @@ import {
   getChartLabels,
   mergeTigerLocale,
   funnelStageDisplayLabel,
+  chartLabelFill,
   funnelSegmentTransitionClasses,
   pieSliceLabelInsideClasses,
   DEFAULT_FUNNEL_HEIGHT,
@@ -49,7 +52,7 @@ export const FunnelChart = defineComponent({
     width: { type: Number, default: 320 },
     height: { type: Number, default: DEFAULT_FUNNEL_HEIGHT },
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: 24 },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: { type: Array as PropType<FunnelChartDatum[]>, required: true },
     orientation: { type: String as PropType<'vertical' | 'horizontal'>, default: 'vertical' },
     gap: { type: Number, default: 2 },
@@ -85,6 +88,9 @@ export const FunnelChart = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
+    const direction = computed(() =>
+      resolveChartWritingDirection(config.value.direction, readPageWritingDirection())
+    )
     const interactive = computed(
       () => props.hoverable || props.selectable || typeof props.onSegmentClick === 'function'
     )
@@ -115,10 +121,7 @@ export const FunnelChart = defineComponent({
       onHoveredIndexChange: (index) => emit('update:hoveredIndex', index),
       onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       onHover: (index, datum) => emit('segment-hover', index, datum),
-      onClick: (index, datum) => {
-        props.onSegmentClick?.(index, datum as FunnelChartDatum)
-        emit('segment-click', index, datum)
-      }
+      onClick: (index, datum) => emit('segment-click', index, datum)
     })
     const { innerRect, onResolvedSizeChange } = useResponsiveChartSize(
       () => props.width,
@@ -134,7 +137,8 @@ export const FunnelChart = defineComponent({
         gap: props.gap,
         pinch: props.pinch,
         colors: palette.value,
-        orientation: props.orientation
+        orientation: props.orientation,
+        direction: direction.value
       })
     )
     const total = computed(() => segments.value.reduce((sum, segment) => sum + segment.value, 0))
@@ -142,12 +146,13 @@ export const FunnelChart = defineComponent({
       funnelStageDisplayLabel(datum, index, labels.value.stageName)
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
-        data: props.data,
+        data: segments.value,
         palette: palette.value,
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
-        getLabel: (d, i) => stageName(d, i),
-        getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
+        getIndex: (segment) => segment.index,
+        getLabel: (segment) => stageName(props.data[segment.index], segment.index),
+        getColor: (segment) => segment.color
       })
     )
     const tooltipContent = computed(() =>
@@ -190,6 +195,7 @@ export const FunnelChart = defineComponent({
           responsive: props.responsive,
           title: props.title,
           desc: props.desc,
+          'aria-label': props.title ? undefined : labels.value.funnelChartAriaLabel,
           onResolvedSizeChange
         },
         {
@@ -245,6 +251,15 @@ export const FunnelChart = defineComponent({
                     : undefined,
                   role: interactive.value ? 'button' : undefined,
                   'aria-hidden': interactive.value ? undefined : true,
+                  'aria-label': interactive.value
+                    ? (() => {
+                        const datum = props.data[seg.index] ?? { value: seg.value, label: seg.label }
+                        const name = stageName(datum, seg.index)
+                        const pct =
+                          total.value > 0 ? ((seg.value / total.value) * 100).toFixed(1) : '0'
+                        return `${name}: ${seg.value} (${pct}%)`
+                      })()
+                    : undefined,
                   onMouseenter: (e: MouseEvent) => handleMouseEnter(seg.index, e),
                   onMousemove: handleMouseMove,
                   onMouseleave: handleMouseLeave,
@@ -265,7 +280,8 @@ export const FunnelChart = defineComponent({
                       class: pieSliceLabelInsideClasses,
                       'text-anchor': 'middle',
                       'dominant-baseline': 'middle',
-                      'aria-hidden': 'true'
+                      fill: chartLabelFill(seg.color),
+                      'aria-hidden': interactive.value ? 'true' : undefined
                     },
                     stageName(
                       props.data[seg.index] ?? { value: seg.value, label: seg.label },

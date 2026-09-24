@@ -236,9 +236,9 @@ describe('DataTableWithToolbar (React)', () => {
         columns={columns}
         dataSource={[]}
         toolbar={{
-          bulkActions: [{ key: 'export', label: '导出' }],
-          selectedKeys: [1, 2]
+          bulkActions: [{ key: 'export', label: '导出' }]
         }}
+        rowSelection={{ selectedRowKeys: [1, 2] }}
         pagination={false}
       />
     )
@@ -260,10 +260,10 @@ describe('DataTableWithToolbar (React)', () => {
         }}
         toolbar={{
           bulkActions: [{ key: 'export', label: 'Export' }],
-          selectedKeys: [1],
           defaultSearchValue: '',
           onSearch: vi.fn()
         }}
+        rowSelection={{ selectedRowKeys: [1] }}
         pagination={false}
       />
     )
@@ -279,12 +279,12 @@ describe('DataTableWithToolbar (React)', () => {
         labels={{ searchButtonText: 'Find', selectedText: 'Chosen' }}
         toolbar={{
           bulkActions: [{ key: 'export', label: 'Export' }],
-          selectedKeys: [1],
           defaultSearchValue: '',
           searchButtonText: 'Go',
           bulkActionsLabel: 'Picked',
           onSearch: vi.fn()
         }}
+        rowSelection={{ selectedRowKeys: [1] }}
         pagination={false}
       />
     )
@@ -375,10 +375,10 @@ describe('DataTableWithToolbar (React)', () => {
           dataSource={[]}
           toolbar={{
             bulkActions: [{ key: 'export', label: '导出' }],
-            selectedKeys: [1],
             defaultSearchValue: '',
             onSearch: vi.fn()
           }}
+          rowSelection={{ selectedRowKeys: [1] }}
           pagination={false}
         />
       </ConfigProvider>
@@ -435,8 +435,8 @@ describe('DataTableWithToolbar (React)', () => {
             total: 20,
             showTotal: true,
             locale: false,
-            prevText: 'Back',
-            nextText: 'Forward',
+            prevAriaLabel: 'Back',
+            nextAriaLabel: 'Forward',
             pageIndicatorText: (cur, tot) => `P.${cur}/${tot}`,
             pageSizeText: (size) => `${size} items/page`
           }}

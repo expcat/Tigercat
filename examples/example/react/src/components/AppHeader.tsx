@@ -50,7 +50,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <div className="h-full px-4 sm:px-6 flex items-center justify-between gap-4">
         <div className="min-w-0 flex items-baseline gap-3">
           <Button
-            htmlType="button"
+            type="button"
             variant="outline"
             size="sm"
             onClick={onToggleSider}
@@ -61,7 +61,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           <Link
             to="/"
             aria-label={DEMO_APP_TITLE[lang]}
-            className="text-base sm:text-lg font-semibold text-gray-900 truncate dark:text-gray-100 hover:text-[var(--tiger-primary,#2563eb)]">
+            className="text-base sm:text-lg font-semibold text-gray-900 truncate dark:text-gray-100 hover:text-[var(--tiger-primary)]">
             {DEMO_APP_TITLE[lang]}
           </Link>
           {rightHint && (
@@ -73,13 +73,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
         {isCompactHeader ? (
           <details className="relative shrink-0 sm:hidden">
-            <summary className="flex size-8 cursor-pointer list-none select-none items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900 [&::-webkit-details-marker]:hidden">
+            <summary className="flex size-8 cursor-pointer list-none select-none items-center justify-center rounded-[var(--tiger-radius-md)] border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900 [&::-webkit-details-marker]:hidden">
               <span aria-hidden="true" className="text-base leading-none">
                 ⚙
               </span>
               <span className="sr-only">{settingsLabel}</span>
             </summary>
-            <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-950">
+            <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-[var(--tiger-radius-md)] border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-950">
               <div className="flex flex-col gap-3">
                 <LanguageSwitch value={lang} onChange={onLangChange} />
                 <ThemeSwitch lang={lang} value={theme} onChange={onThemeChange} />

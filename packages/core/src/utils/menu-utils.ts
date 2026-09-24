@@ -4,6 +4,7 @@
  */
 
 import type { MenuFilterMode, MenuItem, MenuKey, MenuMode, MenuTheme } from '../types/menu'
+import { typedKeyId } from './focus-utils'
 import { getIconDefinition } from './icons/registry'
 import { prefersReducedMotion } from './transition'
 
@@ -11,19 +12,19 @@ import { prefersReducedMotion } from './transition'
  * Base menu container classes
  */
 export const menuBaseClasses =
-  'flex border bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border-[var(--tiger-border,#e5e7eb)]'
+  'flex border bg-[var(--tiger-surface)] text-[var(--tiger-text)] border-[var(--tiger-border)]'
 
 /**
  * Menu mode classes
  */
 export const menuModeClasses = {
   horizontal: 'flex-row border-b',
-  vertical: 'flex-col border-r min-w-[200px]',
+  vertical: 'flex-col border-e min-w-[200px]',
   inline: 'flex-col min-w-[200px]'
 }
 
 export const menuCollapsedModeClasses = {
-  vertical: 'flex-col border-r',
+  vertical: 'flex-col border-e',
   inline: 'flex-col'
 }
 
@@ -34,38 +35,37 @@ export const menuCollapsedModeClasses = {
 export const menuLightThemeClasses = ''
 
 /**
- * Menu theme classes - dark theme
+ * Dark menu uses the semantic `.dark` token set. No hex overrides.
  */
-export const menuDarkThemeClasses =
-  '[--tiger-surface:#111827] [--tiger-text:#f9fafb] [--tiger-text-muted:#9ca3af] [--tiger-border:#374151] [--tiger-surface-muted:#1f2937] [--tiger-outline-bg-hover:#2563eb1a] [--tiger-ghost-bg-hover:#2563eb1a]'
+export const menuDarkThemeClasses = 'dark'
 
 /**
  * Menu item base classes
  */
 export const menuItemBaseClasses =
-  'flex w-full items-center px-4 py-2 text-start bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-inset active:opacity-90'
+  'flex w-full items-center px-4 py-2 text-start bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset active:opacity-90'
 
 /**
  * Menu item hover classes - light theme
  */
-export const menuItemHoverLightClasses = 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+export const menuItemHoverLightClasses = 'hover:bg-[var(--tiger-surface-muted)]'
 
 /**
  * Menu item hover classes - dark theme
  */
-export const menuItemHoverDarkClasses = 'hover:bg-[var(--tiger-surface-muted,#1f2937)]'
+export const menuItemHoverDarkClasses = 'hover:bg-[var(--tiger-surface-muted)]'
 
 /**
  * Menu item selected classes - light theme
  */
 export const menuItemSelectedLightClasses =
-  'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] font-medium'
+  'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)] font-medium'
 
 /**
  * Menu item selected classes - dark theme
  */
 export const menuItemSelectedDarkClasses =
-  'bg-[var(--tiger-outline-bg-hover,#2563eb1a)] text-[var(--tiger-primary,#60a5fa)] font-medium'
+  'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)] font-medium'
 
 /**
  * Menu item disabled classes
@@ -88,7 +88,7 @@ export const menuCollapsedIconClasses = 'flex-shrink-0'
  * Submenu title classes
  */
 export const submenuTitleClasses =
-  'flex w-full items-center justify-between px-4 py-2 text-start bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-inset active:opacity-90'
+  'flex w-full items-center justify-between px-4 py-2 text-start bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset active:opacity-90'
 
 /**
  * Submenu expand icon classes. `rtl:-scale-x-100` flips the inline-end chevron.
@@ -110,7 +110,7 @@ export const submenuExpandIconPopupClasses = '-rotate-90'
  * Submenu content classes - popup (horizontal, nested, and collapsed vertical)
  */
 export const submenuContentPopupClasses =
-  'min-w-[180px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg'
+  'min-w-[180px] bg-[var(--tiger-surface)] text-[var(--tiger-text)] border border-[var(--tiger-border)] rounded shadow-lg'
 
 /**
  * Submenu content classes - vertical mode
@@ -132,7 +132,7 @@ export const submenuHeightTransitionClasses =
  * Menu item group title classes
  */
 export const menuItemGroupTitleClasses =
-  'px-4 py-2 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] uppercase tracking-wider'
+  'px-4 py-2 text-xs font-semibold text-[var(--tiger-text-secondary)] uppercase tracking-wider'
 
 /**
  * Menu search field wrapper classes.
@@ -143,13 +143,13 @@ export const menuSearchFieldClasses = 'px-2 py-2'
  * Menu search input classes.
  */
 export const menuSearchInputClasses =
-  'w-full rounded border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] px-3 py-1.5 text-sm text-[var(--tiger-text,#111827)] outline-none focus:border-[var(--tiger-primary,#2563eb)] focus:ring-2 focus:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/20'
+  'w-full rounded border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-1.5 text-sm text-[var(--tiger-text)] outline-none focus:border-[var(--tiger-primary)] focus:ring-2 focus:ring-[var(--tiger-focus-ring)]/20'
 
 /**
  * Menu search empty state classes.
  */
 export const menuSearchEmptyClasses =
-  'px-4 py-6 text-sm text-center text-[var(--tiger-text-muted,#6b7280)]'
+  'px-4 py-6 text-sm text-center text-[var(--tiger-text-secondary)]'
 
 /**
  * Menu collapsed classes
@@ -283,7 +283,16 @@ export function shouldIndentMenuItem(mode: MenuMode, level: number): boolean {
 }
 
 export function menuKeyId(key: MenuKey): string {
-  return String(key)
+  return typedKeyId(key)
+}
+
+export function parseMenuKeyId(id: string): MenuKey {
+  if (id.startsWith('n:')) {
+    const value = Number(id.slice(2))
+    return Number.isFinite(value) ? value : id.slice(2)
+  }
+  if (id.startsWith('s:')) return id.slice(2)
+  return id
 }
 
 export function sameMenuKey(a: MenuKey, b: MenuKey): boolean {
@@ -506,16 +515,42 @@ export function getMenuListRole(
   options?: { popup?: boolean; isRoot?: boolean }
 ): 'menu' | 'menubar' | undefined {
   if (options?.popup) return 'menu'
-  if (options?.isRoot && mode === 'horizontal') return 'menubar'
-  return undefined
+  if (!options?.isRoot) return 'menu'
+  return mode === 'horizontal' ? 'menubar' : 'menu'
 }
 
 export function isMenuRoving(
-  mode: MenuMode,
-  options?: { popup?: boolean; isRoot?: boolean }
+  _mode: MenuMode,
+  _options?: { popup?: boolean; isRoot?: boolean }
 ): boolean {
-  return Boolean(options?.popup || (options?.isRoot && mode === 'horizontal'))
+  return true
 }
+
+/**
+ * Popup entrance animation. Same keyframes as `dropdownBaseStyles`.
+ * Spread into the Tailwind plugin; do not inject a runtime style tag.
+ */
+export const menuBaseStyles = {
+  '@keyframes tiger-dropdown-in': {
+    from: {
+      opacity: '0',
+      transform: 'scale(0.96) translateY(-2px)'
+    },
+    to: {
+      opacity: '1',
+      transform: 'scale(1) translateY(0)'
+    }
+  },
+  '.tiger-dropdown-enter': {
+    animation:
+      'tiger-dropdown-in var(--tiger-motion-duration-base) var(--tiger-motion-ease-standard)'
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    '.tiger-dropdown-enter': {
+      animationDuration: '0ms'
+    }
+  }
+} as const
 
 // ============================================================================
 // Submenu height transition controller
@@ -771,11 +806,39 @@ export function resolveMenuTabStopKey(options: {
   itemKeys: readonly MenuKey[]
   selectedKeys: readonly MenuKey[]
   disabledKeys?: ReadonlySet<string>
+  /** Stop already stored for this layer. Kept when it is still enabled. */
+  current?: MenuKey
+  /** Popup layers open on their first enabled item. */
+  preferFirst?: boolean
 }): MenuKey | undefined {
   const disabled = options.disabledKeys
   const enabled = options.itemKeys.filter((key) => !disabled?.has(menuKeyId(key)))
+  if (enabled.length === 0) return undefined
+  if (options.preferFirst) return enabled[0]
+  if (options.current != null && enabled.some((key) => sameMenuKey(key, options.current as MenuKey))) {
+    return enabled.find((key) => sameMenuKey(key, options.current as MenuKey))
+  }
   const selected = enabled.find((key) => isKeySelected(key, options.selectedKeys))
   return selected ?? enabled[0]
+}
+
+export function nextMenuRovingKey(options: {
+  itemKeys: readonly MenuKey[]
+  current: MenuKey | undefined
+  delta: 1 | -1 | 'start' | 'end'
+  disabledKeys?: ReadonlySet<string>
+}): MenuKey | undefined {
+  const disabled = options.disabledKeys
+  const enabled = options.itemKeys.filter((key) => !disabled?.has(menuKeyId(key)))
+  if (enabled.length === 0) return undefined
+  if (options.delta === 'start') return enabled[0]
+  if (options.delta === 'end') return enabled[enabled.length - 1]
+  const index = enabled.findIndex(
+    (key) => options.current != null && sameMenuKey(key, options.current)
+  )
+  const base = index < 0 ? 0 : index
+  const next = (base + options.delta + enabled.length) % enabled.length
+  return enabled[next]
 }
 
 /**
@@ -797,7 +860,9 @@ export function focusFirstChildItem(titleEl: HTMLElement, popupEl?: HTMLElement 
 
 export function getMenuPopupPlacement(
   mode: MenuMode,
-  level: number
-): 'bottom-start' | 'right-start' {
-  return mode === 'horizontal' && level === 0 ? 'bottom-start' : 'right-start'
+  level: number,
+  dir: 'ltr' | 'rtl' = 'ltr'
+): 'bottom-start' | 'right-start' | 'left-start' {
+  if (mode === 'horizontal' && level === 0) return 'bottom-start'
+  return dir === 'rtl' ? 'left-start' : 'right-start'
 }

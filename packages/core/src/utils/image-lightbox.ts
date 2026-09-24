@@ -72,11 +72,14 @@ export function formatLightboxImageAlt(
 export function resolveLightboxScaleRange(input: {
   minScale?: number
   maxScale?: number
-  minZoom?: number
-  maxZoom?: number
 }): { minScale: number; maxScale: number } {
-  const minScale = input.minScale ?? input.minZoom ?? LIGHTBOX_MIN_SCALE
-  const maxScale = input.maxScale ?? input.maxZoom ?? LIGHTBOX_MAX_SCALE
+  const minRaw = input.minScale
+  const maxRaw = input.maxScale
+  const minScale =
+    typeof minRaw === 'number' && Number.isFinite(minRaw) && minRaw > 0 ? minRaw : LIGHTBOX_MIN_SCALE
+  const maxScale =
+    typeof maxRaw === 'number' && Number.isFinite(maxRaw) && maxRaw > 0 ? maxRaw : LIGHTBOX_MAX_SCALE
+  if (maxScale < minScale) return { minScale, maxScale: minScale }
   return { minScale, maxScale }
 }
 
@@ -85,12 +88,15 @@ export type LightboxSwipeDirection = 'prev' | 'next'
 export function resolveLightboxSwipe(
   deltaX: number,
   deltaY: number,
-  threshold: number
+  threshold: number,
+  rtl = false
 ): LightboxSwipeDirection | null {
   const absX = Math.abs(deltaX)
   const absY = Math.abs(deltaY)
   if (absX < Math.max(0, threshold) || absX <= absY * 1.2) return null
-  return deltaX < 0 ? 'next' : 'prev'
+  const towardNext = deltaX < 0
+  if (rtl) return towardNext ? 'prev' : 'next'
+  return towardNext ? 'next' : 'prev'
 }
 
 export function resolveLightboxNavIndex(
@@ -114,8 +120,12 @@ export function resolveLightboxKeyAction(
     zoomable: boolean
     rotatable: boolean
     rtl?: boolean
+    altKey?: boolean
+    ctrlKey?: boolean
+    metaKey?: boolean
   }
 ): LightboxKeyAction | null {
+  if (options.altKey || options.ctrlKey || options.metaKey) return null
   switch (key) {
     case 'ArrowLeft':
       if (!options.canNavigate) return null
@@ -154,6 +164,8 @@ export interface LightboxGestureSessionOptions {
   swipeable: boolean
   swipeThreshold: number
   imageCount: number
+  rtl?: boolean
+  getPanLimits?: () => { maxX: number; maxY: number } | null
   onTransform: (next: { scale?: number; translateX?: number; translateY?: number }) => void
   onSwipe: (direction: LightboxSwipeDirection) => void
   onDraggingChange?: (dragging: boolean) => void
@@ -220,7 +232,7 @@ export function createLightboxGestureSession(
 
     if (pan.isPanning) {
       event.preventDefault()
-      const next = movePan(pan, event.clientX, event.clientY)
+      const next = movePan(pan, event.clientX, event.clientY, options.getPanLimits?.() ?? null)
       options.onTransform({ translateX: next.translateX, translateY: next.translateY })
       return
     }
@@ -244,7 +256,8 @@ export function createLightboxGestureSession(
       const direction = resolveLightboxSwipe(
         event.clientX - swipe.startX,
         event.clientY - swipe.startY,
-        options.swipeThreshold
+        options.swipeThreshold,
+        options.rtl
       )
       swipe.active = false
       if (direction) options.onSwipe(direction)

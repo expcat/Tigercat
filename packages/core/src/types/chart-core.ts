@@ -380,8 +380,9 @@ export interface ChartCanvasProps {
   height?: number
 
   /**
-   * Observe the canvas host (not a legend sibling) and resize the SVG
-   * @default false
+   * Observe the canvas host (not a legend sibling) and resize the SVG.
+   * Width and height both follow the container after commit.
+   * @default true
    */
   responsive?: boolean
 

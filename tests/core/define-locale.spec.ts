@@ -4,7 +4,7 @@ import { enUS } from '@expcat/tigercat-core/locales/en-US'
 
 describe('defineLocale()', () => {
   it('returns the enUS baseline as-is when called without overrides', () => {
-    const locale = defineLocale()
+    const locale = defineLocale({}, enUS)
     expect(locale.common?.okText).toBe(enUS.common?.okText)
     expect(locale.pagination?.totalText).toBe(enUS.pagination?.totalText)
     expect(locale.table?.searchButtonText).toBe(enUS.table?.searchButtonText)
@@ -13,16 +13,19 @@ describe('defineLocale()', () => {
 
   it('does not mutate the source enUS preset', () => {
     const before = JSON.stringify(enUS)
-    defineLocale({ common: { okText: 'OK!' }, pagination: { totalText: '{total}' } })
+    defineLocale({ common: { okText: 'OK!' }, pagination: { totalText: '{total}' } }, enUS)
     expect(JSON.stringify(enUS)).toBe(before)
   })
 
   it('deep-merges nested overrides on top of the baseline', () => {
-    const locale = defineLocale({
-      common: { okText: 'はい' },
-      table: { searchButtonText: '探す' },
-      pagination: { totalText: '{total} 件' }
-    })
+    const locale = defineLocale(
+      {
+        common: { okText: 'はい' },
+        table: { searchButtonText: '探す' },
+        pagination: { totalText: '{total} 件' }
+      },
+      enUS
+    )
     // Overridden fields take the new value
     expect(locale.common?.okText).toBe('はい')
     expect(locale.pagination?.totalText).toBe('{total} 件')
@@ -37,33 +40,42 @@ describe('defineLocale()', () => {
   })
 
   it('skips undefined leaves so consumers can build overrides incrementally', () => {
-    const locale = defineLocale({
-      common: { okText: undefined, cancelText: 'キャンセル' }
-    })
+    const locale = defineLocale(
+      {
+        common: { okText: undefined, cancelText: 'キャンセル' }
+      },
+      enUS
+    )
     expect(locale.common?.okText).toBe(enUS.common?.okText)
     expect(locale.common?.cancelText).toBe('キャンセル')
   })
 
   it('adds new sections that do not exist on the baseline', () => {
-    const locale = defineLocale({
-      drawer: { closeAriaLabel: '閉じる' }
-    })
+    const locale = defineLocale(
+      {
+        drawer: { closeAriaLabel: '閉じる' }
+      },
+      enUS
+    )
     expect(locale.drawer?.closeAriaLabel).toBe('閉じる')
     // Untouched drawer fields fall back to enUS (or undefined if enUS omits them)
     expect(locale.drawer).toMatchObject({ closeAriaLabel: '閉じる' })
   })
 
   it('preserves explicit null as a reset signal', () => {
-    const locale = defineLocale({
-      // @ts-expect-error — null is explicitly testing the override semantic
-      common: { okText: null }
-    })
+    const locale = defineLocale(
+      {
+        // @ts-expect-error — null is explicitly testing the override semantic
+        common: { okText: null }
+      },
+      enUS
+    )
     expect(locale.common?.okText).toBeNull()
   })
 
   it('returns a fresh object on every call (no shared references)', () => {
-    const a = defineLocale({ common: { okText: 'A' } })
-    const b = defineLocale({ common: { okText: 'B' } })
+    const a = defineLocale({ common: { okText: 'A' } }, enUS)
+    const b = defineLocale({ common: { okText: 'B' } }, enUS)
     expect(a).not.toBe(b)
     expect(a.common).not.toBe(b.common)
     expect(a.common?.okText).toBe('A')
@@ -73,10 +85,13 @@ describe('defineLocale()', () => {
   it('supports replacing array-typed values wholesale (no array merge)', () => {
     // None of the current TigerLocale fields are arrays, but the helper
     // documents this behaviour. Verify by reaching into a synthetic shape.
-    const synthetic = defineLocale({
-      // Cast through unknown to simulate a future locale section with arrays.
-      taskBoard: { wipLimitText: 'WIP {limit}' }
-    })
+    const synthetic = defineLocale(
+      {
+        // Cast through unknown to simulate a future locale section with arrays.
+        taskBoard: { wipLimitText: 'WIP {limit}' }
+      },
+      enUS
+    )
     expect(synthetic.taskBoard?.wipLimitText).toBe('WIP {limit}')
   })
 })

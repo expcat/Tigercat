@@ -49,8 +49,8 @@ Vue 同构：`<ConfigProvider :locale="locale">` 包裹，`<router-view/>` 放�
 
 ## 3. Theme / Dark / Modern
 
-- 暗色：`<html class="dark">` 或 `ThemeManager.setColorScheme('light' | 'dark' | 'auto')`。
-- 现代视觉：`<html data-tiger-style="modern">`。
+- 暗色：`<ConfigProvider colorScheme="dark">`，或首屏 `<html class="dark">`。`auto` 不另写 `.dark`。
+- 现代视觉：`<ConfigProvider theme="modern">`。
 - 运行时换色：`setThemeColors({ primary })`。细节见 [../theme.md](../theme.md)。
 
 ## 4. i18n

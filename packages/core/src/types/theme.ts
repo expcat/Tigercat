@@ -200,5 +200,5 @@ export interface ThemePreset {
 // Color scheme
 // ---------------------------------------------------------------------------
 
-/** Controls which colour scheme the ThemeManager applies */
+/** Colour scheme a theme scope writes. `auto` follows the root's class or attribute. */
 export type ColorScheme = 'light' | 'dark' | 'auto'

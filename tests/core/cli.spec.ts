@@ -173,6 +173,7 @@ describe('CLI Templates - Vue 3', () => {
     const fileNames = Object.keys(files)
 
     expect(fileNames).toContain('package.json')
+    expect(fileNames).toContain('.gitignore')
     expect(fileNames).toContain('tsconfig.json')
     expect(fileNames).toContain('vite.config.ts')
     expect(fileNames).toContain('index.html')
@@ -185,7 +186,11 @@ describe('CLI Templates - Vue 3', () => {
   it('should use project name in package.json', () => {
     const files = getVue3Template('my-project')
     const pkg = JSON.parse(files['package.json'])
+    const rootPackage = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf-8'))
     expect(pkg.name).toBe('my-project')
+    expect(pkg.packageManager).toBe(rootPackage.packageManager)
+    expect(files['.gitignore']).toContain('.tigercat-playground')
+    expect(files['.gitignore']).toContain('node_modules')
   })
 
   it('should include @expcat/tigercat-vue dependency', () => {
@@ -216,7 +221,8 @@ describe('CLI Templates - Vue 3', () => {
     expect(files['vite.config.ts']).toContain("from '@tailwindcss/vite'")
     expect(files['vite.config.ts']).toContain('tailwindcss()')
     expect(files['src/style.css']).toContain('@import "tailwindcss"')
-    expect(files['src/style.css']).toContain('@expcat/tigercat-core/tailwind/modern')
+    expect(files['src/style.css']).toContain('@plugin "@expcat/tigercat-core/tailwind";')
+    expect(files['src/style.css']).not.toContain('tailwind/modern')
   })
 
   it('should have dev/build/preview scripts', () => {
@@ -271,6 +277,7 @@ describe('CLI Templates - React', () => {
     const fileNames = Object.keys(files)
 
     expect(fileNames).toContain('package.json')
+    expect(fileNames).toContain('.gitignore')
     expect(fileNames).toContain('tsconfig.json')
     expect(fileNames).toContain('tsconfig.node.json')
     expect(fileNames).toContain('vite.config.ts')
@@ -315,7 +322,8 @@ describe('CLI Templates - React', () => {
     expect(files['vite.config.ts']).toContain("from '@tailwindcss/vite'")
     expect(files['vite.config.ts']).toContain('tailwindcss()')
     expect(files['src/style.css']).toContain('@import "tailwindcss"')
-    expect(files['src/style.css']).toContain('@expcat/tigercat-core/tailwind/modern')
+    expect(files['src/style.css']).toContain('@plugin "@expcat/tigercat-core/tailwind";')
+    expect(files['src/style.css']).not.toContain('tailwind/modern')
     expect(files['src/style.css']).toContain('@custom-variant dark')
     expect(files['src/style.css']).toContain('html.dark')
   })
@@ -414,12 +422,12 @@ describe('CLI Doctor', () => {
     const projectDir = writePackage('react-pass', {
       packageManager: 'pnpm@11.9.0',
       dependencies: {
-        '@expcat/tigercat-react': '^1.0.0',
+        '@expcat/tigercat-react': '^2.9.4',
         react: '^19.2.7',
         'react-dom': '^19.2.7'
       },
       devDependencies: {
-        '@expcat/tigercat-core': '^1.0.0',
+        '@expcat/tigercat-core': '^2.9.4',
         '@tailwindcss/vite': '^4.3.1',
         '@vitejs/plugin-react': '^6.0.3',
         tailwindcss: '^4.3.1',
@@ -623,13 +631,12 @@ describe('CLI Doctor - deep checks', () => {
     return projectDir
   }
 
-  const REQUIRED_CORE_EXPORTS = {
-    '.': './dist/index.js',
-    './tailwind': './dist/tailwind.js',
-    './tailwind/modern': './dist/tailwind-modern.js',
-    './tokens.css': './dist/tokens.css',
-    './figma-variables.json': './figma-variables.json'
-  }
+  const requiredCoreExportKeys = JSON.parse(
+    readFileSync(join(process.cwd(), 'packages/cli/src/required-core-exports.json'), 'utf8')
+  )
+  const REQUIRED_CORE_EXPORTS = Object.fromEntries(
+    requiredCoreExportKeys.map((key) => [key, './dist/placeholder.js'])
+  )
 
   it('fails the compatibility matrix when a framework is below the supported major', () => {
     const projectDir = writeProject('old-react', {
@@ -682,7 +689,7 @@ describe('CLI Doctor - deep checks', () => {
     const coreCheck = checks.find((check) => check.name === 'Core exports')
 
     expect(coreCheck?.status).toBe('fail')
-    expect(coreCheck?.details?.some((detail) => detail.includes('./tailwind/modern'))).toBe(true)
+    expect(coreCheck?.details?.some((detail) => detail.includes('./tokens.css'))).toBe(true)
   })
 
   it('passes core exports when every required subpath is present', () => {
@@ -762,6 +769,17 @@ describe('CLI Dry Run', () => {
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Would start Vite on port 3457'))
   })
 
+  it('previews a lock refresh when the playground directory already exists', async () => {
+    const projectDir = join(testDir, '.tigercat-playground', 'playground-react')
+    ensureDir(projectDir)
+    writeFileSafe(join(projectDir, 'package.json'), '{"name":"stale"}')
+
+    await runPlayground('react', '3457', false, true)
+
+    expect(readFileSync(join(projectDir, 'package.json'), 'utf-8')).toBe('{"name":"stale"}')
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('dependency lock'))
+  })
+
   it('previews docs generation without writing markdown files', async () => {
     writeFileSafe(
       join(testDir, 'types/button.ts'),
@@ -771,10 +789,8 @@ describe('CLI Dry Run', () => {
 `
     )
 
-    await runGenerateDocs('types', 'api', true)
-
+    await expect(runGenerateDocs('types', 'api', true)).rejects.toThrow('pnpm docs:api')
     expect(existsSync(join(testDir, 'api'))).toBe(false)
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Dry run'))
   })
 })
 
@@ -795,6 +811,13 @@ describe('CLI Generate - existing files', () => {
     if (existsSync(testDir)) {
       rmSync(testDir, { recursive: true, force: true })
     }
+  })
+
+  it('refuses to generate a test outside the project', async () => {
+    await expect(runGenerateTest('Button', 'vue3', '../outside-tests')).rejects.toThrow(
+      'Refusing to write outside the project'
+    )
+    expect(existsSync(resolve(testDir, '../outside-tests'))).toBe(false)
   })
 
   it('skips generate test when target spec already exists without crashing', async () => {
@@ -849,7 +872,10 @@ describe('CLI E2E Output', () => {
       "from '@expcat/tigercat-vue'"
     )
     expect(readFileSync(join(projectDir, 'src/style.css'), 'utf-8')).toContain(
-      '@expcat/tigercat-core/tailwind/modern'
+      '@plugin "@expcat/tigercat-core/tailwind";'
+    )
+    expect(readFileSync(join(projectDir, 'src/style.css'), 'utf-8')).not.toContain(
+      'tailwind/modern'
     )
   })
 
@@ -866,9 +892,10 @@ describe('CLI E2E Output', () => {
     const inputDemo = readFileSync(join(testDir, 'src/components/InputDemo.tsx'), 'utf-8')
     const output = logSpy.mock.calls.map((call) => call.join(' ')).join('\n')
 
-    expect(buttonDemo).toContain("import { Button } from '@expcat/tigercat-react'")
-    expect(inputDemo).toContain('<Input />')
-    expect(output).toContain("import { Button, Input } from '@expcat/tigercat-react'")
+    expect(buttonDemo).toContain("import { Button } from '@expcat/tigercat-react/Button'")
+    expect(inputDemo).toContain("import { Input } from '@expcat/tigercat-react/Input'")
+    expect(output).toContain("import { Button } from '@expcat/tigercat-react/Button'")
+    expect(output).toContain("import { Input } from '@expcat/tigercat-react/Input'")
   })
 
   it('generates component markdown and index output from generate docs', async () => {
@@ -882,16 +909,7 @@ describe('CLI E2E Output', () => {
 `
     )
 
-    await runGenerateDocs('types', 'api')
-
-    const buttonDoc = readFileSync(join(testDir, 'api/button.md'), 'utf-8')
-    const indexDoc = readFileSync(join(testDir, 'api/index.md'), 'utf-8')
-
-    expect(buttonDoc).toContain('# Button')
-    expect(buttonDoc).toContain('Source: `button.ts`')
-    expect(buttonDoc).toContain('`variant`')
-    expect(buttonDoc).toContain("`'primary' \\| 'secondary'`")
-    expect(indexDoc).toContain('- [Button](./button.md)')
+    await expect(runGenerateDocs('types', 'api')).rejects.toThrow('pnpm docs:api')
   })
 })
 

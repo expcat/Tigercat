@@ -43,16 +43,18 @@ describe('Carousel', () => {
   })
 
   describe('Rendering', () => {
-    it('renders real tabs and does not mint a landmark without a name', () => {
+    it('renders dot buttons and does not mint a landmark without a name', () => {
       const { container } = render(Carousel, {
         slots: { default: () => slideNodes() }
       })
       const root = container.querySelector('[data-tiger-carousel]') as HTMLElement
       expect(root).toHaveAttribute('role', 'group')
       expect(root).not.toHaveAttribute('aria-label')
-      expect(screen.getAllByRole('tab')).toHaveLength(3)
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 1')
-      expect(screen.getAllByRole('tab')[1]).toHaveAttribute('tabindex', '-1')
+      expect(screen.getAllByRole('button', { name: /Go to slide/ })).toHaveLength(3)
+      expect(screen.getByRole('button', { name: 'Go to slide 1' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
     })
 
     it('renders arrows when arrows is true', () => {
@@ -74,9 +76,9 @@ describe('Carousel', () => {
         }
       })
       expect(screen.queryByRole('region')).toBeNull()
-      expect(screen.getByRole('tablist', { name: '轮播导航' })).toBeInTheDocument()
+      expect(document.querySelector('[aria-label="轮播导航"]')).toBeTruthy()
       expect(screen.getByRole('button', { name: '上一张' })).toBeInTheDocument()
-      expect(screen.getByRole('tab', { name: '跳转到第 1 张' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '跳转到第 1 张' })).toBeInTheDocument()
     })
 
     it('uses official zhTW strings instead of simplified Chinese', () => {
@@ -89,7 +91,7 @@ describe('Carousel', () => {
         }
       })
       expect(screen.getByRole('button', { name: '上一張' })).toBeInTheDocument()
-      expect(screen.getByRole('tab', { name: '跳到第 1 張' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '跳到第 1 張' })).toBeInTheDocument()
     })
 
     it('names a region only when the caller provides one', () => {
@@ -129,7 +131,10 @@ describe('Carousel', () => {
       await fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
       expect(onBeforeChange).toHaveBeenCalledWith(0, 1)
       expect(onChange).toHaveBeenCalledWith(1, 0)
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 2')
+      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
       expect(container.querySelector('[data-tiger-carousel-slide="inactive"]')).toHaveAttribute(
         'inert'
       )
@@ -197,30 +202,28 @@ describe('Carousel', () => {
       const { container } = render({
         setup() {
           return () =>
-            h(ConfigProvider, { direction: 'ltr' }, () =>
+            h(ConfigProvider, { dir: 'ltr' }, () =>
               h(Carousel, { onChange: ltrChange }, () => slideNodes())
             )
         }
       })
-      await fireEvent.keyDown(
-        container.querySelector('[data-tiger-carousel-viewport]') as HTMLElement,
-        { key: 'ArrowRight' }
-      )
+      await fireEvent.keyDown(container.querySelector('[data-tiger-carousel]') as HTMLElement, {
+        key: 'ArrowRight'
+      })
       expect(ltrChange).toHaveBeenCalledWith(1, 0)
 
       const rtlChange = vi.fn()
       const rtl = render({
         setup() {
           return () =>
-            h(ConfigProvider, { direction: 'rtl' }, () =>
+            h(ConfigProvider, { dir: 'rtl' }, () =>
               h(Carousel, { onChange: rtlChange }, () => slideNodes())
             )
         }
       })
-      await fireEvent.keyDown(
-        rtl.container.querySelector('[data-tiger-carousel-viewport]') as HTMLElement,
-        { key: 'ArrowLeft' }
-      )
+      await fireEvent.keyDown(rtl.container.querySelector('[data-tiger-carousel]') as HTMLElement, {
+        key: 'ArrowLeft'
+      })
       expect(rtlChange).toHaveBeenCalledWith(1, 0)
     })
   })
@@ -251,7 +254,7 @@ describe('Carousel', () => {
       })
       const root = container.querySelector('[data-tiger-carousel]') as HTMLElement
       await fireEvent.mouseEnter(root)
-      await fireEvent.focusIn(screen.getByRole('tab', { selected: true }))
+      await fireEvent.focusIn(screen.getByRole('button', { name: 'Go to slide 1' }))
       await fireEvent.mouseLeave(root)
       vi.advanceTimersByTime(2000)
       expect(onChange).not.toHaveBeenCalled()
@@ -313,10 +316,16 @@ describe('Carousel', () => {
       await fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
       expect(onUpdateCurrentIndex).toHaveBeenCalledWith(2)
       expect(onChange).toHaveBeenCalledWith(2, 1)
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 2')
+      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
 
       await rerender({ currentIndex: 2 })
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 3')
+      expect(screen.getByRole('button', { name: 'Go to slide 3' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
     })
   })
 

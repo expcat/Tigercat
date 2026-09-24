@@ -16,7 +16,7 @@ export default function App() {
       renderItem={(item) => (
         <Card variant="shadow">
           <h3 className="font-semibold">{String(item.title)}</h3>
-          <p className="text-sm text-[var(--tiger-text-muted)]">{String(item.content)}</p>
+          <p className="text-sm text-[var(--tiger-text-secondary)]">{String(item.content)}</p>
         </Card>
       )}
     />

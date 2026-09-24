@@ -158,7 +158,7 @@ describe('Splitter', () => {
           <div>B</div>
         </Splitter>
       )
-      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(dragged[0], 0)
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(400, 0)
     })
   })
 

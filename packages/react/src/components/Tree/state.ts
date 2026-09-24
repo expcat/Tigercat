@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   EMPTY_TREE_DATA,
   EMPTY_TREE_KEYS,
@@ -7,24 +7,32 @@ import {
   applyTreeFilter,
   applyTreeKeyboard,
   createTreeKeyIdSet,
+  decideAfterBranchLoad,
+  filterTreeNodes,
   formatTreeSelectNodeLabel,
-  getCheckedKeysByStrategy,
+  gateBranchLoad,
   getTreeLabels,
+  isCurrentLoadToken,
   lookupTreeNode,
   mergeLoadedChildren,
   mergeTigerLocale,
+  nextLoadToken,
   nextTreeCheckedState,
   nextTreeExpandedKeys,
   nextTreeSelectedKeys,
+  nodeHasChildren,
   reconcileUncontrolledExpandedKeys,
   resolveCheckedInput,
   resolveInitialExpandedKeys,
   resolveLocaleText,
+  resolveOutwardCheckedKeys,
   resolveTreeDropPosition,
   resolveTreeKeyboardAction,
   resolveTreeSelection,
+  alignTreeVirtualScroll,
+  createTreeEdgeScroll,
+  resolveDisplayedExpandedKeys,
   resolveTreeView,
-  shouldLoadTreeNode,
   sameTreeKey,
   treeKeyId,
   uniqueTreeKeys,
@@ -63,8 +71,6 @@ export function useTreeState(props: TreeProps): TreeContext & {
     defaultExpandAll = false,
     checkStrictly = false,
     checkStrategy = 'all',
-    selectable,
-    multiple,
     allowDeselect = false,
     loadData,
     loadedKeys: controlledLoadedKeys,
@@ -108,13 +114,17 @@ export function useTreeState(props: TreeProps): TreeContext & {
   )
   const labels = useMemo(() => getTreeLabels(mergedLocale), [mergedLocale])
   const dir = config.direction === 'rtl' ? 'rtl' : 'ltr'
-  const selection = resolveTreeSelection({ selectionMode, selectable, multiple })
+  const selection = resolveTreeSelection({ selectionMode })
+  const edgeScroll = useRef(createTreeEdgeScroll())
   const hasLoadData = typeof loadData === 'function'
 
   const itemRefs = useRef(new Map<string, HTMLElement>())
   const virtualRef = useRef<VirtualListHandle | null>(null)
   const dropPosRef = useRef<TreeDropPosition>('inside')
-  const autoExpandRef = useRef<TreeNodeKey[]>([])
+  const savedExpandRef = useRef<TreeNodeKey[] | null>(null)
+  const loadTokensRef = useRef(new Map<string, number>())
+  const reactId = useId()
+  const dragContainerId = `tiger-tree-${reactId}`
   const [dropIndicator, setDropIndicator] = useState<{
     key: TreeNodeKey
     position: TreeDropPosition
@@ -180,15 +190,8 @@ export function useTreeState(props: TreeProps): TreeContext & {
   const matchedKeys = useMemo(
     () =>
       searchQuery
-        ? applyTreeFilter({
-            treeData: derivedTree,
-            query: searchQuery,
-            filterFn,
-            filterMode,
-            autoExpandParent: false,
-            currentExpanded: EMPTY_TREE_KEYS
-          }).matchedKeys
-        : new Set<TreeNodeKey>(),
+        ? filterTreeNodes(derivedTree, searchQuery, filterFn, filterMode)
+        : undefined,
     [derivedTree, searchQuery, filterFn, filterMode]
   )
 
@@ -200,10 +203,9 @@ export function useTreeState(props: TreeProps): TreeContext & {
       filterMode,
       autoExpandParent,
       currentExpanded: computedExpanded,
-      previousAutoExpand: autoExpandRef.current
+      savedExpanded: savedExpandRef.current
     })
-    autoExpandRef.current = result.autoExpandKeys
-    if (!autoExpandParent) return
+    savedExpandRef.current = result.savedExpanded
     if (sameKeyList(computedExpanded, result.nextExpandedKeys)) return
     if (controlledExpandedKeys === undefined) {
       setInternalExpanded(result.nextExpandedKeys)
@@ -228,7 +230,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
         expandedKeys: computedExpanded,
         selectedKeys: computedSelected,
         checkedState: computedChecked,
-        matchedKeys: searchQuery ? matchedKeys : undefined,
+        matchedKeys,
         loadingKeys: loadingIds,
         checkable,
         selectable: selection.selectable,
@@ -268,64 +270,121 @@ export function useTreeState(props: TreeProps): TreeContext & {
     [controlledExpandedKeys, onExpandedKeysChange, onExpand, onNodeExpand, onNodeCollapse]
   )
 
+  const applyLoadedNode = useCallback(
+    (node: TreeNode, children: TreeNode[], token: number, intent: 'select' | 'expand') => {
+      const id = treeKeyId(node.key)
+      if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
+      setLoadedMap((prev) => {
+        const nextMap = new Map(prev)
+        nextMap.set(id, children)
+        return nextMap
+      })
+      setLoadingIds((prev) => {
+        const nextSet = new Set(prev)
+        nextSet.delete(id)
+        return nextSet
+      })
+      const nextTree = applyLoadedChildren(derivedTree, node.key, children)
+      onLoad?.(node, children)
+      onLoadedKeysChange?.(uniqueTreeKeys([...(controlledLoadedKeys ?? []), node.key]))
+      onTreeDataChange?.(nextTree)
+      const decision = decideAfterBranchLoad({
+        childCount: children.length,
+        intent,
+        commitLoadedBranch: intent === 'select'
+      })
+      if (decision.commit && selection.selectable) {
+        const next = nextTreeSelectedKeys({
+          current: computedSelected,
+          key: node.key,
+          multiple: selection.multiple,
+          allowDeselect
+        })
+        if (controlledSelectedKeys === undefined) setInternalSelected(next)
+        onSelectedKeysChange?.(next)
+        onSelect?.(next, {
+          selected: next.some((key) => sameTreeKey(key, node.key)),
+          selectedNodes: next
+            .map((key) => lookupTreeNode(view.index, key))
+            .filter((item): item is TreeNode => Boolean(item)),
+          node
+        })
+      }
+    },
+    [
+      derivedTree,
+      onLoad,
+      onLoadedKeysChange,
+      controlledLoadedKeys,
+      onTreeDataChange,
+      selection.selectable,
+      selection.multiple,
+      computedSelected,
+      allowDeselect,
+      controlledSelectedKeys,
+      onSelectedKeysChange,
+      onSelect,
+      view.index
+    ]
+  )
+
+  const requestLoad = useCallback(
+    (node: TreeNode, intent: 'select' | 'expand') => {
+      if (!loadData || node.disabled) return
+      const id = treeKeyId(node.key)
+      const token = nextLoadToken(loadTokensRef.current, id)
+      const expanded = computedExpanded.some((key) => sameTreeKey(key, node.key))
+      if (!expanded) {
+        commitExpanded(nextTreeExpandedKeys(computedExpanded, node.key, true), node, true)
+      }
+      setLoadingIds((prev) => new Set(prev).add(id))
+      loadData(node)
+        .then((children) => {
+          applyLoadedNode(node, children, token, intent)
+        })
+        .catch(() => {
+          if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
+          setLoadingIds((prev) => {
+            const nextSet = new Set(prev)
+            nextSet.delete(id)
+            return nextSet
+          })
+          devWarn('Tree.loadData', 'Tree loadData rejected; the node is not mutated.')
+        })
+    },
+    [loadData, computedExpanded, commitExpanded, applyLoadedNode]
+  )
+
   const handleExpand = useCallback(
     (nodeKey: TreeNodeKey) => {
       const node = lookupTreeNode(view.index, nodeKey)
       if (!node || node.disabled) return
       const expanded = computedExpanded.some((key) => sameTreeKey(key, nodeKey))
+      if (!expanded) {
+        const gate = gateBranchLoad({
+          disabled: node.disabled,
+          isLeaf: node.isLeaf,
+          hasChildren: nodeHasChildren(node),
+          hasLoadData,
+          loaded: loadedIds.has(treeKeyId(node.key)),
+          loading: loadingIds.has(treeKeyId(node.key))
+        })
+        if (gate === 'load') {
+          requestLoad(node, 'expand')
+          return
+        }
+      }
       const next = nextTreeExpandedKeys(computedExpanded, node.key, !expanded)
       commitExpanded(next, node, !expanded)
-      if (
-        !expanded &&
-        shouldLoadTreeNode({
-          node,
-          hasLoadData,
-          loadedIds,
-          loadingIds
-        })
-      ) {
-        const id = treeKeyId(node.key)
-        setLoadingIds((prev) => new Set(prev).add(id))
-        loadData?.(node)
-          .then((children) => {
-            setLoadedMap((prev) => {
-              const nextMap = new Map(prev)
-              nextMap.set(id, children)
-              return nextMap
-            })
-            setLoadingIds((prev) => {
-              const nextSet = new Set(prev)
-              nextSet.delete(id)
-              return nextSet
-            })
-            const nextTree = applyLoadedChildren(derivedTree, node.key, children)
-            onLoad?.(node, children)
-            onLoadedKeysChange?.(uniqueTreeKeys([...(controlledLoadedKeys ?? []), node.key]))
-            onTreeDataChange?.(nextTree)
-          })
-          .catch(() => {
-            setLoadingIds((prev) => {
-              const nextSet = new Set(prev)
-              nextSet.delete(id)
-              return nextSet
-            })
-            devWarn('Tree.loadData', 'Tree loadData rejected; the node is not mutated.')
-          })
-      }
     },
     [
       view.index,
       computedExpanded,
-      commitExpanded,
       hasLoadData,
       loadedIds,
       loadingIds,
-      loadData,
-      derivedTree,
-      onLoad,
-      onLoadedKeysChange,
-      onTreeDataChange,
-      controlledLoadedKeys
+      requestLoad,
+      commitExpanded
     ]
   )
 
@@ -373,7 +432,12 @@ export function useTreeState(props: TreeProps): TreeContext & {
         checkStrictly
       )
       if (controlledCheckedKeys === undefined) setInternalChecked(nextState)
-      const returnKeys = getCheckedKeysByStrategy(nextState, derivedTree, checkStrategy)
+      const returnKeys = resolveOutwardCheckedKeys(
+        nextState,
+        derivedTree,
+        checkStrategy,
+        checkStrictly
+      )
       onCheckedKeysChange?.(returnKeys)
       onCheck?.(returnKeys, {
         checked,
@@ -416,12 +480,35 @@ export function useTreeState(props: TreeProps): TreeContext & {
       if (patch.activeKey !== undefined) {
         setActiveKey(patch.activeKey)
         const index = view.visibleItems.findIndex((item) => sameTreeKey(item.key, patch.activeKey))
-        if (virtual) virtualRef.current?.scrollToIndex(index)
+        if (virtual) {
+          alignTreeVirtualScroll(
+            virtualRef.current?.getScrollElement(),
+            index,
+            itemHeight,
+            height
+          )
+        }
         const id = treeKeyId(patch.activeKey)
-        requestAnimationFrame(() => itemRefs.current.get(id)?.focus())
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => itemRefs.current.get(id)?.focus())
+        })
       }
       if (patch.expandKey !== undefined) handleExpand(patch.expandKey)
-      if (patch.selectKey !== undefined) handleSelect(patch.selectKey)
+      if (patch.selectKey !== undefined) {
+        const node = lookupTreeNode(view.index, patch.selectKey)
+        const gate = node
+          ? gateBranchLoad({
+              disabled: node.disabled,
+              isLeaf: node.isLeaf,
+              hasChildren: nodeHasChildren(node),
+              hasLoadData,
+              loaded: loadedIds.has(treeKeyId(node.key)),
+              loading: loadingIds.has(treeKeyId(node.key))
+            })
+          : 'ready'
+        if (node && gate === 'load') requestLoad(node, 'select')
+        else handleSelect(patch.selectKey)
+      }
       if (patch.checkKey !== undefined && patch.checkChecked !== undefined) {
         handleCheck(patch.checkKey, patch.checkChecked)
       }
@@ -437,12 +524,15 @@ export function useTreeState(props: TreeProps): TreeContext & {
       handleExpand,
       handleSelect,
       handleCheck,
-      virtual
+      virtual,
+      loadedIds,
+      loadingIds,
+      requestLoad
     ]
   )
 
   const drag = useDrag({
-    containerId: 'tree',
+    containerId: dragContainerId,
     onDrop: (event) => {
       const dropKey = event.overItem?.id
       if (dropKey == null || sameTreeKey(dropKey, event.item.id)) return
@@ -475,7 +565,9 @@ export function useTreeState(props: TreeProps): TreeContext & {
     if (activeKey === undefined) return
     const index = view.visibleItems.findIndex((item) => sameTreeKey(item.key, activeKey))
     if (index < 0) return
-    if (virtual) virtualRef.current?.scrollToIndex(index)
+    if (virtual) {
+      alignTreeVirtualScroll(virtualRef.current?.getScrollElement(), index, itemHeight, height)
+    }
     const focus = () => itemRefs.current.get(treeKeyId(activeKey))?.focus()
     focus()
     const frame = requestAnimationFrame(focus)
@@ -522,6 +614,12 @@ export function useTreeState(props: TreeProps): TreeContext & {
       mergedLocale?.select?.searchPlaceholder
     ),
     selectNodeLabel: (label) => formatTreeSelectNodeLabel(labels.selectNode, label),
+    loadingText: resolveLocaleText(
+      'Loading...',
+      mergedLocale?.common?.loadingText,
+      mergedLocale?.select?.loadingText
+    ),
+    dragContainerId,
     view,
     loadingIds,
     activeKey,
@@ -539,21 +637,39 @@ export function useTreeState(props: TreeProps): TreeContext & {
       if (node.disabled) return
       setActiveKey(node.key)
       onNodeClick?.(node, event)
+      const gate = gateBranchLoad({
+        disabled: node.disabled,
+        isLeaf: node.isLeaf,
+        hasChildren: nodeHasChildren(node),
+        hasLoadData,
+        loaded: loadedIds.has(treeKeyId(node.key)),
+        loading: loadingIds.has(treeKeyId(node.key))
+      })
+      if (gate === 'load') {
+        requestLoad(node, 'select')
+        return
+      }
       if (selection.selectable) handleSelect(node.key)
     },
     startTreeDrag: (nodeKey, event) => {
       const target = event.target as Element | null
-      if (target?.closest('button, input, label')) {
+      if (target?.closest('button, input, label, [data-tiger-tree-check]')) {
         event.preventDefault()
         return
       }
       const index = view.visibleItems.findIndex((item) => sameTreeKey(item.key, nodeKey))
-      drag.startDrag({ id: nodeKey, index: Math.max(0, index), containerId: 'tree' }, event)
+      drag.startDrag(
+        { id: nodeKey, index: Math.max(0, index), containerId: dragContainerId },
+        event
+      )
     },
     overTreeDrag: (nodeKey, event) => {
       event.preventDefault()
       const index = view.visibleItems.findIndex((item) => sameTreeKey(item.key, nodeKey))
-      drag.dragOver({ id: nodeKey, index: Math.max(0, index), containerId: 'tree' }, event)
+      drag.dragOver(
+        { id: nodeKey, index: Math.max(0, index), containerId: dragContainerId },
+        event
+      )
       const node = lookupTreeNode(view.index, nodeKey)
       const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
       const position = resolveTreeDropPosition(
@@ -569,8 +685,8 @@ export function useTreeState(props: TreeProps): TreeContext & {
         if (scroller) {
           const box = scroller.getBoundingClientRect()
           const edge = 24
-          if (event.clientY < box.top + edge) scroller.scrollTop -= 16
-          else if (event.clientY > box.bottom - edge) scroller.scrollTop += 16
+          if (event.clientY < box.top + edge) edgeScroll.current.nudge(scroller, -16)
+          else if (event.clientY > box.bottom - edge) edgeScroll.current.nudge(scroller, 16)
         }
       }
     },

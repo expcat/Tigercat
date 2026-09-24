@@ -11,10 +11,15 @@ import type {
 } from '../types/image-annotation'
 
 export const imageAnnotationContainerClasses =
-  'relative flex w-full max-w-full flex-col gap-3 text-[var(--tiger-text,#111827)]'
+  'relative flex w-full max-w-full flex-col gap-3 text-[var(--tiger-text)]'
 
 export const imageAnnotationStageClasses =
-  'relative block w-full overflow-hidden rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-surface-muted,#f3f4f6)] select-none touch-none'
+  'relative block w-full overflow-auto rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] select-none'
+
+export const imageAnnotationDrawingClasses = 'touch-none'
+
+/** Stage scrolls when the fitted image is taller than this cap. */
+export const IMAGE_ANNOTATION_MAX_STAGE_HEIGHT = 480
 
 export const imageAnnotationImageClasses = 'block max-w-full select-none pointer-events-none'
 
@@ -25,14 +30,14 @@ export const imageAnnotationReadonlyOverlayClasses = 'cursor-default'
 export const imageAnnotationToolbarClasses = 'flex flex-wrap items-center gap-2'
 
 const annotationFocusRing =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-offset-2'
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)] focus-visible:ring-offset-2'
 
-export const imageAnnotationToolButtonClasses = `inline-flex items-center justify-center rounded-[var(--tiger-radius-sm,0.375rem)] border px-3 py-1.5 text-sm font-medium transition-colors ${annotationFocusRing} disabled:cursor-not-allowed disabled:opacity-50`
+export const imageAnnotationToolButtonClasses = `inline-flex items-center justify-center rounded-[var(--tiger-radius-sm)] border px-3 py-1.5 text-sm font-medium transition-colors ${annotationFocusRing} disabled:cursor-not-allowed disabled:opacity-50`
 
-export const imageAnnotationDeleteButtonClasses = `inline-flex items-center justify-center rounded-[var(--tiger-radius-sm,0.375rem)] border border-[var(--tiger-error,#dc2626)] px-3 py-1.5 text-sm font-medium text-[var(--tiger-error,#dc2626)] transition-colors hover:bg-[var(--tiger-error-bg-hover,#fef2f2)] ${annotationFocusRing} disabled:cursor-not-allowed disabled:opacity-50`
+export const imageAnnotationDeleteButtonClasses = `inline-flex items-center justify-center rounded-[var(--tiger-radius-sm)] border border-[var(--tiger-error)] px-3 py-1.5 text-sm font-medium text-[var(--tiger-error)] transition-colors hover:bg-[var(--tiger-error-bg-hover)] ${annotationFocusRing} disabled:cursor-not-allowed disabled:opacity-50`
 
 export const imageAnnotationLabelClasses =
-  'pointer-events-none select-none fill-white text-[11px] font-medium drop-shadow'
+  'pointer-events-none select-none text-[11px] font-medium'
 
 export const imageAnnotationShapeClasses = 'cursor-pointer outline-none focus-visible:outline-none'
 
@@ -63,13 +68,73 @@ export function getImageAnnotationToolButtonClasses(active: boolean): string {
   return classNames(
     imageAnnotationToolButtonClasses,
     active
-      ? 'border-[var(--tiger-primary,#2563eb)] bg-[var(--tiger-primary,#2563eb)] text-white'
-      : 'border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-annotation-tool-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-annotation-tool-text,var(--tiger-text,#111827))] hover:bg-[var(--tiger-surface-muted,#f3f4f6)]'
+      ? 'border-[var(--tiger-primary)] bg-[var(--tiger-primary)] text-white'
+      : 'border-[var(--tiger-border)] bg-[var(--tiger-annotation-tool-bg)] text-[var(--tiger-annotation-tool-text)] hover:bg-[var(--tiger-surface-muted)]'
   )
 }
 
+const ANNOTATION_COLOR =
+  /^(?:#[0-9a-fA-F]{3,8}|var\(--tiger-[a-z0-9-]+\)|[a-zA-Z]+|rgba?\([^)]+\)|hsla?\([^)]+\))$/
+
+const ANNOTATION_TOKEN = /^(?:primary|success|warning|error|info|text|border)$/
+
+/** A theme token or a validated color. Anything else falls back to the primary token. */
 export function getImageAnnotationStrokeColor(annotation: ImageAnnotation): string {
-  return annotation.color ?? 'var(--tiger-primary,#2563eb)'
+  const color = annotation.color?.trim()
+  if (!color) return 'var(--tiger-primary)'
+  if (ANNOTATION_TOKEN.test(color)) return `var(--tiger-${color})`
+  if (ANNOTATION_COLOR.test(color) && !/url\(|expression\(|;|javascript:/i.test(color)) return color
+  return 'var(--tiger-primary)'
+}
+
+export function stepImageAnnotationShapeIndex(
+  current: number,
+  count: number,
+  delta: number
+): number {
+  if (count <= 0) return -1
+  const base = current < 0 || current >= count ? 0 : current
+  return (base + delta + count) % count
+}
+
+export function createAnnotationFrameCoalescer<T>(apply: (value: T) => void): {
+  push: (value: T) => void
+  flush: () => void
+  cancel: () => void
+} {
+  let frame = 0
+  let pending: T | undefined
+  let has = false
+  const run = () => {
+    frame = 0
+    if (!has) return
+    has = false
+    apply(pending as T)
+  }
+  return {
+    push(value) {
+      pending = value
+      has = true
+      if (frame) return
+      const schedule =
+        typeof requestAnimationFrame === 'function'
+          ? requestAnimationFrame
+          : (callback: FrameRequestCallback) => {
+              callback(0)
+              return 0
+            }
+      frame = schedule(run)
+    },
+    flush() {
+      if (frame && typeof cancelAnimationFrame === 'function') cancelAnimationFrame(frame)
+      run()
+    },
+    cancel() {
+      if (frame && typeof cancelAnimationFrame === 'function') cancelAnimationFrame(frame)
+      frame = 0
+      has = false
+    }
+  }
 }
 
 export function clampImageAnnotationUnit(value: number): number {
@@ -290,6 +355,10 @@ export function getAnnotationDisplaySize(
   const height = naturalHeight * (width / naturalWidth)
   if (!isPositiveFinite(width) || !isPositiveFinite(height)) return null
   return { width, height }
+}
+
+export function getImageAnnotationStageStyle(): { maxHeight: string } {
+  return { maxHeight: `${IMAGE_ANNOTATION_MAX_STAGE_HEIGHT}px` }
 }
 
 export interface ImageAnnotationDrawState {

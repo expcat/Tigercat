@@ -13,12 +13,13 @@ describe('animation utilities', () => {
   })
 
   it('exports duration, easing, transition, and animation class constants', () => {
-    expect(animation.ANIMATION_DURATION_MS).toBe(300)
-    expect(animation.ANIMATION_DURATION_FAST_MS).toBe(200)
-    expect(animation.ANIMATION_DURATION_SLOW_MS).toBe(500)
-    expect(animation.DURATION_CLASS).toBe('duration-300')
+    expect(animation.ANIMATION_DURATION_MS).toBe(200)
+    expect(animation.ANIMATION_DURATION_FAST_MS).toBe(150)
+    expect(animation.ANIMATION_DURATION_SLOW_MS).toBe(300)
+    expect(animation.DURATION_CLASS).toBe('[transition-duration:var(--tiger-motion-duration-base)]')
     expect(animation.EASING_SPRING).toContain('cubic-bezier')
-    expect(animation.TRANSITION_BASE).toContain('transition-all')
+    expect(animation.TRANSITION_BASE).toContain('transition-property:color,background-color')
+    expect(animation.TRANSITION_BASE).not.toContain('transition-all')
     expect(animation.TRANSITION_OPACITY).toContain('transition-opacity')
     expect(animation.TRANSITION_TRANSFORM).toContain('transition-transform')
     expect(animation.SHAKE_CLASS).toBe('tiger-animate-shake')
@@ -139,18 +140,16 @@ describe('animation utilities', () => {
       resolveMotionEasing
     } = animation
 
-    expect(resolveMotionDuration('slow')).toBe('var(--tiger-motion-duration-slow,450ms)')
+    expect(resolveMotionDuration('slow')).toBe('var(--tiger-motion-duration-slow)')
     expect(resolveMotionDuration(125)).toBe('125ms')
-    expect(resolveMotionEasing('spring')).toBe(
-      'var(--tiger-motion-ease-spring,cubic-bezier(0.34, 1.56, 0.64, 1))'
-    )
+    expect(resolveMotionEasing('standard')).toBe('var(--tiger-motion-ease-standard)')
 
     const style = getComponentMotionStyle({
-      duration: 'relaxed',
-      easing: 'emphasized',
+      duration: 'slow',
+      easing: 'standard',
       direction: 'up'
     })
-    expect(style[COMPONENT_MOTION_VARS.duration]).toBe('var(--tiger-motion-duration-relaxed,300ms)')
+    expect(style[COMPONENT_MOTION_VARS.duration]).toBe('var(--tiger-motion-duration-slow)')
     expect(style[COMPONENT_MOTION_VARS.translateY]).toBe('0.5rem')
     expect(getComponentMotionTransition(['opacity', 'transform'], { duration: 180 })).toContain(
       'opacity 180ms'

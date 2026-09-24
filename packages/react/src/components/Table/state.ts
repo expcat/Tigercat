@@ -7,8 +7,6 @@ import {
   EMPTY_TABLE_RECORDS,
   applyTableColumnOrder,
   commitTableCellEdit,
-  downloadTableExport,
-  exportTableData,
   freezeTableColumnWidths,
   getNextTableColumnFixed,
   getNextTableExpandKeys,
@@ -19,20 +17,28 @@ import {
   mergeTablePagination,
   reorderTableColumnsByKey,
   reorderTableRowsByKey,
+  coerceTableEditValue,
+  getTableCellValue,
+  getTableSelectionState,
+  resolveTableExportRecords,
   resolveTableKeyList,
+  resolveTableQueryPage,
   resolveTableRecordKey,
+  resolveTableRowKeys,
+  resolveTableSelectLoadedKeys,
   resolveTableView,
-  shouldWarnControlledPageReset,
+  shouldSkipTableLocalProcessing,
+  tableRowKeyId,
   type FilterRule,
   type PaginationConfig,
   type SortState,
   type TableColumn,
-  type TableExportFormat,
+  type TableExportScope,
   type TableFixedPosition,
   type ExpandableConfig,
   type RowSelectionConfig
 } from '@expcat/tigercat-core'
-import { devWarn } from '@expcat/tigercat-core'
+import { downloadTableExport, exportTableData } from '@expcat/tigercat-core/utils/table-export'
 import type { TableContext, TableProps } from './types'
 
 /**
@@ -57,8 +63,12 @@ export interface UseTableStateInput {
   filterMode: 'basic' | 'advanced'
   advancedFilterRules?: FilterRule[]
   groupBy?: string
-  exportFormat?: TableExportFormat
+  exportScope?: TableExportScope
   exportFilename: string
+  columnOrder?: string[]
+  columnFixed?: Record<string, TableFixedPosition | false>
+  sortLocale?: string
+  rowDraggable?: boolean
   measuredColumnWidths?: Record<string, number>
   containerWidth?: number
 
@@ -75,6 +85,7 @@ export interface UseTableStateInput {
   onColumnFixedChange?: TableProps['onColumnFixedChange']
   onRowOrderChange?: (rows: Record<string, unknown>[]) => void
   onExport?: TableProps['onExport']
+  onSelectLoaded?: () => void
 }
 
 export function useTableState(input: UseTableStateInput): TableContext {
@@ -96,7 +107,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
     filterMode,
     advancedFilterRules,
     groupBy,
+    exportScope = 'all',
     exportFilename,
+    columnOrder: columnOrderProp,
+    columnFixed: columnFixedProp,
+    sortLocale,
+    rowDraggable,
     measuredColumnWidths,
     containerWidth,
     onChange,
@@ -111,19 +127,11 @@ export function useTableState(input: UseTableStateInput): TableContext {
     onColumnOrderChange,
     onColumnFixedChange,
     onRowOrderChange,
-    onExport
+    onExport,
+    onSelectLoaded
   } = input
 
   const sourceData = dataSource ?? EMPTY_TABLE_RECORDS
-  const [internalData, setInternalData] = useState<Record<string, unknown>[] | null>(null)
-  const prevSourceData = useRef(sourceData)
-  if (prevSourceData.current !== sourceData) {
-    prevSourceData.current = sourceData
-    if (internalData !== null) {
-      setInternalData(null)
-    }
-  }
-  const effectiveData = internalData ?? sourceData
 
   const isSortControlled = sort !== undefined
   const isFiltersControlled = filters !== undefined
@@ -169,6 +177,8 @@ export function useTableState(input: UseTableStateInput): TableContext {
   const [fixedOverrides, setFixedOverrides] = useState<Record<string, TableFixedPosition | false>>(
     {}
   )
+  const isColumnOrderControlled = columnOrderProp !== undefined
+  const isColumnFixedControlled = columnFixedProp !== undefined
 
   const sortState = isSortControlled ? (sort as SortState) : uncontrolledSortState
   const effectiveHiddenColumnKeys = isHiddenColumnsControlled
@@ -194,19 +204,50 @@ export function useTableState(input: UseTableStateInput): TableContext {
   const columnKeysSignature = columns.map((column) => column.key).join('\0')
   if (prevColumnKeys.current !== columnKeysSignature) {
     prevColumnKeys.current = columnKeysSignature
-    if (columnOrder !== null) {
+    if (!isColumnOrderControlled && columnOrder !== null) {
       setColumnOrder(null)
     }
   }
+
+  const parentFixedRef = useRef<Record<string, TableFixedPosition | false | undefined>>({})
+  if (!isColumnFixedControlled) {
+    const dropped: string[] = []
+    for (const column of columns) {
+      const previous = parentFixedRef.current[column.key]
+      if (
+        previous !== undefined &&
+        previous !== column.fixed &&
+        Object.prototype.hasOwnProperty.call(fixedOverrides, column.key)
+      ) {
+        dropped.push(column.key)
+      }
+    }
+    if (dropped.length > 0) {
+      const next = { ...fixedOverrides }
+      for (const key of dropped) delete next[key]
+      setFixedOverrides(next)
+    }
+  }
+  parentFixedRef.current = Object.fromEntries(columns.map((column) => [column.key, column.fixed]))
+
+  const effectiveColumnOrder = isColumnOrderControlled
+    ? columnOrderProp
+    : (columnOrder ?? undefined)
+  const effectiveFixedOverrides = isColumnFixedControlled ? (columnFixedProp ?? {}) : fixedOverrides
+
+  const sourceRowKeys = useMemo(
+    () => resolveTableRowKeys(sourceData, rowKey, rowSelection?.getRowKey),
+    [sourceData, rowKey, rowSelection]
+  )
 
   const view = useMemo(
     () =>
       resolveTableView({
         columns,
-        dataSource: effectiveData,
+        dataSource: sourceData,
         hiddenColumnKeys: effectiveHiddenColumnKeys,
-        columnOrder: columnOrder ?? undefined,
-        fixedOverrides,
+        columnOrder: effectiveColumnOrder,
+        fixedOverrides: effectiveFixedOverrides,
         filters: filterState,
         sort: sortState,
         filterMode,
@@ -217,18 +258,21 @@ export function useTableState(input: UseTableStateInput): TableContext {
         currentPageSize,
         rowKey,
         getRowKey: rowSelection?.getRowKey,
+        sourceRowKeys,
         rowSelection,
         expandable,
         selectedRowKeys,
         measuredColumnWidths,
-        containerWidth
+        containerWidth,
+        sortLocale,
+        rowDraggable
       }),
     [
       columns,
-      effectiveData,
+      sourceData,
       effectiveHiddenColumnKeys,
-      columnOrder,
-      fixedOverrides,
+      effectiveColumnOrder,
+      effectiveFixedOverrides,
       filterState,
       sortState,
       filterMode,
@@ -239,19 +283,22 @@ export function useTableState(input: UseTableStateInput): TableContext {
       currentPageSize,
       rowKey,
       rowSelection,
+      sourceRowKeys,
       expandable,
       selectedRowKeys,
       measuredColumnWidths,
-      containerWidth
+      containerWidth,
+      sortLocale,
+      rowDraggable
     ]
   )
 
   const selectedRowKeySet = useMemo(
-    () => new Set<string | number>(selectedRowKeys),
+    () => new Set(selectedRowKeys.map((key) => tableRowKeyId(key))),
     [selectedRowKeys]
   )
   const expandedRowKeySet = useMemo(
-    () => new Set<string | number>(expandedRowKeys),
+    () => new Set(expandedRowKeys.map((key) => tableRowKeyId(key))),
     [expandedRowKeys]
   )
 
@@ -289,24 +336,45 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   function toggleColumnLock(columnKey: string) {
     const original = columns.find((column) => column.key === columnKey)?.fixed
-    const current = Object.prototype.hasOwnProperty.call(fixedOverrides, columnKey)
-      ? fixedOverrides[columnKey]
-      : original
+    const current = isColumnFixedControlled
+      ? Object.prototype.hasOwnProperty.call(columnFixedProp ?? {}, columnKey)
+        ? columnFixedProp?.[columnKey]
+        : original
+      : Object.prototype.hasOwnProperty.call(fixedOverrides, columnKey)
+        ? fixedOverrides[columnKey]
+        : original
     const nextFixed = getNextTableColumnFixed(current, original)
-    const nextOverrides = { ...fixedOverrides, [columnKey]: nextFixed }
-    setFixedOverrides(nextOverrides)
-    const fullColumns = applyTableColumnOrder(columns, columnOrder ?? undefined).map((column) =>
+    if (!isColumnFixedControlled) {
+      setFixedOverrides({ ...fixedOverrides, [columnKey]: nextFixed })
+    }
+    const fullColumns = applyTableColumnOrder(columns, effectiveColumnOrder).map((column) =>
       column.key === columnKey ? { ...column, fixed: nextFixed } : column
     )
     onColumnFixedChange?.(columnKey, nextFixed, fullColumns)
+  }
+
+  function queryPage(): number {
+    const nextPage = resolveTableQueryPage(isCurrentPageControlled, currentPage)
+    if (!isCurrentPageControlled && nextPage !== currentPage) {
+      setUncontrolledCurrentPage(nextPage)
+    }
+    return nextPage
   }
 
   function handleSetSort(newSortState: SortState) {
     if (!isSortControlled) {
       setUncontrolledSortState(newSortState)
     }
+    const nextPage = queryPage()
     onSortChange?.(newSortState)
-    emitChange({ sort: newSortState })
+    emitChange({
+      sort: newSortState,
+      pagination:
+        paginationMerged !== false ? { current: nextPage, pageSize: currentPageSize } : null
+    })
+    if (paginationMerged !== false && nextPage !== currentPage) {
+      onPageChange?.({ current: nextPage, pageSize: currentPageSize })
+    }
   }
 
   function handleSort(columnKey: string) {
@@ -320,21 +388,14 @@ export function useTableState(input: UseTableStateInput): TableContext {
     if (!isFiltersControlled) {
       setUncontrolledFilterState(newFilterState)
     }
-    if (!isCurrentPageControlled) {
-      setUncontrolledCurrentPage(1)
-    } else if (shouldWarnControlledPageReset(true, currentPage)) {
-      devWarn(
-        'Table.filter.page',
-        'Table filter reset pagination.current to 1; the controlled current page was not written back'
-      )
-    }
+    const nextPage = queryPage()
     onFilterChange?.(newFilterState)
     if (paginationMerged !== false) {
-      onPageChange?.({ current: 1, pageSize: currentPageSize })
+      onPageChange?.({ current: nextPage, pageSize: currentPageSize })
     }
     emitChange({
       filters: newFilterState,
-      pagination: paginationMerged !== false ? { current: 1, pageSize: currentPageSize } : null
+      pagination: paginationMerged !== false ? { current: nextPage, pageSize: currentPageSize } : null
     })
   }
 
@@ -350,11 +411,9 @@ export function useTableState(input: UseTableStateInput): TableContext {
     if (!isPageSizeControlled) {
       setUncontrolledCurrentPageSize(pageSize)
     }
-    if (!isCurrentPageControlled) {
-      setUncontrolledCurrentPage(1)
-    }
-    onPageChange?.({ current: 1, pageSize })
-    emitChange({ pagination: { current: 1, pageSize } })
+    const nextPage = queryPage()
+    onPageChange?.({ current: nextPage, pageSize })
+    emitChange({ pagination: { current: nextPage, pageSize } })
   }
 
   function handleToggleExpand(key: string | number, record: Record<string, unknown>) {
@@ -396,6 +455,30 @@ export function useTableState(input: UseTableStateInput): TableContext {
     onSelectionChange?.(newKeys)
   }
 
+  function handleSelectLoaded(checked = true) {
+    const remote = shouldSkipTableLocalProcessing(paginationMerged)
+    const loaded = getTableSelectionState({
+      records: view.processedData,
+      rowKeys: view.processedRowKeys,
+      selectedRowKeys,
+      getCheckboxProps: rowSelection?.getCheckboxProps
+    })
+    const result = resolveTableSelectLoadedKeys({
+      remote,
+      selectedKeys: selectedRowKeys,
+      loadedSelectableKeys: loaded.selectableRowKeys,
+      checked
+    })
+    if (result.emitOnly) {
+      onSelectLoaded?.()
+      return
+    }
+    if (!selectionControl.controlled) {
+      setUncontrolledSelectedRowKeys(result.keys)
+    }
+    onSelectionChange?.(result.keys)
+  }
+
   const [editingCell, setEditingCell] = useState<{ rowIndex: number; columnKey: string } | null>(
     null
   )
@@ -415,9 +498,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
   function commitEdit() {
     if (!editingCell) return
     const column = columns.find((item) => item.key === editingCell.columnKey)
-    const nextData = commitTableCellEdit(effectiveData, editingCell.rowIndex, column, editingValue)
-    setInternalData(nextData)
-    onCellChange?.(editingCell.rowIndex, editingCell.columnKey, editingValue)
+    const original = column
+      ? getTableCellValue(sourceData[editingCell.rowIndex] ?? {}, column)
+      : undefined
+    const value = coerceTableEditValue(original, editingValue)
+    const nextData = commitTableCellEdit(sourceData, editingCell.rowIndex, column, value)
+    onCellChange?.(editingCell.rowIndex, editingCell.columnKey, value, nextData)
     setEditingCell(null)
   }
 
@@ -426,7 +512,14 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }
 
   function handleExport() {
-    const content = exportTableData(view.displayColumns, view.processedData)
+    const rows = resolveTableExportRecords({
+      scope: exportScope,
+      pageRecords: view.paginatedData,
+      processedRecords: view.processedData,
+      processedKeys: view.processedRowKeys,
+      selectedKeys: selectedRowKeys
+    })
+    const content = exportTableData(view.displayColumns, rows)
     downloadTableExport(content, exportFilename)
     onExport?.(content)
   }
@@ -439,9 +532,11 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   function handleDrop(targetKey: string) {
     if (!dragColumnKey || dragColumnKey === targetKey) return
-    const fullColumns = applyTableColumnOrder(columns, columnOrder ?? undefined)
+    const fullColumns = applyTableColumnOrder(columns, effectiveColumnOrder)
     const nextColumns = reorderTableColumnsByKey(fullColumns, dragColumnKey, targetKey)
-    setColumnOrder(nextColumns.map((column) => column.key))
+    if (!isColumnOrderControlled) {
+      setColumnOrder(nextColumns.map((column) => column.key))
+    }
     onColumnOrderChange?.(nextColumns)
     setDragColumnKey(null)
   }
@@ -455,13 +550,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
   function handleRowDrop(targetKey: string | number) {
     if (dragRowKey === null || dragRowKey === targetKey) return
     const nextRows = reorderTableRowsByKey(
-      effectiveData,
+      sourceData,
       dragRowKey,
       targetKey,
       (record, sourceIndex) =>
         resolveTableRecordKey(record, sourceIndex, rowKey, rowSelection?.getRowKey)
     )
-    setInternalData(nextRows)
     onRowOrderChange?.(nextRows)
     setDragRowKey(null)
   }
@@ -481,7 +575,8 @@ export function useTableState(input: UseTableStateInput): TableContext {
     paginationInfo: view.paginationInfo,
     allSelected: view.allSelected,
     someSelected: view.someSelected,
-    groupedData: view.groupedData,
+    groupBlocks: view.groupBlocks,
+    processedRowKeys: view.processedRowKeys,
     sortState,
     filterState,
     currentPage,
@@ -501,6 +596,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     handleToggleExpand,
     handleSelectRow,
     handleSelectAll,
+    handleSelectLoaded,
     isCellEditable,
     startEditing,
     commitEdit,

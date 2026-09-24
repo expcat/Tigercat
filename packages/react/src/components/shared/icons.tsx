@@ -8,9 +8,9 @@ import {
   icon24ViewBox,
   icon24StrokeWidth,
   icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  classNames
-} from '@expcat/tigercat-core'
+  icon24PathStrokeLinejoin
+} from '@expcat/tigercat-core/icons/common'
+import { classNames } from '@expcat/tigercat-core'
 
 /**
  * 24×24 status SVG icon (info / success / warning / error).

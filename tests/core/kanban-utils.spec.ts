@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   filterCards,
-  filterColumns,
+  resolveTaskBoardView,
   groupBySwimlane,
   getColumnCardCount,
   kanbanCardCountClasses,
@@ -61,28 +61,29 @@ describe('filterCards', () => {
 
 // ─── filterColumns ────────────────────────────────────────────────
 
-describe('filterColumns', () => {
-  it('applies filter to all columns', () => {
-    const result = filterColumns(columns, 'login')
-    expect(result[0].cards).toHaveLength(1) // todo column: only "Fix login bug"
-    expect(result[1].cards).toHaveLength(0) // doing column: no match
+describe('resolveTaskBoardView', () => {
+  it('filters visible cards and keeps the source column', () => {
+    const view = resolveTaskBoardView({ columns, filterText: 'login' })
+    expect(view.columns[0].visibleCards).toHaveLength(1)
+    expect(view.columns[0].source.cards).toHaveLength(2)
+    expect(view.columns[1].visibleCards).toHaveLength(0)
   })
 
-  it('hides specified columns', () => {
-    const result = filterColumns(columns, '', ['done'])
-    expect(result).toHaveLength(2)
-    expect(result.map((c) => c.id)).toEqual(['todo', 'doing'])
+  it('hides specified columns by string identity', () => {
+    const view = resolveTaskBoardView({ columns, hiddenColumns: ['done'] })
+    expect(view.columns.map((column) => column.source.id)).toEqual(['todo', 'doing'])
   })
 
   it('combines filter and hidden columns', () => {
-    const result = filterColumns(columns, 'docs', ['todo'])
-    expect(result).toHaveLength(2) // doing + done
-    expect(result[0].cards).toHaveLength(1) // doing: "Update docs"
+    const view = resolveTaskBoardView({ columns, filterText: 'docs', hiddenColumns: ['todo'] })
+    expect(view.columns.map((column) => column.source.id)).toEqual(['doing', 'done'])
+    expect(view.columns[0].visibleCards).toHaveLength(1)
+    expect(view.columns[0].source.cards).toHaveLength(1)
   })
 
-  it('returns all when no filter or hidden', () => {
-    const result = filterColumns(columns, '')
-    expect(result).toHaveLength(3)
+  it('returns every column when nothing is filtered', () => {
+    const view = resolveTaskBoardView({ columns })
+    expect(view.columns).toHaveLength(3)
   })
 })
 

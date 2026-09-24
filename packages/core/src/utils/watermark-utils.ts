@@ -22,7 +22,7 @@ export const watermarkDefaults = {
 } as const
 
 export const WATERMARK_DEFAULT_INK =
-  'color-mix(in srgb, var(--tiger-text, #111827) 15%, transparent)'
+  'color-mix(in srgb, var(--tiger-text) 15%, transparent)'
 
 export const watermarkFontDefaults: Required<WatermarkFont> = {
   fontSize: 16,
@@ -201,6 +201,18 @@ export function renderWatermarkCanvas(opts: {
   return renderWatermarkToDomCanvas(opts)
 }
 
+export async function paintWatermark(
+  opts: WatermarkRenderOptions
+): Promise<{ url?: string; imageFailed: boolean }> {
+  if (opts.image) {
+    const image = await loadWatermarkImage(opts.image)
+    if (!image) return { imageFailed: true }
+    return { url: renderWatermarkToDomCanvas(opts, image), imageFailed: false }
+  }
+  const offscreenResult = await renderWatermarkToOffscreenCanvas(opts)
+  return { url: offscreenResult ?? renderWatermarkToDomCanvas(opts), imageFailed: false }
+}
+
 export async function renderWatermarkDataUrl(
   opts: WatermarkRenderOptions
 ): Promise<string | undefined> {
@@ -222,23 +234,11 @@ export type WatermarkFrameRequest = (callback: WatermarkFrameCallback) => number
 
 export type WatermarkFrameCancel = (handle: number) => void
 
-export interface WatermarkResizeObserverLike {
-  observe: (target: Element) => void
-  disconnect: () => void
-}
-
-export type WatermarkResizeObserverFactory = (
-  callback: ResizeObserverCallback
-) => WatermarkResizeObserverLike
-
 export interface WatermarkRenderControllerOptions {
   getRenderOptions: () => WatermarkRenderOptions
   onRender: (base64Url: string | undefined) => void
-  /** Restore overlay only when the direct child is missing or no longer covering. */
-  onTamper?: () => void
   requestFrame?: WatermarkFrameRequest
   cancelFrame?: WatermarkFrameCancel
-  createResizeObserver?: WatermarkResizeObserverFactory
   render?: (options: WatermarkRenderOptions) => Promise<string | undefined> | string | undefined
 }
 
@@ -267,31 +267,58 @@ function cancelDefaultWatermarkFrame(handle: number): void {
   globalThis.clearTimeout(handle)
 }
 
-function createDefaultWatermarkResizeObserver(
-  callback: ResizeObserverCallback
-): WatermarkResizeObserverLike {
-  return new ResizeObserver(callback)
+function readStyleNumber(value: string): number {
+  const parsed = Number.parseFloat(value)
+  return Number.isFinite(parsed) ? parsed : Number.NaN
 }
 
-const WATERMARK_OVERLAY_ATTR_FILTER = ['style', 'class', 'hidden'] as const
-
-function findDirectWatermarkOverlay(container: Element): HTMLElement | null {
-  for (const child of Array.from(container.children)) {
-    if (child instanceof HTMLElement && child.dataset.watermark === 'true') {
-      return child
-    }
-  }
-  return null
-}
-
-function watermarkOverlayCoversHost(overlay: HTMLElement): boolean {
+/**
+ * Whether the overlay still paints a visible tiled background.
+ * Uses computed style. This is the foundation coverage predicate; do not
+ * add a second check.
+ */
+export function watermarkOverlayCoversHost(overlay: HTMLElement): boolean {
   if (overlay.hidden) return false
-  const { position, pointerEvents, display, visibility, opacity } = overlay.style
-  if (display === 'none' || visibility === 'hidden' || opacity === '0') return false
-  if (position !== 'absolute' || pointerEvents !== 'none') return false
-  if (typeof getComputedStyle === 'function') {
-    const computed = getComputedStyle(overlay)
-    if (computed.display === 'none' || computed.visibility === 'hidden') return false
+  const view = overlay.ownerDocument.defaultView
+  const computed = view && typeof view.getComputedStyle === 'function' ? view.getComputedStyle(overlay) : null
+  const display = computed?.display || overlay.style.display
+  const visibility = computed?.visibility || overlay.style.visibility
+  if (display === 'none' || visibility === 'hidden' || visibility === 'collapse') return false
+
+  const opacityRaw = computed?.opacity || overlay.style.opacity
+  const opacity = opacityRaw === '' ? 1 : readStyleNumber(opacityRaw)
+  if (!Number.isFinite(opacity) || opacity < 0.05) return false
+
+  const computedBg = computed?.backgroundImage ?? ''
+  const variableImage = overlay.style.getPropertyValue('--tiger-watermark-image').trim()
+  const background =
+    computedBg && computedBg !== 'none'
+      ? computedBg
+      : variableImage.startsWith('url(')
+        ? variableImage
+        : overlay.style.backgroundImage
+  if (!background || background === 'none') return false
+
+  const inlineWidth = overlay.style.width
+  const inlineHeight = overlay.style.height
+  if (
+    inlineWidth === '0' ||
+    inlineWidth === '0px' ||
+    inlineHeight === '0' ||
+    inlineHeight === '0px'
+  ) {
+    return false
+  }
+  const computedWidth = computed ? readStyleNumber(computed.width) : Number.NaN
+  const computedHeight = computed ? readStyleNumber(computed.height) : Number.NaN
+  if (computedWidth === 0 || computedHeight === 0) return false
+
+  const rect = overlay.getBoundingClientRect()
+  const width = computedWidth > 0 ? computedWidth : rect.width
+  const height = computedHeight > 0 ? computedHeight : rect.height
+  if (width === 0 && height === 0) {
+    const stretched = overlay.style.inset === '0' || overlay.style.inset === '0px'
+    if (!stretched) return false
   }
   return true
 }
@@ -302,13 +329,7 @@ export function createWatermarkRenderController(
   const requestFrame = options.requestFrame ?? requestDefaultWatermarkFrame
   const cancelFrame = options.cancelFrame ?? cancelDefaultWatermarkFrame
   const render = options.render ?? renderWatermarkDataUrl
-  const createResizeObserver = options.createResizeObserver ?? createDefaultWatermarkResizeObserver
 
-  let observer: WatermarkResizeObserverLike | undefined
-  let mutationObserver: MutationObserver | undefined
-  let observedTarget: Element | undefined
-  let observedOverlay: HTMLElement | undefined
-  let restoring = false
   let frameHandle: number | undefined
   let pending = false
   let renderVersion = 0
@@ -340,13 +361,6 @@ export function createWatermarkRenderController(
   }
 
   function disconnect(): void {
-    observer?.disconnect()
-    observer = undefined
-    mutationObserver?.disconnect()
-    mutationObserver = undefined
-    observedOverlay = undefined
-    observedTarget = undefined
-    restoring = false
     pending = false
     renderVersion += 1
 
@@ -356,54 +370,8 @@ export function createWatermarkRenderController(
     }
   }
 
-  function watchOverlay(overlay: HTMLElement | null): void {
-    if (!mutationObserver || !observedTarget) return
-    if (overlay === observedOverlay) return
-    mutationObserver.disconnect()
-    mutationObserver.observe(observedTarget, { childList: true })
-    if (overlay) {
-      mutationObserver.observe(overlay, {
-        attributes: true,
-        attributeFilter: [...WATERMARK_OVERLAY_ATTR_FILTER]
-      })
-    }
-    observedOverlay = overlay ?? undefined
-  }
-
-  function restoreIfNeeded(): void {
-    if (!observedTarget || restoring) return
-    const overlay = findDirectWatermarkOverlay(observedTarget)
-    watchOverlay(overlay)
-    if (overlay && watermarkOverlayCoversHost(overlay)) return
-    restoring = true
-    try {
-      options.onTamper?.()
-    } finally {
-      restoring = false
-    }
-  }
-
-  function observe(target: Element): void {
-    if (target === observedTarget && mutationObserver) return
-
-    disconnect()
-    observedTarget = target
-
-    if (typeof MutationObserver !== 'undefined') {
-      mutationObserver = new MutationObserver(() => {
-        restoreIfNeeded()
-      })
-      mutationObserver.observe(target, { childList: true })
-      watchOverlay(findDirectWatermarkOverlay(target))
-    }
-
-    if (options.createResizeObserver) {
-      observer = createResizeObserver((entries) => {
-        if (!entries.some((entry) => entry.target === target)) return
-        renderNextFrame()
-      })
-      observer.observe(target)
-    }
+  function observe(_target: Element): void {
+    // Host size changes must not re-encode the tile. The stylesheet repeats it.
   }
 
   async function flush(): Promise<void> {
@@ -429,8 +397,31 @@ export function createWatermarkRenderController(
 
 export const watermarkWrapperClasses = 'relative isolate'
 
+export const watermarkOverlayClasses = 'tiger-watermark-overlay'
+
+/** Tile rules. The overlay only sets the custom properties below. */
+export const watermarkBaseStyles = {
+  '.tiger-watermark-overlay': {
+    position: 'absolute',
+    inset: '0',
+    pointerEvents: 'none',
+    zIndex: 'var(--tiger-watermark-z, 20)',
+    backgroundImage: 'var(--tiger-watermark-image, none)',
+    backgroundRepeat: 'repeat',
+    backgroundSize: 'var(--tiger-watermark-size, auto)',
+    backgroundPosition: 'var(--tiger-watermark-position, 0 0)',
+    printColorAdjust: 'exact',
+    WebkitPrintColorAdjust: 'exact'
+  }
+} as const
+
+function watermarkImageValue(url?: string): string {
+  if (!url || /["'\\()]/.test(url)) return 'none'
+  return `url("${url}")`
+}
+
 /**
- * Build the inline `style` object for the watermark overlay <div>.
+ * Custom properties consumed by {@link watermarkBaseStyles}.
  */
 export function getWatermarkOverlayStyle(opts: {
   base64Url?: string
@@ -444,15 +435,9 @@ export function getWatermarkOverlayStyle(opts: {
 }): Record<string, string> {
   const bgSize = `${opts.width + opts.gapX}px ${opts.height + opts.gapY}px`
   return {
-    position: 'absolute',
-    inset: '0',
-    pointerEvents: 'none',
-    zIndex: String(opts.zIndex),
-    backgroundImage: opts.base64Url ? `url(${opts.base64Url})` : 'none',
-    backgroundRepeat: 'repeat',
-    backgroundSize: bgSize,
-    backgroundPosition: `${opts.offsetX}px ${opts.offsetY}px`,
-    printColorAdjust: 'exact',
-    WebkitPrintColorAdjust: 'exact'
+    '--tiger-watermark-image': watermarkImageValue(opts.base64Url),
+    '--tiger-watermark-size': bgSize,
+    '--tiger-watermark-position': `${opts.offsetX}px ${opts.offsetY}px`,
+    '--tiger-watermark-z': String(opts.zIndex)
   }
 }

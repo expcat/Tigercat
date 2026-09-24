@@ -79,21 +79,21 @@ describe('Card', () => {
       props: { variant: 'default' },
       slots: { default: 'body' }
     })
-    expect(getComputedStyle(getRoot(def)).borderWidth).toBe('1px')
+    expect(getRoot(def).className).toContain('border')
+    expect(getRoot(def).className).not.toContain('border-2')
 
     const { container: bordered } = render(Card, {
       props: { variant: 'bordered' },
       slots: { default: 'body' }
     })
-    expect(getComputedStyle(getRoot(bordered)).borderWidth).toBe('2px')
+    expect(getRoot(bordered).className).toContain('border-2')
 
     const { container: transparent } = render(Card, {
       props: { variant: 'transparent' },
       slots: { default: 'body' }
     })
-    expect(getComputedStyle(getRoot(transparent)).backgroundColor).toMatch(
-      /transparent|rgba\(0, 0, 0, 0\)/
-    )
+    expect(getRoot(transparent).className).toContain('bg-transparent')
+    expect(getRoot(transparent).className).toContain('border-0')
   })
 
   it('does not fake a button when hoverable has no click', () => {
@@ -166,9 +166,10 @@ describe('Card', () => {
       components: { Card }
     })
     const root = getRoot(container)
-    expect(getComputedStyle(root).flexDirection).toBe('row-reverse')
+    expect(root.className).toContain('tiger-flex-row')
+    expect(root.className).not.toContain('flex-row-reverse')
     const cover = container.querySelector('[data-tiger-card-cover]') as HTMLElement
-    expect(parseFloat(getComputedStyle(cover).width)).toBe(192)
+    expect(cover.className).toContain('tiger-card-cover-horizontal')
     expect(root.firstElementChild).toBe(cover)
   })
 

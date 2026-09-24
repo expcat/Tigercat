@@ -2,7 +2,8 @@ import { defineComponent, computed, h, onBeforeUnmount, ref, PropType } from 'vu
 import {
   copyTextToClipboard,
   createCopyStatusReset,
-  getCodeLabels,
+  getTextLabels,
+  resolveCopyableTextTag,
   getIconDefinition,
   getTextClasses,
   isTextCopyable,
@@ -93,7 +94,7 @@ export const Text = defineComponent({
     })
 
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const labels = computed(() => getCodeLabels(mergedLocale.value))
+    const labels = computed(() => getTextLabels(mergedLocale.value))
     const idleLabel = computed(() =>
       resolveLocaleText(labels.value.copyLabel, copyOptions.value?.tooltip)
     )
@@ -152,7 +153,7 @@ export const Text = defineComponent({
           )
         : undefined
 
-      return h(resolvedTag.value, { ...attrs, class: [textCopyableRootClasses, attrs.class] }, [
+      return h(resolveCopyableTextTag(props.tag), { ...attrs, class: [textCopyableRootClasses, attrs.class] }, [
         h(
           'span',
           {

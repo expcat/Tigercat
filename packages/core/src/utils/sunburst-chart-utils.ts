@@ -4,10 +4,12 @@
  */
 
 import type { SunburstChartDatum } from '../types/chart'
-import { DEFAULT_CHART_COLORS, createPieArcPath, polarToCartesian } from './chart-utils'
-import { heatmapLabelFill } from './heatmap-chart-utils'
+import { DEFAULT_CHART_COLORS } from './chart/color'
+import { createPieArcPath, polarToCartesian } from './chart/path'
+import { chartLabelFill } from './heatmap-chart-utils'
 import { isFiniteNumber } from './chart/layout'
 import { devWarn } from './dev-warn'
+import { chartTreeNodeKey, createChartTreeVisit, type ChartTreeVisit } from './chart/tree-visit'
 
 export const DEFAULT_SUNBURST_SIZE = 320
 export const DEFAULT_SUNBURST_PADDING = 24
@@ -15,7 +17,7 @@ export const DEFAULT_SUNBURST_START_ANGLE = -Math.PI / 2
 export const DEFAULT_SUNBURST_END_ANGLE = (3 * Math.PI) / 2
 
 export const sunburstArcTransitionClasses =
-  'transition-[opacity,filter] motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
+  'transition-[opacity,filter] motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
 
 export interface SunburstArc {
   index: number
@@ -47,13 +49,27 @@ export interface LayoutSunburstOptions {
   colors?: string[]
 }
 
-function nodeValue(datum: SunburstChartDatum): number | null {
+function nodeValue(
+  datum: SunburstChartDatum,
+  visit: ChartTreeVisit = createChartTreeVisit()
+): number | null {
+  const key = chartTreeNodeKey(datum)
+  if (
+    !visit.enter(
+      key,
+      ['SunburstChart.cycle', 'SunburstChart skipped a cyclic node'],
+      ['SunburstChart.duplicate', 'SunburstChart skipped a duplicate node']
+    )
+  ) {
+    return null
+  }
+  try {
   const children = datum.children
   if (children && children.length > 0) {
     let sum = 0
     let any = false
     for (const child of children) {
-      const childValue = nodeValue(child)
+      const childValue = nodeValue(child, visit)
       if (childValue === null) continue
       any = true
       sum += childValue
@@ -81,6 +97,9 @@ function nodeValue(datum: SunburstChartDatum): number | null {
     return null
   }
   return datum.value
+  } finally {
+    visit.leave(key)
+  }
 }
 
 function maxDrawnDepth(data: readonly SunburstChartDatum[]): number {
@@ -204,7 +223,7 @@ export function layoutSunburst(
         showLabel: arcLength >= 14 && oR - iR >= 10,
         labelX: labelPos.x,
         labelY: labelPos.y,
-        labelFill: heatmapLabelFill(color, 0.6),
+        labelFill: chartLabelFill(color),
         percent: rootTotal > 0 ? (item.value / rootTotal) * 100 : 0
       })
       childIndices.push(index)

@@ -1,4 +1,17 @@
-import { computed, defineComponent, h, onBeforeUnmount, PropType, ref } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, PropType, ref, type VNodeChild } from 'vue'
+
+function renderHighlightTokens(lines: HighlightToken[][]): VNodeChild[] {
+  return lines.map((tokens, lineIndex) =>
+    h('span', { key: lineIndex }, [
+      lineIndex > 0 ? '\n' : null,
+      ...tokens.map((token, tokenIndex) =>
+        token.className
+          ? h('span', { key: tokenIndex, class: token.className }, token.text)
+          : token.text
+      )
+    ])
+  )
+}
 import {
   coerceClassValue,
   codeBlockCopyStatusLiveClasses,
@@ -10,7 +23,9 @@ import {
   getCodeLabels,
   mergeStyleValues,
   mergeTigerLocale,
-  renderCodeHighlightHtml,
+  highlightToTokens,
+  resolveCodeHighlightTheme,
+  type HighlightToken,
   resolveLocaleText,
   type CodeCopyButtonStatus,
   type CodeHighlighter,
@@ -133,21 +148,27 @@ export const Code = defineComponent({
           style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
         },
         [
-          h('pre', { class: codeBlockPreClasses }, [
+          h(
+            'pre',
+            {
+              class: codeBlockPreClasses,
+              tabindex: 0,
+              'aria-label': labels.value.scrollLabel
+            },
+            [
             (() => {
-              const highlighted = renderCodeHighlightHtml(
+              const highlighted = highlightToTokens(
                 props.code,
                 props.language,
-                props.highlighter
+                props.highlighter,
+                resolveCodeHighlightTheme(config.value.colorScheme)
               )
               return highlighted == null
                 ? h('code', { class: 'block' }, props.code)
-                : h('code', {
-                    class: 'block',
-                    innerHTML: highlighted
-                  })
+                : h('code', { class: 'block' }, renderHighlightTokens(highlighted))
             })()
-          ]),
+            ]
+          ),
           props.copyable
             ? h(
                 'button',

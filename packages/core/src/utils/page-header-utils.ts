@@ -15,7 +15,7 @@ import {
 
 /** Root page-header landmark */
 export const pageHeaderRootClasses =
-  'tiger-page-header flex w-full flex-col gap-3 border-b border-[var(--tiger-border,#e5e7eb)] pb-4'
+  'tiger-page-header flex w-full flex-col gap-3 border-b border-[var(--tiger-border)] pb-4'
 
 /** Heading row: left cluster (back + title/crumb) and right actions */
 export const pageHeaderHeadingRowClasses =
@@ -33,11 +33,11 @@ export const pageHeaderTitleRowClasses =
 
 /** Primary title text */
 export const pageHeaderTitleClasses =
-  'tiger-page-header-title text-xl font-semibold leading-7 text-[var(--tiger-text,#111827)]'
+  'tiger-page-header-title text-xl font-semibold leading-7 text-[var(--tiger-text)]'
 
 /** Secondary subtitle text */
 export const pageHeaderSubtitleClasses =
-  'tiger-page-header-subtitle text-sm leading-6 text-[var(--tiger-text-muted,#6b7280)]'
+  'tiger-page-header-subtitle text-sm leading-6 text-[var(--tiger-text-secondary)]'
 
 /** Right-aligned actions */
 export const pageHeaderActionsClasses =

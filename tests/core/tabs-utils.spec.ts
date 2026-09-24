@@ -27,10 +27,12 @@ const tabs: TabRecord[] = [
 ]
 
 describe('tabs-utils', () => {
-  it('treats number and string keys as the same tab', () => {
-    expect(isKeyActive(1, '1')).toBe(true)
-    expect(isKeyActive('2', 2)).toBe(true)
-    expect(findTabIndex([1, 2, 3], '2')).toBe(1)
+  it('keeps number and string keys distinct', () => {
+    expect(isKeyActive(1, '1')).toBe(false)
+    expect(isKeyActive('2', 2)).toBe(false)
+    expect(isKeyActive(2, 2)).toBe(true)
+    expect(findTabIndex([1, 2, 3], '2')).toBe(-1)
+    expect(findTabIndex([1, 2, 3], 2)).toBe(1)
     expect(formatTabKey(1)).toBe('n:1')
     expect(parseTabKey('n:1')).toBe(1)
     expect(parseTabKey('s:home')).toBe('home')
@@ -40,7 +42,7 @@ describe('tabs-utils', () => {
     expect(getDefaultActiveKey(tabs)).toBe('2')
     expect(resolveDisplayedActiveKey(undefined, tabs)).toBe('2')
     expect(resolveDisplayedActiveKey(1, tabs)).toBe(1)
-    expect(resolveDisplayedActiveKey('missing', tabs)).toBe('2')
+    expect(resolveDisplayedActiveKey('missing', tabs)).toBe('missing')
   })
 
   it('skips disabled tabs when the active tab is removed', () => {

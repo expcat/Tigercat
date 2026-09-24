@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { DOC_COMPONENT_ALIASES } from '../../scripts/lib/public-components.mjs'
 import {
   MAX_COMPACT_PROPS,
   buildRequiredPropSnippet,
@@ -122,14 +121,6 @@ describe('shouldUseFrameworkRuntimeProps', () => {
     expect(shouldUseFrameworkRuntimeProps('PieChartProps', coreByName, ['CorePieChartProps'])).toBe(
       false
     )
-  })
-})
-
-describe('DOC_COMPONENT_ALIASES', () => {
-  it('has no first-class identity aliases', () => {
-    expect(Object.fromEntries(DOC_COMPONENT_ALIASES)).toEqual({})
-    expect(DOC_COMPONENT_ALIASES.has('TabPane')).toBe(false)
-    expect(DOC_COMPONENT_ALIASES.has('WorkflowActionBar')).toBe(false)
   })
 })
 

@@ -60,11 +60,11 @@ describe('Skeleton', () => {
   describe('Animation', () => {
     it('sweeps a highlight for wave and stays still for none', () => {
       const wave = render(<Skeleton animation="wave" />)
-      expect(getComputedStyle(getRoot(wave.container)).animationName).toBe('tiger-skeleton-wave')
+      expect(getRoot(wave.container).className).toContain('tiger-skeleton-wave')
       wave.unmount()
 
       const pulse = render(<Skeleton animation="pulse" />)
-      expect(getComputedStyle(getRoot(pulse.container)).animationName).toBe('tiger-skeleton-pulse')
+      expect(getRoot(pulse.container).className).toContain('tiger-skeleton-pulse')
       pulse.unmount()
 
       const none = render(<Skeleton animation="none" />)

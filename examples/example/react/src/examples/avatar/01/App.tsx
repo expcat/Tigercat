@@ -13,7 +13,7 @@ export default function App() {
       <Avatar
         text="TC"
         shape="square"
-        bgColor="bg-[var(--tiger-primary,#2563eb)]"
+        bgColor="bg-[var(--tiger-primary)]"
         textColor="text-white"
       />
     </div>

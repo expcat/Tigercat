@@ -120,8 +120,9 @@ describe('FileManager (React)', () => {
   })
 
   it('shows loading overlay', () => {
-    const { getByRole } = render(<FileManager files={files} loading />)
-    expect(getByRole('status')).toBeTruthy()
+    const { getByRole, getByText, container } = render(<FileManager files={files} loading />)
+    expect(container.querySelector('[role="status"]')).toBeNull()
+    expect(getByText('Loading...')).toBeTruthy()
     expect(getByRole('listbox')).toHaveAttribute('aria-disabled', 'true')
   })
 
@@ -356,10 +357,16 @@ describe('FileManager (React)', () => {
     const { getByText } = render(
       <FileManager files={tree} currentPath={['src']} draggable onFilesChange={onFilesChange} />
     )
-    const dataTransfer = { setData: vi.fn(), effectAllowed: 'none', dropEffect: 'none' }
-    fireEvent.dragStart(getByText('c.ts').closest('[role="option"]')!, { dataTransfer })
-    fireEvent.dragOver(getByText('a.ts').closest('[role="option"]')!, { dataTransfer })
-    fireEvent.drop(getByText('a.ts').closest('[role="option"]')!, { dataTransfer })
+    const source = getByText('c.ts').closest('[role="option"]')!
+    const target = getByText('a.ts').closest('[role="option"]')!
+    expect(source).not.toHaveAttribute('draggable', 'true')
+    expect(source.getAttribute('data-drag-container')).not.toBe('files')
+    const original = document.elementFromPoint.bind(document)
+    document.elementFromPoint = () => target
+    fireEvent.pointerDown(source, { clientX: 0, clientY: 0, button: 0, pointerId: 1 })
+    fireEvent.pointerMove(document, { clientX: 24, clientY: 0, pointerId: 1 })
+    fireEvent.pointerUp(document, { clientX: 24, clientY: 0, pointerId: 1 })
+    document.elementFromPoint = original
     expect(onFilesChange).toHaveBeenCalledOnce()
     const next = onFilesChange.mock.calls[0][0] as FileItem[]
     expect(next[0]?.children?.map((item) => item.name)).toEqual(['c.ts', 'a.ts', 'b.ts'])

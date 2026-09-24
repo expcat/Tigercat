@@ -17,6 +17,7 @@ import type {
   UseDragOptions
 } from '@expcat/tigercat-core'
 import {
+  createDragContainerId,
   createDragState,
   createListReorderController,
   isSameContainerDrag,
@@ -42,6 +43,7 @@ export interface UseDragReturn {
   isCrossContainer: ComputedRef<boolean>
   getDragItemAttrs: (item: DragItem) => Record<string, unknown>
   getDropZoneAttrs: () => Record<string, unknown>
+  containerId: string
 }
 
 function callbacksOf(options: UseDragOptions): DragCallbacks {
@@ -57,8 +59,9 @@ export function useDrag(options: MaybeRefOrGetter<UseDragOptions> = {}): UseDrag
   const getOptions = (): UseDragOptions => toValue(options)
   const state = reactive(createDragState())
 
+  const ownId = createDragContainerId()
   const controller = createListReorderController({
-    getContainerId: () => getOptions().containerId ?? 'default',
+    getContainerId: () => getOptions().containerId ?? ownId,
     getConfig: () => getOptions().config,
     getCallbacks: () => callbacksOf(getOptions())
   })
@@ -93,16 +96,27 @@ export function useDrag(options: MaybeRefOrGetter<UseDragOptions> = {}): UseDrag
 
   function getDragItemAttrs(item: DragItem): Record<string, unknown> {
     const bindings = controller.getItemBindings(item)
-    const { extraClass, onDragStart, onDragOver, onDrop, onDragEnd, onPointerDown, ...rest } =
-      bindings
+    const {
+      extraClass,
+      onDragStart,
+      onDragOver,
+      onDrop,
+      onDragEnd,
+      onPointerDown,
+      onKeyDown,
+      style,
+      ...rest
+    } = bindings
     return {
       ...rest,
       class: extraClass,
+      style,
       onDragstart: onDragStart,
       onDragover: onDragOver,
       onDrop,
       onDragend: onDragEnd,
-      onPointerdown: onPointerDown
+      onPointerdown: onPointerDown,
+      onKeydown: onKeyDown
     }
   }
 
@@ -127,6 +141,7 @@ export function useDrag(options: MaybeRefOrGetter<UseDragOptions> = {}): UseDrag
     isSameContainer: computed(() => isSameContainerDrag(state)),
     isCrossContainer: computed(() => isCrossContainerDrag(state)),
     getDragItemAttrs,
-    getDropZoneAttrs
+    getDropZoneAttrs,
+    containerId: getOptions().containerId ?? ownId
   }
 }

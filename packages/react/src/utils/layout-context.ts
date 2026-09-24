@@ -3,10 +3,9 @@ import { createContext, useContext } from 'react'
 export interface LayoutContextValue {
   nested: boolean
   hasSider: boolean
-  siderCollapsed: boolean
-  setSiderCollapsed: (collapsed: boolean) => void
-  contentEl: HTMLElement | null
-  setContentEl: (el: HTMLElement | null) => void
+  fullHeight: boolean
+  /** A default sidebar name was already used in this shell or an ancestor. */
+  namedSidebarClaimed: boolean
 }
 
 export const LayoutContext = createContext<LayoutContextValue | null>(null)

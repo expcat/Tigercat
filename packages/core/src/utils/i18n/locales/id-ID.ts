@@ -14,6 +14,9 @@ export const idID: TigerLocale = {
     cancelText: 'Batal',
     closeText: 'Tutup',
     loadingText: 'Memuat...',
+    loadingFinishedText: 'Selesai memuat',
+    loadingFailedText: 'Gagal memuat',
+    viewText: 'Lihat',
     emptyText: 'Tidak ada data',
     noMoreText: 'Tidak ada data lagi',
     searchPlaceholder: 'Cari',
@@ -47,7 +50,8 @@ export const idID: TigerLocale = {
     ariaLabel: 'Kode QR',
     expiredText: 'Kode QR kedaluwarsa',
     refreshText: 'Muat ulang',
-    loadingText: 'Memuat...'
+    loadingText: 'Memuat...',
+    errorText: 'Tidak dapat membuat kode QR'
   },
   marquee: {
     ariaLabel: 'Konten bergulir'
@@ -55,10 +59,25 @@ export const idID: TigerLocale = {
   image: {
     previewAriaLabel: 'Pratinjau {alt}',
     previewFallbackAlt: 'gambar',
-    groupAriaLabel: 'Grup gambar'
+    groupAriaLabel: 'Grup gambar',
+    loadErrorText: 'Gambar gagal dimuat'
   },
   imageCompare: {
-    ariaLabel: 'Perbandingan gambar'
+    ariaLabel: 'Perbandingan gambar',
+    beforeAlt: 'Sebelum',
+    afterAlt: 'Sesudah',
+    valueText: '{percent}% sisi sebelum terlihat'
+  },
+  text: {
+    copyLabel: 'Salin',
+    copiedLabel: 'Disalin',
+    copyFailedLabel: 'Gagal menyalin',
+  },
+  watermark: {
+    imageErrorText: 'Gambar tanda air gagal dimuat'
+  },
+  segmented: {
+    ariaLabel: 'Opsi'
   },
   descriptions: {
     colon: ':'
@@ -67,6 +86,9 @@ export const idID: TigerLocale = {
     avatarAlt: 'Foto profil',
     dragHandleAriaLabel: 'Ubah urutan'
   },
+  masonry: {
+    visualOrderText: 'Urutan visual berbeda dari urutan sumber'
+  },
   scrollArea: {
     ariaLabel: 'Area gulir'
   },
@@ -74,7 +96,8 @@ export const idID: TigerLocale = {
     pageBreak: 'Pemisah halaman'
   },
   timeline: {
-    pendingText: 'Memuat...'
+    pendingText: 'Memuat...',
+    pendingReplacedText: 'Pembaruan selesai'
   },
   workflowTimeline: {
     pending: 'Tertunda',
@@ -216,7 +239,11 @@ export const idID: TigerLocale = {
     branchExpression: 'Ekspresi',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: 'Tidak digunakan untuk jenis simpul ini',
+    publishText: 'Terbitkan',
     publishBlocked: 'Tidak dapat memublikasikan sampai ini diperbaiki'
+  },
+  workflowDetailShell: {
+    ariaLabel: 'Detail alur kerja'
   },
   progress: {
     ariaLabel: 'Progres'
@@ -259,7 +286,9 @@ export const idID: TigerLocale = {
     loadingText: 'Memuat',
     expandText: 'Bentangkan',
     collapseText: 'Ciutkan',
-    selectAllText: 'Pilih semua',
+    selectAllText: 'Pilih semua di halaman ini',
+    selectLoadedText: 'Pilih semua baris yang dimuat',
+    tableAriaLabel: 'Tabel data',
     selectRowAriaLabel: 'Pilih baris {row}',
     sortByText: 'Urutkan menurut {column}',
     clearSortText: 'Hapus pengurutan',
@@ -275,9 +304,13 @@ export const idID: TigerLocale = {
     allText: 'Semua',
     filterPlaceholder: 'Saring...',
     exportCsvText: 'Ekspor CSV',
-    exportExcelText: 'Ekspor Excel',
     exportCsvAriaLabel: 'Ekspor ke CSV',
-    exportExcelAriaLabel: 'Ekspor ke Excel',
+    selectionCountText: '{count} dipilih',
+    sortAnnouncementText: 'Diurutkan menurut {column}, {direction}',
+    sortAscendingText: 'menaik',
+    sortDescendingText: 'menurun',
+    sortNoneText: 'tidak diurutkan',
+    dragRowAriaLabel: 'Seret baris {row}',
     expandRowAriaLabel: 'Bentangkan baris',
     collapseRowAriaLabel: 'Ciutkan baris',
     sortMenuAriaLabel: 'Urutkan',
@@ -325,14 +358,17 @@ export const idID: TigerLocale = {
     nextText: 'Selanjutnya',
     finishText: 'Selesai',
     closeAriaLabel: 'Tutup tur',
-    dialogAriaLabel: 'Tur panduan'
+    dialogAriaLabel: 'Tur panduan',
+    loadErrorText: 'Tur ini tidak dapat dimuat.',
   },
   calendar: {
     previousMonth: 'Bulan sebelumnya',
     nextMonth: 'Bulan berikutnya',
     previousYear: 'Tahun sebelumnya',
     nextYear: 'Tahun berikutnya',
-    eventCountText: '{n} acara'
+    eventCountText: '{n} acara',
+    switchToYear: 'Beralih ke tampilan tahun',
+    switchToMonth: 'Beralih ke tampilan bulan'
   },
   fullscreen: {
     enterAriaLabel: 'Masuk layar penuh',
@@ -343,7 +379,8 @@ export const idID: TigerLocale = {
     pathAriaLabel: 'Jalur berkas',
     listboxAriaLabel: 'Berkas',
     searchAriaLabel: 'Cari berkas',
-    emptyText: 'Folder kosong'
+    emptyText: 'Folder kosong',
+    resultCountText: '{count} item'
   },
   imageViewer: {
     dialogAriaLabel: 'Penampil gambar',
@@ -377,6 +414,7 @@ export const idID: TigerLocale = {
     resizeHandleS: 'bawah',
     resizeHandleSw: 'kiri bawah',
     resizeHandleW: 'kiri',
+    cropSizeText: '{width} kali {height}',
     loadingCropImageAriaLabel: 'Memuat gambar untuk dipotong',
     loadErrorAriaLabel: 'Gagal memuat gambar untuk dipotong',
     fileTooLargeText: 'Ukuran file melebihi {maxSize}',
@@ -394,10 +432,14 @@ export const idID: TigerLocale = {
     ellipseToolText: 'Elips',
     polygonToolText: 'Poligon',
     freehandToolText: 'Gambar bebas',
-    deleteText: 'Hapus'
+    deleteText: 'Hapus',
+    annotationLoadFailedText: 'Gambar gagal dimuat.',
+    annotationRetryText: 'Coba lagi',
+    annotationTooSmallText: 'Anotasi terlalu kecil.',
+    annotationPolygonIncompleteText: 'Poligon membutuhkan minimal 3 titik.'
   },
   status: {
-    tagCloseAriaLabel: 'Tutup tag',
+    tagCloseAriaLabel: 'Tutup {label}',
     badgeLabel: 'notifikasi',
     badgeCountLabel: '{count} notifikasi'
   },
@@ -410,6 +452,7 @@ export const idID: TigerLocale = {
     unassignedSwimlaneText: 'Belum ditetapkan',
     wipLimitText: 'Batas WIP: {limit}',
     dragHintText: 'Seret untuk memindahkan',
+    grabAnnouncementText: '{card}. Dari {from} ke {to}. Posisi {position} dari {count}.',
     boardAriaLabel: 'Papan Tugas'
   },
   chatWindow: {
@@ -424,7 +467,8 @@ export const idID: TigerLocale = {
   code: {
     copyLabel: 'Salin',
     copiedLabel: 'Disalin',
-    copyFailedLabel: 'Gagal menyalin'
+    copyFailedLabel: 'Gagal menyalin',
+    scrollLabel: 'Kode'
   },
   commentThread: {
     emptyText: 'Tidak ada komentar',
@@ -441,12 +485,15 @@ export const idID: TigerLocale = {
     listAriaLabel: 'Utas komentar',
     replySubmitText: 'Kirim balasan',
     remainingRepliesText: 'Tampilkan sisa {count}',
+    duplicateIdText: 'Id komentar duplikat {id}',
+    cycleText: 'Siklus komentar di {id}',
     maxDepthReachedText: 'Kedalaman balasan maksimum tercapai'
   },
   activityFeed: {
     emptyText: 'Tidak ada aktivitas',
     loadingText: 'Memuat...',
     listAriaLabel: 'Aktivitas',
+    newItemText: 'Aktivitas baru: {title}',
     otherGroupTitle: 'Lainnya'
   },
   notificationCenter: {
@@ -460,6 +507,9 @@ export const idID: TigerLocale = {
     markReadText: 'Tandai sudah dibaca',
     markUnreadText: 'Tandai belum dibaca',
     defaultGroupTitle: 'Bawaan',
+    filterAriaLabel: 'Status baca',
+    markedReadText: '{count} ditandai sudah dibaca',
+    newItemText: 'Notifikasi baru: {title}',
     unreadCountText: '{count} belum dibaca'
   },
   select: {
@@ -470,7 +520,15 @@ export const idID: TigerLocale = {
     clearAriaLabel: 'Hapus pilihan',
     createOptionLabel: 'Buat "{label}"',
     moreCountText: '+{count} lagi',
-    loadingText: 'Memuat...',
+    loadingText: 'Memuat...'
+  },
+  cascader: {
+    levelLabel: 'Tingkat {level}',
+    backText: 'Kembali',
+    expandAriaLabel: 'Bentangkan',
+    collapseAriaLabel: 'Ciutkan'
+  },
+  treeSelect: {
     levelLabel: 'Tingkat {level}',
     backText: 'Kembali',
     expandAriaLabel: 'Bentangkan',
@@ -541,7 +599,22 @@ export const idID: TigerLocale = {
     sunburstTooltip: '{label}: {value} ({percent} %)',
     orgChartAriaLabel: 'Bagan organisasi',
     ganttAriaLabel: 'Bagan Gantt',
-    ganttTaskAriaLabel: '{label}, {start} sampai {end}{progress}'
+    ganttTaskAriaLabel: '{label}, {start} sampai {end}{progress}',
+    ganttTodayAriaLabel: 'Hari ini',
+    ganttUnknownDate: 'tanggal tidak diketahui',
+    chartAriaLabel: 'Diagram',
+    lineChartAriaLabel: 'Diagram garis',
+    areaChartAriaLabel: 'Diagram area',
+    barChartAriaLabel: 'Diagram batang',
+    scatterChartAriaLabel: 'Diagram sebar',
+    pieChartAriaLabel: 'Diagram lingkaran',
+    radarChartAriaLabel: 'Diagram radar',
+    heatmapChartAriaLabel: 'Peta panas',
+    heatmapSummary: '{rows} baris kali {columns} kolom',
+    funnelChartAriaLabel: 'Diagram corong',
+    sunburstChartAriaLabel: 'Diagram sunburst',
+    treemapChartAriaLabel: 'Peta pohon',
+    gaugeChartAriaLabel: 'Pengukur'
   },
   codeEditor: {
     editorAriaLabel: 'Editor kode'
@@ -555,6 +628,8 @@ export const idID: TigerLocale = {
     editModeLabel: 'Sunting',
     splitModeLabel: 'Bagi',
     previewModeLabel: 'Pratinjau',
+    showEditorText: 'Edit',
+    showPreviewText: 'Pratinjau',
     bold: 'Tebal',
     italic: 'Miring',
     strikethrough: 'Coret',
@@ -664,7 +739,9 @@ export const idID: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: 'Hapus {tag}',
-    clearAllLabel: 'Hapus semua tag'
+    clearAllLabel: 'Hapus semua tag',
+    duplicateText: 'Sudah ditambahkan',
+    limitText: 'Batas tag tercapai'
   },
   input: {
     clearAriaLabel: 'Hapus isian',
@@ -680,12 +757,6 @@ export const idID: TigerLocale = {
     ariaLabel: 'Penggeser',
     minAriaLabel: 'Nilai terendah',
     maxAriaLabel: 'Nilai tertinggi'
-  },
-  stepper: {
-    ariaLabel: 'Pengatur angka',
-    valueAriaLabel: 'Nilai',
-    incrementAriaLabel: 'Tambah',
-    decrementAriaLabel: 'Kurangi'
   },
   signature: {
     ariaLabel: 'Pad tanda tangan',

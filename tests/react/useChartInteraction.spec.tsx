@@ -418,7 +418,8 @@ describe('useChartInteraction (React)', () => {
         useChartInteraction(createTestOptions(createMockCallbacks(), { legendPosition: 'top' }))
       )
 
-      expect(result.current.wrapperClasses).toContain('flex-col-reverse')
+      expect(result.current.wrapperClasses).toContain('flex-col')
+      expect(result.current.wrapperClasses).toContain('[&>:first-child]:order-2')
       expect(result.current.wrapperClasses).toContain('gap-2')
     })
 
@@ -437,7 +438,8 @@ describe('useChartInteraction (React)', () => {
         useChartInteraction(createTestOptions(createMockCallbacks(), { legendPosition: 'left' }))
       )
 
-      expect(result.current.wrapperClasses).toContain('flex-row-reverse')
+      expect(result.current.wrapperClasses).toContain('flex-row')
+      expect(result.current.wrapperClasses).toContain('[&>:first-child]:order-2')
       expect(result.current.wrapperClasses).toContain('items-start')
       expect(result.current.wrapperClasses).toContain('gap-4')
     })

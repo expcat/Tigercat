@@ -3,8 +3,8 @@
  *
  * Class builders, CSS-variable style, and looping helpers shared by the
  * Vue and React Marquee implementations. Resolvers are string/number only
- * so they stay safe to evaluate during server-side rendering. Style
- * injection is guarded by `isBrowser()`.
+ * so they stay safe to evaluate during server-side rendering. Motion
+ * rules live in `marqueeBaseStyles` on the Tailwind plugin.
  */
 
 import {
@@ -19,10 +19,6 @@ import {
   type MarqueeGap
 } from '../types/marquee'
 import { classNames } from './class-names'
-import { isBrowser } from './env'
-
-/** Style element id used by {@link injectMarqueeStyles} */
-export const MARQUEE_STYLE_ID = 'tiger-ui-marquee-styles'
 
 /** CSS custom properties written onto the looping track */
 export const MARQUEE_DURATION_VAR = '--tiger-marquee-duration'
@@ -30,110 +26,6 @@ export const MARQUEE_COPIES_VAR = '--tiger-marquee-copies'
 export const MARQUEE_GAP_VAR = '--tiger-marquee-gap'
 export const MARQUEE_INLINE_SIGN_VAR = '--tiger-marquee-inline-sign'
 export const MARQUEE_COPY_INDEX_VAR = '--tiger-marquee-copy-index'
-
-/**
- * Keyframes plus pause / reduced-motion rules. Clones stay in the DOM for
- * hydration stability; the reduced-motion block hides them and stops motion.
- * Horizontal motion uses the inline axis (flipped under `dir=rtl`).
- * Vertical clones are taken out of flow so the viewport is the first copy.
- */
-export const MARQUEE_CSS = `
-@keyframes tiger-marquee-x {
-  from { transform: translate3d(0, 0, 0); }
-  to {
-    transform: translate3d(
-      calc(var(${MARQUEE_INLINE_SIGN_VAR}, 1) * -100% / var(${MARQUEE_COPIES_VAR}, 2)),
-      0,
-      0
-    );
-  }
-}
-
-@keyframes tiger-marquee-y {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(0, -100%, 0); }
-}
-
-.tiger-marquee-horizontal {
-  ${MARQUEE_INLINE_SIGN_VAR}: 1;
-}
-
-.tiger-marquee-horizontal:dir(rtl),
-[dir="rtl"] .tiger-marquee-horizontal,
-.tiger-marquee-horizontal[dir="rtl"] {
-  ${MARQUEE_INLINE_SIGN_VAR}: -1;
-}
-
-.tiger-marquee-track {
-  animation: tiger-marquee-x var(${MARQUEE_DURATION_VAR}, 20000ms) linear infinite;
-}
-
-.tiger-marquee-horizontal > .tiger-marquee-track {
-  flex-direction: row;
-}
-
-.tiger-marquee-vertical > .tiger-marquee-track {
-  position: relative;
-  flex-direction: column;
-  animation-name: tiger-marquee-y;
-}
-
-.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-clone {
-  position: absolute;
-  inset-inline-start: 0;
-  width: 100%;
-  top: calc(var(${MARQUEE_COPY_INDEX_VAR}, 1) * 100%);
-}
-
-.tiger-marquee-reverse > .tiger-marquee-track {
-  animation-direction: reverse;
-}
-
-.tiger-marquee-content {
-  gap: var(${MARQUEE_GAP_VAR}, 16px);
-}
-
-.tiger-marquee-horizontal > .tiger-marquee-track > .tiger-marquee-content {
-  padding-inline-end: var(${MARQUEE_GAP_VAR}, 16px);
-}
-
-.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-content {
-  padding-block-end: var(${MARQUEE_GAP_VAR}, 16px);
-}
-
-.tiger-marquee-static > .tiger-marquee-track {
-  animation: none;
-}
-
-.tiger-marquee[data-marquee-paused='true'] > .tiger-marquee-track,
-.tiger-marquee-pause-hover:hover > .tiger-marquee-track,
-.tiger-marquee-pause-focus:focus-within > .tiger-marquee-track {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tiger-marquee {
-    overflow: auto;
-  }
-
-  .tiger-marquee > .tiger-marquee-track {
-    animation: none !important;
-    will-change: auto;
-  }
-
-  .tiger-marquee .tiger-marquee-clone {
-    display: none !important;
-  }
-
-  .tiger-marquee-horizontal > .tiger-marquee-track > .tiger-marquee-content {
-    padding-inline-end: 0;
-  }
-
-  .tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-content {
-    padding-block-end: 0;
-  }
-}
-`
 
 /** Root overflow clip */
 export const marqueeRootClasses = 'tiger-marquee overflow-hidden max-w-full'
@@ -150,7 +42,7 @@ export const marqueeHorizontalClasses = 'tiger-marquee-horizontal'
 /** Vertical axis */
 export const marqueeVerticalClasses = 'tiger-marquee-vertical'
 
-/** Reverse the CSS animation (right / down) */
+/** Reverse the CSS animation (`end` / `down`) */
 export const marqueeReverseClasses = 'tiger-marquee-reverse'
 
 /** Skip looping animation when there is only one copy */
@@ -171,22 +63,78 @@ export const marqueeContentVerticalClasses = 'flex-col items-stretch'
 /** Duplicate copies used only for the seamless loop */
 export const marqueeCloneClasses = 'tiger-marquee-clone'
 
-const MARQUEE_DIRECTIONS = new Set<MarqueeDirection>(['left', 'right', 'up', 'down'])
+const MARQUEE_DIRECTIONS = new Set<MarqueeDirection>(['start', 'end', 'up', 'down'])
 
-/**
- * Inject looping keyframes and reduced-motion rules if the style node
- * is missing. Presence in the document is the only guard — a sticky
- * module flag would skip re-inject after the node is removed.
- */
-export function injectMarqueeStyles(): void {
-  if (!isBrowser()) return
-  if (document.getElementById(MARQUEE_STYLE_ID)) return
-
-  const style = document.createElement('style')
-  style.id = MARQUEE_STYLE_ID
-  style.textContent = MARQUEE_CSS
-  document.head.appendChild(style)
-}
+/** Looping keyframes and reduced-motion rules. Wired by the Tailwind plugin. */
+export const marqueeBaseStyles = {
+  '@keyframes tiger-marquee-x': {
+    from: { transform: 'translate3d(0, 0, 0)' },
+    to: {
+      transform: `translate3d(calc(var(${MARQUEE_INLINE_SIGN_VAR}, 1) * -100% / var(${MARQUEE_COPIES_VAR}, 2)), 0, 0)`
+    }
+  },
+  '@keyframes tiger-marquee-y': {
+    from: { transform: 'translate3d(0, 0, 0)' },
+    to: { transform: 'translate3d(0, -100%, 0)' }
+  },
+  '.tiger-marquee-horizontal': {
+    [MARQUEE_INLINE_SIGN_VAR]: '1'
+  },
+  '.tiger-marquee-horizontal:dir(rtl), [dir="rtl"] .tiger-marquee-horizontal, .tiger-marquee-horizontal[dir="rtl"]':
+    {
+      [MARQUEE_INLINE_SIGN_VAR]: '-1'
+    },
+  '.tiger-marquee-track': {
+    animation: `tiger-marquee-x var(${MARQUEE_DURATION_VAR}, var(--tiger-motion-duration-slow)) linear infinite`
+  },
+  '.tiger-marquee-horizontal > .tiger-marquee-track': {
+    flexDirection: 'row'
+  },
+  '.tiger-marquee-vertical > .tiger-marquee-track': {
+    position: 'relative',
+    flexDirection: 'column',
+    animationName: 'tiger-marquee-y'
+  },
+  '.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-clone': {
+    position: 'absolute',
+    insetInlineStart: '0',
+    width: '100%',
+    top: `calc(var(${MARQUEE_COPY_INDEX_VAR}, 1) * 100%)`
+  },
+  '.tiger-marquee-reverse > .tiger-marquee-track': {
+    animationDirection: 'reverse'
+  },
+  '.tiger-marquee-content': {
+    gap: `var(${MARQUEE_GAP_VAR}, 16px)`
+  },
+  '.tiger-marquee-horizontal > .tiger-marquee-track > .tiger-marquee-content': {
+    paddingInlineEnd: `var(${MARQUEE_GAP_VAR}, 16px)`
+  },
+  '.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-content': {
+    paddingBlockEnd: `var(${MARQUEE_GAP_VAR}, 16px)`
+  },
+  '.tiger-marquee-static > .tiger-marquee-track': {
+    animation: 'none'
+  },
+  ".tiger-marquee[data-marquee-paused='true'] > .tiger-marquee-track, .tiger-marquee-pause-hover:hover > .tiger-marquee-track, .tiger-marquee-pause-focus:focus-within > .tiger-marquee-track":
+    {
+      animationPlayState: 'paused'
+    },
+  '@media (prefers-reduced-motion: reduce)': {
+    '.tiger-marquee': { overflow: 'auto' },
+    '.tiger-marquee > .tiger-marquee-track': {
+      animation: 'none',
+      willChange: 'auto'
+    },
+    '.tiger-marquee .tiger-marquee-clone': { display: 'none' },
+    '.tiger-marquee-horizontal > .tiger-marquee-track > .tiger-marquee-content': {
+      paddingInlineEnd: '0'
+    },
+    '.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-content': {
+      paddingBlockEnd: '0'
+    }
+  }
+} as const
 
 /**
  * Resolve direction, falling back to {@link DEFAULT_MARQUEE_DIRECTION}.
@@ -209,7 +157,7 @@ export function isMarqueeVertical(direction?: MarqueeDirection): boolean {
  */
 export function isMarqueeReverse(direction?: MarqueeDirection): boolean {
   const resolved = resolveMarqueeDirection(direction)
-  return resolved === 'right' || resolved === 'down'
+  return resolved === 'end' || resolved === 'down'
 }
 
 /**
@@ -230,9 +178,8 @@ export function resolveMarqueeGap(gap?: MarqueeGap): string {
   if (typeof gap === 'number' && Number.isFinite(gap) && gap >= 0) {
     return `${gap}px`
   }
-  if (typeof gap === 'string') {
-    const trimmed = gap.trim()
-    if (trimmed) return trimmed
+  if (typeof gap === 'string' && /^\d+(\.\d+)?(px|rem|em|%)$/.test(gap.trim())) {
+    return gap.trim()
   }
   return `${DEFAULT_MARQUEE_GAP_PX}px`
 }
@@ -306,6 +253,21 @@ export function resolveMarqueeRegion(input: { ariaLabel?: string; labelledBy?: s
  * Duplicate copies stay in the layout for a seamless loop but must not take
  * focus or pointer. Same contract as a collapsed CollapsePanel wrapper.
  */
+/** Copy the live subtree into inert clones. Ids are stripped so they are not duplicated. */
+export function syncMarqueeClones(track: HTMLElement | null | undefined): void {
+  if (!track) return
+  const source = track.querySelector<HTMLElement>(
+    '[data-marquee-content]:not([data-marquee-clone])'
+  )
+  if (!source) return
+  const clones = track.querySelectorAll<HTMLElement>('[data-marquee-clone]')
+  clones.forEach((clone) => {
+    const copy = source.cloneNode(true) as HTMLElement
+    copy.querySelectorAll<HTMLElement>('[id]').forEach((node) => node.removeAttribute('id'))
+    clone.replaceChildren(...Array.from(copy.childNodes))
+  })
+}
+
 export function getMarqueeCloneAttributes(): {
   'data-marquee-clone': ''
   'aria-hidden': true

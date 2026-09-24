@@ -5,7 +5,6 @@ import {
   type ButtonVariant
 } from '../types/button'
 import { classNames, type ClassValue } from './class-names'
-import { devWarn } from './dev-warn'
 import { getJoinedGroupItemClasses } from './joined-group-utils'
 import { getButtonVariantClasses } from './theme-colors'
 
@@ -14,7 +13,10 @@ import { getButtonVariantClasses } from './theme-colors'
  * `tiger-motion-aware` stops spin/scale when the plugin reduced-motion rule is on.
  */
 export const buttonBaseClasses =
-  'tiger-motion-aware inline-flex items-center justify-center whitespace-nowrap font-medium rounded-[var(--tiger-radius-md,0.5rem)] [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 active:scale-[0.98] motion-reduce:active:scale-100'
+  'tiger-motion-aware inline-flex items-center justify-center whitespace-nowrap font-medium [transition:var(--tiger-transition-base)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 active:scale-[0.98] motion-reduce:active:scale-100'
+
+/** Radius for a button that is not inside a group. Groups paint their own corners. */
+export const buttonRadiusClasses = 'rounded-[var(--tiger-radius-md)]'
 
 export const buttonSizeClasses: Record<ButtonSize, string> = {
   xs: 'px-2 py-1 text-xs',
@@ -27,21 +29,20 @@ export const buttonSizeClasses: Record<ButtonSize, string> = {
 export const buttonDisabledClasses =
   'pointer-events-none cursor-not-allowed opacity-60 active:!scale-100'
 
-const buttonDangerSolidClasses =
-  'bg-[var(--tiger-error,#dc2626)] hover:bg-[var(--tiger-error-hover,#b91c1c)] text-[var(--tiger-error-foreground,#ffffff)] focus-visible:ring-[var(--tiger-error,#dc2626)] disabled:bg-[var(--tiger-error-disabled,#fca5a5)]'
+const dangerKeyFor = (variant?: string) => {
+  if (variant === 'outline') return 'dangerOutline'
+  if (variant === 'ghost') return 'dangerGhost'
+  if (variant === 'link') return 'dangerLink'
+  return 'danger'
+}
 
-/**
- * Danger mode color overrides per variant.
- * Keyboard ring uses `--tiger-error`; mouse click does not paint `focus:ring-*`.
- */
+/** Same table as the color schemes. Kept as a lookup for callers that read by variant. */
 export const buttonDangerClasses: Record<ButtonVariant, string> = {
-  primary: buttonDangerSolidClasses,
-  secondary: buttonDangerSolidClasses,
-  outline:
-    'bg-transparent hover:bg-[var(--tiger-error-bg-hover,#fef2f2)] text-[var(--tiger-error,#dc2626)] border-2 border-[var(--tiger-error,#dc2626)] focus-visible:ring-[var(--tiger-error,#dc2626)] disabled:border-[var(--tiger-error-disabled,#fca5a5)] disabled:text-[var(--tiger-error-disabled,#fca5a5)]',
-  ghost:
-    'bg-transparent hover:bg-[var(--tiger-error-bg-hover,#fef2f2)] text-[var(--tiger-error,#dc2626)] focus-visible:ring-[var(--tiger-error,#dc2626)] disabled:text-[var(--tiger-error-disabled,#fca5a5)]',
-  link: 'bg-transparent hover:underline text-[var(--tiger-error,#dc2626)] focus-visible:ring-[var(--tiger-error,#dc2626)] disabled:text-[var(--tiger-error-disabled,#fca5a5)]'
+  primary: getButtonVariantClasses('danger'),
+  secondary: getButtonVariantClasses('danger'),
+  outline: getButtonVariantClasses('dangerOutline'),
+  ghost: getButtonVariantClasses('dangerGhost'),
+  link: getButtonVariantClasses('dangerLink')
 }
 
 export interface ResolveButtonClassesInput {
@@ -51,6 +52,8 @@ export interface ResolveButtonClassesInput {
   disabled?: boolean
   loading?: boolean
   block?: boolean
+  /** Group or split seam owns the radius. */
+  joined?: boolean
   className?: ClassValue
 }
 
@@ -61,12 +64,13 @@ export interface ResolveButtonClassesInput {
 export function resolveButtonClasses(input: ResolveButtonClassesInput = {}): string {
   const variant = input.variant
   const variantClasses = input.danger
-    ? (buttonDangerClasses[variant as ButtonVariant] ?? buttonDangerClasses.primary)
+    ? getButtonVariantClasses(dangerKeyFor(variant))
     : getButtonVariantClasses(variant)
   const size = input.size && input.size in buttonSizeClasses ? input.size : 'md'
 
   return classNames(
     buttonBaseClasses,
+    !input.joined && buttonRadiusClasses,
     variantClasses,
     buttonSizeClasses[size],
     (input.disabled || input.loading) && buttonDisabledClasses,
@@ -89,23 +93,15 @@ export function isButtonHtmlType(value: unknown): value is ButtonHtmlType {
   return typeof value === 'string' && BUTTON_HTML_TYPES.has(value)
 }
 
-/**
- * `htmlType` and native `type` are the same attribute. Conflicting values keep
- * `htmlType` and warn once.
- */
-export function resolveButtonHtmlType(htmlType: unknown, nativeType?: unknown): ButtonHtmlType {
-  const fromHtml = isButtonHtmlType(htmlType) ? htmlType : undefined
-  const fromNative = isButtonHtmlType(nativeType) ? nativeType : undefined
-  if (fromHtml && fromNative && fromHtml !== fromNative) {
-    devWarn('Button.htmlType', '[Tigercat] Button htmlType and type differ; htmlType wins.')
-  }
-  return fromHtml ?? fromNative ?? 'button'
+/** Native button type. Unknown values fall back to `button`. */
+export function resolveButtonType(type: unknown): ButtonHtmlType {
+  return isButtonHtmlType(type) ? type : 'button'
 }
 
 export type ButtonIconPlacement = 'start' | 'end'
 
 export function resolveButtonIconPlacement(position?: ButtonIconPosition): ButtonIconPlacement {
-  return position === 'right' || position === 'end' ? 'end' : 'start'
+  return position === 'end' ? 'end' : 'start'
 }
 
 export function getButtonIconSlotClasses(

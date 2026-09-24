@@ -7,6 +7,7 @@ import React, {
   useState,
   forwardRef
 } from 'react'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
   classNames,
   breadcrumbContainerClasses,
@@ -20,16 +21,16 @@ import {
   getSeparatorKind,
   getSeparatorContent,
   resolveBreadcrumbItemCurrent,
+  resolveLinkAddress,
   mergeTigerLocale,
   getBreadcrumbLabels,
-  chevronLeftSolidIcon20PathD,
-  icon20ViewBox,
   type BreadcrumbItemProps as CoreBreadcrumbItemProps,
   type BreadcrumbProps as CoreBreadcrumbProps,
   type BreadcrumbSeparator,
   type TigerLocale,
   type TigerLocaleBreadcrumb
 } from '@expcat/tigercat-core'
+import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface BreadcrumbContextValue {
@@ -74,6 +75,8 @@ export interface BreadcrumbItemProps
   icon?: React.ReactNode
   /** @internal */
   isLast?: boolean
+  /** @internal */
+  trailing?: React.ReactNode
 }
 
 export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
@@ -89,6 +92,7 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
       children,
       icon,
       isLast = false,
+      trailing,
       ...props
     },
     ref
@@ -105,7 +109,7 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
       [isCurrent, onClick]
     )
 
-    const computedRel = target === '_blank' ? 'noopener noreferrer' : undefined
+    const address = resolveLinkAddress({ href, target })
     const contentElements = icon ? (
       <>
         <span className="inline-flex">{icon}</span>
@@ -122,13 +126,13 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
           {contentElements}
         </span>
       )
-    } else if (href) {
+    } else if (address.href) {
       control = (
         <a
           className={linkClasses}
-          href={href}
-          target={target}
-          rel={computedRel}
+          href={address.href}
+          target={address.target}
+          rel={address.rel}
           onClick={handleClick}>
           {contentElements}
         </a>
@@ -146,6 +150,7 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
     return (
       <li ref={ref} className={itemClasses} style={style} {...props}>
         {control}
+        {trailing}
       </li>
     )
   }
@@ -215,26 +220,21 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
               onClick={() => setExpanded(true)}>
               ...
             </button>
+            {index !== slots.length - 1 ? <SeparatorMark separator={separator} /> : null}
           </li>
         )
       } else {
         const child = items[slot.index]
         const isLast = slot.index === items.length - 1
+        const trailing = index !== slots.length - 1 ? <SeparatorMark separator={separator} /> : null
         nodes.push(
           React.isValidElement(child)
             ? React.cloneElement(child as React.ReactElement<BreadcrumbItemProps>, {
                 key: child.key ?? slot.index,
-                isLast
+                isLast,
+                trailing
               })
             : child
-        )
-      }
-      const isLastSlot = index === slots.length - 1
-      if (!isLastSlot) {
-        nodes.push(
-          <li key={`sep-${index}`} className={getBreadcrumbItemClasses()} aria-hidden="true">
-            <SeparatorMark separator={separator} />
-          </li>
         )
       }
       return nodes

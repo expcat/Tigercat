@@ -2,15 +2,14 @@
  * @vitest-environment happy-dom
  */
 
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   appendCalendarEventCountLabel,
   buildCalendarDateCellExtra,
-  clearRegisteredIcons,
   getCalendarEventsForDate,
   isFullscreenSupported,
   isTextCopyable,
-  renderCodeHighlightHtml,
+  highlightToTokens,
   resolveMenuSearchQuery,
   resolveTextCopyContent,
   resolveTextCopyableOptions,
@@ -74,22 +73,18 @@ describe('menu collapsed search', () => {
 
 describe('code highlight renderer', () => {
   it('returns null without a highlighter so the default stays plain text', () => {
-    expect(renderCodeHighlightHtml('const x = 1', 'javascript', undefined)).toBeNull()
+    expect(highlightToTokens('const x = 1', 'javascript', undefined)).toBeNull()
   })
 
-  it('uses highlightCode when provided', () => {
-    const html = renderCodeHighlightHtml('const x = 1', 'javascript', {
-      highlightCode: (code, language) => `<span data-lang="${language}">${code}</span>`
+  it('uses highlightCode when highlightLine is absent', () => {
+    const tokens = highlightToTokens('const x = 1', 'javascript', {
+      highlightCode: (code) => [[{ text: code, className: 'lang-javascript' }]]
     })
-    expect(html).toBe('<span data-lang="javascript">const x = 1</span>')
+    expect(tokens).toEqual([[{ text: 'const x = 1', className: 'lang-javascript' }]])
   })
 })
 
 describe('fullscreen helpers', () => {
-  afterEach(() => {
-    clearRegisteredIcons()
-  })
-
   it('reports unsupported outside a Fullscreen API document', () => {
     expect(isFullscreenSupported()).toBe(false)
   })

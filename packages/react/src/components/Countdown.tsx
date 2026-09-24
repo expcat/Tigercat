@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   COUNTDOWN_DEFAULT_FORMAT,
   COUNTDOWN_DEFAULT_INTERVAL_MS,
@@ -10,6 +10,8 @@ import {
   createCountdownPayload,
   formatCountdown,
   getCountdownRemaining,
+  manageLiveRegion,
+  parseCountdownTimestamp,
   getCountdownTitleClasses,
   getCountdownValueClasses,
   type CountdownChangePayload,
@@ -63,6 +65,9 @@ export const Countdown: React.FC<CountdownProps> = ({
   onFinishRef.current = onFinish
 
   const formatted = useMemo(() => formatCountdown(remaining, format), [format, remaining])
+  const target = parseCountdownTimestamp(value)
+  const titleId = useId()
+  const timerName = typeof title === 'string' && title ? title : ariaLabel || 'Countdown'
 
   useEffect(() => {
     const nextRemaining =
@@ -97,7 +102,31 @@ export const Countdown: React.FC<CountdownProps> = ({
 
     timerId = window.setInterval(tick, interval)
     return () => window.clearInterval(timerId)
-  }, [format, interval, value])
+  }, [format, interval, target])
+
+  const liveRef = useRef<ReturnType<typeof manageLiveRegion> | null>(null)
+  const announced = useRef({ tick: false, finish: false })
+  useEffect(() => {
+    const region = manageLiveRegion('polite')
+    liveRef.current = region
+    return () => {
+      region.destroy()
+      liveRef.current = null
+    }
+  }, [])
+  useEffect(() => {
+    const region = liveRef.current
+    if (!region) return
+    if (remaining > 0 && !announced.current.tick) {
+      announced.current.tick = true
+      region.announce(`${timerName} ${formatted}`)
+      return
+    }
+    if (remaining <= 0 && !announced.current.finish) {
+      announced.current.finish = true
+      region.announce(`${timerName} ${formatted}`)
+    }
+  }, [formatted, remaining, timerName])
 
   return (
     <div
@@ -105,10 +134,18 @@ export const Countdown: React.FC<CountdownProps> = ({
       className={classNames(countdownBaseClasses, className)}
       role={ariaLabel ? 'group' : rest.role}
       aria-label={ariaLabel}>
-      {title ? <div className={getCountdownTitleClasses(size)}>{title}</div> : null}
+      {title ? (
+        <div id={titleId} className={getCountdownTitleClasses(size)}>
+          {title}
+        </div>
+      ) : null}
       <div className={countdownValueWrapperClasses}>
         {prefix ? <span className={countdownPrefixClasses}>{prefix}</span> : null}
-        <span className={getCountdownValueClasses(size)} role="timer">
+        <span
+          className={getCountdownValueClasses(size)}
+          role="timer"
+          aria-labelledby={title ? titleId : undefined}
+          aria-label={title ? undefined : timerName}>
           {formatted}
         </span>
         {suffix ? <span className={countdownSuffixClasses}>{suffix}</span> : null}

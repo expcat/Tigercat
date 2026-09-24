@@ -107,8 +107,8 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
     height,
     fit = 'cover',
     fallbackSrc,
-    preview = true,
-    previewTrigger = 'click',
+    preview = false,
+    zoomOnHover = false,
     lazy = false,
     srcSet,
     sizes,
@@ -144,11 +144,7 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
   useImperativeHandle(forwardedRef, () => ({ img: imgRef.current }))
 
   const previewEnabled = resolveImagePreviewEnabled(preview, group?.preview)
-  const hoverPreviewEnabled = isImageHoverPreviewEnabled(
-    previewEnabled,
-    previewTrigger,
-    Boolean(group)
-  )
+  const hoverPreviewEnabled = isImageHoverPreviewEnabled(zoomOnHover, Boolean(group))
   const clickPreviewEnabled = previewEnabled
   const hoverPlacement = resolveImageHoverPlacement(config.direction)
 
@@ -183,37 +179,25 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
       group.unregister(instanceId)
       return
     }
-    group.register({ id: instanceId, src, alt })
+    group.register({ id: instanceId, src: loadState.actualSrc || src, alt })
     return () => {
       group.unregister(instanceId)
     }
-  }, [group, instanceId, src, alt])
+  }, [group, instanceId, src, alt, loadState.actualSrc])
 
   useEffect(() => {
-    if (!lazy) {
-      inViewRef.current = true
-      setLoadState(resetImageLoadState(src, false, true))
-      return
-    }
+    setLoadState(resetImageLoadState(src))
+  }, [src])
 
-    setLoadState(resetImageLoadState(src, true, inViewRef.current))
-    if (inViewRef.current) return
-
-    const root = containerRef.current
-    if (!root) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0]?.isIntersecting) return
-        inViewRef.current = true
-        setLoadState(resetImageLoadState(src, true, true))
-        observer.disconnect()
-      },
-      { threshold: 0.01 }
+  useEffect(() => {
+    const img = imgRef.current
+    if (!img?.complete || !src) return
+    setLoadState(
+      img.naturalWidth > 0
+        ? { actualSrc: src, error: false, loading: false }
+        : { actualSrc: src, error: true, loading: false }
     )
-    observer.observe(root)
-    return () => observer.disconnect()
-  }, [lazy, src])
+  }, [src, loadState.actualSrc])
 
   const handleLoad = useCallback(
     (event: React.SyntheticEvent<HTMLImageElement>) => {
@@ -303,6 +287,7 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
   const errorPlaceholder = errorRender ?? (
     <div className={imageErrorClasses}>
       <SvgIcon d={imageErrorIconPath} />
+      <span>{labels.loadErrorText}</span>
     </div>
   )
 
@@ -318,6 +303,7 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
           ref={imgRef}
           src={loadState.actualSrc}
           alt={previewEnabled ? '' : alt}
+          loading={lazy ? 'lazy' : undefined}
           className={imgClasses}
           srcSet={srcSet}
           sizes={sizes}
@@ -333,28 +319,27 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
     )
   }
 
-  const hostTag = previewEnabled ? 'button' : 'div'
+  const hostProps = {
+    ...props,
+    ref: setRootRef,
+    className: containerClasses,
+    style: containerStyle,
+    'aria-busy': loadState.loading || undefined,
+    ...(hoverPreviewEnabled ? hoverTriggerHandlers : {}),
+    onClick: handleClick,
+    onKeyDown: handleKeyDown,
+    onFocus: handleFocus,
+    onBlur: handleBlur
+  }
 
   return (
     <>
-      {React.createElement(
-        hostTag,
-        {
-          ...props,
-          ref: setRootRef,
-          className: containerClasses,
-          style: containerStyle,
-          type: previewEnabled ? 'button' : undefined,
-          'aria-label': previewEnabled ? previewName : undefined,
-          ...(hoverPreviewEnabled ? hoverTriggerHandlers : {}),
-          onClick: handleClick,
-          onKeyDown: handleKeyDown,
-          onFocus: handleFocus,
-          onBlur: handleBlur
-        },
-        previewEnabled
-          ? React.createElement('span', { className: imageFrameClasses }, content)
-          : content
+      {previewEnabled ? (
+        <button {...hostProps} type="button" aria-label={previewName}>
+          <span className={imageFrameClasses}>{content}</span>
+        </button>
+      ) : (
+        <div {...hostProps}>{content}</div>
       )}
       {!group && previewVisible && previewSrc && (
         <ImagePreview
@@ -376,7 +361,7 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
             style={hoverFloatingStyles}
             className={classNames(
               hoverFloatingClasses,
-              'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-1 shadow-lg'
+              'rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] p-1 shadow-lg'
             )}
             data-positioned={hoverPositioned}
             aria-hidden>

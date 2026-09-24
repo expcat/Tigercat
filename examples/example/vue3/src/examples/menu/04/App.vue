@@ -138,7 +138,7 @@ watch(
         {{ code }}
       </Checkbox>
     </CheckboxGroup>
-    <p class="text-sm text-[var(--tiger-text-muted)]">
+    <p class="text-sm text-[var(--tiger-text-secondary)]">
       当前权限：{{ permissions.length ? permissions.join(', ') : '无' }}
     </p>
     <Layout class="h-72 overflow-hidden rounded border border-[var(--tiger-border)]">

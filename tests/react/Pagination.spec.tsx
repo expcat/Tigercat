@@ -103,21 +103,18 @@ describe('Pagination', () => {
     expect(input.value).toBe('')
   })
 
-  it('normalizes quick jumper input after idle validation', () => {
-    vi.useFakeTimers()
-
-    render(<Pagination total={100} pageSize={10} showQuickJumper />)
+  it('clamps the quick jumper only on submit', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<Pagination total={100} pageSize={10} showQuickJumper onChange={onChange} />)
 
     const input = screen.getByLabelText('Go to') as HTMLInputElement
-    fireEvent.change(input, { target: { value: '99' } })
-
+    await user.type(input, '99')
     expect(input.value).toBe('99')
-
-    act(() => {
-      vi.advanceTimersByTime(120)
-    })
-
-    expect(input.value).toBe('10')
+    expect(onChange).not.toHaveBeenCalled()
+    await user.keyboard('{Enter}')
+    expect(onChange).toHaveBeenCalledWith(10, 10)
+    expect(input.value).toBe('')
   })
 
   it('loads pagination locale lazily', async () => {
@@ -220,6 +217,13 @@ describe('Pagination', () => {
       await expectNoA11yViolations(container)
     })
   })
+  it('clamps an out-of-range controlled page on commit', () => {
+    const onChange = vi.fn()
+    render(<Pagination total={50} pageSize={10} current={999} onChange={onChange} />)
+    expect(screen.getByRole('button', { name: 'Page 5' })).toHaveAttribute('aria-current', 'page')
+    expect(onChange).toHaveBeenCalledWith(5, 10)
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty or minimal props without errors', () => {
       const { container } = render(<Pagination />)

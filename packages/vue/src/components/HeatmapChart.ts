@@ -8,7 +8,7 @@ import {
   paintHeatmapCanvas,
   resolveHeatmapRenderMode,
   formatHeatmapTooltip,
-  heatmapLabelFill,
+  formatHeatmapSummary,
   heatmapCellTransitionClasses,
   getChartElementOpacity,
   getCartesianChartShellClasses,
@@ -51,7 +51,7 @@ export const HeatmapChart = defineComponent({
     width: { type: Number, default: DEFAULT_HEATMAP_WIDTH },
     height: { type: Number, default: DEFAULT_HEATMAP_HEIGHT },
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: DEFAULT_HEATMAP_PADDING },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: { type: Array as PropType<HeatmapChartDatum[]>, required: true },
     xLabels: { type: Array as PropType<string[]>, required: true },
     yLabels: { type: Array as PropType<string[]>, required: true },
@@ -138,7 +138,6 @@ export const HeatmapChart = defineComponent({
       onHover: (index, datum) => emit('cell-hover', index, datum ?? null),
       onClick: (index, datum) => {
         const resolved = datum ?? null
-        props.onCellClick?.(index, resolved)
         emit('cell-click', index, resolved)
       }
     })
@@ -357,7 +356,7 @@ export const HeatmapChart = defineComponent({
                           key: `val-${cell.index}`,
                           x: cell.x + cell.w / 2,
                           y: cell.y + cell.h / 2,
-                          fill: heatmapLabelFill(cell.fill, cell.heat),
+                          fill: cell.labelFill,
                           class: 'text-[10px] pointer-events-none',
                           'text-anchor': 'middle',
                           'dominant-baseline': 'middle',
@@ -396,7 +395,17 @@ export const HeatmapChart = defineComponent({
               pointerEvents: pointerInteractive ? 'auto' : 'none'
             },
             tabindex: interactive.value ? 0 : undefined,
-            'aria-hidden': interactive.value ? undefined : true,
+            'aria-label': (() => {
+              const cell = currentCells[Math.max(0, visualActive)] ?? currentCells[0]
+              if (!cell) {
+                return formatHeatmapSummary(
+                  labels.value.heatmapSummary,
+                  currentLayout.rows,
+                  currentLayout.cols
+                )
+              }
+              return formatHeatmapTooltip(labels.value.heatmapTooltip, cell, formatValue(cell.value))
+            })(),
             'data-heatmap-canvas': 'true',
             'data-heatmap-render-mode': resolvedRenderMode.value,
             onMousemove: pointerInteractive ? handleCanvasMouseMove : undefined,
@@ -421,7 +430,22 @@ export const HeatmapChart = defineComponent({
             className: classNames(coerceClassValue(attrs.class), props.className)
           })
         },
-        [chart, canvas, hiddenTable, tooltip]
+        [
+          chart,
+          canvas,
+          shouldRenderCanvas.value
+            ? h(
+                'p',
+                { class: 'sr-only' },
+                formatHeatmapSummary(
+                  labels.value.heatmapSummary,
+                  currentLayout.rows,
+                  currentLayout.cols
+                )
+              )
+            : hiddenTable,
+          tooltip
+        ]
       )
     }
   }

@@ -8,9 +8,10 @@ import React from 'react'
 import { Divider } from '@expcat/tigercat-react/Divider'
 import { Space } from '@expcat/tigercat-react/Space'
 import { renderWithProps } from '../utils/render-helpers-react'
+import { expectNoA11yViolations } from '../utils/react'
 
 function getRoot(container: HTMLElement): HTMLElement {
-  return container.querySelector('[role="separator"]') as HTMLElement
+  return container.querySelector('[data-tiger-divider]') as HTMLElement
 }
 
 describe('Divider (React)', () => {
@@ -18,7 +19,13 @@ describe('Divider (React)', () => {
     const { container } = render(<Divider />)
     const divider = getRoot(container)
     expect(divider).toBeInTheDocument()
-    expect(divider).toHaveAttribute('aria-orientation', 'horizontal')
+    expect(divider).toHaveAttribute('aria-hidden', 'true')
+    expect(divider).not.toHaveAttribute('role')
+  })
+
+  it('has no accessibility violations on the default separator', async () => {
+    const { container } = render(<Divider />)
+    await expectNoA11yViolations(container)
   })
 
   it('forwards the ref to the root', () => {
@@ -43,16 +50,16 @@ describe('Divider (React)', () => {
       expect(dividerBox.height).toBeGreaterThan(0)
       expect(dividerBox.height).toBeCloseTo(siblingBox.height, 0)
     } else {
-      expect(getComputedStyle(divider).alignSelf).toBe('stretch')
+      expect(divider.className).toContain('self-stretch')
     }
   })
 
   it('applies color and thickness to a gradient line', () => {
     const { container } = render(
-      <Divider lineStyle="gradient" color="rgb(124, 58, 237)" thickness="4px" spacing="none" />
+      <Divider lineStyle="gradient" color="primary" thickness="4px" spacing="none" />
     )
     const divider = getRoot(container)
-    expect(divider.style.backgroundImage).toContain('rgb(124, 58, 237)')
+    expect(divider.style.backgroundImage).toContain('var(--tiger-primary)')
     expect(divider.style.height).toBe('4px')
     expect(divider.style.borderWidth).toBe('0px')
   })

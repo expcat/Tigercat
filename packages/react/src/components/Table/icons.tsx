@@ -1,16 +1,15 @@
 import React from 'react'
+import { icon24ViewBox } from '@expcat/tigercat-core/icons/common'
+import { getSortIconClasses, getExpandIconClasses } from '@expcat/tigercat-core'
 import {
-  getSortIconClasses,
-  getExpandIconClasses,
   icon16ViewBox,
-  icon24ViewBox,
   sortAscIcon16PathD,
   sortDescIcon16PathD,
   sortBothIcon16PathD,
   expandChevronIcon16PathD,
   lockClosedIcon24PathD,
   lockOpenIcon24PathD
-} from '@expcat/tigercat-core'
+} from '@expcat/tigercat-core/icons/table'
 
 export const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direction }) => {
   const active = direction !== null

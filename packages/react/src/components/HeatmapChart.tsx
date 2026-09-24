@@ -7,6 +7,7 @@ import {
   paintHeatmapCanvas,
   resolveHeatmapRenderMode,
   formatHeatmapTooltip,
+  formatHeatmapSummary,
   heatmapLabelFill,
   heatmapCellTransitionClasses,
   getChartElementOpacity,
@@ -46,7 +47,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   width = DEFAULT_HEATMAP_WIDTH,
   height = DEFAULT_HEATMAP_HEIGHT,
   padding = DEFAULT_HEATMAP_PADDING,
-  responsive = false,
+  responsive = true,
   data,
   xLabels,
   yLabels,
@@ -264,32 +265,6 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
     handleKeyDown(event, index)
   }
 
-  const hiddenTable = (
-    <table className="sr-only" data-heatmap-table="">
-      <thead>
-        <tr>
-          <td />
-          {xLabels.map((label) => (
-            <th key={`hx-${label}`} scope="col">
-              {label}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {yLabels.map((yLabel, row) => (
-          <tr key={`hy-${yLabel}`}>
-            <th scope="row">{yLabel}</th>
-            {xLabels.map((xLabel, col) => {
-              const cell = cells[row * layout.cols + col]
-              return <td key={`hv-${xLabel}-${yLabel}`}>{formatValue(cell?.value ?? null)}</td>
-            })}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
-
   const chart = (
     <ChartCanvas
       width={width}
@@ -366,7 +341,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
                 <text
                   x={cell.x + cell.w / 2}
                   y={cell.y + cell.h / 2}
-                  fill={heatmapLabelFill(cell.fill, cell.heat)}
+                  fill={cell.labelFill}
                   className="text-[10px] pointer-events-none"
                   textAnchor="middle"
                   dominantBaseline="middle"
@@ -404,7 +379,17 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
           data-heatmap-render-mode={resolvedRenderMode}
           className={classNames(interactive && 'cursor-pointer')}
           tabIndex={interactive ? 0 : undefined}
-          aria-hidden={interactive ? undefined : true}
+          aria-label={
+            formatHeatmapTooltip(
+              labels.heatmapTooltip,
+              cells[Math.max(0, visualActive)] ?? cells[0] ?? {
+                xLabel: '',
+                yLabel: '',
+                value: null
+              },
+              formatValue((cells[Math.max(0, visualActive)] ?? cells[0])?.value ?? null)
+            ) || formatHeatmapSummary(labels.heatmapSummary, layout.rows, layout.cols)
+          }
           style={{
             position: 'absolute',
             left: `${innerRect.x}px`,
@@ -424,7 +409,11 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
           }
         />
       )}
-      {hiddenTable}
+      {shouldRenderCanvas ? (
+        <p className="sr-only">
+          {formatHeatmapSummary(labels.heatmapSummary, layout.rows, layout.cols)}
+        </p>
+      ) : null}
       {tooltip}
     </div>
   )

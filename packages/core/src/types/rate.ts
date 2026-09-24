@@ -23,14 +23,9 @@ export interface RateProps {
   disabled?: boolean
   /**
    * Read-only: stays in tab order and exposes the value, but does not change it.
-   * `readonly` is the same flag (DOM alias).
    * @default false
    */
   readOnly?: boolean
-  /**
-   * Alias of {@link RateProps.readOnly}.
-   */
-  readonly?: boolean
   /**
    * Component size
    * @default 'md'

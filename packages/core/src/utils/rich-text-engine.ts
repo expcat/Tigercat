@@ -24,7 +24,9 @@
 import {
   defaultToolbar,
   mapToolbarAction,
-  isValidUrl,
+  canonicalizeUrl,
+  cappedBitmapDataUrl,
+  RICH_TEXT_PASTE_IMAGE_MAX_BYTES,
   getToolbarButtons,
   richTextModeToHtml,
   richTextHtmlToMode,
@@ -37,9 +39,43 @@ function canUseExecCommand(): boolean {
   return isBrowser() && typeof document.execCommand === 'function'
 }
 
-function insertSanitizedHtml(html: string): boolean {
-  if (!canUseExecCommand()) return false
-  return document.execCommand('insertHTML', false, sanitizeHtml(html))
+function insertSanitizedHtml(host: HTMLElement, html: string): boolean {
+  if (!isBrowser()) return false
+  const sanitized = sanitizeHtml(html)
+  const doc = host.ownerDocument
+  const selection = doc.getSelection()
+  const template = doc.createElement('template')
+  template.innerHTML = sanitized
+  const fragment = template.content
+  if (
+    selection &&
+    selection.rangeCount > 0 &&
+    selection.anchorNode &&
+    host.contains(selection.anchorNode)
+  ) {
+    const range = selection.getRangeAt(0)
+    range.deleteContents()
+    const last = fragment.lastChild
+    range.insertNode(fragment)
+    if (last?.parentNode) {
+      range.setStartAfter(last)
+      range.collapse(true)
+      selection.removeAllRanges()
+      selection.addRange(range)
+    }
+    return true
+  }
+  host.appendChild(fragment)
+  return true
+}
+
+function pastedBitmap(event: ClipboardEvent): File | null {
+  const files = event.clipboardData?.files
+  if (!files) return null
+  for (const file of files) {
+    if (/^image\/(png|jpeg|gif|webp)$/.test(file.type)) return file
+  }
+  return null
 }
 
 function clipboardHtml(event: ClipboardEvent | DragEvent): string {
@@ -77,6 +113,8 @@ export interface RichTextEngineMountContext {
    * calls `window.prompt`. Return `null` to cancel.
    */
   requestUrl?(kind: 'link' | 'image'): string | null
+  /** Announce a rejected paste. The component owns the live region. */
+  announce?(message: string): void
 }
 
 export interface RichTextEngineInstance {
@@ -162,12 +200,19 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         if (!isBrowser()) return
         const next = blockFormatsFromSelection(element)
         if (typeof document.queryCommandState === 'function') {
-          if (document.queryCommandState('bold')) next.add('bold')
-          if (document.queryCommandState('italic')) next.add('italic')
-          if (document.queryCommandState('underline')) next.add('underline')
-          if (document.queryCommandState('strikeThrough')) next.add('strikethrough')
-          if (document.queryCommandState('insertUnorderedList')) next.add('bulletList')
-          if (document.queryCommandState('insertOrderedList')) next.add('orderedList')
+          const query = (command: string): boolean => {
+            try {
+              return document.queryCommandState(command)
+            } catch {
+              return false
+            }
+          }
+          if (query('bold')) next.add('bold')
+          if (query('italic')) next.add('italic')
+          if (query('underline')) next.add('underline')
+          if (query('strikeThrough')) next.add('strikethrough')
+          if (query('insertUnorderedList')) next.add('bulletList')
+          if (query('insertOrderedList')) next.add('orderedList')
         }
         ctx.notifyActiveFormats(next)
       }
@@ -175,10 +220,31 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
       const handlePaste = (event: Event) => {
         if (readOnly || disabled) return
         const pasteEvent = event as ClipboardEvent
+        const file = pastedBitmap(pasteEvent)
+        if (file) {
+          pasteEvent.preventDefault()
+          if (file.size > RICH_TEXT_PASTE_IMAGE_MAX_BYTES) {
+            ctx.announce?.('Image was not pasted.')
+            return
+          }
+          const reader = new FileReader()
+          reader.onload = () => {
+            const url = typeof reader.result === 'string' ? cappedBitmapDataUrl(reader.result) : null
+            if (!url) {
+              ctx.announce?.('Image was not pasted.')
+              return
+            }
+            insertSanitizedHtml(element, `<img src="${url}" alt="">`)
+            handleInput()
+            refreshActiveFormats()
+          }
+          reader.readAsDataURL(file)
+          return
+        }
         const html = clipboardHtml(pasteEvent)
         if (!html) return
         pasteEvent.preventDefault()
-        insertSanitizedHtml(html)
+        insertSanitizedHtml(element, html)
         handleInput()
         refreshActiveFormats()
       }
@@ -189,29 +255,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         const html = clipboardHtml(dragEvent)
         if (!html) return
         dragEvent.preventDefault()
-        insertSanitizedHtml(html)
-        handleInput()
-        refreshActiveFormats()
-      }
-
-      const handleBeforeInput = (event: Event) => {
-        if (readOnly || disabled) return
-        const inputEvent = event as InputEvent
-        if (
-          inputEvent.inputType !== 'insertFromPaste' &&
-          inputEvent.inputType !== 'insertFromDrop' &&
-          inputEvent.inputType !== 'insertHTML'
-        ) {
-          return
-        }
-        const data =
-          inputEvent.dataTransfer?.getData('text/html') ||
-          inputEvent.dataTransfer?.getData('text/plain') ||
-          inputEvent.data ||
-          ''
-        if (!data) return
-        inputEvent.preventDefault()
-        insertSanitizedHtml(data)
+        insertSanitizedHtml(element, html)
         handleInput()
         refreshActiveFormats()
       }
@@ -219,7 +263,6 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
       element.addEventListener('input', handleInput)
       element.addEventListener('paste', handlePaste)
       element.addEventListener('drop', handleDrop)
-      element.addEventListener('beforeinput', handleBeforeInput)
 
       let selectionHandler: (() => void) | null = null
       if (isBrowser()) {
@@ -266,8 +309,9 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         if (actionName === 'link') {
           if (!canUseExecCommand()) return
           const url = ctx.requestUrl?.('link') ?? null
-          if (url && isValidUrl(url)) {
-            document.execCommand('createLink', false, url)
+          const canonical = url ? canonicalizeUrl(url) : null
+          if (canonical) {
+            document.execCommand('createLink', false, canonical)
             handleInput()
           }
           return
@@ -275,8 +319,9 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         if (actionName === 'image') {
           if (!canUseExecCommand()) return
           const url = ctx.requestUrl?.('image') ?? null
-          if (url && isValidUrl(url)) {
-            document.execCommand('insertImage', false, url)
+          const canonical = url ? canonicalizeUrl(url) : null
+          if (canonical) {
+            document.execCommand('insertImage', false, canonical)
             handleInput()
           }
         }
@@ -285,10 +330,13 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
       return {
         setValue(html) {
           const sanitized = richTextModeToHtml(html, mode)
-          if (element.innerHTML !== sanitized) element.innerHTML = sanitized
+          const current = richTextHtmlToMode(element.innerHTML, mode)
+          const next = richTextHtmlToMode(sanitized, mode)
+          if (current === next) return
+          element.innerHTML = sanitized
         },
         getValue() {
-          return richTextHtmlToMode(element.innerHTML, mode)
+          return richTextHtmlToMode(sanitizeHtml(element.innerHTML), mode)
         },
         exec,
         refreshActiveFormats,
@@ -310,7 +358,6 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           element.removeEventListener('input', handleInput)
           element.removeEventListener('paste', handlePaste)
           element.removeEventListener('drop', handleDrop)
-          element.removeEventListener('beforeinput', handleBeforeInput)
           if (selectionHandler && isBrowser()) {
             document.removeEventListener('selectionchange', selectionHandler)
           }

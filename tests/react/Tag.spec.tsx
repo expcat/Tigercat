@@ -8,16 +8,17 @@ import userEvent from '@testing-library/user-event'
 import React, { createRef, useState } from 'react'
 import { Tag } from '@expcat/tigercat-react/Tag'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
-import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('Tag', () => {
-  it('renders content without a live region', () => {
+  it('renders content without a live region', async () => {
     const { container } = render(<Tag>Test Tag</Tag>)
 
     expect(screen.getByText('Test Tag')).toBeInTheDocument()
     expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
+    await expectNoA11yViolations(container)
   })
 
   it('lets a user role override the root', () => {
@@ -38,17 +39,6 @@ describe('Tag', () => {
     expect(container.firstElementChild).toHaveClass('custom-class')
   })
 
-  it('warns when color is passed instead of variant', () => {
-    resetDevWarnCache()
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-
-    render(<Tag color="green">Color prop</Tag>)
-
-    expect(screen.getByText('Color prop')).toBeInTheDocument()
-    expect(warn).toHaveBeenCalledWith('[Tigercat] Tag does not support color. Use variant instead.')
-    warn.mockRestore()
-  })
-
   it('does not render close button when closable=false', () => {
     const { container } = render(<Tag closable={false}>Tag</Tag>)
     expect(container.querySelector('button')).not.toBeInTheDocument()
@@ -64,7 +54,7 @@ describe('Tag', () => {
       </Tag>
     )
 
-    await user.click(screen.getByRole('button', { name: 'Close tag' }))
+    await user.click(screen.getByRole('button', { name: 'Close Closable Tag' }))
     expect(onClose).toHaveBeenCalledTimes(1)
     expect(screen.getByText('Closable Tag')).toBeInTheDocument()
   })
@@ -89,7 +79,7 @@ describe('Tag', () => {
     }
 
     render(<List />)
-    await user.click(screen.getAllByRole('button', { name: 'Close tag' })[0])
+    await user.click(screen.getByRole('button', { name: 'Close Alpha' }))
     expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
     expect(screen.getByText('Beta')).toBeInTheDocument()
   })
@@ -104,7 +94,7 @@ describe('Tag', () => {
       </span>
     )
 
-    await user.click(screen.getByRole('button', { name: 'Close tag' }))
+    await user.click(screen.getByRole('button', { name: 'Close Closable Tag' }))
     expect(onWrapperClick).not.toHaveBeenCalled()
   })
 
@@ -136,6 +126,6 @@ describe('Tag', () => {
 
   it('applies a pill shape when requested', () => {
     const { container } = render(<Tag pill>Pill</Tag>)
-    expect(container.firstElementChild?.className).toContain('--tiger-radius-pill')
+    expect(container.firstElementChild?.className).toContain('--tiger-radius-full')
   })
 })

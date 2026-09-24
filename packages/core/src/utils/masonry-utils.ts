@@ -2,13 +2,12 @@
  * Masonry utility functions
  *
  * Pure layout helpers plus Tailwind class builders shared by the Vue and
- * React Masonry implementations. The layout model is column-based: items are
- * packed into the currently shortest column, and the frameworks only render
- * columns and measure item heights.
+ * React Masonry implementations. The default layout keeps source order in
+ * CSS columns. Shortest-column packing is an explicit mode.
  */
 
 import { resolveResponsiveValue } from './responsive'
-import type { MasonryResponsiveValue } from '../types/masonry'
+import type { MasonryLayout, MasonryResponsiveValue } from '../types/masonry'
 
 /** Default column count */
 export const MASONRY_DEFAULT_COLUMNS = 3
@@ -19,8 +18,6 @@ export const MASONRY_DEFAULT_GAP = 16
 // ─── Tailwind class constants ─────────────────────────────────────
 
 export const masonryRootClasses = 'tiger-masonry relative w-full'
-
-export const masonryColumnClasses = 'tiger-masonry-column flex min-w-0 flex-1 flex-col'
 
 export const masonryItemClasses = 'tiger-masonry-item min-w-0 break-inside-avoid'
 
@@ -102,7 +99,8 @@ export function hasMeasuredMasonryHeights(heights: number[]): boolean {
 
 export interface MasonryItemPosition {
   column: number
-  left: number
+  /** Distance from the inline start, not a physical `left`. */
+  inlineStart: number
   top: number
   width: number
 }
@@ -131,7 +129,7 @@ export function computeMasonryPositions(
       const height = Number.isFinite(heights[index]) ? heights[index] : 0
       positions[index] = {
         column,
-        left: column * (width + spacing),
+        inlineStart: column * (width + spacing),
         top: tops[column],
         width
       }
@@ -140,6 +138,40 @@ export function computeMasonryPositions(
   })
 
   return positions
+}
+
+/**
+ * Source-order columns: fill the inline-start column downward, then the next.
+ * This matches CSS multi-column reading order and does not reorder items.
+ */
+export function distributeMasonrySourceItems(itemCount: number, columnCount: number): number[][] {
+  const count = clampMasonryColumnCount(columnCount)
+  const columns: number[][] = Array.from({ length: count }, () => [])
+  const total = Number.isFinite(itemCount) && itemCount > 0 ? Math.floor(itemCount) : 0
+  if (total === 0) return columns
+  const perColumn = Math.ceil(total / count)
+  for (let index = 0; index < total; index += 1) {
+    const column = Math.min(count - 1, Math.floor(index / perColumn))
+    columns[column]!.push(index)
+  }
+  return columns
+}
+
+/**
+ * Column heights for the layout event. `source` keeps reading order.
+ * `shortest` uses the packed columns once heights exist.
+ */
+export function masonryLayoutColumnHeights(
+  heights: number[],
+  columnCount: number,
+  gap: number,
+  layout: MasonryLayout
+): number[] {
+  const columns =
+    layout === 'shortest'
+      ? distributeMasonryItems(heights, columnCount)
+      : distributeMasonrySourceItems(heights.length, columnCount)
+  return computeMasonryColumnHeights(heights, columns, gap)
 }
 
 /**
@@ -196,13 +228,6 @@ export function getMasonryRootClasses(className?: string): string {
 }
 
 /**
- * Classes for a single masonry column.
- */
-export function getMasonryColumnClasses(className?: string): string {
-  return [masonryColumnClasses, className].filter(Boolean).join(' ')
-}
-
-/**
  * Classes for an item measurement wrapper.
  */
 export function getMasonryItemClasses(className?: string): string {
@@ -245,13 +270,13 @@ export function getMasonryFlowRootStyle(
 
 export function getMasonryItemPositionStyle(position: MasonryItemPosition): {
   position: 'absolute'
-  left: string
+  insetInlineStart: string
   top: string
   width: string
 } {
   return {
     position: 'absolute',
-    left: `${position.left}px`,
+    insetInlineStart: `${position.inlineStart}px`,
     top: `${position.top}px`,
     width: `${position.width}px`
   }

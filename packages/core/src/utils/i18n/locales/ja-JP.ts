@@ -14,6 +14,9 @@ export const jaJP: TigerLocale = {
     cancelText: 'キャンセル',
     closeText: '閉じる',
     loadingText: '読み込み中...',
+    loadingFinishedText: '読み込み完了',
+    loadingFailedText: '読み込み失敗',
+    viewText: '表示',
     emptyText: 'データなし',
     noMoreText: 'これ以上ありません',
     searchPlaceholder: '検索',
@@ -47,7 +50,8 @@ export const jaJP: TigerLocale = {
     ariaLabel: 'QRコード',
     expiredText: 'QRコードの有効期限が切れました',
     refreshText: '更新',
-    loadingText: '読み込み中...'
+    loadingText: '読み込み中...',
+    errorText: 'QRコードを生成できません'
   },
   marquee: {
     ariaLabel: 'スクロール中のコンテンツ'
@@ -55,10 +59,25 @@ export const jaJP: TigerLocale = {
   image: {
     previewAriaLabel: '{alt} をプレビュー',
     previewFallbackAlt: '画像',
-    groupAriaLabel: '画像グループ'
+    groupAriaLabel: '画像グループ',
+    loadErrorText: '画像を読み込めませんでした'
   },
   imageCompare: {
-    ariaLabel: '画像比較'
+    ariaLabel: '画像比較',
+    beforeAlt: '前',
+    afterAlt: '後',
+    valueText: '前の画像が {percent}% 見えています'
+  },
+  text: {
+    copyLabel: 'コピー',
+    copiedLabel: 'コピーしました',
+    copyFailedLabel: 'コピーに失敗しました',
+  },
+  watermark: {
+    imageErrorText: '透かし画像を読み込めませんでした'
+  },
+  segmented: {
+    ariaLabel: 'オプション'
   },
   descriptions: {
     colon: '：'
@@ -67,6 +86,9 @@ export const jaJP: TigerLocale = {
     avatarAlt: 'アバター',
     dragHandleAriaLabel: '並べ替え'
   },
+  masonry: {
+    visualOrderText: '表示順は元の順序と異なります'
+  },
   scrollArea: {
     ariaLabel: 'スクロール領域'
   },
@@ -74,7 +96,8 @@ export const jaJP: TigerLocale = {
     pageBreak: '改ページ'
   },
   timeline: {
-    pendingText: '読み込み中...'
+    pendingText: '読み込み中...',
+    pendingReplacedText: '更新が完了しました'
   },
   workflowTimeline: {
     pending: '保留中',
@@ -216,7 +239,11 @@ export const jaJP: TigerLocale = {
     branchExpression: '式',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: 'このノード種別では使いません',
+    publishText: '公開',
     publishBlocked: '未解決の項目があり公開できません'
+  },
+  workflowDetailShell: {
+    ariaLabel: 'ワークフロー詳細'
   },
   progress: {
     ariaLabel: '進捗'
@@ -259,7 +286,9 @@ export const jaJP: TigerLocale = {
     loadingText: '読み込み中',
     expandText: '展開',
     collapseText: '折りたたむ',
-    selectAllText: 'すべて選択',
+    selectAllText: 'このページをすべて選択',
+    selectLoadedText: '読み込まれた行をすべて選択',
+    tableAriaLabel: 'データテーブル',
     selectRowAriaLabel: '{row} 行目を選択',
     sortByText: '{column} で並べ替え',
     clearSortText: '並べ替えを解除',
@@ -275,9 +304,13 @@ export const jaJP: TigerLocale = {
     allText: 'すべて',
     filterPlaceholder: '絞り込み...',
     exportCsvText: 'CSV を書き出す',
-    exportExcelText: 'Excel を書き出す',
     exportCsvAriaLabel: 'CSV に書き出す',
-    exportExcelAriaLabel: 'Excel に書き出す',
+    selectionCountText: '{count} 件を選択',
+    sortAnnouncementText: '{column} を{direction}で並べ替えました',
+    sortAscendingText: '昇順',
+    sortDescendingText: '降順',
+    sortNoneText: '未ソート',
+    dragRowAriaLabel: '{row} 行目をドラッグ',
     expandRowAriaLabel: '行を展開',
     collapseRowAriaLabel: '行を折りたたむ',
     sortMenuAriaLabel: '並べ替え',
@@ -325,14 +358,17 @@ export const jaJP: TigerLocale = {
     nextText: '次へ',
     finishText: '完了',
     closeAriaLabel: 'ツアーを閉じる',
-    dialogAriaLabel: 'ツアー'
+    dialogAriaLabel: 'ツアー',
+    loadErrorText: 'このツアーを読み込めませんでした。',
   },
   calendar: {
     previousMonth: '前月',
     nextMonth: '翌月',
     previousYear: '前年',
     nextYear: '翌年',
-    eventCountText: '{n} 件の予定'
+    eventCountText: '{n} 件の予定',
+    switchToYear: '年表示に切り替え',
+    switchToMonth: '月表示に切り替え'
   },
   fullscreen: {
     enterAriaLabel: '全画面表示',
@@ -343,7 +379,8 @@ export const jaJP: TigerLocale = {
     pathAriaLabel: 'ファイルパス',
     listboxAriaLabel: 'ファイル',
     searchAriaLabel: 'ファイルを検索',
-    emptyText: '空のフォルダ'
+    emptyText: '空のフォルダ',
+    resultCountText: '{count} 件'
   },
   imageViewer: {
     dialogAriaLabel: '画像ビューア',
@@ -377,6 +414,7 @@ export const jaJP: TigerLocale = {
     resizeHandleS: '下',
     resizeHandleSw: '左下',
     resizeHandleW: '左',
+    cropSizeText: '幅 {width}、高さ {height}',
     loadingCropImageAriaLabel: '切り抜き用の画像を読み込み中',
     loadErrorAriaLabel: '切り抜き用の画像を読み込めませんでした',
     fileTooLargeText: 'ファイルサイズが {maxSize} を超えています',
@@ -394,10 +432,14 @@ export const jaJP: TigerLocale = {
     ellipseToolText: '楕円',
     polygonToolText: '多角形',
     freehandToolText: 'フリーハンド',
-    deleteText: '削除'
+    deleteText: '削除',
+    annotationLoadFailedText: '画像を読み込めませんでした。',
+    annotationRetryText: '再試行',
+    annotationTooSmallText: '注釈が小さすぎます。',
+    annotationPolygonIncompleteText: '多角形には少なくとも 3 点が必要です。'
   },
   status: {
-    tagCloseAriaLabel: 'タグを閉じる',
+    tagCloseAriaLabel: '{label}を閉じる',
     badgeLabel: '通知',
     badgeCountLabel: '{count} 件の通知'
   },
@@ -410,6 +452,7 @@ export const jaJP: TigerLocale = {
     unassignedSwimlaneText: '未割り当て',
     wipLimitText: 'WIP制限: {limit}',
     dragHintText: 'ドラッグして移動',
+    grabAnnouncementText: '{card}。{from} から {to}。{count} 件中 {position} 番目。',
     boardAriaLabel: 'タスクボード'
   },
   chatWindow: {
@@ -424,7 +467,8 @@ export const jaJP: TigerLocale = {
   code: {
     copyLabel: 'コピー',
     copiedLabel: 'コピーしました',
-    copyFailedLabel: 'コピーに失敗しました'
+    copyFailedLabel: 'コピーに失敗しました',
+    scrollLabel: 'コード'
   },
   commentThread: {
     emptyText: 'コメントはありません',
@@ -441,12 +485,15 @@ export const jaJP: TigerLocale = {
     listAriaLabel: 'コメント一覧',
     replySubmitText: '返信を送信',
     remainingRepliesText: '残り {count} 件を表示',
+    duplicateIdText: 'コメント id {id} が重複しています',
+    cycleText: 'コメントが {id} で循環しています',
     maxDepthReachedText: '返信の最大階層です'
   },
   activityFeed: {
     emptyText: 'アクティビティはありません',
     loadingText: '読み込み中...',
     listAriaLabel: 'アクティビティ',
+    newItemText: '新しいアクティビティ: {title}',
     otherGroupTitle: 'その他'
   },
   notificationCenter: {
@@ -460,6 +507,9 @@ export const jaJP: TigerLocale = {
     markReadText: '既読にする',
     markUnreadText: '未読にする',
     defaultGroupTitle: 'デフォルト',
+    filterAriaLabel: '既読状態',
+    markedReadText: '{count} 件を既読にしました',
+    newItemText: '新しい通知: {title}',
     unreadCountText: '未読 {count} 件'
   },
   select: {
@@ -470,7 +520,15 @@ export const jaJP: TigerLocale = {
     clearAriaLabel: '選択をクリア',
     createOptionLabel: '「{label}」を作成',
     moreCountText: 'ほか{count}件',
-    loadingText: '読み込み中...',
+    loadingText: '読み込み中...'
+  },
+  cascader: {
+    levelLabel: 'レベル {level}',
+    backText: '戻る',
+    expandAriaLabel: '展開',
+    collapseAriaLabel: '折りたたむ'
+  },
+  treeSelect: {
     levelLabel: 'レベル {level}',
     backText: '戻る',
     expandAriaLabel: '展開',
@@ -541,7 +599,22 @@ export const jaJP: TigerLocale = {
     sunburstTooltip: '{label}：{value}（{percent}%）',
     orgChartAriaLabel: '組織図',
     ganttAriaLabel: 'ガントチャート',
-    ganttTaskAriaLabel: '{label}、{start} から {end}{progress}'
+    ganttTaskAriaLabel: '{label}、{start} から {end}{progress}',
+    ganttTodayAriaLabel: '今日',
+    ganttUnknownDate: '不明な日付',
+    chartAriaLabel: 'チャート',
+    lineChartAriaLabel: '折れ線グラフ',
+    areaChartAriaLabel: '面グラフ',
+    barChartAriaLabel: '棒グラフ',
+    scatterChartAriaLabel: '散布図',
+    pieChartAriaLabel: '円グラフ',
+    radarChartAriaLabel: 'レーダーチャート',
+    heatmapChartAriaLabel: 'ヒートマップ',
+    heatmapSummary: '{rows} 行 {columns} 列',
+    funnelChartAriaLabel: 'ファネルチャート',
+    sunburstChartAriaLabel: 'サンバースト',
+    treemapChartAriaLabel: 'ツリーマップ',
+    gaugeChartAriaLabel: 'ゲージ'
   },
   codeEditor: {
     editorAriaLabel: 'コードエディタ'
@@ -555,6 +628,8 @@ export const jaJP: TigerLocale = {
     editModeLabel: '編集',
     splitModeLabel: '分割',
     previewModeLabel: 'プレビュー',
+    showEditorText: '編集',
+    showPreviewText: 'プレビュー',
     bold: '太字',
     italic: '斜体',
     strikethrough: '取り消し線',
@@ -664,7 +739,9 @@ export const jaJP: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: '{tag} を削除',
-    clearAllLabel: 'すべてのタグをクリア'
+    clearAllLabel: 'すべてのタグをクリア',
+    duplicateText: 'すでに追加されています',
+    limitText: 'タグの上限に達しました'
   },
   input: {
     clearAriaLabel: '入力をクリア',
@@ -680,12 +757,6 @@ export const jaJP: TigerLocale = {
     ariaLabel: 'スライダー',
     minAriaLabel: '最小値',
     maxAriaLabel: '最大値'
-  },
-  stepper: {
-    ariaLabel: 'ステッパー',
-    valueAriaLabel: '値',
-    incrementAriaLabel: '増やす',
-    decrementAriaLabel: '減らす'
   },
   signature: {
     ariaLabel: '署名パッド',

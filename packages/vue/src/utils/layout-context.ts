@@ -1,12 +1,10 @@
-import type { ComputedRef, InjectionKey, Ref } from 'vue'
+import type { ComputedRef, InjectionKey } from 'vue'
 
 export interface LayoutContextValue {
   nested: ComputedRef<boolean>
   hasSider: ComputedRef<boolean>
-  siderCollapsed: Ref<boolean>
-  setSiderCollapsed: (collapsed: boolean) => void
-  contentEl: Ref<HTMLElement | null>
-  setContentEl: (el: HTMLElement | null) => void
+  fullHeight: ComputedRef<boolean>
+  namedSidebarClaimed: ComputedRef<boolean>
 }
 
 export const LayoutContextKey: InjectionKey<LayoutContextValue> = Symbol('TigerLayout')

@@ -57,30 +57,32 @@ describe('NotificationCenter ARIA roles', () => {
 // ── ActivityFeed ─────────────────────────────────────────────────
 
 describe('ActivityFeed ARIA roles', () => {
-  it('React: has role=feed and default aria-label', () => {
+  it('React: has role=region and default aria-label', () => {
     renderReact(<ReactActivityFeed items={[{ id: 1, title: 'Activity', type: '更新' }]} />)
-    const feed = reactScreen.getByRole('feed')
-    expect(feed).toHaveAttribute('aria-label', 'Activity')
+    const region = reactScreen.getByRole('region')
+    expect(region).toHaveAttribute('aria-label', 'Activity')
+    expect(region).not.toHaveAttribute('role', 'feed')
   })
 
   it('React: loading state has aria-busy', () => {
     renderReact(<ReactActivityFeed loading />)
-    const feed = reactScreen.getByRole('feed')
-    expect(feed).toHaveAttribute('aria-busy', 'true')
+    const region = reactScreen.getByRole('region')
+    expect(region).toHaveAttribute('aria-busy', 'true')
   })
 
-  it('Vue: has role=feed and default aria-label', () => {
+  it('Vue: has role=region and default aria-label', () => {
     renderVue(VueActivityFeed, {
       props: { items: [{ id: 1, title: 'Activity', type: '更新' }] }
     })
-    const feed = vueScreen.getByRole('feed')
-    expect(feed).toHaveAttribute('aria-label', 'Activity')
+    const region = vueScreen.getByRole('region')
+    expect(region).toHaveAttribute('aria-label', 'Activity')
+    expect(region).not.toHaveAttribute('role', 'feed')
   })
 
   it('Vue: loading state has aria-busy', () => {
     renderVue(VueActivityFeed, { props: { loading: true } })
-    const feed = vueScreen.getByRole('feed')
-    expect(feed).toHaveAttribute('aria-busy', 'true')
+    const region = vueScreen.getByRole('region')
+    expect(region).toHaveAttribute('aria-busy', 'true')
   })
 })
 

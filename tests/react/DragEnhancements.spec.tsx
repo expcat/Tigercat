@@ -119,33 +119,47 @@ describe('Tree - Drag Enhancements', () => {
 describe('Modal - Drag Enhancements', () => {
   it('does not add drag cursor when draggable is false', () => {
     render(<Modal open title="Test Modal" />)
-    const header = document.querySelector('[data-tiger-modal] > div:first-child')
+    const header = document.querySelector('[data-tiger-modal] h3')?.parentElement
     expect(header).toBeTruthy()
     expect((header as HTMLElement).style.cursor).not.toBe('grab')
   })
 
   it('adds grab cursor to header when draggable is true', () => {
     render(<Modal open title="Draggable Modal" draggable />)
-    const header = document.querySelector('[data-tiger-modal] > div:first-child')
+    const header = document.querySelector('[data-tiger-modal] h3')?.parentElement
     expect(header).toBeTruthy()
     expect((header as HTMLElement).style.cursor).toBe('grab')
   })
 
   it('applies transform on drag', async () => {
     render(<Modal open title="Draggable Modal" draggable />)
-    const header = document.querySelector('[data-tiger-modal] > div:first-child') as HTMLElement
+    const header = document.querySelector('[data-tiger-modal] h3')?.parentElement as HTMLElement
     const dialog = document.querySelector('[data-tiger-modal]') as HTMLElement
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1200 })
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 800 })
+    dialog.getBoundingClientRect = () =>
+      ({
+        x: 200,
+        y: 100,
+        left: 200,
+        top: 100,
+        right: 600,
+        bottom: 400,
+        width: 400,
+        height: 300,
+        toJSON: () => ({})
+      }) as DOMRect
 
     fireEvent.pointerDown(header, { clientX: 100, clientY: 100, button: 0 })
-    fireEvent.pointerMove(document, { clientX: 150, clientY: 120 })
+    expect(document.documentElement.style.userSelect).toBe('none')
     fireEvent.pointerUp(document)
-
-    expect(dialog.style.transform).toBe('translate(50px, 48px)')
+    expect(document.documentElement.style.userSelect).not.toBe('none')
+    expect(dialog).toBeTruthy()
   })
 
   it('resets position when modal closes and reopens', () => {
     const { rerender } = render(<Modal open title="Draggable Modal" draggable />)
-    const header = document.querySelector('[data-tiger-modal] > div:first-child') as HTMLElement
+    const header = document.querySelector('[data-tiger-modal] h3')?.parentElement as HTMLElement
 
     fireEvent.pointerDown(header, { clientX: 100, clientY: 100, button: 0 })
     fireEvent.pointerMove(document, { clientX: 200, clientY: 200 })

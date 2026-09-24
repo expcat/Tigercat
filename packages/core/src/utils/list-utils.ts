@@ -14,7 +14,7 @@ import {
 export const listBaseClasses = 'w-full'
 
 export const listBorderedClasses =
-  'bg-[var(--tiger-surface,#ffffff)] rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] overflow-hidden'
+  'bg-[var(--tiger-surface)] rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] overflow-hidden'
 
 export const listWrapperClasses = 'w-full'
 
@@ -30,19 +30,19 @@ export const listItemSizeClasses: Record<ComponentSize, string> = {
   lg: 'px-6 py-4'
 } as const
 
-/** Default virtual row height: padding + one line. */
+/** Default virtual estimate: padding plus a title line and a description line. */
 export const listVirtualItemHeight: Record<ComponentSize, number> = {
-  sm: 40,
-  md: 52,
-  lg: 64
+  sm: 56,
+  md: 72,
+  lg: 88
 }
 
 export const listItemBaseClasses = 'flex w-full tiger-motion-aware transition-colors duration-200'
 
-export const listItemHoverClasses = 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+export const listItemHoverClasses = 'hover:bg-[var(--tiger-surface-muted)]'
 
 export const listItemDividedClasses =
-  'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0'
+  'border-b border-[var(--tiger-border)] last:border-b-0'
 
 export const listItemLayoutClasses: Record<ListItemLayout, string> = {
   horizontal: 'flex-row items-center',
@@ -50,14 +50,17 @@ export const listItemLayoutClasses: Record<ListItemLayout, string> = {
 } as const
 
 export const listHeaderFooterBaseClasses =
-  'border-b border-[var(--tiger-border,#e5e7eb)] font-medium text-[var(--tiger-text,#111827)]'
+  'border-b border-[var(--tiger-border)] font-medium text-[var(--tiger-text)]'
 
 export const listFooterClasses = 'border-t border-b-0'
 
 export const listEmptyStateClasses = 'py-8'
 
 export const listLoadingOverlayClasses =
-  'absolute inset-0 bg-[var(--tiger-surface,#ffffff)]/75 flex items-center justify-center z-10 pointer-events-none'
+  'absolute inset-0 bg-[var(--tiger-surface)]/75 flex items-center justify-center z-10'
+
+export const listItemActivateClasses =
+  'flex min-w-0 flex-1 items-center border-0 bg-transparent p-0 text-start text-inherit cursor-pointer'
 
 export const listItemMetaClasses = 'flex items-center gap-3 flex-1 min-w-0'
 
@@ -65,9 +68,9 @@ export const listItemAvatarClasses = 'flex-shrink-0'
 
 export const listItemContentClasses = 'flex-1 min-w-0'
 
-export const listItemTitleClasses = 'font-medium text-[var(--tiger-text,#111827)] truncate'
+export const listItemTitleClasses = 'font-medium text-[var(--tiger-text)] truncate'
 
-export const listItemDescriptionClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)] mt-1'
+export const listItemDescriptionClasses = 'text-sm text-[var(--tiger-text-secondary)] mt-1'
 
 export const listItemExtraHorizontalClasses = 'flex-shrink-0 ms-4'
 
@@ -76,7 +79,7 @@ export const listItemExtraVerticalClasses = 'flex-shrink-0 mt-2'
 export const listGridContainerClasses = 'grid'
 
 export const listDragHandleClasses =
-  'inline-flex shrink-0 items-center justify-center rounded-sm p-1 text-[var(--tiger-text-muted,#6b7280)] cursor-grab touch-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'inline-flex shrink-0 items-center justify-center rounded-sm p-1 text-[var(--tiger-text-secondary)] cursor-grab touch-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--tiger-focus-ring)]'
 
 const GRID_COLUMNS: Record<number, string> = {
   1: 'grid-cols-1',
@@ -100,12 +103,10 @@ function clampGridColumns(value: number | undefined): number | undefined {
   return n
 }
 
-export function resolveListGridColumnCount(
-  grid: ListGrid | undefined,
-  width: number,
-  minWidths: Record<ResponsiveBreakpoint, number> = RESPONSIVE_BREAKPOINT_FALLBACK_PX
-): number {
-  if (!grid) return 1
+export function listGridResponsiveMap(
+  grid: ListGrid | undefined
+): number | Partial<Record<ResponsiveBreakpoint, number>> | undefined {
+  if (!grid) return undefined
   const map: Partial<Record<ResponsiveBreakpoint, number>> = {}
   if (grid.xs !== undefined) map.xs = grid.xs
   if (grid.sm !== undefined) map.sm = grid.sm
@@ -113,11 +114,30 @@ export function resolveListGridColumnCount(
   if (grid.lg !== undefined) map.lg = grid.lg
   if (grid.xl !== undefined) map.xl = grid.xl
   if (grid['2xl'] !== undefined) map['2xl'] = grid['2xl']
-  const hasMap = Object.keys(map).length > 0
-  const resolved = hasMap
-    ? resolveResponsiveValue(map, width, grid.column ?? 1, minWidths)
-    : (grid.column ?? 1)
+  if (Object.keys(map).length === 0) return grid.column
+  if (grid.column !== undefined && map.xs === undefined) map.xs = grid.column
+  return map
+}
+
+export function resolveListGridColumnCount(
+  grid: ListGrid | undefined,
+  width: number,
+  minWidths: Record<ResponsiveBreakpoint, number> = RESPONSIVE_BREAKPOINT_FALLBACK_PX
+): number {
+  const value = listGridResponsiveMap(grid)
+  if (value == null) return 1
+  if (typeof value === 'number') return clampGridColumns(value) ?? 1
+  const resolved = resolveResponsiveValue(value, width, value.xs ?? value.sm ?? value.md ?? value.lg ?? value.xl ?? value['2xl'] ?? 1, minWidths)
   return clampGridColumns(resolved) ?? 1
+}
+
+export function resolveListRowKey(
+  item: Record<string, unknown>,
+  rowKey: string | ((item: Record<string, unknown>, index: number) => string | number),
+  index: number
+): string | number {
+  const raw = typeof rowKey === 'function' ? rowKey(item, index) : item[rowKey]
+  return (raw ?? index) as string | number
 }
 
 export function getListGridColumnClass(columnCount: number): string {

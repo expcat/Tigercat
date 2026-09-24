@@ -14,13 +14,13 @@ const columns: TableColumn<Row>[] = [
     key: 'name',
     title: '姓名',
     width: 160,
-    fixed: 'left',
+    fixed: 'start',
     fixedHeaderClassName: 'shadow-[inset_-1px_0_0_var(--tiger-border)]',
     fixedClassName: 'shadow-[inset_-1px_0_0_var(--tiger-border)]'
   },
   { key: 'email', title: '邮箱', width: 240 },
   { key: 'city', title: '城市', width: 180 },
-  { key: 'status', title: '状态', width: 140, fixed: 'right' }
+  { key: 'status', title: '状态', width: 140, fixed: 'end' }
 ]
 
 const rows: Row[] = [

@@ -1,41 +1,32 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   createChartResizeObserverController,
-  resolveResponsiveChartSize,
-  type ChartResizeFrameCallback,
-  type ChartResizeObserverLike
+  resolveResponsiveChartSize
 } from '@expcat/tigercat-core'
 import { createFrameScheduler } from '../utils/frame-scheduler'
 
-function createResizeObserverFactory() {
-  let callback: ResizeObserverCallback | undefined
-  let observedTarget: Element | undefined
-  const observer: ChartResizeObserverLike = {
-    observe: vi.fn((target: Element) => {
-      observedTarget = target
-    }),
-    disconnect: vi.fn()
+class MockResizeObserver {
+  static latest: MockResizeObserver | undefined
+  target?: Element
+  disconnect = vi.fn()
+  constructor(private readonly callback: ResizeObserverCallback) {
+    MockResizeObserver.latest = this
   }
-
-  return {
-    factory: vi.fn((nextCallback: ResizeObserverCallback) => {
-      callback = nextCallback
-      return observer
-    }),
-    observer,
-    emit(width: number, height: number) {
-      if (!callback || !observedTarget) return
-
-      callback(
-        [
-          {
-            target: observedTarget,
-            contentRect: new DOMRect(0, 0, width, height)
-          } as ResizeObserverEntry
-        ],
-        observer as ResizeObserver
-      )
-    }
+  observe(target: Element) {
+    this.target = target
+  }
+  emit(width: number, height: number) {
+    if (!this.target) return
+    this.callback(
+      [
+        {
+          target: this.target,
+          contentRect: new DOMRect(0, 0, width, height),
+          contentBoxSize: [{ inlineSize: width, blockSize: height } as ResizeObserverSize]
+        } as ResizeObserverEntry
+      ],
+      this as unknown as ResizeObserver
+    )
   }
 }
 
@@ -63,20 +54,19 @@ describe('chart-resize-utils', () => {
   })
 
   it('batches ResizeObserver updates to one animation frame', () => {
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
     const frames = createFrameScheduler()
-    const resize = createResizeObserverFactory()
     const onSizeChange = vi.fn()
     const target = document.createElement('div')
     const controller = createChartResizeObserverController({
       onSizeChange,
       requestFrame: frames.requestFrame,
-      cancelFrame: frames.cancelFrame,
-      createResizeObserver: resize.factory
+      cancelFrame: frames.cancelFrame
     })
 
     controller.observe(target)
-    resize.emit(320, 180)
-    resize.emit(480, 260)
+    MockResizeObserver.latest?.emit(320, 180)
+    MockResizeObserver.latest?.emit(480, 260)
 
     expect(frames.pendingCount()).toBe(1)
     expect(onSizeChange).not.toHaveBeenCalled()
@@ -85,26 +75,28 @@ describe('chart-resize-utils', () => {
 
     expect(onSizeChange).toHaveBeenCalledTimes(1)
     expect(onSizeChange).toHaveBeenCalledWith({ width: 480, height: 260 })
+    vi.unstubAllGlobals()
   })
 
   it('disconnects observer and cancels pending frame', () => {
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
     const frames = createFrameScheduler()
-    const resize = createResizeObserverFactory()
     const onSizeChange = vi.fn()
     const target = document.createElement('div')
     const controller = createChartResizeObserverController({
       onSizeChange,
       requestFrame: frames.requestFrame,
-      cancelFrame: frames.cancelFrame,
-      createResizeObserver: resize.factory
+      cancelFrame: frames.cancelFrame
     })
 
     controller.observe(target)
-    resize.emit(320, 180)
+    const observer = MockResizeObserver.latest
+    observer?.emit(320, 180)
     controller.disconnect()
     frames.flush()
 
-    expect(resize.observer.disconnect).toHaveBeenCalledTimes(1)
+    expect(observer?.disconnect).toHaveBeenCalledTimes(1)
     expect(onSizeChange).not.toHaveBeenCalled()
+    vi.unstubAllGlobals()
   })
 })

@@ -1,153 +1,66 @@
 import { describe, it, expect } from 'vitest'
+import { modernTheme, defaultTheme, themeTransitionValue } from '@expcat/tigercat-core'
 import {
-  modernTheme,
-  MODERN_BASE_TOKENS_LIGHT,
-  MODERN_BASE_TOKENS_DARK,
-  MODERN_OVERRIDE_TOKENS_LIGHT,
-  MODERN_OVERRIDE_TOKENS_DARK,
-  MODERN_REDUCED_MOTION_TOKENS,
   createTigercatPlugin,
   tigercatPlugin,
   tigercatTheme,
-  tigercatDarkTheme,
-  defaultTheme
-} from '@expcat/tigercat-core'
+  tigercatDarkTheme
+} from '../../packages/core/src/tailwind-plugin'
 
-describe('Modern theme tokens', () => {
-  it('exposes all required radius / shadow / motion / blur / gradient tokens in base layer', () => {
-    const requiredKeys = [
-      '--tiger-radius-sm',
-      '--tiger-radius-md',
-      '--tiger-radius-lg',
-      '--tiger-radius-xl',
-      '--tiger-radius-pill',
-      '--tiger-shadow-sm',
-      '--tiger-shadow-md',
-      '--tiger-shadow-lg',
-      '--tiger-shadow-xl',
-      '--tiger-shadow-glass',
-      '--tiger-shadow-glass-strong',
-      '--tiger-blur-glass',
-      '--tiger-blur-glass-strong',
-      '--tiger-gradient-primary',
-      '--tiger-gradient-surface',
-      '--tiger-gradient-danger',
-      '--tiger-motion-duration-instant',
-      '--tiger-motion-duration-quick',
-      '--tiger-motion-duration-base',
-      '--tiger-motion-duration-relaxed',
-      '--tiger-motion-duration-slow',
-      '--tiger-motion-ease-standard',
-      '--tiger-motion-ease-decelerate',
-      '--tiger-motion-ease-accelerate',
-      '--tiger-motion-ease-emphasized',
-      '--tiger-motion-ease-spring',
-      '--tiger-transition-base',
-      '--tiger-transition-quick',
-      '--tiger-transition-emphasized'
-    ]
-
-    for (const key of requiredKeys) {
-      expect(MODERN_BASE_TOKENS_LIGHT[key]).toBeDefined()
-    }
-  })
-
-  it('base layer keeps base radius 0.5rem and enables glass blur out of the box', () => {
-    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-radius-md']).toBe('0.5rem')
-    // Glass blur defaults are non-zero so opt-in surfaces (Header
-    // translucent/blur variants) render without consumer-set tokens.
-    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass']).toBe('16px')
-    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass-strong']).toBe('24px')
-    // Header border is scoped to its own token (falling back to the global
-    // border) so the glass header border can be tuned without `!important`.
-    expect(MODERN_BASE_TOKENS_LIGHT['--tiger-header-border']).toContain('--tiger-border')
-  })
-
-  it('override layer applies modern values (rounder corners, real glass blur)', () => {
-    expect(MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-radius-md']).toBe('12px')
-    expect(MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-radius-lg']).toBe('16px')
-    expect(MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-blur-glass']).toBe('16px')
-    expect(MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-shadow-glass']).toContain('inset 0 1px 0')
-  })
-
-  it('dark base/override only redefines shadows (colors stay opt-in)', () => {
-    expect(MODERN_BASE_TOKENS_DARK['--tiger-shadow-sm']).toContain('rgb(0 0 0 / 0.2)')
-    expect(MODERN_OVERRIDE_TOKENS_DARK['--tiger-shadow-glass']).toContain('rgb(0 0 0 / 0.4)')
-  })
-
-  it('reduced-motion overrides collapse all durations to 0ms', () => {
-    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-motion-duration-base']).toBe('0ms')
-    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-motion-duration-slow']).toBe('0ms')
-    expect(MODERN_REDUCED_MOTION_TOKENS['--tiger-transition-base']).toBe('all 0ms linear')
-  })
-
-  it('modernTheme preset exposes name + label + radius + shadows + motion', () => {
+describe('Modern theme preset', () => {
+  it('is one preset on the shared token shape', () => {
     expect(modernTheme.name).toBe('modern')
     expect(modernTheme.label).toBe('Modern')
     expect(modernTheme.light.radius?.md).toBe('12px')
+    expect(modernTheme.light.radius?.lg).toBe('16px')
     expect(modernTheme.light.shadows?.lg).toContain('rgb(0 0 0 / 0.08)')
     expect(modernTheme.light.motion?.easing).toBe('cubic-bezier(0.2, 0, 0, 1)')
+    expect(modernTheme.light.motion?.durationSlow).toBe('300ms')
     expect(modernTheme.dark.colors?.surface).toBe('#0f172a')
   })
 
-  it('keeps Tailwind plugin defaults derived from the default preset colors', () => {
+  it('keeps Tailwind plugin defaults derived from the default preset', () => {
     expect(tigercatTheme['--tiger-primary']).toBe(defaultTheme.light.colors?.primary)
     expect(tigercatTheme['--tiger-surface']).toBe(defaultTheme.light.colors?.surface)
-    expect(tigercatTheme['--tiger-chart-6']).toBe(defaultTheme.light.colors?.chart6)
+    expect(tigercatTheme['--tiger-radius-md']).toBe(defaultTheme.light.radius?.md)
     expect(tigercatDarkTheme['--tiger-primary']).toBe(defaultTheme.dark.colors?.primary)
     expect(tigercatDarkTheme['--tiger-surface']).toBe(defaultTheme.dark.colors?.surface)
-    expect(tigercatDarkTheme['--tiger-chart-6']).toBe(defaultTheme.dark.colors?.chart6)
+    expect(tigercatDarkTheme['--tiger-radius-md']).toBe(defaultTheme.dark.radius?.md)
   })
 })
 
-describe('createTigercatPlugin modern option', () => {
+describe('createTigercatPlugin presets', () => {
   type AddBaseFn = (rules: Record<string, Record<string, string>>) => void
   type PluginCallback = (api: { addBase: AddBaseFn }) => void
   type PluginInstance = { handler: PluginCallback }
 
-  function captureRules(p: { handler?: PluginCallback } | PluginInstance) {
+  function captureRules(p: PluginInstance) {
     const rules: Record<string, Record<string, string>> = {}
-    const addBase: AddBaseFn = (rule) => Object.assign(rules, rule)
-    const handler = (p as PluginInstance).handler ?? (p as { handler?: PluginCallback }).handler
-    if (typeof handler === 'function') {
-      handler({ addBase })
-    }
+    p.handler({
+      addBase: (rule) => Object.assign(rules, rule)
+    })
     return rules
   }
 
-  it('default tigercatPlugin writes the default preset including non-color tokens', () => {
+  it('default plugin writes the default preset and no second style layer', () => {
     const rules = captureRules(tigercatPlugin as PluginInstance)
     expect(rules[':root']?.['--tiger-radius-md']).toBe(defaultTheme.light.radius?.md)
     expect(rules[':root']?.['--tiger-primary']).toBe(defaultTheme.light.colors?.primary)
-    expect(rules[':root']?.['--tiger-shadow-glass']).toBeDefined()
-    expect(rules['.dark']?.['--tiger-shadow-md']).toBe(defaultTheme.dark.shadows?.md)
     expect(rules['.dark']?.['--tiger-radius-md']).toBe(defaultTheme.dark.radius?.md)
-  })
-
-  it('createTigercatPlugin without modern flag still emits the data-tiger-style layer', () => {
-    const rules = captureRules(createTigercatPlugin())
-    expect(rules['[data-tiger-style="modern"]']?.['--tiger-radius-md']).toBe('12px')
-    expect(rules[':root']?.['--tiger-radius-md']).toBe(defaultTheme.light.radius?.md)
+    expect(rules['[data-tiger-style="modern"]']).toBeUndefined()
     expect(rules['@media (prefers-reduced-motion: reduce)']).toBeDefined()
   })
 
-  it('createTigercatPlugin({ modern: true }) writes modern tokens at :root', () => {
-    const rules = captureRules(createTigercatPlugin({ modern: true }))
-    expect(rules[':root']?.['--tiger-radius-md']).toBe(modernTheme.light.radius?.md)
-    expect(rules['[data-tiger-style="modern"]']?.['--tiger-radius-md']).toBe('12px')
-    expect(
-      rules['.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark']?.[
-        '--tiger-shadow-glass'
-      ]
-    ).toContain('rgb(0 0 0 / 0.4)')
-    expect(rules['@media (prefers-reduced-motion: reduce)']).toBeDefined()
-  })
-
-  it('createTigercatPlugin({ preset: modernTheme }) maps full preset tokens into :root', () => {
-    const rules = captureRules(createTigercatPlugin({ preset: modernTheme }))
+  it('createTigercatPlugin({ preset: modernTheme }) writes that preset at :root and .dark', () => {
+    const rules = captureRules(createTigercatPlugin({ preset: modernTheme }) as PluginInstance)
     expect(rules[':root']?.['--tiger-primary']).toBe(modernTheme.light.colors?.primary)
     expect(rules[':root']?.['--tiger-radius-md']).toBe(modernTheme.light.radius?.md)
+    expect(rules[':root']?.['--tiger-transition-base']).toBe(
+      themeTransitionValue('200ms', 'cubic-bezier(0.2, 0, 0, 1)')
+    )
+    expect(rules[':root']?.['--tiger-transition-base']).not.toContain('all ')
     expect(rules['.dark']?.['--tiger-surface']).toBe(modernTheme.dark.colors?.surface)
     expect(rules['.dark']?.['--tiger-radius-md']).toBe(modernTheme.dark.radius?.md)
+    expect(rules['[data-tiger-style="modern"]']).toBeUndefined()
   })
 })

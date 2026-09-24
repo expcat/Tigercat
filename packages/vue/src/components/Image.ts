@@ -53,7 +53,7 @@ export interface VueImageProps {
   fit?: ImageFit
   fallbackSrc?: string
   preview?: boolean
-  previewTrigger?: ImagePreviewTrigger
+  zoomOnHover?: boolean
   lazy?: boolean
   srcSet?: string
   sizes?: string
@@ -137,11 +137,8 @@ export const Image = defineComponent({
     height: { type: [Number, String] as PropType<number | string>, default: undefined },
     fit: { type: String as PropType<ImageFit>, default: 'cover' as ImageFit },
     fallbackSrc: { type: String, default: undefined },
-    preview: { type: Boolean, default: true },
-    previewTrigger: {
-      type: String as PropType<ImagePreviewTrigger>,
-      default: 'click' as ImagePreviewTrigger
-    },
+    preview: { type: Boolean, default: false },
+    zoomOnHover: { type: Boolean, default: false },
     lazy: { type: Boolean, default: false },
     srcSet: { type: String, default: undefined },
     sizes: { type: String, default: undefined },
@@ -173,7 +170,7 @@ export const Image = defineComponent({
 
     const previewEnabled = computed(() => resolveImagePreviewEnabled(props.preview, group?.preview))
     const hoverPreviewEnabled = computed(() =>
-      isImageHoverPreviewEnabled(previewEnabled.value, props.previewTrigger, Boolean(group))
+      isImageHoverPreviewEnabled(props.zoomOnHover, Boolean(group))
     )
     const clickPreviewEnabled = computed(() => previewEnabled.value)
     const hoverPlacement = computed(() => resolveImageHoverPlacement(config.value.direction))
@@ -254,7 +251,11 @@ export const Image = defineComponent({
           group.unregister(instanceId)
           return
         }
-        group.register({ id: instanceId, src: props.src, alt: props.alt })
+        group.register({
+          id: instanceId,
+          src: loadState.value.actualSrc || props.src,
+          alt: props.alt
+        })
       },
       { immediate: true }
     )
@@ -370,7 +371,12 @@ export const Image = defineComponent({
           ]
       const errorPlaceholder = slots.error
         ? slots.error()
-        : [h('div', { class: imageErrorClasses }, [renderErrorIcon()])]
+        : [
+            h('div', { class: imageErrorClasses }, [
+              renderErrorIcon(),
+              h('span', null, labels.loadErrorText)
+            ])
+          ]
 
       let content
       if (loadState.value.error) {
@@ -383,6 +389,7 @@ export const Image = defineComponent({
             ref: imgRef,
             src: loadState.value.actualSrc,
             alt: previewEnabled.value ? '' : props.alt,
+            loading: props.lazy ? 'lazy' : undefined,
             class: imgClasses.value,
             srcset: props.srcSet,
             sizes: props.sizes,
@@ -422,7 +429,7 @@ export const Image = defineComponent({
                   'aria-hidden': true,
                   class: classNames(
                     hoverFloatingClasses.value,
-                    'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-1 shadow-lg'
+                    'rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] p-1 shadow-lg'
                   )
                 },
                 [
@@ -439,7 +446,7 @@ export const Image = defineComponent({
 
       const hostTag = previewEnabled.value ? 'button' : 'div'
       const inner = previewEnabled.value
-        ? h('span', { class: imageFrameClasses }, content)
+        ? h('span', { class: imageFrameClasses }, [content])
         : content
 
       return h(

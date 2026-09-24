@@ -10,12 +10,13 @@ import React, {
 } from 'react'
 import {
   classNames,
+  getSecureRel,
+  resolveLinkHref,
   createFloatingHoverDelayController,
   DEFAULT_DROPDOWN_TRIGGER,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
   devWarn,
-  focusFirstMenuItem,
   getDropdownChevronClasses,
   getDropdownContainerClasses,
   getDropdownItemClasses,
@@ -24,7 +25,8 @@ import {
   getOverlayTriggerAria,
   getOverlayTriggerKeyboardAction,
   handleMenuNavigation,
-  injectDropdownStyles,
+  focusMenuItem,
+  isTextEditingTarget,
   restoreFocus,
   type DropdownItemProps as CoreDropdownItemProps,
   type DropdownMenuProps as CoreDropdownMenuProps,
@@ -33,6 +35,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
+import { OverlayPortal } from '../utils/overlay-outlet'
 import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 
 export interface DropdownContextValue {
@@ -113,12 +116,16 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   }
 
   const itemClasses = classNames(getDropdownItemClasses(disabled, divided), className)
-  const Comp = href && !disabled ? 'a' : 'button'
+  const safeHref = resolveLinkHref(href, { disabled })
+  const Comp = safeHref ? 'a' : 'button'
+  const { target, rel, ...itemRest } = rest as React.AnchorHTMLAttributes<HTMLAnchorElement>
 
   return (
     <Comp
-      {...(rest as React.HTMLAttributes<HTMLElement>)}
-      {...(Comp === 'a' ? { href } : { type: 'button' as const })}
+      {...(itemRest as React.HTMLAttributes<HTMLElement>)}
+      {...(Comp === 'a'
+        ? { href: safeHref, target, rel: getSecureRel(target, rel) }
+        : { type: 'button' as const })}
       className={itemClasses}
       role="menuitem"
       tabIndex={-1}
@@ -173,14 +180,11 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
   const floatingRef = useRef<HTMLDivElement>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const openIntentRef = useRef<'menu' | 'hover'>('menu')
+  const focusEdgeRef = useRef<'first' | 'last' | null>(null)
   const skipRestoreRef = useRef(false)
 
   const reactId = useId()
   const menuId = useMemo(() => `tiger-dropdown-menu-${reactId}`, [reactId])
-
-  useEffect(() => {
-    injectDropdownStyles()
-  }, [])
 
   const setVisibleRef = useRef<(next: boolean) => void>(() => undefined)
 
@@ -189,6 +193,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
   )
   if (hoverControllerRef.current === null) {
     hoverControllerRef.current = createFloatingHoverDelayController({
+      showDelay: 0,
       show: () => {
         openIntentRef.current = 'hover'
         setVisibleRef.current(true)
@@ -223,9 +228,11 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
 
   useEffect(() => {
     if (!visible) return
-    if (openIntentRef.current === 'hover') return
+    const edge = focusEdgeRef.current
+    if (!edge) return
+    focusEdgeRef.current = null
     const frame = requestAnimationFrame(() => {
-      if (floatingRef.current) focusFirstMenuItem(floatingRef.current)
+      if (floatingRef.current) focusMenuItem(floatingRef.current, edge)
     })
     return () => cancelAnimationFrame(frame)
   }, [visible])
@@ -257,6 +264,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
 
   const handleTriggerKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
+      if (isTextEditingTarget(event.target)) return
       const action = getOverlayTriggerKeyboardAction(event.nativeEvent, {
         kind: 'menu',
         open: visible,
@@ -269,8 +277,14 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
         setVisible(false)
         return
       }
+      const edge = action === 'open-last' ? 'last' : 'first'
+      focusEdgeRef.current = edge
       openIntentRef.current = 'menu'
-      if (!visible) setVisible(true)
+      if (!visible) {
+        setVisible(true)
+        return
+      }
+      if (floatingRef.current) focusMenuItem(floatingRef.current, edge)
     },
     [visible, disabled, hoverController, setVisible]
   )
@@ -282,6 +296,7 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
         setVisible(false)
         return
       }
+      if (isTextEditingTarget(event.target)) return
       if (floatingRef.current) {
         handleMenuNavigation(floatingRef.current, event.nativeEvent)
       }
@@ -299,9 +314,9 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
     containerRef,
     dismissOnOutside: true,
     dismissOnEscape: true,
-    onDismiss: (reason) => {
-      skipRestoreRef.current = reason !== 'escape'
-      if (reason === 'escape') openIntentRef.current = 'menu'
+    onDismiss: () => {
+      skipRestoreRef.current = false
+      openIntentRef.current = 'menu'
       setVisible(false)
     }
   })
@@ -379,13 +394,12 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
     }
   })
 
-  const menuWrapperNode = (
+  const menuWrapperNode = visible ? (
     <div
       ref={floatingRef}
       className={classNames(overlay.floatingClasses, DROPDOWN_ENTER_CLASS)}
       style={overlay.floatingStyles}
       data-positioned={overlay.positioned}
-      hidden={!visible}
       data-tiger-dropdown-menu=""
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -396,13 +410,17 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
           })
         : menuElement}
     </div>
-  )
+  ) : null
 
   return (
     <DropdownContext.Provider value={contextValue}>
       <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
         {triggerNode}
-        {renderOverlayPortal(menuWrapperNode, overlay.target, !portal)}
+        {menuWrapperNode
+          ? portal
+            ? <OverlayPortal target={overlay.target}>{menuWrapperNode}</OverlayPortal>
+            : renderOverlayPortal(menuWrapperNode, null, true)
+          : null}
       </div>
     </DropdownContext.Provider>
   )

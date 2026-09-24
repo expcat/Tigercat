@@ -59,7 +59,7 @@ const handleLangChange = (v: DemoLang) => {
         <router-link
           to="/"
           :aria-label="title"
-          class="text-base sm:text-lg font-semibold text-gray-900 truncate dark:text-gray-100 hover:text-[var(--tiger-primary,#2563eb)]">
+          class="text-base sm:text-lg font-semibold text-gray-900 truncate dark:text-gray-100 hover:text-[var(--tiger-primary)]">
           {{ title }}
         </router-link>
         <div
@@ -83,12 +83,12 @@ const handleLangChange = (v: DemoLang) => {
 
       <details v-else class="relative shrink-0 sm:hidden">
         <summary
-          class="flex size-8 cursor-pointer list-none select-none items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900 [&::-webkit-details-marker]:hidden">
+          class="flex size-8 cursor-pointer list-none select-none items-center justify-center rounded-[var(--tiger-radius-md)] border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900 [&::-webkit-details-marker]:hidden">
           <span aria-hidden="true" class="text-base leading-none">⚙</span>
           <span class="sr-only">{{ settingsLabel }}</span>
         </summary>
         <div
-          class="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-950">
+          class="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-[var(--tiger-radius-md)] border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-800 dark:bg-gray-950">
           <div class="flex flex-col gap-3">
             <LanguageSwitch :model-value="props.lang" @update:model-value="handleLangChange" />
             <ThemeSwitch

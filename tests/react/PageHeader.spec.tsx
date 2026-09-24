@@ -127,7 +127,7 @@ describe('PageHeader', () => {
           title={<span>自定义标题</span>}
           subTitle={<span>自定义副标题</span>}
           actions={
-            <Button size="sm" htmlType="button">
+            <Button size="sm" type="button">
               保存
             </Button>
           }
@@ -159,7 +159,7 @@ describe('PageHeader', () => {
           subTitle="可访问页头"
           showBack
           actions={
-            <Button size="sm" htmlType="button">
+            <Button size="sm" type="button">
               编辑
             </Button>
           }

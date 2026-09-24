@@ -1,14 +1,15 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import {
+  createChartInteractionHandlers,
   createChartPointerMoveScheduler,
   getChartElementOpacity,
   getChartLegendShellClasses,
   isChartActivationKey,
-  nextChartSelectedIndex,
   resolveChartActiveIndex,
   resolveChartIndex,
   shouldTrackChartPointer,
   tooltipPositionFromEvent,
+  type ChartInteractionState,
   type ChartLegendPosition,
   type ChartPointerMoveScheduler
 } from '@expcat/tigercat-core'
@@ -98,25 +99,55 @@ export function useChartInteraction<T = unknown>(
     [activeIndex, activeOpacity, inactiveOpacity]
   )
 
-  const applyHover = useCallback(
-    (index: number | null, position?: { x: number; y: number }) => {
-      if (!shouldTrackChartPointer(hoverable, showTooltip)) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      if (position) setTooltipPosition(position)
-      if (!hoverable) return
-      onHoveredIndexChange?.(index)
-      onHover?.(index, index !== null ? (getData?.(index) ?? null) : null)
+  const stateRef = useRef<ChartInteractionState>({ hoveredIndex: null, selectedIndex: null })
+  stateRef.current = {
+    get hoveredIndex() {
+      return localHoveredIndex
     },
-    [hoverable, showTooltip, hoveredIndexProp, onHoveredIndexChange, onHover, getData]
-  )
+    set hoveredIndex(value) {
+      setLocalHoveredIndex(value)
+    },
+    get selectedIndex() {
+      return localSelectedIndex
+    },
+    set selectedIndex(value) {
+      setLocalSelectedIndex(value)
+    }
+  }
+
+  const handlersFor = useCallback(() => {
+    return createChartInteractionHandlers([], stateRef.current, {
+      hoverable,
+      showTooltip,
+      selectable,
+      hoveredIndex: hoveredIndexProp,
+      selectedIndex: selectedIndexProp,
+      onHoverChange: (index, datum) => {
+        onHoveredIndexChange?.(index)
+        onHover?.(index, datum)
+      },
+      onSelectChange: (index) => onSelectedIndexChange?.(index),
+      onItemClick: (index, datum) => onClick?.(index, datum)
+    })
+  }, [
+    hoverable,
+    showTooltip,
+    selectable,
+    hoveredIndexProp,
+    selectedIndexProp,
+    onHoveredIndexChange,
+    onHover,
+    onSelectedIndexChange,
+    onClick
+  ])
 
   const handleMouseEnter = useCallback(
     (index: number, event: React.MouseEvent | React.FocusEvent | React.KeyboardEvent) => {
-      applyHover(index, tooltipPositionFromEvent(event))
+      const position = tooltipPositionFromEvent(event)
+      if (shouldTrackChartPointer(hoverable, showTooltip)) setTooltipPosition(position)
+      handlersFor().onMouseEnter(index, getData?.(index), position)
     },
-    [applyHover]
+    [handlersFor, hoverable, showTooltip, getData]
   )
 
   const handleMouseMove = useCallback(
@@ -129,32 +160,24 @@ export function useChartInteraction<T = unknown>(
 
   const handleMouseLeave = useCallback(() => {
     tooltipScheduler.cancel()
-    applyHover(null)
-  }, [tooltipScheduler, applyHover])
+    handlersFor().onMouseLeave()
+  }, [tooltipScheduler, handlersFor])
 
   const handleClick = useCallback(
     (index: number) => {
-      onClick?.(index, getData?.(index))
-      if (!selectable) return
-      const nextIndex = nextChartSelectedIndex(resolvedSelectedIndex, index)
-      if (selectedIndexProp === undefined) {
-        setLocalSelectedIndex(nextIndex)
-      }
-      onSelectedIndexChange?.(nextIndex)
+      handlersFor().onClick(index, getData?.(index))
     },
-    [selectable, resolvedSelectedIndex, selectedIndexProp, onSelectedIndexChange, onClick, getData]
+    [handlersFor, getData]
   )
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, index: number) => {
       if (!isChartActivationKey(event.key)) return
-      event.preventDefault()
-      if (shouldTrackChartPointer(hoverable, showTooltip)) {
-        applyHover(index, tooltipPositionFromEvent(event))
-      }
-      handleClick(index)
+      const position = tooltipPositionFromEvent(event)
+      if (shouldTrackChartPointer(hoverable, showTooltip)) setTooltipPosition(position)
+      handlersFor().onKeyDown(event, index, getData?.(index), position)
     },
-    [hoverable, showTooltip, applyHover, handleClick]
+    [handlersFor, hoverable, showTooltip, getData]
   )
 
   const handleLegendClick = useCallback(
@@ -166,9 +189,11 @@ export function useChartInteraction<T = unknown>(
 
   const handleLegendHover = useCallback(
     (index: number, _item?: unknown, event?: React.SyntheticEvent) => {
-      applyHover(index, event ? tooltipPositionFromEvent(event) : undefined)
+      const position = event ? tooltipPositionFromEvent(event) : undefined
+      if (position && shouldTrackChartPointer(hoverable, showTooltip)) setTooltipPosition(position)
+      handlersFor().onMouseEnter(index, getData?.(index), position)
     },
-    [applyHover]
+    [handlersFor, hoverable, showTooltip, getData]
   )
 
   const handleLegendLeave = useCallback(() => {

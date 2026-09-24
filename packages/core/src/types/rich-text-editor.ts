@@ -7,15 +7,18 @@ import type { TigerLocale, TigerLocaleRichTextEditor } from './locale'
 /** Editing mode */
 export type RichTextEditorMode = 'html' | 'markdown' | 'plain'
 
+/** SVG path data drawn as a `<path>`. Never HTML. */
+export interface ToolbarIcon {
+  path: string
+  viewBox?: string
+}
+
 /** Toolbar button definition */
 export interface ToolbarButton {
   name: string
   label: string
-  /**
-   * Optional icon HTML. TRUSTED — injected with innerHTML; escape or
-   * sanitise untrusted strings before passing.
-   */
-  icon?: string
+  /** Optional icon path. Rendered as an SVG path, not HTML. */
+  icon?: ToolbarIcon
   tooltip?: string
   hotkey?: string
   /**
@@ -74,11 +77,8 @@ export interface RichTextEditorProps {
   disabled?: boolean
   /** Additional CSS class */
   className?: string
-  /**
-   * Pluggable editor engine. Default is builtin contenteditable.
-   * Custom engines are TRUSTED and must sanitise untrusted HTML.
-   */
-  engine?: unknown
+  /** Pluggable editor engine. Default is the built-in contenteditable engine. */
+  engine?: import('../utils/rich-text-engine').RichTextEngine
   /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>
   /** Text/aria label overrides */

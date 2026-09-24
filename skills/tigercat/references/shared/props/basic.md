@@ -50,7 +50,7 @@ Note: 无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶�
 
 ## Button
 
-`packages/core/src/types/button.ts` · `ButtonProps` · 4/13 props
+`packages/core/src/types/button.ts` · `ButtonProps` · 4/12 props
 
 Note: `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。
 
@@ -142,11 +142,11 @@ Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `
 
 `packages/core/src/types/highlight.ts` · `HighlightProps` · 4/9 props
 
-Note: 需要 `keywords`。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。
+Note: `keywords` 只收字符串，按字面量线性扫描，不执行正则。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。
 
 | Prop                  | Type                | Default | Notes                                                                                      |
 | --------------------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `keywords?`           | `HighlightKeywords` | `-`     | Keyword string(s) and/or regular expression(s) to highlight.                               |
+| `keywords?`           | `HighlightKeywords` | `-`     | Keyword string or strings to highlight. Matched literally.                                 |
 | `global?`             | `boolean`           | `true`  | Highlight every occurrence. When false, only the first match of each keyword.              |
 | `highlightClassName?` | `string`            | `-`     | Additional CSS classes on highlighted `mark` elements                                      |
 | `text?`               | `string`            | `-`     | Source text to search. When set, it wins over children/slot. When omitted, children/slo... |
@@ -171,12 +171,12 @@ Priority: SVG children > `icon` > `name`. Built-in `name` values live in `iconNa
 
 Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。
 
-| Prop              | Type                  | Default   | Notes                                                                                      |
-| ----------------- | --------------------- | --------- | ------------------------------------------------------------------------------------------ |
-| `src?`            | `string`              | `-`       | Image source URL                                                                           |
-| `alt?`            | `string`              | `-`       | Alternative text for image                                                                 |
-| `preview?`        | `boolean`             | `true`    | Whether the image triggers preview                                                         |
-| `previewTrigger?` | `ImagePreviewTrigger` | `'click'` | How the preview is triggered when `preview` is enabled. - `click`: full-screen viewer o... |
+| Prop       | Type      | Default | Notes                                                                                      |
+| ---------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
+| `src?`     | `string`  | `-`     | Image source URL                                                                           |
+| `alt?`     | `string`  | `-`     | Alternative text for image                                                                 |
+| `preview?` | `boolean` | `false` | Whether an explicit preview action opens the fullscreen viewer. The bitmap itself stays... |
+| `lazy?`    | `boolean` | `false` | Whether to lazy load the image using IntersectionObserver                                  |
 
 ## ImageCompare
 
@@ -247,7 +247,7 @@ Note: 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可�
 
 `packages/core/src/types/link.ts` · `LinkProps` · 4/8 props
 
-Note: `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。
+Note: 地址只接受 `link-utils` 的协议（`http:`、`https:`、`mailto:`、`tel:` 和无协议的站内路径）。`javascript:`、`data:`、`vbscript:` 和禁用都不输出 `href`。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。
 
 | Prop         | Type                                         | Default     | Notes                                                                       |
 | ------------ | -------------------------------------------- | ----------- | --------------------------------------------------------------------------- |
@@ -260,14 +260,14 @@ Note: `href` 在 disabled 时仍保留。`target="_blank"` 始终把 `noopener n
 
 `packages/core/src/types/marquee.ts` · `MarqueeProps` · 4/13 props
 
-Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。`left`/`right` 走逻辑方向。
+Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。方向只用 `start` / `end` / `up` / `down`。
 
-| Prop            | Type               | Default  | Notes                                                                                      |
-| --------------- | ------------------ | -------- | ------------------------------------------------------------------------------------------ |
-| `direction?`    | `MarqueeDirection` | `'left'` | Scroll direction. `left`/`right` are logical (inline-start/end). Vertical height is the... |
-| `duration?`     | `number`           | `20000`  | Time for one full loop, in milliseconds                                                    |
-| `pauseOnHover?` | `boolean`          | `true`   | Pause looping while hovered. Does not control focus-within pause.                          |
-| `pauseOnFocus?` | `boolean`          | `true`   | Pause looping while focus is inside the region. Independent of `pauseOnHover`; default...  |
+| Prop            | Type               | Default   | Notes                                                                                     |
+| --------------- | ------------------ | --------- | ----------------------------------------------------------------------------------------- |
+| `direction?`    | `MarqueeDirection` | `'start'` | Scroll direction. `start` / `end` follow the inline axis.                                 |
+| `duration?`     | `number`           | `20000`   | Time for one full loop, in milliseconds                                                   |
+| `pauseOnHover?` | `boolean`          | `true`    | Pause looping while hovered. Does not control focus-within pause.                         |
+| `pauseOnFocus?` | `boolean`          | `true`    | Pause looping while focus is inside the region. Independent of `pauseOnHover`; default... |
 
 ## QRCode
 
@@ -284,16 +284,16 @@ Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Ref
 
 ## Rate
 
-`packages/core/src/types/rate.ts` · `RateProps` · 4/13 props
+`packages/core/src/types/rate.ts` · `RateProps` · 4/12 props
 
 Note: `readOnly` 与 `readonly` 是同一标志（冲突用 `readonly`）。可聚焦、不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。`size` 是 `sm|md|lg`（`RateSize` = `ComponentSize`）。
 
-| Prop          | Type      | Default | Notes                                                                                      |
-| ------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
-| `allowHalf?`  | `boolean` | `false` | Whether to allow half stars                                                                |
-| `allowClear?` | `boolean` | `true`  | Whether to allow clearing by clicking the same value                                       |
-| `character?`  | `string`  | `-`     | Character to use (text or emoji) — renders text instead of star icon                       |
-| `readOnly?`   | `boolean` | `false` | Read-only: stays in tab order and exposes the value, but does not change it. `readonly`... |
+| Prop          | Type      | Default | Notes                                                                        |
+| ------------- | --------- | ------- | ---------------------------------------------------------------------------- |
+| `allowHalf?`  | `boolean` | `false` | Whether to allow half stars                                                  |
+| `allowClear?` | `boolean` | `true`  | Whether to allow clearing by clicking the same value                         |
+| `character?`  | `string`  | `-`     | Character to use (text or emoji) — renders text instead of star icon         |
+| `readOnly?`   | `boolean` | `false` | Read-only: stays in tab order and exposes the value, but does not change it. |
 
 ## Result
 
@@ -323,7 +323,7 @@ Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labell
 
 ## SplitButton
 
-`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 4/24 props
+`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 4/23 props
 
 Uses: `Button`, `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
@@ -351,7 +351,7 @@ Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat`
 
 ## Tag
 
-`packages/core/src/types/tag.ts` · `TagProps` · 4/10 props
+`packages/core/src/types/tag.ts` · `TagProps` · 4/9 props
 
 Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。
 
@@ -368,7 +368,7 @@ Events/callback props: `onOpenChange?`.
 
 `packages/core/src/types/text.ts` · `TextProps` · 4/10 props
 
-Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 用 `start`/`end`（`left`/`right` 映射到它们）。`label` 需自备 `htmlFor`。
+Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 只用 `start` / `center` / `end` / `justify`。`label` 需自备 `htmlFor`。
 
 | Prop        | Type        | Default     | Notes                                  |
 | ----------- | ----------- | ----------- | -------------------------------------- |

@@ -214,13 +214,18 @@ describe('Spotlight (React)', () => {
     await expectNoA11yViolations(document.body)
   })
 
-  it('opens from the default hotkey and imperative handle', async () => {
+  it('leaves the global hotkey off by default and marks the active item selected', async () => {
     const ref = React.createRef<SpotlightHandle>()
     render(<Spotlight ref={ref} items={items} />)
     expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
 
     await fireEvent.keyDown(document, { key: 'k', metaKey: true })
-    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+
+    const view = render(<Spotlight open items={items} hotkey />)
+    const selected = document.querySelector('[role="option"][aria-selected="true"]')
+    expect(selected).toBeTruthy()
+    view.unmount()
 
     act(() => {
       ref.current?.close()
@@ -244,13 +249,13 @@ describe('Spotlight (React)', () => {
   it('keeps listbox mounted when there are no matches and names the dialog from locale', async () => {
     render(
       <ConfigProvider locale={zhCN}>
-        <Spotlight open items={items} hotkey={false} />
+        <Spotlight open query="zzzzzzz" items={items} hotkey={false} />
       </ConfigProvider>
     )
     expect(document.querySelector('[role="dialog"]')).toHaveAccessibleName('命令面板')
-    fireEvent.change(document.querySelector('input')!, { target: { value: 'zzzzzzz' } })
     expect(document.querySelector('[role="listbox"]')).toBeInTheDocument()
-    expect(document.body).toHaveTextContent('暂无结果')
+    expect(document.querySelector('[role="status"]')).toHaveTextContent('暂无结果')
+    expect(document.body).not.toHaveTextContent('Open Dashboard')
   })
 
   it('hosts nested overlays on the trap root and skips disabled hover', async () => {

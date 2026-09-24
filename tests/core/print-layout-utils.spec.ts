@@ -1,5 +1,5 @@
 /**
- * @vitest-environment node
+ * @vitest-environment happy-dom
  */
 
 import { describe, expect, it } from 'vitest'
@@ -7,6 +7,7 @@ import {
   buildPrintLayoutCss,
   getPrintLayoutClasses,
   getPrintLayoutPageKey,
+  mountPrintInstanceStyle,
   printLayoutHeaderClasses,
   printLayoutPageBreakClasses,
   resolvePrintPageBox
@@ -30,6 +31,21 @@ describe('print-layout-utils', () => {
     expect(buildPrintLayoutCss()).toContain('@page')
     expect(buildPrintLayoutCss()).toContain('size: A4 portrait')
     expect(getPrintLayoutPageKey(box).length).toBeGreaterThan(0)
+  })
+
+  it('uses A4 for an unknown preset and removes the instance page rule on dispose', () => {
+    const box = resolvePrintPageBox('Tabloid', 'portrait')
+    expect(box.pageSize).toContain('A4')
+    expect(box.width).toBe('210mm')
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    const detach = mountPrintInstanceStyle(document, 'sheet-test', box)
+    const node = document.head.querySelector('[data-tiger-print-page="sheet-test"]')
+    expect(node?.textContent).toContain('A4 portrait')
+    expect(node?.textContent).not.toContain('body')
+    detach()
+    expect(document.head.querySelector('[data-tiger-print-page="sheet-test"]')).toBeNull()
+    root.remove()
   })
 
   it('does not hide the page-break box in print', () => {

@@ -4,7 +4,9 @@
 
 import type { TabType, TabPosition, TabSize } from '../types/tabs'
 import { isBrowser } from './env'
+import { typedKeyId } from './focus-utils'
 import type { SwipeDirection } from './gesture-utils'
+import { logicalInlineScrollPosition } from './scroll-area-utils'
 
 export interface TabNavListStyle {
   display?: string
@@ -43,10 +45,10 @@ export const tabNavPositionClasses = {
 }
 
 export const tabNavLineBorderClasses = {
-  top: 'border-b border-[var(--tiger-border,#e5e7eb)]',
-  bottom: 'border-t border-[var(--tiger-border,#e5e7eb)]',
-  left: 'border-e border-[var(--tiger-border,#e5e7eb)]',
-  right: 'border-s border-[var(--tiger-border,#e5e7eb)]'
+  top: 'border-b border-[var(--tiger-border)]',
+  bottom: 'border-t border-[var(--tiger-border)]',
+  left: 'border-e border-[var(--tiger-border)]',
+  right: 'border-s border-[var(--tiger-border)]'
 }
 
 export const tabNavListBaseClasses = 'relative flex gap-1 overflow-auto'
@@ -61,7 +63,7 @@ export const tabNavListPositionClasses = {
 export const tabNavListCenteredClasses = 'justify-center'
 
 export const tabItemBaseClasses =
-  'relative z-10 cursor-pointer transition-all duration-200 motion-reduce:transition-none select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 active:opacity-90'
+  'relative z-10 cursor-pointer [transition:var(--tiger-transition-quick)] motion-reduce:transition-none select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-offset-2 active:opacity-90'
 
 export const tabItemSizeClasses = {
   sm: 'text-sm px-3 py-1.5',
@@ -70,12 +72,12 @@ export const tabItemSizeClasses = {
 }
 
 export const tabItemLineClasses =
-  'border-transparent hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)] shrink-0'
+  'border-transparent hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
 
-export const tabItemLineActiveClasses = 'text-[var(--tiger-primary,#2563eb)] font-medium'
+export const tabItemLineActiveClasses = 'text-[var(--tiger-primary)] font-medium'
 
 export const tabIndicatorBaseClasses =
-  'pointer-events-none absolute z-0 rounded-full bg-[var(--tiger-primary,#2563eb)] transition-[inset,width,height] duration-200 ease-out motion-reduce:transition-none'
+  'pointer-events-none absolute z-0 rounded-full bg-[var(--tiger-primary)] transition-[inset,width,height] duration-200 ease-out motion-reduce:transition-none'
 
 export const tabIndicatorPositionClasses: Record<TabPosition, string> = {
   top: 'bottom-0 h-0.5',
@@ -85,27 +87,27 @@ export const tabIndicatorPositionClasses: Record<TabPosition, string> = {
 }
 
 export const tabItemCardClasses =
-  'border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#fff)] hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)] shrink-0'
+  'border border-[var(--tiger-border)] bg-[var(--tiger-surface)] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
 
 export const tabItemCardActiveClasses =
-  'bg-[var(--tiger-surface,#fff)] border-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary,#2563eb)] font-medium z-10'
+  'bg-[var(--tiger-surface)] border-[var(--tiger-primary)] text-[var(--tiger-primary)] font-medium z-10'
 
 export const tabItemEditableCardClasses =
-  'border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)] hover:bg-[var(--tiger-surface,#fff)] hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)] shrink-0'
+  'border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] hover:bg-[var(--tiger-surface)] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
 
 export const tabItemEditableCardActiveClasses =
-  'bg-[var(--tiger-surface,#fff)] border-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary,#2563eb)] font-medium z-10'
+  'bg-[var(--tiger-surface)] border-[var(--tiger-primary)] text-[var(--tiger-primary)] font-medium z-10'
 
 export const tabItemPillsClasses =
-  'rounded-full bg-transparent hover:bg-[var(--tiger-primary-subtle,#eff6ff)] hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)] shrink-0'
+  'rounded-full bg-transparent hover:bg-[var(--tiger-primary-subtle)] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
 
 export const tabItemPillsActiveClasses =
-  'bg-[var(--tiger-primary,#2563eb)] text-white font-medium shadow-sm'
+  'bg-[var(--tiger-primary)] text-white font-medium shadow-sm'
 
 export const tabItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-events-none'
 
 export const tabCloseButtonClasses =
-  'ms-2 p-0.5 rounded-[var(--tiger-radius-sm,0.375rem)] hover:bg-[var(--tiger-surface-muted,#e5e7eb)] transition-colors duration-150 motion-reduce:transition-none'
+  'ms-2 p-0.5 rounded-[var(--tiger-radius-sm)] hover:bg-[var(--tiger-surface-muted)] transition-colors duration-150 motion-reduce:transition-none'
 
 export const tabContentBaseClasses = 'min-w-0'
 
@@ -114,14 +116,14 @@ export const tabPaneBaseClasses = 'w-full'
 export const tabPaneHiddenClasses = 'hidden'
 
 export const tabAddButtonClasses =
-  'shrink-0 px-3 py-2 border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)] hover:bg-[var(--tiger-surface,#fff)] hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)] cursor-pointer transition-colors duration-200 motion-reduce:transition-none'
+  'shrink-0 px-3 py-2 border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] hover:bg-[var(--tiger-surface)] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] cursor-pointer transition-colors duration-200 motion-reduce:transition-none'
 
 export function normalizeTabKey(key: string | number): string {
-  return String(key)
+  return typedKeyId(key)
 }
 
 export function formatTabKey(key: string | number): string {
-  return typeof key === 'number' ? `n:${key}` : `s:${key}`
+  return typedKeyId(key)
 }
 
 export function parseTabKey(raw: string | null | undefined): string | number | undefined {
@@ -135,7 +137,7 @@ export function parseTabKey(raw: string | null | undefined): string | number | u
 }
 
 export function isKeyActive(key: string | number, activeKey: string | number | undefined): boolean {
-  return activeKey !== undefined && normalizeTabKey(key) === normalizeTabKey(activeKey)
+  return activeKey !== undefined && formatTabKey(key) === formatTabKey(activeKey)
 }
 
 export function findTabIndex(
@@ -154,14 +156,29 @@ export function getDefaultActiveKey(tabs: TabRecord[]): string | number | undefi
   return tabs.find((tab) => !tab.disabled)?.key
 }
 
+/**
+ * Controlled keys are reflected as given. An illegal key does not become the
+ * first tab. Uncontrolled keys still fall back to the first enabled tab.
+ */
 export function resolveDisplayedActiveKey(
   requested: string | number | undefined,
-  tabs: TabRecord[]
+  tabs: TabRecord[],
+  options?: { controlled?: boolean }
 ): string | number | undefined {
-  if (requested !== undefined && tabs.some((tab) => isKeyActive(tab.key, requested))) {
-    return tabs.find((tab) => isKeyActive(tab.key, requested))?.key
+  if (requested !== undefined) {
+    const match = tabs.find((tab) => isKeyActive(tab.key, requested))
+    return match ? match.key : requested
   }
+  if (options?.controlled) return undefined
   return getDefaultActiveKey(tabs)
+}
+
+export function isIllegalTabKey(
+  requested: string | number | undefined,
+  tabs: TabRecord[]
+): boolean {
+  if (requested === undefined) return false
+  return !tabs.some((tab) => isKeyActive(tab.key, requested) && !tab.disabled)
 }
 
 export function getNextActiveKey(
@@ -370,10 +387,15 @@ export function measureTabIndicatorBox(
       blockSize: tabRect.height
     }
   }
-  const inlineStart =
-    dir === 'rtl'
-      ? listRect.right - tabRect.right + list.scrollLeft
-      : tabRect.left - listRect.left + list.scrollLeft
+  const scrollFromStart = logicalInlineScrollPosition(
+    list.scrollLeft,
+    list.scrollWidth,
+    list.clientWidth,
+    dir
+  )
+  const visualDelta =
+    dir === 'rtl' ? listRect.right - tabRect.right : tabRect.left - listRect.left
+  const inlineStart = visualDelta + scrollFromStart
   return {
     inlineStart,
     blockStart: 0,
@@ -384,15 +406,15 @@ export function measureTabIndicatorBox(
 
 function getCardChromeClasses(position: TabPosition, active: boolean): string {
   if (position === 'bottom') {
-    return active ? 'rounded-b -mt-px border-t-[var(--tiger-surface,#fff)]' : 'rounded-b -mt-px'
+    return active ? 'rounded-b -mt-px border-t-[var(--tiger-surface)]' : 'rounded-b -mt-px'
   }
   if (position === 'left') {
-    return active ? 'rounded-s -me-px border-e-[var(--tiger-surface,#fff)]' : 'rounded-s -me-px'
+    return active ? 'rounded-s -me-px border-e-[var(--tiger-surface)]' : 'rounded-s -me-px'
   }
   if (position === 'right') {
-    return active ? 'rounded-e -ms-px border-s-[var(--tiger-surface,#fff)]' : 'rounded-e -ms-px'
+    return active ? 'rounded-e -ms-px border-s-[var(--tiger-surface)]' : 'rounded-e -ms-px'
   }
-  return active ? 'rounded-t -mb-px border-b-[var(--tiger-surface,#fff)]' : 'rounded-t -mb-px'
+  return active ? 'rounded-t -mb-px border-b-[var(--tiger-surface)]' : 'rounded-t -mb-px'
 }
 
 export function getTabItemClasses(

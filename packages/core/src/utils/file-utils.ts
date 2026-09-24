@@ -29,7 +29,10 @@ export function downloadBrowserFile(
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  // Revoke on a later turn so the browser can start the download first.
+  setTimeout(() => {
+    URL.revokeObjectURL(url)
+  }, 0)
 }
 
 export function formatBytes(

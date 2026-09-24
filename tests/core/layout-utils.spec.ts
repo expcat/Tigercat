@@ -9,38 +9,25 @@ import {
   getLayoutRootClasses,
   getLayoutSidebarClasses,
   getSidebarStyle,
-  injectLayoutGridStyles,
   isCssLengthZero,
   isSidebarFullyHidden,
-  LAYOUT_GRID_STYLE_ID,
+  LAYOUT_GRID_CSS,
   layoutContentClasses,
-  resetGridBreakpointSync,
   resolveLayoutHasSider,
   resolveSidebarAriaProps
 } from '@expcat/tigercat-core'
 
-const OLD_LOCKED_CONTENT_BG = '--tiger-layout-content-bg,#f9fafb'
-
-describe('layout-utils Content surface-muted fallback', () => {
-  it('falls back to registered surface-muted, not fill or locked layout-content-bg hex', () => {
+describe('layout-utils Content surface-muted', () => {
+  it('uses the surface-muted token', () => {
     expect(layoutContentClasses).toContain('--tiger-surface-muted')
-    expect(layoutContentClasses).toContain('--tiger-layout-content-bg')
-    expect(layoutContentClasses).toContain('--tiger-layout-content-bg,var(--tiger-surface-muted')
+    expect(layoutContentClasses).not.toContain('--tiger-layout-content-bg')
     expect(layoutContentClasses).not.toContain('--tiger-fill')
-    expect(layoutContentClasses).not.toContain(OLD_LOCKED_CONTENT_BG)
+    expect(layoutContentClasses).not.toContain('#f9fafb')
 
     const classes = getLayoutContentClasses()
     expect(classes).toContain('--tiger-surface-muted')
-    expect(classes).toContain('--tiger-layout-content-bg')
-    expect(classes).toContain('--tiger-layout-content-bg,var(--tiger-surface-muted')
     expect(classes).toContain(layoutContentClasses)
-    expect(classes).not.toContain('--tiger-fill')
-    expect(classes).not.toContain(OLD_LOCKED_CONTENT_BG)
-
-    const overrideIdx = layoutContentClasses.indexOf('--tiger-layout-content-bg')
-    const semanticIdx = layoutContentClasses.indexOf('--tiger-surface-muted')
-    expect(overrideIdx).toBeGreaterThan(-1)
-    expect(semanticIdx).toBeGreaterThan(overrideIdx)
+    expect(classes).not.toContain('--tiger-layout-content-bg')
   })
 })
 
@@ -82,7 +69,7 @@ describe('header variants', () => {
     expect(glass).toContain('tiger-header-translucent')
     expect(glass).not.toContain('tiger-header-default')
     expect(blur).toContain('tiger-header-blur')
-    expect(blur).toContain('z-[200]')
+    expect(blur).toContain('tiger-header')
   })
 })
 
@@ -111,20 +98,13 @@ describe('sidebar width and hide', () => {
   })
 })
 
-describe('layout grid style injection', () => {
-  afterEach(() => {
-    document.getElementById(LAYOUT_GRID_STYLE_ID)?.remove()
-    resetGridBreakpointSync()
-  })
-
-  it('injects geometry once and keeps reduced-motion duration at zero', () => {
-    injectLayoutGridStyles()
-    injectLayoutGridStyles()
-    expect(document.querySelectorAll(`#${LAYOUT_GRID_STYLE_ID}`)).toHaveLength(1)
-    const css = document.getElementById(LAYOUT_GRID_STYLE_ID)?.textContent ?? ''
-    expect(css).toContain('prefers-reduced-motion: reduce')
-    expect(css).toContain('column-gap: var(--tiger-row-gutter-x, 0px)')
-    expect(css).toContain('border-inline-end')
-    expect(css).toContain('--tiger-breakpoint-2xl')
+describe('layout grid static css', () => {
+  it('uses media queries and does not inject a breakpoint attribute', () => {
+    expect(LAYOUT_GRID_CSS).toContain('@media (min-width:')
+    expect(LAYOUT_GRID_CSS).not.toContain('data-tiger-bp')
+    expect(LAYOUT_GRID_CSS).toContain('prefers-reduced-motion: reduce')
+    expect(LAYOUT_GRID_CSS).toContain('column-gap: var(--tiger-row-gutter-x')
+    expect(LAYOUT_GRID_CSS).toContain('border-inline-end')
+    expect(LAYOUT_GRID_CSS).toContain('--tiger-breakpoint-2xl')
   })
 })

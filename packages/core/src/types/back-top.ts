@@ -28,12 +28,10 @@ export interface BackTopProps {
   target?: ScrollRootInput
 
   /**
-   * 0 (or any non-positive finite number) uses instant scroll.
-   * Any positive number uses the browser's native smooth scroll.
-   * Duration is not milliseconds.
+   * Native scroll behavior. Reduced motion forces `auto`.
    * @default 'smooth'
    */
-  duration?: number
+  behavior?: 'auto' | 'smooth'
 
   /**
    * Positioning strategy. `auto` and `fixed` both pin to the viewport

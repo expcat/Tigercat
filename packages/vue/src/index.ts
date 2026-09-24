@@ -4,17 +4,6 @@
  * Vue 3 components for Tigercat UI library
  */
 
-// Re-export from core
-export * from '@expcat/tigercat-core'
-export type {
-  DrawerPlacement,
-  DrawerSize,
-  ListItem,
-  TableColumn,
-  TreeNode,
-  UploadFile
-} from '@expcat/tigercat-core'
-
 // Global config
 export { ConfigProvider, useTigerConfig } from './components/ConfigProvider'
 export type { TigerConfig, VueConfigProviderProps } from './components/ConfigProvider'
@@ -76,9 +65,8 @@ export { InputNumber } from './components/InputNumber'
 export type { VueInputNumberProps } from './components/InputNumber'
 export { Form, useFormContext } from './components/Form'
 export type { VueFormProps } from './components/Form'
-export { FormItem } from './components/FormItem'
+export { FormItem, FORM_ITEM_CONTROL_INJECTION_KEY } from './components/FormItem'
 export type { VueFormItemProps } from './components/FormItem'
-export { FORM_ITEM_CONTROL_INJECTION_KEY } from './components/FormItemContext'
 export type { VueFormItemControlContext } from './components/FormItemContext'
 export { useFormController } from './composables/useFormController'
 export { Space } from './components/Space'
@@ -389,8 +377,6 @@ export type {
   VirtualListProps,
   VirtualListHandle
 } from './components/VirtualList'
-export { Stepper } from './components/Stepper'
-export type { VueStepperProps } from './components/Stepper'
 export { CronEditor } from './components/CronEditor'
 export type { VueCronEditorProps, CronEditorProps } from './components/CronEditor'
 export { Calendar } from './components/Calendar'
@@ -507,5 +493,3 @@ export type { PrintLayoutInstance } from '@expcat/tigercat-core'
 // AspectRatio (v2.1.0+)
 export { AspectRatio } from './components/AspectRatio'
 export type { VueAspectRatioProps } from './components/AspectRatio'
-
-export const version = '2.9.2'

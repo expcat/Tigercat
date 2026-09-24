@@ -138,6 +138,15 @@ describe('rich-text-engine', () => {
     expect(ctx.element.innerHTML).toBe('<p>Updated</p>')
   })
 
+  it('does not replace innerHTML when sanitizing only changes serialization', () => {
+    const { ctx } = makeContext()
+    instance = builtinRichTextEngine.create(ctx)
+    ctx.element.innerHTML = '<p>Hello <span style="font-weight: bold">world</span></p>'
+    const before = ctx.element.innerHTML
+    instance.setValue(instance.getValue())
+    expect(ctx.element.innerHTML).toBe(before)
+  })
+
   it('setValue is a no-op when content already matches', () => {
     const { ctx } = makeContext({ initialValue: '<p>Same</p>' })
     instance = builtinRichTextEngine.create(ctx)

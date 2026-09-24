@@ -14,6 +14,7 @@ import {
   type AnchorClickLike
 } from './anchor-utils'
 import { overlayZIndexClass } from './floating'
+import { typedKeyId } from './focus-utils'
 import { isBrowser } from './env'
 import { resolveScrollRoot } from './scroll-root'
 
@@ -31,7 +32,7 @@ export interface ScrollSpyObserverOptions {
   onChange: (item: ScrollSpyItem) => void
 }
 
-export const scrollSpyRootClasses = 'relative text-sm text-[var(--tiger-text-muted,#6b7280)]'
+export const scrollSpyRootClasses = 'relative text-sm text-[var(--tiger-text-secondary)]'
 
 export const scrollSpyStickyClasses = `sticky ${overlayZIndexClass.viewport}`
 
@@ -40,18 +41,26 @@ export const scrollSpyListVerticalClasses = 'flex flex-col gap-1'
 export const scrollSpyListHorizontalClasses = 'flex flex-wrap items-center gap-2'
 
 export const scrollSpyNestedListClasses =
-  'mt-1 ms-3 flex flex-col gap-1 border-s border-[var(--tiger-border,#e5e7eb)] ps-3'
+  'mt-1 ms-3 flex flex-col gap-1 border-s border-[var(--tiger-border)] ps-3'
 
 export const scrollSpyItemBaseClasses =
-  'block rounded-md px-3 py-1.5 text-start transition-colors duration-200 motion-reduce:transition-none hover:bg-[var(--tiger-surface-muted,#f3f4f6)] hover:text-[var(--tiger-primary,#2563eb)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#fff)]'
+  'block rounded-md px-3 py-1.5 text-start transition-colors duration-200 motion-reduce:transition-none hover:bg-[var(--tiger-surface-muted)] hover:text-[var(--tiger-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface)]'
 
 export const scrollSpyItemActiveClasses =
-  'bg-[var(--tiger-primary,#2563eb)]/10 font-medium text-[var(--tiger-primary,#2563eb)]'
+  'bg-[var(--tiger-primary)]/10 font-medium text-[var(--tiger-primary)]'
 
 export const scrollSpyItemDisabledClasses = 'cursor-not-allowed opacity-50 hover:bg-transparent'
 
 export function getScrollSpyKeyString(key: ScrollSpyKey): string {
-  return String(key)
+  return typedKeyId(key)
+}
+
+export function sameScrollSpyKey(
+  a: ScrollSpyKey | undefined,
+  b: ScrollSpyKey | undefined
+): boolean {
+  if (a === undefined || b === undefined) return false
+  return getScrollSpyKeyString(a) === getScrollSpyKeyString(b)
 }
 
 export function resolveScrollSpyOffset(targetOffset?: number, offsetTop?: number): number {
@@ -85,8 +94,7 @@ export function getScrollSpyItemByKey(
   key?: ScrollSpyKey
 ): FlatScrollSpyItem | undefined {
   if (key === undefined) return undefined
-  const keyString = getScrollSpyKeyString(key)
-  return flattenScrollSpyItems(items).find((item) => getScrollSpyKeyString(item.key) === keyString)
+  return flattenScrollSpyItems(items).find((item) => sameScrollSpyKey(item.key, key))
 }
 
 export function getScrollSpyItemByHref(

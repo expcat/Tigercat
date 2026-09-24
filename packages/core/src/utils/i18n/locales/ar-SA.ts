@@ -14,6 +14,9 @@ export const arSA: TigerLocale = {
     cancelText: 'إلغاء',
     closeText: 'إغلاق',
     loadingText: 'جار التحميل...',
+    loadingFinishedText: 'اكتمل التحميل',
+    loadingFailedText: 'فشل التحميل',
+    viewText: 'عرض',
     emptyText: 'لا توجد بيانات',
     noMoreText: 'لا مزيد من البيانات',
     searchPlaceholder: 'بحث',
@@ -47,7 +50,8 @@ export const arSA: TigerLocale = {
     ariaLabel: 'رمز QR',
     expiredText: 'انتهت صلاحية رمز QR',
     refreshText: 'تحديث',
-    loadingText: 'جار التحميل...'
+    loadingText: 'جار التحميل...',
+    errorText: 'تعذر إنشاء رمز QR'
   },
   marquee: {
     ariaLabel: 'محتوى التمرير'
@@ -55,10 +59,25 @@ export const arSA: TigerLocale = {
   image: {
     previewAriaLabel: 'معاينة {alt}',
     previewFallbackAlt: 'صورة',
-    groupAriaLabel: 'مجموعة الصور'
+    groupAriaLabel: 'مجموعة الصور',
+    loadErrorText: 'تعذر تحميل الصورة'
   },
   imageCompare: {
-    ariaLabel: 'مقارنة الصور'
+    ariaLabel: 'مقارنة الصور',
+    beforeAlt: 'قبل',
+    afterAlt: 'بعد',
+    valueText: 'ظهر {percent}% من الجانب السابق'
+  },
+  text: {
+    copyLabel: 'نسخ',
+    copiedLabel: 'تم النسخ',
+    copyFailedLabel: 'فشل النسخ',
+  },
+  watermark: {
+    imageErrorText: 'تعذر تحميل صورة العلامة المائية'
+  },
+  segmented: {
+    ariaLabel: 'خيارات'
   },
   descriptions: {
     colon: ':'
@@ -67,6 +86,9 @@ export const arSA: TigerLocale = {
     avatarAlt: 'صورة رمزية',
     dragHandleAriaLabel: 'إعادة ترتيب'
   },
+  masonry: {
+    visualOrderText: 'يختلف الترتيب البصري عن ترتيب المصدر'
+  },
   scrollArea: {
     ariaLabel: 'منطقة التمرير'
   },
@@ -74,7 +96,8 @@ export const arSA: TigerLocale = {
     pageBreak: 'فاصل صفحات'
   },
   timeline: {
-    pendingText: 'جار التحميل...'
+    pendingText: 'جار التحميل...',
+    pendingReplacedText: 'اكتمل التحديث'
   },
   workflowTimeline: {
     pending: 'قيد الانتظار',
@@ -216,7 +239,11 @@ export const arSA: TigerLocale = {
     branchExpression: 'تعبير',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: 'غير مستخدم لهذا النوع من العقد',
+    publishText: 'نشر',
     publishBlocked: 'لا يمكن النشر حتى إصلاح هذه العناصر'
+  },
+  workflowDetailShell: {
+    ariaLabel: 'تفاصيل سير العمل'
   },
   progress: {
     ariaLabel: 'التقدم'
@@ -259,7 +286,9 @@ export const arSA: TigerLocale = {
     loadingText: 'جار التحميل',
     expandText: 'توسيع',
     collapseText: 'طي',
-    selectAllText: 'تحديد الكل',
+    selectAllText: 'تحديد الكل في هذه الصفحة',
+    selectLoadedText: 'تحديد كل الصفوف المحملة',
+    tableAriaLabel: 'جدول البيانات',
     selectRowAriaLabel: 'تحديد الصف {row}',
     sortByText: 'فرز حسب {column}',
     clearSortText: 'مسح الفرز',
@@ -275,9 +304,13 @@ export const arSA: TigerLocale = {
     allText: 'الكل',
     filterPlaceholder: 'تصفية...',
     exportCsvText: 'تصدير CSV',
-    exportExcelText: 'تصدير Excel',
     exportCsvAriaLabel: 'تصدير إلى CSV',
-    exportExcelAriaLabel: 'تصدير إلى Excel',
+    selectionCountText: 'تم تحديد {count}',
+    sortAnnouncementText: 'تم الفرز حسب {column}، {direction}',
+    sortAscendingText: 'تصاعدي',
+    sortDescendingText: 'تنازلي',
+    sortNoneText: 'بدون فرز',
+    dragRowAriaLabel: 'سحب الصف {row}',
     expandRowAriaLabel: 'توسيع الصف',
     collapseRowAriaLabel: 'طي الصف',
     sortMenuAriaLabel: 'فرز',
@@ -325,14 +358,17 @@ export const arSA: TigerLocale = {
     nextText: 'التالي',
     finishText: 'إنهاء',
     closeAriaLabel: 'إغلاق الجولة',
-    dialogAriaLabel: 'الجولة الإرشادية'
+    dialogAriaLabel: 'الجولة الإرشادية',
+    loadErrorText: 'تعذر تحميل هذه الجولة.',
   },
   calendar: {
     previousMonth: 'الشهر السابق',
     nextMonth: 'الشهر التالي',
     previousYear: 'السنة السابقة',
     nextYear: 'السنة التالية',
-    eventCountText: '{n} أحداث'
+    eventCountText: '{n} أحداث',
+    switchToYear: 'التبديل إلى عرض السنة',
+    switchToMonth: 'التبديل إلى عرض الشهر'
   },
   fullscreen: {
     enterAriaLabel: 'دخول ملء الشاشة',
@@ -343,7 +379,8 @@ export const arSA: TigerLocale = {
     pathAriaLabel: 'مسار الملف',
     listboxAriaLabel: 'الملفات',
     searchAriaLabel: 'البحث في الملفات',
-    emptyText: 'مجلد فارغ'
+    emptyText: 'مجلد فارغ',
+    resultCountText: '{count} عناصر'
   },
   imageViewer: {
     dialogAriaLabel: 'عارض الصور',
@@ -377,6 +414,7 @@ export const arSA: TigerLocale = {
     resizeHandleS: 'أسفل',
     resizeHandleSw: 'أسفل اليسار',
     resizeHandleW: 'يسار',
+    cropSizeText: '{width} في {height}',
     loadingCropImageAriaLabel: 'جارٍ تحميل الصورة للقص',
     loadErrorAriaLabel: 'تعذر تحميل الصورة للقص',
     fileTooLargeText: 'حجم الملف يتجاوز {maxSize}',
@@ -394,10 +432,14 @@ export const arSA: TigerLocale = {
     ellipseToolText: 'قطع ناقص',
     polygonToolText: 'مضلع',
     freehandToolText: 'رسم حر',
-    deleteText: 'حذف'
+    deleteText: 'حذف',
+    annotationLoadFailedText: 'تعذر تحميل الصورة.',
+    annotationRetryText: 'إعادة المحاولة',
+    annotationTooSmallText: 'التعليق صغير جدًا.',
+    annotationPolygonIncompleteText: 'يحتاج المضلع إلى 3 نقاط على الأقل.'
   },
   status: {
-    tagCloseAriaLabel: 'إغلاق الوسم',
+    tagCloseAriaLabel: 'إغلاق {label}',
     badgeLabel: 'إشعار',
     badgeCountLabel: '{count} إشعارات'
   },
@@ -410,6 +452,7 @@ export const arSA: TigerLocale = {
     unassignedSwimlaneText: 'غير معيّن',
     wipLimitText: 'حد العمل الجاري: {limit}',
     dragHintText: 'اسحب للنقل',
+    grabAnnouncementText: '{card}. من {from} إلى {to}. الموضع {position} من {count}.',
     boardAriaLabel: 'لوحة المهام'
   },
   chatWindow: {
@@ -424,7 +467,8 @@ export const arSA: TigerLocale = {
   code: {
     copyLabel: 'نسخ',
     copiedLabel: 'تم النسخ',
-    copyFailedLabel: 'فشل النسخ'
+    copyFailedLabel: 'فشل النسخ',
+    scrollLabel: 'رمز'
   },
   commentThread: {
     emptyText: 'لا توجد تعليقات',
@@ -441,12 +485,15 @@ export const arSA: TigerLocale = {
     listAriaLabel: 'موضوع التعليقات',
     replySubmitText: 'إرسال الرد',
     remainingRepliesText: 'عرض المتبقي ({count})',
+    duplicateIdText: 'معرّف تعليق مكرر {id}',
+    cycleText: 'حلقة تعليقات عند {id}',
     maxDepthReachedText: 'تم بلوغ أقصى عمق للرد'
   },
   activityFeed: {
     emptyText: 'لا يوجد نشاط',
     loadingText: 'جارٍ التحميل...',
     listAriaLabel: 'النشاط',
+    newItemText: 'نشاط جديد: {title}',
     otherGroupTitle: 'أخرى'
   },
   notificationCenter: {
@@ -460,6 +507,9 @@ export const arSA: TigerLocale = {
     markReadText: 'وضع علامة مقروء',
     markUnreadText: 'وضع علامة غير مقروء',
     defaultGroupTitle: 'افتراضي',
+    filterAriaLabel: 'حالة القراءة',
+    markedReadText: 'تم تعليم {count} كمقروء',
+    newItemText: 'إشعار جديد: {title}',
     unreadCountText: '{count} غير مقروء'
   },
   select: {
@@ -470,7 +520,15 @@ export const arSA: TigerLocale = {
     clearAriaLabel: 'مسح التحديد',
     createOptionLabel: 'إنشاء "{label}"',
     moreCountText: '+{count} إضافية',
-    loadingText: 'جار التحميل...',
+    loadingText: 'جار التحميل...'
+  },
+  cascader: {
+    levelLabel: 'المستوى {level}',
+    backText: 'رجوع',
+    expandAriaLabel: 'توسيع',
+    collapseAriaLabel: 'طي'
+  },
+  treeSelect: {
     levelLabel: 'المستوى {level}',
     backText: 'رجوع',
     expandAriaLabel: 'توسيع',
@@ -541,7 +599,22 @@ export const arSA: TigerLocale = {
     sunburstTooltip: '{label}: {value} ({percent}٪)',
     orgChartAriaLabel: 'المخطط التنظيمي',
     ganttAriaLabel: 'مخطط غانت',
-    ganttTaskAriaLabel: '{label}، {start} إلى {end}{progress}'
+    ganttTaskAriaLabel: '{label}، {start} إلى {end}{progress}',
+    ganttTodayAriaLabel: 'اليوم',
+    ganttUnknownDate: 'تاريخ غير معروف',
+    chartAriaLabel: 'مخطط',
+    lineChartAriaLabel: 'مخطط خطي',
+    areaChartAriaLabel: 'مخطط مساحي',
+    barChartAriaLabel: 'مخطط أعمدة',
+    scatterChartAriaLabel: 'مخطط مبعثر',
+    pieChartAriaLabel: 'مخطط دائري',
+    radarChartAriaLabel: 'مخطط راداري',
+    heatmapChartAriaLabel: 'خريطة حرارية',
+    heatmapSummary: '{rows} صفوف في {columns} أعمدة',
+    funnelChartAriaLabel: 'مخطط قمعي',
+    sunburstChartAriaLabel: 'مخطط شروق',
+    treemapChartAriaLabel: 'خريطة شجرية',
+    gaugeChartAriaLabel: 'مقياس'
   },
   codeEditor: {
     editorAriaLabel: 'محرر التعليمات البرمجية'
@@ -555,6 +628,8 @@ export const arSA: TigerLocale = {
     editModeLabel: 'تحرير',
     splitModeLabel: 'تقسيم',
     previewModeLabel: 'معاينة',
+    showEditorText: 'تحرير',
+    showPreviewText: 'معاينة',
     bold: 'عريض',
     italic: 'مائل',
     strikethrough: 'يتوسطه خط',
@@ -664,7 +739,9 @@ export const arSA: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: 'إزالة {tag}',
-    clearAllLabel: 'مسح كل الوسوم'
+    clearAllLabel: 'مسح كل الوسوم',
+    duplicateText: 'تمت الإضافة بالفعل',
+    limitText: 'تم بلوغ حد الوسوم'
   },
   input: {
     clearAriaLabel: 'مسح الإدخال',
@@ -680,12 +757,6 @@ export const arSA: TigerLocale = {
     ariaLabel: 'شريط التمرير',
     minAriaLabel: 'الحد الأدنى',
     maxAriaLabel: 'الحد الأعلى'
-  },
-  stepper: {
-    ariaLabel: 'عداد الخطوات',
-    valueAriaLabel: 'القيمة',
-    incrementAriaLabel: 'زيادة',
-    decrementAriaLabel: 'إنقاص'
   },
   signature: {
     ariaLabel: 'لوحة التوقيع',

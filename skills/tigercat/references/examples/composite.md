@@ -15,7 +15,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 
-Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。
+Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`，时间线仍是 `list`，空态和加载态不自称 feed。已有条目时加载保留列表并写出加载说明。新的一条用组件自己的礼貌区域。`content` 只在标题和描述都空时当正文。默认显示时间时，首屏等客户端时区稳定后再写钟点。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。
 
 Vue: `<ActivityFeed :items="items" />`
 
@@ -35,7 +35,7 @@ React: `<ChatWindow messages={messages} onSend={onSend} />`
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 
-Note: `nodes` 一旦传入（含 `[]`）不再回落 `items`。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。
+Note: `nodes` 一旦传入（含 `[]`）不再回落 `items`。输入框和空态在 feed 外面，文章是 feed 的直接子级，回复文章不嵌在父文章里。序号按整棵可见树，收起不改已经公告的位置。环和重复 id 给出可见错误，能挂上的节点留下。达到 `maxDepth` 不再提供回复。发送闩等到 `onReply` 的 Promise。`onReply` 不写树；点赞 overlay 在 `nodes` 换引用后丢弃。Load more 本地剩余按 `maxReplies` 揭一层。展开：Vue `v-model:expanded-keys`，React `onExpandedChange`。
 
 Vue: `<CommentThread :nodes="nodes" @reply="onReply" />`
 
@@ -45,7 +45,7 @@ React: `<CommentThread nodes={nodes} onReply={onReply} />`
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
-Note: 搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。
+Note: 搜索/筛选默认 `toolbar.searchMode: 'local'` 写进当前 `dataSource`（筛选项 `key` 对列 key）；`remote` 才只发 `toolbar.onSearch*` / `onFiltersChange`（Vue 还有 `@search-change` / `@search` / `@filters-change`）。`onFiltersChange` 带这一次要写的值。本地搜索和标量筛选把页码收到第 1 页，沿用表的分页回写。Vue 里让搜索框出现的那次监听也能点亮搜索按钮。批量订内层勾选。`pagination` 与 Table 同一默认（开、pageSize 10），`onPageChange` 是 `{ current, pageSize }`；改 pageSize 只发 `onPageSizeChange`。`id` / `style` / `data-*` / `aria-*` 在外壳，`tableClassName` 才是内层表。`toolbar.filters` 不是 Table 列 `filters`。
 
 Vue: `<DataTableWithToolbar :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :toolbar="toolbar" />`
 
@@ -55,7 +55,7 @@ React: `<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsive
 
 Uses: `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`.
 
-Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，Finish 再 `validate` + `submit`，`onFinish` 带上 values。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。
+Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没写 `fields` 就校验当前步挂上的项。Finish 再 `validate` + `submit`。`submit()` 返回 false 时不发 `finish`，也不跑 `autoSave`。父级直接改 `current` 时，`step-change` 的第三参 `{ skippedValidation: true }`。`beforeNext` 返回字符串会显示在内容区 `role="alert"`。`isLast` 是后面没有未跳过步，不是数组尾巴。`clickable` 只能回已走过的步。Vue 用 `v-model:current`。`onChange` 是步下标。`size` 是 Steps 的 `small|default`，不是 Form 的 `sm|md|lg`。
 
 Vue: `<FormWizard :steps="steps" :before-next="beforeNext" @finish="onFinish" />`
 
@@ -65,7 +65,7 @@ React: `<FormWizard steps={steps} beforeNext={beforeNext} onFinish={onFinish} />
 
 Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
 
-Note: 只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。
+Note: 只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups=[]` 不回落。筛选是有名字的单选，方向键移动，当前项才在 Tab 序里。打开一条是按钮。加载时列表 `inert`。未读变化和新的一条用组件自己的礼貌区域。全部已读只交出这一次未读的条目。这是收件箱面板，不是命令式 `notification` toast。内层 Tabs `swipeable={false}`。
 
 Vue: `<NotificationCenter :items="items" />`
 
@@ -75,7 +75,7 @@ React: `<NotificationCenter items={items} />`
 
 Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
 
-Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。校验复用 Form `rules` / `condition`。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。Core helpers 可从 `@expcat/tigercat-core/schema-form` tree-shake。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。
+Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name` 支持点路径；`groups` 可嵌套。FormItem 收到的规则是补过 `required` 的那一份。`disabled` 不跑必填。未知 `type` 留空，等 `renderField`。模型按路径合并，后写只盖同路径；`source` / `defaultValue` / `schema` 变化时，没编辑过的非受控字段跟新种子走。`mapIn` / `mapOut` / `valuePath` 做值映射；submit 的 `mapped` 是映射后的对象。转发 Form 的 `controller` / `undoable` / `maxHistorySize` / `fieldDependencies` / `onValidate`。radio 走 RadioGroup `options`。工作流节点字段权限用 `applyWorkflowFieldPermissions` 派生 schema（initiate / approve / readonly）；隐藏字段不进校验。权限函数不从 `@expcat/tigercat-core/schema-form` 导出。Vue `v-model` / `modelValue`，React `value` + `onChange`。可选 `source` 跑 `mapIn`。
 
 Vue: `<SchemaForm :schema="schema" :model="model" @submit="onSubmit" />`
 
@@ -85,7 +85,7 @@ React: `<SchemaForm schema={schema} model={model} onSubmit={onSubmit} />`
 
 Uses: `ConfigProvider`, `task-board drag utilities`.
 
-Note: 过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。
+Note: 放下下标和指示线是同一个插入点，末尾是源数组长度。每列一个键盘停靠点，方向键在卡片之间移动。抓取时播报源列、目标列和位置，句子走 locale。卡片里的按钮自己处理 Enter / Space。列 id 记在元素上。过滤 / hiddenColumns 只改显示。WIP 和计数用源卡数。列拖按 id 映回源下标。无 onCardAdd 时 allowAddCard 插入 locale 标题。Vue `@card-add` 与 `:on-card-add` 都会进回调。`swimlanes` 是列内按 `swimlaneField` 分组。
 
 Vue: `<TaskBoard :columns="columns" />`
 
@@ -103,7 +103,7 @@ React: `<WorkflowActionBar items={actions} />`
 
 ## WorkflowDesigner
 
-Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。画布摘要卡（kind 色、标题、审批人摘要、signMode）；选中后右侧 Inspector 四 Tab：审批人 / 操作按钮 / 表单权限 / 高级。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。
+Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。摘要按钮可聚焦，Enter 打开检查器。Inspector 标签用方向键移动。`onChange` 带上 `issues`。有阻塞项时发布按钮不可用，横幅是同一句话。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵，缺省权限与运行时是同一个更严默认。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。
 
 Vue: `<WorkflowDesigner v-model="steps" />`
 
@@ -113,7 +113,7 @@ React: `<WorkflowDesigner value={steps} onChange={setSteps} />`
 
 Uses: `SchemaForm`, `Tabs`, `WorkflowTimeline`, `WorkflowViewer`, `WorkflowActionBar`.
 
-Note: 可选详情布局配方，不是第二套 Timeline / 表单设计器。槽：header / form / tabs（Timeline|Viewer）/ action（sticky ActionBar）。表单请先 `applyWorkflowFieldPermissions(schema, node.fieldPermissions, mode)`。给壳限定高度时 action 钉在底部、form/tabs 滚动。Admin 在后续切片接真页。
+Note: 可选详情布局配方，不是第二套 Timeline / 表单设计器。槽：header / form / tabs（Timeline|Viewer）/ action（sticky ActionBar）。可访问名走 locale `workflowDetailShell.ariaLabel`。`submit()` 走 `mergeWorkflowFormValues`：隐藏和只读保留 `originalValues`，只覆盖可编辑路径。表单请先 `applyWorkflowFieldPermissions(schema, node.fieldPermissions, mode, kind)`。给壳限定高度时 action 钉在底部、form/tabs 滚动。Admin 在后续切片接真页。
 
 Vue: `<WorkflowDetailShell><template #form /><template #tabs /><template #action /></WorkflowDetailShell>`
 
@@ -139,7 +139,7 @@ Vue: `<WorkflowViewer :steps="steps" />`
 
 React: `<WorkflowViewer steps={steps} />`
 
-Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
+Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.
 
 ## DataTableWithToolbar Custom Filters
 

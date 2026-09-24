@@ -9,44 +9,42 @@ import type {
   MarkdownToolbarSeparator
 } from '../types/markdown-editor'
 import type { TigerLocaleMarkdownEditor } from '../types/locale'
-import { enUS } from './i18n/locales/en-US'
-
 export { parseHeight as parseMarkdownHeight }
 
 /** Container fill: optional `--tiger-md-bg`, then registered `--tiger-surface`. */
 export const markdownEditorContainerBase =
-  'flex flex-col border border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-md-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-text,#111827)]'
+  'flex flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-md-bg)] text-[var(--tiger-text)]'
 
 export const markdownEditorContainerDisabled = 'opacity-50 cursor-not-allowed'
 
 /** Toolbar fill: optional `--tiger-md-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const markdownEditorToolbarClasses =
-  'flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-md-toolbar-bg,var(--tiger-surface-muted,#f9fafb))]'
+  'flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 border-b border-[var(--tiger-border)] bg-[var(--tiger-md-toolbar-bg)]'
 
 export const markdownEditorToolbarGroupClasses = 'flex flex-wrap items-center gap-1'
 
 export const markdownEditorToolbarButtonBase =
-  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-outline-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--tiger-primary,#2563eb)]'
+  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary)] hover:bg-[var(--tiger-outline-bg-hover)] hover:text-[var(--tiger-text)] disabled:cursor-not-allowed disabled:opacity-50 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--tiger-primary)]'
 
 export const markdownEditorToolbarButtonActive =
-  'bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)]'
+  'bg-[var(--tiger-primary)]/10 text-[var(--tiger-primary)]'
 
 export const markdownEditorToolbarSeparatorClasses =
-  'w-px h-5 mx-1 bg-[var(--tiger-border,#d1d5db)]'
+  'w-px h-5 mx-1 bg-[var(--tiger-border)]'
 
 /** Body fill: same surface chain as the container. */
 export const markdownEditorBodyClasses =
-  'grid flex-1 min-h-0 bg-[var(--tiger-md-bg,var(--tiger-surface,#ffffff))]'
+  'grid flex-1 min-h-0 bg-[var(--tiger-md-bg)]'
 
 export const markdownEditorTextareaClasses =
-  'w-full h-full min-h-0 resize-none border-0 outline-none bg-transparent p-4 font-mono text-sm leading-7 text-[var(--tiger-text,#111827)] placeholder:text-[var(--tiger-text-muted,#9ca3af)] disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary,#2563eb)]'
+  'w-full h-full min-h-0 resize-none border-0 outline-none bg-transparent p-4 font-mono text-sm leading-7 text-[var(--tiger-text)] placeholder:text-[var(--tiger-text-secondary)] disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary)]'
 
 export const markdownEditorPreviewClasses =
-  'h-full min-h-0 overflow-auto p-4 text-sm leading-7 text-[var(--tiger-text,#111827)] [&_a]:text-[var(--tiger-primary,#2563eb)] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--tiger-border,#d1d5db)] [&_blockquote]:pl-3 [&_blockquote]:text-[var(--tiger-text-secondary,#6b7280)] [&_code]:rounded [&_code]:bg-[var(--tiger-surface-muted,#f3f4f6)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.9em] [&_h1]:mb-3 [&_h1]:text-2xl [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_hr]:my-4 [&_hr]:border-[var(--tiger-border,#d1d5db)] [&_img]:max-w-full [&_li]:my-1 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2 [&_pre]:my-3 [&_pre]:overflow-auto [&_pre]:rounded [&_pre]:bg-[var(--tiger-surface-muted,#f3f4f6)] [&_pre]:p-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_table]:my-3 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--tiger-border,#d1d5db)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--tiger-border,#d1d5db)] [&_th]:bg-[var(--tiger-surface-muted,#f9fafb)] [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6'
+  'h-full min-h-0 overflow-auto p-4 text-sm leading-7 text-[var(--tiger-text)] [&_a]:text-[var(--tiger-primary)] [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--tiger-border)] [&_blockquote]:pl-3 [&_blockquote]:text-[var(--tiger-text-secondary)] [&_code]:rounded [&_code]:bg-[var(--tiger-surface-muted)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.9em] [&_h1]:mb-3 [&_h1]:text-2xl [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_hr]:my-4 [&_hr]:border-[var(--tiger-border)] [&_img]:max-w-full [&_li]:my-1 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-2 [&_pre]:my-3 [&_pre]:overflow-auto [&_pre]:rounded [&_pre]:bg-[var(--tiger-surface-muted)] [&_pre]:p-3 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_table]:my-3 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-[var(--tiger-border)] [&_td]:px-2 [&_td]:py-1 [&_th]:border [&_th]:border-[var(--tiger-border)] [&_th]:bg-[var(--tiger-surface-muted)] [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6'
 
-export const markdownEditorEmptyPreviewClasses = 'text-[var(--tiger-text-muted,#9ca3af)]'
+export const markdownEditorEmptyPreviewClasses = 'text-[var(--tiger-text-secondary)]'
 
-export const markdownEditorSplitDividerClasses = 'border-l border-[var(--tiger-border,#d1d5db)]'
+export const markdownEditorSplitDividerClasses = 'border-l border-[var(--tiger-border)]'
 
 function markdownToolbarTooltip(label: string, hotkey?: string): string {
   return hotkey ? `${label} (${hotkey})` : label
@@ -90,10 +88,6 @@ export function createDefaultMarkdownToolbar(
   ]
 }
 
-export const defaultMarkdownToolbar: MarkdownToolbarItem[] = createDefaultMarkdownToolbar(
-  enUS.markdownEditor as Required<TigerLocaleMarkdownEditor>
-)
-
 export function isMarkdownToolbarSeparator(
   item: MarkdownToolbarItem
 ): item is MarkdownToolbarSeparator {
@@ -117,10 +111,34 @@ export function getMarkdownToolbarButtonClasses(active: boolean): string {
     : markdownEditorToolbarButtonBase
 }
 
-export function getMarkdownBodyClasses(mode: MarkdownEditorMode): string {
-  return mode === 'split'
-    ? `${markdownEditorBodyClasses} grid-cols-1 md:grid-cols-2`
+export function getMarkdownBodyClasses(showBoth: boolean): string {
+  return showBoth
+    ? `${markdownEditorBodyClasses} grid-cols-2`
     : `${markdownEditorBodyClasses} grid-cols-1`
+}
+
+/** Narrow split view shows one pane. Wide split shows both. */
+export function resolveMarkdownPanes(
+  mode: MarkdownEditorMode,
+  narrow: boolean,
+  narrowPane: 'edit' | 'preview'
+): { edit: boolean; preview: boolean } {
+  if (mode === 'edit') return { edit: true, preview: false }
+  if (mode === 'preview') return { edit: false, preview: true }
+  if (!narrow) return { edit: true, preview: true }
+  return narrowPane === 'preview' ? { edit: false, preview: true } : { edit: true, preview: false }
+}
+
+export function isMarkdownNarrowViewport(): boolean {
+  return typeof matchMedia === 'function' && matchMedia('(max-width: 767px)').matches
+}
+
+export function subscribeMarkdownNarrow(onChange: () => void): () => void {
+  if (typeof matchMedia !== 'function') return () => undefined
+  const query = matchMedia('(max-width: 767px)')
+  const listener = () => onChange()
+  query.addEventListener?.('change', listener)
+  return () => query.removeEventListener?.('change', listener)
 }
 
 export function escapeMarkdownHtml(value: string): string {
@@ -202,18 +220,15 @@ export function renderMarkdownInline(value: string): string {
     /!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\)/g,
     (_m, alt, src, title) => {
       if (!isValidUrl(src)) return ''
-      const titleAttr = title ? ` title="${escapeAttribute(title)}"` : ''
-      return stashMarkdownSlot(
-        slots,
-        `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}"${titleAttr} />`
-      )
+      const titleAttr = title ? ` title="${title}"` : ''
+      return stashMarkdownSlot(slots, `<img src="${src}" alt="${alt}"${titleAttr} />`)
     }
   )
   html = html.replace(
     /\[([^\]]+)\]\(([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\)/g,
     (_m, text, href, title) => {
       if (!isValidUrl(href)) return text
-      const titleAttr = title ? ` title="${escapeAttribute(title)}"` : ''
+      const titleAttr = title ? ` title="${title}"` : ''
       return stashMarkdownSlot(
         slots,
         `<a href="${escapeAttribute(href)}"${titleAttr} target="_blank" rel="noreferrer">${text}</a>`
@@ -312,7 +327,7 @@ function renderMarkdownBlocks(markdown: string): string {
         index++
       }
       if (index < lines.length) index++
-      const languageClass = language ? ` class="language-${escapeAttribute(language)}"` : ''
+      const languageClass = language ? ` class="language-${escapeMarkdownHtml(language)}"` : ''
       blocks.push(`<pre><code${languageClass}>${escapeMarkdownHtml(code.join('\n'))}</code></pre>`)
       continue
     }

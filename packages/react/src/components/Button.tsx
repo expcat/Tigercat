@@ -1,12 +1,12 @@
 import React, { forwardRef, useMemo } from 'react'
 import {
+  hasAccessibleName,
   resolveButtonClasses,
-  resolveButtonHtmlType,
+  resolveButtonType,
   resolveButtonIconPlacement,
   getButtonIconSlotClasses,
   getButtonSpinnerClasses,
   getSpinnerSVG,
-  omitUnsupportedColorProp,
   warnMissingAccessibleName,
   TIGER_CHROME_ATTR,
   type ButtonHtmlType,
@@ -14,6 +14,7 @@ import {
   type ButtonSize
 } from '@expcat/tigercat-core'
 import { useButtonGroupContext } from './ButtonGroup'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface ButtonProps
   extends
@@ -42,12 +43,17 @@ const createDefaultSpinner = (size: ButtonSize): React.ReactNode => {
   )
 }
 
-function hasLabelContent(children: React.ReactNode): boolean {
-  if (children == null || children === false) return false
-  if (typeof children === 'string' || typeof children === 'number') {
-    return String(children).trim().length > 0
+function visibleButtonText(node: React.ReactNode): string {
+  if (node == null || typeof node === 'boolean') return ''
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(visibleButtonText).join('')
+  if (React.isValidElement(node)) {
+    const props = node.props as { children?: React.ReactNode; 'aria-hidden'?: unknown }
+    const hidden = props['aria-hidden']
+    if (hidden === true || hidden === '' || hidden === 'true') return ''
+    return visibleButtonText(props.children)
   }
-  return React.Children.count(children) > 0
+  return ''
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -60,7 +66,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     icon,
     block = false,
     iconPosition = 'start',
-    htmlType,
     type,
     danger = false,
     onClick,
@@ -74,16 +79,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   },
   ref
 ) {
-  const domRest = omitUnsupportedColorProp('Button', rest as Record<string, unknown>)
+  const domRest = rest
   const group = useButtonGroupContext()
+  const config = useTigerConfig()
   const resolvedSize = size ?? group?.size ?? 'md'
-  const resolvedType = resolveButtonHtmlType(htmlType, type)
-  const hasLabel = hasLabelContent(children)
-  warnMissingAccessibleName('Button', {
-    text: hasLabel ? 'named' : '',
-    ariaLabel,
-    ariaLabelledby
-  })
+  const resolvedType = resolveButtonType(type)
+  const visibleText = visibleButtonText(children).trim()
+  const named = hasAccessibleName({ text: visibleText, ariaLabel, ariaLabelledby })
+  const hasLabel = visibleText.length > 0
 
   const buttonClasses = useMemo(
     () =>
@@ -93,17 +96,25 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         size: resolvedSize,
         disabled,
         loading,
+        joined: group != null,
         block,
         className
       }),
-    [variant, danger, resolvedSize, disabled, loading, block, className]
+    [variant, danger, resolvedSize, disabled, loading, group, block, className]
   )
+
+  if (!named) {
+    warnMissingAccessibleName('Button', { text: '', ariaLabel, ariaLabelledby })
+    return null
+  }
 
   const placement = resolveButtonIconPlacement(iconPosition)
   const slotClass = getButtonIconSlotClasses(placement, hasLabel)
+  const loadingText = config.locale?.common?.loadingText || 'Loading...'
   const chrome = loading ? (
-    <span className={slotClass || undefined} aria-hidden="true">
-      {loadingIcon ?? createDefaultSpinner(resolvedSize)}
+    <span className={slotClass || undefined}>
+      <span className="sr-only">{loadingText}</span>
+      <span aria-hidden="true">{loadingIcon ?? createDefaultSpinner(resolvedSize)}</span>
     </span>
   ) : icon ? (
     <span className={slotClass || undefined} aria-hidden="true">
@@ -128,8 +139,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledby}
       aria-busy={ariaBusyProp ?? (loading ? true : undefined)}
-      aria-disabled={ariaDisabledProp ?? (disabled ? true : undefined)}
-      disabled={disabled || undefined}
+      aria-disabled={ariaDisabledProp ?? (disabled || loading ? true : undefined)}
+      disabled={disabled || loading || undefined}
       onClick={handleClick}
       type={resolvedType}>
       {placement === 'end' ? (

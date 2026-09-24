@@ -20,12 +20,16 @@ import { Pagination } from '@expcat/tigercat-react/Pagination'
 import { Select } from '@expcat/tigercat-react/Select'
 import { TaskBoard } from '@expcat/tigercat-react/TaskBoard'
 import { Transfer } from '@expcat/tigercat-react/Transfer'
+import { expectNoA11yViolations } from '../utils/react'
 
 describe('custom text (no i18n) — React', () => {
   describe('per-component labels prop', () => {
-    it('Pagination uses labels without any locale', () => {
-      render(<Pagination total={100} labels={{ prevPageAriaLabel: 'PREV!' }} />)
+    it('Pagination uses labels without any locale', async () => {
+      const { container } = render(
+        <Pagination total={100} labels={{ prevPageAriaLabel: 'PREV!' }} />
+      )
       expect(screen.getByLabelText('PREV!')).toBeInTheDocument()
+      await expectNoA11yViolations(container)
     })
 
     it('Modal default footer uses labels', () => {

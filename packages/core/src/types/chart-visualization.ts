@@ -188,7 +188,7 @@ export interface HeatmapChartProps
    * Colour interpolation space for cell fills.
    * - `'rgb'` (default): linear hex interpolation between `minColor` and
    *   `maxColor`. Unparseable colours fall back to the default hex range.
-   * - `'oklch'`: emit a CSS `color-mix(in oklch, ...)` expression.
+   * - `'oklch'`: resolve a hex color in Oklab. CSS variables use the paired token.
    * @default 'rgb'
    */
   colorSpace?: 'rgb' | 'oklch'

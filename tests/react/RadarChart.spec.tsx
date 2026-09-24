@@ -204,7 +204,7 @@ describe('RadarChart', () => {
     expect(container.textContent).toContain('0-A')
   })
 
-  it('renders polygon split areas as evenodd rings without a --tiger-bg punch', () => {
+  it('renders polygon split areas as evenodd rings without a --tiger-surface punch', () => {
     const { container } = renderWithProps(RadarChart, {
       data: singleSeriesData,
       showSplitArea: true
@@ -212,9 +212,9 @@ describe('RadarChart', () => {
     const splitAreas = container.querySelectorAll('[data-radar-split-area]')
     expect(splitAreas.length).toBeGreaterThan(0)
     const html = container.innerHTML
-    expect(html).not.toMatch(/--tiger-bg,#fff/i)
-    expect(html).not.toMatch(/--tiger-bg,#ffffff/i)
-    expect(html).not.toMatch(/--tiger-bg,\s*#fff/i)
+    expect(html).not.toMatch(/--tiger-surface,#fff/i)
+    expect(html).not.toMatch(/--tiger-surface,#ffffff/i)
+    expect(html).not.toMatch(/--tiger-surface,\s*#fff/i)
     for (const el of splitAreas) {
       const fill = (el.getAttribute('fill') || '').toLowerCase()
       expect(fill).not.toBe('#fff')
@@ -224,7 +224,7 @@ describe('RadarChart', () => {
         const siblingFill = (sibling.getAttribute('fill') || '').toLowerCase()
         expect(siblingFill).not.toBe('#fff')
         expect(siblingFill).not.toBe('#ffffff')
-        expect(siblingFill).not.toMatch(/--tiger-bg/)
+        expect(siblingFill).not.toMatch(/--tiger-surface/)
       }
     }
     expect(
@@ -232,7 +232,7 @@ describe('RadarChart', () => {
     ).toBeGreaterThan(0)
   })
 
-  it('renders circle split areas as evenodd rings without a --tiger-bg punch', () => {
+  it('renders circle split areas as evenodd rings without a --tiger-surface punch', () => {
     const { container } = renderWithProps(RadarChart, {
       data: singleSeriesData,
       gridShape: 'circle',
@@ -241,9 +241,9 @@ describe('RadarChart', () => {
     const splitAreas = container.querySelectorAll('[data-radar-split-area]')
     expect(splitAreas.length).toBeGreaterThan(0)
     const html = container.innerHTML
-    expect(html).not.toMatch(/--tiger-bg,#fff/i)
-    expect(html).not.toMatch(/--tiger-bg,#ffffff/i)
-    expect(html).not.toMatch(/--tiger-bg,\s*#fff/i)
+    expect(html).not.toMatch(/--tiger-surface,#fff/i)
+    expect(html).not.toMatch(/--tiger-surface,#ffffff/i)
+    expect(html).not.toMatch(/--tiger-surface,\s*#fff/i)
     expect(
       container.querySelectorAll('path[data-radar-split-area][fill-rule="evenodd"]').length
     ).toBeGreaterThan(0)

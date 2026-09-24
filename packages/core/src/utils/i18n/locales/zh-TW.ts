@@ -14,6 +14,9 @@ export const zhTW: TigerLocale = {
     cancelText: '取消',
     closeText: '關閉',
     loadingText: '載入中...',
+    loadingFinishedText: '載入完成',
+    loadingFailedText: '載入失敗',
+    viewText: '查看',
     emptyText: '暫無資料',
     noMoreText: '沒有更多了',
     searchPlaceholder: '搜尋',
@@ -47,7 +50,8 @@ export const zhTW: TigerLocale = {
     ariaLabel: 'QR 碼',
     expiredText: 'QR 碼已過期',
     refreshText: '重新整理',
-    loadingText: '載入中...'
+    loadingText: '載入中...',
+    errorText: '無法產生 QR code'
   },
   marquee: {
     ariaLabel: '滾動內容'
@@ -55,10 +59,25 @@ export const zhTW: TigerLocale = {
   image: {
     previewAriaLabel: '預覽 {alt}',
     previewFallbackAlt: '圖片',
-    groupAriaLabel: '圖片組'
+    groupAriaLabel: '圖片組',
+    loadErrorText: '圖片載入失敗'
   },
   imageCompare: {
-    ariaLabel: '圖片對比'
+    ariaLabel: '圖片對比',
+    beforeAlt: '之前',
+    afterAlt: '之後',
+    valueText: '已露出前圖的 {percent}%'
+  },
+  text: {
+    copyLabel: '複製',
+    copiedLabel: '已複製',
+    copyFailedLabel: '複製失敗',
+  },
+  watermark: {
+    imageErrorText: '浮水印圖片載入失敗'
+  },
+  segmented: {
+    ariaLabel: '選項'
   },
   descriptions: {
     colon: '：'
@@ -67,6 +86,9 @@ export const zhTW: TigerLocale = {
     avatarAlt: '頭像',
     dragHandleAriaLabel: '拖曳排序'
   },
+  masonry: {
+    visualOrderText: '視覺順序與來源順序不同'
+  },
   scrollArea: {
     ariaLabel: '可捲動區域'
   },
@@ -74,7 +96,8 @@ export const zhTW: TigerLocale = {
     pageBreak: '分頁符號'
   },
   timeline: {
-    pendingText: '載入中...'
+    pendingText: '載入中...',
+    pendingReplacedText: '更新完成'
   },
   workflowTimeline: {
     pending: '待處理',
@@ -216,7 +239,11 @@ export const zhTW: TigerLocale = {
     branchExpression: '運算式',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: '此節點類型不使用該設定',
+    publishText: '發佈',
     publishBlocked: '存在阻塞項，無法發佈'
+  },
+  workflowDetailShell: {
+    ariaLabel: '流程詳情'
   },
   progress: {
     ariaLabel: '進度'
@@ -259,7 +286,9 @@ export const zhTW: TigerLocale = {
     loadingText: '載入中',
     expandText: '展開',
     collapseText: '收合',
-    selectAllText: '全選',
+    selectAllText: '全選本頁',
+    selectLoadedText: '全選已載入列',
+    tableAriaLabel: '資料表',
     selectRowAriaLabel: '選擇第 {row} 列',
     sortByText: '依 {column} 排序',
     clearSortText: '不排序',
@@ -275,9 +304,13 @@ export const zhTW: TigerLocale = {
     allText: '全部',
     filterPlaceholder: '篩選...',
     exportCsvText: '匯出 CSV',
-    exportExcelText: '匯出 Excel',
     exportCsvAriaLabel: '匯出為 CSV',
-    exportExcelAriaLabel: '匯出為 Excel',
+    selectionCountText: '已選 {count} 項',
+    sortAnnouncementText: '已按 {column} {direction} 排序',
+    sortAscendingText: '升序',
+    sortDescendingText: '降序',
+    sortNoneText: '未排序',
+    dragRowAriaLabel: '拖曳第 {row} 列',
     expandRowAriaLabel: '展開列',
     collapseRowAriaLabel: '收合列',
     sortMenuAriaLabel: '排序',
@@ -325,14 +358,17 @@ export const zhTW: TigerLocale = {
     nextText: '下一步',
     finishText: '完成',
     closeAriaLabel: '關閉導覽',
-    dialogAriaLabel: '導覽'
+    dialogAriaLabel: '導覽',
+    loadErrorText: '無法載入這次導覽。',
   },
   calendar: {
     previousMonth: '上個月',
     nextMonth: '下個月',
     previousYear: '上一年',
     nextYear: '下一年',
-    eventCountText: '{n} 個行程'
+    eventCountText: '{n} 個行程',
+    switchToYear: '切換到年檢視',
+    switchToMonth: '切換到月檢視'
   },
   fullscreen: {
     enterAriaLabel: '進入全螢幕',
@@ -343,7 +379,8 @@ export const zhTW: TigerLocale = {
     pathAriaLabel: '檔案路徑',
     listboxAriaLabel: '檔案列表',
     searchAriaLabel: '搜尋檔案',
-    emptyText: '空資料夾'
+    emptyText: '空資料夾',
+    resultCountText: '{count} 項'
   },
   imageViewer: {
     dialogAriaLabel: '圖片檢視器',
@@ -377,6 +414,7 @@ export const zhTW: TigerLocale = {
     resizeHandleS: '下',
     resizeHandleSw: '左下',
     resizeHandleW: '左',
+    cropSizeText: '寬 {width}，高 {height}',
     loadingCropImageAriaLabel: '正在載入待裁剪圖片',
     loadErrorAriaLabel: '無法載入待裁剪圖片',
     fileTooLargeText: '檔案大小超過 {maxSize}',
@@ -394,10 +432,14 @@ export const zhTW: TigerLocale = {
     ellipseToolText: '橢圓',
     polygonToolText: '多邊形',
     freehandToolText: '自由繪製',
-    deleteText: '刪除'
+    deleteText: '刪除',
+    annotationLoadFailedText: '圖片載入失敗。',
+    annotationRetryText: '重試',
+    annotationTooSmallText: '標註太小。',
+    annotationPolygonIncompleteText: '多邊形至少需要 3 個點。'
   },
   status: {
-    tagCloseAriaLabel: '關閉標籤',
+    tagCloseAriaLabel: '關閉{label}',
     badgeLabel: '通知',
     badgeCountLabel: '{count} 則通知'
   },
@@ -410,6 +452,7 @@ export const zhTW: TigerLocale = {
     unassignedSwimlaneText: '未分組',
     wipLimitText: 'WIP 限制: {limit}',
     dragHintText: '拖曳以移動',
+    grabAnnouncementText: '{card}。從{from}到{to}。第 {position} 位，共 {count} 位。',
     boardAriaLabel: '任務看板'
   },
   chatWindow: {
@@ -424,7 +467,8 @@ export const zhTW: TigerLocale = {
   code: {
     copyLabel: '複製',
     copiedLabel: '已複製',
-    copyFailedLabel: '複製失敗'
+    copyFailedLabel: '複製失敗',
+    scrollLabel: '程式碼'
   },
   commentThread: {
     emptyText: '暫無評論',
@@ -441,12 +485,15 @@ export const zhTW: TigerLocale = {
     listAriaLabel: '評論列表',
     replySubmitText: '傳送回覆',
     remainingRepliesText: '顯示剩餘 {count} 則',
+    duplicateIdText: '評論 id {id} 重複',
+    cycleText: '評論在 {id} 處成環',
     maxDepthReachedText: '已到最大回覆層'
   },
   activityFeed: {
     emptyText: '暫無動態',
     loadingText: '載入中...',
     listAriaLabel: '動態',
+    newItemText: '新動態：{title}',
     otherGroupTitle: '其他'
   },
   notificationCenter: {
@@ -460,6 +507,9 @@ export const zhTW: TigerLocale = {
     markReadText: '標記已讀',
     markUnreadText: '標記未讀',
     defaultGroupTitle: '預設',
+    filterAriaLabel: '閱讀狀態',
+    markedReadText: '已將 {count} 則標為已讀',
+    newItemText: '新通知：{title}',
     unreadCountText: '{count} 則未讀'
   },
   select: {
@@ -470,7 +520,15 @@ export const zhTW: TigerLocale = {
     clearAriaLabel: '清除選取',
     createOptionLabel: '建立「{label}」',
     moreCountText: '等 {count} 項',
-    loadingText: '載入中...',
+    loadingText: '載入中...'
+  },
+  cascader: {
+    levelLabel: '第 {level} 級',
+    backText: '返回',
+    expandAriaLabel: '展開',
+    collapseAriaLabel: '收合'
+  },
+  treeSelect: {
     levelLabel: '第 {level} 級',
     backText: '返回',
     expandAriaLabel: '展開',
@@ -541,7 +599,22 @@ export const zhTW: TigerLocale = {
     sunburstTooltip: '{label}：{value}（{percent}%）',
     orgChartAriaLabel: '組織架構圖',
     ganttAriaLabel: '甘特圖',
-    ganttTaskAriaLabel: '{label}，{start} 至 {end}{progress}'
+    ganttTaskAriaLabel: '{label}，{start} 至 {end}{progress}',
+    ganttTodayAriaLabel: '今天',
+    ganttUnknownDate: '未知日期',
+    chartAriaLabel: '圖表',
+    lineChartAriaLabel: '折線圖',
+    areaChartAriaLabel: '面積圖',
+    barChartAriaLabel: '長條圖',
+    scatterChartAriaLabel: '散佈圖',
+    pieChartAriaLabel: '圓餅圖',
+    radarChartAriaLabel: '雷達圖',
+    heatmapChartAriaLabel: '熱力圖',
+    heatmapSummary: '{rows} 列 {columns} 欄',
+    funnelChartAriaLabel: '漏斗圖',
+    sunburstChartAriaLabel: '旭日圖',
+    treemapChartAriaLabel: '矩形樹圖',
+    gaugeChartAriaLabel: '儀表板'
   },
   codeEditor: {
     editorAriaLabel: '程式碼編輯器'
@@ -555,6 +628,8 @@ export const zhTW: TigerLocale = {
     editModeLabel: '編輯',
     splitModeLabel: '分欄',
     previewModeLabel: '預覽',
+    showEditorText: '編輯',
+    showPreviewText: '預覽',
     bold: '粗體',
     italic: '斜體',
     strikethrough: '刪除線',
@@ -664,7 +739,9 @@ export const zhTW: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: '移除 {tag}',
-    clearAllLabel: '清空全部標籤'
+    clearAllLabel: '清空全部標籤',
+    duplicateText: '已經添加',
+    limitText: '已達到標籤數量上限'
   },
   input: {
     clearAriaLabel: '清除輸入',
@@ -680,12 +757,6 @@ export const zhTW: TigerLocale = {
     ariaLabel: '滑桿',
     minAriaLabel: '下限',
     maxAriaLabel: '上限'
-  },
-  stepper: {
-    ariaLabel: '步進器',
-    valueAriaLabel: '數值',
-    incrementAriaLabel: '遞增',
-    decrementAriaLabel: '遞減'
   },
   signature: {
     ariaLabel: '簽名板',

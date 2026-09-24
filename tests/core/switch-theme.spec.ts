@@ -7,7 +7,7 @@ describe('switch theme helpers', () => {
 
     expect(classes).toContain('h-7')
     expect(classes).toContain('w-14')
-    expect(classes).toContain('bg-[var(--tiger-primary,#2563eb)]')
+    expect(classes).toContain('bg-[var(--tiger-primary)]')
     expect(classes).toContain('opacity-50')
     expect(classes).toContain('custom-switch')
   })

@@ -53,8 +53,9 @@ export interface SpotlightProps {
   limit?: number
   locale?: Partial<TigerLocale>
   /**
-   * Global toggle chord. `true` (default) is `Meta/Ctrl+K`; `false` disables;
+   * Global toggle chord. Off by default. `true` is `Meta/Ctrl+K`;
    * a string uses the same shortcut grammar as item `shortcut`.
+   * @default false
    */
   hotkey?: boolean | string
 }

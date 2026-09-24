@@ -72,7 +72,7 @@ describe('Countdown', () => {
 
   it('names the root from ariaLabel and keeps the timer as the formatted time', () => {
     render(<Countdown ariaLabel="付款倒计时" value={baseTime + 5000} now={baseTime} />)
-    expect(screen.getByLabelText('付款倒计时')).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: '付款倒计时' })).toBeInTheDocument()
     expect(screen.getByRole('timer')).toHaveTextContent('00:00:05')
   })
 

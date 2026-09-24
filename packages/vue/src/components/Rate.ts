@@ -9,6 +9,8 @@ import {
   rateInactiveColor,
   rateHoverColor,
   rateIsInlineStartHalf,
+  resolveRateCount,
+  rateKeyboardValue,
   starPathD,
   starViewBox,
   classNames,
@@ -16,10 +18,7 @@ import {
   mergeTigerLocale,
   getRateLabels,
   formatRateValueText,
-  resolveReadOnlyFlag,
-  sliderGetKeyboardValue,
   sliderNormalizeValue,
-  getLocaleDirection,
   type TigerLocale,
   type TigerLocaleRate
 } from '@expcat/tigercat-core'
@@ -36,8 +35,7 @@ export const Rate = defineComponent({
     count: { type: Number, default: 5 },
     allowHalf: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    readOnly: { type: Boolean, default: undefined },
-    readonly: { type: Boolean, default: undefined },
+    readOnly: { type: Boolean, default: false },
     size: { type: String as PropType<RateSize>, default: 'md' },
     allowClear: { type: Boolean, default: true },
     character: { type: String, default: undefined },
@@ -56,12 +54,12 @@ export const Rate = defineComponent({
     )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getRateLabels(mergedLocale.value, props.labels))
-    const rtl = computed(() => getLocaleDirection(mergedLocale.value) === 'rtl')
-    const isReadOnly = computed(() => resolveReadOnlyFlag(props.readonly, props.readOnly))
+    const starCount = computed(() => resolveRateCount(props.count))
+    const isReadOnly = computed(() => props.readOnly)
     const locked = computed(() => props.disabled || isReadOnly.value)
     const step = computed(() => (props.allowHalf ? 0.5 : 1))
     const normalized = computed(() =>
-      sliderNormalizeValue(currentValue.value, 0, props.count, step.value)
+      sliderNormalizeValue(currentValue.value, 0, starCount.value, step.value)
     )
 
     watch(
@@ -83,8 +81,9 @@ export const Rate = defineComponent({
     )
 
     function hitValue(index: number, clientX: number, el: HTMLElement): number {
+      const rtl = getComputedStyle(el).direction === 'rtl'
       const half =
-        props.allowHalf && rateIsInlineStartHalf(clientX, el.getBoundingClientRect(), rtl.value)
+        props.allowHalf && rateIsInlineStartHalf(clientX, el.getBoundingClientRect(), rtl)
       return half ? index + 0.5 : index + 1
     }
 
@@ -92,6 +91,8 @@ export const Rate = defineComponent({
       if (locked.value) return
       const val = hitValue(index, e.clientX, e.currentTarget as HTMLElement)
       commitValue(props.allowClear && val === normalized.value ? 0 : val)
+      const root = (e.currentTarget as HTMLElement | null)?.parentElement
+      root?.focus()
     }
 
     function handleMouseMove(index: number, e: MouseEvent) {
@@ -111,15 +112,9 @@ export const Rate = defineComponent({
 
     function handleKeydown(e: KeyboardEvent) {
       if (locked.value) return
-      const next = sliderGetKeyboardValue(
-        e.key,
-        normalized.value,
-        0,
-        props.count,
-        step.value,
-        undefined,
-        rtl.value
-      )
+      const target = e.currentTarget
+      const rtl = target instanceof HTMLElement && getComputedStyle(target).direction === 'rtl'
+      const next = rateKeyboardValue(e.key, normalized.value, starCount.value, step.value, rtl)
       if (next == null) return
       e.preventDefault()
       commitValue(next)
@@ -127,10 +122,10 @@ export const Rate = defineComponent({
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
-      const slotChar = slots.character?.()
-      const isChar = Boolean(slotChar || props.character)
-      const glyph = (extraClass?: string) =>
-        slotChar
+      const isChar = Boolean(slots.character || props.character)
+      const glyph = (extraClass?: string) => {
+        const slotChar = slots.character?.()
+        return slotChar
           ? h('span', { class: classNames(rateCharacterGlyphClasses, extraClass) }, slotChar)
           : isChar
             ? h(
@@ -147,9 +142,10 @@ export const Rate = defineComponent({
                 },
                 [h('path', { d: starPathD })]
               )
+      }
 
       const stars: ReturnType<typeof h>[] = []
-      for (let i = 0; i < props.count; i++) {
+      for (let i = 0; i < starCount.value; i++) {
         const full = displayValue.value >= i + 1
         const half = props.allowHalf && !full && displayValue.value >= i + 0.5
         const isHovering = hoverValue.value > 0
@@ -205,7 +201,7 @@ export const Rate = defineComponent({
           role: 'slider',
           'aria-label': ariaLabel,
           'aria-valuemin': 0,
-          'aria-valuemax': props.count,
+          'aria-valuemax': starCount.value,
           'aria-valuenow': normalized.value,
           'aria-valuetext': valueText,
           'aria-disabled': props.disabled || undefined,

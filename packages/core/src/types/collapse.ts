@@ -42,6 +42,11 @@ export interface CollapseProps {
    */
   ghost?: boolean
   /**
+   * Heading level wrapping each panel title button.
+   * @default 3
+   */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
+  /**
    * Additional CSS classes
    */
   className?: string

@@ -1,14 +1,12 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import {
   classNames,
   collapseExtraClasses,
   collapseHeaderRowClasses,
   collapseHeaderTextClasses,
-  collapseKeyOf,
   collapsePanelContentBaseClasses,
   collapsePanelContentWrapperClasses,
-  createAriaId,
-  createCollapseTransitionController,
+  createAriaIdScope,
   getCollapseIconClasses,
   getCollapsePanelClasses,
   getCollapsePanelHeaderClasses,
@@ -40,13 +38,16 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
   const collapseContext = useCollapseContext()
   const contentRef = useRef<HTMLDivElement | null>(null)
   const headerRef = useRef<HTMLButtonElement | null>(null)
-  const transitionControllerRef = useRef<ReturnType<
-    typeof createCollapseTransitionController
-  > | null>(null)
-  const initialActiveRef = useRef<boolean | null>(null)
-  const headerIdRef = useRef(createAriaId({ prefix: 'tiger-collapse-header' }))
-  const contentIdRef = useRef(createAriaId({ prefix: 'tiger-collapse-content' }))
-  const [controllerReady, setControllerReady] = useState(false)
+  const ariaIdsRef = useRef<{ header: string; content: string } | null>(null)
+  if (ariaIdsRef.current === null) {
+    const ariaIds = createAriaIdScope()
+    ariaIdsRef.current = {
+      header: ariaIds.next({ prefix: 'tiger-collapse-header' }),
+      content: ariaIds.next({ prefix: 'tiger-collapse-content' })
+    }
+  }
+  const headerId = ariaIdsRef.current.header
+  const contentId = ariaIdsRef.current.content
 
   if (!collapseContext) {
     throw new Error('CollapsePanel must be used within a Collapse component')
@@ -55,10 +56,6 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
   const isActive = useMemo(() => {
     return isPanelActive(panelKey, collapseContext.activeKeys)
   }, [panelKey, collapseContext.activeKeys])
-
-  if (initialActiveRef.current === null) {
-    initialActiveRef.current = isActive
-  }
 
   const panelClasses = useMemo(() => {
     return classNames(getCollapsePanelClasses(collapseContext.ghost, className))
@@ -79,7 +76,7 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
   }, [disabled, collapseContext, panelKey])
 
   const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
       if (disabled) {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
@@ -92,8 +89,6 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
         collapseContext.handlePanelClick(panelKey)
         return
       }
-
-      if (!collapseContext.accordion) return
 
       const action =
         event.key === 'ArrowDown'
@@ -108,44 +103,22 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
 
       if (!action) return
       event.preventDefault()
-      collapseContext.moveHeaderFocus(collapseKeyOf(panelKey), action)
+      collapseContext.moveHeaderFocus(event.currentTarget, action)
     },
     [disabled, collapseContext, panelKey]
   )
 
-  useLayoutEffect(() => {
-    if (!contentRef.current) return undefined
-
-    const controller = createCollapseTransitionController(contentRef.current, {
-      expanded: initialActiveRef.current ?? false
-    })
-    transitionControllerRef.current = controller
-    setControllerReady(true)
-
-    return () => {
-      transitionControllerRef.current = null
-      controller.dispose()
-    }
-  }, [])
+  const pendingFocusRestore = useRef(false)
+  const wasActiveRef = useRef(isActive)
+  if (wasActiveRef.current && !isActive && contentRef.current?.contains(document.activeElement)) {
+    pendingFocusRestore.current = true
+  }
+  wasActiveRef.current = isActive
 
   useLayoutEffect(() => {
-    const key = collapseKeyOf(panelKey)
-    collapseContext.registerHeader({
-      key,
-      el: {
-        focus: () => {
-          headerRef.current?.focus()
-        }
-      },
-      disabled
-    })
-    return () => {
-      collapseContext.unregisterHeader(key)
-    }
-  }, [collapseContext, panelKey, disabled])
-
-  useLayoutEffect(() => {
-    transitionControllerRef.current?.update(isActive)
+    if (!pendingFocusRestore.current) return
+    pendingFocusRestore.current = false
+    headerRef.current?.focus()
   }, [isActive])
 
   const arrowIcon = (
@@ -167,47 +140,42 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
     </svg>
   )
 
-  const initialClass = controllerReady
-    ? undefined
-    : initialActiveRef.current
-      ? 'max-h-none opacity-100'
-      : 'max-h-0 opacity-0'
+  const Heading = `h${collapseContext.headingLevel}` as 'h3'
 
   return (
     <div className={panelClasses} style={style}>
       <div className={collapseHeaderRowClasses}>
-        <button
-          ref={headerRef}
-          type="button"
-          id={headerIdRef.current}
-          className={headerClasses}
-          aria-expanded={isActive}
-          aria-controls={contentIdRef.current}
-          aria-disabled={disabled || undefined}
-          onClick={handleClick}
-          onKeyDown={handleKeyDown}>
-          {showArrow && collapseContext.expandIconPosition === 'start' && arrowIcon}
-          <span className={collapseHeaderTextClasses}>{header}</span>
-          {showArrow && collapseContext.expandIconPosition === 'end' && arrowIcon}
-        </button>
+        <Heading className="m-0 min-w-0 flex-1 font-[inherit]">
+          <button
+            ref={headerRef}
+            type="button"
+            id={headerId}
+            data-tiger-collapse-header=""
+            className={headerClasses}
+            aria-expanded={isActive}
+            aria-controls={isActive ? contentId : undefined}
+            aria-disabled={disabled || undefined}
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}>
+            {showArrow && collapseContext.expandIconPosition === 'start' && arrowIcon}
+            <span className={collapseHeaderTextClasses}>{header}</span>
+            {showArrow && collapseContext.expandIconPosition === 'end' && arrowIcon}
+          </button>
+        </Heading>
         {extra ? <span className={collapseExtraClasses}>{extra}</span> : null}
       </div>
 
-      <div
-        ref={contentRef}
-        id={contentIdRef.current}
-        data-tiger-collapse-content=""
-        className={classNames(collapsePanelContentWrapperClasses, initialClass)}
-        role={isActive ? 'region' : undefined}
-        aria-labelledby={isActive ? headerIdRef.current : undefined}
-        {...(!isActive
-          ? {
-              inert: true,
-              'aria-hidden': true
-            }
-          : {})}>
-        <div className={collapsePanelContentBaseClasses}>{children}</div>
-      </div>
+      {isActive ? (
+        <div
+          ref={contentRef}
+          id={contentId}
+          data-tiger-collapse-content=""
+          className={collapsePanelContentWrapperClasses}
+          role="region"
+          aria-labelledby={headerId}>
+          <div className={collapsePanelContentBaseClasses}>{children}</div>
+        </div>
+      ) : null}
     </div>
   )
 }

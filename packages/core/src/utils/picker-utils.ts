@@ -15,6 +15,12 @@ export interface PickerComboboxAriaOptions {
   activeOptionId?: string
   haspopup?: 'listbox' | 'tree'
   autocomplete?: 'list' | 'none'
+  /**
+   * When false, the popup is open but no listbox node is mounted
+   * (loading or empty status). `aria-expanded` stays true; controls and
+   * the active descendant are omitted.
+   */
+  listMounted?: boolean
 }
 
 export interface PickerListboxAriaOptions {
@@ -167,7 +173,8 @@ export function getPickerComboboxAria({
   activeIndex = -1,
   activeOptionId,
   haspopup = 'listbox',
-  autocomplete
+  autocomplete,
+  listMounted = true
 }: PickerComboboxAriaOptions): {
   role: 'combobox'
   'aria-expanded': boolean
@@ -177,18 +184,27 @@ export function getPickerComboboxAria({
   'aria-autocomplete'?: 'list' | 'none'
   'data-state': 'open' | 'closed'
 } {
+  const pointAtList = expanded && listMounted
   return {
     role: 'combobox',
     'aria-expanded': expanded,
     'aria-haspopup': haspopup,
-    'aria-controls': expanded ? listboxId : undefined,
-    'aria-activedescendant': expanded
+    'aria-controls': pointAtList ? listboxId : undefined,
+    'aria-activedescendant': pointAtList
       ? (activeOptionId ??
         (activeIndex >= 0 ? getPickerOptionId(listboxId, activeIndex) : undefined))
       : undefined,
     ...(autocomplete ? { 'aria-autocomplete': autocomplete } : {}),
     'data-state': expanded ? 'open' : 'closed'
   }
+}
+
+/** IME composition must not be treated as a list action. */
+export function isImeCompositionEvent(event: {
+  isComposing?: boolean
+  keyCode?: number
+}): boolean {
+  return Boolean(event.isComposing) || event.keyCode === 229
 }
 
 export function getPickerTreeAria({

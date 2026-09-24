@@ -50,11 +50,17 @@ export const ChartAxis = ({
       {...props}
       className={classNames(className)}
       transform={`translate(${x}, ${y})`}
-      aria-hidden="true">
-      <line {...geometry.axisLine} className={chartAxisLineClasses} data-axis-line="true" />
+      data-axis-orientation={orientation}
+      aria-hidden={undefined}>
+      <line
+        {...geometry.axisLine}
+        className={chartAxisLineClasses}
+        data-axis-line="true"
+        aria-hidden="true"
+      />
       {geometry.ticks.map((tick) => (
         <g key={tick.key} data-axis-tick="true">
-          <line {...tick.line} className={chartAxisTickLineClasses} />
+          <line {...tick.line} className={chartAxisTickLineClasses} aria-hidden="true" />
           <text {...tick.text} className={chartAxisTickTextClasses}>
             {tick.label}
           </text>

@@ -35,7 +35,7 @@ export const Kbd = forwardRef<HTMLElement, KbdProps>(
   ) => {
     const parts = getKbdParts(keys, separator)
     const hasChildren = hasRenderableChildren(children)
-    const accessibleName = resolveKbdAccessibleName(keys, separator, extraKeyText(children))
+    const accessibleName = resolveKbdAccessibleName(keys, separator)
     const isEmpty = !hasChildren && parts.length === 0
 
     return (

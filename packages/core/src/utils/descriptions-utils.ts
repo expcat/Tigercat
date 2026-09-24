@@ -6,13 +6,13 @@ export const descriptionsBaseClasses = 'w-full'
 export const descriptionsWrapperClasses = 'w-full'
 
 export const descriptionsBorderedWrapperClasses =
-  'rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-surface,#ffffff)]'
+  'rounded-[var(--tiger-radius-md)] bg-[var(--tiger-surface)]'
 
 export const descriptionsHeaderClasses = 'flex items-center justify-between mb-4'
 
-export const descriptionsTitleClasses = 'text-lg font-semibold text-[var(--tiger-text,#111827)]'
+export const descriptionsTitleClasses = 'text-lg font-semibold text-[var(--tiger-text)]'
 
-export const descriptionsExtraClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
+export const descriptionsExtraClasses = 'text-sm text-[var(--tiger-text-secondary)]'
 
 export const descriptionsSizeClasses: Record<ComponentSize, string> = {
   sm: 'text-sm',
@@ -23,7 +23,7 @@ export const descriptionsSizeClasses: Record<ComponentSize, string> = {
 export const descriptionsTableClasses = 'w-full border-collapse'
 
 export const descriptionsTableBorderedClasses =
-  'border border-[var(--tiger-border,#e5e7eb)] overflow-hidden rounded-[var(--tiger-radius-md,0.5rem)]'
+  'border border-[var(--tiger-border)] overflow-hidden rounded-[var(--tiger-radius-md)]'
 
 export const descriptionsCellSizeClasses: Record<ComponentSize, string> = {
   sm: 'px-3 py-2',
@@ -32,25 +32,31 @@ export const descriptionsCellSizeClasses: Record<ComponentSize, string> = {
 } as const
 
 export const descriptionsLabelClasses =
-  'w-[1%] whitespace-nowrap align-middle font-medium bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-muted,#6b7280)]'
+  'w-[1%] whitespace-nowrap align-middle font-medium bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
 
-export const descriptionsLabelBorderedClasses = 'border border-[var(--tiger-border,#e5e7eb)]'
+export const descriptionsLabelBorderedClasses = 'border border-[var(--tiger-border)]'
 
-export const descriptionsContentClasses = 'text-[var(--tiger-text,#111827)]'
+export const descriptionsContentClasses = 'text-[var(--tiger-text)]'
 
-export const descriptionsContentBorderedClasses = 'border border-[var(--tiger-border,#e5e7eb)]'
+export const descriptionsContentBorderedClasses = 'border border-[var(--tiger-border)]'
 
 export const descriptionsVerticalGridClasses = 'grid w-full'
 
 export const descriptionsVerticalItemClasses =
-  'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0 min-w-0'
+  'border-b border-[var(--tiger-border)] last:border-b-0 min-w-0'
 
 export const descriptionsVerticalLabelClasses =
-  'whitespace-nowrap font-medium mb-1 text-[var(--tiger-text-muted,#6b7280)]'
+  'whitespace-nowrap font-medium mb-1 text-[var(--tiger-text-secondary)]'
 
-export const descriptionsVerticalContentClasses = 'text-[var(--tiger-text,#111827)]'
+export const descriptionsVerticalContentClasses = 'text-[var(--tiger-text)]'
 
 export const descriptionsCaptionClasses = 'text-start text-lg font-semibold mb-4'
+
+/** Same id contract for Vue `useId` and React `useId`. */
+export function descriptionsTitleDomId(scopeId: string): string {
+  const safe = scopeId.replace(/:/g, '')
+  return `tiger-descriptions-title-${safe}`
+}
 
 export function getDescriptionsClasses(size: ComponentSize, bordered: boolean): string {
   return [

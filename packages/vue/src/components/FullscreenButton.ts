@@ -90,7 +90,7 @@ export const FullscreenButton = defineComponent({
           ),
           'aria-label': label,
           'aria-pressed': fullscreen.isFullscreen.value,
-          disabled: !fullscreen.supported,
+          disabled: fullscreen.supported.value ? undefined : true,
           onClick: () => {
             void fullscreen.toggle()
           }

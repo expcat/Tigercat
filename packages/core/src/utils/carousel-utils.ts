@@ -113,12 +113,17 @@ export function normalizeAutoplayInterval(interval: number): number | null {
   return Number.isFinite(interval) && interval > 0 ? interval : null
 }
 
+/** Pause control visibility. Ignores reduced motion so server and client agree. */
+export function isCarouselAutoplayRequested(autoplay: boolean, interval: number): boolean {
+  return Boolean(autoplay) && normalizeAutoplayInterval(interval) !== null
+}
+
 export function isCarouselAutoplayEnabled(
   autoplay: boolean,
   interval: number,
   reducedMotion = prefersReducedMotion()
 ): boolean {
-  return Boolean(autoplay) && normalizeAutoplayInterval(interval) !== null && !reducedMotion
+  return isCarouselAutoplayRequested(autoplay, interval) && !reducedMotion
 }
 
 export const carouselBaseClasses = 'relative w-full'
@@ -126,7 +131,32 @@ export const carouselBaseClasses = 'relative w-full'
 export const carouselViewportClasses = 'relative overflow-hidden w-full touch-pan-y'
 
 export const carouselTrackScrollClasses =
-  'flex flex-row [direction:ltr] tiger-motion-aware transition-transform ease-in-out'
+  'tiger-carousel-track flex flex-row tiger-motion-aware ease-in-out'
+
+export const carouselTrackInstantClasses = 'tiger-carousel-track-instant'
+
+/** Track motion. Reduced motion wins over a custom duration variable. */
+export const carouselBaseStyles = {
+  '.tiger-carousel-track': {
+    transitionProperty: 'transform',
+    transitionDuration: 'var(--tiger-carousel-duration, var(--tiger-motion-duration-base))',
+    transitionTimingFunction: 'var(--tiger-motion-ease-standard)'
+  },
+  '.tiger-carousel-track-instant': {
+    transitionDuration: '0ms'
+  },
+  '.tiger-carousel-slide': {
+    transitionProperty: 'opacity',
+    transitionDuration: 'var(--tiger-carousel-duration, var(--tiger-motion-duration-base))',
+    transitionTimingFunction: 'var(--tiger-motion-ease-standard)'
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    '.tiger-carousel-track, .tiger-carousel-slide': {
+      transitionDuration: '0ms',
+      transitionDelay: '0ms'
+    }
+  }
+} as const
 
 export const carouselTrackFadeClasses = 'relative'
 
@@ -149,15 +179,15 @@ export const carouselDotsPositionClasses: Record<CarouselDotPosition, string> = 
 }
 
 export const carouselDotClasses =
-  'inline-flex items-center justify-center w-6 h-6 p-0 m-0 border-0 bg-transparent cursor-pointer rounded-full tiger-motion-aware transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'inline-flex items-center justify-center w-6 h-6 p-0 m-0 border-0 bg-transparent cursor-pointer rounded-full tiger-motion-aware transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
 export const carouselDotMarkClasses =
-  'block w-3 h-3 rounded-full pointer-events-none bg-[var(--tiger-text,#111827)]/40 tiger-motion-aware transition-[background-color,transform] duration-200'
+  'block w-3 h-3 rounded-full pointer-events-none bg-[var(--tiger-text)]/40 tiger-motion-aware transition-[background-color,transform] duration-200'
 
-export const carouselDotActiveClasses = 'bg-[var(--tiger-text,#111827)] scale-110'
+export const carouselDotActiveClasses = 'bg-[var(--tiger-text)] scale-110'
 
 export const carouselArrowBaseClasses =
-  'absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-[var(--tiger-surface,#ffffff)]/90 text-[var(--tiger-text,#111827)] cursor-pointer tiger-motion-aware transition-[background-color,opacity] duration-200 hover:bg-[var(--tiger-surface,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 border-0'
+  'absolute top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-[var(--tiger-surface)]/90 text-[var(--tiger-text)] cursor-pointer tiger-motion-aware transition-[background-color,opacity] duration-200 hover:bg-[var(--tiger-surface)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 border-0'
 
 export const carouselPrevArrowClasses = 'start-4'
 
@@ -166,7 +196,7 @@ export const carouselNextArrowClasses = 'end-4'
 export const carouselArrowDisabledClasses = 'opacity-50 cursor-not-allowed pointer-events-none'
 
 export const carouselPauseButtonClasses =
-  'absolute top-4 end-4 z-10 inline-flex items-center justify-center min-h-6 min-w-6 px-2 py-1 rounded-md text-xs font-medium bg-[var(--tiger-surface,#ffffff)]/90 text-[var(--tiger-text,#111827)] cursor-pointer border-0 tiger-motion-aware transition-[background-color,opacity] duration-200 hover:bg-[var(--tiger-surface,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'absolute top-4 end-4 z-10 inline-flex items-center justify-center min-h-6 min-w-6 px-2 py-1 rounded-md text-xs font-medium bg-[var(--tiger-surface)]/90 text-[var(--tiger-text)] cursor-pointer border-0 tiger-motion-aware transition-[background-color,opacity] duration-200 hover:bg-[var(--tiger-surface)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
 export function getCarouselContainerClasses(className?: string): string {
   return className ? `${carouselBaseClasses} ${className}` : carouselBaseClasses
@@ -300,11 +330,21 @@ export function getCarouselLoopTarget(
   return { displayIndex: to + 1, logicalIndex: to, needsSnap: false }
 }
 
-export function getScrollTransform(displayIndex: number, dir?: string | null): string {
+/**
+ * Move the track along the inline axis. The track follows `dir`, so RTL does
+ * not force LTR and does not flip the sign. The next page sits at the inline
+ * end and enters along the reading direction.
+ */
+export function getScrollTransform(displayIndex: number, _dir?: string | null): string {
   const offset = (Number.isFinite(displayIndex) ? displayIndex : 0) * 100
-  const sign = isCarouselRtl(dir) ? '' : '-'
-  return `translateX(${sign}${offset}%)`
+  return `translateX(-${offset}%)`
 }
+
+export function formatCarouselSlideStatus(template: string, index: number, total: number): string {
+  return template.replace(/\{index\}/g, String(index + 1)).replace(/\{total\}/g, String(total))
+}
+
+export const carouselStatusClasses = 'sr-only'
 
 export function getCarouselTouchPoint(
   touches: ArrayLike<{ clientX: number; clientY: number }> | null | undefined

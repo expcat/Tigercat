@@ -35,26 +35,26 @@ describe('navigation-menu-utils', () => {
       expect(isNavigationMenuValueOpen('products', 'docs')).toBe(false)
     })
 
-    it('treats 1 and "1" as the same open item', () => {
-      expect(isNavigationMenuValueOpen('1', 1)).toBe(true)
-      expect(isNavigationMenuValueOpen(1, '1')).toBe(true)
+    it('keeps 1 and "1" as different open items', () => {
+      expect(isNavigationMenuValueOpen('1', 1)).toBe(false)
+      expect(isNavigationMenuValueOpen(1, '1')).toBe(false)
       expect(isNavigationMenuValueOpen(1, 1)).toBe(true)
       expect(isNavigationMenuValueOpen(1, 2)).toBe(false)
     })
 
-    it('honours a controlled open=false overlay', () => {
+    it('uses the open value and treats an empty value as closed', () => {
       expect(
         resolveNavigationMenuOpenValue({
           value: 'products',
-          internalValue: 'products',
-          open: false
-        })
-      ).toBeNull()
-      expect(
-        resolveNavigationMenuOpenValue({
-          internalValue: 'products'
+          internalValue: 'docs'
         })
       ).toBe('products')
+      expect(
+        resolveNavigationMenuOpenValue({
+          value: null,
+          internalValue: 'products'
+        })
+      ).toBeNull()
     })
   })
 

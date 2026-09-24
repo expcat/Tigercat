@@ -15,14 +15,17 @@ import type { DataExportFormat, DataExportOptions } from '../types/data-export'
 import { isBrowser } from './env'
 import { downloadBrowserFile } from './file-utils'
 import { devWarn } from './dev-warn'
+import { isAllowedLinkUrl } from './link-utils'
 import {
-  DATA_EXPORT_SOFT_CELL_LIMIT,
+  assertDataExportCellCount,
+  dataExportCellText,
   escapeCsvValue,
   getDataExportCellValue,
   isDataExportFormat,
   resolveDataExportColumns,
   resolveDataExportFilename,
-  sanitizeDataExportText
+  toDataExportCell,
+  yieldDataExportFrame
 } from './data-export-value'
 
 function getCellValue<T>(
@@ -202,13 +205,12 @@ const XLSX_STYLES = `${XML_DECLARATION}
 
 function buildSheetCell(value: unknown, columnIndex: number, rowNumber: number): string {
   const ref = `${columnLetter(columnIndex)}${rowNumber}`
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return `<c r="${ref}"><v>${value}</v></c>`
+  const cell = toDataExportCell(value)
+  if (cell.kind === 'number') {
+    return `<c r="${ref}"><v>${cell.value}</v></c>`
   }
-
-  const str = sanitizeDataExportText(value)
-  if (str === '') return ''
-  return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${escapeXml(str)}</t></is></c>`
+  if (cell.value === '') return ''
+  return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${escapeXml(cell.value)}</t></is></c>`
 }
 
 /**
@@ -220,6 +222,7 @@ export function exportDataToXlsx<T>(
   options?: DataExportOptions<T>
 ): Uint8Array {
   const exportColumns = resolveExportColumns(columns, data, options)
+  assertDataExportCellCount(exportColumns.length, data.length)
   const headerCells = exportColumns
     .map((column, index) => buildSheetCell(column.title, index, 1))
     .join('')
@@ -255,8 +258,12 @@ export function exportDataToXlsx<T>(
 // --- Markdown ---
 
 function escapeMarkdownCell(value: unknown): string {
-  const str = value === null || value === undefined ? '' : String(value)
-  return str.replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, '<br>')
+  let str = dataExportCellText(toDataExportCell(value))
+  str = str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  str = str.replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ')
+  return str.replace(/\[([^\]]*)\]\(([^)]*)\)/g, (_match, text: string, url: string) =>
+    isAllowedLinkUrl(url) ? `[${text}](${url})` : text
+  )
 }
 
 function markdownSeparator(align?: TableColumn['align']): string {
@@ -274,6 +281,7 @@ export function exportDataToMarkdown<T>(
   options?: DataExportOptions<T>
 ): string {
   const exportColumns = resolveExportColumns(columns, data, options)
+  assertDataExportCellCount(exportColumns.length, data.length)
   const header = `| ${exportColumns.map((column) => escapeMarkdownCell(column.title)).join(' | ')} |`
   const separator = `| ${exportColumns.map((column) => markdownSeparator(column.align)).join(' | ')} |`
   const rows = data.map(
@@ -295,6 +303,7 @@ export function exportDataToCsv<T>(
   options?: DataExportOptions<T>
 ): string {
   const exportColumns = resolveExportColumns(columns, data, options)
+  assertDataExportCellCount(exportColumns.length, data.length)
   const headers = exportColumns.map((column) => escapeCsvValue(column.title))
   const rows = data.map((record) =>
     exportColumns.map((column) => escapeCsvValue(getCellValue(record, column, options))).join(',')
@@ -354,25 +363,90 @@ export interface RunDataExportInput<T = Record<string, unknown>> extends DataExp
   fileName?: string
 }
 
+/** Rows written between main-thread yields. */
+export const DATA_EXPORT_CHUNK_ROWS = 200
+
+async function yieldBetweenExportChunks(index: number): Promise<void> {
+  if (index > 0 && index % DATA_EXPORT_CHUNK_ROWS === 0) await yieldDataExportFrame()
+}
+
+async function exportDataYielding<T>(
+  columns: TableColumn<T>[],
+  data: T[],
+  format: DataExportFormat,
+  options?: DataExportOptions<T>
+): Promise<Uint8Array | string> {
+  await yieldDataExportFrame()
+  if (format === 'csv') {
+    const headers = columns.map((column) => escapeCsvValue(column.title))
+    const rows: string[] = []
+    for (let index = 0; index < data.length; index++) {
+      await yieldBetweenExportChunks(index)
+      rows.push(
+        columns.map((column) => escapeCsvValue(getCellValue(data[index]!, column, options))).join(',')
+      )
+    }
+    return `\uFEFF${[headers.join(','), ...rows].join('\r\n')}`
+  }
+  if (format === 'markdown') {
+    const header = `| ${columns.map((column) => escapeMarkdownCell(column.title)).join(' | ')} |`
+    const separator = `| ${columns.map((column) => markdownSeparator(column.align)).join(' | ')} |`
+    const rows: string[] = []
+    for (let index = 0; index < data.length; index++) {
+      await yieldBetweenExportChunks(index)
+      rows.push(
+        `| ${columns
+          .map((column) => escapeMarkdownCell(getCellValue(data[index]!, column, options)))
+          .join(' | ')} |`
+      )
+    }
+    return [header, separator, ...rows].join('\n')
+  }
+
+  const headerCells = columns
+    .map((column, index) => buildSheetCell(column.title, index, 1))
+    .join('')
+  const rows = [`<row r="1">${headerCells}</row>`]
+  for (let index = 0; index < data.length; index++) {
+    await yieldBetweenExportChunks(index)
+    const rowNumber = index + 2
+    const cells = columns
+      .map((column, columnIndex) =>
+        buildSheetCell(getCellValue(data[index]!, column, options), columnIndex, rowNumber)
+      )
+      .join('')
+    rows.push(`<row r="${rowNumber}">${cells}</row>`)
+  }
+  const sheetXml = `${XML_DECLARATION}
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${rows.join('')}</sheetData></worksheet>`
+  const workbookXml = `${XML_DECLARATION}
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="${escapeXml(sanitizeSheetName(options?.sheetName))}" sheetId="1" r:id="rId1"/></sheets></workbook>`
+  const encoder = new TextEncoder()
+  return buildStoredZip([
+    { name: '[Content_Types].xml', data: encoder.encode(XLSX_CONTENT_TYPES) },
+    { name: '_rels/.rels', data: encoder.encode(XLSX_ROOT_RELS) },
+    { name: 'xl/workbook.xml', data: encoder.encode(workbookXml) },
+    { name: 'xl/_rels/workbook.xml.rels', data: encoder.encode(XLSX_WORKBOOK_RELS) },
+    { name: 'xl/styles.xml', data: encoder.encode(XLSX_STYLES) },
+    { name: 'xl/worksheets/sheet1.xml', data: encoder.encode(sheetXml) }
+  ])
+}
+
 /**
  * Serialize and download one format. Unknown formats warn and throw.
+ * Over the cell cap this rejects so the caller is told, not only warned.
+ * Row serialization yields the main thread between chunks.
  */
-export function runDataExport<T>(input: RunDataExportInput<T>): DataExportFormat {
+export async function runDataExport<T>(input: RunDataExportInput<T>): Promise<DataExportFormat> {
   if (!isDataExportFormat(input.format)) {
     devWarn('DataExport.format', `Unknown export format "${String(input.format)}"`)
     throw new Error(`Unknown export format: ${String(input.format)}`)
   }
 
   const columns = resolveDataExportColumns(input.columns, input.dataSource, input.hiddenColumnKeys)
-  const cellCount = columns.length * (input.dataSource.length + 1)
-  if (cellCount > DATA_EXPORT_SOFT_CELL_LIMIT) {
-    devWarn(
-      'DataExport.size',
-      `Export has ${cellCount} cells; files above ${DATA_EXPORT_SOFT_CELL_LIMIT} may be slow or fail to open`
-    )
-  }
+  assertDataExportCellCount(columns.length, input.dataSource.length)
 
-  const content = exportData(columns, input.dataSource, input.format, {
+  const content = await exportDataYielding(columns, input.dataSource, input.format, {
     sheetName: input.sheetName,
     cellFormatter: input.cellFormatter
   })

@@ -1,6 +1,7 @@
 import { defineComponent, h, onBeforeUnmount, PropType, ref, watch, type VNodeChild } from 'vue'
 import {
-  composeComponentClasses,
+  classNames,
+  coerceClassValue,
   createDocumentDragSession,
   getImageCompareAfterClasses,
   getImageCompareBeforeClasses,
@@ -16,7 +17,9 @@ import {
   getImageComparePositionFromPointer,
   getImageCompareRootClasses,
   getImageCompareRootStyle,
-  isImageCompareInteractiveTarget,
+  isImageCompareHandleTarget,
+  resolveImageCompareAlt,
+  formatImageCompareValueText,
   isImageCompareVertical,
   mergeStyleValues,
   resolveImageCompareAriaLabel,
@@ -252,7 +255,7 @@ export const ImageCompare = defineComponent({
     const startDrag = (event: PointerEvent): void => {
       if (props.disabled) return
       if (event.button !== 0) return
-      if (isImageCompareInteractiveTarget(event.target, handleRef.value)) return
+      if (!isImageCompareHandleTarget(event.target, handleRef.value)) return
 
       event.preventDefault()
       const point = getImageComparePointerClientPoint(event)
@@ -333,13 +336,13 @@ export const ImageCompare = defineComponent({
           ...restAttrs,
           ref: rootRef,
           dir,
-          class: composeComponentClasses(
+          class: classNames(
             getImageCompareRootClasses({
               orientation,
               disabled: props.disabled,
               className: props.className
             }),
-            attrsRecord.class
+            coerceClassValue(attrsRecord.class)
           ),
           style: mergeStyleValues(
             getImageCompareRootStyle({
@@ -367,7 +370,7 @@ export const ImageCompare = defineComponent({
               class: getImageCompareAfterClasses(),
               'data-image-compare-after': ''
             },
-            [renderPaneContent(slots.after, props.afterSrc, props.afterAlt)]
+            [renderPaneContent(slots.after, props.afterSrc, resolveImageCompareAlt(props.afterAlt, labels.afterAlt))]
           ),
           h(
             'div',
@@ -376,7 +379,7 @@ export const ImageCompare = defineComponent({
               style: getImageCompareClipStyle(position, orientation, step, rtl),
               'data-image-compare-before': ''
             },
-            [renderPaneContent(slots.before, props.beforeSrc, props.beforeAlt)]
+            [renderPaneContent(slots.before, props.beforeSrc, resolveImageCompareAlt(props.beforeAlt, labels.beforeAlt))]
           ),
           h(
             'div',
@@ -396,7 +399,7 @@ export const ImageCompare = defineComponent({
               'aria-valuemin': 0,
               'aria-valuemax': 100,
               'aria-valuenow': position,
-              'aria-valuetext': `${position}%`,
+              'aria-valuetext': formatImageCompareValueText(labels.valueText, position),
               'aria-orientation': vertical ? 'vertical' : 'horizontal',
               'aria-disabled': props.disabled,
               onKeydown: (event: KeyboardEvent) => {

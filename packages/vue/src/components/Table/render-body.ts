@@ -6,6 +6,7 @@ import {
   getTableCellClasses,
   getTableFixedCellClasses,
   getFixedColumnStyle,
+  TABLE_FIXED_CELL_Z_INDEX,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   getExpandedRowClasses,
@@ -20,6 +21,9 @@ import {
   resolveTableExpandSlot,
   formatTableSelectRowAriaLabel,
   formatTableGroupHeaderText,
+  isEscapeKey,
+  tableRowDragHandleClasses,
+  tableRowKeyId,
   tableVirtualSpacerCellClasses,
   type TableVirtualWindow,
   type TigerLocaleTable
@@ -35,6 +39,8 @@ export function renderTableBody(
     interactiveRows?: boolean
     virtualWindow?: TableVirtualWindow
     selectionName?: string
+    activeRowIndex?: number
+    onActiveRowIndex?: (index: number) => void
   },
   slots: Slots,
   labels: Required<TigerLocaleTable>
@@ -129,8 +135,11 @@ export function renderTableBody(
   function renderDataRow(record: Record<string, unknown>, index: number): VNodeChild {
     const sourceIndex = ctx.pageSourceIndices.value[index] ?? index
     const key = ctx.paginatedRowKeys.value[index]
-    const isSelected = ctx.selectedRowKeySet.value.has(key)
-    const isExpanded = ctx.expandedRowKeySet.value.has(key)
+    const isSelected = ctx.selectedRowKeySet.value.has(tableRowKeyId(key))
+    const isExpanded = ctx.expandedRowKeySet.value.has(tableRowKeyId(key))
+    const rowLabel =
+      props.rowSelection?.getRowLabel?.(record, index + 1) ??
+      formatTableSelectRowAriaLabel(labels.selectRowAriaLabel, index + 1)
     const isRowExpandable = props.expandable
       ? props.expandable.rowExpandable
         ? props.expandable.rowExpandable(record)
@@ -183,10 +192,7 @@ export function renderTableBody(
               value: key,
               modelValue: isSelected,
               disabled: checkboxProps.disabled,
-              'aria-label': formatTableSelectRowAriaLabel(
-                labels.selectRowAriaLabel,
-                sourceIndex + 1
-              ),
+              'aria-label': rowLabel,
               onChange: (checked: boolean) => {
                 if (checked) ctx.handleSelectRow(key, true)
               }
@@ -195,10 +201,7 @@ export function renderTableBody(
               size: 'sm',
               modelValue: isSelected,
               disabled: checkboxProps.disabled,
-              'aria-label': formatTableSelectRowAriaLabel(
-                labels.selectRowAriaLabel,
-                sourceIndex + 1
-              ),
+              'aria-label': rowLabel,
               onChange: (checked: boolean) => ctx.handleSelectRow(key, checked)
             })
       ]
@@ -214,7 +217,7 @@ export function renderTableBody(
       const dataKey = column.dataKey || column.key
       const cellValue = record[dataKey]
 
-      const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, 10)
+      const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, TABLE_FIXED_CELL_Z_INDEX)
 
       const widthStyle = column.width
         ? {
@@ -253,7 +256,12 @@ export function renderTableBody(
             onBlur: () => ctx.commitEdit(),
             onKeydown: (e: KeyboardEvent) => {
               if (e.key === 'Enter') ctx.commitEdit()
-              if (e.key === 'Escape') ctx.cancelEdit()
+              if (isEscapeKey(e)) {
+                e.preventDefault()
+                e.stopPropagation()
+                e.stopImmediatePropagation()
+                ctx.cancelEdit()
+              }
             }
           })
         : (slots[`cell-${column.key}`]?.({ record, index: sourceIndex }) ??
@@ -280,6 +288,27 @@ export function renderTableBody(
       )
     })
 
+    if (props.rowDraggable) {
+      cells.unshift(
+        h('td', { class: getCheckboxCellClasses(props.size) }, [
+          h(
+            'button',
+            {
+              type: 'button',
+              class: tableRowDragHandleClasses,
+              draggable: 'true',
+              'aria-label': formatTableSelectRowAriaLabel(labels.dragRowAriaLabel, index + 1),
+              onDragstart: (event: DragEvent) => {
+                event.stopPropagation()
+                ctx.handleRowDragStart(key)
+              }
+            },
+            '::'
+          )
+        ])
+      )
+    }
+
     cells.push(...chrome.trailing.map((slot) => chromeTd(slot)))
 
     const rowNode = h(
@@ -292,18 +321,27 @@ export function renderTableBody(
           ctx.fixedColumnsInfo.value.hasFixedColumns && 'group'
         ),
         'aria-selected': props.rowSelection ? isSelected : undefined,
-        tabindex: props.interactiveRows && !hasRowControls ? 0 : undefined,
-        onKeydown:
-          props.interactiveRows && !hasRowControls
-            ? (e: KeyboardEvent) => {
-                if (e.target !== e.currentTarget) return
-                if (isActivationKey(e)) {
-                  e.preventDefault()
-                  ctx.handleRowClick(record, sourceIndex, key)
-                }
+        'data-tiger-table-page-index': index,
+        tabindex: hasRowControls ? undefined : index === (props.activeRowIndex ?? 0) ? 0 : -1,
+        onKeydown: hasRowControls
+          ? undefined
+          : (e: KeyboardEvent) => {
+              if (e.target !== e.currentTarget) return
+              if (isActivationKey(e) && props.interactiveRows) {
+                e.preventDefault()
+                ctx.handleRowClick(record, sourceIndex, key)
+                return
               }
-            : undefined,
-        draggable: props.rowDraggable ? 'true' : undefined
+              if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+              e.preventDefault()
+              const next = e.key === 'ArrowDown' ? index + 1 : index - 1
+              if (next < 0 || next >= ctx.paginatedData.value.length) return
+              props.onActiveRowIndex?.(next)
+              const row = (e.currentTarget as HTMLElement).parentElement?.querySelector(
+                `tr[data-tiger-table-page-index="${next}"]`
+              ) as HTMLElement | null
+              row?.focus()
+            }
       },
       cells
     )
@@ -339,30 +377,32 @@ export function renderTableBody(
     return rowNode
   }
 
-  if (ctx.groupedData.value) {
+  if (ctx.groupBlocks.value) {
     const groupRows: VNodeChild[] = []
-    for (const [groupKey, groupItems] of ctx.groupedData.value) {
-      groupRows.push(
-        h('tr', { key: `group-${groupKey}`, class: tableGroupHeaderClasses }, [
-          h(
-            'td',
-            {
-              colspan: ctx.totalColumnCount.value,
-              class: getGroupHeaderCellClasses(props.size)
-            },
-            formatTableGroupHeaderText(labels.groupHeaderText, groupKey, groupItems.length)
-          )
-        ])
-      )
-      groupItems.forEach((record, i) => {
-        const globalIndex = ctx.paginatedData.value.indexOf(record)
-        const result = renderDataRow(record, globalIndex >= 0 ? globalIndex : i)
-        if (Array.isArray(result)) {
-          groupRows.push(...result)
-        } else {
-          groupRows.push(result)
-        }
-      })
+    let rowCursor = 0
+    for (const block of ctx.groupBlocks.value) {
+      if (!block.continued) {
+        groupRows.push(
+          h('tr', { key: `group-${block.key}`, class: tableGroupHeaderClasses }, [
+            h(
+              'td',
+              {
+                colspan: ctx.totalColumnCount.value,
+                class: getGroupHeaderCellClasses(props.size)
+              },
+              formatTableGroupHeaderText(labels.groupHeaderText, block.key, block.count)
+            )
+          ])
+        )
+      }
+      for (const record of block.records) {
+        const pageIndex = ctx.paginatedData.value.indexOf(record, rowCursor)
+        const index = pageIndex >= 0 ? pageIndex : rowCursor
+        rowCursor = index + 1
+        const result = renderDataRow(record, index)
+        if (Array.isArray(result)) groupRows.push(...result)
+        else groupRows.push(result)
+      }
     }
     return h('tbody', delegatedBodyHandlers, groupRows)
   }

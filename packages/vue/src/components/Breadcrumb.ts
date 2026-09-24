@@ -11,8 +11,10 @@ import {
   type VNode,
   type VNodeChild
 } from 'vue'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
   classNames,
+  resolveLinkAddress,
   coerceClassValue,
   mergeStyleValues,
   breadcrumbContainerClasses,
@@ -28,12 +30,11 @@ import {
   resolveBreadcrumbItemCurrent,
   mergeTigerLocale,
   getBreadcrumbLabels,
-  chevronLeftSolidIcon20PathD,
-  icon20ViewBox,
   type BreadcrumbSeparator,
   type TigerLocale,
   type TigerLocaleBreadcrumb
 } from '@expcat/tigercat-core'
+import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -124,18 +125,18 @@ export const BreadcrumbItem = defineComponent({
       const iconElement = props.icon ? h('span', { class: 'inline-flex' }, props.icon) : null
       const contentElements = iconElement ? [iconElement, ...children] : children
       const linkClasses = getBreadcrumbLinkClasses(isCurrent.value)
-      const computedRel = props.target === '_blank' ? 'noopener noreferrer' : undefined
+      const address = resolveLinkAddress({ href: props.href, target: props.target })
       let control: VNode
       if (isCurrent.value) {
         control = h('span', { class: linkClasses, 'aria-current': 'page' }, contentElements)
-      } else if (props.href) {
+      } else if (address.href) {
         control = h(
           'a',
           {
             class: linkClasses,
-            href: props.href,
-            target: props.target,
-            rel: computedRel,
+            href: address.href,
+            target: address.target,
+            rel: address.rel,
             onClick: handleClick
           },
           contentElements

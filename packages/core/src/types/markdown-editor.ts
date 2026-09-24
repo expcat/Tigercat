@@ -3,6 +3,7 @@
  */
 
 import type { TigerLocale, TigerLocaleMarkdownEditor } from './locale'
+import type { ToolbarIcon } from './rich-text-editor'
 
 /** Editor display mode */
 export type MarkdownEditorMode = 'edit' | 'split' | 'preview'
@@ -41,10 +42,8 @@ export interface MarkdownInsertResult {
 export interface MarkdownToolbarButton {
   name: MarkdownToolbarAction | string
   label: string
-  /**
-   * Optional icon HTML. TRUSTED — injected with innerHTML.
-   */
-  icon?: string
+  /** Optional icon path. Rendered as an SVG path, not HTML. */
+  icon?: ToolbarIcon
   tooltip?: string
   hotkey?: string
   action?: (selection: MarkdownSelection) => MarkdownInsertResult
@@ -59,9 +58,8 @@ export interface MarkdownToolbarSeparator {
 export type MarkdownToolbarItem = MarkdownToolbarButton | MarkdownToolbarSeparator
 
 /**
- * Pluggable markdown preview renderer. Return value is still passed
- * through `sanitizeHtml`. Treat custom renderers as TRUSTED if you
- * disable sanitisation at the call site.
+ * Pluggable markdown preview renderer. The returned string always passes
+ * through `sanitizeHtml` before it is shown.
  */
 export interface MarkdownRenderer {
   render: (markdown: string) => string

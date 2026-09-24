@@ -121,11 +121,6 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
       { key: 'radio', path: '/radio', label: { 'zh-CN': 'Radio 单选框', 'en-US': 'Radio' } },
       { key: 'switch', path: '/switch', label: { 'zh-CN': 'Switch 开关', 'en-US': 'Switch' } },
       { key: 'slider', path: '/slider', label: { 'zh-CN': 'Slider 滑块', 'en-US': 'Slider' } },
-      {
-        key: 'stepper',
-        path: '/stepper',
-        label: { 'zh-CN': 'Stepper 步进器', 'en-US': 'Stepper' }
-      },
       { key: 'select', path: '/select', label: { 'zh-CN': 'Select 选择器', 'en-US': 'Select' } },
       {
         key: 'auto-complete',

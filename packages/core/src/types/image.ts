@@ -11,9 +11,8 @@ import type { TigerLocale } from './locale'
 export type ImageFit = 'contain' | 'cover' | 'fill' | 'none' | 'scale-down'
 
 /**
- * How the image preview is triggered.
- * - `click`: opens the full-screen preview viewer on click (default).
- * - `hover`: shows an enlarged floating preview overlay on hover.
+ * Kept as a type alias for hover-zoom placement helpers. Fullscreen preview
+ * and hover zoom are separate boolean switches.
  */
 export type ImagePreviewTrigger = 'click' | 'hover'
 
@@ -35,16 +34,12 @@ export interface CropRect {
  * Result returned by the cropper after cropping
  */
 export interface CropResult {
-  /** The canvas element with the cropped image */
-  canvas: HTMLCanvasElement
-  /** Blob of the cropped image */
+  /** Blob of the cropped image. Output edge length is capped. */
   blob: Blob
-  /** Data URL of the cropped image */
-  dataUrl: string
   /** The crop rectangle used */
   cropRect: CropRect
   /** File built from `blob`. CropUpload sets `name` to the original filename. */
-  file: File
+  file?: File
 }
 
 /**
@@ -104,18 +99,17 @@ export interface ImageProps {
   fallbackSrc?: string
 
   /**
-   * Whether the image triggers preview
-   * @default true
+   * Whether an explicit preview action opens the fullscreen viewer.
+   * The bitmap itself stays an image and keeps `alt`.
+   * @default false
    */
   preview?: boolean
 
   /**
-   * How the preview is triggered when `preview` is enabled.
-   * - `click`: full-screen viewer on click (default).
-   * - `hover`: enlarged floating overlay on hover.
-   * @default 'click'
+   * Enlarged floating overlay on hover. Independent of `preview`.
+   * @default false
    */
-  previewTrigger?: ImagePreviewTrigger
+  zoomOnHover?: boolean
 
   /**
    * Whether to lazy load the image using IntersectionObserver
@@ -262,22 +256,6 @@ export interface ImagePreviewProps extends ImageViewerBaseProps {
    * Additional CSS classes on the dialog root.
    */
   className?: string
-}
-
-/**
- * Public ImageViewer surface. Same chrome as ImagePreview.
- * `minZoom` / `maxZoom` map onto `minScale` / `maxScale`.
- */
-export interface ImageViewerProps extends ImagePreviewProps {
-  /**
-   * Alias of `minScale`. Prefer `minScale` on new call sites.
-   */
-  minZoom?: number
-
-  /**
-   * Alias of `maxScale`. Prefer `maxScale` on new call sites.
-   */
-  maxZoom?: number
 }
 
 /**

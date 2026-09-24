@@ -6,10 +6,10 @@ import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/vue'
 import { Divider } from '@expcat/tigercat-vue/Divider'
 import { Space } from '@expcat/tigercat-vue/Space'
-import { renderWithProps } from '../utils'
+import { expectNoA11yViolations, renderWithProps } from '../utils'
 
 function getRoot(container: HTMLElement): HTMLElement {
-  return container.querySelector('[role="separator"]') as HTMLElement
+  return container.querySelector('[data-tiger-divider]') as HTMLElement
 }
 
 describe('Divider (Vue)', () => {
@@ -17,7 +17,13 @@ describe('Divider (Vue)', () => {
     const { container } = render(Divider)
     const divider = getRoot(container)
     expect(divider).toBeInTheDocument()
-    expect(divider).toHaveAttribute('aria-orientation', 'horizontal')
+    expect(divider).toHaveAttribute('aria-hidden', 'true')
+    expect(divider).not.toHaveAttribute('role')
+  })
+
+  it('has no accessibility violations on the default separator', async () => {
+    const { container } = render(Divider)
+    await expectNoA11yViolations(container)
   })
 
   it('stretches a vertical rule in a default Space', () => {
@@ -34,19 +40,19 @@ describe('Divider (Vue)', () => {
       expect(dividerBox.height).toBeGreaterThan(0)
       expect(dividerBox.height).toBeCloseTo(siblingBox.height, 0)
     } else {
-      expect(getComputedStyle(divider).alignSelf).toBe('stretch')
+      expect(divider.className).toContain('self-stretch')
     }
   })
 
   it('applies color and thickness to a gradient line', () => {
     const { container } = renderWithProps(Divider, {
       lineStyle: 'gradient',
-      color: 'rgb(124, 58, 237)',
+      color: 'primary',
       thickness: '4px',
       spacing: 'none'
     })
     const divider = getRoot(container)
-    expect(divider.style.backgroundImage).toContain('rgb(124, 58, 237)')
+    expect(divider.style.backgroundImage).toContain('var(--tiger-primary)')
     expect(divider.style.height).toBe('4px')
     expect(divider.style.borderWidth).toBe('0px')
   })
@@ -88,7 +94,7 @@ describe('Divider (Vue)', () => {
     const { container } = render(Divider, {
       attrs: { class: 'custom-divider-class', 'data-testid': 'divider' }
     })
-    const dividers = container.querySelectorAll('[role="separator"]')
+    const dividers = container.querySelectorAll('[data-tiger-divider]')
     expect(dividers.length).toBe(1)
     expect(dividers[0].className.match(/custom-divider-class/g)?.length).toBe(1)
   })

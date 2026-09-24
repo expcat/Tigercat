@@ -60,14 +60,16 @@ describe('SplitButton', () => {
       expect(screen.getByRole('button', { name: 'More options' })).toBeInTheDocument()
     })
 
-    it('renders menu items via the existing Dropdown API', () => {
-      renderSplitButton()
+    it('renders menu items via the existing Dropdown API', async () => {
+      const { container } = renderSplitButton()
+      expect(screen.queryByText('Save as draft')).not.toBeInTheDocument()
+      await userEvent.click(getTrigger(container))
       expect(screen.getByText('Save as draft')).toBeInTheDocument()
       expect(screen.getByText('Save and publish')).toBeInTheDocument()
     })
 
-    it('accepts DropdownMenu from the menu slot', () => {
-      render(SplitButton, {
+    it('accepts DropdownMenu from the menu slot', async () => {
+      const { container } = render(SplitButton, {
         slots: {
           default: () => 'Export',
           menu: () =>
@@ -77,17 +79,19 @@ describe('SplitButton', () => {
         }
       })
       expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument()
+      expect(screen.queryByText('CSV')).not.toBeInTheDocument()
+      await userEvent.click(getTrigger(container))
       expect(screen.getByText('CSV')).toBeInTheDocument()
     })
 
-    it('puts type and htmlType on the primary button, not the group', async () => {
+    it('puts type on the primary button, not the group', async () => {
       const { container, rerender } = renderSplitButton({}, {})
       await rerender({ type: 'submit' })
       expect(getRoot(container)).not.toHaveAttribute('type')
       expect(getPrimary(container)).toHaveAttribute('type', 'submit')
       expect(getTrigger(container)).toHaveAttribute('type', 'button')
 
-      await rerender({ htmlType: 'reset', type: 'submit' })
+      await rerender({ type: 'reset' })
       expect(getPrimary(container)).toHaveAttribute('type', 'reset')
       expect(getRoot(container)).not.toHaveAttribute('type')
     })
@@ -96,21 +100,20 @@ describe('SplitButton', () => {
   describe('primary action vs menu', () => {
     it('fires click on the primary button without opening the menu', async () => {
       const { container, emitted } = renderSplitButton()
-      const wrapper = getMenuWrapper()
-      expect(wrapper).toHaveAttribute('hidden')
+      expect(getMenuWrapper()).toBeNull()
 
       await userEvent.click(getPrimary(container))
       expect(emitted().click).toHaveLength(1)
-      expect(wrapper).toHaveAttribute('hidden')
+      expect(getMenuWrapper()).toBeNull()
     })
 
     it('opens the dropdown from the chevron trigger without firing the primary click', async () => {
       const { container, emitted } = renderSplitButton()
-      const wrapper = getMenuWrapper()
+      expect(getMenuWrapper()).toBeNull()
 
       await userEvent.click(getTrigger(container))
       expect(emitted().click).toBeUndefined()
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(getMenuWrapper()).not.toBeNull()
       expect(getTrigger(container)).toHaveAttribute('aria-expanded', 'true')
     })
 
@@ -142,15 +145,14 @@ describe('SplitButton', () => {
       await userEvent.click(getPrimary(container))
       await userEvent.click(getTrigger(container))
       expect(emitted().click).toBeUndefined()
-      expect(getMenuWrapper()).toHaveAttribute('hidden')
+      expect(getMenuWrapper()).toBeNull()
     })
 
-    it('puts the primary action into a loading state without disabling the trigger', () => {
+    it('treats loading as disabled on both the primary action and the trigger', () => {
       const { container } = renderSplitButton({ loading: true })
       expect(getPrimary(container)).toHaveAttribute('aria-busy', 'true')
-      expect(getPrimary(container)).not.toBeDisabled()
-      expect(getTrigger(container)).not.toBeDisabled()
-      expect(getTrigger(container)).toHaveAttribute('aria-disabled', 'true')
+      expect(getPrimary(container)).toBeDisabled()
+      expect(getTrigger(container)).toBeDisabled()
     })
   })
 
@@ -226,7 +228,7 @@ describe('SplitButton', () => {
     it('does not open the menu when the trigger is loading-disabled', async () => {
       const { container } = renderSplitButton({ loading: true })
       await fireEvent.click(getTrigger(container))
-      expect(getMenuWrapper()).toHaveAttribute('hidden')
+      expect(getMenuWrapper()).toBeNull()
     })
   })
 })

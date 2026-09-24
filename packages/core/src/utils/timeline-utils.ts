@@ -5,15 +5,15 @@ export const EMPTY_TIMELINE_ITEMS: TimelineItem[] = []
 export const timelineContainerClasses = 'relative'
 export const timelineListClasses = 'list-none m-0 p-0'
 export const timelineItemClasses = 'relative pb-8'
-export const timelineTailClasses = 'absolute w-0.5 bg-[var(--tiger-border,#e5e7eb)]'
+export const timelineTailClasses = 'absolute w-0.5 bg-[var(--tiger-border)]'
 export const timelineHeadClasses = 'absolute z-10 flex h-[1.25rem] items-center justify-center'
 export const timelineContentClasses = 'relative'
 export const timelineCustomDotClasses = 'flex items-center justify-center'
-export const timelineLabelClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)] mb-1'
-export const timelineDescriptionClasses = 'text-[var(--tiger-text,#374151)]'
+export const timelineLabelClasses = 'text-sm text-[var(--tiger-text-secondary)] mb-1'
+export const timelineDescriptionClasses = 'text-[var(--tiger-text)]'
 
-const timelineDotBase = 'w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface,#ffffff)]'
-const timelineDotBg = 'bg-[var(--tiger-border,#d1d5db)]'
+const timelineDotBase = 'w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface)]'
+const timelineDotBg = 'bg-[var(--tiger-border)]'
 export const timelineDotClasses = `${timelineDotBase} ${timelineDotBg}`
 
 const AXIS_TRANSLATE = '-translate-x-1/2 rtl:translate-x-1/2'
@@ -101,7 +101,7 @@ export function getTimelineContentClasses(
 }
 
 export function getPendingDotClasses(): string {
-  return 'w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface,#ffffff)] bg-[var(--tiger-primary,#2563eb)] animate-pulse motion-reduce:animate-none'
+  return 'w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface)] bg-[var(--tiger-primary)] animate-pulse motion-reduce:animate-none'
 }
 
 export interface TimelineDotRenderOptions {

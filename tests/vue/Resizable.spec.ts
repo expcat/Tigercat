@@ -74,9 +74,7 @@ describe('Resizable', () => {
         pointerId: 1
       })
       await fireEvent.pointerMove(document, { clientX: -40, clientY: 100, pointerId: 1 })
-      expect((container.firstElementChild as HTMLElement).style.transform).toBe(
-        'translate(-40px, 0px)'
-      )
+      expect((container.firstElementChild as HTMLElement).style.marginInlineStart).toBe('-40px')
       expect((container.firstElementChild as HTMLElement).style.width).toBe('340px')
     })
   })
@@ -88,7 +86,7 @@ describe('Resizable', () => {
       expect(right.getAttribute('role')).toBe('separator')
       expect(right.getAttribute('tabindex')).toBe('0')
       expect(right.getAttribute('aria-label')).toBe('Resize right')
-      expect(handle(container, 'bottom-right').getAttribute('tabindex')).toBe('-1')
+      expect(handle(container, 'bottom-right').getAttribute('tabindex')).toBe('0')
     })
 
     it('grows width with ArrowRight on the right handle', async () => {

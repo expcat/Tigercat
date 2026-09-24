@@ -5,6 +5,8 @@
 
 import type { ReferrerPolicyAttr } from '../types/base'
 import type { AvatarShape, AvatarSize } from '../types/avatar'
+import { parseColorParts } from './color-picker-utils'
+import { THEME_CSS_VARS } from '../theme-runtime'
 import { mixStatusTowardTextClass } from './status-mix'
 
 /**
@@ -17,10 +19,10 @@ export const avatarBaseClasses =
  * Size classes for avatar
  */
 export const avatarSizeClasses: Record<AvatarSize, string> = {
-  sm: 'w-[var(--tiger-component-avatar-size-sm,32px)] h-[var(--tiger-component-avatar-size-sm,32px)] text-[length:var(--tiger-component-avatar-font-size-sm,12px)]',
-  md: 'w-[var(--tiger-component-avatar-size-md,40px)] h-[var(--tiger-component-avatar-size-md,40px)] text-[length:var(--tiger-component-avatar-font-size-md,14px)]',
-  lg: 'w-[var(--tiger-component-avatar-size-lg,48px)] h-[var(--tiger-component-avatar-size-lg,48px)] text-[length:var(--tiger-component-avatar-font-size-lg,16px)]',
-  xl: 'w-[var(--tiger-component-avatar-size-xl,64px)] h-[var(--tiger-component-avatar-size-xl,64px)] text-[length:var(--tiger-component-avatar-font-size-lg,16px)]'
+  sm: 'w-[var(--tiger-component-avatar-size-sm)] h-[var(--tiger-component-avatar-size-sm)] text-[length:var(--tiger-component-avatar-font-size-sm)]',
+  md: 'w-[var(--tiger-component-avatar-size-md)] h-[var(--tiger-component-avatar-size-md)] text-[length:var(--tiger-component-avatar-font-size-md)]',
+  lg: 'w-[var(--tiger-component-avatar-size-lg)] h-[var(--tiger-component-avatar-size-lg)] text-[length:var(--tiger-component-avatar-font-size-lg)]',
+  xl: 'w-[var(--tiger-component-avatar-size-xl)] h-[var(--tiger-component-avatar-size-xl)] text-[length:var(--tiger-component-avatar-font-size-xl)]'
 }
 
 /**
@@ -31,20 +33,20 @@ export const avatarSizeClasses: Record<AvatarSize, string> = {
  * - `squircle` is a modern iOS-style intermediate shape (PR-19a).
  */
 export const avatarShapeClasses: Record<AvatarShape, string> = {
-  circle: 'rounded-[var(--tiger-component-avatar-border-radius,9999px)]',
-  square: 'rounded-[var(--tiger-radius-md,0.5rem)]',
+  circle: 'rounded-[var(--tiger-component-avatar-border-radius)]',
+  square: 'rounded-[var(--tiger-radius-md)]',
   squircle: 'rounded-[30%]'
 }
 
 /**
  * Default background color for avatar
  */
-export const avatarDefaultBgColor = 'bg-[var(--tiger-surface-muted,#f9fafb)]'
+export const avatarDefaultBgColor = 'bg-[var(--tiger-surface-muted)]'
 
 /**
  * Default text color for avatar
  */
-export const avatarDefaultTextColor = 'text-[var(--tiger-text-secondary,#6b7280)]'
+export const avatarDefaultTextColor = 'text-[var(--tiger-text-secondary)]'
 
 /**
  * Image classes for avatar with image
@@ -92,7 +94,7 @@ const AVATAR_PALETTE = [
   ['--tiger-secondary', '#4b5563']
 ] as const
 
-export const avatarGeneratedTextColor = 'text-[var(--tiger-primary-foreground,#ffffff)]'
+export const avatarGeneratedTextColor = 'text-[var(--tiger-primary-foreground)]'
 
 /**
  * Generate a background color from a string (same name → same color).
@@ -113,9 +115,22 @@ export function generateAvatarColor(str: string): string {
   return mixStatusTowardTextClass('bg', cssVar, fallback)
 }
 
+const AVATAR_COLOR_TOKENS = new Map<string, string>(
+  Object.entries(THEME_CSS_VARS).filter(([key]) => !key.startsWith('breakpoint'))
+)
+
+/**
+ * A single paint: theme token name, `var(--tiger-*)`, or one CSS color.
+ * Class-name strings are not paint.
+ */
 export function isCssPaintValue(value: string): boolean {
   const trimmed = value.trim()
-  return /^(#|rgb\(|rgba\(|hsl\(|hsla\(|var\()/i.test(trimmed)
+  if (!trimmed || /[;{}]|url\s*\(/i.test(trimmed)) return false
+  if (AVATAR_COLOR_TOKENS.has(trimmed)) return true
+  if (parseColorParts(trimmed)) return true
+  if (/^var\(\s*--tiger-[a-z0-9-]+\s*\)$/i.test(trimmed)) return true
+  if (/^(rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch|color|color-mix)\(/i.test(trimmed)) return true
+  return /^[a-zA-Z]+$/.test(trimmed)
 }
 
 export function resolveAvatarPaint(
@@ -123,13 +138,13 @@ export function resolveAvatarPaint(
   kind: 'bg' | 'text',
   fallbackClass: string
 ): { className?: string; style?: Record<string, string> } {
-  if (!value) return { className: fallbackClass }
-  if (isCssPaintValue(value)) {
-    return {
-      style: { [kind === 'bg' ? 'backgroundColor' : 'color']: value.trim() }
-    }
+  if (!value || !isCssPaintValue(value)) return { className: fallbackClass }
+  const trimmed = value.trim()
+  const token = AVATAR_COLOR_TOKENS.get(trimmed)
+  const paint = token ? `var(${token})` : trimmed
+  return {
+    style: { [kind === 'bg' ? 'backgroundColor' : 'color']: paint }
   }
-  return { className: value }
 }
 
 export function resolveAvatarName(input: {
@@ -208,7 +223,7 @@ export function pickAvatarImageAttrs(attrs: Record<string, unknown>): {
  */
 export const avatarGroupBaseClasses = 'inline-flex items-center'
 
-export const avatarGroupItemClasses = '-ms-2 first:ms-0 ring-2 ring-[var(--tiger-surface,#ffffff)]'
+export const avatarGroupItemClasses = '-ms-2 first:ms-0 ring-2 ring-[var(--tiger-surface)]'
 
 export const avatarGroupOverflowBaseClasses =
-  'ring-2 ring-[var(--tiger-surface,#ffffff)] inline-flex items-center justify-center shrink-0 font-medium bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-secondary,#6b7280)]'
+  'ring-2 ring-[var(--tiger-surface)] inline-flex items-center justify-center shrink-0 font-medium bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'

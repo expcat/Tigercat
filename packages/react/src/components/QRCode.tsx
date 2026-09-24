@@ -3,14 +3,14 @@ import {
   classNames,
   mergeTigerLocale,
   getQRCodeLabels,
-  generateQRMatrix,
+  resolveQRMatrix,
+  qrDarkModulesPath,
   qrcodeContainerClasses,
   qrcodeOverlayClasses,
   qrcodeStatusTextClasses,
   qrcodeRefreshClasses,
   QRCODE_DEFAULT_COLOR,
   QRCODE_DEFAULT_BG,
-  QR_QUIET_ZONE,
   qrViewBoxSize,
   qrNeedsContrastWarning,
   devWarn,
@@ -44,19 +44,21 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
     [config.locale, locale]
   )
   const labels = useMemo(() => getQRCodeLabels(mergedLocale), [mergedLocale])
-  const matrix = useMemo(() => generateQRMatrix(value ?? ''), [value])
-  const moduleCount = matrix.length
-  const viewBox = qrViewBoxSize(moduleCount)
-  const overlay = status === 'expired' || status === 'loading'
-  const namedValue = value ? ` (${value})` : ''
-  const imgLabel =
-    status === 'expired'
-      ? `${labels.expiredText}${namedValue}`
+  const encoded = useMemo(() => resolveQRMatrix(value), [value])
+  const failed = !encoded.ok
+  const matrix = encoded.ok ? encoded.matrix : []
+  const viewBox = qrViewBoxSize(matrix.length || 1)
+  const statusText = failed
+    ? labels.errorText
+    : status === 'expired'
+      ? labels.expiredText
       : status === 'loading'
-        ? `${labels.loadingText}${namedValue}`
-        : `${labels.ariaLabel}${namedValue}`
+        ? labels.loadingText
+        : ''
+  const imgLabel = statusText ? `${labels.ariaLabel}, ${statusText}` : labels.ariaLabel
+  const scheme = config.colorScheme === 'dark' ? 'dark' : 'light'
 
-  if (qrNeedsContrastWarning(color, bgColor)) {
+  if (qrNeedsContrastWarning(color, bgColor, scheme)) {
     devWarn(
       'QRCode.contrast',
       'QRCode: `color` and `bgColor` are under 3:1 contrast; scanners may fail.'
@@ -68,35 +70,28 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
       ref={ref}
       className={classNames(qrcodeContainerClasses, className)}
       style={{ ...style, width: size, height: size }}
-      {...rest}>
+      {...rest}
+      role="img"
+      aria-label={imgLabel}>
       <svg
         width={size}
         height={size}
         viewBox={`0 0 ${viewBox} ${viewBox}`}
         xmlns="http://www.w3.org/2000/svg"
-        role={overlay ? undefined : 'img'}
-        aria-hidden={overlay ? true : undefined}
-        aria-label={overlay ? undefined : imgLabel}
+        aria-hidden="true"
         className="block h-full w-full">
         <rect width={viewBox} height={viewBox} fill={bgColor} />
-        {matrix.flatMap((row, r) =>
-          row.map((cell, c) =>
-            cell ? (
-              <rect
-                key={`${r}-${c}`}
-                x={c + QR_QUIET_ZONE}
-                y={r + QR_QUIET_ZONE}
-                width={1}
-                height={1}
-                fill={color}
-              />
-            ) : null
-          )
-        )}
+        {encoded.ok ? <path d={qrDarkModulesPath(matrix)} fill={color} /> : null}
       </svg>
 
-      {status === 'expired' ? (
-        <div className={qrcodeOverlayClasses} role="status" aria-label={imgLabel}>
+      {failed ? (
+        <div className={qrcodeOverlayClasses} role="status">
+          <span className={qrcodeStatusTextClasses}>{labels.errorText}</span>
+        </div>
+      ) : null}
+
+      {!failed && status === 'expired' ? (
+        <div className={qrcodeOverlayClasses} role="status">
           <span className={qrcodeStatusTextClasses}>{labels.expiredText}</span>
           {onRefresh ? (
             <button type="button" className={qrcodeRefreshClasses} onClick={onRefresh}>
@@ -106,8 +101,8 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
         </div>
       ) : null}
 
-      {status === 'loading' ? (
-        <div className={qrcodeOverlayClasses} role="status" aria-label={imgLabel}>
+      {!failed && status === 'loading' ? (
+        <div className={qrcodeOverlayClasses} role="status">
           <span className={qrcodeStatusTextClasses}>{labels.loadingText}</span>
         </div>
       ) : null}

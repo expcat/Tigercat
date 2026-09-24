@@ -1,7 +1,2 @@
-export {
-  createTigerLocaleScope,
-  createGlobalTigerLocaleHandle,
-  getGlobalTigerLocale,
-  resetTigerLocaleScope
-} from '@expcat/tigercat-core'
-export type { GlobalTigerLocaleHandle, TigerLocaleScope } from '@expcat/tigercat-core'
+export { createTigerLocaleScope } from '@expcat/tigercat-core'
+export type { TigerLocaleHandle, TigerLocaleScope } from '@expcat/tigercat-core'

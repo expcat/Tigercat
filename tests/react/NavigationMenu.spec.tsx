@@ -213,7 +213,7 @@ describe('NavigationMenu', () => {
     expect(screen.getByRole('menuitem', { name: 'Pricing' })).toHaveFocus()
   })
 
-  it('opens the matching item when value is 1 and the item key is "1"', () => {
+  it('does not treat numeric 1 and string "1" as the same panel', () => {
     render(
       <NavigationMenu delayDuration={0} skipDelayDuration={0} defaultValue={1}>
         <NavigationMenuItem value="1">
@@ -224,7 +224,7 @@ describe('NavigationMenu', () => {
         </NavigationMenuItem>
       </NavigationMenu>
     )
-    expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'false')
   })
 
   it('closes on item click and Escape', async () => {
@@ -367,9 +367,13 @@ describe('NavigationMenu', () => {
   describe('portal', () => {
     it('renders the panel into document.body by default', () => {
       const { container } = render(<Demo defaultValue="products" />)
-      const wrapper = document.querySelector('[data-tiger-navigation-menu-content]')
-      expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(document.body)
-      expect(container.querySelector('[data-tiger-navigation-menu-content]')).toBeNull()
+      const openPanel = document.querySelector(
+        '[data-tiger-navigation-menu-content]:not([hidden])'
+      )
+      expect(openPanel?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(document.body)
+      expect(
+        container.querySelector('[data-tiger-navigation-menu-content]:not([hidden])')
+      ).toBeNull()
     })
 
     it('renders the panel in place when portal is false', () => {
@@ -383,17 +387,16 @@ describe('NavigationMenu', () => {
   })
 
   describe('a11y', () => {
-    it('exposes menubar semantics and a menu panel for mega content', () => {
+    it('exposes menubar semantics and a disclosure panel for mega content', () => {
       render(<Demo defaultValue="docs" />)
       expect(screen.getByRole('menubar')).toBeInTheDocument()
 
       const trigger = screen.getByRole('menuitem', { name: 'Docs' })
-      expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
       const controlsId = trigger.getAttribute('aria-controls')
       expect(controlsId).toBeTruthy()
-      const menu = document.querySelector(`[id="${controlsId}"]`)
-      expect(menu).toHaveAttribute('role', 'menu')
+      const panel = document.querySelector(`[id="${controlsId}"]`)
+      expect(panel).not.toHaveAttribute('role', 'menu')
     })
 
     it('should have no accessibility violations with an open panel', async () => {

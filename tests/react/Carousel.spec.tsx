@@ -52,9 +52,11 @@ describe('Carousel', () => {
       const root = container.querySelector('[data-tiger-carousel]') as HTMLElement
       expect(root).toHaveAttribute('role', 'group')
       expect(root).not.toHaveAttribute('aria-label')
-      expect(screen.getAllByRole('tab')).toHaveLength(3)
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 1')
-      expect(screen.getAllByRole('tab')[1]).toHaveAttribute('tabindex', '-1')
+      expect(screen.getAllByRole('button', { name: /Go to slide/ })).toHaveLength(3)
+      expect(screen.getByRole('button', { name: 'Go to slide 1' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
     })
 
     it('renders arrows when arrows is true', () => {
@@ -70,9 +72,9 @@ describe('Carousel', () => {
         </ConfigProvider>
       )
       expect(screen.queryByRole('region')).toBeNull()
-      expect(screen.getByRole('tablist', { name: '轮播导航' })).toBeInTheDocument()
+      expect(document.querySelector('[aria-label="轮播导航"]')).toBeTruthy()
       expect(screen.getByRole('button', { name: '上一张' })).toBeInTheDocument()
-      expect(screen.getByRole('tab', { name: '跳转到第 1 张' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '跳转到第 1 张' })).toBeInTheDocument()
     })
 
     it('uses official zhTW strings instead of simplified Chinese', () => {
@@ -82,7 +84,7 @@ describe('Carousel', () => {
         </ConfigProvider>
       )
       expect(screen.getByRole('button', { name: '上一張' })).toBeInTheDocument()
-      expect(screen.getByRole('tab', { name: '跳到第 1 張' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '跳到第 1 張' })).toBeInTheDocument()
     })
 
     it('names a region only when the caller provides one', () => {
@@ -130,7 +132,10 @@ describe('Carousel', () => {
       await fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
       expect(onBeforeChange).toHaveBeenCalledWith(0, 1)
       expect(onChange).toHaveBeenCalledWith(1, 0)
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 2')
+      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
       expect(container.querySelector('[data-tiger-carousel-slide="inactive"]')).toHaveAttribute(
         'inert'
       )
@@ -226,7 +231,7 @@ describe('Carousel', () => {
     it('does not emit before-change when the index does not change', async () => {
       const onBeforeChange = vi.fn()
       render(<Carousel onBeforeChange={onBeforeChange}>{slides()}</Carousel>)
-      await fireEvent.click(screen.getByRole('tab', { selected: true }))
+      await fireEvent.click(screen.getByRole('button', { name: 'Go to slide 1' }))
       expect(onBeforeChange).not.toHaveBeenCalled()
     })
   })
@@ -255,7 +260,7 @@ describe('Carousel', () => {
       )
       const root = container.querySelector('[data-tiger-carousel]') as HTMLElement
       await fireEvent.mouseEnter(root)
-      const tab = screen.getByRole('tab', { selected: true })
+      const tab = screen.getByRole('button', { name: 'Go to slide 1' })
       await fireEvent.focus(tab)
       await fireEvent.mouseLeave(root)
       act(() => {
@@ -338,7 +343,10 @@ describe('Carousel', () => {
       await fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
       expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
       expect(onChange).toHaveBeenCalledWith(2, 1)
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 2')
+      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
 
       rerender(
         <Carousel
@@ -349,7 +357,10 @@ describe('Carousel', () => {
           {slides()}
         </Carousel>
       )
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 3')
+      expect(screen.getByRole('button', { name: 'Go to slide 3' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
     })
 
     it('keeps the last value after dropping the controlled prop', () => {
@@ -367,9 +378,15 @@ describe('Carousel', () => {
         )
       }
       render(<Harness />)
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 2')
+      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
       fireEvent.click(screen.getByRole('button', { name: 'Release' }))
-      expect(screen.getByRole('tab', { selected: true })).toHaveAccessibleName('Go to slide 2')
+      expect(screen.getByRole('button', { name: 'Go to slide 2' })).toHaveAttribute(
+        'aria-current',
+        'true'
+      )
     })
   })
 

@@ -13,13 +13,13 @@
  * Uses a soft shadow glow instead of hard ring for a modern feel
  */
 export const focusRingClasses =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface)]'
 
 /**
  * Focus ring classes for inset elements (dropdown items, menu items)
  */
 export const focusRingInsetClasses =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-inset'
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset'
 
 /**
  * Active press effect - subtle scale down on click
@@ -37,23 +37,23 @@ export const activeOpacityClasses = 'active:opacity-90'
  * Combined interactive classes for buttons and clickable elements
  * Includes focus-visible ring + press scale effect + smooth transition
  */
-export const interactiveClasses = `transition-all duration-200 ease-out ${focusRingClasses} ${activePressClasses}`
+export const interactiveClasses = `[transition:var(--tiger-transition-quick)] ${focusRingClasses} ${activePressClasses}`
 
 /**
  * Interactive classes for form inputs
  * Keeps focus ring visible (not focus-visible) since inputs need persistent focus indication
  */
 export const inputFocusClasses =
-  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus:border-transparent'
+  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-focus-ring)]/40 focus:border-transparent'
 
 /**
  * Tab/navigation item focus classes
  */
 export const tabFocusClasses =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-offset-2'
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)] focus-visible:ring-offset-2'
 
 /**
  * Menu item focus classes (inset ring for contained elements)
  */
 export const menuItemFocusClasses =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-inset'
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)] focus-visible:ring-inset'

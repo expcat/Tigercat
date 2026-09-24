@@ -23,8 +23,7 @@ import {
 } from './helpers/slider-utils'
 
 /** Root surface. Overflow clip lives on the panes so the handle knob stays visible. */
-export const imageCompareRootClasses =
-  'tiger-image-compare relative select-none touch-none max-w-full'
+export const imageCompareRootClasses = 'tiger-image-compare relative select-none max-w-full'
 
 /** Horizontal axis */
 export const imageCompareHorizontalClasses = 'tiger-image-compare-horizontal'
@@ -58,7 +57,7 @@ export const imageCompareHandleDisabledClasses = 'cursor-not-allowed'
 
 /** Visible divider line inside the handle */
 export const imageCompareLineClasses =
-  'tiger-image-compare-line absolute bg-white shadow pointer-events-none'
+  'tiger-image-compare-line absolute bg-[var(--tiger-text)] shadow-[0_0_0_1px_var(--tiger-surface)] pointer-events-none'
 
 export const imageCompareLineHorizontalClasses = 'inset-y-0 left-1/2 w-0.5 -translate-x-1/2'
 
@@ -66,7 +65,7 @@ export const imageCompareLineVerticalClasses = 'inset-x-0 top-1/2 h-0.5 -transla
 
 /** Circular grabber on the divider */
 export const imageCompareKnobClasses =
-  'tiger-image-compare-knob relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--tiger-primary,#2563eb)] text-white shadow pointer-events-none group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'tiger-image-compare-knob relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--tiger-primary)] text-white shadow pointer-events-none group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-[var(--tiger-focus-ring)]'
 
 const IMAGE_COMPARE_ORIENTATIONS = new Set<ImageCompareOrientation>(['horizontal', 'vertical'])
 
@@ -130,6 +129,17 @@ export function resolveImageComparePosition(position?: number, step?: number): n
  * Resolve an explicit accessible name. Empty or whitespace-only values are
  * omitted so the caller can fall back to locale or `aria-labelledby`.
  */
+export function resolveImageCompareAlt(alt: string | undefined, fallback: string): string {
+  const trimmed = alt?.trim()
+  return trimmed ? trimmed : fallback
+}
+
+/** Value text names the revealed side, not a bare percentage. */
+export function formatImageCompareValueText(template: string, position: number): string {
+  const percent = String(Math.round(Number.isFinite(position) ? position : 0))
+  return template.replace('{percent}', percent)
+}
+
 export function resolveImageCompareAriaLabel(label?: string): string | undefined {
   if (typeof label === 'string') {
     const trimmed = label.trim()
@@ -161,6 +171,17 @@ function asElement(target: EventTarget | null): Element | null {
  * Whether a pointer target is an interactive slot child that should not start
  * a handle drag. Clicks on the handle itself are never ignored.
  */
+/** Drag starts only when the pointer is on the handle. */
+export function isImageCompareHandleTarget(
+  target: EventTarget | null,
+  handle: EventTarget | null
+): boolean {
+  if (!(handle instanceof Node)) return false
+  const element = asElement(target)
+  if (!element) return false
+  return handle.contains(element)
+}
+
 export function isImageCompareInteractiveTarget(
   target: EventTarget | null,
   handle: EventTarget | null

@@ -1,7 +1,6 @@
 import { classNames } from './class-names'
 import { THEME_CSS_VARS, TIGER_BREAKPOINT_CSS_VALUES } from '../theme-runtime'
 import { type ContainerMaxWidth } from '../types/container'
-import { ensureGridBreakpointSync, injectLayoutGridStyles } from './layout-grid-styles'
 
 export const containerBaseClasses = 'tiger-container'
 
@@ -58,8 +57,6 @@ export const getContainerClasses = ({
   padding = true,
   className
 }: GetContainerClassesOptions = {}) => {
-  injectLayoutGridStyles()
-  ensureGridBreakpointSync()
   return classNames(
     containerBaseClasses,
     maxWidth === 'full' && containerMaxWidthClasses.full,

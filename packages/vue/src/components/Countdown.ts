@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, onMounted, PropType, ref, useId, watch } from 'vue'
 import {
   COUNTDOWN_DEFAULT_FORMAT,
   COUNTDOWN_DEFAULT_INTERVAL_MS,
@@ -12,6 +12,8 @@ import {
   formatCountdown,
   getCountdownRemaining,
   getCountdownTitleClasses,
+  manageLiveRegion,
+  parseCountdownTimestamp,
   getCountdownValueClasses,
   type CountdownChangePayload,
   type CountdownSize,
@@ -125,7 +127,7 @@ export const Countdown = defineComponent({
     }
 
     watch(
-      () => props.value,
+      () => parseCountdownTimestamp(props.value),
       () => {
         syncRemainingFromSnapshot()
         setupTimer()
@@ -154,9 +156,29 @@ export const Countdown = defineComponent({
       setupTimer()
     })
 
+    const titleId = useId()
+    const liveRegion = manageLiveRegion('polite')
+    const announced = { tick: false, finish: false }
+    watch(remaining, (value) => {
+      const name =
+        typeof props.title === 'string' && props.title
+          ? props.title
+          : props.ariaLabel || 'Countdown'
+      const text = `${name} ${formatCountdown(value, props.format)}`
+      if (value > 0 && !announced.tick) {
+        announced.tick = true
+        liveRegion.announce(text)
+        return
+      }
+      if (value <= 0 && !announced.finish) {
+        announced.finish = true
+        liveRegion.announce(text)
+      }
+    })
     onBeforeUnmount(() => {
       mounted = false
       stopTimer()
+      liveRegion.destroy()
     })
 
     return () => {
@@ -174,14 +196,18 @@ export const Countdown = defineComponent({
           'aria-label': rootAriaLabel
         },
         [
-          titleNode ? h('div', { class: getCountdownTitleClasses(props.size) }, titleNode) : null,
+          titleNode
+            ? h('div', { id: titleId, class: getCountdownTitleClasses(props.size) }, titleNode)
+            : null,
           h('div', { class: countdownValueWrapperClasses }, [
             prefixNode ? h('span', { class: countdownPrefixClasses }, prefixNode) : null,
             h(
               'span',
               {
                 class: getCountdownValueClasses(props.size),
-                role: 'timer'
+                role: 'timer',
+                'aria-labelledby': titleNode ? titleId : undefined,
+                'aria-label': titleNode ? undefined : props.ariaLabel || 'Countdown'
               },
               formatted.value
             ),

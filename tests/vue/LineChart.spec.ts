@@ -221,6 +221,7 @@ describe('LineChart', () => {
       clientX: 40,
       clientY: 40
     })
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
   })
 
@@ -235,6 +236,7 @@ describe('LineChart', () => {
       clientX: 40,
       clientY: 40
     })
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     expect(emitted()['point-hover']).toBeTruthy()
     expect(emitted()['point-hover']?.[0]?.[0]).toEqual(expect.any(Number))
     expect(emitted()['point-hover']?.[0]?.[1]).toEqual(expect.any(Number))

@@ -5,6 +5,7 @@ import {
   getNumberExtent,
   getStableChartGradientPrefix,
   getScatterHoverShadow,
+  chartSeriesColorStyle,
   scatterPointTransitionClasses,
   SCATTER_ENTRANCE_CLASS,
   layoutScatterPoints,
@@ -68,7 +69,7 @@ export const ScatterChart = defineComponent({
       type: [Number, Object] as PropType<ChartPadding>,
       default: () => ({ ...DEFAULT_CHART_PADDING })
     },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: {
       type: Array as PropType<ScatterChartDatum[]>,
       required: true
@@ -78,7 +79,7 @@ export const ScatterChart = defineComponent({
     pointSize: { type: Number, default: 6 },
     pointColor: {
       type: String,
-      default: 'var(--tiger-primary,#2563eb)'
+      default: 'var(--tiger-primary)'
     },
     pointOpacity: { type: Number },
     pointStyle: {
@@ -200,7 +201,6 @@ export const ScatterChart = defineComponent({
       getData: (index: number) => props.data[index],
       onHover: (index, datum) => emit('point-hover', index, datum),
       onClick: (index, datum) => {
-        props.onPointClick?.(index, datum as ScatterChartDatum)
         emit('point-click', index, datum)
       }
     })
@@ -372,9 +372,7 @@ export const ScatterChart = defineComponent({
                         props.hoverable ||
                         props.selectable ||
                         typeof props.onPointClick === 'function'
-                      const filterStyle = point.isHovered
-                        ? getScatterHoverShadow(point.color)
-                        : undefined
+                      const filterStyle = point.isHovered ? getScatterHoverShadow() : undefined
                       const animDelay =
                         props.animated && mounted.value
                           ? `${Math.min(visualIndex * SCATTER_ENTRANCE_STAGGER_MS, SCATTER_ENTRANCE_STAGGER_MAX_MS)}ms`
@@ -382,12 +380,11 @@ export const ScatterChart = defineComponent({
                       const visualActive = points.value.findIndex(
                         (item) => item.index === (activeIndex.value ?? 0)
                       )
-                      const styleStr = [
-                        filterStyle ? `filter:${filterStyle}` : '',
-                        animDelay ? `animation-delay:${animDelay}` : ''
-                      ]
-                        .filter(Boolean)
-                        .join(';')
+                      const styleStr = {
+                        ...chartSeriesColorStyle(point.color),
+                        ...(filterStyle ? { filter: filterStyle } : {}),
+                        ...(animDelay ? { animationDelay: animDelay } : {})
+                      }
 
                       const shared = {
                         fill: point.fill,

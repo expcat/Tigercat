@@ -17,7 +17,7 @@ import {
   carouselNextArrowPath,
   carouselPrevArrowPath,
   clampSlideIndex,
-  composeComponentClasses,
+  classNames,
   createCarouselAutoplayController,
   getCarouselArrowClasses,
   getCarouselCloneAttributes,
@@ -34,7 +34,11 @@ import {
   getNextSlideIndex,
   getPrevSlideIndex,
   getScrollTransform,
+  carouselStatusClasses,
+  carouselTrackInstantClasses,
+  formatCarouselSlideStatus,
   isCarouselAutoplayEnabled,
+  isCarouselAutoplayRequested,
   isCarouselChromeTarget,
   isCarouselFocusInside,
   isCarouselHorizontalLock,
@@ -44,6 +48,7 @@ import {
   isPrevDisabled,
   mergeTigerLocale,
   prefersReducedMotion,
+  subscribePrefersReducedMotion,
   resolveCarouselKeyboardNavigation,
   resolveCarouselLoopSnap,
   resolveCarouselRegion,
@@ -59,6 +64,17 @@ import {
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { useTigerConfig } from './ConfigProvider'
+
+function stripCarouselCloneIds(node: React.ReactNode): React.ReactNode {
+  return React.Children.map(node, (child) => {
+    if (!React.isValidElement(child)) return child
+    const props = child.props as { id?: string; children?: React.ReactNode }
+    return React.cloneElement(child, {
+      id: undefined,
+      children: props.children != null ? stripCarouselCloneIds(props.children) : props.children
+    } as Partial<unknown> & React.Attributes)
+  })
+}
 
 export interface CarouselProps
   extends
@@ -119,7 +135,12 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     const slideCount = slides.length
     const looping = shouldLoopCarousel(infinite, slideCount, effect)
     const dir = config.direction
-    const reducedMotion = prefersReducedMotion()
+    const [reducedMotion, setReducedMotion] = useState(false)
+    useEffect(() => {
+      setReducedMotion(prefersReducedMotion())
+      return subscribePrefersReducedMotion(setReducedMotion)
+    }, [])
+    const autoplayRequested = isCarouselAutoplayRequested(autoplay, autoplaySpeed)
     const autoplayEnabled = isCarouselAutoplayEnabled(autoplay, autoplaySpeed, reducedMotion)
 
     const [currentIndex, setCurrentIndexValue] = useControlledState({
@@ -424,7 +445,8 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
 
     const isPrevArrowDisabled = isPrevDisabled(currentIndex, slideCount, infinite)
     const isNextArrowDisabled = isNextDisabled(currentIndex, slideCount, infinite)
-    const transitionDuration = snapPending || reducedMotion || speed <= 0 ? '0ms' : `${speed}ms`
+    const carouselDuration = snapPending || speed <= 0 ? '0ms' : `${speed}ms`
+    const trackInstant = snapPending || speed <= 0
 
     const renderArrowButton = (
       type: 'prev' | 'next',
@@ -466,7 +488,11 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           }
           id={clone ? undefined : slideId}
           className={getCarouselSlideClasses({ effect, active })}
-          style={effect === 'fade' ? { transitionDuration } : undefined}
+          style={
+            effect === 'fade'
+              ? ({ ['--tiger-carousel-duration']: carouselDuration } as React.CSSProperties)
+              : undefined
+          }
           role="group"
           aria-roledescription={labels.slideRoleDescription}
           aria-label={labels.slideAriaLabel
@@ -476,7 +502,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           inert={hidden || undefined}
           data-tiger-carousel-slide={clone ? 'clone' : active ? 'active' : 'inactive'}
           {...(clone ? getCarouselCloneAttributes() : {})}>
-          {slide}
+          {clone ? stripCarouselCloneIds(slide) : slide}
         </div>
       )
     }
@@ -496,12 +522,14 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         </div>
       ) : (
         <div
-          className={carouselTrackScrollClasses}
+          className={classNames(carouselTrackScrollClasses, trackInstant && carouselTrackInstantClasses)}
           data-tiger-carousel-track=""
-          style={{
-            transform: getScrollTransform(displayIndex, dir),
-            transitionDuration
-          }}
+          style={
+            {
+              transform: getScrollTransform(displayIndex, dir),
+              ['--tiger-carousel-duration']: carouselDuration
+            } as React.CSSProperties
+          }
           onTransitionEnd={handleTrackTransitionEnd}>
           {slideNodes}
         </div>
@@ -511,7 +539,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       <div
         {...domProps}
         ref={containerRef}
-        className={composeComponentClasses(getCarouselContainerClasses(className))}
+        className={classNames(getCarouselContainerClasses(className))}
         style={style}
         data-tiger-carousel=""
         role={region.role}
@@ -526,9 +554,11 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         <div
           ref={viewportRef}
           className={carouselViewportClasses}
-          data-tiger-carousel-viewport=""
-          tabIndex={slideCount > 1 ? 0 : undefined}>
+          data-tiger-carousel-viewport="">
           {track}
+        </div>
+        <div className={carouselStatusClasses} role="status" aria-live="polite">
+          {formatCarouselSlideStatus(labels.slideAriaLabel, currentIndex, slideCount)}
         </div>
         {autoplayEnabled ? (
           <button
@@ -551,24 +581,17 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           <div
             className={getCarouselDotsClasses(dotPosition)}
             data-tiger-carousel-chrome=""
-            role="tablist"
-            aria-label={labels.navigationAriaLabel}
-            aria-orientation={getCarouselDotsOrientation(dotPosition)}
-            onKeyDown={handleTablistKeyDown}>
+            aria-label={labels.navigationAriaLabel}>
             {slides.map((_, index) => {
               const selected = index === currentIndex
               return (
                 <button
                   type="button"
                   key={index}
-                  id={`${instanceId}-tab-${index}`}
-                  role="tab"
                   data-tiger-carousel-tab={index}
                   className={getCarouselDotClasses(selected)}
                   aria-label={labels.goToSlideAriaLabel.replace('{index}', String(index + 1))}
-                  aria-selected={selected}
-                  aria-controls={`${instanceId}-slide-${index}`}
-                  tabIndex={selected ? 0 : -1}
+                  aria-current={selected ? 'true' : undefined}
                   onClick={() => goTo(index)}>
                   <span className={getCarouselDotMarkClasses(selected)} />
                 </button>

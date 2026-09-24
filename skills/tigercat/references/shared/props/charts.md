@@ -48,12 +48,12 @@ description: Compact generated Tigercat Charts props reference
 
 Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。
 
-| Prop          | Type           | Default                                        | Notes                                                                  |
-| ------------- | -------------- | ---------------------------------------------- | ---------------------------------------------------------------------- |
-| `width?`      | `number`       | `320`                                          | SVG width                                                              |
-| `height?`     | `number`       | `200`                                          | SVG height                                                             |
-| `responsive?` | `boolean`      | `false`                                        | Observe the canvas host (not a legend sibling) and resize the SVG      |
-| `padding?`    | `ChartPadding` | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Inner padding for chart drawing area. Default covers ChartAxis labels. |
+| Prop          | Type           | Default                                        | Notes                                                                                      |
+| ------------- | -------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `width?`      | `number`       | `320`                                          | SVG width                                                                                  |
+| `height?`     | `number`       | `200`                                          | SVG height                                                                                 |
+| `responsive?` | `boolean`      | `true`                                         | Observe the canvas host (not a legend sibling) and resize the SVG. Width and height bot... |
+| `padding?`    | `ChartPadding` | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Inner padding for chart drawing area. Default covers ChartAxis labels.                     |
 
 Events/callback props: `onResolvedSizeChange?`.
 
@@ -93,7 +93,7 @@ Note: 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶
 
 ## ChartTooltip
 
-`packages/core/src/types/chart-core.ts` · `ChartTooltipProps` · 4/6 props
+`packages/core/src/types/chart-core.ts` · `ChartTooltipProps` · 4/7 props
 
 Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。
 
@@ -117,7 +117,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## Gantt
 
-`packages/core/src/types/gantt.ts` · `GanttProps` · 4/33 props
+`packages/core/src/types/gantt.ts` · `GanttProps` · 4/34 props
 
 | Prop         | Type          | Default | Notes |
 | ------------ | ------------- | ------- | ----- |
@@ -163,6 +163,8 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 `packages/core/src/types/org-chart.ts` · `OrgChartProps` · 4/26 props
 
+Note: `avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`javascript:`、`data:`、`vbscript:` 不渲染 image。
+
 | Prop          | Type                             | Default | Notes |
 | ------------- | -------------------------------- | ------- | ----- |
 | `data`        | `OrgChartNode \| OrgChartNode[]` | `-`     | -     |
@@ -185,7 +187,7 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 
 ## RadarChart
 
-`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/57 props
+`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/58 props
 
 | Prop          | Type                 | Default        | Notes                        |
 | ------------- | -------------------- | -------------- | ---------------------------- |

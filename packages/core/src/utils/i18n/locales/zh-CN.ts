@@ -13,6 +13,9 @@ export const zhCN: TigerLocale = {
     cancelText: '取消',
     closeText: '关闭',
     loadingText: '加载中...',
+    loadingFinishedText: '加载完成',
+    loadingFailedText: '加载失败',
+    viewText: '查看',
     emptyText: '暂无数据',
     noMoreText: '没有更多了',
     searchPlaceholder: '搜索',
@@ -46,7 +49,8 @@ export const zhCN: TigerLocale = {
     ariaLabel: '二维码',
     expiredText: '二维码已过期',
     refreshText: '刷新',
-    loadingText: '加载中...'
+    loadingText: '加载中...',
+    errorText: '无法生成二维码'
   },
   marquee: {
     ariaLabel: '滚动内容'
@@ -54,10 +58,25 @@ export const zhCN: TigerLocale = {
   image: {
     previewAriaLabel: '预览 {alt}',
     previewFallbackAlt: '图片',
-    groupAriaLabel: '图片组'
+    groupAriaLabel: '图片组',
+    loadErrorText: '图片加载失败'
   },
   imageCompare: {
-    ariaLabel: '图片对比'
+    ariaLabel: '图片对比',
+    beforeAlt: '之前',
+    afterAlt: '之后',
+    valueText: '已露出前图的 {percent}%'
+  },
+  text: {
+    copyLabel: '复制',
+    copiedLabel: '已复制',
+    copyFailedLabel: '复制失败',
+  },
+  watermark: {
+    imageErrorText: '水印图片加载失败'
+  },
+  segmented: {
+    ariaLabel: '选项'
   },
   descriptions: {
     colon: '：'
@@ -66,6 +85,9 @@ export const zhCN: TigerLocale = {
     avatarAlt: '头像',
     dragHandleAriaLabel: '拖动排序'
   },
+  masonry: {
+    visualOrderText: '视觉顺序与源顺序不同'
+  },
   scrollArea: {
     ariaLabel: '可滚动区域'
   },
@@ -73,7 +95,8 @@ export const zhCN: TigerLocale = {
     pageBreak: '分页符'
   },
   timeline: {
-    pendingText: '加载中...'
+    pendingText: '加载中...',
+    pendingReplacedText: '更新完成'
   },
   workflowTimeline: {
     pending: '待处理',
@@ -215,7 +238,11 @@ export const zhCN: TigerLocale = {
     branchExpression: '表达式',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: '此节点类型不使用该设置',
+    publishText: '发布',
     publishBlocked: '存在阻塞项，无法发布'
+  },
+  workflowDetailShell: {
+    ariaLabel: '流程详情'
   },
   progress: {
     ariaLabel: '进度'
@@ -258,7 +285,9 @@ export const zhCN: TigerLocale = {
     loadingText: '加载中',
     expandText: '展开',
     collapseText: '收起',
-    selectAllText: '全选',
+    selectAllText: '全选本页',
+    selectLoadedText: '全选已加载行',
+    tableAriaLabel: '数据表',
     selectRowAriaLabel: '选择第 {row} 行',
     sortByText: '按 {column} 排序',
     clearSortText: '不排序',
@@ -274,9 +303,13 @@ export const zhCN: TigerLocale = {
     allText: '全部',
     filterPlaceholder: '筛选...',
     exportCsvText: '导出 CSV',
-    exportExcelText: '导出 Excel',
     exportCsvAriaLabel: '导出为 CSV',
-    exportExcelAriaLabel: '导出为 Excel',
+    selectionCountText: '已选 {count} 项',
+    sortAnnouncementText: '已按 {column} {direction} 排序',
+    sortAscendingText: '升序',
+    sortDescendingText: '降序',
+    sortNoneText: '未排序',
+    dragRowAriaLabel: '拖动第 {row} 行',
     expandRowAriaLabel: '展开行',
     collapseRowAriaLabel: '收起行',
     sortMenuAriaLabel: '排序',
@@ -325,14 +358,17 @@ export const zhCN: TigerLocale = {
     nextText: '下一步',
     finishText: '完成',
     closeAriaLabel: '关闭导览',
-    dialogAriaLabel: '导览'
+    dialogAriaLabel: '导览',
+    loadErrorText: '无法加载这次引导。',
   },
   calendar: {
     previousMonth: '上个月',
     nextMonth: '下个月',
     previousYear: '上一年',
     nextYear: '下一年',
-    eventCountText: '{n} 个日程'
+    eventCountText: '{n} 个日程',
+    switchToYear: '切换到年视图',
+    switchToMonth: '切换到月视图'
   },
   fullscreen: {
     enterAriaLabel: '进入全屏',
@@ -343,7 +379,8 @@ export const zhCN: TigerLocale = {
     pathAriaLabel: '文件路径',
     listboxAriaLabel: '文件列表',
     searchAriaLabel: '搜索文件',
-    emptyText: '空文件夹'
+    emptyText: '空文件夹',
+    resultCountText: '{count} 项'
   },
   imageViewer: {
     dialogAriaLabel: '图片查看器',
@@ -377,6 +414,7 @@ export const zhCN: TigerLocale = {
     resizeHandleS: '下',
     resizeHandleSw: '左下',
     resizeHandleW: '左',
+    cropSizeText: '宽 {width}，高 {height}',
     loadingCropImageAriaLabel: '正在加载待裁剪图片',
     loadErrorAriaLabel: '无法加载待裁剪图片',
     fileTooLargeText: '文件大小超过 {maxSize}',
@@ -394,10 +432,14 @@ export const zhCN: TigerLocale = {
     ellipseToolText: '椭圆',
     polygonToolText: '多边形',
     freehandToolText: '自由绘制',
-    deleteText: '删除'
+    deleteText: '删除',
+    annotationLoadFailedText: '图片加载失败。',
+    annotationRetryText: '重试',
+    annotationTooSmallText: '标注太小。',
+    annotationPolygonIncompleteText: '多边形至少需要 3 个点。'
   },
   status: {
-    tagCloseAriaLabel: '关闭标签',
+    tagCloseAriaLabel: '关闭{label}',
     badgeLabel: '通知',
     badgeCountLabel: '{count} 条通知'
   },
@@ -410,6 +452,7 @@ export const zhCN: TigerLocale = {
     unassignedSwimlaneText: '未分组',
     wipLimitText: 'WIP 限制: {limit}',
     dragHintText: '拖拽以移动',
+    grabAnnouncementText: '{card}。从{from}到{to}。第 {position} 位，共 {count} 位。',
     boardAriaLabel: '任务看板'
   },
   chatWindow: {
@@ -424,7 +467,8 @@ export const zhCN: TigerLocale = {
   code: {
     copyLabel: '复制',
     copiedLabel: '已复制',
-    copyFailedLabel: '复制失败'
+    copyFailedLabel: '复制失败',
+    scrollLabel: '代码'
   },
   commentThread: {
     emptyText: '暂无评论',
@@ -441,12 +485,15 @@ export const zhCN: TigerLocale = {
     listAriaLabel: '评论列表',
     replySubmitText: '发送回复',
     remainingRepliesText: '显示剩余 {count} 条',
+    duplicateIdText: '评论 id {id} 重复',
+    cycleText: '评论在 {id} 处成环',
     maxDepthReachedText: '已到最大回复层'
   },
   activityFeed: {
     emptyText: '暂无动态',
     loadingText: '加载中...',
     listAriaLabel: '动态',
+    newItemText: '新动态：{title}',
     otherGroupTitle: '其他'
   },
   notificationCenter: {
@@ -460,6 +507,9 @@ export const zhCN: TigerLocale = {
     markReadText: '标记已读',
     markUnreadText: '标记未读',
     defaultGroupTitle: '默认',
+    filterAriaLabel: '阅读状态',
+    markedReadText: '已将 {count} 条标为已读',
+    newItemText: '新通知：{title}',
     unreadCountText: '{count} 条未读'
   },
   select: {
@@ -470,7 +520,15 @@ export const zhCN: TigerLocale = {
     clearAriaLabel: '清除选择',
     createOptionLabel: '创建“{label}”',
     moreCountText: '等 {count} 项',
-    loadingText: '加载中...',
+    loadingText: '加载中...'
+  },
+  cascader: {
+    levelLabel: '第 {level} 级',
+    backText: '返回',
+    expandAriaLabel: '展开',
+    collapseAriaLabel: '收起'
+  },
+  treeSelect: {
     levelLabel: '第 {level} 级',
     backText: '返回',
     expandAriaLabel: '展开',
@@ -541,7 +599,22 @@ export const zhCN: TigerLocale = {
     sunburstTooltip: '{label}：{value}（{percent}%）',
     orgChartAriaLabel: '组织架构图',
     ganttAriaLabel: '甘特图',
-    ganttTaskAriaLabel: '{label}，{start} 至 {end}{progress}'
+    ganttTaskAriaLabel: '{label}，{start} 至 {end}{progress}',
+    ganttTodayAriaLabel: '今天',
+    ganttUnknownDate: '未知日期',
+    chartAriaLabel: '图表',
+    lineChartAriaLabel: '折线图',
+    areaChartAriaLabel: '面积图',
+    barChartAriaLabel: '柱状图',
+    scatterChartAriaLabel: '散点图',
+    pieChartAriaLabel: '饼图',
+    radarChartAriaLabel: '雷达图',
+    heatmapChartAriaLabel: '热力图',
+    heatmapSummary: '{rows} 行 {columns} 列',
+    funnelChartAriaLabel: '漏斗图',
+    sunburstChartAriaLabel: '旭日图',
+    treemapChartAriaLabel: '矩形树图',
+    gaugeChartAriaLabel: '仪表盘'
   },
   codeEditor: {
     editorAriaLabel: '代码编辑器'
@@ -555,6 +628,8 @@ export const zhCN: TigerLocale = {
     editModeLabel: '编辑',
     splitModeLabel: '分栏',
     previewModeLabel: '预览',
+    showEditorText: '编辑',
+    showPreviewText: '预览',
     bold: '加粗',
     italic: '斜体',
     strikethrough: '删除线',
@@ -664,7 +739,9 @@ export const zhCN: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: '移除 {tag}',
-    clearAllLabel: '清空全部标签'
+    clearAllLabel: '清空全部标签',
+    duplicateText: '已经添加',
+    limitText: '已达到标签数量上限'
   },
   input: {
     clearAriaLabel: '清除输入',
@@ -680,12 +757,6 @@ export const zhCN: TigerLocale = {
     ariaLabel: '滑块',
     minAriaLabel: '最小值',
     maxAriaLabel: '最大值'
-  },
-  stepper: {
-    ariaLabel: '步进器',
-    valueAriaLabel: '数值',
-    incrementAriaLabel: '增加',
-    decrementAriaLabel: '减少'
   },
   signature: {
     ariaLabel: '签名板',

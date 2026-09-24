@@ -4,9 +4,6 @@
  * React components for Tigercat UI library
  */
 
-// Re-export from core
-export * from '@expcat/tigercat-core'
-
 // Components
 export { ConfigProvider, useTigerConfig } from './components/ConfigProvider'
 export type { ConfigProviderProps, TigerConfig } from './components/ConfigProvider'
@@ -36,9 +33,8 @@ export { InputNumber } from './components/InputNumber'
 export type { InputNumberProps } from './components/InputNumber'
 export { Form, useFormContext } from './components/Form'
 export type { FormProps, FormHandle, FormSubmitEvent, FormContextValue } from './components/Form'
-export { FormItem } from './components/FormItem'
+export { FormItem, useFormItemControlContext } from './components/FormItem'
 export type { FormItemProps } from './components/FormItem'
-export { useFormItemControlContext } from './components/FormItemContext'
 export type { FormItemControlContextValue } from './components/FormItemContext'
 export { useFormController } from './hooks/useFormController'
 export { Space } from './components/Space'
@@ -362,8 +358,6 @@ export { ColorSwatch } from './components/ColorSwatch'
 export type { ColorSwatchProps } from './components/ColorSwatch'
 export { VirtualList } from './components/VirtualList'
 export type { VirtualListProps, VirtualListHandle } from './components/VirtualList'
-export { Stepper } from './components/Stepper'
-export type { StepperProps } from './components/Stepper'
 export { CronEditor } from './components/CronEditor'
 export type { CronEditorProps } from './components/CronEditor'
 export { Calendar } from './components/Calendar'
@@ -468,5 +462,3 @@ export type {
 // AspectRatio (v2.1.0+)
 export { AspectRatio } from './components/AspectRatio'
 export type { AspectRatioProps } from './components/AspectRatio'
-
-export const version = '2.9.2'

@@ -11,8 +11,9 @@ import {
   getPrintLayoutBoxStyle,
   getPrintLayoutClasses,
   getPrintLayoutLabels,
+  createPrintInstanceId,
   getPrintLayoutPageKey,
-  injectPrintLayoutStyles,
+  mountPrintInstanceStyle,
   mergeTigerLocale,
   printLayoutFooterClasses,
   printLayoutHeaderClasses,
@@ -30,9 +31,11 @@ import { useTigerConfig } from './ConfigProvider'
 
 const PrintLayoutContext = React.createContext<{
   showPageBreaks: boolean
+  printBreaks: boolean
   locale?: Partial<TigerLocale>
 }>({
-  showPageBreaks: true
+  showPageBreaks: true,
+  printBreaks: true
 })
 
 export type { PrintLayoutInstance }
@@ -56,6 +59,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
     headerRender,
     footerRender,
     showPageBreaks = true,
+    printBreaks = true,
     pageWidth,
     pageHeight,
     className,
@@ -66,6 +70,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
   ref
 ) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const instanceId = useRef(createPrintInstanceId())
   const box = useMemo(
     () =>
       resolvePrintPageBox(
@@ -79,8 +84,9 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
   const pageKey = getPrintLayoutPageKey(box)
 
   useEffect(() => {
-    injectPrintLayoutStyles()
-  }, [])
+    const doc = rootRef.current?.ownerDocument ?? document
+    return mountPrintInstanceStyle(doc, instanceId.current, box)
+  }, [box])
 
   useImperativeHandle(
     ref,
@@ -95,13 +101,15 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
   const footer = showFooter ? footerRender || footerText : null
 
   return (
-    <PrintLayoutContext.Provider value={{ showPageBreaks, locale }}>
+    <PrintLayoutContext.Provider value={{ showPageBreaks, printBreaks, locale }}>
       <div
         {...rest}
         ref={rootRef}
         className={getPrintLayoutClasses(className)}
         style={{ ...getPrintLayoutBoxStyle(box), ...(rest.style as React.CSSProperties) }}
-        data-tiger-print={pageKey}>
+        data-tiger-print={pageKey}
+        data-tiger-print-instance={instanceId.current}
+        data-tiger-print-size={box.pageSize}>
         <table className="w-full border-collapse">
           {header ? (
             <thead>
@@ -139,7 +147,7 @@ export const PrintPageBreak = forwardRef<HTMLDivElement, PrintPageBreakProps>(
     { className, locale, children, 'aria-hidden': ariaHidden, ...rest },
     ref
   ) {
-    const { showPageBreaks, locale: layoutLocale } = useContext(PrintLayoutContext)
+    const { showPageBreaks, printBreaks, locale: layoutLocale } = useContext(PrintLayoutContext)
     const config = useTigerConfig()
     const label = getPrintLayoutLabels(
       mergeTigerLocale(mergeTigerLocale(config.locale, layoutLocale), locale)
@@ -148,12 +156,11 @@ export const PrintPageBreak = forwardRef<HTMLDivElement, PrintPageBreakProps>(
       <div
         {...rest}
         ref={ref}
-        className={classNames('print:break-before-page', className)}
+        className={classNames(printBreaks && 'print:break-before-page', className)}
         aria-hidden={ariaHidden ?? true}>
         {showPageBreaks ? (
-          <div
-            className={classNames(printLayoutPageBreakClasses, printLayoutPageBreakLabelClasses)}>
-            {children ?? label}
+          <div className={printLayoutPageBreakClasses}>
+            <span className={printLayoutPageBreakLabelClasses}>{children ?? label}</span>
           </div>
         ) : null}
       </div>

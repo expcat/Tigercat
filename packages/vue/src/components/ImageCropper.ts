@@ -40,7 +40,8 @@ import {
   imageErrorIconPath,
   imageLoadingSpinnerClasses,
   imageLoadingSpinnerPath,
-  injectImageCropperStyles,
+  formatCropSizeText,
+  nudgeCropHandle,
   mergeTigerLocale,
   moveCropRect,
   remapCropRect,
@@ -266,7 +267,7 @@ export const ImageCropper = defineComponent({
     )
 
     onMounted(() => {
-      injectImageCropperStyles()
+
       loadImage()
       observeContainer()
     })
@@ -354,7 +355,7 @@ export const ImageCropper = defineComponent({
         }
         try {
           const rect = currentCropRect()
-          const { canvas, dataUrl } = cropCanvas(
+          cropCanvas(
             imageRef.value,
             rect,
             displayWidth.value,
@@ -362,21 +363,15 @@ export const ImageCropper = defineComponent({
             props.outputType,
             props.quality
           )
-          canvas.toBlob(
-            (blob) => {
-              if (blob) {
-                const extension = (
-                  (props.outputType ?? 'image/png').split('/')[1] || 'png'
-                ).replace('jpeg', 'jpg')
-                const file = new File([blob], `crop.${extension}`, { type: blob.type })
-                resolve({ canvas, blob, dataUrl, cropRect: { ...rect }, file })
-              } else {
-                reject(new Error('Failed to create blob'))
-              }
-            },
-            props.outputType,
-            props.quality
-          )
+            .then((blob) => {
+              const extension = (
+                (props.outputType ?? 'image/png').split('/')[1] || 'png'
+              ).replace('jpeg', 'jpg')
+              const file = new File([blob], `crop.${extension}`, { type: blob.type })
+              resolve({ blob, cropRect: { ...rect }, file })
+            })
+            .catch(reject)
+          return
         } catch (error) {
           reject(error)
         }
@@ -483,6 +478,7 @@ export const ImageCropper = defineComponent({
 
       const img = h('img', {
         src: props.src,
+        crossorigin: 'anonymous',
         class: imageCropperImgClasses,
         style: { width: `${dw}px`, height: `${dh}px` },
         draggable: false,
@@ -607,11 +603,27 @@ export const ImageCropper = defineComponent({
           style: getCropperHandleStyle(handle, cr),
           'data-crop-handle': handle,
           role: 'button',
-          tabindex: -1,
+          tabindex: 0,
           'aria-label': formatCropperResizeAriaLabel(
             labels.value.resizeCropAreaAriaLabel,
             getCropperHandleName(handle, labels.value)
           ),
+          onKeydown: (event: KeyboardEvent) => {
+            const next = nudgeCropHandle(
+              cr,
+              handle,
+              event.key,
+              1,
+              dw,
+              dh,
+              props.aspectRatio,
+              props.minWidth,
+              props.minHeight
+            )
+            if (!next) return
+            event.preventDefault()
+            commitCropRect(next)
+          },
           onPointerdown: (event: PointerEvent) => startDrag(event, 'resize', handle)
         })
       )
@@ -636,7 +648,18 @@ export const ImageCropper = defineComponent({
               role: 'group',
               'aria-label': labels.value.cropperDialogAriaLabel
             },
-            [frame, selection, dragArea, ...guideLines, ...handles]
+            [
+              frame,
+              selection,
+              dragArea,
+              h(
+                'span',
+                { class: 'sr-only', 'aria-live': 'polite' },
+                formatCropSizeText(labels.value.cropSizeText, cr.width, cr.height)
+              ),
+              ...guideLines,
+              ...handles
+            ]
           )
         ]
       )

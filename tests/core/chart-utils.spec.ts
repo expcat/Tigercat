@@ -32,7 +32,6 @@ import {
   clampBarWidth,
   ensureBarMinHeight,
   getBarValueLabelY,
-  getBarGradientPrefix,
   getStableChartGradientPrefix,
   computePieHoverOffset,
   computePieLabelLine,
@@ -682,7 +681,7 @@ describe('chart-utils', () => {
       }
       const joined = RADAR_SPLIT_AREA_COLORS.join(' ')
       expect(joined).not.toMatch(/rgba\(\s*0\s*,\s*0\s*,\s*0/)
-      expect(joined).toContain('--tiger-text')
+      expect(joined).toContain('--tiger-chart-split-')
     })
   })
 
@@ -853,15 +852,6 @@ describe('chart-utils', () => {
 
     it('places a negative top label below the bar', () => {
       expect(getBarValueLabelY(50, 20, 'top', 8, { negative: true })).toBe(78)
-    })
-  })
-
-  describe('getBarGradientPrefix', () => {
-    it('returns unique prefixes on successive calls', () => {
-      const a = getBarGradientPrefix()
-      const b = getBarGradientPrefix()
-      expect(a).not.toBe(b)
-      expect(a).toMatch(/^tiger-bar-grad-\d+$/)
     })
   })
 

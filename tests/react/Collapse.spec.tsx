@@ -56,8 +56,8 @@ describe('Collapse', () => {
 
       expect(screen.getByText('Panel 1')).toBeInTheDocument()
       expect(screen.getByText('Panel 2')).toBeInTheDocument()
-      expect(screen.getByText('Content 1')).toBeInTheDocument()
-      expect(screen.getByText('Content 2')).toBeInTheDocument()
+      expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
+      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
     })
 
     it('should render with bordered style by default', () => {
@@ -341,11 +341,7 @@ describe('Collapse', () => {
       expect(panelHeader).toHaveAttribute('aria-expanded', 'true')
     })
 
-    it('should expand content height on the next animation frame', async () => {
-      const scheduler = createFrameScheduler()
-      vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
-      vi.stubGlobal('cancelAnimationFrame', scheduler.cancelAnimationFrame)
-
+    it('mounts panel content only while the panel is open', async () => {
       render(
         <Collapse>
           <CollapsePanel panelKey="1" header="Panel 1">
@@ -354,41 +350,11 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const wrapper = getContentWrapper('Content 1')
-      Object.defineProperty(wrapper, 'scrollHeight', { value: 80, configurable: true })
-
+      expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
       await fireEvent.click(screen.getByText('Panel 1').closest('button')!)
-
-      expect(scheduler.requestAnimationFrame).toHaveBeenCalledTimes(1)
-      expect(wrapper.style.maxHeight).toBe('0px')
-
-      scheduler.flush()
-      expect(wrapper.style.maxHeight).toBe('80px')
-      expect(wrapper.style.opacity).toBe('1')
-    })
-
-    it('should collapse content height on the next animation frame', async () => {
-      const scheduler = createFrameScheduler()
-      vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
-      vi.stubGlobal('cancelAnimationFrame', scheduler.cancelAnimationFrame)
-
-      render(
-        <Collapse defaultActiveKey="1">
-          <CollapsePanel panelKey="1" header="Panel 1">
-            Content 1
-          </CollapsePanel>
-        </Collapse>
-      )
-
-      const wrapper = getContentWrapper('Content 1')
-      Object.defineProperty(wrapper, 'scrollHeight', { value: 64, configurable: true })
-
+      expect(getContentWrapper('Content 1')).toBeInTheDocument()
       await fireEvent.click(screen.getByText('Panel 1').closest('button')!)
-
-      expect(wrapper.style.maxHeight).toBe('64px')
-      scheduler.flush()
-      expect(wrapper.style.maxHeight).toBe('0px')
-      expect(wrapper.style.opacity).toBe('0')
+      expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
     })
   })
 
@@ -551,7 +517,7 @@ describe('Collapse', () => {
       expect(panelHeader).toHaveFocus()
     })
 
-    it('should mark a default-collapsed panel content wrapper as inert and aria-hidden', () => {
+    it('does not mount a default-collapsed panel', () => {
       render(
         <Collapse>
           <CollapsePanel panelKey="1" header="Panel 1">
@@ -560,9 +526,7 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const wrapper = getContentWrapper('Content 1')
-      expect(wrapper).toHaveAttribute('inert')
-      expect(wrapper).toHaveAttribute('aria-hidden', 'true')
+      expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
     })
 
     it('should not mark a default-expanded panel content wrapper as inert or aria-hidden', () => {
@@ -589,18 +553,13 @@ describe('Collapse', () => {
       )
 
       const panelHeader = screen.getByText('Panel 1').closest('button')
-      const wrapper = getContentWrapper('Content 1')
-
-      expect(wrapper).not.toHaveAttribute('inert')
-      expect(wrapper.getAttribute('aria-hidden')).not.toBe('true')
+      expect(getContentWrapper('Content 1')).toBeInTheDocument()
 
       await fireEvent.click(panelHeader!)
-      expect(wrapper).toHaveAttribute('inert')
-      expect(wrapper).toHaveAttribute('aria-hidden', 'true')
+      expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
 
       await fireEvent.click(panelHeader!)
-      expect(wrapper).not.toHaveAttribute('inert')
-      expect(wrapper.getAttribute('aria-hidden')).not.toBe('true')
+      expect(getContentWrapper('Content 1')).toBeInTheDocument()
     })
 
     it('should have no accessibility violations', async () => {
@@ -651,10 +610,6 @@ describe('Collapse', () => {
     })
 
     it('keeps the first panel expanded when a sibling opens', async () => {
-      const scheduler = createFrameScheduler()
-      vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
-      vi.stubGlobal('cancelAnimationFrame', scheduler.cancelAnimationFrame)
-
       render(
         <Collapse>
           <CollapsePanel panelKey="1" header="Panel 1">
@@ -666,18 +621,16 @@ describe('Collapse', () => {
         </Collapse>
       )
 
-      const firstWrapper = getContentWrapper('Content 1')
-      Object.defineProperty(firstWrapper, 'scrollHeight', { value: 80, configurable: true })
       await fireEvent.click(screen.getByRole('button', { name: 'Panel 1' }))
-      scheduler.flush()
-      expect(firstWrapper.style.maxHeight).toBe('80px')
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
 
       await fireEvent.click(screen.getByRole('button', { name: 'Panel 2' }))
       expect(screen.getByRole('button', { name: 'Panel 1' })).toHaveAttribute(
         'aria-expanded',
         'true'
       )
-      expect(firstWrapper.style.maxHeight).not.toBe('0px')
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      expect(screen.getByText('Content 2')).toBeInTheDocument()
     })
   })
 })

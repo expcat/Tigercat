@@ -10,19 +10,22 @@ import React, {
 import {
   classNames,
   createSubmenuHeightTransitionController,
+  DROPDOWN_ENTER_CLASS,
   focusFirstChildItem,
-  focusMenuEdge,
+  getMenuButtons,
   getMenuItemIndent,
   getMenuListRole,
   getMenuNavigationKeys,
   getMenuPopupPlacement,
+  menuKeyId,
+  nextMenuRovingKey,
+  parseMenuKeyId,
   getSubMenuTitleClasses,
   hasSelectedMenuDescendant,
   isKeyOpen,
   isMenuRoving,
   isSubmenuPopup,
   MENU_POPUP_HOVER_CLOSE_MS,
-  moveFocusInMenu,
   sameMenuKey,
   shouldIndentMenuItem,
   submenuContentInlineClasses,
@@ -31,7 +34,8 @@ import {
   submenuHeightTransitionClasses,
   type SubmenuHeightTransitionController
 } from '@expcat/tigercat-core'
-import { renderOverlayPortal, useAnchoredOverlay } from '../../utils/overlay'
+import { useAnchoredOverlay } from '../../utils/overlay'
+import { OverlayPortal } from '../../utils/overlay-outlet'
 import {
   MenuContext,
   SubMenuScopeContext,
@@ -84,7 +88,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     referenceRef: titleRef,
     floatingRef: popupRef,
     enabled: isPopup && isExpanded,
-    placement: getMenuPopupPlacement(menuContext?.mode ?? 'vertical', level),
+    placement: getMenuPopupPlacement(menuContext?.mode ?? 'vertical', level, menuContext?.dir),
     offset: popupPortal ? 4 : 0,
     portal: popupPortal,
     dismissOnEscape: true,
@@ -185,6 +189,16 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     }, MENU_POPUP_HOVER_CLOSE_MS)
   }, [menuContext, isPopup, itemKey])
 
+  useLayoutEffect(() => {
+    if (!isPopup || !isExpanded) return
+    const list = popupRef.current
+    if (!list) return
+    const first = getMenuButtons(list)[0]
+    const raw = first?.getAttribute('data-tiger-menuitem-key')
+    if (!raw) return
+    setLayerStop(parseMenuKeyId(raw))
+  }, [isExpanded, isPopup])
+
   const focusFirstChild = useCallback(
     (titleEl: HTMLButtonElement) => {
       const run = () => focusFirstChildItem(titleEl, isPopup ? popupRef.current : null)
@@ -210,27 +224,44 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         menuContext.dir
       )
 
+      const setLayerStop = parentScope?.setTabStopKey ?? menuContext.setTabStopKey
+      const move = (delta: 1 | -1 | 'start' | 'end') => {
+        const list = current.closest<HTMLElement>('ul[data-tiger-menu-list]')
+        if (!list) return
+        const keys = getMenuButtons(list)
+          .map((button) => button.getAttribute('data-tiger-menuitem-key'))
+          .filter((value): value is string => Boolean(value))
+          .map(parseMenuKeyId)
+        const next = nextMenuRovingKey({ itemKeys: keys, current: itemKey, delta })
+        if (next == null) return
+        setLayerStop(next)
+        const id = menuKeyId(next)
+        requestAnimationFrame(() => {
+          list.querySelector<HTMLElement>(`[data-tiger-menuitem-key="${id}"]`)?.focus()
+        })
+      }
+
       if (event.key === nextKey) {
         event.preventDefault()
-        moveFocusInMenu(current, 1)
+        move(1)
         return
       }
 
       if (event.key === prevKey) {
         event.preventDefault()
-        moveFocusInMenu(current, -1)
+        move(-1)
         return
       }
 
       if (event.key === 'Home') {
         event.preventDefault()
-        focusMenuEdge(current, 'start')
+        move('start')
         return
       }
 
       if (event.key === 'End') {
         event.preventDefault()
-        focusMenuEdge(current, 'end')
+        move('end')
         return
       }
 
@@ -279,26 +310,26 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     menuContext?.handleOpenChange(itemKey, false)
   }, [menuContext, itemKey])
 
+  const [layerStop, setLayerStop] = useState<MenuKey | undefined>(undefined)
   const scopeValue = useMemo(
     () => ({
       itemKey,
       popup: isPopup,
       titleRef,
-      close: closeSelf
+      close: closeSelf,
+      tabStopKey: layerStop,
+      setTabStopKey: setLayerStop
     }),
-    [itemKey, isPopup, closeSelf]
+    [itemKey, isPopup, closeSelf, layerStop]
   )
 
   if (!menuContext) return null
 
   const inPopup = Boolean(parentScope?.popup)
   const roving = isMenuRoving(menuContext.mode, { popup: inPopup, isRoot: !parentScope })
-  const isTabStop =
-    !disabled &&
-    roving &&
-    menuContext.tabStopKey != null &&
-    sameMenuKey(itemKey, menuContext.tabStopKey)
-  const titleRole = inPopup || menuContext.mode === 'horizontal' ? 'menuitem' : undefined
+  const ownTabStop = parentScope?.tabStopKey ?? menuContext.tabStopKey
+  const isTabStop = !disabled && roving && ownTabStop != null && sameMenuKey(itemKey, ownTabStop)
+  const titleRole = 'menuitem' as const
   const listRole = getMenuListRole(menuContext.mode, { popup: isPopup })
   const label = title || getReactMenuPlainText(children)
 
@@ -344,8 +375,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         <ul
           ref={popupRef}
           id={listId}
-          className={classNames(contentClasses, overlay.floatingClasses)}
-          style={{ ...overlay.floatingStyles, display: isExpanded ? 'block' : 'none' }}
+          className={classNames(contentClasses, overlay.floatingClasses, DROPDOWN_ENTER_CLASS)}
+          style={overlay.floatingStyles}
           data-positioned={overlay.positioned}
           role={listRole}
           aria-labelledby={titleId}
@@ -358,7 +389,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         </ul>
       )
 
-      return renderOverlayPortal(popup, overlay.target, !popupPortal)
+      if (!isExpanded) return null
+      return popupPortal ? <OverlayPortal target={overlay.target}>{popup}</OverlayPortal> : popup
     }
 
     if (!hasRenderedInline) return null
@@ -403,6 +435,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         onKeyDown={handleTitleKeyDown}
         role={titleRole}
         data-tiger-menuitem="true"
+        data-tiger-menuitem-key={menuKeyId(itemKey)}
         data-tiger-submenu-title=""
         aria-expanded={isExpanded ? 'true' : 'false'}
         aria-haspopup={isPopup ? 'menu' : undefined}

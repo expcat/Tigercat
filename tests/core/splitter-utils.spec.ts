@@ -65,7 +65,7 @@ describe('splitter-utils', () => {
 
     it('should include dragging class when dragging', () => {
       const classes = getSplitterGutterClasses('horizontal', true, false)
-      expect(classes).toContain('bg-[var(--tiger-primary,#2563eb)]')
+      expect(classes).toContain('bg-[var(--tiger-primary)]')
     })
 
     it('should include disabled class when disabled', () => {
@@ -76,7 +76,7 @@ describe('splitter-utils', () => {
 
     it('should include both dragging and disabled', () => {
       const classes = getSplitterGutterClasses('horizontal', true, true)
-      expect(classes).toContain('bg-[var(--tiger-primary,#2563eb)]')
+      expect(classes).toContain('bg-[var(--tiger-primary)]')
       expect(classes).toContain('pointer-events-none')
     })
   })
@@ -297,22 +297,24 @@ describe('splitter-utils', () => {
 
   describe('getPaneStyle', () => {
     it('should return width style for horizontal', () => {
-      const style = getPaneStyle(300, 'horizontal')
+      const style = getPaneStyle({ kind: 'fixed', pixels: 300, flexGrow: 0 }, 'horizontal')
       expect(style.width).toBe('300px')
       expect(style.flexShrink).toBe('0')
       expect(style.flexGrow).toBe('0')
       expect(style.minWidth).toBe('0')
     })
 
-    it('uses flex-grow from the ratio before the container is measured', () => {
-      const style = getPaneStyle(null, 'horizontal', { ratio: 0.3, measured: false })
-      expect(style.flexGrow).toBe('0.3')
-      expect(style.flexBasis).toBe('0px')
+    it('keeps the percentage before the container is measured', () => {
+      const style = getPaneStyle(
+        { kind: 'percent', pixels: null, flexBasis: '30%', flexGrow: 0 },
+        'horizontal'
+      )
+      expect(style.flexBasis).toBe('30%')
       expect(style.width).toBeUndefined()
     })
 
     it('should return height style for vertical', () => {
-      const style = getPaneStyle(200, 'vertical')
+      const style = getPaneStyle({ kind: 'fixed', pixels: 200, flexGrow: 0 }, 'vertical')
       expect(style.height).toBe('200px')
       expect(style.flexShrink).toBe('0')
     })

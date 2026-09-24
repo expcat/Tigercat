@@ -7,8 +7,6 @@ import {
   EMPTY_TABLE_RECORDS,
   applyTableColumnOrder,
   commitTableCellEdit,
-  downloadTableExport,
-  exportTableData,
   freezeTableColumnWidths,
   getNextTableColumnFixed,
   getNextTableExpandKeys,
@@ -19,14 +17,22 @@ import {
   mergeTablePagination,
   reorderTableColumnsByKey,
   reorderTableRowsByKey,
+  coerceTableEditValue,
+  getTableCellValue,
+  getTableSelectionState,
+  resolveTableExportRecords,
   resolveTableKeyList,
+  resolveTableQueryPage,
   resolveTableRecordKey,
+  resolveTableRowKeys,
+  resolveTableSelectLoadedKeys,
   resolveTableView,
-  shouldWarnControlledPageReset,
+  shouldSkipTableLocalProcessing,
+  tableRowKeyId,
   type TableColumn,
   type TableFixedPosition
 } from '@expcat/tigercat-core'
-import { devWarn } from '@expcat/tigercat-core'
+import { downloadTableExport, exportTableData } from '@expcat/tigercat-core/utils/table-export'
 import type { TableContext, TableEmitFn, TableInternalProps } from './types'
 
 /**
@@ -36,7 +42,8 @@ export function useTableState(
   props: TableInternalProps,
   emit: TableEmitFn,
   measuredColumnWidths: { value: Record<string, number> },
-  containerSize?: { value: { width: number; height: number } }
+  containerSize?: { value: { width: number; height: number } },
+  sortLocale?: { value: string | undefined }
 ): TableContext {
   const paginationMerged = computed(() => mergeTablePagination(props.pagination))
   const paginationConfig = computed(() => {
@@ -57,16 +64,9 @@ export function useTableState(
     resolveTableKeyList(props.expandable?.expandedRowKeys, 'expandable.expandedRowKeys')
   )
 
-  const internalData = ref<Record<string, unknown>[] | null>(null)
-  watch(
-    () => props.dataSource,
-    () => {
-      internalData.value = null
-    }
-  )
-  const effectiveData = computed(
-    () => internalData.value ?? props.dataSource ?? EMPTY_TABLE_RECORDS
-  )
+  const sourceData = computed(() => props.dataSource ?? EMPTY_TABLE_RECORDS)
+  const isColumnOrderControlled = computed(() => props.columnOrder !== undefined)
+  const isColumnFixedControlled = computed(() => props.columnFixed !== undefined)
 
   const uncontrolledSortState = ref(props.defaultSort ?? DEFAULT_TABLE_SORT)
   const uncontrolledHiddenColumnKeys = ref(
@@ -91,8 +91,35 @@ export function useTableState(
   watch(
     () => props.columns.map((column) => column.key).join('\0'),
     () => {
-      columnOrder.value = null
+      if (!isColumnOrderControlled.value) columnOrder.value = null
     }
+  )
+
+  const parentFixed = ref<Record<string, TableFixedPosition | false | undefined>>({})
+  watch(
+    () => props.columns.map((column) => `${column.key}\u0001${column.fixed ?? ''}`).join('\0'),
+    () => {
+      if (isColumnFixedControlled.value) {
+        parentFixed.value = Object.fromEntries(props.columns.map((column) => [column.key, column.fixed]))
+        return
+      }
+      const next = { ...fixedOverrides.value }
+      let changed = false
+      for (const column of props.columns) {
+        const previous = parentFixed.value[column.key]
+        if (
+          previous !== undefined &&
+          previous !== column.fixed &&
+          Object.prototype.hasOwnProperty.call(next, column.key)
+        ) {
+          delete next[column.key]
+          changed = true
+        }
+      }
+      if (changed) fixedOverrides.value = next
+      parentFixed.value = Object.fromEntries(props.columns.map((column) => [column.key, column.fixed]))
+    },
+    { immediate: true }
   )
 
   const sortState = computed(() => props.sort ?? uncontrolledSortState.value)
@@ -115,13 +142,24 @@ export function useTableState(
     expandControl.value.controlled ? expandControl.value.keys : uncontrolledExpandedRowKeys.value
   )
 
+  const effectiveColumnOrder = computed(() =>
+    isColumnOrderControlled.value ? props.columnOrder : (columnOrder.value ?? undefined)
+  )
+  const effectiveFixedOverrides = computed(() =>
+    isColumnFixedControlled.value ? (props.columnFixed ?? {}) : fixedOverrides.value
+  )
+
+  const sourceRowKeys = computed(() =>
+    resolveTableRowKeys(sourceData.value, props.rowKey, props.rowSelection?.getRowKey)
+  )
+
   const view = computed(() =>
     resolveTableView({
       columns: props.columns,
-      dataSource: effectiveData.value,
+      dataSource: sourceData.value,
       hiddenColumnKeys: hiddenColumnKeys.value,
-      columnOrder: columnOrder.value ?? undefined,
-      fixedOverrides: fixedOverrides.value,
+      columnOrder: effectiveColumnOrder.value,
+      fixedOverrides: effectiveFixedOverrides.value,
       filters: filterState.value,
       sort: sortState.value,
       filterMode: props.filterMode,
@@ -132,11 +170,14 @@ export function useTableState(
       currentPageSize: currentPageSize.value,
       rowKey: props.rowKey,
       getRowKey: props.rowSelection?.getRowKey,
+      sourceRowKeys: sourceRowKeys.value,
       rowSelection: props.rowSelection,
       expandable: props.expandable,
       selectedRowKeys: selectedRowKeys.value,
       measuredColumnWidths: measuredColumnWidths.value,
-      containerWidth: containerSize?.value.width
+      containerWidth: containerSize?.value.width,
+      sortLocale: sortLocale?.value,
+      rowDraggable: props.rowDraggable
     })
   )
 
@@ -146,14 +187,19 @@ export function useTableState(
   const paginatedData = computed(() => view.value.paginatedData)
   const paginatedRowKeys = computed(() => view.value.pageRowKeys)
   const pageSourceIndices = computed(() => view.value.pageSourceIndices)
-  const groupedData = computed(() => view.value.groupedData)
+  const groupBlocks = computed(() => view.value.groupBlocks)
+  const processedRowKeys = computed(() => view.value.processedRowKeys)
   const paginationInfo = computed(() => view.value.paginationInfo)
   const totalColumnCount = computed(() => view.value.totalColumnCount)
   const allSelected = computed(() => view.value.allSelected)
   const someSelected = computed(() => view.value.someSelected)
 
-  const selectedRowKeySet = computed(() => new Set<string | number>(selectedRowKeys.value))
-  const expandedRowKeySet = computed(() => new Set<string | number>(expandedRowKeys.value))
+  const selectedRowKeySet = computed(
+    () => new Set(selectedRowKeys.value.map((key) => tableRowKeyId(key)))
+  )
+  const expandedRowKeySet = computed(
+    () => new Set(expandedRowKeys.value.map((key) => tableRowKeyId(key)))
+  )
 
   const columnByKey = computed<Record<string, TableColumn>>(() => {
     const map: Record<string, TableColumn> = {}
@@ -203,23 +249,48 @@ export function useTableState(
 
   function toggleColumnLock(columnKey: string) {
     const original = props.columns.find((column) => column.key === columnKey)?.fixed
-    const current = Object.prototype.hasOwnProperty.call(fixedOverrides.value, columnKey)
-      ? fixedOverrides.value[columnKey]
-      : original
+    const controlledMap = props.columnFixed ?? {}
+    const current = isColumnFixedControlled.value
+      ? Object.prototype.hasOwnProperty.call(controlledMap, columnKey)
+        ? controlledMap[columnKey]
+        : original
+      : Object.prototype.hasOwnProperty.call(fixedOverrides.value, columnKey)
+        ? fixedOverrides.value[columnKey]
+        : original
     const nextFixed = getNextTableColumnFixed(current, original)
-    fixedOverrides.value = { ...fixedOverrides.value, [columnKey]: nextFixed }
-    const fullColumns = applyTableColumnOrder(props.columns, columnOrder.value ?? undefined).map(
+    if (!isColumnFixedControlled.value) {
+      fixedOverrides.value = { ...fixedOverrides.value, [columnKey]: nextFixed }
+    }
+    const fullColumns = applyTableColumnOrder(props.columns, effectiveColumnOrder.value).map(
       (column) => (column.key === columnKey ? { ...column, fixed: nextFixed } : column)
     )
     emit('column-fixed-change', columnKey, nextFixed, fullColumns)
+  }
+
+  function queryPage(): number {
+    const nextPage = resolveTableQueryPage(isCurrentPageControlled.value, currentPage.value)
+    if (!isCurrentPageControlled.value && nextPage !== currentPage.value) {
+      uncontrolledCurrentPage.value = nextPage
+    }
+    return nextPage
   }
 
   function handleSetSort(nextSortState: (typeof sortState)['value']) {
     if (!isSortControlled.value) {
       uncontrolledSortState.value = nextSortState
     }
+    const nextPage = queryPage()
     emit('sort-change', nextSortState)
-    emitChange({ sort: nextSortState })
+    emitChange({
+      sort: nextSortState,
+      pagination:
+        paginationMerged.value !== false
+          ? { current: nextPage, pageSize: currentPageSize.value }
+          : null
+    })
+    if (paginationMerged.value !== false && nextPage !== currentPage.value) {
+      emit('page-change', { current: nextPage, pageSize: currentPageSize.value })
+    }
   }
 
   function handleSort(columnKey: string) {
@@ -233,22 +304,17 @@ export function useTableState(
     if (!isFiltersControlled.value) {
       uncontrolledFilterState.value = nextFilterState
     }
-    if (!isCurrentPageControlled.value) {
-      uncontrolledCurrentPage.value = 1
-    } else if (shouldWarnControlledPageReset(true, currentPage.value)) {
-      devWarn(
-        'Table.filter.page',
-        'Table filter reset pagination.current to 1; the controlled current page was not written back'
-      )
-    }
+    const nextPage = queryPage()
     emit('filter-change', nextFilterState)
     if (paginationMerged.value !== false) {
-      emit('page-change', { current: 1, pageSize: currentPageSize.value })
+      emit('page-change', { current: nextPage, pageSize: currentPageSize.value })
     }
     emitChange({
       filters: nextFilterState,
       pagination:
-        paginationMerged.value !== false ? { current: 1, pageSize: currentPageSize.value } : null
+        paginationMerged.value !== false
+          ? { current: nextPage, pageSize: currentPageSize.value }
+          : null
     })
   }
 
@@ -264,11 +330,9 @@ export function useTableState(
     if (!isPageSizeControlled.value) {
       uncontrolledCurrentPageSize.value = pageSize
     }
-    if (!isCurrentPageControlled.value) {
-      uncontrolledCurrentPage.value = 1
-    }
-    emit('page-change', { current: 1, pageSize })
-    emitChange({ pagination: { current: 1, pageSize } })
+    const nextPage = queryPage()
+    emit('page-change', { current: nextPage, pageSize })
+    emitChange({ pagination: { current: nextPage, pageSize } })
   }
 
   function handleToggleExpand(key: string | number, record: Record<string, unknown>) {
@@ -316,6 +380,30 @@ export function useTableState(
     emit('selection-change', nextKeys)
   }
 
+  function handleSelectLoaded(checked = true) {
+    const remote = shouldSkipTableLocalProcessing(paginationMerged.value)
+    const loaded = getTableSelectionState({
+      records: view.value.processedData,
+      rowKeys: view.value.processedRowKeys,
+      selectedRowKeys: selectedRowKeys.value,
+      getCheckboxProps: props.rowSelection?.getCheckboxProps
+    })
+    const result = resolveTableSelectLoadedKeys({
+      remote,
+      selectedKeys: selectedRowKeys.value,
+      loadedSelectableKeys: loaded.selectableRowKeys,
+      checked
+    })
+    if (result.emitOnly) {
+      emit('select-loaded')
+      return
+    }
+    if (!selectionControl.value.controlled) {
+      uncontrolledSelectedRowKeys.value = result.keys
+    }
+    emit('selection-change', result.keys)
+  }
+
   const editingCell = ref<{ rowIndex: number; columnKey: string } | null>(null)
   const editingValue = ref('')
 
@@ -333,14 +421,23 @@ export function useTableState(
   function commitEdit() {
     if (!editingCell.value) return
     const column = props.columns.find((item) => item.key === editingCell.value?.columnKey)
+    const original = column
+      ? getTableCellValue(sourceData.value[editingCell.value.rowIndex] ?? {}, column)
+      : undefined
+    const value = coerceTableEditValue(original, editingValue.value)
     const nextData = commitTableCellEdit(
-      effectiveData.value,
+      sourceData.value,
       editingCell.value.rowIndex,
       column,
-      editingValue.value
+      value
     )
-    internalData.value = nextData
-    emit('cell-change', editingCell.value.rowIndex, editingCell.value.columnKey, editingValue.value)
+    emit(
+      'cell-change',
+      editingCell.value.rowIndex,
+      editingCell.value.columnKey,
+      value,
+      nextData
+    )
     editingCell.value = null
   }
 
@@ -349,7 +446,14 @@ export function useTableState(
   }
 
   function handleExport() {
-    const content = exportTableData(displayColumns.value, processedData.value)
+    const rows = resolveTableExportRecords({
+      scope: props.exportScope,
+      pageRecords: paginatedData.value,
+      processedRecords: processedData.value,
+      processedKeys: processedRowKeys.value,
+      selectedKeys: selectedRowKeys.value
+    })
+    const content = exportTableData(displayColumns.value, rows)
     downloadTableExport(content, props.exportFilename)
     emit('export', content)
   }
@@ -362,9 +466,11 @@ export function useTableState(
 
   function handleDrop(targetKey: string) {
     if (!dragColumnKey.value || dragColumnKey.value === targetKey) return
-    const fullColumns = applyTableColumnOrder(props.columns, columnOrder.value ?? undefined)
+    const fullColumns = applyTableColumnOrder(props.columns, effectiveColumnOrder.value)
     const nextColumns = reorderTableColumnsByKey(fullColumns, dragColumnKey.value, targetKey)
-    columnOrder.value = nextColumns.map((column) => column.key)
+    if (!isColumnOrderControlled.value) {
+      columnOrder.value = nextColumns.map((column) => column.key)
+    }
     emit('column-order-change', nextColumns)
     dragColumnKey.value = null
   }
@@ -378,13 +484,12 @@ export function useTableState(
   function handleRowDrop(targetKey: string | number) {
     if (dragRowKey.value === null || dragRowKey.value === targetKey) return
     const nextRows = reorderTableRowsByKey(
-      effectiveData.value,
+      sourceData.value,
       dragRowKey.value,
       targetKey,
       (record, sourceIndex) =>
         resolveTableRecordKey(record, sourceIndex, props.rowKey, props.rowSelection?.getRowKey)
     )
-    internalData.value = nextRows
     emit('row-order-change', nextRows)
     dragRowKey.value = null
   }
@@ -407,7 +512,8 @@ export function useTableState(
     paginationInfo,
     allSelected,
     someSelected,
-    groupedData,
+    groupBlocks,
+    processedRowKeys,
     sortState,
     filterState,
     currentPage,
@@ -429,6 +535,7 @@ export function useTableState(
     handleToggleExpand,
     handleSelectRow,
     handleSelectAll,
+    handleSelectLoaded,
     isCellEditable,
     startEditing,
     commitEdit,

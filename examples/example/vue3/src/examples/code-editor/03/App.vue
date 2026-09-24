@@ -7,8 +7,8 @@ const jsCode = `const release = { version: '2.2.0', ready: true }`
 
 <template>
   <div class="space-y-2">
-    <p class="text-sm text-[var(--tiger-text-muted)]">
-      highlighter 可换成 Prism / Shiki 适配器；输出按 TRUSTED HTML 注入。这里显式传入内置引擎。
+    <p class="text-sm text-[var(--tiger-text-secondary)]">
+      highlighter 返回 token，由编辑器画成文本。这里显式传入内置引擎。
     </p>
     <CodeEditor
       :model-value="jsCode"

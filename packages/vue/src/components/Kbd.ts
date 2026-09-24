@@ -1,6 +1,7 @@
 import { defineComponent, h, PropType, type VNodeChild } from 'vue'
 import {
-  composeComponentClasses,
+  classNames,
+  coerceClassValue,
   formatKbdSeparatorText,
   getKbdParts,
   getKbdRootClasses,
@@ -95,7 +96,7 @@ export const Kbd = defineComponent({
       const accessibleName = resolveKbdAccessibleName(
         props.keys,
         props.separator,
-        extraKeyText(slotNodes)
+        undefined
       )
       const isEmpty = !hasSlot && parts.length === 0
       const children: VNodeChild[] = []
@@ -137,13 +138,13 @@ export const Kbd = defineComponent({
         'kbd',
         {
           ...attrs,
-          class: composeComponentClasses(
+          class: classNames(
             getKbdRootClasses({
               size: props.size,
               variant: props.variant,
               className: props.className
             }),
-            attrsRecord.class
+            coerceClassValue(attrsRecord.class)
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
           'data-kbd': '',

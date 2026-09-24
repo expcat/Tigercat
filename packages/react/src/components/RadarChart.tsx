@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useMemo, useState } from 'react'
+import React, { useCallback, useId, useMemo, useRef, useState } from 'react'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -23,6 +23,7 @@ import {
   layoutRadar,
   findNearestPointIndex,
   polarToCartesian,
+  createChartFrameCoalescer,
   DEFAULT_POLAR_CHART_PADDING,
   type ChartPadding,
   type RadarChartDatum,
@@ -50,13 +51,14 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   width = 320,
   height = 200,
   padding = DEFAULT_POLAR_CHART_PADDING,
-  responsive = false,
+  responsive = true,
   data,
   series,
   indicators,
   maxValue,
   startAngle = -Math.PI / 2,
   levels = 5,
+  missing = 'center',
   showLevelLabels = false,
   showGrid = true,
   showAxis = true,
@@ -100,7 +102,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   strokeGradient = false,
   pointGradient = false,
   pointBorderWidth = 2,
-  pointBorderColor = 'var(--tiger-surface,#ffffff)',
+  pointBorderColor = 'var(--tiger-surface)',
   pointHoverSize,
   labelAutoAlign = true,
   title,
@@ -215,7 +217,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         seriesKeys,
         activeIndex: resolvedActiveIndex,
         activeOpacity,
-        inactiveOpacity
+        inactiveOpacity,
+        missing
       }),
     [
       resolvedSeries,
@@ -224,6 +227,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       startAngle,
       maxValue,
       levels,
+      missing,
       gridShape,
       palette,
       gradient,
@@ -275,6 +279,37 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     handleHoverLeave()
   }, [handleHoverLeave])
 
+  const areaScanRef = useRef({
+    laid,
+    handleHoverEnter,
+    handleMouseMove,
+    trackPointer,
+    setHoveredPoint
+  })
+  areaScanRef.current = { laid, handleHoverEnter, handleMouseMove, trackPointer, setHoveredPoint }
+  const [areaScan] = useState(() =>
+    createChartFrameCoalescer<{
+      seriesIndex: number
+      x: number
+      y: number
+      clientX: number
+      clientY: number
+    }>({
+      onFrame: (sample) => {
+        const current = areaScanRef.current
+        if (!current.trackPointer) return
+        const axisPoints = current.laid.angles.map((angle) =>
+          polarToCartesian(current.laid.cx, current.laid.cy, current.laid.radius, angle)
+        )
+        const pointIndex = findNearestPointIndex(axisPoints, sample.x, sample.y)
+        if (pointIndex === null) return
+        current.setHoveredPoint({ seriesIndex: sample.seriesIndex, pointIndex })
+        const event = { clientX: sample.clientX, clientY: sample.clientY } as React.MouseEvent
+        current.handleHoverEnter(sample.seriesIndex, event)
+        current.handleMouseMove(event)
+      }
+    })
+  )
   const handleAreaMove = useCallback(
     (seriesIndex: number, event: React.MouseEvent<SVGPathElement>) => {
       if (!trackPointer) return
@@ -286,16 +321,15 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       pt.x = event.clientX
       pt.y = event.clientY
       const loc = pt.matrixTransform(ctm.inverse())
-      const axisPoints = laid.angles.map((angle) =>
-        polarToCartesian(laid.cx, laid.cy, laid.radius, angle)
-      )
-      const pointIndex = findNearestPointIndex(axisPoints, loc.x, loc.y)
-      if (pointIndex === null) return
-      setHoveredPoint({ seriesIndex, pointIndex })
-      handleHoverEnter(seriesIndex, event)
-      handleMouseMove(event)
+      areaScan.schedule({
+        seriesIndex,
+        x: loc.x,
+        y: loc.y,
+        clientX: event.clientX,
+        clientY: event.clientY
+      })
     },
-    [trackPointer, laid.angles, laid.cx, laid.cy, laid.radius, handleHoverEnter, handleMouseMove]
+    [areaScan, trackPointer]
   )
 
   const seriesName = useCallback(
@@ -395,7 +429,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                   <stop offset="0%" stopColor={item.color} stopOpacity={item.fillOpacity} />
                   <stop
                     offset="100%"
-                    stopColor={`color-mix(in oklab, var(--tiger-bg,#ffffff) 35%, ${item.color})`}
+                    stopColor={`color-mix(in oklab, var(--tiger-surface) 35%, ${item.color})`}
                     stopOpacity={0.02}
                   />
                 </linearGradient>
@@ -410,12 +444,12 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                   y2={laid.cy + laid.radius}>
                   <stop
                     offset="0%"
-                    stopColor={`color-mix(in oklab, var(--tiger-bg,#ffffff) 20%, ${item.stroke})`}
+                    stopColor={`color-mix(in oklab, var(--tiger-surface) 20%, ${item.stroke})`}
                   />
                   <stop offset="50%" stopColor={item.stroke} />
                   <stop
                     offset="100%"
-                    stopColor={`color-mix(in oklab, var(--tiger-text,#111827) 12%, ${item.stroke})`}
+                    stopColor={`color-mix(in oklab, var(--tiger-text) 12%, ${item.stroke})`}
                   />
                 </linearGradient>
               )}
@@ -423,7 +457,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                 <radialGradient id={`${gradientPrefix}-point-${item.seriesKey}`}>
                   <stop
                     offset="0%"
-                    stopColor={`color-mix(in oklab, var(--tiger-bg,#ffffff) 30%, ${item.color})`}
+                    stopColor={`color-mix(in oklab, var(--tiger-surface) 30%, ${item.color})`}
                   />
                   <stop offset="100%" stopColor={item.color} />
                 </radialGradient>
@@ -478,7 +512,6 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           y2={line.y2}
           className={chartGridLineClasses}
           strokeWidth={gridStrokeWidth}
-          strokeDasharray={dasharray}
           aria-hidden="true"
         />
       ))}
@@ -586,7 +619,17 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                     cy={point.y}
                     r={8}
                     fill="transparent"
-                    aria-hidden="true"
+                    aria-hidden={focusable ? undefined : true}
+                    role={focusable ? 'button' : undefined}
+                    aria-label={
+                      focusable
+                        ? formatChartTemplate(labels.pointAriaLabel, {
+                            index: point.index + 1,
+                            x: seriesName(item.series, item.seriesIndex),
+                            y: point.value
+                          })
+                        : undefined
+                    }
                     tabIndex={
                       focusable
                         ? chartPointTabIndex(item.seriesIndex, point.index, activePoint, flatPoints)

@@ -13,8 +13,8 @@ export type BadgeSize = 'sm' | 'md' | 'lg'
 /** Badge display types */
 export type BadgeType = 'dot' | 'number' | 'text'
 
-/** Badge position types (for non-standalone mode) */
-export type BadgePosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'
+/** Overlay position. Logical inline edges only. */
+export type BadgePosition = 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end'
 
 /** Base badge props interface */
 export interface BadgeProps {
@@ -43,8 +43,8 @@ export interface BadgeProps {
    */
   showZero?: boolean
   /**
-   * Overlay position. `right`/`left` follow the reading direction.
-   * @default 'top-right'
+   * Overlay position. `end` follows the reading direction.
+   * @default 'top-end'
    */
   position?: BadgePosition
   /**

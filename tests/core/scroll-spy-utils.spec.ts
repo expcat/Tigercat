@@ -105,8 +105,9 @@ describe('scroll-spy-utils', () => {
     })
 
     it('normalizes string and numeric keys for DOM attributes', () => {
-      expect(getScrollSpyKeyString('intro')).toBe('intro')
-      expect(getScrollSpyKeyString(12)).toBe('12')
+      expect(getScrollSpyKeyString('intro')).toBe('s:intro')
+      expect(getScrollSpyKeyString(12)).toBe('n:12')
+      expect(getScrollSpyKeyString('12')).toBe('s:12')
     })
   })
 

@@ -21,6 +21,7 @@ import {
   resolveCartesianSeriesScales,
   CHART_SURFACE_FILL,
   AREA_DRAW_CLASS,
+  chartHoverShadowStyle,
   getChartLabels,
   mergeTigerLocale,
   formatChartTemplate,
@@ -78,7 +79,7 @@ export const AreaChart = defineComponent({
       type: [Number, Object] as PropType<ChartPadding>,
       default: () => ({ ...DEFAULT_CHART_PADDING })
     },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: {
       type: Array as PropType<LineChartDatum[]>
     },
@@ -93,7 +94,7 @@ export const AreaChart = defineComponent({
     },
     areaColor: {
       type: String,
-      default: 'var(--tiger-primary,#2563eb)'
+      default: 'var(--tiger-primary)'
     },
     strokeWidth: {
       type: Number,
@@ -416,9 +417,7 @@ export const AreaChart = defineComponent({
 
     const handlePointClick = (seriesIndex: number, pointIndex: number) => {
       const datum = resolvedSeries.value[seriesIndex]?.data[pointIndex]
-      props.onPointClick?.(seriesIndex, pointIndex, datum)
       emit('point-click', seriesIndex, pointIndex, datum)
-      handleSeriesSelect(seriesIndex)
     }
 
     const {
@@ -645,7 +644,7 @@ export const AreaChart = defineComponent({
                         'fill-opacity': props.gradient ? 1 : sd.fillOpacity,
                         stroke: 'none',
                         class:
-                          'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]',
+                          'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]',
                         'data-area-series': sd.seriesIndex,
                         'data-series-key': sd.seriesKey
                       }),
@@ -666,7 +665,7 @@ export const AreaChart = defineComponent({
                         class: classNames(
                           props.animated && !sd.strokeDasharray
                             ? AREA_DRAW_CLASS
-                            : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
+                            : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
                         )
                       })
                     ]
@@ -707,7 +706,7 @@ export const AreaChart = defineComponent({
                           props.animated ? linePointTransitionClasses : undefined,
                           pointInteractive && 'cursor-pointer'
                         ),
-                        style: isHovered ? `filter: drop-shadow(0 0 4px ${sd.color})` : undefined,
+                        style: isHovered ? chartHoverShadowStyle(sd.color) : undefined,
                         role: pointInteractive ? 'button' : undefined,
                         'aria-hidden': pointInteractive ? undefined : true,
                         'aria-label': pointInteractive

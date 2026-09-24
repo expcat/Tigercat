@@ -194,6 +194,13 @@ describe('ImageCompare', () => {
       const root = getRoot(container)
       stubRootRect(root)
       await fireEvent.pointerDown(root, { pointerId: 1, clientX: 80, clientY: 10, button: 0 })
+      expect(onChange).not.toHaveBeenCalled()
+      await fireEvent.pointerDown(getHandle(container), {
+        pointerId: 1,
+        clientX: 80,
+        clientY: 10,
+        button: 0
+      })
       expect(onChange).toHaveBeenCalledWith(40)
       expect(root).toHaveAttribute('data-image-compare-position', '40')
       await fireEvent.pointerMove(document, { pointerId: 1, clientX: 160, clientY: 10 })

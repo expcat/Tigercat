@@ -22,7 +22,7 @@ import {
 } from './path'
 import { createLinearScale, createPointScale, getNumberExtent, scaleContainsValue } from './scale'
 
-export const CHART_SURFACE_FILL = 'var(--tiger-bg,#ffffff)'
+export const CHART_SURFACE_FILL = 'var(--tiger-surface)'
 export const SCATTER_MAX_PIXEL_RADIUS = 40
 export const SCATTER_ENTRANCE_STAGGER_MS = 60
 export const SCATTER_ENTRANCE_STAGGER_MAX_MS = 600
@@ -205,7 +205,7 @@ export function findNearestSeriesPoint(
       const dx = points[pointIndex].x - x
       const dy = points[pointIndex].y - y
       const dist = dx * dx + dy * dy
-      if (dist < bestDist) {
+      if (dist <= bestDist) {
         bestDist = dist
         best = { seriesIndex, pointIndex }
       }
@@ -219,25 +219,26 @@ function scaleX(scale: ChartScale, value: ChartScaleValue): number {
   return scale.map(xKey)
 }
 
-function sortLineData(data: LineChartDatum[], xScale: ChartScale): LineChartDatum[] {
+function sortIndexedLineData(
+  data: Array<{ datum: LineChartDatum; sourceIndex: number }>,
+  xScale: ChartScale
+): Array<{ datum: LineChartDatum; sourceIndex: number }> {
   if (xScale.type !== 'linear') return data
-  return data
-    .map((datum, index) => ({ datum, index }))
-    .sort((a, b) => {
-      const dx = Number(a.datum.x) - Number(b.datum.x)
-      return dx !== 0 ? dx : a.index - b.index
-    })
-    .map((item) => item.datum)
+  return data.slice().sort((a, b) => {
+    const dx = Number(a.datum.x) - Number(b.datum.x)
+    return dx !== 0 ? dx : a.sourceIndex - b.sourceIndex
+  })
 }
 
 function filterLineData(
   data: LineChartDatum[],
   xScale: ChartScale,
   warnKey: string
-): LineChartDatum[] {
+): Array<{ datum: LineChartDatum; sourceIndex: number }> {
   const seen = new Set<string>()
-  const result: LineChartDatum[] = []
-  for (const datum of data) {
+  const result: Array<{ datum: LineChartDatum; sourceIndex: number }> = []
+  for (let sourceIndex = 0; sourceIndex < data.length; sourceIndex++) {
+    const datum = data[sourceIndex]
     if (!isFiniteNumber(datum.y)) {
       devWarn(`${warnKey}.nonFiniteY`, `${warnKey} skipped a datum with a non-finite y`)
       continue
@@ -261,9 +262,9 @@ function filterLineData(
       }
       seen.add(key)
     }
-    result.push(datum)
+    result.push({ datum, sourceIndex })
   }
-  return sortLineData(result, xScale)
+  return sortIndexedLineData(result, xScale)
 }
 
 export interface LayoutBarRectsOptions {
@@ -294,13 +295,21 @@ export function layoutBarRects(
   yScale: ChartScale,
   options: LayoutBarRectsOptions
 ): LaidOutBar[] {
+  if (chartScaleAreaEmpty(xScale, yScale)) return []
   const rawBandWidth =
     xScale.bandwidth ??
     (xScale.step ? xScale.step * 0.7 : (options.innerWidth / Math.max(1, data.length)) * 0.8)
   const bandWidth = clampBarWidth(rawBandWidth, options.barMaxWidth)
   const bandOffset = rawBandWidth > bandWidth ? (rawBandWidth - bandWidth) / 2 : 0
   const baseline = yScale.map(0)
-  const seen = new Set<string>()
+  const groupCounts = new Map<string, number>()
+  for (const item of data) {
+    if (!isFiniteNumber(item.y)) continue
+    if (xScale.type === 'linear') continue
+    const key = String(item.x)
+    groupCounts.set(key, (groupCounts.get(key) ?? 0) + 1)
+  }
+  const groupSlot = new Map<string, number>()
   const bars: LaidOutBar[] = []
 
   data.forEach((item, index) => {
@@ -312,21 +321,18 @@ export function layoutBarRects(
       devWarn('BarChart.nonFiniteX', 'BarChart skipped a datum with a non-finite x')
       return
     }
-    if (xScale.type !== 'linear') {
-      const key = String(item.x)
-      if (seen.has(key)) {
-        devWarn('BarChart.duplicateX', 'BarChart skipped a datum with a duplicate x')
-        return
-      }
-      if (!scaleContainsValue(xScale, item.x)) {
-        devWarn('BarChart.unknownX', 'BarChart skipped a datum whose x is not in the scale domain')
-        return
-      }
-      seen.add(key)
+    if (xScale.type !== 'linear' && !scaleContainsValue(xScale, item.x)) {
+      devWarn('BarChart.unknownX', 'BarChart skipped a datum whose x is not in the scale domain')
+      return
     }
 
     const xPos = scaleX(xScale, item.x)
-    const barX = (xScale.bandwidth ? xPos : xPos - rawBandWidth / 2) + bandOffset
+    const groupKey = String(item.x)
+    const groupSize = xScale.type === 'linear' ? 1 : Math.max(1, groupCounts.get(groupKey) ?? 1)
+    const slot = groupSlot.get(groupKey) ?? 0
+    groupSlot.set(groupKey, slot + 1)
+    const slice = bandWidth / groupSize
+    const barX = (xScale.bandwidth ? xPos : xPos - rawBandWidth / 2) + bandOffset + slot * slice
     const barYValue = yScale.map(item.y)
     let barHeight = Math.abs(baseline - barYValue)
     let barY = Math.min(baseline, barYValue)
@@ -335,12 +341,10 @@ export function layoutBarRects(
       barY = clamped.y
       barHeight = clamped.height
     }
-    if (barHeight === 0) return
-
     bars.push({
       x: barX,
       y: barY,
-      width: bandWidth,
+      width: groupSize > 1 ? slice : bandWidth,
       height: barHeight,
       color: item.color ?? options.palette[index % options.palette.length],
       opacity: getChartElementOpacity(index, options.activeIndex ?? null, {
@@ -364,7 +368,7 @@ export function resolveBarCornerRadius(barRadius: number | undefined): {
   if (barRadius !== undefined) {
     return { rx: barRadius, ry: barRadius }
   }
-  return { style: 'rx:var(--tiger-chart-bar-radius,4px);ry:var(--tiger-chart-bar-radius,4px)' }
+  return { style: 'rx:var(--tiger-chart-bar-radius);ry:var(--tiger-chart-bar-radius)' }
 }
 
 export interface LaidOutLinePoint {
@@ -407,31 +411,37 @@ export interface LayoutLineSeriesOptions {
   inactiveOpacity?: number
 }
 
+function chartScaleAreaEmpty(xScale: ChartScale, yScale: ChartScale): boolean {
+  const width = Math.abs(xScale.range[1] - xScale.range[0])
+  const height = Math.abs(yScale.range[1] - yScale.range[0])
+  return !(width > 0) || !(height > 0)
+}
+
 export function layoutLineSeries(
   series: LineChartSeries[],
   xScale: ChartScale,
   yScale: ChartScale,
   options: LayoutLineSeriesOptions
 ): LaidOutLineSeries[] {
-  const baseline = yScale.map(0)
+  if (chartScaleAreaEmpty(xScale, yScale)) return []
   return series.map((s, seriesIndex) => {
     const color = s.color ?? options.palette[seriesIndex % options.palette.length]
     const data = filterLineData(s.data, xScale, 'LineChart')
-    const points = data.map((datum, pointIndex) => ({
+    const points = data.map(({ datum, sourceIndex }) => ({
       x: scaleX(xScale, datum.x),
       y: yScale.map(datum.y),
       datum,
-      pointIndex
+      pointIndex: sourceIndex
     }))
-    const showArea = s.showArea ?? options.showArea
+    const showArea = options.showArea
     return {
       series: s,
       seriesIndex,
       color,
       linePath: createLinePath(points, options.curve),
-      areaPath: showArea ? createAreaPath(points, baseline, options.curve) : '',
+      areaPath: showArea ? createAreaPath(points, yScale.map(0), options.curve) : '',
       showArea,
-      areaOpacity: s.areaOpacity ?? options.areaOpacity,
+      areaOpacity: showArea ? options.areaOpacity : 0,
       points,
       opacity: getChartElementOpacity(seriesIndex, options.activeIndex, {
         activeOpacity: options.activeOpacity,
@@ -543,6 +553,7 @@ export function layoutAreaSeries(
   yScale: ChartScale,
   options: LayoutAreaSeriesOptions
 ): LaidOutAreaSeries[] {
+  if (chartScaleAreaEmpty(xScale, yScale)) return []
   const baseline = yScale.map(0)
   return series.map((s, seriesIndex) => {
     const color = s.color ?? options.palette[seriesIndex % options.palette.length]
@@ -569,11 +580,11 @@ export function layoutAreaSeries(
       linePath = createLinePath(topPoints, options.curve)
     } else {
       const data = filterLineData(s.data, xScale, 'AreaChart')
-      points = data.map((datum, pointIndex) => ({
+      points = data.map(({ datum, sourceIndex }) => ({
         x: scaleX(xScale, datum.x),
         y: yScale.map(datum.y),
         datum,
-        pointIndex
+        pointIndex: sourceIndex
       }))
       areaPath = createAreaPath(points, baseline, options.curve)
       linePath = createLinePath(points, options.curve)
@@ -668,6 +679,7 @@ export function layoutScatterPoints(
   yScale: ChartScale,
   options: LayoutScatterPointsOptions
 ): LaidOutScatterPoint[] {
+  if (chartScaleAreaEmpty(xScale, yScale)) return []
   const sizes = data
     .map((item) => item.size)
     .filter((size): size is number => isFiniteNumber(size) && size > 0)

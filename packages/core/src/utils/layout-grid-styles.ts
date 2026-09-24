@@ -1,17 +1,14 @@
 /**
- * Injected layout + 24-grid geometry.
+ * Static layout + 24-grid geometry.
  *
- * Happy-dom tests and apps without a processed Tailwind sheet still get
- * flex direction, gap, span lock, and breakpoint cascade. Media queries
- * cannot read CSS variables, so Col/Container padding follow
- * `html[data-tiger-bp]` written by {@link syncGridBreakpointAttr}.
+ * Column width, offset, and visibility are media queries generated from the
+ * token breakpoint table. Nothing writes `data-tiger-bp` or listens for resize.
  */
 
 import { THEME_CSS_VARS, TIGER_BREAKPOINT_CSS_VALUES } from '../theme-runtime'
 import type { Breakpoint } from '../types/grid'
+import { OVERLAY_Z_INDEX } from './floating'
 import { isBrowser } from './env'
-
-export const LAYOUT_GRID_STYLE_ID = 'tiger-ui-layout-grid-styles'
 
 export const GRID_BREAKPOINT_ORDER: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl']
 
@@ -52,7 +49,7 @@ function breakpointBlock(bp: Breakpoint): string {
   --tiger-col-order-units: var(--tiger-col-order, 0);
   --tiger-col-display: var(--tiger-col-display-base, block);
 }
-html[data-tiger-bp="xs"] .tiger-container-pad { padding-inline: 1rem; }
+.tiger-container-pad { padding-inline: 1rem; }
 `
   }
 
@@ -60,16 +57,29 @@ html[data-tiger-bp="xs"] .tiger-container-pad { padding-inline: 1rem; }
   const offsetChain = buildCascade('--tiger-col-offset', '0', bp)
   const orderChain = buildCascade('--tiger-col-order', '0', bp)
   const displayChain = buildDisplayCascade(bp)
+  const min = BREAKPOINT_FALLBACK_PX[bp]
+  const columnChain = buildTokenCascade('--tiger-columns', '1', bp)
+  const gapChain = buildTokenCascade('--tiger-gap', '0px', bp)
 
   return `
-html[data-tiger-bp="${bp}"] .tiger-col {
-  --tiger-col-units: ${spanChain};
-  --tiger-col-offset-units: ${offsetChain};
-  --tiger-col-order-units: ${orderChain};
-  --tiger-col-display: ${displayChain};
+@container tiger-row (min-width: ${min}px) {
+  .tiger-col {
+    --tiger-col-units: ${spanChain};
+    --tiger-col-offset-units: ${offsetChain};
+    --tiger-col-order-units: ${orderChain};
+    --tiger-col-display: ${displayChain};
+  }
 }
-html[data-tiger-bp="${bp}"] .tiger-container-pad {
-  padding-inline: ${bp === 'sm' || bp === 'md' ? '1.5rem' : '2rem'};
+@container tiger (min-width: ${min}px) {
+  .tiger-responsive-columns {
+    --tiger-columns: ${columnChain};
+    --tiger-gap: ${gapChain};
+  }
+}
+@media (min-width: ${min}px) {
+  .tiger-container-pad {
+    padding-inline: ${bp === 'sm' || bp === 'md' ? '1.5rem' : '2rem'};
+  }
 }
 `
 }
@@ -79,6 +89,17 @@ function buildCascade(base: string, fallback: string, upto: Breakpoint): string 
   for (const bp of GRID_BREAKPOINT_ORDER) {
     if (bp === 'xs') continue
     expr = `var(${base}-${bp}, ${expr})`
+    if (bp === upto) break
+  }
+  return expr
+}
+
+/** Breakpoint chain that never reads the property it assigns. */
+function buildTokenCascade(prefix: string, fallback: string, upto: Breakpoint): string {
+  let expr = `var(${prefix}-base, ${fallback})`
+  for (const bp of GRID_BREAKPOINT_ORDER) {
+    if (bp === 'xs') continue
+    expr = `var(${prefix}-${bp}, ${expr})`
     if (bp === upto) break
   }
   return expr
@@ -118,10 +139,6 @@ export const LAYOUT_GRID_CSS = `
 .tiger-layout.tiger-flex-row {
   flex-direction: row;
 }
-[dir="rtl"] .tiger-layout.tiger-flex-row,
-[data-tiger-dir="rtl"] .tiger-layout.tiger-flex-row {
-  flex-direction: row-reverse;
-}
 .tiger-layout-nested {
   flex: 1 1 0%;
   min-height: 0;
@@ -134,49 +151,53 @@ export const LAYOUT_GRID_CSS = `
 .tiger-header {
   display: flex;
   align-items: center;
+  height: 4rem;
   padding-inline: 1rem;
   box-sizing: border-box;
-  border-bottom: 1px solid var(--tiger-border, #e5e7eb);
+  border-bottom: 1px solid var(--tiger-border);
 }
 .tiger-header-default {
-  height: 4rem;
-  background-color: var(--tiger-surface, #ffffff);
+  background-color: var(--tiger-surface);
+}
+.tiger-header-sticky {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: ${OVERLAY_Z_INDEX.viewport};
 }
 .tiger-header-translucent,
 .tiger-header-blur {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  background-color: color-mix(in srgb, var(--tiger-surface, #ffffff) 80%, transparent);
+  background-color: color-mix(in srgb, var(--tiger-surface) 80%, transparent);
 }
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
   .tiger-header-translucent,
   .tiger-header-blur {
-    background-color: color-mix(in srgb, var(--tiger-surface, #ffffff) 70%, transparent);
-    -webkit-backdrop-filter: blur(var(--tiger-blur-glass, 16px)) saturate(var(--tiger-header-saturate, 1.8));
-    backdrop-filter: blur(var(--tiger-blur-glass, 16px)) saturate(var(--tiger-header-saturate, 1.8));
+    background-color: color-mix(in srgb, var(--tiger-surface) 70%, transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(1.8);
+    backdrop-filter: blur(16px) saturate(1.8);
   }
   .tiger-header-blur {
-    -webkit-backdrop-filter: blur(var(--tiger-blur-glass-strong, 24px)) saturate(var(--tiger-header-saturate, 1.8));
-    backdrop-filter: blur(var(--tiger-blur-glass-strong, 24px)) saturate(var(--tiger-header-saturate, 1.8));
-    box-shadow: var(--tiger-header-shadow, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    backdrop-filter: blur(24px) saturate(1.8);
+    box-shadow: var(--tiger-shadow-sm);
   }
 }
 
 .tiger-sidebar {
+  order: -1;
   flex-shrink: 0;
   min-height: 0;
   overflow-x: clip;
   overflow-y: auto;
   box-sizing: border-box;
-  background-color: var(--tiger-surface, #ffffff);
-  border-inline-end: 1px solid var(--tiger-border, #e5e7eb);
+  background-color: var(--tiger-surface);
+  border-inline-end: 1px solid var(--tiger-border);
   transition-property: width, min-width;
-  transition-duration: var(--tiger-motion-duration-base, 300ms);
+  transition-duration: var(--tiger-motion-duration-base);
 }
 .tiger-sidebar-end {
+  order: 1;
   border-inline-end: 0;
-  border-inline-start: 1px solid var(--tiger-border, #e5e7eb);
+  border-inline-start: 1px solid var(--tiger-border);
 }
 .tiger-sidebar-default-width {
   width: 16rem;
@@ -193,13 +214,13 @@ export const LAYOUT_GRID_CSS = `
   min-height: 0;
   min-width: 0;
   overflow: auto;
-  background-color: var(--tiger-layout-content-bg, var(--tiger-surface-muted, #f9fafb));
+  background-color: var(--tiger-surface-muted);
 }
 
 .tiger-footer {
   box-sizing: border-box;
-  background-color: var(--tiger-surface, #ffffff);
-  border-top: 1px solid var(--tiger-border, #e5e7eb);
+  background-color: var(--tiger-surface);
+  border-top: 1px solid var(--tiger-border);
   padding: 1rem;
 }
 .tiger-footer-compact {
@@ -225,10 +246,49 @@ export const LAYOUT_GRID_CSS = `
   width: 100%;
   flex-wrap: wrap;
   box-sizing: border-box;
+  container-type: inline-size;
+  container-name: tiger-row;
   column-gap: var(--tiger-row-gutter-x, 0px);
   row-gap: var(--tiger-row-gutter-y, 0px);
   align-items: var(--tiger-row-align, flex-start);
   justify-content: var(--tiger-row-justify, flex-start);
+}
+.tiger-cq {
+  container-type: inline-size;
+  container-name: tiger;
+}
+.tiger-responsive-columns {
+  --tiger-columns: var(--tiger-columns-base, 1);
+  --tiger-gap: var(--tiger-gap-base, 0px);
+}
+.tiger-desc-vgrid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(var(--tiger-columns, 1), minmax(0, 1fr));
+}
+.tiger-desc-hgrid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(var(--tiger-columns, 1), minmax(0, 1fr));
+}
+.tiger-desc-pair {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-column: span var(--tiger-desc-span, 1);
+}
+.tiger-list-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--tiger-columns, 1), minmax(0, 1fr));
+  gap: var(--tiger-gap, 0px);
+}
+.tiger-masonry-flow {
+  column-count: var(--tiger-columns, 1);
+  column-gap: var(--tiger-gap, 0px);
+}
+.tiger-masonry-flow > .tiger-masonry-item {
+  break-inside: avoid;
+  margin-block-end: var(--tiger-gap, 0px);
+  width: 100%;
 }
 .tiger-row-nowrap {
   flex-wrap: nowrap;
@@ -255,16 +315,6 @@ export const LAYOUT_GRID_CSS = `
 
 ${breakpointCss()}
 `
-
-export function injectLayoutGridStyles(): void {
-  if (!isBrowser()) return
-  if (document.getElementById(LAYOUT_GRID_STYLE_ID)) return
-
-  const style = document.createElement('style')
-  style.id = LAYOUT_GRID_STYLE_ID
-  style.textContent = LAYOUT_GRID_CSS
-  document.head.appendChild(style)
-}
 
 export function readThemeBreakpointPx(
   bp: Breakpoint,
@@ -299,28 +349,3 @@ export function readThemeBreakpointMap(
   return map
 }
 
-export function syncGridBreakpointAttr(
-  target: HTMLElement | null = isBrowser() ? document.documentElement : null
-): Breakpoint | undefined {
-  if (!isBrowser() || !target) return undefined
-  injectLayoutGridStyles()
-  const width = window.innerWidth
-  const active = resolveActiveGridBreakpoint(width, readThemeBreakpointMap(target))
-  if (target.dataset.tigerBp !== active) target.dataset.tigerBp = active
-  return active
-}
-
-let breakpointSyncStarted = false
-
-export function ensureGridBreakpointSync(): void {
-  if (!isBrowser() || breakpointSyncStarted) return
-  breakpointSyncStarted = true
-  injectLayoutGridStyles()
-  syncGridBreakpointAttr()
-  window.addEventListener('resize', () => syncGridBreakpointAttr(), { passive: true })
-}
-
-/** Test-only: allow re-binding the resize listener after JSDOM teardown. */
-export function resetGridBreakpointSync(): void {
-  breakpointSyncStarted = false
-}

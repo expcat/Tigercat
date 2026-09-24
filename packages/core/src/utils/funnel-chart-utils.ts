@@ -4,8 +4,9 @@
  */
 
 import type { FunnelChartDatum } from '../types/chart'
-import { DEFAULT_CHART_COLORS } from './chart-utils'
+import { DEFAULT_CHART_COLORS } from './chart/color'
 import { devWarn } from './dev-warn'
+import { scanFiniteExtent } from './chart/scale'
 
 export interface FunnelSegment {
   /** Index in original data */
@@ -35,6 +36,7 @@ export interface LayoutFunnelOptions {
   pinch?: boolean
   colors?: string[]
   orientation?: 'vertical' | 'horizontal'
+  direction?: 'ltr' | 'rtl'
 }
 
 /**
@@ -48,6 +50,7 @@ export function computeFunnelSegments(
   if (data.length === 0) return []
 
   const { width, height, gap = 2, pinch = false, colors, orientation = 'vertical' } = opts
+  const mirror = orientation === 'horizontal' && opts.direction === 'rtl'
   const safeWidth = Number.isFinite(width) ? Math.max(0, width) : 0
   const safeHeight = Number.isFinite(height) ? Math.max(0, height) : 0
   const safeGap = Number.isFinite(gap) ? Math.max(0, gap) : 0
@@ -72,7 +75,7 @@ export function computeFunnelSegments(
   })
   if (valid.length === 0) return []
 
-  const maxValue = Math.max(...valid.map((item) => item.value))
+  const maxValue = scanFiniteExtent(valid.map((item) => item.value))?.max ?? 0
   if (maxValue <= 0) return []
 
   for (let i = 1; i < valid.length; i++) {
@@ -101,12 +104,14 @@ export function computeFunnelSegments(
       const origin = i * (segMain + safeGap)
 
       if (horizontal) {
-        const x = origin
-        const y1 = halfCross - startCross / 2
-        const y2 = halfCross + startCross / 2
-        const y3 = halfCross + endCross / 2
-        const y4 = halfCross - endCross / 2
-        const path = `M${x},${y1} L${x + segMain},${y4} L${x + segMain},${y3} L${x},${y2} Z`
+        const x = mirror ? safeWidth - origin - segMain : origin
+        const leftCross = mirror ? endCross : startCross
+        const rightCross = mirror ? startCross : endCross
+        const yLeftTop = halfCross - leftCross / 2
+        const yLeftBottom = halfCross + leftCross / 2
+        const yRightTop = halfCross - rightCross / 2
+        const yRightBottom = halfCross + rightCross / 2
+        const path = `M${x},${yLeftTop} L${x + segMain},${yRightTop} L${x + segMain},${yRightBottom} L${x},${yLeftBottom} Z`
         return {
           index: item.index,
           label: item.datum.label,

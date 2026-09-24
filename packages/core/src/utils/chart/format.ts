@@ -1,32 +1,7 @@
 /**
- * Gradient ID factories + data formatting (stack) utilities for charts.
- *
- * Each chart family (line / area / bar / scatter) gets its own counter so
- * SVG <linearGradient> IDs never collide across instances.
- *
- * Split out of `chart-utils.ts` (PR-12).
+ * Stable gradient ids and stacked-series formatting.
+ * Instance ids come from the framework (`useId`); there is no process counter.
  */
-
-function createGradientIdFactory(prefix: string) {
-  let counter = 0
-  return {
-    getPrefix: () => `tiger-${prefix}-grad-${++counter}`,
-    reset: () => {
-      counter = 0
-    }
-  }
-}
-
-const lineGradient = createGradientIdFactory('line')
-const areaGradient = createGradientIdFactory('area')
-const barGradient = createGradientIdFactory('bar')
-const scatterGradient = createGradientIdFactory('scatter')
-const radarGradient = createGradientIdFactory('radar')
-const gaugeGradient = createGradientIdFactory('gauge')
-const funnelGradient = createGradientIdFactory('funnel')
-const treemapGradient = createGradientIdFactory('treemap')
-const sunburstGradient = createGradientIdFactory('sunburst')
-const pieGradient = createGradientIdFactory('pie')
 
 export type ChartGradientKind =
   | 'line'
@@ -47,109 +22,6 @@ function normalizeSvgIdSegment(value: string): string {
 
 export function getStableChartGradientPrefix(kind: ChartGradientKind, instanceId: string): string {
   return `tiger-${kind}-grad-${normalizeSvgIdSegment(instanceId)}`
-}
-
-/** Generate a unique gradient ID prefix for a LineChart instance. */
-export function getLineGradientPrefix(): string {
-  return lineGradient.getPrefix()
-}
-
-/** Reset the line gradient counter (for testing only) */
-export function resetLineGradientCounter(): void {
-  lineGradient.reset()
-}
-
-/** Generate a unique gradient ID prefix for an AreaChart instance. */
-export function getAreaGradientPrefix(): string {
-  return areaGradient.getPrefix()
-}
-
-/** Reset the area gradient counter (for testing only) */
-export function resetAreaGradientCounter(): void {
-  areaGradient.reset()
-}
-
-/**
- * Generate a unique gradient ID prefix for a BarChart instance.
- * Each BarChart must have its own prefix to avoid gradient ID collisions.
- */
-export function getBarGradientPrefix(): string {
-  return barGradient.getPrefix()
-}
-
-/** Reset the bar gradient counter (for testing only) */
-export function resetBarGradientCounter(): void {
-  barGradient.reset()
-}
-
-/** Generate a unique gradient ID prefix for a ScatterChart instance. */
-export function getScatterGradientPrefix(): string {
-  return scatterGradient.getPrefix()
-}
-
-/** Reset the scatter gradient counter (for testing only) */
-export function resetScatterGradientCounter(): void {
-  scatterGradient.reset()
-}
-
-/** Generate a unique gradient ID prefix for a RadarChart instance. */
-export function getRadarGradientPrefix(): string {
-  return radarGradient.getPrefix()
-}
-
-/** Reset the radar gradient counter (for testing only) */
-export function resetRadarGradientCounter(): void {
-  radarGradient.reset()
-}
-
-/** Generate a unique gradient ID prefix for a GaugeChart instance. */
-export function getGaugeGradientPrefix(): string {
-  return gaugeGradient.getPrefix()
-}
-
-/** Reset the gauge gradient counter (for testing only) */
-export function resetGaugeGradientCounter(): void {
-  gaugeGradient.reset()
-}
-
-/** Generate a unique gradient ID prefix for a FunnelChart instance. */
-export function getFunnelGradientPrefix(): string {
-  return funnelGradient.getPrefix()
-}
-
-/** Reset the funnel gradient counter (for testing only) */
-export function resetFunnelGradientCounter(): void {
-  funnelGradient.reset()
-}
-
-/** Generate a unique gradient ID prefix for a TreeMapChart instance. */
-export function getTreeMapGradientPrefix(): string {
-  return treemapGradient.getPrefix()
-}
-
-/** Reset the treemap gradient counter (for testing only) */
-export function resetTreeMapGradientCounter(): void {
-  treemapGradient.reset()
-}
-
-/** Generate a unique gradient ID prefix for a SunburstChart instance. */
-export function getSunburstGradientPrefix(): string {
-  return sunburstGradient.getPrefix()
-}
-
-/** Reset the sunburst gradient counter (for testing only) */
-export function resetSunburstGradientCounter(): void {
-  sunburstGradient.reset()
-}
-
-/** Generate a unique gradient ID prefix for a PieChart instance. */
-export function getPieGradientPrefix(): string {
-  return pieGradient.getPrefix()
-}
-
-/** Reset the pie gradient counter (for testing only) */
-export function resetPieGradientCounter(): void {
-  pieGradient.reset()
 }
 
 /**

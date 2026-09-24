@@ -8,7 +8,6 @@ import {
   PropType,
   h,
   onBeforeUnmount,
-  onMounted,
   nextTick,
   VNode,
   cloneVNode,
@@ -17,6 +16,8 @@ import {
 } from 'vue'
 import {
   classNames,
+  getSecureRel,
+  resolveLinkHref,
   coerceClassValue,
   mergeStyleValues,
   getDropdownContainerClasses,
@@ -24,11 +25,11 @@ import {
   getDropdownChevronClasses,
   getDropdownMenuClasses,
   getDropdownItemClasses,
-  injectDropdownStyles,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
   handleMenuNavigation,
-  focusFirstMenuItem,
+  focusMenuItem,
+  isTextEditingTarget,
   restoreFocus,
   createFloatingHoverDelayController,
   DEFAULT_DROPDOWN_TRIGGER,
@@ -44,7 +45,7 @@ import type {
   DropdownMenuProps as CoreDropdownMenuProps,
   DropdownItemProps as CoreDropdownItemProps
 } from '@expcat/tigercat-core'
-import { useVueAnchoredOverlay, renderVueOverlayTeleport } from '../utils/overlay'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 
 export interface VueDropdownMenuProps extends CoreDropdownMenuProps {}
@@ -185,12 +186,17 @@ export const DropdownItem = defineComponent({
         style?: unknown
       } & Record<string, unknown>
 
-      const isLink = Boolean(props.href) && !props.disabled
+      const safeHref = resolveLinkHref(props.href, { disabled: props.disabled })
+      const isLink = Boolean(safeHref)
+      const target = restAttrs.target as string | undefined
+      const rel = restAttrs.rel as string | undefined
       return h(
         isLink ? 'a' : 'button',
         {
           ...restAttrs,
-          ...(isLink ? { href: props.href } : { type: 'button' }),
+          ...(isLink
+            ? { href: safeHref, rel: getSecureRel(target, rel) }
+            : { type: 'button', href: undefined, rel: undefined }),
           class: itemClasses.value,
           role: 'menuitem',
           tabindex: -1,
@@ -271,8 +277,6 @@ export const Dropdown = defineComponent({
     const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
-    onMounted(() => injectDropdownStyles())
-
     const menuId = `tiger-dropdown-menu-${useId()}`
     const previousActiveElement = ref<HTMLElement | null>(null)
     const internalVisible = ref(props.defaultOpen)
@@ -284,9 +288,11 @@ export const Dropdown = defineComponent({
     const triggerRef = ref<HTMLElement | null>(null)
     const floatingRef = ref<HTMLElement | null>(null)
     const openIntent = ref<'menu' | 'hover'>('menu')
+    const focusEdge = ref<'first' | 'last' | null>(null)
     const skipRestore = ref(false)
 
     const hoverController = createFloatingHoverDelayController({
+      showDelay: 0,
       show: () => {
         openIntent.value = 'hover'
         setVisible(true)
@@ -311,9 +317,11 @@ export const Dropdown = defineComponent({
       emit('open-change', visible)
 
       if (visible) {
-        if (openIntent.value === 'hover') return
+        const edge = focusEdge.value
+        focusEdge.value = null
+        if (!edge) return
         nextTick(() => {
-          if (floatingRef.value) focusFirstMenuItem(floatingRef.value)
+          if (floatingRef.value) focusMenuItem(floatingRef.value, edge)
         })
         return
       }
@@ -327,9 +335,12 @@ export const Dropdown = defineComponent({
     }
 
     watch(currentVisible, (visible) => {
-      if (!visible || openIntent.value === 'hover') return
+      if (!visible) return
+      const edge = focusEdge.value
+      if (!edge) return
+      focusEdge.value = null
       nextTick(() => {
-        if (floatingRef.value) focusFirstMenuItem(floatingRef.value)
+        if (floatingRef.value) focusMenuItem(floatingRef.value, edge)
       })
     })
 
@@ -358,6 +369,7 @@ export const Dropdown = defineComponent({
 
     const handleTriggerKeyDown = (event: Event) => {
       const keyboardEvent = event as KeyboardEvent
+      if (isTextEditingTarget(keyboardEvent.target)) return
       const action = getOverlayTriggerKeyboardAction(keyboardEvent, {
         kind: 'menu',
         open: currentVisible.value,
@@ -370,8 +382,14 @@ export const Dropdown = defineComponent({
         setVisible(false)
         return
       }
+      const edge = action === 'open-last' ? 'last' : 'first'
+      focusEdge.value = edge
       openIntent.value = 'menu'
-      if (!currentVisible.value) setVisible(true)
+      if (!currentVisible.value) {
+        setVisible(true)
+        return
+      }
+      if (floatingRef.value) focusMenuItem(floatingRef.value, edge)
     }
 
     const handleMenuKeyDown = (event: KeyboardEvent) => {
@@ -380,6 +398,7 @@ export const Dropdown = defineComponent({
         setVisible(false)
         return
       }
+      if (isTextEditingTarget(event.target)) return
       if (floatingRef.value) {
         handleMenuNavigation(floatingRef.value, event)
       }
@@ -396,8 +415,8 @@ export const Dropdown = defineComponent({
       containerRef,
       dismissOnOutside: true,
       dismissOnEscape: true,
-      onDismiss: (reason) => {
-        skipRestore.value = reason !== 'escape'
+      onDismiss: () => {
+        skipRestore.value = false
         setVisible(false)
       }
     })
@@ -503,27 +522,29 @@ export const Dropdown = defineComponent({
         }
       })
 
-      const menuWrapper = menuNode
-        ? h(
-            'div',
-            {
-              ref: floatingRef,
-              class: menuWrapperClasses.value,
-              style: overlay.floatingStyles.value,
-              'data-positioned': overlay.positioned.value,
-              'data-tiger-dropdown-menu': '',
-              onMouseenter: handleMouseEnter,
-              onMouseleave: handleMouseLeave,
-              onKeydown: handleMenuKeyDown,
-              hidden: !currentVisible.value
-            },
-            [cloneVNode(menuNode as VNode, { id: menuId })]
-          )
-        : null
+      const menuWrapper =
+        menuNode && currentVisible.value
+          ? h(
+              'div',
+              {
+                ref: floatingRef,
+                class: menuWrapperClasses.value,
+                style: overlay.floatingStyles.value,
+                'data-positioned': overlay.positioned.value,
+                'data-tiger-dropdown-menu': '',
+                onMouseenter: handleMouseEnter,
+                onMouseleave: handleMouseLeave,
+                onKeydown: handleMenuKeyDown
+              },
+              [cloneVNode(menuNode as VNode, { id: menuId })]
+            )
+          : null
 
-      const menu = menuWrapper
-        ? renderVueOverlayTeleport(menuWrapper, overlay.target.value, !props.portal)
-        : null
+      const menu = !menuWrapper
+        ? null
+        : props.portal
+          ? renderVueOverlayTeleport(menuWrapper, overlay.target.value)
+          : menuWrapper
 
       const {
         class: _class,

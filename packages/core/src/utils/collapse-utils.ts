@@ -6,13 +6,14 @@
 import type { ExpandIconPosition } from '../types/collapse'
 import { isBrowser } from './env'
 import { devWarn } from './dev-warn'
+import { observeSize } from './responsive'
 import { prefersReducedMotion } from './transition'
 
 /**
  * Base collapse container classes
  */
 export const collapseBaseClasses =
-  'w-full bg-[var(--tiger-surface,#fff)] border border-[var(--tiger-component-collapse-border-color,var(--tiger-border,#e5e7eb))] rounded overflow-hidden'
+  'w-full bg-[var(--tiger-surface)] border border-[var(--tiger-component-collapse-border-color)] rounded overflow-hidden'
 
 /**
  * Collapse ghost mode classes (transparent without border)
@@ -28,19 +29,19 @@ export const collapseBorderlessClasses = 'border-0'
  * Collapse panel base classes
  */
 export const collapsePanelBaseClasses =
-  'border-b border-[var(--tiger-component-collapse-border-color,var(--tiger-border,#e5e7eb))] last:border-b-0'
+  'border-b border-[var(--tiger-component-collapse-border-color)] last:border-b-0'
 
 /**
  * Header row: button + extra sit as siblings
  */
 export const collapseHeaderRowClasses =
-  'flex items-center px-[var(--tiger-component-collapse-header-padding-x,16px)] py-[var(--tiger-component-collapse-header-padding-y,16px)]'
+  'flex items-center px-[var(--tiger-component-collapse-header-padding-x)] py-[var(--tiger-component-collapse-header-padding-y)]'
 
 /**
  * Collapse panel header button
  */
 export const collapsePanelHeaderBaseClasses =
-  'flex min-w-0 flex-1 items-center cursor-pointer bg-transparent p-0 border-0 text-start transition-colors duration-200 motion-reduce:transition-none hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'flex min-w-0 flex-1 items-center cursor-pointer bg-transparent p-0 border-0 text-start transition-colors duration-200 motion-reduce:transition-none hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring)]'
 
 /**
  * Collapse panel header active classes
@@ -67,14 +68,14 @@ export const collapsePanelContentWrapperClasses =
  * Collapse panel content base classes
  */
 export const collapsePanelContentBaseClasses =
-  'px-[var(--tiger-component-collapse-content-padding,16px)] py-[var(--tiger-component-collapse-content-padding,16px)] bg-[var(--tiger-surface,#fff)] text-[var(--tiger-text,#374151)]'
+  'px-[var(--tiger-component-collapse-content-padding)] py-[var(--tiger-component-collapse-content-padding)] bg-[var(--tiger-surface)] text-[var(--tiger-text)]'
 
 /**
  * Collapse icon base classes.
  * Collapsed points inline-end; expanded points block-end.
  */
 export const collapseIconBaseClasses =
-  'shrink-0 transition-transform duration-300 ease-in-out motion-reduce:transition-none text-[var(--tiger-text-muted,#6b7280)] -rotate-90 rtl:rotate-90'
+  'shrink-0 transition-transform duration-300 ease-in-out motion-reduce:transition-none text-[var(--tiger-text-secondary)] -rotate-90 rtl:rotate-90'
 
 /**
  * Collapse icon expanded classes
@@ -92,7 +93,7 @@ export const collapseIconPositionClasses = {
 /**
  * Collapse header text classes
  */
-export const collapseHeaderTextClasses = 'flex-1 font-medium text-[var(--tiger-text,#111827)]'
+export const collapseHeaderTextClasses = 'flex-1 font-medium text-[var(--tiger-text)]'
 
 /**
  * Get collapse container classes
@@ -263,6 +264,27 @@ export interface CollapseHeaderRecord {
 }
 
 /**
+ * Next enabled header in the current child order. Wraps at the ends.
+ * `headers` must already be document order, not a mount registry.
+ */
+export function getCollapseHeaderTarget<T extends { disabled?: boolean }>(
+  headers: readonly T[],
+  currentIndex: number,
+  action: CollapseHeaderFocusAction
+): number {
+  const enabled = headers
+    .map((header, index) => ({ header, index }))
+    .filter((entry) => !entry.header.disabled)
+  if (enabled.length === 0) return -1
+  if (action === 'first') return enabled[0]!.index
+  if (action === 'last') return enabled[enabled.length - 1]!.index
+  const current = enabled.findIndex((entry) => entry.index === currentIndex)
+  if (current < 0) return enabled[0]!.index
+  if (action === 'next') return enabled[(current + 1) % enabled.length]!.index
+  return enabled[(current - 1 + enabled.length) % enabled.length]!.index
+}
+
+/**
  * Next enabled accordion header index. Wraps at the ends.
  */
 export function getNextAccordionHeaderIndex(
@@ -368,7 +390,7 @@ export function createCollapseTransitionController(
     options.prefersReducedMotion ? options.prefersReducedMotion() : prefersReducedMotion()
   let frame = 0
   let expanded = options.expanded
-  let resizeObserver: ResizeObserver | undefined
+  let stopResize: (() => void) | undefined
 
   applyInitialStyle(element, expanded)
 
@@ -384,17 +406,16 @@ export function createCollapseTransitionController(
   }
 
   const stopObserver = () => {
-    resizeObserver?.disconnect()
-    resizeObserver = undefined
+    stopResize?.()
+    stopResize = undefined
   }
 
   const startObserver = () => {
-    if (!isBrowser() || typeof ResizeObserver === 'undefined') return
+    if (!isBrowser()) return
     stopObserver()
-    resizeObserver = new ResizeObserver(() => {
+    stopResize = observeSize(element as unknown as Element, () => {
       syncExpandedHeight()
     })
-    resizeObserver.observe(element as unknown as Element)
   }
 
   const handleTransitionEnd = (event: Event) => {

@@ -7,7 +7,7 @@ export default function App() {
       <Row gutter={[16, 16]}>
         {[1, 2, 3].map((item) => (
           <Col key={item} span={8}>
-            <div className="rounded bg-[var(--tiger-primary)] p-4 text-center text-[var(--tiger-primary-foreground,#fff)]">
+            <div className="rounded bg-[var(--tiger-primary)] p-4 text-center text-[var(--tiger-primary-foreground)]">
               col-8
             </div>
           </Col>

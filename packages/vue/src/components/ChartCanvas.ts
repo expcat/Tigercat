@@ -45,7 +45,7 @@ export const ChartCanvas = defineComponent({
     },
     responsive: {
       type: Boolean,
-      default: false
+      default: true
     },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
@@ -100,16 +100,17 @@ export const ChartCanvas = defineComponent({
       }
     }
 
-    onMounted(syncResponsiveObserver)
+    let ready = false
+    onMounted(() => {
+      ready = true
+      syncResponsiveObserver()
+    })
     watch(() => props.responsive, syncResponsiveObserver)
-    watch(
-      [() => resolvedSize.value.width, () => resolvedSize.value.height],
-      ([nextWidth, nextHeight], prev) => {
-        if (prev && prev[0] === nextWidth && prev[1] === nextHeight) return
-        emit('resolved-size-change', { width: nextWidth, height: nextHeight })
-      },
-      { immediate: true }
-    )
+    watch([() => resolvedSize.value.width, () => resolvedSize.value.height], ([nextWidth, nextHeight], prev) => {
+      if (!ready) return
+      if (prev && prev[0] === nextWidth && prev[1] === nextHeight) return
+      emit('resolved-size-change', { width: nextWidth, height: nextHeight })
+    })
     onBeforeUnmount(() => resizeController.disconnect())
 
     return () => {
@@ -117,12 +118,14 @@ export const ChartCanvas = defineComponent({
       const size = resolvedSize.value
       const titleId = props.title ? `${labelId}-title` : undefined
       const descId = props.desc ? `${labelId}-desc` : undefined
-      const named = Boolean(props.title || attrs['aria-label'])
+      const accessibleName =
+        (typeof attrs['aria-label'] === 'string' ? attrs['aria-label'] : undefined) || props.title
+      const plotReady = rect.width > 0 && rect.height > 0
       return h(
         'div',
         {
           ref: hostRef,
-          class: chartCanvasHostClasses,
+          class: classNames(chartCanvasHostClasses, 'relative', props.responsive && 'h-full'),
           'data-chart-canvas-host': ''
         },
         [
@@ -135,20 +138,24 @@ export const ChartCanvas = defineComponent({
               viewBox: `0 0 ${size.width} ${size.height}`,
               class: svgClasses.value,
               style: svgStyle.value,
-              role: named ? 'img' : undefined,
+              role: 'group',
+              'aria-label': accessibleName,
               'aria-labelledby': titleId,
-              'aria-describedby': descId
+              'aria-describedby': descId,
+              'data-chart-plot': plotReady ? 'ready' : 'empty'
             },
             [
               props.title ? h('title', { id: titleId }, props.title) : null,
               props.desc ? h('desc', { id: descId }, props.desc) : null,
-              h(
-                'g',
-                {
-                  transform: `translate(${rect.x}, ${rect.y})`
-                },
-                slots.default?.({ innerRect: rect, width: size.width, height: size.height })
-              )
+              plotReady
+                ? h(
+                    'g',
+                    {
+                      transform: `translate(${rect.x}, ${rect.y})`
+                    },
+                    slots.default?.({ innerRect: rect, width: size.width, height: size.height })
+                  )
+                : null
             ].filter(Boolean)
           )
         ]

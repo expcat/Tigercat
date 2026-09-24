@@ -9,7 +9,6 @@ import {
   getEmptyIllustration,
   resolveEmptyImageMode,
   mergeTigerLocale,
-  devWarn,
   type EmptyProps as CoreEmptyProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
@@ -49,13 +48,6 @@ export const Empty = forwardRef<HTMLDivElement, EmptyProps>(function Empty(
   const hasCustomImage = image !== undefined && image !== null
   const imageMode = resolveEmptyImageMode({ showImage, hasCustomImage, preset })
   const illustration = imageMode === 'builtin' ? getEmptyIllustration(preset) : null
-
-  if (showImage === false && hasCustomImage) {
-    devWarn(
-      'Empty.showImage.custom',
-      'Empty: `image` still renders when `showImage` is false. Pass no `image` to hide the illustration.'
-    )
-  }
 
   const wrapperClasses = classNames(emptyBaseClasses, className)
 

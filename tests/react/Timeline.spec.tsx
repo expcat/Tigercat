@@ -58,7 +58,7 @@ describe('Timeline (React)', () => {
     )
 
     expect(container.querySelectorAll('li')).toHaveLength(2)
-    expect(container.querySelector('ul')?.getAttribute('aria-busy')).toBe('true')
+    expect(container.querySelector('li[aria-busy="true"]')).toBeTruthy()
     expect(screen.getByText('Pending Dot')).toBeTruthy()
     expect(screen.getByText('Pending Content')).toBeTruthy()
   })

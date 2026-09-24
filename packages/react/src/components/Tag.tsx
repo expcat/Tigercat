@@ -1,18 +1,20 @@
 import React, { forwardRef, useMemo } from 'react'
 import {
-  classNames,
-  getTagVariantClasses,
-  defaultTagThemeColors,
   icon24PathStrokeLinecap,
   icon24PathStrokeLinejoin,
   icon24StrokeWidth,
-  icon24ViewBox,
+  icon24ViewBox
+} from '@expcat/tigercat-core/icons/common'
+import {
+  classNames,
+  getTagVariantClasses,
+  defaultTagThemeColors,
   tagBaseClasses,
   tagSizeClasses,
   tagPillClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
-  omitUnsupportedColorProp,
+  formatTagCloseName,
   getStatusLabels,
   mergeTigerLocale,
   type TagProps as CoreTagProps
@@ -32,6 +34,17 @@ export type TagProps = CoreTagProps &
      */
     children?: React.ReactNode
   }
+
+function visibleTagText(node: React.ReactNode): string {
+  if (node == null || typeof node === 'boolean') return ''
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(visibleTagText).join('')
+  if (React.isValidElement(node)) {
+    const props = node.props as { children?: React.ReactNode }
+    return visibleTagText(props.children)
+  }
+  return ''
+}
 
 const CloseIcon: React.FC = () => (
   <svg
@@ -58,9 +71,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
     size = 'md',
     closable = false,
     closeAriaLabel,
-    closeTabIndex,
     open,
-    onOpenChange,
     pill = false,
     onClose,
     children,
@@ -74,7 +85,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
     () => getStatusLabels(mergeTigerLocale(config.locale, locale)),
     [config.locale, locale]
   )
-  const rest = omitUnsupportedColorProp('Tag', props as Record<string, unknown>)
+  const rest = props
 
   const tagClasses = useMemo(
     () =>
@@ -96,8 +107,11 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
   const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     onClose?.(event)
-    onOpenChange?.(false)
   }
+
+  const visibleLabel = visibleTagText(children)
+  const closeName =
+    closeAriaLabel ?? formatTagCloseName(labels.tagCloseAriaLabel, visibleLabel)
 
   if (open === false) {
     return null
@@ -110,8 +124,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
         <button
           className={closeButtonClasses}
           onClick={handleClose}
-          aria-label={closeAriaLabel ?? labels.tagCloseAriaLabel}
-          tabIndex={closeTabIndex}
+          aria-label={closeName}
           type="button">
           <CloseIcon />
         </button>

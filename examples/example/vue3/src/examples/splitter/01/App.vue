@@ -11,7 +11,7 @@ const sizes = ref<(number | string)[]>(['30%', '70%'])
       v-model:sizes="sizes"
       orientation="horizontal"
       :gutter-size="6"
-      style="height: 200px; border: 1px solid var(--tiger-border, #e5e7eb); border-radius: 8px">
+      style="height: 200px; border: 1px solid var(--tiger-border); border-radius: 8px">
       <div class="p-4">左侧 30%</div>
       <div class="p-4">右侧 70%</div>
     </Splitter>

@@ -15,25 +15,29 @@ export type CodeLanguage =
  */
 export type CodeEditorTheme = 'light' | 'dark'
 
+/** One highlighted span. `text` is drawn as a text node. */
+export interface HighlightToken {
+  text: string
+  className?: string
+}
+
 /**
- * Pluggable highlighter. Returned HTML is TRUSTED and injected as-is —
- * callers must escape untrusted source themselves (or use
- * `escapeHighlightHtml`).
+ * Pluggable highlighter. Returns tokens. The framework draws them as text.
  */
 export interface CodeHighlighter {
   /** Optional identifier used by tests / devtools. */
   name?: string
+  /** Tokens for one source line. Drawn as text nodes, never as HTML. */
+  highlightLine?(line: string, language: CodeLanguage, theme: CodeEditorTheme): HighlightToken[]
   /**
-   * Render a single line of source to HTML. Returned string is injected
-   * verbatim — engines must escape any untrusted text themselves.
+   * Tokens for the whole block, one array per line. Used when
+   * `highlightLine` is not provided. Strings are not HTML.
    */
-  highlightLine?(line: string, language: CodeLanguage, theme: CodeEditorTheme): string
-  /**
-   * Render the whole code block to HTML. Used when `highlightLine` is
-   * not provided. Engines that emit one `<pre><code>` envelope per call
-   * should prefer this hook.
-   */
-  highlightCode?(code: string, language: CodeLanguage, theme: CodeEditorTheme): string
+  highlightCode?(
+    code: string,
+    language: CodeLanguage,
+    theme: CodeEditorTheme
+  ): HighlightToken[][]
 }
 
 /**
@@ -54,10 +58,9 @@ export interface CodeEditorProps {
    */
   language?: CodeLanguage
   /**
-   * Editor theme
-   * @default 'light'
+   * Editor theme. Omit to follow the document color scheme.
    */
-  theme?: CodeEditorTheme
+  theme?: CodeEditorTheme | 'auto'
   /**
    * Whether the editor is read-only
    * @default false
@@ -110,9 +113,7 @@ export interface CodeEditorProps {
    * Custom styles
    */
   style?: Record<string, string | number>
-  /**
-   * Optional pluggable highlighter. Output is TRUSTED HTML.
-   */
+  /** Optional pluggable highlighter. Returns tokens drawn as text. */
   highlighter?: CodeHighlighter
   /** Locale overrides merged on top of ConfigProvider locale */
   locale?: Partial<TigerLocale>

@@ -5,10 +5,15 @@ import {
   watermarkWrapperClasses,
   resolveWatermarkFont,
   createWatermarkRenderController,
+  getWatermarkLabels,
   getWatermarkOverlayStyle,
+  mergeTigerLocale,
+  paintWatermark,
+  watermarkOverlayClasses,
   type WatermarkRenderController,
   type WatermarkProps as CoreWatermarkProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface WatermarkProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'>, CoreWatermarkProps {
@@ -35,7 +40,8 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
   ref
 ) {
   const [base64, setBase64] = useState<string | undefined>()
-  const [overlayKey, setOverlayKey] = useState(0)
+  const [imageFailed, setImageFailed] = useState(false)
+  const config = useTigerConfig()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const renderControllerRef = useRef<WatermarkRenderController | null>(null)
   const optionsRef = useRef({ content, image, width, height, rotate, gapX, gapY, font })
@@ -59,8 +65,12 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
           font: resolveWatermarkFont(next.font)
         }
       },
-      onRender: setBase64,
-      onTamper: () => setOverlayKey((key) => key + 1)
+      render: async (options) => {
+        const painted = await paintWatermark(options)
+        setImageFailed(painted.imageFailed)
+        return painted.url
+      },
+      onRender: setBase64
     })
 
     renderControllerRef.current = controller
@@ -103,7 +113,12 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
       className={classNames(watermarkWrapperClasses, className)}
       {...props}>
       {children}
-      <div key={overlayKey} data-watermark="true" aria-hidden="true" style={overlayStyle} />
+      <div data-watermark="true" aria-hidden="true" className={watermarkOverlayClasses} style={overlayStyle} />
+      {imageFailed ? (
+        <p className="text-sm text-[var(--tiger-text-secondary)]">
+          {getWatermarkLabels(mergeTigerLocale(config.locale)).imageErrorText}
+        </p>
+      ) : null}
     </div>
   )
 })

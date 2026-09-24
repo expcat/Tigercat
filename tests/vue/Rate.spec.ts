@@ -59,10 +59,10 @@ describe('Rate', () => {
     expect(onChange).toHaveBeenCalledWith(2.5)
   })
 
-  it('locks on both readonly and readOnly and stays focusable', async () => {
+  it('locks on readOnly and stays focusable', async () => {
     const onChange = vi.fn()
-    const { container, rerender } = render(Rate, {
-      props: { modelValue: 2, readonly: true, 'onUpdate:modelValue': onChange }
+    const { container } = render(Rate, {
+      props: { modelValue: 2, readOnly: true, 'onUpdate:modelValue': onChange }
     })
     const slider = container.querySelector('[role="slider"]') as HTMLElement
     await fireEvent.click(getStars(container)[3])
@@ -70,11 +70,6 @@ describe('Rate', () => {
     expect(onChange).not.toHaveBeenCalled()
     expect(slider).toHaveAttribute('aria-readonly', 'true')
     expect(slider).toHaveAttribute('tabindex', '0')
-
-    await rerender({ modelValue: 2, readOnly: true, 'onUpdate:modelValue': onChange })
-    await fireEvent.click(getStars(container)[0])
-    expect(onChange).not.toHaveBeenCalled()
-    expect(slider).toHaveAttribute('aria-readonly', 'true')
   })
 
   // --- Disabled ---

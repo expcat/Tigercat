@@ -1,4 +1,4 @@
-import { onUnmounted, reactive, ref } from 'vue'
+import { onUnmounted, reactive, ref, toValue, watch, type MaybeRefOrGetter } from 'vue'
 import {
   assignFormValues,
   cloneFormValues,
@@ -16,28 +16,42 @@ import {
  * Pass the return value to `<Form :controller="ctrl">` so hook writes and
  * Form validation share one store. `resetFields` on Form is `ctrl.reset()`.
  */
-export function useFormController(options: FormControllerOptions = {}): FormController {
+export function useFormController(
+  source: MaybeRefOrGetter<FormControllerOptions> = {}
+): FormController {
+  const readOptions = (): FormControllerOptions => toValue(source) ?? {}
+  const initial = readOptions()
   const engine: FormEngine = createFormEngine({
-    initialValues: options.initialValues,
-    undoable: options.undoable,
-    maxHistorySize: options.maxHistorySize,
-    getRules: () => options.rules,
-    getConditions: () => options.conditions,
-    getFieldDependencies: () => options.fieldDependencies,
-    getMessages: () => getFormValidationLabels(options.locale),
-    getValidateDebounce: () => options.validateDebounce ?? 0
+    initialValues: initial.initialValues,
+    undoable: initial.undoable,
+    maxHistorySize: initial.maxHistorySize,
+    getRules: () => readOptions().rules,
+    getConditions: () => readOptions().conditions,
+    getFieldDependencies: () => readOptions().fieldDependencies,
+    getMessages: () => getFormValidationLabels(readOptions().locale),
+    getValidateDebounce: () => readOptions().validateDebounce ?? 0
   })
+
+  watch(
+    () => readOptions().initialValues,
+    (next) => {
+      if (next) engine.setInitialValues(next)
+    },
+    { deep: true }
+  )
 
   const values = reactive<FormValues>(cloneFormValues(engine.getValues()))
   const errors = ref(engine.getErrors())
   const canUndo = ref(engine.canUndo)
   const canRedo = ref(engine.canRedo)
+  const errorAnnouncement = ref(engine.errorAnnouncement)
 
   const stop = engine.subscribe(() => {
     assignFormValues(values, engine.getValues())
     errors.value = engine.getErrors()
     canUndo.value = engine.canUndo
     canRedo.value = engine.canRedo
+    errorAnnouncement.value = engine.errorAnnouncement
   })
 
   onUnmounted(() => {
@@ -81,7 +95,14 @@ export function useFormController(options: FormControllerOptions = {}): FormCont
     subscribe: engine.subscribe,
     registerFieldRules: engine.registerFieldRules,
     registerFieldCondition: engine.registerFieldCondition,
+    registerFieldDisabled: engine.registerFieldDisabled,
+    getMountedFieldNames: engine.getMountedFieldNames,
     getFieldConditionState: engine.getFieldConditionState,
+    setFieldError: engine.setFieldError,
+    setInitialValues: engine.setInitialValues,
+    get errorAnnouncement() {
+      return errorAnnouncement.value
+    },
     replaceValues: engine.replaceValues,
     setOptions: engine.setOptions,
     getValues: engine.getValues,

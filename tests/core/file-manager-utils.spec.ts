@@ -276,7 +276,7 @@ describe('file-manager-utils', () => {
         searchText: '',
         draggable: true
       })
-      expect(m.processedItems.map((item) => item.name)).toEqual(['c.txt', 'a.txt', 'z'])
+      expect(m.processedItems.map((item) => item.name)).toEqual(['z', 'a.txt', 'c.txt'])
       expect(m.canReorder).toBe(true)
     })
 
@@ -341,6 +341,17 @@ describe('file-manager-utils', () => {
       const file = makeFile('index.ts')
       const result = resolveFileOpen(file, [])
       expect(result).toEqual({ type: 'open', item: file })
+    })
+
+    it('does not treat a numeric key as the same as its string', () => {
+      const files: FileItem[] = [
+        { key: 1, name: 'one', type: 'folder', children: [{ key: 'a', name: 'a', type: 'file' }] },
+        { key: '1', name: 'two', type: 'folder', children: [{ key: 'b', name: 'b', type: 'file' }] }
+      ]
+      expect(navigateToFolder(files, [1]).map((item) => item.name)).toEqual(['a'])
+      expect(navigateToFolder(files, ['1']).map((item) => item.name)).toEqual(['b'])
+      const next = reorderFileTreeAtPath(files, [1], 0, 0)
+      expect(next[1]?.children?.[0]?.name).toBe('b')
     })
 
     it('returns null for disabled item', () => {

@@ -1,20 +1,22 @@
-import React, { forwardRef, useContext, useEffect, useMemo } from 'react'
+import React, { forwardRef, useMemo } from 'react'
 import {
   classNames,
   getLayoutSidebarClasses,
   getSidebarAriaLabel,
   getSidebarStyle,
-  injectLayoutGridStyles,
   isSidebarFullyHidden,
   resolveSidebarAriaProps,
+  type SidebarLandmark,
   type SidebarProps as CoreSidebarProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
-import { LayoutContext, SidebarContext } from '../utils/layout-context'
+import { SidebarContext } from '../utils/layout-context'
 
 export interface ReactSidebarProps
   extends CoreSidebarProps, Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'width'> {
   children?: React.ReactNode
+  /** Set by Layout. Not a public styling prop. */
+  landmark?: SidebarLandmark
 }
 
 export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sidebar(
@@ -26,19 +28,13 @@ export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sideb
     side = 'start',
     style,
     children,
+    landmark = 'default',
     ...props
   },
   ref
 ) {
-  injectLayoutGridStyles()
-  const layout = useContext(LayoutContext)
   const config = useTigerConfig()
   const fallbackName = useMemo(() => getSidebarAriaLabel(config.locale), [config.locale])
-
-  useEffect(() => {
-    layout?.setSiderCollapsed(collapsed)
-    return () => layout?.setSiderCollapsed(false)
-  }, [collapsed, layout])
 
   const fullyHidden = isSidebarFullyHidden(collapsed, collapsedWidth)
   const sidebarClasses = classNames(
@@ -53,26 +49,30 @@ export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sideb
     ...style,
     ...getSidebarStyle(collapsed, width, collapsedWidth)
   }
-  const aria = resolveSidebarAriaProps({
-    ariaLabel: props['aria-label'],
-    ariaLabelledby: props['aria-labelledby'],
-    fallback: fallbackName
-  })
+  const named =
+    landmark === 'plain'
+      ? {}
+      : resolveSidebarAriaProps({
+          ariaLabel: props['aria-label'],
+          ariaLabelledby: props['aria-labelledby'],
+          fallback: landmark === 'default' ? fallbackName : ''
+        })
 
   const { ['aria-label']: _ignoredLabel, ['aria-labelledby']: _ignoredBy, ...rest } = props
+  const Tag = landmark === 'plain' ? 'div' : 'aside'
 
   return (
     <SidebarContext.Provider value={{ collapsed }}>
-      <aside
+      <Tag
         ref={ref}
         className={sidebarClasses}
         style={sidebarStyle}
         inert={fullyHidden || undefined}
         aria-hidden={fullyHidden || undefined}
-        {...aria}
+        {...named}
         {...rest}>
         {children}
-      </aside>
+      </Tag>
     </SidebarContext.Provider>
   )
 })

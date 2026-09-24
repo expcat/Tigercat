@@ -51,10 +51,18 @@ export interface HeaderProps {
   variant?: HeaderVariant
 
   /**
-   * Header height. When omitted, default height is `h-16` via class so
-   * caller `style.height` / class can override. Passed values write inline style.
+   * Header height. When omitted, the stylesheet height is `4rem` for every
+   * surface so caller `style.height` can override. Passed values write inline style.
    */
   height?: string
+
+  /**
+   * Stick to the block start while the page scrolls.
+   * Ignored inside a `fullHeight` shell, where the header is already outside
+   * the content scroller. Not implied by `variant`.
+   * @default false
+   */
+  sticky?: boolean
 }
 
 export type HeaderVariant = 'default' | 'translucent' | 'blur'

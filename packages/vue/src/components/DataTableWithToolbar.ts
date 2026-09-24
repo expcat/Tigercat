@@ -24,10 +24,12 @@ import {
   mergeStyleValues,
   mergeTigerLocale,
   resolveTigerLocale,
+  isToolbarScalarFilter,
   resolveToolbarFilterMap,
   resolveToolbarPageChange,
   resolveToolbarSelectedKeys,
   seedToolbarFilterState,
+  toolbarFilterMapAfterWrite,
   splitCompositeHostAttrs,
   toggleHiddenColumnKey,
   toolbarHasSearch,
@@ -187,11 +189,14 @@ export const DataTableWithToolbar = defineComponent({
     const resolvedFilters = computed(() =>
       resolveToolbarFilterMap(props.toolbar?.filters, internalFilters.value, extraFilterKeys.value)
     )
+    const searchListener = () => {
+      const vnodeProps = (getCurrentInstance()?.vnode.props ?? {}) as Record<string, unknown>
+      return Boolean(vnodeProps.onSearch || vnodeProps.onSearchChange)
+    }
     const resolveHasSearch = (): boolean => {
       if (props.toolbar?.search === false) return false
       if (toolbarHasSearch(props.toolbar)) return true
-      const vnodeProps = (getCurrentInstance()?.vnode.props ?? {}) as Record<string, unknown>
-      return Boolean(vnodeProps.onSearch || vnodeProps.onSearchChange)
+      return searchListener()
     }
     const hasFilters = computed(() => Boolean(props.toolbar?.filters?.length))
     const hasFiltersExtra = computed(() => Boolean(slots['filters-extra']))
@@ -208,17 +213,28 @@ export const DataTableWithToolbar = defineComponent({
       )
     })
     const selectedKeys = computed(() =>
-      resolveToolbarSelectedKeys(
-        props.toolbar?.selectedKeys,
-        props.rowSelection?.selectedRowKeys,
-        internalSelectedKeys.value
-      )
+      resolveToolbarSelectedKeys(props.rowSelection?.selectedRowKeys, internalSelectedKeys.value)
     )
-    const selectedCount = computed(() =>
-      props.toolbar?.selectedCount !== undefined
-        ? props.toolbar.selectedCount
-        : selectedKeys.value.length
+    const selectedCount = computed(() => selectedKeys.value.length)
+    const paginationConfig = computed(() =>
+      props.pagination && typeof props.pagination === 'object' ? props.pagination : null
     )
+    const pageControlled = computed(() => paginationConfig.value?.current != null)
+    const uncontrolledPage = ref(paginationConfig.value?.defaultCurrent ?? 1)
+    const pageSize = computed(
+      () =>
+        paginationConfig.value?.pageSize ??
+        paginationConfig.value?.defaultPageSize ??
+        previousPageSize.value ??
+        10
+    )
+    const pageCurrent = computed(() =>
+      pageControlled.value ? (paginationConfig.value?.current ?? 1) : uncontrolledPage.value
+    )
+    const tablePagination = computed(() => {
+      if (props.pagination === false || !paginationConfig.value) return props.pagination
+      return { ...paginationConfig.value, current: pageCurrent.value }
+    })
     const bulkLabel = computed(
       () => props.toolbar?.bulkActionsLabel ?? tableLabels.value.selectedText
     )
@@ -233,12 +249,21 @@ export const DataTableWithToolbar = defineComponent({
       if (props.toolbar?.searchValue === undefined) internalSearch.value = value
       props.toolbar?.onSearchChange?.(value)
       emit('search-change', value)
+      if (!isToolbarSearchRemote(props.toolbar)) resetPageToFirst()
     }
 
     const handleSearchSubmit = () => {
       const value = searchValue.value ?? ''
       props.toolbar?.onSearch?.(value)
       emit('search', value)
+      resetPageToFirst()
+    }
+
+    const resetPageToFirst = () => {
+      if (props.pagination === false || !paginationConfig.value) return
+      if (pageCurrent.value === 1) return
+      if (!pageControlled.value) uncontrolledPage.value = 1
+      emit('page-change', { current: 1, pageSize: pageSize.value })
     }
 
     const setFilterValue = (
@@ -253,20 +278,20 @@ export const DataTableWithToolbar = defineComponent({
       if (!filter || filter.value === undefined) {
         internalFilters.value = { ...internalFilters.value, [key]: value }
       }
-      const next = resolveToolbarFilterMap(
+      const next = toolbarFilterMapAfterWrite(
         props.toolbar?.filters,
-        { ...internalFilters.value, [key]: value },
-        extraFilterKeys.value
+        internalFilters.value,
+        extraFilterKeys.value,
+        key,
+        value
       )
       props.toolbar?.onFiltersChange?.(next)
       emit('filters-change', next)
+      if (isToolbarSearchRemote(props.toolbar) || isToolbarScalarFilter(value)) resetPageToFirst()
     }
 
     const handleSelectionChange = (keys: (string | number)[]) => {
-      if (
-        props.toolbar?.selectedKeys === undefined &&
-        props.rowSelection?.selectedRowKeys === undefined
-      ) {
+      if (props.rowSelection?.selectedRowKeys === undefined) {
         internalSelectedKeys.value = keys
       }
       emit('selection-change', keys)
@@ -282,6 +307,7 @@ export const DataTableWithToolbar = defineComponent({
     const handleTablePageChange = (page: { current: number; pageSize: number }) => {
       const result = resolveToolbarPageChange(page, previousPageSize.value)
       previousPageSize.value = page.pageSize
+      if (!pageControlled.value) uncontrolledPage.value = page.current
       if (result.kind === 'size') emit('page-size-change', page)
       else emit('page-change', page)
     }
@@ -395,7 +421,7 @@ export const DataTableWithToolbar = defineComponent({
                   prefix: () =>
                     h(Icon, {
                       name: 'search',
-                      class: 'w-3.5 h-3.5 text-[var(--tiger-text-secondary,#6b7280)]'
+                      class: 'w-3.5 h-3.5 text-[var(--tiger-text-secondary)]'
                     })
                 }
               ),
@@ -405,10 +431,11 @@ export const DataTableWithToolbar = defineComponent({
                     {
                       size: 'sm',
                       variant: 'primary',
-                      class:
-                        'whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md,0.5rem)] px-3',
+                      class: 'whitespace-nowrap shrink-0 rounded-[var(--tiger-radius-md)] px-3',
                       onClick: handleSearchSubmit,
-                      disabled: !canSubmitToolbarSearch(props.toolbar)
+                      disabled: !canSubmitToolbarSearch(props.toolbar, {
+                        hasSearchListener: searchListener()
+                      })
                     },
                     {
                       default: () =>
@@ -492,29 +519,27 @@ export const DataTableWithToolbar = defineComponent({
 
       const bulkChildren: VNodeArrayChildren = []
       if (hasBulkActions.value) {
-        if (selectedCount.value > 0) {
-          bulkChildren.push(
-            h(
-              'div',
-              {
+        bulkChildren.push(
+          h(
+            'div',
+            {
+              class:
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary)]/10 text-[var(--tiger-primary)] text-xs font-medium border border-[var(--tiger-primary)]/15 shrink-0',
+              'aria-live': 'polite'
+            },
+            [
+              h('span', {
                 class:
-                  'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)] text-xs font-medium border border-[var(--tiger-primary,#2563eb)]/15 shrink-0',
-                'aria-live': 'polite'
-              },
-              [
-                h('span', {
-                  class:
-                    'w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] animate-pulse motion-reduce:animate-none'
-                }),
-                h(
-                  'span',
-                  null,
-                  `${bulkLabel.value} ${selectedCount.value} ${tableLabels.value.selectedItemsText}`
-                )
-              ]
-            )
+                  'w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary)] animate-pulse motion-reduce:animate-none'
+              }),
+              h(
+                'span',
+                null,
+                `${bulkLabel.value} ${selectedCount.value} ${tableLabels.value.selectedItemsText}`
+              )
+            ]
           )
-        }
+        )
         ;(props.toolbar?.bulkActions ?? []).forEach((action) => {
           bulkChildren.push(
             h(
@@ -588,6 +613,7 @@ export const DataTableWithToolbar = defineComponent({
             {
               ...rest,
               ...tablePass,
+              pagination: tablePagination.value,
               dataSource: viewRows.value,
               hiddenColumnKeys: resolvedHiddenKeys.value,
               locale: resolvedTableLocale.value,

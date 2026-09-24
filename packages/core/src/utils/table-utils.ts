@@ -6,6 +6,7 @@ import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
 import { isBrowser } from './env'
 import { RESPONSIVE_BREAKPOINT_FALLBACK_PX } from './responsive'
+import { treeKeyId } from './tree-utils'
 import type {
   TableSize,
   ColumnAlign,
@@ -68,7 +69,7 @@ const CARD_LIST_CLASSES: Record<TableCardBreakpoint, string> = {
 }
 
 export const tableResponsiveCardClasses =
-  'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm'
+  'rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] shadow-sm'
 
 export function getTableResponsiveCardClasses(cardPadding: string | false | undefined): string {
   return classNames(
@@ -78,31 +79,31 @@ export function getTableResponsiveCardClasses(cardPadding: string | false | unde
 }
 
 export const tableResponsiveCardRowClasses =
-  'grid grid-cols-[minmax(7rem,40%)_1fr] gap-3 border-b border-[var(--tiger-border,#e5e7eb)] py-2 last:border-b-0'
+  'grid grid-cols-[minmax(7rem,40%)_1fr] gap-3 border-b border-[var(--tiger-border)] py-2 last:border-b-0'
 
 export const tableResponsiveCardLabelClasses =
-  'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-muted,#6b7280)]'
+  'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-secondary)]'
 
 export const tableResponsiveCardValueClasses =
-  'min-w-0 text-sm text-[var(--tiger-text,#111827)] break-words'
+  'min-w-0 text-sm text-[var(--tiger-text)] break-words'
 
 export const tableResponsiveCardTitleClasses =
-  'mb-2 text-sm font-semibold text-[var(--tiger-text,#111827)] break-words'
+  'mb-2 text-sm font-semibold text-[var(--tiger-text)] break-words'
 
 export const tableBackgroundClasses =
-  'bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff)))]'
+  'bg-[var(--tiger-table-bg)]'
 
 export const tableHeaderBackgroundClasses =
-  'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
+  'bg-[var(--tiger-table-header-bg)]'
 
 export const tableRowHoverClasses =
-  'hover:bg-[var(--tiger-table-hover-bg,var(--tiger-component-table-hover-bg,var(--tiger-surface-muted,#f9fafb)))] transition-colors'
+  'hover:bg-[var(--tiger-table-hover-bg)] transition-colors'
 
 export const tableRowGroupHoverClasses =
-  'group-hover:bg-[var(--tiger-table-hover-bg,var(--tiger-component-table-hover-bg,var(--tiger-surface-muted,#f9fafb)))]'
+  'group-hover:bg-[var(--tiger-table-hover-bg)]'
 
 export const tableRowStripedClasses =
-  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
+  'bg-[var(--tiger-table-stripe-bg)]/50'
 
 /**
  * Opaque striped background for sticky fixed cells.
@@ -113,7 +114,7 @@ export const tableRowStripedClasses =
  * 50% stripe overlay sitting on the table background.
  */
 export const tableFixedCellStripedClasses =
-  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))_50%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff))))]'
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg)_50%,var(--tiger-table-bg))]'
 
 export function getTableResponsiveTableClasses(
   mode: TableResponsiveMode,
@@ -286,22 +287,22 @@ export function filterHiddenColumns<T = Record<string, unknown>>(
 export function orderTableFixedColumns<T = Record<string, unknown>>(
   columns: TableColumn<T>[]
 ): TableColumn<T>[] {
-  const left: TableColumn<T>[] = []
+  const start: TableColumn<T>[] = []
   const normal: TableColumn<T>[] = []
-  const right: TableColumn<T>[] = []
+  const end: TableColumn<T>[] = []
 
   for (const column of columns) {
-    if (column.fixed === 'left') {
-      left.push(column)
-    } else if (column.fixed === 'right') {
-      right.push(column)
+    if (column.fixed === 'start') {
+      start.push(column)
+    } else if (column.fixed === 'end') {
+      end.push(column)
     } else {
       normal.push(column)
     }
   }
 
-  if (left.length === 0 && right.length === 0) return columns
-  return [...left, ...normal, ...right]
+  if (start.length === 0 && end.length === 0) return columns
+  return [...start, ...normal, ...end]
 }
 
 /**
@@ -435,17 +436,23 @@ export interface TableSelectionState {
   someSelected: boolean
 }
 
+export function tableRowKeyId(key: string | number): string {
+  return treeKeyId(key)
+}
+
 export function getTableSelectionState<T = Record<string, unknown>>(
   input: TableSelectionStateInput<T>
 ): TableSelectionState {
-  const selectedSet = new Set(input.selectedRowKeys)
+  const selectedSet = new Set(input.selectedRowKeys.map((key) => tableRowKeyId(key)))
   const selectableRowKeys = input.rowKeys.filter((key, index) => {
     const record = input.records[index]
     return !input.getCheckboxProps?.(record)?.disabled
   })
   const allSelected =
-    selectableRowKeys.length > 0 && selectableRowKeys.every((key) => selectedSet.has(key))
-  const someSelected = selectableRowKeys.some((key) => selectedSet.has(key)) && !allSelected
+    selectableRowKeys.length > 0 &&
+    selectableRowKeys.every((key) => selectedSet.has(tableRowKeyId(key)))
+  const someSelected =
+    selectableRowKeys.some((key) => selectedSet.has(tableRowKeyId(key))) && !allSelected
 
   return { selectableRowKeys, allSelected, someSelected }
 }
@@ -455,17 +462,18 @@ export function getNextTableSelectAllKeys(
   selectableRowKeys: (string | number)[],
   checked: boolean
 ): (string | number)[] {
-  const selectableSet = new Set(selectableRowKeys)
+  const selectableSet = new Set(selectableRowKeys.map((key) => tableRowKeyId(key)))
   if (!checked) {
-    return selectedRowKeys.filter((key) => !selectableSet.has(key))
+    return selectedRowKeys.filter((key) => !selectableSet.has(tableRowKeyId(key)))
   }
 
   const next = [...selectedRowKeys]
-  const nextSet = new Set(next)
+  const nextSet = new Set(next.map((key) => tableRowKeyId(key)))
   for (const key of selectableRowKeys) {
-    if (!nextSet.has(key)) {
+    const id = tableRowKeyId(key)
+    if (!nextSet.has(id)) {
       next.push(key)
-      nextSet.add(key)
+      nextSet.add(id)
     }
   }
   return next
@@ -527,68 +535,83 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
   measuredColumnWidths: Record<string, number> = {},
   containerWidth?: number
 ): {
-  leftOffsets: Record<string, number>
-  rightOffsets: Record<string, number>
+  startOffsets: Record<string, number>
+  endOffsets: Record<string, number>
   minTableWidth: number
   hasFixedColumns: boolean
 } {
-  const leftOffsets: Record<string, number> = {}
-  const rightOffsets: Record<string, number> = {}
-  let hasLeftFixedColumns = false
-  let hasRightFixedColumns = false
+  const startOffsets: Record<string, number> = {}
+  const endOffsets: Record<string, number> = {}
+  let hasStartFixedColumns = false
+  let hasEndFixedColumns = false
 
-  let left = 0
+  let start = 0
   for (const column of columns) {
-    if (column.fixed === 'left') {
-      leftOffsets[column.key] = left
-      hasLeftFixedColumns = true
-      left += getColumnWidthForOffset(column, measuredColumnWidths, containerWidth)
+    if (column.fixed !== 'start') continue
+    const width = getColumnWidthForOffset(column, measuredColumnWidths, containerWidth)
+    if (!(width > 0)) {
+      devWarn(
+        'Table.fixed.unmeasured',
+        `Fixed column "${column.key}" has no resolvable width and is not pinned`
+      )
+      continue
     }
+    startOffsets[column.key] = start
+    hasStartFixedColumns = true
+    start += width
   }
 
-  let right = 0
+  let end = 0
   for (let i = columns.length - 1; i >= 0; i--) {
     const column = columns[i]
-    if (column.fixed === 'right') {
-      rightOffsets[column.key] = right
-      hasRightFixedColumns = true
-      right += getColumnWidthForOffset(column, measuredColumnWidths, containerWidth)
+    if (column.fixed !== 'end') continue
+    const width = getColumnWidthForOffset(column, measuredColumnWidths, containerWidth)
+    if (!(width > 0)) {
+      devWarn(
+        'Table.fixed.unmeasured',
+        `Fixed column "${column.key}" has no resolvable width and is not pinned`
+      )
+      continue
     }
+    endOffsets[column.key] = end
+    hasEndFixedColumns = true
+    end += width
   }
 
   const minTableWidth = columns.reduce(
     (sum, col) => sum + getColumnWidthForOffset(col, measuredColumnWidths, containerWidth),
     0
   )
-  const hasFixedColumns = hasLeftFixedColumns || hasRightFixedColumns
+  const hasFixedColumns = hasStartFixedColumns || hasEndFixedColumns
 
-  return { leftOffsets, rightOffsets, minTableWidth, hasFixedColumns }
+  return { startOffsets, endOffsets, minTableWidth, hasFixedColumns }
 }
+
+/** Fixed body cell. Above ordinary cells, below the sticky header. */
+export const TABLE_FIXED_CELL_Z_INDEX = 10
+/** Sticky header row. Above fixed body cells. */
+export const TABLE_STICKY_HEADER_Z_INDEX = 20
+/** Fixed column inside the sticky header. Above the header row and fixed body cells. */
+export const TABLE_FIXED_HEADER_Z_INDEX = 30
 
 export interface TableFixedColumnStyle {
   position: 'sticky'
-  left?: string
-  right?: string
+  insetInlineStart?: string
+  insetInlineEnd?: string
   zIndex: number
 }
 
 export interface TableFixedColumnOffsetInfo {
-  leftOffsets: Record<string, number>
-  rightOffsets: Record<string, number>
+  startOffsets: Record<string, number>
+  endOffsets: Record<string, number>
 }
 
 export function getFixedColumnPosition<T = Record<string, unknown>>(
   column: Pick<TableColumn<T>, 'key' | 'fixed'>,
   fixedInfo: TableFixedColumnOffsetInfo
 ): TableFixedPosition | undefined {
-  if (column.fixed === 'left' || column.key in fixedInfo.leftOffsets) {
-    return 'left'
-  }
-
-  if (column.fixed === 'right' || column.key in fixedInfo.rightOffsets) {
-    return 'right'
-  }
-
+  if (column.key in fixedInfo.startOffsets) return 'start'
+  if (column.key in fixedInfo.endOffsets) return 'end'
   return undefined
 }
 
@@ -598,18 +621,18 @@ export function getFixedColumnStyle<T = Record<string, unknown>>(
   zIndex: number
 ): TableFixedColumnStyle | undefined {
   const fixed = getFixedColumnPosition(column, fixedInfo)
-  if (fixed === 'left') {
+  if (fixed === 'start') {
     return {
       position: 'sticky',
-      left: `${fixedInfo.leftOffsets[column.key] || 0}px`,
+      insetInlineStart: `${fixedInfo.startOffsets[column.key] ?? 0}px`,
       zIndex
     }
   }
 
-  if (fixed === 'right') {
+  if (fixed === 'end') {
     return {
       position: 'sticky',
-      right: `${fixedInfo.rightOffsets[column.key] || 0}px`,
+      insetInlineEnd: `${fixedInfo.endOffsets[column.key] ?? 0}px`,
       zIndex
     }
   }
@@ -756,7 +779,7 @@ export function getTableWrapperClasses(
     'relative w-full',
     scrollable && 'overflow-auto',
     bordered &&
-      'border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden',
+      'border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden',
     scrollable && maxHeight && 'overflow-y-auto'
   )
 }
@@ -768,8 +791,8 @@ export function getTableHeaderClasses(stickyHeader: boolean): string {
   return classNames(
     tableHeaderBackgroundClasses,
     // border on cells, not <thead> — the table is `border-separate`
-    '[&_th]:border-b [&_th]:border-[var(--tiger-border,#e5e7eb)]',
-    stickyHeader && 'sticky top-0 z-10'
+    '[&_th]:border-b [&_th]:border-[var(--tiger-border)]',
+    stickyHeader && 'sticky top-0 z-20'
   )
 }
 
@@ -795,11 +818,11 @@ export function getTableHeaderCellClasses(
   }
 
   return classNames(
-    'font-medium text-[var(--tiger-text-muted,#6b7280)] text-xs uppercase tracking-wider',
+    'font-medium text-[var(--tiger-text-secondary)] text-xs uppercase tracking-wider',
     paddingClasses[size],
     alignClasses[align],
     sortable &&
-      'cursor-pointer select-none hover:bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff)))]/60 transition-colors',
+      'cursor-pointer select-none hover:bg-[var(--tiger-table-bg)]/60 transition-colors',
     customClassName
   )
 }
@@ -816,7 +839,7 @@ export function getTableRowClasses(
   return classNames(
     // border on cells, not <tr> — the table is `border-separate`; `:not(:last-child)`
     // reproduces the old `last:border-b-0` (every row except the last gets a bottom rule)
-    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border,#e5e7eb)]',
+    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]',
     hoverable && tableRowHoverClasses,
     striped && isEven && tableRowStripedClasses,
     customClassName
@@ -844,7 +867,7 @@ export function getTableCellClasses(
   }
 
   return classNames(
-    'text-sm text-[var(--tiger-text,#111827)]',
+    'text-sm text-[var(--tiger-text)]',
     paddingClasses[size],
     alignClasses[align],
     customClassName
@@ -857,7 +880,7 @@ export function getTableCellClasses(
 export function getSortIconClasses(active: boolean): string {
   return classNames(
     'inline-block ms-1 transition-colors',
-    active ? 'text-[var(--tiger-primary,#2563eb)]' : 'text-[var(--tiger-text-muted,#6b7280)]'
+    active ? 'text-[var(--tiger-primary)]' : 'text-[var(--tiger-text-secondary)]'
   )
 }
 
@@ -865,18 +888,18 @@ export function getSortIconClasses(active: boolean): string {
  * Reset native button chrome so a sortable header still looks like a `<th>` label.
  */
 export const tableSortButtonClasses =
-  'inline-flex items-center appearance-none border-0 bg-transparent p-0 font-[inherit] text-inherit cursor-pointer rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'inline-flex items-center appearance-none border-0 bg-transparent p-0 font-[inherit] text-inherit cursor-pointer rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
 /**
  * Get empty state classes
  */
-export const tableEmptyStateClasses = 'text-center py-12 text-[var(--tiger-text-muted,#6b7280)]'
+export const tableEmptyStateClasses = 'text-center py-12 text-[var(--tiger-text-secondary)]'
 
 /**
  * Get loading overlay classes
  */
 export const tableLoadingOverlayClasses = classNames(
-  'absolute inset-0 bg-[var(--tiger-surface,#ffffff)]/80 flex items-center justify-center z-20'
+  'absolute inset-0 bg-[var(--tiger-surface)]/80 flex items-center justify-center z-20'
 )
 
 /**
@@ -892,22 +915,31 @@ export function getCheckboxCellClasses(size: TableSize): string {
   return classNames('text-center', widthClasses[size])
 }
 
+export function isEmptyTableSortValue(value: unknown): boolean {
+  return value === null || value === undefined || value === ''
+}
+
 /**
- * Default sort function for comparable values
+ * Default sort. Empty values sort after present values and are not flipped
+ * when the caller asks for descending order. Strings use `locale`.
  */
-export function defaultSortFn(a: unknown, b: unknown): number {
-  if (a === null || a === undefined) return 1
-  if (b === null || b === undefined) return -1
+export function defaultSortFn(a: unknown, b: unknown, locale?: string): number {
+  const aEmpty = isEmptyTableSortValue(a)
+  const bEmpty = isEmptyTableSortValue(b)
+  if (aEmpty || bEmpty) {
+    if (aEmpty && bEmpty) return 0
+    return aEmpty ? 1 : -1
+  }
 
   if (typeof a === 'string' && typeof b === 'string') {
-    return a.localeCompare(b)
+    return a.localeCompare(b, locale)
   }
 
   if (typeof a === 'number' && typeof b === 'number') {
     return a - b
   }
 
-  return String(a).localeCompare(String(b))
+  return String(a).localeCompare(String(b), locale)
 }
 
 /**
@@ -930,7 +962,8 @@ export function sortData<T>(
   key: string,
   direction: SortDirection,
   sortFn?: (a: unknown, b: unknown) => number,
-  columns?: TableColumn<T>[]
+  columns?: TableColumn<T>[],
+  locale?: string
 ): T[] {
   if (!direction || !key) {
     return data
@@ -942,9 +975,8 @@ export function sortData<T>(
   const sortedData = [...data].sort((a, b) => {
     const aValue = (a as Record<string, unknown>)[fieldKey]
     const bValue = (b as Record<string, unknown>)[fieldKey]
-
-    const compareResult = sortFn ? sortFn(aValue, bValue) : defaultSortFn(aValue, bValue)
-
+    const compareResult = sortFn ? sortFn(aValue, bValue) : defaultSortFn(aValue, bValue, locale)
+    if (isEmptyTableSortValue(aValue) || isEmptyTableSortValue(bValue)) return compareResult
     return direction === 'asc' ? compareResult : -compareResult
   })
 
@@ -969,6 +1001,43 @@ function cellMatchesFilterValue(cellValue: unknown, filterValue: unknown): boole
  * Filter state keys stay `column.key`; the record field is {@link getTableColumnDataKey}.
  * If no column matches a filters key, the lookup falls back to that key.
  */
+/**
+ * Coalesce text-filter keystrokes onto one frame so the table is not scanned
+ * on every keydown.
+ */
+export function createTableTextFilterCoalescer(
+  commit: (value: string) => void,
+  requestFrame: (callback: () => void) => number = (callback) =>
+    typeof requestAnimationFrame === 'function'
+      ? requestAnimationFrame(callback)
+      : (setTimeout(callback, 16) as unknown as number),
+  cancelFrame: (id: number) => void = (id) => {
+    if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(id)
+    else clearTimeout(id)
+  }
+): { push: (value: string) => void; cancel: () => void } {
+  let frame = 0
+  let pending: string | null = null
+  return {
+    push(value: string) {
+      pending = value
+      if (frame) return
+      frame = requestFrame(() => {
+        frame = 0
+        const next = pending
+        pending = null
+        if (next !== null) commit(next)
+      })
+    },
+    cancel() {
+      if (!frame) return
+      cancelFrame(frame)
+      frame = 0
+      pending = null
+    }
+  }
+}
+
 export function filterTableData<T>(
   data: T[],
   columns: TableColumn<T>[],
@@ -1100,7 +1169,7 @@ export function getExpandIconCellClasses(size: TableSize): string {
  */
 export function getExpandIconClasses(expanded: boolean): string {
   return classNames(
-    'inline-block transition-transform duration-200 cursor-pointer text-[var(--tiger-text-muted,#6b7280)]',
+    'inline-block transition-transform duration-200 cursor-pointer text-[var(--tiger-text-secondary)]',
     expanded && 'rotate-90'
   )
 }
@@ -1111,8 +1180,8 @@ export function getExpandIconClasses(expanded: boolean): string {
 export function getExpandedRowClasses(): string {
   return classNames(
     // border on cells, not <tr> — the table is `border-separate`
-    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border,#e5e7eb)]',
-    'bg-[var(--tiger-surface-muted,#f9fafb)]/30'
+    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]',
+    'bg-[var(--tiger-surface-muted)]/30'
   )
 }
 
@@ -1126,13 +1195,37 @@ export function getExpandedRowContentClasses(size: TableSize): string {
     lg: 'px-6 py-4'
   }
 
-  return classNames('text-sm text-[var(--tiger-text,#111827)]', paddingClasses[size])
+  return classNames('text-sm text-[var(--tiger-text)]', paddingClasses[size])
+}
+
+const TABLE_FALLBACK_ROW_PREFIX = 'tiger-row:'
+
+/**
+ * `0` and `'0'` are keys. `''`, `null`, and `undefined` are not.
+ * Comparison of the returned key uses {@link treeKeyId}.
+ */
+export function readTableRowKeyValue(value: unknown): string | number | undefined {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined
+  if (typeof value === 'string' && value !== '') return value
+  return undefined
+}
+
+/**
+ * Fallback identity that does not stringify to a bare dataSource index.
+ * `used` holds {@link treeKeyId} values already taken by real keys.
+ */
+export function allocateTableFallbackRowKey(index: number, used: Set<string>): string {
+  let candidate = `${TABLE_FALLBACK_ROW_PREFIX}${index}`
+  while (used.has(candidate)) candidate = `${TABLE_FALLBACK_ROW_PREFIX}${candidate}`
+  used.add(candidate)
+  return candidate
 }
 
 /**
  * Get row key from record.
  *
  * `index` must be the **dataSource** index, not a page offset.
+ * A missing identity is not that index.
  */
 export function getRowKey<T>(
   record: T,
@@ -1140,16 +1233,14 @@ export function getRowKey<T>(
   index: number
 ): string | number {
   if (typeof rowKey === 'function') {
-    return rowKey(record)
+    const key = readTableRowKeyValue(rowKey(record))
+    if (key !== undefined) return key
+  } else {
+    const key = readTableRowKeyValue((record as Record<string, unknown>)[rowKey])
+    if (key !== undefined) return key
   }
 
-  const key = (record as Record<string, unknown>)[rowKey]
-
-  if (key !== undefined && key !== null) {
-    return key as string | number
-  }
-
-  return index
+  return allocateTableFallbackRowKey(index, new Set())
 }
 
 export interface TableRowKeyCache<T> {
@@ -1173,26 +1264,61 @@ export function createTableRowKeyCache<T>(
       return explicitKeyCache.get(objectRecord)!
     }
 
-    const key =
+    const raw =
       typeof rowKey === 'function'
         ? rowKey(record)
-        : ((record as Record<string, unknown>)[rowKey] as string | number | null | undefined)
+        : (record as Record<string, unknown>)[rowKey]
+    const key = readTableRowKeyValue(raw)
 
-    if (key !== undefined && key !== null) {
+    if (key !== undefined) {
       if (objectRecord) {
         explicitKeyCache.set(objectRecord, key)
       }
       return key
     }
 
-    return index
+    return allocateTableFallbackRowKey(index, new Set())
   }
 
   function getMany(records: T[], indexOffset = 0): (string | number)[] {
-    return records.map((record, index) => get(record, indexOffset + index))
+    return resolveTableRowKeys(records, rowKey, undefined, indexOffset)
   }
 
   return { get, getMany }
+}
+
+/**
+ * Resolve every row once. Explicit keys (`0`, `'0'`) win. Missing identities
+ * get a fallback that is not equal to any explicit key's string id.
+ */
+export function resolveTableRowKeys<T>(
+  records: T[],
+  rowKey: string | ((record: T) => string | number) = 'id',
+  getRowKey?: (record: T) => string | number,
+  indexOffset = 0
+): (string | number)[] {
+  const used = new Set<string>()
+  const explicit = records.map((record, index) => {
+    const raw = getRowKey
+      ? getRowKey(record)
+      : typeof rowKey === 'function'
+        ? rowKey(record)
+        : (record as Record<string, unknown>)[rowKey]
+    const key = readTableRowKeyValue(raw)
+    const sourceIndex = indexOffset + index
+    if (key === undefined) {
+      devWarn(
+        `Table.rowKey.${sourceIndex}`,
+        `Row at index ${sourceIndex} has no identity; falling back to a non-index key`
+      )
+    } else {
+      used.add(tableRowKeyId(key))
+    }
+    return key
+  })
+  return explicit.map((key, index) =>
+    key !== undefined ? key : allocateTableFallbackRowKey(indexOffset + index, used)
+  )
 }
 
 // --- v0.6.0 additions ---
@@ -1201,7 +1327,7 @@ export function createTableRowKeyCache<T>(
  * Summary row footer classes
  */
 export const tableSummaryRowClasses =
-  'bg-[var(--tiger-surface-muted,#f3f4f6)] font-semibold [&>td]:border-t-2 [&>td]:border-[var(--tiger-border,#e5e7eb)]'
+  'bg-[var(--tiger-surface-muted)] font-semibold [&>td]:border-t-2 [&>td]:border-[var(--tiger-border)]'
 
 /**
  * Editable cell classes
@@ -1209,8 +1335,8 @@ export const tableSummaryRowClasses =
 export function getEditableCellClasses(isEditing: boolean): string {
   return classNames(
     isEditing
-      ? 'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-inset bg-[var(--tiger-surface,#ffffff)]'
-      : 'cursor-pointer hover:bg-[var(--tiger-primary,#2563eb)]/5'
+      ? 'ring-2 ring-[var(--tiger-primary)] ring-inset bg-[var(--tiger-surface)]'
+      : 'cursor-pointer hover:bg-[var(--tiger-primary)]/5'
   )
 }
 
@@ -1218,18 +1344,10 @@ export function getEditableCellClasses(isEditing: boolean): string {
  * Editable cell input classes
  */
 export const editableCellInputClasses =
-  'w-full bg-transparent border-none outline-none text-sm text-[var(--tiger-text,#111827)] p-0'
+  'w-full bg-transparent border-none outline-none text-sm text-[var(--tiger-text)] p-0'
 
-/**
- * Column drag handle classes
- */
-export const columnDragHandleClasses =
-  'cursor-grab active:cursor-grabbing text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)] transition-colors'
-
-/**
- * Column drag over indicator classes
- */
-export const columnDragOverClasses = 'border-l-2 border-[var(--tiger-primary,#2563eb)]'
+export const tableRowDragHandleClasses =
+  'inline-flex cursor-grab items-center text-[var(--tiger-text-secondary)] active:cursor-grabbing'
 
 const COL_SPAN_CLASSES: Record<number, string> = {
   1: 'sm:col-span-1',

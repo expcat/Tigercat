@@ -139,31 +139,56 @@ export function createImperativeHost<THandle>(
   }
 }
 
+/** Same-position cap. Older items are removed when a new one would exceed it. */
+export const DEFAULT_TOAST_MAX_PER_POSITION = 5
+
 export interface ToastQueueItem {
   id: string | number
   duration: number
   onClose?: () => void
 }
 
+export interface ToastQueueOptions<T extends ToastQueueItem> {
+  /** Defaults to {@link DEFAULT_TOAST_MAX_PER_POSITION}. `Infinity` disables the cap. */
+  maxPerGroup?: number
+  groupOf?: (item: T) => string
+}
+
 export interface ToastQueue<T extends ToastQueueItem> {
   add: (item: Omit<T, 'id'> & { id?: string | number }) => T | null
   remove: (id: string | number) => boolean
   clear: () => void
+  /** Freeze the auto-close clock while the pointer or focus is on the item. */
+  pause: (id: string | number) => void
+  resume: (id: string | number) => void
   getSnapshot: () => readonly T[]
   getServerSnapshot: () => readonly T[]
   subscribe: (listener: () => void) => () => void
 }
 
+interface ToastTimerMeta {
+  timer?: ImperativeTimeoutId
+  remaining: number
+  startedAt: number
+  paused: boolean
+  /** Pointer and focus each hold the clock. It runs only when both are gone. */
+  holds: number
+}
+
 export function createToastQueue<T extends ToastQueueItem>(
-  hooks: ImperativeTimerHooks = {}
+  hooks: ImperativeTimerHooks = {},
+  options: ToastQueueOptions<T> = {}
 ): ToastQueue<T> {
   let items: T[] = []
   const listeners = new Set<() => void>()
-  const timeouts = new Map<string | number, ImperativeTimeoutId>()
+  const timers = new Map<string | number, ToastTimerMeta>()
   const nextId = createInstanceCounter()
+  const maxPerGroup = options.maxPerGroup ?? DEFAULT_TOAST_MAX_PER_POSITION
+  const groupOf = options.groupOf ?? (() => '')
   const schedule =
     hooks.setTimeout ?? ((handler, timeout) => globalThis.setTimeout(handler, timeout))
   const cancel = hooks.clearTimeout ?? ((id) => globalThis.clearTimeout(id))
+  const now = () => Date.now()
 
   function canMutate(): boolean {
     return isBrowser() || Boolean(hooks.setTimeout)
@@ -174,26 +199,67 @@ export function createToastQueue<T extends ToastQueueItem>(
   }
 
   function clearTimer(id: string | number): void {
-    const timer = timeouts.get(id)
-    if (timer === undefined) return
-    cancel(timer)
-    timeouts.delete(id)
+    const meta = timers.get(id)
+    if (!meta) return
+    if (meta.timer !== undefined) cancel(meta.timer)
+    timers.delete(id)
+  }
+
+  function arm(id: string | number, duration: number, holds = 0): void {
+    clearTimer(id)
+    if (!(duration > 0)) return
+    const meta: ToastTimerMeta = {
+      remaining: duration,
+      startedAt: now(),
+      paused: holds > 0,
+      holds
+    }
+    if (holds <= 0) {
+      meta.timer = schedule(() => {
+        timers.delete(id)
+        remove(id)
+      }, duration)
+    }
+    timers.set(id, meta)
+  }
+
+  function invokeClose(item: T | undefined): void {
+    if (!item?.onClose) return
+    try {
+      item.onClose()
+    } catch (error) {
+      devWarn(
+        'toast.onClose',
+        `[Tigercat] onClose threw after the toast was removed: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    }
+  }
+
+  function dropOldest(group: string, spareId: string | number): void {
+    if (!Number.isFinite(maxPerGroup)) return
+    const grouped = items.filter((item) => groupOf(item) === group)
+    const overflow = grouped.length - maxPerGroup
+    if (overflow <= 0) return
+    const victims = grouped.filter((item) => item.id !== spareId).slice(0, overflow)
+    victims.forEach((item) => remove(item.id))
   }
 
   function add(item: Omit<T, 'id'> & { id?: string | number }): T | null {
     if (!canMutate()) return null
     const instance = { ...item, id: item.id ?? nextId() } as T
-    items = [...items, instance]
-    if (instance.duration > 0) {
-      timeouts.set(
-        instance.id,
-        schedule(() => {
-          timeouts.delete(instance.id)
-          remove(instance.id)
-        }, instance.duration)
-      )
+    const existing = items.findIndex((entry) => entry.id === instance.id)
+    const holds = existing >= 0 ? (timers.get(instance.id)?.holds ?? 0) : 0
+    if (existing >= 0) {
+      clearTimer(instance.id)
+      items = items.map((entry) => (entry.id === instance.id ? instance : entry))
+    } else {
+      items = [...items, instance]
     }
+    arm(instance.id, instance.duration, holds)
     emit()
+    if (existing < 0) dropOldest(groupOf(instance), instance.id)
     return instance
   }
 
@@ -203,24 +269,58 @@ export function createToastQueue<T extends ToastQueueItem>(
     clearTimer(id)
     const instance = items[index]
     items = items.filter((item) => item.id !== id)
-    instance.onClose?.()
     emit()
+    invokeClose(instance)
     return true
+  }
+
+  function pause(id: string | number): void {
+    const meta = timers.get(id)
+    if (!meta) return
+    meta.holds += 1
+    if (meta.holds > 1 || meta.paused) return
+    const elapsed = now() - meta.startedAt
+    meta.remaining = Math.max(0, meta.remaining - elapsed)
+    if (meta.timer !== undefined) cancel(meta.timer)
+    meta.timer = undefined
+    meta.paused = true
+  }
+
+  function resume(id: string | number): void {
+    const meta = timers.get(id)
+    if (!meta || meta.holds <= 0) return
+    meta.holds -= 1
+    if (meta.holds > 0 || !meta.paused) return
+    if (meta.remaining <= 0) {
+      timers.delete(id)
+      remove(id)
+      return
+    }
+    meta.paused = false
+    meta.startedAt = now()
+    meta.timer = schedule(() => {
+      timers.delete(id)
+      remove(id)
+    }, meta.remaining)
   }
 
   function clear(): void {
     const closing = items
     items = []
-    timeouts.forEach((timer) => cancel(timer))
-    timeouts.clear()
-    closing.forEach((item) => item.onClose?.())
+    timers.forEach((meta) => {
+      if (meta.timer !== undefined) cancel(meta.timer)
+    })
+    timers.clear()
     emit()
+    closing.forEach((item) => invokeClose(item))
   }
 
   return {
     add,
     remove,
     clear,
+    pause,
+    resume,
     getSnapshot: () => items,
     getServerSnapshot: () => EMPTY_TOASTS as T[],
     subscribe: (listener) => {

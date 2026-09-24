@@ -33,7 +33,6 @@ import {
   getNavigationMenuItemValue,
   getNavigationMenuRovingTabIndex,
   getNavigationMenuTabExitTarget,
-  injectNavigationMenuStyles,
   NAVIGATION_MENU_ENTER_CLASS,
   NAVIGATION_MENU_CHEVRON_PATH,
   NAVIGATION_MENU_BAR_ITEM_ATTR,
@@ -51,7 +50,7 @@ import {
   focusFirstMenuItemWhenVisible,
   captureActiveElement,
   restoreFocus,
-  getSecureRel,
+  resolveLinkAddress,
   isFocusInsideNavigationMenu,
   warnNavigationMenuOpenWithoutValue,
   type NavigationMenuValue,
@@ -241,13 +240,13 @@ export const NavigationMenuLink = defineComponent({
     return () => {
       const { restAttrs } = splitClassStyleAttrs(attrsRecord)
       const isDisabled = disabled.value
-      const isAnchor = Boolean(props.href) && !isDisabled
-      const rel = isAnchor
-        ? getSecureRel(
-            props.target as '_blank' | '_self' | '_parent' | '_top' | undefined,
-            props.rel
-          )
-        : undefined
+      const address = resolveLinkAddress({
+        href: props.href,
+        target: props.target,
+        rel: props.rel,
+        disabled: isDisabled
+      })
+      const isAnchor = Boolean(address.href)
       const tabIndex = inPanel
         ? -1
         : getNavigationMenuRovingTabIndex(item?.value ?? '', root?.tabStopValue.value)
@@ -258,9 +257,9 @@ export const NavigationMenuLink = defineComponent({
         tag,
         {
           ...restAttrs,
-          href: isAnchor ? props.href : undefined,
-          target: isAnchor ? props.target : undefined,
-          rel,
+          href: address.href,
+          target: isAnchor ? address.target : undefined,
+          rel: isAnchor ? address.rel : undefined,
           type: tag === 'button' ? 'button' : undefined,
           class: linkClasses.value,
           style: mergedStyle.value,
@@ -841,8 +840,6 @@ export const NavigationMenu = defineComponent({
   emits: ['update:value', 'value-change', 'update:open', 'open-change'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
-
-    onMounted(() => injectNavigationMenuStyles())
 
     const previousActiveElement = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)

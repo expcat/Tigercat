@@ -83,7 +83,7 @@ describe('interactive a11y regression coverage', () => {
     })
 
     await waitFor(() => {
-      expect(reactScreen.getByRole('alert')).toHaveTextContent('Email is required')
+      expect(reactScreen.getByRole('status')).toHaveTextContent('Email is required')
       expect(reactScreen.getByLabelText('email')).toHaveAttribute('aria-invalid', 'true')
     })
 
@@ -101,7 +101,7 @@ describe('interactive a11y regression coverage', () => {
         return () =>
           h(
             VueForm,
-            { model, rules },
+            { modelValue: model, rules },
             {
               default: () =>
                 h(
@@ -124,7 +124,7 @@ describe('interactive a11y regression coverage', () => {
     await fireEvent.focusOut(vueScreen.getByLabelText('email'))
 
     await waitForVue(() => {
-      expect(vueScreen.getByRole('alert')).toHaveTextContent('Email is required')
+      expect(vueScreen.getByRole('status')).toHaveTextContent('Email is required')
       expect(vueScreen.getByLabelText('email')).toHaveAttribute('aria-invalid', 'true')
     })
 

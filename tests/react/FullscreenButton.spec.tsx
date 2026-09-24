@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { FullscreenButton } from '@expcat/tigercat-react/FullscreenButton'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -13,6 +14,11 @@ describe('FullscreenButton (React)', () => {
     const button = screen.getByRole('button', { name: 'Enter fullscreen' })
     expect(button).toBeDisabled()
     expect(button).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('does not mark the button disabled on the server render path', () => {
+    const html = renderToStaticMarkup(<FullscreenButton />)
+    expect(html).not.toMatch(/\sdisabled(?:=|\s|>)/)
   })
 
   it('has no obvious a11y violations', async () => {

@@ -1,11 +1,12 @@
-import { defineComponent, h, PropType, computed } from 'vue'
+import { defineComponent, h, PropType, computed, inject } from 'vue'
 import {
   classNames,
   coerceClassValue,
   getLayoutFooterClasses,
-  injectLayoutGridStyles,
-  mergeStyleValues
+  mergeStyleValues,
+  resolveLayoutSectionTag
 } from '@expcat/tigercat-core'
+import { LayoutContextKey } from '../utils/layout-context'
 
 export interface VueFooterProps {
   className?: string
@@ -25,7 +26,7 @@ export const Footer = defineComponent({
     },
     as: {
       type: String as PropType<string>,
-      default: 'footer'
+      default: undefined
     },
     height: {
       type: String as PropType<string>,
@@ -41,7 +42,7 @@ export const Footer = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    injectLayoutGridStyles()
+    const layout = inject(LayoutContextKey, null)
     const footerClasses = computed(() =>
       classNames(
         getLayoutFooterClasses(props.size),
@@ -52,7 +53,11 @@ export const Footer = defineComponent({
 
     return () =>
       h(
-        props.as || 'footer',
+        resolveLayoutSectionTag({
+          kind: 'footer',
+          nested: Boolean(layout?.nested.value),
+          explicit: props.as
+        }),
         {
           ...attrs,
           class: footerClasses.value,

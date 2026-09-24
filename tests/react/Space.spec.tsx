@@ -7,6 +7,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Space } from '@expcat/tigercat-react/Space'
+import { expectNoA11yViolations } from '../utils/react'
 
 function getRoot(container: HTMLElement): HTMLElement {
   return container.querySelector('[data-tiger-space]') as HTMLElement
@@ -21,9 +22,18 @@ describe('Space (React)', () => {
     )
 
     const el = getRoot(container)
-    expect(getComputedStyle(el).display).toBe('inline-flex')
-    expect(getComputedStyle(el).flexDirection).toBe('row')
+    expect(el.className).toContain('tiger-space')
+    expect(el.className).toContain('tiger-flex-row')
     expect(screen.getByText('Item')).toBeInTheDocument()
+  })
+
+  it('has no accessibility violations on the default row', async () => {
+    const { container } = render(
+      <Space>
+        <span>Item</span>
+      </Space>
+    )
+    await expectNoA11yViolations(container)
   })
 
   it('forwards the ref to the root', () => {
@@ -38,7 +48,7 @@ describe('Space (React)', () => {
         <span>Item</span>
       </Space>
     )
-    expect(getComputedStyle(getRoot(container)).flexDirection).toBe('column')
+    expect(getRoot(container).className).toContain('flex-col')
   })
 
   it('reverses the inline axis under rtl', () => {
@@ -50,7 +60,9 @@ describe('Space (React)', () => {
         </Space>
       </div>
     )
-    expect(getComputedStyle(getRoot(container)).flexDirection).toBe('row-reverse')
+    const root = getRoot(container)
+    expect(root.className).toContain('tiger-flex-row')
+    expect(root.className).not.toContain('flex-row-reverse')
   })
 
   it('supports numeric size via inline gap', () => {
@@ -73,7 +85,7 @@ describe('Space (React)', () => {
       </div>
     )
     const root = getRoot(container)
-    expect(getComputedStyle(root).flexWrap).toBe('wrap')
+    expect(root.className).toContain('flex-wrap')
     const items = root.querySelectorAll('span')
     if (items.length === 3 && items[0].offsetHeight > 0) {
       expect(items[2].offsetTop).toBeGreaterThan(items[0].offsetTop)

@@ -7,8 +7,8 @@
  * Toolbar chrome does not include view / sort / hidden controls — the parent
  * owns those props. Search matches names in the **current folder only**.
  *
- * The root is `h-full`. Give the component (or its parent) a height so the
- * file list is the internal scroller.
+ * The root is `h-full` and at least 20rem. A parent height replaces that floor
+ * so the file list is the internal scroller.
  */
 
 import type { TigerLocale } from './locale'
@@ -17,7 +17,7 @@ export type FileType = 'file' | 'folder'
 
 export type FileViewMode = 'list' | 'grid'
 
-/** Sort key. `'none'` keeps `files` order (also used while `draggable`). */
+/** Sort key. `'none'` keeps the current folder order. Drag does not disable sort. */
 export type FileSortField = 'name' | 'size' | 'type' | 'modified' | 'none'
 
 export type FileSortOrder = 'asc' | 'desc'
@@ -40,8 +40,8 @@ export interface FileItem {
   modified?: string
   /** MIME type */
   mimeType?: string
-  /** Icon identifier; string values render as the default glyph */
-  icon?: unknown
+  /** Glyph shown in place of the default file or folder mark */
+  icon?: string
   /** Children for folders */
   children?: FileItem[]
   /** Whether the node is disabled */
@@ -73,8 +73,9 @@ export interface FileManagerProps {
   /** Extra list-view columns (`size` / `type` / `modified`). Name is always shown. */
   columns?: FileColumn[]
   /**
-   * Sort field. Ignored while `draggable` so drop order is kept.
-   * `'none'` keeps the current folder's `files` order.
+   * Sort field. `'none'` keeps the current folder's `files` order.
+   * When drag is also on, the pointer reorders the sorted layer and the
+   * source index is recovered by id.
    */
   sortField?: FileSortField
   /** Sort order */
@@ -84,15 +85,15 @@ export interface FileManagerProps {
    * Omit for an internal path buffer. Double-click / breadcrumb / Backspace
    * change the visible folder without a parent handler.
    */
-  currentPath?: string[]
+  currentPath?: (string | number)[]
   /** Uncontrolled initial path (folder keys) */
-  defaultCurrentPath?: string[]
+  defaultCurrentPath?: (string | number)[]
   /** Show hidden files (prefixed with .) */
   showHidden?: boolean
   /**
-   * Enable HTML5 reorder of the current folder.
-   * Disabled while search or hidden-file filtering is hiding items.
-   * Pointer only — there is no keyboard move.
+   * Reorder the current folder with the shared pointer session.
+   * A filter does not turn dragging off. Arrow keys move the insertion
+   * point while a drag is active; Escape cancels. Order commits on drop.
    */
   draggable?: boolean
   /** Loading state */
@@ -120,11 +121,11 @@ export interface FileManagerProps {
   /** Called when an item is opened (file) */
   onOpen?: (item: FileItem) => void
   /** Called when navigating into a folder / breadcrumb */
-  onNavigate?: (path: string[]) => void
+  onNavigate?: (path: (string | number)[]) => void
   /** Called when the selected keys change */
   onSelectedKeysChange?: (keys: (string | number)[]) => void
   /** Called when the current path changes */
-  onCurrentPathChange?: (path: string[]) => void
+  onCurrentPathChange?: (path: (string | number)[]) => void
   /** Called when the search text changes */
   onSearchTextChange?: (text: string) => void
   /**

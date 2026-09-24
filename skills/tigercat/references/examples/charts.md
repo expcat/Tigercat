@@ -97,6 +97,8 @@ React: `<LineChart data={data} />`
 
 ## OrgChart
 
+Note: `avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`javascript:`、`data:`、`vbscript:` 不渲染 image。
+
 Vue: `<OrgChart :data="nodes" />`
 
 React: `<OrgChart data={nodes} />`
@@ -133,4 +135,4 @@ Vue: `<TreeMapChart :data="data" />`
 
 React: `<TreeMapChart data={data} />`
 
-Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
+Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.

@@ -35,7 +35,7 @@ export const resultHttpLabelClasses = 'text-2xl font-bold tabular-nums'
 export const resultTitleClasses = 'text-xl font-semibold mb-2'
 
 /** SubTitle / description text */
-export const resultSubTitleClasses = 'text-sm text-[var(--tiger-text-secondary,#6b7280)] mb-8'
+export const resultSubTitleClasses = 'text-sm text-[var(--tiger-text-secondary)] mb-8'
 
 /** Extra content (actions slot) wrapper */
 export const resultExtraClasses = 'flex flex-wrap items-center justify-center gap-3'

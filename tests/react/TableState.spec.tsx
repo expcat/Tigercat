@@ -8,6 +8,7 @@ import {
   useTableState,
   type UseTableStateInput
 } from '../../packages/react/src/components/Table/state'
+import { tableRowKeyId } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 const columns = [
@@ -54,7 +55,7 @@ describe('useTableState', () => {
     expect(result.current.processedData.map((row) => row.name)).toEqual(['Bob', 'Carol'])
     expect(result.current.paginatedData).toHaveLength(2)
     expect(result.current.pageRowKeys).toEqual([3, 1])
-    expect([...(result.current.groupedData?.keys() ?? [])]).toEqual(['enabled'])
+    expect(result.current.groupBlocks?.map((block) => block.key)).toEqual(['enabled'])
     expect(result.current.totalColumnCount).toBe(5)
     expect(result.current.paginationInfo?.totalPages).toBe(1)
   })
@@ -109,8 +110,8 @@ describe('useTableState', () => {
     expect(result.current.sortState).toEqual({ key: 'age', direction: 'desc' })
     expect(result.current.currentPage).toBe(2)
     expect(result.current.currentPageSize).toBe(1)
-    expect(result.current.selectedRowKeySet.has(1)).toBe(true)
-    expect(result.current.expandedRowKeySet.has(3)).toBe(true)
+    expect(result.current.selectedRowKeySet.has(tableRowKeyId(1))).toBe(true)
+    expect(result.current.expandedRowKeySet.has(tableRowKeyId(3))).toBe(true)
 
     input = makeInput({
       sort: { key: 'name', direction: 'asc' },
@@ -122,8 +123,8 @@ describe('useTableState', () => {
     rerender()
 
     expect(result.current.processedData.map((row) => row.name)).toEqual(['Alice', 'Dora'])
-    expect(result.current.selectedRowKeySet.has(4)).toBe(true)
-    expect(result.current.expandedRowKeySet.has(4)).toBe(true)
+    expect(result.current.selectedRowKeySet.has(tableRowKeyId(4))).toBe(true)
+    expect(result.current.expandedRowKeySet.has(tableRowKeyId(4))).toBe(true)
   })
 
   it('handles row selection, expansion, and row click expansion', () => {
@@ -217,7 +218,7 @@ describe('useTableState', () => {
 
     act(() => result.current.setEditingValue('Ada'))
     act(() => result.current.commitEdit())
-    expect(onCellChange).toHaveBeenLastCalledWith(0, 'name', 'Ada')
+    expect(onCellChange).toHaveBeenLastCalledWith(0, 'name', 'Ada', expect.any(Array))
     expect(result.current.editingCell).toBeNull()
 
     act(() => result.current.startEditing(0, 'name', 'Grace'))
@@ -231,7 +232,7 @@ describe('useTableState', () => {
       useTableState(
         makeInput({
           columns: [
-            { key: 'name', title: 'Name', fixed: 'left' },
+            { key: 'name', title: 'Name', fixed: 'start' },
             { key: 'age', title: 'Age' },
             { key: 'status', title: 'Status' }
           ],
@@ -241,7 +242,7 @@ describe('useTableState', () => {
       )
     )
 
-    expect(result.current.fixedColumnsInfo.leftOffsets.name).toBe(0)
+    expect(result.current.fixedColumnsInfo.startOffsets.name).toBe(0)
 
     act(() => result.current.toggleColumnLock('name'))
     expect(result.current.displayColumns[0].fixed).toBe(false)
@@ -252,8 +253,8 @@ describe('useTableState', () => {
       'name',
       'status'
     ])
-    expect(result.current.displayColumns[0].fixed).toBe('left')
-    expect(result.current.fixedColumnsInfo.leftOffsets.age).toBe(0)
+    expect(result.current.displayColumns[0].fixed).toBe('start')
+    expect(result.current.fixedColumnsInfo.startOffsets.age).toBe(0)
 
     act(() => result.current.handleDrop('age'))
     expect(onColumnOrderChange).not.toHaveBeenCalled()
@@ -363,8 +364,8 @@ describe('useTableState', () => {
         useTableState(makeInput({ expandable: { defaultExpandedRowKeys: [1] } }))
       )
 
-      expect(result.current.expandedRowKeySet.has(1)).toBe(true)
-      expect(result.current.expandedRowKeySet.has(2)).toBe(false)
+      expect(result.current.expandedRowKeySet.has(tableRowKeyId(1))).toBe(true)
+      expect(result.current.expandedRowKeySet.has(tableRowKeyId(2))).toBe(false)
     })
   })
 })

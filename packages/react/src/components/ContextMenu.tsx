@@ -11,17 +11,20 @@ import React, {
 } from 'react'
 import {
   classNames,
+  getSecureRel,
+  resolveLinkHref,
   getContextMenuContainerClasses,
   getContextMenuTriggerClasses,
   getContextMenuMenuClasses,
   getContextMenuItemClasses,
   getContextMenuSubTriggerClasses,
   getContextMenuSubChevronClasses,
-  getContextMenuPointStyle,
+  createContextMenuVirtualReference,
   getContextMenuOpenPoint,
+  getContextMenuSubKeys,
   getContextMenuSubPlacement,
   getOverlayTriggerAria,
-  injectContextMenuStyles,
+  type ContextMenuVirtualReference,
   CONTEXT_MENU_SUB_HIDE_DELAY_MS,
   CONTEXT_MENU_ENTER_CLASS,
   CONTEXT_MENU_SUB_CHEVRON_PATH,
@@ -37,7 +40,8 @@ import {
   type ContextMenuSubProps as CoreContextMenuSubProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
+import { useAnchoredOverlay } from '../utils/overlay'
+import { OverlayPortal } from '../utils/overlay-outlet'
 import { renderOverlayTrigger } from '../utils/overlay-trigger'
 
 export interface ContextMenuContextValue {
@@ -110,12 +114,16 @@ export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
   }
 
   const itemClasses = classNames(getContextMenuItemClasses(disabled, divided), className)
-  const Comp = href && !disabled ? 'a' : 'button'
+  const safeHref = resolveLinkHref(href, { disabled })
+  const Comp = safeHref ? 'a' : 'button'
+  const { target, rel, ...itemRest } = rest as React.AnchorHTMLAttributes<HTMLAnchorElement>
 
   return (
     <Comp
-      {...(rest as React.HTMLAttributes<HTMLElement>)}
-      {...(Comp === 'a' ? { href } : { type: 'button' as const })}
+      {...(itemRest as React.HTMLAttributes<HTMLElement>)}
+      {...(Comp === 'a'
+        ? { href: safeHref, target, rel: getSecureRel(target, rel) }
+        : { type: 'button' as const })}
       className={itemClasses}
       role="menuitem"
       tabIndex={-1}
@@ -223,8 +231,7 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
       const dir =
         titleRef.current?.closest('[dir]')?.getAttribute('dir') ??
         document.documentElement.getAttribute('dir')
-      const openKey = dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
-      const closeKey = dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft'
+      const { openKey, closeKey } = getContextMenuSubKeys(dir)
 
       if (event.key === openKey || event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
@@ -253,7 +260,11 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
       handleMenuNavigation(popupRef.current, event.nativeEvent)
     }
 
-    if (event.key === 'ArrowLeft' || event.key === 'Escape') {
+    const dir =
+      event.currentTarget.closest('[dir]')?.getAttribute('dir') ??
+      document.documentElement.getAttribute('dir')
+    const { closeKey } = getContextMenuSubKeys(dir)
+    if (event.key === closeKey || event.key === 'Escape') {
       event.preventDefault()
       event.stopPropagation()
       setIsOpenByKeyboard(false)
@@ -278,7 +289,6 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
       style={overlay.floatingStyles}
       data-positioned={overlay.positioned}
       data-tiger-context-menu-sub=""
-      hidden={!isExpanded}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onKeyDown={handlePopupKeyDown}
@@ -335,7 +345,13 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
           <path d={CONTEXT_MENU_SUB_CHEVRON_PATH} />
         </svg>
       </button>
-      {renderOverlayPortal(popup, overlay.target, !portalEnabled)}
+      {isExpanded ? (
+        portalEnabled ? (
+          <OverlayPortal target={overlay.target}>{popup}</OverlayPortal>
+        ) : (
+          popup
+        )
+      ) : null}
     </div>
   )
 }
@@ -371,32 +387,29 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
-  const pointNodeRef = useRef<HTMLDivElement>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const explicitPointRef = useRef(false)
   const [point, setPoint] = useState<ContextMenuPoint>({ x: 0, y: 0 })
+  const virtualReferenceRef = useRef<ContextMenuVirtualReference | null>(null)
+  if (virtualReferenceRef.current == null) {
+    virtualReferenceRef.current = createContextMenuVirtualReference(
+      point,
+      typeof document === 'undefined' ? null : document.documentElement
+    )
+  }
+  virtualReferenceRef.current.setPoint(point)
+  const positionReferenceRef = useMemo(
+    () => ({
+      get current() {
+        return virtualReferenceRef.current
+      }
+    }),
+    []
+  )
 
   const reactId = useId()
   const menuId = useMemo(() => `tiger-context-menu-${reactId}`, [reactId])
-
-  // New ref identity when the cursor moves so anchored-overlay remeasures the point.
-  const pointReferenceRef = useMemo(
-    () => ({
-      get current() {
-        return pointNodeRef.current
-      },
-      set current(node: HTMLDivElement | null) {
-        pointNodeRef.current = node
-      }
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- point is an invalidation key, not a value
-    [point.x, point.y]
-  )
-
-  useEffect(() => {
-    injectContextMenuStyles()
-  }, [])
 
   const setVisible = useCallback(
     (newVisible: boolean) => {
@@ -485,12 +498,15 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   }, [])
 
   const overlay = useAnchoredOverlay({
-    referenceRef: pointReferenceRef,
+    referenceRef: triggerRef,
+    positionReferenceRef,
+    revision: `${point.x},${point.y}`,
     floatingRef,
     enabled: visible,
     placement,
     offset,
     portal,
+    containerRef,
     dismissOnOutside: true,
     dismissOnEscape: true,
     onDismiss: () => setVisible(false)
@@ -502,7 +518,6 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   )
   const triggerClasses = useMemo(() => getContextMenuTriggerClasses(disabled), [disabled])
   const menuWrapperClasses = classNames(overlay.floatingClasses, CONTEXT_MENU_ENTER_CLASS)
-  const pointStyle = useMemo(() => getContextMenuPointStyle(point) as React.CSSProperties, [point])
   const triggerAria = getOverlayTriggerAria({
     kind: 'menu',
     open: visible,
@@ -527,14 +542,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     triggerChildren.push(child)
   })
 
-  const menuWrapperNode = menuElement ? (
+  const menuWrapperNode = visible && menuElement ? (
     <div
-      key={`${point.x},${point.y}`}
       ref={floatingRef}
       className={menuWrapperClasses}
       style={overlay.floatingStyles}
       data-positioned={overlay.positioned}
-      hidden={!visible}
       data-tiger-context-menu=""
       onKeyDown={handleMenuKeyDown}
       onContextMenu={handleMenuContextMenu}>
@@ -561,13 +574,13 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             onKeyDown: handleTriggerKeyDown
           }
         })}
-        <div
-          ref={pointNodeRef}
-          style={pointStyle}
-          aria-hidden="true"
-          data-tiger-context-menu-point=""
-        />
-        {menuWrapperNode && renderOverlayPortal(menuWrapperNode, overlay.target, !portal)}
+        {menuWrapperNode ? (
+          portal ? (
+            <OverlayPortal target={overlay.target}>{menuWrapperNode}</OverlayPortal>
+          ) : (
+            menuWrapperNode
+          )
+        ) : null}
       </div>
     </ContextMenuContext.Provider>
   )

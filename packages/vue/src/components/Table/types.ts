@@ -1,6 +1,7 @@
 import type { ComputedRef, ExtractPropTypes, Ref } from 'vue'
 import type {
   TableColumn,
+  TableGroupBlock,
   SortState,
   PaginationConfig,
   calculatePagination,
@@ -26,13 +27,14 @@ export interface TableContext {
   paginatedData: ComputedRef<Record<string, unknown>[]>
   paginatedRowKeys: ComputedRef<(string | number)[]>
   pageSourceIndices: ComputedRef<number[]>
-  selectedRowKeySet: ComputedRef<Set<string | number>>
-  expandedRowKeySet: ComputedRef<Set<string | number>>
+  selectedRowKeySet: ComputedRef<Set<string>>
+  expandedRowKeySet: ComputedRef<Set<string>>
   totalColumnCount: ComputedRef<number>
   paginationInfo: ComputedRef<ReturnType<typeof calculatePagination> | null>
   allSelected: ComputedRef<boolean>
   someSelected: ComputedRef<boolean>
-  groupedData: ComputedRef<Map<string, Record<string, unknown>[]> | null>
+  groupBlocks: ComputedRef<TableGroupBlock<Record<string, unknown>>[] | null>
+  processedRowKeys: ComputedRef<(string | number)[]>
   sortState: ComputedRef<SortState>
   filterState: ComputedRef<Record<string, unknown>>
   currentPage: ComputedRef<number>
@@ -58,6 +60,7 @@ export interface TableContext {
   handleToggleExpand: (key: string | number, record: Record<string, unknown>) => void
   handleSelectRow: (key: string | number, checked: boolean) => void
   handleSelectAll: (checked: boolean) => void
+  handleSelectLoaded: (checked?: boolean) => void
   isCellEditable: (columnKey: string, rowIndex: number) => boolean
   startEditing: (rowIndex: number, columnKey: string, currentValue: unknown) => void
   commitEdit: () => void

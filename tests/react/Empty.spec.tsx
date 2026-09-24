@@ -48,9 +48,9 @@ describe('Empty (React)', () => {
       expect(screen.getByAltText('custom')).toBeInTheDocument()
     })
 
-    it('keeps a custom image when showImage is false', () => {
+    it('hides a custom image when showImage is false', () => {
       render(<Empty showImage={false} image={<img src="custom.png" alt="kept" />} />)
-      expect(screen.getByAltText('kept')).toBeInTheDocument()
+      expect(screen.queryByAltText('kept')).not.toBeInTheDocument()
     })
 
     it('does not leave an empty image wrapper for image={null}', () => {

@@ -1,24 +1,11 @@
 /**
  * @vitest-environment node
  */
-import { afterEach, describe, expect, it } from 'vitest'
-import {
-  createGlobalTigerLocaleHandle,
-  createTigerLocaleScope,
-  getGlobalTigerLocale,
-  resetTigerLocaleScope
-} from '@expcat/tigercat-core'
+import { describe, expect, it } from 'vitest'
+import { createTigerLocaleScope } from '@expcat/tigercat-core'
 
 describe('Tiger locale scope', () => {
-  afterEach(() => {
-    resetTigerLocaleScope()
-  })
-
-  it('does not install a process-wide locale on Node until a handle is created', () => {
-    expect(getGlobalTigerLocale()).toBeUndefined()
-  })
-
-  it('isolates stacks across createTigerLocaleScope instances', () => {
+  it('keeps two scopes from seeing each other', () => {
     const a = createTigerLocaleScope()
     const b = createTigerLocaleScope()
     const handleA = a.createHandle({ common: { okText: 'A' } })
@@ -26,29 +13,23 @@ describe('Tiger locale scope', () => {
 
     expect(a.getLocale()?.common?.okText).toBe('A')
     expect(b.getLocale()?.common?.okText).toBe('B')
-    expect(getGlobalTigerLocale()).toBeUndefined()
 
     handleA.dispose()
     expect(a.getLocale()).toBeUndefined()
     expect(b.getLocale()?.common?.okText).toBe('B')
   })
 
-  it('resetTigerLocaleScope drops default-scope handles so tests do not leak', () => {
-    createGlobalTigerLocaleHandle({ common: { okText: 'Keep' } })
-    expect(getGlobalTigerLocale()?.common?.okText).toBe('Keep')
+  it('reads the topmost non-empty handle on that scope only', () => {
+    const scope = createTigerLocaleScope()
+    const lower = scope.createHandle({ common: { okText: 'Lower' } })
+    const upper = scope.createHandle({ common: { cancelText: 'Upper' } })
 
-    resetTigerLocaleScope()
-    expect(getGlobalTigerLocale()).toBeUndefined()
-  })
-
-  it('reads the topmost non-empty handle on the default scope', () => {
-    const lower = createGlobalTigerLocaleHandle({ common: { okText: 'Lower' } })
-    const upper = createGlobalTigerLocaleHandle({ common: { cancelText: 'Upper' } })
-
-    expect(getGlobalTigerLocale()?.common?.cancelText).toBe('Upper')
+    expect(scope.getLocale()?.common?.cancelText).toBe('Upper')
     upper.dispose()
-    expect(getGlobalTigerLocale()?.common?.okText).toBe('Lower')
+    expect(scope.getLocale()?.common?.okText).toBe('Lower')
     lower.dispose()
-    expect(getGlobalTigerLocale()).toBeUndefined()
+    expect(scope.getLocale()).toBeUndefined()
+    scope.reset()
+    expect(scope.getLocale()).toBeUndefined()
   })
 })

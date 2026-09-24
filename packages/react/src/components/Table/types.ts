@@ -3,6 +3,7 @@ import type {
   SortState,
   PaginationConfig,
   TableColumn,
+  TableGroupBlock,
   calculatePagination,
   getFixedColumnOffsets
 } from '@expcat/tigercat-core'
@@ -30,14 +31,15 @@ export interface TableContext {
   processedData: Record<string, unknown>[]
   paginatedData: Record<string, unknown>[]
   pageRowKeys: (string | number)[]
+  processedRowKeys: (string | number)[]
   pageSourceIndices: number[]
-  selectedRowKeySet: Set<string | number>
-  expandedRowKeySet: Set<string | number>
+  selectedRowKeySet: Set<string>
+  expandedRowKeySet: Set<string>
   totalColumnCount: number
   paginationInfo: ReturnType<typeof calculatePagination> | null
   allSelected: boolean
   someSelected: boolean
-  groupedData: Map<string, Record<string, unknown>[]> | null
+  groupBlocks: TableGroupBlock<Record<string, unknown>>[] | null
   sortState: SortState
   filterState: Record<string, unknown>
   currentPage: number
@@ -61,6 +63,7 @@ export interface TableContext {
   handleToggleExpand: (key: string | number, record: Record<string, unknown>) => void
   handleSelectRow: (key: string | number, checked: boolean) => void
   handleSelectAll: (checked: boolean) => void
+  handleSelectLoaded: (checked?: boolean) => void
   isCellEditable: (columnKey: string, rowIndex: number) => boolean
   startEditing: (rowIndex: number, columnKey: string, currentValue: unknown) => void
   commitEdit: () => void

@@ -22,6 +22,24 @@ import {
 } from '@expcat/tigercat-core'
 import { MockIntersectionObserver } from '../utils/mock-observers'
 
+function hideScrollEnd(): () => void {
+  const saved: Array<{ target: object; descriptor: PropertyDescriptor }> = []
+  let current: object | null = window
+  while (current) {
+    if (Object.prototype.hasOwnProperty.call(current, 'onscrollend')) {
+      const descriptor = Object.getOwnPropertyDescriptor(current, 'onscrollend')
+      if (descriptor) saved.push({ target: current, descriptor })
+      Reflect.deleteProperty(current, 'onscrollend')
+    }
+    current = Object.getPrototypeOf(current)
+  }
+  return () => {
+    for (const entry of saved.reverse()) {
+      Object.defineProperty(entry.target, 'onscrollend', entry.descriptor)
+    }
+  }
+}
+
 describe('anchor-utils', () => {
   let container: HTMLDivElement
   let section1: HTMLDivElement
@@ -277,6 +295,7 @@ describe('anchor-utils', () => {
     })
 
     it('ignores updates while locked and accepts them after idle', () => {
+      const restore = hideScrollEnd()
       const target = document.createElement('div')
       const lock = createProgrammaticScrollLock(() => target)
       const accepted: string[] = []
@@ -299,6 +318,7 @@ describe('anchor-utils', () => {
       expect(lock.isLocked()).toBe(false)
       apply('#first')
       expect(accepted).toEqual(['#first'])
+      restore()
     })
 
     it('unlocks on scrollend when the event exists', () => {
@@ -317,6 +337,7 @@ describe('anchor-utils', () => {
     })
 
     it('resets idle on rapid lock so the last click wins', () => {
+      const restore = hideScrollEnd()
       const target = document.createElement('div')
       const lock = createProgrammaticScrollLock(() => target)
       lock.lock()
@@ -326,6 +347,7 @@ describe('anchor-utils', () => {
       expect(lock.isLocked()).toBe(true)
       vi.advanceTimersByTime(50)
       expect(lock.isLocked()).toBe(false)
+      restore()
     })
 
     it('unlocks after the safety timeout while scroll events keep resetting idle', () => {

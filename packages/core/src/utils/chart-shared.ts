@@ -9,7 +9,7 @@ import type {
   ChartScaleValue
 } from '../types/chart'
 import { classNames } from './class-names'
-import { DEFAULT_CHART_COLORS } from './chart-utils'
+import { DEFAULT_CHART_COLORS } from './chart/color'
 
 export interface BuildChartSeriesKeysOptions<T> {
   prefix?: string
@@ -81,19 +81,25 @@ export interface BuildLegendItemsOptions<T> {
   selectedIndex?: number | null
   getLabel: (datum: T, index: number) => string
   getColor?: (datum: T, index: number) => string
+  /** Original mark index. Defaults to the array position. */
+  getIndex?: (datum: T, index: number) => number
 }
 
 /** Build `ChartLegendItem[]` from data/series array. */
 export function buildChartLegendItems<T>(options: BuildLegendItemsOptions<T>): ChartLegendItem[] {
-  const { data, palette, activeIndex, selectedIndex = null, getLabel, getColor } = options
+  const { data, palette, activeIndex, selectedIndex = null, getLabel, getColor, getIndex } =
+    options
 
-  return data.map((datum, index) => ({
-    index,
-    label: getLabel(datum, index),
-    color: getColor ? getColor(datum, index) : palette[index % palette.length],
-    active: activeIndex === null || activeIndex === index,
-    selected: selectedIndex !== null && selectedIndex === index
-  }))
+  return data.map((datum, index) => {
+    const markIndex = getIndex ? getIndex(datum, index) : index
+    return {
+      index: markIndex,
+      label: getLabel(datum, markIndex),
+      color: getColor ? getColor(datum, markIndex) : palette[markIndex % palette.length],
+      active: activeIndex === null || activeIndex === markIndex,
+      selected: selectedIndex !== null && selectedIndex === markIndex
+    }
+  })
 }
 
 export function chartLegendOrientationFromPosition(
@@ -103,15 +109,11 @@ export function chartLegendOrientationFromPosition(
 }
 
 export function getChartLegendShellClasses(position: ChartLegendPosition = 'bottom'): string {
+  const atStart = position === 'left' || position === 'top'
   return classNames(
     'inline-flex',
-    position === 'right'
-      ? 'flex-row items-start gap-4'
-      : position === 'left'
-        ? 'flex-row-reverse items-start gap-4'
-        : position === 'top'
-          ? 'flex-col-reverse gap-2'
-          : 'flex-col gap-2'
+    position === 'left' || position === 'right' ? 'flex-row items-start gap-4' : 'flex-col gap-2',
+    atStart && '[&>:first-child]:order-2 [&>:nth-child(2)]:order-1'
   )
 }
 

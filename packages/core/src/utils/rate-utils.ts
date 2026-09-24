@@ -1,14 +1,35 @@
 import { classNames } from './class-names'
+import { sliderGetKeyboardValue } from './helpers/slider-utils'
 import type { RateSize } from '../types/rate'
+
+/** Upper bound so a huge `count` cannot render without limit. */
+export const RATE_MAX_COUNT = 10
+
+export function resolveRateCount(count?: number): number {
+  if (typeof count !== 'number' || !Number.isFinite(count)) return 5
+  const next = Math.floor(count)
+  if (next < 1) return 1
+  return Math.min(next, RATE_MAX_COUNT)
+}
+
+export function rateKeyboardValue(
+  key: string,
+  value: number,
+  max: number,
+  step: number,
+  rtl: boolean
+): number | null {
+  return sliderGetKeyboardValue(key, value, 0, max, step, undefined, rtl)
+}
 
 /* ------------------------------------------------------------------ */
 /*  Style constants                                                    */
 /* ------------------------------------------------------------------ */
 
 export const rateBaseClasses = classNames(
-  'inline-flex items-center gap-0.5 rounded-[var(--tiger-radius-sm,0.25rem)]',
+  'inline-flex items-center gap-0.5 rounded-[var(--tiger-radius-sm)]',
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'focus-visible:ring-[var(--tiger-focus-ring)]/40'
 )
 
 const sizePx: Record<RateSize, string> = {
@@ -43,10 +64,10 @@ export const rateCharacterGlyphClasses = 'inline-flex h-full w-full items-center
 export const rateHalfStarInnerClasses = 'w-[200%] h-full'
 
 export const rateActiveColor =
-  'text-[color-mix(in_srgb,var(--tiger-warning,#d97706)_75%,var(--tiger-text,#111827))]'
-export const rateInactiveColor = 'text-[var(--tiger-text-disabled,#9ca3af)]'
+  'text-[color-mix(in_srgb,var(--tiger-warning)_75%,var(--tiger-text))]'
+export const rateInactiveColor = 'text-[var(--tiger-text-disabled)]'
 export const rateHoverColor =
-  'text-[color-mix(in_srgb,var(--tiger-warning,#d97706)_55%,var(--tiger-text,#111827))]'
+  'text-[color-mix(in_srgb,var(--tiger-warning)_55%,var(--tiger-text))]'
 
 /** True when the pointer is on the inline-start half of the star. */
 export function rateIsInlineStartHalf(

@@ -67,7 +67,7 @@ function drawBox(
 
 const renderLoadedAnnotation = async (element: React.ReactElement) => {
   const result = render(element)
-  await waitFor(() => expect(result.getByLabelText('Image annotation canvas')).toBeInTheDocument())
+  await waitFor(() => expect(result.getByLabelText(/Image annotation canvas/)).toBeInTheDocument())
   return result
 }
 
@@ -83,7 +83,7 @@ describe('ImageAnnotation', () => {
     )
 
     expect(getByRole('button', { name: 'Rectangle' })).toHaveAttribute('aria-pressed', 'false')
-    expect(getByLabelText('Image annotation canvas')).toBeInTheDocument()
+    expect(getByLabelText(/Image annotation canvas/)).toBeInTheDocument()
   })
 
   it('switches drawing tools', async () => {
@@ -105,7 +105,7 @@ describe('ImageAnnotation', () => {
     )
 
     fireEvent.click(getByRole('button', { name: 'Rectangle' }))
-    const canvas = getByLabelText('Image annotation canvas')
+    const canvas = getByLabelText(/Image annotation canvas/)
     drawBox(canvas, { x: 80, y: 60 }, { x: 240, y: 180 })
 
     const [annotations, meta] = onChange.mock.lastCall as [CoreImageAnnotation[], unknown]
@@ -123,7 +123,7 @@ describe('ImageAnnotation', () => {
     )
 
     fireEvent.click(getByRole('button', { name: 'Ellipse' }))
-    const canvas = getByLabelText('Image annotation canvas')
+    const canvas = getByLabelText(/Image annotation canvas/)
     drawBox(canvas, { x: 160, y: 120 }, { x: 320, y: 240 })
 
     expect(onChange.mock.lastCall[0][0]).toMatchObject({ type: 'ellipse', width: 0.2, height: 0.2 })
@@ -246,11 +246,12 @@ describe('ImageAnnotation', () => {
     })
 
     it('renders custom image alt text', async () => {
-      const { getByAltText } = await renderLoadedAnnotation(
+      const { getByLabelText, container } = await renderLoadedAnnotation(
         <ImageAnnotation src="/scene.jpg" alt="Floor plan" />
       )
 
-      expect(getByAltText('Floor plan')).toBeInTheDocument()
+      expect(getByLabelText(/Floor plan/)).toBeInTheDocument()
+      expect(container.querySelector('img')).toHaveAttribute('aria-hidden', 'true')
     })
 
     it('disables tools and delete when disabled', async () => {
@@ -280,7 +281,7 @@ describe('ImageAnnotation', () => {
       )
 
       fireEvent.click(getByRole('button', { name: 'Rectangle' }))
-      const canvas = getByLabelText('Image annotation canvas')
+      const canvas = getByLabelText(/Image annotation canvas/)
       drawBox(canvas, { x: 80, y: 60 }, { x: 82, y: 62 })
 
       expect(onChange).not.toHaveBeenCalled()
@@ -293,7 +294,7 @@ describe('ImageAnnotation', () => {
       )
 
       fireEvent.click(getByRole('button', { name: 'Polygon' }))
-      const canvas = getByLabelText('Image annotation canvas')
+      const canvas = getByLabelText(/Image annotation canvas/)
       fireEvent.click(canvas, { clientX: 80, clientY: 60 })
       fireEvent.click(canvas, { clientX: 240, clientY: 60 })
       fireEvent.click(canvas, { clientX: 240, clientY: 180 })
@@ -308,7 +309,7 @@ describe('ImageAnnotation', () => {
         <ImageAnnotation src="/scene.jpg" readonly tool="rectangle" onChange={onChange} />
       )
 
-      const canvas = getByLabelText('Image annotation canvas')
+      const canvas = getByLabelText(/Image annotation canvas/)
       drawBox(canvas, { x: 80, y: 60 }, { x: 240, y: 180 })
 
       expect(onChange).not.toHaveBeenCalled()
@@ -323,7 +324,7 @@ describe('ImageAnnotation', () => {
         <ImageAnnotation src="/scene.jpg" defaultValue={existing} onChange={onChange} />
       )
       fireEvent.click(getByRole('button', { name: 'Rectangle' }))
-      drawBox(getByLabelText('Image annotation canvas'), { x: 80, y: 60 }, { x: 240, y: 180 })
+      drawBox(getByLabelText(/Image annotation canvas/), { x: 80, y: 60 }, { x: 240, y: 180 })
       const next = onChange.mock.lastCall[0] as CoreImageAnnotation[]
       expect(next[1]?.id).not.toBe('rectangle-1')
       expect(next).toHaveLength(2)
@@ -335,7 +336,7 @@ describe('ImageAnnotation', () => {
         <ImageAnnotation src="/scene.jpg" onChange={onChange} />
       )
       fireEvent.click(getByRole('button', { name: 'Rectangle' }))
-      const canvas = getByLabelText('Image annotation canvas')
+      const canvas = getByLabelText(/Image annotation canvas/)
       fireEvent.pointerDown(canvas, { clientX: 80, clientY: 60, button: 0, pointerId: 1 })
       fireEvent.pointerCancel(document, { clientX: 80, clientY: 60, pointerId: 1 })
       fireEvent.pointerMove(document, { clientX: 240, clientY: 180, pointerId: 1 })
@@ -350,15 +351,21 @@ describe('ImageAnnotation', () => {
         </ConfigProvider>
       )
       await waitFor(() =>
-        expect(getByLabelText(zhCN.imageEditor!.annotationCanvasAriaLabel!)).toBeInTheDocument()
+        expect(
+          getByLabelText(new RegExp(zhCN.imageEditor!.annotationCanvasAriaLabel!))
+        ).toBeInTheDocument()
       )
     })
 
     it('shows an error instead of a spinner when src fails', async () => {
-      const { getByLabelText, queryByLabelText } = render(<ImageAnnotation src="/missing.jpg" />)
+      const { getByLabelText, getByRole, getByText, queryByLabelText } = render(
+        <ImageAnnotation src="/missing.jpg" />
+      )
       await waitFor(() =>
         expect(getByLabelText('Failed to load image for annotation')).toBeInTheDocument()
       )
+      expect(getByText('Could not load this image.')).toBeInTheDocument()
+      expect(getByRole('button', { name: 'Retry' })).toBeInTheDocument()
       expect(queryByLabelText('Loading image for annotation')).not.toBeInTheDocument()
     })
 
@@ -395,7 +402,7 @@ describe('ImageAnnotation', () => {
         <ImageAnnotation src="/scene.jpg" onChange={onChange} />
       )
       fireEvent.click(getByRole('button', { name: 'Freehand' }))
-      const canvas = getByLabelText('Image annotation canvas')
+      const canvas = getByLabelText(/Image annotation canvas/)
       fireEvent.pointerDown(canvas, { clientX: 80, clientY: 60, button: 0, pointerId: 1 })
       fireEvent.pointerMove(document, { clientX: 240, clientY: 180, pointerId: 1 })
       fireEvent.keyDown(canvas, { key: 'Escape' })

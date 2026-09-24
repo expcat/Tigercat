@@ -32,26 +32,26 @@ const items: MenuItem[] = [
 
 describe('menu-controller keys', () => {
   it('treats 1 and "1" as the same selected/open key', () => {
-    expect(isKeySelected(1, ['1'])).toBe(true)
-    expect(isKeySelected('1', [1])).toBe(true)
-    expect(isKeyOpen(1, ['1'])).toBe(true)
-    expect(replaceKeys(1, ['1'])).toEqual([])
-    expect(toggleKey('1', [1])).toEqual([])
+    expect(isKeySelected(1, ['1'])).toBe(false)
+    expect(isKeySelected('1', [1])).toBe(false)
+    expect(isKeyOpen(1, ['1'])).toBe(false)
+    expect(replaceKeys(1, ['1'])).toEqual([1])
+    expect(toggleKey('1', [1])).toEqual([1, '1'])
   })
 
-  it('single-selects: next click of the selected key emits []', () => {
+  it('keeps the current item selected when it is clicked again', () => {
     expect(nextSelectedKeys([], 'a')).toEqual(['a'])
-    expect(nextSelectedKeys(['a'], 'a')).toEqual([])
+    expect(nextSelectedKeys(['a'], 'a')).toEqual(['a'])
     expect(nextSelectedKeys(['a', 'b'], 'c')).toEqual(['c'])
     expect(replaceKeys('c', ['a', 'b'])).toEqual(['c'])
   })
 
-  it('toggles openKeys and respects multiple=false', () => {
-    expect(nextOpenKeys({ current: [], key: 'a', multiple: true })).toEqual(['a'])
-    expect(nextOpenKeys({ current: ['a'], key: 'b', multiple: true })).toEqual(['a', 'b'])
-    expect(nextOpenKeys({ current: ['a'], key: 'b', multiple: false })).toEqual(['b'])
-    expect(nextOpenKeys({ current: ['a'], key: 'a', multiple: true })).toEqual([])
-    expect(nextOpenKeys({ current: ['a'], key: 'a', multiple: true, open: true })).toEqual(['a'])
+  it('toggles openKeys and respects openMultiple=false', () => {
+    expect(nextOpenKeys({ current: [], key: 'a', openMultiple: true })).toEqual(['a'])
+    expect(nextOpenKeys({ current: ['a'], key: 'b', openMultiple: true })).toEqual(['a', 'b'])
+    expect(nextOpenKeys({ current: ['a'], key: 'b', openMultiple: false })).toEqual(['b'])
+    expect(nextOpenKeys({ current: ['a'], key: 'a', openMultiple: true })).toEqual([])
+    expect(nextOpenKeys({ current: ['a'], key: 'a', openMultiple: true, open: true })).toEqual(['a'])
   })
 
   it('inline+collapsed resolves to vertical popup mode', () => {

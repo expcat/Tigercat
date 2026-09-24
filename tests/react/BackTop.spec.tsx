@@ -105,7 +105,7 @@ describe('BackTop', () => {
     const { container } = render(
       <BackTop
         visibilityHeight={0}
-        duration={0}
+        behavior="auto"
         target={() => scrollContainer}
         position="fixed"
         placement="bottom-left"
@@ -148,7 +148,7 @@ describe('BackTop', () => {
       scrollContainer.scrollTop = Number(options?.top ?? 0)
     })
 
-    render(<BackTop visibilityHeight={0} duration={0} target={() => scrollContainer} />)
+    render(<BackTop visibilityHeight={0} behavior="auto" target={() => scrollContainer} />)
     await user.click(screen.getByRole('button'))
     expect(scrollContainer.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' })
   })

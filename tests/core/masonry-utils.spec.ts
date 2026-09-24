@@ -8,7 +8,6 @@ import {
   clampMasonryGap,
   computeMasonryColumnHeights,
   distributeMasonryItems,
-  getMasonryColumnClasses,
   getMasonryColumnStyle,
   getMasonryGapStyle,
   getMasonryItemClasses,
@@ -70,7 +69,7 @@ describe('masonry-utils', () => {
     })
 
     it('falls back when no breakpoint matches above the map', () => {
-      expect(resolveMasonryColumnCount({ sm: 2 }, 100)).toBe(3)
+      expect(resolveMasonryColumnCount({ sm: 2 }, 100)).toBe(2)
     })
   })
 
@@ -173,7 +172,6 @@ describe('masonry-utils', () => {
     it('joins custom class names onto the base classes', () => {
       expect(getMasonryRootClasses('px-2')).toContain('tiger-masonry')
       expect(getMasonryRootClasses('px-2')).toContain('px-2')
-      expect(getMasonryColumnClasses('bordered')).toContain('tiger-masonry-column')
       expect(getMasonryItemClasses('mb-4')).toContain('tiger-masonry-item')
       expect(getMasonryRootClasses()).toBe('tiger-masonry relative w-full')
     })

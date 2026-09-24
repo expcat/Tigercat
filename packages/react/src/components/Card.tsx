@@ -1,17 +1,21 @@
 import React, { forwardRef } from 'react'
 import {
+  cardActionsClasses,
+  cardActionsRaisedClasses,
+  cardCoverClasses,
+  cardDirectionClasses,
+  cardFooterClasses,
+  cardHeaderClasses,
+  cardHorizontalBodyClasses,
+  cardStretchLinkClasses,
+  cardTitleLinkClasses,
   classNames,
   getCardClasses,
   getCardCoverWrapperClasses,
-  resolveCardPadding,
-  resolveCardRoot,
   handleCardActivation,
-  cardHeaderClasses,
-  cardFooterClasses,
-  cardCoverClasses,
-  cardActionsClasses,
-  cardDirectionClasses,
-  cardHorizontalBodyClasses,
+  resolveCardActivation,
+  resolveCardPadding,
+  cardElementTypeIsInteractive,
   type CardProps as CoreCardProps
 } from '@expcat/tigercat-core'
 
@@ -27,7 +31,26 @@ export interface CardProps
   cover?: React.ReactNode
   coverAlt?: string
   href?: string
+  target?: string
+  rel?: string
   onClick?: React.MouseEventHandler<HTMLElement>
+}
+
+function nodeHasControl(node: React.ReactNode): boolean {
+  if (node == null || typeof node === 'boolean' || typeof node === 'string' || typeof node === 'number') {
+    return false
+  }
+  if (Array.isArray(node)) return node.some(nodeHasControl)
+  if (!React.isValidElement(node)) return false
+  const props = node.props as Record<string, unknown>
+  const type = node.type
+  if (cardElementTypeIsInteractive(typeof type === 'string' ? type : undefined, props)) return true
+  if (typeof type === 'function' || (typeof type === 'object' && type)) {
+    const named = type as { displayName?: string; name?: string }
+    const name = named.displayName || named.name || ''
+    if (/button|link/i.test(name)) return true
+  }
+  return nodeHasControl(props.children as React.ReactNode)
 }
 
 function renderCover(
@@ -60,6 +83,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     cover,
     coverAlt = '',
     href,
+    target,
+    rel,
     padding,
     header,
     title,
@@ -70,91 +95,160 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     children,
     onClick,
     onKeyDown,
+    role: roleProp,
+    tabIndex: tabIndexProp,
     ...props
   },
   ref
 ) {
   const isHorizontal = orientation === 'horizontal'
   const hasCover = cover != null && cover !== false
-  const nestedInteractive = actions != null
+  const hasActions = actions != null
+  const foreign =
+    nodeHasControl(header) ||
+    nodeHasControl(children) ||
+    nodeHasControl(footer) ||
+    (typeof cover !== 'string' && nodeHasControl(cover))
   const clickable = Boolean(onClick) || Boolean(href?.trim())
-  const root = resolveCardRoot({ href, clickable, nestedInteractive })
+  const activation = resolveCardActivation({
+    href,
+    target,
+    rel,
+    clickable,
+    hasActions,
+    hasForeignControls: foreign
+  })
   const paddingClass = resolveCardPadding(size, padding)
   const cardClasses = classNames(
-    getCardClasses(variant, hoverable, clickable),
+    getCardClasses(variant, hoverable, activation.rootInteractive),
     cardDirectionClasses[orientation],
+    activation.link?.stretch && 'relative',
     !hasCover && paddingClass,
     className
   )
 
-  const bodyContent = (
+  const headerNode =
+    header != null || title ? <div className={cardHeaderClasses}>{header ?? title}</div> : null
+  const bodyNode = children != null ? <div>{children}</div> : null
+  const footerNode = footer != null ? <div className={cardFooterClasses}>{footer}</div> : null
+  const actionsNode =
+    actions != null ? (
+      <div className={classNames(cardActionsClasses, cardFooterClasses, cardActionsRaisedClasses)}>
+        {actions}
+      </div>
+    ) : null
+
+  const coverNode = renderCover(cover, coverAlt, isHorizontal)
+  const main = (
     <>
-      {(header != null || title) && (
-        <div className={cardHeaderClasses}>{header ?? title}</div>
-      )}
-      {children != null && <div>{children}</div>}
-      {footer != null && <div className={cardFooterClasses}>{footer}</div>}
-      {actions != null && (
-        <div
-          className={classNames(cardActionsClasses, cardFooterClasses)}
-          onClick={(event) => event.stopPropagation()}
-          onKeyDown={(event) => event.stopPropagation()}>
-          {actions}
+      {coverNode}
+      {hasCover ? (
+        <div className={classNames(cardHorizontalBodyClasses, paddingClass)} data-tiger-card-body="">
+          {headerNode}
+          {bodyNode}
+          {footerNode}
         </div>
+      ) : isHorizontal ? (
+        <div className={cardHorizontalBodyClasses} data-tiger-card-body="">
+          {headerNode}
+          {bodyNode}
+          {footerNode}
+        </div>
+      ) : (
+        <>
+          {headerNode}
+          {bodyNode}
+          {footerNode}
+        </>
       )}
     </>
   )
 
-  const content = hasCover ? (
-    <div className={classNames(cardHorizontalBodyClasses, paddingClass)} data-tiger-card-body="">
-      {bodyContent}
-    </div>
-  ) : isHorizontal ? (
-    <div className={cardHorizontalBodyClasses} data-tiger-card-body="">
-      {bodyContent}
-    </div>
-  ) : (
-    bodyContent
-  )
-
   const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (event) => {
     onKeyDown?.(event)
-    if (event.defaultPrevented || root.tag === 'a') return
-    if (root.role) {
-      handleCardActivation(event, () => {
-        if (href) {
-          window.location.assign(href)
-          return
-        }
-        onClick?.(event as unknown as React.MouseEvent<HTMLElement>)
-      })
-    }
+    if (event.defaultPrevented || event.key === 'Escape') return
+    if (activation.rootRole !== 'button') return
+    handleCardActivation(event, () => {
+      onClick?.(event as unknown as React.MouseEvent<HTMLElement>)
+    })
   }
 
   const shared = {
     ...props,
     title: htmlTitle,
     className: cardClasses,
-    onClick,
+    onClick: activation.rootInteractive ? onClick : undefined,
     onKeyDown: handleKeyDown,
-    role: root.role,
-    tabIndex: root.tabIndex,
+    role: activation.rootRole ?? roleProp,
+    tabIndex: activation.rootTabIndex ?? tabIndexProp,
     'data-tiger-card': ''
   }
 
-  if (root.tag === 'a') {
+  if (activation.rootTag === 'a' && activation.href) {
     return (
-      <a {...shared} ref={ref as React.Ref<HTMLAnchorElement>} href={href}>
-        {renderCover(cover, coverAlt, isHorizontal)}
-        {content}
+      <a
+        {...shared}
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={activation.href}
+        target={activation.target}
+        rel={activation.rel}>
+        {main}
+        {actionsNode}
       </a>
     )
   }
 
+  const titleText = typeof title === 'string' ? title : typeof header === 'string' ? header : ''
+  const separateLink = activation.link?.href ? (
+    <a
+      className={activation.link.stretch ? cardStretchLinkClasses : cardTitleLinkClasses}
+      href={activation.link.href}
+      target={activation.link.target}
+      rel={activation.link.rel}
+      data-tiger-card-link=""
+      aria-label={activation.link.stretch || titleText ? undefined : activation.link.href}>
+      {activation.link.stretch ? main : titleText || null}
+    </a>
+  ) : null
+
+  const showMainBesideLink = !activation.link?.stretch
+  const titleLivesInLink = Boolean(separateLink) && !activation.link?.stretch
+  const heading = titleLivesInLink
+    ? typeof header === 'string' || header == null
+      ? null
+      : headerNode
+    : headerNode
+
   return (
     <div {...shared} ref={ref as React.Ref<HTMLDivElement>}>
-      {renderCover(cover, coverAlt, isHorizontal)}
-      {content}
+      {separateLink}
+      {showMainBesideLink ? (
+        <>
+          {coverNode}
+          {hasCover ? (
+            <div
+              className={classNames(cardHorizontalBodyClasses, paddingClass)}
+              data-tiger-card-body="">
+              {heading}
+              {bodyNode}
+              {footerNode}
+            </div>
+          ) : isHorizontal ? (
+            <div className={cardHorizontalBodyClasses} data-tiger-card-body="">
+              {heading}
+              {bodyNode}
+              {footerNode}
+            </div>
+          ) : (
+            <>
+              {heading}
+              {bodyNode}
+              {footerNode}
+            </>
+          )}
+        </>
+      ) : null}
+      {actionsNode}
     </div>
   )
 })

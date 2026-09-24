@@ -189,8 +189,8 @@ describe('carousel-utils track geometry', () => {
     expect(getScrollTransform(1, 'ltr')).toBe('translateX(-100%)')
   })
 
-  it('flips the scroll axis under rtl instead of locking LTR left to next', () => {
-    expect(getScrollTransform(2, 'rtl')).toBe('translateX(200%)')
+  it('uses one translate sign and lets dir reverse the axis', () => {
+    expect(getScrollTransform(2, 'rtl')).toBe('translateX(-200%)')
     expect(getScrollTransform(2, 'ltr')).toBe('translateX(-200%)')
   })
 })

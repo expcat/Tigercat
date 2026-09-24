@@ -7,7 +7,9 @@ import type { ChartScaleValue, HeatmapChartDatum } from '../types/chart'
 import { getChartElementOpacity } from './chart-interaction'
 import { formatChartTemplate, isFiniteNumber } from './chart/layout'
 import { devWarn } from './dev-warn'
+import { scanFiniteExtent } from './chart/scale'
 import { isBrowser } from './env'
+import { CHART_COLOR_TOKEN_FALLBACKS } from './chart/a11y'
 
 export const DEFAULT_HEATMAP_WIDTH = 400
 export const DEFAULT_HEATMAP_HEIGHT = 300
@@ -20,7 +22,7 @@ export const DEFAULT_HEATMAP_EMPTY_FILL = '#f3f4f6'
 export const DEFAULT_HEATMAP_CANVAS_THRESHOLD = 1000
 
 export const heatmapCellTransitionClasses =
-  'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
+  'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
 
 export interface HeatmapCell {
   /** Row-major index: `row * cols + col` */
@@ -39,6 +41,7 @@ export interface HeatmapCell {
   yLabel: string
   datum: HeatmapChartDatum | null
   empty: boolean
+  labelFill: string
 }
 
 export interface HeatmapAxisLabel {
@@ -74,6 +77,7 @@ export interface LayoutHeatmapOptions {
   colorSpace?: HeatmapColorSpace
   min?: number
   max?: number
+  direction?: 'ltr' | 'rtl'
 }
 
 function parseHexColor(color: string): [number, number, number] | null {
@@ -116,17 +120,88 @@ export function interpolateColor(minColor: string, maxColor: string, t: number):
   return rgbToHex(r1 + (r2 - r1) * clamped, g1 + (g2 - g1) * clamped, b1 + (b2 - b1) * clamped)
 }
 
-export function interpolateColorOklch(minColor: string, maxColor: string, t: number): string {
-  const clamped = isFiniteNumber(t) ? Math.max(0, Math.min(1, t)) : 0
-  const pct = Math.round(clamped * 10000) / 100
-  return `color-mix(in oklch, ${maxColor} ${pct}%, ${minColor})`
+function srgbChannelToLinear(channel: number): number {
+  const value = channel / 255
+  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
 }
 
-export function heatmapLabelFill(fill: string, heat: number): string {
-  const rgb = parseHexColor(fill)
-  if (!rgb) return heat > 0.55 ? '#f9fafb' : '#111827'
+function linearToSrgbChannel(value: number): number {
+  const clamped = Math.min(1, Math.max(0, value))
+  const encoded =
+    clamped <= 0.0031308 ? clamped * 12.92 : 1.055 * clamped ** (1 / 2.4) - 0.055
+  return Math.round(Math.min(1, Math.max(0, encoded)) * 255)
+}
+
+function rgbToOklab(r: number, g: number, b: number): [number, number, number] {
+  const lr = srgbChannelToLinear(r)
+  const lg = srgbChannelToLinear(g)
+  const lb = srgbChannelToLinear(b)
+  const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb)
+  const m = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb)
+  const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb)
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s
+  ]
+}
+
+function oklabToRgb(L: number, a: number, b: number): [number, number, number] {
+  const l = L + 0.3963377774 * a + 0.2158037573 * b
+  const m = L - 0.1055613458 * a - 0.0638541728 * b
+  const s = L - 0.0894841775 * a - 1.291485548 * b
+  const l3 = l * l * l
+  const m3 = m * m * m
+  const s3 = s * s * s
+  return [
+    linearToSrgbChannel(4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3),
+    linearToSrgbChannel(-1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3),
+    linearToSrgbChannel(-0.0041960863 * l3 - 0.7034186147 * m3 + 1.707614701 * s3)
+  ]
+}
+
+function readCssVar(color: string): { token: string; fallback?: string } | null {
+  const match = /^var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)$/.exec(color.trim())
+  if (!match) return null
+  return { token: match[1], fallback: match[2]?.trim() }
+}
+
+/** Hex, a `var()` fallback, or the paired chart token. Never a guessed luminance. */
+export function resolveChartColorHex(color: string): string | null {
+  const direct = parseHexColor(color)
+  if (direct) return rgbToHex(direct[0], direct[1], direct[2])
+  const variable = readCssVar(color)
+  if (!variable) return null
+  if (variable.fallback) {
+    const nested = resolveChartColorHex(variable.fallback)
+    if (nested) return nested
+  }
+  return CHART_COLOR_TOKEN_FALLBACKS[variable.token] ?? null
+}
+
+export function interpolateColorOklch(minColor: string, maxColor: string, t: number): string {
+  const clamped = isFiniteNumber(t) ? Math.max(0, Math.min(1, t)) : 0
+  const minHex = resolveChartColorHex(minColor) ?? DEFAULT_HEATMAP_MIN_COLOR
+  const maxHex = resolveChartColorHex(maxColor) ?? DEFAULT_HEATMAP_MAX_COLOR
+  const minRgb = parseHexColor(minHex) ?? parseHexColor(DEFAULT_HEATMAP_MIN_COLOR)!
+  const maxRgb = parseHexColor(maxHex) ?? parseHexColor(DEFAULT_HEATMAP_MAX_COLOR)!
+  const [l1, a1, b1] = rgbToOklab(minRgb[0], minRgb[1], minRgb[2])
+  const [l2, a2, b2] = rgbToOklab(maxRgb[0], maxRgb[1], maxRgb[2])
+  const [r, g, b] = oklabToRgb(l1 + (l2 - l1) * clamped, a1 + (a2 - a1) * clamped, b1 + (b2 - b1) * clamped)
+  return rgbToHex(r, g, b)
+}
+
+/** Label color from the fill's luminance. Unresolved fills use the paired token, not a constant. */
+export function chartLabelFill(fill: string): string {
+  const hex = resolveChartColorHex(fill)
+  const rgb = hex ? parseHexColor(hex) : null
+  if (!rgb) return '#111827'
   const luminance = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255
   return luminance > 0.55 ? '#111827' : '#f9fafb'
+}
+
+export function heatmapLabelFill(fill: string): string {
+  return chartLabelFill(fill)
 }
 
 export function resolveHeatmapRenderMode(
@@ -202,6 +277,10 @@ function isNumericIndex(value: ChartScaleValue): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0
 }
 
+export function formatHeatmapSummary(template: string, rows: number, columns: number): string {
+  return formatChartTemplate(template, { rows, columns })
+}
+
 export function formatHeatmapTooltip(
   template: string,
   cell: Pick<HeatmapCell, 'xLabel' | 'yLabel' | 'value'>,
@@ -264,36 +343,60 @@ export function layoutHeatmap(
       continue
     }
     const labelKey = heatmapLookupKey(datum.x, datum.y)
-    if (byLabel.has(labelKey)) {
-      devWarn(
-        'HeatmapChart.duplicate',
-        'HeatmapChart received duplicate x/y keys; later value wins'
-      )
-    }
-    byLabel.set(labelKey, datum)
-    if (isNumericIndex(datum.x) && isNumericIndex(datum.y)) {
+    const matchesLabel =
+      xLabels.some((label) => label === String(datum.x)) &&
+      yLabels.some((label) => label === String(datum.y))
+    const matchesIndex =
+      isNumericIndex(datum.x) &&
+      isNumericIndex(datum.y) &&
+      datum.x < cols &&
+      datum.y < rows
+    if (matchesLabel) {
+      if (byLabel.has(labelKey)) {
+        devWarn(
+          'HeatmapChart.duplicate',
+          'HeatmapChart received duplicate x/y keys; later value wins'
+        )
+      }
+      byLabel.set(labelKey, datum)
+    } else if (matchesIndex) {
       const indexKey = heatmapLookupKey(datum.x, datum.y)
+      if (byIndex.has(indexKey)) {
+        devWarn(
+          'HeatmapChart.duplicate',
+          'HeatmapChart received duplicate x/y keys; later value wins'
+        )
+      }
       byIndex.set(indexKey, datum)
     }
   }
 
   const present: number[] = []
   const occupancy: Array<HeatmapChartDatum | null> = new Array(rows * cols).fill(null)
+  const placed = new Set<HeatmapChartDatum>()
+  const place = (index: number, datum: HeatmapChartDatum | undefined) => {
+    if (!datum || placed.has(datum) || occupancy[index]) return
+    occupancy[index] = datum
+    placed.add(datum)
+    present.push(datum.value)
+  }
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      const xLabel = xLabels[col]
-      const yLabel = yLabels[row]
-      const datum =
-        byLabel.get(heatmapLookupKey(xLabel, yLabel)) ??
-        byIndex.get(heatmapLookupKey(col, row)) ??
-        null
-      occupancy[row * cols + col] = datum
-      if (datum) present.push(datum.value)
+      place(
+        row * cols + col,
+        byLabel.get(heatmapLookupKey(xLabels[col], yLabels[row]))
+      )
+    }
+  }
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      place(row * cols + col, byIndex.get(heatmapLookupKey(col, row)))
     }
   }
 
-  let minVal = isFiniteNumber(opts.min) ? opts.min : present.length > 0 ? Math.min(...present) : 0
-  let maxVal = isFiniteNumber(opts.max) ? opts.max : present.length > 0 ? Math.max(...present) : 1
+  const presentExtent = scanFiniteExtent(present)
+  let minVal = isFiniteNumber(opts.min) ? opts.min : (presentExtent?.min ?? 0)
+  let maxVal = isFiniteNumber(opts.max) ? opts.max : (presentExtent?.max ?? 1)
   if (minVal === maxVal) maxVal = minVal + 1
 
   const minColor = opts.minColor ?? DEFAULT_HEATMAP_MIN_COLOR
@@ -312,11 +415,12 @@ export function layoutHeatmap(
       y: safeHeight + 16
     })
   }
+  const rtl = opts.direction === 'rtl'
   for (let row = 0; row < rows; row++) {
     const y = row * (cellH + usedGapY)
     yAxisLabels.push({
       text: yLabels[row],
-      x: -8,
+      x: rtl ? safeWidth + 8 : -8,
       y: y + cellH / 2
     })
   }
@@ -330,6 +434,9 @@ export function layoutHeatmap(
       const heat = emptyCell
         ? 0
         : Math.max(0, Math.min(1, (datum.value - minVal) / (maxVal - minVal)))
+      const fill = emptyCell
+        ? DEFAULT_HEATMAP_EMPTY_FILL
+        : resolveCellFill(heat, minColor, maxColor, colorSpace)
       cells.push({
         index,
         row,
@@ -339,14 +446,13 @@ export function layoutHeatmap(
         w: cellW,
         h: cellH,
         heat,
-        fill: emptyCell
-          ? DEFAULT_HEATMAP_EMPTY_FILL
-          : resolveCellFill(heat, minColor, maxColor, colorSpace),
+        fill,
         value,
         xLabel: xLabels[col],
         yLabel: yLabels[row],
         datum,
-        empty: emptyCell
+        empty: emptyCell,
+        labelFill: chartLabelFill(fill)
       })
     }
   }
@@ -425,12 +531,12 @@ export function paintHeatmapCanvas(
   const activeIndex = options.activeIndex ?? null
 
   for (const cell of cells) {
-    if (cell.empty) continue
-    ctx.globalAlpha =
-      getChartElementOpacity(cell.index, activeIndex, {
-        activeOpacity: options.activeOpacity,
-        inactiveOpacity: options.inactiveOpacity
-      }) ?? 1
+    ctx.globalAlpha = cell.empty
+      ? 1
+      : (getChartElementOpacity(cell.index, activeIndex, {
+          activeOpacity: options.activeOpacity,
+          inactiveOpacity: options.inactiveOpacity
+        }) ?? 1)
     ctx.fillStyle = cell.fill
     const radius = Math.max(0, Math.min(cellRadius, cell.w / 2, cell.h / 2))
     if (radius > 0) {
@@ -440,7 +546,7 @@ export function paintHeatmapCanvas(
     }
     if (options.showValues && cell.value !== null) {
       ctx.globalAlpha = 1
-      ctx.fillStyle = heatmapLabelFill(cell.fill, cell.heat)
+      ctx.fillStyle = cell.labelFill
       const text = options.valueFormatter ? options.valueFormatter(cell.value) : `${cell.value}`
       ctx.fillText(text, cell.x + cell.w / 2, cell.y + cell.h / 2)
     }

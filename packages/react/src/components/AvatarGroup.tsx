@@ -1,4 +1,4 @@
-import React, { createContext, isValidElement, useMemo } from 'react'
+import React, { createContext, isValidElement, useMemo, useState } from 'react'
 import {
   getAvatarGroupClasses,
   getAvatarGroupItemClasses,
@@ -6,7 +6,6 @@ import {
   getAvatarGroupOverflowClasses,
   getAvatarGroupOverflowLabel,
   getAvatarGroupOverflowText,
-  getVisibleGroupItems,
   mergeTigerLocale,
   type AvatarShape,
   type AvatarSize,
@@ -62,8 +61,24 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
     [size, shape]
   )
 
-  const childArray = React.Children.toArray(children).filter(isAvatarElement)
-  const { visibleItems, overflowCount, visibleCount } = getVisibleGroupItems(childArray, max)
+  const [expanded, setExpanded] = useState(false)
+  const childArray = React.Children.toArray(children)
+  let avatarSeen = 0
+  const cap =
+    typeof max === 'number' && Number.isFinite(max) ? Math.max(0, Math.floor(max)) : undefined
+  let overflowCount = 0
+  const rendered = childArray.map((child, index) => {
+    if (!isAvatarElement(child)) return <React.Fragment key={index}>{child}</React.Fragment>
+    const hidden = cap != null && !expanded && avatarSeen >= cap
+    if (cap != null && avatarSeen >= cap) overflowCount += 1
+    avatarSeen += 1
+    if (!hidden) return <React.Fragment key={index}>{child}</React.Fragment>
+    return (
+      <span key={index} className="sr-only">
+        {child}
+      </span>
+    )
+  })
   const overflowShape = shape ?? 'circle'
 
   return (
@@ -73,14 +88,16 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
         role="group"
         aria-label={labels.ariaLabel}
         {...props}>
-        {visibleItems}
-        {overflowCount > 0 && (
-          <span
-            className={getAvatarGroupOverflowClasses(size ?? 'md', overflowShape, visibleCount > 0)}
-            role="img"
-            aria-label={getAvatarGroupOverflowLabel(overflowCount, labels.overflowAriaLabel)}>
+        {rendered}
+        {overflowCount > 0 && !expanded && (
+          <button
+            type="button"
+            className={getAvatarGroupOverflowClasses(size ?? 'md', overflowShape, avatarSeen > overflowCount)}
+            aria-expanded={false}
+            aria-label={getAvatarGroupOverflowLabel(overflowCount, labels.overflowAriaLabel)}
+            onClick={() => setExpanded(true)}>
             {getAvatarGroupOverflowText(overflowCount)}
-          </span>
+          </button>
         )}
       </div>
     </AvatarGroupContext.Provider>

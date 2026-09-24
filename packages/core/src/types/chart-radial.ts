@@ -43,8 +43,9 @@ export interface PieChartProps
   startAngle?: number
 
   /**
-   * End angle in radians
-   * @default Math.PI * 2
+   * End angle in radians. Omitted means one full turn after `startAngle`
+   * (`startAngle + 2π`). Pie, radar, and sunburst angles are radians.
+   * Gauge angles are degrees.
    */
   endAngle?: number
 
@@ -88,7 +89,7 @@ export interface PieChartProps
 
   /**
    * Border color between slices
-   * @default 'var(--tiger-surface,#ffffff)'
+   * @default 'var(--tiger-surface)'
    */
   borderColor?: string
 
@@ -138,12 +139,6 @@ export interface PieChartProps
    */
   animated?: boolean
 }
-
-/**
- * Donut is PieChart with a default `innerRadiusRatio` of 0.6.
- * Hole/center/animation fields live on {@link PieChartProps}.
- */
-export interface DonutChartProps extends PieChartProps {}
 
 export interface RadarChartDatum {
   value: number
@@ -252,10 +247,17 @@ export interface RadarChartProps
   startAngle?: number
 
   /**
-   * Grid levels
+   * Grid levels. Values above 12 are capped.
    * @default 5
    */
   levels?: number
+
+  /**
+   * Where a missing indicator is drawn. `center` keeps the vertex on the
+   * axis origin. `gap` breaks the outline. Neighbors are never chorded.
+   * @default 'center'
+   */
+  missing?: 'center' | 'gap'
 
   /**
    * Whether to show level labels
@@ -439,7 +441,7 @@ export interface RadarChartProps
 
   /**
    * Point border color
-   * @default 'var(--tiger-surface,#ffffff)'
+   * @default 'var(--tiger-surface)'
    */
   pointBorderColor?: string
 
@@ -569,13 +571,13 @@ export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProp
 
   /**
    * Default arc track color
-   * @default 'var(--tiger-border,#e5e7eb)'
+   * @default 'var(--tiger-border)'
    */
   trackColor?: string
 
   /**
    * Default arc fill color
-   * @default 'var(--tiger-primary,#2563eb)'
+   * @default 'var(--tiger-primary)'
    */
   color?: string
 
@@ -589,7 +591,8 @@ export interface GaugeChartProps extends BaseChartProps, ChartBuiltInTooltipProp
 
   /**
    * Animate the needle when `value` changes. `prefers-reduced-motion` skips.
-   * @default true
+   * Angles on this chart are degrees.
+   * @default false
    */
   animated?: boolean
 }

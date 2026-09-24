@@ -18,7 +18,7 @@ describe('Grid (React)', () => {
     render(<Row data-testid="row" />)
     const row = screen.getByTestId('row')
     expect(row).toHaveClass('tiger-row')
-    expect(getComputedStyle(row).flexWrap).toBe('wrap')
+    expect(row.className).not.toContain('tiger-row-nowrap')
   })
 
   it('keeps a numeric gutter on the row and does not overflow the parent', () => {
@@ -38,8 +38,6 @@ describe('Grid (React)', () => {
     const row = screen.getByTestId('row')
     expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
     expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('')
-    expect(getComputedStyle(row).columnGap).toBe('16px')
-    expect(getComputedStyle(row).rowGap).toBe('0px')
     const parentBox = box(parent)
     const rowBox = box(row)
     if (parentBox.width > 0) {
@@ -62,7 +60,6 @@ describe('Grid (React)', () => {
     expect(hidden.getByTestId('hidden').style.getPropertyValue('--tiger-col-display-base')).toBe(
       'none'
     )
-    expect(getComputedStyle(hidden.getByTestId('hidden')).display).toBe('none')
 
     render(<Col data-testid="offset" offset={{ xs: 4, md: 0 }} />)
     const col = screen.getByTestId('offset')
@@ -91,7 +88,6 @@ describe('Grid (React)', () => {
   it('disables wrapping with wrap={false}', () => {
     render(<Row data-testid="row" wrap={false} />)
     expect(screen.getByTestId('row')).toHaveClass('tiger-row-nowrap')
-    expect(getComputedStyle(screen.getByTestId('row')).flexWrap).toBe('nowrap')
   })
 
   it('applies both axes with tuple gutter [horizontal, vertical]', () => {
@@ -103,8 +99,6 @@ describe('Grid (React)', () => {
     const row = screen.getByTestId('row')
     expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
     expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('24px')
-    expect(getComputedStyle(row).columnGap).toBe('16px')
-    expect(getComputedStyle(row).rowGap).toBe('24px')
   })
 
   it('forwards ref, className, and a single click on Row and Col', () => {

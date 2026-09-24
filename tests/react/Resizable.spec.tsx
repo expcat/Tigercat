@@ -79,9 +79,7 @@ describe('Resizable', () => {
       })
       fireEvent.pointerMove(document, { clientX: -40, clientY: 100, pointerId: 1 })
       expect(onResize.mock.calls.at(-1)?.[0].width).toBe(340)
-      expect((container.firstElementChild as HTMLElement).style.transform).toBe(
-        'translate(-40px, 0px)'
-      )
+      expect((container.firstElementChild as HTMLElement).style.marginInlineStart).toBe('-40px')
     })
   })
 
@@ -110,8 +108,8 @@ describe('Resizable', () => {
       expect(right).toHaveAttribute('tabindex', '0')
       expect(right).toHaveAttribute('aria-label', 'Resize right')
       const corner = handle(container, 'bottom-right')
-      expect(corner).toHaveAttribute('aria-hidden', 'true')
-      expect(corner).toHaveAttribute('tabindex', '-1')
+      expect(corner).toHaveAttribute('role', 'separator')
+      expect(corner).toHaveAttribute('tabindex', '0')
     })
 
     it('grows width with ArrowRight on the right handle', () => {

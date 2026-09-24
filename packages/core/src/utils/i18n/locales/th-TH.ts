@@ -14,6 +14,9 @@ export const thTH: TigerLocale = {
     cancelText: 'ยกเลิก',
     closeText: 'ปิด',
     loadingText: 'กำลังโหลด...',
+    loadingFinishedText: 'โหลดเสร็จแล้ว',
+    loadingFailedText: 'โหลดไม่สำเร็จ',
+    viewText: 'ดู',
     emptyText: 'ไม่มีข้อมูล',
     noMoreText: 'ไม่มีข้อมูลเพิ่มเติม',
     searchPlaceholder: 'ค้นหา',
@@ -47,7 +50,8 @@ export const thTH: TigerLocale = {
     ariaLabel: 'คิวอาร์โค้ด',
     expiredText: 'คิวอาร์โค้ดหมดอายุแล้ว',
     refreshText: 'รีเฟรช',
-    loadingText: 'กำลังโหลด...'
+    loadingText: 'กำลังโหลด...',
+    errorText: 'ไม่สามารถสร้างคิวอาร์โค้ด'
   },
   marquee: {
     ariaLabel: 'เนื้อหาเลื่อน'
@@ -55,10 +59,25 @@ export const thTH: TigerLocale = {
   image: {
     previewAriaLabel: 'ดูตัวอย่าง {alt}',
     previewFallbackAlt: 'รูปภาพ',
-    groupAriaLabel: 'กลุ่มรูปภาพ'
+    groupAriaLabel: 'กลุ่มรูปภาพ',
+    loadErrorText: 'โหลดรูปภาพไม่สำเร็จ'
   },
   imageCompare: {
-    ariaLabel: 'เปรียบเทียบรูปภาพ'
+    ariaLabel: 'เปรียบเทียบรูปภาพ',
+    beforeAlt: 'ก่อน',
+    afterAlt: 'หลัง',
+    valueText: 'เผยด้านก่อน {percent}%'
+  },
+  text: {
+    copyLabel: 'คัดลอก',
+    copiedLabel: 'คัดลอกแล้ว',
+    copyFailedLabel: 'คัดลอกไม่สำเร็จ',
+  },
+  watermark: {
+    imageErrorText: 'โหลดรูปภาพลายน้ำไม่สำเร็จ'
+  },
+  segmented: {
+    ariaLabel: 'ตัวเลือก'
   },
   descriptions: {
     colon: ':'
@@ -67,6 +86,9 @@ export const thTH: TigerLocale = {
     avatarAlt: 'อวาตาร์',
     dragHandleAriaLabel: 'จัดลำดับ'
   },
+  masonry: {
+    visualOrderText: 'ลำดับที่มองเห็นต่างจากลำดับต้นฉบับ'
+  },
   scrollArea: {
     ariaLabel: 'พื้นที่เลื่อน'
   },
@@ -74,7 +96,8 @@ export const thTH: TigerLocale = {
     pageBreak: 'ตัวแบ่งหน้า'
   },
   timeline: {
-    pendingText: 'กำลังโหลด...'
+    pendingText: 'กำลังโหลด...',
+    pendingReplacedText: 'อัปเดตเสร็จแล้ว'
   },
   workflowTimeline: {
     pending: 'รอดำเนินการ',
@@ -216,7 +239,11 @@ export const thTH: TigerLocale = {
     branchExpression: 'นิพจน์',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: 'ไม่ใช้กับโหนดชนิดนี้',
+    publishText: 'เผยแพร่',
     publishBlocked: 'ยังเผยแพร่ไม่ได้จนกว่าจะแก้รายการที่บล็อก'
+  },
+  workflowDetailShell: {
+    ariaLabel: 'รายละเอียดเวิร์กโฟลว์'
   },
   progress: {
     ariaLabel: 'ความคืบหน้า'
@@ -259,7 +286,9 @@ export const thTH: TigerLocale = {
     loadingText: 'กำลังโหลด',
     expandText: 'ขยาย',
     collapseText: 'ยุบ',
-    selectAllText: 'เลือกทั้งหมด',
+    selectAllText: 'เลือกทั้งหมดในหน้านี้',
+    selectLoadedText: 'เลือกแถวที่โหลดทั้งหมด',
+    tableAriaLabel: 'ตารางข้อมูล',
     selectRowAriaLabel: 'เลือกแถว {row}',
     sortByText: 'เรียงตาม {column}',
     clearSortText: 'ล้างการเรียง',
@@ -275,9 +304,13 @@ export const thTH: TigerLocale = {
     allText: 'ทั้งหมด',
     filterPlaceholder: 'กรอง...',
     exportCsvText: 'ส่งออก CSV',
-    exportExcelText: 'ส่งออก Excel',
     exportCsvAriaLabel: 'ส่งออกเป็น CSV',
-    exportExcelAriaLabel: 'ส่งออกเป็น Excel',
+    selectionCountText: 'เลือกแล้ว {count} รายการ',
+    sortAnnouncementText: 'เรียงตาม {column} {direction}',
+    sortAscendingText: 'น้อยไปมาก',
+    sortDescendingText: 'มากไปน้อย',
+    sortNoneText: 'ยังไม่เรียง',
+    dragRowAriaLabel: 'ลากแถว {row}',
     expandRowAriaLabel: 'ขยายแถว',
     collapseRowAriaLabel: 'ยุบแถว',
     sortMenuAriaLabel: 'เรียงลำดับ',
@@ -325,14 +358,17 @@ export const thTH: TigerLocale = {
     nextText: 'ถัดไป',
     finishText: 'เสร็จสิ้น',
     closeAriaLabel: 'ปิดทัวร์',
-    dialogAriaLabel: 'ทัวร์แนะนำ'
+    dialogAriaLabel: 'ทัวร์แนะนำ',
+    loadErrorText: 'โหลดทัวร์นี้ไม่สำเร็จ',
   },
   calendar: {
     previousMonth: 'เดือนก่อนหน้า',
     nextMonth: 'เดือนถัดไป',
     previousYear: 'ปีก่อนหน้า',
     nextYear: 'ปีถัดไป',
-    eventCountText: '{n} รายการ'
+    eventCountText: '{n} รายการ',
+    switchToYear: 'สลับเป็นมุมมองปี',
+    switchToMonth: 'สลับเป็นมุมมองเดือน'
   },
   fullscreen: {
     enterAriaLabel: 'เข้าสู่เต็มหน้าจอ',
@@ -343,7 +379,8 @@ export const thTH: TigerLocale = {
     pathAriaLabel: 'เส้นทางไฟล์',
     listboxAriaLabel: 'ไฟล์',
     searchAriaLabel: 'ค้นหาไฟล์',
-    emptyText: 'โฟลเดอร์ว่าง'
+    emptyText: 'โฟลเดอร์ว่าง',
+    resultCountText: '{count} รายการ'
   },
   imageViewer: {
     dialogAriaLabel: 'ตัวดูรูปภาพ',
@@ -377,6 +414,7 @@ export const thTH: TigerLocale = {
     resizeHandleS: 'ล่าง',
     resizeHandleSw: 'ล่างซ้าย',
     resizeHandleW: 'ซ้าย',
+    cropSizeText: 'กว้าง {width} สูง {height}',
     loadingCropImageAriaLabel: 'กำลังโหลดรูปภาพสำหรับครอบตัด',
     loadErrorAriaLabel: 'โหลดรูปภาพสำหรับครอบตัดไม่สำเร็จ',
     fileTooLargeText: 'ไฟล์มีขนาดเกิน {maxSize}',
@@ -394,10 +432,14 @@ export const thTH: TigerLocale = {
     ellipseToolText: 'วงรี',
     polygonToolText: 'หลายเหลี่ยม',
     freehandToolText: 'วาดอิสระ',
-    deleteText: 'ลบ'
+    deleteText: 'ลบ',
+    annotationLoadFailedText: 'โหลดรูปภาพไม่สำเร็จ',
+    annotationRetryText: 'ลองอีกครั้ง',
+    annotationTooSmallText: 'คำอธิบายเล็กเกินไป',
+    annotationPolygonIncompleteText: 'รูปหลายเหลี่ยมต้องมีอย่างน้อย 3 จุด'
   },
   status: {
-    tagCloseAriaLabel: 'ปิดแท็ก',
+    tagCloseAriaLabel: 'ปิด {label}',
     badgeLabel: 'การแจ้งเตือน',
     badgeCountLabel: '{count} การแจ้งเตือน'
   },
@@ -410,6 +452,7 @@ export const thTH: TigerLocale = {
     unassignedSwimlaneText: 'ยังไม่กำหนด',
     wipLimitText: 'จำกัด WIP: {limit}',
     dragHintText: 'ลากเพื่อย้าย',
+    grabAnnouncementText: '{card}. จาก {from} ไป {to}. ตำแหน่ง {position} จาก {count}.',
     boardAriaLabel: 'บอร์ดงาน'
   },
   chatWindow: {
@@ -424,7 +467,8 @@ export const thTH: TigerLocale = {
   code: {
     copyLabel: 'คัดลอก',
     copiedLabel: 'คัดลอกแล้ว',
-    copyFailedLabel: 'คัดลอกไม่สำเร็จ'
+    copyFailedLabel: 'คัดลอกไม่สำเร็จ',
+    scrollLabel: 'โค้ด'
   },
   commentThread: {
     emptyText: 'ไม่มีความคิดเห็น',
@@ -441,12 +485,15 @@ export const thTH: TigerLocale = {
     listAriaLabel: 'รายการความคิดเห็น',
     replySubmitText: 'ส่งการตอบกลับ',
     remainingRepliesText: 'แสดงที่เหลือ {count} รายการ',
+    duplicateIdText: 'รหัสความคิดเห็นซ้ำ {id}',
+    cycleText: 'ความคิดเห็นวนที่ {id}',
     maxDepthReachedText: 'ถึงความลึกสูงสุดของการตอบกลับแล้ว'
   },
   activityFeed: {
     emptyText: 'ไม่มีกิจกรรม',
     loadingText: 'กำลังโหลด...',
     listAriaLabel: 'กิจกรรม',
+    newItemText: 'กิจกรรมใหม่: {title}',
     otherGroupTitle: 'อื่นๆ'
   },
   notificationCenter: {
@@ -460,6 +507,9 @@ export const thTH: TigerLocale = {
     markReadText: 'ทำเครื่องหมายว่าอ่านแล้ว',
     markUnreadText: 'ทำเครื่องหมายว่ายังไม่อ่าน',
     defaultGroupTitle: 'ค่าเริ่มต้น',
+    filterAriaLabel: 'สถานะการอ่าน',
+    markedReadText: 'ทำเครื่องหมายว่าอ่านแล้ว {count} รายการ',
+    newItemText: 'การแจ้งเตือนใหม่: {title}',
     unreadCountText: 'ยังไม่อ่าน {count} รายการ'
   },
   select: {
@@ -470,7 +520,15 @@ export const thTH: TigerLocale = {
     clearAriaLabel: 'ล้างรายการที่เลือก',
     createOptionLabel: 'สร้าง "{label}"',
     moreCountText: '+อีก {count}',
-    loadingText: 'กำลังโหลด...',
+    loadingText: 'กำลังโหลด...'
+  },
+  cascader: {
+    levelLabel: 'ระดับ {level}',
+    backText: 'ย้อนกลับ',
+    expandAriaLabel: 'ขยาย',
+    collapseAriaLabel: 'ยุบ'
+  },
+  treeSelect: {
     levelLabel: 'ระดับ {level}',
     backText: 'ย้อนกลับ',
     expandAriaLabel: 'ขยาย',
@@ -541,7 +599,22 @@ export const thTH: TigerLocale = {
     sunburstTooltip: '{label}: {value} ({percent} %)',
     orgChartAriaLabel: 'แผนผังองค์กร',
     ganttAriaLabel: 'แผนภูมิแกนต์',
-    ganttTaskAriaLabel: '{label}, {start} ถึง {end}{progress}'
+    ganttTaskAriaLabel: '{label}, {start} ถึง {end}{progress}',
+    ganttTodayAriaLabel: 'วันนี้',
+    ganttUnknownDate: 'วันที่ไม่ทราบ',
+    chartAriaLabel: 'แผนภูมิ',
+    lineChartAriaLabel: 'แผนภูมิเส้น',
+    areaChartAriaLabel: 'แผนภูมิพื้นที่',
+    barChartAriaLabel: 'แผนภูมิแท่ง',
+    scatterChartAriaLabel: 'แผนภูมิกระจาย',
+    pieChartAriaLabel: 'แผนภูมิวงกลม',
+    radarChartAriaLabel: 'แผนภูมิเรดาร์',
+    heatmapChartAriaLabel: 'ฮีตแมป',
+    heatmapSummary: '{rows} แถว {columns} คอลัมน์',
+    funnelChartAriaLabel: 'แผนภูมิกรวย',
+    sunburstChartAriaLabel: 'แผนภูมิซันเบิร์สต์',
+    treemapChartAriaLabel: 'ทรีแมป',
+    gaugeChartAriaLabel: 'เกจ'
   },
   codeEditor: {
     editorAriaLabel: 'ตัวแก้ไขโค้ด'
@@ -555,6 +628,8 @@ export const thTH: TigerLocale = {
     editModeLabel: 'แก้ไข',
     splitModeLabel: 'แยก',
     previewModeLabel: 'ตัวอย่าง',
+    showEditorText: 'แก้ไข',
+    showPreviewText: 'ตัวอย่าง',
     bold: 'ตัวหนา',
     italic: 'ตัวเอียง',
     strikethrough: 'ขีดฆ่า',
@@ -664,7 +739,9 @@ export const thTH: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: 'ลบ {tag}',
-    clearAllLabel: 'ล้างแท็กทั้งหมด'
+    clearAllLabel: 'ล้างแท็กทั้งหมด',
+    duplicateText: 'เพิ่มแล้ว',
+    limitText: 'ถึงขีดจำกัดแท็กแล้ว'
   },
   input: {
     clearAriaLabel: 'ล้างช่องป้อน',
@@ -680,12 +757,6 @@ export const thTH: TigerLocale = {
     ariaLabel: 'แถบเลื่อน',
     minAriaLabel: 'ค่าต่ำสุด',
     maxAriaLabel: 'ค่าสูงสุด'
-  },
-  stepper: {
-    ariaLabel: 'ตัวปรับค่า',
-    valueAriaLabel: 'ค่า',
-    incrementAriaLabel: 'เพิ่ม',
-    decrementAriaLabel: 'ลด'
   },
   signature: {
     ariaLabel: 'แผ่นลายเซ็น',

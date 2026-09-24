@@ -18,7 +18,7 @@ import {
   collapseKeyOf,
   collapsePanelContentBaseClasses,
   collapsePanelContentWrapperClasses,
-  createAriaId,
+  createAriaIdScope,
   createCollapseTransitionController,
   getCollapseIconClasses,
   getCollapsePanelClasses,
@@ -107,8 +107,9 @@ export const CollapsePanel = defineComponent({
     const headerRef = ref<HTMLButtonElement>()
     const controllerReady = ref(false)
     const initialActive = isActive.value
-    const headerId = createAriaId({ prefix: 'tiger-collapse-header' })
-    const contentId = createAriaId({ prefix: 'tiger-collapse-content' })
+    const ariaIds = createAriaIdScope()
+    const headerId = ariaIds.next({ prefix: 'tiger-collapse-header' })
+    const contentId = ariaIds.next({ prefix: 'tiger-collapse-content' })
     let transitionController: ReturnType<typeof createCollapseTransitionController> | undefined
 
     const panelClasses = computed(() => {
@@ -146,8 +147,6 @@ export const CollapsePanel = defineComponent({
         return
       }
 
-      if (!collapseContext.accordion) return
-
       const action =
         event.key === 'ArrowDown'
           ? 'next'
@@ -161,55 +160,13 @@ export const CollapsePanel = defineComponent({
 
       if (!action) return
       event.preventDefault()
-      collapseContext.moveHeaderFocus(collapseKeyOf(props.panelKey), action)
+      collapseContext.moveHeaderFocus(event.currentTarget as HTMLButtonElement, action)
     }
 
-    onMounted(() => {
-      if (contentRef.value) {
-        transitionController = createCollapseTransitionController(contentRef.value, {
-          expanded: initialActive
-        })
-        controllerReady.value = true
+    watch(isActive, (expanded, wasExpanded) => {
+      if (wasExpanded && !expanded && contentRef.value?.contains(document.activeElement)) {
+        headerRef.value?.focus()
       }
-
-      collapseContext.registerHeader({
-        key: collapseKeyOf(props.panelKey),
-        el: {
-          focus: () => {
-            headerRef.value?.focus()
-          }
-        },
-        disabled: props.disabled
-      })
-    })
-
-    watch(
-      () => props.disabled,
-      (disabled) => {
-        collapseContext.registerHeader({
-          key: collapseKeyOf(props.panelKey),
-          el: {
-            focus: () => {
-              headerRef.value?.focus()
-            }
-          },
-          disabled
-        })
-      }
-    )
-
-    watch(
-      isActive,
-      (expanded) => {
-        transitionController?.update(expanded)
-      },
-      { flush: 'post' }
-    )
-
-    onBeforeUnmount(() => {
-      transitionController?.dispose()
-      transitionController = undefined
-      collapseContext.unregisterHeader(collapseKeyOf(props.panelKey))
     })
 
     return () => {
@@ -263,6 +220,7 @@ export const CollapsePanel = defineComponent({
           ref: headerRef,
           type: 'button',
           id: headerId,
+          'data-tiger-collapse-header': '',
           class: headerClasses.value,
           'aria-expanded': isActive.value,
           'aria-controls': contentId,
@@ -277,49 +235,38 @@ export const CollapsePanel = defineComponent({
         ? extraContent.length > 0
         : extraContent != null && extraContent !== ''
       const extraNode = hasExtra
-          ? h('span', { class: collapseExtraClasses }, extraContent as never)
-          : null
+        ? h('span', { class: collapseExtraClasses }, extraContent as never)
+        : null
 
-      const initialClass = controllerReady.value
-        ? undefined
-        : initialActive
-          ? 'max-h-none opacity-100'
-          : 'max-h-0 opacity-0'
-
-      const content = h(
-        'div',
-        {
-          ref: contentRef,
-          id: contentId,
-          'data-tiger-collapse-content': '',
-          class: classNames(collapsePanelContentWrapperClasses, initialClass),
-          role: isActive.value ? 'region' : undefined,
-          'aria-labelledby': isActive.value ? headerId : undefined,
-          ...(isActive.value
-            ? {}
-            : {
-                inert: true,
-                'aria-hidden': 'true'
-              })
-        },
-        [
-          h(
+      const content = isActive.value
+        ? h(
             'div',
             {
-              class: collapsePanelContentBaseClasses
+              ref: contentRef,
+              id: contentId,
+              'data-tiger-collapse-content': '',
+              class: collapsePanelContentWrapperClasses,
+              role: 'region',
+              'aria-labelledby': headerId
             },
-            slots.default?.()
+            [h('div', { class: collapsePanelContentBaseClasses }, slots.default?.())]
           )
-        ]
-      )
+        : null
 
+      const Heading = `h${collapseContext.headingLevel}` as 'h3'
       return h(
         'div',
         {
           class: panelClasses.value,
           style: props.style
         },
-        [h('div', { class: collapseHeaderRowClasses }, [headerButton, extraNode]), content]
+        [
+          h('div', { class: collapseHeaderRowClasses }, [
+            h(Heading, { class: 'm-0 min-w-0 flex-1 font-[inherit]' }, [headerButton]),
+            extraNode
+          ]),
+          content
+        ]
       )
     }
   }

@@ -19,6 +19,8 @@ React: `<Affix offsetTop={0}><div>Header</div></Affix>`
 
 ## Anchor
 
+Note: `href` 走 `link-utils`。`javascript:`、`data:`、`vbscript:` 不输出地址。
+
 Vue: `<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>`
 
 React: `<Anchor><AnchorLink href="#intro" title="Intro" /></Anchor>`
@@ -37,7 +39,7 @@ React: `<BackTop visibilityHeight={400} />`
 
 ## Breadcrumb
 
-Note: `maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。
+Note: `maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。`href` 走 `link-utils`，危险协议不输出地址。
 
 Vue: `<Breadcrumb><BreadcrumbItem href="/">Home</BreadcrumbItem><BreadcrumbItem>Here</BreadcrumbItem></Breadcrumb>`
 
@@ -50,6 +52,8 @@ Vue: `<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadc
 React: `<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadcrumb>`
 
 ## ContextMenu
+
+Note: 项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。
 
 Vue: `<ContextMenu><button>Surface</button><ContextMenuMenu><ContextMenuItem>Copy</ContextMenuItem></ContextMenuMenu></ContextMenu>`
 
@@ -115,6 +119,8 @@ React: `<FullscreenButton />`
 
 ## Menu
 
+Note: 项上的 `href` 和 schema 的 `path` / `href` / `iframeSrc` 走 `link-utils`。`path` 只作站内路径。危险协议和禁用项不输出 `href`。
+
 Vue: `<Menu :items="items" />`
 
 React: `<Menu items={items} />`
@@ -132,6 +138,8 @@ Vue: `<Menu><MenuItemGroup title="Team"><MenuItem :item-key="a">A</MenuItem></Me
 React: `<Menu><MenuItemGroup title="Team"><MenuItem itemKey="a">A</MenuItem></MenuItemGroup></Menu>`
 
 ## NavigationMenu
+
+Note: 链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferrer`。危险协议和禁用项不输出 `href`。
 
 Vue: `<NavigationMenu><NavigationMenuList><NavigationMenuItem value="docs"><NavigationMenuTrigger>Docs</NavigationMenuTrigger><NavigationMenuContent><NavigationMenuLink href="/guide">Guide</NavigationMenuLink></NavigationMenuContent></NavigationMenuItem></NavigationMenuList></NavigationMenu>`
 
@@ -169,6 +177,8 @@ React: `<NavigationMenu><NavigationMenuItem value="docs"><NavigationMenuTrigger>
 
 ## PageHeader
 
+Note: 返回地址走 `Link`，因此同样只接受 `link-utils` 的协议。危险地址不输出 `href`。
+
 Vue: `<PageHeader title="订单详情" />`
 
 React: `<PageHeader title="订单详情" />`
@@ -182,6 +192,8 @@ Vue: `<Pagination :total="100" :current="1" />`
 React: `<Pagination total={100} current={1} />`
 
 ## ScrollSpy
+
+Note: 项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。
 
 Vue: `<ScrollSpy :items="items" />`
 
@@ -225,10 +237,10 @@ React: `<Tabs activeKey={activeKey}><TabPane tabKey={1} label="Overview">Panel</
 
 ## Tree
 
-Note: `checkStrictly` 默认 false（父子级联）。TreeSelect 默认 true（独立勾选）。`height` 是页面窗口，不是 overlay `listHeight`。
+Note: `checkStrictly` 默认 false（父子级联）。勾选只在 `treeitem` 上用 `aria-checked`，勾选标记不另做一颗复选框。`posinset` / `setsize` 按同一父节点下的兄弟。搜索零命中是空列表。每棵树有自己的拖拽容器。`height` 是页面窗口，不是 overlay `listHeight`。
 
 Vue: `<Tree :tree-data="treeData" />`
 
 React: `<Tree treeData={treeData} />`
 
-Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
+Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.

@@ -2,11 +2,10 @@ import React, { createContext, useCallback, useContext, useMemo, useRef, useStat
 import {
   classNames,
   getCollapseContainerClasses,
-  getNextAccordionHeaderIndex,
+  getCollapseHeaderTarget,
   normalizeActiveKeys,
   togglePanelKey,
   type CollapseHeaderFocusAction,
-  type CollapseHeaderRecord,
   type ExpandIconPosition,
   type CollapseProps as CoreCollapseProps
 } from '@expcat/tigercat-core'
@@ -17,10 +16,9 @@ export interface CollapseContextValue {
   expandIconPosition: ExpandIconPosition
   bordered: boolean
   ghost: boolean
+  headingLevel: 1 | 2 | 3 | 4 | 5 | 6
   handlePanelClick: (key: string | number) => void
-  registerHeader: (record: CollapseHeaderRecord) => void
-  unregisterHeader: (key: string) => void
-  moveHeaderFocus: (currentKey: string, action: CollapseHeaderFocusAction) => void
+  moveHeaderFocus: (current: HTMLButtonElement, action: CollapseHeaderFocusAction) => void
 }
 
 const CollapseContext = createContext<CollapseContextValue | null>(null)
@@ -46,6 +44,7 @@ export const Collapse: React.FC<CollapseProps> = ({
   bordered = true,
   expandIconPosition = 'start',
   ghost = false,
+  headingLevel = 3,
   className,
   style,
   onChange,
@@ -55,7 +54,7 @@ export const Collapse: React.FC<CollapseProps> = ({
   const [internalActiveKeys, setInternalActiveKeys] = useState<(string | number)[]>(() =>
     normalizeActiveKeys(defaultActiveKey, { accordion })
   )
-  const headersRef = useRef<CollapseHeaderRecord[]>([])
+  const rootRef = useRef<HTMLDivElement>(null)
 
   const activeKeys = useMemo(() => {
     return controlledActiveKey !== undefined
@@ -76,25 +75,19 @@ export const Collapse: React.FC<CollapseProps> = ({
     [activeKeys, accordion, controlledActiveKey, onChange]
   )
 
-  const registerHeader = useCallback((record: CollapseHeaderRecord) => {
-    const headers = headersRef.current
-    const index = headers.findIndex((header) => header.key === record.key)
-    if (index >= 0) {
-      headers[index] = record
-    } else {
-      headers.push(record)
-    }
-  }, [])
-
-  const unregisterHeader = useCallback((key: string) => {
-    headersRef.current = headersRef.current.filter((header) => header.key !== key)
-  }, [])
-
-  const moveHeaderFocus = useCallback((currentKey: string, action: CollapseHeaderFocusAction) => {
-    const next = getNextAccordionHeaderIndex(headersRef.current, currentKey, action)
-    if (next >= 0) {
-      headersRef.current[next]?.el.focus()
-    }
+  const moveHeaderFocus = useCallback((current: HTMLButtonElement, action: CollapseHeaderFocusAction) => {
+    const root = rootRef.current
+    if (!root) return
+    const buttons = Array.from(
+      root.querySelectorAll<HTMLButtonElement>('[data-tiger-collapse-header]')
+    ).filter((button) => !button.disabled && button.getAttribute('aria-disabled') !== 'true')
+    const index = buttons.indexOf(current)
+    const next = getCollapseHeaderTarget(
+      buttons.map(() => ({ disabled: false })),
+      index,
+      action
+    )
+    if (next >= 0) buttons[next]?.focus()
   }, [])
 
   const containerClasses = useMemo(() => {
@@ -108,9 +101,8 @@ export const Collapse: React.FC<CollapseProps> = ({
       expandIconPosition,
       bordered,
       ghost,
+      headingLevel,
       handlePanelClick,
-      registerHeader,
-      unregisterHeader,
       moveHeaderFocus
     }),
     [
@@ -119,16 +111,15 @@ export const Collapse: React.FC<CollapseProps> = ({
       expandIconPosition,
       bordered,
       ghost,
+      headingLevel,
       handlePanelClick,
-      registerHeader,
-      unregisterHeader,
       moveHeaderFocus
     ]
   )
 
   return (
     <CollapseContext.Provider value={contextValue}>
-      <div className={containerClasses} style={style} {...rest}>
+      <div ref={rootRef} className={containerClasses} style={style} data-tiger-collapse="" {...rest}>
         {children}
       </div>
     </CollapseContext.Provider>

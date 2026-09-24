@@ -23,7 +23,7 @@ export interface UseFullscreenReturn {
 export function useFullscreen(options: UseFullscreenOptions = {}): UseFullscreenReturn {
   const optionsRef = useRef(options)
   optionsRef.current = options
-  const [supported] = useState(() => isFullscreenSupported())
+  const [supported, setSupported] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   const sync = useCallback(() => {
@@ -34,6 +34,7 @@ export function useFullscreen(options: UseFullscreenOptions = {}): UseFullscreen
   }, [])
 
   useEffect(() => {
+    setSupported(isFullscreenSupported())
     sync()
     return subscribeFullscreenChange(sync)
   }, [sync])
@@ -51,9 +52,10 @@ export function useFullscreen(options: UseFullscreenOptions = {}): UseFullscreen
   }, [])
 
   const exit = useCallback(async () => {
-    if (!getFullscreenElement()) return
+    const target = resolveFullscreenTarget(optionsRef.current.target)
+    if (!target || !isElementFullscreen(target)) return
     try {
-      await exitElementFullscreen()
+      await exitElementFullscreen(target)
     } catch (error) {
       const err = error instanceof Error ? error : new Error('Fullscreen exit failed')
       optionsRef.current.onError?.(err)

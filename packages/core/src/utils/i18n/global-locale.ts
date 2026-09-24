@@ -1,29 +1,32 @@
 import type { TigerLocale } from '../../types/locale'
-import { isBrowser } from '../env'
 
-interface GlobalTigerLocaleEntry {
+interface TigerLocaleEntry {
   id: number
   locale?: Partial<TigerLocale>
 }
 
-export interface GlobalTigerLocaleHandle {
+export interface TigerLocaleHandle {
   update(locale?: Partial<TigerLocale>): void
   dispose(): void
 }
 
 export interface TigerLocaleScope {
-  createHandle(locale?: Partial<TigerLocale>): GlobalTigerLocaleHandle
+  createHandle(locale?: Partial<TigerLocale>): TigerLocaleHandle
   getLocale(): Partial<TigerLocale> | undefined
   reset(): void
 }
 
+/**
+ * Locale stack owned by one ConfigProvider (or one server request).
+ * There is no module-level default stack.
+ */
 export function createTigerLocaleScope(): TigerLocaleScope {
   let nextId = 0
-  const stack: GlobalTigerLocaleEntry[] = []
+  const stack: TigerLocaleEntry[] = []
 
   return {
-    createHandle(locale?: Partial<TigerLocale>): GlobalTigerLocaleHandle {
-      const entry: GlobalTigerLocaleEntry = {
+    createHandle(locale?: Partial<TigerLocale>): TigerLocaleHandle {
+      const entry: TigerLocaleEntry = {
         id: ++nextId,
         locale
       }
@@ -35,18 +38,14 @@ export function createTigerLocaleScope(): TigerLocaleScope {
         },
         dispose() {
           const index = stack.findIndex((item) => item.id === entry.id)
-          if (index !== -1) {
-            stack.splice(index, 1)
-          }
+          if (index !== -1) stack.splice(index, 1)
         }
       }
     },
     getLocale(): Partial<TigerLocale> | undefined {
       for (let index = stack.length - 1; index >= 0; index -= 1) {
         const locale = stack[index]?.locale
-        if (locale) {
-          return locale
-        }
+        if (locale) return locale
       }
       return undefined
     },
@@ -54,40 +53,5 @@ export function createTigerLocaleScope(): TigerLocaleScope {
       stack.length = 0
       nextId = 0
     }
-  }
-}
-
-/**
- * Browser keeps a shared default scope so imperative APIs can read the
- * ConfigProvider locale. Node does not install that default: callers must
- * create a scope (or tests must reset) so SSR requests do not share a
- * process-wide stack.
- */
-let defaultScope: TigerLocaleScope | undefined
-
-function getDefaultScope(): TigerLocaleScope {
-  if (!defaultScope) {
-    defaultScope = createTigerLocaleScope()
-  }
-  return defaultScope
-}
-
-export function createGlobalTigerLocaleHandle(
-  locale?: Partial<TigerLocale>
-): GlobalTigerLocaleHandle {
-  return getDefaultScope().createHandle(locale)
-}
-
-export function getGlobalTigerLocale(): Partial<TigerLocale> | undefined {
-  if (!isBrowser() && !defaultScope) {
-    return undefined
-  }
-  return getDefaultScope().getLocale()
-}
-
-export function resetTigerLocaleScope(): void {
-  defaultScope?.reset()
-  if (!isBrowser()) {
-    defaultScope = undefined
   }
 }

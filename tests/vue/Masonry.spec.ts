@@ -39,9 +39,9 @@ function stubPrototypeHeights(heights: number[]): MockInstance {
   })
 }
 
-function itemLefts(container: HTMLElement): number[] {
+function itemInlineStarts(container: HTMLElement): number[] {
   return Array.from(container.querySelectorAll<HTMLElement>('[data-masonry-item]')).map((item) =>
-    Number.parseFloat(item.style.left || '0')
+    Number.parseFloat(item.style.insetInlineStart || item.style.left || '0')
   )
 }
 
@@ -75,7 +75,7 @@ describe('Masonry', () => {
 
     it('applies custom gap, column and item class names', () => {
       const { container } = render(Masonry, {
-        props: { gap: 24, columnClassName: 'col-extra', itemClassName: 'item-extra' },
+        props: { gap: 24, itemClassName: 'item-extra' },
         slots: { default: () => itemNodes(LABELS) }
       })
       const root = container.querySelector('[data-masonry]') as HTMLElement
@@ -85,14 +85,32 @@ describe('Masonry', () => {
   })
 
   describe('Measured distribution', () => {
-    it('packs items into the currently shortest column', async () => {
+    it('keeps source order in CSS columns by default', async () => {
       const spy = stubPrototypeHeights([100, 50, 150, 10])
       const { container } = render(Masonry, {
         props: { columns: 2 },
         slots: { default: () => itemNodes(LABELS) }
       })
       await nextTick()
-      const lefts = itemLefts(container)
+      const root = container.querySelector('[data-masonry]') as HTMLElement
+      expect(root.style.columnCount).toBe('2')
+      expect(root.getAttribute('data-masonry-order')).toBeNull()
+      expect(root.style.position).not.toBe('relative')
+      expect(itemInlineStarts(container).every((start) => start === 0)).toBe(true)
+      spy.mockRestore()
+    })
+
+    it('packs items into the currently shortest column', async () => {
+      const spy = stubPrototypeHeights([100, 50, 150, 10])
+      const { container } = render(Masonry, {
+        props: { columns: 2, layout: 'shortest' },
+        slots: { default: () => itemNodes(LABELS) }
+      })
+      await nextTick()
+      const root = container.querySelector('[data-masonry]') as HTMLElement
+      expect(root.getAttribute('data-masonry-order')).toBe('visual')
+      expect(root.textContent).toContain('Visual order differs from source order')
+      const lefts = itemInlineStarts(container)
       expect(lefts[0]).toBe(lefts[3])
       expect(lefts[1]).toBe(lefts[2])
       spy.mockRestore()
@@ -106,7 +124,7 @@ describe('Masonry', () => {
           return () =>
             h(
               Masonry,
-              { columns: 2 },
+              { columns: 2, layout: 'shortest' },
               { default: () => items.value.map((label) => h('div', { key: label }, label)) }
             )
         }
@@ -117,7 +135,7 @@ describe('Masonry', () => {
       await nextTick()
 
       expect(container.querySelectorAll('[data-masonry-item]')).toHaveLength(5)
-      const lefts = itemLefts(container)
+      const lefts = itemInlineStarts(container)
       expect(lefts[0]).toBe(lefts[3])
       expect(lefts[0]).toBe(lefts[4])
       expect(lefts[1]).toBe(lefts[2])
@@ -186,7 +204,7 @@ describe('Masonry', () => {
       const spy = stubPrototypeHeights([100, 50, 150, 10])
       const onLayout = vi.fn()
       const { rerender } = render(Masonry, {
-        props: { columns: 2, gap: 16, onLayout },
+        props: { columns: 2, gap: 16, layout: 'shortest', onLayout },
         slots: { default: () => itemNodes(LABELS) }
       })
       await nextTick()
@@ -194,7 +212,7 @@ describe('Masonry', () => {
       // distribution [0,3] / [1,2]: c0=100+10+g, c1=50+150+g
       expect(onLayout.mock.calls.at(-1)![0].columnHeights).toEqual([126, 216])
 
-      rerender({ columns: 2, gap: 32, onLayout })
+      rerender({ columns: 2, gap: 32, layout: 'shortest', onLayout })
       await nextTick()
       await nextTick()
       expect(onLayout.mock.calls.at(-1)![0].columnHeights).toEqual([142, 232])
@@ -221,7 +239,7 @@ describe('Masonry', () => {
       instance.value!.relayout()
       await nextTick()
 
-      const lefts = itemLefts(container)
+      const lefts = itemInlineStarts(container)
       expect(lefts[0]).toBe(lefts[3])
       expect(lefts[1]).toBe(lefts[2])
     })

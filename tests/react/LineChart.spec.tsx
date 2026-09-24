@@ -215,7 +215,7 @@ describe('LineChart', () => {
     })
   })
 
-  it('tracks the nearest point on the plot when showPoints is off', () => {
+  it('tracks the nearest point on the plot when showPoints is off', async () => {
     const { container } = renderWithProps(LineChart, {
       data: basicData,
       showPoints: false,
@@ -223,10 +223,13 @@ describe('LineChart', () => {
     })
     const hit = container.querySelector('[data-plot-hit]')!
     fireEvent.mouseMove(hit, { clientX: 40, clientY: 40 })
+    await act(async () => {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    })
     expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
   })
 
-  it('fires onPointHover from the plot hit target when hoverable', () => {
+  it('fires onPointHover from the plot hit target when hoverable', async () => {
     const onPointHover = vi.fn()
     const { container } = renderWithProps(LineChart, {
       data: basicData,
@@ -236,6 +239,9 @@ describe('LineChart', () => {
       ...defaultSize
     })
     fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, { clientX: 40, clientY: 40 })
+    await act(async () => {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    })
     expect(onPointHover).toHaveBeenCalledWith(
       expect.any(Number),
       expect.any(Number),

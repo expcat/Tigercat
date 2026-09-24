@@ -26,16 +26,17 @@ export interface SplitterProps {
    */
   sizes?: (number | string)[]
   /**
-   * Minimum size of any pane in pixels.
-   * When `min * paneCount + gutters` exceeds the container, panes scale
-   * proportionally to fit instead of each clamping independently.
+   * Minimum pane size in pixels. A number applies to every pane.
+   * An array is per pane (missing entries are 0).
+   * When the mins cannot fit, panes scale proportionally.
    * @default 0
    */
-  min?: number
+  min?: number | number[]
   /**
-   * Maximum size of any pane in pixels
+   * Maximum pane size in pixels. A number applies to every pane.
+   * An array is per pane.
    */
-  max?: number
+  max?: number | number[]
   /**
    * Width of the gutter/divider in pixels
    * @default 4

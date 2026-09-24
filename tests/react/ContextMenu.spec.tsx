@@ -44,14 +44,18 @@ describe('ContextMenu', () => {
     render(<Demo />)
 
     expect(screen.getByText('Surface')).toBeInTheDocument()
+    expect(screen.queryByText('Copy')).not.toBeInTheDocument()
+    act(() => {
+      openMenu()
+    })
     expect(screen.getByText('Copy')).toBeInTheDocument()
     expect(screen.getByText('Delete')).toBeInTheDocument()
   })
 
   it('is hidden by default', () => {
     render(<Demo />)
-    const wrapper = document.querySelector('[data-tiger-context-menu]')
-    expect(wrapper).toHaveAttribute('hidden')
+    expect(document.querySelector('[data-tiger-context-menu]')).toBeNull()
+    expect(document.querySelector('[data-tiger-context-menu-point]')).toBeNull()
   })
 
   it('opens on contextmenu, prevents the browser menu, and records data-state', () => {
@@ -74,14 +78,19 @@ describe('ContextMenu', () => {
     expect(getMenu()).not.toHaveAttribute('hidden')
   })
 
-  it('positions the virtual reference at the cursor', () => {
-    render(<Demo />)
+  it('uses a virtual rect and does not leave a point node beside the trigger', () => {
+    const { container } = render(<Demo />)
     act(() => {
       openMenu(120, 60)
     })
-    const point = document.querySelector('[data-tiger-context-menu-point]') as HTMLElement
-    expect(point.style.left).toBe('120px')
-    expect(point.style.top).toBe('60px')
+    expect(document.querySelector('[data-tiger-context-menu-point]')).toBeNull()
+    expect(container.querySelector('[data-tiger-context-menu-point]')).toBeNull()
+    const menu = getMenu()
+    expect(menu).toBeTruthy()
+    act(() => {
+      openMenu(180, 90)
+    })
+    expect(getMenu()).toBe(menu)
   })
 
   it('closes on item click and Escape', async () => {
@@ -90,18 +99,18 @@ describe('ContextMenu', () => {
     act(() => {
       openMenu()
     })
-    expect(getMenu()).not.toHaveAttribute('hidden')
+    expect(getMenu()).toBeTruthy()
     await fireEvent.click(screen.getByText('Copy'))
-    expect(getMenu()).toHaveAttribute('hidden')
+    expect(document.querySelector('[data-tiger-context-menu]')).toBeNull()
 
     act(() => {
       openMenu()
     })
     await fireEvent.click(screen.getByText('Disabled'))
-    expect(getMenu()).not.toHaveAttribute('hidden')
+    expect(getMenu()).toBeTruthy()
 
     await fireEvent.keyDown(document, { key: 'Escape' })
-    expect(getMenu()).toHaveAttribute('hidden')
+    expect(document.querySelector('[data-tiger-context-menu]')).toBeNull()
   })
 
   it('does not open when disabled and leaves the native menu intact', () => {
@@ -112,7 +121,7 @@ describe('ContextMenu', () => {
       trigger.dispatchEvent(event)
     })
     expect(event.defaultPrevented).toBe(false)
-    expect(document.querySelector('[data-tiger-context-menu]')).toHaveAttribute('hidden')
+    expect(document.querySelector('[data-tiger-context-menu]')).toBeNull()
   })
 
   it('renders open when defaultOpen is true', () => {

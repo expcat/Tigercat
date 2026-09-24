@@ -10,7 +10,7 @@ import {
 } from 'vue'
 import {
   applyWheelZoom,
-  captureActiveElement,
+
   clampLightboxIndex,
   classNames,
   coerceClassValue,
@@ -46,7 +46,7 @@ import {
   resolveLightboxKeyAction,
   resolveLightboxNavIndex,
   resolveLightboxScaleRange,
-  restoreFocus,
+
   zoomInIconPath,
   zoomOutIconPath,
   type GestureTransform,
@@ -128,10 +128,8 @@ export const ImagePreview = defineComponent({
     const dragging = ref(false)
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
-    let previousActive: HTMLElement | null = null
     let gestureSession: ReturnType<typeof createLightboxGestureSession> | null = null
     let detachWheel: (() => void) | undefined
-    let restoreOnClose = false
 
     const resetTransform = () => {
       transform.value = createDefaultTransform()
@@ -158,7 +156,7 @@ export const ImagePreview = defineComponent({
     )
 
     useVueBodyScrollLock(shouldRender)
-    useVueFocusTrap({ enabled: shouldRender, containerRef: rootRef, inert: true })
+    useVueFocusTrap({ enabled: shouldRender, containerRef: rootRef, inert: true, autoFocus: true })
 
     const handleClose = () => {
       emit('update:open', false)
@@ -225,7 +223,10 @@ export const ImagePreview = defineComponent({
         canNavigate: props.showNav && resolved.value.length > 1,
         zoomable: props.zoomable,
         rotatable: props.rotatable,
-        rtl: config.value.direction === 'rtl'
+        rtl: config.value.direction === 'rtl',
+        altKey: event.altKey,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey
       })
       if (!action) return
       event.preventDefault()
@@ -260,8 +261,11 @@ export const ImagePreview = defineComponent({
       if (!root) return
       const handler = (event: WheelEvent) => {
         if (!props.zoomable) return
+        const current = transform.value.scale
+        const next = applyWheelZoom(current, event.deltaY, scaleRange.value)
+        if (Math.abs(next - current) < 1e-6) return
         event.preventDefault()
-        setScale(applyWheelZoom(transform.value.scale, event.deltaY, scaleRange.value))
+        setScale(next)
       }
       root.addEventListener('wheel', handler, { passive: false })
       detachWheel = () => root.removeEventListener('wheel', handler)
@@ -281,6 +285,17 @@ export const ImagePreview = defineComponent({
         swipeable: props.touchSwipeable,
         swipeThreshold: props.touchSwipeThreshold,
         imageCount: resolved.value.length,
+        rtl: config.value.direction === 'rtl',
+        getPanLimits: () => {
+          const img = rootRef.value?.querySelector('img')
+          const root = rootRef.value
+          if (!img || !root) return { maxX: 0, maxY: 0 }
+          const scale = transform.value.scale
+          return {
+            maxX: Math.max(0, (img.offsetWidth * scale - root.clientWidth) / 2),
+            maxY: Math.max(0, (img.offsetHeight * scale - root.clientHeight) / 2)
+          }
+        },
         onTransform: (next) => {
           transform.value = { ...transform.value, ...next }
           if (next.scale != null) emit('scale-change', next.scale)
@@ -304,21 +319,12 @@ export const ImagePreview = defineComponent({
           detachWheel = undefined
           gestureSession?.dispose()
           gestureSession = null
-          if (restoreOnClose) {
-            restoreFocus(previousActive)
-            restoreOnClose = false
-          }
-          document.removeEventListener('keydown', handleKeyDown)
           return
         }
 
-        previousActive = captureActiveElement()
-        restoreOnClose = true
-        document.addEventListener('keydown', handleKeyDown)
         attachGesture()
         await nextTick()
         attachWheel()
-        focusFirst([closeButtonRef.value, rootRef.value])
       },
       { flush: 'post', immediate: true }
     )
@@ -326,8 +332,6 @@ export const ImagePreview = defineComponent({
     onBeforeUnmount(() => {
       detachWheel?.()
       gestureSession?.dispose()
-      if (isBrowser()) document.removeEventListener('keydown', handleKeyDown)
-      if (restoreOnClose) restoreFocus(previousActive)
     })
 
     return () => {
@@ -417,7 +421,7 @@ export const ImagePreview = defineComponent({
               'aria-label': labels.value.previousImageAriaLabel,
               type: 'button'
             },
-            [svgIcon(prevIconPath)]
+            [svgIcon(config.value.direction === 'rtl' ? nextIconPath : prevIconPath)]
           ),
           h(
             'button',
@@ -428,7 +432,7 @@ export const ImagePreview = defineComponent({
               'aria-label': labels.value.nextImageAriaLabel,
               type: 'button'
             },
-            [svgIcon(nextIconPath)]
+            [svgIcon(config.value.direction === 'rtl' ? prevIconPath : nextIconPath)]
           )
         )
       }
@@ -529,6 +533,7 @@ export const ImagePreview = defineComponent({
             onClick: attrOnClick,
             onKeydown: (event: KeyboardEvent) => {
               attrOnKeydown?.(event)
+              if (!event.defaultPrevented) handleKeyDown(event)
             }
           },
           children

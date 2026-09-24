@@ -1,6 +1,8 @@
 import React from 'react'
 import {
+  bindDragContainerItems,
   classNames,
+  commitCrossContainerDrop,
   reorderSequence,
   type DragItem,
   type DragProps as CoreDragProps
@@ -45,6 +47,10 @@ export function Drag<T extends DragItem = DragItem>({
     onDragEnd,
     onDrop: (event) => {
       onDropRef.current?.(event)
+      if (event.fromContainerId !== event.toContainerId) {
+        commitCrossContainerDrop(event)
+        return
+      }
       if (event.fromIndex === event.toIndex) return
       const next = reorderSequence(itemsRef.current, event.fromIndex, event.toIndex).map(
         (item, index) => ({ ...item, index })
@@ -52,6 +58,15 @@ export function Drag<T extends DragItem = DragItem>({
       onItemsChangeRef.current?.(next)
     }
   })
+
+  React.useEffect(
+    () =>
+      bindDragContainerItems(drag.containerId, {
+        getItems: () => itemsRef.current,
+        commit: (next) => onItemsChangeRef.current?.(next)
+      }),
+    [drag.containerId]
+  )
 
   const render = children ?? renderItem
   const zoneProps = drag.getDropZoneProps()

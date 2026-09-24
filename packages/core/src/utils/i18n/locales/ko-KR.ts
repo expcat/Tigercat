@@ -14,6 +14,9 @@ export const koKR: TigerLocale = {
     cancelText: '취소',
     closeText: '닫기',
     loadingText: '로딩 중...',
+    loadingFinishedText: '로딩 완료',
+    loadingFailedText: '로딩 실패',
+    viewText: '보기',
     emptyText: '데이터 없음',
     noMoreText: '더 이상 없습니다',
     searchPlaceholder: '검색',
@@ -47,7 +50,8 @@ export const koKR: TigerLocale = {
     ariaLabel: 'QR 코드',
     expiredText: 'QR 코드가 만료되었습니다',
     refreshText: '새로 고침',
-    loadingText: '로딩 중...'
+    loadingText: '로딩 중...',
+    errorText: 'QR 코드를 만들 수 없습니다'
   },
   marquee: {
     ariaLabel: '스크롤 콘텐츠'
@@ -55,10 +59,25 @@ export const koKR: TigerLocale = {
   image: {
     previewAriaLabel: '{alt} 미리보기',
     previewFallbackAlt: '이미지',
-    groupAriaLabel: '이미지 그룹'
+    groupAriaLabel: '이미지 그룹',
+    loadErrorText: '이미지를 불러오지 못했습니다'
   },
   imageCompare: {
-    ariaLabel: '이미지 비교'
+    ariaLabel: '이미지 비교',
+    beforeAlt: '이전',
+    afterAlt: '이후',
+    valueText: '이전 면의 {percent}%가 보입니다'
+  },
+  text: {
+    copyLabel: '복사',
+    copiedLabel: '복사됨',
+    copyFailedLabel: '복사 실패',
+  },
+  watermark: {
+    imageErrorText: '워터마크 이미지를 불러오지 못했습니다'
+  },
+  segmented: {
+    ariaLabel: '옵션'
   },
   descriptions: {
     colon: ':'
@@ -67,6 +86,9 @@ export const koKR: TigerLocale = {
     avatarAlt: '아바타',
     dragHandleAriaLabel: '순서 변경'
   },
+  masonry: {
+    visualOrderText: '보이는 순서는 원본 순서와 다릅니다'
+  },
   scrollArea: {
     ariaLabel: '스크롤 영역'
   },
@@ -74,7 +96,8 @@ export const koKR: TigerLocale = {
     pageBreak: '페이지 나누기'
   },
   timeline: {
-    pendingText: '로딩 중...'
+    pendingText: '로딩 중...',
+    pendingReplacedText: '업데이트가 끝났습니다'
   },
   workflowTimeline: {
     pending: '대기 중',
@@ -216,7 +239,11 @@ export const koKR: TigerLocale = {
     branchExpression: '식',
     branchExpressionPlaceholder: 'amount > 1000',
     tabNotApplicable: '이 노드 유형에서는 사용하지 않습니다',
+    publishText: '게시',
     publishBlocked: '차단 항목이 있어 게시할 수 없습니다'
+  },
+  workflowDetailShell: {
+    ariaLabel: '워크플로 상세'
   },
   progress: {
     ariaLabel: '진행률'
@@ -259,7 +286,9 @@ export const koKR: TigerLocale = {
     loadingText: '로딩 중',
     expandText: '펼치기',
     collapseText: '접기',
-    selectAllText: '전체 선택',
+    selectAllText: '이 페이지 모두 선택',
+    selectLoadedText: '불러온 행 모두 선택',
+    tableAriaLabel: '데이터 표',
     selectRowAriaLabel: '{row}행 선택',
     sortByText: '{column} 기준 정렬',
     clearSortText: '정렬 해제',
@@ -275,9 +304,13 @@ export const koKR: TigerLocale = {
     allText: '전체',
     filterPlaceholder: '필터...',
     exportCsvText: 'CSV 내보내기',
-    exportExcelText: 'Excel 내보내기',
     exportCsvAriaLabel: 'CSV로 내보내기',
-    exportExcelAriaLabel: 'Excel로 내보내기',
+    selectionCountText: '{count}개 선택됨',
+    sortAnnouncementText: '{column} {direction}으로 정렬됨',
+    sortAscendingText: '오름차순',
+    sortDescendingText: '내림차순',
+    sortNoneText: '정렬 안 함',
+    dragRowAriaLabel: '{row}행 끌기',
     expandRowAriaLabel: '행 펼치기',
     collapseRowAriaLabel: '행 접기',
     sortMenuAriaLabel: '정렬',
@@ -325,14 +358,17 @@ export const koKR: TigerLocale = {
     nextText: '다음',
     finishText: '완료',
     closeAriaLabel: '투어 닫기',
-    dialogAriaLabel: '둘러보기'
+    dialogAriaLabel: '둘러보기',
+    loadErrorText: '이 투어를 불러오지 못했습니다.',
   },
   calendar: {
     previousMonth: '이전 달',
     nextMonth: '다음 달',
     previousYear: '이전 해',
     nextYear: '다음 해',
-    eventCountText: '{n}개 일정'
+    eventCountText: '{n}개 일정',
+    switchToYear: '연도 보기로 전환',
+    switchToMonth: '월 보기로 전환'
   },
   fullscreen: {
     enterAriaLabel: '전체 화면',
@@ -343,7 +379,8 @@ export const koKR: TigerLocale = {
     pathAriaLabel: '파일 경로',
     listboxAriaLabel: '파일',
     searchAriaLabel: '파일 검색',
-    emptyText: '빈 폴더'
+    emptyText: '빈 폴더',
+    resultCountText: '{count}개'
   },
   imageViewer: {
     dialogAriaLabel: '이미지 뷰어',
@@ -377,6 +414,7 @@ export const koKR: TigerLocale = {
     resizeHandleS: '아래',
     resizeHandleSw: '왼쪽 아래',
     resizeHandleW: '왼쪽',
+    cropSizeText: '너비 {width}, 높이 {height}',
     loadingCropImageAriaLabel: '자를 이미지 불러오는 중',
     loadErrorAriaLabel: '자를 이미지를 불러오지 못했습니다',
     fileTooLargeText: '파일 크기가 {maxSize}을(를) 초과합니다',
@@ -394,10 +432,14 @@ export const koKR: TigerLocale = {
     ellipseToolText: '타원',
     polygonToolText: '다각형',
     freehandToolText: '자유 그리기',
-    deleteText: '삭제'
+    deleteText: '삭제',
+    annotationLoadFailedText: '이미지를 불러오지 못했습니다.',
+    annotationRetryText: '다시 시도',
+    annotationTooSmallText: '주석이 너무 작습니다.',
+    annotationPolygonIncompleteText: '다각형은 점이 3개 이상 필요합니다.'
   },
   status: {
-    tagCloseAriaLabel: '태그 닫기',
+    tagCloseAriaLabel: '{label} 닫기',
     badgeLabel: '알림',
     badgeCountLabel: '알림 {count}개'
   },
@@ -410,6 +452,7 @@ export const koKR: TigerLocale = {
     unassignedSwimlaneText: '미지정',
     wipLimitText: 'WIP 제한: {limit}',
     dragHintText: '드래그하여 이동',
+    grabAnnouncementText: '{card}. {from}에서 {to}로. {count}개 중 {position}번째.',
     boardAriaLabel: '작업 보드'
   },
   chatWindow: {
@@ -424,7 +467,8 @@ export const koKR: TigerLocale = {
   code: {
     copyLabel: '복사',
     copiedLabel: '복사됨',
-    copyFailedLabel: '복사 실패'
+    copyFailedLabel: '복사 실패',
+    scrollLabel: '코드'
   },
   commentThread: {
     emptyText: '댓글이 없습니다',
@@ -441,12 +485,15 @@ export const koKR: TigerLocale = {
     listAriaLabel: '댓글 목록',
     replySubmitText: '답글 보내기',
     remainingRepliesText: '남은 {count}개 보기',
+    duplicateIdText: '댓글 id {id}가 중복되었습니다',
+    cycleText: '댓글이 {id}에서 순환합니다',
     maxDepthReachedText: '최대 답글 깊이에 도달했습니다'
   },
   activityFeed: {
     emptyText: '활동이 없습니다',
     loadingText: '로딩 중...',
     listAriaLabel: '활동',
+    newItemText: '새 활동: {title}',
     otherGroupTitle: '기타'
   },
   notificationCenter: {
@@ -460,6 +507,9 @@ export const koKR: TigerLocale = {
     markReadText: '읽음으로 표시',
     markUnreadText: '읽지 않음으로 표시',
     defaultGroupTitle: '기본',
+    filterAriaLabel: '읽음 상태',
+    markedReadText: '{count}개를 읽음으로 표시했습니다',
+    newItemText: '새 알림: {title}',
     unreadCountText: '읽지 않음 {count}개'
   },
   select: {
@@ -470,7 +520,15 @@ export const koKR: TigerLocale = {
     clearAriaLabel: '선택 지우기',
     createOptionLabel: '"{label}" 만들기',
     moreCountText: '외 {count}개',
-    loadingText: '불러오는 중...',
+    loadingText: '불러오는 중...'
+  },
+  cascader: {
+    levelLabel: '{level}단계',
+    backText: '뒤로',
+    expandAriaLabel: '펼치기',
+    collapseAriaLabel: '접기'
+  },
+  treeSelect: {
     levelLabel: '{level}단계',
     backText: '뒤로',
     expandAriaLabel: '펼치기',
@@ -541,7 +599,22 @@ export const koKR: TigerLocale = {
     sunburstTooltip: '{label}: {value} ({percent}％)',
     orgChartAriaLabel: '조직도',
     ganttAriaLabel: '간트 차트',
-    ganttTaskAriaLabel: '{label}, {start} ~ {end}{progress}'
+    ganttTaskAriaLabel: '{label}, {start} ~ {end}{progress}',
+    ganttTodayAriaLabel: '오늘',
+    ganttUnknownDate: '알 수 없는 날짜',
+    chartAriaLabel: '차트',
+    lineChartAriaLabel: '꺾은선형 차트',
+    areaChartAriaLabel: '영역 차트',
+    barChartAriaLabel: '막대 차트',
+    scatterChartAriaLabel: '분산형 차트',
+    pieChartAriaLabel: '원형 차트',
+    radarChartAriaLabel: '방사형 차트',
+    heatmapChartAriaLabel: '히트맵',
+    heatmapSummary: '{rows}행 {columns}열',
+    funnelChartAriaLabel: '깔때기 차트',
+    sunburstChartAriaLabel: '선버스트',
+    treemapChartAriaLabel: '트리맵',
+    gaugeChartAriaLabel: '게이지'
   },
   codeEditor: {
     editorAriaLabel: '코드 편집기'
@@ -555,6 +628,8 @@ export const koKR: TigerLocale = {
     editModeLabel: '편집',
     splitModeLabel: '분할',
     previewModeLabel: '미리보기',
+    showEditorText: '편집',
+    showPreviewText: '미리보기',
     bold: '굵게',
     italic: '기울임',
     strikethrough: '취소선',
@@ -664,7 +739,9 @@ export const koKR: TigerLocale = {
   },
   tagsInput: {
     removeTagLabel: '{tag} 제거',
-    clearAllLabel: '모든 태그 지우기'
+    clearAllLabel: '모든 태그 지우기',
+    duplicateText: '이미 추가됨',
+    limitText: '태그 한도에 도달했습니다'
   },
   input: {
     clearAriaLabel: '입력 지우기',
@@ -680,12 +757,6 @@ export const koKR: TigerLocale = {
     ariaLabel: '슬라이더',
     minAriaLabel: '최솟값',
     maxAriaLabel: '최댓값'
-  },
-  stepper: {
-    ariaLabel: '스테퍼',
-    valueAriaLabel: '값',
-    incrementAriaLabel: '증가',
-    decrementAriaLabel: '감소'
   },
   signature: {
     ariaLabel: '서명 패드',

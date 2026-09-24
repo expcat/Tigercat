@@ -143,7 +143,7 @@ describe('Tigercat MCP stdio server', () => {
   it('exposes redesigned tools, resources, prompts, doctor, and guarded reads from the built binary', async () => {
     const serverPath = resolve(root, 'packages/mcp/dist/index.js')
     if (!existsSync(serverPath)) {
-      return
+      throw new Error(`Missing MCP build: ${serverPath}`)
     }
 
     const doctor = await execFileAsync(process.execPath, [serverPath, '--root', root, '--doctor'], {

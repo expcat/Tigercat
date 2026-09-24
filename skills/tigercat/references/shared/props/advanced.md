@@ -13,12 +13,12 @@ description: Compact generated Tigercat Advanced props reference
 
 `packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 4/22 props
 
-| Prop        | Type              | Default   | Notes                                        |
-| ----------- | ----------------- | --------- | -------------------------------------------- |
-| `language?` | `CodeLanguage`    | `'plain'` | Programming language for syntax highlighting |
-| `theme?`    | `CodeEditorTheme` | `'light'` | Editor theme                                 |
-| `wordWrap?` | `boolean`         | `false`   | Whether to wrap long lines                   |
-| `minLines?` | `number`          | `3`       | Minimum number of visible lines              |
+| Prop        | Type                        | Default   | Notes                                                   |
+| ----------- | --------------------------- | --------- | ------------------------------------------------------- |
+| `language?` | `CodeLanguage`              | `'plain'` | Programming language for syntax highlighting            |
+| `theme?`    | `CodeEditorTheme \| 'auto'` | `-`       | Editor theme. Omit to follow the document color scheme. |
+| `wordWrap?` | `boolean`                   | `false`   | Whether to wrap long lines                              |
+| `minLines?` | `number`                    | `3`       | Minimum number of visible lines                         |
 
 ## Drag
 
@@ -39,7 +39,7 @@ Events/callback props: `onItemsChange?`.
 | Prop            | Type                   | Default     | Notes                                                                                      |
 | --------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
 | `files?`        | `FileItem[]`           | `undefined` | File/folder tree data. `undefined` is an empty uncontrolled tree; `[]` is a controlled...  |
-| `currentPath?`  | `string[]`             | `-`         | Current directory as folder **keys** (controlled). Omit for an internal path buffer. Do... |
+| `currentPath?`  | `(string \| number)[]` | `-`         | Current directory as folder **keys** (controlled). Omit for an internal path buffer. Do... |
 | `selectedKeys?` | `(string \| number)[]` | `-`         | Currently selected file keys (controlled)                                                  |
 | `searchable?`   | `boolean`              | `false`     | Searchable                                                                                 |
 
@@ -58,7 +58,7 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 ## InfiniteScroll
 
-`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 4/15 props
+`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 4/18 props
 
 | Prop        | Type      | Default | Notes                                                      |
 | ----------- | --------- | ------- | ---------------------------------------------------------- |
@@ -80,7 +80,7 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 ## PrintLayout
 
-`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 4/14 props
+`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 4/15 props
 
 Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。
 
@@ -104,18 +104,18 @@ Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直
 
 `packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 4/16 props
 
-| Prop        | Type                 | Default | Notes                                                                                      |
-| ----------- | -------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `toolbar?`  | `ToolbarItem[]`      | `-`     | Toolbar items configuration (buttons and separators)                                       |
-| `readOnly?` | `boolean`            | `-`     | Read-only mode                                                                             |
-| `mode?`     | `RichTextEditorMode` | `-`     | Editing mode                                                                               |
-| `engine?`   | `unknown`            | `-`     | Pluggable editor engine. Default is builtin contenteditable. Custom engines are TRUSTED... |
+| Prop        | Type                                                 | Default | Notes                                                                    |
+| ----------- | ---------------------------------------------------- | ------- | ------------------------------------------------------------------------ |
+| `toolbar?`  | `ToolbarItem[]`                                      | `-`     | Toolbar items configuration (buttons and separators)                     |
+| `readOnly?` | `boolean`                                            | `-`     | Read-only mode                                                           |
+| `mode?`     | `RichTextEditorMode`                                 | `-`     | Editing mode                                                             |
+| `engine?`   | `import('../utils/rich-text-engine').RichTextEngine` | `-`     | Pluggable editor engine. Default is the built-in contenteditable engine. |
 
 Events/callback props: `onRequestUrl?`.
 
 ## VirtualList
 
-`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/11 props
+`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/12 props
 
 | Prop          | Type                                           | Default | Notes                                                                                      |
 | ------------- | ---------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -132,9 +132,9 @@ Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 
 Note: 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。
 
-| Prop                 | Type               | Default | Notes                                                                                     |
-| -------------------- | ------------------ | ------- | ----------------------------------------------------------------------------------------- |
-| `dataSource?`        | `T[]`              | `-`     | Data rows                                                                                 |
-| `columns?`           | `TableColumn<T>[]` | `-`     | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /... |
-| `virtualHeight?`     | `number`           | `400`   | Viewport height in px                                                                     |
-| `virtualItemHeight?` | `number`           | `48`    | Fixed row height in px. Visible rows are clipped to this height.                          |
+| Prop                 | Type                      | Default | Notes                                                                                     |
+| -------------------- | ------------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `dataSource?`        | `T[]`                     | `-`     | Data rows                                                                                 |
+| `columns?`           | `VirtualTableColumn<T>[]` | `-`     | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /... |
+| `virtualHeight?`     | `number`                  | `400`   | Viewport height in px                                                                     |
+| `virtualItemHeight?` | `number`                  | `48`    | Fixed row height in px used by the window. Content is not clipped.                        |

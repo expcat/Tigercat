@@ -1,20 +1,22 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { Comment, Fragment, Text, defineComponent, computed, h, isVNode, PropType } from 'vue'
+import {
+  icon24PathStrokeLinecap,
+  icon24PathStrokeLinejoin,
+  icon24StrokeWidth,
+  icon24ViewBox
+} from '@expcat/tigercat-core/icons/common'
 import {
   classNames,
   coerceClassValue,
   getTagVariantClasses,
   defaultTagThemeColors,
-  icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  icon24StrokeWidth,
-  icon24ViewBox,
   mergeStyleValues,
   tagBaseClasses,
   tagSizeClasses,
   tagPillClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
-  omitUnsupportedColorProp,
+  formatTagCloseName,
   getStatusLabels,
   mergeTigerLocale,
   type TagVariant,
@@ -29,7 +31,6 @@ export interface VueTagProps {
   size?: TagSize
   closable?: boolean
   closeAriaLabel?: string
-  closeTabIndex?: number
   open?: boolean
   pill?: boolean
   className?: string
@@ -99,10 +100,6 @@ export const Tag = defineComponent({
       type: String,
       default: undefined
     },
-    closeTabIndex: {
-      type: Number,
-      default: undefined
-    },
 
     /**
      * When `false`, the tag is not rendered. Closing never hides internally.
@@ -137,7 +134,7 @@ export const Tag = defineComponent({
       default: undefined
     }
   },
-  emits: ['close', 'update:open'],
+  emits: ['close'],
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const labels = computed(() =>
@@ -162,7 +159,15 @@ export const Tag = defineComponent({
     const handleClose = (event: MouseEvent) => {
       event.stopPropagation()
       emit('close', event)
-      emit('update:open', false)
+    }
+
+    const visibleText = (nodes: unknown): string => {
+      if (nodes == null || nodes === false || nodes === true) return ''
+      if (typeof nodes === 'string' || typeof nodes === 'number') return String(nodes)
+      if (Array.isArray(nodes)) return nodes.map(visibleText).join('')
+      if (!isVNode(nodes) || nodes.type === Comment) return ''
+      if (nodes.type === Text || nodes.type === Fragment) return visibleText(nodes.children)
+      return visibleText(nodes.children)
     }
 
     return () => {
@@ -170,9 +175,7 @@ export const Tag = defineComponent({
         return null
       }
 
-      const attrsRecord = omitUnsupportedColorProp('Tag', {
-        ...(attrs as Record<string, unknown>)
-      })
+      const attrsRecord = attrs as Record<string, unknown>
       const attrsClass = attrsRecord.class
       const attrsStyle = attrsRecord.style
 
@@ -191,8 +194,9 @@ export const Tag = defineComponent({
                 {
                   class: closeButtonClasses.value,
                   onClick: handleClose,
-                  'aria-label': props.closeAriaLabel ?? labels.value.tagCloseAriaLabel,
-                  tabindex: props.closeTabIndex,
+                  'aria-label':
+                    props.closeAriaLabel ??
+                    formatTagCloseName(labels.value.tagCloseAriaLabel, visibleText(slots.default?.())),
                   type: 'button'
                 },
                 CloseIcon()

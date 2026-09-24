@@ -218,7 +218,7 @@ describe('NavigationMenu', () => {
     expect(screen.getByRole('menuitem', { name: 'Pricing' })).toHaveFocus()
   })
 
-  it('opens the matching item when value is 1 and the item key is "1"', () => {
+  it('does not treat numeric 1 and string "1" as the same panel', () => {
     render(NavigationMenu, {
       props: { delayDuration: 0, skipDelayDuration: 0, defaultValue: 1 },
       slots: {
@@ -230,7 +230,7 @@ describe('NavigationMenu', () => {
         ]
       }
     })
-    expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'false')
   })
 
   it('closes on item click, outside click, and Escape', async () => {

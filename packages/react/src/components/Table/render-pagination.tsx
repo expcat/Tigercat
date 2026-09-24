@@ -48,8 +48,8 @@ export function renderPagination(
   // When i18n is disabled the Pagination component must not pick up the
   // ConfigProvider locale, so lock every label to the resolved defaults.
   const overrides: Partial<TigerLocalePagination> = view.disableI18n ? { ...labels } : {}
-  if (paginationConfig.prevText) overrides.prevPageAriaLabel = paginationConfig.prevText
-  if (paginationConfig.nextText) overrides.nextPageAriaLabel = paginationConfig.nextText
+  if (paginationConfig.prevAriaLabel) overrides.prevPageAriaLabel = paginationConfig.prevAriaLabel
+  if (paginationConfig.nextAriaLabel) overrides.nextPageAriaLabel = paginationConfig.nextAriaLabel
   const labelsOverride = Object.keys(overrides).length > 0 ? overrides : undefined
 
   const pageSizeOptions = (paginationConfig.pageSizeOptions ?? [
@@ -69,7 +69,7 @@ export function renderPagination(
     <div className={getBuiltInPaginationContainerClasses()}>
       <Pagination
         size={view.size ?? 'md'}
-        align="right"
+        align="end"
         current={ctx.currentPage}
         pageSize={ctx.currentPageSize}
         total={total}

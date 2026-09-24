@@ -5,6 +5,8 @@
 
 import type { ScrollRootInput } from '../types/scroll-root'
 import { isBrowser } from './env'
+import { OVERLAY_Z_INDEX } from './floating'
+import { observeSize } from './responsive'
 import { getScrollRootEventTarget, resolveScrollRoot, type ResolvedScrollRoot } from './scroll-root'
 
 export interface AffixLayoutRect {
@@ -31,8 +33,11 @@ export const AFFIX_UNPINNED_STATE: AffixState = {
 
 const AFFIX_SENTINEL_STYLE = {
   display: 'block',
-  width: '1px',
-  height: '1px',
+  width: '0px',
+  height: '0px',
+  margin: '0px',
+  padding: '0px',
+  border: '0px',
   overflow: 'hidden',
   pointerEvents: 'none'
 } as const
@@ -94,7 +99,7 @@ export function buildAffixPlaceholderStyle(flowRect: AffixLayoutRect): {
   height: string
 } {
   return {
-    width: '100%',
+    width: `${flowRect.width}px`,
     height: `${flowRect.height}px`
   }
 }
@@ -213,7 +218,7 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
   let affixed = false
   let lastSerialized = ''
   let stopObserver: (() => void) | null = null
-  let resizeObs: ResizeObserver | null = null
+  let stopResize: Array<() => void> = []
   let observed = new Set<Element>()
   let scrollTarget: EventTarget | null = null
   let resolved: ResolvedScrollRoot | null = null
@@ -280,30 +285,26 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
   }
 
   const observeFlow = (): void => {
-    if (typeof ResizeObserver === 'undefined') return
     const placeholder = options.getPlaceholder()
     const content = options.getContent()
     const parent = (placeholder ?? content)?.parentElement ?? null
     const next = [placeholder, content, parent].filter((el): el is HTMLElement => el != null)
     const same =
-      resizeObs !== null && next.length === observed.size && next.every((el) => observed.has(el))
+      stopResize.length > 0 && next.length === observed.size && next.every((el) => observed.has(el))
     if (same) return
-    resizeObs?.disconnect()
-    resizeObs = null
+    for (const stop of stopResize) stop()
+    stopResize = []
     observed = new Set()
     if (next.length === 0) return
-    resizeObs = new ResizeObserver(() => onLayoutWhilePinned())
-    for (const el of next) {
-      resizeObs.observe(el)
-      observed.add(el)
-    }
+    stopResize = next.map((el) => observeSize(el, () => onLayoutWhilePinned()))
+    for (const el of next) observed.add(el)
   }
 
   const unbind = (): void => {
     stopObserver?.()
     stopObserver = null
-    resizeObs?.disconnect()
-    resizeObs = null
+    for (const stop of stopResize) stop()
+    stopResize = []
     observed = new Set()
     if (scrollTarget) {
       scrollTarget.removeEventListener('scroll', onLayoutWhilePinned)
@@ -361,6 +362,18 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
     scrollTarget?.addEventListener('scroll', onLayoutWhilePinned, { passive: true })
     window.addEventListener('resize', onLayoutWhilePinned, { passive: true })
     observeFlow()
+    const flow = getFlowRect()
+    if (flow && resolved) {
+      const next = calculateAffixState(
+        flow,
+        resolved.getRect(),
+        options.getOffsetTop(),
+        options.getOffsetBottom(),
+        options.getZIndex()
+      )
+      if (next.affixed) pinFromFlow(true)
+      else unpin(false)
+    }
   }
 
   return { bind, unbind, updateStyle, observeFlow }

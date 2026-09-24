@@ -256,7 +256,7 @@ describe('ScrollSpy', () => {
           getContainer: () => scrollContainer
         }
       })
-      expect(screen.getByText('One')).toHaveAttribute('data-key', '1')
+      expect(screen.getByText('One')).toHaveAttribute('data-key', 'n:1')
       expect(screen.getByText('One')).toHaveAttribute('aria-current', 'location')
     })
 

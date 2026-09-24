@@ -3,7 +3,13 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { iconNames, extendedIcons, rocketIcon, gridIcon, chartPieIcon } from '@expcat/tigercat-core'
+import {
+  iconNames,
+  extendedIcons,
+  rocketIcon,
+  gridIcon,
+  chartPieIcon
+} from '@expcat/tigercat-core/icons/registry'
 
 describe('extended icons', () => {
   it('exposes standalone stroke definitions usable via the Icon `icon` prop', () => {

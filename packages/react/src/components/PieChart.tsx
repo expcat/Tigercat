@@ -48,20 +48,20 @@ export const PieChart: React.FC<PieChartProps> = ({
   width = 320,
   height = 200,
   padding = 24,
-  responsive = false,
+  responsive = true,
   data,
   innerRadius,
   innerRadiusRatio,
   outerRadius,
   startAngle = DEFAULT_PIE_START_ANGLE,
-  endAngle = Math.PI * 2,
+  endAngle,
   padAngle = 0,
   colors,
   showLabels = false,
   labelFormatter,
   labelPosition = 'inside',
   borderWidth = 2,
-  borderColor = 'var(--tiger-surface,#ffffff)',
+  borderColor = 'var(--tiger-surface)',
   hoverOffset = 8,
   shadow = false,
   gradient = false,
@@ -209,12 +209,14 @@ export const PieChart: React.FC<PieChartProps> = ({
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
       buildChartLegendItems({
-        data: slices.map((slice) => slice.datum),
+        data: slices,
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
-        getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : sliceName(d, i)),
-        getColor: (d, i) => d.color ?? palette[i % palette.length]
+        getIndex: (slice) => slice.index,
+        getLabel: (slice) =>
+          legendFormatter ? legendFormatter(slice.datum, slice.index) : sliceName(slice.datum, slice.index),
+        getColor: (slice) => slice.color
       }),
     [slices, legendFormatter, palette, activeIndex, resolvedSelectedIndex, sliceName]
   )
@@ -258,6 +260,7 @@ export const PieChart: React.FC<PieChartProps> = ({
       responsive={responsive}
       title={title}
       desc={resolvedDesc || undefined}
+      aria-label={title ? undefined : labels.pieChartAriaLabel}
       className={animated ? DONUT_ENTRANCE_CLASS : undefined}
       onResolvedSizeChange={onResolvedSizeChange}>
       {gradient && (
@@ -338,7 +341,7 @@ export const PieChart: React.FC<PieChartProps> = ({
             ? labelFormatter(slice.value, slice.datum, slice.index)
             : `${sliceName(slice.datum, slice.index)} ${slice.percent.toFixed(1)}%`
           return (
-            <g key={`label-group-${slice.index}`} aria-hidden="true">
+            <g key={`label-group-${slice.index}`} aria-hidden={interactive ? true : undefined}>
               <polyline
                 points={slice.outside?.points}
                 fill="none"
@@ -351,7 +354,7 @@ export const PieChart: React.FC<PieChartProps> = ({
                 y={slice.outside?.y}
                 textAnchor={slice.outside?.textAnchor}
                 dominantBaseline="middle"
-                className="fill-[color:var(--tiger-text,#1f2937)] text-xs">
+                className="fill-[color:var(--tiger-text)] text-xs">
                 {text}
               </text>
             </g>
@@ -369,9 +372,10 @@ export const PieChart: React.FC<PieChartProps> = ({
               x={slice.labelX}
               y={slice.labelY}
               className={pieSliceLabelInsideClasses}
+              fill={slice.labelFill}
               textAnchor="middle"
               dominantBaseline="middle"
-              aria-hidden="true">
+              aria-hidden={interactive ? true : undefined}>
               {text}
             </text>
           )
@@ -380,14 +384,14 @@ export const PieChart: React.FC<PieChartProps> = ({
         <g
           data-donut-center="true"
           clipPath={radii.innerRadius > 0 ? `url(#${gradientPrefix}-center)` : undefined}
-          aria-hidden="true">
+          aria-hidden={interactive ? true : undefined}>
           {centerValue !== undefined && (
             <text
               x={radii.cx}
               y={centerLabel !== undefined ? radii.cy - 8 : radii.cy}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="fill-[color:var(--tiger-text,#1f2937)] text-xl font-semibold">
+              className="fill-[color:var(--tiger-text)] text-xl font-semibold">
               {`${centerValue}`}
             </text>
           )}
@@ -397,7 +401,7 @@ export const PieChart: React.FC<PieChartProps> = ({
               y={centerValue !== undefined ? radii.cy + 12 : radii.cy}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs">
+              className="fill-[color:var(--tiger-text-secondary)] text-xs">
               {centerLabel}
             </text>
           )}

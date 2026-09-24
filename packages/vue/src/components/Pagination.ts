@@ -9,6 +9,7 @@ import {
   useId,
   type VNodeChild
 } from 'vue'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
   classNames,
   coerceClassValue,
@@ -23,8 +24,6 @@ import {
   normalizePaginationPageSize,
   resolvePageSizeOptions,
   getQuickJumperPrefixClasses,
-  chevronLeftSolidIcon20PathD,
-  icon20ViewBox,
   getPaginationContainerClasses,
   getPaginationButtonBaseClasses,
   getPaginationEllipsisClasses,
@@ -49,6 +48,7 @@ import {
   type TigerLocaleInput,
   type TigerLocalePagination
 } from '@expcat/tigercat-core'
+import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { useTigerConfig } from './ConfigProvider'
 
 export type PaginationProps = VuePaginationProps

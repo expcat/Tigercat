@@ -97,7 +97,7 @@ let skillServer: SkillServer
 let baseUrl = ''
 
 beforeAll(async () => {
-  skillServer = createSkillServer(root)
+  skillServer = createSkillServer(join(root, 'packages/mcp/snapshot'))
   baseUrl = await listen(skillServer.server)
 })
 
@@ -151,6 +151,9 @@ describe('Tigercat MCP remote skill index', () => {
     await expect(readReferenceSource(index, '../package.json', 'test')).rejects.toThrow(
       'parent segments'
     )
+    await expect(
+      readReferenceSource(index, 'skills/tigercat/%2e%2e/%2e%2e/package.json', 'test')
+    ).rejects.toThrow(/parent segments|not allowed/)
     await expect(readReferenceSource(index, 'docs/MIGRATION.md', 'test')).rejects.toThrow(
       'not allowed'
     )
@@ -193,20 +196,14 @@ describe('Tigercat MCP remote skill index', () => {
   it('diagnoses remote sources and reports the deployed version', async () => {
     skillServer.overrides.set('version.json', JSON.stringify({ version: '9.9.9-test' }))
     try {
-      const result = await diagnoseTigercatMcp({ baseUrl })
-
-      expect(result.ok).toBe(true)
-      expect(result.mode).toBe('http')
-      expect(result.issues).toEqual([])
-      expect(result.readableReferenceCount).toBeGreaterThanOrEqual(30)
-      expect(result.remoteVersion).toBe('9.9.9-test')
+      await expect(diagnoseTigercatMcp({ baseUrl })).rejects.toThrow(/does not match package/)
     } finally {
       skillServer.overrides.delete('version.json')
     }
   }, 15_000)
 
   it('normalizes a subpath base URL without a trailing slash (Pages-like layout)', async () => {
-    const prefixed = createSkillServer(root, 'mcp/')
+    const prefixed = createSkillServer(join(root, 'packages/mcp/snapshot'), 'mcp/')
     const prefixedUrl = await listen(prefixed.server)
     try {
       const index = await loadSkillIndex({ baseUrl: `${prefixedUrl}mcp` })
@@ -223,7 +220,7 @@ describe('Tigercat MCP stdio server (remote mode)', () => {
   it('serves tools over stdio with --base-url and doctors via the env fallback', async () => {
     const serverPath = resolve(root, 'packages/mcp/dist/index.js')
     if (!existsSync(serverPath)) {
-      return
+      throw new Error(`Missing MCP build: ${serverPath}`)
     }
 
     const doctor = await execFileAsync(process.execPath, [serverPath, '--doctor'], {

@@ -8,12 +8,31 @@ import {
   getCodeBlockCopyButtonClasses,
   getCodeLabels,
   mergeTigerLocale,
-  renderCodeHighlightHtml,
+  highlightToTokens,
+  resolveCodeHighlightTheme,
+  type HighlightToken,
   resolveLocaleText,
   type CodeCopyButtonStatus,
   type CodeProps as CoreCodeProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+
+function renderHighlightTokens(lines: HighlightToken[][]): React.ReactNode {
+  return lines.map((tokens, lineIndex) => (
+    <span key={lineIndex}>
+      {lineIndex > 0 ? '\n' : null}
+      {tokens.map((token, tokenIndex) =>
+        token.className ? (
+          <span key={tokenIndex} className={token.className}>
+            {token.text}
+          </span>
+        ) : (
+          <React.Fragment key={tokenIndex}>{token.text}</React.Fragment>
+        )
+      )}
+    </span>
+  ))
+}
 
 export type CodeProps = CoreCodeProps &
   Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreCodeProps | 'onCopy'> & {
@@ -84,13 +103,18 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
 
   return (
     <div ref={ref} className={containerClasses} {...props}>
-      <pre className={codeBlockPreClasses}>
+      <pre className={codeBlockPreClasses} tabIndex={0} aria-label={labels.scrollLabel}>
         {(() => {
-          const highlighted = renderCodeHighlightHtml(code, language, highlighter)
+          const highlighted = highlightToTokens(
+            code,
+            language,
+            highlighter,
+            resolveCodeHighlightTheme(config.colorScheme)
+          )
           return highlighted == null ? (
             <code className="block">{code}</code>
           ) : (
-            <code className="block" dangerouslySetInnerHTML={{ __html: highlighted }} />
+            <code className="block">{renderHighlightTokens(highlighted)}</code>
           )
         })()}
       </pre>

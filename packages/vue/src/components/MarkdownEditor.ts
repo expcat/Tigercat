@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, watch, inject, PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, inject, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
   applyMarkdownToolbarAction,
   classNames,
@@ -6,6 +6,11 @@ import {
   createDefaultMarkdownToolbar,
   findMarkdownHotkeyMatch,
   getMarkdownBodyClasses,
+  resolveMarkdownPanes,
+  isMarkdownNarrowViewport,
+  subscribeMarkdownNarrow,
+  shouldCommitEditorValue,
+  syncEditorTextareaValue,
   getMarkdownContainerClasses,
   getMarkdownToolbarButtonClasses,
   isMarkdownToolbarSeparator,
@@ -113,6 +118,10 @@ export const MarkdownEditor = defineComponent({
     const allowTabExit = ref(false)
     const pendingSelection = ref<{ start: number; end: number } | null>(null)
     const formatToolbarIndex = ref(0)
+    const composing = ref(false)
+    const narrow = ref(false)
+    const narrowPane = ref<'edit' | 'preview'>('edit')
+    const previewHtml = ref('')
 
     const formValue = computed(() => formItemControl?.value.value)
     const currentValue = computed(() => {
@@ -121,15 +130,44 @@ export const MarkdownEditor = defineComponent({
       return internalValue.value
     })
     const currentMode = computed(() => props.mode ?? internalMode.value)
-    const previewHtml = computed(() => renderMarkdownToHtml(currentValue.value, props.renderer))
-    const canEdit = computed(() => currentMode.value === 'edit' || currentMode.value === 'split')
+    const panes = computed(() =>
+      resolveMarkdownPanes(currentMode.value, narrow.value, narrowPane.value)
+    )
+    const canEdit = computed(() => panes.value.edit)
     const showFormattingToolbar = computed(
       () => props.toolbar !== false && canEdit.value && !props.readOnly
     )
-    const showTopbar = computed(() => showFormattingToolbar.value || props.showModeSwitch)
-    const showEditor = computed(() => canEdit.value)
-    const showPreview = computed(
-      () => currentMode.value === 'preview' || currentMode.value === 'split'
+    const showTopbar = computed(
+      () => showFormattingToolbar.value || props.showModeSwitch || (narrow.value && currentMode.value === 'split')
+    )
+    const showEditor = computed(() => panes.value.edit)
+    const showPreview = computed(() => panes.value.preview)
+    previewHtml.value = renderMarkdownToHtml(currentValue.value, props.renderer)
+    let previewTimer = 0
+    watch([currentValue, () => props.renderer], () => {
+      if (previewTimer) window.clearTimeout(previewTimer)
+      previewTimer = window.setTimeout(() => {
+        previewTimer = 0
+        previewHtml.value = renderMarkdownToHtml(currentValue.value, props.renderer)
+      }, 200)
+    })
+    onMounted(() => {
+      narrow.value = isMarkdownNarrowViewport()
+      const stop = subscribeMarkdownNarrow(() => {
+        narrow.value = isMarkdownNarrowViewport()
+      })
+      onBeforeUnmount(() => {
+        stop()
+        if (previewTimer) window.clearTimeout(previewTimer)
+      })
+      syncEditorTextareaValue(textareaRef.value, currentValue.value, false)
+    })
+    watch(
+      currentValue,
+      (value) => {
+        syncEditorTextareaValue(textareaRef.value, value, composing.value)
+      },
+      { flush: 'post' }
     )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getMarkdownEditorLabels(mergedLocale.value, props.labels))
@@ -297,7 +335,18 @@ export const MarkdownEditor = defineComponent({
                         onMousedown: (event: Event) => event.preventDefault(),
                         onClick: () => applyToolbarButton(item)
                       },
-                      item.icon ? h('span', { innerHTML: item.icon }) : item.label
+                      item.icon
+                        ? h(
+                            'svg',
+                            {
+                              viewBox: item.icon.viewBox ?? '0 0 24 24',
+                              width: '16',
+                              height: '16',
+                              'aria-hidden': 'true'
+                            },
+                            [h('path', { d: item.icon.path, fill: 'currentColor' })]
+                          )
+                        : item.label
                     )
                   })
                 )
@@ -335,8 +384,18 @@ export const MarkdownEditor = defineComponent({
             ...restAttrs,
             ref: textareaRef,
             class: markdownEditorTextareaClasses,
-            value: currentValue.value,
-            onInput: (event: Event) => commitValue((event.target as HTMLTextAreaElement).value),
+            onCompositionstart: () => {
+              composing.value = true
+            },
+            onCompositionend: (event: CompositionEvent) => {
+              composing.value = false
+              commitValue((event.target as HTMLTextAreaElement).value)
+            },
+            onInput: (event: Event) => {
+              const native = event as InputEvent
+              if (!shouldCommitEditorValue(composing.value || native.isComposing)) return
+              commitValue((event.target as HTMLTextAreaElement).value)
+            },
             onKeydown: handleKeydown,
             onBlur: () => formItemControl?.onBlur(),
             placeholder: props.placeholder,
@@ -365,8 +424,9 @@ export const MarkdownEditor = defineComponent({
                 currentMode.value === 'split' ? markdownEditorSplitDividerClasses : undefined,
                 !currentValue.value ? markdownEditorEmptyPreviewClasses : undefined
               ),
-              role: 'region',
-              'aria-label': labels.value.previewAriaLabel,
+              tabindex: 0,
+              role: labels.value.previewAriaLabel?.trim() ? 'region' : undefined,
+              'aria-label': labels.value.previewAriaLabel?.trim() || undefined,
               ...(currentValue.value ? { innerHTML: previewHtml.value } : {})
             },
             currentValue.value ? undefined : props.placeholder
@@ -382,7 +442,7 @@ export const MarkdownEditor = defineComponent({
         },
         [
           toolbarNode,
-          h('div', { class: getMarkdownBodyClasses(currentMode.value) }, [
+          h('div', { class: getMarkdownBodyClasses(showEditor.value && showPreview.value) }, [
             textareaNode,
             previewNode
           ])

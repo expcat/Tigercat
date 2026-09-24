@@ -8,7 +8,7 @@ import { Col } from '@expcat/tigercat-vue/Col'
     <Row :gutter="[16, 16]">
       <Col v-for="item in 3" :key="item" :span="8">
         <div
-          class="rounded bg-[var(--tiger-primary)] p-4 text-center text-[var(--tiger-primary-foreground,#fff)]">
+          class="rounded bg-[var(--tiger-primary)] p-4 text-center text-[var(--tiger-primary-foreground)]">
           col-8
         </div>
       </Col>

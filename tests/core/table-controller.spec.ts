@@ -80,7 +80,7 @@ describe('table controller', () => {
 
   it('falls back to the dataSource index instead of a page offset', () => {
     const record = { name: 'No id' }
-    expect(resolveTableRecordKey(record, 11, 'id')).toBe(11)
+    expect(resolveTableRecordKey(record, 11, 'id')).toBe('tiger-row:11')
     expect(resolveTableRecordKey({ id: 7 }, 11, 'id')).toBe(7)
     expect(resolveTableRecordKey({ id: 7 }, 11, 'id', (row) => `k-${row.id}`)).toBe('k-7')
   })
@@ -95,7 +95,7 @@ describe('table controller', () => {
       currentPageSize: 1,
       rowKey: 'id'
     })
-    expect(view.pageRowKeys).toEqual([1])
+    expect(view.pageRowKeys).toEqual(['tiger-row:1'])
     expect(view.pageSourceIndices).toEqual([1])
   })
 
@@ -115,8 +115,10 @@ describe('table controller', () => {
       rowKey: 'id'
     })
     expect(view.paginatedData).toHaveLength(5)
-    expect([...(view.groupedData?.keys() ?? [])]).toEqual(['Engineering'])
-    expect(view.groupedData?.get('Engineering')).toHaveLength(5)
+    expect(view.groupBlocks?.map((block) => [block.key, block.count, block.continued])).toEqual([
+      ['Engineering', 15, true]
+    ])
+    expect(view.groupBlocks?.[0]?.records).toHaveLength(5)
   })
 
   it('reads advanced filters and groups through dataKey', () => {
@@ -141,7 +143,7 @@ describe('table controller', () => {
       currentPageSize: 10,
       rowKey: 'id'
     })
-    expect([...(grouped.groupedData?.keys() ?? [])].sort()).toEqual(['Design', 'Engineering'])
+    expect(grouped.groupBlocks?.map((block) => block.key).sort()).toEqual(['Design', 'Engineering'])
   })
 
   it('does not fall back to column filters when advanced rules are empty', () => {
@@ -172,7 +174,7 @@ describe('table controller', () => {
       rowKey: 'id'
     })
     expect(view.paginatedData.map((row) => row.name)).toEqual(['Carol', 'Alice', 'Bob', 'Dora'])
-    expect(view.groupedData).toBeNull()
+    expect(view.groupBlocks).toBeNull()
     expect(view.paginationInfo?.total).toBe(0)
     expect(view.paginationInfo?.totalPages).toBe(0)
   })
@@ -216,10 +218,10 @@ describe('table controller', () => {
     expect(rows[1].name).toBe('Alice')
   })
 
-  it('relocks a right-fixed column back to the right', () => {
-    expect(getNextTableColumnFixed('right', 'right')).toBe(false)
-    expect(getNextTableColumnFixed(false, 'right')).toBe('right')
-    expect(getNextTableColumnFixed(undefined, undefined)).toBe('left')
+  it('relocks an end-fixed column back to the end', () => {
+    expect(getNextTableColumnFixed('end', 'end')).toBe(false)
+    expect(getNextTableColumnFixed(false, 'end')).toBe('end')
+    expect(getNextTableColumnFixed(undefined, undefined)).toBe('start')
   })
 
   it('clamps paginate current and pageSize', () => {

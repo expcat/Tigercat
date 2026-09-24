@@ -1,8 +1,8 @@
 import { computed, defineComponent, getCurrentInstance, h, PropType, useId } from 'vue'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
-  chevronLeftSolidIcon20PathD,
   coerceClassValue,
-  composeComponentClasses,
+  classNames,
   getPageHeaderBackButtonClasses,
   getPageHeaderRootClasses,
   hasPageHeaderHeadingContent,
@@ -10,7 +10,6 @@ import {
   resolvePageHeaderHeadingTag,
   mergeTigerLocale,
   getPageHeaderLabels,
-  icon20ViewBox,
   mergeStyleValues,
   pageHeaderActionsClasses,
   pageHeaderBackIconClasses,
@@ -27,6 +26,7 @@ import {
   type TigerLocale,
   type TigerLocalePageHeader
 } from '@expcat/tigercat-core'
+import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { Button } from './Button'
 import { Link } from './Link'
 import { useTigerConfig } from './ConfigProvider'
@@ -274,7 +274,7 @@ export const PageHeader = defineComponent({
         'header',
         {
           ...attrs,
-          class: composeComponentClasses(
+          class: classNames(
             getPageHeaderRootClasses(props.className),
             coerceClassValue(attrsRecord.class)
           ),

@@ -29,12 +29,11 @@ const { getSpinnerSVGMock } = vi.hoisted(() => ({
 vi.mock('@expcat/tigercat-core', () => ({
   classNames: (...args: unknown[]) => args.filter(Boolean).join(' '),
   resolveButtonClasses: () => 'btn-resolved',
-  resolveButtonHtmlType: () => 'button',
+  resolveButtonType: () => 'button',
   resolveButtonIconPlacement: () => 'start',
   getButtonIconSlotClasses: () => '',
   getButtonSpinnerClasses: () => 'animate-spin h-4 w-4',
   getSpinnerSVG: getSpinnerSVGMock,
-  omitUnsupportedColorProp: (_component: string, props: Record<string, unknown>) => props,
   warnMissingAccessibleName: () => {},
   TIGER_CHROME_ATTR: 'data-tiger-chrome'
 }))

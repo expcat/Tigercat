@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
-  componentTokens,
   defaultTheme,
   designTokens,
   primitiveColors,
+  runtimeBreakpoints,
   runtimeThemeDark,
   runtimeThemeLight,
   semanticTokens
@@ -11,17 +11,16 @@ import {
 import figmaVariables from '../../packages/core/tokens/figma-variables.json'
 
 describe('design tokens', () => {
-  it('exposes primitive, semantic, and component layers', () => {
+  it('exposes primitive and semantic layers from one source', () => {
     expect(designTokens.primitive.color.primary['600']).toBe('#2563eb')
     expect(designTokens.semantic.color['interactive-primary']).toBe('#2563eb')
-    expect(designTokens.component.button['border-radius']).toBe('10px')
+    expect('component' in designTokens).toBe(false)
+    expect(runtimeBreakpoints['2xl']).toBe('1536px')
   })
 
-  it('exposes canonical token registries without compatibility aliases', () => {
+  it('exposes canonical token registries without a second component registry', () => {
     expect(primitiveColors.primary['600']).toBe('#2563eb')
     expect(semanticTokens.color['focus-ring']).toBe('#2563eb')
-    expect(componentTokens.tag['border-radius']).toBe('6px')
-    expect(componentTokens.table.bg).toBe('#fafafa')
   })
 
   it('drives the default runtime theme from the same tokens.json palette', () => {
@@ -38,23 +37,13 @@ describe('design tokens', () => {
     const collections = figmaVariables.collections
     expect(collections.map((collection) => collection.name)).toEqual([
       'Tigercat Primitive',
-      'Tigercat Semantic',
-      'Tigercat Component'
+      'Tigercat Semantic'
     ])
 
     const semantic = collections.find((collection) => collection.name === 'Tigercat Semantic')
-    const component = collections.find((collection) => collection.name === 'Tigercat Component')
-
     expect(
       semantic?.variables.find((variable) => variable.name === 'semantic/color/bg-primary')
         ?.reference
     ).toBe('primitive/color/primary/50')
-    expect(
-      component?.variables.find((variable) => variable.name === 'component/button/border-radius')
-        ?.reference
-    ).toBe('semantic/radius/component')
-    expect(
-      component?.variables.find((variable) => variable.name === 'component/table/bg')?.reference
-    ).toBe('semantic/color/bg-surface')
   })
 })

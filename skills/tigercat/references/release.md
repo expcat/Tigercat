@@ -42,7 +42,7 @@ Stable and RC releases are cut manually, not by `changeset version`.
 ## API Freeze
 
 - `pnpm release:check`, `pnpm types:check`, `pnpm api:validate`.
-- Exports: core `.` / `./tailwind` / `./tailwind/modern` / `./tokens.css` / `./figma-variables.json`
+- Exports: core `.` / `./tailwind` / `./tokens.css` / `./figma-variables.json`
   and locale subpaths; Vue/React root and component subpaths; matching props type exports.
 - Do not rename props, events, slots, children, or subpath imports after freeze unless listed as
   Breaking.
@@ -59,7 +59,7 @@ This is why `pnpm release:check` requires `## v<version>` in CHANGELOG and MIGRA
 number is not evidence that nothing user-visible changed.
 
 Token source is `packages/core/tokens/tokens.json`; after token edits `pnpm tokens:build` then
-`pnpm build`. Confirm core still exports `./tailwind`, `./tailwind/modern`, `./tokens.css`, and
+`pnpm build`. Confirm core still exports `./tailwind`, `./tokens.css`, and
 `./figma-variables.json`. See [tokens.md](tokens.md).
 
 Hydration audit focus: DatePicker locale/timezone, chart SVG ids, closed overlays, client-only

@@ -1,191 +1,76 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+/**
+ * @vitest-environment happy-dom
+ */
+
+import { describe, it, expect, afterEach } from 'vitest'
 import { createElement } from 'react'
 import { render } from '@testing-library/react'
 import { ChatWindow } from '@expcat/tigercat-react/ChatWindow'
-import {
-  createTigercatPlugin,
-  defaultTheme,
-  MODERN_BASE_TOKENS_LIGHT,
-  MODERN_OVERRIDE_TOKENS_LIGHT,
-  MODERN_OVERRIDE_TOKENS_DARK
-} from '@expcat/tigercat-core'
-
-/**
- * Phase 1C — modern theme interaction.
- *
- * These tests cover the runtime triggering path of the opt-in modern token
- * layer: with the plugin's CSS injected into the document, toggling
- * `data-tiger-style="modern"` on the documentElement must flip the value of
- * the relevant CSS custom properties that components consume via
- * `var(--tiger-radius-md, ...)` etc.
- */
+import { createTigerThemeScope, defaultTheme, modernTheme } from '@expcat/tigercat-core'
+import { createTigercatPlugin } from '../../packages/core/src/tailwind-plugin'
 
 type CssBlock = Record<string, string>
-
-interface PluginCapture {
-  rules: Record<string, CssBlock | { [media: string]: CssBlock }>
-}
-
 type AddBaseFn = (rule: Record<string, unknown>) => void
 type PluginCallback = (api: { addBase: AddBaseFn }) => void
 type PluginInstance = { handler: PluginCallback }
 
-function captureRules(p: PluginInstance | { handler?: PluginCallback }): PluginCapture {
-  const rules: PluginCapture['rules'] = {}
-  const addBase: AddBaseFn = (rule) => {
-    for (const [selector, body] of Object.entries(rule)) {
-      // Last-write-wins to match Tailwind's addBase merge behaviour.
-      ;(rules as Record<string, unknown>)[selector] = body as CssBlock
+function captureRules(p: PluginInstance) {
+  const rules: Record<string, CssBlock> = {}
+  p.handler({
+    addBase: (rule) => {
+      for (const [selector, body] of Object.entries(rule)) {
+        if (!selector.startsWith('@') && body && typeof body === 'object') {
+          rules[selector] = body as CssBlock
+        }
+      }
     }
-  }
-  const handler = (p as PluginInstance).handler
-  if (typeof handler === 'function') {
-    handler({ addBase })
-  }
-  return { rules }
+  })
+  return rules
 }
 
-function blockToCss(block: CssBlock): string {
-  return Object.entries(block)
-    .map(([k, v]) => `${k}: ${v};`)
-    .join(' ')
-}
-
-function rulesToCssText(capture: PluginCapture): string {
-  const out: string[] = []
-  for (const [selector, body] of Object.entries(capture.rules)) {
-    if (selector.startsWith('@media')) {
-      const inner = body as Record<string, CssBlock>
-      const innerCss = Object.entries(inner)
-        .map(([sel, decls]) => `${sel} { ${blockToCss(decls)} }`)
-        .join(' ')
-      out.push(`${selector} { ${innerCss} }`)
-    } else {
-      out.push(`${selector} { ${blockToCss(body as CssBlock)} }`)
-    }
-  }
-  return out.join('\n')
-}
-
-function injectStyle(id: string, css: string): HTMLStyleElement {
-  const style = document.createElement('style')
-  style.id = id
-  style.textContent = css
-  document.head.appendChild(style)
-  return style
-}
-
-describe('Modern theme — interaction (data-tiger-style="modern")', () => {
-  let styleEl: HTMLStyleElement | null = null
-
+describe('Modern theme preset application', () => {
   afterEach(() => {
-    styleEl?.remove()
-    styleEl = null
-    document.documentElement.removeAttribute('data-tiger-style')
+    document.documentElement.removeAttribute('style')
+    document.documentElement.removeAttribute('data-tiger-theme')
+    document.documentElement.removeAttribute('data-tiger-theme-scope')
     document.documentElement.classList.remove('dark')
+    document.querySelectorAll('style[data-tiger-theme-style]').forEach((node) => node.remove())
   })
 
-  it('createTigercatPlugin({ modern: true }) writes modern radius at :root without the attribute', () => {
-    const capture = captureRules(createTigercatPlugin({ modern: true }) as PluginInstance)
-    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
-    const styles = getComputedStyle(document.documentElement)
-    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
-      MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-radius-md']
-    )
-    expect(styles.getPropertyValue('--tiger-blur-glass').trim()).toBe(
-      MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-blur-glass']
-    )
+  it('default plugin :root stays on the default preset', () => {
+    const rules = captureRules(createTigercatPlugin() as PluginInstance)
+    expect(rules[':root']?.['--tiger-radius-md']).toBe(defaultTheme.light.radius?.md)
+    expect(rules['[data-tiger-style="modern"]']).toBeUndefined()
   })
 
-  it('default plugin :root stays on the default preset until data-tiger-style is set', () => {
-    const capture = captureRules(createTigercatPlugin() as PluginInstance)
-    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
-    const styles = getComputedStyle(document.documentElement)
-    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(defaultTheme.light.radius?.md)
-    expect(styles.getPropertyValue('--tiger-blur-glass').trim()).toBe(
-      MODERN_BASE_TOKENS_LIGHT['--tiger-blur-glass']
-    )
+  it('preset option writes modern radius at :root', () => {
+    const rules = captureRules(createTigercatPlugin({ preset: modernTheme }) as PluginInstance)
+    expect(rules[':root']?.['--tiger-radius-md']).toBe('12px')
+    expect(rules[':root']?.['--tiger-radius-lg']).toBe('16px')
   })
 
-  it('setting data-tiger-style="modern" on <html> flips radius / blur / shadow tokens', () => {
-    const capture = captureRules(createTigercatPlugin() as PluginInstance)
-    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
-    document.documentElement.setAttribute('data-tiger-style', 'modern')
-    const styles = getComputedStyle(document.documentElement)
-    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
-      MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-radius-md']
-    )
-    expect(styles.getPropertyValue('--tiger-radius-lg').trim()).toBe(
-      MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-radius-lg']
-    )
-    expect(styles.getPropertyValue('--tiger-blur-glass').trim()).toBe(
-      MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-blur-glass']
-    )
-    expect(styles.getPropertyValue('--tiger-shadow-glass').trim()).toBe(
-      MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-shadow-glass']
-    )
-  })
+  it('setTheme("modern") writes the preset on the document and dispose restores it', () => {
+    const scope = createTigerThemeScope()
+    scope.setTheme('modern')
+    expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('modern')
+    expect(document.documentElement.style.getPropertyValue('--tiger-radius-md').trim()).toBe('12px')
+    expect(document.documentElement.getAttribute('data-tiger-style')).toBeNull()
 
-  it('removing data-tiger-style restores default preset tokens (round-trip)', () => {
-    const capture = captureRules(createTigercatPlugin() as PluginInstance)
-    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
-    document.documentElement.setAttribute('data-tiger-style', 'modern')
-    document.documentElement.removeAttribute('data-tiger-style')
-    const styles = getComputedStyle(document.documentElement)
-    expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(defaultTheme.light.radius?.md)
-  })
-
-  it('combined .dark + data-tiger-style="modern" resolves dark override shadows', () => {
-    const capture = captureRules(createTigercatPlugin() as PluginInstance)
-    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
-    document.documentElement.classList.add('dark')
-    document.documentElement.setAttribute('data-tiger-style', 'modern')
-    const styles = getComputedStyle(document.documentElement)
-    expect(styles.getPropertyValue('--tiger-shadow-glass').trim()).toBe(
-      MODERN_OVERRIDE_TOKENS_DARK['--tiger-shadow-glass']
+    scope.setTheme('default')
+    expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('default')
+    expect(document.documentElement.style.getPropertyValue('--tiger-radius-md').trim()).toBe(
+      defaultTheme.light.radius?.md
     )
-  })
-
-  it('attribute selector can also activate the override on a sub-tree', () => {
-    const capture = captureRules(createTigercatPlugin() as PluginInstance)
-    styleEl = injectStyle('tigercat-modern-test', rulesToCssText(capture))
-    const subtree = document.createElement('div')
-    subtree.setAttribute('data-tiger-style', 'modern')
-    document.body.appendChild(subtree)
-    try {
-      const styles = getComputedStyle(subtree)
-      expect(styles.getPropertyValue('--tiger-radius-md').trim()).toBe(
-        MODERN_OVERRIDE_TOKENS_LIGHT['--tiger-radius-md']
-      )
-    } finally {
-      subtree.remove()
-    }
+    scope.dispose()
   })
 })
 
 describe('Modern theme — component class consumption stays token-stable', () => {
-  beforeEach(() => {
-    const capture = captureRules(createTigercatPlugin({ modern: true }) as PluginInstance)
-    injectStyle('tigercat-modern-test-2', rulesToCssText(capture))
-  })
-
-  afterEach(() => {
-    document.getElementById('tigercat-modern-test-2')?.remove()
-    document.documentElement.removeAttribute('data-tiger-style')
-  })
-
-  it('component-side class strings keep referencing var(--tiger-radius-md, ...) regardless of style', () => {
-    const { container, rerender } = render(createElement(ChatWindow, { messages: [] }))
+  it('component class strings keep referencing var(--tiger-radius-md)', () => {
+    const { container } = render(createElement(ChatWindow, { messages: [] }))
     const root = container.querySelector('.tiger-chat-window') as HTMLElement
     expect(root).toBeTruthy()
-    const baseClass = root.className
-    expect(baseClass).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
-
-    document.documentElement.setAttribute('data-tiger-style', 'modern')
-    rerender(createElement(ChatWindow, { messages: [] }))
-    const rootAfter = container.querySelector('.tiger-chat-window') as HTMLElement
-    // Class references the same CSS variable — only the resolved value
-    // changes via the cascade, not the className itself.
-    expect(rootAfter.className).toBe(baseClass)
+    expect(root.className).toContain('rounded-[var(--tiger-radius-md)]')
+    expect(root.className).not.toContain('data-tiger-style')
   })
 })

@@ -6,7 +6,6 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Button } from '@expcat/tigercat-vue/Button'
-import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Button', () => {
@@ -33,48 +32,31 @@ describe('Button', () => {
     expect(button).toHaveAttribute('aria-label', 'Custom')
   })
 
-  it('warns when color is passed instead of variant', () => {
-    // devWarn dedupes per key process-wide, so drop any earlier hit first.
-    resetDevWarnCache()
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
-    render(Button, {
-      attrs: { color: 'primary' },
-      slots: { default: 'Color prop' }
-    })
 
-    const button = screen.getByRole('button', { name: 'Color prop' })
-    expect(button).toBeInTheDocument()
-    expect(button).not.toHaveAttribute('color')
-    expect(warn).toHaveBeenCalledWith(
-      '[Tigercat] Button does not support color. Use variant instead.'
-    )
-    warn.mockRestore()
-  })
-
-  it('respects htmlType prop (submit/reset/button)', () => {
+  it('respects type prop (submit/reset/button)', () => {
     const first = render(Button, {
-      props: { htmlType: 'submit' },
+      props: { type: 'submit' },
       slots: { default: 'Submit' }
     })
     expect(first.container.querySelector('button')).toHaveAttribute('type', 'submit')
     first.unmount()
 
     const second = render(Button, {
-      props: { htmlType: 'reset' },
+      props: { type: 'reset' },
       slots: { default: 'Reset' }
     })
     expect(second.container.querySelector('button')).toHaveAttribute('type', 'reset')
   })
 
-  it('honors native type when htmlType is omitted', () => {
+  it('honors native type when type is omitted', () => {
     const { container, rerender } = render(Button, {
       props: { type: 'submit' },
       slots: { default: 'Submit' }
     })
     expect(container.querySelector('button')).toHaveAttribute('type', 'submit')
 
-    rerender({ type: 'reset', htmlType: 'submit' })
+    rerender({ type: 'reset', type: 'submit' })
     expect(container.querySelector('button')).toHaveAttribute('type', 'submit')
   })
 
@@ -140,15 +122,13 @@ describe('Button', () => {
       attrs: { onClick }
     })
 
-    const button = screen.getByRole('button', { name: 'Loading' })
-    expect(button).not.toBeDisabled()
+    const button = screen.getByRole('button', { name: /Loading/ })
+    expect(button).toBeDisabled()
     expect(button).toHaveAttribute('aria-busy', 'true')
-    expect(button).not.toHaveAttribute('aria-disabled', 'true')
+    expect(button).toHaveAttribute('aria-disabled', 'true')
     expect(container.querySelector('svg.animate-spin')).toBeInTheDocument()
     expect(container.querySelector('svg.animate-spin')).toHaveAttribute('aria-hidden', 'true')
 
-    button.focus()
-    expect(button).toHaveFocus()
     await fireEvent.click(button)
     expect(onClick).not.toHaveBeenCalled()
   })
@@ -156,7 +136,10 @@ describe('Button', () => {
   it('renders custom loading icon via slot', () => {
     const { container } = render(Button, {
       props: { loading: true },
-      slots: { 'loading-icon': '<span class="custom-loader">Loading...</span>' }
+      slots: {
+        default: 'Save',
+        'loading-icon': '<span class="custom-loader">Loading...</span>'
+      }
     })
 
     const loader = container.querySelector('.custom-loader')
@@ -208,11 +191,9 @@ describe('Button', () => {
       attrs: { onClick }
     })
 
-    const button = screen.getByRole('button', { name: 'Loading' })
-    expect(button).not.toBeDisabled()
-
-    button.focus()
-    await user.keyboard('{Enter}')
+    const button = screen.getByRole('button', { name: /Loading/ })
+    expect(button).toBeDisabled()
+    await fireEvent.click(button)
     expect(onClick).not.toHaveBeenCalled()
   })
 
@@ -258,15 +239,15 @@ describe('Button', () => {
       expect(icon.parentElement!.className).not.toContain('order-1')
     })
 
-    it('renders loading spinner after the label when iconPosition is right', () => {
+    it('renders loading spinner after the label when iconPosition is end', () => {
       const { container } = render(Button, {
-        props: { loading: true, iconPosition: 'right' },
+        props: { loading: true, iconPosition: 'end' },
         slots: { default: 'Loading' }
       })
       const button = container.querySelector('button')!
       const spinner = container.querySelector('svg.animate-spin')!
-      expect(button.lastElementChild).toBe(spinner.parentElement)
-      expect(spinner.parentElement!.className).toContain('ms-2')
+      expect(button.lastElementChild).toContain(spinner)
+      expect(button.lastElementChild!.className).toContain('ms-2')
     })
   })
 })

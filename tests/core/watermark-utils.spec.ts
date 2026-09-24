@@ -8,42 +8,9 @@ import {
   watermarkDefaults,
   watermarkFontDefaults,
   type WatermarkFrameCallback,
-  type WatermarkRenderOptions,
-  type WatermarkResizeObserverLike
+  type WatermarkRenderOptions
 } from '@expcat/tigercat-core'
 import { createFrameScheduler } from '../utils/frame-scheduler'
-
-function createResizeObserverFactory() {
-  let callback: ResizeObserverCallback | undefined
-  let observedTarget: Element | undefined
-  const observer: WatermarkResizeObserverLike = {
-    observe: vi.fn((target: Element) => {
-      observedTarget = target
-    }),
-    disconnect: vi.fn()
-  }
-
-  return {
-    factory: vi.fn((nextCallback: ResizeObserverCallback) => {
-      callback = nextCallback
-      return observer
-    }),
-    observer,
-    emit() {
-      if (!callback || !observedTarget) return
-
-      callback(
-        [
-          {
-            target: observedTarget,
-            contentRect: new DOMRect(0, 0, 320, 180)
-          } as ResizeObserverEntry
-        ],
-        observer as ResizeObserver
-      )
-    }
-  }
-}
 
 describe('watermark-utils', () => {
   function createCanvasMock() {
@@ -94,7 +61,7 @@ describe('watermark-utils', () => {
       fontSize: 16,
       fontFamily: 'sans-serif',
       fontWeight: 'normal',
-      color: 'color-mix(in srgb, var(--tiger-text, #111827) 15%, transparent)'
+      color: 'color-mix(in srgb, var(--tiger-text) 15%, transparent)'
     })
   })
 
@@ -197,15 +164,13 @@ describe('watermark-utils', () => {
       offsetY: 8,
       zIndex: 12
     })
-    expect(style).toMatchObject({
-      zIndex: '12',
-      backgroundImage: 'url(data:image/png;base64,abc)',
-      backgroundPosition: '4px 8px',
-      printColorAdjust: 'exact'
+    const size = `${watermarkDefaults.width + watermarkDefaults.gapX}px ${watermarkDefaults.height + watermarkDefaults.gapY}px`
+    expect(style).toEqual({
+      '--tiger-watermark-image': 'url("data:image/png;base64,abc")',
+      '--tiger-watermark-size': size,
+      '--tiger-watermark-position': '4px 8px',
+      '--tiger-watermark-z': '12'
     })
-    expect(style.backgroundSize).toBe(
-      `${watermarkDefaults.width + watermarkDefaults.gapX}px ${watermarkDefaults.height + watermarkDefaults.gapY}px`
-    )
   })
 
   it('batches render requests to one animation frame', async () => {
@@ -239,85 +204,44 @@ describe('watermark-utils', () => {
     expect(onRender).toHaveBeenCalledWith('data:image/png;base64,next')
   })
 
-  it('redraws after ResizeObserver changes using rAF batching', async () => {
+  it('does not re-encode the tile when the host is observed', async () => {
     const frames = createFrameScheduler()
-    const resize = createResizeObserverFactory()
     const onRender = vi.fn()
     const target = document.createElement('div')
     const controller = createWatermarkRenderController({
-      getRenderOptions: () => ({
-        content: 'Demo',
-        width: 120,
-        height: 64,
-        rotate: -22,
-        font: resolveWatermarkFont()
-      }),
+      getRenderOptions: renderOptions,
       onRender,
       render: () => 'data:image/png;base64,resize',
       requestFrame: frames.requestFrame,
-      cancelFrame: frames.cancelFrame,
-      createResizeObserver: resize.factory
+      cancelFrame: frames.cancelFrame
     })
 
     controller.observe(target)
-    resize.emit()
-    resize.emit()
-
-    expect(resize.observer.observe).toHaveBeenCalledWith(target)
-    expect(frames.pendingCount()).toBe(1)
-
+    controller.observe(target)
     frames.flush()
     await controller.flush()
 
-    expect(onRender).toHaveBeenCalledTimes(1)
-    expect(onRender).toHaveBeenCalledWith('data:image/png;base64,resize')
+    expect(onRender).not.toHaveBeenCalled()
+    expect(controller.isPending()).toBe(false)
   })
 
-  it('disconnects observer and cancels pending render', async () => {
+  it('disconnect cancels a pending render', async () => {
     const frames = createFrameScheduler()
-    const resize = createResizeObserverFactory()
     const onRender = vi.fn()
-    const target = document.createElement('div')
     const controller = createWatermarkRenderController({
-      getRenderOptions: () => ({
-        content: 'Demo',
-        width: 120,
-        height: 64,
-        rotate: -22,
-        font: resolveWatermarkFont()
-      }),
+      getRenderOptions: renderOptions,
       onRender,
       render: () => 'data:image/png;base64,next',
       requestFrame: frames.requestFrame,
-      cancelFrame: frames.cancelFrame,
-      createResizeObserver: resize.factory
+      cancelFrame: frames.cancelFrame
     })
 
-    controller.observe(target)
     controller.render()
     controller.disconnect()
     frames.flush()
     await controller.flush()
 
-    expect(resize.observer.disconnect).toHaveBeenCalledTimes(1)
     expect(onRender).not.toHaveBeenCalled()
-  })
-
-  it('skips duplicate observe calls for the same target', () => {
-    const resize = createResizeObserverFactory()
-    const target = document.createElement('div')
-    const controller = createWatermarkRenderController({
-      getRenderOptions: renderOptions,
-      onRender: vi.fn(),
-      render: () => 'data:image/png;base64,x',
-      createResizeObserver: resize.factory
-    })
-
-    controller.observe(target)
-    controller.observe(target)
-
-    expect(resize.factory).toHaveBeenCalledTimes(1)
-    expect(resize.observer.observe).toHaveBeenCalledTimes(1)
   })
 
   it('flushes pending render even before the scheduled frame runs', async () => {
@@ -385,151 +309,26 @@ describe('watermark-utils', () => {
       offsetY: 0,
       zIndex: 999
     })
-    expect(style.zIndex).toBe('999')
-    expect(style.backgroundPosition).toBe('0px 0px')
-    expect(style.backgroundSize).toContain('210px') // width + gapX
-    expect(style.backgroundSize).toContain('120px') // height + gapY
+    expect(style['--tiger-watermark-z']).toBe('999')
+    expect(style['--tiger-watermark-position']).toBe('0px 0px')
+    expect(style['--tiger-watermark-size']).toContain('210px')
+    expect(style['--tiger-watermark-size']).toContain('120px')
   })
 
-  it('controller re-observe replaces previous target', () => {
-    const frames = createFrameScheduler()
-    const resize = createResizeObserverFactory()
+  it('observe does not watch the host for removal or style changes', () => {
     const onRender = vi.fn()
-    const target1 = document.createElement('div')
-    const target2 = document.createElement('div')
-    const controller = createWatermarkRenderController({
-      getRenderOptions: () => ({
-        content: 'Demo',
-        width: 120,
-        height: 64,
-        rotate: -22,
-        font: resolveWatermarkFont()
-      }),
-      onRender,
-      render: () => 'data:image/png;base64,x',
-      requestFrame: frames.requestFrame,
-      cancelFrame: frames.cancelFrame,
-      createResizeObserver: resize.factory
-    })
-
-    controller.observe(target1)
-    controller.observe(target2)
-    expect(resize.observer.observe).toHaveBeenCalledTimes(2)
-  })
-
-  function createCoveringOverlay(): HTMLElement {
-    const overlay = document.createElement('div')
-    overlay.dataset.watermark = 'true'
-    overlay.setAttribute('aria-hidden', 'true')
-    overlay.style.position = 'absolute'
-    overlay.style.pointerEvents = 'none'
-    overlay.style.inset = '0'
-    overlay.style.backgroundRepeat = 'repeat'
-    return overlay
-  }
-
-  function createObservedHost(): HTMLElement {
     const target = document.createElement('div')
-    document.body.appendChild(target)
-    return target
-  }
-
-  async function waitForMutations(): Promise<void> {
-    await Promise.resolve()
-    await Promise.resolve()
-    await new Promise((resolve) => setTimeout(resolve, 0))
-  }
-
-  it('does not treat overlay paint or remount as tamper', async () => {
-    const onTamper = vi.fn()
-    const target = createObservedHost()
-    const overlay = createCoveringOverlay()
+    const overlay = document.createElement('div')
     target.appendChild(overlay)
     const controller = createWatermarkRenderController({
       getRenderOptions: renderOptions,
-      onRender: vi.fn(),
-      onTamper,
-      render: () => 'data:image/png;base64,x'
-    })
-
-    controller.observe(target)
-    overlay.style.backgroundImage = 'url(data:image/png;base64,x)'
-    await waitForMutations()
-
-    const remounted = createCoveringOverlay()
-    remounted.style.backgroundImage = overlay.style.backgroundImage
-    overlay.remove()
-    target.appendChild(remounted)
-    await waitForMutations()
-
-    expect(onTamper).not.toHaveBeenCalled()
-    controller.disconnect()
-    target.remove()
-  })
-
-  it('restores overlay when the direct child is removed', async () => {
-    const onTamper = vi.fn()
-    const target = createObservedHost()
-    const overlay = createCoveringOverlay()
-    target.appendChild(overlay)
-    const controller = createWatermarkRenderController({
-      getRenderOptions: renderOptions,
-      onRender: vi.fn(),
-      onTamper,
+      onRender,
       render: () => 'data:image/png;base64,x'
     })
 
     controller.observe(target)
     overlay.remove()
-    await vi.waitFor(() => expect(onTamper).toHaveBeenCalledTimes(1))
-
-    controller.disconnect()
-    target.remove()
-  })
-
-  it('restores overlay when covering styles are stripped', async () => {
-    const onTamper = vi.fn()
-    const target = createObservedHost()
-    const overlay = createCoveringOverlay()
-    target.appendChild(overlay)
-    const controller = createWatermarkRenderController({
-      getRenderOptions: renderOptions,
-      onRender: vi.fn(),
-      onTamper,
-      render: () => 'data:image/png;base64,x'
-    })
-
-    controller.observe(target)
     overlay.setAttribute('style', '')
-    await vi.waitFor(() => expect(onTamper).toHaveBeenCalledTimes(1))
-
-    controller.disconnect()
-    target.remove()
-  })
-
-  it('ignores descendant watermark overlays', async () => {
-    const onTamper = vi.fn()
-    const target = createObservedHost()
-    const overlay = createCoveringOverlay()
-    const content = document.createElement('div')
-    const nested = createCoveringOverlay()
-    content.appendChild(nested)
-    target.appendChild(content)
-    target.appendChild(overlay)
-    const controller = createWatermarkRenderController({
-      getRenderOptions: renderOptions,
-      onRender: vi.fn(),
-      onTamper,
-      render: () => 'data:image/png;base64,x'
-    })
-
-    controller.observe(target)
-    nested.style.backgroundImage = 'url(data:image/png;base64,nested)'
-    nested.remove()
-    await waitForMutations()
-
-    expect(onTamper).not.toHaveBeenCalled()
-    controller.disconnect()
-    target.remove()
+    expect(onRender).not.toHaveBeenCalled()
   })
 })

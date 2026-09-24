@@ -1,25 +1,19 @@
 /**
- * Shared React hook for floating-popup components
- * (Tooltip, Popover, Popconfirm).
- *
- * Extracts the common pattern: controlled/uncontrolled visibility,
- * Floating UI positioning, click-outside dismiss, escape-key dismiss,
- * trigger → event-handler mapping, floating styles.
+ * React binding for the shared overlay popup controller.
+ * Open state, hover timing, outside click, and Escape live in core.
  */
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 import { useAnchoredOverlay } from './overlay'
-import { useControlledState } from '../hooks/useControlledState'
 import {
   buildOverlayTriggerHandlerMap,
-  createFloatingHoverDelayController,
+  createOverlayPopupController,
   restoreFocus,
   type FloatingPlacement,
-  type FloatingTrigger
+  type FloatingTrigger,
+  type OverlayPopupController,
+  type OverlayPopupDismissReason
 } from '@expcat/tigercat-core'
 
-// ---------------------------------------------------------------------------
-// Options
-// ---------------------------------------------------------------------------
 export interface UsePopupOptions {
   open?: boolean
   defaultOpen?: boolean
@@ -27,19 +21,21 @@ export interface UsePopupOptions {
   trigger?: FloatingTrigger
   placement?: FloatingPlacement
   offset?: number
+  showDelay?: number
+  hideDelay?: number
   /**
-   * Whether the component supports multi-trigger-type (click/hover/focus/manual).
-   * Popconfirm is click-only so this should be false for it.
+   * Popconfirm is click-only.
    * @default true
    */
   multiTrigger?: boolean
   arrowRef?: React.RefObject<HTMLElement | null>
-  onOpenChange?: (visible: boolean) => void
+  onOpenChange?: (open: boolean) => void
+  isDismissLocked?: () => boolean
+  onDismissed?: (reason: OverlayPopupDismissReason) => void
+  /** Popconfirm restores focus for outside clicks too. */
+  restoreFocusOnDismiss?: 'escape' | 'all'
 }
 
-// ---------------------------------------------------------------------------
-// Return type
-// ---------------------------------------------------------------------------
 export interface UsePopupReturn {
   currentVisible: boolean
   setVisible: (next: boolean) => void
@@ -59,55 +55,51 @@ export interface UsePopupReturn {
   arrowY: number | undefined
 }
 
-// ---------------------------------------------------------------------------
-// Hook
-// ---------------------------------------------------------------------------
 export function usePopup(options: UsePopupOptions): UsePopupReturn {
-  const {
-    open,
-    defaultOpen = false,
-    disabled = false,
-    trigger = 'click',
-    placement = 'top',
-    offset = 8,
-    multiTrigger = true,
-    arrowRef,
-    onOpenChange
-  } = options
-
-  // ─── Visibility ──────────────────────────────────────────────────────
-  const [currentVisible, setVisibleState] = useControlledState({
-    value: open,
-    defaultValue: defaultOpen,
-    onChange: onOpenChange
-  })
+  const optionsRef = useRef(options)
+  optionsRef.current = options
 
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
 
-  // ─── setVisible ──────────────────────────────────────────────────────
-  const setVisible = useCallback(
-    (next: boolean) => {
-      if (disabled && next) return
-      setVisibleState(next)
-    },
-    [disabled, setVisibleState]
-  )
-
-  const setVisibleRef = useRef(setVisible)
-  setVisibleRef.current = setVisible
-
-  const hoverControllerRef = useRef<ReturnType<typeof createFloatingHoverDelayController> | null>(
-    null
-  )
-  if (hoverControllerRef.current === null) {
-    hoverControllerRef.current = createFloatingHoverDelayController({
-      show: () => setVisibleRef.current(true),
-      hide: () => setVisibleRef.current(false)
+  const controllerRef = useRef<OverlayPopupController | null>(null)
+  if (controllerRef.current === null) {
+    controllerRef.current = createOverlayPopupController({
+      getControlledOpen: () => optionsRef.current.open,
+      getDefaultOpen: () => optionsRef.current.defaultOpen ?? false,
+      getDisabled: () => Boolean(optionsRef.current.disabled),
+      getTrigger: () =>
+        optionsRef.current.multiTrigger === false
+          ? 'click'
+          : (optionsRef.current.trigger ?? 'click'),
+      getShowDelay: () => optionsRef.current.showDelay,
+      getHideDelay: () => optionsRef.current.hideDelay,
+      isDismissLocked: () => Boolean(optionsRef.current.isDismissLocked?.()),
+      isFocusWithinTrigger: () => {
+        const active = triggerRef.current?.ownerDocument?.activeElement
+        return Boolean(active && triggerRef.current?.contains(active))
+      },
+      onOpenChange: (open) => optionsRef.current.onOpenChange?.(open)
     })
   }
-  const hoverController = hoverControllerRef.current
+  const controller = controllerRef.current
+
+  const currentVisible = useSyncExternalStore(
+    controller.subscribe,
+    controller.getOpen,
+    () => false
+  )
+
+  const disabled = Boolean(options.disabled)
+  useEffect(() => {
+    controller.syncDisabled()
+  }, [disabled, controller])
+
+  useEffect(() => () => controller.dispose(), [controller])
+
+  const multiTrigger = options.multiTrigger !== false
+  const effectiveTrigger: FloatingTrigger = multiTrigger ? (options.trigger ?? 'click') : 'click'
 
   const restoreTriggerFocus = useCallback(() => {
     window.setTimeout(() => {
@@ -115,48 +107,53 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     }, 0)
   }, [])
 
-  const effectiveTrigger: FloatingTrigger = multiTrigger ? trigger : 'click'
-
   const closeAndRestoreFocus = useCallback(() => {
-    hoverController.closeNow()
-    if (effectiveTrigger !== 'hover') restoreTriggerFocus()
-  }, [effectiveTrigger, hoverController, restoreTriggerFocus])
+    const closed = controller.requestClose('escape')
+    if (closed && effectiveTrigger !== 'hover') restoreTriggerFocus()
+  }, [controller, effectiveTrigger, restoreTriggerFocus])
 
-  // ─── Trigger handlers ────────────────────────────────────────────────
+  const relatedInside = (event?: { relatedTarget?: EventTarget | null }) => {
+    const related = event?.relatedTarget
+    if (!(related instanceof Node)) return false
+    return Boolean(
+      floatingRef.current?.contains(related) || triggerRef.current?.contains(related)
+    )
+  }
+
   const handleToggle = useCallback(() => {
-    if (disabled) return
-    hoverController.cancel()
-    setVisible(!currentVisible)
-  }, [disabled, currentVisible, setVisible, hoverController])
+    controller.activate()
+  }, [controller])
 
-  const handleShow = useCallback(() => {
-    if (disabled) return
-    if (effectiveTrigger === 'hover') {
-      hoverController.enter()
-      return
-    }
-    hoverController.cancel()
-    setVisible(true)
-  }, [disabled, effectiveTrigger, setVisible, hoverController])
+  const handleShow = useCallback(
+    (event?: React.SyntheticEvent) => {
+      const type = event?.type
+      if (type === 'click') {
+        controller.activate()
+        return
+      }
+      if (type === 'focus' || type === 'focusin') {
+        controller.focusEnter()
+        return
+      }
+      controller.pointerEnter()
+    },
+    [controller]
+  )
 
   const handleHide = useCallback(
-    (event?: React.FocusEvent | React.MouseEvent) => {
-      if (disabled) return
-      const related = (event as React.FocusEvent | undefined)?.relatedTarget
-      if (
-        related instanceof Node &&
-        (floatingRef.current?.contains(related) || triggerRef.current?.contains(related))
-      ) {
+    (event?: React.SyntheticEvent) => {
+      const type = event?.type
+      if (type === 'blur' || type === 'focusout') {
+        controller.focusLeave(relatedInside(event as React.FocusEvent))
         return
       }
-      if (effectiveTrigger === 'hover') {
-        hoverController.leave()
-        return
-      }
-      hoverController.closeNow()
+      controller.pointerLeave()
     },
-    [disabled, effectiveTrigger, hoverController]
+    [controller]
   )
+
+  const placement = options.placement ?? 'top'
+  const offset = options.offset ?? 8
 
   const overlay = useAnchoredOverlay({
     enabled: currentVisible,
@@ -167,38 +164,44 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     offset,
     dismissOnOutside: effectiveTrigger === 'click' || effectiveTrigger === 'hover',
     dismissOnEscape: effectiveTrigger !== 'manual',
-    arrowRef,
+    arrowRef: options.arrowRef,
     onDismiss: (reason) => {
-      if (reason === 'escape') {
-        closeAndRestoreFocus()
-      } else {
-        hoverController.closeNow()
-      }
+      const mapped: OverlayPopupDismissReason = reason === 'escape' ? 'escape' : 'outside'
+      const closed = controller.requestClose(mapped)
+      if (!closed) return
+      const restore =
+        effectiveTrigger !== 'hover' &&
+        (mapped === 'escape' || optionsRef.current.restoreFocusOnDismiss === 'all')
+      if (restore) restoreTriggerFocus()
+      optionsRef.current.onDismissed?.(mapped)
     }
   })
 
-  // Trigger + floating share one hover group so the pointer can cross the
-  // offset gap into the portaled layer before hideDelay fires.
   useEffect(() => {
-    if (!multiTrigger || effectiveTrigger !== 'hover' || !currentVisible) return
+    if (effectiveTrigger !== 'hover' || !currentVisible) return
     const el = floatingRef.current
     if (!el) return
-    const handleEnter = () => hoverController.enter()
-    const handleLeave = () => hoverController.leave()
-    el.addEventListener('mouseenter', handleEnter)
-    el.addEventListener('mouseleave', handleLeave)
+    const enter = () => controller.pointerEnter()
+    const leave = () => controller.pointerLeave()
+    el.addEventListener('mouseenter', enter)
+    el.addEventListener('mouseleave', leave)
+    el.addEventListener('pointerenter', enter)
+    el.addEventListener('pointerleave', leave)
     return () => {
-      el.removeEventListener('mouseenter', handleEnter)
-      el.removeEventListener('mouseleave', handleLeave)
+      el.removeEventListener('mouseenter', enter)
+      el.removeEventListener('mouseleave', leave)
+      el.removeEventListener('pointerenter', enter)
+      el.removeEventListener('pointerleave', leave)
     }
-  }, [multiTrigger, effectiveTrigger, currentVisible, hoverController])
+  }, [effectiveTrigger, currentVisible, controller])
 
-  useEffect(() => () => hoverController.dispose(), [hoverController])
-
-  // ─── Trigger handlers map ────────────────────────────────────────────
   const triggerHandlers = useMemo<React.DOMAttributes<HTMLElement>>(() => {
     if (!multiTrigger) {
-      return { onClick: handleToggle }
+      return buildOverlayTriggerHandlerMap(
+        'click',
+        { toggle: handleToggle, show: handleShow, hide: handleHide },
+        'react'
+      ) as React.DOMAttributes<HTMLElement>
     }
     return buildOverlayTriggerHandlerMap(
       effectiveTrigger,
@@ -206,6 +209,13 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
       'react'
     ) as React.DOMAttributes<HTMLElement>
   }, [multiTrigger, effectiveTrigger, handleToggle, handleShow, handleHide])
+
+  const setVisible = useCallback(
+    (next: boolean) => {
+      controller.setOpen(next)
+    },
+    [controller]
+  )
 
   return {
     currentVisible,

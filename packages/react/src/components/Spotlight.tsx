@@ -20,11 +20,15 @@ import {
   getPickerNavigationIndex,
   getPickerOptionAria,
   getPickerOptionId,
+  claimSpotlightHotkey,
   getSpotlightLabels,
   getSpotlightOptionClasses,
   getSpotlightSearchState,
   getSpotlightShortcutLabel,
+  isSpotlightHotkeyEnabled,
   isSpotlightToggleHotkey,
+  releaseSpotlightHotkey,
+  resolveSpotlightIconKind,
   mergeTigerLocale,
   restoreFocus,
   shouldCloseOnMaskClick,
@@ -45,7 +49,8 @@ import {
   type SpotlightItem,
   type SpotlightProps as CoreSpotlightProps
 } from '@expcat/tigercat-core'
-import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import { useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import { OverlayPortal } from '../utils/overlay-outlet'
 import { useTigerConfig } from './ConfigProvider'
 import { useControlledState } from '../hooks/useControlledState'
 
@@ -62,11 +67,11 @@ export interface SpotlightProps
 const EMPTY_ITEMS: SpotlightItem[] = []
 
 function getRenderableIcon(icon: unknown): React.ReactNode | null {
-  if (icon === null || icon === undefined) return null
-  if (typeof icon === 'string' || typeof icon === 'number') return icon
-  if (React.isValidElement(icon)) return icon
-  if (Array.isArray(icon)) return icon as React.ReactNode
-  return null
+  const kind = resolveSpotlightIconKind(icon)
+  if (kind === 'none') return null
+  if (kind === 'text') return icon as React.ReactNode
+  if (kind === 'node') return icon as React.ReactNode
+  return icon as React.ReactNode
 }
 
 export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Spotlight(
@@ -90,7 +95,7 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
     defaultActiveFirstItem = true,
     filterItem,
     limit,
-    hotkey = true,
+    hotkey = false,
     onOpenChange,
     onQueryChange,
     onSelect,
@@ -166,15 +171,21 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
   useBodyScrollLock({ enabled: resolvedOpen })
   useFocusTrap({ enabled: resolvedOpen, containerRef: rootRef, inert: true })
 
+  const hotkeyOwnerRef = useRef<object>({})
   useEffect(() => {
-    if (hotkey === false) return
+    if (!isSpotlightHotkeyEnabled(hotkey)) return
+    const owner = hotkeyOwnerRef.current
+    if (!claimSpotlightHotkey(owner)) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (!isSpotlightToggleHotkey(event, hotkey)) return
       event.preventDefault()
       toggleSpotlight()
     }
     document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      releaseSpotlightHotkey(owner)
+    }
   }, [hotkey, toggleSpotlight])
 
   useEffect(() => {
@@ -223,14 +234,17 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
   useEffect(() => {
     if (!resolvedOpen) return
     const onKeyDown = (event: KeyboardEvent) => {
-      const item = findSpotlightShortcutItem(event, items)
+      const item = findSpotlightShortcutItem(
+        event,
+        searchState.flatResults.map((result) => result.item)
+      )
       if (!item) return
       event.preventDefault()
       selectItem(item)
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [items, resolvedOpen, selectItem])
+  }, [resolvedOpen, searchState.flatResults, selectItem])
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -288,7 +302,7 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
       <div
         key={String(result.item.key)}
         id={getPickerOptionId(listboxId, result.flatIndex)}
-        {...getPickerOptionAria({ selected: false, disabled: result.item.disabled })}
+        {...getPickerOptionAria({ selected: active, disabled: result.item.disabled })}
         className={getSpotlightOptionClasses(active, result.item.disabled === true)}
         onMouseEnter={() => {
           if (result.item.disabled) return
@@ -350,7 +364,7 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
               activeOptionId,
               autocomplete: 'list'
             })}
-            onChange={(event) => setQueryValue(event.currentTarget.value)}
+            onChange={(event) => setQueryValue((event.target as HTMLInputElement).value)}
             onKeyDown={handleKeyDown}
           />
         </div>
@@ -379,14 +393,16 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
           )}
         </div>
         {searchState.flatResults.length === 0 ? (
-          <div className={spotlightEmptyClasses}>{emptyMessage}</div>
+          <div className={spotlightEmptyClasses} role="status" aria-live="polite">
+            {emptyMessage}
+          </div>
         ) : null}
       </div>
       <div id={overlayHostId} className="contents" data-tiger-overlay-host="" />
     </div>
   )
 
-  return renderBodyPortal(content)
+  return <OverlayPortal>{content}</OverlayPortal>
 })
 
 export default Spotlight

@@ -5,7 +5,7 @@
 export const STATUS_MIX_HUE_PERCENT = 75
 
 export function mixStatusTowardText(cssVar: string, fallbackHex: string): string {
-  return `color-mix(in_srgb,var(${cssVar},${fallbackHex})_${STATUS_MIX_HUE_PERCENT}%,var(--tiger-text,#111827))`
+  return `color-mix(in_srgb,var(${cssVar},${fallbackHex})_${STATUS_MIX_HUE_PERCENT}%,var(--tiger-text))`
 }
 
 export function mixStatusTowardTextClass(

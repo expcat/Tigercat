@@ -56,14 +56,16 @@ describe('SplitButton', () => {
       expect(screen.getByRole('button', { name: 'More options' })).toBeInTheDocument()
     })
 
-    it('renders menu items via the existing Dropdown API', () => {
-      renderSplitButton()
+    it('renders menu items via the existing Dropdown API', async () => {
+      const { container } = renderSplitButton()
+      expect(screen.queryByText('Save as draft')).not.toBeInTheDocument()
+      await userEvent.click(getTrigger(container))
       expect(screen.getByText('Save as draft')).toBeInTheDocument()
       expect(screen.getByText('Save and publish')).toBeInTheDocument()
     })
 
-    it('accepts DropdownMenu from the menu prop', () => {
-      render(
+    it('accepts DropdownMenu from the menu prop', async () => {
+      const { container } = render(
         <SplitButton
           menu={
             <DropdownMenu>
@@ -74,17 +76,19 @@ describe('SplitButton', () => {
         </SplitButton>
       )
       expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument()
+      expect(screen.queryByText('CSV')).not.toBeInTheDocument()
+      await userEvent.click(getTrigger(container))
       expect(screen.getByText('CSV')).toBeInTheDocument()
     })
 
-    it('puts type and htmlType on the primary button, not the group', () => {
+    it('puts type on the primary button, not the group', () => {
       const { container, rerender } = renderSplitButton({ type: 'submit' })
       expect(getRoot(container)).not.toHaveAttribute('type')
       expect(getPrimary(container)).toHaveAttribute('type', 'submit')
       expect(getTrigger(container)).toHaveAttribute('type', 'button')
 
       rerender(
-        <SplitButton htmlType="reset" type="submit">
+        <SplitButton type="reset">
           Save
           <DropdownMenu>
             <DropdownItem>Save as draft</DropdownItem>
@@ -100,22 +104,21 @@ describe('SplitButton', () => {
     it('fires onClick on the primary button without opening the menu', async () => {
       const onClick = vi.fn()
       const { container } = renderSplitButton({ onClick })
-      const wrapper = getMenuWrapper()
-      expect(wrapper).toHaveAttribute('hidden')
+      expect(getMenuWrapper()).toBeNull()
 
       await userEvent.click(getPrimary(container))
       expect(onClick).toHaveBeenCalledTimes(1)
-      expect(wrapper).toHaveAttribute('hidden')
+      expect(getMenuWrapper()).toBeNull()
     })
 
     it('opens the dropdown from the chevron trigger without firing the primary click', async () => {
       const onClick = vi.fn()
       const { container } = renderSplitButton({ onClick })
-      const wrapper = getMenuWrapper()
+      expect(getMenuWrapper()).toBeNull()
 
       await userEvent.click(getTrigger(container))
       expect(onClick).not.toHaveBeenCalled()
-      expect(wrapper).not.toHaveAttribute('hidden')
+      expect(getMenuWrapper()).not.toBeNull()
       expect(getTrigger(container)).toHaveAttribute('aria-expanded', 'true')
     })
 
@@ -147,15 +150,14 @@ describe('SplitButton', () => {
       await userEvent.click(getPrimary(container))
       await userEvent.click(getTrigger(container))
       expect(onClick).not.toHaveBeenCalled()
-      expect(getMenuWrapper()).toHaveAttribute('hidden')
+      expect(getMenuWrapper()).toBeNull()
     })
 
-    it('puts the primary action into a loading state without disabling the trigger', () => {
+    it('treats loading as disabled on both the primary action and the trigger', () => {
       const { container } = renderSplitButton({ loading: true })
       expect(getPrimary(container)).toHaveAttribute('aria-busy', 'true')
-      expect(getPrimary(container)).not.toBeDisabled()
-      expect(getTrigger(container)).not.toBeDisabled()
-      expect(getTrigger(container)).toHaveAttribute('aria-disabled', 'true')
+      expect(getPrimary(container)).toBeDisabled()
+      expect(getTrigger(container)).toBeDisabled()
     })
   })
 
@@ -223,7 +225,7 @@ describe('SplitButton', () => {
       act(() => {
         fireEvent.click(getTrigger(container))
       })
-      expect(getMenuWrapper()).toHaveAttribute('hidden')
+      expect(getMenuWrapper()).toBeNull()
     })
   })
 })

@@ -5,12 +5,10 @@
 import type { TigerLocale, TigerLocaleMarquee } from './locale'
 
 /**
- * Scroll direction. Horizontal `left` / `right` follow the inline axis
- * (`left` toward inline-start, `right` toward inline-end). `up` / `down`
- * follow the block axis. A vertical viewport is the first copy unless the
- * caller sets a root height.
+ * Scroll direction. `start` / `end` follow the inline axis.
+ * `up` / `down` follow the block axis.
  */
-export type MarqueeDirection = 'left' | 'right' | 'up' | 'down'
+export type MarqueeDirection = 'start' | 'end' | 'up' | 'down'
 
 /**
  * Gap between items and between duplicated copies.
@@ -21,7 +19,7 @@ export type MarqueeGap = number | string
 /**
  * Default loop direction
  */
-export const DEFAULT_MARQUEE_DIRECTION: MarqueeDirection = 'left'
+export const DEFAULT_MARQUEE_DIRECTION: MarqueeDirection = 'start'
 
 /**
  * Default time for one full loop, in milliseconds
@@ -58,9 +56,8 @@ export const DEFAULT_MARQUEE_PAUSE_ON_FOCUS = true
  */
 export interface MarqueeProps {
   /**
-   * Scroll direction. `left`/`right` are logical (inline-start/end).
-   * Vertical height is the first copy unless the root height is set.
-   * @default 'left'
+   * Scroll direction. `start` / `end` follow the inline axis.
+   * @default 'start'
    */
   direction?: MarqueeDirection
 
@@ -106,9 +103,9 @@ export interface MarqueeProps {
   repeat?: number
 
   /**
-   * Accessible name for the region. Overlay: dedicated `ariaLabel` /
-   * `aria-label` → `labels` → `locale.marquee.ariaLabel`. Omitted or blank:
-   * not a landmark.
+   * Accessible name for the region. Uses `aria-label`, `ariaLabel`, or
+   * `labels.ariaLabel`. Omitted or blank: not a landmark. Locale text
+   * does not create a landmark by itself.
    */
   ariaLabel?: string
   /** Locale object merged on top of ConfigProvider. */

@@ -93,6 +93,8 @@ export interface TreeContext {
   searchQuery: string
   setSearchQuery: (value: string) => void
   searchPlaceholder: string
+  loadingText: string
+  dragContainerId: string
   selectNodeLabel: (label: string) => string
   view: TreeView
   loadingIds: Set<string>

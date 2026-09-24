@@ -3,8 +3,8 @@
  * Vue/React bind DOM and controlled props; they must not copy this machine.
  */
 
-import { handleMenuNavigation } from './focus-utils'
 import { devWarn } from './dev-warn'
+import { handleMenuNavigation, isTextEditingTarget } from './focus-utils'
 import { getFocusableElements } from './overlay-utils'
 import {
   NAVIGATION_MENU_BAR_ITEM_ATTR,
@@ -124,10 +124,21 @@ export function handleMenubarNavigation(
 export type NavigationMenuPanelKeyAction =
   'menu-nav' | 'close-to-trigger' | 'move-menubar-next' | 'tab-exit' | 'shift-tab-exit'
 
+export type NavigationMenuPanelMode = 'menu' | 'mega'
+
 export function getNavigationMenuPanelKeyAction(
   event: KeyboardEvent,
-  dir: 'ltr' | 'rtl' = 'ltr'
+  dir: 'ltr' | 'rtl' = 'ltr',
+  mode: NavigationMenuPanelMode = 'menu'
 ): NavigationMenuPanelKeyAction | null {
+  if (isTextEditingTarget(event.target)) {
+    if (event.key === 'Escape') return 'close-to-trigger'
+    return null
+  }
+  if (mode === 'mega') {
+    if (event.key === 'Escape') return 'close-to-trigger'
+    return null
+  }
   if (event.key === 'Tab') return event.shiftKey ? 'shift-tab-exit' : 'tab-exit'
   if (event.key === 'Escape') return 'close-to-trigger'
   if (isInlineStartKey(event.key, dir)) return 'close-to-trigger'
@@ -147,14 +158,30 @@ export function applyNavigationMenuPanelKey(options: {
   event: KeyboardEvent
   panel: HTMLElement
   dir?: 'ltr' | 'rtl'
+  mode?: NavigationMenuPanelMode
 }): NavigationMenuPanelKeyAction | null {
-  const action = getNavigationMenuPanelKeyAction(options.event, options.dir ?? 'ltr')
+  const action = getNavigationMenuPanelKeyAction(
+    options.event,
+    options.dir ?? 'ltr',
+    options.mode ?? 'menu'
+  )
   if (action === 'menu-nav') {
     handleMenuNavigation(options.panel, options.event)
     return action
   }
   if (action) options.event.preventDefault()
   return action
+}
+
+export function shouldKeepNavigationMenuOpen(options: {
+  nav: HTMLElement | null
+  panel: HTMLElement | null
+  active?: Element | null
+}): boolean {
+  const active = options.active
+  if (!active) return false
+  if (options.panel?.contains(active)) return true
+  return false
 }
 
 export function getNavigationMenuTabExitTarget(
@@ -190,6 +217,8 @@ export function createNavigationMenuHoverSession(options: {
   getValue: () => NavigationMenuValue | null
   setValue: (next: NavigationMenuValue | null) => void
   isDisabled?: () => boolean
+  /** Pointer left, but focus is still in the panel. */
+  shouldStayOpen?: () => boolean
 }): {
   scheduleOpen: (itemValue: NavigationMenuValue) => void
   scheduleClose: (itemValue: NavigationMenuValue) => void
@@ -240,9 +269,11 @@ export function createNavigationMenuHoverSession(options: {
   }
 
   const scheduleClose = (itemValue: NavigationMenuValue) => {
+    if (options.shouldStayOpen?.()) return
     clearOpen()
 
     const close = () => {
+      if (options.shouldStayOpen?.()) return
       if (isNavigationMenuValueOpen(itemValue, options.getValue())) {
         options.setValue(null)
       }

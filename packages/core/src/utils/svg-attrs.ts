@@ -41,6 +41,8 @@ export const ICON_STROKE_LINECAP = 'round'
 
 export const ICON_STROKE_LINEJOIN = 'round'
 
+
+
 export type IconPaintMode = 'stroke' | 'fill'
 
 /**

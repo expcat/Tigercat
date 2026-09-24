@@ -11,6 +11,7 @@ import type {
   ChartScaleValue,
   PointScaleOptions
 } from '../../types/chart'
+import { devWarn } from '../dev-warn'
 
 const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
@@ -105,7 +106,11 @@ export function createPointScale(
   const n = domain.length
   const step = n > 1 ? length / Math.max(1, n - 1 + padding * 2) : 0
   const offset = n <= 1 ? length / 2 : step * padding
-  const indexMap = new Map(domain.map((value, index) => [value, index]))
+  const indexMap = new Map<string, number>()
+  domain.forEach((value, index) => {
+    const key = String(value)
+    if (!indexMap.has(key)) indexMap.set(key, index)
+  })
 
   return {
     type: 'point',
@@ -136,7 +141,11 @@ export function createBandScale(
   const step = n > 0 ? length / Math.max(1, n - paddingInner + paddingOuter * 2) : 0
   const bandwidth = step * (1 - paddingInner)
   const offset = (length - step * (n - paddingInner)) * align
-  const indexMap = new Map(domain.map((value, index) => [value, index]))
+  const indexMap = new Map<string, number>()
+  domain.forEach((value, index) => {
+    const key = String(value)
+    if (!indexMap.has(key)) indexMap.set(key, index)
+  })
 
   return {
     type: 'band',
@@ -152,6 +161,28 @@ export function createBandScale(
   }
 }
 
+/** One pass. Non-finite values are skipped. `null` when none remain. */
+export function scanFiniteExtent(values: ArrayLike<number>): { min: number; max: number } | null {
+  let min = Number.POSITIVE_INFINITY
+  let max = Number.NEGATIVE_INFINITY
+  let count = 0
+  let warned = false
+  for (let index = 0; index < values.length; index++) {
+    const value = values[index]
+    if (!Number.isFinite(value)) {
+      if (!warned) {
+        devWarn('chart.extent', 'Skipped a non-finite value while computing an extent')
+        warned = true
+      }
+      continue
+    }
+    count += 1
+    if (value < min) min = value
+    if (value > max) max = value
+  }
+  return count === 0 ? null : { min, max }
+}
+
 export function getNumberExtent(
   values: number[],
   options: {
@@ -161,10 +192,11 @@ export function getNumberExtent(
   } = {}
 ): [number, number] {
   const fallback: [number, number] = options.fallback ?? [0, 1]
-  if (values.length === 0) return fallback
+  const extent = scanFiniteExtent(values)
+  if (!extent) return fallback
 
-  let min = Math.min(...values)
-  let max = Math.max(...values)
+  let min = extent.min
+  let max = extent.max
   const allNonNegative = min >= 0
   const allNonPositive = max <= 0
 

@@ -17,6 +17,9 @@ import {
   richTextToolbarSeparatorClasses,
   richTextPlaceholderClasses,
   createDefaultRichTextToolbar,
+  toolbarForRichTextMode,
+  sanitizeHtml,
+  manageLiveRegion,
   findHotkeyMatch,
   isContentEmpty,
   parseHeight,
@@ -119,13 +122,26 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       () => getRichTextEditorLabels(mergedLocale, labelsOverride),
       [mergedLocale, labelsOverride]
     )
+    const [urlPrompt, setUrlPrompt] = useState<'link' | 'image' | null>(null)
+    const [urlDraft, setUrlDraft] = useState('')
+    const urlRef = useRef<string | null>(null)
+    const liveRef = useRef<ReturnType<typeof manageLiveRegion> | null>(null)
     const toolbarItems = useMemo(
-      () => (mode === 'plain' ? [] : (toolbar ?? createDefaultRichTextToolbar(labels))),
+      () => toolbarForRichTextMode(toolbar ?? createDefaultRichTextToolbar(labels), mode),
       [toolbar, labels, mode]
     )
     const toolbarButtons = useMemo(() => getToolbarButtons(toolbarItems), [toolbarItems])
 
     useImperativeHandle(ref, () => editorRef.current as HTMLDivElement)
+
+    useEffect(() => {
+      const region = manageLiveRegion('polite')
+      liveRef.current = region
+      return () => {
+        region.destroy()
+        liveRef.current = null
+      }
+    }, [])
 
     const createOptionsRef = useRef({
       isControlled,
@@ -164,9 +180,17 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
         disabled: options.effectiveDisabled,
         placeholder: options.placeholder,
         toolbar: options.toolbarItems,
-        requestUrl: options.onRequestUrl,
+        requestUrl: (kind) => {
+          const external = createOptionsRef.current.onRequestUrl
+          if (external) return external(kind)
+          return urlRef.current
+        },
+        announce(message) {
+          liveRef.current?.announce(message)
+        },
         notifyChange(html) {
-          createOptionsRef.current.setContent(html)
+          const currentMode = createOptionsRef.current.mode ?? 'html'
+          createOptionsRef.current.setContent(currentMode === 'html' ? sanitizeHtml(html) : html)
         },
         notifyActiveFormats(next) {
           setActiveFormats(next)
@@ -200,10 +224,24 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     const execButtonAction = useCallback(
       (btn: ToolbarButton) => {
         if (readOnly || effectiveDisabled) return
+        if ((btn.name === 'link' || btn.name === 'image') && !onRequestUrl) {
+          setUrlPrompt(btn.name)
+          setUrlDraft('')
+          return
+        }
         engineRef.current?.exec(btn.name)
       },
-      [readOnly, effectiveDisabled]
+      [onRequestUrl, readOnly, effectiveDisabled]
     )
+
+    const submitUrlPrompt = useCallback(() => {
+      if (!urlPrompt) return
+      urlRef.current = urlDraft.trim() || null
+      engineRef.current?.exec(urlPrompt)
+      urlRef.current = null
+      setUrlPrompt(null)
+      setUrlDraft('')
+    }, [urlDraft, urlPrompt])
 
     const handleKeydown = useCallback(
       (e: React.KeyboardEvent) => {
@@ -293,14 +331,43 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
                   disabled={effectiveDisabled || readOnly}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => execButtonAction(btn)}>
-                  {btn.icon ? <span dangerouslySetInnerHTML={{ __html: btn.icon }} /> : btn.label}
+                  {btn.icon ? (
+                    <svg
+                      viewBox={btn.icon.viewBox ?? '0 0 24 24'}
+                      width="16"
+                      height="16"
+                      aria-hidden="true">
+                      <path d={btn.icon.path} fill="currentColor" />
+                    </svg>
+                  ) : (
+                    btn.label
+                  )}
                 </button>
               )
             })}
           </div>
         )}
+        {urlPrompt ? (
+          <form
+            className="flex items-center gap-2 border-b border-[var(--tiger-border)] px-2 py-1.5"
+            onSubmit={(event) => {
+              event.preventDefault()
+              submitUrlPrompt()
+            }}>
+            <input
+              className="min-w-0 flex-1 rounded border border-[var(--tiger-border)] bg-transparent px-2 py-1 text-sm"
+              aria-label={urlPrompt === 'image' ? labels.image : labels.link}
+              placeholder="https://"
+              value={urlDraft}
+              onChange={(event) => setUrlDraft(event.target.value)}
+            />
+            <button type="submit" className={getToolbarButtonClasses(false)}>
+              {urlPrompt === 'image' ? labels.image : labels.link}
+            </button>
+          </form>
+        ) : null}
 
-        <div className="relative flex-1 overflow-hidden">
+        <div className="relative flex-1 min-h-0">
           <div
             ref={editorRef}
             className={editorAreaClasses}

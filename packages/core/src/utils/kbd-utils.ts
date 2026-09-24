@@ -16,7 +16,7 @@ import {
   type KbdVariant
 } from '../types/kbd'
 import { classNames } from './class-names'
-import { tagSizeClasses } from './tag-utils'
+
 
 /** Segment of a rendered key combo */
 export type KbdPart = { type: 'key'; value: string } | { type: 'separator'; value: string }
@@ -27,7 +27,14 @@ export type KbdPart = { type: 'key'; value: string } | { type: 'separator'; valu
  * carry the spacing so combo text stays readable.
  */
 export const kbdBaseClasses =
-  'tiger-kbd inline-flex items-center rounded-[var(--tiger-radius-sm,0.375rem)] border font-medium font-mono align-middle whitespace-nowrap transition-colors'
+  'tiger-kbd inline-flex items-center rounded-[var(--tiger-radius-sm)] border font-medium font-mono align-middle whitespace-nowrap transition-colors'
+
+/** Own size tokens. Font size changes with the step. */
+export const kbdSizeClasses: Record<KbdSize, string> = {
+  sm: 'h-5 px-1 text-[length:var(--tiger-component-kbd-font-size-sm,11px)]',
+  md: 'h-6 px-1.5 text-[length:var(--tiger-component-kbd-font-size-md,12px)]',
+  lg: 'h-7 px-2 text-[length:var(--tiger-component-kbd-font-size-lg,14px)]'
+}
 
 /** Nested key reset so inner `kbd` elements do not pick up UA chrome */
 export const kbdKeyClasses = 'tiger-kbd-key border-0 bg-transparent p-0 shadow-none rounded-none'
@@ -37,7 +44,7 @@ export const kbdSeparatorClasses = 'tiger-kbd-separator'
 
 /** Quieter chrome for the subtle variant */
 export const kbdSubtleVariantClasses =
-  'border-transparent bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-muted,#6b7280)]'
+  'border-transparent bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
 
 /** Default chrome: Tag default bg/text/border only, no Tag hover/close classes */
 export const kbdDefaultVariantClasses = [
@@ -134,18 +141,15 @@ export function getKbdVariantClasses(variant?: KbdVariant): string {
 }
 
 /**
- * Accessible name for a combo. Extra text is treated as the last key.
+ * Accessible name comes from the key list. Nodes that are not key names
+ * are not part of the combo.
  */
 export function resolveKbdAccessibleName(
   keys?: KbdKeys | null,
-  separator?: string,
-  extraKey?: string | null
+  separator?: string
 ): string | undefined {
   const combo = formatKbdCombo(keys, separator)
-  if (!combo) return undefined
-  const extra = extraKey?.trim() ?? ''
-  if (extra) return `${combo}${formatKbdSeparatorText(separator)}${extra}`
-  return combo
+  return combo || undefined
 }
 
 /**
@@ -161,7 +165,7 @@ export function getKbdRootClasses(
   const size = resolveKbdSize(input.size)
   return classNames(
     kbdBaseClasses,
-    tagSizeClasses[size],
+    kbdSizeClasses[size],
     getKbdVariantClasses(input.variant),
     input.className
   )

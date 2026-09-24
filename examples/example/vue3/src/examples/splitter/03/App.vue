@@ -8,11 +8,11 @@ import { Splitter } from '@expcat/tigercat-vue/Splitter'
       orientation="horizontal"
       :sizes="['25%', '75%']"
       dir="rtl"
-      style="height: 300px; border: 1px solid var(--tiger-border, #e5e7eb); border-radius: 8px">
-      <div class="p-4 h-full bg-[var(--tiger-surface-muted,#f9fafb)]">起始栏</div>
+      style="height: 300px; border: 1px solid var(--tiger-border); border-radius: 8px">
+      <div class="p-4 h-full bg-[var(--tiger-surface-muted)]">起始栏</div>
       <Splitter orientation="vertical" :sizes="['60%', '40%']">
         <div class="p-4">内容区</div>
-        <div class="p-4 bg-[var(--tiger-surface-muted,#f9fafb)]">底部面板</div>
+        <div class="p-4 bg-[var(--tiger-surface-muted)]">底部面板</div>
       </Splitter>
     </Splitter>
   </div>

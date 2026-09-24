@@ -2,21 +2,24 @@ import { computed, defineComponent, h, ref, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
-  DEFAULT_DATA_EXPORT_FORMATS,
   devWarn,
   getDataExportFormatLabel,
   getDataExportLabels,
-  isDataExportFormat,
   mergeStyleValues,
   mergeTigerLocale,
   resolveButtonClasses,
-  yieldDataExportFrame,
   type DataExportFormat,
   type DataExportOptions,
   type TableColumn,
   type TigerLocale,
   type TigerLocaleDataExport
 } from '@expcat/tigercat-core'
+import {
+  DEFAULT_DATA_EXPORT_FORMATS,
+  isDataExportFormat,
+  sanitizeDataExportRows,
+  yieldDataExportFrame
+} from '@expcat/tigercat-core/utils/data-export'
 import { useTigerConfig } from './ConfigProvider'
 import { Dropdown, DropdownMenu, DropdownItem } from './Dropdown'
 
@@ -25,7 +28,12 @@ type DataExportModule = typeof import('@expcat/tigercat-core/utils/data-export')
 let dataExportModulePromise: Promise<DataExportModule> | null = null
 
 function loadDataExportModule(): Promise<DataExportModule> {
-  dataExportModulePromise ??= import('@expcat/tigercat-core/utils/data-export')
+  if (!dataExportModulePromise) {
+    dataExportModulePromise = import('@expcat/tigercat-core/utils/data-export').catch((error) => {
+      dataExportModulePromise = null
+      throw error
+    })
+  }
   return dataExportModulePromise
 }
 
@@ -148,12 +156,12 @@ export const DataExport = defineComponent({
           await props.customExport({
             format,
             columns: props.columns,
-            dataSource: props.dataSource,
+            dataSource: sanitizeDataExportRows(props.columns, props.dataSource),
             fileName: props.fileName
           })
         } else {
           const mod = await loadDataExportModule()
-          mod.runDataExport({
+          await mod.runDataExport({
             columns: props.columns,
             dataSource: props.dataSource,
             format,
@@ -183,10 +191,12 @@ export const DataExport = defineComponent({
       const {
         class: attrsClass,
         style: attrsStyle,
+        onClick: callerClick,
         ...restAttrs
       } = attrsRecord as {
         class?: unknown
         style?: unknown
+        onClick?: (event: MouseEvent) => void
       } & Record<string, unknown>
 
       const triggerText = exporting.value
@@ -218,7 +228,9 @@ export const DataExport = defineComponent({
               : undefined,
           onClick:
             offeredFormats.value.length === 1 && !formatsEmpty.value
-              ? () => void handleExport(offeredFormats.value[0])
+              ? (event: MouseEvent) => {
+                  void handleExport(offeredFormats.value[0]).finally(() => callerClick?.(event))
+                }
               : undefined
         },
         triggerText
@@ -239,7 +251,10 @@ export const DataExport = defineComponent({
             trigger: 'click' as const,
             disabled: triggerDisabled.value,
             asChild: true,
-            showArrow: false
+            showArrow: false,
+            onOpenChange: (open: boolean) => {
+              if (open) callerClick?.(new MouseEvent('click'))
+            }
           },
           {
             default: () => [

@@ -60,8 +60,7 @@ function createImportMap(
 export function createSandboxDocument(options: SandboxDocumentOptions): string {
   const importMap = createImportMap(options.framework, options.imports, options.runtimeUrls)
   const htmlClass = options.colorScheme === 'dark' ? 'dark' : ''
-  const tigerStyleAttr =
-    options.theme === 'modern' ? ' data-tiger-style="modern"' : ' data-tiger-style="classic"'
+  const tigerStyleAttr = options.theme ? ` data-tiger-theme="${options.theme}"` : ''
   const cssVarsAttr = options.cssVars ? ` style="${options.cssVars.replace(/"/g, '&quot;')}"` : ''
   const reactRefreshUrl =
     options.framework === 'react' && options.runtimeUrls.framework.includes('/src/')

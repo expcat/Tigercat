@@ -4,6 +4,7 @@
  * Geometry is logical: horizontal progress 0 is inline-start.
  */
 
+import { observeSize } from './responsive'
 import type {
   ScrollAreaAxis,
   ScrollAreaAxisState,
@@ -35,15 +36,19 @@ export const scrollAreaRootClasses =
   'tiger-scroll-area group/scroll-area relative flex flex-col overflow-hidden'
 
 export const scrollAreaViewportBaseClasses =
-  'tiger-scroll-area-viewport w-full min-h-0 min-w-0 grow [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'tiger-scroll-area-viewport w-full min-h-0 min-w-0 grow focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-focus-ring)]'
+
+/** Native bars stay until the first measurement, then this class hides them. */
+export const scrollAreaViewportMeasuredClasses =
+  '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
 
 export const scrollAreaScrollbarBaseClasses =
-  'tiger-scroll-area-scrollbar absolute z-10 select-none rounded-full bg-[var(--tiger-surface-muted,#f9fafb)] tiger-motion-aware transition-opacity duration-200'
+  'tiger-scroll-area-scrollbar absolute z-10 select-none rounded-full bg-[var(--tiger-surface-muted)] tiger-motion-aware transition-opacity duration-200'
 
 export const scrollAreaThumbBaseClasses =
-  'tiger-scroll-area-thumb absolute rounded-full bg-[var(--tiger-border,#e5e7eb)] tiger-motion-aware transition-colors hover:bg-[var(--tiger-text-muted,#6b7280)] touch-none'
+  'tiger-scroll-area-thumb absolute rounded-full bg-[var(--tiger-border)] tiger-motion-aware transition-colors hover:bg-[var(--tiger-text-secondary)] touch-none'
 
-export const scrollAreaThumbDraggingClasses = 'bg-[var(--tiger-text-muted,#6b7280)]'
+export const scrollAreaThumbDraggingClasses = 'bg-[var(--tiger-text-secondary)]'
 
 export const scrollAreaContentBaseClasses = 'tiger-scroll-area-content'
 
@@ -63,7 +68,7 @@ const SCROLLBAR_THICKNESS_CLASSES: Record<ScrollAreaScrollbarSize, { x: string; 
 
 const THUMB_EDGE_INSET = '2px'
 const SHADOW_LENGTH = '0.75rem'
-const SHADOW_TINT = 'color-mix(in srgb, var(--tiger-text, #111827) 12%, transparent)'
+const SHADOW_TINT = 'color-mix(in srgb, var(--tiger-text) 12%, transparent)'
 
 function clamp(value: number, min: number, max: number): number {
   if (Number.isNaN(value)) return min
@@ -414,7 +419,7 @@ export function getScrollAreaShadowStyle(side: ScrollAreaShadowSide): ScrollArea
       insetBlockEnd: '0px',
       insetInlineStart: '0px',
       width: SHADOW_LENGTH,
-      backgroundImage: `linear-gradient(to right, ${SHADOW_TINT}, transparent)`
+      backgroundImage: `linear-gradient(to inline-end, ${SHADOW_TINT}, transparent)`
     }
   }
   return {
@@ -423,18 +428,46 @@ export function getScrollAreaShadowStyle(side: ScrollAreaShadowSide): ScrollArea
     insetBlockEnd: '0px',
     insetInlineEnd: '0px',
     width: SHADOW_LENGTH,
-    backgroundImage: `linear-gradient(to left, ${SHADOW_TINT}, transparent)`
+    backgroundImage: `linear-gradient(to inline-start, ${SHADOW_TINT}, transparent)`
   }
 }
 
 export function applyScrollAreaWheel(
   event: { deltaX: number; deltaY: number; ctrlKey?: boolean; preventDefault: () => void },
-  viewport: { scrollTop: number; scrollLeft: number }
+  viewport: {
+    scrollTop: number
+    scrollLeft: number
+    scrollHeight: number
+    scrollWidth: number
+    clientHeight: number
+    clientWidth: number
+  }
 ): void {
   if (event.ctrlKey) return
-  viewport.scrollTop += event.deltaY
-  viewport.scrollLeft += event.deltaX
+  const epsilon = 1
+  const maxTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight)
+  const maxLeft = Math.max(0, viewport.scrollWidth - viewport.clientWidth)
+  const vertical = Math.abs(event.deltaY) >= Math.abs(event.deltaX)
+  if (vertical) {
+    const atEnd = event.deltaY > 0 && viewport.scrollTop >= maxTop - epsilon
+    const atStart = event.deltaY < 0 && viewport.scrollTop <= epsilon
+    if (event.deltaY === 0 || atEnd || atStart || maxTop <= 0) return
+    viewport.scrollTop += event.deltaY
+  } else {
+    const atEnd = event.deltaX > 0 && viewport.scrollLeft >= maxLeft - epsilon
+    const atStart = event.deltaX < 0 && viewport.scrollLeft <= epsilon
+    if (event.deltaX === 0 || atEnd || atStart || maxLeft <= 0) return
+    viewport.scrollLeft += event.deltaX
+  }
   event.preventDefault()
+}
+
+/** Arrow keys scroll only when focus is the viewport itself. */
+export function isScrollAreaViewportKeyTarget(event: {
+  target: EventTarget | null
+  currentTarget: EventTarget | null
+}): boolean {
+  return event.target != null && event.target === event.currentTarget
 }
 
 const LINE_SCROLL = 40
@@ -482,11 +515,10 @@ export function computeScrollAreaKeyboardDelta(
 
 export function resolveScrollAreaViewportTabIndex(options: {
   overflow: boolean
-  hasFocusable: boolean
   userTabIndex?: number
 }): number | undefined {
   if (options.userTabIndex !== undefined) return options.userTabIndex
-  if (options.overflow && !options.hasFocusable) return 0
+  if (options.overflow) return 0
   return undefined
 }
 
@@ -494,17 +526,13 @@ export function observeScrollAreaSize(
   targets: Array<Element | null | undefined>,
   onResize: () => void
 ): () => void {
-  if (typeof ResizeObserver === 'undefined') return () => undefined
-
   const observed = targets.filter((target): target is Element => Boolean(target))
   if (observed.length === 0) return () => undefined
 
-  const observer = new ResizeObserver(() => onResize())
-  for (const target of observed) {
-    observer.observe(target)
+  const stops = observed.map((target) => observeSize(target, () => onResize()))
+  return () => {
+    for (const stop of stops) stop()
   }
-
-  return () => observer.disconnect()
 }
 
 const FOCUSABLE = 'a[href],button,input,select,textarea,iframe,[tabindex]:not([tabindex="-1"])'

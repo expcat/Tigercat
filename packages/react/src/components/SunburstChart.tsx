@@ -42,7 +42,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   width = DEFAULT_SUNBURST_SIZE,
   height = DEFAULT_SUNBURST_SIZE,
   padding = DEFAULT_SUNBURST_PADDING,
-  responsive = false,
+  responsive = true,
   data,
   innerRadiusRatio = 0,
   showLabels = true,
@@ -222,7 +222,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
               d={arc.path}
               fill={gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color}
               opacity={opacity}
-              stroke="var(--tiger-surface,#ffffff)"
+              stroke="var(--tiger-surface)"
               strokeWidth={1}
               data-sunburst-arc=""
               data-index={arc.index}

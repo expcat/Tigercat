@@ -2,7 +2,7 @@ import React, {
   useState,
   useRef,
   useEffect,
-  useLayoutEffect,
+
   useCallback,
   useMemo,
   useId,
@@ -38,7 +38,8 @@ import {
   imageErrorIconPath,
   imageLoadingSpinnerClasses,
   imageLoadingSpinnerPath,
-  injectImageCropperStyles,
+  formatCropSizeText,
+  nudgeCropHandle,
   mergeTigerLocale,
   moveCropRect,
   remapCropRect,
@@ -169,10 +170,6 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
         )
     })
 
-    useLayoutEffect(() => {
-      injectImageCropperStyles()
-    }, [])
-
     useEffect(() => {
       displayDimsRef.current = { w: displayWidth, h: displayHeight }
     }, [displayWidth, displayHeight])
@@ -279,38 +276,21 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
     useImperativeHandle(
       ref,
       () => ({
-        getCropResult: (): Promise<CropResult> => {
-          return new Promise((resolve, reject) => {
-            if (status !== 'ready' || !imageRef.current) {
-              reject(new Error('Image not loaded'))
-              return
-            }
-            try {
-              const { canvas, dataUrl } = cropCanvas(
-                imageRef.current,
-                cropRect,
-                displayWidth,
-                displayHeight,
-                outputType,
-                quality
-              )
-              canvas.toBlob(
-                (blob) => {
-                  if (blob) {
-                    const extension = (outputType.split('/')[1] || 'png').replace('jpeg', 'jpg')
-                    const file = new File([blob], `crop.${extension}`, { type: blob.type })
-                    resolve({ canvas, blob, dataUrl, cropRect: { ...cropRect }, file })
-                  } else {
-                    reject(new Error('Failed to create blob'))
-                  }
-                },
-                outputType,
-                quality
-              )
-            } catch (error) {
-              reject(error)
-            }
-          })
+        getCropResult: async (): Promise<CropResult> => {
+          if (status !== 'ready' || !imageRef.current) {
+            throw new Error('Image not loaded')
+          }
+          const blob = await cropCanvas(
+            imageRef.current,
+            cropRect,
+            displayWidth,
+            displayHeight,
+            outputType,
+            quality
+          )
+          const extension = (outputType.split('/')[1] || 'png').replace('jpeg', 'jpg')
+          const file = new File([blob], `crop.${extension}`, { type: blob.type || outputType })
+          return { blob, cropRect: { ...cropRect }, file }
         }
       }),
       [cropRect, displayHeight, displayWidth, outputType, quality, status]
@@ -430,6 +410,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             className={imageCropperFrameClasses}
             style={{ width: displayWidth, height: displayHeight }}>
             <img
+              crossOrigin="anonymous"
               src={src}
               className={imageCropperImgClasses}
               style={{ width: displayWidth, height: displayHeight }}
@@ -535,6 +516,9 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             </>
           )}
 
+          <span className="sr-only" aria-live="polite">
+            {formatCropSizeText(labels.cropSizeText, cr.width, cr.height)}
+          </span>
           {CROP_HANDLES.map((handle) => (
             <div
               key={handle}
@@ -542,11 +526,27 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               style={getCropperHandleStyle(handle, cr)}
               data-crop-handle={handle}
               role="button"
-              tabIndex={-1}
+              tabIndex={0}
               aria-label={formatCropperResizeAriaLabel(
                 labels.resizeCropAreaAriaLabel,
                 getCropperHandleName(handle, labels)
               )}
+              onKeyDown={(event) => {
+                const next = nudgeCropHandle(
+                  cr,
+                  handle,
+                  event.key,
+                  1,
+                  displayWidth,
+                  displayHeight,
+                  aspectRatio,
+                  minWidth,
+                  minHeight
+                )
+                if (!next) return
+                event.preventDefault()
+                setCropRect(next)
+              }}
               onPointerDown={(event) => startDrag(event, 'resize', handle)}
             />
           ))}

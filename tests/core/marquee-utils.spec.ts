@@ -11,11 +11,10 @@ import {
   MAX_MARQUEE_REPEAT,
   MARQUEE_COPIES_VAR,
   MARQUEE_COPY_INDEX_VAR,
-  MARQUEE_CSS,
   MARQUEE_DURATION_VAR,
   MARQUEE_GAP_VAR,
   MARQUEE_INLINE_SIGN_VAR,
-  MARQUEE_STYLE_ID,
+  marqueeBaseStyles,
   getMarqueeCloneAttributes,
   getMarqueeContentClasses,
   getMarqueeContentStyle,
@@ -45,21 +44,15 @@ import {
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 
-const loadFreshMarqueeUtils = async () => {
-  vi.resetModules()
-  return import('../../packages/core/src/utils/marquee-utils')
-}
-
 describe('marquee-utils', () => {
   afterEach(() => {
-    document.getElementById(MARQUEE_STYLE_ID)?.remove()
     vi.unstubAllGlobals()
   })
 
   describe('resolveMarqueeDirection', () => {
     it('accepts known directions and falls back otherwise', () => {
-      expect(resolveMarqueeDirection('left')).toBe('left')
-      expect(resolveMarqueeDirection('right')).toBe('right')
+      expect(resolveMarqueeDirection('start')).toBe('start')
+      expect(resolveMarqueeDirection('end')).toBe('end')
       expect(resolveMarqueeDirection('up')).toBe('up')
       expect(resolveMarqueeDirection('down')).toBe('down')
       expect(resolveMarqueeDirection()).toBe(DEFAULT_MARQUEE_DIRECTION)
@@ -67,10 +60,10 @@ describe('marquee-utils', () => {
     })
 
     it('treats up/down as vertical and right/down as reverse', () => {
-      expect(isMarqueeVertical('left')).toBe(false)
+      expect(isMarqueeVertical('start')).toBe(false)
       expect(isMarqueeVertical('up')).toBe(true)
-      expect(isMarqueeReverse('left')).toBe(false)
-      expect(isMarqueeReverse('right')).toBe(true)
+      expect(isMarqueeReverse('start')).toBe(false)
+      expect(isMarqueeReverse('end')).toBe(true)
       expect(isMarqueeReverse('down')).toBe(true)
     })
   })
@@ -168,7 +161,7 @@ describe('marquee-utils', () => {
   describe('class and style builders', () => {
     it('marks reverse, pause-on-hover, and static single-copy roots', () => {
       const root = getMarqueeRootClasses({
-        direction: 'right',
+        direction: 'end',
         pauseOnHover: true,
         repeat: 2,
         className: 'extra'
@@ -208,54 +201,43 @@ describe('marquee-utils', () => {
     })
   })
 
-  describe('MARQUEE_CSS', () => {
+  describe('marqueeBaseStyles', () => {
     it('defines looping keyframes, hover pause, and reduced-motion freeze', () => {
-      expect(MARQUEE_CSS).toContain('@keyframes tiger-marquee-x')
-      expect(MARQUEE_CSS).toContain('@keyframes tiger-marquee-y')
-      expect(MARQUEE_CSS).toContain('animation-play-state: paused')
-      expect(MARQUEE_CSS).toContain('@media (prefers-reduced-motion: reduce)')
-      expect(MARQUEE_CSS).toContain('animation: none !important')
-      expect(MARQUEE_CSS).toContain('.tiger-marquee-clone')
+      expect(marqueeBaseStyles['@keyframes tiger-marquee-x']).toBeDefined()
+      expect(marqueeBaseStyles['@keyframes tiger-marquee-y']).toBeDefined()
+      expect(
+        marqueeBaseStyles[
+          ".tiger-marquee[data-marquee-paused='true'] > .tiger-marquee-track, .tiger-marquee-pause-hover:hover > .tiger-marquee-track, .tiger-marquee-pause-focus:focus-within > .tiger-marquee-track"
+        ].animationPlayState
+      ).toBe('paused')
+      const reduced = marqueeBaseStyles['@media (prefers-reduced-motion: reduce)']
+      expect(reduced['.tiger-marquee > .tiger-marquee-track'].animation).toBe('none')
+      expect(reduced['.tiger-marquee .tiger-marquee-clone'].display).toBe('none')
     })
 
     it('moves on the inline axis and takes vertical clones out of flow', () => {
-      expect(MARQUEE_CSS).toContain(MARQUEE_INLINE_SIGN_VAR)
-      expect(MARQUEE_CSS).toContain('[dir="rtl"]')
-      expect(MARQUEE_CSS).toContain('padding-inline-end')
-      expect(MARQUEE_CSS).toContain('flex-direction: row')
-      expect(MARQUEE_CSS).toContain('position: absolute')
-      expect(MARQUEE_CSS).toContain('translate3d(0, -100%, 0)')
-    })
-  })
-
-  describe('injectMarqueeStyles', () => {
-    it('injects looping styles once and reuses an existing style element', async () => {
-      const { injectMarqueeStyles } = await loadFreshMarqueeUtils()
-
-      injectMarqueeStyles()
-      injectMarqueeStyles()
-
-      expect(document.querySelectorAll(`#${MARQUEE_STYLE_ID}`)).toHaveLength(1)
-      expect(document.getElementById(MARQUEE_STYLE_ID)?.textContent).toContain('tiger-marquee-x')
-    })
-
-    it('re-injects after the style node is removed without resetting modules', async () => {
-      const { injectMarqueeStyles } = await loadFreshMarqueeUtils()
-      injectMarqueeStyles()
-      document.getElementById(MARQUEE_STYLE_ID)?.remove()
-      injectMarqueeStyles()
-      expect(document.getElementById(MARQUEE_STYLE_ID)?.textContent).toContain('tiger-marquee-x')
+      const horizontal = marqueeBaseStyles[
+        '.tiger-marquee-horizontal:dir(rtl), [dir="rtl"] .tiger-marquee-horizontal, .tiger-marquee-horizontal[dir="rtl"]'
+      ] as Record<string, string>
+      expect(horizontal[MARQUEE_INLINE_SIGN_VAR]).toBe('-1')
+      expect(
+        marqueeBaseStyles['.tiger-marquee-horizontal > .tiger-marquee-track > .tiger-marquee-content']
+          .paddingInlineEnd
+      ).toContain(MARQUEE_GAP_VAR)
+      expect(marqueeBaseStyles['.tiger-marquee-horizontal > .tiger-marquee-track'].flexDirection).toBe(
+        'row'
+      )
+      expect(
+        marqueeBaseStyles['.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-clone']
+          .position
+      ).toBe('absolute')
+      expect(marqueeBaseStyles['@keyframes tiger-marquee-y'].to.transform).toContain(
+        'translate3d(0, -100%, 0)'
+      )
     })
 
-    it('does not inject styles outside a browser environment', async () => {
-      const originalWindow = globalThis.window
-      vi.stubGlobal('window', undefined)
-      const { injectMarqueeStyles } = await loadFreshMarqueeUtils()
-
-      injectMarqueeStyles()
-
-      vi.stubGlobal('window', originalWindow)
-      expect(document.getElementById(MARQUEE_STYLE_ID)).toBeNull()
+    it('does not install a style element', () => {
+      expect(document.getElementById('tiger-ui-marquee-styles')).toBeNull()
     })
   })
 })

@@ -5,52 +5,59 @@
 
 import type { SkeletonVariant, SkeletonAnimation, SkeletonShape } from '../types/skeleton'
 import { classNames } from './class-names'
-import { isBrowser } from './env'
+import { devWarn } from './dev-warn'
 
-export const SKELETON_STYLE_ID = 'tiger-ui-skeleton-styles'
+/** Pulse, wave, and reduced motion. Rendering must not write `document.head`. */
+export const skeletonBaseStyles = {
+  '@keyframes tiger-skeleton-pulse': {
+    '0%, 100%': { opacity: '1' },
+    '50%': { opacity: '0.5' }
+  },
+  '@keyframes tiger-skeleton-wave': {
+    '0%': { backgroundPosition: '100% 0' },
+    '100%': { backgroundPosition: '-100% 0' }
+  },
+  '.tiger-skeleton-pulse': {
+    animationName: 'tiger-skeleton-pulse',
+    animationDuration: '1.5s',
+    animationTimingFunction: 'ease-in-out',
+    animationIterationCount: 'infinite'
+  },
+  '.tiger-skeleton-wave': {
+    backgroundImage:
+      'linear-gradient(90deg, var(--tiger-skeleton-bg) 0%, var(--tiger-skeleton-bg-alt) 50%, var(--tiger-skeleton-bg) 100%)',
+    backgroundSize: '200% 100%',
+    animationName: 'tiger-skeleton-wave',
+    animationDuration: '1.6s',
+    animationTimingFunction: 'ease-in-out',
+    animationIterationCount: 'infinite'
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    '.tiger-skeleton-pulse, .tiger-skeleton-wave': {
+      animation: 'none'
+    }
+  }
+} as const
 
-export const SKELETON_CSS = `
-@keyframes tiger-skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-@keyframes tiger-skeleton-wave {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
-}
-.tiger-skeleton-pulse {
-  animation-name: tiger-skeleton-pulse;
-  animation-duration: 1.5s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-.tiger-skeleton-wave {
-  background-image: linear-gradient(
-    90deg,
-    var(--tiger-skeleton-bg, var(--tiger-surface-muted, #f9fafb)) 0%,
-    var(--tiger-skeleton-bg-alt, var(--tiger-border, #e5e7eb)) 50%,
-    var(--tiger-skeleton-bg, var(--tiger-surface-muted, #f9fafb)) 100%
-  );
-  background-size: 200% 100%;
-  animation-name: tiger-skeleton-wave;
-  animation-duration: 1.6s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-`
+/** Small cap so a caller cannot mount hundreds of bars. */
+export const SKELETON_MAX_ROWS = 6
 
-export function injectSkeletonStyles(): void {
-  if (!isBrowser()) return
-  if (document.getElementById(SKELETON_STYLE_ID)) return
-  const style = document.createElement('style')
-  style.id = SKELETON_STYLE_ID
-  style.textContent = SKELETON_CSS
-  document.head.appendChild(style)
+export function resolveSkeletonRows(rows: number | undefined): number {
+  if (rows == null || !Number.isFinite(rows)) return 1
+  const whole = Math.floor(rows)
+  if (whole > SKELETON_MAX_ROWS) {
+    devWarn(
+      'Skeleton.rows',
+      `Skeleton rows are capped at ${SKELETON_MAX_ROWS} (received ${whole}).`
+    )
+    return SKELETON_MAX_ROWS
+  }
+  return Math.max(1, whole)
 }
 
 /** Bar fill: optional `--tiger-skeleton-bg`, then registered `--tiger-surface-muted`. */
 export const skeletonBaseClasses =
-  'tiger-skeleton bg-[var(--tiger-skeleton-bg,var(--tiger-surface-muted,#f9fafb))] rounded-[var(--tiger-radius-sm,0.375rem)]'
+  'tiger-skeleton bg-[var(--tiger-skeleton-bg)] rounded-[var(--tiger-radius-sm)]'
 
 /**
  * Animation classes for skeleton.
@@ -82,7 +89,7 @@ export const skeletonVariantSizeClasses: Record<
  */
 export const skeletonShapeClasses: Record<SkeletonShape, string> = {
   circle: 'rounded-full',
-  square: 'rounded-[var(--tiger-radius-md,0.5rem)]'
+  square: 'rounded-[var(--tiger-radius-md)]'
 } as const
 
 export interface SkeletonClassOptions {
@@ -103,7 +110,6 @@ export function getSkeletonClasses(
   shape: SkeletonShape = 'circle',
   options: SkeletonClassOptions = {}
 ): string {
-  injectSkeletonStyles()
   const size = skeletonVariantSizeClasses[variant]
   return classNames(
     skeletonBaseClasses,

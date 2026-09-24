@@ -11,9 +11,9 @@ export const badgeBaseClasses =
 
 /** Size classes for badge content (number/text) */
 export const badgeSizeClasses: Record<BadgeSize, string> = {
-  sm: 'min-w-4 h-4 px-[var(--tiger-component-badge-padding-x,8px)] text-[length:var(--tiger-component-badge-font-size,12px)] font-[number:var(--tiger-component-badge-font-weight,500)]',
-  md: 'min-w-5 h-5 px-[var(--tiger-component-badge-padding-x,8px)] text-[length:var(--tiger-component-badge-font-size,12px)] font-[number:var(--tiger-component-badge-font-weight,500)]',
-  lg: 'min-w-6 h-6 px-[var(--tiger-component-badge-padding-x,8px)] text-[length:var(--tiger-component-badge-font-size,12px)] font-[number:var(--tiger-component-badge-font-weight,500)]'
+  sm: 'min-w-4 h-4 px-[var(--tiger-component-badge-padding-x)] text-[length:var(--tiger-component-badge-font-size)] font-[number:var(--tiger-component-badge-font-weight)]',
+  md: 'min-w-5 h-5 px-[var(--tiger-component-badge-padding-x)] text-[length:var(--tiger-component-badge-font-size)] font-[number:var(--tiger-component-badge-font-weight)]',
+  lg: 'min-w-6 h-6 px-[var(--tiger-component-badge-padding-x)] text-[length:var(--tiger-component-badge-font-size)] font-[number:var(--tiger-component-badge-font-weight)]'
 } as const
 
 /** Size classes for dot badges */
@@ -25,21 +25,33 @@ export const dotSizeClasses: Record<BadgeSize, string> = {
 
 /** Shape classes per badge type */
 export const badgeTypeClasses: Record<BadgeType, string> = {
-  dot: 'rounded-[var(--tiger-component-badge-border-radius,9999px)]',
-  number: 'rounded-[var(--tiger-component-badge-border-radius,9999px)]',
-  text: 'rounded-[var(--tiger-radius-md,0.5rem)]'
+  dot: 'rounded-[var(--tiger-component-badge-border-radius)]',
+  number: 'rounded-[var(--tiger-component-badge-border-radius)]',
+  text: 'rounded-[var(--tiger-radius-md)]'
 } as const
 
 /** Wrapper classes for non-standalone badge */
 export const badgeWrapperClasses = 'relative inline-flex'
 
-/** Position classes for non-standalone badge. `right`/`left` follow the reading direction. */
+/** Position classes for an overlay badge. Inline edges follow writing direction. */
 export const badgePositionClasses: Record<BadgePosition, string> = {
-  'top-right': 'absolute -top-1 -end-1',
-  'top-left': 'absolute -top-1 -start-1',
-  'bottom-right': 'absolute -bottom-1 -end-1',
-  'bottom-left': 'absolute -bottom-1 -start-1'
+  'top-end': 'absolute -top-1 -end-1',
+  'top-start': 'absolute -top-1 -start-1',
+  'bottom-end': 'absolute -bottom-1 -end-1',
+  'bottom-start': 'absolute -bottom-1 -start-1'
 } as const
+
+export function resolveBadgePosition(position?: string | null): BadgePosition {
+  if (
+    position === 'top-start' ||
+    position === 'top-end' ||
+    position === 'bottom-start' ||
+    position === 'bottom-end'
+  ) {
+    return position
+  }
+  return 'top-end'
+}
 
 export type BadgeContentResult =
   { kind: 'hidden' } | { kind: 'dot' } | { kind: 'text'; value: string }

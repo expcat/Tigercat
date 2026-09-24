@@ -169,7 +169,7 @@ describe('ImagePreview', () => {
     expect(onScaleChange).toHaveBeenCalledWith(1.5)
     expect(img.style.transform).toContain('scale(1.5)')
 
-    fireEvent.keyDown(document, { key: '-' })
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: '-' })
     expect(img.style.transform).toContain('scale(1)')
   })
 
@@ -191,6 +191,11 @@ describe('ImagePreview', () => {
   it('keeps panning after the pointer leaves the bitmap', () => {
     render(<ImagePreview open images={['/solo.jpg']} />)
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    const dialog = img.closest('[role="dialog"]') as HTMLElement
+    Object.defineProperty(img, 'offsetWidth', { configurable: true, value: 400 })
+    Object.defineProperty(img, 'offsetHeight', { configurable: true, value: 400 })
+    Object.defineProperty(dialog, 'clientWidth', { configurable: true, value: 200 })
+    Object.defineProperty(dialog, 'clientHeight', { configurable: true, value: 200 })
     fireEvent.pointerDown(img, {
       pointerId: 1,
       button: 0,

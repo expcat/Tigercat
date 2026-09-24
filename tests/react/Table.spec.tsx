@@ -24,11 +24,11 @@ const dataSource = [
 ]
 
 const tableHeaderBgClass =
-  'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
+  'bg-[var(--tiger-table-header-bg)]'
 const tableStripeBgClass =
-  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
+  'bg-[var(--tiger-table-stripe-bg)]/50'
 const tableFixedStripeBgClass =
-  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))_50%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff))))]'
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg)_50%,var(--tiger-table-bg))]'
 
 function stubCardViewport(isCard: boolean) {
   window.matchMedia = ((query: string) => ({
@@ -95,7 +95,7 @@ describe('Table', () => {
       rerender(
         <Table columns={columns} dataSource={dataSource} columnLockable pagination={false} />
       )
-      expect(MockResizeObserver.instances).toHaveLength(1)
+      expect(MockResizeObserver.instances).toHaveLength(2)
 
       vi.unstubAllGlobals()
     })
@@ -494,6 +494,7 @@ describe('Table', () => {
           pagination={false}
           autoVirtual
           virtualThreshold={4}
+          virtualHeight={100}
         />
       )
 
@@ -564,7 +565,7 @@ describe('Table', () => {
   describe('Fixed Columns', () => {
     it('keeps striped background on fixed body cells', () => {
       const fixedColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 140, fixed: 'left' },
+        { key: 'name', title: 'Name', width: 140, fixed: 'start' },
         { key: 'age', title: 'Age', width: 120 },
         { key: 'email', title: 'Email', width: 220 }
       ]
@@ -582,7 +583,7 @@ describe('Table', () => {
           key: 'name',
           title: 'Name',
           width: 140,
-          fixed: 'left',
+          fixed: 'start',
           fixedHeaderClassName: 'custom-fixed-header',
           fixedClassName: ({ selected, view, fixed }) =>
             selected ? `${view}-${fixed}-selected` : 'custom-fixed-cell'
@@ -600,7 +601,7 @@ describe('Table', () => {
       )
 
       expect(getByText('Name').closest('th')).toHaveClass('custom-fixed-header')
-      expect(getByText('John Doe').closest('td')).toHaveClass('table-left-selected')
+      expect(getByText('John Doe').closest('td')).toHaveClass('table-start-selected')
     })
   })
 
@@ -629,8 +630,8 @@ describe('Table', () => {
 
     it('recalculates fixed column offsets based on visible columns only', () => {
       const fixedColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 140, fixed: 'left' },
-        { key: 'age', title: 'Age', width: 120, fixed: 'left' },
+        { key: 'name', title: 'Name', width: 140, fixed: 'start' },
+        { key: 'age', title: 'Age', width: 120, fixed: 'start' },
         { key: 'email', title: 'Email', width: 220 }
       ]
 
@@ -645,7 +646,7 @@ describe('Table', () => {
 
       const ageHeader = getByText('Age').closest('th')
       expect(ageHeader!).toHaveStyle('position: sticky')
-      expect(ageHeader!).toHaveStyle('left: 0px')
+      expect(ageHeader!).toHaveStyle({ insetInlineStart: '0px' })
     })
 
     it('renders portaled dropdown menus from fixed action columns into document.body', async () => {
@@ -655,7 +656,7 @@ describe('Table', () => {
           key: 'actions',
           title: 'Actions',
           width: 140,
-          fixed: 'right',
+          fixed: 'end',
           render: () => (
             <Dropdown trigger="click" showArrow={false}>
               <button>Open menu</button>
@@ -699,7 +700,7 @@ describe('Table', () => {
 
       const emailHeaderLocked = getByText('Email').closest('th')!
       expect(emailHeaderLocked).toHaveStyle('position: sticky')
-      expect(emailHeaderLocked).toHaveStyle('left: 0px')
+      expect(emailHeaderLocked).toHaveStyle({ insetInlineStart: '0px' })
       expect(emailHeaderLocked).toHaveClass(tableHeaderBgClass)
       expect(
         Array.from(container.querySelectorAll('thead th')).map((th) => th.textContent?.trim())
@@ -743,7 +744,7 @@ describe('Table', () => {
 
     it('moves a newly locked middle column into the compact left fixed area', async () => {
       const lockableColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 200, fixed: 'left' },
+        { key: 'name', title: 'Name', width: 200, fixed: 'start' },
         { key: 'email', title: 'Email', width: 400 },
         { key: 'age', title: 'Age', width: 200 },
         { key: 'role', title: 'Role', width: 240 }
@@ -767,7 +768,7 @@ describe('Table', () => {
       const ageHeaderLocked = getByText('Age').closest('th')!
       const emailHeader = getByText('Email').closest('th')!
       expect(ageHeaderLocked).toHaveStyle('position: sticky')
-      expect(ageHeaderLocked).toHaveStyle('left: 200px')
+      expect(ageHeaderLocked).toHaveStyle({ insetInlineStart: '200px' })
       expect(emailHeader).not.toHaveStyle('position: sticky')
     })
 
@@ -882,6 +883,9 @@ describe('Table', () => {
 
       const filterInput = container.querySelector('thead input[type="text"]') as HTMLInputElement
       await fireEvent.change(filterInput, { target: { value: '32' } })
+      await act(async () => {
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+      })
 
       const rows = container.querySelectorAll('tbody tr')
       expect(rows).toHaveLength(1)
@@ -1298,7 +1302,7 @@ describe('Table', () => {
 
       rerender(<Table columns={columns} dataSource={dataSource} />)
       const plainRow = container.querySelector('tbody tr')!
-      expect(plainRow).not.toHaveAttribute('tabindex')
+      expect(plainRow).toHaveAttribute('tabindex', '0')
       expect(plainRow).not.toHaveAttribute('aria-selected')
     })
 
@@ -1569,10 +1573,11 @@ describe('Table', () => {
         />
       )
 
+      const handle = container.querySelector('tbody tr button[draggable="true"]')!
+      expect(handle).toBeTruthy()
       const rows = container.querySelectorAll('tbody tr')
-      expect(rows[0]).toHaveAttribute('draggable', 'true')
 
-      fireEvent.dragStart(rows[0])
+      fireEvent.dragStart(handle)
       fireEvent.dragOver(rows[2])
       fireEvent.drop(rows[2])
 

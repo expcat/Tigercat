@@ -64,10 +64,20 @@ describe('table-resize-utils', () => {
     const table = document.createElement('table')
     container.append(table)
 
-    let resizeCallback: ResizeObserverCallback | undefined
+    const observed: Element[] = []
+    const callbacks: ResizeObserverCallback[] = []
+    class MockResizeObserver {
+      constructor(callback: ResizeObserverCallback) {
+        callbacks.push(callback)
+      }
+      observe(target: Element) {
+        observed.push(target)
+      }
+      disconnect() {}
+    }
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+
     let frameCallback: ((timestamp: number) => void) | undefined
-    const observe = vi.fn()
-    const disconnect = vi.fn()
     const onResize = vi.fn()
     const requestFrame = vi.fn((callback: (timestamp: number) => void) => {
       frameCallback = callback
@@ -77,23 +87,18 @@ describe('table-resize-utils', () => {
     const controller = createTableResizeObserverController({
       onResize,
       requestFrame,
-      cancelFrame: vi.fn(),
-      createResizeObserver: (callback) => {
-        resizeCallback = callback
-        return { observe, disconnect }
-      }
+      cancelFrame: vi.fn()
     })
 
     controller.observe(container, table)
-    resizeCallback?.([], {} as ResizeObserver)
-    resizeCallback?.([], {} as ResizeObserver)
+    callbacks.forEach((callback) => callback([], {} as ResizeObserver))
+    callbacks.forEach((callback) => callback([], {} as ResizeObserver))
 
     expect(requestFrame).toHaveBeenCalledTimes(1)
-
     frameCallback?.(0)
-
     expect(onResize).toHaveBeenCalledTimes(1)
-    expect(observe).toHaveBeenCalledWith(container)
-    expect(observe).toHaveBeenCalledWith(table)
+    expect(observed).toContain(container)
+    expect(observed).toContain(table)
+    vi.unstubAllGlobals()
   })
 })

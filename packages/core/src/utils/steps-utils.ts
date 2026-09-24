@@ -74,7 +74,7 @@ export const stepConnectorBaseStyles = {
     '--tiger-step-icon-size': '2.5rem'
   },
   '.tiger-step-item--gap': {
-    paddingBottom: 'var(--tiger-step-gap, 1.5rem)'
+    paddingBottom: 'var(--tiger-step-gap)'
   },
   '.tiger-step-tail': {
     position: 'absolute',
@@ -84,10 +84,10 @@ export const stepConnectorBaseStyles = {
     display: 'none'
   },
   '.tiger-step-tail--finish': {
-    backgroundColor: 'var(--tiger-primary, #2563eb)'
+    backgroundColor: 'var(--tiger-primary)'
   },
   '.tiger-step-tail--wait': {
-    backgroundColor: 'var(--tiger-border, #e5e7eb)'
+    backgroundColor: 'var(--tiger-border)'
   },
   '.tiger-step-tail--simple': {
     '--tiger-step-icon-size': '1.5rem'
@@ -99,18 +99,18 @@ export const stepConnectorBaseStyles = {
     '--tiger-step-icon-size': '2.5rem'
   },
   '.tiger-step-tail--vertical': {
-    left: '50%',
-    width: '0.125rem',
-    top: 'var(--tiger-step-icon-size, 2.5rem)',
-    bottom: 'calc(-1 * var(--tiger-step-gap, 1.5rem))',
-    height: 'auto',
+    insetInlineStart: '50%',
+    inlineSize: '0.125rem',
+    insetBlockStart: 'var(--tiger-step-icon-size)',
+    insetBlockEnd: 'calc(-1 * var(--tiger-step-gap))',
+    blockSize: 'auto',
     transform: 'translateX(-50%)'
   },
   '.tiger-step-tail--horizontal': {
-    left: '50%',
-    width: '100%',
-    height: '0.125rem',
-    top: 'calc(var(--tiger-step-icon-size, 2.5rem) / 2)'
+    insetInlineStart: '50%',
+    inlineSize: '100%',
+    blockSize: '0.125rem',
+    insetBlockStart: 'calc(var(--tiger-step-icon-size) / 2)'
   }
 } as const
 
@@ -174,14 +174,14 @@ export function getStepIconClasses(
 
   // Status-based colors using CSS variables with fallbacks
   const activeClasses =
-    'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white ring-4 ring-[var(--tiger-primary,#2563eb)]/15 scale-105 shadow-sm transition-all duration-300 motion-reduce:transition-none'
+    'bg-[var(--tiger-primary)] border-[var(--tiger-primary)] text-white ring-4 ring-[var(--tiger-primary)]/15 scale-105 shadow-sm [transition:var(--tiger-transition-base)] motion-reduce:transition-none'
   const statusClasses = {
-    wait: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)] transition-all duration-300 motion-reduce:transition-none',
+    wait: 'bg-[var(--tiger-surface-muted)] border-[var(--tiger-border)] text-[var(--tiger-text-secondary)] [transition:var(--tiger-transition-base)] motion-reduce:transition-none',
     process: activeClasses,
     finish:
-      'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white shadow-sm transition-all duration-300 motion-reduce:transition-none',
+      'bg-[var(--tiger-primary)] border-[var(--tiger-primary)] text-white shadow-sm [transition:var(--tiger-transition-base)] motion-reduce:transition-none',
     error:
-      'bg-[var(--tiger-error-bg,#fef2f2)] border-[var(--tiger-error,#ef4444)] text-[var(--tiger-error,#ef4444)] transition-all duration-300'
+      'bg-[var(--tiger-error-bg)] border-[var(--tiger-error)] text-[var(--tiger-error)] [transition:var(--tiger-transition-base)]'
   }
 
   return `${baseClasses} ${sizeClasses} ${iconClasses} ${statusClasses[status]}`
@@ -236,16 +236,16 @@ export function getStepTitleClasses(
   const sizeClasses = size === 'sm' ? 'text-sm' : 'text-base'
 
   const statusClasses = {
-    wait: 'text-[var(--tiger-text-muted,#6b7280)] transition-colors duration-300 motion-reduce:transition-none',
+    wait: 'text-[var(--tiger-text-secondary)] transition-colors duration-300 motion-reduce:transition-none',
     process:
-      'text-[var(--tiger-text,#111827)] font-semibold transition-colors duration-300 motion-reduce:transition-none',
+      'text-[var(--tiger-text)] font-semibold transition-colors duration-300 motion-reduce:transition-none',
     finish:
-      'text-[var(--tiger-text,#111827)] transition-colors duration-300 motion-reduce:transition-none',
-    error: 'text-[var(--tiger-error,#ef4444)]'
+      'text-[var(--tiger-text)] transition-colors duration-300 motion-reduce:transition-none',
+    error: 'text-[var(--tiger-error)]'
   }
 
   const cursorClasses = clickable
-    ? 'bg-transparent border-0 p-0 cursor-pointer hover:text-[var(--tiger-primary,#2563eb)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+    ? 'bg-transparent border-0 p-0 cursor-pointer hover:text-[var(--tiger-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface)]'
     : ''
 
   return `${baseClasses} ${sizeClasses} ${statusClasses[status]} ${cursorClasses}`
@@ -261,8 +261,8 @@ export function getStepDescriptionClasses(status: StepStatus, size: StepSize): s
 
   const statusClass =
     status === 'error'
-      ? 'text-[var(--tiger-error,#ef4444)]'
-      : 'text-[var(--tiger-text-muted,#6b7280)]'
+      ? 'text-[var(--tiger-error)]'
+      : 'text-[var(--tiger-text-secondary)]'
 
   return `${baseClasses} ${sizeClasses} ${statusClass}`
 }

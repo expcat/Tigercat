@@ -14,21 +14,16 @@ import {
   viewportPlacementClasses
 } from './viewport-floating-utils'
 
-export {
-  VIEWPORT_FLOATING_FAB_OFFSET,
-  VIEWPORT_FLOATING_DEFAULT_OFFSET
-} from './viewport-floating-utils'
-
 // ---------------------------------------------------------------------------
 // Base classes
 // ---------------------------------------------------------------------------
 
 export const floatButtonBaseClasses =
-  'tiger-motion-aware inline-flex items-center justify-center shadow-lg transition-all duration-200 motion-reduce:duration-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-focus-ring,#3b82f6)]'
+  'tiger-motion-aware inline-flex items-center justify-center shadow-lg [transition:var(--tiger-transition-quick)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-focus-ring)]'
 
 export const floatButtonShapeClasses: Record<FloatButtonShape, string> = {
   circle: 'rounded-full',
-  square: 'rounded-[var(--tiger-radius-md,0.5rem)]'
+  square: 'rounded-[var(--tiger-radius-md)]'
 }
 
 export const floatButtonSizeClasses: Record<FloatButtonSize, string> = {
@@ -39,9 +34,9 @@ export const floatButtonSizeClasses: Record<FloatButtonSize, string> = {
 
 export const floatButtonTypeClasses = {
   primary:
-    'bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] active:bg-[var(--tiger-primary-active,#1e40af)]',
+    'bg-[var(--tiger-primary)] text-white hover:bg-[var(--tiger-primary-hover)] active:bg-[var(--tiger-primary-active)]',
   default:
-    'bg-[var(--tiger-surface-raised,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] hover:border-[var(--tiger-border-strong,#d1d5db)] hover:shadow-xl'
+    'bg-[var(--tiger-surface-raised)] text-[var(--tiger-text)] border border-[var(--tiger-border)] hover:border-[var(--tiger-border-strong)] hover:shadow-xl'
 }
 
 export const floatButtonDisabledClasses = 'opacity-50 cursor-not-allowed pointer-events-none'
@@ -53,7 +48,7 @@ export const floatButtonDisabledClasses = 'opacity-50 cursor-not-allowed pointer
 export const floatButtonGroupClasses = `${overlayZIndexClass.viewport} flex items-center gap-3`
 
 export const floatButtonGroupExpandClasses =
-  'tiger-motion-aware flex flex-col items-center gap-3 transition-all duration-200 ease-in-out motion-reduce:duration-0'
+  'tiger-motion-aware flex flex-col items-center gap-3 [transition:var(--tiger-transition-quick)]'
 
 export function isTopViewportPlacement(placement: ViewportPlacement | undefined): boolean {
   return (placement ?? 'bottom-right').startsWith('top')

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getMenuClasses,
@@ -7,9 +7,11 @@ import {
   nextOpenKeys,
   nextSelectedKeys,
   reconcileSearchOpenKeys,
+  resolveDisplayedOpenKeys,
   resolveMenuCollapsed,
   resolveMenuMode,
   resolveMenuSearchQuery,
+  resolveMenuTabStopKey,
   resolveSearchFilter,
   shouldShowMenuSearch,
   warnControlledSearchOpenKeys,
@@ -32,7 +34,7 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     openKeys: controlledOpenKeys,
     defaultOpenKeys = [],
     collapsed: collapsedProp,
-    multiple = true,
+    openMultiple = true,
     inlineIndent = 24,
     popupPortal = true,
     className,
@@ -90,11 +92,11 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
 
   const handleOpenChange = useCallback(
     (key: MenuKey, open?: boolean) => {
-      const next = nextOpenKeys({ current: openKeys, key, multiple, open })
+      const next = nextOpenKeys({ current: openKeys, key, openMultiple, open })
       setOpenKeys(next)
       onOpenChange?.(key, { openKeys: next })
     },
-    [openKeys, multiple, setOpenKeys, onOpenChange]
+    [openKeys, openMultiple, setOpenKeys, onOpenChange]
   )
 
   const handleSearchInput = useCallback(
@@ -148,17 +150,21 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
   }, [resolvedMode, theme, collapsed, className])
 
   const slotKeys = useMemo(() => collectReactMenuKeys(children), [children])
-  const tabStopKey = useMemo(() => {
-    if (resolvedMode !== 'horizontal') return undefined
-    const rootKeys =
-      items && items.length > 0
-        ? items.map((item) => item.key).filter((key): key is MenuKey => key != null)
-        : slotKeys
-    const selected = rootKeys.find((key) =>
-      selectedKeys.some((item) => String(item) === String(key))
-    )
-    return selected ?? rootKeys[0]
-  }, [items, slotKeys, resolvedMode, selectedKeys])
+  const rootKeys = useMemo(() => {
+    if (items && items.length > 0) {
+      return items.map((item) => item.key).filter((key): key is MenuKey => key != null)
+    }
+    return slotKeys
+  }, [items, slotKeys])
+  const [tabStopKey, setTabStopKeyState] = useState<MenuKey | undefined>(undefined)
+  const resolvedTabStop = resolveMenuTabStopKey({
+    itemKeys: rootKeys,
+    selectedKeys,
+    current: tabStopKey
+  })
+  const setTabStopKey = useCallback((key: MenuKey) => {
+    setTabStopKeyState(key)
+  }, [])
 
   const contextValue = useMemo<MenuContextValue>(
     () => ({
@@ -168,11 +174,12 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
       inlineIndent,
       popupPortal,
       selectedKeys,
-      openKeys,
+      openKeys: resolveDisplayedOpenKeys({ openKeys, searchExpandKeys: expandKeys }),
       dir,
       handleSelect,
       handleOpenChange,
-      tabStopKey
+      tabStopKey: resolvedTabStop,
+      setTabStopKey
     }),
     [
       resolvedMode,
@@ -182,15 +189,17 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
       popupPortal,
       selectedKeys,
       openKeys,
+      expandKeys,
       dir,
       handleSelect,
       handleOpenChange,
-      tabStopKey
+      resolvedTabStop,
+      setTabStopKey
     ]
   )
 
-  const hasSlotChildren = React.Children.count(children) > 0
-  const empty = Boolean(items && items.length > 0 && filteredItems.length === 0 && !hasSlotChildren)
+  const useItems = items != null
+  const empty = Boolean(useItems && items.length > 0 && filteredItems.length === 0)
 
   const {
     id,
@@ -214,8 +223,12 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     handleSearchInput,
     handleSearchKeyDown,
     filteredItems,
-    items,
-    children,
+    items: useItems ? items : undefined,
+    children: useItems ? undefined : children,
+    displayedOpenKeys: resolveDisplayedOpenKeys({
+      openKeys,
+      searchExpandKeys: expandKeys
+    }),
     empty
   }
 }

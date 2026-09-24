@@ -17,6 +17,8 @@ import {
 } from 'vue'
 import {
   classNames,
+  getSecureRel,
+  resolveLinkHref,
   coerceClassValue,
   createSubmenuHeightTransitionController,
   devWarn,
@@ -346,7 +348,6 @@ export const Menu = defineComponent({
     })
 
     const tabStopKey = computed(() => {
-      if (resolvedMode.value !== 'horizontal') return undefined
       const rootKeys =
         props.items && props.items.length > 0
           ? props.items.map((item) => item.key).filter((key): key is MenuKey => key != null)
@@ -382,7 +383,7 @@ export const Menu = defineComponent({
           return h('li', {
             key: item.key ?? item.label,
             role: 'separator',
-            class: 'my-1 border-t border-[var(--tiger-border,#e5e7eb)]'
+            class: 'my-1 border-t border-[var(--tiger-border)]'
           })
         }
         if (kind === 'group') {
@@ -464,6 +465,8 @@ export const Menu = defineComponent({
             {
               ref: menuEl,
               role: getMenuListRole(resolvedMode.value, { isRoot: true }),
+              'aria-label': attrs['aria-label'],
+              'aria-labelledby': attrs['aria-labelledby'],
               'data-tiger-menu-root': 'true',
               'data-tiger-menu-list': '',
               'data-tiger-menu-mode': resolvedMode.value
@@ -623,12 +626,17 @@ export const MenuItem = defineComponent({
         ...passthroughAttrs.value
       }
 
-      const node = props.href
+      const safeHref = resolveLinkHref(props.href, { disabled: props.disabled })
+      const target = passthroughAttrs.value.target as string | undefined
+      const rel = passthroughAttrs.value.rel as string | undefined
+      const node = safeHref
         ? h(
             'a',
             {
               ...shared,
-              href: props.disabled ? undefined : props.href,
+              href: safeHref,
+              target,
+              rel: getSecureRel(target, rel),
               'aria-current': isSelected.value ? 'page' : undefined
             },
             children

@@ -15,6 +15,7 @@ import {
   classNames,
   coerceClassValue,
   computeScrollAreaKeyboardDelta,
+  isScrollAreaViewportKeyTarget,
   computeScrollAreaState,
   computeScrollFromThumbOffset,
   computeScrollFromTrackPoint,
@@ -324,7 +325,6 @@ export const ScrollArea = defineComponent({
             : undefined
       const tabIndex = resolveScrollAreaViewportTabIndex({
         overflow,
-        hasFocusable: scrollAreaHasFocusable(contentRef.value),
         userTabIndex
       })
       const labelledBy = (attrs['aria-labelledby'] as string | undefined) || undefined
@@ -376,7 +376,7 @@ export const ScrollArea = defineComponent({
               onScroll: handleScroll,
               onKeydown: (event: KeyboardEvent) => {
                 const viewport = viewportRef.value
-                if (!viewport) return
+                if (!viewport || !isScrollAreaViewportKeyTarget(event)) return
                 const delta = computeScrollAreaKeyboardDelta(
                   event.key,
                   props.axis,

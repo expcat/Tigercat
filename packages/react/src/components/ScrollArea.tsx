@@ -33,8 +33,8 @@ import {
   physicalInlineScrollFromLogical,
   readInlineDirection,
   readScrollAreaMetrics,
+  isScrollAreaViewportKeyTarget,
   resolveScrollAreaViewportTabIndex,
-  scrollAreaHasFocusable,
   scrollAreaRootClasses,
   shouldRenderScrollAreaScrollbar,
   SCROLL_AREA_MIN_THUMB_SIZE,
@@ -261,16 +261,20 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     return observeScrollAreaSize([viewportRef.current, contentRef.current], syncState)
   }, [syncState, axis])
 
-  useEffect(() => () => dragSessionRef.current?.dispose(), [])
+  useEffect(
+    () => () => {
+      dragSessionRef.current?.dispose()
+      window.clearTimeout(scrollTimer.current)
+    },
+    []
+  )
 
   const visibleY = shouldRenderScrollAreaScrollbar(scrollbar, axis, 'y', state.y)
   const visibleX = shouldRenderScrollAreaScrollbar(scrollbar, axis, 'x', state.x)
   const overflow = (visibleY && state.y.scrollable) || (visibleX && state.x.scrollable)
-  const hasFocusable = scrollAreaHasFocusable(contentRef.current)
   const userTabIndex = a11y.tabIndex as number | undefined
   const tabIndex = resolveScrollAreaViewportTabIndex({
     overflow,
-    hasFocusable,
     userTabIndex
   })
   const named =
@@ -281,7 +285,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const viewport = viewportRef.current
-    if (!viewport) return
+    if (!viewport || !isScrollAreaViewportKeyTarget(event)) return
     const delta = computeScrollAreaKeyboardDelta(
       event.key,
       axis,

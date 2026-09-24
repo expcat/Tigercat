@@ -3,9 +3,11 @@ import {
   defineComponent,
   h,
   inject,
+  onBeforeUnmount,
   onMounted,
   provide,
   ref,
+  watch,
   type ComputedRef,
   type InjectionKey,
   type PropType
@@ -16,8 +18,9 @@ import {
   getPrintLayoutBoxStyle,
   getPrintLayoutClasses,
   getPrintLayoutLabels,
+  createPrintInstanceId,
   getPrintLayoutPageKey,
-  injectPrintLayoutStyles,
+  mountPrintInstanceStyle,
   mergeStyleValues,
   mergeTigerLocale,
   printLayoutFooterClasses,
@@ -37,6 +40,7 @@ import { useTigerConfig } from './ConfigProvider'
 const PrintLayoutShowPageBreaksKey: InjectionKey<ComputedRef<boolean>> = Symbol(
   'tigerPrintShowPageBreaks'
 )
+const PrintLayoutPrintBreaksKey: InjectionKey<ComputedRef<boolean>> = Symbol('tigerPrintBreaks')
 const PrintLayoutLocaleKey: InjectionKey<ComputedRef<Partial<TigerLocale> | undefined>> =
   Symbol('tigerPrintLocale')
 
@@ -58,6 +62,7 @@ export const PrintLayout = defineComponent({
     headerText: { type: String, default: undefined },
     footerText: { type: String, default: undefined },
     showPageBreaks: { type: Boolean, default: true },
+    printBreaks: { type: Boolean, default: true },
     pageWidth: { type: [Number, String] as PropType<number | string>, default: undefined },
     pageHeight: { type: [Number, String] as PropType<number | string>, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
@@ -65,21 +70,36 @@ export const PrintLayout = defineComponent({
   },
   setup(props, { slots, attrs, expose }) {
     const rootRef = ref<HTMLElement | null>(null)
+    const instanceId = createPrintInstanceId()
     provide(
       PrintLayoutShowPageBreaksKey,
       computed(() => props.showPageBreaks)
+    )
+    provide(
+      PrintLayoutPrintBreaksKey,
+      computed(() => props.printBreaks)
     )
     provide(
       PrintLayoutLocaleKey,
       computed(() => props.locale)
     )
 
-    onMounted(() => injectPrintLayoutStyles())
-
     const box = computed(() =>
       resolvePrintPageBox(props.pageSize, props.orientation, props.pageWidth, props.pageHeight)
     )
     const pageKey = computed(() => getPrintLayoutPageKey(box.value))
+
+    let detachPage: (() => void) | null = null
+    const attachPage = () => {
+      detachPage?.()
+      const doc = rootRef.value?.ownerDocument ?? document
+      detachPage = mountPrintInstanceStyle(doc, instanceId, box.value)
+    }
+    onMounted(attachPage)
+    watch(box, () => {
+      if (rootRef.value) attachPage()
+    })
+    onBeforeUnmount(() => detachPage?.())
 
     expose({
       print: () => printPrintLayoutRoot(rootRef.value),
@@ -97,7 +117,9 @@ export const PrintLayout = defineComponent({
           ref: rootRef,
           class: classNames(getPrintLayoutClasses(props.className), coerceClassValue(attrs.class)),
           style: mergeStyleValues(getPrintLayoutBoxStyle(box.value), attrs.style),
-          'data-tiger-print': pageKey.value
+          'data-tiger-print': pageKey.value,
+          'data-tiger-print-instance': instanceId,
+          'data-tiger-print-size': box.value.pageSize
         },
         [
           h('table', { class: 'w-full border-collapse' }, [
@@ -143,6 +165,7 @@ export const PrintPageBreak = defineComponent({
   },
   setup(props, { attrs, slots }) {
     const showPageBreaks = inject(PrintLayoutShowPageBreaksKey, null)
+    const printBreaks = inject(PrintLayoutPrintBreaksKey, null)
     const layoutLocale = inject(PrintLayoutLocaleKey, null)
     const config = useTigerConfig()
     return () => {
@@ -155,18 +178,20 @@ export const PrintPageBreak = defineComponent({
         {
           ...attrs,
           class: classNames(
-            'print:break-before-page',
+            (printBreaks?.value ?? true) && 'print:break-before-page',
             props.className,
             coerceClassValue(attrs.class)
           ),
           'aria-hidden': hidden === undefined ? 'true' : hidden
         },
         (showPageBreaks?.value ?? true)
-          ? h(
-              'div',
-              { class: classNames(printLayoutPageBreakClasses, printLayoutPageBreakLabelClasses) },
-              slots.default?.() ?? label
-            )
+          ? h('div', { class: printLayoutPageBreakClasses }, [
+              h(
+                'span',
+                { class: printLayoutPageBreakLabelClasses },
+                slots.default?.() ?? label
+              )
+            ])
           : undefined
       )
     }

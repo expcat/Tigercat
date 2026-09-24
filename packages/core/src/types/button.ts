@@ -14,11 +14,10 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'lin
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 /**
- * Icon position relative to button text.
- * `start` / `end` follow writing direction; `left` / `right` are aliases.
+ * Icon position relative to button text. Follows writing direction.
  * @since 0.5.0
  */
-export type ButtonIconPosition = 'start' | 'end' | 'left' | 'right'
+export type ButtonIconPosition = 'start' | 'end'
 
 /**
  * HTML button type attribute
@@ -62,19 +61,17 @@ export interface ButtonProps {
 
   /**
    * Position of the icon relative to button text.
-   * DOM order follows this value (`start`/`left` = icon then label).
+   * DOM order follows this value (`start` = icon then label).
    * @default 'start'
    * @since 0.5.0
    */
   iconPosition?: ButtonIconPosition
 
   /**
-   * HTML `type`. Same attribute as native `type`: `htmlType ?? type ?? 'button'`.
-   * If both are set and differ, `htmlType` wins.
+   * HTML `type` attribute.
    * @default 'button'
-   * @since 0.5.0
    */
-  htmlType?: ButtonHtmlType
+  type?: ButtonHtmlType
 
   /**
    * Whether to apply danger/destructive styling

@@ -43,19 +43,13 @@ export interface TagProps {
 
   /**
    * Accessible label for the close button (when `closable` is true).
-   * Defaults to ConfigProvider locale `status.tagCloseAriaLabel`.
+   * Defaults to the tag text plus `status.tagCloseAriaLabel`.
    */
   closeAriaLabel?: string
 
   /**
-   * Tab index for the close button. TagsInput uses `-1` so the field is one
-   * Tab stop and keyboard removal goes through Backspace.
-   */
-  closeTabIndex?: number
-
-  /**
    * When `false`, the tag is not rendered. Omitted / `true` keeps it shown.
-   * Closing never hides internally — the parent unmounts or sets `open={false}`.
+   * Closing emits one event; the parent unmounts the tag.
    */
   open?: boolean
   onOpenChange?: (open: boolean) => void

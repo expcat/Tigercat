@@ -33,6 +33,7 @@ import {
   replaceAnchorHash,
   resolveActiveAnchorHref,
   resolveAnchorScrollContainer,
+  resolveLinkAddress,
   resolveScrollRoot,
   scrollToAnchor,
   shouldHandleAnchorClick,
@@ -127,15 +128,17 @@ export const AnchorLink = defineComponent({
       if (linkRef.value) anchorContext?.unregisterLink(props.href, linkRef.value)
     })
 
+    const address = computed(() => resolveLinkAddress({ href: props.href, target: props.target }))
+
     const handleClick = (event: Event) => {
       const userClick = (attrs as { onClick?: (event: Event) => void }).onClick
       userClick?.(event)
-      if (!anchorContext) return
-      anchorContext.handleLinkClick(props.href, event, props.target)
+      if (!anchorContext || !address.value.href) return
+      anchorContext.handleLinkClick(address.value.href, event, address.value.target)
     }
 
     const linkClasses = computed(() => {
-      const isActive = anchorContext?.activeLink === props.href
+      const isActive = anchorContext?.activeLink === address.value.href
       return classNames(
         getAnchorLinkClasses(Boolean(isActive), props.className),
         coerceClassValue(attrs.class)
@@ -145,16 +148,18 @@ export const AnchorLink = defineComponent({
     return () => {
       const slotContent = slots.default?.()
       const nested = props.title != null && Boolean(slotContent?.length)
-      const isActive = anchorContext?.activeLink === props.href
+      const safeHref = address.value.href
+      const isActive = anchorContext?.activeLink === safeHref
       const link = h(
         'a',
         {
           ...attrs,
           ref: linkRef,
-          href: props.href,
-          target: props.target,
+          href: safeHref,
+          target: safeHref ? address.value.target : undefined,
+          rel: safeHref ? address.value.rel : undefined,
           class: linkClasses.value,
-          'data-anchor-href': props.href,
+          'data-anchor-href': safeHref,
           'aria-current': isActive ? 'location' : undefined,
           onClick: handleClick
         },

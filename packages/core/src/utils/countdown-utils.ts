@@ -13,8 +13,8 @@ export const countdownBaseClasses = 'inline-block'
 
 export const countdownValueWrapperClasses = 'flex items-baseline'
 
-export const countdownPrefixClasses = 'me-1 text-[var(--tiger-text,#111827)]'
-export const countdownSuffixClasses = 'ms-1 text-[var(--tiger-text-muted,#6b7280)]'
+export const countdownPrefixClasses = 'me-1 text-[var(--tiger-text)]'
+export const countdownSuffixClasses = 'ms-1 text-[var(--tiger-text-secondary)]'
 
 const titleSize: Record<CountdownSize, string> = {
   sm: 'text-xs',
@@ -29,11 +29,11 @@ const valueSize: Record<CountdownSize, string> = {
 }
 
 export function getCountdownTitleClasses(size: CountdownSize): string {
-  return classNames(titleSize[size], 'mb-1 text-[var(--tiger-text-muted,#6b7280)]')
+  return classNames(titleSize[size], 'mb-1 text-[var(--tiger-text-secondary)]')
 }
 
 export function getCountdownValueClasses(size: CountdownSize): string {
-  return classNames(valueSize[size], 'text-[var(--tiger-text,#111827)]')
+  return classNames(valueSize[size], 'text-[var(--tiger-text)]')
 }
 
 export function parseCountdownTimestamp(value: CountdownValue | undefined): number | undefined {
@@ -88,12 +88,30 @@ export function getCountdownDisplayRemaining(remaining: number, format: string):
   return remaining
 }
 
+/**
+ * `D` / `DD` tokens and total-hour `HH` are mutually exclusive.
+ * A capital D inside a word (`Deadline`) is not a day token, so `HH` stays total hours.
+ */
+export function countdownFormatUsesDayToken(format: string): boolean {
+  const pattern = /DD|D/g
+  let match: RegExpExecArray | null
+  while ((match = pattern.exec(format))) {
+    const token = match[0]
+    const offset = match.index
+    const before = format[offset - 1]
+    const after = format[offset + token.length]
+    if (/[A-Za-z]/.test(before ?? '') || /[A-Za-z]/.test(after ?? '')) continue
+    return true
+  }
+  return false
+}
+
 export function formatCountdown(
   remaining: number,
   format: string = COUNTDOWN_DEFAULT_FORMAT
 ): string {
   const parts = getCountdownParts(getCountdownDisplayRemaining(remaining, format))
-  const usesDayToken = /D/.test(format)
+  const usesDayToken = countdownFormatUsesDayToken(format)
   const totalHours = Math.floor(parts.total / 3600000)
   const hours = usesDayToken ? parts.hours : totalHours
 

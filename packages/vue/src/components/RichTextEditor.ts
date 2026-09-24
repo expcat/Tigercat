@@ -19,6 +19,9 @@ import {
   richTextToolbarSeparatorClasses,
   richTextPlaceholderClasses,
   createDefaultRichTextToolbar,
+  toolbarForRichTextMode,
+  sanitizeHtml,
+  manageLiveRegion,
   findHotkeyMatch,
   isContentEmpty,
   parseHeight,
@@ -121,8 +124,12 @@ export const RichTextEditor = defineComponent({
     const isEmpty = computed(() => isContentEmpty(currentContent.value))
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getRichTextEditorLabels(mergedLocale.value, props.labels))
+    const urlPrompt = ref<'link' | 'image' | null>(null)
+    const urlDraft = ref('')
+    const urlValue = ref<string | null>(null)
+    const live = manageLiveRegion('polite')
     const toolbarItems = computed(() =>
-      props.mode === 'plain' ? [] : (props.toolbar ?? createDefaultRichTextToolbar(labels.value))
+      toolbarForRichTextMode(props.toolbar ?? createDefaultRichTextToolbar(labels.value), props.mode)
     )
     const toolbarButtons = computed(() => getToolbarButtons(toolbarItems.value))
     const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
@@ -156,8 +163,9 @@ export const RichTextEditor = defineComponent({
         disabled: effectiveDisabled.value,
         placeholder: props.placeholder,
         toolbar: toolbarItems.value,
-        requestUrl: props.onRequestUrl,
-        notifyChange: commit,
+        requestUrl: (kind) => (props.onRequestUrl ? props.onRequestUrl(kind) : urlValue.value),
+        announce: (message) => live.announce(message),
+        notifyChange: (html) => commit(props.mode === 'html' ? sanitizeHtml(html) : html),
         notifyActiveFormats(next) {
           activeFormats.value = next
         }
@@ -206,13 +214,28 @@ export const RichTextEditor = defineComponent({
     })
 
     onBeforeUnmount(() => {
+      live.destroy()
       engineInstance?.destroy()
       engineInstance = null
     })
 
     function execButtonAction(btn: ToolbarButton) {
       if (props.readOnly || effectiveDisabled.value) return
+      if ((btn.name === 'link' || btn.name === 'image') && !props.onRequestUrl) {
+        urlPrompt.value = btn.name
+        urlDraft.value = ''
+        return
+      }
       engineInstance?.exec(btn.name)
+    }
+
+    function submitUrlPrompt() {
+      if (!urlPrompt.value) return
+      urlValue.value = urlDraft.value.trim() || null
+      engineInstance?.exec(urlPrompt.value)
+      urlValue.value = null
+      urlPrompt.value = null
+      urlDraft.value = ''
     }
 
     function handleKeydown(e: KeyboardEvent) {
@@ -290,7 +313,18 @@ export const RichTextEditor = defineComponent({
                   onMousedown: (e: Event) => e.preventDefault(),
                   onClick: () => execButtonAction(btn)
                 },
-                btn.icon ? h('span', { innerHTML: btn.icon }) : btn.label
+                btn.icon
+                  ? h(
+                      'svg',
+                      {
+                        viewBox: btn.icon.viewBox ?? '0 0 24 24',
+                        width: '16',
+                        height: '16',
+                        'aria-hidden': 'true'
+                      },
+                      [h('path', { d: btn.icon.path, fill: 'currentColor' })]
+                    )
+                  : btn.label
               )
             })
           )
@@ -331,10 +365,40 @@ export const RichTextEditor = defineComponent({
             )
           : null
 
-      const editorWrapper = h('div', { class: 'relative flex-1 overflow-hidden' }, [
+      const editorWrapper = h('div', { class: 'relative min-h-0 flex-1' }, [
         editorEl,
         placeholderEl
       ])
+      const urlForm = urlPrompt.value
+        ? h(
+            'form',
+            {
+              class:
+                'flex items-center gap-2 border-b border-[var(--tiger-border)] px-2 py-1.5',
+              onSubmit: (event: Event) => {
+                event.preventDefault()
+                submitUrlPrompt()
+              }
+            },
+            [
+              h('input', {
+                class:
+                  'min-w-0 flex-1 rounded border border-[var(--tiger-border)] bg-transparent px-2 py-1 text-sm',
+                'aria-label': urlPrompt.value === 'image' ? labels.value.image : labels.value.link,
+                placeholder: 'https://',
+                value: urlDraft.value,
+                onInput: (event: Event) => {
+                  urlDraft.value = (event.target as HTMLInputElement).value
+                }
+              }),
+              h(
+                'button',
+                { type: 'submit', class: getToolbarButtonClasses(false) },
+                urlPrompt.value === 'image' ? labels.value.image : labels.value.link
+              )
+            ]
+          )
+        : null
 
       return h(
         'div',
@@ -343,7 +407,7 @@ export const RichTextEditor = defineComponent({
           style: containerStyle.value,
           'data-tiger-rte': ''
         },
-        [toolbarEl, editorWrapper]
+        [toolbarEl, urlForm, editorWrapper]
       )
     }
   }

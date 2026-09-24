@@ -1,26 +1,19 @@
 /**
- * Shared Vue composable for floating-popup components
- * (Tooltip, Popover, Popconfirm).
- *
- * Extracts the common pattern: controlled/uncontrolled visibility,
- * Floating UI positioning, click-outside dismiss, escape-key dismiss,
- * trigger → event-handler mapping, floating styles.
+ * Vue binding for the shared overlay popup controller.
+ * Open state, hover timing, outside click, and Escape live in core.
  */
 import { computed, onBeforeUnmount, ref, watch, type Ref } from 'vue'
 import { useVueAnchoredOverlay } from './overlay'
 import {
   buildOverlayTriggerHandlerMap,
-  createFloatingHoverDelayController,
+  createOverlayPopupController,
   restoreFocus,
   type FloatingPlacement,
-  type FloatingTrigger
+  type FloatingTrigger,
+  type OverlayPopupDismissReason
 } from '@expcat/tigercat-core'
 
-// ---------------------------------------------------------------------------
-// Options
-// ---------------------------------------------------------------------------
 export interface UsePopupOptions {
-  /** Vue reactive props object — must contain at least open / disabled */
   props: {
     open?: boolean
     defaultOpen?: boolean
@@ -28,93 +21,79 @@ export interface UsePopupOptions {
     trigger?: FloatingTrigger
     placement?: FloatingPlacement
     offset?: number
+    showDelay?: number
+    hideDelay?: number
   }
-  /** Vue emit function (accepts any overloaded emit signature) */
   emit(event: string, ...args: unknown[]): void
-  /**
-   * Whether the component supports multi-trigger-type (click/hover/focus/manual).
-   * Popconfirm is click-only so this should be false for it.
-   * @default true
-   */
+  /** Popconfirm is click-only. @default true */
   multiTrigger?: boolean
   arrowRef?: Ref<HTMLElement | null>
+  isDismissLocked?: () => boolean
+  onDismissed?: (reason: OverlayPopupDismissReason) => void
+  restoreFocusOnDismiss?: 'escape' | 'all'
 }
 
-// ---------------------------------------------------------------------------
-// Return type
-// ---------------------------------------------------------------------------
 export interface UsePopupReturn {
-  /** Resolved current visibility (works for both controlled & uncontrolled) */
   currentVisible: Ref<boolean>
-  /** Toggle / set visibility — honours disabled & controlled */
   setVisible: (next: boolean) => void
-  /** Ref for the outermost container element */
   containerRef: Ref<HTMLElement | null>
-  /** Ref for the trigger wrapper element */
   triggerRef: Ref<HTMLElement | null>
-  /** Ref for the floating content element */
   floatingRef: Ref<HTMLElement | null>
-  /** Floating x position */
   x: Ref<number>
-  /** Floating y position */
   y: Ref<number>
-  /** Actual placement after flip/shift */
   actualPlacement: Ref<FloatingPlacement>
-  /** Computed floating wrapper styles (position + transform-origin + zIndex) */
   floatingStyles: Ref<Record<string, unknown>>
   floatingClasses: Ref<string>
   positioned: Ref<boolean>
   overlayTarget: Ref<HTMLElement | null>
-  /**
-   * Build trigger event handlers for the current trigger type.
-   * Returns a plain object ready to spread onto the trigger element.
-   */
   triggerHandlers: Ref<Record<string, unknown>>
-  /** Close the popup and restore focus to the trigger. */
   closeAndRestoreFocus: () => void
   arrowX: Ref<number | undefined>
   arrowY: Ref<number | undefined>
 }
 
-// ---------------------------------------------------------------------------
-// Composable
-// ---------------------------------------------------------------------------
 export function usePopup(options: UsePopupOptions): UsePopupReturn {
   const { props, emit, multiTrigger = true, arrowRef } = options
-
-  // ─── Visibility ──────────────────────────────────────────────────────
-  const internalVisible = ref(props.open ?? props.defaultOpen ?? false)
-  const isControlled = computed(() => props.open !== undefined)
-
-  // Sync external controlled → internal
-  watch(
-    () => props.open,
-    (next) => {
-      if (next !== undefined) internalVisible.value = next
-    }
-  )
-
-  const currentVisible = computed(() =>
-    isControlled.value ? Boolean(props.open) : internalVisible.value
-  )
-
-  const setVisible = (next: boolean) => {
-    if (props.disabled && next) return
-    if (next === currentVisible.value) return
-    if (!isControlled.value) internalVisible.value = next
-    emit('update:open', next)
-    emit('open-change', next)
-  }
-
-  const hoverController = createFloatingHoverDelayController({
-    show: () => setVisible(true),
-    hide: () => setVisible(false)
-  })
-
-  // ─── Element refs ────────────────────────────────────────────────────
+  const version = ref(0)
   const containerRef = ref<HTMLElement | null>(null)
   const triggerRef = ref<HTMLElement | null>(null)
   const floatingRef = ref<HTMLElement | null>(null)
+
+  const controller = createOverlayPopupController({
+    getControlledOpen: () => props.open,
+    getDefaultOpen: () => props.defaultOpen ?? false,
+    getDisabled: () => Boolean(props.disabled),
+    getTrigger: () => (multiTrigger ? (props.trigger ?? 'click') : 'click'),
+    getShowDelay: () => props.showDelay,
+    getHideDelay: () => props.hideDelay,
+    isDismissLocked: () => Boolean(options.isDismissLocked?.()),
+    isFocusWithinTrigger: () => {
+      const active = triggerRef.value?.ownerDocument?.activeElement
+      return Boolean(active && triggerRef.value?.contains(active))
+    },
+    onOpenChange: (open) => {
+      emit('update:open', open)
+      emit('open-change', open)
+    }
+  })
+
+  const stop = controller.subscribe(() => {
+    version.value += 1
+  })
+
+  const currentVisible = computed(() => {
+    version.value
+    return controller.getOpen()
+  })
+
+  const effectiveTrigger = computed<FloatingTrigger>(() =>
+    multiTrigger ? (props.trigger ?? 'click') : 'click'
+  )
+
+  watch(
+    () => props.disabled,
+    () => controller.syncDisabled()
+  )
 
   const restoreTriggerFocus = () => {
     window.setTimeout(() => {
@@ -123,13 +102,41 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   }
 
   const closeAndRestoreFocus = () => {
-    hoverController.closeNow()
-    if (effectiveTrigger.value !== 'hover') restoreTriggerFocus()
+    const closed = controller.requestClose('escape')
+    if (closed && effectiveTrigger.value !== 'hover') restoreTriggerFocus()
   }
 
-  const effectiveTrigger = computed<FloatingTrigger>(() =>
-    multiTrigger ? (props.trigger ?? 'click') : 'click'
-  )
+  const setVisible = (next: boolean) => {
+    controller.setOpen(next)
+  }
+
+  const relatedInside = (event?: Event) => {
+    const related = (event as FocusEvent | undefined)?.relatedTarget
+    if (!(related instanceof Node)) return false
+    return Boolean(floatingRef.value?.contains(related) || triggerRef.value?.contains(related))
+  }
+
+  const handleToggle = () => controller.activate()
+  const handleShow = (event?: Event) => {
+    const type = event?.type
+    if (type === 'click') {
+      controller.activate()
+      return
+    }
+    if (type === 'focus' || type === 'focusin') {
+      controller.focusEnter()
+      return
+    }
+    controller.pointerEnter()
+  }
+  const handleHide = (event?: Event) => {
+    const type = event?.type
+    if (type === 'blur' || type === 'focusout') {
+      controller.focusLeave(relatedInside(event))
+      return
+    }
+    controller.pointerLeave()
+  }
 
   const overlay = useVueAnchoredOverlay({
     enabled: currentVisible,
@@ -144,74 +151,49 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     dismissOnEscape: computed(() => effectiveTrigger.value !== 'manual'),
     arrowRef,
     onDismiss: (reason) => {
-      if (reason === 'escape') {
-        closeAndRestoreFocus()
-      } else {
-        hoverController.closeNow()
-      }
+      const mapped: OverlayPopupDismissReason = reason === 'escape' ? 'escape' : 'outside'
+      const closed = controller.requestClose(mapped)
+      if (!closed) return
+      const restore =
+        effectiveTrigger.value !== 'hover' &&
+        (mapped === 'escape' || options.restoreFocusOnDismiss === 'all')
+      if (restore) restoreTriggerFocus()
+      options.onDismissed?.(mapped)
     }
   })
 
-  const x = overlay.x
-  const y = overlay.y
-
-  // ─── Trigger handlers ────────────────────────────────────────────────
-  const handleToggle = () => {
-    if (props.disabled) return
-    hoverController.cancel()
-    setVisible(!currentVisible.value)
-  }
-  const handleShow = () => {
-    if (props.disabled) return
-    if (effectiveTrigger.value === 'hover') {
-      hoverController.enter()
-      return
-    }
-    hoverController.cancel()
-    setVisible(true)
-  }
-  const handleHide = (event?: Event) => {
-    if (props.disabled) return
-    const related = (event as FocusEvent | undefined)?.relatedTarget
-    if (
-      related instanceof Node &&
-      (floatingRef.value?.contains(related) || triggerRef.value?.contains(related))
-    ) {
-      return
-    }
-    if (effectiveTrigger.value === 'hover') {
-      hoverController.leave()
-      return
-    }
-    hoverController.closeNow()
-  }
-
-  // Trigger + floating share one hover group so the pointer can cross the
-  // offset gap into the teleported layer before hideDelay fires.
   watch(
     () => [floatingRef.value, currentVisible.value, effectiveTrigger.value] as const,
     ([el, visible, trigger], _prev, onCleanup) => {
       if (!multiTrigger || trigger !== 'hover' || !visible || !el) return
-      const handleEnter = () => hoverController.enter()
-      const handleLeave = () => hoverController.leave()
-      el.addEventListener('mouseenter', handleEnter)
-      el.addEventListener('mouseleave', handleLeave)
+      const enter = () => controller.pointerEnter()
+      const leave = () => controller.pointerLeave()
+      el.addEventListener('mouseenter', enter)
+      el.addEventListener('mouseleave', leave)
+      el.addEventListener('pointerenter', enter)
+      el.addEventListener('pointerleave', leave)
       onCleanup(() => {
-        el.removeEventListener('mouseenter', handleEnter)
-        el.removeEventListener('mouseleave', handleLeave)
+        el.removeEventListener('mouseenter', enter)
+        el.removeEventListener('mouseleave', leave)
+        el.removeEventListener('pointerenter', enter)
+        el.removeEventListener('pointerleave', leave)
       })
     },
     { flush: 'post', immediate: true }
   )
 
   onBeforeUnmount(() => {
-    hoverController.dispose()
+    stop()
+    controller.dispose()
   })
 
   const triggerHandlers = computed<Record<string, unknown>>(() => {
     if (!multiTrigger) {
-      // Click-only (Popconfirm)
-      return { onClick: handleToggle }
+      return buildOverlayTriggerHandlerMap(
+        'click',
+        { toggle: handleToggle, show: handleShow, hide: handleHide },
+        'vue'
+      )
     }
     return buildOverlayTriggerHandlerMap(
       effectiveTrigger.value,
@@ -226,8 +208,8 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     containerRef,
     triggerRef,
     floatingRef,
-    x,
-    y,
+    x: overlay.x,
+    y: overlay.y,
     actualPlacement: overlay.placement,
     floatingStyles: overlay.floatingStyles,
     floatingClasses: overlay.floatingClasses,

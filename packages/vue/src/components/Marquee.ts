@@ -1,18 +1,18 @@
-import { computed, defineComponent, h, onMounted, PropType, ref } from 'vue'
+import { defineComponent, h, onMounted, onUpdated, PropType, ref } from 'vue'
 import {
-  composeComponentClasses,
+  classNames,
+  coerceClassValue,
   getMarqueeCloneAttributes,
   getMarqueeContentClasses,
   getMarqueeContentStyle,
-  getMarqueeLabels,
+  resolveMarqueeAriaLabel,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
   getMarqueeTrackStyle,
-  injectMarqueeStyles,
+  syncMarqueeClones,
   isMarqueeFocusInside,
   isMarqueePaused,
   mergeStyleValues,
-  mergeTigerLocale,
   resolveMarqueeDirection,
   resolveMarqueePauseOnFocus,
   resolveMarqueePauseOnHover,
@@ -23,8 +23,6 @@ import {
   type TigerLocale,
   type TigerLocaleMarquee
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
-
 export interface VueMarqueeProps {
   direction?: MarqueeDirection
   duration?: number
@@ -136,12 +134,10 @@ export const Marquee = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const config = useTigerConfig()
-    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const labels = computed(() => getMarqueeLabels(mergedLocale.value, props.labels))
-    onMounted(() => {
-      injectMarqueeStyles()
-    })
+    const trackRef = ref<HTMLElement | null>(null)
+    const syncClones = () => syncMarqueeClones(trackRef.value)
+    onMounted(syncClones)
+    onUpdated(syncClones)
 
     const hovered = ref(false)
     const focused = ref(false)
@@ -172,36 +168,37 @@ export const Marquee = defineComponent({
         typeof attrsRecord['aria-labelledby'] === 'string'
           ? attrsRecord['aria-labelledby']
           : undefined
-      const dedicatedAria = attrAriaLabel ?? props.ariaLabel
+      const dedicatedAria =
+        attrAriaLabel ?? props.ariaLabel ?? resolveMarqueeAriaLabel(props.labels?.ariaLabel)
       const region = resolveMarqueeRegion({
-        ariaLabel:
-          dedicatedAria !== undefined
-            ? dedicatedAria
-            : attrLabelledBy
-              ? undefined
-              : labels.value.ariaLabel,
+        ariaLabel: dedicatedAria,
         labelledBy: attrLabelledBy
       })
 
-      const contentCopies = Array.from({ length: copies }, (_, index) => {
-        const clone = index > 0
-        return h(
+      const contentCopies = [
+        h(
           'div',
           {
-            class: getMarqueeContentClasses({ direction, clone }),
-            style: getMarqueeContentStyle({ clone, index }),
-            'data-marquee-content': '',
-            ...(clone ? getMarqueeCloneAttributes() : {})
+            class: getMarqueeContentClasses({ direction }),
+            'data-marquee-content': ''
           },
           slots.default?.()
+        ),
+        ...Array.from({ length: Math.max(0, copies - 1) }, (_, index) =>
+          h('div', {
+            class: getMarqueeContentClasses({ direction, clone: true }),
+            style: getMarqueeContentStyle({ clone: true, index: index + 1 }),
+            'data-marquee-content': '',
+            ...getMarqueeCloneAttributes()
+          })
         )
-      })
+      ]
 
       return h(
         'div',
         {
           ...attrs,
-          class: composeComponentClasses(
+          class: classNames(
             getMarqueeRootClasses({
               direction,
               pauseOnHover,
@@ -210,7 +207,7 @@ export const Marquee = defineComponent({
               repeat: copies,
               className: props.className
             }),
-            attrsRecord.class
+            coerceClassValue(attrsRecord.class)
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
           role: region.role,
@@ -243,6 +240,7 @@ export const Marquee = defineComponent({
           h(
             'div',
             {
+              ref: trackRef,
               class: getMarqueeTrackClasses(direction),
               style: getMarqueeTrackStyle({
                 duration: props.duration,

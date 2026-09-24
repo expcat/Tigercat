@@ -1,16 +1,15 @@
-import React, { forwardRef, useCallback, useLayoutEffect, useMemo, useState } from 'react'
+import React, { forwardRef, useCallback, useLayoutEffect, useRef, useState } from 'react'
 import {
   getMarqueeCloneAttributes,
+  syncMarqueeClones,
   getMarqueeContentClasses,
   getMarqueeContentStyle,
-  getMarqueeLabels,
   getMarqueeRootClasses,
   getMarqueeTrackClasses,
   getMarqueeTrackStyle,
-  injectMarqueeStyles,
   isMarqueeFocusInside,
   isMarqueePaused,
-  mergeTigerLocale,
+  resolveMarqueeAriaLabel,
   resolveMarqueeDirection,
   resolveMarqueePauseOnFocus,
   resolveMarqueePauseOnHover,
@@ -18,7 +17,6 @@ import {
   resolveMarqueeRepeat,
   type MarqueeProps as CoreMarqueeProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
 
 export interface MarqueeProps
   extends
@@ -39,7 +37,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       gap,
       repeat,
       ariaLabel,
-      locale,
+      locale: _locale,
       labels: labelsOverride,
       className,
       style,
@@ -52,10 +50,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
     },
     ref
   ) => {
-    useLayoutEffect(() => {
-      injectMarqueeStyles()
-    }, [])
-
+    const trackRef = useRef<HTMLDivElement>(null)
     const [hovered, setHovered] = useState(false)
     const [focused, setFocused] = useState(false)
     const resolvedDirection = resolveMarqueeDirection(direction)
@@ -69,28 +64,19 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       hovered,
       focused
     })
-    const config = useTigerConfig()
-    const mergedLocale = useMemo(
-      () => mergeTigerLocale(config.locale, locale),
-      [config.locale, locale]
-    )
-    const labels = useMemo(
-      () => getMarqueeLabels(mergedLocale, labelsOverride),
-      [mergedLocale, labelsOverride]
-    )
     const { 'aria-label': ariaLabelAttr, 'aria-labelledby': ariaLabelledByAttr, ...domProps } = rest
     const labelledBy =
       typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined
     const dedicatedAria =
-      typeof ariaLabelAttr === 'string' ? ariaLabelAttr : ariaLabel
+      (typeof ariaLabelAttr === 'string' ? ariaLabelAttr : undefined) ??
+      ariaLabel ??
+      resolveMarqueeAriaLabel(labelsOverride?.ariaLabel)
     const region = resolveMarqueeRegion({
-      ariaLabel:
-        dedicatedAria !== undefined
-          ? dedicatedAria
-          : labelledBy
-            ? undefined
-            : labels.ariaLabel,
+      ariaLabel: dedicatedAria,
       labelledBy
+    })
+    useLayoutEffect(() => {
+      syncMarqueeClones(trackRef.current)
     })
 
     const handleMouseEnter = useCallback(
@@ -156,25 +142,29 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
         onFocus={handleFocus}
         onBlur={handleBlur}>
         <div
+          ref={trackRef}
           data-marquee-track=""
           className={getMarqueeTrackClasses(resolvedDirection)}
           style={getMarqueeTrackStyle({ duration, gap, repeat: copies })}>
-          {Array.from({ length: copies }, (_, index) => {
-            const clone = index > 0
-            return (
-              <div
-                key={clone ? `clone-${index}` : 'content'}
-                className={getMarqueeContentClasses({
-                  direction: resolvedDirection,
-                  clone
-                })}
-                data-marquee-content=""
-                style={getMarqueeContentStyle({ clone, index })}
-                {...(clone ? getMarqueeCloneAttributes() : {})}>
-                {children}
-              </div>
-            )
-          })}
+          <div
+            className={getMarqueeContentClasses({ direction: resolvedDirection })}
+            data-marquee-content="">
+            {children}
+          </div>
+          {copies > 1
+            ? Array.from({ length: copies - 1 }, (_, index) => (
+                <div
+                  key={`clone-${index + 1}`}
+                  className={getMarqueeContentClasses({
+                    direction: resolvedDirection,
+                    clone: true
+                  })}
+                  data-marquee-content=""
+                  style={getMarqueeContentStyle({ clone: true, index: index + 1 })}
+                  {...getMarqueeCloneAttributes()}
+                />
+              ))
+            : null}
         </div>
       </div>
     )

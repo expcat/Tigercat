@@ -76,7 +76,7 @@ const scanHint = computed(() =>
       type="button"
       :aria-label="t('A11y 调试面板', 'A11y debug panel')"
       :aria-expanded="open"
-      class="size-11 rounded-full shadow-lg bg-[var(--tiger-primary,#2563eb)] text-white font-bold text-base"
+      class="size-11 rounded-full shadow-lg bg-[var(--tiger-primary)] text-white font-bold text-base"
       @click="open = true">
       ♿
     </button>

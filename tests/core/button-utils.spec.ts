@@ -1,12 +1,11 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   buttonBaseClasses,
   buttonDangerClasses,
   getButtonVariantClasses,
   resolveButtonClasses,
-  resolveButtonHtmlType,
-  resolveButtonIconPlacement,
-  resetDevWarnCache
+  resolveButtonType,
+  resolveButtonIconPlacement
 } from '@expcat/tigercat-core'
 
 describe('resolveButtonClasses', () => {
@@ -41,38 +40,19 @@ describe('resolveButtonClasses', () => {
   })
 })
 
-describe('resolveButtonHtmlType', () => {
-  let warnSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    resetDevWarnCache()
-    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-  })
-
-  afterEach(() => {
-    warnSpy.mockRestore()
-  })
-
-  it('uses htmlType, then native type, then button', () => {
-    expect(resolveButtonHtmlType('submit')).toBe('submit')
-    expect(resolveButtonHtmlType(undefined, 'reset')).toBe('reset')
-    expect(resolveButtonHtmlType(undefined, undefined)).toBe('button')
-  })
-
-  it('lets htmlType win and warns when the two differ', () => {
-    expect(resolveButtonHtmlType('submit', 'reset')).toBe('submit')
-    expect(warnSpy).toHaveBeenCalledWith(
-      '[Tigercat] Button htmlType and type differ; htmlType wins.'
-    )
+describe('resolveButtonType', () => {
+  it('accepts native button types and falls back to button', () => {
+    expect(resolveButtonType('submit')).toBe('submit')
+    expect(resolveButtonType('reset')).toBe('reset')
+    expect(resolveButtonType(undefined)).toBe('button')
+    expect(resolveButtonType('nope')).toBe('button')
   })
 })
 
 describe('resolveButtonIconPlacement', () => {
-  it('maps left/right aliases onto start/end', () => {
+  it('uses start unless the icon sits at the end', () => {
     expect(resolveButtonIconPlacement()).toBe('start')
-    expect(resolveButtonIconPlacement('left')).toBe('start')
     expect(resolveButtonIconPlacement('start')).toBe('start')
-    expect(resolveButtonIconPlacement('right')).toBe('end')
     expect(resolveButtonIconPlacement('end')).toBe('end')
   })
 })

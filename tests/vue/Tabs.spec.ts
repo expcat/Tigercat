@@ -156,16 +156,20 @@ describe('Tabs', () => {
       )
     })
 
-    it('matches number and string tab keys', () => {
-      render(Tabs, {
-        props: { activeKey: '1' },
-        slots: {
-          default: () => [
-            h(TabPane, { tabKey: 1, label: 'Numeric' }, () => 'One'),
-            h(TabPane, { tabKey: '2', label: 'Text' }, () => 'Two')
-          ]
-        }
-      })
+    it('keeps number and string tab keys distinct', () => {
+      const slots = {
+        default: () => [
+          h(TabPane, { tabKey: 1, label: 'Numeric' }, () => 'One'),
+          h(TabPane, { tabKey: '2', label: 'Text' }, () => 'Two')
+        ]
+      }
+      const first = render(Tabs, { props: { activeKey: '1' }, slots })
+      expect(screen.getByRole('tab', { name: 'Numeric', exact: true })).toHaveAttribute(
+        'aria-selected',
+        'false'
+      )
+      first.unmount()
+      render(Tabs, { props: { activeKey: 1 }, slots })
       expect(screen.getByRole('tab', { name: 'Numeric', exact: true })).toHaveAttribute(
         'aria-selected',
         'true'

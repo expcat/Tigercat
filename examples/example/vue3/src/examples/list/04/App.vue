@@ -17,7 +17,7 @@ const items = [
     <template #renderItem="{ item }">
       <Card variant="shadow">
         <h3 class="font-semibold">{{ item.title }}</h3>
-        <p class="text-sm text-[var(--tiger-text-muted)]">{{ item.content }}</p>
+        <p class="text-sm text-[var(--tiger-text-secondary)]">{{ item.content }}</p>
       </Card>
     </template>
   </List>

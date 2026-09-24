@@ -54,7 +54,6 @@ const router = createRouter({
         { path: 'radio', component: () => import('./pages/RadioDemo.vue') },
         { path: 'switch', component: () => import('./pages/SwitchDemo.vue') },
         { path: 'slider', component: () => import('./pages/SliderDemo.vue') },
-        { path: 'stepper', component: () => import('./pages/StepperDemo.vue') },
         { path: 'select', component: () => import('./pages/SelectDemo.vue') },
         {
           path: 'auto-complete',

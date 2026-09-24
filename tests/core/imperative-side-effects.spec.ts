@@ -4,11 +4,14 @@
 
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { act, waitFor } from '@testing-library/react'
+import { act, render, waitFor } from '@testing-library/react'
+import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { nextTick } from 'vue'
+import { createApp, h, nextTick } from 'vue'
 import { Message as ReactMessage, notification as reactNotification } from '@expcat/tigercat-react'
+import { ConfigProvider as ReactConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Message as VueMessage, notification as vueNotification } from '@expcat/tigercat-vue'
+import { ConfigProvider as VueConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 
 function readText(path: string) {
   return readFileSync(resolve(process.cwd(), path), 'utf-8')
@@ -160,6 +163,9 @@ describe('imperative API sideEffects regression', () => {
   )
 
   it('mounts React Message and Notification from the package root entry', async () => {
+    const view = render(
+      React.createElement(ReactConfigProvider, null, React.createElement('span', null, 'app'))
+    )
     await actImperativeReact(() => {
       ReactMessage.info({ content: 'React root message', duration: 0 })
       reactNotification.info({ title: 'React root notification', duration: 0 })
@@ -173,9 +179,16 @@ describe('imperative API sideEffects regression', () => {
         'React root notification'
       )
     })
+    view.unmount()
   })
 
   it('mounts Vue Message and Notification from the package root entry', async () => {
+    const root = document.createElement('div')
+    document.body.append(root)
+    const app = createApp({
+      render: () => h(VueConfigProvider, () => h('span', 'app'))
+    })
+    app.mount(root)
     VueMessage.info({ content: 'Vue root message', duration: 0 })
     vueNotification.info({ title: 'Vue root notification', duration: 0 })
     await flushVueDom()
@@ -188,5 +201,7 @@ describe('imperative API sideEffects regression', () => {
         'Vue root notification'
       )
     })
+    app.unmount()
+    root.remove()
   })
 })

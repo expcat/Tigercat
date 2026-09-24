@@ -46,7 +46,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   width = DEFAULT_TREEMAP_WIDTH,
   height = DEFAULT_TREEMAP_HEIGHT,
   padding = DEFAULT_TREEMAP_PADDING,
-  responsive = false,
+  responsive = true,
   data,
   gap = DEFAULT_TREEMAP_GAP,
   showLabels = true,

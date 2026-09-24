@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent } from '@testing-library/react'
+import { act, fireEvent } from '@testing-library/react'
 import { AreaChart } from '@expcat/tigercat-react/AreaChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 
@@ -170,17 +170,20 @@ describe('AreaChart', () => {
     expect(onPointClick).toHaveBeenCalledWith(0, 0, expect.any(Object))
   })
 
-  it('does not paint a fill gradient by default and still tracks the plot', () => {
+  it('does not paint a fill gradient by default and still tracks the plot', async () => {
     const { container } = renderWithProps(AreaChart, {
       data: basicData,
       ...defaultSize
     })
     expect(container.querySelector('linearGradient')).toBeNull()
     fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, { clientX: 40, clientY: 40 })
+    await act(async () => {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    })
     expect(document.body.querySelector('[data-chart-tooltip]')).toBeTruthy()
   })
 
-  it('fires onPointHover from the plot hit target when hoverable', () => {
+  it('fires onPointHover from the plot hit target when hoverable', async () => {
     const onPointHover = vi.fn()
     const { container } = renderWithProps(AreaChart, {
       data: basicData,
@@ -189,6 +192,9 @@ describe('AreaChart', () => {
       ...defaultSize
     })
     fireEvent.mouseMove(container.querySelector('[data-plot-hit]')!, { clientX: 40, clientY: 40 })
+    await act(async () => {
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    })
     expect(onPointHover).toHaveBeenCalledWith(
       expect.any(Number),
       expect.any(Number),

@@ -14,6 +14,7 @@ import {
   getScrollSpyRootClasses,
   getScrollSpyRootStyle,
   mergeTigerLocale,
+  resolveLinkHref,
   resolveScrollSpyContainer,
   resolveScrollSpyOffset,
   shouldActivateScrollSpyClick,
@@ -162,25 +163,24 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
           const hasChildren = Boolean(item.children?.length)
           const depth =
             flatItems.find((flat) => getScrollSpyKeyString(flat.key) === keyString)?.depth ?? 0
-          const hasHref = Boolean(item.href)
-          const Tag = hasHref ? 'a' : 'span'
+          const safeHref = resolveLinkHref(item.href, { disabled: item.disabled })
+          const itemProps = {
+            className: getScrollSpyItemClasses(isActive, item.disabled),
+            'aria-current': isActive ? ('location' as const) : undefined,
+            'aria-disabled': item.disabled || undefined,
+            tabIndex: item.disabled ? -1 : undefined,
+            'data-key': keyString
+          }
 
           return (
             <li key={keyString} data-depth={depth}>
-              <Tag
-                href={hasHref ? item.href : undefined}
-                className={getScrollSpyItemClasses(isActive, item.disabled)}
-                aria-current={isActive ? 'location' : undefined}
-                aria-disabled={item.disabled || undefined}
-                tabIndex={item.disabled ? -1 : undefined}
-                data-key={keyString}
-                onClick={
-                  hasHref
-                    ? (event) => handleClick(item, event as React.MouseEvent<HTMLElement>)
-                    : undefined
-                }>
-                {item.label}
-              </Tag>
+              {safeHref ? (
+                <a {...itemProps} href={safeHref} onClick={(event) => handleClick(item, event)}>
+                  {item.label}
+                </a>
+              ) : (
+                <span {...itemProps}>{item.label}</span>
+              )}
               {hasChildren ? renderItems(item.children ?? [], true) : null}
             </li>
           )

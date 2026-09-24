@@ -13,7 +13,9 @@ import type {
   TigerLocaleTable,
   TableCardRenderContext,
   TableCardLayoutItem,
-  TableCardSelectionPosition
+  TableCardSelectionPosition,
+  TableExportScope,
+  TableFixedPosition
 } from '@expcat/tigercat-core'
 
 /**
@@ -67,8 +69,12 @@ export interface VueTableProps {
   summaryRow?: { show: boolean; data: Record<string, unknown> }
   groupBy?: string
   exportable?: boolean
-  exportFormat?: 'csv'
+  exportScope?: TableExportScope
   exportFilename?: string
+  columnOrder?: string[]
+  columnFixed?: Record<string, TableFixedPosition | false>
+  cardViewport?: boolean
+  ariaLabel?: string
   cardLayout?: TableCardLayoutItem[]
 }
 
@@ -223,8 +229,15 @@ export const tableProps = {
   summaryRow: { type: Object as PropType<{ show: boolean; data: Record<string, unknown> }> },
   groupBy: { type: String },
   exportable: { type: Boolean, default: false },
-  exportFormat: { type: String as PropType<'csv'>, default: 'csv' },
+  exportScope: { type: String as PropType<TableExportScope>, default: 'all' },
   exportFilename: { type: String, default: 'export' },
+  columnOrder: { type: Array as PropType<string[]>, default: undefined },
+  columnFixed: {
+    type: Object as PropType<Record<string, TableFixedPosition | false>>,
+    default: undefined
+  },
+  cardViewport: { type: Boolean, default: undefined },
+  ariaLabel: { type: String, default: undefined },
   cardLayout: {
     type: Array as PropType<TableCardLayoutItem[]>,
     default: undefined
@@ -245,7 +258,8 @@ export const tableEmits = [
   'column-order-change',
   'column-fixed-change',
   'row-order-change',
-  'export'
+  'export',
+  'select-loaded'
 ] as const
 
 export type TableEmits = (typeof tableEmits)[number]

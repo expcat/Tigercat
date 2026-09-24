@@ -6,7 +6,7 @@ import type { FloatingPlacement } from '../utils/floating'
 
 /**
  * Open item key for a NavigationMenu. `null` / `undefined` / `''` means closed.
- * `1` and `'1'` identify the same item.
+ * `1` and `'1'` are different items.
  */
 export type NavigationMenuValue = string | number
 
@@ -23,19 +23,6 @@ export interface NavigationMenuProps {
    * Default open item key (uncontrolled mode)
    */
   defaultValue?: NavigationMenuValue | null
-  /**
-   * Whether any panel is open (controlled mode).
-   * When `false`, every panel is closed even if `value` is set.
-   * When `true` without a `value` / `defaultValue`, nothing opens
-   * (there is no panel to show).
-   */
-  open?: boolean
-  /**
-   * Default open state (uncontrolled mode). Requires `defaultValue` to know
-   * which panel to show. Alone it does not open a panel.
-   * @default false
-   */
-  defaultOpen?: boolean
   /**
    * Open the hovered trigger's panel after `delayDuration`.
    * Focus never opens a panel; Enter / Space / ArrowDown / click do.

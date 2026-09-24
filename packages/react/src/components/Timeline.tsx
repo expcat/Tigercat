@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import {
   EMPTY_TIMELINE_ITEMS,
   classNames,
@@ -10,6 +10,7 @@ import {
   getTimelineItemClasses,
   getTimelineItemKey,
   getTimelineTailClasses,
+  manageLiveRegion,
   mergeTigerLocale,
   processTimelineItems,
   resolveLocaleText,
@@ -69,6 +70,34 @@ export const Timeline: React.FC<TimelineProps> = ({
     () => processTimelineItems(items ?? EMPTY_TIMELINE_ITEMS, { reverse, mode }),
     [items, reverse, mode]
   )
+
+  const pendingText = resolveLocaleText(
+    'Loading...',
+    mergedLocale?.timeline?.pendingText,
+    mergedLocale?.common?.loadingText
+  )
+  const pendingSignature = pending ? String(pendingContent ?? pendingText) : ''
+  const pendingSeen = useRef<string | null>(null)
+  const liveRef = useRef<ReturnType<typeof manageLiveRegion> | null>(null)
+  useEffect(() => {
+    const region = manageLiveRegion('polite')
+    liveRef.current = region
+    return () => {
+      region.destroy()
+      liveRef.current = null
+    }
+  }, [])
+  useEffect(() => {
+    const previous = pendingSeen.current
+    if (previous === pendingSignature) return
+    pendingSeen.current = pendingSignature
+    if (!liveRef.current) return
+    if (previous === null && !pendingSignature) return
+    if (pendingSignature) liveRef.current.announce(pendingSignature)
+    else if (previous) {
+      liveRef.current.announce(mergedLocale?.timeline?.pendingReplacedText || 'Update finished')
+    }
+  }, [mergedLocale?.timeline?.pendingReplacedText, pendingSignature])
 
   const containerClasses = useMemo(
     () => classNames(getTimelineContainerClasses(mode), timelineListClasses, className),
@@ -153,7 +182,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     )
 
     return (
-      <li key="pending" className={itemClasses}>
+      <li key="pending" className={itemClasses} aria-busy="true">
         <div className={headClasses}>{renderDotElement({}, true)}</div>
         <div className={contentClasses}>
           {pendingContent || <div className={timelineDescriptionClasses}>{pendingText}</div>}
@@ -167,7 +196,7 @@ export const Timeline: React.FC<TimelineProps> = ({
       {...ulProps}
       className={containerClasses}
       role="list"
-      aria-busy={ulProps['aria-busy'] ?? (pending ? true : undefined)}>
+      aria-busy={ulProps['aria-busy']}>
       {processedItems.map((item, index) => renderTimelineItem(item, index))}
       {renderPendingItem()}
     </ul>

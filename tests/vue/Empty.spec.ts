@@ -46,14 +46,14 @@ describe('Empty (Vue)', () => {
       expect(screen.getByAltText('custom')).toBeInTheDocument()
     })
 
-    it('keeps the image slot when showImage is false', () => {
+    it('hides the image slot when showImage is false', () => {
       render(Empty, {
         props: { showImage: false },
         slots: {
           image: () => h('img', { src: 'custom.png', alt: 'kept' })
         }
       })
-      expect(screen.getByAltText('kept')).toBeInTheDocument()
+      expect(screen.queryByAltText('kept')).not.toBeInTheDocument()
     })
 
     it('renders description slot', () => {

@@ -7,6 +7,7 @@ import type { PieChartDatum, RadarChartDatum, RadarChartSeries } from '../../typ
 import { getChartElementOpacity } from '../chart-interaction'
 import { devWarn } from '../dev-warn'
 import { formatChartTemplate, isFiniteNumber } from './layout'
+import { scanFiniteExtent } from './scale'
 import {
   computePieHoverOffset,
   computePieLabelLine,
@@ -14,12 +15,14 @@ import {
   createPieArcPath,
   createPolygonPath,
   createPolygonRingPath,
+  createRadarSeriesPath,
   getPieArcs,
   getRadarAngles,
   getRadarLabelAlign,
   polarToCartesian
 } from './path'
 import { DEFAULT_CHART_COLORS, RADAR_SPLIT_AREA_COLORS } from './color'
+import { chartLabelFill } from '../heatmap-chart-utils'
 
 export const PIE_OUTSIDE_RADIUS_RATIO = 0.72
 export const DEFAULT_PIE_START_ANGLE = -Math.PI / 2
@@ -101,6 +104,7 @@ export interface LaidOutPieSlice {
   labelY: number
   hoverDx: number
   hoverDy: number
+  labelFill: string
   outside?: {
     points: string
     x: number
@@ -194,7 +198,8 @@ export function layoutPieSlices(
       labelY: labelPos.y,
       hoverDx: hover.dx,
       hoverDy: hover.dy,
-      outside
+      outside,
+      labelFill: chartLabelFill(color)
     })
   }
   return slices
@@ -221,14 +226,27 @@ export function resolveRadarIndicators(
   }))
 }
 
+function radarDatumForIndicator(
+  data: RadarChartDatum[],
+  indicator: RadarIndicator
+): RadarChartDatum | null {
+  const labeled = data.find(
+    (item) => item.label && (item.label === indicator.label || item.label === indicator.key)
+  )
+  if (labeled) return labeled
+  const positional = data[indicator.index]
+  if (!positional) return null
+  if (positional.label && positional.label !== indicator.label && positional.label !== indicator.key) {
+    return null
+  }
+  return positional
+}
+
 function radarValueForIndicator(
   data: RadarChartDatum[],
   indicator: RadarIndicator
 ): { value: number; datum: RadarChartDatum } | null {
-  const labeled = data.some((datum) => Boolean(datum.label))
-  const datum = labeled
-    ? data.find((item) => item.label === indicator.label || item.label === indicator.key)
-    : data[indicator.index]
+  const datum = radarDatumForIndicator(data, indicator)
   if (!datum) return null
   if (!isFiniteNumber(datum.value) || datum.value < 0) return null
   return { value: datum.value, datum }
@@ -241,7 +259,12 @@ export interface LaidOutRadarPoint {
   index: number
   angle: number
   datum: RadarChartDatum
+  missing: boolean
 }
+
+export const MAX_RADAR_LEVELS = 12
+
+export type RadarMissingValue = 'center' | 'gap'
 
 export interface LaidOutRadarSeries {
   seriesIndex: number
@@ -302,6 +325,8 @@ export function layoutRadar(
     labelFormatter?: (datum: RadarChartDatum, index: number) => string
     levelLabelFormatter?: (value: number, level: number) => string
     labelAutoAlign?: boolean
+    /** Missing measures sit on the center or break the outline. They never chord. */
+    missing?: RadarMissingValue
     strokeColor?: string
     fillColor?: string
     fillOpacity?: number
@@ -333,7 +358,7 @@ export function layoutRadar(
   const values = series.flatMap((item) =>
     item.data.map((datum) => datum.value).filter((value) => isFiniteNumber(value) && value > 0)
   )
-  const computedMax = values.length > 0 ? Math.max(...values) : 0
+  const computedMax = scanFiniteExtent(values)?.max ?? 0
   const maxValue =
     isFiniteNumber(options.maxValue) && options.maxValue > 0
       ? options.maxValue
@@ -347,7 +372,11 @@ export function layoutRadar(
     )
   }
 
-  const resolvedLevels = Math.max(1, Math.floor(options.levels))
+  const resolvedLevels = Math.min(
+    MAX_RADAR_LEVELS,
+    Math.max(1, Math.floor(Number.isFinite(options.levels) ? options.levels : 1))
+  )
+  const missingMode: RadarMissingValue = options.missing === 'gap' ? 'gap' : 'center'
   const grid: LaidOutRadar['grid'] = []
   if (options.showGrid !== false && angles.length > 0) {
     for (let index = 0; index < resolvedLevels; index++) {
@@ -431,23 +460,24 @@ export function layoutRadar(
     const color = item.color ?? palette[seriesIndex % palette.length]
     const points: LaidOutRadarPoint[] = []
     indicators.forEach((indicator, index) => {
-      const matched = radarValueForIndicator(item.data, indicator)
-      if (!matched) return
       const angle = angles[index]
       if (!isFiniteNumber(angle)) return
-      const pointRadius = radius * (matched.value / maxValue)
+      const matched = radarValueForIndicator(item.data, indicator)
+      const missing = !matched
+      const pointRadius = missing ? 0 : radius * (matched.value / maxValue)
       const pos = polarToCartesian(cx, cy, pointRadius, angle)
       if (!isFiniteNumber(pos.x) || !isFiniteNumber(pos.y)) return
       points.push({
         x: pos.x,
         y: pos.y,
-        value: matched.value,
+        value: matched?.value ?? 0,
         index,
         angle,
-        datum: matched.datum
+        datum: matched?.datum ?? { value: 0, label: indicator.label },
+        missing
       })
     })
-    const path = createPolygonPath(points)
+    const path = createRadarSeriesPath(points, missingMode)
     const fillOpacity = (item.fillOpacity ?? options.fillOpacity ?? 0.2) * (item.opacity ?? 1)
     const seriesKey = options.seriesKeys?.[seriesIndex] ?? `radar-${seriesIndex}`
     const fill =

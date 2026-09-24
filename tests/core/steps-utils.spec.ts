@@ -11,9 +11,9 @@ import {
   getStepSizeDataValue,
   getStepSizeToken,
   getStepTailClasses,
-  stepConnectorBaseStyles,
-  tigercatPlugin
+  stepConnectorBaseStyles
 } from '@expcat/tigercat-core'
+import { tigercatPlugin } from '../../packages/core/src/tailwind-plugin'
 
 describe('steps-utils', () => {
   it('clamps non-finite and out-of-range current indices', () => {
@@ -86,14 +86,14 @@ describe('Steps connector class tokens', () => {
 describe('Steps connector plugin geometry', () => {
   it('centers the vertical tail on the icon column', () => {
     expect(stepConnectorBaseStyles['.tiger-step-tail--vertical']).toMatchObject({
-      left: '50%',
+      insetInlineStart: '50%',
       transform: 'translateX(-50%)',
-      width: '0.125rem'
+      inlineSize: '0.125rem'
     })
     expect(stepConnectorBaseStyles['.tiger-step-tail--horizontal']).toMatchObject({
-      left: '50%',
-      height: '0.125rem',
-      width: '100%'
+      insetInlineStart: '50%',
+      blockSize: '0.125rem',
+      inlineSize: '100%'
     })
   })
 
@@ -105,7 +105,7 @@ describe('Steps connector plugin geometry', () => {
     const plugin = tigercatPlugin as unknown as PluginInstance
     plugin.handler({ addBase: (rule) => Object.assign(rules, rule) })
     expect(rules['.tiger-step-tail--vertical']).toMatchObject({
-      left: '50%',
+      insetInlineStart: '50%',
       transform: 'translateX(-50%)'
     })
     expect(rules['.tiger-step-icon-col--sm']).toMatchObject({ width: '2rem' })

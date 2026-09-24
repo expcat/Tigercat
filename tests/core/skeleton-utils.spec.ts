@@ -17,14 +17,13 @@ const OLD_LOCKED_SKELETON_BG_ALT = '--tiger-skeleton-bg-alt,#d1d5db'
 
 describe('skeleton-utils surface-muted bars', () => {
   it('falls back to registered surface-muted for the bar, not fill or locked gray-200', () => {
-    expect(skeletonBaseClasses).toContain('--tiger-surface-muted')
     expect(skeletonBaseClasses).toContain('--tiger-skeleton-bg')
     expect(skeletonBaseClasses).not.toContain('--tiger-fill')
     expect(skeletonBaseClasses).not.toContain(OLD_LOCKED_SKELETON_BG)
     expect(skeletonBaseClasses).not.toContain('--tiger-component-skeleton')
 
     const classes = getSkeletonClasses()
-    expect(classes).toContain('--tiger-surface-muted')
+    expect(classes).toContain('--tiger-skeleton-bg')
     expect(classes).toContain(skeletonBaseClasses)
     expect(classes).not.toContain('--tiger-fill')
     expect(classes).not.toContain(OLD_LOCKED_SKELETON_BG)
@@ -36,7 +35,7 @@ describe('skeleton-utils surface-muted bars', () => {
     expect(wave).toContain('tiger-skeleton-wave')
     expect(wave).toContain('tiger-motion-aware')
     expect(wave).not.toContain(OLD_LOCKED_SKELETON_BG)
-    expect(wave).not.toContain('--tiger-fill')
+    expect(wave).not.toContain('--tiger-surface-muted')
 
     const classes = getSkeletonClasses('text', 'wave')
     expect(classes).toContain('tiger-skeleton-wave')

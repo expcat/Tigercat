@@ -15,30 +15,30 @@ description: Compact generated route map for Tigercat core type files
 
 ## Basic
 
-| Type File        | Props Interfaces                                                                                                           |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| avatar.ts        | AvatarProps, AvatarGroupProps                                                                                              |
-| badge.ts         | BadgeProps                                                                                                                 |
-| button.ts        | ButtonProps, ButtonGroupProps                                                                                              |
-| code.ts          | CodeProps                                                                                                                  |
-| divider.ts       | DividerProps                                                                                                               |
-| empty.ts         | EmptyProps                                                                                                                 |
-| highlight.ts     | HighlightProps                                                                                                             |
-| icon.ts          | IconProps                                                                                                                  |
-| image.ts         | ImageProps, ImageViewerBaseProps, ImagePreviewProps, ImageViewerProps, ImageGroupProps, ImageCropperProps, CropUploadProps |
-| image-compare.ts | ImageCompareProps                                                                                                          |
-| kbd.ts           | KbdProps                                                                                                                   |
-| link.ts          | LinkProps                                                                                                                  |
-| marquee.ts       | MarqueeProps                                                                                                               |
-| qrcode.ts        | QRCodeProps                                                                                                                |
-| rate.ts          | RateProps                                                                                                                  |
-| result.ts        | ResultProps                                                                                                                |
-| segmented.ts     | SegmentedProps                                                                                                             |
-| split-button.ts  | SplitButtonProps                                                                                                           |
-| statistic.ts     | StatisticProps                                                                                                             |
-| tag.ts           | TagProps                                                                                                                   |
-| text.ts          | TextProps                                                                                                                  |
-| watermark.ts     | WatermarkProps                                                                                                             |
+| Type File        | Props Interfaces                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------------------- |
+| avatar.ts        | AvatarProps, AvatarGroupProps                                                                            |
+| badge.ts         | BadgeProps                                                                                               |
+| button.ts        | ButtonProps, ButtonGroupProps                                                                            |
+| code.ts          | CodeProps                                                                                                |
+| divider.ts       | DividerProps                                                                                             |
+| empty.ts         | EmptyProps                                                                                               |
+| highlight.ts     | HighlightProps                                                                                           |
+| icon.ts          | IconProps                                                                                                |
+| image.ts         | ImageProps, ImageViewerBaseProps, ImagePreviewProps, ImageGroupProps, ImageCropperProps, CropUploadProps |
+| image-compare.ts | ImageCompareProps                                                                                        |
+| kbd.ts           | KbdProps                                                                                                 |
+| link.ts          | LinkProps                                                                                                |
+| marquee.ts       | MarqueeProps                                                                                             |
+| qrcode.ts        | QRCodeProps                                                                                              |
+| rate.ts          | RateProps                                                                                                |
+| result.ts        | ResultProps                                                                                              |
+| segmented.ts     | SegmentedProps                                                                                           |
+| split-button.ts  | SplitButtonProps                                                                                         |
+| statistic.ts     | StatisticProps                                                                                           |
+| tag.ts           | TagProps                                                                                                 |
+| text.ts          | TextProps                                                                                                |
+| watermark.ts     | WatermarkProps                                                                                           |
 
 ## Form
 
@@ -64,7 +64,6 @@ description: Compact generated route map for Tigercat core type files
 | select.ts          | SelectProps                           |
 | signature.ts       | SignatureProps                        |
 | slider.ts          | SliderProps                           |
-| stepper.ts         | StepperProps                          |
 | switch.ts          | SwitchProps                           |
 | textarea.ts        | TextareaProps                         |
 | timepicker.ts      | TimePickerProps                       |
@@ -147,7 +146,7 @@ description: Compact generated route map for Tigercat core type files
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | chart-core.ts          | BaseChartProps, ChartInteractionProps, ChartLegendToggleProps, ChartLegendProps, ChartBuiltInTooltipProps, ChartTooltipProps, ChartWithAxesProps, ChartCanvasProps, ChartAxisProps, ChartGridProps, ChartSeriesProps |
 | chart-cartesian.ts     | BarChartProps, ScatterChartProps, LineChartProps, AreaChartProps                                                                                                                                                     |
-| chart-radial.ts        | PieChartProps, DonutChartProps, RadarChartProps, GaugeChartProps                                                                                                                                                     |
+| chart-radial.ts        | PieChartProps, RadarChartProps, GaugeChartProps                                                                                                                                                                      |
 | chart-visualization.ts | FunnelChartProps, HeatmapChartProps, TreeMapChartProps, SunburstChartProps                                                                                                                                           |
 | gantt.ts               | GanttProps                                                                                                                                                                                                           |
 | org-chart.ts           | OrgChartProps                                                                                                                                                                                                        |
@@ -169,19 +168,21 @@ description: Compact generated route map for Tigercat core type files
 
 ## Composite
 
-| Type File                | Props Interfaces                                                   |
-| ------------------------ | ------------------------------------------------------------------ |
-| activity-feed.ts         | ActivityFeedProps                                                  |
-| chat.ts                  | ChatWindowProps                                                    |
-| comment-thread.ts        | CommentThreadProps                                                 |
-| form-wizard.ts           | FormWizardProps                                                    |
-| schema-form.ts           | SchemaFormProps                                                    |
-| notification-center.ts   | NotificationCenterProps                                            |
-| table-toolbar.ts         | TableToolbarProps, DataTableWithToolbarProps                       |
-| task-board.ts            | TaskBoardProps, KanbanProps                                        |
-| workflow-timeline.ts     | WorkflowTimelineProps, WorkflowActionBarProps, WorkflowViewerProps |
-| workflow-detail-shell.ts | WorkflowDetailShellProps                                           |
-| workflow-designer.ts     | WorkflowDesignerProps                                              |
+| Type File                | Props Interfaces                             |
+| ------------------------ | -------------------------------------------- |
+| activity-feed.ts         | ActivityFeedProps                            |
+| chat.ts                  | ChatWindowProps                              |
+| comment-thread.ts        | CommentThreadProps                           |
+| form-wizard.ts           | FormWizardProps                              |
+| schema-form.ts           | SchemaFormProps                              |
+| notification-center.ts   | NotificationCenterProps                      |
+| table-toolbar.ts         | TableToolbarProps, DataTableWithToolbarProps |
+| task-board.ts            | TaskBoardProps, KanbanProps                  |
+| workflow-timeline.ts     | WorkflowTimelineProps                        |
+| workflow-action-bar.ts   | WorkflowActionBarProps                       |
+| workflow-viewer.ts       | WorkflowViewerProps                          |
+| workflow-detail-shell.ts | WorkflowDetailShellProps                     |
+| workflow-designer.ts     | WorkflowDesignerProps                        |
 
 ## Core
 

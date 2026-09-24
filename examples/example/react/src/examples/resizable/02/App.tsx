@@ -14,7 +14,7 @@ export default function App() {
         </div>
       </Resizable>
       <Resizable defaultWidth={160} defaultHeight={80} disabled>
-        <div className="flex h-full w-full items-center justify-center rounded border bg-[var(--tiger-surface-muted,#f9fafb)] text-sm">
+        <div className="flex h-full w-full items-center justify-center rounded border bg-[var(--tiger-surface-muted)] text-sm">
           disabled
         </div>
       </Resizable>

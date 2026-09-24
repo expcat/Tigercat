@@ -1,5 +1,7 @@
 import { ref, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
 import {
+  chartPointerRemainsInside,
+  createChartFrameCoalescer,
   findNearestSeriesPoint,
   isChartNavigationKey,
   mapPointerToPlotPoint,
@@ -24,6 +26,25 @@ export interface UseCartesianSeriesPointsOptions<T> {
 export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOptions<T>) {
   const hoveredPointInfo: Ref<ChartPointRef | null> = ref(null)
   const tooltipPosition = ref({ x: 0, y: 0 })
+  const plotScan = createChartFrameCoalescer<{ x: number; y: number; clientX: number; clientY: number }>({
+    onFrame: (sample) => {
+      const nearest = findNearestSeriesPoint(
+        options.getSeriesPoints().map((sd) => sd.points),
+        sample.x,
+        sample.y
+      )
+      if (!nearest) return
+      hoveredPointInfo.value = nearest
+      tooltipPosition.value = { x: sample.clientX, y: sample.clientY }
+      if (toValue(options.hoverable)) {
+        options.onPointHover?.(
+          nearest.seriesIndex,
+          nearest.pointIndex,
+          options.getDatum(nearest.seriesIndex, nearest.pointIndex) ?? null
+        )
+      }
+    }
+  })
 
   const trackHover = () => toValue(options.showTooltip) || toValue(options.hoverable)
 
@@ -43,7 +64,9 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
     tooltipPosition.value = { x: event.clientX, y: event.clientY }
   }
 
-  const handlePointMouseLeave = () => {
+  const handlePointMouseLeave = (event?: MouseEvent) => {
+    if (event && chartPointerRemainsInside(event.currentTarget, event.relatedTarget)) return
+    plotScan.cancel()
     hoveredPointInfo.value = null
     if (toValue(options.hoverable)) {
       options.onPointHover?.(null, null, null)
@@ -73,21 +96,7 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
       toValue(options.innerRect)
     )
     if (!mapped) return
-    const nearest = findNearestSeriesPoint(
-      options.getSeriesPoints().map((sd) => sd.points),
-      mapped.x,
-      mapped.y
-    )
-    if (!nearest) return
-    hoveredPointInfo.value = nearest
-    tooltipPosition.value = { x: event.clientX, y: event.clientY }
-    if (toValue(options.hoverable)) {
-      options.onPointHover?.(
-        nearest.seriesIndex,
-        nearest.pointIndex,
-        options.getDatum(nearest.seriesIndex, nearest.pointIndex) ?? null
-      )
-    }
+    plotScan.schedule({ x: mapped.x, y: mapped.y, clientX: event.clientX, clientY: event.clientY })
   }
 
   const handlePointKeydown = (event: KeyboardEvent, seriesIndex: number, pointIndex: number) => {
@@ -110,11 +119,7 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
       event.stopPropagation()
-      if (toValue(options.pointClickable)) {
-        options.onPointActivate(seriesIndex, pointIndex)
-      } else if (event.currentTarget instanceof SVGElement) {
-        showPointTooltipFromElement(event.currentTarget, seriesIndex, pointIndex)
-      }
+      options.onPointActivate(seriesIndex, pointIndex)
     } else if (event.key === 'Escape' && trackHover()) {
       handlePointMouseLeave()
     }

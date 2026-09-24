@@ -9,6 +9,7 @@ import type {
   UseDragOptions
 } from '@expcat/tigercat-core'
 import {
+  createDragContainerId,
   createListReorderController,
   isSameContainerDrag,
   isCrossContainerDrag,
@@ -34,6 +35,7 @@ export interface UseDragReturn {
   isCrossContainer: boolean
   getDragItemProps: (item: DragItem) => Record<string, unknown>
   getDropZoneProps: () => Record<string, unknown>
+  containerId: string
 }
 
 function callbacksOf(options: UseDragOptions): DragCallbacks {
@@ -49,10 +51,12 @@ export function useDrag(options: UseDragOptions = {}): UseDragReturn {
   const optionsRef = useRef(options)
   optionsRef.current = options
 
+  const ownIdRef = useRef<string | null>(null)
+  if (ownIdRef.current === null) ownIdRef.current = createDragContainerId()
   const controllerRef = useRef<ListReorderController | null>(null)
   if (controllerRef.current === null) {
     controllerRef.current = createListReorderController({
-      getContainerId: () => optionsRef.current.containerId ?? 'default',
+      getContainerId: () => optionsRef.current.containerId ?? ownIdRef.current ?? 'tiger-drag',
       getConfig: () => optionsRef.current.config,
       getCallbacks: () => callbacksOf(optionsRef.current)
     })
@@ -103,11 +107,13 @@ export function useDrag(options: UseDragOptions = {}): UseDragReturn {
   const getDragItemProps = useCallback((item: DragItem): Record<string, unknown> => {
     const bindings = controllerRef.current?.getItemBindings(item)
     if (!bindings) return {}
-    const { extraClass, onPointerDown, ...rest } = bindings
+    const { extraClass, onPointerDown, onKeyDown, style, ...rest } = bindings
     return {
       ...rest,
       className: extraClass,
-      onPointerDown
+      style,
+      onPointerDown,
+      onKeyDown
     }
   }, [])
 
@@ -133,6 +139,7 @@ export function useDrag(options: UseDragOptions = {}): UseDragReturn {
     isSameContainer: isSameContainerDrag(state),
     isCrossContainer: isCrossContainerDrag(state),
     getDragItemProps,
-    getDropZoneProps
+    getDropZoneProps,
+    containerId: options.containerId ?? ownIdRef.current ?? 'tiger-drag'
   }
 }

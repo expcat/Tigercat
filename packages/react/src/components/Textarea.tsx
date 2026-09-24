@@ -4,6 +4,7 @@ import {
   autoResizeTextarea,
   clearTextareaAutoResize,
   classNames,
+  coerceTextFormValue,
   formatInputCountText,
   getInputClasses,
   getInputCountClasses,
@@ -82,12 +83,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const formBoundValue = formItemControl?.value
     const resolvedValue =
       value !== undefined
-        ? value
-        : typeof formBoundValue === 'string'
-          ? formBoundValue
-          : formBoundValue === undefined
-            ? undefined
-            : String(formBoundValue ?? '')
+        ? coerceTextFormValue(value)
+        : formItemControl?.name
+          ? coerceTextFormValue(formBoundValue)
+          : undefined
 
     const textareaRef = useRef<HTMLTextAreaElement | null>(null)
     const mountedRef = useRef(false)
@@ -142,9 +141,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     )
 
     const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
-      const next = event.currentTarget.value
-      setValue(next)
-      formItemControl?.onChange?.(next)
       onInput?.(event)
     }
 

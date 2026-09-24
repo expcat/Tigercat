@@ -16,9 +16,12 @@ export interface JoinedGroupItemClassesOptions {
   focus?: JoinedGroupFocus
 }
 
+const JOINED_RADIUS = 'rounded-[var(--tiger-radius-md)]'
+
 /**
- * Child-selector classes that shave inner corners of adjacent items.
- * A lone child is both first and last, so it keeps all four radii.
+ * Child-selector classes that paint outer corners. Joined children do not
+ * bring their own radius, so these rules do not need `!important`.
+ * A lone child is both first and last and keeps all four radii.
  */
 export function getJoinedGroupItemClasses(options: JoinedGroupItemClassesOptions = {}): string {
   const child = options.child ?? '*'
@@ -27,9 +30,9 @@ export function getJoinedGroupItemClasses(options: JoinedGroupItemClassesOptions
 
   if (options.orientation === 'vertical') {
     return classNames(
-      `${sel}:not(:first-child):not(:last-child)]:!rounded-none`,
-      `${sel}:first-child:not(:last-child)]:!rounded-b-none`,
-      `${sel}:last-child:not(:first-child)]:!rounded-t-none`,
+      `${sel}:only-child]:${JOINED_RADIUS}`,
+      `${sel}:first-child:not(:last-child)]:rounded-t-[var(--tiger-radius-md)]`,
+      `${sel}:last-child:not(:first-child)]:rounded-b-[var(--tiger-radius-md)]`,
       `${sel}:not(:first-child)]:-mt-px`,
       `${sel}:${focus}]:z-10`,
       `${sel}:${focus}]:relative`
@@ -37,9 +40,9 @@ export function getJoinedGroupItemClasses(options: JoinedGroupItemClassesOptions
   }
 
   return classNames(
-    `${sel}:not(:first-child):not(:last-child)]:!rounded-none`,
-    `${sel}:first-child:not(:last-child)]:!rounded-e-none`,
-    `${sel}:last-child:not(:first-child)]:!rounded-s-none`,
+    `${sel}:only-child]:${JOINED_RADIUS}`,
+    `${sel}:first-child:not(:last-child)]:rounded-s-[var(--tiger-radius-md)]`,
+    `${sel}:last-child:not(:first-child)]:rounded-e-[var(--tiger-radius-md)]`,
     `${sel}:not(:first-child)]:-ms-px`,
     `${sel}:${focus}]:z-10`,
     `${sel}:${focus}]:relative`

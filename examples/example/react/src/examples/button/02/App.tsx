@@ -17,8 +17,8 @@ export default function App() {
         <input name="title" defaultValue="Tigercat" style={{ marginInlineStart: 8 }} />
       </label>
       <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-        <Button htmlType="submit">提交</Button>
-        <Button htmlType="reset">重置</Button>
+        <Button type="submit">提交</Button>
+        <Button type="reset">重置</Button>
       </div>
       {submitted ? <p>已提交 {submitted}</p> : null}
     </form>

@@ -114,7 +114,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
                 {
                   width: `${markerSize}px`,
                   height: `${markerSize}px`,
-                  background: `var(--tiger-chart-legend-marker-image, ${item.color})`,
+                  background: `var(--tiger-chart-legend-marker-image)`,
                   '--tiger-chart-legend-marker-color': item.color
                 } as React.CSSProperties
               }

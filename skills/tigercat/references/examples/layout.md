@@ -99,7 +99,7 @@ React: `<List dataSource={items} />`
 
 ## Masonry
 
-Note: `columnClassName` 目前是 no-op（声明了但不打到列节点）。列数/缝用 `columns` / `gap`。
+Note: 默认 `layout="source"` 用 CSS 多列保持源顺序。`layout="shortest"` 按最短列定位，容器说明视觉顺序与源顺序不同。
 
 Vue: `<Masonry :columns="3"><slot /></Masonry>`
 
@@ -159,4 +159,4 @@ Vue: `<Splitter :sizes="sizes"><div>A</div><div>B</div></Splitter>`
 
 React: `<Splitter sizes={sizes}><div>A</div><div>B</div></Splitter>`
 
-Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
+Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.

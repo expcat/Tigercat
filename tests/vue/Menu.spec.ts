@@ -30,7 +30,7 @@ function getItem(name: string) {
 
 describe('Menu', () => {
   describe('Rendering', () => {
-    it('renders a named nav list without putting items in a popup menu role', () => {
+    it('renders a named vertical menu with one tab stop', () => {
       const { container } = render(Menu, {
         attrs: { 'aria-label': 'Site' },
         slots: {
@@ -41,8 +41,8 @@ describe('Menu', () => {
         }
       })
 
-      expect(screen.getByRole('navigation', { name: 'Site' })).toBeInTheDocument()
-      expect(container.querySelector('[data-tiger-menu-root]')).not.toHaveAttribute('role', 'menu')
+      expect(screen.getByRole('menu', { name: 'Site' })).toBeInTheDocument()
+      expect(container.querySelector('[data-tiger-menu-root]')).toHaveAttribute('role', 'menu')
       expect(getItem('Item 1')).toBeInTheDocument()
     })
 
@@ -115,9 +115,9 @@ describe('Menu', () => {
   })
 
   describe('Selection', () => {
-    it('treats 1 and "1" as the same key and deselects on a second click', async () => {
+    it('keeps 1 and "1" distinct and a second click stays selected', async () => {
       const { emitted } = render(Menu, {
-        props: { defaultSelectedKeys: [1] },
+        props: { defaultSelectedKeys: ['1'] },
         slots: {
           default: () => [
             h(MenuItem, { itemKey: '1' }, () => 'One'),
@@ -128,12 +128,12 @@ describe('Menu', () => {
 
       expect(getItem('One')).toHaveAttribute('data-tiger-selected', 'true')
       await fireEvent.click(getItem('One'))
-      expect(emitted().select[0]).toEqual(['1', { selectedKeys: [] }])
+      expect(emitted().select?.[0]?.[1]).toEqual({ selectedKeys: ['1'] })
     })
   })
 
   describe('Keyboard', () => {
-    it('moves between vertical items with arrows and leaves every item in the tab order', async () => {
+    it('moves between vertical items with arrows and keeps one tab stop', async () => {
       render(Menu, {
         slots: {
           default: () => [
@@ -146,10 +146,12 @@ describe('Menu', () => {
       const item1 = getItem('Item 1')
       const item2 = getItem('Item 2')
       expect(item1).toHaveAttribute('tabindex', '0')
-      expect(item2).toHaveAttribute('tabindex', '0')
+      expect(item2).toHaveAttribute('tabindex', '-1')
       item1.focus()
       await fireEvent.keyDown(item1, { key: 'ArrowDown' })
       expect(item2).toHaveFocus()
+      expect(item2).toHaveAttribute('tabindex', '0')
+      expect(item1).toHaveAttribute('tabindex', '-1')
     })
 
     it('enters an already open inline submenu with ArrowRight', async () => {

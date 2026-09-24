@@ -62,9 +62,10 @@ describe('ChartAxis', () => {
     expect(container.querySelector('[data-axis-label]')).toHaveTextContent('Value')
   })
 
-  it('hides ticks from the accessibility tree', () => {
+  it('keeps tick text in the accessibility tree', () => {
     const { container } = renderWithProps(ChartAxisWrapper, { scale, tickValues, label: 'Value' })
-    expect(container.querySelector('g')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('g')).not.toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('[data-axis-label]')).toHaveTextContent('Value')
   })
 })
 
@@ -169,7 +170,7 @@ describe('ChartCanvas', () => {
   it('names the svg when a title is provided', async () => {
     const { container } = renderWithProps(ChartCanvas, { title: 'Sales', desc: 'Quarterly' })
     const svg = container.querySelector('svg')
-    expect(svg).toHaveAttribute('role', 'img')
+    expect(svg).toHaveAttribute('role', 'group')
     expect(svg?.querySelector('title')).toHaveTextContent('Sales')
     await expectNoA11yViolations(container)
   })

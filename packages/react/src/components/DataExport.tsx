@@ -8,19 +8,22 @@ import React, {
 } from 'react'
 import {
   classNames,
-  DEFAULT_DATA_EXPORT_FORMATS,
   devWarn,
   getDataExportFormatLabel,
   getDataExportLabels,
-  isDataExportFormat,
   mergeTigerLocale,
   resolveButtonClasses,
-  yieldDataExportFrame,
   type DataExportFormat,
   type DataExportProps as CoreDataExportProps,
   type TigerLocale,
   type TigerLocaleDataExport
 } from '@expcat/tigercat-core'
+import {
+  DEFAULT_DATA_EXPORT_FORMATS,
+  isDataExportFormat,
+  sanitizeDataExportRows,
+  yieldDataExportFrame
+} from '@expcat/tigercat-core/utils/data-export'
 import { useTigerConfig } from './ConfigProvider'
 import { Dropdown, DropdownMenu, DropdownItem } from './Dropdown'
 
@@ -29,7 +32,12 @@ type DataExportModule = typeof import('@expcat/tigercat-core/utils/data-export')
 let dataExportModulePromise: Promise<DataExportModule> | null = null
 
 function loadDataExportModule(): Promise<DataExportModule> {
-  dataExportModulePromise ??= import('@expcat/tigercat-core/utils/data-export')
+  if (!dataExportModulePromise) {
+    dataExportModulePromise = import('@expcat/tigercat-core/utils/data-export').catch((error) => {
+      dataExportModulePromise = null
+      throw error
+    })
+  }
   return dataExportModulePromise
 }
 
@@ -69,6 +77,7 @@ function DataExportInner<T extends Record<string, unknown>>(
     onExport,
     onError,
     customExport,
+    onClick: callerClick,
     ...rest
   }: DataExportProps<T>,
   ref: React.ForwardedRef<DataExportHandle>
@@ -106,10 +115,15 @@ function DataExportInner<T extends Record<string, unknown>>(
       try {
         await yieldDataExportFrame()
         if (customExport) {
-          await customExport({ format, columns, dataSource, fileName })
+          await customExport({
+            format,
+            columns,
+            dataSource: sanitizeDataExportRows(columns, dataSource),
+            fileName
+          })
         } else {
           const mod = await loadDataExportModule()
-          mod.runDataExport({
+          await mod.runDataExport({
             columns,
             dataSource,
             format,
@@ -168,19 +182,21 @@ function DataExportInner<T extends Record<string, unknown>>(
         }),
         className
       )}
+      {...rest}
       disabled={triggerDisabled}
       aria-label={
-        offeredFormats.length > 1 || formatsEmpty
-          ? resolvedLabels.triggerAriaLabel
-          : undefined
+        offeredFormats.length > 1 || formatsEmpty ? resolvedLabels.triggerAriaLabel : undefined
       }
       aria-busy={exporting || undefined}
       onClick={
         offeredFormats.length === 1 && !formatsEmpty
-          ? () => void handleExport(offeredFormats[0])
-          : undefined
-      }
-      {...rest}>
+          ? (event) => {
+              void handleExport(offeredFormats[0]).finally(() => callerClick?.(event))
+            }
+          : (event) => {
+              queueMicrotask(() => callerClick?.(event))
+            }
+      }>
       {triggerText}
     </button>
   )

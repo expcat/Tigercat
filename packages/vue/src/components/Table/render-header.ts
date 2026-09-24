@@ -1,11 +1,14 @@
-import { h, type Slots, type VNodeChild } from 'vue'
+import { defineComponent, h, onBeforeUnmount, ref, watch, type Slots, type VNodeChild } from 'vue'
 import {
   classNames,
+  createTableTextFilterCoalescer,
   formatTableFilterColumnAriaLabel,
+  formatTableSortButtonName,
   formatTableSortByText,
   getCheckboxCellClasses,
   getExpandIconCellClasses,
   getFixedColumnStyle,
+  TABLE_FIXED_HEADER_Z_INDEX,
   getInputClasses,
   getTableChromeSlots,
   getTableFixedHeaderCellClasses,
@@ -72,7 +75,7 @@ export function renderTableHeader(
           : 'none'
       : undefined
 
-    const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, 15)
+    const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, TABLE_FIXED_HEADER_Z_INDEX)
 
     const widthStyle = column.width
       ? {
@@ -103,7 +106,15 @@ export function renderTableHeader(
             type: 'button',
             'data-tiger-table-sort': '',
             class: tableSortButtonClasses,
-            'aria-label': formatTableSortByText(labels.sortByText, String(column.title)),
+            'aria-label': formatTableSortButtonName(
+              labels.sortByText,
+              String(column.title),
+              sortDirection === 'asc'
+                ? labels.sortAscendingText
+                : sortDirection === 'desc'
+                  ? labels.sortDescendingText
+                  : labels.sortNoneText
+            ),
             onClick: (event: Event) => {
               event.stopPropagation()
               ctx.handleSort(column.key)
@@ -124,12 +135,12 @@ export function renderTableHeader(
             type: 'button',
             class: classNames(
               'inline-flex items-center',
-              column.fixed === 'left' || column.fixed === 'right'
-                ? 'text-[var(--tiger-primary,#2563eb)]'
-                : 'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]'
+              column.fixed === 'start' || column.fixed === 'end'
+                ? 'text-[var(--tiger-primary)]'
+                : 'text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-text)]'
             ),
             'aria-label': formatTableSortByText(
-              column.fixed === 'left' || column.fixed === 'right'
+              column.fixed === 'start' || column.fixed === 'end'
                 ? labels.unlockColumnAriaLabel
                 : labels.lockColumnAriaLabel,
               String(column.title)
@@ -139,7 +150,7 @@ export function renderTableHeader(
               ctx.toggleColumnLock(column.key)
             }
           },
-          [LockIcon(column.fixed === 'left' || column.fixed === 'right')]
+          [LockIcon(column.fixed === 'start' || column.fixed === 'end')]
         )
       )
     }
@@ -183,7 +194,9 @@ export function renderTableHeader(
         },
         [
           h('div', { class: 'flex items-center gap-2' }, headerContent),
-          ...(column.filter
+          ...(props.filterMode !== 'advanced' &&
+          column.filter &&
+          (column.filter.type !== 'custom' || column.filter.render)
             ? [
                 h(
                   'div',
@@ -198,7 +211,9 @@ export function renderTableHeader(
                     }
                   },
                   [
-                    column.filter.type === 'select' && column.filter.options
+                    column.filter.type === 'custom' && column.filter.render
+                      ? (column.filter.render() as VNodeChild)
+                      : column.filter.type === 'select' && column.filter.options
                       ? h(
                           'select',
                           {
@@ -219,17 +234,14 @@ export function renderTableHeader(
                             )
                           ]
                         )
-                      : h(Input, {
-                          size: 'sm',
-                          modelValue: filterText,
-                          'aria-label': formatTableFilterColumnAriaLabel(
+                      : h(TableTextFilter, {
+                          value: filterText,
+                          label: formatTableFilterColumnAriaLabel(
                             labels.filterColumnAriaLabel,
                             String(column.title)
                           ),
                           placeholder: column.filter.placeholder || labels.filterPlaceholder,
-                          draggable: false,
-                          'onUpdate:modelValue': (value: string | number | undefined) =>
-                            ctx.handleFilter(column.key, value ?? '')
+                          onCommit: (value: string) => ctx.handleFilter(column.key, value)
                         })
                   ]
                 )
@@ -244,3 +256,36 @@ export function renderTableHeader(
 
   return h('thead', { class: getTableHeaderClasses(props.stickyHeader) }, [h('tr', headerCells)])
 }
+
+const TableTextFilter = defineComponent({
+  name: 'TigerTableTextFilter',
+  props: {
+    value: { type: String, default: '' },
+    label: { type: String, default: '' },
+    placeholder: { type: String, default: '' }
+  },
+  emits: ['commit'],
+  setup(props, { emit }) {
+    const draft = ref(props.value)
+    watch(
+      () => props.value,
+      (value) => {
+        draft.value = value
+      }
+    )
+    const coalescer = createTableTextFilterCoalescer((value) => emit('commit', value))
+    onBeforeUnmount(() => coalescer.cancel())
+    return () =>
+      h(Input, {
+        size: 'sm',
+        modelValue: draft.value,
+        'aria-label': props.label,
+        placeholder: props.placeholder,
+        draggable: false,
+        'onUpdate:modelValue': (value: string | number | undefined) => {
+          draft.value = value == null ? '' : String(value)
+          coalescer.push(draft.value)
+        }
+      })
+  }
+})

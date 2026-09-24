@@ -1,3 +1,5 @@
+import { observeSize } from './responsive'
+
 export interface ChartCanvasSize {
   width: number
   height: number
@@ -29,20 +31,10 @@ export type ChartResizeFrameRequest = (callback: ChartResizeFrameCallback) => nu
 
 export type ChartResizeFrameCancel = (handle: number) => void
 
-export interface ChartResizeObserverLike {
-  observe: (target: Element) => void
-  disconnect: () => void
-}
-
-export type ChartResizeObserverFactory = (
-  callback: ResizeObserverCallback
-) => ChartResizeObserverLike
-
 export interface ChartResizeObserverControllerOptions {
   onSizeChange: (size: ChartCanvasSize) => void
   requestFrame?: ChartResizeFrameRequest
   cancelFrame?: ChartResizeFrameCancel
-  createResizeObserver?: ChartResizeObserverFactory
 }
 
 export interface ChartResizeObserverController {
@@ -69,28 +61,6 @@ function cancelDefaultFrame(handle: number): void {
   globalThis.clearTimeout(handle)
 }
 
-function getEntrySize(entry: ResizeObserverEntry): ChartCanvasSize {
-  const boxSize = Array.isArray(entry.contentBoxSize)
-    ? entry.contentBoxSize[0]
-    : entry.contentBoxSize
-
-  if (boxSize) {
-    return {
-      width: boxSize.inlineSize,
-      height: boxSize.blockSize
-    }
-  }
-
-  return {
-    width: entry.contentRect.width,
-    height: entry.contentRect.height
-  }
-}
-
-function createDefaultResizeObserver(callback: ResizeObserverCallback): ChartResizeObserverLike {
-  return new ResizeObserver(callback)
-}
-
 export function resolveResponsiveChartSize(
   fallback: ChartCanvasSize,
   observedSize: ChartCanvasSize | null | undefined
@@ -108,9 +78,8 @@ export function createChartResizeObserverController(
 ): ChartResizeObserverController {
   const requestFrame = options.requestFrame ?? requestDefaultFrame
   const cancelFrame = options.cancelFrame ?? cancelDefaultFrame
-  const createResizeObserver = options.createResizeObserver ?? createDefaultResizeObserver
 
-  let observer: ChartResizeObserverLike | undefined
+  let stopObserving: (() => void) | undefined
   let observedTarget: Element | undefined
   let frameHandle: number | undefined
   let pendingSize: ChartCanvasSize | undefined
@@ -132,8 +101,8 @@ export function createChartResizeObserverController(
   }
 
   function disconnect(): void {
-    observer?.disconnect()
-    observer = undefined
+    stopObserving?.()
+    stopObserving = undefined
     observedTarget = undefined
 
     if (frameHandle !== undefined) {
@@ -145,17 +114,13 @@ export function createChartResizeObserverController(
   }
 
   function observe(target: Element): void {
-    if (target === observedTarget && observer) return
+    if (target === observedTarget && stopObserving) return
 
     disconnect()
     observedTarget = target
-    observer = createResizeObserver((entries) => {
-      const entry = entries.find((item) => item.target === target)
-      if (!entry) return
-
-      schedule(getEntrySize(entry))
+    stopObserving = observeSize(target, (size) => {
+      schedule(size)
     })
-    observer.observe(target)
   }
 
   function flush(): void {

@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, provide, reactive, watch, PropType, Text } from 'vue'
+import { computed, defineComponent, h, provide, reactive, ref, watch, PropType, Text, type VNode } from 'vue'
 import {
   coerceClassValue,
   getAvatarGroupClasses,
@@ -7,7 +7,6 @@ import {
   getAvatarGroupOverflowClasses,
   getAvatarGroupOverflowLabel,
   getAvatarGroupOverflowText,
-  getVisibleGroupItems,
   mergeTigerLocale,
   type AvatarShape,
   type AvatarSize,
@@ -82,15 +81,32 @@ export const AvatarGroup = defineComponent({
     )
     provide(AVATAR_GROUP_INJECTION_KEY, groupContext)
 
+    const expanded = ref(false)
+
     return () => {
-      const avatars = flattenSlotVNodes(slots.default?.()).filter((child) => {
-        if (child.type === Text) return false
+      const nodes = flattenSlotVNodes(slots.default?.())
+      const cap =
+        typeof props.max === 'number' && Number.isFinite(props.max)
+          ? Math.max(0, Math.floor(props.max))
+          : undefined
+      let avatarSeen = 0
+      let overflowCount = 0
+      const rendered: VNode[] = []
+      nodes.forEach((child, index) => {
+        if (child.type === Text) return
         const type = child.type as { name?: string } | string
-        return typeof type === 'object' && type?.name === 'TigerAvatar'
+        const isAvatar = typeof type === 'object' && type?.name === 'TigerAvatar'
+        if (!isAvatar) {
+          rendered.push(child)
+          return
+        }
+        const hidden = cap != null && !expanded.value && avatarSeen >= cap
+        if (cap != null && avatarSeen >= cap) overflowCount += 1
+        avatarSeen += 1
+        rendered.push(hidden ? h('span', { key: index, class: 'sr-only' }, [child]) : child)
       })
       const attrsRecord = attrs as Record<string, unknown>
       const attrsClass = attrsRecord.class
-      const { visibleItems, overflowCount, visibleCount } = getVisibleGroupItems(avatars, props.max)
       const overflowShape = props.shape ?? 'circle'
 
       return h(
@@ -102,21 +118,25 @@ export const AvatarGroup = defineComponent({
           class: getAvatarGroupClasses(props.className, coerceClassValue(attrsClass))
         },
         [
-          ...visibleItems,
-          overflowCount > 0
+          ...rendered,
+          overflowCount > 0 && !expanded.value
             ? h(
-                'span',
+                'button',
                 {
+                  type: 'button',
                   class: getAvatarGroupOverflowClasses(
                     props.size ?? 'md',
                     overflowShape,
-                    visibleCount > 0
+                    avatarSeen > overflowCount
                   ),
-                  role: 'img',
+                  'aria-expanded': 'false',
                   'aria-label': getAvatarGroupOverflowLabel(
                     overflowCount,
                     labels.value.overflowAriaLabel
-                  )
+                  ),
+                  onClick: () => {
+                    expanded.value = true
+                  }
                 },
                 getAvatarGroupOverflowText(overflowCount)
               )

@@ -145,18 +145,22 @@ describe('Tabs', () => {
       )
     })
 
-    it('matches number and string tab keys', () => {
+    it('does not treat number and string tab keys as the same tab', () => {
       render(
         <Tabs activeKey="1">
           <TabPane tabKey={1} label="Numeric">
             One
           </TabPane>
-          <TabPane tabKey="2" label="Text">
+          <TabPane tabKey="1" label="Text">
             Two
           </TabPane>
         </Tabs>
       )
       expect(screen.getByRole('tab', { name: 'Numeric', exact: true })).toHaveAttribute(
+        'aria-selected',
+        'false'
+      )
+      expect(screen.getByRole('tab', { name: 'Text', exact: true })).toHaveAttribute(
         'aria-selected',
         'true'
       )
@@ -305,7 +309,7 @@ describe('Tabs', () => {
       })
     })
 
-    it('renders the close control as a real button outside the tab', () => {
+    it('renders the close control as a named button inside the tab', () => {
       render(
         <Tabs type="editable-card" closable>
           <TabPane tabKey="1" label="Tab 1">
@@ -317,9 +321,8 @@ describe('Tabs', () => {
       const closeButton = screen.getByRole('button', { name: 'Close Tab 1' })
       const tab = screen.getByRole('tab', { name: 'Tab 1', exact: true })
       expect(closeButton.tagName).toBe('BUTTON')
-      expect(tab.tagName).toBe('BUTTON')
-      expect(tab.contains(closeButton)).toBe(false)
-      expect(closeButton.closest('[role="tablist"]')).toBeNull()
+      expect(tab.contains(closeButton)).toBe(true)
+      expect(closeButton.closest('[role="tablist"]')).toBe(tab.parentElement)
     })
 
     it('does not activate the tab when its close control is clicked (C06-3)', async () => {
@@ -646,8 +649,23 @@ describe('Tabs', () => {
       const tabs = screen.getAllByRole('tab')
       expect(tabs).toHaveLength(2)
 
-      const tabpanels = screen.getAllByRole('tabpanel', { hidden: true })
-      expect(tabpanels).toHaveLength(2)
+      const tabpanels = screen.getAllByRole('tabpanel')
+      expect(tabpanels).toHaveLength(1)
+      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+    })
+
+    it('puts one named close button inside a closable tab', () => {
+      render(
+        <Tabs type="editable-card" closable activeKey="1">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+        </Tabs>
+      )
+      const tab = screen.getByRole('tab', { name: 'Tab 1' })
+      const close = screen.getByRole('button', { name: 'Close Tab 1' })
+      expect(tab.contains(close)).toBe(true)
+      expect(document.querySelector('.sr-only')).toBeNull()
     })
 
     it('should have proper aria-selected attributes', () => {
@@ -669,7 +687,7 @@ describe('Tabs', () => {
       expect(tab2).toHaveAttribute('aria-selected', 'false')
     })
 
-    it('should have proper aria-hidden attributes for tab panels', () => {
+    it('does not mount an unvisited tab panel', () => {
       render(
         <Tabs activeKey="1">
           <TabPane tabKey="1" label="Tab 1">
@@ -681,9 +699,10 @@ describe('Tabs', () => {
         </Tabs>
       )
 
-      const panels = screen.getAllByRole('tabpanel', { hidden: true })
-      expect(panels[0]).toHaveAttribute('aria-hidden', 'false')
-      expect(panels[1]).toHaveAttribute('aria-hidden', 'true')
+      const panels = screen.getAllByRole('tabpanel')
+      expect(panels).toHaveLength(1)
+      expect(panels[0]).not.toHaveAttribute('aria-hidden', 'true')
+      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
     })
 
     it('should have proper aria-disabled attributes', () => {

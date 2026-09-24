@@ -210,6 +210,24 @@ export function valueToGaugeAngle(
   return safeStart + ratio * (safeEnd - safeStart)
 }
 
+function gaugeTickPrecision(min: number, max: number, tickCount: number): number {
+  const step = Math.abs(max - min) / Math.max(1, tickCount)
+  if (!(step > 0)) return 0
+  for (let digits = 0; digits <= 8; digits++) {
+    const scaled = step * 10 ** digits
+    if (Math.round(scaled) !== 0 && Math.abs(scaled - Math.round(scaled)) < 1e-6) return digits
+  }
+  return 8
+}
+
+function formatGaugeTickLabel(value: number, min: number, max: number, tickCount: number): string {
+  if (!Number.isFinite(value)) return ''
+  const digits = gaugeTickPrecision(min, max, tickCount)
+  const text = value.toFixed(digits)
+  if (digits === 0) return text
+  return text.replace(/\.?0+$/, '')
+}
+
 /**
  * Compute tick positions along the gauge arc.
  */
@@ -256,7 +274,7 @@ export function computeGaugeTicks(
       x2: outerX,
       y2: outerY,
       value: val,
-      label: Math.round(val).toString(),
+      label: formatGaugeTickLabel(val, safeMin, safeMax, safeTickCount),
       labelX: cx + labelRadius * Math.cos(rad),
       labelY: cy + labelRadius * Math.sin(rad)
     })

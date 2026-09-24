@@ -17,6 +17,8 @@ import {
 } from 'vue'
 import {
   classNames,
+  getSecureRel,
+  resolveLinkHref,
   coerceClassValue,
   mergeStyleValues,
   getContextMenuContainerClasses,
@@ -25,11 +27,12 @@ import {
   getContextMenuItemClasses,
   getContextMenuSubTriggerClasses,
   getContextMenuSubChevronClasses,
-  getContextMenuPointStyle,
+  createContextMenuVirtualReference,
   getContextMenuOpenPoint,
+  getContextMenuSubKeys,
   getContextMenuSubPlacement,
   getOverlayTriggerAria,
-  injectContextMenuStyles,
+  type ContextMenuVirtualReference,
   CONTEXT_MENU_ENTER_CLASS,
   CONTEXT_MENU_SUB_HIDE_DELAY_MS,
   CONTEXT_MENU_SUB_CHEVRON_PATH,
@@ -48,7 +51,8 @@ import type {
   ContextMenuItemProps as CoreContextMenuItemProps,
   ContextMenuSubProps as CoreContextMenuSubProps
 } from '@expcat/tigercat-core'
-import { useVueAnchoredOverlay, renderVueOverlayTeleport } from '../utils/overlay'
+import { useVueAnchoredOverlay } from '../utils/overlay'
+import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 
 export interface VueContextMenuMenuProps extends CoreContextMenuMenuProps {}
@@ -178,12 +182,17 @@ export const ContextMenuItem = defineComponent({
         style?: unknown
       } & Record<string, unknown>
 
-      const isLink = Boolean(props.href) && !props.disabled
+      const safeHref = resolveLinkHref(props.href, { disabled: props.disabled })
+      const isLink = Boolean(safeHref)
+      const target = restAttrs.target as string | undefined
+      const rel = restAttrs.rel as string | undefined
       return h(
         isLink ? 'a' : 'button',
         {
           ...restAttrs,
-          ...(isLink ? { href: props.href } : { type: 'button' }),
+          ...(isLink
+            ? { href: safeHref, rel: getSecureRel(target, rel) }
+            : { type: 'button', href: undefined, rel: undefined }),
           class: itemClasses.value,
           role: 'menuitem',
           tabindex: -1,
@@ -316,8 +325,7 @@ export const ContextMenuSub = defineComponent({
       const dir =
         titleRef.value?.closest('[dir]')?.getAttribute('dir') ??
         document.documentElement.getAttribute('dir')
-      const openKey = dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
-      const closeKey = dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft'
+      const { openKey, closeKey } = getContextMenuSubKeys(dir)
 
       if (event.key === openKey || event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
@@ -344,7 +352,11 @@ export const ContextMenuSub = defineComponent({
         handleMenuNavigation(popupRef.value, event)
       }
 
-      if (event.key === 'ArrowLeft' || event.key === 'Escape') {
+      const dir =
+        (event.currentTarget as HTMLElement | null)?.closest('[dir]')?.getAttribute('dir') ??
+        document.documentElement.getAttribute('dir')
+      const { closeKey } = getContextMenuSubKeys(dir)
+      if (event.key === closeKey || event.key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()
         isOpenByKeyboard.value = false
@@ -442,7 +454,6 @@ export const ContextMenuSub = defineComponent({
           style: overlay.floatingStyles.value,
           'data-positioned': overlay.positioned.value,
           'data-tiger-context-menu-sub': '',
-          hidden: !isExpanded.value,
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave,
           onKeydown: handlePopupKeyDown,
@@ -469,7 +480,14 @@ export const ContextMenuSub = defineComponent({
           onMouseleave: handleMouseLeave,
           role: 'none'
         },
-        [trigger, renderVueOverlayTeleport(popup, overlay.target.value, !portalEnabled.value)]
+        [
+          trigger,
+          isExpanded.value
+            ? portalEnabled.value
+              ? renderVueOverlayOutlet(subMenuId, popup, overlay.target.value)
+              : popup
+            : null
+        ]
       )
     }
   }
@@ -537,7 +555,6 @@ export const ContextMenu = defineComponent({
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
     onMounted(() => {
-      injectContextMenuStyles()
       if (currentVisible.value) ensurePoint()
     })
 
@@ -550,9 +567,15 @@ export const ContextMenu = defineComponent({
 
     const containerRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
-    const pointRef = ref<HTMLElement | null>(null)
     const floatingRef = ref<HTMLElement | null>(null)
     const point = ref<ContextMenuPoint>({ x: 0, y: 0 })
+    const pointRevision = computed(() => `${point.value.x},${point.value.y}`)
+    const virtualReference = createContextMenuVirtualReference(
+      point.value,
+      typeof document === 'undefined' ? null : document.documentElement
+    ) as ContextMenuVirtualReference
+    const positionReferenceRef = ref<ContextMenuVirtualReference | null>(virtualReference)
+    watch(point, (next) => virtualReference.setPoint(next), { deep: true })
     const hasExplicitPoint = ref(false)
 
     const setVisible = (visible: boolean) => {
@@ -635,12 +658,15 @@ export const ContextMenu = defineComponent({
 
     const portalEnabled = computed(() => props.portal)
     const overlay = useVueAnchoredOverlay({
-      referenceRef: pointRef,
+      referenceRef: triggerRef,
+      positionReferenceRef,
+      revision: pointRevision,
       floatingRef,
       enabled: currentVisible,
       placement: () => props.placement,
       offset: () => props.offset,
       portal: portalEnabled,
+      containerRef,
       dismissOnOutside: true,
       dismissOnEscape: true,
       onDismiss: () => setVisible(false)
@@ -655,8 +681,6 @@ export const ContextMenu = defineComponent({
     const menuWrapperClasses = computed(() =>
       classNames(overlay.floatingClasses.value, CONTEXT_MENU_ENTER_CLASS)
     )
-    const pointStyle = computed(() => getContextMenuPointStyle(point.value))
-
     const contextMenuContext: ContextMenuContext = {
       get closeOnClick() {
         return props.closeOnClick
@@ -700,34 +724,28 @@ export const ContextMenu = defineComponent({
         }
       })
 
-      const pointNode = h('div', {
-        ref: pointRef,
-        style: pointStyle.value,
-        'aria-hidden': 'true',
-        'data-tiger-context-menu-point': ''
-      })
+      const menuWrapper =
+        menuNode && currentVisible.value
+          ? h(
+              'div',
+              {
+                ref: floatingRef,
+                class: menuWrapperClasses.value,
+                style: overlay.floatingStyles.value,
+                'data-positioned': overlay.positioned.value,
+                'data-tiger-context-menu': '',
+                onKeydown: handleMenuKeyDown,
+                onContextmenu: handleMenuContextMenu
+              },
+              [cloneVNode(menuNode as VNode, { id: menuId })]
+            )
+          : null
 
-      const menuWrapper = menuNode
-        ? h(
-            'div',
-            {
-              key: `${point.value.x},${point.value.y}`,
-              ref: floatingRef,
-              class: menuWrapperClasses.value,
-              style: overlay.floatingStyles.value,
-              'data-positioned': overlay.positioned.value,
-              'data-tiger-context-menu': '',
-              onKeydown: handleMenuKeyDown,
-              onContextmenu: handleMenuContextMenu,
-              hidden: !currentVisible.value
-            },
-            [cloneVNode(menuNode as VNode, { id: menuId })]
-          )
-        : null
-
-      const menu = menuWrapper
-        ? renderVueOverlayTeleport(menuWrapper, overlay.target.value, !props.portal)
-        : null
+      const menu = !menuWrapper
+        ? null
+        : props.portal
+          ? renderVueOverlayOutlet(menuId, menuWrapper, overlay.target.value)
+          : menuWrapper
 
       const {
         class: _class,
@@ -746,7 +764,7 @@ export const ContextMenu = defineComponent({
           class: containerClasses.value,
           style: mergedStyle.value
         },
-        [trigger, pointNode, menu]
+        [trigger, menu]
       )
     }
   }

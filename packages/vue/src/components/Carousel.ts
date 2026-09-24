@@ -18,7 +18,8 @@ import {
   carouselNextArrowPath,
   carouselPrevArrowPath,
   clampSlideIndex,
-  composeComponentClasses,
+  classNames,
+  coerceClassValue,
   createCarouselAutoplayController,
   getCarouselArrowClasses,
   getCarouselCloneAttributes,
@@ -46,6 +47,11 @@ import {
   mergeStyleValues,
   mergeTigerLocale,
   prefersReducedMotion,
+  subscribePrefersReducedMotion,
+  isCarouselAutoplayRequested,
+  carouselStatusClasses,
+  carouselTrackInstantClasses,
+  formatCarouselSlideStatus,
   resolveCarouselKeyboardNavigation,
   resolveCarouselLoopSnap,
   resolveCarouselRegion,
@@ -206,7 +212,17 @@ export const Carousel = defineComponent({
       shouldLoopCarousel(props.infinite, slideCount.value, props.effect)
     )
     const dir = computed(() => config.value.direction)
-    const reducedMotion = computed(() => prefersReducedMotion())
+    const reducedMotion = ref(false)
+    let stopMotion: (() => void) | undefined
+    onMounted(() => {
+      reducedMotion.value = prefersReducedMotion()
+      stopMotion = subscribePrefersReducedMotion((value) => {
+        reducedMotion.value = value
+      })
+    })
+    const autoplayRequested = computed(() =>
+      isCarouselAutoplayRequested(props.autoplay, props.autoplaySpeed)
+    )
     const autoplayEnabled = computed(() =>
       isCarouselAutoplayEnabled(props.autoplay, props.autoplaySpeed, reducedMotion.value)
     )
@@ -222,7 +238,7 @@ export const Carousel = defineComponent({
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getCarouselLabels(mergedLocale.value, props.labels))
     const transitionDuration = computed(() =>
-      snapPending.value || reducedMotion.value || props.speed <= 0 ? '0ms' : `${props.speed}ms`
+      snapPending.value || props.speed <= 0 ? '0ms' : `${props.speed}ms`
     )
 
     displayIndex.value = getCarouselDisplayIndex(
@@ -576,9 +592,9 @@ export const Carousel = defineComponent({
         {
           ...attrs,
           ref: containerRef,
-          class: composeComponentClasses(
+          class: classNames(
             getCarouselContainerClasses(props.className),
-            attrsRecord.class
+            coerceClassValue(attrsRecord.class)
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
           'data-tiger-carousel': '',
@@ -616,9 +632,17 @@ export const Carousel = defineComponent({
               ref: viewportRef,
               class: carouselViewportClasses,
               'data-tiger-carousel-viewport': '',
-              tabindex: count > 1 ? 0 : undefined
             },
             track
+          ),
+          h(
+            'div',
+            {
+              class: carouselStatusClasses,
+              role: 'status',
+              'aria-live': 'polite'
+            },
+            formatCarouselSlideStatus(labels.value.slideAriaLabel, current, count)
           ),
           autoplayEnabled.value
             ? h(
@@ -660,10 +684,7 @@ export const Carousel = defineComponent({
                 {
                   class: getCarouselDotsClasses(props.dotPosition),
                   'data-tiger-carousel-chrome': '',
-                  role: 'tablist',
-                  'aria-label': labels.value.navigationAriaLabel,
-                  'aria-orientation': getCarouselDotsOrientation(props.dotPosition),
-                  onKeydown: handleTablistKeyDown
+                  'aria-label': labels.value.navigationAriaLabel
                 },
                 currentSlides.map((_, index) => {
                   const selected = index === current
@@ -672,17 +693,13 @@ export const Carousel = defineComponent({
                     {
                       type: 'button',
                       key: index,
-                      id: `${instanceId}-tab-${index}`,
-                      role: 'tab',
                       'data-tiger-carousel-tab': index,
                       class: getCarouselDotClasses(selected),
                       'aria-label': labels.value.goToSlideAriaLabel.replace(
                         '{index}',
                         String(index + 1)
                       ),
-                      'aria-selected': selected ? 'true' : 'false',
-                      'aria-controls': `${instanceId}-slide-${index}`,
-                      tabindex: selected ? 0 : -1,
+                      'aria-current': selected ? 'true' : undefined,
                       onClick: () => goTo(index, 'goto')
                     },
                     h('span', { class: getCarouselDotMarkClasses(selected) })

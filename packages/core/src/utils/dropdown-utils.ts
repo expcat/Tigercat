@@ -1,5 +1,4 @@
 import { classNames } from './class-names'
-import { isBrowser } from './env'
 
 /**
  * Get base dropdown container classes
@@ -45,8 +44,8 @@ export function getDropdownChevronClasses(
     'tiger-dropdown-chevron',
     'shrink-0',
     DROPDOWN_CHEVRON_SIZE_CLASSES[size],
-    tone === 'current' ? 'text-current' : 'text-[var(--tiger-text-muted,#9ca3af)]',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,transform_200ms_ease)]',
+    tone === 'current' ? 'text-current' : 'text-[var(--tiger-text-secondary)]',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     visible && 'rotate-180'
   )
 }
@@ -62,12 +61,12 @@ export const DROPDOWN_CHEVRON_PATH = 'M6 9l6 6 6-6'
 export function getDropdownMenuClasses(): string {
   return classNames(
     'tiger-dropdown-menu',
-    'min-w-[var(--tiger-component-dropdown-min-width,160px)]',
+    'min-w-[var(--tiger-component-dropdown-min-width)]',
     'py-1.5 px-1',
-    'rounded-[var(--tiger-component-dropdown-border-radius,var(--tiger-radius-md,0.5rem))]',
-    'bg-[var(--tiger-surface,#ffffff)]',
-    'border border-[var(--tiger-border,#e5e7eb)]',
-    'shadow-[var(--tiger-component-dropdown-shadow,0_6px_16px_-2px_rgba(0,0,0,0.12),0_2px_6px_-1px_rgba(0,0,0,0.08))]',
+    'rounded-[var(--tiger-component-dropdown-border-radius)]',
+    'bg-[var(--tiger-surface)]',
+    'border border-[var(--tiger-border)]',
+    'shadow-[var(--tiger-component-dropdown-shadow)]',
     'ring-1 ring-black/[0.04]'
   )
 }
@@ -79,71 +78,50 @@ export function getDropdownItemClasses(disabled: boolean, divided: boolean): str
   return classNames(
     'tiger-dropdown-item',
     'flex items-center gap-2',
-    'w-full rounded-[var(--tiger-radius-md,0.5rem)]',
+    'w-full rounded-[var(--tiger-radius-md)]',
     'px-3 py-1.5',
-    'text-sm text-[var(--tiger-text,#374151)]',
+    'text-sm text-[var(--tiger-text)]',
     'transition-colors duration-150',
     'text-start',
     'focus:outline-none',
-    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)]/40 focus-visible:ring-inset',
-    divided && 'mt-1 border-t border-[var(--tiger-border,#e5e7eb)] pt-1',
+    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)]/40 focus-visible:ring-inset',
+    divided && 'mt-1 border-t border-[var(--tiger-border)] pt-1',
     disabled
       ? 'cursor-not-allowed opacity-50'
       : classNames(
           'cursor-pointer',
-          'hover:bg-[var(--tiger-surface-muted,#f3f4f6)]',
-          'active:bg-[var(--tiger-surface-muted,#e5e7eb)]'
+          'hover:bg-[var(--tiger-surface-muted)]',
+          'active:bg-[var(--tiger-surface-muted)]'
         )
   )
 }
 
 // ============================================================================
-// Dropdown Animation
+// Dropdown Animation — stylesheet object, not a runtime <style> tag.
+// Spread `dropdownBaseStyles` into the Tailwind plugin. Reduced motion is 0.
 // ============================================================================
 
-const DROPDOWN_ANIMATION_CSS = `
-@keyframes tiger-dropdown-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(-2px);
+export const dropdownBaseStyles = {
+  '@keyframes tiger-dropdown-in': {
+    from: {
+      opacity: '0',
+      transform: 'scale(0.96) translateY(-2px)'
+    },
+    to: {
+      opacity: '1',
+      transform: 'scale(1) translateY(0)'
+    }
+  },
+  '.tiger-dropdown-enter': {
+    animation:
+      'tiger-dropdown-in var(--tiger-motion-duration-base) var(--tiger-motion-ease-standard)'
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    '.tiger-dropdown-enter': {
+      animationDuration: '0ms'
+    }
   }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-.tiger-dropdown-enter {
-  animation: tiger-dropdown-in var(--tiger-motion-duration-base,0.2s) var(--tiger-motion-ease-standard,cubic-bezier(0.25, 0.1, 0.25, 1));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tiger-dropdown-enter {
-    animation-duration: 0ms;
-  }
-}
-`
-
-let isDropdownStyleInjected = false
-
-/**
- * Inject dropdown animation styles into the document head.
- * Safe to call multiple times - will only inject once.
- */
-export function injectDropdownStyles(): void {
-  if (!isBrowser() || isDropdownStyleInjected) return
-
-  const styleId = 'tiger-ui-dropdown-styles'
-  if (document.getElementById(styleId)) {
-    isDropdownStyleInjected = true
-    return
-  }
-
-  const style = document.createElement('style')
-  style.id = styleId
-  style.textContent = DROPDOWN_ANIMATION_CSS
-  document.head.appendChild(style)
-  isDropdownStyleInjected = true
-}
+} as const
 
 /**
  * CSS class for dropdown menu entrance animation

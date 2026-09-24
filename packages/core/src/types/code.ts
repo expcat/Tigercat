@@ -14,7 +14,7 @@ export interface CodeProps {
    */
   language?: string
   /**
-   * Optional pluggable highlighter. Output is TRUSTED HTML injected as-is.
+   * Optional pluggable highlighter. Returns tokens drawn as text.
    * Omit to keep a plain-text `<code>` block.
    */
   highlighter?: CodeHighlighter

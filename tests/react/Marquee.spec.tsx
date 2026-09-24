@@ -11,7 +11,7 @@ import {
   MARQUEE_COPY_INDEX_VAR,
   MARQUEE_DURATION_VAR,
   MARQUEE_INLINE_SIGN_VAR,
-  MARQUEE_STYLE_ID
+  marqueeBaseStyles
 } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
@@ -27,7 +27,7 @@ function getTrack(container: HTMLElement): HTMLElement {
 
 describe('Marquee', () => {
   describe('Rendering', () => {
-    it('duplicates children for a seamless loop and names the region from locale', () => {
+    it('duplicates children for a seamless loop without becoming a landmark', () => {
       const { container } = render(
         <Marquee>
           <span>Vue React</span>
@@ -35,9 +35,9 @@ describe('Marquee', () => {
       )
       const root = getRoot(container)
       expect(root.tagName).toBe('DIV')
-      expect(root).toHaveAttribute('role', 'region')
-      expect(root).toHaveAttribute('aria-label', enUS.marquee?.ariaLabel)
-      expect(root).toHaveAttribute('data-marquee-direction', 'left')
+      expect(root).not.toHaveAttribute('role')
+      expect(root).not.toHaveAttribute('aria-label')
+      expect(root).toHaveAttribute('data-marquee-direction', 'start')
       expect(root).toHaveAttribute('data-marquee-paused', 'false')
       expect(root.querySelectorAll('[data-marquee-content]')).toHaveLength(2)
       expect(root.querySelectorAll('[data-marquee-clone]')).toHaveLength(1)
@@ -75,7 +75,7 @@ describe('Marquee', () => {
   })
 
   describe('direction duration gap', () => {
-    it.each(['left', 'right', 'up', 'down'] as const)('renders direction="%s"', (direction) => {
+    it.each(['start', 'end', 'up', 'down'] as const)('renders direction="%s"', (direction) => {
       const { container } = render(<Marquee direction={direction}>{direction}</Marquee>)
       expect(getRoot(container)).toHaveAttribute('data-marquee-direction', direction)
     })
@@ -91,8 +91,12 @@ describe('Marquee', () => {
         '[data-marquee-content]:not([data-marquee-clone])'
       ) as HTMLElement
       const clone = root.querySelector('[data-marquee-clone]') as HTMLElement
-      expect(getComputedStyle(clone).position).toBe('absolute')
-      expect(getComputedStyle(first).position).not.toBe('absolute')
+      expect(root.className).toContain('tiger-marquee-vertical')
+      expect(clone.className).toContain('tiger-marquee-clone')
+      expect(
+        marqueeBaseStyles['.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-clone']
+          .position
+      ).toBe('absolute')
       expect(clone.style.getPropertyValue(MARQUEE_COPY_INDEX_VAR)).toBe('1')
       const rootHeight = root.getBoundingClientRect().height
       const firstHeight = first.getBoundingClientRect().height
@@ -111,8 +115,10 @@ describe('Marquee', () => {
       const root = getRoot(container)
       const sign = getComputedStyle(root).getPropertyValue(MARQUEE_INLINE_SIGN_VAR).trim()
       if (sign) expect(sign).toBe('-1')
-      const track = getTrack(container)
-      expect(getComputedStyle(track).flexDirection).toBe('row')
+      expect(root.className).toContain('tiger-marquee-horizontal')
+      expect(marqueeBaseStyles['.tiger-marquee-horizontal > .tiger-marquee-track'].flexDirection).toBe(
+        'row'
+      )
     })
 
     it('writes duration and gap onto the track as CSS variables', () => {
@@ -224,7 +230,7 @@ describe('Marquee', () => {
   describe('a11y', () => {
     it('keeps cloned interactive nodes out of the tab order', async () => {
       const { container } = render(
-        <Marquee>
+        <Marquee ariaLabel={enUS.marquee?.ariaLabel}>
           <button type="button">Item</button>
         </Marquee>
       )
@@ -237,30 +243,29 @@ describe('Marquee', () => {
       await expectNoA11yViolationsIsolated(container)
     })
 
-    it('reads ConfigProvider zh-CN marquee.ariaLabel', () => {
+    it('does not take a landmark name from ConfigProvider locale', () => {
       const { container } = render(
         <ConfigProvider locale={zhCN}>
           <Marquee>News</Marquee>
         </ConfigProvider>
       )
-      expect(screen.getByRole('region')).toHaveAttribute('aria-label', zhCN.marquee?.ariaLabel)
+      expect(getRoot(container)).not.toHaveAttribute('role')
+      expect(screen.queryByRole('region')).not.toBeInTheDocument()
+    })
+
+    it('uses an explicit labels.ariaLabel as the landmark name', () => {
+      const { container } = render(
+        <Marquee labels={{ ariaLabel: zhCN.marquee?.ariaLabel }}>News</Marquee>
+      )
       expect(getRoot(container)).toHaveAttribute('aria-label', zhCN.marquee?.ariaLabel)
     })
 
-    it('injects reduced-motion CSS that freezes the track and hides clones', () => {
+    it('keeps reduced-motion rules in the stylesheet object and does not write a style tag', () => {
       render(<Marquee>News</Marquee>)
-      const style = document.getElementById(MARQUEE_STYLE_ID)
-      expect(style?.textContent).toContain('prefers-reduced-motion: reduce')
-      expect(style?.textContent).toContain('animation: none !important')
-      expect(style?.textContent).toContain('.tiger-marquee-clone')
-    })
-
-    it('re-injects keyframes after the style node is removed', () => {
-      const first = render(<Marquee>News</Marquee>)
-      document.getElementById(MARQUEE_STYLE_ID)?.remove()
-      first.unmount()
-      render(<Marquee>Again</Marquee>)
-      expect(document.getElementById(MARQUEE_STYLE_ID)?.textContent).toContain('tiger-marquee-x')
+      const reduced = marqueeBaseStyles['@media (prefers-reduced-motion: reduce)']
+      expect(reduced['.tiger-marquee > .tiger-marquee-track'].animation).toBe('none')
+      expect(reduced['.tiger-marquee .tiger-marquee-clone'].display).toBe('none')
+      expect(document.getElementById('tiger-ui-marquee-styles')).toBeNull()
     })
   })
 

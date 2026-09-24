@@ -45,7 +45,7 @@ export default function App() {
         ))}
       </div>
 
-      <p className="text-sm text-[var(--tiger-text-secondary,#6b7280)]" aria-live="polite">
+      <p className="text-sm text-[var(--tiger-text-secondary)]" aria-live="polite">
         {status}；缩放范围 0.75×–2×，遮罩点击不会关闭。切图后缩放回到 1。
       </p>
 

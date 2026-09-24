@@ -154,7 +154,9 @@ export function createChartInteractionHandlers<T>(
     options.onItemClick?.(index, resolved)
     if (!selectable) return
 
-    const nextIndex = nextChartSelectedIndex(state.selectedIndex, index)
+    const currentSelected =
+      options.selectedIndex !== undefined ? options.selectedIndex : state.selectedIndex
+    const nextIndex = nextChartSelectedIndex(currentSelected, index)
     const nextDatum = nextIndex !== null ? (data[nextIndex] ?? null) : null
 
     if (options.selectedIndex !== undefined) {
@@ -225,21 +227,32 @@ function cancelDefaultFrame(handle: number): void {
   globalThis.clearTimeout(handle)
 }
 
-export function createChartPointerMoveScheduler(
-  options: ChartPointerMoveSchedulerOptions
-): ChartPointerMoveScheduler {
+export interface ChartFrameCoalescer<T> {
+  schedule: (value: T) => void
+  flush: () => void
+  cancel: () => void
+  isPending: () => boolean
+}
+
+/** One animation frame for pointer scans. Later samples replace the pending one. */
+export function createChartFrameCoalescer<T>(options: {
+  onFrame: (value: T) => void
+  requestFrame?: ChartFrameRequest
+  cancelFrame?: ChartFrameCancel
+}): ChartFrameCoalescer<T> {
   const requestFrame = options.requestFrame ?? requestDefaultFrame
   const cancelFrame = options.cancelFrame ?? cancelDefaultFrame
   let frameHandle: number | undefined
-  let pendingPosition: ChartTooltipPosition | undefined
+  let pending: T | undefined
+  let hasPending = false
 
   function applyPending(): void {
     frameHandle = undefined
-    if (!pendingPosition) return
-
-    const nextPosition = pendingPosition
-    pendingPosition = undefined
-    options.onPositionChange(nextPosition)
+    if (!hasPending) return
+    const next = pending as T
+    pending = undefined
+    hasPending = false
+    options.onFrame(next)
   }
 
   function cancel(): void {
@@ -247,22 +260,21 @@ export function createChartPointerMoveScheduler(
       cancelFrame(frameHandle)
       frameHandle = undefined
     }
-
-    pendingPosition = undefined
+    pending = undefined
+    hasPending = false
   }
 
   function flush(): void {
     if (frameHandle !== undefined) {
       cancelFrame(frameHandle)
     }
-
     applyPending()
   }
 
-  function schedule(position: ChartTooltipPosition): void {
-    pendingPosition = position
+  function schedule(value: T): void {
+    pending = value
+    hasPending = true
     if (frameHandle !== undefined) return
-
     frameHandle = requestFrame(applyPending)
   }
 
@@ -272,4 +284,28 @@ export function createChartPointerMoveScheduler(
     cancel,
     isPending: () => frameHandle !== undefined
   }
+}
+
+export function createChartPointerMoveScheduler(
+  options: ChartPointerMoveSchedulerOptions
+): ChartPointerMoveScheduler {
+  return createChartFrameCoalescer<ChartTooltipPosition>({
+    onFrame: options.onPositionChange,
+    requestFrame: options.requestFrame,
+    cancelFrame: options.cancelFrame
+  })
+}
+
+/** True when the pointer left one chart node for another node in the same chart. */
+export function chartPointerRemainsInside(
+  currentTarget: EventTarget | null | undefined,
+  relatedTarget: EventTarget | null | undefined
+): boolean {
+  if (!(relatedTarget instanceof Node)) return false
+  if (!(currentTarget instanceof Element)) return false
+  const root =
+    (currentTarget instanceof SVGElement ? currentTarget.ownerSVGElement : null) ??
+    currentTarget.closest('[data-chart-canvas-host]') ??
+    currentTarget
+  return root.contains(relatedTarget)
 }

@@ -21,7 +21,7 @@ export type { UseFullscreenOptions }
 
 export interface UseFullscreenReturn {
   isFullscreen: ReturnType<typeof ref<boolean>>
-  supported: boolean
+  supported: ReturnType<typeof ref<boolean>>
   enter: () => Promise<void>
   exit: () => Promise<void>
   toggle: () => Promise<void>
@@ -31,7 +31,7 @@ export function useFullscreen(
   options: MaybeRefOrGetter<UseFullscreenOptions> = {}
 ): UseFullscreenReturn {
   const getOptions = (): UseFullscreenOptions => toValue(options)
-  const supported = isFullscreenSupported()
+  const supported = ref(true)
   const isFullscreen = ref(false)
   let stop: (() => void) | undefined
 
@@ -57,10 +57,11 @@ export function useFullscreen(
   }
 
   const exit = async () => {
-    if (!getFullscreenElement()) return
     const current = getOptions()
+    const target = resolveFullscreenTarget(current.target)
+    if (!target || !isElementFullscreen(target)) return
     try {
-      await exitElementFullscreen()
+      await exitElementFullscreen(target)
     } catch (error) {
       const err = error instanceof Error ? error : new Error('Fullscreen exit failed')
       current.onError?.(err)
@@ -74,9 +75,12 @@ export function useFullscreen(
 
   if (getCurrentInstance()) {
     onMounted(() => {
+      supported.value = isFullscreenSupported()
       sync()
       stop = subscribeFullscreenChange(sync)
     })
+  } else if (typeof window !== 'undefined') {
+    supported.value = isFullscreenSupported()
     onBeforeUnmount(() => {
       stop?.()
     })

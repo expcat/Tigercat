@@ -1,36 +1,47 @@
 import type { DividerOrientation, DividerLineStyle, DividerSpacing } from '../types/divider'
+import { THEME_CSS_VARS } from '../theme-runtime'
 import { classNames } from './class-names'
-import { isBrowser } from './env'
 
-export const DIVIDER_STYLE_ID = 'tiger-ui-divider-styles'
+/** Stretch and labeled flex. Wired by the Tailwind plugin; components do not inject a style tag. */
+export const dividerBaseStyles = {
+  '.tiger-divider-vertical': {
+    alignSelf: 'stretch'
+  },
+  '.tiger-divider-line-vertical': {
+    alignSelf: 'stretch',
+    width: '1px'
+  },
+  '.tiger-divider-labeled': {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  '.tiger-divider-labeled.tiger-divider-vertical': {
+    flexDirection: 'column'
+  }
+} as const
 
-export const DIVIDER_CSS = `
-.tiger-divider-vertical {
-  align-self: stretch;
-}
-.tiger-divider-line-vertical {
-  align-self: stretch;
-  width: 1px;
-}
-.tiger-divider-labeled {
-  display: flex;
-  align-items: center;
-}
-.tiger-divider-labeled.tiger-divider-vertical {
-  flex-direction: column;
-}
-`
+const COLOR_TOKEN_VARS = new Set<string>(
+  Object.entries(THEME_CSS_VARS)
+    .filter(([key]) => !key.startsWith('breakpoint'))
+    .map(([, cssVar]) => cssVar)
+)
 
-export function injectDividerStyles(): void {
-  if (!isBrowser()) return
-  if (document.getElementById(DIVIDER_STYLE_ID)) return
-  const style = document.createElement('style')
-  style.id = DIVIDER_STYLE_ID
-  style.textContent = DIVIDER_CSS
-  document.head.appendChild(style)
+const COLOR_TOKEN_NAMES = new Map<string, string>(
+  Object.entries(THEME_CSS_VARS).filter(([key]) => !key.startsWith('breakpoint'))
+)
+
+/** Gradient paint accepts a theme token name or `var(--tiger-*)` for that token. */
+export function resolveDividerColorToken(color?: string): string | undefined {
+  if (!color) return undefined
+  const trimmed = color.trim()
+  const named = COLOR_TOKEN_NAMES.get(trimmed)
+  if (named) return `var(${named})`
+  const match = /^var\(\s*(--tiger-[a-z0-9-]+)\s*\)$/i.exec(trimmed)
+  if (match && COLOR_TOKEN_VARS.has(match[1])) return `var(${match[1]})`
+  return undefined
 }
 
-const BORDER_COLOR = 'border-[var(--tiger-border,#e5e7eb)]' as const
+const BORDER_COLOR = 'border-[var(--tiger-border)]' as const
 
 const SPACING_H: Record<DividerSpacing, string> = {
   none: '',
@@ -69,13 +80,12 @@ export function getDividerClasses(
   spacing: DividerSpacing,
   labeled = false
 ): string {
-  injectDividerStyles()
   const isH = isDividerHorizontal(orientation)
   const sp = (isH ? SPACING_H : SPACING_V)[spacing]
   if (labeled) {
     return classNames(
-      'tiger-divider tiger-divider-labeled',
-      isH ? 'w-full gap-2' : 'tiger-divider-vertical gap-2',
+      'tiger-divider tiger-divider-labeled flex items-center',
+      isH ? 'w-full gap-2' : 'tiger-divider-vertical flex-col self-stretch gap-2',
       sp
     )
   }
@@ -90,13 +100,12 @@ export function getDividerLineClasses(
   lineStyle: DividerLineStyle,
   labeled = false
 ): string {
-  injectDividerStyles()
   const isH = isDividerHorizontal(orientation)
   if (lineStyle === 'gradient') {
     return classNames(
       'tiger-divider border-0',
       labeled && (isH ? 'flex-1 min-w-0' : 'flex-1 min-h-0'),
-      isH ? 'w-full' : 'tiger-divider-vertical tiger-divider-line-vertical',
+      isH ? 'w-full' : 'tiger-divider-vertical tiger-divider-line-vertical self-stretch w-px',
       !labeled && !isH && 'tiger-divider-vertical'
     )
   }
@@ -105,7 +114,7 @@ export function getDividerLineClasses(
     BORDER_COLOR,
     LINE_STYLE_MAP[lineStyle],
     labeled && (isH ? 'flex-1 min-w-0' : 'flex-1 min-h-0'),
-    isH ? 'w-full border-t' : 'tiger-divider-vertical border-s',
+    isH ? 'w-full border-t' : 'tiger-divider-vertical self-stretch border-s',
     !isH && !labeled && 'w-px'
   )
 }
@@ -121,16 +130,16 @@ export function getDividerStyle(
 ): Record<string, string> | undefined {
   const isH = isDividerHorizontal(orientation)
   if (lineStyle === 'gradient') {
-    const c = color || 'var(--tiger-border, #e5e7eb)'
+    const c = resolveDividerColorToken(color) || 'var(--tiger-border)'
     const thick = thickness || '1px'
     return isH
       ? {
-          backgroundImage: `linear-gradient(to right, transparent, ${c}, transparent)`,
+          backgroundImage: `linear-gradient(to inline-end, transparent, ${c}, transparent)`,
           height: thick,
           borderWidth: '0px'
         }
       : {
-          backgroundImage: `linear-gradient(to bottom, transparent, ${c}, transparent)`,
+          backgroundImage: `linear-gradient(to block-end, transparent, ${c}, transparent)`,
           width: thick,
           borderWidth: '0px'
         }

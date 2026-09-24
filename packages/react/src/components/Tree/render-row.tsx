@@ -1,11 +1,17 @@
 import React from 'react'
 import {
+  checkboxCheckPathD,
+  checkboxIconSizeClasses,
+  checkboxIconViewBox,
+  checkboxIndeterminatePathD,
   classNames,
+  getCheckboxVisualClasses,
   getHighlightSegments,
   getTreeIndentSlotClasses,
   getTreeIndentSlots,
   getTreeNodeClasses,
   highlightMarkClasses,
+  nextCheckedFromTreeRow,
   sameTreeKey,
   treeDropAfterClasses,
   treeDropBeforeClasses,
@@ -16,7 +22,6 @@ import {
   treeNodeLabelClasses,
   treeNodeLabelMatchedClasses
 } from '@expcat/tigercat-core'
-import { Checkbox } from '../Checkbox'
 import { ExpandIcon, LoadingSpinner } from './icons'
 import type { TreeContext } from './types'
 
@@ -80,7 +85,10 @@ export function renderTreeRow(
       aria-posinset={row.posinset}
       aria-disabled={row.disabled || undefined}
       aria-selected={ctx.selectable ? row.selected : undefined}
-      aria-expanded={row.expandable ? row.expanded : undefined}
+      aria-expanded={
+        node.isLeaf === true ? undefined : row.expandable || row.expanded ? row.expanded : undefined
+      }
+      aria-busy={row.loading || undefined}
       aria-checked={ctx.checkable ? (row.halfChecked ? 'mixed' : row.checked) : undefined}
       tabIndex={isFocusable ? 0 : -1}
       draggable={ctx.draggable && !row.disabled ? true : undefined}
@@ -136,20 +144,39 @@ export function renderTreeRow(
         <ExpandIcon expanded={false} expandable={false} />
       )}
       {ctx.checkable ? (
-        <Checkbox
-          tabIndex={-1}
-          size="sm"
-          checked={row.checked}
-          indeterminate={row.halfChecked}
-          disabled={row.disabled}
-          aria-label={ctx.selectNodeLabel(node.label)}
-          className="me-2 shrink-0"
-          onClick={(event) => event.stopPropagation()}
-          onChange={(checked, event) => {
+        <span
+          data-tiger-tree-check=""
+          data-checked={row.halfChecked ? 'mixed' : row.checked ? 'true' : 'false'}
+          aria-hidden="true"
+          className={classNames(
+            getCheckboxVisualClasses({
+              size: 'sm',
+              checked: row.checked,
+              indeterminate: row.halfChecked,
+              disabled: row.disabled
+            }),
+            'me-2 shrink-0'
+          )}
+          onClick={(event) => {
             event.stopPropagation()
-            ctx.handleCheck(node.key, checked)
-          }}
-        />
+            if (row.disabled) return
+            ctx.handleCheck(node.key, nextCheckedFromTreeRow(row.checked, row.halfChecked))
+          }}>
+          {row.checked || row.halfChecked ? (
+            <svg
+              className={checkboxIconSizeClasses.sm}
+              viewBox={checkboxIconViewBox}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false">
+              <path d={row.halfChecked ? checkboxIndeterminatePathD : checkboxCheckPathD} />
+            </svg>
+          ) : null}
+        </span>
       ) : null}
       {ctx.showIcon && node.icon != null ? (
         <span className={treeNodeIconClasses}>{renderNodeIcon(node.icon)}</span>
@@ -161,7 +188,12 @@ export function renderTreeRow(
         )}>
         {renderLabel(node.label, ctx.searchQuery, row.matched)}
       </span>
-      {row.loading ? <LoadingSpinner /> : null}
+      {row.loading ? (
+        <span className="inline-flex items-center">
+          <LoadingSpinner />
+          <span className="sr-only">{ctx.loadingText}</span>
+        </span>
+      ) : null}
     </div>
   )
 }

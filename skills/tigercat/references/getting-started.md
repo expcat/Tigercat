@@ -46,8 +46,8 @@ centered on the icon column) and the WorkflowDesigner center-axis canvas
 rail. Do not rely on JIT-scanned utilities such as `inset-inline-start-4`
 for those connectors.
 
-Runtime theme switching uses `ConfigProvider` `theme` / `colorScheme` (or `ThemeManager`).
-`@plugin "@expcat/tigercat-core/tailwind/modern"` is the CSS equivalent of `theme="modern"`.
+Runtime theme switching uses `ConfigProvider` `theme` / `colorScheme`. `theme="modern"` selects
+the modern preset. The Tailwind entry is only `@plugin "@expcat/tigercat-core/tailwind"`.
 
 Run `tigercat doctor --json` in an application to verify Node, pnpm, Tailwind v4, framework peers, and template dependencies.
 

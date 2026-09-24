@@ -52,7 +52,7 @@ export const TreeMapChart = defineComponent({
     width: { type: Number, default: DEFAULT_TREEMAP_WIDTH },
     height: { type: Number, default: DEFAULT_TREEMAP_HEIGHT },
     padding: { type: [Number, Object] as PropType<ChartPadding>, default: DEFAULT_TREEMAP_PADDING },
-    responsive: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
     data: { type: Array as PropType<TreeMapChartDatum[]>, required: true },
     gap: { type: Number, default: DEFAULT_TREEMAP_GAP },
     showLabels: { type: Boolean, default: true },
@@ -135,7 +135,6 @@ export const TreeMapChart = defineComponent({
       onSelectedIndexChange: (index) => emit('update:selectedIndex', index),
       onHover: (index, datum) => emit('node-hover', index, datum),
       onClick: (index, datum) => {
-        if (datum) props.onNodeClick?.(index, datum)
         emit('node-click', index, datum)
       }
     })

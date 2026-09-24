@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, PropType } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, PropType, ref, watch } from 'vue'
 import {
   EMPTY_TIMELINE_ITEMS,
   classNames,
@@ -12,6 +12,7 @@ import {
   getTimelineItemKey,
   getTimelineTailClasses,
   mergeStyleValues,
+  manageLiveRegion,
   mergeTigerLocale,
   processTimelineItems,
   resolveLocaleText,
@@ -84,6 +85,22 @@ export const Timeline = defineComponent({
   setup(props, { slots, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const pendingSignature = computed(() =>
+      props.pending ? mergedLocale.value?.timeline?.pendingText || 'Loading...' : ''
+    )
+    const pendingSeen = ref<string | null>(null)
+    const liveRegion = manageLiveRegion('polite')
+    watch(pendingSignature, (signature) => {
+      const previous = pendingSeen.value
+      if (previous === signature) return
+      pendingSeen.value = signature
+      if (previous === null && !signature) return
+      if (signature) liveRegion.announce(signature)
+      else if (previous) {
+        liveRegion.announce(mergedLocale.value?.timeline?.pendingReplacedText || 'Update finished')
+      }
+    }, { immediate: true })
+    onBeforeUnmount(() => liveRegion.destroy())
     const processedItems = computed(() =>
       processTimelineItems(props.items ?? EMPTY_TIMELINE_ITEMS, {
         reverse: props.reverse,
@@ -190,13 +207,13 @@ export const Timeline = defineComponent({
       const contentClasses = getTimelineContentClasses(props.mode, position)
 
       if (slots.pending) {
-        return h('li', { key: 'pending', class: itemClasses }, [
+        return h('li', { key: 'pending', class: itemClasses, 'aria-busy': 'true' }, [
           h('div', { class: headClasses }, [renderDot({}, true)]),
           h('div', { class: contentClasses }, slots.pending())
         ])
       }
 
-      return h('li', { key: 'pending', class: itemClasses }, [
+      return h('li', { key: 'pending', class: itemClasses, 'aria-busy': 'true' }, [
         h('div', { class: headClasses }, [renderDot({}, true)]),
         h('div', { class: contentClasses }, [
           h(
@@ -220,7 +237,7 @@ export const Timeline = defineComponent({
           class: containerClasses.value,
           style: containerStyle.value,
           role: 'list',
-          'aria-busy': attrs['aria-busy'] ?? (props.pending ? 'true' : undefined)
+          'aria-busy': attrs['aria-busy']
         },
         [
           ...processedItems.value.map((item, index) => renderTimelineItem(item, index)),

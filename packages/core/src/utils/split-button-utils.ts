@@ -21,10 +21,11 @@ export const splitButtonRootClasses = 'tiger-split-button inline-flex items-stre
 export const splitButtonRootBlockClasses = 'w-full'
 
 /**
- * Join the primary button to the trigger. `!` wins over Button's token radius
- * so the seam stays square regardless of generated CSS order.
+ * Join the primary button to the trigger. The button itself has no radius
+ * when it is inside the split group; these classes own the outer corner.
  */
-export const splitButtonPrimaryClasses = '!rounded-e-none'
+export const splitButtonPrimaryClasses =
+  'rounded-s-[var(--tiger-radius-md)] rounded-e-none'
 
 /** Let the primary action fill remaining width in block layout */
 export const splitButtonPrimaryBlockClasses = 'min-w-0 flex-1'
@@ -34,7 +35,7 @@ export const splitButtonPrimaryBlockClasses = 'min-w-0 flex-1'
  * when the group is stretched.
  */
 export const splitButtonTriggerClasses =
-  'tiger-split-button-trigger shrink-0 h-full !rounded-s-none -ms-px'
+  'tiger-split-button-trigger shrink-0 h-full rounded-e-[var(--tiger-radius-md)] rounded-s-none -ms-px'
 
 /** Stretch the Dropdown root to the primary action height in the group */
 export const splitButtonDropdownClasses = 'self-stretch'

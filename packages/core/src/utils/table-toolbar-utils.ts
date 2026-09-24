@@ -72,10 +72,15 @@ export function isToolbarSearchRemote(toolbar: ToolbarSearchBits | undefined): b
   return toolbar?.searchMode === 'remote'
 }
 
-export function canSubmitToolbarSearch(toolbar: ToolbarSearchBits | undefined): boolean {
-  if (!toolbarHasSearch(toolbar)) return false
+export function canSubmitToolbarSearch(
+  toolbar: ToolbarSearchBits | undefined,
+  options?: { hasSearchListener?: boolean }
+): boolean {
+  const hasSearch = toolbarHasSearch(toolbar) || options?.hasSearchListener === true
+  if (!hasSearch) return false
+  if (toolbar?.search === false) return false
   if (!isToolbarSearchRemote(toolbar)) return true
-  return Boolean(toolbar?.onSearch || toolbar?.onSearchChange)
+  return Boolean(toolbar?.onSearch || toolbar?.onSearchChange || options?.hasSearchListener)
 }
 
 export function toggleHiddenColumnKey(
@@ -126,14 +131,33 @@ export function resolveToolbarFilterMap(
   return next
 }
 
+/**
+ * One controlled entrance: `rowSelection.selectedRowKeys`. Otherwise the
+ * toolbar's internal keys. Count is `keys.length`.
+ */
 export function resolveToolbarSelectedKeys(
-  toolbarSelected: readonly (string | number)[] | undefined,
   rowSelectionSelected: readonly (string | number)[] | undefined,
   internal: readonly (string | number)[]
 ): (string | number)[] {
-  if (toolbarSelected !== undefined) return [...toolbarSelected]
   if (rowSelectionSelected !== undefined) return [...rowSelectionSelected]
   return [...internal]
+}
+
+/** The map handed to `onFiltersChange`, with this write winning over a controlled value. */
+export function toolbarFilterMapAfterWrite(
+  defs: readonly ToolbarFilterSeed[] | undefined,
+  internal: Record<string, TableToolbarFilterValue>,
+  extraKeys: readonly string[],
+  key: string,
+  value: TableToolbarFilterValue
+): Record<string, TableToolbarFilterValue> {
+  const next = resolveToolbarFilterMap(defs, { ...internal, [key]: value }, extraKeys)
+  next[key] = value
+  return next
+}
+
+export function isToolbarScalarFilter(value: TableToolbarFilterValue): boolean {
+  return value == null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
 }
 
 export function applyToolbarLocalView<T extends Record<string, unknown>>(
@@ -182,7 +206,7 @@ export function getDataTableToolbarWrapperClasses(options: {
   return classNames(
     'tiger-data-table-with-toolbar flex flex-col',
     options.bordered
-      ? 'border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-surface,#ffffff)] shadow-sm'
+      ? 'border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-surface)] shadow-sm'
       : 'gap-3.5',
     options.className
   )
@@ -195,8 +219,8 @@ export function getDataTableToolbarBarClasses(options: {
   return classNames(
     'tiger-data-table-toolbar flex flex-wrap items-center gap-3 px-4 py-3.5',
     options.bordered
-      ? 'bg-[var(--tiger-surface-muted,#f9fafb)] border-b border-[var(--tiger-border,#e5e7eb)]'
-      : 'bg-[var(--tiger-surface-muted,#f9fafb)]/80 border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm',
+      ? 'bg-[var(--tiger-surface-muted)] border-b border-[var(--tiger-border)]'
+      : 'bg-[var(--tiger-surface-muted)]/80 border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] shadow-sm',
     options.className
   )
 }

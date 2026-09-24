@@ -61,6 +61,20 @@ describe('Breadcrumb', () => {
       expect(container.querySelector('svg')).toBeInTheDocument()
     })
 
+    it('renders one li per item with the separator inside the item', () => {
+      const { container } = render(
+        <Breadcrumb>
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem href="/docs">Docs</BreadcrumbItem>
+          <BreadcrumbItem current>Current</BreadcrumbItem>
+        </Breadcrumb>
+      )
+      const items = container.querySelectorAll('ol > li')
+      expect(items).toHaveLength(3)
+      expect(items[0].querySelector('[aria-hidden="true"]')).toHaveTextContent('/')
+      expect(items[2].querySelector('[aria-hidden="true"]')).toBeNull()
+    })
+
     it('does not render a separator after the last item', () => {
       const { container } = render(
         <Breadcrumb>

@@ -1,8 +1,8 @@
-import React, { forwardRef, useContext, useEffect, useRef } from 'react'
+import React, { forwardRef, useContext } from 'react'
 import {
   classNames,
   getLayoutContentClasses,
-  injectLayoutGridStyles,
+  resolveLayoutSectionTag,
   type ContentProps as CoreContentProps
 } from '@expcat/tigercat-core'
 import { LayoutContext } from '../utils/layout-context'
@@ -14,29 +14,19 @@ export interface ReactContentProps
 }
 
 export const Content = forwardRef<HTMLElement, ReactContentProps>(function Content(
-  { className, padding = true, as = 'main', children, ...props },
+  { className, padding = true, as, children, ...props },
   forwardedRef
 ) {
-  injectLayoutGridStyles()
   const layout = useContext(LayoutContext)
-  const localRef = useRef<HTMLElement | null>(null)
-
-  const setRefs = (node: HTMLElement | null) => {
-    localRef.current = node
-    if (typeof forwardedRef === 'function') forwardedRef(node)
-    else if (forwardedRef) forwardedRef.current = node
-  }
-
-  useEffect(() => {
-    layout?.setContentEl(localRef.current)
-    return () => layout?.setContentEl(null)
-  }, [layout])
-
   const contentClasses = classNames(getLayoutContentClasses(padding), className)
-  const Tag = as as React.ElementType
+  const Tag = resolveLayoutSectionTag({
+    kind: 'content',
+    nested: Boolean(layout?.nested),
+    explicit: as
+  }) as React.ElementType
 
   return (
-    <Tag ref={setRefs} className={contentClasses} {...props}>
+    <Tag ref={forwardedRef} className={contentClasses} {...props}>
       {children}
     </Tag>
   )

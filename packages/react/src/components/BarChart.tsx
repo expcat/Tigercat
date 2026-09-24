@@ -55,11 +55,11 @@ export const BarChart: React.FC<BarChartProps> = ({
   width = 320,
   height = 200,
   padding = DEFAULT_CHART_PADDING,
-  responsive = false,
+  responsive = true,
   data,
   xScale,
   yScale,
-  barColor = 'var(--tiger-primary,#2563eb)',
+  barColor = 'var(--tiger-primary)',
   barRadius,
   barPaddingInner = 0.2,
   barPaddingOuter = 0.1,
@@ -164,7 +164,17 @@ export const BarChart: React.FC<BarChartProps> = ({
     padding,
     responsive
   )
-  const xDomain = useMemo(() => data.map((item) => String(item.x)), [data])
+  const xDomain = useMemo(() => {
+    const seen = new Set<string>()
+    const domain: string[] = []
+    for (const item of data) {
+      const key = String(item.x)
+      if (seen.has(key)) continue
+      seen.add(key)
+      domain.push(key)
+    }
+    return domain
+  }, [data])
   const yValues = useMemo(
     () => data.map((item) => item.y).filter((value) => Number.isFinite(value)),
     [data]
@@ -332,8 +342,8 @@ export const BarChart: React.FC<BarChartProps> = ({
             style={
               corner.style
                 ? ({
-                    rx: 'var(--tiger-chart-bar-radius, 4px)',
-                    ry: 'var(--tiger-chart-bar-radius, 4px)'
+                    rx: 'var(--tiger-chart-bar-radius)',
+                    ry: 'var(--tiger-chart-bar-radius)'
                   } as React.CSSProperties)
                 : undefined
             }

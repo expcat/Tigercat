@@ -100,13 +100,15 @@ export interface MenuSchemaNode {
    */
   icon?: string
   /**
-   * Internal route path. Used as `MenuItem.href` when `href` is omitted.
-   * Copied onto {@link MenuRouteRecord.path} when converting routes.
+   * Site-internal route path. No scheme. Used as `MenuItem.href` only when
+   * `href` is omitted and the path passes the link allowlist.
+   * Copied onto {@link MenuRouteRecord.path} when it is an internal path.
    */
   path?: string
   /**
-   * External or explicit link. Wins over `path` when both are set.
-   * Href-only nodes (no `path`) stay menu links and are not route records.
+   * External or explicit link. Gated by the link allowlist on its own.
+   * A rejected `href` is dropped and does not fall back to `path`.
+   * Href-only nodes (no internal `path`) stay menu links and are not route records.
    */
   href?: string
   /**
@@ -139,8 +141,8 @@ export interface MenuSchemaNode {
    */
   badge?: MenuSchemaBadge
   /**
-   * Iframe URL for an embedded page. Copied onto route meta; set `path` for
-   * the in-app route that hosts the iframe.
+   * Iframe URL for an embedded page. Copied onto route meta only when it
+   * passes the link allowlist. Set `path` for the in-app route that hosts it.
    */
   iframeSrc?: string
   /**
@@ -228,11 +230,11 @@ export interface MenuProps {
    */
   collapsed?: boolean
   /**
-   * Whether multiple **submenus** can be opened at once.
+   * Whether several submenus can stay open at once.
    * Does not change item selection (always single-select).
    * @default true
    */
-  multiple?: boolean
+  openMultiple?: boolean
   /**
    * Inline indentation for submenu items
    * @default 24

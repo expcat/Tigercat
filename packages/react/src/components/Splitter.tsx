@@ -18,21 +18,20 @@ import {
   getSplitterGutterCssVars,
   getSplitterGutterHandleClasses,
   getSplitterGutterValueNow,
-  getSplitterKeyboardDelta,
   getSplitterLabels,
   getSplitterPointerDelta,
   isSplitterRtl,
-  layoutPanePixels,
+  jumpSplitterGutter,
+  layoutDeclaredPanes,
   measureSplitterContainer,
-  panePixelsToRatios,
-  reconcileSplitterRatios,
-  resolveInitialPaneSizes,
+  normalizeSplitterBounds,
   resizePanes,
+  resolveSplitterSeparatorKey,
+  serializePaneSizes,
   splitterPaneBaseClasses,
   createDocumentDragSession,
   type DocumentDragSession,
-  type SplitterProps as CoreSplitterProps,
-  type SplitterRatioState
+  type SplitterProps as CoreSplitterProps
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -101,10 +100,11 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
   const containerRef = useRef<HTMLDivElement | null>(null)
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const [containerSize, setContainerSize] = useState(0)
-  const [ratioState, setRatioState] = useState<SplitterRatioState>({
-    ratios: [],
-    sizesKey: undefined
-  })
+  const sizesKey = serializePaneSizes(controlledSizes)
+  const [override, setOverride] = useState<{ key: string | undefined; pixels: number[] } | null>(
+    null
+  )
+  const dragPixels = override && override.key === sizesKey ? override.pixels : null
   const [draggingIndex, setDraggingIndex] = useState(-1)
   const draggingRef = useRef<{
     index: number
@@ -113,14 +113,19 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
     startSizes: number[]
   } | null>(null)
 
-  const available = containerSize > 0 ? containerSize - Math.max(0, paneCount - 1) * gutterSize : 0
-  const reconciled = reconcileSplitterRatios(ratioState, paneCount, controlledSizes, available)
-  if (reconciled !== ratioState) {
-    setRatioState(reconciled)
-  }
-  const ratios = reconciled.ratios
-  const measured = containerSize > 0
-  const paneSizes = measured ? layoutPanePixels(ratios, containerSize, gutterSize, min, max) : []
+  const bounds = useMemo(
+    () => normalizeSplitterBounds(paneCount, min, max),
+    [max, min, paneCount]
+  )
+  const boxes = layoutDeclaredPanes(
+    dragPixels ?? controlledSizes,
+    paneCount,
+    containerSize,
+    gutterSize,
+    bounds.mins,
+    bounds.maxes
+  )
+  const panePixels = boxes.map((box) => box.pixels ?? 0)
 
   if (controlledSizes && controlledSizes.length !== paneCount) {
     devWarn(
@@ -162,32 +167,38 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
 
   useEffect(() => cleanupDragSession, [cleanupDragSession])
 
-  const mins = useMemo(() => Array.from({ length: paneCount }, () => min), [paneCount, min])
-  const maxes = useMemo(() => Array.from({ length: paneCount }, () => max), [paneCount, max])
+  const mins = bounds.mins
+  const maxes = bounds.maxes
 
   const commitSizes = useCallback(
     (nextPixels: number[], index: number, phase: 'move' | 'end' | 'keyboard') => {
-      setRatioState((prev) => ({
-        ratios: panePixelsToRatios(nextPixels),
-        sizesKey: prev.sizesKey
-      }))
+      setOverride({ key: sizesKey, pixels: nextPixels })
       onSizesChange?.(nextPixels)
       onResize?.({ index, sizes: nextPixels })
       if (phase === 'end' || phase === 'keyboard') {
         onResizeEnd?.({ index, sizes: nextPixels })
       }
     },
-    [onResize, onResizeEnd, onSizesChange]
+    [onResize, onResizeEnd, onSizesChange, sizesKey]
+  )
+
+  const pixelsFor = useCallback(
+    (liveSize: number): number[] => {
+      return layoutDeclaredPanes(
+        dragPixels ?? controlledSizes,
+        paneCount,
+        liveSize,
+        gutterSize,
+        mins,
+        maxes
+      ).map((box) => box.pixels ?? 0)
+    },
+    [controlledSizes, dragPixels, gutterSize, maxes, mins, paneCount]
   )
 
   const currentPixels = useCallback(
-    (liveSize = containerSize): number[] => {
-      if (liveSize > 0) {
-        return layoutPanePixels(ratios, liveSize, gutterSize, min, max)
-      }
-      return resolveInitialPaneSizes(paneCount, 0, gutterSize, controlledSizes, min, max) ?? []
-    },
-    [containerSize, controlledSizes, gutterSize, max, min, paneCount, ratios]
+    (liveSize = containerSize): number[] => pixelsFor(liveSize),
+    [containerSize, pixelsFor]
   )
 
   const handlePointerDown = useCallback(
@@ -266,10 +277,14 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
   const handleKeyDown = useCallback(
     (gutterIdx: number, e: React.KeyboardEvent) => {
       if (disabled) return
-      const delta = getSplitterKeyboardDelta(e.key, orientation, rtl)
-      if (delta == null) return
+      const action = resolveSplitterSeparatorKey(e.key, orientation, rtl)
+      if (!action) return
       e.preventDefault()
-      const newSizes = resizePanes(currentPixels(), gutterIdx, delta, mins, maxes)
+      const current = currentPixels()
+      const newSizes =
+        action.type === 'delta'
+          ? resizePanes(current, gutterIdx, action.delta, mins, maxes)
+          : jumpSplitterGutter(current, gutterIdx, action.edge, mins, maxes)
       if (newSizes) commitSizes(newSizes, gutterIdx, 'keyboard')
     },
     [disabled, orientation, rtl, mins, maxes, commitSizes, currentPixels]
@@ -288,11 +303,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
       aria-label={typeof ariaLabel === 'string' ? ariaLabel : undefined}
       aria-labelledby={typeof ariaLabelledby === 'string' ? ariaLabelledby : undefined}>
       {panes.map((child, i) => {
-        const size = measured ? paneSizes[i] : null
-        const paneStyle = getPaneStyle(size, orientation, {
-          ratio: ratios[i] ?? 0,
-          measured
-        })
+        const paneStyle = getPaneStyle(boxes[i] ?? { kind: 'flex', pixels: null, flexGrow: 1 }, orientation)
         const paneId = `${instanceId}-pane-${i}`
         const isDragging = draggingIndex === i
 
@@ -313,7 +324,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
                 aria-controls={paneId}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-valuenow={getSplitterGutterValueNow(measured ? paneSizes : [], i)}
+                aria-valuenow={getSplitterGutterValueNow(containerSize > 0 ? panePixels : [], i)}
                 aria-label={
                   ariaLabelledby ? undefined : formatSplitterGutterLabel(labels.gutterAriaLabel, i)
                 }

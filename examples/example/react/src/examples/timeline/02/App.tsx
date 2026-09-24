@@ -16,7 +16,7 @@ export default function App() {
     <Timeline
       items={items}
       renderDot={(item) => (
-        <span className="block h-3 w-3 rounded-full bg-[var(--tiger-primary,#2563eb)]">
+        <span className="block h-3 w-3 rounded-full bg-[var(--tiger-primary)]">
           <span className="sr-only">{String(item.label)}</span>
         </span>
       )}

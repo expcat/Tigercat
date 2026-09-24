@@ -22,11 +22,20 @@ const dataSource = [
 ]
 
 const tableHeaderBgClass =
-  'bg-[var(--tiger-table-header-bg,var(--tiger-component-table-header-bg,var(--tiger-surface-muted,#f9fafb)))]'
+  'bg-[var(--tiger-table-header-bg)]'
 const tableStripeBgClass =
-  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))]/50'
+  'bg-[var(--tiger-table-stripe-bg)]/50'
 const tableFixedStripeBgClass =
-  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-surface-muted,#f9fafb)))_50%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-surface,#ffffff))))]'
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg)_50%,var(--tiger-table-bg))]'
+
+async function renderSettled(
+  props: Record<string, unknown>,
+  options?: Parameters<typeof renderWithProps>[2]
+) {
+  const rendered = renderWithProps(Table, props, options)
+  await nextTick()
+  return rendered
+}
 
 function stubCardViewport(isCard: boolean) {
   window.matchMedia = ((query: string) => ({
@@ -43,8 +52,8 @@ function stubCardViewport(isCard: boolean) {
 
 describe('Table', () => {
   describe('Rendering', () => {
-    it('should render column headers', () => {
-      const { getByText } = renderWithProps(Table, {
+    it('should render column headers', async () => {
+      const { getByText } = await renderSettled( {
         columns,
         dataSource
       })
@@ -54,8 +63,8 @@ describe('Table', () => {
       expect(getByText('Email')).toBeInTheDocument()
     })
 
-    it('should render data rows', () => {
-      const { getByText } = renderWithProps(Table, {
+    it('should render data rows', async () => {
+      const { getByText } = await renderSettled( {
         columns,
         dataSource
       })
@@ -65,8 +74,8 @@ describe('Table', () => {
       expect(getByText('Bob Johnson')).toBeInTheDocument()
     })
 
-    it('should render empty state when no data', () => {
-      const { getByText } = renderWithProps(Table, {
+    it('should render empty state when no data', async () => {
+      const { getByText } = await renderSettled( {
         columns,
         dataSource: []
       })
@@ -74,8 +83,8 @@ describe('Table', () => {
       expect(getByText('No data')).toBeInTheDocument()
     })
 
-    it('should render custom empty text', () => {
-      const { getByText } = renderWithProps(Table, {
+    it('should render custom empty text', async () => {
+      const { getByText } = await renderSettled( {
         columns,
         dataSource: [],
         emptyText: 'No records found'
@@ -84,9 +93,9 @@ describe('Table', () => {
       expect(getByText('No records found')).toBeInTheDocument()
     })
 
-    it('renders mobile card markup when responsiveMode is card', () => {
+    it('renders mobile card markup when responsiveMode is card', async () => {
       stubCardViewport(true)
-      const { container, getAllByText } = renderWithProps(Table, {
+      const { container, getAllByText } = await renderSettled( {
         columns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -100,9 +109,9 @@ describe('Table', () => {
       expect(getAllByText('Name')).toHaveLength(1)
     })
 
-    it('keeps a single accessible table tree on the desktop card breakpoint', () => {
+    it('keeps a single accessible table tree on the desktop card breakpoint', async () => {
       stubCardViewport(false)
-      const { container, getAllByText } = renderWithProps(Table, {
+      const { container, getAllByText } = await renderSettled( {
         columns,
         dataSource,
         responsiveMode: 'card',
@@ -114,9 +123,9 @@ describe('Table', () => {
       expect(getAllByText('Name')).toHaveLength(1)
     })
 
-    it('hides hideInCard columns in card mode while keeping them in the table', () => {
+    it('hides hideInCard columns in card mode while keeping them in the table', async () => {
       stubCardViewport(true)
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: [
           { key: 'name', title: 'Name' },
           { key: 'age', title: 'Age', hideInCard: true }
@@ -131,9 +140,9 @@ describe('Table', () => {
       expect(cardList.textContent).toContain('Name')
     })
 
-    it('orders card body columns by cardPriority', () => {
+    it('orders card body columns by cardPriority', async () => {
       stubCardViewport(true)
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: [
           { key: 'name', title: 'Name', cardPriority: 2 },
           { key: 'age', title: 'Age', cardPriority: 1 }
@@ -149,9 +158,9 @@ describe('Table', () => {
       expect(labels).toEqual(['Age', 'Name'])
     })
 
-    it('renders a cardTitle column as the card heading instead of a row', () => {
+    it('renders a cardTitle column as the card heading instead of a row', async () => {
       stubCardViewport(true)
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: [
           { key: 'name', title: 'Name', cardTitle: true },
           { key: 'age', title: 'Age' }
@@ -167,9 +176,9 @@ describe('Table', () => {
       expect(labels).toEqual(['Age'])
     })
 
-    it('respects a configurable cardBreakpoint', () => {
+    it('respects a configurable cardBreakpoint', async () => {
       stubCardViewport(true)
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         responsiveMode: 'card',
@@ -182,14 +191,14 @@ describe('Table', () => {
       expect(container.querySelector('table')).not.toBeInTheDocument()
     })
 
-    it('uses the default card field gap, overridable via cardFieldGap', () => {
+    it('uses the default card field gap, overridable via cardFieldGap', async () => {
       stubCardViewport(true)
       const cardColumns: TableColumn[] = [
         { key: 'name', title: 'Name', cardTitle: true },
         { key: 'email', title: 'Email', cardGrid: { colSpan: 6 } }
       ]
 
-      const def = renderWithProps(Table, {
+      const def = await renderSettled( {
         columns: cardColumns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -199,7 +208,7 @@ describe('Table', () => {
         def.container.querySelector('[data-tiger-table-mobile="card"] .grid-cols-12')
       ).toHaveClass('gap-3')
 
-      const custom = renderWithProps(Table, {
+      const custom = await renderSettled( {
         columns: cardColumns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -211,14 +220,14 @@ describe('Table', () => {
       expect(grid).not.toHaveClass('gap-3')
     })
 
-    it('renders configured card fields in a responsive grid layout', () => {
+    it('renders configured card fields in a responsive grid layout', async () => {
       stubCardViewport(true)
       const cardColumns: TableColumn[] = [
         { key: 'name', title: 'Name', cardTitle: true },
         { key: 'email', title: 'Email', cardGrid: { colSpan: 6, labelPosition: 'top' } },
         { key: 'age', title: 'Age', cardGrid: { colSpan: 4, hideLabel: true } }
       ]
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: cardColumns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -236,7 +245,7 @@ describe('Table', () => {
       expect(ageField).not.toHaveTextContent('Age')
     })
 
-    it('uses cardLayout ahead of column-level cardGrid options', () => {
+    it('uses cardLayout ahead of column-level cardGrid options', async () => {
       stubCardViewport(true)
       const cardColumns: TableColumn[] = [
         { key: 'name', title: 'Name', cardTitle: true },
@@ -251,7 +260,7 @@ describe('Table', () => {
           }
         }
       ]
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: cardColumns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -285,9 +294,9 @@ describe('Table', () => {
       expect(emailField.querySelector('.column-label')).not.toBeInTheDocument()
     })
 
-    it('supports inline selection controls and configurable card padding', () => {
+    it('supports inline selection controls and configurable card padding', async () => {
       stubCardViewport(true)
-      const { container, getByLabelText } = renderWithProps(Table, {
+      const { container, getByLabelText } = await renderSettled( {
         columns: [
           { key: 'name', title: 'Name', cardTitle: true },
           { key: 'age', title: 'Age' }
@@ -308,9 +317,9 @@ describe('Table', () => {
       expect(title).toContainElement(getByLabelText('Pick row 1'))
     })
 
-    it('uses custom card padding classes', () => {
+    it('uses custom card padding classes', async () => {
       stubCardViewport(true)
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -326,7 +335,7 @@ describe('Table', () => {
     it('uses table labels and themed selection controls in card mode', async () => {
       stubCardViewport(true)
       const onSelectionChange = vi.fn()
-      const { getByText, getByLabelText, container } = renderWithProps(Table, {
+      const { getByText, getByLabelText, container } = await renderSettled( {
         columns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -356,9 +365,9 @@ describe('Table', () => {
       expect(getByText('Less')).toBeInTheDocument()
     })
 
-    it('renders Empty and custom card slot in card mode', () => {
+    it('renders Empty and custom card slot in card mode', async () => {
       stubCardViewport(true)
-      const empty = renderWithProps(Table, {
+      const empty = await renderSettled( {
         columns,
         dataSource: [],
         responsiveMode: 'card',
@@ -381,6 +390,7 @@ describe('Table', () => {
             h('div', { 'data-testid': 'custom-card' }, String(record.name))
         }
       })
+      await nextTick()
 
       expect(getByTestId('custom-card')).toHaveTextContent('John Doe')
       expect(getByTestId('custom-card').closest('.custom-card')).toBeInTheDocument()
@@ -393,7 +403,7 @@ describe('Table', () => {
         { key: 'name', title: 'Name', sortable: true },
         { key: 'age', title: 'Age', sortable: true }
       ]
-      const { container, getByText } = renderWithProps(Table, {
+      const { container, getByText } = await renderSettled( {
         columns: sortableColumns,
         dataSource,
         responsiveMode: 'card',
@@ -413,9 +423,9 @@ describe('Table', () => {
     })
   })
 
-  describe('Props', () => {
-    it('should show border when bordered is true', () => {
-      const { container } = renderWithProps(Table, {
+  describe('Props', async () => {
+    it('should show border when bordered is true', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         bordered: true
@@ -426,8 +436,8 @@ describe('Table', () => {
       const borderWrapper = Array.from(wrappers).find((div) => div.classList.contains('border'))
       expect(borderWrapper).toBeTruthy()
     })
-    it('should disable pagination when pagination is false', () => {
-      const { container } = renderWithProps(Table, {
+    it('should disable pagination when pagination is false', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         pagination: false
@@ -437,7 +447,7 @@ describe('Table', () => {
       expect(pagination).not.toBeInTheDocument()
     })
 
-    it('marks large non-virtual data sets with a virtual recommendation', () => {
+    it('marks large non-virtual data sets with a virtual recommendation', async () => {
       const largeData = Array.from({ length: 4 }, (_, index) => ({
         id: index,
         name: `User ${index}`,
@@ -445,7 +455,7 @@ describe('Table', () => {
         email: `user${index}@example.com`
       }))
 
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns,
         dataSource: largeData,
         pagination: false,
@@ -459,7 +469,7 @@ describe('Table', () => {
       )
     })
 
-    it('does not auto-enable virtual mode unless autoVirtual is set', () => {
+    it('does not auto-enable virtual mode unless autoVirtual is set', async () => {
       const largeData = Array.from({ length: 4 }, (_, index) => ({
         id: index,
         name: `User ${index}`,
@@ -467,7 +477,7 @@ describe('Table', () => {
         email: `user${index}@example.com`
       }))
 
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns,
         dataSource: largeData,
         pagination: false,
@@ -478,7 +488,7 @@ describe('Table', () => {
       expect(container.querySelector('[data-tiger-virtual-recommended="true"]')).toBeTruthy()
     })
 
-    it('auto-enables virtual mode when autoVirtual is true', () => {
+    it('auto-enables virtual mode when autoVirtual is true', async () => {
       const largeData = Array.from({ length: 4 }, (_, index) => ({
         id: index,
         name: `User ${index}`,
@@ -486,18 +496,19 @@ describe('Table', () => {
         email: `user${index}@example.com`
       }))
 
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns,
         dataSource: largeData,
         pagination: false,
         autoVirtual: true,
-        virtualThreshold: 4
+        virtualThreshold: 4,
+        virtualHeight: 100
       })
 
       expect(container.querySelector('[data-tiger-virtual="enabled"]')).toBeTruthy()
     })
 
-    it('keeps virtual overflow on an inner scroller around the table, not export or Pagination', () => {
+    it('keeps virtual overflow on an inner scroller around the table, not export or Pagination', async () => {
       const rows = Array.from({ length: 15 }, (_, index) => ({
         id: index,
         name: `User ${index}`,
@@ -505,7 +516,7 @@ describe('Table', () => {
         email: `user${index}@example.com`
       }))
 
-      const { container, getByText } = renderWithProps(Table, {
+      const { container, getByText } = await renderSettled( {
         columns,
         dataSource: rows,
         virtual: true,
@@ -538,14 +549,14 @@ describe('Table', () => {
       expect(scroller.contains(pagination)).toBe(false)
     })
 
-    it('pads the virtual window with borderless spacer rows', () => {
+    it('pads the virtual window with borderless spacer rows', async () => {
       const rows = Array.from({ length: 40 }, (_, index) => ({
         id: index,
         name: `User ${index}`,
         age: index,
         email: `user${index}@example.com`
       }))
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns,
         dataSource: rows,
         pagination: false,
@@ -561,13 +572,13 @@ describe('Table', () => {
   })
 
   describe('Sorting', () => {
-    it('renders a real sort button on sortable headers for keyboard access', () => {
+    it('renders a real sort button on sortable headers for keyboard access', async () => {
       const sortableColumns = [
         { key: 'name', title: 'Name', sortable: true },
         { key: 'age', title: 'Age' }
       ]
 
-      const { getByText } = renderWithProps(Table, {
+      const { getByText } = await renderSettled( {
         columns: sortableColumns,
         dataSource
       })
@@ -674,7 +685,7 @@ describe('Table', () => {
         { key: 'ageCol', title: 'Age', dataKey: 'age', filter: { type: 'text' } }
       ]
 
-      const { container, getByText } = renderWithProps(Table, {
+      const { container, getByText } = await renderSettled( {
         columns: splitColumns,
         dataSource,
         pagination: false
@@ -690,6 +701,7 @@ describe('Table', () => {
 
       const filterInput = container.querySelector('thead input[type="text"]') as HTMLInputElement
       await fireEvent.input(filterInput, { target: { value: '32' } })
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
       await nextTick()
 
       const rows = container.querySelectorAll('tbody tr')
@@ -698,8 +710,8 @@ describe('Table', () => {
     })
   })
 
-  describe('Filtering', () => {
-    it('should render filter input for columns with filter config', () => {
+  describe('Filtering', async () => {
+    it('should render filter input for columns with filter config', async () => {
       const filterColumns = [
         {
           key: 'name',
@@ -709,7 +721,7 @@ describe('Table', () => {
         { key: 'age', title: 'Age' }
       ]
 
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: filterColumns,
         dataSource
       })
@@ -719,7 +731,7 @@ describe('Table', () => {
       expect(filterInput).toHaveAttribute('placeholder', 'Search...')
     })
 
-    it('should render filter select for select type filter', () => {
+    it('should render filter select for select type filter', async () => {
       const filterColumns = [
         {
           key: 'status',
@@ -734,7 +746,7 @@ describe('Table', () => {
         }
       ]
 
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: filterColumns,
         dataSource: [
           { id: 1, status: 'active' },
@@ -746,8 +758,8 @@ describe('Table', () => {
       expect(filterSelect).toBeInTheDocument()
     })
 
-    it('binds controlled filters and names the filter control', () => {
-      const { getByLabelText, container } = renderWithProps(Table, {
+    it('binds controlled filters and names the filter control', async () => {
+      const { getByLabelText, container } = await renderSettled( {
         columns: [{ key: 'name', title: 'Name', filter: { type: 'text' } }],
         dataSource,
         filters: { name: 'Jane' },
@@ -760,7 +772,7 @@ describe('Table', () => {
 
     it('sorts when the header cell is clicked', async () => {
       const onSortChange = vi.fn()
-      const { getByText } = renderWithProps(Table, {
+      const { getByText } = await renderSettled( {
         columns: [{ key: 'name', title: 'Name', sortable: true }],
         dataSource,
         pagination: false,
@@ -772,7 +784,7 @@ describe('Table', () => {
     })
   })
 
-  describe('Pagination', () => {
+  describe('Pagination', async () => {
     it('should emit page-change event when clicking next button', async () => {
       const onPageChange = vi.fn()
 
@@ -853,7 +865,7 @@ describe('Table', () => {
       expect(getByText('Jane Smith')).toBeInTheDocument()
     })
 
-    it('should render dataSource as-is and derive page count from total in remote mode', () => {
+    it('should render dataSource as-is and derive page count from total in remote mode', async () => {
       // Server-side pagination: dataSource holds only the current page (page 2 of 48 items)
       const pageTwoRows = Array.from({ length: 10 }, (_, i) => ({
         id: i + 11,
@@ -862,7 +874,7 @@ describe('Table', () => {
         email: `person${i + 11}@example.com`
       }))
 
-      const { container, getByText, getByRole, getByLabelText } = renderWithProps(Table, {
+      const { container, getByText, getByRole, getByLabelText } = await renderSettled( {
         columns,
         dataSource: pageTwoRows,
         pagination: { remote: true, current: 2, pageSize: 10, total: 48 }
@@ -880,14 +892,14 @@ describe('Table', () => {
   })
 
   describe('Fixed Columns', () => {
-    it('keeps striped background on fixed body cells', () => {
+    it('keeps striped background on fixed body cells', async () => {
       const fixedColumns = [
-        { key: 'name', title: 'Name', width: 140, fixed: 'left' },
+        { key: 'name', title: 'Name', width: 140, fixed: 'start' },
         { key: 'age', title: 'Age', width: 120 },
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { getByText } = renderWithProps(Table, {
+      const { getByText } = await renderSettled( {
         columns: fixedColumns,
         dataSource,
         striped: true,
@@ -897,13 +909,13 @@ describe('Table', () => {
       expect(getByText('John Doe').closest('td')).toHaveClass(tableFixedStripeBgClass)
     })
 
-    it('supports fixedClassName and fixedHeaderClassName overrides', () => {
+    it('supports fixedClassName and fixedHeaderClassName overrides', async () => {
       const fixedColumns = [
         {
           key: 'name',
           title: 'Name',
           width: 140,
-          fixed: 'left',
+          fixed: 'start',
           fixedHeaderClassName: 'custom-fixed-header',
           fixedClassName: ({
             selected,
@@ -918,7 +930,7 @@ describe('Table', () => {
         { key: 'age', title: 'Age', width: 120 }
       ]
 
-      const { getByText } = renderWithProps(Table, {
+      const { getByText } = await renderSettled( {
         columns: fixedColumns,
         dataSource,
         pagination: false,
@@ -929,13 +941,13 @@ describe('Table', () => {
       })
 
       expect(getByText('Name').closest('th')).toHaveClass('custom-fixed-header')
-      expect(getByText('John Doe').closest('td')).toHaveClass('table-left-selected')
+      expect(getByText('John Doe').closest('td')).toHaveClass('table-start-selected')
     })
   })
 
   describe('Hidden Columns', () => {
-    it('hides columns listed in defaultHiddenColumnKeys (uncontrolled)', () => {
-      const { queryByText, getByText } = renderWithProps(Table, {
+    it('hides columns listed in defaultHiddenColumnKeys (uncontrolled)', async () => {
+      const { queryByText, getByText } = await renderSettled( {
         columns,
         dataSource,
         defaultHiddenColumnKeys: ['email']
@@ -947,7 +959,7 @@ describe('Table', () => {
     })
 
     it('hides columns via the controlled hiddenColumnKeys prop and reacts to updates', async () => {
-      const { queryByText, getByText, rerender } = renderWithProps(Table, {
+      const { queryByText, getByText, rerender } = await renderSettled( {
         columns,
         dataSource,
         hiddenColumnKeys: ['age']
@@ -960,14 +972,14 @@ describe('Table', () => {
       expect(getByText('Age')).toBeInTheDocument()
     })
 
-    it('recalculates fixed column offsets based on visible columns only', () => {
+    it('recalculates fixed column offsets based on visible columns only', async () => {
       const fixedColumns = [
-        { key: 'name', title: 'Name', width: 140, fixed: 'left' as const },
-        { key: 'age', title: 'Age', width: 120, fixed: 'left' as const },
+        { key: 'name', title: 'Name', width: 140, fixed: 'start' as const },
+        { key: 'age', title: 'Age', width: 120, fixed: 'start' as const },
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { getByText } = renderWithProps(Table, {
+      const { getByText } = await renderSettled( {
         columns: fixedColumns,
         dataSource,
         pagination: false,
@@ -976,7 +988,7 @@ describe('Table', () => {
 
       const ageHeader = getByText('Age').closest('th')!
       expect(ageHeader).toHaveStyle('position: sticky')
-      expect(ageHeader).toHaveStyle('left: 0px')
+      expect(ageHeader).toHaveStyle({ insetInlineStart: '0px' })
     })
   })
 
@@ -988,7 +1000,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { container, getByLabelText, getByText } = renderWithProps(Table, {
+      const { container, getByLabelText, getByText } = await renderSettled( {
         columns: lockableColumns,
         dataSource,
         pagination: false,
@@ -1001,7 +1013,7 @@ describe('Table', () => {
 
       const emailHeaderLocked = getByText('Email').closest('th')!
       expect(emailHeaderLocked).toHaveStyle('position: sticky')
-      expect(emailHeaderLocked).toHaveStyle('left: 0px')
+      expect(emailHeaderLocked).toHaveStyle({ insetInlineStart: '0px' })
       expect(emailHeaderLocked).toHaveClass(tableHeaderBgClass)
       expect(
         Array.from(container.querySelectorAll('thead th')).map((th) => th.textContent?.trim())
@@ -1022,7 +1034,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { container, getByLabelText } = renderWithProps(Table, {
+      const { container, getByLabelText } = await renderSettled( {
         columns: lockableColumns,
         dataSource,
         pagination: false,
@@ -1046,13 +1058,13 @@ describe('Table', () => {
 
     it('moves a newly locked middle column into the compact left fixed area', async () => {
       const lockableColumns = [
-        { key: 'name', title: 'Name', width: 200, fixed: 'left' as const },
+        { key: 'name', title: 'Name', width: 200, fixed: 'start' as const },
         { key: 'email', title: 'Email', width: 400 },
         { key: 'age', title: 'Age', width: 200 },
         { key: 'role', title: 'Role', width: 240 }
       ]
 
-      const { container, getByLabelText, getByText } = renderWithProps(Table, {
+      const { container, getByLabelText, getByText } = await renderSettled( {
         columns: lockableColumns,
         dataSource,
         pagination: false,
@@ -1069,12 +1081,12 @@ describe('Table', () => {
       const ageHeaderLocked = getByText('Age').closest('th')!
       const emailHeader = getByText('Email').closest('th')!
       expect(ageHeaderLocked).toHaveStyle('position: sticky')
-      expect(ageHeaderLocked).toHaveStyle('left: 200px')
+      expect(ageHeaderLocked).toHaveStyle({ insetInlineStart: '200px' })
       expect(emailHeader).not.toHaveStyle('position: sticky')
     })
 
-    it('does not render a colgroup for a plain table without fixed or lockable columns', () => {
-      const { container } = renderWithProps(Table, {
+    it('does not render a colgroup for a plain table without fixed or lockable columns', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         pagination: false
@@ -1085,8 +1097,8 @@ describe('Table', () => {
   })
 
   describe('Row Selection', () => {
-    it('should render checkbox column when rowSelection is provided', () => {
-      const { container } = renderWithProps(Table, {
+    it('should render checkbox column when rowSelection is provided', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         rowSelection: {
@@ -1151,8 +1163,8 @@ describe('Table', () => {
       expect(firstRowCheckboxAfter).toBeChecked()
     })
 
-    it('should support radio selection', () => {
-      const { container } = renderWithProps(Table, {
+    it('should support radio selection', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         rowSelection: {
@@ -1169,8 +1181,8 @@ describe('Table', () => {
       expect(radios[0]).toHaveAttribute('aria-label')
     })
 
-    it('keeps radio, expand, and summary chrome in the same order', () => {
-      const { container } = renderWithProps(Table, {
+    it('keeps radio, expand, and summary chrome in the same order', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         pagination: false,
@@ -1192,8 +1204,8 @@ describe('Table', () => {
   })
 
   describe('Loading State', () => {
-    it('should show loading overlay when loading is true', () => {
-      const { container } = renderWithProps(Table, {
+    it('should show loading overlay when loading is true', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         loading: true
@@ -1205,7 +1217,7 @@ describe('Table', () => {
   })
 
   describe('Custom Rendering', () => {
-    it('should render custom cell content', () => {
+    it('should render custom cell content', async () => {
       const customColumns = [
         {
           key: 'name',
@@ -1214,7 +1226,7 @@ describe('Table', () => {
         }
       ]
 
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: customColumns,
         dataSource
       })
@@ -1223,7 +1235,7 @@ describe('Table', () => {
       expect(strongElements.length).toBe(dataSource.length)
     })
 
-    it('should render custom header content', () => {
+    it('should render custom header content', async () => {
       const customColumns = [
         {
           key: 'name',
@@ -1232,7 +1244,7 @@ describe('Table', () => {
         }
       ]
 
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns: customColumns,
         dataSource
       })
@@ -1245,7 +1257,7 @@ describe('Table', () => {
 
   describe('Accessibility', () => {
     it('should have no a11y violations without row selection', async () => {
-      const { container } = renderWithProps(Table, {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         pagination: false // Disable pagination to avoid selector label issues in test
@@ -1254,8 +1266,8 @@ describe('Table', () => {
       await expectNoA11yViolationsIsolated(container)
     })
 
-    it('should have proper table structure', () => {
-      const { container } = renderWithProps(Table, {
+    it('should have proper table structure', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         pagination: false
@@ -1302,7 +1314,7 @@ describe('Table', () => {
       expect(onRowClick).toHaveBeenCalledTimes(2)
     })
 
-    it('exposes aria-selected on rows and leaves plain rows unfocusable (C21)', () => {
+    it('exposes aria-selected on rows and leaves plain rows unfocusable (C21)', async () => {
       const selected = render(Table, {
         props: {
           columns,
@@ -1318,7 +1330,7 @@ describe('Table', () => {
 
       const plain = render(Table, { props: { columns, dataSource } })
       const plainRow = plain.container.querySelector('tbody tr')!
-      expect(plainRow.getAttribute('tabindex')).toBeNull()
+      expect(plainRow.getAttribute('tabindex')).toBe('0')
       expect(plainRow.getAttribute('aria-selected')).toBeNull()
     })
 
@@ -1351,13 +1363,13 @@ describe('Table', () => {
     })
   })
 
-  describe('Expandable Rows', () => {
+  describe('Expandable Rows', async () => {
     const expandableConfig = {
       expandedRowRender: (record: Record<string, unknown>) =>
         h('div', { class: 'expanded-content' }, `Details for ${record.name}`)
     }
     it('should expand row on clicking expand button', async () => {
-      const { getAllByRole, getByText } = renderWithProps(Table, {
+      const { getAllByRole, getByText } = await renderSettled( {
         columns,
         dataSource,
         expandable: expandableConfig
@@ -1410,8 +1422,8 @@ describe('Table', () => {
       )
     })
 
-    it('should respect rowExpandable function', () => {
-      const { getAllByRole, container } = renderWithProps(Table, {
+    it('should respect rowExpandable function', async () => {
+      const { getAllByRole, container } = await renderSettled( {
         columns,
         dataSource,
         expandable: {
@@ -1430,7 +1442,7 @@ describe('Table', () => {
     })
 
     it('should expand row by clicking entire row when expandRowByClick is true', async () => {
-      const { getByText } = renderWithProps(Table, {
+      const { getByText } = await renderSettled( {
         columns,
         dataSource,
         expandable: {
@@ -1449,7 +1461,7 @@ describe('Table', () => {
     it('should reuse cached row keys when expanding by row click', async () => {
       const rowKey = vi.fn((record: Record<string, unknown>) => record.id as number)
 
-      const { getByText } = renderWithProps(Table, {
+      const { getByText } = await renderSettled( {
         columns,
         dataSource,
         rowKey,
@@ -1489,7 +1501,7 @@ describe('Table', () => {
     })
 
     it('should set aria-expanded attribute on expand button', async () => {
-      const { getAllByRole } = renderWithProps(Table, {
+      const { getAllByRole } = await renderSettled( {
         columns,
         dataSource,
         expandable: expandableConfig
@@ -1509,9 +1521,9 @@ describe('Table', () => {
 
   // --- v0.6.0 Table upgrade tests ---
 
-  describe('v0.6.0 - Advanced Filtering', () => {
+  describe('v0.6.0 - Advanced Filtering', async () => {
     it('should filter data with advanced rules', async () => {
-      const { queryByText } = renderWithProps(Table, {
+      const { queryByText } = await renderSettled( {
         columns,
         dataSource,
         filterMode: 'advanced',
@@ -1525,9 +1537,9 @@ describe('Table', () => {
     })
   })
 
-  describe('v0.6.0 - Editable Cells', () => {
+  describe('v0.6.0 - Editable Cells', async () => {
     it('should enter edit mode on double-click', async () => {
-      const { container, getByText } = renderWithProps(Table, {
+      const { container, getByText } = await renderSettled( {
         columns,
         dataSource,
         editable: true,
@@ -1544,9 +1556,9 @@ describe('Table', () => {
     })
   })
 
-  describe('v0.6.0 - Summary Row', () => {
-    it('should render summary row when summaryRow.show is true', () => {
-      const { container } = renderWithProps(Table, {
+  describe('v0.6.0 - Summary Row', async () => {
+    it('should render summary row when summaryRow.show is true', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         summaryRow: { show: true, data: { name: 'Total', age: '105', email: '-' } },
@@ -1571,8 +1583,8 @@ describe('Table', () => {
       { key: 'dept', title: 'Dept' }
     ]
 
-    it('should render group headers when groupBy is set', () => {
-      const { container } = renderWithProps(Table, {
+    it('should render group headers when groupBy is set', async () => {
+      const { container } = await renderSettled( {
         columns: groupColumns,
         dataSource: groupData,
         groupBy: 'dept',
@@ -1587,8 +1599,8 @@ describe('Table', () => {
   })
 
   describe('v0.6.0 - Export', () => {
-    it('should render export button when exportable is true', () => {
-      const { getByText } = renderWithProps(Table, {
+    it('should render export button when exportable is true', async () => {
+      const { getByText } = await renderSettled( {
         columns,
         dataSource,
         exportable: true,
@@ -1600,8 +1612,8 @@ describe('Table', () => {
   })
 
   describe('v0.6.0 - Column Draggable', () => {
-    it('should set draggable attribute on headers when columnDraggable is true', () => {
-      const { container } = renderWithProps(Table, {
+    it('should set draggable attribute on headers when columnDraggable is true', async () => {
+      const { container } = await renderSettled( {
         columns,
         dataSource,
         columnDraggable: true,
@@ -1630,10 +1642,11 @@ describe('Table', () => {
         }
       })
 
+      const handle = container.querySelector('tbody tr button[draggable="true"]')!
+      expect(handle).toBeTruthy()
       const rows = container.querySelectorAll('tbody tr')
-      expect(rows[0]).toHaveAttribute('draggable', 'true')
 
-      await fireEvent.dragStart(rows[0])
+      await fireEvent.dragStart(handle)
       await fireEvent.dragOver(rows[2])
       await fireEvent.drop(rows[2])
 

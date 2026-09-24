@@ -1,5 +1,6 @@
-import { defineComponent, h, ref, computed, watch, type PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, useId, type PropType } from 'vue'
 import type { ComponentSize, SegmentedOption } from '@expcat/tigercat-core'
+import { icon24ViewBox } from '@expcat/tigercat-core/icons/common'
 import {
   getSegmentedContainerClasses,
   getSegmentedContainerStyle,
@@ -8,12 +9,14 @@ import {
   getSegmentedOptionClasses,
   getSegmentedTrackClasses,
   getSegmentedKeyboardTarget,
+  getSegmentedRovingIndex,
+  getSegmentedLabels,
+  mergeTigerLocale,
   classNames,
   coerceClassValue,
   mergeStyleValues,
   getLocaleDirection,
-  devWarn,
-  icon24ViewBox
+  devWarn
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -44,7 +47,9 @@ export const Segmented = defineComponent({
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
+    const autoName = useId()
     const rtl = computed(() => getLocaleDirection(config.value.locale) === 'rtl')
+    const groupLabels = computed(() => getSegmentedLabels(mergeTigerLocale(config.value.locale)))
     const isControlled = computed(() => props.modelValue !== undefined)
     const innerValue = ref<string | number | undefined>(props.defaultValue)
     const currentValue = computed(() => (isControlled.value ? props.modelValue : innerValue.value))
@@ -94,8 +99,11 @@ export const Segmented = defineComponent({
       }
 
       const selectedIndex = props.options.findIndex((opt) => opt.value === currentValue.value)
-      const firstEnabledIndex = props.options.findIndex((opt) => !opt.disabled)
-      const rovingIndex = selectedIndex >= 0 ? selectedIndex : firstEnabledIndex
+      const enabledIdxs = props.options.reduce<number[]>((acc, opt, i) => {
+        if (!opt.disabled && !props.disabled) acc.push(i)
+        return acc
+      }, [])
+      const rovingIndex = getSegmentedRovingIndex(selectedIndex, enabledIdxs)
       const attrsRecord = attrs as Record<string, unknown>
 
       return h(
@@ -112,12 +120,17 @@ export const Segmented = defineComponent({
             getSegmentedContainerStyle(props.options.length)
           ),
           role: 'radiogroup',
+          'aria-label': attrsRecord['aria-labelledby']
+            ? undefined
+            : (attrsRecord['aria-label'] as string | undefined) || groupLabels.value.ariaLabel,
           'aria-disabled': props.disabled || undefined
         },
         [
-          props.name != null
-            ? h('input', { type: 'hidden', name: props.name, value: currentValue.value ?? '' })
-            : null,
+          h('input', {
+            type: 'hidden',
+            name: props.name || autoName,
+            value: currentValue.value ?? ''
+          }),
           h('div', { class: getSegmentedTrackClasses(), 'aria-hidden': 'true' }, [
             h('div', {
               'data-tiger-segmented-indicator': 'true',

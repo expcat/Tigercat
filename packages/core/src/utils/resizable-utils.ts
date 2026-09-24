@@ -10,7 +10,7 @@ import type { AspectRatioPrimary, ResizeAxis, ResizeHandlePosition } from '../ty
 export const resizableBaseClasses = 'relative'
 
 export const resizableHandleBaseClasses =
-  'absolute z-10 tiger-motion-aware transition-opacity duration-150 opacity-0 pointer-events-none group-hover/resizable:opacity-100 group-hover/resizable:pointer-events-auto hover:opacity-100 hover:pointer-events-auto focus-visible:opacity-100 focus-visible:pointer-events-auto outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] touch-none'
+  'absolute z-10 tiger-motion-aware transition-opacity duration-150 opacity-40 hover:opacity-100 focus-visible:opacity-100 outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)] touch-none'
 
 export const resizableHandleDraggingClasses = 'opacity-100 pointer-events-auto'
 
@@ -138,18 +138,20 @@ export function calculateResizeDelta(
 }
 
 /**
- * Physical origin shift so the grabbed edge moves and the opposite edge stays.
+ * Layout shift so the grabbed start edge moves and the opposite edge stays.
+ * Values are logical margin deltas (inline-start / block-start), not a transform.
  */
 export function getResizeOriginShift(
   handle: ResizeHandlePosition,
   deltaWidth: number,
   deltaHeight: number,
-  rtl = false
+  _rtl = false
 ): { offsetX: number; offsetY: number } {
   const fromStart = handle === 'left' || handle === 'top-left' || handle === 'bottom-left'
   const fromTop = handle === 'top' || handle === 'top-left' || handle === 'top-right'
+  const inline = fromStart ? -deltaWidth : 0
   return {
-    offsetX: fromStart ? (rtl ? deltaWidth : -deltaWidth) : 0,
+    offsetX: _rtl ? -inline : inline,
     offsetY: fromTop ? -deltaHeight : 0
   }
 }
@@ -406,6 +408,19 @@ export function applyResizeJump(
   return { width, height, ...shift }
 }
 
+function addCssLength(existing: string | number | undefined, delta: number): string {
+  if (!delta) return existing == null ? '0px' : String(existing)
+  if (existing == null || existing === '') return `${delta}px`
+  if (typeof existing === 'number' && Number.isFinite(existing)) return `${existing + delta}px`
+  const matched = /^(-?\d+(?:\.\d+)?)px$/.exec(String(existing).trim())
+  if (matched) return `${Number(matched[1]) + delta}px`
+  return `calc(${existing} + ${delta}px)`
+}
+
+/**
+ * Width, height, and logical start live on the layout box.
+ * The caller's `transform` is left untouched.
+ */
 export function mergeResizableBoxStyle(
   userStyle: Record<string, string | number> | undefined,
   width: number | undefined,
@@ -416,8 +431,11 @@ export function mergeResizableBoxStyle(
   const next: Record<string, string | number> = { ...(userStyle ?? {}) }
   if (width != null) next.width = `${width}px`
   if (height != null) next.height = `${height}px`
-  if (offsetX !== 0 || offsetY !== 0) {
-    next.transform = `translate(${offsetX}px, ${offsetY}px)`
+  if (offsetX !== 0) {
+    next.marginInlineStart = addCssLength(userStyle?.marginInlineStart, offsetX)
+  }
+  if (offsetY !== 0) {
+    next.marginTop = addCssLength(userStyle?.marginTop, offsetY)
   }
   return next
 }

@@ -16,6 +16,8 @@ import type { DragItem } from '../types/drag'
 import { classNames } from './class-names'
 import { reorderSequence } from './drag'
 import { formatBytes, getFileExtensionName } from './file-utils'
+import { calculateVirtualRange, dynamicSizeStrategy } from './virtual-list-utils'
+import type { VirtualListSizeStrategy } from '../types/virtual-list'
 
 export const EMPTY_FILE_ITEMS: FileItem[] = []
 export const EMPTY_FILE_PATH: string[] = []
@@ -25,64 +27,77 @@ export const DEFAULT_FILE_GRID_COLUMNS = 4
 
 /** Container fill: optional `--tiger-file-manager-bg`, then registered `--tiger-surface`. */
 export const fileManagerContainerClasses =
-  'tiger-file-manager relative flex h-full min-h-0 flex-col border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-file-manager-bg,var(--tiger-surface,#ffffff))] overflow-hidden'
+  'tiger-file-manager relative flex h-full min-h-0 flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-file-manager-bg)] overflow-hidden'
+
+export const FILE_MANAGER_DEFAULT_HEIGHT = '20rem'
+export const FILE_MANAGER_LIST_ROW_HEIGHT = 40
+export const FILE_MANAGER_VIRTUAL_MIN_COUNT = 48
+export const FILE_BREADCRUMB_SEPARATOR = '›'
 
 /** Toolbar fill: optional `--tiger-file-manager-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const fileManagerToolbarClasses =
-  'flex items-center gap-2 px-3 py-2 border-b border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-file-manager-toolbar-bg,var(--tiger-surface-muted,#f9fafb))]'
+  'flex items-center gap-2 px-3 py-2 border-b border-[var(--tiger-border)] bg-[var(--tiger-file-manager-toolbar-bg)]'
 
 export const fileManagerBreadcrumbClasses =
-  'flex items-center gap-1 text-sm text-[var(--tiger-text-secondary,#6b7280)]'
+  'flex items-center gap-1 text-sm text-[var(--tiger-text-secondary)]'
 
 export const fileManagerBreadcrumbListClasses = 'm-0 flex list-none items-center gap-1 p-0'
 
 export const fileManagerBreadcrumbItemClasses =
-  'rounded-[var(--tiger-radius-sm,0.25rem)] bg-transparent p-0 text-sm text-[var(--tiger-text-secondary,#6b7280)] transition-colors hover:text-[var(--tiger-primary,#2563eb)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'rounded-[var(--tiger-radius-sm)] bg-transparent p-0 text-sm text-[var(--tiger-text-secondary)] transition-colors hover:text-[var(--tiger-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 
-export const fileManagerBreadcrumbCurrentClasses = 'text-sm text-[var(--tiger-text,#1f2937)]'
+export const fileManagerBreadcrumbCurrentClasses = 'text-sm text-[var(--tiger-text)]'
 
-export const fileManagerBreadcrumbSeparatorClasses = 'text-[var(--tiger-text-muted,#9ca3af)]'
+export const fileManagerBreadcrumbSeparatorClasses = 'text-[var(--tiger-text-secondary)]'
 
 export const fileManagerContentClasses = 'min-h-0 flex-1 overflow-auto p-2'
 
 export const fileManagerGridContentClasses = `${fileManagerContentClasses} grid gap-2`
 
 const fileItemFocusRing =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 
-export const fileManagerListItemClasses = `flex items-center gap-3 px-3 py-2 rounded-[var(--tiger-radius-md,0.5rem)] cursor-pointer transition-colors hover:bg-[var(--tiger-surface-muted,#f3f4f6)] ${fileItemFocusRing}`
+export const fileManagerListItemClasses = `flex items-center gap-3 px-3 py-2 rounded-[var(--tiger-radius-md)] cursor-pointer transition-colors hover:bg-[var(--tiger-surface-muted)] ${fileItemFocusRing}`
 
 export const fileManagerListItemSelectedClasses =
-  'bg-[var(--tiger-primary,#2563eb)]/10 hover:bg-[var(--tiger-primary,#2563eb)]/15'
+  'bg-[var(--tiger-primary)]/10 hover:bg-[var(--tiger-primary)]/15'
 
-export const fileManagerGridItemClasses = `flex flex-col items-center gap-2 p-3 rounded-[var(--tiger-radius-md,0.5rem)] cursor-pointer transition-colors hover:bg-[var(--tiger-surface-muted,#f3f4f6)] text-center ${fileItemFocusRing}`
+export const fileManagerGridItemClasses = `flex flex-col items-center gap-2 p-3 rounded-[var(--tiger-radius-md)] cursor-pointer transition-colors hover:bg-[var(--tiger-surface-muted)] text-center ${fileItemFocusRing}`
 
 export const fileManagerGridItemSelectedClasses =
-  'bg-[var(--tiger-primary,#2563eb)]/10 hover:bg-[var(--tiger-primary,#2563eb)]/15'
+  'bg-[var(--tiger-primary)]/10 hover:bg-[var(--tiger-primary)]/15'
 
 export const fileManagerItemDisabledClasses = 'cursor-default opacity-60 hover:bg-transparent'
 
-export const fileManagerItemIconClasses = 'text-[var(--tiger-text-muted,#9ca3af)] flex-shrink-0'
+export const fileManagerItemIconClasses = 'text-[var(--tiger-text-secondary)] flex-shrink-0'
 
 export const fileManagerItemNameClasses =
-  'text-sm font-medium text-[var(--tiger-text,#1f2937)] truncate'
+  'text-sm font-medium text-[var(--tiger-text)] truncate'
 
-export const fileManagerItemMetaClasses = 'text-xs text-[var(--tiger-text-muted,#9ca3af)]'
+export const fileManagerItemMetaClasses = 'text-xs text-[var(--tiger-text-secondary)]'
 
 export const fileManagerEmptyClasses =
-  'flex items-center justify-center py-12 text-sm text-[var(--tiger-text-muted,#9ca3af)]'
+  'flex items-center justify-center py-12 text-sm text-[var(--tiger-text-secondary)]'
 
 /** Loading overlay: same surface chain as the container, at 60% opacity. */
 export const fileManagerLoadingClasses =
-  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-file-manager-bg,var(--tiger-surface,#ffffff))]/60 z-10'
+  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-file-manager-bg)]/60 z-10'
 
 /** Search field fill: same surface chain as the container. */
-export const fileManagerSearchClasses = `px-3 py-1.5 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-file-manager-bg,var(--tiger-surface,#ffffff))] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]`
+export const fileManagerSearchClasses = `px-3 py-1.5 text-sm border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-file-manager-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-focus-ring)]`
 
 // ─── File operations ──────────────────────────────────────────────
 
-function fileKeyEquals(item: FileItem, segment: string | number): boolean {
-  return String(item.key) === String(segment)
+/** Strict key compare. A numeric key is not the same entry as its decimal string. */
+export function fileKeyEquals(item: FileItem, segment: string | number): boolean {
+  return item.key === segment
+}
+
+const BIDI_AND_BREAKS = /[\u0000-\u001F\u007F\u200E\u200F\u202A-\u202E\u2066-\u2069\u2028\u2029]/g
+
+/** Strip bidi controls and line breaks so a name cannot disguise the path. */
+export function sanitizeFileDisplayName(name: string): string {
+  return name.replace(BIDI_AND_BREAKS, '').replace(/[ \t]+/g, ' ').trim()
 }
 
 function compareModified(a: string | undefined, b: string | undefined): number {
@@ -171,7 +186,7 @@ export function getFileExtension(name: string): string {
 /**
  * Walk `path` (folder **keys**) and return that folder's children.
  */
-export function navigateToFolder(files: FileItem[], path: string[]): FileItem[] {
+export function navigateToFolder(files: FileItem[], path: readonly (string | number)[]): FileItem[] {
   let current = files
   for (const segment of path) {
     const folder = current.find((item) => item.type === 'folder' && fileKeyEquals(item, segment))
@@ -182,13 +197,16 @@ export function navigateToFolder(files: FileItem[], path: string[]): FileItem[] 
 }
 
 export interface FileBreadcrumbSegment {
-  key: string
+  key: string | number
   name: string
-  path: string[]
+  path: (string | number)[]
   current: boolean
 }
 
-export function getFilePathSegmentName(files: FileItem[], path: string[]): string {
+export function getFilePathSegmentName(
+  files: FileItem[],
+  path: readonly (string | number)[]
+): string {
   if (path.length === 0) return ''
   const parent = navigateToFolder(files, path.slice(0, -1))
   const key = path[path.length - 1]
@@ -198,7 +216,7 @@ export function getFilePathSegmentName(files: FileItem[], path: string[]): strin
 
 export function buildFileBreadcrumb(
   files: FileItem[],
-  currentPath: string[],
+  currentPath: readonly (string | number)[],
   rootText: string
 ): FileBreadcrumbSegment[] {
   const root: FileBreadcrumbSegment = {
@@ -210,8 +228,8 @@ export function buildFileBreadcrumb(
   const segments = currentPath.map((_, index) => {
     const path = currentPath.slice(0, index + 1)
     return {
-      key: String(currentPath[index]),
-      name: getFilePathSegmentName(files, path),
+      key: currentPath[index],
+      name: sanitizeFileDisplayName(getFilePathSegmentName(files, path)),
       path,
       current: index === currentPath.length - 1
     }
@@ -266,13 +284,13 @@ export const DEFAULT_FILE_COLUMNS: FileColumn[] = ['size', 'modified']
 
 export interface FileManagerModelInput {
   files: FileItem[]
-  currentPath: string[]
+  currentPath: readonly (string | number)[]
   selectedKeys: (string | number)[]
   sortField: FileSortField
   sortOrder: FileSortOrder
   showHidden: boolean
   searchText: string
-  /** When true, skip name/size sort so drop order is kept. */
+  /** Drag stays available while a filter hides rows. Sort still applies. */
   draggable?: boolean
 }
 
@@ -283,19 +301,12 @@ export interface FileManagerModelDerived {
   processedItems: FileItem[]
   /** Fast lookup set for selected keys */
   selectedSet: Set<string | number>
-  /** Whether HTML5 reorder is allowed for this view */
+  /** Whether pointer reorder is allowed. Filters do not turn this off. */
   canReorder: boolean
 }
 
-export function canReorderFileItems(
-  draggable: boolean,
-  searchText: string,
-  currentItems: FileItem[],
-  processedItems: FileItem[]
-): boolean {
-  if (!draggable) return false
-  if (searchText.trim()) return false
-  return processedItems.length === currentItems.length
+export function canReorderFileItems(draggable: boolean): boolean {
+  return draggable
 }
 
 /**
@@ -308,19 +319,14 @@ export function deriveFileManagerModel(input: FileManagerModelInput): FileManage
   if (input.searchText) {
     items = filterFileItems(items, input.searchText)
   }
-  const skipSort = Boolean(input.draggable) || input.sortField === 'none'
-  const processedItems = skipSort ? items : sortFileItems(items, input.sortField, input.sortOrder)
+  const processedItems =
+    input.sortField === 'none' ? items : sortFileItems(items, input.sortField, input.sortOrder)
   const selectedSet = new Set(input.selectedKeys)
   return {
     currentItems,
     processedItems,
     selectedSet,
-    canReorder: canReorderFileItems(
-      Boolean(input.draggable),
-      input.searchText,
-      currentItems,
-      processedItems
-    )
+    canReorder: canReorderFileItems(Boolean(input.draggable))
   }
 }
 
@@ -328,6 +334,20 @@ export function deriveFileManagerModel(input: FileManagerModelInput): FileManage
  * Toggle a file's selection state, respecting single / multi mode.
  * Returns the new selectedKeys array.
  */
+/** Click selects. It does not toggle the key off (double-click must not undo it). */
+export function selectFileItem(
+  selectedKeys: (string | number)[],
+  key: string | number,
+  multiple: boolean
+): (string | number)[] {
+  if (!multiple) {
+    if (selectedKeys.length === 1 && selectedKeys[0] === key) return selectedKeys
+    return [key]
+  }
+  if (selectedKeys.some((entry) => entry === key)) return selectedKeys
+  return [...selectedKeys, key]
+}
+
 export function toggleFileSelection(
   selectedKeys: (string | number)[],
   key: string | number,
@@ -347,7 +367,7 @@ export function toggleFileSelection(
 export interface FileOpenResult {
   type: 'navigate' | 'open'
   /** New path (when type === 'navigate') */
-  path?: string[]
+  path?: (string | number)[]
   /** The opened file item (when type === 'open') */
   item?: FileItem
 }
@@ -356,10 +376,13 @@ export interface FileOpenResult {
  * Determine the action when a file item is activated (double-click / Enter).
  * Returns `null` if the item is disabled. Folder navigation appends `item.key`.
  */
-export function resolveFileOpen(item: FileItem, currentPath: string[]): FileOpenResult | null {
+export function resolveFileOpen(
+  item: FileItem,
+  currentPath: readonly (string | number)[]
+): FileOpenResult | null {
   if (item.disabled) return null
   if (item.type === 'folder') {
-    return { type: 'navigate', path: [...currentPath, String(item.key)] }
+    return { type: 'navigate', path: [...currentPath, item.key] }
   }
   return { type: 'open', item }
 }
@@ -367,11 +390,16 @@ export function resolveFileOpen(item: FileItem, currentPath: string[]): FileOpen
 /**
  * Compute breadcrumb path after clicking an ancestor segment.
  */
-export function sliceBreadcrumbPath(currentPath: string[], index: number): string[] {
+export function sliceBreadcrumbPath(
+  currentPath: readonly (string | number)[],
+  index: number
+): (string | number)[] {
   return currentPath.slice(0, index)
 }
 
-export function getParentFilePath(currentPath: string[]): string[] | null {
+export function getParentFilePath(
+  currentPath: readonly (string | number)[]
+): (string | number)[] | null {
   if (currentPath.length === 0) return null
   return currentPath.slice(0, -1)
 }
@@ -435,7 +463,7 @@ export type FileManagerItemKeyAction =
   | { type: 'end'; index: number }
   | { type: 'select' }
   | { type: 'open' }
-  | { type: 'up'; path: string[] }
+  | { type: 'up'; path: (string | number)[] }
   | null
 
 export function resolveFileManagerItemKeydown(input: {
@@ -446,7 +474,7 @@ export function resolveFileManagerItemKeydown(input: {
   isRtl?: boolean
   currentIndex: number
   items: FileItem[]
-  currentPath: string[]
+  currentPath: readonly (string | number)[]
 }): FileManagerItemKeyAction {
   const { key, items, currentIndex } = input
   if (key === 'Home') {
@@ -479,14 +507,16 @@ export function resolveFileManagerItemKeydown(input: {
  */
 export function reorderFileTreeAtPath(
   files: FileItem[],
-  path: string[],
+  path: readonly (string | number)[],
   fromIndex: number,
   toIndex: number
 ): FileItem[] {
   if (path.length === 0) return reorderSequence(files, fromIndex, toIndex)
   const [head, ...rest] = path
+  let rewritten = false
   return files.map((item) => {
-    if (item.type !== 'folder' || !fileKeyEquals(item, head)) return item
+    if (rewritten || item.type !== 'folder' || !fileKeyEquals(item, head)) return item
+    rewritten = true
     return {
       ...item,
       children: reorderFileTreeAtPath(item.children ?? [], rest, fromIndex, toIndex)
@@ -494,27 +524,97 @@ export function reorderFileTreeAtPath(
   })
 }
 
+/**
+ * Reorder the folder on `path` only.
+ * `fromIndex` / `toIndex` address `visibleLayer` (sorted or filtered).
+ * The source index is the matching id in that folder, not the visible slot.
+ */
 export function applyFileManagerReorder(
   files: FileItem[],
-  path: string[],
+  path: readonly (string | number)[],
   fromIndex: number,
   toIndex: number,
-  currentItems: FileItem[]
+  visibleLayer: FileItem[]
 ): { files: FileItem[]; layer: FileItem[] } | null {
-  if (
-    fromIndex < 0 ||
-    toIndex < 0 ||
-    fromIndex >= currentItems.length ||
-    toIndex >= currentItems.length ||
-    fromIndex === toIndex
-  ) {
-    return null
+  const fromItem = visibleLayer[fromIndex]
+  const toItem = visibleLayer[toIndex]
+  if (!fromItem || !toItem || fromItem.key === toItem.key) return null
+  if (fromItem.disabled || toItem.disabled) return null
+  const source = navigateToFolder(files, path)
+  const sourceFrom = source.findIndex((item) => item.key === fromItem.key)
+  const sourceTo = source.findIndex((item) => item.key === toItem.key)
+  if (sourceFrom < 0 || sourceTo < 0 || sourceFrom === sourceTo) return null
+  const layer = reorderSequence(source, sourceFrom, sourceTo)
+  return { files: reorderFileTreeAtPath(files, path, sourceFrom, sourceTo), layer }
+}
+
+export interface FileManagerWindow {
+  start: number
+  end: number
+  offsetTop: number
+  totalHeight: number
+  virtual: boolean
+}
+
+/** Fixed-height window for a large current layer. Small layers render in full. */
+export function getFileManagerWindow(
+  count: number,
+  scrollTop: number,
+  viewport: number,
+  rowHeight = FILE_MANAGER_LIST_ROW_HEIGHT
+): FileManagerWindow {
+  if (count < FILE_MANAGER_VIRTUAL_MIN_COUNT || rowHeight <= 0) {
+    return {
+      start: 0,
+      end: count,
+      offsetTop: 0,
+      totalHeight: Math.max(0, count * rowHeight),
+      virtual: false
+    }
   }
-  const fromItem = currentItems[fromIndex]
-  const toItem = currentItems[toIndex]
-  if (!fromItem || fromItem.disabled || toItem?.disabled) return null
-  const layer = reorderSequence(currentItems, fromIndex, toIndex)
-  return { files: reorderFileTreeAtPath(files, path, fromIndex, toIndex), layer }
+  const range = calculateVirtualRange(
+    scrollTop,
+    viewport > 0 ? viewport : 320,
+    count,
+    rowHeight,
+    4
+  )
+  return { ...range, virtual: true }
+}
+
+/** Variable row heights, keyed by item id. Used when the current layer is large. */
+export function createFileManagerMeasure(estimatedHeight: number): {
+  strategy: VirtualListSizeStrategy
+  windowFor(keys: readonly (string | number)[], scrollTop: number, viewport: number): FileManagerWindow
+  measure(index: number, height: number, key: string | number): void
+} {
+  const strategy = dynamicSizeStrategy(estimatedHeight, 0)
+  return {
+    strategy,
+    windowFor(keys, scrollTop, viewport) {
+      if (keys.length < FILE_MANAGER_VIRTUAL_MIN_COUNT) {
+        return {
+          start: 0,
+          end: keys.length,
+          offsetTop: 0,
+          totalHeight: keys.length * estimatedHeight,
+          virtual: false
+        }
+      }
+      strategy.setItemKeys(keys)
+      const range = strategy.getRange(scrollTop, viewport > 0 ? viewport : 320, keys.length, 4)
+      return {
+        start: range.startIndex,
+        end: range.endIndex + 1,
+        offsetTop: range.offsetTop,
+        totalHeight: range.totalHeight,
+        virtual: true
+      }
+    },
+    measure(index, height, key) {
+      strategy.updateItemHeight(index, height, key)
+    }
+  }
 }
 
 // ─── Drag integration ─────────────────────────────────────────────

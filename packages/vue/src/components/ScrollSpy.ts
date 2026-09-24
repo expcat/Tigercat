@@ -12,6 +12,7 @@ import {
 import type { VNode } from 'vue'
 import {
   classNames,
+  resolveLinkHref,
   coerceClassValue,
   createProgrammaticScrollLock,
   createScrollSpyObserver,
@@ -205,14 +206,15 @@ export const ScrollSpy = defineComponent({
           const depth =
             flatItems.value.find((flat) => getScrollSpyKeyString(flat.key) === keyString)?.depth ??
             0
-          const hasHref = Boolean(item.href)
+          const safeHref = resolveLinkHref(item.href, { disabled: item.disabled })
+          const hasHref = Boolean(safeHref)
           const tag = hasHref ? 'a' : 'span'
 
           return h('li', { key: keyString, 'data-depth': depth }, [
             h(
               tag,
               {
-                href: hasHref ? item.href : undefined,
+                href: safeHref,
                 class: getScrollSpyItemClasses(isActive, item.disabled),
                 'aria-current': isActive ? 'location' : undefined,
                 'aria-disabled': item.disabled || undefined,

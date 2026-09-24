@@ -13,10 +13,17 @@ components and overlay/focus helpers remain tree-shakeable through normal subpat
 
 ## Keyboard Baseline
 
+Keyboard helpers read `event.key` only. Space is the `' '` key.
+
 - `Tab` / `Shift+Tab`: move between focusable controls.
 - `Enter`: activate buttons, links, menu items, highlighted options, or confirm actions.
 - `Space`: toggle checkbox, radio, switch, button, and selectable items.
 - `Esc`: close the current overlay, cancel temporary state, and restore focus to the trigger.
+
+## Focus scope and live regions
+
+- Modal, Drawer, and other traps share one stacked scope, `createFocusScope`. Tab cycles in sequential focus order (positive `tabindex` first), focus that leaves is pulled back, Escape reaches only the topmost scope, lower modals are `inert`, and closing restores focus and scroll. Toast layers use `data-tiger-toast` and stay interactive.
+- Announcements are caller-owned. `manageLiveRegion()` creates one region per caller; `destroy` removes that node and cancels a pending frame. `polite` is `role="status"`. `assertive` is `aria-live="assertive"` only. Components that are not live regions stay quiet until the caller sets `role` / `aria-live`.
 - Arrow keys: move within composite widgets.
 - `Home` / `End`: move to the first or last item in a composite widget.
 - `PageUp` / `PageDown`: page through date, time, pagination, or virtualized views.
@@ -24,7 +31,7 @@ components and overlay/focus helpers remain tree-shakeable through normal subpat
 ## Component Expectations
 
 - Forms: labels must be associated with controls; required, disabled, readonly, invalid, and error states must be announced.
-- Overlays: Modal, Drawer, Tour, and Spotlight trap focus while open, restore focus to the trigger on close, inert the rest of the document, and still `preventDefault` Tab when the trap has no focusable nodes. Nested Select/Dropdown portal into the current overlay-host so Tab cannot leave. Esc dismisses the topmost layer and restores trigger focus.
+- Overlays: Modal, Drawer, Tour, Spotlight, and fullscreen Loading share one focus stack. They trap focus while open, restore it on close, inert the rest of the document, and still `preventDefault` Tab when the trap has no focusable nodes. Fullscreen Loading sits above modals. Popover and Popconfirm leave focus on the trigger and close when Tab leaves; a Popconfirm promise in progress cannot be dismissed. Nested Select/Dropdown portal into the current overlay-host so Tab cannot leave. Esc dismisses the topmost layer and restores trigger focus. Toast hosts carry `data-tiger-toast` so inert skips them without treating them as a modal.
 - Navigation: current, selected, expanded, and disabled states must be exposed through ARIA or semantic markup.
 - Tables and data views: headers, sorting, filtering, expanded rows, loading, and empty states must be perceivable.
 - Charts: provide a concise accessible name and keyboard access for interactive legends, tooltips, data points, export, zoom, or brush controls; color must not be the only information channel.

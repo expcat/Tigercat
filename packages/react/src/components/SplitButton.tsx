@@ -7,7 +7,7 @@ import {
   getSplitButtonTriggerClasses,
   resolveLocaleText,
   splitButtonDropdownClasses,
-  resolveButtonHtmlType,
+  resolveButtonType,
   resolveSplitButtonSize,
   resolveSplitButtonTriggerAriaLabel,
   resolveSplitButtonVariant,
@@ -15,6 +15,7 @@ import {
   type SplitButtonProps as CoreSplitButtonProps
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
+import { ButtonGroupContext } from './ButtonGroup'
 import { useTigerConfig } from './ConfigProvider'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 
@@ -104,9 +105,8 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
     loading = false,
     danger = false,
     block = false,
-    htmlType,
     type,
-    iconPosition = 'left',
+    iconPosition = 'start',
     icon,
     loadingIcon,
     trigger,
@@ -143,16 +143,19 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
   const primaryClasses = getSplitButtonPrimaryClasses({ block })
   const triggerClasses = getSplitButtonTriggerClasses({ size: resolvedSize })
 
+  const unavailable = disabled || loading
+
   return (
+    <ButtonGroupContext.Provider value={{}}>
     <div className={rootClasses} style={style} role="group" data-split-button="" {...rest}>
       <Button
         ref={forwardedRef}
         variant={resolvedVariant}
         size={resolvedSize}
-        disabled={disabled}
+        disabled={unavailable}
         loading={loading}
         danger={danger}
-        htmlType={resolveButtonHtmlType(htmlType, type)}
+        type={resolveButtonType(type)}
         iconPosition={iconPosition}
         icon={icon}
         loadingIcon={loadingIcon}
@@ -168,7 +171,7 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
           trigger="click"
           showArrow={false}
           asChild
-          disabled={disabled}
+          disabled={unavailable}
           open={open}
           defaultOpen={defaultOpen}
           closeOnClick={closeOnClick}
@@ -183,9 +186,9 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
             <Button
               variant={resolvedVariant}
               size={resolvedSize}
-              disabled={disabled}
+              disabled={unavailable}
               danger={danger}
-              htmlType="button"
+              type="button"
               className={triggerClasses}
               aria-label={triggerLabel}
               aria-disabled={loading || undefined}
@@ -200,6 +203,7 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
         </Dropdown>
       ) : null}
     </div>
+    </ButtonGroupContext.Provider>
   )
 })
 

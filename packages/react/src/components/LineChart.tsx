@@ -19,6 +19,7 @@ import {
   resolveCartesianSeriesScales,
   CHART_SURFACE_FILL,
   LINE_DRAW_CLASS,
+  chartHoverShadowStyle,
   getChartLabels,
   mergeTigerLocale,
   formatChartTemplate,
@@ -63,12 +64,12 @@ export const LineChart: React.FC<LineChartProps> = ({
   width = 320,
   height = 200,
   padding = DEFAULT_CHART_PADDING,
-  responsive = false,
+  responsive = true,
   data,
   series,
   xScale: xScaleProp,
   yScale: yScaleProp,
-  lineColor = 'var(--tiger-primary,#2563eb)',
+  lineColor = 'var(--tiger-primary)',
   strokeWidth = 2,
   curve = 'linear',
   showPoints = true,
@@ -285,9 +286,8 @@ export const LineChart: React.FC<LineChartProps> = ({
   const handlePointClick = useCallback(
     (seriesIndex: number, pointIndex: number) => {
       onPointClick?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
-      handleSeriesSelect(seriesIndex)
     },
-    [onPointClick, resolvedSeries, handleSeriesSelect]
+    [onPointClick, resolvedSeries]
   )
 
   const pointClickable = Boolean(onPointClick)
@@ -418,16 +418,6 @@ export const LineChart: React.FC<LineChartProps> = ({
           label={yAxisLabel}
         />
       )}
-      {trackPointHover ? (
-        <rect
-          width={innerRect.width}
-          height={innerRect.height}
-          fill="transparent"
-          data-plot-hit=""
-          onMouseMove={handlePlotMouseMove}
-          onMouseLeave={handlePointMouseLeave}
-        />
-      ) : null}
       {seriesData.map((sd) => {
         const canAnimateStroke = animated && !sd.strokeDasharray
         return (
@@ -450,7 +440,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                 d={sd.areaPath}
                 fill={`url(#${gradientPrefix}-${sd.seriesKey})`}
                 stroke="none"
-                className="transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]"
+                className="transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]"
                 data-area-series={sd.seriesIndex}
                 data-series-key={sd.seriesKey}
               />
@@ -468,7 +458,7 @@ export const LineChart: React.FC<LineChartProps> = ({
               className={classNames(
                 animated && !sd.strokeDasharray
                   ? undefined
-                  : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]',
+                  : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]',
                 canAnimateStroke && LINE_DRAW_CLASS
               )}
               data-line-series={sd.seriesIndex}
@@ -501,7 +491,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                       animated ? linePointTransitionClasses : undefined,
                       pointInteractive && 'cursor-pointer'
                     )}
-                    style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
+                    style={isHovered ? chartHoverShadowStyle(sd.color) : undefined}
                     role={pointInteractive ? 'button' : undefined}
                     aria-hidden={pointInteractive ? undefined : true}
                     aria-label={
@@ -559,6 +549,16 @@ export const LineChart: React.FC<LineChartProps> = ({
           </ChartSeries>
         )
       })}
+      {trackPointHover ? (
+        <rect
+          width={innerRect.width}
+          height={innerRect.height}
+          fill="transparent"
+          data-plot-hit=""
+          onMouseMove={handlePlotMouseMove}
+          onMouseLeave={handlePointMouseLeave}
+        />
+      ) : null}
     </ChartCanvas>
   )
 

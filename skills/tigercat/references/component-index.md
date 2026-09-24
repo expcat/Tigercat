@@ -87,11 +87,11 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | NotificationCenter    | Composite  | `composite`  | notification-center.ts                              | ./NotificationCenter    |
 | SchemaForm            | Composite  | `composite`  | schema-form.ts                                      | ./SchemaForm            |
 | TaskBoard             | Composite  | `composite`  | task-board.ts                                       | ./TaskBoard             |
-| WorkflowActionBar     | Composite  | `composite`  | workflow-timeline.ts                                | ./WorkflowActionBar     |
+| WorkflowActionBar     | Composite  | `composite`  | workflow-action-bar.ts                              | ./WorkflowActionBar     |
 | WorkflowDesigner      | Composite  | `composite`  | workflow-designer.ts                                | ./WorkflowDesigner      |
 | WorkflowDetailShell   | Composite  | `composite`  | workflow-detail-shell.ts                            | ./WorkflowDetailShell   |
 | WorkflowTimeline      | Composite  | `composite`  | workflow-timeline.ts                                | ./WorkflowTimeline      |
-| WorkflowViewer        | Composite  | `composite`  | workflow-timeline.ts                                | ./WorkflowViewer        |
+| WorkflowViewer        | Composite  | `composite`  | workflow-viewer.ts                                  | ./WorkflowViewer        |
 | Calendar              | Data       | `data`       | calendar.ts                                         | ./Calendar              |
 | Collapse              | Data       | `data`       | collapse.ts                                         | ./Collapse              |
 | CollapsePanel         | Data       | `data`       | collapse.ts                                         | ./CollapsePanel         |
@@ -136,7 +136,6 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | Select                | Form       | `form`       | select.ts                                           | ./Select                |
 | Signature             | Form       | `form`       | signature.ts                                        | ./Signature             |
 | Slider                | Form       | `form`       | slider.ts                                           | ./Slider                |
-| Stepper               | Form       | `form`       | stepper.ts                                          | ./Stepper               |
 | Switch                | Form       | `form`       | switch.ts                                           | ./Switch                |
 | TagsInput             | Form       | `form`       | tags-input.ts                                       | ./TagsInput             |
 | Textarea              | Form       | `form`       | textarea.ts                                         | ./Textarea              |

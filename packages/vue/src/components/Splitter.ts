@@ -11,21 +11,20 @@ import {
   getSplitterGutterCssVars,
   getSplitterGutterHandleClasses,
   getSplitterGutterValueNow,
-  getSplitterKeyboardDelta,
   getSplitterLabels,
   getSplitterPointerDelta,
   isSplitterRtl,
-  layoutPanePixels,
+  jumpSplitterGutter,
+  layoutDeclaredPanes,
   measureSplitterContainer,
   mergeStyleValues,
-  panePixelsToRatios,
-  reconcileSplitterRatios,
-  resolveInitialPaneSizes,
+  normalizeSplitterBounds,
   resizePanes,
+  resolveSplitterSeparatorKey,
+  serializePaneSizes,
   splitterPaneBaseClasses,
   type DocumentDragSession,
-  type SplitDirection,
-  type SplitterRatioState
+  type SplitDirection
 } from '@expcat/tigercat-core'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './ConfigProvider'
@@ -33,8 +32,8 @@ import { useTigerConfig } from './ConfigProvider'
 export interface VueSplitterProps {
   orientation?: SplitDirection
   sizes?: (number | string)[]
-  min?: number
-  max?: number
+  min?: number | number[]
+  max?: number | number[]
   gutterSize?: number
   disabled?: boolean
   className?: string
@@ -54,11 +53,11 @@ export const Splitter = defineComponent({
       default: undefined
     },
     min: {
-      type: Number,
+      type: [Number, Array] as PropType<number | number[]>,
       default: 0
     },
     max: {
-      type: Number,
+      type: [Number, Array] as PropType<number | number[]>,
       default: undefined
     },
     gutterSize: {
@@ -85,7 +84,8 @@ export const Splitter = defineComponent({
     const instanceId = useId()
     const containerRef = ref<HTMLElement | null>(null)
     const containerSize = ref(0)
-    const ratioState = ref<SplitterRatioState>({ ratios: [], sizesKey: undefined })
+    const sizesKey = computed(() => serializePaneSizes(props.sizes))
+    const override = ref<{ key: string | undefined; pixels: number[] } | null>(null)
     const draggingIndex = ref(-1)
     const startPos = ref({ x: 0, y: 0 })
     const startSizes = ref<number[]>([])
@@ -100,13 +100,8 @@ export const Splitter = defineComponent({
 
     const collectPanes = () => flattenElementVNodes(slots.default?.())
 
-    const syncRatios = (count: number) => {
-      const available =
-        containerSize.value > 0
-          ? containerSize.value - Math.max(0, count - 1) * props.gutterSize
-          : 0
-      ratioState.value = reconcileSplitterRatios(ratioState.value, count, props.sizes, available)
-    }
+    const dragPixels = () =>
+      override.value && override.value.key === sizesKey.value ? override.value.pixels : null
 
     const applyMeasure = () => {
       const size = measureSplitterContainer(containerRef.value, props.orientation)
@@ -134,25 +129,20 @@ export const Splitter = defineComponent({
       )
     )
 
-    const paneCount = () => ratioState.value.ratios.length
-    const getMins = (count = paneCount()) => Array.from({ length: count }, () => props.min)
-    const getMaxes = (count = paneCount()) => Array.from({ length: count }, () => props.max)
+    const boundsFor = (count: number) => normalizeSplitterBounds(count, props.min, props.max)
+    const getMins = (count: number) => boundsFor(count).mins
+    const getMaxes = (count: number) => boundsFor(count).maxes
 
-    const currentPixels = (liveSize = containerSize.value): number[] => {
-      const ratios = ratioState.value.ratios
-      if (liveSize > 0) {
-        return layoutPanePixels(ratios, liveSize, props.gutterSize, props.min, props.max)
-      }
-      return (
-        resolveInitialPaneSizes(
-          ratios.length,
-          0,
-          props.gutterSize,
-          props.sizes,
-          props.min,
-          props.max
-        ) ?? []
-      )
+    const currentPixels = (liveSize = containerSize.value, count = collectPanes().length): number[] => {
+      const bounds = boundsFor(count)
+      return layoutDeclaredPanes(
+        dragPixels() ?? props.sizes,
+        count,
+        liveSize,
+        props.gutterSize,
+        bounds.mins,
+        bounds.maxes
+      ).map((box) => box.pixels ?? 0)
     }
 
     const commitSizes = (
@@ -160,10 +150,7 @@ export const Splitter = defineComponent({
       index: number,
       phase: 'move' | 'end' | 'keyboard'
     ) => {
-      ratioState.value = {
-        ratios: panePixelsToRatios(nextPixels),
-        sizesKey: ratioState.value.sizesKey
-      }
+      override.value = { key: sizesKey.value, pixels: nextPixels }
       emit('update:sizes', nextPixels)
       emit('resize', { index, sizes: nextPixels })
       if (phase === 'end' || phase === 'keyboard') {
@@ -219,8 +206,8 @@ export const Splitter = defineComponent({
         startSizes.value,
         draggingIndex.value,
         delta,
-        getMins(),
-        getMaxes()
+        getMins(startSizes.value.length),
+        getMaxes(startSizes.value.length)
       )
       if (newSizes) commitSizes(newSizes, draggingIndex.value, phase)
     }
@@ -234,25 +221,28 @@ export const Splitter = defineComponent({
     return () => {
       const nodes: ReturnType<typeof h>[] = []
       const panes = collectPanes()
-      syncRatios(panes.length)
       if (props.sizes && props.sizes.length !== panes.length && panes.length > 0) {
         devWarn(
           'Splitter.sizes.length',
           `Splitter sizes length (${props.sizes.length}) does not match pane count (${panes.length}). Extra panes share remaining space.`
         )
       }
-      const ratios = ratioState.value.ratios
-      const measured = containerSize.value > 0
-      const pixels = measured
-        ? layoutPanePixels(ratios, containerSize.value, props.gutterSize, props.min, props.max)
-        : []
+      const bounds = boundsFor(panes.length)
+      const boxes = layoutDeclaredPanes(
+        dragPixels() ?? props.sizes,
+        panes.length,
+        containerSize.value,
+        props.gutterSize,
+        bounds.mins,
+        bounds.maxes
+      )
+      const pixels = boxes.map((box) => box.pixels ?? 0)
 
       panes.forEach((child, i) => {
-        const size = measured ? pixels[i] : null
-        const paneStyle = getPaneStyle(size, props.orientation, {
-          ratio: ratios[i] ?? 0,
-          measured
-        })
+        const paneStyle = getPaneStyle(
+          boxes[i] ?? { kind: 'flex', pixels: null, flexGrow: 1 },
+          props.orientation
+        )
         nodes.push(
           h(
             'div',
@@ -279,7 +269,7 @@ export const Splitter = defineComponent({
                 'aria-controls': `${instanceId}-pane-${i}`,
                 'aria-valuemin': 0,
                 'aria-valuemax': 100,
-                'aria-valuenow': getSplitterGutterValueNow(measured ? pixels : [], i),
+                'aria-valuenow': getSplitterGutterValueNow(containerSize.value > 0 ? pixels : [], i),
                 'aria-label':
                   typeof labelledby === 'string'
                     ? undefined
@@ -290,10 +280,15 @@ export const Splitter = defineComponent({
                 onPointerdown: (e: PointerEvent) => onPointerDown(i, e),
                 onKeydown: (e: KeyboardEvent) => {
                   if (props.disabled) return
-                  const delta = getSplitterKeyboardDelta(e.key, props.orientation, rtl.value)
-                  if (delta == null) return
+                  const action = resolveSplitterSeparatorKey(e.key, props.orientation, rtl.value)
+                  if (!action) return
                   e.preventDefault()
-                  const newSizes = resizePanes(currentPixels(), i, delta, getMins(), getMaxes())
+                  const count = panes.length
+                  const current = currentPixels(containerSize.value, count)
+                  const newSizes =
+                    action.type === 'delta'
+                      ? resizePanes(current, i, action.delta, getMins(count), getMaxes(count))
+                      : jumpSplitterGutter(current, i, action.edge, getMins(count), getMaxes(count))
                   if (newSizes) commitSizes(newSizes, i, 'keyboard')
                 }
               },

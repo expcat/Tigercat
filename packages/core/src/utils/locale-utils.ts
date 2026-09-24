@@ -41,6 +41,8 @@ import type {
   TigerLocaleActivityFeed,
   TigerLocaleNotificationCenter,
   TigerLocaleSelect,
+  TigerLocaleCascader,
+  TigerLocaleTreeSelect,
   TigerLocaleColorPicker,
   TigerLocaleTabs,
   TigerLocaleBreadcrumb,
@@ -57,8 +59,12 @@ import type {
   TigerLocaleMarquee,
   TigerLocaleImage,
   TigerLocaleImageCompare,
+  TigerLocaleText,
+  TigerLocaleWatermark,
+  TigerLocaleSegmented,
   TigerLocaleDescriptions,
   TigerLocaleList,
+  TigerLocaleMasonry,
   TigerLocaleScrollArea,
   TigerLocalePrintLayout,
   TigerLocaleProgress,
@@ -76,7 +82,6 @@ import type {
   TigerLocaleInputLabels,
   TigerLocaleInputNumber,
   TigerLocaleSlider,
-  TigerLocaleStepper,
   TigerLocaleSignature,
   TigerLocaleNumberKeyboard,
   TigerLocaleTree,
@@ -85,7 +90,6 @@ import type {
   TigerLocaleDirection
 } from '../types/locale'
 import { deepMergeLocale, TIGER_LOCALE_KEYS } from './i18n/locale-merge'
-import { enUS } from './i18n/locales/en-US'
 
 export { TIGER_LOCALE_KEYS, mergeTigerLocale } from './i18n/locale-merge'
 
@@ -200,33 +204,59 @@ export function resolveLocaleSection<T extends object>(
 
 type TigerLocaleSectionKey = Exclude<keyof TigerLocale, 'locale' | 'direction'>
 
-function enSection<K extends TigerLocaleSectionKey>(key: K): Required<NonNullable<TigerLocale[K]>> {
+import { enUS } from './i18n/locales/en-US'
+
+function enSection<K extends TigerLocaleSectionKey>(
+  key: K,
+  _locale?: Partial<TigerLocale>
+): Required<NonNullable<TigerLocale[K]>> {
   const section = enUS[key]
-  if (typeof section !== 'object' || section === null) {
-    throw new Error(`en-US locale is missing section "${String(key)}"`)
+  if (typeof section === 'object' && section !== null) {
+    return section as Required<NonNullable<TigerLocale[K]>>
   }
-  return section as Required<NonNullable<TigerLocale[K]>>
+  return {} as Required<NonNullable<TigerLocale[K]>>
 }
 
 export function getEmptyLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleEmpty>
 ): Required<TigerLocaleEmpty> {
-  return resolveLocaleSection(enSection('empty'), locale?.empty, overrides)
+  return resolveLocaleSection(enSection('empty', locale), locale?.empty, overrides)
+}
+
+export function getTextLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleText>
+): Required<TigerLocaleText> {
+  return resolveLocaleSection(enSection('text', locale), locale?.text, overrides)
+}
+
+export function getWatermarkLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleWatermark>
+): Required<TigerLocaleWatermark> {
+  return resolveLocaleSection(enSection('watermark', locale), locale?.watermark, overrides)
+}
+
+export function getSegmentedLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleSegmented>
+): Required<TigerLocaleSegmented> {
+  return resolveLocaleSection(enSection('segmented', locale), locale?.segmented, overrides)
 }
 
 export function getQRCodeLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleQRCode>
 ): Required<TigerLocaleQRCode> {
-  return resolveLocaleSection(enSection('qrcode'), locale?.qrcode, overrides)
+  return resolveLocaleSection(enSection('qrcode', locale), locale?.qrcode, overrides)
 }
 
 export function getTourLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTour>
 ): Required<TigerLocaleTour> {
-  const labels = resolveLocaleSection(enSection('tour'), locale?.tour, overrides)
+  const labels = resolveLocaleSection(enSection('tour', locale), locale?.tour, overrides)
   return {
     ...labels,
     closeAriaLabel:
@@ -241,28 +271,28 @@ export function getCalendarLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCalendar>
 ): Required<TigerLocaleCalendar> {
-  return resolveLocaleSection(enSection('calendar'), locale?.calendar, overrides)
+  return resolveLocaleSection(enSection('calendar', locale), locale?.calendar, overrides)
 }
 
 export function getFormWizardLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFormWizard>
 ): Required<TigerLocaleFormWizard> {
-  return resolveLocaleSection(enSection('formWizard'), locale?.formWizard, overrides)
+  return resolveLocaleSection(enSection('formWizard', locale), locale?.formWizard, overrides)
 }
 
 export function getSchemaFormLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleSchemaForm>
 ): Required<TigerLocaleSchemaForm> {
-  return resolveLocaleSection(enSection('schemaForm'), locale?.schemaForm, overrides)
+  return resolveLocaleSection(enSection('schemaForm', locale), locale?.schemaForm, overrides)
 }
 
 export function getPaginationLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocalePagination>
 ): Required<TigerLocalePagination> {
-  return resolveLocaleSection(enSection('pagination'), locale?.pagination, overrides)
+  return resolveLocaleSection(enSection('pagination', locale), locale?.pagination, overrides)
 }
 
 export function formatPaginationTotal(
@@ -299,7 +329,7 @@ export function getTableLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTable>
 ): Required<TigerLocaleTable> {
-  return resolveLocaleSection(enSection('table'), locale?.table, overrides)
+  return resolveLocaleSection(enSection('table', locale), locale?.table, overrides)
 }
 
 export function formatTableSelectRowAriaLabel(
@@ -312,6 +342,26 @@ export function formatTableSelectRowAriaLabel(
 
 export function formatTableSortByText(template: string, column: string): string {
   return template.replace('{column}', column)
+}
+
+export function formatTableSortButtonName(
+  template: string,
+  column: string,
+  directionLabel: string
+): string {
+  return `${formatTableSortByText(template, column)}, ${directionLabel}`
+}
+
+export function formatTableSelectionCount(template: string, count: number, locale?: string): string {
+  return template.replace('{count}', formatIntlNumber(count, locale))
+}
+
+export function formatTableSortAnnouncement(
+  template: string,
+  column: string,
+  direction: string
+): string {
+  return template.replace('{column}', column).replace('{direction}', direction)
 }
 
 export function formatTableFilterColumnAriaLabel(template: string, column: string): string {
@@ -331,7 +381,7 @@ export function getDataExportLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleDataExport>
 ): Required<TigerLocaleDataExport> {
-  return resolveLocaleSection(enSection('dataExport'), locale?.dataExport, overrides)
+  return resolveLocaleSection(enSection('dataExport', locale), locale?.dataExport, overrides)
 }
 
 export function getDataExportFormatLabel(
@@ -347,35 +397,35 @@ export function getTaskBoardLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTaskBoard>
 ): Required<TigerLocaleTaskBoard> {
-  return resolveLocaleSection(enSection('taskBoard'), locale?.taskBoard, overrides)
+  return resolveLocaleSection(enSection('taskBoard', locale), locale?.taskBoard, overrides)
 }
 
 export function getChatWindowLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleChatWindow>
 ): Required<TigerLocaleChatWindow> {
-  return resolveLocaleSection(enSection('chatWindow'), locale?.chatWindow, overrides)
+  return resolveLocaleSection(enSection('chatWindow', locale), locale?.chatWindow, overrides)
 }
 
 export function getCodeLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCode>
 ): Required<TigerLocaleCode> {
-  return resolveLocaleSection(enSection('code'), locale?.code, overrides)
+  return resolveLocaleSection(enSection('code', locale), locale?.code, overrides)
 }
 
 export function getCommentThreadLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCommentThread>
 ): Required<TigerLocaleCommentThread> {
-  return resolveLocaleSection(enSection('commentThread'), locale?.commentThread, overrides)
+  return resolveLocaleSection(enSection('commentThread', locale), locale?.commentThread, overrides)
 }
 
 export function getActivityFeedLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleActivityFeed>
 ): Required<TigerLocaleActivityFeed> {
-  return resolveLocaleSection(enSection('activityFeed'), locale?.activityFeed, overrides)
+  return resolveLocaleSection(enSection('activityFeed', locale), locale?.activityFeed, overrides)
 }
 
 export function getNotificationCenterLabels(
@@ -383,7 +433,7 @@ export function getNotificationCenterLabels(
   overrides?: Partial<TigerLocaleNotificationCenter>
 ): Required<TigerLocaleNotificationCenter> {
   return resolveLocaleSection(
-    enSection('notificationCenter'),
+    enSection('notificationCenter', locale),
     locale?.notificationCenter,
     overrides
   )
@@ -393,7 +443,21 @@ export function getSelectLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleSelect>
 ): Required<TigerLocaleSelect> {
-  return resolveLocaleSection(enSection('select'), locale?.select, overrides)
+  return resolveLocaleSection(enSection('select', locale), locale?.select, overrides)
+}
+
+export function getCascaderLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCascader>
+): Required<TigerLocaleCascader> {
+  return resolveLocaleSection(enSection('cascader', locale), locale?.cascader, overrides)
+}
+
+export function getTreeSelectLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleTreeSelect>
+): Required<TigerLocaleTreeSelect> {
+  return resolveLocaleSection(enSection('treeSelect', locale), locale?.treeSelect, overrides)
 }
 
 export function formatSelectLevelLabel(template: string, level: number): string {
@@ -404,7 +468,7 @@ export function getColorPickerLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleColorPicker>
 ): Required<TigerLocaleColorPicker> {
-  return resolveLocaleSection(enSection('colorPicker'), locale?.colorPicker, overrides)
+  return resolveLocaleSection(enSection('colorPicker', locale), locale?.colorPicker, overrides)
 }
 
 export function formatColorPickerSelectPreset(template: string, color: string): string {
@@ -415,91 +479,102 @@ export function getTabsLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTabs>
 ): Required<TigerLocaleTabs> {
-  return resolveLocaleSection(enSection('tabs'), locale?.tabs, overrides)
+  return resolveLocaleSection(enSection('tabs', locale), locale?.tabs, overrides)
 }
 
 export function getBreadcrumbLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleBreadcrumb>
 ): Required<TigerLocaleBreadcrumb> {
-  return resolveLocaleSection(enSection('breadcrumb'), locale?.breadcrumb, overrides)
+  return resolveLocaleSection(enSection('breadcrumb', locale), locale?.breadcrumb, overrides)
 }
 
 export function getPageHeaderLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocalePageHeader>
 ): Required<TigerLocalePageHeader> {
-  return resolveLocaleSection(enSection('pageHeader'), locale?.pageHeader, overrides)
+  return resolveLocaleSection(enSection('pageHeader', locale), locale?.pageHeader, overrides)
 }
 
 export function getBackTopLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleBackTop>
 ): Required<TigerLocaleBackTop> {
-  return resolveLocaleSection(enSection('backTop'), locale?.backTop, overrides)
+  return resolveLocaleSection(enSection('backTop', locale), locale?.backTop, overrides)
 }
 
 export function getAnchorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleAnchor>
 ): Required<TigerLocaleAnchor> {
-  return resolveLocaleSection(enSection('anchor'), locale?.anchor, overrides)
+  return resolveLocaleSection(enSection('anchor', locale), locale?.anchor, overrides)
 }
 
 export function getFloatButtonLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFloatButton>
 ): Required<TigerLocaleFloatButton> {
-  return resolveLocaleSection(enSection('floatButton'), locale?.floatButton, overrides)
+  return resolveLocaleSection(enSection('floatButton', locale), locale?.floatButton, overrides)
 }
 
 export function getFullscreenLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFullscreen>
 ): Required<TigerLocaleFullscreen> {
-  return resolveLocaleSection(enSection('fullscreen'), locale?.fullscreen, overrides)
+  return resolveLocaleSection(enSection('fullscreen', locale), locale?.fullscreen, overrides)
 }
 
 export function getSpotlightLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleSpotlight>
 ): Required<TigerLocaleSpotlight> {
-  return resolveLocaleSection(enSection('spotlight'), locale?.spotlight, overrides)
+  return resolveLocaleSection(enSection('spotlight', locale), locale?.spotlight, overrides)
 }
 
 export function getScrollSpyLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleScrollSpy>
 ): Required<TigerLocaleScrollSpy> {
-  return resolveLocaleSection(enSection('scrollSpy'), locale?.scrollSpy, overrides)
+  return resolveLocaleSection(enSection('scrollSpy', locale), locale?.scrollSpy, overrides)
 }
 
 export function getStepsLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleSteps>
 ): Required<TigerLocaleSteps> {
-  return resolveLocaleSection(enSection('steps'), locale?.steps, overrides)
+  return resolveLocaleSection(enSection('steps', locale), locale?.steps, overrides)
 }
 
 export function getWorkflowTimelineLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleWorkflowTimeline>
 ): Required<TigerLocaleWorkflowTimeline> {
-  return resolveLocaleSection(enSection('workflowTimeline'), locale?.workflowTimeline, overrides)
+  return resolveLocaleSection(enSection('workflowTimeline', locale), locale?.workflowTimeline, overrides)
+}
+
+export function getWorkflowDetailShellLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocale['workflowDetailShell']>
+): Required<NonNullable<TigerLocale['workflowDetailShell']>> {
+  return resolveLocaleSection(
+    enSection('workflowDetailShell', locale),
+    locale?.workflowDetailShell,
+    overrides
+  )
 }
 
 export function getWorkflowDesignerLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleWorkflowDesigner>
 ): Required<TigerLocaleWorkflowDesigner> {
-  return resolveLocaleSection(enSection('workflowDesigner'), locale?.workflowDesigner, overrides)
+  return resolveLocaleSection(enSection('workflowDesigner', locale), locale?.workflowDesigner, overrides)
 }
 
 export function getRateLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleRate>
 ): Required<TigerLocaleRate> {
-  return resolveLocaleSection(enSection('rate'), locale?.rate, overrides)
+  return resolveLocaleSection(enSection('rate', locale), locale?.rate, overrides)
 }
 
 /**
@@ -513,28 +588,28 @@ export function getAvatarGroupLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleAvatarGroup>
 ): Required<TigerLocaleAvatarGroup> {
-  return resolveLocaleSection(enSection('avatarGroup'), locale?.avatarGroup, overrides)
+  return resolveLocaleSection(enSection('avatarGroup', locale), locale?.avatarGroup, overrides)
 }
 
 export function getCarouselLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCarousel>
 ): Required<TigerLocaleCarousel> {
-  return resolveLocaleSection(enSection('carousel'), locale?.carousel, overrides)
+  return resolveLocaleSection(enSection('carousel', locale), locale?.carousel, overrides)
 }
 
 export function getProgressLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleProgress>
 ): Required<TigerLocaleProgress> {
-  return resolveLocaleSection(enSection('progress'), locale?.progress, overrides)
+  return resolveLocaleSection(enSection('progress', locale), locale?.progress, overrides)
 }
 
 export function getTreeLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTree>
 ): Required<TigerLocaleTree> {
-  return resolveLocaleSection(enSection('tree'), locale?.tree, overrides)
+  return resolveLocaleSection(enSection('tree', locale), locale?.tree, overrides)
 }
 
 export function formatTreeSelectNodeLabel(template: string, label: string): string {
@@ -545,14 +620,14 @@ export function getSplitterLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleSplitter>
 ): Required<TigerLocaleSplitter> {
-  return resolveLocaleSection(enSection('splitter'), locale?.splitter, overrides)
+  return resolveLocaleSection(enSection('splitter', locale), locale?.splitter, overrides)
 }
 
 export function getResizableLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleResizable>
 ): Required<TigerLocaleResizable> {
-  return resolveLocaleSection(enSection('resizable'), locale?.resizable, overrides)
+  return resolveLocaleSection(enSection('resizable', locale), locale?.resizable, overrides)
 }
 
 export function formatResizableHandleLabel(template: string, handle: string): string {
@@ -563,12 +638,12 @@ export function getMarqueeLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleMarquee>
 ): Required<TigerLocaleMarquee> {
-  return resolveLocaleSection(enSection('marquee'), locale?.marquee, overrides)
+  return resolveLocaleSection(enSection('marquee', locale), locale?.marquee, overrides)
 }
 
 export function getSidebarAriaLabel(locale?: Partial<TigerLocale>): string {
   return resolveLocaleText(
-    enUS.common?.sidebarAriaLabel ?? 'Sidebar',
+    locale?.common?.sidebarAriaLabel ?? 'Sidebar',
     locale?.common?.sidebarAriaLabel
   )
 }
@@ -577,112 +652,119 @@ export function getImageLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleImage>
 ): Required<TigerLocaleImage> {
-  return resolveLocaleSection(enSection('image'), locale?.image, overrides)
+  return resolveLocaleSection(enSection('image', locale), locale?.image, overrides)
 }
 
 export function getImageCompareLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleImageCompare>
 ): Required<TigerLocaleImageCompare> {
-  return resolveLocaleSection(enSection('imageCompare'), locale?.imageCompare, overrides)
+  return resolveLocaleSection(enSection('imageCompare', locale), locale?.imageCompare, overrides)
 }
 
 export function getDescriptionsLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleDescriptions>
 ): Required<TigerLocaleDescriptions> {
-  return resolveLocaleSection(enSection('descriptions'), locale?.descriptions, overrides)
+  return resolveLocaleSection(enSection('descriptions', locale), locale?.descriptions, overrides)
+}
+
+export function getMasonryLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleMasonry>
+): Required<TigerLocaleMasonry> {
+  return resolveLocaleSection(enSection('masonry', locale), locale?.masonry, overrides)
 }
 
 export function getListLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleList>
 ): Required<TigerLocaleList> {
-  return resolveLocaleSection(enSection('list'), locale?.list, overrides)
+  return resolveLocaleSection(enSection('list', locale), locale?.list, overrides)
 }
 
 export function getScrollAreaLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleScrollArea>
 ): Required<TigerLocaleScrollArea> {
-  return resolveLocaleSection(enSection('scrollArea'), locale?.scrollArea, overrides)
+  return resolveLocaleSection(enSection('scrollArea', locale), locale?.scrollArea, overrides)
 }
 
 export function getPrintLayoutLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocalePrintLayout>
 ): Required<TigerLocalePrintLayout> {
-  return resolveLocaleSection(enSection('printLayout'), locale?.printLayout, overrides)
+  return resolveLocaleSection(enSection('printLayout', locale), locale?.printLayout, overrides)
 }
 
 export function getTransferLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTransfer>
 ): Required<TigerLocaleTransfer> {
-  return resolveLocaleSection(enSection('transfer'), locale?.transfer, overrides)
+  return resolveLocaleSection(enSection('transfer', locale), locale?.transfer, overrides)
 }
 
 export function getChartLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleChart>
 ): Required<TigerLocaleChart> {
-  return resolveLocaleSection(enSection('chart'), locale?.chart, overrides)
+  return resolveLocaleSection(enSection('chart', locale), locale?.chart, overrides)
 }
 
 export function getCodeEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCodeEditor>
 ): Required<TigerLocaleCodeEditor> {
-  return resolveLocaleSection(enSection('codeEditor'), locale?.codeEditor, overrides)
+  return resolveLocaleSection(enSection('codeEditor', locale), locale?.codeEditor, overrides)
 }
 
 export function getMarkdownEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleMarkdownEditor>
 ): Required<TigerLocaleMarkdownEditor> {
-  return resolveLocaleSection(enSection('markdownEditor'), locale?.markdownEditor, overrides)
+  return resolveLocaleSection(enSection('markdownEditor', locale), locale?.markdownEditor, overrides)
 }
 
 export function getRichTextEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleRichTextEditor>
 ): Required<TigerLocaleRichTextEditor> {
-  return resolveLocaleSection(enSection('richTextEditor'), locale?.richTextEditor, overrides)
+  return resolveLocaleSection(enSection('richTextEditor', locale), locale?.richTextEditor, overrides)
 }
 
 export function getCronEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleCronEditor>
 ): Required<TigerLocaleCronEditor> {
-  return resolveLocaleSection(enSection('cronEditor'), locale?.cronEditor, overrides)
+  return resolveLocaleSection(enSection('cronEditor', locale), locale?.cronEditor, overrides)
 }
 
 export function getFileManagerLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFileManager>
 ): Required<TigerLocaleFileManager> {
-  return resolveLocaleSection(enSection('fileManager'), locale?.fileManager, overrides)
+  return resolveLocaleSection(enSection('fileManager', locale), locale?.fileManager, overrides)
 }
 
 export function getImageViewerLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleImageViewer>
 ): Required<TigerLocaleImageViewer> {
-  return resolveLocaleSection(enSection('imageViewer'), locale?.imageViewer, overrides)
+  return resolveLocaleSection(enSection('imageViewer', locale), locale?.imageViewer, overrides)
 }
 
 export function getImageEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleImageEditor>
 ): Required<TigerLocaleImageEditor> {
-  return resolveLocaleSection(enSection('imageEditor'), locale?.imageEditor, overrides)
+  return resolveLocaleSection(enSection('imageEditor', locale), locale?.imageEditor, overrides)
 }
 
 export function getStatusLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleStatus>
 ): Required<TigerLocaleStatus> {
-  return resolveLocaleSection(enSection('status'), locale?.status, overrides)
+  return resolveLocaleSection(enSection('status', locale), locale?.status, overrides)
 }
 
 function pickLocaleText(...values: Array<string | undefined>): string {
@@ -696,7 +778,7 @@ export function getModalLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleModal>
 ): Required<TigerLocaleModal> {
-  const en = enSection('modal')
+  const en = enSection('modal', locale)
   return {
     closeAriaLabel: pickLocaleText(
       overrides?.closeAriaLabel,
@@ -728,7 +810,7 @@ export function getDrawerLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleDrawer>
 ): Required<TigerLocaleDrawer> {
-  const en = enSection('drawer')
+  const en = enSection('drawer', locale)
   return {
     closeAriaLabel: pickLocaleText(
       overrides?.closeAriaLabel,
@@ -748,17 +830,17 @@ export function getAlertLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleAlert>
 ): Required<TigerLocaleAlert> {
-  return resolveLocaleSection(enSection('alert'), locale?.alert, overrides)
+  return resolveLocaleSection(enSection('alert', locale), locale?.alert, overrides)
 }
 
 export function getLoadingLabel(locale?: Partial<TigerLocale>, text?: string): string {
   if (typeof text === 'string' && text.trim().length > 0) return text.trim()
-  return resolveLocaleSection(enSection('common'), locale?.common).loadingText
+  return resolveLocaleSection(enSection('common', locale), locale?.common).loadingText
 }
 
 export function getMessageCloseAriaLabel(locale?: Partial<TigerLocale>, override?: string): string {
   if (typeof override === 'string' && override.trim().length > 0) return override
-  return resolveLocaleSection(enSection('common'), locale?.common).closeMessageAriaLabel
+  return resolveLocaleSection(enSection('common', locale), locale?.common).closeMessageAriaLabel
 }
 
 export function getNotificationCloseAriaLabel(
@@ -766,7 +848,7 @@ export function getNotificationCloseAriaLabel(
   override?: string
 ): string {
   if (typeof override === 'string' && override.trim().length > 0) return override
-  return resolveLocaleSection(enSection('common'), locale?.common).closeNotificationAriaLabel
+  return resolveLocaleSection(enSection('common', locale), locale?.common).closeNotificationAriaLabel
 }
 
 /**
@@ -785,62 +867,55 @@ export function getFormValidationLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFormValidation>
 ): Required<TigerLocaleFormValidation> {
-  return resolveLocaleSection(enSection('formValidation'), locale?.formValidation, overrides)
+  return resolveLocaleSection(enSection('formValidation', locale), locale?.formValidation, overrides)
 }
 
 export function getInputOTPLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleInputOTP>
 ): Required<TigerLocaleInputOTP> {
-  return resolveLocaleSection(enSection('inputOtp'), locale?.inputOtp, overrides)
+  return resolveLocaleSection(enSection('inputOtp', locale), locale?.inputOtp, overrides)
 }
 
 export function getTagsInputLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleTagsInput>
 ): Required<TigerLocaleTagsInput> {
-  return resolveLocaleSection(enSection('tagsInput'), locale?.tagsInput, overrides)
+  return resolveLocaleSection(enSection('tagsInput', locale), locale?.tagsInput, overrides)
 }
 
 export function getInputLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleInputLabels>
 ): Required<TigerLocaleInputLabels> {
-  return resolveLocaleSection(enSection('input'), locale?.input, overrides)
+  return resolveLocaleSection(enSection('input', locale), locale?.input, overrides)
 }
 
 export function getInputNumberLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleInputNumber>
 ): Required<TigerLocaleInputNumber> {
-  return resolveLocaleSection(enSection('inputNumber'), locale?.inputNumber, overrides)
+  return resolveLocaleSection(enSection('inputNumber', locale), locale?.inputNumber, overrides)
 }
 
 export function getSliderLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleSlider>
 ): Required<TigerLocaleSlider> {
-  return resolveLocaleSection(enSection('slider'), locale?.slider, overrides)
-}
-
-export function getStepperLabels(
-  locale?: Partial<TigerLocale>,
-  overrides?: Partial<TigerLocaleStepper>
-): Required<TigerLocaleStepper> {
-  return resolveLocaleSection(enSection('stepper'), locale?.stepper, overrides)
+  return resolveLocaleSection(enSection('slider', locale), locale?.slider, overrides)
 }
 
 export function getSignatureLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleSignature>
 ): Required<TigerLocaleSignature> {
-  const section = resolveLocaleSection(enSection('signature'), locale?.signature, overrides)
+  const section = resolveLocaleSection(enSection('signature', locale), locale?.signature, overrides)
   const clearText =
     typeof overrides?.clearText === 'string' && overrides.clearText.trim()
       ? overrides.clearText
       : (section.clearText ||
         locale?.common?.clearText ||
-        enUS.common?.clearText ||
+        locale?.common?.clearText ||
         'Clear')
   return {
     ...section,
@@ -857,14 +932,14 @@ export function getNumberKeyboardLabels(
   overrides?: Partial<TigerLocaleNumberKeyboard> & { confirmText?: string; deleteText?: string }
 ): NumberKeyboardResolvedLabels {
   const section = resolveLocaleSection(
-    enSection('numberKeyboard'),
+    enSection('numberKeyboard', locale),
     locale?.numberKeyboard,
     overrides
   )
   const confirmText =
     typeof overrides?.confirmText === 'string' && overrides.confirmText.trim()
       ? overrides.confirmText
-      : (locale?.common?.okText ?? enUS.common?.okText ?? 'OK')
+      : (locale?.common?.okText ?? 'OK')
   const deleteText =
     typeof overrides?.deleteText === 'string' && overrides.deleteText.trim()
       ? overrides.deleteText

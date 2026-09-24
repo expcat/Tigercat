@@ -77,12 +77,12 @@ describe('back-top-utils', () => {
     expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
   })
 
-  it('uses immediate scroll for zero duration', () => {
+  it('uses immediate scroll when behavior is auto', () => {
     const container = document.createElement('div')
     const scrollTo = vi.fn()
     Object.defineProperty(container, 'scrollTo', { value: scrollTo, configurable: true })
 
-    scrollToTop(container, 0)
+    scrollToTop(container, 'auto')
 
     expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' })
   })

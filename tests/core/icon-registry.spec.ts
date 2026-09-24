@@ -6,17 +6,12 @@ import { afterEach, describe, it, expect } from 'vitest'
 import {
   iconRegistry,
   iconNames,
+  createIconRegistry,
   getIconDefinition,
-  getDrawerBodyClasses,
-  registerIcon,
-  unregisterIcon,
-  clearRegisteredIcons
+  getDrawerBodyClasses
 } from '@expcat/tigercat-core'
 
 describe('icon registry', () => {
-  afterEach(() => {
-    clearRegisteredIcons()
-  })
   it('exposes built-in icon names', () => {
     expect(iconNames.length).toBeGreaterThan(20)
     expect(iconNames).toContain('check')
@@ -59,13 +54,16 @@ describe('icon registry', () => {
   })
 
   it('registers application-level names without overwriting built-ins', () => {
+    const registry = createIconRegistry()
     const custom = { viewBox: '0 0 24 24', paths: ['M4 4h16v16H4z'], mode: 'stroke' as const }
-    registerIcon('ticket-custom', custom)
-    expect(getIconDefinition('ticket-custom')).toEqual(custom)
-    registerIcon('close', custom)
-    expect(getIconDefinition('close')).toBe(iconRegistry.close)
-    unregisterIcon('ticket-custom')
-    expect(getIconDefinition('ticket-custom')).toBeUndefined()
+    registry.register('ticket-custom', custom)
+    expect(getIconDefinition('ticket-custom', registry)).toEqual(custom)
+    registry.register('close', custom)
+    expect(getIconDefinition('close', registry)).toBe(iconRegistry.close)
+    registry.unregister('ticket-custom')
+    expect(getIconDefinition('ticket-custom', registry)).toBeUndefined()
+    registry.dispose()
+    expect(registry.customNames()).toEqual([])
   })
 })
 
@@ -80,8 +78,10 @@ describe('getDrawerBodyClasses bodyPadding', () => {
     expect(cls).not.toContain('py-4')
   })
 
-  it('applies a custom padding class', () => {
-    expect(getDrawerBodyClasses(undefined, 'p-0')).toContain('p-0')
+  it('puts custom spacing on the body class', () => {
+    const cls = getDrawerBodyClasses('p-0', false)
+    expect(cls).toContain('p-0')
+    expect(cls).not.toContain('px-6')
   })
 
   it('merges a custom body class', () => {

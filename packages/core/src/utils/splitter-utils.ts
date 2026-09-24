@@ -17,20 +17,20 @@ export const splitterVerticalClasses = 'flex-col'
 export const splitterPaneBaseClasses = 'tiger-splitter-pane relative overflow-auto min-w-0 min-h-0'
 
 export const splitterGutterBaseClasses =
-  'relative flex-shrink-0 bg-[var(--tiger-border,#e5e7eb)] tiger-motion-aware transition-colors duration-150 hover:bg-[var(--tiger-primary,#2563eb)] z-10 touch-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'relative flex-shrink-0 bg-[var(--tiger-border)] tiger-motion-aware transition-colors duration-150 hover:bg-[var(--tiger-primary)] z-10 touch-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 
 export const splitterGutterHorizontalClasses =
-  "cursor-col-resize w-[var(--tiger-splitter-gutter,4px)] h-full before:absolute before:content-[''] before:inset-block-0 before:w-6 before:start-1/2 before:-translate-x-1/2"
+  "cursor-col-resize w-[var(--tiger-splitter-gutter)] h-full before:absolute before:content-[''] before:inset-block-0 before:w-6 before:start-1/2 before:-translate-x-1/2"
 
 export const splitterGutterVerticalClasses =
-  "cursor-row-resize h-[var(--tiger-splitter-gutter,4px)] w-full before:absolute before:content-[''] before:inset-inline-0 before:h-6 before:top-1/2 before:-translate-y-1/2"
+  "cursor-row-resize h-[var(--tiger-splitter-gutter)] w-full before:absolute before:content-[''] before:inset-inline-0 before:h-6 before:top-1/2 before:-translate-y-1/2"
 
-export const splitterGutterDraggingClasses = 'bg-[var(--tiger-primary,#2563eb)]'
+export const splitterGutterDraggingClasses = 'bg-[var(--tiger-primary)]'
 
 export const splitterGutterDisabledClasses = 'cursor-default opacity-50 pointer-events-none'
 
 export const splitterGutterHandleClasses =
-  'absolute rounded bg-[var(--tiger-text-muted,#9ca3af)] tiger-motion-aware transition-colors duration-150 pointer-events-none'
+  'absolute rounded bg-[var(--tiger-text-secondary)] tiger-motion-aware transition-colors duration-150 pointer-events-none'
 
 export const splitterGutterHandleHorizontalClasses =
   'w-0.5 h-6 top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2'
@@ -320,21 +320,17 @@ export function resolveInitialPaneSizes(
   max?: number
 ): number[] | null {
   if (paneCount <= 0) return null
-
-  const provided = sizes && sizes.length > 0 ? sizes : undefined
-  const hasPercent = provided != null && provided.some(isPercentagePaneSize)
-
-  if (containerSize <= 0) {
-    if (hasPercent || !provided) return null
-    if (provided.length !== paneCount) {
-      return paneInputsToRatios(paneCount, provided, 0).map(() => 0)
-    }
-    return provided.map((size) => parsePaneSize(size, 0))
-  }
-
-  const available = containerSize - Math.max(0, paneCount - 1) * gutterSize
-  const ratios = paneInputsToRatios(paneCount, provided, available)
-  return layoutPanePixels(ratios, containerSize, gutterSize, min, max)
+  const bounds = normalizeSplitterBounds(paneCount, min, max)
+  const boxes = layoutDeclaredPanes(
+    sizes,
+    paneCount,
+    containerSize,
+    gutterSize,
+    bounds.mins,
+    bounds.maxes
+  )
+  if (boxes.some((box) => box.pixels == null)) return null
+  return boxes.map((box) => box.pixels ?? 0)
 }
 
 /**
@@ -376,34 +372,223 @@ export function resizePanes(
   return result
 }
 
+export type SplitterPaneKind = 'fixed' | 'percent' | 'flex'
+
+export interface SplitterPaneBox {
+  kind: SplitterPaneKind
+  /** Resolved pixels. Null before the container is measured for percent and flex panes. */
+  pixels: number | null
+  /** Same percentage the pane will use after measure (`30%`). */
+  flexBasis?: string
+  flexGrow: number
+}
+
+export function classifySplitterSize(
+  size: number | string | undefined
+): { kind: SplitterPaneKind; amount: number } {
+  if (size === undefined) return { kind: 'flex', amount: 1 }
+  if (typeof size === 'number') {
+    if (!Number.isFinite(size)) return { kind: 'flex', amount: 1 }
+    return { kind: 'fixed', amount: Math.max(0, size) }
+  }
+  const trimmed = size.trim()
+  if (trimmed.endsWith('%')) {
+    const pct = Number.parseFloat(trimmed)
+    if (!Number.isFinite(pct) || pct < 0) return { kind: 'flex', amount: 1 }
+    return { kind: 'percent', amount: pct }
+  }
+  const px = Number.parseFloat(trimmed)
+  if (!Number.isFinite(px)) return { kind: 'flex', amount: 1 }
+  return { kind: 'fixed', amount: Math.max(0, px) }
+}
+
+export function normalizeSplitterBounds(
+  paneCount: number,
+  min?: number | number[],
+  max?: number | number[]
+): { mins: number[]; maxes: Array<number | undefined> } {
+  const mins = Array.from({ length: paneCount }, (_, index) => {
+    const raw = Array.isArray(min) ? min[index] : min
+    return raw != null && Number.isFinite(raw) ? Math.max(0, raw) : 0
+  })
+  const maxes = Array.from({ length: paneCount }, (_, index) => {
+    const raw = Array.isArray(max) ? max[index] : max
+    return raw != null && Number.isFinite(raw) ? Math.max(0, raw) : undefined
+  })
+  return { mins, maxes }
+}
+
+function scaleToAvailable(values: number[], available: number): number[] {
+  const sum = values.reduce((total, value) => total + value, 0)
+  if (sum <= 0) {
+    const each = values.length > 0 ? available / values.length : 0
+    return values.map(() => each)
+  }
+  return values.map((value) => (value / sum) * available)
+}
+
 /**
- * Convert pane sizes to CSS style objects for flex sizing.
- * Unmeasured panes use flex-grow from `ratio` so percentage layouts paint
- * before the first ResizeObserver callback.
+ * Fixed pixels stay pixels. Percentages are a share of the free space
+ * (container minus gutters). Leftover space goes only to panes with no size.
+ * Before measure, fixed panes keep the declared pixel value and percentages
+ * keep the same percent basis they use after measure.
  */
-export function getPaneStyle(
-  size: number | null | undefined,
-  direction: SplitDirection,
-  options?: { ratio?: number; measured?: boolean }
-): Record<string, string> {
-  const measured = options?.measured ?? size != null
-  if (measured && size != null) {
-    const prop = direction === 'horizontal' ? 'width' : 'height'
+export function layoutDeclaredPanes(
+  sizes: Array<number | string | undefined> | undefined,
+  paneCount: number,
+  containerSize: number,
+  gutterSize: number,
+  mins: number[] = [],
+  maxes: Array<number | undefined> = []
+): SplitterPaneBox[] {
+  if (paneCount <= 0) return []
+  const specs = Array.from({ length: paneCount }, (_, index) => classifySplitterSize(sizes?.[index]))
+  if (!(containerSize > 0)) {
+    return specs.map((spec) => {
+      if (spec.kind === 'fixed') {
+        return { kind: spec.kind, pixels: spec.amount, flexGrow: 0 }
+      }
+      if (spec.kind === 'percent') {
+        return {
+          kind: spec.kind,
+          pixels: null,
+          flexBasis: `${spec.amount}%`,
+          flexGrow: 0
+        }
+      }
+      return { kind: 'flex', pixels: null, flexGrow: spec.amount }
+    })
+  }
+
+  const available = containerSize - Math.max(0, paneCount - 1) * gutterSize
+  if (available <= 0) {
+    return specs.map((spec) => ({ kind: spec.kind, pixels: 0, flexGrow: 0 }))
+  }
+
+  const paneMins = specs.map((_, index) => mins[index] ?? 0)
+  const minSum = paneMins.reduce((total, value) => total + value, 0)
+  if (minSum > available) {
+    const scaled = scaleToAvailable(paneMins, available)
+    return specs.map((spec, index) => ({ kind: spec.kind, pixels: scaled[index] ?? 0, flexGrow: 0 }))
+  }
+
+  const desired = specs.map((spec) => {
+    if (spec.kind === 'fixed') return spec.amount
+    if (spec.kind === 'percent') return (spec.amount / 100) * available
+    return null
+  })
+  const flexIndexes = specs
+    .map((spec, index) => (spec.kind === 'flex' ? index : -1))
+    .filter((index) => index >= 0)
+  const fixedSum = desired.reduce<number>((total, value) => total + (value ?? 0), 0)
+
+  let pixels: number[]
+  if (flexIndexes.length === 0) {
+    pixels =
+      fixedSum > available + 0.01
+        ? scaleToAvailable(
+            desired.map((value) => value ?? 0),
+            available
+          )
+        : desired.map((value) => value ?? 0)
+  } else if (fixedSum > available) {
+    pixels = desired.map((value) => (value == null ? 0 : (value / fixedSum) * available))
+  } else {
+    const leftover = available - fixedSum
+    const weight =
+      flexIndexes.reduce((total, index) => total + specs[index].amount, 0) || flexIndexes.length
+    pixels = desired.map((value, index) => {
+      if (value != null) return value
+      return leftover * (specs[index].amount / weight)
+    })
+  }
+
+  pixels = pixels.map((value, index) => clampPaneSize(value, paneMins[index] ?? 0, maxes[index]))
+  const overflow = pixels.reduce((total, value) => total + value, 0) - available
+  if (overflow > 0.5) {
+    const adjustable = pixels.map((value, index) => Math.max(0, value - (paneMins[index] ?? 0)))
+    const room = adjustable.reduce((total, value) => total + value, 0)
+    if (room > 0) {
+      pixels = pixels.map((value, index) => value - overflow * (adjustable[index] / room))
+    } else {
+      pixels = scaleToAvailable(pixels, available)
+    }
+  }
+
+  return specs.map((spec, index) => ({
+    kind: spec.kind,
+    pixels: pixels[index] ?? 0,
+    flexGrow: 0
+  }))
+}
+
+export function getPaneStyle(box: SplitterPaneBox, direction: SplitDirection): Record<string, string> {
+  const prop = direction === 'horizontal' ? 'width' : 'height'
+  if (box.pixels != null) {
     return {
-      [prop]: `${size}px`,
-      flexShrink: '0',
+      [prop]: `${box.pixels}px`,
       flexGrow: '0',
+      flexShrink: '0',
+      flexBasis: 'auto',
+      minWidth: '0',
+      minHeight: '0'
+    }
+  }
+  if (box.flexBasis) {
+    return {
+      flexGrow: '0',
+      flexShrink: '1',
+      flexBasis: box.flexBasis,
       minWidth: '0',
       minHeight: '0'
     }
   }
   return {
-    flexGrow: String(options?.ratio ?? 1),
+    flexGrow: String(box.flexGrow || 1),
     flexShrink: '1',
     flexBasis: '0px',
     minWidth: '0',
     minHeight: '0'
   }
+}
+
+export function resolveSplitterSeparatorKey(
+  key: string,
+  direction: SplitDirection,
+  rtl: boolean,
+  step: number = RESIZE_KEYBOARD_STEP
+): { type: 'delta'; delta: number } | { type: 'edge'; edge: 'start' | 'end' } | null {
+  if (key === 'Home') return { type: 'edge', edge: 'start' }
+  if (key === 'End') return { type: 'edge', edge: 'end' }
+  const delta = getSplitterKeyboardDelta(key, direction, rtl, step)
+  if (delta == null) return null
+  return { type: 'delta', delta }
+}
+
+/** Home / End move the leading pane to its own min or max. */
+export function jumpSplitterGutter(
+  sizes: number[],
+  gutterIndex: number,
+  edge: 'start' | 'end',
+  mins: number[],
+  maxes: Array<number | undefined>
+): number[] | null {
+  if (gutterIndex < 0 || gutterIndex >= sizes.length - 1) return null
+  const left = gutterIndex
+  const right = gutterIndex + 1
+  const pair = sizes[left] + sizes[right]
+  const leftMin = mins[left] ?? 0
+  const rightMin = mins[right] ?? 0
+  const leftMax = maxes[left]
+  let newLeft =
+    edge === 'start' ? leftMin : (leftMax ?? Math.max(leftMin, pair - rightMin))
+  newLeft = clampPaneSize(newLeft, leftMin, leftMax)
+  let newRight = clampPaneSize(pair - newLeft, rightMin, maxes[right])
+  newLeft = clampPaneSize(pair - newRight, leftMin, leftMax)
+  const result = [...sizes]
+  result[left] = newLeft
+  result[right] = pair - newLeft
+  return result
 }
 
 /**

@@ -148,7 +148,7 @@ export default function App() {
           </Checkbox>
         ))}
       </CheckboxGroup>
-      <p className="text-sm text-[var(--tiger-text-muted)]">
+      <p className="text-sm text-[var(--tiger-text-secondary)]">
         当前权限：{permissions.length ? permissions.join(', ') : '无'}
       </p>
       <Layout className="h-72 overflow-hidden rounded border border-[var(--tiger-border)]">

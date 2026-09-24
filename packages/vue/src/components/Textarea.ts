@@ -15,6 +15,7 @@ import {
   autoResizeTextarea,
   clearTextareaAutoResize,
   classNames,
+  coerceTextFormValue,
   coerceClassValue,
   callUnknownEventHandler,
   formatInputCountText,
@@ -189,9 +190,9 @@ export const Textarea = defineComponent({
       ([modelValue, controlValue]) => {
         const source =
           modelValue !== undefined
-            ? modelValue
-            : typeof controlValue === 'string'
-              ? controlValue
+            ? coerceTextFormValue(modelValue)
+            : formItemControl?.name.value
+              ? coerceTextFormValue(controlValue)
               : undefined
         if (source === undefined) return
         if (source !== localValue.value) localValue.value = source

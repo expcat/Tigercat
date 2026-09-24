@@ -227,15 +227,8 @@ export interface TableToolbarProps {
    */
   bulkActions?: TableToolbarAction[]
   /**
-   * Selected row keys
-   */
-  selectedKeys?: (string | number)[]
-  /**
-   * Selected row count
-   */
-  selectedCount?: number
-  /**
    * Bulk actions label prefix. Defaults to `locale.table.selectedText`.
+   * Selection count is the length of `rowSelection.selectedRowKeys`.
    */
   bulkActionsLabel?: string
   /**

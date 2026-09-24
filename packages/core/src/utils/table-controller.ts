@@ -13,11 +13,17 @@ import type {
   SortDirection,
   SortState,
   TableColumn,
+  TableExportScope,
   TableFixedPosition
 } from '../types/table'
 import { devWarn } from './dev-warn'
 import { filterDataAdvanced } from './table-filter-utils'
-import { groupDataByColumn } from './table-group-utils'
+import {
+  buildTableGroupBlocks,
+  groupDataByColumn,
+  resolveGroupCellValue,
+  type TableGroupBlock
+} from './table-group-utils'
 import {
   calculatePagination,
   filterHiddenColumns,
@@ -28,7 +34,9 @@ import {
   hasTableSelectionColumn,
   orderTableFixedColumns,
   paginateData,
-  sortData
+  resolveTableRowKeys,
+  sortData,
+  tableRowKeyId
 } from './table-utils'
 
 export const EMPTY_TABLE_RECORDS: Record<string, unknown>[] = []
@@ -112,37 +120,41 @@ export function getNextTableSelectRowKeys(options: {
   type?: 'checkbox' | 'radio'
 }): TableKeyList {
   const { selectedRowKeys, key, checked, type } = options
+  const id = tableRowKeyId(key)
   if (type === 'radio') {
     return checked ? [key] : []
   }
   if (checked) {
-    if (selectedRowKeys.includes(key)) return selectedRowKeys
+    if (selectedRowKeys.some((item) => tableRowKeyId(item) === id)) return selectedRowKeys
     return [...selectedRowKeys, key]
   }
-  return selectedRowKeys.filter((item) => item !== key)
+  return selectedRowKeys.filter((item) => tableRowKeyId(item) !== id)
 }
 
 export function getNextTableExpandKeys(
   expandedRowKeys: TableKeyList,
   key: string | number
 ): { keys: TableKeyList; expanded: boolean } {
-  const expanded = !expandedRowKeys.includes(key)
+  const id = tableRowKeyId(key)
+  const expanded = !expandedRowKeys.some((item) => tableRowKeyId(item) === id)
   return {
     expanded,
-    keys: expanded ? [...expandedRowKeys, key] : expandedRowKeys.filter((item) => item !== key)
+    keys: expanded
+      ? [...expandedRowKeys, key]
+      : expandedRowKeys.filter((item) => tableRowKeyId(item) !== id)
   }
 }
 
 /**
  * Lock button: a locked column unlocks; an unlocked column relocks to its
- * original side (`right` stays right) or `left` when it had no original side.
+ * original edge (`end` stays end) or `start` when it had no original edge.
  */
 export function getNextTableColumnFixed(
   current: TableFixedPosition | false | undefined,
   original?: TableFixedPosition | false
 ): TableFixedPosition | false {
-  if (current === 'left' || current === 'right') return false
-  return original === 'right' ? 'right' : 'left'
+  if (current === 'start' || current === 'end') return false
+  return original === 'end' ? 'end' : 'start'
 }
 
 export function applyTableColumnOrder<T>(
@@ -199,9 +211,8 @@ export function reorderTableRowsByKey<T>(
 }
 
 /**
- * Resolve a row identity. `rowSelection.getRowKey` shares this path with
- * `rowKey`. Missing keys fall back to the **dataSource** index, never a page
- * offset.
+ * Resolve one row. Prefer {@link resolveTableRowKeys} for a list so fallbacks
+ * cannot collide with `0` or another numeric id.
  */
 export function resolveTableRecordKey<T>(
   record: T,
@@ -209,18 +220,15 @@ export function resolveTableRecordKey<T>(
   rowKey: string | ((record: T) => string | number) = 'id',
   getRowKey?: (record: T) => string | number
 ): string | number {
-  if (getRowKey) {
-    const key = getRowKey(record)
-    if (key !== undefined && key !== null) return key
-  }
-  if (typeof rowKey === 'function') {
-    const key = rowKey(record)
-    if (key !== undefined && key !== null) return key
-  } else {
-    const key = (record as Record<string, unknown>)[rowKey]
-    if (key !== undefined && key !== null) return key as string | number
-  }
-  return sourceIndex
+  return resolveTableRowKeys([record], rowKey, getRowKey, sourceIndex)[0]!
+}
+
+export function coerceTableEditValue(original: unknown, raw: string): unknown {
+  if (typeof original !== 'number') return raw
+  const trimmed = raw.trim()
+  if (trimmed === '') return original
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) ? parsed : raw
 }
 
 export function getTableCellValue<T>(
@@ -294,11 +302,50 @@ export function resolveTableDisplayColumns<T>(options: {
   )
 }
 
-export function shouldWarnControlledPageReset(
-  isCurrentPageControlled: boolean,
-  currentPage: number
-): boolean {
-  return isCurrentPageControlled && currentPage !== 1
+/**
+ * Filter, page size, and sort share this page. A controlled page stays on
+ * screen until the parent writes it back, so the event must not advertise 1.
+ */
+export function resolveTableQueryPage(pageControlled: boolean, currentPage: number): number {
+  return pageControlled ? currentPage : 1
+}
+
+export function resolveTableExportRecords<T>(options: {
+  scope: TableExportScope
+  pageRecords: T[]
+  processedRecords: T[]
+  processedKeys: (string | number)[]
+  selectedKeys: (string | number)[]
+}): T[] {
+  if (options.scope === 'page') return options.pageRecords
+  if (options.scope === 'selected') {
+    const selected = new Set(options.selectedKeys.map((key) => tableRowKeyId(key)))
+    return options.processedRecords.filter((record, index) => {
+      const key = options.processedKeys[index]
+      return key !== undefined && selected.has(tableRowKeyId(key))
+    })
+  }
+  return options.processedRecords
+}
+
+/**
+ * Loaded-row select. Remote mode does not pretend the other pages are local.
+ */
+export function resolveTableSelectLoadedKeys(options: {
+  remote: boolean
+  selectedKeys: TableKeyList
+  loadedSelectableKeys: TableKeyList
+  checked: boolean
+}): { keys: TableKeyList; emitOnly: boolean } {
+  if (options.remote) return { keys: options.selectedKeys, emitOnly: true }
+  return {
+    keys: getNextTableSelectAllKeys(
+      options.selectedKeys,
+      options.loadedSelectableKeys,
+      options.checked
+    ),
+    emitOnly: false
+  }
 }
 
 export interface TableIndexedRow<T> {
@@ -331,11 +378,15 @@ export interface TableViewInput<T = Record<string, unknown>> {
   currentPageSize: number
   rowKey?: string | ((record: T) => string | number)
   getRowKey?: (record: T) => string | number
+  /** Pre-resolved dataSource keys. Width and page updates must not re-run rowKey. */
+  sourceRowKeys?: (string | number)[]
   rowSelection?: RowSelectionConfig<T>
   expandable?: ExpandableConfig<T>
   selectedRowKeys?: TableKeyList
   measuredColumnWidths?: Record<string, number>
   containerWidth?: number
+  sortLocale?: string
+  rowDraggable?: boolean
 }
 
 export interface TableView<T = Record<string, unknown>> {
@@ -343,8 +394,9 @@ export interface TableView<T = Record<string, unknown>> {
   processedData: T[]
   paginatedData: T[]
   pageRowKeys: TableKeyList
+  processedRowKeys: TableKeyList
   pageSourceIndices: number[]
-  groupedData: Map<string, T[]> | null
+  groupBlocks: TableGroupBlock<T>[] | null
   paginationInfo: ReturnType<typeof calculatePagination> | null
   paginationConfig: PaginationConfig | null
   allSelected: boolean
@@ -369,6 +421,7 @@ export function resolveTableProcessedRows<T>(options: {
   filterMode: 'basic' | 'advanced'
   advancedFilterRules: FilterRule[]
   skipLocalProcessing: boolean
+  sortLocale?: string
 }): TableIndexedRow<T>[] {
   const { dataSource, columns } = options
   if (options.skipLocalProcessing) {
@@ -384,7 +437,14 @@ export function resolveTableProcessedRows<T>(options: {
 
   if (options.sort.key && options.sort.direction) {
     const column = columns.find((item) => item.key === options.sort.key)
-    records = sortData(records, options.sort.key, options.sort.direction, column?.sortFn, columns)
+    records = sortData(
+      records,
+      options.sort.key,
+      options.sort.direction,
+      column?.sortFn,
+      columns,
+      options.sortLocale
+    )
   }
 
   return toIndexedRows(dataSource, records)
@@ -417,7 +477,8 @@ export function resolveTableView<T>(input: TableViewInput<T>): TableView<T> {
     sort,
     filterMode,
     advancedFilterRules,
-    skipLocalProcessing: skipLocal
+    skipLocalProcessing: skipLocal,
+    sortLocale: input.sortLocale
   })
 
   if (input.groupBy && !skipLocal) {
@@ -439,20 +500,36 @@ export function resolveTableView<T>(input: TableViewInput<T>): TableView<T> {
   }
 
   const processedData = processedRows.map((row) => row.record)
+  const sourceKeys =
+    input.sourceRowKeys && input.sourceRowKeys.length === dataSource.length
+      ? input.sourceRowKeys
+      : resolveTableRowKeys(dataSource, rowKey, input.getRowKey)
+  const processedRowKeys = processedRows.map((row) => sourceKeys[row.sourceIndex] ?? row.sourceIndex)
 
+  let pageStart = 0
   let pageRows = processedRows
   if (pagination !== false && !pagination.remote) {
+    const size = Math.max(1, input.currentPageSize)
+    const page = Math.max(1, input.currentPage)
+    pageStart = (page - 1) * size
     pageRows = paginateData(processedRows, input.currentPage, input.currentPageSize)
   }
 
   const paginatedData = pageRows.map((row) => row.record)
   const pageSourceIndices = pageRows.map((row) => row.sourceIndex)
-  const pageRowKeys = pageRows.map((row) =>
-    resolveTableRecordKey(row.record, row.sourceIndex, rowKey, input.getRowKey)
-  )
+  const pageRowKeys = pageRows.map((row) => sourceKeys[row.sourceIndex] ?? row.sourceIndex)
 
-  const groupedData =
-    input.groupBy && !skipLocal ? groupDataByColumn(paginatedData, input.groupBy, columns) : null
+  const groupBlocks =
+    input.groupBy && !skipLocal
+      ? buildTableGroupBlocks({
+          rows: processedData,
+          groupKeys: processedData.map((record) =>
+            resolveGroupCellValue(record, input.groupBy as string, columns)
+          ),
+          pageStart,
+          pageEnd: pageStart + pageRows.length
+        })
+      : null
 
   const total = resolveTablePaginationTotal(pagination, processedData.length)
   const paginationInfo =
@@ -470,14 +547,16 @@ export function resolveTableView<T>(input: TableViewInput<T>): TableView<T> {
   let totalColumnCount = displayColumns.length
   if (hasTableSelectionColumn(input.rowSelection)) totalColumnCount += 1
   if (input.expandable) totalColumnCount += 1
+  if (input.rowDraggable) totalColumnCount += 1
 
   return {
     displayColumns,
     processedData,
     paginatedData,
     pageRowKeys,
+    processedRowKeys,
     pageSourceIndices,
-    groupedData,
+    groupBlocks,
     paginationInfo,
     paginationConfig,
     allSelected: selectionState.allSelected,

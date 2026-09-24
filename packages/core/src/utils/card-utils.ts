@@ -1,86 +1,80 @@
 import type { BaseLayoutProps, CardSize, CardVariant } from '../types'
 import { isActivationKey } from './a11y-utils'
 import { classNames } from './class-names'
-import { isBrowser } from './env'
+import { resolveLinkAddress, type ResolvedLinkAddress } from './link-utils'
 
-export const CARD_STYLE_ID = 'tiger-ui-card-styles'
-
-export const CARD_CSS = `
-.tiger-card {
-  border-radius: var(--tiger-radius-lg, 0.75rem);
-  overflow: visible;
-}
-.tiger-card.tiger-flex-row {
-  display: flex;
-  flex-direction: row;
-}
-[dir="rtl"] .tiger-card.tiger-flex-row,
-[data-tiger-dir="rtl"] .tiger-card.tiger-flex-row {
-  flex-direction: row-reverse;
-}
-.tiger-card-cover {
-  overflow: hidden;
-}
-.tiger-card-cover-vertical {
-  width: 100%;
-  height: 12rem;
-  border-start-start-radius: inherit;
-  border-start-end-radius: inherit;
-}
-.tiger-card-cover-horizontal {
-  flex-shrink: 0;
-  width: 12rem;
-  align-self: stretch;
-  border-start-start-radius: inherit;
-  border-end-start-radius: inherit;
-}
-.tiger-card-cover > img,
-.tiger-card-cover > video {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.tiger-card-variant-default,
-.tiger-card-variant-bordered,
-.tiger-card-variant-shadow,
-.tiger-card-variant-elevated {
-  background-color: var(--tiger-surface, #ffffff);
-  border-style: solid;
-  border-color: var(--tiger-border, #e5e7eb);
-}
-.tiger-card-variant-default,
-.tiger-card-variant-shadow,
-.tiger-card-variant-elevated {
-  border-width: 1px;
-}
-.tiger-card-variant-bordered {
-  border-width: 2px;
-}
-.tiger-card-variant-shadow {
-  box-shadow: var(--tiger-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1));
-}
-.tiger-card-variant-elevated {
-  box-shadow: var(--tiger-shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1));
-}
-.tiger-card-variant-transparent {
-  background-color: transparent;
-  border-width: 0;
-  box-shadow: none;
-}
-`
-
-export function injectCardStyles(): void {
-  if (!isBrowser()) return
-  if (document.getElementById(CARD_STYLE_ID)) return
-  const style = document.createElement('style')
-  style.id = CARD_STYLE_ID
-  style.textContent = CARD_CSS
-  document.head.appendChild(style)
-}
+/** Card geometry previously injected at runtime. Wire into the tailwind plugin. */
+export const cardBaseStyles = {
+  '.tiger-card': {
+    borderRadius: 'var(--tiger-radius-lg)',
+    overflow: 'visible'
+  },
+  '.tiger-card.tiger-flex-row': {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+  '.tiger-card-cover': {
+    overflow: 'hidden'
+  },
+  '.tiger-card-cover-vertical': {
+    width: '100%',
+    height: '12rem',
+    borderStartStartRadius: 'inherit',
+    borderStartEndRadius: 'inherit'
+  },
+  '.tiger-card-cover-horizontal': {
+    flexShrink: '0',
+    width: '12rem',
+    alignSelf: 'stretch',
+    borderStartStartRadius: 'inherit',
+    borderEndStartRadius: 'inherit'
+  },
+  '.tiger-card-cover > img, .tiger-card-cover > video': {
+    display: 'block',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover'
+  },
+  '.tiger-card-variant-default, .tiger-card-variant-bordered, .tiger-card-variant-shadow, .tiger-card-variant-elevated':
+    {
+      backgroundColor: 'var(--tiger-surface)',
+      borderStyle: 'solid',
+      borderColor: 'var(--tiger-border)'
+    },
+  '.tiger-card-variant-default, .tiger-card-variant-shadow, .tiger-card-variant-elevated': {
+    borderWidth: '1px'
+  },
+  '.tiger-card-variant-bordered': {
+    borderWidth: '2px'
+  },
+  '.tiger-card-variant-shadow': {
+    boxShadow: 'var(--tiger-shadow-md)'
+  },
+  '.tiger-card-variant-elevated': {
+    boxShadow: 'var(--tiger-shadow-lg)'
+  },
+  '.tiger-card-variant-transparent': {
+    backgroundColor: 'transparent',
+    borderWidth: '0',
+    boxShadow: 'none'
+  },
+  '.tiger-card-link': {
+    color: 'inherit',
+    textDecoration: 'none'
+  },
+  '.tiger-card-link-stretch::after': {
+    content: '""',
+    position: 'absolute',
+    inset: '0'
+  },
+  '.tiger-card-actions': {
+    position: 'relative',
+    zIndex: '1'
+  }
+} as const
 
 export const cardBaseClasses =
-  'tiger-card rounded-[var(--tiger-radius-lg,0.75rem)] tiger-motion-aware transition-[box-shadow,transform] duration-200 ease-out'
+  'tiger-card rounded-[var(--tiger-radius-lg)] tiger-motion-aware transition-[box-shadow,transform] duration-200 ease-out'
 
 export const cardSizeClasses: Record<CardSize, string> = {
   sm: 'p-3',
@@ -89,23 +83,23 @@ export const cardSizeClasses: Record<CardSize, string> = {
 } as const
 
 const CARD_SHADOW_MD =
-  'shadow-[var(--tiger-shadow-md,0_4px_6px_-1px_rgb(0_0_0_/_0.1),0_2px_4px_-2px_rgb(0_0_0_/_0.1))]'
+  'shadow-[var(--tiger-shadow-md)]'
 const CARD_SHADOW_LG =
-  'shadow-[var(--tiger-shadow-lg,0_10px_15px_-3px_rgb(0_0_0_/_0.1),0_4px_6px_-4px_rgb(0_0_0_/_0.1))]'
+  'shadow-[var(--tiger-shadow-lg)]'
 
 export const cardVariantClasses: Record<CardVariant, string> = {
   default: classNames(
-    'tiger-card-variant-default bg-[var(--tiger-surface,#ffffff)] border border-[var(--tiger-border,#e5e7eb)]'
+    'tiger-card-variant-default bg-[var(--tiger-surface)] border border-[var(--tiger-border)]'
   ),
   bordered: classNames(
-    'tiger-card-variant-bordered bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-border,#e5e7eb)]'
+    'tiger-card-variant-bordered bg-[var(--tiger-surface)] border-2 border-[var(--tiger-border)]'
   ),
   shadow: classNames(
-    'tiger-card-variant-shadow bg-[var(--tiger-surface,#ffffff)] border border-[var(--tiger-border,#e5e7eb)]',
+    'tiger-card-variant-shadow bg-[var(--tiger-surface)] border border-[var(--tiger-border)]',
     CARD_SHADOW_MD
   ),
   elevated: classNames(
-    'tiger-card-variant-elevated bg-[var(--tiger-surface,#ffffff)] border border-[var(--tiger-border,#e5e7eb)]',
+    'tiger-card-variant-elevated bg-[var(--tiger-surface)] border border-[var(--tiger-border)]',
     CARD_SHADOW_LG
   ),
   transparent: 'tiger-card-variant-transparent bg-transparent border-0 shadow-none'
@@ -113,12 +107,12 @@ export const cardVariantClasses: Record<CardVariant, string> = {
 
 /** Visual lift only. Cursor and focus ring attach when the card is actually a control. */
 export const cardHoverClasses = classNames(
-  'hover:shadow-[var(--tiger-shadow-lg,0_10px_15px_-3px_rgb(0_0_0_/_0.1),0_4px_6px_-4px_rgb(0_0_0_/_0.1))]',
+  'hover:shadow-[var(--tiger-shadow-lg)]',
   'hover:-translate-y-1 motion-reduce:hover:translate-y-0'
 )
 
 export const cardClickableClasses =
-  'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
 export const cardDirectionClasses: Record<NonNullable<BaseLayoutProps['orientation']>, string> = {
   vertical: 'flex flex-col',
@@ -127,9 +121,9 @@ export const cardDirectionClasses: Record<NonNullable<BaseLayoutProps['orientati
 
 export const cardHorizontalBodyClasses = 'flex flex-col flex-1 min-w-0'
 
-export const cardHeaderClasses = 'border-b border-[var(--tiger-border,#e5e7eb)] pb-3 mb-3'
+export const cardHeaderClasses = 'border-b border-[var(--tiger-border)] pb-3 mb-3'
 
-export const cardFooterClasses = 'border-t border-[var(--tiger-border,#e5e7eb)] pt-3 mt-3'
+export const cardFooterClasses = 'border-t border-[var(--tiger-border)] pt-3 mt-3'
 
 /** Cover media fills its wrapper. Wrapper holds the only size. */
 export const cardCoverClasses = 'h-full w-full object-cover'
@@ -171,13 +165,110 @@ export function getCardClasses(
   hoverable: boolean,
   clickable = false
 ): string {
-  injectCardStyles()
   return classNames(
     cardBaseClasses,
     cardVariantClasses[variant] ?? cardVariantClasses.default,
     hoverable && cardHoverClasses,
     clickable && cardClickableClasses
   )
+}
+
+const INTERACTIVE_CARD_TAGS = new Set([
+  'a',
+  'button',
+  'input',
+  'select',
+  'textarea',
+  'summary',
+  'audio',
+  'video'
+])
+
+/** Intrinsic controls, and nodes that already expose a button or link role. */
+export function cardElementTypeIsInteractive(
+  type: unknown,
+  props?: Record<string, unknown> | null
+): boolean {
+  if (typeof type === 'string' && INTERACTIVE_CARD_TAGS.has(type)) return true
+  if (!props) return false
+  const role = props.role
+  if (role === 'button' || role === 'link' || role === 'checkbox' || role === 'switch') return true
+  if (typeof props.href === 'string' && props.href.trim()) return true
+  const tab = props.tabIndex ?? props.tabindex
+  if (typeof tab === 'number' && tab >= 0) return true
+  return false
+}
+
+export const cardTitleLinkClasses =
+  'tiger-card-link inline text-inherit no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
+
+export const cardStretchLinkClasses = classNames(
+  cardTitleLinkClasses,
+  'tiger-card-link-stretch block'
+)
+
+export const cardActionsRaisedClasses = 'tiger-card-actions relative z-[1]'
+
+export interface CardActivation {
+  /** Root is the navigation or button control. */
+  rootInteractive: boolean
+  rootTag: 'div' | 'a'
+  rootRole?: 'button'
+  rootTabIndex?: number
+  href?: string
+  target?: string
+  rel?: string
+  /** Present when a separate link (title or stretch) navigates. */
+  link: (ResolvedLinkAddress & { stretch: boolean }) | null
+}
+
+/**
+ * One activation surface. Inner controls keep the root static.
+ * A valid href then lives on the root, or on a title / stretched link
+ * that does not wrap those controls. Rejected hrefs are omitted.
+ */
+export function resolveCardActivation(options: {
+  href?: string | null
+  target?: string | null
+  rel?: string | null
+  clickable?: boolean
+  hasActions?: boolean
+  hasForeignControls?: boolean
+}): CardActivation {
+  const nested = Boolean(options.hasActions) || Boolean(options.hasForeignControls)
+  const address = resolveLinkAddress({
+    href: options.href,
+    target: options.target,
+    rel: options.rel
+  })
+  if (address.href && !nested) {
+    return {
+      rootInteractive: true,
+      rootTag: 'a',
+      link: null,
+      ...address
+    }
+  }
+  if (!address.href && options.clickable && !nested) {
+    return {
+      rootInteractive: true,
+      rootTag: 'div',
+      rootRole: 'button',
+      rootTabIndex: 0,
+      link: null
+    }
+  }
+  if (address.href && nested) {
+    return {
+      rootInteractive: false,
+      rootTag: 'div',
+      link: {
+        ...address,
+        stretch: Boolean(options.hasActions) && !options.hasForeignControls
+      }
+    }
+  }
+  return { rootInteractive: false, rootTag: 'div', link: null }
 }
 
 export type CardRootTag = 'div' | 'a'
@@ -192,12 +283,20 @@ export function resolveCardRoot(options: {
   href?: string
   clickable: boolean
   nestedInteractive: boolean
+  target?: string | null
+  rel?: string | null
+  hasForeignControls?: boolean
 }): CardRootResolution {
-  const href = options.href?.trim()
-  if (!href && !options.clickable) return { tag: 'div' }
-  // Nested buttons/links cannot live inside another control.
-  if (options.nestedInteractive) return { tag: 'div' }
-  if (href) return { tag: 'a' }
+  const activation = resolveCardActivation({
+    href: options.href,
+    target: options.target,
+    rel: options.rel,
+    clickable: options.clickable,
+    hasActions: options.nestedInteractive,
+    hasForeignControls: options.hasForeignControls
+  })
+  if (!activation.rootInteractive) return { tag: 'div' }
+  if (activation.rootTag === 'a') return { tag: 'a' }
   return { tag: 'div', role: 'button', tabIndex: 0 }
 }
 

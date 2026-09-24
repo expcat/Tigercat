@@ -24,7 +24,7 @@ Events/callback props: `onChange?`, `onPanelChange?`.
 
 ## Collapse
 
-`packages/core/src/types/collapse.ts` · `CollapseProps` · 4/9 props
+`packages/core/src/types/collapse.ts` · `CollapseProps` · 4/10 props
 
 Note: `onChange` / `v-model:activeKey` 永远是数组，空是 `[]`。accordion 多键只留最后一项。`1` 与 `"1"` 同一面板。header 是真 button；extra 是兄弟，不进可访问名。
 
@@ -78,7 +78,7 @@ Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip
 
 ## Table
 
-`packages/core/src/types/table.ts` · `TableProps` · 4/49 props
+`packages/core/src/types/table.ts` · `TableProps` · 4/53 props
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 

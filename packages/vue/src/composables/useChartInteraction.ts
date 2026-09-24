@@ -9,15 +9,16 @@ import {
   type Ref
 } from 'vue'
 import {
+  createChartInteractionHandlers,
   createChartPointerMoveScheduler,
   getChartElementOpacity,
   getChartLegendShellClasses,
   isChartActivationKey,
-  nextChartSelectedIndex,
   resolveChartActiveIndex,
   resolveChartIndex,
   shouldTrackChartPointer,
   tooltipPositionFromEvent,
+  type ChartInteractionState,
   type ChartLegendPosition
 } from '@expcat/tigercat-core'
 
@@ -97,19 +98,45 @@ export function useChartInteraction<T = unknown>(
     })
   }
 
-  const applyHover = (index: number | null, position?: { x: number; y: number }) => {
-    if (!shouldTrackChartPointer(isHoverable(), isShowTooltip())) return
-    if (options.hoveredIndexProp?.() === undefined) {
-      localHoveredIndex.value = index
+  const state: ChartInteractionState = {
+    get hoveredIndex() {
+      return localHoveredIndex.value
+    },
+    set hoveredIndex(value) {
+      localHoveredIndex.value = value
+    },
+    get selectedIndex() {
+      return localSelectedIndex.value
+    },
+    set selectedIndex(value) {
+      localSelectedIndex.value = value
     }
-    if (position) tooltipPosition.value = position
-    if (!isHoverable()) return
-    onHoveredIndexChange?.(index)
-    onHover?.(index, index !== null ? (getData?.(index) ?? null) : null)
+  }
+
+  const handlersFor = () => {
+    const hovered = options.hoveredIndexProp?.()
+    const selected = options.selectedIndexProp?.()
+    return createChartInteractionHandlers([], state, {
+      hoverable: isHoverable(),
+      showTooltip: isShowTooltip(),
+      selectable: isSelectable(),
+      hoveredIndex: hovered,
+      selectedIndex: selected,
+      onHoverChange: (index, datum) => {
+        onHoveredIndexChange?.(index)
+        onHover?.(index, datum)
+      },
+      onSelectChange: (index) => onSelectedIndexChange?.(index),
+      onItemClick: (index, datum) => onClick?.(index, datum)
+    })
   }
 
   const handleMouseEnter = (index: number, event: MouseEvent | FocusEvent | KeyboardEvent) => {
-    applyHover(index, tooltipPositionFromEvent(event))
+    const position = tooltipPositionFromEvent(event)
+    if (shouldTrackChartPointer(isHoverable(), isShowTooltip())) {
+      tooltipPosition.value = position
+    }
+    handlersFor().onMouseEnter(index, getData?.(index), position)
   }
 
   const handleMouseMove = (event: MouseEvent) => {
@@ -119,26 +146,20 @@ export function useChartInteraction<T = unknown>(
 
   const handleMouseLeave = () => {
     tooltipScheduler.cancel()
-    applyHover(null)
+    handlersFor().onMouseLeave()
   }
 
   const handleClick = (index: number) => {
-    onClick?.(index, getData?.(index))
-    if (!isSelectable()) return
-    const nextIndex = nextChartSelectedIndex(resolvedSelectedIndex.value, index)
-    if (options.selectedIndexProp?.() === undefined) {
-      localSelectedIndex.value = nextIndex
-    }
-    onSelectedIndexChange?.(nextIndex)
+    handlersFor().onClick(index, getData?.(index))
   }
 
   const handleKeyDown = (event: KeyboardEvent, index: number) => {
     if (!isChartActivationKey(event.key)) return
-    event.preventDefault()
+    const position = tooltipPositionFromEvent(event)
     if (shouldTrackChartPointer(isHoverable(), isShowTooltip())) {
-      applyHover(index, tooltipPositionFromEvent(event))
+      tooltipPosition.value = position
     }
-    handleClick(index)
+    handlersFor().onKeyDown(event, index, getData?.(index), position)
   }
 
   const handleLegendClick = (index: number) => {
@@ -146,7 +167,11 @@ export function useChartInteraction<T = unknown>(
   }
 
   const handleLegendHover = (index: number, _item?: unknown, event?: Event) => {
-    applyHover(index, event ? tooltipPositionFromEvent(event) : undefined)
+    const position = event ? tooltipPositionFromEvent(event) : undefined
+    if (position && shouldTrackChartPointer(isHoverable(), isShowTooltip())) {
+      tooltipPosition.value = position
+    }
+    handlersFor().onMouseEnter(index, getData?.(index), position)
   }
 
   const handleLegendLeave = () => {

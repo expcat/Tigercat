@@ -75,7 +75,7 @@ describe('navigation-menu-controller', () => {
     expect(products.tabIndex).toBe(-1)
   })
 
-  it('closes a hover session only for the matching item, including 1 vs "1"', () => {
+  it('closes a hover session only for the same typed key', () => {
     vi.useFakeTimers()
     let value: string | number | null = 1
     const session = createNavigationMenuHoverSession({
@@ -88,6 +88,10 @@ describe('navigation-menu-controller', () => {
     })
 
     session.scheduleClose('1')
+    vi.advanceTimersByTime(50)
+    expect(value).toBe(1)
+
+    session.scheduleClose(1)
     vi.advanceTimersByTime(50)
     expect(value).toBeNull()
     expect(isNavigationMenuValueOpen(1, value)).toBe(false)
