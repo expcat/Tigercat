@@ -165,14 +165,15 @@ describe('InfiniteScroll (React)', () => {
     expect(getByTestId('feed').style.height).toBe('288px')
   })
 
-  it('loads more when the first page does not fill the box', async () => {
+  it('does not load when the container cannot scroll', async () => {
     const onLoadMore = vi.fn()
     render(
-      <InfiniteScroll hasMore height={288} onLoadMore={onLoadMore}>
+      <InfiniteScroll hasMore height={288} root="container" onLoadMore={onLoadMore}>
         <div>one</div>
       </InfiniteScroll>
     )
-    await waitFor(() => expect(onLoadMore).toHaveBeenCalled())
+    await Promise.resolve()
+    expect(onLoadMore).not.toHaveBeenCalled()
   })
 
   it('does not load while loading is true', async () => {
@@ -186,25 +187,21 @@ describe('InfiniteScroll (React)', () => {
     expect(onLoadMore).not.toHaveBeenCalled()
   })
 
-  it('loads again after loading returns to false while the sentinel stays in view', async () => {
+  it('does not load again while the sentinel stays in view after loading ends', async () => {
     const onLoadMore = vi.fn()
     const { rerender } = render(
-      <InfiniteScroll hasMore loading={false} height={288} onLoadMore={onLoadMore}>
+      <InfiniteScroll hasMore loading height={288} root="container" onLoadMore={onLoadMore}>
         <div>one</div>
       </InfiniteScroll>
     )
-    await waitFor(() => expect(onLoadMore).toHaveBeenCalledTimes(1))
+    expect(onLoadMore).not.toHaveBeenCalled()
     rerender(
-      <InfiniteScroll hasMore loading height={288} onLoadMore={onLoadMore}>
+      <InfiniteScroll hasMore loading={false} height={288} root="container" onLoadMore={onLoadMore}>
         <div>one</div>
       </InfiniteScroll>
     )
-    rerender(
-      <InfiniteScroll hasMore loading={false} height={288} onLoadMore={onLoadMore}>
-        <div>one</div>
-      </InfiniteScroll>
-    )
-    await waitFor(() => expect(onLoadMore).toHaveBeenCalledTimes(2))
+    await Promise.resolve()
+    expect(onLoadMore).not.toHaveBeenCalled()
   })
 
   it('does not load when disabled or exhausted', async () => {

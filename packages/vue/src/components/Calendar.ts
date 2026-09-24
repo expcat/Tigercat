@@ -7,7 +7,8 @@ import {
   onMounted,
   nextTick,
   useId,
-  type PropType
+  type PropType,
+  type VNodeChild
 } from 'vue'
 import { classNames, coerceClassValue } from '@expcat/tigercat-core'
 import type {
@@ -105,17 +106,17 @@ export const Calendar = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const localeCode = computed(() => mergedLocale.value?.locale)
-    const dir = computed(() => getLocaleDirection(mergedLocale.value))
+    const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
+    const viewLive = ref('')
+    const viewLiveReady = ref(false)
     const labels = computed(() => getCalendarLabels(mergedLocale.value))
     const weekStartsOn = computed(() => props.weekStartsOn ?? getWeekStartsOn(localeCode.value))
     const weekdayNames = computed(() => getShortDayNames(localeCode.value, weekStartsOn.value))
     const monthNames = computed(() => getShortMonthNames(localeCode.value))
 
-    const clientNow = ref<Date | null>(null)
-    onMounted(() => {
-      if (!props.now) clientNow.value = new Date()
-    })
-    const today = computed(() => props.now ?? clientNow.value)
+    const today = computed(() =>
+      props.now && !Number.isNaN(props.now.getTime()) ? props.now : null
+    )
 
     const innerSelected = ref<Date | null>(toCalendarDate(props.defaultValue) ?? null)
     const selected = computed(() =>
@@ -125,23 +126,42 @@ export const Calendar = defineComponent({
     const innerMode = ref<CalendarMode>(props.defaultMode ?? 'month')
     const mode = computed(() => props.mode ?? innerMode.value)
 
-    const view = ref(getInitialCalendarView(selected.value, today.value ?? props.now))
+    const view = ref(getInitialCalendarView(selected.value, today.value))
     const followedYmd = ref(selected.value ? toIsoDate(selected.value) : null)
 
     watch(
       () => (selected.value ? toIsoDate(selected.value) : null),
       (ymd) => {
-        const next = followCalendarValue(view.value, selected.value, followedYmd.value)
+        const next = view.value
+          ? followCalendarValue(view.value, selected.value, followedYmd.value)
+          : selected.value
+            ? { viewYear: selected.value.getFullYear(), viewMonth: selected.value.getMonth() }
+            : null
         followedYmd.value = ymd
         if (next) view.value = next
       }
     )
 
     const days = computed(() =>
-      getMonthDays(view.value.viewYear, view.value.viewMonth, weekStartsOn.value)
+      view.value
+        ? getMonthDays(view.value.viewYear, view.value.viewMonth, weekStartsOn.value)
+        : []
     )
     const weeks = computed(() => chunkDaysIntoWeeks(days.value))
     const monthRows = computed(() => chunkMonths(monthNames.value))
+    const titleText = computed(() => {
+      if (!view.value) return ''
+      return mode.value === 'month'
+        ? formatMonthYear(view.value.viewYear, view.value.viewMonth, localeCode.value)
+        : `${view.value.viewYear}`
+    })
+    watch([titleText, mode], () => {
+      if (!viewLiveReady.value) {
+        viewLiveReady.value = true
+        return
+      }
+      viewLive.value = titleText.value
+    })
 
     function emitPanel(nextView: { viewYear: number; viewMonth: number }, nextMode: CalendarMode) {
       emit('panel-change', panelDate(nextView), nextMode)
@@ -178,6 +198,7 @@ export const Calendar = defineComponent({
     }
 
     function toggleMode() {
+      if (!view.value) return
       const next: CalendarMode = mode.value === 'month' ? 'year' : 'month'
       if (props.mode === undefined) innerMode.value = next
       emit('update:mode', next)
@@ -192,6 +213,7 @@ export const Calendar = defineComponent({
     const titleId = useId()
 
     function handleDayGridKeyDown(event: KeyboardEvent) {
+      if (!view.value) return
       const action = getCalendarDayKeyAction(event.key, dir.value, event.altKey)
       if (action.kind === 'none') return
       event.preventDefault()
@@ -229,6 +251,7 @@ export const Calendar = defineComponent({
     }
 
     function handleMonthKeyDown(event: KeyboardEvent, idx: number) {
+      if (!view.value) return
       const action = getCalendarMonthKeyAction(event.key, dir.value)
       if (action.kind === 'none') return
       event.preventDefault()
@@ -248,6 +271,7 @@ export const Calendar = defineComponent({
 
     expose({
       focus: () => {
+        if (!view.value) return
         const iso = resolveCalendarRovingIso({
           days: days.value,
           selected: selected.value,
@@ -264,6 +288,13 @@ export const Calendar = defineComponent({
     })
 
     return () => {
+      if (!view.value) {
+        return h('div', {
+          class: classNames(getCalendarContainerClasses(!!props.fullscreen), props.className),
+          'data-tiger-calendar': '',
+          'aria-label': labels.value.today
+        })
+      }
       const attrRecord = attrs as Record<string, unknown>
       const containerClass = classNames(
         getCalendarContainerClasses(!!props.fullscreen),
@@ -318,6 +349,10 @@ export const Calendar = defineComponent({
             type: 'button',
             id: titleId,
             class: calendarTitleClasses,
+            'aria-label':
+              mode.value === 'month'
+                ? `${title}, ${labels.value.switchToYear}`
+                : `${title}, ${labels.value.switchToMonth}`,
             onClick: toggleMode
           },
           title
@@ -423,6 +458,12 @@ export const Calendar = defineComponent({
               })
               const customCell = slots.dateCell?.({ date, events: extra.events, extra })
               const hasExtra = Boolean(customCell) || extra.events.length > 0
+              const eventTitles = extra.events.map((event) => event.title).filter(Boolean)
+              const dayLabel = appendCalendarEventCountLabel(
+                formatCalendarDayLabel(date, localeCode.value),
+                extra.events.length,
+                labels.value.eventCountText
+              )
               const defaultDots =
                 !customCell && extra.events.length > 0
                   ? h(
@@ -437,18 +478,16 @@ export const Calendar = defineComponent({
                       )
                     )
                   : null
-              return h(
+              return h('div', { key: iso, class: 'flex min-w-0 flex-col items-stretch' }, [
+                h(
                 'button',
                 {
-                  key: iso,
                   type: 'button',
                   role: 'gridcell',
                   'data-date': iso,
-                  'aria-label': appendCalendarEventCountLabel(
-                    formatCalendarDayLabel(date, localeCode.value),
-                    extra.events.length,
-                    labels.value.eventCountText
-                  ),
+                  'aria-label': eventTitles.length
+                    ? `${dayLabel}. ${eventTitles.join(', ')}`
+                    : dayLabel,
                   'aria-selected': isSelected || isRangeStart || isRangeEnd,
                   'aria-current': isTodayDate ? 'date' : undefined,
                   disabled: isDisabled,
@@ -467,8 +506,21 @@ export const Calendar = defineComponent({
                   onClick: () => selectDay(date),
                   onFocus: () => (activeIso.value = iso)
                 },
-                [formatCalendarDayNumber(date, localeCode.value), customCell ?? defaultDots]
-              )
+                [formatCalendarDayNumber(date, localeCode.value), defaultDots]
+              ),
+              customCell ? h('div', {}, [customCell as VNodeChild]) : null,
+              eventTitles.length
+                ? h(
+                    'ul',
+                    { class: 'm-0 list-none p-0 text-[10px] leading-tight text-[var(--tiger-text)]' },
+                    extra.events.map((event, index) =>
+                      event.title
+                        ? h('li', { key: event.key ?? `${extra.iso}-title-${index}` }, event.title)
+                        : null
+                    )
+                  )
+                : null
+              ])
             })
           )
         )
@@ -492,12 +544,15 @@ export const Calendar = defineComponent({
         {
           ...restAttrs,
           ref: rootEl,
-          dir: dir.value,
           class: containerClass,
           style: mergeStyleValues(attrStyle),
           'data-tiger': 'calendar'
         },
-        [header, body]
+        [
+          h('div', { role: 'status', 'aria-live': 'polite', class: 'sr-only' }, viewLive.value),
+          header,
+          body
+        ]
       )
     }
   }

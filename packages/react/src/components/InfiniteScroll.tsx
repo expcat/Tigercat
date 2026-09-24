@@ -4,6 +4,9 @@ import {
   classNames,
   shouldLoadMore,
   createInfiniteScrollObserver,
+  createInfiniteScrollFlight,
+  infiniteScrollContainerCanAdvance,
+  compensateInverseScrollStart,
   resolveLocaleText,
   mergeTigerLocale,
   getInfiniteScrollContainerClasses,
@@ -20,12 +23,15 @@ export interface InfiniteScrollProps
   children?: React.ReactNode
   loader?: React.ReactNode
   end?: React.ReactNode
-  onLoadMore?: () => void
+  onLoadMore?: () => void | Promise<unknown>
 }
 
 export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   hasMore = true,
   loading = false,
+  error = false,
+  errorText,
+  retryText,
   threshold = 100,
   loadingText,
   endText,
@@ -33,7 +39,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   inverse = false,
   disabled = false,
   height,
-  root = 'container',
+  root = null,
   className,
   locale,
   children,
@@ -53,9 +59,9 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   const sentinelRef = useRef<HTMLDivElement>(null)
   const onLoadMoreRef = useRef(onLoadMore)
   onLoadMoreRef.current = onLoadMore
-  const pendingRef = useRef(false)
+  const flightRef = useRef(createInfiniteScrollFlight())
   const wasLoadingRef = useRef(loading)
-  const prevScrollHeightRef = useRef<number | null>(null)
+  const anchorStartRef = useRef<number | null>(null)
 
   const containerClasses = useMemo(
     () => getInfiniteScrollContainerClasses(orientation, className),
@@ -63,16 +69,28 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   )
 
   const requestLoad = useCallback(() => {
-    if (disabled || loading || !hasMore || pendingRef.current) return
-    pendingRef.current = true
-    onLoadMoreRef.current?.()
-  }, [disabled, loading, hasMore])
+    const el = containerRef.current
+    const containerRoot = root === 'container' || root === undefined
+    if (
+      containerRoot &&
+      el &&
+      !infiniteScrollContainerCanAdvance(el, orientation)
+    ) {
+      return
+    }
+    if (!flightRef.current.canRequest({ disabled, hasMore, error, loading })) return
+    const result = onLoadMoreRef.current?.()
+    flightRef.current.begin(result)
+  }, [disabled, error, hasMore, loading, orientation, root])
 
   useEffect(() => {
-    if (wasLoadingRef.current && !loading) pendingRef.current = false
-    if (loading) pendingRef.current = true
+    flightRef.current.noteLoading(loading, wasLoadingRef.current)
     wasLoadingRef.current = loading
   }, [loading])
+
+  useEffect(() => {
+    if (error) flightRef.current.noteError()
+  }, [error])
 
   const resolveObserverRoot = useCallback((): Element | null => {
     if (root === 'container' || root === undefined) return containerRef.current
@@ -94,10 +112,15 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     const observerRoot = resolveObserverRoot()
     const teardown = createInfiniteScrollObserver(sentinel, {
       threshold,
-      direction: orientation,
+      orientation,
       root: observerRoot,
       inverse,
-      onLoadMore: requestLoad
+      dir,
+      onLoadMore: () => {
+        flightRef.current.noteSentinel(true)
+        requestLoad()
+      },
+      onLeave: () => flightRef.current.noteSentinel(false)
     })
 
     if (teardown) {
@@ -106,11 +129,12 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
       return teardown
     }
 
-    const el = containerRef.current
-    if (el) {
-      el.addEventListener('scroll', checkScroll, { passive: true })
+    const scrollTarget: EventTarget | null =
+      observerRoot === null ? window : containerRef.current
+    if (scrollTarget) {
+      scrollTarget.addEventListener('scroll', checkScroll, { passive: true })
       checkScroll()
-      return () => el.removeEventListener('scroll', checkScroll)
+      return () => scrollTarget.removeEventListener('scroll', checkScroll)
     }
   }, [
     disabled,
@@ -121,17 +145,36 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     inverse,
     requestLoad,
     resolveObserverRoot,
-    checkScroll
+    checkScroll,
+    dir
   ])
 
   useLayoutEffect(() => {
-    if (!inverse) return
+    if (!inverse) {
+      anchorStartRef.current = null
+      return
+    }
     const el = containerRef.current
     if (!el) return
-    const next = el.scrollHeight
-    const prev = prevScrollHeightRef.current
-    if (prev != null && next !== prev) el.scrollTop += next - prev
-    prevScrollHeightRef.current = next
+    const content = Array.from(el.children).find((child) => {
+      if (!(child instanceof HTMLElement)) return false
+      if (child.classList.contains(infiniteScrollSentinelClasses)) return false
+      if (child.getAttribute('role') === 'status' || child.getAttribute('role') === 'alert') return false
+      return true
+    }) as HTMLElement | undefined
+    if (!content) return
+    const nextStart = orientation === 'horizontal' ? content.offsetLeft : content.offsetTop
+    const next = compensateInverseScrollStart({
+      orientation,
+      dir,
+      previousStart: anchorStartRef.current,
+      nextStart,
+      scrollTop: el.scrollTop,
+      scrollLeft: el.scrollLeft
+    })
+    if (next.scrollTop !== el.scrollTop) el.scrollTop = next.scrollTop
+    if (next.scrollLeft !== el.scrollLeft) el.scrollLeft = next.scrollLeft
+    anchorStartRef.current = orientation === 'horizontal' ? content.offsetLeft : content.offsetTop
   })
 
   const sentinelEl = hasMore ? (
@@ -152,19 +195,42 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     </div>
   ) : null
 
+  const endName = resolveLocaleText('No more data', endText, mergedLocale?.common?.noMoreText)
+  const errorName = resolveLocaleText('Could not load more', errorText, errorText)
+  const retryName = resolveLocaleText('Retry', retryText, retryText)
   const endEl =
-    !hasMore && !loading ? (
+    !hasMore && !loading && !error ? (
       <div
         className={getInfiniteScrollChromeClasses(orientation, infiniteScrollEndClasses)}
-        aria-live="polite">
-        {end ?? resolveLocaleText('No more data', endText, mergedLocale?.common?.noMoreText)}
+        role="status"
+        aria-live="polite"
+        aria-label={endName}>
+        {end ?? endName}
       </div>
     ) : null
+  const errorEl = error ? (
+    <div
+      className={getInfiniteScrollChromeClasses(orientation, infiniteScrollEndClasses)}
+      role="alert"
+      aria-label={errorName}>
+      <span>{errorName}</span>
+      <button
+        type="button"
+        onClick={() => {
+          flightRef.current.reset()
+          const result = onLoadMoreRef.current?.()
+          flightRef.current.begin(result)
+        }}>
+        {retryName}
+      </button>
+    </div>
+  ) : null
 
   const chrome = (
     <>
       {sentinelEl}
       {loaderEl}
+      {errorEl}
       {endEl}
     </>
   )

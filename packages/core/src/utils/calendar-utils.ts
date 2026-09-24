@@ -8,39 +8,39 @@ function eventIso(value: Date | string): string | null {
 }
 
 const FOCUS_RING =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
 export function getCalendarContainerClasses(fullscreen: boolean): string {
   return classNames(
-    'bg-[var(--tiger-surface,#ffffff)]',
-    'border border-[var(--tiger-border,#d1d5db)]',
+    'bg-[var(--tiger-surface)]',
+    'border border-[var(--tiger-border)]',
     fullscreen ? 'w-full p-4' : 'w-72 p-3',
-    'rounded-[var(--tiger-radius-md,0.5rem)]'
+    'rounded-[var(--tiger-radius-md)]'
   )
 }
 
 export const calendarHeaderClasses = classNames('flex items-center justify-between mb-3')
 
 export const calendarNavButtonClasses = classNames(
-  'inline-flex items-center justify-center w-7 h-7 rounded-[var(--tiger-radius-md,0.5rem)]',
-  'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)]',
-  'text-[var(--tiger-text-muted,#6b7280)]',
-  'hover:bg-[var(--tiger-fill-hover,#e5e7eb)]',
+  'inline-flex items-center justify-center w-7 h-7 rounded-[var(--tiger-radius-md)]',
+  'tiger-motion-aware [transition:var(--tiger-transition-base)]',
+  'text-[var(--tiger-text-secondary)]',
+  'hover:bg-[var(--tiger-ghost-bg-hover)]',
   'cursor-pointer',
   FOCUS_RING
 )
 
 export const calendarTitleClasses = classNames(
   'text-sm font-semibold',
-  'text-[var(--tiger-text,#111827)]',
-  'rounded-[var(--tiger-radius-md,0.5rem)] px-2 py-1',
-  'hover:bg-[var(--tiger-fill-hover,#e5e7eb)]',
+  'text-[var(--tiger-text)]',
+  'rounded-[var(--tiger-radius-md)] px-2 py-1',
+  'hover:bg-[var(--tiger-ghost-bg-hover)]',
   FOCUS_RING
 )
 
 export const calendarWeekdayClasses = classNames(
   'text-xs font-medium text-center py-1',
-  'text-[var(--tiger-text-muted,#6b7280)]'
+  'text-[var(--tiger-text-secondary)]'
 )
 
 export const calendarGridClasses = 'grid grid-cols-7'
@@ -73,21 +73,21 @@ export function getCalendarDayClasses(state: CalendarDayClassState): string {
   return classNames(
     'inline-flex items-center justify-center w-8 text-sm',
     hasExtra
-      ? 'h-auto min-h-8 flex-col gap-0.5 rounded-[var(--tiger-radius-md,0.5rem)] py-0.5'
+      ? 'h-auto min-h-8 flex-col gap-0.5 rounded-[var(--tiger-radius-md)] py-0.5'
       : 'h-8 rounded-full',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)]',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     'justify-self-center my-0.5',
     FOCUS_RING,
     isDisabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer',
     selected
-      ? 'bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary-foreground,#ffffff)]'
+      ? 'bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)]'
       : isToday
-        ? 'bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_10%,transparent)] text-[var(--tiger-primary,#2563eb)]'
+        ? 'bg-[color-mix(in_srgb,var(--tiger-primary)_10%,transparent)] text-[var(--tiger-primary)]'
         : isCurrentMonth
-          ? 'text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-fill-hover,#e5e7eb)]'
-          : 'text-[var(--tiger-text-muted,#9ca3af)]',
-    !selected && isInRange && 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
-    isActive && !selected && 'ring-1 ring-inset ring-[var(--tiger-primary,#2563eb)]'
+          ? 'text-[var(--tiger-text)] hover:bg-[var(--tiger-ghost-bg-hover)]'
+          : 'text-[var(--tiger-text-secondary)]',
+    !selected && isInRange && 'bg-[var(--tiger-outline-bg-hover)]',
+    isActive && !selected && 'ring-1 ring-inset ring-[var(--tiger-primary)]'
   )
 }
 
@@ -97,7 +97,7 @@ export const calendarDateCellExtraClasses =
 export const calendarDateCellDotClasses = 'h-1.5 w-1.5 shrink-0 rounded-full'
 
 export function getCalendarEventDotStyle(color?: string): { backgroundColor: string } {
-  return { backgroundColor: color?.trim() || 'var(--tiger-primary, #2563eb)' }
+  return { backgroundColor: color?.trim() || 'var(--tiger-primary)' }
 }
 
 export function getCalendarEventsForDate(
@@ -155,14 +155,14 @@ export function getCalendarMonthClasses(state: {
   isActive?: boolean
 }): string {
   return classNames(
-    'inline-flex items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] py-2 px-3 text-sm',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)]',
+    'inline-flex items-center justify-center rounded-[var(--tiger-radius-md)] py-2 px-3 text-sm',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     FOCUS_RING,
     state.isDisabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer',
     state.isSelected
-      ? 'bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary-foreground,#ffffff)]'
-      : 'text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-fill-hover,#e5e7eb)]',
-    state.isActive && !state.isSelected && 'ring-1 ring-inset ring-[var(--tiger-primary,#2563eb)]'
+      ? 'bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)]'
+      : 'text-[var(--tiger-text)] hover:bg-[var(--tiger-ghost-bg-hover)]',
+    state.isActive && !state.isSelected && 'ring-1 ring-inset ring-[var(--tiger-primary)]'
   )
 }
 

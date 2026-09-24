@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, onBeforeUnmount, PropType, ref } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, PropType, ref, useId } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -19,6 +19,7 @@ import {
   getGanttTaskClasses,
   isBrowser,
   moveGanttTaskByPx,
+  resolveCallerInstant,
   type ChartPadding,
   type GanttDateValue,
   type GanttLayoutTask,
@@ -75,6 +76,7 @@ export const Gantt = defineComponent({
     maxDate: { type: [String, Number, Date] as PropType<GanttDateValue> },
     minBarWidth: { type: Number, default: 6 },
     showToday: { type: Boolean, default: false },
+    now: { type: [Date, Number, String] as PropType<Date | number | string | null>, default: undefined },
     showProgress: { type: Boolean, default: true },
     showDependencies: { type: Boolean, default: true },
     hoverable: { type: Boolean, default: false },
@@ -114,7 +116,7 @@ export const Gantt = defineComponent({
     const resolvedSelectedId = computed(() =>
       props.selectedId === undefined ? innerSelectedId.value : props.selectedId
     )
-    const canDrag = computed(() => props.draggable || typeof props.onTaskChange === 'function')
+    const canDrag = computed(() => props.draggable)
     const resolvedPadding = computed(() => normalizeChartPadding(props.padding))
     const layout = computed(() =>
       computeGanttLayout(props.data, {
@@ -128,7 +130,7 @@ export const Gantt = defineComponent({
         minBarWidth: props.minBarWidth,
         scale: props.scale,
         colors: props.colors,
-        today: props.showToday ? new Date() : undefined,
+        today: props.showToday ? (resolveCallerInstant(props.now) ?? undefined) : undefined,
         dateFormatter: props.dateFormatter,
         weekStartsOn: props.weekStartsOn
       })
@@ -154,7 +156,6 @@ export const Gantt = defineComponent({
         if (props.selectedId === undefined) innerSelectedId.value = nextId
         emit('update:selectedId', nextId)
       }
-      props.onTaskClick?.(task.task)
       emit('task-click', task.task)
     }
 
@@ -248,7 +249,6 @@ export const Gantt = defineComponent({
       }
 
       const nextData = props.data.map((item) => (item.id === nextTask.id ? nextTask : item))
-      props.onTaskChange?.(nextTask)
       emit('task-change', nextTask)
       emit('update:data', nextData)
     }
@@ -350,7 +350,7 @@ export const Gantt = defineComponent({
                       x2: layout.value.width,
                       y1: props.timelineHeight - 1,
                       y2: props.timelineHeight - 1,
-                      stroke: 'var(--tiger-border,#d1d5db)'
+                      stroke: 'var(--tiger-border)'
                     }),
                     ...layout.value.ticks.map((tick) =>
                       h('g', { key: `${tick.label}-${tick.x}` }, [
@@ -359,7 +359,7 @@ export const Gantt = defineComponent({
                           x2: tick.x,
                           y1: 0,
                           y2: layout.value.height,
-                          stroke: 'var(--tiger-border,#e5e7eb)'
+                          stroke: 'var(--tiger-border)'
                         }),
                         h('text', { x: tick.x + 4, y: 16, class: ganttAxisTextClasses }, tick.label)
                       ])
@@ -387,7 +387,8 @@ export const Gantt = defineComponent({
                         y1: 0,
                         y2: layout.value.height,
                         class: ganttTodayLineClasses,
-                        'data-gantt-today': 'true'
+                        'data-gantt-today': 'true',
+                        'aria-label': labels.value.ganttTodayAriaLabel
                       })
                     : undefined,
                   props.showDependencies
@@ -432,7 +433,10 @@ export const Gantt = defineComponent({
                             class: getGanttTaskClasses(interactive, selected, movable, grabbing),
                             role: interactive ? 'button' : 'group',
                             tabindex: interactive ? 0 : undefined,
-                            'aria-label': getGanttTaskAriaLabel(task.task),
+                            'aria-label': getGanttTaskAriaLabel(task.task, {
+                              template: labels.value.ganttTaskAriaLabel,
+                              unknownDate: labels.value.ganttUnknownDate
+                            }),
                             'data-gantt-task-id': task.id,
                             transform:
                               previewDeltaX !== 0 ? `translate(${previewDeltaX} 0)` : undefined,
@@ -458,7 +462,7 @@ export const Gantt = defineComponent({
                               height: task.height,
                               rx: 4,
                               fill: task.color,
-                              stroke: selected ? 'var(--tiger-text,#111827)' : undefined,
+                              stroke: selected ? 'var(--tiger-text)' : undefined,
                               strokeWidth: selected ? 2 : undefined
                             }),
                             props.showProgress && task.progressWidth > 0

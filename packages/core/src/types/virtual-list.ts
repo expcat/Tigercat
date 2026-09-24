@@ -1,8 +1,8 @@
 /**
  * Exclusive `[start, end)` window shared by VirtualList, VirtualTable, and Table.
  *
- * Overscan is applied symmetrically: `start = startRaw - overscan`,
- * `end = startRaw + visibleCount + overscan`.
+ * The exclusive end is `ceil((scrollTop + viewport) / itemHeight) + overscan`.
+ * Overscan is applied once on each side.
  */
 export interface ExclusiveVirtualRange {
   /** First visible index (inclusive) */
@@ -52,9 +52,30 @@ export interface VirtualListSizeStrategy {
   /** Get the Y offset for a specific item index */
   getItemOffset(index: number): number
 
-  /** Notify the strategy that an item was measured in the DOM (dynamic mode) */
-  updateItemHeight?(index: number, measuredHeight: number): void
+  /**
+   * Record a measured margin-box height. Dynamic strategy keys this by
+   * `itemKey` (or the index when no id has been bound).
+   */
+  updateItemHeight?(index: number, measuredHeight: number, itemKey?: string | number): void
+
+  /** Bind the current id for each index. Dynamic measurements follow these ids. */
+  setItemKeys?(keys: readonly (string | number)[]): void
+
+  /**
+   * Refresh known variable heights without rebuilding when every height matches.
+   * Inline `getItemHeight` functions must go through this instead of a new strategy.
+   */
+  syncHeights?(getHeight: (index: number) => number, itemCount: number): void
+
+  /** Remember which id should stay at the same distance from the viewport top. */
+  noteAnchor?(key: string | number, scrollTop: number): void
+
+  /** Scroll offset that keeps the last {@link noteAnchor} id in place, once. */
+  consumeAnchorScrollTop?(): number | null
 }
+
+/** Where `scrollToIndex` places the item inside the viewport. */
+export type VirtualScrollAlign = 'auto' | 'start' | 'center' | 'end'
 
 /**
  * Shared VirtualList props (framework-agnostic)
@@ -99,11 +120,11 @@ export interface VirtualListProps {
 /**
  * Imperative handle exposed by Vue/React VirtualList.
  *
- * `scrollToIndex(i)` sets `scrollTop` to the item's offset (item aligned to
- * the top of the viewport).
+ * `scrollToIndex(i)` defaults to `start` (item top at the viewport top).
+ * `auto` keeps `scrollTop` when the item already intersects the viewport.
  */
 export interface VirtualListHandle {
-  scrollToIndex: (index: number) => void
+  scrollToIndex: (index: number, align?: VirtualScrollAlign) => void
   scrollToOffset: (offset: number) => void
   getScrollElement: () => HTMLElement | null
 }

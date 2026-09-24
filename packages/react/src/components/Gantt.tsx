@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   clampGanttDragDeltaX,
   computeGanttLayout,
@@ -15,8 +15,12 @@ import {
   normalizeChartPadding,
   getGanttTaskAriaLabel,
   getGanttTaskClasses,
+  chartMarkTabIndex,
+  nextChartRovingIndex,
+  isChartNavigationKey,
   isBrowser,
   moveGanttTaskByPx,
+  resolveCallerInstant,
   type ChartPadding,
   type GanttLayoutTask,
   type GanttProps as CoreGanttProps,
@@ -68,6 +72,7 @@ export function Gantt({
   maxDate,
   minBarWidth = 6,
   showToday = false,
+  now,
   showProgress = true,
   showDependencies = true,
   hoverable = false,
@@ -102,6 +107,8 @@ export function Gantt({
   )
   const [innerSelectedId, setInnerSelectedId] = useState<string | number | null>(null)
   const [hoveredId, setHoveredId] = useState<string | number | null>(null)
+  const [focusedIndex, setFocusedIndex] = useState(0)
+  const labelClipId = useId()
   const [dragPreview, setDragPreview] = useState<{ id: string | number; deltaX: number } | null>(
     null
   )
@@ -145,7 +152,7 @@ export function Gantt({
     },
     [onDocumentPointerEnd, onDocumentPointerMove]
   )
-  const canDrag = draggable || Boolean(onTaskChange) || Boolean(onDataChange)
+  const canDrag = draggable
   const resolvedPadding = normalizeChartPadding(padding)
   const minPlotWidth = width
   const layout = useMemo(
@@ -161,7 +168,7 @@ export function Gantt({
         minBarWidth,
         scale,
         colors,
-        today: showToday ? new Date() : undefined,
+        today: showToday ? (resolveCallerInstant(now) ?? undefined) : undefined,
         dateFormatter,
         weekStartsOn
       }),
@@ -178,6 +185,7 @@ export function Gantt({
       resolvedPadding.right,
       rowHeight,
       scale,
+      now,
       showToday,
       taskLabelWidth,
       timelineHeight,
@@ -356,13 +364,18 @@ export function Gantt({
         desc={desc}
         aria-label={ariaLabel ?? (title ? undefined : labels.ganttAriaLabel)}>
         <g data-series-type="gantt">
+          <defs>
+            <clipPath id={labelClipId}>
+              <rect x={layout.labelX} y={0} width={layout.labelWidth} height={layout.height} />
+            </clipPath>
+          </defs>
           <g data-gantt-axis="true">
             <line
               x1={taskLabelWidth}
               x2={layout.width}
               y1={timelineHeight - 1}
               y2={timelineHeight - 1}
-              stroke="var(--tiger-border,#d1d5db)"
+              stroke="var(--tiger-border)"
             />
             {layout.ticks.map((tick) => (
               <g key={`${tick.label}-${tick.x}`}>
@@ -371,7 +384,7 @@ export function Gantt({
                   x2={tick.x}
                   y1={0}
                   y2={layout.height}
-                  stroke="var(--tiger-border,#e5e7eb)"
+                  stroke="var(--tiger-border)"
                 />
                 <text x={tick.x + 4} y={16} className={ganttAxisTextClasses}>
                   {tick.label}
@@ -400,6 +413,7 @@ export function Gantt({
               y2={layout.height}
               className={ganttTodayLineClasses}
               data-gantt-today="true"
+              aria-label={labels.ganttTodayAriaLabel}
             />
           ) : null}
           {showDependencies ? (
@@ -423,14 +437,22 @@ export function Gantt({
               const previewDeltaX = grabbing ? (dragPreview?.deltaX ?? 0) : 0
               return (
                 <g key={task.id} opacity={getTaskOpacity(task)}>
-                  <text x={0} y={task.y + task.height / 2 + 4} className={ganttLabelClasses}>
+                  <text
+                    x={layout.labelX}
+                    y={task.y + task.height / 2 + 4}
+                    className={ganttLabelClasses}
+                    clipPath={`url(#${labelClipId})`}>
                     {task.task.label}
                   </text>
                   <g
                     className={getGanttTaskClasses(interactive, selected, movable, grabbing)}
                     role={interactive ? 'button' : 'group'}
-                    tabIndex={interactive ? 0 : undefined}
-                    aria-label={getGanttTaskAriaLabel(task.task)}
+                    tabIndex={interactive ? chartMarkTabIndex(task.index, focusedIndex) : undefined}
+                    data-gantt-task-index={task.index}
+                    aria-label={getGanttTaskAriaLabel(task.task, {
+                      template: labels.ganttTaskAriaLabel,
+                      unknownDate: labels.ganttUnknownDate
+                    })}
                     data-gantt-task-id={task.id}
                     transform={previewDeltaX !== 0 ? `translate(${previewDeltaX} 0)` : undefined}
                     onMouseEnter={() => setHoveredTask(task)}
@@ -441,6 +463,16 @@ export function Gantt({
                     onPointerCancel={(event) => finishBarDrag(event.nativeEvent)}
                     onClick={(event) => handleBarClick(event, task)}
                     onKeyDown={(event) => {
+                      if (isChartNavigationKey(event.key)) {
+                        event.preventDefault()
+                        const next = nextChartRovingIndex(task.index, event.key, layout.tasks.length)
+                        setFocusedIndex(next)
+                        const node = event.currentTarget.ownerSVGElement?.querySelector(
+                          `[data-gantt-task-index="${next}"]`
+                        )
+                        if (node instanceof SVGElement) node.focus()
+                        return
+                      }
                       if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault()
                         selectTask(task)
@@ -453,7 +485,7 @@ export function Gantt({
                       height={task.height}
                       rx={4}
                       fill={task.color}
-                      stroke={selected ? 'var(--tiger-text,#111827)' : undefined}
+                      stroke={selected ? 'var(--tiger-text)' : undefined}
                       strokeWidth={selected ? 2 : undefined}
                     />
                     {showProgress && task.progressWidth > 0 ? (

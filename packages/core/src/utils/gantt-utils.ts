@@ -1,9 +1,15 @@
 import { classNames } from './class-names'
-import { DEFAULT_CHART_COLORS } from './chart-utils'
+import { DEFAULT_CHART_COLORS } from './chart/color'
+import { formatChartTemplate } from './chart/layout'
 import { devWarn } from './dev-warn'
 import type { GanttDateValue, GanttScale, GanttTask } from '../types/gantt'
 
 const DAY_MS = 24 * 60 * 60 * 1000
+export const MAX_GANTT_TICKS = 24
+
+export function ganttTaskKey(id: string | number): string {
+  return String(id)
+}
 
 export interface GanttLayoutOptions {
   width?: number
@@ -19,6 +25,7 @@ export interface GanttLayoutOptions {
   today?: GanttDateValue
   dateFormatter?: (date: Date, scale: GanttScale) => string
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6
+  direction?: 'ltr' | 'rtl'
 }
 
 export interface GanttLayoutTask {
@@ -60,23 +67,26 @@ export interface GanttLayoutResult {
   width: number
   height: number
   timelineWidth: number
+  timelineX: number
+  labelX: number
+  labelWidth: number
   minMs: number
   maxMs: number
   todayX: number | null
 }
 
-export const ganttRowClasses = 'fill-[var(--tiger-fill,#f9fafb)]'
+export const ganttRowClasses = 'fill-[var(--tiger-surface-muted)]'
 export const ganttLabelClasses =
-  'pointer-events-none select-none fill-[var(--tiger-text,#111827)] text-xs font-medium'
+  'pointer-events-none select-none fill-[var(--tiger-text)] text-xs font-medium'
 export const ganttAxisTextClasses =
-  'pointer-events-none select-none fill-[var(--tiger-text-muted,#6b7280)] text-[11px]'
+  'pointer-events-none select-none fill-[var(--tiger-text-secondary)] text-[11px]'
 export const ganttBarClasses =
   'transition-[filter,opacity,stroke] motion-reduce:transition-none duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
 export const ganttProgressClasses =
-  'fill-[color-mix(in_oklab,var(--tiger-text,#111827)_20%,transparent)]'
+  'fill-[color-mix(in_oklab,var(--tiger-text)_20%,transparent)]'
 export const ganttDependencyClasses =
-  'fill-none stroke-[var(--tiger-text-muted,#6b7280)] stroke-[1.5]'
-export const ganttTodayLineClasses = 'stroke-[var(--tiger-error,#ef4444)] stroke-2'
+  'fill-none stroke-[var(--tiger-text-secondary)] stroke-[1.5]'
+export const ganttTodayLineClasses = 'stroke-[var(--tiger-error)] stroke-2'
 
 export function normalizeGanttDate(value: GanttDateValue): number {
   const date =
@@ -94,13 +104,23 @@ export function normalizeGanttDate(value: GanttDateValue): number {
   return time
 }
 
-export function getGanttTaskAriaLabel(task: GanttTask): string {
+export function getGanttTaskAriaLabel(
+  task: GanttTask,
+  labels?: { template?: string; unknownDate?: string }
+): string {
+  const unknown = labels?.unknownDate ?? ''
   const startMs = normalizeGanttDate(task.start)
   const endMs = normalizeGanttDate(task.end)
-  const start = Number.isFinite(startMs) ? formatGanttDate(new Date(startMs), 'day') : 'unknown'
-  const end = Number.isFinite(endMs) ? formatGanttDate(new Date(endMs), 'day') : 'unknown'
+  const start = Number.isFinite(startMs) ? formatGanttDate(new Date(startMs), 'day') : unknown
+  const end = Number.isFinite(endMs) ? formatGanttDate(new Date(endMs), 'day') : unknown
   const progress = typeof task.progress === 'number' ? `, ${clampProgress(task.progress)}%` : ''
-  return `${task.label}, ${start} to ${end}${progress}`
+  const template = labels?.template ?? '{label}, {start} – {end}{progress}'
+  return formatChartTemplate(template, {
+    label: task.label,
+    start,
+    end,
+    progress
+  })
 }
 
 export function getGanttTaskClasses(
@@ -283,11 +303,10 @@ export function computeGanttLayout(
   const minBarWidth = Number.isFinite(rawMinBarWidth) ? Math.max(0, rawMinBarWidth) : 0
 
   if (data.length === 0) {
-    const fallbackMin = startOfLocalDay(Date.now())
-    const rawMinMs = normalizeGanttDate(options.minDate ?? fallbackMin)
-    const minMs = Number.isFinite(rawMinMs) ? rawMinMs : fallbackMin
-    const rawMaxMs = normalizeGanttDate(options.maxDate ?? minMs + DAY_MS)
-    const maxMs = Number.isFinite(rawMaxMs) && rawMaxMs > minMs ? rawMaxMs : minMs + DAY_MS
+    const rawMinMs = options.minDate == null ? Number.NaN : normalizeGanttDate(options.minDate)
+    const minMs = Number.isFinite(rawMinMs) ? rawMinMs : 0
+    const rawMaxMs = options.maxDate == null ? Number.NaN : normalizeGanttDate(options.maxDate)
+    const maxMs = Number.isFinite(rawMaxMs) && rawMaxMs > minMs ? rawMaxMs : minMs
     return {
       tasks: [],
       dependencies: [],
@@ -295,6 +314,9 @@ export function computeGanttLayout(
       width,
       height: timelineHeight,
       timelineWidth: Math.max(0, width - taskLabelWidth),
+      timelineX: options.direction === 'rtl' ? 0 : taskLabelWidth,
+      labelX: options.direction === 'rtl' ? Math.max(0, width - taskLabelWidth) : 0,
+      labelWidth: taskLabelWidth,
       minMs,
       maxMs,
       todayX: null
@@ -325,11 +347,14 @@ export function computeGanttLayout(
   const safeMaxMs = maxMs > minMs ? maxMs : minMs + DAY_MS
   const timelineWidth = Math.max(0, width - taskLabelWidth)
   const rangeMs = safeMaxMs - minMs
-  const xForTime = (time: number) => taskLabelWidth + ((time - minMs) / rangeMs) * timelineWidth
+  const rtl = options.direction === 'rtl'
+  const timelineX = rtl ? 0 : taskLabelWidth
+  const labelX = rtl ? timelineWidth : 0
+  const xForTime = (time: number) => timelineX + ((time - minMs) / rangeMs) * timelineWidth
 
   const seenIds = new Set<string>()
   const tasks = taskRanges.flatMap(({ task, startMs, endMs }, visualIndex) => {
-    const key = String(task.id)
+    const key = ganttTaskKey(task.id)
     if (seenIds.has(key)) {
       devWarn('Gantt.duplicateId', 'Gantt skipped a duplicate task id')
       return []
@@ -337,8 +362,9 @@ export function computeGanttLayout(
     seenIds.add(key)
     const rawX = xForTime(startMs)
     const dateEndX = xForTime(endMs)
-    const clippedX = Math.max(taskLabelWidth, Math.min(width, rawX))
-    const clippedEndX = Math.max(taskLabelWidth, Math.min(width, dateEndX))
+    const timelineEnd = timelineX + timelineWidth
+    const clippedX = Math.max(timelineX, Math.min(timelineEnd, rawX))
+    const clippedEndX = Math.max(timelineX, Math.min(timelineEnd, dateEndX))
     const rawWidth = Math.max(0, clippedEndX - clippedX)
     const barWidth = Math.max(minBarWidth, rawWidth)
     return [
@@ -360,10 +386,10 @@ export function computeGanttLayout(
     ]
   })
 
-  const taskMap = new Map(tasks.map((task) => [task.id, task]))
+  const taskMap = new Map(tasks.map((task) => [ganttTaskKey(task.id), task]))
   const dependencies = tasks.flatMap((target) =>
     (target.task.dependencies ?? []).flatMap((sourceId) => {
-      const source = taskMap.get(sourceId)
+      const source = taskMap.get(ganttTaskKey(sourceId))
       if (!source) return []
       const dependency = {
         sourceId: source.id,
@@ -390,7 +416,7 @@ export function computeGanttLayout(
       minMs,
       safeMaxMs,
       timelineWidth,
-      taskLabelWidth,
+      timelineX,
       scale,
       dateFormatter,
       options.weekStartsOn
@@ -398,6 +424,9 @@ export function computeGanttLayout(
     width,
     height: timelineHeight + tasks.length * rowHeight,
     timelineWidth,
+    timelineX,
+    labelX,
+    labelWidth: taskLabelWidth,
     minMs,
     maxMs: safeMaxMs,
     todayX
@@ -413,15 +442,20 @@ export function createGanttTimelineTicks(
   formatter: (date: Date, scale: GanttScale) => string = formatGanttDate,
   weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0
 ): GanttTimelineTick[] {
-  const safeMinMs = Number.isFinite(minMs) ? minMs : Date.now()
+  if (!Number.isFinite(minMs)) return []
+  const safeMinMs = minMs
   const safeMaxMs = Number.isFinite(maxMs) && maxMs > safeMinMs ? maxMs : safeMinMs + DAY_MS
   const safeTimelineWidth = Number.isFinite(timelineWidth) ? Math.max(0, timelineWidth) : 0
   const safeTaskLabelWidth = Number.isFinite(taskLabelWidth) ? Math.max(0, taskLabelWidth) : 0
   const ticks: GanttTimelineTick[] = []
   const rangeMs = Math.max(DAY_MS, safeMaxMs - safeMinMs)
-  let current = startOfTick(new Date(safeMinMs), scale, weekStartsOn)
+  const baseStep = scale === 'month' ? 30 * DAY_MS : scale === 'week' ? 7 * DAY_MS : DAY_MS
+  let step = 1
+  while (rangeMs / (baseStep * step) > MAX_GANTT_TICKS && step < 4096) step *= 2
 
-  while (current.getTime() <= safeMaxMs) {
+  let current = startOfTick(new Date(safeMinMs), scale, weekStartsOn)
+  let guard = 0
+  while (current.getTime() <= safeMaxMs && guard <= MAX_GANTT_TICKS) {
     const currentMs = current.getTime()
     if (currentMs >= safeMinMs) {
       ticks.push({
@@ -430,7 +464,8 @@ export function createGanttTimelineTicks(
         label: formatter(new Date(currentMs), scale)
       })
     }
-    current = addTick(current, scale)
+    current = addTick(current, scale, step)
+    guard += 1
   }
 
   if (ticks.length === 0) {
@@ -446,7 +481,7 @@ export function formatGanttDate(date: Date, scale: GanttScale): string {
   const month = `${date.getMonth() + 1}`.padStart(2, '0')
   const day = `${date.getDate()}`.padStart(2, '0')
   if (scale === 'month') return `${year}-${month}`
-  return `${month}-${day}`
+  return `${year}-${month}-${day}`
 }
 
 function clampProgress(value: number): number {
@@ -485,11 +520,12 @@ function startOfTick(
   return next
 }
 
-function addTick(date: Date, scale: GanttScale): Date {
+function addTick(date: Date, scale: GanttScale, steps = 1): Date {
   const next = new Date(date)
-  if (scale === 'month') next.setMonth(next.getMonth() + 1)
-  else if (scale === 'week') next.setDate(next.getDate() + 7)
-  else next.setDate(next.getDate() + 1)
+  const count = Math.max(1, Math.floor(steps))
+  if (scale === 'month') next.setMonth(next.getMonth() + count)
+  else if (scale === 'week') next.setDate(next.getDate() + 7 * count)
+  else next.setDate(next.getDate() + count)
   return next
 }
 

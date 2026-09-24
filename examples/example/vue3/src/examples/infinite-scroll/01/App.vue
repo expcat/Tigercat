@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { InfiniteScroll } from '@expcat/tigercat-vue/InfiniteScroll'
 
-const items = ref(Array.from({ length: 3 }, (_, index) => index + 1))
+const items = ref(Array.from({ length: 12 }, (_, index) => index + 1))
 const loading = ref(false)
 const hasMore = computed(() => items.value.length < 30)
 
@@ -22,12 +22,13 @@ const loadMore = () => {
     :has-more="hasMore"
     :loading="loading"
     :height="288"
-    class-name="rounded border border-[var(--tiger-border,#e5e7eb)]"
+    root="container"
+    class-name="rounded border border-[var(--tiger-border)]"
     @load-more="loadMore">
     <div
       v-for="item in items"
       :key="item"
-      class="border-b border-[var(--tiger-border,#e5e7eb)] px-4 py-3">
+      class="border-b border-[var(--tiger-border)] px-4 py-3">
       项目 {{ item }}
     </div>
   </InfiniteScroll>

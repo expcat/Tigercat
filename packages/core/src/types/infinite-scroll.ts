@@ -4,8 +4,9 @@
  * Shared props for the InfiniteScroll wrapper component.
  *
  * Framework events (`onLoadMore` / `load-more`) live on the Vue/React wrappers.
- * `onLoadMore` must synchronously set `loading` to true, or the component
- * blocks a second request until `loading` goes true then false.
+ * One request is in flight until the callback's Promise settles, or until
+ * `loading` / `error` says the attempt finished. A callback that never sets
+ * `loading` can run again after the sentinel leaves and re-enters.
  */
 
 import type { TigerLocale } from './locale'
@@ -15,6 +16,12 @@ export interface InfiniteScrollProps {
   hasMore?: boolean
   /** Whether a load is currently in progress */
   loading?: boolean
+  /** The last request failed. The error region stays until this is cleared or retried. */
+  error?: boolean
+  /** Accessible name and text for the error region. */
+  errorText?: string
+  /** Accessible name for the retry control shown with `error`. */
+  retryText?: string
   /**
    * Pixel `rootMargin` before the sentinel intersects (not the IO ratio).
    * The padded edge follows `direction` and `inverse`.
@@ -32,12 +39,12 @@ export interface InfiniteScrollProps {
   disabled?: boolean
   /**
    * Optional px height. The box must be a scroll container (this prop, class,
-   * or style); without a constrained size it will load until `hasMore` is false.
+   * or style). A container that cannot scroll does not request the next page.
    */
   height?: number
   /**
-   * IntersectionObserver root. `'container'` (default) uses this overflow box.
-   * `null` uses the viewport for page-level infinite scroll.
+   * IntersectionObserver root. `null` (default) uses the viewport.
+   * `'container'` uses this overflow box.
    */
   root?: Element | null | 'container'
   locale?: Partial<TigerLocale>

@@ -2,10 +2,10 @@ import { VirtualTable } from '@expcat/tigercat-react/VirtualTable'
 import type { TableColumn } from '@expcat/tigercat-react'
 
 const columns: TableColumn[] = [
-  { key: 'id', title: 'ID', width: 90, fixed: 'left' },
+  { key: 'id', title: 'ID', width: 90, fixed: 'start' },
   { key: 'name', title: '姓名', width: 160 },
   { key: 'email', title: '邮箱', width: 260 },
-  { key: 'status', title: '状态', width: 120, fixed: 'right' }
+  { key: 'status', title: '状态', width: 120, fixed: 'end' }
 ]
 
 const rows = Array.from({ length: 500 }, (_, index) => ({

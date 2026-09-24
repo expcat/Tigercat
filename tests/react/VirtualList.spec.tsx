@@ -90,7 +90,7 @@ describe('VirtualList', () => {
 
     const itemContainer = inner.firstElementChild as HTMLElement
     const firstItem = itemContainer.firstElementChild as HTMLElement
-    expect(firstItem.style.height).toBe('30px')
+    expect(firstItem.style.height).toBe('')
   })
 
   // --- Custom sizeStrategy ---
@@ -205,11 +205,11 @@ describe('VirtualList', () => {
     expect(getByTestId('vl-root')).toHaveAttribute('role', 'list')
   })
 
-  it('pins fixed-height items and clips overflow', () => {
+  it('pins fixed-height items without clipping the focus ring', () => {
     const { container } = render(<VirtualList {...defaultProps} overscan={0} />)
     const item = container.querySelector('[role="listitem"]') as HTMLElement
     expect(item.style.height).toBe('40px')
-    expect(item.style.overflow).toBe('hidden')
+    expect(item.style.overflow).not.toBe('hidden')
   })
 
   it('updates the visible window after scrolling', () => {

@@ -220,7 +220,7 @@ describe('infinite-scroll-utils', () => {
       createInfiniteScrollObserver(sentinel, {
         onLoadMore: vi.fn(),
         threshold: 150,
-        direction: 'horizontal'
+        orientation: 'horizontal'
       })
       expect(lastOptions?.rootMargin).toBe('0px 150px 0px 0px')
     })
@@ -237,7 +237,7 @@ describe('infinite-scroll-utils', () => {
       createInfiniteScrollObserver(sentinel, {
         onLoadMore: vi.fn(),
         threshold: 60,
-        direction: 'horizontal',
+        orientation: 'horizontal',
         inverse: true
       })
       expect(lastOptions?.rootMargin).toBe('0px 0px 0px 60px')

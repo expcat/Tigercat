@@ -9,6 +9,12 @@
 import type { ExclusiveVirtualRange } from './virtual-list'
 import type { RowSelectionConfig, TableColumn } from './table'
 
+/** VirtualTable columns do not advertise sort or filter. Those belong to Table. */
+export type VirtualTableColumn<T = Record<string, unknown>> = Omit<
+  TableColumn<T>,
+  'sortable' | 'filter'
+>
+
 export interface VirtualTableHandle {
   scrollToIndex: (index: number) => void
 }
@@ -18,12 +24,11 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
   dataSource?: T[]
   /**
    * Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` /
-   * `render` / `renderHeader` / `align` / sticky class names. `sortable` and
-   * `filter` are ignored.
+   * `render` / `renderHeader` / `align`. Sort and filter are Table columns.
    */
-  columns?: TableColumn<T>[]
+  columns?: VirtualTableColumn<T>[]
   /**
-   * Fixed row height in px. Visible rows are clipped to this height.
+   * Fixed row height in px used by the window. Content is not clipped.
    * @default 48
    */
   virtualItemHeight?: number

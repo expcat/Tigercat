@@ -40,22 +40,22 @@ describe('Calendar', () => {
     const { rerender } = render(<Calendar value={testDate} now={now} />)
     expect(screen.getByText('June 2024')).toBeInTheDocument()
     rerender(<Calendar value={new Date(2024, 7, 20)} now={now} />)
-    expect(screen.getByText('August 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /August 2024/ })).toBeInTheDocument()
     expect(dayButton('2024-08-20')).toHaveAttribute('aria-selected', 'true')
   })
 
   it('does not reset the panel when the same day is passed as a new Date', () => {
     const { rerender } = render(<Calendar value={testDate} now={now} />)
     fireEvent.click(screen.getByLabelText('Next month'))
-    expect(screen.getByText('July 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /July 2024/ })).toBeInTheDocument()
     rerender(<Calendar value={new Date(2024, 5, 15)} now={now} />)
-    expect(screen.getByText('July 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /July 2024/ })).toBeInTheDocument()
   })
 
   it('navigates months and wraps the year', () => {
     render(<Calendar value={new Date(2024, 11, 1)} now={now} />)
     fireEvent.click(screen.getByLabelText('Next month'))
-    expect(screen.getByText('January 2025')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /January 2025/ })).toBeInTheDocument()
   })
 
   it('emits onChange for an enabled day and ignores a disabled day', () => {
@@ -78,7 +78,7 @@ describe('Calendar', () => {
     const onChange = vi.fn()
     render(<Calendar value={testDate} now={now} onChange={onChange} />)
     fireEvent.click(dayButton('2024-07-01'))
-    expect(screen.getByText('July 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /July 2024/ })).toBeInTheDocument()
     expect((onChange.mock.calls[0][0] as Date).getMonth()).toBe(6)
   })
 
@@ -94,12 +94,12 @@ describe('Calendar', () => {
       />
     )
     fireEvent.click(screen.getByText('June 2024'))
-    expect(screen.getByText('2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^2024,/ })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('gridcell', { name: 'Mar' }))
     expect(onChange).toHaveBeenCalled()
     expect((onChange.mock.calls[0][0] as Date).getMonth()).toBe(2)
     expect(onPanelChange).toHaveBeenCalledWith(expect.any(Date), 'month')
-    expect(screen.getByText('March 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /March 2024/ })).toBeInTheDocument()
   })
 
   it('controlled year mode does not lie about the drawn panel', () => {
@@ -107,7 +107,7 @@ describe('Calendar', () => {
     render(<Calendar mode="year" value={testDate} now={now} onPanelChange={onPanelChange} />)
     fireEvent.click(screen.getByRole('gridcell', { name: 'Mar' }))
     expect(onPanelChange).toHaveBeenCalledWith(expect.any(Date), 'month')
-    expect(screen.getByText('2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^2024,/ })).toBeInTheDocument()
     expect(screen.getByRole('gridcell', { name: 'Mar' })).toBeInTheDocument()
   })
 
@@ -206,7 +206,7 @@ describe('Calendar controlled follow', () => {
     }
     render(<Harness />)
     fireEvent.click(screen.getByText('Jump'))
-    expect(screen.getByText('August 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /August 2024/ })).toBeInTheDocument()
   })
 })
 
@@ -233,6 +233,8 @@ describe('Calendar date cells', () => {
         dateCellRender={(_date, extra) => <span>{extra.events[0]?.title}</span>}
       />
     )
-    expect(dayButton('2024-06-15')).toHaveTextContent('Ship')
+    const cell = dayButton('2024-06-15')
+    expect(cell.querySelector('[aria-hidden="true"]')).toBeNull()
+    expect(cell.parentElement).toHaveTextContent('Ship')
   })
 })

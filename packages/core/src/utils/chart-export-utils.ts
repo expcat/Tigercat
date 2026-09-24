@@ -1,5 +1,7 @@
 import { isBrowser } from './env'
 import { downloadBrowserFile } from './file-utils'
+import { isAllowedLinkUrl } from './link-utils'
+import { resolveDataExportFilename } from './data-export-value'
 
 export type ChartExportFormat = 'svg' | 'png'
 
@@ -9,8 +11,34 @@ export interface ChartDownloadOptions {
   scale?: number
 }
 
+function svgLocalName(element: Element): string {
+  return element.localName || element.tagName.toLowerCase()
+}
+
+/** Drop scripts, event handlers, and image addresses the link gate rejects. */
+export function sanitizeChartSvgTree(root: Element): void {
+  const elements = [root, ...Array.from(root.querySelectorAll('*'))]
+  for (const element of elements) {
+    if (svgLocalName(element) === 'script') {
+      element.remove()
+      continue
+    }
+    for (const attr of Array.from(element.attributes)) {
+      if (attr.name.toLowerCase().startsWith('on')) element.removeAttribute(attr.name)
+    }
+    if (svgLocalName(element) !== 'image') continue
+    const href = element.getAttribute('href') || element.getAttribute('xlink:href')
+    if (href && !isAllowedLinkUrl(href)) element.remove()
+  }
+}
+
+export function chartExportBasename(filename: string | undefined, extension: 'svg' | 'png'): string {
+  return resolveDataExportFilename(filename, extension)
+}
+
 export function serializeChartSvg(svg: SVGSVGElement): string {
   const clone = svg.cloneNode(true) as SVGSVGElement
+  sanitizeChartSvgTree(clone)
   if (!clone.getAttribute('xmlns')) {
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
   }
@@ -30,7 +58,7 @@ export function downloadChartSvg(svg: SVGSVGElement, filename: string = 'chart')
 
   downloadChartBlob(
     new Blob([serializeChartSvg(svg)], { type: 'image/svg+xml;charset=utf-8' }),
-    `${filename}.svg`
+    chartExportBasename(filename, 'svg')
   )
 }
 
@@ -84,7 +112,7 @@ export async function downloadChartPng(
   if (!isBrowser()) return
 
   const blob = await exportChartPng(svg, options)
-  downloadChartBlob(blob, `${options.filename ?? 'chart'}.png`)
+  downloadChartBlob(blob, chartExportBasename(options.filename, 'png'))
 }
 
 export function downloadChartBlob(blob: Blob, filename: string): void {

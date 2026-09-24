@@ -43,7 +43,7 @@ describe('Gantt', () => {
   it('selects tasks when selectable', async () => {
     const { getByRole, emitted } = render(Gantt, { props: { data, selectable: true } })
 
-    await fireEvent.click(getByRole('button', { name: 'Design, 01-01 to 01-05, 40%' }))
+    await fireEvent.click(getByRole('button', { name: 'Design, 2026-01-01 to 2026-01-05, 40%' }))
 
     expect(emitted()['update:selectedId']).toEqual([['design']])
     expect(emitted()['task-click']).toEqual([[data[0]]])
@@ -52,8 +52,8 @@ describe('Gantt', () => {
   it('emits hover events when hoverable', async () => {
     const { getByRole, emitted } = render(Gantt, { props: { data, hoverable: true } })
 
-    await fireEvent.mouseEnter(getByRole('button', { name: 'Build, 01-05 to 01-12, 70%' }))
-    await fireEvent.mouseLeave(getByRole('button', { name: 'Build, 01-05 to 01-12, 70%' }))
+    await fireEvent.mouseEnter(getByRole('button', { name: 'Build, 2026-01-05 to 2026-01-12, 70%' }))
+    await fireEvent.mouseLeave(getByRole('button', { name: 'Build, 2026-01-05 to 2026-01-12, 70%' }))
 
     expect(emitted()['task-hover']).toEqual([[data[1]], [null]])
   })
@@ -61,7 +61,7 @@ describe('Gantt', () => {
   it('supports keyboard selection', async () => {
     const { getByRole, emitted } = render(Gantt, { props: { data, selectable: true } })
 
-    await fireEvent.keyDown(getByRole('button', { name: 'Build, 01-05 to 01-12, 70%' }), {
+    await fireEvent.keyDown(getByRole('button', { name: 'Build, 2026-01-05 to 2026-01-12, 70%' }), {
       key: 'Enter'
     })
 
@@ -119,7 +119,7 @@ describe('Gantt', () => {
         props: { data: disabledData, selectable: true }
       })
 
-      await fireEvent.click(getByRole('group', { name: 'Design, 01-01 to 01-05, 40%' }))
+      await fireEvent.click(getByRole('group', { name: 'Design, 2026-01-01 to 2026-01-05, 40%' }))
 
       expect(emitted()['update:selectedId']).toBeUndefined()
       expect(emitted()['task-click']).toBeUndefined()
@@ -132,7 +132,7 @@ describe('Gantt', () => {
       const maxDate = new Date(today)
       maxDate.setDate(today.getDate() + 1)
       const { container } = render(Gantt, {
-        props: { data, showToday: true, minDate, maxDate }
+        props: { data, showToday: true, now: today, minDate, maxDate }
       })
 
       expect(container.querySelector('[data-gantt-today="true"]')).toBeInTheDocument()

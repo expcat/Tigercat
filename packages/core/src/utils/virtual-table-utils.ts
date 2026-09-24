@@ -7,51 +7,53 @@
 import type { TableColumn } from '../types/table'
 import type { ExclusiveVirtualRange } from '../types/virtual-list'
 import { calculateVirtualRange } from './virtual-list-utils'
+import { getLogicalInlineScroll } from './infinite-scroll-utils'
 import { devWarn } from './dev-warn'
 import {
+  allocateTableFallbackRowKey,
   getFixedColumnOffsets,
   getFixedColumnPosition,
+  getFixedColumnStyle,
   getNextTableSelectAllKeys,
   getTableFixedCellClasses,
   getTableFixedHeaderCellClasses,
   parseWidthToPx,
+  readTableRowKeyValue,
   tableHeaderBackgroundClasses,
-  tableVirtualSpacerCellClasses
+  tableRowKeyId,
+  tableVirtualSpacerCellClasses,
+  TABLE_FIXED_CELL_Z_INDEX,
+  TABLE_FIXED_HEADER_Z_INDEX
 } from './table-utils'
 
 /** Fallback column width (px) when a column has no resolvable `width`. */
 export const DEFAULT_VIRTUAL_COLUMN_WIDTH = 150
 
-/** Assumed sticky header row height subtracted from the row viewport. */
-export const VIRTUAL_TABLE_HEADER_ROW_HEIGHT = 40
-
 export const EMPTY_VIRTUAL_TABLE_ROWS: readonly never[] = Object.freeze([])
 export const EMPTY_VIRTUAL_TABLE_COLUMNS: readonly never[] = Object.freeze([])
 
-export { tableVirtualSpacerCellClasses }
-
 // ─── Tailwind class constants ─────────────────────────────────────
 
-export const virtualTableContainerClasses = `tiger-virtual-table relative overflow-auto border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff))))]`
+export const virtualTableContainerClasses = `tiger-virtual-table relative overflow-auto border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-table-bg)]`
 
-export const virtualTableHeaderClasses = `${tableHeaderBackgroundClasses} sticky top-0 z-10 [&_th]:border-b [&_th]:border-[var(--tiger-border,#e5e7eb)]`
+export const virtualTableHeaderClasses = `${tableHeaderBackgroundClasses} sticky top-0 z-20 [&_th]:border-b [&_th]:border-[var(--tiger-border)]`
 
 export const virtualTableHeaderCellClasses =
-  'px-4 py-3 text-start text-xs font-semibold uppercase tracking-wider text-[var(--tiger-text-secondary,#6b7280)] overflow-hidden'
+  'px-4 py-3 text-start text-xs font-semibold uppercase tracking-wider text-[var(--tiger-text-secondary)] overflow-hidden'
 
 export const virtualTableRowClasses =
-  'group tiger-motion-aware [&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border,#f3f4f6)]'
+  'group tiger-motion-aware [&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]'
 
 export const virtualTableRowHoverClasses =
-  'hover:bg-[var(--tiger-table-hover-bg,var(--tiger-component-table-hover-bg,var(--tiger-bg-hover,var(--tiger-surface-muted,#f9fafb))))]'
+  'hover:bg-[var(--tiger-table-hover-bg)]'
 
 export const virtualTableRowFocusClasses =
-  'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
 export const virtualTableRowStripedClasses =
-  'bg-[var(--tiger-table-stripe-bg,var(--tiger-component-table-stripe-bg,var(--tiger-bg-secondary,var(--tiger-surface-muted,#f9fafb))))]/50'
+  'bg-[var(--tiger-table-stripe-bg)]/50'
 
-export const virtualTableRowSelectedClasses = 'bg-[var(--tiger-primary,#2563eb)]/5'
+export const virtualTableRowSelectedClasses = 'bg-[var(--tiger-primary)]/5'
 
 /**
  * Opaque selected background for sticky fixed cells.
@@ -62,19 +64,19 @@ export const virtualTableRowSelectedClasses = 'bg-[var(--tiger-primary,#2563eb)]
  * 5% primary overlay sitting on the table background.
  */
 export const virtualTableFixedCellSelectedClasses =
-  'bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_5%,var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff)))))]'
+  'bg-[color-mix(in_srgb,var(--tiger-primary)_5%,var(--tiger-table-bg))]'
 
 export const virtualTableCellClasses =
-  'px-4 py-0 text-sm text-[var(--tiger-text,#1f2937)] whitespace-nowrap overflow-hidden'
+  'px-4 py-0 text-sm text-[var(--tiger-text)] whitespace-nowrap'
 
 export const virtualTableBorderedClasses =
   '[&_td]:border-r [&_th]:border-r [&_td:last-child]:border-r-0 [&_th:last-child]:border-r-0'
 
 export const virtualTableEmptyClasses =
-  'absolute inset-0 flex items-center justify-center py-12 text-sm text-[var(--tiger-text-muted,#9ca3af)]'
+  'absolute inset-0 flex items-center justify-center py-12 text-sm text-[var(--tiger-text-secondary)]'
 
 export const virtualTableLoadingClasses =
-  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-table-bg,var(--tiger-component-table-bg,var(--tiger-bg,var(--tiger-surface,#ffffff))))]/60 z-20'
+  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-table-bg)]/60 z-20'
 
 /** Visible column window for horizontal (column) virtualization. */
 export interface VirtualColumnRange {
@@ -82,72 +84,86 @@ export interface VirtualColumnRange {
   start: number
   /** End column index (exclusive) */
   end: number
-  /** Spacer width (px) before the rendered columns */
-  leftPad: number
-  /** Spacer width (px) after the rendered columns */
-  rightPad: number
+  /** Width before the window, along the inline axis */
+  inlineBefore: number
+  /** Width after the window, along the inline axis */
+  inlineAfter: number
 }
 
 /**
- * Compute the visible column window for horizontal column virtualization.
- *
- * Columns without a numeric `width` fall back to `defaultColumnWidth`. Returns
- * the column index range to render plus left/right spacer widths so the table
- * keeps its full horizontal extent.
+ * Column window. `scrollLeft` is converted to distance from the inline start
+ * with {@link getLogicalInlineScroll}. Non-positive widths do not enter the
+ * window and do not advance the inline offset.
  */
 export function calculateVirtualColumnRange(
   scrollLeft: number,
   viewportWidth: number,
   columnWidths: number[],
-  overscan = 2
+  overscan = 2,
+  dir: 'ltr' | 'rtl' = 'ltr'
 ): VirtualColumnRange {
   const count = columnWidths.length
   const safeViewportWidth = Number.isFinite(viewportWidth) ? Math.max(0, viewportWidth) : 0
-  const safeScrollLeft = Number.isFinite(scrollLeft) ? Math.max(0, scrollLeft) : 0
   const safeOverscan = Number.isFinite(overscan) ? Math.max(0, Math.floor(overscan)) : 0
   const widths = columnWidths.map((width) => (Number.isFinite(width) && width > 0 ? width : 0))
+  const empty = { start: 0, end: 0, inlineBefore: 0, inlineAfter: 0 }
+  if (count === 0 || safeViewportWidth <= 0) return empty
 
-  if (count === 0 || safeViewportWidth <= 0) {
-    return { start: 0, end: 0, leftPad: 0, rightPad: 0 }
+  let total = 0
+  for (const width of widths) total += width
+  const maxScroll = Math.max(0, total - safeViewportWidth)
+  const fromStart = getLogicalInlineScroll(
+    Number.isFinite(scrollLeft) ? scrollLeft : 0,
+    maxScroll,
+    dir
+  )
+
+  const positive: number[] = []
+  for (let i = 0; i < count; i++) {
+    if (widths[i] > 0) positive.push(i)
   }
+  if (positive.length === 0) return empty
 
   let acc = 0
-  let rawStart = 0
-  for (let i = 0; i < count; i++) {
-    if (acc + widths[i] > safeScrollLeft) {
-      rawStart = i
+  let rawStart = positive[positive.length - 1]
+  for (const index of positive) {
+    if (acc + widths[index] > fromStart) {
+      rawStart = index
       break
     }
-    acc += widths[i]
-    if (i === count - 1) rawStart = count - 1
+    acc += widths[index]
   }
 
-  const viewEnd = safeScrollLeft + safeViewportWidth
+  const viewEnd = fromStart + safeViewportWidth
   let endExclusive = rawStart
   let endAcc = acc
   while (endExclusive < count && endAcc < viewEnd) {
-    endAcc += widths[endExclusive]
+    if (widths[endExclusive] > 0) endAcc += widths[endExclusive]
     endExclusive++
   }
 
-  const start = Math.max(0, rawStart - safeOverscan)
-  const end = Math.min(count, endExclusive + safeOverscan)
+  const startIndex = positive.findIndex((index) => index >= Math.max(0, rawStart - safeOverscan))
+  const start = startIndex >= 0 ? positive[Math.max(0, startIndex)] : positive[0]
+  let end = Math.min(count, endExclusive + safeOverscan)
+  while (end > start && widths[end - 1] <= 0) end--
 
-  let leftPad = 0
-  for (let i = 0; i < start; i++) leftPad += widths[i]
-  let rightPad = 0
-  for (let i = end; i < count; i++) rightPad += widths[i]
+  let inlineBefore = 0
+  for (let i = 0; i < start; i++) inlineBefore += widths[i]
+  let inlineAfter = 0
+  for (let i = end; i < count; i++) inlineAfter += widths[i]
 
-  return { start, end, leftPad, rightPad }
+  return { start, end, inlineBefore, inlineAfter }
 }
 
 export function getVirtualTableColumnWidths<T>(
   columns: TableColumn<T>[],
-  defaultWidth = DEFAULT_VIRTUAL_COLUMN_WIDTH
+  measuredWidths: Record<string, number> = {}
 ): number[] {
   return columns.map((column) => {
+    const measured = measuredWidths[column.key]
+    if (typeof measured === 'number' && Number.isFinite(measured) && measured > 0) return measured
     const parsed = parseWidthToPx(column.width)
-    return parsed > 0 ? parsed : defaultWidth
+    return parsed > 0 ? parsed : 0
   })
 }
 
@@ -166,7 +182,8 @@ export function resolveVirtualTableWidth(width: unknown): number | 'auto' {
 export function resolveVirtualTableColumnVirtualization(input: {
   virtualizeColumns?: boolean
   hasFixedColumns: boolean
-  width?: number | 'auto' | string
+  widths: number[]
+  viewportWidth: number
 }): { active: boolean; viewportWidth: number } {
   if (!input.virtualizeColumns) {
     return { active: false, viewportWidth: 0 }
@@ -178,14 +195,16 @@ export function resolveVirtualTableColumnVirtualization(input: {
     )
     return { active: false, viewportWidth: 0 }
   }
-  if (typeof input.width !== 'number' || !Number.isFinite(input.width) || input.width <= 0) {
+  const viewport = Number.isFinite(input.viewportWidth) ? input.viewportWidth : 0
+  const measured = input.widths.length > 0 && input.widths.every((width) => width > 0)
+  if (!(viewport > 0) || !measured) {
     devWarn(
       'VirtualTable.virtualizeColumns.width',
-      'Column virtualization needs a numeric width and no fixed columns'
+      'Column virtualization waits until every column width and the scrollport width are measured'
     )
     return { active: false, viewportWidth: 0 }
   }
-  return { active: true, viewportWidth: input.width }
+  return { active: true, viewportWidth: viewport }
 }
 
 export function getVirtualTableRowWindow(
@@ -194,10 +213,35 @@ export function getVirtualTableRowWindow(
   rowCount: number,
   itemHeight: number,
   overscan: number,
-  headerHeight = VIRTUAL_TABLE_HEADER_ROW_HEIGHT
+  headerHeight = 0
 ): ExclusiveVirtualRange {
   const rowViewport = Math.max(0, viewportHeight - Math.max(0, headerHeight))
   return calculateVirtualRange(scrollTop, rowViewport, rowCount, itemHeight, overscan)
+}
+
+/**
+ * Scroll so row `index` sits in the band below the sticky header.
+ * A row already inside that band does not move `scrollTop`.
+ */
+export function scrollTopToRevealVirtualTableRow(input: {
+  scrollTop: number
+  viewportHeight: number
+  headerHeight: number
+  index: number
+  itemHeight: number
+}): number {
+  const scrollTop = Number.isFinite(input.scrollTop) ? Math.max(0, input.scrollTop) : 0
+  const viewport = Number.isFinite(input.viewportHeight) ? Math.max(0, input.viewportHeight) : 0
+  const header = Number.isFinite(input.headerHeight) ? Math.max(0, input.headerHeight) : 0
+  const itemHeight = Number.isFinite(input.itemHeight) && input.itemHeight > 0 ? input.itemHeight : 0
+  const offset = Math.max(0, input.index) * itemHeight
+  const visibleTop = scrollTop + header
+  const visibleBottom = scrollTop + viewport
+  const itemEnd = offset + itemHeight
+  if (itemHeight === 0 || viewport === 0) return scrollTop
+  if (offset >= visibleTop && itemEnd <= visibleBottom) return scrollTop
+  if (offset < visibleTop) return Math.max(0, offset - header)
+  return Math.max(0, itemEnd - viewport)
 }
 
 export function getVirtualTableSpacerHeights(
@@ -219,30 +263,59 @@ export interface VirtualTableRowIdentity {
 }
 
 /**
- * Resolve row identity. Default field is `id`, matching Table.
- * Missing keys are not turned into window indexes for selection.
+ * Resolve one row. Pass the same `used` set for a list so each row is resolved
+ * once and a missing identity cannot collide with `0` or another numeric id.
+ * An empty field or empty function return warns and falls back.
  */
 export function resolveVirtualTableRowIdentity<T>(
   row: T,
   index: number,
-  rowKey?: keyof T | ((row: T, index: number) => string | number)
+  rowKey?: keyof T | ((row: T, index: number) => string | number),
+  used: Set<string> = new Set()
 ): VirtualTableRowIdentity {
   const resolved = rowKey ?? ('id' as keyof T)
-  if (typeof resolved === 'function') {
-    const key = resolved(row, index)
+  const raw =
+    typeof resolved === 'function'
+      ? resolved(row, index)
+      : (row as Record<string, unknown>)[String(resolved)]
+  const key = readTableRowKeyValue(raw)
+  if (key !== undefined) {
+    used.add(tableRowKeyId(key))
     return { key, domKey: key }
   }
 
-  const value = (row as Record<string, unknown>)[String(resolved)]
-  if (typeof value === 'string' || typeof value === 'number') {
-    return { key: value, domKey: value }
-  }
-
   devWarn(
-    'VirtualTable.rowKey',
-    `Row at index ${index} has no "${String(resolved)}" identity; falling back to dataSource index`
+    `VirtualTable.rowKey.${index}`,
+    `Row at index ${index} has no identity; falling back to a non-index key`
   )
-  return { key: index, domKey: index }
+  const fallback = allocateTableFallbackRowKey(index, used)
+  return { key: fallback, domKey: fallback }
+}
+
+/** Resolve every row once. `getRowKey` and `rowKey` share this function. */
+export function resolveVirtualTableRowIdentities<T>(
+  rows: readonly T[],
+  rowKey?: keyof T | ((row: T, index: number) => string | number),
+  getRowKey?: (row: T, index: number) => string | number
+): VirtualTableRowIdentity[] {
+  const used = new Set<string>()
+  const resolver = getRowKey ?? rowKey
+  return rows.map((row, index) => resolveVirtualTableRowIdentity(row, index, resolver, used))
+}
+
+/** Next row that is not disabled. Stays put when every row is disabled. */
+export function nextEnabledRowIndex(
+  count: number,
+  from: number,
+  isDisabled: (index: number) => boolean
+): number {
+  if (count <= 0) return 0
+  const start = ((from % count) + count) % count
+  for (let step = 0; step < count; step++) {
+    const index = (start + step) % count
+    if (!isDisabled(index)) return index
+  }
+  return start
 }
 
 /**
@@ -277,12 +350,10 @@ export function getNextVirtualTableSelection(input: {
   selectedKeys: (string | number)[]
   key: string | number
 }): (string | number)[] {
+  const id = tableRowKeyId(input.key)
+  const selected = input.selectedKeys.some((key) => tableRowKeyId(key) === id)
   if (input.type === 'radio') return [input.key]
-  return getNextTableSelectAllKeys(
-    input.selectedKeys,
-    [input.key],
-    !input.selectedKeys.includes(input.key)
-  )
+  return getNextTableSelectAllKeys(input.selectedKeys, [input.key], !selected)
 }
 
 // ─── Class generators ─────────────────────────────────────────────
@@ -308,8 +379,8 @@ export function getVirtualTableRowClasses(
 // ─── Sticky column helpers ────────────────────────────────────────
 
 export interface VirtualTableFixedInfo {
-  leftOffsets: Record<string, number>
-  rightOffsets: Record<string, number>
+  startOffsets: Record<string, number>
+  endOffsets: Record<string, number>
   hasFixedColumns: boolean
   minTableWidth: number
 }
@@ -321,9 +392,9 @@ export interface VirtualTableFixedInfo {
 export function getVirtualTableFixedInfo<T = Record<string, unknown>>(
   columns: TableColumn<T>[]
 ): VirtualTableFixedInfo {
-  const { leftOffsets, rightOffsets, hasFixedColumns, minTableWidth } =
+  const { startOffsets, endOffsets, hasFixedColumns, minTableWidth } =
     getFixedColumnOffsets(columns)
-  return { leftOffsets, rightOffsets, hasFixedColumns, minTableWidth }
+  return { startOffsets, endOffsets, hasFixedColumns, minTableWidth }
 }
 
 /**
@@ -332,23 +403,18 @@ export function getVirtualTableFixedInfo<T = Record<string, unknown>>(
  */
 export function getVirtualTableFixedCellStyle(
   columnKey: string,
-  fixedInfo: VirtualTableFixedInfo
-): { position: 'sticky'; left?: string; right?: string; zIndex: number } | undefined {
-  if (columnKey in fixedInfo.leftOffsets) {
-    return {
-      position: 'sticky' as const,
-      left: `${fixedInfo.leftOffsets[columnKey]}px`,
-      zIndex: 1
-    }
-  }
-  if (columnKey in fixedInfo.rightOffsets) {
-    return {
-      position: 'sticky' as const,
-      right: `${fixedInfo.rightOffsets[columnKey]}px`,
-      zIndex: 1
-    }
-  }
-  return undefined
+  fixedInfo: VirtualTableFixedInfo,
+  kind: 'header' | 'body' = 'body'
+): ReturnType<typeof getFixedColumnStyle> {
+  const zIndex = kind === 'header' ? TABLE_FIXED_HEADER_Z_INDEX : TABLE_FIXED_CELL_Z_INDEX
+  const fixed =
+    columnKey in fixedInfo.startOffsets
+      ? 'start'
+      : columnKey in fixedInfo.endOffsets
+        ? 'end'
+        : undefined
+  if (!fixed) return undefined
+  return getFixedColumnStyle({ key: columnKey, fixed }, fixedInfo, zIndex)
 }
 
 export interface VirtualTableFixedCellClassOptions<T = Record<string, unknown>> {

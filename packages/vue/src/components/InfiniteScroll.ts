@@ -16,6 +16,9 @@ import {
   mergeStyleValues,
   shouldLoadMore,
   createInfiniteScrollObserver,
+  createInfiniteScrollFlight,
+  infiniteScrollContainerCanAdvance,
+  compensateInverseScrollStart,
   resolveLocaleText,
   mergeTigerLocale,
   getInfiniteScrollContainerClasses,
@@ -37,6 +40,9 @@ export const InfiniteScroll = defineComponent({
   props: {
     hasMore: { type: Boolean, default: true },
     loading: { type: Boolean, default: false },
+    error: { type: Boolean, default: false },
+    errorText: { type: String, default: undefined },
+    retryText: { type: String, default: undefined },
     threshold: { type: Number, default: 100 },
     loadingText: { type: String, default: undefined },
     endText: { type: String, default: undefined },
@@ -50,7 +56,7 @@ export const InfiniteScroll = defineComponent({
     height: { type: Number, default: undefined },
     root: {
       type: [Object, String] as PropType<Element | null | 'container'>,
-      default: 'container'
+      default: null
     },
     className: { type: String, default: undefined }
   },
@@ -61,10 +67,9 @@ export const InfiniteScroll = defineComponent({
     const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const containerRef = ref<HTMLElement | null>(null)
     const sentinelRef = ref<HTMLElement | null>(null)
+    const flight = createInfiniteScrollFlight()
+    const anchorStart = ref<number | null>(null)
     let cleanupObserver: (() => void) | null = null
-    let pending = false
-    let wasLoading = props.loading
-    let prevScrollHeight: number | null = null
 
     const containerClasses = computed(() =>
       classNames(
@@ -73,16 +78,30 @@ export const InfiniteScroll = defineComponent({
       )
     )
 
-    function requestLoad() {
-      if (props.disabled || props.loading || !props.hasMore || pending) return
-      pending = true
-      emit('load-more')
+    function beginLoad() {
+      const returned = emit('load-more') as unknown
+      const tasks = Array.isArray(returned) ? returned : [returned]
+      const pending = tasks.filter(
+        (task) => task && typeof (task as { then?: unknown }).then === 'function'
+      )
+      flight.begin(pending.length > 0 ? Promise.all(pending) : undefined)
     }
 
-    function syncPendingFromLoading() {
-      if (wasLoading && !props.loading) pending = false
-      if (props.loading) pending = true
-      wasLoading = props.loading
+    function requestLoad() {
+      const el = containerRef.value
+      const containerRoot = props.root === 'container' || props.root === undefined
+      if (containerRoot && el && !infiniteScrollContainerCanAdvance(el, props.orientation)) return
+      if (
+        !flight.canRequest({
+          disabled: props.disabled,
+          hasMore: props.hasMore,
+          error: props.error,
+          loading: props.loading
+        })
+      ) {
+        return
+      }
+      beginLoad()
     }
 
     function resolveObserverRoot(): Element | null {
@@ -101,7 +120,6 @@ export const InfiniteScroll = defineComponent({
     function setupObserver() {
       cleanupObserver?.()
       cleanupObserver = null
-      syncPendingFromLoading()
       if (props.disabled || !props.hasMore) return
 
       const sentinel = sentinelRef.value
@@ -113,45 +131,88 @@ export const InfiniteScroll = defineComponent({
         orientation: props.orientation,
         root: observerRoot,
         inverse: props.inverse,
-        onLoadMore: requestLoad
+        dir: dir.value,
+        onLoadMore: () => {
+          flight.noteSentinel(true)
+          requestLoad()
+        },
+        onLeave: () => flight.noteSentinel(false)
       })
 
       if (teardown) {
         cleanupObserver = teardown
-        if (observerRoot && observerRoot === containerRef.value) checkScroll()
+        const el = containerRef.value
+        if (observerRoot && observerRoot === el) checkScroll()
         return
       }
 
-      containerRef.value?.addEventListener('scroll', checkScroll, { passive: true })
+      const scrollTarget: EventTarget | null =
+        observerRoot === null ? window : containerRef.value
+      if (!scrollTarget) return
+      const onScroll = () => checkScroll()
+      scrollTarget.addEventListener('scroll', onScroll, { passive: true })
       checkScroll()
-      cleanupObserver = () => {
-        containerRef.value?.removeEventListener('scroll', checkScroll)
-      }
+      cleanupObserver = () => scrollTarget.removeEventListener('scroll', onScroll)
     }
 
     function restoreInverseScroll() {
-      if (!props.inverse) return
+      if (!props.inverse) {
+        anchorStart.value = null
+        return
+      }
       const el = containerRef.value
       if (!el) return
-      const next = el.scrollHeight
-      if (prevScrollHeight != null && next !== prevScrollHeight) {
-        el.scrollTop += next - prevScrollHeight
-      }
-      prevScrollHeight = next
+      const content = Array.from(el.children).find((child) => {
+        if (!(child instanceof HTMLElement)) return false
+        if (child.classList.contains(infiniteScrollSentinelClasses)) return false
+        const role = child.getAttribute('role')
+        if (role === 'status' || role === 'alert') return false
+        return true
+      }) as HTMLElement | undefined
+      if (!content) return
+      const nextStart = props.orientation === 'horizontal' ? content.offsetLeft : content.offsetTop
+      const next = compensateInverseScrollStart({
+        orientation: props.orientation,
+        dir: dir.value,
+        previousStart: anchorStart.value,
+        nextStart,
+        scrollTop: el.scrollTop,
+        scrollLeft: el.scrollLeft
+      })
+      if (next.scrollTop !== el.scrollTop) el.scrollTop = next.scrollTop
+      if (next.scrollLeft !== el.scrollLeft) el.scrollLeft = next.scrollLeft
+      anchorStart.value = props.orientation === 'horizontal' ? content.offsetLeft : content.offsetTop
     }
 
     onMounted(setupObserver)
     onUpdated(restoreInverseScroll)
 
     watch(
+      () => props.loading,
+      (loading, previous) => {
+        flight.noteLoading(loading, previous ?? loading)
+      },
+      { immediate: true }
+    )
+
+    watch(
+      () => props.error,
+      (error) => {
+        if (error) flight.noteError()
+      }
+    )
+
+    watch(
       () => [
         props.hasMore,
         props.disabled,
         props.loading,
+        props.error,
         props.threshold,
         props.orientation,
         props.inverse,
-        props.root
+        props.root,
+        dir.value
       ],
       setupObserver,
       { flush: 'post' }
@@ -191,24 +252,52 @@ export const InfiniteScroll = defineComponent({
           )
         : null
 
+      const endName = resolveLocaleText(
+        'No more data',
+        props.endText,
+        mergedLocale.value?.common?.noMoreText
+      )
+      const errorName = resolveLocaleText('Could not load more', props.errorText, props.errorText)
+      const retryName = resolveLocaleText('Retry', props.retryText, props.retryText)
       const end =
-        !props.hasMore && !props.loading
+        !props.hasMore && !props.loading && !props.error
           ? h(
               'div',
               {
                 class: getInfiniteScrollChromeClasses(props.orientation, infiniteScrollEndClasses),
-                'aria-live': 'polite'
+                role: 'status',
+                'aria-live': 'polite',
+                'aria-label': endName
               },
-              slots.end?.() ??
-                resolveLocaleText(
-                  'No more data',
-                  props.endText,
-                  mergedLocale.value?.common?.noMoreText
-                )
+              slots.end?.() ?? endName
             )
           : null
+      const error = props.error
+        ? h(
+            'div',
+            {
+              class: getInfiniteScrollChromeClasses(props.orientation, infiniteScrollEndClasses),
+              role: 'alert',
+              'aria-label': errorName
+            },
+            [
+              h('span', errorName),
+              h(
+                'button',
+                {
+                  type: 'button',
+                  onClick: () => {
+                    flight.reset()
+                    beginLoad()
+                  }
+                },
+                retryName
+              )
+            ]
+          )
+        : null
 
-      const chrome = [sentinel, loader, end]
+      const chrome = [sentinel, loader, error, end]
       const children = props.inverse ? [...chrome, content] : [content, ...chrome]
 
       return h(

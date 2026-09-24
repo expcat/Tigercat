@@ -67,7 +67,7 @@ describe('VirtualTable (Vue)', () => {
     const rows = dataRowsOf(container)
     expect(rows.length).toBeGreaterThan(0)
     expect(rows.length).toBeLessThan(30)
-    expect(rows[0].style.height).toBe('40px')
+    expect(rows[0].style.minHeight).toBe('40px')
     expect(container.querySelector('[data-tiger-table-virtual-spacer] td')).toBeTruthy()
   })
 
@@ -122,7 +122,7 @@ describe('VirtualTable (Vue)', () => {
       }
     })
     await fireEvent.click(dataRowsOf(container)[0])
-    expect(emitted()['selection-change']?.[0]).toEqual([[0]])
+    expect(emitted()['selection-change']?.[0]).toEqual([['tiger-row:0']])
   })
 
   it('exposes scrollToIndex', async () => {

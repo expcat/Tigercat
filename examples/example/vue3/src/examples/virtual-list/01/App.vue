@@ -7,7 +7,7 @@ import { VirtualList } from '@expcat/tigercat-vue/VirtualList'
     <template #default="{ index }">
       <div
         class="flex h-full items-center px-4"
-        :class="index % 2 === 0 ? 'bg-[var(--tiger-surface-muted,#f9fafb)]' : ''">
+        :class="index % 2 === 0 ? 'bg-[var(--tiger-surface-muted)]' : ''">
         第 {{ index + 1 }} 行
       </div>
     </template>

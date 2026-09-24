@@ -10,7 +10,7 @@ export default function App() {
         <div
           className={
             index % 2 === 0
-              ? 'flex h-full items-center px-4 bg-[var(--tiger-surface-muted,#f9fafb)]'
+              ? 'flex h-full items-center px-4 bg-[var(--tiger-surface-muted)]'
               : 'flex h-full items-center px-4'
           }>
           第 {index + 1} 行

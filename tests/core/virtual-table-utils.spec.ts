@@ -85,7 +85,7 @@ describe('virtual-table-utils', () => {
         start: 0,
         end: 0,
         offsetTop: 0,
-        totalHeight: 0
+        totalHeight: 4000
       })
       expect(calculateVirtualRange(0, 400, Number.POSITIVE_INFINITY, 40, 5)).toEqual({
         start: 0,
@@ -110,34 +110,34 @@ describe('virtual-table-utils', () => {
       expect(range.start).toBe(0)
       expect(range.end).toBeGreaterThan(0)
       expect(range.end).toBeLessThan(widths.length)
-      expect(range.leftPad).toBe(0)
+      expect(range.inlineBefore).toBe(0)
     })
 
     it('advances the window after a horizontal scroll', () => {
       const range = calculateVirtualColumnRange(360, 400, widths, 0)
       expect(range.start).toBe(3)
       expect(range.end).toBeGreaterThan(range.start)
-      expect(range.leftPad).toBe(360)
+      expect(range.inlineBefore).toBe(360)
     })
 
     it('covers mid-range, empty, and trailing columns', () => {
       expect(calculateVirtualColumnRange(0, 400, [], 2)).toEqual({
         start: 0,
         end: 0,
-        leftPad: 0,
-        rightPad: 0
+        inlineBefore: 0,
+        inlineAfter: 0
       })
       const tail = calculateVirtualColumnRange(960, 400, widths, 0)
       expect(tail.end).toBe(widths.length)
-      expect(tail.rightPad).toBe(0)
+      expect(tail.inlineAfter).toBe(0)
     })
 
     it('returns an empty window for NaN, zero, or negative viewport', () => {
       expect(calculateVirtualColumnRange(0, Number.NaN, widths, 2)).toEqual({
         start: 0,
         end: 0,
-        leftPad: 0,
-        rightPad: 0
+        inlineBefore: 0,
+        inlineAfter: 0
       })
       expect(calculateVirtualColumnRange(0, 0, widths, 2).end).toBe(0)
       expect(calculateVirtualColumnRange(0, -40, widths, 2).end).toBe(0)
@@ -218,18 +218,18 @@ describe('virtual-table-utils', () => {
         key: 'id',
         title: 'ID',
         width: 80,
-        fixed: 'left',
+        fixed: 'start',
         fixedClassName: ({ selected, view }) => (selected ? `${view}-selected` : 'fixed-cell'),
         fixedHeaderClassName: ({ fixed }) => `header-${fixed}`
       },
       { key: 'name', title: 'Name', width: 160 },
-      { key: 'action', title: 'Action', width: 100, fixed: 'right' }
+      { key: 'action', title: 'Action', width: 100, fixed: 'end' }
     ]
 
     it('resolves fixed positions from virtual table metadata', () => {
       const fixedInfo = getVirtualTableFixedInfo(fixedColumns)
-      expect(getVirtualTableFixedColumnPosition(fixedColumns[0], fixedInfo)).toBe('left')
-      expect(getVirtualTableFixedColumnPosition(fixedColumns[2], fixedInfo)).toBe('right')
+      expect(getVirtualTableFixedColumnPosition(fixedColumns[0], fixedInfo)).toBe('start')
+      expect(getVirtualTableFixedColumnPosition(fixedColumns[2], fixedInfo)).toBe('end')
       expect(getVirtualTableFixedColumnPosition(fixedColumns[1], fixedInfo)).toBeUndefined()
     })
 
@@ -256,7 +256,7 @@ describe('virtual-table-utils', () => {
       const fixedInfo = getVirtualTableFixedInfo(fixedColumns)
       const classes = getVirtualTableFixedHeaderCellClasses(fixedColumns[0], fixedInfo, true)
 
-      expect(classes).toContain('header-left')
+      expect(classes).toContain('header-start')
     })
   })
 })

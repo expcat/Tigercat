@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor } from '@testing-library/vue'
+import { render } from '@testing-library/vue'
 import { InfiniteScroll } from '@expcat/tigercat-vue/InfiniteScroll'
 import { h } from 'vue'
 import { expectNoA11yViolations } from '../utils'
@@ -187,13 +187,14 @@ describe('InfiniteScroll (Vue)', () => {
     expect(root.style.height).toBe('288px')
   })
 
-  it('emits load-more when the first page does not fill the box', async () => {
+  it('does not load when the container cannot scroll', async () => {
     const onLoadMore = vi.fn()
     render(InfiniteScroll, {
-      props: { hasMore: true, height: 288, onLoadMore },
+      props: { hasMore: true, height: 288, root: 'container', onLoadMore },
       slots: { default: () => h('div', {}, 'one') }
     })
-    await waitFor(() => expect(onLoadMore).toHaveBeenCalled())
+    await Promise.resolve()
+    expect(onLoadMore).not.toHaveBeenCalled()
   })
 
   it('does not emit load-more while loading', async () => {
@@ -206,16 +207,16 @@ describe('InfiniteScroll (Vue)', () => {
     expect(onLoadMore).not.toHaveBeenCalled()
   })
 
-  it('emits load-more again after loading returns to false', async () => {
+  it('does not load again while the sentinel stays in view after loading ends', async () => {
     const onLoadMore = vi.fn()
     const { rerender } = render(InfiniteScroll, {
-      props: { hasMore: true, loading: false, height: 288, onLoadMore },
+      props: { hasMore: true, loading: true, height: 288, root: 'container', onLoadMore },
       slots: { default: () => h('div', {}, 'one') }
     })
-    await waitFor(() => expect(onLoadMore).toHaveBeenCalledTimes(1))
-    await rerender({ hasMore: true, loading: true, height: 288, onLoadMore })
-    await rerender({ hasMore: true, loading: false, height: 288, onLoadMore })
-    await waitFor(() => expect(onLoadMore).toHaveBeenCalledTimes(2))
+    expect(onLoadMore).not.toHaveBeenCalled()
+    await rerender({ hasMore: true, loading: false, height: 288, root: 'container', onLoadMore })
+    await Promise.resolve()
+    expect(onLoadMore).not.toHaveBeenCalled()
   })
 
   it('does not emit load-more when disabled or exhausted', async () => {

@@ -27,13 +27,10 @@ export function panelDate(view: CalendarPanelView, day = 1): Date {
 export function getInitialCalendarView(
   selected: Date | null,
   now?: Date | null
-): CalendarPanelView {
+): CalendarPanelView | null {
   const base = selected ?? (now && !Number.isNaN(now.getTime()) ? now : null)
-  if (base) {
-    return { viewYear: base.getFullYear(), viewMonth: base.getMonth() }
-  }
-  const fallback = new Date()
-  return { viewYear: fallback.getFullYear(), viewMonth: fallback.getMonth() }
+  if (!base) return null
+  return { viewYear: base.getFullYear(), viewMonth: base.getMonth() }
 }
 
 /**

@@ -100,7 +100,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
     [config.locale, locale]
   )
   const localeCode = mergedLocale?.locale
-  const dir = getLocaleDirection(mergedLocale)
+  const dir = config.direction === 'rtl' ? 'rtl' : 'ltr'
   const labels = useMemo(() => getCalendarLabels(mergedLocale), [mergedLocale])
   const weekStartsOn = weekStartsOnProp ?? getWeekStartsOn(localeCode)
   const weekdayNames = useMemo(
@@ -109,12 +109,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
   )
   const monthNames = useMemo(() => getShortMonthNames(localeCode), [localeCode])
 
-  const [clientNow, setClientNow] = useState<Date | null>(null)
-  useEffect(() => {
-    if (nowProp) return
-    setClientNow(new Date())
-  }, [nowProp])
-  const today = nowProp ?? clientNow
+  const today = nowProp && !Number.isNaN(nowProp.getTime()) ? nowProp : null
 
   const selectedIsoFromValue =
     value !== undefined
@@ -139,21 +134,23 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
     defaultValue: defaultMode
   })
 
-  const [view, setView] = useState(() => getInitialCalendarView(selected, today ?? nowProp))
-  const followedYmdRef = useRef(selected ? toIsoDate(selected) : null)
-  const nextFollow = followCalendarValue(view, selected, followedYmdRef.current)
-  if (selected) followedYmdRef.current = toIsoDate(selected)
-  else followedYmdRef.current = null
-  if (
-    nextFollow &&
-    (nextFollow.viewYear !== view.viewYear || nextFollow.viewMonth !== view.viewMonth)
-  ) {
-    setView(nextFollow)
-  }
+  const [view, setView] = useState(() => getInitialCalendarView(selected, today))
+  const [followedYmd, setFollowedYmd] = useState<string | null>(selected ? toIsoDate(selected) : null)
+  const selectedYmd = selected ? toIsoDate(selected) : null
+  useEffect(() => {
+    const nextFollow = view ? followCalendarValue(view, selected, followedYmd) : null
+    if (
+      nextFollow &&
+      (!view || nextFollow.viewYear !== view.viewYear || nextFollow.viewMonth !== view.viewMonth)
+    ) {
+      setView(nextFollow)
+    }
+    if (selectedYmd !== followedYmd) setFollowedYmd(selectedYmd)
+  }, [followedYmd, selected, selectedYmd, view])
 
   const days = useMemo(
-    () => getMonthDays(view.viewYear, view.viewMonth, weekStartsOn),
-    [view.viewYear, view.viewMonth, weekStartsOn]
+    () => (view ? getMonthDays(view.viewYear, view.viewMonth, weekStartsOn) : []),
+    [view, weekStartsOn]
   )
   const weeks = useMemo(() => chunkDaysIntoWeeks(days), [days])
   const monthRows = useMemo(() => chunkMonths(monthNames), [monthNames])
@@ -187,6 +184,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
 
   const selectMonth = useCallback(
     (monthIdx: number) => {
+      if (!view) return
       const result = selectCalendarMonth(view.viewYear, monthIdx, disabledDate)
       if (!result) return
       setView({ viewYear: view.viewYear, viewMonth: monthIdx })
@@ -194,10 +192,11 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
       if (modeProp === undefined) setMode('month')
       onPanelChange?.(result.date, 'month')
     },
-    [disabledDate, modeProp, onPanelChange, setMode, setSelectedIso, view.viewYear]
+    [disabledDate, modeProp, onPanelChange, setMode, setSelectedIso, view]
   )
 
   const toggleMode = () => {
+    if (!view) return
     const next: CalendarMode = mode === 'month' ? 'year' : 'month'
     if (modeProp === undefined) setMode(next)
     emitPanel(view, next)
@@ -209,20 +208,24 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
   const [activeIso, setActiveIso] = useState<string | null>(null)
   const [activeMonthIdx, setActiveMonthIdx] = useState<number | null>(null)
 
-  const rovingDayIso = resolveCalendarRovingIso({
-    days,
-    selected,
-    today,
-    view,
-    disabledDate,
-    activeIso
-  })
-  const rovingMonthIdx = resolveCalendarRovingMonth({
-    viewMonth: view.viewMonth,
-    viewYear: view.viewYear,
-    disabledDate,
-    activeMonthIdx
-  })
+  const rovingDayIso = view
+    ? resolveCalendarRovingIso({
+        days,
+        selected,
+        today,
+        view,
+        disabledDate,
+        activeIso
+      })
+    : null
+  const rovingMonthIdx = view
+    ? resolveCalendarRovingMonth({
+        viewMonth: view.viewMonth,
+        viewYear: view.viewYear,
+        disabledDate,
+        activeMonthIdx
+      })
+    : 0
 
   useEffect(() => {
     const iso = pendingFocusIsoRef.current
@@ -249,6 +252,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
     })
     if (!result) return
     setActiveIso(result.iso)
+    if (!view) return
     if (result.viewYear !== view.viewYear || result.viewMonth !== view.viewMonth) {
       pendingFocusIsoRef.current = result.iso
       navigate({ viewYear: result.viewYear, viewMonth: result.viewMonth })
@@ -263,6 +267,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
     const action = getCalendarMonthKeyAction(event.key, dir)
     if (action.kind === 'none') return
     event.preventDefault()
+    if (!view) return
     const next = moveCalendarMonthFocus({
       current: idx,
       kind: action.kind,
@@ -278,14 +283,35 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
   }
 
   const titleId = useId()
-  const title =
-    mode === 'month'
+  const [viewLive, setViewLive] = useState('')
+  const viewLiveReady = useRef(false)
+  const title = !view
+    ? ''
+    : mode === 'month'
       ? formatMonthYear(view.viewYear, view.viewMonth, localeCode)
       : `${view.viewYear}`
+  useEffect(() => {
+    if (!view) return
+    if (!viewLiveReady.current) {
+      viewLiveReady.current = true
+      return
+    }
+    setViewLive(title)
+  }, [mode, title, view])
   const prevLabel = mode === 'month' ? labels.previousMonth : labels.previousYear
   const nextLabel = mode === 'month' ? labels.nextMonth : labels.nextYear
   const prevChar = dir === 'rtl' ? '\u203A' : '\u2039'
   const nextChar = dir === 'rtl' ? '\u2039' : '\u203A'
+
+  if (!view) {
+    return (
+      <div
+        className={classNames(calendarRootClasses, className)}
+        data-tiger-calendar=""
+        aria-label={labels.today}>
+      </div>
+    )
+  }
 
   const rangeStart = rangeValue?.[0] ?? null
   const rangeEnd = rangeValue?.[1] ?? null
@@ -294,9 +320,11 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
     <div
       {...splitCalendarDomProps(props)}
       ref={ref}
-      dir={dir}
       className={classNames(getCalendarContainerClasses(fullscreen), className)}
       data-tiger="calendar">
+      <div role="status" aria-live="polite" className="sr-only">
+        {viewLive}
+      </div>
       <div className={calendarHeaderClasses}>
         <button
           type="button"
@@ -307,7 +335,16 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
           }>
           {prevChar}
         </button>
-        <button type="button" id={titleId} className={calendarTitleClasses} onClick={toggleMode}>
+        <button
+          type="button"
+          id={titleId}
+          className={calendarTitleClasses}
+          aria-label={
+            mode === 'month'
+              ? `${title}, ${labels.switchToYear}`
+              : `${title}, ${labels.switchToMonth}`
+          }
+          onClick={toggleMode}>
           {title}
         </button>
         <button
@@ -399,17 +436,23 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                 })
                 const customCell = dateCellRender?.(date, extra)
                 const hasExtra = Boolean(customCell) || extra.events.length > 0
+                const eventTitles = extra.events
+                  .map((event) => event.title)
+                  .filter((title): title is string => Boolean(title))
+                const dayLabel = appendCalendarEventCountLabel(
+                  formatCalendarDayLabel(date, localeCode),
+                  extra.events.length,
+                  labels.eventCountText
+                )
                 return (
+                  <div key={iso} className="flex min-w-0 flex-col items-stretch">
                   <button
-                    key={iso}
                     type="button"
                     role="gridcell"
                     data-date={iso}
-                    aria-label={appendCalendarEventCountLabel(
-                      formatCalendarDayLabel(date, localeCode),
-                      extra.events.length,
-                      labels.eventCountText
-                    )}
+                    aria-label={
+                      eventTitles.length > 0 ? `${dayLabel}. ${eventTitles.join(', ')}` : dayLabel
+                    }
                     aria-selected={isSelected || isRangeStart || isRangeEnd}
                     aria-current={isTodayDate ? 'date' : undefined}
                     disabled={isDisabled}
@@ -428,19 +471,29 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                     onClick={() => selectDay(date)}
                     onFocus={() => setActiveIso(iso)}>
                     {formatCalendarDayNumber(date, localeCode)}
-                    {(customCell as React.ReactNode) ??
-                      (extra.events.length > 0 ? (
-                        <span className={calendarDateCellExtraClasses} aria-hidden="true">
-                          {extra.events.map((event, index) => (
-                            <span
-                              key={event.key ?? `${extra.iso}-${index}`}
-                              className={calendarDateCellDotClasses}
-                              style={getCalendarEventDotStyle(event.color)}
-                            />
-                          ))}
-                        </span>
-                      ) : null)}
+                    {!customCell && extra.events.length > 0 ? (
+                      <span className={calendarDateCellExtraClasses} aria-hidden="true">
+                        {extra.events.map((event, index) => (
+                          <span
+                            key={event.key ?? `${extra.iso}-${index}`}
+                            className={calendarDateCellDotClasses}
+                            style={getCalendarEventDotStyle(event.color)}
+                          />
+                        ))}
+                      </span>
+                    ) : null}
                   </button>
+                  {customCell ? <div>{customCell as React.ReactNode}</div> : null}
+                  {eventTitles.length > 0 ? (
+                    <ul className="m-0 list-none p-0 text-[10px] leading-tight text-[var(--tiger-text)]">
+                      {extra.events.map((event, index) =>
+                        event.title ? (
+                          <li key={event.key ?? `${extra.iso}-title-${index}`}>{event.title}</li>
+                        ) : null
+                      )}
+                    </ul>
+                  ) : null}
+                  </div>
                 )
               })}
             </div>

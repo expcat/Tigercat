@@ -30,8 +30,9 @@ export default function App() {
         hasMore={hasMore}
         loading={loading}
         height={176}
+        root="container"
         onLoadMore={loadMore}
-        className="gap-3 rounded-lg border border-[var(--tiger-border,#e5e7eb)] p-3">
+        className="gap-3 rounded-lg border border-[var(--tiger-border)] p-3">
         {items.map((item) => (
           <article
             key={item}

@@ -43,14 +43,14 @@ describe('Calendar', () => {
     const { rerender } = renderCalendar({ modelValue: testDate })
     expect(screen.getByText('June 2024')).toBeInTheDocument()
     await rerender({ modelValue: new Date(2024, 7, 20), now })
-    expect(screen.getByText('August 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /August 2024/ })).toBeInTheDocument()
     expect(dayButton('2024-08-20')).toHaveAttribute('aria-selected', 'true')
   })
 
   it('navigates months and wraps the year', async () => {
     renderCalendar({ modelValue: new Date(2024, 11, 1) })
     await fireEvent.click(screen.getByLabelText('Next month'))
-    expect(screen.getByText('January 2025')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /January 2025/ })).toBeInTheDocument()
   })
 
   it('emits update:modelValue for an enabled day and ignores a disabled day', async () => {
@@ -75,7 +75,7 @@ describe('Calendar', () => {
       props: { modelValue: testDate, now, 'onUpdate:modelValue': onUpdate }
     })
     await fireEvent.click(dayButton('2024-07-01'))
-    expect(screen.getByText('July 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /July 2024/ })).toBeInTheDocument()
     expect((onUpdate.mock.calls[0][0] as Date).getMonth()).toBe(6)
   })
 
@@ -91,11 +91,11 @@ describe('Calendar', () => {
       }
     })
     await fireEvent.click(screen.getByText('June 2024'))
-    expect(screen.getByText('2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^2024,/ })).toBeInTheDocument()
     await fireEvent.click(screen.getByRole('gridcell', { name: 'Mar' }))
     expect((onUpdate.mock.calls[0][0] as Date).getMonth()).toBe(2)
     expect(onPanelChange).toHaveBeenCalledWith(expect.any(Date), 'month')
-    expect(screen.getByText('March 2024')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /March 2024/ })).toBeInTheDocument()
   })
 
   it('moves focus with arrows and skips disabled days', async () => {
@@ -173,6 +173,8 @@ describe('Calendar', () => {
         dateCell: ({ events }: { events: Array<{ title?: string }> }) => events[0]?.title ?? ''
       }
     })
-    expect(dayButton('2024-06-15')).toHaveTextContent('Ship')
+    const cell = dayButton('2024-06-15')
+    expect(cell.querySelector('[aria-hidden="true"]')).toBeNull()
+    expect(cell.parentElement).toHaveTextContent('Ship')
   })
 })

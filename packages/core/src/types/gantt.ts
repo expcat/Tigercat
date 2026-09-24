@@ -42,11 +42,16 @@ export interface GanttProps
   maxDate?: GanttDateValue
   minBarWidth?: number
   showToday?: boolean
+  /**
+   * Caller clock for the today line. `showToday` draws nothing until this is set.
+   * Render paths do not read the host clock.
+   */
+  now?: Date | number | string | null
   showProgress?: boolean
   showDependencies?: boolean
   /**
-   * Allow pointer-dragging bars. Also implied by `onTaskChange` / `onDataChange`.
-   * Default is read-only: a drag does not keep a new date unless the parent writes `data`.
+   * Allow pointer-dragging bars. Callbacks do not turn dragging on.
+   * A drag does not keep a new date unless the parent writes `data`.
    * @default false
    */
   draggable?: boolean

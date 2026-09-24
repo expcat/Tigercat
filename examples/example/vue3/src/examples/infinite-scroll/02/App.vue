@@ -27,7 +27,8 @@ const loadMore = () => {
       :has-more="hasMore"
       :loading="loading"
       :height="176"
-      class-name="gap-3 rounded-lg border border-[var(--tiger-border,#e5e7eb)] p-3"
+      root="container"
+      class-name="gap-3 rounded-lg border border-[var(--tiger-border)] p-3"
       @load-more="loadMore">
       <article
         v-for="item in items"

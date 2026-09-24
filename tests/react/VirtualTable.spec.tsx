@@ -67,7 +67,7 @@ describe('VirtualTable (React)', () => {
     const rows = dataRowsOf(container)
     expect(rows.length).toBeGreaterThan(0)
     expect(rows.length).toBeLessThan(30)
-    expect(rows[0].style.height).toBe('40px')
+    expect(rows[0].style.minHeight).toBe('40px')
     expect(container.querySelector('[data-tiger-table-virtual-spacer] td')).toBeTruthy()
   })
 
@@ -130,7 +130,10 @@ describe('VirtualTable (React)', () => {
       />
     )
     fireEvent.click(dataRowsOf(container)[0])
-    expect(onSelectionChange).toHaveBeenCalledWith([0])
+    const selected = onSelectionChange.mock.calls[0][0] as (string | number)[]
+    expect(selected).toHaveLength(1)
+    expect(selected[0]).not.toBe(0)
+    expect(String(selected[0])).toContain('tiger-row')
   })
 
   it('scrollToIndex reveals a distant row', () => {
@@ -182,9 +185,9 @@ describe('VirtualTable (React)', () => {
 
   it('keeps sticky left/right cells', () => {
     const fixedColumns = [
-      { key: 'id', title: 'ID', width: 80, fixed: 'left' as const },
+      { key: 'id', title: 'ID', width: 80, fixed: 'start' as const },
       { key: 'name', title: 'Name', width: 150 },
-      { key: 'action', title: 'Action', width: 100, fixed: 'right' as const }
+      { key: 'action', title: 'Action', width: 100, fixed: 'end' as const }
     ]
     render(
       <VirtualTable

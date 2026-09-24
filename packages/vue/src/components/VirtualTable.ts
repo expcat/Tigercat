@@ -3,6 +3,10 @@ import {
   h,
   ref,
   computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
   getCurrentInstance,
   PropType,
   type VNodeChild
@@ -25,12 +29,19 @@ import {
   getVirtualTableFixedCellStyle,
   getVirtualTableFixedCellClasses,
   getVirtualTableFixedHeaderCellClasses,
+  getTableCellClasses,
   getTableColgroup,
+  getTableHeaderCellClasses,
+  getTableLabels,
   isVirtualTableCellControlTarget,
+  nextEnabledRowIndex,
   resolveVirtualTableColumnVirtualization,
-  resolveVirtualTableRowIdentity,
+  resolveVirtualTableRowIdentities,
   resolveVirtualTableSelectedKeys,
+  tableRowKeyId,
+  resolveScrollportViewport,
   resolveVirtualTableWidth,
+  scrollTopToRevealVirtualTableRow,
   tableBaseClasses,
   tableVirtualSpacerCellClasses,
   virtualTableHeaderClasses,
@@ -39,7 +50,7 @@ import {
   virtualTableEmptyClasses,
   virtualTableLoadingClasses,
   virtualTableRowFocusClasses,
-  VIRTUAL_TABLE_HEADER_ROW_HEIGHT,
+  observeSize,
   resolveLocaleText,
   mergeTigerLocale,
   type TableColumn,
@@ -71,12 +82,6 @@ export interface VueVirtualTableProps {
 
 export type VirtualTableProps = VueVirtualTableProps
 export type { VirtualTableHandle }
-
-function alignClass(align?: TableColumn['align']): string | undefined {
-  if (align === 'center') return 'text-center'
-  if (align === 'right') return 'text-end'
-  return 'text-start'
-}
 
 export const VirtualTable = defineComponent({
   name: 'TigerVirtualTable',
@@ -121,18 +126,97 @@ export const VirtualTable = defineComponent({
       default: undefined
     }
   },
-  emits: ['row-click', 'selection-change', 'update:rowSelection'],
+  emits: ['row-click', 'selection-change'],
   setup(props, { emit, attrs, expose }) {
     const instance = getCurrentInstance()
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const containerRef = ref<HTMLElement | null>(null)
+    const headerRef = ref<HTMLElement | null>(null)
+    const measuredHeaderHeight = ref(0)
+    const scrollport = ref({ height: 0, width: 0 })
+    const measuredColumnWidths = ref<Record<string, number>>({})
+    const rowEls = new Map<number, HTMLElement>()
+    let pendingRowFocus = false
+    let stopHeaderSize: (() => void) | undefined
+    let stopScrollport: (() => void) | undefined
+
+    function measureScrollport() {
+      stopScrollport?.()
+      stopScrollport = undefined
+      const scroller = containerRef.value
+      if (!scroller) return
+      const read = () => {
+        const height = scroller.clientHeight
+        const width = scroller.clientWidth
+        if (scrollport.value.height === height && scrollport.value.width === width) return
+        scrollport.value = { height, width }
+      }
+      read()
+      stopScrollport = observeSize(scroller, read)
+    }
+
+    function measureHeader() {
+      stopHeaderSize?.()
+      stopHeaderSize = undefined
+      const header = headerRef.value
+      if (!props.stickyHeader || !header) {
+        measuredHeaderHeight.value = 0
+        return
+      }
+      const read = () => {
+        const next = header.getBoundingClientRect().height
+        measuredHeaderHeight.value = Number.isFinite(next) && next > 0 ? next : 0
+        const widths: Record<string, number> = {}
+        header.querySelectorAll<HTMLElement>('th[data-tiger-table-column-key]').forEach((cell) => {
+          const key = cell.dataset.tigerTableColumnKey
+          const cellWidth = cell.getBoundingClientRect().width
+          if (key && cellWidth > 0) widths[key] = cellWidth
+        })
+        measuredColumnWidths.value = widths
+      }
+      read()
+      stopHeaderSize = observeSize(header, read)
+    }
+
+    onMounted(() => {
+      measureHeader()
+      measureScrollport()
+    })
+    onBeforeUnmount(() => {
+      stopHeaderSize?.()
+      stopScrollport?.()
+    })
     const scrollTop = ref(0)
     const scrollLeft = ref(0)
     const activeIndex = ref(0)
     const resolvedWidth = computed(() => resolveVirtualTableWidth(props.width))
     const resolvedData = computed(() => props.dataSource ?? EMPTY_VIRTUAL_TABLE_ROWS)
+    watch(
+      [activeIndex, resolvedData, () => props.rowSelection],
+      () => {
+        const rows = resolvedData.value
+        const selection = props.rowSelection
+        if (!selection?.getCheckboxProps || rows.length === 0) return
+        const next = nextEnabledRowIndex(rows.length, activeIndex.value, (index) =>
+          Boolean(selection.getCheckboxProps?.(rows[index]!)?.disabled)
+        )
+        if (next !== activeIndex.value) activeIndex.value = next
+      },
+      { immediate: true }
+    )
+    const identities = computed(() =>
+      resolveVirtualTableRowIdentities(
+        resolvedData.value,
+        props.rowKey as never,
+        props.rowSelection?.getRowKey
+      )
+    )
     const resolvedColumns = computed(() => props.columns ?? EMPTY_VIRTUAL_TABLE_COLUMNS)
+    watch(
+      () => [props.stickyHeader, resolvedColumns.value.length, resolvedData.value.length],
+      measureHeader
+    )
     const uncontrolledSelectedKeys = ref<(string | number)[]>(
       resolveVirtualTableSelectedKeys(props.rowSelection?.defaultSelectedRowKeys)
     )
@@ -153,7 +237,6 @@ export const VirtualTable = defineComponent({
         uncontrolledSelectedKeys.value = nextKeys
       }
       emit('selection-change', nextKeys)
-      emit('update:rowSelection', { ...props.rowSelection, selectedRowKeys: nextKeys })
     }
 
     function toggleRowSelection(key: string | number, row: Record<string, unknown>) {
@@ -170,21 +253,38 @@ export const VirtualTable = defineComponent({
     const range = computed(() =>
       getVirtualTableRowWindow(
         scrollTop.value,
-        props.virtualHeight,
+        resolveScrollportViewport(scrollport.value.height, props.virtualHeight),
         resolvedData.value.length,
         props.virtualItemHeight,
         props.overscan,
-        props.stickyHeader ? VIRTUAL_TABLE_HEADER_ROW_HEIGHT : 0
+        props.stickyHeader ? measuredHeaderHeight.value : 0
       )
     )
 
     const visibleData = computed(() => resolvedData.value.slice(range.value.start, range.value.end))
 
     function scrollToIndex(index: number) {
-      const next = Math.max(0, index) * props.virtualItemHeight
       const el = containerRef.value
-      if (el) el.scrollTop = next
+      const next = scrollTopToRevealVirtualTableRow({
+        scrollTop: el?.scrollTop ?? scrollTop.value,
+        viewportHeight: resolveScrollportViewport(el?.clientHeight ?? scrollport.value.height, props.virtualHeight),
+        headerHeight: props.stickyHeader ? measuredHeaderHeight.value : 0,
+        index,
+        itemHeight: props.virtualItemHeight
+      })
+      if (el && el.scrollTop !== next) el.scrollTop = next
       scrollTop.value = next
+    }
+
+    function focusActiveRow(index: number) {
+      pendingRowFocus = true
+      void nextTick(() => {
+        if (!pendingRowFocus) return
+        const row = rowEls.get(index)
+        if (!row || row.tabIndex !== 0) return
+        pendingRowFocus = false
+        if (document.activeElement !== row) row.focus()
+      })
     }
 
     expose({ scrollToIndex })
@@ -196,11 +296,15 @@ export const VirtualTable = defineComponent({
       }
     }
 
-    const columnWidths = computed(() => getVirtualTableColumnWidths(resolvedColumns.value))
+    const columnWidths = computed(() =>
+      getVirtualTableColumnWidths(resolvedColumns.value, measuredColumnWidths.value)
+    )
     const resolveRowClassName = (row: unknown, index: number): string | undefined =>
       typeof props.rowClassName === 'function' ? props.rowClassName(row, index) : props.rowClassName
 
-    const selectedSet = computed(() => new Set(selectedKeys.value))
+    const selectedSet = computed(
+      () => new Set(selectedKeys.value.map((key) => tableRowKeyId(key)))
+    )
     const fixedInfo = computed(() => getVirtualTableFixedInfo(resolvedColumns.value))
 
     return () => {
@@ -222,13 +326,19 @@ export const VirtualTable = defineComponent({
       const colVirtual = resolveVirtualTableColumnVirtualization({
         virtualizeColumns: props.virtualizeColumns,
         hasFixedColumns: fi.hasFixedColumns,
-        width: resolvedWidth.value
+        widths: columnWidths.value,
+        viewportWidth: resolveScrollportViewport(
+          scrollport.value.width,
+          typeof resolvedWidth.value === 'number' ? resolvedWidth.value : 0
+        )
       })
       const colRange = colVirtual.active
         ? calculateVirtualColumnRange(
             scrollLeft.value,
             colVirtual.viewportWidth,
-            columnWidths.value
+            columnWidths.value,
+            props.overscan,
+            config.value.direction === 'rtl' ? 'rtl' : 'ltr'
           )
         : undefined
       const visibleColumns = colRange
@@ -243,8 +353,8 @@ export const VirtualTable = defineComponent({
       })
       const colSpan =
         visibleColumns.length +
-        (colRange && colRange.leftPad > 0 ? 1 : 0) +
-        (colRange && colRange.rightPad > 0 ? 1 : 0)
+        (colRange && colRange.inlineBefore > 0 ? 1 : 0) +
+        (colRange && colRange.inlineAfter > 0 ? 1 : 0)
       const spacers = getVirtualTableSpacerHeights(range.value, props.virtualItemHeight)
       const interactive = hasSelection.value || hasRowClick()
       const focusIndex = visibleData.value.some(
@@ -253,18 +363,21 @@ export const VirtualTable = defineComponent({
         ? activeIndex.value
         : range.value.start
 
-      const headerCells = visibleColumns.map((col) => {
+      const headerCells = visibleColumns.map((col, colIdx) => {
         const widthStyle = col.width
           ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
           : {}
-        const stickyStyle = getVirtualTableFixedCellStyle(col.key, fi)
+        const stickyStyle = getVirtualTableFixedCellStyle(col.key, fi, 'header')
         return h(
           'th',
           {
             key: col.key as string,
+            scope: 'col',
+            'aria-colindex': (colRange ? colRange.start : 0) + colIdx + 1,
+            'data-tiger-table-column-key': col.key,
             class: classNames(
               virtualTableHeaderCellClasses,
-              alignClass(col.align),
+              getTableHeaderCellClasses('md', col.align || 'left', false),
               getVirtualTableFixedHeaderCellClasses(col, fi, props.stickyHeader)
             ),
             style: { ...widthStyle, ...stickyStyle }
@@ -274,41 +387,38 @@ export const VirtualTable = defineComponent({
       })
 
       const headerRow = h('tr', { 'aria-rowindex': 1 }, [
-        colRange && colRange.leftPad > 0
+        colRange && colRange.inlineBefore > 0
           ? h('th', {
               key: '__left-pad',
               'aria-hidden': true,
-              style: { width: `${colRange.leftPad}px`, padding: 0 }
+              style: { width: `${colRange.inlineBefore}px`, padding: 0 }
             })
           : null,
         ...headerCells,
-        colRange && colRange.rightPad > 0
+        colRange && colRange.inlineAfter > 0
           ? h('th', {
               key: '__right-pad',
               'aria-hidden': true,
-              style: { width: `${colRange.rightPad}px`, padding: 0 }
+              style: { width: `${colRange.inlineAfter}px`, padding: 0 }
             })
           : null
       ])
       const thead = h(
         'thead',
-        { class: props.stickyHeader ? virtualTableHeaderClasses : undefined },
+        {
+          ref: headerRef,
+          class: props.stickyHeader ? virtualTableHeaderClasses : undefined
+        },
         [headerRow]
       )
 
-      const rows = visibleData.value.map((row, localIdx) => {
+      const rows = props.loading
+        ? []
+        : visibleData.value.map((row, localIdx) => {
         const globalIdx = range.value.start + localIdx
-        const identity = props.rowSelection?.getRowKey
-          ? {
-              key: props.rowSelection.getRowKey(row),
-              domKey: props.rowSelection.getRowKey(row)
-            }
-          : resolveVirtualTableRowIdentity(
-              row,
-              globalIdx,
-              props.rowKey as keyof typeof row | ((r: typeof row, i: number) => string | number)
-            )
-        const isSelected = identity.key !== undefined && selectedSet.value.has(identity.key)
+        const identity = identities.value[globalIdx] ?? { key: undefined, domKey: globalIdx }
+        const isSelected =
+          identity.key !== undefined && selectedSet.value.has(tableRowKeyId(identity.key))
         const isDisabled = !!props.rowSelection?.getCheckboxProps?.(row)?.disabled
         const tabIndex =
           props.loading || !interactive || isDisabled
@@ -334,7 +444,7 @@ export const VirtualTable = defineComponent({
               'aria-colindex': colIndexOffset + colIdx + 1,
               class: classNames(
                 virtualTableCellClasses,
-                alignClass(col.align),
+                getTableCellClasses('md', col.align || 'left'),
                 getVirtualTableFixedCellClasses({
                   column: col,
                   record: row,
@@ -346,9 +456,8 @@ export const VirtualTable = defineComponent({
                 })
               ),
               style: {
-                height: `${props.virtualItemHeight}px`,
-                overflow: 'hidden',
-                ...getVirtualTableFixedCellStyle(col.key, fi)
+                minHeight: `${props.virtualItemHeight}px`,
+                ...getVirtualTableFixedCellStyle(col.key, fi, 'body')
               }
             },
             [col.render ? (col.render(row, globalIdx) as VNodeChild) : (value as VNodeChild)]
@@ -364,48 +473,56 @@ export const VirtualTable = defineComponent({
               interactive && virtualTableRowFocusClasses,
               resolveRowClassName(row, globalIdx)
             ),
-            style: { height: `${props.virtualItemHeight}px`, overflow: 'hidden' },
+            style: { minHeight: `${props.virtualItemHeight}px` },
             'aria-rowindex': globalIdx + 2,
             'aria-selected': hasSelection.value ? isSelected : undefined,
             'aria-disabled': isDisabled || undefined,
             tabindex: tabIndex,
+            ref: (el: unknown) => {
+              const node = (el as { $el?: HTMLElement } | null)?.$el ?? (el as HTMLElement | null)
+              if (node) rowEls.set(globalIdx, node)
+              else rowEls.delete(globalIdx)
+            },
             onClick: interactive ? (event: MouseEvent) => activate(event) : undefined,
             onKeydown: interactive
               ? (e: KeyboardEvent) => {
+                  if (e.target !== e.currentTarget) return
+                  if (isVirtualTableCellControlTarget(e.target)) return
                   if (isActivationKey(e)) {
                     e.preventDefault()
                     activate(e)
                     return
                   }
+                  const move = (next: number) => {
+                    activeIndex.value = next
+                    scrollToIndex(next)
+                    focusActiveRow(next)
+                  }
                   if (e.key === 'ArrowDown') {
                     e.preventDefault()
-                    const next = Math.max(0, Math.min(resolvedData.value.length - 1, globalIdx + 1))
-                    activeIndex.value = next
-                    if (next < range.value.start || next >= range.value.end) scrollToIndex(next)
+                    move(Math.max(0, Math.min(resolvedData.value.length - 1, globalIdx + 1)))
                   }
                   if (e.key === 'ArrowUp') {
                     e.preventDefault()
-                    const next = Math.max(0, Math.min(resolvedData.value.length - 1, globalIdx - 1))
-                    activeIndex.value = next
-                    if (next < range.value.start || next >= range.value.end) scrollToIndex(next)
+                    move(Math.max(0, Math.min(resolvedData.value.length - 1, globalIdx - 1)))
                   }
                 }
               : undefined
           },
           [
-            colRange && colRange.leftPad > 0
+            colRange && colRange.inlineBefore > 0
               ? h('td', {
                   key: '__left-pad',
                   'aria-hidden': true,
-                  style: { width: `${colRange.leftPad}px`, padding: 0 }
+                  style: { width: `${colRange.inlineBefore}px`, padding: 0 }
                 })
               : null,
             ...cells,
-            colRange && colRange.rightPad > 0
+            colRange && colRange.inlineAfter > 0
               ? h('td', {
                   key: '__right-pad',
                   'aria-hidden': true,
-                  style: { width: `${colRange.rightPad}px`, padding: 0 }
+                  style: { width: `${colRange.inlineAfter}px`, padding: 0 }
                 })
               : null
           ]
@@ -453,8 +570,8 @@ export const VirtualTable = defineComponent({
       const colgroup =
         colgroupEntries.length > 0
           ? h('colgroup', {}, [
-              colRange && colRange.leftPad > 0
-                ? h('col', { key: '__left-pad', style: { width: `${colRange.leftPad}px` } })
+              colRange && colRange.inlineBefore > 0
+                ? h('col', { key: '__left-pad', style: { width: `${colRange.inlineBefore}px` } })
                 : null,
               ...colgroupEntries.map((entry) =>
                 h('col', {
@@ -463,8 +580,8 @@ export const VirtualTable = defineComponent({
                   style: entry.width ? { width: entry.width } : undefined
                 })
               ),
-              colRange && colRange.rightPad > 0
-                ? h('col', { key: '__right-pad', style: { width: `${colRange.rightPad}px` } })
+              colRange && colRange.inlineAfter > 0
+                ? h('col', { key: '__right-pad', style: { width: `${colRange.inlineAfter}px` } })
                 : null
             ])
           : null
@@ -474,6 +591,7 @@ export const VirtualTable = defineComponent({
         {
           class: classNames(tableBaseClasses, 'table-fixed'),
           style: fi.minTableWidth > 0 ? { minWidth: `${fi.minTableWidth}px` } : undefined,
+          'aria-label': getTableLabels(mergedLocale.value).tableAriaLabel,
           'aria-rowcount': resolvedData.value.length + 1,
           'aria-colcount': resolvedColumns.value.length
         },
@@ -484,7 +602,7 @@ export const VirtualTable = defineComponent({
         resolvedData.value.length === 0 && !props.loading
           ? h(
               'div',
-              { class: virtualTableEmptyClasses },
+              { class: virtualTableEmptyClasses, role: 'status', 'aria-live': 'polite' },
               resolveLocaleText('No data', props.emptyText, mergedLocale.value?.common?.emptyText)
             )
           : null
@@ -492,7 +610,7 @@ export const VirtualTable = defineComponent({
       const loadingEl = props.loading
         ? h(
             'div',
-            { class: virtualTableLoadingClasses, 'aria-live': 'polite' },
+            { class: virtualTableLoadingClasses, role: 'status', 'aria-live': 'polite' },
             resolveLocaleText('Loading...', mergedLocale.value?.common?.loadingText)
           )
         : null

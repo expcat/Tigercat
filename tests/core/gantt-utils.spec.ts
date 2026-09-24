@@ -113,8 +113,8 @@ describe('gantt-utils', () => {
   })
 
   it('formats accessible task labels', () => {
-    expect(getGanttTaskAriaLabel(tasks[0])).toBe('Design, 01-01 to 01-05, 50%')
-    expect(formatGanttDate(new Date('2026-02-03'), 'day')).toBe('02-03')
+    expect(getGanttTaskAriaLabel(tasks[0])).toBe('Design, 2026-01-01 – 2026-01-05, 50%')
+    expect(formatGanttDate(new Date('2026-02-03'), 'day')).toBe('2026-02-03')
   })
 
   it('skips invalid dates instead of painting a bar at now', () => {
