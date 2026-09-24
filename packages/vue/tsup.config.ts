@@ -1,24 +1,19 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'tsup'
-import { readdirSync } from 'node:fs'
-import { join } from 'node:path'
+import {
+  buildFrameworkTsupEntries,
+  loadPublicComponentExports
+} from '../../scripts/lib/public-components.mjs'
 
-const componentsDir = join(__dirname, 'src', 'components')
-const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
-  .filter((entry) => entry.isFile() && entry.name.endsWith('.ts'))
-  .map((entry) => `src/components/${entry.name}`)
-
-const composableEntries = [
-  'src/composables/useChartInteraction.ts',
-  'src/composables/useResponsiveChartSize.ts',
-  'src/composables/useDrag.ts',
-  'src/composables/useFullscreen.ts',
-  'src/composables/useFormController.ts'
-]
+const root = fileURLToPath(new URL('../..', import.meta.url))
+const indexContent = readFileSync(new URL('./src/index.ts', import.meta.url), 'utf8')
+const components = loadPublicComponentExports(root).vue
 
 const external = ['vue']
 
 export default defineConfig({
-  entry: ['src/index.ts', ...componentEntries, ...composableEntries],
+  entry: buildFrameworkTsupEntries(components, 'vue', indexContent),
   format: ['esm'],
   dts: {
     compilerOptions: {

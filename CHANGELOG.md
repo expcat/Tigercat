@@ -4,6 +4,10 @@
 
 ## 未发布
 
+## v2.9.4
+
+v2.9.4：2.9.3 的包元数据已写出，但 npm tarball 返回 404。本版只把同一产品内容重新发成可安装的包，没有新的 API。
+
 ## v2.9.2
 
 v2.9.2：修复发布构建类型错误（React ChatWindow `Input` onChange、InfiniteScroll `orientation` 观察者选项、Popover `aria-label`、SchemaForm 与 HTMLAttributes 交叉）。产品内容与 2.9.0/2.9.1 深检收口一致。

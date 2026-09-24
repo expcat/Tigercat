@@ -8,8 +8,7 @@
  * @plugin "@expcat/tigercat-core/tailwind";
  * ```
  *
- * Injects Tigercat's default light/dark CSS variables and `MODERN_BASE`
- * fallback tokens. To opt-in to the visual "modern" style instead, use
- * `@expcat/tigercat-core/tailwind/modern`.
+ * Injects the default preset's light and dark CSS variables.
+ * Pass `createTigercatPlugin({ preset })` for another built-in preset.
  */
 export { tigercatPlugin as default } from './tailwind-plugin'

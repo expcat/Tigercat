@@ -1,14 +1,11 @@
 import type { ThemePreset } from '../../types/theme'
 
 /**
- * Modern theme — opt-in visual refresh.
+ * Modern theme preset.
  *
- * Pairs the default color palette with rounder corners, layered shadows
- * and refined motion easings. Activates the "modern" token layer when
- * combined with `createTigercatPlugin({ modern: true })` or by setting
- * `data-tiger-style="modern"` on `<html>`.
- *
- * @since 1.1.0
+ * Rounder corners and a distinct easing, on the same token shape as the
+ * other presets. Activate with `ConfigProvider theme="modern"` or
+ * `createTigercatPlugin({ preset: modernTheme })`.
  */
 export const modernTheme: ThemePreset = {
   name: 'modern',
@@ -34,16 +31,16 @@ export const modernTheme: ThemePreset = {
       text: '#0f172a',
       textSecondary: '#475569',
       textDisabled: '#cbd5e1',
-      border: '#e2e8f0',
-      borderStrong: '#94a3b8',
-      success: '#16a34a',
-      warning: '#d97706',
+      border: '#64748b',
+      borderStrong: '#334155',
+      success: '#15803d',
+      warning: '#b45309',
       error: '#dc2626',
       errorForeground: '#ffffff',
       errorHover: '#b91c1c',
       errorDisabled: '#fca5a5',
       errorBgHover: '#fef2f2',
-      info: '#0ea5e9',
+      info: '#0369a1',
       chart1: '#2563eb',
       chart2: '#16a34a',
       chart3: '#d97706',
@@ -87,8 +84,8 @@ export const modernTheme: ThemePreset = {
       text: '#f1f5f9',
       textSecondary: '#cbd5e1',
       textDisabled: '#475569',
-      border: '#334155',
-      borderStrong: '#64748b',
+      border: '#94a3b8',
+      borderStrong: '#cbd5e1',
       success: '#4ade80',
       warning: '#fbbf24',
       error: '#f87171',

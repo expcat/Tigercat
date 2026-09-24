@@ -18,7 +18,7 @@ export {
   primitiveEasing,
   semanticTokens,
   designTokens,
-  componentTokens,
+  runtimeBreakpoints,
   runtimeThemeLight,
   runtimeThemeDark
 } from './tokens'
@@ -32,5 +32,5 @@ export type {
   PrimitiveDurationKey,
   PrimitiveEasingKey,
   SemanticTokenCategory,
-  ComponentTokenName
+  RuntimeBreakpoint
 } from './tokens'

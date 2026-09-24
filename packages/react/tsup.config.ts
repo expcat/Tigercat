@@ -1,23 +1,17 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'tsup'
-import { readdirSync } from 'node:fs'
-import { join } from 'node:path'
+import {
+  buildFrameworkTsupEntries,
+  loadPublicComponentExports
+} from '../../scripts/lib/public-components.mjs'
 
-const componentsDir = join(__dirname, 'src', 'components')
-const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
-  .filter((entry) => entry.isFile() && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')))
-  .map((entry) => `src/components/${entry.name}`)
-
-const hookEntries = [
-  'src/hooks/useChartInteraction.ts',
-  'src/hooks/useResponsiveChartSize.ts',
-  'src/hooks/useControlledState.ts',
-  'src/hooks/useDrag.ts',
-  'src/hooks/useFullscreen.ts',
-  'src/hooks/useFormController.ts'
-]
+const root = fileURLToPath(new URL('../..', import.meta.url))
+const indexContent = readFileSync(new URL('./src/index.tsx', import.meta.url), 'utf8')
+const components = loadPublicComponentExports(root).react
 
 export default defineConfig({
-  entry: ['src/index.tsx', ...componentEntries, ...hookEntries],
+  entry: buildFrameworkTsupEntries(components, 'react', indexContent),
   format: ['esm'],
   dts: {
     compilerOptions: {

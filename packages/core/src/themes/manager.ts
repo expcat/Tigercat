@@ -1,23 +1,15 @@
 /**
- * ThemeManager — runtime theme & color-scheme management.
+ * Request-scoped theme application.
  *
- * Responsibilities:
- *  1. Register / retrieve preset themes
- *  2. Apply a theme by converting ThemeConfig → CSS custom-properties
- *  3. Manage light / dark / auto colour schemes (including prefers-color-scheme)
- *  4. Notify listeners on theme or color-scheme change
- *
- * @module themes/manager
- * @since 0.7.0
+ * Each browser root (and each server render) owns a scope. CSS variables are
+ * written into a style element on that root so light, `.dark`, and
+ * `prefers-color-scheme` can disagree without a process-wide singleton.
+ * `auto` does not stamp `.dark`; the first paint follows the class or
+ * `data-tiger-color-scheme` already on the root.
  */
 
 import type { ThemeConfig, ThemePreset, ColorScheme } from '../types/theme'
-import {
-  THEME_CSS_VARS,
-  removeCssVarsCached,
-  semanticColorsToCssVars,
-  setCssVarsCached
-} from '../theme-runtime'
+import { semanticColorsToCssVars, isAllowedThemeValue, setCssVarsCached } from '../theme-runtime'
 import { isBrowser } from '../utils/env'
 import { devWarn } from '../utils/dev-warn'
 import { defaultTheme } from './default/theme'
@@ -27,12 +19,6 @@ import { minimalTheme } from './minimal/theme'
 import { naturalTheme } from './natural/theme'
 import { modernTheme } from './modern/theme'
 import { highContrastTheme } from './high-contrast/theme'
-import {
-  MODERN_BASE_TOKENS_DARK,
-  MODERN_BASE_TOKENS_LIGHT,
-  MODERN_OVERRIDE_TOKENS_DARK,
-  MODERN_OVERRIDE_TOKENS_LIGHT
-} from './modern/tokens'
 
 const builtInPresets = [
   defaultTheme,
@@ -44,10 +30,6 @@ const builtInPresets = [
   highContrastTheme
 ]
 
-/**
- * Merge a preset segment onto the default theme for the same scheme.
- * Missing colors / radius / motion / etc. fall back to `base`.
- */
 export function mergeThemeConfig(base: ThemeConfig = {}, override: ThemeConfig = {}): ThemeConfig {
   return {
     colors: { ...base.colors, ...override.colors },
@@ -59,7 +41,6 @@ export function mergeThemeConfig(base: ThemeConfig = {}, override: ThemeConfig =
   }
 }
 
-/** Resolve a preset's light or dark config with default-theme fallbacks. */
 export function resolvePresetThemeConfig(
   preset: ThemePreset | undefined,
   scheme: 'light' | 'dark',
@@ -67,10 +48,6 @@ export function resolvePresetThemeConfig(
 ): ThemeConfig {
   return mergeThemeConfig(fallback[scheme], preset?.[scheme] ?? {})
 }
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
 
 export const THEME_CONFIG_CSS_VARS = {
   typography: {
@@ -111,16 +88,23 @@ export const THEME_CONFIG_CSS_VARS = {
   motion: {
     durationFast: '--tiger-motion-duration-quick',
     durationBase: '--tiger-motion-duration-base',
-    durationSlow: '--tiger-motion-duration-relaxed',
+    durationSlow: '--tiger-motion-duration-slow',
     easing: '--tiger-motion-ease-standard'
   }
 } as const
+
+export const THEME_TRANSITION_PROPERTIES =
+  'color, background-color, border-color, outline-color, text-decoration-color, box-shadow, opacity, transform'
 
 const THEME_TRANSITION_CSS_VARS = {
   durationFast: '--tiger-transition-quick',
   durationBase: '--tiger-transition-base',
   durationSlow: '--tiger-transition-emphasized'
 } as const
+
+export function themeTransitionValue(duration: string, easing: string): string {
+  return `${THEME_TRANSITION_PROPERTIES} ${duration} ${easing}`
+}
 
 export function themeConfigToCssVars(config: ThemeConfig): Record<string, string> {
   const vars: Record<string, string> = {
@@ -133,57 +117,26 @@ export function themeConfigToCssVars(config: ThemeConfig): Record<string, string
     const varNames = THEME_CONFIG_CSS_VARS[section]
     for (const [key, value] of Object.entries(values)) {
       const varName = varNames[key as keyof typeof varNames]
-      if (varName && value) vars[varName] = value
+      if (varName && value && isAllowedThemeValue(value)) vars[varName] = value
     }
   }
 
   const motion = config.motion
   if (motion) {
     const easing = motion.easing ?? 'cubic-bezier(0.4, 0, 0.2, 1)'
-    if (motion.durationBase) {
-      vars[THEME_TRANSITION_CSS_VARS.durationBase] = `all ${motion.durationBase} ${easing}`
+    if (motion.durationBase && isAllowedThemeValue(easing)) {
+      vars[THEME_TRANSITION_CSS_VARS.durationBase] = themeTransitionValue(motion.durationBase, easing)
     }
-    if (motion.durationFast) {
-      vars[THEME_TRANSITION_CSS_VARS.durationFast] = `all ${motion.durationFast} ${easing}`
+    if (motion.durationFast && isAllowedThemeValue(easing)) {
+      vars[THEME_TRANSITION_CSS_VARS.durationFast] = themeTransitionValue(motion.durationFast, easing)
     }
-    if (motion.durationSlow) {
-      vars[THEME_TRANSITION_CSS_VARS.durationSlow] = `transform ${motion.durationSlow} ${easing}`
+    if (motion.durationSlow && isAllowedThemeValue(easing)) {
+      vars[THEME_TRANSITION_CSS_VARS.durationSlow] = themeTransitionValue(motion.durationSlow, easing)
     }
   }
 
   return vars
 }
-
-function extraThemeVarNames(): string[] {
-  return [
-    ...Object.values(THEME_TRANSITION_CSS_VARS),
-    ...Object.keys(MODERN_BASE_TOKENS_LIGHT),
-    ...Object.keys(MODERN_BASE_TOKENS_DARK),
-    ...Object.keys(MODERN_OVERRIDE_TOKENS_LIGHT),
-    ...Object.keys(MODERN_OVERRIDE_TOKENS_DARK)
-  ]
-}
-
-function clearThemeConfig(target: HTMLElement): void {
-  removeCssVarsCached(target, [
-    ...Object.values(THEME_CSS_VARS),
-    ...Object.values(THEME_CONFIG_CSS_VARS.typography),
-    ...Object.values(THEME_CONFIG_CSS_VARS.radius),
-    ...Object.values(THEME_CONFIG_CSS_VARS.shadows),
-    ...Object.values(THEME_CONFIG_CSS_VARS.spacing),
-    ...Object.values(THEME_CONFIG_CSS_VARS.motion),
-    ...extraThemeVarNames()
-  ])
-}
-
-function resolveSystemDark(): boolean {
-  if (!isBrowser()) return false
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
-// ---------------------------------------------------------------------------
-// ThemeChangeEvent
-// ---------------------------------------------------------------------------
 
 export interface ThemeChangeEvent {
   theme: string
@@ -192,224 +145,174 @@ export interface ThemeChangeEvent {
 
 export type ThemeChangeListener = (event: ThemeChangeEvent) => void
 
-// ---------------------------------------------------------------------------
-// ThemeManager class
-// ---------------------------------------------------------------------------
-
-class ThemeManagerImpl {
-  private presets = new Map<string, ThemePreset>()
-  private currentThemeName = 'default'
-  private colorScheme: ColorScheme = 'light'
-  private resolvedDark = false
-  private listeners: ThemeChangeListener[] = []
-  private mediaQuery: MediaQueryList | null = null
-  private mediaHandler: ((e: MediaQueryListEvent) => void) | null = null
-  private builtInsRegistered = false
-
-  /** Register shipped presets. Safe to call more than once. */
-  registerBuiltIns(): void {
-    if (this.builtInsRegistered) return
-    for (const preset of builtInPresets) {
-      if (!this.presets.has(preset.name)) {
-        this.presets.set(preset.name, preset)
-      }
-    }
-    this.builtInsRegistered = true
-  }
-
-  // -----------------------------------------------------------------------
-  // Theme registration
-  // -----------------------------------------------------------------------
-
-  /** Register a preset theme. Replaces any existing preset with the same name. */
-  registerTheme(preset: ThemePreset): void {
-    this.registerBuiltIns()
-    this.presets.set(preset.name, preset)
-  }
-
-  /** Get a registered preset by name. */
-  getTheme(name: string): ThemePreset | undefined {
-    this.registerBuiltIns()
-    return this.presets.get(name)
-  }
-
-  /** List all registered preset names. */
-  getAvailableThemes(): string[] {
-    this.registerBuiltIns()
-    return Array.from(this.presets.keys())
-  }
-
-  /** Get the currently active theme name. */
-  getCurrentTheme(): string {
-    return this.currentThemeName
-  }
-
-  /** Get the resolved (effective) color scheme — always 'light' or 'dark'. */
-  getResolvedColorScheme(): 'light' | 'dark' {
-    return this.resolvedDark ? 'dark' : 'light'
-  }
-
-  // -----------------------------------------------------------------------
-  // Applying themes
-  // -----------------------------------------------------------------------
-
-  /**
-   * Switch to a registered preset theme.
-   * If the name is not registered the call is a no-op.
-   */
-  setTheme(name: string): void {
-    this.registerBuiltIns()
-    if (!this.presets.has(name)) {
-      devWarn(`ThemeManager.setTheme.${name}`, `[Tigercat] Theme "${name}" is not registered.`)
-      return
-    }
-    this.currentThemeName = name
-    this.apply()
-  }
-
-  /**
-   * Define and immediately apply a custom theme at runtime.
-   * Registers the theme, then switches to it.
-   */
-  defineTheme(preset: ThemePreset): void {
-    this.registerTheme(preset)
-    this.setTheme(preset.name)
-  }
-
-  /**
-   * Set the colour scheme strategy.
-   * - `'light'` / `'dark'` — force a specific mode
-   * - `'auto'` — follow `prefers-color-scheme` media query
-   *
-   * Pass `{ applyResolved: false }` with `'auto'` to attach the media listener
-   * without applying the current system preference. ConfigProvider uses that
-   * on first paint so SSR (light) does not flash `.dark` during hydrate.
-   */
-  setColorScheme(scheme: ColorScheme, options?: { applyResolved?: boolean }): void {
-    this.colorScheme = scheme
-
-    if (scheme === 'auto') {
-      this.startWatchingMedia()
-      if (options?.applyResolved === false) {
-        return
-      }
-      this.resolvedDark = resolveSystemDark()
-    } else {
-      this.stopWatchingMedia()
-      this.resolvedDark = scheme === 'dark'
-    }
-
-    this.apply()
-  }
-
-  /** Get the current color scheme setting (may be 'auto'). */
-  getColorScheme(): ColorScheme {
-    return this.colorScheme
-  }
-
-  // -----------------------------------------------------------------------
-  // Listeners
-  // -----------------------------------------------------------------------
-
-  /** Subscribe to theme/colour-scheme changes. Returns an unsubscribe function. */
-  onChange(listener: ThemeChangeListener): () => void {
-    this.listeners.push(listener)
-    return () => {
-      this.listeners = this.listeners.filter((l) => l !== listener)
-    }
-  }
-
-  // -----------------------------------------------------------------------
-  // Internal
-  // -----------------------------------------------------------------------
-
-  private apply(): void {
-    this.registerBuiltIns()
-    if (!isBrowser()) return
-
-    const root = document.documentElement
-    const preset = this.presets.get(this.currentThemeName)
-    const scheme = this.resolvedDark ? 'dark' : 'light'
-    const config = resolvePresetThemeConfig(preset, scheme)
-
-    // Replace the previous inline theme with the merged config so missing
-    // segments fall back to the default theme instead of disappearing.
-    clearThemeConfig(root)
-
-    const isModern = this.currentThemeName === 'modern'
-    const extra = isModern
-      ? this.resolvedDark
-        ? MODERN_OVERRIDE_TOKENS_DARK
-        : MODERN_OVERRIDE_TOKENS_LIGHT
-      : {}
-    setCssVarsCached(root, { ...themeConfigToCssVars(config), ...extra })
-
-    if (isModern) {
-      root.setAttribute('data-tiger-style', 'modern')
-    } else {
-      root.removeAttribute('data-tiger-style')
-    }
-
-    // Toggle `.dark` class on <html>
-    if (this.resolvedDark) {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-    root.style.colorScheme = this.resolvedDark ? 'dark' : 'light'
-
-    this.notify()
-  }
-
-  private notify(): void {
-    const event: ThemeChangeEvent = {
-      theme: this.currentThemeName,
-      colorScheme: this.resolvedDark ? 'dark' : 'light'
-    }
-    for (const listener of this.listeners) {
-      listener(event)
-    }
-  }
-
-  private startWatchingMedia(): void {
-    if (!isBrowser()) return
-    if (this.mediaQuery) return // already watching
-
-    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    this.mediaHandler = (e: MediaQueryListEvent) => {
-      this.resolvedDark = e.matches
-      this.apply()
-    }
-    this.mediaQuery.addEventListener('change', this.mediaHandler)
-  }
-
-  private stopWatchingMedia(): void {
-    if (this.mediaQuery && this.mediaHandler) {
-      this.mediaQuery.removeEventListener('change', this.mediaHandler)
-    }
-    this.mediaQuery = null
-    this.mediaHandler = null
-  }
+export interface TigerThemeScopeOptions {
+  root?: HTMLElement | null
+  theme?: string
+  colorScheme?: ColorScheme
 }
 
-/**
- * Singleton ThemeManager instance.
- *
- * @example
- * ```ts
- * import { ThemeManager } from '@expcat/tigercat-core'
- *
- * ThemeManager.setTheme('vibrant')
- * ThemeManager.setColorScheme('auto')
- *
- * ThemeManager.onChange(({ theme, colorScheme }) => {
- *   console.log(`Switched to ${theme} (${colorScheme})`)
- * })
- * ```
- */
-export const ThemeManager = new ThemeManagerImpl()
+export interface TigerThemeScope {
+  registerTheme(preset: ThemePreset): void
+  getTheme(name: string): ThemePreset | undefined
+  getAvailableThemes(): string[]
+  getCurrentTheme(): string
+  getResolvedColorScheme(): 'light' | 'dark'
+  getColorScheme(): ColorScheme
+  setTheme(name: string): void
+  defineTheme(preset: ThemePreset): void
+  setColorScheme(scheme: ColorScheme): void
+  onChange(listener: ThemeChangeListener): () => void
+  apply(): void
+  dispose(): void
+}
 
-/** Explicitly register built-in presets. ThemeManager methods also call this. */
-export function registerBuiltInThemes(): void {
-  ThemeManager.registerBuiltIns()
+let nextScopeId = 0
+
+function readExplicitScheme(root: HTMLElement | null): 'light' | 'dark' | null {
+  if (!root) return null
+  const attr = root.getAttribute('data-tiger-color-scheme')
+  if (attr === 'dark' || attr === 'light') return attr
+  if (root.classList.contains('dark')) return 'dark'
+  return null
+}
+
+function decls(vars: Record<string, string>): string {
+  return Object.entries(vars)
+    .filter(([, value]) => isAllowedThemeValue(value))
+    .map(([name, value]) => `${name}:${value}`)
+    .join(';')
+}
+
+export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): TigerThemeScope {
+  const presets = new Map<string, ThemePreset>()
+  for (const preset of builtInPresets) presets.set(preset.name, preset)
+
+  let currentThemeName = options.theme ?? 'default'
+  let colorScheme: ColorScheme = options.colorScheme ?? 'auto'
+  let root = options.root === undefined ? (isBrowser() ? document.documentElement : null) : options.root
+  const scopeId = `tiger-theme-${++nextScopeId}`
+  let styleEl: HTMLStyleElement | null = null
+  const listeners: ThemeChangeListener[] = []
+
+  function resolved(): 'light' | 'dark' {
+    if (colorScheme === 'dark' || colorScheme === 'light') return colorScheme
+    return readExplicitScheme(root) ?? 'light'
+  }
+
+  function ensureStyle(): HTMLStyleElement | null {
+    if (!isBrowser() || !root) return null
+    const doc = root.ownerDocument
+    if (!styleEl || styleEl.ownerDocument !== doc) {
+      styleEl = doc.createElement('style')
+      styleEl.setAttribute('data-tiger-theme-style', scopeId)
+      doc.head.appendChild(styleEl)
+    }
+    return styleEl
+  }
+
+  function apply(): void {
+    if (!presets.has(currentThemeName)) {
+      devWarn(
+        `themeScope.setTheme.${currentThemeName}`,
+        `[Tigercat] Theme "${currentThemeName}" is not registered.`
+      )
+      return
+    }
+    const preset = presets.get(currentThemeName)
+    const lightVars = themeConfigToCssVars(resolvePresetThemeConfig(preset, 'light'))
+    const darkVars = themeConfigToCssVars(resolvePresetThemeConfig(preset, 'dark'))
+    const light = decls(lightVars)
+    const dark = decls(darkVars)
+    const selector = `[data-tiger-theme-scope="${scopeId}"]`
+    const css = [
+      `${selector}{${light}}`,
+      `${selector}[data-tiger-color-scheme="dark"],${selector}.dark{${dark}}`,
+      `@media (prefers-color-scheme: dark){${selector}:not([data-tiger-color-scheme="light"]){${dark}}}`
+    ].join('')
+
+    if (root && isBrowser()) {
+      root.setAttribute('data-tiger-theme-scope', scopeId)
+      root.setAttribute('data-tiger-theme', currentThemeName)
+      if (colorScheme === 'auto') {
+        root.removeAttribute('data-tiger-color-scheme')
+      } else {
+        root.setAttribute('data-tiger-color-scheme', colorScheme)
+        root.classList.toggle('dark', colorScheme === 'dark')
+        root.style.colorScheme = colorScheme
+      }
+      const style = ensureStyle()
+      if (style) style.textContent = css
+      setCssVarsCached(root, resolved() === 'dark' ? darkVars : lightVars)
+    }
+
+    const event: ThemeChangeEvent = { theme: currentThemeName, colorScheme: resolved() }
+    for (const listener of listeners) listener(event)
+  }
+
+  const scope: TigerThemeScope = {
+    registerTheme(preset) {
+      presets.set(preset.name, preset)
+    },
+    getTheme(name) {
+      return presets.get(name)
+    },
+    getAvailableThemes() {
+      return Array.from(presets.keys())
+    },
+    getCurrentTheme() {
+      return currentThemeName
+    },
+    getResolvedColorScheme() {
+      return resolved()
+    },
+    getColorScheme() {
+      return colorScheme
+    },
+    setTheme(name) {
+      if (!presets.has(name)) {
+        devWarn(`themeScope.setTheme.${name}`, `[Tigercat] Theme "${name}" is not registered.`)
+        return
+      }
+      currentThemeName = name
+      apply()
+    },
+    defineTheme(preset) {
+      presets.set(preset.name, preset)
+      currentThemeName = preset.name
+      apply()
+    },
+    setColorScheme(scheme) {
+      colorScheme = scheme
+      apply()
+    },
+    onChange(listener) {
+      listeners.push(listener)
+      return () => {
+        const index = listeners.indexOf(listener)
+        if (index !== -1) listeners.splice(index, 1)
+      }
+    },
+    apply,
+    dispose() {
+      styleEl?.remove()
+      styleEl = null
+      if (root?.getAttribute('data-tiger-theme-scope') === scopeId) {
+        root.removeAttribute('data-tiger-theme-scope')
+      }
+      listeners.length = 0
+      root = null
+    }
+  }
+
+  return scope
+}
+
+export function readTigerDocumentTheme(root?: HTMLElement | null): {
+  theme: string
+  colorScheme: 'light' | 'dark'
+} {
+  const target = root === undefined ? (isBrowser() ? document.documentElement : null) : root
+  const theme = target?.getAttribute('data-tiger-theme') || 'default'
+  const explicit = readExplicitScheme(target)
+  return { theme, colorScheme: explicit ?? 'light' }
 }

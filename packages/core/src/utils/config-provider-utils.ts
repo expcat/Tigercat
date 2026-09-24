@@ -6,6 +6,7 @@
 import type { ColorScheme } from '../types/theme'
 import type { ConfigProviderProps, TigerConfig } from '../types/config-provider'
 import type { TigerLocale, TigerLocaleDirection } from '../types/locale'
+import type { IconRegistry } from './icons/registry'
 import { mergeTigerLocale } from './i18n/locale-merge'
 import { getLocaleDirection } from './locale-utils'
 
@@ -29,6 +30,7 @@ export interface ResolveTigerConfigInput {
   direction?: TigerLocaleDirection
   theme?: string
   colorScheme?: ColorScheme
+  iconRegistry?: IconRegistry
   parent?: TigerConfig
 }
 
@@ -52,10 +54,11 @@ export function resolveTigerConfig(input: ResolveTigerConfigInput): TigerConfig 
 
   return {
     locale: mergedLocale,
-    localeLoading: Boolean(input.localeLoading) || Boolean(input.parent?.localeLoading),
-    localeLoadError: input.localeLoadError ?? input.parent?.localeLoadError,
+    localeLoading: Boolean(input.localeLoading),
+    localeLoadError: input.localeLoadError,
     direction,
     theme: input.theme ?? input.parent?.theme,
-    colorScheme: input.colorScheme ?? input.parent?.colorScheme
+    colorScheme: input.colorScheme ?? input.parent?.colorScheme,
+    iconRegistry: input.iconRegistry ?? input.parent?.iconRegistry
   }
 }

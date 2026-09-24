@@ -57,7 +57,7 @@ pnpm add -D tailwindcss @tailwindcss/vite
 
 ```css
 @import 'tailwindcss';
-@plugin "@expcat/tigercat-core/tailwind/modern";
+@plugin "@expcat/tigercat-core/tailwind";
 ```
 
 可运行 `pnpm dlx @expcat/tigercat-cli doctor` 检查 Node.js、pnpm、Tailwind CSS、框架 peer dependency 与模板工具链。

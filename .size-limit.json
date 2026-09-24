@@ -284,8 +284,8 @@
     "gzip": true
   },
   {
-    "name": "Core tailwind/modern subpath",
-    "path": "packages/core/dist/tailwind/modern.js",
+    "name": "Core tailwind subpath",
+    "path": "packages/core/dist/tailwind.js",
     "limit": "8 kB",
     "gzip": true
   },

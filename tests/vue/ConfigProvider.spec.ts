@@ -6,13 +6,7 @@ import { afterEach, describe, it, expect } from 'vitest'
 import { render, waitFor } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-vue/ConfigProvider'
-import {
-  getGlobalTigerLocale,
-  resetDocumentConfigScope,
-  resetTigerLocaleScope,
-  ThemeManager,
-  type TigerLocale
-} from '@expcat/tigercat-core'
+import { type TigerLocale } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const LocaleDisplay = defineComponent({
@@ -32,15 +26,14 @@ const LocaleDisplay = defineComponent({
 })
 
 function resetDocument(): void {
-  resetDocumentConfigScope()
-  resetTigerLocaleScope()
-  ThemeManager.setTheme('default')
-  ThemeManager.setColorScheme('light')
   document.documentElement.removeAttribute('dir')
   document.documentElement.removeAttribute('data-tiger-dir')
   document.documentElement.removeAttribute('lang')
-  document.documentElement.removeAttribute('data-tiger-style')
+  document.documentElement.removeAttribute('data-tiger-theme')
+  document.documentElement.removeAttribute('data-tiger-color-scheme')
+  document.documentElement.removeAttribute('data-tiger-theme-scope')
   document.documentElement.classList.remove('dark')
+  document.querySelectorAll('style[data-tiger-theme-style]').forEach((node) => node.remove())
 }
 
 describe('ConfigProvider', () => {
@@ -199,7 +192,7 @@ describe('ConfigProvider', () => {
         expect(getByTestId('loading').textContent).toBe('ready')
       })
 
-      expect(getByTestId('ok').textContent).toBe('default')
+      expect(getByTestId('ok').textContent).toBe('OK')
       expect(getByTestId('load-error').textContent).toBe('error')
     })
 
@@ -244,7 +237,7 @@ describe('ConfigProvider', () => {
         })
       )
 
-      expect(getByTestId('loading').textContent).toBe('loading')
+      expect(getByTestId('loading').textContent).toBe('ready')
 
       resolveOuter({ common: { okText: 'Outer Done' } })
 
@@ -272,13 +265,13 @@ describe('ConfigProvider', () => {
       )
 
       expect(getByTestId('theme').textContent).toBe('minimal')
-      expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('vibrant')
 
       showInner.value = false
       await waitFor(() => {
         expect(getByTestId('theme').textContent).toBe('vibrant')
       })
-      expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('vibrant')
     })
 
     it('does not remove an existing html dir when unmounting a locale-only provider', () => {
@@ -338,12 +331,9 @@ describe('ConfigProvider', () => {
     it('exposes the ConfigProvider locale to imperative APIs during setup', () => {
       const ImperativeLocale = defineComponent({
         setup() {
+          const config = useTigerConfig()
           return () =>
-            h(
-              'span',
-              { 'data-testid': 'global' },
-              getGlobalTigerLocale()?.common?.okText ?? 'empty'
-            )
+            h('span', { 'data-testid': 'global' }, config.value.locale?.common?.okText ?? 'empty')
         }
       })
 
@@ -410,7 +400,7 @@ describe('ConfigProvider', () => {
     it('returns empty config outside of ConfigProvider', () => {
       const { getByTestId } = render(LocaleDisplay)
 
-      expect(getByTestId('ok').textContent).toBe('default')
+      expect(getByTestId('ok').textContent).toBe('OK')
       expect(getByTestId('loading').textContent).toBe('ready')
     })
   })
@@ -437,7 +427,7 @@ describe('ConfigProvider', () => {
         })
       )
 
-      expect(document.documentElement.getAttribute('data-tiger-style')).toBe('modern')
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('modern')
     })
   })
 

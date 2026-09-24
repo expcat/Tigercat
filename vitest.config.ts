@@ -46,6 +46,7 @@ function buildHookAliases(framework: 'vue' | 'react') {
 
 const testAliases = {
   '@expcat/tigercat-core/locales': resolve(__dirname, './packages/core/src/utils/i18n/locales'),
+  '@expcat/tigercat-core/icons': resolve(__dirname, './packages/core/src/utils/icons'),
   '@expcat/tigercat-core/datepicker-locales': resolve(
     __dirname,
     './packages/core/src/utils/i18n/datepicker-locales'

@@ -4,6 +4,7 @@
  */
 
 import type { ThemeSemanticColors } from '../types/theme'
+import { runtimeBreakpoints } from '../tokens/tokens'
 import { isBrowser } from '../utils/env'
 import { devWarn } from '../utils/dev-warn'
 
@@ -84,10 +85,6 @@ export const THEME_CSS_VARS = {
   chart4: '--tiger-chart-4',
   chart5: '--tiger-chart-5',
   chart6: '--tiger-chart-6',
-  // Aliases of existing semantic tokens (not a third color system)
-  textMuted: '--tiger-text-muted',
-  fill: '--tiger-fill',
-  bg: '--tiger-bg',
   // Breakpoints
   breakpointXs: '--tiger-breakpoint-xs',
   breakpointSm: '--tiger-breakpoint-sm',
@@ -98,24 +95,47 @@ export const THEME_CSS_VARS = {
 } as const
 
 export const TIGER_BREAKPOINT_CSS_VALUES = {
-  breakpointXs: '0px',
-  breakpointSm: '640px',
-  breakpointMd: '768px',
-  breakpointLg: '1024px',
-  breakpointXl: '1280px',
-  breakpoint2xl: '1536px'
+  breakpointXs: runtimeBreakpoints.xs,
+  breakpointSm: runtimeBreakpoints.sm,
+  breakpointMd: runtimeBreakpoints.md,
+  breakpointLg: runtimeBreakpoints.lg,
+  breakpointXl: runtimeBreakpoints.xl,
+  breakpoint2xl: runtimeBreakpoints['2xl']
 } as const
 
-/** Canonical semantic keys that alias CSS names resolve through. */
-const THEME_CSS_VAR_ALIAS_SOURCES = {
-  textMuted: 'textSecondary',
-  fill: 'surfaceMuted',
-  bg: 'surface'
-} as const satisfies Record<string, keyof typeof THEME_CSS_VARS>
+const REGISTERED_EASINGS = new Set([
+  'linear',
+  'ease',
+  'ease-in',
+  'ease-out',
+  'ease-in-out',
+  'cubic-bezier(0.4, 0, 0.2, 1)',
+  'cubic-bezier(0.4, 0, 1, 1)',
+  'cubic-bezier(0, 0, 0.2, 1)',
+  'cubic-bezier(0.34, 1.56, 0.64, 1)',
+  'cubic-bezier(0.25, 0.1, 0.25, 1)',
+  'cubic-bezier(0.2, 0, 0, 1)'
+])
 
 /**
- * Map semantic colors to CSS custom properties, then emit alias names as `var()`
- * references so they follow preset / runtime changes to the canonical tokens.
+ * Runtime theme values may be colors, lengths, registered easings, or
+ * compositions of those (shadows, font stacks, transition shorthand).
+ * `url()`, HTML, and unregistered cubic-bezier curves are rejected.
+ */
+export function isAllowedThemeValue(value: string): boolean {
+  const normalized = value.trim().replace(/\s+/g, ' ')
+  if (!normalized || normalized.length > 500) return false
+  if (/url\s*\(|expression\s*\(|javascript:|<|>|@import|;|\/\*|\*\/|\\/i.test(normalized)) {
+    return false
+  }
+  const curves = normalized.match(/cubic-bezier\([^)]*\)/g) ?? []
+  if (curves.some((curve) => !REGISTERED_EASINGS.has(curve))) return false
+  if (REGISTERED_EASINGS.has(normalized)) return true
+  return /^[#a-zA-Z0-9\s,.'()%+\-./]+$/.test(normalized)
+}
+
+/**
+ * Map semantic colors to CSS custom properties. Alias names are not emitted.
  */
 export function semanticColorsToCssVars(
   colors: Partial<ThemeSemanticColors> = {}
@@ -124,14 +144,7 @@ export function semanticColorsToCssVars(
 
   for (const [key, value] of Object.entries(colors)) {
     const varName = THEME_CSS_VARS[key as keyof typeof THEME_CSS_VARS]
-    if (varName && value) vars[varName] = value
-  }
-
-  for (const aliasKey of Object.keys(THEME_CSS_VAR_ALIAS_SOURCES) as Array<
-    keyof typeof THEME_CSS_VAR_ALIAS_SOURCES
-  >) {
-    const sourceKey = THEME_CSS_VAR_ALIAS_SOURCES[aliasKey]
-    vars[THEME_CSS_VARS[aliasKey]] = `var(${THEME_CSS_VARS[sourceKey]})`
+    if (varName && value && isAllowedThemeValue(value)) vars[varName] = value
   }
 
   for (const [key, value] of Object.entries(TIGER_BREAKPOINT_CSS_VALUES)) {
@@ -154,8 +167,8 @@ export function setCssVarsCached(
   }
 
   for (const [name, value] of Object.entries(vars)) {
-    if (!value) continue
-    if (cache.get(name) === value) continue
+    if (!value || !isAllowedThemeValue(value)) continue
+    if (cache.get(name) === value && element.style.getPropertyValue(name) === value) continue
     element.style.setProperty(name, value)
     cache.set(name, value)
   }
@@ -208,17 +221,9 @@ export function setThemeColors(
 
   const vars: Record<string, string> = {}
   Object.entries(colors).forEach(([key, value]) => {
-    const canonicalKey =
-      (THEME_CSS_VAR_ALIAS_SOURCES as Record<string, keyof typeof THEME_CSS_VARS>)[key] ?? key
-    const varName = THEME_CSS_VARS[canonicalKey as keyof typeof THEME_CSS_VARS]
+    const varName = THEME_CSS_VARS[key as keyof typeof THEME_CSS_VARS]
     if (varName && value) vars[varName] = value
   })
-  for (const aliasKey of Object.keys(THEME_CSS_VAR_ALIAS_SOURCES) as Array<
-    keyof typeof THEME_CSS_VAR_ALIAS_SOURCES
-  >) {
-    const sourceKey = THEME_CSS_VAR_ALIAS_SOURCES[aliasKey]
-    vars[THEME_CSS_VARS[aliasKey]] = `var(${THEME_CSS_VARS[sourceKey]})`
-  }
   setCssVarsCached(target, vars)
 }
 
@@ -235,10 +240,6 @@ export function setThemeColors(
  *
  * const primaryColor = getThemeColor('primary')
  * console.log(primaryColor) // specified value of --tiger-primary, e.g. '#2563eb'
- *
- * Alias keys (`textMuted`, `fill`, `bg`) resolve through their canonical
- * token so the return is the same hex (or specified value) as `textSecondary` /
- * `surfaceMuted` / `surface`, not the `var(--tiger-…)` wrapper.
  * ```
  */
 export function getThemeColor(
@@ -251,10 +252,7 @@ export function getThemeColor(
     return undefined
   }
 
-  const canonicalKey =
-    (THEME_CSS_VAR_ALIAS_SOURCES as Record<string, keyof typeof THEME_CSS_VARS>)[colorKey] ??
-    colorKey
-  const varName = THEME_CSS_VARS[canonicalKey]
+  const varName = THEME_CSS_VARS[colorKey]
   const value = getComputedStyle(target).getPropertyValue(varName).trim()
 
   return value || undefined

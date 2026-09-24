@@ -18,6 +18,7 @@ import {
   resolveTigerLocale,
   resolveTigerConfig,
   createDocumentConfigHandle,
+  readDocumentOwnerLocale,
   devWarn,
   type TigerConfig,
   type TigerLocale,
@@ -26,7 +27,16 @@ import {
   type ColorScheme,
   type DocumentConfigHandle
 } from '@expcat/tigercat-core'
-import { createGlobalTigerLocaleHandle, type GlobalTigerLocaleHandle } from '../utils/global-locale'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { FeedbackDepthKey, FeedbackHost } from './FeedbackHost'
+import { OverlayOutletProvider } from '../utils/overlay-outlet'
+import {
+  createTigerLocaleScope,
+  createIconRegistry,
+  type TigerLocaleScope,
+  type IconRegistry,
+  type TigerLocaleHandle
+} from '@expcat/tigercat-core'
 
 export type { TigerConfig }
 
@@ -35,8 +45,17 @@ export const TigerConfigKey: InjectionKey<ComputedRef<TigerConfig>> = Symbol('Ti
 export function useTigerConfig(): ComputedRef<TigerConfig> {
   return inject(
     TigerConfigKey,
-    computed(() => ({}))
+    computed(() => ({ locale: enUS }))
   )
+}
+
+/**
+ * Locale for this tree, or the document owner's locale when this tree has no provider.
+ * Imperative hosts mount outside the provider and use the second path.
+ */
+export function useResolvedTigerLocale(): ComputedRef<Partial<TigerLocale> | undefined> {
+  const provided = inject(TigerConfigKey, null)
+  return computed(() => provided?.value.locale ?? readDocumentOwnerLocale())
 }
 
 export const configProviderProps = {
@@ -67,10 +86,12 @@ export const ConfigProvider = defineComponent({
   setup(props, { slots }) {
     const parentInjected = inject(TigerConfigKey, null)
     const isDocumentOwner = parentInjected === null
-    const parent = parentInjected ?? computed(() => ({}) as TigerConfig)
-    let globalLocaleHandle: GlobalTigerLocaleHandle | null = null
+    const parent = parentInjected ?? computed(() => ({ locale: enUS }) as TigerConfig)
+    const localeScope: TigerLocaleScope = createTigerLocaleScope()
+    let localeHandle: TigerLocaleHandle | null = null
     let documentHandle: DocumentConfigHandle | null = null
-    let didHydrateDocument = false
+    const ownedIcons = !parentInjected
+    const iconRegistry: IconRegistry = parentInjected?.value.iconRegistry ?? createIconRegistry()
 
     const resolvedLocale = ref<Partial<TigerLocale> | undefined>(
       isLazyTigerLocale(props.locale) ? undefined : getImmediateTigerLocale(props.locale)
@@ -124,6 +145,7 @@ export const ConfigProvider = defineComponent({
         direction: props.dir,
         theme: props.theme,
         colorScheme: props.colorScheme,
+        iconRegistry,
         parent: parent.value
       })
     )
@@ -131,11 +153,8 @@ export const ConfigProvider = defineComponent({
     watch(
       () => merged.value.locale,
       (locale) => {
-        if (!globalLocaleHandle) {
-          globalLocaleHandle = createGlobalTigerLocaleHandle(locale)
-        } else {
-          globalLocaleHandle.update(locale)
-        }
+        if (!localeHandle) localeHandle = localeScope.createHandle(locale)
+        else localeHandle.update(locale)
       },
       { immediate: true }
     )
@@ -145,36 +164,46 @@ export const ConfigProvider = defineComponent({
         theme: merged.value.theme,
         colorScheme: merged.value.colorScheme,
         direction: merged.value.direction,
-        lang: merged.value.locale?.locale
+        lang: resolvedLocale.value?.locale,
+        locale: merged.value.locale
       }),
       (values) => {
         if (!isDocumentOwner) return
         if (!documentHandle) documentHandle = createDocumentConfigHandle()
-        documentHandle.apply(values, { hydrateAuto: !didHydrateDocument })
-        didHydrateDocument = true
+        documentHandle.apply({
+          theme: values.theme,
+          colorScheme: values.colorScheme,
+          direction: values.direction,
+          lang: values.lang
+        })
+        documentHandle.setLocale(values.locale)
       },
       { immediate: true }
     )
 
     onBeforeUnmount(() => {
-      globalLocaleHandle?.dispose()
-      globalLocaleHandle = null
+      localeHandle?.dispose()
+      localeHandle = null
+      if (ownedIcons) iconRegistry.dispose()
       documentHandle?.dispose()
       documentHandle = null
     })
 
     provide(TigerConfigKey, merged)
+    provide(FeedbackDepthKey, inject(FeedbackDepthKey, 0) + 1)
 
     return () =>
       h(
         'div',
         {
-          class: 'contents',
+          class: 'tiger-config-root',
           'data-tiger-config-root': '',
           dir: merged.value.direction,
-          lang: merged.value.locale?.locale
+          lang: resolvedLocale.value?.locale
         },
-        slots.default?.()
+        h(OverlayOutletProvider, null, {
+          default: () => [slots.default?.(), h(FeedbackHost)]
+        })
       )
   }
 })

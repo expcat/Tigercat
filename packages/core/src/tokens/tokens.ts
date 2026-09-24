@@ -229,190 +229,14 @@ export const semanticTokens = {
   }
 } as const
 
-/** Component-level tokens */
-export const componentTokens = {
-  button: {
-    'height-sm': '32px',
-    'height-md': '36px',
-    'height-lg': '40px',
-    'padding-x-sm': '8px',
-    'padding-x-md': '16px',
-    'padding-x-lg': '24px',
-    'border-radius': '10px',
-    'font-size-sm': '14px',
-    'font-size-md': '16px',
-    'font-size-lg': '18px',
-    'font-weight': '500'
-  },
-  input: {
-    'height-sm': '32px',
-    'height-md': '36px',
-    'height-lg': '40px',
-    'padding-x': '16px',
-    'border-radius': '10px',
-    'font-size': '16px',
-    'border-color': '#e5e7eb',
-    'border-color-focus': '#2563eb',
-    'border-color-error': '#ef4444'
-  },
-  select: {
-    'height-sm': '32px',
-    'height-md': '36px',
-    'height-lg': '40px',
-    'padding-x': '16px',
-    'border-radius': '10px',
-    'dropdown-shadow': '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-    'option-height': '36px',
-    'option-padding-x': '16px'
-  },
-  modal: {
-    'border-radius': '14px',
-    padding: '24px',
-    shadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
-    'header-font-size': '18px',
-    'header-font-weight': '600',
-    'overlay-bg': 'rgba(0,0,0,0.45)',
-    'width-sm': '400px',
-    'width-md': '520px',
-    'width-lg': '680px',
-    'width-xl': '860px'
-  },
-  drawer: {
-    padding: '24px',
-    shadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
-    'header-font-size': '18px',
-    'header-font-weight': '600',
-    'overlay-bg': 'rgba(0,0,0,0.45)',
-    'width-sm': '256px',
-    'width-md': '378px',
-    'width-lg': '520px',
-    'width-xl': '680px'
-  },
-  card: {
-    'border-radius': '14px',
-    padding: '24px',
-    shadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
-    'border-color': '#e5e7eb'
-  },
-  badge: {
-    'font-size': '12px',
-    'font-weight': '500',
-    'padding-x': '8px',
-    'border-radius': '9999px'
-  },
-  avatar: {
-    'size-sm': '32px',
-    'size-md': '40px',
-    'size-lg': '48px',
-    'size-xl': '64px',
-    'border-radius': '9999px',
-    'font-size-sm': '12px',
-    'font-size-md': '14px',
-    'font-size-lg': '16px'
-  },
-  table: {
-    bg: '#fafafa',
-    'header-bg': '#fafafa',
-    'header-font-weight': '600',
-    'cell-padding-x': '16px',
-    'cell-padding-y-sm': '8px',
-    'cell-padding-y-md': '16px',
-    'cell-padding-y-lg': '24px',
-    'border-color': '#e5e7eb',
-    'stripe-bg': '#fafafa',
-    'hover-bg': '#eff6ff'
-  },
-  tooltip: {
-    bg: '#262626',
-    'text-color': '#ffffff',
-    'font-size': '14px',
-    'padding-x': '8px',
-    'padding-y': '4px',
-    'border-radius': '10px',
-    shadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
-    'max-width': '280px'
-  },
-  alert: {
-    'border-radius': '10px',
-    'padding-x': '16px',
-    'padding-y': '16px',
-    'font-size': '16px',
-    'icon-size': '20px'
-  },
-  tabs: {
-    height: '40px',
-    'font-size': '16px',
-    'font-weight-active': '500',
-    'indicator-height': '2px',
-    gap: '24px'
-  },
-  pagination: {
-    'item-size': '32px',
-    'font-size': '14px',
-    'border-radius': '10px',
-    gap: '4px'
-  },
-  tag: {
-    'height-sm': '22px',
-    'height-md': '26px',
-    'height-lg': '32px',
-    'padding-x': '8px',
-    'font-size': '12px',
-    'border-radius': '6px'
-  },
-  progress: {
-    'height-sm': '4px',
-    'height-md': '8px',
-    'height-lg': '12px',
-    'border-radius': '9999px',
-    'track-bg': '#e5e5e5'
-  },
-  skeleton: {
-    bg: '#e5e5e5',
-    'shimmer-bg': '#f5f5f5',
-    'border-radius': '10px'
-  },
-  divider: {
-    color: '#e5e7eb',
-    'text-padding': '16px'
-  },
-  collapse: {
-    'header-padding-x': '16px',
-    'header-padding-y': '16px',
-    'content-padding': '16px',
-    'border-color': '#e5e7eb'
-  },
-  steps: {
-    'icon-size': '32px',
-    'font-size': '16px',
-    'connector-width': '1px'
-  },
-  breadcrumb: {
-    'font-size': '14px',
-    'separator-margin': '8px'
-  },
-  dropdown: {
-    'min-width': '120px',
-    'padding-y': '4px',
-    'item-height': '36px',
-    'item-padding-x': '16px',
-    'border-radius': '14px',
-    shadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)'
-  },
-  notification: {
-    width: '384px',
-    padding: '16px',
-    'border-radius': '14px',
-    shadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-    'title-font-size': '16px',
-    'title-font-weight': '500'
-  },
-  popover: {
-    padding: '16px',
-    'border-radius': '14px',
-    shadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-    'max-width': '320px'
-  }
+/** Breakpoints from tokens.json runtime.breakpoints */
+export const runtimeBreakpoints = {
+  xs: '0px',
+  sm: '640px',
+  md: '768px',
+  lg: '1024px',
+  xl: '1280px',
+  '2xl': '1536px'
 } as const
 
 /** Default runtime theme (light). Source: tokens.json runtime.light */
@@ -437,16 +261,16 @@ export const runtimeThemeLight = {
     text: '#111827',
     textSecondary: '#6b7280',
     textDisabled: '#d1d5db',
-    border: '#e5e7eb',
-    borderStrong: '#9ca3af',
-    success: '#16a34a',
-    warning: '#d97706',
+    border: '#6b7280',
+    borderStrong: '#374151',
+    success: '#15803d',
+    warning: '#92400e',
     error: '#dc2626',
     errorForeground: '#ffffff',
     errorHover: '#b91c1c',
     errorDisabled: '#fca5a5',
     errorBgHover: '#fef2f2',
-    info: '#3b82f6',
+    info: '#1d4ed8',
     chart1: '#2563eb',
     chart2: '#16a34a',
     chart3: '#d97706',
@@ -520,8 +344,8 @@ export const runtimeThemeDark = {
     text: '#f9fafb',
     textSecondary: '#d1d5db',
     textDisabled: '#4b5563',
-    border: '#374151',
-    borderStrong: '#6b7280',
+    border: '#9ca3af',
+    borderStrong: '#d1d5db',
     success: '#4ade80',
     warning: '#fbbf24',
     error: '#f87171',
@@ -592,8 +416,7 @@ export const designTokens = {
     duration: primitiveDuration,
     easing: primitiveEasing
   },
-  semantic: semanticTokens,
-  component: componentTokens
+  semantic: semanticTokens
 } as const
 
 export type PrimitiveColorHue = keyof typeof primitiveColors
@@ -604,4 +427,4 @@ export type PrimitiveShadowKey = keyof typeof primitiveShadow
 export type PrimitiveDurationKey = keyof typeof primitiveDuration
 export type PrimitiveEasingKey = keyof typeof primitiveEasing
 export type SemanticTokenCategory = keyof typeof semanticTokens
-export type ComponentTokenName = keyof typeof componentTokens
+export type RuntimeBreakpoint = keyof typeof runtimeBreakpoints

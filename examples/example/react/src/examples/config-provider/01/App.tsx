@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { ThemeManager, type ColorScheme, type TigerLocaleDirection } from '@expcat/tigercat-core'
+import { readTigerDocumentTheme, type ColorScheme, type TigerLocaleDirection } from '@expcat/tigercat-core'
 import { Button } from '@expcat/tigercat-react/Button'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
 import { Empty } from '@expcat/tigercat-react/Empty'
@@ -73,7 +73,7 @@ function Probe({ copy }: { copy: (typeof chrome)[DemoLanguage] }) {
   return (
     <p style={{ margin: 0, fontSize: 13 }}>
       {copy.contextTheme}: {config.theme ?? '—'} · {copy.documentTheme}:{' '}
-      {ThemeManager.getCurrentTheme()}
+      {readTigerDocumentTheme().theme}
     </p>
   )
 }
@@ -92,9 +92,9 @@ export default function ConfigProviderExample() {
         display: 'grid',
         gap: 12,
         padding: 16,
-        border: '1px solid var(--tiger-border, #e5e7eb)',
-        borderRadius: 'var(--tiger-radius-lg, 12px)',
-        background: 'var(--tiger-surface, #fff)'
+        border: '1px solid var(--tiger-border)',
+        borderRadius: 'var(--tiger-radius-lg)',
+        background: 'var(--tiger-surface)'
       }}>
       <Probe copy={copy} />
       <Button variant="primary">{copy.button}</Button>

@@ -2,7 +2,7 @@
 import { computed, defineComponent, h, ref } from 'vue'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { ThemeManager, type ColorScheme, type TigerLocaleDirection } from '@expcat/tigercat-core'
+import { readTigerDocumentTheme, type ColorScheme, type TigerLocaleDirection } from '@expcat/tigercat-core'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-vue/ConfigProvider'
 import { Empty } from '@expcat/tigercat-vue/Empty'
@@ -57,7 +57,7 @@ const ThemeProbe = defineComponent({
   },
   setup(props) {
     const config = useTigerConfig()
-    const documentTheme = computed(() => ThemeManager.getCurrentTheme())
+    const documentTheme = computed(() => readTigerDocumentTheme().theme)
     return () =>
       h(
         'p',
@@ -78,7 +78,7 @@ const Preview = defineComponent({
         'section',
         {
           style:
-            'display: grid; gap: 12px; padding: 16px; border: 1px solid var(--tiger-border, #e5e7eb); border-radius: var(--tiger-radius-lg, 12px); background: var(--tiger-surface, #fff)'
+            'display: grid; gap: 12px; padding: 16px; border: 1px solid var(--tiger-border); border-radius: var(--tiger-radius-lg); background: var(--tiger-surface)'
         },
         [
           h(ThemeProbe, {

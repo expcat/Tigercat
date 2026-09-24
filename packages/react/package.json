@@ -764,11 +764,6 @@
       "import": "./dist/components/Statistic.mjs",
       "default": "./dist/components/Statistic.mjs"
     },
-    "./Stepper": {
-      "types": "./dist/components/Stepper.d.mts",
-      "import": "./dist/components/Stepper.mjs",
-      "default": "./dist/components/Stepper.mjs"
-    },
     "./Steps": {
       "types": "./dist/components/Steps.d.mts",
       "import": "./dist/components/Steps.mjs",
@@ -918,6 +913,26 @@
       "types": "./dist/components/WorkflowViewer.d.mts",
       "import": "./dist/components/WorkflowViewer.mjs",
       "default": "./dist/components/WorkflowViewer.mjs"
+    },
+    "./useFormController": {
+      "types": "./dist/hooks/useFormController.d.mts",
+      "import": "./dist/hooks/useFormController.mjs",
+      "default": "./dist/hooks/useFormController.mjs"
+    },
+    "./notification": {
+      "types": "./dist/components/NotificationRoot.d.mts",
+      "import": "./dist/components/NotificationRoot.mjs",
+      "default": "./dist/components/NotificationRoot.mjs"
+    },
+    "./useChartInteraction": {
+      "types": "./dist/hooks/useChartInteraction.d.mts",
+      "import": "./dist/hooks/useChartInteraction.mjs",
+      "default": "./dist/hooks/useChartInteraction.mjs"
+    },
+    "./useResponsiveChartSize": {
+      "types": "./dist/hooks/useResponsiveChartSize.d.mts",
+      "import": "./dist/hooks/useResponsiveChartSize.mjs",
+      "default": "./dist/hooks/useResponsiveChartSize.mjs"
     },
     "./useDrag": {
       "types": "./dist/hooks/useDrag.d.mts",

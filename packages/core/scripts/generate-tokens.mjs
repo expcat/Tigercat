@@ -21,12 +21,10 @@ const CHECK_MODE = process.argv.includes('--check')
 const rawTokens = JSON.parse(readFileSync(join(TOKENS_DIR, 'tokens.json'), 'utf-8'))
 const primitiveTokens = rawTokens.primitive ?? rawTokens.global
 const semanticTokens = rawTokens.semantic ?? rawTokens.alias
-const componentTokens = rawTokens.component
 const runtimeTokens = rawTokens.runtime
 const tokens = {
   primitive: primitiveTokens,
   semantic: semanticTokens,
-  component: componentTokens,
   runtime: runtimeTokens
 }
 
@@ -108,15 +106,16 @@ const RUNTIME_SECTION_CSS_VARS = {
   motion: {
     durationFast: '--tiger-motion-duration-quick',
     durationBase: '--tiger-motion-duration-base',
-    durationSlow: '--tiger-motion-duration-relaxed',
+    durationSlow: '--tiger-motion-duration-slow',
     easing: '--tiger-motion-ease-standard'
   }
 }
 
-const RUNTIME_COLOR_ALIASES = {
-  '--tiger-text-muted': '--tiger-text-secondary',
-  '--tiger-fill': '--tiger-surface-muted',
-  '--tiger-bg': '--tiger-surface'
+const TRANSITION_PROPERTIES =
+  'color, background-color, border-color, outline-color, text-decoration-color, box-shadow, opacity, transform'
+
+function transitionValue(duration, easing) {
+  return `${TRANSITION_PROPERTIES} ${duration} ${easing}`
 }
 
 const RUNTIME_BREAKPOINT_CSS_VARS = {
@@ -124,18 +123,16 @@ const RUNTIME_BREAKPOINT_CSS_VARS = {
   sm: '--tiger-breakpoint-sm',
   md: '--tiger-breakpoint-md',
   lg: '--tiger-breakpoint-lg',
-  xl: '--tiger-breakpoint-xl'
+  xl: '--tiger-breakpoint-xl',
+  '2xl': '--tiger-breakpoint-2xl'
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Normalize legacy references while keeping pre-9.1 token sources readable. */
+/** Token references use primitive, semantic, or component prefixes. */
 function normalizeReference(ref) {
-  if (typeof ref !== 'string') return ref
-  if (ref.startsWith('global.')) return ref.replace(/^global\./, 'primitive.')
-  if (ref.startsWith('alias.')) return ref.replace(/^alias\./, 'semantic.')
   return ref
 }
 
@@ -207,10 +204,6 @@ function collectRuntimeCssVars(schemeConfig) {
     }
   }
 
-  for (const [aliasName, sourceName] of Object.entries(RUNTIME_COLOR_ALIASES)) {
-    vars[aliasName] = `var(${sourceName})`
-  }
-
   for (const section of ['typography', 'radius', 'shadows', 'spacing', 'motion']) {
     const values = schemeConfig[section]
     const varNames = RUNTIME_SECTION_CSS_VARS[section]
@@ -223,13 +216,13 @@ function collectRuntimeCssVars(schemeConfig) {
 
   const motion = schemeConfig.motion
   if (motion?.durationBase && motion?.easing) {
-    vars['--tiger-transition-base'] = `all ${motion.durationBase} ${motion.easing}`
+    vars['--tiger-transition-base'] = transitionValue(motion.durationBase, motion.easing)
   }
   if (motion?.durationFast && motion?.easing) {
-    vars['--tiger-transition-quick'] = `all ${motion.durationFast} ${motion.easing}`
+    vars['--tiger-transition-quick'] = transitionValue(motion.durationFast, motion.easing)
   }
   if (motion?.durationSlow && motion?.easing) {
-    vars['--tiger-transition-emphasized'] = `transform ${motion.durationSlow} ${motion.easing}`
+    vars['--tiger-transition-emphasized'] = transitionValue(motion.durationSlow, motion.easing)
   }
 
   const breakpoints = tokens.runtime?.breakpoints
@@ -330,18 +323,10 @@ function generateCSS() {
     }
   }
 
-  lines.push('')
-  lines.push('  /* Component tokens */')
-  for (const [comp, entries] of Object.entries(tokens.component)) {
-    for (const [key, ref] of Object.entries(entries)) {
-      lines.push(`  ${componentCssVarName(comp, key)}: ${resolve(ref)};`)
-    }
-  }
-
   const lightRuntime = collectRuntimeCssVars(resolveRuntimeConfig('light'))
   if (Object.keys(lightRuntime).length > 0) {
     lines.push('')
-    lines.push('  /* Runtime aliases (component-facing --tiger-* names) */')
+    lines.push('  /* Runtime tokens */')
     for (const [name, value] of Object.entries(lightRuntime)) {
       lines.push(`  ${name}: ${value};`)
     }
@@ -355,12 +340,28 @@ function generateCSS() {
   const darkRuntime = collectRuntimeCssVars(resolveRuntimeConfig('dark'))
   if (Object.keys(darkRuntime).length > 0) {
     lines.push('')
-    lines.push('  /* Runtime aliases */')
+    lines.push('  /* Runtime tokens */')
     for (const [name, value] of Object.entries(darkRuntime)) {
       lines.push(`  ${name}: ${value};`)
     }
   }
 
+  lines.push('}')
+  lines.push('')
+  lines.push('@media (prefers-reduced-motion: reduce) {')
+  lines.push('  :root, .dark {')
+  lines.push('    --tiger-motion-duration-quick: 0ms;')
+  lines.push('    --tiger-motion-duration-base: 0ms;')
+  lines.push('    --tiger-motion-duration-slow: 0ms;')
+  lines.push(`    --tiger-transition-quick: ${transitionValue('0ms', 'linear')};`)
+  lines.push(`    --tiger-transition-base: ${transitionValue('0ms', 'linear')};`)
+  lines.push(`    --tiger-transition-emphasized: ${transitionValue('0ms', 'linear')};`)
+  lines.push('  }')
+  lines.push('  .tiger-motion-aware, .tiger-motion-aware::before, .tiger-motion-aware::after, [data-tiger-motion] {')
+  lines.push('    animation-duration: 0ms;')
+  lines.push('    animation-iteration-count: 1;')
+  lines.push('    transition-duration: 0ms;')
+  lines.push('  }')
   lines.push('}')
   return lines.join('\n')
 }
@@ -468,18 +469,8 @@ function generateTS() {
   lines.push('} as const')
   lines.push('')
 
-  // Component
-  lines.push('/** Component-level tokens */')
-  lines.push('export const componentTokens = {')
-  for (const [comp, entries] of Object.entries(tokens.component)) {
-    lines.push(`  ${comp}: {`)
-    for (const [key, ref] of Object.entries(entries)) {
-      const resolved = resolve(ref)
-      lines.push(`    '${key}': '${resolved}',`)
-    }
-    lines.push('  },')
-  }
-  lines.push('} as const')
+  lines.push('/** Breakpoints from tokens.json runtime.breakpoints */')
+  lines.push(`export const runtimeBreakpoints = ${emitJsObject(tokens.runtime?.breakpoints ?? {})} as const`)
   lines.push('')
 
   const lightRuntime = resolveRuntimeConfig('light')
@@ -506,8 +497,7 @@ function generateTS() {
   lines.push('    duration: primitiveDuration,')
   lines.push('    easing: primitiveEasing')
   lines.push('  },')
-  lines.push('  semantic: semanticTokens,')
-  lines.push('  component: componentTokens')
+  lines.push('  semantic: semanticTokens')
   lines.push('} as const')
   lines.push('')
 
@@ -520,7 +510,7 @@ function generateTS() {
   lines.push('export type PrimitiveDurationKey = keyof typeof primitiveDuration')
   lines.push('export type PrimitiveEasingKey = keyof typeof primitiveEasing')
   lines.push('export type SemanticTokenCategory = keyof typeof semanticTokens')
-  lines.push('export type ComponentTokenName = keyof typeof componentTokens')
+  lines.push('export type RuntimeBreakpoint = keyof typeof runtimeBreakpoints')
 
   return lines.join('\n')
 }
@@ -636,8 +626,7 @@ function generateFigmaVariables() {
       source: 'packages/core/tokens/tokens.json',
       collections: [
         createFigmaCollection('primitive', 'Tigercat Primitive', tokens.primitive),
-        createFigmaCollection('semantic', 'Tigercat Semantic', tokens.semantic),
-        createFigmaCollection('component', 'Tigercat Component', tokens.component)
+        createFigmaCollection('semantic', 'Tigercat Semantic', tokens.semantic)
       ]
     },
     null,

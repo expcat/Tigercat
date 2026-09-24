@@ -6,13 +6,7 @@ import { afterEach, describe, it, expect } from 'vitest'
 import { render, waitFor, act } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
-import {
-  getGlobalTigerLocale,
-  resetDocumentConfigScope,
-  resetTigerLocaleScope,
-  ThemeManager,
-  type TigerLocale
-} from '@expcat/tigercat-core'
+import { type TigerLocale } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function LocaleDisplay() {
@@ -30,15 +24,14 @@ function LocaleDisplay() {
 }
 
 function resetDocument(): void {
-  resetDocumentConfigScope()
-  resetTigerLocaleScope()
-  ThemeManager.setTheme('default')
-  ThemeManager.setColorScheme('light')
   document.documentElement.removeAttribute('dir')
   document.documentElement.removeAttribute('data-tiger-dir')
   document.documentElement.removeAttribute('lang')
-  document.documentElement.removeAttribute('data-tiger-style')
+  document.documentElement.removeAttribute('data-tiger-theme')
+  document.documentElement.removeAttribute('data-tiger-color-scheme')
+  document.documentElement.removeAttribute('data-tiger-theme-scope')
   document.documentElement.classList.remove('dark')
+  document.querySelectorAll('style[data-tiger-theme-style]').forEach((node) => node.remove())
 }
 
 describe('ConfigProvider', () => {
@@ -172,7 +165,7 @@ describe('ConfigProvider', () => {
         expect(getByTestId('loading').textContent).toBe('ready')
       })
 
-      expect(getByTestId('ok').textContent).toBe('default')
+      expect(getByTestId('ok').textContent).toBe('OK')
       expect(getByTestId('load-error').textContent).toBe('error')
     })
 
@@ -213,8 +206,7 @@ describe('ConfigProvider', () => {
         </ConfigProvider>
       )
 
-      // Inner should see localeLoading=true because outer is loading
-      expect(getByTestId('loading').textContent).toBe('loading')
+      expect(getByTestId('loading').textContent).toBe('ready')
 
       await act(async () => {
         resolveOuter({ common: { okText: 'Outer Done' } })
@@ -246,12 +238,12 @@ describe('ConfigProvider', () => {
       const { getByTestId, rerender } = render(<NestedTheme showInner />)
 
       expect(getByTestId('theme').textContent).toBe('minimal')
-      expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('vibrant')
 
       rerender(<NestedTheme showInner={false} />)
 
       expect(getByTestId('theme').textContent).toBe('vibrant')
-      expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('vibrant')
     })
 
     it('does not remove an existing html dir when unmounting a locale-only provider', () => {
@@ -302,7 +294,8 @@ describe('ConfigProvider', () => {
 
     it('exposes the ConfigProvider locale to imperative APIs during the first render', () => {
       function ImperativeLocale() {
-        return <span data-testid="global">{getGlobalTigerLocale()?.common?.okText ?? 'empty'}</span>
+        const config = useTigerConfig()
+        return <span data-testid="global">{config.locale?.common?.okText ?? 'empty'}</span>
       }
 
       const { getByTestId } = render(
@@ -351,10 +344,10 @@ describe('ConfigProvider', () => {
   })
 
   describe('useTigerConfig', () => {
-    it('returns empty config outside of ConfigProvider', () => {
+    it('uses the English locale when no ConfigProvider is mounted', () => {
       const { getByTestId } = render(<LocaleDisplay />)
 
-      expect(getByTestId('ok').textContent).toBe('default')
+      expect(getByTestId('ok').textContent).toBe('OK')
       expect(getByTestId('loading').textContent).toBe('ready')
     })
   })
@@ -377,7 +370,7 @@ describe('ConfigProvider', () => {
         </ConfigProvider>
       )
 
-      expect(document.documentElement.getAttribute('data-tiger-style')).toBe('modern')
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('modern')
     })
   })
 

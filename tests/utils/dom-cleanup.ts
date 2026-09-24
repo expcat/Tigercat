@@ -32,6 +32,14 @@ export function resetTestDocument(): void {
   documentElement.removeAttribute('style')
   documentElement.removeAttribute('class')
   documentElement.removeAttribute('data-tiger-style')
+  documentElement.removeAttribute('data-tiger-theme')
+  documentElement.removeAttribute('data-tiger-theme-scope')
+  documentElement.removeAttribute('data-tiger-color-scheme')
+  documentElement.removeAttribute('data-tiger-dir')
+  documentElement.removeAttribute('dir')
+  documentElement.removeAttribute('lang')
+  delete (documentElement as HTMLElement & Record<symbol, unknown>)[Symbol.for('tigercat.documentOwners')]
+  document.querySelectorAll('style[data-tiger-theme-style]').forEach((node) => node.remove())
 
   if (body) {
     body.replaceChildren()

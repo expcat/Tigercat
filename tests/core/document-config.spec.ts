@@ -3,21 +3,17 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import {
-  createDocumentConfigHandle,
-  resetDocumentConfigScope,
-  ThemeManager
-} from '@expcat/tigercat-core'
+import { createDocumentConfigHandle, readDocumentOwnerLocale } from '@expcat/tigercat-core'
 
 function resetDocument(): void {
-  resetDocumentConfigScope()
-  ThemeManager.setTheme('default')
-  ThemeManager.setColorScheme('light')
   document.documentElement.removeAttribute('dir')
   document.documentElement.removeAttribute('data-tiger-dir')
   document.documentElement.removeAttribute('lang')
-  document.documentElement.removeAttribute('data-tiger-style')
+  document.documentElement.removeAttribute('data-tiger-theme')
+  document.documentElement.removeAttribute('data-tiger-color-scheme')
+  document.documentElement.removeAttribute('data-tiger-theme-scope')
   document.documentElement.classList.remove('dark')
+  document.querySelectorAll('style[data-tiger-theme-style]').forEach((node) => node.remove())
 }
 
 describe('document config ownership', () => {
@@ -31,18 +27,32 @@ describe('document config ownership', () => {
 
   it('restores theme and dir when the last owner disposes', () => {
     document.documentElement.setAttribute('dir', 'ltr')
-    ThemeManager.setTheme('default')
 
     const handle = createDocumentConfigHandle()
     handle.apply({ theme: 'minimal', direction: 'rtl' })
 
-    expect(ThemeManager.getCurrentTheme()).toBe('minimal')
+    expect(handle.themeScope.getCurrentTheme()).toBe('minimal')
     expect(document.documentElement.getAttribute('dir')).toBe('rtl')
 
     handle.dispose()
 
-    expect(ThemeManager.getCurrentTheme()).toBe('default')
+    expect(document.documentElement.getAttribute('data-tiger-theme')).toBeNull()
     expect(document.documentElement.getAttribute('dir')).toBe('ltr')
+  })
+
+  it('keeps each owner locale and reads the current owner', () => {
+    const first = createDocumentConfigHandle()
+    first.setLocale({ common: { okText: '第一' } })
+    const second = createDocumentConfigHandle()
+    second.setLocale({ common: { okText: '第二' } })
+
+    expect(readDocumentOwnerLocale()?.common?.okText).toBe('第二')
+
+    second.dispose()
+    expect(readDocumentOwnerLocale()?.common?.okText).toBe('第一')
+
+    first.dispose()
+    expect(readDocumentOwnerLocale()).toBeUndefined()
   })
 
   it('re-applies the remaining sibling instead of restoring the baseline', () => {
@@ -52,17 +62,16 @@ describe('document config ownership', () => {
     second.apply({ direction: 'ltr', theme: 'minimal' })
 
     expect(document.documentElement.getAttribute('dir')).toBe('ltr')
-    expect(ThemeManager.getCurrentTheme()).toBe('minimal')
-
-    first.dispose()
-
-    expect(document.documentElement.getAttribute('dir')).toBe('ltr')
-    expect(ThemeManager.getCurrentTheme()).toBe('minimal')
+    expect(second.themeScope.getCurrentTheme()).toBe('minimal')
 
     second.dispose()
 
+    expect(document.documentElement.getAttribute('dir')).toBe('rtl')
+    expect(first.themeScope.getCurrentTheme()).toBe('vibrant')
+
+    first.dispose()
+
     expect(document.documentElement.getAttribute('dir')).toBeNull()
-    expect(ThemeManager.getCurrentTheme()).toBe('default')
   })
 
   it('does not write dir when the owner never set a direction', () => {
@@ -107,20 +116,16 @@ describe('document config ownership', () => {
       window.matchMedia = originalMatchMedia
     })
 
-    it('stops the media listener after dispose so later changes do not toggle .dark', () => {
+    it('auto does not stamp .dark and dispose restores the previous class', () => {
       const handle = createDocumentConfigHandle()
-      handle.apply({ colorScheme: 'auto' }, { hydrateAuto: true })
+      handle.apply({ colorScheme: 'auto' })
 
       expect(document.documentElement.classList.contains('dark')).toBe(false)
+      expect(handle.themeScope.getColorScheme()).toBe('auto')
 
       handle.dispose()
-      expect(ThemeManager.getColorScheme()).toBe('light')
-
-      for (const listener of mediaListeners) {
-        listener({ matches: true } as MediaQueryListEvent)
-      }
-
       expect(document.documentElement.classList.contains('dark')).toBe(false)
+      expect(mediaListeners).toEqual([])
     })
   })
 })

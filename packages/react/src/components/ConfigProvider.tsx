@@ -5,18 +5,27 @@ import {
   resolveTigerLocale,
   resolveTigerConfig,
   createDocumentConfigHandle,
+  readDocumentOwnerLocale,
   devWarn,
   type TigerConfig,
   type ConfigProviderProps as CoreConfigProviderProps,
   type TigerLocale,
   type DocumentConfigHandle
 } from '@expcat/tigercat-core'
-import { createGlobalTigerLocaleHandle, type GlobalTigerLocaleHandle } from '../utils/global-locale'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { OverlayOutletProvider } from '../utils/overlay-outlet'
+import { FeedbackDepthContext, FeedbackHost } from './FeedbackHost'
+import {
+  createTigerLocaleScope,
+  createIconRegistry,
+  type TigerLocaleHandle,
+  type IconRegistry
+} from '@expcat/tigercat-core'
 
 export type { TigerConfig }
 
-const EMPTY_CONFIG: TigerConfig = {}
-const TigerConfigContext = React.createContext<TigerConfig>(EMPTY_CONFIG)
+const FALLBACK_CONFIG: TigerConfig = { locale: enUS }
+const TigerConfigContext = React.createContext<TigerConfig>(FALLBACK_CONFIG)
 
 export interface ConfigProviderProps extends CoreConfigProviderProps {
   children?: React.ReactNode
@@ -30,16 +39,22 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   children
 }) => {
   const parent = useContext(TigerConfigContext)
-  const isDocumentOwner = parent === EMPTY_CONFIG
-  const globalLocaleHandleRef = useRef<GlobalTigerLocaleHandle | null>(null)
+  const feedbackDepth = useContext(FeedbackDepthContext) + 1
+  const isDocumentOwner = parent === FALLBACK_CONFIG
+  const localeScopeRef = useRef(createTigerLocaleScope())
+  const localeHandleRef = useRef<TigerLocaleHandle | null>(null)
   const documentHandleRef = useRef<DocumentConfigHandle | null>(null)
-  const hydratedDocumentRef = useRef(false)
+  const iconRegistryRef = useRef<IconRegistry | null>(null)
+  if (!iconRegistryRef.current) {
+    iconRegistryRef.current = parent.iconRegistry ?? createIconRegistry()
+  }
 
   const isLazy = isLazyTigerLocale(locale)
   const [lazyLocale, setLazyLocale] = useState<Partial<TigerLocale> | undefined>(undefined)
   const [localeLoading, setLocaleLoading] = useState(isLazy)
   const [localeLoadError, setLocaleLoadError] = useState<Error | undefined>(undefined)
   const resolvedLocale = isLazy ? lazyLocale : getImmediateTigerLocale(locale)
+  const layerLang = resolvedLocale?.locale
 
   useEffect(() => {
     if (!isLazyTigerLocale(locale)) {
@@ -88,23 +103,27 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
         direction: dir,
         theme,
         colorScheme,
+        iconRegistry: iconRegistryRef.current ?? undefined,
         parent
       }),
     [resolvedLocale, localeLoading, localeLoadError, dir, theme, colorScheme, parent]
   )
 
-  if (!globalLocaleHandleRef.current) {
-    globalLocaleHandleRef.current = createGlobalTigerLocaleHandle(value.locale)
+  if (!localeHandleRef.current) {
+    localeHandleRef.current = localeScopeRef.current.createHandle(value.locale)
   } else {
-    globalLocaleHandleRef.current.update(value.locale)
+    localeHandleRef.current.update(value.locale)
   }
 
   useLayoutEffect(() => {
+    const registry = iconRegistryRef.current
+    const ownsRegistry = parent.iconRegistry == null
     return () => {
-      globalLocaleHandleRef.current?.dispose()
-      globalLocaleHandleRef.current = null
+      localeHandleRef.current?.dispose()
+      localeHandleRef.current = null
+      if (ownsRegistry) registry?.dispose()
     }
-  }, [])
+  }, [parent.iconRegistry])
 
   useLayoutEffect(() => {
     if (!isDocumentOwner) return
@@ -113,38 +132,44 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
     return () => {
       handle.dispose()
       documentHandleRef.current = null
-      hydratedDocumentRef.current = false
     }
   }, [isDocumentOwner])
 
   useLayoutEffect(() => {
     if (!documentHandleRef.current) return
-    documentHandleRef.current.apply(
-      {
-        theme: value.theme,
-        colorScheme: value.colorScheme,
-        direction: value.direction,
-        lang: value.locale?.locale
-      },
-      { hydrateAuto: !hydratedDocumentRef.current }
-    )
-    hydratedDocumentRef.current = true
-  }, [value.theme, value.colorScheme, value.direction, value.locale?.locale])
+    documentHandleRef.current.apply({
+      theme: value.theme,
+      colorScheme: value.colorScheme,
+      direction: value.direction,
+      lang: layerLang
+    })
+    documentHandleRef.current.setLocale(value.locale)
+  }, [value.theme, value.colorScheme, value.direction, layerLang, value.locale])
 
   return (
     <TigerConfigContext.Provider value={value}>
-      <div
-        className="contents"
-        data-tiger-config-root=""
-        dir={value.direction}
-        lang={value.locale?.locale}>
-        {children}
+      <div className="tiger-config-root" data-tiger-config-root="" dir={value.direction} lang={layerLang}>
+        <FeedbackDepthContext.Provider value={feedbackDepth}>
+          <OverlayOutletProvider>
+            {children}
+            <FeedbackHost />
+          </OverlayOutletProvider>
+        </FeedbackDepthContext.Provider>
       </div>
     </TigerConfigContext.Provider>
   )
 }
 
 ConfigProvider.displayName = 'TigerConfigProvider'
+
+/**
+ * Locale for this tree, or the document owner's locale when this tree has no provider.
+ */
+export function useResolvedTigerLocale(): Partial<TigerLocale> | undefined {
+  const config = useContext(TigerConfigContext)
+  if (config !== FALLBACK_CONFIG) return config.locale
+  return readDocumentOwnerLocale()
+}
 
 export function useTigerConfig(): TigerConfig {
   return useContext(TigerConfigContext)

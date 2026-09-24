@@ -86,8 +86,8 @@ SSR 示例（Next 16 / Nuxt 4）必须接上面的 Tailwind 配方。页面 HTML
 @source '../node_modules/@expcat/tigercat-core/dist';
 ```
 
-运行时换肤走 `ConfigProvider` 的 `theme` / `colorScheme`（或 `ThemeManager`），不要再手写一套 hex 盘。
-`@plugin '@expcat/tigercat-core/tailwind/modern'` 是 modern 预设的 CSS 入口，与 `theme="modern"` 等价。
+运行时换肤走 `ConfigProvider` 的 `theme` / `colorScheme`。`theme="modern"` 选择 modern 预设。
+Tailwind 入口只有 `@plugin '@expcat/tigercat-core/tailwind'`。
 
 通用接入步骤见 [getting-started.md](../skills/tigercat/references/getting-started.md)。
 

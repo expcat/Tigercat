@@ -5,6 +5,7 @@
 
 import type { TigerLocale, TigerLocaleDirection, TigerLocaleInput } from './locale'
 import type { ColorScheme } from './theme'
+import type { IconRegistry } from '../utils/icons/registry'
 
 /**
  * Tree-level config consumed by `useTigerConfig()`.
@@ -21,6 +22,7 @@ export interface TigerConfig {
   direction?: TigerLocaleDirection
   theme?: string
   colorScheme?: ColorScheme
+  iconRegistry?: IconRegistry
 }
 
 /**
@@ -39,14 +41,17 @@ export interface ConfigProviderProps {
   dir?: TigerLocaleDirection
 
   /**
-   * Built-in or registered theme name. Applied to the document by the
-   * outermost provider (`ThemeManager.setTheme`).
+   * Built-in or registered theme name. The outermost provider writes it
+   * onto its document root.
    */
   theme?: string
 
   /**
-   * Color scheme. `'auto'` follows `prefers-color-scheme` after hydrate;
-   * first paint / SSR treat it as light unless `<html>` is already dark.
+   * `'light'` or `'dark'` sets `data-tiger-color-scheme` on the document root.
+   * `'auto'` leaves the class and attribute already on `<html>` in charge.
    */
   colorScheme?: ColorScheme
+
+  /** App-owned icon registry. Disposed with the provider when it created one. */
+  iconRegistry?: IconRegistry
 }

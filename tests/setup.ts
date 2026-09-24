@@ -24,6 +24,16 @@ afterEach(() => {
 // Guarded so node-environment specs (e.g. SSR rendering tests) can share this
 // setup file without a DOM present.
 if (typeof window !== 'undefined') {
+  // happy-dom reports HTMLImageElement.complete before a decode finishes.
+  // Real browsers stay incomplete until load or error; keep that contract so
+  // cached-image detection does not treat every test bitmap as a failed decode.
+  Object.defineProperty(window.HTMLImageElement.prototype, 'complete', {
+    configurable: true,
+    get() {
+      return (this as HTMLImageElement).naturalWidth > 0
+    }
+  })
+
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: (query: string): MediaQueryList => ({
