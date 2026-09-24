@@ -185,6 +185,8 @@ export interface ActivityFeedProps {
    * @default true
    */
   showTime?: boolean
+  /** IANA timezone. Without it, the first render omits clocks. */
+  timeZone?: string
   /**
    * Show group title
    * @default true
@@ -198,4 +200,12 @@ export interface ActivityFeedProps {
    * Custom render for group header
    */
   renderGroupHeader?: (group: ActivityGroup) => unknown
+  /**
+   * Another page of items exists. The sentinel stays outside the feed and
+   * uses the single in-flight infinite-scroll request.
+   */
+  hasMore?: boolean
+  /** The last page request failed. */
+  loadError?: boolean
+  onLoadMore?: () => void | Promise<unknown>
 }

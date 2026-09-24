@@ -11,6 +11,7 @@ import type { SchemaFormField, SchemaFormGroup, SchemaFormSchema } from '../type
 import type {
   FieldPermission,
   WorkflowFieldPermissionMode,
+  WorkflowStepKind,
   WorkflowTimelineStep
 } from '../types/workflow-timeline'
 import { cloneFormValues, getValueByPath, setValueByPath } from './form-validation'
@@ -37,43 +38,67 @@ export function resolveWorkflowFieldPermissionMode(mode: unknown): WorkflowField
 }
 
 /**
- * Default when a field path is missing from the node map.
- * Start / initiate = editable; approve / CC / done = readonly.
+ * One default. A field is editable only when every supplied side allows it:
+ * node kind `start` and view mode `initiate`. The stricter side wins.
+ * A missing side does not open edits by itself when the other side is stricter.
  */
-export function defaultWorkflowFieldPermission(mode: WorkflowFieldPermissionMode): FieldPermission {
-  return mode === 'initiate' ? 'editable' : 'readonly'
+export function defaultWorkflowFieldPermission(
+  kindOrMode: WorkflowStepKind | WorkflowFieldPermissionMode | undefined,
+  mode?: WorkflowFieldPermissionMode
+): FieldPermission {
+  const kind =
+    kindOrMode === 'start' ||
+    kindOrMode === 'approve' ||
+    kindOrMode === 'cc' ||
+    kindOrMode === 'condition' ||
+    kindOrMode === 'end'
+      ? kindOrMode
+      : undefined
+  const resolvedMode =
+    mode ??
+    (kindOrMode === 'initiate' || kindOrMode === 'approve' || kindOrMode === 'readonly'
+      ? kindOrMode
+      : undefined)
+  const kindEditable = kind === 'start'
+  const modeEditable = resolvedMode === 'initiate'
+  if (kind && resolvedMode) return kindEditable && modeEditable ? 'editable' : 'readonly'
+  if (kind) return kindEditable ? 'editable' : 'readonly'
+  if (resolvedMode) return modeEditable ? 'editable' : 'readonly'
+  return 'readonly'
 }
 
 /**
- * Resolve one field path. Schema-hidden fields stay hidden when unmapped.
- * `readonly` mode never upgrades a field to editable; hidden stays hidden.
+ * Resolve one field path. Schema-hidden fields stay hidden; a node map
+ * cannot open them. `readonly` mode never upgrades a field to editable.
  */
 export function resolveWorkflowFieldPermission(
   field: SchemaFormField | string,
   permissions: Record<string, FieldPermission> | undefined,
-  mode: WorkflowFieldPermissionMode
+  mode: WorkflowFieldPermissionMode,
+  kind?: WorkflowStepKind
 ): FieldPermission {
+  if (typeof field !== 'string' && field.hidden) return 'hidden'
   const name = typeof field === 'string' ? field : field.name
   const mapped = name ? permissions?.[name] : undefined
   let permission: FieldPermission
   if (isFieldPermission(mapped)) {
     permission = mapped
-  } else if (typeof field !== 'string' && field.hidden) {
-    permission = 'hidden'
   } else {
-    permission = defaultWorkflowFieldPermission(mode)
+    permission = defaultWorkflowFieldPermission(kind, mode)
   }
   if (mode === 'readonly' && permission === 'editable') return 'readonly'
+  if (permission === 'hidden') return 'hidden'
   return permission
 }
 
 function applyPermissionToField(
   field: SchemaFormField,
   permissions: Record<string, FieldPermission> | undefined,
-  mode: WorkflowFieldPermissionMode
+  mode: WorkflowFieldPermissionMode,
+  kind?: WorkflowStepKind
 ): SchemaFormField {
   if (typeof field.name !== 'string' || !field.name.trim()) return { ...field }
-  const permission = resolveWorkflowFieldPermission(field, permissions, mode)
+  const permission = resolveWorkflowFieldPermission(field, permissions, mode, kind)
   if (permission === 'hidden') {
     return { ...field, hidden: true, required: false }
   }
@@ -86,13 +111,16 @@ function applyPermissionToField(
 function mapGroups(
   groups: readonly SchemaFormGroup[] | undefined,
   permissions: Record<string, FieldPermission> | undefined,
-  mode: WorkflowFieldPermissionMode
+  mode: WorkflowFieldPermissionMode,
+  kind?: WorkflowStepKind
 ): SchemaFormGroup[] | undefined {
   if (!groups) return undefined
   const next: SchemaFormGroup[] = []
   for (const group of groups) {
-    const fields = group.fields?.map((field) => applyPermissionToField(field, permissions, mode))
-    const nested = mapGroups(group.groups, permissions, mode)
+    const fields = group.fields?.map((field) =>
+      applyPermissionToField(field, permissions, mode, kind)
+    )
+    const nested = mapGroups(group.groups, permissions, mode, kind)
     const hasVisibleField = Boolean(fields?.some((field) => !field.hidden))
     const hasNested = Boolean(nested && nested.length > 0)
     if (!hasVisibleField && !hasNested) continue
@@ -108,21 +136,22 @@ function mapGroups(
 /**
  * Derive a SchemaForm-ready schema. Does not mutate `schema`.
  *
- * `initiate` — starter may edit; unmapped fields stay editable.
- * `approve` — apply current-node permissions; unmapped fields are readonly.
- * `readonly` — CC / done / ended; force ≥ readonly, keep hidden hidden.
+ * The default permission is {@link defaultWorkflowFieldPermission}: editable
+ * only when the node kind and the view mode are both the lenient side.
+ * Schema-hidden fields stay hidden.
  */
 export function applyWorkflowFieldPermissions(
   schema: SchemaFormSchema | undefined,
   permissions: Record<string, FieldPermission> | undefined,
-  mode: WorkflowFieldPermissionMode | string
+  mode: WorkflowFieldPermissionMode | string,
+  kind?: WorkflowStepKind
 ): SchemaFormSchema {
   const resolvedMode = resolveWorkflowFieldPermissionMode(mode)
   if (!schema) return {}
   const fields = schema.fields?.map((field) =>
-    applyPermissionToField(field, permissions, resolvedMode)
+    applyPermissionToField(field, permissions, resolvedMode, kind)
   )
-  const groups = mapGroups(schema.groups, permissions, resolvedMode)
+  const groups = mapGroups(schema.groups, permissions, resolvedMode, kind)
   return {
     ...schema,
     fields,
@@ -135,10 +164,10 @@ export function applyWorkflowFieldPermissions(
  */
 export function applyWorkflowFieldPermissionsFromStep(
   schema: SchemaFormSchema | undefined,
-  step: Pick<WorkflowTimelineStep, 'fieldPermissions'> | undefined,
+  step: Pick<WorkflowTimelineStep, 'fieldPermissions' | 'kind'> | undefined,
   mode: WorkflowFieldPermissionMode | string
 ): SchemaFormSchema {
-  return applyWorkflowFieldPermissions(schema, step?.fieldPermissions, mode)
+  return applyWorkflowFieldPermissions(schema, step?.fieldPermissions, mode, step?.kind)
 }
 
 /**
@@ -148,9 +177,10 @@ export function applyWorkflowFieldPermissionsFromStep(
 export function listWorkflowEditableFieldNames(
   schema: SchemaFormSchema | undefined,
   permissions: Record<string, FieldPermission> | undefined,
-  mode: WorkflowFieldPermissionMode | string
+  mode: WorkflowFieldPermissionMode | string,
+  kind?: WorkflowStepKind
 ): string[] {
-  const derived = applyWorkflowFieldPermissions(schema, permissions, mode)
+  const derived = applyWorkflowFieldPermissions(schema, permissions, mode, kind)
   return flattenSchemaFormFields(derived)
     .filter((field) => !field.disabled)
     .map((field) => field.name)
@@ -166,11 +196,12 @@ export function mergeWorkflowFormValues(
   submitted: FormValues | undefined,
   schema: SchemaFormSchema | undefined,
   permissions: Record<string, FieldPermission> | undefined,
-  mode: WorkflowFieldPermissionMode | string
+  mode: WorkflowFieldPermissionMode | string,
+  kind?: WorkflowStepKind
 ): FormValues {
   const base = cloneFormValues(original ?? {})
   if (!submitted) return base
-  const names = listWorkflowEditableFieldNames(schema, permissions, mode)
+  const names = listWorkflowEditableFieldNames(schema, permissions, mode, kind)
   let next = base
   for (const name of names) {
     next = setValueByPath(next, name, getValueByPath(submitted, name))

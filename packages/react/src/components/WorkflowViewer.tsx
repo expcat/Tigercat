@@ -52,8 +52,8 @@ import { Tag } from './Tag'
 export interface WorkflowViewerProps
   extends CoreWorkflowViewerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {}
 
-const workflowStepActorClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
-const workflowStepCommentClasses = 'text-sm text-[var(--tiger-text-secondary,#4b5563)] mt-1'
+const workflowStepActorClasses = 'text-sm text-[var(--tiger-text-secondary)]'
+const workflowStepCommentClasses = 'text-sm text-[var(--tiger-text-secondary)] mt-1'
 
 function StatusDot({ status }: { status: WorkflowTimelineStepStatus }) {
   return (

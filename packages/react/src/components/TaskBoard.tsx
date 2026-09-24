@@ -26,6 +26,11 @@ import {
   moveCard,
   reorderColumns,
   isWipExceeded,
+  bindTaskBoardColumnId,
+  describeTaskBoardGrabAnnouncement,
+  isTaskBoardNestedControl,
+  nextTaskBoardRovingCardId,
+  taskBoardRovingTabIndex,
   appendDefaultTaskBoardCard,
   appendDefaultTaskBoardColumn,
   createTaskBoardDragController,
@@ -53,6 +58,9 @@ function cardMatchesFilter(card: TaskBoardCard, filterText: string): boolean {
 interface CardItemProps {
   card: TaskBoardCard
   column: TaskBoardColumn
+  visibleCards: readonly TaskBoardCard[]
+  rovingId: string | number | null
+  onRovingChange: (cardId: string | number) => void
   isDragging: boolean
   isKbGrabbed: boolean
   draggable: boolean
@@ -69,6 +77,9 @@ interface CardItemProps {
 const CardItem: React.FC<CardItemProps> = ({
   card,
   column,
+  visibleCards,
+  rovingId,
+  onRovingChange,
   isDragging,
   isKbGrabbed,
   draggable,
@@ -82,14 +93,14 @@ const CardItem: React.FC<CardItemProps> = ({
     isDragging && taskBoardCardDraggingClasses,
     filterHit && kanbanFilterHighlightClasses,
     isKbGrabbed &&
-      'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
+      'ring-2 ring-[var(--tiger-primary)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
   )
 
   return (
     <div
       className={cardClasses}
       draggable={draggable}
-      tabIndex={0}
+      tabIndex={draggable ? taskBoardRovingTabIndex(visibleCards, card.id, rovingId) : -1}
       role="listitem"
       title={dragHintText}
       data-tiger-taskboard-card=""
@@ -104,18 +115,40 @@ const CardItem: React.FC<CardItemProps> = ({
       onTouchMove={(e) => dragCtrl.cardTouchMove(e.nativeEvent)}
       onTouchEnd={() => dragCtrl.cardTouchEnd()}
       onKeyDown={(e) => {
+        if (isTaskBoardNestedControl(e.target, e.currentTarget)) return
         if (dragCtrl.cardKeyDown(e.key, card, column)) {
           e.preventDefault()
-          e.stopPropagation()
+          if (e.key === 'Escape') e.stopPropagation()
+          return
         }
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+        const nextId = nextTaskBoardRovingCardId(
+          visibleCards,
+          card.id,
+          e.key === 'ArrowDown' ? 'down' : 'up'
+        )
+        if (nextId == null || nextId === card.id) return
+        onRovingChange(nextId)
+        e.preventDefault()
+        const list = e.currentTarget.closest('[role="list"]')
+        const escaped =
+          typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
+            ? CSS.escape(String(nextId))
+            : String(nextId)
+        queueMicrotask(() => {
+          const target = list?.querySelector(
+            `[data-tiger-taskboard-card-id="${escaped}"]`
+          ) as HTMLElement | null
+          target?.focus()
+        })
       }}>
       {renderCard ? (
         renderCard({ card, column, isDragging })
       ) : (
         <>
-          <div className="font-medium text-sm text-[var(--tiger-text,#1f2937)]">{card.title}</div>
+          <div className="font-medium text-sm text-[var(--tiger-text)]">{card.title}</div>
           {card.description && (
-            <div className="mt-1 text-xs text-[var(--tiger-text-muted,#6b7280)] line-clamp-2">
+            <div className="mt-1 text-xs text-[var(--tiger-text-secondary)] line-clamp-2">
               {card.description}
             </div>
           )}
@@ -149,6 +182,8 @@ interface ColumnItemProps {
   dragStateId: string | number | null
   kbDragStateId: string | number | null
   showCardCount: boolean
+  rovingId: string | number | null
+  onRovingChange: (cardId: string | number) => void
   onToggleSwimlane: (laneId: string | number, collapsed: boolean) => void
 }
 
@@ -172,6 +207,8 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
   dragStateId,
   kbDragStateId,
   showCardCount,
+  rovingId,
+  onRovingChange,
   onToggleSwimlane
 }) => {
   const column = viewColumn.source
@@ -194,6 +231,9 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
         key={String(card.id)}
         card={card}
         column={column}
+        visibleCards={viewColumn.visibleCards}
+        rovingId={rovingId}
+        onRovingChange={onRovingChange}
         isDragging={dragStateId === card.id}
         isKbGrabbed={kbDragStateId === card.id}
         draggable={draggable}
@@ -230,7 +270,7 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
               />
             )}
             <span>{group.swimlane.label}</span>
-            <span className="ms-auto text-xs text-[var(--tiger-text-muted,#6b7280)]">
+            <span className="ms-auto text-xs text-[var(--tiger-text-secondary)]">
               {group.cards.length}
             </span>
           </button>
@@ -272,6 +312,7 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
   return (
     <div
       className={colClasses}
+      ref={(el) => bindTaskBoardColumnId(el, column.id)}
       data-tiger-taskboard-column=""
       data-tiger-taskboard-column-id={String(column.id)}
       onDragOver={
@@ -293,6 +334,7 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
       <div
         className={taskBoardColumnHeaderClasses}
         draggable={columnDraggable}
+        role={columnDraggable ? 'button' : undefined}
         tabIndex={columnDraggable ? 0 : undefined}
         onDragStart={(e) => {
           if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column)
@@ -304,7 +346,10 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
         onTouchMove={(e) => dragCtrl.columnTouchMove(e.nativeEvent)}
         onTouchEnd={() => dragCtrl.columnTouchEnd()}
         onKeyDown={(e) => {
-          if (dragCtrl.columnKeyDown(e.key, column)) e.preventDefault()
+          if (isTaskBoardNestedControl(e.target, e.currentTarget)) return
+          if (!dragCtrl.columnKeyDown(e.key, column)) return
+          e.preventDefault()
+          if (e.key === 'Escape') e.stopPropagation()
         }}
         style={columnDraggable ? { cursor: 'grab' } : undefined}>
         {renderColumnHeader ? (
@@ -316,10 +361,10 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
               {!showCardCount && cardCount.limit != null ? (
                 <span
                   className={classNames(
-                    'ms-2 text-xs font-normal transition-all duration-200 px-1.5 py-0.5 rounded',
+                    'ms-2 text-xs font-normal [transition:var(--tiger-transition-quick)] px-1.5 py-0.5 rounded',
                     wipOver
-                      ? 'bg-red-50 dark:bg-red-950/30 text-[var(--tiger-error,#ef4444)] font-semibold border border-red-200/30 dark:border-red-900/30 shadow-xs'
-                      : 'opacity-70 bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)]'
+                      ? 'bg-red-50 dark:bg-red-950/30 text-[var(--tiger-error)] font-semibold border border-red-200/30 dark:border-red-900/30 shadow-xs'
+                      : 'opacity-70 bg-[var(--tiger-border)]/20 text-[var(--tiger-text-secondary)]'
                   )}
                   title={wipTitle}>
                   ({countLabel})
@@ -338,7 +383,7 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
               </span>
             ) : null}
             {column.description && (
-              <span className="text-xs font-normal text-[var(--tiger-text-muted,#6b7280)] truncate max-w-[120px]">
+              <span className="text-xs font-normal text-[var(--tiger-text-secondary)] truncate max-w-[120px]">
                 {column.description}
               </span>
             )}
@@ -374,10 +419,7 @@ const ColumnItem: React.FC<ColumnItemProps> = ({
       ) : onCardAdd ? (
         <button
           type="button"
-          className={classNames(
-            'border-t border-[var(--tiger-border,#e5e7eb)]',
-            taskBoardAddCardClasses
-          )}
+          className={classNames('border-t border-[var(--tiger-border)]', taskBoardAddCardClasses)}
           disabled={addDisabled}
           onClick={() => onCardAdd(column.id)}>
           <span>+</span>
@@ -528,7 +570,11 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   )
 
   const [dragSnap, setDragSnap] = useState<TaskBoardDragSnapshot>(createDefaultDragSnapshot)
+  const [rovingCardIds, setRovingCardIds] = useState<ReadonlyMap<string, string | number>>(
+    () => new Map()
+  )
   const boardRef = useRef<HTMLDivElement>(null)
+  const columnRovingKey = (id: string | number) => `${typeof id}:${String(id)}`
 
   const beforeCardMoveRef = useRef(beforeCardMove)
   beforeCardMoveRef.current = beforeCardMove
@@ -618,7 +664,11 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     string | number | null
   const kbDragStateId = (dragSnap.kbDrag?.id ?? null) as string | number | null
   const kbGrabbing = dragSnap.kbDrag?.type === 'card'
-  const liveMessage = dragSnap.kbDrag ? labels.dragHintText : ''
+  const liveMessage = describeTaskBoardGrabAnnouncement(
+    dragSnap,
+    view,
+    labels.grabAnnouncementText
+  )
 
   return (
     <div
@@ -665,6 +715,14 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             dragStateId={dragStateId}
             kbDragStateId={kbDragStateId}
             showCardCount={showCardCount}
+            rovingId={rovingCardIds.get(columnRovingKey(col.id)) ?? null}
+            onRovingChange={(cardId) => {
+              setRovingCardIds((prev) => {
+                const next = new Map(prev)
+                next.set(columnRovingKey(col.id), cardId)
+                return next
+              })
+            }}
             onToggleSwimlane={handleToggleSwimlane}
           />
         )

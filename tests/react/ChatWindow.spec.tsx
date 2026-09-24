@@ -176,7 +176,7 @@ describe('ChatWindow (React)', () => {
 
   describe('auto-scroll', () => {
     function getChatScroller(container: HTMLElement): HTMLElement {
-      return container.querySelector('[role="log"]') as HTMLElement
+      return container.querySelector('[data-tiger-chat-scroller]') as HTMLElement
     }
 
     function mockScrollerMetrics(
@@ -256,13 +256,22 @@ describe('ChatWindow (React)', () => {
     expect(onSend).not.toHaveBeenCalled()
   })
 
-  it('sends once when clearOnSend is false and the button is clicked twice', async () => {
-    const onSend = vi.fn()
+  it('blocks a second send until the in-flight request settles, then allows the same text', async () => {
+    let release: (() => void) | undefined
+    const onSend = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve
+        })
+    )
     render(<ChatWindow allowEmpty clearOnSend={false} onSend={onSend} />)
     const sendButton = screen.getByRole('button', { name: 'Send' })
     await userEvent.click(sendButton)
     await userEvent.click(sendButton)
     expect(onSend).toHaveBeenCalledTimes(1)
+    release?.()
+    await userEvent.click(sendButton)
+    expect(onSend).toHaveBeenCalledTimes(2)
   })
 
   it('disables send when onSend is omitted', () => {

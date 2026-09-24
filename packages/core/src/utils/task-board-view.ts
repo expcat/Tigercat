@@ -1,28 +1,35 @@
 import type { TaskBoardCard, TaskBoardColumn, TaskBoardSwimlane } from '../types/task-board'
-import { mapVisibleCardIndexToSource } from './task-board-utils'
+import { devWarn } from './dev-warn'
+import { treeKeyId } from './tree-utils'
+import {
+  formatTaskBoardGrabAnnouncement,
+  mapVisibleCardIndexToSource,
+  type TaskBoardDragState
+} from './task-board-utils'
 
-export const UNASSIGNED_SWIMLANE_ID = '__unassigned'
+/** Reserved so a business swimlane id cannot occupy the unassigned bucket. */
+export const UNASSIGNED_SWIMLANE_ID = '\u0000tiger-unassigned'
 
 /** Card count badge */
 export const kanbanCardCountClasses =
-  'inline-flex items-center justify-center h-5 min-w-[22px] px-2 rounded-full text-xs font-semibold bg-[var(--tiger-border,#e5e7eb)]/60 text-[var(--tiger-text-secondary,#6b7280)]/90 backdrop-blur-xs shadow-inner'
+  'inline-flex items-center justify-center h-5 min-w-[22px] px-2 rounded-full text-xs font-semibold bg-[var(--tiger-border)]/60 text-[var(--tiger-text-secondary)]/90 backdrop-blur-xs shadow-inner'
 
 /** Swimlane row wrapper */
-export const kanbanSwimlaneClasses = 'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0'
+export const kanbanSwimlaneClasses = 'border-b border-[var(--tiger-border)] last:border-b-0'
 
 /** Swimlane header (click / keyboard toggles collapsed) */
 export const kanbanSwimlaneHeaderClasses =
-  'flex items-center gap-2 w-full px-4 py-2 text-sm font-medium text-[var(--tiger-text,#1f2937)] cursor-pointer select-none hover:bg-[var(--tiger-bg-hover,#f9fafb)]'
+  'flex items-center gap-2 w-full px-4 py-2 text-sm font-medium text-[var(--tiger-text)] cursor-pointer select-none hover:bg-[var(--tiger-bg-hover)]'
 
 /** Swimlane color dot */
 export const kanbanSwimlaneDotClasses = 'w-2.5 h-2.5 rounded-full shrink-0'
 
 /** Filter match highlight on card */
-export const kanbanFilterHighlightClasses = 'bg-[var(--tiger-warning,#fbbf24)]/20'
+export const kanbanFilterHighlightClasses = 'bg-[var(--tiger-warning)]/20'
 
 /** Add column button */
 export const kanbanAddColumnClasses =
-  'flex items-center justify-center shrink-0 w-76 min-h-[120px] rounded-[var(--tiger-radius-lg,0.75rem)] border-2 border-dashed border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)]/40 text-sm font-medium text-[var(--tiger-text-muted,#6b7280)] hover:border-[var(--tiger-primary,#2563eb)]/80 hover:text-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-surface,#ffffff)] hover:shadow-sm cursor-pointer transition-all duration-300 active:scale-98'
+  'flex items-center justify-center shrink-0 w-76 min-h-[120px] rounded-[var(--tiger-radius-lg)] border-2 border-dashed border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)]/40 text-sm font-medium text-[var(--tiger-text-secondary)] hover:border-[var(--tiger-primary)]/80 hover:text-[var(--tiger-primary)] hover:bg-[var(--tiger-surface)] hover:shadow-sm cursor-pointer [transition:var(--tiger-transition-base)] active:scale-98'
 
 /**
  * Filter cards by a search term (matches against title and description).
@@ -38,22 +45,7 @@ export function filterCards(cards: TaskBoardCard[], filterText: string): TaskBoa
   })
 }
 
-/**
- * Apply filter to all columns.
- * Returns new column array with filtered cards.
- */
-export function filterColumns(
-  columns: TaskBoardColumn[],
-  filterText: string,
-  hiddenColumns?: (string | number)[]
-): TaskBoardColumn[] {
-  return columns
-    .filter((col) => !hiddenColumns?.includes(col.id))
-    .map((col) => ({
-      ...col,
-      cards: filterCards(col.cards, filterText)
-    }))
-}
+
 
 export interface SwimlaneGroup {
   swimlane: TaskBoardSwimlane
@@ -71,27 +63,36 @@ export function groupBySwimlane(
   fieldName: string,
   unassignedLabel = 'Unassigned'
 ): SwimlaneGroup[] {
-  const groups: Map<string | number, TaskBoardCard[]> = new Map()
+  const groups = new Map<string, TaskBoardCard[]>()
 
   for (const lane of swimlanes) {
-    groups.set(lane.id, [])
+    const id = treeKeyId(lane.id)
+    if (id === UNASSIGNED_SWIMLANE_ID) {
+      devWarn(
+        'TaskBoard.swimlane.unassigned',
+        'A swimlane id uses the reserved unassigned bucket and is kept separate'
+      )
+      continue
+    }
+    if (!groups.has(id)) groups.set(id, [])
   }
 
   const unassigned: TaskBoardCard[] = []
 
   for (const card of cards) {
     const fieldValue = (card as Record<string, unknown>)[fieldName]
-    if (fieldValue != null && groups.has(fieldValue as string | number)) {
-      groups.get(fieldValue as string | number)!.push(card)
-    } else {
-      unassigned.push(card)
-    }
+    const id = fieldValue == null ? '' : treeKeyId(fieldValue as string | number)
+    const bucket = id && id !== UNASSIGNED_SWIMLANE_ID ? groups.get(id) : undefined
+    if (bucket) bucket.push(card)
+    else unassigned.push(card)
   }
 
-  const result: SwimlaneGroup[] = swimlanes.map((lane) => ({
-    swimlane: lane,
-    cards: groups.get(lane.id) ?? []
-  }))
+  const result: SwimlaneGroup[] = swimlanes
+    .filter((lane) => treeKeyId(lane.id) !== UNASSIGNED_SWIMLANE_ID)
+    .map((lane) => ({
+      swimlane: lane,
+      cards: groups.get(treeKeyId(lane.id)) ?? []
+    }))
 
   if (unassigned.length > 0) {
     result.push({
@@ -158,12 +159,12 @@ export interface ResolveTaskBoardViewOptions {
  * rendered. WIP, counts, and move indices always go back to `source`.
  */
 export function resolveTaskBoardView(options: ResolveTaskBoardViewOptions): TaskBoardView {
-  const hidden = new Set(options.hiddenColumns ?? [])
+  const hidden = new Set((options.hiddenColumns ?? []).map((id) => treeKeyId(id)))
   const filterText = options.filterText ?? ''
   const columns: TaskBoardViewColumn[] = []
 
   options.columns.forEach((source, sourceIndex) => {
-    if (hidden.has(source.id)) return
+    if (hidden.has(treeKeyId(source.id))) return
 
     const filtered = filterCards(source.cards, filterText)
     let visibleCards = filtered
@@ -195,7 +196,7 @@ export function findTaskBoardViewColumn(
   view: TaskBoardView,
   columnId: string | number
 ): TaskBoardViewColumn | undefined {
-  return view.columns.find((column) => column.source.id === columnId)
+  return view.columns.find((column) => treeKeyId(column.source.id) === treeKeyId(columnId))
 }
 
 /**
@@ -304,6 +305,48 @@ export function moveTaskBoardKeyboardDrop(
     columnId: target.source.id,
     dropIndex: Math.min(dropIndex, target.visibleCards.length)
   }
+}
+
+/**
+ * Spoken grab line. Empty when nothing is grabbed. Position is 1-based.
+ * Column grabs name the column; card grabs name the card, source, and target.
+ */
+export function describeTaskBoardGrabAnnouncement(
+  snapshot: {
+    kbDrag: TaskBoardDragState | null
+    dropTargetColumnId: string | number | null
+    dropIndex: number
+  },
+  view: TaskBoardView,
+  template: string
+): string {
+  const grab = snapshot.kbDrag
+  if (!grab || template.trim() === '') return ''
+  if (grab.type === 'column') {
+    const index = view.columns.findIndex((column) => column.source.id === grab.id)
+    const column = index >= 0 ? view.columns[index] : undefined
+    const title = column?.source.title || String(grab.id)
+    return formatTaskBoardGrabAnnouncement(template, {
+      card: title,
+      from: title,
+      to: title,
+      position: index >= 0 ? index + 1 : 1,
+      count: Math.max(1, view.columns.length)
+    })
+  }
+  const fromColumn = view.columns.find((column) => column.source.id === grab.fromColumnId)
+  const toId = snapshot.dropTargetColumnId ?? grab.fromColumnId
+  const toColumn = view.columns.find((column) => column.source.id === toId)
+  const card = fromColumn?.source.cards.find((item) => item.id === grab.id)
+  const slotCount = (toColumn?.visibleCards.length ?? 0) + 1
+  const position = snapshot.dropIndex >= 0 ? snapshot.dropIndex + 1 : 1
+  return formatTaskBoardGrabAnnouncement(template, {
+    card: card?.title || String(grab.id),
+    from: fromColumn?.source.title || String(grab.fromColumnId ?? ''),
+    to: toColumn?.source.title || String(toId ?? ''),
+    position: Math.min(Math.max(1, position), Math.max(1, slotCount)),
+    count: Math.max(1, slotCount)
+  })
 }
 
 export function moveTaskBoardKeyboardColumn(

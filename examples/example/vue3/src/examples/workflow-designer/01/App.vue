@@ -55,12 +55,12 @@ const steps = ref<WorkflowTimelineStep[]>([
 
 <template>
   <div class="space-y-3">
-    <p class="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+    <p class="text-sm text-[var(--tiger-text-secondary)]">
       纵向摘要卡流程画布（中轴轨道穿过卡片中心）+ 右侧 Inspector 四 Tab（审批人 / 操作按钮 / 表单权限 /
       高级）。节点间 + 打开调色板插入。不是 BPMN。
     </p>
     <WorkflowDesigner v-model="steps" :schema="schema" />
-    <pre class="overflow-auto rounded-md bg-[var(--tiger-fill,#f3f4f6)] p-3 text-xs">{{
+    <pre class="overflow-auto rounded-md bg-[var(--tiger-surface-muted)] p-3 text-xs">{{
       JSON.stringify(steps, null, 2)
     }}</pre>
   </div>

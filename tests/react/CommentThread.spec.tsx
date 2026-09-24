@@ -129,7 +129,8 @@ describe('CommentThread (React)', () => {
   })
   it('renders empty state when no nodes provided', () => {
     render(<CommentThread nodes={[]} />)
-    expect(screen.getByRole('feed', { name: 'Comment thread' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Comment thread' })).toBeInTheDocument()
+    expect(screen.queryByRole('feed')).not.toBeInTheDocument()
   })
 
   it('renders emptyText when nodes is empty', () => {

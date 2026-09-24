@@ -4,7 +4,8 @@ import React, {
   useImperativeHandle,
   useEffect,
   useMemo,
-  useRef
+  useRef,
+  useState
 } from 'react'
 import {
   classNames,
@@ -20,8 +21,10 @@ import {
   shouldSendChatOnEnter,
   isChatScrollerNearBottom,
   planChatScroll,
-  didChatPrepend,
+  chatThreadSharesId,
   getChatItemKey,
+  readDocumentTimeZone,
+  CHAT_VIRTUAL_THRESHOLD,
   getChatMessageRowClasses,
   getChatBubbleClasses,
   chatWindowRootClasses,
@@ -74,13 +77,14 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
     showAvatar = true,
     showName = true,
     showTime = false,
+    timeZone,
     inputType = 'textarea',
     inputRows = 3,
     sendOnEnter = true,
     allowShiftEnter = true,
     allowEmpty = false,
     clearOnSend = true,
-    virtual = false,
+    virtual,
     virtualItemHeight = CHAT_VIRTUAL_ESTIMATED_ITEM_HEIGHT,
     virtualHeight = 400,
     autoScrollToBottom = true,
@@ -112,11 +116,18 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
     defaultValue,
     onChange
   })
-  const lastSentRef = useRef<string | null>(null)
-  const [, setSendTick] = React.useState(0)
+  const [sending, setSending] = React.useState(false)
+  const sendingRef = useRef(false)
   const stickToBottomRef = useRef(true)
   const messageListRef = useRef<HTMLDivElement | null>(null)
   const virtualListRef = useRef<VirtualListHandle | null>(null)
+  const previousIdsRef = useRef(new Set<string>())
+  const anchorIdRef = useRef<string | number | null>(null)
+  const seenLastIdRef = useRef<string | number | null | undefined>(undefined)
+  const [liveText, setLiveText] = useState('')
+  const [documentTimeZone, setDocumentTimeZone] = useState<string | null>(timeZone ?? null)
+  const clockZone = timeZone ?? documentTimeZone
+  const virtualOn = virtual ?? messages.length >= CHAT_VIRTUAL_THRESHOLD
   const previousScrollHeightRef = useRef(0)
   const previousFirstIdRef = useRef<string | number | undefined>(messages[0]?.id)
   const previousLengthRef = useRef(messages.length)
@@ -126,17 +137,16 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
     disabled,
     allowEmpty,
     value: inputValue,
-    sending: false,
-    hasSendHandler,
-    lastSent: lastSentRef.current
+    sending,
+    hasSendHandler
   })
 
   const wrapperClasses = useMemo(() => classNames(chatWindowRootClasses, className), [className])
 
   const resolveScroller = useCallback((): HTMLElement | null => {
-    if (virtual) return virtualListRef.current?.getScrollElement() ?? null
+    if (virtualOn) return virtualListRef.current?.getScrollElement() ?? null
     return messageListRef.current
-  }, [virtual])
+  }, [virtualOn])
 
   const syncStickToBottom = useCallback(() => {
     const scroller = resolveScroller()
@@ -145,47 +155,64 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
   }, [resolveScroller])
 
   const scrollToBottom = useCallback(() => {
-    if (!autoScrollToBottom) return
     requestAnimationFrame(() => {
+      const last = messages.length - 1
+      stickToBottomRef.current = true
+      if (last >= 0 && virtualOn) {
+        virtualListRef.current?.scrollToIndex(last, 'end')
+        return
+      }
       const scroller = resolveScroller()
       if (!scroller) return
       scroller.scrollTop = scroller.scrollHeight
-      stickToBottomRef.current = true
-      previousScrollHeightRef.current = scroller.scrollHeight
     })
-  }, [autoScrollToBottom, resolveScroller])
+  }, [messages.length, resolveScroller, virtualOn])
 
   useImperativeHandle(ref, () => ({ scrollToBottom }), [scrollToBottom])
 
   const handleValueChange = useCallback(
     (nextValue: string | number) => {
       const next = String(nextValue)
-      if (lastSentRef.current != null && next !== lastSentRef.current) {
-        lastSentRef.current = null
-      }
       setInputValue(next)
     },
     [setInputValue]
   )
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     if (
+      sendingRef.current ||
       !canSendChatMessage({
         disabled,
         allowEmpty,
         value: inputValue,
-        hasSendHandler,
-        lastSent: lastSentRef.current
+        sending: sendingRef.current,
+        hasSendHandler
       })
     ) {
       return
     }
     const payload = String(inputValue ?? '')
-    lastSentRef.current = payload
-    setSendTick((tick) => tick + 1)
-    onSend?.(payload)
-    if (clearOnSend) setInputValue('')
-  }, [allowEmpty, clearOnSend, disabled, hasSendHandler, inputValue, onSend, setInputValue])
+    sendingRef.current = true
+    setSending(true)
+    try {
+      await Promise.resolve(onSend?.(payload))
+      if (clearOnSend) setInputValue('')
+    } catch {
+      // Keep the draft so the same text can be sent again.
+    } finally {
+      sendingRef.current = false
+      setSending(false)
+    }
+  }, [
+    allowEmpty,
+    clearOnSend,
+    disabled,
+    hasSendHandler,
+    inputValue,
+    onSend,
+    sending,
+    setInputValue
+  ])
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -212,13 +239,16 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
       const statusInfo = message.status
         ? getChatMessageStatusInfo(message.status, statusMap)
         : undefined
-      const timeText = showTime ? formatChatTime(message.time, mergedLocale) : ''
+      const timeText = showTime
+        ? formatChatTime(message.time, mergedLocale, { timeZone: clockZone ?? undefined })
+        : ''
 
       return (
         <div
           key={message.id ?? index}
           className={getChatMessageRowClasses(isSelf)}
-          data-tiger-chat-message>
+          data-tiger-chat-message
+          data-tiger-chat-id={message.id}>
           {showAvatar && message.user ? (
             <Avatar
               size="sm"
@@ -232,7 +262,7 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
             {showName && message.user?.name && (
               <div
                 className={classNames(
-                  'text-xs mb-1 text-[var(--tiger-text-muted,#6b7280)]',
+                  'text-xs mb-1 text-[var(--tiger-text-secondary)]',
                   isSelf && 'text-end'
                 )}>
                 {message.user.name}
@@ -247,58 +277,89 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
               </div>
             )}
             {timeText ? (
-              <div className="text-xs mt-1 text-[var(--tiger-text-muted,#6b7280)]">{timeText}</div>
+              <div className="text-xs mt-1 text-[var(--tiger-text-secondary)]">{timeText}</div>
             ) : null}
           </div>
         </div>
       )
     },
-    [mergedLocale, renderBubbleBody, showAvatar, showName, showTime, statusMap]
+    [clockZone, mergedLocale, renderBubbleBody, showAvatar, showName, showTime, statusMap]
   )
 
-  const lastContent = messages[messages.length - 1]?.content
-  const firstId = messages[0]?.id
+  useEffect(() => {
+    if (timeZone) {
+      setDocumentTimeZone(timeZone)
+      return
+    }
+    setDocumentTimeZone(readDocumentTimeZone())
+  }, [timeZone])
+
+  const lastId = messages[messages.length - 1]?.id ?? null
 
   useEffect(() => {
-    const raf = requestAnimationFrame(() => {
-      const scroller = resolveScroller()
-      if (!scroller) return
-      const prepended = didChatPrepend(
-        previousFirstIdRef.current,
-        firstId,
-        previousLengthRef.current,
-        messages.length
-      )
-      const plan = planChatScroll({
-        stickToBottom: stickToBottomRef.current,
-        autoScrollToBottom,
-        prepended,
-        previousScrollHeight: previousScrollHeightRef.current,
-        nextScrollHeight: scroller.scrollHeight
-      })
-      if (plan.scrollTop != null) {
-        scroller.scrollTop = plan.scrollTop
-        stickToBottomRef.current = true
-      } else if (plan.compensate) {
-        scroller.scrollTop += plan.compensate
-      }
-      previousScrollHeightRef.current = scroller.scrollHeight
-      previousFirstIdRef.current = firstId
-      previousLengthRef.current = messages.length
+    if (seenLastIdRef.current === undefined) {
+      seenLastIdRef.current = lastId
+      return
+    }
+    if (lastId !== seenLastIdRef.current) {
+      seenLastIdRef.current = lastId
+      const last = messages[messages.length - 1]
+      setLiveText(last ? String(last.content ?? '') : '')
+    }
+  }, [lastId, messages])
+
+  useEffect(() => {
+    if (!autoScrollToBottom) return undefined
+    const ids = messages.map((message) => message.id)
+    const sessionChanged = !chatThreadSharesId(previousIdsRef.current, ids)
+    const decision = planChatScroll({
+      messages,
+      stickToBottom: sessionChanged ? true : stickToBottomRef.current,
+      sessionChanged,
+      anchorId: anchorIdRef.current
     })
+    stickToBottomRef.current = decision.stickToBottom
+    const raf = requestAnimationFrame(() => {
+      if (!decision.stickToBottom) return
+      const index = messages.findIndex((message) => message.id === decision.anchorId)
+      if (virtualOn && index >= 0) {
+        virtualListRef.current?.scrollToIndex(index, 'end')
+        return
+      }
+      const scroller = messageListRef.current
+      if (scroller) scroller.scrollTop = scroller.scrollHeight
+    })
+    previousIdsRef.current = new Set(ids.filter((id) => id != null).map((id) => String(id)))
+    if (!decision.stickToBottom && decision.anchorId != null) {
+      anchorIdRef.current = decision.anchorId
+    } else if (decision.stickToBottom) {
+      anchorIdRef.current = decision.anchorId
+    }
     return () => cancelAnimationFrame(raf)
-  }, [autoScrollToBottom, firstId, lastContent, messages.length, resolveScroller])
+  }, [autoScrollToBottom, messages, virtualOn])
 
   const listA11y = {
-    role: 'log' as const,
-    'aria-live': 'polite' as const,
-    'aria-relevant': 'additions text' as const,
+    role: 'list' as const,
     'aria-label': listLabel
   }
 
   return (
     <div className={wrapperClasses} data-tiger-chat-window {...props}>
-      {virtual && messages.length > 0 ? (
+      {virtualOn ? (
+        <div
+          className="sr-only"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-label={listLabel}>
+          {liveText}
+        </div>
+      ) : null}
+      {messages.length === 0 ? (
+        <div className={classNames(chatMessageListClasses, 'h-full flex items-center justify-center py-8')}>
+          <Empty description={resolvedEmptyText} />
+        </div>
+      ) : virtualOn ? (
         <VirtualList
           ref={virtualListRef}
           className={chatMessageListClasses}
@@ -308,21 +369,18 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
           getItemKey={(index) => getChatItemKey(messages, index)}
           onScroll={syncStickToBottom}
           renderItem={({ index }) => renderMessageItem(messages[index], index)}
-          {...listA11y}
+          role="presentation"
+          data-tiger-chat-scroller=""
         />
       ) : (
         <div
           ref={messageListRef}
           className={chatMessageListClasses}
-          {...listA11y}
+          role="log"
+          aria-label={listLabel}
+          data-tiger-chat-scroller=""
           onScroll={syncStickToBottom}>
-          {messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center py-8">
-              <Empty description={resolvedEmptyText} />
-            </div>
-          ) : (
-            messages.map(renderMessageItem)
-          )}
+          {messages.map(renderMessageItem)}
         </div>
       )}
       {statusText ? (

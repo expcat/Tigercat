@@ -22,7 +22,7 @@ function createMessages(count: number): ChatMessage[] {
 }
 
 function getChatScroller(container: HTMLElement): HTMLElement {
-  return container.querySelector('[role="log"]') as HTMLElement
+  return container.querySelector('[data-tiger-chat-scroller]') as HTMLElement
 }
 
 function mockScrollerMetrics(

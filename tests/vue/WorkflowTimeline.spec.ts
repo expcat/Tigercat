@@ -100,18 +100,18 @@ describe('WorkflowTimeline (Vue)', () => {
   })
 
   it('shows the action bar when the current step is active', () => {
-    render(WorkflowTimeline, { props: { steps: mixedSteps, actions } })
+    render(WorkflowTimeline, { props: { steps: mixedSteps, actions, viewerRole: 'approver' } })
 
     expect(screen.getByRole('toolbar', { name: 'Workflow actions' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Approve' })).toBeEnabled()
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
   })
 
   it('hides the action bar when no step is active', () => {
     const pendingOnly: WorkflowTimelineStep[] = [
       { key: 'wait', title: 'Waiting', status: 'pending' }
     ]
-    render(WorkflowTimeline, { props: { steps: pendingOnly, actions } })
+    render(WorkflowTimeline, { props: { steps: pendingOnly, actions, viewerRole: 'approver' } })
 
     expect(screen.queryByRole('toolbar')).not.toBeInTheDocument()
     expect(screen.getByText('Waiting')).toBeInTheDocument()
@@ -119,7 +119,7 @@ describe('WorkflowTimeline (Vue)', () => {
 
   it('emits action when an enabled action is clicked', async () => {
     const { emitted } = render(WorkflowTimeline, {
-      props: { steps: mixedSteps, actions }
+      props: { steps: mixedSteps, actions, viewerRole: 'approver' }
     })
 
     await fireEvent.click(screen.getByRole('button', { name: 'Approve' }))
@@ -128,10 +128,14 @@ describe('WorkflowTimeline (Vue)', () => {
 
   it('does not emit action from a disabled button', async () => {
     const { emitted } = render(WorkflowTimeline, {
-      props: { steps: mixedSteps, actions }
+      props: {
+        steps: mixedSteps,
+        viewerRole: 'approver',
+        actions: [{ key: 'approve', label: 'Approve', action: 'approve', disabled: true }]
+      }
     })
 
-    await fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Approve' }))
     expect(emitted().action).toBeFalsy()
   })
 
@@ -215,11 +219,11 @@ describe('WorkflowTimeline (Vue)', () => {
 
   describe('WorkflowActionBar', () => {
     it('renders labelled buttons and emits the clicked item', async () => {
-      const { emitted } = render(WorkflowActionBar, { props: { items: actions } })
+      const { emitted } = render(WorkflowActionBar, { props: { viewerRole: 'approver', items: actions } })
 
       expect(screen.getByRole('toolbar', { name: 'Workflow actions' })).toBeInTheDocument()
-      await fireEvent.click(screen.getByRole('button', { name: 'Reject' }))
-      expect(emitted().action?.[0]?.[0]).toMatchObject({ key: 'reject', action: 'reject' })
+      await fireEvent.click(screen.getByRole('button', { name: 'Approve' }))
+      expect(emitted().action?.[0]?.[0]).toMatchObject({ key: 'approve', action: 'approve' })
       expect(emitted().action?.[0]?.[1]).toBeUndefined()
     })
 
@@ -231,21 +235,20 @@ describe('WorkflowTimeline (Vue)', () => {
         { key: 'reject', label: 'Reject', action: 'reject' },
         { key: 'approve', label: 'Approve', action: 'approve' }
       ]
-      render(WorkflowActionBar, { props: { items: shuffled } })
+      render(WorkflowActionBar, { props: { viewerRole: 'approver', items: shuffled } })
 
       const buttons = within(screen.getByRole('toolbar')).getAllByRole('button')
       expect(buttons.map((button) => button.textContent)).toEqual([
         'Approve',
         'Reject',
         'Transfer',
-        'Cancel',
         'Comment'
       ])
       expect(screen.getByRole('button', { name: 'Approve' }).className).not.toContain(
-        'text-[var(--tiger-error,#dc2626)]'
+        'text-[var(--tiger-error)]'
       )
       expect(screen.getByRole('button', { name: 'Reject' }).className).toContain(
-        'text-[var(--tiger-error,#dc2626)]'
+        'text-[var(--tiger-error)]'
       )
     })
 
@@ -254,7 +257,7 @@ describe('WorkflowTimeline (Vue)', () => {
       render({
         render: () =>
           h(ConfigProvider, { locale: zhCN }, () =>
-            h(WorkflowActionBar, { items: actions, confirm: true })
+            h(WorkflowActionBar, { viewerRole: 'approver', items: actions, confirm: true })
           )
       })
 
@@ -264,13 +267,13 @@ describe('WorkflowTimeline (Vue)', () => {
       expect(screen.queryByText(/该步骤/)).not.toBeInTheDocument()
       expect(screen.getByPlaceholderText('请输入审批意见')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: '确定' }).className).toContain(
-        'bg-[var(--tiger-error,#dc2626)]'
+        'bg-[var(--tiger-error)]'
       )
     })
 
     it('blocks empty reject comment by default', async () => {
       const user = userEvent.setup()
-      const { emitted } = render(WorkflowActionBar, { props: { items: actions, confirm: true } })
+      const { emitted } = render(WorkflowActionBar, { props: { viewerRole: 'approver', items: actions, confirm: true } })
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
       await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
@@ -284,7 +287,7 @@ describe('WorkflowTimeline (Vue)', () => {
 
     it('passes typed comment on confirm', async () => {
       const user = userEvent.setup()
-      const { emitted } = render(WorkflowActionBar, { props: { items: actions, confirm: true } })
+      const { emitted } = render(WorkflowActionBar, { props: { viewerRole: 'approver', items: actions, confirm: true } })
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
       const textarea = await screen.findByPlaceholderText('Comment required')
@@ -297,7 +300,7 @@ describe('WorkflowTimeline (Vue)', () => {
     it('blocks empty submit when commentRequired and keeps the dialog open', async () => {
       const user = userEvent.setup()
       const { emitted } = render(WorkflowActionBar, {
-        props: { items: actions, confirm: true, commentRequired: true }
+        props: { viewerRole: 'approver', items: actions, confirm: true, commentRequired: true }
       })
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
@@ -333,6 +336,7 @@ describe('WorkflowTimeline (Vue)', () => {
       ]
       const { emitted } = render(WorkflowActionBar, {
         props: {
+          viewerRole: 'approver',
           items: full,
           confirm: true,
           returnTargets: targets,
@@ -378,7 +382,7 @@ describe('WorkflowTimeline (Vue)', () => {
         { key: 'return', label: 'Return', action: 'return' },
         { key: 'addsign', label: 'Add approver', action: 'addsign' }
       ]
-      render(WorkflowActionBar, { props: { items, confirm: true } })
+      render(WorkflowActionBar, { props: { viewerRole: 'approver', items, confirm: true } })
       expect(screen.getByRole('button', { name: 'Return' })).toBeDisabled()
       expect(screen.getByRole('button', { name: 'Add approver' })).toBeDisabled()
     })
@@ -390,6 +394,7 @@ describe('WorkflowTimeline (Vue)', () => {
       ]
       render(WorkflowActionBar, {
         props: {
+          viewerRole: 'approver',
           items,
           confirm: true,
           returnTargets: [{ key: 'start', title: 'Start' }]
@@ -405,7 +410,7 @@ describe('WorkflowTimeline (Vue)', () => {
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(WorkflowTimeline, {
-        props: { steps: mixedSteps, actions }
+        props: { steps: mixedSteps, actions, viewerRole: 'approver' }
       })
       expect(screen.getByRole('list', { name: 'Workflow timeline' })).toBeInTheDocument()
       expect(screen.getByRole('toolbar', { name: 'Workflow actions' })).toBeInTheDocument()

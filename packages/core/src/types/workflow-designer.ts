@@ -73,9 +73,17 @@ export interface WorkflowDesignerProps {
    */
   className?: string
   /**
-   * Emits the full tree after an edit.
+   * Emits the full tree after an edit, with the validation issues for that tree.
+   * Blocking issues stay in the draft. Publish reads the same issues.
    */
-  onChange?: (steps: WorkflowTimelineStep[]) => void
+  onChange?: (
+    steps: WorkflowTimelineStep[],
+    detail: { issues: ReadonlyArray<{ code: string; path: readonly string[]; blocking: boolean }> }
+  ) => void
+  /**
+   * Publish the current tree. The designer does not call this while blocking issues remain.
+   */
+  onPublish?: (steps: WorkflowTimelineStep[]) => void
   /**
    * Emits the selected node's full path (from the tree root) and step.
    */

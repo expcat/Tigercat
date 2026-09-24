@@ -167,7 +167,7 @@ function pickPerson(
         </RadioGroup>
       </template>
     </WorkflowActionBar>
-    <p v-if="lastAction" class="text-sm text-[var(--tiger-text-muted)]">
+    <p v-if="lastAction" class="text-sm text-[var(--tiger-text-secondary)]">
       最近操作：{{ lastAction }}
     </p>
   </div>

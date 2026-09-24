@@ -9,6 +9,17 @@ import { TaskBoard } from '@expcat/tigercat-vue/TaskBoard'
 import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
+function boardDragTransfer() {
+  let stored = ''
+  return {
+    setData: (_type: string, value: string) => {
+      stored = value
+    },
+    getData: () => stored,
+    effectAllowed: ''
+  }
+}
+
 const columns: TaskBoardColumn[] = [
   {
     id: 'todo',
@@ -98,7 +109,7 @@ describe('TaskBoard (Vue)', () => {
         }
       ]
       const { container } = render(TaskBoard, { props: { columns: wipCols } })
-      const exceeded = container.querySelector('.text-\\[var\\(--tiger-error\\,\\#ef4444\\)\\]')
+      const exceeded = container.querySelector('.text-\\[var\\(--tiger-error\\)\\]')
       expect(exceeded).toBeInTheDocument()
     })
   })
@@ -246,12 +257,12 @@ describe('TaskBoard (Vue)', () => {
       const targetBody = container
         .querySelectorAll('[data-tiger-taskboard-column]')[1]
         .querySelector('[role="list"]')!
-      const dragData = JSON.stringify({ type: 'card', cardId: 'c1', columnId: 'todo', index: 0 })
+      const dataTransfer = boardDragTransfer()
 
-      await fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      await fireEvent.dragStart(card, { dataTransfer })
       await fireEvent.dragOver(targetBody, { clientY: 150 })
       await fireEvent.drop(targetBody, {
-        dataTransfer: { getData: () => dragData, effectAllowed: '' }
+        dataTransfer
       })
 
       await waitFor(() => expect(emitted()['card-move']).toBeTruthy())
@@ -269,12 +280,12 @@ describe('TaskBoard (Vue)', () => {
       const targetBody = container
         .querySelectorAll('[data-tiger-taskboard-column]')[1]
         .querySelector('[role="list"]')!
-      const dragData = JSON.stringify({ type: 'card', cardId: 'c1', columnId: 'todo', index: 0 })
+      const dataTransfer = boardDragTransfer()
 
-      await fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      await fireEvent.dragStart(card, { dataTransfer })
       await fireEvent.dragOver(targetBody, { clientY: 150 })
       await fireEvent.drop(targetBody, {
-        dataTransfer: { getData: () => dragData, effectAllowed: '' }
+        dataTransfer
       })
 
       await waitFor(() => expect(beforeCardMove).toHaveBeenCalled())
@@ -309,12 +320,12 @@ describe('TaskBoard (Vue)', () => {
       const targetBody = container
         .querySelectorAll('[data-tiger-taskboard-column]')[0]
         .querySelector('[role="list"]')!
-      const dragData = JSON.stringify({ type: 'card', cardId: 'e', columnId: 'doing', index: 0 })
+      const dataTransfer = boardDragTransfer()
 
-      await fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      await fireEvent.dragStart(card, { dataTransfer })
       await fireEvent.dragOver(targetBody, { clientY: 150 })
       await fireEvent.drop(targetBody, {
-        dataTransfer: { getData: () => dragData, effectAllowed: '' }
+        dataTransfer
       })
 
       await waitFor(() => expect(emitted()['card-move']).toBeTruthy())
@@ -336,12 +347,12 @@ describe('TaskBoard (Vue)', () => {
       const targetBody = container
         .querySelectorAll('[data-tiger-taskboard-column]')[0]
         .querySelector('[role="list"]')!
-      const dragData = JSON.stringify({ type: 'card', cardId: 'e', columnId: 'doing', index: 0 })
+      const dataTransfer = boardDragTransfer()
 
-      await fireEvent.dragStart(card, { dataTransfer: { setData: vi.fn(), effectAllowed: '' } })
+      await fireEvent.dragStart(card, { dataTransfer })
       await fireEvent.dragOver(targetBody, { clientY: 150 })
       await fireEvent.drop(targetBody, {
-        dataTransfer: { getData: () => dragData, effectAllowed: '' }
+        dataTransfer
       })
 
       await waitFor(() => expect(emitted()['card-move']).toBeTruthy())
@@ -395,9 +406,9 @@ describe('TaskBoard (Vue)', () => {
     it('cards are focusable', () => {
       const { container } = render(TaskBoard, { props: { columns } })
       const cards = container.querySelectorAll('[data-tiger-taskboard-card]')
-      cards.forEach((card) => {
-        expect(card.getAttribute('tabindex')).toBe('0')
-      })
+      const tabStops = Array.from(cards).filter((card) => card.getAttribute('tabindex') === '0')
+      expect(cards.length).toBe(3)
+      expect(tabStops).toHaveLength(2)
     })
 
     it('uses boardAriaLabel from locale', () => {

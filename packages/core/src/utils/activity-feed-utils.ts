@@ -1,4 +1,4 @@
-import type { ActivityGroup, ActivityItem } from '../types/composite'
+import type { ActivityGroup, ActivityItem } from '../types/activity-feed'
 import type { TimelineItem } from '../types/timeline'
 
 export const EMPTY_ACTIVITY_ITEMS: ActivityItem[] = []
@@ -82,6 +82,25 @@ export const buildActivityGroups = (
   }
 
   return [{ key: 'default', title: '', items: list }]
+}
+
+/**
+ * `content` is the body only when both title and description are empty.
+ * Otherwise the title and description stand on their own.
+ */
+export function resolveActivityCopy(item: Pick<ActivityItem, 'title' | 'description' | 'content'>): {
+  title?: string
+  body?: string
+} {
+  const title = typeof item.title === 'string' && item.title.trim() ? item.title : undefined
+  const description =
+    typeof item.description === 'string' && item.description.trim() ? item.description : undefined
+  if (title || description) return { title, body: description }
+  if (typeof item.content === 'string' || typeof item.content === 'number') {
+    const body = String(item.content)
+    return body ? { body } : {}
+  }
+  return {}
 }
 
 export const toActivityTimelineItems = (

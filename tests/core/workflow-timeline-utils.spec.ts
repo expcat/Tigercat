@@ -863,7 +863,8 @@ describe('workflow action confirm recipe', () => {
         { action: 'cancel', enabled: true },
         { action: 'comment', enabled: false }
       ],
-      { actionApprove: '同意' }
+      { actionApprove: '同意' },
+      { viewerRole: 'approver' }
     )
     expect(items.map((item) => item.action)).toEqual(['approve', 'return'])
     expect(items[0]?.label).toBe('同意')

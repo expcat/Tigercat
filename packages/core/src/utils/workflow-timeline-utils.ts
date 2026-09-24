@@ -79,11 +79,11 @@ const TERMINAL_STATUS_SET = new Set<string>(WORKFLOW_TERMINAL_STEP_STATUSES)
  * CSS color hints for Timeline dots. Data only — no framework nodes.
  */
 export const WORKFLOW_STEP_STATUS_COLORS: Record<WorkflowTimelineStepStatus, string> = {
-  pending: 'var(--tiger-border,#d1d5db)',
-  active: 'var(--tiger-primary,#2563eb)',
-  approved: 'var(--tiger-success,#16a34a)',
-  rejected: 'var(--tiger-error,#dc2626)',
-  canceled: 'var(--tiger-text-muted,#6b7280)'
+  pending: 'var(--tiger-border)',
+  active: 'var(--tiger-primary)',
+  approved: 'var(--tiger-success)',
+  rejected: 'var(--tiger-error)',
+  canceled: 'var(--tiger-text-secondary)'
 }
 
 export type WorkflowStepHighlight = 'active' | 'pending' | null
@@ -225,10 +225,7 @@ function copyAdvanced(
   advanced: WorkflowNodeAdvanced | undefined
 ): WorkflowNodeAdvanced | undefined {
   if (!advanced) return undefined
-  return {
-    ...advanced,
-    timeout: advanced.timeout ? { ...advanced.timeout } : advanced.timeout
-  }
+  return { ...advanced }
 }
 
 function copyTasks(tasks: WorkflowTask[] | undefined): WorkflowTask[] | undefined {
@@ -1006,6 +1003,19 @@ export function shouldConfirmWorkflowAction(
 }
 
 /**
+ * Comment collection is not the confirm dialog. Open the layer when a comment
+ * is required, a picker is required, or the action asks for a second confirmation.
+ */
+export function shouldOpenWorkflowActionLayer(
+  item: Pick<WorkflowActionBarItem, 'action' | 'confirm' | 'commentRequired'>,
+  options?: { confirm?: boolean; commentRequired?: boolean }
+): boolean {
+  if (workflowActionBarCommentRequired(item, options?.commentRequired)) return true
+  if (workflowActionNeedsPicker(item.action) != null) return true
+  return shouldConfirmWorkflowAction(item, options?.confirm)
+}
+
+/**
  * Comment field in the confirm dialog. Omitted `commentInput` shows it for
  * reject / return / request_changes; `true` opts in other confirming actions;
  * `false` hides it unless `commentRequired` is set. `comment` never uses
@@ -1101,13 +1111,23 @@ export function workflowActionNeedsPicker(
 
 export function isWorkflowActionVisible(
   action: WorkflowTimelineAction,
-  options?: { isStarter?: boolean; viewerRole?: WorkflowActionBarViewerRole }
+  options?: {
+    isStarter?: boolean
+    viewerRole?: WorkflowActionBarViewerRole
+    permission?: string | string[]
+  }
 ): boolean {
-  const role = options?.viewerRole ?? 'approver'
-  if (role === 'cc') return action === 'comment'
+  const role = options?.viewerRole ?? 'readonly'
+  if (options?.permission != null) {
+    const codes = (Array.isArray(options.permission) ? options.permission : [options.permission])
+      .map((code) => code.trim())
+      .filter((code) => code !== '')
+    if (codes.length > 0 && !codes.includes(role)) return false
+  }
   if (action === 'cancel') return role === 'starter' || options?.isStarter === true
-  if (role === 'starter') return action === 'comment'
-  return true
+  if (role === 'readonly') return false
+  if (role === 'cc' || role === 'starter') return action === 'comment'
+  return role === 'approver'
 }
 
 export function workflowButtonConfigToActionBarItem(
@@ -1146,12 +1166,19 @@ export function resolveWorkflowActionBarItems(options: {
   isStarter?: boolean
   viewerRole?: WorkflowActionBarViewerRole
 }): WorkflowActionBarItem[] {
-  if (options.items !== undefined) return [...options.items]
+  const viewerRole = options.viewerRole ?? 'readonly'
+  const visible = (item: WorkflowActionBarItem) =>
+    isWorkflowActionVisible(item.action, {
+      isStarter: options.isStarter,
+      viewerRole,
+      permission: item.permission
+    })
+  if (options.items !== undefined) return options.items.filter(visible)
   if (options.buttonPolicy) {
     return workflowButtonConfigsToActionBarItems(options.buttonPolicy.buttons, options.labels, {
       isStarter: options.isStarter,
-      viewerRole: options.viewerRole
-    })
+      viewerRole
+    }).filter(visible)
   }
   return []
 }
@@ -1236,39 +1263,39 @@ export const workflowViewerListClasses = 'm-0 flex list-none flex-col items-cent
 export const workflowViewerBranchClasses =
   'm-0 flex list-none flex-row flex-wrap items-start justify-center gap-6 p-0'
 export const workflowViewerItemClasses = 'flex w-full min-w-0 flex-col items-center'
-export const workflowViewerConnectorClasses = 'h-4 w-px bg-[var(--tiger-border,#d1d5db)]'
+export const workflowViewerConnectorClasses = 'h-4 w-px bg-[var(--tiger-border)]'
 export const workflowViewerCardClasses =
-  'min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-2 shadow-sm'
+  'min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2 shadow-sm'
 export const workflowViewerCardCcClasses =
-  'min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-surface-muted,#f9fafb)] px-3 py-2 shadow-none'
-export const workflowViewerCardOnPathClasses = 'border-[var(--tiger-primary,#2563eb)]'
-export const workflowViewerCardRollbackClasses = 'border-[var(--tiger-error,#dc2626)]'
-export const workflowViewerCardReturnTargetClasses = 'border-[var(--tiger-warning,#d97706)]'
+  'min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] px-3 py-2 shadow-none'
+export const workflowViewerCardOnPathClasses = 'border-[var(--tiger-primary)]'
+export const workflowViewerCardRollbackClasses = 'border-[var(--tiger-error)]'
+export const workflowViewerCardReturnTargetClasses = 'border-[var(--tiger-warning)]'
 export const workflowViewerCardOffPathClasses = 'opacity-50'
 export const workflowViewerCardActiveClasses =
-  'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-1'
+  'ring-2 ring-[var(--tiger-primary)] ring-offset-1'
 export const workflowViewerKindRowClasses = 'flex flex-wrap items-center gap-1'
-export const workflowViewerRollbackLabelClasses = 'mt-1 text-xs text-[var(--tiger-error,#dc2626)]'
+export const workflowViewerRollbackLabelClasses = 'mt-1 text-xs text-[var(--tiger-error)]'
 export const workflowViewerReturnTargetLabelClasses =
-  'mt-1 text-xs text-[var(--tiger-warning,#d97706)]'
-export const workflowViewerActiveTitleClasses = 'text-[var(--tiger-primary,#2563eb)]'
+  'mt-1 text-xs text-[var(--tiger-warning)]'
+export const workflowViewerActiveTitleClasses = 'text-[var(--tiger-primary)]'
 export const workflowViewerLegendClasses =
-  'mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--tiger-text-muted,#6b7280)]'
+  'mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--tiger-text-secondary)]'
 export const workflowViewerLegendItemClasses = 'inline-flex items-center gap-1.5'
 export const workflowViewerLegendSwatchClasses =
-  'inline-block h-2.5 w-4 shrink-0 rounded-sm border bg-[var(--tiger-bg,#fff)]'
-export const workflowViewerLegendCurrentSwatchClasses = 'border-[var(--tiger-primary,#2563eb)]'
+  'inline-block h-2.5 w-4 shrink-0 rounded-sm border bg-[var(--tiger-surface)]'
+export const workflowViewerLegendCurrentSwatchClasses = 'border-[var(--tiger-primary)]'
 export const workflowViewerLegendOffPathSwatchClasses =
-  'border-[var(--tiger-border,#d1d5db)] opacity-50'
-export const workflowViewerLegendRollbackSwatchClasses = 'border-[var(--tiger-error,#dc2626)]'
-export const workflowViewerLegendReturnSwatchClasses = 'border-[var(--tiger-warning,#d97706)]'
+  'border-[var(--tiger-border)] opacity-50'
+export const workflowViewerLegendRollbackSwatchClasses = 'border-[var(--tiger-error)]'
+export const workflowViewerLegendReturnSwatchClasses = 'border-[var(--tiger-warning)]'
 export const workflowStepStatusDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'
 export const workflowStepActorsListClasses = 'mt-1 flex flex-col gap-0.5'
 export const workflowStepActorRowClasses =
-  'flex items-center gap-1.5 text-sm text-[var(--tiger-text-muted,#6b7280)]'
-export const workflowStepActorProgressClasses = 'text-xs text-[var(--tiger-text-muted,#6b7280)]'
-export const workflowStepActorCurrentClasses = 'font-medium text-[var(--tiger-primary,#2563eb)]'
-export const workflowStepActorMetaClasses = 'text-xs text-[var(--tiger-text-muted,#6b7280)]'
+  'flex items-center gap-1.5 text-sm text-[var(--tiger-text-secondary)]'
+export const workflowStepActorProgressClasses = 'text-xs text-[var(--tiger-text-secondary)]'
+export const workflowStepActorCurrentClasses = 'font-medium text-[var(--tiger-primary)]'
+export const workflowStepActorMetaClasses = 'text-xs text-[var(--tiger-text-secondary)]'
 export const workflowTimelineOffPathClasses = 'opacity-50'
 
 export type WorkflowViewerLegendKey = 'currentPath' | 'offPath' | 'rollbackPoint' | 'returnTarget'

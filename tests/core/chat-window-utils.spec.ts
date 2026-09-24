@@ -26,7 +26,7 @@ describe('chat-window-utils', () => {
     expect(canSendChatMessage({ value: 'hi', hasSendHandler: false })).toBe(false)
     expect(canSendChatMessage({ value: 'hi', sending: true })).toBe(false)
     expect(canSendChatMessage({ value: 'hi' })).toBe(true)
-    expect(canSendChatMessage({ value: 'hi', lastSent: 'hi' })).toBe(false)
+    expect(canSendChatMessage({ value: 'hi', sending: false })).toBe(true)
     expect(isChatEnterComposing({ isComposing: true })).toBe(true)
     expect(isChatEnterComposing({ keyCode: 229 })).toBe(true)
     expect(
@@ -40,34 +40,32 @@ describe('chat-window-utils', () => {
     ).toBe(true)
   })
 
-  it('follows the latest only when pinned and compensates prepends otherwise', () => {
+  it('sticks to the last message id and keeps the anchor when not pinned', () => {
+    const messages = [{ id: 'a' }, { id: 'b' }]
     expect(
       planChatScroll({
+        messages,
         stickToBottom: true,
-        autoScrollToBottom: true,
-        prepended: false,
-        previousScrollHeight: 1000,
-        nextScrollHeight: 1300
+        sessionChanged: false,
+        anchorId: 'a'
       })
-    ).toEqual({ scrollTop: 1300 })
+    ).toEqual({ anchorId: 'b', align: 'end', stickToBottom: true })
     expect(
       planChatScroll({
+        messages,
         stickToBottom: false,
-        autoScrollToBottom: true,
-        prepended: true,
-        previousScrollHeight: 1000,
-        nextScrollHeight: 1300
+        sessionChanged: false,
+        anchorId: 'a'
       })
-    ).toEqual({ compensate: 300 })
+    ).toEqual({ anchorId: 'a', align: 'auto', stickToBottom: false })
     expect(
       planChatScroll({
+        messages,
         stickToBottom: false,
-        autoScrollToBottom: true,
-        prepended: false,
-        previousScrollHeight: 1000,
-        nextScrollHeight: 1300
+        sessionChanged: true,
+        anchorId: 'a'
       })
-    ).toEqual({})
+    ).toEqual({ anchorId: 'b', align: 'end', stickToBottom: true })
     expect(didChatPrepend('a', 'old', 2, 3)).toBe(true)
     expect(didChatPrepend('a', 'a', 2, 3)).toBe(false)
   })

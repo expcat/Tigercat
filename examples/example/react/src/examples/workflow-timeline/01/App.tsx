@@ -163,7 +163,7 @@ export default function App() {
         )}
       />
       {lastAction ? (
-        <p className="text-sm text-[var(--tiger-text-muted)]">最近操作：{lastAction}</p>
+        <p className="text-sm text-[var(--tiger-text-secondary)]">最近操作：{lastAction}</p>
       ) : null}
     </div>
   )

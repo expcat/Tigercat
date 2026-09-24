@@ -52,7 +52,10 @@ describe('comment-thread-utils like overlay', () => {
 
 describe('comment-thread-utils tree', () => {
   it('does not fall back to items when nodes is an empty array', () => {
-    expect(resolveCommentNodes([], [{ id: 1, content: 'orphan' }])).toEqual([])
+    expect(resolveCommentNodes([], [{ id: 1, content: 'orphan' }])).toEqual({
+      roots: [],
+      errors: []
+    })
   })
 
   it('builds a tree from items only when nodes is omitted', () => {
@@ -60,8 +63,9 @@ describe('comment-thread-utils tree', () => {
       { id: 1, content: 'root' },
       { id: 2, content: 'child', parentId: 1 }
     ])
-    expect(tree).toHaveLength(1)
-    expect(tree[0]?.children).toHaveLength(1)
+    expect(tree.roots).toHaveLength(1)
+    expect(tree.roots[0]?.children).toHaveLength(1)
+    expect(tree.errors).toEqual([])
   })
 
   it('promotes missing parents and self-references to roots', () => {
@@ -69,16 +73,27 @@ describe('comment-thread-utils tree', () => {
       { id: 1, content: 'orphan', parentId: 99 },
       { id: 2, content: 'loop', parentId: 2 }
     ])
-    expect(tree.map((node) => node.id)).toEqual([1, 2])
+    expect(tree.roots.map((node) => node.id)).toEqual([1, 2])
+    expect(tree.errors).toEqual([])
   })
 
-  it('last duplicate id wins and appears once', () => {
+  it('keeps the first duplicate and reports the second', () => {
     const tree = buildCommentTree([
       { id: 1, content: 'first' },
-      { id: 1, content: 'second' }
+      { id: '1', content: 'second' }
     ])
-    expect(tree).toHaveLength(1)
-    expect(tree[0]?.content).toBe('second')
+    expect(tree.roots).toHaveLength(1)
+    expect(tree.roots[0]?.content).toBe('first')
+    expect(tree.errors).toEqual([{ code: 'duplicate-id', id: '1' }])
+  })
+
+  it('keeps a cycle visible and reports it', () => {
+    const tree = buildCommentTree([
+      { id: 'a', content: 'A', parentId: 'b' },
+      { id: 'b', content: 'B', parentId: 'a' }
+    ])
+    expect(tree.roots.length).toBeGreaterThan(0)
+    expect(tree.errors.some((error) => error.code === 'cycle')).toBe(true)
   })
 
   it('clips children past maxDepth and records clipped ids', () => {

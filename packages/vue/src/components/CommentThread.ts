@@ -1,12 +1,32 @@
-import { defineComponent, computed, h, ref, watch, getCurrentInstance, PropType } from 'vue'
+import {
+  defineComponent,
+  computed,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  getCurrentInstance,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
   canSubmitCommentReply,
+  commentIdKey,
+  formatCommentTreeError,
+  commentNodeAcceptsReply,
   clipCommentTreeDepth,
   formatBadgeCountLabel,
+  COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+  COMPOSITE_LIST_VIEWPORT,
+  compositeListUsesWindow,
+  createInfiniteScrollFlight,
+  createInfiniteScrollObserver,
   formatCommentTime,
+  infiniteScrollSentinelClasses,
+  readDocumentTimeZone,
   getCommentRepliesView,
   getTextClasses,
   nextCommentRevealedCount,
@@ -17,6 +37,14 @@ import {
   resolveCommentLikeState,
   resolveLocaleText,
   writeCommentLikeOverlay,
+  type CommentAction,
+  type CommentLikeOverlay,
+  type CommentNode,
+  type CommentThreadProps as CoreCommentThreadProps,
+  type TigerLocale,
+  type TigerLocaleCommentThread
+} from '@expcat/tigercat-core'
+import {
   commentThreadActionButtonClasses,
   commentThreadPrimaryButtonClasses,
   commentThreadLikeButtonClasses,
@@ -36,20 +64,15 @@ import {
   commentThreadSubmitButtonClasses,
   commentThreadRepliesClasses,
   commentThreadEmptyClasses,
-  commentThreadEmptyIconClasses,
-  type CommentAction,
-  type CommentLikeOverlay,
-  type CommentNode,
-  type CommentThreadProps as CoreCommentThreadProps,
-  type TigerLocale,
-  type TigerLocaleCommentThread
-} from '@expcat/tigercat-core'
+  commentThreadEmptyIconClasses
+} from '../../../core/src/internal/comment-thread-styles'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Button } from './Button'
 import { Textarea } from './Textarea'
 import { Text } from './Text'
 import { useTigerConfig } from './ConfigProvider'
+import { VirtualList } from './VirtualList'
 
 /**
  * Vue CommentThread props. The React-only `onExpandedChange` callback is
@@ -124,6 +147,9 @@ export const CommentThread = defineComponent({
       type: String,
       default: undefined
     },
+    timeZone: { type: String, default: undefined },
+    hasMore: { type: Boolean, default: false },
+    loadError: { type: Boolean, default: false },
     collapseRepliesText: {
       type: String,
       default: undefined
@@ -173,7 +199,7 @@ export const CommentThread = defineComponent({
       default: undefined
     }
   },
-  emits: ['like', 'reply', 'more', 'action', 'update:expandedKeys', 'load-more', 'user-click'],
+  emits: ['like', 'reply', 'more', 'action', 'update:expandedKeys', 'load-more', 'load-root', 'user-click'],
   setup(props, { emit, attrs }) {
     const instance = getCurrentInstance()
     const config = useTigerConfig()
@@ -189,18 +215,66 @@ export const CommentThread = defineComponent({
     const composerValue = ref('')
     const replyInFlight = ref(false)
     const clippedIds = ref(new Set<string | number>())
+    const documentTimeZone = ref<string | null>(props.timeZone ?? null)
+    const flight = createInfiniteScrollFlight()
+    const sentinelRef = ref<HTMLElement | null>(null)
+    const listRef = ref<{ getScrollElement: () => HTMLElement | null } | null>(null)
+    const flatCount = ref(0)
+    onMounted(() => {
+      documentTimeZone.value = props.timeZone || readDocumentTimeZone()
+    })
+    watch(
+      () => props.timeZone,
+      (zone) => {
+        documentTimeZone.value = zone || readDocumentTimeZone()
+      }
+    )
+    watch(
+      () => props.loadError,
+      (error) => {
+        if (error) flight.noteError()
+      }
+    )
+    let stopObserver: (() => void) | null = null
+    function bindSentinel() {
+      stopObserver?.()
+      stopObserver = null
+      const sentinel = sentinelRef.value
+      if (!props.hasMore || !sentinel) return
+      const windowed = compositeListUsesWindow(flatCount.value)
+      const teardown = createInfiniteScrollObserver(sentinel, {
+        root: windowed ? (listRef.value?.getScrollElement() ?? null) : null,
+        onLoadMore: () => {
+          flight.noteSentinel(true)
+          if (!flight.canRequest({ hasMore: props.hasMore, error: props.loadError })) return
+          const returned = emit('load-root') as unknown
+          const tasks = Array.isArray(returned) ? returned : [returned]
+          const pending = tasks.filter(
+            (task) => task && typeof (task as { then?: unknown }).then === 'function'
+          )
+          flight.begin(pending.length > 0 ? Promise.all(pending) : undefined)
+        },
+        onLeave: () => flight.noteSentinel(false)
+      })
+      stopObserver = teardown
+    }
+    onMounted(bindSentinel)
+    watch(() => [props.hasMore, props.loadError, flatCount.value], bindSentinel, { flush: 'post' })
+    onBeforeUnmount(() => stopObserver?.())
 
     const mergedExpandedKeys = computed(() => props.expandedKeys ?? innerExpandedKeys.value)
 
     const expandedSet = computed(() => new Set<string | number>(mergedExpandedKeys.value))
 
+    const treeBuild = computed(() => resolveCommentNodes(props.nodes, props.items))
     const resolvedNodes = computed(() => {
       const clipped = new Set<string | number>()
-      const tree = resolveCommentNodes(props.nodes, props.items)
-      const next = clipCommentTreeDepth(tree, props.maxDepth, clipped)
+      const next = clipCommentTreeDepth(treeBuild.value.roots, props.maxDepth, clipped)
       clippedIds.value = clipped
       return next
     })
+    const treeErrors = computed(() => treeBuild.value.errors)
+    let positionMap = new Map<string, { pos: number; depth: number }>()
 
     watch(
       () => [props.nodes, props.items],
@@ -211,7 +285,7 @@ export const CommentThread = defineComponent({
     )
 
     const hasLoadMoreHandler = computed(() => typeof vnodeProps().onLoadMore === 'function')
-    const hasReplyHandler = computed(() => typeof vnodeProps().onReply === 'function')
+    const hasReplyHandler = () => typeof vnodeProps().onReply === 'function'
     const hasMoreHandler = computed(() => typeof vnodeProps().onMore === 'function')
     const hasUserClickHandler = computed(() => typeof vnodeProps().onUserClick === 'function')
 
@@ -263,23 +337,37 @@ export const CommentThread = defineComponent({
       emit('like', node, next.liked)
     }
 
-    const handleReplySubmit = (node?: CommentNode) => {
+    const handleReplySubmit = async (node?: CommentNode) => {
       const source = node ? replyValue.value : composerValue.value
-      if (!canSubmitCommentReply(source, replyInFlight.value) || !hasReplyHandler.value) return
-      replyInFlight.value = true
-      emit('reply', node, source.trim())
-      if (node) {
-        replyValue.value = ''
-        replyingTo.value = null
-        if (!expandedSet.value.has(node.id)) {
-          updateExpandedKeys([...mergedExpandedKeys.value, node.id])
-        }
-      } else {
-        composerValue.value = ''
+      if (
+        !canSubmitCommentReply({
+          value: source,
+          inFlight: replyInFlight.value,
+          hasReplyHandler: hasReplyHandler()
+        })
+      ) {
+        return
       }
-      queueMicrotask(() => {
+      const text = source.trim()
+      replyInFlight.value = true
+      try {
+        const returned = emit('reply', node, text) as unknown
+        const tasks = Array.isArray(returned) ? returned : [returned]
+        await Promise.all(tasks.map((task) => Promise.resolve(task)))
+        if (node) {
+          replyValue.value = ''
+          replyingTo.value = null
+          if (!expandedSet.value.has(node.id)) {
+            updateExpandedKeys([...mergedExpandedKeys.value, node.id])
+          }
+        } else {
+          composerValue.value = ''
+        }
+      } catch {
+        // Keep the draft so the same reply can be sent again.
+      } finally {
         replyInFlight.value = false
-      })
+      }
     }
 
     const renderNode = (
@@ -297,11 +385,15 @@ export const CommentThread = defineComponent({
         hasLoadMoreHandler: hasLoadMoreHandler.value
       })
       const showReplies = hasChildren && isExpanded && children.length > 0
-      const repliesId = `tiger-comment-replies-${node.id}`
+      const articleId = `tiger-comment-${instance?.uid ?? 0}-article-${commentIdKey(node.id)}`
       const visibleChildren = showReplies ? repliesView.visible : []
+      const firstReply = visibleChildren[0]
+      const controlsId = firstReply
+        ? `tiger-comment-${instance?.uid ?? 0}-article-${commentIdKey(firstReply.id)}`
+        : undefined
       const showLoadMore = showReplies && repliesView.loadMoreKind != null
-      pos.current += 1
-      const posinset = pos.current
+      const placed = positionMap.get(commentIdKey(node.id))
+      const posinset = placed?.pos ?? 1
 
       const actions: Array<ReturnType<typeof h>> = []
 
@@ -354,7 +446,7 @@ export const CommentThread = defineComponent({
         )
       }
 
-      if (props.showReply) {
+      if (props.showReply && commentNodeAcceptsReply(depth, props.maxDepth)) {
         actions.push(
           h(
             Button,
@@ -474,6 +566,7 @@ export const CommentThread = defineComponent({
             depth === 1 && !isLast && props.showDivider && commentThreadDividerClasses
           ),
           key: node.id,
+          id: articleId,
           'aria-posinset': posinset,
           'aria-setsize': pos.total
         },
@@ -552,7 +645,11 @@ export const CommentThread = defineComponent({
                     { default: () => tag.label }
                   )
                 ),
-                formatCommentTime(node.time, mergedLocale.value)
+                formatCommentTime(
+                  node.time,
+                  mergedLocale.value,
+                  documentTimeZone.value ? { timeZone: documentTimeZone.value } : undefined
+                )
                   ? h(
                       Text,
                       {
@@ -561,7 +658,14 @@ export const CommentThread = defineComponent({
                         color: 'muted',
                         class: commentThreadTimeClasses
                       },
-                      { default: () => formatCommentTime(node.time, mergedLocale.value) }
+                      {
+                        default: () =>
+                          formatCommentTime(
+                            node.time,
+                            mergedLocale.value,
+                            documentTimeZone.value ? { timeZone: documentTimeZone.value } : undefined
+                          )
+                      }
                     )
                   : null
               ]),
@@ -590,6 +694,7 @@ export const CommentThread = defineComponent({
                           props.replyPlaceholder
                         ),
                         className: commentThreadReplyTextareaClasses,
+                        'aria-label': labels.value.replyPlaceholder,
                         'onUpdate:modelValue': (value: string) => {
                           replyValue.value = value
                         }
@@ -617,9 +722,12 @@ export const CommentThread = defineComponent({
                             size: 'sm',
                             variant: 'primary',
                             className: commentThreadSubmitButtonClasses,
-                            disabled:
-                              !canSubmitCommentReply(replyValue.value, false) ||
-                              !hasReplyHandler.value,
+                            disabled: !canSubmitCommentReply({
+                              value: replyValue.value,
+                              inFlight: replyInFlight.value,
+                              hasReplyHandler: hasReplyHandler()
+                            }),
+
                             onClick: () => handleReplySubmit(node)
                           },
                           {
@@ -642,7 +750,7 @@ export const CommentThread = defineComponent({
                         commentThreadPrimaryButtonClasses
                       ),
                       'aria-expanded': isExpanded,
-                      'aria-controls': children.length > 0 ? repliesId : undefined,
+                      'aria-controls': controlsId,
                       disabled: clippedIds.value.has(node.id) && children.length === 0,
                       onClick: () => {
                         if (clippedIds.value.has(node.id) && children.length === 0) return
@@ -669,39 +777,25 @@ export const CommentThread = defineComponent({
                     }
                   )
                 : null,
-              showReplies
+              showLoadMore
                 ? h(
-                    'div',
+                    Button,
                     {
-                      id: repliesId,
-                      class: commentThreadRepliesClasses
+                      size: 'sm',
+                      variant: 'ghost',
+                      className: commentThreadPrimaryButtonClasses,
+                      onClick: () => handleLoadMore(node)
                     },
-                    [
-                      ...visibleChildren.map((child, index) =>
-                        renderNode(child, depth + 1, index === visibleChildren.length - 1, pos)
-                      ),
-                      showLoadMore
-                        ? h(
-                            Button,
-                            {
-                              size: 'sm',
-                              variant: 'ghost',
-                              className: commentThreadPrimaryButtonClasses,
-                              onClick: () => handleLoadMore(node)
-                            },
-                            {
-                              default: () =>
-                                repliesView.loadMoreKind === 'remaining'
-                                  ? formatBadgeCountLabel(
-                                      labels.value.remainingRepliesText,
-                                      repliesView.remaining,
-                                      mergedLocale.value?.locale
-                                    )
-                                  : resolveLocaleText(labels.value.loadMoreText, props.loadMoreText)
-                            }
-                          )
-                        : null
-                    ]
+                    {
+                      default: () =>
+                        repliesView.loadMoreKind === 'remaining'
+                          ? formatBadgeCountLabel(
+                              labels.value.remainingRepliesText,
+                              repliesView.remaining,
+                              mergedLocale.value?.locale
+                            )
+                          : resolveLocaleText(labels.value.loadMoreText, props.loadMoreText)
+                    }
                   )
                 : null
             ])
@@ -710,22 +804,43 @@ export const CommentThread = defineComponent({
       )
     }
 
-    const countVisible = (list: CommentNode[]): number =>
-      list.reduce((sum, node) => {
-        if (!expandedSet.value.has(node.id)) return sum + 1
+    const indexTree = (
+      list: CommentNode[],
+      depth: number,
+      into: Map<string, { pos: number; depth: number }>
+    ) => {
+      for (const node of list) {
+        into.set(commentIdKey(node.id), { pos: into.size + 1, depth })
+        indexTree(node.children ?? [], depth + 1, into)
+      }
+    }
+
+    const flattenVisible = (
+      list: CommentNode[],
+      depth: number,
+      into: Array<{ node: CommentNode; depth: number }>
+    ) => {
+      for (const node of list) {
+        into.push({ node, depth })
+        if (!expandedSet.value.has(node.id)) continue
         const view = getCommentRepliesView(node.children, {
           maxReplies: props.maxReplies,
           revealedCount: revealedCounts.value.get(node.id) ?? props.maxReplies,
           hasLoadMoreHandler: hasLoadMoreHandler.value
         })
-        return sum + 1 + countVisible(view.visible)
-      }, 0)
+        flattenVisible(view.visible, depth + 1, into)
+      }
+    }
 
     return () => {
       const ariaLabel =
         (attrs['aria-label'] as string | undefined) ??
         (attrs['aria-labelledby'] ? undefined : labels.value.listAriaLabel)
-      const pos = { current: 0, total: countVisible(resolvedNodes.value) }
+      positionMap = new Map<string, { pos: number; depth: number }>()
+      indexTree(resolvedNodes.value, 1, positionMap)
+      const flat: Array<{ node: CommentNode; depth: number }> = []
+      flattenVisible(resolvedNodes.value, 1, flat)
+      const pos = { current: 0, total: positionMap.size }
 
       const composer = props.showComposer
         ? h('div', { class: commentThreadReplyEditorClasses }, [
@@ -749,8 +864,11 @@ export const CommentThread = defineComponent({
                   size: 'sm',
                   variant: 'primary',
                   className: commentThreadSubmitButtonClasses,
-                  disabled:
-                    !canSubmitCommentReply(composerValue.value, false) || !hasReplyHandler.value,
+                  disabled: !canSubmitCommentReply({
+                    value: composerValue.value,
+                    inFlight: replyInFlight.value,
+                    hasReplyHandler: hasReplyHandler()
+                  }),
                   onClick: () => handleReplySubmit()
                 },
                 {
@@ -762,46 +880,61 @@ export const CommentThread = defineComponent({
           ])
         : null
 
-      const children =
-        resolvedNodes.value.length === 0
-          ? [
+      flatCount.value = flat.length
+      const articles = flat.map(({ node, depth }, index) =>
+        renderNode(node, depth, index === flat.length - 1, pos)
+      )
+      const pageSentinel = props.hasMore
+        ? h('div', {
+            ref: sentinelRef,
+            class: infiniteScrollSentinelClasses,
+            'aria-hidden': 'true'
+          })
+        : null
+      const empty =
+        flat.length === 0
+          ? h('div', { class: commentThreadEmptyClasses }, [
               h(
-                'div',
+                'svg',
                 {
-                  class: commentThreadEmptyClasses
+                  'aria-hidden': 'true',
+                  class: commentThreadEmptyIconClasses,
+                  fill: 'none',
+                  viewBox: '0 0 24 24',
+                  stroke: 'currentColor',
+                  strokeWidth: '1.5'
                 },
                 [
-                  h(
-                    'svg',
-                    {
-                      'aria-hidden': 'true',
-                      class: commentThreadEmptyIconClasses,
-                      fill: 'none',
-                      viewBox: '0 0 24 24',
-                      stroke: 'currentColor',
-                      strokeWidth: '1.5'
-                    },
-                    [
-                      h('path', {
-                        strokeLinecap: 'round',
-                        strokeLinejoin: 'round',
-                        d: 'M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
-                      })
-                    ]
-                  ),
-                  h(
-                    Text,
-                    { tag: 'div', size: 'sm', color: 'muted', class: 'font-medium' },
-                    {
-                      default: () => resolveLocaleText(labels.value.emptyText, props.emptyText)
-                    }
-                  )
+                  h('path', {
+                    strokeLinecap: 'round',
+                    strokeLinejoin: 'round',
+                    d: 'M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
+                  })
                 ]
+              ),
+              h(
+                Text,
+                { tag: 'div', size: 'sm', color: 'muted', class: 'font-medium' },
+                {
+                  default: () => resolveLocaleText(labels.value.emptyText, props.emptyText)
+                }
               )
-            ]
-          : resolvedNodes.value.map((node, index) =>
-              renderNode(node, 1, index === resolvedNodes.value.length - 1, pos)
+            ])
+          : null
+      const errors =
+        treeErrors.value.length > 0
+          ? h(
+              'div',
+              { role: 'alert' },
+              treeErrors.value.map((error) =>
+                h(
+                  'p',
+                  { key: `${error.code}-${error.id}` },
+                  formatCommentTreeError(error, labels.value)
+                )
+              )
             )
+          : null
 
       return h(
         'div',
@@ -809,11 +942,38 @@ export const CommentThread = defineComponent({
           ...attrs,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
-          role: (attrs.role as string | undefined) ?? 'feed',
+          role: 'region',
           'data-tiger-comment-thread': true,
           'aria-label': ariaLabel
         },
-        [composer, ...children]
+        [
+          errors,
+          composer,
+          empty,
+          articles.length > 0
+            ? compositeListUsesWindow(flat.length)
+              ? h(
+                  VirtualList,
+                  {
+                    ref: listRef,
+                    'data-tiger-comment-window': '',
+                    itemCount: flat.length,
+                    estimatedItemHeight: COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+                    height: COMPOSITE_LIST_VIEWPORT,
+                    getItemKey: (index: number) => String(flat[index]?.node.id ?? index),
+                    role: 'presentation'
+                  },
+                  {
+                    default: ({ index }: { index: number }) => articles[index],
+                    footer: () => pageSentinel
+                  }
+                )
+              : h('div', null, [
+                  h('div', { role: 'feed', 'aria-label': ariaLabel }, articles),
+                  pageSentinel
+                ])
+            : null
+        ]
       )
     }
   }

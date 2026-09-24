@@ -6,7 +6,7 @@
  * through `getView()` — never pass filtered `colIndex` into reorder.
  */
 
-import type { TaskBoardCard, TaskBoardColumn } from '../types/composite'
+import type { TaskBoardCard, TaskBoardColumn } from '../types/task-board'
 import { isBrowser } from './env'
 import type { TaskBoardDragState, TouchDragTracker } from './task-board-utils'
 import {
@@ -17,7 +17,8 @@ import {
   getDropIndex,
   getColumnDropIndex,
   createTouchDragTracker,
-  findColumnFromPoint
+  findColumnFromPoint,
+  taskBoardColumnIdOf
 } from './task-board-utils'
 import {
   type TaskBoardView,
@@ -86,6 +87,10 @@ export interface TaskBoardDragController {
   /** Lifecycle */
   init(): void
   dispose(): void
+  /** Id stamped on payloads this board starts. Foreign drags are ignored. */
+  getBoardId(): string
+  /** End the pointer or keyboard session without applying a move. */
+  cancel(): void
 
   /** Update options (called when props change) */
   setOptions(opts: Partial<TaskBoardDragOptions>): void
@@ -163,6 +168,21 @@ export function createTaskBoardDragController(
   let touchRaf = 0
   let disposed = false
   let pending = false
+  const boardId = `tb-${Math.random().toString(36).slice(2)}`
+  let detachPointerGuards: (() => void) | null = null
+  let touchIntent:
+    | {
+        type: 'card'
+        card: TaskBoardCard
+        column: TaskBoardColumn
+        fromIndex: number
+      }
+    | {
+        type: 'column'
+        column: TaskBoardColumn
+        fromIndex: number
+      }
+    | null = null
 
   const emit = () => {
     callbacks.onStateChange({ ...snap })
@@ -247,18 +267,49 @@ export function createTaskBoardDragController(
 
   const ctrl: TaskBoardDragController = {
     getSnapshot: () => snap,
+    getBoardId: () => boardId,
+
+    cancel() {
+      touchIntent = null
+      touchTracker?.cancel()
+      resetDrag()
+      if (snap.kbDrag) resetKb()
+    },
 
     init() {
       disposed = false
       if (isBrowser() && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
         touchTracker = createTouchDragTracker()
       }
+      if (isBrowser()) {
+        const onEscape = (event: KeyboardEvent) => {
+          if (event.key !== 'Escape') return
+          if (!snap.drag && !snap.kbDrag) return
+          event.preventDefault()
+          event.stopPropagation()
+          ctrl.cancel()
+        }
+        const onTouchMove = (event: TouchEvent) => {
+          if (!touchTracker?.getState().engaged) return
+          if (event.cancelable) event.preventDefault()
+        }
+        document.addEventListener('keydown', onEscape, true)
+        const board = callbacks.getBoardEl()
+        board?.addEventListener('touchmove', onTouchMove, { passive: false })
+        detachPointerGuards = () => {
+          document.removeEventListener('keydown', onEscape, true)
+          board?.removeEventListener('touchmove', onTouchMove)
+        }
+      }
     },
 
     dispose() {
       disposed = true
       cancelAnimationFrame(touchRaf)
+      detachPointerGuards?.()
+      detachPointerGuards = null
       touchTracker = null
+      touchIntent = null
       pending = false
     },
 
@@ -274,7 +325,7 @@ export function createTaskBoardDragController(
       if (!opts.draggable) return
       const viewCol = findTaskBoardViewColumn(callbacks.getView(), column.id)
       const idx = (viewCol?.source.cards ?? column.cards).findIndex((item) => item.id === card.id)
-      setDragData(dt, createCardDragData(card.id, column.id, idx))
+      setDragData(dt, createCardDragData(card.id, column.id, idx, boardId))
       snap = {
         ...snap,
         drag: { type: 'card', id: card.id, fromColumnId: column.id, fromIndex: idx }
@@ -290,7 +341,7 @@ export function createTaskBoardDragController(
 
     cardDrop(dt, column) {
       if (pending) return
-      const data = parseDragData(dt)
+      const data = parseDragData(dt, boardId)
       if (!data || data.type !== 'card') return
       commitCardMove(data.cardId, data.columnId, column.id, visibleDropIndex(column))
     },
@@ -302,7 +353,7 @@ export function createTaskBoardDragController(
     columnDragStart(dt, column) {
       if (!opts.columnDraggable) return
       const fromIndex = callbacks.getSourceColumns().findIndex((item) => item.id === column.id)
-      setDragData(dt, createColumnDragData(column.id, fromIndex))
+      setDragData(dt, createColumnDragData(column.id, fromIndex, boardId))
       snap = { ...snap, drag: { type: 'column', id: column.id, fromIndex } }
       emit()
     },
@@ -313,7 +364,7 @@ export function createTaskBoardDragController(
 
     columnDrop(dt, clientX) {
       if (pending) return
-      const data = parseDragData(dt)
+      const data = parseDragData(dt, boardId)
       if (!data || data.type !== 'column') return
 
       const boardEl = callbacks.getBoardEl()
@@ -351,36 +402,59 @@ export function createTaskBoardDragController(
       const viewCol = findTaskBoardViewColumn(callbacks.getView(), column.id)
       const idx = (viewCol?.source.cards ?? column.cards).findIndex((item) => item.id === card.id)
       touchTracker.onTouchStart(nativeEvent, sourceEl)
-      snap = {
-        ...snap,
-        drag: { type: 'card', id: card.id, fromColumnId: column.id, fromIndex: idx }
-      }
-      emit()
+      touchIntent = { type: 'card', card, column, fromIndex: idx }
     },
 
     cardTouchMove(nativeEvent) {
-      if (!touchTracker || !snap.drag || snap.drag.type !== 'card') return
+      if (!touchTracker || touchIntent?.type !== 'card') return
       touchTracker.onTouchMove(nativeEvent)
+      const preview = touchTracker.getState()
+      if (!preview.engaged) return
+      if (!snap.drag) {
+        snap = {
+          ...snap,
+          drag: {
+            type: 'card',
+            id: touchIntent.card.id,
+            fromColumnId: touchIntent.column.id,
+            fromIndex: touchIntent.fromIndex
+          }
+        }
+        emit()
+      }
 
       cancelAnimationFrame(touchRaf)
       touchRaf = requestAnimationFrame(() => {
-        if (disposed || !touchTracker) return
+        if (disposed || !touchTracker || touchIntent?.type !== 'card') return
         const st = touchTracker.getState()
+        if (!st.engaged) return
         const boardEl = callbacks.getBoardEl()
         const colEl = findColumnFromPoint(st.currentX, st.currentY, boardEl)
-        if (colEl) {
-          const colId = colEl.getAttribute('data-tiger-taskboard-column-id')
+        const colId = taskBoardColumnIdOf(colEl)
+        if (colEl && colId != null) {
           const dropIndex = getDropIndex(st.currentY, visibleCardRects(colEl))
-          setDropTarget(colId ?? null, dropIndex)
+          setDropTarget(colId, dropIndex)
         }
       })
     },
 
     cardTouchEnd() {
-      if (!touchTracker || !snap.drag) return
-      touchTracker.onTouchEnd()
-
-      if (snap.drag.type === 'card' && snap.dropTargetColumnId != null) {
+      if (!touchTracker || touchIntent?.type !== 'card') return
+      const ended = touchTracker.onTouchEnd()
+      const intent = touchIntent
+      touchIntent = null
+      if (!ended.engaged) {
+        resetDrag()
+        return
+      }
+      const drag = snap.drag ?? {
+        type: 'card' as const,
+        id: intent.card.id,
+        fromColumnId: intent.column.id,
+        fromIndex: intent.fromIndex
+      }
+      if (!snap.drag) snap = { ...snap, drag }
+      if (drag.type === 'card' && snap.dropTargetColumnId != null) {
         const column: TaskBoardColumn = {
           id: snap.dropTargetColumnId,
           title: '',
@@ -389,8 +463,8 @@ export function createTaskBoardDragController(
             []
         }
         commitCardMove(
-          snap.drag.id,
-          snap.drag.fromColumnId!,
+          drag.id,
+          drag.fromColumnId!,
           snap.dropTargetColumnId,
           visibleDropIndex(column)
         )
@@ -407,19 +481,36 @@ export function createTaskBoardDragController(
       if (!opts.columnDraggable || !touchTracker) return
       const fromIndex = callbacks.getSourceColumns().findIndex((item) => item.id === column.id)
       touchTracker.onTouchStart(nativeEvent, sourceEl)
-      snap = { ...snap, drag: { type: 'column', id: column.id, fromIndex } }
-      emit()
+      touchIntent = { type: 'column', column, fromIndex }
     },
 
     columnTouchMove(nativeEvent) {
-      if (!touchTracker || !snap.drag || snap.drag.type !== 'column') return
+      if (!touchTracker || touchIntent?.type !== 'column') return
       touchTracker.onTouchMove(nativeEvent)
+      if (!touchTracker.getState().engaged || snap.drag) return
+      snap = {
+        ...snap,
+        drag: { type: 'column', id: touchIntent.column.id, fromIndex: touchIntent.fromIndex }
+      }
+      emit()
     },
 
     columnTouchEnd() {
-      if (!touchTracker || !snap.drag || snap.drag.type !== 'column') return
+      if (!touchTracker || touchIntent?.type !== 'column') return
       const st = touchTracker.onTouchEnd()
-      const fromId = snap.drag.id
+      const intent = touchIntent
+      touchIntent = null
+      if (!st.engaged) {
+        resetDrag()
+        return
+      }
+      if (!snap.drag) {
+        snap = {
+          ...snap,
+          drag: { type: 'column', id: intent.column.id, fromIndex: intent.fromIndex }
+        }
+      }
+      const fromId = intent.column.id
 
       const boardEl = callbacks.getBoardEl()
       const colEls = boardEl?.querySelectorAll('[data-tiger-taskboard-column]')
@@ -546,6 +637,7 @@ export function createTaskBoardDragController(
 
       const arrow = arrowDirection(key)
       if (arrow && snap.kbDrag?.type === 'column' && (arrow === 'start' || arrow === 'end')) {
+        if (pending) return true
         const mapped = moveTaskBoardKeyboardColumn(
           callbacks.getSourceColumns(),
           callbacks.getView(),

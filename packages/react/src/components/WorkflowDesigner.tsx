@@ -1,26 +1,47 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
+import {
+  classNames,
+  getWorkflowDesignerLabels,
+  getWorkflowTimelineLabels,
+  mergeTigerLocale,
+  workflowSignModeLabel,
+  WORKFLOW_FIELD_PERMISSIONS,
+  type ApproverSource,
+  type FieldPermission,
+  type SchemaFormSchema,
+  type TigerLocaleWorkflowDesigner,
+  type TigerLocaleWorkflowTimeline,
+  type WorkflowAutoDecide,
+  type WorkflowDesignerPath,
+  type WorkflowDesignerProps as CoreWorkflowDesignerProps,
+  type WorkflowDesignerStepPatch,
+  type WorkflowEmptyApprover,
+  type WorkflowNodeAdvanced,
+  type WorkflowSignMode,
+  type WorkflowStepKind,
+
+  type WorkflowTimelineStep
+} from '@expcat/tigercat-core'
 import {
   actorsFromApproverSource,
   applyWorkflowDesignerFieldPermissionColumn,
   buildWorkflowDesignerNodes,
-  classNames,
   cloneWorkflowDesignerStepWithNewKeys,
   createWorkflowDesignerPaletteStep,
   createWorkflowDesignerStep,
   findWorkflowDesignerNode,
-  getWorkflowDesignerLabels,
   getWorkflowStepAtPath,
-  getWorkflowTimelineLabels,
   insertWorkflowDesignerPaletteStep,
   insertWorkflowStepAfterPath,
   insertWorkflowStepAtPath,
-  mergeTigerLocale,
   moveWorkflowStepAtPath,
   patchWorkflowDesignerButton,
   patchWorkflowStepAtPath,
   removeWorkflowStepAtPath,
   resolveWorkflowDesignerView,
+  nextWorkflowDesignerInspectorTab,
   validateWorkflowDesigner,
+  workflowDesignerBlockingIssues,
   workflowDesignerActionButtonClasses,
   workflowDesignerActionLabel,
   workflowDesignerActorRowClasses,
@@ -73,31 +94,13 @@ import {
   workflowDesignerTableCellClasses,
   workflowDesignerTableClasses,
   workflowDesignerTableHeadClasses,
-  workflowDesignerTimeoutActionOptions,
   workflowDesignerToolbarClasses,
   workflowDesignerTreeClasses,
-  workflowSignModeLabel,
   WORKFLOW_DESIGNER_INSPECTOR_TABS,
   WORKFLOW_DESIGNER_PALETTE_KINDS,
-  WORKFLOW_FIELD_PERMISSIONS,
-  type ApproverSource,
-  type FieldPermission,
-  type SchemaFormSchema,
-  type TigerLocaleWorkflowDesigner,
-  type TigerLocaleWorkflowTimeline,
-  type WorkflowAutoDecide,
   type WorkflowDesignerInspectorTab,
-  type WorkflowDesignerNode,
-  type WorkflowDesignerPath,
-  type WorkflowDesignerProps as CoreWorkflowDesignerProps,
-  type WorkflowDesignerStepPatch,
-  type WorkflowEmptyApprover,
-  type WorkflowNodeAdvanced,
-  type WorkflowSignMode,
-  type WorkflowStepKind,
-  type WorkflowTimeoutAction,
-  type WorkflowTimelineStep
-} from '@expcat/tigercat-core'
+  type WorkflowDesignerNode
+} from '@expcat/tigercat-core/workflow-designer'
 import { useTigerConfig } from './ConfigProvider'
 import { useControlledState } from '../hooks/useControlledState'
 import { Tag } from './Tag'
@@ -110,7 +113,10 @@ export interface WorkflowDesignerProps
       'onChange' | 'onSelect' | 'defaultValue' | 'children'
     > {
   schema?: SchemaFormSchema
-  onChange?: (steps: WorkflowTimelineStep[]) => void
+  onChange?: (
+    steps: WorkflowTimelineStep[],
+    detail: { issues: ReadonlyArray<{ code: string; path: readonly string[]; blocking: boolean }> }
+  ) => void
   onSelect?: (path: WorkflowDesignerPath, step: WorkflowTimelineStep | undefined) => void
 }
 
@@ -189,7 +195,10 @@ function DesignerNode({
         aria-label={groupName}
         aria-selected={selected ? true : undefined}
         onClick={() => onSelect(node)}>
-        <div className={workflowDesignerSummaryClasses}>
+        <button
+          type="button"
+          className={classNames(workflowDesignerSummaryClasses, 'w-full bg-transparent text-start')}
+          onClick={() => onSelect(node)}>
           <div className={workflowDesignerSummaryRowClasses}>
             <span
               className={workflowDesignerKindDotClasses}
@@ -204,7 +213,7 @@ function DesignerNode({
             ) : null}
           </div>
           {summary ? <div className={workflowDesignerSummaryActorsClasses}>{summary}</div> : null}
-        </div>
+        </button>
         <div className={workflowDesignerToolbarClasses}>
           <ActionButton
             label={labels.moveUp}
@@ -327,7 +336,6 @@ function DesignerEditPanel({
   const sourceOptions = workflowDesignerApproverSourceOptions(labels)
   const emptyOptions = workflowDesignerEmptyApproverOptions(timelineLabels)
   const autoDecideOptions = workflowDesignerAutoDecideOptions(timelineLabels)
-  const timeoutOptions = workflowDesignerTimeoutActionOptions({ ...labels, ...timelineLabels })
   const buttonPolicy = workflowDesignerEditableButtonPolicy(node.step)
   const advanced = workflowDesignerAdvancedFromStep(node.step)
   const permissionRows = workflowDesignerFieldPermissionRows(schema, node.step)
@@ -346,8 +354,7 @@ function DesignerEditPanel({
     onPatch(node.path, {
       advanced: {
         ...advanced,
-        ...patch,
-        timeout: patch.timeout ? { ...advanced.timeout, ...patch.timeout } : advanced.timeout
+        ...patch
       }
     })
   }
@@ -752,42 +759,6 @@ function DesignerEditPanel({
                 ))}
               </select>
             </label>
-            <label className={workflowDesignerFieldClasses}>
-              <span className={workflowDesignerLabelClasses}>{labels.timeoutActionLabel}</span>
-              <select
-                className={workflowDesignerControlClasses}
-                value={advanced.timeout?.action ?? 'remind'}
-                disabled={locked}
-                aria-label={labels.timeoutActionLabel}
-                onChange={(event) =>
-                  patchAdvanced({
-                    timeout: {
-                      ...advanced.timeout,
-                      action: event.target.value as WorkflowTimeoutAction
-                    }
-                  })
-                }>
-                {timeoutOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className={workflowDesignerFieldClasses}>
-              <span className={workflowDesignerLabelClasses}>{labels.timeoutDurationLabel}</span>
-              <input
-                className={workflowDesignerControlClasses}
-                value={advanced.timeout?.durationLabel ?? ''}
-                disabled={locked}
-                aria-label={labels.timeoutDurationLabel}
-                onChange={(event) =>
-                  patchAdvanced({
-                    timeout: { ...advanced.timeout, durationLabel: event.target.value }
-                  })
-                }
-              />
-            </label>
           </>
         ) : null}
         {node.kind === 'condition' ? (
@@ -814,12 +785,62 @@ function DesignerEditPanel({
                 </div>
                 <input
                   className={workflowDesignerControlClasses}
-                  value={branch.expression ?? ''}
-                  placeholder={labels.branchExpressionPlaceholder}
+                  value={branch.condition?.field ?? ''}
+                  placeholder={labels.branchExpression}
                   disabled={locked}
                   aria-label={`${labels.branchExpression} ${index + 1}`}
                   onChange={(event) =>
-                    onPatch([...node.path, branch.key], { expression: event.target.value })
+                    onPatch([...node.path, branch.key], {
+                      condition: {
+                        field: event.target.value,
+                        operator: branch.condition?.operator ?? 'eq',
+                        value: branch.condition?.value ?? ''
+                      }
+                    })
+                  }
+                />
+                <select
+                  className={workflowDesignerControlClasses}
+                  value={branch.condition?.operator ?? 'eq'}
+                  disabled={locked}
+                  aria-label={`Operator ${index + 1}`}
+                  onChange={(event) =>
+                    onPatch([...node.path, branch.key], {
+                      condition: {
+                        field: branch.condition?.field ?? '',
+                        operator: event.target.value as NonNullable<
+                          typeof branch.condition
+                        >['operator'],
+                        value: branch.condition?.value ?? ''
+                      }
+                    })
+                  }>
+                  {(['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'contains', 'empty', 'notEmpty'] as const).map(
+                    (operator) => (
+                      <option key={operator} value={operator}>
+                        {operator}
+                      </option>
+                    )
+                  )}
+                </select>
+                <input
+                  className={workflowDesignerControlClasses}
+                  value={branch.condition?.value == null ? '' : String(branch.condition.value)}
+                  placeholder={labels.branchExpressionPlaceholder}
+                  disabled={
+                    locked ||
+                    branch.condition?.operator === 'empty' ||
+                    branch.condition?.operator === 'notEmpty'
+                  }
+                  aria-label={`${labels.branchExpressionPlaceholder} ${index + 1}`}
+                  onChange={(event) =>
+                    onPatch([...node.path, branch.key], {
+                      condition: {
+                        field: branch.condition?.field ?? '',
+                        operator: branch.condition?.operator ?? 'eq',
+                        value: event.target.value
+                      }
+                    })
                   }
                 />
               </div>
@@ -833,7 +854,7 @@ function DesignerEditPanel({
                   createWorkflowDesignerStep([node.step, ...(node.step.children ?? [])], {
                     kind: 'approve',
                     title: `${labels.branchLabel} ${(node.step.children?.length ?? 0) + 1}`,
-                    expression: ''
+                    condition: { field: '', operator: 'eq', value: '' }
                   })
                 )
               }
@@ -890,21 +911,47 @@ function DesignerEditPanel({
         {WORKFLOW_DESIGNER_INSPECTOR_TABS.map((tab) => {
           const enabled = tabEnabled(tab)
           const selected = inspectorTab === tab
+          const tabId = `tiger-workflow-designer-tab-${workflowDesignerPathKey(node.path)}-${tab}`
           return (
             <button
               key={tab}
               type="button"
               role="tab"
+              id={tabId}
               className={workflowDesignerTabClassName(selected)}
               aria-selected={selected}
+              aria-controls={`${tabId}-panel`}
+              tabIndex={selected ? 0 : -1}
               disabled={!enabled}
-              onClick={() => enabled && onTabChange(tab)}>
+              data-inspector-tab={tab}
+              onClick={() => enabled && onTabChange(tab)}
+              onKeyDown={(event) => {
+                if (
+                  event.key !== 'ArrowRight' &&
+                  event.key !== 'ArrowLeft' &&
+                  event.key !== 'ArrowDown' &&
+                  event.key !== 'ArrowUp'
+                ) {
+                  return
+                }
+                const direction = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1
+                const next = nextWorkflowDesignerInspectorTab(inspectorTab, direction, tabEnabled)
+                event.preventDefault()
+                onTabChange(next)
+                const list = event.currentTarget.parentElement
+                queueMicrotask(() => {
+                  list?.querySelector<HTMLElement>(`[data-inspector-tab="${next}"]`)?.focus()
+                })
+              }}>
               {workflowDesignerInspectorTabLabel(tab, labels)}
             </button>
           )
         })}
       </div>
-      <div role="tabpanel">
+      <div
+        role="tabpanel"
+        id={`tiger-workflow-designer-tab-${workflowDesignerPathKey(node.path)}-${inspectorTab}-panel`}
+        aria-labelledby={`tiger-workflow-designer-tab-${workflowDesignerPathKey(node.path)}-${inspectorTab}`}>
         {inspectorTab === 'approvers'
           ? renderApprovers()
           : inspectorTab === 'buttons'
@@ -930,15 +977,31 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
   className,
   style,
   onChange,
+  onPublish,
   onSelect,
   ...rest
 }) => {
   const config = useTigerConfig()
-  const [steps, setSteps] = useControlledState<WorkflowTimelineStep[]>({
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
+  const onPublishRef = useRef(onPublish)
+  onPublishRef.current = onPublish
+  const [steps, setWorkflowSteps] = useControlledState<
+    WorkflowTimelineStep[],
+    [{ issues: ReturnType<typeof validateWorkflowDesigner> }]
+  >({
     value,
     defaultValue: defaultValue ?? [],
-    onChange
+    onChange: (next, detail) => {
+      onChangeRef.current?.(next, detail ?? { issues: validateWorkflowDesigner(next) })
+    }
   })
+  const commit = useCallback(
+    (next: WorkflowTimelineStep[]) => {
+      setWorkflowSteps(next, { issues: validateWorkflowDesigner(next) })
+    },
+    [setWorkflowSteps]
+  )
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [inspectorTab, setInspectorTab] = useState<WorkflowDesignerInspectorTab>('approvers')
   const [insertMenuPath, setInsertMenuPath] = useState<string | null>(null)
@@ -979,15 +1042,15 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
   )
   const handlePatch = useCallback(
     (nodePath: WorkflowDesignerPath, patch: WorkflowDesignerStepPatch) => {
-      setSteps(patchWorkflowStepAtPath(steps, nodePath, patch))
+      commit(patchWorkflowStepAtPath(steps, nodePath, patch))
     },
-    [setSteps, steps]
+    [commit, steps]
   )
   const handleMove = useCallback(
     (nodePath: WorkflowDesignerPath, delta: number) => {
-      setSteps(moveWorkflowStepAtPath(steps, nodePath, delta))
+      commit(moveWorkflowStepAtPath(steps, nodePath, delta))
     },
-    [setSteps, steps]
+    [commit, steps]
   )
   const handleAddChild = useCallback(
     (nodePath: WorkflowDesignerPath) => {
@@ -998,12 +1061,12 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
           ? createWorkflowDesignerStep(steps, {
               kind: 'approve',
               title: designerLabels.branchLabel,
-              expression: ''
+              condition: { field: '', operator: 'eq', value: '' }
             })
           : createWorkflowDesignerStep(steps)
-      setSteps(insertWorkflowStepAtPath(steps, nodePath, created))
+      commit(insertWorkflowStepAtPath(steps, nodePath, created))
     },
-    [designerLabels.branchLabel, nodes, setSteps, steps]
+    [designerLabels.branchLabel, nodes, commit, steps]
   )
   const handleCopy = useCallback(
     (nodePath: WorkflowDesignerPath) => {
@@ -1011,12 +1074,12 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
       if (!source) return
       const copy = cloneWorkflowDesignerStepWithNewKeys(source, steps)
       const next = insertWorkflowStepAfterPath(steps, nodePath, copy)
-      setSteps(next)
+      commit(next)
       const nextPath = [...nodePath.slice(0, -1), copy.key]
       setSelectedKey(workflowDesignerPathKey(nextPath))
       onSelect?.(nextPath, copy)
     },
-    [nodes, onSelect, setSteps, steps]
+    [nodes, onSelect, commit, steps]
   )
   const handleInsertKind = useCallback(
     (nodePath: WorkflowDesignerPath, kind: WorkflowStepKind) => {
@@ -1024,27 +1087,27 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
         ...timelineLabels,
         ...designerLabels
       })
-      setSteps(result.steps)
+      commit(result.steps)
       setInsertMenuPath(null)
       setSelectedKey(workflowDesignerPathKey(result.path))
       setInspectorTab(workflowDesignerDefaultInspectorTab(kind))
       onSelect?.(result.path, getWorkflowStepAtPath(result.steps, result.path))
     },
-    [designerLabels, onSelect, setSteps, steps, timelineLabels]
+    [designerLabels, onSelect, commit, steps, timelineLabels]
   )
   const handleRemove = useCallback(
     (nodePath: WorkflowDesignerPath) => {
       if (selectedKey === workflowDesignerPathKey(nodePath)) setSelectedKey(null)
-      setSteps(removeWorkflowStepAtPath(steps, nodePath))
+      commit(removeWorkflowStepAtPath(steps, nodePath))
     },
-    [selectedKey, setSteps, steps]
+    [selectedKey, commit, steps]
   )
   const handleAddStep = useCallback(() => {
     if (!view.valid) return
     const created = createWorkflowDesignerStep(steps)
     if (view.parentPath.length === 0 && steps.length === 0) created.kind = 'start'
-    setSteps(insertWorkflowStepAtPath(steps, view.parentPath, created))
-  }, [setSteps, steps, view.parentPath, view.valid])
+    commit(insertWorkflowStepAtPath(steps, view.parentPath, created))
+  }, [commit, steps, view.parentPath, view.valid])
   const handlePaletteKind = useCallback(
     (kind: WorkflowStepKind) => {
       if (!view.valid) return
@@ -1053,13 +1116,13 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
         ...designerLabels
       })
       const next = insertWorkflowStepAtPath(steps, view.parentPath, created)
-      setSteps(next)
+      commit(next)
       const nextPath = [...view.parentPath, created.key]
       setSelectedKey(workflowDesignerPathKey(nextPath))
       setInspectorTab(workflowDesignerDefaultInspectorTab(kind))
       onSelect?.(nextPath, created)
     },
-    [designerLabels, onSelect, setSteps, steps, timelineLabels, view.parentPath, view.valid]
+    [designerLabels, onSelect, commit, steps, timelineLabels, view.parentPath, view.valid]
   )
 
   const emptyCopy = view.valid ? designerLabels.emptyHint : designerLabels.subpathEmpty
@@ -1096,6 +1159,14 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
             className={workflowDesignerPaletteClasses}
             role="toolbar"
             aria-label={designerLabels.paletteAriaLabel}>
+            <ActionButton
+              label={designerLabels.publishText}
+              disabled={locked || workflowDesignerBlockingIssues(issues).length > 0}
+              onClick={() => {
+                if (locked || workflowDesignerBlockingIssues(issues).length > 0) return
+                onPublishRef.current?.(steps)
+              }}
+            />
             {WORKFLOW_DESIGNER_PALETTE_KINDS.map((kind) => (
               <ActionButton
                 key={kind}
@@ -1151,7 +1222,7 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
             onTabChange={setInspectorTab}
             onPatch={handlePatch}
             onInsertChild={(parentPath, step) => {
-              setSteps(insertWorkflowStepAtPath(steps, parentPath, step))
+              commit(insertWorkflowStepAtPath(steps, parentPath, step))
             }}
             onRemovePath={handleRemove}
           />

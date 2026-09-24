@@ -2,7 +2,11 @@
  * NotificationCenter component utilities
  */
 
-import type { NotificationGroup, NotificationItem } from '../types/composite'
+import type {
+  NotificationGroup,
+  NotificationItem,
+  NotificationReadFilter
+} from '../types/notification-center'
 
 export const EMPTY_NOTIFICATION_ITEMS: NotificationItem[] = []
 export const EMPTY_NOTIFICATION_GROUPS: NotificationGroup[] = []
@@ -46,6 +50,43 @@ function normalizeNotificationGroups(groups: NotificationGroup[]): NotificationG
  * Only an explicit `groups` prop or a `groupBy` function opens Tabs.
  * Passing `items` alone is a flat List.
  */
+/** Read-state map key. `1` and `"1"` are one entry. */
+export function notificationItemKey(id: string | number): string {
+  return String(id)
+}
+
+const NOTIFICATION_READ_FILTER_ORDER = ['all', 'unread', 'read'] as const
+
+/**
+ * Move the read-state radio. Returns null when the key is not a radio key.
+ * Home / End jump to the ends. Arrows move one step and stop at the ends.
+ */
+export function moveNotificationReadFilter(
+  current: NotificationReadFilter,
+  key: string
+): NotificationReadFilter | null {
+  const index = NOTIFICATION_READ_FILTER_ORDER.indexOf(current)
+  if (index < 0) return null
+  if (key === 'Home') return NOTIFICATION_READ_FILTER_ORDER[0]
+  if (key === 'End') return NOTIFICATION_READ_FILTER_ORDER[NOTIFICATION_READ_FILTER_ORDER.length - 1]
+  if (key === 'ArrowRight' || key === 'ArrowDown') {
+    return NOTIFICATION_READ_FILTER_ORDER[
+      Math.min(NOTIFICATION_READ_FILTER_ORDER.length - 1, index + 1)
+    ]
+  }
+  if (key === 'ArrowLeft' || key === 'ArrowUp') {
+    return NOTIFICATION_READ_FILTER_ORDER[Math.max(0, index - 1)]
+  }
+  return null
+}
+
+/** Items this "mark all read" pass will change. Already-read rows stay out. */
+export function notificationItemsPendingRead(
+  items: readonly NotificationItem[]
+): NotificationItem[] {
+  return items.filter((item) => !item.read)
+}
+
 export function shouldUseNotificationTabs(
   groups?: NotificationGroup[] | null,
   groupBy?: (item: NotificationItem) => string

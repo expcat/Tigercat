@@ -9,27 +9,40 @@
  *
  * Not a second Timeline and not a form designer. Host gives a bounded height
  * (`h-full` / `flex-1 min-h-0`); do not hand-calc magic rem. Action stays pinned
- * while form/tabs scroll.
+ * while form/tabs scroll. `submit()` merges through `mergeWorkflowFormValues`.
  */
 
 import { computed, defineComponent, h, PropType } from 'vue'
 import {
-  WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL,
   classNames,
   coerceClassValue,
+  getWorkflowDetailShellLabels,
   getWorkflowDetailShellRootClasses,
   mergeStyleValues,
+  mergeTigerLocale,
+  submitWorkflowDetailForm,
   workflowDetailShellActionClasses,
   workflowDetailShellBodyClasses,
   workflowDetailShellFormClasses,
   workflowDetailShellHeaderClasses,
   workflowDetailShellTabsClasses,
-  type WorkflowDetailShellProps as CoreWorkflowDetailShellProps
+  type FieldPermission,
+  type FormValues,
+  type SchemaFormSchema,
+  type TigerLocale,
+  type WorkflowDetailShellProps as CoreWorkflowDetailShellProps,
+  type WorkflowFieldPermissionMode,
+  type WorkflowStepKind
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueWorkflowDetailShellProps extends CoreWorkflowDetailShellProps {}
 
 export type WorkflowDetailShellProps = VueWorkflowDetailShellProps
+
+export interface WorkflowDetailShellHandle {
+  submit: (submitted?: FormValues) => FormValues
+}
 
 function hasSlotContent(nodes: unknown): boolean {
   return Array.isArray(nodes) && nodes.length > 0
@@ -46,17 +59,49 @@ export const WorkflowDetailShell = defineComponent({
     showActions: { type: Boolean, default: true },
     /**
      * Accessible name for the detail region.
-     * @default 'Workflow detail'
+     * Omitted: locale `workflowDetailShell.ariaLabel`.
      */
     ariaLabel: { type: String, default: undefined },
     className: { type: String, default: undefined },
-    style: { type: Object as PropType<Record<string, unknown>>, default: undefined }
+    style: { type: Object as PropType<Record<string, unknown>>, default: undefined },
+    originalValues: { type: Object as PropType<FormValues>, default: undefined },
+    values: { type: Object as PropType<FormValues>, default: undefined },
+    schema: { type: Object as PropType<SchemaFormSchema>, default: undefined },
+    fieldPermissions: {
+      type: Object as PropType<Record<string, FieldPermission>>,
+      default: undefined
+    },
+    permissionMode: {
+      type: String as PropType<WorkflowFieldPermissionMode | string>,
+      default: 'readonly'
+    },
+    nodeKind: { type: String as PropType<WorkflowStepKind>, default: undefined },
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
-  setup(props, { slots, attrs }) {
+  emits: ['submit'],
+  setup(props, { slots, attrs, emit, expose }) {
+    const config = useTigerConfig()
+    const labels = computed(() =>
+      getWorkflowDetailShellLabels(mergeTigerLocale(config.value.locale, props.locale))
+    )
     const rootClasses = computed(() =>
       classNames(getWorkflowDetailShellRootClasses(props.className), coerceClassValue(attrs.class))
     )
     const rootStyle = computed(() => mergeStyleValues(attrs.style, props.style))
+
+    const submit = (submitted?: FormValues): FormValues => {
+      const merged = submitWorkflowDetailForm({
+        original: props.originalValues,
+        submitted: submitted ?? props.values,
+        schema: props.schema,
+        permissions: props.fieldPermissions,
+        mode: props.permissionMode,
+        kind: props.nodeKind
+      })
+      emit('submit', merged)
+      return merged
+    }
+    expose({ submit })
 
     return () => {
       const header = slots.header?.()
@@ -83,7 +128,7 @@ export const WorkflowDetailShell = defineComponent({
           class: rootClasses.value,
           style: rootStyle.value,
           role: 'region',
-          'aria-label': props.ariaLabel || WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL,
+          'aria-label': props.ariaLabel || labels.value.ariaLabel,
           'data-tiger-workflow-detail-shell': ''
         },
         [

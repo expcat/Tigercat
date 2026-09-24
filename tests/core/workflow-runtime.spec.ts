@@ -118,7 +118,8 @@ describe('reduceWorkflowAction — no tasks (2.4.2 node-level)', () => {
       steps: [
         { key: 'start', kind: 'start', title: 'Start', status: 'approved', actor: ada },
         { key: 'mgr', kind: 'approve', title: 'Manager', status: 'active', actor: lin },
-        { key: 'fin', kind: 'approve', title: 'Finance', status: 'pending', actor: chen }
+        { key: 'fin', kind: 'approve', title: 'Finance', status: 'pending', actor: chen },
+        { key: 'end', kind: 'end', status: 'pending' }
       ]
     })
 
@@ -138,6 +139,8 @@ describe('reduceWorkflowAction — no tasks (2.4.2 node-level)', () => {
     const done = act(mid, 'approve', { actorId: 'chen', nodeKey: 'fin' })
     expect(done.status).toBe('approved')
     expect(nodeOf(done, 'fin')?.status).toBe('approved')
+    expect(nodeOf(done, 'end')?.status).toBe('approved')
+    expect(done.cursor).toEqual({ nodeKey: 'end' })
   })
 
   it('reject terminates the instance', () => {
@@ -183,7 +186,13 @@ describe('reduceWorkflowAction — no tasks (2.4.2 node-level)', () => {
       assignees: [expert],
       tempNodeKey: 'add-before'
     })
-    expect(added.steps.map((step) => step.key)).toEqual(['start', 'add-before', 'mgr', 'fin'])
+    expect(added.steps.map((step) => step.key)).toEqual([
+      'start',
+      'add-before',
+      'mgr',
+      'fin',
+      'end'
+    ])
     expect(nodeOf(added, 'add-before')?.temporary).toBe(true)
     expect(nodeOf(added, 'add-before')?.status).toBe('active')
     expect(nodeOf(added, 'mgr')?.status).toBe('pending')
@@ -202,7 +211,7 @@ describe('reduceWorkflowAction — no tasks (2.4.2 node-level)', () => {
       assignees: [expert],
       tempNodeKey: 'add-after'
     })
-    expect(added.steps.map((step) => step.key)).toEqual(['start', 'mgr', 'add-after', 'fin'])
+    expect(added.steps.map((step) => step.key)).toEqual(['start', 'mgr', 'add-after', 'fin', 'end'])
     expect(nodeOf(added, 'mgr')?.status).toBe('approved')
     expect(nodeOf(added, 'add-after')?.status).toBe('active')
     const done = act(added, 'approve', { actorId: 'expert', nodeKey: 'add-after' })
@@ -271,7 +280,8 @@ describe('reduceWorkflowAction — orsign closes siblings', () => {
           status: 'active',
           signMode: 'orsign',
           actors: [lin, chen]
-        }
+        },
+        { key: 'end', kind: 'end', status: 'pending' }
       ],
       tasks: [
         task({ id: 't-lin', nodeKey: 'or', assignee: lin }),
@@ -296,7 +306,8 @@ describe('reduceWorkflowAction — sequential', () => {
           status: 'active',
           signMode: 'sequential',
           actors: [lin, chen]
-        }
+        },
+        { key: 'end', kind: 'end', status: 'pending' }
       ],
       tasks: [
         task({ id: 't-lin', nodeKey: 'seq', assignee: lin, status: 'active' }),
@@ -518,7 +529,8 @@ describe('reduceWorkflowAction — return path', () => {
       actorId: 'wu',
       taskId: 't-wu',
       targetNodeKey: 'a',
-      resume: 'direct'
+      resume: 'direct',
+      comment: 'back'
     })
     expect(next.cursor).toEqual({ nodeKey: 'a' })
     expect(next.resumeToNodeKey).toBe('c')
@@ -603,8 +615,6 @@ describe('reduceWorkflowAction — purity and no-ops', () => {
       steps: [{ key: 'mgr', kind: 'approve', status: 'rejected' }]
     })
     expect(act(src, 'approve', { actorId: 'lin' })).toBe(src)
-    const commented = act(src, 'comment', { actorId: 'ada', comment: 'closed' })
-    expect(commented.history?.at(-1)?.action).toBe('comment')
-    expect(commented.status).toBe('rejected')
+    expect(act(src, 'comment', { actorId: 'ada', comment: 'closed' })).toBe(src)
   })
 })

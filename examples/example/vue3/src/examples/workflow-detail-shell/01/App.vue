@@ -13,7 +13,10 @@ import { SchemaForm } from '@expcat/tigercat-vue/SchemaForm'
 import { TabPane } from '@expcat/tigercat-vue/TabPane'
 import { Tabs } from '@expcat/tigercat-vue/Tabs'
 import { Tag } from '@expcat/tigercat-vue/Tag'
-import { WorkflowDetailShell } from '@expcat/tigercat-vue/WorkflowDetailShell'
+import {
+  WorkflowDetailShell,
+  type WorkflowDetailShellHandle
+} from '@expcat/tigercat-vue/WorkflowDetailShell'
 import { WorkflowActionBar, WorkflowTimeline } from '@expcat/tigercat-vue/WorkflowTimeline'
 import { WorkflowViewer } from '@expcat/tigercat-vue/WorkflowViewer'
 
@@ -35,7 +38,9 @@ const schema = computed(() =>
   applyWorkflowFieldPermissions(starterSchema, fieldPermissions, 'approve')
 )
 
-const model = reactive({ reason: '年假回家', days: 3, amount: 1200 })
+const original = { reason: '年假回家', days: 3, amount: 1200 }
+const model = reactive({ ...original })
+const shell = ref<WorkflowDetailShellHandle | null>(null)
 
 const steps: WorkflowTimelineStep[] = [
   {
@@ -75,19 +80,32 @@ const actions: WorkflowActionBarItem[] = [
 const lastAction = ref('')
 
 function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) {
+  const merged = shell.value?.submit()
   const comment = payload?.comment?.trim()
-  lastAction.value = comment ? `${item.label} · ${comment}` : item.label
+  const amount = merged?.amount
+  lastAction.value = [item.label, comment, amount != null ? `金额 ${String(amount)}` : '']
+    .filter(Boolean)
+    .join(' · ')
 }
 </script>
 
 <template>
   <div class="flex h-[32rem] min-h-0 flex-col">
-    <WorkflowDetailShell class="h-full min-h-0" aria-label="请假审批详情">
+    <WorkflowDetailShell
+      ref="shell"
+      class="h-full min-h-0"
+      aria-label="请假审批详情"
+      :original-values="original"
+      :values="model"
+      :schema="starterSchema"
+      :field-permissions="fieldPermissions"
+      permission-mode="approve"
+      node-kind="approve">
       <template #header>
         <div class="flex flex-wrap items-center gap-2">
           <strong>请假申请</strong>
           <Tag variant="primary" size="sm">审批中</Tag>
-          <span class="text-sm text-[var(--tiger-text-muted,#6b7280)]">金额字段对本节点隐藏</span>
+          <span class="text-sm text-[var(--tiger-text-secondary)]">金额字段对本节点隐藏</span>
         </div>
       </template>
       <template #form>
@@ -105,7 +123,7 @@ function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) 
       </template>
       <template #action>
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <p v-if="lastAction" class="m-0 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+          <p v-if="lastAction" class="m-0 text-sm text-[var(--tiger-text-secondary)]">
             最近操作：{{ lastAction }}
           </p>
           <WorkflowActionBar :items="actions" confirm @action="onAction" />

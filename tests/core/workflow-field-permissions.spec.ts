@@ -6,22 +6,20 @@ import { describe, expect, it } from 'vitest'
 import {
   applyWorkflowFieldPermissions,
   applyWorkflowFieldPermissionsFromStep,
-  collectSchemaFormRules,
   defaultWorkflowFieldPermission,
-  flattenSchemaFormFields,
   isWorkflowFieldPermissionMode,
   listWorkflowEditableFieldNames,
   mergeWorkflowFormValues,
-  resolveSchemaFormLayout,
   resolveWorkflowFieldPermission,
   resolveWorkflowFieldPermissionMode,
   type FieldPermission,
-  type SchemaFormSchema,
   type WorkflowTimelineStep
 } from '@expcat/tigercat-core'
 import {
-  applyWorkflowFieldPermissions as applyFromSubpath,
-  mergeWorkflowFormValues as mergeFromSubpath
+  collectSchemaFormRules,
+  flattenSchemaFormFields,
+  resolveSchemaFormLayout,
+  type SchemaFormSchema
 } from '@expcat/tigercat-core/schema-form'
 
 const schema: SchemaFormSchema = {
@@ -59,7 +57,6 @@ describe('applyWorkflowFieldPermissions', () => {
       'amount',
       'budget.code'
     ])
-    expect(applyFromSubpath(schema, approvePermissions, 'initiate')).toEqual(derived)
   })
 
   it('approve defaults unmapped visible fields to readonly', () => {
@@ -68,7 +65,7 @@ describe('applyWorkflowFieldPermissions', () => {
     expect(fields.map((field) => field.name)).toEqual(['reason', 'budget.code'])
     expect(fields.every((field) => field.disabled)).toBe(true)
     expect(collectSchemaFormRules(derived)?.amount).toBeUndefined()
-    expect(collectSchemaFormRules(derived)?.reason).toEqual({ required: true })
+    expect(collectSchemaFormRules(derived)?.reason).toBeUndefined()
   })
 
   it('readonly mode forces editable permissions down to readonly and keeps hidden hidden', () => {
@@ -154,9 +151,6 @@ describe('mergeWorkflowFormValues', () => {
       'approve'
     )
     expect(merged).toEqual({ reason: 'Travel', amount: 1200, budget: { code: 'B-2' } })
-    expect(mergeFromSubpath(original, submitted, schema, approvePermissions, 'approve')).toEqual(
-      merged
-    )
     expect(listWorkflowEditableFieldNames(schema, approvePermissions, 'approve')).toEqual([
       'budget.code'
     ])

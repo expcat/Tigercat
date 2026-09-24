@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   createTaskBoardDragController,
   createDefaultDragSnapshot,
+  bindTaskBoardColumnId,
   resolveTaskBoardView,
   type TaskBoardDragSnapshot,
   type TaskBoardDragCallbacks,
@@ -165,7 +166,13 @@ describe('createTaskBoardDragController', () => {
 
       // Simulate drop on 'doing' column
       const dropDT = makeDT(
-        JSON.stringify({ type: 'card', cardId: 'c1', columnId: 'todo', index: 0 })
+        JSON.stringify({
+          type: 'card',
+          cardId: 'c1',
+          columnId: 'todo',
+          index: 0,
+          boardId: ctrl.getBoardId()
+        })
       )
       ctrl.cardDrop(dropDT, cols[1])
 
@@ -269,7 +276,17 @@ describe('createTaskBoardDragController', () => {
       )
       ctrl = createTaskBoardDragController(cbs)
 
-      ctrl.columnDrop(makeDT(JSON.stringify({ type: 'column', columnId: 'todo', index: 0 })), 175)
+      ctrl.columnDrop(
+        makeDT(
+          JSON.stringify({
+            type: 'column',
+            columnId: 'todo',
+            index: 0,
+            boardId: ctrl.getBoardId()
+          })
+        ),
+        175
+      )
 
       expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(0, 1)
     })
@@ -287,7 +304,17 @@ describe('createTaskBoardDragController', () => {
       )
       ctrl = createTaskBoardDragController(cbs)
 
-      ctrl.columnDrop(makeDT(JSON.stringify({ type: 'column', columnId: 'doing', index: 1 })), 175)
+      ctrl.columnDrop(
+        makeDT(
+          JSON.stringify({
+            type: 'column',
+            columnId: 'doing',
+            index: 1,
+            boardId: ctrl.getBoardId()
+          })
+        ),
+        175
+      )
 
       expect(cbs.applyColumnMoveFn).toHaveBeenCalledWith(1, 2)
     })
@@ -399,6 +426,7 @@ describe('createTaskBoardDragController', () => {
     it('moves a touched card to the detected column', () => {
       const frames = installFrameScheduler()
       const { board, doing } = makeBoardWithColumns()
+      bindTaskBoardColumnId(doing, 'doing')
       const elementFromPoint = vi.spyOn(document, 'elementFromPoint').mockReturnValue(doing)
       Object.defineProperty(navigator, 'maxTouchPoints', { value: 1, configurable: true })
       cbs = createMockCallbacks({ getBoardEl: () => board })

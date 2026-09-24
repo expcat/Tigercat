@@ -1,12 +1,21 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   EMPTY_ACTIVITY_ITEMS,
+  COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+  COMPOSITE_LIST_VIEWPORT,
+  compositeListUsesWindow,
+  createInfiniteScrollFlight,
+  createInfiniteScrollObserver,
+  flattenCompositeGroupRows,
+  infiniteScrollSentinelClasses,
   buildActivityGroups,
   formatActivityTime,
+  readDocumentTimeZone,
   getActivityFeedLabels,
   mergeTigerLocale,
   resolveLocaleText,
+  resolveActivityCopy,
   toActivityTimelineItems,
   activityItemClasses,
   activityItemLayoutClasses,
@@ -15,6 +24,13 @@ import {
   activityItemTitleGroupClasses,
   activityItemDescriptionClasses,
   activityItemActionsClasses,
+  type ActivityFeedProps as CoreActivityFeedProps,
+  type ActivityGroup,
+  type ActivityItem,
+  type ActivityAction,
+  type ActivityTimelineItem
+} from '@expcat/tigercat-core'
+import {
   activityFeedActionClasses,
   activityFeedItemSurfaceClasses,
   activityFeedAvatarClasses,
@@ -28,14 +44,10 @@ import {
   activityFeedGroupTitleClasses,
   activityFeedDotBaseClasses,
   activityFeedDotPulseBaseClasses,
-  getActivityFeedDotClasses,
-  type ActivityFeedProps as CoreActivityFeedProps,
-  type ActivityGroup,
-  type ActivityItem,
-  type ActivityAction,
-  type ActivityTimelineItem
-} from '@expcat/tigercat-core'
+  getActivityFeedDotClasses
+} from '../../../core/src/internal/activity-feed-styles'
 import { Timeline } from './Timeline'
+import { VirtualList, type VirtualListHandle } from './VirtualList'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Card } from './Card'
@@ -104,7 +116,11 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   labels: labelsOverride,
   showAvatar = true,
   showTime = true,
+  timeZone,
   showGroupTitle = true,
+  hasMore = false,
+  loadError = false,
+  onLoadMore,
   renderItem,
   renderGroupHeader,
   renderLoading,
@@ -129,6 +145,71 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     [items, groups, groupBy, groupOrder, labels.otherGroupTitle]
   )
 
+  const [documentTimeZone, setDocumentTimeZone] = useState<string | null>(timeZone ?? null)
+  useEffect(() => {
+    setDocumentTimeZone(timeZone || readDocumentTimeZone())
+  }, [timeZone])
+  const seenIds = useRef<Set<string> | null>(null)
+  const [announcement, setAnnouncement] = useState('')
+  useEffect(() => {
+    const flat = resolvedGroups.flatMap((group) => group.items ?? [])
+    const ids = flat.map((item) => String(item.id ?? ''))
+    if (seenIds.current === null) {
+      seenIds.current = new Set(ids)
+      return
+    }
+    const fresh = flat.filter(
+      (item) => item.id != null && !seenIds.current!.has(String(item.id))
+    )
+    seenIds.current = new Set(ids)
+    const newest = fresh[fresh.length - 1]
+    if (!newest) return
+    const copy = resolveActivityCopy(newest)
+    const title = copy.title || copy.body || ''
+    setAnnouncement(labels.newItemText.split('{title}').join(title))
+  }, [labels.newItemText, resolvedGroups])
+
+  const windowRows = useMemo(
+    () => flattenCompositeGroupRows(resolvedGroups, showGroupTitle),
+    [resolvedGroups, showGroupTitle]
+  )
+  const windowed = compositeListUsesWindow(windowRows.length)
+  const flightRef = useRef(createInfiniteScrollFlight())
+  const wasLoadingRef = useRef(loading)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<VirtualListHandle | null>(null)
+  const onLoadMoreRef = useRef(onLoadMore)
+  onLoadMoreRef.current = onLoadMore
+  useEffect(() => {
+    flightRef.current.noteLoading(loading, wasLoadingRef.current)
+    wasLoadingRef.current = loading
+  }, [loading])
+  useEffect(() => {
+    if (loadError) flightRef.current.noteError()
+  }, [loadError])
+  useEffect(() => {
+    if (!hasMore || !onLoadMore) return undefined
+    const sentinel = sentinelRef.current
+    if (!sentinel) return undefined
+    const root = windowed ? (listRef.current?.getScrollElement() ?? null) : null
+    const request = () => {
+      const start = onLoadMoreRef.current
+      if (!start) return
+      if (!flightRef.current.canRequest({ hasMore, error: loadError, loading })) return
+      flightRef.current.begin(start())
+    }
+    return (
+      createInfiniteScrollObserver(sentinel, {
+        root,
+        onLoadMore: () => {
+          flightRef.current.noteSentinel(true)
+          request()
+        },
+        onLeave: () => flightRef.current.noteSentinel(false)
+      }) ?? undefined
+    )
+  }, [hasMore, loadError, loading, onLoadMore, windowRows.length, windowed])
+
   const wrapperClasses = classNames(
     'tiger-activity-feed',
     'flex',
@@ -145,18 +226,16 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   ): React.ReactNode => {
     if (renderItem) return renderItem(item, index, group)
 
-    const titleText =
-      item.title ??
-      (typeof item.content === 'string' || typeof item.content === 'number'
-        ? String(item.content)
-        : '')
-
-    const descriptionText =
-      item.description ??
-      (item.title && (typeof item.content === 'string' || typeof item.content === 'number')
-        ? String(item.content)
-        : undefined)
-    const timeText = showTime ? formatActivityTime(item.time, mergedLocale) : ''
+    const copy = resolveActivityCopy(item)
+    const titleText = copy.title ?? ''
+    const descriptionText = copy.body
+    const timeText = showTime
+      ? formatActivityTime(
+          item.time,
+          mergedLocale,
+          documentTimeZone ? { timeZone: documentTimeZone } : undefined
+        )
+      : ''
 
     const actionNodes = item.actions?.map((action, actionIndex) =>
       renderAction(item, action, actionIndex)
@@ -225,11 +304,14 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     return (
       <div
         className={wrapperClasses}
-        role="feed"
+        {...props}
+        role={props.role ?? 'region'}
         aria-label={feedLabel}
         aria-busy
-        {...props}
         data-tiger-activity-feed>
+        <div className="sr-only" aria-live="polite">
+          {announcement}
+        </div>
         <Card
           variant="bordered"
           size="sm"
@@ -248,10 +330,13 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     return (
       <div
         className={wrapperClasses}
-        role="feed"
-        aria-label={feedLabel}
         {...props}
+        role={props.role ?? 'region'}
+        aria-label={feedLabel}
         data-tiger-activity-feed>
+        <div className="sr-only" aria-live="polite">
+          {announcement}
+        </div>
         <Card
           variant="bordered"
           size="sm"
@@ -284,12 +369,49 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   return (
     <div
       className={wrapperClasses}
-      role="feed"
+      {...props}
+      role={props.role ?? 'region'}
       aria-label={feedLabel}
       aria-busy={loading || undefined}
-      {...props}
       data-tiger-activity-feed>
-      {resolvedGroups.map((group, groupIndex) => {
+      <div className="sr-only" aria-live="polite">
+        {announcement}
+      </div>
+      {loading ? <p>{resolvedLoadingText}</p> : null}
+      {windowed ? (
+        <VirtualList
+          ref={listRef}
+          data-tiger-activity-window=""
+          itemCount={windowRows.length}
+          estimatedItemHeight={COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT}
+          height={COMPOSITE_LIST_VIEWPORT}
+          getItemKey={(index) => windowRows[index]?.key ?? index}
+          renderItem={({ index }) => {
+            const row = windowRows[index]
+            const group = resolvedGroups[row?.groupIndex]
+            if (!row || !group) return null
+            if (row.kind === 'header') {
+              return (
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={activityFeedGroupMarkerClasses} />
+                  <Text tag="span" size="sm" weight="bold" className={activityFeedGroupTitleClasses}>
+                    {group.title}
+                  </Text>
+                </div>
+              )
+            }
+            const item = group.items?.[row.itemIndex]
+            return item ? renderDefaultItem(item, row.itemIndex, group) : null
+          }}
+          role="presentation"
+          footer={
+            hasMore ? (
+              <div ref={sentinelRef} className={infiniteScrollSentinelClasses} aria-hidden="true" />
+            ) : null
+          }
+        />
+      ) : (
+        resolvedGroups.map((group, groupIndex) => {
         const headerNode = renderGroupHeader?.(group)
         const groupTitle = group.title
         const timelineItems = toActivityTimelineItems(group.items)
@@ -335,7 +457,24 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             />
           </div>
         )
-      })}
+      })
+      )}
+      {windowed || !hasMore ? null : (
+        <div ref={sentinelRef} className={infiniteScrollSentinelClasses} aria-hidden="true" />
+      )}
+      {loadError ? (
+        <div role="alert">
+          <button
+            type="button"
+            onClick={() => {
+              flightRef.current.reset()
+              const start = onLoadMoreRef.current
+              if (start) flightRef.current.begin(start())
+            }}>
+            Retry
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }

@@ -102,12 +102,19 @@ describe('moveCard', () => {
     expect(result!.columns[2].cards[0].id).toBe('c2')
   })
 
-  it('reorders a card within the same column', () => {
+  it('reorders a card within the same column at the indicator index', () => {
     const cols = makeCols()
     const result = moveCard(cols, 'c1', 'todo', 'todo', 2)
     expect(result).not.toBeNull()
-    expect(result!.columns[0].cards.map((c) => c.id)).toEqual(['c2', 'c3', 'c1'])
+    expect(result!.columns[0].cards.map((c) => c.id)).toEqual(['c2', 'c1', 'c3'])
     expect(result!.event.fromIndex).toBe(0)
+    expect(result!.event.toIndex).toBe(1)
+  })
+
+  it('appends when the insertion index is the source length', () => {
+    const cols = makeCols()
+    const result = moveCard(cols, 'c1', 'todo', 'todo', 3)
+    expect(result!.columns[0].cards.map((c) => c.id)).toEqual(['c2', 'c3', 'c1'])
     expect(result!.event.toIndex).toBe(2)
   })
 
@@ -200,7 +207,7 @@ describe('moveCard', () => {
     it('allows reorder within same column even at WIP limit', () => {
       const cols = makeWipCols()
       // 'doing' is at limit 2/2, but reorder within same column should work
-      const result = moveCard(cols, 'c3', 'doing', 'doing', 1, { enforceWipLimit: true })
+      const result = moveCard(cols, 'c3', 'doing', 'doing', 2, { enforceWipLimit: true })
       expect(result).not.toBeNull()
     })
 
@@ -469,7 +476,7 @@ describe('mapVisibleCardIndexToSource', () => {
 
 describe('drag data serialisation', () => {
   it('round-trips card drag data', () => {
-    const json = createCardDragData('c1', 'todo', 2)
+    const json = createCardDragData('c1', 'todo', 2, 'board-a')
     const map = new Map<string, string>()
     const dt = {
       setData(mime: string, val: string) {
@@ -482,12 +489,19 @@ describe('drag data serialisation', () => {
     } as unknown as DataTransfer
 
     setDragData(dt, json)
-    const parsed = parseDragData(dt)
-    expect(parsed).toEqual({ type: 'card', cardId: 'c1', columnId: 'todo', index: 2 })
+    const parsed = parseDragData(dt, 'board-a')
+    expect(parsed).toEqual({
+      type: 'card',
+      cardId: 'c1',
+      columnId: 'todo',
+      index: 2,
+      boardId: 'board-a'
+    })
+    expect(parseDragData(dt, 'other-board')).toBeNull()
   })
 
   it('round-trips column drag data', () => {
-    const json = createColumnDragData('doing', 1)
+    const json = createColumnDragData('doing', 1, 'board-a')
     const map = new Map<string, string>()
     const dt = {
       setData(mime: string, val: string) {
@@ -500,8 +514,8 @@ describe('drag data serialisation', () => {
     } as unknown as DataTransfer
 
     setDragData(dt, json)
-    const parsed = parseDragData(dt)
-    expect(parsed).toEqual({ type: 'column', columnId: 'doing', index: 1 })
+    const parsed = parseDragData(dt, 'board-a')
+    expect(parsed).toEqual({ type: 'column', columnId: 'doing', index: 1, boardId: 'board-a' })
   })
 
   it('returns null for invalid data', () => {
@@ -511,7 +525,7 @@ describe('drag data serialisation', () => {
       },
       effectAllowed: ''
     } as unknown as DataTransfer
-    expect(parseDragData(dt)).toBeNull()
+    expect(parseDragData(dt, 'board-a')).toBeNull()
   })
 
   it('returns null for empty data', () => {

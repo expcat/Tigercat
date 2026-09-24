@@ -69,6 +69,8 @@ export interface NotificationGroup {
  * Notification center props interface
  */
 export interface NotificationCenterProps {
+  /** IANA timezone. Without it, the first render omits clocks. */
+  timeZone?: string
   /**
    * Notification items (flat list)
    */

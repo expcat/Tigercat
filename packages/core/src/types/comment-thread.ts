@@ -133,6 +133,8 @@ export interface CommentNode {
  * Comment thread props interface
  */
 export interface CommentThreadProps {
+  /** IANA timezone. Without it, the first render omits clocks. */
+  timeZone?: string
   /**
    * Comment nodes (tree)
    */
@@ -272,4 +274,12 @@ export interface CommentThreadProps {
    * Load more callback
    */
   onLoadMore?: (node: CommentNode) => void
+  /**
+   * Another page of root comments exists. The sentinel stays outside the feed
+   * and uses the single in-flight infinite-scroll request.
+   */
+  hasMore?: boolean
+  /** The last root page request failed. */
+  loadError?: boolean
+  onLoadRoot?: () => void | Promise<unknown>
 }

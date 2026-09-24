@@ -1,15 +1,30 @@
-import { defineComponent, computed, ref, watch, getCurrentInstance, PropType, h } from 'vue'
+import { defineComponent, computed, ref, watch, onMounted, getCurrentInstance, PropType, h } from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
   buildNotificationGroups,
+  COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+  COMPOSITE_LIST_VIEWPORT,
+  compositeListUsesWindow,
   formatActivityTime,
+  readDocumentTimeZone,
+  moveNotificationReadFilter,
+  notificationItemKey,
+  notificationItemsPendingRead,
   formatBadgeCountLabel,
   shouldUseNotificationTabs,
   getNotificationCenterLabels,
   mergeTigerLocale,
   resolveLocaleText,
+  type NotificationCenterProps as CoreNotificationCenterProps,
+  type NotificationGroup,
+  type NotificationItem,
+  type NotificationReadFilter,
+  type TigerLocale,
+  type TigerLocaleNotificationCenter
+} from '@expcat/tigercat-core'
+import {
   notificationCenterItemClasses,
   notificationCenterUnreadItemClasses,
   notificationCenterReadItemClasses,
@@ -33,17 +48,12 @@ import {
   notificationCenterFilterGroupClasses,
   notificationCenterFilterButtonClasses,
   notificationCenterFilterActiveClasses,
-  notificationCenterFilterIdleClasses,
-  type NotificationCenterProps as CoreNotificationCenterProps,
-  type NotificationGroup,
-  type NotificationItem,
-  type NotificationReadFilter,
-  type TigerLocale,
-  type TigerLocaleNotificationCenter
-} from '@expcat/tigercat-core'
+  notificationCenterFilterIdleClasses
+} from '../../../core/src/internal/notification-center-styles'
 import { Card } from './Card'
 import { Tabs, TabPane } from './Tabs'
 import { List } from './List'
+import { VirtualList } from './VirtualList'
 import { Text } from './Text'
 import { Button } from './Button'
 import { Loading } from './Loading'
@@ -151,6 +161,10 @@ export const NotificationCenter = defineComponent({
       type: Boolean,
       default: false
     },
+    timeZone: {
+      type: String,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -174,6 +188,16 @@ export const NotificationCenter = defineComponent({
     const vnodeProps = () => (instance?.vnode.props ?? {}) as Record<string, unknown>
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const documentTimeZone = ref<string | null>(props.timeZone ?? null)
+    onMounted(() => {
+      documentTimeZone.value = props.timeZone || readDocumentTimeZone()
+    })
+    watch(
+      () => props.timeZone,
+      (zone) => {
+        documentTimeZone.value = zone || readDocumentTimeZone()
+      }
+    )
     const labels = computed(() => getNotificationCenterLabels(mergedLocale.value, props.labels))
 
     const resolvedGroups = computed(() =>
@@ -220,12 +244,13 @@ export const NotificationCenter = defineComponent({
     )
 
     // --- Internal read-state management ---
-    const readStateOverrides = ref(new Map<string | number, boolean>())
+    const readStateOverrides = ref(new Map<string, boolean>())
+    const politeText = ref('')
 
     const applyReadOverrides = (items: NotificationItem[]): NotificationItem[] => {
       if (!props.manageReadState || readStateOverrides.value.size === 0) return items
       return items.map((item) => {
-        const override = readStateOverrides.value.get(item.id)
+        const override = readStateOverrides.value.get(notificationItemKey(item.id))
         return override !== undefined ? { ...item, read: override } : item
       })
     }
@@ -239,7 +264,7 @@ export const NotificationCenter = defineComponent({
           .concat(props.items ?? [])
         const next = new Map(readStateOverrides.value)
         for (const [id, read] of readStateOverrides.value) {
-          const item = source.find((entry) => entry.id === id)
+          const item = source.find((entry) => notificationItemKey(entry.id) === id)
           if (!item || Boolean(item.read) === read) next.delete(id)
         }
         readStateOverrides.value = next
@@ -274,6 +299,21 @@ export const NotificationCenter = defineComponent({
     const allManagedItems = computed(() => {
       const grouped = effectiveGroups.value.flatMap((group) => group.items)
       return grouped.length > 0 ? grouped : effectiveItems.value
+    })
+    const seenNotificationIds = ref<Set<string> | null>(null)
+    watch(allManagedItems, (items) => {
+      const ids = items.map((item) => notificationItemKey(item.id))
+      if (seenNotificationIds.value === null) {
+        seenNotificationIds.value = new Set(ids)
+        return
+      }
+      const fresh = items.filter(
+        (item) => !seenNotificationIds.value!.has(notificationItemKey(item.id))
+      )
+      seenNotificationIds.value = new Set(ids)
+      const newest = fresh[fresh.length - 1]
+      if (!newest) return
+      politeText.value = labels.value.newItemText.split('{title}').join(newest.title ?? '')
     })
 
     const hasUnread = computed(() => allManagedItems.value.some((item) => !item.read))
@@ -327,10 +367,18 @@ export const NotificationCenter = defineComponent({
       const items = allManagedItems.value
       if (props.manageReadState) {
         const next = new Map(readStateOverrides.value)
-        items.forEach((item) => next.set(item.id, true))
+        const pending = notificationItemsPendingRead(items)
+        pending.forEach((item) => next.set(notificationItemKey(item.id), true))
         readStateOverrides.value = next
+        politeText.value = labels.value.markedReadText
+          .split('{count}')
+          .join(String(pending.length))
+        emit('mark-all-read', undefined, pending)
+        return
       }
-      emit('mark-all-read', undefined, items)
+      const pending = notificationItemsPendingRead(items)
+      politeText.value = labels.value.markedReadText.split('{count}').join(String(pending.length))
+      emit('mark-all-read', undefined, pending)
     }
 
     const handleItemClick = (item: NotificationItem, index: number) => {
@@ -340,7 +388,10 @@ export const NotificationCenter = defineComponent({
     const handleItemReadChange = (item: NotificationItem, nextRead: boolean) => {
       if (props.manageReadState) {
         const next = new Map(readStateOverrides.value)
-        next.set(item.id, nextRead)
+        next.set(notificationItemKey(item.id), nextRead)
+        if (nextRead) {
+          politeText.value = labels.value.markedReadText.split('{count}').join('1')
+        }
         readStateOverrides.value = next
       }
       emit('item-read-change', item, nextRead)
@@ -357,7 +408,8 @@ export const NotificationCenter = defineComponent({
         'div',
         {
           class: notificationCenterFilterGroupClasses,
-          role: 'radiogroup'
+          role: 'radiogroup',
+          'aria-label': labels.value.filterAriaLabel
         },
         options.map((option) =>
           h(
@@ -367,13 +419,26 @@ export const NotificationCenter = defineComponent({
               type: 'button',
               role: 'radio',
               'aria-checked': currentReadFilter.value === option.key,
+              tabindex: currentReadFilter.value === option.key ? 0 : -1,
               class: classNames(
                 notificationCenterFilterButtonClasses,
                 currentReadFilter.value === option.key
                   ? notificationCenterFilterActiveClasses
                   : notificationCenterFilterIdleClasses
               ),
-              onClick: () => handleReadFilterChange(option.key)
+              onClick: () => handleReadFilterChange(option.key),
+              onKeydown: (event: KeyboardEvent) => {
+                const next = moveNotificationReadFilter(currentReadFilter.value, event.key)
+                if (!next || next === currentReadFilter.value) return
+                event.preventDefault()
+                handleReadFilterChange(next)
+                const group = (event.currentTarget as HTMLElement | null)?.parentElement
+                queueMicrotask(() => {
+                  const target = group?.querySelector<HTMLElement>(`[data-read-filter="${next}"]`)
+                  target?.focus()
+                })
+              },
+              'data-read-filter': option.key
             },
             option.label
           )
@@ -383,7 +448,11 @@ export const NotificationCenter = defineComponent({
 
     const renderListItem = (item: NotificationItem, _index: number) => {
       const isRead = Boolean(item.read)
-      const timeText = formatActivityTime(item.time, mergedLocale.value)
+      const timeText = formatActivityTime(
+        item.time,
+        mergedLocale.value,
+        documentTimeZone.value ? { timeZone: documentTimeZone.value } : undefined
+      )
 
       return h(
         'div',
@@ -394,7 +463,14 @@ export const NotificationCenter = defineComponent({
           )
         },
         [
-          h('div', { class: 'flex-1 min-w-0' }, [
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'flex-1 min-w-0 text-start',
+              onClick: () => handleItemClick(item, _index)
+            },
+            [
             h('div', { class: 'flex items-baseline justify-between gap-2' }, [
               h('div', { class: 'flex items-center gap-1.5' }, [
                 h(
@@ -514,15 +590,36 @@ export const NotificationCenter = defineComponent({
           dataSource: items,
           rowKey: 'id',
           split: true,
-          hoverable: typeof vnodeProps().onItemClick === 'function',
-          emptyText: resolveLocaleText(labels.value.emptyText, props.emptyText),
-          onItemClick: typeof vnodeProps().onItemClick === 'function' ? handleItemClick : undefined
+          hoverable: false,
+          emptyText: resolveLocaleText(labels.value.emptyText, props.emptyText)
         },
         {
           renderItem: ({ item, index }: { item: NotificationItem; index: number }) =>
             renderListItem(item, index)
         }
       )
+    }
+
+    const renderNotificationScroller = (items: NotificationItem[]) => {
+      if (compositeListUsesWindow(items.length)) {
+        return h('div', { class: '-mx-4 -mb-4' }, [
+          h(
+            VirtualList,
+            {
+              'data-tiger-notification-window': '',
+              itemCount: items.length,
+              estimatedItemHeight: COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+              height: COMPOSITE_LIST_VIEWPORT,
+              getItemKey: (index: number) => notificationItemKey(items[index]?.id ?? index),
+              role: 'list'
+            },
+            {
+              default: ({ index }: { index: number }) => renderListItem(items[index], index)
+            }
+          )
+        ])
+      }
+      return h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [renderList(items)])
     }
 
     const renderTabs = () =>
@@ -547,11 +644,9 @@ export const NotificationCenter = defineComponent({
                 },
                 {
                   default: () =>
-                    h(
-                      'div',
-                      { class: 'max-h-[380px] overflow-y-auto' },
-                      renderList(tab.filteredItems)
-                    )
+                    tab.key === currentGroupKey.value
+                      ? renderNotificationScroller(tab.filteredItems)
+                      : null
                 }
               )
             )
@@ -612,10 +707,8 @@ export const NotificationCenter = defineComponent({
       const listBody = shouldUseNotificationTabs(props.groups, props.groupBy)
         ? resolvedGroups.value.length > 0
           ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])
-          : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [renderList([])])
-        : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [
-            renderList(filteredFlatItems.value)
-          ])
+          : renderNotificationScroller([])
+        : renderNotificationScroller(filteredFlatItems.value)
       const hasList = shouldUseNotificationTabs(props.groups, props.groupBy)
         ? resolvedGroups.value.length > 0 || filteredFlatItems.value.length > 0
         : filteredFlatItems.value.length > 0
@@ -627,14 +720,21 @@ export const NotificationCenter = defineComponent({
                 class: notificationCenterLoadingClasses
               })
             ])
-          : h('div', { class: 'relative', 'aria-busy': props.loading ? 'true' : undefined }, [
+          : h(
+              'div',
+              {
+                class: 'relative',
+                'aria-busy': props.loading ? 'true' : undefined,
+                inert: props.loading ? true : undefined
+              },
+              [
               listBody,
               props.loading
                 ? h(
                     'div',
                     {
                       class:
-                        'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface,#ffffff)]/70'
+                        'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface)]/70'
                     },
                     [
                       h(Loading, {
@@ -662,6 +762,7 @@ export const NotificationCenter = defineComponent({
           'data-tiger-notification-center': true
         },
         [
+          h('div', { class: 'sr-only', 'aria-live': 'polite' }, politeText.value),
           h(
             Card,
             {

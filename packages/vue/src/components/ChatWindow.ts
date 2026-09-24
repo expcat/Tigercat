@@ -22,9 +22,11 @@ import {
   canSendChatMessage,
   shouldSendChatOnEnter,
   isChatScrollerNearBottom,
+  CHAT_VIRTUAL_THRESHOLD,
   planChatScroll,
-  didChatPrepend,
+  chatThreadSharesId,
   getChatItemKey,
+  readDocumentTimeZone,
   getChatMessageRowClasses,
   getChatBubbleClasses,
   chatWindowRootClasses,
@@ -129,6 +131,10 @@ export const ChatWindow = defineComponent({
       type: Boolean,
       default: false
     },
+    timeZone: {
+      type: String,
+      default: undefined
+    },
     inputType: {
       type: String as PropType<'input' | 'textarea'>,
       default: 'textarea'
@@ -154,8 +160,8 @@ export const ChatWindow = defineComponent({
       default: true
     },
     virtual: {
-      type: Boolean,
-      default: false
+      type: Boolean as PropType<boolean | undefined>,
+      default: undefined
     },
     virtualItemHeight: {
       type: Number,
@@ -189,32 +195,42 @@ export const ChatWindow = defineComponent({
     const messages = computed(() => props.messages ?? EMPTY_CHAT_MESSAGES)
 
     const localValue = ref<string>(props.defaultValue ?? '')
-    const lastSent = ref<string | null>(null)
+    const sending = ref(false)
+    let sendingNow = false
     const stickToBottom = ref(true)
     const messageListRef = ref<HTMLElement | null>(null)
     const virtualListRef = ref<VirtualListHandle | null>(null)
-    const previousScrollHeight = ref(0)
-    const previousFirstId = ref<string | number | undefined>(messages.value[0]?.id)
-    const previousLength = ref(messages.value.length)
-
-    const hasSendHandler = computed(
-      () =>
-        typeof (instance?.vnode.props as { onSend?: unknown } | undefined)?.onSend === 'function'
+    const documentTimeZone = ref<string | null>(props.timeZone ?? null)
+    const liveText = ref('')
+    const anchorId = ref<string | number | null>(null)
+    const virtualOn = computed(
+      () => props.virtual ?? messages.value.length >= CHAT_VIRTUAL_THRESHOLD
     )
+    onMounted(() => {
+      documentTimeZone.value = props.timeZone || readDocumentTimeZone()
+    })
+    watch(
+      () => props.timeZone,
+      (zone) => {
+        documentTimeZone.value = zone || readDocumentTimeZone()
+      }
+    )
+
+    const hasSendHandler = () =>
+      typeof (instance?.vnode.props as { onSend?: unknown } | undefined)?.onSend === 'function'
 
     const inputValue = computed(() =>
       props.modelValue !== undefined ? props.modelValue : localValue.value
     )
 
-    const canSend = computed(() =>
+    const canSendNow = () =>
       canSendChatMessage({
         disabled: props.disabled,
         allowEmpty: props.allowEmpty,
         value: inputValue.value,
-        hasSendHandler: hasSendHandler.value,
-        lastSent: lastSent.value
+        sending: sending.value,
+        hasSendHandler: hasSendHandler()
       })
-    )
 
     const wrapperClasses = computed(() =>
       classNames(chatWindowRootClasses, props.className, coerceClassValue(attrs.class))
@@ -225,7 +241,7 @@ export const ChatWindow = defineComponent({
     )
 
     const resolveScroller = (): HTMLElement | null => {
-      if (props.virtual) return virtualListRef.value?.getScrollElement() ?? null
+      if (virtualOn.value) return virtualListRef.value?.getScrollElement() ?? null
       return messageListRef.value
     }
 
@@ -235,57 +251,71 @@ export const ChatWindow = defineComponent({
       stickToBottom.value = isChatScrollerNearBottom(scroller)
     }
 
+    let seenIds = new Set<string>()
+
     const applyScrollPlan = () => {
-      const scroller = resolveScroller()
-      if (!scroller) return
+      if (props.autoScrollToBottom === false) return
       const nextMessages = messages.value
-      const prepended = didChatPrepend(
-        previousFirstId.value,
-        nextMessages[0]?.id,
-        previousLength.value,
-        nextMessages.length
-      )
-      const plan = planChatScroll({
-        stickToBottom: stickToBottom.value,
-        autoScrollToBottom: props.autoScrollToBottom,
-        prepended,
-        previousScrollHeight: previousScrollHeight.value,
-        nextScrollHeight: scroller.scrollHeight
+      const ids = nextMessages.map((message) => message.id)
+      const sessionChanged = !chatThreadSharesId(seenIds, ids)
+      const decision = planChatScroll({
+        messages: nextMessages,
+        stickToBottom: sessionChanged ? true : stickToBottom.value,
+        sessionChanged,
+        anchorId: anchorId.value
       })
-      if (plan.scrollTop != null) {
-        scroller.scrollTop = plan.scrollTop
-        stickToBottom.value = true
-      } else if (plan.compensate) {
-        scroller.scrollTop += plan.compensate
+      stickToBottom.value = decision.stickToBottom
+      anchorId.value = decision.anchorId
+      if (decision.stickToBottom) {
+        const index = nextMessages.findIndex((message) => message.id === decision.anchorId)
+        if (virtualOn.value && index >= 0) {
+          virtualListRef.value?.scrollToIndex(index, 'end')
+        } else {
+          const scroller = messageListRef.value
+          if (scroller) scroller.scrollTop = scroller.scrollHeight
+        }
       }
-      previousScrollHeight.value = scroller.scrollHeight
-      previousFirstId.value = nextMessages[0]?.id
-      previousLength.value = nextMessages.length
+      seenIds = new Set(ids.filter((id) => id != null).map((id) => String(id)))
+      const last = nextMessages[nextMessages.length - 1]
+      if (last && virtualOn.value) liveText.value = String(last.content ?? '')
     }
 
     const scrollToBottom = () => {
-      if (!props.autoScrollToBottom) return
       requestAnimationFrame(() => {
+        stickToBottom.value = true
+        const last = messages.value.length - 1
+        if (last >= 0 && virtualOn.value) {
+          virtualListRef.value?.scrollToIndex(last, 'end')
+          anchorId.value = messages.value[last]?.id ?? null
+          return
+        }
         const scroller = resolveScroller()
         if (!scroller) return
         scroller.scrollTop = scroller.scrollHeight
-        stickToBottom.value = true
-        previousScrollHeight.value = scroller.scrollHeight
       })
     }
 
     const handleValueChange = (nextValue: string) => {
       if (props.modelValue === undefined) localValue.value = nextValue
-      if (lastSent.value != null && nextValue !== lastSent.value) lastSent.value = null
       emit('update:modelValue', nextValue)
     }
 
-    const handleSend = () => {
-      if (!canSend.value) return
+    const handleSend = async () => {
+      if (sendingNow || !canSendNow()) return
       const payload = String(inputValue.value ?? '')
-      lastSent.value = payload
-      emit('send', payload)
-      if (props.clearOnSend) handleValueChange('')
+      sendingNow = true
+      sending.value = true
+      try {
+        const returned = emit('send', payload) as unknown
+        const tasks = Array.isArray(returned) ? returned : [returned]
+        await Promise.all(tasks.map((task) => Promise.resolve(task)))
+        if (props.clearOnSend) handleValueChange('')
+      } catch {
+        // Keep the draft so the same text can be sent again.
+      } finally {
+        sendingNow = false
+        sending.value = false
+      }
     }
 
     const handleKeydown = (event: KeyboardEvent) => {
@@ -320,7 +350,11 @@ export const ChatWindow = defineComponent({
       const statusInfo = message.status
         ? getChatMessageStatusInfo(message.status, statusMap.value)
         : undefined
-      const timeText = props.showTime ? formatChatTime(message.time, mergedLocale.value) : ''
+      const timeText = props.showTime
+        ? formatChatTime(message.time, mergedLocale.value, {
+            timeZone: (props.timeZone ?? documentTimeZone.value) || undefined
+          })
+        : ''
       const customContent =
         slots.bubble?.({ message, index }) ?? slots.message?.({ message, index })
 
@@ -347,7 +381,7 @@ export const ChatWindow = defineComponent({
                   'div',
                   {
                     class: classNames(
-                      'text-xs mb-1 text-[var(--tiger-text-muted,#6b7280)]',
+                      'text-xs mb-1 text-[var(--tiger-text-secondary)]',
                       isSelf && 'text-end'
                     )
                   },
@@ -370,7 +404,7 @@ export const ChatWindow = defineComponent({
                 )
               : null,
             timeText
-              ? h('div', { class: 'text-xs mt-1 text-[var(--tiger-text-muted,#6b7280)]' }, timeText)
+              ? h('div', { class: 'text-xs mt-1 text-[var(--tiger-text-secondary)]' }, timeText)
               : null
           ])
         ]
@@ -397,13 +431,6 @@ export const ChatWindow = defineComponent({
       return h(Textarea, { ...commonProps, rows: props.inputRows })
     }
 
-    const listA11y = () => ({
-      role: 'log' as const,
-      'aria-live': 'polite' as const,
-      'aria-relevant': 'additions text',
-      'aria-label': listAriaLabel.value
-    })
-
     expose({
       scrollToBottom
     } satisfies ChatWindowHandle)
@@ -418,48 +445,56 @@ export const ChatWindow = defineComponent({
           'data-tiger-chat-window': ''
         },
         [
-          props.virtual && messages.value.length > 0
+          virtualOn.value
             ? h(
-                VirtualList,
-                {
-                  ref: virtualListRef,
-                  className: chatMessageListClasses,
-                  itemCount: messages.value.length,
-                  estimatedItemHeight: props.virtualItemHeight,
-                  height: props.virtualHeight,
-                  getItemKey: (index: number) => getChatItemKey(messages.value, index),
-                  onScroll: syncStickToBottom,
-                  ...listA11y()
-                },
-                {
-                  default: ({ index }: { index: number }) =>
-                    renderMessageItem(messages.value[index], index)
-                }
-              )
-            : h(
                 'div',
                 {
-                  ref: messageListRef,
-                  class: chatMessageListClasses,
-                  ...listA11y(),
-                  onScroll: syncStickToBottom
+                  class: 'sr-only',
+                  role: 'log',
+                  'aria-live': 'polite',
+                  'aria-relevant': 'additions text',
+                  'aria-label': listAriaLabel.value
                 },
-                messages.value.length === 0
-                  ? [
-                      h(
-                        'div',
-                        {
-                          class: 'h-full flex items-center justify-center py-8'
-                        },
-                        [
-                          h(Empty, {
-                            description: resolveLocaleText(labels.value.emptyText, props.emptyText)
-                          })
-                        ]
-                      )
-                    ]
-                  : messages.value.map((message, index) => renderMessageItem(message, index))
-              ),
+                liveText.value
+              )
+            : null,
+          messages.value.length === 0
+            ? h(
+                'div',
+                { class: classNames(chatMessageListClasses, 'h-full flex items-center justify-center py-8') },
+                [h(Empty, { description: resolveLocaleText(labels.value.emptyText, props.emptyText) })]
+              )
+            : virtualOn.value
+              ? h(
+                  VirtualList,
+                  {
+                    ref: virtualListRef,
+                    className: chatMessageListClasses,
+                    itemCount: messages.value.length,
+                    estimatedItemHeight: props.virtualItemHeight,
+                    height: props.virtualHeight,
+                    getItemKey: (index: number) => getChatItemKey(messages.value, index),
+                    onScroll: syncStickToBottom,
+                    role: 'presentation',
+                    'data-tiger-chat-scroller': ''
+                  },
+                  {
+                    default: ({ index }: { index: number }) =>
+                      renderMessageItem(messages.value[index], index)
+                  }
+                )
+              : h(
+                  'div',
+                  {
+                    ref: messageListRef,
+                    class: chatMessageListClasses,
+                    role: 'log',
+                    'aria-label': listAriaLabel.value,
+                    'data-tiger-chat-scroller': '',
+                    onScroll: syncStickToBottom
+                  },
+                  messages.value.map((message, index) => renderMessageItem(message, index))
+                ),
           props.statusText
             ? h(
                 'div',
@@ -475,7 +510,7 @@ export const ChatWindow = defineComponent({
             h(
               Button,
               {
-                disabled: !canSend.value,
+                disabled: !canSendNow(),
                 onClick: handleSend,
                 'aria-label':
                   props.sendAriaLabel ?? resolveLocaleText(labels.value.sendText, props.sendText)

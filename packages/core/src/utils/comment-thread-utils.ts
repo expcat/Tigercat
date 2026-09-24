@@ -1,4 +1,4 @@
-import type { CommentNode } from '../types/composite'
+import type { CommentNode } from '../types/comment-thread'
 
 export const EMPTY_COMMENT_NODES: CommentNode[] = []
 
@@ -11,12 +11,16 @@ export type CommentLikeOverlay = Map<string | number, CommentLikeState>
 
 type CommentLikeNode = Pick<CommentNode, 'id' | 'liked' | 'likes'>
 
+export function commentIdKey(id: string | number): string {
+  return String(id)
+}
+
 export const resolveCommentLikeState = (
   node: CommentLikeNode,
   overlay?: ReadonlyMap<string | number, CommentLikeState> | null
 ): CommentLikeState => {
   const nodeState = { liked: !!node.liked, likes: node.likes ?? 0 }
-  const entry = overlay?.get(node.id)
+  const entry = overlay?.get(commentIdKey(node.id)) ?? overlay?.get(node.id)
   if (!entry) return nodeState
   if (entry.liked === nodeState.liked && entry.likes === nodeState.likes) return nodeState
   return { liked: entry.liked, likes: entry.likes }
@@ -36,9 +40,24 @@ export const writeCommentLikeOverlay = (
   id: string | number,
   state: CommentLikeState
 ): CommentLikeOverlay => {
-  const next = new Map(overlay ?? undefined)
-  next.set(id, { liked: state.liked, likes: state.likes })
+  const next = new Map<string | number, CommentLikeState>()
+  overlay?.forEach((value, key) => {
+    next.set(commentIdKey(key), value)
+  })
+  next.set(commentIdKey(id), { liked: state.liked, likes: state.likes })
   return next
+}
+
+export type CommentTreeErrorCode = 'duplicate-id' | 'cycle'
+
+export interface CommentTreeError {
+  code: CommentTreeErrorCode
+  id: string
+}
+
+export interface CommentTreeBuild {
+  roots: CommentNode[]
+  errors: CommentTreeError[]
 }
 
 /**
@@ -49,47 +68,69 @@ export const writeCommentLikeOverlay = (
 export const resolveCommentNodes = (
   nodes?: CommentNode[] | null,
   items?: CommentNode[]
-): CommentNode[] => {
-  if (nodes != null) return nodes
+): CommentTreeBuild => {
+  if (nodes != null) return { roots: nodes, errors: [] }
   return buildCommentTree(items ?? EMPTY_COMMENT_NODES)
 }
 
-export const buildCommentTree = (items: CommentNode[] = []): CommentNode[] => {
-  if (!items || items.length === 0) return []
+export const buildCommentTree = (items: CommentNode[] = []): CommentTreeBuild => {
+  if (!items || items.length === 0) return { roots: [], errors: [] }
 
-  const nodeMap = new Map<string | number, CommentNode>()
-  const order: Array<string | number> = []
+  const nodeMap = new Map<string, CommentNode>()
+  const order: string[] = []
+  const errors: CommentTreeError[] = []
 
   items.forEach((item) => {
-    nodeMap.set(item.id, {
-      ...item,
-      children: []
-    })
-    if (!order.includes(item.id)) order.push(item.id)
+    const key = commentIdKey(item.id)
+    if (nodeMap.has(key)) {
+      errors.push({ code: 'duplicate-id', id: key })
+      return
+    }
+    nodeMap.set(key, { ...item, children: [] })
+    order.push(key)
+  })
+
+  const parentOf = new Map<string, string | null>()
+  order.forEach((key) => {
+    const node = nodeMap.get(key)
+    if (!node) return
+    if (node.parentId == null || commentIdKey(node.parentId) === key) {
+      parentOf.set(key, null)
+      return
+    }
+    const parentKey = commentIdKey(node.parentId)
+    parentOf.set(key, nodeMap.has(parentKey) ? parentKey : null)
+  })
+
+  order.forEach((start) => {
+    const seen = new Set<string>()
+    let current: string | null = start
+    while (current) {
+      if (seen.has(current)) {
+        errors.push({ code: 'cycle', id: current })
+        parentOf.set(current, null)
+        break
+      }
+      seen.add(current)
+      current = parentOf.get(current) ?? null
+    }
   })
 
   const roots: CommentNode[] = []
-
-  order.forEach((id) => {
-    const node = nodeMap.get(id)
+  order.forEach((key) => {
+    const node = nodeMap.get(key)
     if (!node) return
-
-    if (node.parentId === undefined || node.parentId === null || node.parentId === node.id) {
+    const parentKey = parentOf.get(key)
+    const parent = parentKey ? nodeMap.get(parentKey) : undefined
+    if (!parent) {
       roots.push(node)
       return
     }
-
-    const parent = nodeMap.get(node.parentId)
-    if (!parent || parent === node) {
-      roots.push(node)
-      return
-    }
-
     if (!parent.children) parent.children = []
     parent.children.push(node)
   })
 
-  return roots
+  return { roots, errors }
 }
 
 export const clipCommentTreeDepth = (
@@ -152,6 +193,27 @@ export function nextCommentRevealedCount(
   return Math.min(childCount, start + Math.max(1, maxReplies))
 }
 
-export function canSubmitCommentReply(value: string, inFlight: boolean): boolean {
-  return !inFlight && value.trim().length > 0
+export function canSubmitCommentReply(options: {
+  value?: string | null
+  inFlight?: boolean
+  hasReplyHandler?: boolean
+}): boolean {
+  if (options.inFlight || options.hasReplyHandler === false) return false
+  return String(options.value ?? '').trim().length > 0
+}
+
+/** A node at `maxDepth` has no reply control. Depth is 1-based. */
+export function commentNodeAcceptsReply(depth: number, maxDepth: number): boolean {
+  return depth < maxDepth
+}
+
+export function formatCommentTreeError(
+  error: CommentTreeError,
+  labels: { duplicateIdText?: string; cycleText?: string }
+): string {
+  const template =
+    error.code === 'duplicate-id'
+      ? (labels.duplicateIdText ?? 'Duplicate comment id {id}')
+      : (labels.cycleText ?? 'Comment cycle at {id}')
+  return template.split('{id}').join(error.id)
 }

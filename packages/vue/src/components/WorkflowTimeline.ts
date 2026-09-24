@@ -18,6 +18,7 @@ import {
   resolveWorkflowSignMode,
   resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
+  shouldOpenWorkflowActionLayer,
   shouldShowWorkflowActionCommentInput,
   shouldShowWorkflowActions,
   shouldShowWorkflowSignMode,
@@ -114,8 +115,8 @@ export type WorkflowTimelineProps = VueWorkflowTimelineProps
 const workflowTimelineRootClasses = 'flex flex-col gap-4'
 const workflowActionBarClasses = 'flex flex-nowrap items-center gap-2 overflow-x-auto'
 const workflowStepHeaderClasses = 'flex flex-wrap items-center gap-2'
-const workflowStepActorClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
-const workflowStepCommentClasses = 'text-sm text-[var(--tiger-text-secondary,#4b5563)] mt-1'
+const workflowStepActorClasses = 'text-sm text-[var(--tiger-text-secondary)]'
+const workflowStepCommentClasses = 'text-sm text-[var(--tiger-text-secondary)] mt-1'
 
 function isWorkflowTimelineItem(item: unknown): item is WorkflowTimelineItem {
   return (
@@ -402,7 +403,10 @@ export const WorkflowActionBar = defineComponent({
         event?: { preventDefault: () => void }
       ): boolean => {
         if (isWorkflowActionBarItemDisabled(item, disableOptions)) return false
-        const confirming = shouldConfirmWorkflowAction(item, props.confirm)
+        const confirming = shouldOpenWorkflowActionLayer(item, {
+          confirm: props.confirm,
+          commentRequired: props.commentRequired
+        })
         if (!confirming) {
           emit('action', item)
           return true
@@ -484,7 +488,7 @@ export const WorkflowActionBar = defineComponent({
                   : targets.length === 0
                     ? h(
                         'div',
-                        { class: 'text-sm text-[var(--tiger-text-muted,#6b7280)]' },
+                        { class: 'text-sm text-[var(--tiger-text-secondary)]' },
                         labels.returnNoTargets
                       )
                     : h(
@@ -563,7 +567,7 @@ export const WorkflowActionBar = defineComponent({
           draft.error
             ? h(
                 'div',
-                { role: 'alert', class: 'mt-2 text-sm text-[var(--tiger-error,#dc2626)]' },
+                { role: 'alert', class: 'mt-2 text-sm text-[var(--tiger-error)]' },
                 draft.error
               )
             : null
@@ -578,7 +582,10 @@ export const WorkflowActionBar = defineComponent({
           returnNoTargets: labels.returnNoTargets
         })
         const required = workflowActionBarCommentRequired(item, props.commentRequired)
-        const confirmCopy = shouldConfirmWorkflowAction(item, props.confirm)
+        const confirmCopy = shouldOpenWorkflowActionLayer(item, {
+          confirm: props.confirm,
+          commentRequired: props.commentRequired
+        })
           ? getWorkflowActionConfirmCopy(item.action, labels, { commentRequired: required })
           : null
         const showComment =
@@ -635,7 +642,11 @@ export const WorkflowActionBar = defineComponent({
         ? workflowActionBarCommentRequired(pendingMore, props.commentRequired)
         : false
       const moreConfirmCopy =
-        pendingMore && shouldConfirmWorkflowAction(pendingMore, props.confirm)
+        pendingMore &&
+          shouldOpenWorkflowActionLayer(pendingMore, {
+            confirm: props.confirm,
+            commentRequired: props.commentRequired
+          })
           ? getWorkflowActionConfirmCopy(pendingMore.action, labels, {
               commentRequired: moreRequired
             })
@@ -672,7 +683,10 @@ export const WorkflowActionBar = defineComponent({
                             ...disableOptions,
                             returnNoTargets: labels.returnNoTargets
                           })
-                          const needsDialog = shouldConfirmWorkflowAction(item, props.confirm)
+                          const needsDialog = shouldOpenWorkflowActionLayer(item, {
+                            confirm: props.confirm,
+                            commentRequired: props.commentRequired
+                          })
                           return h(
                             DropdownItem,
                             {

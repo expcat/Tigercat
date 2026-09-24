@@ -2,7 +2,7 @@ import type {
   TaskBoardColumn,
   TaskBoardCardMoveEvent,
   TaskBoardColumnMoveEvent
-} from '../types/composite'
+} from '../types/task-board'
 
 // ============================================================================
 // Tailwind class constants
@@ -14,11 +14,11 @@ export const taskBoardBaseClasses =
 
 /** Single column shell */
 export const taskBoardColumnClasses =
-  'tiger-task-board-column flex flex-col shrink-0 w-76 rounded-[var(--tiger-radius-lg,0.75rem)] border border-[var(--tiger-border,#e5e7eb)]/80 bg-[var(--tiger-surface-muted,#f9fafb)] shadow-xs transition-all duration-300 hover:shadow-md'
+  'tiger-task-board-column flex flex-col shrink-0 w-76 rounded-[var(--tiger-radius-lg)] border border-[var(--tiger-border)]/80 bg-[var(--tiger-surface-muted)] shadow-xs [transition:var(--tiger-transition-base)] hover:shadow-md'
 
 /** Column header (sticky, never scrolls) */
 export const taskBoardColumnHeaderClasses =
-  'flex items-center justify-between px-4 py-3.5 border-b border-[var(--tiger-border,#e5e7eb)]/60 text-sm font-semibold text-[var(--tiger-text,#1f2937)] select-none transition-colors'
+  'flex items-center justify-between px-4 py-3.5 border-b border-[var(--tiger-border)]/60 text-sm font-semibold text-[var(--tiger-text)] select-none transition-colors'
 
 /** Scrollable card area */
 export const taskBoardColumnBodyClasses =
@@ -26,32 +26,32 @@ export const taskBoardColumnBodyClasses =
 
 /** Card base styles */
 export const taskBoardCardClasses =
-  'tiger-task-board-card rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)]/80 bg-[var(--tiger-surface,#ffffff)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),_0_1px_2px_rgba(0,0,0,0.02)] cursor-grab select-none transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--tiger-primary,#2563eb)]/30 active:cursor-grabbing'
+  'tiger-task-board-card rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)]/80 bg-[var(--tiger-surface)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),_0_1px_2px_rgba(0,0,0,0.02)] cursor-grab select-none [transition:var(--tiger-transition-quick)] hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--tiger-primary)]/30 active:cursor-grabbing'
 
 /** Card while being dragged */
 export const taskBoardCardDraggingClasses = 'opacity-40 shadow-xl scale-[0.98] rotate-1'
 
 /** Thin line indicating the drop position */
 export const taskBoardDropIndicatorClasses =
-  'h-1.5 rounded-full bg-[var(--tiger-primary,#2563eb)] my-2 shadow-[0_0_8px_var(--tiger-primary,#2563eb)] transition-all duration-200'
+  'h-1.5 rounded-full bg-[var(--tiger-primary)] my-2 shadow-[0_0_8px_var(--tiger-primary)] [transition:var(--tiger-transition-quick)]'
 
 /** Column highlighted when a card hovers over it */
 export const taskBoardColumnDropTargetClasses =
-  'ring-2 ring-[var(--tiger-primary,#2563eb)]/60 bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_4%,transparent)]'
+  'ring-2 ring-[var(--tiger-primary)]/60 bg-[color-mix(in_srgb,var(--tiger-primary)_4%,transparent)]'
 
 /** Column being dragged */
 export const taskBoardColumnDraggingClasses = 'opacity-50'
 
 /** Empty column placeholder */
 export const taskBoardEmptyClasses =
-  'flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)] text-sm py-8'
+  'flex items-center justify-center text-[var(--tiger-text-secondary)] text-sm py-8'
 
 /** WIP exceeded badge / header tint */
-export const taskBoardWipExceededClasses = 'text-[var(--tiger-error,#ef4444)]'
+export const taskBoardWipExceededClasses = 'text-[var(--tiger-error)]'
 
 /** Add-card button inside column footer */
 export const taskBoardAddCardClasses =
-  'flex items-center justify-center gap-1.5 w-[calc(100%-16px)] mx-2 my-2 py-2.5 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] border border-dashed border-[var(--tiger-border,#e5e7eb)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-surface,#ffffff)] hover:shadow-xs rounded-[var(--tiger-radius-md,0.5rem)] transition-all duration-200 cursor-pointer active:scale-98'
+  'flex items-center justify-center gap-1.5 w-[calc(100%-16px)] mx-2 my-2 py-2.5 text-xs font-semibold text-[var(--tiger-text-secondary)] border border-dashed border-[var(--tiger-border)] hover:border-[var(--tiger-primary)] hover:text-[var(--tiger-primary)] hover:bg-[var(--tiger-surface)] hover:shadow-xs rounded-[var(--tiger-radius-md)] [transition:var(--tiger-transition-quick)] cursor-pointer active:scale-98'
 
 // ============================================================================
 // Drag-data serialisation (used by both HTML5 DnD and touch fallback)
@@ -62,12 +62,16 @@ export interface CardDragData {
   cardId: string | number
   columnId: string | number
   index: number
+  /** Board that started the drag. Other boards reject the payload. */
+  boardId: string
 }
 
 export interface ColumnDragData {
   type: 'column'
   columnId: string | number
   index: number
+  /** Board that started the drag. Other boards reject the payload. */
+  boardId: string
 }
 
 export type TaskBoardDragData = CardDragData | ColumnDragData
@@ -77,24 +81,33 @@ const MIME = 'text/plain'
 export function createCardDragData(
   cardId: string | number,
   columnId: string | number,
-  index: number
+  index: number,
+  boardId: string
 ): string {
-  const data: CardDragData = { type: 'card', cardId, columnId, index }
+  const data: CardDragData = { type: 'card', cardId, columnId, index, boardId }
   return JSON.stringify(data)
 }
 
-export function createColumnDragData(columnId: string | number, index: number): string {
-  const data: ColumnDragData = { type: 'column', columnId, index }
+export function createColumnDragData(
+  columnId: string | number,
+  index: number,
+  boardId: string
+): string {
+  const data: ColumnDragData = { type: 'column', columnId, index, boardId }
   return JSON.stringify(data)
 }
 
-export function parseDragData(dataTransfer: DataTransfer): TaskBoardDragData | null {
+export function parseDragData(
+  dataTransfer: DataTransfer,
+  boardId: string
+): TaskBoardDragData | null {
   try {
     const raw = dataTransfer.getData(MIME)
     if (!raw) return null
     const data = JSON.parse(raw) as TaskBoardDragData
-    if (data.type === 'card' || data.type === 'column') return data
-    return null
+    if (data.type !== 'card' && data.type !== 'column') return null
+    if (typeof data.boardId !== 'string' || data.boardId !== boardId) return null
+    return data
   } catch {
     return null
   }
@@ -150,26 +163,30 @@ export function moveCard(
   if (cardIdx === -1) return null
 
   const card = srcCol.cards[cardIdx]
-  const clampedTo = Math.max(
-    0,
-    Math.min(
-      toIndex,
-      srcColIdx === dstColIdx ? srcCol.cards.length - 1 : columns[dstColIdx].cards.length
-    )
-  )
+  const sameColumn = srcColIdx === dstColIdx
 
-  // Same column reorder
-  if (srcColIdx === dstColIdx) {
-    if (cardIdx === clampedTo) return null
+  // `toIndex` is the insertion point the indicator draws: before the card at
+  // that index in the original list, or `length` to append. Same column and
+  // cross column share it. The dragged card is not part of the insertion
+  // list, so a same-column index after the source shifts left by one.
+  // Do not clamp the end to `length - 1`.
+  if (sameColumn) {
+    const length = srcCol.cards.length
+    const clampedTo = Math.max(0, Math.min(toIndex, length))
+    const insertAt = clampedTo > cardIdx ? clampedTo - 1 : clampedTo
+    if (insertAt === cardIdx) return null
     const newCards = [...srcCol.cards]
     newCards.splice(cardIdx, 1)
-    newCards.splice(clampedTo, 0, card)
+    newCards.splice(insertAt, 0, card)
     const newCols = columns.map((c, i) => (i === srcColIdx ? { ...c, cards: newCards } : c))
     return {
       columns: newCols,
-      event: { cardId, fromColumnId, toColumnId, fromIndex: cardIdx, toIndex: clampedTo }
+      event: { cardId, fromColumnId, toColumnId, fromIndex: cardIdx, toIndex: insertAt }
     }
   }
+
+  const dstLength = columns[dstColIdx].cards.length
+  const clampedTo = Math.max(0, Math.min(toIndex, dstLength))
 
   // Cross-column transfer
   const dstCol = columns[dstColIdx]
@@ -374,13 +391,90 @@ export function getColumnDropIndex(
 // Touch drag tracker (lightweight pointer-based fallback)
 // ============================================================================
 
+/** Pointer must move this far before a touch becomes a drag. Shorter moves scroll. */
+export const TASK_BOARD_DRAG_THRESHOLD_PX = 8
+
 export interface TouchDragState {
   startX: number
   startY: number
   currentX: number
   currentY: number
   active: boolean
+  /** True only after the pointer passes {@link TASK_BOARD_DRAG_THRESHOLD_PX}. */
+  engaged: boolean
   sourceElement: HTMLElement | null
+}
+
+const taskBoardColumnIds = new WeakMap<Element, string | number>()
+
+/**
+ * Remember the column id on the element itself. Hit testing reads this map
+ * so a numeric id is not coerced through a string attribute.
+ */
+export function bindTaskBoardColumnId(element: Element | null, id: string | number): void {
+  if (element) taskBoardColumnIds.set(element, id)
+}
+
+export function taskBoardColumnIdOf(element: Element | null): string | number | null {
+  if (!element) return null
+  const host = element.closest('[data-tiger-taskboard-column]')
+  if (!host) return null
+  const bound = taskBoardColumnIds.get(host)
+  return bound === undefined ? null : bound
+}
+
+export function formatTaskBoardGrabAnnouncement(
+  template: string,
+  input: { card: string; from: string; to: string; position: number; count: number }
+): string {
+  return template
+    .split('{card}')
+    .join(input.card)
+    .split('{from}')
+    .join(input.from)
+    .split('{to}')
+    .join(input.to)
+    .split('{position}')
+    .join(String(input.position))
+    .split('{count}')
+    .join(String(input.count))
+}
+
+const TASK_BOARD_CONTROL_SELECTOR =
+  'button, a, input, textarea, select, [role="button"], [role="link"], [role="menuitem"]'
+
+/** Enter / Space inside a card belong to the nested control, not the card grab. */
+export function isTaskBoardNestedControl(
+  target: EventTarget | null,
+  current: EventTarget | null
+): boolean {
+  if (!(target instanceof Element) || target === current) return false
+  return Boolean(target.closest(TASK_BOARD_CONTROL_SELECTOR))
+}
+
+export function nextTaskBoardRovingCardId(
+  cards: readonly { id: string | number }[],
+  cardId: string | number | null,
+  direction: 'up' | 'down'
+): string | number | null {
+  if (cards.length === 0) return null
+  const index = cardId == null ? -1 : cards.findIndex((card) => card.id === cardId)
+  if (index < 0) return cards[0]?.id ?? null
+  const next = direction === 'down' ? index + 1 : index - 1
+  if (next < 0 || next >= cards.length) return cards[index]?.id ?? null
+  return cards[next]?.id ?? null
+}
+
+/** One tab stop per column: the active card, or the first card when none is active. */
+export function taskBoardRovingTabIndex(
+  cards: readonly { id: string | number }[],
+  cardId: string | number,
+  activeId: string | number | null | undefined
+): 0 | -1 {
+  if (cards.length === 0) return -1
+  const active = cards.find((card) => card.id === activeId)
+  const dock = active?.id ?? cards[0]?.id
+  return cardId === dock ? 0 : -1
 }
 
 export interface TouchDragTracker {
@@ -398,6 +492,7 @@ export function createTouchDragTracker(): TouchDragTracker {
     currentX: 0,
     currentY: 0,
     active: false,
+    engaged: false,
     sourceElement: null
   }
 
@@ -410,6 +505,7 @@ export function createTouchDragTracker(): TouchDragTracker {
         currentX: touch.clientX,
         currentY: touch.clientY,
         active: true,
+        engaged: false,
         sourceElement: source
       }
     },
@@ -419,11 +515,20 @@ export function createTouchDragTracker(): TouchDragTracker {
       const touch = e.touches[0]
       state.currentX = touch.clientX
       state.currentY = touch.clientY
-      e.preventDefault() // prevent scroll while dragging
+      const dx = state.currentX - state.startX
+      const dy = state.currentY - state.startY
+      if (!state.engaged) {
+        if (dx * dx + dy * dy < TASK_BOARD_DRAG_THRESHOLD_PX * TASK_BOARD_DRAG_THRESHOLD_PX) {
+          return
+        }
+        state.engaged = true
+      }
+      e.preventDefault()
     },
 
     onTouchEnd() {
-      state = { ...state, active: false, sourceElement: null }
+      const engaged = state.engaged
+      state = { ...state, active: false, engaged, sourceElement: null }
       return { ...state }
     },
 
@@ -432,7 +537,7 @@ export function createTouchDragTracker(): TouchDragTracker {
     },
 
     cancel() {
-      state = { ...state, active: false, sourceElement: null }
+      state = { ...state, active: false, engaged: false, sourceElement: null }
     }
   }
 }

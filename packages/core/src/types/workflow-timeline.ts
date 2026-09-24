@@ -83,7 +83,32 @@ export type WorkflowEmptyApprover = 'skip_pass' | 'pause' | 'transfer_admin' | '
 /**
  * Timeout policy action. Display only — core does not tick a clock.
  */
-export type WorkflowTimeoutAction = 'remind' | 'auto_pass' | 'auto_reject' | 'transfer'
+/**
+ * Structured comparison on a condition branch. Designer, viewer, and the
+ * reducer share {@link selectWorkflowConditionBranch}. There is no timeout
+ * job in this model.
+ */
+export const WORKFLOW_CONDITION_OPERATORS = [
+  'eq',
+  'neq',
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'contains',
+  'empty',
+  'notEmpty'
+] as const
+
+export type WorkflowConditionOperator = (typeof WORKFLOW_CONDITION_OPERATORS)[number]
+
+export interface WorkflowBranchCondition {
+  /** Dotted field path read from the instance `formValues`. */
+  field: string
+  operator: WorkflowConditionOperator
+  /** Ignored by `empty` / `notEmpty`. */
+  value?: unknown
+}
 
 /**
  * Approver source contract. Hosts inject `resolveApprovers`; Tigercat stores
@@ -135,15 +160,12 @@ export interface WorkflowNodeButtonPolicy {
 }
 
 /**
- * Inspector "advanced" enums. Timeout is a label + action, not a job queue.
+ * Inspector "advanced" enums. Timeout is not part of the model: this library
+ * does not schedule jobs.
  */
 export interface WorkflowNodeAdvanced {
   emptyApprover?: WorkflowEmptyApprover
   autoDecide?: WorkflowAutoDecide
-  timeout?: {
-    action?: WorkflowTimeoutAction
-    durationLabel?: string
-  }
   returnResume?: WorkflowReturnResume
 }
 
@@ -328,9 +350,10 @@ export interface WorkflowTimelineStep {
    */
   kind?: WorkflowStepKind
   /**
-   * Condition-branch expression stub. Document convention only — not an engine.
+   * Structured branch comparison. Only the branch
+   * {@link selectWorkflowConditionBranch} picks is entered.
    */
-  expression?: string
+  condition?: WorkflowBranchCondition
   /**
    * Countersign / or-sign / sequential. Display-only; omitted means sequential.
    */
@@ -527,7 +550,11 @@ export interface WorkflowTimelineProps {
 /**
  * Who is looking at the action bar. Used when deriving items from `buttonPolicy`.
  */
-export type WorkflowActionBarViewerRole = 'starter' | 'approver' | 'cc'
+/**
+ * Who is looking at the action bar. Omitted means `readonly`: nothing is actionable
+ * until the host passes the current operator's role.
+ */
+export type WorkflowActionBarViewerRole = 'readonly' | 'starter' | 'approver' | 'cc'
 
 /**
  * One node the return picker may target.
@@ -577,131 +604,4 @@ export interface WorkflowActionPayload {
   resume?: WorkflowReturnResume
   taskId?: string
   actorId?: string | number
-}
-
-/**
- * Presentational action-bar props. Vue/React bindings render these.
- * Display order is approve → reject → transfer → return → addsign → cancel →
- * comment, then remaining keys in original relative order. Not a BPM engine.
- */
-export interface WorkflowActionBarProps {
-  /**
-   * Action buttons to render. Sorted approve → reject → transfer → return →
-   * addsign → cancel → comment unless a custom `renderActions` replaces the bar.
-   */
-  items?: WorkflowActionBarItem[]
-  /**
-   * Disable every action, in addition to per-item `disabled`.
-   */
-  disabled?: boolean
-  /**
-   * Accessible name for the toolbar. Defaults to "Workflow actions".
-   */
-  ariaLabel?: string
-  /**
-   * Enable the confirm-dialog recipe for confirming actions.
-   * Per-item `confirm` overrides this. Copy is `locale.workflowTimeline` title +
-   * description. Return / add-sign / transfer still open a dialog when they
-   * need picker input even if this flag is off.
-   * @default false
-   */
-  confirm?: boolean
-  /**
-   * Show a comment field in the confirm dialog. Omitted: reject / return /
-   * request_changes show it when `confirm` is on; `true` opts in other
-   * confirming actions; `false` hides it unless the action requires a comment.
-   * `comment` never uses Popconfirm.
-   */
-  commentInput?: boolean
-  /**
-   * Require a non-empty comment before `onAction` fires. Per-item
-   * `commentRequired` wins. When omitted, reject / return / request_changes
-   * require a comment. Empty submit is blocked (2.5.0 upgrade vs 2.4.2).
-   */
-  commentRequired?: boolean
-  /**
-   * Node button table. Used when `items` is omitted / empty. Enabled rows
-   * become action-bar items; `placement: 'more'` folds into the overflow menu.
-   */
-  buttonPolicy?: WorkflowNodeButtonPolicy
-  /**
-   * Eligible return-to nodes for the built-in radio list. Passing an array
-   * (including empty) enables the picker; omit both this and a return-picker
-   * slot to keep `return` disabled.
-   */
-  returnTargets?: WorkflowReturnTarget[]
-  /**
-   * Add-sign positions offered in the confirm dialog. One value hides the
-   * radio; two values show before / after. Omitted: `buttonPolicy.addsign`
-   * or `['before', 'after']`.
-   */
-  addsignPositions?: WorkflowAddsignPosition[]
-  /**
-   * Current node sign mode. Used as the default when add-sign has ≥2 people.
-   */
-  currentSignMode?: WorkflowSignMode
-  /**
-   * When true, `cancel` stays visible while deriving items from `buttonPolicy`.
-   */
-  isStarter?: boolean
-  /**
-   * Viewer role used when deriving items from `buttonPolicy`.
-   * `cc` keeps comment only; `starter` keeps cancel + comment.
-   * @default 'approver'
-   */
-  viewerRole?: WorkflowActionBarViewerRole
-  /**
-   * Overflow menu trigger label. Defaults to `locale.workflowTimeline.moreActions`.
-   */
-  moreLabel?: string
-  /**
-   * Fired after an action is confirmed (or immediately when confirm is off).
-   * Empty required comments and missing pickers do **not** fire this.
-   */
-  onAction?: (item: WorkflowActionBarItem, payload?: WorkflowActionPayload) => void
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-}
-
-/**
- * Read-only DingTalk-style workflow tree. Same {@link WorkflowTimelineStep}
- * model as WorkflowTimeline — not a second timeline. Countersign people use
- * `actors` or runtime `tasks`; `children` are parallel / CC / condition
- * branches. Temporary add-sign nodes get an add-sign tag; the return-to node
- * is highlighted; untaken condition branches are dimmed.
- */
-export interface WorkflowViewerProps {
-  /**
-   * Approval steps. Normalized in place; children stay nested for the tree.
-   */
-  steps?: WorkflowTimelineStep[]
-  /**
-   * Instance-level per-actor tasks. When present, each person is a row
-   * (status / actedAt / comment). Wins over `step.tasks` / `actors`.
-   */
-  tasks?: WorkflowTask[]
-  /**
-   * Highlight the taken path from start to the current or rollback step.
-   * @default true
-   */
-  highlightPath?: boolean
-  /**
-   * Show the reject rollback-point label when a rejected step exists.
-   * @default true
-   */
-  showRollbackPoint?: boolean
-  /**
-   * Locale override merged on top of ConfigProvider locale.
-   */
-  locale?: Partial<TigerLocale>
-  /**
-   * Kind / sign-mode / path overlay. Wins over `locale.workflowTimeline`.
-   */
-  labels?: Partial<TigerLocaleWorkflowTimeline>
-  /**
-   * Additional CSS classes
-   */
-  className?: string
 }

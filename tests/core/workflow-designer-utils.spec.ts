@@ -34,9 +34,9 @@ import {
   workflowDesignerInsertRowClasses,
   workflowDesignerKindColor,
   workflowDesignerListClasses,
-  workflowDesignerSignModeHint,
-  tigercatPlugin
-} from '@expcat/tigercat-core'
+  workflowDesignerSignModeHint
+} from '@expcat/tigercat-core/workflow-designer'
+import { tigercatPlugin } from '../../packages/core/src/tailwind-plugin'
 import {
   applyWorkflowDesignerView as applyFromSubpath,
   getWorkflowStepAtPath as getFromSubpath,
@@ -213,7 +213,11 @@ describe('workflow-designer helpers', () => {
     const created = createWorkflowDesignerPaletteStep(tree, 'condition')
     expect(created.kind).toBe('condition')
     expect(created.children).toHaveLength(2)
-    expect(created.children?.every((child) => child.expression === '')).toBe(true)
+    expect(
+      created.children?.every(
+        (child) => child.condition?.field === '' && child.condition.operator === 'eq'
+      )
+    ).toBe(true)
   })
 
   it('copies a node after the path with new keys', () => {

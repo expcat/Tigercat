@@ -4,6 +4,8 @@
  * are empty; ISO strings are parsed; any other string is already formatted.
  */
 
+import { resolveCallerTimeZone } from './caller-clock'
+
 export type CompositeTimeValue = string | number | Date
 
 export type CompositeTimeLocale = string | { locale?: string } | null | undefined
@@ -49,16 +51,16 @@ function formatResolvedDate(
   date: Date,
   localeId: string | undefined,
   style: CompositeTimeStyle,
+  timeZone: string,
   intlOptions: Intl.DateTimeFormatOptions | undefined
 ): string {
+  const options = { ...intlOptions, timeZone }
   try {
     return style === 'time'
-      ? date.toLocaleTimeString(localeId, intlOptions)
-      : date.toLocaleString(localeId, intlOptions)
+      ? date.toLocaleTimeString(localeId, options)
+      : date.toLocaleString(localeId, options)
   } catch {
-    return style === 'time'
-      ? date.toLocaleTimeString(undefined, intlOptions)
-      : date.toLocaleString(undefined, intlOptions)
+    return ''
   }
 }
 
@@ -68,16 +70,18 @@ export function formatCompositeTime(
   options?: FormatCompositeTimeOptions
 ): string {
   if (isCompositeTimeEmpty(value)) return ''
+  const { style = 'datetime', timeZone, ...intlOptions } = options ?? {}
+  const zone = resolveCallerTimeZone(timeZone)
   if (typeof value === 'string') {
     const parsed = parseCompositeTime(value)
     if (!parsed) return value
-    const { style = 'datetime', ...intlOptions } = options ?? {}
-    return formatResolvedDate(parsed, resolveCompositeTimeLocale(locale), style, intlOptions)
+    if (!zone) return ''
+    return formatResolvedDate(parsed, resolveCompositeTimeLocale(locale), style, zone, intlOptions)
   }
+  if (!zone) return ''
   const date = value instanceof Date ? value : new Date(value)
   if (Number.isNaN(date.getTime())) return ''
-  const { style = 'datetime', ...intlOptions } = options ?? {}
-  return formatResolvedDate(date, resolveCompositeTimeLocale(locale), style, intlOptions)
+  return formatResolvedDate(date, resolveCompositeTimeLocale(locale), style, zone, intlOptions)
 }
 
 export const formatChatTime = (

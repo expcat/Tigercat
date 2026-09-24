@@ -1,29 +1,50 @@
 import { computed, defineComponent, h, ref, watch, type PropType, type VNode } from 'vue'
 import {
+  classNames,
+  coerceClassValue,
+  getWorkflowDesignerLabels,
+  getWorkflowTimelineLabels,
+  mergeStyleValues,
+  mergeTigerLocale,
+  workflowSignModeLabel,
+  WORKFLOW_FIELD_PERMISSIONS,
+  type ApproverSource,
+  type FieldPermission,
+  type SchemaFormSchema,
+  type TigerLocale,
+  type TigerLocaleWorkflowDesigner,
+  type WorkflowAutoDecide,
+  type WorkflowDesignerPath,
+  type WorkflowDesignerProps as CoreWorkflowDesignerProps,
+  type WorkflowDesignerStepPatch,
+  type WorkflowEmptyApprover,
+  type WorkflowNodeAdvanced,
+  type WorkflowSignMode,
+  type WorkflowBranchCondition,
+  type WorkflowStepKind,
+  type WorkflowTimelineStep
+} from '@expcat/tigercat-core'
+import {
   actorsFromApproverSource,
   applyWorkflowDesignerFieldPermissionColumn,
   buildWorkflowDesignerNodes,
-  classNames,
   cloneWorkflowDesignerStepWithNewKeys,
   cloneWorkflowSteps,
-  coerceClassValue,
   createWorkflowDesignerPaletteStep,
   createWorkflowDesignerStep,
   findWorkflowDesignerNode,
-  getWorkflowDesignerLabels,
   getWorkflowStepAtPath,
-  getWorkflowTimelineLabels,
   insertWorkflowDesignerPaletteStep,
   insertWorkflowStepAfterPath,
   insertWorkflowStepAtPath,
-  mergeStyleValues,
-  mergeTigerLocale,
   moveWorkflowStepAtPath,
   patchWorkflowDesignerButton,
   patchWorkflowStepAtPath,
   removeWorkflowStepAtPath,
   resolveWorkflowDesignerView,
+  nextWorkflowDesignerInspectorTab,
   validateWorkflowDesigner,
+  workflowDesignerBlockingIssues,
   workflowDesignerActionButtonClasses,
   workflowDesignerActionLabel,
   workflowDesignerActorRowClasses,
@@ -76,31 +97,13 @@ import {
   workflowDesignerTableCellClasses,
   workflowDesignerTableClasses,
   workflowDesignerTableHeadClasses,
-  workflowDesignerTimeoutActionOptions,
   workflowDesignerToolbarClasses,
   workflowDesignerTreeClasses,
-  workflowSignModeLabel,
   WORKFLOW_DESIGNER_INSPECTOR_TABS,
   WORKFLOW_DESIGNER_PALETTE_KINDS,
-  WORKFLOW_FIELD_PERMISSIONS,
-  type ApproverSource,
-  type FieldPermission,
-  type SchemaFormSchema,
-  type TigerLocale,
-  type TigerLocaleWorkflowDesigner,
-  type WorkflowAutoDecide,
   type WorkflowDesignerInspectorTab,
-  type WorkflowDesignerNode,
-  type WorkflowDesignerPath,
-  type WorkflowDesignerProps as CoreWorkflowDesignerProps,
-  type WorkflowDesignerStepPatch,
-  type WorkflowEmptyApprover,
-  type WorkflowNodeAdvanced,
-  type WorkflowSignMode,
-  type WorkflowStepKind,
-  type WorkflowTimeoutAction,
-  type WorkflowTimelineStep
-} from '@expcat/tigercat-core'
+  type WorkflowDesignerNode
+} from '@expcat/tigercat-core/workflow-designer'
 import { useTigerConfig } from './ConfigProvider'
 import { Tag } from './Tag'
 
@@ -190,7 +193,7 @@ export const WorkflowDesigner = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'change', 'select'],
+  emits: ['update:modelValue', 'change', 'select', 'publish'],
   setup(props, { attrs, emit }) {
     const config = useTigerConfig()
     const innerValue = ref<WorkflowTimelineStep[]>(cloneWorkflowSteps(props.defaultValue))
@@ -231,7 +234,14 @@ export const WorkflowDesigner = defineComponent({
     function commit(next: WorkflowTimelineStep[]): void {
       if (props.modelValue === undefined) innerValue.value = next
       emit('update:modelValue', next)
-      emit('change', next)
+      emit('change', next, { issues: validateWorkflowDesigner(next) })
+    }
+
+    function publish(): void {
+      if (locked.value) return
+      const currentIssues = validateWorkflowDesigner(sourceSteps.value)
+      if (workflowDesignerBlockingIssues(currentIssues).length > 0) return
+      emit('publish', sourceSteps.value)
     }
 
     function patchNode(path: WorkflowDesignerPath, patch: WorkflowDesignerStepPatch): void {
@@ -274,7 +284,14 @@ export const WorkflowDesigner = defineComponent({
     function renderSummary(node: WorkflowDesignerNode): VNode {
       const groupName = node.title || node.key
       const summary = workflowDesignerApproverSummary(node.step, designerLabels.value)
-      return h('div', { class: workflowDesignerSummaryClasses }, [
+      return h(
+        'button',
+        {
+          type: 'button',
+          class: classNames(workflowDesignerSummaryClasses, 'w-full bg-transparent text-start'),
+          onClick: () => selectNode(node)
+        },
+        [
         h('div', { class: workflowDesignerSummaryRowClasses }, [
           h('span', {
             class: workflowDesignerKindDotClasses,
@@ -312,8 +329,7 @@ export const WorkflowDesigner = defineComponent({
         patchNode(node.path, {
           advanced: {
             ...advanced,
-            ...patch,
-            timeout: patch.timeout ? { ...advanced.timeout, ...patch.timeout } : advanced.timeout
+            ...patch
           }
         })
       }
@@ -725,8 +741,7 @@ export const WorkflowDesigner = defineComponent({
         patchNode(node.path, {
           advanced: {
             ...advanced,
-            ...patch,
-            timeout: patch.timeout ? { ...advanced.timeout, ...patch.timeout } : advanced.timeout
+            ...patch
           }
         })
       }
@@ -755,51 +770,6 @@ export const WorkflowDesigner = defineComponent({
               )
             ])
           : null,
-        showAuto
-          ? h('label', { class: workflowDesignerFieldClasses }, [
-              h('span', { class: workflowDesignerLabelClasses }, labels.timeoutActionLabel),
-              h(
-                'select',
-                {
-                  class: workflowDesignerControlClasses,
-                  value: advanced.timeout?.action ?? 'remind',
-                  disabled: lockedNow,
-                  'aria-label': labels.timeoutActionLabel,
-                  onChange: (event: Event) => {
-                    patchAdvanced({
-                      timeout: {
-                        ...advanced.timeout,
-                        action: (event.target as HTMLSelectElement).value as WorkflowTimeoutAction
-                      }
-                    })
-                  }
-                },
-                workflowDesignerTimeoutActionOptions({
-                  ...labels,
-                  ...timelineLabels.value
-                }).map((option) => h('option', { value: option.value }, option.label))
-              )
-            ])
-          : null,
-        showAuto
-          ? h('label', { class: workflowDesignerFieldClasses }, [
-              h('span', { class: workflowDesignerLabelClasses }, labels.timeoutDurationLabel),
-              h('input', {
-                class: workflowDesignerControlClasses,
-                value: advanced.timeout?.durationLabel ?? '',
-                disabled: lockedNow,
-                'aria-label': labels.timeoutDurationLabel,
-                onInput: (event: Event) => {
-                  patchAdvanced({
-                    timeout: {
-                      ...advanced.timeout,
-                      durationLabel: (event.target as HTMLInputElement).value
-                    }
-                  })
-                }
-              })
-            ])
-          : null,
         node.kind === 'condition'
           ? h('div', { class: workflowDesignerFieldClasses }, [
               h('span', { class: workflowDesignerLabelClasses }, labels.branchLabel),
@@ -824,13 +794,58 @@ export const WorkflowDesigner = defineComponent({
                   ]),
                   h('input', {
                     class: workflowDesignerControlClasses,
-                    value: branch.expression ?? '',
-                    placeholder: labels.branchExpressionPlaceholder,
+                    value: branch.condition?.field ?? '',
+                    placeholder: labels.branchExpression,
                     disabled: lockedNow,
                     'aria-label': `${labels.branchExpression} ${index + 1}`,
                     onInput: (event: Event) => {
                       patchNode([...node.path, branch.key], {
-                        expression: (event.target as HTMLInputElement).value
+                        condition: {
+                          field: (event.target as HTMLInputElement).value,
+                          operator: branch.condition?.operator ?? 'eq',
+                          value: branch.condition?.value ?? ''
+                        }
+                      })
+                    }
+                  }),
+                  h(
+                    'select',
+                    {
+                      class: workflowDesignerControlClasses,
+                      value: branch.condition?.operator ?? 'eq',
+                      disabled: lockedNow,
+                      'aria-label': `Operator ${index + 1}`,
+                      onChange: (event: Event) => {
+                        patchNode([...node.path, branch.key], {
+                          condition: {
+                            field: branch.condition?.field ?? '',
+                            operator: (event.target as HTMLSelectElement)
+                              .value as WorkflowBranchCondition['operator'],
+                            value: branch.condition?.value ?? ''
+                          }
+                        })
+                      }
+                    },
+                    (['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'contains', 'empty', 'notEmpty'] as const).map(
+                      (operator) => h('option', { value: operator }, operator)
+                    )
+                  ),
+                  h('input', {
+                    class: workflowDesignerControlClasses,
+                    value: branch.condition?.value == null ? '' : String(branch.condition.value),
+                    placeholder: labels.branchExpressionPlaceholder,
+                    disabled:
+                      lockedNow ||
+                      branch.condition?.operator === 'empty' ||
+                      branch.condition?.operator === 'notEmpty',
+                    'aria-label': `${labels.branchExpressionPlaceholder} ${index + 1}`,
+                    onInput: (event: Event) => {
+                      patchNode([...node.path, branch.key], {
+                        condition: {
+                          field: branch.condition?.field ?? '',
+                          operator: branch.condition?.operator ?? 'eq',
+                          value: (event.target as HTMLInputElement).value
+                        }
                       })
                     }
                   })
@@ -842,7 +857,7 @@ export const WorkflowDesigner = defineComponent({
                   {
                     kind: 'approve',
                     title: `${labels.branchLabel} ${(node.step.children?.length ?? 0) + 1}`,
-                    expression: ''
+                    condition: { field: '', operator: 'eq', value: '' }
                   }
                 )
                 commit(insertWorkflowStepAtPath(sourceSteps.value, node.path, created))
@@ -929,17 +944,47 @@ export const WorkflowDesigner = defineComponent({
             WORKFLOW_DESIGNER_INSPECTOR_TABS.map((item) => {
               const enabled = workflowDesignerInspectorTabEnabled(item, node.kind)
               const selected = tab === item
+              const tabId = `tiger-workflow-designer-tab-${workflowDesignerPathKey(node.path)}-${item}`
               return h(
                 'button',
                 {
                   key: item,
                   type: 'button',
                   role: 'tab',
+                  id: tabId,
                   class: workflowDesignerTabClassName(selected),
                   'aria-selected': selected,
+                  'aria-controls': `${tabId}-panel`,
+                  tabindex: selected ? 0 : -1,
                   disabled: !enabled,
+                  'data-inspector-tab': item,
                   onClick: () => {
                     if (enabled) inspectorTab.value = item
+                  },
+                  onKeydown: (event: KeyboardEvent) => {
+                    if (
+                      event.key !== 'ArrowRight' &&
+                      event.key !== 'ArrowLeft' &&
+                      event.key !== 'ArrowDown' &&
+                      event.key !== 'ArrowUp'
+                    ) {
+                      return
+                    }
+                    const direction = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1
+                    const next = nextWorkflowDesignerInspectorTab(
+                      tab,
+                      direction,
+                      (candidate: WorkflowDesignerInspectorTab) =>
+                        workflowDesignerInspectorTabEnabled(candidate, node.kind)
+                    )
+                    event.preventDefault()
+                    inspectorTab.value = next
+                    const list = (event.currentTarget as HTMLElement | null)?.parentElement
+                    queueMicrotask(() => {
+                      list
+                        ?.querySelector<HTMLElement>(`[data-inspector-tab="${next}"]`)
+                        ?.focus()
+                    })
                   }
                 },
                 workflowDesignerInspectorTabLabel(item, labels)
@@ -948,7 +993,11 @@ export const WorkflowDesigner = defineComponent({
           ),
           h(
             'div',
-            { role: 'tabpanel' },
+            {
+              role: 'tabpanel',
+              id: `tiger-workflow-designer-tab-${workflowDesignerPathKey(node.path)}-${tab}-panel`,
+              'aria-labelledby': `tiger-workflow-designer-tab-${workflowDesignerPathKey(node.path)}-${tab}`
+            },
             tab === 'approvers'
               ? renderApproversTab(node)
               : tab === 'buttons'
@@ -993,7 +1042,7 @@ export const WorkflowDesigner = defineComponent({
                     ? createWorkflowDesignerStep(sourceSteps.value, {
                         kind: 'approve',
                         title: labels.branchLabel,
-                        expression: ''
+                        condition: { field: '', operator: 'eq', value: '' }
                       })
                     : createWorkflowDesignerStep(sourceSteps.value)
                 commit(insertWorkflowStepAtPath(sourceSteps.value, node.path, created))
@@ -1114,7 +1163,13 @@ export const WorkflowDesigner = defineComponent({
                   role: 'toolbar',
                   'aria-label': labels.paletteAriaLabel
                 },
-                WORKFLOW_DESIGNER_PALETTE_KINDS.map((kind) =>
+                [
+                  renderActionButton(
+                    labels.publishText,
+                    locked.value || workflowDesignerBlockingIssues(issueItems).length > 0,
+                    () => publish()
+                  ),
+                  ...WORKFLOW_DESIGNER_PALETTE_KINDS.map((kind) =>
                   renderActionButton(
                     kindOptions.value.find((option) => option.value === kind)?.label ?? kind,
                     locked.value || !view.value.valid,
@@ -1133,6 +1188,7 @@ export const WorkflowDesigner = defineComponent({
                     }
                   )
                 )
+                ]
               ),
               showEmpty ? h('p', { class: workflowDesignerEmptyClasses }, emptyCopy) : null,
               showEmpty ? null : renderList(nodes.value),

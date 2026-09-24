@@ -5,6 +5,7 @@ import {
   watch,
   h,
   PropType,
+  type VNode,
   onMounted,
   onBeforeUnmount,
   getCurrentInstance
@@ -38,6 +39,11 @@ import {
   moveCard,
   reorderColumns,
   isWipExceeded,
+  bindTaskBoardColumnId,
+  describeTaskBoardGrabAnnouncement,
+  isTaskBoardNestedControl,
+  nextTaskBoardRovingCardId,
+  taskBoardRovingTabIndex,
   appendDefaultTaskBoardCard,
   appendDefaultTaskBoardColumn,
   createTaskBoardDragController,
@@ -234,6 +240,8 @@ export const TaskBoard = defineComponent({
 
     const dragSnap = ref<TaskBoardDragSnapshot>(createDefaultDragSnapshot())
     const boardRef = ref<HTMLElement | null>(null)
+    const rovingCardIds = ref(new Map<string, string | number>())
+    const columnRovingKey = (id: string | number) => `${typeof id}:${String(id)}`
 
     const applyCardMove = async (
       cardId: string | number,
@@ -308,7 +316,11 @@ export const TaskBoard = defineComponent({
       mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
     )
 
-    const renderCard = (card: TaskBoardCard, column: TaskBoardColumn) => {
+    const renderCard = (
+      card: TaskBoardCard,
+      column: TaskBoardColumn,
+      visibleCards: readonly TaskBoardCard[]
+    ) => {
       const isDragging = dragSnap.value.drag?.type === 'card' && dragSnap.value.drag.id === card.id
       const isKbGrabbed = dragSnap.value.kbDrag?.id === card.id
       const cardClasses = classNames(
@@ -316,14 +328,20 @@ export const TaskBoard = defineComponent({
         isDragging && taskBoardCardDraggingClasses,
         cardMatchesFilter(card, props.filterText || '') && kanbanFilterHighlightClasses,
         isKbGrabbed &&
-          'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
+          'ring-2 ring-[var(--tiger-primary)] ring-offset-2 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
       )
 
       const cardAttrs = {
         key: String(card.id),
         class: cardClasses,
         draggable: props.draggable,
-        tabindex: 0,
+        tabindex: props.draggable
+          ? taskBoardRovingTabIndex(
+              visibleCards,
+              card.id,
+              rovingCardIds.value.get(columnRovingKey(column.id))
+            )
+          : -1,
         role: 'listitem',
         title: labels.value.dragHintText,
         'data-tiger-taskboard-card': '',
@@ -337,10 +355,34 @@ export const TaskBoard = defineComponent({
         onTouchmove: (e: TouchEvent) => dragCtrl.cardTouchMove(e),
         onTouchend: () => dragCtrl.cardTouchEnd(),
         onKeydown: (e: KeyboardEvent) => {
+          if (isTaskBoardNestedControl(e.target, e.currentTarget)) return
           if (dragCtrl.cardKeyDown(e.key, card, column)) {
             e.preventDefault()
-            e.stopPropagation()
+            if (e.key === 'Escape') e.stopPropagation()
+            return
           }
+          if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+          const nextId = nextTaskBoardRovingCardId(
+            visibleCards,
+            card.id,
+            e.key === 'ArrowDown' ? 'down' : 'up'
+          )
+          if (nextId == null || nextId === card.id) return
+          const nextMap = new Map(rovingCardIds.value)
+          nextMap.set(columnRovingKey(column.id), nextId)
+          rovingCardIds.value = nextMap
+          e.preventDefault()
+          const list = (e.currentTarget as HTMLElement | null)?.closest('[role="list"]')
+          const escaped =
+            typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
+              ? CSS.escape(String(nextId))
+              : String(nextId)
+          queueMicrotask(() => {
+            const target = list?.querySelector(
+              `[data-tiger-taskboard-card-id="${escaped}"]`
+            ) as HTMLElement | null
+            target?.focus()
+          })
         }
       }
 
@@ -349,11 +391,11 @@ export const TaskBoard = defineComponent({
       }
 
       return h('div', cardAttrs, [
-        h('div', { class: 'font-medium text-sm text-[var(--tiger-text,#1f2937)]' }, card.title),
+        h('div', { class: 'font-medium text-sm text-[var(--tiger-text)]' }, card.title),
         card.description
           ? h(
               'div',
-              { class: 'mt-1 text-xs text-[var(--tiger-text-muted,#6b7280)] line-clamp-2' },
+              { class: 'mt-1 text-xs text-[var(--tiger-text-secondary)] line-clamp-2' },
               card.description
             )
           : null
@@ -395,10 +437,10 @@ export const TaskBoard = defineComponent({
                     'span',
                     {
                       class: classNames(
-                        'ms-2 text-xs font-normal transition-all duration-200 px-1.5 py-0.5 rounded',
+                        'ms-2 text-xs font-normal [transition:var(--tiger-transition-quick)] px-1.5 py-0.5 rounded',
                         wipOver
-                          ? 'bg-red-50 dark:bg-red-950/30 text-[var(--tiger-error,#ef4444)] font-semibold border border-red-200/30 dark:border-red-900/30 shadow-xs'
-                          : 'opacity-70 bg-[var(--tiger-border,#e5e7eb)]/20 text-[var(--tiger-text-secondary,#6b7280)]'
+                          ? 'bg-red-50 dark:bg-red-950/30 text-[var(--tiger-error)] font-semibold border border-red-200/30 dark:border-red-900/30 shadow-xs'
+                          : 'opacity-70 bg-[var(--tiger-border)]/20 text-[var(--tiger-text-secondary)]'
                       ),
                       title: wipTitle
                     },
@@ -425,7 +467,7 @@ export const TaskBoard = defineComponent({
                   'span',
                   {
                     class:
-                      'text-xs font-normal text-[var(--tiger-text-muted,#6b7280)] truncate max-w-[120px]'
+                      'text-xs font-normal text-[var(--tiger-text-secondary)] truncate max-w-[120px]'
                   },
                   column.description
                 )
@@ -437,6 +479,7 @@ export const TaskBoard = defineComponent({
         {
           class: taskBoardColumnHeaderClasses,
           draggable: props.columnDraggable,
+          role: props.columnDraggable ? 'button' : undefined,
           tabindex: props.columnDraggable ? 0 : undefined,
           onDragstart: (e: DragEvent) => {
             if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column)
@@ -447,7 +490,10 @@ export const TaskBoard = defineComponent({
           onTouchmove: (e: TouchEvent) => dragCtrl.columnTouchMove(e),
           onTouchend: () => dragCtrl.columnTouchEnd(),
           onKeydown: (e: KeyboardEvent) => {
-            if (dragCtrl.columnKeyDown(e.key, column)) e.preventDefault()
+            if (isTaskBoardNestedControl(e.target, e.currentTarget)) return
+            if (!dragCtrl.columnKeyDown(e.key, column)) return
+            e.preventDefault()
+            if (e.key === 'Escape') e.stopPropagation()
           },
           style: props.columnDraggable ? 'cursor: grab' : undefined
         },
@@ -461,7 +507,7 @@ export const TaskBoard = defineComponent({
             h('div', { key: `drop-${visibleIndex}`, class: taskBoardDropIndicatorClasses })
           )
         }
-        nodes.push(renderCard(card, column))
+        nodes.push(renderCard(card, column, viewColumn.visibleCards))
         return nodes
       }
 
@@ -498,7 +544,7 @@ export const TaskBoard = defineComponent({
                   h('span', null, group.swimlane.label),
                   h(
                     'span',
-                    { class: 'ms-auto text-xs text-[var(--tiger-text-muted,#6b7280)]' },
+                    { class: 'ms-auto text-xs text-[var(--tiger-text-secondary)]' },
                     String(group.cards.length)
                   )
                 ]
@@ -573,10 +619,7 @@ export const TaskBoard = defineComponent({
               'button',
               {
                 type: 'button',
-                class: classNames(
-                  'border-t border-[var(--tiger-border,#e5e7eb)]',
-                  taskBoardAddCardClasses
-                ),
+                class: classNames('border-t border-[var(--tiger-border)]', taskBoardAddCardClasses),
                 disabled: atWip,
                 onClick: () => addCardToColumn(column.id)
               },
@@ -589,6 +632,10 @@ export const TaskBoard = defineComponent({
         {
           key: String(column.id),
           class: colClasses,
+          onVnodeMounted: (vnode: VNode) =>
+            bindTaskBoardColumnId(vnode.el as Element | null, column.id),
+          onVnodeUpdated: (vnode: VNode) =>
+            bindTaskBoardColumnId(vnode.el as Element | null, column.id),
           'data-tiger-taskboard-column': '',
           'data-tiger-taskboard-column-id': String(column.id),
           onDragover:
@@ -628,7 +675,11 @@ export const TaskBoard = defineComponent({
         )
       }
 
-      const liveMessage = dragSnap.value.kbDrag ? labels.value.dragHintText : ''
+      const liveMessage = describeTaskBoardGrabAnnouncement(
+        dragSnap.value,
+        view.value,
+        labels.value.grabAnnouncementText
+      )
 
       return h(
         'div',

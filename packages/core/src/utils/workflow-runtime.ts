@@ -21,6 +21,7 @@ import type {
   WorkflowTimelineActor,
   WorkflowTimelineStep
 } from '../types/workflow-timeline'
+import { selectWorkflowConditionBranch } from './workflow-condition'
 import {
   getCurrentWorkflowStep,
   isWorkflowTimelineStepStatus,
@@ -132,8 +133,7 @@ export function workflowButtonCommentRequired(
 }
 
 /**
- * Confirm-layer intercept: empty comment fails when required.
- * The reducer itself does not block; ActionBar (s2) calls this before submit.
+ * Empty required comments fail. The reducer and the action bar both use this.
  */
 export function assertWorkflowActionComment(
   comment: string | undefined,
@@ -184,10 +184,10 @@ function cloneRuntimeStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
       : cloneApproverSource(step.approverPolicy)
   }
   if (step.advanced) {
-    next.advanced = {
-      ...step.advanced,
-      timeout: step.advanced.timeout ? { ...step.advanced.timeout } : step.advanced.timeout
-    }
+    next.advanced = { ...step.advanced }
+  }
+  if (step.condition) {
+    next.condition = { ...step.condition }
   }
   if (step.origin) next.origin = { ...step.origin }
   if (step.pendingAfterAddsign) {
@@ -254,16 +254,30 @@ function patchStep(
   key: string,
   update: (step: WorkflowTimelineStep) => WorkflowTimelineStep
 ): void {
-  const apply = (list: WorkflowTimelineStep[]): WorkflowTimelineStep[] =>
-    list.map((step) => {
-      if (step.key === key) return update(step)
+  let done = false
+  const apply = (list: WorkflowTimelineStep[]): WorkflowTimelineStep[] => {
+    if (done) return list
+    let changed = false
+    const next = list.map((step) => {
+      if (done) return step
+      if (step.key === key) {
+        done = true
+        changed = true
+        return update(step)
+      }
       if (step.children && step.children.length > 0) {
         const children = apply(step.children)
-        if (children !== step.children) return { ...step, children }
+        if (children !== step.children) {
+          changed = true
+          return { ...step, children }
+        }
       }
       return step
     })
-  draft.steps = apply(draft.steps)
+    return changed ? next : list
+  }
+  const steps = apply(draft.steps)
+  if (steps !== draft.steps) draft.steps = steps
 }
 
 function insertRelative(
@@ -353,12 +367,11 @@ function currentTask(
   const tasks = nodeTasks(draft, node.key)
   if (action.taskId) return tasks.find((task) => task.id === action.taskId)
   if (action.actorId != null) {
-    const match = tasks.find(
+    return tasks.find(
       (task) =>
         sameActorId(task.assignee.id, action.actorId) &&
         (isOpenTask(task) || task.status === 'blocked')
     )
-    if (match) return match
   }
   const signMode = resolveWorkflowSignMode(node)
   if (signMode === 'sequential') {
@@ -456,22 +469,82 @@ function markNode(
   patchStep(draft, nodeKey, (step) => ({ ...step, ...extra, status }))
 }
 
+function locateRuntimeStep(
+  steps: readonly WorkflowTimelineStep[],
+  key: string,
+  parent: WorkflowTimelineStep | null = null
+): {
+  list: readonly WorkflowTimelineStep[]
+  index: number
+  parent: WorkflowTimelineStep | null
+} | null {
+  for (let index = 0; index < steps.length; index += 1) {
+    const step = steps[index]
+    if (!step) continue
+    if (step.key === key) return { list: steps, index, parent }
+    if (step.children && step.children.length > 0) {
+      const nested = locateRuntimeStep(step.children, key, step)
+      if (nested) return nested
+    }
+  }
+  return null
+}
+
+/**
+ * Next node after `fromKey` in sibling order. A condition's children are
+ * branches: finishing one branch continues after the condition, not into
+ * the other branches. The condition node itself is returned so `enterNode`
+ * can select a single branch.
+ */
 function nextActionableKey(draft: WorkflowInstance, fromKey: string): string | undefined {
-  const flat = flattenRuntimeSteps(draft.steps)
-  const index = flat.findIndex((step) => step.key === fromKey)
-  if (index < 0) return undefined
-  for (let i = index + 1; i < flat.length; i += 1) {
-    const step = flat[i]
+  const located = locateRuntimeStep(draft.steps, fromKey)
+  if (!located) return undefined
+  const parentKind = located.parent ? resolveWorkflowStepKind(located.parent) : undefined
+  if (parentKind === 'condition' && located.parent) {
+    return nextActionableKey(draft, located.parent.key)
+  }
+  for (let index = located.index + 1; index < located.list.length; index += 1) {
+    const step = located.list[index]
     if (!step) continue
     const kind = resolveWorkflowStepKind(step)
-    const status = resolveWorkflowStepStatus(step)
-    if (kind === 'condition') continue
-    if (kind === 'cc') return step.key
+    if (kind === 'condition' || kind === 'end' || kind === 'cc') return step.key
     if (kind === 'start' || kind === 'approve') {
+      const status = resolveWorkflowStepStatus(step)
       if (status === 'pending' || status === 'active') return step.key
     }
   }
+  if (located.parent) return nextActionableKey(draft, located.parent.key)
   return undefined
+}
+
+function workflowButtonEnabled(
+  node: WorkflowTimelineStep,
+  action: WorkflowRuntimeAction['action']
+): boolean {
+  const buttons = node.buttonPolicy?.buttons
+  if (!buttons || buttons.length === 0) return true
+  return buttons.some((button) => button.action === action && button.enabled !== false)
+}
+
+function workflowActorMayAct(
+  instance: WorkflowInstance,
+  node: WorkflowTimelineStep,
+  action: WorkflowRuntimeAction
+): boolean {
+  if (action.action === 'cancel') {
+    return instance.starter != null && sameActorId(instance.starter.id, action.actorId)
+  }
+  if (workflowInstanceUsesTasks(instance)) {
+    const tasks = nodeTasks(instance, node.key)
+    const owned = tasks.find(
+      (task) =>
+        sameActorId(task.assignee.id, action.actorId) &&
+        (isOpenTask(task) || task.status === 'blocked')
+    )
+    if (!owned) return false
+    return isTaskActionable(node, owned, instance.tasks)
+  }
+  return resolveWorkflowStepActors(node).some((actor) => sameActorId(actor.id, action.actorId))
 }
 
 function enterNode(
@@ -487,25 +560,27 @@ function enterNode(
   draft.cursor = { nodeKey }
   draft.status = 'active'
 
+  if (kind === 'end') {
+    markNode(draft, nodeKey, 'approved')
+    draft.status = 'approved'
+    draft.cursor = { nodeKey }
+    return
+  }
   if (kind === 'cc') {
     markNode(draft, nodeKey, 'approved')
     completeNode(draft, nodeKey, action, depth + 1)
     return
   }
   if (kind === 'condition') {
-    const child = node.children?.find((item) => {
-      const childKind = resolveWorkflowStepKind(item)
-      const childStatus = resolveWorkflowStepStatus(item)
-      return (
-        (childKind === 'approve' || childKind === 'start' || childKind === 'cc') &&
-        (childStatus === 'pending' || childStatus === 'active')
-      )
-    })
-    if (child) {
-      enterNode(draft, child.key, action, depth + 1)
+    const branch = selectWorkflowConditionBranch(node, draft.formValues)
+    if (!branch) {
+      markNode(draft, nodeKey, 'active')
+      draft.cursor = { nodeKey }
+      draft.status = 'active'
       return
     }
-    completeNode(draft, nodeKey, action, depth + 1)
+    markNode(draft, nodeKey, 'approved')
+    enterNode(draft, branch.key, action, depth + 1)
     return
   }
 
@@ -607,7 +682,6 @@ function completeNode(
 
   const nextKey = nextActionableKey(draft, nodeKey)
   if (!nextKey) {
-    draft.status = 'approved'
     draft.cursor = { nodeKey }
     return
   }
@@ -1064,7 +1138,21 @@ export function reduceWorkflowAction(
 ): WorkflowInstance {
   if (!instance?.steps || instance.steps.length === 0) return instance
   if (!action?.action) return instance
-  if (instanceIsTerminal(instance) && action.action !== 'comment') return instance
+  if (action.actorId == null || String(action.actorId).trim() === '') return instance
+  if (instanceIsTerminal(instance)) return instance
+
+  const gateNode = currentNode(instance, action)
+  if (!gateNode) return instance
+  if (!workflowButtonEnabled(gateNode, action.action)) return instance
+  if (
+    !assertWorkflowActionComment(
+      action.comment,
+      workflowButtonCommentRequired(gateNode, action.action)
+    )
+  ) {
+    return instance
+  }
+  if (!workflowActorMayAct(instance, gateNode, action)) return instance
 
   const draft = cloneWorkflowInstance(instance)
   const node = currentNode(draft, action)

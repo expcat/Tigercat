@@ -17,6 +17,7 @@ import {
   resolveWorkflowSignMode,
   resolveWorkflowStepKind,
   shouldConfirmWorkflowAction,
+  shouldOpenWorkflowActionLayer,
   shouldShowWorkflowActionCommentInput,
   shouldShowWorkflowActions,
   shouldShowWorkflowSignMode,
@@ -104,8 +105,8 @@ interface ActionDraft {
 const workflowTimelineRootClasses = 'flex flex-col gap-4'
 const workflowActionBarClasses = 'flex flex-nowrap items-center gap-2 overflow-x-auto'
 const workflowStepHeaderClasses = 'flex flex-wrap items-center gap-2'
-const workflowStepActorClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
-const workflowStepCommentClasses = 'text-sm text-[var(--tiger-text-secondary,#4b5563)] mt-1'
+const workflowStepActorClasses = 'text-sm text-[var(--tiger-text-secondary)]'
+const workflowStepCommentClasses = 'text-sm text-[var(--tiger-text-secondary)] mt-1'
 
 function isWorkflowTimelineItem(item: unknown): item is WorkflowTimelineItem {
   return (
@@ -339,7 +340,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
     event?: { preventDefault: () => void }
   ): boolean => {
     if (isWorkflowActionBarItemDisabled(item, disableOptions)) return false
-    const confirming = shouldConfirmWorkflowAction(item, confirm)
+    const confirming = shouldOpenWorkflowActionLayer(item, { confirm, commentRequired })
     if (!confirming) {
       onAction?.(item)
       return true
@@ -414,7 +415,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
             {renderReturnPicker ? (
               renderReturnPicker(returnPickerCtx)
             ) : targets.length === 0 ? (
-              <div className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+              <div className="text-sm text-[var(--tiger-text-secondary)]">
                 {stepLabels.returnNoTargets}
               </div>
             ) : (
@@ -470,7 +471,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
           />
         ) : null}
         {draft.error ? (
-          <div role="alert" className="mt-2 text-sm text-[var(--tiger-error,#dc2626)]">
+          <div role="alert" className="mt-2 text-sm text-[var(--tiger-error)]">
             {draft.error}
           </div>
         ) : null}
@@ -488,7 +489,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       returnNoTargets: stepLabels.returnNoTargets
     })
     const required = workflowActionBarCommentRequired(item, commentRequired)
-    const confirmCopy = shouldConfirmWorkflowAction(item, confirm)
+    const confirmCopy = shouldOpenWorkflowActionLayer(item, { confirm, commentRequired })
       ? getWorkflowActionConfirmCopy(item.action, stepLabels, { commentRequired: required })
       : null
     const showComment =
@@ -549,7 +550,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
   }
 
   const moreConfirmCopy =
-    moreItem && shouldConfirmWorkflowAction(moreItem, confirm)
+    moreItem && shouldOpenWorkflowActionLayer(moreItem, { confirm, commentRequired })
       ? getWorkflowActionConfirmCopy(moreItem.action, stepLabels, {
           commentRequired: workflowActionBarCommentRequired(moreItem, commentRequired)
         })
@@ -589,7 +590,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
                   ...disableOptions,
                   returnNoTargets: stepLabels.returnNoTargets
                 })
-                const needsDialog = shouldConfirmWorkflowAction(item, confirm)
+                const needsDialog = shouldOpenWorkflowActionLayer(item, { confirm, commentRequired })
                 return (
                   <DropdownItem
                     key={item.key}

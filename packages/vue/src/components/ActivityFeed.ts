@@ -1,13 +1,22 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
 import {
   classNames,
   buildActivityGroups,
   coerceClassValue,
+  COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+  COMPOSITE_LIST_VIEWPORT,
+  compositeListUsesWindow,
+  createInfiniteScrollFlight,
+  createInfiniteScrollObserver,
+  flattenCompositeGroupRows,
   formatActivityTime,
+  infiniteScrollSentinelClasses,
+  readDocumentTimeZone,
   mergeStyleValues,
   getActivityFeedLabels,
   mergeTigerLocale,
   resolveLocaleText,
+  resolveActivityCopy,
   toActivityTimelineItems,
   activityItemClasses,
   activityItemLayoutClasses,
@@ -16,6 +25,15 @@ import {
   activityItemTitleGroupClasses,
   activityItemDescriptionClasses,
   activityItemActionsClasses,
+  type ActivityFeedProps as CoreActivityFeedProps,
+  type ActivityGroup,
+  type ActivityItem,
+  type ActivityAction,
+  type ActivityTimelineItem,
+  type TigerLocale,
+  type TigerLocaleActivityFeed
+} from '@expcat/tigercat-core'
+import {
   activityFeedActionClasses,
   activityFeedItemSurfaceClasses,
   activityFeedAvatarClasses,
@@ -29,16 +47,10 @@ import {
   activityFeedGroupTitleClasses,
   activityFeedDotBaseClasses,
   activityFeedDotPulseBaseClasses,
-  getActivityFeedDotClasses,
-  type ActivityFeedProps as CoreActivityFeedProps,
-  type ActivityGroup,
-  type ActivityItem,
-  type ActivityAction,
-  type ActivityTimelineItem,
-  type TigerLocale,
-  type TigerLocaleActivityFeed
-} from '@expcat/tigercat-core'
+  getActivityFeedDotClasses
+} from '../../../core/src/internal/activity-feed-styles'
 import { Timeline } from './Timeline'
+import { VirtualList } from './VirtualList'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Card } from './Card'
@@ -145,6 +157,9 @@ export const ActivityFeed = defineComponent({
       type: Boolean,
       default: true
     },
+    timeZone: { type: String, default: undefined },
+    hasMore: { type: Boolean, default: false },
+    loadError: { type: Boolean, default: false },
     showGroupTitle: {
       type: Boolean,
       default: true
@@ -158,10 +173,41 @@ export const ActivityFeed = defineComponent({
       default: undefined
     }
   },
-  setup(props, { slots, attrs }) {
+  emits: ['load-more'],
+  setup(props, { slots, attrs, emit }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getActivityFeedLabels(mergedLocale.value, props.labels))
+
+    const documentTimeZone = ref<string | null>(props.timeZone ?? null)
+    const flight = createInfiniteScrollFlight()
+    const sentinelRef = ref<HTMLElement | null>(null)
+    const listRef = ref<{ getScrollElement: () => HTMLElement | null } | null>(null)
+    let wasLoading = props.loading
+    onMounted(() => {
+      documentTimeZone.value = props.timeZone || readDocumentTimeZone()
+    })
+    watch(
+      () => props.timeZone,
+      (zone) => {
+        documentTimeZone.value = zone || readDocumentTimeZone()
+      }
+    )
+    watch(
+      () => props.loading,
+      (loading) => {
+        flight.noteLoading(loading, wasLoading)
+        wasLoading = loading
+      }
+    )
+    watch(
+      () => props.loadError,
+      (error) => {
+        if (error) flight.noteError()
+      }
+    )
+    const announcement = ref('')
+    const seenIds = ref<Set<string> | null>(null)
 
     const resolvedGroups = computed(() =>
       buildActivityGroups(
@@ -187,19 +233,82 @@ export const ActivityFeed = defineComponent({
 
     const wrapperStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
+    const windowRows = computed(() =>
+      flattenCompositeGroupRows(resolvedGroups.value, props.showGroupTitle)
+    )
+    let stopObserver: (() => void) | null = null
+    function bindSentinel() {
+      stopObserver?.()
+      stopObserver = null
+      const sentinel = sentinelRef.value
+      if (!props.hasMore || !sentinel) return
+      const windowed = compositeListUsesWindow(windowRows.value.length)
+      const root = windowed ? (listRef.value?.getScrollElement() ?? null) : null
+      const teardown = createInfiniteScrollObserver(sentinel, {
+        root,
+        onLoadMore: () => {
+          flight.noteSentinel(true)
+          if (
+            !flight.canRequest({
+              hasMore: props.hasMore,
+              error: props.loadError,
+              loading: props.loading
+            })
+          ) {
+            return
+          }
+          const returned = emit('load-more') as unknown
+          const tasks = Array.isArray(returned) ? returned : [returned]
+          const pending = tasks.filter(
+            (task) => task && typeof (task as { then?: unknown }).then === 'function'
+          )
+          flight.begin(pending.length > 0 ? Promise.all(pending) : undefined)
+        },
+        onLeave: () => flight.noteSentinel(false)
+      })
+      stopObserver = teardown
+    }
+    onMounted(bindSentinel)
+    watch(() => [props.hasMore, props.loading, props.loadError, windowRows.value.length], bindSentinel, {
+      flush: 'post'
+    })
+    onBeforeUnmount(() => stopObserver?.())
+
+    watch(resolvedGroups, (groups) => {
+      const flat = groups.flatMap((group) => group.items ?? [])
+      const ids = flat.map((item) => String(item.id ?? ''))
+      if (seenIds.value === null) {
+        seenIds.value = new Set(ids)
+        return
+      }
+      const fresh = flat.filter((item) => item.id != null && !seenIds.value!.has(String(item.id)))
+      seenIds.value = new Set(ids)
+      const newest = fresh[fresh.length - 1]
+      if (!newest) return
+      const copy = resolveActivityCopy(newest)
+      const title = copy.title || copy.body || ''
+      announcement.value = labels.value.newItemText.split('{title}').join(title)
+    })
+
+    const liveRegion = () =>
+      h('div', { class: 'sr-only', 'aria-live': 'polite' }, announcement.value)
+
     const renderDefaultItem = (item: ActivityItem, index: number, group?: ActivityGroup) => {
       if (slots.item) {
         const slotContent = slots.item({ item, index, group })
         if (slotContent) return slotContent
       }
 
-      const titleText =
-        item.title ??
-        (typeof item.content === 'string' || typeof item.content === 'number'
-          ? String(item.content)
-          : '')
-      const descriptionText = item.description
-      const timeText = props.showTime ? formatActivityTime(item.time, mergedLocale.value) : ''
+      const copy = resolveActivityCopy(item)
+      const titleText = copy.title ?? ''
+      const descriptionText = copy.body
+      const timeText = props.showTime
+        ? formatActivityTime(
+            item.time,
+            mergedLocale.value,
+            documentTimeZone.value ? { timeZone: documentTimeZone.value } : undefined
+          )
+        : ''
       const actionNodes = item.actions?.map((action, actionIndex) =>
         renderAction(item, action, actionIndex)
       )
@@ -288,7 +397,7 @@ export const ActivityFeed = defineComponent({
       )
     }
 
-    const feedRole = computed(() => (attrs.role as string | undefined) ?? 'feed')
+    const feedRole = computed(() => (attrs.role as string | undefined) ?? 'region')
     const feedAriaLabel = computed(
       () =>
         (attrs['aria-label'] as string | undefined) ??
@@ -317,6 +426,7 @@ export const ActivityFeed = defineComponent({
             'data-tiger-activity-feed': true
           },
           [
+            liveRegion(),
             h(
               Card,
               {
@@ -370,9 +480,11 @@ export const ActivityFeed = defineComponent({
             style: wrapperStyle.value,
             role: feedRole.value,
             'aria-label': feedAriaLabel.value,
+            'aria-busy': feedAriaBusy.value,
             'data-tiger-activity-feed': true
           },
           [
+            liveRegion(),
             h(
               Card,
               {
@@ -396,9 +508,66 @@ export const ActivityFeed = defineComponent({
           style: wrapperStyle.value,
           role: feedRole.value,
           'aria-label': feedAriaLabel.value,
+          'aria-busy': feedAriaBusy.value,
           'data-tiger-activity-feed': true
         },
-        resolvedGroups.value.map((group, groupIndex) => {
+        [
+          liveRegion(),
+          props.loading
+            ? h(
+                'p',
+                null,
+                resolveLocaleText(labels.value.loadingText, props.loadingText)
+              )
+            : null,
+          ...(compositeListUsesWindow(windowRows.value.length)
+            ? [
+                h(
+                  VirtualList,
+                  {
+                    ref: listRef,
+                    'data-tiger-activity-window': '',
+                    itemCount: windowRows.value.length,
+                    estimatedItemHeight: COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+                    height: COMPOSITE_LIST_VIEWPORT,
+                    getItemKey: (index: number) => windowRows.value[index]?.key ?? index,
+                    role: 'presentation'
+                  },
+                  {
+                    default: ({ index }: { index: number }) => {
+                      const row = windowRows.value[index]
+                      const group = resolvedGroups.value[row?.groupIndex]
+                      if (!row || !group) return null
+                      if (row.kind === 'header') {
+                        return h('div', { class: 'flex items-center gap-2 mb-2' }, [
+                          h('span', { class: activityFeedGroupMarkerClasses }),
+                          h(
+                            Text,
+                            {
+                              tag: 'span',
+                              size: 'sm',
+                              weight: 'bold',
+                              class: activityFeedGroupTitleClasses
+                            },
+                            { default: () => group.title }
+                          )
+                        ])
+                      }
+                      const item = group.items?.[row.itemIndex]
+                      return item ? renderDefaultItem(item, row.itemIndex, group) : null
+                    },
+                    footer: () =>
+                      props.hasMore
+                        ? h('div', {
+                            ref: sentinelRef,
+                            class: infiniteScrollSentinelClasses,
+                            'aria-hidden': 'true'
+                          })
+                        : null
+                  }
+                )
+              ]
+            : resolvedGroups.value.map((group, groupIndex) => {
           const headerNode = slots.groupHeader?.({ group }) ?? slots.groupTitle?.({ group })
           const groupTitle = group.title
           const timelineItems = toActivityTimelineItems(group.items)
@@ -450,7 +619,16 @@ export const ActivityFeed = defineComponent({
               }
             )
           ])
-        }) as HChildren
+        }))
+          ,
+          !compositeListUsesWindow(windowRows.value.length) && props.hasMore
+            ? h('div', {
+                ref: sentinelRef,
+                class: infiniteScrollSentinelClasses,
+                'aria-hidden': 'true'
+              })
+            : null
+        ] as HChildren
       )
     }
   }

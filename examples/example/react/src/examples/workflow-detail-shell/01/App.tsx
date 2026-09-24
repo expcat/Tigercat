@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   applyWorkflowFieldPermissions,
   type FieldPermission,
@@ -13,7 +13,10 @@ import { SchemaForm } from '@expcat/tigercat-react/SchemaForm'
 import { TabPane } from '@expcat/tigercat-react/TabPane'
 import { Tabs } from '@expcat/tigercat-react/Tabs'
 import { Tag } from '@expcat/tigercat-react/Tag'
-import { WorkflowDetailShell } from '@expcat/tigercat-react/WorkflowDetailShell'
+import {
+  WorkflowDetailShell,
+  type WorkflowDetailShellHandle
+} from '@expcat/tigercat-react/WorkflowDetailShell'
 import { WorkflowActionBar, WorkflowTimeline } from '@expcat/tigercat-react/WorkflowTimeline'
 import { WorkflowViewer } from '@expcat/tigercat-react/WorkflowViewer'
 
@@ -71,26 +74,41 @@ export default function App() {
     () => applyWorkflowFieldPermissions(starterSchema, fieldPermissions, 'approve'),
     []
   )
-  const [model, setModel] = useState<FormValues>({ reason: '年假回家', days: 3, amount: 1200 })
+  const original = useMemo<FormValues>(() => ({ reason: '年假回家', days: 3, amount: 1200 }), [])
+  const [model, setModel] = useState<FormValues>(original)
   const [lastAction, setLastAction] = useState('')
+  const shellRef = useRef<WorkflowDetailShellHandle>(null)
 
   const onAction = (item: WorkflowActionBarItem, payload?: WorkflowActionPayload) => {
+    const merged = shellRef.current?.submit()
     const comment = payload?.comment?.trim()
-    setLastAction(comment ? `${item.label} · ${comment}` : item.label)
+    const amount = merged?.amount
+    setLastAction(
+      [item.label, comment, amount != null ? `金额 ${String(amount)}` : '']
+        .filter(Boolean)
+        .join(' · ')
+    )
   }
 
   return (
     <div className="flex h-[32rem] min-h-0 flex-col">
       <WorkflowDetailShell
+        ref={shellRef}
         className="h-full min-h-0"
         ariaLabel="请假审批详情"
+        originalValues={original}
+        values={model}
+        schema={starterSchema}
+        fieldPermissions={fieldPermissions}
+        permissionMode="approve"
+        nodeKind="approve"
         header={
           <div className="flex flex-wrap items-center gap-2">
             <strong>请假申请</strong>
             <Tag variant="primary" size="sm">
               审批中
             </Tag>
-            <span className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+            <span className="text-sm text-[var(--tiger-text-secondary)]">
               金额字段对本节点隐藏
             </span>
           </div>
@@ -109,7 +127,7 @@ export default function App() {
         action={
           <div className="flex flex-wrap items-center justify-between gap-3">
             {lastAction ? (
-              <p className="m-0 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+              <p className="m-0 text-sm text-[var(--tiger-text-secondary)]">
                 最近操作：{lastAction}
               </p>
             ) : null}

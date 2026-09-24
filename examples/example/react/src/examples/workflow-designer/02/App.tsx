@@ -37,12 +37,12 @@ export default function App() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+      <p className="text-sm text-[var(--tiger-text-secondary)]">
         path 只编辑主管会签的子节点（抄送/并行，不是审批人），Inspector 仍可改选中节点；onChange
         回写整棵树。
       </p>
       <WorkflowDesigner value={steps} path={['manager']} schema={schema} onChange={setSteps} />
-      <pre className="overflow-auto rounded-md bg-[var(--tiger-fill,#f3f4f6)] p-3 text-xs">
+      <pre className="overflow-auto rounded-md bg-[var(--tiger-surface-muted)] p-3 text-xs">
         {JSON.stringify(steps, null, 2)}
       </pre>
     </div>

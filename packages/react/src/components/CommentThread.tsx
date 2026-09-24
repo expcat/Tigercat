@@ -1,10 +1,20 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   canSubmitCommentReply,
   clipCommentTreeDepth,
+  commentIdKey,
+  commentNodeAcceptsReply,
+  formatCommentTreeError,
   formatBadgeCountLabel,
+  COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+  COMPOSITE_LIST_VIEWPORT,
+  compositeListUsesWindow,
+  createInfiniteScrollFlight,
+  createInfiniteScrollObserver,
   formatCommentTime,
+  infiniteScrollSentinelClasses,
+  readDocumentTimeZone,
   getCommentRepliesView,
   nextCommentRevealedCount,
   resolveCommentNodes,
@@ -14,6 +24,12 @@ import {
   resolveCommentLikeState,
   resolveLocaleText,
   writeCommentLikeOverlay,
+  type CommentAction,
+  type CommentLikeOverlay,
+  type CommentNode,
+  type CommentThreadProps as CoreCommentThreadProps
+} from '@expcat/tigercat-core'
+import {
   commentThreadActionButtonClasses,
   commentThreadPrimaryButtonClasses,
   commentThreadLikeButtonClasses,
@@ -33,18 +49,15 @@ import {
   commentThreadSubmitButtonClasses,
   commentThreadRepliesClasses,
   commentThreadEmptyClasses,
-  commentThreadEmptyIconClasses,
-  type CommentAction,
-  type CommentLikeOverlay,
-  type CommentNode,
-  type CommentThreadProps as CoreCommentThreadProps
-} from '@expcat/tigercat-core'
+  commentThreadEmptyIconClasses
+} from '../../../core/src/internal/comment-thread-styles'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Button } from './Button'
 import { Textarea } from './Textarea'
 import { Text } from './Text'
 import { useTigerConfig } from './ConfigProvider'
+import { VirtualList, type VirtualListHandle } from './VirtualList'
 
 export interface CommentThreadProps
   extends CoreCommentThreadProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {}
@@ -82,6 +95,10 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   onUserClick,
   onExpandedChange,
   onLoadMore,
+  timeZone,
+  hasMore = false,
+  loadError = false,
+  onLoadRoot,
   className,
   ...divProps
 }) => {
@@ -104,7 +121,20 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   const [replyingTo, setReplyingTo] = useState<string | number | null>(null)
   const [replyValue, setReplyValue] = useState('')
   const [composerValue, setComposerValue] = useState('')
-  const replyInFlight = useRef(false)
+  const [replyInFlight, setReplyInFlight] = useState(false)
+  const [documentTimeZone, setDocumentTimeZone] = useState<string | null>(timeZone ?? null)
+  const flightRef = useRef(createInfiniteScrollFlight())
+  const wasLoadingRef = useRef(false)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<VirtualListHandle | null>(null)
+  const onLoadRootRef = useRef(onLoadRoot)
+  onLoadRootRef.current = onLoadRoot
+  useEffect(() => {
+    setDocumentTimeZone(timeZone || readDocumentTimeZone())
+  }, [timeZone])
+  useEffect(() => {
+    if (loadError) flightRef.current.noteError()
+  }, [loadError])
 
   const mergedExpandedKeys = expandedKeys ?? innerExpandedKeys
   const expandedSet = useMemo(
@@ -112,12 +142,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     [mergedExpandedKeys]
   )
 
-  const { resolvedNodes, clippedIds } = useMemo(() => {
+  const { resolvedNodes, clippedIds, treeErrors } = useMemo(() => {
     const clipped = new Set<string | number>()
     const tree = resolveCommentNodes(nodes, items)
     return {
-      resolvedNodes: clipCommentTreeDepth(tree, maxDepth, clipped),
-      clippedIds: clipped
+      resolvedNodes: clipCommentTreeDepth(tree.roots, maxDepth, clipped),
+      clippedIds: clipped,
+      treeErrors: tree.errors
     }
   }, [items, maxDepth, nodes])
 
@@ -168,28 +199,52 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     onLike?.(node, next.liked)
   }
 
-  const handleReplySubmit = (node?: CommentNode) => {
+  const handleReplySubmit = async (node?: CommentNode) => {
     const source = node ? replyValue : composerValue
-    if (!canSubmitCommentReply(source, replyInFlight.current) || !hasReplyHandler) return
-    replyInFlight.current = true
-    onReply?.(node, source.trim())
-    if (node) {
-      setReplyValue('')
-      setReplyingTo(null)
-      if (!expandedSet.has(node.id)) updateExpandedKeys([...mergedExpandedKeys, node.id])
-    } else {
-      setComposerValue('')
+    if (
+      !canSubmitCommentReply({
+        value: source,
+        inFlight: replyInFlight,
+        hasReplyHandler
+      })
+    ) {
+      return
     }
-    queueMicrotask(() => {
-      replyInFlight.current = false
-    })
+    const text = source.trim()
+    setReplyInFlight(true)
+    try {
+      await Promise.resolve(onReply?.(node, text))
+      if (node) {
+        setReplyValue('')
+        setReplyingTo(null)
+        if (!expandedSet.has(node.id)) updateExpandedKeys([...mergedExpandedKeys, node.id])
+      } else {
+        setComposerValue('')
+      }
+    } catch {
+      // Keep the draft so the same reply can be sent again.
+    } finally {
+      setReplyInFlight(false)
+    }
   }
+
+  const instanceId = useId()
+  const positionMap = useMemo(() => {
+    const into = new Map<string, number>()
+    const walk = (list: CommentNode[]) => {
+      for (const node of list) {
+        into.set(commentIdKey(node.id), into.size + 1)
+        walk(node.children ?? [])
+      }
+    }
+    walk(resolvedNodes)
+    return into
+  }, [resolvedNodes])
 
   const renderNode = (
     node: CommentNode,
     depth: number,
-    isLast: boolean,
-    pos: { current: number; total: number }
+    isLast: boolean
   ) => {
     const children = node.children ?? []
     const hasChildren = children.length > 0 || clippedIds.has(node.id)
@@ -200,11 +255,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       hasLoadMoreHandler
     })
     const showReplies = hasChildren && isExpanded && children.length > 0
-    const repliesId = `tiger-comment-replies-${node.id}`
+    const articleId = `${instanceId}-article-${commentIdKey(node.id)}`
     const visibleChildren = showReplies ? repliesView.visible : []
+    const firstReply = visibleChildren[0]
+    const controlsId = firstReply
+      ? `${instanceId}-article-${commentIdKey(firstReply.id)}`
+      : undefined
     const showLoadMoreBtn = showReplies && repliesView.loadMoreKind != null
-    pos.current += 1
-    const posinset = pos.current
+    const posinset = positionMap.get(commentIdKey(node.id)) ?? 1
 
     const actions: React.ReactNode[] = []
 
@@ -245,7 +303,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       )
     }
 
-    if (showReply) {
+    if (showReply && commentNodeAcceptsReply(depth, maxDepth)) {
       actions.push(
         <Button
           key="reply"
@@ -329,13 +387,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     return (
       <article
         key={node.id}
+        id={articleId}
         className={classNames(
           'tiger-comment-thread-item',
           depth === 1 && 'py-5',
           depth === 1 && !isLast && showDivider && commentThreadDividerClasses
         )}
         aria-posinset={posinset}
-        aria-setsize={pos.total}>
+        aria-setsize={positionMap.size}>
         <div className="flex gap-3">
           {showAvatar && node.user ? (
             <Avatar
@@ -390,9 +449,17 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   {tag.label}
                 </Tag>
               ))}
-              {formatCommentTime(node.time, mergedLocale) ? (
+              {formatCommentTime(
+                node.time,
+                mergedLocale,
+                documentTimeZone ? { timeZone: documentTimeZone } : undefined
+              ) ? (
                 <Text tag="span" size="xs" color="muted" className={commentThreadTimeClasses}>
-                  {formatCommentTime(node.time, mergedLocale)}
+                  {formatCommentTime(
+                    node.time,
+                    mergedLocale,
+                    documentTimeZone ? { timeZone: documentTimeZone } : undefined
+                  )}
                 </Text>
               ) : null}
             </div>
@@ -428,7 +495,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                     size="sm"
                     variant="primary"
                     className={commentThreadSubmitButtonClasses}
-                    disabled={!canSubmitCommentReply(replyValue, false) || !hasReplyHandler}
+                    disabled={
+                      !canSubmitCommentReply({
+                        value: replyValue,
+                        inFlight: replyInFlight,
+                        hasReplyHandler
+                      })
+                    }
+
                     onClick={() => handleReplySubmit(node)}>
                     {resolveLocaleText(labels.replySubmitText, replyButtonText)}
                   </Button>
@@ -442,7 +516,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 variant="ghost"
                 className={classNames('mt-2 font-semibold', commentThreadPrimaryButtonClasses)}
                 aria-expanded={isExpanded}
-                aria-controls={children.length > 0 ? repliesId : undefined}
+                aria-controls={controlsId}
                 disabled={clippedIds.has(node.id) && children.length === 0}
                 onClick={() => {
                   if (clippedIds.has(node.id) && children.length === 0) return
@@ -460,11 +534,8 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               </Button>
             ) : null}
 
-            {showReplies ? (
-              <div id={repliesId} className={commentThreadRepliesClasses}>
-                {visibleChildren.map((child, index) =>
-                  renderNode(child, depth + 1, index === visibleChildren.length - 1, pos)
-                )}
+            {showLoadMoreBtn ? (
+              <div className={commentThreadRepliesClasses}>
                 {showLoadMoreBtn ? (
                   <Button
                     size="sm"
@@ -488,18 +559,43 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     )
   }
 
-  const countVisible = (list: CommentNode[]): number =>
-    list.reduce((sum, node) => {
-      if (!expandedSet.has(node.id)) return sum + 1
+  const flatComments: Array<{ node: CommentNode; depth: number }> = []
+  const flattenVisible = (list: CommentNode[], depth: number) => {
+    for (const node of list) {
+      flatComments.push({ node, depth })
+      if (!expandedSet.has(node.id)) continue
       const view = getCommentRepliesView(node.children, {
         maxReplies,
         revealedCount: revealedCounts.get(node.id) ?? maxReplies,
         hasLoadMoreHandler
       })
-      return sum + 1 + countVisible(view.visible)
-    }, 0)
+      flattenVisible(view.visible, depth + 1)
+    }
+  }
+  flattenVisible(resolvedNodes, 1)
+  const windowed = compositeListUsesWindow(flatComments.length)
+  useEffect(() => {
+    if (!hasMore || !onLoadRoot) return undefined
+    const sentinel = sentinelRef.current
+    if (!sentinel) return undefined
+    const root = windowed ? (listRef.current?.getScrollElement() ?? null) : null
+    return (
+      createInfiniteScrollObserver(sentinel, {
+        root,
+        onLoadMore: () => {
+          flightRef.current.noteSentinel(true)
+          const start = onLoadRootRef.current
+          if (!start || !flightRef.current.canRequest({ hasMore, error: loadError })) return
+          flightRef.current.begin(start())
+        },
+        onLeave: () => flightRef.current.noteSentinel(false)
+      }) ?? undefined
+    )
+  }, [flatComments.length, hasMore, loadError, onLoadRoot, windowed])
 
-  const pos = { current: 0, total: countVisible(resolvedNodes) }
+  const pageSentinel = hasMore ? (
+    <div ref={sentinelRef} className={infiniteScrollSentinelClasses} aria-hidden="true" />
+  ) : null
 
   const composer = showComposer ? (
     <div className={commentThreadReplyEditorClasses}>
@@ -516,7 +612,13 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           size="sm"
           variant="primary"
           className={commentThreadSubmitButtonClasses}
-          disabled={!canSubmitCommentReply(composerValue, false) || !hasReplyHandler}
+          disabled={
+            !canSubmitCommentReply({
+              value: composerValue,
+              inFlight: replyInFlight,
+              hasReplyHandler
+            })
+          }
           onClick={() => handleReplySubmit()}>
           {resolveLocaleText(labels.replySubmitText, replyButtonText)}
         </Button>
@@ -527,12 +629,21 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   return (
     <div
       className={classNames('tiger-comment-thread flex flex-col', className)}
-      role={divProps.role ?? 'feed'}
+      role="region"
       data-tiger-comment-thread
       aria-label={
         divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : labels.listAriaLabel)
       }
       {...divProps}>
+      {treeErrors.length > 0 ? (
+        <div role="alert">
+          {treeErrors.map((error) => (
+            <p key={`${error.code}-${error.id}`}>
+              {formatCommentTreeError(error, labels)}
+            </p>
+          ))}
+        </div>
+      ) : null}
       {composer}
       {resolvedNodes.length === 0 ? (
         <div className={commentThreadEmptyClasses}>
@@ -553,10 +664,37 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             {resolveLocaleText(labels.emptyText, emptyText)}
           </Text>
         </div>
+      ) : windowed ? (
+        <VirtualList
+          ref={listRef}
+          data-tiger-comment-window=""
+          itemCount={flatComments.length}
+          estimatedItemHeight={COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT}
+          height={COMPOSITE_LIST_VIEWPORT}
+          getItemKey={(index) => String(flatComments[index]?.node.id ?? index)}
+          renderItem={({ index }) => {
+            const entry = flatComments[index]
+            return entry
+              ? renderNode(entry.node, entry.depth, index === flatComments.length - 1)
+              : null
+          }}
+          role="presentation"
+          footer={pageSentinel}
+        />
       ) : (
-        resolvedNodes.map((node, index) =>
-          renderNode(node, 1, index === resolvedNodes.length - 1, pos)
-        )
+        <>
+          <div
+            role="feed"
+            aria-label={
+              divProps['aria-label'] ??
+              (divProps['aria-labelledby'] ? undefined : labels.listAriaLabel)
+            }>
+            {flatComments.map(({ node, depth }, index) =>
+              renderNode(node, depth, index === flatComments.length - 1)
+            )}
+          </div>
+          {pageSentinel}
+        </>
       )}
     </div>
   )

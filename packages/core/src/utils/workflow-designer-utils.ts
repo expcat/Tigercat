@@ -17,12 +17,12 @@ import type {
   WorkflowNodeButtonPolicy,
   WorkflowSignMode,
   WorkflowStepKind,
-  WorkflowTimeoutAction,
   WorkflowTimelineAction,
   WorkflowTimelineActor,
   WorkflowTimelineStep
 } from '../types/workflow-timeline'
 import { flattenSchemaFormFields } from './schema-form-utils'
+import { defaultWorkflowFieldPermission } from './workflow-field-permissions'
 import { createFullWorkflowButtonPolicy, listApproverSources } from './workflow-runtime'
 import {
   resolveWorkflowSignMode,
@@ -63,7 +63,7 @@ export const workflowDesignerCanvasBaseStyles = {
     left: '50%',
     width: '0.125rem',
     transform: 'translateX(-50%)',
-    backgroundColor: 'color-mix(in srgb, var(--tiger-primary, #2563eb) 35%, transparent)',
+    backgroundColor: 'color-mix(in srgb, var(--tiger-primary) 35%, transparent)',
     pointerEvents: 'none',
     zIndex: '0'
   },
@@ -112,62 +112,62 @@ export const workflowDesignerCanvasBaseStyles = {
 export const workflowDesignerRootClasses = 'tiger-workflow-designer w-full'
 export const workflowDesignerShellClasses = 'flex flex-col gap-3 lg:flex-row lg:items-stretch'
 export const workflowDesignerTreeClasses =
-  'tiger-workflow-designer__canvas relative flex min-w-0 flex-1 flex-col gap-2 rounded-lg bg-[var(--tiger-fill,#f3f4f6)] px-4 py-3'
+  'tiger-workflow-designer__canvas relative flex min-w-0 flex-1 flex-col gap-2 rounded-lg bg-[var(--tiger-surface-muted)] px-4 py-3'
 export const workflowDesignerListClasses = 'tiger-workflow-designer__flow'
 export const workflowDesignerItemClasses = 'tiger-workflow-designer__node'
 export const workflowDesignerCardClasses =
-  'tiger-workflow-designer__card min-w-0 cursor-pointer rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-2'
+  'tiger-workflow-designer__card min-w-0 cursor-pointer rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2'
 export const workflowDesignerCardSelectedClasses =
-  'border-[var(--tiger-primary,#2563eb)] bg-[var(--tiger-primary-soft,#eff6ff)] ring-2 ring-[var(--tiger-primary,#2563eb)] ring-offset-1'
+  'border-[var(--tiger-primary)] bg-[var(--tiger-primary-soft)] ring-2 ring-[var(--tiger-primary)] ring-offset-1'
 export const workflowDesignerSummaryClasses = 'flex min-w-0 flex-col gap-1'
 export const workflowDesignerSummaryRowClasses = 'flex min-w-0 items-center gap-2'
 export const workflowDesignerSummaryTitleClasses =
-  'min-w-0 truncate text-sm font-medium text-[var(--tiger-text,#111827)]'
-export const workflowDesignerSummaryActorsClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
+  'min-w-0 truncate text-sm font-medium text-[var(--tiger-text)]'
+export const workflowDesignerSummaryActorsClasses = 'text-sm text-[var(--tiger-text-secondary)]'
 export const workflowDesignerKindDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'
 export const workflowDesignerToolbarClasses = 'mt-2 flex flex-wrap items-center gap-1'
 export const workflowDesignerInsertRowClasses = 'tiger-workflow-designer__insert'
 export const workflowDesignerInsertButtonClasses =
-  'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] text-xs font-medium leading-none text-[var(--tiger-text-muted,#6b7280)] disabled:cursor-not-allowed disabled:opacity-50'
+  'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--tiger-border)] bg-[var(--tiger-surface)] text-xs font-medium leading-none text-[var(--tiger-text-secondary)] disabled:cursor-not-allowed disabled:opacity-50'
 export const workflowDesignerInsertGlyph = '+'
 export const workflowDesignerEmptyInspectorClasses =
-  'flex min-h-[12rem] items-center justify-center px-3 text-center text-sm text-[var(--tiger-text-muted,#6b7280)]'
+  'flex min-h-[12rem] items-center justify-center px-3 text-center text-sm text-[var(--tiger-text-secondary)]'
 export const workflowDesignerPanelClasses =
-  'min-w-0 rounded-lg border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-3 py-3 lg:sticky lg:top-0 lg:w-[24rem] lg:shrink-0'
+  'min-w-0 rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-3 lg:sticky lg:top-0 lg:w-[24rem] lg:shrink-0'
 export const workflowDesignerPaletteClasses = 'flex flex-wrap items-center gap-1'
 export const workflowDesignerTabListClasses =
-  'mb-3 flex flex-wrap gap-1 border-b border-[var(--tiger-border,#d1d5db)] pb-2'
+  'mb-3 flex flex-wrap gap-1 border-b border-[var(--tiger-border)] pb-2'
 export const workflowDesignerTabClasses =
-  'inline-flex items-center rounded-md px-2 py-1 text-xs text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50'
+  'inline-flex items-center rounded-md px-2 py-1 text-xs text-[var(--tiger-text)] disabled:cursor-not-allowed disabled:opacity-50'
 export const workflowDesignerTabSelectedClasses =
-  'bg-[var(--tiger-primary-soft,#dbeafe)] text-[var(--tiger-primary,#2563eb)]'
+  'bg-[var(--tiger-primary-soft)] text-[var(--tiger-primary)]'
 export const workflowDesignerIssueBannerClasses =
-  'rounded-md border border-[var(--tiger-error,#dc2626)] bg-[var(--tiger-error-soft,#fef2f2)] px-3 py-2 text-sm text-[var(--tiger-error,#dc2626)]'
+  'rounded-md border border-[var(--tiger-error)] bg-[var(--tiger-error-soft)] px-3 py-2 text-sm text-[var(--tiger-error)]'
 export const workflowDesignerIssueListClasses = 'm-0 list-disc space-y-1 ps-4'
 export const workflowDesignerTableClasses = 'w-full border-collapse text-sm'
 export const workflowDesignerTableHeadClasses =
-  'border-b border-[var(--tiger-border,#d1d5db)] py-1 text-start text-xs font-medium text-[var(--tiger-text-muted,#6b7280)]'
+  'border-b border-[var(--tiger-border)] py-1 text-start text-xs font-medium text-[var(--tiger-text-secondary)]'
 export const workflowDesignerTableCellClasses =
-  'border-b border-[var(--tiger-border,#e5e7eb)] py-1 align-middle'
+  'border-b border-[var(--tiger-border)] py-1 align-middle'
 export const workflowDesignerFieldsClasses = 'flex flex-col gap-2'
 export const workflowDesignerFieldClasses = 'flex min-w-0 flex-col gap-1'
 export const workflowDesignerLabelClasses =
-  'text-xs font-medium text-[var(--tiger-text-muted,#6b7280)]'
-export const workflowDesignerHintClasses = 'text-xs text-[var(--tiger-text-muted,#6b7280)]'
+  'text-xs font-medium text-[var(--tiger-text-secondary)]'
+export const workflowDesignerHintClasses = 'text-xs text-[var(--tiger-text-secondary)]'
 export const workflowDesignerControlClasses =
-  'w-full rounded-md border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-2 py-1 text-sm text-[var(--tiger-text,#111827)]'
+  'w-full rounded-md border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-sm text-[var(--tiger-text)]'
 export const workflowDesignerActorRowClasses = 'flex min-w-0 items-center gap-1'
-export const workflowDesignerEmptyClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)]'
+export const workflowDesignerEmptyClasses = 'text-sm text-[var(--tiger-text-secondary)]'
 export const workflowDesignerChildrenClasses = 'tiger-workflow-designer__children'
 export const workflowDesignerActionButtonClasses =
-  'inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg,#fff)] px-2 py-1 text-xs text-[var(--tiger-text,#111827)] disabled:cursor-not-allowed disabled:opacity-50'
+  'inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-xs text-[var(--tiger-text)] disabled:cursor-not-allowed disabled:opacity-50'
 
 export const WORKFLOW_DESIGNER_KIND_COLORS: Record<WorkflowStepKind, string> = {
-  start: 'var(--tiger-primary,#2563eb)',
-  approve: 'var(--tiger-success,#16a34a)',
-  cc: 'var(--tiger-text-muted,#6b7280)',
-  condition: 'var(--tiger-warning,#d97706)',
-  end: 'var(--tiger-text,#111827)'
+  start: 'var(--tiger-primary)',
+  approve: 'var(--tiger-success)',
+  cc: 'var(--tiger-text-secondary)',
+  condition: 'var(--tiger-warning)',
+  end: 'var(--tiger-text)'
 }
 
 export const WORKFLOW_DESIGNER_PALETTE_KINDS: readonly WorkflowStepKind[] = WORKFLOW_STEP_KINDS
@@ -204,15 +204,13 @@ export const WORKFLOW_EMPTY_APPROVERS: readonly WorkflowEmptyApprover[] = [
   'transfer_user'
 ]
 
-export const WORKFLOW_TIMEOUT_ACTIONS: readonly WorkflowTimeoutAction[] = [
-  'remind',
-  'auto_pass',
-  'auto_reject',
-  'transfer'
-]
-
 export type WorkflowDesignerIssueCode =
-  'missing_start' | 'missing_end' | 'empty_approvers' | 'missing_branches' | 'buttons_all_disabled'
+  | 'missing_start'
+  | 'missing_end'
+  | 'empty_approvers'
+  | 'missing_branches'
+  | 'buttons_all_disabled'
+  | 'duplicate_key'
 
 export interface WorkflowDesignerIssue {
   code: WorkflowDesignerIssueCode
@@ -299,10 +297,10 @@ function cloneStep(step: WorkflowTimelineStep): WorkflowTimelineStep {
         : { ...step.approverPolicy }
   }
   if (step.advanced) {
-    next.advanced = {
-      ...step.advanced,
-      timeout: step.advanced.timeout ? { ...step.advanced.timeout } : step.advanced.timeout
-    }
+    next.advanced = { ...step.advanced }
+  }
+  if (step.condition) {
+    next.condition = { ...step.condition }
   }
   if (step.origin) next.origin = { ...step.origin }
   if (step.pendingAfterAddsign) {
@@ -643,6 +641,34 @@ export function workflowDesignerDefaultInspectorTab(
   return workflowDesignerInspectorTabEnabled('approvers', kind) ? 'approvers' : 'advanced'
 }
 
+const DESIGNER_NESTED_CONTROL_SELECTOR =
+  'button, a, input, textarea, select, [role="button"], [role="link"], [role="menuitem"], [role="tab"]'
+
+/** Enter on a nested control belongs to that control, not the node card. */
+export function isWorkflowDesignerNestedControl(
+  target: EventTarget | null,
+  current: EventTarget | null
+): boolean {
+  if (!(target instanceof Element) || target === current) return false
+  return Boolean(target.closest(DESIGNER_NESTED_CONTROL_SELECTOR))
+}
+
+/** Next enabled inspector tab. Arrow keys stay inside the tabs that apply to this node. */
+export function nextWorkflowDesignerInspectorTab(
+  current: WorkflowDesignerInspectorTab,
+  direction: 1 | -1,
+  enabled: (tab: WorkflowDesignerInspectorTab) => boolean
+): WorkflowDesignerInspectorTab {
+  const tabs = WORKFLOW_DESIGNER_INSPECTOR_TABS
+  const start = Math.max(0, tabs.indexOf(current))
+  for (let step = 1; step <= tabs.length; step += 1) {
+    const index = (start + direction * step + tabs.length * 4) % tabs.length
+    const tab = tabs[index]
+    if (tab && enabled(tab)) return tab
+  }
+  return current
+}
+
 function uniqueDesignerKey(used: Set<string>, seed?: string): string {
   const base = seed && seed.trim() !== '' ? `${seed}-copy` : 'step'
   if (!used.has(base)) return base
@@ -695,12 +721,12 @@ export function createWorkflowDesignerPaletteStep(
   const first = createWorkflowDesignerStep(existing, {
     kind: 'approve',
     title: `${branchTitle} 1`,
-    expression: ''
+    condition: { field: '', operator: 'eq', value: '' }
   })
   const second = createWorkflowDesignerStep([...(existing ?? []), first], {
     kind: 'approve',
     title: `${branchTitle} 2`,
-    expression: ''
+    condition: { field: '', operator: 'eq', value: '' }
   })
   return createWorkflowDesignerStep([...(existing ?? []), first, second], {
     kind,
@@ -749,6 +775,7 @@ export function validateWorkflowDesigner(
   const issues: WorkflowDesignerIssue[] = []
   let hasStart = false
   let hasEnd = false
+  const seenKeys = new Map<string, string[]>()
 
   const visit = (
     list: readonly WorkflowTimelineStep[],
@@ -758,6 +785,12 @@ export function validateWorkflowDesigner(
     for (const step of list) {
       const path = [...parentPath, step.key]
       const kind = resolveWorkflowStepKind(step)
+      const previous = seenKeys.get(step.key)
+      if (previous) {
+        issues.push({ code: 'duplicate_key', path, blocking: true })
+      } else {
+        seenKeys.set(step.key, path)
+      }
       if (kind === 'start') hasStart = true
       if (kind === 'end') hasEnd = true
       if (kind === 'approve' && parentKind !== 'condition') {
@@ -797,6 +830,7 @@ export function workflowDesignerIssueMessage(
     | 'validationEmptyApprovers'
     | 'validationMissingBranches'
     | 'validationButtonsAllDisabled'
+    | 'validationDuplicateKey'
   >
 ): string {
   if (issue.code === 'missing_start') return labels.validationMissingStart ?? 'Add a start node'
@@ -806,6 +840,9 @@ export function workflowDesignerIssueMessage(
   }
   if (issue.code === 'missing_branches') {
     return labels.validationMissingBranches ?? 'This condition node has no branches'
+  }
+  if (issue.code === 'duplicate_key') {
+    return labels.validationDuplicateKey ?? 'Each node key must be unique'
   }
   return labels.validationButtonsAllDisabled ?? 'All action buttons are disabled'
 }
@@ -929,11 +966,13 @@ export function patchWorkflowDesignerButton(
 export function resolveWorkflowDesignerFieldPermission(
   kind: WorkflowStepKind,
   permissions: Record<string, FieldPermission> | undefined,
-  fieldPath: string
+  fieldPath: string,
+  schemaHidden?: boolean
 ): FieldPermission {
+  if (schemaHidden) return 'hidden'
   const current = permissions?.[fieldPath]
   if (current === 'editable' || current === 'readonly' || current === 'hidden') return current
-  return kind === 'start' ? 'editable' : 'readonly'
+  return defaultWorkflowFieldPermission(kind)
 }
 
 export function workflowDesignerFieldPermissionRows(
@@ -964,9 +1003,6 @@ export function workflowDesignerAdvancedFromStep(step: WorkflowTimelineStep): Wo
   return {
     emptyApprover: step.advanced?.emptyApprover,
     autoDecide: step.advanced?.autoDecide ?? 'manual',
-    timeout: step.advanced?.timeout
-      ? { ...step.advanced.timeout }
-      : { action: 'remind', durationLabel: '' },
     returnResume: step.advanced?.returnResume
   }
 }
@@ -1013,19 +1049,6 @@ export function workflowDesignerAutoDecideOptions(
       return { value, label: labels?.autoDecideAutoReject ?? 'Auto-reject' }
     }
     return { value, label: labels?.autoDecideManual ?? 'Manual' }
-  })
-}
-
-export function workflowDesignerTimeoutActionOptions(
-  labels?: Partial<TigerLocaleWorkflowDesigner & TigerLocaleWorkflowTimeline>
-): Array<{ value: WorkflowTimeoutAction; label: string }> {
-  return WORKFLOW_TIMEOUT_ACTIONS.map((value) => {
-    if (value === 'auto_pass') return { value, label: labels?.autoDecideAutoPass ?? 'Auto-approve' }
-    if (value === 'auto_reject') {
-      return { value, label: labels?.autoDecideAutoReject ?? 'Auto-reject' }
-    }
-    if (value === 'transfer') return { value, label: labels?.actionTransfer ?? 'Transfer' }
-    return { value, label: labels?.timeoutRemind ?? 'Remind' }
   })
 }
 

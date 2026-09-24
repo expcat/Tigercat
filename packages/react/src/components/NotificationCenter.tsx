@@ -1,14 +1,27 @@
-import React, { useMemo, useEffect, useState, useCallback } from 'react'
+import React, { useMemo, useEffect, useState, useCallback, useRef } from 'react'
 import {
   classNames,
   EMPTY_NOTIFICATION_ITEMS,
   buildNotificationGroups,
+  COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+  COMPOSITE_LIST_VIEWPORT,
+  compositeListUsesWindow,
   formatActivityTime,
+  moveNotificationReadFilter,
+  readDocumentTimeZone,
+  notificationItemKey,
+  notificationItemsPendingRead,
   formatBadgeCountLabel,
   shouldUseNotificationTabs,
   getNotificationCenterLabels,
   mergeTigerLocale,
   resolveLocaleText,
+  type NotificationCenterProps as CoreNotificationCenterProps,
+  type NotificationGroup,
+  type NotificationItem,
+  type NotificationReadFilter
+} from '@expcat/tigercat-core'
+import {
   notificationCenterItemClasses,
   notificationCenterUnreadItemClasses,
   notificationCenterReadItemClasses,
@@ -32,15 +45,12 @@ import {
   notificationCenterFilterGroupClasses,
   notificationCenterFilterButtonClasses,
   notificationCenterFilterActiveClasses,
-  notificationCenterFilterIdleClasses,
-  type NotificationCenterProps as CoreNotificationCenterProps,
-  type NotificationGroup,
-  type NotificationItem,
-  type NotificationReadFilter
-} from '@expcat/tigercat-core'
+  notificationCenterFilterIdleClasses
+} from '../../../core/src/internal/notification-center-styles'
 import { Card } from './Card'
 import { Tabs, TabPane } from './Tabs'
 import { List } from './List'
+import { VirtualList } from './VirtualList'
 import { Text } from './Text'
 import { Button } from './Button'
 import { Loading } from './Loading'
@@ -89,6 +99,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   onMarkAllRead,
   onItemClick,
   onItemReadChange,
+  timeZone,
   className,
   ...props
 }) => {
@@ -129,6 +140,10 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const currentGroupKey = activeGroupKey ?? internalGroupKey ?? firstGroupKey
   const currentReadFilter = readFilter ?? internalReadFilter
+  const [documentTimeZone, setDocumentTimeZone] = useState<string | null>(timeZone ?? null)
+  useEffect(() => {
+    setDocumentTimeZone(timeZone || readDocumentTimeZone())
+  }, [timeZone])
 
   useEffect(() => {
     if (activeGroupKey !== undefined) return
@@ -143,9 +158,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   }, [activeGroupKey, currentGroupKey, resolvedGroups])
 
   // --- Internal read-state management ---
-  const [readStateOverrides, setReadStateOverrides] = useState(
-    () => new Map<string | number, boolean>()
-  )
+  const [readStateOverrides, setReadStateOverrides] = useState(() => new Map<string, boolean>())
+  const [politeText, setPoliteText] = useState('')
+  const seenNotificationIds = useRef<Set<string> | null>(null)
 
   useEffect(() => {
     if (!manageReadState) return
@@ -154,7 +169,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       const source = (groups ?? []).flatMap((group) => group.items ?? []).concat(items)
       const next = new Map(prev)
       for (const [id, read] of prev) {
-        const item = source.find((entry) => entry.id === id)
+        const item = source.find((entry) => notificationItemKey(entry.id) === id)
         if (!item || Boolean(item.read) === read) next.delete(id)
       }
       return next
@@ -165,7 +180,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     (list: NotificationItem[]): NotificationItem[] => {
       if (!manageReadState || readStateOverrides.size === 0) return list
       return list.map((item) => {
-        const override = readStateOverrides.get(item.id)
+        const override = readStateOverrides.get(notificationItemKey(item.id))
         return override !== undefined ? { ...item, read: override } : item
       })
     },
@@ -187,6 +202,21 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     const grouped = effectiveGroups.flatMap((group) => group.items)
     return grouped.length > 0 ? grouped : effectiveItems
   }, [effectiveGroups, effectiveItems])
+
+  useEffect(() => {
+    const ids = allManagedItems.map((item) => notificationItemKey(item.id))
+    if (seenNotificationIds.current === null) {
+      seenNotificationIds.current = new Set(ids)
+      return
+    }
+    const fresh = allManagedItems.filter(
+      (item) => !seenNotificationIds.current!.has(notificationItemKey(item.id))
+    )
+    seenNotificationIds.current = new Set(ids)
+    const newest = fresh[fresh.length - 1]
+    if (!newest) return
+    setPoliteText(labels.newItemText.split('{title}').join(newest.title ?? ''))
+  }, [allManagedItems, labels.newItemText])
 
   const hasUnread = useMemo(() => allManagedItems.some((item) => !item.read), [allManagedItems])
 
@@ -246,19 +276,25 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   }
 
   const handleMarkAllRead = () => {
+    const pending = notificationItemsPendingRead(allManagedItems)
     if (manageReadState) {
       setReadStateOverrides((prev) => {
         const next = new Map(prev)
-        allManagedItems.forEach((item) => next.set(item.id, true))
+        pending.forEach((item) => next.set(notificationItemKey(item.id), true))
         return next
       })
     }
-    onMarkAllRead?.(undefined, allManagedItems)
+    setPoliteText(labels.markedReadText.split('{count}').join(String(pending.length)))
+    onMarkAllRead?.(undefined, pending)
   }
 
   const renderItem = (item: NotificationItem, _index: number) => {
     const isRead = Boolean(item.read)
-    const timeText = formatActivityTime(item.time, mergedLocale)
+    const timeText = formatActivityTime(
+      item.time,
+      mergedLocale,
+      documentTimeZone ? { timeZone: documentTimeZone } : undefined
+    )
 
     return (
       <div
@@ -266,7 +302,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           notificationCenterItemClasses,
           isRead ? notificationCenterReadItemClasses : notificationCenterUnreadItemClasses
         )}>
-        <div className="flex-1 min-w-0">
+        <button
+          type="button"
+          className="flex-1 min-w-0 text-start"
+          onClick={() => onItemClick?.(item, _index)}>
+          <div className="min-w-0">
           <div className="flex items-baseline justify-between gap-2">
             <div className="flex items-center gap-1.5">
               <Text
@@ -296,6 +336,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             </div>
           ) : null}
         </div>
+        </button>
         <Button
           size="sm"
           variant="ghost"
@@ -305,9 +346,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             if (manageReadState) {
               setReadStateOverrides((prev) => {
                 const next = new Map(prev)
-                next.set(item.id, !isRead)
+                next.set(notificationItemKey(item.id), !isRead)
                 return next
               })
+            }
+            if (!isRead) {
+              setPoliteText(labels.markedReadText.split('{count}').join('1'))
             }
             onItemReadChange?.(item, !isRead)
           }}>
@@ -347,12 +391,30 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         dataSource={listItems}
         rowKey="id"
         split
-        hoverable={typeof onItemClick === 'function'}
+        hoverable={false}
         emptyText={resolvedEmptyText}
-        onItemClick={onItemClick}
         renderItem={renderItem}
       />
     )
+  }
+
+  const renderNotificationScroller = (listItems: NotificationItem[]) => {
+    if (compositeListUsesWindow(listItems.length)) {
+      return (
+        <div className="-mx-4 -mb-4">
+          <VirtualList
+            data-tiger-notification-window=""
+            itemCount={listItems.length}
+            estimatedItemHeight={COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT}
+            height={COMPOSITE_LIST_VIEWPORT}
+            getItemKey={(index) => notificationItemKey(listItems[index]?.id ?? index)}
+            renderItem={({ index }) => renderItem(listItems[index], index)}
+            role="list"
+          />
+        </div>
+      )
+    }
+    return <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">{renderList(listItems)}</div>
   }
 
   const listBody = shouldUseNotificationTabs(groups, groupBy) ? (
@@ -366,16 +428,16 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           onChange={handleGroupChange}>
           {groupTabData.map((tab) => (
             <TabPane key={String(tab.key)} tabKey={tab.key} label={tab.label}>
-              <div className="max-h-[380px] overflow-y-auto">{renderList(tab.filteredItems)}</div>
+              {tab.key === currentGroupKey ? renderNotificationScroller(tab.filteredItems) : null}
             </TabPane>
           ))}
         </Tabs>
       </div>
     ) : (
-      <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">{renderList([])}</div>
+      renderNotificationScroller([])
     )
   ) : (
-    <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">{renderList(filteredFlatItems)}</div>
+    renderNotificationScroller(filteredFlatItems)
   )
 
   const hasList = shouldUseNotificationTabs(groups, groupBy)
@@ -387,10 +449,10 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
       </div>
     ) : (
-      <div className="relative" aria-busy={loading || undefined}>
+      <div className="relative" aria-busy={loading || undefined} inert={loading || undefined}>
         {listBody}
         {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface,#ffffff)]/70">
+          <div className="absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface)]/70">
             <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
           </div>
         ) : null}
@@ -405,6 +467,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       aria-label={props['aria-label'] ?? (props['aria-labelledby'] ? undefined : resolvedTitle)}
       {...props}
       data-tiger-notification-center>
+      <div className="sr-only" aria-live="polite">
+        {politeText}
+      </div>
       <Card
         variant="bordered"
         className={notificationCenterCardClasses}
@@ -445,20 +510,35 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 {resolvedMarkAllReadText}
               </Button>
             </div>
-            <div className={notificationCenterFilterGroupClasses} role="radiogroup">
+            <div
+              className={notificationCenterFilterGroupClasses}
+              role="radiogroup"
+              aria-label={labels.filterAriaLabel}>
               {filterButtons.map((option) => (
                 <button
                   key={option.key}
                   type="button"
                   role="radio"
                   aria-checked={currentReadFilter === option.key}
+                  tabIndex={currentReadFilter === option.key ? 0 : -1}
+                  data-read-filter={option.key}
                   className={classNames(
                     notificationCenterFilterButtonClasses,
                     currentReadFilter === option.key
                       ? notificationCenterFilterActiveClasses
                       : notificationCenterFilterIdleClasses
                   )}
-                  onClick={() => handleReadFilterChange(option.key)}>
+                  onClick={() => handleReadFilterChange(option.key)}
+                  onKeyDown={(event) => {
+                    const next = moveNotificationReadFilter(currentReadFilter, event.key)
+                    if (!next || next === currentReadFilter) return
+                    event.preventDefault()
+                    handleReadFilterChange(next)
+                    const group = event.currentTarget.parentElement
+                    queueMicrotask(() => {
+                      group?.querySelector<HTMLElement>(`[data-read-filter="${next}"]`)?.focus()
+                    })
+                  }}>
                   {option.label}
                 </button>
               ))}

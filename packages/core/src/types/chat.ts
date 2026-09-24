@@ -81,6 +81,11 @@ export interface ChatMessage {
  */
 export interface ChatWindowProps {
   /**
+   * IANA timezone for message clocks. Without it, the first render omits the
+   * clock and the client fills `Intl`'s document zone after mount.
+   */
+  timeZone?: string
+  /**
    * Message list
    */
   messages?: ChatMessage[]

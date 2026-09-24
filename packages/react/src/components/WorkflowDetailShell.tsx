@@ -9,32 +9,41 @@
  *
  * Not a second Timeline and not a form designer. Host gives a bounded height
  * (`h-full` / `flex-1 min-h-0`); do not hand-calc magic rem. Action stays pinned
- * while form/tabs scroll.
+ * while form/tabs scroll. `submit()` merges through `mergeWorkflowFormValues`.
  */
 
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useImperativeHandle, useMemo } from 'react'
 import {
-  WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL,
   classNames,
+  getWorkflowDetailShellLabels,
   getWorkflowDetailShellRootClasses,
+  mergeTigerLocale,
+  submitWorkflowDetailForm,
   workflowDetailShellActionClasses,
   workflowDetailShellBodyClasses,
   workflowDetailShellFormClasses,
   workflowDetailShellHeaderClasses,
   workflowDetailShellTabsClasses,
+  type FormValues,
   type WorkflowDetailShellProps as CoreWorkflowDetailShellProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
+
+export interface WorkflowDetailShellHandle {
+  submit: (submitted?: FormValues) => FormValues
+}
 
 export interface WorkflowDetailShellProps
   extends
-    Omit<CoreWorkflowDetailShellProps, 'style'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'style'> {
+    Omit<CoreWorkflowDetailShellProps, 'style' | 'onSubmit'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'style' | 'onSubmit'> {
   style?: React.CSSProperties
   header?: React.ReactNode
   form?: React.ReactNode
   tabs?: React.ReactNode
   action?: React.ReactNode
   children?: React.ReactNode
+  onSubmit?: (values: FormValues) => void
 }
 
 function hasNode(node: React.ReactNode): boolean {
@@ -43,7 +52,7 @@ function hasNode(node: React.ReactNode): boolean {
   return true
 }
 
-export const WorkflowDetailShell = forwardRef<HTMLDivElement, WorkflowDetailShellProps>(
+export const WorkflowDetailShell = forwardRef<WorkflowDetailShellHandle, WorkflowDetailShellProps>(
   function WorkflowDetailShell(
     {
       showActions = true,
@@ -55,20 +64,54 @@ export const WorkflowDetailShell = forwardRef<HTMLDivElement, WorkflowDetailShel
       tabs,
       action,
       children,
+      locale,
+      originalValues,
+      values,
+      schema,
+      fieldPermissions,
+      permissionMode = 'readonly',
+      nodeKind,
+      onSubmit,
       ...rest
     },
     ref
   ) {
+    const config = useTigerConfig()
+    const labels = useMemo(
+      () => getWorkflowDetailShellLabels(mergeTigerLocale(config.locale, locale)),
+      [config.locale, locale]
+    )
     const showAction = showActions && hasNode(action)
+
+    const submit = (submitted?: FormValues): FormValues => {
+      const merged = submitWorkflowDetailForm({
+        original: originalValues,
+        submitted: submitted ?? values,
+        schema,
+        permissions: fieldPermissions,
+        mode: permissionMode,
+        kind: nodeKind
+      })
+      onSubmit?.(merged)
+      return merged
+    }
+    useImperativeHandle(ref, () => ({ submit }), [
+      originalValues,
+      values,
+      schema,
+      fieldPermissions,
+      permissionMode,
+      nodeKind,
+      onSubmit
+    ])
 
     return (
       <div
         {...rest}
-        ref={ref}
         className={classNames(getWorkflowDetailShellRootClasses(className))}
         style={style}
         role="region"
-        aria-label={ariaLabel || WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL}
+        aria-label={ariaLabel || labels.ariaLabel}
         data-tiger-workflow-detail-shell="">
         {hasNode(header) ? (
           <div className={workflowDetailShellHeaderClasses} data-slot="header">
