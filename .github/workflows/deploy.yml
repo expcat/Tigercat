@@ -58,10 +58,12 @@ jobs:
         run: pnpm build
 
       - name: Build Vue example
-        run: pnpm --filter @expcat/tigercat-example-vue3 build
+        # Packages are already built above. Skip vue-tsc: example tsconfig path-aliases
+        # into package sources and noUnusedLocals then fails the Pages job.
+        run: pnpm --filter @expcat/tigercat-example-vue3 exec vite build
 
       - name: Build React example
-        run: pnpm --filter @expcat/tigercat-example-react build
+        run: pnpm --filter @expcat/tigercat-example-react exec vite build
 
       - name: Prepare public_html
         run: |

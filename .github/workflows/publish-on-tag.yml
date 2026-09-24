@@ -52,7 +52,36 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Publish packages
-        run: pnpm release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          pnpm build
+          # Prerelease tags (e.g. v3.0.0-preview.1) must not take npm "latest".
+          if [[ "$TAG" == *-* ]]; then
+            pnpm exec changeset publish --tag next
+          else
+            pnpm exec changeset publish
+          fi
+
+      - name: Repair latest dist-tag after prerelease
+        if: contains(github.ref_name, '-')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          # If a prior run parked a prerelease on latest, put latest back on last stable.
+          STABLE=2.9.4
+          for pkg in @expcat/tigercat-core @expcat/tigercat-vue @expcat/tigercat-react @expcat/tigercat-cli @expcat/tigercat-mcp; do
+            current=$(npm view "$pkg" dist-tags.latest 2>/dev/null || true)
+            if [[ "$current" == *-* ]]; then
+              echo "Repairing $pkg latest: $current -> $STABLE"
+              npm dist-tag add "$pkg@$STABLE" latest
+            fi
+            ver=${GITHUB_REF_NAME#v}
+            if npm view "$pkg@$ver" version >/dev/null 2>&1; then
+              npm dist-tag add "$pkg@$ver" next || true
+            fi
+          done
