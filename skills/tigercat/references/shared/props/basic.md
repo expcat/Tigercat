@@ -7,7 +7,7 @@ description: Basic props split by component
 
 # Basic Props
 
-This category is split by component so each file stays within the line budget.
+One component per page. This index only links to those pages.
 
 - [Avatar](./avatar.md)
 - [AvatarGroup](./avatar-group.md)

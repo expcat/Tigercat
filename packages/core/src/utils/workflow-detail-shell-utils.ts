@@ -15,6 +15,8 @@ import type {
 } from '../types/workflow-timeline'
 import { classNames } from './class-names'
 import { mergeWorkflowFormValues } from './workflow-field-permissions'
+import { reduceWorkflowAction } from './workflow-runtime'
+import type { WorkflowInstance, WorkflowRuntimeAction } from '../types/workflow-timeline'
 
 export const workflowDetailShellRootClasses =
   'tiger-workflow-detail-shell relative flex h-full min-h-0 flex-col overflow-hidden rounded-md border border-[var(--tiger-border)] bg-[var(--tiger-surface)]'
@@ -51,4 +53,25 @@ export function submitWorkflowDetailForm(input: {
     input.mode ?? 'readonly',
     input.kind
   )
+}
+
+/**
+ * One approval submit: merge the form, then apply the action-bar opinion
+ * through the same reducer call. Hidden and readonly paths stay on `original`.
+ */
+export function submitWorkflowDetailAction(input: {
+  original?: FormValues
+  submitted?: FormValues
+  schema?: SchemaFormSchema
+  permissions?: Record<string, FieldPermission>
+  mode?: WorkflowFieldPermissionMode | string
+  kind?: WorkflowStepKind
+  instance: WorkflowInstance
+  action: WorkflowRuntimeAction
+}): { values: FormValues; instance: WorkflowInstance } {
+  const values = submitWorkflowDetailForm(input)
+  return {
+    values,
+    instance: reduceWorkflowAction(input.instance, input.action)
+  }
 }

@@ -1,0 +1,7 @@
+{
+  "id": "app-shell-01",
+  "title": "应用壳",
+  "description": "AppShell 复用 Layout、Sidebar、Header、Breadcrumb、Tabs 和 PageHeader。页签标题来自静态表。跳到主内容的链接指向唯一的 main。",
+  "entry": "App.tsx",
+  "order": 1
+}

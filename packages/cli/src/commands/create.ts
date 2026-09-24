@@ -3,6 +3,8 @@ import prompts from 'prompts'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { type TemplateName } from '../constants'
+
+export type CreatePreset = 'blank' | 'shell'
 import { logSuccess, logError, logInfo, logStep } from '../utils/logger'
 import { ensureDir, isDirEmpty, writeFileSafe } from '../utils/fs'
 import { resolveTemplateOption, suggestProjectName, validateProjectName } from '../utils/validate'
@@ -13,14 +15,29 @@ export function createCreateCommand() {
   return new Command('create')
     .argument('<name>', 'Project name')
     .option('-t, --template <template>', 'Project template (vue3 | react)')
+    .option('--preset <preset>', 'blank or shell. shell scaffolds the application shell.')
     .option('--dry-run', 'Preview files without writing them')
     .description('Create a new project with Tigercat pre-configured')
-    .action(async (name: string, opts: { template?: string; dryRun?: boolean }) => {
-      await runCreate(name, opts.template, Boolean(opts.dryRun))
-    })
+    .action(
+      async (name: string, opts: { template?: string; preset?: string; dryRun?: boolean }) => {
+        await runCreate(name, opts.template, Boolean(opts.dryRun), opts.preset)
+      }
+    )
 }
 
-export async function runCreate(name: string, templateArg?: string, dryRun = false) {
+function resolvePreset(value: string | undefined): CreatePreset {
+  if (value === undefined || value === 'blank') return 'blank'
+  if (value === 'shell') return 'shell'
+  logError(`Invalid preset "${value}". Valid presets: blank, shell`)
+  process.exit(1)
+}
+
+export async function runCreate(
+  name: string,
+  templateArg?: string,
+  dryRun = false,
+  presetArg?: string
+) {
   const nameError = validateProjectName(name)
   if (nameError) {
     logError(`${nameError}. Try "${suggestProjectName(name)}" instead.`)
@@ -28,7 +45,8 @@ export async function runCreate(name: string, templateArg?: string, dryRun = fal
   }
 
   const template: TemplateName = await resolveTemplateOption(templateArg, 'Select a framework')
-  const files = template === 'vue3' ? getVue3Template(name) : getReactTemplate(name)
+  const preset = resolvePreset(presetArg)
+  const files = template === 'vue3' ? getVue3Template(name, preset) : getReactTemplate(name, preset)
 
   const targetDir = resolve(process.cwd(), name)
 

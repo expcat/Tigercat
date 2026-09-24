@@ -288,6 +288,13 @@
 - 3.0 的唯一行为：服务端和客户端第一次都输出 `<table>`，窄视口卡片只在挂载后切换。固定列用逻辑起点和终点。没有行内控件时数据行共用一个 Tab 停靠。行拖拽只在把手上。收起的折叠面板卸掉子树，焦点回到标题按钮。图表 svg 是 `role="group"`，名字在组上，轴和标记仍可逐条读到。甘特刻度带年份。折线在 `showArea` 时面积回到 `y = 0`。雷达每个指标都有一个顶点。缺身份的行键是 `tiger-row:` 前缀，不与数字 id 相撞。
 - 已删除：`exportFormat`、`columnDragHandleClasses`、`DonutChartProps`。
 
+## 应用壳与发布面
+
+- 组件：`Layout`、`AppShell`、`DataTableWithToolbar`、`WorkflowDetailShell`、CLI、MCP
+- 旧的默认行为：页级壳没有跳到 `main` 的链接。列表筛选散在工具条里。审批表单和动作条各交一次。`create` 只有空白页。文档按类别收成一份。迁移靠手改导入。
+- 3.0 的唯一行为：最外层 `Layout` 有一条跳到页面 `main` 的链接，目标 id 是 `tiger-main`。顶栏 `sticky` 仍是独立开关，不由 `variant` 打开。`AppShell` 把已有的侧栏、顶栏、面包屑、页签和页头拼成一页，页签标题只来自调用方。查询区提交和重置是按钮，收起后留下条件摘要，对象条件只交给父级，本地匹配跳过对象，提交把页码收回第 1 页。详情 `submitAction` 先 `mergeWorkflowFormValues`，再把动作条意见交给 `reduceWorkflowAction`。标题走 locale。`tigercat create --preset shell` 带上可运行的壳。文档站一组件一页。MCP 回答带安装版本；`tigercat_example` 只读示例，不安装。`tigercat migrate` 只改导入说明符和已删除的名字。
+- 已删除：无运行时旧名。`migrate` 可改写的名字见 `REMOVED_PUBLIC_NAMES`。
+
 ## W9 模块增强
 
 - 组件：主题根、`Inplace`、`CopyButton`、`Gallery`、`WaterfallChart`、`SankeyChart`、`NotificationBell`、`AssigneePicker`，以及各模块在 W0–W8 结构上的增强 props

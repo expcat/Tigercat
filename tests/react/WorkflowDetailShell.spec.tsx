@@ -62,7 +62,7 @@ describe('WorkflowDetailShell (React)', () => {
     )
 
     expect(screen.getByRole('region', { name: 'Request detail' })).toBeInTheDocument()
-    expect(container.querySelector('[data-slot="header"]')).toBeNull()
+    expect(container.querySelector('[data-slot="header"]')).toHaveTextContent('Approval')
     expect(container.querySelector('[data-slot="tabs"]')).toBeNull()
     expect(container.querySelector('[data-slot="action"]')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Hidden approve' })).not.toBeInTheDocument()

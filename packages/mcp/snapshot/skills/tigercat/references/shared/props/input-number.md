@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## InputNumber
 
-`packages/core/src/types/input-number.ts` · `InputNumberProps` · 4/26 props
+`packages/core/src/types/input-number.ts` · `InputNumberProps` · 4/25 props
 
 Note: React `onChange` 收到 `number | null`。值可以是有限数字或数字字符串，`null` 和 `''` 是空。`controlsPosition="both"` 是两侧按钮；`snapToStep` 默认关闭，步长只约束按钮和方向键。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。可访问名来自标签或 `aria-label`。
 

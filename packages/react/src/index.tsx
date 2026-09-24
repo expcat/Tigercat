@@ -461,6 +461,8 @@ export { WaterfallChart } from './components/WaterfallChart'
 export type { WaterfallChartProps } from './components/WaterfallChart'
 export { SankeyChart } from './components/SankeyChart'
 export type { SankeyChartProps } from './components/SankeyChart'
+export { AppShell } from './components/AppShell'
+export type { AppShellProps } from './components/AppShell'
 export { NotificationBell } from './components/NotificationBell'
 export { AssigneePicker } from './components/AssigneePicker'
 export type {

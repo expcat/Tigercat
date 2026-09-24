@@ -207,6 +207,23 @@ describe('Layout Sections', () => {
     expect(footer.style.height).toBe('32px')
   })
 
+  it('skips to the page main and keeps sticky independent of variant', () => {
+    const { container } = render(
+      <Layout>
+        <Header variant="blur" sticky>
+          Top
+        </Header>
+        <Content>Body</Content>
+      </Layout>
+    )
+    const skip = container.querySelector('a.tiger-skip-link') as HTMLAnchorElement
+    expect(skip.getAttribute('href')).toBe('#tiger-main')
+    expect(container.querySelector('main')?.id).toBe('tiger-main')
+    const header = container.querySelector('header')
+    expect(header?.className).toContain('tiger-header-blur')
+    expect(header?.className).toContain('tiger-header-sticky')
+  })
+
   it('forwards Layout ref to the root node', () => {
     const ref = React.createRef<HTMLDivElement>()
     const { container } = render(<Layout ref={ref}>Shell</Layout>)

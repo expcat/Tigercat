@@ -7,7 +7,9 @@ import {
   buildCorePackageExports,
   buildFrameworkPackageExports,
   getComponentPackageTarget,
-  loadPublicComponentExports
+  loadPublicComponentExports,
+  REMOVED_IMPORT_SPECIFIERS,
+  REMOVED_PUBLIC_NAMES
 } from './lib/public-components.mjs'
 import { readJson, writeJson } from './utils/files.mjs'
 
@@ -120,6 +122,23 @@ for (const [framework, info] of Object.entries(frameworkPackages)) {
   syncFrameworkPackage(framework, publicComponents[framework], info)
 }
 syncCorePackageExports()
+syncRemovedNames()
+
+function syncRemovedNames() {
+  const namesPath = join(root, 'packages/cli/src/removed-names.json')
+  const payload = `${JSON.stringify(
+    { names: REMOVED_PUBLIC_NAMES, specifiers: REMOVED_IMPORT_SPECIFIERS },
+    null,
+    2
+  )}\n`
+  if (checkMode) {
+    if (!existsSync(namesPath) || readFileSync(namesPath, 'utf8') !== payload) {
+      addIssue('packages/cli/src/removed-names.json drifted from public-components.mjs')
+    }
+    return
+  }
+  writeFileSync(namesPath, payload)
+}
 
 if (issues.length > 0) {
   console.error('Package exports check failed:')

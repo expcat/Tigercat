@@ -9,6 +9,7 @@ import { classNames } from './class-names'
 import { filterTableData, getTableColumnDataKey } from './table-utils'
 import type { TableColumn } from '../types/table'
 import type {
+  TableQueryField,
   TableToolbarFilter,
   TableToolbarFilterValue,
   TableToolbarProps,
@@ -157,7 +158,12 @@ export function toolbarFilterMapAfterWrite(
 }
 
 export function isToolbarScalarFilter(value: TableToolbarFilterValue): boolean {
-  return value == null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
+  return (
+    value == null ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  )
 }
 
 export function applyToolbarLocalView<T extends Record<string, unknown>>(
@@ -223,6 +229,66 @@ export function getDataTableToolbarBarClasses(options: {
       : 'bg-[var(--tiger-surface-muted)]/80 border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] shadow-sm',
     options.className
   )
+}
+
+export function seedQueryValues(
+  fields: readonly TableQueryField[] | undefined
+): Record<string, TableToolbarFilterValue> {
+  const next: Record<string, TableToolbarFilterValue> = {}
+  for (const field of fields ?? []) {
+    next[field.key] = field.value !== undefined ? field.value : (field.defaultValue ?? null)
+  }
+  return next
+}
+
+export function readQueryValues(
+  fields: readonly TableQueryField[] | undefined,
+  draft: Record<string, TableToolbarFilterValue>
+): Record<string, TableToolbarFilterValue> {
+  const next: Record<string, TableToolbarFilterValue> = {}
+  for (const field of fields ?? []) {
+    if (field.value !== undefined) next[field.key] = field.value
+    else if (Object.prototype.hasOwnProperty.call(draft, field.key))
+      next[field.key] = draft[field.key]
+    else next[field.key] = field.defaultValue ?? null
+  }
+  return next
+}
+
+export function queryValueIsEmpty(value: TableToolbarFilterValue): boolean {
+  if (value == null || value === '') return true
+  if (typeof value === 'object') return Object.keys(value).length === 0
+  return false
+}
+
+/** Collapsed summary. Objects are named, not stringified into a local search. */
+export function summarizeQueryValues(
+  fields: readonly TableQueryField[] | undefined,
+  values: Record<string, TableToolbarFilterValue>
+): string {
+  const parts: string[] = []
+  for (const field of fields ?? []) {
+    const value = values[field.key]
+    if (queryValueIsEmpty(value)) continue
+    if (value != null && typeof value === 'object') {
+      parts.push(field.label)
+      continue
+    }
+    parts.push(`${field.label}: ${String(value)}`)
+  }
+  return parts.join(', ')
+}
+
+/** Scalars only. Object conditions stay on the submit payload. */
+export function queryScalarsForLocalView(
+  values: Record<string, TableToolbarFilterValue>
+): Record<string, TableToolbarFilterValue> {
+  const next: Record<string, TableToolbarFilterValue> = {}
+  for (const [key, value] of Object.entries(values)) {
+    if (value != null && typeof value === 'object') continue
+    next[key] = value
+  }
+  return next
 }
 
 export type { TableToolbarSearchMode }

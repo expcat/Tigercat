@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ContextMenu
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 4/11 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 4/12 props
 
 Note: 项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。
 

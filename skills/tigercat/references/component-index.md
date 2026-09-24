@@ -85,6 +85,7 @@ description: Canonical Tigercat component route map for props, examples, and typ
 | TreeMapChart          | Charts     | `charts`     | chart-visualization.ts                              | ./TreeMapChart          |
 | WaterfallChart        | Charts     | `charts`     | chart-visualization.ts                              | ./WaterfallChart        |
 | ActivityFeed          | Composite  | `composite`  | activity-feed.ts                                    | ./ActivityFeed          |
+| AppShell              | Composite  | `composite`  | app-shell.ts                                        | ./AppShell              |
 | AssigneePicker        | Composite  | `composite`  | assignee-picker.ts                                  | ./AssigneePicker        |
 | ChatWindow            | Composite  | `composite`  | chat.ts                                             | ./ChatWindow            |
 | CommentThread         | Composite  | `composite`  | comment-thread.ts                                   | ./CommentThread         |

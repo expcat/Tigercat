@@ -2,6 +2,7 @@ import React, { forwardRef, useContext } from 'react'
 import {
   classNames,
   getLayoutContentClasses,
+  LAYOUT_MAIN_ID,
   resolveLayoutSectionTag,
   type ContentProps as CoreContentProps
 } from '@expcat/tigercat-core'
@@ -24,9 +25,10 @@ export const Content = forwardRef<HTMLElement, ReactContentProps>(function Conte
     nested: Boolean(layout?.nested),
     explicit: as
   }) as React.ElementType
+  const id = Tag === 'main' ? props.id || LAYOUT_MAIN_ID : props.id
 
   return (
-    <Tag ref={forwardedRef} className={contentClasses} {...props}>
+    <Tag ref={forwardedRef} className={contentClasses} {...props} id={id}>
       {children}
     </Tag>
   )

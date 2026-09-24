@@ -18,6 +18,7 @@ import {
   getWorkflowDetailShellLabels,
   getWorkflowDetailShellRootClasses,
   mergeTigerLocale,
+  submitWorkflowDetailAction,
   submitWorkflowDetailForm,
   workflowDetailShellActionClasses,
   workflowDetailShellBodyClasses,
@@ -25,12 +26,18 @@ import {
   workflowDetailShellHeaderClasses,
   workflowDetailShellTabsClasses,
   type FormValues,
-  type WorkflowDetailShellProps as CoreWorkflowDetailShellProps
+  type WorkflowDetailShellProps as CoreWorkflowDetailShellProps,
+  type WorkflowInstance,
+  type WorkflowRuntimeAction
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface WorkflowDetailShellHandle {
   submit: (submitted?: FormValues) => FormValues
+  submitAction: (
+    action: WorkflowRuntimeAction,
+    submitted?: FormValues
+  ) => { values: FormValues; instance: WorkflowInstance }
 }
 
 export interface WorkflowDetailShellProps
@@ -44,6 +51,11 @@ export interface WorkflowDetailShellProps
   action?: React.ReactNode
   children?: React.ReactNode
   onSubmit?: (values: FormValues) => void
+  onDetailAction?: (result: {
+    values: FormValues
+    instance: WorkflowInstance
+    action: WorkflowRuntimeAction
+  }) => void
 }
 
 function hasNode(node: React.ReactNode): boolean {
@@ -57,6 +69,8 @@ export const WorkflowDetailShell = forwardRef<WorkflowDetailShellHandle, Workflo
     {
       showActions = true,
       ariaLabel,
+      title,
+      instance,
       className,
       style,
       header,
@@ -72,6 +86,7 @@ export const WorkflowDetailShell = forwardRef<WorkflowDetailShellHandle, Workflo
       permissionMode = 'readonly',
       nodeKind,
       onSubmit,
+      onDetailAction,
       ...rest
     },
     ref
@@ -95,14 +110,31 @@ export const WorkflowDetailShell = forwardRef<WorkflowDetailShellHandle, Workflo
       onSubmit?.(merged)
       return merged
     }
-    useImperativeHandle(ref, () => ({ submit }), [
+    const submitAction = (action: WorkflowRuntimeAction, submitted?: FormValues) => {
+      const result = submitWorkflowDetailAction({
+        original: originalValues,
+        submitted: submitted ?? values,
+        schema,
+        permissions: fieldPermissions,
+        mode: permissionMode,
+        kind: nodeKind,
+        instance: instance ?? { steps: [] },
+        action
+      })
+      onSubmit?.(result.values)
+      onDetailAction?.({ ...result, action })
+      return result
+    }
+    useImperativeHandle(ref, () => ({ submit, submitAction }), [
       originalValues,
       values,
       schema,
       fieldPermissions,
       permissionMode,
       nodeKind,
-      onSubmit
+      instance,
+      onSubmit,
+      onDetailAction
     ])
 
     return (
@@ -113,11 +145,13 @@ export const WorkflowDetailShell = forwardRef<WorkflowDetailShellHandle, Workflo
         role="region"
         aria-label={ariaLabel || labels.ariaLabel}
         data-tiger-workflow-detail-shell="">
-        {hasNode(header) ? (
-          <div className={workflowDetailShellHeaderClasses} data-slot="header">
-            {header}
-          </div>
-        ) : null}
+        <div className={workflowDetailShellHeaderClasses} data-slot="header">
+          {hasNode(header) ? (
+            header
+          ) : (
+            <h1 className="text-base font-semibold">{title || labels.title}</h1>
+          )}
+        </div>
         <div className={workflowDetailShellBodyClasses} data-slot="body">
           {hasNode(form) ? (
             <div className={workflowDetailShellFormClasses} data-slot="form">

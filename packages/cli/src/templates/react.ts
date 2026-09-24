@@ -1,5 +1,8 @@
-export function getReactTemplate(projectName: string): Record<string, string> {
-  return {
+export function getReactTemplate(
+  projectName: string,
+  preset: 'blank' | 'shell' = 'blank'
+): Record<string, string> {
+  const files: Record<string, string> = {
     'package.json': reactPackageJson(projectName),
     '.gitignore': TEMPLATE_GITIGNORE,
     'tsconfig.json': reactTsconfig(),
@@ -7,9 +10,12 @@ export function getReactTemplate(projectName: string): Record<string, string> {
     'vite.config.ts': reactViteConfig(),
     'index.html': reactIndexHtml(projectName),
     'src/main.tsx': reactMain(),
-    'src/App.tsx': reactApp(),
+    'src/App.tsx': preset === 'shell' ? reactShellApp() : reactApp(),
+    'src/routes.ts': preset === 'shell' ? reactRoutes() : '',
     'src/style.css': commonStyleCss()
   }
+  if (!files['src/routes.ts']) delete files['src/routes.ts']
+  return files
 }
 
 import { TEMPLATE_GITIGNORE, TEMPLATE_PACKAGE_MANAGER, TEMPLATE_VERSIONS as V } from '../constants'
@@ -136,6 +142,56 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 )
+`
+}
+
+function reactRoutes(): string {
+  return `export const shellRoutes = [
+  { key: 'home', title: 'Home' },
+  { key: 'list', title: 'List' }
+] as const
+`
+}
+
+function reactShellApp(): string {
+  return `import { useState } from 'react'
+import { AppShell, ConfigProvider } from '@expcat/tigercat-react'
+import { shellRoutes } from './routes'
+
+export default function App() {
+  const [active, setActive] = useState<string>(shellRoutes[0].key)
+  const current = shellRoutes.find((route) => route.key === active)
+
+  return (
+    <ConfigProvider theme="modern">
+      <AppShell
+        fullHeight
+        headerSticky
+        title={current?.title}
+        tabs={shellRoutes.map((route) => ({ key: route.key, title: route.title }))}
+        activeTab={active}
+        onTabChange={setActive}
+        breadcrumb={[{ title: current?.title ?? 'Home' }]}
+        sidebar={
+          <nav className="flex flex-col gap-1 p-3">
+            {shellRoutes.map((route) => (
+              <button
+                key={route.key}
+                type="button"
+                className="rounded px-3 py-2 text-start text-sm"
+                onClick={() => setActive(route.key)}
+              >
+                {route.title}
+              </button>
+            ))}
+          </nav>
+        }
+      >
+        <p className="text-[var(--tiger-text)]">{current?.title}</p>
+      </AppShell>
+    </ConfigProvider>
+  )
+}
 `
 }
 

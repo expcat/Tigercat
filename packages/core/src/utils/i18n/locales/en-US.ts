@@ -20,6 +20,7 @@ export const enUS: TigerLocale = {
     closeMessageAriaLabel: 'Close message',
     closeNotificationAriaLabel: 'Close notification',
     sidebarAriaLabel: 'Sidebar',
+    skipToContent: 'Skip to main content',
     moreOptionsText: 'More options',
     confirmTitle: 'Are you sure you want to continue?',
     loadingFinishedText: 'Loading finished',
@@ -242,7 +243,8 @@ export const enUS: TigerLocale = {
     publishBlocked: 'Cannot publish until these are fixed'
   },
   workflowDetailShell: {
-    ariaLabel: 'Workflow detail'
+    ariaLabel: 'Workflow detail',
+    title: 'Approval'
   },
   progress: {
     ariaLabel: 'Progress'

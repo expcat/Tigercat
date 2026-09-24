@@ -125,14 +125,22 @@ async function assertRemoteMirror(source: SkillSource): Promise<void> {
   }
   const remoteFiles = remote.files ?? {}
   const localFiles = local.files ?? {}
-  const remoteKeys = Object.keys(remoteFiles).sort()
-  const localKeys = Object.keys(localFiles).sort()
-  if (
-    remoteKeys.length !== localKeys.length ||
-    remoteKeys.some((key, index) => key !== localKeys[index] || remoteFiles[key] !== localFiles[key])
-  ) {
+  if (!sameDigest(remoteFiles, localFiles)) {
     throw new Error('Remote skill digest does not match the packaged snapshot')
   }
+  const versionFiles = (version as { files?: Record<string, string> }).files
+  if (versionFiles && !sameDigest(versionFiles, localFiles)) {
+    throw new Error('Remote version.json digest does not match the packaged snapshot')
+  }
+}
+
+function sameDigest(left: Record<string, string>, right: Record<string, string>): boolean {
+  const leftKeys = Object.keys(left).sort()
+  const rightKeys = Object.keys(right).sort()
+  return (
+    leftKeys.length === rightKeys.length &&
+    leftKeys.every((key, index) => key === rightKeys[index] && left[key] === right[key])
+  )
 }
 
 function collectAllowedReferencePaths(context7: TigercatContext7): Set<string> {
@@ -226,6 +234,9 @@ export async function diagnoseTigercatMcp(
     }
   }
 
+  const catalogIssue = await readCatalogIssue(index.source)
+  if (catalogIssue) issues.push(catalogIssue)
+
   let remoteVersion: string | undefined
   if (index.source.kind === 'http') {
     // version.json 由 Pages 部署时生成,属补充信息,不可达不算问题。
@@ -252,6 +263,29 @@ export async function diagnoseTigercatMcp(
     ...(remoteVersion ? { remoteVersion } : {}),
     issues
   }
+}
+
+async function readCatalogIssue(source: SkillSource): Promise<string | undefined> {
+  try {
+    const version = JSON.parse(await source.readText('version.json')) as {
+      version?: unknown
+      files?: Record<string, string>
+    }
+    if (version.version !== PACKAGE_VERSION) {
+      return `skill catalog version ${String(version.version)} does not match package ${PACKAGE_VERSION}`
+    }
+    if (version.files) {
+      const manifest = JSON.parse(await source.readText('manifest.json')) as {
+        files?: Record<string, string>
+      }
+      if (!sameDigest(version.files, manifest.files ?? {})) {
+        return 'skill catalog digest does not match manifest.json'
+      }
+    }
+  } catch {
+    return undefined
+  }
+  return undefined
 }
 
 export async function readReferenceSource(

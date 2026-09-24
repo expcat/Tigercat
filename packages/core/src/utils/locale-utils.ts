@@ -352,7 +352,11 @@ export function formatTableSortButtonName(
   return `${formatTableSortByText(template, column)}, ${directionLabel}`
 }
 
-export function formatTableSelectionCount(template: string, count: number, locale?: string): string {
+export function formatTableSelectionCount(
+  template: string,
+  count: number,
+  locale?: string
+): string {
   return template.replace('{count}', formatIntlNumber(count, locale))
 }
 
@@ -549,7 +553,11 @@ export function getWorkflowTimelineLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleWorkflowTimeline>
 ): Required<TigerLocaleWorkflowTimeline> {
-  return resolveLocaleSection(enSection('workflowTimeline', locale), locale?.workflowTimeline, overrides)
+  return resolveLocaleSection(
+    enSection('workflowTimeline', locale),
+    locale?.workflowTimeline,
+    overrides
+  )
 }
 
 export function getWorkflowDetailShellLabels(
@@ -567,7 +575,11 @@ export function getWorkflowDesignerLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleWorkflowDesigner>
 ): Required<TigerLocaleWorkflowDesigner> {
-  return resolveLocaleSection(enSection('workflowDesigner', locale), locale?.workflowDesigner, overrides)
+  return resolveLocaleSection(
+    enSection('workflowDesigner', locale),
+    locale?.workflowDesigner,
+    overrides
+  )
 }
 
 export function getRateLabels(
@@ -648,6 +660,13 @@ export function getSidebarAriaLabel(locale?: Partial<TigerLocale>): string {
   )
 }
 
+export function getSkipToContentLabel(locale?: Partial<TigerLocale>): string {
+  return resolveLocaleText(
+    locale?.common?.skipToContent ?? 'Skip to main content',
+    locale?.common?.skipToContent
+  )
+}
+
 export function getImageLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleImage>
@@ -722,14 +741,22 @@ export function getMarkdownEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleMarkdownEditor>
 ): Required<TigerLocaleMarkdownEditor> {
-  return resolveLocaleSection(enSection('markdownEditor', locale), locale?.markdownEditor, overrides)
+  return resolveLocaleSection(
+    enSection('markdownEditor', locale),
+    locale?.markdownEditor,
+    overrides
+  )
 }
 
 export function getRichTextEditorLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleRichTextEditor>
 ): Required<TigerLocaleRichTextEditor> {
-  return resolveLocaleSection(enSection('richTextEditor', locale), locale?.richTextEditor, overrides)
+  return resolveLocaleSection(
+    enSection('richTextEditor', locale),
+    locale?.richTextEditor,
+    overrides
+  )
 }
 
 export function getCronEditorLabels(
@@ -848,7 +875,8 @@ export function getNotificationCloseAriaLabel(
   override?: string
 ): string {
   if (typeof override === 'string' && override.trim().length > 0) return override
-  return resolveLocaleSection(enSection('common', locale), locale?.common).closeNotificationAriaLabel
+  return resolveLocaleSection(enSection('common', locale), locale?.common)
+    .closeNotificationAriaLabel
 }
 
 /**
@@ -867,7 +895,11 @@ export function getFormValidationLabels(
   locale?: Partial<TigerLocale>,
   overrides?: Partial<TigerLocaleFormValidation>
 ): Required<TigerLocaleFormValidation> {
-  return resolveLocaleSection(enSection('formValidation', locale), locale?.formValidation, overrides)
+  return resolveLocaleSection(
+    enSection('formValidation', locale),
+    locale?.formValidation,
+    overrides
+  )
 }
 
 export function getInputOTPLabels(
@@ -913,10 +945,7 @@ export function getSignatureLabels(
   const clearText =
     typeof overrides?.clearText === 'string' && overrides.clearText.trim()
       ? overrides.clearText
-      : (section.clearText ||
-        locale?.common?.clearText ||
-        locale?.common?.clearText ||
-        'Clear')
+      : section.clearText || locale?.common?.clearText || locale?.common?.clearText || 'Clear'
   return {
     ...section,
     clearText

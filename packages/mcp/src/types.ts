@@ -105,6 +105,8 @@ export interface SkillIndex {
 
 export interface ComponentRoute {
   component: ComponentMetadata
+  packageVersion: string
+  importPath: string
   sources: ReferenceSource[]
 }
 
@@ -132,7 +134,17 @@ export interface SearchResult {
 export interface SearchResponse {
   query: string
   framework?: TigercatFramework
+  packageVersion: string
   results: SearchResult[]
+}
+
+export interface ExampleLookupResult {
+  query: string
+  found: boolean
+  packageVersion: string
+  importPath?: string
+  example?: string
+  candidates: SearchResult[]
 }
 
 export interface TopicRoute {

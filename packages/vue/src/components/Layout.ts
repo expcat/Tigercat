@@ -4,7 +4,10 @@ import {
   classNames,
   coerceClassValue,
   getLayoutRootClasses,
+  getLayoutSkipLinkClasses,
+  getSkipToContentLabel,
   isLayoutSiderTypeName,
+  LAYOUT_MAIN_ID,
   resolveLayoutHasSider,
   resolveSidebarLandmark,
   warnIfLayoutSiderMissed,
@@ -13,6 +16,7 @@ import {
 } from '@expcat/tigercat-core'
 import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { LayoutContextKey, type LayoutContextValue } from '../utils/layout-context'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface VueLayoutProps {
   className?: string
@@ -67,6 +71,7 @@ export const Layout = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const parent = inject(LayoutContextKey, null)
+    const config = useTigerConfig()
     const nested = computed(() => parent != null)
     const shellFullHeight = computed(() => props.fullHeight && !nested.value)
     const hasSider = ref(false)
@@ -113,7 +118,18 @@ export const Layout = defineComponent({
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
 
-      return h('div', { ...attrs, class: layoutClasses, style: props.style }, rendered)
+      const skip = nested.value
+        ? null
+        : h(
+            'a',
+            {
+              class: getLayoutSkipLinkClasses(),
+              href: `#${LAYOUT_MAIN_ID}`
+            },
+            getSkipToContentLabel(config.value.locale)
+          )
+
+      return h('div', { ...attrs, class: layoutClasses, style: props.style }, [skip, ...rendered])
     }
   }
 })

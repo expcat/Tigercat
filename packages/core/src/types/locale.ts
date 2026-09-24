@@ -21,6 +21,8 @@ export interface TigerLocaleCommon {
   closeNotificationAriaLabel?: string
   /** Default accessible name for Sidebar (`<aside>`) when none is passed */
   sidebarAriaLabel?: string
+  /** Skip link on the outermost layout. Targets the page `main`. */
+  skipToContent?: string
   /** Default accessible name for SplitButton chevron / "more" triggers */
   moreOptionsText?: string
   /** Default Popconfirm title when none is passed */
@@ -807,6 +809,8 @@ export interface TigerLocaleNotificationCenter {
 export interface TigerLocaleWorkflowDetailShell {
   /** Accessible name for the detail region */
   ariaLabel?: string
+  /** Visible title when the shell does not receive a custom header title */
+  title?: string
 }
 
 export interface TigerLocaleSelect {

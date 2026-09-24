@@ -12,14 +12,19 @@ import {
   isToolbarSearchRemote,
   mergeTigerLocale,
   resolveTigerLocale,
+  queryScalarsForLocalView,
+  readQueryValues,
   resolveToolbarFilterMap,
   resolveToolbarPageChange,
   resolveToolbarSelectedKeys,
+  seedQueryValues,
   seedToolbarFilterState,
+  summarizeQueryValues,
   splitCompositeHostAttrs,
   toolbarFilterMapAfterWrite,
   toggleHiddenColumnKey,
   toolbarHasSearch,
+  type TableQueryConfig,
   type TableToolbarAction,
   type TableToolbarFilterValue,
   type TableToolbarFiltersExtraContext,
@@ -84,6 +89,7 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends 
   onPageSizeChange?: (page: { current: number; pageSize: number }) => void
   className?: string
   tableClassName?: string
+  query?: TableQueryConfig
   id?: string
   style?: React.CSSProperties
 }
@@ -105,6 +111,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   columns,
   onSelectionChange,
   bordered = false,
+  query,
   id,
   style,
   ...rest
@@ -134,6 +141,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     () => seedToolbarFilterState({}, toolbar?.filters)
   )
   const [extraFilterKeys, setExtraFilterKeys] = useState<string[]>([])
+  const [queryDraft, setQueryDraft] = useState(() => seedQueryValues(query?.fields))
+  const [submittedQuery, setSubmittedQuery] = useState(() => seedQueryValues(query?.fields))
+  const [queryCollapsed, setQueryCollapsed] = useState(query?.defaultCollapsed ?? false)
   const [internalSelectedKeys, setInternalSelectedKeys] = useState<(string | number)[]>(
     () => rowSelection?.defaultSelectedRowKeys ?? []
   )
@@ -190,12 +200,23 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   const hasFiltersExtra = Boolean(toolbar?.filtersExtra)
   const hasBulkActions = Boolean(toolbar?.bulkActions && toolbar.bulkActions.length > 0)
   const hasColumnSettings = Boolean(toolbar?.showColumnSettings)
+  if (query) {
+    const api = query.api ?? {
+      getQueryValues: () => readQueryValues(query.fields, queryDraft)
+    }
+    api.getQueryValues = () => readQueryValues(query.fields, queryDraft)
+    query.api = api
+  }
+
   const viewRows = useMemo(() => {
     const sourceRows = (dataSource ?? []) as T[]
     return isToolbarSearchRemote(toolbar)
       ? sourceRows
-      : applyToolbarLocalView(sourceRows, columns, searchValue ?? '', resolvedFilters)
-  }, [columns, dataSource, resolvedFilters, searchValue, toolbar])
+      : applyToolbarLocalView(sourceRows, columns, searchValue ?? '', {
+          ...resolvedFilters,
+          ...queryScalarsForLocalView(submittedQuery)
+        })
+  }, [columns, dataSource, resolvedFilters, searchValue, submittedQuery, toolbar])
 
   const selectedKeys = resolveToolbarSelectedKeys(
     rowSelection?.selectedRowKeys,
@@ -262,7 +283,13 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         ? extraFilterKeys
         : [...extraFilterKeys, key]
     toolbar?.onFiltersChange?.(
-      toolbarFilterMapAfterWrite(toolbar?.filters, { ...internalFilters, [key]: value }, keys, key, value)
+      toolbarFilterMapAfterWrite(
+        toolbar?.filters,
+        { ...internalFilters, [key]: value },
+        keys,
+        key,
+        value
+      )
     )
     if (isToolbarSearchRemote(toolbar) || isToolbarScalarFilter(value)) resetPageToFirst()
   }
@@ -496,6 +523,77 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       className={getDataTableToolbarWrapperClasses({ bordered, className })}
       data-tiger-data-table-with-toolbar
       {...hostAttrs}>
+      {query?.fields?.length || query ? (
+        <div className="tiger-table-query flex flex-col gap-2" data-tiger-table-query="">
+          {(query.collapsed ?? queryCollapsed) ? (
+            <p data-tiger-query-summary="">
+              {summarizeQueryValues(query.fields, readQueryValues(query.fields, queryDraft))}
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {(query.fields ?? []).map((field) =>
+                field.options ? (
+                  <Select
+                    key={field.key}
+                    options={field.options}
+                    placeholder={field.placeholder ?? field.label}
+                    value={readQueryValues(query.fields, queryDraft)[field.key] as string}
+                    onChange={(value) =>
+                      setQueryDraft((prev) => ({
+                        ...prev,
+                        [field.key]: value as TableToolbarFilterValue
+                      }))
+                    }
+                  />
+                ) : (
+                  <Input
+                    key={field.key}
+                    placeholder={field.placeholder ?? field.label}
+                    value={String(readQueryValues(query.fields, queryDraft)[field.key] ?? '')}
+                    onChange={(value) => setQueryDraft((prev) => ({ ...prev, [field.key]: value }))}
+                  />
+                )
+              )}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              onClick={() => {
+                const values = readQueryValues(query.fields, queryDraft)
+                setSubmittedQuery(values)
+                query.onSubmit?.(values)
+                resetPageToFirst()
+              }}>
+              Search
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                const cleared = seedQueryValues(
+                  query.fields?.map((field) => ({ ...field, value: undefined }))
+                )
+                setQueryDraft(cleared)
+                setSubmittedQuery(cleared)
+                query.onReset?.(cleared)
+                resetPageToFirst()
+              }}>
+              Reset
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                const next = !(query.collapsed ?? queryCollapsed)
+                if (query.collapsed === undefined) setQueryCollapsed(next)
+                query.onCollapsedChange?.(next)
+              }}>
+              {(query.collapsed ?? queryCollapsed) ? 'Expand' : 'Collapse'}
+            </Button>
+          </div>
+        </div>
+      ) : null}
       {renderToolbar()}
       <Table
         {...(tableRest as Omit<TableProps<T>, 'columns' | 'dataSource'>)}

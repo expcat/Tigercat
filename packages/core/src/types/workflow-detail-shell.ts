@@ -13,6 +13,7 @@ import type { SchemaFormSchema } from './schema-form'
 import type {
   FieldPermission,
   WorkflowFieldPermissionMode,
+  WorkflowInstance,
   WorkflowStepKind
 } from './workflow-timeline'
 
@@ -47,6 +48,10 @@ export interface WorkflowDetailShellProps {
   nodeKind?: WorkflowStepKind
   /** Merged values after `submit`. */
   onSubmit?: (values: FormValues) => void
+  /** Visible title. Omitted: locale `workflowDetailShell.title`, unless `header` is filled. */
+  title?: string
+  /** Runtime instance. `submitAction` reduces this with the action-bar opinion. */
+  instance?: WorkflowInstance
   /** Locale override merged on top of ConfigProvider. */
   locale?: Partial<TigerLocale>
   /**

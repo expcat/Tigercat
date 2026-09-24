@@ -269,7 +269,8 @@ describe('server surface', () => {
       'tigercat_search',
       'tigercat_component',
       'tigercat_route',
-      'tigercat_reference'
+      'tigercat_reference',
+      'tigercat_example'
     ])
     for (const tool of TIGERCAT_TOOLS) {
       expect(tool.description.length).toBeGreaterThan(80)

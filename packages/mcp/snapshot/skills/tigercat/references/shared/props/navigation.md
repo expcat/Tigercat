@@ -7,7 +7,7 @@ description: Navigation props split by component
 
 # Navigation Props
 
-This category is split by component so each file stays within the line budget.
+One component per page. This index only links to those pages.
 
 - [Affix](./affix.md)
 - [Anchor](./anchor.md)

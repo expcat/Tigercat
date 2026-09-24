@@ -35,7 +35,11 @@ walk(dest)
 const ordered = Object.fromEntries(Object.keys(files).sort().map((key) => [key, files[key]]))
 writeFileSync(
   join(dest, 'version.json'),
-  `${JSON.stringify({ version, commit: process.env.GITHUB_SHA ?? '' }, null, 2)}\n`
+  `${JSON.stringify(
+    { version, commit: process.env.GITHUB_SHA ?? '', algorithm: 'sha256', files: ordered },
+    null,
+    2
+  )}\n`
 )
 writeFileSync(
   join(dest, 'manifest.json'),

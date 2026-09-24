@@ -3,6 +3,7 @@ import {
   classNames,
   coerceClassValue,
   getLayoutContentClasses,
+  LAYOUT_MAIN_ID,
   resolveLayoutSectionTag
 } from '@expcat/tigercat-core'
 import { LayoutContextKey } from '../utils/layout-context'
@@ -46,20 +47,24 @@ export const Content = defineComponent({
       )
     )
 
-    return () =>
-      h(
-        resolveLayoutSectionTag({
-          kind: 'content',
-          nested: Boolean(layout?.nested.value),
-          explicit: props.as
-        }),
+    return () => {
+      const tag = resolveLayoutSectionTag({
+        kind: 'content',
+        nested: Boolean(layout?.nested.value),
+        explicit: props.as
+      })
+      const attrId = (attrs as { id?: string }).id
+      return h(
+        tag,
         {
           ...attrs,
+          id: tag === 'main' ? attrId || LAYOUT_MAIN_ID : attrId,
           class: contentClasses.value,
           style: props.style
         },
         slots.default?.()
       )
+    }
   }
 })
 

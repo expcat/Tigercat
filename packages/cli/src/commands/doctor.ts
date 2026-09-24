@@ -133,7 +133,68 @@ export function collectDoctorChecks(options: DoctorOptions = {}): DoctorCheck[] 
     checks.push(coreExportsCheck)
   }
 
+  checks.push(createSkillCatalogCheck(cwd))
+
   return checks
+}
+
+function createSkillCatalogCheck(cwd: string): DoctorCheck {
+  const candidates = [
+    join(cwd, 'node_modules', '@expcat', 'tigercat-mcp', 'snapshot', 'version.json'),
+    resolveAdjacent('../../../mcp/snapshot/version.json')
+  ]
+  const versionPath = candidates.find((path) => existsSync(path))
+  if (!versionPath) {
+    return {
+      name: 'Skill catalog',
+      status: 'pass',
+      message: 'No packaged skill catalog in this project.'
+    }
+  }
+  try {
+    const version = JSON.parse(readFileSync(versionPath, 'utf8')) as {
+      version?: unknown
+      files?: Record<string, string>
+    }
+    if (version.version !== CLI_VERSION) {
+      return {
+        name: 'Skill catalog',
+        status: 'fail',
+        message: `Skill catalog version ${String(version.version)} does not match CLI ${CLI_VERSION}.`
+      }
+    }
+    if (version.files) {
+      const manifestPath = join(dirname(versionPath), 'manifest.json')
+      const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+        files?: Record<string, string>
+      }
+      const left = Object.keys(version.files).sort()
+      const right = Object.keys(manifest.files ?? {}).sort()
+      const mismatch =
+        left.length !== right.length ||
+        left.some(
+          (key, index) => key !== right[index] || version.files?.[key] !== manifest.files?.[key]
+        )
+      if (mismatch) {
+        return {
+          name: 'Skill catalog',
+          status: 'fail',
+          message: 'Skill catalog digest does not match manifest.json.'
+        }
+      }
+    }
+    return {
+      name: 'Skill catalog',
+      status: 'pass',
+      message: `Skill catalog ${CLI_VERSION} matches this CLI.`
+    }
+  } catch (error) {
+    return {
+      name: 'Skill catalog',
+      status: 'fail',
+      message: error instanceof Error ? error.message : String(error)
+    }
+  }
 }
 
 function runDoctor(json = false) {
@@ -362,7 +423,10 @@ function createPeerDepsCheck(packageJson: ProjectPackage, cwd: string): DoctorCh
     FRAMEWORK_REQUIREMENTS[framework].peers
       .filter((dependency) => dependency.startsWith('@expcat/tigercat-'))
       .filter((dependency) =>
-        isDifferentMajor(unwrapCatalogRange(allDeps[dependency], dependency, cwd), REQUIRED_TIGERCAT_MAJOR)
+        isDifferentMajor(
+          unwrapCatalogRange(allDeps[dependency], dependency, cwd),
+          REQUIRED_TIGERCAT_MAJOR
+        )
       )
       .map((dependency) => `${dependency}@${allDeps[dependency]}`)
   )

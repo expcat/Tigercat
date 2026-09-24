@@ -237,10 +237,3 @@ export interface TaskBoardProps {
 
 /** Swimlane grouping bucket. Same as {@link TaskBoardSwimlane}. */
 export type KanbanSwimlane = TaskBoardSwimlane
-
-/**
- * Kanban props — TaskBoard with Kanban-friendly defaults
- * (`showCardCount` / `allowAddCard` true). Swimlanes group cards **inside
- * each column** by `swimlaneField`; they are not horizontal rows across columns.
- */
-export interface KanbanProps extends TaskBoardProps {}

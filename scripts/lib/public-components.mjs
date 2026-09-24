@@ -134,6 +134,7 @@ export const CATEGORIES = {
     'comment-thread',
     'form-wizard',
     'schema-form',
+    'app-shell',
     'notification-bell',
     'notification-center',
     'table-toolbar',
@@ -367,6 +368,8 @@ export const COMPONENT_ROUTE_ALIASES = {
   固钉: ['Affix'],
   滚动监听: ['ScrollSpy'],
   布局: ['Layout'],
+  应用壳: ['AppShell'],
+  后台壳: ['AppShell'],
   侧边栏: ['Sidebar'],
   容器: ['Container'],
   分割线: ['Divider'],
@@ -1034,6 +1037,24 @@ export function categoryTestGroup(category) {
  * Names the CLI may resolve but must not offer as addable components.
  * Grid is Row + Col. Notification is the imperative API. DonutChart is PieChart.
  */
+/**
+ * Deleted compat names. `tigercat migrate` reads this list. Do not copy it.
+ * Values are the 3.0 names. Import specifier replacements are separate.
+ */
+export const REMOVED_PUBLIC_NAMES = {
+  Kanban: 'TaskBoard',
+  KanbanProps: 'TaskBoardProps',
+  ImageViewer: 'ImagePreview',
+  DonutChart: 'PieChart',
+  Stepper: 'InputNumber'
+}
+
+/** Old import specifiers rewritten by `tigercat migrate`. */
+export const REMOVED_IMPORT_SPECIFIERS = {
+  '@expcat/tigercat-core/tailwind/modern': '@expcat/tigercat-core',
+  '@expcat/tigercat-core/datepicker-locales': '@expcat/tigercat-core/locales'
+}
+
 export const CLI_ADD_RESOLUTIONS = {
   Grid: ['Row', 'Col'],
   Notification: [],

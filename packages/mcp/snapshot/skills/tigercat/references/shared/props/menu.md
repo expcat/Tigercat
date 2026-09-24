@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Menu
 
-`packages/core/src/types/menu.ts` · `MenuProps` · 4/19 props
+`packages/core/src/types/menu.ts` · `MenuProps` · 4/20 props
 
 Note: 项上的 `href` 和 schema 的 `path` / `href` / `iframeSrc` 走 `link-utils`。`path` 只作站内路径。危险协议和禁用项不输出 `href`。
 

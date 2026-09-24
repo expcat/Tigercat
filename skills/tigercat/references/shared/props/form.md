@@ -7,7 +7,7 @@ description: Form props split by component
 
 # Form Props
 
-This category is split by component so each file stays within the line budget.
+One component per page. This index only links to those pages.
 
 - [AutoComplete](./auto-complete.md)
 - [Cascader](./cascader.md)

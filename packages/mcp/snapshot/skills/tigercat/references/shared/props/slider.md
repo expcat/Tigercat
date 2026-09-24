@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Slider
 
-`packages/core/src/types/slider.ts` · `SliderProps` · 4/15 props
+`packages/core/src/types/slider.ts` · `SliderProps` · 4/21 props
 
 Note: Vue 只认 `modelValue` / `update:modelValue`。方向读最近的 `dir`，否则读 ConfigProvider。拖动松手才写入表单，键盘立即写入。`marks` 过密时只标两端。
 

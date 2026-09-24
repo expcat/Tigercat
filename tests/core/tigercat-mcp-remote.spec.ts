@@ -113,7 +113,7 @@ describe('Tigercat MCP remote skill index', () => {
     expect(remote.source.kind).toBe('http')
     expect(remote.root).toBe(baseUrl)
     expect(remote.context7.generated_by).toBe('pnpm docs:api')
-    expect(remote.components.size).toBe(178)
+    expect(remote.components.size).toBe(185)
     expect(remote.aliasTargetsByNormalizedName.get('grid')).toEqual(['Row', 'Col'])
     expect([...remote.allowedReferencePaths].sort()).toEqual(
       [...local.allowedReferencePaths].sort()
@@ -133,8 +133,8 @@ describe('Tigercat MCP remote skill index', () => {
     expect(result.matches[0].sources.map((source) => source.path)).toEqual(
       expect.arrayContaining([
         'skills/tigercat/references/component-index.md',
-        'skills/tigercat/references/shared/props/basic.md',
-        'skills/tigercat/references/examples/basic.md',
+        'skills/tigercat/references/shared/props/button.md',
+        'skills/tigercat/references/examples/button.md',
         'skills/tigercat/references/react/index.md',
         'skills/tigercat/references/shared/patterns/common.md'
       ])
@@ -209,7 +209,7 @@ describe('Tigercat MCP remote skill index', () => {
       const index = await loadSkillIndex({ baseUrl: `${prefixedUrl}mcp` })
 
       expect(index.root).toBe(`${prefixedUrl}mcp/`)
-      expect(index.components.size).toBe(178)
+      expect(index.components.size).toBe(185)
     } finally {
       await close(prefixed.server)
     }

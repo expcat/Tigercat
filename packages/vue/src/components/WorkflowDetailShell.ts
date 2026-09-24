@@ -20,6 +20,7 @@ import {
   getWorkflowDetailShellRootClasses,
   mergeStyleValues,
   mergeTigerLocale,
+  submitWorkflowDetailAction,
   submitWorkflowDetailForm,
   workflowDetailShellActionClasses,
   workflowDetailShellBodyClasses,
@@ -32,6 +33,8 @@ import {
   type TigerLocale,
   type WorkflowDetailShellProps as CoreWorkflowDetailShellProps,
   type WorkflowFieldPermissionMode,
+  type WorkflowInstance,
+  type WorkflowRuntimeAction,
   type WorkflowStepKind
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
@@ -42,6 +45,10 @@ export type WorkflowDetailShellProps = VueWorkflowDetailShellProps
 
 export interface WorkflowDetailShellHandle {
   submit: (submitted?: FormValues) => FormValues
+  submitAction: (
+    action: WorkflowRuntimeAction,
+    submitted?: FormValues
+  ) => { values: FormValues; instance: WorkflowInstance }
 }
 
 function hasSlotContent(nodes: unknown): boolean {
@@ -62,6 +69,8 @@ export const WorkflowDetailShell = defineComponent({
      * Omitted: locale `workflowDetailShell.ariaLabel`.
      */
     ariaLabel: { type: String, default: undefined },
+    title: { type: String, default: undefined },
+    instance: { type: Object as PropType<WorkflowInstance>, default: undefined },
     className: { type: String, default: undefined },
     style: { type: Object as PropType<Record<string, unknown>>, default: undefined },
     originalValues: { type: Object as PropType<FormValues>, default: undefined },
@@ -78,7 +87,7 @@ export const WorkflowDetailShell = defineComponent({
     nodeKind: { type: String as PropType<WorkflowStepKind>, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
-  emits: ['submit'],
+  emits: ['submit', 'detail-action'],
   setup(props, { slots, attrs, emit, expose }) {
     const config = useTigerConfig()
     const labels = computed(() =>
@@ -101,7 +110,22 @@ export const WorkflowDetailShell = defineComponent({
       emit('submit', merged)
       return merged
     }
-    expose({ submit })
+    const submitAction = (action: WorkflowRuntimeAction, submitted?: FormValues) => {
+      const result = submitWorkflowDetailAction({
+        original: props.originalValues,
+        submitted: submitted ?? props.values,
+        schema: props.schema,
+        permissions: props.fieldPermissions,
+        mode: props.permissionMode,
+        kind: props.nodeKind,
+        instance: props.instance ?? { steps: [] },
+        action
+      })
+      emit('submit', result.values)
+      emit('detail-action', { ...result, action })
+      return result
+    }
+    expose({ submit, submitAction })
 
     return () => {
       const header = slots.header?.()
@@ -132,9 +156,13 @@ export const WorkflowDetailShell = defineComponent({
           'data-tiger-workflow-detail-shell': ''
         },
         [
-          hasSlotContent(header)
-            ? h('div', { class: workflowDetailShellHeaderClasses, 'data-slot': 'header' }, header)
-            : null,
+          h(
+            'div',
+            { class: workflowDetailShellHeaderClasses, 'data-slot': 'header' },
+            hasSlotContent(header)
+              ? header
+              : h('h1', { class: 'text-base font-semibold' }, props.title || labels.value.title)
+          ),
           h('div', { class: workflowDetailShellBodyClasses, 'data-slot': 'body' }, body),
           hasSlotContent(action)
             ? h('div', { class: workflowDetailShellActionClasses, 'data-slot': 'action' }, action)

@@ -2,13 +2,17 @@ import React, { forwardRef, useContext, useMemo } from 'react'
 import {
   classNames,
   getLayoutRootClasses,
+  getLayoutSkipLinkClasses,
+  getSkipToContentLabel,
   isLayoutSiderTypeName,
+  LAYOUT_MAIN_ID,
   resolveLayoutHasSider,
   resolveSidebarLandmark,
   warnIfLayoutSiderMissed,
   type LayoutProps as CoreLayoutProps,
   type SidebarLandmark
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './ConfigProvider'
 import { LayoutContext, type LayoutContextValue } from '../utils/layout-context'
 
 export interface ReactLayoutProps
@@ -39,6 +43,7 @@ export const Layout = forwardRef<HTMLDivElement, ReactLayoutProps>(function Layo
   ref
 ) {
   const parent = useContext(LayoutContext)
+  const config = useTigerConfig()
   const nested = parent != null
   const shellFullHeight = fullHeight && !nested
   const childArray = React.Children.toArray(children)
@@ -84,6 +89,11 @@ export const Layout = forwardRef<HTMLDivElement, ReactLayoutProps>(function Layo
   return (
     <LayoutContext.Provider value={contextValue}>
       <div ref={ref} className={layoutClasses} style={style} {...props}>
+        {nested ? null : (
+          <a className={getLayoutSkipLinkClasses()} href={`#${LAYOUT_MAIN_ID}`}>
+            {getSkipToContentLabel(config.locale)}
+          </a>
+        )}
         {rendered}
       </div>
     </LayoutContext.Provider>

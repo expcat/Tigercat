@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## BreadcrumbItem
 
-`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 4/9 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 4/10 props
 
 | Prop         | Type                  | Default | Notes                                                                                     |
 | ------------ | --------------------- | ------- | ----------------------------------------------------------------------------------------- |

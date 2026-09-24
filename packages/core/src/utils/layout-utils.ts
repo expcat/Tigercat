@@ -4,6 +4,13 @@ import type { HeaderVariant, LayoutDirection, LayoutSiderSide } from '../types/l
 
 export const LAYOUT_SIDER_NAME = 'TigerSidebar'
 
+/** Id of the page-level Content `main`. The outermost skip link targets this. */
+export const LAYOUT_MAIN_ID = 'tiger-main'
+
+export function getLayoutSkipLinkClasses(): string {
+  return 'tiger-skip-link'
+}
+
 export function isLayoutSiderTypeName(name: unknown): boolean {
   return name === LAYOUT_SIDER_NAME
 }
@@ -36,7 +43,8 @@ export function resolveLayoutSectionTag(options: {
   nested: boolean
   explicit?: string | null
 }): string {
-  if (typeof options.explicit === 'string' && options.explicit.trim()) return options.explicit.trim()
+  if (typeof options.explicit === 'string' && options.explicit.trim())
+    return options.explicit.trim()
   if (options.nested) return 'div'
   if (options.kind === 'header') return 'header'
   if (options.kind === 'footer') return 'footer'

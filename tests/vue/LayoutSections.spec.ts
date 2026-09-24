@@ -204,6 +204,26 @@ describe('Layout Sections', () => {
     expect(footer.style.height).toBe('32px')
   })
 
+  it('skips to the page main and keeps sticky independent of variant', () => {
+    const { container } = render({
+      setup() {
+        return () =>
+          h(Layout, null, () => [
+            h(Header, { variant: 'blur', sticky: true }, () => 'Top'),
+            h(Content, null, () => 'Body')
+          ])
+      }
+    })
+    const skip = container.querySelector('a.tiger-skip-link') as HTMLAnchorElement
+    const main = container.querySelector('main')
+    expect(skip.getAttribute('href')).toBe('#tiger-main')
+    expect(skip.textContent).toContain('Skip to main content')
+    expect(main?.id).toBe('tiger-main')
+    const header = container.querySelector('header')
+    expect(header?.className).toContain('tiger-header-blur')
+    expect(header?.className).toContain('tiger-header-sticky')
+  })
+
   it('has no basic accessibility violations', async () => {
     const { container } = render(Layout, {
       slots: {

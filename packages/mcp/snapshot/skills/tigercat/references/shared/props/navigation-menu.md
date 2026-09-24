@@ -18,6 +18,6 @@ Note: 链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferr
 | Prop            | Type                          | Default | Notes                                                                                      |
 | --------------- | ----------------------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `value?`        | `NavigationMenuValue \| null` | `-`     | Currently open top-level item key (controlled mode). `null` or `''` closes every panel.    |
-| `open?`         | `boolean`                     | `-`     | Whether any panel is open (controlled mode). When `false`, every panel is closed even i... |
 | `portal?`       | `boolean`                     | `true`  | Portal panels through the overlay target chain (overlay-host, then ConfigProvider root,... |
 | `closeOnClick?` | `boolean`                     | `true`  | Whether to close the open panel when a link or item is clicked                             |
+| `disabled?`     | `boolean`                     | `false` | Whether the navigation menu is disabled                                                    |

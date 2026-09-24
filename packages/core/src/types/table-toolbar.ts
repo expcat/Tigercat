@@ -325,4 +325,34 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends 
    * Class applied to the inner table element.
    */
   tableClassName?: string
+  /**
+   * Collapsible query above the toolbar. Submit and reset are explicit.
+   * Object values are emitted to the parent and skipped by local matching.
+   */
+  query?: TableQueryConfig
+}
+
+export interface TableQueryField {
+  key: string
+  label: string
+  placeholder?: string
+  options?: FilterOption[]
+  value?: TableToolbarFilterValue
+  defaultValue?: TableToolbarFilterValue
+}
+
+export interface TableQueryConfig {
+  fields?: TableQueryField[]
+  collapsed?: boolean
+  defaultCollapsed?: boolean
+  onSubmit?: (values: Record<string, TableToolbarFilterValue>) => void
+  onReset?: (values: Record<string, TableToolbarFilterValue>) => void
+  onCollapsedChange?: (collapsed: boolean) => void
+  /**
+   * Filled by the component. Read the current conditions from here.
+   * Vue also exposes `getQueryValues` on the component instance.
+   */
+  api?: {
+    getQueryValues: () => Record<string, TableToolbarFilterValue>
+  }
 }

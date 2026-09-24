@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Tabs
 
-`packages/core/src/types/tabs.ts` · `TabsProps` · 4/18 props
+`packages/core/src/types/tabs.ts` · `TabsProps` · 4/20 props
 
 | Prop                      | Type               | Default | Notes                                                                                      |
 | ------------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |

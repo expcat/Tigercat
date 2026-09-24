@@ -55,6 +55,11 @@
       "import": "./dist/components/Anchor.mjs",
       "default": "./dist/components/Anchor.mjs"
     },
+    "./AppShell": {
+      "types": "./dist/components/AppShell.d.mts",
+      "import": "./dist/components/AppShell.mjs",
+      "default": "./dist/components/AppShell.mjs"
+    },
     "./AreaChart": {
       "types": "./dist/components/AreaChart.d.mts",
       "import": "./dist/components/AreaChart.mjs",

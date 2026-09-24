@@ -1,15 +1,21 @@
-export function getVue3Template(projectName: string): Record<string, string> {
-  return {
+export function getVue3Template(
+  projectName: string,
+  preset: 'blank' | 'shell' = 'blank'
+): Record<string, string> {
+  const files: Record<string, string> = {
     'package.json': vue3PackageJson(projectName),
     '.gitignore': TEMPLATE_GITIGNORE,
     'tsconfig.json': vue3Tsconfig(),
     'vite.config.ts': vue3ViteConfig(),
     'index.html': vue3IndexHtml(projectName),
     'src/main.ts': vue3Main(),
-    'src/App.vue': vue3App(),
+    'src/App.vue': preset === 'shell' ? vue3ShellApp() : vue3App(),
+    'src/routes.ts': preset === 'shell' ? vue3Routes() : '',
     'src/style.css': commonStyleCss(),
     'src/env.d.ts': vue3EnvDts()
   }
+  if (!files['src/routes.ts']) delete files['src/routes.ts']
+  return files
 }
 
 import { TEMPLATE_GITIGNORE, TEMPLATE_PACKAGE_MANAGER, TEMPLATE_VERSIONS as V } from '../constants'
@@ -162,6 +168,55 @@ function toggleDark(value: boolean) {
         </div>
       </div>
     </div>
+  </ConfigProvider>
+</template>
+`
+}
+
+function vue3Routes(): string {
+  return `export const shellRoutes = [
+  { key: 'home', title: 'Home' },
+  { key: 'list', title: 'List' }
+] as const
+`
+}
+
+function vue3ShellApp(): string {
+  return `<script setup lang="ts">
+import { ref } from 'vue'
+import { AppShell, ConfigProvider } from '@expcat/tigercat-vue'
+import { shellRoutes } from './routes'
+
+const active = ref<string>(shellRoutes[0].key)
+const current = () => shellRoutes.find((route) => route.key === active.value)
+</script>
+
+<template>
+  <ConfigProvider theme="modern">
+    <AppShell
+      full-height
+      header-sticky
+      :title="current()?.title"
+      :tabs="shellRoutes.map((route) => ({ key: route.key, title: route.title }))"
+      :active-tab="active"
+      :breadcrumb="[{ title: current()?.title ?? 'Home' }]"
+      @tab-change="active = $event"
+    >
+      <template #sidebar>
+        <nav class="flex flex-col gap-1 p-3">
+          <button
+            v-for="route in shellRoutes"
+            :key="route.key"
+            type="button"
+            class="rounded px-3 py-2 text-start text-sm"
+            @click="active = route.key"
+          >
+            {{ route.title }}
+          </button>
+        </nav>
+      </template>
+      <p class="text-[var(--tiger-text)]">{{ current()?.title }}</p>
+    </AppShell>
   </ConfigProvider>
 </template>
 `

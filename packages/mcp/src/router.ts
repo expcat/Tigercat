@@ -17,6 +17,7 @@ import {
   normalizeName,
   readReferenceSource
 } from './skill-index'
+import { PACKAGE_VERSION } from './version'
 
 interface RouteTaskInput {
   task: string
@@ -55,7 +56,44 @@ export async function searchTigercat(
   return {
     query,
     framework: input.framework,
+    packageVersion: PACKAGE_VERSION,
     results: findSearchResults(index, query, clampResultLimit(input.limit))
+  }
+}
+
+export async function getTigercatExample(
+  index: SkillIndex,
+  input: ComponentInput
+): Promise<import('./types').ExampleLookupResult> {
+  const query = input.component?.trim()
+  if (!query) throw new Error('tigercat_example requires a non-empty component')
+  const components = resolveComponentQuery(index, query)
+  if (components.length === 0) {
+    return {
+      query,
+      found: false,
+      packageVersion: PACKAGE_VERSION,
+      candidates: findSearchResults(index, query, DEFAULT_LIMIT).filter(
+        (result) => result.kind === 'component' || result.kind === 'alias'
+      )
+    }
+  }
+  const entry = components[0]
+  const source = await readReferenceSource(
+    index,
+    entry.references.examples,
+    `${entry.name} example snippet`,
+    input.maxBytes,
+    entry.name
+  )
+  const pkg = input.framework === 'vue' ? '@expcat/tigercat-vue' : '@expcat/tigercat-react'
+  return {
+    query,
+    found: true,
+    packageVersion: PACKAGE_VERSION,
+    importPath: `${pkg}${entry.packageSubpath.startsWith('.') ? entry.packageSubpath.slice(1) : `/${entry.packageSubpath}`}`,
+    example: source.text,
+    candidates: []
   }
 }
 
@@ -229,8 +267,11 @@ export async function createComponentRoute(
     }
   ].map((spec) => createReferencePointer(index, spec.path, spec.reason))
 
+  const pkg = framework === 'vue' ? '@expcat/tigercat-vue' : '@expcat/tigercat-react'
   return {
     component: entry,
+    packageVersion: PACKAGE_VERSION,
+    importPath: `${pkg}${entry.packageSubpath.startsWith('.') ? entry.packageSubpath.slice(1) : `/${entry.packageSubpath}`}`,
     sources: dedupeByPath([...sources, ...pointers])
   }
 }
@@ -555,7 +596,9 @@ function keywordMatches(task: string, normalizedTask: string, keyword: string): 
   const normalizedKeyword = normalizeName(keyword)
   if (!normalizedKeyword) return false
   if (/^[a-z0-9]+$/.test(normalizedKeyword)) {
-    return new RegExp(`(^|[^a-z0-9])${escapeRegExp(normalizedKeyword)}([^a-z0-9]|$)`, 'i').test(task)
+    return new RegExp(`(^|[^a-z0-9])${escapeRegExp(normalizedKeyword)}([^a-z0-9]|$)`, 'i').test(
+      task
+    )
   }
   if (normalizedKeyword.length < 2) return false
   return normalizedTask.includes(normalizedKeyword)

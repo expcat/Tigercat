@@ -27,8 +27,12 @@ import {
   isToolbarScalarFilter,
   resolveToolbarFilterMap,
   resolveToolbarPageChange,
+  queryScalarsForLocalView,
+  readQueryValues,
   resolveToolbarSelectedKeys,
+  seedQueryValues,
   seedToolbarFilterState,
+  summarizeQueryValues,
   toolbarFilterMapAfterWrite,
   splitCompositeHostAttrs,
   toggleHiddenColumnKey,
@@ -37,6 +41,7 @@ import {
   type TableToolbarAction,
   type TableToolbarFilter,
   type TableToolbarFilterRenderContext,
+  type TableQueryConfig,
   type TableToolbarFilterValue,
   type TableToolbarFiltersExtraContext,
   type TableToolbarProps as CoreTableToolbarProps,
@@ -92,6 +97,10 @@ export const DataTableWithToolbar = defineComponent({
       type: Object as PropType<VueTableToolbarProps>,
       default: undefined
     },
+    query: {
+      type: Object as PropType<TableQueryConfig>,
+      default: undefined
+    },
     tableClassName: {
       type: String,
       default: undefined
@@ -113,10 +122,12 @@ export const DataTableWithToolbar = defineComponent({
     'selection-change': (_keys: (string | number)[]) => true,
     'page-change': (_page: { current: number; pageSize: number }) => true,
     'page-size-change': (_page: { current: number; pageSize: number }) => true,
+    'query-submit': (_values: Record<string, TableToolbarFilterValue>) => true,
+    'query-reset': (_values: Record<string, TableToolbarFilterValue>) => true,
     'update:hiddenColumnKeys': (_hiddenKeys: string[]) => true,
     'hidden-column-keys-change': (_hiddenKeys: string[]) => true
   },
-  setup(props, { attrs, emit, slots }) {
+  setup(props, { attrs, emit, slots, expose }) {
     const config = useTigerConfig()
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
     const internalHiddenKeys = ref<string[]>(props.defaultHiddenColumnKeys ?? [])
@@ -124,6 +135,9 @@ export const DataTableWithToolbar = defineComponent({
       seedToolbarFilterState({}, props.toolbar?.filters)
     )
     const extraFilterKeys = ref<string[]>([])
+    const queryDraft = ref(seedQueryValues(props.query?.fields))
+    const submittedQuery = ref(seedQueryValues(props.query?.fields))
+    const queryCollapsed = ref(props.query?.defaultCollapsed ?? false)
     const internalSelectedKeys = ref<(string | number)[]>(
       props.rowSelection?.defaultSelectedRowKeys ?? []
     )
@@ -205,12 +219,10 @@ export const DataTableWithToolbar = defineComponent({
     const viewRows = computed(() => {
       const rows = (props.dataSource ?? []) as Record<string, unknown>[]
       if (isToolbarSearchRemote(props.toolbar)) return rows
-      return applyToolbarLocalView(
-        rows,
-        props.columns as TableColumn[],
-        searchValue.value ?? '',
-        resolvedFilters.value
-      )
+      return applyToolbarLocalView(rows, props.columns as TableColumn[], searchValue.value ?? '', {
+        ...resolvedFilters.value,
+        ...queryScalarsForLocalView(submittedQuery.value)
+      })
     })
     const selectedKeys = computed(() =>
       resolveToolbarSelectedKeys(props.rowSelection?.selectedRowKeys, internalSelectedKeys.value)
@@ -586,6 +598,96 @@ export const DataTableWithToolbar = defineComponent({
       )
     }
 
+    const currentQuery = () => readQueryValues(props.query?.fields, queryDraft.value)
+    const submitQuery = () => {
+      const values = currentQuery()
+      submittedQuery.value = values
+      props.query?.onSubmit?.(values)
+      emit('query-submit', values)
+      resetPageToFirst()
+    }
+    const resetQuery = () => {
+      queryDraft.value = seedQueryValues(
+        props.query?.fields?.map((field) => ({ ...field, value: undefined }))
+      )
+      const values = currentQuery()
+      submittedQuery.value = values
+      props.query?.onReset?.(values)
+      emit('query-reset', values)
+      resetPageToFirst()
+    }
+    expose({ getQueryValues: currentQuery })
+    if (props.query) {
+      const api = props.query.api ?? { getQueryValues: currentQuery }
+      api.getQueryValues = currentQuery
+      props.query.api = api
+    }
+
+    const renderQuery = () => {
+      const fields = props.query?.fields
+      if (!fields?.length && !slots.query) return null
+      const collapsed = props.query?.collapsed ?? queryCollapsed.value
+      const values = currentQuery()
+      const summary = summarizeQueryValues(fields, values)
+      return h(
+        'div',
+        { class: 'tiger-table-query flex flex-col gap-2', 'data-tiger-table-query': '' },
+        [
+          collapsed
+            ? h('p', { 'data-tiger-query-summary': '' }, summary)
+            : h('div', { class: 'flex flex-wrap gap-2' }, [
+                slots.query?.({
+                  values,
+                  setValue: (key: string, value: TableToolbarFilterValue) => {
+                    queryDraft.value = { ...queryDraft.value, [key]: value }
+                  }
+                }),
+                ...(fields ?? []).map((field) =>
+                  field.options
+                    ? h(Select, {
+                        key: field.key,
+                        options: field.options,
+                        placeholder: field.placeholder ?? field.label,
+                        modelValue: values[field.key] as string | number | null,
+                        'onUpdate:modelValue': (value: TableToolbarFilterValue) => {
+                          queryDraft.value = { ...queryDraft.value, [field.key]: value }
+                        }
+                      })
+                    : h(Input, {
+                        key: field.key,
+                        placeholder: field.placeholder ?? field.label,
+                        modelValue: values[field.key] == null ? '' : String(values[field.key]),
+                        'onUpdate:modelValue': (value: string) => {
+                          queryDraft.value = { ...queryDraft.value, [field.key]: value }
+                        }
+                      })
+                )
+              ]),
+          h('div', { class: 'flex gap-2' }, [
+            h(Button, { type: 'button', onClick: submitQuery }, { default: () => 'Search' }),
+            h(
+              Button,
+              { type: 'button', variant: 'outline', onClick: resetQuery },
+              { default: () => 'Reset' }
+            ),
+            h(
+              Button,
+              {
+                type: 'button',
+                variant: 'ghost',
+                onClick: () => {
+                  const next = !collapsed
+                  if (props.query?.collapsed === undefined) queryCollapsed.value = next
+                  props.query?.onCollapsedChange?.(next)
+                }
+              },
+              { default: () => (collapsed ? 'Expand' : 'Collapse') }
+            )
+          ])
+        ]
+      )
+    }
+
     return () => {
       const { host, rest } = splitCompositeHostAttrs(attrs as Record<string, unknown>)
       const wrapperClass = getDataTableToolbarWrapperClasses({
@@ -607,6 +709,7 @@ export const DataTableWithToolbar = defineComponent({
           'data-tiger-data-table-with-toolbar': ''
         },
         [
+          renderQuery(),
           renderToolbar(),
           h(
             Table as unknown as Component,

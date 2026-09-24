@@ -22,8 +22,8 @@ describe('Tigercat MCP generated inventory', () => {
     const index = await loadSkillIndex(root)
 
     expect(index.context7.generated_by).toBe('pnpm docs:api')
-    expect(index.context7.component_count).toBe(178)
-    expect(index.components.size).toBe(178)
+    expect(index.context7.component_count).toBe(185)
+    expect(index.components.size).toBe(185)
     expect(index.components.has('ConfigProvider')).toBe(true)
     expect(index.components.has('DataTableWithToolbar')).toBe(true)
     expect(index.components.has('Notification')).toBe(false)
@@ -35,7 +35,7 @@ describe('Tigercat MCP generated inventory', () => {
     const result = await diagnoseTigercatMcp(root)
 
     expect(result.ok).toBe(true)
-    expect(result.componentCount).toBe(178)
+    expect(result.componentCount).toBe(185)
     expect(result.aliasCount).toBeGreaterThanOrEqual(1)
     expect(result.topicCount).toBeGreaterThanOrEqual(10)
     expect(result.issues).toEqual([])
@@ -58,8 +58,8 @@ describe('Tigercat MCP routing API', () => {
     expect(result.matches[0].sources.map((source) => source.path)).toEqual(
       expect.arrayContaining([
         'skills/tigercat/references/component-index.md',
-        'skills/tigercat/references/shared/props/basic.md',
-        'skills/tigercat/references/examples/basic.md',
+        'skills/tigercat/references/shared/props/button.md',
+        'skills/tigercat/references/examples/button.md',
         'skills/tigercat/references/react/index.md',
         'skills/tigercat/references/shared/patterns/common.md'
       ])
@@ -104,7 +104,8 @@ describe('Tigercat MCP routing API', () => {
     )
     expect(result.sources.map((source) => source.path)).toEqual(
       expect.arrayContaining([
-        'skills/tigercat/references/shared/props/basic.md',
+        'skills/tigercat/references/shared/props/button.md',
+        'skills/tigercat/references/examples/button.md',
         'skills/tigercat/references/vue/index.md',
         'skills/tigercat/references/ssr.md',
         'skills/tigercat/references/theme.md'

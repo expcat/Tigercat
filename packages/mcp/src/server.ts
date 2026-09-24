@@ -17,6 +17,7 @@ import {
   getInventory,
   getTigercatComponent,
   routeTigercatTask,
+  getTigercatExample,
   searchTigercat
 } from './router'
 import type { SkillIndex, TigercatFramework, TigercatMcpOptions } from './types'
@@ -159,6 +160,25 @@ export const TIGERCAT_TOOLS = [
       required: ['path'],
       additionalProperties: false
     }
+  },
+  {
+    name: 'tigercat_example',
+    description:
+      'Read-only example snippet for one component. Same text the docs page and `tigercat add` use. ' +
+      'Does not install packages or write files. Includes the installed package version.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        component: {
+          type: 'string',
+          description: 'Component name or alias, such as Button or AppShell.'
+        },
+        framework: FRAMEWORK_SCHEMA,
+        maxBytes: MAX_BYTES_SCHEMA
+      },
+      required: ['component'],
+      additionalProperties: false
+    }
   }
 ] as const
 
@@ -218,6 +238,16 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
             framework: frameworkArg(args.framework),
             maxBytes: clampMaxBytes(numberArg(args.maxBytes)),
             limit: clampResultLimit(numberArg(args.limit))
+          })
+        )
+      }
+
+      if (request.params.name === 'tigercat_example') {
+        return renderToolResult(
+          await getTigercatExample(index, {
+            component: stringArg(args.component),
+            framework: frameworkArg(args.framework),
+            maxBytes: clampMaxBytes(numberArg(args.maxBytes))
           })
         )
       }
@@ -290,7 +320,6 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
   })
 
   async function readMcpResource(index: SkillIndex, uri: string) {
-
     if (uri === 'tigercat://inventory') {
       return resourceText(uri, JSON.stringify(getInventory(index)), JSON_MIME)
     }

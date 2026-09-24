@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## FloatButton
 
-`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 4/13 props
+`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 4/15 props
 
 | Prop         | Type                | Default          | Notes                                                          |
 | ------------ | ------------------- | ---------------- | -------------------------------------------------------------- |

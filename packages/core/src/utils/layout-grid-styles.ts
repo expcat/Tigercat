@@ -148,6 +148,21 @@ export const LAYOUT_GRID_CSS = `
   overflow: hidden;
 }
 
+.tiger-skip-link {
+  position: absolute;
+  inset-inline-start: 0.5rem;
+  inset-block-start: 0.5rem;
+  z-index: ${OVERLAY_Z_INDEX.viewport + 1};
+  padding: 0.5rem 0.75rem;
+  background: var(--tiger-surface);
+  color: var(--tiger-text);
+  border-radius: var(--tiger-radius-md);
+  transform: translateY(-200%);
+}
+.tiger-skip-link:focus {
+  transform: none;
+}
+
 .tiger-header {
   display: flex;
   align-items: center;
@@ -348,4 +363,3 @@ export function readThemeBreakpointMap(
   }
   return map
 }
-

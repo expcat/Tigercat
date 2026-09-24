@@ -11,11 +11,11 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Spotlight
 
-`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 4/21 props
+`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 4/22 props
 
 | Prop      | Type                | Default | Notes                                                                                      |
 | --------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `items?`  | `SpotlightItem[]`   | `-`     | -                                                                                          |
 | `open?`   | `boolean`           | `-`     | -                                                                                          |
-| `hotkey?` | `boolean \| string` | `-`     | Global toggle chord. `true` (default) is `Meta/Ctrl+K`; `false` disables; a string uses... |
+| `hotkey?` | `boolean \| string` | `false` | Global toggle chord. Off by default. `true` is `Meta/Ctrl+K`; a string uses the same sh... |
 | `query?`  | `string`            | `-`     | -                                                                                          |

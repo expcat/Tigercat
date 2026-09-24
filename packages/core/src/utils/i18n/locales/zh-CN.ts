@@ -23,6 +23,7 @@ export const zhCN: TigerLocale = {
     closeMessageAriaLabel: '关闭消息',
     closeNotificationAriaLabel: '关闭通知',
     sidebarAriaLabel: '侧栏',
+    skipToContent: '跳到主内容',
     moreOptionsText: '更多操作',
     confirmTitle: '确定要执行此操作吗？'
   },
@@ -242,7 +243,8 @@ export const zhCN: TigerLocale = {
     publishBlocked: '存在阻塞项，无法发布'
   },
   workflowDetailShell: {
-    ariaLabel: '流程详情'
+    ariaLabel: '流程详情',
+    title: '审批'
   },
   progress: {
     ariaLabel: '进度'

@@ -1,0 +1,13 @@
+{
+  "names": {
+    "Kanban": "TaskBoard",
+    "KanbanProps": "TaskBoardProps",
+    "ImageViewer": "ImagePreview",
+    "DonutChart": "PieChart",
+    "Stepper": "InputNumber"
+  },
+  "specifiers": {
+    "@expcat/tigercat-core/tailwind/modern": "@expcat/tigercat-core",
+    "@expcat/tigercat-core/datepicker-locales": "@expcat/tigercat-core/locales"
+  }
+}
