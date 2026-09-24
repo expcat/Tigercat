@@ -105,6 +105,40 @@ export default defineConfig(({ command }) => ({
         find: '@expcat/tigercat-vue',
         replacement: path.resolve(workspaceRoot, 'packages/vue/src/index.ts')
       },
+
+      {
+        find: '@expcat/tigercat-core/icons/common',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/icons/common.ts')
+      },
+      {
+        find: '@expcat/tigercat-core/icons/picker',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/icons/picker.ts')
+      },
+      {
+        find: '@expcat/tigercat-core/icons/status',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/icons/status.ts')
+      },
+      {
+        find: '@expcat/tigercat-core/icons/table',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/icons/table.ts')
+      },
+      {
+        find: '@expcat/tigercat-core/icons/registry',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/icons/registry.ts')
+      },
+      {
+        find: '@expcat/tigercat-core/utils/table-export',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/table-export.ts')
+      },
+      {
+        find: '@expcat/tigercat-core/workflow-designer',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/workflow-designer.ts')
+      },
+      {
+        find: '@expcat/tigercat-core/schema-form',
+        replacement: path.resolve(workspaceRoot, 'packages/core/src/schema-form.ts')
+      },
+
       {
         find: '@expcat/tigercat-core/utils/data-export',
         replacement: path.resolve(workspaceRoot, 'packages/core/src/utils/data-export.ts')
