@@ -9,10 +9,10 @@ import { validateFileSize, validateFileType } from './upload-utils'
 import { classNames } from './class-names'
 
 export const cropUploadTriggerClasses =
-  'tiger-motion-aware inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-lg,0.75rem)] text-[var(--tiger-text-muted,#4b5563)] bg-[var(--tiger-surface-muted,#f9fafb)] hover:bg-[var(--tiger-surface,#ffffff)] hover:border-[var(--tiger-primary,#2563eb)] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'tiger-motion-aware inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border)] rounded-[var(--tiger-radius-lg)] text-[var(--tiger-text-secondary)] bg-[var(--tiger-surface-muted)] hover:bg-[var(--tiger-surface)] hover:border-[var(--tiger-primary)] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 
 export const cropUploadTriggerDisabledClasses =
-  'inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-lg,0.75rem)] text-[var(--tiger-text-muted,#9ca3af)] bg-[var(--tiger-surface-muted,#f9fafb)] cursor-not-allowed opacity-60'
+  'inline-flex items-center justify-center gap-2.5 px-5 py-2.5 border-2 border-dashed border-[var(--tiger-border)] rounded-[var(--tiger-radius-lg)] text-[var(--tiger-text-secondary)] bg-[var(--tiger-surface-muted)] cursor-not-allowed opacity-60'
 
 export function validateUploadFile(file: File | null | undefined, maxSize?: number): Error | null {
   if (!file) return null
@@ -24,10 +24,7 @@ export function validateUploadFile(file: File | null | undefined, maxSize?: numb
 
 export function fileFromCropResult(result: CropResult, originalName: string): File {
   const type = result.blob.type || 'image/png'
-  return new File([result.blob], originalName || result.file?.name || 'crop.png', {
-    type,
-    lastModified: Date.now()
-  })
+  return new File([result.blob], originalName || 'crop.png', { type })
 }
 
 export function withCropFile(result: CropResult, originalName: string): CropResult {

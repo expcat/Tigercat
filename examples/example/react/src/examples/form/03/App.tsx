@@ -25,7 +25,7 @@ export default function App() {
       <FormItem name="username" label="用户名">
         <Input placeholder="输入 admin 观察异步错误" />
       </FormItem>
-      <Button htmlType="submit" variant="primary">
+      <Button type="submit" variant="primary">
         异步校验
       </Button>
     </Form>

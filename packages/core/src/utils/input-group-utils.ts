@@ -29,7 +29,7 @@ export const inputGroupSpacedClasses = 'gap-2'
  * Addon base classes
  */
 export const inputGroupAddonBaseClasses =
-  'inline-flex items-center justify-center border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text-muted,#6b7280)] whitespace-nowrap rounded-[var(--tiger-radius-md,0.5rem)]'
+  'inline-flex items-center justify-center border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)] whitespace-nowrap rounded-[var(--tiger-radius-md)]'
 
 /**
  * Addon size classes

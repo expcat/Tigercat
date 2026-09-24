@@ -18,21 +18,26 @@ import {
   selectTrailingSlotClasses
 } from './select-utils'
 import {
+  calculateCheckedState,
   filterTreeNodes,
   findNode,
   getAllKeys,
   getAutoExpandKeys,
-  getCheckedKeysByStrategy,
   getParentKeys,
   getVisibleTreeItems,
   handleNodeCheck,
+  resolveOutwardCheckedKeys,
+  sameTreeKey,
+  treeKeyId,
   type VisibleTreeItem
 } from './tree-utils'
 
 export const TREE_SELECT_DEFAULT_HEIGHT = 256
 
-export function resolveTreeSelectListHeight(height?: number, listHeight?: number): number {
-  return listHeight ?? height ?? TREE_SELECT_DEFAULT_HEIGHT
+const EMPTY_TREE_SELECT_MULTIPLE: (string | number)[] = []
+
+export function resolveTreeSelectListHeight(listHeight?: number): number {
+  return listHeight ?? TREE_SELECT_DEFAULT_HEIGHT
 }
 
 export const treeSelectBaseClasses = selectBaseClasses
@@ -47,9 +52,9 @@ export const treeSelectTrailingSlotClasses = selectTrailingSlotClasses
 export const treeSelectTreeClasses = 'overflow-auto min-h-0 flex-1 max-sm:max-h-none'
 export const treeSelectExpandButtonClasses = classNames(
   'inline-flex items-center justify-center w-6 h-6 shrink-0 rounded-sm',
-  'text-[var(--tiger-text-muted,#9ca3af)]',
+  'text-[var(--tiger-text-secondary)]',
   'focus:outline-none focus-visible:ring-2',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'focus-visible:ring-[var(--tiger-focus-ring)]'
 )
 
 const TREE_SELECT_NODE_PAD_Y: Record<ComponentSize, string> = {
@@ -99,15 +104,15 @@ export function getTreeSelectNodeClasses(options: {
   return classNames(
     'flex items-center w-full rounded text-start',
     TREE_SELECT_NODE_PAD_Y[size],
-    'tiger-motion-aware [transition:var(--tiger-transition-base,background-color_150ms_ease,color_150ms_ease)]',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     options.isDisabled
-      ? 'text-[var(--tiger-text-muted,#9ca3af)] cursor-not-allowed opacity-50'
-      : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
+      ? 'text-[var(--tiger-text-secondary)] cursor-not-allowed opacity-50'
+      : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover)]',
     options.isSelected &&
-      'bg-[var(--tiger-outline-bg-active,#dbeafe)] text-[var(--tiger-primary,#2563eb)]',
+      'bg-[var(--tiger-outline-bg-active)] text-[var(--tiger-primary)]',
     options.isActive &&
       !options.isDisabled &&
-      'ring-2 ring-inset ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+      'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
   )
 }
 
@@ -122,7 +127,7 @@ export function getTreeSelectExpandIconClasses(
   dir: 'ltr' | 'rtl' = 'ltr'
 ): string {
   return classNames(
-    'inline-flex tiger-motion-aware [transition:var(--tiger-transition-base,transform_150ms_ease)]',
+    'inline-flex tiger-motion-aware [transition:var(--tiger-transition-base)]',
     expanded && 'rotate-90',
     !expanded && dir === 'rtl' && 'rotate-180'
   )
@@ -133,8 +138,12 @@ export function getTreeSelectVirtualItemHeight(size: ComponentSize = 'md'): numb
 }
 
 export function isTreeSelectValueEmpty(value: TreeSelectValue, multiple: boolean): boolean {
-  if (multiple) return !Array.isArray(value) || value.length === 0
-  return value === undefined
+  if (multiple) {
+    if (value == null || value === '') return true
+    if (Array.isArray(value)) return value.length === 0
+    return false
+  }
+  return value == null || value === ''
 }
 
 export function normalizeTreeSelectValue(
@@ -142,12 +151,38 @@ export function normalizeTreeSelectValue(
   multiple: boolean
 ): TreeSelectValue {
   if (multiple) {
-    if (value === undefined) return []
-    if (Array.isArray(value)) return value
+    if (value == null || value === '') return EMPTY_TREE_SELECT_MULTIPLE
+    if (Array.isArray(value)) {
+      if (value.every((item) => item != null && item !== '')) return value
+      const filtered = value.filter((item) => item != null && item !== '')
+      return filtered.length === 0 ? EMPTY_TREE_SELECT_MULTIPLE : filtered
+    }
     return [value]
   }
-  if (Array.isArray(value)) return value[0]
+  if (value == null || value === '') return null
+  if (Array.isArray(value)) {
+    const first = value.find((item) => item != null && item !== '')
+    return first === undefined ? null : first
+  }
   return value
+}
+
+export function treeSelectValuesEqual(
+  left: TreeSelectValue,
+  right: TreeSelectValue,
+  multiple: boolean
+): boolean {
+  const a = normalizeTreeSelectValue(left, multiple)
+  const b = normalizeTreeSelectValue(right, multiple)
+  if (multiple) {
+    const leftKeys = Array.isArray(a) ? a : []
+    const rightKeys = Array.isArray(b) ? b : []
+    if (leftKeys.length !== rightKeys.length) return false
+    return leftKeys.every((key, index) => sameTreeKey(key, rightKeys[index]))
+  }
+  if (a == null && b == null) return true
+  if (a == null || b == null) return false
+  return sameTreeKey(a as string | number, b as string | number)
 }
 
 export function getTreeSelectSelectedKeys(
@@ -156,35 +191,70 @@ export function getTreeSelectSelectedKeys(
 ): (string | number)[] {
   const normalized = normalizeTreeSelectValue(value, multiple)
   if (multiple) return Array.isArray(normalized) ? normalized : []
-  return normalized === undefined ? [] : [normalized as string | number]
+  if (normalized == null || normalized === '') return []
+  return [normalized as string | number]
 }
 
 export function shouldShowTreeSelectClear(options: {
   clearable: boolean
   disabled: boolean
+  readOnly?: boolean
   value: TreeSelectValue
   multiple: boolean
 }): boolean {
   return (
     options.clearable &&
     !options.disabled &&
+    !options.readOnly &&
     !isTreeSelectValueEmpty(options.value, options.multiple)
   )
 }
 
+/** One explicit empty field when nothing is selected. Disabled callers omit the input. */
 export function serializeTreeSelectFormValues(value: TreeSelectValue, multiple: boolean): string[] {
-  return getTreeSelectSelectedKeys(value, multiple).map(String)
+  const keys = getTreeSelectSelectedKeys(value, multiple)
+  if (keys.length === 0) return ['']
+  return keys.map(String)
 }
 
 export function coerceTreeSelectFormValue(value: unknown, multiple: boolean): TreeSelectValue {
-  if (value === undefined || value === null) return undefined
+  if (value === undefined) return undefined
   if (multiple) {
-    if (Array.isArray(value)) return value as (string | number)[]
-    return [value as string | number]
+    if (value === '' || value === null) return EMPTY_TREE_SELECT_MULTIPLE
+    if (Array.isArray(value)) {
+      const filtered = (value as unknown[]).filter(
+        (item): item is string | number =>
+          (typeof item === 'string' || typeof item === 'number') && item !== ''
+      )
+      return filtered.length === 0 ? EMPTY_TREE_SELECT_MULTIPLE : filtered
+    }
+    if (typeof value === 'string' || typeof value === 'number') return [value]
+    return []
   }
-  if (Array.isArray(value)) return value[0] as string | number | undefined
+  if (value === '' || value === null) return null
+  if (Array.isArray(value)) {
+    const first = value.find(
+      (item) => (typeof item === 'string' || typeof item === 'number') && item !== ''
+    )
+    return (first as string | number | undefined) ?? null
+  }
   if (typeof value === 'string' || typeof value === 'number') return value
-  return undefined
+  return null
+}
+
+/** Named field is missing when FormItem passes `''` (or null / undefined). */
+export function shouldSeedTreeSelectFormDefault(options: {
+  alreadySeeded: boolean
+  fieldName?: string
+  controlledValue: TreeSelectValue
+  formValue: unknown
+  defaultValue: TreeSelectValue
+}): boolean {
+  if (options.alreadySeeded) return false
+  if (!options.fieldName) return false
+  if (options.controlledValue !== undefined) return false
+  if (options.defaultValue === undefined) return false
+  return options.formValue === '' || options.formValue == null
 }
 
 export function rememberTreeSelectLabel(
@@ -192,7 +262,15 @@ export function rememberTreeSelectLabel(
   key: string | number,
   label: string
 ): void {
-  cache.set(key, label)
+  cache.set(treeKeyId(key), label)
+}
+
+function readTreeSelectCachedLabel(
+  cache: Map<string | number, string> | undefined,
+  key: string | number
+): string | undefined {
+  if (!cache) return undefined
+  return cache.get(treeKeyId(key)) ?? cache.get(key)
 }
 
 export function getTreeSelectDisplayLabel(
@@ -200,41 +278,65 @@ export function getTreeSelectDisplayLabel(
   value: TreeSelectValue,
   cache?: Map<string | number, string>
 ): string {
-  if (value === undefined) return ''
+  if (isTreeSelectValueEmpty(value, Array.isArray(value))) return ''
   if (Array.isArray(value)) {
     return value
-      .map((key) => findNode(data, key)?.label ?? cache?.get(key) ?? String(key))
+      .map((key) => findNode(data, key)?.label ?? readTreeSelectCachedLabel(cache, key) ?? String(key))
       .join(', ')
   }
-  return findNode(data, value)?.label ?? cache?.get(value) ?? String(value)
+  if (value == null) return ''
+  return findNode(data, value)?.label ?? readTreeSelectCachedLabel(cache, value) ?? String(value)
 }
 
 export function getTreeSelectVisibleIndex(
   items: VisibleTreeItem[],
   value: TreeSelectValue
 ): number {
-  if (value === undefined) return -1
+  if (isTreeSelectValueEmpty(value, Array.isArray(value))) return -1
   if (Array.isArray(value)) {
     if (value.length === 0) return -1
-    const selected = new Set(value)
-    return items.findIndex((item) => selected.has(item.key))
+    return items.findIndex((item) => value.some((key) => sameTreeKey(key, item.key)))
   }
-  return items.findIndex((item) => item.key === value)
+  if (value == null) return -1
+  return items.findIndex((item) => sameTreeKey(item.key, value))
 }
 
 export function resolveTreeSelectVisibleItems(options: {
   treeData: TreeNode[]
-  expandedKeys: Set<string | number>
+  expandedKeys: Iterable<string | number>
   searchQuery: string
   filterFn?: TreeFilterFn
 }): VisibleTreeItem[] {
-  const matched = options.searchQuery
-    ? filterTreeNodes(options.treeData, options.searchQuery, options.filterFn)
-    : undefined
-  const expanded = matched
-    ? new Set([...options.expandedKeys, ...getAutoExpandKeys(options.treeData, matched)])
-    : options.expandedKeys
+  if (!options.searchQuery) {
+    return getVisibleTreeItems(options.treeData, options.expandedKeys, undefined)
+  }
+  const matched = filterTreeNodes(options.treeData, options.searchQuery, options.filterFn)
+  const expanded = new Set<string | number>([
+    ...options.expandedKeys,
+    ...getAutoExpandKeys(options.treeData, matched)
+  ])
   return getVisibleTreeItems(options.treeData, expanded, matched)
+}
+
+export function countTreeNodes(treeData: TreeNode[]): number {
+  let count = 0
+  const walk = (nodes: TreeNode[]): void => {
+    for (const node of nodes) {
+      count += 1
+      if (node.children && node.children.length > 0) walk(node.children)
+    }
+  }
+  walk(treeData)
+  return count
+}
+
+/** `defaultExpandAll` runs only when the tree goes from empty to non-empty. */
+export function shouldApplyTreeSelectDefaultExpandAll(
+  previousNodeCount: number,
+  nextNodeCount: number,
+  defaultExpandAll: boolean
+): boolean {
+  return defaultExpandAll && previousNodeCount === 0 && nextNodeCount > 0
 }
 
 export function getTreeSelectOpenExpandedKeys(options: {
@@ -253,12 +355,28 @@ export function getTreeSelectOpenExpandedKeys(options: {
   return next
 }
 
+export function treeSetHas(keys: Iterable<string | number>, key: string | number): boolean {
+  const id = treeKeyId(key)
+  for (const item of keys) {
+    if (treeKeyId(item) === id) return true
+  }
+  return false
+}
+
 export function toggleTreeSelectExpandedKey(
   expanded: Iterable<string | number>,
   key: string | number
 ): Set<string | number> {
   const next = new Set(expanded)
-  if (next.has(key)) next.delete(key)
+  const id = treeKeyId(key)
+  let found: string | number | undefined
+  for (const item of next) {
+    if (treeKeyId(item) === id) {
+      found = item
+      break
+    }
+  }
+  if (found !== undefined) next.delete(found)
   else next.add(key)
   return next
 }
@@ -272,11 +390,14 @@ export function commitTreeSelectNode(options: {
   checkStrategy: TreeCheckStrategy
 }): TreeSelectValue {
   const { treeData, key, multiple, checkStrictly, checkStrategy } = options
-  if (!multiple) return key
+  if (!multiple) return key === '' ? null : key
   const current = getTreeSelectSelectedKeys(options.value, true)
-  const checked = current.includes(key)
-  const state = handleNodeCheck(treeData, key, !checked, current, checkStrictly)
-  return getCheckedKeysByStrategy(state, treeData, checkStrategy)
+  const visual = calculateCheckedState(treeData, current, checkStrictly)
+  const fully = visual.checked.some((item) => sameTreeKey(item, key))
+  const half = visual.halfChecked.some((item) => sameTreeKey(item, key))
+  const nextChecked = half ? true : !fully
+  const state = handleNodeCheck(treeData, key, nextChecked, visual.checked, checkStrictly)
+  return resolveOutwardCheckedKeys(state, treeData, checkStrategy, checkStrictly)
 }
 
 export function getTreeSelectTriggerKeyIntent(options: {
@@ -325,28 +446,35 @@ export function getTreeSelectTreeItemAria(options: {
   level: number
   expanded?: boolean
   expandable: boolean
+  isLeaf?: boolean
+  checkable?: boolean
+  checked?: boolean
+  halfChecked?: boolean
 }): {
   role: 'treeitem'
-  'aria-selected': boolean
+  'aria-selected': boolean | undefined
+  'aria-checked': boolean | 'mixed' | undefined
   'aria-disabled': boolean | undefined
   'aria-level': number
   'aria-expanded': boolean | undefined
 } {
+  const opened = Boolean(options.expanded)
+  const reportsExpanded = options.isLeaf !== true && (options.expandable || opened)
   return {
     role: 'treeitem',
-    'aria-selected': options.selected,
+    'aria-selected': options.checkable ? undefined : options.selected,
+    'aria-checked': options.checkable
+      ? options.halfChecked
+        ? 'mixed'
+        : Boolean(options.checked)
+      : undefined,
     'aria-disabled': options.disabled || undefined,
     'aria-level': options.level,
-    'aria-expanded': options.expandable ? Boolean(options.expanded) : undefined
+    'aria-expanded': reportsExpanded ? opened : undefined
   }
 }
 
 export {
   getTreeVirtualAlignScrollTop as getTreeSelectVirtualAlignScrollTop,
-  alignTreeVirtualScroll as alignTreeSelectVirtualScroll,
-  isTreeNodeExpandable,
-  getVisibleTreeItems,
-  findNode,
-  getAllKeys,
-  getParentKeys
+  alignTreeVirtualScroll as alignTreeSelectVirtualScroll
 } from './tree-utils'

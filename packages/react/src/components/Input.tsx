@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useId, forwardRef } from 'react'
 import {
   classNames,
+  coerceTextFormValue,
   mergeAriaDescribedBy,
   getInputFieldClasses,
   getInputWrapperClasses,
@@ -107,12 +108,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const formBoundValue = formItemControl?.value
   const resolvedValue =
     value !== undefined
-      ? value
-      : typeof formBoundValue === 'string' || typeof formBoundValue === 'number'
-        ? formBoundValue
-        : formBoundValue === undefined
-          ? undefined
-          : String(formBoundValue ?? '')
+      ? coerceTextFormValue(value)
+      : formItemControl?.name
+        ? coerceTextFormValue(formBoundValue)
+        : undefined
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -155,9 +154,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   })
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
-    const next = parseInputValue(event.currentTarget, type)
-    setInputValue(next)
-    formItemControl?.onChange?.(next)
     onInput?.(event)
   }
 

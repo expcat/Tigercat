@@ -94,11 +94,66 @@ export function mergeAriaDescribedBy(
   return Array.from(parts).join(' ')
 }
 
+const FOCUSABLE_INVALID_SELECTOR = [
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'button:not([disabled])',
+  'a[href]',
+  '[tabindex]:not([tabindex="-1"])',
+  '[contenteditable="true"]'
+].join(',')
+
+function canProgramFocus(element: HTMLElement): boolean {
+  if (element.hasAttribute('disabled')) return false
+  if (element.getAttribute('aria-disabled') === 'true') return false
+  if (element.getAttribute('aria-hidden') === 'true') return false
+  if (element.matches('input[type="hidden"]')) return false
+  if (element.getAttribute('tabindex') === '-1') return false
+  return typeof element.focus === 'function'
+}
+
+function firstFocusableInvalid(node: HTMLElement): HTMLElement | null {
+  if (canProgramFocus(node) && node.matches(FOCUSABLE_INVALID_SELECTOR)) return node
+  const nested = node.querySelectorAll<HTMLElement>(FOCUSABLE_INVALID_SELECTOR)
+  for (const element of nested) {
+    if (canProgramFocus(element)) return element
+  }
+  return null
+}
+
+/** Focus the first invalid control that can take focus. Group wrappers are skipped. */
 export function focusFirstInvalidField(root: ParentNode | null | undefined): void {
-  if (!root || typeof (root as Element).querySelector !== 'function') {
+  if (!root || typeof (root as Element).querySelectorAll !== 'function') {
     return
   }
-  const invalid = (root as Element).querySelector<HTMLElement>('[aria-invalid="true"]')
-  invalid?.focus()
-  invalid?.scrollIntoView({ block: 'nearest' })
+  const invalids = (root as Element).querySelectorAll<HTMLElement>('[aria-invalid="true"]')
+  for (const node of invalids) {
+    const target = firstFocusableInvalid(node)
+    if (!target) continue
+    target.focus()
+    target.scrollIntoView({ block: 'nearest' })
+    return
+  }
+}
+
+/**
+ * Blur the control inside `root` that still holds the caret so a pending
+ * edit (number text, tag) commits before validation reads the model.
+ */
+export function commitFocusedFormControl(root: ParentNode | null | undefined): void {
+  if (!root || typeof (root as Element).contains !== 'function') return
+  const owner = (root as Node).ownerDocument
+  const active = owner?.activeElement
+  if (!(active instanceof HTMLElement)) return
+  if (!(root as Node).contains(active)) return
+  active.blur()
+}
+
+/** Disabled fields stay out of the native submit set. Read-only fields stay in. */
+export function shouldSubmitNativeField(options: {
+  name?: string
+  disabled?: boolean
+}): boolean {
+  return Boolean(options.name) && !options.disabled
 }

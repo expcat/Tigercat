@@ -50,25 +50,19 @@ describe('TreeSelect', () => {
     expect(getByRole('treeitem', { name: /Apple/ })).toBeInTheDocument()
   })
 
-  it('applies listHeight as the overlay height, winning over height', async () => {
+  it('applies listHeight as the overlay height', async () => {
     const user = userEvent.setup()
     const { getByRole } = render(
-      <TreeSelect
-        treeData={treeData}
-        defaultExpandAll
-        height={200}
-        listHeight={120}
-        aria-label="Height"
-      />
+      <TreeSelect treeData={treeData} defaultExpandAll listHeight={120} aria-label="Height" />
     )
     await user.click(getByRole('combobox'))
     expect(getByRole('tree')).toHaveStyle({ maxHeight: '120px' })
   })
 
-  it('treats empty string as a legal key', async () => {
+  it('does not treat an empty string as a selected key', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
-    const { getByRole, getByLabelText } = render(
+    const { getByRole } = render(
       <TreeSelect
         treeData={[
           { key: '', label: 'Blank' },
@@ -81,10 +75,8 @@ describe('TreeSelect', () => {
     )
     await user.click(getByRole('combobox'))
     await user.click(getByRole('treeitem', { name: 'Blank' }))
-    expect(onChange).toHaveBeenCalledWith('')
-    expect(getByRole('combobox')).toHaveTextContent('Blank')
-    await user.click(getByLabelText('Clear selection'))
-    expect(onChange).toHaveBeenLastCalledWith(undefined)
+    expect(onChange).not.toHaveBeenCalled()
+    expect(getByRole('combobox')).not.toHaveTextContent('Blank')
   })
 
   it('expands a parent from the chevron button', async () => {

@@ -528,7 +528,7 @@ describe('Form', () => {
 
       render(Demo)
       await formApi?.validateField('email')
-      const message = await screen.findByRole('alert')
+      const message = await screen.findByRole('status')
       expect(message.textContent).toBe('此欄位為必填項')
       expect(message.textContent).not.toBe('此字段为必填项')
     })
@@ -565,7 +565,7 @@ describe('Form', () => {
       await fireEvent.focusOut(screen.getByLabelText('field'))
 
       await waitFor(() => {
-        const alert = screen.getByRole('alert')
+        const alert = screen.getByRole('status')
         expect(alert).toBeInTheDocument()
         expect(alert).toHaveTextContent('Field is required')
       })
@@ -1189,6 +1189,9 @@ describe('Form', () => {
               Form,
               {
                 modelValue: model,
+                'onUpdate:modelValue': (next: { username: string }) => {
+                  model.username = next.username
+                },
                 ref: (el) => {
                   formApi = (el as typeof formApi) ?? undefined
                 }
@@ -1499,7 +1502,7 @@ describe('Form', () => {
           return () =>
             h(
               Form,
-              { model: {} },
+              { modelValue: {} },
               {
                 default: () =>
                   h(
@@ -1729,7 +1732,7 @@ describe('Form', () => {
       render(Demo)
       await fireEvent.focusOut(screen.getByLabelText('name'))
 
-      const alert = await screen.findByRole('alert')
+      const alert = await screen.findByRole('status')
       expect(alert).toHaveTextContent('Name required')
     })
   })
@@ -1764,6 +1767,9 @@ describe('Form', () => {
               Form,
               {
                 modelValue: model,
+                'onUpdate:modelValue': (next: Record<string, unknown>) => {
+                  Object.assign(model, next)
+                },
                 ref: (el: unknown) => {
                   formRef = el as typeof formRef
                 }
@@ -1794,6 +1800,12 @@ describe('Form', () => {
               {
                 modelValue: model,
                 rules,
+                'onUpdate:modelValue': (next: Record<string, unknown>) => {
+                  for (const key of Object.keys(model)) {
+                    if (!Object.prototype.hasOwnProperty.call(next, key)) delete model[key]
+                  }
+                  Object.assign(model, next)
+                },
                 ref: (el: unknown) => {
                   formRef = el as typeof formRef
                 }

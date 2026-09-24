@@ -148,15 +148,25 @@ export function commitTagCandidates(
   }
 }
 
-export function resolveTagsPasteCandidates(
-  pending: string,
-  clipboard: string,
-  delimiters: string[] = [',']
-): string[] {
-  const fromClipboard = splitTagInput(clipboard, delimiters)
-  const head = pending.trim()
-  if (!head) return fromClipboard
-  return [head, ...fromClipboard]
+/**
+ * Insert the clipboard at the caret, then split the whole string.
+ * Text after the last delimiter stays pending instead of becoming a tag.
+ */
+export function resolveTagsPaste(options: {
+  pending: string
+  clipboard: string
+  delimiters?: string[]
+  selectionStart?: number
+  selectionEnd?: number
+}): { candidates: string[]; pending: string } {
+  const delimiters = options.delimiters ?? [',']
+  const start = options.selectionStart ?? options.pending.length
+  const end = options.selectionEnd ?? start
+  const safeStart = Math.max(0, Math.min(start, options.pending.length))
+  const safeEnd = Math.max(safeStart, Math.min(end, options.pending.length))
+  const inserted =
+    options.pending.slice(0, safeStart) + options.clipboard + options.pending.slice(safeEnd)
+  return extractTagCandidates(inserted, [...delimiters, '\n', '\r'])
 }
 
 export function getTagsArrowDelta(key: string, dir: 'ltr' | 'rtl' = 'ltr'): number | null {
@@ -200,10 +210,10 @@ const TAGS_INPUT_SIZE_CLASSES: Record<ComponentSize, string> = {
 
 const TAGS_INPUT_STATUS_CLASSES: Record<InputStatus, string> = {
   default:
-    'border-[var(--tiger-border,#e5e7eb)] focus-within:has-[:focus-visible]:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-within:has-[:focus-visible]:border-transparent',
-  error: 'border-[var(--tiger-error,#dc2626)]',
-  success: 'border-[var(--tiger-success,#16a34a)]',
-  warning: 'border-[var(--tiger-warning,#d97706)]'
+    'border-[var(--tiger-border)] focus-within:has-[:focus-visible]:ring-[var(--tiger-focus-ring)]/40 focus-within:has-[:focus-visible]:border-transparent',
+  error: 'border-[var(--tiger-error)]',
+  success: 'border-[var(--tiger-success)]',
+  warning: 'border-[var(--tiger-warning)]'
 }
 
 export interface GetTagsInputContainerClassesOptions {
@@ -217,38 +227,38 @@ export function getTagsInputContainerClasses(
   options: GetTagsInputContainerClassesOptions = {}
 ): string {
   return classNames(
-    'flex flex-wrap items-center border rounded-[var(--tiger-radius-md,0.5rem)]',
-    'bg-[var(--tiger-surface,#ffffff)] tiger-motion-aware',
-    '[transition:var(--tiger-transition-base,color_150ms_ease,border-color_150ms_ease)]',
+    'flex flex-wrap items-center border rounded-[var(--tiger-radius-md)]',
+    'bg-[var(--tiger-surface)] tiger-motion-aware',
+    '[transition:var(--tiger-transition-base)]',
     'focus-within:has-[:focus-visible]:ring-2',
     TAGS_INPUT_SIZE_CLASSES[size],
     TAGS_INPUT_STATUS_CLASSES[status],
     options.inGroup ? 'flex-1 min-w-0' : 'w-full',
     options.disabled &&
-      'cursor-not-allowed bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text-muted,#6b7280)]'
+      'cursor-not-allowed bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
   )
 }
 
 export function getTagsInputInnerInputClasses(): string {
   return classNames(
     'min-w-16 flex-1 border-none bg-transparent p-0 outline-none',
-    'text-[var(--tiger-text,#111827)] placeholder:text-[var(--tiger-text-muted,#6b7280)]',
+    'text-[var(--tiger-text)] placeholder:text-[var(--tiger-text-secondary)]',
     'disabled:cursor-not-allowed'
   )
 }
 
 /** Extra classes marking the tag highlighted for two-step backspace removal */
 export function getTagsInputHighlightClasses(): string {
-  return 'ring-2 ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/60'
+  return 'ring-2 ring-[var(--tiger-focus-ring)]/60'
 }
 
 export function getTagsInputClearButtonClasses(): string {
   return classNames(
     'shrink-0 cursor-pointer border-none bg-transparent p-0',
-    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]'
+    'text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-text)]'
   )
 }
 
 export function getTagsInputErrorClasses(): string {
-  return 'mt-1 text-sm text-[var(--tiger-error,#dc2626)]'
+  return 'mt-1 text-sm text-[var(--tiger-error)]'
 }

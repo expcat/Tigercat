@@ -10,6 +10,7 @@ import {
 } from 'vue'
 import {
   classNames,
+  coerceChoiceFormValue,
   coerceClassValue,
   callUnknownEventHandler,
   defaultRadioColors,
@@ -116,9 +117,20 @@ export const Radio = defineComponent({
       () => props.status ?? formItemControl?.status.value ?? 'default'
     )
 
+    const formBound = computed(
+      () => !isInGroup.value && Boolean(formItemControl?.name.value)
+    )
     const isChecked = computed(() => {
       if (isInGroup.value) return groupContext.value?.value === props.value
+      if (formBound.value) {
+        return coerceChoiceFormValue(formItemControl?.value.value) === props.value
+      }
       return isCheckedControlled.value ? props.modelValue === true : internalChecked.value
+    })
+    const ownsInvalid = computed(() => {
+      if (status.value !== 'error') return false
+      if (!isInGroup.value) return true
+      return groupContext.value?.invalidValue === props.value
     })
 
     const inputRef = ref<HTMLInputElement | null>(null)
@@ -175,10 +187,14 @@ export const Radio = defineComponent({
         return
       }
 
+      if (formBound.value) {
+        formItemControl?.onChange(props.value)
+        return
+      }
+
       if (!isCheckedControlled.value) internalChecked.value = true
       emit('update:modelValue', true)
       emit('change', true, event)
-      formItemControl?.onChange(props.value)
     }
 
     const handleBlur = (event: FocusEvent) => {
@@ -186,13 +202,25 @@ export const Radio = defineComponent({
       if (!isInGroup.value) formItemControl?.onBlur()
     }
 
+    watch(
+      () => [isInGroup.value, props.value] as const,
+      ([grouped, optionValue]) => {
+        if (grouped) groupContext.value?.claimInvalid(optionValue)
+      },
+      { immediate: true }
+    )
+
     return () => {
       const { class: _class, style: _style, onBlur: _onBlur, ...restAttrs } = attrs
       const describedBy = mergeAriaDescribedBy(
         typeof restAttrs['aria-describedby'] === 'string'
           ? (restAttrs['aria-describedby'] as string)
           : undefined,
-        isInGroup.value ? undefined : formItemControl?.describedBy.value
+        isInGroup.value
+          ? ownsInvalid.value
+            ? groupContext.value?.describedBy
+            : undefined
+          : formItemControl?.describedBy.value
       )
       const attrId = typeof restAttrs.id === 'string' ? restAttrs.id : undefined
       const effectiveId = isInGroup.value ? attrId : (attrId ?? formItemControl?.id.value)
@@ -207,7 +235,7 @@ export const Radio = defineComponent({
         value: props.value,
         checked: isChecked.value,
         disabled: actualDisabled.value,
-        'aria-invalid': status.value === 'error' ? true : restAttrs['aria-invalid'],
+        'aria-invalid': ownsInvalid.value ? true : restAttrs['aria-invalid'],
         'aria-describedby': describedBy,
         onChange: handleChange,
         onBlur: handleBlur

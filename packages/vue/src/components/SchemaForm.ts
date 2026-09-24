@@ -4,31 +4,19 @@ import {
   h,
   reactive,
   ref,
+  watch,
   type PropType,
   type VNode,
   type VNodeChild
 } from 'vue'
 import {
   classNames,
-  clampSchemaFormSpan,
   coerceClassValue,
-  collectSchemaFormConditions,
-  collectSchemaFormRules,
-  createSchemaFormModel,
-  getSchemaFormFieldSpanClasses,
-  getSchemaFormFieldsClasses,
+  devWarn,
+  formValuesEqual,
   getSchemaFormLabels,
-  mapSchemaFormValuesOut,
   mergeStyleValues,
   mergeTigerLocale,
-  resolveSchemaFormLayout,
-  resolveSchemaFormWidgetType,
-  schemaFormActionsClasses,
-  schemaFormGroupClasses,
-  schemaFormGroupDescriptionClasses,
-  schemaFormGroupTitleClasses,
-  schemaFormNestedGroupClasses,
-  schemaFormRootClasses,
   type ComponentSize,
   type FormConditions,
   type FormController,
@@ -47,6 +35,25 @@ import {
   type TigerLocale,
   type TigerLocaleSchemaForm
 } from '@expcat/tigercat-core'
+import {
+  clampSchemaFormSpan,
+  collectSchemaFormConditions,
+  collectSchemaFormRules,
+  collectChangedSchemaFormPaths,
+  createSchemaFormModel,
+  getSchemaFormFieldSpanClasses,
+  getSchemaFormFieldsClasses,
+  mapSchemaFormValuesOut,
+  overlaySchemaFormDirtyValues,
+  resolveSchemaFormLayout,
+  resolveSchemaFormWidgetType,
+  schemaFormActionsClasses,
+  schemaFormGroupClasses,
+  schemaFormGroupDescriptionClasses,
+  schemaFormGroupTitleClasses,
+  schemaFormNestedGroupClasses,
+  schemaFormRootClasses
+} from '@expcat/tigercat-core/schema-form'
 import { useTigerConfig } from './ConfigProvider'
 import { Form } from './Form'
 import { FormItem } from './FormItem'
@@ -79,7 +86,7 @@ export interface VueSchemaFormProps extends Omit<
 
 export type SchemaFormProps = VueSchemaFormProps
 
-function renderWidget(field: SchemaFormField): VNode {
+function renderWidget(field: SchemaFormField): VNode | null {
   const type = resolveSchemaFormWidgetType(field)
   const disabled = field.disabled
   const placeholder = field.placeholder
@@ -130,6 +137,13 @@ function renderWidget(field: SchemaFormField): VNode {
   }
   if (type === 'tags') {
     return h(TagsInput, { placeholder, disabled })
+  }
+  if (type == null) {
+    devWarn(
+      `schema-form:${field.name}`,
+      `Unknown schema field type "${String(field.type)}" on "${field.name}". Pass a field slot instead of a built-in control.`
+    )
+    return null
   }
   return h(Input, { placeholder, disabled })
 }
@@ -261,6 +275,14 @@ export const SchemaForm = defineComponent({
     const innerModel = reactive<FormValues>(
       createSchemaFormModel(props.schema, props.defaultValue, props.source)
     )
+    const dirtyPaths = new Set<string>()
+    let applyingSeed = false
+    const replaceInnerModel = (next: FormValues) => {
+      for (const key of Object.keys(innerModel)) {
+        if (!Object.prototype.hasOwnProperty.call(next, key)) delete innerModel[key]
+      }
+      Object.assign(innerModel, next)
+    }
 
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const chromeLabels = computed(() => getSchemaFormLabels(mergedLocale.value, props.labels))
@@ -283,7 +305,10 @@ export const SchemaForm = defineComponent({
         formRef.value?.validateField(fieldName, rulesOverride, trigger) ?? Promise.resolve(),
       clearValidate: (fieldNames) => formRef.value?.clearValidate(fieldNames),
       resetFields: () => {
-        formRef.value?.resetFields()
+        handleReset()
+      },
+      setInitialValues: (values) => {
+        formRef.value?.setInitialValues(values)
       },
       addField: (fieldName, defaultValue) => {
         formRef.value?.addField(fieldName, defaultValue)
@@ -311,9 +336,29 @@ export const SchemaForm = defineComponent({
     expose(handle)
 
     const handleModelUpdate = (values: FormValues) => {
+      if (!applyingSeed && props.modelValue === undefined) {
+        for (const path of collectChangedSchemaFormPaths(innerModel, values)) dirtyPaths.add(path)
+        applyingSeed = true
+        replaceInnerModel(values)
+        applyingSeed = false
+      }
       emit('update:modelValue', values)
       emit('change', values)
     }
+
+    watch(
+      () => [props.schema, props.defaultValue, props.source] as const,
+      () => {
+        if (props.modelValue !== undefined) return
+        const seed = createSchemaFormModel(props.schema, props.defaultValue, props.source)
+        const next = overlaySchemaFormDirtyValues(seed, innerModel, dirtyPaths)
+        formRef.value?.setInitialValues(seed)
+        if (formValuesEqual(next, innerModel)) return
+        applyingSeed = true
+        replaceInnerModel(next)
+        applyingSeed = false
+      }
+    )
 
     const publishSubmit = (event: FormSubmitEvent) => {
       const payload: SchemaFormSubmitEvent = {
@@ -330,7 +375,16 @@ export const SchemaForm = defineComponent({
     }
 
     const handleReset = () => {
+      const seed = createSchemaFormModel(props.schema, props.defaultValue, props.source)
+      dirtyPaths.clear()
+      formRef.value?.setInitialValues(seed)
+      if (props.modelValue === undefined) {
+        applyingSeed = true
+        replaceInnerModel(seed)
+        applyingSeed = false
+      }
       formRef.value?.resetFields()
+      emit('update:modelValue', seed)
       emit('reset')
     }
 
@@ -350,8 +404,9 @@ export const SchemaForm = defineComponent({
             {
               name: field.name,
               label: field.label,
-              required: field.required,
-              rules: field.rules,
+              required: field.disabled ? false : field.required,
+              rules: field.disabled ? undefined : formRules.value?.[field.name],
+              disabled: field.disabled,
               condition: field.condition,
               extra: field.extra
             },
@@ -403,7 +458,6 @@ export const SchemaForm = defineComponent({
           style: rootStyle.value,
           'data-tiger-schema-form': '',
           modelValue: formModel.value,
-          rules: formRules.value,
           conditions: formConditions.value,
           labelWidth: props.labelWidth,
           labelPosition: props.labelPosition,
@@ -432,13 +486,13 @@ export const SchemaForm = defineComponent({
               ? h('div', { class: schemaFormActionsClasses }, [
                   h(
                     Button,
-                    { htmlType: 'button', variant: 'outline', onClick: handleReset },
+                    { type: 'button', variant: 'outline', onClick: handleReset },
                     () => props.resetText ?? chromeLabels.value.resetText
                   ),
                   h(
                     Button,
                     {
-                      htmlType: 'submit',
+                      type: 'submit',
                       variant: 'primary',
                       loading: props.loading
                     },

@@ -6,7 +6,7 @@
  */
 
 import { classNames } from './class-names'
-import type { WizardStep, FormWizardValidator } from '../types/composite'
+import type { WizardStep, FormWizardValidator } from '../types/form-wizard'
 
 /**
  * Clamp a candidate step index into `[0, totalCount - 1]`.
@@ -105,10 +105,13 @@ export async function runWizardAdvanceGate(options: {
   steps: readonly WizardStep[]
   beforeNext?: FormWizardValidator
   validateFields?: (fields: string[]) => Promise<boolean>
+  /** Names mounted on the current step when `fields` is omitted. */
+  mountedFields?: readonly string[]
 }): Promise<StepValidationOutcome> {
-  const fields = options.currentStep?.fields
-  if (fields?.length && options.validateFields) {
-    const valid = await options.validateFields(fields)
+  const explicit = options.currentStep?.fields
+  const names = explicit?.length ? explicit : options.mountedFields
+  if (names?.length && options.validateFields) {
+    const valid = await options.validateFields([...names])
     if (!valid) return { ok: false }
   }
   return runStepValidation(
@@ -147,7 +150,7 @@ export function getFormWizardWrapperClasses(options: {
   return classNames(
     'tiger-form-wizard w-full tiger-motion-aware transition-colors duration-300 motion-reduce:transition-none',
     options.bordered
-      ? 'rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm'
+      ? 'rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] shadow-sm'
       : 'bg-transparent',
     options.className
   )
@@ -155,8 +158,8 @@ export function getFormWizardWrapperClasses(options: {
 
 export function getFormWizardHeaderClasses(bordered?: boolean): string {
   return classNames(
-    'px-6 py-5 bg-[var(--tiger-surface-muted,#f9fafb)]/95 transition-colors duration-300 motion-reduce:transition-none',
-    bordered ? 'border-b border-[var(--tiger-border,#e5e7eb)]' : ''
+    'px-6 py-5 bg-[var(--tiger-surface-muted)]/95 transition-colors duration-300 motion-reduce:transition-none',
+    bordered ? 'border-b border-[var(--tiger-border)]' : ''
   )
 }
 
@@ -166,7 +169,7 @@ export function getFormWizardBodyClasses(): string {
 
 export function getFormWizardActionsClasses(bordered?: boolean): string {
   return classNames(
-    'flex items-center justify-between gap-3 px-8 py-4 bg-[var(--tiger-surface-muted,#f9fafb)]/95 transition-colors duration-300 motion-reduce:transition-none',
-    bordered ? 'border-t border-[var(--tiger-border,#e5e7eb)]' : ''
+    'flex items-center justify-between gap-3 px-8 py-4 bg-[var(--tiger-surface-muted)]/95 transition-colors duration-300 motion-reduce:transition-none',
+    bordered ? 'border-t border-[var(--tiger-border)]' : ''
   )
 }

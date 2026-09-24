@@ -5,6 +5,7 @@ import {
   h,
   inject,
   onBeforeUnmount,
+  onMounted,
   watch,
   type PropType
 } from 'vue'
@@ -31,6 +32,9 @@ import {
   sliderThumbInsetStyle,
   sliderRangeFillStyle,
   sliderSortRange,
+  sliderDisplayValue,
+  sliderBounds,
+  shouldSubmitNativeField,
   resolveSliderThumbName,
   getSliderLabels,
   mergeAriaDescribedBy,
@@ -45,8 +49,8 @@ import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from 
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueSliderProps {
-  modelValue?: number | [number, number]
-  defaultValue?: number | [number, number]
+  modelValue?: number | string | [number, number] | null
+  defaultValue?: number | string | [number, number]
   min?: number
   max?: number
   step?: number
@@ -56,24 +60,27 @@ export interface VueSliderProps {
   size?: ComponentSize
   range?: boolean
   status?: InputStatus
+  name?: string
   className?: string
   style?: Record<string, string | number>
 }
 
 function displaySliderValue(
-  value: number | [number, number],
+  value: number | [number, number] | null,
   range: boolean,
   min: number,
   max: number
 ): number | [number, number] {
+  const { lower, upper } = sliderBounds(min, max)
   if (range) {
-    const tuple = Array.isArray(value) ? value : [min, max]
-    const a = Math.min(Math.max(tuple[0], min), max)
-    const b = Math.min(Math.max(tuple[1], min), max)
-    return sliderSortRange([a, b])
+    const tuple = Array.isArray(value) ? value : [lower, upper]
+    return sliderSortRange([
+      sliderDisplayValue(tuple[0], min, max),
+      sliderDisplayValue(tuple[1], min, max)
+    ])
   }
-  const n = typeof value === 'number' ? value : value[0]
-  return Math.min(Math.max(n, min), max)
+  const numeric = typeof value === 'number' ? value : lower
+  return sliderDisplayValue(numeric, min, max)
 }
 
 export const Slider = defineComponent({
@@ -81,10 +88,7 @@ export const Slider = defineComponent({
   inheritAttrs: false,
   props: {
     modelValue: {
-      type: [Number, Array] as PropType<number | [number, number]>
-    },
-    value: {
-      type: [Number, Array] as PropType<number | [number, number]>
+      type: [Number, String, Array] as PropType<number | string | [number, number] | null>
     },
     defaultValue: {
       type: [Number, Array] as PropType<number | [number, number]>
@@ -104,15 +108,13 @@ export const Slider = defineComponent({
     },
     range: { type: Boolean, default: false },
     status: { type: String as PropType<InputStatus> },
+    name: { type: String },
     className: { type: String },
     style: { type: Object as PropType<Record<string, string | number>> }
   },
   emits: {
-    'update:value': (value: number | [number, number]) =>
-      typeof value === 'number' || Array.isArray(value),
     'update:modelValue': (value: number | [number, number]) =>
-      typeof value === 'number' || Array.isArray(value),
-    change: (value: number | [number, number]) => typeof value === 'number' || Array.isArray(value)
+      typeof value === 'number' || Array.isArray(value)
   },
   setup(props, { emit, attrs, expose }) {
     const formItemControl = inject<VueFormItemControlContext | null>(
@@ -122,28 +124,46 @@ export const Slider = defineComponent({
     const config = useTigerConfig()
     const labels = computed(() => getSliderLabels(config.value.locale))
 
-    const resolveBoundValue = (): number | [number, number] | undefined => {
-      if (props.modelValue !== undefined) return props.modelValue
-      if (props.value !== undefined) return props.value
-      return resolveFormItemSeed(
-        undefined,
-        formItemControl?.name.value,
-        formItemControl?.value.value,
-        (raw) => coerceSliderFormValue(raw, props.range)
+    const resolveBoundValue = (): number | [number, number] | null | undefined => {
+      if (props.modelValue !== undefined) {
+        if (props.modelValue === null) return null
+        const coerced = coerceSliderFormValue(props.modelValue, props.range)
+        return coerced
+      }
+      if (!formItemControl?.name.value) return undefined
+      return (
+        resolveFormItemSeed(
+          undefined,
+          formItemControl.name.value,
+          formItemControl.value.value,
+          (raw) => coerceSliderFormValue(raw, props.range)
+        ) ?? null
       )
     }
 
     const isControlled = computed(() => resolveBoundValue() !== undefined)
+    const initialBound = resolveBoundValue()
     const internalValue = ref<number | [number, number]>(
-      resolveBoundValue() ??
-        props.defaultValue ??
+      (Array.isArray(initialBound)
+        ? [initialBound[0], initialBound[1]]
+        : initialBound) ??
+        (Array.isArray(props.defaultValue)
+          ? [props.defaultValue[0], props.defaultValue[1]]
+          : props.defaultValue) ??
         (props.range ? [props.min, props.max] : props.min)
     )
-    const currentValue = computed(() =>
-      isControlled.value ? (resolveBoundValue() as number | [number, number]) : internalValue.value
-    )
+    const preview = ref<number | [number, number] | null>(null)
+    const currentValue = computed<number | [number, number]>(() => {
+      const bound = resolveBoundValue()
+      if (bound === undefined) return internalValue.value
+      if (bound === null) {
+        return props.range ? [props.min, props.max] : props.min
+      }
+      if (Array.isArray(bound)) return [bound[0], bound[1]]
+      return bound
+    })
     const displayed = computed(() =>
-      displaySliderValue(currentValue.value, props.range, props.min, props.max)
+      displaySliderValue(preview.value ?? currentValue.value, props.range, props.min, props.max)
     )
 
     const effectiveDisabled = computed(
@@ -178,13 +198,28 @@ export const Slider = defineComponent({
     })
 
     const commit = (next: number | [number, number]) => {
-      if (sliderValuesEqual(displayed.value, next)) return
-      if (!isControlled.value) internalValue.value = next
+      if (sliderValuesEqual(currentValue.value, next) && preview.value === null) return
+      preview.value = null
+      if (props.modelValue === undefined && !formItemControl?.name.value) internalValue.value = next
       emit('update:modelValue', next)
-      emit('update:value', next)
-      emit('change', next)
       formItemControl?.onChange(next)
     }
+
+    const elementDir = ref<'ltr' | 'rtl' | null>(null)
+    const readDirection = () => {
+      const closest = rootElement.value?.closest('[dir]')
+      const attr = closest?.getAttribute('dir')
+      if (attr === 'rtl' || attr === 'ltr') {
+        elementDir.value = attr
+        return
+      }
+      elementDir.value = null
+    }
+    onMounted(readDirection)
+    watch(() => config.value.direction, readDirection)
+    const rtl = computed(
+      () => (elementDir.value ?? (config.value.direction === 'rtl' ? 'rtl' : 'ltr')) === 'rtl'
+    )
 
     const stopDrag = () => {
       dragSession?.dispose()
@@ -223,7 +258,7 @@ export const Slider = defineComponent({
       activeThumb.value = which
       isDragging.value = true
       if (props.tooltip) showTooltip.value = true
-      commit(sliderApplyThumbValue(current, pointerValue, which, props.range))
+      preview.value = sliderApplyThumbValue(current, pointerValue, which, props.range)
       ;(event.currentTarget as HTMLElement).focus()
 
       dragSession?.dispose()
@@ -246,9 +281,17 @@ export const Slider = defineComponent({
             props.step,
             dir
           )
-          commit(sliderApplyThumbValue(displayed.value, moved, activeThumbLive, props.range))
+          preview.value = sliderApplyThumbValue(
+            preview.value ?? displayed.value,
+            moved,
+            activeThumbLive,
+            props.range
+          )
         },
-        onEnd: stopDrag
+        onEnd: () => {
+          if (preview.value !== null) commit(preview.value)
+          stopDrag()
+        }
       })
     }
 
@@ -271,15 +314,20 @@ export const Slider = defineComponent({
       )
       const attrId = typeof restAttrs.id === 'string' ? restAttrs.id : undefined
       const effectiveId = attrId ?? formItemControl?.id.value
-      const rtl = getElementTextDirection(trackElement.value ?? rootElement.value) === 'rtl'
+      const directionRtl = rtl.value
+      const bounds = sliderBounds(props.min, props.max)
       const getPercentage = (val: number) => sliderGetPercentage(val, props.min, props.max)
       const current = displayed.value
       const rangeStyles = (() => {
         if (props.range && Array.isArray(current)) {
-          return sliderRangeFillStyle(getPercentage(current[0]), getPercentage(current[1]), rtl)
+          return sliderRangeFillStyle(
+            getPercentage(current[0]),
+            getPercentage(current[1]),
+            directionRtl
+          )
         }
         const val = typeof current === 'number' ? current : current[0]
-        return sliderRangeFillStyle(0, getPercentage(val), rtl)
+        return sliderRangeFillStyle(0, getPercentage(val), directionRtl)
       })()
       const thumbClasses = getSliderThumbClasses(
         props.size,
@@ -293,7 +341,7 @@ export const Slider = defineComponent({
       const createThumb = (
         value: number,
         thumbType: 'min' | 'max' | null,
-        name: { ariaLabel?: string; ariaLabelledby?: string },
+        name: { ariaLabel?: string; ariaLabelledby?: string; suffix?: string },
         thumbId?: string
       ) => {
         const focused =
@@ -302,8 +350,9 @@ export const Slider = defineComponent({
           (thumbType === null && focusedThumb.value === 'single')
         const showThumbTooltip =
           props.tooltip &&
-          (showTooltip.value || focused) &&
-          (thumbType === activeThumb.value || thumbType === null)
+          (thumbType === null
+            ? showTooltip.value || focused || isDragging.value
+            : focused || (isDragging.value && activeThumb.value === thumbType))
         const zIndex =
           activeThumb.value && thumbType ? (activeThumb.value === thumbType ? 2 : 1) : undefined
 
@@ -313,17 +362,19 @@ export const Slider = defineComponent({
             ref: thumbType === null ? thumbElement : undefined,
             id: thumbId,
             class: thumbClasses,
-            style: { ...sliderThumbInsetStyle(getPercentage(value), rtl), zIndex },
+            style: { ...sliderThumbInsetStyle(getPercentage(value), directionRtl), zIndex },
             tabindex: effectiveDisabled.value ? -1 : 0,
             role: 'slider',
             'aria-valuenow': value,
-            'aria-valuemin': props.min,
-            'aria-valuemax': props.max,
+            'aria-valuemin': bounds.lower,
+            'aria-valuemax': bounds.upper,
             'aria-orientation': 'horizontal',
             'aria-disabled': effectiveDisabled.value || undefined,
             'aria-invalid': status.value === 'error' || undefined,
-            'aria-label': name.ariaLabel,
-            'aria-labelledby': name.ariaLabelledby,
+            'aria-label': name.suffix ? undefined : name.ariaLabel,
+            'aria-labelledby': name.suffix
+              ? `${name.ariaLabelledby ?? ''} ${thumbId ?? ''}-suffix`.trim()
+              : name.ariaLabelledby,
             'aria-describedby': describedBy,
             'aria-valuetext': String(value),
             onPointerdown: (e: PointerEvent) => handlePointerDown(e, thumbType),
@@ -336,13 +387,15 @@ export const Slider = defineComponent({
             onFocus: () => {
               focusedThumb.value = thumbType ?? 'single'
             },
-            onBlur: () => {
+            onBlur: (event: FocusEvent) => {
               focusedThumb.value = null
+              const next = event.relatedTarget as Node | null
+              if (next && rootElement.value?.contains(next)) return
               formItemControl?.onBlur()
             },
             onKeydown: (e: KeyboardEvent) => {
               if (effectiveDisabled.value) return
-              const isRtl = getElementTextDirection(trackElement.value) === 'rtl'
+              const isRtl = directionRtl
               const newValue = sliderGetKeyboardValue(
                 e.key,
                 value,
@@ -357,7 +410,12 @@ export const Slider = defineComponent({
               commit(sliderApplyThumbValue(displayed.value, newValue, thumbType, props.range))
             }
           },
-          showThumbTooltip ? [h('div', { class: tooltipClasses }, String(value))] : undefined
+          [
+            ...(showThumbTooltip ? [h('div', { class: tooltipClasses }, String(value))] : []),
+            ...(name.suffix
+              ? [h('span', { id: `${thumbId ?? 'thumb'}-suffix`, class: 'sr-only' }, name.suffix)]
+              : [])
+          ]
         )
       }
 
@@ -387,7 +445,7 @@ export const Slider = defineComponent({
         props.range && Array.isArray(current)
           ? [
               createThumb(current[0], 'min', minName, effectiveId),
-              createThumb(current[1], 'max', maxName)
+              createThumb(current[1], 'max', maxName, effectiveId ? `${effectiveId}-max` : 'slider-max')
             ]
           : createThumb(
               typeof current === 'number' ? current : current[0],
@@ -406,9 +464,8 @@ export const Slider = defineComponent({
                 h(
                   'div',
                   {
-                    class:
-                      'absolute text-xs text-[var(--tiger-text-muted,#6b7280)] -translate-x-1/2',
-                    style: sliderThumbInsetStyle(getPercentage(Number(key)), rtl)
+                    class: 'absolute text-xs text-[var(--tiger-text-secondary)] -translate-x-1/2',
+                    style: sliderThumbInsetStyle(getPercentage(Number(key)), directionRtl)
                   },
                   label
                 )
@@ -423,7 +480,8 @@ export const Slider = defineComponent({
           class: getSliderRootClasses(
             effectiveDisabled.value,
             classNames(props.className, coerceClassValue(attrs.class)),
-            props.tooltip,
+            props.tooltip &&
+              (showTooltip.value || focusedThumb.value !== null || isDragging.value),
             status.value
           ),
           style: mergeStyleValues(attrs.style, props.style),
@@ -456,7 +514,22 @@ export const Slider = defineComponent({
               )
             ]
           ),
-          markNodes
+          markNodes,
+          shouldSubmitNativeField({
+            name: props.name ?? formItemControl?.name.value,
+            disabled: effectiveDisabled.value
+          })
+            ? h('input', {
+                type: 'hidden',
+                name: props.name ?? formItemControl?.name.value,
+                value:
+                  resolveBoundValue() === null
+                    ? ''
+                    : Array.isArray(current)
+                      ? `${current[0]},${current[1]}`
+                      : String(current)
+              })
+            : null
         ]
       )
     }

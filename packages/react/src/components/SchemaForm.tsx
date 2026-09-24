@@ -1,6 +1,7 @@
 import React, {
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -8,24 +9,11 @@ import React, {
 } from 'react'
 import {
   classNames,
-  clampSchemaFormSpan,
-  collectSchemaFormConditions,
-  collectSchemaFormRules,
-  createSchemaFormModel,
-  getSchemaFormFieldSpanClasses,
-  getSchemaFormFieldsClasses,
+  devWarn,
   getSchemaFormLabels,
-  mapSchemaFormValuesOut,
   mergeTigerLocale,
-  resolveSchemaFormLayout,
-  resolveSchemaFormWidgetType,
-  schemaFormActionsClasses,
-  schemaFormGroupClasses,
-  schemaFormGroupDescriptionClasses,
-  schemaFormGroupTitleClasses,
-  schemaFormNestedGroupClasses,
-  schemaFormRootClasses,
   type FormHandle,
+  type FormRules,
   type FormSubmitEvent,
   type FormValues,
   type SchemaFormField,
@@ -33,6 +21,25 @@ import {
   type SchemaFormProps as CoreSchemaFormProps,
   type SchemaFormSubmitEvent
 } from '@expcat/tigercat-core'
+import {
+  clampSchemaFormSpan,
+  collectSchemaFormConditions,
+  collectSchemaFormRules,
+  collectChangedSchemaFormPaths,
+  createSchemaFormModel,
+  getSchemaFormFieldSpanClasses,
+  getSchemaFormFieldsClasses,
+  mapSchemaFormValuesOut,
+  overlaySchemaFormDirtyValues,
+  resolveSchemaFormLayout,
+  resolveSchemaFormWidgetType,
+  schemaFormActionsClasses,
+  schemaFormGroupClasses,
+  schemaFormGroupDescriptionClasses,
+  schemaFormGroupTitleClasses,
+  schemaFormNestedGroupClasses,
+  schemaFormRootClasses
+} from '@expcat/tigercat-core/schema-form'
 import { useTigerConfig } from './ConfigProvider'
 import { Form } from './Form'
 import { FormItem } from './FormItem'
@@ -97,28 +104,16 @@ function renderWidget(field: SchemaFormField): React.ReactNode {
     return <RadioGroup disabled={disabled} options={field.options} />
   }
   if (type === 'date') {
-    return (
-      <DatePicker placeholder={placeholder} disabled={disabled} range={field.range === true} />
-    )
+    return <DatePicker placeholder={placeholder} disabled={disabled} range={field.range === true} />
   }
   if (type === 'time') {
-    return (
-      <TimePicker placeholder={placeholder} disabled={disabled} range={field.range === true} />
-    )
+    return <TimePicker placeholder={placeholder} disabled={disabled} range={field.range === true} />
   }
   if (type === 'cascader') {
-    return (
-      <Cascader
-        options={field.options ?? []}
-        placeholder={placeholder}
-        disabled={disabled}
-      />
-    )
+    return <Cascader options={field.options ?? []} placeholder={placeholder} disabled={disabled} />
   }
   if (type === 'tree-select') {
-    return (
-      <TreeSelect treeData={field.treeData} placeholder={placeholder} disabled={disabled} />
-    )
+    return <TreeSelect treeData={field.treeData} placeholder={placeholder} disabled={disabled} />
   }
   if (type === 'slider') {
     return <Slider disabled={disabled} min={field.min} max={field.max} />
@@ -135,17 +130,26 @@ function renderWidget(field: SchemaFormField): React.ReactNode {
   if (type === 'tags') {
     return <TagsInput placeholder={placeholder} disabled={disabled} />
   }
+  if (type == null) {
+    devWarn(
+      `schema-form:${field.name}`,
+      `Unknown schema field type "${String(field.type)}" on "${field.name}". Pass renderField instead of a built-in control.`
+    )
+    return null
+  }
   return <Input placeholder={placeholder} disabled={disabled} />
 }
 
 function SchemaFormFieldCell({
   field,
   columns,
-  renderField
+  renderField,
+  fieldRules
 }: {
   field: SchemaFormField
   columns: 1 | 2 | 3
   renderField?: (field: SchemaFormField) => React.ReactNode
+  fieldRules?: FormRules
 }): React.ReactElement {
   const custom = renderField?.(field)
   const control = custom ?? renderWidget(field)
@@ -156,8 +160,9 @@ function SchemaFormFieldCell({
       <FormItem
         name={field.name}
         label={field.label}
-        required={field.required}
-        rules={field.rules}
+        required={field.disabled ? false : field.required}
+        rules={field.disabled ? undefined : fieldRules?.[field.name]}
+        disabled={field.disabled}
         condition={field.condition}
         extra={field.extra}>
         {control}
@@ -169,11 +174,13 @@ function SchemaFormFieldCell({
 function SchemaFormGroupView({
   group,
   nested,
-  renderField
+  renderField,
+  fieldRules
 }: {
   group: SchemaFormLayoutGroup
   nested: boolean
   renderField?: (field: SchemaFormField) => React.ReactNode
+  fieldRules?: FormRules
 }): React.ReactElement {
   return (
     <section
@@ -191,12 +198,19 @@ function SchemaFormGroupView({
               field={field}
               columns={group.columns}
               renderField={renderField}
+              fieldRules={fieldRules}
             />
           ))}
         </div>
       ) : null}
       {group.groups.map((child) => (
-        <SchemaFormGroupView key={child.key} group={child} nested renderField={renderField} />
+        <SchemaFormGroupView
+          key={child.key}
+          group={child}
+          nested
+          renderField={renderField}
+          fieldRules={fieldRules}
+        />
       ))}
     </section>
   )
@@ -255,6 +269,7 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     [schema, defaultValue, source]
   )
   const [innerModel, setInnerModel] = useState<FormValues>(initialModel)
+  const dirtyPathsRef = useRef(new Set<string>())
   const controlled = value !== undefined
   const formModel = controlled ? value : innerModel
   const formRules = useMemo(() => collectSchemaFormRules(schema, rules), [schema, rules])
@@ -266,11 +281,25 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
 
   const handleChange = useCallback(
     (values: FormValues) => {
-      if (!controlled) setInnerModel(values)
+      if (!controlled) {
+        setInnerModel((current) => {
+          for (const path of collectChangedSchemaFormPaths(current, values)) {
+            dirtyPathsRef.current.add(path)
+          }
+          return values
+        })
+      }
       onChange?.(values)
     },
     [controlled, onChange]
   )
+
+  useEffect(() => {
+    if (controlled) return
+    const seed = createSchemaFormModel(schema, defaultValue, source)
+    formRef.current?.setInitialValues(seed)
+    setInnerModel((current) => overlaySchemaFormDirtyValues(seed, current, dirtyPathsRef.current))
+  }, [controlled, schema, defaultValue, source])
 
   const handleSubmit = useCallback(
     (event: FormSubmitEvent) => {
@@ -283,10 +312,14 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
   )
 
   const handleReset = useCallback(() => {
+    const seed = createSchemaFormModel(schema, defaultValue, source)
+    dirtyPathsRef.current.clear()
+    formRef.current?.setInitialValues(seed)
+    if (!controlled) setInnerModel(seed)
     formRef.current?.resetFields()
-    if (!controlled) setInnerModel(createSchemaFormModel(schema, defaultValue, source))
+    onChange?.(seed)
     onReset?.()
-  }, [controlled, defaultValue, onReset, schema])
+  }, [controlled, defaultValue, onChange, onReset, schema, source])
 
   useImperativeHandle(ref, () => ({
     validate: () => formRef.current?.validate() ?? Promise.resolve(false),
@@ -295,7 +328,10 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     validateField: (fieldName, rulesOverride, trigger) =>
       formRef.current?.validateField(fieldName, rulesOverride, trigger) ?? Promise.resolve(),
     clearValidate: (fieldNames) => formRef.current?.clearValidate(fieldNames),
-    resetFields: () => formRef.current?.resetFields(),
+    resetFields: () => {
+      handleReset()
+    },
+    setInitialValues: (values) => formRef.current?.setInitialValues(values),
     addField: (fieldName, defaultValue) => formRef.current?.addField(fieldName, defaultValue),
     removeField: (fieldName) => formRef.current?.removeField(fieldName),
     undo: () => formRef.current?.undo(),
@@ -314,7 +350,6 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
       {...rest}
       ref={formRef}
       value={formModel}
-      rules={formRules}
       conditions={formConditions}
       labelWidth={labelWidth}
       labelPosition={labelPosition}
@@ -343,14 +378,15 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
           group={group}
           nested={false}
           renderField={renderField}
+          fieldRules={formRules}
         />
       ))}
       {showActions ? (
         <div className={schemaFormActionsClasses}>
-          <Button htmlType="button" variant="outline" onClick={handleReset}>
+          <Button type="button" variant="outline" onClick={handleReset}>
             {resetText ?? chromeLabels.resetText}
           </Button>
-          <Button htmlType="submit" variant="primary" loading={loading}>
+          <Button type="submit" variant="primary" loading={loading}>
             {submitText ?? chromeLabels.submitText}
           </Button>
         </div>

@@ -7,6 +7,8 @@ import type {
 } from '../types/auto-complete'
 import { classNames } from './class-names'
 import { getInitialPickerActiveIndex } from './picker-utils'
+import { getSelectVirtualItemHeight } from './select-utils'
+import { fixedSizeStrategy, scrollTopForVirtualAlign, type VirtualRange } from './virtual-list-utils'
 import {
   selectBaseClasses,
   selectClearButtonClasses,
@@ -26,7 +28,10 @@ export type AutoCompleteKeyIntent =
   | { type: 'close' }
   | { type: 'navigate'; key: string }
   | { type: 'select-active' }
-  | { type: 'commit-query' }
+  | { type: 'commit-query'; allowDefault?: boolean }
+
+/** Shown when an external value cannot be displayed as text or a finite number. */
+export const AUTO_COMPLETE_INVALID_VALUE = 'This value can’t be shown.'
 
 export interface AutoCompleteCommitResult {
   value: AutoCompleteValue | undefined
@@ -48,10 +53,10 @@ const OPTION_PAD_Y: Record<ComponentSize, string> = {
 }
 
 const STATUS_BORDER: Record<InputStatus, string> = {
-  default: 'border-[var(--tiger-border,#d1d5db)]',
-  error: 'border-[var(--tiger-error,#dc2626)]',
-  success: 'border-[var(--tiger-success,#16a34a)]',
-  warning: 'border-[var(--tiger-warning,#d97706)]'
+  default: 'border-[var(--tiger-border)]',
+  error: 'border-[var(--tiger-error)]',
+  success: 'border-[var(--tiger-success)]',
+  warning: 'border-[var(--tiger-warning)]'
 }
 
 export const autoCompleteBaseClasses = selectBaseClasses
@@ -80,6 +85,46 @@ export function getAutoCompletePanelStyle(listHeight: number): { maxHeight: stri
   return { maxHeight: `${listHeight}px` }
 }
 
+/** Same row box as Select. The window arithmetic is fixedSizeStrategy. */
+export function getAutoCompleteVirtualItemHeight(size: ComponentSize = 'md'): number {
+  return getSelectVirtualItemHeight(size)
+}
+
+export function shouldVirtualizeAutoCompleteList(
+  count: number,
+  listHeight: number,
+  size: ComponentSize = 'md'
+): boolean {
+  if (count <= 0 || !(listHeight > 0)) return false
+  return count * getAutoCompleteVirtualItemHeight(size) > listHeight
+}
+
+export function getAutoCompleteVirtualRange(
+  scrollTop: number,
+  listHeight: number,
+  count: number,
+  itemHeight: number,
+  overscan = 5
+): VirtualRange {
+  return fixedSizeStrategy(itemHeight).getRange(scrollTop, listHeight, count, overscan)
+}
+
+export function getAutoCompleteAlignScrollTop(
+  scrollTop: number,
+  index: number,
+  itemHeight: number,
+  listHeight: number
+): number {
+  if (index < 0 || itemHeight <= 0 || listHeight <= 0) return scrollTop
+  return scrollTopForVirtualAlign({
+    scrollTop,
+    viewport: listHeight,
+    offset: index * itemHeight,
+    size: itemHeight,
+    align: 'auto'
+  })
+}
+
 export function getAutoCompleteInputClasses(options: {
   size?: ComponentSize
   disabled?: boolean
@@ -93,20 +138,20 @@ export function getAutoCompleteInputClasses(options: {
     'w-full',
     INPUT_PAD_Y[size],
     options.hasClear ? 'ps-3 pe-10' : 'ps-3 pe-3',
-    'bg-[var(--tiger-surface,#ffffff)]',
+    'bg-[var(--tiger-surface)]',
     'border',
     STATUS_BORDER[status],
-    'text-[var(--tiger-text,#111827)] text-start',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
-    'placeholder:text-[var(--tiger-text-muted,#9ca3af)]',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease)]',
+    'text-[var(--tiger-text)] text-start',
+    'rounded-[var(--tiger-radius-md)]',
+    'placeholder:text-[var(--tiger-text-secondary)]',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     'focus:outline-none',
-    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
-    'focus-visible:border-[var(--tiger-primary,#2563eb)]',
+    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40',
+    'focus-visible:border-[var(--tiger-primary)]',
     options.disabled &&
-      'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text-muted,#6b7280)] border-[var(--tiger-border,#e5e7eb)] cursor-not-allowed',
+      'bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)] border-[var(--tiger-border)] cursor-not-allowed',
     options.isOpen &&
-      'ring-2 ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 border-[var(--tiger-primary,#2563eb)]'
+      'ring-2 ring-[var(--tiger-focus-ring)]/40 border-[var(--tiger-primary)]'
   )
 }
 
@@ -120,15 +165,15 @@ export function getAutoCompleteOptionClasses(options: {
   return classNames(
     autoCompleteOptionBaseClasses,
     OPTION_PAD_Y[size],
-    'tiger-motion-aware [transition:var(--tiger-transition-base,background-color_150ms_ease,color_150ms_ease)]',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     options.isDisabled
       ? 'opacity-50 cursor-not-allowed'
-      : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
+      : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover)]',
     options.isSelected &&
-      'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] font-medium',
+      'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)] font-medium',
     options.isActive &&
       !options.isDisabled &&
-      'ring-2 ring-inset ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+      'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
   )
 }
 
@@ -176,18 +221,40 @@ export function resolveAutoCompleteDisplayValue(
   return String(value)
 }
 
+export function isAutoCompleteEmptyValue(
+  value: unknown
+): value is null | undefined | '' {
+  return value === undefined || value === null || value === ''
+}
+
 export function isSameAutoCompleteValue(
-  left: AutoCompleteValue | undefined,
-  right: AutoCompleteValue | undefined
+  left: AutoCompleteValue | null | undefined,
+  right: AutoCompleteValue | null | undefined
 ): boolean {
-  if (left === undefined || right === undefined) return left === right
-  return String(left) === String(right)
+  const normalizedLeft = isAutoCompleteEmptyValue(left) ? undefined : left
+  const normalizedRight = isAutoCompleteEmptyValue(right) ? undefined : right
+  if (normalizedLeft === undefined || normalizedRight === undefined) {
+    return normalizedLeft === normalizedRight
+  }
+  return String(normalizedLeft) === String(normalizedRight)
+}
+
+/**
+ * External values are empty or a string/finite number.
+ * `''`, `null`, and a missing key are not committed. Anything else is unusable.
+ */
+export function sanitizeAutoCompleteExternalValue(value: unknown): {
+  value: AutoCompleteValue | undefined
+  invalid: boolean
+} {
+  if (isAutoCompleteEmptyValue(value)) return { value: undefined, invalid: false }
+  if (typeof value === 'string') return { value, invalid: false }
+  if (typeof value === 'number' && Number.isFinite(value)) return { value, invalid: false }
+  return { value: undefined, invalid: true }
 }
 
 export function coerceAutoCompleteFormValue(value: unknown): AutoCompleteValue | undefined {
-  if (value === undefined || value === null) return undefined
-  if (typeof value === 'string' || typeof value === 'number') return value
-  return String(value)
+  return sanitizeAutoCompleteExternalValue(value).value
 }
 
 export function getAutoCompleteOptionKey(option: AutoCompleteOption, index: number): string {
@@ -198,12 +265,38 @@ export function findAutoCompleteOption(
   options: readonly AutoCompleteOption[],
   query: string
 ): AutoCompleteOption | undefined {
+  if (query === '') return undefined
   const needle = query.toLowerCase()
   return options.find(
     (option) =>
       !option.disabled &&
       (option.label.toLowerCase() === needle || String(option.value).toLowerCase() === needle)
   )
+}
+
+export function autoCompleteOptionIdentity(option: AutoCompleteOption): string {
+  return option.id ?? String(option.value)
+}
+
+/**
+ * Keep the highlight on the same option when the suggestion list changes.
+ * An index that would now point at a different option is recomputed.
+ */
+export function syncAutoCompleteHighlight(
+  items: readonly AutoCompleteOption[],
+  activeKey: string | undefined,
+  activeFirst: boolean
+): { index: number; key: string | undefined } {
+  if (items.length === 0) return { index: -1, key: undefined }
+  if (activeKey) {
+    const found = items.findIndex((item) => autoCompleteOptionIdentity(item) === activeKey)
+    if (found >= 0) return { index: found, key: activeKey }
+  }
+  const index = getInitialPickerActiveIndex(items, activeFirst)
+  return {
+    index,
+    key: index >= 0 ? autoCompleteOptionIdentity(items[index]) : undefined
+  }
 }
 
 export function resolveAutoCompleteInitialQuery(options: {
@@ -232,17 +325,19 @@ export function resolveAutoCompleteIdleQuery(
  */
 export function resolveAutoCompleteBlurCommit(options: {
   query: string
-  committed: AutoCompleteValue | undefined
+  committed: AutoCompleteValue | null | undefined
   optionList: readonly AutoCompleteOption[]
   allowFreeInput: boolean
 }): AutoCompleteCommitResult {
+  const committed = isAutoCompleteEmptyValue(options.committed) ? undefined : options.committed
   const match = findAutoCompleteOption(options.optionList, options.query)
   if (match) {
+    const value = isAutoCompleteEmptyValue(match.value) ? undefined : match.value
     return {
-      value: match.value,
-      query: match.label,
+      value,
+      query: value === undefined ? '' : match.label,
       option: match,
-      didCommit: !isSameAutoCompleteValue(match.value, options.committed)
+      didCommit: !isSameAutoCompleteValue(value, committed)
     }
   }
 
@@ -251,22 +346,19 @@ export function resolveAutoCompleteBlurCommit(options: {
       return {
         value: undefined,
         query: '',
-        didCommit: options.committed !== undefined
+        didCommit: committed !== undefined
       }
     }
     return {
       value: options.query,
       query: options.query,
-      didCommit: !isSameAutoCompleteValue(options.query, options.committed)
+      didCommit: !isSameAutoCompleteValue(options.query, committed)
     }
   }
 
   return {
-    value: options.committed,
-    query: resolveAutoCompleteIdleQuery(
-      options.committed,
-      options.optionList as AutoCompleteOption[]
-    ),
+    value: committed,
+    query: resolveAutoCompleteIdleQuery(committed, options.optionList as AutoCompleteOption[]),
     didCommit: false
   }
 }
@@ -274,10 +366,13 @@ export function resolveAutoCompleteBlurCommit(options: {
 export function getAutoCompleteKeyIntent(
   key: string,
   isOpen: boolean,
-  activeIndex: number
+  activeIndex: number,
+  optionCount?: number
 ): AutoCompleteKeyIntent {
+  const noOptions = optionCount === 0
   if (!isOpen) {
     if (key === 'ArrowDown' || key === 'ArrowUp') return { type: 'open' }
+    if (key === 'Enter' && noOptions) return { type: 'commit-query', allowDefault: true }
     return { type: 'none' }
   }
 
@@ -288,6 +383,7 @@ export function getAutoCompleteKeyIntent(
     case 'End':
       return { type: 'navigate', key }
     case 'Enter':
+      if (noOptions) return { type: 'commit-query', allowDefault: true }
       return activeIndex >= 0 ? { type: 'select-active' } : { type: 'commit-query' }
     case 'Escape':
       return { type: 'close' }
@@ -314,5 +410,5 @@ export function shouldShowAutoCompleteClear(options: {
   committed?: AutoCompleteValue
 }): boolean {
   if (!options.clearable || options.disabled) return false
-  return (options.query ?? '') !== '' || options.committed !== undefined
+  return (options.query ?? '') !== '' || !isAutoCompleteEmptyValue(options.committed)
 }

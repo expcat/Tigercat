@@ -15,7 +15,7 @@ import type {
   FormRules,
   FormValues
 } from '../types/form'
-import { getValueByPath } from './form-validation'
+import { getValueByPath, readFiniteFormNumber } from './form-validation'
 
 /**
  * Get fields that depend on a given field
@@ -92,13 +92,9 @@ function isConditionValueEmpty(value: unknown): boolean {
 }
 
 function compareNumericValues(actual: unknown, expected: unknown): [number, number] | null {
-  const actualNumber = Number(actual)
-  const expectedNumber = Number(expected)
-
-  if (!Number.isFinite(actualNumber) || !Number.isFinite(expectedNumber)) {
-    return null
-  }
-
+  const actualNumber = readFiniteFormNumber(actual)
+  const expectedNumber = readFiniteFormNumber(expected)
+  if (actualNumber === null || expectedNumber === null) return null
   return [actualNumber, expectedNumber]
 }
 
@@ -211,6 +207,10 @@ export function hasRequiredRule(rules: FormRule | FormRule[] | undefined): boole
   if (!rules) return false
   const ruleList = Array.isArray(rules) ? rules : [rules]
   return ruleList.some((rule) => !!rule && typeof rule === 'object' && !!rule.required)
+}
+
+export function withRequiredRule(rules: FormRule | FormRule[] | undefined): FormRule | FormRule[] {
+  return addRequiredRule(rules)
 }
 
 function addRequiredRule(rules: FormRule | FormRule[] | undefined): FormRule | FormRule[] {

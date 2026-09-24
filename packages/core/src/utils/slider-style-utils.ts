@@ -11,22 +11,22 @@ export const sliderBaseClasses = 'relative w-full'
 /** Extra top space so the value tooltip is not clipped by overflow ancestors. */
 export const sliderTooltipReserveClasses = 'pt-12'
 
-export const sliderTrackClasses = 'relative w-full rounded-full bg-[var(--tiger-border,#e5e7eb)]'
+export const sliderTrackClasses = 'relative w-full rounded-full bg-[var(--tiger-border)]'
 
 export const sliderHitAreaClasses = 'relative w-full py-2 min-h-6'
 
 export const sliderRangeClasses =
-  'bg-[var(--tiger-primary,#2563eb)] rounded-full absolute inset-y-0'
+  'bg-[var(--tiger-primary)] rounded-full absolute inset-y-0'
 
 export const sliderThumbClasses =
-  'bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer tiger-motion-aware hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'bg-[var(--tiger-surface)] border-2 border-[var(--tiger-primary)] rounded-full absolute top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer tiger-motion-aware hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 
 export const sliderThumbDraggingClasses = '[transition:none] hover:scale-100'
 
 export const sliderDisabledClasses = 'opacity-50 cursor-not-allowed'
 
 export const sliderTooltipClasses =
-  'absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--tiger-text,#111827)] text-[var(--tiger-surface,#ffffff)] rounded whitespace-nowrap pointer-events-none'
+  'absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--tiger-text)] text-[var(--tiger-surface)] rounded whitespace-nowrap pointer-events-none'
 
 export const sliderSizeClasses: Record<
   ComponentSize,
@@ -76,7 +76,7 @@ export function getSliderThumbClasses(
     sliderSizeClasses[size].thumb,
     dragging && sliderThumbDraggingClasses,
     disabled && 'cursor-not-allowed',
-    error && 'border-[var(--tiger-error,#dc2626)]'
+    error && 'border-[var(--tiger-error)]'
   )
 }
 
@@ -85,22 +85,22 @@ export function getSliderTooltipClasses(size: ComponentSize = 'md'): string {
 }
 
 export function getSliderStatusClasses(status: InputStatus = 'default'): string {
-  if (status === 'error') return 'ring-2 ring-[var(--tiger-error,#dc2626)] rounded-sm'
-  if (status === 'warning') return 'ring-2 ring-[var(--tiger-warning,#d97706)] rounded-sm'
-  if (status === 'success') return 'ring-2 ring-[var(--tiger-success,#16a34a)] rounded-sm'
+  if (status === 'error') return 'ring-2 ring-[var(--tiger-error)] rounded-sm'
+  if (status === 'warning') return 'ring-2 ring-[var(--tiger-warning)] rounded-sm'
+  if (status === 'success') return 'ring-2 ring-[var(--tiger-success)] rounded-sm'
   return ''
 }
 
 export function getSliderRootClasses(
   disabled: boolean = false,
   className?: string,
-  tooltip: boolean = false,
+  tooltipOpen: boolean = false,
   status: InputStatus = 'default'
 ): string {
   return classNames(
     sliderBaseClasses,
     disabled && sliderDisabledClasses,
-    tooltip && sliderTooltipReserveClasses,
+    tooltipOpen && sliderTooltipReserveClasses,
     getSliderStatusClasses(status),
     className
   )

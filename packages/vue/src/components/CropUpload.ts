@@ -92,7 +92,10 @@ export const CropUpload = defineComponent({
       onState: (state) => {
         sessionState.value = state
       },
-      onError: (error) => emit('error', error)
+      onError: (error) => {
+        formItemControl?.setError(error.message)
+        emit('error', error)
+      }
     })
 
     onBeforeUnmount(() => session.dispose())
@@ -118,9 +121,12 @@ export const CropUpload = defineComponent({
         const originalName = session.getState().originalFile?.name ?? raw.file.name
         const result = withCropFile(raw, originalName)
         emit('crop-complete', result)
+        formItemControl?.setError(null)
         formItemControl?.onChange(result.file)
         session.close()
       } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        formItemControl?.setError(message)
         emit('error', error)
         session.endCrop()
       }
@@ -133,15 +139,19 @@ export const CropUpload = defineComponent({
         Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
       )
       const cropper = props.cropperProps ?? {}
-      const { onReady: userReady, locale: cropperLocale, ...restCropper } = cropper
+      const { onReady: userReady, onError: userCropperError, locale: cropperLocale, ...restCropper } = cropper
 
       const trigger = h(
-        'label',
+        'button',
         {
           ...forwarded,
+          type: 'button',
           ref: triggerRef,
           id: triggerId.value,
-          for: effectiveDisabled.value ? undefined : inputId.value,
+          onClick: () => {
+            if (effectiveDisabled.value) return
+            fileInputRef.value?.click()
+          },
           class: getCropUploadTriggerClasses(
             effectiveDisabled.value,
             classNames(props.className, coerceClassValue((attrs as Record<string, unknown>).class))
@@ -220,7 +230,10 @@ export const CropUpload = defineComponent({
                       session.markReady()
                       userReady?.()
                     },
-                    onError: (error: Error) => session.markLoadError(error)
+                    onError: (error: Error) => {
+                      session.markLoadError(error)
+                      userCropperError?.(error)
+                    }
                   })
                 : null,
             footer: () =>
@@ -235,7 +248,7 @@ export const CropUpload = defineComponent({
                   {
                     onClick: handleConfirm,
                     loading: sessionState.value.cropping,
-                    disabled: !sessionState.value.cropperReady
+                    disabled: !sessionState.value.cropperReady || sessionState.value.cropping
                   },
                   { default: () => labels.value.cropConfirmText }
                 )

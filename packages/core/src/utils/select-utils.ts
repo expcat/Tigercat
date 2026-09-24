@@ -16,7 +16,7 @@ import {
   findLastEnabledIndex,
   getPickerNavigationIndex
 } from './picker-utils'
-import { fixedSizeStrategy } from './virtual-list-utils'
+import { fixedSizeStrategy, scrollTopForVirtualAlign, variableSizeStrategy } from './virtual-list-utils'
 
 export interface ResolveSelectOptionsOptions {
   searchable?: boolean
@@ -59,6 +59,7 @@ export type SelectTriggerKeyIntent =
   | { type: 'toggle' }
   | { type: 'select-active' }
   | { type: 'clear' }
+  | { type: 'remove-last' }
   | { type: 'navigate'; key: string }
   | { type: 'typeahead'; character: string }
   | { type: 'prevent-scroll' }
@@ -81,11 +82,17 @@ const SELECT_VIRTUAL_ITEM_HEIGHT: Record<ComponentSize, number> = {
   lg: 48
 }
 
+const SELECT_VIRTUAL_GROUP_HEIGHT: Record<ComponentSize, number> = {
+  sm: 24,
+  md: 28,
+  lg: 32
+}
+
 const SELECT_STATUS_BORDER: Record<InputStatus, string> = {
-  default: 'border-[var(--tiger-border,#d1d5db)]',
-  error: 'border-[var(--tiger-error,#dc2626)]',
-  success: 'border-[var(--tiger-success,#16a34a)]',
-  warning: 'border-[var(--tiger-warning,#d97706)]'
+  default: 'border-[var(--tiger-border)]',
+  error: 'border-[var(--tiger-error)]',
+  success: 'border-[var(--tiger-success)]',
+  warning: 'border-[var(--tiger-warning)]'
 }
 
 export const selectBaseClasses = 'relative inline-block'
@@ -93,58 +100,90 @@ export const selectInGroupClasses = 'flex-1 min-w-0'
 export const selectStandaloneClasses = 'w-full'
 
 export const selectDropdownBaseClasses = classNames(
-  'bg-[var(--tiger-surface,#ffffff)]',
-  'border border-[var(--tiger-border,#e5e7eb)]',
-  'rounded-[var(--tiger-radius-lg,0.75rem)]',
-  'shadow-[var(--tiger-shadow-lg,0_10px_15px_-3px_rgb(0_0_0_/_0.1),0_4px_6px_-4px_rgb(0_0_0_/_0.1))]',
+  'bg-[var(--tiger-surface)]',
+  'border border-[var(--tiger-border)]',
+  'rounded-[var(--tiger-radius-lg)]',
+  'shadow-[var(--tiger-shadow-lg)]',
   'overflow-hidden',
-  'flex flex-col',
-  'max-sm:rounded-none max-sm:border-0 max-sm:shadow-none',
-  'max-sm:pt-[env(safe-area-inset-top)] max-sm:pb-[env(safe-area-inset-bottom)]'
+  'flex flex-col'
 )
 
-export const selectListboxClasses = 'overflow-auto min-h-0 flex-1 max-sm:max-h-none'
+export const selectListboxClasses = 'overflow-auto min-h-0 flex-1'
+
+export const selectTagListClasses = 'flex min-w-0 flex-1 flex-wrap items-center gap-1'
+export const selectTagClasses = classNames(
+  'inline-flex max-w-full items-center gap-1 rounded-[var(--tiger-radius-sm)]',
+  'bg-[var(--tiger-surface-muted)] px-1.5 py-0.5 text-sm text-[var(--tiger-text)]'
+)
+export const selectTagRemoveClasses = classNames(
+  'inline-flex text-[var(--tiger-text-secondary)]',
+  'hover:text-[var(--tiger-text)]'
+)
 export const selectSearchWrapClasses =
-  'shrink-0 border-b border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]'
+  'shrink-0 border-b border-[var(--tiger-border)] bg-[var(--tiger-surface)]'
 export const selectEmptyStateClasses =
-  'px-3 py-8 text-center text-[var(--tiger-text-muted,#6b7280)] text-sm'
+  'px-3 py-8 text-center text-[var(--tiger-text-secondary)] text-sm'
 export const selectGroupLabelClasses =
-  'px-3 py-2 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] uppercase bg-[var(--tiger-surface-muted,#f9fafb)] truncate'
+  'px-3 py-2 text-xs font-semibold text-[var(--tiger-text-secondary)] uppercase bg-[var(--tiger-surface-muted)] truncate'
 export const selectSearchInputClasses = classNames(
   'w-full px-3 py-2 bg-transparent',
-  'text-[var(--tiger-text,#111827)]',
-  'placeholder:text-[var(--tiger-text-muted,#9ca3af)]',
+  'text-[var(--tiger-text)]',
+  'placeholder:text-[var(--tiger-text-secondary)]',
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'focus-visible:ring-[var(--tiger-focus-ring)]'
 )
 export const selectDoneActionClasses =
-  'shrink-0 max-sm:block hidden border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-2'
+  'shrink-0 max-sm:block hidden border-t border-[var(--tiger-border)] bg-[var(--tiger-surface)] p-2'
 export const selectDoneButtonClasses = classNames(
-  'w-full rounded-[var(--tiger-radius-md,0.5rem)]',
-  'bg-[var(--tiger-primary,#2563eb)] px-3 py-2 text-sm font-medium',
-  'text-[var(--tiger-primary-foreground,#ffffff)]',
-  'tiger-motion-aware [transition:var(--tiger-transition-base,background-color_150ms_ease)]',
-  'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]',
+  'w-full rounded-[var(--tiger-radius-md)]',
+  'bg-[var(--tiger-primary)] px-3 py-2 text-sm font-medium',
+  'text-[var(--tiger-primary-foreground)]',
+  'tiger-motion-aware [transition:var(--tiger-transition-base)]',
+  'hover:bg-[var(--tiger-primary-hover)]',
   'focus:outline-none focus-visible:ring-2',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'focus-visible:ring-[var(--tiger-focus-ring)]'
 )
 export const selectTrailingSlotClasses =
   'pointer-events-none absolute inset-y-0 end-3 flex items-center gap-1'
 export const selectClearButtonClasses = classNames(
   'pointer-events-auto inline-flex rounded-sm',
-  'text-[var(--tiger-text-muted,#9ca3af)]',
-  'hover:text-[var(--tiger-text-muted,#6b7280)]',
+  'focus:outline-none',
+  'text-[var(--tiger-text-secondary)]',
+  'hover:text-[var(--tiger-text-secondary)]',
   'focus-visible:outline-none focus-visible:ring-2',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'focus-visible:ring-[var(--tiger-focus-ring)]'
 )
 export const selectChevronWrapClasses =
-  'inline-flex tiger-motion-aware [transition:var(--tiger-transition-base,transform_150ms_ease)]'
-export const selectCheckIconClasses = 'w-5 h-5 text-[var(--tiger-primary,#2563eb)]'
-export const selectChromeIconClasses = 'w-5 h-5 text-[var(--tiger-text-muted,#9ca3af)]'
+  'inline-flex tiger-motion-aware [transition:var(--tiger-transition-base)]'
+export const selectCheckIconClasses = 'w-5 h-5 text-[var(--tiger-primary)]'
+export const selectChromeIconClasses = 'w-5 h-5 text-[var(--tiger-text-secondary)]'
 export const selectClearIconClasses = 'w-4 h-4'
 
 export function getSelectVirtualItemHeight(size: ComponentSize = 'md'): number {
   return SELECT_VIRTUAL_ITEM_HEIGHT[size] ?? SELECT_VIRTUAL_ITEM_HEIGHT.md
+}
+
+export function getSelectVirtualRowHeight(
+  size: ComponentSize = 'md',
+  kind: SelectListRow['kind'] = 'option'
+): number {
+  if (kind === 'group') return SELECT_VIRTUAL_GROUP_HEIGHT[size] ?? SELECT_VIRTUAL_GROUP_HEIGHT.md
+  return getSelectVirtualItemHeight(size)
+}
+
+/** Virtualize once the option list is taller than the panel. */
+export function shouldVirtualizeSelectList(options: {
+  rowCount: number
+  listHeight: number
+  size?: ComponentSize
+  rows?: readonly SelectListRow[]
+}): boolean {
+  if (options.rowCount <= 0) return false
+  const size = options.size ?? 'md'
+  const total = options.rows
+    ? options.rows.reduce((sum, row) => sum + getSelectVirtualRowHeight(size, row.kind), 0)
+    : options.rowCount * getSelectVirtualItemHeight(size)
+  return total > options.listHeight
 }
 
 export function getSelectTriggerClasses(options: {
@@ -160,21 +199,21 @@ export function getSelectTriggerClasses(options: {
     'w-full flex items-center justify-between gap-2 ps-3',
     options.hasClear ? 'pe-14' : 'pe-9',
     SELECT_TRIGGER_PAD_Y[size],
-    'bg-[var(--tiger-surface,#ffffff)]',
+    'bg-[var(--tiger-surface)]',
     'border',
     SELECT_STATUS_BORDER[status],
-    'text-[var(--tiger-text,#111827)] text-start',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
+    'text-[var(--tiger-text)] text-start',
+    'rounded-[var(--tiger-radius-md)]',
     options.disabled ? 'cursor-not-allowed' : 'cursor-pointer',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease,border-color_150ms_ease,box-shadow_150ms_ease,transform_150ms_ease)]',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     'focus:outline-none',
-    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
-    'focus-visible:border-[var(--tiger-primary,#2563eb)]',
+    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40',
+    'focus-visible:border-[var(--tiger-primary)]',
     !options.disabled && 'active:scale-[0.99]',
     options.disabled &&
-      'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text-muted,#6b7280)] border-[var(--tiger-border,#e5e7eb)]',
+      'bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)] border-[var(--tiger-border)]',
     options.isOpen &&
-      'ring-2 ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 border-[var(--tiger-primary,#2563eb)]'
+      'ring-2 ring-[var(--tiger-focus-ring)]/40 border-[var(--tiger-primary)]'
   )
 }
 
@@ -188,15 +227,15 @@ export function getSelectOptionClasses(options: {
   return classNames(
     'w-full px-3 text-start truncate',
     SELECT_OPTION_PAD_Y[size],
-    'tiger-motion-aware [transition:var(--tiger-transition-base,background-color_150ms_ease,color_150ms_ease)]',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     options.isDisabled
       ? 'opacity-50 cursor-not-allowed'
-      : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
+      : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover)]',
     options.isSelected &&
-      'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] font-medium',
+      'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)] font-medium',
     options.isActive &&
       !options.isDisabled &&
-      'ring-2 ring-inset ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+      'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
   )
 }
 
@@ -307,8 +346,15 @@ export function createSelectOptionFromQuery(
   }
 }
 
-function sameSelectIdentity(left: SelectValue, right: SelectValue): boolean {
-  return String(left).toLowerCase() === String(right).toLowerCase()
+export function sameSelectValue(left: SelectValue, right: SelectValue): boolean {
+  return Object.is(left, right)
+}
+
+function exactSelectQueryMatch(option: SelectOption, query: string): boolean {
+  if (option.label === query) return true
+  if (typeof option.value === 'string') return option.value === query
+  if (typeof option.value === 'number') return String(option.value) === query
+  return false
 }
 
 export function resolveCreatableSelectOption(
@@ -319,13 +365,31 @@ export function resolveCreatableSelectOption(
   if (!resolveOptions.creatable) return null
   const candidate = createSelectOptionFromQuery(query, options)
   if (!candidate) return null
-  const exists = flattenSelectOptions(options).some((option) => {
-    return (
-      option.label.toLowerCase() === candidate.label.toLowerCase() ||
-      sameSelectIdentity(option.value, candidate.value)
-    )
-  })
+  const exists = flattenSelectOptions(options).some((option) =>
+    exactSelectQueryMatch(option, candidate.label)
+  )
   return exists ? null : candidate
+}
+
+/** Enter creates the current query when nothing in the list is an exact match. */
+export function shouldCreateSelectQuery(options: {
+  creatable: boolean
+  query: string
+  items: readonly SelectOption[]
+}): boolean {
+  if (!options.creatable) return false
+  const query = options.query.trim()
+  if (!query) return false
+  return !options.items.some((item) => exactSelectQueryMatch(item, query))
+}
+
+export function withCreatedSelectOptions(
+  options: SelectOptions,
+  created: readonly SelectOption[]
+): SelectOptions {
+  const pending = pruneCreatedSelectOptions([...created], options)
+  if (pending.length === 0) return options
+  return [...options, ...pending]
 }
 
 export function getCreateSelectOptionLabel(
@@ -387,7 +451,7 @@ export function isSelectValueEmpty(value: SelectModelValue, multiple: boolean): 
   if (multiple) {
     return !Array.isArray(value) || value.length === 0
   }
-  return value === undefined
+  return value === undefined || value === null
 }
 
 export function normalizeSelectValue(
@@ -424,7 +488,7 @@ export function isSelectOptionSelected(
   multiple: boolean
 ): boolean {
   const selected = getSelectSelectedValues(value, multiple)
-  return selected.includes(option.value)
+  return selected.some((item) => sameSelectValue(item, option.value))
 }
 
 export function shouldShowSelectClear(options: {
@@ -496,7 +560,7 @@ export function resolveSelectDisplayText(options: {
     return labels.join(', ')
   }
 
-  if (options.value === undefined) return options.placeholder
+  if (options.value === undefined || options.value === null) return options.placeholder
   return findLabel(options.value as SelectValue)
 }
 
@@ -510,15 +574,71 @@ export function commitSelectOption(options: {
   }
   if (options.multiple) {
     const current = getSelectSelectedValues(options.value, true)
-    return current.includes(options.option.value)
-      ? current.filter((item) => item !== options.option.value)
+    return current.some((item) => sameSelectValue(item, options.option.value))
+      ? current.filter((item) => !sameSelectValue(item, options.option.value))
       : [...current, options.option.value]
   }
   return options.option.value
 }
 
 export function clearSelectValue(multiple: boolean): SelectModelValue {
-  return multiple ? [] : undefined
+  return multiple ? [] : null
+}
+
+export function removeLastSelectValue(value: SelectModelValue): SelectValue[] {
+  const current = getSelectSelectedValues(value, true)
+  return current.slice(0, -1)
+}
+
+export function removeSelectValue(value: SelectModelValue, target: SelectValue): SelectValue[] {
+  return getSelectSelectedValues(value, true).filter((item) => !sameSelectValue(item, target))
+}
+
+export interface SelectTagItem {
+  value: SelectValue
+  label: string
+  key: string
+}
+
+export interface SelectTagPresentation {
+  tags: SelectTagItem[]
+  collapsedCount: number
+  collapsedLabel: string
+}
+
+export function resolveSelectTags(options: {
+  value: SelectModelValue
+  options: SelectOptions
+  createdOptions?: SelectOption[]
+  optionCache?: ReadonlyMap<SelectValue, SelectOption>
+  maxTagCount?: number
+  moreCountText?: string
+}): SelectTagPresentation {
+  const lookup = [
+    ...flattenSelectOptions(options.options),
+    ...(options.createdOptions ?? []),
+    ...Array.from(options.optionCache?.values() ?? [])
+  ]
+  const values = getSelectSelectedValues(options.value, true)
+  const items = values.map((value, index) => {
+    const match = lookup.find((option) => sameSelectValue(option.value, value))
+    return {
+      value,
+      label: match?.label ?? String(value),
+      key: `${index}-${String(value)}`
+    }
+  })
+  const limit = options.maxTagCount
+  if (limit === undefined || items.length <= limit) {
+    return { tags: items, collapsedCount: 0, collapsedLabel: '' }
+  }
+  const hidden = items.length - limit
+  const collapsedLabel = (options.moreCountText ?? '+{count}').replace(/\{count\}/g, String(hidden))
+  return {
+    tags: items.slice(0, limit),
+    collapsedCount: hidden,
+    collapsedLabel
+  }
 }
 
 export function resolveSelectActiveIndex(options: {
@@ -588,6 +708,7 @@ export function getSelectTriggerKeyIntent(options: {
   searchable: boolean
   clearable: boolean
   hasValue: boolean
+  multiple?: boolean
   fromSearchInput?: boolean
 }): SelectTriggerKeyIntent {
   const { key, open, searchable, fromSearchInput } = options
@@ -598,6 +719,9 @@ export function getSelectTriggerKeyIntent(options: {
     return open ? { type: 'close' } : { type: 'none' }
   }
   if (!open) {
+    if ((key === 'Backspace' || key === 'Delete') && options.multiple && options.hasValue) {
+      return { type: 'remove-last' }
+    }
     if ((key === 'Backspace' || key === 'Delete') && options.clearable && options.hasValue) {
       return { type: 'clear' }
     }
@@ -708,12 +832,13 @@ export function getSelectActiveAlignScrollTop(options: {
   itemHeight: number
 }): number {
   if (options.rowIndex < 0) return options.scrollTop
-  const top = options.rowIndex * options.itemHeight
-  if (top < options.scrollTop) return top
-  if (top + options.itemHeight > options.scrollTop + options.listHeight) {
-    return top + options.itemHeight - options.listHeight
-  }
-  return options.scrollTop
+  return scrollTopForVirtualAlign({
+    scrollTop: options.scrollTop,
+    viewport: options.listHeight,
+    offset: options.rowIndex * options.itemHeight,
+    size: options.itemHeight,
+    align: 'auto'
+  })
 }
 
 export function serializeSelectFormValues(value: SelectModelValue, multiple: boolean): string[] {
@@ -724,16 +849,116 @@ export function coerceSelectFormValue(
   raw: unknown,
   options: SelectOptions,
   multiple: boolean
-): SelectModelValue | undefined {
+): SelectModelValue | null | undefined {
   if (raw === undefined) return undefined
   if (multiple) {
-    return Array.isArray(raw) ? (raw as SelectValues) : undefined
-  }
-  if (raw === '' && !flattenSelectOptions(options).some((option) => option.value === '')) {
+    if (Array.isArray(raw)) return raw as SelectValues
+    if (raw === '' || raw === null) return []
     return undefined
   }
+  if (raw === '') {
+    return flattenSelectOptions(options).some((option) => option.value === '') ? '' : null
+  }
+  if (raw === null) return null
   if (typeof raw === 'string' || typeof raw === 'number') return raw
+  return null
+}
+
+export function selectRowGroupLabel(rows: readonly SelectListRow[], index: number): string | undefined {
+  for (let cursor = index; cursor >= 0; cursor -= 1) {
+    const row = rows[cursor]
+    if (row?.kind === 'group') return row.label
+  }
   return undefined
+}
+
+export interface SelectVirtualWindow {
+  startIndex: number
+  endIndex: number
+  offsetTop: number
+  totalHeight: number
+}
+
+/** Variable-height window that always keeps the active row mounted. */
+export function getSelectVirtualWindow(options: {
+  rows: readonly SelectListRow[]
+  scrollTop: number
+  listHeight: number
+  size?: ComponentSize
+  activeRowIndex?: number
+  overscan?: number
+}): SelectVirtualWindow {
+  const size = options.size ?? 'md'
+  const count = options.rows.length
+  if (count === 0) return { startIndex: 0, endIndex: -1, offsetTop: 0, totalHeight: 0 }
+  const strategy = variableSizeStrategy(
+    (index) => getSelectVirtualRowHeight(size, options.rows[index]?.kind),
+    count
+  )
+  const range = strategy.getRange(
+    options.scrollTop,
+    options.listHeight,
+    count,
+    options.overscan ?? 5
+  )
+  let startIndex = range.startIndex
+  let endIndex = range.endIndex
+  const active = options.activeRowIndex ?? -1
+  if (active >= 0 && active < count) {
+    startIndex = Math.min(startIndex, active)
+    endIndex = Math.max(endIndex, active)
+  }
+  return {
+    startIndex,
+    endIndex,
+    offsetTop: strategy.getItemOffset(startIndex),
+    totalHeight: strategy.getItemOffset(count)
+  }
+}
+
+export function focusAfterPaint(read: () => HTMLElement | null | undefined): void {
+  const focus = () => {
+    const node = read()
+    node?.focus()
+  }
+  if (typeof requestAnimationFrame !== 'function') {
+    queueMicrotask(focus)
+    return
+  }
+  requestAnimationFrame(() => {
+    requestAnimationFrame(focus)
+  })
+}
+
+export function createSelectScrollScheduler(apply: (scrollTop: number) => void): {
+  onScroll: (scrollTop: number) => void
+  cancel: () => void
+} {
+  let frame: number | undefined
+  let latest = 0
+  const requestFrame =
+    typeof requestAnimationFrame === 'function'
+      ? (callback: () => void) => requestAnimationFrame(callback)
+      : (callback: () => void) => setTimeout(callback, 16) as unknown as number
+  const cancelFrame =
+    typeof cancelAnimationFrame === 'function'
+      ? (id: number) => cancelAnimationFrame(id)
+      : (id: number) => clearTimeout(id)
+  return {
+    onScroll(scrollTop: number) {
+      latest = scrollTop
+      if (frame !== undefined) return
+      frame = requestFrame(() => {
+        frame = undefined
+        apply(latest)
+      })
+    },
+    cancel() {
+      if (frame === undefined) return
+      cancelFrame(frame)
+      frame = undefined
+    }
+  }
 }
 
 export function createSelectTypeaheadBuffer(options: {

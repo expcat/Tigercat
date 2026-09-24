@@ -48,13 +48,13 @@ export const SCHEMA_FORM_WIDGET_TYPES: readonly SchemaFormWidgetType[] = [
 export const schemaFormRootClasses = 'tiger-schema-form w-full'
 export const schemaFormGroupClasses = 'tiger-schema-form__group space-y-4'
 export const schemaFormGroupTitleClasses =
-  'tiger-schema-form__group-title m-0 text-sm font-medium text-[var(--tiger-text,#111827)]'
+  'tiger-schema-form__group-title m-0 text-sm font-medium text-[var(--tiger-text)]'
 export const schemaFormGroupDescriptionClasses =
-  'tiger-schema-form__group-description m-0 text-xs text-[var(--tiger-text-muted,#6b7280)]'
+  'tiger-schema-form__group-description m-0 text-xs text-[var(--tiger-text-secondary)]'
 export const schemaFormNestedGroupClasses =
-  'tiger-schema-form__nested ps-3 border-s border-[var(--tiger-border,#e5e7eb)] space-y-4'
+  'tiger-schema-form__nested ps-3 border-s border-[var(--tiger-border)] space-y-4'
 export const schemaFormExtraClasses =
-  'tiger-schema-form__extra mt-1 text-xs text-[var(--tiger-text-muted,#6b7280)] min-w-0'
+  'tiger-schema-form__extra mt-1 text-xs text-[var(--tiger-text-secondary)] min-w-0'
 export const schemaFormActionsClasses =
   'tiger-schema-form__actions flex items-center justify-end gap-3 pt-2'
 
@@ -97,8 +97,15 @@ export function isSchemaFormWidgetType(value: unknown): value is SchemaFormWidge
   )
 }
 
-export function resolveSchemaFormWidgetType(field: SchemaFormField): SchemaFormWidgetType {
-  return isSchemaFormWidgetType(field.type) ? field.type : 'input'
+/**
+ * Omitted `type` is an input. An unknown `type` is empty so the host can
+ * supply `renderField`; it is not coerced to input.
+ */
+export function resolveSchemaFormWidgetType(
+  field: SchemaFormField
+): SchemaFormWidgetType | null {
+  if (field.type == null) return 'input'
+  return isSchemaFormWidgetType(field.type) ? field.type : null
 }
 
 function isVisibleField(field: SchemaFormField | undefined): field is SchemaFormField {
@@ -180,7 +187,8 @@ export function resolveSchemaFormLayout(
   return layout
 }
 
-function normalizeRules(field: SchemaFormField): FormRule | FormRule[] | undefined {
+export function schemaFormFieldRules(field: SchemaFormField): FormRule | FormRule[] | undefined {
+  if (field.disabled) return undefined
   const rules = field.rules
   if (field.required && !hasRequiredRule(rules)) {
     const requiredRule: FormRule = { required: true }
@@ -200,11 +208,13 @@ export function collectSchemaFormRules(
   const fields = flattenSchemaFormFields(schema)
   const rules: FormRules = {}
   for (const field of fields) {
-    const fieldRules = normalizeRules(field)
+    const fieldRules = schemaFormFieldRules(field)
     if (fieldRules) rules[field.name] = fieldRules
   }
   if (overlay) {
     for (const [name, rule] of Object.entries(overlay)) {
+      const field = fields.find((item) => item.name === name)
+      if (field?.disabled) continue
       rules[name] = rule
     }
   }
@@ -289,8 +299,38 @@ export function mapSchemaFormValuesOut(
   return output
 }
 
+function isPlainFormRecord(value: unknown): value is FormValues {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date)
+}
+
 /**
- * Merge schema defaults, mapped source, and an explicit model (explicit wins).
+ * Overlay `patch` onto `base` one path at a time. A nested object does not
+ * replace sibling paths that the patch omitted.
+ */
+export function mergeSchemaFormValuesByPath(base: FormValues, patch: FormValues | undefined): FormValues {
+  if (!patch) return cloneFormValues(base)
+  let next = cloneFormValues(base)
+  const walk = (value: unknown, path: string) => {
+    if (isPlainFormRecord(value)) {
+      const entries = Object.entries(value)
+      if (entries.length === 0 && path) {
+        next = setValueByPath(next, path, {})
+        return
+      }
+      for (const [key, child] of entries) {
+        walk(child, path ? `${path}.${key}` : key)
+      }
+      return
+    }
+    if (path) next = setValueByPath(next, path, value)
+  }
+  walk(patch, '')
+  return next
+}
+
+/**
+ * Merge schema defaults, mapped source, and an explicit model. Later paths
+ * cover only the same path.
  */
 export function createSchemaFormModel(
   schema: SchemaFormSchema | undefined,
@@ -299,7 +339,39 @@ export function createSchemaFormModel(
 ): FormValues {
   const mapped = source ? mapSchemaFormValuesIn(schema, source) : collectSchemaFormDefaults(schema)
   if (!model) return mapped
-  return { ...mapped, ...cloneFormValues(model) }
+  return mergeSchemaFormValuesByPath(mapped, model)
+}
+
+export function collectChangedSchemaFormPaths(previous: FormValues, next: FormValues): string[] {
+  const paths = new Set<string>()
+  const collect = (value: unknown, path: string) => {
+    if (isPlainFormRecord(value)) {
+      for (const [key, child] of Object.entries(value)) {
+        collect(child, path ? `${path}.${key}` : key)
+      }
+      return
+    }
+    if (path) paths.add(path)
+  }
+  collect(previous, '')
+  collect(next, '')
+  const changed: string[] = []
+  for (const path of paths) {
+    if (!Object.is(getValueByPath(previous, path), getValueByPath(next, path))) changed.push(path)
+  }
+  return changed
+}
+
+export function overlaySchemaFormDirtyValues(
+  seed: FormValues,
+  current: FormValues,
+  dirtyPaths: ReadonlySet<string>
+): FormValues {
+  let next = cloneFormValues(seed)
+  for (const path of dirtyPaths) {
+    next = setValueByPath(next, path, getValueByPath(current, path))
+  }
+  return next
 }
 
 export function mergeSchemaFormConditions(

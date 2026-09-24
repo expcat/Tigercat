@@ -1,21 +1,21 @@
 import type { ComponentSize } from './base'
 import type { InputStatus } from './input'
-import type { TigerLocale, TigerLocaleSelect } from './locale'
+import type { TigerLocale, TigerLocaleSelect, TigerLocaleTreeSelect } from './locale'
 import type { TreeCheckStrategy, TreeFilterFn, TreeLoadDataFn, TreeNode } from './tree'
 import type { FloatingPlacement } from '../utils/floating'
 
 /**
- * Single-select key. `''` and `0` are legal keys (not “unselected”).
+ * Single-select key. `0` is a legal key. `''` is empty, not a key.
  */
 export type TreeSelectSingleValue = string | number
 
 export type TreeSelectMultipleValue = (string | number)[]
 
 /**
- * Selected key(s). `undefined` is empty / uncontrolled.
- * Multiple mode uses an array (`[]` is empty).
+ * Selected key(s). `undefined` is uncontrolled.
+ * Single empty is `null`. Multiple empty is `[]`. `''` is empty, not a key.
  */
-export type TreeSelectValue = TreeSelectSingleValue | TreeSelectMultipleValue | undefined
+export type TreeSelectValue = TreeSelectSingleValue | TreeSelectMultipleValue | null | undefined
 
 /**
  * Shared TreeSelect props (framework-agnostic)
@@ -24,7 +24,8 @@ export interface TreeSelectProps {
   /** Tree data */
   treeData?: TreeNode[]
   /**
-   * Selected key(s). `undefined` is empty / uncontrolled; `''` is a legal key.
+   * Selected key(s). `undefined` is uncontrolled.
+   * Single empty is `null`. Multiple empty is `[]`. `''` is empty, not a key.
    */
   value?: TreeSelectValue
   /**
@@ -53,6 +54,11 @@ export interface TreeSelectProps {
   size?: ComponentSize
   /** Whether the component is disabled */
   disabled?: boolean
+  /**
+   * Focusable and submitted, but the value cannot change.
+   * `readonly` is not a prop.
+   */
+  readOnly?: boolean
   /**
    * Whether to show clear button. Same default as Select / Cascader.
    * @default true
@@ -105,11 +111,6 @@ export interface TreeSelectProps {
    * Pixel height of the tree content area (virtual and non-virtual).
    * Same job as Select/Cascader `listHeight`.
    * @default 256
-   */
-  height?: number
-  /**
-   * Alias of {@link TreeSelectProps.height} (Select/Cascader overlay list synonym).
-   * Wins when both are set.
    */
   listHeight?: number
   /**
@@ -164,7 +165,7 @@ export interface TreeSelectProps {
   /**
    * UI labels for custom text. Takes precedence over `locale` and ConfigProvider text.
    */
-  labels?: Partial<TigerLocaleSelect>
+  labels?: Partial<TigerLocaleSelect & TigerLocaleTreeSelect>
   /** Custom class name */
   className?: string
 }

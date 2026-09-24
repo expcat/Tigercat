@@ -39,11 +39,15 @@ export interface AutoCompleteProps {
   /** Placeholder text */
   placeholder?: string
   /**
-   * Committed value. `undefined` is unselected; `''` is a legal value.
+   * Committed value. `undefined`, `null`, and `''` are not committed.
    * Typing updates the query only — commit happens on option select,
-   * Enter, or blur (see `allowFreeInput`).
+   * Enter, outside close, or blur (see `allowFreeInput`).
    */
   value?: AutoCompleteValue
+  /**
+   * Focusable and submittable, but the query and value cannot change.
+   */
+  readOnly?: boolean
   /**
    * Initial committed value when `value` is omitted.
    */

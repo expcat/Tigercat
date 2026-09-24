@@ -20,7 +20,7 @@ export default function App() {
       <FormItem name="email" label="邮箱">
         <Input placeholder="name@example.com" />
       </FormItem>
-      <Button htmlType="submit" variant="primary">
+      <Button type="submit" variant="primary">
         校验并提交
       </Button>
     </Form>

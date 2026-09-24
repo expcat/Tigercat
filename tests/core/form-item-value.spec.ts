@@ -7,7 +7,10 @@ import {
   coerceArrayFormValue,
   coerceBooleanFormValue,
   coerceChoiceFormValue,
+  coerceNumberFormValue,
   coerceSliderFormValue,
+  coerceTagsFormValue,
+  coerceTextFormValue,
   resolveFormItemSeed
 } from '@expcat/tigercat-core'
 
@@ -24,9 +27,15 @@ describe('form-item-value', () => {
     expect(coerceArrayFormValue(['a'])).toEqual(['a'])
     expect(coerceChoiceFormValue('')).toBeUndefined()
     expect(coerceChoiceFormValue('yes')).toBe('yes')
-    expect(coerceSliderFormValue('', false)).toBeUndefined()
+    expect(coerceSliderFormValue('', false)).toBeNull()
+    expect(coerceSliderFormValue('12', false)).toBe(12)
     expect(coerceSliderFormValue(12, false)).toBe(12)
     expect(coerceSliderFormValue([1, 8], true)).toEqual([1, 8])
-    expect(coerceSliderFormValue(3, true)).toBeUndefined()
+    expect(coerceSliderFormValue(['1', '8'], true)).toEqual([1, 8])
+    expect(coerceSliderFormValue(3, true)).toBeNull()
+    expect(coerceNumberFormValue('12')).toBe(12)
+    expect(coerceNumberFormValue('')).toBeNull()
+    expect(coerceTextFormValue(null)).toBe('')
+    expect(coerceTagsFormValue('')).toBeNull()
   })
 })

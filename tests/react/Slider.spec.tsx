@@ -160,13 +160,13 @@ describe('Slider', () => {
         <Slider value={[20, 80]} range aria-label="Brightness" />
       )
       const labelled = getThumbs(withLabel)
-      expect(labelled[0]).toHaveAttribute('aria-label', 'Brightness (Minimum value)')
-      expect(labelled[1]).toHaveAttribute('aria-label', 'Brightness (Maximum value)')
+      expect(labelled[0]).toHaveAttribute('aria-label', 'Brightness, Minimum value')
+      expect(labelled[1]).toHaveAttribute('aria-label', 'Brightness, Maximum value')
 
       const { container: noLabel } = render(<Slider value={[20, 80]} range />)
       const fallback = getThumbs(noLabel)
-      expect(fallback[0]).toHaveAttribute('aria-label', 'Slider (Minimum value)')
-      expect(fallback[1]).toHaveAttribute('aria-label', 'Slider (Maximum value)')
+      expect(fallback[0]).toHaveAttribute('aria-label', 'Slider, Minimum value')
+      expect(fallback[1]).toHaveAttribute('aria-label', 'Slider, Maximum value')
     })
   })
 
@@ -234,6 +234,7 @@ describe('Slider', () => {
         <Slider value={0} min={0} max={100} step={1} onChange={onChange} />
       )
       fireEvent.pointerDown(stubTrackRect(container, 200), { clientX: 80, pointerId: 1, button: 0 })
+      fireEvent.pointerUp(document, { clientX: 80, pointerId: 1 })
       expect(onChange).toHaveBeenCalledWith(40)
 
       const off = vi.fn()
@@ -255,6 +256,7 @@ describe('Slider', () => {
         pointerId: 1,
         button: 0
       })
+      fireEvent.pointerUp(document, { clientX: clientX as number, pointerId: 1 })
       expect(onChange.mock.calls.at(-1)![0]).toEqual(expected)
     })
   })

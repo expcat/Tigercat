@@ -13,7 +13,7 @@ import {
   mapSchemaFormValuesOut,
   resolveSchemaFormLayout,
   resolveSchemaFormWidgetType
-} from '@expcat/tigercat-core'
+} from '@expcat/tigercat-core/schema-form'
 import {
   flattenSchemaFormFields as flattenFromSubpath,
   mapSchemaFormValuesOut as mapOutFromSubpath
@@ -126,11 +126,11 @@ describe('schema-form helpers', () => {
     })
   })
 
-  it('falls unknown widget types back to input', () => {
+  it('leaves unknown widget types empty and keeps an omitted type as input', () => {
     expect(resolveSchemaFormWidgetType({ name: 'x' })).toBe('input')
     expect(resolveSchemaFormWidgetType({ name: 'x', type: 'textarea' })).toBe('textarea')
     expect(resolveSchemaFormWidgetType({ name: 'x', type: 'date' })).toBe('date')
     expect(resolveSchemaFormWidgetType({ name: 'x', type: 'tree-select' })).toBe('tree-select')
-    expect(resolveSchemaFormWidgetType({ name: 'x', type: 'mentions' as never })).toBe('input')
+    expect(resolveSchemaFormWidgetType({ name: 'x', type: 'mentions' as never })).toBeNull()
   })
 })

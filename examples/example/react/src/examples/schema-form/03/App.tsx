@@ -56,11 +56,11 @@ export default function App() {
         options={options}
         aria-label="字段权限模式"
       />
-      <p className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+      <p className="text-sm text-[var(--tiger-text-secondary)]">
         发起模式不套审批节点矩阵，字段都可编。审批人模式隐藏金额、原因只读、天数可改。只读模式不会把可编字段重新打开。
       </p>
       <SchemaForm schema={schema} value={model} onChange={setModel} onSubmit={handleSubmit} />
-      {message ? <p className="text-sm text-[var(--tiger-text-muted,#6b7280)]">{message}</p> : null}
+      {message ? <p className="text-sm text-[var(--tiger-text-secondary)]">{message}</p> : null}
     </div>
   )
 }

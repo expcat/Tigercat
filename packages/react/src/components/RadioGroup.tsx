@@ -1,4 +1,4 @@
-import React, { Children, useCallback, useId, useMemo } from 'react'
+import React, { Children, useCallback, useId, useMemo, useState } from 'react'
 import {
   coerceChoiceFormValue,
   collectRadioGroupInputs,
@@ -34,6 +34,10 @@ interface RadioGroupContextValue {
   name: string
   disabled: boolean
   size: ComponentSize
+  invalid: boolean
+  describedBy?: string
+  invalidValue?: string | number
+  claimInvalid: (value: string | number) => void
   onChange: (value: string | number) => void
 }
 
@@ -73,6 +77,12 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
   const groupName = name || `tiger-radio-${reactId}`
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const [claimedInvalid, setClaimedInvalid] = useState<string | number | undefined>(
+    options?.[0]?.value
+  )
+  const claimInvalid = useCallback((optionValue: string | number) => {
+    setClaimedInvalid((current) => current ?? optionValue)
+  }, [])
   const labelledby =
     typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
       ? props['aria-labelledby'].trim()
@@ -121,16 +131,37 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
     nextInput.click()
   }
 
+  const invalidValue = currentValue ?? claimedInvalid ?? options?.[0]?.value
   const contextValue = useMemo<RadioGroupContextValue>(
     () => ({
       value: currentValue,
       name: groupName,
       disabled: effectiveDisabled,
       size,
+      invalid: status === 'error',
+      describedBy,
+      invalidValue,
+      claimInvalid,
       onChange: handleChange
     }),
-    [currentValue, groupName, effectiveDisabled, size, handleChange]
+    [
+      claimInvalid,
+      currentValue,
+      describedBy,
+      effectiveDisabled,
+      groupName,
+      handleChange,
+      invalidValue,
+      size,
+      status
+    ]
   )
+
+  const handleFocusOut = (event: React.FocusEvent<HTMLDivElement>) => {
+    const next = event.relatedTarget
+    if (next && event.currentTarget.contains(next)) return
+    formItemControl?.onBlur?.()
+  }
 
   return (
     <RadioGroupContext.Provider value={contextValue}>
@@ -140,9 +171,9 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
         role={role}
         aria-labelledby={labelledby}
         aria-describedby={describedBy}
-        aria-invalid={status === 'error' ? true : props['aria-invalid']}
         aria-disabled={effectiveDisabled || undefined}
-        onKeyDown={handleKeyDown}>
+        onKeyDown={handleKeyDown}
+        onBlur={handleFocusOut}>
         {Children.count(children) > 0
           ? children
           : options?.map((option) => (

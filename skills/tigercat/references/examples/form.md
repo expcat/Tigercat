@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## AutoComplete
 
-Note: 打字只改 query，点选项才 `onChange(option.value)`。未选是 `undefined`；`''` 是合法值。`defaultActiveFirstOption` 默认 true 时 Enter 选高亮项，自由文本用失焦提交或关掉该 prop。空态走 `empty.noResults`。
+Note: 关层（完成、点外面、受控关闭）提交或还原。原生 `name` 提交已提交的值，展示用提交时的标签。缺键、`null` 和 `''` 是未提交。空查询不命中 `value` 或 `label` 为 `''` 的选项。没有可选项时 Enter 提交查询。组合输入期间把键交给输入法。打开着的空列表 `aria-expanded` 仍是真。只读用 `readOnly`。
 
 Vue: `<AutoComplete v-model="value" :options="options" />`
 
@@ -21,7 +21,7 @@ React: `<AutoComplete value={value} options={options} onChange={(next) => setVal
 
 ## Cascader
 
-Note: value 是 path 数组；未选是 `undefined`，不要用 `[]`。Clear 发出 `undefined`。搜索即时，空态走 `empty.noResults`。列导航读 `dir`。
+Note: 空路径是 `[]`。缺键、`null` 和 `''` 都是 `[]`。对不上的段保留原始键。浏览路径只在打开时初始化。懒加载的鼠标、Enter 和方向键走同一道。列、返回、展开文案在 `locale.cascader`，不在 `select`。只读用 `readOnly`。
 
 Vue: `<Cascader v-model="value" :options="options" />`
 
@@ -43,11 +43,15 @@ React: `<CheckboxGroup value={values} onChange={setValues}><Checkbox value="a">A
 
 ## ColorPicker
 
+Note: 文本在失焦或 Enter 时才按最终格式提交。解析失败留在草稿里并标成错误，不上屏，隐藏域提交空。饱和度、色相和透明度在拖动中只更新预览，松手再写入。触发按钮带 `aria-expanded`。只读用 `readOnly`。
+
 Vue: `<ColorPicker v-model="value" />`
 
 React: `<ColorPicker value={value} onChange={setValue} />`
 
 ## ColorSwatch
+
+Note: 选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex 与 `rgb()` 可以是同一支。解析不了的字符串不涂成颜色。只读用 `readOnly`。
 
 Vue: `<ColorSwatch v-model="value" :colors="colors" />`
 
@@ -55,13 +59,15 @@ React: `<ColorSwatch value={value} colors={colors} onChange={setValue} />`
 
 ## CronEditor
 
+Note: 提交给表单的值是空，或一份通过 5 段规则的表达式。非法文本留在草稿里，错误走 FormItem，输入过程用 `polite`。空值的字段显示空，不画成五个 `*`。只读用 `readOnly`：可以聚焦和提交，不能改值。
+
 Vue: `<CronEditor v-model="value" />`
 
 React: `<CronEditor value={value} onChange={setValue} />`
 
 ## DatePicker
 
-Note: 空范围是 `null`。进行中的范围才是元组。不要用 `[null, null]` 表示空范围。日期是本地日历日。
+Note: 存储和 `name` 是公历日历日（`YYYY-MM-DD`，范围 `start|end`）。展示可以本地化，解析用生成这段文字的同一套历法和数字。点选、键入、快捷方式和确定走同一道禁用边界；结束早于开始会对调。区间第一次点选只预览，确定提交完整区间，未完成留在面板里。空是 `null`。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`，打开只有 `update:open`。
 
 Vue: `<DatePicker v-model="value" />`
 
@@ -69,7 +75,7 @@ React: `<DatePicker value={date} onChange={setDate} />`
 
 ## Form
 
-Note: 值对象是 Vue `modelValue`（`v-model`）/ React `value`。Wizard 步下标走 `onStepChange`，不是表单 values。Form `size` 是 `sm|md|lg`。
+Note: 值对象是 Vue `modelValue`（`v-model`）/ React `value`。父级要把 `update:modelValue` 写回自己的模型。`required` 会参与校验。一次 `validate()` 作废仍在飞的上一次。失败提交聚焦第一个可聚焦的无效控件。Wizard 步下标走 `onStepChange`。Form `size` 是 `sm|md|lg`。
 
 Vue: `<Form v-model="form"><FormItem name="name" label="Name"><Input /></FormItem></Form>`
 
@@ -77,7 +83,7 @@ React: `<Form value={form} onChange={setForm}><FormItem name="name" label="Name"
 
 ## FormItem
 
-Note: 具名 FormItem 注入 context。省略公开 value/`checked`/`fileList` 时从 model 取值（boolean/list/tuple 不会把 `''` 当成字符串）。字段请用 RadioGroup，不要把单颗 Radio 当 field。
+Note: 具名 FormItem 只把值和校验接到第一个控件。`required` 合并成一条规则。错误文本一直在文档里：字段校验是 `role="status"`，提交失败是 `role="alert"`。省略公开 value/`checked`/`fileList` 时从模型取值（boolean/list/tuple 不会把 `''` 当成字符串）。单颗 Radio 写入自己的选项值。
 
 Vue: `<FormItem name="name" label="Name"><Input /></FormItem>`
 
@@ -107,7 +113,7 @@ React: `<InputGroupAddon>https://</InputGroupAddon>`
 
 ## InputNumber
 
-Note: React `onChange` 收到 `number | null`。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。
+Note: React `onChange` 收到 `number | null`。值可以是有限数字或数字字符串，`null` 和 `''` 是空。`controlsPosition="both"` 是两侧按钮；`snapToStep` 默认关闭，步长只约束按钮和方向键。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。可访问名来自标签或 `aria-label`。
 
 Vue: `<InputNumber v-model="value" />`
 
@@ -127,7 +133,7 @@ React: `<MaskInput value={value} mask="##/##/####" onChange={(raw) => setValue(r
 
 ## Mentions
 
-Note: 插入的是 `prefix + option.value + 空格`。字段 props 与 Textarea 对齐：`autoResize` / `maxLength` / `showCount` / `readonly`（`readOnly` 别名）/ `clearable`（默认 false）。不要把 `prefix` 当成 Input 的前缀槽。
+Note: 插入读文本框当前值和选区。解析和插入共用同一套分隔符。搜索事件带上前缀。组合输入期间不插入。清除文案是 `common.clearText`。只读用 `readOnly`，不能从列表插入。不要把 `prefix` 当成 Input 的前缀槽。
 
 Vue: `<Mentions v-model="value" :options="options" />`
 
@@ -135,7 +141,7 @@ React: `<Mentions value={value} options={options} onChange={setValue} />`
 
 ## NumberKeyboard
 
-Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。`phone` 默认 11 位大陆手机号，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。组是一个 Tab 停。
+Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。打开后焦点在对话框里，当前键可见。进入的值先按模式收成合法串，收不干净当空。`phone` 默认 11 位，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。只读用 `readOnly`，只读键不可激活。
 
 Vue: `<NumberKeyboard v-model="value" />`
 
@@ -149,7 +155,7 @@ React: `<Radio checked={checked} onChange={setChecked} value="a">A</Radio>`
 
 ## RadioGroup
 
-Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。字段请用 RadioGroup，不要把单颗 Radio 当 FormItem。
+Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。具名 FormItem 里的单颗 Radio 写入该选项的 `value`。
 
 Vue: `<RadioGroup v-model="value"><Radio value="a">A</Radio></RadioGroup>`
 
@@ -157,7 +163,7 @@ React: `<RadioGroup value={value} onChange={setValue}><Radio value="a">A</Radio>
 
 ## Select
 
-Note: 未选是 `undefined`（多选 `[]`）；`''` 是合法选项值。React 单选 Clear 的 `onChange` 第一参是 `undefined`，不要收成 `''`。搜索框即时更新，`onSearchChange` 才走 debounce。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）；TreeSelect 同职是 `height`，也接受 `listHeight`。
+Note: 单选未选是 `null`（`undefined` 表示非受控），多选未选是 `[]`。`''` 是合法选项值。Clear 发出 `null` 或 `[]`。创建项留在列表里，直到 `options` 接过去；完全相同才不算新建。小屏列表仍锚在触发器上。搜索防抖读最新回调。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）。列、返回和展开文案不在 Select 语言包。
 
 Vue: `<Select v-model="value" :options="options" />`
 
@@ -165,7 +171,7 @@ React: `<Select value={value} options={options} onChange={(next) => setValue(nex
 
 ## Signature
 
-Note: 受控值是 SVG data URL 或 `''`（空签）。光栅导出走 `toDataURL()`，不要把 PNG 当受控值。`readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）；可聚焦并展示已有签名；`disabled` 才出 Tab。读 FormItem；id/aria 在画板 widget 上。
+Note: 受控值是空，或当前笔画导出的 SVG。解析不了的字符串当空，不提交原文。单点在画布、受控值和 `toDataURL()` 里是同一笔。Escape 和 `pointercancel` 丢掉当前笔。一次落笔写一次。只读用 `readOnly`：可聚焦、可提交、不能画。`disabled` 才离开 Tab 序。读 FormItem；id/aria 在画板 widget 上。
 
 Vue: `<Signature v-model="value" />`
 
@@ -173,15 +179,11 @@ React: `<Signature value={value} onChange={setValue} />`
 
 ## Slider
 
+Note: Vue 只认 `modelValue` / `update:modelValue`。方向读最近的 `dir`，否则读 ConfigProvider。拖动松手才写入表单，键盘立即写入。`marks` 过密时只标两端。
+
 Vue: `<Slider v-model="value" />`
 
 React: `<Slider value={value} onChange={setValue} />`
-
-## Stepper
-
-Vue: `<Stepper v-model="value" />`
-
-React: `<Stepper value={value} onChange={setValue} />`
 
 ## Switch
 
@@ -190,6 +192,8 @@ Vue: `<Switch v-model="checked">Label</Switch>`
 React: `<Switch checked={checked} onChange={setChecked}>Label</Switch>`
 
 ## TagsInput
+
+Note: 只读用 `readOnly`。粘贴在光标处插入后再按分隔符切开。错误只走 FormItem。拒绝重复或超限时给一句实时说明。
 
 Vue: `<TagsInput v-model="tags" />`
 
@@ -205,7 +209,7 @@ React: `<Textarea value={value} onChange={(next) => setValue(next)} />`
 
 ## TimePicker
 
-Note: 值是 24h `HH:mm` / `HH:mm:ss`（`showSeconds`）。`format` 只影响显示和键入。列点改草稿，OK 才 `onChange`。空单值 `null`；空范围也是 `null`。DatePicker 空范围同样是 `null`，进行中才是元组。`locale` 只收官方对象。
+Note: 值是 24h `HH:mm`；`showSeconds` 为真才留秒。此刻、键入和确定共用 `minTime` / `maxTime` / `disabledTime`。结束早于开始会对调。半截区间留在元组里，空单值是 `null`。桌面列和手机 select 同时在文档里，用 CSS 切换。`name` 提交同一套字符串。只读用 `readOnly`。`locale` 只收官方对象。
 
 Vue: `<TimePicker v-model="value" />`
 
@@ -213,13 +217,15 @@ React: `<TimePicker value={value} onChange={setValue} />`
 
 ## Transfer
 
+Note: 目标只留 `value`，初始值只留 `defaultValue`。数据源按字符串键收成一条，`1` 和 `'1'` 是同一行。搜索、全选和移动只处理当前可见项。搜索框的 Enter 不提交外层表单。滤掉的已选项单独成条，可以一次清掉。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`。
+
 Vue: `<Transfer v-model="targetKeys" :data-source="dataSource" />`
 
 React: `<Transfer value={targetKeys} dataSource={dataSource} onChange={setTargetKeys} />`
 
 ## TreeSelect
 
-Note: 选中的是节点 `key` 不是节点上的 `value`。未选是 `undefined`（多选 `[]`）；`''` / `0` 是合法 key。下拉是 `tree`。空态走 `empty.noResults`。`checkStrictly` 默认 true（父子独立）；Tree 默认 false（级联）。overlay 高度是 `height`（默认 256），`listHeight` 是同职别名（两者都传时 `listHeight` 胜出）。List 页窗是 `virtualHeight`；Tree `height` 是页面窗口。
+Note: 选中的是节点 `key`。空单选是 `null`，空多选是 `[]`。`''` 不是键，`0` 是合法键。勾选框表示级联，`checkStrategy` 只决定提交哪些键；`checkStrictly` 时不按策略过滤。搜索零命中是空列表。`defaultExpandAll` 只在树第一次有数据时生效。浮层高度只留 `listHeight`。文案在 `locale.treeSelect`。只读用 `readOnly`。
 
 Vue: `<TreeSelect v-model="value" :tree-data="treeData" />`
 
@@ -227,8 +233,10 @@ React: `<TreeSelect value={value} treeData={treeData} onChange={(next) => setVal
 
 ## Upload
 
+Note: 界面、进度、`submit` 和表单写入用同一份列表。`name` 是表单字段，`fileFieldName` 是请求里的文件字段。成功时写回可用地址；没有地址不把 uid 当结果。`multiple` 为假时拖拽也只留第一个。失败行用同一把在途锁重试。只读用 `readOnly`。
+
 Vue: `<Upload v-model:file-list="fileList" />`
 
 React: `<Upload fileList={fileList} onChange={(file, next) => setFileList(next)} />`
 
-Imports: prefer PascalCase component subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`; keep root named exports for convenience-only usage, hooks/composables, `Message` / `notification` command APIs, and shared types.
+Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.

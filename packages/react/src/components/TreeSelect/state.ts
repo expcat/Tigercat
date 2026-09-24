@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   TIGER_CHROME_ATTR,
-  TREE_SELECT_DEFAULT_HEIGHT,
-  resolveTreeSelectListHeight,
+  calculateCheckedState,
   coerceTreeSelectFormValue,
   commitTreeSelectNode,
+  countTreeNodes,
+  decideAfterBranchLoad,
+  gateBranchLoad,
   getEmptyLabels,
   getFirstVisibleChildKey,
   getPickerComboboxAria,
@@ -12,30 +14,44 @@ import {
   getSelectLabels,
   getTreeKeyboardAction,
   getTreeSelectDisplayLabel,
+  getTreeSelectLabels,
   getTreeSelectOpenExpandedKeys,
   getTreeSelectRootClasses,
   getTreeSelectSelectedKeys,
   getTreeSelectTreeItemId,
   getTreeSelectTriggerClasses,
   getTreeSelectTriggerKeyIntent,
+  getFixedVirtualRange,
   getTreeSelectVirtualItemHeight,
   getTreeSelectVisibleIndex,
+  isCurrentLoadToken,
   isSelectTypeaheadCharacter,
   isTreeNodeExpandable,
   isTreeSelectValueEmpty,
   mergeAriaDescribedBy,
   mergeTigerLocale,
+  nextLoadToken,
+  nodeHasChildren,
   normalizeTreeSelectValue,
   rememberTreeSelectLabel,
+  resolveTreeSelectListHeight,
   resolveTreeSelectVisibleItems,
+  sameTreeKey,
   serializeTreeSelectFormValues,
+  shouldApplyTreeSelectDefaultExpandAll,
+  shouldSeedTreeSelectFormDefault,
   shouldShowTreeSelectClear,
+  shouldSubmitNativeField,
   toggleTreeSelectExpandedKey,
+  treeKeyId,
+  treeSelectValuesEqual,
+  treeSetHas,
   type InputStatus,
   type TreeNode,
   type TreeSelectValue,
   type VisibleTreeItem
 } from '@expcat/tigercat-core'
+import type { VirtualListHandle } from '../VirtualList'
 import { useControlledState } from '../../hooks/useControlledState'
 import { useTigerConfig } from '../ConfigProvider'
 import { useInputGroupContext } from '../InputGroup'
@@ -55,6 +71,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
     searchValue,
     defaultSearchValue = '',
     clearable = true,
+    readOnly = false,
     emptyText,
     multiple = false,
     checkStrictly = false,
@@ -63,7 +80,6 @@ export function useTreeSelectController(props: TreeSelectProps) {
     expandedKeys,
     defaultExpandedKeys,
     virtual = false,
-    height = TREE_SELECT_DEFAULT_HEIGHT,
     listHeight,
     itemHeight: itemHeightProp,
     loading = false,
@@ -71,7 +87,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
     filterFn,
     autoClearSearchValue = true,
     labels: labelsOverride,
-    onSearchChange,
+    onSearch,
     onOpenChange,
     onExpand,
     className,
@@ -95,13 +111,18 @@ export function useTreeSelectController(props: TreeSelectProps) {
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const labels = useMemo(
+  const selectLabels = useMemo(
     () => getSelectLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const treeLabels = useMemo(
+    () => getTreeSelectLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
   const emptyLabels = useMemo(() => getEmptyLabels(mergedLocale), [mergedLocale])
 
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const isReadOnly = Boolean(readOnly) && !effectiveDisabled
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
   const shakeTrigger = formItemControl?.shakeTrigger
   const effectiveId = id ?? formItemControl?.id
@@ -120,11 +141,16 @@ export function useTreeSelectController(props: TreeSelectProps) {
       : undefined
   const required = Boolean(formItemControl?.required)
 
+  const formNamed = Boolean(formItemControl?.name)
   const incomingValue =
-    value !== undefined ? value : coerceTreeSelectFormValue(formItemControl?.value, multiple)
-  const [selected, setSelected] = useControlledState<TreeSelectValue>({
+    value !== undefined
+      ? value
+      : formNamed
+        ? coerceTreeSelectFormValue(formItemControl?.value, multiple)
+        : undefined
+  const [selected, setSelectedState] = useControlledState<TreeSelectValue>({
     value: incomingValue,
-    defaultValue: defaultValue ?? (multiple ? EMPTY_MULTIPLE_VALUE : undefined),
+    defaultValue: defaultValue ?? (multiple ? EMPTY_MULTIPLE_VALUE : null),
     onChange: (next) => {
       const normalized = normalizeTreeSelectValue(next, multiple)
       onChange?.(normalized)
@@ -132,6 +158,14 @@ export function useTreeSelectController(props: TreeSelectProps) {
     },
     postState: (next) => normalizeTreeSelectValue(next, multiple)
   })
+  const setSelected = useCallback(
+    (next: TreeSelectValue) => {
+      const normalized = normalizeTreeSelectValue(next, multiple)
+      if (treeSelectValuesEqual(normalized, selected, multiple)) return
+      setSelectedState(normalized)
+    },
+    [multiple, selected, setSelectedState]
+  )
 
   const [isOpen, setOpen] = useControlledState({
     value: open,
@@ -142,7 +176,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
   const [searchQuery, setSearchQuery] = useControlledState({
     value: searchValue,
     defaultValue: defaultSearchValue,
-    onChange: onSearchChange
+    onChange: onSearch
   })
 
   const instanceId = useId()
@@ -154,6 +188,10 @@ export function useTreeSelectController(props: TreeSelectProps) {
   )
   const [activeKey, setActiveKey] = useState<string | number | undefined>(undefined)
   const labelCacheRef = useRef(new Map<string | number, string>())
+  const loadTokensRef = useRef(new Map<string, number>())
+  const loadedIdsRef = useRef(new Set<string>())
+  const treeCountRef = useRef(0)
+  const seededRef = useRef(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -163,6 +201,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
   if (treeDataPropRef.current !== treeDataProp) {
     treeDataPropRef.current = treeDataProp
     setLoadedData(null)
+    loadedIdsRef.current = new Set()
   }
 
   const treeData = loadedData ?? treeDataProp
@@ -190,10 +229,10 @@ export function useTreeSelectController(props: TreeSelectProps) {
   )
 
   const displayLabel = getTreeSelectDisplayLabel(treeData, selected, labelCacheRef.current)
-  const placeholderText = placeholder ?? labels.placeholder
+  const placeholderText = placeholder ?? selectLabels.placeholder
   const displayText = isTreeSelectValueEmpty(selected, multiple) ? placeholderText : displayLabel
   const emptyCopy = loading
-    ? labels.loadingText
+    ? selectLabels.loadingText
     : emptyText?.trim()
       ? emptyText
       : emptyLabels.noResults
@@ -201,9 +240,19 @@ export function useTreeSelectController(props: TreeSelectProps) {
     clearable,
     disabled: effectiveDisabled,
     value: selected,
-    multiple
+    multiple,
+    readOnly: isReadOnly
   })
   const itemHeight = itemHeightProp ?? getTreeSelectVirtualItemHeight(size)
+  const listHeightPx = resolveTreeSelectListHeight(listHeight)
+  const virtualListRef = useRef<VirtualListHandle | null>(null)
+  const [listScrollTop, setListScrollTop] = useState(0)
+  const activeIndex = visibleItems.findIndex((item) => sameTreeKey(item.key, activeKey))
+
+  useLayoutEffect(() => {
+    if (!isOpen || !virtual || activeIndex < 0) return
+    virtualListRef.current?.scrollToIndex(activeIndex, 'auto')
+  }, [activeIndex, isOpen, virtual])
 
   const setExpanded = useCallback(
     (next: Set<string | number>) => {
@@ -218,15 +267,15 @@ export function useTreeSelectController(props: TreeSelectProps) {
   }, [setOpen])
 
   const openDropdown = useCallback(() => {
-    if (effectiveDisabled) return
+    if (effectiveDisabled || isReadOnly) return
     setOpen(true)
-  }, [effectiveDisabled, setOpen])
+  }, [effectiveDisabled, isReadOnly, setOpen])
 
   const toggleDropdown = useCallback(() => {
-    if (effectiveDisabled) return
+    if (effectiveDisabled || isReadOnly) return
     if (isOpen) closeDropdown()
     else openDropdown()
-  }, [closeDropdown, effectiveDisabled, isOpen, openDropdown])
+  }, [closeDropdown, effectiveDisabled, isOpen, isReadOnly, openDropdown])
 
   const focusCombobox = useCallback(() => {
     triggerRef.current?.focus()
@@ -234,7 +283,8 @@ export function useTreeSelectController(props: TreeSelectProps) {
 
   const commitKey = useCallback(
     (key: string | number) => {
-      const node = visibleItems.find((item) => item.key === key)?.node
+      if (isReadOnly || effectiveDisabled) return
+      const node = visibleItems.find((item) => sameTreeKey(item.key, key))?.node
       if (node) rememberTreeSelectLabel(labelCacheRef.current, key, node.label)
       const next = commitTreeSelectNode({
         treeData,
@@ -262,7 +312,9 @@ export function useTreeSelectController(props: TreeSelectProps) {
       setSearchQuery,
       setSelected,
       treeData,
-      visibleItems
+      visibleItems,
+      isReadOnly,
+      effectiveDisabled
     ]
   )
 
@@ -274,85 +326,139 @@ export function useTreeSelectController(props: TreeSelectProps) {
   )
 
   const loadChildren = useCallback(
-    async (node: TreeNode) => {
-      if (!loadData) return
-      setLoadingKeys((current) => new Set(current).add(node.key))
+    async (node: TreeNode, intent: 'select' | 'expand') => {
+      if (!loadData || node.disabled) return
+      const id = treeKeyId(node.key)
+      const token = nextLoadToken(loadTokensRef.current, id)
+      setLoadingKeys((current) => new Set(current).add(id))
+      if (!treeSetHas(expandedSet, node.key)) {
+        setExpanded(toggleTreeSelectExpandedKey(expandedSet, node.key))
+      }
       try {
         const children = await loadData(node)
+        if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
+        loadedIdsRef.current.add(id)
         const inject = (nodes: TreeNode[]): TreeNode[] =>
           nodes.map((item) =>
-            item.key === node.key
-              ? { ...item, children, isLeaf: children.length === 0 ? true : item.isLeaf }
+            sameTreeKey(item.key, node.key)
+              ? { ...item, children }
               : item.children
                 ? { ...item, children: inject(item.children) }
                 : item
           )
         setLoadedData((current) => inject(current ?? treeDataProp))
-        setExpanded(new Set(expandedSet).add(node.key))
+        const decision = decideAfterBranchLoad({
+          childCount: children.length,
+          intent,
+          commitLoadedBranch: false
+        })
+        if (decision.expand && !treeSetHas(expandedSet, node.key)) {
+          setExpanded(new Set(expandedSet).add(node.key))
+        }
+        if (decision.commit) commitKey(node.key)
+      } catch {
+        if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
       } finally {
+        if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
         setLoadingKeys((current) => {
           const next = new Set(current)
-          next.delete(node.key)
+          next.delete(id)
           return next
         })
       }
     },
-    [expandedSet, loadData, setExpanded, treeDataProp]
+    [commitKey, expandedSet, loadData, setExpanded, treeDataProp]
   )
 
   const handleNodeSelect = useCallback(
     (item: VisibleTreeItem) => {
-      if (item.node.disabled || effectiveDisabled) return
-      const expandable = isTreeNodeExpandable(item.node, hasLoadData)
-      if (expandable && (!item.node.children || item.node.children.length === 0) && loadData) {
-        void loadChildren(item.node)
+      if (item.node.disabled || effectiveDisabled || isReadOnly) return
+      const id = treeKeyId(item.key)
+      const gate = gateBranchLoad({
+        disabled: item.node.disabled,
+        isLeaf: item.node.isLeaf,
+        hasChildren: nodeHasChildren(item.node),
+        hasLoadData,
+        loaded: loadedIdsRef.current.has(id),
+        loading: loadingKeys.has(id)
+      })
+      if (gate === 'reject') return
+      if (gate === 'load') {
+        void loadChildren(item.node, 'select')
         return
       }
       setActiveKey(item.key)
       commitKey(item.key)
     },
-    [commitKey, effectiveDisabled, hasLoadData, loadChildren, loadData]
+    [commitKey, effectiveDisabled, hasLoadData, isReadOnly, loadChildren, loadingKeys]
   )
 
   const handleExpandClick = useCallback(
     (item: VisibleTreeItem, event: { stopPropagation: () => void }) => {
       event.stopPropagation()
-      if (item.node.disabled) return
-      const expandable = isTreeNodeExpandable(item.node, hasLoadData)
-      if (expandable && (!item.node.children || item.node.children.length === 0) && loadData) {
-        void loadChildren(item.node)
+      if (item.node.disabled || isReadOnly) return
+      const id = treeKeyId(item.key)
+      const gate = gateBranchLoad({
+        disabled: item.node.disabled,
+        isLeaf: item.node.isLeaf,
+        hasChildren: nodeHasChildren(item.node),
+        hasLoadData,
+        loaded: loadedIdsRef.current.has(id),
+        loading: loadingKeys.has(id)
+      })
+      if (gate === 'load') {
+        void loadChildren(item.node, 'expand')
         return
       }
       toggleExpand(item.key)
       setActiveKey(item.key)
     },
-    [hasLoadData, loadChildren, loadData, toggleExpand]
+    [hasLoadData, isReadOnly, loadChildren, loadingKeys, toggleExpand]
   )
 
   const clearSelection = useCallback(
     (event?: { stopPropagation: () => void }) => {
       event?.stopPropagation()
-      setSelected(multiple ? [] : undefined)
+      if (isReadOnly || effectiveDisabled) return
+      setSelected(multiple ? [] : null)
       requestAnimationFrame(() => triggerRef.current?.focus())
     },
-    [multiple, setSelected]
+    [effectiveDisabled, isReadOnly, multiple, setSelected]
   )
 
   useEffect(() => {
-    if (expandedKeys !== undefined) return
-    if (!defaultExpandAll) return
-    setLocalExpanded((current) => {
-      const next = getTreeSelectOpenExpandedKeys({
+    if (
+      !shouldSeedTreeSelectFormDefault({
+        alreadySeeded: seededRef.current,
+        fieldName: formItemControl?.name,
+        controlledValue: value,
+        formValue: formItemControl?.value,
+        defaultValue
+      })
+    ) {
+      return
+    }
+    seededRef.current = true
+    formItemControl?.onChange?.(normalizeTreeSelectValue(defaultValue, multiple))
+  }, [defaultValue, formItemControl, multiple, value])
+
+  useEffect(() => {
+    const nextCount = countTreeNodes(treeData)
+    const apply = shouldApplyTreeSelectDefaultExpandAll(
+      treeCountRef.current,
+      nextCount,
+      defaultExpandAll
+    )
+    treeCountRef.current = nextCount
+    if (!apply || expandedKeys !== undefined) return
+    setLocalExpanded((current) =>
+      getTreeSelectOpenExpandedKeys({
         treeData,
         selectedKeys,
         defaultExpandAll: true,
         expandedKeys: current
       })
-      if (next.size === current.size && [...next].every((key) => current.has(key))) {
-        return current
-      }
-      return next
-    })
+    )
   }, [defaultExpandAll, expandedKeys, selectedKeys, treeData])
 
   useEffect(() => {
@@ -361,7 +467,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
       getTreeSelectOpenExpandedKeys({
         treeData,
         selectedKeys,
-        defaultExpandAll,
+        defaultExpandAll: false,
         expandedKeys: expandedSet
       })
     )
@@ -382,8 +488,11 @@ export function useTreeSelectController(props: TreeSelectProps) {
     (key: string) => {
       const current = activeKey ?? visibleItems[0]?.key
       if (current === undefined) return
-      const item = visibleItems.find((row) => row.key === current)
+      const item = visibleItems.find((row) => sameTreeKey(row.key, current))
       if (!item) return
+      const visual = calculateCheckedState(treeData, selectedKeys, checkStrictly)
+      const fully = visual.checked.some((keyId) => sameTreeKey(keyId, current))
+      const half = visual.halfChecked.some((keyId) => sameTreeKey(keyId, current))
       const action = getTreeKeyboardAction({
         key,
         nodeKey: current,
@@ -392,9 +501,10 @@ export function useTreeSelectController(props: TreeSelectProps) {
         parentKey: item.parentKey,
         firstChildKey: getFirstVisibleChildKey(visibleItems, current),
         isExpandable: isTreeNodeExpandable(item.node, hasLoadData),
-        isExpanded: expandedSet.has(current),
-        isParentExpanded: item.parentKey !== undefined && expandedSet.has(item.parentKey),
-        isChecked: selectedKeys.includes(current),
+        isExpanded: treeSetHas(expandedSet, current),
+        isParentExpanded:
+          item.parentKey !== undefined && treeSetHas(expandedSet, item.parentKey),
+        isChecked: fully && !half,
         selectable: true,
         checkable: multiple,
         dir
@@ -406,16 +516,39 @@ export function useTreeSelectController(props: TreeSelectProps) {
         return true
       }
       if (action.type === 'toggleExpand') {
-        toggleExpand(action.key)
+        const target = visibleItems.find((row) => sameTreeKey(row.key, action.key))
+        const gate = target
+          ? gateBranchLoad({
+              disabled: target.node.disabled,
+              isLeaf: target.node.isLeaf,
+              hasChildren: nodeHasChildren(target.node),
+              hasLoadData,
+              loaded: loadedIdsRef.current.has(treeKeyId(target.key)),
+              loading: loadingKeys.has(treeKeyId(target.key))
+            })
+          : 'ready'
+        if (target && gate === 'load' && !treeSetHas(expandedSet, target.key)) {
+          void loadChildren(target.node, 'expand')
+        } else {
+          toggleExpand(action.key)
+        }
         setActiveKey(action.key)
         return true
       }
-      if (action.type === 'select') {
-        commitKey(action.key)
-        return true
-      }
-      if (action.type === 'check') {
-        commitKey(action.key)
+      if (action.type === 'select' || action.type === 'check') {
+        const target = visibleItems.find((row) => sameTreeKey(row.key, action.key))
+        const gate = target
+          ? gateBranchLoad({
+              disabled: target.node.disabled,
+              isLeaf: target.node.isLeaf,
+              hasChildren: nodeHasChildren(target.node),
+              hasLoadData,
+              loaded: loadedIdsRef.current.has(treeKeyId(target.key)),
+              loading: loadingKeys.has(treeKeyId(target.key))
+            })
+          : 'ready'
+        if (target && gate === 'load') void loadChildren(target.node, 'select')
+        else commitKey(action.key)
         return true
       }
       if (action.type === 'collapseAndFocus') {
@@ -427,19 +560,24 @@ export function useTreeSelectController(props: TreeSelectProps) {
     },
     [
       activeKey,
+      checkStrictly,
       commitKey,
       dir,
       expandedSet,
       hasLoadData,
+      loadChildren,
+      loadingKeys,
       multiple,
       selectedKeys,
       toggleExpand,
+      treeData,
       visibleItems
     ]
   )
 
   const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (effectiveDisabled) return
+    if (isReadOnly) return
     const fromSearchInput = event.currentTarget.tagName === 'INPUT'
     if (!isOpen && isSelectTypeaheadCharacter(event.key, event)) {
       event.preventDefault()
@@ -505,8 +643,19 @@ export function useTreeSelectController(props: TreeSelectProps) {
     onBlur?.(event)
   }
 
+  const virtualRange = getFixedVirtualRange(
+    listScrollTop,
+    listHeightPx,
+    itemHeight,
+    visibleItems.length,
+    5
+  )
+  const activeInWindow =
+    !virtual || (activeIndex >= virtualRange.startIndex && activeIndex <= virtualRange.endIndex)
   const activeOptionId =
-    isOpen && activeKey !== undefined ? getTreeSelectTreeItemId(treeId, activeKey) : undefined
+    isOpen && activeKey !== undefined && activeInWindow
+      ? getTreeSelectTreeItemId(treeId, activeKey)
+      : undefined
   const comboboxAria = getPickerComboboxAria({
     expanded: isOpen,
     listboxId: treeId,
@@ -534,11 +683,13 @@ export function useTreeSelectController(props: TreeSelectProps) {
     placeholderText,
     emptyCopy,
     showClear,
-    clearAriaLabel: labels.clearAriaLabel,
-    searchPlaceholder: labels.searchPlaceholder,
-    doneText: labels.doneText,
-    expandAriaLabel: labels.expandAriaLabel,
-    collapseAriaLabel: labels.collapseAriaLabel,
+    clearAriaLabel: selectLabels.clearAriaLabel,
+    searchPlaceholder: selectLabels.searchPlaceholder,
+    doneText: selectLabels.doneText,
+    expandAriaLabel: treeLabels.expandAriaLabel,
+    collapseAriaLabel: treeLabels.collapseAriaLabel,
+    loadingText: selectLabels.loadingText,
+    readOnly: isReadOnly,
     triggerClasses: getTreeSelectTriggerClasses({
       size,
       disabled: effectiveDisabled,
@@ -559,8 +710,10 @@ export function useTreeSelectController(props: TreeSelectProps) {
     required,
     size,
     virtual,
-    height: resolveTreeSelectListHeight(height, listHeight),
+    height: listHeightPx,
     itemHeight,
+    virtualListRef,
+    onListScroll: setListScrollTop,
     dir,
     multiple,
     loading,
@@ -570,7 +723,15 @@ export function useTreeSelectController(props: TreeSelectProps) {
     setActiveKey,
     expandedSet,
     selectedKeys,
-    hiddenValues: effectiveName ? serializeTreeSelectFormValues(selected, multiple) : [],
+    hiddenValues: shouldSubmitNativeField({
+      name: effectiveName,
+      disabled: effectiveDisabled
+    })
+      ? serializeTreeSelectFormValues(selected, multiple)
+      : [],
+    checkedState: calculateCheckedState(treeData, selectedKeys, checkStrictly),
+    isExpanded: (key: string | number) => treeSetHas(expandedSet, key),
+    isLoadingKey: (key: string | number) => loadingKeys.has(treeKeyId(key)),
     handleNodeSelect,
     handleExpandClick,
     handleTriggerKeyDown,

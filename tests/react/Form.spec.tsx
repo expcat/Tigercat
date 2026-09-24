@@ -328,7 +328,7 @@ describe('Form', () => {
         await formRef.current?.validateField('username')
       })
 
-      const message = await screen.findByRole('alert')
+      const message = await screen.findByRole('status')
       expect(message).toHaveTextContent('此欄位為必填項')
       expect(message).not.toHaveTextContent('此字段为必填项')
       expect(message).not.toHaveTextContent('This field is required')
@@ -381,7 +381,7 @@ describe('Form', () => {
       })
 
       await waitFor(() => {
-        const alert = screen.getByRole('alert')
+        const alert = screen.getByRole('status')
         expect(alert).toBeInTheDocument()
         expect(alert).toHaveTextContent('Field is required')
       })
@@ -504,7 +504,7 @@ describe('Form', () => {
               <Input
                 aria-label="email"
                 value={model.email}
-                onChange={(event) => setModel({ email: event.target.value })}
+                onChange={(next) => setModel({ email: String(next) })}
               />
             </FormItem>
           </Form>
@@ -566,7 +566,7 @@ describe('Form', () => {
               <Input
                 aria-label="email"
                 value={model.email}
-                onChange={(event) => setModel({ email: event.target.value })}
+                onChange={(next) => setModel({ email: String(next) })}
               />
             </FormItem>
           </Form>
@@ -1172,7 +1172,7 @@ describe('Form', () => {
       )
 
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-      expect(screen.queryByText('Username taken')).not.toBeInTheDocument()
+      expect(screen.getByText('Username taken')).toBeInTheDocument()
       expect(screen.getByLabelText('username')).toHaveAttribute('aria-invalid', 'true')
     })
 
@@ -1321,7 +1321,7 @@ describe('Form', () => {
         await formRef.current?.validateField('name')
       })
 
-      const alert = await screen.findByRole('alert')
+      const alert = await screen.findByRole('status')
       expect(alert).toHaveTextContent('Name required')
     })
   })
@@ -1570,7 +1570,7 @@ describe('Form', () => {
 
       expect(input).toHaveValue('')
       await waitFor(() => {
-        expect(screen.getByRole('alert')).toHaveTextContent('Required')
+        expect(screen.getByRole('status')).toHaveTextContent('Required')
       })
     })
   })

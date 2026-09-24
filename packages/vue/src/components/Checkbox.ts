@@ -168,6 +168,18 @@ export const Checkbox = defineComponent({
       { flush: 'post' }
     )
 
+    const ownsInvalid = computed(
+      () => !inGroup.value || groupContext.value?.invalidValue === props.value
+    )
+
+    watch(
+      () => [inGroup.value, props.value] as const,
+      ([grouped, optionValue]) => {
+        if (grouped && optionValue !== undefined) groupContext.value?.claimInvalid(optionValue)
+      },
+      { immediate: true }
+    )
+
     const handleChange = (event: Event) => {
       if (effectiveDisabled.value) return
       const target = event.target as HTMLInputElement
@@ -241,9 +253,10 @@ export const Checkbox = defineComponent({
         disabled: effectiveDisabled.value,
         value: props.value,
         'aria-checked': props.indeterminate ? 'mixed' : checked.value,
-        'aria-invalid': status.value === 'error' ? true : restAttrs['aria-invalid'],
+        'aria-invalid':
+          status.value === 'error' && ownsInvalid.value ? true : restAttrs['aria-invalid'],
         'aria-required': formItemControl?.required.value ? true : restAttrs['aria-required'],
-        'aria-describedby': describedBy,
+        'aria-describedby': inGroup.value && !ownsInvalid.value ? undefined : describedBy,
         onChange: handleChange,
         onBlur: handleBlur
       })

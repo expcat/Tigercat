@@ -10,7 +10,6 @@ import {
   getTagsArrowDelta,
   getTagsInputClearButtonClasses,
   getTagsInputContainerClasses,
-  getTagsInputErrorClasses,
   getTagsInputHighlightClasses,
   getTagsInputInnerInputClasses,
   getTagsInputLabels,
@@ -18,7 +17,9 @@ import {
   mergeStyleValues,
   moveTagsHighlight,
   removeTagAt,
-  resolveTagsPasteCandidates,
+  resolveTagsPaste,
+  shouldSubmitNativeField,
+  coerceTagsFormValue,
   runShakeAnimation,
   type ComponentSize,
   type InputStatus
@@ -40,7 +41,6 @@ export const TagsInput = defineComponent({
     defaultValue: { type: Array as PropType<string[]>, default: () => [] },
     size: { type: String as PropType<ComponentSize>, default: undefined },
     status: { type: String as PropType<InputStatus>, default: undefined },
-    errorMessage: String,
     placeholder: { type: String, default: '' },
     allowDuplicates: Boolean,
     max: { type: Number, default: undefined },
@@ -52,11 +52,11 @@ export const TagsInput = defineComponent({
     },
     clearable: Boolean,
     disabled: Boolean,
-    readonly: Boolean,
+    readOnly: { type: Boolean, default: false },
     name: String,
     id: String,
     removeTagAriaLabel: String,
-    _shakeTrigger: { type: Number, default: undefined },
+
     className: String,
     style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
   },
@@ -88,21 +88,25 @@ export const TagsInput = defineComponent({
     const formValue = computed(() => formItemControl?.value.value)
     const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const labels = computed(() => getTagsInputLabels(config.value.locale))
-    const errorMsgId = `tiger-tags-input-error-${useId()}`
+    const uid = useId()
+    const rejectionId = `tiger-tags-input-rejection-${uid}`
 
     const containerRef = ref<HTMLDivElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
     const localTags = ref<string[]>([...(props.defaultValue ?? [])])
-    const tags = computed(() =>
-      props.modelValue !== undefined
-        ? props.modelValue
-        : Array.isArray(formValue.value)
-          ? formValue.value
-          : localTags.value
+    const emptyTags = ref<string[]>([])
+    const formBound = computed(
+      () => props.modelValue === undefined && Boolean(formItemControl?.name.value)
     )
+    const tags = computed(() => {
+      if (props.modelValue !== undefined) return props.modelValue
+      if (formBound.value) return coerceTagsFormValue(formValue.value) ?? emptyTags.value
+      return localTags.value
+    })
     const inputText = ref('')
     const highlightedIndex = ref<number | null>(null)
-    const isInteractive = computed(() => !effectiveDisabled.value && !props.readonly)
+    const rejection = ref('')
+    const isInteractive = computed(() => !effectiveDisabled.value && !props.readOnly)
 
     watch(
       () => [props.modelValue, formValue.value] as const,
@@ -115,7 +119,7 @@ export const TagsInput = defineComponent({
     )
 
     watch(
-      () => [status.value, formItemControl?.shakeTrigger.value, props._shakeTrigger] as const,
+      () => [status.value, formItemControl?.shakeTrigger.value] as const,
       (current, previous) => {
         if (!previous) return
         if (current[0] === 'error') runShakeAnimation(containerRef.value)
@@ -124,7 +128,7 @@ export const TagsInput = defineComponent({
     )
 
     function setTags(next: string[]) {
-      if (props.modelValue === undefined && !Array.isArray(formValue.value)) {
+      if (props.modelValue === undefined && !formBound.value) {
         localTags.value = next
       }
       emit('update:modelValue', next)
@@ -141,6 +145,12 @@ export const TagsInput = defineComponent({
       if (result.added.length > 0) {
         setTags(result.tags)
         result.added.forEach((tag) => emit('add', tag))
+      }
+      if (result.rejected.length > 0) {
+        const atLimit = props.max !== undefined && result.tags.length >= props.max
+        rejection.value = atLimit ? labels.value.limitText : labels.value.duplicateText
+      } else if (result.added.length > 0) {
+        rejection.value = ''
       }
       return result
     }
@@ -169,6 +179,7 @@ export const TagsInput = defineComponent({
     function handleKeydown(event: KeyboardEvent) {
       if (!isInteractive.value) return
       if (event.key === 'Enter') {
+        if (event.isComposing) return
         if (!inputText.value.trim()) return
         event.preventDefault()
         const result = commitCandidates([inputText.value], inputText.value)
@@ -204,11 +215,22 @@ export const TagsInput = defineComponent({
     function handlePaste(event: ClipboardEvent) {
       if (!isInteractive.value) return
       const text = event.clipboardData?.getData('text') ?? ''
-      const candidates = resolveTagsPasteCandidates(inputText.value, text, props.delimiters)
-      if (candidates.length <= 1) return
+      const input = event.target as HTMLInputElement
+      const pasted = resolveTagsPaste({
+        pending: inputText.value,
+        clipboard: text,
+        delimiters: props.delimiters,
+        selectionStart: input.selectionStart ?? undefined,
+        selectionEnd: input.selectionEnd ?? undefined
+      })
       event.preventDefault()
-      const result = commitCandidates(candidates, inputText.value)
-      inputText.value = result.added.length > 0 ? '' : result.pending
+      if (pasted.candidates.length === 0) {
+        inputText.value = pasted.pending
+        if (inputRef.value) inputRef.value.value = inputText.value
+        return
+      }
+      const result = commitCandidates(pasted.candidates, pasted.pending)
+      inputText.value = result.pending
       if (inputRef.value) inputRef.value.value = inputText.value
     }
 
@@ -245,8 +267,7 @@ export const TagsInput = defineComponent({
 
     return () => {
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
-      const activeError = status.value === 'error' && !!props.errorMessage
-      const hasExtras = activeError
+      const hasExtras = false
       const isFull = props.max !== undefined && tags.value.length >= props.max
       const removeLabelTemplate = props.removeTagAriaLabel ?? labels.value.removeTagLabel
       const tagSize = effectiveSize.value === 'lg' ? 'md' : 'sm'
@@ -259,34 +280,53 @@ export const TagsInput = defineComponent({
           typeof restAttrs['aria-describedby'] === 'string'
             ? restAttrs['aria-describedby']
             : undefined,
-          activeError ? errorMsgId : undefined
+          rejection.value ? rejectionId : undefined
         ),
         formItemControl?.describedBy.value
       )
+      const fieldId = effectiveId.value ?? `tags-${uid}`
+      const activeDescendant =
+        highlightedIndex.value !== null ? `${fieldId}-tag-${highlightedIndex.value}` : undefined
 
       const children: ReturnType<typeof h>[] = []
-      tags.value.forEach((tag, index) => {
+      if (tags.value.length > 0) {
         children.push(
           h(
-            Tag,
-            {
-              key: `${tag}-${index}`,
-              size: tagSize,
-              closable: isInteractive.value,
-              closeTabIndex: -1,
-              closeAriaLabel: formatRemoveTagLabel(removeLabelTemplate, tag),
-              class: index === highlightedIndex.value ? getTagsInputHighlightClasses() : undefined,
-              'aria-current': index === highlightedIndex.value ? 'true' : undefined,
-              onClose: (event: MouseEvent) => {
-                event.preventDefault()
-                removeAt(index)
-                inputRef.value?.focus()
-              }
-            },
-            () => tag
+            'span',
+            { key: 'tag-list', role: 'list', class: 'contents' },
+            tags.value.map((tag, index) =>
+              h(
+                'span',
+                {
+                  key: `${tag}-${index}`,
+                  id: `${fieldId}-tag-${index}`,
+                  role: 'listitem'
+                },
+                [
+                  h(
+                    Tag,
+                    {
+                      size: tagSize,
+                      closable: isInteractive.value,
+                      closeAriaLabel: formatRemoveTagLabel(removeLabelTemplate, tag),
+                      class:
+                        index === highlightedIndex.value
+                          ? getTagsInputHighlightClasses()
+                          : undefined,
+                      onClose: (event: MouseEvent) => {
+                        event.preventDefault()
+                        removeAt(index)
+                        inputRef.value?.focus()
+                      }
+                    },
+                    () => tag
+                  )
+                ]
+              )
+            )
           )
         )
-      })
+      }
 
       children.push(
         h('input', {
@@ -297,7 +337,7 @@ export const TagsInput = defineComponent({
           value: inputText.value,
           placeholder: tags.value.length === 0 ? props.placeholder : '',
           disabled: effectiveDisabled.value,
-          readonly: props.readonly,
+          readonly: props.readOnly,
           id: effectiveId.value,
           'aria-label':
             typeof restAttrs['aria-label'] === 'string' ? restAttrs['aria-label'] : undefined,
@@ -305,6 +345,7 @@ export const TagsInput = defineComponent({
           'aria-invalid': status.value === 'error' ? true : undefined,
           'aria-required': formItemControl?.required.value ? true : undefined,
           'aria-describedby': describedBy,
+          'aria-activedescendant': activeDescendant,
           onInput: handleInput,
           onKeydown: handleKeydown,
           onPaste: handlePaste,
@@ -331,17 +372,43 @@ export const TagsInput = defineComponent({
         )
       }
 
-      if (effectiveName.value && !effectiveDisabled.value) {
-        tags.value.forEach((tag, index) => {
+      if (shouldSubmitNativeField({ name: effectiveName.value, disabled: effectiveDisabled.value })) {
+        if (tags.value.length === 0) {
           children.push(
             h('input', {
-              key: `hidden-${index}`,
+              key: 'hidden-empty',
               type: 'hidden',
               name: effectiveName.value,
-              value: tag
+              value: ''
             })
           )
-        })
+        } else {
+          tags.value.forEach((tag, index) => {
+            children.push(
+              h('input', {
+                key: `hidden-${index}`,
+                type: 'hidden',
+                name: effectiveName.value,
+                value: tag
+              })
+            )
+          })
+        }
+      }
+
+      if (rejection.value) {
+        children.push(
+          h(
+            'span',
+            {
+              key: 'rejection',
+              id: rejectionId,
+              class: 'sr-only',
+              'aria-live': 'polite'
+            },
+            rejection.value
+          )
+        )
       }
 
       const containerNode = h(
@@ -368,26 +435,7 @@ export const TagsInput = defineComponent({
         children
       )
 
-      if (!hasExtras) return containerNode
-      return h(
-        'div',
-        {
-          class: classNames(
-            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-            props.className,
-            coerceClassValue(attrClass)
-          ),
-          style: mergeStyleValues(props.style, attrStyle as Record<string, unknown> | undefined)
-        },
-        [
-          containerNode,
-          h(
-            'div',
-            { id: errorMsgId, class: getTagsInputErrorClasses(), 'aria-live': 'polite' },
-            props.errorMessage
-          )
-        ]
-      )
+      return containerNode
     }
   }
 })

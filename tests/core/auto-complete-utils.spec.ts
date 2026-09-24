@@ -79,6 +79,15 @@ describe('findAutoCompleteOption', () => {
     expect(findAutoCompleteOption(options, 'BeiJing')?.value).toBe('beijing')
     expect(findAutoCompleteOption(options, 'banana')).toBeUndefined()
   })
+
+  it('does not match an option whose value or label is empty when the query is empty', () => {
+    const blank = [
+      { label: '', value: '' },
+      { label: 'Empty value', value: '' },
+      { label: '', value: 'blank-label' }
+    ]
+    expect(findAutoCompleteOption(blank, '')).toBeUndefined()
+  })
 })
 
 describe('resolveAutoCompleteBlurCommit', () => {
@@ -126,6 +135,25 @@ describe('resolveAutoCompleteBlurCommit', () => {
     })
     expect(result).toEqual({ value: undefined, query: '', didCommit: true })
   })
+
+  it('does not commit undefined again when the field is already empty', () => {
+    expect(
+      resolveAutoCompleteBlurCommit({
+        query: '',
+        committed: undefined,
+        optionList: options,
+        allowFreeInput: true
+      }).didCommit
+    ).toBe(false)
+    expect(
+      resolveAutoCompleteBlurCommit({
+        query: '',
+        committed: '',
+        optionList: options,
+        allowFreeInput: true
+      }).didCommit
+    ).toBe(false)
+  })
 })
 
 describe('resolveAutoCompleteInitialQuery', () => {
@@ -156,7 +184,8 @@ describe('getAutoCompleteOptionKey', () => {
 describe('shouldShowAutoCompleteClear', () => {
   it('shows when the query or a committed value is present', () => {
     expect(shouldShowAutoCompleteClear({ clearable: true, query: 'x' })).toBe(true)
-    expect(shouldShowAutoCompleteClear({ clearable: true, committed: '' })).toBe(true)
+    expect(shouldShowAutoCompleteClear({ clearable: true, committed: '' })).toBe(false)
+    expect(shouldShowAutoCompleteClear({ clearable: true, committed: 'apple' })).toBe(true)
     expect(shouldShowAutoCompleteClear({ clearable: true, query: '' })).toBe(false)
     expect(shouldShowAutoCompleteClear({ clearable: true, disabled: true, query: 'x' })).toBe(false)
   })

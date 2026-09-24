@@ -41,11 +41,13 @@ import {
   cloneFormValues,
   createFormErrorMap,
   createFormValidationDebouncer,
+  evaluateFieldRules,
+  firstFieldRuleError,
+  formValuesEqual,
   getValueByPath,
   isFormValidationCancelled,
+  FormValidationSupersededError,
   setValueByPath,
-  validateField as validateFieldUtil,
-  validateFormFields,
   type FormValidationDebouncer,
   type FormValidationMessages
 } from './form-validation'
@@ -77,6 +79,8 @@ export interface FormEngine extends FormController {
   subscribe: (listener: () => void) => () => void
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
   registerFieldCondition: (fieldName: string, condition?: FormFieldCondition) => void
+  registerFieldDisabled: (fieldName: string, disabled: boolean | null) => void
+  getMountedFieldNames: () => string[]
   getFieldConditionState: (
     fieldName: string,
     conditionOverride?: FormFieldCondition
@@ -92,14 +96,19 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
   const listeners = new Set<() => void>()
   const fieldRules: Record<string, FormRule | FormRule[]> = {}
   const fieldConditions: FormConditions = {}
+  const fieldDisabled: Record<string, boolean> = {}
+  const mountedFields = new Set<string>()
 
   let values: FormValues = cloneFormValues(options.initialValues ?? {})
-  const initialValues: FormValues = cloneFormValues(options.initialValues ?? {})
+  let initialValues: FormValues = cloneFormValues(options.initialValues ?? {})
   let errors: FormError[] = []
+  let errorAnnouncement: 'polite' | 'assertive' = 'polite'
   let undoable = options.undoable ?? false
   let maxHistorySize = options.maxHistorySize ?? 50
   let history: FormHistoryState | null = undoable ? createFormHistory(values, maxHistorySize) : null
-  let inflightValidate: Promise<boolean> | null = null
+  let validateGeneration = 0
+  /** Per-field outcomes aligned to the last merged rule list. `undefined` was not run. */
+  const ruleOutcomes = new Map<string, Array<string | null | undefined>>()
 
   let formRules = options.rules
   let formConditions = options.conditions
@@ -168,26 +177,67 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     )
   }
 
+  function normalizeRuleList(rules?: FormRule | FormRule[]): FormRule[] {
+    if (!rules) return []
+    return (Array.isArray(rules) ? rules : [rules]).filter((rule): rule is FormRule => Boolean(rule))
+  }
+
+  function mergeRuleLists(
+    base?: FormRule | FormRule[],
+    extra?: FormRule | FormRule[]
+  ): FormRule | FormRule[] | undefined {
+    const merged = [...normalizeRuleList(base), ...normalizeRuleList(extra)]
+    if (merged.length === 0) return undefined
+    if (merged.length === 1) return merged[0]
+    return merged
+  }
+
   function getMergedRules(): FormRules | undefined {
-    const merged = { ...(readRules() ?? {}), ...fieldRules }
+    const formLevel = readRules() ?? {}
+    const names = new Set<string>([...Object.keys(formLevel), ...Object.keys(fieldRules)])
+    const merged: FormRules = {}
+    for (const fieldName of names) {
+      const combined = mergeRuleLists(formLevel[fieldName], fieldRules[fieldName])
+      if (combined) merged[fieldName] = combined
+    }
     return Object.keys(merged).length > 0 ? merged : undefined
   }
 
-  function getEffectiveRules(): FormRules | undefined {
-    return resolveConditionalFormRules(values, getMergedRules(), getEffectiveConditions())
+  function getEffectiveRules(model: FormValues = values): FormRules | undefined {
+    return resolveConditionalFormRules(model, getMergedRules(), getEffectiveConditions())
   }
 
   function resolveFieldRules(
     fieldName: string,
-    rulesOverride?: FormRule | FormRule[]
+    rulesOverride?: FormRule | FormRule[],
+    model: FormValues = values
   ): FormRule | FormRule[] | undefined {
-    const fieldRule = rulesOverride ?? fieldRules[fieldName] ?? readRules()?.[fieldName]
+    const itemRules = rulesOverride !== undefined ? rulesOverride : fieldRules[fieldName]
+    const fieldRule = mergeRuleLists(readRules()?.[fieldName], itemRules)
     const resolved = resolveConditionalFormRules(
-      values,
+      model,
       fieldRule ? { [fieldName]: fieldRule } : undefined,
       getEffectiveConditions()
     )
     return resolved?.[fieldName]
+  }
+
+  function rememberRuleOutcomes(
+    fieldName: string,
+    outcomes: Array<string | null | undefined>
+  ): string | null {
+    const previous = ruleOutcomes.get(fieldName)
+    const sameLength = previous && previous.length === outcomes.length
+    const merged = outcomes.map((outcome, index) => {
+      if (outcome !== undefined) return outcome
+      return sameLength ? previous[index] : undefined
+    })
+    const ran = outcomes.some((outcome) => outcome !== undefined)
+    if (!ran) {
+      return errors.find((entry) => entry.field === fieldName)?.message ?? null
+    }
+    ruleOutcomes.set(fieldName, merged)
+    return firstFieldRuleError(merged)
   }
 
   function getDependencyMap(): Map<string, string[]> | undefined {
@@ -217,6 +267,8 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
   }
 
   function commitValues(next: FormValues, snapshot: boolean): void {
+    const changed = !formValuesEqual(values, next)
+    if (!changed) return
     values = next
     if (snapshot && undoable && history) {
       history = pushFormHistory(history, values)
@@ -237,13 +289,14 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     visited.add(fieldName)
 
     const conditionState = getFieldConditionState(fieldName)
-    if (!conditionState.shown || conditionState.disabled) {
+    if (!conditionState.shown || conditionState.disabled || fieldDisabled[fieldName]) {
+      ruleOutcomes.delete(fieldName)
       patchFieldError(fieldName, null)
       onValidate?.(fieldName, true, null)
     } else {
       const fieldRule = resolveFieldRules(fieldName, rulesOverride)
       if (fieldRule) {
-        const error = await validateFieldUtil(
+        const evaluation = await evaluateFieldRules(
           fieldName,
           getValueByPath(values, fieldName),
           fieldRule,
@@ -251,8 +304,12 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
           trigger,
           readMessages()
         )
-        patchFieldError(fieldName, error)
-        onValidate?.(fieldName, !error, error)
+        const ran = evaluation.outcomes.some((outcome) => outcome !== undefined)
+        if (ran) {
+          const error = rememberRuleOutcomes(fieldName, evaluation.outcomes)
+          patchFieldError(fieldName, error)
+          onValidate?.(fieldName, !error, error)
+        }
       }
     }
 
@@ -274,6 +331,7 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     rulesOverride?: FormRule | FormRule[],
     trigger?: FormRuleTrigger
   ): Promise<string | null> {
+    errorAnnouncement = 'polite'
     ensureDebouncer()
     if (trigger === 'change' && readDebounce() > 0) {
       try {
@@ -291,33 +349,63 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     return validateFieldNow(fieldName, rulesOverride, trigger)
   }
 
-  async function runValidate(): Promise<boolean> {
+  async function runValidate(snapshot: FormValues, generation: number): Promise<boolean> {
     debouncer.cancel()
-    const effectiveRules = getEffectiveRules()
+    const effectiveRules = getEffectiveRules(snapshot)
+    if (generation !== validateGeneration) {
+      throw new FormValidationSupersededError()
+    }
     if (!effectiveRules) {
       errors = []
+      ruleOutcomes.clear()
       emit()
       return true
     }
     const order = getValidationOrder(Object.keys(effectiveRules), getDependencyMap())
-    const result = await validateFormFields(
-      values,
-      effectiveRules,
-      order,
-      undefined,
-      readMessages()
-    )
-    errors = result.errors
+    const nextErrors: FormError[] = []
+    const nextOutcomes = new Map<string, Array<string | null | undefined>>()
+    for (const fieldName of order) {
+      if (generation !== validateGeneration) {
+        throw new FormValidationSupersededError()
+      }
+      const fieldRule = effectiveRules[fieldName]
+      if (!fieldRule) continue
+      const evaluation = await evaluateFieldRules(
+        fieldName,
+        getValueByPath(snapshot, fieldName),
+        fieldRule,
+        snapshot,
+        undefined,
+        readMessages()
+      )
+      nextOutcomes.set(fieldName, evaluation.outcomes)
+      const error = firstFieldRuleError(evaluation.outcomes)
+      if (error) nextErrors.push({ field: fieldName, message: error })
+    }
+    if (generation !== validateGeneration) {
+      throw new FormValidationSupersededError()
+    }
+    ruleOutcomes.clear()
+    for (const [fieldName, outcomes] of nextOutcomes) {
+      ruleOutcomes.set(fieldName, outcomes)
+    }
+    errors = nextErrors
     emit()
-    return result.valid
+    return nextErrors.length === 0
   }
 
   async function validate(): Promise<boolean> {
-    if (inflightValidate) return inflightValidate
-    inflightValidate = runValidate().finally(() => {
-      inflightValidate = null
-    })
-    return inflightValidate
+    const generation = ++validateGeneration
+    const snapshot = cloneFormValues(values)
+    errorAnnouncement = 'assertive'
+    try {
+      return await runValidate(snapshot, generation)
+    } catch (error) {
+      if (generation !== validateGeneration) {
+        throw new FormValidationSupersededError()
+      }
+      throw error
+    }
   }
 
   async function validateFields(fieldNames: string[]): Promise<boolean> {
@@ -340,13 +428,30 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     if (!fieldNames) {
       debouncer.cancel()
       errors = []
+      ruleOutcomes.clear()
       emit()
       return
     }
     const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames]
-    fields.forEach((fieldName) => debouncer.cancel(fieldName))
+    fields.forEach((fieldName) => {
+      debouncer.cancel(fieldName)
+      ruleOutcomes.delete(fieldName)
+    })
     errors = errors.filter((entry) => !fields.includes(entry.field))
     emit()
+  }
+
+  function setFieldError(fieldName: string, message: string | null): void {
+    if (!fieldName) return
+    ruleOutcomes.delete(fieldName)
+    patchFieldError(fieldName, message)
+    onValidate?.(fieldName, !message, message)
+    emit()
+  }
+
+  function setInitialValues(next: FormValues): void {
+    if (formValuesEqual(initialValues, next)) return
+    initialValues = cloneFormValues(next ?? {})
   }
 
   function setFieldValue(fieldName: string, value: unknown): void {
@@ -362,6 +467,7 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
   }
 
   function replaceValues(next: FormValues, options?: { emit?: boolean }): void {
+    if (formValuesEqual(values, next)) return
     values = cloneFormValues(next)
     if (options?.emit !== false) {
       emit()
@@ -390,6 +496,18 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     fieldConditions[fieldName] = condition
   }
 
+  function registerFieldDisabled(fieldName: string, disabled: boolean | null): void {
+    if (!fieldName) return
+    if (disabled == null) {
+      mountedFields.delete(fieldName)
+      delete fieldDisabled[fieldName]
+      return
+    }
+    mountedFields.add(fieldName)
+    if (disabled) fieldDisabled[fieldName] = true
+    else delete fieldDisabled[fieldName]
+  }
+
   function reset(): void {
     debouncer.cancel()
     values = cloneFormValues(initialValues)
@@ -410,6 +528,7 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     if (!fieldName) return
     const { [fieldName]: _removed, ...rest } = values
     values = rest
+    ruleOutcomes.delete(fieldName)
     errors = errors.filter((entry) => entry.field !== fieldName)
     if (undoable && history) {
       history = pushFormHistory(history, values)
@@ -484,6 +603,9 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     get hasErrors() {
       return errors.length > 0
     },
+    get errorAnnouncement() {
+      return errorAnnouncement
+    },
     getValues: () => values,
     getErrors: () => errors,
     setFieldValue,
@@ -509,7 +631,11 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     subscribe,
     registerFieldRules,
     registerFieldCondition,
+    registerFieldDisabled,
+    getMountedFieldNames: () => Array.from(mountedFields),
     getFieldConditionState,
+    setFieldError,
+    setInitialValues,
     replaceValues,
     setOptions,
     dispose

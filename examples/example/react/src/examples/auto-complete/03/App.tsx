@@ -13,7 +13,7 @@ export default function App() {
 
   return (
     <div className="space-y-2">
-      <p className="text-sm text-[var(--tiger-text-muted)]">
+      <p className="text-sm text-[var(--tiger-text-secondary)]">
         打字只改 searchValue；点选或回车才改 value。
       </p>
       <AutoComplete
@@ -26,7 +26,7 @@ export default function App() {
         placeholder="输入或选择框架"
         className="w-full max-w-sm"
       />
-      <p className="text-sm text-[var(--tiger-text-muted)]">
+      <p className="text-sm text-[var(--tiger-text-secondary)]">
         query: {searchValue || '空'} · value: {value ?? '未提交'}
       </p>
     </div>

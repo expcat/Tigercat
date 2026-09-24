@@ -7,6 +7,8 @@ import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { TagsInput } from '@expcat/tigercat-react/TagsInput'
+import { Form } from '@expcat/tigercat-react/Form'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('TagsInput', () => {
@@ -123,11 +125,18 @@ describe('TagsInput', () => {
   })
 
   describe('Accessibility', () => {
-    it('marks the input invalid and links the error message', () => {
-      const { getByRole, getByText } = render(<TagsInput status="error" errorMessage="Required" />)
-      const input = getByRole('textbox')
+    it('marks the input invalid and links the FormItem error message', () => {
+      const { getByRole, getByText } = render(
+        <Form>
+          <FormItem name="tags" error="Required">
+            <TagsInput aria-label="Tags" />
+          </FormItem>
+        </Form>
+      )
+      const input = getByRole('textbox', { name: 'Tags' })
       expect(input).toHaveAttribute('aria-invalid', 'true')
       expect(getByText('Required')).toBeInTheDocument()
+      expect(input.getAttribute('aria-describedby')).toBeTruthy()
     })
 
     it('has no a11y violations', async () => {

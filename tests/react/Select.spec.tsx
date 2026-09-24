@@ -72,7 +72,7 @@ describe('Select', () => {
     expect(onChange).toHaveBeenCalledWith('')
     expect(getByRole('combobox')).toHaveTextContent('None')
     await user.click(getByLabelText('Clear selection'))
-    expect(onChange).toHaveBeenLastCalledWith(undefined)
+    expect(onChange).toHaveBeenLastCalledWith(null)
     expect(getByRole('combobox')).toHaveTextContent('Select an option')
   })
 

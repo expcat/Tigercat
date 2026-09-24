@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect, forwardRef } from 'react'
 import {
   classNames,
+  coerceNumberFormValue,
+  shouldSubmitNativeField,
   getInputNumberWrapperClasses,
   getInputNumberSizeClasses,
   getInputNumberInputClasses,
@@ -80,6 +82,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     controlsPosition = 'right',
     formatter,
     parser,
+    snapToStep = false,
     autoFocus = false,
     incrementAriaLabel,
     decrementAriaLabel,
@@ -112,11 +115,9 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   const formBoundValue = formItemControl?.value
   const resolvedValue =
     controlledValue !== undefined
-      ? controlledValue
+      ? (coerceNumberFormValue(controlledValue) ?? null)
       : formItemControl?.name
-        ? typeof formBoundValue === 'number'
-          ? formBoundValue
-          : null
+        ? (coerceNumberFormValue(formBoundValue) ?? null)
         : undefined
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -129,7 +130,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   const [focused, setFocused] = useState(false)
   const [currentValue, setValue] = useControlledState<number | null>({
     value: resolvedValue,
-    defaultValue: defaultValue ?? null,
+    defaultValue: coerceNumberFormValue(defaultValue) ?? null,
     onChange
   })
   const [displayValue, setDisplayValue] = useState('')
@@ -170,7 +171,9 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     const { value: next, changed } = commitInputNumberValue(raw, currentValue, {
       min,
       max,
-      precision
+      precision,
+      step,
+      snapToStep
     })
     if (changed) {
       setValue(next)
@@ -348,8 +351,14 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
         placeholder={placeholder}
         disabled={effectiveDisabled}
         readOnly={isReadOnly}
-        name={effectiveName}
         id={effectiveId}
+        aria-labelledby={
+          typeof rest['aria-label'] === 'string'
+            ? undefined
+            : typeof rest['aria-labelledby'] === 'string'
+              ? rest['aria-labelledby']
+              : formItemControl?.labelId
+        }
         onChange={handleInput}
         onBlur={handleBlur}
         onFocus={handleFocus}
@@ -381,6 +390,14 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
           </svg>
         </button>
       )}
+
+      {shouldSubmitNativeField({ name: effectiveName, disabled: effectiveDisabled }) ? (
+        <input
+          type="hidden"
+          name={effectiveName}
+          value={currentValue == null ? '' : String(currentValue)}
+        />
+      ) : null}
 
       {layout === 'end' && (
         <div className={inputNumberControlsRightClasses}>

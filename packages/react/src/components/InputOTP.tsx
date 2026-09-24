@@ -160,13 +160,15 @@ export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function Inp
     if (!isInteractive) return
     const inputType = (event.nativeEvent as InputEvent).inputType
     const sanitized = sanitizeOtpInput(event.currentTarget.value, charOptions)
-    const result = applyOtpCharInput(currentValue, index, event.currentTarget.value, length, {
+    const typed =
+      index === 0 && sanitized.length === 1 ? (currentValue + sanitized).slice(0, length) : event.currentTarget.value
+    const result = applyOtpCharInput(currentValue, index, typed, length, {
       ...charOptions,
       distributeFromStart: shouldDistributeOtpInput(index, inputType, sanitized.length)
     })
     event.currentTarget.value = displayChar(result.value, index)
     emitValue(result.value)
-    focusSlot(result.nextIndex)
+    if (index !== 0) focusSlot(result.nextIndex)
   }
 
   const handleSlotKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -259,16 +261,17 @@ export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function Inp
         type="text"
         inputMode={inputMode}
         autoComplete={i === 0 ? 'one-time-code' : 'off'}
-        maxLength={1}
+        maxLength={i === 0 ? undefined : 1}
         value={displayChar(currentValue, i)}
         disabled={effectiveDisabled}
-        readOnly={readonly}
-        tabIndex={getOtpSlotTabIndex(i, currentTab, effectiveDisabled)}
-        id={isTabStop ? (id ?? formItemControl?.id) : undefined}
-        aria-label={formatOtpSlotLabel(labels.slotLabel, i + 1, length)}
-        aria-invalid={status === 'error' ? true : undefined}
-        aria-required={isTabStop && formItemControl?.required ? true : undefined}
-        aria-describedby={isTabStop ? describedBy : undefined}
+        readOnly={readonly || i !== 0}
+        tabIndex={i === 0 && !effectiveDisabled ? 0 : -1}
+        id={i === 0 ? (id ?? formItemControl?.id) : undefined}
+        aria-hidden={i === 0 ? undefined : true}
+        aria-label={i === 0 ? formatOtpSlotLabel(labels.slotLabel, 1, length) : undefined}
+        aria-invalid={i === 0 && status === 'error' ? true : undefined}
+        aria-required={i === 0 && formItemControl?.required ? true : undefined}
+        aria-describedby={i === 0 ? describedBy : undefined}
         onChange={(event) => handleSlotChange(i, event)}
         onKeyDown={(event) => handleSlotKeyDown(i, event)}
         onMouseDown={(event) => handleSlotMouseDown(i, event)}

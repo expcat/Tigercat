@@ -1,12 +1,14 @@
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
-  icon20ViewBox,
-  chevronDownSolidIcon20PathD,
-  closeSolidIcon20PathD,
-  checkSolidIcon20PathD,
   selectCheckIconClasses,
   selectChromeIconClasses,
   selectClearIconClasses
 } from '@expcat/tigercat-core'
+import {
+  chevronDownSolidIcon20PathD,
+  closeSolidIcon20PathD,
+  checkSolidIcon20PathD
+} from '@expcat/tigercat-core/icons/picker'
 
 function SelectIcon({ path, className }: { path: string; className: string }) {
   return (

@@ -87,7 +87,7 @@ export function getFormItemLabelClasses(options: FormItemLabelClassOptions = {})
     'tiger-form-item__label',
     `tiger-form-item__label--${labelAlign}`,
     'font-medium',
-    'text-[var(--tiger-text,#111827)]',
+    'text-[var(--tiger-text)]',
     LABEL_TEXT_SIZE[size],
     alignClass,
     positionClasses,
@@ -120,7 +120,7 @@ export function getFormItemErrorClasses(
     'mt-1',
     ERROR_TEXT_SIZE[size],
     ERROR_MIN_HEIGHT[size],
-    'text-[var(--tiger-error,#ef4444)]',
+    'text-[var(--tiger-error)]',
     'tiger-motion-aware',
     'transition-opacity',
     'duration-150',
@@ -135,9 +135,9 @@ export function getFormItemErrorBlockClasses(size: ComponentSize = 'md'): string
     'tiger-form-item__error--block',
     'mt-1 p-2 rounded border',
     ERROR_TEXT_SIZE[size],
-    'bg-[var(--tiger-error-bg,#fef2f2)]',
-    'border-[var(--tiger-error,#ef4444)]',
-    'text-[var(--tiger-error,#ef4444)]'
+    'bg-[var(--tiger-error-bg)]',
+    'border-[var(--tiger-error)]',
+    'text-[var(--tiger-error)]'
   )
 }
 
@@ -146,9 +146,14 @@ export function getFormItemErrorPopupClasses(): string {
     'tiger-form-item__error',
     'tiger-form-item__error--popup',
     'px-2 py-1 rounded text-xs shadow-lg',
-    'bg-[var(--tiger-error,#ef4444)]',
-    'text-[var(--tiger-error-foreground,#ffffff)]'
+    'bg-[var(--tiger-error)]',
+    'text-[var(--tiger-error-foreground)]'
   )
+}
+
+/** Screen-reader error that stays in the document when the visible message is off. */
+export function getFormItemErrorSrOnlyClasses(): string {
+  return classNames('tiger-form-item__error', 'sr-only')
 }
 
 export function getFormItemAsteriskClasses(): string {
@@ -156,6 +161,6 @@ export function getFormItemAsteriskClasses(): string {
     'tiger-form-item__asterisk',
     'me-1',
     'font-semibold',
-    'text-[var(--tiger-error,#ef4444)]'
+    'text-[var(--tiger-error)]'
   )
 }

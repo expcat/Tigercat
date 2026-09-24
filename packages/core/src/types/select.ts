@@ -11,7 +11,8 @@ export type SelectValue = string | number
 
 export type SelectValues = SelectValue[]
 
-export type SelectModelValue = SelectValue | SelectValues | undefined
+/** `null` is a controlled empty single value. `undefined` is uncontrolled. */
+export type SelectModelValue = SelectValue | SelectValues | null | undefined
 
 /**
  * Predicate used to decide whether an option matches the current search query.

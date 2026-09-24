@@ -4,17 +4,20 @@ import type {
   AutoCompleteProps as CoreAutoCompleteProps,
   AutoCompleteValue
 } from '@expcat/tigercat-core'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
   classNames,
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
-  closeSolidIcon20PathD,
-  coerceAutoCompleteFormValue,
+  AUTO_COMPLETE_INVALID_VALUE,
+  autoCompleteOptionIdentity,
   filterAutoCompleteOptions,
   getAutoCompleteInputClasses,
   getAutoCompleteOptionClasses,
   getAutoCompleteOptionKey,
   getAutoCompletePanelStyle,
+  getAutoCompleteVirtualItemHeight,
+  shouldVirtualizeAutoCompleteList,
   getAutoCompleteRootClasses,
   getAutoCompleteKeyIntent,
   getEmptyLabels,
@@ -25,16 +28,18 @@ import {
   getPickerOptionAria,
   getPickerOptionId,
   getSelectLabels,
-  icon20ViewBox,
+  isAutoCompleteEmptyValue,
+  isImeCompositionEvent,
   isSameAutoCompleteValue,
   mergeAriaDescribedBy,
   mergeTigerLocale,
   resolveAutoCompleteBlurCommit,
-  resolveAutoCompleteIdleQuery,
   resolveAutoCompleteInitialQuery,
   resolveLocaleText,
   runShakeAnimation,
+  sanitizeAutoCompleteExternalValue,
   shouldShowAutoCompleteClear,
+  syncAutoCompleteHighlight,
   autoCompleteClearButtonClasses,
   autoCompleteClearIconClasses,
   autoCompleteDoneActionClasses,
@@ -44,9 +49,11 @@ import {
   autoCompleteListboxClasses,
   autoCompleteTrailingSlotClasses
 } from '@expcat/tigercat-core'
+import { closeSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { useControlledState } from '../hooks/useControlledState'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
+import { useFixedVirtualWindow } from './internal/useFixedVirtualWindow'
 import { useFormItemControlContext } from './FormItemContext'
 import { useInputGroupContext } from './InputGroup'
 
@@ -104,6 +111,7 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       locale,
       className,
       loading = false,
+      readOnly = false,
       status: statusProp,
       name,
       id,
@@ -137,6 +145,8 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
     const doneText = selectLabels.doneText
 
     const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
+    const isReadOnly = Boolean(readOnly)
+    const canEdit = !effectiveDisabled && !isReadOnly
     const status = statusProp ?? formItemControl?.status ?? 'default'
     const shakeTrigger = formItemControl?.shakeTrigger
     const effectiveId = id ?? formItemControl?.id
@@ -154,16 +164,21 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
         ? rest['aria-label']
         : undefined
 
-    const incomingValue =
-      value !== undefined ? value : coerceAutoCompleteFormValue(formItemControl?.value)
-    const [committed, setCommitted] = useControlledState<AutoCompleteValue | undefined>({
-      value: incomingValue,
-      defaultValue,
+    const formBound = value === undefined && Boolean(formItemControl?.name)
+    const rawExternal = value !== undefined ? value : formBound ? formItemControl?.value : undefined
+    const sanitized =
+      value !== undefined || formBound ? sanitizeAutoCompleteExternalValue(rawExternal) : undefined
+    const hasControlled = value !== undefined || formBound
+    const [committed, setCommitted] = useControlledState<AutoCompleteValue | null>({
+      value: hasControlled ? (sanitized?.value ?? null) : undefined,
+      defaultValue: isAutoCompleteEmptyValue(defaultValue) ? null : (defaultValue ?? null),
       onChange: (next) => {
-        onChange?.(next)
-        formItemControl?.onChange?.(next)
+        const emitted = isAutoCompleteEmptyValue(next) ? undefined : next
+        onChange?.(emitted)
+        formItemControl?.onChange?.(emitted)
       }
     })
+    const committedValue = isAutoCompleteEmptyValue(committed) ? undefined : committed
 
     const [isOpen, setOpen] = useControlledState({
       value: open,
@@ -175,7 +190,11 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       value: searchValue,
       defaultValue: resolveAutoCompleteInitialQuery({
         defaultSearchValue,
-        committed: incomingValue !== undefined ? incomingValue : defaultValue,
+        committed: hasControlled
+          ? sanitized?.value
+          : isAutoCompleteEmptyValue(defaultValue)
+            ? undefined
+            : defaultValue,
         optionList: options
       }),
       onChange: onSearchChange
@@ -185,31 +204,52 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
     const listboxId = `tiger-autocomplete-listbox-${instanceId}`
     const [activeIndex, setActiveIndex] = useState(-1)
     const isEditingRef = useRef(false)
+    const composingRef = useRef(false)
     const rootRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null)
+    const hiddenRef = useRef<HTMLInputElement>(null)
     const mountedRef = useRef(false)
-    const committedRef = useRef(committed)
-    committedRef.current = committed
+    const seededRef = useRef(false)
+    const explainedRef = useRef(false)
+    const activeKeyRef = useRef<string | undefined>(undefined)
+    const labelMemory = useRef<{ value: AutoCompleteValue; label: string } | null>(null)
+    const wasOpenRef = useRef(false)
+    const hadCommittedRef = useRef(!isAutoCompleteEmptyValue(committedValue))
+    const committedRef = useRef(committedValue)
+    committedRef.current = committedValue
     const queryRef = useRef(query)
     queryRef.current = query
     const optionsRef = useRef(options)
     optionsRef.current = options
     const allowFreeInputRef = useRef(allowFreeInput)
     allowFreeInputRef.current = allowFreeInput
-    const hadCommittedRef = useRef(committed !== undefined)
 
     const filteredOptions = useMemo(
       () => filterAutoCompleteOptions(options, query, filterOption),
       [filterOption, options, query]
     )
     const hasOptions = filteredOptions.length > 0
+    const optionItemHeight = getAutoCompleteVirtualItemHeight(size)
+    const virtualizeOptions = shouldVirtualizeAutoCompleteList(
+      filteredOptions.length,
+      listHeight,
+      size
+    )
+    const optionWindow = useFixedVirtualWindow({
+      enabled: virtualizeOptions,
+      activeIndex,
+      itemHeight: optionItemHeight,
+      viewport: listHeight,
+      count: filteredOptions.length
+    })
     const showClear = shouldShowAutoCompleteClear({
       clearable,
-      disabled: effectiveDisabled,
+      disabled: effectiveDisabled || isReadOnly,
       query,
-      committed
+      committed: committedValue
     })
+    const filteredIdentity = filteredOptions.map(autoCompleteOptionIdentity).join('\0')
 
     const setInputRefs = (node: HTMLInputElement | null) => {
       inputRef.current = node
@@ -225,27 +265,92 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       if (status === 'error') runShakeAnimation(rootRef.current)
     }, [status, shakeTrigger])
 
+    const rememberLabel = useCallback((next: AutoCompleteValue | undefined, label: string) => {
+      if (isAutoCompleteEmptyValue(next)) {
+        labelMemory.current = null
+        return
+      }
+      labelMemory.current = { value: next as AutoCompleteValue, label }
+    }, [])
+
+    const writeNative = useCallback((next: AutoCompleteValue | undefined) => {
+      if (!hiddenRef.current) return
+      hiddenRef.current.value = isAutoCompleteEmptyValue(next) ? '' : String(next)
+    }, [])
+
+    useEffect(() => {
+      if (seededRef.current) return
+      seededRef.current = true
+      if (!formItemControl?.name || value !== undefined) return
+      const raw = formItemControl.value
+      if (raw !== '' && raw != null) return
+      if (isAutoCompleteEmptyValue(defaultValue)) return
+      formItemControl.onChange?.(defaultValue)
+    }, [defaultValue, formItemControl, value])
+
+    useEffect(() => {
+      if (sanitized?.invalid) {
+        formItemControl?.setError?.(AUTO_COMPLETE_INVALID_VALUE)
+        if (!explainedRef.current) {
+          explainedRef.current = true
+          onChange?.(undefined)
+          formItemControl?.onChange?.(undefined)
+        }
+        return
+      }
+      if (explainedRef.current && sanitized?.value !== undefined) {
+        explainedRef.current = false
+        formItemControl?.setError?.(null)
+      }
+    }, [formItemControl, onChange, sanitized?.invalid, sanitized?.value])
+
     useEffect(() => {
       if (searchValue !== undefined) return
       if (isEditingRef.current) return
-      if (committed === undefined) {
+      if (committedValue === undefined) {
         if (hadCommittedRef.current) setQuery('')
         hadCommittedRef.current = false
         return
       }
       hadCommittedRef.current = true
-      setQuery(resolveAutoCompleteIdleQuery(committed, options))
-    }, [committed, options, searchValue, setQuery])
+      const memory = labelMemory.current
+      const label =
+        memory && isSameAutoCompleteValue(memory.value, committedValue)
+          ? memory.label
+          : resolveAutoCompleteInitialQuery({ committed: committedValue, optionList: options })
+      if (!(memory && isSameAutoCompleteValue(memory.value, committedValue))) {
+        rememberLabel(committedValue, label)
+      }
+      setQuery(label)
+    }, [committedValue, options, rememberLabel, searchValue, setQuery])
+
+    useEffect(() => {
+      const next = syncAutoCompleteHighlight(
+        filteredOptions,
+        activeKeyRef.current,
+        defaultActiveFirstOption
+      )
+      activeKeyRef.current = next.key
+      setActiveIndex((current) => (current === next.index ? current : next.index))
+    }, [defaultActiveFirstOption, filteredIdentity, filteredOptions])
+
+    useEffect(() => {
+      writeNative(committedValue)
+    }, [committedValue, writeNative])
 
     const openDropdown = useCallback(() => {
-      if (effectiveDisabled) return
+      if (!canEdit) return
       setOpen(true)
-      setActiveIndex(getInitialPickerActiveIndex(filteredOptions, defaultActiveFirstOption))
-    }, [defaultActiveFirstOption, effectiveDisabled, filteredOptions, setOpen])
+      const index = getInitialPickerActiveIndex(filteredOptions, defaultActiveFirstOption)
+      activeKeyRef.current =
+        index >= 0 ? autoCompleteOptionIdentity(filteredOptions[index]) : undefined
+      setActiveIndex(index)
+    }, [canEdit, defaultActiveFirstOption, filteredOptions, setOpen])
 
     const closeDropdown = useCallback(() => {
-      setOpen(false)
+      activeKeyRef.current = undefined
       setActiveIndex(-1)
+      setOpen(false)
     }, [setOpen])
 
     const applyQuery = useCallback(
@@ -257,10 +362,15 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
 
     const commitValue = useCallback(
       (next: AutoCompleteValue | undefined, option?: AutoCompleteOption) => {
-        setCommitted(next)
-        if (option) onSelect?.(option.value, option)
+        const stored = isAutoCompleteEmptyValue(next) ? undefined : next
+        if (option && stored !== undefined) rememberLabel(stored, option.label)
+        else if (stored !== undefined) rememberLabel(stored, String(stored))
+        else rememberLabel(undefined, '')
+        writeNative(stored)
+        setCommitted(stored ?? null)
+        if (option && stored !== undefined) onSelect?.(option.value, option)
       },
-      [onSelect, setCommitted]
+      [onSelect, rememberLabel, setCommitted, writeNative]
     )
 
     const commitCurrentQuery = useCallback(() => {
@@ -270,14 +380,38 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
         optionList: optionsRef.current,
         allowFreeInput: allowFreeInputRef.current
       })
+      if (result.option && !isAutoCompleteEmptyValue(result.value)) {
+        rememberLabel(result.value as AutoCompleteValue, result.query)
+      } else if (!isAutoCompleteEmptyValue(result.value)) {
+        rememberLabel(result.value as AutoCompleteValue, result.query)
+      } else {
+        rememberLabel(undefined, '')
+      }
       applyQuery(result.query)
+      writeNative(result.value)
       if (result.didCommit) commitValue(result.value, result.option)
       return result
-    }, [applyQuery, commitValue])
+    }, [applyQuery, commitValue, rememberLabel, writeNative])
 
     const revertQuery = useCallback(() => {
-      applyQuery(resolveAutoCompleteIdleQuery(committedRef.current, optionsRef.current))
+      const committedNow = committedRef.current
+      const memory = labelMemory.current
+      const label =
+        memory && isSameAutoCompleteValue(memory.value, committedNow)
+          ? memory.label
+          : resolveAutoCompleteInitialQuery({
+              committed: committedNow,
+              optionList: optionsRef.current
+            })
+      applyQuery(label)
     }, [applyQuery])
+
+    const finishEdit = useCallback(() => {
+      isEditingRef.current = false
+      const result = commitCurrentQuery()
+      writeNative(result.value)
+      closeDropdown()
+    }, [closeDropdown, commitCurrentQuery, writeNative])
 
     const handleDismiss = useCallback(
       (reason: 'outside' | 'escape') => {
@@ -287,11 +421,9 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
           closeDropdown()
           return
         }
-        isEditingRef.current = false
-        commitCurrentQuery()
-        closeDropdown()
+        finishEdit()
       },
-      [closeDropdown, commitCurrentQuery, revertQuery]
+      [closeDropdown, finishEdit, revertQuery]
     )
 
     const overlay = useAnchoredOverlay({
@@ -310,42 +442,53 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       onDismiss: handleDismiss
     })
 
+    useEffect(() => {
+      if (wasOpenRef.current && !isOpen && isEditingRef.current) {
+        isEditingRef.current = false
+        commitCurrentQuery()
+      }
+      wasOpenRef.current = isOpen
+    }, [commitCurrentQuery, isOpen])
+
     const handleSelect = (option: AutoCompleteOption) => {
-      if (option.disabled || effectiveDisabled) return
+      if (option.disabled || !canEdit) return
       isEditingRef.current = false
-      applyQuery(option.label)
+      applyQuery(isAutoCompleteEmptyValue(option.value) ? '' : option.label)
       commitValue(option.value, option)
       closeDropdown()
     }
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (effectiveDisabled) return
+      if (!canEdit) return
       const next = event.target.value
       isEditingRef.current = true
       applyQuery(next)
       if (!isOpen) setOpen(true)
-      setActiveIndex(
-        getInitialPickerActiveIndex(
-          filterAutoCompleteOptions(options, next, filterOption),
-          defaultActiveFirstOption
-        )
-      )
+      const nextItems = filterAutoCompleteOptions(options, next, filterOption)
+      const index = getInitialPickerActiveIndex(nextItems, defaultActiveFirstOption)
+      activeKeyRef.current = index >= 0 ? autoCompleteOptionIdentity(nextItems[index]) : undefined
+      setActiveIndex(index)
     }
 
     const handleClear = (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
       event.stopPropagation()
+      if (!canEdit) return
       isEditingRef.current = true
       applyQuery('')
       commitValue(undefined)
       inputRef.current?.focus()
       if (!isOpen) setOpen(true)
-      setActiveIndex(getInitialPickerActiveIndex(options, defaultActiveFirstOption))
+      const index = getInitialPickerActiveIndex(options, defaultActiveFirstOption)
+      activeKeyRef.current = index >= 0 ? autoCompleteOptionIdentity(options[index]) : undefined
+      setActiveIndex(index)
     }
 
     const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-      isEditingRef.current = true
-      openDropdown()
+      if (canEdit) {
+        isEditingRef.current = true
+        openDropdown()
+      }
       onFocus?.(event)
     }
 
@@ -365,7 +508,14 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
     }
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      const intent = getAutoCompleteKeyIntent(event.key, isOpen, activeIndex)
+      if (
+        composingRef.current ||
+        isImeCompositionEvent(event.nativeEvent) ||
+        !canEdit
+      ) {
+        return
+      }
+      const intent = getAutoCompleteKeyIntent(event.key, isOpen, activeIndex, filteredOptions.length)
       switch (intent.type) {
         case 'open':
           event.preventDefault()
@@ -373,7 +523,12 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
           return
         case 'navigate':
           event.preventDefault()
-          setActiveIndex((prev) => getPickerNavigationIndex(filteredOptions, prev, intent.key))
+          setActiveIndex((prev) => {
+            const next = getPickerNavigationIndex(filteredOptions, prev, intent.key)
+            activeKeyRef.current =
+              next >= 0 ? autoCompleteOptionIdentity(filteredOptions[next]) : undefined
+            return next
+          })
           return
         case 'select-active': {
           event.preventDefault()
@@ -382,10 +537,8 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
           return
         }
         case 'commit-query':
-          event.preventDefault()
-          isEditingRef.current = false
-          commitCurrentQuery()
-          closeDropdown()
+          if (!intent.allowDefault) event.preventDefault()
+          finishEdit()
           return
         case 'close':
           event.preventDefault()
@@ -398,21 +551,53 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       }
     }
 
-    const expanded = isOpen && hasOptions
+    const listMounted = hasOptions
+    const popupId = `${listboxId}-popup`
     const comboboxAria = {
       ...getPickerComboboxAria({
-        expanded,
+        expanded: isOpen,
         listboxId,
-        activeIndex: expanded ? activeIndex : -1
+        activeIndex: listMounted && optionWindow.activeInWindow ? activeIndex : -1,
+        listMounted
       }),
+      'aria-controls': isOpen ? (listMounted ? listboxId : popupId) : undefined,
       'aria-autocomplete': 'list' as const,
       id: effectiveId,
-      name: effectiveName,
       'aria-label': ariaLabel,
       'aria-labelledby': labelledby,
       'aria-describedby': describedBy,
-      'aria-invalid': status === 'error' ? true : undefined,
-      'aria-required': formItemControl?.required ? true : undefined
+      'aria-invalid': status === 'error' || sanitized?.invalid ? true : undefined,
+      'aria-required': formItemControl?.required ? true : undefined,
+      readOnly: isReadOnly || undefined
+    }
+
+    const renderAutoCompleteOption = (option: (typeof filteredOptions)[number], index: number) => {
+      const selected = isSameAutoCompleteValue(option.value, committedValue)
+      const isActive = index === activeIndex
+      return (
+        <div
+          key={getAutoCompleteOptionKey(option, index)}
+          id={getPickerOptionId(listboxId, index)}
+          data-active={isActive || undefined}
+          {...getPickerOptionAria({
+            selected,
+            disabled: !!option.disabled
+          })}
+          className={getAutoCompleteOptionClasses({
+            isSelected: selected,
+            isDisabled: !!option.disabled,
+            isActive,
+            size
+          })}
+          style={virtualizeOptions ? { height: optionItemHeight } : undefined}
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => handleSelect(option)}
+          onMouseEnter={() => {
+            if (!option.disabled) setActiveIndex(index)
+          }}>
+          {option.label}
+        </div>
+      )
     }
 
     const dropdown = isOpen ? (
@@ -425,49 +610,47 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
         )}
         style={overlay.floatingStyles}
         data-positioned={overlay.positioned}
+        id={popupId}
         data-tiger-autocomplete-dropdown=""
         onMouseDown={(event) => event.preventDefault()}
         onBlur={handleFocusOut}>
         {hasOptions ? (
           <div
             className={autoCompleteListboxClasses}
-            style={getAutoCompletePanelStyle(listHeight)}
+            style={
+              virtualizeOptions
+                ? { height: listHeight, overflow: 'auto' }
+                : getAutoCompletePanelStyle(listHeight)
+            }
+            ref={virtualizeOptions ? optionWindow.scrollerRef : undefined}
+            onScroll={virtualizeOptions ? optionWindow.onScroll : undefined}
+            data-tiger-autocomplete-virtual={virtualizeOptions ? '' : undefined}
             {...getPickerListboxAria({ id: listboxId })}>
-            {filteredOptions.map((option, index) => {
-              const selected = isSameAutoCompleteValue(option.value, committed)
-              const isActive = index === activeIndex
-              return (
-                <div
-                  key={getAutoCompleteOptionKey(option, index)}
-                  id={getPickerOptionId(listboxId, index)}
-                  data-active={isActive || undefined}
-                  {...getPickerOptionAria({
-                    selected,
-                    disabled: !!option.disabled
-                  })}
-                  className={getAutoCompleteOptionClasses({
-                    isSelected: selected,
-                    isDisabled: !!option.disabled,
-                    isActive,
-                    size
-                  })}
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => handleSelect(option)}
-                  onMouseEnter={() => {
-                    if (!option.disabled) setActiveIndex(index)
-                  }}>
-                  {option.label}
-                </div>
-              )
-            })}
+            {(virtualizeOptions && optionWindow.range
+              ? [
+                  <div
+                    key="window"
+                    style={{ height: optionWindow.range.totalHeight, position: 'relative' }}>
+                    <div style={{ transform: `translateY(${optionWindow.range.offsetTop}px)` }}>
+                      {filteredOptions
+                        .slice(optionWindow.range.startIndex, optionWindow.range.endIndex + 1)
+                        .map((option, offset) => {
+                          const index = optionWindow.range!.startIndex + offset
+                          return renderAutoCompleteOption(option, index)
+                        })}
+                    </div>
+                  </div>
+                ]
+              : filteredOptions.map((option, index) => renderAutoCompleteOption(option, index))
+            )}
           </div>
         ) : (
-          <div className={autoCompleteEmptyStateClasses}>
+          <div className={autoCompleteEmptyStateClasses} role="status" aria-live="polite">
             {loading ? loadingText : resolvedEmptyText}
           </div>
         )}
         <div className={autoCompleteDoneActionClasses}>
-          <button type="button" className={autoCompleteDoneButtonClasses} onClick={closeDropdown}>
+          <button type="button" className={autoCompleteDoneButtonClasses} onClick={finishEdit}>
             {doneText}
           </button>
         </div>
@@ -481,6 +664,20 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
         style={style}
         {...{ [TIGER_CHROME_ATTR]: '' }}
         onAnimationEnd={() => rootRef.current?.classList.remove(SHAKE_CLASS)}>
+        {effectiveName ? (
+          <input
+            ref={hiddenRef}
+            type="hidden"
+            name={effectiveName}
+            value={committedValue === undefined ? '' : String(committedValue)}
+            disabled={effectiveDisabled || undefined}
+          />
+        ) : null}
+        {sanitized?.invalid && !formItemControl ? (
+          <p role="status" aria-live="polite">
+            {AUTO_COMPLETE_INVALID_VALUE}
+          </p>
+        ) : null}
         <div className="relative">
           <input
             {...rest}
@@ -502,6 +699,12 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
             onFocus={handleFocus}
             onKeyDown={handleKeyDown}
             onBlur={handleFocusOut}
+            onCompositionStart={() => {
+              composingRef.current = true
+            }}
+            onCompositionEnd={() => {
+              composingRef.current = false
+            }}
           />
           {showClear ? (
             <span className={autoCompleteTrailingSlotClasses}>

@@ -11,7 +11,7 @@ export interface TreeSelectProps
   value?: TreeSelectValue
   defaultValue?: TreeSelectValue
   onChange?: (value: TreeSelectValue) => void
-  onSearchChange?: (value: string) => void
+  onSearch?: (value: string) => void
   onOpenChange?: (open: boolean) => void
   onExpand?: (keys: (string | number)[]) => void
   onBlur?: React.FocusEventHandler<HTMLElement>

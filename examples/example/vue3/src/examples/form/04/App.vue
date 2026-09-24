@@ -15,7 +15,11 @@ const rules: FormRules = {
 </script>
 
 <template>
-  <Form :model-value="model" :rules="rules" class="max-w-sm">
+  <Form
+    :model-value="model"
+    :rules="rules"
+    class="max-w-sm"
+    @update:model-value="Object.assign(model, $event)">
     <FormItem name="email" label="邮箱">
       <Space>
         <Input placeholder="不传 required，只靠 rules" />

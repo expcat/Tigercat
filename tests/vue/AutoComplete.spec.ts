@@ -55,7 +55,7 @@ describe('AutoComplete', () => {
     expect(getByText('Apple')).toBeInTheDocument()
     expect(queryByText('Banana')).not.toBeInTheDocument()
     expect(emitted()['update:modelValue']).toBeUndefined()
-    expect(emitted()['search-change']?.at(-1)).toEqual(['App'])
+    expect(emitted()['update:searchValue']?.at(-1)).toEqual(['App'])
     expect(input).toHaveValue('App')
   })
 
@@ -244,7 +244,7 @@ describe('AutoComplete', () => {
     await fireEvent.click(getByRole('button', { name: 'Clear' }))
     await nextTick()
     expect(emitted()['update:modelValue']?.at(-1)).toEqual([undefined])
-    expect(emitted()['search-change']?.at(-1)).toEqual([''])
+    expect(emitted()['update:searchValue']?.at(-1)).toEqual([''])
     expect(input).toHaveFocus()
   })
 
@@ -286,7 +286,7 @@ describe('AutoComplete', () => {
     await fireEvent.focus(input)
     await fireEvent.update(input, 'Bana')
     expect(emitted()['update:searchValue']?.at(-1)).toEqual(['Bana'])
-    expect(emitted()['search-change']?.at(-1)).toEqual(['Bana'])
+    expect(emitted()['search-change']).toBeUndefined()
   })
 
   it('shows loading instead of empty when filterOption is false', async () => {
@@ -305,8 +305,11 @@ describe('AutoComplete', () => {
     const input = getByRole('combobox')
     await fireEvent.focus(input)
     await fireEvent.update(input, 'zzzz')
-    expect(input).toHaveAttribute('aria-expanded', 'false')
-    expect(input).not.toHaveAttribute('aria-controls')
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    const controls = input.getAttribute('aria-controls')
+    expect(controls).toBeTruthy()
+    expect(document.getElementById(controls!)).toBeTruthy()
+    expect(document.getElementById(controls!)).not.toHaveAttribute('role', 'listbox')
   })
 
   it('reads FormItem and validates the committed value', async () => {
@@ -317,7 +320,13 @@ describe('AutoComplete', () => {
         return () =>
           h(
             Form,
-            { model: model.value, rules: { fruit: [{ validator, trigger: 'change' }] } },
+            {
+              modelValue: model.value,
+              'onUpdate:modelValue': (next: { fruit?: string }) => {
+                model.value = next
+              },
+              rules: { fruit: [{ validator, trigger: 'change' }] }
+            },
             () =>
               h(FormItem, { name: 'fruit', label: 'Fruit' }, () =>
                 h(AutoComplete, {

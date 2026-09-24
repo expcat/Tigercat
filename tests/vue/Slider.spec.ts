@@ -46,7 +46,7 @@ describe('Slider', () => {
 
   describe('Value and ARIA', () => {
     it('should reflect value, min and max as aria attributes', () => {
-      const { container } = render(Slider, { props: { value: 15, min: 10, max: 20 } })
+      const { container } = render(Slider, { props: { modelValue: 15, min: 10, max: 20 } })
       const slider = getThumb(container)
       expect(slider).toHaveAttribute('role', 'slider')
       expect(slider).toHaveAttribute('aria-valuenow', '15')
@@ -55,7 +55,7 @@ describe('Slider', () => {
     })
 
     it('should support negative values', () => {
-      const { container } = render(Slider, { props: { value: -5, min: -10, max: 0 } })
+      const { container } = render(Slider, { props: { modelValue: -5, min: -10, max: 0 } })
       expect(getThumb(container)).toHaveAttribute('aria-valuenow', '-5')
     })
 
@@ -66,37 +66,19 @@ describe('Slider', () => {
   })
 
   describe('Events', () => {
-    it('should emit update:value and change on arrow key', async () => {
+    it('emits update:modelValue on arrow key', async () => {
       const onUpdate = vi.fn()
-      const onChange = vi.fn()
       const { container } = render(Slider, {
-        props: { value: 50, 'onUpdate:value': onUpdate, onChange }
+        props: { modelValue: 50, 'onUpdate:modelValue': onUpdate }
       })
       await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
       expect(onUpdate).toHaveBeenCalled()
-      expect(onChange).toHaveBeenCalled()
-    })
-
-    it('should emit update:modelValue with the same payload as update:value', async () => {
-      const onUpdateValue = vi.fn()
-      const onUpdateModelValue = vi.fn()
-      const { container } = render(Slider, {
-        props: {
-          value: 50,
-          'onUpdate:value': onUpdateValue,
-          'onUpdate:modelValue': onUpdateModelValue
-        }
-      })
-      await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
-      expect(onUpdateValue).toHaveBeenCalled()
-      expect(onUpdateModelValue).toHaveBeenCalled()
-      expect(onUpdateModelValue.mock.calls[0][0]).toEqual(onUpdateValue.mock.calls[0][0])
     })
 
     it('should not emit events when disabled', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Slider, {
-        props: { disabled: true, 'onUpdate:value': onUpdate }
+        props: { disabled: true, 'onUpdate:modelValue': onUpdate }
       })
       await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
       expect(onUpdate).not.toHaveBeenCalled()
@@ -110,7 +92,7 @@ describe('Slider', () => {
     ])('should not emit %s at the boundary', async (key, value) => {
       const onUpdate = vi.fn()
       const { container } = render(Slider, {
-        props: { value: value as number, min: 0, max: 100, 'onUpdate:value': onUpdate }
+        props: { modelValue: value as number, min: 0, max: 100, 'onUpdate:modelValue': onUpdate }
       })
       await fireEvent.keyDown(getThumb(container), { key: key as string })
       expect(onUpdate).not.toHaveBeenCalled()
@@ -126,9 +108,9 @@ describe('Slider', () => {
 
   describe('Controlled and uncontrolled', () => {
     it('should update aria-valuenow when the value prop changes', async () => {
-      const { container, rerender } = render(Slider, { props: { value: 30 } })
+      const { container, rerender } = render(Slider, { props: { modelValue: 30 } })
       expect(getThumb(container)).toHaveAttribute('aria-valuenow', '30')
-      await rerender({ value: 70 })
+      await rerender({ modelValue: 70 })
       expect(getThumb(container)).toHaveAttribute('aria-valuenow', '70')
     })
 
@@ -153,7 +135,7 @@ describe('Slider', () => {
   describe('Range mode', () => {
     it('should render two thumbs with correct aria values', () => {
       const { container } = render(Slider, {
-        props: { value: [30, 70], range: true, min: 0, max: 100 }
+        props: { modelValue: [30, 70], range: true, min: 0, max: 100 }
       })
       const thumbs = getThumbs(container)
       expect(thumbs.length).toBe(2)
@@ -180,13 +162,13 @@ describe('Slider', () => {
     it('should emit an array value in range mode', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Slider, {
-        props: { value: [20, 80], range: true, 'onUpdate:value': onUpdate }
+        props: { modelValue: [20, 80], range: true, 'onUpdate:modelValue': onUpdate }
       })
       await fireEvent.keyDown(getThumbs(container)[0], { key: 'ArrowRight' })
       expect(Array.isArray(onUpdate.mock.calls[0][0])).toBe(true)
     })
     it('should label range thumbs with min/max', () => {
-      const { container } = render(Slider, { props: { value: [20, 80], range: true } })
+      const { container } = render(Slider, { props: { modelValue: [20, 80], range: true } })
       const thumbs = getThumbs(container)
       expect(thumbs[0].getAttribute('aria-label')).toContain('Minimum')
       expect(thumbs[1].getAttribute('aria-label')).toContain('Maximum')
@@ -197,18 +179,19 @@ describe('Slider', () => {
     it('should update value via track click, and ignore it when disabled', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Slider, {
-        props: { value: 0, min: 0, max: 100, step: 1, 'onUpdate:value': onUpdate }
+        props: { modelValue: 0, min: 0, max: 100, step: 1, 'onUpdate:modelValue': onUpdate }
       })
       await fireEvent.pointerDown(stubTrackRect(container, 200), {
         clientX: 80,
         pointerId: 1,
         button: 0
       })
+      await fireEvent.pointerUp(document, { clientX: 80, pointerId: 1 })
       expect(onUpdate).toHaveBeenCalledWith(40)
 
       const off = vi.fn()
       const { container: disabled } = render(Slider, {
-        props: { value: 0, disabled: true, 'onUpdate:value': off }
+        props: { modelValue: 0, disabled: true, 'onUpdate:modelValue': off }
       })
       await fireEvent.pointerDown(stubTrackRect(disabled, 200), {
         clientX: 80,
@@ -222,12 +205,12 @@ describe('Slider', () => {
       const onUpdate = vi.fn()
       const { container } = render(Slider, {
         props: {
-          value: [20, 80],
+          modelValue: [20, 80],
           range: true,
           min: 0,
           max: 100,
           step: 1,
-          'onUpdate:value': onUpdate
+          'onUpdate:modelValue': onUpdate
         }
       })
       await fireEvent.pointerDown(stubTrackRect(container, 200), {
@@ -235,13 +218,14 @@ describe('Slider', () => {
         pointerId: 1,
         button: 0
       })
+      await fireEvent.pointerUp(document, { clientX: 60, pointerId: 1 })
       expect(onUpdate.mock.calls.at(-1)![0]).toEqual([30, 80])
     })
   })
 
   describe('Tooltip', () => {
     it('should show the value in a tooltip on hover when enabled', async () => {
-      const { container } = render(Slider, { props: { value: 50, tooltip: true } })
+      const { container } = render(Slider, { props: { modelValue: 50, tooltip: true } })
       await fireEvent.mouseEnter(getThumb(container))
       expect(container.textContent).toContain('50')
     })
@@ -260,13 +244,13 @@ describe('Slider', () => {
 
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(Slider, { props: { value: 50, 'aria-label': 'Volume' } })
+      const { container } = render(Slider, { props: { modelValue: 50, 'aria-label': 'Volume' } })
       await expectNoA11yViolationsIsolated(container)
     })
 
     it('sets aria-invalid when status is error', () => {
       const { container } = render(Slider, {
-        props: { status: 'error', value: 10, 'aria-label': 'Volume' }
+        props: { status: 'error', modelValue: 10, 'aria-label': 'Volume' }
       })
       expect(getThumb(container)).toHaveAttribute('aria-invalid', 'true')
     })

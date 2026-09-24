@@ -365,8 +365,11 @@ describe('AutoComplete', () => {
     const input = getByRole('combobox')
     await user.click(input)
     await user.type(input, 'zzzz')
-    expect(input).toHaveAttribute('aria-expanded', 'false')
-    expect(input).not.toHaveAttribute('aria-controls')
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    const controls = input.getAttribute('aria-controls')
+    expect(controls).toBeTruthy()
+    expect(document.getElementById(controls!)).toBeTruthy()
+    expect(document.getElementById(controls!)).not.toHaveAttribute('role', 'listbox')
   })
 
   it('reads FormItem and validates the committed value', async () => {

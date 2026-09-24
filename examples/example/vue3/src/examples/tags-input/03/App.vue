@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { TagsInput } from '@expcat/tigercat-vue/TagsInput'
 </script>
 
@@ -11,11 +12,8 @@ import { TagsInput } from '@expcat/tigercat-vue/TagsInput'
       status="warning"
       clearable
       placeholder="警告态" />
-    <TagsInput
-      :default-value="['error']"
-      size="lg"
-      status="error"
-      error-message="至少保留一个标签"
-      clearable />
+    <FormItem label="标签" error="至少保留一个标签">
+      <TagsInput :default-value="['error']" size="lg" clearable />
+    </FormItem>
   </div>
 </template>

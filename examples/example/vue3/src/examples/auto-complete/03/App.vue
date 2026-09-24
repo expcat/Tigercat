@@ -13,7 +13,7 @@ const options = [
 
 <template>
   <div class="space-y-2">
-    <p class="text-sm text-[var(--tiger-text-muted)]">
+    <p class="text-sm text-[var(--tiger-text-secondary)]">
       打字只改 searchValue；点选或回车才改 value。
     </p>
     <AutoComplete
@@ -23,7 +23,7 @@ const options = [
       allow-free-input
       placeholder="输入或选择框架"
       class="w-full max-w-sm" />
-    <p class="text-sm text-[var(--tiger-text-muted)]">
+    <p class="text-sm text-[var(--tiger-text-secondary)]">
       query: {{ searchValue || '空' }} · value: {{ value ?? '未提交' }}
     </p>
   </div>

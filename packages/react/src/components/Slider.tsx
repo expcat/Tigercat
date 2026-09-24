@@ -1,4 +1,14 @@
-import React, { useRef, useEffect, useCallback, useMemo, memo, forwardRef, useState } from 'react'
+import React, {
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useMemo,
+  useId,
+  memo,
+  forwardRef,
+  useState
+} from 'react'
 import {
   type SliderProps as CoreSliderProps,
   sliderRangeClasses,
@@ -18,6 +28,9 @@ import {
   sliderThumbInsetStyle,
   sliderRangeFillStyle,
   sliderSortRange,
+  sliderDisplayValue,
+  sliderBounds,
+  shouldSubmitNativeField,
   resolveSliderThumbName,
   getSliderLabels,
   mergeAriaDescribedBy,
@@ -40,23 +53,26 @@ export interface SliderProps
       'value' | 'defaultValue' | 'onChange' | 'onPointerDown'
     > {
   onChange?: (value: number | [number, number]) => void
+  name?: string
   onPointerDown?: React.PointerEventHandler<Element>
 }
 
 function displaySliderValue(
-  value: number | [number, number],
+  value: number | [number, number] | null,
   range: boolean,
   min: number,
   max: number
 ): number | [number, number] {
+  const { lower, upper } = sliderBounds(min, max)
   if (range) {
-    const tuple = Array.isArray(value) ? value : [min, max]
-    const a = Math.min(Math.max(tuple[0], min), max)
-    const b = Math.min(Math.max(tuple[1], min), max)
-    return sliderSortRange([a, b])
+    const tuple = Array.isArray(value) ? value : [lower, upper]
+    return sliderSortRange([
+      sliderDisplayValue(tuple[0], min, max),
+      sliderDisplayValue(tuple[1], min, max)
+    ])
   }
-  const n = typeof value === 'number' ? value : value[0]
-  return Math.min(Math.max(n, min), max)
+  const numeric = typeof value === 'number' ? value : lower
+  return sliderDisplayValue(numeric, min, max)
 }
 
 interface ThumbProps {
@@ -72,6 +88,7 @@ interface ThumbProps {
   max: number
   ariaLabel?: string
   ariaLabelledby?: string
+  suffix?: string
   ariaDescribedby?: string
   ariaInvalid?: boolean
   id?: string
@@ -101,6 +118,7 @@ const Thumb = memo<ThumbProps>(
     max,
     ariaLabel,
     ariaLabelledby,
+    suffix,
     ariaDescribedby,
     ariaInvalid,
     id,
@@ -116,10 +134,15 @@ const Thumb = memo<ThumbProps>(
     getPercentage
   }) => {
     const pct = getPercentage(value)
+    const suffixId = suffix ? `${id ?? 'slider'}-suffix` : undefined
+    const labelledBy = suffixId
+      ? [ariaLabelledby, suffixId].filter(Boolean).join(' ')
+      : ariaLabelledby
     const showThumbTooltip =
       tooltip &&
-      (showTooltip || focused || isDragging) &&
-      (thumbType === activeThumb || thumbType === null || (!activeThumb && thumbType === null))
+      (thumbType == null
+        ? showTooltip || focused || isDragging
+        : focused || (isDragging && activeThumb === thumbType))
     const zIndex = activeThumb && thumbType ? (activeThumb === thumbType ? 2 : 1) : undefined
 
     return (
@@ -135,8 +158,8 @@ const Thumb = memo<ThumbProps>(
         aria-valuemax={max}
         aria-orientation="horizontal"
         aria-disabled={disabled || undefined}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledby}
+        aria-label={suffix ? undefined : ariaLabel}
+        aria-labelledby={labelledBy}
         aria-describedby={ariaDescribedby}
         aria-invalid={ariaInvalid || undefined}
         aria-valuetext={String(value)}
@@ -147,6 +170,11 @@ const Thumb = memo<ThumbProps>(
         onBlur={onBlur}
         onKeyDown={(e) => onKeyDown(e, value, thumbType)}>
         {showThumbTooltip && <div className={tooltipClasses}>{value}</div>}
+        {suffix && suffixId ? (
+          <span id={suffixId} className="sr-only">
+            {suffix}
+          </span>
+        ) : null}
       </div>
     )
   }
@@ -177,9 +205,11 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     'aria-label': ariaLabel,
     'aria-labelledby': ariaLabelledby,
     'aria-describedby': ariaDescribedby,
+    name,
     ...divProps
   } = props
 
+  const reactId = useId()
   const formItemControl = useFormItemControlContext()
   const config = useTigerConfig()
   const labels = getSliderLabels(config.locale)
@@ -195,22 +225,38 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
       ? ariaLabelledby
       : formItemControl?.labelId
 
+  const seeded = resolveFormItemSeed(
+    controlledValue,
+    formItemControl?.name,
+    formItemControl?.value,
+    (raw) => coerceSliderFormValue(raw, range)
+  )
   const [internalValue, setInternalValue] = useControlledState<number | [number, number]>({
-    value: resolveFormItemSeed(
-      controlledValue,
-      formItemControl?.name,
-      formItemControl?.value,
-      (raw) => coerceSliderFormValue(raw, range)
-    ),
+    value:
+      seeded === null
+        ? range
+          ? [min, max]
+          : min
+        : seeded,
     defaultValue: defaultValue ?? (range ? [min, max] : min),
     onChange: (next) => {
       onChange?.(next)
       formItemControl?.onChange?.(next)
     }
   })
-  const displayed = displaySliderValue(internalValue, range, min, max)
+  const [preview, setPreview] = useState<number | [number, number] | null>(null)
+  const previewRef = useRef<number | [number, number] | null>(null)
+  const rememberPreview = (next: number | [number, number] | null) => {
+    previewRef.current = next
+    setPreview(next)
+  }
+  const modelDisplayed = displaySliderValue(internalValue, range, min, max)
+  const displayed = preview ?? modelDisplayed
   const valueRef = useRef(displayed)
   valueRef.current = displayed
+  const modelRef = useRef(modelDisplayed)
+  modelRef.current = modelDisplayed
+  const [elementDir, setElementDir] = useState<'ltr' | 'rtl' | null>(null)
 
   const [isDragging, setIsDragging] = useState(false)
   const [activeThumb, setActiveThumb] = useState<'min' | 'max' | null>(null)
@@ -242,7 +288,12 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     }
   }
 
-  const rtl = getElementTextDirection(trackRef.current ?? rootRef.current) === 'rtl'
+  useLayoutEffect(() => {
+    const closest = rootRef.current?.closest('[dir]')
+    const attr = closest?.getAttribute('dir')
+    setElementDir(attr === 'rtl' || attr === 'ltr' ? attr : null)
+  }, [config.direction])
+  const rtl = (elementDir ?? (config.direction === 'rtl' ? 'rtl' : 'ltr')) === 'rtl'
 
   const getPercentage = useCallback(
     (val: number): number => sliderGetPercentage(val, min, max),
@@ -251,8 +302,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
 
   const commit = useCallback(
     (next: number | [number, number]) => {
-      const current = valueRef.current
-      if (sliderValuesEqual(current, next)) return
+      if (sliderValuesEqual(modelRef.current, next)) return
       setInternalValue(next)
     },
     [setInternalValue]
@@ -288,8 +338,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     setActiveThumb(which)
     setIsDragging(true)
     if (tooltip) setShowTooltip(true)
-    const next = sliderApplyThumbValue(current, pointerValue, which, range)
-    commit(next)
+    rememberPreview(sliderApplyThumbValue(current, pointerValue, which, range))
     ;(event.currentTarget as HTMLElement).focus()
 
     dragSessionRef.current?.dispose()
@@ -305,9 +354,18 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
         if (!box) return
         const dir = getElementTextDirection(trackRef.current) === 'rtl'
         const moved = sliderGetValueFromClientX(currentX, box, min, max, step, dir)
-        commit(sliderApplyThumbValue(valueRef.current, moved, activeThumbRef.current, range))
+        rememberPreview(
+          sliderApplyThumbValue(
+            previewRef.current ?? valueRef.current,
+            moved,
+            activeThumbRef.current,
+            range
+          )
+        )
       },
       onEnd: () => {
+        if (previewRef.current !== null) commit(previewRef.current)
+        rememberPreview(null)
         dragSessionRef.current = null
         setIsDragging(false)
         setActiveThumb(null)
@@ -359,6 +417,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
   )
   const tooltipClasses = useMemo(() => getSliderTooltipClasses(size), [size])
   const marksObj = sliderResolveMarks(marks, min, max, step)
+  const bounds = sliderBounds(min, max)
 
   const named = resolveSliderThumbName({
     thumb: null,
@@ -387,8 +446,18 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     <div
       {...divProps}
       ref={setRootRef}
-      className={getSliderRootClasses(effectiveDisabled, className, tooltip, status)}
-      data-status={status === 'default' ? undefined : status}>
+      className={getSliderRootClasses(
+        effectiveDisabled,
+        className,
+        tooltip && (showTooltip || focusedThumb !== null || isDragging),
+        status
+      )}
+      data-status={status === 'default' ? undefined : status}
+      onBlur={(event) => {
+        const next = event.relatedTarget
+        if (next && event.currentTarget.contains(next as Node)) return
+        formItemControl?.onBlur?.()
+      }}>
       <div className={sliderHitAreaClasses} onPointerDown={handleTrackPointerDown}>
         <div ref={trackRef} className={trackClasses} onPointerDown={handleTrackPointerDown}>
           <div className={sliderRangeClasses} style={rangeStyles} />
@@ -403,13 +472,14 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 focused={focusedThumb === 'min'}
                 activeThumb={activeThumb}
                 isDragging={isDragging}
-                min={min}
-                max={max}
+                min={bounds.lower}
+                max={bounds.upper}
                 ariaLabel={minNamed.ariaLabel}
                 ariaLabelledby={minNamed.ariaLabelledby}
+                suffix={minNamed.suffix}
                 ariaDescribedby={describedBy}
                 ariaInvalid={status === 'error'}
-                id={effectiveId}
+                id={effectiveId ?? `${reactId}-min`}
                 thumbClasses={thumbClasses}
                 tooltipClasses={tooltipClasses}
                 rtl={rtl}
@@ -421,7 +491,6 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 onFocus={() => setFocusedThumb('min')}
                 onBlur={() => {
                   setFocusedThumb(null)
-                  formItemControl?.onBlur?.()
                 }}
                 getPercentage={getPercentage}
               />
@@ -434,12 +503,14 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 focused={focusedThumb === 'max'}
                 activeThumb={activeThumb}
                 isDragging={isDragging}
-                min={min}
-                max={max}
+                min={bounds.lower}
+                max={bounds.upper}
                 ariaLabel={maxNamed.ariaLabel}
                 ariaLabelledby={maxNamed.ariaLabelledby}
+                suffix={maxNamed.suffix}
                 ariaDescribedby={describedBy}
                 ariaInvalid={status === 'error'}
+                id={effectiveId ? `${effectiveId}-max` : `${reactId}-max`}
                 thumbClasses={thumbClasses}
                 tooltipClasses={tooltipClasses}
                 rtl={rtl}
@@ -451,7 +522,6 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 onFocus={() => setFocusedThumb('max')}
                 onBlur={() => {
                   setFocusedThumb(null)
-                  formItemControl?.onBlur?.()
                 }}
                 getPercentage={getPercentage}
               />
@@ -465,8 +535,8 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
               focused={focusedThumb === 'single'}
               activeThumb={activeThumb}
               isDragging={isDragging}
-              min={min}
-              max={max}
+              min={bounds.lower}
+              max={bounds.upper}
               ariaLabel={named.ariaLabel}
               ariaLabelledby={named.ariaLabelledby}
               ariaDescribedby={describedBy}
@@ -484,7 +554,6 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
               onFocus={() => setFocusedThumb('single')}
               onBlur={() => {
                 setFocusedThumb(null)
-                formItemControl?.onBlur?.()
               }}
               getPercentage={getPercentage}
             />
@@ -498,7 +567,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
             return (
               <div
                 key={key}
-                className="absolute text-xs text-[var(--tiger-text-muted,#6b7280)] -translate-x-1/2"
+                className="absolute text-xs text-[var(--tiger-text-secondary)] -translate-x-1/2"
                 style={sliderThumbInsetStyle(getPercentage(markValue), rtl)}>
                 {label}
               </div>
@@ -506,6 +575,22 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
           })}
         </div>
       )}
+      {shouldSubmitNativeField({
+        name: name ?? formItemControl?.name,
+        disabled: effectiveDisabled
+      }) ? (
+        <input
+          type="hidden"
+          name={name ?? formItemControl?.name}
+          value={
+            seeded === null
+              ? ''
+              : Array.isArray(displayed)
+                ? `${displayed[0]},${displayed[1]}`
+                : String(displayed)
+          }
+        />
+      ) : null}
     </div>
   )
 })

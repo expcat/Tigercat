@@ -86,6 +86,11 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   const effectiveId = id ?? formItemControl?.id
   const effectiveName = name ?? formItemControl?.name
 
+  useEffect(() => {
+    if (inGroup && value !== undefined) groupContext?.claimInvalid(value)
+  }, [groupContext, inGroup, value])
+
+  const ownsInvalid = !inGroup || groupContext?.invalidValue === value
   const checked = inGroup
     ? value !== undefined && checkboxGroupIncludes(groupContext!.value, value)
     : checkedState
@@ -161,9 +166,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
       disabled={effectiveDisabled}
       value={typeof value === 'boolean' ? String(value) : (value as string | number | undefined)}
       aria-checked={indeterminate ? 'mixed' : checked}
-      aria-invalid={status === 'error' ? true : props['aria-invalid']}
+      aria-invalid={status === 'error' && ownsInvalid ? true : props['aria-invalid']}
       aria-required={formItemControl?.required || props['aria-required'] ? true : undefined}
-      aria-describedby={describedBy}
+      aria-describedby={inGroup && !ownsInvalid ? undefined : describedBy}
       onChange={handleChange}
       onBlur={handleBlur}
     />

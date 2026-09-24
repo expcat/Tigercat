@@ -402,6 +402,11 @@ export interface FormItemProps {
    * Help text rendered in the control column, under the field.
    */
   extra?: string
+
+  /**
+   * Disables the control and skips this field's rules, including required.
+   */
+  disabled?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -443,6 +448,8 @@ export interface FormHandle {
   ) => Promise<void>
   clearValidate: (fieldNames?: string | string[]) => void
   resetFields: () => void
+  /** Replace the snapshot `resetFields()` restores. */
+  setInitialValues: (values: FormValues) => void
   addField: (fieldName: string, defaultValue?: unknown) => void
   removeField: (fieldName: string) => void
   undo: () => void
@@ -518,9 +525,27 @@ export interface FormController {
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
   /** Register per-item condition (FormItem). Pass `undefined` to unregister. */
   registerFieldCondition: (fieldName: string, condition?: FormFieldCondition) => void
+  /**
+   * Control `disabled` (including workflow readonly). Skips that field's rules.
+   * Pass `false` when the control is editable. Unmount clears it.
+   */
+  registerFieldDisabled: (fieldName: string, disabled: boolean | null) => void
+  /** Names of FormItems currently mounted. */
+  getMountedFieldNames: () => string[]
   /** Resolved visibility / disabled / required for a field */
   getFieldConditionState: (
     fieldName: string,
     conditionOverride?: FormFieldCondition
   ) => FormConditionState
+  /**
+   * Write one field error. `null` clears it.
+   * Crop and other widgets use this instead of a second error channel.
+   */
+  setFieldError: (fieldName: string, message: string | null) => void
+  /** Replace the snapshot `reset()` restores. Ignored when the contents match. */
+  setInitialValues: (values: FormValues) => void
+  /**
+   * `polite` while the user is editing. `assertive` after a failed submit.
+   */
+  readonly errorAnnouncement: 'polite' | 'assertive'
 }

@@ -6,19 +6,19 @@ import { type RadioColorScheme } from './theme-colors'
 export const radioRootBaseClasses = 'inline-flex items-center'
 
 export const radioVisualBaseClasses =
-  'relative inline-flex items-center justify-center rounded-full border-2 tiger-motion-aware [transition:var(--tiger-transition-base,border-color_150ms_ease,background-color_150ms_ease,transform_150ms_ease)] cursor-pointer'
+  'relative inline-flex items-center justify-center rounded-full border-2 tiger-motion-aware [transition:var(--tiger-transition-base)] cursor-pointer'
 
 export const radioFocusVisibleClasses =
-  'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+  'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring)] peer-focus-visible:ring-offset-[var(--tiger-surface)]'
 
 export const radioDotBaseClasses =
-  'rounded-full tiger-motion-aware [transition:var(--tiger-transition-base,transform_150ms_ease)]'
+  'rounded-full tiger-motion-aware [transition:var(--tiger-transition-base)]'
 
 export const radioLabelBaseClasses = 'ms-2 cursor-pointer select-none'
 
 export const radioDisabledCursorClasses = 'cursor-not-allowed'
 
-export const radioHoverBorderClasses = 'hover:border-[var(--tiger-primary,#2563eb)]'
+export const radioHoverBorderClasses = 'hover:border-[var(--tiger-primary)]'
 
 export const radioSizeClasses: Record<
   ComponentSize,
@@ -65,7 +65,7 @@ export const getRadioVisualClasses = ({
     radioVisualBaseClasses,
     radioFocusVisibleClasses,
     radioSizeClasses[size].radio,
-    checked ? colors.borderChecked : error ? 'border-[var(--tiger-error,#dc2626)]' : colors.border,
+    checked ? colors.borderChecked : error ? 'border-[var(--tiger-error)]' : colors.border,
     checked ? colors.bgChecked : colors.bg,
     disabled && colors.disabled,
     disabled ? radioDisabledCursorClasses : radioHoverBorderClasses
@@ -96,7 +96,7 @@ export const getRadioLabelClasses = ({ size, disabled, colors }: GetRadioLabelCl
   classNames(
     radioLabelBaseClasses,
     radioSizeClasses[size].label,
-    disabled ? colors.textDisabled : 'text-[var(--tiger-text,#111827)]',
+    disabled ? colors.textDisabled : 'text-[var(--tiger-text)]',
     disabled && radioDisabledCursorClasses
   )
 

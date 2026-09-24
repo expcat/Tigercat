@@ -10,6 +10,7 @@ import {
   getValueByPath,
   createFormValidationDebouncer,
   isFormValidationCancelled,
+  isFormValidationSuperseded,
   validateRule,
   getFormValidationLabels,
   extractFormChangeValue
@@ -176,6 +177,72 @@ describe('extractFormChangeValue', () => {
     expect(extractFormChangeValue(0)).toEqual({ found: true, value: 0 })
     expect(extractFormChangeValue('')).toEqual({ found: true, value: '' })
     expect(extractFormChangeValue(undefined)).toEqual({ found: false })
+  })
+})
+
+describe('trigger and validate generation', () => {
+  it('keeps blur errors when a change trigger does not run that rule', async () => {
+    const engine = createFormEngine({
+      initialValues: { name: '' },
+      rules: {
+        name: [
+          { required: true, trigger: 'blur', message: 'blur required' },
+          { min: 3, trigger: 'change', message: 'too short' }
+        ]
+      }
+    })
+    expect(await engine.validateField('name', undefined, 'blur')).toBe('blur required')
+    expect(await engine.validateField('name', undefined, 'change')).toBe('blur required')
+    engine.setFieldValue('name', 'Ada')
+    expect(await engine.validateField('name', undefined, 'change')).toBe('blur required')
+    expect(await engine.validateField('name', undefined, 'blur')).toBeNull()
+  })
+
+  it('merges item rules with form rules', async () => {
+    const engine = createFormEngine({
+      initialValues: { name: '' },
+      rules: { name: { required: true, message: 'need name' } }
+    })
+    engine.registerFieldRules('name', { min: 3, message: 'short' })
+    expect(await engine.validateField('name')).toBe('need name')
+    engine.setFieldValue('name', 'A')
+    expect(await engine.validateField('name')).toBe('short')
+  })
+
+  it('supersedes an in-flight validate', async () => {
+    let release: (value: boolean) => void = () => {}
+    const engine = createFormEngine({
+      initialValues: { name: '' },
+      rules: {
+        name: {
+          validator: () =>
+            new Promise<boolean>((resolve) => {
+              release = resolve
+            })
+        }
+      }
+    })
+    const first = engine.validate()
+    const second = engine.validate()
+    release(true)
+    await expect(first).rejects.toSatisfy(isFormValidationSuperseded)
+    await expect(second).resolves.toBe(true)
+  })
+
+  it('does not push history when the value is unchanged', () => {
+    const engine = createFormEngine({ initialValues: { name: 'Ada' }, undoable: true })
+    engine.setFieldValue('name', 'Ada')
+    expect(engine.canUndo).toBe(false)
+    engine.setFieldValue('name', 'Grace')
+    expect(engine.canUndo).toBe(true)
+  })
+
+  it('writes a field error', () => {
+    const engine = createFormEngine({ initialValues: { file: null } })
+    engine.setFieldError('file', 'Too large')
+    expect(engine.errorsByField.file).toBe('Too large')
+    engine.setFieldError('file', null)
+    expect(engine.errorsByField.file).toBeUndefined()
   })
 })
 

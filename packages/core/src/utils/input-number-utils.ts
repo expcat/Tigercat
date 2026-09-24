@@ -7,9 +7,9 @@ import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
 
 const FOCUS_RING =
-  'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[var(--tiger-focus-ring)]/40'
 const ERROR_FOCUS_RING =
-  'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[var(--tiger-error,#dc2626)]/40'
+  'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[var(--tiger-error)]/40'
 
 export interface GetInputNumberWrapperOptions {
   disabled?: boolean
@@ -34,22 +34,22 @@ export function getInputNumberWrapperClasses(
   return classNames(
     'inline-flex items-center relative',
     options.inGroup ? 'flex-1 min-w-0' : 'w-full',
-    'border rounded-[var(--tiger-radius-md,0.5rem)] shadow-sm',
+    'border rounded-[var(--tiger-radius-md)] shadow-sm',
     isDisabled
-      ? 'bg-[var(--tiger-surface-muted,#f3f4f6)] cursor-not-allowed'
-      : 'bg-[var(--tiger-surface,#ffffff)] hover:border-[var(--tiger-primary,#2563eb)]',
+      ? 'bg-[var(--tiger-surface-muted)] cursor-not-allowed'
+      : 'bg-[var(--tiger-surface)] hover:border-[var(--tiger-primary)]',
     'tiger-motion-aware',
-    '[transition:var(--tiger-transition-base,color_150ms_ease)]',
+    '[transition:var(--tiger-transition-base)]',
     WRAPPER_STATUS_CLASSES[status],
     status === 'error' ? ERROR_FOCUS_RING : FOCUS_RING
   )
 }
 
 const WRAPPER_STATUS_CLASSES: Record<InputStatus, string> = {
-  default: 'border-[var(--tiger-border,#e5e7eb)]',
-  error: 'border-[var(--tiger-error,#dc2626)]',
-  success: 'border-[var(--tiger-success,#16a34a)]',
-  warning: 'border-[var(--tiger-warning,#d97706)]'
+  default: 'border-[var(--tiger-border)]',
+  error: 'border-[var(--tiger-error)]',
+  success: 'border-[var(--tiger-success)]',
+  warning: 'border-[var(--tiger-warning)]'
 }
 
 export function getInputNumberStatusClasses(status: InputStatus = 'default'): string {
@@ -57,10 +57,10 @@ export function getInputNumberStatusClasses(status: InputStatus = 'default'): st
 }
 
 export function getInputNumberFocusRingColor(status: InputStatus = 'default'): string {
-  if (status === 'error') return 'ring-[var(--tiger-error,#dc2626)]'
-  if (status === 'success') return 'ring-[var(--tiger-success,#16a34a)]'
-  if (status === 'warning') return 'ring-[var(--tiger-warning,#d97706)]'
-  return 'ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  if (status === 'error') return 'ring-[var(--tiger-error)]'
+  if (status === 'success') return 'ring-[var(--tiger-success)]'
+  if (status === 'warning') return 'ring-[var(--tiger-warning)]'
+  return 'ring-[var(--tiger-focus-ring)]'
 }
 
 const WRAPPER_SIZE_CLASSES: Record<ComponentSize, string> = {
@@ -102,9 +102,9 @@ export function getInputNumberInputClasses(
 
   return classNames(
     'w-full h-full bg-transparent border-0 outline-none',
-    'text-[var(--tiger-text,#111827)]',
-    'placeholder:text-[var(--tiger-text-muted,#6b7280)]',
-    'disabled:text-[var(--tiger-text-muted,#6b7280)] disabled:cursor-not-allowed',
+    'text-[var(--tiger-text)]',
+    'placeholder:text-[var(--tiger-text-secondary)]',
+    'disabled:text-[var(--tiger-text-secondary)] disabled:cursor-not-allowed',
     '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
     size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base',
     layout === 'both' && 'px-8 text-center',
@@ -114,7 +114,7 @@ export function getInputNumberInputClasses(
 }
 
 const STEP_BUTTON_FOCUS =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
 export function getInputNumberStepButtonClasses(
   position: 'up' | 'down',
@@ -123,15 +123,15 @@ export function getInputNumberStepButtonClasses(
   return classNames(
     'flex items-center justify-center',
     'w-7 h-1/2',
-    'border-s border-[var(--tiger-border,#e5e7eb)]',
-    'text-[var(--tiger-text-muted,#6b7280)]',
+    'border-s border-[var(--tiger-border)]',
+    'text-[var(--tiger-text-secondary)]',
     'tiger-motion-aware',
-    '[transition:var(--tiger-transition-base,color_150ms_ease)] cursor-pointer select-none',
+    '[transition:var(--tiger-transition-base)] cursor-pointer select-none',
     STEP_BUTTON_FOCUS,
-    position === 'up' ? 'border-b border-b-[var(--tiger-border,#e5e7eb)]' : '',
+    position === 'up' ? 'border-b border-b-[var(--tiger-border)]' : '',
     disabled
       ? 'opacity-40 cursor-not-allowed'
-      : 'hover:text-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+      : 'hover:text-[var(--tiger-primary)] hover:bg-[var(--tiger-surface-muted)]'
   )
 }
 
@@ -143,16 +143,16 @@ export function getInputNumberSideButtonClasses(
   return classNames(
     'flex items-center justify-center',
     'w-8 h-full',
-    'text-[var(--tiger-text-muted,#6b7280)]',
+    'text-[var(--tiger-text-secondary)]',
     'tiger-motion-aware',
-    '[transition:var(--tiger-transition-base,color_150ms_ease)] cursor-pointer select-none',
+    '[transition:var(--tiger-transition-base)] cursor-pointer select-none',
     STEP_BUTTON_FOCUS,
     atStart
-      ? 'border-e border-e-[var(--tiger-border,#e5e7eb)] rounded-s-[var(--tiger-radius-md,0.5rem)]'
-      : 'border-s border-s-[var(--tiger-border,#e5e7eb)] rounded-e-[var(--tiger-radius-md,0.5rem)]',
+      ? 'border-e border-e-[var(--tiger-border)] rounded-s-[var(--tiger-radius-md)]'
+      : 'border-s border-s-[var(--tiger-border)] rounded-e-[var(--tiger-radius-md)]',
     disabled
       ? 'opacity-40 cursor-not-allowed'
-      : 'hover:text-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+      : 'hover:text-[var(--tiger-primary)] hover:bg-[var(--tiger-surface-muted)]'
   )
 }
 
@@ -255,6 +255,31 @@ export interface CommitInputNumberOptions {
   min?: number
   max?: number
   precision?: number
+  step?: number
+  /** When true, blur and Enter snap onto the step grid. Buttons always step. */
+  snapToStep?: boolean
+}
+
+/** Snap onto the step grid. Origin is `min` when it is finite, otherwise 0. */
+export function snapInputNumberToStep(
+  value: number,
+  min: number,
+  step: number,
+  precision?: number
+): number {
+  const origin = Number.isFinite(min) ? min : 0
+  const safeStep = Number.isFinite(step) && step > 0 ? step : 1
+  const places = Math.max(
+    countDecimalPlaces(safeStep),
+    countDecimalPlaces(origin),
+    precision ?? 0,
+    countDecimalPlaces(value)
+  )
+  const factor = 10 ** places
+  const stepInt = Math.round(safeStep * factor)
+  if (stepInt === 0) return value
+  const offsetInt = Math.round((value - origin) * factor)
+  return (Math.round(origin * factor) + Math.round(offsetInt / stepInt) * stepInt) / factor
 }
 
 export function commitInputNumberValue(
@@ -270,6 +295,10 @@ export function commitInputNumberValue(
       next = null
     } else {
       next = clampValue(next, min, max)
+      if (options.snapToStep) {
+        next = snapInputNumberToStep(next, min, options.step ?? 1, options.precision)
+        next = clampValue(next, min, max)
+      }
       if (options.precision !== undefined) {
         next = formatPrecision(next, options.precision)
       }

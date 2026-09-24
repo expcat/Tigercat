@@ -21,7 +21,7 @@ export default function App() {
   return (
     <div className="space-y-3">
       <SchemaForm schema={schema} value={model} onChange={setModel} onSubmit={handleSubmit} />
-      {message ? <p className="text-sm text-[var(--tiger-text-muted,#6b7280)]">{message}</p> : null}
+      {message ? <p className="text-sm text-[var(--tiger-text-secondary)]">{message}</p> : null}
     </div>
   )
 }

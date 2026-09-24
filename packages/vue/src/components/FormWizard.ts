@@ -2,6 +2,7 @@ import {
   defineComponent,
   computed,
   ref,
+  watch,
   h,
   PropType,
   useId,
@@ -164,16 +165,36 @@ export const FormWizard = defineComponent({
     )
     const wrapperStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
+    let selfStep = false
     const setCurrent = async (next: number) => {
       const clamped = clampStepIndex(next, totalCount.value)
       const prev = currentIndex.value
+      selfStep = true
       if (props.current === undefined) innerCurrent.value = clamped
       emit('update:current', clamped)
-      emit('step-change', clamped, prev)
+      emit('step-change', clamped, prev, { skippedValidation: false })
       if (props.autoSave && props.steps[clamped]) {
         await props.autoSave(clamped, props.steps[clamped])
       }
     }
+
+    watch(
+      () => props.current,
+      (next, prev) => {
+        if (next === undefined) return
+        if (selfStep) {
+          selfStep = false
+          return
+        }
+        if (prev === undefined) return
+        emit(
+          'step-change',
+          clampStepIndex(next, totalCount.value),
+          clampStepIndex(prev, totalCount.value),
+          { skippedValidation: true }
+        )
+      }
+    )
 
     const formApi = () => formContext?.value
 
@@ -184,7 +205,8 @@ export const FormWizard = defineComponent({
         currentStep: currentStep.value,
         steps: props.steps,
         beforeNext: props.beforeNext,
-        validateFields: form ? (fields) => form.validateFields(fields) : undefined
+        validateFields: form ? (fields) => form.validateFields(fields) : undefined,
+        mountedFields: form?.getMountedFieldNames()
       })
     }
 
@@ -192,9 +214,11 @@ export const FormWizard = defineComponent({
       const form = formApi()
       if (form) {
         const fields = props.steps[index]?.fields
-        const valid = fields?.length ? await form.validateFields(fields) : await form.validate()
+        const names = fields?.length ? fields : form.getMountedFieldNames()
+        const valid = names.length ? await form.validateFields(names) : await form.validate()
         if (!valid) return
-        await form.submit()
+        const submitted = await form.submit()
+        if (!submitted) return
       }
       emit('finish', index, props.steps, form?.getValues())
       if (props.autoSave && props.steps[index]) {
@@ -325,7 +349,7 @@ export const FormWizard = defineComponent({
                   'div',
                   {
                     role: 'alert',
-                    class: 'mb-3 w-full text-sm text-[var(--tiger-error,#dc2626)]'
+                    class: 'mb-3 w-full text-sm text-[var(--tiger-error)]'
                   },
                   errorMessage.value
                 )
@@ -338,7 +362,7 @@ export const FormWizard = defineComponent({
                   ? h(
                       Button,
                       {
-                        htmlType: 'button',
+                        type: 'button',
                         variant: 'secondary',
                         class: 'group',
                         onClick: handlePrev,
@@ -354,7 +378,7 @@ export const FormWizard = defineComponent({
                 h(
                   Button,
                   {
-                    htmlType: 'button',
+                    type: 'button',
                     variant: 'primary',
                     class: 'group',
                     onClick: handleNext,

@@ -247,13 +247,13 @@ const OTP_SLOT_SIZE_CLASSES: Record<ComponentSize, string> = {
 
 const OTP_SLOT_STATUS_CLASSES: Record<InputStatus, string> = {
   default:
-    'border-[var(--tiger-border,#e5e7eb)] focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:border-transparent',
+    'border-[var(--tiger-border)] focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:border-transparent',
   error:
-    'border-[var(--tiger-error,#dc2626)] focus-visible:ring-[var(--tiger-error,#dc2626)]/40 text-[var(--tiger-error,#dc2626)]',
+    'border-[var(--tiger-error)] focus-visible:ring-[var(--tiger-error)]/40 text-[var(--tiger-error)]',
   success:
-    'border-[var(--tiger-success,#16a34a)] focus-visible:ring-[var(--tiger-success,#16a34a)]/40 text-[var(--tiger-success,#16a34a)]',
+    'border-[var(--tiger-success)] focus-visible:ring-[var(--tiger-success)]/40 text-[var(--tiger-success)]',
   warning:
-    'border-[var(--tiger-warning,#d97706)] focus-visible:ring-[var(--tiger-warning,#d97706)]/40 text-[var(--tiger-warning,#d97706)]'
+    'border-[var(--tiger-warning)] focus-visible:ring-[var(--tiger-warning)]/40 text-[var(--tiger-warning)]'
 }
 
 export interface GetOtpSlotClassesOptions {
@@ -267,11 +267,11 @@ export function getOtpSlotClasses(
   options: GetOtpSlotClassesOptions = {}
 ): string {
   return classNames(
-    'text-center border rounded-[var(--tiger-radius-md,0.5rem)]',
-    'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]',
+    'text-center border rounded-[var(--tiger-radius-md)]',
+    'bg-[var(--tiger-surface)] text-[var(--tiger-text)]',
     'focus:outline-none focus-visible:ring-2 tiger-motion-aware',
-    '[transition:var(--tiger-transition-base,color_150ms_ease,border-color_150ms_ease)]',
-    'disabled:bg-[var(--tiger-surface-muted,#f3f4f6)] disabled:text-[var(--tiger-text-muted,#6b7280)] disabled:cursor-not-allowed',
+    '[transition:var(--tiger-transition-base)]',
+    'disabled:bg-[var(--tiger-surface-muted)] disabled:text-[var(--tiger-text-secondary)] disabled:cursor-not-allowed',
     OTP_SLOT_SIZE_CLASSES[size],
     OTP_SLOT_STATUS_CLASSES[status],
     options.readonly && 'cursor-default'
@@ -280,11 +280,11 @@ export function getOtpSlotClasses(
 
 export function getOtpSeparatorClasses(size: ComponentSize = 'md'): string {
   return classNames(
-    'select-none text-[var(--tiger-text-muted,#6b7280)]',
+    'select-none text-[var(--tiger-text-secondary)]',
     OTP_TEXT_SIZE_CLASSES[size]
   )
 }
 
 export function getOtpErrorClasses(): string {
-  return 'mt-1 text-sm text-[var(--tiger-error,#dc2626)]'
+  return 'mt-1 text-sm text-[var(--tiger-error)]'
 }

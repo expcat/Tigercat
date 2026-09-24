@@ -95,6 +95,12 @@ describe('form conditional DSL', () => {
       evaluateFormCondition({ field: 'tags', operator: 'includes', value: 'vip' }, values)
     ).toBe(true)
     expect(evaluateFormCondition({ field: 'age', operator: 'gte', value: 18 }, values)).toBe(true)
+    expect(
+      evaluateFormCondition({ field: 'companyName', operator: 'gt', value: -1 }, values)
+    ).toBe(false)
+    expect(
+      evaluateFormCondition({ field: 'companyName', operator: 'empty' }, values)
+    ).toBe(true)
   })
 
   it('combines multiple conditions with all or any logic', () => {

@@ -23,11 +23,6 @@ export interface TagsInputProps {
   status?: InputStatus
 
   /**
-   * Error message to display
-   */
-  errorMessage?: string
-
-  /**
    * Tags (for controlled mode)
    */
   value?: string[]
@@ -89,10 +84,10 @@ export interface TagsInputProps {
   disabled?: boolean
 
   /**
-   * Whether the input is readonly
+   * Whether the input is read-only. Read-only tags still submit.
    * @default false
    */
-  readonly?: boolean
+  readOnly?: boolean
 
   /**
    * Name for the hidden input carrying the joined value (form submission)

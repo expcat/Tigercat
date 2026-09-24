@@ -26,18 +26,38 @@ import {
   getFormItemErrorPopupClasses,
   getFormItemFieldClasses,
   getFormItemLabelClasses,
+  getFormItemErrorSrOnlyClasses,
   hasRequiredRule,
   isFormItemGroupControl,
+  withRequiredRule,
   mergeAriaDescribedBy,
-  schemaFormExtraClasses,
   type FormRule,
   type FormFieldCondition,
   type ComponentSize,
   type FormErrorDisplayMode,
   type InputStatus
 } from '@expcat/tigercat-core'
+import { schemaFormExtraClasses } from '@expcat/tigercat-core/schema-form'
 import { FormContextKey, type FormContext } from './Form'
-import { FORM_ITEM_CONTROL_INJECTION_KEY } from './FormItemContext'
+import {
+  FORM_ITEM_CONTROL_INJECTION_KEY,
+  type VueFormItemControlContext
+} from './FormItemContext'
+export { FORM_ITEM_CONTROL_INJECTION_KEY } from './FormItemContext'
+
+const FormItemControlHost = defineComponent({
+  name: 'TigerFormItemControlHost',
+  props: {
+    control: {
+      type: Object as PropType<VueFormItemControlContext>,
+      required: true
+    }
+  },
+  setup(props, { slots }) {
+    provide(FORM_ITEM_CONTROL_INJECTION_KEY, props.control)
+    return () => slots.default?.()
+  }
+})
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 
 export interface VueFormItemProps {
@@ -93,6 +113,10 @@ export const FormItem = defineComponent({
     },
     extra: {
       type: String
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props, { slots }) {
@@ -160,35 +184,62 @@ export const FormItem = defineComponent({
       { immediate: true }
     )
 
-    const unregisterFieldRules = () => {
+    const registeredName = ref<string | undefined>(undefined)
+
+    const itemRules = () => (props.required ? withRequiredRule(props.rules) : props.rules)
+
+    const unregisterName = (name: string | undefined) => {
       const ctx = formContext.value
-      if (props.name && ctx) {
-        ctx.registerFieldRules(props.name, undefined)
-        ctx.registerFieldCondition(props.name, undefined)
-      }
+      if (!name || !ctx) return
+      ctx.registerFieldRules(name, undefined)
+      ctx.registerFieldCondition(name, undefined)
     }
 
     watch(
-      () => [props.name, props.rules, props.condition] as const,
-      ([name, rules, condition]) => {
+      () => [props.name, props.rules, props.required, props.condition] as const,
+      ([name, rules, required, condition]) => {
         const ctx = formContext.value
-        if (!name || !ctx) return
-        if (rules) {
-          ctx.registerFieldRules(name, rules)
-        } else {
-          ctx.registerFieldRules(name, undefined)
+        if (!ctx) return
+        if (registeredName.value && registeredName.value !== name) {
+          unregisterName(registeredName.value)
         }
+        registeredName.value = name
+        if (!name) return
+        ctx.registerFieldRules(name, required ? withRequiredRule(rules) : rules)
         ctx.registerFieldCondition(name, condition)
       },
       { immediate: true }
     )
 
-    onUnmounted(unregisterFieldRules)
+    watch(
+      () =>
+        [
+          props.name,
+          props.disabled,
+          formContext.value?.disabled,
+          conditionState.value.disabled
+        ] as const,
+      ([name, itemDisabled, formDisabled, conditionDisabled]) => {
+        const ctx = formContext.value
+        if (!ctx || !name) return
+        ctx.registerFieldDisabled(
+          name,
+          Boolean(itemDisabled || formDisabled || conditionDisabled)
+        )
+      },
+      { immediate: true }
+    )
+
+    onUnmounted(() => {
+      const name = registeredName.value
+      unregisterName(name)
+      if (name) formContext.value?.registerFieldDisabled(name, null)
+    })
 
     const handleBlur = () => {
       const ctx = formContext.value
       if (props.name && ctx) {
-        ctx.validateField(props.name, props.rules, 'blur')
+        ctx.validateField(props.name, itemRules(), 'blur')
       }
     }
 
@@ -196,7 +247,7 @@ export const FormItem = defineComponent({
       const ctx = formContext.value
       if (!props.name || !ctx) return
       ctx.updateValue(props.name, next)
-      ctx.validateField(props.name, props.rules, 'change')
+      ctx.validateField(props.name, itemRules(), 'change')
     }
 
     const handleNativeChange = (argument?: unknown) => {
@@ -206,9 +257,15 @@ export const FormItem = defineComponent({
       } else {
         const ctx = formContext.value
         if (props.name && ctx) {
-          ctx.validateField(props.name, props.rules, 'change')
+          ctx.validateField(props.name, itemRules(), 'change')
         }
       }
+    }
+
+    const setError = (message: string | null) => {
+      const ctx = formContext.value
+      if (!props.name || !ctx) return
+      ctx.setFieldError(props.name, message)
     }
 
     const effectiveShowMessage = computed(
@@ -229,21 +286,22 @@ export const FormItem = defineComponent({
       offset: 4
     })
 
-    const describedById = computed(() =>
-      effectiveShowMessage.value && hasError.value ? errorId : undefined
-    )
+    const describedById = computed(() => (hasError.value ? errorId : undefined))
     const fieldValue = computed(() => {
       if (!props.name) return undefined
       return formContext.value?.getFieldValue(props.name) ?? ''
     })
     const controlDisabled = computed(() =>
       Boolean(
-        formContext.value?.disabled || formContext.value?.loading || conditionState.value.disabled
+        props.disabled ||
+          formContext.value?.disabled ||
+          formContext.value?.loading ||
+          conditionState.value.disabled
       )
     )
     const effectiveFieldId = computed(() => fieldId)
 
-    provide(FORM_ITEM_CONTROL_INJECTION_KEY, {
+    const controlContext: VueFormItemControlContext = {
       id: effectiveFieldId,
       labelId: computed(() => (props.label ? labelId : undefined)),
       name: computed(() => props.name),
@@ -254,8 +312,9 @@ export const FormItem = defineComponent({
       required: fieldIsRequired,
       value: fieldValue,
       onChange: handleValueChange,
-      onBlur: handleBlur
-    })
+      onBlur: handleBlur,
+      setError
+    }
 
     const formItemClasses = computed(() =>
       getFormItemClasses({
@@ -307,7 +366,7 @@ export const FormItem = defineComponent({
 
       const fieldChildren = (() => {
         if (!isNativeElement || !only) {
-          return defaultSlot
+          return only ? [only] : []
         }
 
         const vnode = only as VNode
@@ -350,50 +409,49 @@ export const FormItem = defineComponent({
               id: labelId,
               for: isGroupControl ? undefined : controlId
             },
-            [showAsterisk.value && h('span', { class: asteriskClasses }, '*'), props.label]
+            [
+              showAsterisk.value &&
+                h('span', { class: asteriskClasses, 'aria-hidden': 'true' }, '*'),
+              props.label
+            ]
           )
         : null
 
       const errorElement = (() => {
-        if (!effectiveShowMessage.value) return null
-        if (props.errorDisplayMode === 'block' && !hasError.value) return null
-        if (props.errorDisplayMode === 'popup' && !hasError.value) return null
-
-        const errorClass =
-          props.errorDisplayMode === 'block'
+        if (!hasError.value) return null
+        const announcement = formContext.value?.errorAnnouncement ?? 'polite'
+        const popupOpen =
+          effectiveShowMessage.value && props.errorDisplayMode === 'popup' && popupActive.value
+        const hidden = !effectiveShowMessage.value || (props.errorDisplayMode === 'popup' && !popupOpen)
+        const errorClass = hidden
+          ? getFormItemErrorSrOnlyClasses()
+          : props.errorDisplayMode === 'block'
             ? getFormItemErrorBlockClasses(actualSize.value)
             : props.errorDisplayMode === 'popup'
               ? classNames(getFormItemErrorPopupClasses(), overlay.floatingClasses.value)
-              : getFormItemErrorClasses(actualSize.value, { visible: hasError.value })
-
-        return renderVueOverlayTeleport(
-          h(
-            'div',
-            {
-              ref: errorRef,
-              id: hasError.value ? errorId : undefined,
-              role: hasError.value ? 'alert' : undefined,
-              class: errorClass,
-              style: props.errorDisplayMode === 'popup' ? overlay.floatingStyles.value : undefined,
-              'data-positioned':
-                props.errorDisplayMode === 'popup' ? overlay.positioned.value : undefined,
-              'aria-hidden': hasError.value ? undefined : 'true'
-            },
-            hasError.value ? errorMessage.value : ''
-          ),
-          overlay.target.value,
-          props.errorDisplayMode !== 'popup'
+              : getFormItemErrorClasses(actualSize.value, { visible: true })
+        const node = h(
+          'div',
+          {
+            ref: errorRef,
+            id: errorId,
+            'aria-live': announcement,
+            role: announcement === 'assertive' ? 'alert' : 'status',
+            class: errorClass,
+            style: popupOpen ? overlay.floatingStyles.value : undefined,
+            'data-positioned': popupOpen ? overlay.positioned.value : undefined
+          },
+          errorMessage.value
         )
+        if (!popupOpen) return node
+        return renderVueOverlayTeleport(node, overlay.target.value, false)
       })()
 
       const fieldWrapper: Record<string, unknown> = {
         class: fieldClasses
       }
-      if (useGroup) {
-        fieldWrapper.role = 'group'
-        fieldWrapper['aria-labelledby'] = props.label ? labelId : undefined
-        fieldWrapper['aria-describedby'] = describedById.value
-        fieldWrapper['aria-invalid'] = hasError.value ? 'true' : undefined
+      if (useGroup && props.label) {
+        fieldWrapper['aria-labelledby'] = labelId
       }
 
       const contentElement = h(
@@ -421,7 +479,12 @@ export const FormItem = defineComponent({
           }
         },
         [
-          h('div', fieldWrapper, fieldChildren),
+          h('div', fieldWrapper, [
+            fieldChildren.length > 0
+              ? h(FormItemControlHost, { control: controlContext }, { default: () => fieldChildren })
+              : null,
+            ...defaultSlot.slice(1)
+          ]),
           props.extra ? h('p', { class: schemaFormExtraClasses }, props.extra) : null,
           errorElement
         ]

@@ -3,6 +3,7 @@ import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
   classNames,
+  coerceTagsFormValue,
   commitTagCandidates,
   extractTagCandidates,
   formatRemoveTagLabel,
@@ -17,7 +18,8 @@ import {
   moveTagsHighlight,
   removeTagAt,
   resolveReadOnlyFlag,
-  resolveTagsPasteCandidates,
+  resolveTagsPaste,
+  shouldSubmitNativeField,
   runShakeAnimation,
   type TagsInputProps as CoreTagsInputProps
 } from '@expcat/tigercat-core'
@@ -36,8 +38,6 @@ export interface TagsInputProps
       'onChange' | 'defaultValue' | 'id' | 'onFocus' | 'onBlur'
     > {
   className?: string
-  /** @internal */
-  _shakeTrigger?: number
   onChange?: (value: string[]) => void
   onAdd?: (tag: string) => void
   onRemove?: (tag: string, index: number) => void
@@ -51,8 +51,6 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   {
     size,
     status: statusProp,
-    errorMessage: errorMessageProp,
-    _shakeTrigger: shakeTriggerProp,
     value,
     defaultValue,
     placeholder = '',
@@ -63,8 +61,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
     beforeAdd,
     clearable = false,
     disabled = false,
-    readonly: readonlyProp,
-    readOnly: readOnlyProp,
+    readOnly = false,
     name,
     id,
     removeTagAriaLabel,
@@ -87,15 +84,19 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   const inGroup = inputGroup != null
   const effectiveSize = size ?? inputGroup?.size ?? 'md'
   const status = statusProp ?? formItemControl?.status ?? 'default'
-  const errorMessage = errorMessageProp
-  const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
+  const shakeTrigger = formItemControl?.shakeTrigger
   const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
-  const isReadOnly = resolveReadOnlyFlag(readonlyProp, readOnlyProp)
+  const isReadOnly = readOnly
   const effectiveId = id ?? formItemControl?.id
   const effectiveName = name ?? formItemControl?.name
   const formBoundValue = formItemControl?.value
+  const emptyTags = useRef<string[]>([]).current
   const resolvedValue =
-    value !== undefined ? value : Array.isArray(formBoundValue) ? formBoundValue : undefined
+    value !== undefined
+      ? value
+      : formItemControl?.name
+        ? (coerceTagsFormValue(formBoundValue) ?? emptyTags)
+        : undefined
   const dir = config.direction === 'rtl' ? 'rtl' : 'ltr'
   const labels = getTagsInputLabels(config.locale)
   const reactId = useId()
@@ -120,6 +121,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   })
   const [inputText, setInputText] = useState('')
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null)
+  const [rejection, setRejection] = useState('')
 
   useEffect(() => {
     if (!mountedRef.current) {
@@ -141,6 +143,12 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
     if (result.added.length > 0) {
       setTags(result.tags)
       result.added.forEach((tag) => onAdd?.(tag))
+    }
+    if (result.rejected.length > 0) {
+      const atLimit = max !== undefined && result.tags.length >= max
+      setRejection(atLimit ? labels.limitText : labels.duplicateText)
+    } else if (result.added.length > 0) {
+      setRejection('')
     }
     return result
   }
@@ -167,6 +175,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isInteractive) return
     if (event.key === 'Enter') {
+      if (event.nativeEvent.isComposing) return
       if (!inputText.trim()) return
       event.preventDefault()
       const result = commitCandidates([inputText], inputText)
@@ -203,11 +212,20 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
     if (!isInteractive) return
     const text = event.clipboardData.getData('text')
-    const candidates = resolveTagsPasteCandidates(inputText, text, delimiters)
-    if (candidates.length <= 1) return
+    const pasted = resolveTagsPaste({
+      pending: inputText,
+      clipboard: text,
+      delimiters,
+      selectionStart: event.currentTarget.selectionStart ?? undefined,
+      selectionEnd: event.currentTarget.selectionEnd ?? undefined
+    })
     event.preventDefault()
-    const result = commitCandidates(candidates, inputText)
-    setInputText(result.added.length > 0 ? '' : result.pending)
+    if (pasted.candidates.length === 0) {
+      setInputText(pasted.pending)
+      return
+    }
+    const result = commitCandidates(pasted.candidates, pasted.pending)
+    setInputText(result.pending)
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -248,8 +266,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
     focusInput()
   }
 
-  const activeError = status === 'error' && !!errorMessage
-  const hasExtras = activeError
+  const hasExtras = false
   const isFull = max !== undefined && tags.length >= max
   const removeLabelTemplate = removeTagAriaLabel ?? labels.removeTagLabel
   const labelledby =
@@ -259,7 +276,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
   const describedBy = mergeAriaDescribedBy(
     mergeAriaDescribedBy(
       typeof rest['aria-describedby'] === 'string' ? rest['aria-describedby'] : undefined,
-      activeError ? errorMsgId : undefined
+      rejection ? `${effectiveId ?? 'tags'}-rejection` : undefined
     ),
     formItemControl?.describedBy
   )
@@ -280,19 +297,23 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
       onClick={handleContainerClick}
       onAnimationEnd={() => containerRef.current?.classList.remove(SHAKE_CLASS)}
       {...{ [TIGER_CHROME_ATTR]: '' }}>
-      {tags.map((tag, index) => (
-        <Tag
-          key={`${tag}-${index}`}
-          size={effectiveSize === 'lg' ? 'md' : 'sm'}
-          closable={isInteractive}
-          closeTabIndex={-1}
-          closeAriaLabel={formatRemoveTagLabel(removeLabelTemplate, tag)}
-          className={index === highlightedIndex ? getTagsInputHighlightClasses() : undefined}
-          aria-current={index === highlightedIndex ? 'true' : undefined}
-          onClose={(event) => handleClose(index, event)}>
-          {tag}
-        </Tag>
-      ))}
+      <span role="list" className="contents">
+        {tags.map((tag, index) => (
+          <span
+            key={`${tag}-${index}`}
+            id={`${effectiveId ?? 'tags'}-tag-${index}`}
+            role="listitem">
+            <Tag
+              size={effectiveSize === 'lg' ? 'md' : 'sm'}
+              closable={isInteractive}
+              closeAriaLabel={formatRemoveTagLabel(removeLabelTemplate, tag)}
+              className={index === highlightedIndex ? getTagsInputHighlightClasses() : undefined}
+              onClose={(event) => handleClose(index, event)}>
+              {tag}
+            </Tag>
+          </span>
+        ))}
+      </span>
       <input
         ref={setInputRefs}
         className={getTagsInputInnerInputClasses()}
@@ -307,6 +328,11 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
         aria-invalid={status === 'error' ? true : undefined}
         aria-required={formItemControl?.required ? true : undefined}
         aria-describedby={describedBy}
+        aria-activedescendant={
+          highlightedIndex !== null
+            ? `${effectiveId ?? 'tags'}-tag-${highlightedIndex}`
+            : undefined
+        }
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
@@ -324,28 +350,22 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
           <Icon name="close" size="sm" aria-hidden />
         </button>
       )}
-      {effectiveName && !effectiveDisabled
-        ? tags.map((tag, index) => (
-            <input key={`hidden-${index}`} type="hidden" name={effectiveName} value={tag} />
-          ))
+      {shouldSubmitNativeField({ name: effectiveName, disabled: effectiveDisabled })
+        ? tags.length > 0
+          ? tags.map((tag, index) => (
+              <input key={`hidden-${index}`} type="hidden" name={effectiveName} value={tag} />
+            ))
+          : <input type="hidden" name={effectiveName} value="" />
         : null}
+      {rejection ? (
+        <span id={`${effectiveId ?? 'tags'}-rejection`} className="sr-only" aria-live="polite">
+          {rejection}
+        </span>
+      ) : null}
     </div>
   )
 
-  if (!hasExtras) return containerNode
-  return (
-    <div
-      className={classNames(
-        inGroup ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-        className
-      )}
-      style={style}>
-      {containerNode}
-      <div id={errorMsgId} className={getTagsInputErrorClasses()} aria-live="polite">
-        {errorMessage}
-      </div>
-    </div>
-  )
+  return containerNode
 })
 
 TagsInput.displayName = 'TagsInput'

@@ -6,7 +6,7 @@
 
 import { countDecimalPlaces } from '../input-number-utils'
 
-function sliderBounds(min: number, max: number): { lower: number; upper: number } {
+export function sliderBounds(min: number, max: number): { lower: number; upper: number } {
   const safeMin = Number.isFinite(min) ? min : 0
   const safeMax = Number.isFinite(max) ? max : safeMin
   return {
@@ -14,6 +14,16 @@ function sliderBounds(min: number, max: number): { lower: number; upper: number 
     upper: Math.max(safeMin, safeMax)
   }
 }
+
+/** Display clamp. Inverted min/max use the same swapped bounds as the geometry. */
+export function sliderDisplayValue(value: number, min: number, max: number): number {
+  const { lower, upper } = sliderBounds(min, max)
+  if (!Number.isFinite(value)) return lower
+  return Math.min(Math.max(value, lower), upper)
+}
+
+/** Marks denser than this only label the two ends. */
+export const SLIDER_MARK_LIMIT = 21
 
 function sliderStep(step: number): number {
   return Number.isFinite(step) && step > 0 ? step : 1
@@ -84,10 +94,14 @@ export function sliderResolveMarks(
   const { lower, upper } = sliderBounds(min, max)
   const safeStep = sliderStep(step)
   if (lower === upper) return { [lower]: String(lower) }
+  const span = (upper - lower) / safeStep
+  if (!Number.isFinite(span) || Math.floor(span) + 1 > SLIDER_MARK_LIMIT) {
+    return { [lower]: String(lower), [upper]: String(upper) }
+  }
   const result: Record<number, string> = {}
   let current = lower
   let guard = 0
-  while (current <= upper && guard < 10000) {
+  while (current <= upper && guard < SLIDER_MARK_LIMIT) {
     const snapped = sliderNormalizeValue(current, lower, upper, safeStep)
     result[snapped] = String(snapped)
     if (snapped >= upper) break
@@ -244,22 +258,22 @@ export function resolveSliderThumbName(options: {
   ariaLabel?: string
   ariaLabelledby?: string
   labels: { ariaLabel: string; minAriaLabel: string; maxAriaLabel: string }
-}): { ariaLabel?: string; ariaLabelledby?: string } {
+}): { ariaLabel?: string; ariaLabelledby?: string; suffix?: string } {
   const { thumb, range, ariaLabel, ariaLabelledby, labels } = options
   const named = typeof ariaLabel === 'string' && ariaLabel.trim() ? ariaLabel.trim() : undefined
   const labelledby =
     typeof ariaLabelledby === 'string' && ariaLabelledby.trim() ? ariaLabelledby.trim() : undefined
 
   if (!range || !thumb) {
-    if (labelledby) return { ariaLabel: named, ariaLabelledby: labelledby }
+    if (labelledby) return { ariaLabelledby: labelledby }
     return { ariaLabel: named ?? labels.ariaLabel }
   }
 
-  if (labelledby && !named) {
-    return { ariaLabelledby: labelledby }
+  const suffix = thumb === 'min' ? labels.minAriaLabel : labels.maxAriaLabel
+  if (labelledby) {
+    return { ariaLabelledby: labelledby, suffix }
   }
 
   const base = named ?? labels.ariaLabel
-  const suffix = thumb === 'min' ? labels.minAriaLabel : labels.maxAriaLabel
-  return { ariaLabel: `${base} (${suffix})` }
+  return { ariaLabel: `${base}, ${suffix}` }
 }

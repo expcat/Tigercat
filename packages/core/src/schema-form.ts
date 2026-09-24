@@ -15,7 +15,6 @@ export type {
   SchemaFormSubmitEvent,
   SchemaFormWidgetType
 } from './types/schema-form'
-export type { FieldPermission, WorkflowFieldPermissionMode } from './types/workflow-timeline'
 export {
   SCHEMA_FORM_WIDGET_TYPES,
   clampSchemaFormColumns,
@@ -24,6 +23,10 @@ export {
   collectSchemaFormDefaults,
   collectSchemaFormRules,
   createSchemaFormModel,
+  collectChangedSchemaFormPaths,
+  mergeSchemaFormValuesByPath,
+  overlaySchemaFormDirtyValues,
+  schemaFormFieldRules,
   fieldConditionOf,
   flattenSchemaFormFields,
   getSchemaFormFieldSpanClasses,
@@ -42,14 +45,3 @@ export {
   schemaFormNestedGroupClasses,
   schemaFormRootClasses
 } from './utils/schema-form-utils'
-export {
-  WORKFLOW_FIELD_PERMISSION_MODES,
-  applyWorkflowFieldPermissions,
-  applyWorkflowFieldPermissionsFromStep,
-  defaultWorkflowFieldPermission,
-  isWorkflowFieldPermissionMode,
-  listWorkflowEditableFieldNames,
-  mergeWorkflowFormValues,
-  resolveWorkflowFieldPermission,
-  resolveWorkflowFieldPermissionMode
-} from './utils/workflow-field-permissions'

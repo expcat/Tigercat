@@ -6,7 +6,7 @@ import {
   formatRemoveTagLabel,
   getTagsArrowDelta,
   removeTagAt,
-  resolveTagsPasteCandidates,
+  resolveTagsPaste,
   splitTagInput
 } from '@expcat/tigercat-core'
 
@@ -123,8 +123,19 @@ describe('tags-input-utils', () => {
   })
 
   describe('paste and arrows', () => {
-    it('prepends current pending text to a multi-value paste', () => {
-      expect(resolveTagsPasteCandidates('hello', 'a,b', [','])).toEqual(['hello', 'a', 'b'])
+    it('splits the text after inserting the paste at the caret', () => {
+      expect(
+        resolveTagsPaste({ pending: 'hel', clipboard: 'lo,world', delimiters: [','] })
+      ).toEqual({ candidates: ['hello'], pending: 'world' })
+      expect(
+        resolveTagsPaste({
+          pending: 'hello',
+          clipboard: 'a,b',
+          delimiters: [','],
+          selectionStart: 2,
+          selectionEnd: 2
+        })
+      ).toEqual({ candidates: ['hea'], pending: 'bllo' })
     })
 
     it('mirrors arrow keys in RTL', () => {

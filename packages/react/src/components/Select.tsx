@@ -5,8 +5,9 @@ import {
   runShakeAnimation,
   selectChevronWrapClasses,
   selectClearButtonClasses,
-  selectDoneActionClasses,
-  selectDoneButtonClasses,
+  selectTagClasses,
+  selectTagListClasses,
+  selectTagRemoveClasses,
   selectDropdownBaseClasses,
   selectTrailingSlotClasses
 } from '@expcat/tigercat-core'
@@ -42,7 +43,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
     floatingRef: ctx.dropdownRef,
     placement: props.placement ?? 'bottom-start',
     offset: props.offset ?? 4,
-    layout: 'fullscreen-sm',
+    layout: 'anchored',
     matchReferenceWidth: true,
     dismissOnOutside: true,
     dismissOnEscape: true,
@@ -110,13 +111,40 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
       onKeyDown={ctx.handleTriggerKeyDown}
       onBlur={ctx.handleFocusOut}
       {...comboboxCommon}>
-      <span
-        className={classNames(
-          'flex-1 truncate',
-          ctx.displayText === ctx.placeholder && 'text-[var(--tiger-text-muted,#9ca3af)]'
-        )}>
-        {ctx.displayText}
-      </span>
+      {ctx.tags && ctx.tags.tags.length > 0 ? (
+        <span className={selectTagListClasses}>
+          {ctx.tags.tags.map((tag) => (
+            <span key={tag.key} className={selectTagClasses}>
+              <span className="truncate">{tag.label}</span>
+              <button
+                type="button"
+                tabIndex={-1}
+                className={selectTagRemoveClasses}
+                aria-label={ctx.clearAriaLabel ? `${ctx.clearAriaLabel} ${tag.label}` : tag.label}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  ctx.removeTag(tag.value)
+                }}>
+                ×
+              </button>
+            </span>
+          ))}
+          {ctx.tags.collapsedCount > 0 ? (
+            <span className={selectTagClasses} aria-label={ctx.tags.collapsedLabel}>
+              {ctx.tags.collapsedLabel}
+            </span>
+          ) : null}
+        </span>
+      ) : (
+        <span
+          className={classNames(
+            'flex-1 truncate',
+            ctx.displayText === ctx.placeholder && 'text-[var(--tiger-text-secondary)]'
+          )}>
+          {ctx.displayText}
+        </span>
+      )}
     </div>
   )
 
@@ -135,11 +163,6 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
       onMouseDown={(event) => event.preventDefault()}
       onBlur={ctx.handleFocusOut}>
       {hasOptions ? renderSelectPanelBody(ctx.renderCtx) : renderSelectEmpty(ctx.renderCtx)}
-      <div className={selectDoneActionClasses}>
-        <button type="button" className={selectDoneButtonClasses} onClick={ctx.closeDropdown}>
-          {ctx.doneText}
-        </button>
-      </div>
     </div>
   ) : null
 
@@ -158,6 +181,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
               type="button"
               className={selectClearButtonClasses}
               data-tiger-select-clear=""
+              tabIndex={-1}
               aria-label={ctx.clearAriaLabel}
               onClick={ctx.clearSelection}>
               <SelectClearIcon />

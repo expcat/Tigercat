@@ -11,6 +11,8 @@ import {
 } from 'vue'
 import {
   classNames,
+  coerceNumberFormValue,
+  shouldSubmitNativeField,
   coerceClassValue,
   callUnknownEventHandler,
   getInputNumberWrapperClasses,
@@ -47,8 +49,8 @@ import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from 
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueInputNumberProps extends Omit<CoreInputNumberProps, 'value' | 'defaultValue'> {
-  modelValue?: number | null
-  defaultValue?: number | null
+  modelValue?: number | string | null
+  defaultValue?: number | string | null
   className?: string
 }
 
@@ -57,10 +59,10 @@ export const InputNumber = defineComponent({
   inheritAttrs: false,
   props: {
     modelValue: {
-      type: [Number, null] as PropType<number | null>
+      type: [Number, String] as PropType<number | string | null>
     },
     defaultValue: {
-      type: [Number, null] as PropType<number | null>,
+      type: [Number, String] as PropType<number | string | null>,
       default: undefined
     },
     size: {
@@ -115,6 +117,10 @@ export const InputNumber = defineComponent({
     },
     parser: {
       type: Function as PropType<(displayValue: string) => number | null>
+    },
+    snapToStep: {
+      type: Boolean,
+      default: false
     },
     autoFocus: {
       type: Boolean,
@@ -195,12 +201,10 @@ export const InputNumber = defineComponent({
     }
 
     const isControlled = computed(() => props.modelValue !== undefined)
-    const internalValue = ref<number | null>(props.modelValue ?? props.defaultValue ?? null)
+    const internalValue = ref<number | null>(coerceNumberFormValue(props.modelValue ?? props.defaultValue) ?? null)
     const currentValue = computed(() => {
-      if (isControlled.value) return props.modelValue ?? null
-      if (formItemControl?.name.value) {
-        return typeof formValue.value === 'number' ? formValue.value : null
-      }
+      if (isControlled.value) return coerceNumberFormValue(props.modelValue) ?? null
+      if (formItemControl?.name.value) return coerceNumberFormValue(formValue.value) ?? null
       return internalValue.value
     })
 
@@ -225,7 +229,9 @@ export const InputNumber = defineComponent({
       const { value: next, changed } = commitInputNumberValue(val, currentValue.value, {
         min: props.min,
         max: props.max,
-        precision: props.precision
+        precision: props.precision,
+        step: props.step,
+        snapToStep: props.snapToStep
       })
       if (changed) {
         if (!isControlled.value) internalValue.value = next
@@ -416,8 +422,12 @@ export const InputNumber = defineComponent({
           placeholder: props.placeholder,
           disabled: effectiveDisabled.value,
           readonly: props.readonly,
-          name: effectiveName.value,
           id: effectiveId.value,
+          'aria-labelledby':
+            typeof restAttrs['aria-label'] === 'string'
+              ? undefined
+              : ((restAttrs['aria-labelledby'] as string | undefined) ??
+                formItemControl?.labelId.value),
           onInput: (event: Event) => {
             handleInput(event)
             callUnknownEventHandler(restAttrs.onInput, event)
@@ -497,6 +507,16 @@ export const InputNumber = defineComponent({
               [renderStepIcon(inputNumberDownIconPathD, false)]
             )
           ])
+        )
+      }
+
+      if (shouldSubmitNativeField({ name: effectiveName.value, disabled: effectiveDisabled.value })) {
+        children.push(
+          h('input', {
+            type: 'hidden',
+            name: effectiveName.value,
+            value: currentValue.value == null ? '' : String(currentValue.value)
+          })
         )
       }
 

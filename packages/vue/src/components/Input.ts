@@ -12,6 +12,7 @@ import {
 import {
   classNames,
   coerceClassValue,
+  coerceTextFormValue,
   mergeAriaDescribedBy,
   callUnknownEventHandler,
   getInputFieldClasses,
@@ -173,9 +174,9 @@ export const Input = defineComponent({
       ([modelValue, controlValue]) => {
         const source =
           modelValue !== undefined
-            ? modelValue
-            : typeof controlValue === 'string' || typeof controlValue === 'number'
-              ? controlValue
+            ? coerceTextFormValue(modelValue)
+            : formItemControl?.name.value
+              ? coerceTextFormValue(controlValue)
               : undefined
         if (source === undefined) return
         if (source !== localValue.value) {

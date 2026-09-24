@@ -1,4 +1,4 @@
-import React, { Children, createContext, useContext } from 'react'
+import React, { Children, createContext, useCallback, useContext, useState } from 'react'
 import {
   coerceArrayFormValue,
   getChoiceGroupClasses,
@@ -20,6 +20,10 @@ export interface CheckboxGroupContext {
   value: CheckboxGroupValue
   disabled: boolean
   size: ComponentSize
+  invalid: boolean
+  describedBy?: string
+  invalidValue?: CheckboxGroupValue[number]
+  claimInvalid: (value: CheckboxGroupValue[number]) => void
   updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void
 }
 
@@ -82,6 +86,12 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
     formItemControl?.describedBy
   )
 
+  const [claimedInvalid, setClaimedInvalid] = useState<CheckboxGroupValue[number] | undefined>(
+    options?.[0]?.value
+  )
+  const claimInvalid = useCallback((optionValue: CheckboxGroupValue[number]) => {
+    setClaimedInvalid((current) => current ?? optionValue)
+  }, [])
   const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {
     if (effectiveDisabled) return
     const next = toggleCheckboxGroupValue(value, val, checked)
@@ -92,6 +102,10 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
     value,
     disabled: effectiveDisabled,
     size,
+    invalid: status === 'error',
+    describedBy,
+    invalidValue: claimedInvalid ?? options?.[0]?.value,
+    claimInvalid,
     updateValue
   }
 
@@ -103,7 +117,6 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
         aria-labelledby={labelledby}
         aria-describedby={describedBy}
         aria-disabled={effectiveDisabled || undefined}
-        aria-invalid={status === 'error' ? true : props['aria-invalid']}
         className={getChoiceGroupClasses({ orientation, className })}>
         {Children.count(children) > 0
           ? children

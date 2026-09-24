@@ -24,6 +24,10 @@ export interface CheckboxGroupContext {
   value: CheckboxGroupValue
   disabled: boolean
   size: ComponentSize
+  invalid: boolean
+  describedBy?: string
+  invalidValue?: CheckboxGroupValue[number]
+  claimInvalid: (value: CheckboxGroupValue[number]) => void
   updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void
 }
 
@@ -103,6 +107,10 @@ export const CheckboxGroup = markFormItemGroupControl(
         () => props.disabled || (formItemControl?.disabled.value ?? false)
       )
 
+      const claimedInvalid = ref<CheckboxGroupValue[number] | undefined>(props.options?.[0]?.value)
+      const claimInvalid = (optionValue: CheckboxGroupValue[number]) => {
+        if (claimedInvalid.value === undefined) claimedInvalid.value = optionValue
+      }
       const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {
         if (effectiveDisabled.value) return
         const currentValue = toggleCheckboxGroupValue(value.value, val, checked)
@@ -118,6 +126,10 @@ export const CheckboxGroup = markFormItemGroupControl(
           value: value.value,
           disabled: effectiveDisabled.value,
           size: props.size,
+          invalid: (props.status ?? formItemControl?.status.value ?? 'default') === 'error',
+          describedBy: formItemControl?.describedBy.value,
+          invalidValue: claimedInvalid.value ?? props.options?.[0]?.value,
+          claimInvalid,
           updateValue
         }))
       )
@@ -151,8 +163,7 @@ export const CheckboxGroup = markFormItemGroupControl(
             style: mergeStyleValues(attrs.style, props.style),
             'aria-labelledby': labelledby,
             'aria-describedby': describedBy,
-            'aria-disabled': effectiveDisabled.value || undefined,
-            'aria-invalid': status === 'error' ? true : restAttrs['aria-invalid']
+            'aria-disabled': effectiveDisabled.value || undefined
           },
           (() => {
             const slotted = slots.default?.()

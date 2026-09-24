@@ -13,8 +13,11 @@ import {
   getTreeSelectVisibleIndex,
   getTreeSelectVirtualAlignScrollTop,
   isTreeNodeExpandable,
+  coerceTreeSelectFormValue,
+  countTreeNodes,
   isTreeSelectValueEmpty,
   normalizeTreeSelectValue,
+  shouldApplyTreeSelectDefaultExpandAll,
   resolveTreeSelectVisibleItems,
   type TreeNode
 } from '@expcat/tigercat-core'
@@ -36,11 +39,10 @@ describe('tree-select helpers', () => {
     expect(TREE_SELECT_DEFAULT_HEIGHT).toBe(256)
   })
 
-  it('resolves listHeight as an alias of height, with listHeight winning', () => {
+  it('resolves listHeight and ignores any legacy height alias', () => {
     expect(resolveTreeSelectListHeight()).toBe(TREE_SELECT_DEFAULT_HEIGHT)
-    expect(resolveTreeSelectListHeight(120)).toBe(120)
-    expect(resolveTreeSelectListHeight(undefined, 80)).toBe(80)
-    expect(resolveTreeSelectListHeight(120, 80)).toBe(80)
+    expect(resolveTreeSelectListHeight(undefined)).toBe(TREE_SELECT_DEFAULT_HEIGHT)
+    expect(resolveTreeSelectListHeight(80)).toBe(80)
   })
 
   it('treats isLeaf true as not expandable even with children', () => {
@@ -68,13 +70,29 @@ describe('tree-select helpers', () => {
     expect(getTreeSelectVisibleIndex(items, '')).toBe(-1)
   })
 
-  it('keeps empty string and 0 as legal keys', () => {
-    expect(isTreeSelectValueEmpty('', false)).toBe(false)
+  it('treats empty string as empty and keeps 0 as a key', () => {
+    expect(isTreeSelectValueEmpty('', false)).toBe(true)
+    expect(isTreeSelectValueEmpty(null, false)).toBe(true)
     expect(isTreeSelectValueEmpty(0, false)).toBe(false)
     expect(isTreeSelectValueEmpty(undefined, false)).toBe(true)
-    expect(normalizeTreeSelectValue('', false)).toBe('')
-    expect(getTreeSelectDisplayLabel([{ key: '', label: 'Blank' }], '')).toBe('Blank')
+    expect(isTreeSelectValueEmpty('', true)).toBe(true)
+    expect(normalizeTreeSelectValue('', false)).toBeNull()
+    expect(normalizeTreeSelectValue('', true)).toEqual([])
+    expect(coerceTreeSelectFormValue('', true)).toEqual([])
+    expect(coerceTreeSelectFormValue('', false)).toBeNull()
+    expect(coerceTreeSelectFormValue(undefined, true)).toBeUndefined()
+    expect(getTreeSelectDisplayLabel([{ key: '', label: 'Blank' }], '')).toBe('')
     expect(getTreeSelectDisplayLabel([{ key: 0, label: 'Zero' }], 0)).toBe('Zero')
+  })
+
+  it('applies defaultExpandAll only when the tree becomes non-empty', () => {
+    expect(shouldApplyTreeSelectDefaultExpandAll(0, countTreeNodes(treeData), true)).toBe(true)
+    expect(shouldApplyTreeSelectDefaultExpandAll(countTreeNodes(treeData), countTreeNodes(treeData), true)).toBe(
+      false
+    )
+    expect(shouldApplyTreeSelectDefaultExpandAll(0, 0, true)).toBe(false)
+    expect(shouldApplyTreeSelectDefaultExpandAll(2, 0, true)).toBe(false)
+    expect(shouldApplyTreeSelectDefaultExpandAll(0, 2, false)).toBe(false)
   })
 
   it('expands selected ancestors when opening', () => {

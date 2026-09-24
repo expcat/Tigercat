@@ -1,6 +1,7 @@
 import React, {
   forwardRef,
   useCallback,
+  useEffect,
   useId,
   useImperativeHandle,
   useMemo,
@@ -43,10 +44,7 @@ export interface FormWizardHandle {
 export interface FormWizardProps
   extends
     Omit<CoreFormWizardProps, 'style'>,
-    Omit<
-      React.HTMLAttributes<HTMLDivElement>,
-      'onChange' | 'children' | 'style' | 'autoSave'
-    > {
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children' | 'style' | 'autoSave'> {
   renderStep?: (step: WizardStep, index: number) => React.ReactNode
   children?: React.ReactNode | ((step: WizardStep, index: number) => React.ReactNode)
   style?: React.CSSProperties
@@ -98,11 +96,14 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
   )
 
   const totalCount = steps.length
-  const [currentIndex, setIndex] = useControlledState({
+  const [currentIndex, setIndex] = useControlledState<
+    number,
+    [number | undefined, { skippedValidation: boolean }]
+  >({
     value: current,
     defaultValue: defaultCurrent,
-    onChange: (next, prev?: number) => {
-      onStepChange?.(next, prev ?? next)
+    onChange: (next, prev, detail) => {
+      onStepChange?.(next, prev ?? next, detail ?? { skippedValidation: false })
     },
     postState: (next) => clampStepIndex(next, totalCount)
   })
@@ -112,16 +113,36 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     findNextUnskippedStep(currentIndex - 1, -1, steps, currentIndex) === currentIndex
   const isLast = isLastAvailableStep(currentIndex, steps)
 
+  const selfStep = useRef(false)
   const setCurrent = useCallback(
     async (next: number) => {
       const prev = currentIndex
-      setIndex(next, prev)
+      selfStep.current = true
+      setIndex(next, prev, { skippedValidation: false })
       if (autoSave && steps[next]) {
         await autoSave(next, steps[next])
       }
     },
     [autoSave, currentIndex, setIndex, steps]
   )
+
+  const seenCurrent = useRef(current)
+  useEffect(() => {
+    if (current === undefined) return
+    if (Object.is(current, seenCurrent.current)) return
+    const prev = seenCurrent.current
+    seenCurrent.current = current
+    if (selfStep.current) {
+      selfStep.current = false
+      return
+    }
+    if (prev === undefined) return
+    onStepChange?.(
+      clampStepIndex(current, totalCount),
+      clampStepIndex(prev, totalCount),
+      { skippedValidation: true }
+    )
+  }, [current, onStepChange, totalCount])
 
   const validateAdvance = useCallback(
     () =>
@@ -130,7 +151,8 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
         currentStep,
         steps,
         beforeNext,
-        validateFields: form ? (fields) => form.validateFields(fields) : undefined
+        validateFields: form ? (fields) => form.validateFields(fields) : undefined,
+        mountedFields: form?.getMountedFieldNames()
       }),
     [beforeNext, currentIndex, currentStep, form, steps]
   )
@@ -147,9 +169,11 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     async (index: number) => {
       if (form) {
         const fields = steps[index]?.fields
-        const valid = fields?.length ? await form.validateFields(fields) : await form.validate()
+        const names = fields?.length ? fields : form.getMountedFieldNames()
+        const valid = names.length ? await form.validateFields(names) : await form.validate()
         if (!valid) return
-        await form.submit()
+        const submitted = await form.submit()
+        if (!submitted) return
       }
       onFinish?.(index, steps, form?.getValues())
       if (autoSave && steps[index]) await autoSave(index, steps[index])
@@ -205,9 +229,8 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
 
   const contentNode = useMemo(() => {
     if (!currentStep) return null
-    if (renderStep) return renderStep(currentStep, currentIndex)
     if (typeof children === 'function') return children(currentStep, currentIndex)
-    if (children) return children
+    if (renderStep) return renderStep(currentStep, currentIndex)
     return (currentStep.content as React.ReactNode) ?? null
   }, [children, currentIndex, currentStep, renderStep])
 
@@ -266,7 +289,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
           {currentStep?.title}
         </div>
         {errorMessage ? (
-          <div role="alert" className="mb-3 w-full text-sm text-[var(--tiger-error,#dc2626)]">
+          <div role="alert" className="mb-3 w-full text-sm text-[var(--tiger-error)]">
             {errorMessage}
           </div>
         ) : null}
@@ -276,7 +299,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
         <div className={getFormWizardActionsClasses(bordered)} role="group">
           {!isFirst ? (
             <Button
-              htmlType="button"
+              type="button"
               variant="secondary"
               className="group"
               onClick={handlePrev}
@@ -289,7 +312,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
             <div />
           )}
           <Button
-            htmlType="button"
+            type="button"
             variant="primary"
             className="group"
             onClick={() => void handleNext()}

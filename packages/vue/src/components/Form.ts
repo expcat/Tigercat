@@ -12,10 +12,12 @@ import {
 } from 'vue'
 import {
   classNames,
-  assignFormValues,
   createFormEngine,
   createFormErrorMap,
+  commitFocusedFormControl,
   focusFirstInvalidField,
+  formValuesEqual,
+  isFormValidationSuperseded,
   mergeTigerLocale,
   getFormValidationLabels,
   type FormRules,
@@ -54,6 +56,8 @@ export interface FormContext {
   errorsByField: Record<string, string | undefined>
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
   registerFieldCondition: (fieldName: string, condition?: FormFieldCondition) => void
+  registerFieldDisabled: (fieldName: string, disabled: boolean | null) => void
+  getMountedFieldNames: () => string[]
   getFieldConditionState: (
     fieldName: string,
     conditionOverride?: FormFieldCondition
@@ -70,6 +74,8 @@ export interface FormContext {
   validateFields: (fieldNames: string[]) => Promise<boolean>
   getValues: () => FormValues
   submit: () => Promise<boolean>
+  setFieldError: (fieldName: string, message: string | null) => void
+  errorAnnouncement: 'polite' | 'assertive'
 }
 
 export function useFormContext(): ComputedRef<FormContext> | null {
@@ -197,9 +203,6 @@ export const Form = defineComponent({
             onValidate: (fieldName, valid, error) =>
               emit('validate', fieldName, valid, error ?? undefined),
             onValuesChange: (next) => {
-              if (props.modelValue) {
-                assignFormValues(props.modelValue, next)
-              }
               emit('update:modelValue', next)
             }
           })
@@ -218,18 +221,21 @@ export const Form = defineComponent({
     const values = ref(engine().getValues())
     const canUndoNow = ref(engine().canUndo)
     const canRedoNow = ref(engine().canRedo)
+    const errorAnnouncement = ref(engine().errorAnnouncement)
     const stop = engine().subscribe(() => {
       const current = engine()
       errors.value = current.getErrors()
       values.value = current.getValues()
       canUndoNow.value = current.canUndo
       canRedoNow.value = current.canRedo
+      errorAnnouncement.value = current.errorAnnouncement
     })
 
     watch(
       () => props.modelValue,
       (next) => {
         if (props.controller || !next) return
+        if (formValuesEqual(engine().getValues(), next)) return
         engine().replaceValues(next)
       },
       { deep: true }
@@ -275,9 +281,16 @@ export const Form = defineComponent({
     }
 
     const submitForm = async (): Promise<boolean> => {
-      if (props.loading) return false
+      if (props.loading || props.disabled) return false
       const current = engine()
-      const valid = await current.validate()
+      commitFocusedFormControl(formElementRef.value)
+      let valid = false
+      try {
+        valid = await current.validate()
+      } catch (error) {
+        if (isFormValidationSuperseded(error)) return false
+        throw error
+      }
       if (!valid) {
         focusFirstInvalidField(formElementRef.value)
       }
@@ -312,6 +325,9 @@ export const Form = defineComponent({
         engine().registerFieldRules(fieldName, nextRules),
       registerFieldCondition: (fieldName, condition) =>
         engine().registerFieldCondition(fieldName, condition),
+      registerFieldDisabled: (fieldName, disabled) =>
+        engine().registerFieldDisabled(fieldName, disabled),
+      getMountedFieldNames: () => engine().getMountedFieldNames(),
       getFieldConditionState: (fieldName, override) =>
         engine().getFieldConditionState(fieldName, override),
       validateField,
@@ -321,7 +337,9 @@ export const Form = defineComponent({
       validate: () => engine().validate(),
       validateFields: (fieldNames) => engine().validateFields(fieldNames),
       getValues: () => engine().getValues(),
-      submit: submitForm
+      submit: submitForm,
+      setFieldError: (fieldName, message) => engine().setFieldError(fieldName, message),
+      errorAnnouncement: errorAnnouncement.value
     }))
 
     provide<ComputedRef<FormContext>>(FormContextKey, formContextValue)
@@ -332,6 +350,7 @@ export const Form = defineComponent({
       validateField,
       clearValidate: (fieldNames) => engine().clearValidate(fieldNames),
       resetFields: () => engine().reset(),
+      setInitialValues: (values) => engine().setInitialValues(values),
       addField: (fieldName, defaultValue) => engine().addField(fieldName, defaultValue),
       removeField: (fieldName) => engine().removeField(fieldName),
       undo: () => engine().undo(),
@@ -367,16 +386,7 @@ export const Form = defineComponent({
           onSubmit: handleSubmit,
           onReset: handleReset
         },
-        [
-          h(
-            'fieldset',
-            {
-              disabled: props.disabled || props.loading,
-              class: 'contents m-0 min-w-0 border-0 p-0'
-            },
-            slots.default?.()
-          )
-        ]
+        slots.default?.()
       )
   }
 })

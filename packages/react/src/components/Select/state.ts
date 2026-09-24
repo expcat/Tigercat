@@ -28,11 +28,19 @@ import {
   findSelectTypeaheadIndex,
   isSelectTypeaheadCharacter,
   isSelectOptionSelected,
+  isSelectValueEmpty,
   shouldShowSelectClear,
   navigateSelectActiveIndex,
   getSelectClosedHomeEndIndex,
   serializeSelectFormValues,
   coerceSelectFormValue,
+  focusAfterPaint,
+  removeLastSelectValue,
+  removeSelectValue,
+  resolveSelectTags,
+  shouldCreateSelectQuery,
+  shouldSubmitNativeField,
+  withCreatedSelectOptions,
   type InputStatus,
   type SelectModelValue,
   type SelectOption,
@@ -117,7 +125,12 @@ export function useSelectController(props: SelectProps) {
       : undefined
 
   const incomingValue =
-    value !== undefined ? value : coerceSelectFormValue(formItemControl?.value, options, isMultiple)
+    value !== undefined
+      ? value
+      : formItemControl?.name
+        ? (coerceSelectFormValue(formItemControl.value, options, isMultiple) ??
+          (isMultiple ? [] : null))
+        : undefined
   const [selected, setSelected] = useControlledState<SelectModelValue>({
     value: incomingValue,
     defaultValue: defaultValue ?? (isMultiple ? [] : undefined),
@@ -162,6 +175,9 @@ export function useSelectController(props: SelectProps) {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const searchDebouncerRef = useRef<SelectSearchDebouncer | null>(null)
   const activeValueRef = useRef<SelectValue | undefined>(undefined)
+  const highlightReasonRef = useRef<'open' | 'filter' | 'home' | 'end' | 'typeahead'>('open')
+  const onSearchChangeRef = useRef(onSearchChange)
+  onSearchChangeRef.current = onSearchChange
   const typeaheadRef = useRef(
     createSelectTypeaheadBuffer({
       onQuery: (query) => {
@@ -175,18 +191,19 @@ export function useSelectController(props: SelectProps) {
     () => pruneCreatedSelectOptions(createdOptions, options),
     [createdOptions, options]
   )
-  const allOptions = useMemo(
-    () => [...flattenSelectOptions(options), ...liveCreated],
-    [options, liveCreated]
+  const optionSource = useMemo(
+    () => withCreatedSelectOptions(options, liveCreated),
+    [liveCreated, options]
   )
+  const allOptions = useMemo(() => flattenSelectOptions(optionSource), [optionSource])
   const filteredOptions = useMemo(
     () =>
-      resolveSelectFilteredOptions(options, searchQuery, {
+      resolveSelectFilteredOptions(optionSource, searchQuery, {
         searchable,
         remote,
         filterOption
       }),
-    [filterOption, options, remote, searchable, searchQuery]
+    [filterOption, optionSource, remote, searchable, searchQuery]
   )
   const creatableOption = useMemo(
     () =>
@@ -267,7 +284,7 @@ export function useSelectController(props: SelectProps) {
         return
       }
       closeDropdown()
-      requestAnimationFrame(() => triggerRef.current?.focus())
+      focusAfterPaint(() => triggerRef.current)
     },
     [
       autoClearSearchValue,
@@ -287,9 +304,16 @@ export function useSelectController(props: SelectProps) {
     (event?: { stopPropagation: () => void }) => {
       event?.stopPropagation()
       setSelected(clearSelectValue(isMultiple))
-      requestAnimationFrame(() => triggerRef.current?.focus())
+      focusAfterPaint(() => triggerRef.current)
     },
     [isMultiple, setSelected]
+  )
+
+  const removeTag = useCallback(
+    (target: SelectValue) => {
+      setSelected(removeSelectValue(selected, target))
+    },
+    [selected, setSelected]
   )
 
   const updateSearchValue = useCallback(
@@ -301,18 +325,28 @@ export function useSelectController(props: SelectProps) {
   )
 
   useEffect(() => {
-    searchDebouncerRef.current?.cancel()
+    const previous = searchDebouncerRef.current
     searchDebouncerRef.current = createSelectSearchDebouncer({
       delay: searchDebounce,
-      onSearchChange: (query) => onSearchChange?.(query)
+      onSearchChange: (query) => onSearchChangeRef.current?.(query)
     })
-    return () => searchDebouncerRef.current?.cancel()
-  }, [onSearchChange, searchDebounce])
+    return () => {
+      previous?.cancel()
+      searchDebouncerRef.current?.cancel()
+    }
+  }, [searchDebounce])
 
+  const selectedKey = selectedValues.map((item) => String(item)).join('\u0000')
   useEffect(() => {
     if (!isOpen) {
       setActiveIndex(-1)
       activeValueRef.current = undefined
+      highlightReasonRef.current = 'open'
+      return
+    }
+    const reason = highlightReasonRef.current
+    if (reason === 'home' || reason === 'end' || reason === 'typeahead') {
+      highlightReasonRef.current = 'filter'
       return
     }
     setActiveIndex((previous) => {
@@ -326,7 +360,9 @@ export function useSelectController(props: SelectProps) {
       activeValueRef.current = flatSelectableOptions[next]?.value
       return next
     })
-  }, [flatSelectableOptions, isOpen, selectedValues])
+    // selectedValues is read from the render that opened or filtered the list.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flatSelectableOptions, isOpen, selectedKey])
 
   useEffect(() => {
     if (isOpen && searchable) {
@@ -339,6 +375,7 @@ export function useSelectController(props: SelectProps) {
     const fromSearchInput = event.currentTarget.tagName === 'INPUT'
     if (!isOpen && isSelectTypeaheadCharacter(event.key, event)) {
       event.preventDefault()
+      highlightReasonRef.current = searchable ? 'open' : 'typeahead'
       openDropdown()
       if (searchable) updateSearchValue(event.key)
       else typeaheadRef.current.push(event.key)
@@ -355,27 +392,34 @@ export function useSelectController(props: SelectProps) {
         value: selected,
         multiple: isMultiple
       }),
+      multiple: isMultiple,
       fromSearchInput
     })
     switch (intent.type) {
       case 'open':
         event.preventDefault()
+        highlightReasonRef.current = 'open'
         openDropdown()
         return
       case 'close':
         if (event.key !== 'Tab') event.preventDefault()
         closeDropdown()
-        triggerRef.current?.focus()
+        focusAfterPaint(() => triggerRef.current)
         return
       case 'clear':
         event.preventDefault()
         clearSelection()
         return
+      case 'remove-last':
+        event.preventDefault()
+        setSelected(removeLastSelectValue(selected))
+        return
       case 'prevent-scroll': {
         event.preventDefault()
-        openDropdown()
+        highlightReasonRef.current = event.key === 'Home' ? 'home' : 'end'
         const next = getSelectClosedHomeEndIndex(flatSelectableOptions, event.key as 'Home' | 'End')
         setActiveIndex(next)
+        openDropdown()
         return
       }
       case 'navigate': {
@@ -389,6 +433,17 @@ export function useSelectController(props: SelectProps) {
       }
       case 'select-active': {
         event.preventDefault()
+        if (
+          shouldCreateSelectQuery({
+            creatable: creatable && searchable,
+            query: searchQuery,
+            items: flatSelectableOptions.filter((item) => item !== creatableOption)
+          }) &&
+          creatableOption
+        ) {
+          selectOption(creatableOption)
+          return
+        }
         const option = flatSelectableOptions[activeIndex]
         if (option) selectOption(option)
         return
@@ -459,6 +514,17 @@ export function useSelectController(props: SelectProps) {
     ariaLabel,
     required: formItemControl?.required,
     displayText,
+    tags: isMultiple
+      ? resolveSelectTags({
+          value: selected,
+          options,
+          createdOptions: liveCreated,
+          optionCache: optionCacheRef.current,
+          maxTagCount,
+          moreCountText: labels.moreCountText
+        })
+      : null,
+    removeTag,
     placeholder: resolveLocaleText(labels.placeholder, placeholder),
     showClear,
     searchQuery,
@@ -476,7 +542,14 @@ export function useSelectController(props: SelectProps) {
       hasClear: showClear
     }),
     chromeAttr: TIGER_CHROME_ATTR,
-    hiddenValues: effectiveName ? serializeSelectFormValues(selected, isMultiple) : [],
+    hiddenValues: shouldSubmitNativeField({
+      name: effectiveName,
+      disabled: effectiveDisabled
+    })
+      ? isSelectValueEmpty(selected, isMultiple)
+        ? ['']
+        : serializeSelectFormValues(selected, isMultiple)
+      : [],
     renderCtx,
     toggleDropdown,
     closeDropdown,

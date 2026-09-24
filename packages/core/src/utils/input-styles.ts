@@ -16,8 +16,8 @@ const successPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tige
 const warningPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-warning', '#d97706')}]`
 
 const FOCUS_RING =
-  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40'
-const ERROR_FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-error,#dc2626)]/40'
+  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
+const ERROR_FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-error)]/40'
 
 /**
  * Field-only classes (padding, type, disabled text). Chrome lives on the
@@ -25,12 +25,12 @@ const ERROR_FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-e
  */
 const INPUT_FIELD_BASE_CLASSES = [
   'bg-transparent',
-  'text-[var(--tiger-text,#111827)]',
+  'text-[var(--tiger-text)]',
   'focus:outline-none',
   FOCUS_RING,
-  'disabled:text-[var(--tiger-text-muted,#6b7280)]',
+  'disabled:text-[var(--tiger-text-secondary)]',
   'disabled:cursor-not-allowed',
-  'placeholder:text-[var(--tiger-text-muted,#6b7280)]'
+  'placeholder:text-[var(--tiger-text-secondary)]'
 ] as const
 
 /**
@@ -40,43 +40,43 @@ const INPUT_FIELD_BASE_CLASSES = [
  */
 const INPUT_CHROME_BASE_CLASSES = [
   'border',
-  'rounded-[var(--tiger-radius-md,0.5rem)]',
-  'bg-[var(--tiger-surface,#ffffff)]',
+  'rounded-[var(--tiger-radius-md)]',
+  'bg-[var(--tiger-surface)]',
   'tiger-motion-aware',
-  '[transition:var(--tiger-transition-base,color_150ms_ease)]'
+  '[transition:var(--tiger-transition-base)]'
 ] as const
 
-const NATIVE_CHROME_FOCUS_CLASSES = ['disabled:bg-[var(--tiger-surface-muted,#f3f4f6)]'] as const
+const NATIVE_CHROME_FOCUS_CLASSES = ['disabled:bg-[var(--tiger-surface-muted)]'] as const
 
 const WRAPPER_CHROME_FOCUS_CLASSES = [
-  'has-[:disabled]:bg-[var(--tiger-surface-muted,#f3f4f6)]'
+  'has-[:disabled]:bg-[var(--tiger-surface-muted)]'
 ] as const
 
 const NATIVE_STATUS_CLASSES: Record<InputStatus, string> = {
-  default: 'border-[var(--tiger-border,#e5e7eb)] focus-visible:border-transparent',
+  default: 'border-[var(--tiger-border)] focus-visible:border-transparent',
   error: classNames(
-    'border-[var(--tiger-error,#dc2626)]',
+    'border-[var(--tiger-error)]',
     ERROR_FOCUS_RING,
     errorTextClass,
     errorPlaceholderClass
   ),
   success: classNames(
-    'border-[var(--tiger-success,#16a34a)]',
+    'border-[var(--tiger-success)]',
     successTextClass,
     successPlaceholderClass
   ),
   warning: classNames(
-    'border-[var(--tiger-warning,#d97706)]',
+    'border-[var(--tiger-warning)]',
     warningTextClass,
     warningPlaceholderClass
   )
 }
 
 const WRAPPER_STATUS_CLASSES: Record<InputStatus, string> = {
-  default: 'border-[var(--tiger-border,#e5e7eb)]',
-  error: 'border-[var(--tiger-error,#dc2626)]',
-  success: 'border-[var(--tiger-success,#16a34a)]',
-  warning: 'border-[var(--tiger-warning,#d97706)]'
+  default: 'border-[var(--tiger-border)]',
+  error: 'border-[var(--tiger-error)]',
+  success: 'border-[var(--tiger-success)]',
+  warning: 'border-[var(--tiger-warning)]'
 }
 
 const FIELD_STATUS_CLASSES: Record<InputStatus, string> = {
@@ -271,13 +271,13 @@ export function getInputClasses(options: GetInputClassesOptions = {}): string {
   return classNames(
     getInputWidthClass(inGroup),
     ...INPUT_CHROME_BASE_CLASSES,
-    'text-[var(--tiger-text,#111827)]',
+    'text-[var(--tiger-text)]',
     'focus:outline-none',
     status === 'error' ? ERROR_FOCUS_RING : FOCUS_RING,
     ...NATIVE_CHROME_FOCUS_CLASSES,
-    'disabled:text-[var(--tiger-text-muted,#6b7280)]',
+    'disabled:text-[var(--tiger-text-secondary)]',
     'disabled:cursor-not-allowed',
-    'placeholder:text-[var(--tiger-text-muted,#6b7280)]',
+    'placeholder:text-[var(--tiger-text-secondary)]',
     NATIVE_STATUS_CLASSES[status],
     getInputLayoutClasses(options)
   )
@@ -300,7 +300,7 @@ export function getInputAffixClasses(
   options: { offsetSlots?: number } = {}
 ): string {
   const base =
-    'absolute top-0 bottom-0 flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]'
+    'absolute top-0 bottom-0 flex items-center justify-center text-[var(--tiger-text-secondary)]'
   const posClass =
     position === 'prefix' ? 'start-0' : insetInlineEndClass(size, options.offsetSlots)
   const widthClass = {
@@ -317,7 +317,7 @@ export function getInputAffixClasses(
  * `size` is unused; kept so existing callers do not break.
  */
 export function getInputErrorClasses(_size: ComponentSize = 'md'): string {
-  return classNames('text-[var(--tiger-error,#dc2626)] text-sm mt-1 text-start break-words')
+  return classNames('text-[var(--tiger-error)] text-sm mt-1 text-start break-words')
 }
 
 function getInputTrailingButtonPositionClasses(size: ComponentSize, offsetSlots = 0): string {
@@ -326,7 +326,7 @@ function getInputTrailingButtonPositionClasses(size: ComponentSize, offsetSlots 
     'focus:outline-none',
     FOCUS_RING,
     insetInlineEndClass(size, offsetSlots),
-    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
+    'text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-text)]',
     INPUT_PADDING[size].end
   )
 }
@@ -360,7 +360,7 @@ export function getInputPasswordToggleClasses(
 export function getInputCountClasses(isOverLimit: boolean = false): string {
   return classNames(
     'text-xs mt-1 text-end',
-    isOverLimit ? 'text-[var(--tiger-error,#dc2626)]' : 'text-[var(--tiger-text-muted,#6b7280)]'
+    isOverLimit ? 'text-[var(--tiger-error)]' : 'text-[var(--tiger-text-secondary)]'
   )
 }
 

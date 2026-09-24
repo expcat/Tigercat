@@ -13,7 +13,10 @@ import {
   classNames,
   createFormEngine,
   createFormErrorMap,
+  commitFocusedFormControl,
   focusFirstInvalidField,
+  formValuesEqual,
+  isFormValidationSuperseded,
   mergeTigerLocale,
   getFormValidationLabels,
   type FormProps as CoreFormProps,
@@ -51,6 +54,8 @@ export interface FormContextValue {
   errorsByField: Record<string, string | undefined>
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
   registerFieldCondition: (fieldName: string, condition?: FormFieldCondition) => void
+  registerFieldDisabled: (fieldName: string, disabled: boolean | null) => void
+  getMountedFieldNames: () => string[]
   getFieldConditionState: (
     fieldName: string,
     conditionOverride?: FormFieldCondition
@@ -67,6 +72,8 @@ export interface FormContextValue {
   validateFields: (fieldNames: string[]) => Promise<boolean>
   getValues: () => FormValues
   submit: () => Promise<boolean>
+  setFieldError: (fieldName: string, message: string | null) => void
+  errorAnnouncement: 'polite' | 'assertive'
 }
 
 const FormContext = createContext<FormContextValue | null>(null)
@@ -168,9 +175,13 @@ function FormInner<T extends FormValues>(
     throw new Error('Form is missing a form engine')
   }
 
-  if (!controller && value !== undefined) {
-    engine.replaceValues(value, { emit: false })
-  }
+  useEffect(() => {
+    if (controller || value === undefined) return
+    const owned = ownedEngineRef.current
+    if (!owned) return
+    if (formValuesEqual(owned.getValues(), value)) return
+    owned.replaceValues(value)
+  }, [controller, value])
 
   if (controller && isFormEngine(controller)) {
     controller.setOptions({
@@ -200,6 +211,7 @@ function FormInner<T extends FormValues>(
   const formElementRef = useRef<HTMLFormElement>(null)
   const values = engine.getValues()
   const errors = engine.getErrors()
+  const errorAnnouncement = engine.errorAnnouncement
   const errorsByField = useMemo(() => createFormErrorMap(errors), [errors])
 
   const validateField = useCallback(
@@ -214,14 +226,21 @@ function FormInner<T extends FormValues>(
   )
 
   const submitForm = useCallback(async (): Promise<boolean> => {
-    if (loading) return false
-    const valid = await engine.validate()
+    if (loading || disabled) return false
+    commitFocusedFormControl(formElementRef.current)
+    let valid = false
+    try {
+      valid = await engine.validate()
+    } catch (error) {
+      if (isFormValidationSuperseded(error)) return false
+      throw error
+    }
     if (!valid) {
       focusFirstInvalidField(formElementRef.current)
     }
     onSubmit?.({ valid, values: engine.getValues(), errors: engine.getErrors() })
     return valid
-  }, [engine, loading, onSubmit])
+  }, [disabled, engine, loading, onSubmit])
 
   useImperativeHandle(
     ref,
@@ -231,6 +250,7 @@ function FormInner<T extends FormValues>(
       validateField,
       clearValidate: (fieldNames) => engine.clearValidate(fieldNames),
       resetFields: () => engine.reset(),
+      setInitialValues: (values) => engine.setInitialValues(values),
       addField: (fieldName, defaultValue) => engine.addField(fieldName, defaultValue),
       removeField: (fieldName) => engine.removeField(fieldName),
       undo: () => engine.undo(),
@@ -262,6 +282,8 @@ function FormInner<T extends FormValues>(
       errorsByField,
       registerFieldRules: engine.registerFieldRules,
       registerFieldCondition: engine.registerFieldCondition,
+      registerFieldDisabled: engine.registerFieldDisabled,
+      getMountedFieldNames: engine.getMountedFieldNames,
       getFieldConditionState: engine.getFieldConditionState,
       validateField,
       clearValidate: engine.clearValidate,
@@ -270,7 +292,9 @@ function FormInner<T extends FormValues>(
       validate: () => engine.validate(),
       validateFields: (fieldNames) => engine.validateFields(fieldNames),
       getValues: () => engine.getValues(),
-      submit: submitForm
+      submit: submitForm,
+      setFieldError: engine.setFieldError,
+      errorAnnouncement
     }),
     [
       values,
@@ -285,6 +309,7 @@ function FormInner<T extends FormValues>(
       loading,
       errors,
       errorsByField,
+      errorAnnouncement,
       engine,
       submitForm,
       validateField
@@ -319,9 +344,7 @@ function FormInner<T extends FormValues>(
         aria-busy={loading || undefined}
         onSubmit={handleSubmit}
         onReset={handleReset}>
-        <fieldset disabled={disabled || loading} className="contents m-0 min-w-0 border-0 p-0">
-          {children}
-        </fieldset>
+        {children}
       </form>
     </FormContext.Provider>
   )

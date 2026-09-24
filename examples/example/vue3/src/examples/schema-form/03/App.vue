@@ -50,10 +50,10 @@ const handleSubmit = (event: SchemaFormSubmitEvent) => {
 <template>
   <div class="space-y-3">
     <Segmented v-model="mode" :options="options" aria-label="字段权限模式" />
-    <p class="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+    <p class="text-sm text-[var(--tiger-text-secondary)]">
       发起模式不套审批节点矩阵，字段都可编。审批人模式隐藏金额、原因只读、天数可改。只读模式不会把可编字段重新打开。
     </p>
     <SchemaForm :schema="schema" :model-value="model" @submit="handleSubmit" />
-    <p v-if="message" class="text-sm text-[var(--tiger-text-muted,#6b7280)]">{{ message }}</p>
+    <p v-if="message" class="text-sm text-[var(--tiger-text-secondary)]">{{ message }}</p>
   </div>
 </template>

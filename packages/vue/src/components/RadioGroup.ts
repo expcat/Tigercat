@@ -37,6 +37,11 @@ export interface RadioGroupContext {
   name: string
   disabled: boolean
   size: ComponentSize
+  invalid: boolean
+  describedBy?: string
+  /** Option value that owns the single `aria-invalid`. */
+  invalidValue?: string | number
+  claimInvalid: (value: string | number) => void
   onChange: (value: string | number) => void
 }
 
@@ -116,6 +121,10 @@ export const RadioGroup = markFormItemGroupControl(
         )
         return seeded !== undefined ? seeded : internalValue.value
       })
+      const claimedInvalid = ref<string | number | undefined>(props.options?.[0]?.value)
+      const claimInvalid = (value: string | number) => {
+        if (claimedInvalid.value === undefined) claimedInvalid.value = value
+      }
       const generatedName = `tiger-radio-${useId()}`
       const groupName = computed(() => props.name || generatedName)
       const effectiveDisabled = computed(
@@ -131,6 +140,10 @@ export const RadioGroup = markFormItemGroupControl(
         formItemControl?.onChange(value)
       }
 
+      const groupInvalid = computed(
+        () => (props.status ?? formItemControl?.status.value ?? 'default') === 'error'
+      )
+
       provide<ComputedRef<RadioGroupContext>>(
         RadioGroupKey,
         computed(() => ({
@@ -138,6 +151,10 @@ export const RadioGroup = markFormItemGroupControl(
           name: groupName.value,
           disabled: effectiveDisabled.value,
           size: props.size,
+          invalid: groupInvalid.value,
+          describedBy: formItemControl?.describedBy.value,
+          invalidValue: currentValue.value ?? claimedInvalid.value ?? props.options?.[0]?.value,
+          claimInvalid,
           onChange: handleChange
         }))
       )
@@ -185,7 +202,6 @@ export const RadioGroup = markFormItemGroupControl(
             : undefined,
           formItemControl?.describedBy.value
         )
-        const status = props.status ?? formItemControl?.status.value ?? 'default'
 
         return h(
           'div',
@@ -199,9 +215,14 @@ export const RadioGroup = markFormItemGroupControl(
             role: 'radiogroup',
             'aria-labelledby': labelledby,
             'aria-describedby': describedBy,
-            'aria-invalid': status === 'error' ? true : restAttrs['aria-invalid'],
             'aria-disabled': effectiveDisabled.value || undefined,
-            onKeydown: handleKeyDown
+            onKeydown: handleKeyDown,
+            onFocusout: (event: FocusEvent) => {
+              const next = event.relatedTarget as Node | null
+              const current = event.currentTarget as Node | null
+              if (next && current?.contains(next)) return
+              formItemControl?.onBlur()
+            }
           },
           (() => {
             const slotted = slots.default?.()

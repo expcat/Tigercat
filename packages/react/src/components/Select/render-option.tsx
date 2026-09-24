@@ -6,11 +6,13 @@ import {
   selectListboxClasses,
   getCreateSelectOptionLabel,
   getPickerOptionAria,
-  getSelectVirtualItemHeight,
-  getSelectVirtualRange,
+  getSelectVirtualRowHeight,
+  getSelectVirtualWindow,
   getSelectActiveAlignScrollTop,
   getSelectRowIndexForOption,
   buildSelectListRows,
+  selectRowGroupLabel,
+  shouldVirtualizeSelectList,
   type SelectListRow,
   type SelectOption
 } from '@expcat/tigercat-core'
@@ -69,32 +71,66 @@ function OptionRow({
   )
 }
 
-function renderRows(ctx: SelectRenderContext, rows: SelectListRow[]) {
-  return rows.map((row) => {
-    if (row.kind === 'group') {
-      return (
-        <div key={row.key} role="group" aria-label={row.label}>
-          <div className={selectGroupLabelClasses} aria-hidden="true">
-            {row.label}
-          </div>
+function renderRows(
+  ctx: SelectRenderContext,
+  rows: SelectListRow[],
+  fullRows: readonly SelectListRow[] = rows,
+  offset = 0
+) {
+  const nodes: React.ReactNode[] = []
+  let bucket: { key: string; label: string; header: boolean; children: React.ReactNode[] } | null =
+    null
+  const flush = () => {
+    if (!bucket) return
+    nodes.push(
+      <div key={bucket.key} role="group" aria-label={bucket.label}>
+        <div className={bucket.header ? selectGroupLabelClasses : 'sr-only'} aria-hidden="true">
+          {bucket.label}
         </div>
-      )
+        {bucket.children}
+      </div>
+    )
+    bucket = null
+  }
+  rows.forEach((row, localIndex) => {
+    if (row.kind === 'group') {
+      flush()
+      bucket = { key: row.key, label: row.label, header: true, children: [] }
+      return
     }
-    return <OptionRow key={row.key} ctx={ctx} row={row} />
+    const label = selectRowGroupLabel(fullRows, offset + localIndex)
+    if (label && bucket?.label !== label) {
+      flush()
+      bucket = { key: `wrap-${row.key}`, label, header: false, children: [] }
+    }
+    const option = <OptionRow key={row.key} ctx={ctx} row={row} />
+    if (bucket) bucket.children.push(option)
+    else nodes.push(option)
   })
+  flush()
+  return nodes
+}
+
+function listMaxStyle(listHeight: number): React.CSSProperties {
+  return {
+    maxHeight: `min(${listHeight}px, var(--tiger-overlay-available-height, ${listHeight}px))`
+  }
 }
 
 function VirtualSelectRows({ ctx, rows }: { ctx: SelectRenderContext; rows: SelectListRow[] }) {
-  const itemHeight = getSelectVirtualItemHeight(ctx.size)
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const rafRef = useRef<number | undefined>(undefined)
-  const { startIndex, endIndex, totalHeight } = getSelectVirtualRange(
+  const activeRowIndex = getSelectRowIndexForOption(rows, ctx.activeIndex)
+  const { startIndex, endIndex, offsetTop, totalHeight } = getSelectVirtualWindow({
+    rows,
     scrollTop,
-    ctx.listHeight,
-    rows.length,
-    itemHeight
-  )
+    listHeight: ctx.listHeight,
+    size: ctx.size,
+    activeRowIndex
+  })
+  const activeHeight =
+    activeRowIndex >= 0 ? getSelectVirtualRowHeight(ctx.size, rows[activeRowIndex]?.kind) : 0
 
   useEffect(() => {
     const el = containerRef.current
@@ -104,13 +140,13 @@ function VirtualSelectRows({ ctx, rows }: { ctx: SelectRenderContext; rows: Sele
       scrollTop: el.scrollTop,
       listHeight: ctx.listHeight,
       rowIndex,
-      itemHeight
+      itemHeight: activeHeight || getSelectVirtualRowHeight(ctx.size, 'option')
     })
     if (next !== el.scrollTop) {
       el.scrollTop = next
       setScrollTop(next)
     }
-  }, [ctx.activeIndex, ctx.listHeight, itemHeight, rows])
+  }, [activeHeight, ctx.activeIndex, ctx.listHeight, rows])
 
   useEffect(
     () => () => {
@@ -126,7 +162,7 @@ function VirtualSelectRows({ ctx, rows }: { ctx: SelectRenderContext; rows: Sele
       ref={containerRef}
       data-tiger-select-virtual=""
       className={selectListboxClasses}
-      style={{ maxHeight: `${ctx.listHeight}px` }}
+      style={listMaxStyle(ctx.listHeight)}
       {...ctx.listboxAria}
       aria-multiselectable={ctx.multiple ? true : undefined}
       aria-busy={ctx.loading || undefined}
@@ -136,8 +172,8 @@ function VirtualSelectRows({ ctx, rows }: { ctx: SelectRenderContext; rows: Sele
         rafRef.current = requestAnimationFrame(() => setScrollTop(top))
       }}>
       <div style={{ height: `${totalHeight}px`, position: 'relative' }}>
-        <div style={{ transform: `translateY(${startIndex * itemHeight}px)` }}>
-          {renderRows(ctx, visible)}
+        <div style={{ transform: `translateY(${offsetTop}px)` }}>
+          {renderRows(ctx, visible, rows, startIndex)}
         </div>
       </div>
     </div>
@@ -153,11 +189,13 @@ export function hasSelectOptionRows(ctx: SelectRenderContext): boolean {
 export function renderSelectPanelBody(ctx: SelectRenderContext): React.ReactNode {
   const rows = buildSelectListRows(ctx.filteredOptions, ctx.creatableOption)
   if (!rows.some((row) => row.kind === 'option')) return null
-  if (ctx.virtual) return <VirtualSelectRows ctx={ctx} rows={rows} />
+  if (ctx.virtual || shouldVirtualizeSelectList({ rowCount: rows.length, listHeight: ctx.listHeight, size: ctx.size, rows })) {
+    return <VirtualSelectRows ctx={ctx} rows={rows} />
+  }
   return (
     <div
       className={selectListboxClasses}
-      style={{ maxHeight: `${ctx.listHeight}px` }}
+      style={listMaxStyle(ctx.listHeight)}
       {...ctx.listboxAria}
       aria-multiselectable={ctx.multiple ? true : undefined}
       aria-busy={ctx.loading || undefined}>

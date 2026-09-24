@@ -68,7 +68,7 @@ export default function App() {
         onChange={setModel}
         onSubmit={handleSubmit}
       />
-      {message ? <p className="text-sm text-[var(--tiger-text-muted,#6b7280)]">{message}</p> : null}
+      {message ? <p className="text-sm text-[var(--tiger-text-secondary)]">{message}</p> : null}
     </div>
   )
 }

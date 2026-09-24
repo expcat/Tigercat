@@ -28,7 +28,7 @@ export default function App() {
           <option value="user">用户</option>
         </select>
       </FormItem>
-      <Button htmlType="submit" variant="primary">
+      <Button type="submit" variant="primary">
         提交
       </Button>
     </Form>

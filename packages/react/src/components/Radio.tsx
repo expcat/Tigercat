@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, forwardRef } from 'react'
 import {
   classNames,
+  coerceChoiceFormValue,
   defaultRadioColors,
   devWarn,
   getRadioDotClasses,
@@ -78,7 +79,19 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
     if (status === 'error') runShakeAnimation(rootRef.current)
   }, [status, shakeTrigger])
 
-  const isChecked = isInGroup ? groupContext!.value === value : checkedState
+  const formBound = !isInGroup && Boolean(formItemControl?.name)
+  const isChecked = isInGroup
+    ? groupContext!.value === value
+    : formBound
+      ? coerceChoiceFormValue(formItemControl?.value) === value
+      : checkedState
+  const ownsInvalid =
+    status === 'error' && (!isInGroup || groupContext?.invalidValue === value)
+
+  useEffect(() => {
+    if (!isInGroup || value === undefined) return
+    groupContext?.claimInvalid(value)
+  }, [groupContext, isInGroup, value])
 
   const radioClasses = useMemo(
     () =>
@@ -125,8 +138,12 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
       return
     }
 
+    if (formBound) {
+      formItemControl?.onChange?.(value)
+      return
+    }
+
     setChecked(true, event)
-    formItemControl?.onChange?.(value)
   }
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -136,7 +153,11 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
 
   const describedBy = mergeAriaDescribedBy(
     typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
-    isInGroup ? undefined : formItemControl?.describedBy
+    isInGroup
+      ? ownsInvalid
+        ? groupContext?.describedBy
+        : undefined
+      : formItemControl?.describedBy
   )
   const effectiveId = isInGroup ? id : (id ?? formItemControl?.id)
 
@@ -151,7 +172,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
       value={value}
       checked={isChecked}
       disabled={actualDisabled}
-      aria-invalid={status === 'error' ? true : props['aria-invalid']}
+      aria-invalid={ownsInvalid ? true : props['aria-invalid']}
       aria-describedby={describedBy}
       onChange={handleChange}
       onBlur={handleBlur}

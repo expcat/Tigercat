@@ -39,13 +39,12 @@ export function pushFormHistory(
   newValues: FormValues
 ): FormHistoryState {
   const past = [...history.past, history.present]
-  // Trim history if exceeded
   if (past.length > history.maxSize) {
     past.splice(0, past.length - history.maxSize)
   }
 
   return {
-    past: past.map((entry) => cloneFormValues(entry)),
+    past,
     present: cloneFormValues(newValues),
     future: [],
     maxSize: history.maxSize

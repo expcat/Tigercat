@@ -21,6 +21,7 @@ const handleChange = () => {
     <Form
       :model-value="model"
       :rules="{ name: [{ required: true, message: '请输入姓名' }] }"
+      @update:model-value="Object.assign(model, $event)"
       @submit="finished = $event.valid">
       <FormWizard
         v-model:current="current"

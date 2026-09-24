@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { TreeSelect } from '@expcat/tigercat-vue/TreeSelect'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -44,12 +44,11 @@ describe('TreeSelect', () => {
     expect(getByRole('treeitem', { name: /Apple/ })).toBeInTheDocument()
   })
 
-  it('applies listHeight as the overlay height, winning over height', async () => {
+  it('applies listHeight as the overlay height', async () => {
     const { getByRole } = render(TreeSelect, {
       props: {
         treeData,
         defaultExpandAll: true,
-        height: 200,
         listHeight: 120,
         'aria-label': 'Height'
       }
@@ -72,10 +71,17 @@ describe('TreeSelect', () => {
     const validator = vi.fn().mockResolvedValue(undefined)
     const Wrapper = defineComponent({
       setup() {
+        const model = ref<{ team?: unknown }>({})
         return () =>
           h(
             Form,
-            { model: { team: undefined }, rules: { team: [{ validator, trigger: 'change' }] } },
+            {
+              modelValue: model.value,
+              'onUpdate:modelValue': (next: { team?: unknown }) => {
+                model.value = next
+              },
+              rules: { team: [{ validator, trigger: 'change' }] }
+            },
             {
               default: () =>
                 h(

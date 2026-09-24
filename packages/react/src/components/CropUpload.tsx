@@ -108,6 +108,8 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
   maxSizeRef.current = maxSize
   const onErrorRef = useRef(onError)
   onErrorRef.current = onError
+  const setErrorRef = useRef(formItemControl?.setError)
+  setErrorRef.current = formItemControl?.setError
 
   const sessionHolder = useRef<ReturnType<typeof createCropUploadSession> | null>(null)
   if (!sessionHolder.current) {
@@ -118,7 +120,10 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
         interpolateUploadLabel(labelsRef.current.fileTooLargeText, { maxSize: formatBytes(limit) }),
       getTypeError: () => labelsRef.current.fileTypeRejectedText,
       onState: setSessionState,
-      onError: (error) => onErrorRef.current?.(error)
+      onError: (error) => {
+        setErrorRef.current?.(error.message)
+        onErrorRef.current?.(error)
+      }
     })
   }
   const session = sessionHolder.current
@@ -147,14 +152,20 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
     if (!session.beginCrop()) return
     try {
       const raw = await cropperRef.current?.getCropResult()
-      if (!raw) return
+      if (!raw) {
+        session.endCrop()
+        return
+      }
       const originalName = session.getState().originalFile?.name ?? raw.file.name
       const result = withCropFile(raw, originalName)
       onCropComplete?.(result)
+      formItemControl?.setError?.(null)
       formItemControl?.onChange?.(result.file)
       session.close()
     } catch (error) {
-      onError?.(error as Error)
+      const failure = error instanceof Error ? error : new Error(String(error))
+      formItemControl?.setError?.(failure.message)
+      onError?.(failure)
       session.endCrop()
     }
   }
@@ -182,11 +193,15 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
         onChange={(event) => handleFiles(event.target.files?.[0])}
         tabIndex={-1}
       />
-      <label
-        {...(rest as React.LabelHTMLAttributes<HTMLLabelElement>)}
+      <button
+        {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+        type="button"
         ref={triggerRef}
         id={triggerId}
-        htmlFor={effectiveDisabled ? undefined : inputId}
+        onClick={() => {
+          if (effectiveDisabled) return
+          inputRef.current?.click()
+        }}
         className={getCropUploadTriggerClasses(effectiveDisabled, className)}
         style={style}
         aria-disabled={effectiveDisabled || undefined}
@@ -213,7 +228,7 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
             <span>{labels.selectImageText}</span>
           </>
         )}
-      </label>
+      </button>
       <Modal
         open={sessionState.modalOpen}
         width={modalWidth}
@@ -230,7 +245,7 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
             <Button
               onClick={handleConfirm}
               loading={sessionState.cropping}
-              disabled={!sessionState.cropperReady}>
+              disabled={!sessionState.cropperReady || sessionState.cropping}>
               {labels.cropConfirmText}
             </Button>
           </div>

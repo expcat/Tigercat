@@ -71,10 +71,13 @@ describe('select-utils', () => {
       })
     })
 
-    it('does not create duplicates by label or value, case-insensitive', () => {
+    it('creates when the query is not an exact match', () => {
       expect(resolveCreatableSelectOption(options, 'Alpha', { creatable: true })).toBe(null)
       expect(resolveCreatableSelectOption(options, 'alpha', { creatable: true })).toBe(null)
-      expect(resolveCreatableSelectOption(options, 'ALPHA', { creatable: true })).toBe(null)
+      expect(resolveCreatableSelectOption(options, 'ALPHA', { creatable: true })).toEqual({
+        label: 'ALPHA',
+        value: 'ALPHA'
+      })
     })
 
     it('formats the creatable option from a locale template', () => {
@@ -176,7 +179,7 @@ describe('select-utils', () => {
           multiple: true
         })
       ).toEqual([])
-      expect(clearSelectValue(false)).toBeUndefined()
+      expect(clearSelectValue(false)).toBeNull()
       expect(clearSelectValue(true)).toEqual([])
     })
 

@@ -10,7 +10,7 @@ import { classNames } from './class-names'
 export const checkboxRootBaseClasses = 'inline-flex items-center'
 
 export const checkboxVisualBaseClasses =
-  'relative inline-flex items-center justify-center rounded border-2 tiger-motion-aware [transition:var(--tiger-transition-base,border-color_150ms_ease,background-color_150ms_ease,transform_150ms_ease)] peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+  'relative inline-flex items-center justify-center rounded border-2 tiger-motion-aware [transition:var(--tiger-transition-base)] peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring)] peer-focus-visible:ring-offset-[var(--tiger-surface)]'
 
 export const checkboxSizeClasses: Record<ComponentSize, string> = {
   sm: 'w-4 h-4',
@@ -55,12 +55,12 @@ export function getCheckboxVisualClasses({
     checkboxVisualBaseClasses,
     checkboxSizeClasses[size],
     disabled
-      ? 'cursor-not-allowed border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text-muted,#6b7280)]'
+      ? 'cursor-not-allowed border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
       : filled
-        ? 'cursor-pointer border-[var(--tiger-primary,#2563eb)] bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-on-primary,#ffffff)]'
+        ? 'cursor-pointer border-[var(--tiger-primary)] bg-[var(--tiger-primary)] text-[var(--tiger-on-primary)]'
         : error
-          ? 'cursor-pointer border-[var(--tiger-error,#dc2626)] bg-[var(--tiger-surface,#ffffff)]'
-          : 'cursor-pointer border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-surface,#ffffff)]'
+          ? 'cursor-pointer border-[var(--tiger-error)] bg-[var(--tiger-surface)]'
+          : 'cursor-pointer border-[var(--tiger-border)] bg-[var(--tiger-surface)]'
   )
 }
 
@@ -83,8 +83,8 @@ export function getCheckboxLabelTextClasses(
     'ms-2 select-none',
     checkboxLabelSizeClasses[size],
     disabled
-      ? 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
-      : 'text-[var(--tiger-text,#111827)] cursor-pointer'
+      ? 'text-[var(--tiger-text-secondary)] cursor-not-allowed'
+      : 'text-[var(--tiger-text)] cursor-pointer'
   )
 }
 

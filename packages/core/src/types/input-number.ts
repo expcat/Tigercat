@@ -24,12 +24,16 @@ export interface InputNumberProps {
   /**
    * Current value (controlled mode)
    */
-  value?: number | null
+  /**
+   * Current value. Finite numbers and numeric strings are the same value.
+   * `null` and `''` are empty.
+   */
+  value?: number | string | null
 
   /**
    * Default value (uncontrolled mode)
    */
-  defaultValue?: number | null
+  defaultValue?: number | string | null
 
   /**
    * Minimum value
@@ -98,6 +102,13 @@ export interface InputNumberProps {
    * @default 'right'
    */
   controlsPosition?: 'right' | 'both'
+
+  /**
+   * Snap a committed number onto the `step` grid.
+   * Arrow keys and the step buttons always move by `step`.
+   * @default false
+   */
+  snapToStep?: boolean
 
   /**
    * Format the display value (applied when the field is not focused)
