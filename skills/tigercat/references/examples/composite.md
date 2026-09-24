@@ -21,6 +21,12 @@ Vue: `<ActivityFeed :items="items" />`
 
 React: `<ActivityFeed items={items} />`
 
+## AssigneePicker
+
+Vue: `<AssigneePicker />`
+
+React: `<AssigneePicker />`
+
 ## ChatWindow
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
@@ -60,6 +66,12 @@ Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没�
 Vue: `<FormWizard :steps="steps" :before-next="beforeNext" @finish="onFinish" />`
 
 React: `<FormWizard steps={steps} beforeNext={beforeNext} onFinish={onFinish} />`
+
+## NotificationBell
+
+Vue: `<NotificationBell />`
+
+React: `<NotificationBell />`
 
 ## NotificationCenter
 

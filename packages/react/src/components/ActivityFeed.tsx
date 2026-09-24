@@ -6,6 +6,8 @@ import {
   COMPOSITE_LIST_VIEWPORT,
   compositeListUsesWindow,
   createInfiniteScrollFlight,
+  groupActivityByDate,
+  latestActivityAnnouncement,
   createInfiniteScrollObserver,
   flattenCompositeGroupRows,
   infiniteScrollSentinelClasses,
@@ -65,6 +67,7 @@ export interface ActivityFeedProps
   renderGroupHeader?: (group: ActivityGroup) => React.ReactNode
   renderLoading?: () => React.ReactNode
   renderEmpty?: () => React.ReactNode
+  groupByDate?: boolean
 }
 
 const renderAction = (item: ActivityItem, action: ActivityAction, index: number) => {
@@ -120,6 +123,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   showGroupTitle = true,
   hasMore = false,
   loadError = false,
+  groupByDate = false,
   onLoadMore,
   renderItem,
   renderGroupHeader,
@@ -151,6 +155,11 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   }, [timeZone])
   const seenIds = useRef<Set<string> | null>(null)
   const [announcement, setAnnouncement] = useState('')
+  useEffect(() => {
+    if (!groupByDate) return
+    const text = latestActivityAnnouncement(items)
+    if (text) setAnnouncement(text)
+  }, [groupByDate, items])
   useEffect(() => {
     const flat = resolvedGroups.flatMap((group) => group.items ?? [])
     const ids = flat.map((item) => String(item.id ?? ''))
@@ -377,6 +386,28 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <div className="sr-only" aria-live="polite">
         {announcement}
       </div>
+      {groupByDate ? (
+        <div data-tiger-activity-dates="">
+          {groupActivityByDate(items).map((group) => (
+            <section key={group.title}>
+              <h3 data-activity-date={group.title}>{group.title}</h3>
+            </section>
+          ))}
+        </div>
+      ) : null}
+      {groupByDate ? (
+        <button
+          type="button"
+          data-tiger-next-page=""
+          onClick={() => {
+            const flight = flightRef.current
+            if (!flight.canRequest({ hasMore, loading, error: loadError })) return
+            flight.begin(undefined)
+            onLoadMore?.()
+          }}>
+          next
+        </button>
+      ) : null}
       {loading ? <p>{resolvedLoadingText}</p> : null}
       {windowed ? (
         <VirtualList

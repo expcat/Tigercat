@@ -7,7 +7,7 @@ export default function ImageCropperDemo() {
   return (
     <DemoPage
       title="ImageCropper 图片裁剪"
-      description="交互式图片裁剪组件，支持自由裁剪、固定宽高比、辅助线、Canvas 输出。"
+      description="有界裁剪支持 1:1、4:3、16:9、自由比例，以及旋转、翻转和圆形遮罩。键盘仍能改边。"
       modules={modules}
     />
   )

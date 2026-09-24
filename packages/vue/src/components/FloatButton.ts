@@ -30,6 +30,7 @@ import {
   getFloatButtonOffsetStyle,
   mergeTigerLocale,
   resolveFloatButtonAriaLabel,
+  resolveFloatButtonHref,
   resolveFloatButtonShape,
   shouldMergeOverlayTriggerChild,
   type FloatButtonShape,
@@ -39,6 +40,8 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { Badge } from './Badge'
+import { Tooltip } from './Tooltip'
 import { renderVueBodyTeleport, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
 
 function renderDefaultPlusIcon(size: FloatButtonSize) {
@@ -125,6 +128,8 @@ export const FloatButton = defineComponent({
       type: String,
       default: undefined
     },
+    href: { type: String, default: undefined },
+    badge: { type: [String, Number] as PropType<string | number>, default: undefined },
     disabled: {
       type: Boolean,
       default: false
@@ -204,24 +209,36 @@ export const FloatButton = defineComponent({
         localeLabel: labels.value.ariaLabel
       })
 
-      return h(
-        'button',
+      const href = resolveFloatButtonHref(props.href, props.disabled)
+      const control = h(
+        href ? 'a' : 'button',
         {
           ...attrs,
           class: classes.value,
+          href,
           style: mergeStyleValues(
             getFloatButtonOffsetStyle(props.placement, props.offset, props.floating && !inGroup),
             attrsRecord.style,
             props.style
           ),
-          type: 'button',
-          disabled: props.disabled,
+          type: href ? undefined : 'button',
+          disabled: href ? undefined : props.disabled,
           'aria-label': ariaLabel,
-          title: props.tooltip,
+          title: inGroup ? undefined : props.tooltip,
           onClick: handleClick
         },
         content
       )
+      const badged =
+        props.badge == null
+          ? control
+          : h(Badge, { content: props.badge, type: typeof props.badge === 'number' ? 'number' : 'text' }, () => [
+              control
+            ])
+      if (inGroup && props.tooltip) {
+        return h(Tooltip, { content: props.tooltip, asChild: true }, () => [badged])
+      }
+      return badged
     }
   }
 })

@@ -288,10 +288,25 @@ export const Descriptions = defineComponent({
     }
 
     return () => {
-      if (slots.default && props.items.length === 0) {
+      if (slots.default && props.items.length > 0) {
         devWarn(
           'Descriptions.children',
-          'Descriptions: `items` is the data source. Default slot content is ignored and is not description rows.'
+          '[Tigercat] Descriptions received both items and children. Children are used.'
+        )
+      }
+      if (slots.default) {
+        return h(
+          'div',
+          {
+            ...attrs,
+            class: classNames(
+              getDescriptionsClasses(props.size, props.bordered),
+              props.className,
+              coerceClassValue(attrs.class)
+            ),
+            'data-tiger-descriptions': ''
+          },
+          slots.default()
         )
       }
 
@@ -330,6 +345,20 @@ export const Descriptions = defineComponent({
         ]
       )
     }
+  }
+})
+
+export const DescriptionsItem = defineComponent({
+  name: 'TigerDescriptionsItem',
+  props: {
+    label: { type: String, default: '' }
+  },
+  setup(props, { slots }) {
+    return () =>
+      h('div', { 'data-tiger-descriptions-item': '' }, [
+        h('dt', slots.label ? slots.label() : props.label),
+        h('dd', slots.default?.())
+      ])
   }
 })
 

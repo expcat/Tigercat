@@ -111,7 +111,7 @@ describe('ImagePreview', () => {
     expect(emitted()['update:open']?.length).toBeGreaterThan(2)
   })
 
-  it('navigates with buttons and stops at the ends', async () => {
+  it('navigates with buttons and loops at the ends', async () => {
     const { emitted } = render(ImagePreview, {
       props: { open: true, images, currentIndex: 1 }
     })
@@ -119,7 +119,9 @@ describe('ImagePreview', () => {
     await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
     expect(emitted()['update:currentIndex']?.[0]).toEqual([2])
     expect(img).toHaveAttribute('src', '/img3.jpg')
-    expect(screen.getByRole('button', { name: labels.nextImageAriaLabel })).toBeDisabled()
+    expect(screen.getByRole('button', { name: labels.nextImageAriaLabel })).toBeEnabled()
+    await fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(img).toHaveAttribute('src', '/img1.jpg')
   })
 
   it('does not listen to arrows when showNav is false', async () => {

@@ -22,6 +22,26 @@ export const DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS = 100
  */
 export const DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS = 100
 
+/** After one tooltip opens, the next one in the group skips show delay. */
+export const TOOLTIP_DELAY_SKIP_MS = 300
+
+export interface TooltipDelayGroup {
+  shouldSkip: (now?: number) => boolean
+  noteOpen: (now?: number) => void
+}
+
+export function createTooltipDelayGroup(windowMs = TOOLTIP_DELAY_SKIP_MS): TooltipDelayGroup {
+  let lastOpen = 0
+  return {
+    shouldSkip(now = Date.now()) {
+      return lastOpen > 0 && now - lastOpen < windowMs
+    },
+    noteOpen(now = Date.now()) {
+      lastOpen = now
+    }
+  }
+}
+
 export interface FloatingHoverDelayControllerOptions {
   show: () => void
   hide: () => void
@@ -190,6 +210,10 @@ export interface OverlayPopupControllerOptions {
   getTrigger: () => OverlayPopupTrigger
   getShowDelay?: () => number | undefined
   getHideDelay?: () => number | undefined
+  /** A recently opened sibling tooltip skips the show delay. */
+  getSkipShowDelay?: () => boolean
+  /** Called when the popup actually opens. */
+  onShown?: () => void
   /** Popconfirm ignores dismiss while its confirm promise is pending. */
   isDismissLocked?: () => boolean
   /** Focus is inside the trigger, so a pointer leave keeps a hover popup open. */
@@ -236,6 +260,7 @@ export function createOverlayPopupController(
   }
 
   function showDelay(): number {
+    if (options.getSkipShowDelay?.()) return 0
     const value = options.getShowDelay?.()
     return value === undefined ? DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS : value
   }
@@ -275,6 +300,7 @@ export function createOverlayPopupController(
       return true
     }
     options.onOpenChange?.(next)
+    if (next) options.onShown?.()
     emit()
     return true
   }

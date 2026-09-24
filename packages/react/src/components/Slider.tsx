@@ -21,6 +21,9 @@ import {
   sliderGetPercentage,
   sliderGetValueFromClientX,
   sliderGetKeyboardValue,
+  sliderGetValueFromClientY,
+  sliderPushApartRange,
+  formatSliderTooltip,
   sliderResolveMarks,
   sliderValuesEqual,
   sliderApplyThumbValue,
@@ -102,6 +105,8 @@ interface ThumbProps {
   onBlur: () => void
   onHoverChange: (hover: boolean) => void
   getPercentage: (val: number) => number
+  formatTooltip?: (value: number) => string
+  readOnly?: boolean
 }
 
 const Thumb = memo<ThumbProps>(
@@ -131,7 +136,9 @@ const Thumb = memo<ThumbProps>(
     onFocus,
     onBlur,
     onHoverChange,
-    getPercentage
+    getPercentage,
+    formatTooltip,
+    readOnly = false
   }) => {
     const pct = getPercentage(value)
     const suffixId = suffix ? `${id ?? 'slider'}-suffix` : undefined
@@ -162,7 +169,8 @@ const Thumb = memo<ThumbProps>(
         aria-labelledby={labelledBy}
         aria-describedby={ariaDescribedby}
         aria-invalid={ariaInvalid || undefined}
-        aria-valuetext={String(value)}
+        aria-valuetext={formatSliderTooltip(value, formatTooltip)}
+        aria-readonly={readOnly || undefined}
         onPointerDown={(e) => onPointerDown(e, thumbType)}
         onMouseEnter={() => onHoverChange(true)}
         onMouseLeave={() => onHoverChange(false)}
@@ -188,6 +196,12 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     max = 100,
     step = 1,
     disabled = false,
+    readOnly = false,
+    vertical = false,
+    pushApart = false,
+    showRange = true,
+    showInput = false,
+    formatTooltip,
     marks = false,
     tooltip = true,
     size = 'md',
@@ -321,7 +335,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
 
   const handlePointerDown = (event: React.PointerEvent, thumb: 'min' | 'max' | null) => {
     onPointerDown?.(event)
-    if (event.defaultPrevented || effectiveDisabled) return
+    if (event.defaultPrevented || effectiveDisabled || readOnly) return
     if (event.button !== 0) return
     event.preventDefault()
     const track = trackRef.current
@@ -387,7 +401,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, value: number, thumbType: 'min' | 'max' | null) => {
-      if (effectiveDisabled) return
+      if (effectiveDisabled || readOnly) return
       const isRtl = getElementTextDirection(trackRef.current) === 'rtl'
       const newValue = sliderGetKeyboardValue(e.key, value, min, max, step, undefined, isRtl)
       if (newValue === null) return
@@ -453,6 +467,12 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
         status
       )}
       data-status={status === 'default' ? undefined : status}
+      data-orientation={vertical ? 'vertical' : 'horizontal'}
+      data-show-input={showInput || undefined}
+      data-show-range={showRange || undefined}
+      data-push-apart={pushApart || undefined}
+      data-readonly={readOnly || undefined}
+      aria-readonly={readOnly || undefined}
       onBlur={(event) => {
         const next = event.relatedTarget
         if (next && event.currentTarget.contains(next as Node)) return
@@ -493,6 +513,8 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                   setFocusedThumb(null)
                 }}
                 getPercentage={getPercentage}
+                formatTooltip={formatTooltip}
+                readOnly={readOnly}
               />
               <Thumb
                 value={displayed[1]}
@@ -524,6 +546,8 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                   setFocusedThumb(null)
                 }}
                 getPercentage={getPercentage}
+                formatTooltip={formatTooltip}
+                readOnly={readOnly}
               />
             </>
           ) : (
@@ -556,6 +580,8 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 setFocusedThumb(null)
               }}
               getPercentage={getPercentage}
+                formatTooltip={formatTooltip}
+                readOnly={readOnly}
             />
           )}
         </div>
@@ -565,12 +591,28 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
           {Object.entries(marksObj).map(([key, label]) => {
             const markValue = Number(key)
             return (
-              <div
+              <button
                 key={key}
+                type="button"
                 className="absolute text-xs text-[var(--tiger-text-secondary)] -translate-x-1/2"
-                style={sliderThumbInsetStyle(getPercentage(markValue), rtl)}>
+                style={sliderThumbInsetStyle(getPercentage(markValue), rtl)}
+                disabled={effectiveDisabled || readOnly}
+                onClick={() => {
+                  if (effectiveDisabled || readOnly) return
+                  const current = valueRef.current
+                  commit(
+                    range && Array.isArray(current)
+                      ? (sliderApplyThumbValue(
+                          current,
+                          markValue,
+                          sliderPickRangeThumb(current, markValue),
+                          true
+                        ) as [number, number])
+                      : markValue
+                  )
+                }}>
                 {label}
-              </div>
+              </button>
             )
           })}
         </div>

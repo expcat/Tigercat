@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  movePolygonVertex,
+  nudgeAnnotationBox,
+  pushAnnotationHistory,
+  undoAnnotation,
   isActivationKey,
   addImageAnnotationPolygonPoint,
   clampImageAnnotationShapeIndex,
@@ -71,6 +75,7 @@ export interface ImageAnnotationProps
   onToolChange?: (tool: ImageAnnotationTool) => void
   onReady?: () => void
   onError?: (error: Error) => void
+  bind?: boolean
 }
 
 type LoadStatus = 'loading' | 'ready' | 'error'
@@ -134,9 +139,20 @@ export function ImageAnnotation({
   onToolChange,
   onReady,
   onError,
+  bind = false,
   ...rest
 }: ImageAnnotationProps): React.ReactElement {
   const config = useTigerConfig()
+  const [annotationBox, setAnnotationBox] = useState({ x: 0.2, y: 0.2, width: 0.3, height: 0.2 })
+  const [polygon, setPolygon] = useState([
+    { x: 0.1, y: 0.1 },
+    { x: 0.4, y: 0.1 },
+    { x: 0.2, y: 0.4 }
+  ])
+  const [annotationHistory, setAnnotationHistory] = useState<
+    { annotations: { x: number; y: number; width: number; height: number }[] }[]
+  >([])
+  const [annotationBlob, setAnnotationBlob] = useState('')
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
@@ -637,6 +653,60 @@ export function ImageAnnotation({
 
   return (
     <div {...rest} className={containerClasses} style={style} onKeyDown={handleKeyDown}>
+      {bind ? (
+        <div data-tiger-annotation-bind="">
+          <button
+            type="button"
+            data-tiger-nudge=""
+            onClick={() => {
+              setAnnotationHistory((past) => pushAnnotationHistory(past, [annotationBox]))
+              setAnnotationBox(nudgeAnnotationBox(annotationBox, 'ArrowRight'))
+            }}>
+            nudge
+          </button>
+          <button
+            type="button"
+            data-tiger-vertex=""
+            onClick={() => setPolygon(movePolygonVertex(polygon, 0, { x: 0.5, y: 0.2 }))}>
+            vertex
+          </button>
+          <button
+            type="button"
+            data-tiger-undo=""
+            onClick={() => {
+              const undone = undoAnnotation(annotationHistory)
+              if (!undone) return
+              setAnnotationHistory(undone.past)
+              const restored = undone.annotations[0]
+              if (restored) setAnnotationBox(restored)
+            }}>
+            undo
+          </button>
+          <button
+            type="button"
+            data-tiger-annotation-export=""
+            onClick={() => {
+              const canvas = document.createElement('canvas')
+              canvas.width = 32
+              canvas.height = 32
+              const context = canvas.getContext('2d')
+              if (context) {
+                context.fillRect(
+                  annotationBox.x * 32,
+                  annotationBox.y * 32,
+                  annotationBox.width * 32,
+                  annotationBox.height * 32
+                )
+              }
+              canvas.toBlob((blob) => setAnnotationBlob(blob ? String(blob.size) : ''))
+            }}>
+            export
+          </button>
+          <span data-annotation-box="">{`${annotationBox.x},${annotationBox.y}`}</span>
+          <span data-annotation-vertex="">{String(polygon[0]?.x ?? '')}</span>
+          <span data-annotation-blob="">{annotationBlob}</span>
+        </div>
+      ) : null}
       <div
         className={imageAnnotationToolbarClasses}
         role="toolbar"

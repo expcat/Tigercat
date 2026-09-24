@@ -45,9 +45,12 @@ import {
   firstFieldRuleError,
   formValuesEqual,
   getValueByPath,
+  insertFieldArrayItem,
   isFormValidationCancelled,
   FormValidationSupersededError,
+  removeFieldArrayItem,
   setValueByPath,
+  shiftFieldArrayErrors,
   type FormValidationDebouncer,
   type FormValidationMessages
 } from './form-validation'
@@ -537,6 +540,24 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     emit()
   }
 
+  function insertArrayItem(path: string, index: number, item: unknown = {}): void {
+    if (!path) return
+    const next = insertFieldArrayItem(values, path, index, item)
+    errors = shiftFieldArrayErrors(errors, path, index, 'insert')
+    commitValues(next, true)
+  }
+
+  function removeArrayItem(path: string, index: number): void {
+    if (!path) return
+    const next = removeFieldArrayItem(values, path, index)
+    if (next === values) return
+    errors = shiftFieldArrayErrors(errors, path, index, 'remove')
+    for (const name of Array.from(ruleOutcomes.keys())) {
+      if (name.startsWith(`${path}[${index}]`)) ruleOutcomes.delete(name)
+    }
+    commitValues(next, true)
+  }
+
   function snapshotHistory(): void {
     if (!undoable) return
     if (!history) {
@@ -619,6 +640,8 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     resetFields: reset,
     addField,
     removeField,
+    insertFieldArrayItem: insertArrayItem,
+    removeFieldArrayItem: removeArrayItem,
     undo,
     redo,
     snapshotHistory,

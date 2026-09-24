@@ -1,0 +1,7 @@
+{
+  "id": "float-button-03",
+  "title": "链接与徽标",
+  "description": "浮动按钮可以是允许列表里的链接，并用 Badge 显示徽标。",
+  "entry": "App.vue",
+  "order": 3
+}

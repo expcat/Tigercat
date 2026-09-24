@@ -453,6 +453,16 @@ export type { InputGroupProps, InputGroupAddonProps } from './components/InputGr
 
 // PrintLayout (v0.9.0+)
 export { PrintLayout, PrintPageBreak } from './components/PrintLayout'
+export { Inplace } from './components/Inplace'
+export { CopyButton } from './components/CopyButton'
+export { Gallery } from './components/Gallery'
+export type { GalleryProps } from './components/Gallery'
+export { WaterfallChart } from './components/WaterfallChart'
+export type { WaterfallChartProps } from './components/WaterfallChart'
+export { SankeyChart } from './components/SankeyChart'
+export type { SankeyChartProps } from './components/SankeyChart'
+export { NotificationBell } from './components/NotificationBell'
+export { AssigneePicker } from './components/AssigneePicker'
 export type {
   PrintLayoutProps,
   PrintPageBreakProps,

@@ -477,3 +477,124 @@ function isCronIntegerInRange(value: string, min: number, max: number): boolean 
 function isNumberInRange(value: number, min: number, max: number): boolean {
   return Number.isInteger(value) && value >= min && value <= max
 }
+
+function cronTokenValues(token: string, min: number, max: number): number[] | null {
+  const [rangePart, stepPart] = token.split('/')
+  if (token.split('/').length > 2) return null
+  const step = stepPart === undefined ? 1 : Number(stepPart)
+  if (!Number.isInteger(step) || step < 1) return null
+  let start = min
+  let end = max
+  if (rangePart !== '*') {
+    const range = rangePart.match(/^(\d+)-(\d+)$/)
+    if (range) {
+      start = Number(range[1])
+      end = Number(range[2])
+    } else if (/^\d+$/.test(rangePart)) {
+      start = Number(rangePart)
+      end = start
+    } else return null
+  }
+  if (start < min || end > max || start > end) return null
+  const values: number[] = []
+  for (let value = start; value <= end; value += step) values.push(value)
+  return values
+}
+
+function cronFieldMatches(part: string, min: number, max: number): Set<number> | null {
+  const values = new Set<number>()
+  for (const token of part.split(',')) {
+    const next = cronTokenValues(token.trim(), min, max)
+    if (!next) return null
+    next.forEach((value) => values.add(value))
+  }
+  return values
+}
+
+export interface CronSchedule {
+  minute: Set<number>
+  hour: Set<number>
+  dayOfMonth: Set<number>
+  month: Set<number>
+  dayOfWeek: Set<number>
+  dayOfMonthAny: boolean
+  dayOfWeekAny: boolean
+}
+
+export function parseCronSchedule(expression: string): CronSchedule | null {
+  if (!validateCronExpression(expression).valid) return null
+  const parts = getCronExpressionParts(expression)
+  const minute = cronFieldMatches(parts[0], 0, 59)
+  const hour = cronFieldMatches(parts[1], 0, 23)
+  const dayOfMonth = cronFieldMatches(parts[2], 1, 31)
+  const month = cronFieldMatches(parts[3], 1, 12)
+  const dayOfWeek = cronFieldMatches(parts[4], 0, 7)
+  if (!minute || !hour || !dayOfMonth || !month || !dayOfWeek) return null
+  if (dayOfWeek.has(7)) dayOfWeek.add(0)
+  return {
+    minute,
+    hour,
+    dayOfMonth,
+    month,
+    dayOfWeek,
+    dayOfMonthAny: parts[2].trim() === '*',
+    dayOfWeekAny: parts[4].trim() === '*'
+  }
+}
+
+function cronDayMatches(schedule: CronSchedule, date: Date): boolean {
+  if (!schedule.month.has(date.getMonth() + 1)) return false
+  const dom = schedule.dayOfMonth.has(date.getDate())
+  const dow = schedule.dayOfWeek.has(date.getDay())
+  if (schedule.dayOfMonthAny && schedule.dayOfWeekAny) return true
+  if (schedule.dayOfMonthAny) return dow
+  if (schedule.dayOfWeekAny) return dom
+  return dom || dow
+}
+
+/** Next fire time after `from`, using the same 5-field rules as validation. */
+export function nextCronRun(expression: string, from: Date = new Date()): Date | null {
+  const schedule = parseCronSchedule(expression)
+  if (!schedule) return null
+  const cursor = new Date(from.getTime())
+  cursor.setSeconds(0, 0)
+  cursor.setMinutes(cursor.getMinutes() + 1)
+  const limit = new Date(cursor.getTime())
+  limit.setFullYear(limit.getFullYear() + 2)
+  while (cursor < limit) {
+    if (
+      cronDayMatches(schedule, cursor) &&
+      schedule.hour.has(cursor.getHours()) &&
+      schedule.minute.has(cursor.getMinutes())
+    ) {
+      return cursor
+    }
+    cursor.setMinutes(cursor.getMinutes() + 1)
+  }
+  return null
+}
+
+function listPhrase(values: number[], any: boolean): string {
+  if (any) return '*'
+  return [...values].sort((a, b) => a - b).join(',')
+}
+
+/** One sentence. Month numbers stay numbers; names, Quartz, and seconds are out of scope. */
+export function describeCronExpression(expression: string): string | null {
+  const schedule = parseCronSchedule(expression)
+  if (!schedule) return null
+  const parts = getCronExpressionParts(expression)
+  const minute = parts[0].trim() === '*' ? 'every minute' : `minute ${listPhrase([...schedule.minute], false)}`
+  const hour = parts[1].trim() === '*' ? 'every hour' : `hour ${listPhrase([...schedule.hour], false)}`
+  const day =
+    schedule.dayOfMonthAny && schedule.dayOfWeekAny
+      ? 'every day'
+      : [
+          schedule.dayOfMonthAny ? '' : `day ${listPhrase([...schedule.dayOfMonth], false)}`,
+          schedule.dayOfWeekAny ? '' : `weekday ${listPhrase([...schedule.dayOfWeek], false)}`
+        ]
+          .filter(Boolean)
+          .join(' or ')
+  const month = parts[3].trim() === '*' ? 'every month' : `month ${listPhrase([...schedule.month], false)}`
+  return `Runs at ${minute}, ${hour}, ${day}, ${month}.`
+}

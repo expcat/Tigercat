@@ -29,6 +29,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
+import { DrillHost } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
@@ -76,6 +77,10 @@ export const SunburstChart = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
+    bind: {
+      type: Object as PropType<{ roots?: { id: string; children?: { id: string }[] }[] }>,
+      default: undefined
+    },
     onArcClick: {
       type: Function as PropType<(index: number, datum: SunburstChartDatum) => void>
     }
@@ -123,7 +128,8 @@ export const SunburstChart = defineComponent({
       handleKeyDown,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave
+      handleLegendLeave,
+      isLegendIndexHidden
     } = useChartInteraction<SunburstChartDatum>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -149,8 +155,14 @@ export const SunburstChart = defineComponent({
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
         getLabel: (d) => d.label,
-        getColor: (_d, i) => roots.value[i]?.color ?? palette.value[i % palette.value.length]
-      }).map((item, i) => ({ ...item, index: roots.value[i]?.index ?? item.index }))
+        getColor: (_d, i) => roots.value[i]?.color ?? palette.value[i % palette.value.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
+      }).map((item, i) => ({
+        ...item,
+        index: roots.value[i]?.index ?? item.index,
+        hidden: isLegendIndexHidden(roots.value[i]?.index ?? item.index)
+      }))
     )
     const tooltipContent = computed(() => {
       if (resolvedHoveredIndex.value === null) return ''
@@ -233,10 +245,12 @@ export const SunburstChart = defineComponent({
                   key: `arc-${arc.index}`,
                   d: arc.path,
                   fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color,
-                  opacity: getChartElementOpacity(arc.index, activeIndex.value, {
-                    activeOpacity: props.activeOpacity,
-                    inactiveOpacity: props.inactiveOpacity
-                  }),
+                  opacity: isLegendIndexHidden(arc.index)
+                    ? 0
+                    : getChartElementOpacity(arc.index, activeIndex.value, {
+                        activeOpacity: props.activeOpacity,
+                        inactiveOpacity: props.inactiveOpacity
+                      }),
                   stroke: 'var(--tiger-surface)',
                   'stroke-width': 1,
                   'data-sunburst-arc': '',
@@ -322,6 +336,7 @@ export const SunburstChart = defineComponent({
                 onItemLeave: handleLegendLeave
               })
             : null,
+          props.bind?.roots ? h(DrillHost, { roots: props.bind.roots }) : null,
           tooltip
         ]
       )

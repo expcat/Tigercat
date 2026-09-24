@@ -32,8 +32,10 @@ import { FeedbackDepthKey, FeedbackHost } from './FeedbackHost'
 import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import {
   createTigerLocaleScope,
+  createTigerThemeScope,
   createIconRegistry,
   type TigerLocaleScope,
+  type TigerThemeScope,
   type IconRegistry,
   type TigerLocaleHandle
 } from '@expcat/tigercat-core'
@@ -90,6 +92,8 @@ export const ConfigProvider = defineComponent({
     const localeScope: TigerLocaleScope = createTigerLocaleScope()
     let localeHandle: TigerLocaleHandle | null = null
     let documentHandle: DocumentConfigHandle | null = null
+    let nestedScope: TigerThemeScope | null = null
+    const hostRef = ref<HTMLElement | null>(null)
     const ownedIcons = !parentInjected
     const iconRegistry: IconRegistry = parentInjected?.value.iconRegistry ?? createIconRegistry()
 
@@ -181,12 +185,41 @@ export const ConfigProvider = defineComponent({
       { immediate: true }
     )
 
+    watch(
+      () => ({
+        host: hostRef.value,
+        theme: props.theme,
+        colorScheme: props.colorScheme
+      }),
+      (values) => {
+        if (isDocumentOwner) return
+        if (!values.host || !values.theme) {
+          nestedScope?.dispose()
+          nestedScope = null
+          return
+        }
+        if (!nestedScope) {
+          nestedScope = createTigerThemeScope({
+            root: values.host,
+            nested: true,
+            theme: values.theme,
+            colorScheme: values.colorScheme ?? 'auto'
+          })
+        }
+        nestedScope.setTheme(values.theme)
+        if (values.colorScheme) nestedScope.setColorScheme(values.colorScheme)
+        else nestedScope.apply()
+      }
+    )
+
     onBeforeUnmount(() => {
       localeHandle?.dispose()
       localeHandle = null
       if (ownedIcons) iconRegistry.dispose()
       documentHandle?.dispose()
       documentHandle = null
+      nestedScope?.dispose()
+      nestedScope = null
     })
 
     provide(TigerConfigKey, merged)
@@ -196,6 +229,7 @@ export const ConfigProvider = defineComponent({
       h(
         'div',
         {
+          ref: hostRef,
           class: 'tiger-config-root',
           'data-tiger-config-root': '',
           dir: merged.value.direction,

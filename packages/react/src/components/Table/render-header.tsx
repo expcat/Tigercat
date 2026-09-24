@@ -39,6 +39,7 @@ export interface RenderHeaderViewProps {
   labels: Required<TigerLocaleTable>
   selectionName?: string
   filterMode?: 'basic' | 'advanced'
+  renderedColumns?: TableContext['displayColumns']
 }
 
 function isHeaderSortClickTarget(target: EventTarget | null): boolean {
@@ -57,8 +58,10 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
     lockColumnAriaLabel,
     unlockColumnAriaLabel,
     labels,
-    filterMode = 'basic'
+    filterMode = 'basic',
+    renderedColumns
   } = view
+  const headerColumns = renderedColumns ?? ctx.displayColumns
   const chrome = getTableChromeSlots({
     hasSelectionColumn: hasTableSelectionColumn(rowSelection),
     expand: resolveTableExpandSlot(expandable)
@@ -91,7 +94,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
           <React.Fragment key={slot}>{renderChromeTh(slot)}</React.Fragment>
         ))}
 
-        {ctx.displayColumns.map((column) => {
+        {headerColumns.map((column) => {
           const isSorted = ctx.sortState.key === column.key
           const sortDirection = isSorted ? ctx.sortState.direction : null
 
@@ -105,11 +108,15 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
 
           const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, TABLE_FIXED_HEADER_Z_INDEX)
 
-          const widthStyle = column.width
-            ? {
-                width: typeof column.width === 'number' ? `${column.width}px` : column.width
-              }
-            : undefined
+          const measuredWidth = ctx.widthMap[column.key]
+          const widthStyle =
+            measuredWidth !== undefined
+              ? { width: `${measuredWidth}px` }
+              : column.width
+                ? {
+                    width: typeof column.width === 'number' ? `${column.width}px` : column.width
+                  }
+                : undefined
 
           const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
@@ -125,6 +132,8 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
               key={column.key}
               scope="col"
               data-tiger-table-column-key={column.key}
+              data-tiger-col-width={measuredWidth}
+              data-tiger-col-drag-handle={columnDraggable ? '' : undefined}
               aria-sort={ariaSort}
               className={classNames(
                 getTableHeaderCellClasses(

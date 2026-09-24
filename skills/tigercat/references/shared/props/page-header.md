@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## PageHeader
 
-`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 4/14 props
+`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 4/16 props
 
 Note: 返回地址走 `Link`，因此同样只接受 `link-utils` 的协议。危险地址不输出 `href`。
 

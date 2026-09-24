@@ -38,8 +38,11 @@ import {
   type ContextMenuMenuProps as CoreContextMenuMenuProps,
   type ContextMenuItemProps as CoreContextMenuItemProps,
   type ContextMenuSubProps as CoreContextMenuSubProps,
-  type FloatingPlacement
+  type FloatingPlacement,
+  type PopupMenuCheckChange,
+  type PopupMenuItem
 } from '@expcat/tigercat-core'
+import { PopupMenuList } from './popup-menu-items'
 import { useAnchoredOverlay } from '../utils/overlay'
 import { OverlayPortal } from '../utils/overlay-outlet'
 import { renderOverlayTrigger } from '../utils/overlay-trigger'
@@ -365,6 +368,9 @@ export interface ContextMenuProps
   asChild?: boolean
   onOpenChange?: (open: boolean) => void
   children?: React.ReactNode
+  items?: PopupMenuItem[]
+  onCheck?: (change: PopupMenuCheckChange) => void
+  onItemSelect?: (item: PopupMenuItem) => void
 }
 
 export const ContextMenu: React.FC<ContextMenuProps> = ({
@@ -380,6 +386,9 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   style,
   onOpenChange,
   children,
+  items,
+  onCheck,
+  onItemSelect,
   ...divProps
 }) => {
   const [internalVisible, setInternalVisible] = useState(defaultOpen)
@@ -542,22 +551,32 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     triggerChildren.push(child)
   })
 
-  const menuWrapperNode = visible && menuElement ? (
-    <div
-      ref={floatingRef}
-      className={menuWrapperClasses}
-      style={overlay.floatingStyles}
-      data-positioned={overlay.positioned}
-      data-tiger-context-menu=""
-      onKeyDown={handleMenuKeyDown}
-      onContextMenu={handleMenuContextMenu}>
-      {React.isValidElement(menuElement)
-        ? React.cloneElement(menuElement as React.ReactElement<Record<string, unknown>>, {
-            id: menuId
-          })
-        : menuElement}
-    </div>
-  ) : null
+  const menuWrapperNode =
+    visible && (menuElement || (items && items.length > 0)) ? (
+      <div
+        ref={floatingRef}
+        className={menuWrapperClasses}
+        style={overlay.floatingStyles}
+        data-positioned={overlay.positioned}
+        data-tiger-context-menu=""
+        role={items && items.length > 0 && !menuElement ? 'menu' : undefined}
+        onKeyDown={handleMenuKeyDown}
+        onContextMenu={handleMenuContextMenu}>
+        {items && items.length > 0 ? (
+          <PopupMenuList
+            items={items}
+            onCheck={onCheck}
+            onSelect={onItemSelect}
+            onClose={() => setVisible(false)}
+          />
+        ) : null}
+        {React.isValidElement(menuElement)
+          ? React.cloneElement(menuElement as React.ReactElement<Record<string, unknown>>, {
+              id: menuId
+            })
+          : menuElement}
+      </div>
+    ) : null
 
   return (
     <ContextMenuContext.Provider value={contextValue}>

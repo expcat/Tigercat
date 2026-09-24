@@ -47,6 +47,7 @@ export function processTimelineItems(
 }
 
 export function getTimelineContainerClasses(mode: TimelineMode): string {
+  if (mode === 'horizontal') return `${timelineContainerClasses} flex flex-row overflow-x-auto`
   if (mode === 'alternate') return `${timelineContainerClasses} flex flex-col`
   return timelineContainerClasses
 }
@@ -57,6 +58,7 @@ export function getTimelineItemClasses(
   isLast = false
 ): string {
   const base = isLast ? 'relative pb-0' : timelineItemClasses
+  if (mode === 'horizontal') return `${base} flex flex-col items-center px-4`
   if (mode === 'right') return `${base} pe-8`
   if (mode === 'alternate') {
     return `${base} grid grid-cols-2`

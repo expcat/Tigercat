@@ -1,0 +1,12 @@
+{
+  "id": "notification-bell-01",
+  "title": "通知铃铛",
+  "description": "未读数按钮打开通知中心浮层。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

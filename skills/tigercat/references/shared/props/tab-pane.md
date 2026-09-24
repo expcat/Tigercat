@@ -13,9 +13,9 @@ description: Compact generated Tigercat Navigation props reference
 
 `packages/core/src/types/tabs.ts` · `TabPaneProps` · 4/11 props
 
-| Prop        | Type               | Default | Notes                                                     |
-| ----------- | ------------------ | ------- | --------------------------------------------------------- |
-| `tabKey`    | `string \| number` | `-`     | Unique key for the tab pane (required)                    |
-| `label`     | `string`           | `-`     | Tab label/title                                           |
-| `disabled?` | `boolean`          | `false` | Whether the tab is disabled                               |
-| `closable?` | `boolean`          | `-`     | Whether the tab can be closed (overrides parent closable) |
+| Prop        | Type               | Default | Notes                                                            |
+| ----------- | ------------------ | ------- | ---------------------------------------------------------------- |
+| `tabKey`    | `string \| number` | `-`     | Unique key for the tab pane (required)                           |
+| `label`     | `string`           | `-`     | Tab title text. A label slot or node replaces the visible title. |
+| `disabled?` | `boolean`          | `false` | Whether the tab is disabled                                      |
+| `closable?` | `boolean`          | `-`     | Whether the tab can be closed (overrides parent closable)        |

@@ -48,6 +48,7 @@ export interface TreeProps extends Omit<
   filterFn?: TreeFilterFn
   filterMode?: TreeFilterMode
   autoExpandParent?: boolean
+  expandOnClick?: boolean
   blockNode?: boolean
   emptyText?: string
   ariaLabel?: string

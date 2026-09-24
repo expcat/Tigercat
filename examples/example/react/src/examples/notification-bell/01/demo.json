@@ -1,0 +1,12 @@
+{
+  "id": "notification-bell-01",
+  "title": "Notification bell",
+  "description": "Unread count button opens NotificationCenter in a popover.",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

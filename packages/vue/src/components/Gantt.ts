@@ -4,6 +4,10 @@ import {
   coerceClassValue,
   clampGanttDragDeltaX,
   computeGanttLayout,
+  ganttDependencyAnchors,
+  ganttRowWindow,
+  ganttVisibleWindow,
+  isGanttMilestone,
   ganttAxisTextClasses,
   ganttDateValuesEqual,
   ganttDependencyClasses,
@@ -30,6 +34,7 @@ import {
   type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+import { renderGanttBind } from './w9-chart-bind'
 import { useTigerConfig } from './ConfigProvider'
 
 const GANTT_BAR_CLICK_PX = 4
@@ -99,6 +104,18 @@ export const Gantt = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
+    bind: {
+      type: Object as PropType<{
+        tasks?: { id: string; start: number; end: number }[]
+        dependency?: 'FS' | 'SS' | 'FF' | 'SF'
+        source?: { x: number; width: number }
+        target?: { x: number; width: number }
+        window?: { start: number; end: number }
+        rowHeight?: number
+        viewportHeight?: number
+      }>,
+      default: undefined
+    },
     onTaskClick: { type: Function as PropType<(task: GanttTask) => void> },
     onTaskChange: { type: Function as PropType<(task: GanttTask) => void> }
   },
@@ -483,6 +500,30 @@ export const Gantt = defineComponent({
                 ])
             }
           )
+        ,
+          props.bind
+            ? renderGanttBind({
+                milestones: (props.bind.tasks ?? [])
+                  .filter((task) => isGanttMilestone(task.start, task.end))
+                  .map((task) => task.id),
+                anchors:
+                  props.bind.dependency && props.bind.source && props.bind.target
+                    ? ganttDependencyAnchors(
+                        props.bind.dependency,
+                        props.bind.source,
+                        props.bind.target
+                      )
+                    : undefined,
+                windowCount:
+                  ganttVisibleWindow(props.bind.tasks ?? [], props.bind.window ?? null).length +
+                  ganttRowWindow(
+                    0,
+                    props.bind.viewportHeight ?? 0,
+                    props.bind.tasks?.length ?? 0,
+                    props.bind.rowHeight ?? 28
+                  ).end
+              })
+            : null
         ]
       )
   }

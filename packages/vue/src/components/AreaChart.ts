@@ -318,7 +318,8 @@ export const AreaChart = defineComponent({
       handleClick: handleSeriesSelect,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave
+      handleLegendLeave,
+      isLegendIndexHidden
     } = useChartInteraction<AreaChartSeries>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -411,7 +412,9 @@ export const AreaChart = defineComponent({
           props.legendFormatter
             ? props.legendFormatter(s, i)
             : (s.name ?? defaultChartSeriesName(i, labels.value.seriesName)),
-        getColor: (s, i) => s.color ?? palette.value[i % palette.value.length]
+        getColor: (s, i) => s.color ?? palette.value[i % palette.value.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       })
     )
 

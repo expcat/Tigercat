@@ -461,6 +461,64 @@ export function getTabPaneClasses(active: boolean): string {
   return active ? tabPaneBaseClasses : `${tabPaneBaseClasses} ${tabPaneHiddenClasses}`
 }
 
+export type TabActivation = 'automatic' | 'manual'
+
+export function tabActivationSelectsOnArrow(activation: TabActivation | undefined): boolean {
+  return activation !== 'manual'
+}
+
+export function splitOverflowTabKeys<K extends string | number>(options: {
+  keys: readonly K[]
+  widths: readonly number[]
+  available: number
+  activeKey?: K
+  moreWidth?: number
+}): { visible: K[]; overflow: K[] } {
+  const moreWidth = options.moreWidth ?? 48
+  const widths = options.keys.map((key, index) => options.widths[index] ?? 0)
+  const total = widths.reduce((sum, width) => sum + width, 0)
+  if (options.available <= 0 || total <= options.available) {
+    return { visible: [...options.keys], overflow: [] }
+  }
+  const budget = Math.max(0, options.available - moreWidth)
+  const visible: K[] = []
+  let used = 0
+  options.keys.forEach((key, index) => {
+    const width = widths[index]
+    if (used + width <= budget) {
+      visible.push(key)
+      used += width
+    }
+  })
+  if (
+    options.activeKey != null &&
+    !visible.some((key) => String(key) === String(options.activeKey))
+  ) {
+    const activeIndex = options.keys.findIndex((key) => String(key) === String(options.activeKey))
+    if (activeIndex >= 0) {
+      if (visible.length > 0) visible.pop()
+      visible.push(options.keys[activeIndex])
+    }
+  }
+  const visibleSet = new Set(visible.map((key) => String(key)))
+  const overflow = options.keys.filter((key) => !visibleSet.has(String(key)))
+  return { visible, overflow }
+}
+
+export function nextTabOrder<K extends string | number>(
+  keys: readonly K[],
+  from: K,
+  to: K
+): K[] {
+  const next = [...keys]
+  const fromIndex = next.findIndex((key) => String(key) === String(from))
+  const toIndex = next.findIndex((key) => String(key) === String(to))
+  if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return next
+  const [moved] = next.splice(fromIndex, 1)
+  next.splice(toIndex, 0, moved)
+  return next
+}
+
 export function getTabAddButtonClasses(position: TabPosition): string {
   if (position === 'bottom') return `${tabAddButtonClasses} rounded-b`
   if (position === 'left') return `${tabAddButtonClasses} rounded-s`

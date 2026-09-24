@@ -147,8 +147,8 @@ describe('Input', () => {
       expect(input.className).toContain('disabled:')
     })
 
-    it('should be readonly when readonly prop is true', () => {
-      const { getByRole } = render(<Input readonly />)
+    it('should be readOnly when readOnly prop is true', () => {
+      const { getByRole } = render(<Input readOnly />)
 
       const input = getByRole('textbox')
       expect(input).toHaveAttribute('readonly')
@@ -218,9 +218,9 @@ describe('Input', () => {
       expect(handleChange).not.toHaveBeenCalled()
     })
 
-    it('should not allow typing when readonly', async () => {
+    it('should not allow typing when readOnly', async () => {
       const user = userEvent.setup()
-      const { getByRole } = render(<Input readonly value="initial" />)
+      const { getByRole } = render(<Input readOnly value="initial" />)
 
       const input = getByRole('textbox') as HTMLInputElement
       await user.type(input, 'test')
@@ -443,7 +443,7 @@ describe('Input', () => {
           suffix="Suf"
           placeholder="Placeholder"
           disabled={false}
-          readonly={false}
+          readOnly={false}
           required={true}
           maxLength={100}
           minLength={1}
@@ -613,10 +613,10 @@ describe('Input', () => {
       expect(ref.current).toHaveFocus()
     })
 
-    it('honors React readOnly the same as readonly', () => {
+    it('honors React readOnly the same as readOnly', () => {
       const { rerender } = render(<Input readOnly defaultValue="x" />)
       expect(screen.getByRole('textbox')).toHaveAttribute('readonly')
-      rerender(<Input readonly defaultValue="x" />)
+      rerender(<Input readOnly defaultValue="x" />)
       expect(screen.getByRole('textbox')).toHaveAttribute('readonly')
     })
 

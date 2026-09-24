@@ -188,7 +188,7 @@ export function resolveSchemaFormLayout(
 }
 
 export function schemaFormFieldRules(field: SchemaFormField): FormRule | FormRule[] | undefined {
-  if (field.disabled) return undefined
+  if (field.disabled || field.readOnly) return undefined
   const rules = field.rules
   if (field.required && !hasRequiredRule(rules)) {
     const requiredRule: FormRule = { required: true }

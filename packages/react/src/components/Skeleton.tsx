@@ -4,13 +4,17 @@ import {
   getParagraphRowWidth,
   getSkeletonClasses,
   getSkeletonInlineStyle,
+  feedbackLayoutLabels,
   isSkeletonNamed,
   resolveSkeletonAriaHidden,
   type SkeletonProps as CoreSkeletonProps
 } from '@expcat/tigercat-core'
 
 export type SkeletonProps = CoreSkeletonProps &
-  Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>
+  Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> & {
+    loading?: boolean
+    children?: React.ReactNode
+  }
 
 export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skeleton(
   {
@@ -21,6 +25,8 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
     shape = 'circle',
     rows = 1,
     paragraph = false,
+    loading = true,
+    children,
     className,
     style,
     'aria-label': ariaLabel,
@@ -40,6 +46,14 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
     'aria-hidden': computedAriaHidden,
     role: namedStatus ? ('status' as const) : undefined,
     'aria-busy': namedStatus ? true : undefined
+  }
+
+  if (!loading) {
+    return (
+      <div ref={ref} data-tiger-skeleton="" aria-busy={false}>
+        {children}
+      </div>
+    )
   }
 
   if (variant === 'text' && rows > 1) {
@@ -71,10 +85,12 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
         {...divProps}
         ref={ref}
         data-tiger-skeleton=""
+        aria-busy="true"
+        aria-label={feedbackLayoutLabels.skeletonBusy}
         className={classNames('flex flex-col', !width && 'w-full', className)}
         style={{ ...inlineStyle, ...style }}
         {...a11y}>
-        {rowElements}
+        <div aria-hidden="true">{rowElements}</div>
       </div>
     )
   }
@@ -84,6 +100,9 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
       {...divProps}
       ref={ref}
       data-tiger-skeleton=""
+      aria-busy="true"
+      aria-label={feedbackLayoutLabels.skeletonBusy}
+      aria-hidden="true"
       className={classNames(
         getSkeletonClasses(variant, animation, shape, { width, height }),
         className

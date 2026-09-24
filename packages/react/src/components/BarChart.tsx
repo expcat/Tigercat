@@ -17,6 +17,7 @@ import {
   barInteractiveClasses,
   BAR_ANIMATED_CLASS,
   layoutBarRects,
+  layoutGroupedOrStackedBars,
   resolveBarCornerRadius,
   getCartesianChartShellClasses,
   chartMarkTabIndex,
@@ -39,6 +40,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
+import { BarBind } from './w9-chart-bind'
 
 export interface BarChartProps extends CoreBarChartProps {
   data: BarChartDatum[]
@@ -49,6 +51,11 @@ export interface BarChartProps extends CoreBarChartProps {
   onSelectedIndexChange?: (index: number | null) => void
   onBarClick?: (index: number, datum: BarChartDatum) => void
   onBarHover?: (index: number | null, datum: BarChartDatum | null) => void
+  bind?: {
+    series?: { key: string; data: { x: string | number; y: number }[] }[]
+    mode?: 'grouped' | 'stacked'
+    line?: { y: number }[]
+  }
 }
 
 export const BarChart: React.FC<BarChartProps> = ({
@@ -103,6 +110,7 @@ export const BarChart: React.FC<BarChartProps> = ({
   locale,
   labels: labelsOverride,
   className,
+  bind,
   onHoveredIndexChange,
   onSelectedIndexChange,
   onBarClick,
@@ -137,7 +145,8 @@ export const BarChart: React.FC<BarChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<BarChartDatum>({
     hoverable,
     showTooltip,
@@ -224,14 +233,16 @@ export const BarChart: React.FC<BarChartProps> = ({
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
       buildChartLegendItems({
-        data,
+        data: data.length > 0 ? [data[0]] : [],
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
         getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : (d.label ?? String(d.x))),
-        getColor: (d, i) => d.color ?? palette[i % palette.length]
-      }),
-    [data, legendFormatter, palette, activeIndex, resolvedSelectedIndex]
+        getColor: (d, i) => d.color ?? palette[i % palette.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
+      }).map((item) => ({ ...item, index: 0, hidden: isLegendIndexHidden(0) })),
+    [data, legendFormatter, palette, activeIndex, resolvedSelectedIndex, isLegendIndexHidden]
   )
 
   const tooltipContent = useMemo(
@@ -334,7 +345,7 @@ export const BarChart: React.FC<BarChartProps> = ({
             rx={corner.rx}
             ry={corner.ry}
             fill={gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color}
-            opacity={bar.opacity}
+            opacity={isLegendIndexHidden(0) ? 0 : bar.opacity}
             className={classNames(
               animated && BAR_ANIMATED_CLASS,
               interactive && barInteractiveClasses
@@ -385,7 +396,7 @@ export const BarChart: React.FC<BarChartProps> = ({
               textAnchor="middle"
               dominantBaseline={isInside ? 'central' : bar.negative ? 'hanging' : 'auto'}
               className={isInside ? barValueLabelInsideClasses : barValueLabelClasses}
-              opacity={bar.opacity}
+              opacity={isLegendIndexHidden(0) ? 0 : bar.opacity}
               data-value-label="">
               {labelText}
             </text>
@@ -423,6 +434,12 @@ export const BarChart: React.FC<BarChartProps> = ({
           onItemClick={handleLegendClick}
           onItemHover={handleLegendHover}
           onItemLeave={handleLegendLeave}
+        />
+      ) : null}
+      {bind?.series ? (
+        <BarBind
+          bars={layoutGroupedOrStackedBars(bind.series, bind.mode ?? 'grouped')}
+          line={bind.line}
         />
       ) : null}
       {tooltip}

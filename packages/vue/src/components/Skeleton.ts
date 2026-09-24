@@ -5,6 +5,7 @@ import {
   getSkeletonClasses,
   getSkeletonInlineStyle,
   getParagraphRowWidth,
+  feedbackLayoutLabels,
   isSkeletonNamed,
   resolveSkeletonAriaHidden,
   mergeStyleValues,
@@ -42,6 +43,10 @@ export const Skeleton = defineComponent({
       type: String as PropType<SkeletonShape>,
       default: 'circle' as SkeletonShape
     },
+    loading: {
+      type: Boolean,
+      default: true
+    },
     rows: {
       type: Number,
       default: 1
@@ -59,13 +64,16 @@ export const Skeleton = defineComponent({
       default: undefined
     }
   },
-  setup(props, { attrs }) {
+  setup(props, { attrs, slots }) {
     const visualOptions = computed(() => ({
       width: props.width,
       height: props.height
     }))
 
     return () => {
+      if (!props.loading) {
+        return h('div', { 'data-tiger-skeleton': '', 'aria-busy': 'false' }, slots.default?.())
+      }
       const attrsRecord = attrs as Record<string, unknown>
       const attrsClass = attrsRecord.class
       const attrsStyle = attrsRecord.style
@@ -115,7 +123,10 @@ export const Skeleton = defineComponent({
             ),
             style: mergeStyleValues(inlineStyle, attrsStyle, props.style),
             'data-tiger-skeleton': '',
-            ...a11y
+            'aria-busy': 'true',
+            'aria-label': feedbackLayoutLabels.skeletonBusy,
+            ...a11y,
+            'aria-hidden': undefined
           },
           rows
         )

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Spotlight
 
-`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 4/21 props
+`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 4/22 props
 
 | Prop      | Type                | Default | Notes                                                                                      |
 | --------- | ------------------- | ------- | ------------------------------------------------------------------------------------------ |

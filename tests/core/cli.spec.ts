@@ -898,6 +898,24 @@ describe('CLI E2E Output', () => {
     expect(output).toContain("import { Input } from '@expcat/tigercat-react/Input'")
   })
 
+  it('fails unknown component names and lists known names', async () => {
+    writeFileSafe(
+      join(testDir, 'package.json'),
+      JSON.stringify({ dependencies: { '@expcat/tigercat-react': '^1.0.0' } })
+    )
+    ensureDir(join(testDir, 'src/components'))
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    await expect(runAdd(['NotARealWidget'])).rejects.toThrow(/process\.exit/)
+
+    const output = [...logSpy.mock.calls, ...errorSpy.mock.calls]
+      .map((call) => call.join(' '))
+      .join('\n')
+    expect(output).toContain('NotARealWidget')
+    expect(output).toContain('Button')
+    errorSpy.mockRestore()
+  })
+
   it('generates component markdown and index output from generate docs', async () => {
     writeFileSafe(
       join(testDir, 'types/button.ts'),

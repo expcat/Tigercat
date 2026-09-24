@@ -18,6 +18,7 @@ import {
   barInteractiveClasses,
   BAR_ANIMATED_CLASS,
   layoutBarRects,
+  layoutGroupedOrStackedBars,
   resolveBarCornerRadius,
   getCartesianChartShellClasses,
   chartMarkTabIndex,
@@ -43,6 +44,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { renderBarBind } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
@@ -239,6 +241,14 @@ export const BarChart = defineComponent({
     className: {
       type: String
     },
+    bind: {
+      type: Object as PropType<{
+        series?: { key: string; data: { x: string | number; y: number }[] }[]
+        mode?: 'grouped' | 'stacked'
+        line?: { y: number }[]
+      }>,
+      default: undefined
+    },
     onBarClick: {
       type: Function as PropType<(index: number, datum: BarChartDatum) => void>
     }
@@ -266,7 +276,8 @@ export const BarChart = defineComponent({
       handleKeyDown,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave
+      handleLegendLeave,
+      isLegendIndexHidden
     } = useChartInteraction<BarChartDatum>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -339,14 +350,16 @@ export const BarChart = defineComponent({
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
-        data: props.data,
+        data: props.data.length > 0 ? [props.data[0]] : [],
         palette: palette.value,
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
         getLabel: (d, i) =>
           props.legendFormatter ? props.legendFormatter(d, i) : (d.label ?? String(d.x)),
-        getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
-      })
+        getColor: (d, i) => d.color ?? palette.value[i % palette.value.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
+      }).map((item) => ({ ...item, index: 0, hidden: isLegendIndexHidden(0) }))
     )
 
     const tooltipContent = computed(() =>
@@ -501,7 +514,7 @@ export const BarChart = defineComponent({
                         rx: corner.value.rx,
                         ry: corner.value.ry,
                         fill: props.gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color,
-                        opacity: bar.opacity,
+                        opacity: isLegendIndexHidden(0) ? 0 : bar.opacity,
                         class: classNames(
                           props.animated && BAR_ANIMATED_CLASS,
                           interactive.value && barInteractiveClasses
@@ -563,6 +576,12 @@ export const BarChart = defineComponent({
                 onItemHover: handleLegendHover,
                 onItemLeave: handleLegendLeave
               })
+            : null,
+          props.bind?.series
+            ? renderBarBind(
+                layoutGroupedOrStackedBars(props.bind.series, props.bind.mode ?? 'grouped'),
+                props.bind.line
+              )
             : null,
           tooltip
         ]

@@ -1,7 +1,11 @@
 import React, { useEffect, useLayoutEffect, useMemo, useCallback, useRef, useId, useState } from 'react'
 import {
+  acquireOverlayZ,
   classNames,
   createDismissActionEvent,
+  destroyAllConfirmModals,
+  enqueueConfirmModal,
+  getActiveFeedbackScope,
   getModalContentClasses,
   getGestureTouchPoint,
   isModalSheetSwipeCloseGesture,
@@ -20,6 +24,10 @@ import {
   isOverlayVisuallyHidden,
   whenOverlayTransitionEnds,
   canStartOverlaySwipeClose,
+  clampSheetDragDistance,
+  prefersReducedMotion,
+  resolveSheetReducedMotion,
+  resolveSheetRelease,
   isOverlayDragHandleEvent,
   clampOverlayDragOffset,
   OVERLAY_SWIPE_HANDLE_ATTR,
@@ -30,6 +38,8 @@ import {
   createDocumentDragSession,
   type DocumentDragSession,
   type GesturePoint,
+  type ConfirmModalInput,
+  type ConfirmModalKind,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
 import {
@@ -94,6 +104,12 @@ export interface ModalProps
    * Callback when OK button is clicked
    */
   onOk?: (event: { preventDefault(): void }) => void | Promise<void>
+
+  /**
+   * Show the cancel button in the default footer.
+   * @default true
+   */
+  showCancel?: boolean
 }
 
 export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal(
@@ -110,7 +126,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
     centered = false,
     mobileSheet = false,
     destroyOnClose = false,
-    zIndex = OVERLAY_Z_INDEX.modal,
+    zIndex,
     className,
     children,
     footer,
@@ -121,6 +137,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
     onOk,
     closeAriaLabel,
     showDefaultFooter = false,
+    showCancel = true,
     okText,
     cancelText,
     initialFocus,
@@ -140,6 +157,18 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
   const [hasOpened, setHasOpened] = React.useState(open)
   const [leaving, setLeaving] = React.useState(false)
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
+  const [stackedZ, setStackedZ] = useState<number | undefined>(undefined)
+  useEffect(() => {
+    if (!open || zIndex !== undefined) {
+      setStackedZ(undefined)
+      return
+    }
+    const layer = acquireOverlayZ()
+    setStackedZ(layer.zIndex)
+    return () => {
+      layer.release()
+    }
+  }, [open, zIndex])
   const [dragging, setDragging] = React.useState(false)
   const wasOpenRef = useRef(open)
   const afterCloseRef = useRef(onAfterClose)
@@ -314,6 +343,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
   const swipeAllowedRef = useRef(false)
+  const [sheetOffset, setSheetOffset] = useState(0)
 
   useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
   useBodyScrollLock({ enabled: open })
@@ -335,6 +365,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
     touchStartRef.current = null
     touchCurrentRef.current = null
     swipeAllowedRef.current = false
+    setSheetOffset(0)
   }, [])
 
   const handleTouchStart = useCallback(
@@ -360,7 +391,10 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
       if (!touchStartRef.current) return
 
       const point = getGestureTouchPoint(event.touches)
-      if (point) {
+      if (point && touchStartRef.current && swipeAllowedRef.current) {
+        touchCurrentRef.current = point
+        setSheetOffset(clampSheetDragDistance(point.y - touchStartRef.current.y))
+      } else if (point) {
         touchCurrentRef.current = point
       }
     },
@@ -377,13 +411,15 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
       )
 
       const allowed = swipeAllowedRef.current
+      const distance = sheetOffset || gesture?.distance || 0
+      const size = dialogRef.current?.offsetHeight ?? 0
       resetTouchGesture()
-
-      if (allowed && mobileSheet && isModalSheetSwipeCloseGesture(gesture)) {
-        handleClose()
-      }
+      if (!allowed || !mobileSheet) return
+      const release = resolveSheetRelease(distance, size)
+      const motion = resolveSheetReducedMotion(release, prefersReducedMotion())
+      if (motion === 'close') handleClose()
     },
-    [dialogDivProps, handleClose, mobileSheet, resetTouchGesture]
+    [dialogDivProps, handleClose, mobileSheet, resetTouchGesture, sheetOffset]
   )
 
   const handleTouchCancel = useCallback(
@@ -423,7 +459,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
     <div
       ref={rootRef}
       className={modalWrapperClasses}
-      style={{ zIndex }}
+      style={{ zIndex: zIndex ?? stackedZ ?? OVERLAY_Z_INDEX.modal }}
       hidden={isOverlayVisuallyHidden(open, leaving)}
       aria-hidden={!open ? 'true' : undefined}
       data-tiger-overlay-layer=""
@@ -448,7 +484,9 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
               : undefined),
             ...(isDraggable && (dragOffset.x !== 0 || dragOffset.y !== 0)
               ? { transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)` }
-              : undefined),
+              : sheetOffset > 0
+                ? { transform: `translate3d(0, ${sheetOffset}px, 0)`, transitionDuration: '0ms' }
+                : undefined),
             ...(dragging ? modalDragStyle : null)
           }}
           {...dialogDivProps}
@@ -516,9 +554,11 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
             </div>
           ) : showDefaultFooter ? (
             <div className={modalFooterClasses} data-tiger-modal-footer="">
-              <Button variant="secondary" onClick={handleClose}>
-                {resolvedCancelText}
-              </Button>
+              {showCancel ? (
+                <Button variant="secondary" onClick={handleClose}>
+                  {resolvedCancelText}
+                </Button>
+              ) : null}
               <Button onClick={handleOk} loading={confirming} disabled={confirming}>
                 {resolvedOkText}
               </Button>
@@ -537,3 +577,31 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
     </>
   )
 })
+
+function openModal(kind: ConfirmModalKind, input: ConfirmModalInput = {}) {
+  return enqueueConfirmModal(getActiveFeedbackScope(), { ...input, kind })
+}
+
+export function confirmModal(input: ConfirmModalInput = {}) {
+  return openModal('confirm', input)
+}
+
+export function infoModal(input: ConfirmModalInput = {}) {
+  return openModal('info', input)
+}
+
+export function successModal(input: ConfirmModalInput = {}) {
+  return openModal('success', input)
+}
+
+export function warningModal(input: ConfirmModalInput = {}) {
+  return openModal('warning', input)
+}
+
+export function errorModal(input: ConfirmModalInput = {}) {
+  return openModal('error', input)
+}
+
+export function destroyAllModals(): void {
+  destroyAllConfirmModals(getActiveFeedbackScope())
+}

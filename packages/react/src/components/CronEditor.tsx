@@ -23,6 +23,8 @@ import {
   cronFieldMetas,
   cronFieldModes,
   formatCronControlLabel,
+  describeCronExpression,
+  nextCronRun,
   getCronEditorControlClasses,
   getCronEditorLabels,
   getCronExpressionIssue,
@@ -444,6 +446,11 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
           )
         })}
       </div>
+      {validation.valid && expressionDraft ? (
+        <p className="text-sm text-[var(--tiger-text-secondary)]" data-tiger-cron-summary="">
+          {describeCronExpression(expressionDraft)} {nextCronRun(expressionDraft)?.toISOString() ?? ''}
+        </p>
+      ) : null}
     </div>
   )
 })

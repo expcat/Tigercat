@@ -469,3 +469,24 @@ export function getTourMaskHoleStyle(
     clipPath: `polygon(evenodd, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, ${left}px ${top}px, ${right}px ${top}px, ${right}px ${bottom}px, ${left}px ${bottom}px, ${left}px ${top}px)`
   }
 }
+
+export function tourStepAdvancesOnTarget(step: TourStep | undefined): boolean {
+  return step?.type === 'advanceOnTarget'
+}
+
+/** Target stays outside inert when the step is interactive or advances on click. */
+export function tourTargetExempt(step: TourStep | undefined): boolean {
+  return Boolean(step && (step.interact || tourStepAdvancesOnTarget(step)))
+}
+
+export function tourArrowKey(
+  key: string,
+  target: EventTarget | null
+): 'prev' | 'next' | null {
+  if (key !== 'ArrowLeft' && key !== 'ArrowRight') return null
+  if (target instanceof Element) {
+    const field = target.closest('input, textarea, select, [contenteditable="true"]')
+    if (field) return null
+  }
+  return key === 'ArrowLeft' ? 'prev' : 'next'
+}

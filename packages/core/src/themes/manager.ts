@@ -9,7 +9,13 @@
  */
 
 import type { ThemeConfig, ThemePreset, ColorScheme } from '../types/theme'
-import { semanticColorsToCssVars, isAllowedThemeValue, setCssVarsCached } from '../theme-runtime'
+import {
+  THEME_CSS_VARS,
+  semanticColorsToCssVars,
+  isAllowedThemeValue,
+  setCssVarsCached,
+  removeCssVarsCached
+} from '../theme-runtime'
 import { isBrowser } from '../utils/env'
 import { devWarn } from '../utils/dev-warn'
 import { defaultTheme } from './default/theme'
@@ -125,13 +131,22 @@ export function themeConfigToCssVars(config: ThemeConfig): Record<string, string
   if (motion) {
     const easing = motion.easing ?? 'cubic-bezier(0.4, 0, 0.2, 1)'
     if (motion.durationBase && isAllowedThemeValue(easing)) {
-      vars[THEME_TRANSITION_CSS_VARS.durationBase] = themeTransitionValue(motion.durationBase, easing)
+      vars[THEME_TRANSITION_CSS_VARS.durationBase] = themeTransitionValue(
+        motion.durationBase,
+        easing
+      )
     }
     if (motion.durationFast && isAllowedThemeValue(easing)) {
-      vars[THEME_TRANSITION_CSS_VARS.durationFast] = themeTransitionValue(motion.durationFast, easing)
+      vars[THEME_TRANSITION_CSS_VARS.durationFast] = themeTransitionValue(
+        motion.durationFast,
+        easing
+      )
     }
     if (motion.durationSlow && isAllowedThemeValue(easing)) {
-      vars[THEME_TRANSITION_CSS_VARS.durationSlow] = themeTransitionValue(motion.durationSlow, easing)
+      vars[THEME_TRANSITION_CSS_VARS.durationSlow] = themeTransitionValue(
+        motion.durationSlow,
+        easing
+      )
     }
   }
 
@@ -145,10 +160,49 @@ export interface ThemeChangeEvent {
 
 export type ThemeChangeListener = (event: ThemeChangeEvent) => void
 
+export const THEME_ROOT_ATTRIBUTE = 'data-tiger-theme-scope'
+
+/**
+ * Nearest ancestor (including the node itself) marked as a theme root.
+ * Portals use this instead of always attaching to `documentElement`.
+ */
+export function nearestThemeRoot(node: Node | null): HTMLElement | null {
+  if (!node) return null
+  const element = node instanceof Element ? node : node.parentElement
+  if (!element) return null
+  return element.closest<HTMLElement>(`[${THEME_ROOT_ATTRIBUTE}]`)
+}
+
+/** CSS variables for keys the config actually sets. Parent breakpoints stay inherited. */
+export function themeConfigOwnCssVars(config: ThemeConfig): Record<string, string> {
+  const vars: Record<string, string> = {}
+  if (config.colors) {
+    for (const [key, value] of Object.entries(config.colors)) {
+      const varName = THEME_CSS_VARS[key as keyof typeof THEME_CSS_VARS]
+      if (varName && value && isAllowedThemeValue(value)) vars[varName] = value
+    }
+  }
+  for (const section of ['typography', 'radius', 'shadows', 'spacing', 'motion'] as const) {
+    const values = config[section]
+    if (!values) continue
+    const varNames = THEME_CONFIG_CSS_VARS[section]
+    for (const [key, value] of Object.entries(values)) {
+      const varName = varNames[key as keyof typeof varNames]
+      if (varName && value && isAllowedThemeValue(value)) vars[varName] = value
+    }
+  }
+  return vars
+}
+
 export interface TigerThemeScopeOptions {
   root?: HTMLElement | null
   theme?: string
   colorScheme?: ColorScheme
+  /**
+   * Child root. Only variables this preset sets are written, so parent
+   * custom properties keep inheriting.
+   */
+  nested?: boolean
 }
 
 export interface TigerThemeScope {
@@ -187,11 +241,14 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
   const presets = new Map<string, ThemePreset>()
   for (const preset of builtInPresets) presets.set(preset.name, preset)
 
+  const nested = options.nested === true
   let currentThemeName = options.theme ?? 'default'
   let colorScheme: ColorScheme = options.colorScheme ?? 'auto'
-  let root = options.root === undefined ? (isBrowser() ? document.documentElement : null) : options.root
+  let root =
+    options.root === undefined ? (isBrowser() ? document.documentElement : null) : options.root
   const scopeId = `tiger-theme-${++nextScopeId}`
   let styleEl: HTMLStyleElement | null = null
+  let inlineNames: string[] = []
   const listeners: ThemeChangeListener[] = []
 
   function resolved(): 'light' | 'dark' {
@@ -219,8 +276,12 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
       return
     }
     const preset = presets.get(currentThemeName)
-    const lightVars = themeConfigToCssVars(resolvePresetThemeConfig(preset, 'light'))
-    const darkVars = themeConfigToCssVars(resolvePresetThemeConfig(preset, 'dark'))
+    const lightSource = nested ? (preset?.light ?? {}) : resolvePresetThemeConfig(preset, 'light')
+    const darkSource = nested ? (preset?.dark ?? {}) : resolvePresetThemeConfig(preset, 'dark')
+    const lightVars = nested
+      ? themeConfigOwnCssVars(lightSource)
+      : themeConfigToCssVars(lightSource)
+    const darkVars = nested ? themeConfigOwnCssVars(darkSource) : themeConfigToCssVars(darkSource)
     const light = decls(lightVars)
     const dark = decls(darkVars)
     const selector = `[data-tiger-theme-scope="${scopeId}"]`
@@ -242,7 +303,13 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
       }
       const style = ensureStyle()
       if (style) style.textContent = css
-      setCssVarsCached(root, resolved() === 'dark' ? darkVars : lightVars)
+      const nextVars = resolved() === 'dark' ? darkVars : lightVars
+      if (nested) {
+        const stale = inlineNames.filter((name) => !(name in nextVars))
+        if (stale.length > 0) removeCssVarsCached(root, stale)
+        inlineNames = Object.keys(nextVars)
+      }
+      setCssVarsCached(root, nextVars)
     }
 
     const event: ThemeChangeEvent = { theme: currentThemeName, colorScheme: resolved() }
@@ -296,6 +363,8 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
     dispose() {
       styleEl?.remove()
       styleEl = null
+      if (root && inlineNames.length > 0) removeCssVarsCached(root, inlineNames)
+      inlineNames = []
       if (root?.getAttribute('data-tiger-theme-scope') === scopeId) {
         root.removeAttribute('data-tiger-theme-scope')
       }

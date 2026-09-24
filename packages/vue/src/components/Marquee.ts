@@ -31,6 +31,7 @@ export interface VueMarqueeProps {
   paused?: boolean
   gap?: MarqueeGap
   repeat?: number
+  edgeFade?: boolean
   ariaLabel?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleMarquee>
@@ -102,6 +103,10 @@ export const Marquee = defineComponent({
     repeat: {
       type: Number,
       default: undefined
+    },
+    edgeFade: {
+      type: Boolean,
+      default: false
     },
     /**
      * Accessible name for the region. Omitted or blank: not a landmark.
@@ -205,6 +210,7 @@ export const Marquee = defineComponent({
               pauseOnFocus,
               paused: props.paused,
               repeat: copies,
+              edgeFade: props.edgeFade,
               className: props.className
             }),
             coerceClassValue(attrsRecord.class)

@@ -1,0 +1,7 @@
+{
+  "id": "progress-04",
+  "title": "成功和不确定",
+  "description": "status=success 才把显示收到 100。indeterminate 不改传入的百分比。",
+  "entry": "App.tsx",
+  "order": 4
+}

@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
+import { nextTick } from 'vue'
 import { SunburstChart } from '@expcat/tigercat-vue/SunburstChart'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
@@ -58,7 +59,7 @@ describe('SunburstChart (Vue)', () => {
     expect(onArcClick).toHaveBeenCalledWith(1, sampleData[1])
   })
 
-  it('legend click highlights the matching root arc', () => {
+  it('legend click hides the matching root arc without selecting it', async () => {
     const onArcClick = vi.fn()
     const { container } = renderWithProps(SunburstChart, {
       data: pagesData,
@@ -67,10 +68,11 @@ describe('SunburstChart (Vue)', () => {
       ...defaultSize
     })
     const legendButtons = container.querySelectorAll('[data-legend-item]')
-    legendButtons[legendButtons.length - 1].dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    )
-    expect(onArcClick.mock.calls[0][1].label).toBe('美洲')
+    const last = legendButtons[legendButtons.length - 1]
+    last.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await nextTick()
+    expect(onArcClick).not.toHaveBeenCalled()
+    expect(container.querySelector('[data-legend-hidden="true"]')).toBeTruthy()
   })
 
   it('applies className on the outer wrapper', () => {

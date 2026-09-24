@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
+  formatChartTimeTick,
+  heatBandLabel,
+  heatColorBand,
   layoutHeatmap,
   getHeatmapCellIndexAtPoint,
   getHeatmapDevicePixelRatio,
@@ -34,6 +37,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
+import { HeatBind } from './w9-chart-bind'
 
 export interface HeatmapChartProps extends CoreHeatmapChartProps {
   padding?: ChartPadding
@@ -41,6 +45,14 @@ export interface HeatmapChartProps extends CoreHeatmapChartProps {
   onSelectedIndexChange?: (index: number | null) => void
   onCellClick?: (index: number, datum: HeatmapChartDatum | null) => void
   onCellHover?: (index: number | null, datum: HeatmapChartDatum | null) => void
+  bind?: {
+    minColor?: string
+    maxColor?: string
+    value?: number
+    min?: number
+    max?: number
+    calendar?: (number | Date)[]
+  }
 }
 
 export const HeatmapChart: React.FC<HeatmapChartProps> = ({
@@ -78,7 +90,8 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   onHoveredIndexChange,
   onSelectedIndexChange,
   onCellClick,
-  onCellHover
+  onCellHover,
+  bind
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -415,6 +428,24 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
         </p>
       ) : null}
       {tooltip}
+      {bind ? (
+        <div data-tiger-calendar-axis={bind.calendar ? '' : undefined}>
+          <HeatBind
+            stops={heatColorBand(bind.minColor ?? '#e0f2fe', bind.maxColor ?? '#0369a1').map(
+              (stop) => ({
+                offset: String(stop.offset),
+                color: stop.color
+              })
+            )}
+            label={heatBandLabel(bind.value ?? null, bind.min ?? 0, bind.max ?? 1)}
+          />
+          {(bind.calendar ?? []).map((tick, index) => (
+            <time key={index} dateTime={formatChartTimeTick(tick)} data-calendar-tick="">
+              {formatChartTimeTick(tick)}
+            </time>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }

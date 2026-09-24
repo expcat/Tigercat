@@ -1,40 +1,12 @@
-import { Breadcrumb } from '@expcat/tigercat-react/Breadcrumb'
-import { BreadcrumbItem } from '@expcat/tigercat-react/BreadcrumbItem'
-
-function stay(event: { preventDefault: () => void }) {
-  event.preventDefault()
-}
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react/Breadcrumb'
 
 export default function App() {
   return (
-    <div className="space-y-3">
-      <Breadcrumb separator="slash">
-        <BreadcrumbItem href="/" onClick={stay}>
-          首页
-        </BreadcrumbItem>
-        <BreadcrumbItem href="/settings" onClick={stay}>
-          设置
-        </BreadcrumbItem>
-        <BreadcrumbItem>账户</BreadcrumbItem>
-      </Breadcrumb>
-      <Breadcrumb separator="arrow">
-        <BreadcrumbItem href="/" onClick={stay}>
-          首页
-        </BreadcrumbItem>
-        <BreadcrumbItem href="/settings" onClick={stay}>
-          设置
-        </BreadcrumbItem>
-        <BreadcrumbItem>账户</BreadcrumbItem>
-      </Breadcrumb>
-      <Breadcrumb separator="›">
-        <BreadcrumbItem href="/" icon="🏠" onClick={stay}>
-          首页
-        </BreadcrumbItem>
-        <BreadcrumbItem icon="📁" onClick={() => undefined}>
-          文件
-        </BreadcrumbItem>
-        <BreadcrumbItem icon="📄">文档</BreadcrumbItem>
-      </Breadcrumb>
-    </div>
+    <Breadcrumb maxItems={3}>
+      <BreadcrumbItem href="/">首页</BreadcrumbItem>
+      <BreadcrumbItem href="/docs">文档</BreadcrumbItem>
+      <BreadcrumbItem href="/api">接口</BreadcrumbItem>
+      <BreadcrumbItem current>当前</BreadcrumbItem>
+    </Breadcrumb>
   )
 }

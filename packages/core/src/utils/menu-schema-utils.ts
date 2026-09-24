@@ -137,6 +137,7 @@ function schemaNodeToMenuItem(node: MenuSchemaNode): MenuItem {
   if (node.children && node.children.length > 0) {
     item.children = menuSchemaToMenuItems(node.children)
   }
+  if (node.badge != null) item.badge = node.badge
   return item
 }
 
@@ -146,7 +147,8 @@ function schemaNodeToMenuItem(node: MenuSchemaNode): MenuItem {
  * href only when `href` is omitted. An explicit `href` is gated on its own
  * and does not fall back to `path` when it is rejected.
  * Schema-only fields (`permission`, `hideInMenu`, `hideInBreadcrumb`, `flatMenu`,
- * `badge`, `iframeSrc`) are not copied onto {@link MenuItem}.
+ * `iframeSrc`) are not copied onto {@link MenuItem}. `badge` is copied so the
+ * menu can render it. Permission filtering and route records stay pure.
  */
 export function menuSchemaToMenuItems(nodes: readonly MenuSchemaNode[]): MenuItem[] {
   return nodes.map(schemaNodeToMenuItem)

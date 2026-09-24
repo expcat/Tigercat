@@ -1,5 +1,7 @@
 import { defineComponent, computed, h, PropType, useId, watch } from 'vue'
 import { usePopup } from '../utils/use-popup'
+import { TooltipDelayProvider, useTooltipDelayGroup } from '../utils/tooltip-delay'
+export { TooltipDelayProvider }
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
@@ -10,6 +12,8 @@ import {
   getOverlayTriggerAria,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
+  getFloatingArrowStyle,
+  getPopconfirmArrowClasses,
   getTooltipContentClasses,
   type TooltipTrigger,
   type FloatingPlacement,
@@ -51,6 +55,7 @@ export const Tooltip = defineComponent({
   emits: ['update:open', 'open-change'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
+    const delayGroup = useTooltipDelayGroup()
 
     const {
       currentVisible,
@@ -59,10 +64,16 @@ export const Tooltip = defineComponent({
       floatingRef,
       floatingStyles,
       floatingClasses,
+      actualPlacement,
       positioned,
       overlayTarget,
       triggerHandlers
-    } = usePopup({ props, emit })
+    } = usePopup({
+      props,
+      emit,
+      getSkipShowDelay: () => delayGroup?.shouldSkip() ?? false,
+      onShown: () => delayGroup?.noteOpen()
+    })
 
     watch(currentVisible, (visible) => {
       if (!visible) return
@@ -138,7 +149,12 @@ export const Tooltip = defineComponent({
                       'div',
                       { id: tooltipId, role: 'tooltip', class: contentClasses.value },
                       props.content
-                    )
+                    ),
+                    h('span', {
+                      'data-tiger-floating-arrow': '',
+                      class: getPopconfirmArrowClasses(),
+                      style: getFloatingArrowStyle(actualPlacement.value)
+                    })
                   ]
                 ),
                 overlayTarget.value

@@ -56,6 +56,13 @@ export interface AddTagsOptions {
   max?: number
 }
 
+export type TagRejectReason = 'duplicate' | 'max'
+
+export interface TagRejection {
+  tag: string
+  reason: TagRejectReason
+}
+
 export interface AddTagsResult {
   /** The resulting tag list */
   tags: string[]
@@ -63,6 +70,8 @@ export interface AddTagsResult {
   added: string[]
   /** Candidates rejected by deduplication or the max limit */
   rejected: string[]
+  /** Why each rejected candidate was refused. */
+  rejections: TagRejection[]
 }
 
 /**
@@ -78,21 +87,41 @@ export function addTags(
   const tags = [...current]
   const added: string[] = []
   const rejected: string[] = []
+  const rejections: TagRejection[] = []
   for (const candidate of candidates) {
     const tag = candidate.trim()
     if (!tag) continue
     if (max !== undefined && tags.length >= max) {
       rejected.push(tag)
+      rejections.push({ tag, reason: 'max' })
       continue
     }
     if (!allowDuplicates && tags.includes(tag)) {
       rejected.push(tag)
+      rejections.push({ tag, reason: 'duplicate' })
       continue
     }
     tags.push(tag)
     added.push(tag)
   }
-  return { tags, added, rejected }
+  return { tags, added, rejected, rejections }
+}
+
+export function moveTag(tags: readonly string[], from: number, to: number): string[] {
+  if (from === to || from < 0 || to < 0 || from >= tags.length || to >= tags.length) {
+    return tags.slice()
+  }
+  const next = tags.slice()
+  const [item] = next.splice(from, 1)
+  next.splice(to, 0, item)
+  return next
+}
+
+export function formatTagRejectAnnouncement(
+  template: string,
+  rejection: TagRejection
+): string {
+  return template.replace('{tag}', rejection.tag).replace('{reason}', rejection.reason)
 }
 
 export function removeTagAt(tags: string[], index: number): string[] {
@@ -138,12 +167,14 @@ export function commitTagCandidates(
       tags: current,
       added: [],
       rejected: [],
+      rejections: [],
       pending: options.pendingFallback ?? candidates.map((item) => item.trim()).find(Boolean) ?? ''
     }
   }
   const result = addTags(current, prepared, options)
   return {
     ...result,
+    rejections: result.rejections,
     pending: result.added.length > 0 ? '' : (options.pendingFallback ?? prepared.at(-1) ?? '')
   }
 }

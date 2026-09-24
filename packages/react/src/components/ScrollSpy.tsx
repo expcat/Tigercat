@@ -3,6 +3,8 @@ import {
   classNames,
   createProgrammaticScrollLock,
   createScrollSpyObserver,
+  createSectionScrollModel,
+  sectionScrollBehavior,
   createScrollSpyPayload,
   flattenScrollSpyItems,
   getInitialScrollSpyActiveKey,
@@ -189,13 +191,25 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
     )
   }
 
+  const activeItem = items.find((item) => item.key === currentActiveKey)
+  const sectionModel = useMemo(
+    () =>
+      createSectionScrollModel({
+        activeHref: typeof activeItem?.href === 'string' ? activeItem.href : '',
+        container: getContainer
+      }),
+    [activeItem?.href, getContainer]
+  )
+
   return (
     <nav
       {...rest}
       ref={setHostRef}
       className={classNames(getScrollSpyRootClasses(sticky, className))}
       style={getScrollSpyRootStyle(sticky, offset, style as Record<string, string | number>)}
-      aria-label={ariaLabel ?? labels.ariaLabel}>
+      aria-label={ariaLabel ?? labels.ariaLabel}
+      data-tiger-section-behavior={sectionScrollBehavior(sectionModel.reducedMotion)}
+      data-tiger-section-active={sectionModel.activeHref}>
       {renderItems(items)}
     </nav>
   )

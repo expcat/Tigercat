@@ -74,6 +74,24 @@ export interface TourStep {
    * @default false
    */
   interact?: boolean
+
+  /**
+   * `advanceOnTarget` excludes the target from inert and moves next only when
+   * that target is clicked.
+   */
+  type?: 'default' | 'advanceOnTarget'
+
+  /** Cover image URL. Alt stays caller-provided. */
+  cover?: string
+
+  /** Empty string marks the cover as decorative. */
+  coverAlt?: string
+
+  /**
+   * Draw an arrow toward the target.
+   * @default true
+   */
+  arrow?: boolean
 }
 
 /** Slot / render-prop context for the current visible step. */

@@ -1,0 +1,12 @@
+{
+  "id": "waterfall-chart-01",
+  "title": "Waterfall",
+  "description": "Increase, decrease, and total bars share the bar layout.",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

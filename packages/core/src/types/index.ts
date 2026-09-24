@@ -78,6 +78,7 @@ export * from './breadcrumb'
 export * from './steps'
 export * from './pagination'
 export * from './dropdown'
+export * from './popup-menu'
 export * from './context-menu'
 export * from './navigation-menu'
 export * from './page-header'
@@ -109,6 +110,8 @@ export * from './task-board'
 
 // Image components
 export * from './image'
+export * from './inplace'
+export * from './copy-button'
 export * from './image-compare'
 
 // Other components
@@ -201,5 +204,7 @@ export * from './input-group'
 
 // PrintLayout types (v0.9.0+)
 export * from './print-layout'
+export * from './notification-bell'
+export * from './assignee-picker'
 
 

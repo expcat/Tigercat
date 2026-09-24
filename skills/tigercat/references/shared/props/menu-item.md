@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## MenuItem
 
-`packages/core/src/types/menu.ts` · `MenuItemProps` · 4/8 props
+`packages/core/src/types/menu.ts` · `MenuItemProps` · 4/10 props
 
 | Prop         | Type      | Default | Notes                                                                        |
 | ------------ | --------- | ------- | ---------------------------------------------------------------------------- |

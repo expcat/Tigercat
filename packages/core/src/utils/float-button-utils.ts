@@ -6,6 +6,7 @@
 import type { FloatButtonShape, FloatButtonSize } from '../types/float-button'
 import type { ViewportPlacement } from '../types/viewport'
 import { classNames } from './class-names'
+import { resolveLinkHref } from './link-utils'
 import { overlayZIndexClass } from './floating'
 import {
   VIEWPORT_FLOATING_FAB_OFFSET,
@@ -117,6 +118,10 @@ export function getFloatButtonClasses(options: {
     floating && viewportPlacementClasses[placement],
     options.className
   )
+}
+
+export function resolveFloatButtonHref(href: string | undefined, disabled?: boolean): string | undefined {
+  return resolveLinkHref(href, { disabled })
 }
 
 export function resolveFloatButtonAriaLabel(options: {

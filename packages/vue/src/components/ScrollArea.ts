@@ -33,6 +33,8 @@ import {
   getScrollAreaThumbClasses,
   getScrollAreaThumbStyle,
   getScrollAreaViewportClasses,
+  prefersReducedMotion,
+  scrollAreaMotionBehavior,
   mergeTigerLocale,
   observeScrollAreaSize,
   physicalInlineScrollFromLogical,
@@ -69,6 +71,10 @@ export const ScrollArea = defineComponent({
     axis: {
       type: String as PropType<ScrollAreaDirection>,
       default: 'vertical' as ScrollAreaDirection
+    },
+    nativeBars: {
+      type: Boolean,
+      default: false
     },
     scrollbar: {
       type: String as PropType<ScrollAreaScrollbarVisibility>,
@@ -246,8 +252,21 @@ export const ScrollArea = defineComponent({
       }
     )
 
+    const scrollToMarker = (id: string) => {
+      const viewport = viewportRef.value
+      if (!viewport) return
+      const marker = viewport.querySelector(`[id="${CSS.escape(id)}"]`)
+      if (!(marker instanceof HTMLElement)) return
+      const top = marker.offsetTop - viewport.offsetTop
+      viewport.scrollTo({
+        top,
+        behavior: scrollAreaMotionBehavior(prefersReducedMotion())
+      })
+    }
+
     expose({
       scrollTo,
+      scrollToMarker,
       scrollToTop: (behavior?: ScrollAreaScrollToOptions['behavior']) =>
         scrollTo({ top: 0, behavior }),
       scrollToBottom: (behavior?: ScrollAreaScrollToOptions['behavior']) =>
@@ -258,7 +277,10 @@ export const ScrollArea = defineComponent({
 
     function renderScrollbar(axis: ScrollAreaAxis) {
       const axisState = axis === 'y' ? scrollState.value.y : scrollState.value.x
-      if (!shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, axis, axisState)) {
+      if (
+        props.nativeBars ||
+        !shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, axis, axisState)
+      ) {
         return null
       }
       const otherVisible =
@@ -356,6 +378,13 @@ export const ScrollArea = defineComponent({
           class: classNames(scrollAreaRootClasses, props.className, coerceClassValue(attrClass)),
           style: attrStyle,
           'data-scroll-area': '',
+          'data-native-bars': props.nativeBars ? '' : undefined,
+          ref: (el: unknown) => {
+            if (el instanceof HTMLElement) {
+              ;(el as HTMLElement & { scrollToMarker?: (id: string) => void }).scrollToMarker =
+                scrollToMarker
+            }
+          },
           'data-scrolling': scrolling.value ? '' : undefined
         },
         [
@@ -363,7 +392,10 @@ export const ScrollArea = defineComponent({
             'div',
             {
               ref: viewportRef,
-              class: getScrollAreaViewportClasses(props.axis, props.viewportClassName),
+              class: classNames(
+                getScrollAreaViewportClasses(props.axis, props.viewportClassName),
+                props.nativeBars ? 'overflow-auto' : undefined
+              ),
               style: {
                 ...getScrollAreaBoxStyle(props),
                 ...getScrollAreaGutterStyle(props.scrollbarSize, visibleX, visibleY)

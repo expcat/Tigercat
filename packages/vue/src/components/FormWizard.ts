@@ -27,6 +27,9 @@ import {
   mergeTigerLocale,
   resolveLocaleText,
   runWizardAdvanceGate,
+  getW9DataLabels,
+  stableModelSnapshot,
+  wizardStepIsDirty,
   type WizardStep,
   type StepsDirection,
   type StepSize,
@@ -35,6 +38,7 @@ import {
   type TigerLocale,
   type TigerLocaleFormWizard
 } from '@expcat/tigercat-core'
+import { confirmModal } from './Modal'
 import { Steps } from './Steps'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -115,6 +119,7 @@ export const FormWizard = defineComponent({
       type: Boolean,
       default: true
     },
+    model: { type: Object as PropType<unknown>, default: undefined },
     autoSave: {
       type: Function as PropType<(current: number, step: WizardStep) => void | Promise<void>>,
       default: undefined
@@ -128,7 +133,7 @@ export const FormWizard = defineComponent({
       default: undefined
     }
   },
-  emits: ['step-change', 'update:current', 'finish'],
+  emits: ['step-change', 'update:current', 'finish', 'close'],
   setup(props, { slots, attrs, emit, expose }) {
     const config = useTigerConfig()
     const formContext = useFormContext()
@@ -166,16 +171,38 @@ export const FormWizard = defineComponent({
     const wrapperStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     let selfStep = false
+    const snapshot = ref(stableModelSnapshot(props.model))
+    const confirmLeave = async (): Promise<boolean> => {
+      if (!wizardStepIsDirty(snapshot.value, props.model)) return true
+      const copy = getW9DataLabels()
+      try {
+        await confirmModal({
+          title: copy.leaveStepTitle,
+          content: copy.leaveStepMessage,
+          okText: copy.leave,
+          cancelText: copy.stay
+        })
+        return true
+      } catch {
+        return false
+      }
+    }
     const setCurrent = async (next: number) => {
       const clamped = clampStepIndex(next, totalCount.value)
       const prev = currentIndex.value
+      if (clamped === prev) return
+      if (props.autoSave && props.steps[clamped]) {
+        try {
+          await props.autoSave(clamped, props.steps[clamped])
+        } catch {
+          return
+        }
+      }
       selfStep = true
       if (props.current === undefined) innerCurrent.value = clamped
       emit('update:current', clamped)
       emit('step-change', clamped, prev, { skippedValidation: false })
-      if (props.autoSave && props.steps[clamped]) {
-        await props.autoSave(clamped, props.steps[clamped])
-      }
+      snapshot.value = stableModelSnapshot(props.model)
     }
 
     watch(
@@ -220,13 +247,18 @@ export const FormWizard = defineComponent({
         const submitted = await form.submit()
         if (!submitted) return
       }
-      emit('finish', index, props.steps, form?.getValues())
       if (props.autoSave && props.steps[index]) {
-        await props.autoSave(index, props.steps[index])
+        try {
+          await props.autoSave(index, props.steps[index])
+        } catch {
+          return
+        }
       }
+      emit('finish', index, props.steps, form?.getValues())
     }
 
-    const handlePrev = () => {
+    const handlePrev = async () => {
+      if (!(await confirmLeave())) return
       if (currentIndex.value <= 0) return
       const target = findNextUnskippedStep(
         currentIndex.value - 1,
@@ -269,14 +301,22 @@ export const FormWizard = defineComponent({
     }
 
     const handleStepChange = (nextIndex: number) => {
-      if (!canClickWizardStep(nextIndex, currentIndex.value, props.steps)) return
-      errorMessage.value = undefined
-      void setCurrent(nextIndex)
+      void (async () => {
+        if (!canClickWizardStep(nextIndex, currentIndex.value, props.steps)) return
+        if (nextIndex < currentIndex.value && !(await confirmLeave())) return
+        errorMessage.value = undefined
+        void setCurrent(nextIndex)
+      })()
     }
 
     expose({
       next: handleNext,
       prev: handlePrev,
+      requestClose: async () => {
+        if (!(await confirmLeave())) return false
+        emit('close')
+        return true
+      },
       finish: async () => {
         if (!isLast.value) return
         await handleNext()

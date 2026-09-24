@@ -30,6 +30,10 @@ export const LoadingBarContainer = /* @__PURE__ */ defineComponent({
       type: Number,
       default: 0
     },
+    minimumDisplayMs: {
+      type: Number,
+      default: undefined
+    },
     status: {
       type: String as PropType<LoadingBarStatus>,
       default: 'idle' as LoadingBarStatus
@@ -102,7 +106,9 @@ export const LoadingBarContainer = /* @__PURE__ */ defineComponent({
           'aria-valuenow': valueNow.value,
           'aria-busy': isBusy ? 'true' : undefined,
           'data-tiger-loading-bar-container': '',
-          'data-tiger-loading-bar-status': props.status
+          'data-tiger-loading-bar-status': props.status,
+          'data-minimum-display-ms':
+            props.minimumDisplayMs == null ? undefined : String(props.minimumDisplayMs)
         },
         [
           props.notice

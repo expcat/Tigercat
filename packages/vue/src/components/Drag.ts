@@ -1,9 +1,10 @@
-import { computed, defineComponent, h, onBeforeUnmount, PropType, watch } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, PropType, ref, watch } from 'vue'
 import {
   bindDragContainerItems,
   classNames,
   coerceClassValue,
   commitCrossContainerDrop,
+  dragMoveAnnouncement,
   reorderSequence,
   type DragConfig,
   type DragDropEvent,
@@ -46,12 +47,23 @@ export const Drag = defineComponent({
   },
   emits: ['update:items', 'items-change', 'drag-start', 'drag-over', 'drop', 'drag-end'],
   setup(props, { emit, slots, attrs }) {
+    const announcement = ref('')
     const drag = useDrag(() => ({
       config: props.config,
       containerId: props.containerId,
       onDragStart: (event: DragStartEvent) => emit('drag-start', event),
-      onDragOver: (event: DragOverEvent) => emit('drag-over', event),
-      onDragEnd: (event: DragEndEvent) => emit('drag-end', event),
+      onDragOver: (event: DragOverEvent) => {
+        const from = props.items.findIndex((item) => item.id === event.item.id)
+        const to = event.overItem
+          ? props.items.findIndex((item) => item.id === event.overItem?.id)
+          : from
+        announcement.value = dragMoveAnnouncement(Math.max(0, from), Math.max(0, to))
+        emit('drag-over', event)
+      },
+      onDragEnd: (event: DragEndEvent) => {
+        announcement.value = ''
+        emit('drag-end', event)
+      },
       onDrop: (event: DragDropEvent) => {
         emit('drop', event)
         if (event.fromContainerId !== event.toContainerId) {
@@ -108,13 +120,23 @@ export const Drag = defineComponent({
           'data-tiger-drag': '',
           role: 'list'
         },
-        props.items.map((item) => {
+        [
+          drag.draggedItem.value
+            ? h(
+                'div',
+                { 'data-tiger-drag-preview': '' },
+                String(drag.draggedItem.value.id)
+              )
+            : null,
+          h('div', { role: 'status', 'data-tiger-drag-live': '' }, announcement.value),
+          ...props.items.map((item) => {
           const itemAttrs = drag.getDragItemAttrs(item)
           const isDragging = drag.draggedItem.value?.id === item.id
           const custom = slots.item?.({ item, attrs: itemAttrs, isDragging })
           if (custom) return custom
           return h('li', { ...itemAttrs, key: item.id, role: 'listitem' }, String(item.id))
         })
+        ]
       )
     }
   }

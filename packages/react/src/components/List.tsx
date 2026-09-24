@@ -57,6 +57,9 @@ export interface ListProps<T extends ListItem = ListItem>
   grid?: ListGrid
   rowKey?: string | ((item: T, index: number) => string | number)
   renderItem?: (item: T, index: number) => React.ReactNode
+  item?: (item: T, index: number) => React.ReactNode
+  meta?: (item: T, index: number) => React.ReactNode
+  actions?: (item: T, index: number) => React.ReactNode
   onItemClick?: (item: T, index: number) => void
   onPageChange?: (page: { current: number; pageSize: number }) => void
   onReorder?: (items: T[], from: number, to: number) => void
@@ -89,6 +92,10 @@ function ListInner<T extends ListItem>(
     rowKey = 'id',
     hoverable = false,
     renderItem,
+    item: itemSlot,
+    meta: metaSlot,
+    actions: actionsSlot,
+    children,
     onItemClick,
     onPageChange,
     className,
@@ -246,7 +253,13 @@ function ListInner<T extends ListItem>(
       ...dragRest
     } = bindings as Record<string, unknown>
 
-    const body = renderItem ? renderItem(item, sourceIndex) : renderDefaultListItem(item)
+    const body = itemSlot
+      ? itemSlot(item, sourceIndex)
+      : metaSlot
+        ? metaSlot(item, sourceIndex)
+        : renderItem
+          ? renderItem(item, sourceIndex)
+          : renderDefaultListItem(item)
     const handleReorderKey = (event: React.KeyboardEvent) => {
       if (!event.altKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return
       event.preventDefault()
@@ -294,12 +307,20 @@ function ListInner<T extends ListItem>(
         ) : (
           body
         )}
+        {actionsSlot ? (
+          <div data-tiger-list-actions="" onClick={(event) => event.stopPropagation()}>
+            {actionsSlot(item, sourceIndex)}
+          </div>
+        ) : null}
       </li>
     )
   }
 
   const renderItems = () => {
-    if (paginatedData.length === 0) {
+    if (dataSource.length > 0 && children) {
+      devWarn('List.children', '[Tigercat] List received both dataSource and children. Children are ignored.')
+    }
+    if (paginatedData.length === 0 && !loading) {
       return (
         <div className={listEmptyStateClasses}>
           <Empty
@@ -398,7 +419,8 @@ function ListInner<T extends ListItem>(
       <div className="relative" aria-busy={loading || undefined}>
         {renderItems()}
         {loading ? (
-          <div className={listLoadingOverlayClasses}>
+          <div className={listLoadingOverlayClasses} data-tiger-list-skeleton="" aria-hidden="true">
+            <div className="h-8 animate-pulse rounded bg-neutral-200" />
             <Loading variant="spinner" aria-hidden role="presentation" />
           </div>
         ) : null}

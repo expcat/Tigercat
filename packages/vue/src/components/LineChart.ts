@@ -14,6 +14,8 @@ import {
   defaultSeriesXYTooltipFormatter,
   defaultChartSeriesName,
   layoutLineSeries,
+  brushDomain,
+  chartReferenceInDomain,
   getCartesianChartShellClasses,
   flattenChartPoints,
   chartPointTabIndex,
@@ -43,6 +45,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { renderAxisBind } from './w9-chart-bind'
 import { useCartesianSeriesPoints } from '../composables/useCartesianSeriesPoints'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
@@ -272,6 +275,19 @@ export const LineChart = defineComponent({
     className: {
       type: String
     },
+    bind: {
+      type: Object as PropType<{
+        time?: (number | Date)[]
+        reference?: { axis?: 'y' | 'y2'; value: number; end?: number }
+        domain?: { min: number; max: number }
+        brush?: { min: number; max: number }
+        secondAxis?: boolean
+        tooltip?: { name: string; value: number }[]
+        tooltipTotal?: number
+        exportSvg?: SVGSVGElement | null
+      }>,
+      default: undefined
+    },
     onPointClick: {
       type: Function as PropType<
         (seriesIndex: number, pointIndex: number, datum: LineChartDatum) => void
@@ -319,7 +335,8 @@ export const LineChart = defineComponent({
       handleClick: handleSeriesSelect,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave
+      handleLegendLeave,
+      isLegendIndexHidden
     } = useChartInteraction<LineChartSeries>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -399,7 +416,9 @@ export const LineChart = defineComponent({
           props.legendFormatter
             ? props.legendFormatter(s, i)
             : (s.name ?? defaultChartSeriesName(i, labels.value.seriesName)),
-        getColor: (s, i) => s.color ?? palette.value[i % palette.value.length]
+        getColor: (s, i) => s.color ?? palette.value[i % palette.value.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       })
     )
 
@@ -774,6 +793,30 @@ export const LineChart = defineComponent({
                 onItemClick: handleLegendClick,
                 onItemHover: handleLegendHover,
                 onItemLeave: handleLegendLeave
+              })
+            : null,
+          props.bind
+            ? renderAxisBind({
+                ticks: props.bind.time,
+                reference:
+                  props.bind.reference &&
+                  chartReferenceInDomain(
+                    props.bind.reference,
+                    props.bind.domain ?? { min: 0, max: 100 }
+                  )
+                    ? props.bind.reference
+                    : null,
+                brush: props.bind.brush
+                  ? {
+                      start: brushDomain(props.bind.domain ?? { min: 0, max: 1 }, props.bind.brush)
+                        .min,
+                      end: brushDomain(props.bind.domain ?? { min: 0, max: 1 }, props.bind.brush).max
+                    }
+                  : null,
+                secondAxis: props.bind.secondAxis,
+                tooltip: props.bind.tooltip,
+                tooltipTotal: props.bind.tooltipTotal,
+                exportSvg: props.bind.exportSvg
               })
             : null,
           tooltip

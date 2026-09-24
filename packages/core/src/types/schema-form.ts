@@ -81,6 +81,14 @@ export interface SchemaFormField {
    */
   disabled?: boolean
   /**
+   * Read-only fields render as text and are not validated.
+   */
+  readOnly?: boolean
+  /**
+   * Extra widget params, narrowed by widget type. Unknown keys warn in dev.
+   */
+  widgetParams?: Record<string, unknown>
+  /**
    * Skip this field in layout, rules, and mapping.
    */
   hidden?: boolean

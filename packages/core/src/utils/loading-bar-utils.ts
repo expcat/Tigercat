@@ -25,6 +25,7 @@ export const LOADING_BAR_START_PERCENTAGE = 8
 export const LOADING_BAR_MAX_TRICKLE_PERCENTAGE = 94
 export const LOADING_BAR_TRICKLE_INTERVAL_MS = 200
 export const LOADING_BAR_FINISH_HIDE_DELAY_MS = 300
+export const DEFAULT_LOADING_BAR_MIN_DISPLAY_MS = 200
 
 export const loadingBarContainerBaseClasses = `fixed top-0 inset-inline-0 ${overlayZIndexClass.loadingBar} pointer-events-none overflow-hidden`
 
@@ -53,6 +54,8 @@ export interface LoadingBarRuntimeState extends Required<
   /** Spoken once when a load starts, fails, or finishes. Percentage stays on the progressbar. */
   notice: LoadingBarNotice
   noticeToken: number
+  minimumDisplayMs: number
+  renderBar?: unknown
 }
 
 export function createInitialLoadingBarState(): LoadingBarRuntimeState {
@@ -64,7 +67,8 @@ export function createInitialLoadingBarState(): LoadingBarRuntimeState {
     height: DEFAULT_LOADING_BAR_HEIGHT,
     startedCount: 0,
     notice: null,
-    noticeToken: 0
+    noticeToken: 0,
+    minimumDisplayMs: DEFAULT_LOADING_BAR_MIN_DISPLAY_MS
   }
 }
 
@@ -202,7 +206,14 @@ function mergeStartOptions(
     className: options?.className ?? state.className,
     style: options?.style ?? state.style,
     ariaLabel: options?.ariaLabel ?? state.ariaLabel,
-    container: options?.container ?? state.container
+    container: options?.container ?? state.container,
+    minimumDisplayMs:
+      options?.minimumDisplayMs !== undefined &&
+      Number.isFinite(options.minimumDisplayMs) &&
+      options.minimumDisplayMs >= 0
+        ? options.minimumDisplayMs
+        : state.minimumDisplayMs,
+    renderBar: options?.renderBar !== undefined ? options.renderBar : state.renderBar
   }
 }
 
@@ -212,6 +223,7 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
   let trickleTimer: LoadingBarTimeoutId | undefined
   let hideTimer: LoadingBarTimeoutId | undefined
   let sawError = false
+  let shownAt = 0
 
   const schedule =
     hooks.setTimeout ?? ((handler, timeout) => globalThis.setTimeout(handler, timeout))
@@ -266,6 +278,12 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
     state = { ...state, notice, noticeToken: state.noticeToken + 1 }
   }
 
+  function hideDelay(): number {
+    const elapsed = Date.now() - shownAt
+    const remain = Math.max(0, state.minimumDisplayMs - elapsed)
+    return Math.max(LOADING_BAR_FINISH_HIDE_DELAY_MS, remain)
+  }
+
   function scheduleHide(): void {
     stopHide()
     if (reduceMotion() || (!isBrowser() && !hooks.setTimeout)) {
@@ -275,7 +293,7 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
     hideTimer = schedule(() => {
       hideTimer = undefined
       hideNow(false)
-    }, LOADING_BAR_FINISH_HIDE_DELAY_MS)
+    }, hideDelay())
   }
 
   function tickTrickle(): void {
@@ -314,6 +332,7 @@ export function createLoadingBarController(hooks: LoadingBarTimerHooks = {}): Lo
     }
     if (isFresh) {
       sawError = false
+      shownAt = Date.now()
       announce('loading')
     }
     emit()

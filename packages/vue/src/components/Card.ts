@@ -9,6 +9,7 @@ import {
   resolveCardActivation,
   handleCardActivation,
   cardHeaderClasses,
+  cardTitleTag,
   cardFooterClasses,
   cardCoverClasses,
   cardActionsClasses,
@@ -72,6 +73,7 @@ export const Card = defineComponent({
     target: { type: String, default: undefined },
     rel: { type: String, default: undefined },
     title: { type: String, default: undefined },
+    titleLevel: { type: Number, default: 2 },
     htmlTitle: { type: String, default: undefined },
     className: { type: String, default: undefined },
     style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
@@ -124,7 +126,7 @@ export const Card = defineComponent({
       const headerNode = headerNodes
         ? h('div', { class: cardHeaderClasses }, headerNodes)
         : props.title
-          ? h('div', { class: cardHeaderClasses }, props.title)
+          ? h(cardTitleTag(props.titleLevel), { class: cardHeaderClasses }, props.title)
           : null
       const bodyNode = defaultNodes ? h('div', {}, defaultNodes) : null
       const footerNode = footerNodes ? h('div', { class: cardFooterClasses }, footerNodes) : null

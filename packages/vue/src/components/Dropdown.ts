@@ -25,6 +25,20 @@ import {
   getDropdownChevronClasses,
   getDropdownMenuClasses,
   getDropdownItemClasses,
+  getPopupMenuItemClasses,
+  getPopupMenuShortcutClasses,
+  popupMenuAccessibleName,
+  popupMenuItemCloses,
+  popupMenuItemHref,
+  popupMenuItemRole,
+  resolvePopupMenuItemType,
+  nextPopupMenuCheck,
+  getContextMenuSubPlacement,
+  createTypeaheadHighlight,
+  markTypeaheadMatch,
+  TYPEAHEAD_MATCH_ATTR,
+  POPUP_MENU_TYPEAHEAD_MATCH_CLASS,
+  navLabels,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
   handleMenuNavigation,
@@ -43,7 +57,8 @@ import {
 import type {
   DropdownProps as CoreDropdownProps,
   DropdownMenuProps as CoreDropdownMenuProps,
-  DropdownItemProps as CoreDropdownItemProps
+  DropdownItemProps as CoreDropdownItemProps,
+  PopupMenuItem
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
@@ -128,6 +143,10 @@ export const DropdownItem = defineComponent({
       type: String,
       default: undefined
     },
+    danger: { type: Boolean, default: false },
+    shortcut: { type: String, default: undefined },
+    checked: { type: Boolean, default: undefined },
+    itemType: { type: String, default: 'item' },
     itemKey: {
       type: [String, Number],
       default: undefined
@@ -141,7 +160,7 @@ export const DropdownItem = defineComponent({
       default: undefined
     }
   },
-  emits: ['click'],
+  emits: ['click', 'check'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
     const attrsClass = (attrsRecord as { class?: unknown }).class
@@ -159,16 +178,29 @@ export const DropdownItem = defineComponent({
       }
 
       emit('click', event)
+      if (props.itemType === 'checkbox' || props.itemType === 'radio') {
+        emit('check', !props.checked)
+        return
+      }
 
       const shouldClose = props.closeOnClick ?? context?.closeOnClick ?? true
-      if (shouldClose) {
+      if (shouldClose && popupMenuItemCloses(props.itemType === 'danger' ? 'danger' : 'item')) {
         context?.handleItemClick()
       }
     }
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== ' ' && event.key !== 'Spacebar') return
+      if (props.itemType !== 'checkbox' && props.itemType !== 'radio') return
+      event.preventDefault()
+      emit('check', props.itemType === 'checkbox' ? !props.checked : true)
+    }
+
     const itemClasses = computed(() => {
       return classNames(
-        getDropdownItemClasses(props.disabled, props.divided),
+        props.danger || props.itemType === 'danger'
+          ? getPopupMenuItemClasses(props.disabled, true, props.divided)
+          : getDropdownItemClasses(props.disabled, props.divided),
         props.className,
         coerceClassValue(attrsClass)
       )
@@ -198,14 +230,32 @@ export const DropdownItem = defineComponent({
             ? { href: safeHref, rel: getSecureRel(target, rel) }
             : { type: 'button', href: undefined, rel: undefined }),
           class: itemClasses.value,
-          role: 'menuitem',
+          role:
+            props.itemType === 'checkbox'
+              ? 'menuitemcheckbox'
+              : props.itemType === 'radio'
+                ? 'menuitemradio'
+                : 'menuitem',
+          'aria-checked':
+            props.itemType === 'checkbox' || props.itemType === 'radio'
+              ? Boolean(props.checked)
+              : undefined,
           tabindex: -1,
           'aria-disabled': props.disabled || undefined,
           disabled: isLink ? undefined : props.disabled,
           onClick: handleClick,
+          onKeydown: handleKeyDown,
           style: mergedStyle.value
         },
-        slots.default?.()
+        [
+          slots.default?.(),
+          props.shortcut
+            ? h('span', { class: getPopupMenuShortcutClasses() }, props.shortcut)
+            : null,
+          props.danger || props.itemType === 'danger'
+            ? h('span', { class: 'sr-only' }, `, ${navLabels.dangerItem}`)
+            : null
+        ]
       )
     }
   }
@@ -214,6 +264,62 @@ export const DropdownItem = defineComponent({
 export interface VueDropdownProps extends CoreDropdownProps {
   placement?: FloatingPlacement
   offset?: number
+  items?: PopupMenuItem[]
+}
+
+function itemLabels(root: HTMLElement): string[] {
+  return Array.from(root.querySelectorAll<HTMLElement>('[role^="menuitem"]')).map(
+    (node) => node.textContent ?? ''
+  )
+}
+
+function renderPopupItems(
+  items: PopupMenuItem[],
+  emitCheck: (key: string | number, checked: boolean) => void,
+  emitSelect?: (item: PopupMenuItem) => void
+): VNode[] {
+  return items.map((item) => {
+    const type = resolvePopupMenuItemType(item)
+    if (type === 'separator') {
+      return h('div', {
+        key: item.key,
+        role: 'separator',
+        class: 'my-1 h-px bg-[var(--tiger-border)]'
+      })
+    }
+    if (type === 'submenu') {
+      return h(
+        Dropdown,
+        {
+          key: item.key,
+          items: item.children,
+          trigger: 'hover',
+          placement: getContextMenuSubPlacement(
+            typeof document === 'undefined' ? 'ltr' : document.documentElement.dir
+          )
+        },
+        { default: () => item.label }
+      )
+    }
+    const href = popupMenuItemHref(item)
+    return h(
+      DropdownItem,
+      {
+        key: item.key,
+        itemKey: item.key,
+        disabled: item.disabled,
+        danger: type === 'danger',
+        itemType: type,
+        href,
+        shortcut: item.shortcut,
+        checked: item.checked,
+        closeOnClick: popupMenuItemCloses(type),
+        onCheck: (checked: boolean) => emitCheck(item.key, checked),
+        onClick: () => emitSelect?.(item)
+      },
+      () => item.label
+    )
+  })
 }
 
 export type DropdownProps = VueDropdownProps
@@ -254,6 +360,7 @@ export const Dropdown = defineComponent({
       type: Boolean,
       default: true
     },
+    items: { type: Array as PropType<PopupMenuItem[]>, default: undefined },
     portal: {
       type: Boolean,
       default: true
@@ -271,7 +378,7 @@ export const Dropdown = defineComponent({
       default: false
     }
   },
-  emits: ['update:open', 'open-change'],
+  emits: ['update:open', 'open-change', 'check', 'select'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
     const attrsClass = (attrsRecord as { class?: unknown }).class
@@ -392,6 +499,8 @@ export const Dropdown = defineComponent({
       if (floatingRef.value) focusMenuItem(floatingRef.value, edge)
     }
 
+    const typeahead = createTypeaheadHighlight()
+
     const handleMenuKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
         skipRestore.value = true
@@ -399,9 +508,18 @@ export const Dropdown = defineComponent({
         return
       }
       if (isTextEditingTarget(event.target)) return
-      if (floatingRef.value) {
-        handleMenuNavigation(floatingRef.value, event)
+      if (!floatingRef.value) return
+      const highlight = typeahead.push(event.key, itemLabels(floatingRef.value), -1)
+      if (highlight && highlight.index >= 0) {
+        event.preventDefault()
+        const nodes = Array.from(
+          floatingRef.value.querySelectorAll<HTMLElement>('[role^="menuitem"]')
+        )
+        markTypeaheadMatch(nodes, highlight.index)
+        nodes[highlight.index]?.focus()
+        return
       }
+      handleMenuNavigation(floatingRef.value, event)
     }
 
     const portalEnabled = computed(() => props.portal)
@@ -461,6 +579,24 @@ export const Dropdown = defineComponent({
       if (triggerSlot && triggerSlot.length > 0) {
         triggerNode = triggerSlot.length === 1 ? triggerSlot[0] : triggerSlot
         sawTrigger = true
+      }
+
+      if (props.items && props.items.length > 0) {
+        menuNode = h(
+          DropdownMenu,
+          {},
+          {
+            default: () =>
+              renderPopupItems(
+                props.items ?? [],
+                (key, checked) => {
+                  const change = nextPopupMenuCheck(props.items ?? [], key)
+                  emit('check', change ?? { key, checked })
+                },
+                (item) => emit('select', item)
+              )
+          }
+        )
       }
 
       defaultSlot.forEach((node: VNode) => {

@@ -370,16 +370,19 @@ describe('WorkflowDesigner center-rail class tokens', () => {
     ).not.toHaveProperty('borderInlineStart')
   })
 
-  it('is injected by the default Tailwind plugin', () => {
+  it('keeps canvas geometry in the component style module', () => {
     const rules: Record<string, unknown> = {}
     type PluginInstance = {
       handler: (api: { addBase: (rule: Record<string, unknown>) => void }) => void
     }
     const plugin = tigercatPlugin as unknown as PluginInstance
     plugin.handler({ addBase: (rule) => Object.assign(rules, rule) })
-    expect(rules['.tiger-workflow-designer__flow::before']).toMatchObject({
+    expect(
+      workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__flow::before']
+    ).toMatchObject({
       left: '50%',
       transform: 'translateX(-50%)'
     })
+    expect(rules['.tiger-workflow-designer__flow::before']).toBeUndefined()
   })
 })

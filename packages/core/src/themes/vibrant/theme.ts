@@ -1,4 +1,18 @@
 import type { ThemePreset } from '../../types/theme'
+import { deriveAccentScale } from '../../utils/accent-scale'
+
+export const vibrantThemeKnobs = {
+  accent: '#8b5cf6',
+  neutral: '#6b21a8',
+  radius: '10px',
+  density: 1.05
+} as const
+
+export const vibrantThemeScale = deriveAccentScale(vibrantThemeKnobs.accent, {
+  neutral: vibrantThemeKnobs.neutral,
+  radius: vibrantThemeKnobs.radius,
+  density: vibrantThemeKnobs.density
+})
 
 /**
  * Vibrant theme — young & energetic, multi-color gradients.

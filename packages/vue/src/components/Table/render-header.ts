@@ -63,7 +63,10 @@ export function renderTableHeader(
 
   const headerCells: VNodeChild[] = chrome.leading.map((slot) => chromeTh(slot))
 
-  ctx.displayColumns.value.forEach((column) => {
+  const headerColumns =
+    (props as TableInternalProps & { renderedColumns?: TableInternalProps['columns'] })
+      .renderedColumns ?? ctx.displayColumns.value
+  headerColumns.forEach((column) => {
     const isSorted = ctx.sortState.value.key === column.key
     const sortDirection = isSorted ? ctx.sortState.value.direction : null
 
@@ -77,11 +80,15 @@ export function renderTableHeader(
 
     const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, TABLE_FIXED_HEADER_Z_INDEX)
 
-    const widthStyle = column.width
-      ? {
-          width: typeof column.width === 'number' ? `${column.width}px` : column.width
-        }
-      : undefined
+    const measuredWidth = ctx.widthMap.value[column.key]
+    const widthStyle =
+      measuredWidth !== undefined
+        ? { width: `${measuredWidth}px` }
+        : column.width
+          ? {
+              width: typeof column.width === 'number' ? `${column.width}px` : column.width
+            }
+          : undefined
 
     const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
@@ -165,6 +172,8 @@ export function renderTableHeader(
           key: column.key,
           scope: 'col',
           'data-tiger-table-column-key': column.key,
+          'data-tiger-col-width': measuredWidth,
+          'data-tiger-col-drag-handle': props.columnDraggable ? '' : undefined,
           'aria-sort': ariaSort,
           class: classNames(
             getTableHeaderCellClasses(

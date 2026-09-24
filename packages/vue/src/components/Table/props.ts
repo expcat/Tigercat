@@ -15,7 +15,8 @@ import type {
   TableCardLayoutItem,
   TableCardSelectionPosition,
   TableExportScope,
-  TableFixedPosition
+  TableFixedPosition,
+  TableSortLevel
 } from '@expcat/tigercat-core'
 
 /**
@@ -60,13 +61,26 @@ export interface VueTableProps {
   virtualItemHeight?: number
   autoVirtual?: boolean
   virtualThreshold?: number
+  virtualizeColumns?: boolean
+  width?: number | 'auto'
+  overscan?: number
+  scrollToIndex?: number
+  sorts?: TableSortLevel[]
+  columnWidths?: Record<string, number>
+  grid?: boolean
+  collapsedGroupKeys?: string[]
   editable?: boolean
   editableCells?: Record<string, number[]>
   filterMode?: 'basic' | 'advanced'
   advancedFilterRules?: FilterRule[]
   columnDraggable?: boolean
   rowDraggable?: boolean
-  summaryRow?: { show: boolean; data: Record<string, unknown> }
+  summaryRow?: {
+    show: boolean
+    data?: Record<string, unknown>
+    sum?: boolean | string[]
+  }
+  cardItemHeight?: number
   groupBy?: string
   exportable?: boolean
   exportScope?: TableExportScope
@@ -220,13 +234,28 @@ export const tableProps = {
   virtualHeight: { type: Number, default: 400 },
   virtualItemHeight: { type: Number, default: 40 },
   virtualThreshold: { type: Number, default: 1000 },
+  virtualizeColumns: { type: Boolean, default: false },
+  width: { type: [Number, String] as PropType<number | 'auto'>, default: 'auto' },
+  overscan: { type: Number, default: 5 },
+  scrollToIndex: { type: Number, default: undefined },
+  sorts: { type: Array as PropType<TableSortLevel[]>, default: undefined },
+  columnWidths: { type: Object as PropType<Record<string, number>>, default: undefined },
+  grid: { type: Boolean, default: false },
+  collapsedGroupKeys: { type: Array as PropType<string[]>, default: undefined },
   editable: { type: Boolean, default: false },
   editableCells: { type: Object as PropType<Record<string, number[]>> },
   filterMode: { type: String as PropType<'basic' | 'advanced'>, default: 'basic' },
   advancedFilterRules: { type: Array as PropType<FilterRule[]>, default: undefined },
   columnDraggable: { type: Boolean, default: false },
   rowDraggable: { type: Boolean, default: false },
-  summaryRow: { type: Object as PropType<{ show: boolean; data: Record<string, unknown> }> },
+  summaryRow: {
+    type: Object as PropType<{
+      show: boolean
+      data?: Record<string, unknown>
+      sum?: boolean | string[]
+    }>
+  },
+  cardItemHeight: { type: Number, default: undefined },
   groupBy: { type: String },
   exportable: { type: Boolean, default: false },
   exportScope: { type: String as PropType<TableExportScope>, default: 'all' },
@@ -259,7 +288,10 @@ export const tableEmits = [
   'column-fixed-change',
   'row-order-change',
   'export',
-  'select-loaded'
+  'select-loaded',
+  'update:sorts',
+  'update:columnWidths',
+  'update:collapsedGroupKeys'
 ] as const
 
 export type TableEmits = (typeof tableEmits)[number]

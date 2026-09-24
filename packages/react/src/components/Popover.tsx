@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useId, useMemo } from 'react'
 import { usePopup } from '../utils/use-popup'
+import { useTooltipDelayGroup } from '../utils/tooltip-delay'
 import { renderOverlayPortal } from '../utils/overlay'
 import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
@@ -11,6 +12,8 @@ import {
   getPopoverContentStyle,
   getPopoverTriggerClasses,
   resolvePopoverWidth,
+  getFloatingArrowStyle,
+  getPopconfirmArrowClasses,
   POPOVER_TITLE_CLASSES,
   POPOVER_TEXT_CLASSES,
   type PopoverProps as CorePopoverProps,
@@ -29,6 +32,7 @@ export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement' | 'conte
     style?: React.CSSProperties
     placement?: FloatingPlacement
     offset?: number
+    closeOnScroll?: boolean
     asChild?: boolean
     onOpenChange?: (open: boolean) => void
   }
@@ -47,6 +51,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     showDelay,
     hideDelay,
     offset = 8,
+    closeOnScroll = false,
     asChild = false,
     className,
     style,
@@ -61,13 +66,16 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
   const titleId = `${popoverId}-title`
   const contentId = `${popoverId}-content`
 
+  const delayGroup = useTooltipDelayGroup()
   const {
     currentVisible,
+    setVisible,
     containerRef,
     triggerRef,
     floatingRef,
     floatingStyles,
     floatingClasses,
+    actualPlacement,
     positioned,
     overlayTarget,
     triggerHandlers
@@ -80,8 +88,17 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     offset,
     showDelay,
     hideDelay,
-    onOpenChange
+    onOpenChange,
+    getSkipShowDelay: () => delayGroup?.shouldSkip() ?? false,
+    onShown: () => delayGroup?.noteOpen()
   })
+
+  useEffect(() => {
+    if (!closeOnScroll || !currentVisible) return
+    const onScroll = () => setVisible(false)
+    window.addEventListener('scroll', onScroll, true)
+    return () => window.removeEventListener('scroll', onScroll, true)
+  }, [closeOnScroll, currentVisible, setVisible])
 
   useEffect(() => {
     const resolved = resolvePopoverWidth(width)
@@ -162,6 +179,11 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
                   {titleContent || title}
                 </div>
               )}
+              <span
+                data-tiger-floating-arrow=""
+                className={getPopconfirmArrowClasses()}
+                style={getFloatingArrowStyle(actualPlacement)}
+              />
               {hasContent && (
                 <div id={contentId} className={POPOVER_TEXT_CLASSES}>
                   {content}

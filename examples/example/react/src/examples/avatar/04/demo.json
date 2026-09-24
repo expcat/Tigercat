@@ -1,0 +1,8 @@
+{
+  "id": "avatar-04",
+  "title": "溢出名单",
+  "description": "溢出按钮打开浮层，列出被折叠头像的名字。",
+  "entry": "App.tsx",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 360 }
+}

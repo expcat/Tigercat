@@ -1,5 +1,19 @@
 import type { ThemePreset, ThemeSemanticColors } from '../../types/theme'
 import { runtimeThemeDark, runtimeThemeLight } from '../../tokens/tokens'
+import { deriveAccentScale } from '../../utils/accent-scale'
+
+export const defaultThemeKnobs = {
+  accent: '#2563eb',
+  neutral: '#737373',
+  radius: '6px',
+  density: 1
+} as const
+
+export const defaultThemeScale = deriveAccentScale(defaultThemeKnobs.accent, {
+  neutral: defaultThemeKnobs.neutral,
+  radius: defaultThemeKnobs.radius,
+  density: defaultThemeKnobs.density
+})
 
 export const defaultThemeLightColors: ThemeSemanticColors = {
   ...runtimeThemeLight.colors

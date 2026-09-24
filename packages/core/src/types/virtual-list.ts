@@ -113,6 +113,12 @@ export interface VirtualListProps {
   getItemKey?: (index: number) => string | number
   /** Accessible name for the scrollable list. */
   ariaLabel?: string
+  /** Columns in a grid. The row window uses the same virtual range. @default 1 */
+  columns?: number
+  /** Horizontal uses the same window on the inline scroll axis. @default 'vertical' */
+  orientation?: 'vertical' | 'horizontal'
+  /** Item indexes that stay mounted outside the window. */
+  stickyIndexes?: number[]
   /** Custom class name */
   className?: string
 }

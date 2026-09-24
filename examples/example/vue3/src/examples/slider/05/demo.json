@@ -1,0 +1,12 @@
+{
+  "id": "slider-05",
+  "title": "垂直滑块与刻度",
+  "description": "只读时值仍可见。刻度可以点，气泡使用格式化文本。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 280,
+    "maxHeight": 640
+  }
+}

@@ -50,8 +50,8 @@ describe('VirtualTable (React)', () => {
     )
     expect(screen.getByText('No records')).toBeInTheDocument()
     rerender(<VirtualTable dataSource={makeData(2)} columns={columns} loading />)
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
-    expect(screen.getByText('Loading...').closest('[aria-busy="true"]')).toBeTruthy()
+    expect(screen.getByText('Loading')).toBeInTheDocument()
+    expect(screen.getByText('Loading').closest('[aria-busy="true"]')).toBeTruthy()
   })
 
   it('windows large datasets and pins row height', () => {

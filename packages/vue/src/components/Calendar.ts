@@ -10,7 +10,7 @@ import {
   type PropType,
   type VNodeChild
 } from 'vue'
-import { classNames, coerceClassValue } from '@expcat/tigercat-core'
+import { calendarWeekNumber, classNames, coerceClassValue, getW9DataLabels } from '@expcat/tigercat-core'
 import type {
   CalendarEvent,
   CalendarMode,
@@ -23,7 +23,6 @@ import {
   buildCalendarDateCellExtra,
   calendarDateCellDotClasses,
   calendarDateCellExtraClasses,
-  calendarGridClasses,
   calendarHeaderClasses,
   calendarNavButtonClasses,
   calendarTitleClasses,
@@ -59,7 +58,7 @@ import {
   resolveCalendarRovingMonth,
   selectCalendarDay,
   selectCalendarMonth,
-  shiftCalendarMonth,
+  shiftCalendarPanel,
   shiftCalendarYear,
   toCalendarDate,
   toIsoDate
@@ -337,7 +336,7 @@ export const Calendar = defineComponent({
             onClick: () =>
               navigate(
                 mode.value === 'month'
-                  ? shiftCalendarMonth(view.value, -1)
+                  ? shiftCalendarPanel(view.value, -1)
                   : shiftCalendarYear(view.value, -1)
               )
           },
@@ -366,7 +365,7 @@ export const Calendar = defineComponent({
             onClick: () =>
               navigate(
                 mode.value === 'month'
-                  ? shiftCalendarMonth(view.value, 1)
+                  ? shiftCalendarPanel(view.value, 1)
                   : shiftCalendarYear(view.value, 1)
               )
           },
@@ -421,18 +420,32 @@ export const Calendar = defineComponent({
           )
         )
       } else {
+        const weekGridClass = 'grid grid-cols-8'
         const weekdayRow = h(
           'div',
-          { class: calendarGridClasses, role: 'row' },
-          weekdayNames.value.map((wd) =>
-            h('div', { key: wd, class: calendarWeekdayClasses, role: 'columnheader' }, wd)
-          )
+          { class: weekGridClass, role: 'row' },
+          [
+            h(
+              'div',
+              { class: calendarWeekdayClasses, role: 'columnheader' },
+              getW9DataLabels().weekNumber
+            ),
+            ...weekdayNames.value.map((wd) =>
+              h('div', { key: wd, class: calendarWeekdayClasses, role: 'columnheader' }, wd)
+            )
+          ]
         )
         const weekRows = weeks.value.map((week, wi) =>
           h(
             'div',
-            { key: wi, class: calendarGridClasses, role: 'row' },
-            week.map((date) => {
+            { key: wi, class: weekGridClass, role: 'row' },
+            [
+              h(
+                'div',
+                { class: calendarWeekdayClasses, 'data-week-number': '' },
+                String(calendarWeekNumber(week[0], weekStartsOn.value))
+              ),
+              ...week.map((date) => {
               const iso = toIsoDate(date)
               const isCurrentMonth = date.getMonth() === view.value.viewMonth
               const isSelected = selected.value ? isSameDay(date, selected.value) : false
@@ -522,6 +535,7 @@ export const Calendar = defineComponent({
                 : null
               ])
             })
+            ]
           )
         )
         body = h(

@@ -1,5 +1,6 @@
 import React, { forwardRef, useMemo } from 'react'
 import {
+  basicLabel,
   classNames,
   mergeTigerLocale,
   getQRCodeLabels,
@@ -19,8 +20,10 @@ import {
 import { useTigerConfig } from './ConfigProvider'
 
 export interface QRCodeProps
-  extends CoreQRCodeProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
+  extends Omit<CoreQRCodeProps, 'icon'>, Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
   onRefresh?: () => void
+  /** SVG path data, or a center icon node. The matrix is left intact. */
+  icon?: string | React.ReactNode
 }
 
 export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
@@ -30,6 +33,8 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
     color = QRCODE_DEFAULT_COLOR,
     bgColor = QRCODE_DEFAULT_BG,
     status = 'active',
+    errorLevel = 'M',
+    icon,
     onRefresh,
     className,
     locale,
@@ -44,17 +49,22 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
     [config.locale, locale]
   )
   const labels = useMemo(() => getQRCodeLabels(mergedLocale), [mergedLocale])
-  const encoded = useMemo(() => resolveQRMatrix(value), [value])
+  const encoded = useMemo(() => resolveQRMatrix(value, errorLevel), [value, errorLevel])
   const failed = !encoded.ok
   const matrix = encoded.ok ? encoded.matrix : []
   const viewBox = qrViewBoxSize(matrix.length || 1)
+  const scannedText = basicLabel(mergedLocale.locale, 'qrcode', 'scanned')
+  const iconPath = typeof icon === 'string' ? icon : undefined
+  const iconNode = typeof icon === 'string' ? null : icon
   const statusText = failed
     ? labels.errorText
     : status === 'expired'
       ? labels.expiredText
       : status === 'loading'
         ? labels.loadingText
-        : ''
+        : status === 'scanned'
+          ? scannedText
+          : ''
   const imgLabel = statusText ? `${labels.ariaLabel}, ${statusText}` : labels.ariaLabel
   const scheme = config.colorScheme === 'dark' ? 'dark' : 'light'
 
@@ -82,7 +92,21 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
         className="block h-full w-full">
         <rect width={viewBox} height={viewBox} fill={bgColor} />
         {encoded.ok ? <path d={qrDarkModulesPath(matrix)} fill={color} /> : null}
+        {iconPath ? (
+          <path
+            d={iconPath}
+            fill={color}
+            transform={`translate(${viewBox / 2 - 3} ${viewBox / 2 - 3}) scale(${6 / 24})`}
+          />
+        ) : null}
       </svg>
+      {iconNode ? (
+        <div
+          className="pointer-events-none absolute inset-0 flex items-center justify-center"
+          aria-hidden="true">
+          {iconNode}
+        </div>
+      ) : null}
 
       {failed ? (
         <div className={qrcodeOverlayClasses} role="status">
@@ -98,6 +122,12 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
               {labels.refreshText}
             </button>
           ) : null}
+        </div>
+      ) : null}
+
+      {!failed && status === 'scanned' ? (
+        <div className={qrcodeOverlayClasses} role="status">
+          <span className={qrcodeStatusTextClasses}>{scannedText}</span>
         </div>
       ) : null}
 

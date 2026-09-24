@@ -16,8 +16,11 @@ export interface LoadingBarContainerProps
     CoreLoadingBarContainerProps,
     Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingBarContainerProps | 'role'> {}
 
-export const LoadingBarContainer: React.FC<LoadingBarContainerProps> = ({
+export const LoadingBarContainer: React.FC<
+  LoadingBarContainerProps & { minimumDisplayMs?: number }
+> = ({
   percentage = 0,
+  minimumDisplayMs,
   status = 'idle',
   color = DEFAULT_LOADING_BAR_COLOR,
   height = DEFAULT_LOADING_BAR_HEIGHT,
@@ -55,7 +58,8 @@ export const LoadingBarContainer: React.FC<LoadingBarContainerProps> = ({
       aria-valuenow={valueNow}
       aria-busy={isBusy || undefined}
       data-tiger-loading-bar-container=""
-      data-tiger-loading-bar-status={status}>
+      data-tiger-loading-bar-status={status}
+      data-minimum-display-ms={minimumDisplayMs == null ? undefined : String(minimumDisplayMs)}>
       {notice ? (
         <span key={noticeToken} className="sr-only" role="status">
           {notice}

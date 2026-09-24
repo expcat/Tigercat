@@ -11,11 +11,16 @@ import {
   isKeySelected,
   isMenuRoving,
   menuKeyId,
+  markTypeaheadMatch,
+  menuCollapsedTooltip,
   nextMenuRovingKey,
+  normalizeMenuItemBadge,
   parseMenuKeyId,
   sameMenuKey,
   shouldIndentMenuItem
 } from '@expcat/tigercat-core'
+import { Badge } from '../Badge'
+import { Tooltip } from '../Tooltip'
 import { useMenuContext, useSubMenuScope, warnMissingMenuContext } from './context'
 import { getReactMenuPlainText, renderCollapsedLabel, renderMenuIcon } from './render'
 import type { MenuItemProps } from './types'
@@ -29,6 +34,8 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   children,
   level = 0,
   collapsed: collapsedOverride,
+  badge,
+  shortcut,
   ...rest
 }) => {
   const menuContext = useMenuContext()
@@ -42,7 +49,9 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   const effectiveCollapsed = collapsedOverride ?? (menuContext ? menuContext.collapsed : false)
   const inPopup = Boolean(submenuScope?.popup)
   const usesMenuRole = Boolean(menuContext)
-  const roving = Boolean(menuContext && isMenuRoving(menuContext.mode, { popup: inPopup, isRoot: !submenuScope }))
+  const roving = Boolean(
+    menuContext && isMenuRoving(menuContext.mode, { popup: inPopup, isRoot: !submenuScope })
+  )
   const layerStop = submenuScope?.tabStopKey ?? menuContext?.tabStopKey
   const setLayerStop = submenuScope?.setTabStopKey ?? menuContext?.setTabStopKey
   const isTabStop = !disabled && (!roving || (layerStop != null && sameMenuKey(itemKey, layerStop)))
@@ -69,6 +78,25 @@ export const MenuItem: React.FC<MenuItemProps> = ({
     (event: React.KeyboardEvent<HTMLElement>) => {
       if (!menuContext) return
       const current = event.currentTarget
+      const typeaheadList = current.closest<HTMLElement>('ul[data-tiger-menu-list]')
+      if (typeaheadList) {
+        const nodes = Array.from(
+          typeaheadList.querySelectorAll<HTMLElement>('[data-tiger-menuitem]')
+        )
+        const hit = menuContext.typeahead.push(
+          event.key,
+          nodes.map((node) => (node.textContent ?? '').trim()),
+          Math.max(0, nodes.indexOf(current)),
+          nodes.map((node) => node.getAttribute('aria-disabled') === 'true')
+        )
+        if (hit && hit.index >= 0) {
+          event.preventDefault()
+          markTypeaheadMatch(nodes, hit.index)
+          nodes[hit.index]?.focus()
+          return
+        }
+      }
+      const currentTarget = current
       const rootMenu = current.closest('[data-tiger-menu-root="true"]') as HTMLElement | null
       const isRoot = Boolean(rootMenu && current.closest('[data-tiger-menu-list]') === rootMenu)
       const { nextKey, prevKey, closeKey } = getMenuNavigationKeys(
@@ -78,7 +106,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       )
 
       const move = (delta: 1 | -1 | 'start' | 'end') => {
-        const list = current.closest<HTMLElement>('ul[data-tiger-menu-list]')
+        const list = currentTarget.closest<HTMLElement>('ul[data-tiger-menu-list]')
         if (!list || !setLayerStop) return
         const keys = getMenuButtons(list)
           .map((button) => button.getAttribute('data-tiger-menuitem-key'))
@@ -127,6 +155,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   )
 
   const label = getReactMenuPlainText(children)
+  const badgeModel = normalizeMenuItemBadge(badge)
   const content = (
     <>
       {renderMenuIcon(icon, effectiveCollapsed)}
@@ -135,8 +164,23 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       ) : (
         <span className="flex-1">{children}</span>
       )}
+      {!effectiveCollapsed && shortcut ? (
+        <span
+          data-tiger-menu-shortcut=""
+          className="ms-auto text-xs text-[var(--tiger-text-secondary)]">
+          {shortcut}
+        </span>
+      ) : null}
     </>
   )
+  const badged = badgeModel ? (
+    <Badge content={badgeModel.content} type={badgeModel.type ?? 'number'} standalone={false}>
+      {content}
+    </Badge>
+  ) : (
+    content
+  )
+  const collapsedTip = menuCollapsedTooltip(effectiveCollapsed, label)
 
   const { target, rel, ...itemRest } = rest as React.AnchorHTMLAttributes<HTMLAnchorElement>
   const safeHref = resolveLinkHref(href, { disabled })
@@ -156,32 +200,36 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   const role = usesMenuRole ? ('menuitem' as const) : undefined
   const wrapperRole = usesMenuRole ? ('none' as const) : undefined
 
-  if (safeHref) {
-    return (
-      <li role={wrapperRole}>
-        <a
-          {...shared}
-          href={safeHref}
-          target={target}
-          rel={getSecureRel(target, rel)}
-          role={role}
-          aria-current={isSelected ? 'page' : undefined}
-          aria-disabled={disabled ? true : undefined}>
-          {content}
-        </a>
-      </li>
-    )
-  }
+  const control = safeHref ? (
+    <a
+      {...shared}
+      href={safeHref}
+      target={target}
+      rel={getSecureRel(target, rel)}
+      role={role}
+      aria-current={isSelected ? 'page' : undefined}
+      aria-disabled={disabled ? true : undefined}>
+      {badged}
+    </a>
+  ) : (
+    <button
+      {...(shared as unknown as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+      type="button"
+      role={role}
+      disabled={disabled}>
+      {badged}
+    </button>
+  )
 
   return (
     <li role={wrapperRole}>
-      <button
-        {...(shared as unknown as React.ButtonHTMLAttributes<HTMLButtonElement>)}
-        type="button"
-        role={role}
-        disabled={disabled}>
-        {content}
-      </button>
+      {collapsedTip ? (
+        <Tooltip asChild content={collapsedTip} trigger="hover">
+          {control}
+        </Tooltip>
+      ) : (
+        control
+      )}
     </li>
   )
 }

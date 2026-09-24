@@ -46,14 +46,19 @@ export function lightboxShouldClose(open: boolean, length: number): boolean {
   return open && length === 0
 }
 
-export function getLightboxNavState(currentIndex: number, total: number): PreviewNavState {
+export function getLightboxNavState(
+  currentIndex: number,
+  total: number,
+  loop = false
+): PreviewNavState {
   if (total <= 0) {
     return { hasPrev: false, hasNext: false, counter: '' }
   }
   const index = clampLightboxIndex(currentIndex, total)
+  const canMove = total > 1
   return {
-    hasPrev: index > 0,
-    hasNext: index < total - 1,
+    hasPrev: loop ? canMove : index > 0,
+    hasNext: loop ? canMove : index < total - 1,
     counter: total > 1 ? `${index + 1} / ${total}` : ''
   }
 }
@@ -102,12 +107,17 @@ export function resolveLightboxSwipe(
 export function resolveLightboxNavIndex(
   current: number,
   total: number,
-  direction: LightboxSwipeDirection
+  direction: LightboxSwipeDirection,
+  loop = false
 ): number | null {
   if (total <= 1) return null
   const index = clampLightboxIndex(current, total)
-  if (direction === 'prev') return index > 0 ? index - 1 : null
-  return index < total - 1 ? index + 1 : null
+  if (direction === 'prev') {
+    if (index > 0) return index - 1
+    return loop ? total - 1 : null
+  }
+  if (index < total - 1) return index + 1
+  return loop ? 0 : null
 }
 
 export type LightboxKeyAction =

@@ -12,6 +12,11 @@ import {
   shouldCommitEditorValue,
   syncEditorTextareaValue,
   getMarkdownContainerClasses,
+  getW9DataLabels,
+  htmlToMarkdown,
+  lockedPaneScroll,
+  markdownHeadings,
+  sanitizeHtml,
   getMarkdownToolbarButtonClasses,
   isMarkdownToolbarSeparator,
   markdownEditorEmptyPreviewClasses,
@@ -96,6 +101,10 @@ export const MarkdownEditor = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleMarkdownEditor>>, default: undefined },
     className: { type: String, default: undefined },
+    bind: {
+      type: Object as PropType<{ html?: string; lockScroll?: boolean }>,
+      default: undefined
+    },
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
@@ -115,6 +124,8 @@ export const MarkdownEditor = defineComponent({
     const internalValue = ref(props.defaultValue || '')
     const internalMode = ref<MarkdownEditorMode>(props.defaultMode)
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
+    const previewRef = ref<HTMLElement | null>(null)
+    let lockingScroll = false
     const allowTabExit = ref(false)
     const pendingSelection = ref<{ start: number; end: number } | null>(null)
     const formatToolbarIndex = ref(0)
@@ -122,6 +133,17 @@ export const MarkdownEditor = defineComponent({
     const narrow = ref(false)
     const narrowPane = ref<'edit' | 'preview'>('edit')
     const previewHtml = ref('')
+
+    function syncLockedPane(source: HTMLElement, target: HTMLElement | null) {
+      if (!props.bind?.lockScroll || !target || lockingScroll) return
+      lockingScroll = true
+      target.scrollTop = lockedPaneScroll(
+        source.scrollTop,
+        Math.max(0, source.scrollHeight - source.clientHeight),
+        Math.max(0, target.scrollHeight - target.clientHeight)
+      )
+      lockingScroll = false
+    }
 
     const formValue = computed(() => formItemControl?.value.value)
     const currentValue = computed(() => {
@@ -398,6 +420,9 @@ export const MarkdownEditor = defineComponent({
             },
             onKeydown: handleKeydown,
             onBlur: () => formItemControl?.onBlur(),
+            onScroll: (event: Event) => {
+              syncLockedPane(event.currentTarget as HTMLElement, previewRef.value)
+            },
             placeholder: props.placeholder,
             readonly: props.readOnly || effectiveDisabled.value,
             disabled: effectiveDisabled.value,
@@ -419,6 +444,10 @@ export const MarkdownEditor = defineComponent({
         ? h(
             'div',
             {
+              ref: previewRef,
+              onScroll: (event: Event) => {
+                syncLockedPane(event.currentTarget as HTMLElement, textareaRef.value)
+              },
               class: classNames(
                 markdownEditorPreviewClasses,
                 currentMode.value === 'split' ? markdownEditorSplitDividerClasses : undefined,
@@ -441,6 +470,56 @@ export const MarkdownEditor = defineComponent({
           'data-mode': currentMode.value
         },
         [
+          props.bind
+            ? h(
+                'div',
+                {
+                  'data-tiger-markdown-bind': '',
+                  'data-lock-scroll': props.bind.lockScroll ? '' : undefined
+                },
+                [
+                  ...markdownHeadings(currentValue.value).map((heading) =>
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        'data-toc': heading.text,
+                        onClick: () => {
+                          const area = document.querySelector('textarea')
+                          if (area instanceof HTMLTextAreaElement) {
+                            area.focus()
+                            area.setSelectionRange(heading.index, heading.index)
+                          }
+                        }
+                      },
+                      heading.text
+                    )
+                  ),
+                  ...currentValue.value
+                    .split('\n')
+                    .filter((line) => /^- \[[ xX]\] /.test(line))
+                    .map((line, index) =>
+                      h(
+                        'span',
+                        { key: index, 'data-markdown-task': line.includes('[x]') || line.includes('[X]') ? 'done' : 'open' },
+                        line
+                      )
+                    ),
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      'data-tiger-md-paste': '',
+                      onClick: () => {
+                        const next = htmlToMarkdown(sanitizeHtml(props.bind?.html ?? ''))
+                        commitValue(`${currentValue.value}${next}`)
+                      }
+                    },
+                    getW9DataLabels().preview
+                  )
+                ]
+              )
+            : null,
           toolbarNode,
           h('div', { class: getMarkdownBodyClasses(showEditor.value && showPreview.value) }, [
             textareaNode,

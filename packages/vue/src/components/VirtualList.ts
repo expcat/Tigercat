@@ -19,6 +19,8 @@ import {
   readMarginBoxBlockSize,
   resolveScrollportViewport,
   scrollTopForVirtualAlign,
+  stickyIndexesInWindow,
+  virtualGridWindow,
   warnFixedRowOverflow,
   type VirtualScrollAlign,
   coerceClassValue,
@@ -53,6 +55,12 @@ export const VirtualList = defineComponent({
       default: undefined
     },
     ariaLabel: { type: String, default: undefined },
+    columns: { type: Number, default: 1 },
+    orientation: {
+      type: String as PropType<'vertical' | 'horizontal'>,
+      default: 'vertical'
+    },
+    stickyIndexes: { type: Array as PropType<number[]>, default: undefined },
     className: { type: String, default: undefined },
     role: { type: String, default: 'list' }
   },
@@ -225,19 +233,52 @@ export const VirtualList = defineComponent({
 
     function handleScroll() {
       if (!containerRef.value) return
-      const st = containerRef.value.scrollTop
+      const st =
+        props.orientation === 'horizontal'
+          ? containerRef.value.scrollLeft
+          : containerRef.value.scrollTop
       scrollTop.value = st
       emit('scroll', st)
     }
 
     return () => {
       const { startIndex, endIndex, totalHeight, offsetTop } = range.value
+      const columns = Math.max(1, Math.floor(props.columns ?? 1))
+      const grid = columns > 1 || props.orientation === 'horizontal'
       const currentStrategy = strategy.value
       const items: ReturnType<typeof h>[] = []
       const dynamic = canMeasure.value
       const asList = props.role === 'list'
+      const indexes = grid
+        ? stickyIndexesInWindow(
+            (() => {
+              const window = virtualGridWindow({
+                scroll: scrollTop.value,
+                viewport: viewport.value,
+                itemCount: props.itemCount,
+                itemSize: props.itemHeight ?? 40,
+                columns,
+                overscan: props.overscan
+              })
+              return {
+                start: window.start * columns,
+                end: Math.min(props.itemCount, window.end * columns),
+                offsetTop: 0,
+                totalHeight: 0
+              }
+            })(),
+            props.stickyIndexes ?? [],
+            props.itemCount
+          )
+        : props.stickyIndexes && props.stickyIndexes.length > 0
+          ? stickyIndexesInWindow(
+              { start: startIndex, end: endIndex + 1, offsetTop, totalHeight },
+              props.stickyIndexes,
+              props.itemCount
+            )
+          : Array.from({ length: Math.max(0, endIndex - startIndex + 1) }, (_, offset) => startIndex + offset)
       if (dynamic) itemEls.clear()
-      for (let i = startIndex; i <= endIndex; i++) {
+      for (const i of indexes) {
         const itemH = currentStrategy.getItemHeight(i)
         const slotContent = slots.default?.({ index: i })
         const index = i
@@ -286,6 +327,8 @@ export const VirtualList = defineComponent({
           role: props.role,
           tabindex: keyboardScroll ? 0 : undefined,
           'aria-label': namedAriaLabel,
+          'data-tiger-virtual-columns': grid ? String(columns) : undefined,
+          'data-tiger-virtual-orientation': props.orientation,
           class: classNames(
             virtualListContainerClasses,
             props.className,

@@ -10,7 +10,12 @@ import React, {
 import { useControlledState } from '../hooks/useControlledState'
 import {
   classNames,
+  applyMarkdownShortcut,
   getRichTextContainerClasses,
+  getW9DataLabels,
+  serializeRichText,
+  setRichTextImageWidth,
+  slashInsertBlock,
   getToolbarButtonClasses,
   getEditorAreaClasses,
   richTextToolbarClasses,
@@ -60,6 +65,7 @@ export interface RichTextEditorProps extends Omit<
    * must sanitise untrusted HTML themselves.
    */
   engine?: RichTextEngine
+  bind?: boolean
   ariaLabel?: string
   name?: string
   onRequestUrl?: (kind: 'link' | 'image') => string | null
@@ -85,6 +91,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       name,
       id,
       style,
+      bind = false,
       onRequestUrl,
       onFocus,
       onBlur,
@@ -298,8 +305,34 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       }
     }
 
+    const [blocks, setBlocks] = useState<ReturnType<typeof slashInsertBlock>[]>([])
     return (
       <div className={containerClasses} style={containerStyle} data-tiger-rte="" {...containerRest}>
+        {bind ? (
+          <div data-tiger-rte-bind="">
+            <button
+              type="button"
+              data-tiger-slash="table"
+              onClick={() => setBlocks((current) => [...current, slashInsertBlock('table')])}>
+              table
+            </button>
+            <button
+              type="button"
+              data-tiger-slash="image"
+              onClick={() =>
+                setBlocks((current) => [
+                  ...current,
+                  setRichTextImageWidth(slashInsertBlock('image'), 120)
+                ])
+              }>
+              image
+            </button>
+            <pre data-tiger-rte-serial="">{serializeRichText(blocks)}</pre>
+            <span data-shortcut={applyMarkdownShortcut('# Title')?.type ?? ''}>
+              {getW9DataLabels().preview}
+            </span>
+          </div>
+        ) : null}
         {toolbarItems.length > 0 && (
           <div
             className={richTextToolbarClasses}

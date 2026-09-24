@@ -43,6 +43,22 @@ export interface SelectOption {
    * Stable identity used for list keys. Falls back to index + value.
    */
   id?: string
+
+  /**
+   * Secondary line under the label.
+   */
+  description?: string
+}
+
+/**
+ * Data keys used to read options that are not already `{ label, value }`.
+ */
+export interface SelectOptionFields {
+  label?: string
+  value?: string
+  disabled?: string
+  description?: string
+  options?: string
 }
 
 /**
@@ -153,6 +169,22 @@ export interface SelectProps {
    * @since 0.5.0
    */
   maxTagCount?: number
+
+  /**
+   * Maximum number of selected values. Further picks are ignored.
+   */
+  maxCount?: number
+
+  /**
+   * Read-only: the list can open, the value cannot change, and the field still submits.
+   * @default false
+   */
+  readOnly?: boolean
+
+  /**
+   * Keys on raw option records. Omit when options are already `{ label, value }`.
+   */
+  optionFields?: SelectOptionFields
 
   /**
    * Whether to use virtual scrolling for large option lists.

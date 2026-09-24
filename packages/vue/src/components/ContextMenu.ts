@@ -37,6 +37,18 @@ import {
   CONTEXT_MENU_SUB_HIDE_DELAY_MS,
   CONTEXT_MENU_SUB_CHEVRON_PATH,
   isContextMenuKeyboardEvent,
+  resolvePopupMenuItemType,
+  popupMenuItemHref,
+  popupMenuItemCloses,
+  popupMenuItemRole,
+  popupMenuAccessibleName,
+  getPopupMenuItemClasses,
+  getPopupMenuShortcutClasses,
+  nextPopupMenuCheck,
+  navLabels,
+  createTypeaheadHighlight,
+  markTypeaheadMatch,
+  type PopupMenuItem,
   handleMenuNavigation,
   focusFirstMenuItem,
   captureActiveElement,
@@ -527,6 +539,7 @@ export const ContextMenu = defineComponent({
       type: Boolean,
       default: true
     },
+    items: { type: Array as PropType<PopupMenuItem[]>, default: undefined },
     offset: {
       type: Number,
       default: 0
@@ -548,7 +561,7 @@ export const ContextMenu = defineComponent({
       default: false
     }
   },
-  emits: ['update:open', 'open-change'],
+  emits: ['update:open', 'open-change', 'check'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
     const attrsClass = (attrsRecord as { class?: unknown }).class
@@ -642,14 +655,29 @@ export const ContextMenu = defineComponent({
       openAt(getContextMenuOpenPoint(null, triggerRef.value))
     }
 
+    const typeahead = createTypeaheadHighlight()
+    const openSubKey = ref<string | number | null>(null)
+
     const handleMenuKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
         setVisible(false)
         return
       }
-      if (floatingRef.value) {
-        handleMenuNavigation(floatingRef.value, event)
+      if (!floatingRef.value) return
+      const labels = Array.from(
+        floatingRef.value.querySelectorAll<HTMLElement>('[role^="menuitem"]')
+      ).map((node) => node.textContent ?? '')
+      const highlight = typeahead.push(event.key, labels, -1)
+      if (highlight && highlight.index >= 0) {
+        event.preventDefault()
+        const nodes = Array.from(
+          floatingRef.value.querySelectorAll<HTMLElement>('[role^="menuitem"]')
+        )
+        markTypeaheadMatch(nodes, highlight.index)
+        nodes[highlight.index]?.focus()
+        return
       }
+      handleMenuNavigation(floatingRef.value, event)
     }
 
     const handleMenuContextMenu = (event: Event) => {
@@ -695,6 +723,104 @@ export const ContextMenu = defineComponent({
       const defaultSlot = slots.default?.() ?? []
       let triggerNodes: VNode[] = []
       let menuNode: VNode | null = null
+
+      const renderPopupBranch = (entries: PopupMenuItem[]): VNode[] =>
+        entries.map((item) => {
+          const type = resolvePopupMenuItemType(item)
+          if (type === 'separator') {
+            return h('div', {
+              key: item.key,
+              role: 'separator',
+              class: 'my-1 h-px bg-[var(--tiger-border)]'
+            })
+          }
+          if (type === 'submenu') {
+            const placement = getContextMenuSubPlacement(
+              typeof document === 'undefined' ? 'ltr' : document.documentElement.dir
+            )
+            return h(
+              'div',
+              {
+                key: item.key,
+                class: 'relative',
+                onMouseenter: () => {
+                  openSubKey.value = item.key
+                },
+                onMouseleave: () => {
+                  if (openSubKey.value === item.key) openSubKey.value = null
+                }
+              },
+              [
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    role: 'menuitem',
+                    'aria-haspopup': 'menu',
+                    'aria-expanded': openSubKey.value === item.key,
+                    class: getPopupMenuItemClasses(Boolean(item.disabled), false),
+                    'data-tiger-popup-item': ''
+                  },
+                  item.label
+                ),
+                openSubKey.value === item.key
+                  ? h(
+                      'div',
+                      {
+                        role: 'menu',
+                        'data-tiger-popup-submenu': '',
+                        class: placement.endsWith('end')
+                          ? 'absolute top-0 end-full z-10 min-w-40 p-1'
+                          : 'absolute top-0 start-full z-10 min-w-40 p-1'
+                      },
+                      renderPopupBranch(item.children ?? [])
+                    )
+                  : null
+              ]
+            )
+          }
+          const href = popupMenuItemHref(item)
+          const danger = type === 'danger'
+          return h(
+            href ? 'a' : 'button',
+            {
+              key: item.key,
+              type: href ? undefined : 'button',
+              href,
+              role: popupMenuItemRole(type),
+              'aria-checked':
+                type === 'checkbox' || type === 'radio' ? Boolean(item.checked) : undefined,
+              'aria-label': danger ? popupMenuAccessibleName(item) : undefined,
+              disabled: href ? undefined : item.disabled,
+              class: getPopupMenuItemClasses(Boolean(item.disabled), danger),
+              'data-tiger-popup-item': '',
+              onClick: (event: MouseEvent) => {
+                if (item.disabled) {
+                  event.preventDefault()
+                  return
+                }
+                if (type === 'checkbox' || type === 'radio') {
+                  event.preventDefault()
+                  const change = nextPopupMenuCheck(entries, item.key)
+                  if (change) emit('check', change)
+                  return
+                }
+                if (popupMenuItemCloses(type)) handleItemClick()
+              }
+            },
+            [
+              item.label,
+              item.shortcut
+                ? h('span', { class: getPopupMenuShortcutClasses() }, item.shortcut)
+                : null,
+              danger ? h('span', { class: 'sr-only' }, `, ${navLabels.dangerItem}`) : null
+            ]
+          )
+        })
+
+      if (props.items && props.items.length > 0 && !menuNode) {
+        menuNode = h(ContextMenuMenu, {}, () => renderPopupBranch(props.items ?? []))
+      }
 
       defaultSlot.forEach((node: VNode) => {
         if (node.type === ContextMenuMenu) {

@@ -16,6 +16,7 @@ import {
   progressTextBaseClasses,
   progressTextSizeClasses,
   progressTrackBgClasses,
+  progressStepFilled,
   resolveProgressView,
   type ProgressProps,
   type ProgressSize,
@@ -63,7 +64,9 @@ export const Progress = defineComponent({
     width: { type: [String, Number], default: 'auto' },
     height: { type: Number, default: undefined },
     className: { type: String, default: undefined },
-    style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
+    style: { type: Object as PropType<Record<string, string | number>>, default: undefined },
+    indeterminate: { type: Boolean, default: false },
+    steps: { type: Number, default: undefined }
   },
   setup(props, { attrs }) {
     const config = useTigerConfig()
@@ -82,7 +85,10 @@ export const Progress = defineComponent({
         stripedAnimation: props.stripedAnimation,
         ariaLabel,
         ariaLabelledby: ariaLabelledby as string | undefined,
-        widgetName: getProgressLabels(config.value.locale).ariaLabel
+        widgetName: getProgressLabels(config.value.locale).ariaLabel,
+        indeterminate: props.indeterminate,
+        steps: props.steps,
+        locales: config.value.locale?.locale
       })
     })
 
@@ -135,12 +141,33 @@ export const Progress = defineComponent({
               ),
               style: { flex: 1, ...(props.height ? { height: `${props.height}px` } : {}) }
             },
-            [
-              h('div', {
-                class: getProgressFillClasses(view.value),
-                style: { width: `${view.value.percentage}%` }
-              })
-            ]
+            view.value.steps > 1
+              ? progressStepFilled(view.value.steps, view.value.percentage).map((filled, index) =>
+                  h('div', {
+                    key: index,
+                    class: classNames(
+                      getProgressFillClasses(view.value),
+                      'inline-block h-full'
+                    ),
+                    style: {
+                      width: `${100 / view.value.steps}%`,
+                      opacity: filled ? 1 : 0.25
+                    },
+                    'data-tiger-progress-step': filled ? 'on' : 'off'
+                  })
+                )
+              : [
+                  h('div', {
+                    class: classNames(
+                      getProgressFillClasses(view.value),
+                      view.value.indeterminate && 'tiger-progress-indeterminate'
+                    ),
+                    style: view.value.indeterminate
+                      ? undefined
+                      : { width: `${view.value.percentage}%` },
+                    'data-tiger-progress-success': view.value.successMark ? '' : undefined
+                  })
+                ]
           ),
           view.value.shouldShowText
             ? h(

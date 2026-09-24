@@ -1,0 +1,12 @@
+{
+  "id": "select-05",
+  "title": "多选全选与摘要",
+  "description": "全选当前过滤结果，最多两项，剩余标签显示名字。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 320,
+    "maxHeight": 720
+  }
+}

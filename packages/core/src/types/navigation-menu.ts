@@ -20,6 +20,16 @@ export interface NavigationMenuProps {
    */
   value?: NavigationMenuValue | null
   /**
+   * Current page. The indicator follows this value on the logical axis.
+   */
+  current?: NavigationMenuValue | null
+  /**
+   * Several triggers share one viewport. Switching replaces the content.
+   * `mega` panels stay their own disclosure.
+   * @default false
+   */
+  viewport?: boolean
+  /**
    * Default open item key (uncontrolled mode)
    */
   defaultValue?: NavigationMenuValue | null

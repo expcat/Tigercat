@@ -66,7 +66,7 @@ export interface InputProps {
    * Whether the input is readonly
    * @default false
    */
-  readonly?: boolean
+  readOnly?: boolean
 
   /**
    * Whether the input is required

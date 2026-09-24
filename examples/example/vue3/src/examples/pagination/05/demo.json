@@ -1,0 +1,7 @@
+{
+  "id": "pagination-05",
+  "title": "省略号跳页",
+  "description": "省略号打开页码入口，夹取规则与快速跳转相同。",
+  "entry": "App.vue",
+  "order": 5
+}

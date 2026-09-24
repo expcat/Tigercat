@@ -4,6 +4,7 @@ import {
   coerceClassValue,
   mergeStyleValues,
   getSpaceClasses,
+  getSpaceGapStyle,
   getSpaceStyle,
   type SpaceProps,
   type SpaceSize
@@ -31,6 +32,14 @@ export const Space = defineComponent({
       type: Boolean,
       default: false
     },
+    verticalSize: {
+      type: Number,
+      default: undefined
+    },
+    split: {
+      type: Boolean,
+      default: false
+    },
     className: {
       type: String,
       default: undefined
@@ -42,10 +51,32 @@ export const Space = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const classes = computed(() => getSpaceClasses(props))
-    const gapStyle = computed(() => getSpaceStyle(props.size))
+    const gapStyle = computed(() => {
+      if (props.verticalSize != null) {
+        return getSpaceGapStyle(typeof props.size === 'number' ? props.size : 0, props.verticalSize)
+      }
+      return getSpaceStyle(props.size)
+    })
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
+      const kids = slots.default?.() ?? []
+      const flat = kids.flatMap((node) => (Array.isArray(node) ? node : [node]))
+      const content =
+        props.split && flat.length > 1
+          ? flat.flatMap((node, index) =>
+              index === 0
+                ? [node]
+                : [
+                    h(
+                      'span',
+                      { 'data-tiger-space-split': '', 'aria-hidden': 'true' },
+                      slots.split ? slots.split() : '|'
+                    ),
+                    node
+                  ]
+            )
+          : kids
       return h(
         'div',
         {
@@ -54,7 +85,7 @@ export const Space = defineComponent({
           style: mergeStyleValues(gapStyle.value, attrsRecord.style, props.style),
           'data-tiger-space': ''
         },
-        slots.default?.()
+        content
       )
     }
   }

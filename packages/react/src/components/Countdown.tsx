@@ -9,6 +9,7 @@ import {
   countdownValueWrapperClasses,
   createCountdownPayload,
   formatCountdown,
+  countdownRemainingRatio,
   getCountdownRemaining,
   manageLiveRegion,
   parseCountdownTimestamp,
@@ -58,6 +59,8 @@ export const Countdown: React.FC<CountdownProps> = ({
   ...rest
 }) => {
   const [remaining, setRemaining] = useState(() => initialRemaining(value, now))
+  const [total, setTotal] = useState(() => Math.max(initialRemaining(value, now), 0))
+  const seenTarget = useRef(parseCountdownTimestamp(value))
   const finishedRef = useRef(remaining <= 0)
   const onChangeRef = useRef(onChange)
   const onFinishRef = useRef(onFinish)
@@ -73,6 +76,11 @@ export const Countdown: React.FC<CountdownProps> = ({
     const nextRemaining =
       now === undefined ? getCountdownRemaining(value) : getCountdownRemaining(value, now)
     setRemaining(nextRemaining)
+    const nextTarget = parseCountdownTimestamp(value)
+    if (nextTarget !== seenTarget.current) {
+      seenTarget.current = nextTarget
+      setTotal(Math.max(nextRemaining, 0))
+    }
     finishedRef.current = nextRemaining <= 0
   }, [value, now])
 
@@ -133,7 +141,8 @@ export const Countdown: React.FC<CountdownProps> = ({
       {...rest}
       className={classNames(countdownBaseClasses, className)}
       role={ariaLabel ? 'group' : rest.role}
-      aria-label={ariaLabel}>
+      aria-label={ariaLabel}
+      data-remaining-ratio={String(countdownRemainingRatio(remaining, total))}>
       {title ? (
         <div id={titleId} className={getCountdownTitleClasses(size)}>
           {title}

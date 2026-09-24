@@ -2,6 +2,7 @@ import { defineComponent, h, PropType, computed, provide } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  feedbackLayoutLabels,
   getLayoutSidebarClasses,
   getSidebarAriaLabel,
   getSidebarStyle,
@@ -44,6 +45,10 @@ export const Sidebar = defineComponent({
       type: Boolean as PropType<boolean>,
       default: false
     },
+    collapsible: {
+      type: Boolean as PropType<boolean>,
+      default: false
+    },
     side: {
       type: String as PropType<LayoutSiderSide>,
       default: 'start'
@@ -57,7 +62,8 @@ export const Sidebar = defineComponent({
       default: undefined
     }
   },
-  setup(props, { slots, attrs }) {
+  emits: ['update:collapsed'],
+  setup(props, { slots, attrs, emit }) {
     const config = useTigerConfig()
     const fallbackName = computed(() => getSidebarAriaLabel(config.value.locale))
     const collapsedRef = computed(() => props.collapsed)
@@ -97,18 +103,37 @@ export const Sidebar = defineComponent({
               fallback: props.landmark === 'default' ? fallbackName.value : ''
             })
 
-      return h(
+      const aside = h(
         props.landmark === 'plain' ? 'div' : 'aside',
         {
           ...restAttrs,
           class: sidebarClasses.value,
           style: mergeStyleValues(props.style, sidebarStyle.value),
           inert: fullyHidden.value ? true : undefined,
+          tabindex: fullyHidden.value ? -1 : undefined,
           'aria-hidden': fullyHidden.value ? true : undefined,
           ...aria
         },
         slots.default?.()
       )
+      if (!props.collapsible) return aside
+      const triggerLabel = props.collapsed
+        ? feedbackLayoutLabels.sidebarExpand
+        : feedbackLayoutLabels.sidebarCollapse
+      return h('div', { class: 'contents', 'data-tiger-sidebar-shell': '' }, [
+        aside,
+        h(
+          'button',
+          {
+            type: 'button',
+            'data-tiger-sidebar-trigger': '',
+            'aria-expanded': props.collapsed ? 'false' : 'true',
+            'aria-label': triggerLabel,
+            onClick: () => emit('update:collapsed', !props.collapsed)
+          },
+          triggerLabel
+        )
+      ])
     }
   }
 })

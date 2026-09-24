@@ -15,6 +15,9 @@ import {
   createFormErrorMap,
   commitFocusedFormControl,
   focusFirstInvalidField,
+  focusFormField,
+  formErrorSummary,
+  getW9FormLabels,
   formValuesEqual,
   isFormValidationSuperseded,
   mergeTigerLocale,
@@ -120,6 +123,7 @@ function FormInner<T extends FormValues>(
     fieldDependencies,
     conditions,
     validateDebounce = 0,
+    showErrorSummary = false,
     undoable = false,
     maxHistorySize = 50,
     locale,
@@ -253,6 +257,8 @@ function FormInner<T extends FormValues>(
       setInitialValues: (values) => engine.setInitialValues(values),
       addField: (fieldName, defaultValue) => engine.addField(fieldName, defaultValue),
       removeField: (fieldName) => engine.removeField(fieldName),
+      insertFieldArrayItem: (path, index, item) => engine.insertFieldArrayItem(path, index, item),
+      removeFieldArrayItem: (path, index) => engine.removeFieldArrayItem(path, index),
       undo: () => engine.undo(),
       redo: () => engine.redo(),
       snapshotHistory: () => engine.snapshotHistory(),
@@ -344,6 +350,22 @@ function FormInner<T extends FormValues>(
         aria-busy={loading || undefined}
         onSubmit={handleSubmit}
         onReset={handleReset}>
+        {showErrorSummary && errors.length > 0 ? (
+          <ul
+            className="tiger-form__error-summary mb-3 list-disc ps-5 text-sm text-[var(--tiger-error)]"
+            aria-label={getW9FormLabels(mergeTigerLocale(config.locale, locale).locale).errorSummary}>
+            {formErrorSummary(errors).map((item) => (
+              <li key={item.field}>
+                <button
+                  type="button"
+                  className="underline"
+                  onClick={() => focusFormField(formElementRef.current, item.field)}>
+                  {item.message}
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
         {children}
       </form>
     </FormContext.Provider>

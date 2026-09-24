@@ -15,7 +15,7 @@ export interface ContainerProps extends CoreContainerProps, React.HTMLAttributes
 
 export const Container = forwardRef<HTMLElement, ContainerProps>(function Container(
   {
-    maxWidth = false,
+    maxWidth = 'lg',
     center = true,
     padding = true,
     children,

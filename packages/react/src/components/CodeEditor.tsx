@@ -20,6 +20,13 @@ import {
   codeEditorScrollerClasses,
   getCodeEditorWrapClass,
   resolveCodeEditorTheme,
+  codeEditorLineWindow,
+  findCodeMatches,
+  getW9DataLabels,
+  matchBrackets,
+  registerCodeEditorLanguage,
+  registeredCodeEditorLanguage,
+  replaceCodeMatches,
   scrollCodeEditorCaretIntoView,
   shouldCommitEditorValue,
   syncEditorTextareaValue,
@@ -43,6 +50,16 @@ export interface CodeEditorProps extends Omit<CoreCodeEditorProps, 'style'> {
   highlighter?: CodeHighlighter
   name?: string
   id?: string
+  bind?: {
+    query?: string
+    replacement?: string
+    caret?: number
+    scrollTop?: number
+    viewportHeight?: number
+    lineHeight?: number
+    lineCount?: number
+    language?: { id: string; keywords?: string[] }
+  }
 }
 
 export interface CodeEditorHandle {
@@ -74,6 +91,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
     ariaLabel,
     name,
     id,
+    bind,
     ...restProps
   },
   ref
@@ -268,6 +286,49 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
       data-language={language}
       data-theme={resolvedTheme}
       {...extraContainer}>
+      {bind ? (
+        <div data-tiger-code-bind="">
+          {findCodeMatches(code, bind.query ?? '').map((match, index) => (
+            <span key={index} data-code-match={String(match.index)} />
+          ))}
+          <button
+            type="button"
+            data-tiger-replace=""
+            onClick={() => {
+              setCode(
+                replaceCodeMatches(code, bind.query ?? '', bind.replacement ?? '', true)
+              )
+            }}>
+            {getW9DataLabels().replaceAll}
+          </button>
+          <span
+            data-bracket={(() => {
+              const pair = matchBrackets(code, bind.caret ?? 0)
+              return pair ? `${pair.open}-${pair.close}` : ''
+            })()}
+          />
+          <span
+            data-line-window={(() => {
+              if (bind.language) {
+                registerCodeEditorLanguage({
+                  id: bind.language.id,
+                  keywords: bind.language.keywords
+                })
+              }
+              const window = codeEditorLineWindow({
+                scrollTop: bind.scrollTop ?? 0,
+                viewportHeight: bind.viewportHeight ?? 0,
+                lineHeight: bind.lineHeight ?? 20,
+                lineCount: bind.lineCount ?? 0
+              })
+              const registered = bind.language
+                ? registeredCodeEditorLanguage(bind.language.id)?.id
+                : ''
+              return `${window.start}-${window.end}:${registered ?? ''}`
+            })()}
+          />
+        </div>
+      ) : null}
       <div
         ref={scrollerRef}
         className={codeEditorScrollerClasses}

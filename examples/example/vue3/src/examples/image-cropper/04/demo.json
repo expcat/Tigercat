@@ -1,0 +1,8 @@
+{
+  "id": "image-cropper-04",
+  "title": "比例、旋转与圆形",
+  "description": "1:1、4:3、16:9 和自由比例。旋转会交换宽高。圆形遮罩不放大输出边。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 360, "maxHeight": 520 }
+}

@@ -2,11 +2,15 @@ import { defineComponent, h, inject, onBeforeUnmount, shallowRef, type Injection
 import {
   activateFeedbackScope,
   createFeedbackScope,
+  dismissConfirmModal,
   isBrowser,
+  settleConfirmModalOk,
+  type ImperativeModalRecord,
   type MessagePosition,
   type NotificationPosition
 } from '@expcat/tigercat-core'
 import { MessageContainer } from './MessageContainer'
+import { Modal } from './Modal'
 import { NotificationContainer } from './NotificationContainer'
 
 const MESSAGE_POSITIONS: MessagePosition[] = [
@@ -27,6 +31,41 @@ const NOTIFICATION_POSITIONS: NotificationPosition[] = [
 
 export const FeedbackDepthKey: InjectionKey<number> = Symbol('TigerFeedbackDepth')
 
+function renderImperativeModal(
+  modal: ImperativeModalRecord,
+  scope: ReturnType<typeof createFeedbackScope>
+) {
+  return h(
+    Modal,
+    {
+      key: modal.id,
+      open: true,
+      title: modal.title,
+      showDefaultFooter: true,
+      showCancel: modal.showCancel,
+      okText: modal.okText,
+      cancelText: modal.cancelText,
+      'data-tiger-confirm-kind': modal.kind,
+      onOk: (event: unknown) => {
+        const result = modal.onOk?.(event as never)
+        modal.okResult = result
+        return result
+      },
+      onCancel: () => {
+        modal.cancelled = true
+      },
+      onClose: () => {
+        if (modal.cancelled) dismissConfirmModal(modal)
+        else settleConfirmModalOk(modal, modal.okResult)
+        scope.modals.remove(modal.id)
+      }
+    },
+    {
+      default: () => modal.content
+    }
+  )
+}
+
 /** Renders the active ConfigProvider's message and notification queues. */
 export const FeedbackHost = defineComponent({
   name: 'TigerFeedbackHost',
@@ -36,16 +75,21 @@ export const FeedbackHost = defineComponent({
     const deactivate = isBrowser() ? activateFeedbackScope(document, scope) : undefined
     const messages = shallowRef(scope.messages.getSnapshot())
     const notifications = shallowRef(scope.notifications.getSnapshot())
+    const modals = shallowRef(scope.modals.getSnapshot())
     const stopMessages = scope.messages.subscribe(() => {
       messages.value = scope.messages.getSnapshot()
     })
     const stopNotifications = scope.notifications.subscribe(() => {
       notifications.value = scope.notifications.getSnapshot()
     })
+    const stopModals = scope.modals.subscribe(() => {
+      modals.value = scope.modals.getSnapshot()
+    })
     onBeforeUnmount(() => {
       deactivate?.()
       stopMessages()
       stopNotifications()
+      stopModals()
     })
 
     return () => {
@@ -79,6 +123,9 @@ export const FeedbackHost = defineComponent({
             onResume: (id: string | number) => scope.notifications.resume(id)
           })
         )
+      }
+      for (const modal of modals.value) {
+        nodes.push(renderImperativeModal(modal, scope))
       }
       return h(
         'div',

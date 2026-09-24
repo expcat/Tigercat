@@ -42,7 +42,7 @@ This category is split by component so each file stays within the line budget.
 
 ## Form
 
-`packages/core/src/types/form.ts` · `FormProps` · 4/19 props
+`packages/core/src/types/form.ts` · `FormProps` · 4/20 props
 
 Note: 值对象是 Vue `modelValue`（`v-model`）/ React `value`。父级要把 `update:modelValue` 写回自己的模型。`required` 会参与校验。一次 `validate()` 作废仍在飞的上一次。失败提交聚焦第一个可聚焦的无效控件。Wizard 步下标走 `onStepChange`。Form `size` 是 `sm|md|lg`。
 

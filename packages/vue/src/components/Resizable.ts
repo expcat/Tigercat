@@ -6,7 +6,10 @@ import {
   coerceClassValue,
   createDocumentDragSession,
   defaultResizeHandles,
+  feedbackLayoutLabels,
   formatResizableHandleLabel,
+  formatResizableLiveText,
+  resolveResizableAspectRatio,
   getResizableHandleClasses,
   getResizableLabels,
   getResizeHandleOrientation,
@@ -35,7 +38,7 @@ export interface VueResizableProps {
   handles?: ResizeHandlePosition[]
   axis?: ResizeAxis
   disabled?: boolean
-  lockAspectRatio?: boolean
+  lockAspectRatio?: boolean | string
   className?: string
   style?: Record<string, string | number>
 }
@@ -61,7 +64,7 @@ export const Resizable = defineComponent({
       default: 'both' as ResizeAxis
     },
     disabled: { type: Boolean, default: false },
-    lockAspectRatio: { type: Boolean, default: false },
+    lockAspectRatio: { type: [Boolean, String] as PropType<boolean | string>, default: false },
     className: { type: String, default: undefined },
     style: {
       type: Object as PropType<Record<string, string | number>>,
@@ -145,7 +148,12 @@ export const Resizable = defineComponent({
 
     const resizeOptions = () => ({
       rtl: rtl.value,
-      lockAspectRatio: props.lockAspectRatio,
+      lockAspectRatio: props.lockAspectRatio === true || typeof props.lockAspectRatio === 'string',
+      aspectRatio: resolveResizableAspectRatio(
+        props.lockAspectRatio,
+        startWidth.value,
+        startHeight.value
+      ),
       minWidth: props.minWidth,
       minHeight: props.minHeight,
       maxWidth: props.maxWidth,
@@ -291,7 +299,21 @@ export const Resizable = defineComponent({
           style: mergeStyleValues(attrs.style, props.style, boxStyle),
           'data-resizable': ''
         },
-        [...(slots.default?.() || []), ...handleNodes]
+        [
+          ...(slots.default?.() || []),
+          draggingHandle.value
+            ? h(
+                'span',
+                { 'aria-live': 'polite', 'data-tiger-resizable-live': '' },
+                formatResizableLiveText(
+                  width.value ?? 0,
+                  height.value ?? 0,
+                  feedbackLayoutLabels.resizableLive
+                )
+              )
+            : null,
+          ...handleNodes
+        ]
       )
     }
   }

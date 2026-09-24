@@ -18,6 +18,9 @@ import {
   getPageRange,
   validateCurrentPage,
   getPageNumbers,
+  paginationEllipsisPages,
+  clampPaginationJump,
+  navLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
   normalizePaginationTotal,
@@ -223,6 +226,8 @@ export const Pagination = defineComponent({
      * Whether to show less items (affects page number range)
      * @default false
      */
+    ellipsisJump: { type: Boolean, default: false },
+    itemRender: { type: Function as PropType<(page: number, kind: string) => VNodeChild>, default: undefined },
     showLessItems: {
       type: Boolean,
       default: false
@@ -518,10 +523,43 @@ export const Pagination = defineComponent({
           h('span', { class: classNames('mx-2', getSizeTextClasses(size)) }, indicatorText)
         )
       } else {
-        getPageNumbers(page, pages, props.showLessItems).forEach((pageNum) => {
+        getPageNumbers(page, pages, props.showLessItems).forEach((pageNum, tokenIndex, tokens) => {
           if (pageNum === '...') {
+            const hidden = paginationEllipsisPages(tokens, tokenIndex, pages)
             elements.push(
-              h('span', { class: getPaginationEllipsisClasses(size), 'aria-hidden': 'true' }, '...')
+              props.ellipsisJump
+                ? h('span', { class: 'inline-flex items-center' }, [
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: getPaginationEllipsisClasses(size),
+                        'aria-label': navLabels.paginationJump,
+                        onClick: (event: MouseEvent) => {
+                          const input = (event.currentTarget as HTMLElement).parentElement?.querySelector(
+                            'input'
+                          )
+                          input?.focus()
+                        }
+                      },
+                      '...'
+                    ),
+                    h('input', {
+                      type: 'number',
+                      class: 'w-12',
+                      'aria-label': navLabels.paginationJump,
+                      onKeydown: (event: KeyboardEvent) => {
+                        if (event.key !== 'Enter') return
+                        const next = clampPaginationJump(
+                          (event.currentTarget as HTMLInputElement).value,
+                          pages
+                        )
+                        if (next != null) handlePageChange(next)
+                      }
+                    }),
+                    h('span', { class: 'sr-only' }, hidden.join(','))
+                  ])
+                : h('span', { class: getPaginationEllipsisClasses(size), 'aria-hidden': 'true' }, '...')
             )
           } else {
             const isActive = pageNum === page
@@ -536,7 +574,7 @@ export const Pagination = defineComponent({
                   'aria-current': isActive ? 'page' : undefined,
                   'aria-label': labels.value.pageAriaLabel.replace('{page}', String(pageNum))
                 },
-                String(pageNum)
+                props.itemRender ? props.itemRender(pageNum, 'page') : String(pageNum)
               )
             )
           }

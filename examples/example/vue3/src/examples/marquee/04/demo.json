@@ -1,0 +1,8 @@
+{
+  "id": "marquee-04",
+  "title": "边缘渐隐",
+  "description": "渐隐层 pointer-events 为 none。不传名字时不是地标。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 200 }
+}

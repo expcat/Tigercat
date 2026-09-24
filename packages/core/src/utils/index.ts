@@ -43,6 +43,9 @@ export * from './tree-controller'
 export * from './menu-schema-utils'
 export * from './menu-controller'
 export * from './pagination-utils'
+export * from './popup-menu-utils'
+export * from './typeahead-highlight'
+export * from './section-scroll-utils'
 export * from './navigation-menu-controller'
 export * from './container-utils'
 export * from './layout-grid-styles'
@@ -77,7 +80,6 @@ export {
   toActivityTimelineItems
 } from './activity-feed-utils'
 export type { ActivityTimelineItem } from './activity-feed-utils'
-
 
 // NotificationCenter utilities
 export {
@@ -193,12 +195,13 @@ export * from './table-filter-utils'
 export * from './table-group-utils'
 export * from './table-resize-utils'
 
-
 // Form v0.6.0 upgrades
 export * from './form-dependency-utils'
 export * from './form-history-utils'
 export * from './form-control-utils'
 export * from './form-controller'
+export * from './i18n/w9/form-labels'
+export * from './w9-form-enhancements'
 export * from './form-item-value'
 export * from './upload-queue-utils'
 export * from './upload-controller'
@@ -303,6 +306,44 @@ export { createRenderOutlet } from './overlay-outlet'
 export type { RenderOutlet, RenderOutletItem } from './overlay-outlet'
 
 export { createDismissActionEvent, settleDismissAction } from './confirm-action'
+
+export {
+  deriveAccentScale,
+  accentScaleCssVars,
+  ACCENT_STEP_COUNT,
+  NEUTRAL_STEP_COUNT,
+  SHADOW_STEP_COUNT
+} from './accent-scale'
+export type { AccentScale, AccentScaleOptions, RadiusScale } from './accent-scale'
+export {
+  relativeLuminance,
+  contrastRatio,
+  assertContrast,
+  deriveInteractionStates,
+  TEXT_CONTRAST_MIN,
+  BOUNDARY_CONTRAST_MIN,
+  ContrastError
+} from './contrast'
+export { colorSchemeInitScript } from './color-scheme-script'
+export type { ColorSchemeInitOptions } from './color-scheme-script'
+export { partAttrs, stateAttrs, COMPONENT_PARTS } from './part-state'
+export type { PartAttrMap, StateAttrMap, ComponentPartName } from './part-state'
+export { createRovingFocus } from './roving-focus'
+export type { RovingFocus, RovingFocusOptions, RovingItem, RovingOrientation } from './roving-focus'
+export { createDismissLayer } from './dismiss-layer'
+export type { DismissLayer, DismissLayerOptions } from './dismiss-layer'
+export {
+  containerBreakpointCss,
+  tigerContainer,
+  CONTAINER_BREAKPOINT_NAMES
+} from './container-breakpoints'
+export type { ContainerBreakpointName } from './container-breakpoints'
+export { chartStatusChannel, STATUS_CHANNELS, CHART_PALETTE_COUNT } from './status-channel'
+export type { StatusChannel } from './status-channel'
+export { createExportStream, printExchangeTokens } from './data-export-exchange'
+export type { ExportStreamOptions, PrintExchangeTokens } from './data-export-exchange'
+export { toggleInplace } from './inplace-utils'
+export type { InplaceState, InplaceAction, InplaceActionType } from './inplace-utils'
 export type { DismissActionEvent } from './confirm-action'
 
 export {
@@ -311,8 +352,22 @@ export {
   clearMessages,
   clearNotifications,
   createFeedbackScope,
+  createModalQueue,
+  destroyAllConfirmModals,
+  dismissConfirmModal,
+  enqueueConfirmModal,
   enqueueMessage,
   enqueueNotification,
-  getActiveFeedbackScope
+  getActiveFeedbackScope,
+  settleConfirmModalOk,
+  settleMessage
 } from './feedback-scope'
-export type { FeedbackScope, MessageQueueItem } from './feedback-scope'
+export type {
+  ConfirmModalInput,
+  ConfirmModalKind,
+  FeedbackScope,
+  ImperativeModalRecord,
+  MessagePromisePhases,
+  MessageQueueItem,
+  ModalQueue
+} from './feedback-scope'

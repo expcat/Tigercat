@@ -3,7 +3,9 @@
  */
 import type { TigerLocale } from './locale'
 
-export type QRCodeStatus = 'active' | 'expired' | 'loading'
+export type QRCodeStatus = 'active' | 'expired' | 'loading' | 'scanned'
+
+export type QRCodeErrorLevel = 'L' | 'M' | 'Q' | 'H'
 
 /**
  * Shared QRCode props (framework-agnostic).
@@ -28,9 +30,22 @@ export interface QRCodeProps {
   bgColor?: string
   /**
    * Overlay status. `expired` shows a refresh control when a handler is passed.
+   * `scanned` names the code as already scanned.
    * @default 'active'
    */
   status?: QRCodeStatus
+
+  /**
+   * Reed–Solomon level passed to the existing encoder.
+   * @default 'M'
+   */
+  errorLevel?: QRCodeErrorLevel
+
+  /**
+   * Center icon as SVG path data. A framework slot/node paints a component instead.
+   * The matrix itself is not cleared.
+   */
+  icon?: string
   /**
    * Locale override merged on top of ConfigProvider locale.
    */

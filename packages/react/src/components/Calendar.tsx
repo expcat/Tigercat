@@ -1,12 +1,11 @@
 import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { classNames } from '@expcat/tigercat-core'
+import { calendarWeekNumber, classNames, getW9DataLabels } from '@expcat/tigercat-core'
 import type { CalendarMode, CalendarProps as CoreCalendarProps } from '@expcat/tigercat-core'
 import {
   appendCalendarEventCountLabel,
   buildCalendarDateCellExtra,
   calendarDateCellDotClasses,
   calendarDateCellExtraClasses,
-  calendarGridClasses,
   calendarHeaderClasses,
   calendarNavButtonClasses,
   calendarTitleClasses,
@@ -41,7 +40,7 @@ import {
   resolveCalendarRovingMonth,
   selectCalendarDay,
   selectCalendarMonth,
-  shiftCalendarMonth,
+  shiftCalendarPanel,
   shiftCalendarYear,
   toCalendarDate,
   toIsoDate
@@ -331,7 +330,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
           className={calendarNavButtonClasses}
           aria-label={prevLabel}
           onClick={() =>
-            navigate(mode === 'month' ? shiftCalendarMonth(view, -1) : shiftCalendarYear(view, -1))
+            navigate(mode === 'month' ? shiftCalendarPanel(view, -1) : shiftCalendarYear(view, -1))
           }>
           {prevChar}
         </button>
@@ -352,7 +351,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
           className={calendarNavButtonClasses}
           aria-label={nextLabel}
           onClick={() =>
-            navigate(mode === 'month' ? shiftCalendarMonth(view, 1) : shiftCalendarYear(view, 1))
+            navigate(mode === 'month' ? shiftCalendarPanel(view, 1) : shiftCalendarYear(view, 1))
           }>
           {nextChar}
         </button>
@@ -397,11 +396,14 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
         <div
           role="grid"
           aria-rowcount={7}
-          aria-colcount={7}
+          aria-colcount={8}
           aria-labelledby={titleId}
           ref={dayGridRef}
           onKeyDown={handleDayGridKeyDown}>
-          <div className={calendarGridClasses} role="row">
+          <div className="grid grid-cols-8" role="row">
+            <div className={calendarWeekdayClasses} role="columnheader">
+              {getW9DataLabels().weekNumber}
+            </div>
             {weekdayNames.map((wd) => (
               <div key={wd} className={calendarWeekdayClasses} role="columnheader">
                 {wd}
@@ -409,7 +411,10 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
             ))}
           </div>
           {weeks.map((week, wi) => (
-            <div key={wi} className={calendarGridClasses} role="row">
+            <div key={wi} className="grid grid-cols-8" role="row">
+              <div className={calendarWeekdayClasses} data-week-number="">
+                {calendarWeekNumber(week[0], weekStartsOn)}
+              </div>
               {week.map((date) => {
                 const iso = toIsoDate(date)
                 const isCurrentMonth = date.getMonth() === view.viewMonth

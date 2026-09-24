@@ -36,6 +36,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       paused: pausedProp,
       gap,
       repeat,
+      edgeFade = false,
       ariaLabel,
       locale: _locale,
       labels: labelsOverride,
@@ -134,6 +135,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
           pauseOnFocus: resolvedPauseOnFocus,
           paused: pausedProp,
           repeat: copies,
+          edgeFade,
           className
         })}
         style={style}

@@ -65,6 +65,12 @@ Vue: `<ConfigProvider />`
 
 React: `<ConfigProvider />`
 
+## CopyButton
+
+Vue: `<CopyButton :text="text" />`
+
+React: `<CopyButton text={text} />`
+
 ## CropUpload
 
 Note: FormItem 写入的是裁切后的 `File`，不是媒体 id。需要上传后的 id 时由宿主替换（Users 页模式）。
@@ -88,6 +94,12 @@ Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `
 Vue: `<Empty />`
 
 React: `<Empty />`
+
+## Gallery
+
+Vue: `<Gallery :items="items" />`
+
+React: `<Gallery items={items} />`
 
 ## Highlight
 
@@ -144,6 +156,12 @@ Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（
 Vue: `<ImagePreview :images="images" />`
 
 React: `<ImagePreview images={images} />`
+
+## Inplace
+
+Vue: `<Inplace />`
+
+React: `<Inplace />`
 
 ## Kbd
 

@@ -1,0 +1,8 @@
+{
+  "id": "code-04",
+  "title": "行号、语言与换行",
+  "description": "可选行号和语言标签。换行开关不改变复制的原始字符串。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 360 }
+}

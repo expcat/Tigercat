@@ -131,4 +131,11 @@ export interface DrawerProps {
    * Custom inline style for the drawer panel.
    */
   panelStyle?: Record<string, string | number>
+
+  /**
+   * Drag the inner edge to change width (or height for top/bottom).
+   * No transition while the pointer is down.
+   * @default false
+   */
+  resizable?: boolean
 }

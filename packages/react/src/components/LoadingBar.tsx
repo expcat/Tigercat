@@ -76,6 +76,7 @@ function LoadingBarHost() {
       className={state.className}
       style={state.style}
       ariaLabel={state.ariaLabel}
+      minimumDisplayMs={state.minimumDisplayMs}
       notice={notice}
       noticeToken={state.noticeToken}
     />

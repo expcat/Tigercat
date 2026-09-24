@@ -77,12 +77,18 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         <div className={classNames(notificationTitleClasses, colorScheme.titleText)}>
           {notification.title}
         </div>
-        {notification.description && (
+        {typeof notification.description === 'string' && notification.description ? (
           <div className={classNames(notificationDescriptionClasses, colorScheme.descriptionText)}>
             {notification.description}
           </div>
-        )}
-        {(notification.onClick || (notification.actions && notification.actions.length > 0)) && (
+        ) : notification.descriptionNode ? (
+          <div className={classNames(notificationDescriptionClasses, colorScheme.descriptionText)}>
+            {notification.descriptionNode as React.ReactNode}
+          </div>
+        ) : null}
+        {(notification.onClick ||
+          (notification.actions && notification.actions.length > 0) ||
+          notification.actionNode) && (
           <div className={notificationActionsClasses}>
             {notification.onClick ? (
               <button
@@ -115,6 +121,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                 {action.label}
               </button>
             ))}
+            {notification.actionNode ? (notification.actionNode as React.ReactNode) : null}
           </div>
         )}
       </div>

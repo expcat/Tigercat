@@ -1,0 +1,12 @@
+{
+  "id": "modal-05",
+  "title": "命令式确认",
+  "description": "confirmModal 挂在当前 ConfigProvider 上。确定走原来的 OK Promise。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 280,
+    "maxHeight": 720
+  }
+}

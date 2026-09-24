@@ -49,7 +49,9 @@ import {
   parseOptionalInt,
   seedCronFieldDrafts,
   updateCronExpressionField,
-  validateCronExpressionWithLabels
+  validateCronExpressionWithLabels,
+  describeCronExpression,
+  nextCronRun
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
@@ -471,7 +473,18 @@ export const CronEditor = markFormItemGroupControl(
                     ? h('div', { id: fieldErrorId, class: cronEditorErrorClasses }, issue.message)
                     : undefined
                 ])
-              })
+              }),
+            validation.value.valid && expressionDraft.value
+              ? h(
+                  'p',
+                  { class: 'text-sm text-[var(--tiger-text-secondary)]', 'data-tiger-cron-summary': '' },
+                  [
+                    describeCronExpression(expressionDraft.value),
+                    ' ',
+                    nextCronRun(expressionDraft.value)?.toISOString() ?? ''
+                  ]
+                )
+              : null
             )
           ]
         )

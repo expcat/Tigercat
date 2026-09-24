@@ -34,11 +34,15 @@ import {
   formatTabKey,
   parseTabKey,
   resolveDisplayedActiveKey,
+  navLabels,
+  splitOverflowTabKeys,
+  tabActivationSelectsOnArrow,
   isTabPaneType,
   isTabPaneChildProps,
   readTabPaneKey,
   mergeTigerLocale,
   getTabsLabels,
+  type TabActivation,
   type TabRecord,
   type TabIndicatorStyle,
   type TigerLocale,
@@ -49,6 +53,7 @@ import {
 } from '@expcat/tigercat-core'
 import { closeIconPathD, closeIconViewBox } from '@expcat/tigercat-core/icons/common'
 import { useTigerConfig } from './ConfigProvider'
+import { Dropdown } from './Dropdown'
 
 export interface TabsContextValue {
   activeKey: string | number | undefined
@@ -59,10 +64,13 @@ export interface TabsContextValue {
   destroyInactiveTabPane: boolean
   lazy: boolean
   swipeable: boolean
+  activation: TabActivation
+  overflowKeys: Array<string | number>
   idBase: string
   labels: Required<TigerLocaleTabs>
   handleTabClick: (key: string | number, options?: { focus?: boolean }) => void
   handleTabClose: (key: string | number, event: React.SyntheticEvent) => void
+  focusTab: (key: string | number) => void
 }
 
 const TabsContext = createContext<TabsContextValue | null>(null)
@@ -73,7 +81,7 @@ export function useTabsContext(): TabsContextValue | null {
 
 export interface TabPaneProps {
   tabKey: string | number
-  label: string
+  label: React.ReactNode
   disabled?: boolean
   closable?: boolean
   icon?: React.ReactNode
@@ -160,7 +168,9 @@ export const TabPane: React.FC<TabPaneProps> = ({
     if (delta == null) return
     event.preventDefault()
 
-    const tabButtons = Array.from(tabList?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])
+    const tabButtons = Array.from(
+      tabList?.querySelectorAll<HTMLElement>('[role="tab"]') ?? []
+    ).filter((button) => !button.hasAttribute('hidden'))
     const records: TabRecord[] = tabButtons.map((button) => ({
       key: parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id,
       disabled: button.getAttribute('aria-disabled') === 'true'
@@ -177,7 +187,11 @@ export const TabPane: React.FC<TabPaneProps> = ({
           : getAdjacentEnabledKey(records, tabKey, delta)
     if (nextKey === undefined) return
 
-    tabsContext.handleTabClick(nextKey, { focus: true })
+    if (tabActivationSelectsOnArrow(tabsContext.activation)) {
+      tabsContext.handleTabClick(nextKey, { focus: true })
+      return
+    }
+    tabsContext.focusTab(nextKey)
   }
 
   const handleClose = (event: React.MouseEvent) => {
@@ -200,6 +214,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
         aria-disabled={disabled || undefined}
         aria-labelledby={`${tabId}-label`}
         tabIndex={disabled ? -1 : isActive ? 0 : -1}
+        hidden={tabsContext.overflowKeys.some((key) => isKeyActive(key, tabKey)) || undefined}
         data-tiger-tabs-id={tabsContext.idBase}
         data-tiger-tab-key={formatTabKey(tabKey)}
         onClick={handleClick}
@@ -210,7 +225,10 @@ export const TabPane: React.FC<TabPaneProps> = ({
           <button
             type="button"
             className={tabCloseButtonClasses}
-            aria-label={tabsContext.labels.closeTabAriaLabel.replace('{label}', String(label))}
+            aria-label={tabsContext.labels.closeTabAriaLabel.replace(
+              '{label}',
+              typeof label === 'string' ? label : String(tabKey)
+            )}
             onClick={handleClose}
             onKeyDown={(event) => event.stopPropagation()}>
             <svg
@@ -285,6 +303,7 @@ export const Tabs: React.FC<TabsProps> = ({
   destroyInactiveTabPane = false,
   lazy = true,
   swipeable = false,
+  activation = 'automatic',
   className,
   id,
   'aria-label': ariaLabel,
@@ -316,12 +335,14 @@ export const Tabs: React.FC<TabsProps> = ({
   const swipeStartRef = useRef<ReturnType<typeof getGestureTouchPoint> | null>(null)
   const tabListRef = useRef<HTMLDivElement>(null)
   const indicatorRef = useRef<HTMLDivElement>(null)
+  const tabWidthCache = useRef(new Map<string, number>())
+  const [overflowKeys, setOverflowKeys] = useState<Array<string | number>>([])
 
   const containerClasses = classNames(getTabsContainerClasses(tabPosition), className)
   const tabNavClasses = getTabNavClasses(tabPosition, type)
   const tabNavListClasses = getTabNavListClasses(tabPosition, centered)
 
-  const { tabItems, tabPanes, tabRecords } = useMemo(() => {
+  const { tabItems, tabPanes, tabRecords, labelByKey } = useMemo(() => {
     const items: ReactElement[] = []
     const panes: ReactElement[] = []
     const records: TabRecord[] = []
@@ -337,7 +358,7 @@ export const Tabs: React.FC<TabsProps> = ({
           child.props.closable !== undefined
             ? child.props.closable
             : closable && type === 'editable-card',
-        label: child.props.label
+        label: typeof child.props.label === 'string' ? child.props.label : undefined
       })
       const tabId = `${idBase}-tab-${formatTabKey(key)}`
       const panelId = `${idBase}-panel-${formatTabKey(key)}`
@@ -359,7 +380,16 @@ export const Tabs: React.FC<TabsProps> = ({
       )
     })
 
-    return { tabItems: items, tabPanes: panes, tabRecords: records }
+    const labelByKey = new Map<string, string>()
+    React.Children.forEach(children, (child) => {
+      if (!isTabPaneElement(child)) return
+      const key = readTabPaneKey(child.props as unknown as Record<string, unknown>)
+      if (key === undefined) return
+      const label = child.props.label
+      labelByKey.set(String(key), typeof label === 'string' ? label : String(key))
+    })
+
+    return { tabItems: items, tabPanes: panes, tabRecords: records, labelByKey }
   }, [children, idBase, closable, type])
 
   const requestedKey = controlledActiveKey !== undefined ? controlledActiveKey : internalActiveKey
@@ -399,6 +429,14 @@ export const Tabs: React.FC<TabsProps> = ({
   }, [type, updateIndicator])
 
   const pendingFocusKey = useRef<string | number | null>(null)
+  const focusTab = useCallback(
+    (key: string | number) => {
+      const id = `${idBase}-tab-${formatTabKey(key)}`
+      tabListRef.current?.querySelector<HTMLElement>(`#${CSS.escape(id)}`)?.focus()
+    },
+    [idBase]
+  )
+
   const handleTabClick = useCallback(
     (key: string | number, options?: { focus?: boolean }) => {
       onTabClick?.(key)
@@ -477,6 +515,37 @@ export const Tabs: React.FC<TabsProps> = ({
     [activeKey, dir, handleTabClick, swipeable, tabPosition, tabRecords]
   )
 
+  useLayoutEffect(() => {
+    const list = tabListRef.current
+    if (!list) return
+    const buttons = Array.from(list.querySelectorAll<HTMLElement>('[role="tab"]'))
+    const keys = buttons.map(
+      (button) => parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id
+    )
+    const widths = buttons.map((button, index) => {
+      const measured = button.getBoundingClientRect().width
+      const cacheKey = String(keys[index])
+      if (measured > 0) tabWidthCache.current.set(cacheKey, measured)
+      return tabWidthCache.current.get(cacheKey) ?? measured
+    })
+    const available = list.getBoundingClientRect().width
+    const split = splitOverflowTabKeys({
+      keys,
+      widths,
+      available,
+      activeKey
+    })
+    setOverflowKeys((previous) => {
+      if (
+        previous.length === split.overflow.length &&
+        previous.every((key, index) => isKeyActive(key, split.overflow[index]))
+      ) {
+        return previous
+      }
+      return split.overflow
+    })
+  }, [activeKey, tabItems])
+
   const contextValue = useMemo<TabsContextValue>(
     () => ({
       activeKey,
@@ -487,6 +556,9 @@ export const Tabs: React.FC<TabsProps> = ({
       destroyInactiveTabPane,
       lazy,
       swipeable,
+      activation,
+      overflowKeys,
+      focusTab,
       idBase,
       labels,
       handleTabClick,
@@ -501,6 +573,9 @@ export const Tabs: React.FC<TabsProps> = ({
       destroyInactiveTabPane,
       lazy,
       swipeable,
+      activation,
+      overflowKeys,
+      focusTab,
       idBase,
       labels,
       handleTabClick,
@@ -530,6 +605,18 @@ export const Tabs: React.FC<TabsProps> = ({
         )}
         {tabItems}
       </div>
+      {overflowKeys.length > 0 ? (
+        <Dropdown
+          items={overflowKeys.map((key) => ({
+            key,
+            label: labelByKey.get(String(key)) ?? String(key)
+          }))}
+          onItemSelect={(item) => handleTabClick(item.key)}>
+          <button type="button" data-tiger-tabs-more="">
+            {navLabels.moreTabs}
+          </button>
+        </Dropdown>
+      ) : null}
       {type === 'editable-card' && (
         <button
           type="button"

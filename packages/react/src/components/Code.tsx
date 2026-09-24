@@ -1,11 +1,17 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  basicLabel,
+  classNames,
   codeBlockCopyStatusLiveClasses,
-  codeBlockPreClasses,
+  codeBlockLanguageClasses,
+  codeBlockLineNumberClasses,
+  codeBlockWrapButtonClasses,
+  codeLineNumbers,
   copyTextToClipboard,
   createCopyStatusReset,
   getCodeBlockContainerClasses,
   getCodeBlockCopyButtonClasses,
+  getCodeBlockPreClasses,
   getCodeLabels,
   mergeTigerLocale,
   highlightToTokens,
@@ -50,6 +56,9 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
     copyFailedLabel,
     locale,
     labels: labelsOverride,
+    lineNumbers = false,
+    showLanguage = false,
+    wrapToggle = false,
     onCopy,
     className,
     ...props
@@ -70,6 +79,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
   const resolvedCopyFailedLabel = resolveLocaleText(labels.copyFailedLabel, copyFailedLabel)
 
   const [copyStatus, setCopyStatus] = useState<CodeCopyButtonStatus>('idle')
+  const [wrapped, setWrapped] = useState(false)
   const resetRef = useRef<ReturnType<typeof createCopyStatusReset> | null>(null)
   if (resetRef.current == null) {
     resetRef.current = createCopyStatusReset(setCopyStatus)
@@ -103,7 +113,17 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
 
   return (
     <div ref={ref} className={containerClasses} {...props}>
-      <pre className={codeBlockPreClasses} tabIndex={0} aria-label={labels.scrollLabel}>
+      <pre
+        className={classNames(getCodeBlockPreClasses(wrapped), lineNumbers && 'flex')}
+        tabIndex={0}
+        aria-label={labels.scrollLabel}>
+        {lineNumbers ? (
+          <ol className={codeBlockLineNumberClasses} aria-hidden="true">
+            {codeLineNumbers(code).map((n) => (
+              <li key={n}>{n}</li>
+            ))}
+          </ol>
+        ) : null}
         {(() => {
           const highlighted = highlightToTokens(
             code,
@@ -118,6 +138,20 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
           )
         })()}
       </pre>
+      {showLanguage && language ? (
+        <span className={codeBlockLanguageClasses}>
+          {basicLabel(mergedLocale.locale, 'code', 'language')}: {language}
+        </span>
+      ) : null}
+      {wrapToggle ? (
+        <button
+          type="button"
+          className={classNames(codeBlockWrapButtonClasses, copyable && 'end-28')}
+          aria-pressed={wrapped}
+          onClick={() => setWrapped((value) => !value)}>
+          {basicLabel(mergedLocale.locale, 'code', wrapped ? 'nowrap' : 'wrap')}
+        </button>
+      ) : null}
       {copyable && (
         <>
           <button type="button" className={copyButtonClasses} onClick={handleCopy}>

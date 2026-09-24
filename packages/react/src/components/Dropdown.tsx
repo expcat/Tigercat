@@ -31,8 +31,11 @@ import {
   type DropdownItemProps as CoreDropdownItemProps,
   type DropdownMenuProps as CoreDropdownMenuProps,
   type DropdownProps as CoreDropdownProps,
-  type FloatingPlacement
+  type FloatingPlacement,
+  type PopupMenuCheckChange,
+  type PopupMenuItem
 } from '@expcat/tigercat-core'
+import { PopupMenuList } from './popup-menu-items'
 import { useControlledState } from '../hooks/useControlledState'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 import { OverlayPortal } from '../utils/overlay-outlet'
@@ -146,6 +149,9 @@ export interface DropdownProps
   children?: React.ReactNode
   renderTrigger?: (state: { open: boolean }) => React.ReactNode
   asChild?: boolean
+  items?: PopupMenuItem[]
+  onCheck?: (change: PopupMenuCheckChange) => void
+  onItemSelect?: (item: PopupMenuItem) => void
 }
 
 export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown(
@@ -165,6 +171,9 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
     onOpenChange,
     children,
     renderTrigger,
+    items,
+    onCheck,
+    onItemSelect,
     ...divProps
   },
   forwardedRef
@@ -394,33 +403,45 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
     }
   })
 
-  const menuWrapperNode = visible ? (
-    <div
-      ref={floatingRef}
-      className={classNames(overlay.floatingClasses, DROPDOWN_ENTER_CLASS)}
-      style={overlay.floatingStyles}
-      data-positioned={overlay.positioned}
-      data-tiger-dropdown-menu=""
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onKeyDown={handleMenuKeyDown}>
-      {menuElement && React.isValidElement(menuElement)
-        ? React.cloneElement(menuElement as React.ReactElement<Record<string, unknown>>, {
-            id: menuId
-          })
-        : menuElement}
-    </div>
-  ) : null
+  const menuWrapperNode =
+    visible && (menuElement || (items && items.length > 0)) ? (
+      <div
+        ref={floatingRef}
+        className={classNames(overlay.floatingClasses, DROPDOWN_ENTER_CLASS)}
+        style={overlay.floatingStyles}
+        data-positioned={overlay.positioned}
+        data-tiger-dropdown-menu=""
+        role={items && items.length > 0 ? 'menu' : undefined}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onKeyDown={handleMenuKeyDown}>
+        {items && items.length > 0 ? (
+          <PopupMenuList
+            items={items}
+            onCheck={onCheck}
+            onSelect={onItemSelect}
+            onClose={() => setVisible(false)}
+          />
+        ) : null}
+        {menuElement && React.isValidElement(menuElement)
+          ? React.cloneElement(menuElement as React.ReactElement<Record<string, unknown>>, {
+              id: menuId
+            })
+          : menuElement}
+      </div>
+    ) : null
 
   return (
     <DropdownContext.Provider value={contextValue}>
       <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
         {triggerNode}
-        {menuWrapperNode
-          ? portal
-            ? <OverlayPortal target={overlay.target}>{menuWrapperNode}</OverlayPortal>
-            : renderOverlayPortal(menuWrapperNode, null, true)
-          : null}
+        {menuWrapperNode ? (
+          portal ? (
+            <OverlayPortal target={overlay.target}>{menuWrapperNode}</OverlayPortal>
+          ) : (
+            renderOverlayPortal(menuWrapperNode, null, true)
+          )
+        ) : null}
       </div>
     </DropdownContext.Provider>
   )

@@ -17,6 +17,7 @@ import {
   floatButtonIconSizeClasses,
   floatButtonPlusIconPath,
   getFloatButtonClasses,
+  resolveFloatButtonHref,
   getFloatButtonGroupClasses,
   getFloatButtonLabels,
   getFloatButtonOffsetStyle,
@@ -31,6 +32,8 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+import { Badge } from './Badge'
+import { Tooltip } from './Tooltip'
 import { useControlledState } from '../hooks/useControlledState'
 import { composeEventHandlers } from '../utils/overlay-trigger'
 import { renderBodyPortal, useClickOutside, useEscapeKey } from '../utils/overlay'
@@ -78,6 +81,8 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
     size = 'md',
     type = 'primary',
     tooltip,
+    href,
+    badge,
     disabled = false,
     ariaLabel,
     className,
@@ -126,7 +131,19 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
     localeLabel: labels.ariaLabel
   })
 
-  return (
+  const safeHref = resolveFloatButtonHref(href, disabled)
+  const content = children ?? <DefaultPlusIcon size={size} />
+  const control = safeHref ? (
+    <a
+      {...props}
+      ref={ref as React.Ref<HTMLAnchorElement>}
+      className={classes}
+      href={safeHref}
+      style={buttonStyle}
+      aria-label={resolvedAriaLabel}>
+      {content}
+    </a>
+  ) : (
     <button
       {...props}
       ref={ref}
@@ -135,11 +152,30 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
       disabled={disabled}
       style={buttonStyle}
       aria-label={resolvedAriaLabel}
-      title={tooltip}
+      title={group?.inGroup ? undefined : tooltip}
       onClick={disabled ? undefined : onClick}>
-      {children ?? <DefaultPlusIcon size={size} />}
+      {content}
     </button>
   )
+  const badged =
+    badge == null ? (
+      control
+    ) : (
+      <Badge
+        content={badge}
+        type={typeof badge === 'number' ? 'number' : 'text'}
+        standalone={false}>
+        {control}
+      </Badge>
+    )
+  if (group?.inGroup && tooltip) {
+    return (
+      <Tooltip asChild content={tooltip} trigger="hover">
+        {badged}
+      </Tooltip>
+    )
+  }
+  return badged
 })
 
 export interface FloatButtonGroupProps

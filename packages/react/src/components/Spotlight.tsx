@@ -24,6 +24,9 @@ import {
   getSpotlightLabels,
   getSpotlightOptionClasses,
   getSpotlightSearchState,
+  navLabels,
+  orderSpotlightWithRecent,
+  spotlightFooterShortcuts,
   getSpotlightShortcutLabel,
   isSpotlightHotkeyEnabled,
   isSpotlightToggleHotkey,
@@ -95,6 +98,7 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
     defaultActiveFirstItem = true,
     filterItem,
     limit,
+    recentIds,
     hotkey = false,
     onOpenChange,
     onQueryChange,
@@ -141,8 +145,15 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
 
   const searchState = useMemo(
-    () => getSpotlightSearchState(items, resolvedQuery, { filterItem, limit }),
-    [items, resolvedQuery, filterItem, limit]
+    () =>
+      getSpotlightSearchState(orderSpotlightWithRecent(items, recentIds), resolvedQuery, {
+        filterItem,
+        limit
+      }),
+    [items, recentIds, resolvedQuery, filterItem, limit]
+  )
+  const footerShortcuts = spotlightFooterShortcuts(
+    searchState.flatResults.map((result) => result.item)
   )
 
   const closeSpotlight = useCallback(() => {
@@ -395,6 +406,15 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
         {searchState.flatResults.length === 0 ? (
           <div className={spotlightEmptyClasses} role="status" aria-live="polite">
             {emptyMessage}
+          </div>
+        ) : null}
+        {footerShortcuts.length > 0 ? (
+          <div data-tiger-spotlight-footer="" aria-label={navLabels.spotlightFooter}>
+            {footerShortcuts.map((shortcut) => (
+              <kbd key={shortcut} className="rounded border px-1">
+                {shortcut}
+              </kbd>
+            ))}
           </div>
         ) : null}
       </div>

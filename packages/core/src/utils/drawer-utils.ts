@@ -5,6 +5,7 @@
 import { classNames } from './class-names'
 import type { DrawerPlacement, DrawerSize } from '../types/drawer'
 import type { SwipeGesture, SwipeDirection } from './gesture-utils'
+import { clampSheetDragDistance } from './gesture-utils'
 import { RESPONSIVE_BREAKPOINT_FALLBACK_PX } from './responsive'
 
 /**
@@ -179,4 +180,124 @@ export function getDrawerCloseButtonClasses(): string {
  */
 export function getDrawerTitleClasses(): string {
   return 'text-lg font-semibold text-[var(--tiger-text)]'
+}
+
+/** How far a covered drawer shifts when a later drawer opens on the same edge. */
+export const DRAWER_PUSH_DISTANCE_PX = 180
+
+export interface DrawerLayerSnapshot {
+  id: number
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>
+}
+
+const drawerLayers: DrawerLayerSnapshot[] = []
+const drawerListeners = new Set<() => void>()
+
+function emitDrawerLayers(): void {
+  drawerListeners.forEach((listener) => listener())
+}
+
+export function getDrawerLayers(): readonly DrawerLayerSnapshot[] {
+  return drawerLayers
+}
+
+export function subscribeDrawerLayers(listener: () => void): () => void {
+  drawerListeners.add(listener)
+  return () => {
+    drawerListeners.delete(listener)
+  }
+}
+
+export function registerDrawerLayer(
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>
+): { id: number; release: () => void } {
+  const id = drawerLayers.length === 0 ? 1 : drawerLayers[drawerLayers.length - 1].id + 1
+  drawerLayers.push({ id, placement })
+  emitDrawerLayers()
+  let released = false
+  return {
+    id,
+    release() {
+      if (released) return
+      released = true
+      const index = drawerLayers.findIndex((layer) => layer.id === id)
+      if (index >= 0) drawerLayers.splice(index, 1)
+      emitDrawerLayers()
+    }
+  }
+}
+
+export function resetDrawerLayers(): void {
+  drawerLayers.length = 0
+  emitDrawerLayers()
+}
+
+export function drawerLayerIndex(id: number): number {
+  return drawerLayers.findIndex((layer) => layer.id === id)
+}
+
+/** Only the top drawer paints a mask. Covered drawers are pushed aside. */
+export function drawerShowsMask(id: number, mask: boolean): boolean {
+  if (!mask) return false
+  const index = drawerLayerIndex(id)
+  return index >= 0 && index === drawerLayers.length - 1
+}
+
+export function drawerPushOffset(
+  id: number,
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>
+): { x: number; y: number } {
+  const index = drawerLayerIndex(id)
+  if (index < 0) return { x: 0, y: 0 }
+  let above = 0
+  for (let cursor = index + 1; cursor < drawerLayers.length; cursor += 1) {
+    if (drawerLayers[cursor].placement === placement) above += 1
+  }
+  if (above === 0) return { x: 0, y: 0 }
+  const distance = above * DRAWER_PUSH_DISTANCE_PX
+  if (placement === 'right') return { x: -distance, y: 0 }
+  if (placement === 'left') return { x: distance, y: 0 }
+  if (placement === 'bottom') return { x: 0, y: -distance }
+  return { x: 0, y: distance }
+}
+
+export function drawerResizeAxis(
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>
+): 'width' | 'height' {
+  return placement === 'top' || placement === 'bottom' ? 'height' : 'width'
+}
+
+/** Positive distance moves the panel toward its close edge. */
+export function drawerFollowDistance(
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>,
+  deltaX: number,
+  deltaY: number
+): number {
+  if (placement === 'right') return clampSheetDragDistance(deltaX)
+  if (placement === 'left') return clampSheetDragDistance(-deltaX)
+  if (placement === 'bottom') return clampSheetDragDistance(deltaY)
+  return clampSheetDragDistance(-deltaY)
+}
+
+export function drawerFollowTransform(
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>,
+  distance: number
+): string {
+  const traveled = clampSheetDragDistance(distance)
+  if (placement === 'right') return `translate3d(${traveled}px, 0, 0)`
+  if (placement === 'left') return `translate3d(${-traveled}px, 0, 0)`
+  if (placement === 'bottom') return `translate3d(0, ${traveled}px, 0)`
+  return `translate3d(0, ${-traveled}px, 0)`
+}
+
+/** Dragging the inner edge. Positive grows the panel. */
+export function drawerResizeDelta(
+  placement: Exclude<DrawerPlacement, 'start' | 'end'>,
+  deltaX: number,
+  deltaY: number
+): number {
+  if (placement === 'right') return -deltaX
+  if (placement === 'left') return deltaX
+  if (placement === 'bottom') return -deltaY
+  return deltaY
 }

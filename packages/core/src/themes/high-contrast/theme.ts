@@ -1,4 +1,18 @@
 import type { ThemePreset } from '../../types/theme'
+import { deriveAccentScale } from '../../utils/accent-scale'
+
+export const highContrastThemeKnobs = {
+  accent: '#0033cc',
+  neutral: '#000000',
+  radius: '4px',
+  density: 1
+} as const
+
+export const highContrastThemeScale = deriveAccentScale(highContrastThemeKnobs.accent, {
+  neutral: highContrastThemeKnobs.neutral,
+  radius: highContrastThemeKnobs.radius,
+  density: highContrastThemeKnobs.density
+})
 
 /**
  * High Contrast theme — maximum legibility for low-vision and forced-contrast use cases.

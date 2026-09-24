@@ -1,3 +1,4 @@
+import { nearestThemeRoot } from '../themes/manager'
 import { classNames } from './class-names'
 import { getFocusableElements } from './overlay-utils'
 
@@ -22,6 +23,15 @@ export function resolveAnchoredOverlayTarget(reference: HTMLElement | null): HTM
     ?.closest(`[${OVERLAY_LAYER_ATTRIBUTE}]`)
     ?.querySelector<HTMLElement>(`:scope > [${OVERLAY_HOST_ATTRIBUTE}]`)
   if (overlayHost) return overlayHost
+
+  const themeRoot = reference ? nearestThemeRoot(reference) : null
+  if (
+    themeRoot &&
+    themeRoot !== ownerDocument.documentElement &&
+    themeRoot !== ownerDocument.body
+  ) {
+    return themeRoot
+  }
 
   const configRoot =
     reference?.closest<HTMLElement>(`[${CONFIG_ROOT_ATTRIBUTE}]`) ??

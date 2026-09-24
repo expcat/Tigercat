@@ -7,7 +7,7 @@ export default function ImageCompareDemo() {
   return (
     <DemoPage
       title="ImageCompare 图片对比"
-      description="叠放 before/after 图片，拖动或键盘调整对比滑块。支持横向与纵向，src 与插槽均可。"
+      description="叠放 before/after。两侧可加标题，标题进入滑块值文本。页面仍可滚动。"
       modules={modules}
     />
   )

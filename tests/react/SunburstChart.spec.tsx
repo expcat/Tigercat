@@ -53,7 +53,7 @@ describe('SunburstChart (React)', () => {
     expect(onArcClick).toHaveBeenCalledWith(1, sampleData[1])
   })
 
-  it('legend click highlights the matching root arc', () => {
+  it('legend click hides the matching root arc without selecting it', () => {
     const onArcClick = vi.fn()
     const { container } = renderWithProps(SunburstChart, {
       data: pagesData,
@@ -63,7 +63,8 @@ describe('SunburstChart (React)', () => {
     })
     const legendButtons = container.querySelectorAll('[data-legend-item]')
     fireEvent.click(legendButtons[legendButtons.length - 1])
-    expect(onArcClick.mock.calls[0][1].label).toBe('美洲')
+    expect(onArcClick).not.toHaveBeenCalled()
+    expect(container.querySelector('[data-legend-hidden="true"]')).toBeTruthy()
   })
 
   it('paints gradient fills in sunburst user space', () => {

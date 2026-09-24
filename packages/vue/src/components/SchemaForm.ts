@@ -14,6 +14,8 @@ import {
   coerceClassValue,
   devWarn,
   formValuesEqual,
+  formatExportCell,
+  narrowWidgetParams,
   getSchemaFormLabels,
   mergeStyleValues,
   mergeTigerLocale,
@@ -90,17 +92,31 @@ function renderWidget(field: SchemaFormField): VNode | null {
   const type = resolveSchemaFormWidgetType(field)
   const disabled = field.disabled
   const placeholder = field.placeholder
+  const params = narrowWidgetParams(type ?? 'input', field.widgetParams)
   if (type === 'textarea') {
     return h(Textarea, { placeholder, disabled })
   }
   if (type === 'number') {
-    return h(InputNumber, { placeholder, disabled, min: field.min, max: field.max })
+    return h(InputNumber, {
+      placeholder,
+      disabled,
+      min: (params.min as number | undefined) ?? field.min,
+      max: (params.max as number | undefined) ?? field.max,
+      step: params.step as number | undefined,
+      precision: params.precision as number | undefined
+    })
   }
   if (type === 'password') {
     return h(Input, { type: 'password', placeholder, disabled })
   }
   if (type === 'select') {
-    return h(Select, { options: field.options ?? [], placeholder, disabled })
+    return h(Select, {
+      options: field.options ?? [],
+      placeholder,
+      disabled,
+      multiple: params.multiple === true,
+      searchable: params.showSearch === true
+    })
   }
   if (type === 'checkbox') {
     return h(Checkbox, { disabled })
@@ -124,7 +140,12 @@ function renderWidget(field: SchemaFormField): VNode | null {
     return h(TreeSelect, { treeData: field.treeData, placeholder, disabled })
   }
   if (type === 'slider') {
-    return h(Slider, { disabled, min: field.min, max: field.max })
+    return h(Slider, {
+      disabled,
+      min: (params.min as number | undefined) ?? field.min,
+      max: (params.max as number | undefined) ?? field.max,
+      step: params.step as number | undefined
+    })
   }
   if (type === 'upload') {
     return h(Upload, { disabled })
@@ -389,6 +410,18 @@ export const SchemaForm = defineComponent({
     }
 
     const renderField = (field: SchemaFormField, columns: 1 | 2 | 3): VNode => {
+      if (field.readOnly) {
+        const raw = formModel.value?.[field.name]
+        return h(
+          'div',
+          {
+            class: getSchemaFormFieldSpanClasses(clampSchemaFormSpan(field.span, columns), columns),
+            'data-schema-field': field.name,
+            'data-schema-readonly': ''
+          },
+          [field.label ? h('span', field.label) : null, h('span', formatExportCell(raw, formModel.value ?? {}))]
+        )
+      }
       const custom = slots.field?.({ field })
       const control: VNodeChild =
         custom && (Array.isArray(custom) ? custom.length > 0 : true) ? custom : renderWidget(field)
@@ -404,8 +437,8 @@ export const SchemaForm = defineComponent({
             {
               name: field.name,
               label: field.label,
-              required: field.disabled ? false : field.required,
-              rules: field.disabled ? undefined : formRules.value?.[field.name],
+              required: field.disabled || field.readOnly ? false : field.required,
+              rules: field.disabled || field.readOnly ? undefined : formRules.value?.[field.name],
               disabled: field.disabled,
               condition: field.condition,
               extra: field.extra
@@ -418,13 +451,13 @@ export const SchemaForm = defineComponent({
 
     const renderGroup = (group: SchemaFormLayoutGroup, nested: boolean): VNode => {
       return h(
-        'section',
+        'fieldset',
         {
           class: nested ? schemaFormNestedGroupClasses : schemaFormGroupClasses,
           'data-schema-group': group.key
         },
         [
-          group.title ? h('h3', { class: schemaFormGroupTitleClasses }, group.title) : null,
+          group.title ? h('legend', { class: schemaFormGroupTitleClasses }, group.title) : null,
           group.description
             ? h('p', { class: schemaFormGroupDescriptionClasses }, group.description)
             : null,

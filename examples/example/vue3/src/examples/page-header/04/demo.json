@@ -1,0 +1,7 @@
+{
+  "id": "page-header-04",
+  "title": "页头插槽",
+  "description": "页头放入调用方的面包屑、页签和页脚，不另建面包屑数据。",
+  "entry": "App.vue",
+  "order": 4
+}

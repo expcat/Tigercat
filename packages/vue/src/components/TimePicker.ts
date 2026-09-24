@@ -37,6 +37,7 @@ import {
   getLocaleDirection,
   getTimePeriodLabels,
   getTimePickerItemClasses,
+  snapTimeColumnScroll,
   getTimePickerLabels,
   getTimePickerMobileSelectRowClasses,
   getTimePickerRangeTabButtonClasses,
@@ -660,7 +661,13 @@ export const TimePicker = defineComponent({
                       ? `${column.listId}-${String(active.value)}`
                       : undefined,
                     class: timePickerColumnListClasses,
-                    onKeydown: handlePanelKeyDown
+                    onKeydown: handlePanelKeyDown,
+                    onScroll: (event: Event) => {
+                      const list = event.currentTarget as HTMLElement
+                      const item = list.querySelector<HTMLElement>('[role="option"]')
+                      const next = snapTimeColumnScroll(list.scrollTop, item?.offsetHeight ?? 0)
+                      if (next !== list.scrollTop) list.scrollTop = next
+                    }
                   },
                   column.options.map((option) => {
                     const selected = option.selected

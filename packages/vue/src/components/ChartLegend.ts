@@ -117,6 +117,7 @@ export const ChartLegend = defineComponent({
               }),
               role: props.interactive ? undefined : 'listitem',
               'aria-pressed': props.interactive ? Boolean(item.selected) : undefined,
+              'data-legend-hidden': item.hidden ? 'true' : undefined,
               'aria-current': props.interactive && highlighted ? 'true' : undefined,
               'data-legend-item': 'true',
               onClick: props.interactive ? () => handleClick(item) : undefined,

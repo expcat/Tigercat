@@ -269,8 +269,32 @@ export interface ImageGroupProps {
   preview?: boolean
 
   /**
+   * Controlled lightbox open state. Omit to let the group own it.
+   */
+  open?: boolean
+
+  /**
+   * Controlled lightbox index. Omit to let the group own it.
+   */
+  currentIndex?: number
+
+  /**
    * Additional CSS classes. Merged with the group base class.
    */
+  className?: string
+}
+
+export interface GalleryItem {
+  src: string
+  alt: string
+}
+
+export interface GalleryProps {
+  items: GalleryItem[]
+  /** Controlled thumbnail index. */
+  currentIndex?: number
+  /** Uncontrolled starting index. @default 0 */
+  defaultCurrentIndex?: number
   className?: string
 }
 
@@ -301,9 +325,21 @@ export interface ImageCropperProps {
 
   /**
    * Fixed aspect ratio (width / height). Leave undefined for free cropping.
+   * Ignored when `aspectPreset` is set.
    * @example 1 for square, 16/9 for widescreen
    */
   aspectRatio?: number
+
+  /**
+   * Named crop ratio. `free` clears a numeric ratio.
+   */
+  aspectPreset?: '1:1' | '4:3' | '16:9' | 'free'
+
+  /**
+   * Circular crop mask on the selection and the output bitmap.
+   * @default false
+   */
+  circular?: boolean
 
   /**
    * Minimum crop width in pixels

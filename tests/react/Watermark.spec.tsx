@@ -3,7 +3,7 @@
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { Watermark } from '@expcat/tigercat-react/Watermark'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
@@ -104,7 +104,7 @@ describe('Watermark', () => {
     expect(container.querySelector('[data-watermark="true"]')).toBe(overlay)
   })
 
-  it('restores overlay after covering styles are stripped', async () => {
+  it('does not replace the overlay when covering styles are stripped', async () => {
     const { container } = render(
       <Watermark content="Secret">
         <span>Protected content</span>
@@ -113,12 +113,8 @@ describe('Watermark', () => {
     const overlay = container.querySelector('[data-watermark="true"]') as HTMLElement
     expect(overlay).toBeTruthy()
     overlay.setAttribute('style', '')
-    await waitFor(() => {
-      const restored = container.querySelector('[data-watermark="true"]') as HTMLElement | null
-      expect(restored).toBeTruthy()
-      expect(restored).not.toBe(overlay)
-      expect(restored?.style.position).toBe('absolute')
-    })
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(container.querySelector('[data-watermark="true"]')).toBe(overlay)
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {

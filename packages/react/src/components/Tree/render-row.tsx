@@ -12,6 +12,7 @@ import {
   getTreeNodeClasses,
   highlightMarkClasses,
   nextCheckedFromTreeRow,
+  navLabels,
   sameTreeKey,
   treeDropAfterClasses,
   treeDropBeforeClasses,
@@ -180,6 +181,10 @@ export function renderTreeRow(
       ) : null}
       {ctx.showIcon && node.icon != null ? (
         <span className={treeNodeIconClasses}>{renderNodeIcon(node.icon)}</span>
+      ) : ctx.showIcon && node.directory ? (
+        <span data-tiger-tree-directory="" className={treeNodeIconClasses} aria-hidden="true">
+          ▸<span className="sr-only">{navLabels.directory}</span>
+        </span>
       ) : null}
       <span
         className={classNames(

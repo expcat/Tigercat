@@ -4,6 +4,7 @@
  */
 
 import { classNames } from './class-names'
+export { basicLabel, type BasicLabelGroup } from './i18n/w9/basic-labels'
 import { isBrowser } from './env'
 import { overlayZIndexClass } from './floating'
 import type { ImageFit, CropRect, CropHandle, PreviewNavState } from '../types/image'
@@ -169,6 +170,12 @@ export const nextIconPath = 'M9 5l7 7-7 7'
 
 /** Close icon path */
 export const previewCloseIconPath = 'M6 18L18 6M6 6l12 12'
+
+/** Horizontal mirror for the preview toolbar. */
+export const flipHorizontalIconPath = 'M12 3v18M8 7l-4 5 4 5M16 7l4 5-4 5'
+
+/** Download the image currently shown in the lightbox. */
+export const downloadIconPath = 'M12 3v12m0 0l-4-4m4 4l4-4M4 21h16'
 
 // ============================================================================
 // ImagePreview styles
@@ -800,6 +807,39 @@ export function getCropperHandleName(handle: CropHandle, labels: Record<string, 
 /** Longest output edge from `cropCanvas`. Larger sources are scaled down. */
 export const CROP_OUTPUT_MAX_EDGE = 4096
 
+export type CropAspectPreset = '1:1' | '4:3' | '16:9' | 'free'
+
+export function resolveCropAspectRatio(
+  preset?: CropAspectPreset,
+  aspectRatio?: number
+): number | undefined {
+  if (preset === '1:1') return 1
+  if (preset === '4:3') return 4 / 3
+  if (preset === '16:9') return 16 / 9
+  if (preset === 'free') return undefined
+  if (typeof aspectRatio === 'number' && Number.isFinite(aspectRatio) && aspectRatio > 0) {
+    return aspectRatio
+  }
+  return undefined
+}
+
+/** 90° and 270° swap the output edges. Other quarters keep the crop size. */
+export function cropOutputSize(
+  width: number,
+  height: number,
+  rotation: number
+): { width: number; height: number } {
+  const quarter = Math.round(normalizeRotation(rotation) / 90) % 4
+  if (quarter === 1 || quarter === 3) return { width: height, height: width }
+  return { width, height }
+}
+
+export interface CropCanvasOptions {
+  rotation?: number
+  flipX?: boolean
+  circular?: boolean
+}
+
 /**
  * Crop to a blob. Output width and height are each at most
  * {@link CROP_OUTPUT_MAX_EDGE}. There is no synchronous data URL.
@@ -810,7 +850,8 @@ export async function cropCanvas(
   displayWidth: number,
   displayHeight: number,
   outputType: string = 'image/png',
-  quality: number = 0.92
+  quality: number = 0.92,
+  options?: CropCanvasOptions
 ): Promise<Blob> {
   if (!isBrowser()) {
     throw new Error('Image canvas cropping is only available in the browser')
@@ -836,18 +877,39 @@ export async function cropCanvas(
   const sh = cropRect.height * scaleY
   const rawW = Math.max(1, Math.round(sw))
   const rawH = Math.max(1, Math.round(sh))
-  const longest = Math.max(rawW, rawH)
+  const rotation = normalizeRotation(options?.rotation ?? 0)
+  const flipX = Boolean(options?.flipX)
+  const circular = Boolean(options?.circular)
+  const transformed = rotation !== 0 || flipX || circular
+  const rotated = transformed ? cropOutputSize(rawW, rawH, rotation) : { width: rawW, height: rawH }
+  const longest = Math.max(rotated.width, rotated.height)
   const scaleDown = longest > CROP_OUTPUT_MAX_EDGE ? CROP_OUTPUT_MAX_EDGE / longest : 1
 
   const canvas = document.createElement('canvas')
-  canvas.width = Math.max(1, Math.round(rawW * scaleDown))
-  canvas.height = Math.max(1, Math.round(rawH * scaleDown))
+  canvas.width = Math.max(1, Math.round(rotated.width * scaleDown))
+  canvas.height = Math.max(1, Math.round(rotated.height * scaleDown))
 
   const ctx = canvas.getContext('2d')
   if (!ctx) {
     throw new Error('Image canvas cropping is unavailable without a 2D context')
   }
-  ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height)
+  if (!transformed) {
+    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height)
+  } else {
+    ctx.save()
+    ctx.translate(canvas.width / 2, canvas.height / 2)
+    ctx.rotate((rotation * Math.PI) / 180)
+    if (flipX) ctx.scale(-1, 1)
+    if (circular) {
+      ctx.beginPath()
+      ctx.arc(0, 0, Math.min(canvas.width, canvas.height) / 2, 0, Math.PI * 2)
+      ctx.clip()
+    }
+    const drawW = Math.max(1, Math.round(rawW * scaleDown))
+    const drawH = Math.max(1, Math.round(rawH * scaleDown))
+    ctx.drawImage(image, sx, sy, sw, sh, -drawW / 2, -drawH / 2, drawW, drawH)
+    ctx.restore()
+  }
 
   const blob = await new Promise<Blob | null>((resolve) => {
     canvas.toBlob((value) => resolve(value), outputType, quality)
@@ -917,6 +979,16 @@ export function toCSSSize(value: number | string | undefined): string | undefine
   return typeof value === 'number' ? `${value}px` : value
 }
 
+export function clampGalleryIndex(index: number, total: number): number {
+  if (total <= 0) return 0
+  if (!Number.isFinite(index)) return 0
+  return Math.min(Math.max(0, Math.floor(index)), total - 1)
+}
+
+export function formatGalleryCount(template: string, current: number, total: number): string {
+  return template.replace('{current}', String(current)).replace('{total}', String(total))
+}
+
 export function normalizeRotation(rotation: number): number {
   return ((rotation % 360) + 360) % 360
 }
@@ -926,6 +998,8 @@ export interface GestureTransform {
   translateX: number
   translateY: number
   rotation: number
+  /** Horizontal mirror. Omitted means not flipped. */
+  flipX?: boolean
 }
 
 export function createDefaultTransform(): GestureTransform {
@@ -933,7 +1007,38 @@ export function createDefaultTransform(): GestureTransform {
 }
 
 export function getImageTransformStyle(t: GestureTransform): string {
-  return `translate(${t.translateX}px, ${t.translateY}px) scale(${t.scale}) rotate(${t.rotation}deg)`
+  const base = `translate(${t.translateX}px, ${t.translateY}px) scale(${t.scale}) rotate(${t.rotation}deg)`
+  if (!t.flipX) return base
+  return `${base} scaleX(-1)`
+}
+
+/** Save only the URL that is on screen. Does not fetch a different file. */
+export function downloadCurrentImageUrl(url: string): void {
+  if (!isBrowser() || !url) return
+  const link = document.createElement('a')
+  link.href = url
+  const path = url.split('?')[0]?.split('#')[0] ?? ''
+  const name = path.slice(path.lastIndexOf('/') + 1) || 'image'
+  link.download = name
+  link.rel = 'noopener'
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+}
+
+export type ImagePreviewToolbarAction =
+  | 'zoomOut'
+  | 'reset'
+  | 'zoomIn'
+  | 'rotateLeft'
+  | 'rotateRight'
+  | 'flip'
+  | 'download'
+
+export interface ImagePreviewToolbarItemContext {
+  action: ImagePreviewToolbarAction
+  label: string
+  disabled: boolean
 }
 
 export interface WheelZoomOptions {

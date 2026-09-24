@@ -18,6 +18,7 @@ import { devWarn } from './dev-warn'
 import { isBrowser } from './env'
 import { normalizeStringOption } from './imperative-api'
 import { createToastQueue, type ToastQueue } from './imperative-host'
+import type { DismissActionEvent } from './confirm-action'
 import { resolveMessageDuration } from './message-utils'
 import { resolveNotificationDuration } from './notification-utils'
 
@@ -27,11 +28,75 @@ export interface MessageQueueItem extends MessageInstance {
   position: MessagePosition
 }
 
+export type ConfirmModalKind = 'confirm' | 'info' | 'success' | 'warning' | 'error'
+
+export interface ImperativeModalRecord {
+  id: number
+  kind: ConfirmModalKind
+  title: string
+  content: string
+  showCancel: boolean
+  okText?: string
+  cancelText?: string
+  onOk?: (event: DismissActionEvent) => unknown
+  /** Value returned by the OK handler. The caller promise adopts it. */
+  okResult?: unknown
+  cancelled: boolean
+  settled: boolean
+  resolve: (value: unknown) => void
+  reject: (reason?: unknown) => void
+}
+
+export interface ModalQueue {
+  add: (item: ImperativeModalRecord) => void
+  remove: (id: number) => void
+  clear: () => void
+  getSnapshot: () => readonly ImperativeModalRecord[]
+  getServerSnapshot: () => readonly ImperativeModalRecord[]
+  subscribe: (listener: () => void) => () => void
+}
+
+const EMPTY_MODALS: ImperativeModalRecord[] = []
+
+export function createModalQueue(): ModalQueue {
+  let items: ImperativeModalRecord[] = []
+  const listeners = new Set<() => void>()
+  const emit = () => {
+    listeners.forEach((listener) => listener())
+  }
+  return {
+    add(item) {
+      items = [...items, item]
+      emit()
+    },
+    remove(id) {
+      const next = items.filter((item) => item.id !== id)
+      if (next.length === items.length) return
+      items = next
+      emit()
+    },
+    clear() {
+      if (items.length === 0) return
+      items = []
+      emit()
+    },
+    getSnapshot: () => items,
+    getServerSnapshot: () => EMPTY_MODALS,
+    subscribe(listener) {
+      listeners.add(listener)
+      return () => {
+        listeners.delete(listener)
+      }
+    }
+  }
+}
+
 export interface FeedbackScope {
   /** Nesting depth. The deepest mounted provider owns imperative calls. */
   depth: number
   messages: ToastQueue<MessageQueueItem>
   notifications: ToastQueue<NotificationInstance>
+  modals: ModalQueue
 }
 
 type ScopeHost = HTMLElement & { [FEEDBACK_SCOPE_STACK]?: FeedbackScope[] }
@@ -46,7 +111,8 @@ export function createFeedbackScope(depth = 0): FeedbackScope {
     notifications: createToastQueue<NotificationInstance>(
       {},
       { groupOf: (item) => String(item.position) }
-    )
+    ),
+    modals: createModalQueue()
   }
 }
 
@@ -131,7 +197,9 @@ export function enqueueNotification(
     id: normalized.key,
     type,
     title: normalized.title,
-    description: normalized.description,
+    description: typeof normalized.description === 'string' ? normalized.description : undefined,
+    descriptionNode: normalized.descriptionNode,
+    actionNode: normalized.actionNode,
     duration: resolveNotificationDuration(normalized.duration),
     closable: normalized.closable ?? true,
     onClose: normalized.onClose,
@@ -151,4 +219,109 @@ export function enqueueNotification(
 
 export function clearNotifications(scope: FeedbackScope | null): void {
   scope?.notifications.clear()
+}
+
+export interface MessagePromisePhases {
+  loading: string
+  success: string
+  error: string
+}
+
+let modalSerial = 1
+
+export interface ConfirmModalInput {
+  kind?: ConfirmModalKind
+  title?: string
+  content?: string
+  okText?: string
+  cancelText?: string
+  onOk?: (event: DismissActionEvent) => unknown
+}
+
+function rejectModal(item: ImperativeModalRecord): void {
+  if (item.settled) return
+  item.settled = true
+  item.reject(new Error('cancel'))
+}
+
+/**
+ * OK adopts `onOk`'s return value, including an existing Promise.
+ * Cancel and destroyAll reject.
+ */
+export function enqueueConfirmModal(
+  scope: FeedbackScope | null,
+  input: ConfirmModalInput
+): Promise<unknown> {
+  if (!isBrowser() || !scope) {
+    if (isBrowser()) {
+      devWarn(
+        'feedback.modal.host',
+        '[Tigercat] confirmModal renders on the ConfigProvider modal host. Mount one before calling it.'
+      )
+    }
+    return Promise.reject(new Error('host'))
+  }
+  const kind = input.kind ?? 'confirm'
+  return new Promise((resolve, reject) => {
+    const record: ImperativeModalRecord = {
+      id: modalSerial++,
+      kind,
+      title: input.title ?? '',
+      content: input.content ?? '',
+      showCancel: kind === 'confirm',
+      okText: input.okText,
+      cancelText: input.cancelText,
+      onOk: input.onOk,
+      cancelled: false,
+      settled: false,
+      resolve: (value) => {
+        if (record.settled) return
+        record.settled = true
+        resolve(value)
+      },
+      reject: (reason) => {
+        if (record.settled) return
+        record.settled = true
+        reject(reason instanceof Error ? reason : new Error('cancel'))
+      }
+    }
+    scope.modals.add(record)
+  })
+}
+
+export function settleConfirmModalOk(record: ImperativeModalRecord, value: unknown): void {
+  record.okResult = value
+  record.resolve(value)
+}
+
+export function dismissConfirmModal(record: ImperativeModalRecord): void {
+  record.cancelled = true
+  rejectModal(record)
+}
+
+export function destroyAllConfirmModals(scope: FeedbackScope | null): void {
+  if (!scope) return
+  const open = scope.modals.getSnapshot()
+  open.forEach((item) => dismissConfirmModal(item))
+  scope.modals.clear()
+}
+
+/**
+ * One key walks loading → success or error. Loading does not auto-dismiss.
+ */
+export async function settleMessage<T>(
+  scope: FeedbackScope | null,
+  key: string | number,
+  phases: MessagePromisePhases,
+  task: Promise<T>
+): Promise<T> {
+  enqueueMessage(scope, { key, content: phases.loading, duration: 0, closable: false }, 'loading')
+  try {
+    const value = await task
+    enqueueMessage(scope, { key, content: phases.success }, 'success')
+    return value
+  } catch (error) {
+    enqueueMessage(scope, { key, content: phases.error }, 'error')
+    throw error
+  }
 }

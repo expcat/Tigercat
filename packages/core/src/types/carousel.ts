@@ -83,6 +83,16 @@ export interface CarouselProps {
    * Custom styles
    */
   style?: Record<string, string | number>
+  /**
+   * Main axis. Displacement follows this axis.
+   * @default 'horizontal'
+   */
+  axis?: 'horizontal' | 'vertical'
+  /**
+   * Slides visible along the main axis.
+   * @default 1
+   */
+  slidesPerView?: number
 }
 
 /**

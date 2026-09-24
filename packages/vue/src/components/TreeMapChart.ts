@@ -33,6 +33,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
+import { DrillHost } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
@@ -79,6 +80,10 @@ export const TreeMapChart = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
+    bind: {
+      type: Object as PropType<{ roots?: { id: string; children?: { id: string }[] }[] }>,
+      default: undefined
+    },
     onNodeClick: {
       type: Function as PropType<(index: number, datum: TreeMapChartDatum) => void>
     }
@@ -120,7 +125,8 @@ export const TreeMapChart = defineComponent({
       handleKeyDown,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave
+      handleLegendLeave,
+      isLegendIndexHidden
     } = useChartInteraction<TreeMapChartDatum>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -147,7 +153,9 @@ export const TreeMapChart = defineComponent({
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
         getLabel: (d) => d.label,
-        getColor: (_d, i) => roots.value[i]?.color ?? palette.value[i % palette.value.length]
+        getColor: (_d, i) => roots.value[i]?.color ?? palette.value[i % palette.value.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       }).map((item, i) => ({ ...item, index: roots.value[i]?.index ?? item.index }))
     )
     const tooltipContent = computed(() => {
@@ -338,6 +346,7 @@ export const TreeMapChart = defineComponent({
                 onItemLeave: handleLegendLeave
               })
             : null,
+          props.bind?.roots ? h(DrillHost, { roots: props.bind.roots }) : null,
           tooltip
         ]
       )

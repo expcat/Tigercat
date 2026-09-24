@@ -6,6 +6,7 @@
 import type { AnchorDirection } from '../types/anchor'
 import { isBrowser } from './env'
 import { prefersReducedMotion } from './transition'
+import { createSectionScrollModel, sectionScrollBehavior } from './section-scroll-utils'
 import { resolveScrollRoot, type ScrollRootInput } from './scroll-root'
 
 /**
@@ -266,7 +267,7 @@ export function scrollToAnchor(
 
   const top = getElementOffsetTop(element, container) - targetOffset
   const scrollTarget = container === window ? window : (container as HTMLElement)
-  const behavior: ScrollBehavior = prefersReducedMotion() ? 'auto' : 'smooth'
+  const behavior = sectionScrollBehavior(prefersReducedMotion())
   scrollTarget.scrollTo({ top, behavior })
 }
 

@@ -91,6 +91,11 @@ export interface StepsProps {
    */
   clickable?: boolean
   /**
+   * Dot markers. Connectors still follow the step list.
+   * @default false
+   */
+  progressDot?: boolean
+  /**
    * Data-driven items. When set, `StepsItem` children are optional.
    */
   items?: StepItem[]

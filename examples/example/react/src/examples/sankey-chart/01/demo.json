@@ -1,0 +1,12 @@
+{
+  "id": "sankey-chart-01",
+  "title": "Sankey",
+  "description": "Nodes and flow bands. Layout stays in core.",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

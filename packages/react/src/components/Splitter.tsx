@@ -22,7 +22,10 @@ import {
   getSplitterPointerDelta,
   isSplitterRtl,
   jumpSplitterGutter,
+  collapseSplitterSizes,
+  feedbackLayoutLabels,
   layoutDeclaredPanes,
+  restoreSplitterSize,
   measureSplitterContainer,
   normalizeSplitterBounds,
   resizePanes,
@@ -50,6 +53,7 @@ export interface SplitterProps
   onSizesChange?: (sizes: number[]) => void
   children?: React.ReactNode
   style?: React.CSSProperties
+  collapsible?: boolean
 }
 
 function flattenSplitterPanes(children: React.ReactNode): React.ReactNode[] {
@@ -84,6 +88,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
     onResizeEnd,
     onSizesChange,
     children,
+    collapsible = false,
     dir,
     ...rest
   },
@@ -126,6 +131,9 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
     bounds.maxes
   )
   const panePixels = boxes.map((box) => box.pixels ?? 0)
+  const pixelsRef = useRef(panePixels)
+  pixelsRef.current = panePixels
+  const [collapsedPrevious, setCollapsedPrevious] = useState<(number | string | null)[]>([])
 
   if (controlledSizes && controlledSizes.length !== paneCount) {
     devWarn(
@@ -137,6 +145,10 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
   const setContainerNode = useCallback(
     (node: HTMLDivElement | null) => {
       containerRef.current = node
+      if (node) {
+        ;(node as HTMLDivElement & { getSizes?: () => number[] }).getSizes = () =>
+          pixelsRef.current.slice()
+      }
       if (typeof ref === 'function') ref(node)
       else if (ref) ref.current = node
     },
@@ -313,8 +325,39 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
               id={paneId}
               className={splitterPaneBaseClasses}
               style={paneStyle}
-              data-pane-index={i}>
-              {child}
+              data-pane-index={i}
+              data-collapsed={collapsedPrevious[i] != null ? '' : undefined}>
+              {collapsible ? (
+                <button
+                  type="button"
+                  data-tiger-splitter-collapse={String(i)}
+                  aria-label={
+                    collapsedPrevious[i] != null
+                      ? feedbackLayoutLabels.splitterExpand
+                      : feedbackLayoutLabels.splitterCollapse
+                  }
+                  onClick={() => {
+                    const base = (dragPixels ?? controlledSizes ?? panePixels).slice()
+                    const stored = collapsedPrevious[i]
+                    const nextSizes =
+                      stored == null
+                        ? collapseSplitterSizes(base, i).sizes
+                        : restoreSplitterSize(base, i, stored)
+                    setCollapsedPrevious((current) => {
+                      const copy = current.slice()
+                      copy[i] = stored == null ? (collapseSplitterSizes(base, i).previous) : null
+                      return copy
+                    })
+                    const numeric = nextSizes.map((size) => (typeof size === 'number' ? size : 0))
+                    setOverride({ key: sizesKey, pixels: numeric })
+                    onSizesChange?.(numeric)
+                  }}>
+                  {collapsedPrevious[i] != null
+                    ? feedbackLayoutLabels.splitterExpand
+                    : feedbackLayoutLabels.splitterCollapse}
+                </button>
+              ) : null}
+              {collapsedPrevious[i] != null ? null : child}
             </div>
             {i < panes.length - 1 && (
               <div

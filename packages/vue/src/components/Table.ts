@@ -36,6 +36,11 @@ import {
   getTableVirtualRecommendation,
   getTableVirtualWindow,
   resolveScrollportViewport,
+  virtualizeMiddleColumns,
+  parseWidthToPx,
+  cardVirtualWindow,
+  nextGridCell,
+  resolveTableKeyboardMode,
   getTableCardSortValue,
   parseTableCardSortValue,
   subscribeTableCardViewport,
@@ -69,6 +74,7 @@ import { renderTableHeader } from './Table/render-header'
 import { renderTableBody } from './Table/render-body'
 import { renderSummaryRow } from './Table/render-summary'
 import { renderPagination } from './Table/render-pagination'
+import { TableW9Panel } from './Table/w9-panel'
 import type { TableInternalProps } from './Table/types'
 
 export type { VueTableProps, VueTableProps as TableProps }
@@ -87,8 +93,10 @@ export const Table = defineComponent({
     const measuredContainerSize = ref({ width: 0, height: 0 })
     const virtualScrollerRef = ref<HTMLElement | null>(null)
     const virtualClientHeight = ref(0)
+    const columnScrollLeft = ref(0)
     const uncontrolledCardViewport = ref(false)
     const activeRowIndex = ref(0)
+    const gridCell = ref({ row: 0, column: 0 })
     const cardViewportControlled = computed(() => props.cardViewport !== undefined)
     const isCardViewport = computed(() =>
       cardViewportControlled.value ? Boolean(props.cardViewport) : uncontrolledCardViewport.value
@@ -310,6 +318,16 @@ export const Table = defineComponent({
     onMounted(() => attachResizeObserver())
 
     watch(
+      () => props.scrollToIndex,
+      (index) => {
+        if (typeof index !== 'number' || !virtualScrollerRef.value) return
+        const top = Math.max(0, index) * props.virtualItemHeight
+        virtualScrollerRef.value.scrollTop = top
+        ctx.virtualScrollTop.value = top
+      }
+    )
+
+    watch(
       () => ctx.currentPage.value,
       () => {
         ctx.virtualScrollTop.value = 0
@@ -413,6 +431,17 @@ export const Table = defineComponent({
             ctx.paginatedData.value.length
           )
         : undefined
+      const columnSlice = virtualizeMiddleColumns({
+        columns: ctx.displayColumns.value,
+        widths: ctx.displayColumns.value.map((column) => parseWidthToPx(column.width)),
+        scrollLeft: columnScrollLeft.value,
+        viewportWidth: typeof resolvedProps.width === 'number' ? resolvedProps.width : 0,
+        overscan: resolvedProps.overscan,
+        enabled: resolvedProps.virtualizeColumns
+      })
+      const renderedColumns = columnSlice.active
+        ? [...columnSlice.start, ...columnSlice.middle, ...columnSlice.end]
+        : undefined
 
       const renderProps = {
         ...resolvedProps,
@@ -422,6 +451,7 @@ export const Table = defineComponent({
         interactiveRows:
           !!resolvedProps.rowSelection || typeof instance?.vnode.props?.onRowClick === 'function',
         virtualWindow,
+        renderedColumns,
         selectionName: selectionGroupName,
         activeRowIndex: activeRowIndex.value,
         onActiveRowIndex: (index: number) => {
@@ -464,6 +494,34 @@ export const Table = defineComponent({
         {
           ref: tableRef,
           'aria-label': resolvedProps.ariaLabel || tableLabels.value.tableAriaLabel,
+          'aria-rowcount': resolvedProps.virtual
+            ? String(ctx.paginatedData.value.length + 1)
+            : undefined,
+          'aria-colcount': resolvedProps.virtualizeColumns
+            ? String(ctx.displayColumns.value.length)
+            : undefined,
+          'data-keyboard-mode': resolvedProps.grid
+            ? resolveTableKeyboardMode(true)
+            : undefined,
+          'data-grid-cell': resolvedProps.grid
+            ? `${gridCell.value.row}-${gridCell.value.column}`
+            : undefined,
+          tabindex: resolvedProps.grid ? 0 : undefined,
+          onKeydown: resolvedProps.grid
+            ? (event: KeyboardEvent) => {
+                const next = nextGridCell({
+                  row: gridCell.value.row,
+                  column: gridCell.value.column,
+                  rowCount: ctx.paginatedData.value.length,
+                  columnCount: ctx.displayColumns.value.length,
+                  key: event.key
+                })
+                if (!next || next === undefined) return
+                if (!event.key.startsWith('Arrow')) return
+                event.preventDefault()
+                gridCell.value = next
+              }
+            : undefined,
           class: classNames(
             tableBaseClasses,
             resolvedProps.responsiveMode === 'scroll'
@@ -490,7 +548,9 @@ export const Table = defineComponent({
         overflow: 'auto'
       }
       const onVirtualScroll = (e: Event) => {
-        ctx.virtualScrollTop.value = (e.target as HTMLElement).scrollTop
+        const target = e.target as HTMLElement
+        ctx.virtualScrollTop.value = target.scrollTop
+        columnScrollLeft.value = target.scrollLeft
       }
 
       const tableContent =
@@ -579,6 +639,14 @@ export const Table = defineComponent({
           )
         }
 
+        const cardHeightWindow = cardVirtualWindow({
+          scrollTop: ctx.virtualScrollTop.value,
+          viewportHeight: virtualClientHeight.value || 240,
+          cardHeight: resolvedProps.cardItemHeight,
+          variable: false,
+          count: ctx.paginatedData.value.length
+        })
+
         if (resolvedProps.loading) {
           // Data is hidden under the overlay, matching table tbody.
         } else if (ctx.paginatedData.value.length === 0) {
@@ -594,9 +662,14 @@ export const Table = defineComponent({
             )
           )
         } else {
-          const cardStart = effectiveVirtual && virtualWindow ? virtualWindow.startIndex : 0
-          const cardEnd =
-            effectiveVirtual && virtualWindow
+          const cardStart = cardHeightWindow
+            ? cardHeightWindow.start
+            : effectiveVirtual && virtualWindow
+              ? virtualWindow.startIndex
+              : 0
+          const cardEnd = cardHeightWindow
+            ? cardHeightWindow.end
+            : effectiveVirtual && virtualWindow
               ? virtualWindow.endIndex + 1
               : ctx.paginatedData.value.length
           if (effectiveVirtual && virtualWindow && virtualWindow.topPad > 0) {
@@ -901,6 +974,9 @@ export const Table = defineComponent({
           {
             class: tableCardListVisibleClasses,
             'data-tiger-table-mobile': 'card',
+            'data-tiger-card-window': cardHeightWindow
+              ? `${cardHeightWindow.start}-${cardHeightWindow.end}`
+              : undefined,
             style: effectiveVirtual ? virtualScrollerStyle : undefined,
             onScroll: effectiveVirtual ? onVirtualScroll : undefined
           },
@@ -928,6 +1004,40 @@ export const Table = defineComponent({
           'aria-busy': resolvedProps.loading
         },
         [
+          h(TableW9Panel, {
+            active: resolvedProps.sorts !== undefined,
+            columns: ctx.displayColumns.value,
+            sorts: ctx.multiSort.value,
+            pageKeys: ctx.paginatedRowKeys.value,
+            loadedKeys: ctx.processedRowKeys.value,
+            disabledKeys: ctx.paginatedData.value.flatMap((record, index) => {
+              const key = ctx.paginatedRowKeys.value[index]
+              const checkbox = resolvedProps.rowSelection?.getCheckboxProps?.(record)
+              return checkbox?.disabled && key !== undefined ? [key] : []
+            }),
+            pageRecords: ctx.paginatedData.value as Record<string, unknown>[],
+            processedRecords: ctx.processedData.value,
+            processedKeys: ctx.processedRowKeys.value,
+            selectedKeys: ctx.selectedRowKeys.value,
+            remote: resolvedProps.rowSelection?.remote === true,
+            onSort: (key: string) => ctx.applyMultiSort(key),
+            onFilter: (key: string, value: string) => ctx.handleFilter(key, value),
+            onHide: (key: string) => {
+              const hidden = ctx.hiddenColumnKeys.value.includes(key)
+                ? ctx.hiddenColumnKeys.value.filter((item) => item !== key)
+                : [...ctx.hiddenColumnKeys.value, key]
+              ctx.handleSetHiddenColumns(hidden)
+            },
+            onResize: (key: string, width: number) => ctx.applyColumnWidth(key, width),
+            onSelection: (keys: (string | number)[], announcement: string) => {
+              ctx.replaceSelectedKeys(keys)
+              if (announcement) ctx.selectionLive.value = announcement
+            },
+            onRemoteSelect: () => ctx.handleSelectLoaded(true)
+          }),
+          ctx.dragLive.value
+            ? h('div', { role: 'status', 'data-tiger-drag-live': '' }, ctx.dragLive.value)
+            : null,
           resolvedProps.exportable &&
             h('div', { class: tableExportBarClasses }, [
               h(

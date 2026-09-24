@@ -2,6 +2,9 @@ import { defineComponent, computed, h, nextTick, PropType, ref, watchEffect } fr
 import {
   classNames,
   coerceClassValue,
+  formatChartTimeTick,
+  heatBandLabel,
+  heatColorBand,
   layoutHeatmap,
   getHeatmapCellIndexAtPoint,
   getHeatmapDevicePixelRatio,
@@ -33,6 +36,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
+import { renderHeatBind } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
@@ -81,6 +85,17 @@ export const HeatmapChart = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
+    bind: {
+      type: Object as PropType<{
+        minColor?: string
+        maxColor?: string
+        value?: number
+        min?: number
+        max?: number
+        calendar?: (number | Date)[]
+      }>,
+      default: undefined
+    },
     onCellClick: {
       type: Function as PropType<(index: number, datum: HeatmapChartDatum | null) => void>
     }
@@ -444,7 +459,25 @@ export const HeatmapChart = defineComponent({
                 )
               )
             : hiddenTable,
-          tooltip
+          tooltip,
+          props.bind
+            ? h('div', { 'data-tiger-calendar-axis': props.bind.calendar ? '' : undefined }, [
+                renderHeatBind(
+                  heatColorBand(
+                    props.bind.minColor ?? '#e0f2fe',
+                    props.bind.maxColor ?? '#0369a1'
+                  ).map((stop) => ({ offset: String(stop.offset), color: stop.color })),
+                  heatBandLabel(props.bind.value ?? null, props.bind.min ?? 0, props.bind.max ?? 1)
+                ),
+                ...(props.bind.calendar ?? []).map((tick, index) =>
+                  h(
+                    'time',
+                    { key: index, dateTime: formatChartTimeTick(tick), 'data-calendar-tick': '' },
+                    formatChartTimeTick(tick)
+                  )
+                )
+              ])
+            : null
         ]
       )
     }

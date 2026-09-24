@@ -108,6 +108,16 @@ export interface ImageCompareProps {
   height?: number | string
 
   /**
+   * Short title for the before side. A slot/node overrides this string.
+   */
+  beforeTitle?: string
+
+  /**
+   * Short title for the after side. A slot/node overrides this string.
+   */
+  afterTitle?: string
+
+  /**
    * Accessible name for the comparison handle.
    * Empty or whitespace is treated as omitted; the ConfigProvider
    * `locale.imageCompare.ariaLabel` is used when no `aria-labelledby` is set.

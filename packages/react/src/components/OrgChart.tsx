@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import {
   computeOrgChartLayout,
+  findOrgMatch,
+  orgVisibleIds,
   getCartesianChartShellClasses,
   getChartLabels,
   mergeTigerLocale,
@@ -20,6 +22,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { useTigerConfig } from './ConfigProvider'
+import { OrgBind } from './w9-chart-bind'
 
 export interface OrgChartProps extends Omit<CoreOrgChartProps, 'className'> {
   padding?: ChartPadding
@@ -27,6 +30,12 @@ export interface OrgChartProps extends Omit<CoreOrgChartProps, 'className'> {
   onNodeClick?: (node: OrgChartNode) => void
   onNodeHover?: (node: OrgChartNode | null) => void
   onSelectedIdChange?: (id: string | number | null) => void
+  bind?: {
+    nodes?: { id: string; label: string; children?: { id: string; label: string }[] }[]
+    collapsed?: string[]
+    query?: string
+    zoom?: number
+  }
 }
 
 export function OrgChart({
@@ -55,9 +64,11 @@ export function OrgChart({
   className,
   onNodeClick,
   onNodeHover,
-  onSelectedIdChange
+  onSelectedIdChange,
+  bind
 }: OrgChartProps): React.ReactElement {
   const config = useTigerConfig()
+  const [orgZoom, setOrgZoom] = useState(1)
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
@@ -205,6 +216,18 @@ export function OrgChart({
           </g>
         </g>
       </ChartCanvas>
+      {bind?.nodes ? (
+        <div data-tiger-org-host="">
+          <OrgBind
+            visible={orgVisibleIds(bind.nodes, bind.collapsed ?? [])}
+            match={findOrgMatch(bind.nodes, bind.query ?? '')}
+            zoom={bind.zoom ?? orgZoom}
+          />
+          <button type="button" data-tiger-org-zoom-in="" onClick={() => setOrgZoom((value) => value + 0.25)}>
+            +
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }

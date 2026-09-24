@@ -22,6 +22,10 @@ export interface SelectBaseProps
   onOpenChange?: (open: boolean) => void
   onBlur?: React.FocusEventHandler<HTMLElement>
   renderOption?: (ctx: SelectOptionSlotContext) => React.ReactNode
+  panelHeader?: React.ReactNode
+  panelFooter?: React.ReactNode
+  panelEmpty?: React.ReactNode
+  maxTagPlaceholder?: (items: { value: SelectValue; label: string; key: string }[]) => React.ReactNode
   className?: string
 }
 

@@ -33,6 +33,8 @@ import {
   getCarouselSlideClasses,
   getNextSlideIndex,
   getPrevSlideIndex,
+  getCarouselAxisTransform,
+  getCarouselSlidesPerView,
   getScrollTransform,
   carouselStatusClasses,
   carouselTrackInstantClasses,
@@ -89,6 +91,7 @@ export interface CarouselProps
   style?: React.CSSProperties
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleCarousel>
+  thumbnails?: boolean
 }
 
 export interface CarouselRef extends CarouselMethods {}
@@ -99,6 +102,9 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       autoplay = false,
       autoplaySpeed = 3000,
       dots = true,
+      axis = 'horizontal',
+      slidesPerView = 1,
+      thumbnails = false,
       dotPosition = 'bottom',
       effect = 'scroll',
       arrows = false,
@@ -526,7 +532,14 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           data-tiger-carousel-track=""
           style={
             {
-              transform: getScrollTransform(displayIndex, dir),
+              transform:
+                axis === 'vertical' || slidesPerView > 1
+                  ? getCarouselAxisTransform(
+                      displayIndex,
+                      axis,
+                      getCarouselSlidesPerView(slidesPerView, slideCount)
+                    )
+                  : getScrollTransform(displayIndex, dir),
               ['--tiger-carousel-duration']: carouselDuration
             } as React.CSSProperties
           }
@@ -542,6 +555,8 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         className={classNames(getCarouselContainerClasses(className))}
         style={style}
         data-tiger-carousel=""
+        data-axis={axis}
+        data-slides-per-view={String(getCarouselSlidesPerView(slidesPerView, slideCount))}
         role={region.role}
         aria-roledescription={labels.roleDescription}
         aria-label={region.ariaLabel}
@@ -577,6 +592,20 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         {arrows
           ? renderArrowButton('next', isNextArrowDisabled, next, carouselNextArrowPath)
           : null}
+        {thumbnails && slideCount > 1 ? (
+          <div data-tiger-carousel-thumbs="">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                data-tiger-carousel-thumb={index}
+                aria-current={index === currentIndex ? 'true' : undefined}
+                onClick={() => goTo(index)}>
+                {index + 1}
+              </button>
+            ))}
+          </div>
+        ) : null}
         {dots && slideCount > 1 ? (
           <div
             className={getCarouselDotsClasses(dotPosition)}

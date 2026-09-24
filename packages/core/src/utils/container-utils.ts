@@ -40,8 +40,11 @@ export interface GetContainerClassesOptions {
   className?: string
 }
 
+/** Default reading measure. `false` turns the cap off. */
+export const CONTAINER_READING_MAX_WIDTH: Exclude<ContainerMaxWidth, false | 'full'> = 'lg'
+
 export function getContainerMaxWidthStyle(
-  maxWidth: ContainerMaxWidth = false
+  maxWidth: ContainerMaxWidth = CONTAINER_READING_MAX_WIDTH
 ): Record<string, string> {
   if (maxWidth === false) return {}
   if (maxWidth === 'full') return { maxWidth: '100%' }

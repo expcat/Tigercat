@@ -32,6 +32,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
+import { DrillHost } from './w9-chart-bind'
 
 export interface TreeMapChartProps extends CoreTreeMapChartProps {
   data: TreeMapChartDatum[]
@@ -40,6 +41,7 @@ export interface TreeMapChartProps extends CoreTreeMapChartProps {
   onSelectedIndexChange?: (index: number | null) => void
   onNodeClick?: (index: number, datum: TreeMapChartDatum) => void
   onNodeHover?: (index: number | null, datum: TreeMapChartDatum | null) => void
+  bind?: { roots?: { id: string; children?: { id: string }[] }[] }
 }
 
 export const TreeMapChart: React.FC<TreeMapChartProps> = ({
@@ -71,6 +73,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   locale,
   labels: labelsOverride,
   className,
+  bind,
   onHoveredIndexChange,
   onSelectedIndexChange,
   onNodeClick,
@@ -121,7 +124,8 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<TreeMapChartDatum>({
     hoverable,
     showTooltip,
@@ -154,7 +158,9 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
         getLabel: (d) => d.label,
-        getColor: (_d, i) => roots[i]?.color ?? palette[i % palette.length]
+        getColor: (_d, i) => roots[i]?.color ?? palette[i % palette.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       }).map((item, i) => ({ ...item, index: roots[i]?.index ?? item.index })),
     [roots, palette, activeIndex, resolvedSelectedIndex]
   )
@@ -314,6 +320,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
           onItemLeave={handleLegendLeave}
         />
       ) : null}
+      {bind?.roots ? <DrillHost roots={bind.roots} /> : null}
       {tooltip}
     </div>
   )

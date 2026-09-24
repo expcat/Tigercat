@@ -315,8 +315,8 @@ describe('menuSchemaToMenuItems', () => {
       })
     ])
 
-    expect(items).toEqual([{ key: 'jobs', label: 'Jobs', href: '/jobs' }])
-    expect(items[0]).not.toHaveProperty('badge')
+    expect(items).toEqual([{ key: 'jobs', label: 'Jobs', href: '/jobs', badge: 3 }])
+    expect(items[0]?.badge).toBe(3)
     expect(items[0]).not.toHaveProperty('iframeSrc')
     expect(items[0]).not.toHaveProperty('hideInBreadcrumb')
     expect(items[0]).not.toHaveProperty('flatMenu')

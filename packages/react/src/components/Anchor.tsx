@@ -14,6 +14,8 @@ import {
   classNames,
   anchorNestedListClasses,
   createAnchorObserver,
+  createSectionScrollModel,
+  sectionScrollBehavior,
   createProgrammaticScrollLock,
   findAnchorLinkElement,
   getAnchorInkActiveClasses,
@@ -305,8 +307,19 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
     [activeLink, orientation, registerLink, unregisterLink, handleLinkClick]
   )
 
+  const sectionModel = useMemo(
+    () => createSectionScrollModel({ activeHref: activeLink }),
+    [activeLink]
+  )
+
   const nav = (
-    <nav ref={setNavRef} className={wrapperClasses} style={style} aria-label={navLabel}>
+    <nav
+      ref={setNavRef}
+      className={wrapperClasses}
+      style={style}
+      aria-label={navLabel}
+      data-tiger-section-behavior={sectionScrollBehavior(sectionModel.reducedMotion)}
+      data-tiger-section-active={sectionModel.activeHref}>
       {showInk && (
         <div className={getAnchorInkContainerClasses(orientation)}>
           <div ref={inkRef} className={getAnchorInkActiveClasses(orientation)} />

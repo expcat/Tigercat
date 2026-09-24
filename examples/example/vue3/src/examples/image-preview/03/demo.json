@@ -1,0 +1,8 @@
+{
+  "id": "image-preview-03",
+  "title": "翻转、下载与循环",
+  "description": "水平翻转、下载当前地址、回到 1:1。多图左右循环。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 560, "maxHeight": 720 }
+}

@@ -2,6 +2,10 @@ import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   clampGanttDragDeltaX,
   computeGanttLayout,
+  ganttDependencyAnchors,
+  ganttRowWindow,
+  ganttVisibleWindow,
+  isGanttMilestone,
   ganttAxisTextClasses,
   ganttDateValuesEqual,
   ganttDependencyClasses,
@@ -28,6 +32,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { useTigerConfig } from './ConfigProvider'
+import { GanttBind } from './w9-chart-bind'
 
 const GANTT_BAR_CLICK_PX = 4
 
@@ -56,6 +61,15 @@ export interface GanttProps extends Omit<CoreGanttProps, 'className'> {
   onSelectedIdChange?: (id: string | number | null) => void
   onTaskChange?: (task: GanttTask) => void
   onDataChange?: (data: GanttTask[]) => void
+  bind?: {
+    tasks?: { id: string; start: number; end: number }[]
+    dependency?: 'FS' | 'SS' | 'FF' | 'SF'
+    source?: { x: number; width: number }
+    target?: { x: number; width: number }
+    window?: { start: number; end: number }
+    rowHeight?: number
+    viewportHeight?: number
+  }
 }
 
 export function Gantt({
@@ -94,7 +108,8 @@ export function Gantt({
   onTaskHover,
   onSelectedIdChange,
   onTaskChange,
-  onDataChange
+  onDataChange,
+  bind
 }: GanttProps): React.ReactElement {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -505,6 +520,23 @@ export function Gantt({
           </g>
         </g>
       </ChartCanvas>
+      {bind ? (
+        <GanttBind
+          milestones={(bind.tasks ?? [])
+            .filter((task) => isGanttMilestone(task.start, task.end))
+            .map((task) => task.id)}
+          anchors={
+            bind.dependency && bind.source && bind.target
+              ? ganttDependencyAnchors(bind.dependency, bind.source, bind.target)
+              : undefined
+          }
+          windowCount={
+            ganttVisibleWindow(bind.tasks ?? [], bind.window ?? null).length +
+            ganttRowWindow(0, bind.viewportHeight ?? 0, bind.tasks?.length ?? 0, bind.rowHeight ?? 28)
+              .end
+          }
+        />
+      ) : null}
     </div>
   )
 }

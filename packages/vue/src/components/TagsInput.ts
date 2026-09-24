@@ -13,8 +13,11 @@ import {
   getTagsInputHighlightClasses,
   getTagsInputInnerInputClasses,
   getTagsInputLabels,
+  getW9FormLabels,
+  formatW9Label,
   mergeAriaDescribedBy,
   mergeStyleValues,
+  moveTag,
   moveTagsHighlight,
   removeTagAt,
   resolveTagsPaste,
@@ -68,7 +71,7 @@ export const TagsInput = defineComponent({
     focus: null,
     blur: null
   },
-  setup(props, { emit, attrs, expose }) {
+  setup(props, { emit, attrs, expose, slots }) {
     const config = useTigerConfig()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
     const formItemControl = inject<VueFormItemControlContext | null>(
@@ -146,9 +149,13 @@ export const TagsInput = defineComponent({
         setTags(result.tags)
         result.added.forEach((tag) => emit('add', tag))
       }
-      if (result.rejected.length > 0) {
-        const atLimit = props.max !== undefined && result.tags.length >= props.max
-        rejection.value = atLimit ? labels.value.limitText : labels.value.duplicateText
+      if (result.rejections.length > 0) {
+        const first = result.rejections[0]
+        const labelsW9 = getW9FormLabels()
+        rejection.value = formatW9Label(
+          first.reason === 'max' ? labelsW9.tagMax : labelsW9.tagDuplicate,
+          { tag: first.tag }
+        )
       } else if (result.added.length > 0) {
         rejection.value = ''
       }
@@ -300,7 +307,18 @@ export const TagsInput = defineComponent({
                 {
                   key: `${tag}-${index}`,
                   id: `${fieldId}-tag-${index}`,
-                  role: 'listitem'
+                  role: 'listitem',
+                  draggable: isInteractive.value,
+                  onDragstart: (event: DragEvent) => {
+                    event.dataTransfer?.setData('text/plain', String(index))
+                  },
+                  onDragover: (event: DragEvent) => event.preventDefault(),
+                  onDrop: (event: DragEvent) => {
+                    event.preventDefault()
+                    const from = Number(event.dataTransfer?.getData('text/plain'))
+                    if (!Number.isInteger(from)) return
+                    setTags(moveTag(tags.value, from, index))
+                  }
                 },
                 [
                   h(
@@ -319,7 +337,7 @@ export const TagsInput = defineComponent({
                         inputRef.value?.focus()
                       }
                     },
-                    () => tag
+                    () => slots.tag?.({ tag, index }) ?? tag
                   )
                 ]
               )

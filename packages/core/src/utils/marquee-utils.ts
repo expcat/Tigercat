@@ -63,6 +63,9 @@ export const marqueeContentVerticalClasses = 'flex-col items-stretch'
 /** Duplicate copies used only for the seamless loop */
 export const marqueeCloneClasses = 'tiger-marquee-clone'
 
+/** Edge fade overlays. They do not receive pointer events. */
+export const marqueeFadeClasses = 'tiger-marquee-fade'
+
 const MARQUEE_DIRECTIONS = new Set<MarqueeDirection>(['start', 'end', 'up', 'down'])
 
 /** Looping keyframes and reduced-motion rules. Wired by the Tailwind plugin. */
@@ -120,6 +123,43 @@ export const marqueeBaseStyles = {
     {
       animationPlayState: 'paused'
     },
+  '.tiger-marquee-fade': {
+    position: 'relative'
+  },
+  '.tiger-marquee-fade::before, .tiger-marquee-fade::after': {
+    content: '""',
+    position: 'absolute',
+    pointerEvents: 'none',
+    zIndex: '1'
+  },
+  '.tiger-marquee-horizontal.tiger-marquee-fade::before, .tiger-marquee-horizontal.tiger-marquee-fade::after':
+    {
+      top: '0',
+      bottom: '0',
+      width: '2rem'
+    },
+  '.tiger-marquee-horizontal.tiger-marquee-fade::before': {
+    insetInlineStart: '0',
+    background: 'linear-gradient(to right, var(--tiger-surface), transparent)'
+  },
+  '.tiger-marquee-horizontal.tiger-marquee-fade::after': {
+    insetInlineEnd: '0',
+    background: 'linear-gradient(to left, var(--tiger-surface), transparent)'
+  },
+  '.tiger-marquee-vertical.tiger-marquee-fade::before, .tiger-marquee-vertical.tiger-marquee-fade::after':
+    {
+      insetInlineStart: '0',
+      insetInlineEnd: '0',
+      height: '2rem'
+    },
+  '.tiger-marquee-vertical.tiger-marquee-fade::before': {
+    top: '0',
+    background: 'linear-gradient(to bottom, var(--tiger-surface), transparent)'
+  },
+  '.tiger-marquee-vertical.tiger-marquee-fade::after': {
+    bottom: '0',
+    background: 'linear-gradient(to top, var(--tiger-surface), transparent)'
+  },
   '@media (prefers-reduced-motion: reduce)': {
     '.tiger-marquee': { overflow: 'auto' },
     '.tiger-marquee > .tiger-marquee-track': {
@@ -341,6 +381,7 @@ export function getMarqueeRootClasses(
     pauseOnFocus?: boolean
     paused?: boolean
     repeat?: number
+    edgeFade?: boolean
     className?: string
   } = {}
 ): string {
@@ -354,6 +395,7 @@ export function getMarqueeRootClasses(
     !pauseControlled && resolveMarqueePauseOnHover(input.pauseOnHover) && marqueePauseHoverClasses,
     !pauseControlled && resolveMarqueePauseOnFocus(input.pauseOnFocus) && marqueePauseFocusClasses,
     !looping && marqueeStaticClasses,
+    input.edgeFade && marqueeFadeClasses,
     input.className
   )
 }

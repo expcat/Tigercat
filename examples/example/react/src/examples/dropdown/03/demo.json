@@ -1,0 +1,7 @@
+{
+  "id": "dropdown-03",
+  "title": "共用菜单项",
+  "description": "危险项、勾选、快捷键和子菜单使用同一套项模型。",
+  "entry": "App.tsx",
+  "order": 3
+}

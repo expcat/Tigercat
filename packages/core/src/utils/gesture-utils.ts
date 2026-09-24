@@ -214,3 +214,45 @@ export function createLongPressController(
     isPending: () => timerHandle !== undefined
   }
 }
+
+/** Fraction of the panel size that commits a follow-finger close. */
+export const SHEET_CLOSE_THRESHOLD_RATIO = 0.35
+
+export type SheetRelease = 'close' | 'snap'
+
+export type SheetReducedMotionRelease = 'close' | 'stay'
+
+/** Distance along the close axis. Motion the other way stays at 0. */
+export function clampSheetDragDistance(distance: number): number {
+  if (!Number.isFinite(distance) || distance <= 0) return 0
+  return distance
+}
+
+export function resolveSheetRelease(
+  distance: number,
+  size: number,
+  threshold = SHEET_CLOSE_THRESHOLD_RATIO
+): SheetRelease {
+  const traveled = clampSheetDragDistance(distance)
+  if (!(size > 0)) return traveled >= 48 ? 'close' : 'snap'
+  const ratio = Number.isFinite(threshold) && threshold > 0 ? threshold : SHEET_CLOSE_THRESHOLD_RATIO
+  return traveled / size >= ratio ? 'close' : 'snap'
+}
+
+/**
+ * Reduced motion skips the snap-back animation.
+ * A commit still closes; a short drag stays put.
+ */
+export function resolveSheetReducedMotion(
+  release: SheetRelease,
+  reducedMotion: boolean
+): SheetRelease | SheetReducedMotionRelease {
+  if (!reducedMotion) return release
+  return release === 'close' ? 'close' : 'stay'
+}
+
+export function sheetDragTransform(axis: 'x' | 'y', distance: number, sign: 1 | -1): string {
+  const offset = clampSheetDragDistance(distance) * sign
+  if (axis === 'x') return `translate3d(${offset}px, 0, 0)`
+  return `translate3d(0, ${offset}px, 0)`
+}

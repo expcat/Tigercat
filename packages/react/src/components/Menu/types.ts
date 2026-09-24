@@ -3,6 +3,7 @@ import type {
   MenuKey,
   MenuMode,
   MenuTheme,
+  MenuSchemaBadge,
   MenuItem as CoreMenuItem,
   MenuProps as CoreMenuProps,
   MenuItemProps as CoreMenuItemProps,
@@ -23,6 +24,14 @@ export interface MenuContextValue {
   handleOpenChange: (key: MenuKey, open?: boolean) => void
   tabStopKey?: MenuKey
   setTabStopKey: (key: MenuKey) => void
+  typeahead: {
+    push: (
+      character: string,
+      labels: readonly string[],
+      fromIndex: number,
+      disabled?: readonly boolean[]
+    ) => { query: string; index: number } | null
+  }
 }
 
 export interface SubMenuScopeValue {
@@ -49,6 +58,8 @@ export interface MenuItemProps
   children?: React.ReactNode
   level?: number
   collapsed?: boolean
+  badge?: MenuSchemaBadge
+  shortcut?: string
 }
 
 export interface MenuItemGroupProps extends CoreMenuItemGroupProps {

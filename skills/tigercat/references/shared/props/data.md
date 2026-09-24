@@ -78,7 +78,7 @@ Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip
 
 ## Table
 
-`packages/core/src/types/table.ts` · `TableProps` · 4/53 props
+`packages/core/src/types/table.ts` · `TableProps` · 4/62 props
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 

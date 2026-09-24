@@ -45,6 +45,7 @@ export interface TableContext {
   currentPage: number
   currentPageSize: number
   hiddenColumnKeys: string[]
+  selectedRowKeys: (string | number)[]
 
   // editable state
   editingCell: { rowIndex: number; columnKey: string } | null
@@ -73,4 +74,17 @@ export interface TableContext {
   handleDrop: (targetKey: string) => void
   handleRowDragStart: (rowKey: string | number) => void
   handleRowDrop: (targetKey: string | number) => void
+  applyMultiSort: (columnKey: string) => void
+  applyColumnWidth: (key: string, width: number) => void
+  toggleGroup: (key: string) => void
+  replaceSelectedKeys: (keys: (string | number)[]) => void
+  multiSort: { key: string; direction: 'asc' | 'desc' }[] | undefined
+  widthMap: Record<string, number>
+  collapsedGroups: string[]
+  groupCollapseEnabled: boolean
+  selectionLive: string
+  dragLive: string
+  setPreviousSelectionCount: (count: number | null) => void
+  previousSelectionCount: number | null
+  setSelectionLive: (text: string) => void
 }

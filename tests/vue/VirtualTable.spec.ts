@@ -51,7 +51,7 @@ describe('VirtualTable (Vue)', () => {
     })
     expect(screen.getByText('Nothing here')).toBeTruthy()
     await rerender({ dataSource: makeData(2), columns, loading: true })
-    expect(screen.getByText('Loading...')).toBeTruthy()
+    expect(screen.getByText('Loading')).toBeTruthy()
   })
 
   it('windows large datasets and pins row height', () => {

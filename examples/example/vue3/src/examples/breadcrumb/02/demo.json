@@ -1,8 +1,7 @@
 {
   "id": "breadcrumb-02",
-  "title": "分隔符与图标",
-  "description": "separator 支持 slash/arrow/chevron 及自定义字符。无 href 只有 onClick 的项渲成按钮。",
+  "title": "折起进菜单",
+  "description": "省略号打开被折起项的菜单，再点一次可以折回。",
   "entry": "App.vue",
-  "order": 2,
-  "viewport": { "mode": "auto", "minHeight": 140, "maxHeight": 720 }
+  "order": 2
 }

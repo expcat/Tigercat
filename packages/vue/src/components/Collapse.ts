@@ -5,7 +5,7 @@ import {
   getCollapseContainerClasses,
   getCollapseHeaderTarget,
   normalizeActiveKeys,
-  togglePanelKey,
+  collapseLevelKeys,
   type CollapseHeaderFocusAction,
   type CollapseHeaderRecord,
   type ExpandIconPosition
@@ -126,7 +126,7 @@ export const Collapse = defineComponent({
     })
 
     const handlePanelClick = (key: string | number) => {
-      const newKeys = togglePanelKey(key, currentActiveKeys.value, props.accordion)
+      const newKeys = collapseLevelKeys(currentActiveKeys.value, key, props.accordion)
 
       if (props.activeKey === undefined) {
         internalActiveKeys.value = newKeys
@@ -141,7 +141,12 @@ export const Collapse = defineComponent({
       if (!root) return
       const buttons = Array.from(
         root.querySelectorAll<HTMLButtonElement>('[data-tiger-collapse-header]')
-      ).filter((button) => !button.disabled && button.getAttribute('aria-disabled') !== 'true')
+      ).filter(
+        (button) =>
+          button.closest('[data-tiger-collapse]') === root &&
+          !button.disabled &&
+          button.getAttribute('aria-disabled') !== 'true'
+      )
       const index = buttons.indexOf(current)
       const next = getCollapseHeaderTarget(
         buttons.map(() => ({ disabled: false })),

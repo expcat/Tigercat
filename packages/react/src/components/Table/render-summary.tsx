@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  buildSummaryCells,
   getTableCellClasses,
   getTableChromeSlots,
   hasTableSelectionColumn,
@@ -15,7 +16,11 @@ export interface RenderSummaryViewProps {
   size: TableSize
   rowSelection?: RowSelectionConfig
   expandable?: ExpandableConfig
-  summaryRow?: { show: boolean; data: Record<string, unknown> }
+  summaryRow?: {
+    show: boolean
+    data?: Record<string, unknown>
+    sum?: boolean | string[]
+  }
 }
 
 export function renderSummaryRow(ctx: TableContext, view: RenderSummaryViewProps): React.ReactNode {
@@ -26,15 +31,21 @@ export function renderSummaryRow(ctx: TableContext, view: RenderSummaryViewProps
     expand: resolveTableExpandSlot(expandable)
   })
   const emptyCell = (key: string) => <td key={key} className={getTableCellClasses(size, 'left')} />
+  const summaryCells = buildSummaryCells({
+    records: ctx.processedData,
+    columns: ctx.displayColumns,
+    caller: summaryRow.data,
+    sum: summaryRow.sum
+  })
   return (
-    <tfoot>
+    <tfoot data-tiger-summary="" style={{ position: 'sticky', bottom: 0 }}>
       <tr className={tableSummaryRowClasses}>
         {chrome.leading.map((slot) => emptyCell(slot))}
-        {ctx.displayColumns.map((column) => (
+        {ctx.displayColumns.map((column, index) => (
           <td
             key={column.key}
             className={getTableCellClasses(size, column.align || 'left', column.className)}>
-            {(summaryRow.data[column.dataKey || column.key] as React.ReactNode) ?? ''}
+            {summaryCells[index] ?? ''}
           </td>
         ))}
         {chrome.trailing.map((slot) => emptyCell(`end-${slot}`))}

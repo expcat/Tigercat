@@ -2,7 +2,7 @@
   "url": "https://context7.com/expcat/tigercat",
   "public_key": "pk_FJkrJukw2qS9fFqa8Lt4m",
   "generated_by": "pnpm docs:api",
-  "component_count": 177,
+  "component_count": 184,
   "reference_paths": {
     "skill_index": "skills/tigercat/SKILL.md",
     "component_index": "skills/tigercat/references/component-index.md",
@@ -43,39 +43,62 @@
     "skills/tigercat/references/shared/props/anchor-link.md",
     "skills/tigercat/references/shared/props/anchor.md",
     "skills/tigercat/references/shared/props/auto-complete.md",
+    "skills/tigercat/references/shared/props/avatar-group.md",
+    "skills/tigercat/references/shared/props/avatar.md",
     "skills/tigercat/references/shared/props/back-top.md",
+    "skills/tigercat/references/shared/props/badge.md",
     "skills/tigercat/references/shared/props/basic.md",
     "skills/tigercat/references/shared/props/breadcrumb-item.md",
     "skills/tigercat/references/shared/props/breadcrumb.md",
+    "skills/tigercat/references/shared/props/button-group.md",
+    "skills/tigercat/references/shared/props/button.md",
     "skills/tigercat/references/shared/props/cascader.md",
     "skills/tigercat/references/shared/props/charts.md",
     "skills/tigercat/references/shared/props/checkbox-group.md",
     "skills/tigercat/references/shared/props/checkbox.md",
+    "skills/tigercat/references/shared/props/code.md",
     "skills/tigercat/references/shared/props/color-picker.md",
     "skills/tigercat/references/shared/props/color-swatch.md",
     "skills/tigercat/references/shared/props/composite.md",
+    "skills/tigercat/references/shared/props/config-provider.md",
     "skills/tigercat/references/shared/props/context-menu-item.md",
     "skills/tigercat/references/shared/props/context-menu-menu.md",
     "skills/tigercat/references/shared/props/context-menu-sub.md",
     "skills/tigercat/references/shared/props/context-menu.md",
+    "skills/tigercat/references/shared/props/copy-button.md",
     "skills/tigercat/references/shared/props/cron-editor.md",
+    "skills/tigercat/references/shared/props/crop-upload.md",
     "skills/tigercat/references/shared/props/data.md",
     "skills/tigercat/references/shared/props/date-picker.md",
+    "skills/tigercat/references/shared/props/divider.md",
     "skills/tigercat/references/shared/props/dropdown-item.md",
     "skills/tigercat/references/shared/props/dropdown-menu.md",
     "skills/tigercat/references/shared/props/dropdown.md",
+    "skills/tigercat/references/shared/props/empty.md",
     "skills/tigercat/references/shared/props/feedback.md",
     "skills/tigercat/references/shared/props/float-button-group.md",
     "skills/tigercat/references/shared/props/float-button.md",
     "skills/tigercat/references/shared/props/form-item.md",
     "skills/tigercat/references/shared/props/form.md",
     "skills/tigercat/references/shared/props/fullscreen-button.md",
+    "skills/tigercat/references/shared/props/gallery.md",
+    "skills/tigercat/references/shared/props/highlight.md",
+    "skills/tigercat/references/shared/props/icon.md",
+    "skills/tigercat/references/shared/props/image-compare.md",
+    "skills/tigercat/references/shared/props/image-cropper.md",
+    "skills/tigercat/references/shared/props/image-group.md",
+    "skills/tigercat/references/shared/props/image-preview.md",
+    "skills/tigercat/references/shared/props/image.md",
+    "skills/tigercat/references/shared/props/inplace.md",
     "skills/tigercat/references/shared/props/input-group-addon.md",
     "skills/tigercat/references/shared/props/input-group.md",
     "skills/tigercat/references/shared/props/input-number.md",
     "skills/tigercat/references/shared/props/input-otp.md",
     "skills/tigercat/references/shared/props/input.md",
+    "skills/tigercat/references/shared/props/kbd.md",
     "skills/tigercat/references/shared/props/layout.md",
+    "skills/tigercat/references/shared/props/link.md",
+    "skills/tigercat/references/shared/props/marquee.md",
     "skills/tigercat/references/shared/props/mask-input.md",
     "skills/tigercat/references/shared/props/mentions.md",
     "skills/tigercat/references/shared/props/menu-item-group.md",
@@ -91,26 +114,35 @@
     "skills/tigercat/references/shared/props/number-keyboard.md",
     "skills/tigercat/references/shared/props/page-header.md",
     "skills/tigercat/references/shared/props/pagination.md",
+    "skills/tigercat/references/shared/props/qr-code.md",
     "skills/tigercat/references/shared/props/radio-group.md",
     "skills/tigercat/references/shared/props/radio.md",
+    "skills/tigercat/references/shared/props/rate.md",
+    "skills/tigercat/references/shared/props/result.md",
     "skills/tigercat/references/shared/props/scroll-spy.md",
+    "skills/tigercat/references/shared/props/segmented.md",
     "skills/tigercat/references/shared/props/select.md",
     "skills/tigercat/references/shared/props/signature.md",
     "skills/tigercat/references/shared/props/slider.md",
+    "skills/tigercat/references/shared/props/split-button.md",
     "skills/tigercat/references/shared/props/spotlight.md",
+    "skills/tigercat/references/shared/props/statistic.md",
     "skills/tigercat/references/shared/props/steps-item.md",
     "skills/tigercat/references/shared/props/steps.md",
     "skills/tigercat/references/shared/props/sub-menu.md",
     "skills/tigercat/references/shared/props/switch.md",
     "skills/tigercat/references/shared/props/tab-pane.md",
     "skills/tigercat/references/shared/props/tabs.md",
+    "skills/tigercat/references/shared/props/tag.md",
     "skills/tigercat/references/shared/props/tags-input.md",
+    "skills/tigercat/references/shared/props/text.md",
     "skills/tigercat/references/shared/props/textarea.md",
     "skills/tigercat/references/shared/props/time-picker.md",
     "skills/tigercat/references/shared/props/transfer.md",
     "skills/tigercat/references/shared/props/tree-select.md",
     "skills/tigercat/references/shared/props/tree.md",
     "skills/tigercat/references/shared/props/upload.md",
+    "skills/tigercat/references/shared/props/watermark.md",
     "skills/tigercat/references/ssr.md",
     "skills/tigercat/references/theme.md",
     "skills/tigercat/references/tokens.md",
@@ -415,9 +447,11 @@
         "ButtonGroup",
         "Code",
         "ConfigProvider",
+        "CopyButton",
         "CropUpload",
         "Divider",
         "Empty",
+        "Gallery",
         "Highlight",
         "Icon",
         "Image",
@@ -425,6 +459,7 @@
         "ImageCropper",
         "ImageGroup",
         "ImagePreview",
+        "Inplace",
         "Kbd",
         "Link",
         "Marquee",
@@ -461,9 +496,11 @@
         "OrgChart",
         "PieChart",
         "RadarChart",
+        "SankeyChart",
         "ScatterChart",
         "SunburstChart",
-        "TreeMapChart"
+        "TreeMapChart",
+        "WaterfallChart"
       ],
       "examples": "skills/tigercat/references/examples/charts.md"
     },
@@ -473,10 +510,12 @@
       "react": "skills/tigercat/references/react/index.md",
       "components": [
         "ActivityFeed",
+        "AssigneePicker",
         "ChatWindow",
         "CommentThread",
         "DataTableWithToolbar",
         "FormWizard",
+        "NotificationBell",
         "NotificationCenter",
         "SchemaForm",
         "TaskBoard",
@@ -872,7 +911,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/avatar.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -892,7 +931,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/avatar-group.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -912,7 +951,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/badge.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -932,7 +971,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/button.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -952,7 +991,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/button-group.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -972,7 +1011,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/code.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -992,7 +1031,27 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/config-provider.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "CopyButton": {
+      "name": "CopyButton",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "copy-button",
+      "testGroup": "basic",
+      "packageSubpath": "./CopyButton",
+      "packageTarget": "CopyButton",
+      "typeSource": "packages/core/src/types/copy-button.ts",
+      "sourceFiles": ["packages/core/src/types/copy-button.ts"],
+      "propsInterfaces": ["CopyButtonProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/copy-button.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1012,7 +1071,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/crop-upload.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1032,7 +1091,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/divider.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1052,7 +1111,27 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/empty.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Gallery": {
+      "name": "Gallery",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "gallery",
+      "testGroup": "basic",
+      "packageSubpath": "./Gallery",
+      "packageTarget": "Gallery",
+      "typeSource": "packages/core/src/types/image.ts",
+      "sourceFiles": ["packages/core/src/types/image.ts"],
+      "propsInterfaces": ["GalleryProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/gallery.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1072,7 +1151,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/highlight.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1092,7 +1171,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/icon.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1112,7 +1191,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/image.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1132,7 +1211,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/image-compare.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1152,7 +1231,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/image-cropper.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1172,7 +1251,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/image-group.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1192,7 +1271,27 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/image-preview.md",
+        "examples": "skills/tigercat/references/examples/basic.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "Inplace": {
+      "name": "Inplace",
+      "aliases": [],
+      "category": "Basic",
+      "slug": "inplace",
+      "testGroup": "basic",
+      "packageSubpath": "./Inplace",
+      "packageTarget": "Inplace",
+      "typeSource": "packages/core/src/types/inplace.ts",
+      "sourceFiles": ["packages/core/src/types/inplace.ts"],
+      "propsInterfaces": ["InplaceProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/inplace.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1212,7 +1311,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/kbd.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1232,7 +1331,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/link.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1252,7 +1351,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/marquee.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1272,7 +1371,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/qr-code.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1292,7 +1391,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/rate.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1312,7 +1411,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/result.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1332,7 +1431,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/segmented.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1352,7 +1451,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/split-button.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1372,7 +1471,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/statistic.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1392,7 +1491,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/tag.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1412,7 +1511,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/text.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1432,7 +1531,7 @@
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
-        "props": "skills/tigercat/references/shared/props/basic.md",
+        "props": "skills/tigercat/references/shared/props/watermark.md",
         "examples": "skills/tigercat/references/examples/basic.md",
         "react": "skills/tigercat/references/react/index.md",
         "vue": "skills/tigercat/references/vue/index.md"
@@ -1758,6 +1857,26 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
+    "SankeyChart": {
+      "name": "SankeyChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "sankey-chart",
+      "testGroup": "charts",
+      "packageSubpath": "./SankeyChart",
+      "packageTarget": "SankeyChart",
+      "typeSource": "packages/core/src/types/chart-visualization.ts",
+      "sourceFiles": ["packages/core/src/types/chart-visualization.ts"],
+      "propsInterfaces": ["SankeyChartProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
     "ScatterChart": {
       "name": "ScatterChart",
       "aliases": ["散点图"],
@@ -1818,6 +1937,26 @@
         "vue": "skills/tigercat/references/vue/index.md"
       }
     },
+    "WaterfallChart": {
+      "name": "WaterfallChart",
+      "aliases": [],
+      "category": "Charts",
+      "slug": "waterfall-chart",
+      "testGroup": "charts",
+      "packageSubpath": "./WaterfallChart",
+      "packageTarget": "WaterfallChart",
+      "typeSource": "packages/core/src/types/chart-visualization.ts",
+      "sourceFiles": ["packages/core/src/types/chart-visualization.ts"],
+      "propsInterfaces": ["WaterfallChartProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/charts.md",
+        "examples": "skills/tigercat/references/examples/charts.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
     "ActivityFeed": {
       "name": "ActivityFeed",
       "aliases": ["活动流"],
@@ -1829,6 +1968,26 @@
       "typeSource": "packages/core/src/types/activity-feed.ts",
       "sourceFiles": ["packages/core/src/types/activity-feed.ts"],
       "propsInterfaces": ["ActivityFeedProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "AssigneePicker": {
+      "name": "AssigneePicker",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "assignee-picker",
+      "testGroup": "composite",
+      "packageSubpath": "./AssigneePicker",
+      "packageTarget": "AssigneePicker",
+      "typeSource": "packages/core/src/types/assignee-picker.ts",
+      "sourceFiles": ["packages/core/src/types/assignee-picker.ts"],
+      "propsInterfaces": ["AssigneePickerProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",
@@ -1909,6 +2068,26 @@
       "typeSource": "packages/core/src/types/form-wizard.ts",
       "sourceFiles": ["packages/core/src/types/form-wizard.ts"],
       "propsInterfaces": ["FormWizardProps"],
+      "frameworks": ["react", "vue"],
+      "references": {
+        "componentIndex": "skills/tigercat/references/component-index.md",
+        "props": "skills/tigercat/references/shared/props/composite.md",
+        "examples": "skills/tigercat/references/examples/composite.md",
+        "react": "skills/tigercat/references/react/index.md",
+        "vue": "skills/tigercat/references/vue/index.md"
+      }
+    },
+    "NotificationBell": {
+      "name": "NotificationBell",
+      "aliases": [],
+      "category": "Composite",
+      "slug": "notification-bell",
+      "testGroup": "composite",
+      "packageSubpath": "./NotificationBell",
+      "packageTarget": "NotificationBell",
+      "typeSource": "packages/core/src/types/notification-bell.ts",
+      "sourceFiles": ["packages/core/src/types/notification-bell.ts"],
+      "propsInterfaces": ["NotificationBellProps"],
       "frameworks": ["react", "vue"],
       "references": {
         "componentIndex": "skills/tigercat/references/component-index.md",

@@ -85,13 +85,12 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     [columnProp, containerWidth]
   )
 
-  if (children && items.length === 0) {
+  if (children && items.length > 0) {
     devWarn(
       'Descriptions.children',
-      'Descriptions: `items` is the data source. Default children are ignored and are not description rows.'
+      '[Tigercat] Descriptions received both items and children. Children are used.'
     )
   }
-
   const rows = groupItemsIntoRows(items, column)
   const labelledBy = title ? titleId : undefined
   const rootClasses = classNames(getDescriptionsClasses(size, bordered), className)
@@ -100,6 +99,17 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     rootRef.current = node
     if (typeof ref === 'function') ref(node)
     else if (ref) ref.current = node
+  }
+
+  if (children) {
+    return (
+      <div
+        ref={setRootRef}
+        data-tiger-descriptions=""
+        className={classNames(getDescriptionsClasses(size, bordered), className)}>
+        {children}
+      </div>
+    )
   }
 
   const renderLabel = (item: DescriptionsItem) => (
@@ -252,5 +262,20 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
 })
 
 Descriptions.displayName = 'Descriptions'
+
+export function DescriptionsItem({
+  label,
+  children
+}: {
+  label?: React.ReactNode
+  children?: React.ReactNode
+}) {
+  return (
+    <div data-tiger-descriptions-item="">
+      <dt>{label}</dt>
+      <dd>{children}</dd>
+    </div>
+  )
+}
 
 export default Descriptions

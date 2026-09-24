@@ -1,0 +1,8 @@
+{
+  "id": "inplace-01",
+  "title": "展示与编辑",
+  "description": "点击展示文案进入编辑，Enter 提交，Escape 取消。编辑态复用输入框。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 240 }
+}

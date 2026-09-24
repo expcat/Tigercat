@@ -39,6 +39,8 @@ export interface VueImageCompareProps {
   afterSrc?: string
   beforeAlt?: string
   afterAlt?: string
+  beforeTitle?: string
+  afterTitle?: string
   fit?: ImageFit
   position?: number
   defaultPosition?: number
@@ -98,6 +100,8 @@ export const ImageCompare = defineComponent({
       type: String,
       default: ''
     },
+    beforeTitle: { type: String, default: undefined },
+    afterTitle: { type: String, default: undefined },
     /**
      * Object-fit applied to the before/after `<img>` elements
      * @default 'cover'
@@ -370,7 +374,16 @@ export const ImageCompare = defineComponent({
               class: getImageCompareAfterClasses(),
               'data-image-compare-after': ''
             },
-            [renderPaneContent(slots.after, props.afterSrc, resolveImageCompareAlt(props.afterAlt, labels.afterAlt))]
+            [
+              props.afterTitle || slots.afterTitle
+                ? h(
+                    'span',
+                    { class: 'pointer-events-none absolute end-2 top-2 text-sm', 'data-compare-after-title': '' },
+                    slots.afterTitle ? slots.afterTitle() : props.afterTitle
+                  )
+                : null,
+              renderPaneContent(slots.after, props.afterSrc, resolveImageCompareAlt(props.afterAlt, labels.afterAlt))
+            ]
           ),
           h(
             'div',
@@ -379,7 +392,16 @@ export const ImageCompare = defineComponent({
               style: getImageCompareClipStyle(position, orientation, step, rtl),
               'data-image-compare-before': ''
             },
-            [renderPaneContent(slots.before, props.beforeSrc, resolveImageCompareAlt(props.beforeAlt, labels.beforeAlt))]
+            [
+              props.beforeTitle || slots.beforeTitle
+                ? h(
+                    'span',
+                    { class: 'pointer-events-none absolute start-2 top-2 text-sm', 'data-compare-before-title': '' },
+                    slots.beforeTitle ? slots.beforeTitle() : props.beforeTitle
+                  )
+                : null,
+              renderPaneContent(slots.before, props.beforeSrc, resolveImageCompareAlt(props.beforeAlt, labels.beforeAlt))
+            ]
           ),
           h(
             'div',
@@ -399,7 +421,10 @@ export const ImageCompare = defineComponent({
               'aria-valuemin': 0,
               'aria-valuemax': 100,
               'aria-valuenow': position,
-              'aria-valuetext': formatImageCompareValueText(labels.valueText, position),
+              'aria-valuetext': formatImageCompareValueText(labels.valueText, position, {
+                before: props.beforeTitle,
+                after: props.afterTitle
+              }),
               'aria-orientation': vertical ? 'vertical' : 'horizontal',
               'aria-disabled': props.disabled,
               onKeydown: (event: KeyboardEvent) => {

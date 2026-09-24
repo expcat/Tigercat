@@ -16,6 +16,9 @@ import {
   createFormErrorMap,
   commitFocusedFormControl,
   focusFirstInvalidField,
+  focusFormField,
+  formErrorSummary,
+  getW9FormLabels,
   formValuesEqual,
   isFormValidationSuperseded,
   mergeTigerLocale,
@@ -146,6 +149,10 @@ export const Form = defineComponent({
       default: true
     },
     disabled: {
+      type: Boolean,
+      default: false
+    },
+    showErrorSummary: {
       type: Boolean,
       default: false
     },
@@ -353,6 +360,8 @@ export const Form = defineComponent({
       setInitialValues: (values) => engine().setInitialValues(values),
       addField: (fieldName, defaultValue) => engine().addField(fieldName, defaultValue),
       removeField: (fieldName) => engine().removeField(fieldName),
+      insertFieldArrayItem: (path, index, item) => engine().insertFieldArrayItem(path, index, item),
+      removeFieldArrayItem: (path, index) => engine().removeFieldArrayItem(path, index),
       undo: () => engine().undo(),
       redo: () => engine().redo(),
       snapshotHistory: () => engine().snapshotHistory(),
@@ -386,7 +395,35 @@ export const Form = defineComponent({
           onSubmit: handleSubmit,
           onReset: handleReset
         },
-        slots.default?.()
+        [
+          props.showErrorSummary && errors.value.length
+            ? h(
+                'ul',
+                {
+                  class: 'tiger-form__error-summary mb-3 list-disc ps-5 text-sm text-[var(--tiger-error)]',
+                  'aria-label': getW9FormLabels(
+                    mergeTigerLocale(config.value.locale, props.locale).locale
+                  ).errorSummary
+                },
+                formErrorSummary(errors.value).map((item) =>
+                  h(
+                    'li',
+                    { key: item.field },
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: 'underline',
+                        onClick: () => focusFormField(formElementRef.value, item.field)
+                      },
+                      item.message
+                    )
+                  )
+                )
+              )
+            : null,
+          slots.default?.()
+        ]
       )
   }
 })

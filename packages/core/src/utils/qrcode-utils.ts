@@ -1,7 +1,7 @@
 import { parseColorParts } from './color-picker-utils'
 import { classNames } from './class-names'
 import { isBrowser } from './env'
-import { encodeQRMatrix, QR_QUIET_ZONE } from './qrcode-encoder'
+import { encodeQRMatrix, QR_QUIET_ZONE, type QREccLevel } from './qrcode-encoder'
 import { defaultTheme } from '../themes/default/theme'
 import { resolvePresetThemeConfig, themeConfigToCssVars } from '../themes/manager'
 
@@ -41,8 +41,8 @@ export const QRCODE_DEFAULT_BG = 'var(--tiger-surface)'
  * Dark modules are `true`. Size depends on the payload (version 1 is 21).
  * Empty and over-capacity payloads throw; components use {@link resolveQRMatrix}.
  */
-export function generateQRMatrix(value: string): boolean[][] {
-  return encodeQRMatrix(value ?? '')
+export function generateQRMatrix(value: string, ecc: QREccLevel = 'M'): boolean[][] {
+  return encodeQRMatrix(value ?? '', ecc)
 }
 
 export type QRMatrixFailure = 'empty' | 'capacity'
@@ -55,10 +55,13 @@ export type QRMatrixResult =
  * Component-facing encode. Empty and over-capacity values are a failure
  * state. This never throws.
  */
-export function resolveQRMatrix(value: string | null | undefined): QRMatrixResult {
+export function resolveQRMatrix(
+  value: string | null | undefined,
+  ecc: QREccLevel = 'M'
+): QRMatrixResult {
   if (value == null || value.length === 0) return { ok: false, reason: 'empty' }
   try {
-    const matrix = encodeQRMatrix(value)
+    const matrix = encodeQRMatrix(value, ecc)
     if (!matrix.length) return { ok: false, reason: 'capacity' }
     return { ok: true, matrix }
   } catch {

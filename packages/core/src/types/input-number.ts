@@ -68,7 +68,7 @@ export interface InputNumberProps {
    * Whether the input is read-only
    * @default false
    */
-  readonly?: boolean
+  readOnly?: boolean
 
   /**
    * Placeholder text

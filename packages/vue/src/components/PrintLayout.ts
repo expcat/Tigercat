@@ -17,6 +17,7 @@ import {
   coerceClassValue,
   getPrintLayoutBoxStyle,
   getPrintLayoutClasses,
+  paginatePrintPreview,
   getPrintLayoutLabels,
   createPrintInstanceId,
   getPrintLayoutPageKey,
@@ -65,6 +66,15 @@ export const PrintLayout = defineComponent({
     printBreaks: { type: Boolean, default: true },
     pageWidth: { type: [Number, String] as PropType<number | string>, default: undefined },
     pageHeight: { type: [Number, String] as PropType<number | string>, default: undefined },
+    bind: {
+      type: Object as PropType<{
+        contentHeightMm?: number
+        pageHeightMm?: number
+        marginMm?: number
+        manualBreaks?: number
+      }>,
+      default: undefined
+    },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     className: { type: String, default: undefined }
   },
@@ -122,6 +132,20 @@ export const PrintLayout = defineComponent({
           'data-tiger-print-size': box.value.pageSize
         },
         [
+          props.bind
+            ? h(
+                'div',
+                { 'data-tiger-print-preview': '' },
+                paginatePrintPreview({
+                  contentHeightMm: props.bind.contentHeightMm ?? 0,
+                  pageHeightMm: props.bind.pageHeightMm ?? 297,
+                  marginMm: props.bind.marginMm,
+                  manualBreaks: props.bind.manualBreaks
+                }).map((page) =>
+                  h('span', { key: page.index, 'data-page-number': page.numberLabel }, page.numberLabel)
+                )
+              )
+            : null,
           h('table', { class: 'w-full border-collapse' }, [
             header
               ? h('thead', {}, [

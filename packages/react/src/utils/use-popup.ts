@@ -31,6 +31,8 @@ export interface UsePopupOptions {
   arrowRef?: React.RefObject<HTMLElement | null>
   onOpenChange?: (open: boolean) => void
   isDismissLocked?: () => boolean
+  getSkipShowDelay?: () => boolean
+  onShown?: () => void
   onDismissed?: (reason: OverlayPopupDismissReason) => void
   /** Popconfirm restores focus for outside clicks too. */
   restoreFocusOnDismiss?: 'escape' | 'all'
@@ -75,6 +77,8 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
           : (optionsRef.current.trigger ?? 'click'),
       getShowDelay: () => optionsRef.current.showDelay,
       getHideDelay: () => optionsRef.current.hideDelay,
+      getSkipShowDelay: () => Boolean(optionsRef.current.getSkipShowDelay?.()),
+      onShown: () => optionsRef.current.onShown?.(),
       isDismissLocked: () => Boolean(optionsRef.current.isDismissLocked?.()),
       isFocusWithinTrigger: () => {
         const active = triggerRef.current?.ownerDocument?.activeElement

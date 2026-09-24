@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect, forwardRef } from 'react'
 import {
   classNames,
-  coerceNumberFormValue,
   shouldSubmitNativeField,
   getInputNumberWrapperClasses,
   getInputNumberSizeClasses,
@@ -19,12 +18,14 @@ import {
   formatInputNumberDisplay,
   formatInputNumberEditingDisplay,
   parseInputNumberValue,
-  commitInputNumberValue,
+  parseInputNumberModel,
+  commitInputNumberModel,
+  stepInputNumberModel,
+  addDecimalString,
   getInputNumberKeyboardNextValue,
   resolveInputNumberControlsLayout,
   createRafRepeatActionController,
   mergeAriaDescribedBy,
-  resolveReadOnlyFlag,
   runShakeAnimation,
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
@@ -52,7 +53,7 @@ export interface InputNumberProps
       | 'step'
       | 'readOnly'
     > {
-  onChange?: (value: number | null) => void
+  onChange?: (value: number | string | null) => void
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void
   className?: string
@@ -72,8 +73,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     step = 1,
     precision,
     disabled = false,
-    readonly: readonlyProp,
-    readOnly: readOnlyProp,
+    readOnly = false,
     placeholder,
     name,
     id,
@@ -109,15 +109,20 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   const status = statusProp ?? formItemControl?.status ?? 'default'
   const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
   const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
-  const isReadOnly = resolveReadOnlyFlag(readonlyProp, readOnlyProp)
+  const isReadOnly = readOnly
   const effectiveId = id ?? formItemControl?.id
   const effectiveName = name ?? formItemControl?.name
   const formBoundValue = formItemControl?.value
+  const readStored = (raw: unknown): number | string | null => {
+    if (typeof raw === 'number') return Number.isFinite(raw) ? raw : null
+    if (typeof raw === 'string') return raw === '' ? null : parseInputNumberModel(raw)
+    return null
+  }
   const resolvedValue =
     controlledValue !== undefined
-      ? (coerceNumberFormValue(controlledValue) ?? null)
+      ? readStored(controlledValue)
       : formItemControl?.name
-        ? (coerceNumberFormValue(formBoundValue) ?? null)
+        ? readStored(formBoundValue)
         : undefined
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -128,9 +133,9 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   const repeatValueRef = useRef<number | null>(null)
   const suppressNextClickRef = useRef(false)
   const [focused, setFocused] = useState(false)
-  const [currentValue, setValue] = useControlledState<number | null>({
+  const [currentValue, setValue] = useControlledState<number | string | null>({
     value: resolvedValue,
-    defaultValue: coerceNumberFormValue(defaultValue) ?? null,
+    defaultValue: readStored(defaultValue),
     onChange
   })
   const [displayValue, setDisplayValue] = useState('')
@@ -142,10 +147,14 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   }
 
   const toDisplayValue = useCallback(
-    (val: number | null | undefined, editing: boolean): string =>
-      editing
+    (val: number | string | null | undefined, editing: boolean): string => {
+      if (typeof val === 'string') {
+        return precision !== undefined ? addDecimalString(val, 0, precision) : val
+      }
+      return editing
         ? formatInputNumberEditingDisplay(val, precision)
-        : formatInputNumberDisplay(val, { formatter, precision }),
+        : formatInputNumberDisplay(val, { formatter, precision })
+    },
     [formatter, precision]
   )
 
@@ -167,8 +176,8 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     if (status === 'error') runShakeAnimation(wrapperRef.current)
   }, [status, shakeTrigger])
 
-  const commit = (raw: number | null, nextFocused = focusedRef.current): number | null => {
-    const { value: next, changed } = commitInputNumberValue(raw, currentValue, {
+  const commit = (raw: number | string | null, nextFocused = focusedRef.current): number | string | null => {
+    const { value: next, changed } = commitInputNumberModel(raw, currentValue, {
       min,
       max,
       precision,
@@ -185,9 +194,12 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
 
   const handleStep = (
     direction: 'up' | 'down',
-    baseValue: number | null | undefined = currentValue
+    baseValue: number | string | null | undefined = currentValue
   ): number | null => {
     if (effectiveDisabled || isReadOnly) return baseValue ?? null
+    if (typeof baseValue === 'string') {
+      return commit(stepInputNumberModel(baseValue, step, direction, min, max, precision))
+    }
     const next = stepValue(baseValue, step, direction, min, max, precision)
     return commit(next)
   }
@@ -232,7 +244,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   }
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const parsed = parseInputNumberValue(displayValue, { parser })
+    const parsed = parser ? parseInputNumberValue(displayValue, { parser }) : parseInputNumberModel(displayValue)
     commit(parsed, false)
     setFocused(false)
     formItemControl?.onBlur?.()
@@ -247,7 +259,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      commit(parseInputNumberValue(displayValue, { parser }))
+      commit(parser ? parseInputNumberValue(displayValue, { parser }) : parseInputNumberModel(displayValue))
     } else {
       const next = getInputNumberKeyboardNextValue(e.key, currentValue, {
         min,

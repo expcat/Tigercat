@@ -844,3 +844,188 @@ export function getDatePickerCalendarCellState(
     isRangeEnd
   }
 }
+
+export type CalendarUnit = 'date' | 'week' | 'month' | 'quarter' | 'year' | 'datetime'
+
+const UNIT_PATTERNS: Record<CalendarUnit, RegExp> = {
+  date: /^\d{4}-\d{2}-\d{2}$/,
+  week: /^\d{4}-W\d{2}$/,
+  month: /^\d{4}-\d{2}$/,
+  quarter: /^\d{4}-Q[1-4]$/,
+  year: /^\d{4}$/,
+  datetime: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:Z|[+-]\d{2}:\d{2})?$/
+}
+
+export function isCalendarUnitValue(value: string, unit: CalendarUnit): boolean {
+  return UNIT_PATTERNS[unit].test(value)
+}
+
+function isoWeekParts(date: Date): { year: number; week: number } {
+  const utc = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+  const day = utc.getUTCDay() || 7
+  utc.setUTCDate(utc.getUTCDate() + 4 - day)
+  const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1))
+  const week = Math.ceil(((utc.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
+  return { year: utc.getUTCFullYear(), week }
+}
+
+function dateFromIsoWeek(year: number, week: number): Date {
+  const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7))
+  const day = simple.getUTCDay() || 7
+  if (day <= 4) simple.setUTCDate(simple.getUTCDate() - day + 1)
+  else simple.setUTCDate(simple.getUTCDate() + 8 - day)
+  return new Date(simple.getUTCFullYear(), simple.getUTCMonth(), simple.getUTCDate())
+}
+
+/** Store one explicit calendar unit. `date` is `YYYY-MM-DD`; datetime may carry an offset. */
+export function formatCalendarUnit(
+  date: Date,
+  unit: CalendarUnit,
+  timeZone?: string
+): string {
+  const zoned = timeZone ? dateInTimeZone(date, timeZone) : date
+  const y = zoned.getFullYear()
+  const m = String(zoned.getMonth() + 1).padStart(2, '0')
+  const d = String(zoned.getDate()).padStart(2, '0')
+  if (unit === 'year') return String(y)
+  if (unit === 'month') return `${y}-${m}`
+  if (unit === 'quarter') return `${y}-Q${Math.floor(zoned.getMonth() / 3) + 1}`
+  if (unit === 'week') {
+    const iso = isoWeekParts(zoned)
+    return `${iso.year}-W${String(iso.week).padStart(2, '0')}`
+  }
+  if (unit === 'datetime') {
+    const hh = String(zoned.getHours()).padStart(2, '0')
+    const mm = String(zoned.getMinutes()).padStart(2, '0')
+    const wall = `${y}-${m}-${d}T${hh}:${mm}`
+    if (!timeZone) return wall
+    const offset = timeZoneOffset(date, timeZone)
+    return `${wall}${offset}`
+  }
+  return `${y}-${m}-${d}`
+}
+
+export function parseCalendarUnit(value: string, unit: CalendarUnit): Date | null {
+  if (!isCalendarUnitValue(value, unit)) return null
+  if (unit === 'year') return new Date(Number(value), 0, 1)
+  if (unit === 'month') {
+    const [year, month] = value.split('-').map(Number)
+    return new Date(year, month - 1, 1)
+  }
+  if (unit === 'quarter') {
+    const [yearText, quarterText] = value.split('-Q')
+    return new Date(Number(yearText), (Number(quarterText) - 1) * 3, 1)
+  }
+  if (unit === 'week') {
+    const [yearText, weekText] = value.split('-W')
+    return dateFromIsoWeek(Number(yearText), Number(weekText))
+  }
+  if (unit === 'datetime') {
+    const parsed = new Date(value.length === 16 ? `${value}:00` : value)
+    return Number.isNaN(parsed.getTime()) ? null : parsed
+  }
+  return toCalendarDate(value)
+}
+
+export function dateInTimeZone(date: Date, timeZone: string): Date {
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23'
+    }).formatToParts(date)
+    const pick = (type: Intl.DateTimeFormatPartTypes): number =>
+      Number(parts.find((part) => part.type === type)?.value ?? '0')
+    return new Date(
+      pick('year'),
+      pick('month') - 1,
+      pick('day'),
+      pick('hour'),
+      pick('minute'),
+      pick('second')
+    )
+  } catch {
+    return date
+  }
+}
+
+function timeZoneOffset(date: Date, timeZone: string): string {
+  const zoned = dateInTimeZone(date, timeZone)
+  const utc = new Date(date.getTime())
+  const diffMinutes = Math.round((zoned.getTime() - Date.UTC(
+    utc.getUTCFullYear(),
+    utc.getUTCMonth(),
+    utc.getUTCDate(),
+    utc.getUTCHours(),
+    utc.getUTCMinutes(),
+    utc.getUTCSeconds()
+  )) / 60000)
+  // Compare wall clock in zone against the instant's UTC fields via format offset.
+  try {
+    const formatted = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      timeZoneName: 'longOffset',
+      hour: '2-digit'
+    }).format(date)
+    const match = formatted.match(/GMT([+-]\d{1,2})(?::(\d{2}))?/)
+    if (!match) return 'Z'
+    const hours = String(Math.abs(Number(match[1]))).padStart(2, '0')
+    const minutes = match[2] ?? '00'
+    const sign = match[1].startsWith('-') ? '-' : '+'
+    if (hours === '00' && minutes === '00') return 'Z'
+    return `${sign}${hours}:${minutes}`
+  } catch {
+    const sign = diffMinutes >= 0 ? '+' : '-'
+    const abs = Math.abs(diffMinutes)
+    return `${sign}${String(Math.floor(abs / 60)).padStart(2, '0')}:${String(abs % 60).padStart(2, '0')}`
+  }
+}
+
+export interface CalendarSegments {
+  year: string
+  month: string
+  day: string
+  hour: string
+  minute: string
+}
+
+export function calendarUnitSegments(value: string, unit: CalendarUnit): CalendarSegments {
+  const date = parseCalendarUnit(value, unit)
+  if (!date) return { year: '', month: '', day: '', hour: '', minute: '' }
+  return {
+    year: String(date.getFullYear()),
+    month: String(date.getMonth() + 1).padStart(2, '0'),
+    day: String(date.getDate()).padStart(2, '0'),
+    hour: String(date.getHours()).padStart(2, '0'),
+    minute: String(date.getMinutes()).padStart(2, '0')
+  }
+}
+
+export function calendarUnitFromSegments(
+  segments: Partial<CalendarSegments>,
+  unit: CalendarUnit
+): string | null {
+  const year = Number(segments.year)
+  const month = Number(segments.month || '1')
+  const day = Number(segments.day || '1')
+  const hour = Number(segments.hour || '0')
+  const minute = Number(segments.minute || '0')
+  if (!Number.isInteger(year) || year < 1) return null
+  const date = new Date(year, (month || 1) - 1, day || 1, hour, minute)
+  if (Number.isNaN(date.getTime())) return null
+  return formatCalendarUnit(date, unit)
+}
+
+export function toggleCalendarUnitValue(values: readonly string[], next: string): string[] {
+  return values.includes(next) ? values.filter((item) => item !== next) : [...values, next]
+}
+
+export function shiftCalendarMonth(year: number, month: number, delta: number): { year: number; month: number } {
+  const date = new Date(year, month + delta, 1)
+  return { year: date.getFullYear(), month: date.getMonth() }
+}

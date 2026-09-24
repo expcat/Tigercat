@@ -5,6 +5,8 @@
 import { classNames } from './class-names'
 import type { ModalSize } from '../types/modal'
 import type { SwipeGesture } from './gesture-utils'
+export { acquireOverlayZ, overlayZCeiling, overlayZOpenCount, resetOverlayZ } from './overlay-z'
+export { getFloatingArrowGeometry, getFloatingArrowStyle, FLOATING_ARROW_SIZE_PX } from './floating-arrow'
 
 /**
  * Base modal wrapper classes

@@ -349,7 +349,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   const fieldWrapperProps = useGroup && label ? { 'aria-labelledby': labelId } : {}
 
   return (
-    <div className={formItemClasses} style={style} {...rest}>
+    <div className={formItemClasses} style={style} data-tiger-field={name || undefined} {...rest}>
       {label && (
         <label
           id={labelId}

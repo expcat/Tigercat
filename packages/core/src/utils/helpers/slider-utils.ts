@@ -141,6 +141,18 @@ export function sliderGetValueFromPosition(
   return sliderNormalizeValue(rawValue, lower, upper, step)
 }
 
+/** Vertical track: the bottom edge is `min`. */
+export function sliderGetValueFromClientY(
+  clientY: number,
+  track: { top: number; height: number },
+  min: number,
+  max: number,
+  step: number = 1
+): number {
+  const fromBottom = track.top + track.height - clientY
+  return sliderGetValueFromPosition(fromBottom, track.height, min, max, step, false)
+}
+
 export function sliderGetValueFromClientX(
   clientX: number,
   track: { left: number; width: number },
@@ -222,6 +234,42 @@ export function sliderValuesEqual(
 export function sliderPickRangeThumb(value: [number, number], next: number): 'min' | 'max' {
   const [lo, hi] = sliderSortRange(value)
   return Math.abs(next - lo) <= Math.abs(next - hi) ? 'min' : 'max'
+}
+
+/**
+ * When thumbs would share a value, push the other thumb one step away.
+ * Returns the sorted range.
+ */
+export function sliderPushApartRange(
+  current: [number, number],
+  next: number,
+  thumb: 'min' | 'max',
+  min: number,
+  max: number,
+  step: number
+): [number, number] {
+  const applied = sliderApplyThumbValue(current, next, thumb, true) as [number, number]
+  const [lo, hi] = sliderSortRange(applied)
+  if (lo < hi) return [lo, hi]
+  const safeStep = Number.isFinite(step) && step > 0 ? step : 1
+  if (thumb === 'min') {
+    const pushed = sliderNormalizeValue(lo + safeStep, min, max, safeStep)
+    if (pushed > lo) return [lo, pushed]
+    const pulled = sliderNormalizeValue(hi - safeStep, min, max, safeStep)
+    return pulled < hi ? [pulled, hi] : [lo, hi]
+  }
+  const pulled = sliderNormalizeValue(hi - safeStep, min, max, safeStep)
+  if (pulled < hi) return [pulled, hi]
+  const pushed = sliderNormalizeValue(lo + safeStep, min, max, safeStep)
+  return pushed > lo ? [lo, pushed] : [lo, hi]
+}
+
+export function formatSliderTooltip(
+  value: number,
+  formatter?: (value: number) => string
+): string {
+  if (formatter) return formatter(value)
+  return String(value)
 }
 
 export function sliderApplyThumbValue(

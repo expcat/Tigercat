@@ -22,6 +22,7 @@ import {
   defaultChartSeriesName,
   formatChartTemplate,
   layoutRadar,
+  radarRatio,
   findNearestPointIndex,
   polarToCartesian,
   createChartFrameCoalescer,
@@ -38,6 +39,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
+import { renderRadarBind } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
@@ -131,6 +133,13 @@ export const RadarChart = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
+    bind: {
+      type: Object as PropType<{
+        values?: number[]
+        indicators?: { name: string; max: number }[]
+      }>,
+      default: undefined
+    },
     onSeriesClick: {
       type: Function as PropType<(index: number, series: RadarChartSeries) => void>
     }
@@ -167,7 +176,8 @@ export const RadarChart = defineComponent({
       handleClick: handleSelectIndex,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave
+      handleLegendLeave,
+      isLegendIndexHidden
     } = useChartInteraction<RadarChartSeries>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -280,7 +290,8 @@ export const RadarChart = defineComponent({
         selectedIndex: resolvedSelectedIndex.value,
         getLabel: (item, index) =>
           props.legendFormatter ? props.legendFormatter(item, index) : seriesName(item, index),
-        getColor: (item, index) => item.color ?? palette.value[index % palette.value.length]
+        getColor: (item, index) => item.color ?? palette.value[index % palette.value.length],
+        isHidden: (index) => isLegendIndexHidden(index)
       })
     )
 
@@ -689,6 +700,13 @@ export const RadarChart = defineComponent({
                 onItemHover: handleLegendHover,
                 onItemLeave: handleLegendLeave
               })
+            : null,
+          props.bind?.indicators
+            ? renderRadarBind(
+                props.bind.indicators.map((indicator, index) =>
+                  radarRatio(props.bind?.values?.[index] ?? 0, indicator)
+                )
+              )
             : null,
           tooltip
         ]

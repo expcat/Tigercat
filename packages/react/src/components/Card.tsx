@@ -6,6 +6,7 @@ import {
   cardDirectionClasses,
   cardFooterClasses,
   cardHeaderClasses,
+  cardTitleTag,
   cardHorizontalBodyClasses,
   cardStretchLinkClasses,
   cardTitleLinkClasses,
@@ -88,6 +89,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     padding,
     header,
     title,
+    titleLevel = 2,
     htmlTitle,
     footer,
     actions,
@@ -128,7 +130,13 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   )
 
   const headerNode =
-    header != null || title ? <div className={cardHeaderClasses}>{header ?? title}</div> : null
+    header != null || title ? (
+      header != null ? (
+        <div className={cardHeaderClasses}>{header}</div>
+      ) : (
+        React.createElement(cardTitleTag(titleLevel), { className: cardHeaderClasses }, title)
+      )
+    ) : null
   const bodyNode = children != null ? <div>{children}</div> : null
   const footerNode = footer != null ? <div className={cardFooterClasses}>{footer}</div> : null
   const actionsNode =

@@ -1,0 +1,7 @@
+{
+  "id": "steps-03",
+  "title": "点状步骤",
+  "description": "点状只改标记形状。错误步在可点击时与普通步一样能点。",
+  "entry": "App.vue",
+  "order": 3
+}

@@ -5,7 +5,7 @@
 /**
  * Timeline mode/direction types
  */
-export type TimelineMode = 'left' | 'right' | 'alternate'
+export type TimelineMode = 'left' | 'right' | 'alternate' | 'horizontal'
 
 /**
  * Timeline item position for alternate mode

@@ -200,6 +200,23 @@ export function getNavigationMenuChevronClasses(open: boolean): string {
 /**
  * Get dropdown / MegaMenu panel classes (reuses dropdown chrome)
  */
+export function getNavigationMenuIndicatorStyle(start: number, size: number): Record<string, string> {
+  return {
+    insetInlineStart: `${start}px`,
+    inlineSize: `${size}px`
+  }
+}
+
+export function measureNavigationIndicator(
+  trigger: { left: number; right: number; width: number },
+  container: { left: number; right: number },
+  dir: 'ltr' | 'rtl'
+): { start: number; size: number } {
+  const size = trigger.width
+  const start = dir === 'rtl' ? container.right - trigger.right : trigger.left - container.left
+  return { start, size }
+}
+
 export function getNavigationMenuContentClasses(mega: boolean): string {
   return classNames(
     'tiger-navigation-menu-content',

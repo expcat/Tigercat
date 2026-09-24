@@ -77,7 +77,7 @@ export interface ResizableProps {
    * Edge handles follow that axis; corners follow the larger pointer delta.
    * @default false
    */
-  lockAspectRatio?: boolean
+  lockAspectRatio?: boolean | string
   /**
    * Additional CSS classes
    */

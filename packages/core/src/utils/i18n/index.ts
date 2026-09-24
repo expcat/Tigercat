@@ -21,3 +21,10 @@ export { defineLocale } from './define-locale'
 export { defineText } from './define-text'
 export { createTigerLocaleScope } from './global-locale'
 export type { TigerLocaleHandle, TigerLocaleScope } from './global-locale'
+export {
+  feedbackLayoutLabels,
+  formatFeedbackLayoutLabel
+} from './w9/feedback-layout-labels'
+export type { FeedbackLayoutLabels } from './w9/feedback-layout-labels'
+export { navLabels, formatNavLabel } from './w9/nav-labels'
+export type { NavLabels } from './w9/nav-labels'

@@ -13,6 +13,9 @@ import {
   defaultSeriesXYTooltipFormatter,
   defaultChartSeriesName,
   layoutLineSeries,
+  brushDomain,
+  chartReferenceInDomain,
+  downloadChartSvg,
   getCartesianChartShellClasses,
   flattenChartPoints,
   chartPointTabIndex,
@@ -41,6 +44,7 @@ import { useCartesianSeriesPoints } from '../hooks/useCartesianSeriesPoints'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
+import { AxisBind } from './w9-chart-bind'
 
 export interface LineChartProps extends CoreLineChartProps {
   data?: LineChartDatum[]
@@ -58,6 +62,16 @@ export interface LineChartProps extends CoreLineChartProps {
     pointIndex: number | null,
     datum: LineChartDatum | null
   ) => void
+  bind?: {
+    time?: (number | Date)[]
+    reference?: { axis?: 'y' | 'y2'; value: number; end?: number }
+    domain?: { min: number; max: number }
+    brush?: { min: number; max: number }
+    secondAxis?: boolean
+    tooltip?: { name: string; value: number }[]
+    tooltipTotal?: number
+    exportSvg?: SVGSVGElement | null
+  }
 }
 
 export const LineChart: React.FC<LineChartProps> = ({
@@ -115,6 +129,7 @@ export const LineChart: React.FC<LineChartProps> = ({
   locale,
   labels: labelsOverride,
   className,
+  bind,
   onHoveredIndexChange,
   onSelectedIndexChange,
   onSeriesClick,
@@ -166,7 +181,8 @@ export const LineChart: React.FC<LineChartProps> = ({
     handleClick: handleSeriesSelect,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<LineChartSeries>({
     hoverable,
     showTooltip,
@@ -271,7 +287,8 @@ export const LineChart: React.FC<LineChartProps> = ({
           legendFormatter
             ? legendFormatter(s, i)
             : (s.name ?? defaultChartSeriesName(i, labels.seriesName)),
-        getColor: (s, i) => s.color ?? palette[i % palette.length]
+        getColor: (s, i) => s.color ?? palette[i % palette.length],
+        isHidden: (index) => isLegendIndexHidden(index)
       }),
     [
       resolvedSeries,
@@ -591,6 +608,33 @@ export const LineChart: React.FC<LineChartProps> = ({
           onItemClick={handleLegendClick}
           onItemHover={handleLegendHover}
           onItemLeave={handleLegendLeave}
+        />
+      ) : null}
+      {bind ? (
+        <AxisBind
+          ticks={bind.time}
+          reference={
+            bind.reference &&
+            chartReferenceInDomain(bind.reference, bind.domain ?? { min: 0, max: 100 })
+              ? bind.reference
+              : null
+          }
+          brush={
+            bind.brush
+              ? {
+                  start: brushDomain(bind.domain ?? { min: 0, max: 1 }, bind.brush).min,
+                  end: brushDomain(bind.domain ?? { min: 0, max: 1 }, bind.brush).max
+                }
+              : null
+          }
+          secondAxis={bind.secondAxis}
+          tooltip={bind.tooltip}
+          tooltipTotal={bind.tooltipTotal}
+          onExport={
+            bind.exportSvg
+              ? () => downloadChartSvg(bind.exportSvg as SVGSVGElement, 'chart.svg')
+              : undefined
+          }
         />
       ) : null}
       {tooltip}

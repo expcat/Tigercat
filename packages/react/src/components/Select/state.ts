@@ -22,6 +22,8 @@ import {
   resolveSelectDisplayText,
   resolveSelectFilteredOptions,
   commitSelectOption,
+  normalizeSelectOptions,
+  selectAllSelectValues,
   clearSelectValue,
   getSelectSelectedValues,
   getSelectTriggerKeyIntent,
@@ -56,7 +58,10 @@ import { isMultipleSelect, type SelectProps, type SelectRenderContext } from './
 export function useSelectController(props: SelectProps) {
   const isMultiple = isMultipleSelect(props)
   const {
-    options = [],
+    options: rawOptions = [],
+    optionFields,
+    maxCount,
+    readOnly = false,
     size = 'md',
     disabled = false,
     placeholder,
@@ -104,6 +109,10 @@ export function useSelectController(props: SelectProps) {
   const labels = useMemo(
     () => getSelectLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
+  )
+  const options = useMemo(
+    () => normalizeSelectOptions(rawOptions, optionFields),
+    [optionFields, rawOptions]
   )
 
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
@@ -234,7 +243,7 @@ export function useSelectController(props: SelectProps) {
   })
   const showClear = shouldShowSelectClear({
     clearable,
-    disabled: effectiveDisabled,
+    disabled: effectiveDisabled || readOnly,
     value: selected,
     multiple: isMultiple
   })
@@ -264,14 +273,20 @@ export function useSelectController(props: SelectProps) {
 
   const selectOption = useCallback(
     (option: SelectOption) => {
-      if (option.disabled || effectiveDisabled) return
+      if (option.disabled || effectiveDisabled || readOnly) return
       if (creatableOption && option.value === creatableOption.value) {
         setCreatedOptions((current) =>
           current.some((item) => item.value === option.value) ? current : [...current, option]
         )
         onCreate?.(option)
       }
-      const next = commitSelectOption({ option, value: selected, multiple: isMultiple })
+      const next = commitSelectOption({
+        option,
+        value: selected,
+        multiple: isMultiple,
+        maxCount,
+        readOnly
+      })
       setSelected(next)
       activeValueRef.current = option.value
       if (isMultiple) {
@@ -293,7 +308,9 @@ export function useSelectController(props: SelectProps) {
       effectiveDisabled,
       flatSelectableOptions,
       isMultiple,
+      maxCount,
       onCreate,
+      readOnly,
       selected,
       setSearchQuery,
       setSelected
@@ -493,6 +510,18 @@ export function useSelectController(props: SelectProps) {
     renderOption
   }
 
+  const selectFiltered = useCallback(() => {
+    if (readOnly || effectiveDisabled) return
+    setSelected(
+      selectAllSelectValues({
+        value: selected,
+        options: filteredOptions,
+        maxCount,
+        readOnly
+      })
+    )
+  }, [effectiveDisabled, filteredOptions, maxCount, readOnly, selected, setSelected])
+
   return {
     rootRef,
     triggerRef,
@@ -503,6 +532,8 @@ export function useSelectController(props: SelectProps) {
     listboxAria,
     isOpen,
     isMultiple,
+    readOnly,
+    selectFiltered,
     searchable,
     effectiveDisabled,
     status,

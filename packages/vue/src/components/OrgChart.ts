@@ -3,6 +3,8 @@ import {
   classNames,
   coerceClassValue,
   computeOrgChartLayout,
+  findOrgMatch,
+  orgVisibleIds,
   getCartesianChartShellClasses,
   getChartLabels,
   mergeTigerLocale,
@@ -23,6 +25,7 @@ import {
   type TigerLocaleChart
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+import { renderOrgBind } from './w9-chart-bind'
 import { useTigerConfig } from './ConfigProvider'
 
 export interface VueOrgChartProps extends CoreOrgChartProps {
@@ -62,11 +65,21 @@ export const OrgChart = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
+    bind: {
+      type: Object as PropType<{
+        nodes?: { id: string; label: string; children?: { id: string; label: string }[] }[]
+        collapsed?: string[]
+        query?: string
+        zoom?: number
+      }>,
+      default: undefined
+    },
     onNodeClick: { type: Function as PropType<(node: OrgChartNode) => void> }
   },
   emits: ['update:selectedId', 'node-click', 'node-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
+    const orgZoom = ref(1)
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const innerSelectedId = ref<string | number | null>(null)
@@ -263,6 +276,27 @@ export const OrgChart = defineComponent({
                 )
             }
           )
+        ,
+          props.bind?.nodes
+            ? h('div', { 'data-tiger-org-host': '' }, [
+                renderOrgBind({
+                  visible: orgVisibleIds(props.bind.nodes, props.bind.collapsed ?? []),
+                  match: findOrgMatch(props.bind.nodes, props.bind.query ?? ''),
+                  zoom: props.bind.zoom ?? orgZoom.value
+                }),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    'data-tiger-org-zoom-in': '',
+                    onClick: () => {
+                      orgZoom.value += 0.25
+                    }
+                  },
+                  '+'
+                )
+              ])
+            : null
         ]
       )
   }

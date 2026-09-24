@@ -10,6 +10,7 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
+import { checkTokenContrast, filterUnreadComponentTokens } from './check-contrast.mjs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { format, resolveConfig } from 'prettier'
@@ -19,6 +20,10 @@ const TOKENS_DIR = join(__dirname, '..', 'tokens')
 const SRC_TOKENS_DIR = join(__dirname, '..', 'src', 'tokens')
 const CHECK_MODE = process.argv.includes('--check')
 const rawTokens = JSON.parse(readFileSync(join(TOKENS_DIR, 'tokens.json'), 'utf-8'))
+if (rawTokens.component) {
+  rawTokens.component = filterUnreadComponentTokens(rawTokens.component)
+}
+checkTokenContrast(rawTokens)
 const primitiveTokens = rawTokens.primitive ?? rawTokens.global
 const semanticTokens = rawTokens.semantic ?? rawTokens.alias
 const runtimeTokens = rawTokens.runtime
@@ -363,6 +368,10 @@ function generateCSS() {
   lines.push('    transition-duration: 0ms;')
   lines.push('  }')
   lines.push('}')
+  lines.push('')
+  lines.push(
+    readFileSync(join(__dirname, '..', 'src', 'themes', 'forced-colors.css'), 'utf-8').trim()
+  )
   return lines.join('\n')
 }
 

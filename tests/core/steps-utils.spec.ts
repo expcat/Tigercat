@@ -97,17 +97,17 @@ describe('Steps connector plugin geometry', () => {
     })
   })
 
-  it('is injected by the default Tailwind plugin', () => {
+  it('keeps connector geometry in the component style module', () => {
     const rules: Record<string, unknown> = {}
     type PluginInstance = {
       handler: (api: { addBase: (rule: Record<string, unknown>) => void }) => void
     }
     const plugin = tigercatPlugin as unknown as PluginInstance
     plugin.handler({ addBase: (rule) => Object.assign(rules, rule) })
-    expect(rules['.tiger-step-tail--vertical']).toMatchObject({
+    expect(stepConnectorBaseStyles['.tiger-step-tail--vertical']).toMatchObject({
       insetInlineStart: '50%',
       transform: 'translateX(-50%)'
     })
-    expect(rules['.tiger-step-icon-col--sm']).toMatchObject({ width: '2rem' })
+    expect(rules['.tiger-step-tail--vertical']).toBeUndefined()
   })
 })

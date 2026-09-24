@@ -41,11 +41,14 @@ import {
   imageLoadingSpinnerClasses,
   imageLoadingSpinnerPath,
   formatCropSizeText,
+  basicLabel,
   nudgeCropHandle,
+  resolveCropAspectRatio,
   mergeTigerLocale,
   moveCropRect,
   remapCropRect,
   resizeCropRect,
+  type CropAspectPreset,
   type CropHandle,
   type CropRect,
   type CropResult,
@@ -60,6 +63,8 @@ export interface VueImageCropperProps {
   cropRect?: CropRect
   defaultCropRect?: CropRect
   aspectRatio?: number
+  aspectPreset?: CropAspectPreset
+  circular?: boolean
   minWidth?: number
   minHeight?: number
   outputType?: 'image/png' | 'image/jpeg' | 'image/webp'
@@ -93,6 +98,8 @@ export const ImageCropper = defineComponent({
       default: undefined
     },
     aspectRatio: { type: Number, default: undefined },
+    aspectPreset: { type: String as PropType<CropAspectPreset>, default: undefined },
+    circular: { type: Boolean, default: false },
     minWidth: { type: Number, default: 20 },
     minHeight: { type: Number, default: 20 },
     outputType: {
@@ -132,7 +139,17 @@ export const ImageCropper = defineComponent({
     let resizeObserver: ResizeObserver | null = null
     let naturalWidth = 0
     let naturalHeight = 0
-    let loadedAspect = props.aspectRatio
+    const rotation = ref(0)
+    const flipX = ref(false)
+    const aspectChoice = ref(props.aspectPreset)
+    watch(
+      () => props.aspectPreset,
+      (value) => {
+        aspectChoice.value = value
+      }
+    )
+    const activeAspect = () => resolveCropAspectRatio(aspectChoice.value, props.aspectRatio)
+    let loadedAspect = activeAspect()
 
     const currentCropRect = (): CropRect =>
       props.cropRect !== undefined ? props.cropRect : internalCropRect.value
@@ -142,7 +159,7 @@ export const ImageCropper = defineComponent({
         next,
         displayWidth.value,
         displayHeight.value,
-        props.aspectRatio,
+        activeAspect(),
         props.minWidth,
         props.minHeight
       )
@@ -172,7 +189,7 @@ export const ImageCropper = defineComponent({
       if (resetCrop) {
         commitCropRect(
           props.defaultCropRect ??
-            getInitialCropRect(width, height, props.aspectRatio, props.minWidth, props.minHeight)
+            getInitialCropRect(width, height, activeAspect(), props.minWidth, props.minHeight)
         )
       }
     }
@@ -192,7 +209,7 @@ export const ImageCropper = defineComponent({
           imageRef.value = img
           naturalWidth = nw
           naturalHeight = nh
-          loadedAspect = props.aspectRatio
+          loadedAspect = activeAspect()
           applyDisplaySize(size.width, size.height, true)
           status.value = 'ready'
           emit('ready')
@@ -227,7 +244,7 @@ export const ImageCropper = defineComponent({
           displayHeight.value,
           next.width,
           next.height,
-          props.aspectRatio,
+          activeAspect(),
           props.minWidth,
           props.minHeight
         )
@@ -246,7 +263,7 @@ export const ImageCropper = defineComponent({
     )
 
     watch(
-      () => props.aspectRatio,
+      () => activeAspect(),
       (value) => {
         if (status.value !== 'ready') {
           loadedAspect = value
@@ -309,7 +326,7 @@ export const ImageCropper = defineComponent({
                 deltaY,
                 displayWidth.value,
                 displayHeight.value,
-                props.aspectRatio,
+                activeAspect(),
                 props.minWidth,
                 props.minHeight
               )
@@ -361,7 +378,8 @@ export const ImageCropper = defineComponent({
             displayWidth.value,
             displayHeight.value,
             props.outputType,
-            props.quality
+            props.quality,
+            { rotation: rotation.value, flipX: flipX.value, circular: props.circular }
           )
             .then((blob) => {
               const extension = (
@@ -458,6 +476,8 @@ export const ImageCropper = defineComponent({
             },
             'data-image-cropper': '',
             'data-image-cropper-status': status.value,
+            'data-crop-rotation': String(rotation.value),
+            'data-crop-aspect': aspectChoice.value ?? props.aspectPreset ?? '',
             role: 'img',
             'aria-label':
               status.value === 'error'
@@ -465,6 +485,27 @@ export const ImageCropper = defineComponent({
                 : labels.value.loadingCropImageAriaLabel
           },
           [
+            h(
+              'button',
+              {
+                type: 'button',
+                onClick: () => {
+                  rotation.value = (rotation.value + 90) % 360
+                }
+              },
+              basicLabel(mergedLocale.value.locale, 'imageCropper', 'rotate')
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                'data-crop-preset': '4:3',
+                onClick: () => {
+                  aspectChoice.value = '4:3'
+                }
+              },
+              basicLabel(mergedLocale.value.locale, 'imageCropper', 'fourThree')
+            ),
             status.value === 'error'
               ? h('div', { class: imageErrorClasses }, [renderErrorIcon()])
               : renderLoadingSpinner()
@@ -480,7 +521,12 @@ export const ImageCropper = defineComponent({
         src: props.src,
         crossorigin: 'anonymous',
         class: imageCropperImgClasses,
-        style: { width: `${dw}px`, height: `${dh}px` },
+        style: {
+          width: `${dw}px`,
+          height: `${dh}px`,
+          transform: `rotate(${rotation.value}deg) scaleX(${flipX.value ? -1 : 1})`,
+          transformOrigin: 'center'
+        },
         draggable: false,
         alt: labels.value.imageToCropAriaLabel
       })
@@ -616,7 +662,7 @@ export const ImageCropper = defineComponent({
               1,
               dw,
               dh,
-              props.aspectRatio,
+              activeAspect(),
               props.minWidth,
               props.minHeight
             )
@@ -636,9 +682,63 @@ export const ImageCropper = defineComponent({
           class: containerClasses.value,
           style: mergedStyle,
           'data-image-cropper': '',
-          'data-image-cropper-status': 'ready'
+          'data-image-cropper-status': 'ready',
+          'data-crop-rotation': String(rotation.value),
+          'data-crop-flip': flipX.value ? 'true' : 'false',
+          'data-crop-circle': props.circular ? 'true' : 'false',
+          'data-crop-aspect': aspectChoice.value ?? ''
         },
         [
+          h(
+            'div',
+            { class: 'mb-2 flex flex-wrap gap-1', 'data-crop-tools': '' },
+            [
+              ...(['1:1', '4:3', '16:9', 'free'] as const).map((preset) =>
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    'data-crop-preset': preset,
+                    'aria-pressed': aspectChoice.value === preset ? 'true' : 'false',
+                    onClick: () => {
+                      aspectChoice.value = preset
+                    }
+                  },
+                  basicLabel(
+                    mergedLocale.value.locale,
+                    'imageCropper',
+                    preset === '1:1'
+                      ? 'square'
+                      : preset === '4:3'
+                        ? 'fourThree'
+                        : preset === '16:9'
+                          ? 'sixteenNine'
+                          : 'free'
+                  )
+                )
+              ),
+              h(
+                'button',
+                {
+                  type: 'button',
+                  onClick: () => {
+                    rotation.value = (rotation.value + 90) % 360
+                  }
+                },
+                basicLabel(mergedLocale.value.locale, 'imageCropper', 'rotate')
+              ),
+              h(
+                'button',
+                {
+                  type: 'button',
+                  onClick: () => {
+                    flipX.value = !flipX.value
+                  }
+                },
+                basicLabel(mergedLocale.value.locale, 'imageCropper', 'flip')
+              )
+            ]
+          ),
           h(
             'div',
             {

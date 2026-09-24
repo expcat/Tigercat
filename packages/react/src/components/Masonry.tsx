@@ -58,6 +58,7 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
     columns = MASONRY_DEFAULT_COLUMNS,
     gap = MASONRY_DEFAULT_GAP,
     layout = 'source',
+    balance,
     className,
     itemClassName,
     children,
@@ -83,7 +84,7 @@ export const Masonry = forwardRef<MasonryInstance, MasonryProps>(function Masonr
   const orderNoteId = React.useId()
   const columnCount = resolveMasonryColumnCount(columns, containerWidth)
   const gapPx = resolveMasonryGap(gap, containerWidth)
-  const shortest = layout === 'shortest'
+  const shortest = balance === 'shortest' || layout === 'shortest'
   const packed =
     shortest &&
     hasMeasuredMasonryHeights(heights) &&

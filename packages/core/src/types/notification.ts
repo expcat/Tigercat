@@ -85,9 +85,19 @@ export interface NotificationInstance {
   title: string
 
   /**
-   * Notification description/content
+   * Notification description/content. Strings render as text nodes.
    */
   description?: string
+
+  /**
+   * Framework render node for the description. Strings stay on `description`.
+   */
+  descriptionNode?: unknown
+
+  /**
+   * Framework render node for the action area. Buttons or links only.
+   */
+  actionNode?: unknown
 
   /**
    * Duration in milliseconds before auto-close (0 means no auto-close)
@@ -156,9 +166,19 @@ export interface NotificationProps {
   title?: string
 
   /**
-   * Notification description/content
+   * Notification description/content. Strings render as text nodes.
    */
   description?: string
+
+  /**
+   * Framework render node for the description. Strings stay on `description`.
+   */
+  descriptionNode?: unknown
+
+  /**
+   * Framework render node for the action area. Buttons or links only.
+   */
+  actionNode?: unknown
 
   /**
    * Duration in milliseconds before auto-close (0 means no auto-close)

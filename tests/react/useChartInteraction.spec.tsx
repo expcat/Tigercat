@@ -330,7 +330,7 @@ describe('useChartInteraction (React)', () => {
   })
 
   describe('legend handlers', () => {
-    it('should handle legend click as series click', () => {
+    it('hides a legend series without changing the selection index', () => {
       const callbacks = createMockCallbacks()
       const { result } = renderHook(() => useChartInteraction(createTestOptions(callbacks)))
 
@@ -338,8 +338,15 @@ describe('useChartInteraction (React)', () => {
         result.current.handleLegendClick(2)
       })
 
-      expect(result.current.resolvedSelectedIndex).toBe(2)
-      expect(callbacks.onClick).toHaveBeenCalledWith(2, mockData[2])
+      expect(result.current.resolvedSelectedIndex).toBe(null)
+      expect(result.current.legendHiddenKeys).toEqual(['2'])
+      expect(result.current.isLegendIndexHidden(2)).toBe(true)
+      expect(callbacks.onClick).not.toHaveBeenCalled()
+
+      act(() => {
+        result.current.handleLegendClick(2)
+      })
+      expect(result.current.legendHiddenKeys).toEqual([])
     })
 
     it('should handle legend hover', () => {

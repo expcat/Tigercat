@@ -17,6 +17,7 @@ import { overlayZIndexClass } from './floating'
 import { typedKeyId } from './focus-utils'
 import { isBrowser } from './env'
 import { resolveScrollRoot } from './scroll-root'
+import { createSectionScrollModel } from './section-scroll-utils'
 
 export interface FlatScrollSpyItem extends ScrollSpyItem {
   depth: number
@@ -175,6 +176,15 @@ export function scrollToScrollSpyItem(
 ): void {
   if (item.disabled) return
   scrollToAnchor(item.href, container, targetOffset)
+}
+
+export function resolveScrollSpySectionModel(options: {
+  activeHref?: string
+  container?: ScrollRootInput
+  from?: Element | null
+  reducedMotion?: boolean
+}) {
+  return createSectionScrollModel(options)
 }
 
 export function resolveScrollSpyContainer(

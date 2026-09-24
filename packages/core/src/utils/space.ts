@@ -81,6 +81,31 @@ export function getSpaceClasses(
 /**
  * Inline gap for a numeric size. Named sizes stay on classes.
  */
+export function spaceGapPixels(size: SpaceSize | undefined): number | undefined {
+  if (typeof size !== 'number') return undefined
+  if (!Number.isFinite(size) || size < 0) {
+    devWarn('space.size', `[Tigercat] Space gap ${String(size)} is ignored. Use a number >= 0.`)
+    return 0
+  }
+  return size
+}
+
+export function getSpaceGapStyle(
+  size: SpaceSize = 'md',
+  verticalSize?: number
+): Record<string, string> | undefined {
+  const horizontal = spaceGapPixels(typeof size === 'number' ? size : undefined)
+  const vertical = spaceGapPixels(verticalSize)
+  if (horizontal === undefined && vertical === undefined) return undefined
+  const style: Record<string, string> = {}
+  if (horizontal !== undefined) style.columnGap = `${horizontal}px`
+  if (vertical !== undefined) style.rowGap = `${vertical}px`
+  else if (horizontal !== undefined && typeof size === 'number') {
+    style.columnGap = `${horizontal}px`
+  }
+  return style
+}
+
 export function getSpaceStyle(size: SpaceSize = 'md'): Record<string, string> | undefined {
   const gap = resolveSpaceSize(size).gap
   return gap ? { gap } : undefined

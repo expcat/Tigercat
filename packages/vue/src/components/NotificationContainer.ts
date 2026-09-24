@@ -96,12 +96,20 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
         )
       ]
 
-      if (notification.description) {
+      if (typeof notification.description === 'string' && notification.description) {
         contentChildren.push(
           h(
             'div',
             { class: classNames(notificationDescriptionClasses, colorScheme.descriptionText) },
             notification.description
+          )
+        )
+      } else if (notification.descriptionNode) {
+        contentChildren.push(
+          h(
+            'div',
+            { class: classNames(notificationDescriptionClasses, colorScheme.descriptionText) },
+            notification.descriptionNode as never
           )
         )
       }
@@ -150,6 +158,10 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
           )
         })
         contentChildren.push(h('div', { class: notificationActionsClasses }, actionButtons))
+      } else if (notification.actionNode) {
+        contentChildren.push(
+          h('div', { class: notificationActionsClasses }, notification.actionNode as never)
+        )
       }
 
       const children: HArrayChildren = [

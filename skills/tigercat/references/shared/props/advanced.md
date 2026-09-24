@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## CodeEditor
 
-`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 4/22 props
+`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 4/23 props
 
 | Prop        | Type                        | Default   | Notes                                                   |
 | ----------- | --------------------------- | --------- | ------------------------------------------------------- |
@@ -34,7 +34,7 @@ Events/callback props: `onItemsChange?`.
 
 ## FileManager
 
-`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 4/21 props
+`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 4/22 props
 
 | Prop            | Type                   | Default     | Notes                                                                                      |
 | --------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
@@ -47,7 +47,7 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 ## ImageAnnotation
 
-`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 4/18 props
+`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 4/19 props
 
 | Prop          | Type                  | Default | Notes                                                                         |
 | ------------- | --------------------- | ------- | ----------------------------------------------------------------------------- |
@@ -69,7 +69,7 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 ## MarkdownEditor
 
-`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 4/20 props
+`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 4/21 props
 
 | Prop              | Type                             | Default | Notes                                                            |
 | ----------------- | -------------------------------- | ------- | ---------------------------------------------------------------- |
@@ -80,7 +80,7 @@ Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysCha
 
 ## PrintLayout
 
-`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 4/15 props
+`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 4/16 props
 
 Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。
 
@@ -102,7 +102,7 @@ Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直
 
 ## RichTextEditor
 
-`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 4/16 props
+`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 4/17 props
 
 | Prop        | Type                                                 | Default | Notes                                                                    |
 | ----------- | ---------------------------------------------------- | ------- | ------------------------------------------------------------------------ |
@@ -115,7 +115,7 @@ Events/callback props: `onRequestUrl?`.
 
 ## VirtualList
 
-`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/12 props
+`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/15 props
 
 | Prop          | Type                                           | Default | Notes                                                                                      |
 | ------------- | ---------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -126,15 +126,15 @@ Events/callback props: `onRequestUrl?`.
 
 ## VirtualTable
 
-`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 4/19 props
+`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 4/16 props
 
 Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 
 Note: 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 `TableColumn` 的 `key`/`title`/`width`/`dataKey`/`fixed`/`render`/`align`（不读 sortable/filter）。列虚拟化要数字 `width` 且无固定列，否则 `devWarn` 后全量渲。选择是点行，没有 checkbox 列；`rowKey` 默认 `id`。
 
-| Prop                 | Type                      | Default | Notes                                                                                     |
-| -------------------- | ------------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `dataSource?`        | `T[]`                     | `-`     | Data rows                                                                                 |
-| `columns?`           | `VirtualTableColumn<T>[]` | `-`     | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /... |
-| `virtualHeight?`     | `number`                  | `400`   | Viewport height in px                                                                     |
-| `virtualItemHeight?` | `number`                  | `48`    | Fixed row height in px used by the window. Content is not clipped.                        |
+| Prop                 | Type               | Default | Notes                                                                                     |
+| -------------------- | ------------------ | ------- | ----------------------------------------------------------------------------------------- |
+| `dataSource?`        | `T[]`              | `-`     | Data rows                                                                                 |
+| `columns?`           | `TableColumn<T>[]` | `-`     | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /... |
+| `virtualHeight?`     | `number`           | `400`   | Viewport height in px                                                                     |
+| `virtualItemHeight?` | `number`           | `48`    | Fixed row height in px used by the window. Content is not clipped.                        |

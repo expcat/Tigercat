@@ -17,8 +17,10 @@ import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import { FeedbackDepthContext, FeedbackHost } from './FeedbackHost'
 import {
   createTigerLocaleScope,
+  createTigerThemeScope,
   createIconRegistry,
   type TigerLocaleHandle,
+  type TigerThemeScope,
   type IconRegistry
 } from '@expcat/tigercat-core'
 
@@ -44,6 +46,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   const localeScopeRef = useRef(createTigerLocaleScope())
   const localeHandleRef = useRef<TigerLocaleHandle | null>(null)
   const documentHandleRef = useRef<DocumentConfigHandle | null>(null)
+  const nestedScopeRef = useRef<TigerThemeScope | null>(null)
+  const hostRef = useRef<HTMLDivElement | null>(null)
   const iconRegistryRef = useRef<IconRegistry | null>(null)
   if (!iconRegistryRef.current) {
     iconRegistryRef.current = parent.iconRegistry ?? createIconRegistry()
@@ -136,6 +140,31 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   }, [isDocumentOwner])
 
   useLayoutEffect(() => {
+    if (isDocumentOwner) return
+    const host = hostRef.current
+    if (!host || !theme) {
+      nestedScopeRef.current?.dispose()
+      nestedScopeRef.current = null
+      return
+    }
+    if (!nestedScopeRef.current) {
+      nestedScopeRef.current = createTigerThemeScope({
+        root: host,
+        nested: true,
+        theme,
+        colorScheme: colorScheme ?? 'auto'
+      })
+    }
+    nestedScopeRef.current.setTheme(theme)
+    if (colorScheme) nestedScopeRef.current.setColorScheme(colorScheme)
+    else nestedScopeRef.current.apply()
+    return () => {
+      nestedScopeRef.current?.dispose()
+      nestedScopeRef.current = null
+    }
+  }, [isDocumentOwner, theme, colorScheme])
+
+  useLayoutEffect(() => {
     if (!documentHandleRef.current) return
     documentHandleRef.current.apply({
       theme: value.theme,
@@ -148,7 +177,12 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
 
   return (
     <TigerConfigContext.Provider value={value}>
-      <div className="tiger-config-root" data-tiger-config-root="" dir={value.direction} lang={layerLang}>
+      <div
+        ref={hostRef}
+        className="tiger-config-root"
+        data-tiger-config-root=""
+        dir={value.direction}
+        lang={layerLang}>
         <FeedbackDepthContext.Provider value={feedbackDepth}>
           <OverlayOutletProvider>
             {children}

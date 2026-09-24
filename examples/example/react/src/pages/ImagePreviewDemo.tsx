@@ -7,7 +7,7 @@ export default function ImagePreviewDemo() {
   return (
     <DemoPage
       title="ImagePreview 图片预览"
-      description="全屏图片预览，支持缩放、旋转和多图切换。用 minScale/maxScale 限制缩放。"
+      description="全屏预览支持缩放、旋转、水平翻转、下载当前图和回到 1:1。多图循环。工具条项可用 renderToolbarItem 替换。"
       modules={modules}
     />
   )

@@ -151,23 +151,32 @@ export function getStepItemClasses(direction: StepsDirection, isLast: boolean): 
 /**
  * Get Step icon container classes
  */
+/** Error steps stay clickable when `clickable` is set. Current stays on the control. */
+export function isStepClickable(clickable: boolean, disabled: boolean, _status: StepStatus): boolean {
+  return clickable && !disabled
+}
+
 export function getStepIconClasses(
   status: StepStatus,
   size: StepSize,
   simple: boolean,
-  isCustomIcon: boolean
+  isCustomIcon: boolean,
+  progressDot = false
 ): string {
-  const baseClasses =
-    'tiger-step-icon relative z-10 flex items-center justify-center rounded-full border-2'
+  const baseClasses = progressDot
+    ? 'tiger-step-icon tiger-step-icon--dot relative z-10 flex items-center justify-center rounded-full border-0 w-2.5 h-2.5'
+    : 'tiger-step-icon relative z-10 flex items-center justify-center rounded-full border-2'
 
   // Size classes
-  const sizeClasses = simple
-    ? 'w-6 h-6 text-xs'
-    : size === 'sm'
-      ? 'w-8 h-8 text-sm'
-      : size === 'lg'
-        ? 'w-12 h-12 text-lg'
-        : 'w-10 h-10 text-base'
+  const sizeClasses = progressDot
+    ? ''
+    : simple
+      ? 'w-6 h-6 text-xs'
+      : size === 'sm'
+        ? 'w-8 h-8 text-sm'
+        : size === 'lg'
+          ? 'w-12 h-12 text-lg'
+          : 'w-10 h-10 text-base'
 
   // Custom icon might need less padding
   const iconClasses = isCustomIcon ? '' : 'font-medium'

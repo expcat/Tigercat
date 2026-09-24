@@ -30,12 +30,24 @@ export const progressBaseStyles = {
     {
       animationPlayState: 'paused'
     },
+  '@keyframes tiger-progress-indeterminate': {
+    '0%': { transform: 'translateX(-120%)' },
+    '100%': { transform: 'translateX(280%)' }
+  },
+  '.tiger-progress-indeterminate': {
+    width: '40%',
+    animation: 'tiger-progress-indeterminate 1.2s ease-in-out infinite'
+  },
   '@media (prefers-reduced-motion: reduce)': {
     '.tiger-progress-fill': {
       transition: 'none'
     },
     '.tiger-progress-striped-animated': {
       animation: 'none'
+    },
+    '.tiger-progress-indeterminate': {
+      animation: 'none',
+      width: '100%'
     }
   }
 } as const
@@ -94,7 +106,16 @@ export function formatProgressText(
     return formatFn(percentage)
   }
 
-  return `${Math.round(percentage)}%`
+  return formatProgressPercent(percentage)
+}
+
+/** Percent sign from Intl, not a hardcoded glyph. */
+export function formatProgressPercent(percentage: number, locales?: Intl.LocalesArgument): string {
+  const value = clampPercentage(percentage) / 100
+  return new Intl.NumberFormat(locales, {
+    style: 'percent',
+    maximumFractionDigits: 0
+  }).format(value)
 }
 
 export function clampPercentage(percentage: number): number {
@@ -161,6 +182,9 @@ export interface ProgressViewInput {
   ariaLabel?: string
   ariaLabelledby?: string
   widgetName: string
+  indeterminate?: boolean
+  steps?: number
+  locales?: Intl.LocalesArgument
 }
 
 export interface ProgressView {
@@ -174,6 +198,9 @@ export interface ProgressView {
   striped: boolean
   stripedAnimated: boolean
   paused: boolean
+  indeterminate: boolean
+  steps: number
+  successMark: boolean
 }
 
 /**
@@ -181,11 +208,19 @@ export interface ProgressView {
  */
 export function resolveProgressView(input: ProgressViewInput): ProgressView {
   const type = input.type ?? 'line'
-  const percentage = Math.round(clampPercentage(input.percentage ?? 0))
+  const passed = Math.round(clampPercentage(input.percentage ?? 0))
+  const successMark = input.status === 'success'
+  const percentage = successMark ? 100 : passed
+  const indeterminate = Boolean(input.indeterminate) && !successMark
+  const steps = Number.isFinite(input.steps) && (input.steps ?? 0) > 1 ? Math.floor(input.steps ?? 0) : 0
   const statusVariant = getStatusVariant(input.status ?? 'normal')
   const effectiveVariant = (statusVariant || input.variant || 'primary') as ProgressVariant
   const shouldShowText = input.showText ?? type === 'line'
-  const displayText = shouldShowText ? formatProgressText(percentage, input.text, input.format) : ''
+  const displayText = shouldShowText
+    ? input.text !== undefined || input.format
+      ? formatProgressText(percentage, input.text, input.format)
+      : formatProgressPercent(percentage, input.locales)
+    : ''
   const hasCustomText = input.text !== undefined || input.format !== undefined
   const valueText = hasCustomText && shouldShowText ? displayText : undefined
   const ariaLabel = input.ariaLabel ?? (input.ariaLabelledby ? undefined : input.widgetName)
@@ -203,7 +238,10 @@ export function resolveProgressView(input: ProgressViewInput): ProgressView {
     ariaLabel,
     striped,
     stripedAnimated,
-    paused
+    paused,
+    indeterminate,
+    steps,
+    successMark
   }
 }
 
@@ -218,6 +256,11 @@ export function getProgressFillClasses(view: ProgressView, extra?: string): stri
   ]
     .filter(Boolean)
     .join(' ')
+}
+
+export function progressStepFilled(steps: number, percentage: number): boolean[] {
+  const count = Math.max(0, Math.floor(steps))
+  return Array.from({ length: count }, (_, index) => ((index + 1) / count) * 100 <= percentage + 0.001)
 }
 
 export function getProgressStrokeClasses(variant: ProgressVariant): string {

@@ -107,6 +107,12 @@ export function buildAffixPlaceholderStyle(flowRect: AffixLayoutRect): {
 /**
  * Calculate whether an element should be affixed based on scroll position.
  */
+/** Notify once when the boolean flips. `null` means no notice. */
+export function nextAffixNotice(previous: boolean | null, next: boolean): boolean | null {
+  if (previous === next) return null
+  return next
+}
+
 export function calculateAffixState(
   elementRect: AffixLayoutRect,
   containerRect: { top: number; bottom: number },
@@ -238,7 +244,10 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
       lastSerialized = serialized
       options.onState(next)
     }
-    if (emitChange && was !== next.affixed) options.onChange?.(next.affixed)
+    if (emitChange) {
+      const notice = nextAffixNotice(was, next.affixed)
+      if (notice !== null) options.onChange?.(notice)
+    }
   }
 
   const pinFromFlow = (emitChange: boolean): void => {

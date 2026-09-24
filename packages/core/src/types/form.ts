@@ -288,6 +288,11 @@ export interface FormProps {
    * @default false
    */
   loading?: boolean
+  /**
+   * List existing field errors. Activating an item focuses that field's control.
+   * @default false
+   */
+  showErrorSummary?: boolean
 
   /**
    * Headless controller from `useFormController` / `createFormEngine`.
@@ -452,6 +457,10 @@ export interface FormHandle {
   setInitialValues: (values: FormValues) => void
   addField: (fieldName: string, defaultValue?: unknown) => void
   removeField: (fieldName: string) => void
+  /** Insert a row at `path[index]`. Later row paths shift up. */
+  insertFieldArrayItem: (path: string, index: number, item?: unknown) => void
+  /** Remove `path[index]`. Later row paths shift down. */
+  removeFieldArrayItem: (path: string, index: number) => void
   undo: () => void
   redo: () => void
   snapshotHistory: () => void
@@ -509,6 +518,10 @@ export interface FormController {
   addField: (fieldName: string, defaultValue?: unknown) => void
   /** Remove a top-level field */
   removeField: (fieldName: string) => void
+  /** Insert a row at `path[index]`. Later row paths shift up. */
+  insertFieldArrayItem: (path: string, index: number, item?: unknown) => void
+  /** Remove `path[index]`. Later row paths shift down. */
+  removeFieldArrayItem: (path: string, index: number) => void
   /** Undo last change (if undoable) */
   undo: () => void
   /** Redo last undone change (if undoable) */

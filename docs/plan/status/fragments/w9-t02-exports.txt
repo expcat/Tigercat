@@ -1,0 +1,16 @@
+packages/vue/src/index.ts
+export { Gallery } from './components/Gallery'
+export type { VueGalleryProps } from './components/Gallery'
+
+packages/react/src/index.tsx
+export { Gallery } from './components/Gallery'
+export type { GalleryProps } from './components/Gallery'
+
+packages/vue/package.json exports
+"./Gallery": { "types": "./dist/components/Gallery.d.mts", "import": "./dist/components/Gallery.mjs", "default": "./dist/components/Gallery.mjs" }
+
+packages/react/package.json exports
+"./Gallery": { "types": "./dist/components/Gallery.d.mts", "import": "./dist/components/Gallery.mjs", "default": "./dist/components/Gallery.mjs" }
+
+scripts/lib/public-components.mjs
+Gallery

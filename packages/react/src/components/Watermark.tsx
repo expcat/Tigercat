@@ -32,6 +32,9 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
     gapY = watermarkDefaults.gapY,
     offsetX = watermarkDefaults.offsetX,
     offsetY = watermarkDefaults.offsetY,
+    rowGap = 0,
+    density = 1,
+    printVisible = true,
     font,
     className,
     children,
@@ -100,7 +103,9 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
     gapY,
     offsetX,
     offsetY,
-    zIndex
+    zIndex,
+    rowGap,
+    density
   })
 
   return (
@@ -113,7 +118,19 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
       className={classNames(watermarkWrapperClasses, className)}
       {...props}>
       {children}
-      <div data-watermark="true" aria-hidden="true" className={watermarkOverlayClasses} style={overlayStyle} />
+      <div
+        data-watermark="true"
+        data-watermark-print={printVisible ? 'on' : 'off'}
+        aria-hidden="true"
+        className={watermarkOverlayClasses}
+        style={{
+          ...overlayStyle,
+          position: 'absolute',
+          pointerEvents: 'none',
+          backgroundRepeat: 'repeat',
+          zIndex
+        }}
+      />
       {imageFailed ? (
         <p className="text-sm text-[var(--tiger-text-secondary)]">
           {getWatermarkLabels(mergeTigerLocale(config.locale)).imageErrorText}

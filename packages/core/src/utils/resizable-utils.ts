@@ -4,6 +4,7 @@
  */
 
 import type { AspectRatioPrimary, ResizeAxis, ResizeHandlePosition } from '../types/resizable'
+import { parseAspectRatio } from './aspect-ratio-utils'
 
 // ─── Style Constants ────────────────────────────────────────────────
 
@@ -287,6 +288,8 @@ export function applyResizeSize(
   options: {
     rtl?: boolean
     lockAspectRatio?: boolean
+    /** Parsed width/height. Presets such as `16/9` supply this. */
+    aspectRatio?: number
     minWidth: number
     minHeight: number
     maxWidth?: number
@@ -302,9 +305,15 @@ export function applyResizeSize(
   )
   let nextWidth = startWidth + deltaWidth
   let nextHeight = startHeight + deltaHeight
-  if (options.lockAspectRatio) {
+  const lockedRatio =
+    options.aspectRatio && options.aspectRatio > 0
+      ? options.aspectRatio
+      : options.lockAspectRatio && startWidth > 0 && startHeight > 0
+        ? startWidth / startHeight
+        : 0
+  if (lockedRatio > 0) {
     const primary = getAspectRatioPrimary(handle, deltaWidth, deltaHeight)
-    const locked = applyAspectRatio(nextWidth, nextHeight, startWidth, startHeight, primary)
+    const locked = applyAspectRatio(nextWidth, nextHeight, lockedRatio, 1, primary)
     const clamped = clampDimensionsWithRatio(
       locked.width,
       locked.height,
@@ -347,6 +356,8 @@ export function applyResizeJump(
   options: {
     rtl?: boolean
     lockAspectRatio?: boolean
+    /** Parsed width/height. Presets such as `16/9` supply this. */
+    aspectRatio?: number
     minWidth: number
     minHeight: number
     maxWidth?: number
@@ -377,9 +388,15 @@ export function applyResizeJump(
   if (axis !== 'horizontal' && vertical) {
     height = toMin ? options.minHeight : (options.maxHeight ?? startHeight)
   }
-  if (options.lockAspectRatio) {
+  const jumpRatio =
+    options.aspectRatio && options.aspectRatio > 0
+      ? options.aspectRatio
+      : options.lockAspectRatio && startWidth > 0 && startHeight > 0
+        ? startWidth / startHeight
+        : 0
+  if (jumpRatio > 0) {
     const primary = getAspectRatioPrimary(handle, width - startWidth, height - startHeight)
-    const locked = applyAspectRatio(width, height, startWidth, startHeight, primary)
+    const locked = applyAspectRatio(width, height, jumpRatio, 1, primary)
     const clamped = clampDimensionsWithRatio(
       locked.width,
       locked.height,
@@ -438,4 +455,22 @@ export function mergeResizableBoxStyle(
     next.marginTop = addCssLength(userStyle?.marginTop, offsetY)
   }
   return next
+}
+
+/** `true` keeps the current box. A preset string uses the AspectRatio parser (`16/9`, `16:9`). */
+export function resolveResizableAspectRatio(
+  lock: boolean | string | undefined,
+  width: number,
+  height: number
+): number | undefined {
+  if (lock === true) {
+    if (width > 0 && height > 0) return width / height
+    return undefined
+  }
+  if (typeof lock === 'string' && lock.trim()) return parseAspectRatio(lock)
+  return undefined
+}
+
+export function formatResizableLiveText(width: number, height: number, template: string): string {
+  return template.replace('{width}', String(Math.round(width))).replace('{height}', String(Math.round(height)))
 }

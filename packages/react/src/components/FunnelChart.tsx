@@ -1,6 +1,7 @@
 import React, { useCallback, useId, useMemo } from 'react'
 import {
   classNames,
+  funnelLayerRatios,
   layoutFunnel,
   getChartElementOpacity,
   getStableChartGradientPrefix,
@@ -102,7 +103,8 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<FunnelChartDatum>({
     hoverable,
     showTooltip,
@@ -144,6 +146,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
     [data, innerRect.width, innerRect.height, gap, pinch, palette, orientation, direction]
   )
   const total = useMemo(() => segments.reduce((sum, segment) => sum + segment.value, 0), [segments])
+  const ratios = useMemo(() => funnelLayerRatios(data.map((item) => item.value)), [data])
   const stageName = useCallback(
     (datum: FunnelChartDatum, index: number) =>
       funnelStageDisplayLabel(datum, index, labels.stageName),
@@ -163,7 +166,9 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         selectedIndex: resolvedSelectedIndex,
         getIndex: (segment) => segment.index,
         getLabel: (segment) => stageName(data[segment.index], segment.index),
-        getColor: (segment) => segment.color
+        getColor: (segment) => segment.color,
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       }),
     [segments, data, palette, activeIndex, resolvedSelectedIndex, stageName]
   )
@@ -275,7 +280,15 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
             dominantBaseline="middle"
             fill={chartLabelFill(seg.color)}
             aria-hidden={interactive ? true : undefined}>
-            {stageName(data[seg.index] ?? { value: seg.value, label: seg.label }, seg.index)}
+            {(() => {
+              const name = stageName(data[seg.index] ?? { value: seg.value, label: seg.label }, seg.index)
+              const ratio = ratios[seg.index]
+              if (!ratio) return name
+              const previous =
+                ratio.versusPrevious === null ? '' : ` ${Math.round(ratio.versusPrevious * 100)}%`
+              const first = ratio.versusFirst === null ? '' : ` ${Math.round(ratio.versusFirst * 100)}%`
+              return `${name} ${ratio.value}${previous}${first}`
+            })()}
           </text>
         ))}
     </ChartCanvas>

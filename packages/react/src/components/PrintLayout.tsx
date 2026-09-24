@@ -10,6 +10,7 @@ import {
   classNames,
   getPrintLayoutBoxStyle,
   getPrintLayoutClasses,
+  paginatePrintPreview,
   getPrintLayoutLabels,
   createPrintInstanceId,
   getPrintLayoutPageKey,
@@ -46,6 +47,12 @@ export interface PrintLayoutProps
   footerRender?: React.ReactNode
   children?: React.ReactNode
   locale?: Partial<TigerLocale>
+  bind?: {
+    contentHeightMm?: number
+    pageHeightMm?: number
+    marginMm?: number
+    manualBreaks?: number
+  }
 }
 
 export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(function PrintLayout(
@@ -65,6 +72,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
     className,
     children,
     locale,
+    bind,
     ...rest
   },
   ref
@@ -110,6 +118,20 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
         data-tiger-print={pageKey}
         data-tiger-print-instance={instanceId.current}
         data-tiger-print-size={box.pageSize}>
+        {bind ? (
+          <div data-tiger-print-preview="">
+            {paginatePrintPreview({
+              contentHeightMm: bind.contentHeightMm ?? 0,
+              pageHeightMm: bind.pageHeightMm ?? 297,
+              marginMm: bind.marginMm,
+              manualBreaks: bind.manualBreaks
+            }).map((page) => (
+              <span key={page.index} data-page-number={page.numberLabel}>
+                {page.numberLabel}
+              </span>
+            ))}
+          </div>
+        ) : null}
         <table className="w-full border-collapse">
           {header ? (
             <thead>

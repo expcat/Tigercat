@@ -5,6 +5,7 @@ import {
   layoutGauge,
   createGaugeArcPath,
   createGaugeNeedlePath,
+  gaugeShowsPointer,
   createGaugeAnimation,
   getStableChartGradientPrefix,
   chartAxisTickTextClasses,
@@ -23,6 +24,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
+import { renderGaugeBind } from './w9-chart-bind'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -63,7 +65,11 @@ export const GaugeChart = defineComponent({
     desc: { type: String },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
-    className: { type: String }
+    className: { type: String },
+    bind: {
+      type: Object as PropType<{ display?: 'pointer' | 'arc' }>,
+      default: undefined
+    }
   },
   setup(props, { attrs }) {
     const config = useTigerConfig()
@@ -296,6 +302,9 @@ export const GaugeChart = defineComponent({
                 x: tooltip.value.x,
                 y: tooltip.value.y
               })
+            : null,
+          props.bind?.display
+            ? renderGaugeBind(gaugeShowsPointer(props.bind.display), props.bind.display)
             : null
         ]
       )

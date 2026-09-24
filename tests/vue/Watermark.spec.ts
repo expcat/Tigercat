@@ -3,7 +3,7 @@
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/vue'
+import { render, screen } from '@testing-library/vue'
 import { Watermark } from '@expcat/tigercat-vue/Watermark'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -101,7 +101,7 @@ describe('Watermark', () => {
     expect(container.querySelector('[data-watermark="true"]')).toBe(overlay)
   })
 
-  it('restores overlay after it is removed', async () => {
+  it('does not recreate an overlay after it is removed', async () => {
     const { container } = render(Watermark, {
       props: { content: 'Secret' },
       slots: { default: 'Protected content' }
@@ -109,11 +109,8 @@ describe('Watermark', () => {
     const overlay = container.querySelector('[data-watermark="true"]') as HTMLElement
     expect(overlay).toBeTruthy()
     overlay.remove()
-    await waitFor(() => {
-      const restored = container.querySelector('[data-watermark="true"]')
-      expect(restored).toBeTruthy()
-      expect(restored).not.toBe(overlay)
-    })
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(container.querySelector('[data-watermark="true"]')).toBeNull()
   })
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {

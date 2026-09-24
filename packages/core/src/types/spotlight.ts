@@ -58,4 +58,8 @@ export interface SpotlightProps {
    * @default false
    */
   hotkey?: boolean | string
+  /**
+   * Ids shown ahead of the other filter results. The caller owns the list.
+   */
+  recentIds?: SpotlightItemKey[]
 }

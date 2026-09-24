@@ -1,0 +1,19 @@
+# New public components. Re-export from the Vue and React barrels. Do not add them in this change.
+# packages/vue/src/index.ts
+export { WaterfallChart } from './components/WaterfallChart'
+export { SankeyChart } from './components/SankeyChart'
+export { NotificationBell } from './components/NotificationBell'
+export { AssigneePicker } from './components/AssigneePicker'
+
+# packages/react/src/index.ts
+export { WaterfallChart } from './components/WaterfallChart'
+export { SankeyChart } from './components/SankeyChart'
+export { NotificationBell } from './components/NotificationBell'
+export { AssigneePicker } from './components/AssigneePicker'
+
+# Core helpers already leave the package through utils/table-controller.ts `export * from './w9-data'`.
+# Labels: packages/core/src/utils/i18n/w9/data-labels.ts
+# Re-exported names: getW9DataLabels, formatW9Label, W9DataLabels
+# Plus resolveTableVirtualStrategy, virtualizeMiddleColumns, toggleLegendHidden, layoutWaterfall, layoutSankey,
+# virtualGridWindow, funnelLayerRatios, commitValidatedCellEdit, narrowWidgetParams, wizardStepIsDirty,
+# stableModelSnapshot, filterAssignees, toggleAssignee, nextListboxIndex, countdownRemainingRatio, calendarWeekNumber

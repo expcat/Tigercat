@@ -38,6 +38,11 @@ import {
   resolveEditorTabAction,
   nextToolbarRovingIndex,
   getMarkdownToolbarButtons,
+  getW9DataLabels,
+  htmlToMarkdown,
+  lockedPaneScroll,
+  markdownHeadings,
+  sanitizeHtml,
   type MarkdownEditorMode,
   type MarkdownEditorProps as CoreMarkdownEditorProps,
   type MarkdownToolbarButton,
@@ -68,6 +73,7 @@ export interface MarkdownEditorProps extends Omit<
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleMarkdownEditor>
   tabSize?: number
+  bind?: { html?: string; lockScroll?: boolean }
   ariaLabel?: string
   name?: string
   onChange?: (markdown: string) => void
@@ -96,6 +102,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
       ariaLabel,
       name,
       id,
+      bind,
       onChange,
       onModeChange,
       className,
@@ -109,6 +116,18 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
     const config = useTigerConfig()
     const formItemControl = useFormItemControlContext()
     const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const previewRef = useRef<HTMLDivElement>(null)
+    const lockingScroll = useRef(false)
+    const syncLockedPane = (source: HTMLElement, target: HTMLElement | null) => {
+      if (!bind?.lockScroll || !target || lockingScroll.current) return
+      lockingScroll.current = true
+      target.scrollTop = lockedPaneScroll(
+        source.scrollTop,
+        Math.max(0, source.scrollHeight - source.clientHeight),
+        Math.max(0, target.scrollHeight - target.clientHeight)
+      )
+      lockingScroll.current = false
+    }
     const pendingSelection = useRef<{ start: number; end: number } | null>(null)
     const composingRef = useRef(false)
     const narrow = useSyncExternalStore(subscribeMarkdownNarrow, isMarkdownNarrowViewport, () => false)
@@ -273,6 +292,8 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
     const previewName = labels.previewAriaLabel?.trim() ?? ''
     const previewNode = (
       <div
+        ref={previewRef}
+        onScroll={(event) => syncLockedPane(event.currentTarget, textareaRef.current)}
         className={classNames(
           markdownEditorPreviewClasses,
           currentMode === 'split' && !narrow ? markdownEditorSplitDividerClasses : undefined,
@@ -291,7 +312,40 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
         className={getMarkdownContainerClasses(effectiveDisabled, className)}
         style={containerStyle}
         data-mode={currentMode}
+        data-lock-scroll={bind?.lockScroll ? '' : undefined}
         {...containerRest}>
+        {bind ? (
+          <div data-tiger-markdown-bind="">
+            {markdownHeadings(currentValue).map((heading) => (
+              <button
+                type="button"
+                key={heading.index}
+                data-toc={heading.text}
+                onClick={() => {
+                  textareaRef.current?.focus()
+                  textareaRef.current?.setSelectionRange(heading.index, heading.index)
+                }}>
+                {heading.text}
+              </button>
+            ))}
+            {currentValue
+              .split('\n')
+              .filter((line) => /^- \[[ xX]\] /.test(line))
+              .map((line, index) => (
+                <span
+                  key={index}
+                  data-markdown-task={line.includes('[x]') || line.includes('[X]') ? 'done' : 'open'}>
+                  {line}
+                </span>
+              ))}
+            <button
+              type="button"
+              data-tiger-md-paste=""
+              onClick={() => commitValue(`${currentValue}${htmlToMarkdown(sanitizeHtml(bind.html ?? ''))}`)}>
+              {getW9DataLabels().preview}
+            </button>
+          </div>
+        ) : null}
         {showTopbar && (
           <div className={markdownEditorToolbarClasses}>
             {showFormattingToolbar ? (
@@ -415,6 +469,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
                 commitValue(event.target.value)
               }}
               onKeyDown={handleKeyDown}
+              onScroll={(event) => syncLockedPane(event.currentTarget, previewRef.current)}
               onFocus={onFocus}
               onBlur={(event) => {
                 formItemControl?.onBlur?.()

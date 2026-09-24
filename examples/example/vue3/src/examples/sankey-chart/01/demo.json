@@ -1,0 +1,12 @@
+{
+  "id": "sankey-chart-01",
+  "title": "桑基图",
+  "description": "节点和流量带由 core 布局，组件只绑定路径。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

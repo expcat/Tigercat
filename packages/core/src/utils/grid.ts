@@ -7,6 +7,7 @@ import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
 import {
   GRID_BREAKPOINT_ORDER } from './layout-grid-styles'
+import { isResponsiveMap, resolveResponsiveValue } from './responsive'
 
 export { GRID_BREAKPOINT_ORDER }
 
@@ -44,15 +45,47 @@ function clampGridValue(value: number, fieldName: string): number | undefined {
   return value
 }
 
+function nonNegativeGutter(value: number | undefined): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return 0
+  return value
+}
+
 export function resolveGutter(gutter: GutterSize | undefined | null): { x: number; y: number } {
   if (gutter === undefined || gutter === null || gutter === 0) return { x: 0, y: 0 }
   if (Array.isArray(gutter)) {
     return {
-      x: Math.max(0, gutter[0] ?? 0),
-      y: Math.max(0, gutter[1] ?? 0)
+      x: nonNegativeGutter(gutter[0]),
+      y: nonNegativeGutter(gutter[1])
     }
   }
-  return { x: Math.max(0, gutter), y: 0 }
+  if (typeof gutter === 'number') return { x: nonNegativeGutter(gutter), y: 0 }
+  return { x: 0, y: 0 }
+}
+
+export function resolveResponsiveGutter(
+  gutter: GutterSize | undefined | null,
+  width: number
+): { x: number; y: number } {
+  if (isResponsiveMap(gutter)) {
+    return resolveGutter(resolveResponsiveValue(gutter, width, 0))
+  }
+  return resolveGutter(gutter)
+}
+
+export function resolveResponsiveAlign(
+  align: Align | Partial<Record<Breakpoint, Align>> | undefined,
+  width: number
+): Align {
+  if (!align || typeof align === 'string') return align ?? 'top'
+  return resolveResponsiveValue(align, width, 'top')
+}
+
+export function resolveResponsiveJustify(
+  justify: Justify | Partial<Record<Breakpoint, Justify>> | undefined,
+  width: number
+): Justify {
+  if (!justify || typeof justify === 'string') return justify ?? 'start'
+  return resolveResponsiveValue(justify, width, 'start')
 }
 
 export function hasGutter(gutter: GutterSize | undefined | null): boolean {

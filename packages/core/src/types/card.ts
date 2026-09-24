@@ -81,4 +81,10 @@ export interface CardProps {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Heading level for the visible title. Defaults to 2 so the card does not take the page h1.
+   * @default 2
+   */
+  titleLevel?: 1 | 2 | 3 | 4 | 5 | 6
 }

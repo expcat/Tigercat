@@ -4,6 +4,7 @@ import {
   createGaugeAnimation,
   createGaugeArcPath,
   createGaugeNeedlePath,
+  gaugeShowsPointer,
   getStableChartGradientPrefix,
   chartAxisTickTextClasses,
   getCartesianChartShellClasses,
@@ -20,9 +21,11 @@ import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
+import { GaugeBind } from './w9-chart-bind'
 
 export interface GaugeChartProps extends CoreGaugeChartProps {
   padding?: ChartPadding
+  bind?: { display?: 'pointer' | 'arc' }
 }
 
 export const GaugeChart: React.FC<GaugeChartProps> = ({
@@ -51,7 +54,8 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   desc,
   locale,
   labels: labelsOverride,
-  className
+  className,
+  bind
 }) => {
   const config = useTigerConfig()
   const labels = useMemo(
@@ -273,6 +277,9 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
           y={tooltip.y}
         />
       )}
+      {bind?.display ? (
+        <GaugeBind pointer={gaugeShowsPointer(bind.display)} arc={bind.display} />
+      ) : null}
     </div>
   )
 }

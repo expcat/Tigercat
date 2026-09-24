@@ -1,0 +1,8 @@
+{
+  "id": "gallery-01",
+  "title": "缩略图画廊",
+  "description": "缩略图列表、当前项和计数。点开复用 ImagePreview，不另写手势。",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": { "mode": "auto", "minHeight": 360, "maxHeight": 560 }
+}

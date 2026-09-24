@@ -23,6 +23,10 @@ import {
   getNavigationMenuTriggerClasses,
   getNavigationMenuChevronClasses,
   getNavigationMenuContentClasses,
+  getNavigationMenuIndicatorStyle,
+  measureNavigationIndicator,
+  createTypeaheadHighlight,
+  markTypeaheadMatch,
   getNavigationMenuLinkClasses,
   getNavigationMenuItemValue,
   getNavigationMenuRovingTabIndex,
@@ -59,6 +63,8 @@ import { composeRefs } from '../utils/overlay-trigger'
 
 export interface NavigationMenuContextValue {
   value: NavigationMenuValue | null
+  current: NavigationMenuValue | null | undefined
+  viewport: boolean
   tabStopValue: NavigationMenuValue | null
   setTabStopValue: (next: NavigationMenuValue | null) => void
   setValue: (next: NavigationMenuValue | null, options?: { restoreFocus?: boolean }) => void
@@ -76,6 +82,16 @@ export interface NavigationMenuContextValue {
   showArrow: boolean
   rootRef: React.RefObject<HTMLElement | null>
   menubarRef: React.RefObject<HTMLElement | null>
+  typeahead: {
+    push: (
+      character: string,
+      labels: readonly string[],
+      fromIndex: number,
+      disabled?: readonly boolean[]
+    ) => { query: string; index: number } | null
+  }
+  setViewportContent: (owner: string, node: React.ReactNode) => void
+  clearViewportContent: (owner: string) => void
 }
 
 export interface NavigationMenuItemContextValue {
@@ -178,6 +194,21 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
       if (inPanel || !root?.menubarRef.current) return
+      const barItems = getNavigationMenuBarItems(root.menubarRef.current)
+      const hit = root.typeahead.push(
+        event.key,
+        barItems.map((node) => (node.textContent ?? '').trim()),
+        Math.max(0, barItems.indexOf(event.currentTarget)),
+        barItems.map((node) => node.getAttribute('aria-disabled') === 'true')
+      )
+      if (hit && hit.index >= 0) {
+        event.preventDefault()
+        markTypeaheadMatch(barItems, hit.index)
+        barItems[hit.index]?.focus()
+        const matched = getNavigationMenuItemValue(barItems[hit.index])
+        if (matched != null) root.setTabStopValue(matched)
+        return
+      }
       const next = handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
       if (!next) return
       const value = getNavigationMenuItemValue(next)
@@ -441,7 +472,20 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
     }
   }
 
+  useLayoutEffect(() => {
+    if (!root?.viewport || mega || !item || !isOpen) return
+    const owner = String(item.value)
+    root.setViewportContent(
+      owner,
+      <div role="menu" data-tiger-navigation-menu-content="">
+        {children}
+      </div>
+    )
+    return () => root.clearViewportContent(owner)
+  }, [root, mega, item, isOpen, children])
+
   if (!item || !root) return null
+  if (root.viewport && !mega) return null
 
   const popup = (
     <div
@@ -603,6 +647,7 @@ export const NavigationMenuList: React.FC<NavigationMenuListProps> = ({
 }) => {
   const root = useContext(NavigationMenuContext)
   const listRef = useRef<HTMLUListElement | null>(null)
+  const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties | undefined>(undefined)
 
   const setListRef = useCallback(
     (node: HTMLUListElement | null) => {
@@ -613,6 +658,32 @@ export const NavigationMenuList: React.FC<NavigationMenuListProps> = ({
     },
     [root]
   )
+
+  useLayoutEffect(() => {
+    const list = listRef.current
+    if (!list || root?.current == null) {
+      setIndicatorStyle(undefined)
+      return
+    }
+    const trigger = list.querySelector<HTMLElement>(
+      `[${NAVIGATION_MENU_ITEM_VALUE_ATTR}="${String(root.current)}"]`
+    )
+    if (!trigger) {
+      setIndicatorStyle(undefined)
+      return
+    }
+    const dir = getComputedStyle(list).direction === 'rtl' ? 'rtl' : 'ltr'
+    const measured = measureNavigationIndicator(
+      trigger.getBoundingClientRect(),
+      list.getBoundingClientRect(),
+      dir
+    )
+    const nextStyle = getNavigationMenuIndicatorStyle(measured.start, measured.size)
+    setIndicatorStyle({
+      insetInlineStart: nextStyle.insetInlineStart,
+      inlineSize: nextStyle.inlineSize
+    })
+  }, [root, children])
 
   useLayoutEffect(() => {
     const list = listRef.current
@@ -634,6 +705,9 @@ export const NavigationMenuList: React.FC<NavigationMenuListProps> = ({
       style={style}
       role="menubar"
       data-tiger-navigation-menu-list="">
+      {root?.current != null ? (
+        <span data-tiger-navigation-indicator="" aria-hidden="true" style={indicatorStyle} />
+      ) : null}
       {children}
     </ul>
   )
@@ -662,6 +736,8 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
   portal = true,
   offset = NAVIGATION_MENU_DEFAULT_OFFSET,
   placement = 'bottom-start',
+  current = null,
+  viewport = false,
   className,
   style,
   onValueChange,
@@ -763,9 +839,24 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
     [setValue]
   )
 
+  const [viewportNode, setViewportNode] = useState<React.ReactNode>(null)
+  const viewportOwnerRef = useRef<string | null>(null)
+  const typeaheadRef = useRef(createTypeaheadHighlight())
+  const setViewportContent = useCallback((owner: string, node: React.ReactNode) => {
+    viewportOwnerRef.current = owner
+    setViewportNode(node)
+  }, [])
+  const clearViewportContent = useCallback((owner: string) => {
+    if (viewportOwnerRef.current !== owner) return
+    viewportOwnerRef.current = null
+    setViewportNode(null)
+  }, [])
+
   const contextValue = useMemo<NavigationMenuContextValue>(
     () => ({
       value: currentValue,
+      current,
+      viewport,
       tabStopValue,
       setTabStopValue,
       setValue,
@@ -782,10 +873,15 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
       placement,
       showArrow,
       rootRef,
-      menubarRef
+      menubarRef,
+      typeahead: typeaheadRef.current,
+      setViewportContent,
+      clearViewportContent
     }),
     [
+      clearViewportContent,
       closeOnClick,
+      current,
       currentValue,
       disabled,
       handleFocusLeave,
@@ -795,8 +891,10 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
       placement,
       portal,
       setValue,
+      setViewportContent,
       showArrow,
-      tabStopValue
+      tabStopValue,
+      viewport
     ]
   )
 
@@ -810,12 +908,18 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
         className={classNames(getNavigationMenuClasses(), className)}
         style={style}
         data-tiger-navigation-menu=""
+        data-tiger-navigation-viewport={viewport ? 'true' : undefined}
         data-state={currentOpen ? 'open' : 'closed'}
         onBlur={(event) => {
           navProps.onBlur?.(event)
           handleFocusLeave(event)
         }}>
         {hasList ? children : <NavigationMenuList>{children}</NavigationMenuList>}
+        {viewport ? (
+          <div data-tiger-navigation-viewport-panel="" hidden={currentValue == null}>
+            {viewportNode}
+          </div>
+        ) : null}
       </nav>
     </NavigationMenuContext.Provider>
   )

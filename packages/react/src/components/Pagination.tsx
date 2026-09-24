@@ -1,4 +1,12 @@
-import React, { useState, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useId } from 'react'
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useId
+} from 'react'
 import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
   classNames,
@@ -6,6 +14,9 @@ import {
   getPageRange,
   validateCurrentPage,
   getPageNumbers,
+  paginationEllipsisPages,
+  clampPaginationJump,
+  navLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
   normalizePaginationTotal,
@@ -49,6 +60,7 @@ export interface PaginationProps
    * Locale configuration for i18n support
    */
   locale?: TigerLocaleInput
+  itemRender?: (page: number, kind: 'page') => React.ReactNode
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
@@ -69,6 +81,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   disabled = false,
   hideOnSinglePage = false,
   showLessItems = false,
+  ellipsisJump = false,
+  itemRender,
   quickJumperValidation,
   className,
   style,
@@ -292,13 +306,39 @@ export const Pagination: React.FC<PaginationProps> = ({
   } else {
     getPageNumbers(validatedCurrentPage, totalPages, showLessItems).forEach((pageNum, index) => {
       if (pageNum === '...') {
+        const hidden = paginationEllipsisPages(
+          getPageNumbers(validatedCurrentPage, totalPages, showLessItems),
+          index,
+          totalPages
+        )
         elements.push(
-          <span
-            key={`ellipsis-${index}`}
-            className={getPaginationEllipsisClasses(size)}
-            aria-hidden="true">
-            ...
-          </span>
+          ellipsisJump ? (
+            <span key={`ellipsis-${index}`} className="inline-flex items-center">
+              <button
+                type="button"
+                className={getPaginationEllipsisClasses(size)}
+                aria-label={navLabels.paginationJump}>
+                ...
+              </button>
+              <input
+                aria-label={navLabels.paginationJump}
+                className="w-12"
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter') return
+                  const next = clampPaginationJump(event.currentTarget.value, totalPages)
+                  if (next != null) handlePageChange(next)
+                }}
+              />
+              <span className="sr-only">{hidden.join(',')}</span>
+            </span>
+          ) : (
+            <span
+              key={`ellipsis-${index}`}
+              className={getPaginationEllipsisClasses(size)}
+              aria-hidden="true">
+              ...
+            </span>
+          )
         )
       } else {
         const isActive = pageNum === validatedCurrentPage
@@ -312,7 +352,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             onClick={() => handlePageChange(pageNum, 'page')}
             aria-current={isActive ? 'page' : undefined}
             aria-label={labels.pageAriaLabel.replace('{page}', String(pageNum))}>
-            {String(pageNum)}
+            {itemRender ? itemRender(pageNum, 'page') : String(pageNum)}
           </button>
         )
       }

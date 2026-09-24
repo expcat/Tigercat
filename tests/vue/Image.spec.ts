@@ -198,7 +198,7 @@ describe('Image', () => {
   it('opens a hover overlay on focus as well as pointer enter', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     try {
-      render(Image, { props: { src: '/hover.jpg', alt: 'Hover', previewTrigger: 'hover' } })
+      render(Image, { props: { src: '/hover.jpg', alt: 'Hover', zoomOnHover: true } })
       const button = screen.getByRole('button')
 
       await fireEvent.focus(button)
@@ -221,7 +221,7 @@ describe('Image', () => {
         src: '/broken.jpg',
         fallbackSrc: '/fallback.jpg',
         alt: 'Harbor',
-        previewTrigger: 'hover'
+        zoomOnHover: true
       }
     })
 

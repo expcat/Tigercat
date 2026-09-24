@@ -17,7 +17,9 @@ import {
   pieSliceDisplayLabel,
   pieSliceTransitionClasses,
   pieSliceLabelInsideClasses,
+  pieOuterRadius,
   resolvePieRadii,
+  separatePieLabels,
   DEFAULT_PIE_START_ANGLE,
   DONUT_ENTRANCE_CLASS,
   PIE_BASE_SHADOW,
@@ -34,6 +36,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
+import { PieBind } from './w9-chart-bind'
 
 export interface PieChartProps extends CorePieChartProps {
   data: PieChartDatum[]
@@ -42,6 +45,13 @@ export interface PieChartProps extends CorePieChartProps {
   onSelectedIndexChange?: (index: number | null) => void
   onSliceClick?: (index: number, datum: PieChartDatum) => void
   onSliceHover?: (index: number | null, datum: PieChartDatum | null) => void
+  bind?: {
+    labels?: { index: number; x: number; y: number; width: number; height: number }[]
+    values?: number[]
+    base?: number
+    max?: number
+    rose?: boolean
+  }
 }
 
 export const PieChart: React.FC<PieChartProps> = ({
@@ -86,6 +96,7 @@ export const PieChart: React.FC<PieChartProps> = ({
   locale,
   labels: labelsOverride,
   className,
+  bind,
   onHoveredIndexChange,
   onSelectedIndexChange,
   onSliceClick,
@@ -119,7 +130,8 @@ export const PieChart: React.FC<PieChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<PieChartDatum>({
     hoverable,
     showTooltip,
@@ -216,7 +228,9 @@ export const PieChart: React.FC<PieChartProps> = ({
         getIndex: (slice) => slice.index,
         getLabel: (slice) =>
           legendFormatter ? legendFormatter(slice.datum, slice.index) : sliceName(slice.datum, slice.index),
-        getColor: (slice) => slice.color
+        getColor: (slice) => slice.color,
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       }),
     [slices, legendFormatter, palette, activeIndex, resolvedSelectedIndex, sliceName]
   )
@@ -441,6 +455,17 @@ export const PieChart: React.FC<PieChartProps> = ({
           onItemClick={handleLegendClick}
           onItemHover={handleLegendHover}
           onItemLeave={handleLegendLeave}
+        />
+      ) : null}
+      {bind ? (
+        <PieBind
+          labels={separatePieLabels(bind.labels ?? []).map((label) => ({
+            index: label.index,
+            y: label.y
+          }))}
+          radii={(bind.values ?? []).map((value) =>
+            pieOuterRadius(bind.rose ? 'rose' : 'equal', bind.base ?? 40, value, bind.max ?? 1)
+          )}
         />
       ) : null}
       {tooltip}

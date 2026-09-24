@@ -70,4 +70,15 @@ export interface TableContext {
   handleDrop: (targetKey: string) => void
   handleRowDragStart: (rowKey: string | number) => void
   handleRowDrop: (targetKey: string | number) => void
+  applyMultiSort: (columnKey: string) => void
+  applyColumnWidth: (key: string, width: number) => void
+  toggleGroup: (key: string) => void
+  replaceSelectedKeys: (keys: (string | number)[]) => void
+  multiSort: Ref<{ key: string; direction: 'asc' | 'desc' }[] | undefined>
+  widthMap: Ref<Record<string, number>>
+  collapsedGroups: Ref<string[]>
+  groupCollapseEnabled: ComputedRef<boolean>
+  selectionLive: Ref<string>
+  dragLive: Ref<string>
+  previousSelectionCount: Ref<number | null>
 }

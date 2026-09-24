@@ -122,6 +122,28 @@ function firstFocusableInvalid(node: HTMLElement): HTMLElement | null {
   return null
 }
 
+function cssEscapeField(field: string): string {
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') return CSS.escape(field)
+  return field.replace(/"/g, '\\"')
+}
+
+/** Focus the same control invalid-submit would focus, limited to one field. */
+export function focusFormField(root: ParentNode | null | undefined, field: string): void {
+  if (!root || !field || typeof (root as Element).querySelector !== 'function') return
+  const host = (root as Element).querySelector<HTMLElement>(
+    `[data-tiger-field="${cssEscapeField(field)}"]`
+  )
+  if (!host) {
+    focusFirstInvalidField(root)
+    return
+  }
+  const marked = host.matches('[aria-invalid="true"]') ? host : host.querySelector<HTMLElement>('[aria-invalid="true"]')
+  const target = firstFocusableInvalid(marked ?? host) ?? firstFocusableInvalid(host)
+  if (!target) return
+  target.focus()
+  target.scrollIntoView({ block: 'nearest' })
+}
+
 /** Focus the first invalid control that can take focus. Group wrappers are skipped. */
 export function focusFirstInvalidField(root: ParentNode | null | undefined): void {
   if (!root || typeof (root as Element).querySelectorAll !== 'function') {

@@ -137,6 +137,16 @@ export const cardCoverHorizontalWrapperClasses =
 
 export const cardActionsClasses = 'flex gap-2 justify-end'
 
+export function cardTitleTag(level?: number): 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' {
+  const value = level === undefined ? 2 : Math.floor(level)
+  if (value === 1) return 'h1'
+  if (value === 3) return 'h3'
+  if (value === 4) return 'h4'
+  if (value === 5) return 'h5'
+  if (value === 6) return 'h6'
+  return 'h2'
+}
+
 export function getCardCoverWrapperClasses(horizontal: boolean): string {
   return classNames(
     cardCoverWrapperClasses,

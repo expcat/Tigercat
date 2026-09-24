@@ -169,7 +169,8 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<ScatterChartDatum>({
     hoverable,
     showTooltip,
@@ -257,7 +258,9 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
           legendFormatter
             ? legendFormatter(d, i)
             : scatterPointDisplayLabel(d, i, labels.pointAriaLabel),
-        getColor: (d, i) => d.color ?? palette[i % palette.length]
+        getColor: (d, i) => d.color ?? palette[i % palette.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       }),
     [data, legendFormatter, palette, activeIndex, resolvedSelectedIndex, labels.pointAriaLabel]
   )

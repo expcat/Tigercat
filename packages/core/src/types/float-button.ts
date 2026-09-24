@@ -34,6 +34,14 @@ export interface FloatButtonProps {
    * Tooltip text shown on hover
    */
   tooltip?: string
+  /**
+   * Link address. Gated by the link allowlist. Omitted renders a button.
+   */
+  href?: string
+  /**
+   * Badge content rendered with Badge. Not a count prop.
+   */
+  badge?: string | number
 
   /**
    * Button type / variant

@@ -10,6 +10,7 @@ import React, {
   forwardRef
 } from 'react'
 import {
+  basicLabel,
   classNames,
   CROP_HANDLES,
   IMAGE_CROPPER_MASK_FILL,
@@ -43,6 +44,7 @@ import {
   mergeTigerLocale,
   moveCropRect,
   remapCropRect,
+  resolveCropAspectRatio,
   resizeCropRect,
   type CropHandle,
   type CropRect,
@@ -111,7 +113,9 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       src,
       cropRect: controlledCropRect,
       defaultCropRect,
-      aspectRatio,
+      aspectRatio: aspectRatioProp,
+      aspectPreset,
+      circular = false,
       minWidth = 20,
       minHeight = 20,
       outputType = 'image/png',
@@ -135,6 +139,10 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       [config.locale, locale]
     )
     const labels = useMemo(() => getImageEditorLabels(mergedLocale), [mergedLocale])
+    const [preset, setPreset] = useState(aspectPreset)
+    const [rotation, setRotation] = useState(0)
+    const [flipX, setFlipX] = useState(false)
+    const aspectRatio = resolveCropAspectRatio(preset ?? aspectPreset, aspectRatioProp)
     const containerRef = useRef<HTMLDivElement>(null)
     const imageRef = useRef<HTMLImageElement | null>(null)
     const loaderRef = useRef(createCropperImageLoader())
@@ -286,14 +294,15 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             displayWidth,
             displayHeight,
             outputType,
-            quality
+            quality,
+            { rotation, flipX, circular }
           )
           const extension = (outputType.split('/')[1] || 'png').replace('jpeg', 'jpg')
           const file = new File([blob], `crop.${extension}`, { type: blob.type || outputType })
           return { blob, cropRect: { ...cropRect }, file }
         }
       }),
-      [cropRect, displayHeight, displayWidth, outputType, quality, status]
+      [circular, cropRect, displayHeight, displayWidth, flipX, outputType, quality, rotation, status]
     )
 
     const startDrag = useCallback(
@@ -377,10 +386,15 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           style={rootStyle}
           data-image-cropper=""
           data-image-cropper-status={status}
+          data-crop-rotation={rotation}
+          data-crop-aspect={preset ?? aspectPreset ?? ''}
           role="img"
           aria-label={
             status === 'error' ? labels.loadErrorAriaLabel : labels.loadingCropImageAriaLabel
           }>
+          <button type="button" onClick={() => setRotation((value) => (value + 90) % 360)}>
+            {basicLabel(mergedLocale.locale, 'imageCropper', 'rotate')}
+          </button>
           {status === 'error' ? (
             <div className={imageErrorClasses}>{renderErrorIcon()}</div>
           ) : (
@@ -399,7 +413,39 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
         className={containerClasses}
         style={rootStyle}
         data-image-cropper=""
-        data-image-cropper-status="ready">
+        data-image-cropper-status="ready"
+        data-crop-rotation={rotation}
+        data-crop-flip={flipX ? 'true' : 'false'}
+        data-crop-circle={circular ? 'true' : 'false'}
+        data-crop-aspect={preset ?? ''}>
+        <div className="mb-2 flex flex-wrap gap-1" data-crop-tools="">
+          {(['1:1', '4:3', '16:9', 'free'] as const).map((item) => (
+            <button
+              key={item}
+              type="button"
+              data-crop-preset={item}
+              aria-pressed={preset === item}
+              onClick={() => setPreset(item)}>
+              {basicLabel(
+                mergedLocale.locale,
+                'imageCropper',
+                item === '1:1'
+                  ? 'square'
+                  : item === '4:3'
+                    ? 'fourThree'
+                    : item === '16:9'
+                      ? 'sixteenNine'
+                      : 'free'
+              )}
+            </button>
+          ))}
+          <button type="button" onClick={() => setRotation((value) => (value + 90) % 360)}>
+            {basicLabel(mergedLocale.locale, 'imageCropper', 'rotate')}
+          </button>
+          <button type="button" onClick={() => setFlipX((value) => !value)}>
+            {basicLabel(mergedLocale.locale, 'imageCropper', 'flip')}
+          </button>
+        </div>
         <div
           className={imageCropperContainerClasses}
           style={{ width: displayWidth, height: displayHeight }}
@@ -413,7 +459,12 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               crossOrigin="anonymous"
               src={src}
               className={imageCropperImgClasses}
-              style={{ width: displayWidth, height: displayHeight }}
+              style={{
+                width: displayWidth,
+                height: displayHeight,
+                transform: `rotate(${rotation}deg) scaleX(${flipX ? -1 : 1})`,
+                transformOrigin: 'center'
+              }}
               draggable={false}
               alt={labels.imageToCropAriaLabel}
             />

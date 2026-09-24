@@ -11,12 +11,17 @@ import {
   getCurrentInstance
 } from 'vue'
 import {
+  acquireOverlayZ,
   classNames,
   coerceClassValue,
   mergeStyleValues,
   getModalContentClasses,
+  clampSheetDragDistance,
   getGestureTouchPoint,
   isModalSheetSwipeCloseGesture,
+  prefersReducedMotion,
+  resolveSheetReducedMotion,
+  resolveSheetRelease,
   modalWrapperClasses,
   modalMaskClasses,
   getModalContainerClasses,
@@ -46,7 +51,12 @@ import {
   type TigerLocale,
   type TigerLocaleModal,
   type ModalSize,
-  OVERLAY_Z_INDEX
+  OVERLAY_Z_INDEX,
+  destroyAllConfirmModals,
+  enqueueConfirmModal,
+  getActiveFeedbackScope,
+  type ConfirmModalInput,
+  type ConfirmModalKind
 } from '@expcat/tigercat-core'
 import {
   closeIconViewBox,
@@ -189,7 +199,7 @@ export const Modal = defineComponent({
      */
     zIndex: {
       type: Number,
-      default: OVERLAY_Z_INDEX.modal
+      default: undefined
     },
     /**
      * Custom class name
@@ -233,6 +243,15 @@ export const Modal = defineComponent({
     cancelText: {
       type: String,
       default: undefined
+    },
+
+    /**
+     * Show the cancel button in the default footer.
+     * @default true
+     */
+    showCancel: {
+      type: Boolean,
+      default: true
     },
 
     /**
@@ -302,6 +321,9 @@ export const Modal = defineComponent({
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const bodyRef = ref<HTMLElement | null>(null)
+    const sheetOffset = ref(0)
+    const stackedZ = ref<number | undefined>(undefined)
+    let releaseOverlayZ: (() => void) | undefined
     let touchStartPoint: GesturePoint | null = null
     let touchCurrentPoint: GesturePoint | null = null
     let swipeAllowed = false
@@ -414,7 +436,32 @@ export const Modal = defineComponent({
       touchStartPoint = null
       touchCurrentPoint = null
       swipeAllowed = false
+      sheetOffset.value = 0
     }
+
+    watch(
+      () => props.open,
+      (open) => {
+        releaseOverlayZ?.()
+        releaseOverlayZ = undefined
+        if (!open) {
+          stackedZ.value = undefined
+          return
+        }
+        if (props.zIndex !== undefined) {
+          stackedZ.value = props.zIndex
+          return
+        }
+        const layer = acquireOverlayZ()
+        stackedZ.value = layer.zIndex
+        releaseOverlayZ = layer.release
+      },
+      { immediate: true }
+    )
+
+    onBeforeUnmount(() => {
+      releaseOverlayZ?.()
+    })
 
     const handleTouchStart = (event: TouchEvent) => {
       callAttrHandler('onTouchstart', event)
@@ -434,7 +481,10 @@ export const Modal = defineComponent({
       if (!touchStartPoint) return
 
       const point = getGestureTouchPoint(event.touches)
-      if (point) {
+      if (point && touchStartPoint && swipeAllowed && props.mobileSheet) {
+        touchCurrentPoint = point
+        sheetOffset.value = clampSheetDragDistance(point.y - touchStartPoint.y)
+      } else if (point) {
         touchCurrentPoint = point
       }
     }
@@ -448,11 +498,14 @@ export const Modal = defineComponent({
       )
 
       const allowed = swipeAllowed
+      const distance = sheetOffset.value
+      const size = dialogRef.value?.offsetHeight ?? 0
       resetTouchGesture()
 
-      if (allowed && props.mobileSheet && isModalSheetSwipeCloseGesture(gesture)) {
-        handleClose()
-      }
+      if (!allowed || !props.mobileSheet) return
+      const release = resolveSheetRelease(distance || (gesture?.distance ?? 0), size)
+      const motion = resolveSheetReducedMotion(release, prefersReducedMotion())
+      if (motion === 'close') handleClose()
     }
 
     const handleTouchCancel = (event: TouchEvent) => {
@@ -582,7 +635,9 @@ export const Modal = defineComponent({
       const dragStyle =
         props.draggable && (dragOffset.value.x !== 0 || dragOffset.value.y !== 0)
           ? { transform: `translate(${dragOffset.value.x}px, ${dragOffset.value.y}px)` }
-          : undefined
+          : sheetOffset.value > 0
+            ? { transform: `translate3d(0, ${sheetOffset.value}px, 0)`, transitionDuration: '0ms' }
+            : undefined
       const finalStyle = mergeStyleValues(
         mergedStyle,
         dragStyle,
@@ -650,13 +705,15 @@ export const Modal = defineComponent({
           )
         : props.showDefaultFooter
           ? h('div', { class: modalFooterClasses, 'data-tiger-modal-footer': '' }, [
-              h(
-                Button,
-                { variant: 'secondary', onClick: handleClose },
-                {
-                  default: () => modalLabels.value.cancelText
-                }
-              ),
+              props.showCancel
+                ? h(
+                    Button,
+                    { variant: 'secondary', onClick: handleClose },
+                    {
+                      default: () => modalLabels.value.cancelText
+                    }
+                  )
+                : null,
               h(
                 Button,
                 { onClick: handleOk, loading: confirming.value, disabled: confirming.value },
@@ -672,7 +729,7 @@ export const Modal = defineComponent({
         {
           class: modalWrapperClasses,
           ref: rootRef,
-          style: { zIndex: props.zIndex },
+          style: { zIndex: stackedZ.value ?? OVERLAY_Z_INDEX.modal },
           hidden: isOverlayVisuallyHidden(props.open, leaving.value),
           'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-overlay-layer': '',
@@ -731,5 +788,33 @@ export const Modal = defineComponent({
     }
   }
 })
+
+function openModal(kind: ConfirmModalKind, input: ConfirmModalInput = {}) {
+  return enqueueConfirmModal(getActiveFeedbackScope(), { ...input, kind })
+}
+
+export function confirmModal(input: ConfirmModalInput = {}) {
+  return openModal('confirm', input)
+}
+
+export function infoModal(input: ConfirmModalInput = {}) {
+  return openModal('info', input)
+}
+
+export function successModal(input: ConfirmModalInput = {}) {
+  return openModal('success', input)
+}
+
+export function warningModal(input: ConfirmModalInput = {}) {
+  return openModal('warning', input)
+}
+
+export function errorModal(input: ConfirmModalInput = {}) {
+  return openModal('error', input)
+}
+
+export function destroyAllModals(): void {
+  destroyAllConfirmModals(getActiveFeedbackScope())
+}
 
 export default Modal

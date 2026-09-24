@@ -26,6 +26,10 @@ import {
   focusMenuEdge,
   getMenuClasses,
   getMenuCollapsedInitial,
+  menuCollapsedTooltip,
+  normalizeMenuItemBadge,
+  createTypeaheadHighlight,
+  markTypeaheadMatch,
   getMenuItemClasses,
   getMenuItemIndent,
   getMenuItemKind,
@@ -80,6 +84,8 @@ import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overla
 import { SidebarContextKey } from '../utils/layout-context'
 import { useTigerConfig } from './ConfigProvider'
 import { Icon } from './Icon'
+import { Badge } from './Badge'
+import { Tooltip } from './Tooltip'
 
 export const MenuContextKey = Symbol('MenuContext')
 export const SubMenuScopeKey = Symbol('SubMenuScope')
@@ -96,6 +102,7 @@ export interface MenuContext {
   handleSelect: (key: MenuKey) => void
   handleOpenChange: (key: MenuKey, open?: boolean) => void
   tabStopKey: ComputedRef<MenuKey | undefined>
+  typeahead: ReturnType<typeof createTypeaheadHighlight>
 }
 
 export interface SubMenuScope {
@@ -367,7 +374,8 @@ export const Menu = defineComponent({
       dir,
       handleSelect,
       handleOpenChange,
-      tabStopKey
+      tabStopKey,
+      typeahead: createTypeaheadHighlight()
     })
 
     const handleSearchKeyDown = (event: KeyboardEvent) => {
@@ -413,7 +421,9 @@ export const Menu = defineComponent({
             itemKey: item.key ?? item.label ?? '',
             icon: item.icon,
             disabled: item.disabled,
-            href: item.href
+            href: item.href,
+            badge: item.badge,
+            shortcut: item.shortcut
           },
           () => item.label
         )
@@ -486,6 +496,8 @@ export interface VueMenuItemProps {
   disabled?: boolean
   icon?: unknown
   href?: string
+  badge?: CoreMenuItem['badge']
+  shortcut?: string
   level?: number
   collapsed?: boolean
   className?: string
@@ -502,6 +514,8 @@ export const MenuItem = defineComponent({
     disabled: { type: Boolean, default: false },
     icon: { type: [String, Object] as PropType<unknown> },
     href: { type: String, default: undefined },
+    badge: { type: [String, Number, Object] as PropType<CoreMenuItem['badge']>, default: undefined },
+    shortcut: { type: String, default: undefined },
     level: { type: Number, default: 0 },
     collapsed: { type: Boolean, default: undefined },
     className: { type: String, default: undefined },
@@ -559,6 +573,19 @@ export const MenuItem = defineComponent({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!menuContext) return
       const current = event.currentTarget as HTMLElement
+      const list = current.closest('[data-tiger-menu-list]') as HTMLElement | null
+      if (list) {
+        const nodes = Array.from(list.querySelectorAll<HTMLElement>('[data-tiger-menuitem="true"]'))
+        const labels = nodes.map((node) => node.textContent ?? '')
+        const from = nodes.indexOf(current)
+        const highlight = menuContext.typeahead.push(event.key, labels, from)
+        if (highlight && highlight.index >= 0) {
+          event.preventDefault()
+          markTypeaheadMatch(nodes, highlight.index)
+          nodes[highlight.index]?.focus()
+          return
+        }
+      }
       const rootMenu = current.closest('[data-tiger-menu-root="true"]') as HTMLElement | null
       const isRoot = Boolean(rootMenu && current.closest('[data-tiger-menu-list]') === rootMenu)
       const { nextKey, prevKey, closeKey } = getMenuNavigationKeys(
@@ -597,9 +624,21 @@ export const MenuItem = defineComponent({
       const slotNodes = slots.default?.() ?? []
       const label = getVueSlotPlainText(slotNodes)
       const collapsed = effectiveCollapsed.value
+      const badgeModel = normalizeMenuItemBadge(props.badge)
+      const badgeNode = badgeModel
+        ? h(Badge, {
+            content: badgeModel.content,
+            type: badgeModel.type,
+            variant: badgeModel.variant as 'danger' | undefined,
+            standalone: true
+          })
+        : null
+      const shortcutNode = props.shortcut
+        ? h('span', { class: 'ms-auto text-xs text-[var(--tiger-text-secondary)]' }, props.shortcut)
+        : null
       const children = collapsed
         ? [renderMenuIcon(props.icon, true), ...renderCollapsedLabel(label, props.icon)]
-        : [renderMenuIcon(props.icon, false), h('span', { class: 'flex-1' }, slotNodes)]
+        : [renderMenuIcon(props.icon, false), h('span', { class: 'flex-1' }, slotNodes), badgeNode, shortcutNode]
 
       const inPopupMenu = inPopup.value
       const usesMenuRole = inPopupMenu || menuContext?.mode.value === 'horizontal'
@@ -651,7 +690,11 @@ export const MenuItem = defineComponent({
             children
           )
 
-      return h('li', { role: usesMenuRole ? 'none' : undefined }, [node])
+      const tip = menuCollapsedTooltip(collapsed, label)
+      const wrapped = tip
+        ? h(Tooltip, { content: tip, trigger: 'hover', asChild: true }, () => [node])
+        : node
+      return h('li', { role: usesMenuRole ? 'none' : undefined }, [wrapped])
     }
   }
 })

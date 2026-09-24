@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Steps
 
-`packages/core/src/types/steps.ts` · `StepsProps` · 4/12 props
+`packages/core/src/types/steps.ts` · `StepsProps` · 4/13 props
 
 | Prop         | Type         | Default     | Notes                                                       |
 | ------------ | ------------ | ----------- | ----------------------------------------------------------- |

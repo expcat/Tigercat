@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Input
 
-`packages/core/src/types/input.ts` · `InputProps` · 4/26 props
+`packages/core/src/types/input.ts` · `InputProps` · 4/25 props
 
 Note: React `onChange` 是字符串/数字值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。
 

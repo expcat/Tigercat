@@ -14,10 +14,12 @@ import {
   qrcodeRefreshClasses,
   QRCODE_DEFAULT_COLOR,
   QRCODE_DEFAULT_BG,
+  basicLabel,
   QR_QUIET_ZONE,
   qrViewBoxSize,
   qrNeedsContrastWarning,
   devWarn,
+  type QRCodeErrorLevel,
   type QRCodeStatus,
   type TigerLocale
 } from '@expcat/tigercat-core'
@@ -29,6 +31,8 @@ export interface VueQRCodeProps {
   color?: string
   bgColor?: string
   status?: QRCodeStatus
+  errorLevel?: QRCodeErrorLevel
+  icon?: string
   className?: string
   locale?: Partial<TigerLocale>
 }
@@ -42,15 +46,17 @@ export const QRCode = defineComponent({
     color: { type: String, default: QRCODE_DEFAULT_COLOR },
     bgColor: { type: String, default: QRCODE_DEFAULT_BG },
     status: { type: String as PropType<QRCodeStatus>, default: 'active' as QRCodeStatus },
+    errorLevel: { type: String as PropType<QRCodeErrorLevel>, default: 'M' },
+    icon: { type: String, default: undefined },
     className: { type: String, default: undefined },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
   emits: ['refresh'],
-  setup(props, { emit, attrs }) {
+  setup(props, { emit, attrs, slots }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getQRCodeLabels(mergedLocale.value))
-    const encoded = computed(() => resolveQRMatrix(props.value))
+    const encoded = computed(() => resolveQRMatrix(props.value, props.errorLevel))
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
@@ -59,13 +65,16 @@ export const QRCode = defineComponent({
       const modules = result.ok ? result.matrix : []
       const viewBox = qrViewBoxSize(modules.length || 1)
       const overlay = failed || props.status === 'expired' || props.status === 'loading'
+      const scannedText = basicLabel(mergedLocale.value.locale, 'qrcode', 'scanned')
       const statusText = failed
         ? labels.value.errorText
         : props.status === 'expired'
           ? labels.value.expiredText
           : props.status === 'loading'
             ? labels.value.loadingText
-            : ''
+            : props.status === 'scanned'
+              ? scannedText
+              : ''
       const imgLabel = statusText
         ? `${labels.value.ariaLabel}, ${statusText}`
         : labels.value.ariaLabel
@@ -92,7 +101,14 @@ export const QRCode = defineComponent({
         },
         [
           h('rect', { width: viewBox, height: viewBox, fill: props.bgColor }),
-          darkPath ? h('path', { d: darkPath, fill: props.color }) : null
+          darkPath ? h('path', { d: darkPath, fill: props.color }) : null,
+          props.icon && !slots.icon
+            ? h('path', {
+                d: props.icon,
+                fill: props.color,
+                transform: `translate(${viewBox / 2 - 3} ${viewBox / 2 - 3}) scale(${6 / 24})`
+              })
+            : null
         ]
       )
 
@@ -130,6 +146,27 @@ export const QRCode = defineComponent({
             { class: qrcodeOverlayClasses, role: 'status' },
             refreshKids
           )
+        )
+      }
+
+      if (slots.icon) {
+        children.push(
+          h(
+            'div',
+            {
+              class: 'pointer-events-none absolute inset-0 flex items-center justify-center',
+              'aria-hidden': 'true'
+            },
+            slots.icon()
+          )
+        )
+      }
+
+      if (!failed && props.status === 'scanned') {
+        children.push(
+          h('div', { class: qrcodeOverlayClasses, role: 'status' }, [
+            h('span', { class: qrcodeStatusTextClasses }, scannedText)
+          ])
         )
       }
 

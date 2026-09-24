@@ -28,15 +28,25 @@ export interface ImageGroupProps extends React.HTMLAttributes<HTMLDivElement> {
    * @default true
    */
   preview?: boolean
+  /** Controlled lightbox open state. */
+  open?: boolean
+  /** Controlled lightbox index. */
+  currentIndex?: number
   /**
    * Callback when preview open state changes
    */
   onPreviewOpenChange?: (open: boolean) => void
+  onOpenChange?: (open: boolean) => void
+  onCurrentIndexChange?: (index: number) => void
 }
 
 export const ImageGroup: React.FC<ImageGroupProps> = ({
   preview = true,
+  open,
+  currentIndex,
   onPreviewOpenChange,
+  onOpenChange,
+  onCurrentIndexChange,
   children,
   className,
   id,
@@ -67,10 +77,12 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
       const index = getImageGroupItemIndex(itemsRef.current, itemId)
       if (index < 0) return
       setPreviewIndex(index)
-      setPreviewVisible(true)
+      if (open === undefined) setPreviewVisible(true)
+      onCurrentIndexChange?.(index)
+      onOpenChange?.(true)
       onPreviewOpenChange?.(true)
     },
-    [preview, onPreviewOpenChange]
+    [preview, open, onPreviewOpenChange, onOpenChange, onCurrentIndexChange]
   )
 
   const contextValue = useMemo(
@@ -79,7 +91,9 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
   )
 
   const images = getImageGroupLightboxItems(items)
-  const currentIndex = clampImageGroupPreviewIndex(previewIndex, images.length)
+  const rawIndex = currentIndex !== undefined ? currentIndex : previewIndex
+  const activeIndex = clampImageGroupPreviewIndex(rawIndex, images.length)
+  const activeOpen = open !== undefined ? open : previewVisible
   const groupName = resolveImageGroupName({
     ariaLabel,
     ariaLabelledby,
@@ -99,14 +113,18 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
         {children}
         {preview && (
           <ImagePreview
-            open={previewVisible && images.length > 0}
+            open={activeOpen && images.length > 0}
             images={images}
-            currentIndex={currentIndex}
+            currentIndex={activeIndex}
             onOpenChange={(val: boolean) => {
-              setPreviewVisible(val)
+              if (open === undefined) setPreviewVisible(val)
+              onOpenChange?.(val)
               if (!val) onPreviewOpenChange?.(false)
             }}
-            onCurrentIndexChange={setPreviewIndex}
+            onCurrentIndexChange={(val: number) => {
+              if (currentIndex === undefined) setPreviewIndex(val)
+              onCurrentIndexChange?.(val)
+            }}
           />
         )}
       </div>

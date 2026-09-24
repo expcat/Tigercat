@@ -137,7 +137,7 @@ export const Image = defineComponent({
     height: { type: [Number, String] as PropType<number | string>, default: undefined },
     fit: { type: String as PropType<ImageFit>, default: 'cover' as ImageFit },
     fallbackSrc: { type: String, default: undefined },
-    preview: { type: Boolean, default: false },
+    preview: { type: Boolean, default: true },
     zoomOnHover: { type: Boolean, default: false },
     lazy: { type: Boolean, default: false },
     srcSet: { type: String, default: undefined },
@@ -244,7 +244,7 @@ export const Image = defineComponent({
     )
 
     watch(
-      () => [group, props.src, props.alt] as const,
+      () => [group, props.src, props.alt, loadState.value.actualSrc] as const,
       () => {
         if (!group) return
         if (!props.src) {

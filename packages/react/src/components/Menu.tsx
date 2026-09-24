@@ -61,7 +61,9 @@ function renderDataItem(item: CoreMenuItem): React.ReactNode {
       itemKey={item.key ?? item.label ?? ''}
       icon={item.icon}
       disabled={item.disabled}
-      href={item.href}>
+      href={item.href}
+      badge={item.badge}
+      shortcut={item.shortcut}>
       {item.label}
     </MenuItem>
   )

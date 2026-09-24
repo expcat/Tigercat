@@ -1,4 +1,18 @@
 import type { ThemePreset } from '../../types/theme'
+import { deriveAccentScale } from '../../utils/accent-scale'
+
+export const modernThemeKnobs = {
+  accent: '#2563eb',
+  neutral: '#64748b',
+  radius: '12px',
+  density: 1.1
+} as const
+
+export const modernThemeScale = deriveAccentScale(modernThemeKnobs.accent, {
+  neutral: modernThemeKnobs.neutral,
+  radius: modernThemeKnobs.radius,
+  density: modernThemeKnobs.density
+})
 
 /**
  * Modern theme preset.

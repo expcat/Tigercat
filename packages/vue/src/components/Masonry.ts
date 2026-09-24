@@ -72,6 +72,10 @@ export const Masonry = defineComponent({
       type: String as PropType<MasonryLayout>,
       default: 'source' as MasonryLayout
     },
+    balance: {
+      type: String as PropType<'shortest'>,
+      default: undefined
+    },
     className: { type: String, default: undefined },
     itemClassName: { type: String, default: undefined }
   },
@@ -92,7 +96,9 @@ export const Masonry = defineComponent({
     )
     const gapPx = computed(() => resolveMasonryGap(props.gap, containerWidth.value))
     const orderNoteId = useId()
-    const shortest = computed(() => props.layout === 'shortest')
+    const shortest = computed(
+      () => props.balance === 'shortest' || props.layout === 'shortest'
+    )
     const packed = computed(
       () =>
         shortest.value &&

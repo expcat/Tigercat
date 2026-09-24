@@ -490,7 +490,11 @@ export const FormItem = defineComponent({
         ]
       )
 
-      return h('div', { class: formItemClasses.value }, [labelElement, contentElement])
+      return h(
+        'div',
+        { class: formItemClasses.value, 'data-tiger-field': props.name || undefined },
+        [labelElement, contentElement]
+      )
     }
   }
 })

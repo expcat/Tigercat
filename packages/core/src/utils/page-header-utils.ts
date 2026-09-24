@@ -97,6 +97,10 @@ export function resolvePageHeaderHeadingTag(level?: number): `h${PageHeaderHeadi
 /**
  * True when the heading row has anything to render.
  */
+export function hasPageHeaderRegion(value: unknown): boolean {
+  return hasPageHeaderNode(value)
+}
+
 export function hasPageHeaderHeadingContent(flags: PageHeaderHeadingContentFlags): boolean {
   return Boolean(
     flags.showBack || flags.hasBreadcrumb || flags.hasTitle || flags.hasSubtitle || flags.hasActions

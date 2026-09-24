@@ -100,6 +100,23 @@ export function nextTreeExpandedKeys(
   return uniqueTreeKeys(current).filter((item) => treeKeyId(item) !== id)
 }
 
+/** Shift range across visible, non-disabled nodes. Anchor stays the start. */
+export function nextTreeRangeSelection(options: {
+  visibleKeys: readonly TreeNodeKey[]
+  disabledKeys?: Iterable<TreeNodeKey>
+  anchor: TreeNodeKey | undefined
+  key: TreeNodeKey
+}): { keys: TreeNodeKey[]; anchor: TreeNodeKey } {
+  const disabled = createTreeKeyIdSet(options.disabledKeys)
+  const selectable = options.visibleKeys.filter((key) => !disabled.has(treeKeyId(key)))
+  const anchor = options.anchor ?? options.key
+  const start = selectable.findIndex((key) => sameTreeKey(key, anchor))
+  const end = selectable.findIndex((key) => sameTreeKey(key, options.key))
+  if (start < 0 || end < 0) return { keys: [options.key], anchor: options.key }
+  const [from, to] = start <= end ? [start, end] : [end, start]
+  return { keys: selectable.slice(from, to + 1), anchor }
+}
+
 export function nextTreeSelectedKeys(options: {
   current: Iterable<TreeNodeKey>
   key: TreeNodeKey

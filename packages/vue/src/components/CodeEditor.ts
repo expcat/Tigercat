@@ -13,6 +13,13 @@ import {
   codeEditorScrollerClasses,
   getCodeEditorWrapClass,
   resolveCodeEditorTheme,
+  codeEditorLineWindow,
+  findCodeMatches,
+  getW9DataLabels,
+  matchBrackets,
+  registerCodeEditorLanguage,
+  registeredCodeEditorLanguage,
+  replaceCodeMatches,
   scrollCodeEditorCaretIntoView,
   shouldCommitEditorValue,
   syncEditorTextareaValue,
@@ -92,6 +99,19 @@ export const CodeEditor = defineComponent({
     labels: { type: Object as PropType<Partial<TigerLocaleCodeEditor>>, default: undefined },
     ariaLabel: { type: String, default: undefined },
     name: { type: String, default: undefined },
+    bind: {
+      type: Object as PropType<{
+        query?: string
+        replacement?: string
+        caret?: number
+        scrollTop?: number
+        viewportHeight?: number
+        lineHeight?: number
+        lineCount?: number
+        language?: { id: string; keywords?: string[] }
+      }>,
+      default: undefined
+    },
     id: { type: String, default: undefined }
   },
   emits: ['update:modelValue', 'change'],
@@ -341,6 +361,63 @@ export const CodeEditor = defineComponent({
           'data-theme': themeName
         },
         [
+          props.bind
+            ? h('div', { 'data-tiger-code-bind': '' }, [
+                ...findCodeMatches(props.modelValue ?? internalValue.value, props.bind.query ?? '').map(
+                  (match, index) =>
+                    h('span', {
+                      key: index,
+                      'data-code-match': String(match.index)
+                    })
+                ),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    'data-tiger-replace': '',
+                    onClick: () => {
+                      const next = replaceCodeMatches(
+                        props.modelValue ?? internalValue.value,
+                        props.bind?.query ?? '',
+                        props.bind?.replacement ?? '',
+                        true
+                      )
+                      commitValue(next)
+                    }
+                  },
+                  getW9DataLabels().replaceAll
+                ),
+                h('span', {
+                  'data-bracket': (() => {
+                    const pair = matchBrackets(
+                      props.modelValue ?? internalValue.value,
+                      props.bind?.caret ?? 0
+                    )
+                    return pair ? `${pair.open}-${pair.close}` : ''
+                  })()
+                }),
+                h('span', {
+                  'data-line-window': (() => {
+                    if (props.bind?.language) {
+                      registerCodeEditorLanguage({
+                        id: props.bind.language.id,
+                        keywords: props.bind.language.keywords
+                      })
+                    }
+                    const window = codeEditorLineWindow({
+                      scrollTop: props.bind?.scrollTop ?? 0,
+                      viewportHeight: props.bind?.viewportHeight ?? 0,
+                      lineHeight: props.bind?.lineHeight ?? 20,
+                      lineCount: props.bind?.lineCount ?? 0
+                    })
+                    const registered = props.bind?.language
+                      ? registeredCodeEditorLanguage(props.bind.language.id)?.id
+                      : ''
+                    return `${window.start}-${window.end}:${registered ?? ''}`
+                  })()
+                })
+              ])
+            : null,
           h(
             'div',
             {

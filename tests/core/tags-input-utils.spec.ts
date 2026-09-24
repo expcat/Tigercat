@@ -58,7 +58,8 @@ describe('tags-input-utils', () => {
       expect(addTags(['a'], ['b', 'c'])).toEqual({
         tags: ['a', 'b', 'c'],
         added: ['b', 'c'],
-        rejected: []
+        rejected: [],
+        rejections: []
       })
     })
 
@@ -66,12 +67,14 @@ describe('tags-input-utils', () => {
       expect(addTags(['a'], ['a', 'b'])).toEqual({
         tags: ['a', 'b'],
         added: ['b'],
-        rejected: ['a']
+        rejected: ['a'],
+        rejections: [{ tag: 'a', reason: 'duplicate' }]
       })
       expect(addTags(['a'], ['a'], { allowDuplicates: true })).toEqual({
         tags: ['a', 'a'],
         added: ['a'],
-        rejected: []
+        rejected: [],
+        rejections: []
       })
     })
 
@@ -79,17 +82,24 @@ describe('tags-input-utils', () => {
       expect(addTags(['a'], ['b', 'c'], { max: 2 })).toEqual({
         tags: ['a', 'b'],
         added: ['b'],
-        rejected: ['c']
+        rejected: ['c'],
+        rejections: [{ tag: 'c', reason: 'max' }]
       })
       expect(addTags(['a', 'b'], ['c'], { max: 2 })).toEqual({
         tags: ['a', 'b'],
         added: [],
-        rejected: ['c']
+        rejected: ['c'],
+        rejections: [{ tag: 'c', reason: 'max' }]
       })
     })
 
     it('trims candidates and drops empty ones silently', () => {
-      expect(addTags([], [' a ', '  ', ''])).toEqual({ tags: ['a'], added: ['a'], rejected: [] })
+      expect(addTags([], [' a ', '  ', ''])).toEqual({
+        tags: ['a'],
+        added: ['a'],
+        rejected: [],
+        rejections: []
+      })
     })
   })
 
@@ -111,6 +121,7 @@ describe('tags-input-utils', () => {
         tags: ['dup'],
         added: [],
         rejected: ['dup'],
+        rejections: [{ tag: 'dup', reason: 'duplicate' }],
         pending: 'dup'
       })
     })

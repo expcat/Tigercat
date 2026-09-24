@@ -9,6 +9,17 @@ export const codeBlockContainerClasses =
 export const codeBlockPreClasses =
   'm-0 overflow-auto p-4 text-sm leading-relaxed font-mono whitespace-pre'
 
+export const codeBlockPreWrapClasses = 'whitespace-pre-wrap break-words'
+
+export const codeBlockLineNumberClasses =
+  'select-none pe-3 text-end text-[var(--tiger-text-secondary)] tabular-nums'
+
+export const codeBlockLanguageClasses =
+  'absolute start-3 top-3 text-xs text-[var(--tiger-text-secondary)]'
+
+export const codeBlockWrapButtonClasses =
+  'absolute end-3 top-3 inline-flex items-center justify-center min-h-6 rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-xs text-[var(--tiger-text-secondary)]'
+
 export const codeBlockCopyButtonBaseClasses =
   'absolute end-3 top-3 inline-flex items-center justify-center min-h-6 min-w-6 rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-xs text-[var(--tiger-text-secondary)] shadow-sm transition-colors hover:text-[var(--tiger-text)] motion-reduce:transition-none'
 
@@ -23,6 +34,15 @@ export const codeBlockCopyStatusLiveClasses = 'sr-only'
 export type CodeCopyButtonStatus = 'idle' | 'copied' | 'failed'
 
 export const CODE_COPY_STATUS_RESET_MS = 1500
+
+export function codeLineNumbers(code: string): number[] {
+  const parts = code.split('\n')
+  return parts.map((_, index) => index + 1)
+}
+
+export function getCodeBlockPreClasses(wrap: boolean): string {
+  return classNames(codeBlockPreClasses, wrap && codeBlockPreWrapClasses)
+}
 
 export function getCodeBlockContainerClasses(...classes: ClassValue[]): string {
   return classNames(codeBlockContainerClasses, ...classes)

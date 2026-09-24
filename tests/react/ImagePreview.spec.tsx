@@ -120,7 +120,7 @@ describe('ImagePreview', () => {
     expect(onOpenChange).not.toHaveBeenCalled()
   })
 
-  it('navigates with buttons and arrow keys and stops at the ends', () => {
+  it('navigates with buttons and arrow keys and loops at the ends', () => {
     const onCurrentIndexChange = vi.fn()
     render(
       <ImagePreview
@@ -134,13 +134,10 @@ describe('ImagePreview', () => {
     fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
     expect(onCurrentIndexChange).toHaveBeenCalledWith(2)
     expect(img).toHaveAttribute('src', '/img3.jpg')
-    expect(screen.getByRole('button', { name: labels.nextImageAriaLabel })).toBeDisabled()
-
-    fireEvent.keyDown(document, { key: 'ArrowRight' })
-    expect(onCurrentIndexChange).toHaveBeenLastCalledWith(2)
-
-    fireEvent.click(screen.getByRole('button', { name: labels.previousImageAriaLabel }))
-    expect(onCurrentIndexChange).toHaveBeenCalledWith(1)
+    expect(screen.getByRole('button', { name: labels.nextImageAriaLabel })).toBeEnabled()
+    fireEvent.click(screen.getByRole('button', { name: labels.nextImageAriaLabel }))
+    expect(onCurrentIndexChange).toHaveBeenLastCalledWith(0)
+    expect(img).toHaveAttribute('src', '/img1.jpg')
   })
 
   it('does not listen to arrows when showNav is false', () => {

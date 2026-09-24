@@ -12,6 +12,7 @@ import {
   getStepsContainerClasses,
   calculateStepStatus,
   clampStepCurrent,
+  isStepClickable,
   getStepStatusText,
   isStepsItemType,
   mergeTigerLocale,
@@ -36,6 +37,7 @@ export interface StepsContextValue {
   size: StepSize
   simple: boolean
   clickable: boolean
+  progressDot: boolean
   labels: Required<TigerLocaleSteps>
   handleStepClick?: (index: number) => void
 }
@@ -112,11 +114,21 @@ export const StepsItem: React.FC<StepsItemProps> = ({
     customStatus
   )
 
-  const isClickable = !!stepsContext.handleStepClick && !disabled
+  const isClickable = isStepClickable(
+    Boolean(stepsContext.handleStepClick),
+    Boolean(disabled),
+    stepStatus
+  )
 
   const itemClasses = classNames(getStepItemClasses(stepsContext.orientation, isLast), className)
 
-  const iconClasses = getStepIconClasses(stepStatus, stepsContext.size, stepsContext.simple, !!icon)
+  const iconClasses = getStepIconClasses(
+    stepStatus,
+    stepsContext.size,
+    stepsContext.simple,
+    !!icon,
+    stepsContext.progressDot
+  )
 
   const tailClasses = getStepTailClasses(
     stepsContext.orientation,
@@ -245,6 +257,7 @@ export const Steps: React.FC<StepsProps> = ({
   size = 'md',
   simple = false,
   clickable = false,
+  progressDot = false,
   items,
   className,
   style,
@@ -305,11 +318,22 @@ export const Steps: React.FC<StepsProps> = ({
       orientation,
       size,
       simple,
+      progressDot,
       clickable,
       labels: stepLabels,
       handleStepClick: clickable ? handleStepClick : undefined
     }),
-    [clampedCurrent, status, orientation, size, simple, clickable, stepLabels, handleStepClick]
+    [
+      clampedCurrent,
+      status,
+      orientation,
+      size,
+      simple,
+      progressDot,
+      clickable,
+      stepLabels,
+      handleStepClick
+    ]
   )
 
   const stepsWithProps = itemNodes.map((child, index) => {

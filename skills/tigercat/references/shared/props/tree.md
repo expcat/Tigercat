@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Tree
 
-`packages/core/src/types/tree.ts` · `TreeProps` · 4/34 props
+`packages/core/src/types/tree.ts` · `TreeProps` · 4/35 props
 
 Note: `checkStrictly` 默认 false（父子级联）。勾选只在 `treeitem` 上用 `aria-checked`，勾选标记不另做一颗复选框。`posinset` / `setsize` 按同一父节点下的兄弟。搜索零命中是空列表。每棵树有自己的拖拽容器。`height` 是页面窗口，不是 overlay `listHeight`。
 

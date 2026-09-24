@@ -11,6 +11,7 @@ import {
   mergeTigerLocale,
   getPageHeaderLabels,
   mergeStyleValues,
+  resolveLinkHref,
   pageHeaderActionsClasses,
   pageHeaderBackIconClasses,
   pageHeaderBackWrapClasses,
@@ -160,6 +161,8 @@ export const PageHeader = defineComponent({
       const attrsRecord = attrs as Record<string, unknown>
       const vnodeProps = instance?.vnode.props as Record<string, unknown> | undefined
       const breadcrumb = slots.breadcrumb?.()
+      const tabs = slots.tabs?.()
+      const footer = slots.footer?.()
       const titleSlot = slots.title?.()
       const subTitleSlot = slots.subTitle?.()
       const actions = slots.actions?.()
@@ -201,11 +204,11 @@ export const PageHeader = defineComponent({
         ? h('div', { class: pageHeaderBackWrapClasses, 'data-page-header-back': '' }, [
             hasBackOverride
               ? backOverride
-              : props.backHref
+              : resolveLinkHref(props.backHref)
                 ? h(
                     Link,
                     {
-                      href: props.backHref,
+                      href: resolveLinkHref(props.backHref),
                       underline: false,
                       variant: 'default' as const,
                       class: getPageHeaderBackButtonClasses(),
@@ -282,7 +285,12 @@ export const PageHeader = defineComponent({
           'data-page-header': '',
           'aria-labelledby': hasTitle ? titleId : undefined
         },
-        [heading, hasBody ? h('div', { class: pageHeaderContentClasses }, body) : null]
+        [
+          heading,
+          hasPageHeaderNode(tabs) ? h('div', { 'data-page-header-tabs': '' }, tabs) : null,
+          hasBody ? h('div', { class: pageHeaderContentClasses }, body) : null,
+          hasPageHeaderNode(footer) ? h('div', { 'data-page-header-footer': '' }, footer) : null
+        ]
       )
     }
   }

@@ -1,4 +1,5 @@
-import { defineComponent, computed, h, PropType, useId, watch } from 'vue'
+import { defineComponent, computed, h, onBeforeUnmount, PropType, useId, watch } from 'vue'
+import { useTooltipDelayGroup } from '../utils/tooltip-delay'
 import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
@@ -12,6 +13,8 @@ import {
   getPopoverContentStyle,
   getPopoverTriggerClasses,
   resolvePopoverWidth,
+  getFloatingArrowStyle,
+  getPopconfirmArrowClasses,
   POPOVER_TITLE_CLASSES,
   POPOVER_TEXT_CLASSES,
   type PopoverTrigger,
@@ -52,6 +55,7 @@ export const Popover = defineComponent({
     showDelay: { type: Number, default: undefined },
     hideDelay: { type: Number, default: undefined },
     offset: { type: Number, default: 8 },
+    closeOnScroll: { type: Boolean, default: false },
     asChild: { type: Boolean, default: false },
     className: { type: String, default: undefined },
     style: { type: [String, Object, Array] as PropType<StyleValue>, default: undefined }
@@ -59,18 +63,34 @@ export const Popover = defineComponent({
   emits: ['update:open', 'open-change'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
+    const delayGroup = useTooltipDelayGroup()
 
     const {
       currentVisible,
+      setVisible,
       containerRef,
       triggerRef,
       floatingRef,
       floatingStyles,
       floatingClasses,
+      actualPlacement,
       positioned,
       overlayTarget,
       triggerHandlers
-    } = usePopup({ props, emit })
+    } = usePopup({
+      props,
+      emit,
+      getSkipShowDelay: () => delayGroup?.shouldSkip() ?? false,
+      onShown: () => delayGroup?.noteOpen()
+    })
+
+    const onScroll = () => {
+      if (props.closeOnScroll && currentVisible.value) setVisible(false)
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', onScroll, true)
+      onBeforeUnmount(() => window.removeEventListener('scroll', onScroll, true))
+    }
 
     watch(
       () => [props.width, props.title, props.ariaLabel, slots.title] as const,
@@ -174,6 +194,11 @@ export const Popover = defineComponent({
                             { id: titleId, class: POPOVER_TITLE_CLASSES },
                             slots.title ? slots.title() : props.title
                           ),
+                        h('span', {
+                          'data-tiger-floating-arrow': '',
+                          class: getPopconfirmArrowClasses(),
+                          style: getFloatingArrowStyle(actualPlacement.value)
+                        }),
                         hasContent &&
                           h(
                             'div',

@@ -33,7 +33,7 @@ describe('InputNumber (React)', () => {
     it('renders disabled and readonly states', () => {
       const { container: disabled } = render(<InputNumber disabled value={5} />)
       expect(getInput(disabled).disabled).toBe(true)
-      const { container: readonly } = render(<InputNumber readonly value={5} />)
+      const { container: readonly } = render(<InputNumber readOnly value={5} />)
       expect(getInput(readonly).readOnly).toBe(true)
     })
 

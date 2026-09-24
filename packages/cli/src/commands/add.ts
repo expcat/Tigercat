@@ -1,6 +1,7 @@
 import { Command } from 'commander'
 import { existsSync } from 'node:fs'
-import { resolve, join } from 'node:path'
+import { resolve, join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import prompts from 'prompts'
 import {
   ALL_COMPONENTS,
@@ -156,8 +157,9 @@ export async function runAdd(components: string[], options: AddOptions = {}) {
   const { valid, invalid, commands } = validateComponents(selectedComponents)
 
   if (invalid.length > 0) {
-    logWarn(`Unknown components: ${invalid.join(', ')}`)
+    logError(`Unknown components: ${invalid.join(', ')}`)
     logInfo(`Available: ${ALL_COMPONENTS.join(', ')}`)
+    process.exit(1)
   }
 
   if (commands.length > 0) {
@@ -275,7 +277,21 @@ ${components.map((component) => `  ${component}`).join(',\n')}
 `
 }
 
+function componentExamplePath(component: string, framework: Framework): string {
+  const here = dirname(fileURLToPath(import.meta.url))
+  const root = resolve(here, '../../../..')
+  const kebab = component
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase()
+  const side = framework === 'vue3' ? 'vue3' : 'react'
+  const entry = framework === 'vue3' ? 'App.vue' : 'App.tsx'
+  return join(root, 'examples/example', side, 'src/examples', kebab, '01', entry)
+}
+
 function generateVue3Demo(component: string, pkg: string): string {
+  const example = readFileSafe(componentExamplePath(component, 'vue3'))
+  if (example?.includes(`from '`)) return example
   return `<script setup lang="ts">
 import { ${component} } from '${componentImportSpecifier(pkg, component)}'
 </script>
@@ -290,6 +306,8 @@ import { ${component} } from '${componentImportSpecifier(pkg, component)}'
 }
 
 function generateReactDemo(component: string, pkg: string): string {
+  const example = readFileSafe(componentExamplePath(component, 'react'))
+  if (example?.includes(`from '`)) return example
   return `import { ${component} } from '${componentImportSpecifier(pkg, component)}'
 
 export default function ${component}Demo() {

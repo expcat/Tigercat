@@ -37,6 +37,14 @@ export interface TreeNode {
    */
   icon?: unknown
   /**
+   * Directory nodes use the directory icon when `icon` is omitted.
+   */
+  directory?: boolean
+  /**
+   * Shortcut column for typeahead. Matching does not open the search box.
+   */
+  shortcut?: string
+  /**
    * Custom data
    */
   [key: string]: unknown
@@ -190,6 +198,11 @@ export interface TreeProps {
    * @default false
    */
   allowDeselect?: boolean
+  /**
+   * Title click toggles expand. Selection still follows `selectionMode`.
+   * @default false
+   */
+  expandOnClick?: boolean
   /**
    * Whether to load data asynchronously. Must not mutate the incoming node.
    */

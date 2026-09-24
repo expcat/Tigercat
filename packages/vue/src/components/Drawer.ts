@@ -10,8 +10,19 @@ import {
   useId
 } from 'vue'
 import {
+  acquireOverlayZ,
   classNames,
   coerceClassValue,
+  drawerFollowDistance,
+  drawerFollowTransform,
+  drawerPushOffset,
+  drawerResizeDelta,
+  drawerShowsMask,
+  feedbackLayoutLabels,
+  prefersReducedMotion,
+  registerDrawerLayer,
+  resolveSheetReducedMotion,
+  resolveSheetRelease,
   getDrawerLabels,
   mergeTigerLocale,
   mergeStyleValues,
@@ -164,7 +175,11 @@ export const Drawer = defineComponent({
      */
     zIndex: {
       type: Number,
-      default: OVERLAY_Z_INDEX.modal
+      default: undefined
+    },
+    resizable: {
+      type: Boolean,
+      default: false
     },
     /**
      * Additional CSS class for the drawer panel.
@@ -270,6 +285,39 @@ export const Drawer = defineComponent({
     const resolvedPlacement = computed(() =>
       resolveDrawerPlacement(props.placement, writingDirection.value)
     )
+    const layerId = ref<number | null>(null)
+    const stackedZ = ref<number | undefined>(undefined)
+    let releaseOverlayZ: (() => void) | undefined
+    let releaseDrawerLayer: (() => void) | undefined
+
+    const releaseStack = () => {
+      releaseOverlayZ?.()
+      releaseOverlayZ = undefined
+      releaseDrawerLayer?.()
+      releaseDrawerLayer = undefined
+      layerId.value = null
+    }
+
+    watch(
+      () => [props.open, resolvedPlacement.value, props.zIndex] as const,
+      ([open, placement, zIndex]) => {
+        releaseStack()
+        if (!open) return
+        if (zIndex === undefined) {
+          const layer = acquireOverlayZ()
+          stackedZ.value = layer.zIndex
+          releaseOverlayZ = layer.release
+        } else {
+          stackedZ.value = zIndex
+        }
+        const registered = registerDrawerLayer(placement)
+        layerId.value = registered.id
+        releaseDrawerLayer = registered.release
+      },
+      { immediate: true }
+    )
+
+    onBeforeUnmount(releaseStack)
 
     const titleId = computed(() => `${instanceId.value}-title`)
 
@@ -298,10 +346,14 @@ export const Drawer = defineComponent({
       if (typeof handler === 'function') handler(event)
     }
 
+    const sheetOffset = ref(0)
+    const resizedLength = ref<number | null>(null)
+    const resizing = ref(false)
     const resetTouchGesture = () => {
       touchStartPoint = null
       touchCurrentPoint = null
       swipeAllowed = false
+      sheetOffset.value = 0
     }
 
     const handleTouchStart = (event: TouchEvent) => {
@@ -329,7 +381,14 @@ export const Drawer = defineComponent({
       if (!touchStartPoint) return
 
       const point = getGestureTouchPoint(event.touches)
-      if (point) {
+      if (point && touchStartPoint && swipeAllowed) {
+        touchCurrentPoint = point
+        sheetOffset.value = drawerFollowDistance(
+          resolvedPlacement.value,
+          point.x - touchStartPoint.x,
+          point.y - touchStartPoint.y
+        )
+      } else if (point) {
         touchCurrentPoint = point
       }
     }
@@ -343,24 +402,17 @@ export const Drawer = defineComponent({
       )
 
       const allowed = swipeAllowed
+      const distance = sheetOffset.value || gesture?.distance || 0
+      const size =
+        resolvedPlacement.value === 'left' || resolvedPlacement.value === 'right'
+          ? (dialogRef.value?.offsetWidth ?? 0)
+          : (dialogRef.value?.offsetHeight ?? 0)
       resetTouchGesture()
 
-      if (
-        allowed &&
-        isDrawerSwipeCloseGesture(
-          {
-            placement: resolvedPlacement.value,
-            direction: writingDirection.value,
-            fullscreen: isDrawerMobileFullscreen({
-              fullscreenOnMobile: props.fullscreenOnMobile,
-              viewportWidth: window.innerWidth
-            })
-          },
-          gesture
-        )
-      ) {
-        handleClose()
-      }
+      if (!allowed) return
+      const release = resolveSheetRelease(distance, size)
+      const motion = resolveSheetReducedMotion(release, prefersReducedMotion())
+      if (motion === 'close') handleClose()
     }
 
     const handleTouchCancel = (event: TouchEvent) => {
@@ -472,7 +524,32 @@ export const Drawer = defineComponent({
               typeof props.width === 'number' ? `${props.width}px` : props.width
           }
         : undefined
-      const mergedStyle = mergeStyleValues(attrs.style, props.panelStyle, widthStyle)
+      const push =
+        layerId.value == null ? { x: 0, y: 0 } : drawerPushOffset(layerId.value, resolvedPlacement.value)
+      const follow =
+        sheetOffset.value > 0 ? drawerFollowTransform(resolvedPlacement.value, sheetOffset.value) : ''
+      const transform = [
+        push.x || push.y ? `translate(${push.x}px, ${push.y}px)` : '',
+        follow
+      ]
+        .filter(Boolean)
+        .join(' ')
+      const lengthStyle =
+        resizedLength.value != null
+          ? {
+              [isHorizontal ? 'width' : 'height']: `${resizedLength.value}px`
+            }
+          : undefined
+      const motionStyle =
+        sheetOffset.value > 0 || resizing.value ? { transitionDuration: '0ms' } : undefined
+      const mergedStyle = mergeStyleValues(
+        attrs.style,
+        props.panelStyle,
+        widthStyle,
+        lengthStyle,
+        transform ? { transform } : undefined,
+        motionStyle
+      )
 
       const headerClasses = getDrawerHeaderClasses()
       const bodyClasses = getDrawerBodyClasses(props.bodyClassName, props.bodyPadding)
@@ -537,7 +614,8 @@ export const Drawer = defineComponent({
 
       const footer = slots.footer ? h('div', { class: footerClasses }, slots.footer()) : null
 
-      const mask = props.mask
+      const mask =
+        props.mask && layerId.value != null && drawerShowsMask(layerId.value, true)
         ? h('div', {
             class: maskClasses,
             onClick: handleMaskClick,
@@ -566,7 +644,57 @@ export const Drawer = defineComponent({
           onTouchcancel: handleTouchCancel,
           'data-tiger-drawer': ''
         },
-        [header, body, footer]
+        [
+          header,
+          body,
+          footer,
+          props.resizable
+            ? h('div', {
+                'data-tiger-drawer-resize': '',
+                role: 'separator',
+                'aria-orientation': isHorizontal ? 'vertical' : 'horizontal',
+                'aria-label': feedbackLayoutLabels.drawerResize,
+                style: {
+                  position: 'absolute',
+                  touchAction: 'none',
+                  ...(resolvedPlacement.value === 'right'
+                    ? { left: '0', top: '0', bottom: '0', width: '8px', cursor: 'ew-resize' }
+                    : resolvedPlacement.value === 'left'
+                      ? { right: '0', top: '0', bottom: '0', width: '8px', cursor: 'ew-resize' }
+                      : resolvedPlacement.value === 'bottom'
+                        ? { top: '0', left: '0', right: '0', height: '8px', cursor: 'ns-resize' }
+                        : { bottom: '0', left: '0', right: '0', height: '8px', cursor: 'ns-resize' })
+                },
+                onPointerdown: (event: PointerEvent) => {
+                  if (event.button !== 0) return
+                  event.preventDefault()
+                  resizing.value = true
+                  const startX = event.clientX
+                  const startY = event.clientY
+                  const start =
+                    resizedLength.value ??
+                    (isHorizontal
+                      ? (dialogRef.value?.offsetWidth ?? 320)
+                      : (dialogRef.value?.offsetHeight ?? 240))
+                  const move = (pointer: PointerEvent) => {
+                    const delta = drawerResizeDelta(
+                      resolvedPlacement.value,
+                      pointer.clientX - startX,
+                      pointer.clientY - startY
+                    )
+                    resizedLength.value = Math.max(80, start + delta)
+                  }
+                  const end = () => {
+                    resizing.value = false
+                    window.removeEventListener('pointermove', move)
+                    window.removeEventListener('pointerup', end)
+                  }
+                  window.addEventListener('pointermove', move)
+                  window.addEventListener('pointerup', end)
+                }
+              })
+            : null
+        ]
       )
 
       const root = h(
@@ -574,7 +702,7 @@ export const Drawer = defineComponent({
         {
           class: containerClasses,
           ref: rootRef,
-          style: { zIndex: props.zIndex },
+          style: { zIndex: stackedZ.value ?? OVERLAY_Z_INDEX.modal },
           hidden: isOverlayVisuallyHidden(props.open, leaving.value),
           'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-overlay-layer': '',

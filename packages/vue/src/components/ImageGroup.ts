@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, provide, onBeforeUnmount, type InjectionKey } from 'vue'
+import { computed, defineComponent, h, ref, provide, onBeforeUnmount, watch, type InjectionKey } from 'vue'
 import {
   clampImageGroupPreviewIndex,
   coerceClassValue,
@@ -25,6 +25,8 @@ export const IMAGE_GROUP_INJECTION_KEY: InjectionKey<ImageGroupContext> = Symbol
 
 export interface VueImageGroupProps {
   preview?: boolean
+  open?: boolean
+  currentIndex?: number
   className?: string
 }
 
@@ -33,14 +35,25 @@ export const ImageGroup = defineComponent({
   inheritAttrs: false,
   props: {
     preview: { type: Boolean, default: true },
+    open: { type: Boolean, default: undefined },
+    currentIndex: { type: Number, default: undefined },
     className: { type: String, default: undefined }
   },
-  emits: ['preview-open-change'],
+  emits: ['preview-open-change', 'update:open', 'update:currentIndex'],
   setup(props, { slots, emit, attrs }) {
     const config = useTigerConfig()
     const images = ref<ImageGroupItem[]>([])
     const previewVisible = ref(false)
     const previewIndex = ref(0)
+    const openIsControlled = computed(() => props.open !== undefined)
+    const indexIsControlled = computed(() => props.currentIndex !== undefined)
+
+    watch(
+      () => props.currentIndex,
+      (value) => {
+        if (typeof value === 'number' && Number.isFinite(value)) previewIndex.value = value
+      }
+    )
 
     const context: ImageGroupContext = {
       get preview() {
@@ -57,7 +70,9 @@ export const ImageGroup = defineComponent({
         const index = getImageGroupItemIndex(images.value, id)
         if (index < 0) return
         previewIndex.value = index
-        previewVisible.value = true
+        if (!openIsControlled.value) previewVisible.value = true
+        emit('update:currentIndex', index)
+        emit('update:open', true)
         emit('preview-open-change', true)
       }
     }
@@ -72,7 +87,9 @@ export const ImageGroup = defineComponent({
       const children = slots.default?.()
       const labels = getImageLabels(config.value.locale)
       const srcs = getImageGroupLightboxItems(images.value)
-      const currentIndex = clampImageGroupPreviewIndex(previewIndex.value, srcs.length)
+      const rawIndex = indexIsControlled.value ? (props.currentIndex ?? 0) : previewIndex.value
+      const currentIndex = clampImageGroupPreviewIndex(rawIndex, srcs.length)
+      const open = openIsControlled.value ? Boolean(props.open) : previewVisible.value
       const groupName = resolveImageGroupName({
         ariaLabel: attrs['aria-label'],
         ariaLabelledby: attrs['aria-labelledby'],
@@ -81,15 +98,17 @@ export const ImageGroup = defineComponent({
 
       const preview = props.preview
         ? h(ImagePreview, {
-            open: previewVisible.value && srcs.length > 0,
+            open: open && srcs.length > 0,
             images: srcs,
             currentIndex,
             'onUpdate:open': (val: boolean) => {
-              previewVisible.value = val
+              if (!openIsControlled.value) previewVisible.value = val
+              emit('update:open', val)
               if (!val) emit('preview-open-change', false)
             },
             'onUpdate:currentIndex': (val: number) => {
-              previewIndex.value = val
+              if (!indexIsControlled.value) previewIndex.value = val
+              emit('update:currentIndex', val)
             }
           })
         : null

@@ -107,7 +107,7 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
     height,
     fit = 'cover',
     fallbackSrc,
-    preview = false,
+    preview = true,
     zoomOnHover = false,
     lazy = false,
     srcSet,
@@ -180,10 +180,14 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
       return
     }
     group.register({ id: instanceId, src: loadState.actualSrc || src, alt })
+  }, [group, instanceId, src, alt, loadState.actualSrc])
+
+  useEffect(() => {
+    if (!group) return
     return () => {
       group.unregister(instanceId)
     }
-  }, [group, instanceId, src, alt, loadState.actualSrc])
+  }, [group, instanceId])
 
   useEffect(() => {
     setLoadState(resetImageLoadState(src))

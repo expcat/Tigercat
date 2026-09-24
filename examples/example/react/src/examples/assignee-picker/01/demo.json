@@ -1,0 +1,12 @@
+{
+  "id": "assignee-picker-01",
+  "title": "Assignee picker",
+  "description": "Search and multi-select people supplied by the caller.",
+  "entry": "App.tsx",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}

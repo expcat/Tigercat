@@ -300,6 +300,12 @@ export const Alert = defineComponent({
         )
       }
 
+      if (slots.action) {
+        contentChildren.push(
+          h('div', { 'data-tiger-alert-action': '', class: descriptionClasses.value }, slots.action())
+        )
+      }
+
       if (hasDescription) {
         contentChildren.push(
           h(
@@ -353,7 +359,7 @@ export const Alert = defineComponent({
         )
       }
 
-      const hasContent = hasTitle || hasDescription || hasDefault
+      const hasContent = hasTitle || hasDescription || hasDefault || !!slots.action
       const live = resolveAlertLive(props.type, hasContent, inserted)
       const role = typeof attrsRole === 'string' ? attrsRole : live.role
 

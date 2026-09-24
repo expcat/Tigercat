@@ -10,7 +10,14 @@ export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 /**
  * Gutter size type (in px or Tailwind spacing scale)
  */
-export type GutterSize = number | [number, number]
+export type GutterSize =
+  | number
+  | [number, number]
+  | Partial<Record<Breakpoint, number | [number, number]>>
+
+export type ResponsiveAlign = Align | Partial<Record<Breakpoint, Align>>
+
+export type ResponsiveJustify = Justify | Partial<Record<Breakpoint, Justify>>
 
 /**
  * Column span value (1-24 or responsive object)
@@ -42,13 +49,13 @@ export interface RowProps {
    * Vertical alignment of flex layout
    * @default 'top'
    */
-  align?: Align
+  align?: ResponsiveAlign
 
   /**
    * Horizontal arrangement of flex layout
    * @default 'start'
    */
-  justify?: Justify
+  justify?: ResponsiveJustify
 
   /**
    * Whether to wrap

@@ -63,7 +63,14 @@ function OptionRow({
       onClick={() => ctx.selectOption(option)}>
       {custom ?? (
         <span className="flex items-center justify-between w-full gap-2">
-          <span className="truncate">{displayLabel}</span>
+          <span className="min-w-0">
+            <span className="block truncate">{displayLabel}</span>
+            {option.description ? (
+              <span className="block truncate text-xs text-[var(--tiger-text-secondary)]">
+                {option.description}
+              </span>
+            ) : null}
+          </span>
           {selected ? <SelectCheckIcon /> : null}
         </span>
       )}

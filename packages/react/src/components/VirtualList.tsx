@@ -24,6 +24,8 @@ import {
   readMarginBoxBlockSize,
   resolveScrollportViewport,
   scrollTopForVirtualAlign,
+  stickyIndexesInWindow,
+  virtualGridWindow,
   warnFixedRowOverflow
 } from '@expcat/tigercat-core'
 
@@ -57,6 +59,9 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
     overscan = 5,
     getItemKey,
     ariaLabel,
+    columns = 1,
+    orientation = 'vertical',
+    stickyIndexes,
     className,
     renderItem,
     onScroll,
@@ -227,17 +232,48 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return
-    const st = containerRef.current.scrollTop
+    const st =
+      orientation === 'horizontal' ? containerRef.current.scrollLeft : containerRef.current.scrollTop
     setScrollTop(st)
     onScroll?.(st)
-  }, [onScroll])
+  }, [onScroll, orientation])
 
   const { startIndex, endIndex, totalHeight, offsetTop } = range
+  const columnCount = Math.max(1, Math.floor(columns))
+  const grid = columnCount > 1 || orientation === 'horizontal'
+  const indexes = grid
+    ? stickyIndexesInWindow(
+        (() => {
+          const window = virtualGridWindow({
+            scroll: scrollTop,
+            viewport,
+            itemCount,
+            itemSize: itemHeight ?? 40,
+            columns: columnCount,
+            overscan
+          })
+          return {
+            start: window.start * columnCount,
+            end: Math.min(itemCount, window.end * columnCount),
+            offsetTop: 0,
+            totalHeight: 0
+          }
+        })(),
+        stickyIndexes ?? [],
+        itemCount
+      )
+    : stickyIndexes && stickyIndexes.length > 0
+      ? stickyIndexesInWindow(
+          { start: startIndex, end: endIndex + 1, offsetTop, totalHeight },
+          stickyIndexes,
+          itemCount
+        )
+      : Array.from({ length: Math.max(0, endIndex - startIndex + 1) }, (_, offset) => startIndex + offset)
   const resolvedRole = role ?? 'list'
   const asList = resolvedRole === 'list'
 
   const items: React.ReactNode[] = []
-  for (let i = startIndex; i <= endIndex; i++) {
+  for (const i of indexes) {
     const itemH = strategy.getItemHeight(i)
     const key = getItemKey ? getItemKey(i) : i
     const itemA11y = asList
@@ -332,6 +368,8 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
       role={resolvedRole}
       tabIndex={keyboardScroll ? 0 : undefined}
       aria-label={namedAriaLabel}
+      data-tiger-virtual-columns={grid ? String(columnCount) : undefined}
+      data-tiger-virtual-orientation={orientation}
       className={classNames(virtualListContainerClasses, className)}
       style={{ ...style, height: `${height}px` }}
       onScroll={handleScroll}

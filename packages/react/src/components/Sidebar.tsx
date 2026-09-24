@@ -1,6 +1,7 @@
-import React, { forwardRef, useMemo } from 'react'
+import React, { forwardRef, useMemo, useState } from 'react'
 import {
   classNames,
+  feedbackLayoutLabels,
   getLayoutSidebarClasses,
   getSidebarAriaLabel,
   getSidebarStyle,
@@ -17,6 +18,8 @@ export interface ReactSidebarProps
   children?: React.ReactNode
   /** Set by Layout. Not a public styling prop. */
   landmark?: SidebarLandmark
+  collapsible?: boolean
+  onCollapsedChange?: (collapsed: boolean) => void
 }
 
 export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sidebar(
@@ -29,6 +32,8 @@ export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sideb
     style,
     children,
     landmark = 'default',
+    collapsible = false,
+    onCollapsedChange,
     ...props
   },
   ref
@@ -36,10 +41,12 @@ export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sideb
   const config = useTigerConfig()
   const fallbackName = useMemo(() => getSidebarAriaLabel(config.locale), [config.locale])
 
-  const fullyHidden = isSidebarFullyHidden(collapsed, collapsedWidth)
+  const [localCollapsed, setLocalCollapsed] = useState(collapsed)
+  const effectiveCollapsed = collapsible ? localCollapsed : collapsed
+  const fullyHidden = isSidebarFullyHidden(effectiveCollapsed, collapsedWidth)
   const sidebarClasses = classNames(
     getLayoutSidebarClasses({
-      collapsed,
+      collapsed: effectiveCollapsed,
       side,
       widthProvided: width !== undefined
     }),
@@ -47,7 +54,7 @@ export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sideb
   )
   const sidebarStyle: React.CSSProperties = {
     ...style,
-    ...getSidebarStyle(collapsed, width, collapsedWidth)
+    ...getSidebarStyle(effectiveCollapsed, width, collapsedWidth)
   }
   const named =
     landmark === 'plain'
@@ -61,19 +68,41 @@ export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sideb
   const { ['aria-label']: _ignoredLabel, ['aria-labelledby']: _ignoredBy, ...rest } = props
   const Tag = landmark === 'plain' ? 'div' : 'aside'
 
-  return (
-    <SidebarContext.Provider value={{ collapsed }}>
+  const aside = (
+    <SidebarContext.Provider value={{ collapsed: effectiveCollapsed }}>
       <Tag
         ref={ref}
         className={sidebarClasses}
         style={sidebarStyle}
         inert={fullyHidden || undefined}
+        tabIndex={fullyHidden ? -1 : undefined}
         aria-hidden={fullyHidden || undefined}
         {...named}
         {...rest}>
         {children}
       </Tag>
     </SidebarContext.Provider>
+  )
+  if (!collapsible) return aside
+  const triggerLabel = effectiveCollapsed
+    ? feedbackLayoutLabels.sidebarExpand
+    : feedbackLayoutLabels.sidebarCollapse
+  return (
+    <div className="contents" data-tiger-sidebar-shell="">
+      {aside}
+      <button
+        type="button"
+        data-tiger-sidebar-trigger=""
+        aria-expanded={effectiveCollapsed ? 'false' : 'true'}
+        aria-label={triggerLabel}
+        onClick={() => {
+          const next = !effectiveCollapsed
+          setLocalCollapsed(next)
+          onCollapsedChange?.(next)
+        }}>
+        {triggerLabel}
+      </button>
+    </div>
   )
 })
 

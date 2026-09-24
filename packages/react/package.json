@@ -64,6 +64,11 @@
       "import": "./dist/components/AspectRatio.mjs",
       "default": "./dist/components/AspectRatio.mjs"
     },
+    "./AssigneePicker": {
+      "types": "./dist/components/AssigneePicker.d.mts",
+      "import": "./dist/components/AssigneePicker.mjs",
+      "default": "./dist/components/AssigneePicker.mjs"
+    },
     "./AutoComplete": {
       "types": "./dist/components/AutoComplete.d.mts",
       "import": "./dist/components/AutoComplete.mjs",
@@ -254,6 +259,11 @@
       "import": "./dist/components/ContextMenu.mjs",
       "default": "./dist/components/ContextMenu.mjs"
     },
+    "./CopyButton": {
+      "types": "./dist/components/CopyButton.d.mts",
+      "import": "./dist/components/CopyButton.mjs",
+      "default": "./dist/components/CopyButton.mjs"
+    },
     "./Countdown": {
       "types": "./dist/components/Countdown.d.mts",
       "import": "./dist/components/Countdown.mjs",
@@ -369,6 +379,11 @@
       "import": "./dist/components/FunnelChart.mjs",
       "default": "./dist/components/FunnelChart.mjs"
     },
+    "./Gallery": {
+      "types": "./dist/components/Gallery.d.mts",
+      "import": "./dist/components/Gallery.mjs",
+      "default": "./dist/components/Gallery.mjs"
+    },
     "./Gantt": {
       "types": "./dist/components/Gantt.d.mts",
       "import": "./dist/components/Gantt.mjs",
@@ -433,6 +448,11 @@
       "types": "./dist/components/InfiniteScroll.d.mts",
       "import": "./dist/components/InfiniteScroll.mjs",
       "default": "./dist/components/InfiniteScroll.mjs"
+    },
+    "./Inplace": {
+      "types": "./dist/components/Inplace.d.mts",
+      "import": "./dist/components/Inplace.mjs",
+      "default": "./dist/components/Inplace.mjs"
     },
     "./Input": {
       "types": "./dist/components/Input.d.mts",
@@ -584,6 +604,11 @@
       "import": "./dist/components/NavigationMenu.mjs",
       "default": "./dist/components/NavigationMenu.mjs"
     },
+    "./NotificationBell": {
+      "types": "./dist/components/NotificationBell.d.mts",
+      "import": "./dist/components/NotificationBell.mjs",
+      "default": "./dist/components/NotificationBell.mjs"
+    },
     "./NotificationCenter": {
       "types": "./dist/components/NotificationCenter.d.mts",
       "import": "./dist/components/NotificationCenter.mjs",
@@ -688,6 +713,11 @@
       "types": "./dist/components/Row.d.mts",
       "import": "./dist/components/Row.mjs",
       "default": "./dist/components/Row.mjs"
+    },
+    "./SankeyChart": {
+      "types": "./dist/components/SankeyChart.d.mts",
+      "import": "./dist/components/SankeyChart.mjs",
+      "default": "./dist/components/SankeyChart.mjs"
     },
     "./ScatterChart": {
       "types": "./dist/components/ScatterChart.d.mts",
@@ -883,6 +913,11 @@
       "types": "./dist/components/VirtualTable.d.mts",
       "import": "./dist/components/VirtualTable.mjs",
       "default": "./dist/components/VirtualTable.mjs"
+    },
+    "./WaterfallChart": {
+      "types": "./dist/components/WaterfallChart.d.mts",
+      "import": "./dist/components/WaterfallChart.mjs",
+      "default": "./dist/components/WaterfallChart.mjs"
     },
     "./Watermark": {
       "types": "./dist/components/Watermark.d.mts",

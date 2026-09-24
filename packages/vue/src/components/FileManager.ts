@@ -10,7 +10,16 @@ import {
   PropType
 } from 'vue'
 import {
+  canEmitFileDelete,
+  canEmitFileOpen,
+  canEmitFileRename,
   classNames,
+  fileToUploadFile,
+  filterUploadPreviewUrl,
+  getW9DataLabels,
+  isImageUploadFile,
+  sanitizeFileDisplayName,
+  searchFileTree,
   coerceClassValue,
   mergeStyleValues,
   getFileManagerContainerClasses,
@@ -20,7 +29,6 @@ import {
   deriveFileManagerModel,
   selectFileItem,
   toggleFileSelection,
-  sanitizeFileDisplayName,
   getFileManagerWindow,
   createFileManagerMeasure,
   FILE_MANAGER_DEFAULT_HEIGHT,
@@ -128,6 +136,15 @@ export const FileManager = defineComponent({
     searchText: { type: String, default: undefined },
     defaultSearchText: { type: String, default: undefined },
     className: { type: String, default: undefined },
+    bind: {
+      type: Object as PropType<{
+        query?: string
+        recursive?: boolean
+        name?: string
+        permission?: { readable?: boolean; writable?: boolean }
+      }>,
+      default: undefined
+    },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
   emits: [
@@ -146,6 +163,9 @@ export const FileManager = defineComponent({
     const labels = computed(() => getFileManagerLabels(mergedLocale.value))
     const isRtl = computed(() => mergedLocale.value?.direction === 'rtl')
     const focusedIndex = ref(0)
+    const fileAction = ref('')
+    const uploadedName = ref('')
+    const previewLabel = ref('')
     const scrollTop = ref(0)
     const viewport = ref(0)
     const measureTick = ref(0)
@@ -538,7 +558,74 @@ export const FileManager = defineComponent({
           style: containerStyle.value,
           'aria-busy': props.loading || undefined
         },
-        [toolbar, content, loadingEl]
+        [
+          props.bind
+            ? h('div', { 'data-tiger-file-bind': '' }, [
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    'data-tiger-file-open': '',
+                    disabled: !canEmitFileOpen(props.bind.permission),
+                    onClick: () => {
+                      if (canEmitFileOpen(props.bind?.permission)) emit('open', props.bind?.name)
+                    }
+                  },
+                  getW9DataLabels().preview
+                ),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    'data-tiger-file-rename': '',
+                    disabled: !canEmitFileRename(props.bind.permission),
+                    onClick: () => {
+                      if (!canEmitFileRename(props.bind?.permission)) return
+                      fileAction.value = sanitizeFileDisplayName(props.bind?.name ?? '')
+                    }
+                  },
+                  getW9DataLabels().rename
+                ),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    'data-tiger-file-delete': '',
+                    disabled: !canEmitFileDelete(props.bind.permission),
+                    onClick: () => {
+                      if (canEmitFileDelete(props.bind?.permission)) {
+                        fileAction.value = `delete:${sanitizeFileDisplayName(props.bind?.name ?? '')}`
+                      }
+                    }
+                  },
+                  getW9DataLabels().delete
+                ),
+                h('input', {
+                  type: 'file',
+                  'data-tiger-file-upload': '',
+                  'aria-label': getW9DataLabels().upload,
+                  onChange: (event: Event) => {
+                    const file = (event.target as HTMLInputElement).files?.[0]
+                    if (!file) return
+                    const uploaded = fileToUploadFile(file)
+                    uploadedName.value = uploaded.name
+                    previewLabel.value =
+                      filterUploadPreviewUrl(uploaded.url) ??
+                      (isImageUploadFile(uploaded) ? uploaded.name : '')
+                  }
+                }),
+                h('span', { 'data-file-upload': '' }, uploadedName.value),
+                h('span', { 'data-file-preview': '' }, previewLabel.value),
+                ...searchFileTree(props.files ?? [], props.bind.query ?? '', props.bind.recursive === true).map(
+                  (hit) => h('span', { key: hit.path.join('/'), 'data-file-hit': hit.item.name })
+                ),
+                h('span', { 'data-file-action': '' }, fileAction.value)
+              ])
+            : null,
+          toolbar,
+          content,
+          loadingEl
+        ]
       )
     }
   }

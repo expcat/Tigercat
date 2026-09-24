@@ -30,4 +30,19 @@ export interface CodeProps {
    * Takes precedence over `locale` and global ConfigProvider text.
    */
   labels?: Partial<TigerLocaleCode>
+  /**
+   * Gutter of line numbers beside the code. Numbers are not part of the copy.
+   * @default false
+   */
+  lineNumbers?: boolean
+  /**
+   * Show the `language` string above the block.
+   * @default false
+   */
+  showLanguage?: boolean
+  /**
+   * Show a control that toggles soft wrapping. Copy stays the raw string.
+   * @default false
+   */
+  wrapToggle?: boolean
 }

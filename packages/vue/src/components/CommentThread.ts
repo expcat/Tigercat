@@ -11,6 +11,9 @@ import {
 } from 'vue'
 import {
   classNames,
+  commentDisplayHtml,
+  commentEditRequest,
+  sanitizeHtml,
   coerceClassValue,
   mergeStyleValues,
   canSubmitCommentReply,
@@ -99,6 +102,8 @@ export const CommentThread = defineComponent({
       type: Number,
       default: 3
     },
+    editable: { type: Boolean, default: false },
+    rich: { type: Boolean, default: false },
     maxReplies: {
       type: Number,
       default: 3
@@ -199,7 +204,18 @@ export const CommentThread = defineComponent({
       default: undefined
     }
   },
-  emits: ['like', 'reply', 'more', 'action', 'update:expandedKeys', 'load-more', 'load-root', 'user-click'],
+  emits: [
+    'like',
+    'reply',
+    'more',
+    'action',
+    'update:expandedKeys',
+    'load-more',
+    'load-root',
+    'user-click',
+    'edit',
+    'delete'
+  ],
   setup(props, { emit, attrs }) {
     const instance = getCurrentInstance()
     const config = useTigerConfig()
@@ -947,6 +963,42 @@ export const CommentThread = defineComponent({
           'aria-label': ariaLabel
         },
         [
+          props.editable
+            ? h(
+                'div',
+                { 'data-tiger-comment-manage': '' },
+                (props.items ?? props.nodes ?? []).map((comment) => {
+                  const raw = String(comment.content ?? '')
+                  const sanitized = sanitizeHtml(raw)
+                  const display = commentDisplayHtml(props.rich ? 'rich' : 'plain', sanitized)
+                  return h('div', { key: String(comment.id) }, [
+                    display === 'fragment'
+                      ? h('span', { 'data-comment-html': '', innerHTML: sanitized })
+                      : h('span', { 'data-comment-text': '' }, raw),
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        'data-comment-edit': String(comment.id),
+                        onClick: () => {
+                          emit('edit', commentEditRequest(comment.id, props.rich ? sanitized : raw))
+                        }
+                      },
+                      'edit'
+                    ),
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        'data-comment-delete': String(comment.id),
+                        onClick: () => emit('delete', comment.id)
+                      },
+                      'delete'
+                    )
+                  ])
+                })
+              )
+            : null,
           errors,
           composer,
           empty,

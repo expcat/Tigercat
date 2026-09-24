@@ -16,6 +16,7 @@ import {
   resolveLocaleText,
   timelineDescriptionClasses,
   timelineLabelClasses,
+  timelineLabelSide,
   timelineListClasses,
   type TimelineItem,
   type TimelineItemPosition,
@@ -147,16 +148,24 @@ export const Timeline: React.FC<TimelineProps> = ({
       )
     }
 
+    const contentSide = mode === 'right' ? 'start' : 'end'
+    const labelSide = timelineLabelSide(mode === 'horizontal' ? 'horizontal' : 'vertical', contentSide)
+    const labelNode = item.label ? (
+      <time className={timelineLabelClasses} dateTime={String(item.label)} data-timeline-label-side={labelSide}>
+        {item.label}
+      </time>
+    ) : null
     return (
-      <li key={key} className={itemClasses}>
+      <li key={key} className={itemClasses} data-timeline-mode={mode}>
+        {labelSide === 'start' ? labelNode : null}
         <div className={tailClasses} />
         <div className={headClasses}>{renderDotElement(item)}</div>
         <div className={contentClasses}>
-          {item.label && <div className={timelineLabelClasses}>{item.label}</div>}
           {(item.content as React.ReactNode) ? (
             <div className={timelineDescriptionClasses}>{item.content as React.ReactNode}</div>
           ) : null}
         </div>
+        {labelSide === 'end' ? labelNode : null}
       </li>
     )
   }

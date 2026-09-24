@@ -28,6 +28,8 @@ import {
   getSpotlightLabels,
   getSpotlightOptionClasses,
   getSpotlightSearchState,
+  orderSpotlightWithRecent,
+  spotlightFooterShortcuts,
   getSpotlightShortcutLabel,
   isSpotlightHotkeyEnabled,
   isSpotlightToggleHotkey,
@@ -141,6 +143,7 @@ export const Spotlight = defineComponent({
       type: Number,
       default: undefined
     },
+    recentIds: { type: Array as PropType<Array<string | number>>, default: undefined },
     hotkey: {
       type: [Boolean, String] as PropType<boolean | string>,
       default: false
@@ -178,7 +181,7 @@ export const Spotlight = defineComponent({
     const resolvedOpen = computed(() => props.open ?? uncontrolledOpen.value)
     const resolvedQuery = computed(() => props.query ?? uncontrolledQuery.value)
     const searchState = computed(() =>
-      getSpotlightSearchState(props.items, resolvedQuery.value, {
+      getSpotlightSearchState(orderSpotlightWithRecent(props.items ?? [], props.recentIds), resolvedQuery.value, {
         filterItem: props.filterItem,
         limit: props.limit
       })
@@ -480,7 +483,14 @@ export const Spotlight = defineComponent({
                     { class: spotlightEmptyClasses, role: 'status', 'aria-live': 'polite' },
                     emptyMessage.value
                   )
-                : null
+                : null,
+              h(
+                'div',
+                { class: 'flex gap-2 px-3 py-2 text-xs', 'data-tiger-spotlight-footer': '' },
+                spotlightFooterShortcuts(state.flatResults.map((result) => result.item)).map((shortcut) =>
+                  h('kbd', { class: 'rounded border px-1' }, shortcut)
+                )
+              )
             ]
           ),
           h('div', { id: overlayHostId, class: 'contents', 'data-tiger-overlay-host': '' })

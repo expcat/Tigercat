@@ -65,6 +65,7 @@ const LoadingBarHost = /* @__PURE__ */ defineComponent({
         className: current.className,
         style: current.style,
         ariaLabel: current.ariaLabel,
+        minimumDisplayMs: current.minimumDisplayMs,
         notice,
         noticeToken: current.noticeToken
       })

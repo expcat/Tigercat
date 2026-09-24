@@ -36,6 +36,8 @@ import {
   isScrollAreaViewportKeyTarget,
   resolveScrollAreaViewportTabIndex,
   scrollAreaRootClasses,
+  prefersReducedMotion,
+  scrollAreaMotionBehavior,
   shouldRenderScrollAreaScrollbar,
   SCROLL_AREA_MIN_THUMB_SIZE,
   type DocumentDragSession,
@@ -53,6 +55,7 @@ export interface ScrollAreaProps
     Omit<CoreScrollAreaProps, 'onScroll'>,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onScroll' | 'className'> {
   onScroll?: (detail: ScrollAreaScrollDetail) => void
+  nativeBars?: boolean
 }
 
 export type { ScrollAreaInstance }
@@ -86,6 +89,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     viewportClassName,
     children,
     onScroll,
+    nativeBars = false,
     locale,
     ...rest
   },
@@ -243,18 +247,35 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     [handleScroll]
   )
 
+  const scrollToMarker = useCallback((id: string) => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+    const marker = viewport.querySelector(`[id="${CSS.escape(id)}"]`)
+    if (!(marker instanceof HTMLElement)) return
+    viewport.scrollTo({
+      top: marker.offsetTop - viewport.offsetTop,
+      behavior: scrollAreaMotionBehavior(prefersReducedMotion())
+    })
+  }, [])
+
   useImperativeHandle(
     ref,
     () => ({
       scrollTo,
+      scrollToMarker,
       scrollToTop: (behavior) => scrollTo({ top: 0, behavior }),
       scrollToBottom: (behavior) =>
         scrollTo({ top: viewportRef.current?.scrollHeight ?? 0, behavior }),
       getViewport: () => viewportRef.current,
       getState: () => stateRef.current
     }),
-    [scrollTo]
+    [scrollTo, scrollToMarker]
   )
+
+  useEffect(() => {
+    const root = rootRef.current as (HTMLDivElement & { scrollToMarker?: (id: string) => void }) | null
+    if (root) root.scrollToMarker = scrollToMarker
+  }, [scrollToMarker])
 
   useEffect(() => {
     syncState()
@@ -269,8 +290,12 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     []
   )
 
-  const visibleY = shouldRenderScrollAreaScrollbar(scrollbar, axis, 'y', state.y)
-  const visibleX = shouldRenderScrollAreaScrollbar(scrollbar, axis, 'x', state.x)
+  const visibleY = nativeBars
+    ? false
+    : shouldRenderScrollAreaScrollbar(scrollbar, axis, 'y', state.y)
+  const visibleX = nativeBars
+    ? false
+    : shouldRenderScrollAreaScrollbar(scrollbar, axis, 'x', state.x)
   const overflow = (visibleY && state.y.scrollable) || (visibleX && state.x.scrollable)
   const userTabIndex = a11y.tabIndex as number | undefined
   const tabIndex = resolveScrollAreaViewportTabIndex({
@@ -323,7 +348,7 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
 
   const renderScrollbar = (barAxis: ScrollAreaAxis) => {
     const axisState = barAxis === 'y' ? state.y : state.x
-    if (!shouldRenderScrollAreaScrollbar(scrollbar, axis, barAxis, axisState)) return null
+    if (nativeBars || !shouldRenderScrollAreaScrollbar(scrollbar, axis, barAxis, axisState)) return null
     const otherVisible = barAxis === 'y' ? visibleX : visibleY
     return (
       <div
@@ -354,10 +379,14 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
       ref={rootRef}
       className={classNames(scrollAreaRootClasses, className)}
       data-scroll-area=""
+      data-native-bars={nativeBars ? '' : undefined}
       data-scrolling={scrolling ? '' : undefined}>
       <div
         ref={viewportRef}
-        className={getScrollAreaViewportClasses(axis, viewportClassName)}
+        className={classNames(
+          getScrollAreaViewportClasses(axis, viewportClassName),
+          nativeBars ? 'overflow-auto' : undefined
+        )}
         style={{
           ...getScrollAreaBoxStyle({ height, maxHeight, width, maxWidth }),
           ...getScrollAreaGutterStyle(scrollbarSize, visibleX, visibleY)

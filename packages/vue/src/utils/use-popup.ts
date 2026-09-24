@@ -29,6 +29,8 @@ export interface UsePopupOptions {
   multiTrigger?: boolean
   arrowRef?: Ref<HTMLElement | null>
   isDismissLocked?: () => boolean
+  getSkipShowDelay?: () => boolean
+  onShown?: () => void
   onDismissed?: (reason: OverlayPopupDismissReason) => void
   restoreFocusOnDismiss?: 'escape' | 'all'
 }
@@ -66,6 +68,8 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     getTrigger: () => (multiTrigger ? (props.trigger ?? 'click') : 'click'),
     getShowDelay: () => props.showDelay,
     getHideDelay: () => props.hideDelay,
+    getSkipShowDelay: () => Boolean(options.getSkipShowDelay?.()),
+    onShown: () => options.onShown?.(),
     isDismissLocked: () => Boolean(options.isDismissLocked?.()),
     isFocusWithinTrigger: () => {
       const active = triggerRef.value?.ownerDocument?.activeElement

@@ -1,19 +1,9 @@
 /**
- * VirtualTable types — high-performance table for very large datasets.
- *
- * Unlike Table's `virtual` mode (which adds basic windowing),
- * VirtualTable is optimized from the ground up for 10K+ rows,
- * with fixed headers, column virtualization, and overscan support.
+ * VirtualTable is Table with the virtual strategy. It is not a second table.
  */
 
 import type { ExclusiveVirtualRange } from './virtual-list'
 import type { RowSelectionConfig, TableColumn } from './table'
-
-/** VirtualTable columns do not advertise sort or filter. Those belong to Table. */
-export type VirtualTableColumn<T = Record<string, unknown>> = Omit<
-  TableColumn<T>,
-  'sortable' | 'filter'
->
 
 export interface VirtualTableHandle {
   scrollToIndex: (index: number) => void
@@ -26,7 +16,7 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
    * Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` /
    * `render` / `renderHeader` / `align`. Sort and filter are Table columns.
    */
-  columns?: VirtualTableColumn<T>[]
+  columns?: TableColumn<T>[]
   /**
    * Fixed row height in px used by the window. Content is not clipped.
    * @default 48

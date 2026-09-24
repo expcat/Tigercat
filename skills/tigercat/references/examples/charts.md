@@ -117,6 +117,12 @@ Vue: `<RadarChart :data="data" />`
 
 React: `<RadarChart data={data} />`
 
+## SankeyChart
+
+Vue: `<SankeyChart :nodes="nodes" :links="links" />`
+
+React: `<SankeyChart nodes={nodes} links={links} />`
+
 ## ScatterChart
 
 Vue: `<ScatterChart :data="data" />`
@@ -134,5 +140,11 @@ React: `<SunburstChart data={data} />`
 Vue: `<TreeMapChart :data="data" />`
 
 React: `<TreeMapChart data={data} />`
+
+## WaterfallChart
+
+Vue: `<WaterfallChart :data="data" />`
+
+React: `<WaterfallChart data={data} />`
 
 Imports: use PascalCase subpaths such as `@expcat/tigercat-vue/Button` and `@expcat/tigercat-react/Button`. Hooks and `notification` use the same subpath rule. Shared types and helpers come from `@expcat/tigercat-core`.

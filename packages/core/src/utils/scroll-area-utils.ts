@@ -537,6 +537,10 @@ export function observeScrollAreaSize(
 
 const FOCUSABLE = 'a[href],button,input,select,textarea,iframe,[tabindex]:not([tabindex="-1"])'
 
+export function scrollAreaMotionBehavior(reducedMotion: boolean): ScrollBehavior {
+  return reducedMotion ? 'auto' : 'smooth'
+}
+
 export function scrollAreaHasFocusable(root: Element | null | undefined): boolean {
   if (!root) return false
   return root.querySelector(FOCUSABLE) !== null

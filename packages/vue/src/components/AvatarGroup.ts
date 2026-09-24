@@ -1,5 +1,7 @@
-import { computed, defineComponent, h, provide, reactive, ref, watch, PropType, Text, type VNode } from 'vue'
+import { computed, defineComponent, h, provide, reactive, watch, PropType, Text, type VNode } from 'vue'
 import {
+  avatarOverflowName,
+  basicLabel,
   coerceClassValue,
   getAvatarGroupClasses,
   getAvatarGroupItemClasses,
@@ -13,6 +15,7 @@ import {
   type TigerLocale,
   type TigerLocaleAvatarGroup
 } from '@expcat/tigercat-core'
+import { Popover } from './Popover'
 import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -81,8 +84,6 @@ export const AvatarGroup = defineComponent({
     )
     provide(AVATAR_GROUP_INJECTION_KEY, groupContext)
 
-    const expanded = ref(false)
-
     return () => {
       const nodes = flattenSlotVNodes(slots.default?.())
       const cap =
@@ -91,6 +92,7 @@ export const AvatarGroup = defineComponent({
           : undefined
       let avatarSeen = 0
       let overflowCount = 0
+      const collapsedNames: string[] = []
       const rendered: VNode[] = []
       nodes.forEach((child, index) => {
         if (child.type === Text) return
@@ -100,8 +102,17 @@ export const AvatarGroup = defineComponent({
           rendered.push(child)
           return
         }
-        const hidden = cap != null && !expanded.value && avatarSeen >= cap
-        if (cap != null && avatarSeen >= cap) overflowCount += 1
+        const hidden = cap != null && avatarSeen >= cap
+        if (hidden) {
+          overflowCount += 1
+          const childProps = (child.props ?? {}) as Record<string, unknown>
+          const name = avatarOverflowName({
+            text: childProps.text,
+            alt: childProps.alt,
+            ariaLabel: childProps['aria-label'] ?? childProps.ariaLabel
+          })
+          if (name) collapsedNames.push(name)
+        }
         avatarSeen += 1
         rendered.push(hidden ? h('span', { key: index, class: 'sr-only' }, [child]) : child)
       })
@@ -119,26 +130,44 @@ export const AvatarGroup = defineComponent({
         },
         [
           ...rendered,
-          overflowCount > 0 && !expanded.value
+          overflowCount > 0
             ? h(
-                'button',
+                Popover,
                 {
-                  type: 'button',
-                  class: getAvatarGroupOverflowClasses(
-                    props.size ?? 'md',
-                    overflowShape,
-                    avatarSeen > overflowCount
-                  ),
-                  'aria-expanded': 'false',
-                  'aria-label': getAvatarGroupOverflowLabel(
-                    overflowCount,
-                    labels.value.overflowAriaLabel
-                  ),
-                  onClick: () => {
-                    expanded.value = true
-                  }
+                  trigger: 'click',
+                  placement: 'top',
+                  asChild: true,
+                  ariaLabel: basicLabel(
+                    mergedLocale.value.locale,
+                    'avatarGroup',
+                    'overflowList'
+                  )
                 },
-                getAvatarGroupOverflowText(overflowCount)
+                {
+                  default: () =>
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: getAvatarGroupOverflowClasses(
+                          props.size ?? 'md',
+                          overflowShape,
+                          avatarSeen > overflowCount
+                        ),
+                        'aria-label': getAvatarGroupOverflowLabel(
+                          overflowCount,
+                          labels.value.overflowAriaLabel
+                        )
+                      },
+                      getAvatarGroupOverflowText(overflowCount)
+                    ),
+                  content: () =>
+                    h(
+                      'ul',
+                      { class: 'm-0 list-none p-0' },
+                      collapsedNames.map((name) => h('li', { key: name }, name))
+                    )
+                }
               )
             : null
         ]

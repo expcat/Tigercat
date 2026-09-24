@@ -25,6 +25,9 @@ import {
   getBreadcrumbLinkClasses,
   getBreadcrumbSeparatorClasses,
   getBreadcrumbSlots,
+  getBreadcrumbCollapsedItems,
+  breadcrumbCollapsedMenuItems,
+  resolveLinkHref,
   getSeparatorKind,
   getSeparatorContent,
   resolveBreadcrumbItemCurrent,
@@ -224,7 +227,8 @@ export const Breadcrumb = defineComponent({
     return () => {
       const items = flattenElementVNodes(slots.default?.() as VNode[] | undefined)
       itemSignature.value = items.map((item) => String(item.key ?? '')).join('|')
-      const slotsList = getBreadcrumbSlots(items.length, props.maxItems, expanded.value)
+      const slotsList = getBreadcrumbSlots(items.length, props.maxItems, false)
+      const collapsed = getBreadcrumbCollapsedItems(items.length, props.maxItems ?? items.length).collapsed
       const nodes: VNodeChild[] = []
 
       slotsList.forEach((slot, index) => {
@@ -238,12 +242,58 @@ export const Breadcrumb = defineComponent({
                   class: breadcrumbEllipsisClasses,
                   'aria-label': labels.value.expandAriaLabel,
                   'aria-expanded': expanded.value,
+                  'aria-haspopup': 'menu',
                   onClick: () => {
-                    expanded.value = true
+                    expanded.value = !expanded.value
                   }
                 },
                 '...'
-              )
+              ),
+              expanded.value
+                ? h(
+                    'div',
+                    { role: 'menu', 'data-tiger-breadcrumb-menu': '' },
+                    breadcrumbCollapsedMenuItems(
+                      collapsed.map((itemIndex) => {
+                        const child = items[itemIndex]
+                        const propsRecord = (child?.props ?? {}) as Record<string, unknown>
+                        const href = typeof propsRecord.href === 'string' ? propsRecord.href : undefined
+                        const rawChildren = child?.children
+                        const slotFn =
+                          typeof rawChildren === 'function'
+                            ? rawChildren
+                            : rawChildren &&
+                                typeof rawChildren === 'object' &&
+                                'default' in rawChildren &&
+                                typeof (rawChildren as { default?: unknown }).default === 'function'
+                              ? (rawChildren as { default: () => unknown }).default
+                              : null
+                        const rendered = slotFn ? slotFn() : rawChildren
+                        const text =
+                          typeof rendered === 'string'
+                            ? rendered
+                            : Array.isArray(rendered)
+                              ? rendered.filter((part) => typeof part === 'string').join('')
+                              : ''
+                        return {
+                          key: itemIndex,
+                          label: text || String(propsRecord.label ?? href ?? itemIndex),
+                          href
+                        }
+                      })
+                    ).map((entry) =>
+                      h(
+                        'a',
+                        {
+                          role: 'menuitem',
+                          href: resolveLinkHref(entry.href),
+                          key: entry.key
+                        },
+                        entry.label
+                      )
+                    )
+                  )
+                : null
             ])
           )
         } else {

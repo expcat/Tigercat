@@ -10,6 +10,7 @@ import {
   countdownValueWrapperClasses,
   createCountdownPayload,
   formatCountdown,
+  countdownRemainingRatio,
   getCountdownRemaining,
   getCountdownTitleClasses,
   manageLiveRegion,
@@ -85,7 +86,9 @@ export const Countdown = defineComponent({
     const remaining = ref(
       props.now !== undefined ? getCountdownRemaining(props.value, props.now) : 0
     )
+    const total = ref(Math.max(remaining.value, 0))
     const formatted = computed(() => formatCountdown(remaining.value, props.format))
+    const ratio = computed(() => countdownRemainingRatio(remaining.value, total.value))
     let finished = remaining.value <= 0
     let mounted = false
     let timerId: ReturnType<typeof setInterval> | null = null
@@ -130,6 +133,7 @@ export const Countdown = defineComponent({
       () => parseCountdownTimestamp(props.value),
       () => {
         syncRemainingFromSnapshot()
+        total.value = Math.max(remaining.value, 0)
         setupTimer()
       }
     )
@@ -193,7 +197,8 @@ export const Countdown = defineComponent({
           ...attrs,
           class: classNames(countdownBaseClasses, props.className, coerceClassValue(attrs.class)),
           role: rootAriaLabel ? 'group' : (attrs.role as string | undefined),
-          'aria-label': rootAriaLabel
+          'aria-label': rootAriaLabel,
+          'data-remaining-ratio': String(ratio.value)
         },
         [
           titleNode

@@ -15,7 +15,10 @@ import {
   getSplitterPointerDelta,
   isSplitterRtl,
   jumpSplitterGutter,
+  collapseSplitterSizes,
+  feedbackLayoutLabels,
   layoutDeclaredPanes,
+  restoreSplitterSize,
   measureSplitterContainer,
   mergeStyleValues,
   normalizeSplitterBounds,
@@ -75,6 +78,10 @@ export const Splitter = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+    collapsible: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:sizes', 'resize-start', 'resize', 'resize-end'],
@@ -86,6 +93,7 @@ export const Splitter = defineComponent({
     const containerSize = ref(0)
     const sizesKey = computed(() => serializePaneSizes(props.sizes))
     const override = ref<{ key: string | undefined; pixels: number[] } | null>(null)
+    const collapsedPrevious = ref<(number | string | null)[]>([])
     const draggingIndex = ref(-1)
     const startPos = ref({ x: 0, y: 0 })
     const startSizes = ref<number[]>([])
@@ -237,6 +245,28 @@ export const Splitter = defineComponent({
         bounds.maxes
       )
       const pixels = boxes.map((box) => box.pixels ?? 0)
+      const root = containerRef.value as (HTMLElement & { getSizes?: () => number[] }) | null
+      if (root) root.getSizes = () => pixels.slice()
+
+      const toggleCollapse = (index: number) => {
+        const base = (dragPixels() ?? props.sizes ?? pixels).slice()
+        const stored = collapsedPrevious.value[index]
+        const nextSizes =
+          stored == null
+            ? collapseSplitterSizes(base, index).sizes
+            : restoreSplitterSize(base, index, stored)
+        if (stored == null) {
+          const collapsed = collapseSplitterSizes(base, index)
+          collapsedPrevious.value = collapsedPrevious.value.slice()
+          collapsedPrevious.value[index] = collapsed.previous
+        } else {
+          collapsedPrevious.value = collapsedPrevious.value.slice()
+          collapsedPrevious.value[index] = null
+        }
+        const numeric = nextSizes.map((size) => (typeof size === 'number' ? size : 0))
+        override.value = { key: sizesKey.value, pixels: numeric }
+        emit('update:sizes', numeric)
+      }
 
       panes.forEach((child, i) => {
         const paneStyle = getPaneStyle(
@@ -250,9 +280,29 @@ export const Splitter = defineComponent({
               id: `${instanceId}-pane-${i}`,
               class: splitterPaneBaseClasses,
               style: paneStyle,
-              'data-pane-index': i
+              'data-pane-index': i,
+              'data-collapsed': collapsedPrevious.value[i] != null ? '' : undefined
             },
-            [child]
+            props.collapsible
+              ? [
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      'data-tiger-splitter-collapse': String(i),
+                      'aria-label':
+                        collapsedPrevious.value[i] != null
+                          ? feedbackLayoutLabels.splitterExpand
+                          : feedbackLayoutLabels.splitterCollapse,
+                      onClick: () => toggleCollapse(i)
+                    },
+                    collapsedPrevious.value[i] != null
+                      ? feedbackLayoutLabels.splitterExpand
+                      : feedbackLayoutLabels.splitterCollapse
+                  ),
+                  collapsedPrevious.value[i] != null ? null : child
+                ]
+              : [child]
           )
         )
 

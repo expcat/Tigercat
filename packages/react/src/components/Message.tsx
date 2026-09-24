@@ -2,7 +2,9 @@ import {
   clearMessages,
   enqueueMessage,
   getActiveFeedbackScope,
-  type MessageOptions
+  settleMessage,
+  type MessageOptions,
+  type MessagePromisePhases
 } from '@expcat/tigercat-core'
 
 export { MessageContainer } from './MessageContainer'
@@ -30,6 +32,9 @@ export const Message = {
   },
   clear() {
     clearMessages(getActiveFeedbackScope())
+  },
+  promise<T>(key: string | number, phases: MessagePromisePhases, task: Promise<T>) {
+    return settleMessage(getActiveFeedbackScope(), key, phases, task)
   }
 }
 

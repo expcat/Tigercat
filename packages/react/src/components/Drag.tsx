@@ -3,6 +3,7 @@ import {
   bindDragContainerItems,
   classNames,
   commitCrossContainerDrop,
+  dragMoveAnnouncement,
   reorderSequence,
   type DragItem,
   type DragProps as CoreDragProps
@@ -39,12 +40,23 @@ export function Drag<T extends DragItem = DragItem>({
   const onDropRef = React.useRef(onDrop)
   onDropRef.current = onDrop
 
+  const [announcement, setAnnouncement] = React.useState('')
   const drag = useDrag({
     config,
     containerId,
     onDragStart,
-    onDragOver,
-    onDragEnd,
+    onDragOver: (event) => {
+      const from = items.findIndex((item) => item.id === event.item.id)
+      const to = event.overItem
+        ? items.findIndex((item) => item.id === event.overItem?.id)
+        : from
+      setAnnouncement(dragMoveAnnouncement(Math.max(0, from), Math.max(0, to)))
+      onDragOver?.(event)
+    },
+    onDragEnd: (event) => {
+      setAnnouncement('')
+      onDragEnd?.(event)
+    },
     onDrop: (event) => {
       onDropRef.current?.(event)
       if (event.fromContainerId !== event.toContainerId) {
@@ -77,6 +89,12 @@ export function Drag<T extends DragItem = DragItem>({
       className={classNames('m-0 list-none p-0', className)}
       data-tiger-drag=""
       role="list">
+      {drag.draggedItem ? (
+        <div data-tiger-drag-preview="">{String(drag.draggedItem.id)}</div>
+      ) : null}
+      <div role="status" data-tiger-drag-live="">
+        {announcement}
+      </div>
       {items.map((item) => {
         const itemProps = drag.getDragItemProps(item)
         const node = render?.(item, {

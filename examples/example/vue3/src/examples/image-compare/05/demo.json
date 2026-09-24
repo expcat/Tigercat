@@ -1,0 +1,8 @@
+{
+  "id": "image-compare-05",
+  "title": "前后标题",
+  "description": "两侧标题进入滑块的值文本。页面仍可滚动。",
+  "entry": "App.vue",
+  "order": 5,
+  "viewport": { "mode": "auto", "minHeight": 280, "maxHeight": 420 }
+}

@@ -40,6 +40,12 @@ export interface MasonryProps {
   layout?: MasonryLayout
 
   /**
+   * `shortest` packs by column height. Visual order then differs from source order.
+   * Omit to keep CSS columns in source order.
+   */
+  balance?: 'shortest'
+
+  /**
    * Additional CSS class name for the root element
    */
   className?: string

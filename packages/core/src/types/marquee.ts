@@ -113,6 +113,12 @@ export interface MarqueeProps {
   labels?: Partial<TigerLocaleMarquee>
 
   /**
+   * Fade both edges. The fade does not receive clicks.
+   * @default false
+   */
+  edgeFade?: boolean
+
+  /**
    * Additional CSS classes on the root
    */
   className?: string

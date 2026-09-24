@@ -1,4 +1,18 @@
 import type { ThemePreset } from '../../types/theme'
+import { deriveAccentScale } from '../../utils/accent-scale'
+
+export const minimalThemeKnobs = {
+  accent: '#18181b',
+  neutral: '#71717a',
+  radius: '4px',
+  density: 0.9
+} as const
+
+export const minimalThemeScale = deriveAccentScale(minimalThemeKnobs.accent, {
+  neutral: minimalThemeKnobs.neutral,
+  radius: minimalThemeKnobs.radius,
+  density: minimalThemeKnobs.density
+})
 
 /**
  * Minimal theme — minimalist aesthetic, black/white/gray high-contrast.

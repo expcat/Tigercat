@@ -49,7 +49,7 @@ export interface VueInputProps {
   suffix?: string
   placeholder?: string
   disabled?: boolean
-  readonly?: boolean
+  readOnly?: boolean
   required?: boolean
   maxLength?: number
   minLength?: number
@@ -95,7 +95,7 @@ export const Input = defineComponent({
       default: ''
     },
     disabled: Boolean,
-    readonly: Boolean,
+    readOnly: Boolean,
     required: Boolean,
     maxLength: Number,
     minLength: Number,
@@ -252,7 +252,7 @@ export const Input = defineComponent({
         showPassword: props.showPassword,
         type: props.type,
         disabled: effectiveDisabled.value,
-        readOnly: props.readonly,
+        readOnly: props.readOnly,
         valueLength: currentValStr.length,
         hasCustomSuffix: hasCustomSuffix.value
       })
@@ -339,7 +339,7 @@ export const Input = defineComponent({
           value: localValue.value,
           placeholder: props.placeholder,
           disabled: effectiveDisabled.value,
-          readonly: props.readonly,
+          readonly: props.readOnly,
           required: props.required,
           maxlength: props.maxLength,
           minlength: props.minLength,

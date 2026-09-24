@@ -412,6 +412,11 @@ export const watermarkBaseStyles = {
     backgroundPosition: 'var(--tiger-watermark-position, 0 0)',
     printColorAdjust: 'exact',
     WebkitPrintColorAdjust: 'exact'
+  },
+  '@media print': {
+    '.tiger-watermark-overlay[data-watermark-print="off"]': {
+      display: 'none'
+    }
   }
 } as const
 
@@ -432,12 +437,25 @@ export function getWatermarkOverlayStyle(opts: {
   offsetX: number
   offsetY: number
   zIndex: number
+  /** Extra space between tile rows. CSS only; does not re-encode the tile. */
+  rowGap?: number
+  /** Repeat density. Values above 1 pack tiles tighter. CSS only. */
+  density?: number
 }): Record<string, string> {
-  const bgSize = `${opts.width + opts.gapX}px ${opts.height + opts.gapY}px`
-  return {
+  const rowGap = typeof opts.rowGap === 'number' && Number.isFinite(opts.rowGap) ? Math.max(0, opts.rowGap) : 0
+  const density =
+    typeof opts.density === 'number' && Number.isFinite(opts.density) && opts.density > 0
+      ? opts.density
+      : 1
+  const tileW = (opts.width + opts.gapX) / density
+  const tileH = (opts.height + opts.gapY + rowGap) / density
+  const style: Record<string, string> = {
     '--tiger-watermark-image': watermarkImageValue(opts.base64Url),
-    '--tiger-watermark-size': bgSize,
+    '--tiger-watermark-size': `${tileW}px ${tileH}px`,
     '--tiger-watermark-position': `${opts.offsetX}px ${opts.offsetY}px`,
     '--tiger-watermark-z': String(opts.zIndex)
   }
+  if (rowGap > 0) style['--tiger-watermark-row-gap'] = `${rowGap}px`
+  if (density !== 1) style['--tiger-watermark-density'] = String(density)
+  return style
 }

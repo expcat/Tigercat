@@ -7,11 +7,11 @@ description: Compact generated Tigercat Composite props reference
 
 # Composite Props
 
-由基础组件组合出的业务型组件。 共 13 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+由基础组件组合出的业务型组件。 共 15 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## ActivityFeed
 
-`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 4/21 props
+`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 4/22 props
 
 Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 
@@ -25,6 +25,16 @@ Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`�
 | `groupOrder?` | `string[]`                       | `-`     | Optional group order                                |
 
 Events/callback props: `onLoadMore?`.
+
+## AssigneePicker
+
+`packages/core/src/types/assignee-picker.ts` · `AssigneePickerProps`
+
+| Prop           | Type                     | Default | Notes                                                         |
+| -------------- | ------------------------ | ------- | ------------------------------------------------------------- |
+| `options?`     | `AssigneePickerOption[]` | `-`     | Directory supplied by the caller. Empty shows an explanation. |
+| `locale?`      | `string`                 | `-`     | Locale id for empty and search copy.                          |
+| `selectedIds?` | `string[]`               | `-`     | Selected ids.                                                 |
 
 ## ChatWindow
 
@@ -45,7 +55,7 @@ Events/callback props: `onChange?`, `onSend?`.
 
 ## CommentThread
 
-`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 4/30 props
+`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 4/32 props
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 
@@ -62,7 +72,7 @@ Events/callback props: `onLike?`, `onReply?`, `onUserClick?`, `onMore?`, `onActi
 
 ## DataTableWithToolbar
 
-`packages/core/src/types/table-toolbar.ts` · `DataTableWithToolbarProps` · 4/58 props
+`packages/core/src/types/table-toolbar.ts` · `DataTableWithToolbarProps` · 4/67 props
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 
@@ -83,7 +93,7 @@ Events/callback props: `onPageChange?`, `onPageSizeChange?`, `onChange?`, `onRow
 
 ## FormWizard
 
-`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 4/21 props
+`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 4/22 props
 
 Uses: `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`.
 
@@ -96,7 +106,16 @@ Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没�
 | `beforeNext?` | `FormWizardValidator` | `-`     | Validation hook before moving to next step. `true` proceeds, `false` blocks, a string b... |
 | `clickable?`  | `boolean`             | `false` | Whether step titles are clickable. Only already-reached unskipped steps can be opened t... |
 
-Events/callback props: `onStepChange?`, `onFinish?`.
+Events/callback props: `onStepChange?`, `onFinish?`, `onClose?`.
+
+## NotificationBell
+
+`packages/core/src/types/notification-bell.ts` · `NotificationBellProps`
+
+| Prop      | Type                     | Default | Notes                                               |
+| --------- | ------------------------ | ------- | --------------------------------------------------- |
+| `items?`  | `NotificationBellItem[]` | `-`     | Inbox rows. The bell does not read the toast queue. |
+| `locale?` | `string`                 | `-`     | Locale id for unread copy.                          |
 
 ## NotificationCenter
 
@@ -117,7 +136,7 @@ Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`
 
 ## SchemaForm
 
-`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/29 props
+`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/30 props
 
 Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
 

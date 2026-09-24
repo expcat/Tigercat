@@ -14,8 +14,12 @@ import {
   clampLightboxIndex,
   classNames,
   coerceClassValue,
+  basicLabel,
   createDefaultTransform,
   createLightboxGestureSession,
+  downloadCurrentImageUrl,
+  downloadIconPath,
+  flipHorizontalIconPath,
   focusFirst,
   formatLightboxImageAlt,
   getImageTransformStyle,
@@ -51,6 +55,7 @@ import {
   zoomOutIconPath,
   type GestureTransform,
   type ImageLightboxItem,
+  type ImagePreviewToolbarItemContext,
   type ImagePreviewProps as CoreImagePreviewProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
@@ -112,7 +117,7 @@ export const ImagePreview = defineComponent({
     }
   },
   emits: ['update:open', 'update:currentIndex', 'scale-change'],
-  setup(props, { emit, attrs }) {
+  setup(props, { emit, attrs, slots }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getImageViewerLabels(mergedLocale.value))
@@ -175,13 +180,13 @@ export const ImagePreview = defineComponent({
     }
 
     const handlePrev = () => {
-      const next = resolveLightboxNavIndex(index.value, resolved.value.length, 'prev')
+      const next = resolveLightboxNavIndex(index.value, resolved.value.length, 'prev', true)
       if (next === null) return
       applyIndex(next)
     }
 
     const handleNext = () => {
-      const next = resolveLightboxNavIndex(index.value, resolved.value.length, 'next')
+      const next = resolveLightboxNavIndex(index.value, resolved.value.length, 'next', true)
       if (next === null) return
       applyIndex(next)
     }
@@ -216,6 +221,16 @@ export const ImagePreview = defineComponent({
         ...transform.value,
         rotation: normalizeRotation(transform.value.rotation + 90)
       }
+    }
+
+    const handleFlip = () => {
+      transform.value = { ...transform.value, flipX: !transform.value.flipX }
+    }
+
+    const handleDownload = () => {
+      const current = resolved.value[clampLightboxIndex(index.value, resolved.value.length)]
+      if (!current) return
+      downloadCurrentImageUrl(current.src)
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -342,7 +357,7 @@ export const ImagePreview = defineComponent({
       const current = items[displayIndex]
       if (!current) return null
 
-      const navState = getLightboxNavState(displayIndex, items.length)
+      const navState = getLightboxNavState(displayIndex, items.length, true)
       const currentAlt = formatLightboxImageAlt(
         current,
         displayIndex,
@@ -437,79 +452,82 @@ export const ImagePreview = defineComponent({
         )
       }
 
-      if (props.zoomable || props.rotatable || showCount) {
-        const toolbar: ReturnType<typeof h>[] = []
-        if (props.zoomable) {
-          toolbar.push(
-            h(
-              'button',
-              {
-                class: imagePreviewToolbarBtnClasses,
-                onClick: handleZoomOut,
-                disabled: canZoomOut,
-                'aria-label': labels.value.zoomOutAriaLabel,
-                type: 'button'
-              },
-              [svgIcon(zoomOutIconPath)]
-            ),
-            h(
-              'button',
-              {
-                class: imagePreviewToolbarBtnClasses,
-                onClick: handleReset,
-                'aria-label': labels.value.resetAriaLabel,
-                type: 'button'
-              },
-              [svgIcon(resetIconPath)]
-            ),
-            h(
-              'button',
-              {
-                class: imagePreviewToolbarBtnClasses,
-                onClick: handleZoomIn,
-                disabled: canZoomIn,
-                'aria-label': labels.value.zoomInAriaLabel,
-                type: 'button'
-              },
-              [svgIcon(zoomInIconPath)]
-            )
-          )
-        }
-        if (props.rotatable) {
-          toolbar.push(
-            h(
-              'button',
-              {
-                class: imagePreviewToolbarBtnClasses,
-                onClick: handleRotateLeft,
-                'aria-label': labels.value.rotateLeftAriaLabel,
-                type: 'button'
-              },
-              [svgIcon(imageViewerIcons.rotateLeft)]
-            ),
-            h(
-              'button',
-              {
-                class: imagePreviewToolbarBtnClasses,
-                onClick: handleRotateRight,
-                'aria-label': labels.value.rotateRightAriaLabel,
-                type: 'button'
-              },
-              [svgIcon(imageViewerIcons.rotateRight)]
-            )
-          )
-        }
-        if (showCount && navState.counter) {
-          toolbar.push(
-            h(
-              'span',
-              { class: imagePreviewCounterClasses, 'aria-live': 'polite' },
-              navState.counter
-            )
-          )
-        }
-        children.push(h('div', { class: imagePreviewToolbarClasses }, toolbar))
+      const toolbarLabel = (key: 'flipHorizontal' | 'download' | 'resetScale') =>
+        basicLabel(mergedLocale.value.locale, 'imagePreview', key)
+
+      const toolbarButton = (
+        item: ImagePreviewToolbarItemContext,
+        icon: string,
+        onClick: () => void
+      ) => {
+        const custom = slots.toolbarItem?.(item)
+        if (custom && custom.length > 0) return custom
+        return h(
+          'button',
+          {
+            class: imagePreviewToolbarBtnClasses,
+            onClick,
+            disabled: item.disabled,
+            'aria-label': item.label,
+            type: 'button',
+            'data-preview-action': item.action
+          },
+          [svgIcon(icon)]
+        )
       }
+
+      const toolbar: ReturnType<typeof h>[] = []
+      if (props.zoomable) {
+        toolbar.push(
+          toolbarButton(
+            { action: 'zoomOut', label: labels.value.zoomOutAriaLabel, disabled: canZoomOut },
+            zoomOutIconPath,
+            handleZoomOut
+          ),
+          toolbarButton(
+            { action: 'reset', label: labels.value.resetAriaLabel, disabled: false },
+            resetIconPath,
+            handleReset
+          ),
+          toolbarButton(
+            { action: 'zoomIn', label: labels.value.zoomInAriaLabel, disabled: canZoomIn },
+            zoomInIconPath,
+            handleZoomIn
+          )
+        )
+      }
+      if (props.rotatable) {
+        toolbar.push(
+          toolbarButton(
+            { action: 'rotateLeft', label: labels.value.rotateLeftAriaLabel, disabled: false },
+            imageViewerIcons.rotateLeft,
+            handleRotateLeft
+          ),
+          toolbarButton(
+            { action: 'rotateRight', label: labels.value.rotateRightAriaLabel, disabled: false },
+            imageViewerIcons.rotateRight,
+            handleRotateRight
+          )
+        )
+      }
+      toolbar.push(
+        toolbarButton(
+          { action: 'flip', label: toolbarLabel('flipHorizontal'), disabled: false },
+          flipHorizontalIconPath,
+          handleFlip
+        ),
+        toolbarButton(
+          { action: 'download', label: toolbarLabel('download'), disabled: false },
+          downloadIconPath,
+          () => handleDownload()
+        )
+      )
+      if (showCount && navState.counter) {
+        toolbar.push(
+          h('span', { class: imagePreviewCounterClasses, 'aria-live': 'polite' }, navState.counter)
+        )
+      }
+      children.push(h('div', { class: imagePreviewToolbarClasses }, toolbar))
 
       return renderVueBodyTeleport(
         h(

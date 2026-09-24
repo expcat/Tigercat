@@ -33,8 +33,10 @@ import { useTigerConfig } from './ConfigProvider'
 
 export interface ImageCompareProps
   extends
-    Omit<CoreImageCompareProps, 'style'>,
+    Omit<CoreImageCompareProps, 'style' | 'beforeTitle' | 'afterTitle'>,
     Omit<React.ComponentPropsWithoutRef<'div'>, keyof CoreImageCompareProps | 'onChange'> {
+  beforeTitle?: React.ReactNode
+  afterTitle?: React.ReactNode
   /** Before pane content. Takes precedence over `beforeSrc`. */
   before?: React.ReactNode
   /** After pane content. Takes precedence over `afterSrc`. */
@@ -69,6 +71,8 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
       afterSrc,
       beforeAlt,
       afterAlt,
+      beforeTitle,
+      afterTitle,
       fit,
       position: controlledPosition,
       defaultPosition,
@@ -240,12 +244,26 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
         }}
         onPointerDown={handlePointerDown}>
         <div className={getImageCompareAfterClasses()} data-image-compare-after="">
+          {afterTitle ? (
+            <span
+              className="pointer-events-none absolute end-2 top-2 text-sm"
+              data-compare-after-title="">
+              {afterTitle}
+            </span>
+          ) : null}
           {renderPaneContent(after, afterSrc, resolveImageCompareAlt(afterAlt, labels.afterAlt), fit)}
         </div>
         <div
           className={getImageCompareBeforeClasses()}
           style={getImageCompareClipStyle(current, resolvedOrientation, resolvedStep, rtl)}
           data-image-compare-before="">
+          {beforeTitle ? (
+            <span
+              className="pointer-events-none absolute start-2 top-2 text-sm"
+              data-compare-before-title="">
+              {beforeTitle}
+            </span>
+          ) : null}
           {renderPaneContent(before, beforeSrc, resolveImageCompareAlt(beforeAlt, labels.beforeAlt), fit)}
         </div>
         <div
@@ -264,7 +282,10 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={current}
-          aria-valuetext={formatImageCompareValueText(labels.valueText, current)}
+          aria-valuetext={formatImageCompareValueText(labels.valueText, current, {
+            before: typeof beforeTitle === 'string' ? beforeTitle : undefined,
+            after: typeof afterTitle === 'string' ? afterTitle : undefined
+          })}
           aria-orientation={vertical ? 'vertical' : 'horizontal'}
           aria-disabled={disabled}
           onKeyDown={handleKeyDown}>

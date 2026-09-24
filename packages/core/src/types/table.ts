@@ -293,6 +293,34 @@ export interface TableColumn<T = Record<string, unknown>> {
    * CSS class for fixed column header cells, or a resolver for sticky header state.
    */
   fixedHeaderClassName?: TableFixedHeaderClassName<T>
+
+  /**
+   * Body cell row span. A span other than 1 leaves the fixed-height virtual window.
+   */
+  rowSpan?: number | ((record: T, index: number) => number)
+
+  /**
+   * Body cell column span. A span other than 1 leaves the fixed-height virtual window.
+   */
+  colSpan?: number | ((record: T, index: number) => number)
+
+  /** In-cell editor. Text, number, and select reuse the form controls. */
+  edit?: 'text' | 'number' | 'select'
+
+  /** Options when `edit` is `select`. */
+  editOptions?: { label: string; value: string | number }[]
+
+  /**
+   * Return false or a message to keep the previous data.
+   * A failed check does not emit the next source.
+   */
+  validate?: (value: unknown, record: T) => boolean | string
+
+  /** Text written by CSV export. Objects are not dumped. */
+  cellFormatter?: (value: unknown, record: T) => string
+
+  /** Include this column in a computed summary row. */
+  sum?: boolean
 }
 
 /**
@@ -827,9 +855,53 @@ export interface TableProps<T = Record<string, unknown>> {
   rowDraggable?: boolean
 
   /**
-   * Summary row configuration
+   * Summary row. `data` is the caller row. `sum` adds per-column totals.
+   * Cells are text, never raw objects.
    */
-  summaryRow?: { show: boolean; data: Record<string, unknown> }
+  summaryRow?: {
+    show: boolean
+    data?: Record<string, unknown>
+    sum?: boolean | string[]
+  }
+
+  /**
+   * Virtualize only the unpinned middle columns. Requires measured widths.
+   * @default false
+   */
+  virtualizeColumns?: boolean
+
+  /** Scrollport width used by column virtualization. */
+  width?: number | 'auto'
+
+  /** Extra rows or columns rendered outside the window. @default 5 */
+  overscan?: number
+
+  /** Scroll the virtual window so this row index is visible. */
+  scrollToIndex?: number
+
+  /**
+   * Controlled multi-sort. Order is the priority order.
+   * Omitted keeps the single `sort` state.
+   */
+  sorts?: { key: string; direction: 'asc' | 'desc' }[]
+
+  /** Controlled column widths in px, shared with measurement. */
+  columnWidths?: Record<string, number>
+
+  /**
+   * Card-mode row height in px. A positive number virtualizes the card list.
+   * Unmeasured or variable heights leave the window.
+   */
+  cardItemHeight?: number
+
+  /**
+   * Grid keyboard. Default is the native table: header sort buttons, one row tab stop.
+   * @default false
+   */
+  grid?: boolean
+
+  /** Collapsed group keys. The header count stays the full group. */
+  collapsedGroupKeys?: string[]
 
   /**
    * Group rows by column key

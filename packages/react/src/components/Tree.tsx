@@ -41,6 +41,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(props, r
     filterFn: _filterFn,
     filterMode: _filterMode,
     autoExpandParent: _autoExpandParent,
+    expandOnClick: _expandOnClick,
     blockNode: _blockNode,
     emptyText: _emptyText,
     ariaLabel: _ariaLabel,

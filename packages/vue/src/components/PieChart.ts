@@ -3,7 +3,9 @@ import {
   classNames,
   coerceClassValue,
   getStableChartGradientPrefix,
+  pieOuterRadius,
   resolveChartPalette,
+  separatePieLabels,
   buildChartLegendItems,
   chartLegendOrientationFromPosition,
   resolveChartTooltipContent,
@@ -36,6 +38,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
+import { renderPieBind } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
@@ -89,6 +92,16 @@ export const PieChart = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleChart>>, default: undefined },
     className: { type: String },
+    bind: {
+      type: Object as PropType<{
+        labels?: { index: number; x: number; y: number; width: number; height: number }[]
+        values?: number[]
+        base?: number
+        max?: number
+        rose?: boolean
+      }>,
+      default: undefined
+    },
     borderWidth: { type: Number, default: 2 },
     borderColor: { type: String, default: 'var(--tiger-surface)' },
     hoverOffset: { type: Number, default: 8 },
@@ -122,7 +135,8 @@ export const PieChart = defineComponent({
       handleKeyDown,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave
+      handleLegendLeave,
+      isLegendIndexHidden
     } = useChartInteraction<PieChartDatum>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -189,7 +203,9 @@ export const PieChart = defineComponent({
           props.legendFormatter
             ? props.legendFormatter(slice.datum, slice.index)
             : sliceName(slice.datum, slice.index),
-        getColor: (slice) => slice.color
+        getColor: (slice) => slice.color,
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       })
     )
     const tooltipContent = computed(() =>
@@ -479,6 +495,22 @@ export const PieChart = defineComponent({
                 onItemClick: handleLegendClick,
                 onItemHover: handleLegendHover,
                 onItemLeave: handleLegendLeave
+              })
+            : null,
+          props.bind
+            ? renderPieBind({
+                labels: separatePieLabels(props.bind.labels ?? []).map((label) => ({
+                  index: label.index,
+                  y: label.y
+                })),
+                radii: (props.bind.values ?? []).map((value) =>
+                  pieOuterRadius(
+                    props.bind?.rose ? 'rose' : 'equal',
+                    props.bind?.base ?? 40,
+                    value,
+                    props.bind?.max ?? 1
+                  )
+                )
               })
             : null,
           tooltip

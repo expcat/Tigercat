@@ -387,6 +387,7 @@ export interface TableViewInput<T = Record<string, unknown>> {
   containerWidth?: number
   sortLocale?: string
   rowDraggable?: boolean
+  sorts?: { key: string; direction: 'asc' | 'desc' }[]
 }
 
 export interface TableView<T = Record<string, unknown>> {
@@ -422,6 +423,7 @@ export function resolveTableProcessedRows<T>(options: {
   advancedFilterRules: FilterRule[]
   skipLocalProcessing: boolean
   sortLocale?: string
+  sorts?: { key: string; direction: 'asc' | 'desc' }[]
 }): TableIndexedRow<T>[] {
   const { dataSource, columns } = options
   if (options.skipLocalProcessing) {
@@ -435,12 +437,19 @@ export function resolveTableProcessedRows<T>(options: {
     records = filterTableData(dataSource, columns, options.filters)
   }
 
-  if (options.sort.key && options.sort.direction) {
-    const column = columns.find((item) => item.key === options.sort.key)
+  const levels =
+    options.sorts && options.sorts.length > 0
+      ? options.sorts
+      : options.sort.key && options.sort.direction
+        ? [{ key: options.sort.key, direction: options.sort.direction }]
+        : []
+  for (let level = levels.length - 1; level >= 0; level--) {
+    const sortLevel = levels[level]
+    const column = columns.find((item) => item.key === sortLevel.key)
     records = sortData(
       records,
-      options.sort.key,
-      options.sort.direction,
+      sortLevel.key,
+      sortLevel.direction,
       column?.sortFn,
       columns,
       options.sortLocale
@@ -478,7 +487,8 @@ export function resolveTableView<T>(input: TableViewInput<T>): TableView<T> {
     filterMode,
     advancedFilterRules,
     skipLocalProcessing: skipLocal,
-    sortLocale: input.sortLocale
+    sortLocale: input.sortLocale,
+    sorts: input.sorts
   })
 
   if (input.groupBy && !skipLocal) {
@@ -570,6 +580,8 @@ export function resolveTableView<T>(input: TableViewInput<T>): TableView<T> {
     )
   }
 }
+
+export * from './w9-data'
 
 export function resolveTablePageRow<T>(
   pageSourceIndices: number[],

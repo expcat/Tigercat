@@ -1,0 +1,12 @@
+{
+  "id": "input-number-03",
+  "title": "大整数",
+  "description": "超过安全整数的值以字符串保存。普通 12 仍是数字。",
+  "entry": "App.vue",
+  "order": 3,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 200,
+    "maxHeight": 480
+  }
+}

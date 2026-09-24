@@ -64,11 +64,19 @@ export interface MenuItem {
    * Child menu items (submenu or group).
    */
   children?: MenuItem[]
+  /**
+   * Badge copied from the schema. Rendered with Badge. Not a count prop.
+   */
+  badge?: MenuSchemaBadge
+  /**
+   * Shortcut column. Typeahead does not open a search box.
+   */
+  shortcut?: string
 }
 
 /**
  * Badge on a schema node. A string/number is count or text content.
- * Stays on the schema and {@link MenuRouteMeta}; not copied onto {@link MenuItem}.
+ * Copied onto {@link MenuItem} and {@link MenuRouteMeta}.
  */
 export type MenuSchemaBadge =
   | string
@@ -82,8 +90,8 @@ export type MenuSchemaBadge =
 /**
  * Backend-style dynamic menu node. Maps onto {@link MenuItem} via
  * `menuSchemaToMenuItems`; extra fields (`path`, `permission`, `hideInMenu`,
- * `hideInBreadcrumb`, `flatMenu`, `badge`, `iframeSrc`) stay on the schema
- * and are not added to `MenuItem`.
+ * `hideInBreadcrumb`, `flatMenu`, `iframeSrc`) stay on the schema.
+ * `badge` is copied onto {@link MenuItem} and onto route meta.
  */
 export interface MenuSchemaNode {
   /**

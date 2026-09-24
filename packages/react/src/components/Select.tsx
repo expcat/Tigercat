@@ -1,5 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import {
+  collapsedTagSummary,
+  getW9FormLabels,
   classNames,
   SHAKE_CLASS,
   runShakeAnimation,
@@ -124,6 +126,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={(event) => {
                   event.stopPropagation()
+                  if (ctx.readOnly) return
                   ctx.removeTag(tag.value)
                 }}>
                 ×
@@ -132,7 +135,8 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
           ))}
           {ctx.tags.collapsedCount > 0 ? (
             <span className={selectTagClasses} aria-label={ctx.tags.collapsedLabel}>
-              {ctx.tags.collapsedLabel}
+              {props.maxTagPlaceholder?.(ctx.tags.collapsedItems) ??
+                collapsedTagSummary(ctx.tags.collapsedItems)}
             </span>
           ) : null}
         </span>
@@ -162,7 +166,21 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
       data-tiger-select-dropdown=""
       onMouseDown={(event) => event.preventDefault()}
       onBlur={ctx.handleFocusOut}>
-      {hasOptions ? renderSelectPanelBody(ctx.renderCtx) : renderSelectEmpty(ctx.renderCtx)}
+      {props.panelHeader}
+      {ctx.isMultiple ? (
+        <button
+          type="button"
+          data-tiger-select-all=""
+          className="w-full px-3 py-2 text-start text-sm text-[var(--tiger-primary)] hover:bg-[var(--tiger-outline-bg-hover)]"
+          disabled={ctx.readOnly}
+          onClick={ctx.selectFiltered}>
+          {getW9FormLabels(props.locale?.locale).selectAll}
+        </button>
+      ) : null}
+      {hasOptions
+        ? renderSelectPanelBody(ctx.renderCtx)
+        : (props.panelEmpty ?? renderSelectEmpty(ctx.renderCtx))}
+      {props.panelFooter}
     </div>
   ) : null
 

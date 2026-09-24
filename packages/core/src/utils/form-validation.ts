@@ -49,11 +49,37 @@ interface PendingValidation {
 
 const BLOCKED_PATH_SEGMENTS = new Set(['__proto__', 'constructor', 'prototype'])
 
+function expandBracketToken(token: string): string[] | null {
+  if (!token.includes('[')) return [token]
+  const parts: string[] = []
+  const pattern = /([^[\]]+)|\[([^[\]]*)\]/g
+  let consumed = ''
+  let match: RegExpExecArray | null
+  while ((match = pattern.exec(token))) {
+    const piece = match[1] ?? match[2]
+    if (!piece) return null
+    parts.push(piece)
+    consumed += match[0]
+  }
+  if (consumed !== token || parts.length === 0) return null
+  return parts
+}
+
 function readPathSegments(path: string): string[] | null {
-  const segments = path.split('.').filter(Boolean)
-  if (segments.length === 0) return null
+  const dotted = path.split('.').filter(Boolean)
+  if (dotted.length === 0) return null
+  const segments: string[] = []
+  for (const token of dotted) {
+    const expanded = expandBracketToken(token)
+    if (!expanded) return null
+    segments.push(...expanded)
+  }
   if (segments.some((segment) => BLOCKED_PATH_SEGMENTS.has(segment))) return null
   return segments
+}
+
+function isArrayIndexSegment(segment: string): boolean {
+  return /^\d+$/.test(segment)
 }
 
 export function getValueByPath(values: FormValues | undefined, path: string): unknown {
@@ -66,7 +92,14 @@ export function getValueByPath(values: FormValues | undefined, path: string): un
 
   let current: unknown = values
   for (const segment of segments) {
-    if (!current || typeof current !== 'object' || Array.isArray(current)) {
+    if (Array.isArray(current)) {
+      if (!isArrayIndexSegment(segment)) return undefined
+      const index = Number(segment)
+      if (index >= current.length) return undefined
+      current = current[index]
+      continue
+    }
+    if (!current || typeof current !== 'object') {
       return undefined
     }
 
@@ -94,33 +127,127 @@ export function setValueByPath(values: FormValues, path: string, value: unknown)
     return values
   }
 
-  if (segments.length === 1) {
-    return { ...values, [segments[0]]: value }
-  }
-
-  const clone: FormValues = { ...values }
-  let cursor: Record<string, unknown> = clone
+  const root: FormValues = { ...values }
+  let cursor: unknown = root
 
   for (let i = 0; i < segments.length; i++) {
     const key = segments[i]
     const isLast = i === segments.length - 1
+    const nextKey = segments[i + 1]
+    const parentIsArray = Array.isArray(cursor)
+    if (!parentIsArray && (!cursor || typeof cursor !== 'object')) return values
+    const record = cursor as Record<string, unknown> & unknown[]
 
     if (isLast) {
-      cursor[key] = value
+      if (parentIsArray) {
+        if (!isArrayIndexSegment(key)) return values
+        record[Number(key)] = value
+      } else {
+        record[key] = value
+      }
       break
     }
 
-    const existing = cursor[key]
-    const next =
-      existing && typeof existing === 'object' && !Array.isArray(existing)
-        ? { ...(existing as Record<string, unknown>) }
-        : {}
+    const existing = parentIsArray
+      ? isArrayIndexSegment(key)
+        ? record[Number(key)]
+        : undefined
+      : record[key]
+    const nextIsIndex = nextKey !== undefined && isArrayIndexSegment(nextKey)
+    let child: unknown
+    if (Array.isArray(existing)) child = existing.slice()
+    else if (existing && typeof existing === 'object') child = { ...(existing as Record<string, unknown>) }
+    else child = nextIsIndex ? [] : {}
 
-    cursor[key] = next
-    cursor = next
+    if (parentIsArray) {
+      if (!isArrayIndexSegment(key)) return values
+      record[Number(key)] = child
+    } else {
+      record[key] = child
+    }
+    cursor = child
   }
 
-  return clone
+  return root
+}
+
+/**
+ * Insert `item` into the array at `path`. Later indexes shift up so
+ * `path[i].field` still addresses the same row.
+ */
+export function insertFieldArrayItem(
+  values: FormValues,
+  path: string,
+  index: number,
+  item: unknown
+): FormValues {
+  const current = getValueByPath(values, path)
+  const list = Array.isArray(current) ? current.slice() : []
+  const at = Number.isInteger(index) ? Math.max(0, Math.min(index, list.length)) : list.length
+  list.splice(at, 0, item)
+  return setValueByPath(values, path, list)
+}
+
+/**
+ * Remove the array item at `path[index]`. Later indexes shift down.
+ */
+export function removeFieldArrayItem(values: FormValues, path: string, index: number): FormValues {
+  const current = getValueByPath(values, path)
+  if (!Array.isArray(current) || !Number.isInteger(index) || index < 0 || index >= current.length) {
+    return values
+  }
+  return setValueByPath(
+    values,
+    path,
+    current.filter((_, itemIndex) => itemIndex !== index)
+  )
+}
+
+function fieldArrayIndex(field: string, arrayPath: string): number | null {
+  const prefix = `${arrayPath}[`
+  if (!field.startsWith(prefix)) return null
+  const rest = field.slice(prefix.length)
+  const end = rest.indexOf(']')
+  if (end <= 0) return null
+  const indexText = rest.slice(0, end)
+  if (!isArrayIndexSegment(indexText)) return null
+  return Number(indexText)
+}
+
+function rewriteFieldArrayIndex(field: string, arrayPath: string, nextIndex: number): string {
+  const prefix = `${arrayPath}[`
+  const rest = field.slice(prefix.length)
+  const end = rest.indexOf(']')
+  return `${arrayPath}[${nextIndex}]${rest.slice(end + 1)}`
+}
+
+/** Move error paths with the rows they describe after an insert or remove. */
+export function shiftFieldArrayErrors<T extends { field: string }>(
+  errors: readonly T[],
+  arrayPath: string,
+  index: number,
+  mode: 'insert' | 'remove'
+): T[] {
+  if (!arrayPath || !Number.isInteger(index)) return errors.slice()
+  const next: T[] = []
+  for (const error of errors) {
+    const current = fieldArrayIndex(error.field, arrayPath)
+    if (current === null) {
+      next.push(error)
+      continue
+    }
+    if (mode === 'remove' && current === index) continue
+    if (mode === 'remove' && current > index) {
+      next.push({ ...error, field: rewriteFieldArrayIndex(error.field, arrayPath, current - 1) })
+      continue
+    }
+    if (mode === 'insert' && current >= index) {
+      next.push({ ...error, field: rewriteFieldArrayIndex(error.field, arrayPath, current + 1) })
+      continue
+    }
+    next.push(error)
+  }
+  return next
 }
 
 /**

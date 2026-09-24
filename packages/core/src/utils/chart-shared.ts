@@ -83,6 +83,8 @@ export interface BuildLegendItemsOptions<T> {
   getColor?: (datum: T, index: number) => string
   /** Original mark index. Defaults to the array position. */
   getIndex?: (datum: T, index: number) => number
+  /** Legend hide is separate from the selection index. */
+  isHidden?: (index: number) => boolean
 }
 
 /** Build `ChartLegendItem[]` from data/series array. */
@@ -97,7 +99,8 @@ export function buildChartLegendItems<T>(options: BuildLegendItemsOptions<T>): C
       label: getLabel(datum, markIndex),
       color: getColor ? getColor(datum, markIndex) : palette[markIndex % palette.length],
       active: activeIndex === null || activeIndex === markIndex,
-      selected: selectedIndex !== null && selectedIndex === markIndex
+      selected: selectedIndex !== null && selectedIndex === markIndex,
+      hidden: options.isHidden ? options.isHidden(markIndex) : undefined
     }
   })
 }

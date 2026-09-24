@@ -84,6 +84,20 @@ export function getAvatarGroupOverflowText(overflowCount: number): string {
   return `+${overflowCount}`
 }
 
+/** Name shown for an avatar folded into the overflow list. */
+export function avatarOverflowName(props: {
+  text?: unknown
+  alt?: unknown
+  ariaLabel?: unknown
+}): string {
+  const alt = typeof props.alt === 'string' ? props.alt.trim() : ''
+  if (alt) return alt
+  const aria = typeof props.ariaLabel === 'string' ? props.ariaLabel.trim() : ''
+  if (aria) return aria
+  const text = typeof props.text === 'string' ? props.text.trim() : ''
+  return text
+}
+
 export function getButtonGroupClasses(vertical = false, ...classes: ClassValue[]): string {
   return classNames(
     buttonGroupBaseClasses,

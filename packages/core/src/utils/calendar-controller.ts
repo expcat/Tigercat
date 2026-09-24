@@ -55,6 +55,11 @@ export function shiftCalendarMonth(view: CalendarPanelView, delta: number): Cale
   return { viewYear: next.getFullYear(), viewMonth: next.getMonth() }
 }
 
+/** Panel shift. The barrel also exports a year/month helper with the same name. */
+export function shiftCalendarPanel(view: CalendarPanelView, delta: number): CalendarPanelView {
+  return shiftCalendarMonth(view, delta)
+}
+
 export function shiftCalendarYear(view: CalendarPanelView, delta: number): CalendarPanelView {
   return { viewYear: view.viewYear + delta, viewMonth: view.viewMonth }
 }

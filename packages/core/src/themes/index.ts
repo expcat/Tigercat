@@ -5,15 +5,23 @@
 
 export {
   createTigerThemeScope,
+  nearestThemeRoot,
   readTigerDocumentTheme,
   THEME_CONFIG_CSS_VARS,
+  THEME_ROOT_ATTRIBUTE,
   THEME_TRANSITION_PROPERTIES,
+  themeConfigOwnCssVars,
   themeConfigToCssVars,
   themeTransitionValue,
   mergeThemeConfig,
   resolvePresetThemeConfig
 } from './manager'
-export type { TigerThemeScope, TigerThemeScopeOptions, ThemeChangeEvent, ThemeChangeListener } from './manager'
+export type {
+  TigerThemeScope,
+  TigerThemeScopeOptions,
+  ThemeChangeEvent,
+  ThemeChangeListener
+} from './manager'
 
 export { defaultTheme } from './default/theme'
 export { vibrantTheme } from './vibrant/theme'
@@ -22,6 +30,8 @@ export { minimalTheme } from './minimal/theme'
 export { naturalTheme } from './natural/theme'
 export { modernTheme } from './modern/theme'
 export { highContrastTheme } from './high-contrast/theme'
+export { forcedColorsCss } from './forced-colors'
+export { reviewPreset, reviewNamedPreset } from './preset-review'
 
 export type {
   ThemeConfig,

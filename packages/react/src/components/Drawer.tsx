@@ -1,6 +1,13 @@
-import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
+  acquireOverlayZ,
   classNames,
+  drawerFollowDistance,
+  drawerFollowTransform,
+  drawerPushOffset,
+  drawerResizeDelta,
+  drawerShowsMask,
+  feedbackLayoutLabels,
   getDrawerMaskClasses,
   getDrawerContainerClasses,
   getDrawerPanelClasses,
@@ -24,6 +31,10 @@ import {
   shouldCloseOnMaskClick,
   mergeTigerLocale,
   OVERLAY_Z_INDEX,
+  prefersReducedMotion,
+  registerDrawerLayer,
+  resolveSheetReducedMotion,
+  resolveSheetRelease,
   type GesturePoint,
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
@@ -88,7 +99,8 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
     mask = true,
     maskClosable = true,
     keyboard = true,
-    zIndex = OVERLAY_Z_INDEX.modal,
+    zIndex,
+    resizable = false,
     className,
     bodyClassName,
     bodyPadding,
@@ -195,9 +207,36 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
   const touchStartRef = useRef<GesturePoint | null>(null)
   const touchCurrentRef = useRef<GesturePoint | null>(null)
   const swipeAllowedRef = useRef(false)
+  const [sheetOffset, setSheetOffset] = useState(0)
+  const [resizedLength, setResizedLength] = useState<number | null>(null)
+  const [resizing, setResizing] = useState(false)
+  const [layerId, setLayerId] = useState<number | null>(null)
+  const [stackedZ, setStackedZ] = useState<number | undefined>(undefined)
 
   const writingDirection = mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
   const resolvedPlacement = resolveDrawerPlacement(placement, writingDirection)
+
+  useEffect(() => {
+    if (!open) {
+      setLayerId(null)
+      setStackedZ(undefined)
+      return
+    }
+    let releaseZ: (() => void) | undefined
+    if (zIndex === undefined) {
+      const layer = acquireOverlayZ()
+      setStackedZ(layer.zIndex)
+      releaseZ = layer.release
+    } else {
+      setStackedZ(zIndex)
+    }
+    const registered = registerDrawerLayer(resolvedPlacement)
+    setLayerId(registered.id)
+    return () => {
+      releaseZ?.()
+      registered.release()
+    }
+  }, [open, resolvedPlacement, zIndex])
 
   useEscapeKey({ enabled: open && keyboard, onEscape: handleClose, layerRef: rootRef })
 
@@ -221,6 +260,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
     touchStartRef.current = null
     touchCurrentRef.current = null
     swipeAllowedRef.current = false
+    setSheetOffset(0)
   }, [])
 
   const handleTouchStart = useCallback(
@@ -253,11 +293,20 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
       if (!touchStartRef.current) return
 
       const point = getGestureTouchPoint(event.touches)
-      if (point) {
+      if (point && touchStartRef.current && swipeAllowedRef.current) {
+        touchCurrentRef.current = point
+        setSheetOffset(
+          drawerFollowDistance(
+            resolvedPlacement,
+            point.x - touchStartRef.current.x,
+            point.y - touchStartRef.current.y
+          )
+        )
+      } else if (point) {
         touchCurrentRef.current = point
       }
     },
-    [dialogDivProps]
+    [dialogDivProps, resolvedPlacement]
   )
 
   const handleTouchEnd = useCallback(
@@ -270,26 +319,18 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
       )
 
       const allowed = swipeAllowedRef.current
+      const distance = sheetOffset || gesture?.distance || 0
+      const size =
+        resolvedPlacement === 'left' || resolvedPlacement === 'right'
+          ? (dialogRef.current?.offsetWidth ?? 0)
+          : (dialogRef.current?.offsetHeight ?? 0)
       resetTouchGesture()
-
-      if (
-        allowed &&
-        isDrawerSwipeCloseGesture(
-          {
-            placement: resolvedPlacement,
-            direction: writingDirection,
-            fullscreen: isDrawerMobileFullscreen({
-              fullscreenOnMobile,
-              viewportWidth: window.innerWidth
-            })
-          },
-          gesture
-        )
-      ) {
-        handleClose()
-      }
+      if (!allowed) return
+      const release = resolveSheetRelease(distance, size)
+      const motion = resolveSheetReducedMotion(release, prefersReducedMotion())
+      if (motion === 'close') handleClose()
     },
-    [dialogDivProps, fullscreenOnMobile, handleClose, resolvedPlacement, resetTouchGesture, writingDirection]
+    [dialogDivProps, handleClose, resetTouchGesture, resolvedPlacement, sheetOffset]
   )
 
   const handleTouchCancel = useCallback(
@@ -325,12 +366,12 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
     <div
       ref={rootRef}
       className={containerClasses}
-      style={{ zIndex }}
+      style={{ zIndex: stackedZ ?? OVERLAY_Z_INDEX.modal }}
       hidden={isOverlayVisuallyHidden(open, leaving)}
       aria-hidden={!open ? 'true' : undefined}
       data-tiger-overlay-layer=""
       data-tiger-drawer-root="">
-      {mask && (
+      {mask && layerId != null && drawerShowsMask(layerId, true) && (
         <div
           className={maskClasses}
           onClick={handleMaskClick}
@@ -350,7 +391,23 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
                   ? 'width'
                   : 'height']: typeof width === 'number' ? `${width}px` : width
               }
-            : undefined)
+            : undefined),
+          ...(resizedLength != null
+            ? {
+                [resolvedPlacement === 'left' || resolvedPlacement === 'right'
+                  ? 'width'
+                  : 'height']: `${resizedLength}px`
+              }
+            : undefined),
+          transform: [
+            layerId != null
+              ? `translate(${drawerPushOffset(layerId, resolvedPlacement).x}px, ${drawerPushOffset(layerId, resolvedPlacement).y}px)`
+              : '',
+            sheetOffset > 0 ? drawerFollowTransform(resolvedPlacement, sheetOffset) : ''
+          ]
+            .filter((part) => part && part !== 'translate(0px, 0px)')
+            .join(' ') || undefined,
+          transitionDuration: sheetOffset > 0 || resizing ? '0ms' : undefined
         }}
         {...dialogDivProps}
         role="dialog"
@@ -396,6 +453,53 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
           </div>
         )}
         {footer && <div className={footerClasses}>{footer}</div>}
+        {resizable ? (
+          <div
+            data-tiger-drawer-resize=""
+            role="separator"
+            aria-orientation={
+              resolvedPlacement === 'left' || resolvedPlacement === 'right' ? 'vertical' : 'horizontal'
+            }
+            aria-label={feedbackLayoutLabels.drawerResize}
+            style={{
+              position: 'absolute',
+              touchAction: 'none',
+              ...(resolvedPlacement === 'right'
+                ? { left: 0, top: 0, bottom: 0, width: 8, cursor: 'ew-resize' }
+                : resolvedPlacement === 'left'
+                  ? { right: 0, top: 0, bottom: 0, width: 8, cursor: 'ew-resize' }
+                  : resolvedPlacement === 'bottom'
+                    ? { top: 0, left: 0, right: 0, height: 8, cursor: 'ns-resize' }
+                    : { bottom: 0, left: 0, right: 0, height: 8, cursor: 'ns-resize' })
+            }}
+            onPointerDown={(event) => {
+              if (event.button !== 0) return
+              event.preventDefault()
+              setResizing(true)
+              const startX = event.clientX
+              const startY = event.clientY
+              const horizontal = resolvedPlacement === 'left' || resolvedPlacement === 'right'
+              const start =
+                resizedLength ??
+                (horizontal ? (dialogRef.current?.offsetWidth ?? 320) : (dialogRef.current?.offsetHeight ?? 240))
+              const move = (pointer: PointerEvent) => {
+                const delta = drawerResizeDelta(
+                  resolvedPlacement,
+                  pointer.clientX - startX,
+                  pointer.clientY - startY
+                )
+                setResizedLength(Math.max(80, start + delta))
+              }
+              const end = () => {
+                setResizing(false)
+                window.removeEventListener('pointermove', move)
+                window.removeEventListener('pointerup', end)
+              }
+              window.addEventListener('pointermove', move)
+              window.addEventListener('pointerup', end)
+            }}
+          />
+        ) : null}
       </div>
       <div id={overlayHostId} className="contents" data-tiger-overlay-host="" />
     </div>

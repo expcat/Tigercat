@@ -199,16 +199,19 @@ describe('Breadcrumb', () => {
       expect(screen.queryByText('A')).not.toBeInTheDocument()
     })
 
-    it('expands all items when the ellipsis is clicked', async () => {
+    it('opens collapsed items in a menu and can collapse again', async () => {
       const user = userEvent.setup()
       const { container } = render(Breadcrumb, {
         props: { maxItems: 3 },
         slots: { default: items }
       })
       await user.click(ellipsis(container)!)
+      expect(screen.getByRole('menu')).toBeInTheDocument()
       expect(screen.getByText('A')).toBeInTheDocument()
       expect(screen.getByText('B')).toBeInTheDocument()
-      expect(ellipsis(container)).toBeNull()
+      await user.click(ellipsis(container)!)
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+      expect(ellipsis(container)).toHaveAttribute('aria-expanded', 'false')
     })
 
     it('does not collapse when maxItems is >= the item count', () => {

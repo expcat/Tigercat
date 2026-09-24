@@ -17,7 +17,6 @@ import {
   TIGER_CHROME_ATTR,
   getInputLabels,
   resolveInputTrailingLayout,
-  resolveReadOnlyFlag,
   type InputProps as CoreInputProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
@@ -69,8 +68,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     defaultValue,
     placeholder = '',
     disabled = false,
-    readonly: readonlyProp,
-    readOnly: readOnlyProp,
+    readOnly = false,
     required = false,
     maxLength,
     minLength,
@@ -102,7 +100,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const errorMessage = errorMessageProp
   const shakeTrigger = shakeTriggerProp ?? formItemControl?.shakeTrigger
   const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
-  const isReadOnly = resolveReadOnlyFlag(readonlyProp, readOnlyProp)
+  const isReadOnly = readOnly
   const effectiveId = id ?? formItemControl?.id
   const effectiveName = name ?? formItemControl?.name
   const formBoundValue = formItemControl?.value

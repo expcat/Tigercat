@@ -134,10 +134,18 @@ export function resolveImageCompareAlt(alt: string | undefined, fallback: string
   return trimmed ? trimmed : fallback
 }
 
-/** Value text names the revealed side, not a bare percentage. */
-export function formatImageCompareValueText(template: string, position: number): string {
+/** Value text names the revealed side, not a bare percentage. Titles join when set. */
+export function formatImageCompareValueText(
+  template: string,
+  position: number,
+  titles?: { before?: string; after?: string }
+): string {
   const percent = String(Math.round(Number.isFinite(position) ? position : 0))
-  return template.replace('{percent}', percent)
+  const base = template.replace('{percent}', percent)
+  const before = titles?.before?.trim() ?? ''
+  const after = titles?.after?.trim() ?? ''
+  if (!before && !after) return base
+  return [before, base, after].filter((part) => part.length > 0).join(' ')
 }
 
 export function resolveImageCompareAriaLabel(label?: string): string | undefined {

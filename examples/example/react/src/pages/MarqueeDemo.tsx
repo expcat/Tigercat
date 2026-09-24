@@ -7,7 +7,7 @@ export default function MarqueeDemo() {
   return (
     <DemoPage
       title="Marquee 跑马灯"
-      description="循环滚动子内容。悬停或焦点在区域内时暂停，并遵循 prefers-reduced-motion。"
+      description="循环滚动子内容。可选边缘渐隐不接收点击。不传名字时不是地标。减少动效时暂停。"
       modules={modules}
     />
   )

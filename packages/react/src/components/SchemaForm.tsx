@@ -10,7 +10,9 @@ import React, {
 import {
   classNames,
   devWarn,
+  formatExportCell,
   getSchemaFormLabels,
+  narrowWidgetParams,
   mergeTigerLocale,
   type FormHandle,
   type FormRules,
@@ -80,19 +82,35 @@ function renderWidget(field: SchemaFormField): React.ReactNode {
   const type = resolveSchemaFormWidgetType(field)
   const disabled = field.disabled
   const placeholder = field.placeholder
+  const params = narrowWidgetParams(type ?? 'input', field.widgetParams)
   if (type === 'textarea') {
     return <Textarea placeholder={placeholder} disabled={disabled} />
   }
   if (type === 'number') {
     return (
-      <InputNumber placeholder={placeholder} disabled={disabled} min={field.min} max={field.max} />
+      <InputNumber
+        placeholder={placeholder}
+        disabled={disabled}
+        min={(params.min as number | undefined) ?? field.min}
+        max={(params.max as number | undefined) ?? field.max}
+        step={params.step as number | undefined}
+        precision={params.precision as number | undefined}
+      />
     )
   }
   if (type === 'password') {
     return <Input type="password" placeholder={placeholder} disabled={disabled} />
   }
   if (type === 'select') {
-    return <Select options={field.options ?? []} placeholder={placeholder} disabled={disabled} />
+    return (
+      <Select
+        options={field.options ?? []}
+        placeholder={placeholder}
+        disabled={disabled}
+        multiple={params.multiple === true}
+        searchable={params.showSearch === true}
+      />
+    )
   }
   if (type === 'checkbox') {
     return <Checkbox disabled={disabled} />
@@ -116,7 +134,14 @@ function renderWidget(field: SchemaFormField): React.ReactNode {
     return <TreeSelect treeData={field.treeData} placeholder={placeholder} disabled={disabled} />
   }
   if (type === 'slider') {
-    return <Slider disabled={disabled} min={field.min} max={field.max} />
+    return (
+      <Slider
+        disabled={disabled}
+        min={(params.min as number | undefined) ?? field.min}
+        max={(params.max as number | undefined) ?? field.max}
+        step={params.step as number | undefined}
+      />
+    )
   }
   if (type === 'upload') {
     return <Upload disabled={disabled} />
@@ -144,13 +169,26 @@ function SchemaFormFieldCell({
   field,
   columns,
   renderField,
-  fieldRules
+  fieldRules,
+  values
 }: {
   field: SchemaFormField
   columns: 1 | 2 | 3
   renderField?: (field: SchemaFormField) => React.ReactNode
   fieldRules?: FormRules
+  values?: FormValues
 }): React.ReactElement {
+  if (field.readOnly) {
+    return (
+      <div
+        className={getSchemaFormFieldSpanClasses(clampSchemaFormSpan(field.span, columns), columns)}
+        data-schema-field={field.name}
+        data-schema-readonly="">
+        {field.label ? <span>{field.label}</span> : null}
+        <span>{formatExportCell(values?.[field.name], values ?? {})}</span>
+      </div>
+    )
+  }
   const custom = renderField?.(field)
   const control = custom ?? renderWidget(field)
   return (
@@ -160,8 +198,8 @@ function SchemaFormFieldCell({
       <FormItem
         name={field.name}
         label={field.label}
-        required={field.disabled ? false : field.required}
-        rules={field.disabled ? undefined : fieldRules?.[field.name]}
+        required={field.disabled || field.readOnly ? false : field.required}
+        rules={field.disabled || field.readOnly ? undefined : fieldRules?.[field.name]}
         disabled={field.disabled}
         condition={field.condition}
         extra={field.extra}>
@@ -175,18 +213,20 @@ function SchemaFormGroupView({
   group,
   nested,
   renderField,
-  fieldRules
+  fieldRules,
+  values
 }: {
   group: SchemaFormLayoutGroup
   nested: boolean
   renderField?: (field: SchemaFormField) => React.ReactNode
   fieldRules?: FormRules
+  values?: FormValues
 }): React.ReactElement {
   return (
-    <section
+    <fieldset
       className={nested ? schemaFormNestedGroupClasses : schemaFormGroupClasses}
       data-schema-group={group.key}>
-      {group.title ? <h3 className={schemaFormGroupTitleClasses}>{group.title}</h3> : null}
+      {group.title ? <legend className={schemaFormGroupTitleClasses}>{group.title}</legend> : null}
       {group.description ? (
         <p className={schemaFormGroupDescriptionClasses}>{group.description}</p>
       ) : null}
@@ -199,6 +239,7 @@ function SchemaFormGroupView({
               columns={group.columns}
               renderField={renderField}
               fieldRules={fieldRules}
+              values={values}
             />
           ))}
         </div>
@@ -210,9 +251,10 @@ function SchemaFormGroupView({
           nested
           renderField={renderField}
           fieldRules={fieldRules}
+          values={values}
         />
       ))}
-    </section>
+    </fieldset>
   )
 }
 
@@ -379,6 +421,7 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
           nested={false}
           renderField={renderField}
           fieldRules={formRules}
+          values={formModel}
         />
       ))}
       {showActions ? (

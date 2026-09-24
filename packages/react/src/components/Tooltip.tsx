@@ -1,5 +1,7 @@
 import React, { forwardRef, useEffect, useId, useMemo } from 'react'
 import { usePopup } from '../utils/use-popup'
+import { TooltipDelayProvider, useTooltipDelayGroup } from '../utils/tooltip-delay'
+export { TooltipDelayProvider }
 import { renderOverlayPortal } from '../utils/overlay'
 import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 import {
@@ -9,6 +11,8 @@ import {
   getOverlayTriggerAria,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
+  getFloatingArrowStyle,
+  getPopconfirmArrowClasses,
   getTooltipContentClasses,
   type TooltipProps as CoreTooltipProps,
   type FloatingPlacement
@@ -50,6 +54,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
   forwardedRef
 ) {
   const tooltipId = `tiger-tooltip-${useId()}`
+  const delayGroup = useTooltipDelayGroup()
 
   const {
     currentVisible,
@@ -58,6 +63,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
     floatingRef,
     floatingStyles,
     floatingClasses,
+    actualPlacement,
     positioned,
     overlayTarget,
     triggerHandlers
@@ -70,7 +76,9 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
     offset,
     showDelay,
     hideDelay,
-    onOpenChange
+    onOpenChange,
+    getSkipShowDelay: () => delayGroup?.shouldSkip() ?? false,
+    onShown: () => delayGroup?.noteOpen()
   })
 
   useEffect(() => {
@@ -129,6 +137,11 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
             <div id={tooltipId} role="tooltip" className={contentClasses}>
               {content}
             </div>
+            <span
+              data-tiger-floating-arrow=""
+              className={getPopconfirmArrowClasses()}
+              style={getFloatingArrowStyle(actualPlacement)}
+            />
           </div>,
           overlayTarget
         )}

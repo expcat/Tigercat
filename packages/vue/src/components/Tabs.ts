@@ -10,6 +10,7 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
+  onUpdated,
   type VNode,
   type Component
 } from 'vue'
@@ -39,6 +40,8 @@ import {
   formatTabKey,
   parseTabKey,
   resolveDisplayedActiveKey,
+  navLabels,
+  splitOverflowTabKeys,
   isTabPaneType,
   isTabPaneChildProps,
   readTabPaneKey,
@@ -57,6 +60,8 @@ import {
 import { closeIconPathD, closeIconViewBox } from '@expcat/tigercat-core/icons/common'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './ConfigProvider'
+import { Dropdown } from './Dropdown'
+import type { PopupMenuItem } from '@expcat/tigercat-core'
 
 export const TabsContextKey = Symbol('TabsContext')
 
@@ -69,6 +74,8 @@ export interface TabsContext {
   destroyInactiveTabPane: boolean
   lazy: boolean
   swipeable: boolean
+  activation: 'automatic' | 'manual'
+  overflowKeys: Array<string | number>
   idBase: string
   labels: Required<TigerLocaleTabs>
   handleTabClick: (key: string | number) => void
@@ -243,7 +250,7 @@ export const TabPane = defineComponent({
         isKeyActive(parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id, nextKey)
       )
       nextButton?.focus()
-      tabsContext.handleTabClick(nextKey)
+      if (tabsContext.activation !== 'manual') tabsContext.handleTabClick(nextKey)
     }
 
     return () => {
@@ -273,13 +280,15 @@ export const TabPane = defineComponent({
                   ? 0
                   : -1,
             'data-tiger-tabs-id': tabsContext.idBase,
+            hidden:
+              tabsContext.overflowKeys.some((key) => isKeyActive(key, props.tabKey)) || undefined,
             'data-tiger-tab-key': formatTabKey(props.tabKey),
             onClick: handleClick,
             onKeydown: handleKeydown
           },
           [
             props.icon && h('span', { class: 'flex items-center' }, props.icon),
-            h('span', { 'aria-hidden': 'true' }, props.label),
+            h('span', { 'aria-hidden': 'true' }, slots.label?.() ?? props.label),
             isClosable.value &&
               h(
                 'span',
@@ -356,6 +365,11 @@ export const Tabs = defineComponent({
       type: String as PropType<TabSize>,
       default: 'md' as TabSize
     },
+    activation: {
+      type: String as PropType<'automatic' | 'manual'>,
+      default: 'automatic'
+    },
+    reorderable: { type: Boolean, default: false },
     closable: {
       type: Boolean,
       default: false
@@ -404,6 +418,8 @@ export const Tabs = defineComponent({
     const internalActiveKey = ref<string | number | undefined>(props.defaultActiveKey)
     const swipeStart = ref<ReturnType<typeof getGestureTouchPoint> | null>(null)
     const tabListEl = ref<HTMLElement | null>(null)
+    const overflowKeys = ref<Array<string | number>>([])
+    const tabWidthCache = new Map<string, number>()
     const indicatorBox = ref<TabIndicatorStyle>({ opacity: '0' })
     let lastTabRecords: TabRecord[] = []
     let resizeObserver: ResizeObserver | null = null
@@ -428,6 +444,31 @@ export const Tabs = defineComponent({
       emit('edit', { targetKey: key, action: 'remove' })
     }
 
+    const measureOverflow = () => {
+      const list = tabListEl.value
+      if (!list) return
+      const buttons = Array.from(list.querySelectorAll<HTMLElement>('[role="tab"]'))
+      const keys = buttons.map(
+        (button) => parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id
+      )
+      const widths = buttons.map((button, index) => {
+        const measured = button.getBoundingClientRect().width
+        const cacheKey = String(keys[index])
+        if (measured > 0) tabWidthCache.set(cacheKey, measured)
+        return tabWidthCache.get(cacheKey) ?? measured
+      })
+      const split = splitOverflowTabKeys({
+        keys,
+        widths,
+        available: list.getBoundingClientRect().width,
+        activeKey: currentActiveKey.value
+      })
+      const same =
+        overflowKeys.value.length === split.overflow.length &&
+        overflowKeys.value.every((key, index) => String(key) === String(split.overflow[index]))
+      if (!same) overflowKeys.value = split.overflow
+    }
+
     const updateIndicator = () => {
       const list = tabListEl.value
       if (!list || props.type !== 'line') {
@@ -446,13 +487,19 @@ export const Tabs = defineComponent({
       resizeObserver?.disconnect()
       const list = tabListEl.value
       if (!list || typeof ResizeObserver === 'undefined') return
-      resizeObserver = new ResizeObserver(updateIndicator)
+      resizeObserver = new ResizeObserver(() => {
+        updateIndicator()
+        measureOverflow()
+      })
       resizeObserver.observe(list)
       Array.from(list.querySelectorAll('[role="tab"]')).forEach((node) =>
         resizeObserver?.observe(node)
       )
       updateIndicator()
+      measureOverflow()
     }
+
+    onUpdated(measureOverflow)
 
     onMounted(bindIndicatorObserver)
     onBeforeUnmount(() => resizeObserver?.disconnect())
@@ -513,6 +560,12 @@ export const Tabs = defineComponent({
       },
       get swipeable() {
         return props.swipeable
+      },
+      get activation() {
+        return props.activation
+      },
+      get overflowKeys() {
+        return overflowKeys.value
       },
       idBase,
       get labels() {
@@ -627,6 +680,20 @@ export const Tabs = defineComponent({
             ...tabItems
           ]
         ),
+        overflowKeys.value.length > 0
+          ? h(
+              Dropdown,
+              {
+                items: overflowKeys.value.map((key) => ({
+                  key,
+                  label:
+                    tabRecords.find((record) => isKeyActive(record.key, key))?.label ?? String(key)
+                })),
+                onSelect: (item: PopupMenuItem) => handleTabClick(item.key)
+              },
+              { default: () => navLabels.moreTabs }
+            )
+          : null,
         ...tabRecords
           .filter((tab) => tab.closable && !tab.disabled)
           .map((tab) =>

@@ -65,11 +65,15 @@ import {
   resolveLocaleText,
   mergeTigerLocale,
   getSelectLabels,
+  getW9FormLabels,
+  collapsedTagSummary,
   normalizeSelectValue,
   pruneCreatedSelectOptions,
   rememberSelectOptions,
   resolveSelectDisplayText,
   commitSelectOption,
+  normalizeSelectOptions,
+  selectAllSelectValues,
   clearSelectValue,
   getSelectSelectedValues,
   getSelectTriggerKeyIntent,
@@ -82,6 +86,7 @@ import {
   serializeSelectFormValues,
   coerceSelectFormValue,
   type SelectOption,
+  type SelectOptionFields,
   type SelectOptions,
   type ComponentSize,
   type SelectModelValue,
@@ -195,6 +200,9 @@ export const Select = defineComponent({
     clearable: { type: Boolean, default: true },
     emptyText: { type: String, default: undefined },
     maxTagCount: { type: Number, default: undefined },
+    maxCount: { type: Number, default: undefined },
+    readOnly: Boolean,
+    optionFields: { type: Object as PropType<SelectOptionFields>, default: undefined },
     virtual: Boolean,
     remote: Boolean,
     searchDebounce: { type: Number, default: 0 },
@@ -225,12 +233,16 @@ export const Select = defineComponent({
     'blur'
   ],
   setup(props, { emit, attrs, slots, expose }) {
+    const sourceOptions = computed(() =>
+      normalizeSelectOptions(props.options, props.optionFields)
+    )
     const config = useTigerConfig()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
     const formItemControl = inject<VueFormItemControlContext | null>(
       FORM_ITEM_CONTROL_INJECTION_KEY,
       null
     )
+    const isReadOnly = computed(() => props.readOnly)
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getSelectLabels(mergedLocale.value, props.labels))
     const instanceId = useId()
@@ -240,7 +252,7 @@ export const Select = defineComponent({
     const localValue = ref<SelectModelValue>(
       normalizeSelectValue(
         props.modelValue ??
-          coerceSelectFormValue(formItemControl?.value.value, props.options, props.multiple) ??
+          coerceSelectFormValue(formItemControl?.value.value, sourceOptions.value, props.multiple) ??
           props.defaultValue ??
           (props.multiple ? [] : undefined),
         props.multiple,
@@ -271,7 +283,7 @@ export const Select = defineComponent({
       if (formItemControl?.name.value) {
         const coerced = coerceSelectFormValue(
           formItemControl.value.value,
-          props.options,
+          sourceOptions.value,
           props.multiple
         )
         return normalizeSelectValue(
@@ -297,7 +309,7 @@ export const Select = defineComponent({
         const next =
           model !== undefined
             ? model
-            : coerceSelectFormValue(formValue, props.options, props.multiple)
+            : coerceSelectFormValue(formValue, sourceOptions.value, props.multiple)
         if (next === undefined && !formItemControl?.name.value) return
         if (next === undefined) return
         localValue.value = normalizeSelectValue(next, props.multiple, false)
@@ -360,9 +372,9 @@ export const Select = defineComponent({
     }
 
     const liveCreated = computed(() =>
-      pruneCreatedSelectOptions(createdOptions.value, props.options)
+      pruneCreatedSelectOptions(createdOptions.value, sourceOptions.value)
     )
-    const optionSource = computed(() => withCreatedSelectOptions(props.options, liveCreated.value))
+    const optionSource = computed(() => withCreatedSelectOptions(sourceOptions.value, liveCreated.value))
     const filteredOptions = computed(() =>
       resolveSelectFilteredOptions(optionSource.value, searchQuery.value, {
         searchable: props.searchable,
@@ -371,7 +383,7 @@ export const Select = defineComponent({
       })
     )
     const creatableOption = computed(() =>
-      resolveCreatableSelectOption([...props.options, ...liveCreated.value], searchQuery.value, {
+      resolveCreatableSelectOption([...sourceOptions.value, ...liveCreated.value], searchQuery.value, {
         creatable: props.creatable && props.searchable
       })
     )
@@ -391,16 +403,22 @@ export const Select = defineComponent({
       }
       return labels.value.createOptionLabel
     })
+    watch(
+      [sourceOptions, liveCreated, selectedValues],
+      () => {
+        optionCache.value = rememberSelectOptions(
+          optionCache.value,
+          [...flattenSelectOptions(sourceOptions.value), ...liveCreated.value],
+          selectedValues.value
+        )
+      },
+      { immediate: true }
+    )
     const displayText = computed(() => {
-      optionCache.value = rememberSelectOptions(
-        optionCache.value,
-        [...flattenSelectOptions(props.options), ...liveCreated.value],
-        selectedValues.value
-      )
       return resolveSelectDisplayText({
         value: selected.value,
         multiple: props.multiple,
-        options: props.options,
+        options: sourceOptions.value,
         createdOptions: liveCreated.value,
         optionCache: optionCache.value,
         placeholder: placeholderText.value,
@@ -411,7 +429,7 @@ export const Select = defineComponent({
     const showClear = computed(() =>
       shouldShowSelectClear({
         clearable: props.clearable,
-        disabled: effectiveDisabled.value,
+        disabled: effectiveDisabled.value || isReadOnly.value,
         value: selected.value,
         multiple: props.multiple
       })
@@ -436,7 +454,7 @@ export const Select = defineComponent({
     }
 
     function selectOption(option: SelectOption) {
-      if (option.disabled || effectiveDisabled.value) return
+      if (option.disabled || effectiveDisabled.value || isReadOnly.value) return
       if (creatableOption.value && option.value === creatableOption.value.value) {
         if (!createdOptions.value.some((item) => item.value === option.value)) {
           createdOptions.value = [...createdOptions.value, option]
@@ -446,7 +464,9 @@ export const Select = defineComponent({
       const next = commitSelectOption({
         option,
         value: selected.value,
-        multiple: props.multiple
+        multiple: props.multiple,
+        maxCount: props.maxCount,
+        readOnly: isReadOnly.value
       })
       setSelected(next)
       if (props.multiple) {
@@ -679,7 +699,16 @@ export const Select = defineComponent({
         },
         custom ?? [
           h('span', { class: 'flex items-center justify-between w-full gap-2' }, [
-            h('span', { class: 'truncate' }, displayLabel),
+            h('span', { class: 'min-w-0' }, [
+              h('span', { class: 'block truncate' }, displayLabel),
+              option.description
+                ? h(
+                    'span',
+                    { class: 'block truncate text-xs text-[var(--tiger-text-secondary)]' },
+                    option.description
+                  )
+                : null
+            ]),
             selectedOption ? iconVNode(checkSolidIcon20PathD, selectCheckIconClasses) : null
           ])
         ]
@@ -795,7 +824,7 @@ export const Select = defineComponent({
             props.multiple &&
             resolveSelectTags({
               value: selected.value,
-              options: props.options,
+              options: sourceOptions.value,
               createdOptions: liveCreated.value,
               optionCache: optionCache.value,
               maxTagCount: props.maxTagCount,
@@ -804,7 +833,7 @@ export const Select = defineComponent({
               ? h('span', { class: selectTagListClasses }, [
                   ...resolveSelectTags({
                     value: selected.value,
-                    options: props.options,
+                    options: sourceOptions.value,
                     createdOptions: liveCreated.value,
                     optionCache: optionCache.value,
                     maxTagCount: props.maxTagCount,
@@ -822,6 +851,7 @@ export const Select = defineComponent({
                           onMousedown: (event: MouseEvent) => event.preventDefault(),
                           onClick: (event: MouseEvent) => {
                             event.stopPropagation()
+                            if (isReadOnly.value) return
                             setSelected(removeSelectValue(selected.value, tag.value))
                           }
                         },
@@ -831,7 +861,7 @@ export const Select = defineComponent({
                   ),
                   ...(resolveSelectTags({
                     value: selected.value,
-                    options: props.options,
+                    options: sourceOptions.value,
                     createdOptions: liveCreated.value,
                     optionCache: optionCache.value,
                     maxTagCount: props.maxTagCount,
@@ -844,21 +874,33 @@ export const Select = defineComponent({
                             class: selectTagClasses,
                             'aria-label': resolveSelectTags({
                               value: selected.value,
-                              options: props.options,
+                              options: sourceOptions.value,
                               createdOptions: liveCreated.value,
                               optionCache: optionCache.value,
                               maxTagCount: props.maxTagCount,
                               moreCountText: labels.value.moreCountText
                             }).collapsedLabel
                           },
-                          resolveSelectTags({
-                            value: selected.value,
-                            options: props.options,
-                            createdOptions: liveCreated.value,
-                            optionCache: optionCache.value,
-                            maxTagCount: props.maxTagCount,
-                            moreCountText: labels.value.moreCountText
-                          }).collapsedLabel
+                          slots.maxTagPlaceholder?.({
+                            items: resolveSelectTags({
+                              value: selected.value,
+                              options: sourceOptions.value,
+                              createdOptions: liveCreated.value,
+                              optionCache: optionCache.value,
+                              maxTagCount: props.maxTagCount,
+                              moreCountText: labels.value.moreCountText
+                            }).collapsedItems
+                          }) ??
+                            collapsedTagSummary(
+                              resolveSelectTags({
+                                value: selected.value,
+                                options: sourceOptions.value,
+                                createdOptions: liveCreated.value,
+                                optionCache: optionCache.value,
+                                maxTagCount: props.maxTagCount,
+                                moreCountText: labels.value.moreCountText
+                              }).collapsedItems
+                            )
                         )
                       ]
                     : [])
@@ -969,7 +1011,35 @@ export const Select = defineComponent({
                 onMousedown: (event: MouseEvent) => event.preventDefault(),
                 onFocusout: handleFocusOut
               },
-              [listNode]
+              [
+                slots.header?.(),
+                props.multiple
+                  ? h(
+                      'button',
+                      {
+                        type: 'button',
+                        class:
+                          'w-full px-3 py-2 text-start text-sm text-[var(--tiger-primary)] hover:bg-[var(--tiger-outline-bg-hover)]',
+                        'data-tiger-select-all': '',
+                        disabled: isReadOnly.value || undefined,
+                        onClick: () => {
+                          if (isReadOnly.value) return
+                          setSelected(
+                            selectAllSelectValues({
+                              value: selected.value,
+                              options: filteredOptions.value,
+                              maxCount: props.maxCount,
+                              readOnly: isReadOnly.value
+                            })
+                          )
+                        }
+                      },
+                      getW9FormLabels(mergedLocale.value.locale).selectAll
+                    )
+                  : null,
+                hasOptions ? listNode : slots.empty?.() ?? listNode,
+                slots.footer?.()
+              ]
             ),
             overlay.target.value
           )

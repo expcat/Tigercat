@@ -24,7 +24,7 @@ export const Container = defineComponent({
     },
     maxWidth: {
       type: [String, Boolean] as PropType<ContainerMaxWidth>,
-      default: false
+      default: 'lg' as ContainerMaxWidth
     },
     center: {
       type: Boolean,

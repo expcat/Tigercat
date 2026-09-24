@@ -36,7 +36,7 @@ describe('InputNumber (Vue)', () => {
       })
       expect(getInput(disabled).disabled).toBe(true)
       const { container: readonly } = render(InputNumber, {
-        props: { readonly: true, modelValue: 5 }
+        props: { readOnly: true, modelValue: 5 }
       })
       expect(getInput(readonly).readOnly).toBe(true)
     })

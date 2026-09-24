@@ -3,7 +3,14 @@
  * Shared styles and helpers for Menu components
  */
 
-import type { MenuFilterMode, MenuItem, MenuKey, MenuMode, MenuTheme } from '../types/menu'
+import type {
+  MenuFilterMode,
+  MenuItem,
+  MenuKey,
+  MenuMode,
+  MenuSchemaBadge,
+  MenuTheme
+} from '../types/menu'
 import { typedKeyId } from './focus-utils'
 import { getIconDefinition } from './icons/registry'
 import { prefersReducedMotion } from './transition'
@@ -486,6 +493,26 @@ export function resolveMenuIconKind(icon: unknown): MenuIconKind {
     return getIconDefinition(icon) ? 'name' : 'none'
   }
   return 'node'
+}
+
+export function menuCollapsedTooltip(collapsed: boolean, label: string | null | undefined): string | null {
+  if (!collapsed) return null
+  const text = label?.trim()
+  return text ? text : null
+}
+
+export function normalizeMenuItemBadge(
+  badge: MenuSchemaBadge | undefined
+): { content?: string | number; type?: 'dot' | 'number' | 'text'; variant?: string } | null {
+  if (badge == null || badge === '') return null
+  if (typeof badge === 'string' || typeof badge === 'number') {
+    return { content: badge, type: typeof badge === 'number' ? 'number' : 'text' }
+  }
+  return {
+    content: badge.content,
+    type: badge.type ?? (typeof badge.content === 'number' ? 'number' : 'text'),
+    variant: badge.variant
+  }
 }
 
 export function getMenuCollapsedInitial(text: string | null | undefined): string | null {

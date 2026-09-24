@@ -84,6 +84,25 @@ export interface WatermarkProps {
   font?: WatermarkFont
 
   /**
+   * Extra row spacing in px, applied as a CSS variable. Does not redraw the tile.
+   * @default 0
+   */
+  rowGap?: number
+
+  /**
+   * How tightly tiles repeat. `1` is the encoded tile; larger values pack tighter.
+   * CSS only.
+   * @default 1
+   */
+  density?: number
+
+  /**
+   * Whether the tile stays visible when printing.
+   * @default true
+   */
+  printVisible?: boolean
+
+  /**
    * Additional CSS class name
    */
   className?: string

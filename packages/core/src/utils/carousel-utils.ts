@@ -335,6 +335,22 @@ export function getCarouselLoopTarget(
  * not force LTR and does not flip the sign. The next page sits at the inline
  * end and enters along the reading direction.
  */
+export function getCarouselSlidesPerView(perView: number | undefined, total: number): number {
+  if (!Number.isFinite(perView) || (perView ?? 0) < 1) return 1
+  return Math.min(total || 1, Math.floor(perView as number))
+}
+
+export function getCarouselAxisTransform(
+  displayIndex: number,
+  axis: 'horizontal' | 'vertical' = 'horizontal',
+  perView = 1
+): string {
+  const span = Math.max(1, perView)
+  const offset = (displayIndex * 100) / span
+  if (axis === 'vertical') return `translate3d(0, ${-offset}%, 0)`
+  return `translate3d(${-offset}%, 0, 0)`
+}
+
 export function getScrollTransform(displayIndex: number, _dir?: string | null): string {
   const offset = (Number.isFinite(displayIndex) ? displayIndex : 0) * 100
   return `translateX(-${offset}%)`

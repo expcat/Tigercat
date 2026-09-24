@@ -110,4 +110,15 @@ export interface ProgressProps {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Bar animates without a known value. An explicit success status still fills to 100.
+   * @default false
+   */
+  indeterminate?: boolean
+
+  /**
+   * Render this many segments instead of one continuous bar.
+   */
+  steps?: number
 }

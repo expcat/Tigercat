@@ -10,11 +10,11 @@ function eventIso(value: Date | string): string | null {
 const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
-export function getCalendarContainerClasses(fullscreen: boolean): string {
+export function getCalendarContainerClasses(_fullscreen?: boolean): string {
   return classNames(
     'bg-[var(--tiger-surface)]',
     'border border-[var(--tiger-border)]',
-    fullscreen ? 'w-full p-4' : 'w-72 p-3',
+    'w-72 p-3',
     'rounded-[var(--tiger-radius-md)]'
   )
 }

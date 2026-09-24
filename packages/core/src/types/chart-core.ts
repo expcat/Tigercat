@@ -356,6 +356,11 @@ export interface ChartLegendItem {
   color: string
 
   /**
+   * Hidden by a legend click. The mark stays in keyboard order and in the total.
+   */
+  hidden?: boolean
+
+  /**
    * Visual highlight (full opacity). Not pressed.
    */
   active?: boolean

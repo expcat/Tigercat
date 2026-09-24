@@ -18,6 +18,9 @@ import {
   getBreadcrumbLinkClasses,
   getBreadcrumbSeparatorClasses,
   getBreadcrumbSlots,
+  getBreadcrumbCollapsedItems,
+  breadcrumbCollapsedMenuItems,
+  resolveLinkHref,
   getSeparatorKind,
   getSeparatorContent,
   resolveBreadcrumbItemCurrent,
@@ -205,7 +208,8 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     const hasExtra = Boolean(extra)
     const containerClasses = classNames(breadcrumbContainerClasses, hasExtra && 'w-full', className)
     const contextValue = useMemo<BreadcrumbContextValue>(() => ({ separator }), [separator])
-    const slots = getBreadcrumbSlots(items.length, maxItems, expanded)
+    const slots = getBreadcrumbSlots(items.length, maxItems, false)
+    const collapsed = getBreadcrumbCollapsedItems(items.length, maxItems ?? items.length).collapsed
 
     const rendered = slots.map((slot, index) => {
       const nodes: React.ReactNode[] = []
@@ -217,9 +221,34 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
               className={breadcrumbEllipsisClasses}
               aria-label={labels.expandAriaLabel}
               aria-expanded={expanded}
-              onClick={() => setExpanded(true)}>
+              aria-haspopup="menu"
+              onClick={() => setExpanded((open) => !open)}>
               ...
             </button>
+            {expanded ? (
+              <div role="menu" data-tiger-breadcrumb-menu="">
+                {breadcrumbCollapsedMenuItems(
+                  collapsed.map((itemIndex) => {
+                    const child = items[itemIndex]
+                    const href =
+                      React.isValidElement(child) && typeof (child.props as { href?: string }).href === 'string'
+                        ? (child.props as { href?: string }).href
+                        : undefined
+                    const text =
+                      React.isValidElement(child) &&
+                      (typeof (child.props as { children?: unknown }).children === 'string' ||
+                        typeof (child.props as { children?: unknown }).children === 'number')
+                        ? String((child.props as { children?: unknown }).children)
+                        : ''
+                    return { key: itemIndex, label: text || href || String(itemIndex), href }
+                  })
+                ).map((entry) => (
+                  <a key={entry.key} role="menuitem" href={resolveLinkHref(entry.href)}>
+                    {entry.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
             {index !== slots.length - 1 ? <SeparatorMark separator={separator} /> : null}
           </li>
         )

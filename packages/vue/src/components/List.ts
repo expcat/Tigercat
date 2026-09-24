@@ -290,9 +290,23 @@ export const List = defineComponent({
         draggable: _d,
         ...dragRest
       } = bindings as Record<string, unknown>
-      const body = slots.renderItem
-        ? slots.renderItem({ item, index: sourceIndex })
-        : renderDefault(item)
+      const body = slots.item
+        ? slots.item({ item, index: sourceIndex })
+        : slots.renderItem
+          ? slots.renderItem({ item, index: sourceIndex })
+          : slots.meta
+            ? slots.meta({ item, index: sourceIndex })
+            : renderDefault(item)
+      const actions = slots.actions
+        ? h(
+            'div',
+            {
+              'data-tiger-list-actions': '',
+              onClick: (event: Event) => event.stopPropagation()
+            },
+            slots.actions({ item, index: sourceIndex })
+          )
+        : null
 
       return h(
         'li',
@@ -349,12 +363,19 @@ export const List = defineComponent({
                 },
                 body
               )
-            : body
+            : body,
+          actions
         ]
       )
     }
 
     function renderItems() {
+      if (props.dataSource.length > 0 && slots.default) {
+        devWarn(
+          'List.children',
+          '[Tigercat] List received both dataSource and children. Children are ignored.'
+        )
+      }
       if (props.virtual && props.grid) {
         devWarn('List.virtualGrid', 'List: `virtual` is ignored when `grid` is set.')
       }
@@ -462,7 +483,8 @@ export const List = defineComponent({
           h('div', { class: 'relative', 'aria-busy': props.loading || undefined }, [
             renderItems(),
             props.loading
-              ? h('div', { class: listLoadingOverlayClasses }, [
+              ? h('div', { class: listLoadingOverlayClasses, 'data-tiger-list-skeleton': '', 'aria-hidden': 'true' }, [
+                  h('div', { class: 'h-8 animate-pulse rounded bg-neutral-200' }),
                   h(Loading, { variant: 'spinner', 'aria-hidden': true, role: 'presentation' })
                 ])
               : null

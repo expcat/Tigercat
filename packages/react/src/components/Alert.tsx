@@ -34,6 +34,7 @@ export interface AlertProps
    * Alert content (React children). Rendered even when `title` is set.
    */
   children?: React.ReactNode
+  action?: React.ReactNode
 
   /**
    * Custom title content (overrides title prop)
@@ -68,6 +69,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
     showCountdown = false,
     className,
     children,
+    action,
     titleSlot,
     descriptionSlot,
     onClose,
@@ -178,7 +180,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   const hasTitle = !!(title || titleSlot)
   const hasDescription = !!(description || descriptionSlot)
   const hasChildren = children != null && children !== false
-  const hasContent = hasTitle || hasDescription || hasChildren
+  const hasContent = hasTitle || hasDescription || hasChildren || action != null
   const live = resolveAlertLive(type, hasContent, inserted)
   const role = roleProp ?? live.role
 
@@ -210,6 +212,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
           {hasDescription && (
             <div className={descriptionClasses}>{descriptionSlot || description}</div>
           )}
+          {action ? <div data-tiger-alert-action="">{action}</div> : null}
           {hasChildren && (
             <div className={hasTitle || hasDescription ? descriptionClasses : titleClasses}>
               {children}

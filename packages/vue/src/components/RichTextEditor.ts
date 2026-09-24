@@ -12,7 +12,12 @@ import {
 import {
   classNames,
   coerceClassValue,
+  applyMarkdownShortcut,
   getRichTextContainerClasses,
+  getW9DataLabels,
+  serializeRichText,
+  setRichTextImageWidth,
+  slashInsertBlock,
   getToolbarButtonClasses,
   getEditorAreaClasses,
   richTextToolbarClasses,
@@ -85,6 +90,7 @@ export const RichTextEditor = defineComponent({
       default: 300
     },
     readOnly: { type: Boolean, default: false },
+    bind: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     labels: { type: Object as PropType<Partial<TigerLocaleRichTextEditor>>, default: undefined },
@@ -109,6 +115,7 @@ export const RichTextEditor = defineComponent({
       null
     )
     const editorRef = ref<HTMLDivElement | null>(null)
+    const blocks = ref<ReturnType<typeof slashInsertBlock>[]>([])
     const internalValue = ref(props.defaultValue || '')
     const activeFormats = ref<Set<string>>(new Set())
     const toolbarIndex = ref(0)
@@ -407,7 +414,46 @@ export const RichTextEditor = defineComponent({
           style: containerStyle.value,
           'data-tiger-rte': ''
         },
-        [toolbarEl, urlForm, editorWrapper]
+        [
+          props.bind
+            ? h('div', { 'data-tiger-rte-bind': '' }, [
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    'data-tiger-slash': 'table',
+                    onClick: () => {
+                      blocks.value = [...blocks.value, slashInsertBlock('table')]
+                    }
+                  },
+                  'table'
+                ),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    'data-tiger-slash': 'image',
+                    onClick: () => {
+                      blocks.value = [
+                        ...blocks.value,
+                        setRichTextImageWidth(slashInsertBlock('image'), 120)
+                      ]
+                    }
+                  },
+                  'image'
+                ),
+                h('pre', { 'data-tiger-rte-serial': '' }, serializeRichText(blocks.value)),
+                h(
+                  'span',
+                  { 'data-shortcut': applyMarkdownShortcut('# Title')?.type ?? '' },
+                  getW9DataLabels().preview
+                )
+              ])
+            : null,
+          toolbarEl,
+          urlForm,
+          editorWrapper
+        ]
       )
     }
   }

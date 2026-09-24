@@ -5,7 +5,10 @@ import {
   classNames,
   createDocumentDragSession,
   defaultResizeHandles,
+  feedbackLayoutLabels,
   formatResizableHandleLabel,
+  formatResizableLiveText,
+  resolveResizableAspectRatio,
   getResizableHandleClasses,
   getResizeHandleOrientation,
   getResizeKeyboardDelta,
@@ -195,7 +198,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
             axis,
             {
               rtl,
-              lockAspectRatio,
+              lockAspectRatio: lockAspectRatio === true || typeof lockAspectRatio === 'string',
+              aspectRatio: resolveResizableAspectRatio(lockAspectRatio, drag.startW, drag.startH),
               minWidth,
               minHeight,
               maxWidth,
@@ -226,7 +230,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
                   axis,
                   {
                     rtl,
-                    lockAspectRatio,
+                    lockAspectRatio: lockAspectRatio === true || typeof lockAspectRatio === 'string',
+                    aspectRatio: resolveResizableAspectRatio(lockAspectRatio, drag.startW, drag.startH),
                     minWidth,
                     minHeight,
                     maxWidth,
@@ -273,7 +278,8 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       const box = measureBox()
       const jumped = applyResizeJump(e.key, handle, box.width, box.height, axis, {
         rtl,
-        lockAspectRatio,
+        lockAspectRatio: lockAspectRatio === true || typeof lockAspectRatio === 'string',
+        aspectRatio: resolveResizableAspectRatio(lockAspectRatio, box.width, box.height),
         minWidth,
         minHeight,
         maxWidth,
@@ -294,7 +300,15 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
         delta.deltaX,
         delta.deltaY,
         axis,
-        { rtl, lockAspectRatio, minWidth, minHeight, maxWidth, maxHeight }
+        {
+          rtl,
+          lockAspectRatio: lockAspectRatio === true || typeof lockAspectRatio === 'string',
+          aspectRatio: resolveResizableAspectRatio(lockAspectRatio, box.width, box.height),
+          minWidth,
+          minHeight,
+          maxWidth,
+          maxHeight
+        }
       )
       commitSize(next, handle, box.width, box.height, offset.x, offset.y, 'keyboard')
     },
@@ -333,6 +347,11 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       data-resizable=""
       aria-label={typeof ariaLabel === 'string' ? ariaLabel : undefined}
       aria-labelledby={typeof ariaLabelledby === 'string' ? ariaLabelledby : undefined}>
+      {draggingHandle ? (
+        <span aria-live="polite" data-tiger-resizable-live="">
+          {formatResizableLiveText(width ?? 0, height ?? 0, feedbackLayoutLabels.resizableLive)}
+        </span>
+      ) : null}
       {children}
       {visibleHandles.map((pos) => {
         const usesHeight = pos === 'top' || pos === 'bottom'

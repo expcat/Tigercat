@@ -7,6 +7,8 @@ import {
   COMPOSITE_LIST_VIEWPORT,
   compositeListUsesWindow,
   createInfiniteScrollFlight,
+  groupActivityByDate,
+  latestActivityAnnouncement,
   createInfiniteScrollObserver,
   flattenCompositeGroupRows,
   formatActivityTime,
@@ -160,6 +162,7 @@ export const ActivityFeed = defineComponent({
     timeZone: { type: String, default: undefined },
     hasMore: { type: Boolean, default: false },
     loadError: { type: Boolean, default: false },
+    groupByDate: { type: Boolean, default: false },
     showGroupTitle: {
       type: Boolean,
       default: true
@@ -207,6 +210,15 @@ export const ActivityFeed = defineComponent({
       }
     )
     const announcement = ref('')
+    watch(
+      () => props.items,
+      (items) => {
+        if (!props.groupByDate) return
+        const text = latestActivityAnnouncement(items)
+        if (text) announcement.value = text
+      },
+      { immediate: true }
+    )
     const seenIds = ref<Set<string> | null>(null)
 
     const resolvedGroups = computed(() =>
@@ -513,6 +525,40 @@ export const ActivityFeed = defineComponent({
         },
         [
           liveRegion(),
+          props.groupByDate
+            ? h(
+                'div',
+                { 'data-tiger-activity-dates': '' },
+                groupActivityByDate(props.items).map((group) =>
+                  h('section', { key: group.title }, [
+                    h('h3', { 'data-activity-date': group.title }, group.title)
+                  ])
+                )
+              )
+            : null,
+          props.groupByDate
+            ? h(
+                'button',
+                {
+                  type: 'button',
+                  'data-tiger-next-page': '',
+                  onClick: () => {
+                    if (
+                      !flight.canRequest({
+                        hasMore: props.hasMore,
+                        loading: props.loading,
+                        error: props.loadError
+                      })
+                    ) {
+                      return
+                    }
+                    flight.begin(undefined)
+                    emit('load-more')
+                  }
+                },
+                'next'
+              )
+            : null,
           props.loading
             ? h(
                 'p',

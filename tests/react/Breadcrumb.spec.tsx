@@ -227,13 +227,13 @@ describe('Breadcrumb', () => {
       expect(screen.queryByText('A')).not.toBeInTheDocument()
     })
 
-    it('expands all items when the ellipsis is clicked', async () => {
+    it('opens collapsed items in a menu and can collapse again', async () => {
       const user = userEvent.setup()
       const { container } = renderItems(3)
       await user.click(ellipsis(container)!)
-      expect(screen.getByText('A')).toBeInTheDocument()
-      expect(screen.getByText('B')).toBeInTheDocument()
-      expect(ellipsis(container)).toBeNull()
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+      await user.click(ellipsis(container)!)
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument()
     })
 
     it('does not collapse when maxItems is >= the item count', () => {

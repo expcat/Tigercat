@@ -25,13 +25,19 @@ import {
   tableRowDragHandleClasses,
   tableRowKeyId,
   tableVirtualSpacerCellClasses,
+  isVirtualTableCellControlTarget,
+  resolveCellSpan,
   type TableVirtualWindow,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { Checkbox } from '../Checkbox'
+import { Empty } from '../Empty'
 import { Radio } from '../Radio'
 import { ExpandIcon } from './icons'
 import type { TableContext, TableInternalProps } from './types'
+import { Input } from '../Input'
+import { InputNumber } from '../InputNumber'
+import { Select } from '../Select'
 
 export function renderTableBody(
   ctx: TableContext,
@@ -51,7 +57,18 @@ export function renderTableBody(
     expand: resolveTableExpandSlot(props.expandable)
   })
   if (props.loading) {
-    return null
+    return h('tbody', { 'aria-hidden': 'true' }, [
+      h('tr', { tabindex: -1 }, [
+        h(
+          'td',
+          {
+            colspan: ctx.totalColumnCount.value,
+            class: 'animate-pulse'
+          },
+          '\u00a0'
+        )
+      ])
+    ])
   }
 
   if (ctx.paginatedData.value.length === 0) {
@@ -64,14 +81,10 @@ export function renderTableBody(
             class: tableEmptyStateClasses
           },
           [
-            h(
-              'div',
-              {
-                role: 'status',
-                'aria-live': 'polite'
-              },
-              props.emptyText
-            )
+            h(Empty, {
+              description: props.emptyText,
+              showImage: false
+            })
           ]
         )
       ])
@@ -101,6 +114,7 @@ export function renderTableBody(
   }
 
   function handleBodyClick(event: MouseEvent) {
+    if (isVirtualTableCellControlTarget(event.target)) return
     const row = getDelegatedRow(event)
     if (!row) return
     ctx.handleRowClick(row.record, row.index, row.key)
@@ -213,7 +227,10 @@ export function renderTableBody(
 
     cells.push(...chrome.leading.map((slot) => chromeTd(slot)))
 
-    ctx.displayColumns.value.forEach((column) => {
+    const bodyColumns =
+      (props as TableInternalProps & { renderedColumns?: TableInternalProps['columns'] })
+        .renderedColumns ?? ctx.displayColumns.value
+    bodyColumns.forEach((column) => {
       const dataKey = column.dataKey || column.key
       const cellValue = record[dataKey]
 
@@ -244,26 +261,54 @@ export function renderTableBody(
         ctx.editingCell.value?.columnKey === column.key
       const isEditableCell = ctx.isCellEditable(column.key, sourceIndex)
 
+      const editorEvents = {
+        onBlur: () => ctx.commitEdit(),
+        onKeydown: (e: KeyboardEvent) => {
+          if (e.key === 'Enter') ctx.commitEdit()
+          if (isEscapeKey(e)) {
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+            ctx.cancelEdit()
+          }
+        }
+      }
       const cellContent = isEditing
-        ? h('input', {
-            type: 'text',
-            class: editableCellInputClasses,
-            value: ctx.editingValue.value,
-            autofocus: true,
-            onInput: (e: Event) => {
-              ctx.editingValue.value = (e.target as HTMLInputElement).value
-            },
-            onBlur: () => ctx.commitEdit(),
-            onKeydown: (e: KeyboardEvent) => {
-              if (e.key === 'Enter') ctx.commitEdit()
-              if (isEscapeKey(e)) {
-                e.preventDefault()
-                e.stopPropagation()
-                e.stopImmediatePropagation()
-                ctx.cancelEdit()
-              }
-            }
-          })
+        ? column.edit === 'number'
+          ? h(InputNumber, {
+              modelValue: Number(ctx.editingValue.value),
+              'onUpdate:modelValue': (value: number | null) => {
+                ctx.editingValue.value = value == null ? '' : String(value)
+              },
+              ...editorEvents
+            })
+          : column.edit === 'select'
+            ? h(Select, {
+                modelValue: ctx.editingValue.value,
+                options: column.editOptions ?? [],
+                'onUpdate:modelValue': (value: string | number | undefined) => {
+                  ctx.editingValue.value = value == null ? '' : String(value)
+                },
+                ...editorEvents
+              })
+            : column.edit === 'text'
+              ? h(Input, {
+                  modelValue: ctx.editingValue.value,
+                  'onUpdate:modelValue': (value: string) => {
+                    ctx.editingValue.value = value
+                  },
+                  ...editorEvents
+                })
+              : h('input', {
+                  type: 'text',
+                  class: editableCellInputClasses,
+                  value: ctx.editingValue.value,
+                  autofocus: true,
+                  onInput: (e: Event) => {
+                    ctx.editingValue.value = (e.target as HTMLInputElement).value
+                  },
+                  ...editorEvents
+                })
         : (slots[`cell-${column.key}`]?.({ record, index: sourceIndex }) ??
           (column.render ? (column.render(record, sourceIndex) as string) : (cellValue as string)))
 
@@ -272,6 +317,14 @@ export function renderTableBody(
           'td',
           {
             key: column.key,
+            rowspan:
+              resolveCellSpan(column.rowSpan, record, sourceIndex) !== 1
+                ? resolveCellSpan(column.rowSpan, record, sourceIndex)
+                : undefined,
+            colspan:
+              resolveCellSpan(column.colSpan, record, sourceIndex) !== 1
+                ? resolveCellSpan(column.colSpan, record, sourceIndex)
+                : undefined,
             class: classNames(
               getTableCellClasses(props.size, column.align || 'left', column.className),
               stickyCellClass,
@@ -298,6 +351,7 @@ export function renderTableBody(
               class: tableRowDragHandleClasses,
               draggable: 'true',
               'aria-label': formatTableSelectRowAriaLabel(labels.dragRowAriaLabel, index + 1),
+              'data-tiger-row-drag-handle': '',
               onDragstart: (event: DragEvent) => {
                 event.stopPropagation()
                 ctx.handleRowDragStart(key)
@@ -322,7 +376,16 @@ export function renderTableBody(
         ),
         'aria-selected': props.rowSelection ? isSelected : undefined,
         'data-tiger-table-page-index': index,
-        tabindex: hasRowControls ? undefined : index === (props.activeRowIndex ?? 0) ? 0 : -1,
+        style: props.virtualWindow
+          ? { minHeight: `${props.virtualItemHeight}px`, height: `${props.virtualItemHeight}px` }
+          : undefined,
+        tabindex: props.grid
+          ? -1
+          : hasRowControls
+            ? undefined
+            : index === (props.activeRowIndex ?? 0)
+              ? 0
+              : -1,
         onKeydown: hasRowControls
           ? undefined
           : (e: KeyboardEvent) => {
@@ -381,7 +444,10 @@ export function renderTableBody(
     const groupRows: VNodeChild[] = []
     let rowCursor = 0
     for (const block of ctx.groupBlocks.value) {
+      const collapsed =
+        ctx.groupCollapseEnabled.value && ctx.collapsedGroups.value.includes(String(block.key))
       if (!block.continued) {
+        const headerText = formatTableGroupHeaderText(labels.groupHeaderText, block.key, block.count)
         groupRows.push(
           h('tr', { key: `group-${block.key}`, class: tableGroupHeaderClasses }, [
             h(
@@ -390,11 +456,23 @@ export function renderTableBody(
                 colspan: ctx.totalColumnCount.value,
                 class: getGroupHeaderCellClasses(props.size)
               },
-              formatTableGroupHeaderText(labels.groupHeaderText, block.key, block.count)
+              ctx.groupCollapseEnabled.value
+                ? h(
+                    'button',
+                    {
+                      type: 'button',
+                      'data-tiger-group': String(block.key),
+                      'aria-expanded': collapsed ? 'false' : 'true',
+                      onClick: () => ctx.toggleGroup(String(block.key))
+                    },
+                    headerText
+                  )
+                : headerText
             )
           ])
         )
       }
+      if (collapsed) continue
       for (const record of block.records) {
         const pageIndex = ctx.paginatedData.value.indexOf(record, rowCursor)
         const index = pageIndex >= 0 ? pageIndex : rowCursor

@@ -18,6 +18,7 @@ import {
   resolveLocaleText,
   timelineDescriptionClasses,
   timelineLabelClasses,
+  timelineLabelSide,
   timelineListClasses,
   type TimelineItem,
   type TimelineItemPosition,
@@ -172,23 +173,41 @@ export const Timeline = defineComponent({
         ])
       }
 
-      const contentChildren = []
+      const contentSide = props.mode === 'right' ? 'start' : 'end'
+      const labelSide = timelineLabelSide(
+        props.mode === 'horizontal' ? 'horizontal' : 'vertical',
+        contentSide
+      )
+      const labelNode = item.label
+        ? h(
+            'time',
+            {
+              class: timelineLabelClasses,
+              datetime: String(item.label),
+              'data-timeline-label-side': labelSide
+            },
+            item.label
+          )
+        : null
+      const contentNode = item.content
+        ? h('div', { class: timelineDescriptionClasses }, item.content as unknown as HChildren)
+        : null
 
-      if (item.label) {
-        contentChildren.push(h('div', { class: timelineLabelClasses }, item.label))
-      }
-
-      if (item.content) {
-        contentChildren.push(
-          h('div', { class: timelineDescriptionClasses }, item.content as unknown as HChildren)
-        )
-      }
-
-      return h('li', { key, class: itemClasses }, [
-        h('div', { class: tailClasses }),
-        h('div', { class: headClasses }, [renderDot(item)]),
-        h('div', { class: contentClasses }, contentChildren)
-      ])
+      return h(
+        'li',
+        {
+          key,
+          class: itemClasses,
+          'data-timeline-mode': props.mode
+        },
+        [
+          labelSide === 'start' ? labelNode : null,
+          h('div', { class: tailClasses }),
+          h('div', { class: headClasses }, [renderDot(item)]),
+          h('div', { class: contentClasses }, [contentNode]),
+          labelSide === 'end' ? labelNode : null
+        ]
+      )
     }
 
     function renderPendingItem() {

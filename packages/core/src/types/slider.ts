@@ -46,6 +46,41 @@ export interface SliderProps {
   disabled?: boolean
 
   /**
+   * Focusable, submitted, and visible, but drag and arrow keys do not change the value.
+   * @default false
+   */
+  readOnly?: boolean
+
+  /**
+   * Vertical track. The bottom edge is `min`.
+   * @default false
+   */
+  vertical?: boolean
+
+  /**
+   * When range thumbs meet, push the other thumb one step away.
+   * @default false
+   */
+  pushApart?: boolean
+
+  /**
+   * Paint the selected portion of the track.
+   * @default true
+   */
+  showRange?: boolean
+
+  /**
+   * Show the current value in an InputNumber beside the track.
+   * @default false
+   */
+  showInput?: boolean
+
+  /**
+   * Tooltip and `aria-valuetext` text.
+   */
+  formatTooltip?: (value: number) => string
+
+  /**
    * Whether to show marks on the slider
    * @default false
    */

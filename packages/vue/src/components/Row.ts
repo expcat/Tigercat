@@ -5,6 +5,9 @@ import {
   getRowAlignJustifyVars,
   getRowClasses,
   getRowGutterStyleVars,
+  resolveResponsiveAlign,
+  resolveResponsiveGutter,
+  resolveResponsiveJustify,
   type Align,
   type Justify,
   type GutterSize
@@ -23,7 +26,7 @@ export const Row = defineComponent({
   inheritAttrs: false,
   props: {
     gutter: {
-      type: [Number, Array] as PropType<GutterSize>,
+      type: [Number, Array, Object] as PropType<GutterSize>,
       default: 0
     },
     align: {
@@ -44,10 +47,16 @@ export const Row = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const rowStyle = computed(() => ({
-      ...getRowGutterStyleVars(props.gutter),
-      ...getRowAlignJustifyVars(props.align, props.justify)
-    }))
+    const rowStyle = computed(() => {
+      const width = typeof window !== 'undefined' ? window.innerWidth : 0
+      const gutter = resolveResponsiveGutter(props.gutter, width)
+      const align = resolveResponsiveAlign(props.align as Align, width)
+      const justify = resolveResponsiveJustify(props.justify as Justify, width)
+      return {
+        ...getRowGutterStyleVars([gutter.x, gutter.y]),
+        ...getRowAlignJustifyVars(align, justify)
+      }
+    })
 
     const rowClasses = computed(() =>
       classNames(

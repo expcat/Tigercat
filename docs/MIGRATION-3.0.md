@@ -287,3 +287,10 @@
 - 旧的默认行为：卡片树在第一次渲染就跟着 `matchMedia` 换掉表格。固定列用物理 `left` / `right`。没有行内控件时每一行都能 Tab。行拖拽整行可拖。折叠收起仍挂着子树。图表 svg 是 `role="img"`。甘特任务名用英文 `to` 且不带年份。折线的面积填充不跟零基线闭合。雷达缺测会把两侧连成弦。没有身份的虚拟行选择键是下标 `0`。
 - 3.0 的唯一行为：服务端和客户端第一次都输出 `<table>`，窄视口卡片只在挂载后切换。固定列用逻辑起点和终点。没有行内控件时数据行共用一个 Tab 停靠。行拖拽只在把手上。收起的折叠面板卸掉子树，焦点回到标题按钮。图表 svg 是 `role="group"`，名字在组上，轴和标记仍可逐条读到。甘特刻度带年份。折线在 `showArea` 时面积回到 `y = 0`。雷达每个指标都有一个顶点。缺身份的行键是 `tiger-row:` 前缀，不与数字 id 相撞。
 - 已删除：`exportFormat`、`columnDragHandleClasses`、`DonutChartProps`。
+
+## W9 模块增强
+
+- 组件：主题根、`Inplace`、`CopyButton`、`Gallery`、`WaterfallChart`、`SankeyChart`、`NotificationBell`、`AssigneePicker`，以及各模块在 W0–W8 结构上的增强 props
+- 旧的默认行为：主题写在文档根；没有行内编辑组件和复制按钮；预览、选择、表、图停在优化收口后的能力；`add` 写入空标签
+- 3.0 的唯一行为：子树可以成为主题根，强调色从 seed 阶梯派生。`Inplace` 切换展示和编辑，编辑态复用已有输入框。`CopyButton` 只调用 `copyTextToClipboard`，失败可见且焦点留在按钮上。`Gallery` 组合缩略图和 `ImagePreview`。表的虚拟化是 `Table` 的策略。图例隐藏会移出比例尺。瀑布和桑基是两张新图。`NotificationBell` 不读命令式提示队列。`AssigneePicker` 只消费调用方目录。`tigercat add` 写入可运行用法。
+- 已删除：无。不另做第二套预览、多选、日期、对话框或虚拟表。

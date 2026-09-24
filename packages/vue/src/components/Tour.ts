@@ -37,6 +37,11 @@ import {
   tourNextEvents,
   tourPrevEvents,
   tourCloseEvents,
+  tourArrowKey,
+  tourStepAdvancesOnTarget,
+  tourTargetExempt,
+  getFloatingArrowStyle,
+  getPopconfirmArrowClasses,
   shouldCloseOnMaskClick,
   getTourLabels,
   mergeTigerLocale,
@@ -160,6 +165,17 @@ export const Tour = defineComponent({
     let resizeObserver: ResizeObserver | undefined
     const scrolledKey = ref('')
 
+    let advanceCleanup: (() => void) | undefined
+    const bindAdvance = (el: HTMLElement | null, current: TourStep) => {
+      advanceCleanup?.()
+      advanceCleanup = undefined
+      if (!el || !tourStepAdvancesOnTarget(current)) return
+      const onClick = () => next()
+      el.addEventListener('click', onClick)
+      advanceCleanup = () => el.removeEventListener('click', onClick)
+    }
+    onBeforeUnmount(() => advanceCleanup?.())
+
     const measure = (shouldScroll: boolean) => {
       const current = step.value
       if (!props.open || !current) {
@@ -169,7 +185,8 @@ export const Tour = defineComponent({
         return
       }
       const targetEl = resolveTourTarget(current.target)
-      targetExemptRef.value = current.interact ? (targetEl ?? null) : null
+      targetExemptRef.value = tourTargetExempt(current) ? (targetEl ?? null) : null
+      bindAdvance(targetEl, current)
       if (targetEl) {
         if (shouldScroll) scrollTourTargetIntoView(targetEl)
         targetRect.value = getTourRectFromElement(targetEl)
@@ -410,10 +427,10 @@ export const Tour = defineComponent({
             'data-tiger-tour-mask': '',
             'aria-hidden': 'true',
             style: {
-              ...(current.step.interact && targetRect.value
+              ...(tourTargetExempt(current.step) && targetRect.value
                 ? getTourMaskHoleStyle(targetRect.value)
                 : null),
-              ...(targetRect.value && !current.step.interact
+              ...(targetRect.value && !tourTargetExempt(current.step)
                 ? { backgroundColor: 'transparent' }
                 : null)
             },
@@ -449,6 +466,25 @@ export const Tour = defineComponent({
               focusable: 'false'
             })
           )
+        )
+      }
+
+      if (current.step.cover) {
+        popoverChildren.push(
+          h('img', {
+            src: current.step.cover,
+            alt: current.step.coverAlt ?? '',
+            'data-tiger-tour-cover': ''
+          })
+        )
+      }
+      if (current.step.arrow !== false) {
+        popoverChildren.push(
+          h('span', {
+            'data-tiger-tour-arrow': '',
+            class: getPopconfirmArrowClasses(),
+            style: getFloatingArrowStyle(placement === 'center' ? 'bottom' : placement)
+          })
         )
       }
 
@@ -519,6 +555,16 @@ export const Tour = defineComponent({
           {
             ...restAttrs,
             ref: popoverRef,
+            onKeydown: (event: KeyboardEvent) => {
+              const dir = tourArrowKey(event.key, event.target)
+              if (dir === 'next') {
+                event.preventDefault()
+                next()
+              } else if (dir === 'prev') {
+                event.preventDefault()
+                prev()
+              }
+            },
             class: classNames(tourPopoverClasses, props.className, coerceClassValue(attrs.class)),
             style: popoverStyle,
             role: 'dialog',

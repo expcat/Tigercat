@@ -1,4 +1,4 @@
-import type { SpotlightItem, SpotlightItemFilter } from '../types/spotlight'
+import type { SpotlightItem, SpotlightItemFilter, SpotlightItemKey } from '../types/spotlight'
 import { classNames } from './class-names'
 import { getIconDefinition } from './icons/registry'
 
@@ -132,6 +132,37 @@ export function getSpotlightFuzzyScore(query: string, target: string): number {
   }
 
   return Number.POSITIVE_INFINITY
+}
+
+export function orderSpotlightWithRecent(
+  items: readonly SpotlightItem[],
+  recentIds: readonly SpotlightItemKey[] = []
+): SpotlightItem[] {
+  if (recentIds.length === 0) return [...items]
+  const rank = new Map(recentIds.map((id, index) => [String(id), index]))
+  return [...items].sort((a, b) => {
+    const aRank = rank.get(String(a.key))
+    const bRank = rank.get(String(b.key))
+    if (aRank == null && bRank == null) return 0
+    if (aRank == null) return 1
+    if (bRank == null) return -1
+    return aRank - bRank
+  })
+}
+
+export function spotlightFooterShortcuts(
+  items: readonly SpotlightItem[]
+): string[] {
+  const seen = new Set<string>()
+  const labels: string[] = []
+  for (const item of items) {
+    if (item.disabled || !item.shortcut) continue
+    const label = getSpotlightShortcutLabel(item.shortcut)
+    if (!label || seen.has(label)) continue
+    seen.add(label)
+    labels.push(label)
+  }
+  return labels
 }
 
 export function getSpotlightSearchState(

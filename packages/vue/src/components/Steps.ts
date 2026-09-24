@@ -17,6 +17,7 @@ import {
   mergeStyleValues,
   getStepItemClasses,
   getStepIconClasses,
+  isStepClickable,
   getStepIconColumnClasses,
   getStepSizeDataValue,
   getStepTailClasses,
@@ -54,6 +55,7 @@ export interface StepsContext {
   size: StepSize
   simple: boolean
   clickable: boolean
+  progressDot: boolean
   labels: Required<TigerLocaleSteps>
   handleStepClick?: (index: number) => void
 }
@@ -181,7 +183,8 @@ export const StepsItem = defineComponent({
         stepStatus.value,
         stepsContext.size,
         stepsContext.simple,
-        hasCustomIcon
+        hasCustomIcon,
+        stepsContext.progressDot
       )
     })
 
@@ -212,7 +215,7 @@ export const StepsItem = defineComponent({
     })
 
     const handleClick = () => {
-      if (props.disabled || !stepsContext.handleStepClick) {
+      if (!isStepClickable(Boolean(stepsContext.handleStepClick), props.disabled, stepStatus.value)) {
         return
       }
       stepsContext.handleStepClick(props.stepIndex)
@@ -388,6 +391,7 @@ export const Steps = defineComponent({
      * Whether steps are clickable
      * @default false
      */
+    progressDot: { type: Boolean, default: false },
     clickable: {
       type: Boolean,
       default: false
@@ -451,6 +455,7 @@ export const Steps = defineComponent({
         orientation: computed(() => props.orientation),
         size: computed(() => props.size),
         simple: computed(() => props.simple),
+        progressDot: computed(() => props.progressDot),
         clickable: computed(() => props.clickable),
         labels: computed(() => stepLabels.value),
         handleStepClick: computed(() => (props.clickable ? handleStepClick : undefined))

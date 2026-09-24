@@ -156,6 +156,11 @@ export interface PaginationProps {
    * @default false
    */
   showLessItems?: boolean
+  /**
+   * Ellipsis opens a page jump. The value is clamped with the quick jumper.
+   * @default false
+   */
+  ellipsisJump?: boolean
 
   /**
    * Additional CSS classes

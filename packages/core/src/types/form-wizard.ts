@@ -167,6 +167,12 @@ export interface FormWizardProps {
    */
   autoSave?: (current: number, step: WizardStep) => void | Promise<void>
   /**
+   * Step model compared with the snapshot taken when the step was entered.
+   * A difference asks for confirmation before going back or closing.
+   */
+  model?: unknown
+  onClose?: () => void
+  /**
    * Additional CSS classes
    */
   className?: string

@@ -1,4 +1,12 @@
-import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import {
   EMPTY_TREE_DATA,
   EMPTY_TREE_KEYS,
@@ -19,8 +27,10 @@ import {
   nextLoadToken,
   nextTreeCheckedState,
   nextTreeExpandedKeys,
+  nextTreeRangeSelection,
   nextTreeSelectedKeys,
   nodeHasChildren,
+  createTypeaheadHighlight,
   reconcileUncontrolledExpandedKeys,
   resolveCheckedInput,
   resolveInitialExpandedKeys,
@@ -80,6 +90,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
     filterFn,
     filterMode,
     autoExpandParent = true,
+    expandOnClick = false,
     blockNode = false,
     emptyText,
     ariaLabel,
@@ -123,6 +134,8 @@ export function useTreeState(props: TreeProps): TreeContext & {
   const dropPosRef = useRef<TreeDropPosition>('inside')
   const savedExpandRef = useRef<TreeNodeKey[] | null>(null)
   const loadTokensRef = useRef(new Map<string, number>())
+  const selectionAnchorRef = useRef<TreeNodeKey | null>(null)
+  const typeaheadRef = useRef(createTypeaheadHighlight())
   const reactId = useId()
   const dragContainerId = `tiger-tree-${reactId}`
   const [dropIndicator, setDropIndicator] = useState<{
@@ -189,9 +202,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
 
   const matchedKeys = useMemo(
     () =>
-      searchQuery
-        ? filterTreeNodes(derivedTree, searchQuery, filterFn, filterMode)
-        : undefined,
+      searchQuery ? filterTreeNodes(derivedTree, searchQuery, filterFn, filterMode) : undefined,
     [derivedTree, searchQuery, filterFn, filterMode]
   )
 
@@ -377,27 +388,33 @@ export function useTreeState(props: TreeProps): TreeContext & {
       const next = nextTreeExpandedKeys(computedExpanded, node.key, !expanded)
       commitExpanded(next, node, !expanded)
     },
-    [
-      view.index,
-      computedExpanded,
-      hasLoadData,
-      loadedIds,
-      loadingIds,
-      requestLoad,
-      commitExpanded
-    ]
+    [view.index, computedExpanded, hasLoadData, loadedIds, loadingIds, requestLoad, commitExpanded]
   )
 
   const handleSelect = useCallback(
-    (nodeKey: TreeNodeKey) => {
+    (nodeKey: TreeNodeKey, shiftKey = false) => {
       const node = lookupTreeNode(view.index, nodeKey)
       if (!node || node.disabled || !selection.selectable) return
-      const next = nextTreeSelectedKeys({
-        current: computedSelected,
-        key: node.key,
-        multiple: selection.multiple,
-        allowDeselect
-      })
+      const range =
+        shiftKey && selection.multiple
+          ? nextTreeRangeSelection({
+              visibleKeys: view.visibleItems.map((item) => item.key),
+              disabledKeys: view.visibleItems
+                .filter((item) => lookupTreeNode(view.index, item.key)?.disabled)
+                .map((item) => item.key),
+              anchor: selectionAnchorRef.current ?? node.key,
+              key: node.key
+            })
+          : null
+      const next = range
+        ? range.keys
+        : nextTreeSelectedKeys({
+            current: computedSelected,
+            key: node.key,
+            multiple: selection.multiple,
+            allowDeselect
+          })
+      selectionAnchorRef.current = range ? range.anchor : node.key
       if (controlledSelectedKeys === undefined) setInternalSelected(next)
       onSelectedKeysChange?.(next)
       onSelect?.(next, {
@@ -410,6 +427,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
     },
     [
       view.index,
+      view.visibleItems,
       selection.selectable,
       selection.multiple,
       computedSelected,
@@ -462,6 +480,24 @@ export function useTreeState(props: TreeProps): TreeContext & {
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent, nodeKey: TreeNodeKey) => {
+      const labels = view.visibleItems.map((item) => {
+        const entry = lookupTreeNode(view.index, item.key)
+        return typeof entry?.label === 'string' || typeof entry?.label === 'number'
+          ? String(entry.label)
+          : ''
+      })
+      const from = view.visibleItems.findIndex((item) => sameTreeKey(item.key, nodeKey))
+      const hit = typeaheadRef.current.push(
+        event.key,
+        labels,
+        Math.max(0, from),
+        view.visibleItems.map((item) => Boolean(lookupTreeNode(view.index, item.key)?.disabled))
+      )
+      if (hit && hit.index >= 0) {
+        event.preventDefault()
+        setActiveKey(view.visibleItems[hit.index].key)
+        return
+      }
       const action = resolveTreeKeyboardAction({
         key: event.key,
         nodeKey,
@@ -481,12 +517,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
         setActiveKey(patch.activeKey)
         const index = view.visibleItems.findIndex((item) => sameTreeKey(item.key, patch.activeKey))
         if (virtual) {
-          alignTreeVirtualScroll(
-            virtualRef.current?.getScrollElement(),
-            index,
-            itemHeight,
-            height
-          )
+          alignTreeVirtualScroll(virtualRef.current?.getScrollElement(), index, itemHeight, height)
         }
         const id = treeKeyId(patch.activeKey)
         requestAnimationFrame(() => {
@@ -649,7 +680,9 @@ export function useTreeState(props: TreeProps): TreeContext & {
         requestLoad(node, 'select')
         return
       }
-      if (selection.selectable) handleSelect(node.key)
+      const expandable = !node.isLeaf && (nodeHasChildren(node) || Boolean(node.children?.length))
+      if (expandOnClick && expandable) handleExpand(node.key)
+      if (selection.selectable) handleSelect(node.key, event.shiftKey)
     },
     startTreeDrag: (nodeKey, event) => {
       const target = event.target as Element | null
@@ -666,10 +699,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
     overTreeDrag: (nodeKey, event) => {
       event.preventDefault()
       const index = view.visibleItems.findIndex((item) => sameTreeKey(item.key, nodeKey))
-      drag.dragOver(
-        { id: nodeKey, index: Math.max(0, index), containerId: dragContainerId },
-        event
-      )
+      drag.dragOver({ id: nodeKey, index: Math.max(0, index), containerId: dragContainerId }, event)
       const node = lookupTreeNode(view.index, nodeKey)
       const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
       const position = resolveTreeDropPosition(

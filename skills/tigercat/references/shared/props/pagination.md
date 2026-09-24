@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Pagination
 
-`packages/core/src/types/pagination.ts` · `PaginationProps` · 4/22 props
+`packages/core/src/types/pagination.ts` · `PaginationProps` · 4/24 props
 
 Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默认开并跟随 Table `size`；List 默认关。
 

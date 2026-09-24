@@ -15,15 +15,18 @@ import {
   getNextTableSortState,
   mergeTableFilterValue,
   mergeTablePagination,
-  reorderTableColumnsByKey,
-  reorderTableRowsByKey,
+  commitValidatedCellEdit,
+  dragMoveAnnouncement,
+  nextMultiSort,
+  reorderByHandle,
+  resolveFormattedExportRows,
+  toggleCollapsedKey,
   coerceTableEditValue,
   getTableCellValue,
   getTableSelectionState,
   resolveTableExportRecords,
   resolveTableKeyList,
   resolveTableQueryPage,
-  resolveTableRecordKey,
   resolveTableRowKeys,
   resolveTableSelectLoadedKeys,
   resolveTableView,
@@ -153,6 +156,32 @@ export function useTableState(
     resolveTableRowKeys(sourceData.value, props.rowKey, props.rowSelection?.getRowKey)
   )
 
+  const multiSort = ref(props.sorts)
+  watch(
+    () => props.sorts,
+    (value) => {
+      multiSort.value = value
+    }
+  )
+  const widthMap = ref<Record<string, number>>({ ...(props.columnWidths ?? {}) })
+  watch(
+    () => props.columnWidths,
+    (value) => {
+      if (value) widthMap.value = { ...value }
+    }
+  )
+  const collapsedGroups = ref<string[]>([...(props.collapsedGroupKeys ?? [])])
+  watch(
+    () => props.collapsedGroupKeys,
+    (value) => {
+      if (value) collapsedGroups.value = [...value]
+    }
+  )
+  const groupCollapseEnabled = computed(() => props.collapsedGroupKeys !== undefined)
+  const selectionLive = ref('')
+  const dragLive = ref('')
+  const previousSelectionCount = ref<number | null>(null)
+
   const view = computed(() =>
     resolveTableView({
       columns: props.columns,
@@ -177,7 +206,8 @@ export function useTableState(
       measuredColumnWidths: measuredColumnWidths.value,
       containerWidth: containerSize?.value.width,
       sortLocale: sortLocale?.value,
-      rowDraggable: props.rowDraggable
+      rowDraggable: props.rowDraggable,
+      sorts: multiSort.value
     })
   )
 
@@ -353,6 +383,10 @@ export function useTableState(
         handleToggleExpand(key, record)
       }
     }
+    if (props.rowSelection && props.rowSelection.showCheckbox === false) {
+      const selected = selectedRowKeys.value.some((item) => tableRowKeyId(item) === tableRowKeyId(key))
+      handleSelectRow(key, !selected)
+    }
   }
 
   function handleSelectRow(key: string | number, checked: boolean) {
@@ -408,6 +442,8 @@ export function useTableState(
   const editingValue = ref('')
 
   function isCellEditable(columnKey: string, rowIndex: number): boolean {
+    const column = props.columns.find((item) => item.key === columnKey)
+    if (column?.edit) return true
     if (!props.editable) return false
     if (!props.editableCells) return true
     return props.editableCells[columnKey]?.includes(rowIndex) === true
@@ -421,6 +457,24 @@ export function useTableState(
   function commitEdit() {
     if (!editingCell.value) return
     const column = props.columns.find((item) => item.key === editingCell.value?.columnKey)
+    if (column?.edit || column?.validate) {
+      const result = commitValidatedCellEdit({
+        data: sourceData.value as Record<string, unknown>[],
+        rowIndex: editingCell.value.rowIndex,
+        column,
+        raw: editingValue.value
+      })
+      if (!result.ok) return
+      emit(
+        'cell-change',
+        editingCell.value.rowIndex,
+        editingCell.value.columnKey,
+        result.value,
+        result.nextData
+      )
+      editingCell.value = null
+      return
+    }
     const original = column
       ? getTableCellValue(sourceData.value[editingCell.value.rowIndex] ?? {}, column)
       : undefined
@@ -446,6 +500,19 @@ export function useTableState(
   }
 
   function handleExport() {
+    const formatted = resolveFormattedExportRows({
+      scope:
+        props.exportScope === 'page'
+          ? 'page'
+          : props.exportScope === 'selected'
+            ? 'selected'
+            : 'all',
+      pageRecords: paginatedData.value as Record<string, unknown>[],
+      processedRecords: processedData.value,
+      processedKeys: processedRowKeys.value,
+      selectedKeys: selectedRowKeys.value,
+      columns: displayColumns.value
+    })
     const rows = resolveTableExportRecords({
       scope: props.exportScope,
       pageRecords: paginatedData.value,
@@ -453,6 +520,19 @@ export function useTableState(
       processedKeys: processedRowKeys.value,
       selectedKeys: selectedRowKeys.value
     })
+    if (displayColumns.value.some((column) => column.cellFormatter)) {
+      const formattedRecords = formatted.rows.map((row) => {
+        const record: Record<string, unknown> = {}
+        displayColumns.value.forEach((column, index) => {
+          record[column.dataKey || column.key] = row[index] ?? ''
+        })
+        return record
+      })
+      const content = exportTableData(displayColumns.value, formattedRecords)
+      downloadTableExport(content, props.exportFilename)
+      emit('export', content)
+      return
+    }
     const content = exportTableData(displayColumns.value, rows)
     downloadTableExport(content, props.exportFilename)
     emit('export', content)
@@ -464,10 +544,39 @@ export function useTableState(
     dragColumnKey.value = columnKey
   }
 
+  function applyMultiSort(columnKey: string) {
+    const next = nextMultiSort(multiSort.value ?? [], columnKey)
+    multiSort.value = next
+    emit('update:sorts', next)
+    emit('sort-change', next[0] ?? null)
+  }
+
+  function applyColumnWidth(key: string, width: number) {
+    widthMap.value = { ...widthMap.value, [key]: width }
+    measuredColumnWidths.value = { ...measuredColumnWidths.value, [key]: width }
+    emit('update:columnWidths', widthMap.value)
+  }
+
+  function toggleGroup(key: string) {
+    const next = toggleCollapsedKey(collapsedGroups.value, key)
+    collapsedGroups.value = next
+    emit('update:collapsedGroupKeys', next)
+  }
+
+  function replaceSelectedKeys(keys: (string | number)[]) {
+    if (!selectionControl.value.controlled) {
+      uncontrolledSelectedRowKeys.value = keys
+    }
+    emit('selection-change', keys)
+  }
+
   function handleDrop(targetKey: string) {
     if (!dragColumnKey.value || dragColumnKey.value === targetKey) return
     const fullColumns = applyTableColumnOrder(props.columns, effectiveColumnOrder.value)
-    const nextColumns = reorderTableColumnsByKey(fullColumns, dragColumnKey.value, targetKey)
+    const from = fullColumns.findIndex((column) => column.key === dragColumnKey.value)
+    const to = fullColumns.findIndex((column) => column.key === targetKey)
+    const nextColumns = reorderByHandle(fullColumns, from, to)
+    dragLive.value = dragMoveAnnouncement(from, to)
     if (!isColumnOrderControlled.value) {
       columnOrder.value = nextColumns.map((column) => column.key)
     }
@@ -483,13 +592,14 @@ export function useTableState(
 
   function handleRowDrop(targetKey: string | number) {
     if (dragRowKey.value === null || dragRowKey.value === targetKey) return
-    const nextRows = reorderTableRowsByKey(
-      sourceData.value,
-      dragRowKey.value,
-      targetKey,
-      (record, sourceIndex) =>
-        resolveTableRecordKey(record, sourceIndex, props.rowKey, props.rowSelection?.getRowKey)
+    const from = sourceRowKeys.value.findIndex(
+      (key) => tableRowKeyId(key) === tableRowKeyId(dragRowKey.value)
     )
+    const to = sourceRowKeys.value.findIndex(
+      (key) => tableRowKeyId(key) === tableRowKeyId(targetKey)
+    )
+    const nextRows = reorderByHandle(sourceData.value, from, to)
+    dragLive.value = dragMoveAnnouncement(from, to)
     emit('row-order-change', nextRows)
     dragRowKey.value = null
   }
@@ -544,6 +654,17 @@ export function useTableState(
     handleDragStart,
     handleDrop,
     handleRowDragStart,
-    handleRowDrop
+    handleRowDrop,
+    applyMultiSort,
+    applyColumnWidth,
+    toggleGroup,
+    replaceSelectedKeys,
+    multiSort,
+    widthMap,
+    collapsedGroups,
+    groupCollapseEnabled,
+    selectionLive,
+    dragLive,
+    previousSelectionCount
   }
 }

@@ -21,6 +21,7 @@ import {
   defaultChartSeriesName,
   formatChartTemplate,
   layoutRadar,
+  radarRatio,
   findNearestPointIndex,
   polarToCartesian,
   createChartFrameCoalescer,
@@ -36,6 +37,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
+import { RadarBind } from './w9-chart-bind'
 
 export interface RadarChartProps extends CoreRadarChartProps {
   data?: RadarChartDatum[]
@@ -45,6 +47,10 @@ export interface RadarChartProps extends CoreRadarChartProps {
   onSelectedIndexChange?: (index: number | null) => void
   onSeriesClick?: (index: number, series: RadarChartSeries) => void
   onSeriesHover?: (index: number | null, series: RadarChartSeries | null) => void
+  bind?: {
+    values?: number[]
+    indicators?: { name: string; max: number }[]
+  }
 }
 
 export const RadarChart: React.FC<RadarChartProps> = ({
@@ -109,7 +115,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   desc,
   locale,
   labels: labelsOverride,
-  className
+  className,
+  bind
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -145,7 +152,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     handleClick: handleSelectIndex,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<RadarChartSeries>({
     hoverable,
     showTooltip,
@@ -369,7 +377,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         selectedIndex: resolvedSelectedIndex,
         getLabel: (item, index) =>
           legendFormatter ? legendFormatter(item, index) : seriesName(item, index),
-        getColor: (item, index) => item.color ?? palette[index % palette.length]
+        getColor: (item, index) => item.color ?? palette[index % palette.length],
+        isHidden: (index) => isLegendIndexHidden(index)
       }),
     [
       resolvedSeries,
@@ -700,6 +709,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           onItemClick={handleLegendClick}
           onItemHover={handleLegendHover}
           onItemLeave={handleLegendLeave}
+        />
+      ) : null}
+      {bind?.indicators ? (
+        <RadarBind
+          ratios={bind.indicators.map((indicator, index) => radarRatio(bind.values?.[index] ?? 0, indicator))}
         />
       ) : null}
       {tooltip}

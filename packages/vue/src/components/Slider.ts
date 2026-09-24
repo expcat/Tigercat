@@ -25,6 +25,9 @@ import {
   sliderGetPercentage,
   sliderGetValueFromClientX,
   sliderGetKeyboardValue,
+  sliderGetValueFromClientY,
+  sliderPushApartRange,
+  formatSliderTooltip,
   sliderResolveMarks,
   sliderValuesEqual,
   sliderApplyThumbValue,
@@ -97,6 +100,12 @@ export const Slider = defineComponent({
     max: { type: Number, default: 100 },
     step: { type: Number, default: 1 },
     disabled: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
+    vertical: { type: Boolean, default: false },
+    pushApart: { type: Boolean, default: false },
+    showRange: { type: Boolean, default: true },
+    showInput: { type: Boolean, default: false },
+    formatTooltip: { type: Function as PropType<(value: number) => string>, default: undefined },
     marks: {
       type: [Boolean, Object] as PropType<boolean | Record<number, string>>,
       default: false
@@ -234,7 +243,7 @@ export const Slider = defineComponent({
 
     const handlePointerDown = (event: PointerEvent, thumb: 'min' | 'max' | null) => {
       callUnknownEventHandler(attrs.onPointerdown, event)
-      if (event.defaultPrevented || effectiveDisabled.value) return
+      if (event.defaultPrevented || effectiveDisabled.value || props.readOnly) return
       if (event.button !== 0) return
       event.preventDefault()
       const track = trackElement.value
@@ -376,7 +385,8 @@ export const Slider = defineComponent({
               ? `${name.ariaLabelledby ?? ''} ${thumbId ?? ''}-suffix`.trim()
               : name.ariaLabelledby,
             'aria-describedby': describedBy,
-            'aria-valuetext': String(value),
+            'aria-valuetext': formatSliderTooltip(value, props.formatTooltip),
+            'aria-readonly': props.readOnly || undefined,
             onPointerdown: (e: PointerEvent) => handlePointerDown(e, thumbType),
             onMouseenter: () => {
               if (props.tooltip) showTooltip.value = true
@@ -394,7 +404,7 @@ export const Slider = defineComponent({
               formItemControl?.onBlur()
             },
             onKeydown: (e: KeyboardEvent) => {
-              if (effectiveDisabled.value) return
+              if (effectiveDisabled.value || props.readOnly) return
               const isRtl = directionRtl
               const newValue = sliderGetKeyboardValue(
                 e.key,
@@ -411,7 +421,9 @@ export const Slider = defineComponent({
             }
           },
           [
-            ...(showThumbTooltip ? [h('div', { class: tooltipClasses }, String(value))] : []),
+            ...(showThumbTooltip
+              ? [h('div', { class: tooltipClasses }, formatSliderTooltip(value, props.formatTooltip))]
+              : []),
             ...(name.suffix
               ? [h('span', { id: `${thumbId ?? 'thumb'}-suffix`, class: 'sr-only' }, name.suffix)]
               : [])
@@ -462,10 +474,25 @@ export const Slider = defineComponent({
               { class: 'relative w-full mt-2 h-4' },
               Object.entries(marksObj).map(([key, label]) =>
                 h(
-                  'div',
+                  'button',
                   {
+                    type: 'button',
                     class: 'absolute text-xs text-[var(--tiger-text-secondary)] -translate-x-1/2',
-                    style: sliderThumbInsetStyle(getPercentage(Number(key)), directionRtl)
+                    style: sliderThumbInsetStyle(getPercentage(Number(key)), directionRtl),
+                    disabled: effectiveDisabled.value || props.readOnly || undefined,
+                    onClick: () => {
+                      if (effectiveDisabled.value || props.readOnly) return
+                      commit(
+                        props.range && Array.isArray(displayed.value)
+                          ? (sliderApplyThumbValue(
+                              displayed.value,
+                              Number(key),
+                              sliderPickRangeThumb(displayed.value, Number(key)),
+                              true
+                            ) as [number, number])
+                          : Number(key)
+                      )
+                    }
                   },
                   label
                 )
@@ -477,6 +504,11 @@ export const Slider = defineComponent({
         {
           ...restAttrs,
           ref: rootElement,
+          'data-orientation': props.vertical ? 'vertical' : 'horizontal',
+          'data-readonly': props.readOnly || undefined,
+          'data-show-input': props.showInput || undefined,
+          'data-show-range': props.showRange || undefined,
+          'data-push-apart': props.pushApart || undefined,
           class: getSliderRootClasses(
             effectiveDisabled.value,
             classNames(props.className, coerceClassValue(attrs.class)),

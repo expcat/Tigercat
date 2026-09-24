@@ -1,4 +1,18 @@
 import type { ThemePreset } from '../../types/theme'
+import { deriveAccentScale } from '../../utils/accent-scale'
+
+export const professionalThemeKnobs = {
+  accent: '#1e40af',
+  neutral: '#334155',
+  radius: '4px',
+  density: 0.95
+} as const
+
+export const professionalThemeScale = deriveAccentScale(professionalThemeKnobs.accent, {
+  neutral: professionalThemeKnobs.neutral,
+  radius: professionalThemeKnobs.radius,
+  density: professionalThemeKnobs.density
+})
 
 /**
  * Professional theme — corporate & premium, deep gray/blue.

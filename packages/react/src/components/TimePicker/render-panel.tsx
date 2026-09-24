@@ -2,6 +2,7 @@ import React from 'react'
 import {
   classNames,
   getTimePickerItemClasses,
+  snapTimeColumnScroll,
   getTimePickerMobileSelectRowClasses,
   timePickerColumnClasses,
   timePickerColumnHeaderClasses,
@@ -40,7 +41,13 @@ export function TimePickerDesktopColumns({
                 active ? `${column.listId}-${String(active.value)}` : undefined
               }
               className={timePickerColumnListClasses}
-              onKeyDown={onKeyDown}>
+              onKeyDown={onKeyDown}
+              onScroll={(event) => {
+                const list = event.currentTarget
+                const item = list.querySelector<HTMLElement>('[role="option"]')
+                const next = snapTimeColumnScroll(list.scrollTop, item?.offsetHeight ?? 0)
+                if (next !== list.scrollTop) list.scrollTop = next
+              }}>
               {column.options.map((option) => {
                 const selected = option.selected
                 const tabIndex = option.disabled ? -1 : selected || option === active ? 0 : -1

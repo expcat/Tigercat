@@ -1,4 +1,18 @@
 import type { ThemePreset } from '../../types/theme'
+import { deriveAccentScale } from '../../utils/accent-scale'
+
+export const naturalThemeKnobs = {
+  accent: '#059669',
+  neutral: '#57534e',
+  radius: '8px',
+  density: 1
+} as const
+
+export const naturalThemeScale = deriveAccentScale(naturalThemeKnobs.accent, {
+  neutral: naturalThemeKnobs.neutral,
+  radius: naturalThemeKnobs.radius,
+  density: naturalThemeKnobs.density
+})
 
 /**
  * Natural theme — warm & friendly, earth tones.

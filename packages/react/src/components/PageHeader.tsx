@@ -20,6 +20,7 @@ import {
   pageHeaderTitleClasses,
   pageHeaderTitleRowClasses,
   resolvePageHeaderBackAriaLabel,
+  resolveLinkHref,
   resolvePageHeaderBackVisibility,
   type PageHeaderProps as CorePageHeaderProps,
   type TigerLocale,
@@ -46,6 +47,8 @@ export interface PageHeaderProps
    * Breadcrumb row, typically a Breadcrumb component
    */
   breadcrumb?: React.ReactNode
+  tabs?: React.ReactNode
+  footer?: React.ReactNode
   /**
    * Right-aligned action area
    */
@@ -87,6 +90,8 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
       title,
       subTitle,
       breadcrumb,
+      tabs,
+      footer,
       actions,
       back,
       onBack,
@@ -147,9 +152,10 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
       [onBack]
     )
 
-    const defaultBackControl = backHref ? (
+    const safeBackHref = resolveLinkHref(backHref)
+    const defaultBackControl = safeBackHref ? (
       <Link
-        href={backHref}
+        href={safeBackHref}
         underline={false}
         variant="default"
         className={backButtonClasses}
@@ -214,7 +220,9 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
             ) : null}
           </div>
         ) : null}
+        {tabs ? <div data-page-header-tabs="">{tabs}</div> : null}
         {hasBody ? <div className={pageHeaderContentClasses}>{children}</div> : null}
+        {footer ? <div data-page-header-footer="">{footer}</div> : null}
       </header>
     )
   }

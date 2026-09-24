@@ -16,6 +16,7 @@ import {
   progressTextBaseClasses,
   progressTextSizeClasses,
   progressTrackBgClasses,
+  progressStepFilled,
   resolveProgressView,
   type ProgressProps as CoreProgressProps
 } from '@expcat/tigercat-core'
@@ -41,6 +42,8 @@ export const Progress: React.FC<ProgressProps> = React.memo(
     height,
     className,
     style,
+    indeterminate = false,
+    steps,
     'aria-label': ariaLabel,
     'aria-labelledby': ariaLabelledby,
     'aria-describedby': ariaDescribedby,
@@ -62,6 +65,8 @@ export const Progress: React.FC<ProgressProps> = React.memo(
           striped,
           stripedAnimation,
           ariaLabel,
+          indeterminate,
+          steps,
           ariaLabelledby,
           widgetName
         }),
@@ -76,6 +81,8 @@ export const Progress: React.FC<ProgressProps> = React.memo(
         striped,
         stripedAnimation,
         ariaLabel,
+        indeterminate,
+        steps,
         ariaLabelledby,
         widgetName
       ]
@@ -186,7 +193,25 @@ export const Progress: React.FC<ProgressProps> = React.memo(
             !height && progressLineSizeClasses[size]
           )}
           style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>
-          <div className={getProgressFillClasses(view)} style={{ width: `${view.percentage}%` }} />
+          {view.steps > 1 ? (
+            progressStepFilled(view.steps, view.percentage).map((filled, index) => (
+              <div
+                key={index}
+                className={classNames(getProgressFillClasses(view), 'inline-block h-full')}
+                style={{ width: `${100 / view.steps}%`, opacity: filled ? 1 : 0.25 }}
+                data-tiger-progress-step={filled ? 'on' : 'off'}
+              />
+            ))
+          ) : (
+            <div
+              className={classNames(
+                getProgressFillClasses(view),
+                view.indeterminate && 'tiger-progress-indeterminate'
+              )}
+              style={view.indeterminate ? undefined : { width: `${view.percentage}%` }}
+              data-tiger-progress-success={view.successMark ? '' : undefined}
+            />
+          )}
         </div>
         {view.shouldShowText && (
           <span

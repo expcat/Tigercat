@@ -45,6 +45,9 @@ import {
   nodeHasChildren,
   nextTreeExpandedKeys,
   nextTreeSelectedKeys,
+  nextTreeRangeSelection,
+  createTypeaheadHighlight,
+  markTypeaheadMatch,
   normalizeSvgAttrs,
   reconcileUncontrolledExpandedKeys,
   resolveCheckedInput,
@@ -166,6 +169,7 @@ export const Tree = defineComponent({
     selectable: { type: Boolean, default: undefined },
     multiple: { type: Boolean, default: false },
     allowDeselect: { type: Boolean, default: false },
+    expandOnClick: { type: Boolean, default: false },
     loadData: { type: Function as PropType<TreeLoadDataFn> },
     loadedKeys: { type: Array as PropType<TreeNodeKey[]> },
     searchValue: { type: String, default: undefined },
@@ -413,9 +417,33 @@ export const Tree = defineComponent({
       commitExpanded(next, node, !expanded)
     }
 
-    function handleSelect(nodeKey: TreeNodeKey): void {
+    const selectionAnchor = ref<TreeNodeKey | undefined>(undefined)
+
+    function handleSelect(nodeKey: TreeNodeKey, shiftKey = false): void {
       const node = lookupTreeNode(view.value.index, nodeKey)
       if (!node || node.disabled || !selection.value.selectable) return
+      if (shiftKey && selection.value.multiple) {
+        const range = nextTreeRangeSelection({
+          visibleKeys: view.value.visibleItems.map((item) => item.key),
+          disabledKeys: view.value.visibleItems
+            .filter((item) => item.node.disabled)
+            .map((item) => item.key),
+          anchor: selectionAnchor.value,
+          key: node.key
+        })
+        selectionAnchor.value = range.anchor
+        if (props.selectedKeys === undefined) internalSelected.value = range.keys
+        emit('update:selectedKeys', range.keys)
+        emit('select', range.keys, {
+          selected: true,
+          selectedNodes: range.keys
+            .map((key) => lookupTreeNode(view.value.index, key))
+            .filter((item): item is TreeNode => Boolean(item)),
+          node
+        })
+        return
+      }
+      selectionAnchor.value = node.key
       const next = nextTreeSelectedKeys({
         current: computedSelected.value,
         key: node.key,
@@ -461,7 +489,23 @@ export const Tree = defineComponent({
       })
     }
 
+    const typeahead = createTypeaheadHighlight()
+
     function handleKeyDown(event: KeyboardEvent, nodeKey: TreeNodeKey): void {
+      const labels = view.value.visibleItems.map((item) => item.node.label)
+      const from = view.value.visibleItems.findIndex((item) => sameTreeKey(item.key, nodeKey))
+      const highlight = typeahead.push(
+        event.key,
+        labels,
+        from,
+        view.value.visibleItems.map((item) => Boolean(item.node.disabled))
+      )
+      if (highlight && highlight.index >= 0) {
+        event.preventDefault()
+        const row = view.value.visibleItems[highlight.index]
+        if (row) activeKey.value = row.key
+        return
+      }
       const action = resolveTreeKeyboardAction({
         key: event.key,
         nodeKey,
@@ -690,7 +734,8 @@ export const Tree = defineComponent({
               requestLoad(node, 'select')
               return
             }
-            if (selection.value.selectable) handleSelect(node.key)
+            if (props.expandOnClick && row.expandable) handleExpand(node.key)
+            if (selection.value.selectable) handleSelect(node.key, event.shiftKey)
           }
         },
         [
@@ -777,8 +822,12 @@ export const Tree = defineComponent({
                   : []
               )
             : null,
-          props.showIcon && node.icon != null
-            ? h('span', { class: treeNodeIconClasses }, renderNodeIcon(node.icon) ?? undefined)
+          props.showIcon && (node.icon != null || node.directory)
+            ? h(
+                'span',
+                { class: treeNodeIconClasses, 'data-tiger-tree-directory': node.directory ? '' : undefined },
+                renderNodeIcon(node.icon) ?? (node.directory ? '▸' : undefined)
+              )
             : null,
           h(
             'span',

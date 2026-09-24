@@ -37,4 +37,10 @@ export interface SpaceProps extends Pick<BaseLayoutProps, 'orientation' | 'align
    * @default false
    */
   wrap?: BaseLayoutProps['wrap']
+
+  /**
+   * Vertical gap in pixels. Omit to use `size` on both axes when `size` is a preset.
+   * A numeric `size` stays horizontal-only until this is set.
+   */
+  verticalSize?: number
 }

@@ -217,7 +217,7 @@ describe('Input', () => {
 
     it('should be readonly when readonly prop is true', () => {
       const { getByRole } = renderWithProps(Input, {
-        readonly: true
+        readOnly: true
       })
 
       const input = getByRole('textbox')
@@ -325,7 +325,7 @@ describe('Input', () => {
 
     it('should not allow input when readonly', async () => {
       const { getByRole } = renderWithProps(Input, {
-        readonly: true,
+        readOnly: true,
         modelValue: 'initial'
       })
 
@@ -556,7 +556,7 @@ describe('Input', () => {
           suffix: 'Suf',
           placeholder: 'Placeholder',
           disabled: false,
-          readonly: false,
+          readOnly: false,
           required: true,
           maxLength: 100,
           minLength: 1,

@@ -16,6 +16,11 @@ import {
   getTableVirtualWindow,
   devWarn,
   resolveScrollportViewport,
+  virtualizeMiddleColumns,
+  parseWidthToPx,
+  cardVirtualWindow,
+  nextGridCell,
+  resolveTableKeyboardMode,
   getTableCardSortValue,
   parseTableCardSortValue,
   subscribeTableCardViewport,
@@ -58,6 +63,7 @@ import { renderTableHeader } from './Table/render-header'
 import { renderTableBody } from './Table/render-body'
 import { renderSummaryRow } from './Table/render-summary'
 import { renderPagination } from './Table/render-pagination'
+import { TableW9Panel } from './Table/w9-panel'
 import type { TableProps } from './Table/types'
 
 export type { TableProps } from './Table/types'
@@ -102,6 +108,15 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   virtualHeight = 400,
   virtualItemHeight = 40,
   virtualThreshold = 1000,
+  virtualizeColumns = false,
+  width = 'auto',
+  overscan = 5,
+  scrollToIndex,
+  sorts,
+  columnWidths,
+  grid = false,
+  collapsedGroupKeys,
+  cardItemHeight,
   editable = false,
   editableCells,
   filterMode = 'basic',
@@ -142,6 +157,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const [measuredContainerSize, setMeasuredContainerSize] = useState({ width: 0, height: 0 })
   const [uncontrolledCardViewport, setUncontrolledCardViewport] = useState(false)
   const [activeRowIndex, setActiveRowIndex] = useState(0)
+  const [gridCell, setGridCell] = useState({ row: 0, column: 0 })
   const cardViewportControlled = cardViewport !== undefined
   const isCardViewport = cardViewportControlled ? Boolean(cardViewport) : uncontrolledCardViewport
   const selectionGroupName = useId()
@@ -255,6 +271,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     filterMode,
     advancedFilterRules,
     groupBy,
+    sorts,
+    columnWidths,
+    collapsedGroupKeys,
     exportScope,
     exportFilename,
     columnOrder,
@@ -377,7 +396,14 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
   // Row windowing: track the scroll position and compute the visible slice.
   const [virtualScrollTop, setVirtualScrollTop] = useState(0)
+  const [columnScrollLeft, setColumnScrollLeft] = useState(0)
   const virtualScrollerRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (typeof scrollToIndex !== 'number' || !virtualScrollerRef.current) return
+    const top = Math.max(0, scrollToIndex) * virtualItemHeight
+    virtualScrollerRef.current.scrollTop = top
+    setVirtualScrollTop(top)
+  }, [scrollToIndex, virtualItemHeight])
   const [virtualClientHeight, setVirtualClientHeight] = useState(0)
   const declaredRowHeight = virtualItemHeight
   const unevenRows = Object.values(measuredRowHeights).some(
@@ -468,6 +494,18 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     return () => controller.disconnect()
   }, [shouldObserveGeometry, ctx.displayColumns.length, ctx.paginatedData.length])
 
+  const columnSlice = virtualizeMiddleColumns({
+    columns: ctx.displayColumns,
+    widths: ctx.displayColumns.map((column) => parseWidthToPx(column.width)),
+    scrollLeft: columnScrollLeft,
+    viewportWidth: typeof width === 'number' ? width : 0,
+    overscan,
+    enabled: virtualizeColumns
+  })
+  const renderedColumns = columnSlice.active
+    ? [...columnSlice.start, ...columnSlice.middle, ...columnSlice.end]
+    : undefined
+
   const tableInner = (
     <table
       ref={tableRef}
@@ -480,7 +518,28 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         className
       )}
       {...props}
+      data-keyboard-mode={grid ? resolveTableKeyboardMode(true) : undefined}
+      data-grid-cell={grid ? `${gridCell.row}-${gridCell.column}` : undefined}
+      tabIndex={grid ? 0 : undefined}
+      onKeyDown={
+        grid
+          ? (event) => {
+              const next = nextGridCell({
+                row: gridCell.row,
+                column: gridCell.column,
+                rowCount: ctx.paginatedData.length,
+                columnCount: ctx.displayColumns.length,
+                key: event.key
+              })
+              if (!next || !event.key.startsWith('Arrow')) return
+              event.preventDefault()
+              setGridCell(next)
+            }
+          : undefined
+      }
       aria-label={ariaLabel || tableLabels.tableAriaLabel}
+      aria-rowcount={virtual ? ctx.paginatedData.length + 1 : undefined}
+      aria-colcount={virtualizeColumns ? ctx.displayColumns.length : undefined}
       style={
         ctx.fixedColumnsInfo.hasFixedColumns && ctx.fixedColumnsInfo.minTableWidth
           ? {
@@ -516,7 +575,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         unlockColumnAriaLabel: tableLabels.unlockColumnAriaLabel,
         labels: tableLabels,
         selectionName: selectionGroupName,
-        filterMode
+        filterMode,
+        renderedColumns
       })}
       {renderTableBody(ctx, {
         size,
@@ -531,9 +591,12 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         rowDraggable,
         interactiveRows: !!onRowClick || !!internalRowSelection,
         virtualWindow,
+        virtualItemHeight,
+        renderedColumns,
         selectionName: selectionGroupName,
         activeRowIndex,
-        onActiveRowIndex: setActiveRowIndex
+        onActiveRowIndex: setActiveRowIndex,
+        grid
       })}
       {renderSummaryRow(ctx, {
         size,
@@ -549,13 +612,25 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     overflow: 'auto' as const
   }
 
+  const cardHeightWindow = cardVirtualWindow({
+    scrollTop: virtualScrollTop,
+    viewportHeight: typeof virtualHeight === 'number' ? virtualHeight : 240,
+    cardHeight: cardItemHeight,
+    variable: false,
+    count: ctx.paginatedData.length
+  })
+
   const tableContent =
     showTableTree &&
     (effectiveVirtual ? (
       <div
         ref={virtualScrollerRef}
         style={virtualScrollerStyle}
-        onScroll={(e) => setVirtualScrollTop((e.target as HTMLDivElement).scrollTop)}>
+        onScroll={(e) => {
+          const target = e.target as HTMLDivElement
+          setVirtualScrollTop(target.scrollTop)
+          setColumnScrollLeft(target.scrollLeft)
+        }}>
         {tableInner}
       </div>
     ) : (
@@ -575,6 +650,39 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       data-tiger-measured-row-height={Object.values(measuredRowHeights)[0] || undefined}
       data-tiger-table-layout={showCardTree ? 'card' : 'table'}
       aria-busy={loading}>
+      <TableW9Panel
+        active={sorts !== undefined}
+        columns={ctx.displayColumns}
+        sorts={ctx.multiSort}
+        pageKeys={ctx.pageRowKeys}
+        loadedKeys={ctx.processedRowKeys}
+        disabledKeys={ctx.paginatedData.flatMap((record, index) => {
+          const key = ctx.pageRowKeys[index]
+          const checkbox = internalRowSelection?.getCheckboxProps?.(record)
+          return checkbox?.disabled && key !== undefined ? [key] : []
+        })}
+        pageRecords={ctx.paginatedData}
+        processedRecords={ctx.processedData}
+        processedKeys={ctx.processedRowKeys}
+        selectedKeys={ctx.selectedRowKeys ?? []}
+        remote={internalRowSelection?.remote === true}
+        onSort={(key) => ctx.applyMultiSort(key)}
+        onFilter={(key, value) => ctx.handleFilter(key, value)}
+        onHide={(key) => {
+          const hidden = ctx.hiddenColumnKeys.includes(key)
+            ? ctx.hiddenColumnKeys.filter((item) => item !== key)
+            : [...ctx.hiddenColumnKeys, key]
+          ctx.handleSetHiddenColumns(hidden)
+        }}
+        onResize={(key, width) => ctx.applyColumnWidth(key, width)}
+        onSelection={(keys) => ctx.replaceSelectedKeys(keys)}
+        onRemoteSelect={() => ctx.handleSelectLoaded(true)}
+      />
+      {ctx.dragLive ? (
+        <div role="status" data-tiger-drag-live="">
+          {ctx.dragLive}
+        </div>
+      ) : null}
       {exportable && (
         <div className={tableExportBarClasses}>
           <Button
@@ -593,7 +701,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       {showCardTree && (
         <div
           className={tableCardListVisibleClasses}
-          data-tiger-table-mobile="card">
+          data-tiger-table-mobile="card"
+          data-tiger-card-window={
+            cardHeightWindow ? `${cardHeightWindow.start}-${cardHeightWindow.end}` : undefined
+          }>
           {internalRowSelection?.type !== 'radio' &&
           internalRowSelection?.showCheckbox !== false &&
           internalRowSelection &&
@@ -648,8 +759,14 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
               ) : null}
               {ctx.paginatedData
                 .slice(
-                  effectiveVirtual && virtualWindow ? virtualWindow.startIndex : 0,
-                  effectiveVirtual && virtualWindow
+                  cardHeightWindow
+                    ? cardHeightWindow.start
+                    : effectiveVirtual && virtualWindow
+                      ? virtualWindow.startIndex
+                      : 0,
+                  cardHeightWindow
+                    ? cardHeightWindow.end
+                    : effectiveVirtual && virtualWindow
                     ? virtualWindow.endIndex + 1
                     : ctx.paginatedData.length
                 )

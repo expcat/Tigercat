@@ -733,4 +733,10 @@ export function resolveTimePickerNow(
   }
 }
 
+/** Snap a column's scroll offset onto the nearest step row. */
+export function snapTimeColumnScroll(scrollTop: number, itemHeight: number): number {
+  if (!Number.isFinite(itemHeight) || itemHeight <= 0 || !Number.isFinite(scrollTop)) return 0
+  return Math.max(0, Math.round(scrollTop / itemHeight) * itemHeight)
+}
+
 

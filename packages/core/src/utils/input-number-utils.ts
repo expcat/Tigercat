@@ -208,6 +208,107 @@ export function formatPrecision(value: number, precision: number): number {
   return Number(value.toFixed(precision))
 }
 
+export type InputNumberModel = number | string | null
+
+const DECIMAL_STRING = /^-?\d+(\.\d+)?$/
+
+/** Plain `"12"` stays a number. Integers past `MAX_SAFE_INTEGER` stay strings. */
+export function parseInputNumberModel(str: string): InputNumberModel {
+  const trimmed = str.trim()
+  if (trimmed === '' || trimmed === '-' || trimmed === '.') return null
+  if (!DECIMAL_STRING.test(trimmed)) {
+    const num = Number(trimmed)
+    return Number.isFinite(num) ? num : null
+  }
+  const integer = trimmed.replace(/^-/, '').split('.')[0]
+  if (integer.length > 15 || Math.abs(Number(trimmed)) > Number.MAX_SAFE_INTEGER) {
+    return trimmed
+  }
+  const num = Number(trimmed)
+  return Number.isFinite(num) ? num : null
+}
+
+function splitDecimal(value: string): { sign: -1 | 1; digits: string; scale: number } | null {
+  if (!DECIMAL_STRING.test(value)) return null
+  const sign: -1 | 1 = value.startsWith('-') ? -1 : 1
+  const body = value.replace(/^-/, '')
+  const [whole, frac = ''] = body.split('.')
+  return { sign, digits: `${whole}${frac}`.replace(/^0+(?=\d)/, ''), scale: frac.length }
+}
+
+function formatDecimalParts(sign: -1 | 1, digits: string, scale: number, precision?: number): string {
+  let nextScale = scale
+  let nextDigits = digits.replace(/^0+(?=\d)/, '') || '0'
+  if (precision !== undefined) {
+    if (nextScale < precision) {
+      nextDigits = nextDigits.padEnd(nextDigits.length + (precision - nextScale), '0')
+      nextScale = precision
+    } else if (nextScale > precision) {
+      const cut = nextDigits.length - (nextScale - precision)
+      const kept = nextDigits.slice(0, cut) || '0'
+      const roundDigit = nextDigits[cut] ?? '0'
+      nextDigits = kept
+      nextScale = precision
+      if (roundDigit >= '5') {
+        const bumped = (BigInt(nextDigits || '0') + 1n).toString()
+        nextDigits = bumped
+      }
+    }
+  }
+  nextDigits = nextDigits.replace(/^0+(?=\d)/, '') || '0'
+  const wholeLen = Math.max(nextDigits.length - nextScale, 1)
+  const padded = nextDigits.padStart(wholeLen + nextScale, '0')
+  const whole = padded.slice(0, padded.length - nextScale) || '0'
+  const frac = nextScale > 0 ? padded.slice(padded.length - nextScale) : ''
+  const body = frac ? `${whole}.${frac}` : whole
+  return sign < 0 && body !== '0' ? `-${body}` : body
+}
+
+/** Add `delta` (a finite step) onto a decimal string. */
+export function addDecimalString(current: string, delta: number, precision?: number): string {
+  const base = splitDecimal(current)
+  if (!base) return current
+  const deltaText = String(delta)
+  const step = splitDecimal(deltaText)
+  if (!step) return current
+  const scale = Math.max(base.scale, step.scale, precision ?? 0)
+  const left = BigInt(base.digits || '0') * 10n ** BigInt(scale - base.scale) * BigInt(base.sign)
+  const right = BigInt(step.digits || '0') * 10n ** BigInt(scale - step.scale) * BigInt(step.sign)
+  const sum = left + right
+  const sign: -1 | 1 = sum < 0n ? -1 : 1
+  return formatDecimalParts(sign, (sum < 0n ? -sum : sum).toString(), scale, precision)
+}
+
+export function stepInputNumberModel(
+  current: InputNumberModel,
+  step: number,
+  direction: 'up' | 'down',
+  min: number = -Infinity,
+  max: number = Infinity,
+  precision?: number
+): InputNumberModel {
+  if (typeof current === 'string') {
+    const delta = direction === 'up' ? Math.abs(step || 1) : -Math.abs(step || 1)
+    return addDecimalString(current, delta, precision)
+  }
+  return stepValue(current, step, direction, min, max, precision)
+}
+
+export function commitInputNumberModel(
+  raw: InputNumberModel,
+  current: InputNumberModel,
+  options: CommitInputNumberOptions = {}
+): { value: InputNumberModel; changed: boolean } {
+  if (typeof raw === 'string') {
+    let next: InputNumberModel = raw
+    if (options.precision !== undefined) next = addDecimalString(raw, 0, options.precision)
+    return { value: next, changed: next !== current }
+  }
+  const numericCurrent = typeof current === 'number' ? current : null
+  const committed = commitInputNumberValue(raw, numericCurrent, options)
+  return committed
+}
+
 export function isAtMin(value: number | null | undefined, min: number = -Infinity): boolean {
   if (value === null || value === undefined) return false
   return value <= min

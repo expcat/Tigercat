@@ -28,6 +28,9 @@ export interface VueWatermarkProps {
   gapY?: number
   offsetX?: number
   offsetY?: number
+  rowGap?: number
+  density?: number
+  printVisible?: boolean
   font?: WatermarkFont
   className?: string
   style?: Record<string, string | number>
@@ -53,6 +56,9 @@ export const Watermark = defineComponent({
     gapY: { type: Number, default: watermarkDefaults.gapY },
     offsetX: { type: Number, default: watermarkDefaults.offsetX },
     offsetY: { type: Number, default: watermarkDefaults.offsetY },
+    rowGap: { type: Number, default: 0 },
+    density: { type: Number, default: 1 },
+    printVisible: { type: Boolean, default: true },
     font: {
       type: Object as PropType<WatermarkFont>,
       default: undefined
@@ -130,7 +136,9 @@ export const Watermark = defineComponent({
         gapY: props.gapY,
         offsetX: props.offsetX,
         offsetY: props.offsetY,
-        zIndex: props.zIndex
+        zIndex: props.zIndex,
+        rowGap: props.rowGap,
+        density: props.density
       })
     )
 
@@ -154,7 +162,14 @@ export const Watermark = defineComponent({
             'data-watermark': 'true',
             class: watermarkOverlayClasses,
             'aria-hidden': 'true',
-            style: overlayStyle.value
+            'data-watermark-print': props.printVisible ? 'on' : 'off',
+            style: {
+              ...overlayStyle.value,
+              position: 'absolute',
+              pointerEvents: 'none',
+              backgroundRepeat: 'repeat',
+              zIndex: String(props.zIndex)
+            }
           }),
           imageFailed.value
             ? h(

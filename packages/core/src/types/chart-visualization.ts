@@ -359,3 +359,34 @@ export interface SunburstChartProps
    */
   tooltipFormatter?: (datum: SunburstChartDatum, index: number) => string
 }
+
+export type WaterfallKind = 'increase' | 'decrease' | 'total'
+
+export interface WaterfallDatum {
+  label: string
+  value: number
+  kind: WaterfallKind
+}
+
+export interface WaterfallChartProps extends BaseChartProps {
+  data: WaterfallDatum[]
+  height?: number
+  colors?: { increase?: string; decrease?: string; total?: string }
+}
+
+export interface SankeyNode {
+  id: string
+  label?: string
+}
+
+export interface SankeyLink {
+  source: string
+  target: string
+  value: number
+}
+
+export interface SankeyChartProps extends BaseChartProps {
+  nodes: SankeyNode[]
+  links: SankeyLink[]
+  height?: number
+}

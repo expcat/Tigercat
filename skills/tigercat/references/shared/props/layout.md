@@ -23,7 +23,7 @@ Note: 根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `ove
 
 ## Card
 
-`packages/core/src/types/card.ts` · `CardProps` · 4/18 props
+`packages/core/src/types/card.ts` · `CardProps` · 4/19 props
 
 Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。
 
@@ -36,7 +36,7 @@ Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根
 
 ## Carousel
 
-`packages/core/src/types/carousel.ts` · `CarouselProps` · 4/17 props
+`packages/core/src/types/carousel.ts` · `CarouselProps` · 4/20 props
 
 Note: 子节点才是 slides。`infinite` 在 scroll 下走首尾 clone，不会整段倒带。无名不是 landmark。非当前页 `inert`。开 autoplay 时有可聚焦暂停；`autoplaySpeed<=0` 和 reduced-motion 都不自动播。
 
@@ -68,7 +68,7 @@ Note: `maxWidth={false}` 没有 max-width；`"full"` 是 `max-width: 100%`；命
 
 | Prop        | Type                          | Default | Notes                                                                 |
 | ----------- | ----------------------------- | ------- | --------------------------------------------------------------------- |
-| `maxWidth?` | `ContainerMaxWidth`           | `false` | Maximum width constraint, read from `--tiger-breakpoint-*`. - 'sm' \\ | 'md' \\ | 'lg' \\ | '... |
+| `maxWidth?` | `ContainerMaxWidth`           | `'lg'`  | Maximum width constraint, read from `--tiger-breakpoint-*`. - 'sm' \\ | 'md' \\ | 'lg' \\ | '... |
 | `center?`   | `boolean`                     | `true`  | Whether to center the container horizontally                          |
 | `padding?`  | `boolean`                     | `true`  | Whether to add horizontal padding                                     |
 | `as?`       | `keyof HTMLElementTagNameMap` | `'div'` | HTML element to render as                                             |
@@ -134,7 +134,7 @@ Note: 默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSide
 
 ## List
 
-`packages/core/src/types/list.ts` · `ListProps` · 4/22 props
+`packages/core/src/types/list.ts` · `ListProps` · 4/25 props
 
 Note: 分页默认关（与 Table 默认开、`pageSize` 10 相反）。传入 `pagination` 才渲染 Pagination：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`（与 Table `pagination.remote`、工具栏 `toolbar.searchMode: 'remote'` 是三套独立开关）：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。虚拟窗高是 `virtualHeight`，不是 TreeSelect overlay `height` / Select `listHeight`。
 
@@ -147,7 +147,7 @@ Note: 分页默认关（与 Table 默认开、`pageSize` 10 相反）。传入 `
 
 ## Masonry
 
-`packages/core/src/types/masonry.ts` · `MasonryProps` · 4/5 props
+`packages/core/src/types/masonry.ts` · `MasonryProps` · 4/6 props
 
 Note: 默认 `layout="source"` 用 CSS 多列保持源顺序。`layout="shortest"` 按最短列定位，容器说明视觉顺序与源顺序不同。
 
@@ -177,16 +177,16 @@ Note: `left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄�
 
 Note: 数字 `gutter` 只开横缝，双轴传 `[h, v]`。缝是 CSS gap，不是负 margin。`wrap={false}` 不折行。
 
-| Prop       | Type         | Default   | Notes                                                                                      |
-| ---------- | ------------ | --------- | ------------------------------------------------------------------------------------------ |
-| `gutter?`  | `GutterSize` | `0`       | Grid gutter in px. A number is **horizontal only**; pass `[horizontal, vertical]` for b... |
-| `wrap?`    | `boolean`    | `true`    | Whether to wrap                                                                            |
-| `align?`   | `Align`      | `'top'`   | Vertical alignment of flex layout                                                          |
-| `justify?` | `Justify`    | `'start'` | Horizontal arrangement of flex layout                                                      |
+| Prop       | Type                | Default   | Notes                                                                                      |
+| ---------- | ------------------- | --------- | ------------------------------------------------------------------------------------------ |
+| `gutter?`  | `GutterSize`        | `0`       | Grid gutter in px. A number is **horizontal only**; pass `[horizontal, vertical]` for b... |
+| `wrap?`    | `boolean`           | `true`    | Whether to wrap                                                                            |
+| `align?`   | `ResponsiveAlign`   | `'top'`   | Vertical alignment of flex layout                                                          |
+| `justify?` | `ResponsiveJustify` | `'start'` | Horizontal arrangement of flex layout                                                      |
 
 ## ScrollArea
 
-`packages/core/src/types/scroll-area.ts` · `ScrollAreaProps` · 4/13 props
+`packages/core/src/types/scroll-area.ts` · `ScrollAreaProps` · 4/14 props
 
 | Prop         | Type               | Default | Notes                                                                                      |
 | ------------ | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
@@ -212,7 +212,7 @@ Note: `collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开
 
 ## Skeleton
 
-`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 4/9 props
+`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 4/11 props
 
 Note: `wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰默认 `aria-hidden`；有名字时是 `status`。加载态也可由父级 `aria-busy` 负责。
 
@@ -225,20 +225,19 @@ Note: `wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰
 
 ## Space
 
-`packages/core/src/types/space.ts` · `SpaceProps` · 4/5 props
+`packages/core/src/types/space.ts` · `SpaceProps` · 3/6 props
 
 Note: `wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基类。
 
-| Prop           | Type                             | Default        | Notes                                                  |
-| -------------- | -------------------------------- | -------------- | ------------------------------------------------------ |
-| `wrap?`        | `BaseLayoutProps['wrap']`        | `false`        | Whether to wrap items                                  |
-| `size?`        | `SpaceSize`                      | `'md'`         | Space size between items Can be a preset size ('sm' \\ | 'md' \\ | 'lg') or a custom number... |
-| `align?`       | `BaseLayoutProps['align']`       | `'start'`      | Align items in the space                               |
-| `orientation?` | `BaseLayoutProps['orientation']` | `'horizontal'` | Space orientation                                      |
+| Prop     | Type                       | Default   | Notes                                                  |
+| -------- | -------------------------- | --------- | ------------------------------------------------------ |
+| `wrap?`  | `BaseLayoutProps['wrap']`  | `false`   | Whether to wrap items                                  |
+| `size?`  | `SpaceSize`                | `'md'`    | Space size between items Can be a preset size ('sm' \\ | 'md' \\ | 'lg') or a custom number... |
+| `align?` | `BaseLayoutProps['align']` | `'start'` | Align items in the space                               |
 
 ## Splitter
 
-`packages/core/src/types/splitter.ts` · `SplitterProps` · 4/9 props
+`packages/core/src/types/splitter.ts` · `SplitterProps` · 4/10 props
 
 Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值不会清拖拽）；百分比跟容器走。水平几何读 `dir`。gutter 是带名字的 `separator`。
 

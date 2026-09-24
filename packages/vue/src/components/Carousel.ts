@@ -35,6 +35,8 @@ import {
   getCarouselSlideClasses,
   getNextSlideIndex,
   getPrevSlideIndex,
+  getCarouselAxisTransform,
+  getCarouselSlidesPerView,
   getScrollTransform,
   isCarouselAutoplayEnabled,
   isCarouselChromeTarget,
@@ -119,6 +121,18 @@ export const Carousel = defineComponent({
     dots: {
       type: Boolean,
       default: true
+    },
+    axis: {
+      type: String as PropType<'horizontal' | 'vertical'>,
+      default: 'horizontal'
+    },
+    slidesPerView: {
+      type: Number,
+      default: 1
+    },
+    thumbnails: {
+      type: Boolean,
+      default: false
     },
     dotPosition: {
       type: String as PropType<CarouselDotPosition>,
@@ -539,7 +553,14 @@ export const Carousel = defineComponent({
                 class: carouselTrackScrollClasses,
                 'data-tiger-carousel-track': '',
                 style: {
-                  transform: getScrollTransform(displayIndex.value, dir.value),
+                  transform:
+                    props.axis === 'vertical' || props.slidesPerView > 1
+                      ? getCarouselAxisTransform(
+                          displayIndex.value,
+                          props.axis,
+                          getCarouselSlidesPerView(props.slidesPerView, count)
+                        )
+                      : getScrollTransform(displayIndex.value, dir.value),
                   transitionDuration: transitionDuration.value
                 },
                 onTransitionend: handleTrackTransitionEnd
@@ -598,6 +619,8 @@ export const Carousel = defineComponent({
           ),
           style: mergeStyleValues(attrsRecord.style, props.style),
           'data-tiger-carousel': '',
+          'data-axis': props.axis,
+          'data-slides-per-view': String(getCarouselSlidesPerView(props.slidesPerView, count)),
           role: region.role,
           'aria-roledescription': labels.value.roleDescription,
           'aria-label': region.ariaLabel,
@@ -676,6 +699,24 @@ export const Carousel = defineComponent({
                 isNextDisabled(current, count, props.infinite),
                 next,
                 carouselNextArrowPath
+              )
+            : null,
+          props.thumbnails && count > 1
+            ? h(
+                'div',
+                { 'data-tiger-carousel-thumbs': '' },
+                currentSlides.map((_, index) =>
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      'data-tiger-carousel-thumb': index,
+                      'aria-current': index === current ? 'true' : undefined,
+                      onClick: () => goTo(index)
+                    },
+                    String(index + 1)
+                  )
+                )
               )
             : null,
           props.dots && count > 1

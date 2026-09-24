@@ -69,4 +69,15 @@ export interface SkeletonProps {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * `true` shows the placeholder. `false` shows children.
+   * Omit to always show the placeholder.
+   */
+  loading?: boolean
+
+  /**
+   * Shape and row preset. Not a separate control component.
+   */
+  preset?: 'text' | 'avatar' | 'image' | 'button'
 }

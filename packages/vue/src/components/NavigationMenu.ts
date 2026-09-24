@@ -11,6 +11,7 @@ import {
   nextTick,
   useId,
   Fragment,
+  Teleport,
   isVNode,
   type ComputedRef,
   type Ref,
@@ -29,6 +30,11 @@ import {
   getNavigationMenuTriggerClasses,
   getNavigationMenuChevronClasses,
   getNavigationMenuContentClasses,
+  getNavigationMenuIndicatorStyle,
+  measureNavigationIndicator,
+  createTypeaheadHighlight,
+  isTypeaheadCharacter,
+  markTypeaheadMatch,
   getNavigationMenuLinkClasses,
   getNavigationMenuItemValue,
   getNavigationMenuRovingTabIndex,
@@ -66,12 +72,34 @@ import type {
 } from '@expcat/tigercat-core'
 import { useVueAnchoredOverlay, renderVueOverlayTeleport } from '../utils/overlay'
 
+function indicatorStyle(
+  list: HTMLElement | null,
+  current: NavigationMenuValue | null | undefined
+): Record<string, string> {
+  if (!list || current == null) return getNavigationMenuIndicatorStyle(0, 0)
+  const trigger = list.querySelector<HTMLElement>(
+    `[data-tiger-navigation-menu-value="${String(current)}"]`
+  )
+  if (!trigger) return getNavigationMenuIndicatorStyle(0, 0)
+  const dir = getComputedStyle(list).direction === 'rtl' ? 'rtl' : 'ltr'
+  const measured = measureNavigationIndicator(
+    trigger.getBoundingClientRect(),
+    list.getBoundingClientRect(),
+    dir
+  )
+  return getNavigationMenuIndicatorStyle(measured.start, measured.size)
+}
+
 export const NavigationMenuContextKey = Symbol('NavigationMenuContext')
 export const NavigationMenuItemContextKey = Symbol('NavigationMenuItemContext')
 export const NavigationMenuContentContextKey = Symbol('NavigationMenuContentContext')
 
 export interface NavigationMenuContext {
   value: ComputedRef<NavigationMenuValue | null>
+  current: ComputedRef<NavigationMenuValue | null | undefined>
+  viewport: ComputedRef<boolean>
+  viewportEl: Ref<HTMLElement | null>
+  typeahead: ReturnType<typeof createTypeaheadHighlight>
   tabStopValue: Ref<NavigationMenuValue | null>
   setTabStopValue: (next: NavigationMenuValue | null) => void
   setValue: (next: NavigationMenuValue | null, options?: { restoreFocus?: boolean }) => void
@@ -144,6 +172,24 @@ function nodesHaveList(nodes: unknown[]): boolean {
 
 function commitMenubarKey(root: NavigationMenuContext | null, event: KeyboardEvent): boolean {
   if (!root?.menubarRef.value) return false
+  if (isTypeaheadCharacter(event.key)) {
+    const nodes = getNavigationMenuBarItems(root.menubarRef.value)
+    const current = event.target instanceof HTMLElement ? event.target : null
+    const hit = root.typeahead.push(
+      event.key,
+      nodes.map((node) => (node.textContent ?? '').trim()),
+      current ? Math.max(0, nodes.indexOf(current)) : 0,
+      nodes.map((node) => node.getAttribute('aria-disabled') === 'true')
+    )
+    if (hit && hit.index >= 0) {
+      event.preventDefault()
+      markTypeaheadMatch(nodes, hit.index)
+      nodes[hit.index]?.focus()
+      const value = getNavigationMenuItemValue(nodes[hit.index])
+      if (value != null) root.setTabStopValue(value)
+      return true
+    }
+  }
   const next = handleMenubarNavigation(root.menubarRef.value, event)
   if (!next) return false
   const value = getNavigationMenuItemValue(next)
@@ -565,6 +611,15 @@ export const NavigationMenuContent = defineComponent({
         ]
       )
 
+      if (root.viewport.value && !props.mega) {
+        if (!isOpen) return null
+        const target = root.viewportEl.value
+        if (!target) return null
+        return h(Teleport, { to: target }, [
+          h('div', { role: 'menu', 'data-tiger-navigation-menu-content': '' }, slots.default?.())
+        ])
+      }
+
       return renderVueOverlayTeleport(popup, overlay.target.value, !portalEnabled.value)
     }
   }
@@ -762,7 +817,16 @@ export const NavigationMenuList = defineComponent({
           role: 'menubar',
           'data-tiger-navigation-menu-list': ''
         },
-        slots.default?.()
+        [
+          slots.default?.(),
+          root?.current.value != null
+            ? h('span', {
+                'data-tiger-navigation-indicator': '',
+                class: 'absolute bottom-0 h-0.5 bg-[var(--tiger-primary)]',
+                style: indicatorStyle(listRef.value, root.current.value)
+              })
+            : null
+        ]
       )
     }
   }
@@ -784,6 +848,11 @@ export const NavigationMenu = defineComponent({
       type: [String, Number] as PropType<NavigationMenuValue | null>,
       default: undefined
     },
+    current: {
+      type: [String, Number] as PropType<NavigationMenuValue | null>,
+      default: undefined
+    },
+    viewport: { type: Boolean, default: false },
     open: {
       type: Boolean,
       default: undefined
@@ -921,9 +990,15 @@ export const NavigationMenu = defineComponent({
     })
 
     const portalEnabled = computed(() => props.portal)
+    const viewportEl = ref<HTMLElement | null>(null)
+    const typeahead = createTypeaheadHighlight()
 
     const navigationMenuContext: NavigationMenuContext = {
       value: currentValue,
+      current: computed(() => props.current),
+      viewport: computed(() => props.viewport),
+      viewportEl,
+      typeahead,
       tabStopValue,
       setTabStopValue: (next) => {
         tabStopValue.value = next
@@ -987,10 +1062,20 @@ export const NavigationMenu = defineComponent({
           class: containerClasses.value,
           style: mergedStyle.value,
           'data-tiger-navigation-menu': '',
+          'data-tiger-navigation-viewport': props.viewport ? 'true' : undefined,
           'data-state': currentOpen.value ? 'open' : 'closed',
           onFocusout: handleFocusLeave
         },
-        children
+        [
+          ...children,
+          props.viewport
+            ? h('div', {
+                ref: viewportEl,
+                'data-tiger-navigation-viewport-panel': '',
+                hidden: !currentOpen.value
+              })
+            : null
+        ]
       )
     }
   }

@@ -17,6 +17,7 @@ import {
   isChartNavigationKey,
   getChartLabels,
   mergeTigerLocale,
+  funnelLayerRatios,
   funnelStageDisplayLabel,
   chartLabelFill,
   funnelSegmentTransitionClasses,
@@ -107,7 +108,8 @@ export const FunnelChart = defineComponent({
       handleKeyDown,
       handleLegendClick,
       handleLegendHover,
-      handleLegendLeave
+      handleLegendLeave,
+      isLegendIndexHidden
     } = useChartInteraction<FunnelChartDatum>({
       hoverable: computed(() => props.hoverable),
       showTooltip: computed(() => props.showTooltip),
@@ -144,6 +146,15 @@ export const FunnelChart = defineComponent({
     const total = computed(() => segments.value.reduce((sum, segment) => sum + segment.value, 0))
     const stageName = (datum: FunnelChartDatum, index: number) =>
       funnelStageDisplayLabel(datum, index, labels.value.stageName)
+    const ratios = computed(() => funnelLayerRatios(props.data.map((item) => item.value)))
+    const layerLabel = (index: number, name: string) => {
+      const ratio = ratios.value[index]
+      if (!ratio) return name
+      const previous =
+        ratio.versusPrevious === null ? '' : ` ${Math.round(ratio.versusPrevious * 100)}%`
+      const first = ratio.versusFirst === null ? '' : ` ${Math.round(ratio.versusFirst * 100)}%`
+      return `${name} ${ratio.value}${previous}${first}`
+    }
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
         data: segments.value,
@@ -152,7 +163,9 @@ export const FunnelChart = defineComponent({
         selectedIndex: resolvedSelectedIndex.value,
         getIndex: (segment) => segment.index,
         getLabel: (segment) => stageName(props.data[segment.index], segment.index),
-        getColor: (segment) => segment.color
+        getColor: (segment) => segment.color,
+      
+        isHidden: (index) => isLegendIndexHidden(index)
       })
     )
     const tooltipContent = computed(() =>
@@ -283,9 +296,12 @@ export const FunnelChart = defineComponent({
                       fill: chartLabelFill(seg.color),
                       'aria-hidden': interactive.value ? 'true' : undefined
                     },
-                    stageName(
-                      props.data[seg.index] ?? { value: seg.value, label: seg.label },
-                      seg.index
+                    layerLabel(
+                      seg.index,
+                      stageName(
+                        props.data[seg.index] ?? { value: seg.value, label: seg.label },
+                        seg.index
+                      )
                     )
                   )
                 )

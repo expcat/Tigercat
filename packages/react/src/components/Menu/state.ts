@@ -12,6 +12,7 @@ import {
   resolveMenuMode,
   resolveMenuSearchQuery,
   resolveMenuTabStopKey,
+  createTypeaheadHighlight,
   resolveSearchFilter,
   shouldShowMenuSearch,
   warnControlledSearchOpenKeys,
@@ -165,6 +166,7 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
   const setTabStopKey = useCallback((key: MenuKey) => {
     setTabStopKeyState(key)
   }, [])
+  const typeaheadRef = useRef(createTypeaheadHighlight())
 
   const contextValue = useMemo<MenuContextValue>(
     () => ({
@@ -179,7 +181,8 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
       handleSelect,
       handleOpenChange,
       tabStopKey: resolvedTabStop,
-      setTabStopKey
+      setTabStopKey,
+      typeahead: typeaheadRef.current
     }),
     [
       resolvedMode,

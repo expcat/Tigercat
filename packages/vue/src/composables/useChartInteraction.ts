@@ -17,6 +17,8 @@ import {
   resolveChartActiveIndex,
   resolveChartIndex,
   shouldTrackChartPointer,
+  toggleLegendHidden,
+  isLegendHidden,
   tooltipPositionFromEvent,
   type ChartInteractionState,
   type ChartLegendPosition
@@ -53,6 +55,8 @@ export interface UseChartInteractionReturn {
   handleLegendHover: (index: number, _item?: unknown, event?: Event) => void
   handleLegendLeave: () => void
   wrapperClasses: ComputedRef<string>
+  legendHiddenKeys: Ref<string[]>
+  isLegendIndexHidden: (index: number) => boolean
 }
 
 export function useChartInteraction<T = unknown>(
@@ -68,6 +72,7 @@ export function useChartInteraction<T = unknown>(
 
   const localHoveredIndex = ref<number | null>(null)
   const localSelectedIndex = ref<number | null>(null)
+  const legendHiddenKeys = ref<string[]>([])
   const tooltipPosition = ref({ x: 0, y: 0 })
   const tooltipScheduler = createChartPointerMoveScheduler({
     onPositionChange: (position) => {
@@ -163,8 +168,10 @@ export function useChartInteraction<T = unknown>(
   }
 
   const handleLegendClick = (index: number) => {
-    handleClick(index)
+    legendHiddenKeys.value = toggleLegendHidden(legendHiddenKeys.value, String(index))
   }
+
+  const isLegendIndexHidden = (index: number) => isLegendHidden(legendHiddenKeys.value, String(index))
 
   const handleLegendHover = (index: number, _item?: unknown, event?: Event) => {
     const position = event ? tooltipPositionFromEvent(event) : undefined
@@ -196,6 +203,8 @@ export function useChartInteraction<T = unknown>(
     handleLegendClick,
     handleLegendHover,
     handleLegendLeave,
-    wrapperClasses
+    wrapperClasses,
+    legendHiddenKeys,
+    isLegendIndexHidden
   }
 }

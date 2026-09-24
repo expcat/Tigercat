@@ -1,6 +1,9 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  commentDisplayHtml,
+  commentEditRequest,
+  sanitizeHtml,
   canSubmitCommentReply,
   clipCommentTreeDepth,
   commentIdKey,
@@ -60,7 +63,12 @@ import { useTigerConfig } from './ConfigProvider'
 import { VirtualList, type VirtualListHandle } from './VirtualList'
 
 export interface CommentThreadProps
-  extends CoreCommentThreadProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {}
+  extends CoreCommentThreadProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+  editable?: boolean
+  rich?: boolean
+  onEdit?: (request: { id: string | number; body: string }) => void
+  onDelete?: (id: string | number) => void
+}
 
 export const CommentThread: React.FC<CommentThreadProps> = ({
   nodes,
@@ -100,6 +108,10 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   loadError = false,
   onLoadRoot,
   className,
+  editable = false,
+  rich = false,
+  onEdit,
+  onDelete,
   ...divProps
 }) => {
   const config = useTigerConfig()
@@ -635,6 +647,36 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : labels.listAriaLabel)
       }
       {...divProps}>
+      {editable ? (
+        <div data-tiger-comment-manage="">
+          {(items ?? nodes ?? []).map((comment) => {
+            const raw = String(comment.content ?? '')
+            const sanitized = sanitizeHtml(raw)
+            const display = commentDisplayHtml(rich ? 'rich' : 'plain', sanitized)
+            return (
+              <div key={String(comment.id)}>
+                {display === 'fragment' ? (
+                  <span data-comment-html="" dangerouslySetInnerHTML={{ __html: sanitized }} />
+                ) : (
+                  <span data-comment-text="">{raw}</span>
+                )}
+                <button
+                  type="button"
+                  data-comment-edit={String(comment.id)}
+                  onClick={() => onEdit?.(commentEditRequest(comment.id, rich ? sanitized : raw))}>
+                  edit
+                </button>
+                <button
+                  type="button"
+                  data-comment-delete={String(comment.id)}
+                  onClick={() => onDelete?.(comment.id)}>
+                  delete
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      ) : null}
       {treeErrors.length > 0 ? (
         <div role="alert">
           {treeErrors.map((error) => (

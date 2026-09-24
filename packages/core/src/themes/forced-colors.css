@@ -1,0 +1,25 @@
+@media (prefers-contrast: more) {
+  :root,
+  .dark {
+    --tiger-border: var(--tiger-border-strong);
+    --tiger-text-secondary: var(--tiger-text);
+  }
+}
+@media (forced-colors: active) {
+  :root,
+  .dark {
+    --tiger-text: CanvasText;
+    --tiger-text-secondary: LinkText;
+    --tiger-surface: Canvas;
+    --tiger-border: CanvasText;
+    --tiger-focus-ring: Highlight;
+    --tiger-primary: LinkText;
+    --tiger-primary-foreground: Canvas;
+    color-scheme: light dark;
+  }
+  :focus,
+  :focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}

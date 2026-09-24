@@ -4,6 +4,7 @@ import type {
   SelectFilterOption,
   SelectModelValue,
   SelectOption,
+  SelectOptionFields,
   SelectOptionGroup,
   SelectOptions,
   SelectValue,
@@ -124,7 +125,7 @@ export const selectSearchWrapClasses =
 export const selectEmptyStateClasses =
   'px-3 py-8 text-center text-[var(--tiger-text-secondary)] text-sm'
 export const selectGroupLabelClasses =
-  'px-3 py-2 text-xs font-semibold text-[var(--tiger-text-secondary)] uppercase bg-[var(--tiger-surface-muted)] truncate'
+  'sticky top-0 z-10 px-3 py-2 text-xs font-semibold text-[var(--tiger-text-secondary)] uppercase bg-[var(--tiger-surface-muted)] truncate'
 export const selectSearchInputClasses = classNames(
   'w-full px-3 py-2 bg-transparent',
   'text-[var(--tiger-text)]',
@@ -568,17 +569,84 @@ export function commitSelectOption(options: {
   option: SelectOption
   value: SelectModelValue
   multiple: boolean
+  maxCount?: number
+  readOnly?: boolean
 }): SelectModelValue {
-  if (options.option.disabled) {
+  if (options.readOnly || options.option.disabled) {
     return options.value
   }
   if (options.multiple) {
     const current = getSelectSelectedValues(options.value, true)
-    return current.some((item) => sameSelectValue(item, options.option.value))
-      ? current.filter((item) => !sameSelectValue(item, options.option.value))
-      : [...current, options.option.value]
+    const exists = current.some((item) => sameSelectValue(item, options.option.value))
+    if (exists) return current.filter((item) => !sameSelectValue(item, options.option.value))
+    if (options.maxCount !== undefined && current.length >= options.maxCount) return current
+    return [...current, options.option.value]
   }
   return options.option.value
+}
+
+/** Select every enabled option in the current filtered list, up to `maxCount`. */
+export function selectAllSelectValues(options: {
+  value: SelectModelValue
+  options: SelectOptions
+  maxCount?: number
+  readOnly?: boolean
+}): SelectValue[] {
+  const current = getSelectSelectedValues(options.value, true)
+  if (options.readOnly) return current
+  const next = [...current]
+  for (const option of flattenSelectOptions(options.options)) {
+    if (option.disabled) continue
+    if (next.some((item) => sameSelectValue(item, option.value))) continue
+    if (options.maxCount !== undefined && next.length >= options.maxCount) break
+    next.push(option.value)
+  }
+  return next
+}
+
+function readOptionField(record: Record<string, unknown>, key: string | undefined, fallback: string): unknown {
+  const name = key || fallback
+  return record[name]
+}
+
+function mapSelectRecord(record: Record<string, unknown>, fields: SelectOptionFields): SelectOption | SelectOptionGroup | null {
+  const groupKey = fields.options || 'options'
+  const nested = record[groupKey]
+  if (Array.isArray(nested)) {
+    const label = readOptionField(record, fields.label, 'label')
+    const options = nested
+      .map((item) =>
+        item && typeof item === 'object' ? mapSelectRecord(item as Record<string, unknown>, fields) : null
+      )
+      .filter((item): item is SelectOption => !!item && !isOptionGroup(item))
+    return { label: label == null ? '' : String(label), options }
+  }
+  const value = readOptionField(record, fields.value, 'value')
+  if (typeof value !== 'string' && typeof value !== 'number') return null
+  const label = readOptionField(record, fields.label, 'label')
+  const description = readOptionField(record, fields.description, 'description')
+  const disabled = readOptionField(record, fields.disabled, 'disabled')
+  const option: SelectOption = {
+    value,
+    label: label == null ? String(value) : String(label)
+  }
+  if (typeof description === 'string' && description) option.description = description
+  if (disabled === true) option.disabled = true
+  return option
+}
+
+/** Read options from caller data. Without `optionFields`, records pass through. */
+export function normalizeSelectOptions(
+  options: readonly unknown[] | undefined,
+  fields?: SelectOptionFields
+): SelectOptions {
+  if (!options) return []
+  if (!fields) return options as SelectOptions
+  return options
+    .map((item) =>
+      item && typeof item === 'object' ? mapSelectRecord(item as Record<string, unknown>, fields) : null
+    )
+    .filter((item): item is SelectOption | SelectOptionGroup => item !== null)
 }
 
 export function clearSelectValue(multiple: boolean): SelectModelValue {
@@ -604,6 +672,8 @@ export interface SelectTagPresentation {
   tags: SelectTagItem[]
   collapsedCount: number
   collapsedLabel: string
+  /** Names of the tags hidden by `maxTagCount`. */
+  collapsedItems: SelectTagItem[]
 }
 
 export function resolveSelectTags(options: {
@@ -630,14 +700,18 @@ export function resolveSelectTags(options: {
   })
   const limit = options.maxTagCount
   if (limit === undefined || items.length <= limit) {
-    return { tags: items, collapsedCount: 0, collapsedLabel: '' }
+    return { tags: items, collapsedCount: 0, collapsedLabel: '', collapsedItems: [] }
   }
-  const hidden = items.length - limit
-  const collapsedLabel = (options.moreCountText ?? '+{count}').replace(/\{count\}/g, String(hidden))
+  const collapsedItems = items.slice(limit)
+  const collapsedLabel = (options.moreCountText ?? '+{count}').replace(
+    /\{count\}/g,
+    String(collapsedItems.length)
+  )
   return {
     tags: items.slice(0, limit),
-    collapsedCount: hidden,
-    collapsedLabel
+    collapsedCount: collapsedItems.length,
+    collapsedLabel,
+    collapsedItems
   }
 }
 

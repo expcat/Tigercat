@@ -346,6 +346,30 @@ export function getPaginationButtonActiveClasses(): string {
 /**
  * Get ellipsis classes
  */
+/** Pages hidden by one ellipsis token. Same clamp as the quick jumper. */
+export function paginationEllipsisPages(
+  tokens: readonly PaginationPageToken[],
+  ellipsisIndex: number,
+  totalPages: number
+): number[] {
+  const previous = tokens[ellipsisIndex - 1]
+  const next = tokens[ellipsisIndex + 1]
+  const start = typeof previous === 'number' ? previous + 1 : 1
+  const end = typeof next === 'number' ? next - 1 : totalPages
+  const pages: number[] = []
+  for (let page = start; page <= end; page++) {
+    const clamped = validateCurrentPage(page, totalPages)
+    if (!pages.includes(clamped)) pages.push(clamped)
+  }
+  return pages
+}
+
+export function clampPaginationJump(value: string, totalPages: number): number | null {
+  return getPaginationJumperPage(value, totalPages)
+}
+
+export type PaginationItemKind = 'page' | 'prev' | 'next' | 'ellipsis'
+
 export function getPaginationEllipsisClasses(size: PaginationSize = 'md'): string {
   const sizeClasses = {
     sm: 'min-w-7 h-7 text-sm',

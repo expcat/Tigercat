@@ -103,6 +103,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
             })}
             role={interactive ? undefined : 'listitem'}
             aria-pressed={interactive ? Boolean(item.selected) : undefined}
+            data-legend-hidden={item.hidden ? 'true' : undefined}
             aria-current={interactive && highlighted ? 'true' : undefined}
             data-legend-item="true"
             onClick={interactive ? () => handleClick(item) : undefined}

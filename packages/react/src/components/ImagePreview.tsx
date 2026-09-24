@@ -8,8 +8,12 @@ import React, {
 } from 'react'
 import {
   applyWheelZoom,
+  basicLabel,
   classNames,
   createDefaultTransform,
+  downloadCurrentImageUrl,
+  downloadIconPath,
+  flipHorizontalIconPath,
   createLightboxGestureSession,
   focusFirst,
   formatLightboxImageAlt,
@@ -44,7 +48,8 @@ import {
   zoomInIconPath,
   zoomOutIconPath,
   type GestureTransform,
-  type ImagePreviewProps as CoreImagePreviewProps
+  type ImagePreviewProps as CoreImagePreviewProps,
+  type ImagePreviewToolbarItemContext
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
@@ -54,6 +59,7 @@ export interface ImagePreviewProps
   onOpenChange?: (open: boolean) => void
   onCurrentIndexChange?: (index: number) => void
   onScaleChange?: (scale: number) => void
+  renderToolbarItem?: (item: ImagePreviewToolbarItemContext) => React.ReactNode
 }
 
 const SvgIcon: React.FC<{ d: string; cls?: string }> = ({ d, cls = 'w-5 h-5' }) => (
@@ -90,6 +96,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   onCurrentIndexChange,
   onScaleChange,
   onKeyDown,
+  renderToolbarItem,
   ...rest
 }) => {
   const config = useTigerConfig()
@@ -167,13 +174,13 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   )
 
   const handlePrev = useCallback(() => {
-    const next = resolveLightboxNavIndex(indexRef.current, resolvedRef.current.length, 'prev')
+    const next = resolveLightboxNavIndex(indexRef.current, resolvedRef.current.length, 'prev', true)
     if (next === null) return
     applyIndex(next)
   }, [applyIndex])
 
   const handleNext = useCallback(() => {
-    const next = resolveLightboxNavIndex(indexRef.current, resolvedRef.current.length, 'next')
+    const next = resolveLightboxNavIndex(indexRef.current, resolvedRef.current.length, 'next', true)
     if (next === null) return
     applyIndex(next)
   }, [applyIndex])
@@ -204,6 +211,17 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   const handleRotateRight = useCallback(() => {
     setTransform((current) => ({ ...current, rotation: normalizeRotation(current.rotation + 90) }))
+  }, [])
+
+  const handleFlip = useCallback(() => {
+    setTransform((current) => ({ ...current, flipX: !current.flipX }))
+  }, [])
+
+  const handleDownload = useCallback(() => {
+    const items = resolvedRef.current
+    const current = items[clampLightboxIndex(indexRef.current, items.length)]
+    if (!current) return
+    downloadCurrentImageUrl(current.src)
   }, [])
 
   const handleDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -319,7 +337,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   ])
 
   const displayIndex = clampLightboxIndex(index, resolved.length)
-  const navState = getLightboxNavState(displayIndex, resolved.length)
+  const navState = getLightboxNavState(displayIndex, resolved.length, true)
   const current = resolved[displayIndex]
   const currentAlt = formatLightboxImageAlt(
     current,
@@ -339,6 +357,27 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const handlePointerDown = useCallback((event: React.PointerEvent<HTMLImageElement>) => {
     gestureRef.current?.pointerDown(event.nativeEvent)
   }, [])
+
+  const toolbarButton = (
+    item: ImagePreviewToolbarItemContext,
+    icon: string,
+    onClick: () => void
+  ) => {
+    const custom = renderToolbarItem?.(item)
+    if (custom != null && custom !== false) return custom
+    return (
+      <button
+        key={item.action}
+        className={imagePreviewToolbarBtnClasses}
+        onClick={onClick}
+        disabled={item.disabled}
+        aria-label={item.label}
+        type="button"
+        data-preview-action={item.action}>
+        <SvgIcon d={icon} />
+      </button>
+    )
+  }
 
   if (!shouldRender || !current) return null
 
@@ -395,60 +434,64 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           <SvgIcon d={config.direction === 'rtl' ? prevIconPath : nextIconPath} />
         </button>
       )}
-      {(zoomable || rotatable || showCount) && (
-        <div className={imagePreviewToolbarClasses}>
-          {zoomable && (
-            <>
-              <button
-                className={imagePreviewToolbarBtnClasses}
-                onClick={handleZoomOut}
-                disabled={canZoomOut}
-                aria-label={labels.zoomOutAriaLabel}
-                type="button">
-                <SvgIcon d={zoomOutIconPath} />
-              </button>
-              <button
-                className={imagePreviewToolbarBtnClasses}
-                onClick={handleReset}
-                aria-label={labels.resetAriaLabel}
-                type="button">
-                <SvgIcon d={resetIconPath} />
-              </button>
-              <button
-                className={imagePreviewToolbarBtnClasses}
-                onClick={handleZoomIn}
-                disabled={canZoomIn}
-                aria-label={labels.zoomInAriaLabel}
-                type="button">
-                <SvgIcon d={zoomInIconPath} />
-              </button>
-            </>
-          )}
-          {rotatable && (
-            <>
-              <button
-                className={imagePreviewToolbarBtnClasses}
-                onClick={handleRotateLeft}
-                aria-label={labels.rotateLeftAriaLabel}
-                type="button">
-                <SvgIcon d={imageViewerIcons.rotateLeft} />
-              </button>
-              <button
-                className={imagePreviewToolbarBtnClasses}
-                onClick={handleRotateRight}
-                aria-label={labels.rotateRightAriaLabel}
-                type="button">
-                <SvgIcon d={imageViewerIcons.rotateRight} />
-              </button>
-            </>
-          )}
-          {showCount && navState.counter ? (
-            <span className={imagePreviewCounterClasses} aria-live="polite">
-              {navState.counter}
-            </span>
-          ) : null}
-        </div>
-      )}
+      <div className={imagePreviewToolbarClasses}>
+        {zoomable && (
+          <>
+            {toolbarButton(
+              { action: 'zoomOut', label: labels.zoomOutAriaLabel, disabled: canZoomOut },
+              zoomOutIconPath,
+              handleZoomOut
+            )}
+            {toolbarButton(
+              { action: 'reset', label: labels.resetAriaLabel, disabled: false },
+              resetIconPath,
+              handleReset
+            )}
+            {toolbarButton(
+              { action: 'zoomIn', label: labels.zoomInAriaLabel, disabled: canZoomIn },
+              zoomInIconPath,
+              handleZoomIn
+            )}
+          </>
+        )}
+        {rotatable && (
+          <>
+            {toolbarButton(
+              { action: 'rotateLeft', label: labels.rotateLeftAriaLabel, disabled: false },
+              imageViewerIcons.rotateLeft,
+              handleRotateLeft
+            )}
+            {toolbarButton(
+              { action: 'rotateRight', label: labels.rotateRightAriaLabel, disabled: false },
+              imageViewerIcons.rotateRight,
+              handleRotateRight
+            )}
+          </>
+        )}
+        {toolbarButton(
+          {
+            action: 'flip',
+            label: basicLabel(mergedLocale.locale, 'imagePreview', 'flipHorizontal'),
+            disabled: false
+          },
+          flipHorizontalIconPath,
+          handleFlip
+        )}
+        {toolbarButton(
+          {
+            action: 'download',
+            label: basicLabel(mergedLocale.locale, 'imagePreview', 'download'),
+            disabled: false
+          },
+          downloadIconPath,
+          handleDownload
+        )}
+        {showCount && navState.counter ? (
+          <span className={imagePreviewCounterClasses} aria-live="polite">
+            {navState.counter}
+          </span>
+        ) : null}
+      </div>
     </div>
   )
 }

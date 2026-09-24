@@ -3,35 +3,43 @@ import type { PluginAPI } from 'tailwindcss/plugin'
 import type { ThemePreset } from './types/theme'
 import { defaultTheme } from './themes/default/theme'
 import { highContrastTheme } from './themes/high-contrast/theme'
-import { resolvePresetThemeConfig, themeConfigToCssVars, themeTransitionValue } from './themes/manager'
-import { alertCountdownBaseStyles } from './utils/alert-utils'
+import {
+  resolvePresetThemeConfig,
+  themeConfigToCssVars,
+  themeTransitionValue
+} from './themes/manager'
 import { aspectRatioBaseStyles } from './utils/aspect-ratio-utils'
 import { cardBaseStyles } from './utils/card-utils'
 import { carouselBaseStyles } from './utils/carousel-utils'
-import { cartesianChartAnimationBaseStyles } from './utils/chart/color'
 import { dividerBaseStyles } from './utils/divider'
 import { dropdownBaseStyles } from './utils/dropdown-utils'
 import { imageCropperBaseStyles } from './utils/image-utils'
-import { loadingAnimationBaseStyles } from './utils/loading-utils'
 import { marqueeBaseStyles } from './utils/marquee-utils'
 import { menuBaseStyles } from './utils/menu-utils'
 import { printLayoutBaseStyles } from './utils/print-layout-utils'
 import { progressBaseStyles } from './utils/progress-utils'
 import { skeletonBaseStyles } from './utils/skeleton-utils'
 import { spaceBaseStyles } from './utils/space'
-import { stepConnectorBaseStyles } from './utils/steps-utils'
 import { watermarkBaseStyles } from './utils/watermark-utils'
-import { workflowDesignerCanvasBaseStyles } from './utils/workflow-designer-utils'
 import { LAYOUT_GRID_CSS } from './utils/layout-grid-styles'
 
+export { forcedColorsCss } from './themes/forced-colors'
+
 /** Each object stays separate so shared `@media` keys merge instead of replacing. */
+/** Semantic utilities. Component keyframes stay in their style modules. */
+export const tigercatSemanticTheme = {
+  colors: {
+    surface: 'var(--tiger-surface)',
+    muted: 'var(--tiger-text-secondary)',
+    line: 'var(--tiger-border)'
+  },
+  borderRadius: {
+    md: 'var(--tiger-radius-md)'
+  }
+} as const
+
 const tigercatComponentStyleParts: Array<Record<string, unknown>> = [
-  alertCountdownBaseStyles,
   progressBaseStyles,
-  loadingAnimationBaseStyles,
-  cartesianChartAnimationBaseStyles,
-  stepConnectorBaseStyles,
-  workflowDesignerCanvasBaseStyles,
   aspectRatioBaseStyles,
   cardBaseStyles,
   carouselBaseStyles,
@@ -99,11 +107,23 @@ const tigercatForcedColorsBase = {
       '--tiger-info': 'LinkText',
       '--tiger-text-disabled': 'GrayText',
       colorScheme: 'light dark'
+    },
+    ':focus, :focus-visible': {
+      outline: '2px solid Highlight',
+      outlineOffset: '2px'
     }
   },
   '@media (prefers-contrast: more)': {
-    ':root': highContrastLight,
-    '.dark': highContrastDark
+    ':root': {
+      ...highContrastLight,
+      '--tiger-border': 'var(--tiger-border-strong)',
+      '--tiger-text-secondary': 'var(--tiger-text)'
+    },
+    '.dark': {
+      ...highContrastDark,
+      '--tiger-border': 'var(--tiger-border-strong)',
+      '--tiger-text-secondary': 'var(--tiger-text)'
+    }
   }
 }
 
@@ -119,9 +139,7 @@ function pluginBase(preset: ThemePreset): Record<string, unknown> {
   ])
 }
 
-function mergeBase(
-  parts: Array<Record<string, unknown>>
-): Record<string, unknown> {
+function mergeBase(parts: Array<Record<string, unknown>>): Record<string, unknown> {
   const merged: Record<string, unknown> = {}
   for (const part of parts) {
     for (const [selector, body] of Object.entries(part)) {
@@ -147,9 +165,15 @@ function asBase(value: Record<string, unknown>): Parameters<PluginAPI['addBase']
   return value as Parameters<PluginAPI['addBase']>[0]
 }
 
+const semanticPluginTheme = {
+  theme: {
+    extend: tigercatSemanticTheme
+  }
+}
+
 export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
   addBase(asBase(mergeBase([pluginBase(defaultTheme), parseLayoutCss(LAYOUT_GRID_CSS)])))
-})
+}, semanticPluginTheme)
 
 export interface TigercatPluginOptions {
   /** Theme preset written to `:root` / `.dark`. */
@@ -160,7 +184,7 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
   const preset = options.preset ?? defaultTheme
   return plugin(function ({ addBase }: PluginAPI) {
     addBase(asBase(mergeBase([pluginBase(preset), parseLayoutCss(LAYOUT_GRID_CSS)])))
-  })
+  }, semanticPluginTheme)
 }
 
 type LayoutDecls = Record<string, string | Record<string, string>>

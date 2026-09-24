@@ -37,6 +37,11 @@ import {
   tourNextEvents,
   tourPrevEvents,
   tourCloseEvents,
+  tourArrowKey,
+  tourStepAdvancesOnTarget,
+  tourTargetExempt,
+  getFloatingArrowStyle,
+  getPopconfirmArrowClasses,
   shouldCloseOnMaskClick,
   getTourLabels,
   type TourProps as CoreTourProps,
@@ -214,7 +219,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
       return
     }
     const targetEl = resolveTourTarget(step.target)
-    targetExemptRef.current = step.interact ? (targetEl ?? null) : null
+    targetExemptRef.current = tourTargetExempt(step) ? (targetEl ?? null) : null
     if (targetEl) {
       if (shouldScroll) scrollTourTargetIntoView(targetEl)
       setTargetRect(getTourRectFromElement(targetEl))
@@ -294,6 +299,15 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
 
   const next = useCallback(() => applyNavEvents(tourNextEvents(nav)), [applyNavEvents, nav])
   const prev = useCallback(() => applyNavEvents(tourPrevEvents(nav)), [applyNavEvents, nav])
+
+  useEffect(() => {
+    if (!open || !step || !tourStepAdvancesOnTarget(step)) return
+    const targetEl = resolveTourTarget(step.target)
+    if (!targetEl) return
+    const onClick = () => next()
+    targetEl.addEventListener('click', onClick)
+    return () => targetEl.removeEventListener('click', onClick)
+  }, [open, step, next])
   const close = useCallback(() => applyNavEvents(tourCloseEvents()), [applyNavEvents])
   useImperativeHandle(forwardedRef, () => ({ close }), [close])
 
@@ -407,8 +421,8 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
             aria-hidden="true"
             style={
               {
-                ...(step.interact && targetRect ? getTourMaskHoleStyle(targetRect) : null),
-                ...(targetRect && !step.interact ? { backgroundColor: 'transparent' } : null)
+                ...(tourTargetExempt(step) && targetRect ? getTourMaskHoleStyle(targetRect) : null),
+                ...(targetRect && !tourTargetExempt(step) ? { backgroundColor: 'transparent' } : null)
               } as React.CSSProperties
             }
             onClick={handleMaskClick}
@@ -436,7 +450,27 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
         aria-label={ariaLabelFromRest ?? (hasTitle ? undefined : labels.dialogAriaLabel)}
         aria-describedby={ariaDescribedbyFromRest ?? (hasDescription ? descriptionId : undefined)}
         tabIndex={-1}
-        data-tiger-tour="">
+        data-tiger-tour=""
+        onKeyDown={(event) => {
+          const dir = tourArrowKey(event.key, event.target)
+          if (dir === 'next') {
+            event.preventDefault()
+            next()
+          } else if (dir === 'prev') {
+            event.preventDefault()
+            prev()
+          }
+        }}>
+        {step.cover ? (
+          <img src={step.cover} alt={step.coverAlt ?? ''} data-tiger-tour-cover="" />
+        ) : null}
+        {step.arrow !== false ? (
+          <span
+            data-tiger-tour-arrow=""
+            className={getPopconfirmArrowClasses()}
+            style={getFloatingArrowStyle(step.placement === 'center' ? 'bottom' : (step.placement ?? 'bottom'))}
+          />
+        ) : null}
         {closable && (
           <button
             ref={closeButtonRef}

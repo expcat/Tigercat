@@ -15,15 +15,18 @@ import {
   getNextTableSortState,
   mergeTableFilterValue,
   mergeTablePagination,
-  reorderTableColumnsByKey,
-  reorderTableRowsByKey,
+  commitValidatedCellEdit,
+  dragMoveAnnouncement,
+  nextMultiSort,
+  reorderByHandle,
+  resolveFormattedExportRows,
+  toggleCollapsedKey,
   coerceTableEditValue,
   getTableCellValue,
   getTableSelectionState,
   resolveTableExportRecords,
   resolveTableKeyList,
   resolveTableQueryPage,
-  resolveTableRecordKey,
   resolveTableRowKeys,
   resolveTableSelectLoadedKeys,
   resolveTableView,
@@ -63,6 +66,9 @@ export interface UseTableStateInput {
   filterMode: 'basic' | 'advanced'
   advancedFilterRules?: FilterRule[]
   groupBy?: string
+  sorts?: { key: string; direction: 'asc' | 'desc' }[]
+  columnWidths?: Record<string, number>
+  collapsedGroupKeys?: string[]
   exportScope?: TableExportScope
   exportFilename: string
   columnOrder?: string[]
@@ -107,6 +113,9 @@ export function useTableState(input: UseTableStateInput): TableContext {
     filterMode,
     advancedFilterRules,
     groupBy,
+    sorts,
+    columnWidths,
+    collapsedGroupKeys,
     exportScope = 'all',
     exportFilename,
     columnOrder: columnOrderProp,
@@ -173,6 +182,26 @@ export function useTableState(input: UseTableStateInput): TableContext {
   const [uncontrolledExpandedRowKeys, setUncontrolledExpandedRowKeys] = useState<
     (string | number)[]
   >(expandable?.defaultExpandedRowKeys ?? [])
+  const [multiSort, setMultiSort] = useState(sorts)
+  const [widthMap, setWidthMap] = useState<Record<string, number>>(() => ({
+    ...(columnWidths ?? {})
+  }))
+  const [collapsedGroups, setCollapsedGroups] = useState<string[]>(() => [
+    ...(collapsedGroupKeys ?? [])
+  ])
+  const [selectionLive, setSelectionLive] = useState('')
+  const [dragLive, setDragLive] = useState('')
+  const [previousSelectionCount, setPreviousSelectionCount] = useState<number | null>(null)
+  useEffect(() => {
+    setMultiSort(sorts)
+  }, [sorts])
+  useEffect(() => {
+    if (columnWidths) setWidthMap({ ...columnWidths })
+  }, [columnWidths])
+  useEffect(() => {
+    if (collapsedGroupKeys) setCollapsedGroups([...collapsedGroupKeys])
+  }, [collapsedGroupKeys])
+  const groupCollapseEnabled = collapsedGroupKeys !== undefined
   const [columnOrder, setColumnOrder] = useState<string[] | null>(null)
   const [fixedOverrides, setFixedOverrides] = useState<Record<string, TableFixedPosition | false>>(
     {}
@@ -265,7 +294,8 @@ export function useTableState(input: UseTableStateInput): TableContext {
         measuredColumnWidths,
         containerWidth,
         sortLocale,
-        rowDraggable
+        rowDraggable,
+        sorts: multiSort
       }),
     [
       columns,
@@ -289,7 +319,8 @@ export function useTableState(input: UseTableStateInput): TableContext {
       measuredColumnWidths,
       containerWidth,
       sortLocale,
-      rowDraggable
+      rowDraggable,
+      multiSort
     ]
   )
 
@@ -432,6 +463,10 @@ export function useTableState(input: UseTableStateInput): TableContext {
         handleToggleExpand(key, record)
       }
     }
+    if (rowSelection && rowSelection.showCheckbox === false) {
+      const selected = selectedRowKeys.some((item) => tableRowKeyId(item) === tableRowKeyId(key))
+      handleSelectRow(key, !selected)
+    }
   }
 
   function handleSelectRow(key: string | number, checked: boolean) {
@@ -485,6 +520,8 @@ export function useTableState(input: UseTableStateInput): TableContext {
   const [editingValue, setEditingValue] = useState('')
 
   function isCellEditable(columnKey: string, rowIndex: number): boolean {
+    const column = columns.find((item) => item.key === columnKey)
+    if (column?.edit) return true
     if (!editable) return false
     if (!editableCells) return true
     return editableCells[columnKey]?.includes(rowIndex) === true
@@ -498,6 +535,18 @@ export function useTableState(input: UseTableStateInput): TableContext {
   function commitEdit() {
     if (!editingCell) return
     const column = columns.find((item) => item.key === editingCell.columnKey)
+    if (column?.edit || column?.validate) {
+      const result = commitValidatedCellEdit({
+        data: sourceData as Record<string, unknown>[],
+        rowIndex: editingCell.rowIndex,
+        column,
+        raw: editingValue
+      })
+      if (!result.ok) return
+      onCellChange?.(editingCell.rowIndex, editingCell.columnKey, result.value, result.nextData)
+      setEditingCell(null)
+      return
+    }
     const original = column
       ? getTableCellValue(sourceData[editingCell.rowIndex] ?? {}, column)
       : undefined
@@ -512,6 +561,14 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }
 
   function handleExport() {
+    const formatted = resolveFormattedExportRows({
+      scope: exportScope === 'page' ? 'page' : exportScope === 'selected' ? 'selected' : 'all',
+      pageRecords: view.paginatedData,
+      processedRecords: view.processedData,
+      processedKeys: view.processedRowKeys,
+      selectedKeys: selectedRowKeys,
+      columns: view.displayColumns
+    })
     const rows = resolveTableExportRecords({
       scope: exportScope,
       pageRecords: view.paginatedData,
@@ -519,7 +576,18 @@ export function useTableState(input: UseTableStateInput): TableContext {
       processedKeys: view.processedRowKeys,
       selectedKeys: selectedRowKeys
     })
-    const content = exportTableData(view.displayColumns, rows)
+    const content = view.displayColumns.some((column) => column.cellFormatter)
+      ? exportTableData(
+          view.displayColumns,
+          formatted.rows.map((row) => {
+            const record: Record<string, unknown> = {}
+            view.displayColumns.forEach((column, index) => {
+              record[column.dataKey || column.key] = row[index] ?? ''
+            })
+            return record
+          })
+        )
+      : exportTableData(view.displayColumns, rows)
     downloadTableExport(content, exportFilename)
     onExport?.(content)
   }
@@ -530,10 +598,32 @@ export function useTableState(input: UseTableStateInput): TableContext {
     setDragColumnKey(columnKey)
   }
 
+  function applyMultiSort(columnKey: string) {
+    const next = nextMultiSort(multiSort ?? [], columnKey)
+    setMultiSort(next)
+    onSortChange?.(next[0] ?? null)
+  }
+
+  function applyColumnWidth(key: string, width: number) {
+    setWidthMap((current) => ({ ...current, [key]: width }))
+  }
+
+  function toggleGroup(key: string) {
+    setCollapsedGroups((current) => toggleCollapsedKey(current, key))
+  }
+
+  function replaceSelectedKeys(keys: (string | number)[]) {
+    if (!selectionControl.controlled) setUncontrolledSelectedRowKeys(keys)
+    onSelectionChange?.(keys)
+  }
+
   function handleDrop(targetKey: string) {
     if (!dragColumnKey || dragColumnKey === targetKey) return
     const fullColumns = applyTableColumnOrder(columns, effectiveColumnOrder)
-    const nextColumns = reorderTableColumnsByKey(fullColumns, dragColumnKey, targetKey)
+    const from = fullColumns.findIndex((column) => column.key === dragColumnKey)
+    const to = fullColumns.findIndex((column) => column.key === targetKey)
+    const nextColumns = reorderByHandle(fullColumns, from, to)
+    setDragLive(dragMoveAnnouncement(from, to))
     if (!isColumnOrderControlled) {
       setColumnOrder(nextColumns.map((column) => column.key))
     }
@@ -549,13 +639,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   function handleRowDrop(targetKey: string | number) {
     if (dragRowKey === null || dragRowKey === targetKey) return
-    const nextRows = reorderTableRowsByKey(
-      sourceData,
-      dragRowKey,
-      targetKey,
-      (record, sourceIndex) =>
-        resolveTableRecordKey(record, sourceIndex, rowKey, rowSelection?.getRowKey)
+    const from = sourceRowKeys.findIndex(
+      (key) => tableRowKeyId(key) === tableRowKeyId(dragRowKey)
     )
+    const to = sourceRowKeys.findIndex((key) => tableRowKeyId(key) === tableRowKeyId(targetKey))
+    const nextRows = reorderByHandle(sourceData, from, to)
+    setDragLive(dragMoveAnnouncement(from, to))
     onRowOrderChange?.(nextRows)
     setDragRowKey(null)
   }
@@ -582,6 +671,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     currentPage,
     currentPageSize,
     hiddenColumnKeys: effectiveHiddenColumnKeys,
+    selectedRowKeys,
     editingCell,
     editingValue,
     setEditingValue,
@@ -605,6 +695,19 @@ export function useTableState(input: UseTableStateInput): TableContext {
     handleDragStart,
     handleDrop,
     handleRowDragStart,
-    handleRowDrop
+    handleRowDrop,
+    applyMultiSort,
+    applyColumnWidth,
+    toggleGroup,
+    replaceSelectedKeys,
+    multiSort,
+    widthMap,
+    collapsedGroups,
+    groupCollapseEnabled,
+    selectionLive,
+    dragLive,
+    setPreviousSelectionCount,
+    previousSelectionCount,
+    setSelectionLive
   }
 }

@@ -28,6 +28,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './ConfigProvider'
+import { DrillHost } from './w9-chart-bind'
 
 export interface SunburstChartProps extends CoreSunburstChartProps {
   data: SunburstChartDatum[]
@@ -36,6 +37,7 @@ export interface SunburstChartProps extends CoreSunburstChartProps {
   onSelectedIndexChange?: (index: number | null) => void
   onArcClick?: (index: number, datum: SunburstChartDatum) => void
   onArcHover?: (index: number | null, datum: SunburstChartDatum | null) => void
+  bind?: { roots?: { id: string; children?: { id: string }[] }[] }
 }
 
 export const SunburstChart: React.FC<SunburstChartProps> = ({
@@ -65,6 +67,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   locale,
   labels: labelsOverride,
   className,
+  bind,
   onHoveredIndexChange,
   onSelectedIndexChange,
   onArcClick,
@@ -119,7 +122,8 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
     handleKeyDown,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<SunburstChartDatum>({
     hoverable,
     showTooltip,
@@ -148,9 +152,15 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
         getLabel: (d) => d.label,
-        getColor: (_d, i) => roots[i]?.color ?? palette[i % palette.length]
-      }).map((item, i) => ({ ...item, index: roots[i]?.index ?? item.index })),
-    [roots, palette, activeIndex, resolvedSelectedIndex]
+        getColor: (_d, i) => roots[i]?.color ?? palette[i % palette.length],
+      
+        isHidden: (index) => isLegendIndexHidden(index)
+      }).map((item, i) => ({
+        ...item,
+        index: roots[i]?.index ?? item.index,
+        hidden: isLegendIndexHidden(roots[i]?.index ?? item.index)
+      })),
+    [roots, palette, activeIndex, resolvedSelectedIndex, isLegendIndexHidden]
   )
   const tooltipContent = useMemo(() => {
     if (resolvedHoveredIndex === null) return ''
@@ -207,10 +217,12 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       )}
       <g data-series-type="sunburst">
         {arcs.map((arc, visualIndex) => {
-          const opacity = getChartElementOpacity(arc.index, activeIndex, {
-            activeOpacity,
-            inactiveOpacity
-          })
+          const opacity = isLegendIndexHidden(arc.index)
+            ? 0
+            : getChartElementOpacity(arc.index, activeIndex, {
+                activeOpacity,
+                inactiveOpacity
+              })
           const ariaLabel = formatChartTemplate(labels.sunburstTooltip, {
             label: arc.label,
             value: arc.value,
@@ -296,6 +308,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
           onItemLeave={handleLegendLeave}
         />
       ) : null}
+      {bind?.roots ? <DrillHost roots={bind.roots} /> : null}
       {tooltip}
     </div>
   )

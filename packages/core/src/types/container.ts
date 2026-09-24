@@ -16,7 +16,7 @@ export interface ContainerProps {
    * - 'sm' | 'md' | 'lg' | 'xl' | '2xl': `max-width: var(--tiger-breakpoint-*)`
    * - 'full': `max-width: 100%` (caps at the parent)
    * - false: no max-width (still `width: 100%`)
-   * @default false
+   * @default 'lg'
    */
   maxWidth?: ContainerMaxWidth
 

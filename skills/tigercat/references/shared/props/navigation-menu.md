@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## NavigationMenu
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 4/14 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 4/16 props
 
 Note: 链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferrer`。危险协议和禁用项不输出 `href`。
 

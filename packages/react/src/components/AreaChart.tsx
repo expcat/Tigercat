@@ -173,7 +173,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     handleClick: handleSeriesSelect,
     handleLegendClick,
     handleLegendHover,
-    handleLegendLeave
+    handleLegendLeave,
+    isLegendIndexHidden
   } = useChartInteraction<AreaChartSeries>({
     hoverable,
     showTooltip,
@@ -293,7 +294,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           legendFormatter
             ? legendFormatter(s, i)
             : (s.name ?? defaultChartSeriesName(i, labels.seriesName)),
-        getColor: (s, i) => s.color ?? palette[i % palette.length]
+        getColor: (s, i) => s.color ?? palette[i % palette.length],
+        isHidden: (index) => isLegendIndexHidden(index)
       }),
     [
       resolvedSeries,

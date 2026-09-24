@@ -7,7 +7,7 @@ description: Compact generated Tigercat Charts props reference
 
 # Charts Props
 
-图表画布、图例、工具提示和可视化组件。 共 19 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
+图表画布、图例、工具提示和可视化组件。 共 21 个组件。字段细节以 `packages/core/src/types/*.ts` 为准；跨包组件以本段列出的源码为准。
 
 ## AreaChart
 
@@ -22,7 +22,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## BarChart
 
-`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 4/51 props
+`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 4/52 props
 
 | Prop          | Type              | Default                                        | Notes                                                                                   |
 | ------------- | ----------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -117,7 +117,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## Gantt
 
-`packages/core/src/types/gantt.ts` · `GanttProps` · 4/34 props
+`packages/core/src/types/gantt.ts` · `GanttProps` · 4/35 props
 
 | Prop         | Type          | Default | Notes |
 | ------------ | ------------- | ------- | ----- |
@@ -128,7 +128,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## GaugeChart
 
-`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 4/26 props
+`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 4/27 props
 
 | Prop          | Type                                               | Default | Notes                                                                                      |
 | ------------- | -------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -139,7 +139,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## HeatmapChart
 
-`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 4/31 props
+`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 4/32 props
 
 | Prop        | Type                  | Default     | Notes                                                                                      |
 | ----------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
@@ -150,7 +150,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## LineChart
 
-`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 4/54 props
+`packages/core/src/types/chart-cartesian.ts` · `LineChartProps` · 4/55 props
 
 | Prop          | Type                | Default    | Notes                               |
 | ------------- | ------------------- | ---------- | ----------------------------------- |
@@ -161,7 +161,7 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 
 ## OrgChart
 
-`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 4/26 props
+`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 4/27 props
 
 Note: `avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`javascript:`、`data:`、`vbscript:` 不渲染 image。
 
@@ -174,7 +174,7 @@ Note: `avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`jav
 
 ## PieChart
 
-`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/41 props
+`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/42 props
 
 Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。
 
@@ -187,7 +187,7 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 
 ## RadarChart
 
-`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/58 props
+`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/59 props
 
 | Prop          | Type                 | Default        | Notes                        |
 | ------------- | -------------------- | -------------- | ---------------------------- |
@@ -195,6 +195,17 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 | `series?`     | `RadarChartSeries[]` | `-`            | Multiple series              |
 | `maxValue?`   | `number`             | `-`            | Max value for radius scaling |
 | `startAngle?` | `number`             | `-Math.PI / 2` | Start angle in radians       |
+
+## SankeyChart
+
+`packages/core/src/types/chart-visualization.ts` · `SankeyChartProps` · 4/11 props
+
+| Prop      | Type                   | Default | Notes                                          |
+| --------- | ---------------------- | ------- | ---------------------------------------------- |
+| `nodes`   | `SankeyNode[]`         | `-`     | -                                              |
+| `links`   | `SankeyLink[]`         | `-`     | -                                              |
+| `height?` | `number`               | `-`     | -                                              |
+| `locale?` | `Partial<TigerLocale>` | `-`     | Locale object merged on top of ConfigProvider. |
 
 ## ScatterChart
 
@@ -209,7 +220,7 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 
 ## SunburstChart
 
-`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 4/26 props
+`packages/core/src/types/chart-visualization.ts` · `SunburstChartProps` · 4/27 props
 
 | Prop                | Type                   | Default | Notes                                                                                      |
 | ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -220,7 +231,7 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 
 ## TreeMapChart
 
-`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 4/28 props
+`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 4/29 props
 
 | Prop            | Type                  | Default | Notes                                                                    |
 | --------------- | --------------------- | ------- | ------------------------------------------------------------------------ |
@@ -228,3 +239,14 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 | `gap?`          | `number`              | `2`     | Gap between nodes in px                                                  |
 | `showLabels?`   | `boolean`             | `true`  | Whether to show labels inside nodes                                      |
 | `minLabelSize?` | `number`              | `10`    | Minimum font size for labels (hide if cell too small)                    |
+
+## WaterfallChart
+
+`packages/core/src/types/chart-visualization.ts` · `WaterfallChartProps` · 4/11 props
+
+| Prop      | Type                                                       | Default | Notes                                          |
+| --------- | ---------------------------------------------------------- | ------- | ---------------------------------------------- |
+| `data`    | `WaterfallDatum[]`                                         | `-`     | -                                              |
+| `height?` | `number`                                                   | `-`     | -                                              |
+| `colors?` | `{ increase?: string; decrease?: string; total?: string }` | `-`     | -                                              |
+| `locale?` | `Partial<TigerLocale>`                                     | `-`     | Locale object merged on top of ConfigProvider. |

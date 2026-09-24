@@ -1,0 +1,8 @@
+{
+  "id": "watermark-03",
+  "title": "行距、密度与打印",
+  "description": "rowGap、density 和 printVisible 只写 CSS 变量，不重绘平铺。",
+  "entry": "App.tsx",
+  "order": 3,
+  "viewport": { "mode": "auto", "minHeight": 220, "maxHeight": 320 }
+}

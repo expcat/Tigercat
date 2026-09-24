@@ -662,6 +662,26 @@ export function formatSplitterGutterLabel(template: string, index: number): stri
   return template.replace(/\{index\}/g, String(index + 1))
 }
 
+export function collapseSplitterSizes(
+  sizes: (number | string)[],
+  index: number
+): { sizes: (number | string)[]; previous: number | string } {
+  const previous = sizes[index] ?? 0
+  const next = sizes.slice()
+  next[index] = 0
+  return { sizes: next, previous }
+}
+
+export function restoreSplitterSize(
+  sizes: (number | string)[],
+  index: number,
+  previous: number | string
+): (number | string)[] {
+  const next = sizes.slice()
+  next[index] = previous
+  return next
+}
+
 export function getSplitterGutterValueNow(pixels: number[], gutterIndex: number): number {
   const left = pixels[gutterIndex] ?? 0
   const right = pixels[gutterIndex + 1] ?? 0

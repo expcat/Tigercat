@@ -76,6 +76,16 @@ export interface TabsProps {
    */
   swipeable?: boolean
   /**
+   * `manual`: arrows move focus and Enter selects. Default activates on arrow.
+   * @default 'automatic'
+   */
+  activation?: 'automatic' | 'manual'
+  /**
+   * Emit the next key order once when a drag finishes.
+   * @default false
+   */
+  reorderable?: boolean
+  /**
    * Additional CSS classes
    */
   className?: string
@@ -94,7 +104,7 @@ export interface TabPaneProps {
    */
   tabKey: string | number
   /**
-   * Tab label/title
+   * Tab title text. A label slot or node replaces the visible title.
    */
   label: string
   /**

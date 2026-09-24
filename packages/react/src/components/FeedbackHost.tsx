@@ -2,12 +2,16 @@ import React, { useEffect, useRef, useSyncExternalStore } from 'react'
 import {
   activateFeedbackScope,
   createFeedbackScope,
+  dismissConfirmModal,
   isBrowser,
+  settleConfirmModalOk,
   type FeedbackScope,
+  type ImperativeModalRecord,
   type MessagePosition,
   type NotificationPosition
 } from '@expcat/tigercat-core'
 import { MessageContainer } from './MessageContainer'
+import { Modal } from './Modal'
 import { NotificationContainer } from './NotificationContainer'
 
 const MESSAGE_POSITIONS: MessagePosition[] = [
@@ -49,6 +53,11 @@ export function FeedbackHost() {
     scope.notifications.getSnapshot,
     scope.notifications.getServerSnapshot
   )
+  const modals = useSyncExternalStore(
+    scope.modals.subscribe,
+    scope.modals.getSnapshot,
+    scope.modals.getServerSnapshot
+  )
 
   return (
     <div className="contents" data-tiger-toast="" data-tiger-feedback-host="">
@@ -82,6 +91,43 @@ export function FeedbackHost() {
           />
         )
       })}
+      {modals.map((modal) => (
+        <ImperativeModal key={modal.id} modal={modal} scope={scope} />
+      ))}
     </div>
+  )
+}
+
+function ImperativeModal({
+  modal,
+  scope
+}: {
+  modal: ImperativeModalRecord
+  scope: FeedbackScope
+}) {
+  return (
+    <Modal
+      open
+      title={modal.title}
+      showDefaultFooter
+      showCancel={modal.showCancel}
+      okText={modal.okText}
+      cancelText={modal.cancelText}
+      data-tiger-confirm-kind={modal.kind}
+      onOk={(event) => {
+        const result = modal.onOk?.(event)
+        modal.okResult = result
+        return result
+      }}
+      onCancel={() => {
+        modal.cancelled = true
+      }}
+      onClose={() => {
+        if (modal.cancelled) dismissConfirmModal(modal)
+        else settleConfirmModalOk(modal, modal.okResult)
+        scope.modals.remove(modal.id)
+      }}>
+      {modal.content}
+    </Modal>
   )
 }

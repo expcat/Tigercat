@@ -1,6 +1,15 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
+  canEmitFileDelete,
+  canEmitFileOpen,
+  canEmitFileRename,
   classNames,
+  fileToUploadFile,
+  filterUploadPreviewUrl,
+  getW9DataLabels,
+  isImageUploadFile,
+  sanitizeFileDisplayName,
+  searchFileTree,
   getFileManagerContainerClasses,
   getFileItemClasses,
   getFileManagerContentClasses,
@@ -8,7 +17,6 @@ import {
   deriveFileManagerModel,
   selectFileItem,
   toggleFileSelection,
-  sanitizeFileDisplayName,
   getFileManagerWindow,
   createFileManagerMeasure,
   FILE_MANAGER_DEFAULT_HEIGHT,
@@ -56,6 +64,12 @@ export interface FileManagerProps
   className?: string
   /** Custom icon renderer */
   renderIcon?: (item: FileItem) => React.ReactNode
+  bind?: {
+    query?: string
+    recursive?: boolean
+    name?: string
+    permission?: { readable?: boolean; writable?: boolean }
+  }
 }
 
 export const FileManager: React.FC<FileManagerProps> = ({
@@ -88,6 +102,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
   onFilesChange,
   renderIcon,
   locale,
+  bind,
   style,
   ...rest
 }) => {
@@ -100,6 +115,9 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const isRtl = mergedLocale?.direction === 'rtl'
   const tree = files ?? EMPTY_FILE_ITEMS
   const [focusedIndex, setFocusedIndex] = useState(0)
+  const [fileAction, setFileAction] = useState('')
+  const [uploadedName, setUploadedName] = useState('')
+  const [previewLabel, setPreviewLabel] = useState('')
   const [scrollTop, setScrollTop] = useState(0)
   const [viewport, setViewport] = useState(0)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -352,6 +370,61 @@ export const FileManager: React.FC<FileManagerProps> = ({
       className={classNames(containerClasses)}
       style={rootStyle}
       aria-busy={loading || undefined}>
+      {bind ? (
+        <div data-tiger-file-bind="">
+          <button
+            type="button"
+            data-tiger-file-open=""
+            disabled={!canEmitFileOpen(bind.permission)}
+            onClick={() => {
+              if (canEmitFileOpen(bind.permission)) onOpen?.(files?.[0] as FileItem)
+            }}>
+            {getW9DataLabels().preview}
+          </button>
+          <button
+            type="button"
+            data-tiger-file-rename=""
+            disabled={!canEmitFileRename(bind.permission)}
+            onClick={() => {
+              if (canEmitFileRename(bind.permission)) {
+                setFileAction(sanitizeFileDisplayName(bind.name ?? ''))
+              }
+            }}>
+            {getW9DataLabels().rename}
+          </button>
+          <button
+            type="button"
+            data-tiger-file-delete=""
+            disabled={!canEmitFileDelete(bind.permission)}
+            onClick={() => {
+              if (canEmitFileDelete(bind.permission)) {
+                setFileAction(`delete:${sanitizeFileDisplayName(bind.name ?? '')}`)
+              }
+            }}>
+            {getW9DataLabels().delete}
+          </button>
+          <input
+            type="file"
+            data-tiger-file-upload=""
+            aria-label={getW9DataLabels().upload}
+            onChange={(event) => {
+              const file = event.target.files?.[0]
+              if (!file) return
+              const uploaded = fileToUploadFile(file)
+              setUploadedName(uploaded.name)
+              setPreviewLabel(
+                filterUploadPreviewUrl(uploaded.url) ?? (isImageUploadFile(uploaded) ? uploaded.name : '')
+              )
+            }}
+          />
+          <span data-file-upload="">{uploadedName}</span>
+          <span data-file-preview="">{previewLabel}</span>
+          {searchFileTree(files ?? [], bind.query ?? '', bind.recursive === true).map((hit) => (
+            <span key={hit.path.join('/')} data-file-hit={hit.item.name} />
+          ))}
+          <span data-file-action="">{fileAction}</span>
+        </div>
+      ) : null}
       <div className={fileManagerToolbarClasses}>
         <nav className={fileManagerBreadcrumbClasses} aria-label={labels.pathAriaLabel}>
           <ol className={fileManagerBreadcrumbListClasses}>

@@ -17,6 +17,7 @@ import {
   type MiddlewareData,
   type ReferenceElement
 } from '@floating-ui/dom'
+import { getFloatingArrowStyle } from './floating-arrow'
 
 /**
  * Shared stacking scale for overlays.
@@ -407,26 +408,5 @@ export function getArrowStyles(
   placement: FloatingPlacement,
   arrowData?: { x?: number; y?: number }
 ): Record<string, string> {
-  const side = getPlacementSide(placement)
-  const staticSide: Record<string, string> = {
-    top: 'bottom',
-    bottom: 'top',
-    left: 'right',
-    right: 'left'
-  }
-
-  const styles: Record<string, string> = {
-    position: 'absolute',
-    [staticSide[side]]: '-4px'
-  }
-
-  if (arrowData?.x != null) {
-    styles.left = `${arrowData.x}px`
-  }
-
-  if (arrowData?.y != null) {
-    styles.top = `${arrowData.y}px`
-  }
-
-  return styles
+  return getFloatingArrowStyle(placement, arrowData)
 }

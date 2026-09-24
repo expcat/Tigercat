@@ -20,12 +20,16 @@ import {
   mergeTigerLocale,
   resolveLocaleText,
   runWizardAdvanceGate,
+  getW9DataLabels,
+  stableModelSnapshot,
+  wizardStepIsDirty,
   clampStepIndex,
   findNextUnskippedStep,
   isStepSkipped,
   type FormWizardProps as CoreFormWizardProps,
   type WizardStep
 } from '@expcat/tigercat-core'
+import { confirmModal } from './Modal'
 import { Steps } from './Steps'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -39,6 +43,7 @@ export interface FormWizardHandle {
   next: () => Promise<void>
   prev: () => void
   finish: () => Promise<void>
+  requestClose: () => Promise<boolean>
 }
 
 export interface FormWizardProps
@@ -69,6 +74,8 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     labels: labelsOverride,
     beforeNext,
     autoSave,
+    model,
+    onClose,
     onStepChange,
     onFinish,
     renderStep,
@@ -114,16 +121,38 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
   const isLast = isLastAvailableStep(currentIndex, steps)
 
   const selfStep = useRef(false)
+  const snapshot = useRef(stableModelSnapshot(model))
+  const confirmLeave = useCallback(async () => {
+    if (!wizardStepIsDirty(snapshot.current, model)) return true
+    const copy = getW9DataLabels()
+    try {
+      await confirmModal({
+        title: copy.leaveStepTitle,
+        content: copy.leaveStepMessage,
+        okText: copy.leave,
+        cancelText: copy.stay
+      })
+      return true
+    } catch {
+      return false
+    }
+  }, [model])
   const setCurrent = useCallback(
     async (next: number) => {
       const prev = currentIndex
+      if (next === prev) return
+      if (autoSave && steps[next]) {
+        try {
+          await autoSave(next, steps[next])
+        } catch {
+          return
+        }
+      }
       selfStep.current = true
       setIndex(next, prev, { skippedValidation: false })
-      if (autoSave && steps[next]) {
-        await autoSave(next, steps[next])
-      }
+      snapshot.current = stableModelSnapshot(model)
     },
-    [autoSave, currentIndex, setIndex, steps]
+    [autoSave, currentIndex, model, setIndex, steps]
   )
 
   const seenCurrent = useRef(current)
@@ -158,12 +187,15 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
   )
 
   const handlePrev = useCallback(() => {
-    if (currentIndex <= 0) return
-    const target = findNextUnskippedStep(currentIndex - 1, -1, steps, currentIndex)
-    if (target === currentIndex) return
-    setErrorMessage(undefined)
-    void setCurrent(target)
-  }, [currentIndex, setCurrent, steps])
+    void (async () => {
+      if (!(await confirmLeave())) return
+      if (currentIndex <= 0) return
+      const target = findNextUnskippedStep(currentIndex - 1, -1, steps, currentIndex)
+      if (target === currentIndex) return
+      setErrorMessage(undefined)
+      void setCurrent(target)
+    })()
+  }, [confirmLeave, currentIndex, setCurrent, steps])
 
   const finishAt = useCallback(
     async (index: number) => {
@@ -175,8 +207,14 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
         const submitted = await form.submit()
         if (!submitted) return
       }
+      if (autoSave && steps[index]) {
+        try {
+          await autoSave(index, steps[index])
+        } catch {
+          return
+        }
+      }
       onFinish?.(index, steps, form?.getValues())
-      if (autoSave && steps[index]) await autoSave(index, steps[index])
     },
     [autoSave, form, onFinish, steps]
   )
@@ -207,11 +245,14 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
 
   const handleStepChange = useCallback(
     (nextIndex: number) => {
-      if (!canClickWizardStep(nextIndex, currentIndex, steps)) return
-      setErrorMessage(undefined)
-      void setCurrent(nextIndex)
+      void (async () => {
+        if (!canClickWizardStep(nextIndex, currentIndex, steps)) return
+        if (nextIndex < currentIndex && !(await confirmLeave())) return
+        setErrorMessage(undefined)
+        void setCurrent(nextIndex)
+      })()
     },
-    [currentIndex, setCurrent, steps]
+    [confirmLeave, currentIndex, setCurrent, steps]
   )
 
   useImperativeHandle(
@@ -219,12 +260,17 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     () => ({
       next: () => handleNext(),
       prev: handlePrev,
+      requestClose: async () => {
+        if (!(await confirmLeave())) return false
+        onClose?.()
+        return true
+      },
       finish: async () => {
         if (!isLast) return
         await handleNext()
       }
     }),
-    [handleNext, handlePrev, isLast]
+    [confirmLeave, handleNext, handlePrev, isLast, onClose]
   )
 
   const contentNode = useMemo(() => {

@@ -11,7 +11,6 @@ import {
 } from 'vue'
 import {
   classNames,
-  coerceNumberFormValue,
   shouldSubmitNativeField,
   coerceClassValue,
   callUnknownEventHandler,
@@ -31,7 +30,10 @@ import {
   formatInputNumberDisplay,
   formatInputNumberEditingDisplay,
   parseInputNumberValue,
-  commitInputNumberValue,
+  parseInputNumberModel,
+  commitInputNumberModel,
+  stepInputNumberModel,
+  addDecimalString,
   getInputNumberKeyboardNextValue,
   resolveInputNumberControlsLayout,
   createRafRepeatActionController,
@@ -93,7 +95,7 @@ export const InputNumber = defineComponent({
       type: Boolean,
       default: false
     },
-    readonly: {
+    readOnly: {
       type: Boolean,
       default: false
     },
@@ -187,7 +189,19 @@ export const InputNumber = defineComponent({
       input: inputRef
     })
 
-    function toDisplayValue(val: number | null | undefined, editing: boolean): string {
+    function readStored(raw: unknown): number | string | null {
+      if (typeof raw === 'number') return Number.isFinite(raw) ? raw : null
+      if (typeof raw === 'string') {
+        if (raw === '') return null
+        return parseInputNumberModel(raw)
+      }
+      return null
+    }
+
+    function toDisplayValue(val: number | string | null | undefined, editing: boolean): string {
+      if (typeof val === 'string') {
+        return props.precision !== undefined ? addDecimalString(val, 0, props.precision) : val
+      }
       return editing
         ? formatInputNumberEditingDisplay(val, props.precision)
         : formatInputNumberDisplay(val, {
@@ -196,15 +210,18 @@ export const InputNumber = defineComponent({
           })
     }
 
-    function parseValue(str: string): number | null {
-      return parseInputNumberValue(str, { parser: props.parser })
+    function parseValue(str: string): number | string | null {
+      if (props.parser) return parseInputNumberValue(str, { parser: props.parser })
+      return parseInputNumberModel(str)
     }
 
     const isControlled = computed(() => props.modelValue !== undefined)
-    const internalValue = ref<number | null>(coerceNumberFormValue(props.modelValue ?? props.defaultValue) ?? null)
+    const internalValue = ref<number | string | null>(
+      readStored(props.modelValue ?? props.defaultValue)
+    )
     const currentValue = computed(() => {
-      if (isControlled.value) return coerceNumberFormValue(props.modelValue) ?? null
-      if (formItemControl?.name.value) return coerceNumberFormValue(formValue.value) ?? null
+      if (isControlled.value) return readStored(props.modelValue)
+      if (formItemControl?.name.value) return readStored(formValue.value)
       return internalValue.value
     })
 
@@ -225,8 +242,8 @@ export const InputNumber = defineComponent({
       { flush: 'post' }
     )
 
-    function commit(val: number | null, nextFocused = focused.value): number | null {
-      const { value: next, changed } = commitInputNumberValue(val, currentValue.value, {
+    function commit(val: number | string | null, nextFocused = focused.value): number | string | null {
+      const { value: next, changed } = commitInputNumberModel(val, currentValue.value, {
         min: props.min,
         max: props.max,
         precision: props.precision,
@@ -245,9 +262,12 @@ export const InputNumber = defineComponent({
 
     function handleStep(
       direction: 'up' | 'down',
-      baseValue: number | null | undefined = currentValue.value
-    ): number | null {
-      if (effectiveDisabled.value || props.readonly) return baseValue ?? null
+      baseValue: number | string | null | undefined = currentValue.value
+    ): number | string | null {
+      if (effectiveDisabled.value || props.readOnly) return baseValue ?? null
+      if (typeof baseValue === 'string') {
+        return commit(stepInputNumberModel(baseValue, props.step, direction, props.min, props.max, props.precision))
+      }
       const next = stepValue(
         baseValue,
         props.step,
@@ -270,7 +290,7 @@ export const InputNumber = defineComponent({
     function startStepRepeat(direction: 'up' | 'down') {
       return (event: PointerEvent) => {
         event.preventDefault()
-        if (effectiveDisabled.value || props.readonly) return
+        if (effectiveDisabled.value || props.readOnly) return
         if (direction === 'down' && isAtMin(currentValue.value, props.min)) return
         if (direction === 'up' && isAtMax(currentValue.value, props.max)) return
 
@@ -316,7 +336,7 @@ export const InputNumber = defineComponent({
           max: props.max,
           step: props.step,
           precision: props.precision,
-          keyboard: props.keyboard && !effectiveDisabled.value && !props.readonly
+          keyboard: props.keyboard && !effectiveDisabled.value && !props.readOnly
         })
         if (next !== undefined) {
           e.preventDefault()
@@ -331,7 +351,7 @@ export const InputNumber = defineComponent({
     const layout = computed(() =>
       resolveInputNumberControlsLayout(props.controls, props.controlsPosition)
     )
-    const stepDisabled = computed(() => effectiveDisabled.value || props.readonly)
+    const stepDisabled = computed(() => effectiveDisabled.value || props.readOnly)
 
     const wrapperClasses = computed(() =>
       classNames(
@@ -421,7 +441,7 @@ export const InputNumber = defineComponent({
           value: displayValue.value,
           placeholder: props.placeholder,
           disabled: effectiveDisabled.value,
-          readonly: props.readonly,
+          readonly: props.readOnly,
           id: effectiveId.value,
           'aria-labelledby':
             typeof restAttrs['aria-label'] === 'string'

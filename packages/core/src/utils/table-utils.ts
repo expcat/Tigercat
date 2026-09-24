@@ -227,8 +227,12 @@ export function resolveTableExpandSlot(
 export function canUseTableVirtualWindow(options: {
   expandable?: unknown
   groupBy?: string
+  variableRowHeight?: boolean
+  spannedCells?: boolean
 }): boolean {
-  return !options.expandable && !options.groupBy
+  return (
+    !options.expandable && !options.groupBy && !options.variableRowHeight && !options.spannedCells
+  )
 }
 
 export const tableExportBarClasses = 'mb-2 flex justify-end'

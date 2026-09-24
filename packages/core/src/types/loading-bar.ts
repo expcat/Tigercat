@@ -52,6 +52,17 @@ export interface LoadingBarProps {
    * @default locale `common.loadingText` (`'Loading...'`)
    */
   ariaLabel?: string
+
+  /**
+   * Keep the bar visible at least this long so a fast finish still flashes.
+   * @default 200
+   */
+  minimumDisplayMs?: number
+
+  /**
+   * Replaces the bar look. Start, fail, and finish announcements stay.
+   */
+  renderBar?: unknown
 }
 
 /**

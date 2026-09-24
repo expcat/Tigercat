@@ -1,0 +1,12 @@
+{
+  "id": "waterfall-chart-01",
+  "title": "瀑布图",
+  "description": "增减柱与合计柱共用柱状布局。",
+  "entry": "App.vue",
+  "order": 1,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
+}
