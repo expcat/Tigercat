@@ -1,19 +1,19 @@
 import { forwardRef, useEffect, useImperativeHandle } from 'react'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
+  TIME_PICKER_DESKTOP_QUERY,
   classNames,
-  clockSolidIcon20PathD,
-  closeSolidIcon20PathD,
   datePickerSheetScrimClasses,
   getInputClearButtonClasses,
   getInputPasswordToggleClasses,
   getTimePickerRangeTabButtonClasses,
-  icon20ViewBox,
   timePickerBaseClasses,
   timePickerFooterButtonClasses,
   timePickerFooterClasses,
   timePickerPanelClasses,
   timePickerRangeHeaderClasses
 } from '@expcat/tigercat-core'
+import { clockSolidIcon20PathD, closeSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { renderOverlayPortal, useAnchoredOverlay, useFocusTrap } from '../utils/overlay'
 import { TimePickerDesktopColumns, TimePickerMobileSelects } from './TimePicker/render-panel'
 import { useTimePickerController } from './TimePicker/state'
@@ -74,7 +74,10 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
       if (!ctx.isOpen) return
       const panel = ctx.panelRef.current
       if (!panel) return
-      if (ctx.desktop) {
+      const desktop =
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia(TIME_PICKER_DESKTOP_QUERY).matches
+      if (desktop) {
         const selected = panel.querySelector<HTMLElement>(
           '[data-tiger-timepicker-unit="hour"][aria-selected="true"]'
         )
@@ -88,7 +91,7 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
         return
       }
       panel.querySelector('select')?.focus()
-    }, [ctx.isOpen, ctx.desktop, ctx.activePart, ctx.panelRef])
+    }, [ctx.isOpen, ctx.activePart, ctx.panelRef])
 
     const panel = ctx.isOpen ? (
       <>
@@ -134,15 +137,12 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
               </button>
             </div>
           ) : null}
-          {ctx.desktop ? (
-            <TimePickerDesktopColumns
-              columns={ctx.columns}
-              onSelect={ctx.selectColumn}
-              onKeyDown={ctx.handlePanelKeyDown}
-            />
-          ) : (
-            <TimePickerMobileSelects columns={ctx.columns} onSelect={ctx.selectColumn} />
-          )}
+          <TimePickerDesktopColumns
+            columns={ctx.columns}
+            onSelect={ctx.selectColumn}
+            onKeyDown={ctx.handlePanelKeyDown}
+          />
+          <TimePickerMobileSelects columns={ctx.columns} onSelect={ctx.selectColumn} />
           <div className={timePickerFooterClasses}>
             <button type="button" className={timePickerFooterButtonClasses} onClick={ctx.selectNow}>
               {ctx.labels.now}
@@ -175,20 +175,31 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
             disabled={ctx.effectiveDisabled}
             readOnly={ctx.isReadOnly}
             required={ctx.required}
-            name={ctx.effectiveName}
             id={ctx.effectiveId}
             autoComplete="off"
             aria-label={ctx.ariaLabel ?? (ctx.labelledby ? undefined : ctx.placeholder)}
             aria-labelledby={ctx.labelledby}
             aria-describedby={ctx.describedBy}
-            aria-invalid={ctx.status === 'error' ? true : undefined}
+            aria-invalid={ctx.status === 'error' || ctx.validationMessage ? true : undefined}
             aria-required={ctx.required ? true : undefined}
+            aria-expanded={ctx.isOpen}
+            aria-haspopup="dialog"
             aria-controls={ctx.isOpen ? ctx.panelId : undefined}
-            onChange={(event) => ctx.onDraftChange(event.target.value)}
+            onChange={(event) => {
+              if (ctx.effectiveDisabled || ctx.isReadOnly) return
+              ctx.onDraftChange(event.target.value)
+            }}
             onClick={() => ctx.setOpenSafe(true)}
             onKeyDown={ctx.handleInputKeyDown}
-            onBlur={ctx.parseDraftInput}
           />
+          {ctx.effectiveName ? (
+            <input
+              type="hidden"
+              name={ctx.effectiveName}
+              value={ctx.nativeValue}
+              disabled={ctx.effectiveDisabled}
+            />
+          ) : null}
           {ctx.showClear ? (
             <button
               type="button"
@@ -206,10 +217,16 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
             className={getInputPasswordToggleClasses(ctx.size, { offsetSlots: 0 })}
             disabled={ctx.effectiveDisabled || ctx.isReadOnly}
             aria-label={ctx.labels.toggle}
+            aria-expanded={ctx.isOpen}
+            aria-haspopup="dialog"
+            aria-controls={ctx.isOpen ? ctx.panelId : undefined}
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => ctx.setOpenSafe(!ctx.isOpen)}>
             <ChromeIcon path={clockSolidIcon20PathD} className="w-5 h-5" />
           </button>
+          <div id={ctx.validationId} role="status" aria-live="polite" className="sr-only">
+            {ctx.validationMessage}
+          </div>
         </div>
         {renderOverlayPortal(panel, overlay.target)}
       </div>

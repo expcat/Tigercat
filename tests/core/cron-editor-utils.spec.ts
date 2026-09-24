@@ -4,6 +4,7 @@ import {
   buildCronFieldValue,
   buildCronFieldValueFromDraft,
   cronFieldMetas,
+  cronFormValue,
   defaultCronExpression,
   defaultCronPresetValues,
   getCronExpressionParts,
@@ -13,6 +14,7 @@ import {
   normalizeCronExpression,
   parseCronFieldControl,
   seedCronFieldDraft,
+  seedCronFieldDrafts,
   updateCronExpressionField,
   validateCronExpression,
   validateCronField
@@ -37,7 +39,16 @@ describe('cron-editor-utils', () => {
     expect(defaultCronPresetValues).toContain('0 0 * * *')
     expect(normalizeCronExpression('')).toBe('')
     expect(isCronExpressionEmpty('')).toBe(true)
+    expect(isCronExpressionEmpty(null)).toBe(true)
+    expect(isCronExpressionEmpty(undefined)).toBe(true)
     expect(isCronExpressionEmpty('* * * * *')).toBe(false)
+    expect(cronFormValue('')).toBeNull()
+    expect(cronFormValue('*/0')).toBeNull()
+    expect(cronFormValue('foo')).toBeNull()
+    expect(cronFormValue('0 0 * * *')).toBe('0 0 * * *')
+    expect(seedCronFieldDrafts('').minute.raw).toBe('')
+    expect(seedCronFieldDrafts('').minute.raw).not.toBe('*')
+    expect(seedCronFieldDraft(undefined).raw).toBe('')
   })
 
   it('splits expressions without inventing five stars', () => {

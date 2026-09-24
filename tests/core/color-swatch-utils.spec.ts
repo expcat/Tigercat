@@ -4,6 +4,7 @@ import {
   getColorSwatchCheckTone,
   getColorSwatchOptionKey,
   getNextColorSwatchIndex,
+  getColorSwatchPaint,
   isColorSwatchSelected,
   normalizeColorSwatchGroups,
   normalizeColorSwatchValue
@@ -37,10 +38,16 @@ describe('color-swatch-utils', () => {
     expect(options.map(getColorSwatchOptionKey)).toEqual(['0-0-#111111', '1-0-#222222'])
   })
 
-  it('normalizes values for selected comparisons', () => {
+  it('compares swatches by parsed color, not trimmed strings', () => {
     expect(normalizeColorSwatchValue(' #ABCDEF ')).toBe('#abcdef')
+    expect(isColorSwatchSelected('#fff', '#ffffff')).toBe(true)
+    expect(isColorSwatchSelected('#ff0000', 'rgb(255, 0, 0)')).toBe(true)
     expect(isColorSwatchSelected('#ABCDEF', ' #abcdef ')).toBe(true)
+    expect(isColorSwatchSelected('#ff0000', '#00ff00')).toBe(false)
+    expect(isColorSwatchSelected('not-a-color', '#ffffff')).toBe(false)
     expect(isColorSwatchSelected('#ABCDEF', undefined)).toBe(false)
+    expect(getColorSwatchPaint('nope')).toBe('var(--tiger-surface-muted)')
+    expect(getColorSwatchPaint('#fff')).toBe('#fff')
   })
 
   it('moves to the next enabled option and wraps', () => {

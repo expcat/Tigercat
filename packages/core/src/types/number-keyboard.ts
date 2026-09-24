@@ -59,10 +59,10 @@ export interface NumberKeyboardProps {
    */
   disabled?: boolean
   /**
-   * Focusable; key presses are ignored. Distinct from `disabled`.
+   * Focusable and submittable. Keys are not activatable. Distinct from `disabled`.
    * @default false
    */
-  readonly?: boolean
+  readOnly?: boolean
   confirmText?: string
   deleteText?: string
   ariaLabel?: string

@@ -143,9 +143,9 @@ describe('Signature', () => {
     expect(pad()).toHaveAttribute('tabIndex', '-1')
   })
 
-  it('does not draw while readonly and stays focusable', () => {
+  it('does not draw while readOnly and stays focusable', () => {
     const onChange = vi.fn()
-    const { container } = render(<Signature readonly value={sampleValue} onChange={onChange} />)
+    const { container } = render(<Signature readOnly value={sampleValue} onChange={onChange} />)
 
     drawSignature(pad())
 
@@ -155,7 +155,7 @@ describe('Signature', () => {
     expect(pad()).toHaveAttribute('tabIndex', '0')
   })
 
-  it('honors the readOnly alias the same as readonly', () => {
+  it('stays focusable when readOnly', () => {
     const onChange = vi.fn()
     render(<Signature readOnly value={sampleValue} onChange={onChange} />)
 
@@ -399,7 +399,7 @@ describe('Signature', () => {
     })
 
     it('has no accessibility violations for a readonly signed pad', async () => {
-      const { container } = render(<Signature readonly value={sampleValue} />)
+      const { container } = render(<Signature readOnly value={sampleValue} />)
       await expectNoA11yViolations(container)
     })
 

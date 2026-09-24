@@ -70,11 +70,19 @@ describe('upload-utils drag helpers', () => {
     expect(event.preventDefault).toHaveBeenCalledTimes(1)
   })
 
-  it('does not prevent default when disabled', () => {
-    const event = createDragEvent()
+  it('prevents default when disabled but does not accept files', () => {
+    const file = new File(['content'], 'test.txt', { type: 'text/plain' })
+    const event = createDragEvent([file])
 
-    expect(handleUploadDrop(event, true)).toEqual({ handled: false, isDragging: false, files: [] })
-    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(handleUploadDrop(event, true)).toEqual({ handled: true, isDragging: false, files: [] })
+    expect(event.preventDefault).toHaveBeenCalledTimes(1)
+    const over = createDragEvent([file])
+    expect(handleUploadDragOver(over, true)).toEqual({
+      handled: true,
+      isDragging: false,
+      files: []
+    })
+    expect(over.preventDefault).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -143,6 +151,30 @@ describe('upload-utils validation', () => {
     expect(validateFileType(jpg, 'image/*')).toBe(true)
     expect(validateFileType(jpg, '.jpg')).toBe(true)
     expect(validateFileType(jpg, '.png')).toBe(false)
+  })
+
+  it('accepts image extensions for image/* when the type is empty or octet-stream', () => {
+    const empty = new File(['x'], 'photo.webp', { type: '' })
+    const octet = new File(['x'], 'photo.png', { type: 'application/octet-stream' })
+    const text = new File(['x'], 'notes.txt', { type: 'application/octet-stream' })
+    expect(validateFileType(empty, 'image/*')).toBe(true)
+    expect(validateFileType(octet, 'image/*')).toBe(true)
+    expect(validateFileType(text, 'image/*')).toBe(false)
+    expect(validateFileType(text, '*/*')).toBe(true)
+    expect(validateFileType(text, '')).toBe(true)
+  })
+
+  it('keeps only the first file when multiple is false', async () => {
+    const prepared = await prepareUploadFiles({
+      currentCount: 0,
+      incomingFiles: [
+        new File(['a'], 'a.png', { type: 'image/png' }),
+        new File(['b'], 'b.png', { type: 'image/png' })
+      ],
+      multiple: false
+    })
+    expect(prepared.acceptedFiles.map((file) => file.name)).toEqual(['a.png'])
+    expect(prepared.rejectedFiles.map((item) => item.reason)).toEqual(['single'])
   })
 
   it('does not let rejected files occupy limit slots', async () => {

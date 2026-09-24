@@ -232,7 +232,7 @@ describe('Tree', () => {
         props: {
           treeData: sampleTreeData,
           defaultExpandAll: true,
-          multiple: true
+          selectionMode: 'multiple'
         }
       })
 
@@ -360,7 +360,7 @@ describe('Tree', () => {
       const { getByText } = render(Tree, {
         props: {
           treeData: sampleTreeData,
-          selectable: false,
+          selectionMode: 'none',
           onSelect
         }
       })
@@ -402,7 +402,7 @@ describe('Tree', () => {
         }
       })
 
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+      const checkboxes = container.querySelectorAll('[data-tiger-tree-check]')
       expect(checkboxes.length).toBeGreaterThan(0)
     })
 
@@ -417,7 +417,7 @@ describe('Tree', () => {
         }
       })
 
-      const checkbox = container.querySelector('input[type="checkbox"]')
+      const checkbox = container.querySelector('[data-tiger-tree-check]')
 
       if (checkbox) {
         await fireEvent.click(checkbox)
@@ -440,7 +440,7 @@ describe('Tree', () => {
         }
       })
 
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+      const checkboxes = container.querySelectorAll('[data-tiger-tree-check]')
       const parentCheckbox = checkboxes[0] as HTMLInputElement
 
       await fireEvent.click(parentCheckbox)
@@ -464,7 +464,7 @@ describe('Tree', () => {
         }
       })
 
-      const checkbox = container.querySelector('input[type="checkbox"]')
+      const checkbox = container.querySelector('[data-tiger-tree-check]')
 
       if (checkbox) {
         await fireEvent.click(checkbox)
@@ -491,7 +491,7 @@ describe('Tree', () => {
         }
       })
 
-      const checkbox = container.querySelector('input[type="checkbox"][disabled]')
+      const checkbox = container.querySelector('[data-tiger-tree-check]')
 
       if (checkbox) {
         await fireEvent.click(checkbox)
@@ -668,8 +668,8 @@ describe('Tree', () => {
         }
       })
 
-      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(false)
+      const checkbox = container.querySelector('[data-tiger-tree-check]') as HTMLElement
+      expect(checkbox.getAttribute('data-checked')).toBe('false')
 
       await fireEvent.click(checkbox)
       await nextTick()
@@ -680,8 +680,8 @@ describe('Tree', () => {
       await rerender({ checkedKeys: ['1'] })
       await nextTick()
 
-      const updatedCheckbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(updatedCheckbox.checked).toBe(true)
+      const updatedCheckbox = container.querySelector('[data-tiger-tree-check]') as HTMLElement
+      expect(updatedCheckbox.getAttribute('data-checked')).toBe('true')
     })
 
     it('supports controlled selected keys and multiple selection mode', () => {

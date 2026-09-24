@@ -100,6 +100,83 @@ describe('DatePicker', () => {
     await waitFor(() => expect(validator).toHaveBeenCalled())
   })
 
+  it('submits the Gregorian day, not the Buddhist display year', () => {
+    const date = new Date(2024, 0, 5)
+    const { container } = render(
+      <DatePicker name="day" locale={{ locale: 'th-TH' }} value={date} />
+    )
+    expect(screen.getByRole('textbox')).toHaveValue('2567-01-05')
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('name')
+    const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement
+    expect(hidden).toHaveAttribute('name', 'day')
+    expect(hidden).toHaveValue('2024-01-05')
+    expect(container.querySelectorAll('[name="day"]')).toHaveLength(1)
+  })
+
+  it('keeps an empty named field in the form', () => {
+    const { container } = render(<DatePicker name="day" />)
+    const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement
+    expect(hidden).toHaveValue('')
+    expect(hidden).not.toBeDisabled()
+  })
+
+  it('does not commit a typed disabled day', () => {
+    const onChange = vi.fn()
+    render(
+      <DatePicker
+        onChange={onChange}
+        disabledDate={(date) => date.getFullYear() === 2024 && date.getMonth() === 0 && date.getDate() === 15}
+      />
+    )
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: '2024-01-15' } })
+    fireEvent.blur(input)
+    expect(onChange).not.toHaveBeenCalled()
+    expect(input).toHaveValue('2024-01-15')
+    expect(screen.getByRole('status')).toHaveTextContent('That date is not available.')
+  })
+
+  it('swaps a typed range whose end is before the start', () => {
+    const onChange = vi.fn()
+    render(<DatePicker range onChange={onChange} />)
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: '2024-01-10 - 2024-01-01' } })
+    fireEvent.blur(input)
+    const range = onChange.mock.calls[0]?.[0] as [Date, Date]
+    expect(range[0]).toEqual(new Date(2024, 0, 1))
+    expect(range[1]).toEqual(new Date(2024, 0, 10))
+  })
+
+  it('keeps an incomplete range open on OK', async () => {
+    const onChange = vi.fn()
+    render(<DatePicker range defaultOpen now={june} onChange={onChange} />)
+    fireEvent.click(document.querySelector('[data-date="2024-06-10"]') as HTMLElement)
+    await userEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.getByRole('textbox')).toHaveValue('2024-06-10 - ')
+    expect(screen.getByRole('status')).toHaveTextContent('Choose an end date.')
+  })
+
+  it('does not emit when the clicked day is already selected', () => {
+    const onChange = vi.fn()
+    render(<DatePicker defaultOpen value={june} now={june} onChange={onChange} />)
+    fireEvent.click(document.querySelector('[data-date="2024-06-15"]') as HTMLElement)
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('exposes the dialog on the input and the calendar button', async () => {
+    render(<DatePicker defaultOpen value={june} now={june} />)
+    const input = screen.getByRole('textbox')
+    const toggle = screen.getByLabelText('Toggle calendar')
+    const dialog = screen.getByRole('dialog')
+    expect(input).toHaveAttribute('aria-haspopup', 'dialog')
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    expect(input).toHaveAttribute('aria-controls', dialog.id)
+    expect(toggle).toHaveAttribute('aria-controls', dialog.id)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+  })
+
   it('has no axe violations when the dialog is open', async () => {
     const { container } = render(
       <DatePicker defaultOpen value={june} now={june} aria-label="Pick a day" />

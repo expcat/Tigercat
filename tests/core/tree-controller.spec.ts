@@ -35,21 +35,13 @@ const treeData: TreeNode[] = [
 ]
 
 describe('resolveTreeSelection', () => {
-  it('keeps selectable true when selectionMode is omitted', () => {
+  it('defaults to single selection when selectionMode is omitted', () => {
     expect(resolveTreeSelection({})).toEqual({ selectable: true, multiple: false })
-    expect(resolveTreeSelection({ selectable: false })).toEqual({
+    expect(resolveTreeSelection({ selectionMode: 'none' })).toEqual({
       selectable: false,
       multiple: false
     })
-    expect(resolveTreeSelection({ multiple: true })).toEqual({ selectable: true, multiple: true })
-  })
-
-  it('lets selectionMode override selectable/multiple', () => {
-    expect(resolveTreeSelection({ selectionMode: 'none', selectable: true })).toEqual({
-      selectable: false,
-      multiple: false
-    })
-    expect(resolveTreeSelection({ selectionMode: 'multiple', multiple: false })).toEqual({
+    expect(resolveTreeSelection({ selectionMode: 'multiple' })).toEqual({
       selectable: true,
       multiple: true
     })
@@ -96,8 +88,9 @@ describe('expanded keys', () => {
     ).toEqual(['root'])
   })
 
-  it('toggles a key without depending on 1 vs "1"', () => {
-    expect(nextTreeExpandedKeys([1], '1', false)).toEqual([])
+  it('toggles only the same typed key', () => {
+    expect(nextTreeExpandedKeys([1], '1', false)).toEqual([1])
+    expect(nextTreeExpandedKeys([1], 1, false)).toEqual([])
     expect(nextTreeExpandedKeys([], 1, true)).toEqual([1])
   })
 })
@@ -150,10 +143,32 @@ describe('filter', () => {
       query: '',
       autoExpandParent: true,
       currentExpanded: ['root', 'child-b'],
-      previousAutoExpand: applied.autoExpandKeys
+      savedExpanded: applied.savedExpanded
     })
-    expect(cleared.matchedKeys.size).toBe(0)
+    expect(cleared.matchedKeys).toBeUndefined()
     expect(cleared.nextExpandedKeys).toEqual([])
+    expect(cleared.savedExpanded).toBeNull()
+  })
+
+  it('restores the expansion captured before the query, not the search-time set', () => {
+    const applied = applyTreeFilter({
+      treeData,
+      query: 'Leaf B1',
+      autoExpandParent: true,
+      currentExpanded: ['standalone'],
+      savedExpanded: null
+    })
+    expect(applied.savedExpanded).toEqual(['standalone'])
+    expect(applied.matchedKeys?.size).toBeGreaterThan(0)
+    const cleared = applyTreeFilter({
+      treeData,
+      query: '',
+      autoExpandParent: true,
+      currentExpanded: applied.nextExpandedKeys,
+      savedExpanded: applied.savedExpanded
+    })
+    expect(cleared.nextExpandedKeys).toEqual(['standalone'])
+    expect(cleared.matchedKeys).toBeUndefined()
   })
 })
 
@@ -176,7 +191,7 @@ describe('lazy load', () => {
     expect(next[0]).not.toBe(source[0])
     expect(next[0].children).toEqual(children)
 
-    const overlaid = mergeLoadedChildren(source, new Map([['p', children]]))
+    const overlaid = mergeLoadedChildren(source, new Map([['s:p', children]]))
     expect(overlaid[0].children).toEqual(children)
     expect(source[0].children).toEqual([])
   })
@@ -238,8 +253,57 @@ describe('resolveTreeView', () => {
     })
     expect(view.visibleItems.map((item) => item.key)).toEqual(['root', 'child-a', 'child-b'])
     expect(view.rows[1]?.selected).toBe(true)
-    expect(view.rows[1]?.posinset).toBe(2)
-    expect(view.rows[1]?.setsize).toBe(3)
+    expect(view.rows[0]?.posinset).toBe(1)
+    expect(view.rows[0]?.setsize).toBe(1)
+    expect(view.rows[1]?.posinset).toBe(1)
+    expect(view.rows[1]?.setsize).toBe(2)
+    expect(view.rows[2]?.posinset).toBe(2)
+    expect(view.rows[2]?.setsize).toBe(2)
     expect(view.focusableKeys).toEqual(['root', 'child-a', 'child-b'])
+  })
+
+  it('numbers posinset among siblings, including two roots', () => {
+    const data: TreeNode[] = [
+      {
+        key: 'a',
+        label: 'A',
+        children: [
+          { key: 'a1', label: 'A1' },
+          { key: 'a2', label: 'A2' }
+        ]
+      },
+      { key: 'b', label: 'B' }
+    ]
+    const view = resolveTreeView({
+      treeData: data,
+      expandedKeys: ['a'],
+      selectedKeys: [],
+      checkedState: { checked: [], halfChecked: [] },
+      selectable: true,
+      checkable: false,
+      hasLoadData: false
+    })
+    const byKey = Object.fromEntries(view.rows.map((row) => [row.item.key, row]))
+    expect(byKey.a?.setsize).toBe(2)
+    expect(byKey.b?.setsize).toBe(2)
+    expect(byKey.a?.posinset).toBe(1)
+    expect(byKey.b?.posinset).toBe(2)
+    expect(byKey.a1?.setsize).toBe(2)
+    expect(byKey.a2?.posinset).toBe(2)
+    expect(byKey.a1?.setsize).not.toBe(view.rows.length)
+  })
+
+  it('keeps aria expanded state after an opened node has no visible children', () => {
+    const data: TreeNode[] = [{ key: 'p', label: 'P', isLeaf: false, children: [] }]
+    const view = resolveTreeView({
+      treeData: data,
+      expandedKeys: ['p'],
+      selectedKeys: [],
+      checkedState: { checked: [], halfChecked: [] },
+      selectable: true,
+      checkable: false,
+      hasLoadData: false
+    })
+    expect(view.rows[0]?.expanded).toBe(true)
   })
 })

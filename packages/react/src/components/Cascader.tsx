@@ -75,6 +75,8 @@ export const Cascader = forwardRef<CascaderRef, CascaderProps>(function Cascader
       type="text"
       className={classNames(ctx.triggerClasses, 'bg-transparent')}
       disabled={ctx.effectiveDisabled}
+      readOnly={ctx.readOnly}
+      aria-readonly={ctx.readOnly || undefined}
       value={ctx.searchQuery}
       placeholder={ctx.displayText}
       onChange={(event) => ctx.updateSearchValue(event.target.value)}
@@ -88,6 +90,8 @@ export const Cascader = forwardRef<CascaderRef, CascaderProps>(function Cascader
         ctx.triggerRef.current = node
       }}
       tabIndex={ctx.effectiveDisabled ? -1 : 0}
+      aria-disabled={ctx.effectiveDisabled || undefined}
+      aria-readonly={ctx.readOnly || undefined}
       className={ctx.triggerClasses}
       onClick={ctx.toggleDropdown}
       onKeyDown={ctx.handleTriggerKeyDown}
@@ -96,7 +100,7 @@ export const Cascader = forwardRef<CascaderRef, CascaderProps>(function Cascader
       <span
         className={classNames(
           'flex-1 truncate',
-          ctx.displayText === ctx.placeholderText && 'text-[var(--tiger-text-muted,#9ca3af)]'
+          ctx.displayText === ctx.placeholderText && 'text-[var(--tiger-text-secondary)]'
         )}>
         {ctx.displayText}
       </span>

@@ -44,18 +44,11 @@ export const EMPTY_TREE_KEYS: TreeNodeKey[] = []
 
 export function resolveTreeSelection(options: {
   selectionMode?: TreeSelectionMode
-  selectable?: boolean
-  multiple?: boolean
 }): { selectable: boolean; multiple: boolean } {
-  if (options.selectionMode !== undefined) {
-    return {
-      selectable: options.selectionMode !== 'none',
-      multiple: options.selectionMode === 'multiple'
-    }
-  }
+  const mode = options.selectionMode ?? 'single'
   return {
-    selectable: options.selectable !== false,
-    multiple: options.multiple === true
+    selectable: mode !== 'none',
+    multiple: mode === 'multiple'
   }
 }
 
@@ -136,18 +129,21 @@ export function nextTreeCheckedState(
 
 export function resolveCheckedInput(
   treeData: TreeNode[],
-  checkedKeys: TreeNodeKey[] | TreeCheckedState | undefined,
+  checkedKeys: TreeNodeKey[] | undefined,
   defaultCheckedKeys: TreeNodeKey[] | undefined,
   checkStrictly: boolean
 ): TreeCheckedState {
   const source = checkedKeys ?? defaultCheckedKeys ?? EMPTY_TREE_KEYS
-  if (Array.isArray(source)) {
-    return calculateCheckedState(treeData, source, checkStrictly)
-  }
-  return {
-    checked: [...source.checked],
-    halfChecked: [...source.halfChecked]
-  }
+  return calculateCheckedState(treeData, source, checkStrictly)
+}
+
+/** Filter ancestors to show before a controlled `expandedKeys` write-back. */
+export function resolveDisplayedExpandedKeys(options: {
+  expandedKeys: readonly TreeNodeKey[]
+  autoExpandKeys: readonly TreeNodeKey[]
+}): TreeNodeKey[] {
+  if (options.autoExpandKeys.length === 0) return uniqueTreeKeys(options.expandedKeys)
+  return uniqueTreeKeys([...options.expandedKeys, ...options.autoExpandKeys])
 }
 
 export function applyTreeFilter(options: {
@@ -157,31 +153,41 @@ export function applyTreeFilter(options: {
   filterMode?: TreeFilterMode
   autoExpandParent: boolean
   currentExpanded: readonly TreeNodeKey[]
-  previousAutoExpand?: Iterable<TreeNodeKey>
+  /** Expansion captured before the current non-empty query. Null when not searching. */
+  savedExpanded?: readonly TreeNodeKey[] | null
 }): {
-  matchedKeys: Set<TreeNodeKey>
+  /** `undefined` when the query is empty (no search). An empty set is zero hits. */
+  matchedKeys: Set<TreeNodeKey> | undefined
   autoExpandKeys: TreeNodeKey[]
   nextExpandedKeys: TreeNodeKey[]
+  savedExpanded: TreeNodeKey[] | null
 } {
+  if (!options.query) {
+    const restored = options.savedExpanded
+      ? uniqueTreeKeys(options.savedExpanded)
+      : uniqueTreeKeys(options.currentExpanded)
+    return {
+      matchedKeys: undefined,
+      autoExpandKeys: [],
+      nextExpandedKeys: restored,
+      savedExpanded: null
+    }
+  }
+
   const matchedKeys = filterTreeNodes(
     options.treeData,
     options.query,
     options.filterFn,
     options.filterMode ?? 'subtree'
   )
-  if (!options.query) {
-    const retract = createTreeKeyIdSet(options.previousAutoExpand)
-    const nextExpandedKeys = uniqueTreeKeys(options.currentExpanded).filter(
-      (key) => !retract.has(treeKeyId(key))
-    )
-    return { matchedKeys, autoExpandKeys: [], nextExpandedKeys }
-  }
-
+  const savedExpanded = options.savedExpanded
+    ? uniqueTreeKeys(options.savedExpanded)
+    : uniqueTreeKeys(options.currentExpanded)
   const autoExpandKeys = options.autoExpandParent
     ? [...getAutoExpandKeys(options.treeData, matchedKeys)]
     : []
   const nextExpandedKeys = uniqueTreeKeys([...options.currentExpanded, ...autoExpandKeys])
-  return { matchedKeys, autoExpandKeys, nextExpandedKeys }
+  return { matchedKeys, autoExpandKeys, nextExpandedKeys, savedExpanded }
 }
 
 export function shouldLoadTreeNode(options: {
@@ -383,25 +389,41 @@ export function resolveTreeView(input: TreeViewInput): TreeView {
   const selectedIds = createTreeKeyIdSet(input.selectedKeys)
   const checkedIds = createTreeKeyIdSet(input.checkedState.checked)
   const halfIds = createTreeKeyIdSet(input.checkedState.halfChecked)
-  const matchedIds = input.matchedKeys ? createTreeKeyIdSet(input.matchedKeys) : new Set<string>()
+  const matchedIds =
+    input.matchedKeys != null ? createTreeKeyIdSet(input.matchedKeys) : new Set<string>()
   const loadingIds = createTreeKeyIdSet(input.loadingKeys)
   const visibleItems = getVisibleTreeItems(input.treeData, input.expandedKeys, input.matchedKeys)
-  const setsize = visibleItems.length
-  const rows: TreeRowView[] = visibleItems.map((item, i) => {
+  const siblingGroups = new Map<string, VisibleTreeItem[]>()
+  for (const item of visibleItems) {
+    const parentId = item.parentKey === undefined ? '' : treeKeyId(item.parentKey)
+    const group = siblingGroups.get(parentId)
+    if (group) group.push(item)
+    else siblingGroups.set(parentId, [item])
+  }
+  const siblingMeta = new Map<string, { posinset: number; setsize: number }>()
+  for (const group of siblingGroups.values()) {
+    group.forEach((item, index) => {
+      siblingMeta.set(treeKeyId(item.key), { posinset: index + 1, setsize: group.length })
+    })
+  }
+  const rows: TreeRowView[] = visibleItems.map((item) => {
     const id = treeKeyId(item.key)
     const expandable = isTreeNodeExpandable(item.node, input.hasLoadData)
+    const opened = expandedIds.has(id)
+    const sibling = siblingMeta.get(id)
     return {
       item,
       expandable,
-      expanded: expandable && expandedIds.has(id),
+      // Stay expanded after an empty or failed child list. Do not require visible children.
+      expanded: item.node.isLeaf !== true && opened,
       selected: input.selectable && selectedIds.has(id),
       checked: checkedIds.has(id),
       halfChecked: halfIds.has(id),
       loading: loadingIds.has(id),
       matched: matchedIds.has(id),
       disabled: Boolean(item.node.disabled),
-      posinset: i + 1,
-      setsize
+      posinset: sibling?.posinset ?? 1,
+      setsize: sibling?.setsize ?? 1
     }
   })
   const focusableKeys = rows.filter((row) => !row.disabled).map((row) => row.item.key)
@@ -449,7 +471,7 @@ export function resolveTreeKeyboardAction(options: {
   hasLoadData: boolean
   dir?: 'ltr' | 'rtl'
 }): TreeKeyboardAction | null {
-  const entry = options.view.index.byId.get(String(options.nodeKey))
+  const entry = options.view.index.byId.get(treeKeyId(options.nodeKey))
   const node = entry?.node
   if (!node || node.disabled) return null
   const expandedIds = createTreeKeyIdSet(options.expandedKeys)
@@ -465,7 +487,7 @@ export function resolveTreeKeyboardAction(options: {
     isExpandable: isTreeNodeExpandable(node, options.hasLoadData),
     isExpanded: Boolean(row?.expanded),
     isParentExpanded: parentKey !== undefined && expandedIds.has(treeKeyId(parentKey)),
-    isChecked: Boolean(row?.checked),
+    isChecked: Boolean(row?.checked) && !row?.halfChecked,
     selectable: options.selectable,
     checkable: options.checkable,
     dir: options.dir

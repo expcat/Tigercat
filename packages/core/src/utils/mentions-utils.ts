@@ -62,9 +62,24 @@ export interface MentionQuery {
   prefix: string
 }
 
+/** Characters that end a mention token. Shared by parse and insert. */
+const MENTION_SEPARATORS = new Set([' ', '\n', '\t', '\r', '\f'])
+
+/** True at the start of the text and on separator characters. */
+export function isMentionSeparator(char: string | undefined): boolean {
+  if (char == null || char === '') return true
+  return MENTION_SEPARATORS.has(char)
+}
+
+/** The separator insert writes after a token. It is in {@link isMentionSeparator}. */
+export function mentionInsertSeparator(): string {
+  return ' '
+}
+
 /**
- * Extract the mention query immediately before `cursorPos`. The trigger
- * must be at the start of the string or after whitespace.
+ * Mention query at the cursor. Scans backward to the nearest legal prefix:
+ * the current token must start with that prefix, and the character before
+ * it must be a separator (or the start of the text).
  */
 export function extractMentionQuery(
   text: string,
@@ -74,23 +89,27 @@ export function extractMentionQuery(
   const prefixes = normalizeMentionPrefixes(prefix)
     .slice()
     .sort((a, b) => b.length - a.length)
-  const before = text.slice(0, cursorPos)
-  let best: MentionQuery | null = null
+  if (prefixes.length === 0) return null
+  const end = Math.max(0, Math.min(cursorPos, text.length))
+  let start = end
+  while (start > 0 && !isMentionSeparator(text[start - 1])) start -= 1
+  const token = text.slice(start, end)
   for (const item of prefixes) {
-    const lastPrefixIdx = before.lastIndexOf(item)
-    if (lastPrefixIdx === -1) continue
-    if (lastPrefixIdx > 0 && !/\s/.test(before[lastPrefixIdx - 1] ?? '')) continue
-    const query = before.slice(lastPrefixIdx + item.length)
-    if (/\s/.test(query)) continue
-    if (
-      !best ||
-      lastPrefixIdx > best.startPos ||
-      (lastPrefixIdx === best.startPos && item.length > best.prefix.length)
-    ) {
-      best = { query, startPos: lastPrefixIdx, prefix: item }
-    }
+    if (!token.startsWith(item)) continue
+    return { query: token.slice(item.length), startPos: start, prefix: item }
   }
-  return best
+  return null
+}
+
+/** Live textarea value and selection. Insert must use this snapshot only. */
+export function readMentionSnapshot(
+  text: string,
+  cursor: number,
+  prefix: string | string[] = '@'
+): (MentionQuery & { text: string; cursor: number }) | null {
+  const query = extractMentionQuery(text, cursor, prefix)
+  if (!query) return null
+  return { ...query, text, cursor }
 }
 
 export function defaultMentionFilter(query: string, option: MentionOption): boolean {
@@ -115,11 +134,10 @@ export function filterMentionOptions(
 
 export function shouldOpenMentions(input: {
   query: MentionQuery | null
-  filteredCount: number
+  filteredCount?: number
   loading?: boolean
 }): boolean {
-  if (!input.query) return false
-  return input.filteredCount > 0 || Boolean(input.loading)
+  return Boolean(input.query)
 }
 
 /**
@@ -137,7 +155,7 @@ export function insertMention(input: {
   const cursor = Math.max(start, input.cursor)
   const before = input.text.slice(0, start)
   const after = input.text.slice(cursor)
-  const inserted = `${input.prefix}${input.value} `
+  const inserted = `${input.prefix}${input.value}${mentionInsertSeparator()}`
   return { value: `${before}${inserted}${after}`, caret: before.length + inserted.length }
 }
 
@@ -148,31 +166,36 @@ export interface ParsedMention {
   end: number
 }
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
 /**
- * Parse inserted tokens of the form `prefix + value` (optionally followed
- * by a space). Round-trips with {@link insertMention}.
+ * Parse inserted tokens of the form `prefix + value` followed by a
+ * {@link isMentionSeparator} character. Round-trips with {@link insertMention}.
  */
 export function parseMentions(text: string, prefix: string | string[] = '@'): ParsedMention[] {
   const prefixes = normalizeMentionPrefixes(prefix)
     .slice()
     .sort((a, b) => b.length - a.length)
   if (prefixes.length === 0) return []
-  const source = prefixes.map(escapeRegExp).join('|')
-  const pattern = new RegExp(`(?:^|\\s)(${source})(\\S+)`, 'g')
   const result: ParsedMention[] = []
-  let match: RegExpExecArray | null
-  while ((match = pattern.exec(text)) !== null) {
-    const prefixToken = match[1] ?? ''
-    const value = match[2] ?? ''
-    const consumed = match[0] ?? ''
-    const leadingWs = consumed.startsWith(prefixToken) ? 0 : 1
-    const start = match.index + leadingWs
-    const end = start + prefixToken.length + value.length
-    result.push({ prefix: prefixToken, value, start, end })
+  let index = 0
+  while (index < text.length) {
+    const boundary = index === 0 ? undefined : text[index - 1]
+    if (!isMentionSeparator(boundary)) {
+      index += 1
+      continue
+    }
+    const matched = prefixes.find((item) => text.startsWith(item, index))
+    if (!matched) {
+      index += 1
+      continue
+    }
+    const valueStart = index + matched.length
+    let valueEnd = valueStart
+    while (valueEnd < text.length && !isMentionSeparator(text[valueEnd])) valueEnd += 1
+    const value = text.slice(valueStart, valueEnd)
+    if (value.length > 0) {
+      result.push({ prefix: matched, value, start: index, end: valueEnd })
+    }
+    index = Math.max(valueEnd, index + 1)
   }
   return result
 }

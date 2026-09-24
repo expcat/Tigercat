@@ -148,10 +148,18 @@ describe('ColorSwatch', () => {
       expect(screen.queryAllByRole('radio')).toHaveLength(0)
     })
 
-    it('matches selected colors case-insensitively', () => {
+    it('matches selected colors by parsed value', () => {
       render(<ColorSwatch value="#ABCDEF" colors={['#abcdef']} />)
 
       expect(screen.getByRole('radio', { name: '#abcdef' })).toHaveAttribute('aria-checked', 'true')
+    })
+
+    it('matches rgb to hex and does not paint an unparseable swatch string', () => {
+      render(<ColorSwatch value="rgb(255, 0, 0)" colors={['#f00', 'not-a-color']} />)
+
+      expect(screen.getByRole('radio', { name: '#f00' })).toHaveAttribute('aria-checked', 'true')
+      const bad = screen.getByRole('radio', { name: 'not-a-color' })
+      expect(bad.style.backgroundColor).toContain('tiger-surface-muted')
     })
 
     it('ignores keyboard selection when disabled', () => {

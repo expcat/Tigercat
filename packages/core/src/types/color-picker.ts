@@ -32,6 +32,11 @@ export interface ColorPickerProps {
    */
   disabled?: boolean
   /**
+   * Focusable and submittable, but the value cannot change.
+   * @default false
+   */
+  readOnly?: boolean
+  /**
    * @default 'md'
    */
   size?: ComponentSize

@@ -89,11 +89,25 @@ describe('TimePicker', () => {
     expect(emitted()['update:modelValue']?.at(-1)?.[0]).toBe('09:30')
   })
 
-  it('mounts only one time tree', async () => {
+  it('renders desktop columns and mobile selects together', async () => {
     render(TimePicker, { props: { defaultOpen: true } })
     const dialog = screen.getByRole('dialog')
-    expect(dialog.querySelectorAll('[data-tiger-timepicker-unit="hour"]').length).toBeGreaterThan(0)
-    expect(dialog.querySelectorAll('select')).toHaveLength(0)
+    const columns = dialog.querySelector('[class*="sm:flex"]')
+    const selects = dialog.querySelector('select')?.parentElement
+    expect(dialog.querySelectorAll('[role="listbox"]').length).toBeGreaterThan(0)
+    expect(dialog.querySelectorAll('select')).toHaveLength(2)
+    expect(columns?.className).toContain('hidden')
+    expect(selects?.className).toContain('sm:hidden')
+  })
+
+  it('does not emit change or input aliases', async () => {
+    const { emitted } = render(TimePicker, { props: { defaultOpen: true } })
+    await fireEvent.click(document.querySelector('[aria-label="09 Hour"]') as HTMLElement)
+    await fireEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(emitted().change).toBeUndefined()
+    expect(emitted().input).toBeUndefined()
+    expect(emitted()['open-change']).toBeUndefined()
+    expect(emitted()['update:modelValue']?.at(-1)?.[0]).toBe('09:00')
   })
 
   it('has no axe violations when the dialog is open', async () => {

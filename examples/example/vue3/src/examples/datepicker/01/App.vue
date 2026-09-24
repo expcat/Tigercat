@@ -11,7 +11,7 @@ import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
       <FormItem label="日期" class="w-full max-w-[280px]">
         <DatePicker />
       </FormItem>
-      <p class="text-sm text-[var(--tiger-text-muted)]">上面不绑 v-model，点格子仍会改显示。</p>
+      <p class="text-sm text-[var(--tiger-text-secondary)]">上面不绑 v-model，点格子仍会改显示。</p>
     </div>
   </ConfigProvider>
 </template>

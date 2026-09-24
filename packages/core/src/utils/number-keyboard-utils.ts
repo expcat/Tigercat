@@ -35,19 +35,19 @@ export interface ApplyNumberKeyboardKeyResult {
 }
 
 const KEY_LAYOUT =
-  'flex min-h-12 select-none items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] border px-3 text-lg font-medium tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease,background-color_150ms_ease)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/30 disabled:cursor-not-allowed disabled:opacity-50'
+  'flex min-h-12 select-none items-center justify-center rounded-[var(--tiger-radius-md)] border px-3 text-lg font-medium tiger-motion-aware [transition:var(--tiger-transition-base)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/30 disabled:cursor-not-allowed disabled:opacity-50'
 
 const KEY_TONE =
-  'border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-fill,#f3f4f6)] text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]'
+  'border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] text-[var(--tiger-text)] hover:bg-[var(--tiger-outline-bg-hover)]'
 
 const CONFIRM_TONE =
-  'col-span-3 border-[var(--tiger-primary,#2563eb)] bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary-foreground,#ffffff)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)]'
+  'col-span-3 border-[var(--tiger-primary)] bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] hover:bg-[var(--tiger-primary-hover)]'
 
 export const numberKeyboardRootClasses = classNames(
-  'w-full rounded-[var(--tiger-radius-lg,0.75rem)]',
-  'border border-[var(--tiger-border,#d1d5db)]',
-  'bg-[var(--tiger-surface,#ffffff)] p-2',
-  'shadow-[var(--tiger-shadow-sm,0_1px_2px_rgb(0_0_0_/_0.05))]'
+  'w-full rounded-[var(--tiger-radius-lg)]',
+  'border border-[var(--tiger-border)]',
+  'bg-[var(--tiger-surface)] p-2',
+  'shadow-[var(--tiger-shadow-sm)]'
 )
 
 export const numberKeyboardGridClasses = 'grid grid-cols-3 gap-2'
@@ -58,33 +58,87 @@ export const numberKeyboardSheetClasses = classNames(
   'fixed inset-x-0 bottom-0',
   overlayZIndexClass.overlay,
   'w-full',
-  'rounded-t-[var(--tiger-radius-lg,0.75rem)]',
-  'border-t border-[var(--tiger-border,#d1d5db)]',
-  'bg-[var(--tiger-surface,#ffffff)] p-2',
+  'rounded-t-[var(--tiger-radius-lg)]',
+  'border-t border-[var(--tiger-border)]',
+  'bg-[var(--tiger-surface)] p-2',
   'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
-  'shadow-[var(--tiger-shadow-lg,0_10px_15px_-3px_rgb(0_0_0_/_0.1),0_4px_6px_-4px_rgb(0_0_0_/_0.1))]'
+  'shadow-[var(--tiger-shadow-lg)]'
 )
 
 export const numberKeyboardScrimClasses = classNames(
   'fixed inset-0',
   overlayZIndexClass.overlay,
-  'bg-[color-mix(in_srgb,var(--tiger-text,#111827)_40%,transparent)]'
+  'bg-[color-mix(in_srgb,var(--tiger-text)_40%,transparent)]'
 )
 
 export const numberKeyboardKeyClasses = classNames(KEY_LAYOUT, KEY_TONE)
 
 export const numberKeyboardConfirmKeyClasses = classNames(KEY_LAYOUT, CONFIRM_TONE)
 
+export const NUMBER_KEYBOARD_INVALID_VALUE_TEXT =
+  'This value does not match the keyboard mode and was cleared.'
+
 export function normalizeNumberKeyboardValue(value: unknown): string {
   return value === null || value === undefined ? '' : String(value)
 }
 
+function escapeNumberKeyboardSeparator(separator: string): string {
+  return separator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * Legal external strings only. Anything else (`12a`, `1.2.3`) is `''`.
+ * `undefined` / `null` / `''` stay empty. Digits are not stripped off an illegal prefix.
+ */
+export function sanitizeNumberKeyboardValue(
+  value: unknown,
+  mode: NumberKeyboardMode = 'number',
+  options: NumberKeyboardInputOptions = {}
+): string {
+  if (value === undefined || value === null) return ''
+  const raw = typeof value === 'number' && Number.isFinite(value) ? String(value) : String(value)
+  if (raw === '') return ''
+
+  const maxLength = getNumberKeyboardMaxLength(mode, options.maxLength)
+  if (mode === 'number' || mode === 'phone') {
+    if (!/^\d+$/.test(raw) || raw.length > maxLength) return ''
+    return raw
+  }
+
+  if (mode === 'id-card') {
+    const upper = raw.toUpperCase()
+    if (!/^\d*X?$/.test(upper) || upper.length > maxLength) return ''
+    return upper
+  }
+
+  const precision = getNumberKeyboardPrecision('amount', options.precision) ?? 2
+  const separator = options.decimalSeparator || '.'
+  if (Number.isFinite(maxLength) && raw.length > maxLength) return ''
+  if (precision <= 0) return /^\d+$/.test(raw) ? raw : ''
+  const sep = escapeNumberKeyboardSeparator(separator)
+  const pattern = new RegExp(
+    `^(?:\\d+|\\d+${sep}\\d{0,${precision}}|${sep}\\d{1,${precision}})$`
+  )
+  return pattern.test(raw) ? raw : ''
+}
+
+/** True when a provided value is non-empty and not legal for the mode. */
+export function isNumberKeyboardValueRejected(
+  value: unknown,
+  mode: NumberKeyboardMode = 'number',
+  options: NumberKeyboardInputOptions = {}
+): boolean {
+  if (value === undefined || value === null) return false
+  if (typeof value === 'string' && value === '') return false
+  return sanitizeNumberKeyboardValue(value, mode, options) === ''
+}
+
 export function postNumberKeyboardValue(
   value: unknown,
-  mode: NumberKeyboardMode = 'number'
+  mode: NumberKeyboardMode = 'number',
+  options: NumberKeyboardInputOptions = {}
 ): string {
-  const normalized = normalizeNumberKeyboardValue(value)
-  return mode === 'id-card' ? normalized.toUpperCase() : normalized
+  return sanitizeNumberKeyboardValue(value, mode, { ...options, mode })
 }
 
 export function getNumberKeyboardMaxLength(
@@ -161,7 +215,7 @@ export function applyNumberKeyboardInput(
   options: NumberKeyboardInputOptions = {}
 ): string {
   const mode = options.mode ?? 'number'
-  const current = postNumberKeyboardValue(currentValue, mode)
+  const current = sanitizeNumberKeyboardValue(currentValue, mode, options)
   const maxLength = getNumberKeyboardMaxLength(mode, options.maxLength)
   const decimalSeparator = options.decimalSeparator || '.'
 
@@ -179,9 +233,10 @@ export function applyNumberKeyboardInput(
 
 export function deleteNumberKeyboardValue(
   value: unknown,
-  mode: NumberKeyboardMode = 'number'
+  mode: NumberKeyboardMode = 'number',
+  options: NumberKeyboardInputOptions = {}
 ): string {
-  return postNumberKeyboardValue(value, mode).slice(0, -1)
+  return sanitizeNumberKeyboardValue(value, mode, options).slice(0, -1)
 }
 
 export function getNumberKeyboardAction(key: NumberKeyboardKey): NumberKeyboardAction {
@@ -196,7 +251,7 @@ export function applyNumberKeyboardKey(
   options: NumberKeyboardInputOptions = {}
 ): ApplyNumberKeyboardKeyResult {
   const mode = options.mode ?? 'number'
-  const currentValue = postNumberKeyboardValue(current, mode)
+  const currentValue = sanitizeNumberKeyboardValue(current, mode, options)
   const resolved =
     typeof key === 'string'
       ? resolveNumberKeyboardPhysicalKey(key, options)
@@ -212,7 +267,7 @@ export function applyNumberKeyboardKey(
 
   const nextValue =
     resolved.type === 'delete'
-      ? deleteNumberKeyboardValue(currentValue, mode)
+      ? deleteNumberKeyboardValue(currentValue, mode, options)
       : applyNumberKeyboardInput(currentValue, resolved.value, options)
 
   return {
@@ -296,17 +351,27 @@ export function getNumberKeyboardKeys(options: NumberKeyboardLayoutOptions): Num
   return keys
 }
 
-export function getNumberKeyboardKeyClasses(key: NumberKeyboardKey, disabled = false): string {
+export const numberKeyboardKeyActiveClasses =
+  'ring-2 ring-[var(--tiger-focus-ring)] outline outline-2 outline-offset-2 outline-[var(--tiger-focus-ring)]'
+
+export function getNumberKeyboardKeyClasses(
+  key: NumberKeyboardKey,
+  disabled = false,
+  active = false
+): string {
   if (key.type === 'empty') return numberKeyboardEmptyKeyClasses
   return classNames(
     KEY_LAYOUT,
     key.type === 'confirm' ? CONFIRM_TONE : KEY_TONE,
+    active && numberKeyboardKeyActiveClasses,
     disabled && 'pointer-events-none'
   )
 }
 
 export function getNumberKeyboardInteractiveIndexes(keys: readonly NumberKeyboardKey[]): number[] {
-  return keys.map((key, index) => (key.type === 'empty' ? -1 : index)).filter((index) => index >= 0)
+  return keys
+    .map((key, index) => (key.type === 'empty' || key.disabled ? -1 : index))
+    .filter((index) => index >= 0)
 }
 
 export function moveNumberKeyboardIndex(

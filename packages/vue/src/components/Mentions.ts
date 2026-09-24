@@ -36,7 +36,9 @@ import {
   getMentionOptionKey,
   getMentionsKeyIntent,
   getMentionsOptionClasses,
+  getAutoCompleteVirtualItemHeight,
   getMentionsPanelStyle,
+  shouldVirtualizeAutoCompleteList,
   getMentionsTextareaClasses,
   getPickerComboboxAria,
   getPickerListboxAria,
@@ -44,6 +46,8 @@ import {
   getPickerOptionAria,
   getPickerOptionId,
   insertMention,
+  isImeCompositionEvent,
+  readMentionSnapshot,
   mentionsDropdownClasses,
   mentionsEmptyStateClasses,
   mentionsListboxClasses,
@@ -51,12 +55,12 @@ import {
   mergeStyleValues,
   mergeTigerLocale,
   resolveLocaleText,
-  resolveReadOnlyFlag,
   runShakeAnimation,
   shouldOpenMentions
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
+import { useFixedListWindow } from './internal/useFixedListWindow'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 
@@ -76,7 +80,6 @@ export interface VueMentionsProps {
   minRows?: number
   maxLength?: number
   showCount?: boolean
-  readonly?: boolean
   readOnly?: boolean
   clearable?: boolean
   status?: InputStatus
@@ -115,8 +118,7 @@ export const Mentions = defineComponent({
     minRows: { type: Number, default: undefined },
     maxLength: { type: Number, default: undefined },
     showCount: { type: Boolean, default: false },
-    readonly: { type: Boolean, default: undefined },
-    readOnly: { type: Boolean, default: undefined },
+    readOnly: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false },
     status: { type: String as PropType<InputStatus>, default: undefined },
     errorMessage: String,
@@ -137,10 +139,8 @@ export const Mentions = defineComponent({
   emits: [
     'update:modelValue',
     'update:open',
-    'change',
     'select',
     'search',
-    'open-change',
     'focus',
     'blur'
   ],
@@ -169,6 +169,7 @@ export const Mentions = defineComponent({
     const query = ref('')
     const activeIndex = ref(-1)
     const mentionStartPos = ref(-1)
+    const mentionSnapshot = ref<ReturnType<typeof readMentionSnapshot>>(null)
     const mentionEndPos = ref(-1)
     const mentionPrefix = ref('@')
     const dismissed = ref(false)
@@ -195,6 +196,18 @@ export const Mentions = defineComponent({
     const filteredOptions = computed(() =>
       filterMentionOptions(props.options, query.value, props.filterOption)
     )
+    const mentionWindow = useFixedListWindow({
+      enabled: () =>
+        shouldVirtualizeAutoCompleteList(
+          filteredOptions.value.length,
+          props.listHeight,
+          effectiveSize.value
+        ),
+      activeIndex: () => activeIndex.value,
+      itemHeight: () => getAutoCompleteVirtualItemHeight(effectiveSize.value),
+      viewport: () => props.listHeight,
+      count: () => filteredOptions.value.length
+    })
     const expanded = computed(
       () =>
         isOpen.value &&
@@ -212,7 +225,8 @@ export const Mentions = defineComponent({
         })
     )
     const activeError = computed(() => status.value === 'error' && !!props.errorMessage)
-    const isReadOnly = computed(() => resolveReadOnlyFlag(props.readonly, props.readOnly))
+    const isReadOnly = computed(() => Boolean(props.readOnly))
+    const composing = ref(false)
     const hasExtras = computed(
       () =>
         activeError.value ||
@@ -258,20 +272,22 @@ export const Mentions = defineComponent({
     )
 
     function setOpen(next: boolean) {
+      if (next === isOpen.value) return
       if (props.open === undefined) localOpen.value = next
       emit('update:open', next)
-      emit('open-change', next)
     }
 
     function commitValue(next: string, caret?: number) {
+      const changed = next !== currentValue.value
       liveText.value = next
       if (props.modelValue === undefined && typeof formValue.value !== 'string') {
         localValue.value = next
       }
       if (textareaRef.value) textareaRef.value.value = next
-      emit('update:modelValue', next)
-      emit('change', next)
-      formItemControl?.onChange(next)
+      if (changed) {
+        emit('update:modelValue', next)
+        formItemControl?.onChange(next)
+      }
       if (caret !== undefined) {
         nextTick(() => {
           textareaRef.value?.setSelectionRange(caret, caret)
@@ -285,8 +301,9 @@ export const Mentions = defineComponent({
         mentionStartPos.value = result.startPos
         mentionEndPos.value = cursor
         mentionPrefix.value = result.prefix
+        mentionSnapshot.value = { ...result, text, cursor }
         query.value = result.query
-        emit('search', result.query)
+        emit('search', result.query, result.prefix)
         const nextFiltered = filterMentionOptions(props.options, result.query, props.filterOption)
         setOpen(
           shouldOpenMentions({
@@ -351,16 +368,17 @@ export const Mentions = defineComponent({
     })
 
     function selectOption(option: MentionOption) {
-      if (option.disabled || effectiveDisabled.value) return
+      if (option.disabled || effectiveDisabled.value || isReadOnly.value || composing.value) return
       const textarea = textareaRef.value
-      const text = liveText.value || textarea?.value || currentValue.value
-      const cursor =
-        mentionEndPos.value >= 0 ? mentionEndPos.value : (textarea?.selectionStart ?? text.length)
+      const text = textarea?.value ?? liveText.value ?? currentValue.value
+      const cursor = textarea?.selectionStart ?? text.length
+      const snapshot = readMentionSnapshot(text, cursor, props.prefix) ?? mentionSnapshot.value
+      if (!snapshot) return
       const result = insertMention({
-        text,
-        mentionStart: mentionStartPos.value,
-        cursor,
-        prefix: mentionPrefix.value,
+        text: snapshot.text,
+        mentionStart: snapshot.startPos,
+        cursor: snapshot.cursor,
+        prefix: snapshot.prefix,
         value: option.value
       })
       commitValue(result.value, result.caret)
@@ -372,8 +390,16 @@ export const Mentions = defineComponent({
       textarea?.focus()
     }
 
+    function syncFromField(field?: HTMLTextAreaElement | null) {
+      const textarea = field ?? textareaRef.value
+      const text = textarea?.value ?? currentValue.value
+      const cursor = textarea?.selectionStart ?? text.length
+      liveText.value = text
+      applyQuery(text, cursor)
+    }
+
     function handleInput(event: Event) {
-      if (effectiveDisabled.value) return
+      if (effectiveDisabled.value || isReadOnly.value) return
       dismissed.value = false
       const target = event.target as HTMLTextAreaElement
       liveText.value = target.value
@@ -382,6 +408,7 @@ export const Mentions = defineComponent({
     }
 
     function handleKeydown(event: KeyboardEvent) {
+      if (composing.value || isImeCompositionEvent(event) || isReadOnly.value) return
       const intent = getMentionsKeyIntent(event.key, expanded.value)
       switch (intent.type) {
         case 'navigate':
@@ -429,6 +456,55 @@ export const Mentions = defineComponent({
     })
 
     return () => {
+      const renderMentionRows = () => {
+        const options = filteredOptions.value
+        const virtualize = shouldVirtualizeAutoCompleteList(
+          options.length,
+          props.listHeight,
+          effectiveSize.value
+        )
+        const range = mentionWindow.range.value
+        const source =
+          virtualize && range.endIndex >= range.startIndex
+            ? options.slice(range.startIndex, range.endIndex + 1)
+            : options
+        const nodes = source.map((option, offset) => {
+          const index = virtualize ? range.startIndex + offset : offset
+          const isActive = index === activeIndex.value
+          return h(
+            'div',
+            {
+              key: getMentionOptionKey(option, index),
+              id: getPickerOptionId(listboxId, index),
+              'data-active': isActive || undefined,
+              ...getPickerOptionAria({
+                selected: false,
+                disabled: !!option.disabled
+              }),
+              class: getMentionsOptionClasses({
+                isActive,
+                isDisabled: !!option.disabled,
+                size: effectiveSize.value
+              }),
+              style: virtualize
+                ? { height: `${getAutoCompleteVirtualItemHeight(effectiveSize.value)}px` }
+                : undefined,
+              onMousedown: (event: Event) => event.preventDefault(),
+              onClick: () => selectOption(option),
+              onMouseenter: () => {
+                if (!option.disabled) activeIndex.value = index
+              }
+            },
+            option.label
+          )
+        })
+        if (!virtualize) return nodes
+        return [
+          h('div', { style: { height: `${range.totalHeight}px`, position: 'relative' } }, [
+            h('div', { style: { transform: `translateY(${range.offsetTop}px)` } }, nodes)
+          ])
+        ]
+      }
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
       const ariaLabel =
         typeof restAttrs['aria-label'] === 'string' ? restAttrs['aria-label'] : undefined
@@ -451,8 +527,17 @@ export const Mentions = defineComponent({
         ...getPickerComboboxAria({
           expanded: expanded.value,
           listboxId,
-          activeIndex: expanded.value ? activeIndex.value : -1
+          activeIndex:
+            filteredOptions.value.length > 0 && mentionWindow.activeInWindow.value
+              ? activeIndex.value
+              : -1,
+          listMounted: filteredOptions.value.length > 0
         }),
+        'aria-controls': expanded.value
+          ? filteredOptions.value.length > 0
+            ? listboxId
+            : `${listboxId}-popup`
+          : undefined,
         'aria-autocomplete': 'list' as const
       }
 
@@ -475,6 +560,20 @@ export const Mentions = defineComponent({
         placeholder: props.placeholder,
         disabled: effectiveDisabled.value,
         readonly: isReadOnly.value || undefined,
+        onKeyup: (event: KeyboardEvent) => {
+          if (isReadOnly.value || effectiveDisabled.value) return
+          syncFromField(event.target as HTMLTextAreaElement)
+        },
+        onClick: (event: MouseEvent) => {
+          if (isReadOnly.value || effectiveDisabled.value) return
+          syncFromField(event.target as HTMLTextAreaElement)
+        },
+        onCompositionstart: () => {
+          composing.value = true
+        },
+        onCompositionend: () => {
+          composing.value = false
+        },
         maxlength: props.maxLength,
         rows: props.rows,
         name: effectiveName,
@@ -503,6 +602,7 @@ export const Mentions = defineComponent({
             h(
               'div',
               {
+                id: filteredOptions.value.length > 0 ? undefined : `${listboxId}-popup`,
                 ref: dropdownRef,
                 class: classNames(
                   mentionsDropdownClasses,
@@ -515,42 +615,45 @@ export const Mentions = defineComponent({
               },
               [
                 props.loading && filteredOptions.value.length === 0
-                  ? h('div', { class: mentionsEmptyStateClasses }, loadingText.value)
+                  ? h(
+                      'div',
+                      { class: mentionsEmptyStateClasses, role: 'status', 'aria-live': 'polite' },
+                      loadingText.value
+                    )
                   : filteredOptions.value.length === 0
-                    ? h('div', { class: mentionsEmptyStateClasses }, resolvedEmptyText.value)
+                    ? h(
+                        'div',
+                        { class: mentionsEmptyStateClasses, role: 'status', 'aria-live': 'polite' },
+                        resolvedEmptyText.value
+                      )
                     : h(
                         'div',
                         {
                           class: mentionsListboxClasses,
-                          style: getMentionsPanelStyle(props.listHeight),
+                          style: shouldVirtualizeAutoCompleteList(
+                            filteredOptions.value.length,
+                            props.listHeight,
+                            effectiveSize.value
+                          )
+                            ? { height: `${props.listHeight}px`, overflow: 'auto' }
+                            : getMentionsPanelStyle(props.listHeight),
+                          ref: shouldVirtualizeAutoCompleteList(
+                            filteredOptions.value.length,
+                            props.listHeight,
+                            effectiveSize.value
+                          )
+                            ? mentionWindow.bindRef
+                            : undefined,
+                          onScroll: shouldVirtualizeAutoCompleteList(
+                            filteredOptions.value.length,
+                            props.listHeight,
+                            effectiveSize.value
+                          )
+                            ? mentionWindow.onScroll
+                            : undefined,
                           ...getPickerListboxAria({ id: listboxId })
                         },
-                        filteredOptions.value.map((option, index) => {
-                          const isActive = index === activeIndex.value
-                          return h(
-                            'div',
-                            {
-                              key: getMentionOptionKey(option, index),
-                              id: getPickerOptionId(listboxId, index),
-                              'data-active': isActive || undefined,
-                              ...getPickerOptionAria({
-                                selected: false,
-                                disabled: !!option.disabled
-                              }),
-                              class: getMentionsOptionClasses({
-                                isActive,
-                                isDisabled: !!option.disabled,
-                                size: effectiveSize.value
-                              }),
-                              onMousedown: (event: Event) => event.preventDefault(),
-                              onClick: () => selectOption(option),
-                              onMouseenter: () => {
-                                if (!option.disabled) activeIndex.value = index
-                              }
-                            },
-                            option.label
-                          )
-                        })
+                        renderMentionRows()
                       )
               ]
             ),
@@ -579,8 +682,8 @@ export const Mentions = defineComponent({
                 'button',
                 {
                   type: 'button',
-                  class: 'self-end text-sm text-[var(--tiger-text-muted,#6b7280)]',
-                  'aria-label': 'Clear',
+                  class: 'self-end text-sm text-[var(--tiger-text-secondary)]',
+                  'aria-label': mergedLocale.value?.common?.clearText ?? 'Clear',
                   onClick: () => commitValue('')
                 },
                 '×'

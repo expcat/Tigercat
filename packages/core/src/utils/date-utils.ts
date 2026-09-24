@@ -8,16 +8,48 @@ import type { DateFormat } from '../types/datepicker'
 /** Date-only ISO (`YYYY-MM-DD`) with optional surrounding whitespace. */
 const DATE_ONLY_ISO_RE = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/
 
-const ASCII_DIGIT_RE = /[０-９٠-٩۰-۹]/g
+/**
+ * Starts of contiguous Unicode Nd blocks of length 10.
+ * Offset from the base is the digit 0–9. Do not use `Number(char)` —
+ * it is NaN for non-ASCII decimal digits.
+ */
+const ND_DIGIT_BASES: readonly number[] = [
+  0x30, 0x660, 0x6f0, 0x7c0, 0x966, 0x9e6, 0xa66, 0xae6, 0xb66, 0xbe6, 0xc66, 0xce6, 0xd66,
+  0xde6, 0xe50, 0xed0, 0xf20, 0x1040, 0x1090, 0x17e0, 0x1810, 0x1946, 0x19d0, 0x1a80, 0x1a90,
+  0x1b50, 0x1bb0, 0x1c40, 0x1c50, 0xa620, 0xa8d0, 0xa900, 0xa9d0, 0xa9f0, 0xaa50, 0xabf0, 0xff10,
+  0x104a0, 0x10d30, 0x10d40, 0x11066, 0x110f0, 0x11136, 0x111d0, 0x112f0, 0x11450, 0x114d0,
+  0x11650, 0x116c0, 0x116d0, 0x116da, 0x11730, 0x118e0, 0x11950, 0x11bf0, 0x11c50, 0x11d50,
+  0x11da0, 0x11f50, 0x16130, 0x16a60, 0x16ac0, 0x16b50, 0x16d70, 0x1ccf0, 0x1d7ce, 0x1d7d8,
+  0x1d7e2, 0x1d7ec, 0x1d7f6, 0x1e140, 0x1e2f0, 0x1e4f0, 0x1e5f1, 0x1e950, 0x1fbf0
+]
+
+function ndDigitToAscii(codePoint: number): string | null {
+  let lo = 0
+  let hi = ND_DIGIT_BASES.length - 1
+  let base = -1
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1
+    const candidate = ND_DIGIT_BASES[mid]
+    if (candidate <= codePoint) {
+      base = candidate
+      lo = mid + 1
+    } else {
+      hi = mid - 1
+    }
+  }
+  if (base < 0) return null
+  const offset = codePoint - base
+  if (offset > 9) return null
+  return String(offset)
+}
 
 export function toAsciiDigits(value: string): string {
-  return value.replace(ASCII_DIGIT_RE, (ch) => {
-    const code = ch.charCodeAt(0)
-    if (code >= 0xff10 && code <= 0xff19) return String(code - 0xff10)
-    if (code >= 0x0660 && code <= 0x0669) return String(code - 0x0660)
-    if (code >= 0x06f0 && code <= 0x06f9) return String(code - 0x06f0)
-    return ch
-  })
+  let out = ''
+  for (const ch of value) {
+    const mapped = ndDigitToAscii(ch.codePointAt(0) ?? 0)
+    out += mapped ?? ch
+  }
+  return out
 }
 
 /**
@@ -46,7 +78,132 @@ export function toCalendarDate(value: Date | string | null | undefined): Date | 
   return new Date(value.getFullYear(), value.getMonth(), value.getDate())
 }
 
-function parseFormattedDate(value: string, format: DateFormat): Date | null {
+function readDatePart(part: string): number {
+  const digits = toAsciiDigits(part).replace(/\D/g, '')
+  if (!digits) return Number.NaN
+  return Number(digits)
+}
+
+function localMidnight(year: number, month: number, day: number): Date | null {
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return null
+  const local = new Date(year, month - 1, day)
+  if (local.getFullYear() !== year || local.getMonth() !== month - 1 || local.getDate() !== day) {
+    return null
+  }
+  return local
+}
+
+function resolvedCalendarId(locale: string): string | null {
+  try {
+    return new Intl.DateTimeFormat(locale).resolvedOptions().calendar || 'gregory'
+  } catch {
+    return null
+  }
+}
+
+function isGregorianCalendarLocale(locale: string | undefined): boolean {
+  if (!locale) return true
+  const calendar = resolvedCalendarId(locale)
+  if (!calendar) return true
+  return calendar === 'gregory' || calendar === 'iso8601'
+}
+
+function seedGregorianYear(calendar: string, year: number): number {
+  if (calendar === 'buddhist') return year - 543
+  if (calendar.startsWith('persian')) return year + 621
+  if (calendar.startsWith('islamic')) return year + 579
+  return year
+}
+
+interface CalendarYmd {
+  year: number
+  month: number
+  day: number
+}
+
+function readLatnYmd(fmt: Intl.DateTimeFormat, date: Date): CalendarYmd | null {
+  const parts = fmt.formatToParts(date)
+  let year = Number.NaN
+  let month = Number.NaN
+  let day = Number.NaN
+  for (const part of parts) {
+    if (part.type === 'year') year = Number(part.value)
+    else if (part.type === 'month') month = Number(part.value)
+    else if (part.type === 'day') day = Number(part.value)
+  }
+  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return null
+  return { year, month, day }
+}
+
+function sameCalendarYmd(formatted: CalendarYmd, year: number, month: number, day: number): boolean {
+  return formatted.year === year && formatted.month === month && formatted.day === day
+}
+
+/**
+ * Convert a calendar Y-M-D (the numbers `formatDate` showed for `locale`)
+ * into a Gregorian local-midnight Date. Never constructs `new Date(buddhistYear, …)`.
+ */
+function calendarYmdToGregorian(
+  year: number,
+  month: number,
+  day: number,
+  locale: string
+): Date | null {
+  const calendar = resolvedCalendarId(locale)
+  if (!calendar || calendar === 'gregory' || calendar === 'iso8601') {
+    return localMidnight(year, month, day)
+  }
+  let fmt: Intl.DateTimeFormat
+  try {
+    fmt = new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      numberingSystem: 'latn'
+    })
+  } catch {
+    return null
+  }
+
+  let cursor = new Date(seedGregorianYear(calendar, year), Math.max(0, month - 1), 1)
+  if (Number.isNaN(cursor.getTime())) return null
+
+  for (let i = 0; i < 12; i++) {
+    const formatted = readLatnYmd(fmt, cursor)
+    if (!formatted) return null
+    if (sameCalendarYmd(formatted, year, month, day)) {
+      return localMidnight(cursor.getFullYear(), cursor.getMonth() + 1, cursor.getDate())
+    }
+    const signature = cursor.getTime()
+    if (formatted.year !== year) {
+      cursor = new Date(
+        cursor.getFullYear() + (year - formatted.year),
+        cursor.getMonth(),
+        Math.min(cursor.getDate(), 28)
+      )
+    } else if (formatted.month !== month) {
+      cursor = addMonths(cursor, month - formatted.month)
+    } else {
+      cursor = addDays(cursor, day - formatted.day)
+    }
+    if (Number.isNaN(cursor.getTime()) || cursor.getTime() === signature) break
+  }
+
+  const center = cursor
+  for (let offset = 0; offset <= 400; offset++) {
+    const deltas = offset === 0 ? [0] : [offset, -offset]
+    for (const delta of deltas) {
+      const candidate = addDays(center, delta)
+      const formatted = readLatnYmd(fmt, candidate)
+      if (formatted && sameCalendarYmd(formatted, year, month, day)) {
+        return localMidnight(candidate.getFullYear(), candidate.getMonth() + 1, candidate.getDate())
+      }
+    }
+  }
+  return null
+}
+
+function parseFormattedDate(value: string, format: DateFormat, locale?: string): Date | null {
   const ascii = toAsciiDigits(value).trim()
   const separator = format.includes('/') ? '/' : '-'
   const parts = ascii.split(separator)
@@ -56,33 +213,30 @@ function parseFormattedDate(value: string, format: DateFormat): Date | null {
   let day: number
   switch (format) {
     case 'MM/dd/yyyy':
-      month = Number(parts[0])
-      day = Number(parts[1])
-      year = Number(parts[2])
+      month = readDatePart(parts[0])
+      day = readDatePart(parts[1])
+      year = readDatePart(parts[2])
       break
     case 'dd/MM/yyyy':
-      day = Number(parts[0])
-      month = Number(parts[1])
-      year = Number(parts[2])
+      day = readDatePart(parts[0])
+      month = readDatePart(parts[1])
+      year = readDatePart(parts[2])
       break
     case 'yyyy/MM/dd':
-      year = Number(parts[0])
-      month = Number(parts[1])
-      day = Number(parts[2])
+      year = readDatePart(parts[0])
+      month = readDatePart(parts[1])
+      day = readDatePart(parts[2])
       break
     case 'yyyy-MM-dd':
     default:
-      year = Number(parts[0])
-      month = Number(parts[1])
-      day = Number(parts[2])
+      year = readDatePart(parts[0])
+      month = readDatePart(parts[1])
+      day = readDatePart(parts[2])
       break
   }
   if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return null
-  const local = new Date(year, month - 1, day)
-  if (local.getFullYear() !== year || local.getMonth() !== month - 1 || local.getDate() !== day) {
-    return null
-  }
-  return local
+  if (!locale || isGregorianCalendarLocale(locale)) return localMidnight(year, month, day)
+  return calendarYmdToGregorian(year, month, day, locale)
 }
 
 /**
@@ -114,15 +268,17 @@ function parseDateOnlyLocal(value: string): Date | null | undefined {
  */
 export function parseDate(
   value: Date | string | null | undefined,
-  format?: DateFormat
+  format?: DateFormat,
+  locale?: string
 ): Date | null {
   if (value == null || value === '') return null
   if (value instanceof Date) return toCalendarDate(value)
   if (typeof value !== 'string') return null
   const ascii = toAsciiDigits(value)
   if (format) {
-    const formatted = parseFormattedDate(ascii, format)
+    const formatted = parseFormattedDate(ascii, format, locale)
     if (formatted) return formatted
+    if (locale && !isGregorianCalendarLocale(locale)) return null
     if (format !== 'yyyy-MM-dd') return null
   }
   const dateOnly = parseDateOnlyLocal(ascii)
@@ -448,6 +604,10 @@ function safeIntlFormat(
     const key = `${locale ?? ''}_${JSON.stringify(options)}`
     let fmt = intlCache.get(key)
     if (!fmt) {
+      if (intlCache.size >= 64) {
+        const oldest = intlCache.keys().next().value
+        if (oldest !== undefined) intlCache.delete(oldest)
+      }
       fmt = new Intl.DateTimeFormat(locale, options)
       intlCache.set(key, fmt)
     }
@@ -462,6 +622,10 @@ function safeIntlFormatDateParts(locale: string, format: DateFormat, date: Date)
     const key = `${locale}_${JSON.stringify(defaultDateFormatOptions)}_parts`
     let fmt = intlCache.get(key)
     if (!fmt) {
+      if (intlCache.size >= 64) {
+        const oldest = intlCache.keys().next().value
+        if (oldest !== undefined) intlCache.delete(oldest)
+      }
       fmt = new Intl.DateTimeFormat(locale, defaultDateFormatOptions)
       intlCache.set(key, fmt)
     }
@@ -656,7 +820,6 @@ export function getDatePickerCalendarCellState(
   const normDate = normalizeDate(date)
   const normStart = rangeStart ? normalizeDate(rangeStart) : null
   const normEnd = rangeEnd ? normalizeDate(rangeEnd) : null
-  const isSelectingEnd = isRangeMode && Boolean(rangeStart) && !rangeEnd
 
   const isRangeStart = isRangeMode && rangeStart ? isSameDay(date, rangeStart) : false
   const isRangeEnd = isRangeMode && rangeEnd ? isSameDay(date, rangeEnd) : false
@@ -668,8 +831,7 @@ export function getDatePickerCalendarCellState(
       ? isSameDay(date, selectedDate)
       : false
     : isRangeStart || isRangeEnd
-  const isBeforeRangeStart = Boolean(isSelectingEnd && normStart && normDate < normStart)
-  const isDisabled = Boolean(input.isDateDisabled?.(date)) || isBeforeRangeStart
+  const isDisabled = Boolean(input.isDateDisabled?.(date))
 
   return {
     iso: formatDate(date, 'yyyy-MM-dd'),

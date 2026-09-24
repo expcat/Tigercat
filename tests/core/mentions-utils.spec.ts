@@ -7,6 +7,8 @@ import {
   getMentionsActiveIndex,
   getMentionsKeyIntent,
   insertMention,
+  isMentionSeparator,
+  mentionInsertSeparator,
   parseMentions,
   shouldOpenMentions
 } from '@expcat/tigercat-core'
@@ -82,12 +84,28 @@ describe('mentions-utils', () => {
         { prefix: '#', value: 'frontend', start: 17, end: 26 }
       ])
     })
+
+    it('uses one separator rule for insert and parse', () => {
+      expect(isMentionSeparator(mentionInsertSeparator())).toBe(true)
+      const inserted = insertMention({
+        text: 'hi @a',
+        mentionStart: 3,
+        cursor: 5,
+        prefix: '@',
+        value: 'bob'
+      })
+      expect(parseMentions(inserted.value, '@')).toEqual([
+        { prefix: '@', value: 'bob', start: 3, end: 7 }
+      ])
+      expect(isMentionSeparator('\n')).toBe(true)
+      expect(extractMentionQuery('a@bob', 5, '@')).toBeNull()
+    })
   })
 
   describe('open and keyboard', () => {
     it('opens only when a query exists and there are matches or loading', () => {
       const query = { query: 'z', startPos: 0, prefix: '@' }
-      expect(shouldOpenMentions({ query, filteredCount: 0 })).toBe(false)
+      expect(shouldOpenMentions({ query, filteredCount: 0 })).toBe(true)
       expect(shouldOpenMentions({ query, filteredCount: 0, loading: true })).toBe(true)
       expect(shouldOpenMentions({ query, filteredCount: 1 })).toBe(true)
       expect(shouldOpenMentions({ query: null, filteredCount: 3 })).toBe(false)

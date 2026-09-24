@@ -6,8 +6,9 @@
 import type { TimePickerLabels } from '../types/timepicker'
 import type { TigerLocale } from '../types/locale'
 import { classNames } from './class-names'
-import { resolveLocaleSection } from './locale-utils'
 import { enUS } from './i18n/locales/en-US'
+import { resolveLocaleSection } from './locale-utils'
+
 import { findFirstEnabledIndex, findLastEnabledIndex, findNextEnabledIndex } from './picker-utils'
 
 type TimePickerLocaleInput = string | Partial<TigerLocale>
@@ -18,7 +19,7 @@ export function getTimePickerLabels(
 ): TimePickerLabels {
   const localeObject = typeof locale === 'string' ? undefined : locale
   return resolveLocaleSection(
-    enUS.timePicker as TimePickerLabels,
+    (enUS.timePicker ?? {}) as TimePickerLabels,
     localeObject?.timePicker,
     overrides
   )
@@ -89,61 +90,62 @@ export function focusTimePickerOption(
 export const timePickerBaseClasses = 'relative inline-block w-full'
 
 export const timePickerPanelClasses = classNames(
-  'bg-[var(--tiger-surface,#ffffff)]',
-  'text-[var(--tiger-text,#111827)]',
-  'border border-[var(--tiger-border,#d1d5db)]',
-  'rounded-[var(--tiger-radius-md,0.5rem)]',
-  'shadow-[var(--tiger-shadow-md,0_4px_6px_-1px_rgb(0_0_0_/_0.1))]',
+  'bg-[var(--tiger-surface)]',
+  'text-[var(--tiger-text)]',
+  'border border-[var(--tiger-border)]',
+  'rounded-[var(--tiger-radius-md)]',
+  'shadow-[var(--tiger-shadow-md)]',
   'w-max',
-  'max-sm:w-auto max-sm:rounded-t-[var(--tiger-radius-lg,0.75rem)] max-sm:rounded-b-none',
+  'max-sm:w-auto max-sm:rounded-t-[var(--tiger-radius-lg)] max-sm:rounded-b-none',
   'max-sm:p-4 max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))]'
 )
 
-export const timePickerDesktopColumnsClasses =
-  'flex divide-x divide-[var(--tiger-border,#e5e7eb)] rtl:divide-x-reverse'
+export const timePickerDesktopColumnsClasses = classNames(
+  'hidden sm:flex divide-x divide-[var(--tiger-border)] rtl:divide-x-reverse'
+)
 
 export function getTimePickerMobileSelectRowClasses(count: 2 | 3 | 4): string {
   return classNames(
-    'grid gap-2',
+    'grid gap-2 sm:hidden',
     count === 2 ? 'grid-cols-2' : count === 4 ? 'grid-cols-4' : 'grid-cols-3'
   )
 }
 
 export const timePickerMobileSelectClasses = classNames(
-  'w-full rounded-[var(--tiger-radius-md,0.5rem)]',
-  'border border-[var(--tiger-border,#d1d5db)]',
-  'bg-[var(--tiger-surface,#ffffff)] px-3 py-3',
-  'text-center text-base text-[var(--tiger-text,#111827)]',
+  'w-full rounded-[var(--tiger-radius-md)]',
+  'border border-[var(--tiger-border)]',
+  'bg-[var(--tiger-surface)] px-3 py-3',
+  'text-center text-base text-[var(--tiger-text)]',
   'focus:outline-none',
-  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
-  'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)]'
+  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40',
+  'tiger-motion-aware [transition:var(--tiger-transition-base)]'
 )
 
 export const timePickerRangeHeaderClasses = classNames(
-  'px-3 py-2 border-b border-[var(--tiger-border,#e5e7eb)]',
-  'bg-[var(--tiger-surface-muted,#f9fafb)]',
+  'px-3 py-2 border-b border-[var(--tiger-border)]',
+  'bg-[var(--tiger-surface-muted)]',
   'flex items-center gap-2'
 )
 
 export function getTimePickerRangeTabButtonClasses(isActive: boolean): string {
   return classNames(
     'px-3 py-1 text-xs font-medium',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
-    'border border-[var(--tiger-border,#d1d5db)]',
+    'rounded-[var(--tiger-radius-md)]',
+    'border border-[var(--tiger-border)]',
     'focus:outline-none',
-    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)]',
+    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     isActive
-      ? 'bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary-foreground,#ffffff)] border-transparent'
-      : 'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#374151)] hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+      ? 'bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] border-transparent'
+      : 'bg-[var(--tiger-surface)] text-[var(--tiger-text)] hover:bg-[var(--tiger-surface-muted)]'
   )
 }
 
 export const timePickerColumnClasses = 'flex flex-col overflow-hidden shrink-0 w-16'
 
 export const timePickerColumnHeaderClasses = classNames(
-  'px-2 py-1 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] text-center',
-  'bg-[var(--tiger-surface-muted,#f9fafb)] border-b border-[var(--tiger-border,#e5e7eb)]'
+  'px-2 py-1 text-xs font-semibold text-[var(--tiger-text-secondary)] text-center',
+  'bg-[var(--tiger-surface-muted)] border-b border-[var(--tiger-border)]'
 )
 
 export const timePickerColumnListClasses = 'overflow-y-auto max-h-48'
@@ -152,13 +154,13 @@ export function getTimePickerItemClasses(isSelected: boolean, isDisabled: boolea
   return classNames(
     'w-full px-3 py-1.5 text-sm text-center',
     'focus:outline-none',
-    'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)]',
+    'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring)]/40',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     isDisabled
-      ? 'text-[var(--tiger-text-muted,#9ca3af)] opacity-50 cursor-not-allowed'
+      ? 'text-[var(--tiger-text-secondary)] opacity-50 cursor-not-allowed'
       : isSelected
-        ? 'bg-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary-foreground,#ffffff)] font-medium focus:bg-[var(--tiger-primary,#2563eb)] focus:text-[var(--tiger-primary-foreground,#ffffff)]'
-        : 'text-[var(--tiger-text,#374151)] hover:bg-[var(--tiger-surface-muted,#f3f4f6)] focus:bg-[var(--tiger-surface-muted,#f3f4f6)] cursor-pointer'
+        ? 'bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] font-medium focus:bg-[var(--tiger-primary)] focus:text-[var(--tiger-primary-foreground)]'
+        : 'text-[var(--tiger-text)] hover:bg-[var(--tiger-surface-muted)] focus:bg-[var(--tiger-surface-muted)] cursor-pointer'
   )
 }
 
@@ -167,18 +169,18 @@ export function getTimePickerPeriodButtonClasses(isSelected: boolean): string {
 }
 
 export const timePickerFooterClasses = classNames(
-  'px-3 py-2 border-t border-[var(--tiger-border,#e5e7eb)]',
+  'px-3 py-2 border-t border-[var(--tiger-border)]',
   'flex items-center justify-between gap-2'
 )
 
 export const timePickerFooterButtonClasses = classNames(
   'px-3 py-1 text-xs font-medium',
-  'rounded-[var(--tiger-radius-md,0.5rem)]',
-  'border border-[var(--tiger-border,#d1d5db)]',
-  'bg-[var(--tiger-surface,#ffffff)]',
-  'text-[var(--tiger-text,#374151)]',
-  'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
+  'rounded-[var(--tiger-radius-md)]',
+  'border border-[var(--tiger-border)]',
+  'bg-[var(--tiger-surface)]',
+  'text-[var(--tiger-text)]',
+  'hover:bg-[var(--tiger-surface-muted)]',
   'focus:outline-none',
-  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40',
-  'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)]'
+  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40',
+  'tiger-motion-aware [transition:var(--tiger-transition-base)]'
 )

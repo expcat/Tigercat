@@ -17,6 +17,7 @@ import {
   getSignaturePoint,
   isSignatureEmpty,
   parseSignatureSvg,
+  sanitizeSignatureValue,
   signatureStrokeToPath,
   signatureStrokesToSvg,
   signatureSvgToDataUrl,
@@ -75,6 +76,19 @@ describe('signature-utils', () => {
 
   it('converts a stroke to an svg path', () => {
     expect(signatureStrokeToPath(stroke)).toBe('M 10 20 L 30.12 40.57')
+  })
+
+  it('draws a single point with the same dot rule as the canvas', () => {
+    expect(signatureStrokeToPath({ ...stroke, points: [{ x: 1, y: 2 }] })).toBe('M 1 2 L 1.01 2.01')
+  })
+
+  it('sanitizes external values to empty or legal svg', () => {
+    expect(sanitizeSignatureValue('')).toEqual({ value: '', invalid: false })
+    expect(sanitizeSignatureValue('not-a-signature').invalid).toBe(true)
+    expect(sanitizeSignatureValue('not-a-signature').value).toBe('')
+    const legal = signatureSvgToDataUrl(signatureStrokesToSvg([stroke], { width: 20, height: 20 }))
+    expect(sanitizeSignatureValue(legal).invalid).toBe(false)
+    expect(sanitizeSignatureValue(legal).value).toBe(legal)
   })
 
   it('exports strokes to svg with background', () => {

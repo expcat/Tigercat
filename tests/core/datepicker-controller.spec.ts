@@ -6,12 +6,15 @@ import { describe, expect, it } from 'vitest'
 import {
   coerceDatePickerRange,
   coerceDatePickerSingle,
+  acceptDatePickerCandidate,
   commitDatePickerDay,
   commitDatePickerToday,
+  confirmDatePicker,
   emptyDatePickerValue,
   formatDatePickerDisplay,
   parseTypedDatePickerValue,
-  resolveDatePickerDisabled
+  resolveDatePickerDisabled,
+  resolveTypedDatePickerCommit
 } from '@expcat/tigercat-core'
 
 describe('datepicker controller', () => {
@@ -73,20 +76,51 @@ describe('datepicker controller', () => {
     })
   })
 
-  it('disables dates before the in-progress range start', () => {
+  it('does not treat an earlier range end as disabled', () => {
     const start = new Date(2024, 5, 10)
-    expect(
-      resolveDatePickerDisabled(new Date(2024, 5, 9), {
-        rangeStart: start,
-        rangeSelectingEnd: true
-      })
-    ).toBe(true)
-    expect(
-      resolveDatePickerDisabled(new Date(2024, 5, 11), {
-        rangeStart: start,
-        rangeSelectingEnd: true
-      })
-    ).toBe(false)
+    expect(resolveDatePickerDisabled(new Date(2024, 5, 9), {})).toBe(false)
+    expect(resolveDatePickerDisabled(new Date(2024, 5, 11), { minDate: start })).toBe(false)
+    expect(resolveDatePickerDisabled(new Date(2024, 5, 9), { minDate: start })).toBe(true)
+  })
+
+  it('swaps a range whose end is before the start', () => {
+    const accepted = acceptDatePickerCandidate(true, [
+      new Date(2024, 0, 10),
+      new Date(2024, 0, 1)
+    ])
+    expect(accepted).toEqual({
+      ok: true,
+      value: [new Date(2024, 0, 1), new Date(2024, 0, 10)]
+    })
+    const typed = resolveTypedDatePickerCommit(
+      '2024-01-10 - 2024-01-01',
+      'yyyy-MM-dd',
+      true,
+      undefined
+    )
+    expect(typed).toEqual({
+      ok: true,
+      value: [new Date(2024, 0, 1), new Date(2024, 0, 10)]
+    })
+  })
+
+  it('rejects a typed disabled day without a value', () => {
+    const result = resolveTypedDatePickerCommit('2024-01-15', 'yyyy-MM-dd', false, undefined, {
+      disabledDate: (date) => date.getDate() === 15
+    })
+    expect(result).toEqual({ ok: false, reason: 'That date is not available.' })
+  })
+
+  it('keeps an incomplete range open and names the missing end', () => {
+    const start = new Date(2024, 5, 10)
+    const result = confirmDatePicker({
+      preview: [start, null],
+      committed: null
+    })
+    expect(result.close).toBe(false)
+    expect(result.error).toBe('Choose an end date.')
+    expect(result.nextPreview).toEqual([start, null])
+    expect(result.nextCommitted).toBeNull()
   })
 
   it('treats committed range empty as null', () => {

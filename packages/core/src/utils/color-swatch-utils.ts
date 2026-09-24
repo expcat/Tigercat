@@ -30,14 +30,14 @@ export function createDefaultColorSwatchGroups(
 }
 
 export const colorSwatchBaseClasses = classNames(
-  'inline-flex flex-col gap-3 rounded-[var(--tiger-radius-md,0.5rem)]',
-  'text-[var(--tiger-text,#111827)]'
+  'inline-flex flex-col gap-3 rounded-[var(--tiger-radius-md)]',
+  'text-[var(--tiger-text)]'
 )
 
 export const colorSwatchGroupClasses = 'flex flex-col gap-2'
 
 export const colorSwatchGroupLabelClasses =
-  'text-xs font-medium text-[var(--tiger-text-muted,#6b7280)]'
+  'text-xs font-medium text-[var(--tiger-text-secondary)]'
 
 export const colorSwatchGridClasses = 'grid gap-2'
 
@@ -53,15 +53,15 @@ export function getColorSwatchButtonClasses(
   disabled: boolean
 ): string {
   return classNames(
-    'relative inline-flex shrink-0 items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] border',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,border-color_150ms_ease,box-shadow_150ms_ease,transform_150ms_ease)]',
-    'border-[var(--tiger-border,#d1d5db)]',
+    'relative inline-flex shrink-0 items-center justify-center rounded-[var(--tiger-radius-md)] border',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
+    'border-[var(--tiger-border)]',
     'outline-none focus-visible:ring-2 focus-visible:ring-inset',
-    'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+    'focus-visible:ring-[var(--tiger-focus-ring)]',
     colorSwatchSizeClasses[size],
     selected
-      ? 'ring-2 ring-inset ring-[var(--tiger-primary,#2563eb)]'
-      : 'motion-safe:hover:scale-105 hover:border-[var(--tiger-primary,#2563eb)]',
+      ? 'ring-2 ring-inset ring-[var(--tiger-primary)]'
+      : 'motion-safe:hover:scale-105 hover:border-[var(--tiger-primary)]',
     disabled ? 'cursor-not-allowed opacity-45' : 'cursor-pointer'
   )
 }
@@ -87,7 +87,7 @@ export function getColorSwatchCheckClasses(
     'pointer-events-none',
     tone === 'light'
       ? 'text-white [filter:drop-shadow(0_0_1px_rgb(0_0_0_/_0.85))]'
-      : 'text-[var(--tiger-text,#111827)] [filter:drop-shadow(0_0_1px_rgb(255_255_255_/_0.9))]',
+      : 'text-[var(--tiger-text)] [filter:drop-shadow(0_0_1px_rgb(255_255_255_/_0.9))]',
     size === 'sm' ? 'h-3 w-3' : size === 'md' ? 'h-4 w-4' : 'h-5 w-5'
   )
 }
@@ -120,12 +120,27 @@ export function normalizeColorSwatchValue(value: string): string {
   return value.trim().toLowerCase()
 }
 
+function sameSwatchAlpha(left: number, right: number): boolean {
+  return Math.abs(left - right) < 0.002
+}
+
+/** Parsed-channel equality. `#fff` matches `#ffffff`; hex matches `rgb()`. */
 export function isColorSwatchSelected(value: string, selectedValue?: string): boolean {
+  if (selectedValue == null || selectedValue.trim() === '') return false
+  const left = parseColorParts(value)
+  const right = parseColorParts(selectedValue)
+  if (!left || !right) return false
   return (
-    selectedValue !== undefined &&
-    selectedValue !== '' &&
-    normalizeColorSwatchValue(value) === normalizeColorSwatchValue(selectedValue)
+    left.r === right.r &&
+    left.g === right.g &&
+    left.b === right.b &&
+    sameSwatchAlpha(left.a, right.a)
   )
+}
+
+/** Paint only a parsed color. Unparseable strings use a neutral token, not the raw text. */
+export function getColorSwatchPaint(color: string): string {
+  return parseColorParts(color) ? color : 'var(--tiger-surface-muted)'
 }
 
 export function getColorSwatchOptionKey(option: ColorSwatchNormalizedOption): string {

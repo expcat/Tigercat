@@ -89,12 +89,8 @@ export interface MentionsProps {
    */
   showCount?: boolean
   /**
-   * Non-editable, still tabbable.
+   * Focusable and submittable. The suggestion list cannot insert.
    * @default false
-   */
-  readonly?: boolean
-  /**
-   * Alias of {@link MentionsProps.readonly}.
    */
   readOnly?: boolean
   /**

@@ -5,6 +5,7 @@ import {
   inject,
   nextTick,
   ref,
+  useId,
   watch,
   type PropType,
   type VNodeRef
@@ -33,6 +34,7 @@ import {
   getColorSwatchButtonClasses,
   getColorSwatchCheckClasses,
   getColorSwatchCheckTone,
+  getColorSwatchPaint,
   getElementTextDirection,
   getNextColorSwatchIndex,
   isColorSwatchSelected,
@@ -55,6 +57,7 @@ export const ColorSwatch = markFormItemGroupControl(
       modelValue: { type: String, default: undefined },
       defaultValue: { type: String, default: undefined },
       disabled: { type: Boolean, default: false },
+      readOnly: { type: Boolean, default: false },
       size: { type: String as PropType<ComponentSize>, default: 'md' },
       colors: { type: Array as PropType<ColorSwatchOptionInput[]>, default: undefined },
       groups: { type: Array as PropType<ColorSwatchGroup[]>, default: undefined },
@@ -67,7 +70,7 @@ export const ColorSwatch = markFormItemGroupControl(
       status: { type: String as PropType<InputStatus>, default: undefined },
       className: { type: String, default: undefined }
     },
-    emits: ['update:modelValue', 'change', 'input', 'blur'],
+    emits: ['update:modelValue', 'blur'],
     setup(props, { attrs, emit, expose }) {
       const config = useTigerConfig()
       const formItemControl = inject<VueFormItemControlContext | null>(
@@ -78,7 +81,7 @@ export const ColorSwatch = markFormItemGroupControl(
       const focusIndex = ref(-1)
       const optionRefs = ref<HTMLElement[]>([])
       const rootRef = ref<HTMLElement | null>(null)
-      const instanceId = `tiger-colorswatch-${Math.random().toString(36).slice(2, 9)}`
+      const instanceId = useId()
 
       watch(
         () => props.modelValue,
@@ -122,11 +125,10 @@ export const ColorSwatch = markFormItemGroupControl(
       )
 
       function commit(option: ColorSwatchNormalizedOption) {
-        if (effectiveDisabled.value || option.disabled) return
+        if (effectiveDisabled.value || props.readOnly || option.disabled) return
+        if (isColorSwatchSelected(option.value, selectedValue.value)) return
         if (props.modelValue === undefined) innerValue.value = option.value
         emit('update:modelValue', option.value)
-        emit('input', option.value)
-        emit('change', option.value, option)
         formItemControl?.onChange(option.value)
       }
 
@@ -218,6 +220,7 @@ export const ColorSwatch = markFormItemGroupControl(
             'aria-describedby': describedBy,
             'aria-invalid': status.value === 'error' ? true : undefined,
             'aria-disabled': effectiveDisabled.value || undefined,
+            'aria-readonly': props.readOnly || undefined,
             'aria-required': formItemControl?.required.value || undefined,
             onFocusout: handleFocusout
           },
@@ -226,7 +229,8 @@ export const ColorSwatch = markFormItemGroupControl(
               ? h('input', {
                   type: 'hidden',
                   name: effectiveName.value,
-                  value: selectedValue.value ?? ''
+                  value: selectedValue.value ?? '',
+                  disabled: effectiveDisabled.value || undefined
                 })
               : null,
             ...normalizedGroups.value.map((group, groupIndex) => {
@@ -271,7 +275,7 @@ export const ColorSwatch = markFormItemGroupControl(
                           }) as VNodeRef,
                           type: 'button',
                           class: getColorSwatchButtonClasses(props.size, selected, optionDisabled),
-                          style: { backgroundColor: option.value },
+                          style: { backgroundColor: getColorSwatchPaint(option.value) },
                           role: 'radio',
                           'aria-checked': selected,
                           'aria-label': option.label,

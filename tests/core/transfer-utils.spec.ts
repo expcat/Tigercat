@@ -3,6 +3,7 @@ import {
   defaultTransferFilter,
   filterTransferItems,
   moveTransferItems,
+  partitionTransferSelection,
   splitTransferData,
   toggleTransferKey
 } from '@expcat/tigercat-core'
@@ -59,6 +60,28 @@ describe('moveTransferItems', () => {
     const moved = moveTransferItems('right', [], ['d', 'a'], data)
     const { targetItems } = splitTransferData(data, moved.targetKeys)
     expect(targetItems.map((item) => item.key)).toEqual(['d', 'a'])
+  })
+})
+
+describe('splitTransferData', () => {
+  it('draws one row when 1 and "1" are both in the source', () => {
+    const rows: TransferItem[] = [
+      { key: 1, label: 'One' },
+      { key: '1', label: 'One again' },
+      { key: 2, label: 'Two' }
+    ]
+    const { sourceItems } = splitTransferData(rows, [])
+    expect(sourceItems.map((item) => item.key)).toEqual([1, 2])
+  })
+})
+
+describe('partitionTransferSelection', () => {
+  it('keeps filtered-out keys out of the visible selection', () => {
+    const visible: TransferItem[] = [{ key: 'a', label: 'A' }]
+    expect(partitionTransferSelection(['a', 'b', 1, '1'], visible)).toEqual({
+      visible: ['a'],
+      hidden: ['b', 1]
+    })
   })
 })
 

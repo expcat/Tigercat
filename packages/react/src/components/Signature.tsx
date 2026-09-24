@@ -20,6 +20,8 @@ import {
   appendSignaturePoint,
   beginSignatureStroke,
   classNames,
+  SIGNATURE_INVALID_VALUE,
+  cancelSignatureStroke,
   clampSignatureLineWidth,
   clearSignatureStrokes,
   createDocumentDragSession,
@@ -35,8 +37,8 @@ import {
   isSignatureEmpty,
   mergeAriaDescribedBy,
   mergeTigerLocale,
-  resolveReadOnlyFlag,
   resolveSignaturePenColor,
+  sanitizeSignatureValue,
   resolveSignatureSurfaceColor,
   runShakeAnimation,
   signatureCanvasClasses,
@@ -89,8 +91,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
     backgroundColor,
     lineWidth = 2,
     disabled = false,
-    readonly,
-    readOnly,
+    readOnly = false,
     clearable = true,
     exportType = 'image/png',
     quality = 0.92,
@@ -143,11 +144,15 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
     typeof rest['aria-labelledby'] === 'string' && rest['aria-labelledby'].trim()
       ? rest['aria-labelledby']
       : formItemControl?.labelId
-  const parsedValue = value !== undefined ? value : (formItemControl?.value as string | undefined)
+  const formBound = value === undefined && Boolean(formItemControl?.name)
+  const rawExternal = value !== undefined ? value : formBound ? formItemControl?.value : undefined
+  const sanitized =
+    value !== undefined || formBound ? sanitizeSignatureValue(rawExternal) : undefined
+  const explainedRef = useRef(false)
 
   const [committed, setCommitted] = useControlledState<string, [SignatureChangePayload]>({
-    value: value !== undefined || formItemControl?.value !== undefined ? parsedValue : undefined,
-    defaultValue: defaultValue ?? '',
+    value: sanitized ? sanitized.value : undefined,
+    defaultValue: sanitizeSignatureValue(defaultValue ?? '').value,
     onChange: (next, payload) => {
       onChange?.(next, payload)
       formItemControl?.onChange?.(next)
@@ -165,7 +170,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
   const [strokes, setStrokes] = useState(() => signatureValueToStrokes(committed))
   const [observedWidth, setObservedWidth] = useState(0)
   const logicalWidth = widthProp ?? observedWidth
-  const isReadOnly = resolveReadOnlyFlag(readonly, readOnly)
+  const isReadOnly = Boolean(readOnly)
   const isInteractive = !effectiveDisabled && !isReadOnly
   const normalizedLineWidth = clampSignatureLineWidth(lineWidth)
 
@@ -232,6 +237,23 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
   useEffect(() => {
     if (status === 'error') runShakeAnimation(rootRef.current)
   }, [status, formItemControl?.shakeTrigger])
+
+  useEffect(() => {
+    if (sanitized?.invalid) {
+      formItemControl?.setError?.(SIGNATURE_INVALID_VALUE)
+      if (!explainedRef.current) {
+        explainedRef.current = true
+        const payload = createSignatureChangePayload([], exportOptions())
+        onChange?.('', payload)
+        formItemControl?.onChange?.('')
+      }
+      return
+    }
+    if (explainedRef.current && committed) {
+      explainedRef.current = false
+      formItemControl?.setError?.(null)
+    }
+  }, [committed, exportOptions, formItemControl, onChange, sanitized?.invalid])
 
   const emitPayload = useCallback(
     (session: SignatureSession, extra?: { clear?: boolean; undo?: boolean }) => {
@@ -304,6 +326,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
   }
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    event.currentTarget.focus()
     if (!isInteractive) return
     event.preventDefault()
     const pointerId = event.pointerId
@@ -336,9 +359,25 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
         sessionRef.current = moved
         setStrokes(moved.strokes)
       },
-      onEnd: () => endDrawing(pointerId)
+      onEnd: (payload) => {
+        if (payload.cancelled) {
+          dropActiveStroke(pointerId)
+          return
+        }
+        endDrawing(pointerId)
+      }
     })
     dragDisposeRef.current = () => session.dispose()
+  }
+
+  const dropActiveStroke = (id: number) => {
+    dragDisposeRef.current?.()
+    dragDisposeRef.current = undefined
+    if (activePointerRef.current !== id) return
+    activePointerRef.current = null
+    const next = cancelSignatureStroke(sessionRef.current)
+    sessionRef.current = next
+    setStrokes(next.strokes)
   }
 
   const endDrawing = (id: number) => {
@@ -370,6 +409,12 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
     if (event.key === 'Delete') {
       event.preventDefault()
       clear()
+      return
+    }
+    if (event.key === 'Escape' && sessionRef.current.activeStroke) {
+      event.preventDefault()
+      const id = activePointerRef.current
+      if (id != null) dropActiveStroke(id)
     }
   }
 
@@ -390,7 +435,19 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
       style={style}
       onBlur={handleFocusOut}
       {...rootRest}>
-      {effectiveName ? <input type="hidden" name={effectiveName} value={committed ?? ''} /> : null}
+      {effectiveName ? (
+        <input
+          type="hidden"
+          name={effectiveName}
+          value={committed ?? ''}
+          disabled={effectiveDisabled || undefined}
+        />
+      ) : null}
+      {sanitized?.invalid && !formItemControl ? (
+        <p role="status" aria-live="polite">
+          {SIGNATURE_INVALID_VALUE}
+        </p>
+      ) : null}
       <div
         ref={wrapRef}
         className={classNames(
@@ -400,8 +457,11 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
         <canvas
           ref={canvasRef}
           className={signatureCanvasClasses}
-          width={Math.max(1, logicalWidth)}
-          height={height}
+          style={
+            widthProp != null
+              ? { width: widthProp, height }
+              : { width: logicalWidth > 0 ? logicalWidth : '100%', height }
+          }
           tabIndex={effectiveDisabled ? -1 : 0}
           role="textbox"
           aria-multiline="true"

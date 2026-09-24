@@ -11,6 +11,7 @@ import {
   type CSSProperties,
   type VNode
 } from 'vue'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
   CASCADER_DEFAULT_LIST_HEIGHT,
   CASCADER_DEFAULT_SEPARATOR,
@@ -24,8 +25,11 @@ import {
   cascaderEmptyStateClasses,
   cascaderListboxClasses,
   classNames,
+  cascaderPathId,
+  cascaderValuesEqual,
   coerceCascaderFormValue,
   coerceClassValue,
+  decideAfterBranchLoad,
   filterCascaderOptions,
   flattenCascaderOptions,
   formatSelectLevelLabel,
@@ -33,12 +37,15 @@ import {
   getCascaderColumnOptionId,
   getCascaderColumnStyle,
   getCascaderColumns,
+  gateCascaderLoad,
   getCascaderDisplayLabel,
+  getCascaderLabels,
   getCascaderOptionClasses,
   getCascaderOptionKey,
   getCascaderRootClasses,
   getCascaderTriggerClasses,
   getCascaderTriggerKeyIntent,
+  getCascaderVirtualAlignScrollTop,
   getCascaderVirtualItemHeight,
   getCascaderVirtualRange,
   getEmptyLabels,
@@ -48,20 +55,19 @@ import {
   getPickerOptionAria,
   getPickerOptionId,
   getSelectLabels,
-  icon20ViewBox,
-  chevronDownSolidIcon20PathD,
-  chevronRightSolidIcon20PathD,
-  closeSolidIcon20PathD,
   initialCascaderColumnActiveIndices,
   isCascaderOptionExpandable,
   isCascaderValueEmpty,
+  isCurrentLoadToken,
   isSelectTypeaheadCharacter,
   mergeAriaDescribedBy,
   mergeTigerLocale,
   navigateCascaderColumnIndex,
+  nextCascaderBrowsePath,
+  nextLoadToken,
   normalizeCascaderValue,
   rememberCascaderLabel,
-  resolveCascaderActivePath,
+  sameTreeKey,
   runShakeAnimation,
   selectChevronWrapClasses,
   selectChromeIconClasses,
@@ -70,7 +76,9 @@ import {
   selectTrailingSlotClasses,
   serializeCascaderFormValue,
   setCascaderOptionChildren,
+  shouldSeedCascaderFormDefault,
   shouldShowCascaderClear,
+  shouldSubmitNativeField,
   type CascaderExpandTrigger,
   type CascaderFlattenedOption,
   type CascaderLoadDataFn,
@@ -82,8 +90,14 @@ import {
   type FloatingPlacement,
   type InputStatus,
   type TigerLocale,
+  type TigerLocaleCascader,
   type TigerLocaleSelect
 } from '@expcat/tigercat-core'
+import {
+  chevronDownSolidIcon20PathD,
+  chevronRightSolidIcon20PathD,
+  closeSolidIcon20PathD
+} from '@expcat/tigercat-core/icons/picker'
 import { useTigerConfig } from './ConfigProvider'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
@@ -119,6 +133,7 @@ export interface VueCascaderProps {
   placeholder?: string
   size?: ComponentSize
   disabled?: boolean
+  readOnly?: boolean
   clearable?: boolean
   searchable?: boolean | CascaderSearchConfig
   searchValue?: string
@@ -138,7 +153,7 @@ export interface VueCascaderProps {
   dropdownClassName?: string
   getPopupContainer?: () => HTMLElement | null
   locale?: Partial<TigerLocale>
-  labels?: Partial<TigerLocaleSelect>
+  labels?: Partial<TigerLocaleSelect & TigerLocaleCascader>
   className?: string
 }
 
@@ -157,6 +172,7 @@ export const Cascader = defineComponent({
     placeholder: { type: String, default: undefined },
     size: { type: String as PropType<ComponentSize>, default: 'md' as ComponentSize },
     disabled: Boolean,
+    readOnly: Boolean,
     clearable: { type: Boolean, default: true },
     searchable: {
       type: [Boolean, Object] as PropType<boolean | CascaderSearchConfig>,
@@ -179,18 +195,10 @@ export const Cascader = defineComponent({
     dropdownClassName: String,
     getPopupContainer: { type: Function as PropType<() => HTMLElement | null> },
     locale: { type: Object as PropType<Partial<TigerLocale>> },
-    labels: { type: Object as PropType<Partial<TigerLocaleSelect>> },
+    labels: { type: Object as PropType<Partial<TigerLocaleSelect & TigerLocaleCascader>> },
     className: String
   },
-  emits: [
-    'update:modelValue',
-    'update:searchValue',
-    'update:open',
-    'change',
-    'search-change',
-    'open-change',
-    'blur'
-  ],
+  emits: ['update:modelValue', 'update:searchValue', 'update:open', 'blur'],
   setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
@@ -199,17 +207,24 @@ export const Cascader = defineComponent({
       null
     )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const labels = computed(() => getSelectLabels(mergedLocale.value, props.labels))
+    const selectLabels = computed(() => getSelectLabels(mergedLocale.value, props.labels))
+    const cascaderLabels = computed(() => getCascaderLabels(mergedLocale.value, props.labels))
     const emptyLabels = computed(() => getEmptyLabels(mergedLocale.value))
     const dir = computed<'ltr' | 'rtl'>(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const instanceId = useId()
     const listboxId = computed(() => `tiger-cascader-listbox-${instanceId}`)
 
+    const loadTokens = new Map<string, number>()
+    const loadedIds = new Set<string>()
+    let seeded = false
+    const formNamed = Boolean(formItemControl?.name.value)
     const localValue = ref<CascaderModelValue>(
       normalizeCascaderValue(
-        props.modelValue ??
-          coerceCascaderFormValue(formItemControl?.value.value) ??
-          props.defaultValue
+        props.modelValue !== undefined
+          ? props.modelValue
+          : formNamed
+            ? (coerceCascaderFormValue(formItemControl?.value.value) ?? props.defaultValue)
+            : props.defaultValue
       )
     )
     const localOpen = ref(props.defaultOpen)
@@ -228,16 +243,19 @@ export const Cascader = defineComponent({
     const searchInputRef = ref<HTMLInputElement | null>(null)
     const dropdownRef = ref<HTMLElement | null>(null)
 
-    const selected = computed(() =>
-      props.modelValue !== undefined
-        ? normalizeCascaderValue(props.modelValue)
-        : (coerceCascaderFormValue(formItemControl?.value.value) ?? localValue.value)
-    )
+    const selected = computed(() => {
+      if (props.modelValue !== undefined) return normalizeCascaderValue(props.modelValue)
+      if (formItemControl?.name.value) {
+        return coerceCascaderFormValue(formItemControl.value.value) ?? localValue.value
+      }
+      return localValue.value
+    })
     const isOpen = computed(() => (props.open !== undefined ? props.open : localOpen.value))
     const searchQuery = computed(() => props.searchValue ?? localSearch.value)
     const effectiveDisabled = computed(
       () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
+    const isReadOnly = computed(() => props.readOnly && !effectiveDisabled.value)
     const status = computed<InputStatus>(
       () => props.status ?? formItemControl?.status.value ?? 'default'
     )
@@ -257,7 +275,7 @@ export const Cascader = defineComponent({
         ? filterCascaderOptions(flattened.value, searchQuery.value, props.searchable)
         : []
     )
-    const placeholderText = computed(() => props.placeholder ?? labels.value.placeholder)
+    const placeholderText = computed(() => props.placeholder ?? selectLabels.value.placeholder)
     const displayLabel = computed(() =>
       getCascaderDisplayLabel(options.value, selected.value, props.separator, labelCache)
     )
@@ -266,7 +284,7 @@ export const Cascader = defineComponent({
     )
     const emptyCopy = computed(() =>
       props.loading
-        ? labels.value.loadingText
+        ? selectLabels.value.loadingText
         : props.emptyText?.trim()
           ? props.emptyText
           : emptyLabels.value.noResults
@@ -275,6 +293,7 @@ export const Cascader = defineComponent({
       shouldShowCascaderClear({
         clearable: props.clearable,
         disabled: effectiveDisabled.value,
+        readOnly: isReadOnly.value,
         value: selected.value
       })
     )
@@ -300,35 +319,36 @@ export const Cascader = defineComponent({
       () => props.options,
       () => {
         loadedOptions.value = null
+        loadedIds.clear()
       }
     )
 
     function setOpen(next: boolean) {
+      if (next === isOpen.value) return
       if (props.open === undefined) localOpen.value = next
       emit('update:open', next)
-      emit('open-change', next)
     }
     function setSearch(query: string) {
+      if (query === searchQuery.value) return
       if (props.searchValue === undefined) localSearch.value = query
       emit('update:searchValue', query)
-      emit('search-change', query)
     }
     function setSelected(next: CascaderModelValue) {
       const normalized = normalizeCascaderValue(next)
+      if (cascaderValuesEqual(normalized, selected.value)) return
       if (props.modelValue === undefined) localValue.value = normalized
       emit('update:modelValue', normalized)
-      emit('change', normalized)
       formItemControl?.onChange(normalized)
     }
     function closeDropdown() {
       setOpen(false)
     }
     function openDropdown() {
-      if (effectiveDisabled.value) return
+      if (effectiveDisabled.value || isReadOnly.value) return
       setOpen(true)
     }
     function toggleDropdown() {
-      if (effectiveDisabled.value) return
+      if (effectiveDisabled.value || isReadOnly.value) return
       if (isOpen.value) closeDropdown()
       else openDropdown()
     }
@@ -336,9 +356,10 @@ export const Cascader = defineComponent({
       triggerRef.value?.focus()
     }
     function commitPath(path: CascaderValue, close: boolean) {
-      const normalized = normalizeCascaderValue(path)
+      if (isReadOnly.value || effectiveDisabled.value) return
+      const normalized = normalizeCascaderValue(path) ?? []
       const label = getCascaderDisplayLabel(options.value, normalized, props.separator)
-      if (normalized) rememberCascaderLabel(labelCache, normalized, label)
+      if (normalized.length > 0) rememberCascaderLabel(labelCache, normalized, label)
       setSelected(normalized)
       if (close) {
         closeDropdown()
@@ -361,20 +382,35 @@ export const Cascader = defineComponent({
       onDismiss: closeDropdown
     })
 
-    async function loadChildren(option: CascaderOption, path: CascaderValue) {
-      if (!props.loadData) return
-      const key = path.map(String).join('/')
-      const nextKeys = new Set(loadingKeys.value)
-      nextKeys.add(key)
-      loadingKeys.value = nextKeys
+    async function loadChildren(
+      option: CascaderOption,
+      path: CascaderValue,
+      intent: 'select' | 'expand'
+    ) {
+      if (!props.loadData || option.disabled) return
+      const key = cascaderPathId(path)
+      const token = nextLoadToken(loadTokens, key)
+      loadingKeys.value = new Set(loadingKeys.value).add(key)
       try {
         const children = await props.loadData(option)
+        if (!isCurrentLoadToken(loadTokens, key, token)) return
+        loadedIds.add(key)
         loadedOptions.value = setCascaderOptionChildren(
           loadedOptions.value ?? props.options,
           path,
           children
         )
+        const decision = decideAfterBranchLoad({
+          childCount: children.length,
+          intent,
+          commitLoadedBranch: intent === 'select' && props.changeOnSelect
+        })
+        if (decision.expand && children.length > 0) focusedColumnIndex.value = path.length
+        if (decision.commit) commitPath(path, children.length === 0)
+      } catch {
+        if (!isCurrentLoadToken(loadTokens, key, token)) return
       } finally {
+        if (!isCurrentLoadToken(loadTokens, key, token)) return
         const after = new Set(loadingKeys.value)
         after.delete(key)
         loadingKeys.value = after
@@ -382,21 +418,29 @@ export const Cascader = defineComponent({
     }
 
     function activateOption(option: CascaderOption, colIndex: number, commitLeaf: boolean) {
-      if (option.disabled || effectiveDisabled.value) return
+      if (option.disabled || effectiveDisabled.value || isReadOnly.value) return
       const nextPath = [...activePath.value.slice(0, colIndex), option.value]
+      const key = cascaderPathId(nextPath)
+      const gate = gateCascaderLoad(
+        option,
+        hasLoadData.value,
+        loadedIds.has(key),
+        loadingKeys.value.has(key)
+      )
+      if (gate === 'reject') return
       activePath.value = nextPath
-      const expandable = isCascaderOptionExpandable(option, hasLoadData.value)
-      if (expandable && (!option.children || option.children.length === 0) && props.loadData) {
-        void loadChildren(option, nextPath)
-        if (props.changeOnSelect) commitPath(nextPath, false)
+      const intent = commitLeaf ? 'select' : 'expand'
+      if (gate === 'load') {
+        void loadChildren(option, nextPath, intent)
         return
       }
-      if (expandable) {
-        if (props.changeOnSelect && commitLeaf) commitPath(nextPath, false)
-        focusedColumnIndex.value = colIndex + 1
-        return
-      }
-      if (commitLeaf) commitPath(nextPath, true)
+      const decision = decideAfterBranchLoad({
+        childCount: option.children?.length ?? 0,
+        intent,
+        commitLoadedBranch: props.changeOnSelect
+      })
+      if (decision.expand) focusedColumnIndex.value = colIndex + 1
+      if (decision.commit) commitPath(nextPath, !decision.expand)
     }
 
     function handleOptionClick(option: CascaderOption, colIndex: number) {
@@ -408,7 +452,22 @@ export const Cascader = defineComponent({
       activateOption(option, colIndex, false)
     }
     function handleSearchResultClick(item: CascaderFlattenedOption) {
-      if (item.disabled) return
+      if (item.disabled || isReadOnly.value || effectiveDisabled.value) return
+      const option = item.path[item.path.length - 1]
+      if (!option) return
+      const key = cascaderPathId(item.valuePath)
+      const gate = gateCascaderLoad(
+        option,
+        hasLoadData.value,
+        loadedIds.has(key),
+        loadingKeys.value.has(key)
+      )
+      if (gate === 'reject') return
+      if (gate === 'load') {
+        activePath.value = item.valuePath
+        void loadChildren(option, item.valuePath, 'select')
+        return
+      }
       commitPath(item.valuePath, true)
     }
     function clearSelection(event?: Event) {
@@ -439,7 +498,7 @@ export const Cascader = defineComponent({
     }
 
     function handleKeyDown(event: KeyboardEvent, fromSearchInput = false) {
-      if (effectiveDisabled.value) return
+      if (effectiveDisabled.value || isReadOnly.value) return
       if (!isOpen.value && isSelectTypeaheadCharacter(event.key, event)) {
         event.preventDefault()
         openDropdown()
@@ -538,9 +597,31 @@ export const Cascader = defineComponent({
       emit('blur', event)
     }
 
-    watch(isOpen, (open) => {
-      if (!open) return
-      const nextPath = resolveCascaderActivePath(selected.value)
+    function maybeSeedCascader() {
+      if (
+        !shouldSeedCascaderFormDefault({
+          alreadySeeded: seeded,
+          fieldName: formItemControl?.name.value,
+          controlledValue: props.modelValue,
+          formValue: formItemControl?.value.value,
+          defaultValue: props.defaultValue
+        })
+      ) {
+        return
+      }
+      seeded = true
+      formItemControl?.onChange(normalizeCascaderValue(props.defaultValue) ?? [])
+    }
+    maybeSeedCascader()
+
+    watch(isOpen, (open, previous) => {
+      if (!open || previous) return
+      const nextPath = nextCascaderBrowsePath({
+        open: true,
+        previousOpen: false,
+        activePath: activePath.value,
+        committed: selected.value
+      })
       activePath.value = nextPath
       const nextColumns = getCascaderColumns(options.value, nextPath, hasLoadData.value)
       columnActiveIndices.value = initialCascaderColumnActiveIndices(nextColumns)
@@ -548,6 +629,52 @@ export const Cascader = defineComponent({
       searchActiveIndex.value = 0
       if (props.searchable) nextTick(() => searchInputRef.value?.focus())
     })
+
+    watch(
+      () =>
+        [
+          props.virtual,
+          isOpen.value,
+          isSearchMode.value,
+          searchActiveIndex.value,
+          focusedColumnIndex.value,
+          columnActiveIndices.value[focusedColumnIndex.value] ?? -1,
+          itemHeight.value,
+          props.listHeight
+        ] as const,
+      () => {
+        if (!props.virtual || !isOpen.value) return
+        if (isSearchMode.value) {
+          const next = getCascaderVirtualAlignScrollTop(
+            searchScrollTop.value,
+            searchActiveIndex.value,
+            itemHeight.value,
+            props.listHeight
+          )
+          if (next !== searchScrollTop.value) searchScrollTop.value = next
+          return
+        }
+        const col = focusedColumnIndex.value
+        const current = columnScrollTops.value[col] ?? 0
+        const next = getCascaderVirtualAlignScrollTop(
+          current,
+          columnActiveIndices.value[col] ?? -1,
+          itemHeight.value,
+          props.listHeight
+        )
+        if (next === current) return
+        const tops = columnScrollTops.value.slice()
+        tops[col] = next
+        columnScrollTops.value = tops
+      },
+      { flush: 'post' }
+    )
+
+    function indexInVirtualWindow(scrollTop: number, index: number, count: number) {
+      if (!props.virtual || index < 0) return index >= 0
+      const range = getCascaderVirtualRange(scrollTop, props.listHeight, count, itemHeight.value)
+      return index >= range.startIndex && index <= range.endIndex
+    }
 
     expose({ focus: focusCombobox, open: openDropdown, close: closeDropdown })
 
@@ -572,10 +699,20 @@ export const Cascader = defineComponent({
       const activeOptionId = !isOpen.value
         ? undefined
         : isSearchMode.value
-          ? searchActiveIndex.value >= 0
+          ? searchActiveIndex.value >= 0 &&
+            indexInVirtualWindow(
+              searchScrollTop.value,
+              searchActiveIndex.value,
+              searchResults.value.length
+            )
             ? getPickerOptionId(listboxId.value, searchActiveIndex.value)
             : undefined
-          : currentOpt >= 0
+          : currentOpt >= 0 &&
+              indexInVirtualWindow(
+                columnScrollTops.value[colIndex] ?? 0,
+                currentOpt,
+                columns.value[colIndex]?.options.length ?? 0
+              )
             ? getCascaderColumnOptionId(listboxId.value, colIndex, currentOpt)
             : undefined
       const comboboxAria = getPickerComboboxAria({
@@ -587,7 +724,7 @@ export const Cascader = defineComponent({
         id: listboxId.value,
         label: isSearchMode.value
           ? undefined
-          : formatSelectLevelLabel(labels.value.levelLabel, colIndex + 1)
+          : formatSelectLevelLabel(cascaderLabels.value.levelLabel, colIndex + 1)
       })
       const triggerClasses = getCascaderTriggerClasses({
         size: props.size,
@@ -618,6 +755,8 @@ export const Cascader = defineComponent({
           type: 'text',
           class: classNames(triggerClasses, 'bg-transparent'),
           disabled: effectiveDisabled.value,
+          readonly: isReadOnly.value,
+          'aria-readonly': isReadOnly.value || undefined,
           value: searchQuery.value,
           placeholder: displayText.value,
           onInput: (event: Event) => setSearch((event.target as HTMLInputElement).value),
@@ -631,6 +770,8 @@ export const Cascader = defineComponent({
           {
             ref: triggerRef,
             tabindex: effectiveDisabled.value ? -1 : 0,
+            'aria-disabled': effectiveDisabled.value || undefined,
+            'aria-readonly': isReadOnly.value || undefined,
             class: triggerClasses,
             onClick: toggleDropdown,
             onKeydown: (event: KeyboardEvent) => handleKeyDown(event, false),
@@ -644,7 +785,7 @@ export const Cascader = defineComponent({
                 class: classNames(
                   'flex-1 truncate',
                   displayText.value === placeholderText.value &&
-                    'text-[var(--tiger-text-muted,#9ca3af)]'
+                    'text-[var(--tiger-text-secondary)]'
                 )
               },
               displayText.value
@@ -655,8 +796,11 @@ export const Cascader = defineComponent({
 
       function renderOptionRow(option: CascaderOption, c: number, i: number) {
         const isSelected =
-          columns.value[c]?.selectedValue === option.value ||
-          (selected.value ?? [])[c] === option.value
+          sameTreeKey(columns.value[c]?.selectedValue, option.value) ||
+          sameTreeKey((selected.value ?? [])[c], option.value)
+        const optionLoading = loadingKeys.value.has(
+          cascaderPathId([...(activePath.value.slice(0, c) ?? []), option.value])
+        )
         const isActive = (columnActiveIndices.value[c] ?? -1) === i
         return h(
           'div',
@@ -682,6 +826,9 @@ export const Cascader = defineComponent({
           },
           [
             h('span', { class: 'flex-1 truncate' }, option.label),
+            optionLoading
+              ? h('span', { class: 'sr-only' }, selectLabels.value.loadingText)
+              : null,
             isCascaderOptionExpandable(option, hasLoadData.value)
               ? h(
                   'span',
@@ -689,7 +836,7 @@ export const Cascader = defineComponent({
                   [
                     iconVNode(
                       chevronRightSolidIcon20PathD,
-                      'w-4 h-4 text-[var(--tiger-text-muted,#9ca3af)]'
+                      'w-4 h-4 text-[var(--tiger-text-secondary)]'
                     )
                   ]
                 )
@@ -699,7 +846,7 @@ export const Cascader = defineComponent({
       }
 
       function renderSearchRow(item: CascaderFlattenedOption, index: number) {
-        const isSelected = (selected.value ?? []).join('\0') === item.valuePath.join('\0')
+        const isSelected = cascaderValuesEqual(selected.value, item.valuePath)
         const isActive = searchActiveIndex.value === index
         const label =
           typeof props.searchable === 'object' && props.searchable.render
@@ -745,6 +892,10 @@ export const Cascader = defineComponent({
         return h(
           'div',
           {
+            ref: (el: Element | null) => {
+              if (!(el instanceof HTMLElement)) return
+              if (el.scrollTop !== scrollTop) el.scrollTop = scrollTop
+            },
             style: { height: `${props.listHeight}px`, overflow: 'auto' },
             onScroll: (event: Event) => onScrollTop((event.target as HTMLElement).scrollTop)
           },
@@ -804,7 +955,7 @@ export const Cascader = defineComponent({
                   focusedColumnIndex.value = Math.max(0, focusedColumnIndex.value - 1)
                 }
               },
-              labels.value.backText
+              cascaderLabels.value.backText
             )
           )
         }
@@ -821,7 +972,7 @@ export const Cascader = defineComponent({
                   class: getCascaderColumnClasses(focused),
                   style: getCascaderColumnStyle(props.listHeight),
                   'data-focused': focused || undefined,
-                  'aria-label': formatSelectLevelLabel(labels.value.levelLabel, c + 1),
+                  'aria-label': formatSelectLevelLabel(cascaderLabels.value.levelLabel, c + 1),
                   ...(focused ? listboxAria : {})
                 },
                 column.options.length === 0
@@ -876,7 +1027,7 @@ export const Cascader = defineComponent({
                       onMousedown: (event: MouseEvent) => event.preventDefault(),
                       onClick: closeDropdown
                     },
-                    labels.value.doneText
+                    selectLabels.value.doneText
                   )
                 ])
               ]
@@ -885,7 +1036,12 @@ export const Cascader = defineComponent({
           )
         : null
 
-      const hiddenValue = effectiveName ? serializeCascaderFormValue(selected.value) : undefined
+      const hiddenValue = shouldSubmitNativeField({
+        name: effectiveName,
+        disabled: effectiveDisabled.value
+      })
+        ? serializeCascaderFormValue(selected.value)
+        : undefined
 
       return h(
         'div',
@@ -911,7 +1067,7 @@ export const Cascader = defineComponent({
                       type: 'button',
                       class: selectClearButtonClasses,
                       'data-tiger-cascader-clear': '',
-                      'aria-label': labels.value.clearAriaLabel,
+                      'aria-label': selectLabels.value.clearAriaLabel,
                       onMousedown: (event: MouseEvent) => event.preventDefault(),
                       onClick: clearSelection
                     },

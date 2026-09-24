@@ -11,12 +11,12 @@ const sampleSignature =
 <template>
   <div class="flex flex-wrap gap-4">
     <div class="w-[280px] space-y-1">
-      <Signature :width="280" :height="140" readonly :model-value="sampleSignature" />
-      <p class="text-xs text-[var(--tiger-text-muted,#6b7280)]">readonly：展示已有签名，不可绘制</p>
+      <Signature :width="280" :height="140" read-only :model-value="sampleSignature" />
+      <p class="text-xs text-[var(--tiger-text-secondary)]">readOnly：展示已有签名，不可绘制</p>
     </div>
     <div class="w-[280px] space-y-1">
       <Signature :width="280" :height="140" disabled :clearable="false" />
-      <p class="text-xs text-[var(--tiger-text-muted,#6b7280)]">disabled + 隐藏清除按钮</p>
+      <p class="text-xs text-[var(--tiger-text-secondary)]">disabled + 隐藏清除按钮</p>
     </div>
   </div>
 </template>

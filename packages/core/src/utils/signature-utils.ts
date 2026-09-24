@@ -35,29 +35,29 @@ export const SIGNATURE_MIN_BACKING = 1
 export const signatureRootClasses = 'inline-flex w-full flex-col gap-2'
 
 export const signatureCanvasWrapClasses = classNames(
-  'relative w-full rounded-[var(--tiger-radius-md,0.5rem)]',
-  'border border-[var(--tiger-border,#d1d5db)]',
-  'bg-[var(--tiger-surface,#ffffff)]'
+  'relative w-full rounded-[var(--tiger-radius-md)]',
+  'border border-[var(--tiger-border)]',
+  'bg-[var(--tiger-surface)]'
 )
 
 export const signatureCanvasClasses = classNames(
   'block w-full touch-none rounded-[inherit]',
   'outline-none focus-visible:ring-2',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+  'focus-visible:ring-[var(--tiger-focus-ring)]',
   'focus-visible:ring-offset-2',
-  'focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+  'focus-visible:ring-offset-[var(--tiger-surface)]'
 )
 
 export const signatureToolbarClasses = 'flex items-center justify-end gap-2'
 
 export const signatureToolbarButtonClasses = classNames(
-  'inline-flex items-center rounded-[var(--tiger-radius-sm,0.375rem)]',
-  'border border-[var(--tiger-border,#d1d5db)] px-3 py-1.5 text-sm',
-  'text-[var(--tiger-text,#111827)]',
-  'tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease,background-color_150ms_ease)]',
-  'hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]',
+  'inline-flex items-center rounded-[var(--tiger-radius-sm)]',
+  'border border-[var(--tiger-border)] px-3 py-1.5 text-sm',
+  'text-[var(--tiger-text)]',
+  'tiger-motion-aware [transition:var(--tiger-transition-base)]',
+  'hover:bg-[var(--tiger-outline-bg-hover)]',
   'focus:outline-none focus-visible:ring-2',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+  'focus-visible:ring-[var(--tiger-focus-ring)]',
   'disabled:cursor-not-allowed disabled:opacity-50'
 )
 
@@ -70,9 +70,9 @@ export function getSignatureCanvasWrapClasses(disabled = false, readonly = false
 }
 
 export function getSignatureCanvasStatusClasses(status: InputStatus = 'default'): string {
-  if (status === 'error') return 'border-[var(--tiger-error,#dc2626)]'
-  if (status === 'warning') return 'border-[var(--tiger-warning,#d97706)]'
-  if (status === 'success') return 'border-[var(--tiger-success,#16a34a)]'
+  if (status === 'error') return 'border-[var(--tiger-error)]'
+  if (status === 'warning') return 'border-[var(--tiger-warning)]'
+  if (status === 'success') return 'border-[var(--tiger-success)]'
   return ''
 }
 
@@ -189,6 +189,40 @@ export function clearSignatureStrokes(): SignatureSession {
   return createSignatureSession([])
 }
 
+/** Drop the in-progress stroke. Does not keep it in the committed list. */
+export function cancelSignatureStroke(session: SignatureSession): SignatureSession {
+  if (!session.activeStroke) {
+    return { strokes: session.strokes, activeStroke: null, pointerId: null }
+  }
+  const active = session.activeStroke
+  return {
+    strokes: session.strokes.filter((stroke) => stroke !== active),
+    activeStroke: null,
+    pointerId: null
+  }
+}
+
+/** Shown when an external signature string cannot be drawn. */
+export const SIGNATURE_INVALID_VALUE = 'This signature can’t be shown.'
+
+/**
+ * External values are empty or a legal SVG the canvas can draw.
+ * Unparseable text is empty — never submitted as the raw string.
+ */
+export function sanitizeSignatureValue(value: unknown): { value: string; invalid: boolean } {
+  if (value == null || value === '') return { value: '', invalid: false }
+  if (typeof value !== 'string') return { value: '', invalid: true }
+  const strokes = signatureValueToStrokes(value)
+  if (!isSignatureEmpty(strokes)) return { value, invalid: false }
+  const svg = isSignatureSvgDataUrl(value)
+    ? decodeSignatureSvgDataUrl(value)
+    : value.includes('<svg')
+      ? value
+      : null
+  if (svg && /<svg[\s>]/i.test(svg)) return { value: '', invalid: false }
+  return { value: '', invalid: true }
+}
+
 function escapeSvgAttribute(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -204,6 +238,10 @@ function pointToPath(point: SignaturePoint): string {
 export function signatureStrokeToPath(stroke: SignatureStroke): string {
   if (stroke.points.length === 0) return ''
   const [first, ...rest] = stroke.points
+  if (rest.length === 0) {
+    const dot = pointToPath({ x: first.x + 0.01, y: first.y + 0.01 })
+    return `M ${pointToPath(first)} L ${dot}`
+  }
   return [`M ${pointToPath(first)}`, ...rest.map((point) => `L ${pointToPath(point)}`)].join(' ')
 }
 
@@ -369,8 +407,10 @@ export function syncSignatureCanvasBackingStore(
     canvas.width = nextWidth
     canvas.height = nextHeight
   }
-  canvas.style.width = '100%'
-  canvas.style.height = `${height}px`
+  const cssWidth = Math.max(SIGNATURE_MIN_BACKING, width)
+  const cssHeight = Math.max(SIGNATURE_MIN_BACKING, height)
+  canvas.style.width = `${cssWidth}px`
+  canvas.style.height = `${cssHeight}px`
   const context = canvas.getContext('2d')
   if (!context) return null
   context.setTransform(dpr, 0, 0, dpr, 0, 0)

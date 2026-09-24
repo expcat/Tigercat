@@ -12,7 +12,9 @@ import {
   getCascaderVirtualItemHeight,
   getCascaderVirtualRange,
   isCascaderOptionExpandable,
+  getCascaderDisplaySegments,
   isCascaderValueEmpty,
+  nextCascaderBrowsePath,
   normalizeCascaderValue,
   rememberCascaderLabel,
   setCascaderOptionChildren,
@@ -124,6 +126,41 @@ describe('cascader columns, flatten, and display', () => {
     const flat = flattenCascaderOptions(many)
     expect(filterCascaderOptions(flat, 'Item').length).toBe(CASCADER_DEFAULT_SEARCH_LIMIT)
     expect(filterCascaderOptions(flat, 'Item', { limit: 80 }).length).toBe(80)
+  })
+
+  it('keeps resolved labels and the unresolved raw key', () => {
+    expect(getCascaderDisplayLabel(options, ['zhejiang', 'missing'], ' / ')).toBe(
+      'Zhejiang / missing'
+    )
+    expect(getCascaderDisplaySegments(options, ['zhejiang', 1, 'nope']).segments).toEqual([
+      'Zhejiang',
+      '1',
+      'nope'
+    ])
+  })
+
+  it('treats numeric and string option values as the same key', () => {
+    const numeric: CascaderOption[] = [{ label: 'One', value: 1, children: [{ label: 'Child', value: '1-1' }] }]
+    expect(getCascaderDisplayLabel(numeric, ['1', '1-1'], ' / ')).toBe('One / Child')
+  })
+
+  it('does not reset the browse path while the panel stays open', () => {
+    expect(
+      nextCascaderBrowsePath({
+        open: true,
+        previousOpen: true,
+        activePath: ['zhejiang', 'hangzhou'],
+        committed: ['jiangsu']
+      })
+    ).toEqual(['zhejiang', 'hangzhou'])
+    expect(
+      nextCascaderBrowsePath({
+        open: true,
+        previousOpen: false,
+        activePath: ['zhejiang', 'hangzhou'],
+        committed: ['jiangsu']
+      })
+    ).toEqual(['jiangsu'])
   })
 
   it('keeps a cached label when the path is missing from options', () => {

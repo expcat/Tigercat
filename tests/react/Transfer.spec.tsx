@@ -61,14 +61,14 @@ describe('Transfer', () => {
       expect(target).toHaveTextContent('Item 1')
     })
 
-    it('keeps target order from targetKeys', () => {
+    it('keeps target order from value', () => {
       render(
         <Transfer
           dataSource={[
             { key: 'design', label: 'design' },
             { key: 'qa', label: 'qa' }
           ]}
-          targetKeys={['qa', 'design']}
+          value={['qa', 'design']}
         />
       )
       const target = screen.getByRole('group', { name: 'Target' })

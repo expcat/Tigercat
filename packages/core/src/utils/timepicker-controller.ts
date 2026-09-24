@@ -81,7 +81,7 @@ export function parseTimePickerValueString(raw: string): TimeParts | null {
   return parseTime(raw)
 }
 
-export function coerceTimePickerSingle(raw: unknown): string | null {
+export function coerceTimePickerSingle(raw: unknown, showSeconds = false): string | null {
   if (raw == null) return null
   if (Array.isArray(raw)) {
     devWarn('TimePicker.value', 'range={false} expected a 24-hour time string, not a tuple.')
@@ -100,10 +100,13 @@ export function coerceTimePickerSingle(raw: unknown): string | null {
     devWarn('TimePicker.value', `"${raw}" is not a 24-hour "HH:mm" / "HH:mm:ss" string.`)
     return null
   }
-  return formatValue(parsed, raw.trim().split(':').length === 3)
+  return formatValue(parsed, showSeconds)
 }
 
-export function coerceTimePickerRange(raw: unknown): TimePickerRangeTuple | null {
+export function coerceTimePickerRange(
+  raw: unknown,
+  showSeconds = false
+): TimePickerRangeTuple | null {
   if (raw == null) return null
   if (!Array.isArray(raw) || raw.length !== 2) {
     devWarn('TimePicker.range', 'range={true} expects a [start, end] tuple or null.')
@@ -121,12 +124,8 @@ export function coerceTimePickerRange(raw: unknown): TimePickerRangeTuple | null
       : typeof raw[1] === 'string'
         ? parseTimePickerValueString(raw[1])
         : null
-  const startText = start
-    ? formatValue(start, typeof raw[0] === 'string' && raw[0].split(':').length === 3)
-    : null
-  const endText = end
-    ? formatValue(end, typeof raw[1] === 'string' && raw[1].split(':').length === 3)
-    : null
+  const startText = start ? formatValue(start, showSeconds) : null
+  const endText = end ? formatValue(end, showSeconds) : null
   if (startText == null && endText == null) return null
   return [startText, endText]
 }
@@ -158,8 +157,78 @@ export function formTimePickerValue(
   value: string | null | TimePickerRangeTuple
 ): string | null | TimePickerRangeTuple {
   if (!range) return (value as string | null) ?? null
-  if (!isTimePickerRangeComplete(value as TimePickerRangeTuple | null)) return null
-  return value
+  if (!Array.isArray(value)) return null
+  if (value[0] == null && value[1] == null) return null
+  return [value[0], value[1]]
+}
+
+export function serializeTimePickerValue(
+  range: boolean,
+  value: string | null | TimePickerRangeTuple
+): string {
+  if (!range) return typeof value === 'string' ? value : ''
+  if (!Array.isArray(value)) return ''
+  if (value[0] == null && value[1] == null) return ''
+  return `${value[0] ?? ''}|${value[1] ?? ''}`
+}
+
+export function isSameTimePickerValue(
+  range: boolean,
+  a: string | null | TimePickerRangeTuple,
+  b: string | null | TimePickerRangeTuple
+): boolean {
+  if (!range) return ((a as string | null) ?? null) === ((b as string | null) ?? null)
+  const left = Array.isArray(a) ? a : null
+  const right = Array.isArray(b) ? b : null
+  const leftEmpty = left == null || (left[0] == null && left[1] == null)
+  const rightEmpty = right == null || (right[0] == null && right[1] == null)
+  if (leftEmpty || rightEmpty) return leftEmpty && rightEmpty
+  return left![0] === right![0] && left![1] === right![1]
+}
+
+export const timePickerInvalidReason = 'Enter a valid time.'
+export const timePickerUnavailableReason = 'That time is not available.'
+export const timePickerMissingReason = 'Choose a time.'
+export const timePickerMissingStartReason = 'Choose a start time.'
+export const timePickerMissingEndReason = 'Choose an end time.'
+
+export type TimePickerAcceptResult =
+  | { ok: true; value: string | null | TimePickerRangeTuple }
+  | { ok: false; reason: string }
+
+export function acceptTimePickerValue(
+  range: boolean,
+  value: string | null | TimePickerRangeTuple,
+  constraints: TimePickerConstraints
+): TimePickerAcceptResult {
+  if (!range) {
+    if (value == null || value === '') return { ok: true, value: null }
+    if (typeof value !== 'string') return { ok: false, reason: timePickerInvalidReason }
+    const parts = parseTime(value)
+    if (!parts) return { ok: false, reason: timePickerInvalidReason }
+    if (isTimeSlotDisabled(parts, constraints)) {
+      return { ok: false, reason: timePickerUnavailableReason }
+    }
+    return { ok: true, value: formatValue(parts, constraints.showSeconds) }
+  }
+  if (value == null || !Array.isArray(value)) return { ok: true, value: null }
+  let start = value[0]
+  let end = value[1]
+  if (start) {
+    const parts = parseTime(start)
+    if (!parts || isTimeSlotDisabled(parts, constraints)) {
+      return { ok: false, reason: timePickerUnavailableReason }
+    }
+    start = formatValue(parts, constraints.showSeconds)
+  }
+  if (end) {
+    const parts = parseTime(end)
+    if (!parts || isTimeSlotDisabled(parts, constraints)) {
+      return { ok: false, reason: timePickerUnavailableReason }
+    }
+    end = formatValue(parts, constraints.showSeconds)
+  }
+  return { ok: true, value: clampTimeRange(start, end) }
 }
 
 export function formatTimePickerDisplay(
@@ -326,6 +395,15 @@ export function isMinuteOptionDisabled(
   return true
 }
 
+export function isPeriodOptionDisabled(
+  period: 'AM' | 'PM',
+  constraints: TimePickerConstraints
+): boolean {
+  if (constraints.format !== '12') return false
+  const hours = generateHours(constraints.hourStep, '12')
+  return hours.every((hour) => isHourOptionDisabled(hour, constraints, period))
+}
+
 export function isSecondOptionDisabled(
   second: number,
   constraints: TimePickerConstraints,
@@ -385,7 +463,7 @@ export function clampTimeRange(
   const startParts = parseTime(start)
   const endParts = parseTime(end)
   if (!startParts || !endParts) return [start, end]
-  if (timeToSeconds(endParts) < timeToSeconds(startParts)) return [start, start]
+  if (timeToSeconds(endParts) < timeToSeconds(startParts)) return [end, start]
   return [start, end]
 }
 
@@ -423,27 +501,37 @@ export function applyTimePickerRangeColumn(input: {
   }
 }
 
+export type TimePickerCommitResult =
+  | { nextCommitted: string | null | TimePickerRangeTuple; close: boolean }
+  | { close: false; error: string }
+
 export function commitTimePickerOk(input: {
   range: boolean
   draft: TimePickerDraft
   draftRange: TimePickerRangeTuple | null
   constraints: TimePickerConstraints
-}): { nextCommitted: string | null | TimePickerRangeTuple; close: boolean } | null {
+}): TimePickerCommitResult {
   if (!input.range) {
-    if (!input.draft.parts) return { nextCommitted: null, close: true }
-    if (isTimeSlotDisabled(input.draft.parts, input.constraints)) return null
+    if (!input.draft.parts) return { close: false, error: timePickerMissingReason }
+    if (isTimeSlotDisabled(input.draft.parts, input.constraints)) {
+      return { close: false, error: timePickerUnavailableReason }
+    }
     return {
       nextCommitted: formatValue(input.draft.parts, input.constraints.showSeconds),
       close: true
     }
   }
   const clamped = input.draftRange ? clampTimeRange(input.draftRange[0], input.draftRange[1]) : null
-  if (!isTimePickerRangeComplete(clamped)) return null
+  if (!clamped || (!clamped[0] && !clamped[1])) {
+    return { close: false, error: timePickerMissingStartReason }
+  }
+  if (!clamped[0]) return { close: false, error: timePickerMissingStartReason }
+  if (!clamped[1]) return { close: false, error: timePickerMissingEndReason }
   const start = parseTime(clamped[0])
   const end = parseTime(clamped[1])
-  if (!start || !end) return null
+  if (!start || !end) return { close: false, error: timePickerInvalidReason }
   if (isTimeSlotDisabled(start, input.constraints) || isTimeSlotDisabled(end, input.constraints)) {
-    return null
+    return { close: false, error: timePickerUnavailableReason }
   }
   return { nextCommitted: clamped, close: true }
 }
@@ -452,14 +540,46 @@ export function commitTimePickerNow(
   range: boolean,
   now: Date,
   constraints: TimePickerConstraints
-): { nextCommitted: string | null | TimePickerRangeTuple; close: boolean } {
+): TimePickerCommitResult {
   const aligned = alignTimeToStep(
     { hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds() },
     constraints
   )
+  if (isTimeSlotDisabled(aligned, constraints)) {
+    return { close: false, error: timePickerUnavailableReason }
+  }
   const text = formatValue(aligned, constraints.showSeconds)
   if (!range) return { nextCommitted: text, close: true }
   return { nextCommitted: [text, text], close: false }
+}
+
+export function resolveTypedTimePickerCommit(
+  text: string,
+  constraints: TimePickerConstraints,
+  range: boolean,
+  periodLabels?: { am: string; pm: string }
+): TimePickerAcceptResult {
+  const trimmed = text.trim()
+  if (!trimmed) return { ok: true, value: null }
+  const parsed = parseTypedTimePickerValue(
+    trimmed,
+    constraints.format,
+    constraints.showSeconds,
+    range,
+    periodLabels
+  )
+  if (!range) {
+    if (typeof parsed !== 'string') return { ok: false, reason: timePickerInvalidReason }
+    return acceptTimePickerValue(false, parsed, constraints)
+  }
+  if (!Array.isArray(parsed)) return { ok: false, reason: timePickerInvalidReason }
+  const parts = trimmed.split(/\s+-\s+/)
+  if (parts.length < 2 || !parts[1]?.trim()) {
+    return { ok: false, reason: timePickerMissingEndReason }
+  }
+  if (!parts[0]?.trim()) return { ok: false, reason: timePickerMissingStartReason }
+  if (!parsed[0] || !parsed[1]) return { ok: false, reason: timePickerInvalidReason }
+  return acceptTimePickerValue(true, parsed, constraints)
 }
 
 export function visibleTimePickerColumns(
@@ -568,14 +688,14 @@ export function buildTimePickerColumns(input: {
           value: 'AM',
           label: periodLabels.am,
           ariaLabel: periodLabels.am,
-          disabled: false,
+          disabled: isPeriodOptionDisabled('AM', constraints),
           selected: Boolean(selected && draft.period === 'AM')
         },
         {
           value: 'PM',
           label: periodLabels.pm,
           ariaLabel: periodLabels.pm,
-          disabled: false,
+          disabled: isPeriodOptionDisabled('PM', constraints),
           selected: Boolean(selected && draft.period === 'PM')
         }
       ]
@@ -613,4 +733,4 @@ export function resolveTimePickerNow(
   }
 }
 
-export { getTimePeriodLabels }
+

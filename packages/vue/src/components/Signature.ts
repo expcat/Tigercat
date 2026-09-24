@@ -23,10 +23,12 @@ import {
   appendSignaturePoint,
   beginSignatureStroke,
   classNames,
+  SIGNATURE_INVALID_VALUE,
+  cancelSignatureStroke,
   clampSignatureLineWidth,
   clearSignatureStrokes,
   coerceClassValue,
-  resolveReadOnlyFlag,
+  sanitizeSignatureValue,
   createDocumentDragSession,
   createSignatureChangePayload,
   createSignatureSession,
@@ -76,8 +78,7 @@ export const Signature = defineComponent({
     backgroundColor: { type: String, default: undefined },
     lineWidth: { type: Number, default: 2 },
     disabled: { type: Boolean, default: false },
-    readonly: { type: Boolean, default: undefined },
-    readOnly: { type: Boolean, default: undefined },
+    readOnly: { type: Boolean, default: false },
     clearable: { type: Boolean, default: true },
     exportType: {
       type: String as PropType<SignatureExportType>,
@@ -98,7 +99,7 @@ export const Signature = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:modelValue', 'change', 'input', 'begin', 'end', 'clear', 'undo', 'blur'],
+  emits: ['update:modelValue', 'begin', 'end', 'clear', 'undo', 'blur'],
   setup(props, { attrs, emit, expose }) {
     const config = useTigerConfig()
     const formItemControl = inject<VueFormItemControlContext | null>(
@@ -125,21 +126,47 @@ export const Signature = defineComponent({
     )
     const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
     const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
-    const isReadOnly = computed(() => resolveReadOnlyFlag(props.readonly, props.readOnly))
+    const isReadOnly = computed(() => Boolean(props.readOnly))
+    const explained = ref(false)
 
-    const innerValue = ref(props.defaultValue ?? '')
+    const innerValue = ref(sanitizeSignatureValue(props.defaultValue ?? '').value)
     const observedWidth = ref(0)
     const logicalWidth = computed(() => props.width ?? observedWidth.value)
     const isInteractive = computed(() => !effectiveDisabled.value && !isReadOnly.value)
     const normalizedLineWidth = computed(() => clampSignatureLineWidth(props.lineWidth))
 
-    const committed = computed(() => {
+    const externalRaw = computed(() => {
       if (props.modelValue !== undefined) return props.modelValue
-      if (formItemControl?.value.value !== undefined) {
-        return formItemControl.value.value as string | undefined
-      }
+      if (formItemControl?.name.value) return formItemControl.value.value
+      return undefined
+    })
+    const externalState = computed(() =>
+      externalRaw.value === undefined ? undefined : sanitizeSignatureValue(externalRaw.value)
+    )
+    const committed = computed(() => {
+      if (externalState.value) return externalState.value.value
       return innerValue.value
     })
+
+    watch(
+      () => externalState.value?.invalid,
+      (invalid) => {
+        if (invalid) {
+          formItemControl?.setError(SIGNATURE_INVALID_VALUE)
+          if (!explained.value) {
+            explained.value = true
+            emit('update:modelValue', '')
+            formItemControl?.onChange('')
+          }
+          return
+        }
+        if (explained.value && committed.value) {
+          explained.value = false
+          formItemControl?.setError(null)
+        }
+      },
+      { immediate: true }
+    )
 
     const session = ref<SignatureSession>(
       createSignatureSession(signatureValueToStrokes(committed.value))
@@ -229,10 +256,9 @@ export const Signature = defineComponent({
     )
 
     function writeCommitted(payload: SignatureChangePayload) {
+      if (payload.value === committed.value) return
       if (props.modelValue === undefined) innerValue.value = payload.value
-      emit('update:modelValue', payload.value)
-      emit('input', payload.value)
-      emit('change', payload.value, payload)
+      emit('update:modelValue', payload.value, payload)
       formItemControl?.onChange(payload.value)
     }
 
@@ -292,6 +318,16 @@ export const Signature = defineComponent({
 
     const activePointerId = ref<number | null>(null)
 
+    function dropActiveStroke(id: number) {
+      dragDispose?.()
+      dragDispose = undefined
+      if (activePointerId.value !== id) return
+      activePointerId.value = null
+      const next = cancelSignatureStroke(session.value)
+      session.value = next
+      strokes.value = next.strokes
+    }
+
     function endDrawing(id: number) {
       dragDispose?.()
       dragDispose = undefined
@@ -305,6 +341,7 @@ export const Signature = defineComponent({
     }
 
     function handlePointerDown(event: PointerEvent) {
+      canvasRef.value?.focus()
       if (!isInteractive.value) return
       event.preventDefault()
       const pointerId = event.pointerId
@@ -338,7 +375,13 @@ export const Signature = defineComponent({
           session.value = moved
           strokes.value = moved.strokes
         },
-        onEnd: () => endDrawing(pointerId)
+        onEnd: (payload) => {
+          if (payload.cancelled) {
+            dropActiveStroke(pointerId)
+            return
+          }
+          endDrawing(pointerId)
+        }
       })
       dragDispose = () => handle.dispose()
     }
@@ -363,6 +406,11 @@ export const Signature = defineComponent({
       if (event.key === 'Delete') {
         event.preventDefault()
         clear()
+        return
+      }
+      if (event.key === 'Escape' && session.value.activeStroke && activePointerId.value != null) {
+        event.preventDefault()
+        dropActiveStroke(activePointerId.value)
       }
     }
 
@@ -422,7 +470,8 @@ export const Signature = defineComponent({
             ? h('input', {
                 type: 'hidden',
                 name: effectiveName.value,
-                value: committed.value ?? ''
+                value: committed.value ?? '',
+                disabled: effectiveDisabled.value || undefined
               })
             : null,
           h(
@@ -438,8 +487,13 @@ export const Signature = defineComponent({
               h('canvas', {
                 ref: canvasRef,
                 class: signatureCanvasClasses,
-                width: Math.max(1, logicalWidth.value),
-                height: props.height,
+                style:
+                  props.width != null
+                    ? { width: `${props.width}px`, height: `${props.height}px` }
+                    : {
+                        width: logicalWidth.value > 0 ? `${logicalWidth.value}px` : '100%',
+                        height: `${props.height}px`
+                      },
                 tabindex: effectiveDisabled.value ? -1 : 0,
                 role: 'textbox',
                 'aria-multiline': 'true',

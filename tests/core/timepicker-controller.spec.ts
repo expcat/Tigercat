@@ -104,7 +104,7 @@ describe('timepicker controller', () => {
     })
     expect(first.nextRange).toEqual(['10:00', null])
     expect(first.nextActivePart).toBe('end')
-    expect(formTimePickerValue(true, first.nextRange)).toBeNull()
+    expect(formTimePickerValue(true, first.nextRange)).toEqual(['10:00', null])
 
     const second = applyTimePickerRangeColumn({
       draftRange: first.nextRange,
@@ -117,7 +117,7 @@ describe('timepicker controller', () => {
     expect(formTimePickerValue(true, second.nextRange)).toEqual(['10:00', '11:00'])
   })
 
-  it('clamps an end earlier than start to start', () => {
+  it('swaps an end earlier than start', () => {
     const result = applyTimePickerRangeColumn({
       draftRange: ['12:00', '12:00'],
       activePart: 'end',
@@ -125,7 +125,33 @@ describe('timepicker controller', () => {
       option: 9,
       constraints: constraints()
     })
-    expect(result.nextRange).toEqual(['12:00', '12:00'])
+    expect(result.nextRange).toEqual(['09:00', '12:00'])
+    expect(parseTypedTimePickerValue('11:00 - 10:00', '24', false, true)).toEqual([
+      '10:00',
+      '11:00'
+    ])
+  })
+
+  it('strips seconds when showSeconds is false', () => {
+    expect(coerceTimePickerSingle('14:30:15', false)).toBe('14:30')
+    expect(coerceTimePickerSingle('14:30:15', true)).toBe('14:30:15')
+    expect(coerceTimePickerRange(['10:00:01', '11:00:02'], false)).toEqual(['10:00', '11:00'])
+  })
+
+  it('does not commit Now when the aligned time is disabled', () => {
+    const now = new Date(2024, 5, 15, 8, 0, 0)
+    const result = commitTimePickerNow(false, now, constraints({ minTime: '09:00' }))
+    expect(result).toEqual({ close: false, error: 'That time is not available.' })
+  })
+
+  it('keeps OK open when the draft time is not allowed', () => {
+    const result = commitTimePickerOk({
+      range: false,
+      draft: { parts: { hours: 9, minutes: 0, seconds: 0 }, period: 'AM' },
+      draftRange: null,
+      constraints: constraints({ minTime: '09:30' })
+    })
+    expect(result).toEqual({ close: false, error: 'That time is not available.' })
   })
 
   it('parses typed 12-hour input using the active format', () => {

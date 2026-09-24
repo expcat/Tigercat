@@ -4,7 +4,7 @@
 
 import type { ComponentSize } from './base'
 import type { InputStatus } from './input'
-import type { TigerLocale, TigerLocaleSelect } from './locale'
+import type { TigerLocale, TigerLocaleCascader, TigerLocaleSelect } from './locale'
 import type { FloatingPlacement } from '../utils/floating'
 
 /**
@@ -27,7 +27,7 @@ export interface CascaderOption {
 }
 
 /**
- * Selected path. `undefined` is empty / uncontrolled; `[]` is an empty path.
+ * Selected path. `[]` is an empty path. `undefined` is uncontrolled.
  */
 export type CascaderValue = (string | number)[]
 
@@ -129,6 +129,12 @@ export interface CascaderProps {
    * @default false
    */
   disabled?: boolean
+
+  /**
+   * Focusable and submitted, but the value cannot change.
+   * `readonly` is not a prop.
+   */
+  readOnly?: boolean
 
   /**
    * Whether to allow clearing the selection
@@ -242,7 +248,7 @@ export interface CascaderProps {
   /**
    * UI labels for custom text. Takes precedence over `locale` and ConfigProvider text.
    */
-  labels?: Partial<TigerLocaleSelect>
+  labels?: Partial<TigerLocaleSelect & TigerLocaleCascader>
 
   /**
    * Additional CSS classes

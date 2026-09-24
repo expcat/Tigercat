@@ -10,14 +10,14 @@ export default function App() {
   return (
     <div className="flex flex-wrap gap-4">
       <div className="w-[280px] space-y-1">
-        <Signature width={280} height={140} readonly value={SAMPLE_SIGNATURE} />
-        <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">
-          readonly：展示已有签名，不可绘制
+        <Signature width={280} height={140} readOnly value={SAMPLE_SIGNATURE} />
+        <p className="text-xs text-[var(--tiger-text-secondary)]">
+          readOnly：展示已有签名，不可绘制
         </p>
       </div>
       <div className="w-[280px] space-y-1">
         <Signature width={280} height={140} disabled clearable={false} />
-        <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">disabled + 隐藏清除按钮</p>
+        <p className="text-xs text-[var(--tiger-text-secondary)]">disabled + 隐藏清除按钮</p>
       </div>
     </div>
   )

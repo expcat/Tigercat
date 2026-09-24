@@ -13,6 +13,7 @@ import {
   coerceArrayFormValue,
   createUploadController,
   createUploadPreviewUrlCache,
+  filterUploadPreviewUrl,
   formatFileSize,
   getDragAreaClasses,
   getFileListItemClasses,
@@ -29,6 +30,10 @@ import {
   mergeTigerLocale,
   readUploadDropFiles,
   runShakeAnimation,
+  uploadQueuedStatusText,
+  uploadRetryFileAriaLabel,
+  uploadSingleFileText,
+  uploadSubmitValues,
   uploadFileInputClasses,
   uploadIconActionClasses,
   uploadItemActionsClasses,
@@ -120,6 +125,9 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
     fileList: fileListProp,
     defaultFileList,
     name,
+    fileFieldName,
+    allowedPreviewOrigins,
+    readOnly = false,
     status: statusProp,
     action,
     method,
@@ -166,6 +174,8 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
     [mergedLocale, labelsOverrides]
   )
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const isReadOnly = Boolean(readOnly)
+  const canMutate = !effectiveDisabled && !isReadOnly
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
   const reactId = useId()
   const triggerId = id ?? formItemControl?.id ?? `tiger-upload-${reactId}`
@@ -184,8 +194,10 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLElement>(null)
   const previewUrls = useRef(createUploadPreviewUrlCache())
+  const seededRef = useRef(false)
   const [isDragging, setIsDragging] = useState(false)
   const [previewSrc, setPreviewSrc] = useState<string | null>(null)
+  const [singleFileNote, setSingleFileNote] = useState('')
 
   const [fileList, setFileList] = useControlledState<UploadFile[], [UploadFile?]>({
     value: resolveFormItemSeed(
@@ -235,6 +247,8 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
     chunkSize,
     resumable,
     action,
+    fileFieldName,
+    multiple,
     name: fieldName,
     method,
     headers,
@@ -253,6 +267,8 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
     chunkSize,
     resumable,
     action,
+    fileFieldName,
+    multiple,
     name: fieldName,
     method,
     headers,
@@ -284,7 +300,12 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
         onSuccess: (response, file) => callbacksRef.current.onSuccess?.(response, file),
         onError: (error, file) => callbacksRef.current.onError?.(error, file),
         onExceed: (files, list) => callbacksRef.current.onExceed?.(files, list),
-        onReject: (files) => callbacksRef.current.onReject?.(files),
+        onReject: (files) => {
+          callbacksRef.current.onReject?.(files)
+          setSingleFileNote(
+            files.some((item) => item.reason === 'single') ? uploadSingleFileText : ''
+          )
+        },
         onQueueChange: (queueItems) => callbacksRef.current.onQueueChange?.(queueItems),
         onChunkProgress: (chunk, progress, file) =>
           callbacksRef.current.onChunkProgress?.(chunk, progress, file)
@@ -295,6 +316,21 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   useEffect(() => {
     previewUrls.current.sync(fileList)
   }, [fileList])
+
+  useEffect(() => {
+    if (seededRef.current) return
+    seededRef.current = true
+    if (!formItemControl?.name || fileListProp !== undefined) return
+    const raw = formItemControl.value
+    if (raw !== '' && raw != null) return
+    if (defaultFileList === undefined) return
+    formItemControl.onChange?.(defaultFileList)
+  }, [defaultFileList, fileListProp, formItemControl])
+
+  const previewUrlFor = useCallback(
+    (file: UploadFile) => filterUploadPreviewUrl(previewUrls.current.get(file), allowedPreviewOrigins),
+    [allowedPreviewOrigins]
+  )
 
   useEffect(
     () => () => {
@@ -320,9 +356,9 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   )
 
   const openPicker = useCallback(() => {
-    if (effectiveDisabled) return
+    if (!canMutate) return
     inputRef.current?.click()
-  }, [effectiveDisabled])
+  }, [canMutate])
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation()
@@ -332,8 +368,13 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   }
 
   const handleRemove = async (file: UploadFile) => {
-    if (effectiveDisabled) return
+    if (!canMutate) return
     await controllerRef.current.remove(file)
+  }
+
+  const handleRetry = (file: UploadFile) => {
+    if (!canMutate) return
+    void controllerRef.current.retry(file)
   }
 
   const handlePreview = (file: UploadFile) => {
@@ -342,8 +383,8 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
       onPreview(file)
       return
     }
-    const url = previewUrls.current.get(file)
-    if (url) setPreviewSrc(url)
+    const url = previewUrlFor(file)
+    if (url && isImageUploadFile(file)) setPreviewSrc(url)
   }
 
   const handleFocusOut = (event: React.FocusEvent<HTMLDivElement>) => {
@@ -370,25 +411,28 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
           className={getDragAreaClasses(isDragging, effectiveDisabled)}
           onClick={openPicker}
           onKeyDown={(event) => {
-            if (effectiveDisabled) return
+            if (!canMutate) return
             if (event.key === 'Enter' || event.key === ' ') {
               event.preventDefault()
               openPicker()
             }
           }}
           onDragOver={(event) => {
-            const result = handleUploadDragOver(event, effectiveDisabled)
+            const result = handleUploadDragOver(event, !canMutate)
             if (!result.handled) return
             setIsDragging(result.isDragging)
           }}
           onDragLeave={(event) => {
-            const result = handleUploadDragLeave(event, effectiveDisabled, event.currentTarget)
+            const result = handleUploadDragLeave(event, !canMutate, event.currentTarget)
             if (!result.handled) return
             setIsDragging(result.isDragging)
           }}
           onDrop={async (event) => {
-            const result = handleUploadDrop(event, effectiveDisabled)
-            if (!result.handled) return
+            const result = handleUploadDrop(event, !canMutate)
+            if (!result.handled || !canMutate) {
+              setIsDragging(false)
+              return
+            }
             setIsDragging(false)
             const read = readUploadDropFiles(event.dataTransfer)
             if (read.rejectedDirectories.length > 0) {
@@ -407,7 +451,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
             <>
               <Icon
                 name="upload"
-                className="w-12 h-12 mb-3 text-[var(--tiger-text-muted,#9ca3af)]"
+                className="w-12 h-12 mb-3 text-[var(--tiger-text-secondary)]"
                 aria-hidden
               />
               <p className="mb-2 text-sm">
@@ -415,12 +459,12 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
                 {labels.dragAndDropText}
               </p>
               {accept && (
-                <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">
+                <p className="text-xs text-[var(--tiger-text-secondary)]">
                   {interpolateUploadLabel(labels.acceptInfoText, { accept })}
                 </p>
               )}
               {maxSize ? (
-                <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">
+                <p className="text-xs text-[var(--tiger-text-secondary)]">
                   {interpolateUploadLabel(labels.maxSizeInfoText, {
                     maxSize: formatFileSize(maxSize)
                   })}
@@ -460,7 +504,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
         </div>
       ) : null}
       {file.status === 'error' && file.error ? (
-        <p id={errorId} className="text-xs text-[var(--tiger-error,#dc2626)]">
+        <p id={errorId} className="text-xs text-[var(--tiger-error)]">
           {file.error}
         </p>
       ) : null}
@@ -468,8 +512,10 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   )
 
   const renderActions = (file: UploadFile, picture: boolean) => {
-    const canPreview =
-      Boolean(onPreview) || (isImageUploadFile(file) && Boolean(previewUrls.current.get(file)))
+    const safePreview = previewUrlFor(file)
+    const canPreview = onPreview
+      ? true
+      : Boolean(isImageUploadFile(file) && safePreview)
     return (
       <>
         {canPreview ? (
@@ -477,7 +523,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
             type="button"
             className={
               picture
-                ? 'text-[var(--tiger-on-primary,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] rounded-sm'
+                ? 'text-[var(--tiger-on-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)] rounded-sm'
                 : uploadIconActionClasses
             }
             disabled={effectiveDisabled}
@@ -489,14 +535,25 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
             <Icon name="eye" className={picture ? 'w-6 h-6' : 'w-5 h-5'} aria-hidden />
           </button>
         ) : null}
+        {file.status === 'error' ? (
+          <button
+            type="button"
+            className={uploadIconActionClasses}
+            disabled={!canMutate}
+            tabIndex={effectiveDisabled ? -1 : 0}
+            onClick={() => handleRetry(file)}
+            aria-label={interpolateUploadLabel(uploadRetryFileAriaLabel, { fileName: file.name })}>
+            <Icon name="refresh" className={picture ? 'w-6 h-6' : 'w-5 h-5'} aria-hidden />
+          </button>
+        ) : null}
         <button
           type="button"
           className={
             picture
-              ? 'text-[var(--tiger-on-primary,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] rounded-sm'
+              ? 'text-[var(--tiger-on-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)] rounded-sm'
               : uploadIconActionClasses
           }
-          disabled={effectiveDisabled}
+          disabled={!canMutate}
           tabIndex={effectiveDisabled ? -1 : 0}
           onClick={() => handleRemove(file)}
           aria-label={interpolateUploadLabel(labels.removeFileAriaLabel, { fileName: file.name })}>
@@ -512,7 +569,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
 
   const renderTextItem = (file: UploadFile) => {
     const errorId = file.status === 'error' && file.error ? `${file.uid}-error` : undefined
-    const thumb = listType === 'picture' ? previewUrls.current.get(file) : undefined
+    const thumb = listType === 'picture' ? previewUrlFor(file) : undefined
     return (
       <li key={file.uid} className={getFileListItemClasses(file.status)} aria-describedby={errorId}>
         <div className="flex items-center flex-1 min-w-0 gap-2">
@@ -528,8 +585,13 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{file.name}</p>
             {file.size != null ? (
-              <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">
+              <p className="text-xs text-[var(--tiger-text-secondary)]">
                 {formatFileSize(file.size)}
+              </p>
+            ) : null}
+            {file.status === 'queued' ? (
+              <p className="text-xs text-[var(--tiger-text-secondary)]" role="status">
+                {uploadQueuedStatusText}
               </p>
             ) : null}
             {renderProgress(file, errorId)}
@@ -544,7 +606,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   }
 
   const renderPictureCard = (file: UploadFile) => {
-    const imageUrl = previewUrls.current.get(file)
+    const imageUrl = previewUrlFor(file)
     const errorId = file.status === 'error' && file.error ? `${file.uid}-error` : undefined
     return (
       <div key={file.uid} className={getPictureCardClasses(file.status)} aria-describedby={errorId}>
@@ -552,14 +614,14 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
           {imageUrl ? (
             <img src={imageUrl} alt={file.name} className="w-full h-full object-cover" />
           ) : (
-            <span className="flex h-full w-full items-center justify-center px-2 text-xs text-center text-[var(--tiger-text-muted,#6b7280)]">
+            <span className="flex h-full w-full items-center justify-center px-2 text-xs text-center text-[var(--tiger-text-secondary)]">
               {file.name}
             </span>
           )}
         </div>
         <div className={uploadPictureOverlayClasses}>{renderActions(file, true)}</div>
         {file.status === 'uploading' ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--tiger-surface,#ffffff)]/80">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--tiger-surface)]/80">
             <UploadStatusIcon status="uploading" labels={labels} size="lg" />
             {renderProgress(file)}
           </div>
@@ -567,7 +629,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
         {file.status === 'error' && file.error ? (
           <p
             id={errorId}
-            className="absolute bottom-1 inset-x-1 text-[10px] text-[var(--tiger-error,#dc2626)] truncate">
+            className="absolute bottom-1 inset-x-1 text-[10px] text-[var(--tiger-error)] truncate">
             {file.error}
           </p>
         ) : null}
@@ -607,10 +669,25 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
         tabIndex={-1}
       />
       {fieldName
-        ? fileList.map((file) => (
-            <input key={file.uid} type="hidden" name={fieldName} value={file.url ?? file.uid} />
-          ))
+        ? uploadSubmitValues(fileList).length > 0
+          ? uploadSubmitValues(fileList).map((url, index) => (
+              <input
+                key={`${url}-${index}`}
+                type="hidden"
+                name={fieldName}
+                value={url}
+                disabled={effectiveDisabled || undefined}
+              />
+            ))
+          : (
+              <input type="hidden" name={fieldName} value="" disabled={effectiveDisabled || undefined} />
+            )
         : null}
+      {singleFileNote ? (
+        <p role="status" aria-live="polite">
+          {singleFileNote}
+        </p>
+      ) : null}
       {renderTrigger()}
       {renderFileList()}
       {previewSrc ? (

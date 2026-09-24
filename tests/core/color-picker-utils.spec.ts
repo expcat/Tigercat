@@ -10,10 +10,12 @@ import {
   parseColorInput,
   parseColorParts,
   parseColorToHsva,
+  resolveColorPickerDrag,
   rgbToHex,
   rgbToHex8,
   rgbToHsv,
-  seedColorPickerHsva
+  seedColorPickerHsva,
+  submittedColorPickerValue
 } from '@expcat/tigercat-core'
 
 describe('color-picker-utils — hexToRgb', () => {
@@ -107,7 +109,11 @@ describe('color-picker-utils — format / parse', () => {
     expect(parseColorInput('not-a-color')).toBeNull()
     expect(isColorPickerEmpty('')).toBe(true)
     expect(isColorPickerEmpty(undefined)).toBe(true)
+    expect(isColorPickerEmpty('foo')).toBe(true)
+    expect(isColorPickerEmpty('#fff')).toBe(false)
     expect(isColorPickerEmpty('#000000')).toBe(false)
+    expect(submittedColorPickerValue('foo')).toBe('')
+    expect(submittedColorPickerValue('#fff')).toBe('#fff')
   })
 })
 
@@ -122,10 +128,22 @@ describe('color-picker-utils — HSV source of truth', () => {
     expect(parseColorToHsva(formatted)?.s).toBeGreaterThan(0)
   })
 
-  it('seeds empty as a usable HSVA without treating it as committed black', () => {
-    const seeded = seedColorPickerHsva('')
-    expect(seeded.s).toBeGreaterThan(0)
+  it('does not invent red for empty or unparseable text', () => {
+    expect(seedColorPickerHsva('')).toBeNull()
+    expect(seedColorPickerHsva('foo')).toBeNull()
+    expect(seedColorPickerHsva(undefined)).toBeNull()
     expect(parseColorToHsva('')).toBeNull()
+    const parsed = seedColorPickerHsva('#00ff00')
+    expect(parsed?.h).toBeGreaterThan(0)
+  })
+
+  it('previews a drag without a form value and commits once', () => {
+    const next = { h: 200, s: 40, v: 80, a: 1 }
+    expect(resolveColorPickerDrag('preview', next, 'hex', false)).toEqual({
+      hsva: next,
+      value: null
+    })
+    expect(resolveColorPickerDrag('commit', next, 'hex', false).value).toMatch(/^#[0-9a-f]{6}$/)
   })
 })
 

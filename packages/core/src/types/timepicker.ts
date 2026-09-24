@@ -31,9 +31,10 @@ export interface TimePickerLabels {
  * `modelValue` / `update:modelValue` and `open` / `update:open`.
  *
  * The stored value is always 24-hour `'HH:mm'` or `'HH:mm:ss'` (`showSeconds`).
+ * When `showSeconds` is false the model does not keep seconds.
  * `format` is display and typed parse only — it is never written back to `value`.
- * Empty single is `null`. Empty range is `null`. A complete range is `[start, end]`.
- * `name` submits the formatted display string.
+ * Empty single is `null`. Empty range is `null`. A partial range stays `[start, end]`.
+ * `name` submits that same 24-hour value (a range uses `start|end`). Empty submits `''`.
  *
  * Column clicks edit a panel draft. Footer OK commits the draft and closes.
  * Escape / outside dismiss drops the draft. `Now` commits the clock time.
@@ -79,10 +80,10 @@ export interface TimePickerProps {
    */
   disabled?: boolean
   /**
-   * When true, the field cannot be typed and the panel cannot open.
+   * When true, the field can focus and submit but cannot change or open to edit.
    * @default false
    */
-  readonly?: boolean
+  readOnly?: boolean
   /**
    * @default false
    */

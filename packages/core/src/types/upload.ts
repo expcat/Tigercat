@@ -7,7 +7,7 @@ import type { TigerLocale } from './locale'
 /**
  * File status type
  */
-export type UploadFileStatus = 'ready' | 'uploading' | 'success' | 'error'
+export type UploadFileStatus = 'ready' | 'queued' | 'uploading' | 'success' | 'error'
 
 export type UploadQueueStatus = 'queued' | 'uploading' | 'success' | 'error'
 
@@ -34,7 +34,13 @@ export interface UploadQueueItem {
 export type UploadListType = 'text' | 'picture' | 'picture-card'
 
 export type UploadRejectReason =
-  'exceed' | 'type' | 'size' | 'before-upload' | 'before-upload-error' | 'directory'
+  | 'exceed'
+  | 'type'
+  | 'size'
+  | 'before-upload'
+  | 'before-upload-error'
+  | 'directory'
+  | 'single'
 
 export interface UploadRejectedFile {
   file: File
@@ -147,11 +153,29 @@ export interface UploadProps {
   defaultFileList?: UploadFile[]
 
   /**
-   * Native form field name. Each listed file is submitted as a hidden input
-   * (`uid` or `url`). The hidden `<input type="file">` is not named, so a reset
-   * file picker cannot submit an empty FileList.
+   * Native form field name. Successful files submit their URL, one hidden
+   * input each. An empty list submits one hidden input with `''`.
+   * The file picker itself is not named.
    */
   name?: string
+
+  /**
+   * Multipart field name for the default `action` request.
+   * Distinct from {@link UploadProps.name}.
+   * @default 'file'
+   */
+  fileFieldName?: string
+
+  /**
+   * Origins (`https://cdn.example.com`) whose http(s) file URLs may be previewed.
+   * `blob:` object URLs are always allowed. Other URLs are not.
+   */
+  allowedPreviewOrigins?: string[]
+
+  /**
+   * Focusable and submittable, but files cannot be added or removed.
+   */
+  readOnly?: boolean
 
   /**
    * Visual validation status. Do not spread as a DOM attribute.
@@ -160,7 +184,7 @@ export interface UploadProps {
 
   /**
    * Upload URL. Used when `customRequest` is omitted. Posts `FormData` with
-   * the file under `name` (default `'file'`).
+   * the file under `fileFieldName` (default `'file'`).
    */
   action?: string
 

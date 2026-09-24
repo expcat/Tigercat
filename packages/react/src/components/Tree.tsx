@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 import {
   classNames,
+  parseTreeKeyId,
   treeBaseClasses,
   treeEmptyStateClasses,
   treeSearchInputClasses
@@ -78,7 +79,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(props, r
     />
   ) : null
 
-  const empty = !ctx.treeData.length
+  const empty = ctx.view.rows.length === 0
   const tree = empty ? (
     <div className={treeEmptyStateClasses}>{ctx.emptyText}</div>
   ) : (
@@ -92,7 +93,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(props, r
           .closest('[data-tiger-treeitem-key]')
           ?.getAttribute('data-tiger-treeitem-key')
         if (attr == null) return
-        ctx.handleKeyDown(event, attr)
+        ctx.handleKeyDown(event, parseTreeKeyId(attr))
       }}>
       {ctx.virtual ? (
         <VirtualList
@@ -102,6 +103,10 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(props, r
           itemCount={ctx.view.rows.length}
           itemHeight={ctx.itemHeight}
           height={ctx.height}
+          getItemKey={(index) => {
+            const row = ctx.view.rows[index]
+            return row ? row.item.node.key : index
+          }}
           renderItem={({ index }) => renderTreeRow(ctx, index, true)}
         />
       ) : (

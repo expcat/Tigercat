@@ -22,7 +22,7 @@ const users = [
         placeholder="输入 @ 提及；可清空" />
     </FormItem>
     <FormItem label="只读">
-      <Mentions model-value="已锁定 @zhangsan " :options="users" readonly />
+      <Mentions model-value="已锁定 @zhangsan " :options="users" read-only />
     </FormItem>
   </div>
 </template>

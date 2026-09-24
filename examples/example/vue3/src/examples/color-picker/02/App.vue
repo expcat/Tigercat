@@ -15,17 +15,17 @@ const sizes = ['sm', 'md', 'lg'] as const
       <div class="flex items-center gap-2">
         <ColorPicker v-model="hex" format="hex" />
         <span class="text-sm text-gray-500">hex</span>
-        <code class="text-xs text-[var(--tiger-text-muted,#6b7280)]">{{ hex }}</code>
+        <code class="text-xs text-[var(--tiger-text-secondary)]">{{ hex }}</code>
       </div>
       <div class="flex items-center gap-2">
         <ColorPicker v-model="rgb" format="rgb" />
         <span class="text-sm text-gray-500">rgb</span>
-        <code class="text-xs text-[var(--tiger-text-muted,#6b7280)]">{{ rgb }}</code>
+        <code class="text-xs text-[var(--tiger-text-secondary)]">{{ rgb }}</code>
       </div>
       <div class="flex items-center gap-2">
         <ColorPicker v-model="hsl" format="hsl" />
         <span class="text-sm text-gray-500">hsl</span>
-        <code class="text-xs text-[var(--tiger-text-muted,#6b7280)]">{{ hsl }}</code>
+        <code class="text-xs text-[var(--tiger-text-secondary)]">{{ hsl }}</code>
       </div>
     </div>
     <div class="flex flex-wrap items-center gap-4">

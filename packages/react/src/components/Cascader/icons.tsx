@@ -1,11 +1,10 @@
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
+import { selectChromeIconClasses, selectClearIconClasses } from '@expcat/tigercat-core'
 import {
-  icon20ViewBox,
   chevronDownSolidIcon20PathD,
   chevronRightSolidIcon20PathD,
-  closeSolidIcon20PathD,
-  selectChromeIconClasses,
-  selectClearIconClasses
-} from '@expcat/tigercat-core'
+  closeSolidIcon20PathD
+} from '@expcat/tigercat-core/icons/picker'
 
 function CascaderIcon({ path, className }: { path: string; className: string }) {
   return (
@@ -34,7 +33,7 @@ export function CascaderColumnChevronIcon({ dir }: { dir: 'ltr' | 'rtl' }) {
     <span className={dir === 'rtl' ? 'inline-flex rotate-180' : 'inline-flex'}>
       <CascaderIcon
         path={chevronRightSolidIcon20PathD}
-        className="w-4 h-4 text-[var(--tiger-text-muted,#9ca3af)]"
+        className="w-4 h-4 text-[var(--tiger-text-secondary)]"
       />
     </span>
   )

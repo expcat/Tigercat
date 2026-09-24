@@ -53,22 +53,22 @@ export function getDefaultCronPresets(labels: {
 export const cronFieldModes: CronFieldMode[] = ['any', 'every', 'specific', 'range', 'custom']
 
 export const cronEditorBaseClasses = classNames(
-  'inline-flex w-full flex-col gap-3 rounded-[var(--tiger-radius-md,0.5rem)] border p-3',
-  'border-[var(--tiger-border,#d1d5db)]',
-  'bg-[var(--tiger-surface,#ffffff)]',
-  'text-[var(--tiger-text,#111827)]'
+  'inline-flex w-full flex-col gap-3 rounded-[var(--tiger-radius-md)] border p-3',
+  'border-[var(--tiger-border)]',
+  'bg-[var(--tiger-surface)]',
+  'text-[var(--tiger-text)]'
 )
 
 export const cronEditorFieldsClasses = 'grid gap-2 md:grid-cols-5'
 
 export const cronEditorFieldClasses = classNames(
-  'flex min-w-0 flex-col gap-2 rounded-[var(--tiger-radius-md,0.5rem)] border p-2',
-  'border-[var(--tiger-border,#d1d5db)]',
-  'bg-[var(--tiger-fill,#f9fafb)]'
+  'flex min-w-0 flex-col gap-2 rounded-[var(--tiger-radius-md)] border p-2',
+  'border-[var(--tiger-border)]',
+  'bg-[var(--tiger-surface-muted)]'
 )
 
-export const cronEditorLabelClasses = 'text-xs font-medium text-[var(--tiger-text-muted,#6b7280)]'
-export const cronEditorErrorClasses = 'text-xs text-[var(--tiger-error,#dc2626)]'
+export const cronEditorLabelClasses = 'text-xs font-medium text-[var(--tiger-text-secondary)]'
+export const cronEditorErrorClasses = 'text-xs text-[var(--tiger-error)]'
 
 const controlSizeClasses: Record<CronEditorSize, string> = {
   sm: 'h-8 px-2 text-xs',
@@ -78,13 +78,13 @@ const controlSizeClasses: Record<CronEditorSize, string> = {
 
 export function getCronEditorControlClasses(size: CronEditorSize, invalid = false): string {
   return classNames(
-    'min-w-0 rounded-[var(--tiger-radius-sm,0.375rem)] border font-mono',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,border-color_150ms_ease,box-shadow_150ms_ease)]',
+    'min-w-0 rounded-[var(--tiger-radius-sm)] border font-mono',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     'outline-none focus-visible:ring-2',
-    'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+    'focus-visible:ring-[var(--tiger-focus-ring)]',
     controlSizeClasses[size],
-    invalid ? 'border-[var(--tiger-error,#dc2626)]' : 'border-[var(--tiger-border,#d1d5db)]',
-    'bg-[var(--tiger-surface,#ffffff)]',
+    invalid ? 'border-[var(--tiger-error)]' : 'border-[var(--tiger-border)]',
+    'bg-[var(--tiger-surface)]',
     'disabled:cursor-not-allowed disabled:opacity-50'
   )
 }
@@ -99,6 +99,27 @@ export function isCronFieldCountValid(expression: string): boolean {
 
 export function isCronExpressionEmpty(expression: string | undefined | null): boolean {
   return expression == null || expression.trim() === ''
+}
+
+/**
+ * Value allowed in the form and the named control.
+ * Empty and invalid expressions are `null` (submitted as '').
+ * Valid text is trimmed but not otherwise rewritten.
+ */
+export function cronFormValue(expression: string | null | undefined): string | null {
+  if (isCronExpressionEmpty(expression)) return null
+  const trimmed = expression!.trim()
+  return validateCronExpressionWithLabels(trimmed).valid ? trimmed : null
+}
+
+export function cronDraftErrorMessage(
+  expression: string | null | undefined,
+  result?: CronValidationResult
+): string | null {
+  if (isCronExpressionEmpty(expression)) return null
+  const validation = result ?? validateCronExpressionWithLabels(expression!)
+  if (validation.valid) return null
+  return getCronExpressionIssue(validation)?.message ?? validation.issues[0]?.message ?? null
 }
 
 /**
@@ -154,11 +175,29 @@ export function parseCronFieldControl(raw: string): CronFieldControl {
   return { mode: 'custom', raw: value }
 }
 
+export function createEmptyCronFieldDraft(): CronFieldDraft {
+  return {
+    mode: 'any',
+    raw: '',
+    valueText: '',
+    startText: '',
+    endText: '',
+    stepText: ''
+  }
+}
+
+/**
+ * Seed one field from its token. Missing text stays empty — it does not become `*`.
+ */
 export function seedCronFieldDraft(
   raw: string | undefined,
   stickyMode?: CronFieldMode
 ): CronFieldDraft {
-  const parsed = parseCronFieldControl(raw ?? '*')
+  if (raw == null || raw.trim() === '') {
+    const empty = createEmptyCronFieldDraft()
+    return stickyMode ? { ...empty, mode: stickyMode } : empty
+  }
+  const parsed = parseCronFieldControl(raw)
   const mode = stickyMode ?? parsed.mode
   return {
     mode,
@@ -168,6 +207,26 @@ export function seedCronFieldDraft(
     endText: parsed.end != null ? String(parsed.end) : '',
     stepText: parsed.step != null ? String(parsed.step) : ''
   }
+}
+
+/**
+ * Field drafts for an expression. Empty or non-5-field text does not seed five `*` fields.
+ */
+export function seedCronFieldDrafts(
+  expression: string,
+  sticky: Partial<Record<CronFieldKey, CronFieldMode>> = {}
+): Record<CronFieldKey, CronFieldDraft> {
+  if (isCronExpressionEmpty(expression) || !isCronFieldCountValid(expression)) {
+    return Object.fromEntries(
+      cronFieldMetas.map((meta) => [meta.key, createEmptyCronFieldDraft()])
+    ) as Record<CronFieldKey, CronFieldDraft>
+  }
+  return Object.fromEntries(
+    cronFieldMetas.map((meta) => [
+      meta.key,
+      seedCronFieldDraft(getCronFieldValue(expression, meta.key) ?? '', sticky[meta.key])
+    ])
+  ) as Record<CronFieldKey, CronFieldDraft>
 }
 
 export function applyCronFieldMode(

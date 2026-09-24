@@ -17,6 +17,7 @@ import {
   getColorSwatchButtonClasses,
   getColorSwatchCheckClasses,
   getColorSwatchCheckTone,
+  getColorSwatchPaint,
   getElementTextDirection,
   getNextColorSwatchIndex,
   isColorSwatchSelected,
@@ -47,6 +48,7 @@ const ColorSwatchInner = forwardRef<HTMLDivElement, ColorSwatchProps>(function C
     value,
     defaultValue,
     disabled = false,
+    readOnly = false,
     size = 'md',
     colors,
     groups,
@@ -128,10 +130,11 @@ const ColorSwatchInner = forwardRef<HTMLDivElement, ColorSwatchProps>(function C
 
   const handleSelect = useCallback(
     (option: ColorSwatchNormalizedOption) => {
-      if (effectiveDisabled || option.disabled) return
+      if (effectiveDisabled || readOnly || option.disabled) return
+      if (isColorSwatchSelected(option.value, selectedValue)) return
       setSelectedValue(option.value, option)
     },
-    [effectiveDisabled, setSelectedValue]
+    [effectiveDisabled, readOnly, selectedValue, setSelectedValue]
   )
 
   function handleKeyDown(optionIndex: number, event: React.KeyboardEvent<HTMLButtonElement>) {
@@ -197,10 +200,16 @@ const ColorSwatchInner = forwardRef<HTMLDivElement, ColorSwatchProps>(function C
       aria-describedby={describedBy}
       aria-invalid={status === 'error' ? true : undefined}
       aria-disabled={effectiveDisabled || undefined}
+      aria-readonly={readOnly || undefined}
       aria-required={formItemControl?.required || undefined}
       onBlur={handleBlur}>
       {effectiveName ? (
-        <input type="hidden" name={effectiveName} value={selectedValue ?? ''} />
+        <input
+          type="hidden"
+          name={effectiveName}
+          value={selectedValue ?? ''}
+          disabled={effectiveDisabled || undefined}
+        />
       ) : null}
       {normalizedGroups.map((group, groupIndex) => {
         const labelId = group.label ? `${reactId}-g${groupIndex}` : undefined
@@ -237,7 +246,7 @@ const ColorSwatchInner = forwardRef<HTMLDivElement, ColorSwatchProps>(function C
                     }}
                     type="button"
                     className={getColorSwatchButtonClasses(size, selected, optionDisabled)}
-                    style={{ backgroundColor: option.value }}
+                    style={{ backgroundColor: getColorSwatchPaint(option.value) }}
                     role="radio"
                     aria-checked={selected}
                     aria-label={option.label}

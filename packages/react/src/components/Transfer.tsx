@@ -1,4 +1,13 @@
-import React, { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef } from 'react'
+import React, {
+  forwardRef,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import type {
   TransferItem,
   TransferProps as CoreTransferProps,
@@ -12,12 +21,16 @@ import {
   coerceArrayFormValue,
   canMoveTransferItems,
   classNames,
+  dedupeTransferKeys,
   emptyTransferSelectedKeys,
   filterTransferItems,
   getCheckboxLabelClasses,
   getCheckboxVisualClasses,
   getInputClasses,
   getTransferItemClasses,
+  getTransferPanelBodyStyle,
+  getTransferVirtualWindow,
+  transferListNeedsWindow,
   getTransferLabels,
   getTransferSelectAllState,
   hasTransferKey,
@@ -25,10 +38,12 @@ import {
   mergeAriaDescribedBy,
   mergeTigerLocale,
   moveTransferItems,
+  partitionTransferSelection,
   resolveFormItemSeed,
   resolveLocaleText,
-  resolveTransferTargetKeys,
+  resolveTransferValue,
   runShakeAnimation,
+  sameTransferKeys,
   splitTransferData,
   toggleTransferKey,
   transferBaseClasses,
@@ -45,10 +60,48 @@ import {
   checkboxIconSizeClasses,
   checkboxIconViewBox,
   checkboxIndeterminatePathD,
-  devWarn,
   type InputStatus
 } from '@expcat/tigercat-core'
+import type { ComponentSize } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
+
+function TransferItemList({
+  items,
+  size,
+  renderItem
+}: {
+  items: TransferItem[]
+  size: ComponentSize
+  renderItem: (item: TransferItem) => React.ReactNode
+}) {
+  const [scrollTop, setScrollTop] = useState(0)
+  const needsWindow = transferListNeedsWindow(items, size)
+  const range = needsWindow ? getTransferVirtualWindow(items, scrollTop, size) : null
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const el = scrollerRef.current
+    if (el && el.scrollTop !== scrollTop) el.scrollTop = scrollTop
+  }, [scrollTop])
+  const slice =
+    needsWindow && range ? items.slice(range.startIndex, range.endIndex + 1) : items
+  return (
+    <div
+      ref={scrollerRef}
+      className={transferPanelBodyClasses}
+      style={getTransferPanelBodyStyle()}
+      onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}>
+      {needsWindow && range ? (
+        <div style={{ height: range.totalHeight, position: 'relative' }}>
+          <div style={{ transform: `translateY(${range.offsetTop}px)` }}>
+            {slice.map((item) => renderItem(item))}
+          </div>
+        </div>
+      ) : (
+        slice.map((item) => renderItem(item))
+      )}
+    </div>
+  )
+}
 import { useControlledState } from '../hooks/useControlledState'
 import { useFormItemControlContext } from './FormItemContext'
 import { Button } from './Button'
@@ -135,9 +188,8 @@ function TransferCheckbox({
 const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfer(props, ref) {
   const {
     value,
-    targetKeys,
     defaultValue,
-    defaultTargetKeys,
+    readOnly = false,
     selectedKeys: selectedKeysProp,
     defaultSelectedKeys,
     dataSource = [],
@@ -177,24 +229,27 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
       }),
     [mergedLocale, labelsOverride, sourceTitle, targetTitle]
   )
-  const resolved = resolveTransferTargetKeys(value, targetKeys)
-  useEffect(() => {
-    if (resolved.conflict) {
-      devWarn(
-        'Transfer.valueTargetKeys',
-        'Transfer received both `value` and `targetKeys`. `value` wins.'
-      )
+  const formBound = value === undefined && Boolean(formItemControl?.name)
+  const seededValue = resolveFormItemSeed(
+    value,
+    formItemControl?.name,
+    formItemControl?.value,
+    coerceArrayFormValue<string | number>
+  )
+  const normalizedValueRef = useRef<(string | number)[] | undefined>(undefined)
+  const normalizedValue = (() => {
+    if (value === undefined && !formBound) return undefined
+    const next = resolveTransferValue(seededValue ?? []) ?? []
+    if (!normalizedValueRef.current || !sameTransferKeys(normalizedValueRef.current, next)) {
+      normalizedValueRef.current = next
     }
-  }, [resolved.conflict])
+    return normalizedValueRef.current
+  })()
+  const seededRef = useRef(false)
 
   const [targetValue, setTargetValue] = useControlledState<(string | number)[]>({
-    value: resolveFormItemSeed(
-      resolved.keys,
-      formItemControl?.name,
-      formItemControl?.value,
-      coerceArrayFormValue<string | number>
-    ),
-    defaultValue: defaultValue ?? defaultTargetKeys ?? [],
+    value: normalizedValue,
+    defaultValue: dedupeTransferKeys(defaultValue ?? []),
     onChange: (next) => {
       formItemControl?.onChange?.(next)
     }
@@ -211,6 +266,8 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
   })
 
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const isReadOnly = Boolean(readOnly)
+  const canMutate = !effectiveDisabled && !isReadOnly
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
   const fieldName = name ?? formItemControl?.name
   const describedBy = mergeAriaDescribedBy(
@@ -228,6 +285,16 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
     if (status === 'error') runShakeAnimation(rootRef.current)
   }, [status, formItemControl?.shakeTrigger])
 
+  useEffect(() => {
+    if (seededRef.current) return
+    seededRef.current = true
+    if (!formItemControl?.name || value !== undefined) return
+    const raw = formItemControl.value
+    if (raw !== '' && raw != null) return
+    if (defaultValue === undefined) return
+    formItemControl.onChange?.(dedupeTransferKeys(defaultValue))
+  }, [defaultValue, formItemControl, value])
+
   const { sourceItems, targetItems } = useMemo(
     () => splitTransferData(dataSource, targetValue),
     [dataSource, targetValue]
@@ -243,8 +310,10 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
     [targetItems, targetSearch, filterOption]
   )
 
-  const canMoveRight = canMoveTransferItems(selected.source, dataSource, effectiveDisabled)
-  const canMoveLeft = canMoveTransferItems(selected.target, dataSource, effectiveDisabled)
+  const sourceSelection = partitionTransferSelection(selected.source, filteredSource)
+  const targetSelection = partitionTransferSelection(selected.target, filteredTarget)
+  const canMoveRight = canMoveTransferItems(sourceSelection.visible, dataSource, !canMutate)
+  const canMoveLeft = canMoveTransferItems(targetSelection.visible, dataSource, !canMutate)
 
   function updateSearch(panel: keyof TransferSearchValue, nextValue: string) {
     setSearch({ ...search, [panel]: nextValue })
@@ -255,10 +324,12 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
   }
 
   function toggle(panel: 'source' | 'target', key: string | number) {
+    if (!canMutate) return
     updateSelected({ ...selected, [panel]: toggleTransferKey(selected[panel], key) })
   }
 
   function selectAll(panel: 'source' | 'target', visible: TransferItem[], checked: boolean) {
+    if (!canMutate) return
     const state = getTransferSelectAllState(visible, selected[panel])
     updateSelected({
       ...selected,
@@ -267,13 +338,16 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
   }
 
   function move(direction: 'left' | 'right') {
-    const selectedKeys = direction === 'right' ? selected.source : selected.target
+    if (!canMutate) return
+    const selectedKeys = direction === 'right' ? sourceSelection.visible : targetSelection.visible
     if (direction === 'right' && !canMoveRight) return
     if (direction === 'left' && !canMoveLeft) return
     const result = moveTransferItems(direction, targetValue, selectedKeys, dataSource)
     const movedIds = new Set(result.movedKeys.map(transferKeyId))
-    setTargetValue(result.targetKeys)
-    onChange?.(result.targetKeys, direction, result.movedKeys)
+    if (!sameTransferKeys(result.targetKeys, targetValue)) {
+      setTargetValue(result.targetKeys)
+      onChange?.(result.targetKeys, direction, result.movedKeys)
+    }
     updateSelected({
       source:
         direction === 'right'
@@ -314,7 +388,7 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
             disabled={effectiveDisabled || selectState.enabledKeys.length === 0}
             size={size}
             onChange={() => selectAll(panel, visibleItems, !selectState.checked)}>
-            <span className="font-medium text-[var(--tiger-text,#111827)]">
+            <span className="font-medium text-[var(--tiger-text)]">
               {title} ({selectedCount}/{allItems.length})
             </span>
           </TransferCheckbox>
@@ -326,13 +400,22 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
             placeholder={resolveLocaleText('Search', mergedLocale?.common?.searchPlaceholder)}
             value={query}
             disabled={effectiveDisabled}
+            readOnly={isReadOnly || undefined}
             aria-label={labels.searchAriaLabel.replace('{title}', title)}
-            onChange={(event) => updateSearch(panel, event.target.value)}
+            onChange={(event) => {
+              if (!canMutate) return
+              updateSearch(panel, event.target.value)
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') event.preventDefault()
+            }}
           />
         ) : null}
-        <div className={transferPanelBodyClasses}>
-          {visibleItems.length > 0 ? (
-            visibleItems.map((item) => {
+        {visibleItems.length > 0 ? (
+          <TransferItemList
+            items={visibleItems}
+            size={size}
+            renderItem={(item) => {
               const isSelected = hasTransferKey(selectedKeys, item.key)
               const itemDisabled = effectiveDisabled || Boolean(item.disabled)
               return (
@@ -353,13 +436,41 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
                   </TransferCheckbox>
                 </div>
               )
-            })
-          ) : (
+            }}
+          />
+        ) : (
+          <div className={transferPanelBodyClasses} style={getTransferPanelBodyStyle()}>
             <div className={transferEmptyClasses}>
               {resolveLocaleText('No data', emptyText, mergedLocale?.common?.emptyText)}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+        {(() => {
+          const hidden = partitionTransferSelection(selectedKeys, visibleItems).hidden
+          if (hidden.length === 0) return null
+          const clearText = mergedLocale?.common?.clearText ?? 'Clear'
+          return (
+            <div className="flex items-center justify-between gap-2 border-t border-[var(--tiger-border)] px-3 py-1 text-xs">
+              <span role="status">
+                {hidden.length} selected hidden by search
+              </span>
+              <button
+                type="button"
+                className="text-[var(--tiger-primary)]"
+                disabled={!canMutate}
+                aria-label={clearText}
+                onClick={() => {
+                  const hiddenIds = new Set(hidden.map(transferKeyId))
+                  updateSelected({
+                    ...selected,
+                    [panel]: selectedKeys.filter((key) => !hiddenIds.has(transferKeyId(key)))
+                  })
+                }}>
+                {clearText}
+              </button>
+            </div>
+          )
+        })()}
       </div>
     )
   }
@@ -377,14 +488,24 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
       aria-disabled={effectiveDisabled || undefined}
       className={classNames(
         transferBaseClasses,
-        status === 'error' && 'ring-1 ring-[var(--tiger-error,#dc2626)]',
+        status === 'error' && 'ring-1 ring-[var(--tiger-error)]',
         className
       )}
       onBlur={handleFocusOut}>
       {fieldName
-        ? targetValue.map((key) => (
-            <input key={transferKeyId(key)} type="hidden" name={fieldName} value={String(key)} />
-          ))
+        ? targetValue.length > 0
+          ? targetValue.map((key) => (
+              <input
+                key={transferKeyId(key)}
+                type="hidden"
+                name={fieldName}
+                value={String(key)}
+                disabled={effectiveDisabled || undefined}
+              />
+            ))
+          : (
+              <input type="hidden" name={fieldName} value="" disabled={effectiveDisabled || undefined} />
+            )
         : null}
       {renderPanel('source', labels.sourceTitle, sourceItems, filteredSource, sourceSearch)}
       <div className={transferOperationClasses}>

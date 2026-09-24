@@ -28,10 +28,11 @@ describe('NumberKeyboard', () => {
     expect(screen.getByRole('button', { name: confirmName })).toBeInTheDocument()
   })
 
-  it('is a single tab stop', () => {
+  it('uses a roving tabindex on the active key', () => {
     render(<NumberKeyboard />)
-    expect(keypad()).toHaveAttribute('tabIndex', '0')
-    expect(screen.getAllByRole('button').every((button) => button.tabIndex === -1)).toBe(true)
+    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('tabindex', '0')
+    expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('tabindex', '-1')
+    expect(screen.getByRole('button', { name: '1' }).className).toMatch(/ring-/)
   })
 
   it('does not expose the empty spacer as a button', () => {
@@ -77,13 +78,13 @@ describe('NumberKeyboard', () => {
     expect(keypad()).toHaveAttribute('tabIndex', '-1')
   })
 
-  it('does not emit when readonly but stays focusable', () => {
+  it('does not emit when readOnly but stays focusable', () => {
     const onChange = vi.fn()
-    render(<NumberKeyboard readonly onChange={onChange} />)
+    render(<NumberKeyboard readOnly onChange={onChange} />)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     expect(onChange).not.toHaveBeenCalled()
     expect(keypad()).toHaveAttribute('tabIndex', '0')
-    expect(screen.getByRole('button', { name: '1' })).not.toBeDisabled()
+    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-disabled', 'true')
   })
 
   it('supports custom labels and hidden confirm key', () => {
@@ -106,6 +107,43 @@ describe('NumberKeyboard', () => {
     render(<NumberKeyboard mode="id-card" value="12345678901234567x" onChange={onChange} />)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('clears an illegal amount instead of extending it', () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <NumberKeyboard mode="amount" value="1.2.3" name="amt" onChange={onChange} />
+    )
+    expect(container.querySelector('input[name="amt"]')).toHaveValue('')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).toHaveTextContent(
+      /does not match/
+    )
+    fireEvent.click(screen.getByRole('button', { name: '4' }))
+    expect(onChange).toHaveBeenCalledWith('4', expect.objectContaining({ action: 'input' }))
+    expect(onChange.mock.calls[0][0]).not.toContain('1.2.3')
+  })
+
+  it('does not render the string undefined for an omitted value', () => {
+    const { container } = render(<NumberKeyboard name="n" />)
+    expect(container.querySelector('input[name="n"]')).toHaveValue('')
+  })
+
+  it('keeps a single named field while the sheet is open', () => {
+    render(<NumberKeyboard name="pin" defaultOpen defaultValue="8" />)
+    expect(document.querySelectorAll('input[name="pin"]')).toHaveLength(1)
+  })
+
+  it('moves focus into the dialog', async () => {
+    const opener = document.createElement('button')
+    opener.textContent = 'open'
+    document.body.append(opener)
+    opener.focus()
+    render(<NumberKeyboard defaultOpen />)
+    await waitFor(() => {
+      const dialog = screen.getByRole('dialog')
+      expect(dialog.contains(document.activeElement)).toBe(true)
+    })
+    opener.remove()
   })
 
   it('closes the overlay on confirm', () => {

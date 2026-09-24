@@ -115,13 +115,48 @@ describe('TimePicker', () => {
     expect(onChange).toHaveBeenCalledWith(['10:00', '11:00'])
   })
 
-  it('clamps an out-of-order range end to start', async () => {
+  it('swaps an out-of-order range end with the start', async () => {
     const onChange = vi.fn()
     render(<TimePicker range defaultOpen defaultValue={['12:00', '12:00']} onChange={onChange} />)
     await userEvent.click(screen.getByRole('tab', { name: 'End' }))
     fireEvent.click(document.querySelector('[aria-label="09 Hour"]') as HTMLElement)
     await userEvent.click(screen.getByRole('button', { name: 'OK' }))
-    expect(onChange).toHaveBeenCalledWith(['12:00', '12:00'])
+    expect(onChange).toHaveBeenCalledWith(['09:00', '12:00'])
+  })
+
+  it('does not commit Now inside a disabled slot', async () => {
+    const onChange = vi.fn()
+    render(
+      <TimePicker
+        defaultOpen
+        now={new Date(2024, 5, 15, 8, 0, 0)}
+        minTime="09:00"
+        onChange={onChange}
+      />
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Now' }))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('That time is not available.')
+  })
+
+  it('stores HH:mm when showSeconds is false', async () => {
+    const onChange = vi.fn()
+    const { unmount } = render(<TimePicker showSeconds={false} defaultValue="10:11:12" />)
+    expect(screen.getByRole('textbox')).toHaveValue('10:11')
+    unmount()
+    render(<TimePicker showSeconds={false} defaultOpen onChange={onChange} />)
+    fireEvent.click(document.querySelector('[aria-label="09 Hour"]') as HTMLElement)
+    await userEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(onChange).toHaveBeenCalledWith('09:00')
+  })
+
+  it('does not emit when OK repeats the current time', async () => {
+    const onChange = vi.fn()
+    render(<TimePicker defaultOpen defaultValue="10:00" onChange={onChange} />)
+    await userEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('parses typed 12-hour input', async () => {
@@ -149,19 +184,17 @@ describe('TimePicker', () => {
     await waitFor(() => expect(validator).toHaveBeenCalled())
   })
 
-  it('mounts only the desktop column tree in the a11y tree', async () => {
-    render(<TimePicker defaultOpen />)
-    const dialog = screen.getByRole('dialog')
-    expect(dialog.querySelectorAll('[data-tiger-timepicker-unit="hour"]').length).toBeGreaterThan(0)
-    expect(dialog.querySelectorAll('select')).toHaveLength(0)
-  })
-
-  it('mounts native selects on small screens instead of columns', async () => {
+  it('renders desktop columns and mobile selects together', async () => {
     mockLayout(false)
     render(<TimePicker defaultOpen />)
     const dialog = screen.getByRole('dialog')
+    const columns = dialog.querySelector('[class*="sm:flex"]')
+    const selects = dialog.querySelector('select')?.parentElement
+    expect(dialog.querySelectorAll('[role="listbox"]').length).toBeGreaterThan(0)
     expect(dialog.querySelectorAll('select')).toHaveLength(2)
-    expect(dialog.querySelectorAll('[role="listbox"]')).toHaveLength(0)
+    expect(columns?.className).toContain('hidden')
+    expect(columns?.className).toContain('sm:flex')
+    expect(selects?.className).toContain('sm:hidden')
   })
 
   it('does not change the time when ArrowDown is pressed on OK', async () => {

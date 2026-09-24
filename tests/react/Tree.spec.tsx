@@ -198,7 +198,7 @@ describe('Tree', () => {
     it('should support multiple selection with Enter', async () => {
       const user = userEvent.setup()
 
-      render(<Tree treeData={sampleTreeData} defaultExpandAll multiple />)
+      render(<Tree treeData={sampleTreeData} defaultExpandAll selectionMode="multiple" />)
 
       const items = screen.getAllByRole('treeitem')
       act(() => {
@@ -249,7 +249,7 @@ describe('Tree', () => {
     it('handles Home, End, ArrowUp, ArrowLeft, Escape, and expandable Space paths', async () => {
       const user = userEvent.setup()
 
-      render(<Tree treeData={sampleTreeData} defaultExpandAll selectable={false} />)
+      render(<Tree treeData={sampleTreeData} defaultExpandAll selectionMode="none" />)
 
       const items = screen.getAllByRole('treeitem')
       act(() => {
@@ -322,7 +322,7 @@ describe('Tree', () => {
       const onSelect = vi.fn()
 
       const { getByText } = render(
-        <Tree treeData={sampleTreeData} selectable={false} onSelect={onSelect} />
+        <Tree treeData={sampleTreeData} selectionMode="none" onSelect={onSelect} />
       )
 
       await user.click(getByText('Parent 1'))
@@ -350,7 +350,7 @@ describe('Tree', () => {
     it('should render checkboxes when checkable is true', () => {
       const { container } = render(<Tree treeData={sampleTreeData} checkable />)
 
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+      const checkboxes = container.querySelectorAll('[data-tiger-tree-check]')
       expect(checkboxes.length).toBeGreaterThan(0)
     })
 
@@ -360,7 +360,7 @@ describe('Tree', () => {
 
       const { container } = render(<Tree treeData={sampleTreeData} checkable onCheck={onCheck} />)
 
-      const checkbox = container.querySelector('input[type="checkbox"]')
+      const checkbox = container.querySelector('[data-tiger-tree-check]')
 
       if (checkbox) {
         await user.click(checkbox)
@@ -385,7 +385,7 @@ describe('Tree', () => {
         />
       )
 
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+      const checkboxes = container.querySelectorAll('[data-tiger-tree-check]')
       const parentCheckbox = checkboxes[0] as HTMLInputElement
 
       await user.click(parentCheckbox)
@@ -406,7 +406,7 @@ describe('Tree', () => {
         <Tree treeData={sampleTreeData} checkable checkStrictly onCheck={onCheck} />
       )
 
-      const checkbox = container.querySelector('input[type="checkbox"]')
+      const checkbox = container.querySelector('[data-tiger-tree-check]')
 
       if (checkbox) {
         await user.click(checkbox)
@@ -429,7 +429,7 @@ describe('Tree', () => {
 
       const { container } = render(<Tree treeData={dataWithDisabled} checkable onCheck={onCheck} />)
 
-      const checkbox = container.querySelector('input[type="checkbox"][disabled]')
+      const checkbox = container.querySelector('[data-tiger-tree-check]')
 
       if (checkbox) {
         await user.click(checkbox)
@@ -556,8 +556,8 @@ describe('Tree', () => {
         <Tree treeData={sampleTreeData} checkable checkedKeys={[]} onCheck={onCheck} />
       )
 
-      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
-      expect(checkbox.checked).toBe(false)
+      const checkbox = container.querySelector('[data-tiger-tree-check]') as HTMLElement
+      expect(checkbox.getAttribute('data-checked')).toBe('false')
 
       await user.click(checkbox)
 
@@ -569,10 +569,8 @@ describe('Tree', () => {
       rerender(<Tree treeData={sampleTreeData} checkable checkedKeys={['1']} onCheck={onCheck} />)
 
       await waitFor(() => {
-        const updatedCheckbox = container.querySelector(
-          'input[type="checkbox"]'
-        ) as HTMLInputElement
-        expect(updatedCheckbox.checked).toBe(true)
+        const updatedCheckbox = container.querySelector('[data-tiger-tree-check]') as HTMLElement
+        expect(updatedCheckbox.getAttribute('data-checked')).toBe('true')
       })
     })
 
@@ -679,6 +677,19 @@ describe('Tree', () => {
   })
 
   describe('Virtual scrolling', () => {
+    it('does not put the virtual scroller in the tab order', () => {
+      const largeTree = Array.from({ length: 20 }, (_, i) => ({
+        key: `n-${i}`,
+        label: `Node ${i}`
+      }))
+      const { container } = render(
+        <Tree treeData={largeTree} virtual height={200} itemHeight={32} />
+      )
+      const scroller = container.querySelector('[data-tiger-tree-virtual]')
+      expect(scroller).toBeTruthy()
+      expect(scroller).not.toHaveAttribute('tabindex', '0')
+    })
+
     it('renders only a subset of items when virtual is enabled', () => {
       const largeTree = Array.from({ length: 500 }, (_, i) => ({
         key: `n-${i}`,
@@ -713,16 +724,14 @@ describe('Tree', () => {
   })
 
   describe('Controller bindings', () => {
-    it('treats 1 and "1" as the same expanded node', async () => {
-      const user = userEvent.setup()
+    it('does not treat numeric 1 and string "1" as the same expanded node', () => {
       render(
         <Tree
           treeData={[{ key: 1, label: 'One', children: [{ key: '1-1', label: 'Nested' }] }]}
           expandedKeys={['1']}
         />
       )
-      expect(screen.getByText('Nested')).toBeInTheDocument()
-      await user.click(screen.getByText('One'))
+      expect(screen.queryByText('Nested')).not.toBeInTheDocument()
     })
 
     it('keeps a user-expanded node after treeData identity changes', async () => {
@@ -804,7 +813,7 @@ describe('Tree', () => {
       )
       const leaf = screen.getByText('Child 1-1').closest('[role="treeitem"]')
       expect(leaf).toHaveAttribute('aria-checked', 'true')
-      const boxes = document.querySelectorAll('input[type="checkbox"]')
+      const boxes = document.querySelectorAll('[data-tiger-tree-check]')
       await user.click(boxes[0] as HTMLInputElement)
       await waitFor(() => expect(onCheckedKeysChange).toHaveBeenCalled())
       const keys = onCheckedKeysChange.mock.calls.at(-1)?.[0] as Array<string | number>

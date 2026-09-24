@@ -10,17 +10,18 @@ import {
   type PropType,
   type CSSProperties
 } from 'vue'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
-  calendarSolidIcon20PathD,
   classNames,
-  closeSolidIcon20PathD,
   coerceClassValue,
+  acceptDatePickerCandidate,
   coerceDatePickerRange,
   coerceDatePickerSingle,
   commitDatePickerDay,
   commitDatePickerToday,
+  confirmDatePicker,
   datePickerFooterButtonClasses,
   datePickerFooterClasses,
   datePickerPanelClasses,
@@ -37,17 +38,17 @@ import {
   getInputPasswordToggleClasses,
   getInputWrapperClasses,
   getWeekStartsOn,
-  icon20ViewBox,
   isDatePickerValueEmpty,
+  isSameDatePickerValue,
   mergeAriaDescribedBy,
   mergeStyleValues,
   mergeTigerLocale,
   parseDatePickerShortcut,
-  parseTypedDatePickerValue,
   resolveDatePickerDisabled,
   resolveInputTrailingLayout,
-  resolveReadOnlyFlag,
+  resolveTypedDatePickerCommit,
   runShakeAnimation,
+  serializeDatePickerValue,
   toCalendarDate,
   type ComponentSize,
   type DateFormat,
@@ -59,6 +60,7 @@ import {
   type TigerLocale,
   type WeekStartsOn
 } from '@expcat/tigercat-core'
+import { calendarSolidIcon20PathD, closeSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { useTigerConfig } from './ConfigProvider'
 import { Calendar } from './Calendar'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay, useVueFocusTrap } from '../utils/overlay'
@@ -94,7 +96,7 @@ export interface VueDatePickerProps {
   format?: DateFormat
   placeholder?: string
   disabled?: boolean
-  readonly?: boolean
+  readOnly?: boolean
   required?: boolean
   minDate?: Date | string | null
   maxDate?: Date | string | null
@@ -137,7 +139,7 @@ export const DatePicker = defineComponent({
     format: { type: String as PropType<DateFormat>, default: 'yyyy-MM-dd' },
     placeholder: { type: String, default: undefined },
     disabled: Boolean,
-    readonly: { type: Boolean, default: undefined },
+    readOnly: { type: Boolean, default: undefined },
     required: Boolean,
     minDate: { type: [Date, String, null] as PropType<Date | string | null>, default: undefined },
     maxDate: { type: [Date, String, null] as PropType<Date | string | null>, default: undefined },
@@ -155,7 +157,7 @@ export const DatePicker = defineComponent({
     getPopupContainer: { type: Function as PropType<() => HTMLElement | null> },
     className: String
   },
-  emits: ['update:modelValue', 'update:open', 'change', 'input', 'open-change', 'clear', 'blur'],
+  emits: ['update:modelValue', 'update:open', 'clear', 'blur'],
   setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
@@ -167,7 +169,7 @@ export const DatePicker = defineComponent({
     const localeCode = computed(() => getDatePickerLocaleCode(mergedLocale.value))
     const labels = computed(() => getDatePickerLabels(mergedLocale.value, props.labels))
     const weekStartsOn = computed(() => props.weekStartsOn ?? getWeekStartsOn(localeCode.value))
-    const isReadOnly = computed(() => resolveReadOnlyFlag(props.readonly))
+    const isReadOnly = computed(() => props.readOnly === true)
     const effectiveDisabled = computed(
       () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
@@ -188,6 +190,7 @@ export const DatePicker = defineComponent({
     const localOpen = ref(props.defaultOpen)
     const previewRange = ref<RangeTuple | null>(null)
     const draftText = ref<string | null>(null)
+    const validationMessage = ref<string | null>(null)
 
     const committed = computed(() => {
       if (props.modelValue !== undefined) {
@@ -204,21 +207,33 @@ export const DatePicker = defineComponent({
     })
     const isOpen = computed(() => (props.open !== undefined ? props.open : localOpen.value))
 
+    function clearPickerError() {
+      validationMessage.value = null
+      formItemControl?.setError(null)
+    }
+
+    function reportPickerError(reason: string) {
+      validationMessage.value = reason
+      formItemControl?.setError(reason)
+    }
+
     function writeCommitted(next: Date | null | RangeTuple) {
+      const same = isSameDatePickerValue(props.range, committed.value, next)
+      clearPickerError()
+      draftText.value = null
+      if (same) return
       if (props.modelValue === undefined && formItemControl?.value.value === undefined) {
         localValue.value = next
       }
       emit('update:modelValue', next)
-      emit('change', next)
-      emit('input', next)
-      formItemControl?.onChange(formDatePickerValue(props.range, next, null))
+      formItemControl?.onChange(formDatePickerValue(props.range, next))
     }
 
     function setOpenSafe(next: boolean) {
       if (effectiveDisabled.value || isReadOnly.value) return
+      const changed = isOpen.value !== next
       if (props.open === undefined) localOpen.value = next
-      emit('update:open', next)
-      emit('open-change', next)
+      if (changed) emit('update:open', next)
       if (!next) previewRange.value = null
     }
 
@@ -237,17 +252,13 @@ export const DatePicker = defineComponent({
     )
     const minDate = computed(() => toCalendarDate(props.minDate ?? null))
     const maxDate = computed(() => toCalendarDate(props.maxDate ?? null))
-    const rangeSelectingEnd = computed(() =>
-      Boolean(props.range && previewRange.value?.[0] && !previewRange.value?.[1])
-    )
+    const bounds = computed(() => ({
+      minDate: minDate.value,
+      maxDate: maxDate.value,
+      disabledDate: props.disabledDate
+    }))
     function isDateDisabled(date: Date) {
-      return resolveDatePickerDisabled(date, {
-        minDate: minDate.value,
-        maxDate: maxDate.value,
-        disabledDate: props.disabledDate,
-        rangeStart: previewRange.value?.[0] ?? null,
-        rangeSelectingEnd: rangeSelectingEnd.value
-      })
+      return resolveDatePickerDisabled(date, bounds.value)
     }
     const calendarValue = computed(() => {
       if (!props.range) return committed.value as Date | null
@@ -320,31 +331,73 @@ export const DatePicker = defineComponent({
         range: props.range,
         picked: date,
         committed: committed.value,
-        preview: previewRange.value
+        preview: previewRange.value,
+        bounds: bounds.value
       })
-      writeCommitted(result.nextCommitted)
+      if (result.error) {
+        reportPickerError(result.error)
+        return
+      }
+      if (result.commit) writeCommitted(result.nextCommitted)
+      else clearPickerError()
       previewRange.value = result.nextPreview
       draftText.value = null
       if (result.close) setOpenSafe(false)
     }
 
     function selectToday() {
-      const today = props.now ?? new Date()
-      if (isDateDisabled(today)) return
-      const result = commitDatePickerToday(props.range, today)
+      if (!props.now) return
+      const result = commitDatePickerToday(props.range, props.now, bounds.value)
+      if ('error' in result) return
       writeCommitted(result.nextCommitted)
       previewRange.value = null
-      draftText.value = null
       if (result.close) setOpenSafe(false)
     }
 
     function applyShortcut(shortcut: DatePickerShortcut) {
       const parsed = parseDatePickerShortcut(shortcut, props.range)
       if (parsed == null) return
-      writeCommitted(parsed)
+      const accepted = acceptDatePickerCandidate(props.range, parsed, bounds.value)
+      if (!accepted.ok) {
+        reportPickerError(accepted.reason)
+        return
+      }
+      writeCommitted(accepted.value)
       previewRange.value = null
-      draftText.value = null
       if (!props.range) setOpenSafe(false)
+    }
+
+    function confirmRange() {
+      if (draftText.value != null) {
+        const typed = resolveTypedDatePickerCommit(
+          draftText.value,
+          props.format,
+          props.range,
+          localeCode.value,
+          bounds.value
+        )
+        if (!typed.ok) {
+          reportPickerError(typed.reason)
+          return
+        }
+        writeCommitted(typed.value)
+        previewRange.value = null
+        setOpenSafe(false)
+        return
+      }
+      const result = confirmDatePicker({
+        preview: previewRange.value,
+        committed: committed.value,
+        bounds: bounds.value
+      })
+      if (!result.close) {
+        if (result.error) reportPickerError(result.error)
+        previewRange.value = result.nextPreview
+        return
+      }
+      writeCommitted(result.nextCommitted)
+      previewRange.value = null
+      setOpenSafe(false)
     }
 
     function clearValue() {
@@ -357,13 +410,18 @@ export const DatePicker = defineComponent({
 
     function parseDraft() {
       if (draftText.value == null) return
-      const parsed = parseTypedDatePickerValue(draftText.value, props.format, props.range)
-      writeCommitted(
-        props.range
-          ? ((parsed as RangeTuple | null) ?? null)
-          : ((parsed as Date | null) ?? null)
+      const result = resolveTypedDatePickerCommit(
+        draftText.value,
+        props.format,
+        props.range,
+        localeCode.value,
+        bounds.value
       )
-      draftText.value = null
+      if (!result.ok) {
+        reportPickerError(result.reason)
+        return
+      }
+      writeCommitted(result.value)
     }
 
     function handleFocusOut(event: FocusEvent) {
@@ -431,21 +489,24 @@ export const DatePicker = defineComponent({
         disabled: effectiveDisabled.value,
         readonly: isReadOnly.value,
         required: required.value,
-        name: effectiveName.value,
         id: effectiveId.value,
         autocomplete: 'off',
         'aria-label': ariaLabel ?? (labelledby ? undefined : placeholderText.value),
         'aria-labelledby': labelledby,
-        'aria-describedby': describedBy,
-        'aria-invalid': status.value === 'error' ? true : undefined,
+        'aria-describedby': validationMessage.value
+          ? mergeAriaDescribedBy(describedBy, `${panelId.value}-status`)
+          : describedBy,
+        'aria-invalid': status.value === 'error' || validationMessage.value ? true : undefined,
         'aria-required': required.value ? true : undefined,
+        'aria-expanded': isOpen.value,
+        'aria-haspopup': 'dialog',
         'aria-controls': isOpen.value ? panelId.value : undefined,
         onInput: (event: Event) => {
+          if (effectiveDisabled.value || isReadOnly.value) return
           draftText.value = (event.target as HTMLInputElement).value
         },
         onClick: () => setOpenSafe(true),
-        onKeydown: handleInputKeyDown,
-        onBlur: parseDraft
+        onKeydown: handleInputKeyDown
       })
       const clearBtn = showClear.value
         ? h(
@@ -469,6 +530,9 @@ export const DatePicker = defineComponent({
           class: getInputPasswordToggleClasses(effectiveSize.value, { offsetSlots: 0 }),
           disabled: effectiveDisabled.value || isReadOnly.value,
           'aria-label': labels.value.toggleCalendar,
+          'aria-expanded': isOpen.value,
+          'aria-haspopup': 'dialog',
+          'aria-controls': isOpen.value ? panelId.value : undefined,
           onMousedown: (event: MouseEvent) => event.preventDefault(),
           onClick: () => setOpenSafe(!isOpen.value)
         },
@@ -546,7 +610,7 @@ export const DatePicker = defineComponent({
                         {
                           type: 'button',
                           class: datePickerFooterButtonClasses,
-                          onClick: () => setOpenSafe(false)
+                          onClick: confirmRange
                         },
                         labels.value.ok
                       )
@@ -580,7 +644,29 @@ export const DatePicker = defineComponent({
               ref: inputWrapperRef,
               class: getInputWrapperClasses(status.value, { inGroup: inGroup.value })
             },
-            [input, clearBtn, calendarBtn]
+            [
+              input,
+              effectiveName.value
+                ? h('input', {
+                    type: 'hidden',
+                    name: effectiveName.value,
+                    value: serializeDatePickerValue(props.range, committed.value),
+                    disabled: effectiveDisabled.value
+                  })
+                : null,
+              clearBtn,
+              calendarBtn,
+              h(
+                'div',
+                {
+                  id: `${panelId.value}-status`,
+                  role: 'status',
+                  'aria-live': 'polite',
+                  class: 'sr-only'
+                },
+                validationMessage.value ?? ''
+              )
+            ]
           ),
           renderVueOverlayTeleport(panel, overlay.target.value)
         ]

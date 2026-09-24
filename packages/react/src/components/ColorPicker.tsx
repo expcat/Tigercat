@@ -11,6 +11,7 @@ import {
   applyColorPickerAlpha,
   applyColorPickerHue,
   classNames,
+  COLOR_PICKER_INVALID_VALUE_TEXT,
   colorPickerBaseClasses,
   colorPickerCheckerboardStyle,
   colorPickerChromeLabelClasses,
@@ -26,6 +27,8 @@ import {
   commitPresetColor,
   createDocumentDragSession,
   cssColorFromHsva,
+  DEFAULT_COLOR_PICKER_HSVA,
+  describeColorPickerValue,
   formatHsva,
   getColorPickerAlphaTrackStyle,
   getColorPickerFormatLabel,
@@ -38,13 +41,13 @@ import {
   mergeHsvaHue,
   mergeTigerLocale,
   nudgeColorPickerSv,
-  parseColorInput,
   parseColorToHsva,
-  seedColorPickerHsva,
+  resolveColorPickerDrag,
   selectDoneActionClasses,
   selectDoneButtonClasses,
   SHAKE_CLASS,
-  runShakeAnimation
+  runShakeAnimation,
+  submittedColorPickerValue
 } from '@expcat/tigercat-core'
 import {
   renderOverlayPortal,
@@ -76,6 +79,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
       value,
       defaultValue,
       disabled = false,
+      readOnly = false,
       size = 'md',
       showAlpha = false,
       format = 'hex',
@@ -122,37 +126,35 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
       typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
         ? props['aria-labelledby']
         : formItemControl?.labelId
-    const parsedValue =
+    const externalValue =
       value !== undefined ? value : (formItemControl?.value as string | null | undefined)
+    const valueControlled = value !== undefined || formItemControl?.value !== undefined
 
-    const [committed, setCommitted] = useControlledState<string | null>({
-      value:
-        value !== undefined || formItemControl?.value !== undefined
-          ? isColorPickerEmpty(parsedValue)
-            ? null
-            : (parsedValue as string)
-          : undefined,
+    const [uncontrolled, setUncontrolled] = useControlledState<string | null>({
+      value: valueControlled ? (externalValue ?? null) : undefined,
       defaultValue: defaultValue ?? null,
       onChange: (next) => {
         onChange?.(next)
         formItemControl?.onChange?.(next)
       }
     })
+    const source = valueControlled ? (externalValue ?? null) : uncontrolled
     const [isOpen, setOpen] = useControlledState({
       value: open,
       defaultValue: defaultOpen,
       onChange: onOpenChange
     })
 
-    const draggingRef = useRef(false)
-    const [hsva, setHsva] = useState<HsvaColor>(() => seedColorPickerHsva(committed))
-    const hsvaRef = useRef(hsva)
-    hsvaRef.current = hsva
-    const [inputValue, setInputValue] = useState(() =>
-      isColorPickerEmpty(committed)
-        ? ''
-        : formatHsva(seedColorPickerHsva(committed), format, showAlpha)
-    )
+    const initialDescribed = describeColorPickerValue(source, format, showAlpha)
+    const [baseHsva, setBaseHsva] = useState<HsvaColor | null>(initialDescribed.hsva)
+    const [previewHsva, setPreviewHsva] = useState<HsvaColor | null>(null)
+    const previewRef = useRef<HsvaColor | null>(null)
+    const textDirtyRef = useRef(false)
+    const [inputValue, setInputValue] = useState(initialDescribed.text)
+    const [inputInvalid, setInputInvalid] = useState(initialDescribed.invalid)
+    const editingHsva = previewHsva ?? baseHsva ?? DEFAULT_COLOR_PICKER_HSVA
+    const editingRef = useRef(editingHsva)
+    editingRef.current = editingHsva
 
     const rootRef = useRef<HTMLDivElement>(null)
     const triggerRef = useRef<HTMLButtonElement>(null)
@@ -161,6 +163,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
     const dragSessionRef = useRef<{ dispose: () => void } | null>(null)
     const instanceId = useId()
     const panelId = `${instanceId}-panel`
+    const inputErrorId = `${instanceId}-error`
 
     const overlay = useAnchoredOverlay({
       enabled: isOpen,
@@ -190,17 +193,28 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
     }
 
     useEffect(() => {
-      if (draggingRef.current) return
-      const parsed = parseColorToHsva(committed)
-      if (parsed) {
-        setHsva((prev) => mergeHsvaHue(prev, parsed))
-        setInputValue(formatHsva(parsed, format, showAlpha))
+      if (previewRef.current) return
+      if (textDirtyRef.current && isColorPickerEmpty(source)) return
+      const next = describeColorPickerValue(source, format, showAlpha)
+      if (next.hsva) {
+        setBaseHsva((prev) => mergeHsvaHue(prev, next.hsva!))
+        setInputValue(next.text)
+        setInputInvalid(false)
+        textDirtyRef.current = false
         return
       }
-      if (isColorPickerEmpty(committed)) {
-        setInputValue('')
+      setBaseHsva(null)
+      if (source == null || String(source).trim() === '') {
+        if (!textDirtyRef.current) {
+          setInputValue('')
+          setInputInvalid(false)
+        }
+        return
       }
-    }, [committed, format, showAlpha])
+      setInputValue(next.text)
+      setInputInvalid(true)
+      textDirtyRef.current = false
+    }, [source, format, showAlpha])
 
     useEffect(() => {
       if (status === 'error') runShakeAnimation(rootRef.current)
@@ -224,19 +238,72 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
       [effectiveDisabled, setOpen]
     )
 
-    const commitHsva = useCallback(
-      (next: HsvaColor) => {
-        setHsva(next)
-        const formatted = formatHsva(next, format, showAlpha)
-        setInputValue(formatted)
-        setCommitted(formatted)
+    const writeCommitted = useCallback(
+      (next: string | null) => {
+        if (effectiveDisabled || readOnly) return
+        const current = source ?? null
+        if (current === next) return
+        if (isColorPickerEmpty(current) && (next == null || next === '')) return
+        setUncontrolled(next)
       },
-      [format, setCommitted, showAlpha]
+      [effectiveDisabled, readOnly, setUncontrolled, source]
     )
 
-    const displayColor = cssColorFromHsva(hsva, showAlpha)
-    const hasValue = !isColorPickerEmpty(committed)
-    const showClear = Boolean(clearable && hasValue && !effectiveDisabled)
+    const previewHsvaValue = useCallback(
+      (next: HsvaColor) => {
+        if (effectiveDisabled || readOnly) return
+        const resolved = resolveColorPickerDrag('preview', next, format, showAlpha)
+        previewRef.current = resolved.hsva
+        setPreviewHsva(resolved.hsva)
+      },
+      [effectiveDisabled, format, readOnly, showAlpha]
+    )
+
+    const commitHsva = useCallback(
+      (next: HsvaColor) => {
+        if (effectiveDisabled || readOnly) return
+        const resolved = resolveColorPickerDrag('commit', next, format, showAlpha)
+        previewRef.current = null
+        setPreviewHsva(null)
+        setBaseHsva(resolved.hsva)
+        setInputValue(resolved.value ?? '')
+        setInputInvalid(false)
+        textDirtyRef.current = false
+        writeCommitted(resolved.value)
+      },
+      [effectiveDisabled, format, readOnly, showAlpha, writeCommitted]
+    )
+
+    const commitTextDraft = useCallback(() => {
+      if (effectiveDisabled || readOnly) return
+      const raw = inputValue
+      if (raw.trim() === '') {
+        textDirtyRef.current = false
+        setInputInvalid(false)
+        setBaseHsva(null)
+        previewRef.current = null
+        setPreviewHsva(null)
+        writeCommitted(null)
+        return
+      }
+      const parsed = parseColorToHsva(raw)
+      if (!parsed) {
+        textDirtyRef.current = true
+        setInputInvalid(true)
+        previewRef.current = null
+        setPreviewHsva(null)
+        setBaseHsva(null)
+        writeCommitted(null)
+        return
+      }
+      commitHsva(mergeHsvaHue(baseHsva, parsed))
+    }, [baseHsva, commitHsva, effectiveDisabled, inputValue, readOnly, writeCommitted])
+
+    const paintableHsva = isColorPickerEmpty(source) ? null : baseHsva
+    const displayColor = paintableHsva ? cssColorFromHsva(paintableHsva, showAlpha) : ''
+    const previewColor = previewHsva ? cssColorFromHsva(previewHsva, showAlpha) : displayColor
+    const hasValue = paintableHsva != null
+    const showClear = Boolean(clearable && hasValue && !effectiveDisabled && !readOnly)
 
     function handleTriggerKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
       if (effectiveDisabled) return
@@ -248,8 +315,13 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         setOpenSafe(false)
       } else if ((event.key === 'Delete' || event.key === 'Backspace') && showClear) {
         event.preventDefault()
-        setCommitted(null)
+        textDirtyRef.current = false
+        setInputInvalid(false)
         setInputValue('')
+        setBaseHsva(null)
+        previewRef.current = null
+        setPreviewHsva(null)
+        writeCommitted(null)
       }
     }
 
@@ -266,19 +338,18 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
     }
 
     function startSvDrag(event: React.PointerEvent<HTMLDivElement>) {
-      if (effectiveDisabled) return
+      if (effectiveDisabled || readOnly) return
       event.preventDefault()
       const plane = svRef.current
       if (!plane) return
-      draggingRef.current = true
       const apply = (clientX: number, clientY: number) => {
-        commitHsva(
+        previewHsvaValue(
           hsvaFromSvPointer(
             clientX,
             clientY,
             plane.getBoundingClientRect(),
-            hsvaRef.current.h,
-            hsvaRef.current.a
+            editingRef.current.h,
+            editingRef.current.a
           )
         )
       }
@@ -292,60 +363,76 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         dragThreshold: 0,
         onMove: (payload) => apply(payload.currentX, payload.currentY),
         onEnd: () => {
-          draggingRef.current = false
+          const pending = previewRef.current
           dragSessionRef.current = null
+          if (pending) commitHsva(pending)
         }
       })
     }
 
     function handleSvKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+      if (readOnly) return
       const step = event.shiftKey ? 10 : 2
+      const current = editingRef.current
       let next: HsvaColor | null = null
-      if (event.key === 'ArrowRight') next = nudgeColorPickerSv(hsva, step, 0)
-      else if (event.key === 'ArrowLeft') next = nudgeColorPickerSv(hsva, -step, 0)
-      else if (event.key === 'ArrowUp') next = nudgeColorPickerSv(hsva, 0, step)
-      else if (event.key === 'ArrowDown') next = nudgeColorPickerSv(hsva, 0, -step)
+      if (event.key === 'ArrowRight') next = nudgeColorPickerSv(current, step, 0)
+      else if (event.key === 'ArrowLeft') next = nudgeColorPickerSv(current, -step, 0)
+      else if (event.key === 'ArrowUp') next = nudgeColorPickerSv(current, 0, step)
+      else if (event.key === 'ArrowDown') next = nudgeColorPickerSv(current, 0, -step)
       if (!next) return
       event.preventDefault()
       commitHsva(next)
     }
 
-    function handleHueChange(event: React.ChangeEvent<HTMLInputElement>) {
-      draggingRef.current = true
-      commitHsva(applyColorPickerHue(hsva, Number(event.target.value)))
-      draggingRef.current = false
+    function handleHuePreview(event: React.ChangeEvent<HTMLInputElement>) {
+      previewHsvaValue(applyColorPickerHue(editingRef.current, Number(event.target.value)))
     }
 
-    function handleAlphaChange(event: React.ChangeEvent<HTMLInputElement>) {
-      draggingRef.current = true
-      commitHsva(applyColorPickerAlpha(hsva, Number(event.target.value) / 100))
-      draggingRef.current = false
+    function handleAlphaPreview(event: React.ChangeEvent<HTMLInputElement>) {
+      previewHsvaValue(applyColorPickerAlpha(editingRef.current, Number(event.target.value) / 100))
+    }
+
+    function commitSlider(kind: 'hue' | 'alpha', raw: string) {
+      const current = previewRef.current ?? editingRef.current
+      commitHsva(
+        kind === 'hue'
+          ? applyColorPickerHue(current, Number(raw))
+          : applyColorPickerAlpha(current, Number(raw) / 100)
+      )
     }
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+      if (readOnly) return
       const raw = event.target.value
+      textDirtyRef.current = true
       setInputValue(raw)
-      const parsed = parseColorInput(raw, format, showAlpha)
-      if (!parsed) return
-      const next = parseColorToHsva(parsed)
-      if (!next) return
-      setHsva(next)
-      setCommitted(parsed)
+      setInputInvalid(raw.trim() !== '' && parseColorToHsva(raw) == null)
+    }
+
+    function handleTextKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+      if (event.key !== 'Enter') return
+      event.preventDefault()
+      commitTextDraft()
     }
 
     function handlePreset(color: string) {
-      const formatted = commitPresetColor(color, hsva, format, showAlpha)
+      if (readOnly) return
+      const formatted = commitPresetColor(color, editingRef.current, format, showAlpha)
       if (!formatted) return
       const next = parseColorToHsva(formatted)
-      if (next) setHsva(next)
-      setInputValue(formatted)
-      setCommitted(formatted)
+      if (!next) return
+      commitHsva(next)
       if (closeOnSelect) setOpenSafe(false)
     }
 
     function handleClear() {
-      setCommitted(null)
+      textDirtyRef.current = false
+      setInputInvalid(false)
       setInputValue('')
+      setBaseHsva(null)
+      previewRef.current = null
+      setPreviewHsva(null)
+      writeCommitted(null)
     }
 
     const triggerSwatchStyle: React.CSSProperties = {
@@ -358,9 +445,9 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
     }
 
     const svStyle = {
-      ...getColorPickerSvPlaneStyle(hsva.h)
+      ...getColorPickerSvPlaneStyle(editingHsva.h)
     }
-    const alphaStyle = getColorPickerAlphaTrackStyle(hsva)
+    const alphaStyle = getColorPickerAlphaTrackStyle(editingHsva)
 
     const panel = isOpen ? (
       <div
@@ -375,9 +462,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         data-tiger-colorpicker-panel=""
         onBlur={handleFocusOut}>
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-medium text-[var(--tiger-text,#111827)]">
-            {labels.panelTitle}
-          </span>
+          <span className="text-xs font-medium text-[var(--tiger-text)]">{labels.panelTitle}</span>
           {showClear ? (
             <button
               type="button"
@@ -398,14 +483,15 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           aria-label={`${labels.saturation}, ${labels.brightness}`}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-valuenow={Math.round(hsva.s)}
-          aria-valuetext={`${labels.saturation} ${Math.round(hsva.s)}, ${labels.brightness} ${Math.round(hsva.v)}`}
+          aria-valuenow={Math.round(editingHsva.s)}
+          aria-valuetext={`${labels.saturation} ${Math.round(editingHsva.s)}, ${labels.brightness} ${Math.round(editingHsva.v)}`}
+          aria-readonly={readOnly || undefined}
           data-tiger-colorpicker-sv=""
           onPointerDown={startSvDrag}
           onKeyDown={handleSvKeyDown}>
           <span
             className={colorPickerSvThumbClasses}
-            style={{ left: `${hsva.s}%`, top: `${100 - hsva.v}%` }}
+            style={{ left: `${editingHsva.s}%`, top: `${100 - editingHsva.v}%` }}
             aria-hidden="true"
           />
         </div>
@@ -416,12 +502,20 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
             type="range"
             min={0}
             max={360}
-            value={Math.round(hsva.h)}
+            value={Math.round(editingHsva.h)}
             className={colorPickerSliderTrackClasses}
             style={colorPickerHueTrackStyle}
             aria-label={labels.hue}
+            aria-readonly={readOnly || undefined}
             disabled={effectiveDisabled}
-            onChange={handleHueChange}
+            onChange={handleHuePreview}
+            onPointerUp={(event) => commitSlider('hue', event.currentTarget.value)}
+            onKeyUp={(event) => {
+              if (!event.key.startsWith('Arrow') && event.key !== 'Home' && event.key !== 'End') {
+                return
+              }
+              commitSlider('hue', event.currentTarget.value)
+            }}
           />
         </div>
 
@@ -432,12 +526,20 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
               type="range"
               min={0}
               max={100}
-              value={Math.round(hsva.a * 100)}
+              value={Math.round(editingHsva.a * 100)}
               className={colorPickerSliderTrackClasses}
               style={alphaStyle}
               aria-label={labels.alpha}
+              aria-readonly={readOnly || undefined}
               disabled={effectiveDisabled}
-              onChange={handleAlphaChange}
+              onChange={handleAlphaPreview}
+              onPointerUp={(event) => commitSlider('alpha', event.currentTarget.value)}
+              onKeyUp={(event) => {
+                if (!event.key.startsWith('Arrow') && event.key !== 'Home' && event.key !== 'End') {
+                  return
+                }
+                commitSlider('alpha', event.currentTarget.value)
+              }}
             />
           </div>
         ) : null}
@@ -448,12 +550,25 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           </label>
           <input
             type="text"
-            className={colorPickerInputClasses}
+            className={classNames(
+              colorPickerInputClasses,
+              inputInvalid && 'border-[var(--tiger-error)]'
+            )}
             value={inputValue}
             aria-label={labels.value}
+            aria-invalid={inputInvalid || undefined}
+            aria-describedby={inputInvalid ? inputErrorId : undefined}
             disabled={effectiveDisabled}
+            readOnly={readOnly}
             onChange={handleInputChange}
+            onBlur={commitTextDraft}
+            onKeyDown={handleTextKeyDown}
           />
+          {inputInvalid ? (
+            <p id={inputErrorId} className="text-xs text-[var(--tiger-error)]" aria-live="polite">
+              {COLOR_PICKER_INVALID_VALUE_TEXT}
+            </p>
+          ) : null}
         </div>
 
         <div className="flex items-center gap-2">
@@ -461,13 +576,17 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
             className={colorPickerPreviewClasses}
             style={{
               ...colorPickerCheckerboardStyle,
-              boxShadow: `inset 0 0 0 999px ${displayColor}`
+              ...(previewColor ? { boxShadow: `inset 0 0 0 999px ${previewColor}` } : null)
             }}
             role="img"
             aria-hidden="true"
           />
-          <span className="text-xs font-mono text-[var(--tiger-text,#111827)]">
-            {hasValue ? formatHsva(hsva, format, showAlpha) : ''}
+          <span className="text-xs font-mono text-[var(--tiger-text)]">
+            {previewHsva
+              ? formatHsva(previewHsva, format, showAlpha)
+              : hasValue
+                ? formatHsva(paintableHsva!, format, showAlpha)
+                : ''}
           </span>
         </div>
 
@@ -475,9 +594,12 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           <FormItemControlProvider value={null}>
             <ColorSwatch
               colors={presets}
-              value={hasValue ? formatHsva(hsva, 'hex', false) : undefined}
+              value={
+                hasValue ? formatHsva(paintableHsva!, format, showAlpha) : undefined
+              }
               columns={Math.min(8, presets.length)}
               size="sm"
+              readOnly={readOnly}
               ariaLabel={labels.swatches}
               onChange={(color) => handlePreset(color)}
             />
@@ -502,7 +624,12 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         style={style}
         onBlur={handleFocusOut}>
         {effectiveName ? (
-          <input type="hidden" name={effectiveName} value={hasValue ? (committed ?? '') : ''} />
+          <input
+            type="hidden"
+            name={effectiveName}
+            value={submittedColorPickerValue(source)}
+            disabled={effectiveDisabled || undefined}
+          />
         ) : null}
         <button
           ref={setTriggerRef}
@@ -516,7 +643,8 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           title={labels.trigger}
           aria-haspopup="dialog"
           aria-expanded={isOpen}
-          aria-controls={isOpen ? panelId : undefined}
+          aria-controls={panelId}
+          aria-readonly={readOnly || undefined}
           aria-invalid={status === 'error' ? true : undefined}
           aria-required={formItemControl?.required || undefined}
           disabled={effectiveDisabled}

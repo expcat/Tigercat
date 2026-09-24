@@ -28,10 +28,11 @@ describe('NumberKeyboard', () => {
     expect(screen.getByRole('button', { name: confirmName })).toBeInTheDocument()
   })
 
-  it('is a single tab stop', () => {
+  it('uses a roving tabindex on the active key', () => {
     render(NumberKeyboard)
-    expect(keypad()).toHaveAttribute('tabindex', '0')
-    expect(screen.getAllByRole('button').every((button) => button.tabIndex === -1)).toBe(true)
+    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('tabindex', '0')
+    expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('tabindex', '-1')
+    expect(screen.getByRole('button', { name: '1' }).className).toMatch(/ring-/)
   })
 
   it('does not expose the empty spacer as a button', () => {
@@ -48,7 +49,7 @@ describe('NumberKeyboard', () => {
     const { emitted } = render(NumberKeyboard)
     await fireEvent.click(screen.getByRole('button', { name: '1' }))
     await fireEvent.click(screen.getByRole('button', { name: '2' }))
-    expect(emitted().change.map(([value]) => value)).toEqual(['1', '12'])
+    expect(emitted()['update:modelValue'].map(([value]) => value)).toEqual(['1', '12'])
   })
 
   it('uses modelValue when provided', async () => {
@@ -67,22 +68,41 @@ describe('NumberKeyboard', () => {
   it('does not emit when disabled', async () => {
     const { emitted } = render(NumberKeyboard, { props: { disabled: true } })
     await fireEvent.click(screen.getByRole('button', { name: '1' }))
-    expect(emitted().change).toBeUndefined()
+    expect(emitted()['update:modelValue']).toBeUndefined()
     expect(keypad()).toHaveAttribute('aria-disabled', 'true')
   })
 
-  it('does not emit when readonly but stays focusable', async () => {
-    const { emitted } = render(NumberKeyboard, { props: { readonly: true } })
+  it('does not emit when readOnly but stays focusable', async () => {
+    const { emitted } = render(NumberKeyboard, { props: { readOnly: true } })
     await fireEvent.click(screen.getByRole('button', { name: '1' }))
-    expect(emitted().change).toBeUndefined()
+    expect(emitted()['update:modelValue']).toBeUndefined()
     expect(keypad()).toHaveAttribute('tabindex', '0')
+    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-disabled', 'true')
   })
 
   it('types from the focused keypad', async () => {
     const { emitted } = render(NumberKeyboard)
     keypad().focus()
     await fireEvent.keyDown(keypad(), { key: '5' })
-    expect(emitted().change[0][0]).toBe('5')
+    expect(emitted()['update:modelValue'][0][0]).toBe('5')
+  })
+
+  it('clears an illegal amount instead of extending it', async () => {
+    const onUpdate = vi.fn()
+    const { container } = render(NumberKeyboard, {
+      props: { mode: 'amount', modelValue: '1.2.3', name: 'amt', 'onUpdate:modelValue': onUpdate }
+    })
+    expect(container.querySelector('input[name="amt"]')).toHaveValue('')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).toHaveTextContent(
+      /does not match/
+    )
+    await fireEvent.click(screen.getByRole('button', { name: '4' }))
+    expect(onUpdate).toHaveBeenCalledWith('4')
+  })
+
+  it('keeps a single named field while the sheet is open', () => {
+    render(NumberKeyboard, { props: { name: 'pin', defaultOpen: true, defaultValue: '8' } })
+    expect(document.querySelectorAll('input[name="pin"]')).toHaveLength(1)
   })
 
   it('closes the overlay on confirm', async () => {

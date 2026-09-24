@@ -13,7 +13,9 @@ import {
   applyCronFieldMode,
   buildCronFieldValueFromDraft,
   classNames,
+  cronDraftErrorMessage,
   cronEditorBaseClasses,
+  cronFormValue,
   cronEditorErrorClasses,
   cronEditorFieldClasses,
   cronEditorFieldsClasses,
@@ -25,7 +27,6 @@ import {
   getCronEditorLabels,
   getCronExpressionIssue,
   getCronFieldIssue,
-  getCronFieldValue,
   getCronModeLabels,
   getDefaultCronPresets,
   isCronExpressionEmpty,
@@ -34,7 +35,7 @@ import {
   mergeAriaDescribedBy,
   mergeTigerLocale,
   parseOptionalInt,
-  seedCronFieldDraft,
+  seedCronFieldDrafts,
   updateCronExpressionField,
   validateCronExpressionWithLabels
 } from '@expcat/tigercat-core'
@@ -56,7 +57,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     value,
     defaultValue,
     disabled = false,
-    readonly = false,
+    readOnly = false,
     size = 'md',
     presets,
     ariaLabel,
@@ -103,22 +104,22 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
   )
   const modeLabels = useMemo(() => getCronModeLabels(labels), [labels])
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
-  const inactive = effectiveDisabled || readonly
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
   const effectiveId = id ?? formItemControl?.id
   const effectiveName = name ?? formItemControl?.name
   const describedBy = mergeAriaDescribedBy(formItemControl?.describedBy, undefined)
   const labelledby = formItemControl?.labelId
   const parsedValue = value !== undefined ? value : (formItemControl?.value as string | null | undefined)
+  const valueControlled = value !== undefined || formItemControl?.value !== undefined
 
+  const modelSource = valueControlled
+    ? parsedValue == null
+      ? ''
+      : String(parsedValue)
+    : undefined
   const [expression, setExpression] = useControlledState<string | null, [CronValidationResult]>({
-    value:
-      value !== undefined || formItemControl?.value !== undefined
-        ? isCronExpressionEmpty(parsedValue)
-          ? null
-          : (parsedValue as string)
-        : undefined,
-    defaultValue: isCronExpressionEmpty(defaultValue) ? null : (defaultValue ?? null),
+    value: valueControlled ? cronFormValue(modelSource) : undefined,
+    defaultValue: cronFormValue(defaultValue),
     onChange: (next, validation) => {
       onChange?.(next, validation)
       onValidate?.(validation)
@@ -126,49 +127,96 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     }
   })
 
-  const currentExpression = expression ?? ''
-  const validation = useMemo(
-    () => validateCronExpressionWithLabels(currentExpression, labels, fieldLabels),
-    [currentExpression, labels, fieldLabels]
+  const externalRaw = valueControlled ? (modelSource ?? '') : (expression ?? '')
+  const [expressionDraft, setExpressionDraft] = useState(() =>
+    value !== undefined
+      ? (value ?? '')
+      : formItemControl?.value !== undefined
+        ? parsedValue == null
+          ? ''
+          : String(parsedValue)
+        : (defaultValue ?? '')
   )
-  const fieldsReady = isCronFieldCountValid(currentExpression)
+  const echoedRef = useRef<string | null | undefined>(undefined)
+  const draftRef = useRef(expressionDraft)
+  draftRef.current = expressionDraft
+
+  useEffect(() => {
+    if (!valueControlled) return
+    const next = externalRaw
+    if (echoedRef.current !== undefined && (echoedRef.current ?? '') === next) {
+      echoedRef.current = undefined
+      return
+    }
+    if (next === draftRef.current) return
+    if (next === '' && (cronFormValue(draftRef.current) ?? '') === '') return
+    setExpressionDraft(next)
+  }, [externalRaw, valueControlled])
+
+  const validation = useMemo(
+    () => validateCronExpressionWithLabels(expressionDraft, labels, fieldLabels),
+    [expressionDraft, labels, fieldLabels]
+  )
+  const fieldsReady = !isCronExpressionEmpty(expressionDraft) && isCronFieldCountValid(expressionDraft)
+  const submittedValue = cronFormValue(expressionDraft) ?? ''
   const instanceId = useId()
   const errorId = `${instanceId}-error`
   const stickyModes = useRef<Partial<Record<CronFieldKey, CronFieldMode>>>({})
   const [drafts, setDrafts] = useState<Record<CronFieldKey, CronFieldDraft>>(() =>
-    seedAllDrafts(currentExpression, stickyModes.current)
+    seedCronFieldDrafts(expressionDraft, stickyModes.current)
   )
+  const lastErrorRef = useRef<string | null>(null)
 
   useEffect(() => {
-    setDrafts(seedAllDrafts(currentExpression, stickyModes.current))
-  }, [currentExpression])
+    setDrafts(seedCronFieldDrafts(expressionDraft, stickyModes.current))
+  }, [expressionDraft])
+
+  useEffect(() => {
+    const message = cronDraftErrorMessage(expressionDraft, validation)
+    if (message === lastErrorRef.current) return
+    const previous = lastErrorRef.current
+    lastErrorRef.current = message
+    if (message) formItemControl?.setError?.(message)
+    else if (previous) formItemControl?.setError?.(null)
+  }, [expressionDraft, formItemControl, validation])
 
   function commit(nextValue: string) {
-    const stored = nextValue.trim() === '' ? null : nextValue
-    const nextValidation = validateCronExpressionWithLabels(stored ?? '', labels, fieldLabels)
-    setExpression(stored, nextValidation)
+    if (effectiveDisabled || readOnly) return
+    setExpressionDraft(nextValue)
+    const stored = cronFormValue(nextValue)
+    const nextValidation = validateCronExpressionWithLabels(nextValue, labels, fieldLabels)
+    const currentStored = cronFormValue(valueControlled ? externalRaw : expression)
+    if (currentStored !== stored) {
+      echoedRef.current = stored
+      setExpression(stored, nextValidation)
+      return
+    }
+    onValidate?.(nextValidation)
   }
 
   function handleRawExpressionChange(nextValue: string) {
+    if (readOnly) return
     stickyModes.current = {}
     commit(nextValue)
   }
 
   function writeField(meta: CronFieldMeta, draft: CronFieldDraft) {
-    const raw = buildCronFieldValueFromDraft(draft, meta)
-    if (isCronExpressionEmpty(currentExpression)) {
+    if (!fieldsReady && isCronExpressionEmpty(expressionDraft)) {
       const parts = ['*', '*', '*', '*', '*']
       const index = cronFieldMetas.findIndex((item) => item.key === meta.key)
-      parts[index] = raw
+      parts[index] = buildCronFieldValueFromDraft(draft, meta)
       commit(parts.join(' '))
       return
     }
-    const updated = updateCronExpressionField(currentExpression, meta.key, raw)
+    if (!fieldsReady) return
+    const raw = buildCronFieldValueFromDraft(draft, meta)
+    const updated = updateCronExpressionField(expressionDraft, meta.key, raw)
     if (updated == null) return
     commit(updated)
   }
 
   function handleModeChange(meta: CronFieldMeta, mode: CronFieldMode) {
+    if (effectiveDisabled || readOnly || !fieldsReady) return
     stickyModes.current[meta.key] = mode
     const next = applyCronFieldMode(drafts[meta.key], mode, meta)
     setDrafts((prev) => ({ ...prev, [meta.key]: next }))
@@ -199,9 +247,11 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
           inputMode="numeric"
           className={getCronEditorControlClasses(size, invalid)}
           value={draft.stepText}
-          disabled={inactive || !fieldsReady}
+          disabled={effectiveDisabled || !fieldsReady}
+          readOnly={readOnly}
           aria-label={formatCronControlLabel(labels.stepAriaLabel, meta.label)}
           onChange={(event) => {
+            if (readOnly) return
             const text = event.target.value
             patchDraft(meta, { stepText: text, mode: 'every' }, parseOptionalInt(text) != null)
           }}
@@ -216,9 +266,11 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
           inputMode="numeric"
           className={getCronEditorControlClasses(size, invalid)}
           value={draft.valueText}
-          disabled={inactive || !fieldsReady}
+          disabled={effectiveDisabled || !fieldsReady}
+          readOnly={readOnly}
           aria-label={formatCronControlLabel(labels.valueAriaLabel, meta.label)}
           onChange={(event) => {
+            if (readOnly) return
             const text = event.target.value
             patchDraft(meta, { valueText: text, mode: 'specific' }, parseOptionalInt(text) != null)
           }}
@@ -234,9 +286,11 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
             inputMode="numeric"
             className={getCronEditorControlClasses(size, invalid)}
             value={draft.startText}
-            disabled={inactive || !fieldsReady}
+            disabled={effectiveDisabled || !fieldsReady}
+            readOnly={readOnly}
             aria-label={formatCronControlLabel(labels.rangeStartAriaLabel, meta.label)}
             onChange={(event) => {
+              if (readOnly) return
               const text = event.target.value
               patchDraft(
                 meta,
@@ -250,9 +304,11 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
             inputMode="numeric"
             className={getCronEditorControlClasses(size, invalid)}
             value={draft.endText}
-            disabled={inactive || !fieldsReady}
+            disabled={effectiveDisabled || !fieldsReady}
+            readOnly={readOnly}
             aria-label={formatCronControlLabel(labels.rangeEndAriaLabel, meta.label)}
             onChange={(event) => {
+              if (readOnly) return
               const text = event.target.value
               patchDraft(
                 meta,
@@ -270,15 +326,19 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
         type="text"
         className={getCronEditorControlClasses(size, invalid)}
         value={draft.raw}
-        disabled={inactive || !fieldsReady}
+        disabled={effectiveDisabled || !fieldsReady}
+        readOnly={readOnly}
         aria-label={formatCronControlLabel(labels.customValueAriaLabel, meta.label)}
-        onChange={(event) => patchDraft(meta, { raw: event.target.value, mode: 'custom' }, true)}
+        onChange={(event) => {
+          if (readOnly) return
+          patchDraft(meta, { raw: event.target.value, mode: 'custom' }, true)
+        }}
       />
     )
   }
 
   const expressionIssue = getCronExpressionIssue(validation)
-  const expressionInvalid = Boolean(expressionIssue) && !isCronExpressionEmpty(currentExpression)
+  const expressionInvalid = Boolean(expressionIssue) && !isCronExpressionEmpty(expressionDraft)
   const groupName = ariaLabel ?? labels.ariaLabel
 
   return (
@@ -291,17 +351,25 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
       aria-labelledby={labelledby}
       aria-describedby={describedBy}
       aria-invalid={status === 'error' || expressionInvalid ? true : undefined}
+      aria-readonly={readOnly || undefined}
       onBlur={handleBlur}>
+      {effectiveName ? (
+        <input
+          type="hidden"
+          name={effectiveName}
+          value={submittedValue}
+          disabled={effectiveDisabled || undefined}
+        />
+      ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
           ref={ref}
           type="text"
           id={effectiveId}
-          name={effectiveName}
           className={classNames(getCronEditorControlClasses(size, expressionInvalid), 'flex-1')}
-          value={currentExpression}
+          value={expressionDraft}
           disabled={effectiveDisabled}
-          readOnly={readonly}
+          readOnly={readOnly}
           aria-label={labels.expressionAriaLabel}
           aria-invalid={expressionInvalid || undefined}
           aria-describedby={expressionIssue ? errorId : describedBy}
@@ -311,17 +379,16 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
           <select
             className={getCronEditorControlClasses(size)}
             value={
-              resolvedPresets.some((preset) => preset.value === currentExpression)
-                ? currentExpression
+              resolvedPresets.some((preset) => preset.value === expressionDraft)
+                ? expressionDraft
                 : ''
             }
-            disabled={inactive}
+            disabled={effectiveDisabled}
             aria-label={labels.presetAriaLabel}
             onChange={(event) => {
-              if (event.target.value) {
-                stickyModes.current = {}
-                commit(event.target.value)
-              }
+              if (readOnly || !event.target.value) return
+              stickyModes.current = {}
+              commit(event.target.value)
             }}>
             <option value="">{labels.presetPlaceholder}</option>
             {resolvedPresets.map((preset) => (
@@ -334,7 +401,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
       </div>
 
       {expressionIssue ? (
-        <div id={errorId} className={cronEditorErrorClasses} role="alert">
+        <div id={errorId} className={cronEditorErrorClasses} aria-live="polite">
           {expressionIssue.message}
         </div>
       ) : null}
@@ -354,12 +421,13 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
               <select
                 id={modeId}
                 className={getCronEditorControlClasses(size, Boolean(issue))}
-                value={draft.mode}
-                disabled={inactive || !fieldsReady}
+                value={fieldsReady ? draft.mode : ''}
+                disabled={effectiveDisabled || !fieldsReady}
                 aria-invalid={issue ? true : undefined}
                 aria-describedby={issue ? fieldErrorId : undefined}
                 aria-label={formatCronControlLabel(labels.modeAriaLabel, meta.label)}
                 onChange={(event) => handleModeChange(meta, event.target.value as CronFieldMode)}>
+                {fieldsReady ? null : <option value="">{'\u00a0'}</option>}
                 {cronFieldModes.map((mode) => (
                   <option key={mode} value={mode}>
                     {modeLabels[mode]}
@@ -381,18 +449,5 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
 })
 
 export const CronEditor = markFormItemGroupControl(CronEditorInner)
-
-function seedAllDrafts(
-  expression: string,
-  sticky: Partial<Record<CronFieldKey, CronFieldMode>>
-): Record<CronFieldKey, CronFieldDraft> {
-  const ready = isCronFieldCountValid(expression)
-  return Object.fromEntries(
-    cronFieldMetas.map((meta) => {
-      const raw = ready ? (getCronFieldValue(expression, meta.key) ?? '*') : '*'
-      return [meta.key, seedCronFieldDraft(raw, sticky[meta.key])]
-    })
-  ) as Record<CronFieldKey, CronFieldDraft>
-}
 
 export default CronEditor

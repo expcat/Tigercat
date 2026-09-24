@@ -52,9 +52,10 @@ export interface DatePickerShortcut {
  *
  * Dates are calendar days (local midnight). A UTC-midnight `Date` such as
  * `new Date('2024-01-15')` is that calendar day in every timezone.
- * `format` is used for both the input display and typed parse.
+ * `format` is the input display and typed parse. Display may use a locale
+ * calendar and digits; `name` submits one Gregorian `YYYY-MM-DD`
+ * (a range uses `start|end`). Empty submits `''`.
  * Empty range is `null`. A partial range is a `[start, end]` tuple.
- * `name` submits the formatted display string.
  */
 export interface DatePickerProps {
   /** Locale object merged on top of ConfigProvider. Do not pass a language id string. */
@@ -80,10 +81,10 @@ export interface DatePickerProps {
    */
   disabled?: boolean
   /**
-   * When true, the field cannot be typed and the calendar cannot open.
+   * When true, the field can focus and submit but cannot change or open to edit.
    * @default false
    */
-  readonly?: boolean
+  readOnly?: boolean
   /**
    * @default false
    */

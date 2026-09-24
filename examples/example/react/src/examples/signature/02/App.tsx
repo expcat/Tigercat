@@ -16,7 +16,7 @@ export default function App() {
           value={red}
           onChange={setRed}
         />
-        <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">penColor 红 · lineWidth 2</p>
+        <p className="text-xs text-[var(--tiger-text-secondary)]">penColor 红 · lineWidth 2</p>
       </div>
       <div className="w-[280px] space-y-1">
         <Signature
@@ -28,7 +28,7 @@ export default function App() {
           value={dark}
           onChange={setDark}
         />
-        <p className="text-xs text-[var(--tiger-text-muted,#6b7280)]">
+        <p className="text-xs text-[var(--tiger-text-secondary)]">
           backgroundColor 深色 · lineWidth 4
         </p>
       </div>

@@ -88,10 +88,17 @@ describe('Cascader', () => {
     const validator = vi.fn().mockResolvedValue(undefined)
     const Wrapper = defineComponent({
       setup() {
+        const model = ref<{ region?: unknown }>({})
         return () =>
           h(
             Form,
-            { model: { region: undefined }, rules: { region: [{ validator, trigger: 'change' }] } },
+            {
+              modelValue: model.value,
+              'onUpdate:modelValue': (next: { region?: unknown }) => {
+                model.value = next
+              },
+              rules: { region: [{ validator, trigger: 'change' }] }
+            },
             {
               default: () =>
                 h(

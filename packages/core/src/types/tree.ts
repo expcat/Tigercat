@@ -123,8 +123,8 @@ export interface TreeProps {
    */
   treeData?: TreeNode[]
   /**
-   * Selection mode. When set, overrides `selectable` / `multiple`.
-   * Omit to use `selectable` (default true) and `multiple` (default false).
+   * Selection mode.
+   * @default 'single'
    */
   selectionMode?: TreeSelectionMode
   /**
@@ -164,10 +164,10 @@ export interface TreeProps {
    */
   selectedKeys?: TreeNodeKey[]
   /**
-   * Checked node keys. Arrays in, arrays out. Objects are accepted as an input
-   * snapshot (`checked` + `halfChecked`) and still emit an array.
+   * Checked node keys. Always an array. Indeterminate keys are computed inside
+   * the tree and are not part of this value.
    */
-  checkedKeys?: TreeNodeKey[] | TreeCheckedState
+  checkedKeys?: TreeNodeKey[]
   /**
    * Expand every current node. Combined with `defaultExpandedKeys` (union) when
    * uncontrolled. Applied again when `treeData` later fills in, until the user
@@ -185,16 +185,6 @@ export interface TreeProps {
    * @default 'all'
    */
   checkStrategy?: TreeCheckStrategy
-  /**
-   * Whether clicking a node selects it. Ignored when `selectionMode` is set.
-   * @default true
-   */
-  selectable?: boolean
-  /**
-   * Whether multiple nodes can be selected. Ignored when `selectionMode` is set.
-   * @default false
-   */
-  multiple?: boolean
   /**
    * Allow clicking a selected single-select node to clear it.
    * @default false

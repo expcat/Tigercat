@@ -10,7 +10,7 @@ const dark = ref('')
   <div class="flex flex-wrap gap-4">
     <div class="w-[280px] space-y-1">
       <Signature :width="280" :height="140" pen-color="#dc2626" :line-width="2" v-model="red" />
-      <p class="text-xs text-[var(--tiger-text-muted,#6b7280)]">penColor 红 · lineWidth 2</p>
+      <p class="text-xs text-[var(--tiger-text-secondary)]">penColor 红 · lineWidth 2</p>
     </div>
     <div class="w-[280px] space-y-1">
       <Signature
@@ -20,7 +20,7 @@ const dark = ref('')
         background-color="#0f172a"
         :line-width="4"
         v-model="dark" />
-      <p class="text-xs text-[var(--tiger-text-muted,#6b7280)]">
+      <p class="text-xs text-[var(--tiger-text-secondary)]">
         backgroundColor 深色 · lineWidth 4
       </p>
     </div>

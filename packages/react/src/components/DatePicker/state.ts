@@ -2,10 +2,12 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
+  acceptDatePickerCandidate,
   coerceDatePickerRange,
   coerceDatePickerSingle,
   commitDatePickerDay,
   commitDatePickerToday,
+  confirmDatePicker,
   emptyDatePickerValue,
   formatDatePickerDisplay,
   formDatePickerValue,
@@ -16,14 +18,15 @@ import {
   getLocaleDirection,
   getWeekStartsOn,
   isDatePickerValueEmpty,
+  isSameDatePickerValue,
   mergeAriaDescribedBy,
   mergeTigerLocale,
   parseDatePickerShortcut,
-  parseTypedDatePickerValue,
   resolveDatePickerDisabled,
   resolveInputTrailingLayout,
-  resolveReadOnlyFlag,
+  resolveTypedDatePickerCommit,
   runShakeAnimation,
+  serializeDatePickerValue,
   toCalendarDate,
   type DateFormat,
   type DatePickerShortcut,
@@ -40,7 +43,7 @@ export function useDatePickerController(props: DatePickerProps) {
   const {
     size = 'md',
     disabled = false,
-    readonly: readonlyProp,
+    readOnly = false,
     required = false,
     clearable = true,
     format = 'yyyy-MM-dd' as DateFormat,
@@ -57,7 +60,7 @@ export function useDatePickerController(props: DatePickerProps) {
     onBlur
   } = props
 
-  const isReadOnly = resolveReadOnlyFlag(readonlyProp, (props as { readOnly?: boolean }).readOnly)
+  const isReadOnly = readOnly === true
   const config = useTigerConfig()
   const inputGroup = useInputGroupContext()
   const formItemControl = useFormItemControlContext()
@@ -126,7 +129,7 @@ export function useDatePickerController(props: DatePickerProps) {
       } else {
         ;(props.onChange as ((value: Date | null) => void) | undefined)?.(next as Date | null)
       }
-      formItemControl?.onChange?.(formDatePickerValue(isRangeMode, next, null))
+      formItemControl?.onChange?.(formDatePickerValue(isRangeMode, next))
     }
   })
 
@@ -138,6 +141,7 @@ export function useDatePickerController(props: DatePickerProps) {
 
   const [previewRange, setPreviewRange] = useState<DatePickerRangeResolvedValue | null>(null)
   const [draftText, setDraftText] = useState<string | null>(null)
+  const [validationMessage, setValidationMessage] = useState<string | null>(null)
 
   const displaySource = isRangeMode ? (previewRange ?? committed) : committed
   const displayValue =
@@ -157,20 +161,18 @@ export function useDatePickerController(props: DatePickerProps) {
   const rangeHighlight = isRangeMode
     ? (previewRange ?? (Array.isArray(committed) ? committed : undefined))
     : undefined
-  const rangeSelectingEnd = Boolean(
-    isRangeMode && previewRange && previewRange[0] && !previewRange[1]
+  const bounds = useMemo(
+    () => ({
+      minDate,
+      maxDate,
+      disabledDate: props.disabledDate
+    }),
+    [maxDate, minDate, props.disabledDate]
   )
 
   const isDateDisabled = useCallback(
-    (date: Date) =>
-      resolveDatePickerDisabled(date, {
-        minDate,
-        maxDate,
-        disabledDate: props.disabledDate,
-        rangeStart: previewRange?.[0] ?? null,
-        rangeSelectingEnd
-      }),
-    [minDate, maxDate, previewRange, props.disabledDate, rangeSelectingEnd]
+    (date: Date) => resolveDatePickerDisabled(date, bounds),
+    [bounds]
   )
 
   const showClear = Boolean(
@@ -212,16 +214,28 @@ export function useDatePickerController(props: DatePickerProps) {
     [effectiveDisabled, isReadOnly, setOpen]
   )
 
-  const commit = useCallback(
-    (
-      next: Date | null | DatePickerRangeResolvedValue,
-      preview: DatePickerRangeResolvedValue | null
-    ) => {
-      setCommitted(next)
-      setPreviewRange(preview)
-      setDraftText(null)
+  const reportError = useCallback(
+    (reason: string) => {
+      setValidationMessage(reason)
+      formItemControl?.setError?.(reason)
     },
-    [setCommitted]
+    [formItemControl]
+  )
+
+  const clearError = useCallback(() => {
+    setValidationMessage(null)
+    formItemControl?.setError?.(null)
+  }, [formItemControl])
+
+  const writeCommitted = useCallback(
+    (next: Date | null | DatePickerRangeResolvedValue) => {
+      const same = isSameDatePickerValue(isRangeMode, committed, next)
+      clearError()
+      setDraftText(null)
+      if (same) return
+      setCommitted(next)
+    },
+    [clearError, committed, isRangeMode, setCommitted]
   )
 
   const selectDay = useCallback(
@@ -230,51 +244,110 @@ export function useDatePickerController(props: DatePickerProps) {
         range: isRangeMode,
         picked: date,
         committed,
-        preview: previewRange
+        preview: previewRange,
+        bounds
       })
-      commit(result.nextCommitted, result.nextPreview)
+      if (result.error) {
+        reportError(result.error)
+        return
+      }
+      if (result.commit) writeCommitted(result.nextCommitted)
+      else clearError()
+      setPreviewRange(result.nextPreview)
+      setDraftText(null)
       if (result.close) setOpenSafe(false)
     },
-    [commit, committed, isRangeMode, previewRange, setOpenSafe]
+    [
+      bounds,
+      clearError,
+      committed,
+      isRangeMode,
+      previewRange,
+      reportError,
+      setOpenSafe,
+      writeCommitted
+    ]
   )
 
   const selectToday = useCallback(() => {
-    const today = now ?? new Date()
-    if (isDateDisabled(today)) return
-    const result = commitDatePickerToday(isRangeMode, today)
-    commit(result.nextCommitted, null)
+    if (!now) return
+    const result = commitDatePickerToday(isRangeMode, now, bounds)
+    if ('error' in result) return
+    writeCommitted(result.nextCommitted)
+    setPreviewRange(null)
     if (result.close) setOpenSafe(false)
-  }, [commit, isDateDisabled, isRangeMode, now, setOpenSafe])
+  }, [bounds, isRangeMode, now, setOpenSafe, writeCommitted])
 
   const applyShortcut = useCallback(
     (shortcut: DatePickerShortcut) => {
       const parsed = parseDatePickerShortcut(shortcut, isRangeMode)
       if (parsed == null) return
-      commit(parsed, null)
+      const accepted = acceptDatePickerCandidate(isRangeMode, parsed, bounds)
+      if (!accepted.ok) {
+        reportError(accepted.reason)
+        return
+      }
+      writeCommitted(accepted.value)
+      setPreviewRange(null)
       if (!isRangeMode) setOpenSafe(false)
     },
-    [commit, isRangeMode, setOpenSafe]
+    [bounds, isRangeMode, reportError, setOpenSafe, writeCommitted]
   )
 
   const clearValue = useCallback(() => {
-    commit(emptyDatePickerValue(isRangeMode), null)
+    writeCommitted(emptyDatePickerValue(isRangeMode))
+    setPreviewRange(null)
     onClear?.()
     inputRef.current?.focus()
-  }, [commit, isRangeMode, onClear])
+  }, [isRangeMode, onClear, writeCommitted])
 
   const confirmOpen = useCallback(() => {
+    if (draftText != null) {
+      const typed = resolveTypedDatePickerCommit(draftText, format, isRangeMode, localeCode, bounds)
+      if (!typed.ok) {
+        reportError(typed.reason)
+        return
+      }
+      writeCommitted(typed.value)
+      setPreviewRange(null)
+      setOpenSafe(false)
+      return
+    }
+    const result = confirmDatePicker({
+      preview: previewRange,
+      committed,
+      bounds
+    })
+    if (!result.close) {
+      if (result.error) reportError(result.error)
+      setPreviewRange(result.nextPreview)
+      return
+    }
+    writeCommitted(result.nextCommitted)
+    setPreviewRange(null)
     setOpenSafe(false)
-  }, [setOpenSafe])
+  }, [
+    bounds,
+    committed,
+    draftText,
+    format,
+    isRangeMode,
+    localeCode,
+    previewRange,
+    reportError,
+    setOpenSafe,
+    writeCommitted
+  ])
 
   const parseDraft = useCallback(() => {
     if (draftText == null) return
-    const parsed = parseTypedDatePickerValue(draftText, format, isRangeMode)
-    if (isRangeMode) {
-      commit((parsed as DatePickerRangeResolvedValue | null) ?? null, null)
-    } else {
-      commit((parsed as Date | null) ?? null, null)
+    const result = resolveTypedDatePickerCommit(draftText, format, isRangeMode, localeCode, bounds)
+    if (!result.ok) {
+      reportError(result.reason)
+      return
     }
-  }, [commit, draftText, format, isRangeMode])
+    writeCommitted(result.value)
+  }, [bounds, draftText, format, isRangeMode, localeCode, reportError, writeCommitted])
 
   const handleFocusOut = (event: React.FocusEvent<HTMLElement>) => {
     const next = event.relatedTarget as Node | null
@@ -336,7 +409,12 @@ export function useDatePickerController(props: DatePickerProps) {
     required: required || Boolean(formItemControl?.required),
     effectiveId,
     effectiveName,
-    describedBy,
+    describedBy: validationMessage
+      ? mergeAriaDescribedBy(describedBy, `${panelId}-status`)
+      : describedBy,
+    validationMessage,
+    validationId: `${panelId}-status`,
+    nativeValue: serializeDatePickerValue(isRangeMode, committed),
     labelledby,
     ariaLabel,
     status,

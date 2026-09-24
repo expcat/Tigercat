@@ -37,6 +37,7 @@ function clickSv(s = 80, v = 80) {
       toJSON: () => undefined
     }) as DOMRect
   fireEvent.pointerDown(plane, { clientX: s, clientY: 100 - v, pointerId: 1 })
+  fireEvent.pointerUp(plane, { clientX: s, clientY: 100 - v, pointerId: 1 })
 }
 
 describe('ColorPicker', () => {
@@ -79,8 +80,25 @@ describe('ColorPicker', () => {
     const { container } = render(<ColorPicker value="#2563eb" onChange={onChange} />)
     open(container)
     const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'ff0000' } })
-    expect(onChange).toHaveBeenCalledWith('#ff0000')
+    fireEvent.change(input, { target: { value: '#fff' } })
+    expect(onChange).not.toHaveBeenCalled()
+    expect(input).toHaveValue('#fff')
+    fireEvent.change(input, { target: { value: '#ff00aa' } })
+    expect(onChange).not.toHaveBeenCalled()
+    fireEvent.blur(input)
+    expect(onChange).toHaveBeenCalledWith('#ff00aa')
+  })
+
+  it('does not paint or submit an unparseable color', () => {
+    const { container } = render(<ColorPicker value="foo" name="color" />)
+    const swatch = trigger(container).firstElementChild as HTMLElement
+    expect(swatch.style.boxShadow).toBe('')
+    expect(swatch.style.backgroundColor).toBe('')
+    expect(container.querySelector('input[name="color"]')).toHaveValue('')
+    open(container)
+    const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
+    expect(input).toHaveValue('foo')
+    expect(input).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('opens with Enter and Space on the trigger', () => {
@@ -109,7 +127,10 @@ describe('ColorPicker', () => {
     const onChange = vi.fn()
     const { container } = render(<ColorPicker value="#ff0000" format="hex" onChange={onChange} />)
     open(container)
-    fireEvent.change(screen.getByRole('slider', { name: 'Hue' }), { target: { value: '120' } })
+    const hue = screen.getByRole('slider', { name: 'Hue' })
+    fireEvent.change(hue, { target: { value: '120' } })
+    expect(onChange).not.toHaveBeenCalled()
+    fireEvent.pointerUp(hue)
     const emitted = String(onChange.mock.calls.at(-1)?.[0])
     expect(emitted).toMatch(/^#[0-9a-f]{6}$/)
   })
@@ -139,7 +160,10 @@ describe('ColorPicker', () => {
       <ColorPicker value="rgba(37, 99, 235, 0.8)" showAlpha format="rgb" onChange={onChange} />
     )
     open(container)
-    fireEvent.change(screen.getByRole('slider', { name: 'Alpha' }), { target: { value: '50' } })
+    const alpha = screen.getByRole('slider', { name: 'Alpha' })
+    fireEvent.change(alpha, { target: { value: '50' } })
+    expect(onChange).not.toHaveBeenCalled()
+    fireEvent.pointerUp(alpha)
     const emitted = String(onChange.mock.calls[0][0])
     expect(emitted).toMatch(/rgba\(/)
     expect(emitted).not.toMatch(/^#[0-9a-fA-F]{6}$/)

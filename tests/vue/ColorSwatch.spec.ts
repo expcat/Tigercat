@@ -34,21 +34,19 @@ describe('ColorSwatch', () => {
     expect(screen.getByRole('radio', { name: 'Success' })).toBeInTheDocument()
   })
 
-  it('emits update:modelValue and change when a color is selected', async () => {
+  it('emits update:modelValue when a color is selected', async () => {
     const onUpdate = vi.fn()
-    const onChange = vi.fn()
     render(ColorSwatch, {
       props: {
         colors: ['#111111', '#222222'],
-        'onUpdate:modelValue': onUpdate,
-        onChange
+        'onUpdate:modelValue': onUpdate
       }
     })
 
     await fireEvent.click(screen.getByRole('radio', { name: '#222222' }))
 
+    expect(onUpdate).toHaveBeenCalledTimes(1)
     expect(onUpdate).toHaveBeenCalledWith('#222222')
-    expect(onChange).toHaveBeenCalledWith('#222222', expect.objectContaining({ value: '#222222' }))
   })
 
   it('selects a color without modelValue', async () => {
@@ -66,23 +64,23 @@ describe('ColorSwatch', () => {
   })
 
   it('does not select disabled colors', async () => {
-    const onChange = vi.fn()
+    const onUpdate = vi.fn()
     render(ColorSwatch, {
-      props: { colors: [{ value: '#111111', disabled: true }], onChange }
+      props: { colors: [{ value: '#111111', disabled: true }], 'onUpdate:modelValue': onUpdate }
     })
 
     await fireEvent.click(screen.getByRole('radio', { name: '#111111' }))
 
-    expect(onChange).not.toHaveBeenCalled()
+    expect(onUpdate).not.toHaveBeenCalled()
   })
 
   it('supports keyboard navigation and selection', async () => {
-    const onChange = vi.fn()
+    const onUpdate = vi.fn()
     render(ColorSwatch, {
       props: {
         columns: 3,
         colors: ['#111111', { value: '#222222', disabled: true }, '#333333'],
-        onChange
+        'onUpdate:modelValue': onUpdate
       }
     })
 
@@ -91,7 +89,7 @@ describe('ColorSwatch', () => {
     await fireEvent.keyDown(first, { key: 'ArrowRight' })
     await fireEvent.keyDown(screen.getByRole('radio', { name: '#333333' }), { key: 'Enter' })
 
-    expect(onChange).toHaveBeenCalledWith('#333333', expect.objectContaining({ value: '#333333' }))
+    expect(onUpdate).toHaveBeenCalledWith('#333333')
   })
 
   it('applies size and class', () => {
@@ -132,21 +130,33 @@ describe('ColorSwatch', () => {
       expect(screen.queryAllByRole('radio')).toHaveLength(0)
     })
 
-    it('matches selected colors case-insensitively', () => {
+    it('matches selected colors by parsed value', () => {
       renderWithProps(ColorSwatch, { modelValue: '#ABCDEF', colors: ['#abcdef'] })
 
       expect(screen.getByRole('radio', { name: '#abcdef' })).toHaveAttribute('aria-checked', 'true')
     })
 
+    it('matches short hex to long hex and skips unparseable paint', () => {
+      renderWithProps(ColorSwatch, {
+        modelValue: 'rgb(255, 0, 0)',
+        colors: ['#ff0000', 'not-a-color']
+      })
+
+      expect(screen.getByRole('radio', { name: '#ff0000' })).toHaveAttribute('aria-checked', 'true')
+      const bad = screen.getByRole('radio', { name: 'not-a-color' }) as HTMLElement
+      expect(bad.style.backgroundColor).toContain('tiger-surface-muted')
+      expect(bad.style.backgroundColor).not.toBe('not-a-color')
+    })
+
     it('ignores keyboard selection when disabled', async () => {
-      const onChange = vi.fn()
+      const onUpdate = vi.fn()
       render(ColorSwatch, {
-        props: { disabled: true, colors: ['#111111', '#222222'], onChange }
+        props: { disabled: true, colors: ['#111111', '#222222'], 'onUpdate:modelValue': onUpdate }
       })
 
       await fireEvent.keyDown(screen.getByRole('radio', { name: '#111111' }), { key: 'Enter' })
 
-      expect(onChange).not.toHaveBeenCalled()
+      expect(onUpdate).not.toHaveBeenCalled()
     })
 
     it('keeps disabled options out of the tab sequence', () => {

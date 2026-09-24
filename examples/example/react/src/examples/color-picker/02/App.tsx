@@ -20,7 +20,7 @@ export default function App() {
           <div key={format} className="flex items-center gap-2">
             <ColorPicker value={values[format]} onChange={(v) => setters[format](v ?? '')} format={format} />
             <span className="text-sm text-gray-500">{format}</span>
-            <code className="text-xs text-[var(--tiger-text-muted,#6b7280)]">{values[format]}</code>
+            <code className="text-xs text-[var(--tiger-text-secondary)]">{values[format]}</code>
           </div>
         ))}
       </div>

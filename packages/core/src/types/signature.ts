@@ -64,13 +64,8 @@ export interface SignatureProps {
    */
   disabled?: boolean
   /**
-   * Focusable, not drawable. Distinct from `disabled`.
-   * `readOnly` is the same flag (React/DOM alias).
+   * Focusable and submittable, not drawable. Distinct from `disabled`.
    * @default false
-   */
-  readonly?: boolean
-  /**
-   * Alias of {@link SignatureProps.readonly}.
    */
   readOnly?: boolean
   /**

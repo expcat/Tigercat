@@ -11,6 +11,7 @@ import {
   moveNumberKeyboardIndex,
   normalizeNumberKeyboardValue,
   postNumberKeyboardValue,
+  sanitizeNumberKeyboardValue,
   resolveNumberKeyboardPhysicalKey
 } from '@expcat/tigercat-core'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
@@ -31,6 +32,26 @@ describe('number-keyboard-utils', () => {
 
   it('uppercases id-card values', () => {
     expect(postNumberKeyboardValue('110101x', 'id-card')).toBe('110101X')
+  })
+
+  it('clears values that are not already legal for the mode', () => {
+    expect(sanitizeNumberKeyboardValue(undefined, 'number')).toBe('')
+    expect(sanitizeNumberKeyboardValue(null, 'amount')).toBe('')
+    expect(sanitizeNumberKeyboardValue('12a', 'number')).toBe('')
+    expect(sanitizeNumberKeyboardValue('12a', 'phone')).toBe('')
+    expect(sanitizeNumberKeyboardValue('1.2.3', 'amount')).toBe('')
+    expect(sanitizeNumberKeyboardValue('12.3', 'amount')).toBe('12.3')
+    expect(sanitizeNumberKeyboardValue('12.345', 'amount')).toBe('')
+    expect(sanitizeNumberKeyboardValue('13800138000', 'phone')).toBe('13800138000')
+    expect(sanitizeNumberKeyboardValue('138001380001', 'phone')).toBe('')
+    expect(sanitizeNumberKeyboardValue('12X3', 'id-card')).toBe('')
+  })
+
+  it('does not extend an illegal prefix', () => {
+    expect(applyNumberKeyboardInput('1.2.3', '4', { mode: 'amount' })).toBe('4')
+    expect(applyNumberKeyboardInput('1.2.3', '4', { mode: 'amount' })).not.toContain('1.2.3')
+    expect(applyNumberKeyboardInput('12a', '9')).toBe('9')
+    expect(applyNumberKeyboardKey('12a', { type: 'digit', value: '3' }).nextValue).toBe('3')
   })
 
   it('uses mode-specific max lengths', () => {
@@ -140,8 +161,8 @@ describe('number-keyboard-utils', () => {
     const digit = getNumberKeyboardKeys({ labels }).find((key) => key.type === 'digit')!
     expect(getNumberKeyboardAction(confirm)).toBe('confirm')
     expect(getNumberKeyboardKeyClasses(confirm)).toContain('bg-[var(--tiger-primary')
-    expect(getNumberKeyboardKeyClasses(confirm)).not.toContain('bg-[var(--tiger-fill')
-    expect(getNumberKeyboardKeyClasses(digit)).toContain('bg-[var(--tiger-fill')
+    expect(getNumberKeyboardKeyClasses(confirm)).not.toContain('bg-[var(--tiger-surface-muted')
+    expect(getNumberKeyboardKeyClasses(digit)).toContain('bg-[var(--tiger-surface-muted')
     expect(getNumberKeyboardKeyClasses(digit)).not.toContain('bg-[var(--tiger-primary')
   })
 

@@ -209,7 +209,7 @@ describe('Mentions', () => {
     expect(getByRole('combobox')).toHaveAttribute('rows', '5')
   })
 
-  it('honors maxLength, showCount, and both readonly spellings', () => {
+  it('honors maxLength, showCount, and readOnly', () => {
     const { getByRole, getByText, rerender } = render(
       <Mentions
         options={defaultOptions}
@@ -222,11 +222,6 @@ describe('Mentions', () => {
     const textarea = getByRole('combobox') as HTMLTextAreaElement
     expect(textarea).toHaveAttribute('maxLength', '10')
     expect(getByText('5 / 10')).toBeInTheDocument()
-
-    rerender(
-      <Mentions options={defaultOptions} defaultValue="hello" readonly aria-label="Members" />
-    )
-    expect(getByRole('combobox')).toHaveAttribute('readonly')
 
     rerender(
       <Mentions options={defaultOptions} defaultValue="hello" readOnly aria-label="Members" />

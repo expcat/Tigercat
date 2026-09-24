@@ -18,7 +18,7 @@ function trigger(container: HTMLElement) {
   return container.querySelector('[data-tiger-colorpicker-trigger]') as HTMLButtonElement
 }
 
-function clickSv(s = 80, v = 80) {
+async function clickSv(s = 80, v = 80) {
   const plane = document.body.querySelector('[data-tiger-colorpicker-sv]') as HTMLElement
   plane.getBoundingClientRect = () =>
     ({
@@ -32,7 +32,8 @@ function clickSv(s = 80, v = 80) {
       height: 100,
       toJSON: () => undefined
     }) as DOMRect
-  return fireEvent.pointerDown(plane, { clientX: s, clientY: 100 - v, pointerId: 1 })
+  await fireEvent.pointerDown(plane, { clientX: s, clientY: 100 - v, pointerId: 1 })
+  return fireEvent.pointerUp(plane, { clientX: s, clientY: 100 - v, pointerId: 1 })
 }
 
 describe('ColorPicker', () => {
@@ -75,8 +76,25 @@ describe('ColorPicker', () => {
     })
     await fireEvent.click(trigger(container))
     const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
-    await fireEvent.update(input, 'ff0000')
-    expect(onChange).toHaveBeenCalledWith('#ff0000')
+    await fireEvent.update(input, '#fff')
+    expect(onChange).not.toHaveBeenCalled()
+    expect(input).toHaveValue('#fff')
+    await fireEvent.update(input, '#ff00aa')
+    expect(onChange).not.toHaveBeenCalled()
+    expect(input).toHaveValue('#ff00aa')
+    await fireEvent.blur(input)
+    expect(onChange).toHaveBeenCalledWith('#ff00aa')
+  })
+
+  it('does not paint or submit an unparseable color', async () => {
+    const { container } = renderWithProps(ColorPicker, { modelValue: 'foo', name: 'color' })
+    const swatch = trigger(container).firstElementChild as HTMLElement
+    expect(swatch.style.boxShadow).toBe('')
+    expect(container.querySelector('input[name="color"]')).toHaveValue('')
+    await fireEvent.click(trigger(container))
+    const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
+    expect(input).toHaveValue('foo')
+    expect(input).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('emits rgb after an SV change when format is rgb', async () => {
@@ -126,6 +144,8 @@ describe('ColorPicker', () => {
     await fireEvent.click(trigger(container))
     const slider = document.body.querySelector('input[aria-label="Alpha"]') as HTMLInputElement
     await fireEvent.update(slider, '50')
+    expect(onUpdate).not.toHaveBeenCalled()
+    await fireEvent.change(slider)
     const emitted = String(onUpdate.mock.calls[0][0])
     expect(emitted).toMatch(/rgba\(/)
   })

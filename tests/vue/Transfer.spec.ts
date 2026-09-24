@@ -67,7 +67,7 @@ describe('Transfer', () => {
       expect(emitted()['update:modelValue']).toBeTruthy()
     })
 
-    it('should emit update:targetKeys with the same payload as update:modelValue on move-right', async () => {
+    it('should emit update:modelValue once on move-right', async () => {
       const { container, getByLabelText, emitted } = render(Transfer, {
         props: { dataSource }
       })
@@ -78,15 +78,13 @@ describe('Transfer', () => {
       await fireEvent.click(getByLabelText('Move selected to target'))
 
       const modelValue = emitted()['update:modelValue']
-      const targetKeys = emitted()['update:targetKeys']
       expect(modelValue).toBeTruthy()
-      expect(targetKeys).toBeTruthy()
-      expect(targetKeys[0][0]).toEqual(modelValue[0][0])
+      expect(emitted()['update:targetKeys']).toBeUndefined()
     })
 
-    it('should emit update:targetKeys with the same payload as update:modelValue on move-left', async () => {
+    it('should move items back to the source', async () => {
       const { getByText, getByLabelText, emitted } = render(Transfer, {
-        props: { dataSource, targetKeys: ['1'] }
+        props: { dataSource, modelValue: ['1'] }
       })
 
       const checkbox = getByText('Item 1')
@@ -97,13 +95,11 @@ describe('Transfer', () => {
       await fireEvent.click(getByLabelText('Move selected to source'))
 
       const modelValue = emitted()['update:modelValue']
-      const targetKeys = emitted()['update:targetKeys']
       expect(modelValue).toBeTruthy()
-      expect(targetKeys).toBeTruthy()
-      expect(targetKeys[0][0]).toEqual(modelValue[0][0])
+      expect(emitted()['update:targetKeys']).toBeUndefined()
     })
 
-    it('should show seeded targetKeys in the target panel', () => {
+    it('should show seeded value in the target panel', () => {
       const pagesData = [
         { key: 'design', label: '设计' },
         { key: 'frontend', label: '前端' },
@@ -113,7 +109,7 @@ describe('Transfer', () => {
       const { container } = render(Transfer, {
         props: {
           dataSource: pagesData,
-          targetKeys: ['frontend'],
+          modelValue: ['frontend'],
           sourceTitle: '可选团队',
           targetTitle: '已选团队'
         }

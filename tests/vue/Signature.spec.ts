@@ -111,10 +111,10 @@ describe('Signature', () => {
     await drawSignature(pad())
 
     expect(emitted().begin).toHaveLength(1)
-    expect(emitted().change).toHaveLength(1)
+    expect(emitted()['update:modelValue']).toHaveLength(1)
     expect(emitted().end).toHaveLength(1)
-    expect(emitted().change[0][0]).toContain('data:image/svg+xml')
-    expect(emitted().change[0][1]).toMatchObject({ empty: false, exportType: 'image/png' })
+    expect(emitted()['update:modelValue'][0][0]).toContain('data:image/svg+xml')
+    expect(emitted()['update:modelValue'][0][1]).toMatchObject({ empty: false, exportType: 'image/png' })
   })
 
   it('emits update:modelValue after drawing', async () => {
@@ -123,7 +123,6 @@ describe('Signature', () => {
     await drawSignature(pad())
 
     expect(emitted()['update:modelValue'][0][0]).toContain('data:image/svg+xml')
-    expect(emitted().input[0][0]).toContain('data:image/svg+xml')
   })
 
   it('round-trips svg values onto the pad', () => {
@@ -136,18 +135,18 @@ describe('Signature', () => {
 
     await drawSignature(pad())
 
-    expect(emitted().change).toBeUndefined()
+    expect(emitted()['update:modelValue']).toBeUndefined()
     expect(pad()).toHaveAttribute('aria-disabled', 'true')
   })
 
   it('does not draw while readonly and stays focusable', async () => {
     const { container, emitted } = render(Signature, {
-      props: { readonly: true, modelValue: sampleValue, width: 280, height: 140 }
+      props: { readOnly: true, modelValue: sampleValue, width: 280, height: 140 }
     })
 
     await drawSignature(pad())
 
-    expect(emitted().change).toBeUndefined()
+    expect(emitted()['update:modelValue']).toBeUndefined()
     expect(pad()).toHaveAttribute('aria-readonly', 'true')
     expect(pad()).not.toHaveAttribute('aria-disabled')
   })
@@ -159,7 +158,7 @@ describe('Signature', () => {
 
     await drawSignature(pad())
 
-    expect(emitted().change).toBeUndefined()
+    expect(emitted()['update:modelValue']).toBeUndefined()
     expect(pad()).toHaveAttribute('aria-readonly', 'true')
     expect(pad()).toHaveAttribute('tabIndex', '0')
   })
@@ -170,15 +169,15 @@ describe('Signature', () => {
 
     await fireEvent.click(screen.getByRole('button', { name: enUS.common.clearText }))
 
-    expect(emitted().change.at(-1)?.[0]).toBe('')
-    expect(emitted().change.at(-1)?.[1]).toMatchObject({ empty: true })
+    expect(emitted()['update:modelValue'].at(-1)?.[0]).toBe('')
+    expect(emitted()['update:modelValue'].at(-1)?.[1]).toMatchObject({ empty: true })
   })
 
   it('clears drawn strokes with Delete', async () => {
     const { emitted } = render(Signature, { props: { width: 480, height: 180 } })
     await drawSignature(pad())
     await fireEvent.keyDown(pad(), { key: 'Delete' })
-    expect(emitted().change.at(-1)?.[0]).toBe('')
+    expect(emitted()['update:modelValue'].at(-1)?.[0]).toBe('')
   })
 
   it('maps pointer coordinates through the canvas display rect', async () => {
@@ -191,7 +190,7 @@ describe('Signature', () => {
     await fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 110, clientY: 70 })
     await fireEvent.pointerUp(pad(), { pointerId: 1 })
 
-    expect(emitted().change[0][1].strokes[0].points[0]).toMatchObject({ x: 50, y: 25 })
+    expect(emitted()['update:modelValue'][0][1].strokes[0].points[0]).toMatchObject({ x: 50, y: 25 })
   })
 
   it('uses custom pen color and line width', async () => {
@@ -201,7 +200,7 @@ describe('Signature', () => {
 
     await drawSignature(pad())
 
-    expect(emitted().change[0][1].strokes[0]).toMatchObject({ color: '#dc2626', lineWidth: 6 })
+    expect(emitted()['update:modelValue'][0][1].strokes[0]).toMatchObject({ color: '#dc2626', lineWidth: 6 })
   })
 
   it('hides the toolbar when clearable is false', () => {
@@ -231,7 +230,7 @@ describe('Signature', () => {
     await fireEvent.pointerUp(document, { pointerId: 1 })
 
     expect(emitted().begin).toHaveLength(1)
-    expect(emitted().change).toHaveLength(1)
+    expect(emitted()['update:modelValue']).toHaveLength(1)
     expect(emitted().end).toHaveLength(1)
   })
 
@@ -241,7 +240,7 @@ describe('Signature', () => {
     await fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 10, clientY: 20 })
     await fireEvent.lostPointerCapture(pad())
 
-    expect(emitted().change).toHaveLength(1)
+    expect(emitted()['update:modelValue']).toHaveLength(1)
     expect(emitted().end).toHaveLength(1)
   })
 
@@ -253,7 +252,7 @@ describe('Signature', () => {
         return () =>
           h(Form, null, () =>
             h(FormItem, { name: 'sign', label: 'Sign', rules: [{ validator }] }, () =>
-              h(Signature, { width: 480, height: 180, onChange })
+              h(Signature, { width: 480, height: 180, 'onUpdate:modelValue': onChange })
             )
           )
       }
@@ -298,7 +297,7 @@ describe('Signature', () => {
 
     it('has no accessibility violations for a readonly signed pad', async () => {
       const { container } = render(Signature, {
-        props: { readonly: true, modelValue: sampleValue }
+        props: { readOnly: true, modelValue: sampleValue }
       })
       await expectNoA11yViolations(container)
     })

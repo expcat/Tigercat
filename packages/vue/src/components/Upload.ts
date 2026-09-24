@@ -7,6 +7,7 @@ import {
   onBeforeUnmount,
   inject,
   useId,
+  getCurrentInstance,
   PropType
 } from 'vue'
 import {
@@ -31,7 +32,12 @@ import {
   readUploadDropFiles,
   createUploadController,
   createUploadPreviewUrlCache,
+  filterUploadPreviewUrl,
   runShakeAnimation,
+  uploadQueuedStatusText,
+  uploadRetryFileAriaLabel,
+  uploadSingleFileText,
+  uploadSubmitValues,
   uploadFileInputClasses,
   uploadIconActionClasses,
   uploadItemActionsClasses,
@@ -69,6 +75,9 @@ export interface VueUploadProps {
   fileList?: UploadFile[]
   defaultFileList?: UploadFile[]
   name?: string
+  fileFieldName?: string
+  allowedPreviewOrigins?: string[]
+  readOnly?: boolean
   status?: InputStatus
   action?: string
   method?: string
@@ -108,6 +117,9 @@ export const Upload = defineComponent({
     fileList: { type: Array as PropType<UploadFile[]>, default: undefined },
     defaultFileList: { type: Array as PropType<UploadFile[]>, default: undefined },
     name: { type: String, default: undefined },
+    fileFieldName: { type: String, default: undefined },
+    allowedPreviewOrigins: { type: Array as PropType<string[]>, default: undefined },
+    readOnly: { type: Boolean, default: false },
     status: { type: String as PropType<InputStatus>, default: undefined },
     action: { type: String, default: undefined },
     method: { type: String, default: undefined },
@@ -135,8 +147,7 @@ export const Upload = defineComponent({
     labels: { type: Object as PropType<Partial<UploadLabels>>, default: undefined }
   },
   emits: {
-    'update:file-list': (files: UploadFile[]) => Array.isArray(files),
-    change: (_file: UploadFile, _fileList: UploadFile[]) => true,
+    'update:fileList': (files: UploadFile[]) => Array.isArray(files),
     remove: (_file: UploadFile, _fileList: UploadFile[]) => true,
     preview: (_file: UploadFile) => true,
     progress: (progress: number, _file: UploadFile) => typeof progress === 'number',
@@ -155,6 +166,8 @@ export const Upload = defineComponent({
     const rootRef = ref<HTMLElement | null>(null)
     const isDragging = ref(false)
     const previewSrc = ref<string | null>(null)
+    const singleFileNote = ref('')
+    const seeded = ref(false)
     const previewUrls = createUploadPreviewUrlCache()
 
     const config = useTigerConfig()
@@ -167,6 +180,7 @@ export const Upload = defineComponent({
     const effectiveDisabled = computed(
       () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
+    const canMutate = computed(() => !effectiveDisabled.value && !props.readOnly)
     const status = computed<InputStatus>(
       () => props.status ?? formItemControl?.status.value ?? 'default'
     )
@@ -183,23 +197,45 @@ export const Upload = defineComponent({
       )
     )
 
-    const workingList = ref<UploadFile[]>([...(props.fileList ?? props.defaultFileList ?? [])])
-    const fileListValue = computed<UploadFile[]>(() => {
-      const seeded = resolveFormItemSeed(
-        props.fileList,
-        formItemControl?.name.value,
-        formItemControl?.value.value,
-        coerceArrayFormValue<UploadFile>
-      )
-      return seeded ?? workingList.value
-    })
+    const localList = ref<UploadFile[]>([...(props.defaultFileList ?? [])])
+    const fileListValue = computed<UploadFile[]>(() => localList.value)
+
+    function isMissingFormValue(raw: unknown) {
+      return raw === '' || raw == null
+    }
 
     watch(
-      () => props.fileList,
-      (value) => {
-        if (value !== undefined) workingList.value = [...value]
-      }
+      () =>
+        [
+          props.fileList,
+          formItemControl?.name.value,
+          formItemControl?.value.value
+        ] as const,
+      () => {
+        if (props.fileList !== undefined) {
+          localList.value = Array.isArray(props.fileList) ? [...props.fileList] : []
+          return
+        }
+        if (!formItemControl?.name.value) return
+        const raw = formItemControl.value.value
+        if (isMissingFormValue(raw)) return
+        const coerced = coerceArrayFormValue<UploadFile>(raw)
+        if (coerced) localList.value = [...coerced]
+      },
+      { immediate: true, flush: 'sync' }
     )
+
+    if (
+      !seeded.value &&
+      formItemControl?.name.value &&
+      props.fileList === undefined &&
+      isMissingFormValue(formItemControl.value.value) &&
+      props.defaultFileList !== undefined
+    ) {
+      seeded.value = true
+      localList.value = [...props.defaultFileList]
+      formItemControl.onChange(props.defaultFileList)
+    }
 
     watch(fileListValue, (files) => previewUrls.sync(files), { deep: true, immediate: true })
     watch(
@@ -216,28 +252,29 @@ export const Upload = defineComponent({
       controller.dispose()
     })
 
-    const setFileList = (value: UploadFile[], changed?: UploadFile) => {
-      workingList.value = value
-      emit('update:file-list', value)
-      if (changed) emit('change', changed, value)
+    const setFileList = (value: UploadFile[], _changed?: UploadFile) => {
+      localList.value = value
+      emit('update:fileList', value)
       formItemControl?.onChange(value)
     }
 
     const controller = createUploadController({
       host: {
-        getFileList: () => workingList.value,
+        getFileList: () => localList.value,
         setFileList
       },
       getConfig: () => ({
         accept: props.accept,
         limit: props.limit,
         maxSize: props.maxSize,
+        multiple: props.multiple,
         autoUpload: props.autoUpload,
         queue: props.queue,
         maxConcurrent: props.maxConcurrent,
         chunkSize: props.chunkSize,
         resumable: props.resumable,
         action: props.action,
+        fileFieldName: props.fileFieldName,
         name: fieldName.value,
         method: props.method,
         headers: props.headers,
@@ -252,16 +289,24 @@ export const Upload = defineComponent({
         onSuccess: (response, file) => emit('success', response, file),
         onError: (error, file) => emit('error', error, file),
         onExceed: (files, list) => emit('exceed', files, list),
-        onReject: (files) => emit('reject', files),
+        onReject: (files) => {
+          emit('reject', files)
+          singleFileNote.value = files.some((item) => item.reason === 'single')
+            ? uploadSingleFileText
+            : ''
+        },
         onQueueChange: (queue) => emit('queue-change', queue),
         onChunkProgress: (chunk, progress, file) => emit('chunk-progress', chunk, progress, file)
       }
     })
 
     const openPicker = () => {
-      if (effectiveDisabled.value) return
+      if (!canMutate.value) return
       inputRef.value?.click()
     }
+
+    const previewUrlFor = (file: UploadFile) =>
+      filterUploadPreviewUrl(previewUrls.get(file), props.allowedPreviewOrigins)
 
     const handleFileChange = async (event: Event) => {
       event.stopPropagation()
@@ -271,17 +316,26 @@ export const Upload = defineComponent({
     }
 
     const handleRemove = async (file: UploadFile) => {
-      if (effectiveDisabled.value) return
+      if (!canMutate.value) return
       const removed = await controller.remove(file)
       if (removed) emit('remove', file, fileListValue.value)
     }
 
+    const handleRetry = (file: UploadFile) => {
+      if (!canMutate.value) return
+      void controller.retry(file)
+    }
+
+    let customPreview = false
+
     const handlePreview = (file: UploadFile) => {
       if (effectiveDisabled.value) return
-      emit('preview', file)
-      if (attrs.onPreview) return
-      const url = previewUrls.get(file)
-      if (url) previewSrc.value = url
+      if (customPreview) {
+        emit('preview', file)
+        return
+      }
+      const url = previewUrlFor(file)
+      if (url && isImageUploadFile(file)) previewSrc.value = url
     }
 
     const handleFocusOut = (event: FocusEvent) => {
@@ -331,6 +385,13 @@ export const Upload = defineComponent({
     }
 
     const progressBlock = (file: UploadFile, errorId?: string) => [
+      file.status === 'queued'
+        ? h(
+            'p',
+            { class: 'text-xs text-[var(--tiger-text-secondary)]', role: 'status' },
+            uploadQueuedStatusText
+          )
+        : null,
       file.status === 'uploading'
         ? h(
             'div',
@@ -350,15 +411,20 @@ export const Upload = defineComponent({
           )
         : null,
       file.status === 'error' && file.error
-        ? h('p', { id: errorId, class: 'text-xs text-[var(--tiger-error,#dc2626)]' }, file.error)
+        ? h('p', { id: errorId, class: 'text-xs text-[var(--tiger-error)]' }, file.error)
         : null
     ]
 
     const actionButtons = (file: UploadFile, picture: boolean) => {
-      const canPreview =
-        Boolean(attrs.onPreview) || (isImageUploadFile(file) && Boolean(previewUrls.get(file)))
+      customPreview =
+        typeof getCurrentInstance()?.vnode.props?.onPreview === 'function' ||
+        typeof attrs.onPreview === 'function'
+      const safePreview = previewUrlFor(file)
+      const canPreview = customPreview
+        ? true
+        : Boolean(isImageUploadFile(file) && safePreview)
       const actionClass = picture
-        ? 'text-[var(--tiger-on-primary,#ffffff)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] rounded-sm'
+        ? 'text-[var(--tiger-on-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)] rounded-sm'
         : uploadIconActionClasses
       return [
         canPreview
@@ -383,12 +449,34 @@ export const Upload = defineComponent({
               ]
             )
           : null,
+        file.status === 'error'
+          ? h(
+              'button',
+              {
+                type: 'button',
+                class: uploadIconActionClasses,
+                disabled: !canMutate.value,
+                tabindex: effectiveDisabled.value ? -1 : 0,
+                onClick: () => handleRetry(file),
+                'aria-label': interpolateUploadLabel(uploadRetryFileAriaLabel, {
+                  fileName: file.name
+                })
+              },
+              [
+                h(Icon, {
+                  name: 'refresh',
+                  class: picture ? 'w-6 h-6' : 'w-5 h-5',
+                  'aria-hidden': true
+                })
+              ]
+            )
+          : null,
         h(
           'button',
           {
             type: 'button',
             class: actionClass,
-            disabled: effectiveDisabled.value,
+            disabled: !canMutate.value,
             tabindex: effectiveDisabled.value ? -1 : 0,
             onClick: () => handleRemove(file),
             'aria-label': interpolateUploadLabel(labels.value.removeFileAriaLabel, {
@@ -431,29 +519,32 @@ export const Upload = defineComponent({
               class: getDragAreaClasses(isDragging.value, effectiveDisabled.value),
               onClick: openPicker,
               onKeydown: (event: KeyboardEvent) => {
-                if (effectiveDisabled.value) return
+                if (!canMutate.value) return
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault()
                   openPicker()
                 }
               },
               onDragover: (event: DragEvent) => {
-                const result = handleUploadDragOver(event, effectiveDisabled.value)
+                const result = handleUploadDragOver(event, !canMutate.value)
                 if (!result.handled) return
                 isDragging.value = result.isDragging
               },
               onDragleave: (event: DragEvent) => {
                 const result = handleUploadDragLeave(
                   event,
-                  effectiveDisabled.value,
+                  !canMutate.value,
                   event.currentTarget
                 )
                 if (!result.handled) return
                 isDragging.value = result.isDragging
               },
               onDrop: async (event: DragEvent) => {
-                const result = handleUploadDrop(event, effectiveDisabled.value)
-                if (!result.handled) return
+                const result = handleUploadDrop(event, !canMutate.value)
+                if (!result.handled || !canMutate.value) {
+                  isDragging.value = false
+                  return
+                }
                 isDragging.value = false
                 const read = readUploadDropFiles(event.dataTransfer)
                 if (read.rejectedDirectories.length > 0) {
@@ -477,7 +568,7 @@ export const Upload = defineComponent({
               : [
                   h(Icon, {
                     name: 'upload',
-                    class: 'w-12 h-12 mb-3 text-[var(--tiger-text-muted,#9ca3af)]',
+                    class: 'w-12 h-12 mb-3 text-[var(--tiger-text-secondary)]',
                     'aria-hidden': true
                   }),
                   h('p', { class: 'mb-2 text-sm' }, [
@@ -487,7 +578,7 @@ export const Upload = defineComponent({
                   props.accept
                     ? h(
                         'p',
-                        { class: 'text-xs text-[var(--tiger-text-muted,#6b7280)]' },
+                        { class: 'text-xs text-[var(--tiger-text-secondary)]' },
                         interpolateUploadLabel(labels.value.acceptInfoText, {
                           accept: props.accept
                         })
@@ -496,7 +587,7 @@ export const Upload = defineComponent({
                   props.maxSize
                     ? h(
                         'p',
-                        { class: 'text-xs text-[var(--tiger-text-muted,#6b7280)]' },
+                        { class: 'text-xs text-[var(--tiger-text-secondary)]' },
                         interpolateUploadLabel(labels.value.maxSizeInfoText, {
                           maxSize: formatFileSize(props.maxSize)
                         })
@@ -528,7 +619,7 @@ export const Upload = defineComponent({
                 'div',
                 { class: uploadPictureListClasses },
                 fileListValue.value.map((file) => {
-                  const imageUrl = previewUrls.get(file)
+                  const imageUrl = previewUrlFor(file)
                   const errorId =
                     file.status === 'error' && file.error ? `${file.uid}-error` : undefined
                   return h('div', { class: getPictureCardClasses(file.status), key: file.uid }, [
@@ -543,7 +634,7 @@ export const Upload = defineComponent({
                             'span',
                             {
                               class:
-                                'flex h-full w-full items-center justify-center px-2 text-xs text-center text-[var(--tiger-text-muted,#6b7280)]'
+                                'flex h-full w-full items-center justify-center px-2 text-xs text-center text-[var(--tiger-text-secondary)]'
                             },
                             file.name
                           )
@@ -554,7 +645,7 @@ export const Upload = defineComponent({
                           'div',
                           {
                             class:
-                              'absolute inset-0 flex flex-col items-center justify-center bg-[var(--tiger-surface,#ffffff)]/80'
+                              'absolute inset-0 flex flex-col items-center justify-center bg-[var(--tiger-surface)]/80'
                           },
                           [statusIcon('uploading', 'lg'), ...progressBlock(file)]
                         )
@@ -565,7 +656,7 @@ export const Upload = defineComponent({
                           {
                             id: errorId,
                             class:
-                              'absolute bottom-1 inset-x-1 text-[10px] text-[var(--tiger-error,#dc2626)] truncate'
+                              'absolute bottom-1 inset-x-1 text-[10px] text-[var(--tiger-error)] truncate'
                           },
                           file.error
                         )
@@ -583,7 +674,7 @@ export const Upload = defineComponent({
                 fileListValue.value.map((file) => {
                   const errorId =
                     file.status === 'error' && file.error ? `${file.uid}-error` : undefined
-                  const thumb = props.listType === 'picture' ? previewUrls.get(file) : undefined
+                  const thumb = props.listType === 'picture' ? previewUrlFor(file) : undefined
                   return h(
                     'li',
                     {
@@ -609,7 +700,7 @@ export const Upload = defineComponent({
                           file.size != null
                             ? h(
                                 'p',
-                                { class: 'text-xs text-[var(--tiger-text-muted,#6b7280)]' },
+                                { class: 'text-xs text-[var(--tiger-text-secondary)]' },
                                 formatFileSize(file.size)
                               )
                             : null,
@@ -651,14 +742,25 @@ export const Upload = defineComponent({
             tabindex: -1
           }),
           fieldName.value
-            ? fileListValue.value.map((file) =>
-                h('input', {
-                  key: file.uid,
+            ? uploadSubmitValues(fileListValue.value).length > 0
+              ? uploadSubmitValues(fileListValue.value).map((url, index) =>
+                  h('input', {
+                    key: `${url}-${index}`,
+                    type: 'hidden',
+                    name: fieldName.value,
+                    value: url,
+                    disabled: effectiveDisabled.value || undefined
+                  })
+                )
+              : h('input', {
                   type: 'hidden',
                   name: fieldName.value,
-                  value: file.url ?? file.uid
+                  value: '',
+                  disabled: effectiveDisabled.value || undefined
                 })
-              )
+            : null,
+          singleFileNote.value
+            ? h('p', { role: 'status', 'aria-live': 'polite' }, singleFileNote.value)
             : null,
           trigger,
           list,

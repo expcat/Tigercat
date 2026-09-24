@@ -19,6 +19,7 @@ import {
 import {
   fileToUploadFile,
   prepareUploadFiles,
+  readUploadResponseUrl,
   startXhrUpload,
   type BeforeUploadHandler
 } from './upload-utils'
@@ -33,7 +34,11 @@ export interface UploadControllerConfig {
   chunkSize?: number
   resumable: boolean
   action?: string
+  /** Form field name. Not the multipart filename. */
   name?: string
+  /** Multipart filename for the default action request. */
+  fileFieldName?: string
+  multiple?: boolean
   method?: string
   headers?: Record<string, string>
   data?: Record<string, string | Blob>
@@ -75,16 +80,39 @@ export function createUploadController(options: {
 }): UploadController {
   const removedUids = new Set<string>()
   const abortByUid = new Map<string, () => void>()
+  const inflightUids = new Set<string>()
+  const completedChunks = new Map<string, Set<number>>()
   let processChain: Promise<void> = Promise.resolve()
+  let disposed = false
+  const queueAbort = new AbortController()
+
+  function enqueue(task: () => Promise<void>): Promise<void> {
+    const run = processChain.then(
+      () => (disposed ? undefined : task()),
+      () => (disposed ? undefined : task())
+    )
+    processChain = run.then(
+      () => undefined,
+      () => undefined
+    )
+    return run
+  }
+
+  function liveList(): UploadFile[] {
+    const list = options.host.getFileList()
+    return Array.isArray(list) ? list : []
+  }
 
   function emitList(list: UploadFile[], changed?: UploadFile): void {
-    options.host.setFileList(list, changed)
-    if (changed) options.callbacks.onChange?.(changed, list)
+    const liveIds = new Set(liveList().map((item) => item.uid))
+    const kept = list.filter((item) => liveIds.has(item.uid) || item.uid === changed?.uid)
+    options.host.setFileList(kept, changed)
+    if (changed) options.callbacks.onChange?.(changed, kept)
   }
 
   function patchUid(uid: string, patch: Partial<UploadFile>): UploadFile | undefined {
     if (removedUids.has(uid)) return undefined
-    const list = options.host.getFileList()
+    const list = liveList()
     let changed: UploadFile | undefined
     const next = list.map((item) => {
       if (item.uid !== uid) return item
@@ -142,7 +170,12 @@ export function createUploadController(options: {
               return
             }
             if (!extra.chunk) {
-              const current = patchUid(uploadFile.uid, { status: 'success', progress: 100 })
+              const url = readUploadResponseUrl(response)
+              const current = patchUid(uploadFile.uid, {
+                status: 'success',
+                progress: 100,
+                ...(url ? { url } : {})
+              })
               if (current) options.callbacks.onSuccess?.(response, current)
             }
             resolve()
@@ -177,7 +210,7 @@ export function createUploadController(options: {
         abortHandle = startXhrUpload({
           file,
           action: config.action,
-          filename: config.name ?? 'file',
+          filename: config.fileFieldName || 'file',
           method: config.method,
           headers: config.headers,
           data: config.data,
@@ -202,41 +235,56 @@ export function createUploadController(options: {
   }
 
   async function uploadOne(uploadFile: UploadFile): Promise<boolean> {
-    if (removedUids.has(uploadFile.uid)) return false
+    if (disposed || removedUids.has(uploadFile.uid)) return false
+    if (inflightUids.has(uploadFile.uid)) return false
     const file = uploadFile.file
     if (!file) return false
 
     const config = options.getConfig()
     if (!config.customRequest && !config.action) return true
 
-    patchUid(uploadFile.uid, { status: 'uploading', progress: 0, error: undefined })
+    inflightUids.add(uploadFile.uid)
+    try {
+      patchUid(uploadFile.uid, { status: 'uploading', progress: 0, error: undefined })
 
-    const chunks =
-      config.chunkSize && config.customRequest ? createUploadChunks(file, config.chunkSize) : []
-    const resumeKey = config.resumable ? getUploadResumeKey(file) : undefined
+      const chunks =
+        config.chunkSize && config.customRequest ? createUploadChunks(file, config.chunkSize) : []
+      const resumeKey = config.resumable ? getUploadResumeKey(file) : undefined
+      const done = resumeKey ? (completedChunks.get(resumeKey) ?? new Set<number>()) : null
 
-    if (chunks.length <= 1) {
-      await requestOne(file, uploadFile, { resumeKey })
+      if (chunks.length <= 1) {
+        await requestOne(file, uploadFile, { resumeKey })
+        if (resumeKey) completedChunks.delete(resumeKey)
+        return true
+      }
+
+      for (const chunk of chunks) {
+        if (disposed || removedUids.has(uploadFile.uid)) return false
+        if (done?.has(chunk.index)) continue
+        const chunkFile = new File([chunk.blob], file.name, {
+          type: file.type,
+          lastModified: file.lastModified
+        })
+        await requestOne(chunkFile, uploadFile, {
+          originalFile: file,
+          chunk,
+          totalChunks: chunks.length,
+          resumeKey
+        })
+        if (resumeKey) {
+          const set = completedChunks.get(resumeKey) ?? new Set<number>()
+          set.add(chunk.index)
+          completedChunks.set(resumeKey, set)
+        }
+      }
+
+      if (resumeKey) completedChunks.delete(resumeKey)
+      const current = patchUid(uploadFile.uid, { status: 'success', progress: 100 })
+      if (current) options.callbacks.onSuccess?.({ chunks: chunks.length, resumeKey }, current)
       return true
+    } finally {
+      inflightUids.delete(uploadFile.uid)
     }
-
-    for (const chunk of chunks) {
-      if (removedUids.has(uploadFile.uid)) return false
-      const chunkFile = new File([chunk.blob], file.name, {
-        type: file.type,
-        lastModified: file.lastModified
-      })
-      await requestOne(chunkFile, uploadFile, {
-        originalFile: file,
-        chunk,
-        totalChunks: chunks.length,
-        resumeKey
-      })
-    }
-
-    const current = patchUid(uploadFile.uid, { status: 'success', progress: 100 })
-    if (current) options.callbacks.onSuccess?.({ chunks: chunks.length, resumeKey }, current)
-    return true
   }
 
   async function uploadAccepted(added: UploadFile[]): Promise<void> {
@@ -252,13 +300,15 @@ export function createUploadController(options: {
       await runUploadQueue(
         queueItems,
         async (item) => {
-          const uploadFile =
-            options.host.getFileList().find((candidate) => candidate.uid === item.id) ??
-            added.find((candidate) => candidate.uid === item.id)
-          if (!uploadFile || removedUids.has(item.id)) return false
+          const uploadFile = liveList().find((candidate) => candidate.uid === item.id)
+          if (!uploadFile || removedUids.has(item.id) || disposed) return false
           return uploadOne(uploadFile)
         },
-        { concurrency: config.maxConcurrent, onChange: options.callbacks.onQueueChange }
+        {
+          concurrency: config.maxConcurrent,
+          onChange: options.callbacks.onQueueChange,
+          signal: queueAbort.signal
+        }
       )
       return
     }
@@ -274,15 +324,16 @@ export function createUploadController(options: {
   }
 
   async function processFilesInner(incoming: File[]): Promise<void> {
-    if (incoming.length === 0) return
+    if (disposed || incoming.length === 0) return
     const config = options.getConfig()
-    const currentList = options.host.getFileList()
+    const currentList = liveList()
     const prepared = await prepareUploadFiles({
       currentCount: currentList.length,
       incomingFiles: incoming,
       limit: config.limit,
       accept: config.accept,
       maxSize: config.maxSize,
+      multiple: config.multiple,
       beforeUpload: config.beforeUpload
     })
 
@@ -293,33 +344,35 @@ export function createUploadController(options: {
       options.callbacks.onReject?.(prepared.rejectedFiles)
     }
 
-    let nextList = [...currentList]
     const added: UploadFile[] = []
     for (const file of prepared.acceptedFiles) {
       const uploadFile = fileToUploadFile(file)
+      if (config.queue && config.autoUpload) uploadFile.status = 'queued'
       added.push(uploadFile)
-      nextList = [...nextList, uploadFile]
-      emitList(nextList, uploadFile)
+      emitList([...liveList(), uploadFile], uploadFile)
     }
 
     await uploadAccepted(added)
   }
 
   function processFiles(incoming: File[]): Promise<void> {
-    const run = processChain.then(
-      () => processFilesInner(incoming),
-      () => processFilesInner(incoming)
-    )
-    processChain = run.then(
-      () => undefined,
-      () => undefined
-    )
-    return run
+    return enqueue(() => processFilesInner(incoming))
   }
 
   async function submit(): Promise<void> {
+    return enqueue(() => submitInner())
+  }
+
+  async function submitInner(): Promise<void> {
     const config = options.getConfig()
-    const ready = options.host.getFileList().filter((item) => item.status === 'ready' && item.file)
+    const ready = liveList().filter(
+      (item) => (item.status === 'ready' || item.status === 'queued') && item.file
+    )
+    if (config.queue) {
+      for (const item of ready) {
+        if (item.status !== 'queued') patchUid(item.uid, { status: 'queued' })
+      }
+    }
     if (ready.length === 0) return
     if (!config.customRequest && !config.action) return
 
@@ -331,13 +384,15 @@ export function createUploadController(options: {
       await runUploadQueue(
         queueItems,
         async (item) => {
-          const uploadFile = options.host
-            .getFileList()
-            .find((candidate) => candidate.uid === item.id)
-          if (!uploadFile || removedUids.has(item.id)) return false
+          const uploadFile = liveList().find((candidate) => candidate.uid === item.id)
+          if (!uploadFile || removedUids.has(item.id) || disposed) return false
           return uploadOne(uploadFile)
         },
-        { concurrency: config.maxConcurrent, onChange: options.callbacks.onQueueChange }
+        {
+          concurrency: config.maxConcurrent,
+          onChange: options.callbacks.onQueueChange,
+          signal: queueAbort.signal
+        }
       )
       return
     }
@@ -362,16 +417,18 @@ export function createUploadController(options: {
   }
 
   async function retry(file: UploadFile): Promise<void> {
-    if (file.status !== 'error' || !file.file) return
-    try {
-      await uploadOne(file)
-    } catch {
-      // error already patched
-    }
+    return enqueue(async () => {
+      if (disposed || file.status !== 'error' || !file.file) return
+      try {
+        await uploadOne(file)
+      } catch {
+        // error already patched
+      }
+    })
   }
 
   async function remove(file: UploadFile): Promise<boolean> {
-    const next = options.host.getFileList().filter((item) => item.uid !== file.uid)
+    const next = liveList().filter((item) => item.uid !== file.uid)
     const allowed = await options.callbacks.onRemove?.(file, next)
     if (allowed === false) return false
     removedUids.add(file.uid)
@@ -381,8 +438,9 @@ export function createUploadController(options: {
   }
 
   function dispose(): void {
+    disposed = true
+    queueAbort.abort()
     abort()
-    removedUids.clear()
   }
 
   return { processFiles, submit, abort, retry, remove, dispose }

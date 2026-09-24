@@ -21,10 +21,11 @@ export const uploadStatusIconSizeClasses: Record<UploadStatusIconSize, string> =
 }
 
 export const uploadStatusIconColorClasses: Record<UploadFileStatus, string> = {
-  ready: 'text-[var(--tiger-text-muted,#6b7280)]',
-  uploading: 'text-[var(--tiger-primary,#2563eb)]',
-  success: 'text-[var(--tiger-success,#16a34a)]',
-  error: 'text-[var(--tiger-error,#dc2626)]'
+  ready: 'text-[var(--tiger-text-secondary)]',
+  queued: 'text-[var(--tiger-text-secondary)]',
+  uploading: 'text-[var(--tiger-primary)]',
+  success: 'text-[var(--tiger-success)]',
+  error: 'text-[var(--tiger-error)]'
 }
 
 export function getUploadStatusIconClasses(
@@ -49,6 +50,7 @@ export interface PrepareUploadFilesOptions {
   limit?: number
   accept?: string
   maxSize?: number
+  multiple?: boolean
   beforeUpload?: BeforeUploadHandler
 }
 
@@ -88,7 +90,7 @@ function coerceToError(error: unknown): Error {
 export async function prepareUploadFiles(
   options: PrepareUploadFilesOptions
 ): Promise<PrepareUploadFilesResult> {
-  const { currentCount, incomingFiles, limit, accept, maxSize, beforeUpload } = options
+  const { currentCount, incomingFiles, limit, accept, maxSize, multiple, beforeUpload } = options
 
   if (incomingFiles.length === 0) {
     return {
@@ -135,6 +137,12 @@ export async function prepareUploadFiles(
   let acceptedFiles = validated
   const rejectedExceedFiles: File[] = []
 
+  if (multiple === false && acceptedFiles.length > 1) {
+    const rest = acceptedFiles.slice(1)
+    acceptedFiles = acceptedFiles.slice(0, 1)
+    rejectedFiles.push(...rest.map((file) => ({ file, reason: 'single' as const })))
+  }
+
   if (limit !== undefined) {
     const remainingSlots = Math.max(0, limit - currentCount)
     if (validated.length > remainingSlots) {
@@ -160,11 +168,10 @@ export function handleUploadDragOver(
   event: UploadDragEventLike,
   disabled: boolean = false
 ): UploadDragResult {
-  if (disabled) {
-    return { handled: false, isDragging: false, files: [] }
-  }
-
   event.preventDefault()
+  if (disabled) {
+    return { handled: true, isDragging: false, files: [] }
+  }
   return { handled: true, isDragging: true, files: [] }
 }
 
@@ -182,11 +189,11 @@ export function handleUploadDragLeave(
   disabled: boolean = false,
   currentTarget?: EventTarget | null
 ): UploadDragResult {
+  event.preventDefault()
   if (disabled) {
-    return { handled: false, isDragging: false, files: [] }
+    return { handled: true, isDragging: false, files: [] }
   }
 
-  event.preventDefault()
   const root = currentTarget ?? event.currentTarget
   if (isNodeInside(root, event.relatedTarget)) {
     return { handled: true, isDragging: true, files: [] }
@@ -198,11 +205,10 @@ export function handleUploadDrop(
   event: UploadDragEventLike,
   disabled: boolean = false
 ): UploadDragResult {
-  if (disabled) {
-    return { handled: false, isDragging: false, files: [] }
-  }
-
   event.preventDefault()
+  if (disabled) {
+    return { handled: true, isDragging: false, files: [] }
+  }
   return {
     handled: true,
     isDragging: false,
@@ -273,14 +279,23 @@ export function validateFileType(file: File, accept?: string): boolean {
   const fileExtension = getFileExtension(file.name)
 
   return acceptList.some((acceptItem) => {
+    if (acceptItem === '*/*') return true
+
     if (acceptItem.startsWith('.')) {
       return fileExtension === acceptItem
     }
 
     if (acceptItem.endsWith('/*')) {
       const baseType = acceptItem.slice(0, -2)
+      if (!baseType || baseType === '*') return true
       if (fileType.startsWith(`${baseType}/`)) return true
-      if (!fileType && baseType === 'image') return IMAGE_EXTENSIONS.has(fileExtension)
+      if (
+        baseType === 'image' &&
+        (fileType === '' || fileType === 'application/octet-stream') &&
+        IMAGE_EXTENSIONS.has(fileExtension)
+      ) {
+        return true
+      }
       return false
     }
 
@@ -334,37 +349,37 @@ export function getDragAreaClasses(isDragging: boolean, disabled: boolean): stri
     'py-8',
     'border-2',
     'border-dashed',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
-    '[transition:var(--tiger-transition-base,border-color_200ms_ease,background-color_200ms_ease)]',
+    'rounded-[var(--tiger-radius-md)]',
+    '[transition:var(--tiger-transition-base)]',
     'focus:outline-none',
     'focus-visible:ring-2',
     'focus-visible:ring-offset-2',
-    'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+    'focus-visible:ring-[var(--tiger-focus-ring)]'
   ]
 
   let stateClasses: string[]
   if (disabled) {
     stateClasses = [
-      'border-[var(--tiger-border,#d1d5db)]',
-      'bg-[var(--tiger-surface-muted,#f9fafb)]',
+      'border-[var(--tiger-border)]',
+      'bg-[var(--tiger-surface-muted)]',
       'cursor-not-allowed',
-      'text-[var(--tiger-text-muted,#9ca3af)]'
+      'text-[var(--tiger-text-secondary)]'
     ]
   } else if (isDragging) {
     stateClasses = [
-      'border-[var(--tiger-primary,#2563eb)]',
-      'bg-[var(--tiger-primary,#2563eb)]/10',
+      'border-[var(--tiger-primary)]',
+      'bg-[var(--tiger-primary)]/10',
       'cursor-copy',
-      'text-[var(--tiger-text,#111827)]'
+      'text-[var(--tiger-text)]'
     ]
   } else {
     stateClasses = [
-      'border-[var(--tiger-border,#d1d5db)]',
-      'bg-[var(--tiger-surface,#ffffff)]',
-      'hover:border-[var(--tiger-primary,#2563eb)]',
-      'hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
+      'border-[var(--tiger-border)]',
+      'bg-[var(--tiger-surface)]',
+      'hover:border-[var(--tiger-primary)]',
+      'hover:bg-[var(--tiger-surface-muted)]',
       'cursor-pointer',
-      'text-[var(--tiger-text,#111827)]'
+      'text-[var(--tiger-text)]'
     ]
   }
 
@@ -375,20 +390,19 @@ export function getDragAreaClasses(isDragging: boolean, disabled: boolean): stri
  * File list item status classes (constant for performance)
  */
 const FILE_LIST_STATUS_CLASSES: Record<NonNullable<UploadFileStatus>, string[]> = {
-  ready: [
-    'bg-[var(--tiger-surface-muted,#f9fafb)]',
-    'hover:bg-[var(--tiger-surface-muted,#f3f4f6)]'
-  ],
-  uploading: ['bg-[var(--tiger-primary,#2563eb)]/10', 'text-[var(--tiger-text,#111827)]'],
-  success: ['bg-[var(--tiger-success,#16a34a)]/10', 'text-[var(--tiger-text,#111827)]'],
-  error: ['bg-[var(--tiger-error,#dc2626)]/10', 'text-[var(--tiger-text,#111827)]']
+  ready: ['bg-[var(--tiger-surface-muted)]', 'hover:bg-[var(--tiger-surface-muted)]'],
+  queued: ['bg-[var(--tiger-surface-muted)]', 'hover:bg-[var(--tiger-surface-muted)]'],
+  uploading: ['bg-[var(--tiger-primary)]/10', 'text-[var(--tiger-text)]'],
+  success: ['bg-[var(--tiger-success)]/10', 'text-[var(--tiger-text)]'],
+  error: ['bg-[var(--tiger-error)]/10', 'text-[var(--tiger-text)]']
 }
 
 const PICTURE_CARD_STATUS_CLASSES: Record<NonNullable<UploadFileStatus>, string[]> = {
-  ready: ['border-[var(--tiger-border,#d1d5db)]'],
-  uploading: ['border-[var(--tiger-primary,#2563eb)]', 'bg-[var(--tiger-primary,#2563eb)]/10'],
-  success: ['border-[var(--tiger-border,#d1d5db)]', 'hover:border-[var(--tiger-primary,#2563eb)]'],
-  error: ['border-[var(--tiger-error,#dc2626)]', 'bg-[var(--tiger-error,#dc2626)]/10']
+  ready: ['border-[var(--tiger-border)]'],
+  queued: ['border-[var(--tiger-border)]'],
+  uploading: ['border-[var(--tiger-primary)]', 'bg-[var(--tiger-primary)]/10'],
+  success: ['border-[var(--tiger-border)]', 'hover:border-[var(--tiger-primary)]'],
+  error: ['border-[var(--tiger-error)]', 'bg-[var(--tiger-error)]/10']
 }
 
 /**
@@ -405,7 +419,7 @@ export function getFileListItemClasses(status?: UploadFileStatus): string {
     'py-2',
     'rounded',
     'tiger-motion-aware',
-    '[transition:var(--tiger-transition-base,background-color_200ms_ease)]'
+    '[transition:var(--tiger-transition-base)]'
   ]
 
   const stateClasses = status ? FILE_LIST_STATUS_CLASSES[status] : FILE_LIST_STATUS_CLASSES.ready
@@ -427,9 +441,9 @@ export function getPictureCardClasses(status?: UploadFileStatus): string {
     'w-32',
     'h-32',
     'border',
-    'rounded-[var(--tiger-radius-md,0.5rem)]',
+    'rounded-[var(--tiger-radius-md)]',
     'tiger-motion-aware',
-    '[transition:var(--tiger-transition-base,border-color_200ms_ease)]'
+    '[transition:var(--tiger-transition-base)]'
   ]
 
   const stateClasses = status
@@ -444,20 +458,78 @@ export const uploadListClasses = 'mt-4 flex flex-col gap-2'
 export const uploadPictureListClasses = 'mt-4 flex flex-wrap gap-2'
 export const uploadItemActionsClasses = 'flex items-center gap-2 ms-4'
 export const uploadPictureOverlayClasses =
-  'absolute inset-0 flex items-center justify-center gap-2 bg-[var(--tiger-text,#111827)]/50 opacity-0 hover:opacity-100 focus-within:opacity-100 tiger-motion-aware [transition:var(--tiger-transition-base,opacity_150ms_ease)]'
+  'absolute inset-0 flex items-center justify-center gap-2 bg-[var(--tiger-text)]/50 opacity-0 hover:opacity-100 focus-within:opacity-100 tiger-motion-aware [transition:var(--tiger-transition-base)]'
 export const uploadPictureImageWrapClasses =
   'absolute inset-0 overflow-hidden rounded-[inherit] pointer-events-none'
 export const uploadProgressTrackClasses =
-  'mt-1 h-1 w-full overflow-hidden rounded-full bg-[var(--tiger-border,#d1d5db)]'
+  'mt-1 h-1 w-full overflow-hidden rounded-full bg-[var(--tiger-border)]'
 export const uploadProgressValueClasses =
-  'h-full bg-[var(--tiger-primary,#2563eb)] tiger-motion-aware [transition:var(--tiger-transition-base,width_150ms_ease)]'
+  'h-full bg-[var(--tiger-primary)] tiger-motion-aware [transition:var(--tiger-transition-base)]'
 export const uploadIconActionClasses =
-  'inline-flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-error,#dc2626)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] rounded-sm tiger-motion-aware [transition:var(--tiger-transition-base,color_150ms_ease)] disabled:pointer-events-none disabled:opacity-50'
+  'inline-flex items-center justify-center text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-error)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)] rounded-sm tiger-motion-aware [transition:var(--tiger-transition-base)] disabled:pointer-events-none disabled:opacity-50'
 
 export function isImageUploadFile(file: Pick<UploadFile, 'type' | 'name' | 'url'>): boolean {
   if (file.type && file.type.toLowerCase().startsWith('image/')) return true
   if (file.url && /\.(avif|bmp|gif|ico|jpe?g|png|svg|tiff?|webp)(\?|$)/i.test(file.url)) return true
   return IMAGE_EXTENSIONS.has(getFileExtension(file.name))
+}
+
+export function isSubmittableUploadUrl(url: string): boolean {
+  if (!/^https?:\/\//i.test(url)) return false
+  try {
+    const protocol = new URL(url).protocol
+    return protocol === 'http:' || protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+/** Usable URL from an upload response. Missing URL must not fall back to the uid. */
+export function readUploadResponseUrl(response: unknown): string | undefined {
+  if (typeof response === 'string') {
+    return isSubmittableUploadUrl(response) ? response : undefined
+  }
+  if (!response || typeof response !== 'object') return undefined
+  const record = response as Record<string, unknown>
+  for (const key of ['url', 'fileUrl', 'src']) {
+    const value = record[key]
+    if (typeof value === 'string' && isSubmittableUploadUrl(value)) return value
+  }
+  if (record.data && typeof record.data === 'object') return readUploadResponseUrl(record.data)
+  return undefined
+}
+
+/**
+ * Preview only `blob:` URLs and http(s) origins the caller listed.
+ * `allowedOrigins` entries are origins (`https://cdn.example`) or full URL prefixes.
+ */
+export function filterUploadPreviewUrl(
+  url: string | undefined,
+  allowedOrigins?: readonly string[]
+): string | undefined {
+  if (!url) return undefined
+  if (url.startsWith('blob:')) return url
+  if (!isSubmittableUploadUrl(url)) return undefined
+  if (!allowedOrigins || allowedOrigins.length === 0) return url
+  let origin = ''
+  try {
+    origin = new URL(url).origin
+  } catch {
+    return undefined
+  }
+  const allowed = allowedOrigins.some(
+    (entry) => entry === origin || entry === url || url.startsWith(entry)
+  )
+  return allowed ? url : undefined
+}
+
+/** URLs that native submit should include. Uids are never submitted. */
+export function uploadSubmitValues(files: readonly UploadFile[]): string[] {
+  const values: string[] = []
+  for (const file of files) {
+    if (file.url && isSubmittableUploadUrl(file.url)) values.push(file.url)
+  }
+  return values
 }
 
 export interface UploadPreviewUrlCache {
@@ -471,8 +543,7 @@ export function createUploadPreviewUrlCache(): UploadPreviewUrlCache {
 
   return {
     get(file) {
-      if (file.url) return file.url
-      return urls.get(file.uid)
+      return urls.get(file.uid) ?? file.url
     },
     sync(files) {
       const active = new Set(files.map((file) => file.uid))

@@ -10,14 +10,14 @@ export default function App() {
       <FormItem name="sign" label="合同签名">
         <Signature value={value} onChange={setValue} exportType="image/jpeg" />
       </FormItem>
-      <p className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+      <p className="text-sm text-[var(--tiger-text-secondary)]">
         {value ? '已签名（受控值为 SVG data URL）' : '等待签名'}
       </p>
       {value ? (
         <img
           src={value}
           alt=""
-          className="w-full rounded border border-[var(--tiger-border,#d1d5db)]"
+          className="w-full rounded border border-[var(--tiger-border)]"
         />
       ) : null}
     </div>

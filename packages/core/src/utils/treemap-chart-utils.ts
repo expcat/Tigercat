@@ -4,10 +4,12 @@
  */
 
 import type { TreeMapChartDatum } from '../types/chart'
-import { DEFAULT_CHART_COLORS } from './chart-utils'
-import { heatmapLabelFill } from './heatmap-chart-utils'
+import { DEFAULT_CHART_COLORS } from './chart/color'
+import { chartLabelFill } from './heatmap-chart-utils'
 import { isFiniteNumber } from './chart/layout'
 import { devWarn } from './dev-warn'
+import { scanFiniteExtent } from './chart/scale'
+import { chartTreeNodeKey, createChartTreeVisit, type ChartTreeVisit } from './chart/tree-visit'
 
 export const DEFAULT_TREEMAP_WIDTH = 400
 export const DEFAULT_TREEMAP_HEIGHT = 300
@@ -17,7 +19,7 @@ export const DEFAULT_TREEMAP_NODE_RADIUS = 2
 export const DEFAULT_TREEMAP_MIN_LABEL_SIZE = 10
 
 export const treemapNodeTransitionClasses =
-  'transition-[opacity,filter] motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base,200ms)]'
+  'transition-[opacity,filter] motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
 
 export interface TreeMapNode {
   index: number
@@ -30,6 +32,7 @@ export interface TreeMapNode {
   h: number
   color: string
   datum: TreeMapChartDatum
+  parentIndex: number | null
   showLabel: boolean
   fontSize: number
   labelFill: string
@@ -50,13 +53,27 @@ interface SizedItem {
   color: string
 }
 
-function nodeValue(datum: TreeMapChartDatum): number | null {
+function nodeValue(
+  datum: TreeMapChartDatum,
+  visit: ChartTreeVisit = createChartTreeVisit()
+): number | null {
+  const key = chartTreeNodeKey(datum)
+  if (
+    !visit.enter(
+      key,
+      ['TreeMapChart.cycle', 'TreeMapChart skipped a cyclic node'],
+      ['TreeMapChart.duplicate', 'TreeMapChart skipped a duplicate node']
+    )
+  ) {
+    return null
+  }
+  try {
   const children = datum.children
   if (children && children.length > 0) {
     let sum = 0
     let any = false
     for (const child of children) {
-      const childValue = nodeValue(child)
+      const childValue = nodeValue(child, visit)
       if (childValue === null) continue
       any = true
       sum += childValue
@@ -84,14 +101,18 @@ function nodeValue(datum: TreeMapChartDatum): number | null {
     return null
   }
   return datum.value
+  } finally {
+    visit.leave(key)
+  }
 }
 
 function worst(row: number[], side: number): number {
   if (row.length === 0 || !(side > 0)) return Number.POSITIVE_INFINITY
   const sum = row.reduce((total, value) => total + value, 0)
   if (!(sum > 0)) return Number.POSITIVE_INFINITY
-  const max = Math.max(...row)
-  const min = Math.min(...row)
+  const extent = scanFiniteExtent(row)
+  const max = extent?.max ?? 0
+  const min = extent?.min ?? 0
   return Math.max((side * side * max) / (sum * sum), (sum * sum) / (side * side * min))
 }
 
@@ -103,7 +124,8 @@ function pushNode(
   h: number,
   gap: number,
   minLabelSize: number,
-  out: TreeMapNode[]
+  out: TreeMapNode[],
+  parentIndex: number | null
 ): TreeMapNode {
   const pad = gap / 2
   const node: TreeMapNode = {
@@ -119,7 +141,8 @@ function pushNode(
     datum: item.datum,
     showLabel: false,
     fontSize: minLabelSize,
-    labelFill: heatmapLabelFill(item.color, 0.6)
+    labelFill: chartLabelFill(item.color),
+    parentIndex
   }
   const fontSize = Math.min(12, Math.max(8, Math.min(node.h * 0.3, node.w * 0.2)))
   node.fontSize = fontSize
@@ -138,7 +161,8 @@ function layoutRow(
   horizontal: boolean,
   gap: number,
   minLabelSize: number,
-  out: TreeMapNode[]
+  out: TreeMapNode[],
+  parentIndex: number | null
 ): void {
   const total = row.reduce((sum, item) => sum + item.value, 0)
   let offset = 0
@@ -146,11 +170,11 @@ function layoutRow(
     const share = total > 0 ? item.value / total : 0
     if (horizontal) {
       const rowH = h * share
-      layoutItem(item, x, y + offset, w, rowH, gap, minLabelSize, out)
+      layoutItem(item, x, y + offset, w, rowH, gap, minLabelSize, out, parentIndex)
       offset += rowH
     } else {
       const rowW = w * share
-      layoutItem(item, x + offset, y, rowW, h, gap, minLabelSize, out)
+      layoutItem(item, x + offset, y, rowW, h, gap, minLabelSize, out, parentIndex)
       offset += rowW
     }
   }
@@ -164,9 +188,10 @@ function layoutItem(
   h: number,
   gap: number,
   minLabelSize: number,
-  out: TreeMapNode[]
+  out: TreeMapNode[],
+  parentIndex: number | null
 ): void {
-  const node = pushNode(item, x, y, w, h, gap, minLabelSize, out)
+  const node = pushNode(item, x, y, w, h, gap, minLabelSize, out, parentIndex)
   const children = item.datum.children
   if (!children || children.length === 0) return
   const header = Math.min(18, Math.max(0, node.h * 0.22))
@@ -176,7 +201,7 @@ function layoutItem(
   if (childW <= 0 || childH <= 0) return
   const childItems = sizeItems(children, item.depth + 1, item.color)
   if (childItems.length === 0) return
-  squarify(childItems, node.x + inset, node.y + header, childW, childH, gap, minLabelSize, out)
+  squarify(childItems, node.x + inset, node.y + header, childW, childH, gap, minLabelSize, out, node.index)
 }
 
 function squarify(
@@ -187,11 +212,12 @@ function squarify(
   h: number,
   gap: number,
   minLabelSize: number,
-  out: TreeMapNode[]
+  out: TreeMapNode[],
+  parentIndex: number | null
 ): void {
   if (items.length === 0 || w <= 0 || h <= 0) return
   if (items.length === 1) {
-    layoutItem(items[0], x, y, w, h, gap, minLabelSize, out)
+    layoutItem(items[0], x, y, w, h, gap, minLabelSize, out, parentIndex)
     return
   }
 
@@ -227,12 +253,12 @@ function squarify(
     const horizontal = cw >= ch
     if (horizontal) {
       const rowW = cw * rowShare
-      layoutRow(row, cx, cy, rowW, ch, false, gap, minLabelSize, out)
+      layoutRow(row, cx, cy, rowW, ch, false, gap, minLabelSize, out, parentIndex)
       cx += rowW
       cw -= rowW
     } else {
       const rowH = ch * rowShare
-      layoutRow(row, cx, cy, cw, rowH, true, gap, minLabelSize, out)
+      layoutRow(row, cx, cy, cw, rowH, true, gap, minLabelSize, out, parentIndex)
       cy += rowH
       ch -= rowH
     }
@@ -282,8 +308,49 @@ export function layoutTreeMap(
     })
   })
   const out: TreeMapNode[] = []
-  squarify(items, 0, 0, safeWidth, safeHeight, gap, minLabelSize, out)
+  squarify(items, 0, 0, safeWidth, safeHeight, gap, minLabelSize, out, null)
   return out
+}
+
+export function nextTreeMapNodeIndex(
+  index: number,
+  key: string,
+  nodes: readonly Pick<TreeMapNode, 'index' | 'x' | 'y' | 'w' | 'h' | 'parentIndex'>[]
+): number {
+  const current = nodes[index]
+  if (!current) return index
+  const cx = current.x + current.w / 2
+  const cy = current.y + current.h / 2
+  let best: number | null = null
+  let bestDist = Number.POSITIVE_INFINITY
+  for (const node of nodes) {
+    if (node.index === current.index) continue
+    const dx = node.x + node.w / 2 - cx
+    const dy = node.y + node.h / 2 - cy
+    const matches =
+      key === 'ArrowRight'
+        ? dx > 0 && Math.abs(dy) <= Math.abs(dx)
+        : key === 'ArrowLeft'
+          ? dx < 0 && Math.abs(dy) <= Math.abs(dx)
+          : key === 'ArrowDown'
+            ? dy > 0 && Math.abs(dx) <= Math.abs(dy)
+            : key === 'ArrowUp'
+              ? dy < 0 && Math.abs(dx) <= Math.abs(dy)
+              : false
+    if (!matches) continue
+    const dist = dx * dx + dy * dy
+    if (dist < bestDist) {
+      bestDist = dist
+      best = node.index
+    }
+  }
+  if (best !== null) return best
+  if (key === 'ArrowUp' && current.parentIndex !== null) return current.parentIndex
+  if (key === 'ArrowDown') {
+    const child = nodes.find((node) => node.parentIndex === current.index)
+    if (child) return child.index
+  }
+  return index
 }
 
 export function computeTreeMapNodes(

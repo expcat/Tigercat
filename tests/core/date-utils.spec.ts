@@ -6,6 +6,7 @@ import {
   clearCalendarMonthDaysCache,
   formatDate,
   formatDateWithLocale,
+  toAsciiDigits,
   getCalendarDays,
   getCalendarMonthDaysCacheSize,
   getDatePickerCalendarCellState,
@@ -255,6 +256,32 @@ describe('parseDate', () => {
     expect(parseDate('2024-01-05')?.getFullYear()).toBe(2024)
     expect(parseDate('15/01/2024', 'dd/MM/yyyy')).toEqual(new Date(2024, 0, 15))
     expect(parseDate('01/15/2024', 'dd/MM/yyyy')).toBeNull()
+  })
+
+  it('maps Unicode decimal digits to ASCII without Number(char)', () => {
+    expect(toAsciiDigits('２０２４')).toBe('2024')
+    expect(toAsciiDigits('٢٠٢٤')).toBe('2024')
+    expect(toAsciiDigits('۲۰۲۴')).toBe('2024')
+    expect(toAsciiDigits('२०२४')).toBe('2024')
+    expect(toAsciiDigits('২০২৪')).toBe('2024')
+    expect(toAsciiDigits('๒๕๖๗')).toBe('2567')
+    expect(toAsciiDigits('๐๕')).toBe('05')
+  })
+
+  it('round-trips a Buddhist display back to the Gregorian day', () => {
+    const date = new Date(2024, 0, 5)
+    const text = formatDate(date, 'yyyy-MM-dd', 'th-TH')
+    expect(text).toBe('2567-01-05')
+    const parsed = parseDate(text, 'yyyy-MM-dd', 'th-TH')
+    expect(parsed).toEqual(date)
+    expect(parsed?.getFullYear()).toBe(2024)
+  })
+
+  it('round-trips ar-SA digits to the same Gregorian day', () => {
+    const date = new Date(2024, 0, 5)
+    const text = formatDate(date, 'yyyy/MM/dd', 'ar-SA')
+    expect(text).not.toBe('2024/01/05')
+    expect(parseDate(text, 'yyyy/MM/dd', 'ar-SA')).toEqual(date)
   })
 
   it('still parses ISO datetime strings that include a time component', () => {

@@ -13,11 +13,13 @@ import type {
   TreeNodeKey
 } from '../types/tree'
 import { classNames } from './class-names'
+import { typedKeyId } from './focus-utils'
+import { scrollTopForVirtualAlign } from './virtual-list-utils'
 
 export type { TreeNodeKey }
 
 export function treeKeyId(key: TreeNodeKey): string {
-  return String(key)
+  return typedKeyId(key)
 }
 
 export function sameTreeKey(
@@ -115,6 +117,66 @@ export function isTreeNodeExpandable(node: TreeNode, hasLoadData = false): boole
   return hasLoadData
 }
 
+export type BranchLoadGate = 'reject' | 'load' | 'ready'
+
+/**
+ * Shared lazy-load gate. Disabled nodes are rejected. A leaf (`isLeaf: true`,
+ * or no children when loadData is absent) is ready and must not be intercepted.
+ * Empty children with `isLeaf !== true` and loadData still need a load until
+ * that node has been loaded.
+ */
+export function gateBranchLoad(options: {
+  disabled?: boolean
+  isLeaf?: boolean
+  hasChildren: boolean
+  hasLoadData: boolean
+  loaded: boolean
+  loading: boolean
+}): BranchLoadGate {
+  if (options.disabled) return 'reject'
+  const expandable = isTreeNodeExpandable(
+    {
+      key: '',
+      label: '',
+      isLeaf: options.isLeaf,
+      children: options.hasChildren ? [{ key: '', label: '' }] : []
+    },
+    options.hasLoadData
+  )
+  if (!expandable || options.hasChildren || !options.hasLoadData || options.loaded) return 'ready'
+  if (options.loading) return 'load'
+  return 'load'
+}
+
+/** After a load settles, expand into children or commit a resolved leaf. */
+export function decideAfterBranchLoad(options: {
+  childCount: number
+  intent: 'select' | 'expand'
+  /** Cascader `changeOnSelect` or a tree row select also commits a loaded branch. */
+  commitLoadedBranch?: boolean
+}): { expand: boolean; commit: boolean } {
+  const hasChildren = options.childCount > 0
+  if (options.intent === 'expand') return { expand: true, commit: false }
+  if (!hasChildren) return { expand: false, commit: true }
+  return { expand: true, commit: options.commitLoadedBranch === true }
+}
+
+export function nextLoadToken(tokens: Map<string, number>, id: string): number {
+  const next = (tokens.get(id) ?? 0) + 1
+  tokens.set(id, next)
+  return next
+}
+
+export function isCurrentLoadToken(tokens: Map<string, number>, id: string, token: number): boolean {
+  return tokens.get(id) === token
+}
+
+/** Half-checked completes the enabled branch. Fully checked clears it. */
+export function nextCheckedFromTreeRow(checked: boolean, halfChecked: boolean): boolean {
+  if (halfChecked) return true
+  return !checked
+}
+
 export function nodeHasChildren(node: TreeNode): boolean {
   return Boolean(node.children && node.children.length > 0)
 }
@@ -122,11 +184,12 @@ export function nodeHasChildren(node: TreeNode): boolean {
 export function getVisibleTreeItems(
   treeData: TreeNode[],
   expandedKeys: Iterable<TreeNodeKey> = [],
-  matchedKeys?: Iterable<TreeNodeKey>
+  matchedKeys?: Iterable<TreeNodeKey> | null
 ): VisibleTreeItem[] {
   const expandedIds = createTreeKeyIdSet(expandedKeys)
-  const matchedIds = matchedKeys ? createTreeKeyIdSet(matchedKeys) : null
-  const isFiltered = Boolean(matchedIds && matchedIds.size > 0)
+  // `undefined` / `null` is no search. An empty matched set is an active search with zero hits.
+  const filtering = matchedKeys != null
+  const matchedIds = filtering ? createTreeKeyIdSet(matchedKeys) : null
   const result: VisibleTreeItem[] = []
 
   function traverse(
@@ -138,7 +201,7 @@ export function getVisibleTreeItems(
     const lastIndex = nodes.length - 1
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]
-      if (isFiltered && matchedIds && !matchedIds.has(treeKeyId(node.key))) continue
+      if (filtering && matchedIds && !matchedIds.has(treeKeyId(node.key))) continue
 
       const isLastChild = i === lastIndex
       result.push({
@@ -268,20 +331,20 @@ export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAct
 export const TREE_INDENT_SLOT_PX = 24
 
 export const treeBaseClasses =
-  'w-full bg-[var(--tiger-tree-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-text,#111827)] rounded-[var(--tiger-radius-md,0.5rem)]'
+  'w-full bg-[var(--tiger-tree-bg)] text-[var(--tiger-text)] rounded-[var(--tiger-radius-md)]'
 
 export const treeNodeWrapperClasses = 'select-none'
 
 export const treeNodeContentClasses =
-  'flex items-center px-2 py-1.5 rounded tiger-motion-aware transition-colors duration-200 motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'flex items-center px-2 py-1.5 rounded tiger-motion-aware transition-colors duration-200 motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring)]'
 
 export const treeNodeHoverClasses =
-  'hover:bg-[var(--tiger-tree-node-hover,var(--tiger-surface-muted,#f9fafb))]'
+  'hover:bg-[var(--tiger-tree-node-hover)]'
 
 export const treeNodeSelectedClasses =
-  'bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_10%,transparent)] text-[var(--tiger-primary,#2563eb)]'
+  'bg-[color-mix(in_srgb,var(--tiger-primary)_10%,transparent)] text-[var(--tiger-primary)]'
 
-export const treeNodeActiveClasses = 'bg-[var(--tiger-surface-muted,#f3f4f6)]'
+export const treeNodeActiveClasses = 'bg-[var(--tiger-surface-muted)]'
 
 export const treeNodeDisabledClasses = 'opacity-50 cursor-not-allowed'
 
@@ -300,25 +363,25 @@ export const treeNodeIconClasses = 'me-2 flex-shrink-0'
 
 export const treeNodeLabelClasses = 'flex-1 truncate'
 
-export const treeNodeLabelMatchedClasses = 'font-semibold text-[var(--tiger-primary,#2563eb)]'
+export const treeNodeLabelMatchedClasses = 'font-semibold text-[var(--tiger-primary)]'
 
 export const treeNodeChildrenClasses = 'ms-6'
 
 export const treeLoadingClasses = 'inline-block ms-2 animate-spin h-4 w-4'
 
-export const treeEmptyStateClasses = 'py-8 text-center text-[var(--tiger-text-secondary,#6b7280)]'
+export const treeEmptyStateClasses = 'py-8 text-center text-[var(--tiger-text-secondary)]'
 
-export const treeLineClasses = 'border-s border-[var(--tiger-border,#e5e7eb)]'
+export const treeLineClasses = 'border-s border-[var(--tiger-border)]'
 
 export const treeSearchInputClasses =
-  'w-full mb-2 px-2 py-1 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded bg-[var(--tiger-surface,#ffffff)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--tiger-primary,#2563eb)]'
+  'w-full mb-2 px-2 py-1 text-sm border border-[var(--tiger-border)] rounded bg-[var(--tiger-surface)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--tiger-primary)]'
 
 export const treeDropBeforeClasses =
-  'before:absolute before:inset-x-2 before:top-0 before:h-0.5 before:bg-[var(--tiger-primary,#2563eb)]'
+  'before:absolute before:inset-x-2 before:top-0 before:h-0.5 before:bg-[var(--tiger-primary)]'
 export const treeDropAfterClasses =
-  'after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-[var(--tiger-primary,#2563eb)]'
+  'after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-[var(--tiger-primary)]'
 export const treeDropInsideClasses =
-  'outline outline-2 outline-[var(--tiger-primary,#2563eb)] outline-offset-[-2px]'
+  'outline outline-2 outline-[var(--tiger-primary)] outline-offset-[-2px]'
 
 export function getTreeNodeClasses(
   selected: boolean,
@@ -592,6 +655,17 @@ export function handleNodeCheck(
   return calculateCheckedState(treeData, next, checkStrictly)
 }
 
+/** Strategy filters the outward value only. `checkStrictly` keeps each key. */
+export function resolveOutwardCheckedKeys(
+  checkedState: TreeCheckedState,
+  treeData: TreeNode[],
+  strategy: TreeCheckStrategy = 'all',
+  checkStrictly = false
+): TreeNodeKey[] {
+  if (checkStrictly) return checkedState.checked
+  return getCheckedKeysByStrategy(checkedState, treeData, strategy)
+}
+
 export function getCheckedKeysByStrategy(
   checkedState: TreeCheckedState,
   treeData: TreeNode[],
@@ -704,10 +778,13 @@ export function getTreeVirtualAlignScrollTop(
   viewportHeight: number
 ): number {
   if (index < 0 || itemHeight <= 0 || viewportHeight <= 0) return scrollTop
-  const top = index * itemHeight
-  if (top < scrollTop) return top
-  if (top + itemHeight > scrollTop + viewportHeight) return top + itemHeight - viewportHeight
-  return scrollTop
+  return scrollTopForVirtualAlign({
+    scrollTop,
+    viewport: viewportHeight,
+    offset: index * itemHeight,
+    size: itemHeight,
+    align: 'auto'
+  })
 }
 
 export function alignTreeVirtualScroll(
@@ -726,5 +803,55 @@ export function alignTreeVirtualScroll(
 }
 
 export function treeItemKeyAttr(key: TreeNodeKey): string {
-  return String(key)
+  return treeKeyId(key)
+}
+
+export function parseTreeKeyId(id: string): TreeNodeKey {
+  if (id.startsWith('n:')) {
+    const value = Number(id.slice(2))
+    return Number.isFinite(value) ? value : id.slice(2)
+  }
+  if (id.startsWith('s:')) return id.slice(2)
+  return id
+}
+
+export interface TreeEdgeScroll {
+  nudge(element: HTMLElement, delta: number): void
+  cancel(): void
+}
+
+/** Coalesce edge drag-scroll into one animation frame. */
+export function createTreeEdgeScroll(hooks?: {
+  requestAnimationFrame?: (callback: () => void) => number
+  cancelAnimationFrame?: (id: number) => void
+}): TreeEdgeScroll {
+  const request =
+    hooks?.requestAnimationFrame ??
+    (typeof requestAnimationFrame === 'function'
+      ? (callback: () => void) => requestAnimationFrame(callback)
+      : (callback: () => void) => setTimeout(callback, 16) as unknown as number)
+  const cancel =
+    hooks?.cancelAnimationFrame ??
+    (typeof cancelAnimationFrame === 'function'
+      ? (id: number) => cancelAnimationFrame(id)
+      : (id: number) => clearTimeout(id))
+  let frame = 0
+  let target: HTMLElement | null = null
+  let delta = 0
+  return {
+    nudge(element, amount) {
+      target = element
+      delta = amount
+      if (frame) return
+      frame = request(() => {
+        frame = 0
+        if (target) target.scrollTop += delta
+      })
+    },
+    cancel() {
+      if (!frame) return
+      cancel(frame)
+      frame = 0
+    }
+  }
 }

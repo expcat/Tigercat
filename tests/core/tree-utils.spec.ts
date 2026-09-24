@@ -7,6 +7,8 @@ import {
   getAllKeys,
   getAutoExpandKeys,
   getCheckedKeysByStrategy,
+  nextCheckedFromTreeRow,
+  resolveOutwardCheckedKeys,
   getDescendantKeys,
   getFirstVisibleChildKey,
   getLeafKeys,
@@ -64,7 +66,7 @@ describe('tree-utils classes', () => {
     expect(treeNodeWrapperClasses).toBe('select-none')
     expect(treeNodeContentClasses).toContain('tiger-motion-aware')
     expect(treeNodeContentClasses).toContain('motion-reduce:transition-none')
-    expect(treeNodeHoverClasses).toContain('--tiger-surface-muted')
+    expect(treeNodeHoverClasses).toContain('--tiger-tree-node-hover')
     expect(treeNodeSelectedClasses).toContain('tiger-primary')
     expect(treeNodeDisabledClasses).toContain('cursor-not-allowed')
     expect(treeNodeIndentClasses).toContain('w-6')
@@ -83,25 +85,18 @@ describe('tree-utils classes', () => {
   })
 
   it('lands tree root chrome on registered surface/text, not locked white or bg/fill aliases', () => {
-    expect(treeBaseClasses).toContain('--tiger-surface')
+    expect(treeBaseClasses).toContain('--tiger-tree-bg')
     expect(treeBaseClasses).toContain('--tiger-text')
-    expect(treeBaseClasses).toContain('--tiger-tree-bg,var(--tiger-surface')
     expect(treeBaseClasses).toContain('w-full')
     expect(treeBaseClasses).toContain('--tiger-radius-md')
     expect(treeBaseClasses).not.toContain('bg-white')
-    expect(treeBaseClasses).not.toContain('--tiger-bg')
     expect(treeBaseClasses).not.toContain('--tiger-fill')
-    expect(treeBaseClasses).not.toContain('--tiger-surface-muted')
-
-    const overrideIdx = treeBaseClasses.indexOf('--tiger-tree-bg')
-    const semanticIdx = treeBaseClasses.indexOf('--tiger-surface')
-    expect(overrideIdx).toBeGreaterThan(-1)
-    expect(semanticIdx).toBeGreaterThan(overrideIdx)
+    expect(treeBaseClasses).not.toContain('--tiger-bg')
   })
 
   it('lands node hover on registered surface-muted, not locked gray-50', () => {
-    expect(treeNodeHoverClasses).toContain('--tiger-surface-muted')
-    expect(treeNodeHoverClasses).toContain('--tiger-tree-node-hover,var(--tiger-surface-muted')
+    expect(treeNodeHoverClasses).toContain('--tiger-tree-node-hover')
+    expect(treeNodeHoverClasses).not.toContain('--tiger-fill')
     expect(treeNodeHoverClasses).not.toContain('hover:bg-gray-50')
     expect(treeNodeHoverClasses).not.toContain('bg-gray-50')
   })
@@ -149,6 +144,22 @@ describe('tree-utils traversal', () => {
     ])
   })
 
+  it('returns no rows when a search matched set is empty', () => {
+    const expanded = new Set<string | number>(['root', 'child-b'])
+    expect(getVisibleTreeItems(treeData, expanded, new Set()).map((item) => item.key)).toEqual([])
+    expect(getVisibleTreeItems(treeData, expanded, []).map((item) => item.key)).toEqual([])
+  })
+
+  it('returns the expanded tree when matched keys are omitted', () => {
+    const expanded = new Set<string | number>(['root'])
+    expect(getVisibleTreeItems(treeData, expanded, undefined).map((item) => item.key)).toEqual([
+      'root',
+      'child-a',
+      'child-b',
+      'standalone'
+    ])
+  })
+
   it('filters visible tree items to matched keys', () => {
     const expanded = new Set<string | number>(['root', 'child-b'])
     const matched = new Set<string | number>(['root', 'child-b', 'leaf-b2'])
@@ -160,7 +171,7 @@ describe('tree-utils traversal', () => {
     ])
   })
 
-  it('treats numeric and string keys as the same node', () => {
+  it('keeps numeric and string keys as different nodes', () => {
     const data: TreeNode[] = [
       {
         key: 1,
@@ -168,10 +179,11 @@ describe('tree-utils traversal', () => {
         children: [{ key: '1-1', label: 'Nested' }]
       }
     ]
-    expect(sameTreeKey(1, '1')).toBe(true)
-    expect(findNode(data, '1')?.label).toBe('One')
+    expect(sameTreeKey(1, '1')).toBe(false)
+    expect(findNode(data, '1')).toBeNull()
+    expect(findNode(data, 1)?.label).toBe('One')
     expect(getParentKeys(data, '1-1')).toEqual([1])
-    const items = getVisibleTreeItems(data, new Set(['1']))
+    const items = getVisibleTreeItems(data, new Set([1]))
     expect(items.map((item) => item.key)).toEqual([1, '1-1'])
   })
 
@@ -293,6 +305,41 @@ describe('tree-utils checked state', () => {
     const mid = calculateCheckedState(treeData, ['child-b'])
     expect(getCheckedKeysByStrategy(mid, treeData, 'parent')).toEqual(['child-b'])
     expect(getCheckedKeysByStrategy(mid, treeData, 'child')).toEqual(['leaf-b1', 'leaf-b2'])
+  })
+
+  it('keeps a half-checked parent indeterminate while parent strategy reports only full parents', () => {
+    const visual = calculateCheckedState(treeData, ['leaf-b1'])
+    expect(visual.halfChecked).toEqual(expect.arrayContaining(['child-b', 'root']))
+    expect(getCheckedKeysByStrategy(visual, treeData, 'parent')).toEqual(['leaf-b1'])
+    const outward = resolveOutwardCheckedKeys(visual, treeData, 'parent', false)
+    const again = calculateCheckedState(treeData, outward)
+    expect(again.halfChecked).toEqual(expect.arrayContaining(['child-b', 'root']))
+    expect(again.checked).toContain('leaf-b1')
+    expect(again.checked).not.toContain('root')
+  })
+
+  it('does not apply check strategy when checkStrictly is set', () => {
+    const strict = handleNodeCheck(treeData, 'root', true, [], true)
+    expect(resolveOutwardCheckedKeys(strict, treeData, 'child', true)).toEqual(strict.checked)
+    expect(resolveOutwardCheckedKeys(strict, treeData, 'child', true)).toEqual(['root'])
+  })
+
+  it('completes the enabled branch when a half-checked parent is checked', () => {
+    const partial = calculateCheckedState(treeData, ['leaf-b1'])
+    const rootHalf = partial.halfChecked.includes('root')
+    expect(rootHalf).toBe(true)
+    const next = handleNodeCheck(
+      treeData,
+      'root',
+      nextCheckedFromTreeRow(false, true),
+      partial.checked,
+      false
+    )
+    expect(next.halfChecked).toEqual([])
+    expect(next.checked).toEqual(
+      expect.arrayContaining(['root', 'child-a', 'child-b', 'leaf-b1', 'leaf-b2'])
+    )
+    expect(next.checked).not.toContain('standalone')
   })
 
   it('skips disabled descendants when cascading a check', () => {

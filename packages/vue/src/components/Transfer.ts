@@ -26,7 +26,7 @@ import {
   classNames,
   coerceArrayFormValue,
   coerceClassValue,
-  devWarn,
+  dedupeTransferKeys,
   emptyTransferSelectedKeys,
   filterTransferItems,
   getCheckboxLabelClasses,
@@ -40,9 +40,11 @@ import {
   mergeAriaDescribedBy,
   mergeTigerLocale,
   moveTransferItems,
+  partitionTransferSelection,
   resolveFormItemSeed,
   resolveLocaleText,
-  resolveTransferTargetKeys,
+  resolveTransferValue,
+  sameTransferKeys,
   runShakeAnimation,
   splitTransferData,
   toggleTransferKey,
@@ -53,6 +55,9 @@ import {
   transferMoveToSourceIconClasses,
   transferMoveToTargetIconClasses,
   transferOperationClasses,
+  getTransferPanelBodyStyle,
+  getTransferVirtualWindow,
+  transferListNeedsWindow,
   transferPanelBodyClasses,
   transferPanelClasses,
   transferPanelHeaderClasses
@@ -129,9 +134,8 @@ export const Transfer = markFormItemGroupControl(
     inheritAttrs: false,
     props: {
       modelValue: { type: Array as PropType<(string | number)[]>, default: undefined },
-      targetKeys: { type: Array as PropType<(string | number)[]>, default: undefined },
       defaultValue: { type: Array as PropType<(string | number)[]>, default: undefined },
-      defaultTargetKeys: { type: Array as PropType<(string | number)[]>, default: undefined },
+      readOnly: { type: Boolean, default: false },
       selectedKeys: { type: Object as PropType<TransferSelectedKeys>, default: undefined },
       defaultSelectedKeys: { type: Object as PropType<TransferSelectedKeys>, default: undefined },
       dataSource: { type: Array as PropType<TransferItem[]>, default: () => [] },
@@ -155,12 +159,8 @@ export const Transfer = markFormItemGroupControl(
     },
     emits: [
       'update:modelValue',
-      'update:targetKeys',
       'update:searchValue',
-      'update:selectedKeys',
-      'change',
-      'search-change',
-      'select-change'
+      'update:selectedKeys'
     ],
     setup(props, { emit, attrs, expose }) {
       const config = useTigerConfig()
@@ -176,32 +176,36 @@ export const Transfer = markFormItemGroupControl(
           targetTitle: props.targetTitle
         })
       )
-      const resolved = computed(() => resolveTransferTargetKeys(props.modelValue, props.targetKeys))
-      watch(
-        () => resolved.value.conflict,
-        (conflict) => {
-          if (conflict) {
-            devWarn(
-              'Transfer.valueTargetKeys',
-              'Transfer received both `modelValue` and `targetKeys`. `modelValue` wins.'
-            )
-          }
-        },
-        { immediate: true }
+      const formBound = computed(
+        () => props.modelValue === undefined && Boolean(formItemControl?.name.value)
       )
-
-      const internalTarget = ref<(string | number)[]>([
-        ...(props.defaultValue ?? props.defaultTargetKeys ?? [])
-      ])
-      const targetValue = computed(() => {
-        const seeded = resolveFormItemSeed(
-          resolved.value.keys,
+      const seededKeys = computed(() =>
+        resolveFormItemSeed(
+          props.modelValue,
           formItemControl?.name.value,
           formItemControl?.value.value,
           coerceArrayFormValue<string | number>
         )
-        return seeded ?? internalTarget.value
-      })
+      )
+      const controlledKeys = computed(() =>
+        props.modelValue !== undefined || formBound.value
+          ? resolveTransferValue(seededKeys.value ?? [])
+          : undefined
+      )
+
+      const internalTarget = ref<(string | number)[]>(dedupeTransferKeys(props.defaultValue ?? []))
+      if (
+        formItemControl?.name.value &&
+        props.modelValue === undefined &&
+        (formItemControl.value.value === '' || formItemControl.value.value == null) &&
+        props.defaultValue !== undefined
+      ) {
+        formItemControl.onChange(dedupeTransferKeys(props.defaultValue))
+      }
+      const targetValue = computed(() => controlledKeys.value ?? internalTarget.value)
+      const canMutate = computed(
+        () => !effectiveDisabled.value && !props.readOnly
+      )
       const internalSelected = ref<TransferSelectedKeys>(
         props.defaultSelectedKeys ?? emptyTransferSelectedKeys()
       )
@@ -228,29 +232,23 @@ export const Transfer = markFormItemGroupControl(
         { flush: 'post' }
       )
 
-      function setTarget(
-        next: (string | number)[],
-        direction: 'left' | 'right',
-        moved: (string | number)[]
-      ) {
-        if (resolved.value.keys === undefined) internalTarget.value = next
+      function setTarget(next: (string | number)[]) {
+        if (sameTransferKeys(next, targetValue.value)) return
+        if (controlledKeys.value === undefined) internalTarget.value = next
         emit('update:modelValue', next)
-        emit('update:targetKeys', next)
-        emit('change', next, direction, moved)
         formItemControl?.onChange(next)
       }
 
       function setSelected(next: TransferSelectedKeys) {
         if (props.selectedKeys === undefined) internalSelected.value = next
         emit('update:selectedKeys', next)
-        emit('select-change', next)
       }
 
       function updateSearch(panel: keyof TransferSearchValue, value: string) {
+        if ((search.value[panel] ?? '') === value) return
         const next = { ...search.value, [panel]: value }
         if (props.searchValue === undefined) internalSearch.value = next
         emit('update:searchValue', next)
-        emit('search-change', next)
       }
 
       const computedData = computed(() => splitTransferData(props.dataSource, targetValue.value))
@@ -268,17 +266,25 @@ export const Transfer = markFormItemGroupControl(
           props.filterOption
         )
       )
+      const sourceSelection = computed(() =>
+        partitionTransferSelection(selected.value.source, filteredSource.value)
+      )
+      const targetSelection = computed(() =>
+        partitionTransferSelection(selected.value.target, filteredTarget.value)
+      )
       const canMoveRight = computed(() =>
-        canMoveTransferItems(selected.value.source, props.dataSource, effectiveDisabled.value)
+        canMoveTransferItems(sourceSelection.value.visible, props.dataSource, !canMutate.value)
       )
       const canMoveLeft = computed(() =>
-        canMoveTransferItems(selected.value.target, props.dataSource, effectiveDisabled.value)
+        canMoveTransferItems(targetSelection.value.visible, props.dataSource, !canMutate.value)
       )
 
       function move(direction: 'left' | 'right') {
+        if (!canMutate.value) return
         if (direction === 'right' && !canMoveRight.value) return
         if (direction === 'left' && !canMoveLeft.value) return
-        const selectedKeys = direction === 'right' ? selected.value.source : selected.value.target
+        const selectedKeys =
+          direction === 'right' ? sourceSelection.value.visible : targetSelection.value.visible
         const result = moveTransferItems(
           direction,
           targetValue.value,
@@ -286,7 +292,7 @@ export const Transfer = markFormItemGroupControl(
           props.dataSource
         )
         const movedIds = new Set(result.movedKeys.map(transferKeyId))
-        setTarget(result.targetKeys, direction, result.movedKeys)
+        setTarget(result.targetKeys)
         setSelected({
           source:
             direction === 'right'
@@ -297,6 +303,65 @@ export const Transfer = markFormItemGroupControl(
               ? selected.value.target.filter((key) => !movedIds.has(transferKeyId(key)))
               : selected.value.target
         })
+      }
+
+      const sourceScroll = ref(0)
+      const targetScroll = ref(0)
+
+      function renderTransferRow(item: TransferItem, selectedKeys: (string | number)[], panel: 'source' | 'target') {
+        const isSelected = hasTransferKey(selectedKeys, item.key)
+        const itemDisabled = effectiveDisabled.value || Boolean(item.disabled)
+        return h(
+          'div',
+          {
+            key: transferKeyId(item.key),
+            class: getTransferItemClasses(isSelected, itemDisabled, props.size)
+          },
+          [
+            TransferCheckbox({
+              checked: isSelected,
+              disabled: itemDisabled,
+              size: props.size,
+              onChange: () => {
+                if (!canMutate.value) return
+                setSelected({
+                  ...selected.value,
+                  [panel]: toggleTransferKey(selected.value[panel], item.key)
+                })
+              },
+              children: h('span', { class: 'min-w-0' }, [
+                h('span', { class: 'block truncate' }, item.label),
+                item.description
+                  ? h('span', { class: transferItemDescriptionClasses }, item.description)
+                  : null
+              ])
+            })
+          ]
+        )
+      }
+
+      function renderTransferRows(
+        panel: 'source' | 'target',
+        items: TransferItem[],
+        selectedKeys: (string | number)[]
+      ) {
+        if (!transferListNeedsWindow(items, props.size)) {
+          return items.map((item) => renderTransferRow(item, selectedKeys, panel))
+        }
+        const scrollTop = panel === 'source' ? sourceScroll.value : targetScroll.value
+        const range = getTransferVirtualWindow(items, scrollTop, props.size)
+        const slice = items.slice(range.startIndex, range.endIndex + 1)
+        return h(
+          'div',
+          { style: { height: `${range.totalHeight}px`, position: 'relative' } },
+          [
+            h(
+              'div',
+              { style: { transform: `translateY(${range.offsetTop}px)` } },
+              slice.map((item) => renderTransferRow(item, selectedKeys, panel))
+            )
+          ]
+        )
       }
 
       expose({
@@ -323,6 +388,7 @@ export const Transfer = markFormItemGroupControl(
               disabled: effectiveDisabled.value || selectState.enabledKeys.length === 0,
               size: props.size,
               onChange: () => {
+                if (!canMutate.value) return
                 setSelected({
                   ...selected.value,
                   [panel]: applyTransferSelectAll(
@@ -334,7 +400,7 @@ export const Transfer = markFormItemGroupControl(
               },
               children: h(
                 'span',
-                { class: 'font-medium text-[var(--tiger-text,#111827)]' },
+                { class: 'font-medium text-[var(--tiger-text)]' },
                 `${title} (${selectedCount}/${allItems.length})`
               )
             })
@@ -349,52 +415,74 @@ export const Transfer = markFormItemGroupControl(
                 ),
                 value: query,
                 disabled: effectiveDisabled.value,
+                readonly: props.readOnly || undefined,
                 'aria-label': labels.value.searchAriaLabel.replace('{title}', title),
-                onInput: (event: Event) =>
+                onInput: (event: Event) => {
+                  if (!canMutate.value) return
                   updateSearch(panel, (event.target as HTMLInputElement).value)
+                },
+                onKeydown: (event: KeyboardEvent) => {
+                  if (event.key === 'Enter') event.preventDefault()
+                }
               })
             : null,
-          h('div', { class: transferPanelBodyClasses }, [
-            visibleItems.length > 0
-              ? visibleItems.map((item) => {
-                  const isSelected = hasTransferKey(selectedKeys, item.key)
-                  const itemDisabled = effectiveDisabled.value || Boolean(item.disabled)
-                  return h(
+          h(
+            'div',
+            {
+              class: transferPanelBodyClasses,
+              style: getTransferPanelBodyStyle(),
+              onScroll: (event: Event) => {
+                const top = (event.target as HTMLElement).scrollTop
+                if (panel === 'source') sourceScroll.value = top
+                else targetScroll.value = top
+              }
+            },
+            [
+              visibleItems.length > 0
+                ? renderTransferRows(panel, visibleItems, selectedKeys)
+                : h(
                     'div',
-                    {
-                      key: transferKeyId(item.key),
-                      class: getTransferItemClasses(isSelected, itemDisabled, props.size)
-                    },
-                    [
-                      TransferCheckbox({
-                        checked: isSelected,
-                        disabled: itemDisabled,
-                        size: props.size,
-                        onChange: () =>
-                          setSelected({
-                            ...selected.value,
-                            [panel]: toggleTransferKey(selected.value[panel], item.key)
-                          }),
-                        children: h('span', { class: 'min-w-0' }, [
-                          h('span', { class: 'block truncate' }, item.label),
-                          item.description
-                            ? h('span', { class: transferItemDescriptionClasses }, item.description)
-                            : null
-                        ])
+                    { class: transferEmptyClasses },
+                    resolveLocaleText(
+                      'No data',
+                      props.emptyText,
+                      mergedLocale.value?.common?.emptyText
+                    )
+                  )
+            ]
+          ),
+          (() => {
+            const hidden = partitionTransferSelection(selectedKeys, visibleItems).hidden
+            if (hidden.length === 0) return null
+            const clearText = mergedLocale.value?.common?.clearText ?? 'Clear'
+            return h(
+              'div',
+              {
+                class:
+                  'flex items-center justify-between gap-2 border-t border-[var(--tiger-border)] px-3 py-1 text-xs'
+              },
+              [
+                h('span', { role: 'status' }, `${hidden.length} selected hidden by search`),
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: 'text-[var(--tiger-primary)]',
+                    disabled: !canMutate.value,
+                    'aria-label': clearText,
+                    onClick: () => {
+                      const hiddenIds = new Set(hidden.map(transferKeyId))
+                      setSelected({
+                        ...selected.value,
+                        [panel]: selectedKeys.filter((key) => !hiddenIds.has(transferKeyId(key)))
                       })
-                    ]
-                  )
-                })
-              : h(
-                  'div',
-                  { class: transferEmptyClasses },
-                  resolveLocaleText(
-                    'No data',
-                    props.emptyText,
-                    mergedLocale.value?.common?.emptyText
-                  )
+                    }
+                  },
+                  clearText
                 )
-          ])
+              ]
+            )
+          })()
         ])
       }
 
@@ -410,7 +498,7 @@ export const Transfer = markFormItemGroupControl(
             role: 'group',
             class: classNames(
               transferBaseClasses,
-              status.value === 'error' && 'ring-1 ring-[var(--tiger-error,#dc2626)]',
+              status.value === 'error' && 'ring-1 ring-[var(--tiger-error)]',
               props.className,
               coerceClassValue(attrs.class),
               coerceClassValue((attrs as Record<string, unknown>).className)
@@ -433,14 +521,22 @@ export const Transfer = markFormItemGroupControl(
           },
           [
             fieldName.value
-              ? targetValue.value.map((key) =>
-                  h('input', {
-                    key: transferKeyId(key),
+              ? targetValue.value.length > 0
+                ? targetValue.value.map((key) =>
+                    h('input', {
+                      key: transferKeyId(key),
+                      type: 'hidden',
+                      name: fieldName.value,
+                      value: String(key),
+                      disabled: effectiveDisabled.value || undefined
+                    })
+                  )
+                : h('input', {
                     type: 'hidden',
                     name: fieldName.value,
-                    value: String(key)
+                    value: '',
+                    disabled: effectiveDisabled.value || undefined
                   })
-                )
               : null,
             renderPanel(
               'source',

@@ -17,6 +17,7 @@ describe('CronEditor', () => {
     expect(screen.getByRole('group', { name: 'Cron editor' })).toBeInTheDocument()
     expect(screen.getByLabelText('Cron expression')).toHaveValue('')
     expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+    expect(screen.getByLabelText('Minute mode')).toHaveValue('')
   })
 
   it('uses controlled value', () => {
@@ -33,6 +34,20 @@ describe('CronEditor', () => {
     fireEvent.change(screen.getByLabelText('Cron expression'), { target: { value: '0 8 * * 1' } })
 
     expect(onChange).toHaveBeenCalledWith('0 8 * * 1', expect.objectContaining({ valid: true }))
+  })
+
+  it('does not write an invalid expression into the form value', () => {
+    const onChange = vi.fn()
+    const { container } = render(<CronEditor defaultValue="" name="job" onChange={onChange} />)
+
+    fireEvent.change(screen.getByLabelText('Cron expression'), { target: { value: '*/0' } })
+
+    expect(onChange).not.toHaveBeenCalledWith('*/0', expect.anything())
+    expect(screen.getByLabelText('Cron expression')).toHaveValue('*/0')
+    expect(container.querySelector('input[name="job"]')).toHaveValue('')
+    const live = container.querySelector('[aria-live="polite"]')
+    expect(live).toBeTruthy()
+    expect(live).not.toHaveAttribute('role', 'alert')
   })
 
   it('shows validation errors for invalid expression', () => {
@@ -71,10 +86,7 @@ describe('CronEditor', () => {
     render(<CronEditor defaultValue="* * * * *" onChange={onChange} />)
 
     fireEvent.change(screen.getByLabelText('Minute mode'), { target: { value: 'every' } })
-    expect(onChange).toHaveBeenLastCalledWith(
-      '*/1 * * * *',
-      expect.objectContaining({ valid: true })
-    )
+    expect(onChange).toHaveBeenLastCalledWith('*/1 * * * *', expect.objectContaining({ valid: true }))
     fireEvent.change(screen.getByLabelText('Minute step'), { target: { value: '15' } })
     expect(onChange).toHaveBeenLastCalledWith(
       '*/15 * * * *',
@@ -123,12 +135,17 @@ describe('CronEditor', () => {
       expect(screen.queryByLabelText('Cron preset')).not.toBeInTheDocument()
     })
 
-    it('makes controls inactive when readonly', () => {
-      render(<CronEditor readonly />)
+    it('keeps read-only controls focusable without changing the value', () => {
+      const onChange = vi.fn()
+      render(<CronEditor readOnly value="* * * * *" onChange={onChange} />)
 
       expect(screen.getByLabelText('Cron expression')).toHaveAttribute('readonly')
-      expect(screen.getByLabelText('Cron preset')).toBeDisabled()
-      expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+      expect(screen.getByLabelText('Cron expression')).not.toBeDisabled()
+      expect(screen.getByLabelText('Cron preset')).not.toBeDisabled()
+      expect(screen.getByLabelText('Minute mode')).not.toBeDisabled()
+      fireEvent.change(screen.getByLabelText('Minute mode'), { target: { value: 'every' } })
+      expect(onChange).not.toHaveBeenCalled()
+      expect(screen.getByLabelText('Cron expression')).toHaveValue('* * * * *')
     })
 
     it('keeps custom mode when switching from any', () => {
@@ -146,6 +163,7 @@ describe('CronEditor', () => {
       render(<CronEditor value="0 0 0 * * *" onChange={onChange} />)
 
       expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+      expect(screen.getByLabelText('Minute mode')).toHaveValue('')
       fireEvent.change(screen.getByLabelText('Minute mode'), { target: { value: 'specific' } })
       expect(onChange).not.toHaveBeenCalled()
       expect(screen.getByLabelText('Cron expression')).toHaveValue('0 0 0 * * *')

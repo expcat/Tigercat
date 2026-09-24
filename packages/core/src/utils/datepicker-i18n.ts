@@ -4,11 +4,7 @@ import type {
   DatePickerLocalePreset
 } from '../types/datepicker'
 import type { TigerLocale } from '../types/locale'
-import { EN_US_DATEPICKER_LOCALE as EN_US_DATEPICKER_PRESET } from './i18n/datepicker-locales/en-US'
-
-export const EN_US_DATEPICKER_LOCALE: DatePickerLocalePreset = EN_US_DATEPICKER_PRESET
-
-const EN_US_LABELS = EN_US_DATEPICKER_LOCALE.labels as DatePickerLabels
+const EMPTY_DATE_LABELS = {} as DatePickerLabels
 
 export type DatePickerLocaleSource =
   Partial<TigerLocale> | DatePickerLocalePreset | DatePickerLocaleConfig
@@ -37,7 +33,7 @@ export function getDatePickerLabels(
   overrides?: Partial<DatePickerLabels>
 ): DatePickerLabels {
   return {
-    ...EN_US_LABELS,
+    ...EMPTY_DATE_LABELS,
     ...(readPreset(locale).labels ?? {}),
     ...(overrides ?? {})
   }

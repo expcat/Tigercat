@@ -74,9 +74,11 @@ export interface CronEditorProps {
    */
   disabled?: boolean
   /**
+   * Focusable and submittable. The expression field is read-only; other controls
+   * stay focusable but do not change the value.
    * @default false
    */
-  readonly?: boolean
+  readOnly?: boolean
   /**
    * @default 'md'
    */

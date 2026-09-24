@@ -29,9 +29,13 @@ import {
   getMentionOptionKey,
   getMentionsKeyIntent,
   getMentionsOptionClasses,
+  getAutoCompleteVirtualItemHeight,
   getMentionsPanelStyle,
+  shouldVirtualizeAutoCompleteList,
   getMentionsTextareaClasses,
   getPickerComboboxAria,
+  isImeCompositionEvent,
+  readMentionSnapshot,
   getPickerListboxAria,
   getPickerNavigationIndex,
   getPickerOptionAria,
@@ -43,13 +47,13 @@ import {
   mergeAriaDescribedBy,
   mergeTigerLocale,
   resolveLocaleText,
-  resolveReadOnlyFlag,
   runShakeAnimation,
   shouldOpenMentions
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
 import { useTigerConfig } from './ConfigProvider'
+import { useFixedVirtualWindow } from './internal/useFixedVirtualWindow'
 import { useFormItemControlContext } from './FormItemContext'
 import { useInputGroupContext } from './InputGroup'
 
@@ -67,7 +71,7 @@ export interface MentionsProps
   open?: boolean
   onChange?: (value: string) => void
   onSelect?: (option: MentionOption) => void
-  onSearch?: (query: string) => void
+  onSearch?: (query: string, prefix: string) => void
   onOpenChange?: (open: boolean) => void
   onFocus?: React.FocusEventHandler<HTMLTextAreaElement>
   onBlur?: React.FocusEventHandler<HTMLTextAreaElement>
@@ -91,8 +95,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       minRows,
       maxLength,
       showCount = false,
-      readonly: readonlyProp,
-      readOnly: readOnlyProp,
+      readOnly = false,
       clearable = false,
       status: statusProp,
       errorMessage: errorMessageProp,
@@ -134,7 +137,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
     const errorMessage = errorMessageProp
     const shakeTrigger = formItemControl?.shakeTrigger
     const effectiveDisabled = Boolean(disabled) || Boolean(formItemControl?.disabled)
-    const isReadOnly = resolveReadOnlyFlag(readonlyProp, readOnlyProp)
+    const isReadOnly = Boolean(readOnly)
     const effectiveId = id ?? formItemControl?.id
     const effectiveName = name ?? formItemControl?.name
     const formBoundValue = formItemControl?.value
@@ -148,8 +151,9 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
     const textareaRef = useRef<HTMLTextAreaElement | null>(null)
     const dropdownRef = useRef<HTMLDivElement | null>(null)
     const mentionStartRef = useRef(-1)
-    const mentionEndRef = useRef(-1)
     const mentionPrefixRef = useRef('@')
+    const snapshotRef = useRef<ReturnType<typeof readMentionSnapshot>>(null)
+    const composingRef = useRef(false)
     const pendingCaret = useRef<number | null>(null)
     const dismissedRef = useRef(false)
     const liveTextRef = useRef(resolvedValue ?? defaultValue)
@@ -180,26 +184,32 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       () => filterMentionOptions(options, query, filterOption as MentionsFilterOption),
       [options, query, filterOption]
     )
-    const expanded =
-      isOpen &&
-      shouldOpenMentions({
-        query:
-          mentionStartRef.current >= 0
-            ? { query, startPos: mentionStartRef.current, prefix: mentionPrefixRef.current }
-            : null,
-        filteredCount: filteredOptions.length,
-        loading
-      })
+    const mentionActive = mentionStartRef.current >= 0
+    const expanded = isOpen && mentionActive
+    const listMounted = expanded && filteredOptions.length > 0
+    const mentionItemHeight = getAutoCompleteVirtualItemHeight(effectiveSize)
+    const virtualizeMentions = shouldVirtualizeAutoCompleteList(
+      filteredOptions.length,
+      listHeight,
+      effectiveSize
+    )
+    const mentionWindow = useFixedVirtualWindow({
+      enabled: virtualizeMentions,
+      activeIndex,
+      itemHeight: mentionItemHeight,
+      viewport: listHeight,
+      count: filteredOptions.length
+    })
 
     const applyQuery = useCallback(
       (text: string, cursor: number) => {
         const result = extractMentionQuery(text, cursor, prefix)
         if (result) {
           mentionStartRef.current = result.startPos
-          mentionEndRef.current = cursor
           mentionPrefixRef.current = result.prefix
+          snapshotRef.current = { ...result, text, cursor }
           setQuery(result.query)
-          onSearch?.(result.query)
+          onSearch?.(result.query, result.prefix)
           const nextFiltered = filterMentionOptions(
             options,
             result.query,
@@ -216,7 +226,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
           return
         }
         mentionStartRef.current = -1
-        mentionEndRef.current = -1
+        snapshotRef.current = null
         setQuery('')
         setOpen(false)
         setActiveIndex(-1)
@@ -225,24 +235,34 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
     )
 
     useEffect(() => {
-      if (dismissedRef.current) return
+      if (dismissedRef.current || isReadOnly) return
+      if (liveTextRef.current && liveTextRef.current !== currentValue) return
       const textarea = textareaRef.current
       const text = textarea?.value ?? currentValue
-      const result = extractMentionQuery(text, textarea?.selectionStart ?? text.length, prefix)
-      if (!result) return
-      const nextFiltered = filterMentionOptions(
-        options,
-        result.query,
-        filterOption as MentionsFilterOption
+      const cursor = textarea?.selectionStart ?? text.length
+      const result = extractMentionQuery(text, cursor, prefix)
+      if (!result) {
+        if (mentionStartRef.current !== -1) mentionStartRef.current = -1
+        return
+      }
+      if (
+        mentionStartRef.current === result.startPos &&
+        mentionPrefixRef.current === result.prefix &&
+        query === result.query
+      ) {
+        return
+      }
+      mentionStartRef.current = result.startPos
+      mentionPrefixRef.current = result.prefix
+      setQuery(result.query)
+      onSearch?.(result.query, result.prefix)
+      setOpen(shouldOpenMentions({ query: result, loading }))
+      setActiveIndex(
+        getInitialMentionsActiveIndex(
+          filterMentionOptions(options, result.query, filterOption as MentionsFilterOption)
+        )
       )
-      setOpen(
-        shouldOpenMentions({
-          query: result,
-          filteredCount: nextFiltered.length,
-          loading
-        })
-      )
-    }, [currentValue, filterOption, loading, options, prefix, setOpen])
+    }, [currentValue, filterOption, isReadOnly, loading, onSearch, options, prefix, query, setOpen])
 
     useLayoutEffect(() => {
       if (pendingCaret.current === null || !textareaRef.current) return
@@ -293,33 +313,40 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
 
     const selectOption = useCallback(
       (option: MentionOption) => {
-        if (option.disabled || effectiveDisabled) return
+        if (option.disabled || effectiveDisabled || isReadOnly || composingRef.current) return
         const textarea = textareaRef.current
-        const text = liveTextRef.current || textarea?.value || currentValue
-        const cursor =
-          mentionEndRef.current >= 0
-            ? mentionEndRef.current
-            : (textarea?.selectionStart ?? text.length)
+        const text = textarea?.value ?? liveTextRef.current ?? currentValue
+        const cursor = textarea?.selectionStart ?? text.length
+        const fresh = readMentionSnapshot(text, cursor, prefix)
+        const snapshot = fresh ?? snapshotRef.current
+        if (!snapshot) return
         const result = insertMention({
-          text,
-          mentionStart: mentionStartRef.current,
-          cursor,
-          prefix: mentionPrefixRef.current,
+          text: snapshot.text,
+          mentionStart: snapshot.startPos,
+          cursor: snapshot.cursor,
+          prefix: snapshot.prefix,
           value: option.value
         })
         commitValue(result.value, result.caret)
         onSelect?.(option)
         mentionStartRef.current = -1
-        mentionEndRef.current = -1
         setQuery('')
         closeDropdown()
         textarea?.focus()
       },
-      [closeDropdown, commitValue, currentValue, effectiveDisabled, onSelect, setQuery]
+      [closeDropdown, commitValue, currentValue, effectiveDisabled, isReadOnly, onSelect, prefix, setQuery]
     )
 
+    const syncFromField = (field?: HTMLTextAreaElement | null) => {
+      const textarea = field ?? textareaRef.current
+      const text = textarea?.value ?? currentValue
+      const cursor = textarea?.selectionStart ?? text.length
+      liveTextRef.current = text
+      applyQuery(text, cursor)
+    }
+
     const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      if (effectiveDisabled) return
+      if (effectiveDisabled || isReadOnly) return
       dismissedRef.current = false
       const next = event.currentTarget.value
       liveTextRef.current = next
@@ -328,6 +355,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
     }
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (composingRef.current || isImeCompositionEvent(event.nativeEvent) || isReadOnly) return
       const intent = getMentionsKeyIntent(event.key, expanded)
       switch (intent.type) {
         case 'navigate':
@@ -386,14 +414,18 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       ),
       formItemControl?.describedBy
     )
+    const popupId = `${listboxId}-popup`
     const comboboxAria = {
       ...getPickerComboboxAria({
         expanded,
-        listboxId,
-        activeIndex: expanded ? activeIndex : -1
+        listboxId: listMounted ? listboxId : popupId,
+        activeIndex: listMounted && mentionWindow.activeInWindow ? activeIndex : -1,
+        listMounted
       }),
+      'aria-controls': expanded ? (listMounted ? listboxId : popupId) : undefined,
       'aria-autocomplete': 'list' as const
     }
+    const clearLabel = mergedLocale?.common?.clearText ?? 'Clear'
 
     const textarea = (
       <textarea
@@ -425,6 +457,20 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
         aria-describedby={describedBy}
         onChange={handleInput}
         onKeyDown={handleKeyDown}
+        onKeyUp={(event) => {
+          if (isReadOnly || effectiveDisabled) return
+          syncFromField(event.currentTarget)
+        }}
+        onClick={(event) => {
+          if (isReadOnly || effectiveDisabled) return
+          syncFromField(event.currentTarget)
+        }}
+        onCompositionStart={() => {
+          composingRef.current = true
+        }}
+        onCompositionEnd={() => {
+          composingRef.current = false
+        }}
         onFocus={onFocus}
         onBlur={handleFocusOut}
         onAnimationEnd={() => textareaRef.current?.classList.remove(SHAKE_CLASS)}
@@ -432,10 +478,38 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       />
     )
 
+    const renderMentionOption = (option: MentionOption, index: number) => {
+      const isActive = index === activeIndex
+      return (
+        <div
+          key={getMentionOptionKey(option, index)}
+          id={getPickerOptionId(listboxId, index)}
+          data-active={isActive || undefined}
+          {...getPickerOptionAria({
+            selected: false,
+            disabled: !!option.disabled
+          })}
+          className={getMentionsOptionClasses({
+            isActive,
+            isDisabled: !!option.disabled,
+            size: effectiveSize
+          })}
+          style={virtualizeMentions ? { height: mentionItemHeight } : undefined}
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => selectOption(option)}
+          onMouseEnter={() => {
+            if (!option.disabled) setActiveIndex(index)
+          }}>
+          {option.label}
+        </div>
+      )
+    }
+
     const dropdown = renderOverlayPortal(
       expanded ? (
         <div
           ref={dropdownRef}
+          id={listMounted ? undefined : popupId}
           className={classNames(
             mentionsDropdownClasses,
             overlay.floatingClasses,
@@ -445,39 +519,38 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
           data-positioned={overlay.positioned}
           onMouseDown={(event) => event.preventDefault()}>
           {loading && filteredOptions.length === 0 ? (
-            <div className={mentionsEmptyStateClasses}>{loadingText}</div>
+            <div className={mentionsEmptyStateClasses} role="status" aria-live="polite">
+              {loadingText}
+            </div>
           ) : filteredOptions.length === 0 ? (
-            <div className={mentionsEmptyStateClasses}>{resolvedEmptyText}</div>
+            <div className={mentionsEmptyStateClasses} role="status" aria-live="polite">
+              {resolvedEmptyText}
+            </div>
           ) : (
             <div
               className={mentionsListboxClasses}
-              style={getMentionsPanelStyle(listHeight)}
+              style={
+                virtualizeMentions
+                  ? { height: listHeight, overflow: 'auto' }
+                  : getMentionsPanelStyle(listHeight)
+              }
+              ref={virtualizeMentions ? mentionWindow.scrollerRef : undefined}
+              onScroll={virtualizeMentions ? mentionWindow.onScroll : undefined}
+              data-tiger-mentions-virtual={virtualizeMentions ? '' : undefined}
               {...getPickerListboxAria({ id: listboxId })}>
-              {filteredOptions.map((option, index) => {
-                const isActive = index === activeIndex
-                return (
-                  <div
-                    key={getMentionOptionKey(option, index)}
-                    id={getPickerOptionId(listboxId, index)}
-                    data-active={isActive || undefined}
-                    {...getPickerOptionAria({
-                      selected: false,
-                      disabled: !!option.disabled
-                    })}
-                    className={getMentionsOptionClasses({
-                      isActive,
-                      isDisabled: !!option.disabled,
-                      size: effectiveSize
-                    })}
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => selectOption(option)}
-                    onMouseEnter={() => {
-                      if (!option.disabled) setActiveIndex(index)
-                    }}>
-                    {option.label}
+              {virtualizeMentions && mentionWindow.range ? (
+                <div style={{ height: mentionWindow.range.totalHeight, position: 'relative' }}>
+                  <div style={{ transform: `translateY(${mentionWindow.range.offsetTop}px)` }}>
+                    {filteredOptions
+                      .slice(mentionWindow.range.startIndex, mentionWindow.range.endIndex + 1)
+                      .map((option, offset) =>
+                        renderMentionOption(option, mentionWindow.range!.startIndex + offset)
+                      )}
                   </div>
-                )
-              })}
+                </div>
+              ) : (
+                filteredOptions.map((option, index) => renderMentionOption(option, index))
+              )}
             </div>
           )}
         </div>
@@ -505,8 +578,8 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
         {clearable && currentValue && !effectiveDisabled && !isReadOnly ? (
           <button
             type="button"
-            className="self-end text-sm text-[var(--tiger-text-muted,#6b7280)]"
-            aria-label="Clear"
+            className="self-end text-sm text-[var(--tiger-text-secondary)]"
+            aria-label={clearLabel}
             onClick={() => commitValue('')}>
             ×
           </button>

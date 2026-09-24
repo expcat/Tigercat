@@ -35,10 +35,16 @@ function VirtualWindow<T>({
   onScrollTop: (top: number) => void
   renderItem: (item: T, index: number) => React.ReactNode
 }) {
+  const scrollerRef = React.useRef<HTMLDivElement>(null)
   const range = getCascaderVirtualRange(scrollTop, listHeight, items.length, itemHeight)
   const slice = items.slice(range.startIndex, range.endIndex + 1)
+  React.useLayoutEffect(() => {
+    const el = scrollerRef.current
+    if (el && el.scrollTop !== scrollTop) el.scrollTop = scrollTop
+  }, [scrollTop])
   return (
     <div
+      ref={scrollerRef}
       style={{ height: listHeight, overflow: 'auto' }}
       onScroll={(event) => onScrollTop((event.target as HTMLElement).scrollTop)}>
       <div style={{ height: range.totalHeight, position: 'relative' }}>
@@ -76,6 +82,9 @@ function renderOptionRow(ctx: Ctx, option: CascaderOption, colIndex: number, opt
       onMouseEnter={() => ctx.handleOptionHover(option, colIndex)}
       onClick={() => ctx.handleOptionClick(option, colIndex)}>
       <span className="flex-1 truncate">{option.label}</span>
+      {ctx.isOptionLoading(colIndex, option) ? (
+        <span className="sr-only">{ctx.loadingText}</span>
+      ) : null}
       {expandable ? <CascaderColumnChevronIcon dir={ctx.dir} /> : null}
     </div>
   )
@@ -185,7 +194,7 @@ export function renderCascaderPanel(ctx: Ctx) {
                 itemHeight={ctx.itemHeight}
                 listHeight={ctx.listHeight}
                 scrollTop={ctx.columnScrollTops[colIndex] ?? 0}
-                onScrollTop={() => undefined}
+                onScrollTop={(top) => ctx.setColumnScrollTop(colIndex, top)}
                 renderItem={(option, optionIndex) =>
                   renderOptionRow(ctx, option, colIndex, optionIndex)
                 }

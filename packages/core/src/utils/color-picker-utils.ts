@@ -23,52 +23,52 @@ export function getColorPickerTriggerClasses(
 ): string {
   return classNames(
     'inline-flex items-center justify-center p-0',
-    'rounded-[var(--tiger-radius-md,0.5rem)] border',
-    'tiger-motion-aware [transition:var(--tiger-transition-base,border-color_150ms_ease,box-shadow_150ms_ease)]',
+    'rounded-[var(--tiger-radius-md)] border',
+    'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-    'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]',
+    'focus-visible:ring-[var(--tiger-focus-ring)]',
     triggerSizes[size],
     status === 'error'
-      ? 'border-[var(--tiger-error,#dc2626)]'
-      : 'border-[var(--tiger-border,#d1d5db)]',
+      ? 'border-[var(--tiger-error)]'
+      : 'border-[var(--tiger-border)]',
     disabled
       ? 'opacity-50 cursor-not-allowed'
-      : 'cursor-pointer hover:border-[var(--tiger-primary,#2563eb)]'
+      : 'cursor-pointer hover:border-[var(--tiger-primary)]'
   )
 }
 
 export const colorPickerTriggerSwatchClasses =
-  'block h-full w-full overflow-hidden rounded-[calc(var(--tiger-radius-md,0.5rem)-1px)]'
+  'block h-full w-full overflow-hidden rounded-[calc(var(--tiger-radius-md)-1px)]'
 
 export const colorPickerPanelClasses = classNames(
   'flex flex-col gap-3 p-3',
-  'rounded-[var(--tiger-radius-md,0.5rem)]',
-  'shadow-[var(--tiger-shadow-md,0_4px_6px_-1px_rgb(0_0_0_/_0.1))]',
-  'bg-[var(--tiger-surface,#ffffff)]',
-  'border border-[var(--tiger-border,#d1d5db)]',
+  'rounded-[var(--tiger-radius-md)]',
+  'shadow-[var(--tiger-shadow-md)]',
+  'bg-[var(--tiger-surface)]',
+  'border border-[var(--tiger-border)]',
   'max-sm:h-full max-sm:max-h-none max-sm:rounded-none max-sm:shadow-none'
 )
 
 export const colorPickerInputClasses = classNames(
-  'w-full rounded-[var(--tiger-radius-sm,0.375rem)] border px-2 py-1 text-xs font-mono',
-  'bg-[var(--tiger-surface,#ffffff)]',
-  'border-[var(--tiger-border,#d1d5db)]',
-  'text-[var(--tiger-text,#111827)]',
-  'tiger-motion-aware [transition:var(--tiger-transition-base,border-color_150ms_ease)]',
+  'w-full rounded-[var(--tiger-radius-sm)] border px-2 py-1 text-xs font-mono',
+  'bg-[var(--tiger-surface)]',
+  'border-[var(--tiger-border)]',
+  'text-[var(--tiger-text)]',
+  'tiger-motion-aware [transition:var(--tiger-transition-base)]',
   'outline-none focus-visible:ring-2',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'focus-visible:ring-[var(--tiger-focus-ring)]'
 )
 
 export const colorPickerSliderTrackClasses = classNames(
   'w-full h-3 rounded-full cursor-pointer appearance-none',
-  'border border-[var(--tiger-border,#d1d5db)]',
+  'border border-[var(--tiger-border)]',
   '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3',
-  '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--tiger-surface,#ffffff)]',
-  '[&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-[var(--tiger-border,#d1d5db)]',
-  '[&::-webkit-slider-thumb]:shadow-[var(--tiger-shadow-sm,0_1px_2px_rgb(0_0_0_/_0.1))]',
+  '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--tiger-surface)]',
+  '[&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-[var(--tiger-border)]',
+  '[&::-webkit-slider-thumb]:shadow-[var(--tiger-shadow-sm)]',
   '[&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:rounded-full',
-  '[&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-[var(--tiger-border,#d1d5db)]',
-  '[&::-moz-range-thumb]:bg-[var(--tiger-surface,#ffffff)]'
+  '[&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-[var(--tiger-border)]',
+  '[&::-moz-range-thumb]:bg-[var(--tiger-surface)]'
 )
 
 export const colorPickerHueTrackStyle = {
@@ -84,31 +84,34 @@ export const colorPickerCheckerboardStyle = {
 } as const
 
 export const colorPickerSvPlaneClasses = classNames(
-  'relative h-36 w-full cursor-crosshair rounded-[var(--tiger-radius-sm,0.375rem)]',
-  'border border-[var(--tiger-border,#d1d5db)] outline-none',
-  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'relative h-36 w-full cursor-crosshair rounded-[var(--tiger-radius-sm)]',
+  'border border-[var(--tiger-border)] outline-none',
+  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 )
 
 export const colorPickerSvThumbClasses = classNames(
   'pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full',
-  'border-2 border-white shadow-[var(--tiger-shadow-sm,0_1px_2px_rgb(0_0_0_/_0.35))]'
+  'border-2 border-white shadow-[var(--tiger-shadow-sm)]'
 )
 
 export const colorPickerPreviewClasses = classNames(
-  'h-8 w-8 shrink-0 overflow-hidden rounded-[var(--tiger-radius-sm,0.375rem)]',
-  'border border-[var(--tiger-border,#d1d5db)]'
+  'h-8 w-8 shrink-0 overflow-hidden rounded-[var(--tiger-radius-sm)]',
+  'border border-[var(--tiger-border)]'
 )
 
 export const colorPickerClearButtonClasses = classNames(
-  'text-xs text-[var(--tiger-primary,#2563eb)] hover:underline',
+  'text-xs text-[var(--tiger-primary)] hover:underline',
   'rounded-sm outline-none focus-visible:ring-2',
-  'focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+  'focus-visible:ring-[var(--tiger-focus-ring)]'
 )
 
 export const colorPickerChromeLabelClasses =
-  'block text-xs text-[var(--tiger-text-muted,#6b7280)] mb-1'
+  'block text-xs text-[var(--tiger-text-secondary)] mb-1'
 
 export const DEFAULT_COLOR_PICKER_HSVA: HsvaColor = { h: 0, s: 100, v: 100, a: 1 }
+
+/** Shown beside an unparseable draft. Not a painted or submitted color. */
+export const COLOR_PICKER_INVALID_VALUE_TEXT = 'Enter a valid color.'
 
 /* ------------------------------------------------------------------ */
 /*  Color conversion utilities                                         */
@@ -134,8 +137,19 @@ export interface ParsedColorParts extends RgbColor {
   a: number
 }
 
+/**
+ * Empty for painting and for the submitted value.
+ * Null, blank, and unparseable strings are empty. A parsed color is not.
+ */
 export function isColorPickerEmpty(value: string | undefined | null): boolean {
-  return value == null || value.trim() === ''
+  if (value == null || value.trim() === '') return true
+  return parseColorParts(value) == null
+}
+
+/** Native submit value: a parsed color, or '' when empty or unparseable. */
+export function submittedColorPickerValue(value: string | null | undefined): string {
+  if (isColorPickerEmpty(value) || value == null) return ''
+  return value
 }
 
 export function hexToRgb(hex: string): RgbColor {
@@ -433,8 +447,46 @@ export function parseColorToHsva(raw: string | undefined | null): HsvaColor | nu
   return rgbToHsva(parts.r, parts.g, parts.b, parts.a)
 }
 
-export function seedColorPickerHsva(value: string | undefined | null): HsvaColor {
-  return parseColorToHsva(value) ?? { ...DEFAULT_COLOR_PICKER_HSVA }
+/**
+ * Parsed HSVA for a committed color. Empty and unparseable text stay null —
+ * never a stand-in red.
+ */
+export function seedColorPickerHsva(value: string | undefined | null): HsvaColor | null {
+  return parseColorToHsva(value)
+}
+
+export interface ColorPickerValueDescription {
+  text: string
+  invalid: boolean
+  hsva: HsvaColor | null
+}
+
+/** How an external value should appear before the user edits the draft. */
+export function describeColorPickerValue(
+  value: string | null | undefined,
+  format: ColorFormat,
+  showAlpha: boolean
+): ColorPickerValueDescription {
+  if (value == null || value.trim() === '') return { text: '', invalid: false, hsva: null }
+  const hsva = parseColorToHsva(value)
+  if (!hsva) return { text: value, invalid: true, hsva: null }
+  return { text: formatHsva(hsva, format, showAlpha), invalid: false, hsva }
+}
+
+export type ColorPickerDragPhase = 'preview' | 'commit'
+
+/**
+ * Drag / slider phases. Preview keeps the next HSVA and writes nothing.
+ * Commit formats once for the form value.
+ */
+export function resolveColorPickerDrag(
+  phase: ColorPickerDragPhase,
+  next: HsvaColor,
+  format: ColorFormat,
+  showAlpha: boolean
+): { hsva: HsvaColor; value: string | null } {
+  if (phase === 'preview') return { hsva: next, value: null }
+  return { hsva: next, value: formatHsva(next, format, showAlpha) }
 }
 
 /**

@@ -17,6 +17,7 @@ describe('CronEditor', () => {
     expect(screen.getByRole('group', { name: 'Cron editor' })).toBeInTheDocument()
     expect(screen.getByLabelText('Cron expression')).toHaveValue('')
     expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+    expect(screen.getByLabelText('Minute mode')).toHaveValue('')
   })
 
   it('uses modelValue', () => {
@@ -26,17 +27,31 @@ describe('CronEditor', () => {
     expect(screen.getByLabelText('Hour mode')).toHaveValue('specific')
   })
 
-  it('emits update:modelValue and change when raw expression changes', async () => {
+  it('emits update:modelValue when raw expression changes', async () => {
     const onUpdate = vi.fn()
-    const onChange = vi.fn()
     render(CronEditor, {
-      props: { defaultValue: '', 'onUpdate:modelValue': onUpdate, onChange }
+      props: { defaultValue: '', 'onUpdate:modelValue': onUpdate }
     })
 
     await fireEvent.update(screen.getByLabelText('Cron expression'), '0 8 * * 1')
 
     expect(onUpdate).toHaveBeenCalledWith('0 8 * * 1')
-    expect(onChange).toHaveBeenCalledWith('0 8 * * 1', expect.objectContaining({ valid: true }))
+  })
+
+  it('keeps invalid text out of the form value', async () => {
+    const onUpdate = vi.fn()
+    const { container } = render(CronEditor, {
+      props: { defaultValue: '', name: 'job', 'onUpdate:modelValue': onUpdate }
+    })
+
+    await fireEvent.update(screen.getByLabelText('Cron expression'), '*/0')
+
+    expect(onUpdate).not.toHaveBeenCalledWith('*/0')
+    expect(screen.getByLabelText('Cron expression')).toHaveValue('*/0')
+    expect(container.querySelector('input[name="job"]')).toHaveValue('')
+    const live = container.querySelector('[aria-live="polite"]')
+    expect(live).toBeTruthy()
+    expect(live).not.toHaveAttribute('role', 'alert')
   })
 
   it('shows validation errors for invalid expression', () => {
@@ -46,12 +61,12 @@ describe('CronEditor', () => {
   })
 
   it('applies presets', async () => {
-    const onChange = vi.fn()
-    render(CronEditor, { props: { onChange } })
+    const onUpdate = vi.fn()
+    render(CronEditor, { props: { 'onUpdate:modelValue': onUpdate } })
 
     await fireEvent.update(screen.getByLabelText('Cron preset'), '0 0 * * *')
 
-    expect(onChange).toHaveBeenCalledWith('0 0 * * *', expect.objectContaining({ valid: true }))
+    expect(onUpdate).toHaveBeenCalledWith('0 0 * * *')
   })
 
   it('uses ConfigProvider locale for fields, presets, aria, and validation', () => {
@@ -73,33 +88,24 @@ describe('CronEditor', () => {
   })
 
   it('updates field mode and step', async () => {
-    const onChange = vi.fn()
-    render(CronEditor, { props: { defaultValue: '* * * * *', onChange } })
+    const onUpdate = vi.fn()
+    render(CronEditor, { props: { defaultValue: '* * * * *', 'onUpdate:modelValue': onUpdate } })
 
     await fireEvent.update(screen.getByLabelText('Minute mode'), 'every')
-    expect(onChange).toHaveBeenLastCalledWith(
-      '*/1 * * * *',
-      expect.objectContaining({ valid: true })
-    )
+    expect(onUpdate).toHaveBeenLastCalledWith('*/1 * * * *')
     await fireEvent.update(screen.getByLabelText('Minute step'), '15')
-    expect(onChange).toHaveBeenLastCalledWith(
-      '*/15 * * * *',
-      expect.objectContaining({ valid: true })
-    )
+    expect(onUpdate).toHaveBeenLastCalledWith('*/15 * * * *')
   })
 
   it('supports range editing', async () => {
-    const onChange = vi.fn()
-    render(CronEditor, { props: { defaultValue: '* * * * *', onChange } })
+    const onUpdate = vi.fn()
+    render(CronEditor, { props: { defaultValue: '* * * * *', 'onUpdate:modelValue': onUpdate } })
 
     await fireEvent.update(screen.getByLabelText('Hour mode'), 'range')
     await fireEvent.update(screen.getByLabelText('Hour range start'), '9')
     await fireEvent.update(screen.getByLabelText('Hour range end'), '18')
 
-    expect(onChange).toHaveBeenLastCalledWith(
-      '* 9-18 * * *',
-      expect.objectContaining({ valid: true })
-    )
+    expect(onUpdate).toHaveBeenLastCalledWith('* 9-18 * * *')
   })
 
   it('disables controls when disabled', () => {
@@ -129,12 +135,19 @@ describe('CronEditor', () => {
       expect(screen.queryByLabelText('Cron preset')).not.toBeInTheDocument()
     })
 
-    it('makes controls inactive when readonly', () => {
-      renderWithProps(CronEditor, { readonly: true })
+    it('keeps read-only controls focusable without changing the value', async () => {
+      const onUpdate = vi.fn()
+      render(CronEditor, {
+        props: { readOnly: true, modelValue: '* * * * *', 'onUpdate:modelValue': onUpdate }
+      })
 
       expect(screen.getByLabelText('Cron expression')).toHaveAttribute('readonly')
-      expect(screen.getByLabelText('Cron preset')).toBeDisabled()
-      expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+      expect(screen.getByLabelText('Cron expression')).not.toBeDisabled()
+      expect(screen.getByLabelText('Cron preset')).not.toBeDisabled()
+      expect(screen.getByLabelText('Minute mode')).not.toBeDisabled()
+      await fireEvent.update(screen.getByLabelText('Minute mode'), 'every')
+      expect(onUpdate).not.toHaveBeenCalled()
+      expect(screen.getByLabelText('Cron expression')).toHaveValue('* * * * *')
     })
 
     it('keeps custom mode when switching from any', async () => {
@@ -147,12 +160,15 @@ describe('CronEditor', () => {
     })
 
     it('does not rewrite a 6-field expression when a column changes', async () => {
-      const onChange = vi.fn()
-      renderWithProps(CronEditor, { modelValue: '0 0 0 * * *', onChange })
+      const onUpdate = vi.fn()
+      render(CronEditor, {
+        props: { modelValue: '0 0 0 * * *', 'onUpdate:modelValue': onUpdate }
+      })
 
       expect(screen.getByLabelText('Minute mode')).toBeDisabled()
+      expect(screen.getByLabelText('Minute mode')).toHaveValue('')
       await fireEvent.update(screen.getByLabelText('Minute mode'), 'specific')
-      expect(onChange).not.toHaveBeenCalled()
+      expect(onUpdate).not.toHaveBeenCalled()
     })
 
     it('reports invalid custom field values', () => {

@@ -230,7 +230,7 @@ describe('Upload', () => {
       const onChange = vi.fn()
       const { container } = render(Upload, {
         props: {
-          onChange
+          'onUpdate:fileList': onChange
         }
       })
 
@@ -336,10 +336,10 @@ describe('Upload', () => {
       await fireEvent.change(input)
 
       await waitFor(() => {
-        expect(emitted()).toHaveProperty('update:file-list')
+        expect(emitted()).toHaveProperty('update:fileList')
       })
 
-      const updates = emitted()['update:file-list'] as unknown[]
+      const updates = emitted()['update:fileList'] as unknown[]
       const last = updates[updates.length - 1] as [unknown]
       const lastList = last[0] as Array<{ name: string }>
       expect(lastList).toHaveLength(2)
@@ -352,7 +352,7 @@ describe('Upload', () => {
       const onChange = vi.fn()
       const { container, emitted } = renderWithProps(Upload, {
         accept: 'image/*',
-        onChange
+        'onUpdate:fileList': onChange
       })
 
       const input = container.querySelector('input[type="file"]') as HTMLInputElement
@@ -369,7 +369,7 @@ describe('Upload', () => {
         expect(onChange).not.toHaveBeenCalled()
       })
 
-      expect(emitted()).not.toHaveProperty('update:file-list')
+      expect(emitted()).not.toHaveProperty('update:fileList')
       expect(container.querySelector('[role="list"]')).not.toBeInTheDocument()
     })
 
@@ -377,7 +377,7 @@ describe('Upload', () => {
       const onChange = vi.fn()
       const { container, emitted } = renderWithProps(Upload, {
         maxSize: 50,
-        onChange
+        'onUpdate:fileList': onChange
       })
 
       const input = container.querySelector('input[type="file"]') as HTMLInputElement
@@ -396,7 +396,7 @@ describe('Upload', () => {
         expect(onChange).not.toHaveBeenCalled()
       })
 
-      expect(emitted()).not.toHaveProperty('update:file-list')
+      expect(emitted()).not.toHaveProperty('update:fileList')
       expect(container.querySelector('[role="list"]')).not.toBeInTheDocument()
     })
 
@@ -405,7 +405,7 @@ describe('Upload', () => {
       const onChange = vi.fn()
       const { container, emitted } = renderWithProps(Upload, {
         beforeUpload,
-        onChange
+        'onUpdate:fileList': onChange
       })
 
       const input = container.querySelector('input[type="file"]') as HTMLInputElement
@@ -423,7 +423,7 @@ describe('Upload', () => {
         expect(onChange).not.toHaveBeenCalled()
       })
 
-      expect(emitted()).not.toHaveProperty('update:file-list')
+      expect(emitted()).not.toHaveProperty('update:fileList')
       expect(container.querySelector('[role="list"]')).not.toBeInTheDocument()
     })
 
@@ -434,7 +434,7 @@ describe('Upload', () => {
       const onChange = vi.fn()
       const { container, emitted } = renderWithProps(Upload, {
         beforeUpload,
-        onChange
+        'onUpdate:fileList': onChange
       })
 
       const input = container.querySelector('input[type="file"]') as HTMLInputElement
@@ -452,7 +452,7 @@ describe('Upload', () => {
         expect(onChange).not.toHaveBeenCalled()
       })
 
-      expect(emitted()).not.toHaveProperty('update:file-list')
+      expect(emitted()).not.toHaveProperty('update:fileList')
       expect(container.querySelector('[role="list"]')).not.toBeInTheDocument()
     })
   })
@@ -674,7 +674,7 @@ describe('Upload', () => {
       const { container } = render(Upload, {
         props: {
           drag: true,
-          onChange
+          'onUpdate:fileList': onChange
         }
       })
 
@@ -697,7 +697,7 @@ describe('Upload', () => {
       const { container } = render(Upload, {
         props: {
           drag: true,
-          onChange
+          'onUpdate:fileList': onChange
         },
         slots: {
           default: '点击或拖拽文档到此处'
@@ -739,7 +739,7 @@ describe('Upload', () => {
         props: {
           drag: true,
           disabled: true,
-          onChange
+          'onUpdate:fileList': onChange
         }
       })
 

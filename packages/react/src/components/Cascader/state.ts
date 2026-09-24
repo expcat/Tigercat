@@ -3,13 +3,18 @@ import {
   CASCADER_DEFAULT_LIST_HEIGHT,
   CASCADER_DEFAULT_SEPARATOR,
   TIGER_CHROME_ATTR,
+  cascaderPathId,
+  cascaderValuesEqual,
   coerceCascaderFormValue,
+  decideAfterBranchLoad,
   filterCascaderOptions,
   flattenCascaderOptions,
   formatSelectLevelLabel,
+  gateCascaderLoad,
   getCascaderColumnOptionId,
   getCascaderColumns,
   getCascaderDisplayLabel,
+  getCascaderLabels,
   getCascaderOptionKey,
   getCascaderRootClasses,
   getCascaderTriggerClasses,
@@ -27,16 +32,21 @@ import {
   initialCascaderColumnActiveIndices,
   isCascaderOptionExpandable,
   isCascaderValueEmpty,
+  isCurrentLoadToken,
   isSelectTypeaheadCharacter,
   mergeAriaDescribedBy,
   mergeTigerLocale,
   navigateCascaderColumnIndex,
+  nextCascaderBrowsePath,
+  nextLoadToken,
   normalizeCascaderValue,
   rememberCascaderLabel,
-  resolveCascaderActivePath,
+  sameTreeKey,
   serializeCascaderFormValue,
   setCascaderOptionChildren,
+  shouldSeedCascaderFormDefault,
   shouldShowCascaderClear,
+  shouldSubmitNativeField,
   type CascaderFlattenedOption,
   type CascaderModelValue,
   type CascaderOption,
@@ -61,6 +71,7 @@ export function useCascaderController(props: CascaderProps) {
     searchValue,
     defaultSearchValue = '',
     clearable = true,
+    readOnly = false,
     emptyText,
     expandTrigger = 'click',
     changeOnSelect = false,
@@ -70,7 +81,7 @@ export function useCascaderController(props: CascaderProps) {
     loading = false,
     loadData,
     labels: labelsOverride,
-    onSearchChange,
+    onSearch,
     onOpenChange,
     className,
     value,
@@ -93,13 +104,18 @@ export function useCascaderController(props: CascaderProps) {
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
   )
-  const labels = useMemo(
+  const selectLabels = useMemo(
     () => getSelectLabels(mergedLocale, labelsOverride),
+    [mergedLocale, labelsOverride]
+  )
+  const cascaderLabels = useMemo(
+    () => getCascaderLabels(mergedLocale, labelsOverride),
     [mergedLocale, labelsOverride]
   )
   const emptyLabels = useMemo(() => getEmptyLabels(mergedLocale), [mergedLocale])
 
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const isReadOnly = Boolean(readOnly) && !effectiveDisabled
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
   const shakeTrigger = formItemControl?.shakeTrigger
   const effectiveId = id ?? formItemControl?.id
@@ -118,9 +134,14 @@ export function useCascaderController(props: CascaderProps) {
       : undefined
   const required = Boolean(formItemControl?.required)
 
+  const formNamed = Boolean(formItemControl?.name)
   const incomingValue =
-    value !== undefined ? value : coerceCascaderFormValue(formItemControl?.value)
-  const [selected, setSelected] = useControlledState<CascaderModelValue>({
+    value !== undefined
+      ? value
+      : formNamed
+        ? coerceCascaderFormValue(formItemControl?.value)
+        : undefined
+  const [selected, setSelectedState] = useControlledState<CascaderModelValue>({
     value: incomingValue,
     defaultValue,
     onChange: (next) => {
@@ -130,6 +151,14 @@ export function useCascaderController(props: CascaderProps) {
     },
     postState: normalizeCascaderValue
   })
+  const setSelected = useCallback(
+    (next: CascaderModelValue) => {
+      const normalized = normalizeCascaderValue(next)
+      if (cascaderValuesEqual(normalized, selected)) return
+      setSelectedState(normalized)
+    },
+    [selected, setSelectedState]
+  )
 
   const [isOpen, setOpen] = useControlledState({
     value: open,
@@ -140,7 +169,7 @@ export function useCascaderController(props: CascaderProps) {
   const [searchQuery, setSearchQuery] = useControlledState({
     value: searchValue,
     defaultValue: defaultSearchValue,
-    onChange: onSearchChange
+    onChange: onSearch
   })
 
   const instanceId = useId()
@@ -154,6 +183,10 @@ export function useCascaderController(props: CascaderProps) {
   const [columnScrollTops, setColumnScrollTops] = useState<number[]>([])
   const [searchScrollTop, setSearchScrollTop] = useState(0)
   const labelCacheRef = useRef(new Map<string, string>())
+  const loadTokensRef = useRef(new Map<string, number>())
+  const loadedIdsRef = useRef(new Set<string>())
+  const seededRef = useRef(false)
+  const openWasRef = useRef(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -163,6 +196,7 @@ export function useCascaderController(props: CascaderProps) {
   if (optionsPropRef.current !== optionsProp) {
     optionsPropRef.current = optionsProp
     setLoadedOptions(null)
+    loadedIdsRef.current = new Set()
   }
 
   const options = loadedOptions ?? optionsProp
@@ -182,12 +216,18 @@ export function useCascaderController(props: CascaderProps) {
   )
 
   const displayLabel = getCascaderDisplayLabel(options, selected, separator, labelCacheRef.current)
-  const placeholderText = placeholder ?? labels.placeholder
+  const placeholderText = placeholder ?? selectLabels.placeholder
   const displayText = isCascaderValueEmpty(selected) ? placeholderText : displayLabel
-  const emptyCopy = resolveEmptyCopy(emptyText, emptyLabels.noResults, loading, labels.loadingText)
+  const emptyCopy = resolveEmptyCopy(
+    emptyText,
+    emptyLabels.noResults,
+    loading,
+    selectLabels.loadingText
+  )
   const showClear = shouldShowCascaderClear({
     clearable,
     disabled: effectiveDisabled,
+    readOnly: isReadOnly,
     value: selected
   })
 
@@ -196,15 +236,15 @@ export function useCascaderController(props: CascaderProps) {
   }, [setOpen])
 
   const openDropdown = useCallback(() => {
-    if (effectiveDisabled) return
+    if (effectiveDisabled || isReadOnly) return
     setOpen(true)
-  }, [effectiveDisabled, setOpen])
+  }, [effectiveDisabled, isReadOnly, setOpen])
 
   const toggleDropdown = useCallback(() => {
-    if (effectiveDisabled) return
+    if (effectiveDisabled || isReadOnly) return
     if (isOpen) closeDropdown()
     else openDropdown()
-  }, [closeDropdown, effectiveDisabled, isOpen, openDropdown])
+  }, [closeDropdown, effectiveDisabled, isOpen, isReadOnly, openDropdown])
 
   const focusCombobox = useCallback(() => {
     triggerRef.current?.focus()
@@ -212,29 +252,54 @@ export function useCascaderController(props: CascaderProps) {
 
   const commitPath = useCallback(
     (path: CascaderValue, close: boolean) => {
+      if (isReadOnly || effectiveDisabled) return
       const normalized = normalizeCascaderValue(path)
       const label = getCascaderDisplayLabel(options, normalized, separator)
-      if (normalized) rememberCascaderLabel(labelCacheRef.current, normalized, label)
-      setSelected(normalized)
+      if (normalized && normalized.length > 0) {
+        rememberCascaderLabel(labelCacheRef.current, normalized, label)
+      }
+      setSelected(normalized ?? [])
       if (close) {
         closeDropdown()
         requestAnimationFrame(() => triggerRef.current?.focus())
       }
     },
-    [closeDropdown, options, separator, setSelected]
+    [closeDropdown, effectiveDisabled, isReadOnly, options, separator, setSelected]
   )
 
+  const focusColumnAfterLoad = useCallback((path: CascaderValue, childCount: number) => {
+    if (childCount <= 0) return
+    setFocusedColumnIndex(path.length)
+  }, [])
+
   const loadChildren = useCallback(
-    async (option: CascaderOption, path: CascaderValue) => {
-      if (!loadData) return
-      const key = path.map(String).join('/')
+    async (
+      option: CascaderOption,
+      path: CascaderValue,
+      intent: 'select' | 'expand'
+    ) => {
+      if (!loadData || option.disabled) return
+      const key = cascaderPathId(path)
+      const token = nextLoadToken(loadTokensRef.current, key)
       setLoadingKeys((current) => new Set(current).add(key))
       try {
         const children = await loadData(option)
+        if (!isCurrentLoadToken(loadTokensRef.current, key, token)) return
+        loadedIdsRef.current.add(key)
         setLoadedOptions((current) =>
           setCascaderOptionChildren(current ?? optionsProp, path, children)
         )
+        const decision = decideAfterBranchLoad({
+          childCount: children.length,
+          intent,
+          commitLoadedBranch: intent === 'select' && changeOnSelect
+        })
+        if (decision.expand) focusColumnAfterLoad(path, children.length)
+        if (decision.commit) commitPath(path, children.length === 0)
+      } catch {
+        if (!isCurrentLoadToken(loadTokensRef.current, key, token)) return
       } finally {
+        if (!isCurrentLoadToken(loadTokensRef.current, key, token)) return
         setLoadingKeys((current) => {
           const next = new Set(current)
           next.delete(key)
@@ -242,28 +307,45 @@ export function useCascaderController(props: CascaderProps) {
         })
       }
     },
-    [loadData, optionsProp]
+    [changeOnSelect, commitPath, focusColumnAfterLoad, loadData, optionsProp]
   )
 
   const activateOption = useCallback(
     (option: CascaderOption, colIndex: number, commitLeaf: boolean) => {
-      if (option.disabled || effectiveDisabled) return
+      if (option.disabled || effectiveDisabled || isReadOnly) return
       const nextPath = [...activePath.slice(0, colIndex), option.value]
+      const key = cascaderPathId(nextPath)
+      const gate = gateCascaderLoad(
+        option,
+        hasLoadData,
+        loadedIdsRef.current.has(key),
+        loadingKeys.has(key)
+      )
+      if (gate === 'reject') return
       setActivePath(nextPath)
-      const expandable = isCascaderOptionExpandable(option, hasLoadData)
-      if (expandable && (!option.children || option.children.length === 0) && loadData) {
-        void loadChildren(option, nextPath)
-        if (changeOnSelect) commitPath(nextPath, false)
+      const intent = commitLeaf ? 'select' : 'expand'
+      if (gate === 'load') {
+        void loadChildren(option, nextPath, intent)
         return
       }
-      if (expandable) {
-        if (changeOnSelect && commitLeaf) commitPath(nextPath, false)
-        setFocusedColumnIndex(colIndex + 1)
-        return
-      }
-      if (commitLeaf) commitPath(nextPath, true)
+      const decision = decideAfterBranchLoad({
+        childCount: option.children?.length ?? 0,
+        intent,
+        commitLoadedBranch: changeOnSelect
+      })
+      if (decision.expand) setFocusedColumnIndex(colIndex + 1)
+      if (decision.commit) commitPath(nextPath, !decision.expand)
     },
-    [activePath, changeOnSelect, commitPath, effectiveDisabled, hasLoadData, loadChildren, loadData]
+    [
+      activePath,
+      changeOnSelect,
+      commitPath,
+      effectiveDisabled,
+      hasLoadData,
+      isReadOnly,
+      loadChildren,
+      loadingKeys
+    ]
   )
 
   const handleOptionClick = useCallback(
@@ -284,10 +366,25 @@ export function useCascaderController(props: CascaderProps) {
 
   const handleSearchResultClick = useCallback(
     (item: CascaderFlattenedOption) => {
-      if (item.disabled) return
+      if (item.disabled || isReadOnly || effectiveDisabled) return
+      const option = item.path[item.path.length - 1]
+      if (!option) return
+      const key = cascaderPathId(item.valuePath)
+      const gate = gateCascaderLoad(
+        option,
+        hasLoadData,
+        loadedIdsRef.current.has(key),
+        loadingKeys.has(key)
+      )
+      if (gate === 'reject') return
+      if (gate === 'load') {
+        setActivePath(item.valuePath)
+        void loadChildren(option, item.valuePath, 'select')
+        return
+      }
       commitPath(item.valuePath, true)
     },
-    [commitPath]
+    [commitPath, effectiveDisabled, hasLoadData, isReadOnly, loadChildren, loadingKeys]
   )
 
   const clearSelection = useCallback(
@@ -306,17 +403,40 @@ export function useCascaderController(props: CascaderProps) {
   )
 
   useEffect(() => {
-    if (!isOpen) return
-    const nextPath = resolveCascaderActivePath(selected)
+    if (
+      !shouldSeedCascaderFormDefault({
+        alreadySeeded: seededRef.current,
+        fieldName: formItemControl?.name,
+        controlledValue: value,
+        formValue: formItemControl?.value,
+        defaultValue
+      })
+    ) {
+      return
+    }
+    seededRef.current = true
+    formItemControl?.onChange?.(normalizeCascaderValue(defaultValue) ?? [])
+  }, [defaultValue, formItemControl, value])
+
+  useEffect(() => {
+    const previousOpen = openWasRef.current
+    openWasRef.current = isOpen
+    const nextPath = nextCascaderBrowsePath({
+      open: isOpen,
+      previousOpen,
+      activePath,
+      committed: selected
+    })
+    if (!(isOpen && !previousOpen)) return
     setActivePath(nextPath)
     const nextColumns = getCascaderColumns(options, nextPath, hasLoadData)
     setColumnActiveIndices(initialCascaderColumnActiveIndices(nextColumns))
     setFocusedColumnIndex(Math.max(0, nextColumns.length - 1))
     setSearchActiveIndex(0)
-    if (searchable) {
-      searchInputRef.current?.focus()
-    }
-  }, [hasLoadData, isOpen, options, searchable, selected])
+    if (searchable) searchInputRef.current?.focus()
+    // Initialize only on the closed → open edge. Options and search identity must not reset the browse path.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   useEffect(() => {
     if (!isOpen || isSearchMode) return
@@ -357,6 +477,7 @@ export function useCascaderController(props: CascaderProps) {
 
   const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (effectiveDisabled) return
+    if (isReadOnly) return
     const fromSearchInput = event.currentTarget.tagName === 'INPUT'
     if (!isOpen && isSelectTypeaheadCharacter(event.key, event)) {
       event.preventDefault()
@@ -458,13 +579,25 @@ export function useCascaderController(props: CascaderProps) {
 
   const colIndex = getCurrentColumnIndex()
   const currentOpt = columnActiveIndices[colIndex] ?? -1
+  const itemHeight = getCascaderVirtualItemHeight(size)
+  const activeInWindow = (scrollTop: number, index: number, count: number) => {
+    if (!virtual || index < 0) return index >= 0
+    const range = getCascaderVirtualRange(scrollTop, listHeight, count, itemHeight)
+    return index >= range.startIndex && index <= range.endIndex
+  }
   const activeOptionId = !isOpen
     ? undefined
     : isSearchMode
-      ? searchActiveIndex >= 0
+      ? searchActiveIndex >= 0 &&
+        activeInWindow(searchScrollTop, searchActiveIndex, searchResults.length)
         ? getPickerOptionId(listboxId, searchActiveIndex)
         : undefined
-      : currentOpt >= 0
+      : currentOpt >= 0 &&
+          activeInWindow(
+            columnScrollTops[colIndex] ?? 0,
+            currentOpt,
+            columns[colIndex]?.options.length ?? 0
+          )
         ? getCascaderColumnOptionId(listboxId, colIndex, currentOpt)
         : undefined
 
@@ -475,10 +608,11 @@ export function useCascaderController(props: CascaderProps) {
   })
   const listboxAria = getPickerListboxAria({
     id: listboxId,
-    label: isSearchMode ? undefined : formatSelectLevelLabel(labels.levelLabel, colIndex + 1)
+    label: isSearchMode
+      ? undefined
+      : formatSelectLevelLabel(cascaderLabels.levelLabel, colIndex + 1)
   })
 
-  const itemHeight = getCascaderVirtualItemHeight(size)
   const alignColumnScroll = (index: number, optionIndex: number) => {
     if (!virtual || optionIndex < 0) return
     setColumnScrollTops((prev) => {
@@ -510,7 +644,12 @@ export function useCascaderController(props: CascaderProps) {
     virtual
   ])
 
-  const hiddenValue = effectiveName ? serializeCascaderFormValue(selected) : undefined
+  const hiddenValue = shouldSubmitNativeField({
+    name: effectiveName,
+    disabled: effectiveDisabled
+  })
+    ? serializeCascaderFormValue(selected)
+    : undefined
 
   return {
     rootRef,
@@ -529,12 +668,14 @@ export function useCascaderController(props: CascaderProps) {
     placeholderText,
     emptyCopy,
     showClear,
-    clearAriaLabel: labels.clearAriaLabel,
-    searchPlaceholder: labels.searchPlaceholder,
-    doneText: labels.doneText,
-    backText: labels.backText,
-    levelLabel: labels.levelLabel,
-    formatLevel: (level: number) => formatSelectLevelLabel(labels.levelLabel, level),
+    clearAriaLabel: selectLabels.clearAriaLabel,
+    searchPlaceholder: selectLabels.searchPlaceholder,
+    doneText: selectLabels.doneText,
+    backText: cascaderLabels.backText,
+    levelLabel: cascaderLabels.levelLabel,
+    loadingText: selectLabels.loadingText,
+    readOnly: isReadOnly,
+    formatLevel: (level: number) => formatSelectLevelLabel(cascaderLabels.levelLabel, level),
     triggerClasses: getCascaderTriggerClasses({
       size,
       disabled: effectiveDisabled,
@@ -586,13 +727,24 @@ export function useCascaderController(props: CascaderProps) {
     clearSelection,
     focusCombobox,
     columnScrollTops,
+    setColumnScrollTop: (index: number, top: number) => {
+      setColumnScrollTops((prev) => {
+        if ((prev[index] ?? 0) === top) return prev
+        const next = prev.slice()
+        next[index] = top
+        return next
+      })
+    },
     searchScrollTop,
     setSearchScrollTop,
     getVirtualRange: getCascaderVirtualRange,
     isExpandable: (option: CascaderOption) => isCascaderOptionExpandable(option, hasLoadData),
-    isSelectedPath: (path: CascaderValue) => (selected ?? []).join('\0') === path.join('\0'),
+    isSelectedPath: (path: CascaderValue) => cascaderValuesEqual(selected, path),
     isSelectedValue: (col: number, option: CascaderOption) =>
-      columns[col]?.selectedValue === option.value || (selected ?? [])[col] === option.value,
+      sameTreeKey(columns[col]?.selectedValue, option.value) ||
+      sameTreeKey((selected ?? [])[col], option.value),
+    isOptionLoading: (col: number, option: CascaderOption) =>
+      loadingKeys.has(cascaderPathId([...(activePath.slice(0, col) ?? []), option.value])),
     selected
   }
 }

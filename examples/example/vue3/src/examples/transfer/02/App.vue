@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { TransferDirection, TransferItem, TransferSearchValue } from '@expcat/tigercat-core'
+import type { TransferItem, TransferSearchValue } from '@expcat/tigercat-core'
 import { Transfer } from '@expcat/tigercat-vue/Transfer'
 
 const dataSource: TransferItem[] = [
@@ -15,13 +15,14 @@ const targetKeys = ref<Array<string | number>>(['observability'])
 const searchValue = ref<TransferSearchValue>({})
 const lastMove = ref('尚未移动项目')
 
-const handleChange = (
-  nextTargetKeys: Array<string | number>,
-  direction: TransferDirection,
-  movedKeys: Array<string | number>
-) => {
+const handleValue = (nextTargetKeys: Array<string | number>) => {
+  const previous = new Set(targetKeys.value.map((key) => String(key)))
+  const next = new Set(nextTargetKeys.map((key) => String(key)))
+  const added = nextTargetKeys.filter((key) => !previous.has(String(key)))
+  const removed = targetKeys.value.filter((key) => !next.has(String(key)))
+  if (added.length > 0) lastMove.value = `加入：${added.join(', ')}`
+  else if (removed.length > 0) lastMove.value = `移出：${removed.join(', ')}`
   targetKeys.value = nextTargetKeys
-  lastMove.value = `${direction === 'right' ? '加入' : '移出'}：${movedKeys.join(', ')}`
 }
 </script>
 
@@ -29,7 +30,7 @@ const handleChange = (
   <div class="space-y-3">
     <p class="text-sm text-gray-500">默认过滤会匹配名称和 description，例如搜「核心」。</p>
     <Transfer
-      v-model="targetKeys"
+      :model-value="targetKeys"
       v-model:search-value="searchValue"
       :data-source="dataSource"
       searchable
@@ -37,7 +38,7 @@ const handleChange = (
       source-title="待分配服务"
       target-title="已启用服务"
       class="max-w-3xl"
-      @change="handleChange" />
+      @update:model-value="handleValue" />
     <p role="status" class="text-sm text-gray-500">
       已选 {{ targetKeys.length }} 项；{{ lastMove }}
     </p>

@@ -15,7 +15,7 @@ const color = ref('rgba(37, 99, 235, 0.8)')
         format="rgb"
         :presets="['#2563eb', '#0891b2', '#059669', '#dc2626']"
         size="lg" />
-      <code class="text-sm text-[var(--tiger-text-muted,#6b7280)]">{{ color }}</code>
+      <code class="text-sm text-[var(--tiger-text-secondary)]">{{ color }}</code>
     </div>
   </FormItem>
 </template>

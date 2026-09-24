@@ -2,7 +2,6 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
-  TIME_PICKER_DESKTOP_QUERY,
   adjacentTimePickerColumn,
   applyTimePickerColumn,
   applyTimePickerRangeColumn,
@@ -21,14 +20,14 @@ import {
   getLocaleDirection,
   getTimePeriodLabels,
   getTimePickerLabels,
-  isTimePickerDesktopLayout,
+  isSameTimePickerValue,
   isTimePickerValueEmpty,
   mergeAriaDescribedBy,
   mergeTigerLocale,
-  parseTypedTimePickerValue,
   resolveInputTrailingLayout,
-  resolveReadOnlyFlag,
+  resolveTypedTimePickerCommit,
   runShakeAnimation,
+  serializeTimePickerValue,
   seedTimePickerDraft,
   visibleTimePickerColumns,
   type InputStatus,
@@ -49,7 +48,7 @@ export function useTimePickerController(props: TimePickerProps) {
   const {
     size = 'md',
     disabled = false,
-    readonly: readonlyProp,
+    readOnly = false,
     required = false,
     clearable = true,
     format = '24' as TimeFormat,
@@ -70,7 +69,7 @@ export function useTimePickerController(props: TimePickerProps) {
     onBlur
   } = props
 
-  const isReadOnly = resolveReadOnlyFlag(readonlyProp, (props as { readOnly?: boolean }).readOnly)
+  const isReadOnly = readOnly === true
   const config = useTigerConfig()
   const inputGroup = useInputGroupContext()
   const formItemControl = useFormItemControlContext()
@@ -109,22 +108,22 @@ export function useTimePickerController(props: TimePickerProps) {
   const parsedValue = useMemo(() => {
     if (isRangeMode) {
       if (props.value === undefined) {
-        return coerceTimePickerRange(formItemControl?.value)
+        return coerceTimePickerRange(formItemControl?.value, showSeconds)
       }
-      return coerceTimePickerRange(props.value)
+      return coerceTimePickerRange(props.value, showSeconds)
     }
     if (props.value === undefined) {
-      return coerceTimePickerSingle(formItemControl?.value)
+      return coerceTimePickerSingle(formItemControl?.value, showSeconds)
     }
-    return coerceTimePickerSingle(props.value)
-  }, [formItemControl?.value, isRangeMode, props.value])
+    return coerceTimePickerSingle(props.value, showSeconds)
+  }, [formItemControl?.value, isRangeMode, props.value, showSeconds])
 
   const parsedDefault = useMemo(
     () =>
       isRangeMode
-        ? coerceTimePickerRange(props.defaultValue)
-        : coerceTimePickerSingle(props.defaultValue),
-    [isRangeMode, props.defaultValue]
+        ? coerceTimePickerRange(props.defaultValue, showSeconds)
+        : coerceTimePickerSingle(props.defaultValue, showSeconds),
+    [isRangeMode, props.defaultValue, showSeconds]
   )
 
   const [committed, setCommitted] = useControlledState<string | null | TimePickerRangeTuple>({
@@ -157,7 +156,7 @@ export function useTimePickerController(props: TimePickerProps) {
   )
   const [activePart, setActivePart] = useState<'start' | 'end'>('start')
   const [draftText, setDraftText] = useState<string | null>(null)
-  const [desktop, setDesktop] = useState(isTimePickerDesktopLayout)
+  const [validationMessage, setValidationMessage] = useState<string | null>(null)
 
   const constraints: TimePickerConstraints = useMemo(
     () => ({
@@ -225,14 +224,18 @@ export function useTimePickerController(props: TimePickerProps) {
     if (status === 'error') runShakeAnimation(rootRef.current)
   }, [status, shakeTrigger])
 
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return
-    const mq = window.matchMedia(TIME_PICKER_DESKTOP_QUERY)
-    const update = () => setDesktop(mq.matches)
-    update()
-    mq.addEventListener('change', update)
-    return () => mq.removeEventListener('change', update)
-  }, [])
+  const reportError = useCallback(
+    (reason: string) => {
+      setValidationMessage(reason)
+      formItemControl?.setError?.(reason)
+    },
+    [formItemControl]
+  )
+
+  const clearError = useCallback(() => {
+    setValidationMessage(null)
+    formItemControl?.setError?.(null)
+  }, [formItemControl])
 
   const seedPanel = useCallback(
     (value: string | null | TimePickerRangeTuple, part: 'start' | 'end') => {
@@ -267,26 +270,49 @@ export function useTimePickerController(props: TimePickerProps) {
 
   const writeCommitted = useCallback(
     (next: string | null | TimePickerRangeTuple) => {
-      setCommitted(next)
+      const same = isSameTimePickerValue(isRangeMode, committed, next)
+      clearError()
       setDraftText(null)
+      if (same) return
+      setCommitted(next)
     },
-    [setCommitted]
+    [clearError, committed, isRangeMode, setCommitted]
   )
 
   const confirmDraft = useCallback(() => {
+    if (draftText != null) {
+      const typed = resolveTypedTimePickerCommit(draftText, constraints, isRangeMode, periodLabels)
+      if (!typed.ok) {
+        reportError(typed.reason)
+        return
+      }
+      writeCommitted(typed.value)
+      setOpenSafe(false)
+      return
+    }
     const result = commitTimePickerOk({
       range: isRangeMode,
       draft,
       draftRange,
       constraints
     })
-    if (!result) {
-      setOpenSafe(false)
+    if ('error' in result) {
+      reportError(result.error)
       return
     }
     writeCommitted(result.nextCommitted)
     if (result.close) setOpenSafe(false)
-  }, [constraints, draft, draftRange, isRangeMode, setOpenSafe, writeCommitted])
+  }, [
+    constraints,
+    draft,
+    draftRange,
+    draftText,
+    isRangeMode,
+    periodLabels,
+    reportError,
+    setOpenSafe,
+    writeCommitted
+  ])
 
   const selectColumn = useCallback(
     (unit: TimePickerFocusUnit, option: number | 'AM' | 'PM') => {
@@ -311,10 +337,14 @@ export function useTimePickerController(props: TimePickerProps) {
 
   const selectNow = useCallback(() => {
     const result = commitTimePickerNow(isRangeMode, props.now ?? new Date(), constraints)
+    if ('error' in result) {
+      reportError(result.error)
+      return
+    }
     writeCommitted(result.nextCommitted)
     seedPanel(result.nextCommitted, 'start')
     if (result.close) setOpenSafe(false)
-  }, [constraints, isRangeMode, props.now, seedPanel, setOpenSafe, writeCommitted])
+  }, [constraints, isRangeMode, props.now, reportError, seedPanel, setOpenSafe, writeCommitted])
 
   const clearValue = useCallback(() => {
     writeCommitted(emptyTimePickerValue(isRangeMode))
@@ -324,15 +354,13 @@ export function useTimePickerController(props: TimePickerProps) {
 
   const parseDraftInput = useCallback(() => {
     if (draftText == null) return
-    const parsed = parseTypedTimePickerValue(
-      draftText,
-      format,
-      showSeconds,
-      isRangeMode,
-      periodLabels
-    )
-    writeCommitted(parsed)
-  }, [draftText, format, isRangeMode, periodLabels, showSeconds, writeCommitted])
+    const result = resolveTypedTimePickerCommit(draftText, constraints, isRangeMode, periodLabels)
+    if (!result.ok) {
+      reportError(result.reason)
+      return
+    }
+    writeCommitted(result.value)
+  }, [constraints, draftText, isRangeMode, periodLabels, reportError, writeCommitted])
 
   const handleFocusOut = (event: React.FocusEvent<HTMLElement>) => {
     const next = event.relatedTarget as Node | null
@@ -453,7 +481,12 @@ export function useTimePickerController(props: TimePickerProps) {
     required: required || Boolean(formItemControl?.required),
     effectiveId,
     effectiveName,
-    describedBy,
+    describedBy: validationMessage
+      ? mergeAriaDescribedBy(describedBy, `${panelId}-status`)
+      : describedBy,
+    validationMessage,
+    validationId: `${panelId}-status`,
+    nativeValue: serializeTimePickerValue(isRangeMode, committed),
     labelledby,
     ariaLabel,
     status,
@@ -466,7 +499,6 @@ export function useTimePickerController(props: TimePickerProps) {
     shakeClass: SHAKE_CLASS,
     className,
     size: effectiveSize,
-    desktop,
     columns,
     activePart,
     switchPart,

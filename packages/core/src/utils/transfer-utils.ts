@@ -2,24 +2,65 @@ import type { ComponentSize } from '../types/base'
 import type { TransferDirection, TransferItem, TransferSelectedKeys } from '../types/transfer'
 import { classNames } from './class-names'
 import { resolveButtonClasses } from './button-utils'
+import { treeKeyId } from './tree-utils'
+import { variableSizeStrategy, type VirtualRange } from './virtual-list-utils'
 
 export const transferBaseClasses = 'flex flex-col sm:flex-row items-stretch gap-4 max-sm:flex-col'
 
 export const transferPanelClasses =
-  'flex-1 min-w-0 border border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] flex flex-col bg-[var(--tiger-surface,#ffffff)]'
+  'flex-1 min-w-0 border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] flex flex-col bg-[var(--tiger-surface)]'
 
 export const transferPanelHeaderClasses =
-  'flex items-center justify-between gap-2 px-3 py-2 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-surface-muted,#f9fafb)]'
+  'flex items-center justify-between gap-2 px-3 py-2 border-b border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)]'
 
-export const transferPanelBodyClasses = 'flex-1 overflow-auto min-h-[200px]'
+/** Fixed usable height. Rows past this box use the shared virtual window. */
+export const TRANSFER_PANEL_BODY_HEIGHT = 256
 
-export const transferEmptyClasses = 'px-3 py-8 text-center text-[var(--tiger-text-muted,#9ca3af)]'
+export const transferPanelBodyClasses = 'overflow-auto shrink-0'
+
+export function getTransferPanelBodyStyle(): { height: string } {
+  return { height: `${TRANSFER_PANEL_BODY_HEIGHT}px` }
+}
+
+export function getTransferRowHeight(size: ComponentSize = 'md', described = false): number {
+  const base = size === 'sm' ? 36 : size === 'lg' ? 52 : 44
+  return described ? base + 18 : base
+}
+
+export function transferListNeedsWindow(
+  items: readonly { description?: string }[],
+  size: ComponentSize = 'md',
+  viewport = TRANSFER_PANEL_BODY_HEIGHT
+): boolean {
+  let total = 0
+  for (const item of items) {
+    total += getTransferRowHeight(size, Boolean(item.description))
+    if (total > viewport) return true
+  }
+  return false
+}
+
+export function getTransferVirtualWindow(
+  items: readonly { description?: string }[],
+  scrollTop: number,
+  size: ComponentSize = 'md',
+  viewport = TRANSFER_PANEL_BODY_HEIGHT,
+  overscan = 5
+): VirtualRange {
+  const strategy = variableSizeStrategy(
+    (index) => getTransferRowHeight(size, Boolean(items[index]?.description)),
+    items.length
+  )
+  return strategy.getRange(scrollTop, viewport, items.length, overscan)
+}
+
+export const transferEmptyClasses = 'px-3 py-8 text-center text-[var(--tiger-text-secondary)]'
 
 export const transferOperationClasses =
   'flex flex-row sm:flex-col items-center justify-center gap-2 max-sm:flex-row'
 
 export const transferItemDescriptionClasses =
-  'block text-xs text-[var(--tiger-text-muted,#6b7280)] truncate'
+  'block text-xs text-[var(--tiger-text-secondary)] truncate'
 
 export const transferMoveToTargetIconClasses = 'rtl:rotate-180 max-sm:rotate-90'
 export const transferMoveToSourceIconClasses = 'rtl:rotate-180 max-sm:rotate-90'
@@ -42,13 +83,13 @@ export function getTransferItemClasses(
   size: ComponentSize = 'md'
 ): string {
   const base =
-    'flex items-start gap-2 tiger-motion-aware [transition:var(--tiger-transition-base,background-color_150ms_ease)]'
+    'flex items-start gap-2 tiger-motion-aware [transition:var(--tiger-transition-base)]'
 
   const stateClass = isDisabled
-    ? 'text-[var(--tiger-text-muted,#9ca3af)] cursor-not-allowed'
+    ? 'text-[var(--tiger-text-secondary)] cursor-not-allowed'
     : isSelected
-      ? 'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-text,#111827)]'
-      : 'text-[var(--tiger-text,#111827)] hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)] cursor-pointer'
+      ? 'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-text)]'
+      : 'text-[var(--tiger-text)] hover:bg-[var(--tiger-outline-bg-hover)] cursor-pointer'
 
   return classNames(base, sizeClasses[size], itemPaddingClasses[size], stateClass)
 }
@@ -58,7 +99,59 @@ export function getTransferButtonClasses(disabled: boolean): string {
 }
 
 export function transferKeyId(key: string | number): string {
-  return String(key)
+  return treeKeyId(key)
+}
+
+/** Collapse `1` and `'1'` to one row. First occurrence wins. */
+export function dedupeTransferItems(dataSource: readonly TransferItem[]): TransferItem[] {
+  const seen = new Set<string>()
+  const result: TransferItem[] = []
+  for (const item of dataSource) {
+    const id = treeKeyId(item.key)
+    if (seen.has(id)) continue
+    seen.add(id)
+    result.push(item)
+  }
+  return result
+}
+
+export function dedupeTransferKeys(keys: readonly (string | number)[]): (string | number)[] {
+  const seen = new Set<string>()
+  const result: (string | number)[] = []
+  for (const key of keys) {
+    const id = treeKeyId(key)
+    if (seen.has(id)) continue
+    seen.add(id)
+    result.push(key)
+  }
+  return result
+}
+
+export function sameTransferKeys(
+  left: readonly (string | number)[],
+  right: readonly (string | number)[]
+): boolean {
+  if (left.length !== right.length) return false
+  return left.every((key, index) => treeKeyId(key) === treeKeyId(right[index]!))
+}
+
+/** Selected keys split into the current filtered rows and the ones search hid. */
+export function partitionTransferSelection(
+  selectedKeys: readonly (string | number)[],
+  visibleItems: readonly TransferItem[]
+): { visible: (string | number)[]; hidden: (string | number)[] } {
+  const visibleIds = new Set(visibleItems.map((item) => treeKeyId(item.key)))
+  const visible: (string | number)[] = []
+  const hidden: (string | number)[] = []
+  const seen = new Set<string>()
+  for (const key of selectedKeys) {
+    const id = treeKeyId(key)
+    if (seen.has(id)) continue
+    seen.add(id)
+    if (visibleIds.has(id)) visible.push(key)
+    else hidden.push(key)
+  }
+  return { visible, hidden }
 }
 
 export function findTransferItem(
@@ -105,14 +198,14 @@ export function splitTransferData(
   dataSource: TransferItem[],
   targetKeys: (string | number)[]
 ): { sourceItems: TransferItem[]; targetItems: TransferItem[] } {
+  const uniqueSource = dedupeTransferItems(dataSource)
   const byId = new Map<string, TransferItem>()
-  for (const item of dataSource) {
-    const id = transferKeyId(item.key)
-    if (!byId.has(id)) byId.set(id, item)
+  for (const item of uniqueSource) {
+    byId.set(transferKeyId(item.key), item)
   }
 
   const targetIdSet = new Set(targetKeys.map(transferKeyId))
-  const sourceItems = dataSource.filter((item) => !targetIdSet.has(transferKeyId(item.key)))
+  const sourceItems = uniqueSource.filter((item) => !targetIdSet.has(transferKeyId(item.key)))
   const targetItems: TransferItem[] = []
   const seen = new Set<string>()
   for (const key of targetKeys) {
@@ -232,17 +325,9 @@ export function emptyTransferSelectedKeys(): TransferSelectedKeys {
   return { source: [], target: [] }
 }
 
-export function resolveTransferTargetKeys(
-  value?: (string | number)[],
-  targetKeys?: (string | number)[]
-): { keys: (string | number)[] | undefined; conflict: boolean } {
-  if (value !== undefined && targetKeys !== undefined) {
-    const same =
-      value.length === targetKeys.length &&
-      value.every((key, index) => transferKeyId(key) === transferKeyId(targetKeys[index]!))
-    return { keys: value, conflict: !same }
-  }
-  if (value !== undefined) return { keys: value, conflict: false }
-  if (targetKeys !== undefined) return { keys: targetKeys, conflict: false }
-  return { keys: undefined, conflict: false }
+export function resolveTransferValue(
+  value?: (string | number)[] | null
+): (string | number)[] | undefined {
+  if (value == null) return undefined
+  return dedupeTransferKeys(value)
 }

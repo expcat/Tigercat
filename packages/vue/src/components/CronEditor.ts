@@ -1,4 +1,14 @@
-import { computed, defineComponent, h, inject, reactive, ref, watch, type PropType } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  inject,
+  reactive,
+  ref,
+  useId,
+  watch,
+  type PropType
+} from 'vue'
 import type {
   CronEditorSize,
   CronFieldDraft,
@@ -15,6 +25,8 @@ import {
   buildCronFieldValueFromDraft,
   classNames,
   coerceClassValue,
+  cronDraftErrorMessage,
+  cronFormValue,
   cronEditorBaseClasses,
   cronEditorErrorClasses,
   cronEditorFieldClasses,
@@ -27,7 +39,6 @@ import {
   getCronEditorLabels,
   getCronExpressionIssue,
   getCronFieldIssue,
-  getCronFieldValue,
   getCronModeLabels,
   getDefaultCronPresets,
   isCronExpressionEmpty,
@@ -36,7 +47,7 @@ import {
   mergeAriaDescribedBy,
   mergeTigerLocale,
   parseOptionalInt,
-  seedCronFieldDraft,
+  seedCronFieldDrafts,
   updateCronExpressionField,
   validateCronExpressionWithLabels
 } from '@expcat/tigercat-core'
@@ -46,19 +57,6 @@ import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from 
 export type VueCronEditorProps = InstanceType<typeof CronEditor>['$props']
 export type CronEditorProps = VueCronEditorProps
 
-function seedAllDrafts(
-  expression: string,
-  sticky: Partial<Record<CronFieldKey, CronFieldMode>>
-): Record<CronFieldKey, CronFieldDraft> {
-  const ready = isCronFieldCountValid(expression)
-  return Object.fromEntries(
-    cronFieldMetas.map((meta) => {
-      const raw = ready ? (getCronFieldValue(expression, meta.key) ?? '*') : '*'
-      return [meta.key, seedCronFieldDraft(raw, sticky[meta.key])]
-    })
-  ) as Record<CronFieldKey, CronFieldDraft>
-}
-
 export const CronEditor = markFormItemGroupControl(
   defineComponent({
     name: 'TigerCronEditor',
@@ -67,7 +65,7 @@ export const CronEditor = markFormItemGroupControl(
       modelValue: { type: String as PropType<string | null>, default: undefined },
       defaultValue: { type: String as PropType<string | null>, default: undefined },
       disabled: { type: Boolean, default: false },
-      readonly: { type: Boolean, default: false },
+      readOnly: { type: Boolean, default: false },
       size: { type: String as PropType<CronEditorSize>, default: 'md' },
       presets: { type: Array as PropType<CronPreset[]>, default: undefined },
       ariaLabel: { type: String, default: undefined },
@@ -78,29 +76,28 @@ export const CronEditor = markFormItemGroupControl(
       status: { type: String as PropType<InputStatus>, default: undefined },
       className: String
     },
-    emits: ['update:modelValue', 'change', 'input', 'validate', 'blur'],
+    emits: ['update:modelValue', 'validate', 'blur'],
     setup(props, { attrs, emit, expose }) {
       const config = useTigerConfig()
       const formItemControl = inject<VueFormItemControlContext | null>(
         FORM_ITEM_CONTROL_INJECTION_KEY,
         null
       )
-      const innerValue = ref<string | null>(
-        props.defaultValue != null && props.defaultValue !== '' ? props.defaultValue : null
-      )
+      const initialRaw = props.modelValue ?? props.defaultValue ?? ''
+      const innerValue = ref<string | null>(cronFormValue(initialRaw))
+      const expressionDraft = ref(initialRaw ?? '')
       const expressionInput = ref<HTMLInputElement | null>(null)
       const stickyModes = reactive<Partial<Record<CronFieldKey, CronFieldMode>>>({})
       const drafts = reactive<Record<CronFieldKey, CronFieldDraft>>(
-        seedAllDrafts(props.modelValue ?? props.defaultValue ?? '', stickyModes)
+        seedCronFieldDrafts(expressionDraft.value, stickyModes)
       )
-      const instanceId = `tiger-cron-${Math.random().toString(36).slice(2, 9)}`
+      const instanceId = useId()
+      let echoed: string | null | undefined
 
-      watch(
-        () => props.modelValue,
-        (value) => {
-          if (value !== undefined) innerValue.value = value
-        }
-      )
+      function applyDrafts(expression: string) {
+        const seeded = seedCronFieldDrafts(expression, stickyModes)
+        for (const meta of cronFieldMetas) drafts[meta.key] = seeded[meta.key]
+      }
 
       const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
       const labels = computed(() => getCronEditorLabels(mergedLocale.value, props.labels))
@@ -121,70 +118,96 @@ export const CronEditor = markFormItemGroupControl(
       const effectiveDisabled = computed(
         () => props.disabled || (formItemControl?.disabled.value ?? false)
       )
-      const inactive = computed(() => effectiveDisabled.value || props.readonly)
       const status = computed(() => props.status ?? formItemControl?.status.value ?? 'default')
       const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
       const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
 
-      const expression = computed(() => {
+      const modelRaw = computed(() => {
         if (props.modelValue !== undefined) return props.modelValue ?? ''
         if (formItemControl?.value.value !== undefined) {
-          return String(formItemControl.value.value ?? '')
+          return formItemControl.value.value == null ? '' : String(formItemControl.value.value)
         }
         return innerValue.value ?? ''
       })
 
+      watch(modelRaw, (next) => {
+        if (echoed !== undefined && (echoed ?? '') === next) {
+          echoed = undefined
+          return
+        }
+        if (next === expressionDraft.value) return
+        if (next === (cronFormValue(expressionDraft.value) ?? '') && next === '') return
+        expressionDraft.value = next
+        applyDrafts(next)
+      })
+
+      const validation = computed(() =>
+        validateCronExpressionWithLabels(expressionDraft.value, labels.value, fieldLabels.value)
+      )
+      const fieldsReady = computed(
+        () =>
+          !isCronExpressionEmpty(expressionDraft.value) &&
+          isCronFieldCountValid(expressionDraft.value)
+      )
+      const submittedValue = computed(() => cronFormValue(expressionDraft.value) ?? '')
+
       watch(
-        expression,
-        (next) => {
-          const seeded = seedAllDrafts(next, stickyModes)
-          for (const meta of cronFieldMetas) drafts[meta.key] = seeded[meta.key]
+        () => cronDraftErrorMessage(expressionDraft.value, validation.value),
+        (message, previous) => {
+          if (message) formItemControl?.setError(message)
+          else if (previous) formItemControl?.setError(null)
         },
         { immediate: true }
       )
 
-      const validation = computed(() =>
-        validateCronExpressionWithLabels(expression.value, labels.value, fieldLabels.value)
-      )
-      const fieldsReady = computed(() => isCronFieldCountValid(expression.value))
-
       function writeValue(nextValue: string) {
-        const stored = nextValue.trim() === '' ? null : nextValue
+        if (effectiveDisabled.value || props.readOnly) return
+        expressionDraft.value = nextValue
+        const stored = cronFormValue(nextValue)
         const nextValidation = validateCronExpressionWithLabels(
-          stored ?? '',
+          nextValue,
           labels.value,
           fieldLabels.value
         )
-        if (props.modelValue === undefined) innerValue.value = stored
-        emit('update:modelValue', stored)
-        emit('input', stored)
-        emit('change', stored, nextValidation)
+        const currentStored = cronFormValue(modelRaw.value)
+        if (currentStored !== stored) {
+          echoed = stored
+          if (props.modelValue === undefined && formItemControl?.value.value === undefined) {
+            innerValue.value = stored
+          }
+          emit('update:modelValue', stored)
+          formItemControl?.onChange(stored)
+        }
         emit('validate', nextValidation)
-        formItemControl?.onChange(stored)
       }
 
       function handleRawExpressionChange(nextValue: string) {
+        if (props.readOnly) return
         for (const key of Object.keys(stickyModes) as CronFieldKey[]) {
           delete stickyModes[key]
         }
+        expressionDraft.value = nextValue
+        applyDrafts(nextValue)
         writeValue(nextValue)
       }
 
       function writeField(meta: CronFieldMeta, draft: CronFieldDraft) {
-        const raw = buildCronFieldValueFromDraft(draft, meta)
-        if (isCronExpressionEmpty(expression.value)) {
+        if (!fieldsReady.value && isCronExpressionEmpty(expressionDraft.value)) {
           const parts = ['*', '*', '*', '*', '*']
           const index = cronFieldMetas.findIndex((item) => item.key === meta.key)
-          parts[index] = raw
+          parts[index] = buildCronFieldValueFromDraft(draft, meta)
           writeValue(parts.join(' '))
           return
         }
-        const updated = updateCronExpressionField(expression.value, meta.key, raw)
+        if (!fieldsReady.value) return
+        const raw = buildCronFieldValueFromDraft(draft, meta)
+        const updated = updateCronExpressionField(expressionDraft.value, meta.key, raw)
         if (updated == null) return
         writeValue(updated)
       }
 
       function handleModeChange(meta: CronFieldMeta, mode: CronFieldMode) {
+        if (effectiveDisabled.value || props.readOnly || !fieldsReady.value) return
         stickyModes[meta.key] = mode
         const next = applyCronFieldMode(drafts[meta.key], mode, meta)
         drafts[meta.key] = next
@@ -212,9 +235,11 @@ export const CronEditor = markFormItemGroupControl(
             inputmode: 'numeric',
             class: getCronEditorControlClasses(props.size, invalid),
             value: draft.stepText,
-            disabled: inactive.value || !fieldsReady.value,
+            disabled: effectiveDisabled.value || !fieldsReady.value,
+            readonly: props.readOnly,
             'aria-label': formatCronControlLabel(labels.value.stepAriaLabel, meta.label),
             onInput: (event: Event) => {
+              if (props.readOnly) return
               const text = (event.target as HTMLInputElement).value
               drafts[meta.key] = { ...draft, stepText: text, mode: 'every' }
               if (parseOptionalInt(text) != null) writeField(meta, drafts[meta.key])
@@ -228,9 +253,11 @@ export const CronEditor = markFormItemGroupControl(
             inputmode: 'numeric',
             class: getCronEditorControlClasses(props.size, invalid),
             value: draft.valueText,
-            disabled: inactive.value || !fieldsReady.value,
+            disabled: effectiveDisabled.value || !fieldsReady.value,
+            readonly: props.readOnly,
             'aria-label': formatCronControlLabel(labels.value.valueAriaLabel, meta.label),
             onInput: (event: Event) => {
+              if (props.readOnly) return
               const text = (event.target as HTMLInputElement).value
               drafts[meta.key] = { ...draft, valueText: text, mode: 'specific' }
               if (parseOptionalInt(text) != null) writeField(meta, drafts[meta.key])
@@ -245,9 +272,11 @@ export const CronEditor = markFormItemGroupControl(
               inputmode: 'numeric',
               class: getCronEditorControlClasses(props.size, invalid),
               value: draft.startText,
-              disabled: inactive.value || !fieldsReady.value,
+              disabled: effectiveDisabled.value || !fieldsReady.value,
+              readonly: props.readOnly,
               'aria-label': formatCronControlLabel(labels.value.rangeStartAriaLabel, meta.label),
               onInput: (event: Event) => {
+                if (props.readOnly) return
                 const text = (event.target as HTMLInputElement).value
                 drafts[meta.key] = { ...draft, startText: text, mode: 'range' }
                 if (
@@ -263,9 +292,11 @@ export const CronEditor = markFormItemGroupControl(
               inputmode: 'numeric',
               class: getCronEditorControlClasses(props.size, invalid),
               value: draft.endText,
-              disabled: inactive.value || !fieldsReady.value,
+              disabled: effectiveDisabled.value || !fieldsReady.value,
+              readonly: props.readOnly,
               'aria-label': formatCronControlLabel(labels.value.rangeEndAriaLabel, meta.label),
               onInput: (event: Event) => {
+                if (props.readOnly) return
                 const text = (event.target as HTMLInputElement).value
                 drafts[meta.key] = { ...draft, endText: text, mode: 'range' }
                 if (
@@ -283,9 +314,11 @@ export const CronEditor = markFormItemGroupControl(
           type: 'text',
           class: getCronEditorControlClasses(props.size, invalid),
           value: draft.raw,
-          disabled: inactive.value || !fieldsReady.value,
+          disabled: effectiveDisabled.value || !fieldsReady.value,
+          readonly: props.readOnly,
           'aria-label': formatCronControlLabel(labels.value.customValueAriaLabel, meta.label),
           onInput: (event: Event) => {
+            if (props.readOnly) return
             const text = (event.target as HTMLInputElement).value
             drafts[meta.key] = { ...draft, raw: text, mode: 'custom' }
             writeField(meta, drafts[meta.key])
@@ -308,7 +341,7 @@ export const CronEditor = markFormItemGroupControl(
         )
         const expressionIssue = getCronExpressionIssue(validation.value)
         const expressionInvalid =
-          Boolean(expressionIssue) && !isCronExpressionEmpty(expression.value)
+          Boolean(expressionIssue) && !isCronExpressionEmpty(expressionDraft.value)
         const errorId = `${instanceId}-error`
         const groupName = props.ariaLabel ?? labels.value.ariaLabel
 
@@ -326,22 +359,30 @@ export const CronEditor = markFormItemGroupControl(
             'aria-labelledby': labelledby,
             'aria-describedby': describedBy,
             'aria-invalid': status.value === 'error' || expressionInvalid ? true : undefined,
+            'aria-readonly': props.readOnly || undefined,
             onFocusout: handleFocusout
           },
           [
+            effectiveName.value
+              ? h('input', {
+                  type: 'hidden',
+                  name: effectiveName.value,
+                  value: submittedValue.value,
+                  disabled: effectiveDisabled.value || undefined
+                })
+              : null,
             h('div', { class: 'flex flex-col gap-2 sm:flex-row' }, [
               h('input', {
                 ref: expressionInput,
                 type: 'text',
                 id: effectiveId.value,
-                name: effectiveName.value,
                 class: classNames(
                   getCronEditorControlClasses(props.size, expressionInvalid),
                   'flex-1'
                 ),
-                value: expression.value,
+                value: expressionDraft.value,
                 disabled: effectiveDisabled.value,
-                readonly: props.readonly,
+                readonly: props.readOnly,
                 'aria-label': labels.value.expressionAriaLabel,
                 'aria-invalid': expressionInvalid || undefined,
                 'aria-describedby': expressionIssue ? errorId : describedBy,
@@ -354,18 +395,21 @@ export const CronEditor = markFormItemGroupControl(
                     {
                       class: getCronEditorControlClasses(props.size),
                       value: resolvedPresets.value.some(
-                        (preset) => preset.value === expression.value
+                        (preset) => preset.value === expressionDraft.value
                       )
-                        ? expression.value
+                        ? expressionDraft.value
                         : '',
-                      disabled: inactive.value,
+                      disabled: effectiveDisabled.value,
                       'aria-label': labels.value.presetAriaLabel,
                       onChange: (event: Event) => {
+                        if (props.readOnly) return
                         const nextValue = (event.target as HTMLSelectElement).value
                         if (nextValue) {
                           for (const key of Object.keys(stickyModes) as CronFieldKey[]) {
                             delete stickyModes[key]
                           }
+                          expressionDraft.value = nextValue
+                          applyDrafts(nextValue)
                           writeValue(nextValue)
                         }
                       }
@@ -382,7 +426,7 @@ export const CronEditor = markFormItemGroupControl(
             expressionIssue
               ? h(
                   'div',
-                  { id: errorId, class: cronEditorErrorClasses, role: 'alert' },
+                  { id: errorId, class: cronEditorErrorClasses, 'aria-live': 'polite' },
                   expressionIssue.message
                 )
               : undefined,
@@ -402,8 +446,8 @@ export const CronEditor = markFormItemGroupControl(
                     {
                       id: modeId,
                       class: getCronEditorControlClasses(props.size, !!issue),
-                      value: draft.mode,
-                      disabled: inactive.value || !fieldsReady.value,
+                      value: fieldsReady.value ? draft.mode : '',
+                      disabled: effectiveDisabled.value || !fieldsReady.value,
                       'aria-invalid': issue ? true : undefined,
                       'aria-describedby': issue ? fieldErrorId : undefined,
                       'aria-label': formatCronControlLabel(labels.value.modeAriaLabel, meta.label),
@@ -413,9 +457,14 @@ export const CronEditor = markFormItemGroupControl(
                           (event.target as HTMLSelectElement).value as CronFieldMode
                         )
                     },
-                    cronFieldModes.map((mode) =>
-                      h('option', { key: mode, value: mode }, modeLabels.value[mode])
-                    )
+                    [
+                      fieldsReady.value
+                        ? null
+                        : h('option', { value: '' }, '\u00a0'),
+                      ...cronFieldModes.map((mode) =>
+                        h('option', { key: mode, value: mode }, modeLabels.value[mode])
+                      )
+                    ]
                   ),
                   renderFieldControl(meta, draft, !!issue),
                   issue

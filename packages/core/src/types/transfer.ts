@@ -39,21 +39,16 @@ export interface TransferProps {
   /** All available data items */
   dataSource?: TransferItem[]
   /**
-   * Keys of items in the right (target) list. Alias of `value` with lower
-   * priority. Both set and unequal logs a dev warning.
-   */
-  targetKeys?: (string | number)[]
-  /**
    * Controlled target keys. `undefined` is uncontrolled; `[]` is a real empty
-   * target list.
+   * target list. `null` and `''` from a named field are an empty list.
    */
   value?: (string | number)[]
   /** Uncontrolled initial target keys. */
   defaultValue?: (string | number)[]
   /**
-   * Uncontrolled initial target keys when `defaultValue` is omitted.
+   * Focusable and submittable, but selection and moves do not change the value.
    */
-  defaultTargetKeys?: (string | number)[]
+  readOnly?: boolean
   /**
    * Controlled checkbox selection in each panel. Search-hidden keys stay
    * selected until cleared or moved; the header count includes them.

@@ -1,8 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle } from 'react'
+import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
-  calendarSolidIcon20PathD,
   classNames,
-  closeSolidIcon20PathD,
   datePickerFooterButtonClasses,
   datePickerFooterClasses,
   datePickerPanelClasses,
@@ -10,9 +9,9 @@ import {
   datePickerShortcutButtonClasses,
   datePickerShortcutListClasses,
   getInputClearButtonClasses,
-  getInputPasswordToggleClasses,
-  icon20ViewBox
+  getInputPasswordToggleClasses
 } from '@expcat/tigercat-core'
+import { calendarSolidIcon20PathD, closeSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { renderOverlayPortal, useAnchoredOverlay, useFocusTrap } from '../utils/overlay'
 import { Calendar } from './Calendar'
 import { useDatePickerController } from './DatePicker/state'
@@ -157,20 +156,31 @@ export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
             disabled={ctx.effectiveDisabled}
             readOnly={ctx.isReadOnly}
             required={ctx.required}
-            name={ctx.effectiveName}
             id={ctx.effectiveId}
             autoComplete="off"
             aria-label={ctx.ariaLabel ?? (ctx.labelledby ? undefined : ctx.placeholder)}
             aria-labelledby={ctx.labelledby}
             aria-describedby={ctx.describedBy}
-            aria-invalid={ctx.status === 'error' ? true : undefined}
+            aria-invalid={ctx.status === 'error' || ctx.validationMessage ? true : undefined}
             aria-required={ctx.required ? true : undefined}
+            aria-expanded={ctx.isOpen}
+            aria-haspopup="dialog"
             aria-controls={ctx.isOpen ? ctx.panelId : undefined}
-            onChange={(event) => ctx.onDraftChange(event.target.value)}
+            onChange={(event) => {
+              if (ctx.effectiveDisabled || ctx.isReadOnly) return
+              ctx.onDraftChange(event.target.value)
+            }}
             onClick={() => ctx.setOpenSafe(true)}
             onKeyDown={ctx.handleInputKeyDown}
-            onBlur={ctx.parseDraft}
           />
+          {ctx.effectiveName ? (
+            <input
+              type="hidden"
+              name={ctx.effectiveName}
+              value={ctx.nativeValue}
+              disabled={ctx.effectiveDisabled}
+            />
+          ) : null}
           {ctx.showClear ? (
             <button
               type="button"
@@ -188,10 +198,16 @@ export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
             className={getInputPasswordToggleClasses(ctx.size, { offsetSlots: 0 })}
             disabled={ctx.effectiveDisabled || ctx.isReadOnly}
             aria-label={ctx.labels.toggleCalendar}
+            aria-expanded={ctx.isOpen}
+            aria-haspopup="dialog"
+            aria-controls={ctx.isOpen ? ctx.panelId : undefined}
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => ctx.setOpenSafe(!ctx.isOpen)}>
             <ChromeIcon path={calendarSolidIcon20PathD} className="w-5 h-5" />
           </button>
+          <div id={ctx.validationId} role="status" aria-live="polite" className="sr-only">
+            {ctx.validationMessage}
+          </div>
         </div>
         {renderOverlayPortal(panel, overlay.target)}
       </div>

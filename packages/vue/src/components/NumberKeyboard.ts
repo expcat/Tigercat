@@ -1,4 +1,15 @@
-import { computed, defineComponent, h, inject, provide, ref, watch, type PropType } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  inject,
+  nextTick,
+  provide,
+  ref,
+  useId,
+  watch,
+  type PropType
+} from 'vue'
 import type {
   InputStatus,
   NumberKeyboardChangePayload,
@@ -15,6 +26,7 @@ import {
   getNumberKeyboardKeyClasses,
   getNumberKeyboardKeys,
   getNumberKeyboardLabels,
+  isNumberKeyboardValueRejected,
   mergeAriaDescribedBy,
   mergeStyleValues,
   mergeTigerLocale,
@@ -23,6 +35,7 @@ import {
   numberKeyboardGridClasses,
   numberKeyboardRootClasses,
   numberKeyboardScrimClasses,
+  NUMBER_KEYBOARD_INVALID_VALUE_TEXT,
   numberKeyboardSheetClasses,
   postNumberKeyboardValue,
   resolveAnchoredOverlayTarget,
@@ -51,7 +64,7 @@ export const NumberKeyboard = defineComponent({
     precision: { type: Number, default: undefined },
     decimalSeparator: { type: String, default: '.' },
     disabled: { type: Boolean, default: false },
-    readonly: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
     confirmText: { type: String, default: undefined },
     deleteText: { type: String, default: undefined },
     ariaLabel: { type: String, default: undefined },
@@ -72,17 +85,7 @@ export const NumberKeyboard = defineComponent({
       default: undefined
     }
   },
-  emits: [
-    'update:modelValue',
-    'update:open',
-    'change',
-    'input',
-    'open-change',
-    'key-press',
-    'delete',
-    'confirm',
-    'blur'
-  ],
+  emits: ['update:modelValue', 'update:open', 'key-press', 'delete', 'confirm', 'blur'],
   setup(props, { attrs, emit, expose }) {
     const config = useTigerConfig()
     const formItemControl = inject<VueFormItemControlContext | null>(
@@ -111,41 +114,92 @@ export const NumberKeyboard = defineComponent({
     const effectiveName = computed(() => props.name ?? formItemControl?.name.value)
     const overlayMode = computed(() => props.open !== undefined || props.defaultOpen !== undefined)
 
-    const innerValue = ref(postNumberKeyboardValue(props.defaultValue, props.mode))
+    const inputOptions = computed(() => ({
+      mode: props.mode,
+      maxLength: props.maxLength,
+      precision: props.precision,
+      decimalSeparator: props.decimalSeparator
+    }))
+
+    const innerValue = ref(
+      postNumberKeyboardValue(props.defaultValue, props.mode, inputOptions.value)
+    )
     const innerOpen = ref(props.defaultOpen ?? false)
 
+    const externalRaw = computed(() => {
+      if (props.modelValue !== undefined) return props.modelValue
+      if (formItemControl?.value.value !== undefined) return formItemControl.value.value
+      return undefined
+    })
     const currentValue = computed(() => {
-      if (props.modelValue !== undefined)
-        return postNumberKeyboardValue(props.modelValue, props.mode)
-      if (formItemControl?.value.value !== undefined) {
-        return postNumberKeyboardValue(formItemControl.value.value, props.mode)
+      if (externalRaw.value !== undefined) {
+        return postNumberKeyboardValue(externalRaw.value, props.mode, inputOptions.value)
       }
       return innerValue.value
     })
+    const invalidValue = computed(() => {
+      if (externalRaw.value !== undefined) {
+        return isNumberKeyboardValueRejected(externalRaw.value, props.mode, inputOptions.value)
+      }
+      const sanitizedDefault = postNumberKeyboardValue(
+        props.defaultValue,
+        props.mode,
+        inputOptions.value
+      )
+      if (innerValue.value !== sanitizedDefault) return false
+      return isNumberKeyboardValueRejected(props.defaultValue, props.mode, inputOptions.value)
+    })
+    const errorId = `${useId()}-error`
     const isOpen = computed(() => (props.open !== undefined ? props.open : innerOpen.value))
     const overlayEnabled = computed(
       () => overlayMode.value && isOpen.value && !effectiveDisabled.value
     )
 
-    const keys = computed(() =>
-      getNumberKeyboardKeys({
+    const keys = computed(() => {
+      const layout = getNumberKeyboardKeys({
         mode: props.mode,
         decimalSeparator: props.decimalSeparator,
         showConfirm: props.showConfirm,
         labels: labels.value
       })
-    )
+      if (!props.readOnly) return layout
+      return layout.map((key) => (key.type === 'empty' ? key : { ...key, disabled: true }))
+    })
     const interactive = computed(() => getNumberKeyboardInteractiveIndexes(keys.value))
     const activeIndex = ref(interactive.value[0] ?? 0)
+    const keyRefs = ref<Array<HTMLButtonElement | null>>([])
 
     watch(interactive, (next) => {
       if (!next.includes(activeIndex.value)) activeIndex.value = next[0] ?? 0
     })
 
+    watch(
+      invalidValue,
+      (isInvalid, previous) => {
+        if (isInvalid) formItemControl?.setError(NUMBER_KEYBOARD_INVALID_VALUE_TEXT)
+        else if (previous) formItemControl?.setError(null)
+      },
+      { immediate: true }
+    )
+
     const rootRef = ref<HTMLDivElement | null>(null)
     const sheetRef = ref<HTMLDivElement | null>(null)
 
-    useVueFocusTrap({ enabled: overlayEnabled, containerRef: sheetRef, inert: true })
+    useVueFocusTrap({
+      enabled: overlayEnabled,
+      containerRef: sheetRef,
+      inert: true,
+      autoFocus: true
+    })
+    watch(overlayEnabled, (open) => {
+      if (!open) return
+      nextTick(() => {
+        const active =
+          sheetRef.value?.querySelector<HTMLElement>('[data-tiger-number-key-active]') ??
+          sheetRef.value
+        active?.focus()
+      })
+    })
     useVueBodyScrollLock(overlayEnabled)
     useVueEscapeKey({
       enabled: overlayEnabled,
@@ -154,29 +208,26 @@ export const NumberKeyboard = defineComponent({
     })
 
     function setOpenSafe(next: boolean) {
-      if (!overlayMode.value || effectiveDisabled.value) return
+      if (!overlayMode.value || effectiveDisabled.value || next === isOpen.value) return
       if (props.open === undefined) innerOpen.value = next
       emit('update:open', next)
-      emit('open-change', next)
     }
 
     function writeValue(next: string, payload: NumberKeyboardChangePayload) {
+      if (next === currentValue.value) return
       if (props.modelValue === undefined) innerValue.value = next
       emit('update:modelValue', next)
-      emit('input', next)
-      emit('change', next, payload)
       formItemControl?.onChange(next)
     }
 
-    function applyKey(key: NumberKeyboardKey) {
-      if (effectiveDisabled.value || props.readonly || key.type === 'empty') return
+    function focusActiveKey(index: number) {
+      nextTick(() => keyRefs.value[index]?.focus())
+    }
 
-      const result = applyNumberKeyboardKey(currentValue.value, key, {
-        mode: props.mode,
-        maxLength: props.maxLength,
-        precision: props.precision,
-        decimalSeparator: props.decimalSeparator
-      })
+    function applyKey(key: NumberKeyboardKey) {
+      if (effectiveDisabled.value || props.readOnly || key.disabled || key.type === 'empty') return
+
+      const result = applyNumberKeyboardKey(currentValue.value, key, inputOptions.value)
       const payload: NumberKeyboardChangePayload = {
         value: result.nextValue,
         key: key.value,
@@ -206,7 +257,9 @@ export const NumberKeyboard = defineComponent({
         event.key === 'End'
       ) {
         event.preventDefault()
+        if (interactive.value.length === 0) return
         activeIndex.value = moveNumberKeyboardIndex(keys.value, activeIndex.value, event.key)
+        focusActiveKey(activeIndex.value)
         return
       }
       if (event.key === ' ') {
@@ -269,14 +322,27 @@ export const NumberKeyboard = defineComponent({
                 'button',
                 {
                   key: `${key.type}-${key.value}-${index}`,
+                  ref: (el: unknown) => {
+                    keyRefs.value[index] = el instanceof HTMLButtonElement ? el : null
+                  },
                   type: 'button',
-                  tabindex: -1,
-                  class: getNumberKeyboardKeyClasses(key, effectiveDisabled.value),
-                  disabled: effectiveDisabled.value,
+                  tabindex: interactive.value.includes(index) && index === activeIndex.value ? 0 : -1,
+                  class: getNumberKeyboardKeyClasses(
+                    key,
+                    effectiveDisabled.value || !!key.disabled,
+                    interactive.value.includes(index) && index === activeIndex.value
+                  ),
+                  disabled: effectiveDisabled.value || !!key.disabled,
+                  'aria-disabled': key.disabled || effectiveDisabled.value || undefined,
                   'aria-label': key.ariaLabel,
                   'data-key': key.value,
                   'data-active': index === activeIndex.value ? '' : undefined,
+                  'data-tiger-number-key-active':
+                    interactive.value.includes(index) && index === activeIndex.value
+                      ? ''
+                      : undefined,
                   onClick: () => {
+                    if (key.disabled || props.readOnly) return
                     activeIndex.value = index
                     applyKey(key)
                   }
@@ -298,7 +364,15 @@ export const NumberKeyboard = defineComponent({
       const attrLabelledby =
         typeof attrs['aria-labelledby'] === 'string' ? attrs['aria-labelledby'] : undefined
       const labelledby = attrLabelledby?.trim() ? attrLabelledby : formItemControl?.labelId.value
-      const describedBy = mergeAriaDescribedBy(attrDescribedBy, formItemControl?.describedBy.value)
+      const describedBy = mergeAriaDescribedBy(
+        mergeAriaDescribedBy(attrDescribedBy, invalidValue.value ? errorId : undefined),
+        formItemControl?.describedBy.value
+      )
+      const groupTabIndex = effectiveDisabled.value
+        ? -1
+        : interactive.value.length > 0
+          ? -1
+          : 0
 
       return h(
         'div',
@@ -309,30 +383,57 @@ export const NumberKeyboard = defineComponent({
           style: sheet ? undefined : rootStyle.value,
           role: sheet ? 'dialog' : 'group',
           'aria-modal': sheet || undefined,
-          id: effectiveId.value,
-          tabindex: effectiveDisabled.value ? -1 : 0,
+          id: sheet ? undefined : effectiveId.value,
+          tabindex: groupTabIndex,
           'aria-label': labelledby ? undefined : labels.value.ariaLabel,
           'aria-labelledby': labelledby,
           'aria-describedby': describedBy,
           'aria-disabled': effectiveDisabled.value || undefined,
-          'aria-readonly': props.readonly || undefined,
-          'aria-invalid': status.value === 'error' ? true : undefined,
+          'aria-readonly': props.readOnly || undefined,
+          'aria-invalid': status.value === 'error' || invalidValue.value ? true : undefined,
           'aria-required': formItemControl?.required.value ? true : undefined,
           'data-tiger-number-keyboard': '',
           onKeydown: handleGroupKeyDown,
           onFocusout: handleFocusOut
         },
         [
-          effectiveName.value
+          !sheet && effectiveName.value
             ? h('input', {
                 type: 'hidden',
                 name: effectiveName.value,
-                value: currentValue.value
+                value: currentValue.value,
+                disabled: effectiveDisabled.value || undefined
               })
             : null,
+          sheet ? null : renderInvalidNote(),
           renderKeys()
         ]
       )
+    }
+
+    function renderInvalidNote() {
+      if (!invalidValue.value) return null
+      return h(
+        'p',
+        {
+          id: errorId,
+          class: 'px-1 text-xs text-[var(--tiger-error)]',
+          'aria-live': 'polite',
+          'data-tiger-number-keyboard-error': ''
+        },
+        NUMBER_KEYBOARD_INVALID_VALUE_TEXT
+      )
+    }
+
+    function renderAnchorInput() {
+      if (!effectiveName.value && !effectiveId.value) return null
+      return h('input', {
+        type: 'hidden',
+        id: effectiveId.value,
+        name: effectiveName.value,
+        value: currentValue.value,
+        disabled: effectiveDisabled.value || undefined
+      })
     }
 
     return () => {
@@ -340,9 +441,8 @@ export const NumberKeyboard = defineComponent({
 
       const target = resolveAnchoredOverlayTarget(rootRef.value)
       return h('div', { ref: rootRef, class: classNames('contents', props.className) }, [
-        effectiveName.value
-          ? h('input', { type: 'hidden', name: effectiveName.value, value: currentValue.value })
-          : null,
+        renderAnchorInput(),
+        renderInvalidNote(),
         overlayEnabled.value
           ? renderVueOverlayTeleport(
               [

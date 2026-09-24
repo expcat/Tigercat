@@ -5,6 +5,7 @@ import {
   h,
   watch,
   nextTick,
+  useId,
   type PropType,
   type VNode,
   type VNodeChild
@@ -18,9 +19,14 @@ import {
   applyTreeKeyboard,
   classNames,
   coerceClassValue,
+  checkboxCheckPathD,
+  checkboxIconSizeClasses,
+  checkboxIconViewBox,
+  checkboxIndeterminatePathD,
   createTreeKeyIdSet,
-  formatTreeSelectNodeLabel,
-  getCheckedKeysByStrategy,
+  decideAfterBranchLoad,
+  gateBranchLoad,
+  getCheckboxVisualClasses,
   getHighlightSegments,
   getSpinnerSVG,
   getTreeIndentSlotClasses,
@@ -31,8 +37,12 @@ import {
   highlightMarkClasses,
   lookupTreeNode,
   mergeLoadedChildren,
+  isCurrentLoadToken,
   mergeTigerLocale,
+  nextLoadToken,
+  nextCheckedFromTreeRow,
   nextTreeCheckedState,
+  nodeHasChildren,
   nextTreeExpandedKeys,
   nextTreeSelectedKeys,
   normalizeSvgAttrs,
@@ -40,12 +50,15 @@ import {
   resolveCheckedInput,
   resolveInitialExpandedKeys,
   resolveLocaleText,
+  resolveOutwardCheckedKeys,
+  parseTreeKeyId,
   resolveTreeDropPosition,
   resolveTreeKeyboardAction,
   resolveTreeSelection,
+  alignTreeVirtualScroll,
+  createTreeEdgeScroll,
   resolveTreeView,
   sameTreeKey,
-  shouldLoadTreeNode,
   treeBaseClasses,
   treeDropAfterClasses,
   treeDropBeforeClasses,
@@ -77,7 +90,6 @@ import {
 } from '@expcat/tigercat-core'
 import { useDrag } from '../composables/useDrag'
 import { VirtualList } from './VirtualList'
-import { Checkbox } from './Checkbox'
 import { useTigerConfig } from './ConfigProvider'
 
 const spinnerSvg = getSpinnerSVG('spinner')
@@ -196,9 +208,7 @@ export const Tree = defineComponent({
     const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const selection = computed(() =>
       resolveTreeSelection({
-        selectionMode: props.selectionMode,
-        selectable: props.selectable,
-        multiple: props.multiple
+        selectionMode: props.selectionMode
       })
     )
     const hasLoadData = computed(() => typeof props.loadData === 'function')
@@ -230,11 +240,14 @@ export const Tree = defineComponent({
     const loadingIds = ref(new Set<string>())
     const activeKey = ref<TreeNodeKey | undefined>(undefined)
     const internalSearch = ref(props.defaultSearchValue ?? '')
-    const autoExpandKeys = ref<TreeNodeKey[]>([])
+    const savedExpanded = ref<TreeNodeKey[] | null>(null)
+    const loadTokens = new Map<string, number>()
+    const dragContainerId = `tiger-tree-${useId()}`
     const dropIndicator = ref<{ key: TreeNodeKey; position: TreeDropPosition } | null>(null)
     const dropPos = ref<TreeDropPosition>('inside')
     const itemRefs = new Map<string, HTMLElement>()
     const virtualRef = ref<VirtualListHandle | null>(null)
+    const edgeScroll = createTreeEdgeScroll()
 
     watch(
       () => props.treeData,
@@ -275,7 +288,7 @@ export const Tree = defineComponent({
     const matchedKeys = computed(() =>
       searchQuery.value
         ? filterTreeNodes(derivedTree.value, searchQuery.value, props.filterFn, props.filterMode)
-        : new Set<TreeNodeKey>()
+        : undefined
     )
 
     watch(
@@ -288,10 +301,9 @@ export const Tree = defineComponent({
           filterMode: props.filterMode,
           autoExpandParent: props.autoExpandParent,
           currentExpanded: computedExpanded.value,
-          previousAutoExpand: autoExpandKeys.value
+          savedExpanded: savedExpanded.value
         })
-        autoExpandKeys.value = result.autoExpandKeys
-        if (!props.autoExpandParent) return
+        savedExpanded.value = result.savedExpanded
         if (sameKeyList(computedExpanded.value, result.nextExpandedKeys)) return
         if (props.expandedKeys === undefined) internalExpanded.value = result.nextExpandedKeys
         emit('update:expandedKeys', result.nextExpandedKeys)
@@ -306,7 +318,7 @@ export const Tree = defineComponent({
         expandedKeys: computedExpanded.value,
         selectedKeys: computedSelected.value,
         checkedState: computedChecked.value,
-        matchedKeys: searchQuery.value ? matchedKeys.value : undefined,
+        matchedKeys: matchedKeys.value,
         loadingKeys: [...loadingIds.value],
         activeKey: activeKey.value,
         checkable: props.checkable,
@@ -330,44 +342,75 @@ export const Tree = defineComponent({
       else emit('node-collapse', node, node.key)
     }
 
+    function loadGate(node: TreeNode) {
+      const id = treeKeyId(node.key)
+      return gateBranchLoad({
+        disabled: node.disabled,
+        isLeaf: node.isLeaf,
+        hasChildren: nodeHasChildren(node),
+        hasLoadData: hasLoadData.value,
+        loaded: loadedIds.value.has(id),
+        loading: loadingIds.value.has(id)
+      })
+    }
+
+    function finishLoaded(
+      node: TreeNode,
+      children: TreeNode[],
+      token: number,
+      intent: 'select' | 'expand'
+    ): void {
+      const id = treeKeyId(node.key)
+      if (!isCurrentLoadToken(loadTokens, id, token)) return
+      const nextMap = new Map(loadedMap.value)
+      nextMap.set(id, children)
+      loadedMap.value = nextMap
+      const nextSet = new Set(loadingIds.value)
+      nextSet.delete(id)
+      loadingIds.value = nextSet
+      const nextTree = applyLoadedChildren(derivedTree.value, node.key, children)
+      emit('load', node, children)
+      emit('update:loadedKeys', uniqueTreeKeys([...(props.loadedKeys ?? []), node.key]))
+      emit('update:treeData', nextTree)
+      const decision = decideAfterBranchLoad({
+        childCount: children.length,
+        intent,
+        commitLoadedBranch: intent === 'select'
+      })
+      if (decision.commit) handleSelect(node.key)
+    }
+
+    function requestLoad(node: TreeNode, intent: 'select' | 'expand'): void {
+      if (!props.loadData || node.disabled) return
+      const id = treeKeyId(node.key)
+      const token = nextLoadToken(loadTokens, id)
+      const expanded = computedExpanded.value.some((key) => sameTreeKey(key, node.key))
+      if (!expanded) {
+        commitExpanded(nextTreeExpandedKeys(computedExpanded.value, node.key, true), node, true)
+      }
+      loadingIds.value = new Set(loadingIds.value).add(id)
+      props
+        .loadData(node)
+        .then((children) => finishLoaded(node, children, token, intent))
+        .catch(() => {
+          if (!isCurrentLoadToken(loadTokens, id, token)) return
+          const nextSet = new Set(loadingIds.value)
+          nextSet.delete(id)
+          loadingIds.value = nextSet
+          devWarn('Tree.loadData', 'Tree loadData rejected; the node is not mutated.')
+        })
+    }
+
     function handleExpand(nodeKey: TreeNodeKey): void {
       const node = lookupTreeNode(view.value.index, nodeKey)
       if (!node || node.disabled) return
       const expanded = computedExpanded.value.some((key) => sameTreeKey(key, nodeKey))
+      if (!expanded && loadGate(node) === 'load') {
+        requestLoad(node, 'expand')
+        return
+      }
       const next = nextTreeExpandedKeys(computedExpanded.value, node.key, !expanded)
       commitExpanded(next, node, !expanded)
-      if (
-        !expanded &&
-        shouldLoadTreeNode({
-          node,
-          hasLoadData: hasLoadData.value,
-          loadedIds: loadedIds.value,
-          loadingIds: loadingIds.value
-        })
-      ) {
-        const id = treeKeyId(node.key)
-        loadingIds.value = new Set(loadingIds.value).add(id)
-        props
-          .loadData?.(node)
-          .then((children) => {
-            const nextMap = new Map(loadedMap.value)
-            nextMap.set(id, children)
-            loadedMap.value = nextMap
-            const nextSet = new Set(loadingIds.value)
-            nextSet.delete(id)
-            loadingIds.value = nextSet
-            const nextTree = applyLoadedChildren(derivedTree.value, node.key, children)
-            emit('load', node, children)
-            emit('update:loadedKeys', uniqueTreeKeys([...(props.loadedKeys ?? []), node.key]))
-            emit('update:treeData', nextTree)
-          })
-          .catch(() => {
-            const nextSet = new Set(loadingIds.value)
-            nextSet.delete(id)
-            loadingIds.value = nextSet
-            devWarn('Tree.loadData', 'Tree loadData rejected; the node is not mutated.')
-          })
-      }
     }
 
     function handleSelect(nodeKey: TreeNodeKey): void {
@@ -401,7 +444,12 @@ export const Tree = defineComponent({
         props.checkStrictly
       )
       if (props.checkedKeys === undefined) internalChecked.value = nextState
-      const returnKeys = getCheckedKeysByStrategy(nextState, derivedTree.value, props.checkStrategy)
+      const returnKeys = resolveOutwardCheckedKeys(
+        nextState,
+        derivedTree.value,
+        props.checkStrategy,
+        props.checkStrictly
+      )
       emit('update:checkedKeys', returnKeys)
       emit('check', returnKeys, {
         checked,
@@ -434,19 +482,30 @@ export const Tree = defineComponent({
         const index = view.value.visibleItems.findIndex((item) =>
           sameTreeKey(item.key, patch.activeKey)
         )
-        if (props.virtual) virtualRef.value?.scrollToIndex(index)
+        if (props.virtual) {
+          alignTreeVirtualScroll(
+            virtualRef.value?.getScrollElement(),
+            index,
+            props.itemHeight,
+            props.height
+          )
+        }
         const id = treeKeyId(patch.activeKey)
         void nextTick(() => itemRefs.get(id)?.focus())
       }
       if (patch.expandKey !== undefined) handleExpand(patch.expandKey)
-      if (patch.selectKey !== undefined) handleSelect(patch.selectKey)
+      if (patch.selectKey !== undefined) {
+        const node = lookupTreeNode(view.value.index, patch.selectKey)
+        if (node && loadGate(node) === 'load') requestLoad(node, 'select')
+        else handleSelect(patch.selectKey)
+      }
       if (patch.checkKey !== undefined && patch.checkChecked !== undefined) {
         handleCheck(patch.checkKey, patch.checkChecked)
       }
     }
 
     const drag = useDrag({
-      containerId: 'tree',
+      containerId: dragContainerId,
       onDrop: (event) => {
         const dropKey = event.overItem?.id
         if (dropKey == null || sameTreeKey(dropKey, event.item.id)) return
@@ -474,7 +533,14 @@ export const Tree = defineComponent({
       if (key === undefined) return
       const index = view.value.visibleItems.findIndex((item) => sameTreeKey(item.key, key))
       if (index < 0) return
-      if (props.virtual) virtualRef.value?.scrollToIndex(index)
+      if (props.virtual) {
+        alignTreeVirtualScroll(
+          virtualRef.value?.getScrollElement(),
+          index,
+          props.itemHeight,
+          props.height
+        )
+      }
       await nextTick()
       itemRefs.get(treeKeyId(key))?.focus()
     })
@@ -541,7 +607,13 @@ export const Tree = defineComponent({
           'aria-posinset': row.posinset,
           'aria-disabled': row.disabled || undefined,
           'aria-selected': selection.value.selectable ? row.selected : undefined,
-          'aria-expanded': row.expandable ? row.expanded : undefined,
+          'aria-expanded':
+            node.isLeaf === true
+              ? undefined
+              : row.expandable || row.expanded
+                ? row.expanded
+                : undefined,
+          'aria-busy': row.loading || undefined,
           'aria-checked': props.checkable ? (row.halfChecked ? 'mixed' : row.checked) : undefined,
           tabindex: isFocusable ? 0 : -1,
           draggable: props.draggable && !row.disabled ? true : undefined,
@@ -550,7 +622,7 @@ export const Tree = defineComponent({
               ? (event: DragEvent) => {
                   event.stopPropagation()
                   const target = event.target as Element | null
-                  if (target?.closest('button, input, label')) {
+                  if (target?.closest('button, input, label, [data-tiger-tree-check]')) {
                     event.preventDefault()
                     return
                   }
@@ -558,7 +630,7 @@ export const Tree = defineComponent({
                     sameTreeKey(item.key, node.key)
                   )
                   drag.startDrag(
-                    { id: node.key, index: Math.max(0, index), containerId: 'tree' },
+                    { id: node.key, index: Math.max(0, index), containerId: dragContainerId },
                     event
                   )
                 }
@@ -571,7 +643,7 @@ export const Tree = defineComponent({
                   sameTreeKey(item.key, node.key)
                 )
                 drag.dragOver(
-                  { id: node.key, index: Math.max(0, index), containerId: 'tree' },
+                  { id: node.key, index: Math.max(0, index), containerId: dragContainerId },
                   event
                 )
                 const el = event.currentTarget as HTMLElement
@@ -588,8 +660,8 @@ export const Tree = defineComponent({
                   const scroller = virtualRef.value?.getScrollElement()
                   if (scroller) {
                     const box = scroller.getBoundingClientRect()
-                    if (event.clientY < box.top + 24) scroller.scrollTop -= 16
-                    else if (event.clientY > box.bottom - 24) scroller.scrollTop += 16
+                    if (event.clientY < box.top + 24) edgeScroll.nudge(scroller, -16)
+                    else if (event.clientY > box.bottom - 24) edgeScroll.nudge(scroller, 16)
                   }
                 }
               }
@@ -614,6 +686,10 @@ export const Tree = defineComponent({
             if (row.disabled) return
             activeKey.value = node.key
             emit('node-click', node, event)
+            if (loadGate(node) === 'load') {
+              requestLoad(node, 'select')
+              return
+            }
             if (selection.value.selectable) handleSelect(node.key)
           }
         },
@@ -655,17 +731,51 @@ export const Tree = defineComponent({
               )
             : h('span', { class: treeNodeIndentClasses, 'aria-hidden': true }),
           props.checkable
-            ? h(Checkbox, {
-                size: 'sm',
-                modelValue: row.checked,
-                indeterminate: row.halfChecked,
-                disabled: row.disabled,
-                tabindex: -1,
-                className: 'me-2 shrink-0',
-                'aria-label': formatTreeSelectNodeLabel(labels.value.selectNode, node.label),
-                onClick: (event: MouseEvent) => event.stopPropagation(),
-                onChange: (checked: boolean) => handleCheck(node.key, checked)
-              })
+            ? h(
+                'span',
+                {
+                  'data-tiger-tree-check': '',
+                  'data-checked': row.halfChecked ? 'mixed' : row.checked ? 'true' : 'false',
+                  'aria-hidden': 'true',
+                  class: classNames(
+                    getCheckboxVisualClasses({
+                      size: 'sm',
+                      checked: row.checked,
+                      indeterminate: row.halfChecked,
+                      disabled: row.disabled
+                    }),
+                    'me-2 shrink-0'
+                  ),
+                  onClick: (event: MouseEvent) => {
+                    event.stopPropagation()
+                    if (row.disabled) return
+                    handleCheck(node.key, nextCheckedFromTreeRow(row.checked, row.halfChecked))
+                  }
+                },
+                row.checked || row.halfChecked
+                  ? [
+                      h(
+                        'svg',
+                        {
+                          class: checkboxIconSizeClasses.sm,
+                          viewBox: checkboxIconViewBox,
+                          fill: 'none',
+                          stroke: 'currentColor',
+                          'stroke-width': '2',
+                          'stroke-linecap': 'round',
+                          'stroke-linejoin': 'round',
+                          'aria-hidden': 'true',
+                          focusable: 'false'
+                        },
+                        [
+                          h('path', {
+                            d: row.halfChecked ? checkboxIndeterminatePathD : checkboxCheckPathD
+                          })
+                        ]
+                      )
+                    ]
+                  : []
+              )
             : null,
           props.showIcon && node.icon != null
             ? h('span', { class: treeNodeIconClasses }, renderNodeIcon(node.icon) ?? undefined)
@@ -681,18 +791,29 @@ export const Tree = defineComponent({
             renderLabel(node.label, searchQuery.value, row.matched)
           ),
           row.loading
-            ? h(
-                'svg',
-                {
-                  class: treeLoadingClasses,
-                  xmlns: 'http://www.w3.org/2000/svg',
-                  fill: 'none',
-                  viewBox: spinnerSvg.viewBox,
-                  'aria-hidden': 'true',
-                  focusable: 'false'
-                },
-                spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
-              )
+            ? h('span', { class: 'inline-flex items-center' }, [
+                h(
+                  'svg',
+                  {
+                    class: treeLoadingClasses,
+                    xmlns: 'http://www.w3.org/2000/svg',
+                    fill: 'none',
+                    viewBox: spinnerSvg.viewBox,
+                    'aria-hidden': 'true',
+                    focusable: 'false'
+                  },
+                  spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
+                ),
+                h(
+                  'span',
+                  { class: 'sr-only' },
+                  resolveLocaleText(
+                    'Loading...',
+                    mergedLocale.value?.common?.loadingText,
+                    mergedLocale.value?.select?.loadingText
+                  )
+                )
+              ])
             : null
         ]
       )
@@ -710,7 +831,7 @@ export const Tree = defineComponent({
         mergedLocale.value?.empty?.noData,
         mergedLocale.value?.common?.emptyText
       )
-      const empty = derivedTree.value.length === 0
+      const empty = view.value.rows.length === 0
       const search = props.searchable
         ? h('input', {
             type: 'search',
@@ -734,7 +855,7 @@ export const Tree = defineComponent({
                   .closest('[data-tiger-treeitem-key]')
                   ?.getAttribute('data-tiger-treeitem-key')
                 if (attr == null) return
-                handleKeyDown(event, attr)
+                handleKeyDown(event, parseTreeKeyId(attr))
               }
             },
             props.virtual
@@ -747,7 +868,9 @@ export const Tree = defineComponent({
                       'data-tiger-tree-virtual': '',
                       itemCount: view.value.rows.length,
                       itemHeight: props.itemHeight,
-                      height: props.height
+                      height: props.height,
+                      getItemKey: (index: number) =>
+                        view.value.rows[index]?.item.node.key ?? index
                     },
                     {
                       default: ({ index }: { index: number }) => renderRow(index, true)

@@ -53,6 +53,24 @@ describe('DatePicker', () => {
     expect(container.querySelector('input')).toHaveAttribute('placeholder', '請選擇日期')
   })
 
+  it('submits the Gregorian day and does not emit legacy value events', async () => {
+    const date = new Date(2024, 0, 5)
+    const { container, emitted } = render(DatePicker, {
+      props: { name: 'day', locale: { locale: 'th-TH' }, modelValue: date, now: date }
+    })
+    const text = container.querySelector('input[type="text"]') as HTMLInputElement
+    const hidden = container.querySelector('input[type="hidden"]') as HTMLInputElement
+    expect(text).toHaveValue('2567-01-05')
+    expect(text).not.toHaveAttribute('name')
+    expect(hidden).toHaveAttribute('name', 'day')
+    expect(hidden).toHaveValue('2024-01-05')
+    await fireEvent.click(screen.getByLabelText('Toggle calendar'))
+    expect(emitted().change).toBeUndefined()
+    expect(emitted().input).toBeUndefined()
+    expect(emitted()['open-change']).toBeUndefined()
+    expect(emitted()['update:open']?.[0]).toEqual([true])
+  })
+
   it('has no axe violations when the dialog is open', async () => {
     const { container } = render(DatePicker, {
       props: { defaultOpen: true, modelValue: june, now: june, 'aria-label': 'Pick a day' }

@@ -31,6 +31,11 @@ export interface ColorSwatchNormalizedGroup {
  */
 export interface ColorSwatchProps {
   disabled?: boolean
+  /**
+   * Focusable and submittable, but the selection cannot change.
+   * @default false
+   */
+  readOnly?: boolean
   size?: ComponentSize
   colors?: ColorSwatchOptionInput[]
   groups?: ColorSwatchGroup[]

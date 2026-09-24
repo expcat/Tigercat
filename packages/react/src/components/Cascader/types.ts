@@ -15,7 +15,7 @@ export interface CascaderProps
   value?: CascaderModelValue
   defaultValue?: CascaderModelValue
   onChange?: (value: CascaderModelValue) => void
-  onSearchChange?: (value: string) => void
+  onSearch?: (value: string) => void
   onOpenChange?: (open: boolean) => void
   onBlur?: React.FocusEventHandler<HTMLElement>
   className?: string
