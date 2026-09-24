@@ -31,7 +31,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueAlertProps {
   locale?: Partial<TigerLocale>
@@ -302,7 +302,11 @@ export const Alert = defineComponent({
 
       if (slots.action) {
         contentChildren.push(
-          h('div', { 'data-tiger-alert-action': '', class: descriptionClasses.value }, slots.action())
+          h(
+            'div',
+            { 'data-tiger-alert-action': '', class: descriptionClasses.value },
+            slots.action()
+          )
         )
       }
 

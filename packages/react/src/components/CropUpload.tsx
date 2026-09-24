@@ -28,7 +28,7 @@ import { Modal } from './Modal'
 import { ImageCropper, type ImageCropperRef } from './ImageCropper'
 import { Button } from './Button'
 import { Icon } from './Icon'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 
 export interface CropUploadProps {
@@ -88,7 +88,7 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
   )
 
   const inputRef = useRef<HTMLInputElement>(null)
-  const triggerRef = useRef<HTMLLabelElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   const cropperRef = useRef<ImageCropperRef>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [sessionState, setSessionState] = useState(() => ({
@@ -156,7 +156,7 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
         session.endCrop()
         return
       }
-      const originalName = session.getState().originalFile?.name ?? raw.file.name
+      const originalName = session.getState().originalFile?.name ?? raw.file?.name ?? ''
       const result = withCropFile(raw, originalName)
       onCropComplete?.(result)
       formItemControl?.setError?.(null)

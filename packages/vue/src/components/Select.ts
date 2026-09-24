@@ -23,6 +23,8 @@ import {
   getSelectTriggerClasses,
   getSelectOptionClasses,
   getSelectRootClasses,
+  selectDoneActionClasses,
+  selectDoneButtonClasses,
   selectDropdownBaseClasses,
   selectGroupLabelClasses,
   selectEmptyStateClasses,
@@ -104,7 +106,7 @@ import {
   closeSolidIcon20PathD,
   checkSolidIcon20PathD
 } from '@expcat/tigercat-core/icons/picker'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
@@ -233,9 +235,7 @@ export const Select = defineComponent({
     'blur'
   ],
   setup(props, { emit, attrs, slots, expose }) {
-    const sourceOptions = computed(() =>
-      normalizeSelectOptions(props.options, props.optionFields)
-    )
+    const sourceOptions = computed(() => normalizeSelectOptions(props.options, props.optionFields))
     const config = useTigerConfig()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
     const formItemControl = inject<VueFormItemControlContext | null>(
@@ -252,7 +252,11 @@ export const Select = defineComponent({
     const localValue = ref<SelectModelValue>(
       normalizeSelectValue(
         props.modelValue ??
-          coerceSelectFormValue(formItemControl?.value.value, sourceOptions.value, props.multiple) ??
+          coerceSelectFormValue(
+            formItemControl?.value.value,
+            sourceOptions.value,
+            props.multiple
+          ) ??
           props.defaultValue ??
           (props.multiple ? [] : undefined),
         props.multiple,
@@ -374,7 +378,9 @@ export const Select = defineComponent({
     const liveCreated = computed(() =>
       pruneCreatedSelectOptions(createdOptions.value, sourceOptions.value)
     )
-    const optionSource = computed(() => withCreatedSelectOptions(sourceOptions.value, liveCreated.value))
+    const optionSource = computed(() =>
+      withCreatedSelectOptions(sourceOptions.value, liveCreated.value)
+    )
     const filteredOptions = computed(() =>
       resolveSelectFilteredOptions(optionSource.value, searchQuery.value, {
         searchable: props.searchable,
@@ -383,9 +389,13 @@ export const Select = defineComponent({
       })
     )
     const creatableOption = computed(() =>
-      resolveCreatableSelectOption([...sourceOptions.value, ...liveCreated.value], searchQuery.value, {
-        creatable: props.creatable && props.searchable
-      })
+      resolveCreatableSelectOption(
+        [...sourceOptions.value, ...liveCreated.value],
+        searchQuery.value,
+        {
+          creatable: props.creatable && props.searchable
+        }
+      )
     )
     const flatSelectableOptions = computed(() => {
       const flat = flattenSelectOptions(filteredOptions.value)
@@ -715,7 +725,11 @@ export const Select = defineComponent({
       )
     }
 
-    function renderRows(rows: SelectListRow[], fullRows: readonly SelectListRow[] = rows, offset = 0) {
+    function renderRows(
+      rows: SelectListRow[],
+      fullRows: readonly SelectListRow[] = rows,
+      offset = 0
+    ) {
       const nodes: VNode[] = []
       let bucket: { key: string; label: string; header: boolean; children: VNode[] } | null = null
       const flush = () => {
@@ -1034,10 +1048,23 @@ export const Select = defineComponent({
                           )
                         }
                       },
-                      getW9FormLabels(mergedLocale.value.locale).selectAll
+                      getW9FormLabels(mergedLocale.value?.locale).selectAll
                     )
                   : null,
-                hasOptions ? listNode : slots.empty?.() ?? listNode,
+                hasOptions ? listNode : (slots.empty?.() ?? listNode),
+                h('div', { class: selectDoneActionClasses }, [
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: selectDoneButtonClasses,
+                      onClick: () => {
+                        setOpen(false)
+                      }
+                    },
+                    labels.value.doneText
+                  )
+                ]),
                 slots.footer?.()
               ]
             ),

@@ -56,7 +56,7 @@ import {
   schemaFormNestedGroupClasses,
   schemaFormRootClasses
 } from '@expcat/tigercat-core/schema-form'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Form } from './Form'
 import { FormItem } from './FormItem'
 import { Input } from './Input'
@@ -337,6 +337,12 @@ export const SchemaForm = defineComponent({
       removeField: (fieldName) => {
         formRef.value?.removeField(fieldName)
       },
+      insertFieldArrayItem: (path, index, item) => {
+        formRef.value?.insertFieldArrayItem(path, index, item)
+      },
+      removeFieldArrayItem: (path, index) => {
+        formRef.value?.removeFieldArrayItem(path, index)
+      },
       undo: () => {
         formRef.value?.undo()
       },
@@ -419,7 +425,10 @@ export const SchemaForm = defineComponent({
             'data-schema-field': field.name,
             'data-schema-readonly': ''
           },
-          [field.label ? h('span', field.label) : null, h('span', formatExportCell(raw, formModel.value ?? {}))]
+          [
+            field.label ? h('span', field.label) : null,
+            h('span', formatExportCell(raw, formModel.value ?? {}))
+          ]
         )
       }
       const custom = slots.field?.({ field })

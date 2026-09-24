@@ -29,7 +29,7 @@ import {
   type ImageCompareProps as CoreImageCompareProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ImageCompareProps
   extends
@@ -251,7 +251,12 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
               {afterTitle}
             </span>
           ) : null}
-          {renderPaneContent(after, afterSrc, resolveImageCompareAlt(afterAlt, labels.afterAlt), fit)}
+          {renderPaneContent(
+            after,
+            afterSrc,
+            resolveImageCompareAlt(afterAlt, labels.afterAlt),
+            fit
+          )}
         </div>
         <div
           className={getImageCompareBeforeClasses()}
@@ -264,7 +269,12 @@ export const ImageCompare = forwardRef<HTMLDivElement, ImageCompareProps>(
               {beforeTitle}
             </span>
           ) : null}
-          {renderPaneContent(before, beforeSrc, resolveImageCompareAlt(beforeAlt, labels.beforeAlt), fit)}
+          {renderPaneContent(
+            before,
+            beforeSrc,
+            resolveImageCompareAlt(beforeAlt, labels.beforeAlt),
+            fit
+          )}
         </div>
         <div
           ref={handleRef}

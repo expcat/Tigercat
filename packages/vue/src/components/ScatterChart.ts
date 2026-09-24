@@ -45,7 +45,7 @@ import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueScatterChartProps extends CoreScatterChartProps {
   data: ScatterChartDatum[]
@@ -260,7 +260,7 @@ export const ScatterChart = defineComponent({
             ? props.legendFormatter(d, i)
             : scatterPointDisplayLabel(d, i, labels.value.pointAriaLabel),
         getColor: (d, i) => d.color ?? palette.value[i % palette.value.length],
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       })
     )

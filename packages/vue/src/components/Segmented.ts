@@ -18,7 +18,7 @@ import {
   getLocaleDirection,
   devWarn
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type VueSegmentedProps = InstanceType<typeof Segmented>['$props']
 

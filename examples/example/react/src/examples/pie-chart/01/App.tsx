@@ -1,5 +1,5 @@
 import { PieChart } from '@expcat/tigercat-react/PieChart'
-import type { PieChartDatum } from '@expcat/tigercat-react'
+import type { PieChartDatum } from '@expcat/tigercat-core'
 
 const data: PieChartDatum[] = [
   { value: 40, label: '产品 A' },

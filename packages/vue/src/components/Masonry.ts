@@ -40,7 +40,7 @@ import {
   type MasonryResponsiveValue
 } from '@expcat/tigercat-core'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueMasonryProps extends CoreMasonryProps {}
 
@@ -96,9 +96,7 @@ export const Masonry = defineComponent({
     )
     const gapPx = computed(() => resolveMasonryGap(props.gap, containerWidth.value))
     const orderNoteId = useId()
-    const shortest = computed(
-      () => props.balance === 'shortest' || props.layout === 'shortest'
-    )
+    const shortest = computed(() => props.balance === 'shortest' || props.layout === 'shortest')
     const packed = computed(
       () =>
         shortest.value &&

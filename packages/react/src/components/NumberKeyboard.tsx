@@ -33,7 +33,7 @@ import {
   useFocusTrap
 } from '../utils/overlay'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 
 export interface NumberKeyboardProps

@@ -143,7 +143,7 @@ function createMessageRootExport() {
 
   return `let resolvedMessage = null;
 function loadMessage() {
-  return import('./components/Message.mjs').then((module) => {
+  return import('./components/MessageRoot.mjs').then((module) => {
     resolvedMessage = module.Message;
     return module.Message;
   });
@@ -205,7 +205,7 @@ function createNotificationRootExport() {
 
   return `let resolvedNotification = null;
 function loadNotification() {
-  return import('./components/Notification.mjs').then((module) => {
+  return import('./components/NotificationRoot.mjs').then((module) => {
     resolvedNotification = module.notification;
     return module.notification;
   });
@@ -268,7 +268,7 @@ function createLoadingBarRootExport() {
     return;
   }
   pendingLoadingBarCommands.push(command);
-  void import('./components/LoadingBar.mjs').then(({ LoadingBar }) => {
+  void import('./components/LoadingBarRoot.mjs').then(({ LoadingBar }) => {
     resolvedLoadingBar = LoadingBar;
     const queue = pendingLoadingBarCommands;
     pendingLoadingBarCommands = [];

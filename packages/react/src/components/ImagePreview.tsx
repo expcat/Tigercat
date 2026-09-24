@@ -52,7 +52,7 @@ import {
   type ImagePreviewToolbarItemContext
 } from '@expcat/tigercat-core'
 import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ImagePreviewProps
   extends CoreImagePreviewProps, Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
@@ -239,28 +239,28 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     if (!action) return
     event.preventDefault()
     switch (action) {
-        case 'prev':
-          handlePrev()
-          break
-        case 'next':
-          handleNext()
-          break
-        case 'zoomIn':
-          handleZoomIn()
-          break
-        case 'zoomOut':
-          handleZoomOut()
-          break
-        case 'rotateLeft':
-          handleRotateLeft()
-          break
-        case 'rotateRight':
-          handleRotateRight()
-          break
-        case 'reset':
-          handleReset()
-          break
-      }
+      case 'prev':
+        handlePrev()
+        break
+      case 'next':
+        handleNext()
+        break
+      case 'zoomIn':
+        handleZoomIn()
+        break
+      case 'zoomOut':
+        handleZoomOut()
+        break
+      case 'rotateLeft':
+        handleRotateLeft()
+        break
+      case 'rotateRight':
+        handleRotateRight()
+        break
+      case 'reset':
+        handleReset()
+        break
+    }
   }
 
   useEffect(() => {
@@ -471,7 +471,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         {toolbarButton(
           {
             action: 'flip',
-            label: basicLabel(mergedLocale.locale, 'imagePreview', 'flipHorizontal'),
+            label: basicLabel(mergedLocale?.locale, 'imagePreview', 'flipHorizontal'),
             disabled: false
           },
           flipHorizontalIconPath,
@@ -480,7 +480,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         {toolbarButton(
           {
             action: 'download',
-            label: basicLabel(mergedLocale.locale, 'imagePreview', 'download'),
+            label: basicLabel(mergedLocale?.locale, 'imagePreview', 'download'),
             disabled: false
           },
           downloadIconPath,

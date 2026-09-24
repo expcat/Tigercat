@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { DataExport } from '@expcat/tigercat-vue/DataExport'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
-import type { TableColumn } from '@expcat/tigercat-vue'
+import type { TableColumn } from '@expcat/tigercat-core'
 import type { DataExportFormat } from '@expcat/tigercat-core'
 
 interface Row extends Record<string, unknown> {

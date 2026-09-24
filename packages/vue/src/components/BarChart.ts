@@ -47,7 +47,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { renderBarBind } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueBarChartProps extends CoreBarChartProps {
   data: BarChartDatum[]
@@ -357,7 +357,7 @@ export const BarChart = defineComponent({
         getLabel: (d, i) =>
           props.legendFormatter ? props.legendFormatter(d, i) : (d.label ?? String(d.x)),
         getColor: (d, i) => d.color ?? palette.value[i % palette.value.length],
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       }).map((item) => ({ ...item, index: 0, hidden: isLegendIndexHidden(0) }))
     )

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
-import type { UploadFile } from '@expcat/tigercat-vue'
+import type { UploadFile } from '@expcat/tigercat-core'
 import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Upload } from '@expcat/tigercat-vue/Upload'
@@ -9,7 +9,10 @@ const model = reactive<{ files: UploadFile[] }>({ files: [] })
 </script>
 
 <template>
-  <Form :model-value="model" label-position="top" @update:model-value="Object.assign(model, $event)">
+  <Form
+    :model-value="model"
+    label-position="top"
+    @update:model-value="Object.assign(model, $event)">
     <FormItem name="files" label="图片">
       <Upload
         v-model:file-list="model.files"

@@ -12,7 +12,7 @@ import {
   type LayoutSiderSide,
   type SidebarLandmark
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { SidebarContextKey } from '../utils/layout-context'
 
 export interface VueSidebarProps {

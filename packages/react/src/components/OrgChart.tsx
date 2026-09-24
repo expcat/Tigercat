@@ -21,7 +21,7 @@ import {
   type OrgChartProps as CoreOrgChartProps
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { OrgBind } from './w9-chart-bind'
 
 export interface OrgChartProps extends Omit<CoreOrgChartProps, 'className'> {
@@ -223,7 +223,10 @@ export function OrgChart({
             match={findOrgMatch(bind.nodes, bind.query ?? '')}
             zoom={bind.zoom ?? orgZoom}
           />
-          <button type="button" data-tiger-org-zoom-in="" onClick={() => setOrgZoom((value) => value + 0.25)}>
+          <button
+            type="button"
+            data-tiger-org-zoom-in=""
+            onClick={() => setOrgZoom((value) => value + 0.25)}>
             +
           </button>
         </div>

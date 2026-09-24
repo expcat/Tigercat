@@ -32,6 +32,7 @@ import {
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
   submenuHeightTransitionClasses,
+  type MenuKey,
   type SubmenuHeightTransitionController
 } from '@expcat/tigercat-core'
 import { useAnchoredOverlay } from '../../utils/overlay'

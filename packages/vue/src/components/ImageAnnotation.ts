@@ -59,7 +59,7 @@ import {
   type ImageAnnotationTool,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueImageAnnotationProps {
   locale?: Partial<TigerLocale>
@@ -135,9 +135,9 @@ export const ImageAnnotation = defineComponent({
       { x: 0.4, y: 0.1 },
       { x: 0.2, y: 0.4 }
     ])
-    const annotationHistory = ref<{ annotations: { x: number; y: number; width: number; height: number }[] }[]>(
-      []
-    )
+    const annotationHistory = ref<
+      { annotations: { x: number; y: number; width: number; height: number }[] }[]
+    >([])
     const annotationBlob = ref('')
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -424,10 +424,7 @@ export const ImageAnnotation = defineComponent({
             : isRtl.value
               ? 1
               : -1
-        const focused = clampImageAnnotationShapeIndex(
-          focusedShape.value,
-          annotations.value.length
-        )
+        const focused = clampImageAnnotationShapeIndex(focusedShape.value, annotations.value.length)
         const next = stepImageAnnotationShapeIndex(focused, annotations.value.length, delta)
         focusedShape.value = next
         shapeEls[next]?.focus()

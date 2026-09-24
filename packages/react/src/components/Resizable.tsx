@@ -24,7 +24,7 @@ import {
   type ResizeHandlePosition
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ResizableProps
   extends
@@ -230,8 +230,13 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
                   axis,
                   {
                     rtl,
-                    lockAspectRatio: lockAspectRatio === true || typeof lockAspectRatio === 'string',
-                    aspectRatio: resolveResizableAspectRatio(lockAspectRatio, drag.startW, drag.startH),
+                    lockAspectRatio:
+                      lockAspectRatio === true || typeof lockAspectRatio === 'string',
+                    aspectRatio: resolveResizableAspectRatio(
+                      lockAspectRatio,
+                      drag.startW,
+                      drag.startH
+                    ),
                     minWidth,
                     minHeight,
                     maxWidth,

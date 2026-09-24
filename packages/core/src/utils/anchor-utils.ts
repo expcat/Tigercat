@@ -4,10 +4,11 @@
  */
 
 import type { AnchorDirection } from '../types/anchor'
+import type { ScrollRootInput } from '../types/scroll-root'
 import { isBrowser } from './env'
 import { prefersReducedMotion } from './transition'
 import { createSectionScrollModel, sectionScrollBehavior } from './section-scroll-utils'
-import { resolveScrollRoot, type ScrollRootInput } from './scroll-root'
+import { resolveScrollRoot } from './scroll-root'
 
 /**
  * Base anchor wrapper classes

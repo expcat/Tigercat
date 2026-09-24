@@ -1,4 +1,13 @@
-import { computed, defineComponent, h, ref, provide, onBeforeUnmount, watch, type InjectionKey } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  ref,
+  provide,
+  onBeforeUnmount,
+  watch,
+  type InjectionKey
+} from 'vue'
 import {
   clampImageGroupPreviewIndex,
   coerceClassValue,
@@ -12,7 +21,7 @@ import {
   type ImageGroupItem
 } from '@expcat/tigercat-core'
 import { ImagePreview } from './ImagePreview'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ImageGroupContext {
   preview: boolean

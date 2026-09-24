@@ -1,5 +1,5 @@
 import { VirtualTable } from '@expcat/tigercat-react/VirtualTable'
-import type { TableColumn } from '@expcat/tigercat-react'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 const columns: TableColumn[] = [
   { key: 'id', title: 'ID', width: 90, fixed: 'start' },

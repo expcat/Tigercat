@@ -43,7 +43,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useCartesianSeriesPoints } from '../hooks/useCartesianSeriesPoints'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { AxisBind } from './w9-chart-bind'
 
 export interface LineChartProps extends CoreLineChartProps {

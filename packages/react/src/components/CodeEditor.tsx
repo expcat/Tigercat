@@ -40,7 +40,7 @@ import {
   type CodeHighlighter
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 
 export interface CodeEditorProps extends Omit<CoreCodeEditorProps, 'style'> {
@@ -295,9 +295,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
             type="button"
             data-tiger-replace=""
             onClick={() => {
-              setCode(
-                replaceCodeMatches(code, bind.query ?? '', bind.replacement ?? '', true)
-              )
+              setCode(replaceCodeMatches(code, bind.query ?? '', bind.replacement ?? '', true))
             }}>
             {getW9DataLabels().replaceAll}
           </button>
@@ -351,13 +349,14 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
                   {lineNumbers ? (
                     <div
                       ref={lineIndex === 0 ? gutterRef : undefined}
-                      className={classNames(getLineNumberClasses(resolvedTheme), 'min-h-[1.625rem]')}>
+                      className={classNames(
+                        getLineNumberClasses(resolvedTheme),
+                        'min-h-[1.625rem]'
+                      )}>
                       {lineNums[lineIndex]}
                     </div>
                   ) : null}
-                  <div
-                    className={lineClass}
-                    data-active-line={line.isActive ? '' : undefined}>
+                  <div className={lineClass} data-active-line={line.isActive ? '' : undefined}>
                     {line.tokens.map(renderToken)}
                     {line.text === '' ? '\n' : null}
                   </div>

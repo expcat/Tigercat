@@ -54,7 +54,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { OverlayPortal } from '../utils/overlay-outlet'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 
 export interface SpotlightProps

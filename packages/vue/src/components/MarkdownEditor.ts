@@ -1,4 +1,14 @@
-import { defineComponent, h, ref, computed, watch, inject, onMounted, onBeforeUnmount, PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  ref,
+  computed,
+  watch,
+  inject,
+  onMounted,
+  onBeforeUnmount,
+  PropType
+} from 'vue'
 import {
   applyMarkdownToolbarAction,
   classNames,
@@ -41,7 +51,7 @@ import {
   type TigerLocale,
   type TigerLocaleMarkdownEditor
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 const modes: MarkdownEditorMode[] = ['edit', 'split', 'preview']
@@ -160,7 +170,10 @@ export const MarkdownEditor = defineComponent({
       () => props.toolbar !== false && canEdit.value && !props.readOnly
     )
     const showTopbar = computed(
-      () => showFormattingToolbar.value || props.showModeSwitch || (narrow.value && currentMode.value === 'split')
+      () =>
+        showFormattingToolbar.value ||
+        props.showModeSwitch ||
+        (narrow.value && currentMode.value === 'split')
     )
     const showEditor = computed(() => panes.value.edit)
     const showPreview = computed(() => panes.value.preview)
@@ -501,7 +514,11 @@ export const MarkdownEditor = defineComponent({
                     .map((line, index) =>
                       h(
                         'span',
-                        { key: index, 'data-markdown-task': line.includes('[x]') || line.includes('[X]') ? 'done' : 'open' },
+                        {
+                          key: index,
+                          'data-markdown-task':
+                            line.includes('[x]') || line.includes('[X]') ? 'done' : 'open'
+                        },
                         line
                       )
                     ),

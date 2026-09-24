@@ -41,7 +41,7 @@ import {
   updateCronExpressionField,
   validateCronExpressionWithLabels
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 import { useFormItemControlContext } from './FormItemContext'
 
@@ -111,14 +111,11 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
   const effectiveName = name ?? formItemControl?.name
   const describedBy = mergeAriaDescribedBy(formItemControl?.describedBy, undefined)
   const labelledby = formItemControl?.labelId
-  const parsedValue = value !== undefined ? value : (formItemControl?.value as string | null | undefined)
+  const parsedValue =
+    value !== undefined ? value : (formItemControl?.value as string | null | undefined)
   const valueControlled = value !== undefined || formItemControl?.value !== undefined
 
-  const modelSource = valueControlled
-    ? parsedValue == null
-      ? ''
-      : String(parsedValue)
-    : undefined
+  const modelSource = valueControlled ? (parsedValue == null ? '' : String(parsedValue)) : undefined
   const [expression, setExpression] = useControlledState<string | null, [CronValidationResult]>({
     value: valueControlled ? cronFormValue(modelSource) : undefined,
     defaultValue: cronFormValue(defaultValue),
@@ -159,7 +156,8 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     () => validateCronExpressionWithLabels(expressionDraft, labels, fieldLabels),
     [expressionDraft, labels, fieldLabels]
   )
-  const fieldsReady = !isCronExpressionEmpty(expressionDraft) && isCronFieldCountValid(expressionDraft)
+  const fieldsReady =
+    !isCronExpressionEmpty(expressionDraft) && isCronFieldCountValid(expressionDraft)
   const submittedValue = cronFormValue(expressionDraft) ?? ''
   const instanceId = useId()
   const errorId = `${instanceId}-error`
@@ -448,7 +446,8 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
       </div>
       {validation.valid && expressionDraft ? (
         <p className="text-sm text-[var(--tiger-text-secondary)]" data-tiger-cron-summary="">
-          {describeCronExpression(expressionDraft)} {nextCronRun(expressionDraft)?.toISOString() ?? ''}
+          {describeCronExpression(expressionDraft)}{' '}
+          {nextCronRun(expressionDraft)?.toISOString() ?? ''}
         </p>
       ) : null}
     </div>

@@ -14,7 +14,7 @@ import { Layout } from '@expcat/tigercat-vue/Layout'
 import { Menu } from '@expcat/tigercat-vue/Menu'
 import { Sidebar } from '@expcat/tigercat-vue/Sidebar'
 import { Table } from '@expcat/tigercat-vue/Table'
-import type { TableColumn } from '@expcat/tigercat-vue'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 const backendSchema: MenuSchema = [
   { key: 'dashboard', label: '工作台', icon: 'dashboard', path: '/dashboard' },

@@ -44,7 +44,7 @@ import { VirtualList } from './VirtualList'
 import { Pagination } from './Pagination'
 import { Empty } from './Empty'
 import { Loading } from './Loading'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useDrag } from '../hooks/useDrag'
 
 export interface ListProps<T extends ListItem = ListItem>
@@ -318,7 +318,10 @@ function ListInner<T extends ListItem>(
 
   const renderItems = () => {
     if (dataSource.length > 0 && children) {
-      devWarn('List.children', '[Tigercat] List received both dataSource and children. Children are ignored.')
+      devWarn(
+        'List.children',
+        '[Tigercat] List received both dataSource and children. Children are ignored.'
+      )
     }
     if (paginatedData.length === 0 && !loading) {
       return (

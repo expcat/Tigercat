@@ -14,7 +14,7 @@ import {
   classNames,
   mergeTigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface StatisticProps
   extends

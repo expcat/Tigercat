@@ -1,4 +1,12 @@
-import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import {
   acquireOverlayZ,
   classNames,
@@ -53,7 +61,7 @@ import {
   useOverlayPortalTarget
 } from '../utils/overlay'
 import { composeRefs } from '../utils/overlay-trigger'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface DrawerProps
   extends
@@ -399,14 +407,15 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
                   : 'height']: `${resizedLength}px`
               }
             : undefined),
-          transform: [
-            layerId != null
-              ? `translate(${drawerPushOffset(layerId, resolvedPlacement).x}px, ${drawerPushOffset(layerId, resolvedPlacement).y}px)`
-              : '',
-            sheetOffset > 0 ? drawerFollowTransform(resolvedPlacement, sheetOffset) : ''
-          ]
-            .filter((part) => part && part !== 'translate(0px, 0px)')
-            .join(' ') || undefined,
+          transform:
+            [
+              layerId != null
+                ? `translate(${drawerPushOffset(layerId, resolvedPlacement).x}px, ${drawerPushOffset(layerId, resolvedPlacement).y}px)`
+                : '',
+              sheetOffset > 0 ? drawerFollowTransform(resolvedPlacement, sheetOffset) : ''
+            ]
+              .filter((part) => part && part !== 'translate(0px, 0px)')
+              .join(' ') || undefined,
           transitionDuration: sheetOffset > 0 || resizing ? '0ms' : undefined
         }}
         {...dialogDivProps}
@@ -458,7 +467,9 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
             data-tiger-drawer-resize=""
             role="separator"
             aria-orientation={
-              resolvedPlacement === 'left' || resolvedPlacement === 'right' ? 'vertical' : 'horizontal'
+              resolvedPlacement === 'left' || resolvedPlacement === 'right'
+                ? 'vertical'
+                : 'horizontal'
             }
             aria-label={feedbackLayoutLabels.drawerResize}
             style={{
@@ -481,7 +492,9 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
               const horizontal = resolvedPlacement === 'left' || resolvedPlacement === 'right'
               const start =
                 resizedLength ??
-                (horizontal ? (dialogRef.current?.offsetWidth ?? 320) : (dialogRef.current?.offsetHeight ?? 240))
+                (horizontal
+                  ? (dialogRef.current?.offsetWidth ?? 320)
+                  : (dialogRef.current?.offsetHeight ?? 240))
               const move = (pointer: PointerEvent) => {
                 const delta = drawerResizeDelta(
                   resolvedPlacement,

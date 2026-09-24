@@ -13,7 +13,7 @@ import {
   resolveCalendarRovingIso,
   selectCalendarDay,
   selectCalendarMonth,
-  shiftCalendarMonth,
+  shiftCalendarPanel,
   toIsoDate
 } from '@expcat/tigercat-core'
 
@@ -36,7 +36,7 @@ describe('calendar controller', () => {
   })
 
   it('shifts months across year boundaries', () => {
-    expect(shiftCalendarMonth({ viewYear: 2024, viewMonth: 11 }, 1)).toEqual({
+    expect(shiftCalendarPanel({ viewYear: 2024, viewMonth: 11 }, 1)).toEqual({
       viewYear: 2025,
       viewMonth: 0
     })

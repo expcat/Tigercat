@@ -12,7 +12,7 @@ import {
   type LayoutProps as CoreLayoutProps,
   type SidebarLandmark
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { LayoutContext, type LayoutContextValue } from '../utils/layout-context'
 
 export interface ReactLayoutProps

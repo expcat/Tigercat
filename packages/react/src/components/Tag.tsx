@@ -19,7 +19,7 @@ import {
   mergeTigerLocale,
   type TagProps as CoreTagProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type TagProps = CoreTagProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, keyof CoreTagProps | 'onClose'> & {
@@ -110,8 +110,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
   }
 
   const visibleLabel = visibleTagText(children)
-  const closeName =
-    closeAriaLabel ?? formatTagCloseName(labels.tagCloseAriaLabel, visibleLabel)
+  const closeName = closeAriaLabel ?? formatTagCloseName(labels.tagCloseAriaLabel, visibleLabel)
 
   if (open === false) {
     return null
@@ -125,7 +124,8 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
           className={closeButtonClasses}
           onClick={handleClose}
           aria-label={closeName}
-          type="button">
+          type="button"
+          tabIndex={-1}>
           <CloseIcon />
         </button>
       )}

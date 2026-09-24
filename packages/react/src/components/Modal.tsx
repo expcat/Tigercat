@@ -1,4 +1,12 @@
-import React, { useEffect, useLayoutEffect, useMemo, useCallback, useRef, useId, useState } from 'react'
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useCallback,
+  useRef,
+  useId,
+  useState
+} from 'react'
 import {
   acquireOverlayZ,
   classNames,
@@ -58,7 +66,7 @@ import {
 import { OverlayPortal } from '../utils/overlay-outlet'
 import { composeRefs } from '../utils/overlay-trigger'
 import { Button } from './Button'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ModalProps
   extends

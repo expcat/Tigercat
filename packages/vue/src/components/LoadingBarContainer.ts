@@ -14,7 +14,7 @@ import {
   type LoadingBarContainerProps as CoreLoadingBarContainerProps,
   type LoadingBarStatus
 } from '@expcat/tigercat-core'
-import { useResolvedTigerLocale } from './ConfigProvider'
+import { useResolvedTigerLocale } from './tiger-config'
 
 export interface VueLoadingBarContainerProps extends CoreLoadingBarContainerProps {
   style?: Record<string, string | number>
@@ -112,11 +112,7 @@ export const LoadingBarContainer = /* @__PURE__ */ defineComponent({
         },
         [
           props.notice
-            ? h(
-                'span',
-                { key: props.noticeToken, class: 'sr-only', role: 'status' },
-                props.notice
-              )
+            ? h('span', { key: props.noticeToken, class: 'sr-only', role: 'status' }, props.notice)
             : null,
           h('div', {
             class: fillClasses.value,

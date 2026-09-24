@@ -7,9 +7,7 @@ import {
   provide,
   ref,
   watch,
-  type ComputedRef,
   type ExtractPropTypes,
-  type InjectionKey,
   type PropType
 } from 'vue'
 import {
@@ -18,7 +16,6 @@ import {
   resolveTigerLocale,
   resolveTigerConfig,
   createDocumentConfigHandle,
-  readDocumentOwnerLocale,
   devWarn,
   type TigerConfig,
   type TigerLocale,
@@ -29,6 +26,7 @@ import {
 } from '@expcat/tigercat-core'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { FeedbackDepthKey, FeedbackHost } from './FeedbackHost'
+import { TigerConfigKey } from './tiger-config'
 import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import {
   createTigerLocaleScope,
@@ -41,24 +39,7 @@ import {
 } from '@expcat/tigercat-core'
 
 export type { TigerConfig }
-
-export const TigerConfigKey: InjectionKey<ComputedRef<TigerConfig>> = Symbol('TigerConfig')
-
-export function useTigerConfig(): ComputedRef<TigerConfig> {
-  return inject(
-    TigerConfigKey,
-    computed(() => ({ locale: enUS }))
-  )
-}
-
-/**
- * Locale for this tree, or the document owner's locale when this tree has no provider.
- * Imperative hosts mount outside the provider and use the second path.
- */
-export function useResolvedTigerLocale(): ComputedRef<Partial<TigerLocale> | undefined> {
-  const provided = inject(TigerConfigKey, null)
-  return computed(() => provided?.value.locale ?? readDocumentOwnerLocale())
-}
+export { TigerConfigKey, useResolvedTigerLocale, useTigerConfig } from './tiger-config'
 
 export const configProviderProps = {
   locale: {

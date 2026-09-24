@@ -18,7 +18,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useFocusTrap } from '../utils/overlay'
 import { OverlayPortal } from '../utils/overlay-outlet'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface LoadingProps
   extends CoreLoadingProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingProps> {

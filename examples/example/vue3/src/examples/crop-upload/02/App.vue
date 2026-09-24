@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { CropUpload } from '@expcat/tigercat-vue/CropUpload'
 import type { CropResult } from '@expcat/tigercat-core'
 
 const result = ref<CropResult | null>(null)
+const previewUrl = ref('')
+
+watch(result, (value, _previous, onCleanup) => {
+  const url = value ? URL.createObjectURL(value.blob) : ''
+  previewUrl.value = url
+  onCleanup(() => {
+    if (url) URL.revokeObjectURL(url)
+  })
+})
 </script>
 
 <template>
@@ -14,6 +23,6 @@ const result = ref<CropResult | null>(null)
         📷 上传头像
       </span>
     </CropUpload>
-    <img v-if="result" :src="result.dataUrl" class="max-w-48 rounded" :alt="result.file.name" />
+    <img v-if="previewUrl" :src="previewUrl" class="max-w-48 rounded" :alt="result?.file?.name" />
   </div>
 </template>

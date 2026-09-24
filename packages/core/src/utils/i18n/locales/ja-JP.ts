@@ -24,6 +24,7 @@ export const jaJP: TigerLocale = {
     closeMessageAriaLabel: 'メッセージを閉じる',
     closeNotificationAriaLabel: '通知を閉じる',
     sidebarAriaLabel: 'サイドバー',
+    skipToContent: 'メインコンテンツへスキップ',
     moreOptionsText: 'その他の操作',
     confirmTitle: 'この操作を実行しますか？'
   },
@@ -71,7 +72,7 @@ export const jaJP: TigerLocale = {
   text: {
     copyLabel: 'コピー',
     copiedLabel: 'コピーしました',
-    copyFailedLabel: 'コピーに失敗しました',
+    copyFailedLabel: 'コピーに失敗しました'
   },
   watermark: {
     imageErrorText: '透かし画像を読み込めませんでした'
@@ -243,7 +244,8 @@ export const jaJP: TigerLocale = {
     publishBlocked: '未解決の項目があり公開できません'
   },
   workflowDetailShell: {
-    ariaLabel: 'ワークフロー詳細'
+    ariaLabel: 'ワークフロー詳細',
+    title: '承認'
   },
   progress: {
     ariaLabel: '進捗'
@@ -359,7 +361,7 @@ export const jaJP: TigerLocale = {
     finishText: '完了',
     closeAriaLabel: 'ツアーを閉じる',
     dialogAriaLabel: 'ツアー',
-    loadErrorText: 'このツアーを読み込めませんでした。',
+    loadErrorText: 'このツアーを読み込めませんでした。'
   },
   calendar: {
     previousMonth: '前月',

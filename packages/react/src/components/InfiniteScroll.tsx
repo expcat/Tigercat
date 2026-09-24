@@ -16,7 +16,7 @@ import {
   infiniteScrollEndClasses,
   infiniteScrollSentinelClasses
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface InfiniteScrollProps
   extends CoreInfiniteScrollProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -71,11 +71,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   const requestLoad = useCallback(() => {
     const el = containerRef.current
     const containerRoot = root === 'container' || root === undefined
-    if (
-      containerRoot &&
-      el &&
-      !infiniteScrollContainerCanAdvance(el, orientation)
-    ) {
+    if (containerRoot && el && !infiniteScrollContainerCanAdvance(el, orientation)) {
       return
     }
     if (!flightRef.current.canRequest({ disabled, hasMore, error, loading })) return
@@ -129,8 +125,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
       return teardown
     }
 
-    const scrollTarget: EventTarget | null =
-      observerRoot === null ? window : containerRef.current
+    const scrollTarget: EventTarget | null = observerRoot === null ? window : containerRef.current
     if (scrollTarget) {
       scrollTarget.addEventListener('scroll', checkScroll, { passive: true })
       checkScroll()
@@ -159,7 +154,8 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     const content = Array.from(el.children).find((child) => {
       if (!(child instanceof HTMLElement)) return false
       if (child.classList.contains(infiniteScrollSentinelClasses)) return false
-      if (child.getAttribute('role') === 'status' || child.getAttribute('role') === 'alert') return false
+      if (child.getAttribute('role') === 'status' || child.getAttribute('role') === 'alert')
+        return false
       return true
     }) as HTMLElement | undefined
     if (!content) return

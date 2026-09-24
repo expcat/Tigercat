@@ -28,7 +28,7 @@ import {
   type InputOTPProps as CoreInputOTPProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 
 export interface InputOTPProps
@@ -161,7 +161,9 @@ export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function Inp
     const inputType = (event.nativeEvent as InputEvent).inputType
     const sanitized = sanitizeOtpInput(event.currentTarget.value, charOptions)
     const typed =
-      index === 0 && sanitized.length === 1 ? (currentValue + sanitized).slice(0, length) : event.currentTarget.value
+      index === 0 && sanitized.length === 1
+        ? (currentValue + sanitized).slice(0, length)
+        : event.currentTarget.value
     const result = applyOtpCharInput(currentValue, index, typed, length, {
       ...charOptions,
       distributeFromStart: shouldDistributeOtpInput(index, inputType, sanitized.length)

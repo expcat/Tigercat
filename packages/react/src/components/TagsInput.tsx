@@ -24,7 +24,7 @@ import {
   type TagsInputProps as CoreTagsInputProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 import { useInputGroupContext } from './InputGroup'
 import { Icon } from './Icon'
@@ -329,9 +329,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
         aria-required={formItemControl?.required ? true : undefined}
         aria-describedby={describedBy}
         aria-activedescendant={
-          highlightedIndex !== null
-            ? `${effectiveId ?? 'tags'}-tag-${highlightedIndex}`
-            : undefined
+          highlightedIndex !== null ? `${effectiveId ?? 'tags'}-tag-${highlightedIndex}` : undefined
         }
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
@@ -350,13 +348,15 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
           <Icon name="close" size="sm" aria-hidden />
         </button>
       )}
-      {shouldSubmitNativeField({ name: effectiveName, disabled: effectiveDisabled })
-        ? tags.length > 0
-          ? tags.map((tag, index) => (
-              <input key={`hidden-${index}`} type="hidden" name={effectiveName} value={tag} />
-            ))
-          : <input type="hidden" name={effectiveName} value="" />
-        : null}
+      {shouldSubmitNativeField({ name: effectiveName, disabled: effectiveDisabled }) ? (
+        tags.length > 0 ? (
+          tags.map((tag, index) => (
+            <input key={`hidden-${index}`} type="hidden" name={effectiveName} value={tag} />
+          ))
+        ) : (
+          <input type="hidden" name={effectiveName} value="" />
+        )
+      ) : null}
       {rejection ? (
         <span id={`${effectiveId ?? 'tags'}-rejection`} className="sr-only" aria-live="polite">
           {rejection}

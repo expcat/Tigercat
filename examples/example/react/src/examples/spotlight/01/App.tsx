@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Spotlight } from '@expcat/tigercat-react/Spotlight'
-import type { SpotlightItem } from '@expcat/tigercat-react'
+import type { SpotlightItem } from '@expcat/tigercat-core'
 
 const items: SpotlightItem[] = [
   {

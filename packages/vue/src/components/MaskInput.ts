@@ -33,7 +33,7 @@ import {
   type MaskInputChangeDetail,
   type MaskToken
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 import { Icon } from './Icon'

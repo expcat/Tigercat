@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RadarChart } from '@expcat/tigercat-vue/RadarChart'
-import type { RadarChartDatum } from '@expcat/tigercat-vue'
+import type { RadarChartDatum } from '@expcat/tigercat-core'
 
 const data: RadarChartDatum[] = [
   { label: '速度', value: 80 },

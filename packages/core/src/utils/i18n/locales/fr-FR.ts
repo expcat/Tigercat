@@ -24,6 +24,7 @@ export const frFR: TigerLocale = {
     closeMessageAriaLabel: 'Fermer le message',
     closeNotificationAriaLabel: 'Fermer la notification',
     sidebarAriaLabel: 'Barre latérale',
+    skipToContent: 'Aller au contenu principal',
     moreOptionsText: 'Plus d’options',
     confirmTitle: 'Voulez-vous vraiment continuer ?'
   },
@@ -71,13 +72,13 @@ export const frFR: TigerLocale = {
   text: {
     copyLabel: 'Copier',
     copiedLabel: 'Copié',
-    copyFailedLabel: 'Échec de la copie',
+    copyFailedLabel: 'Échec de la copie'
   },
   watermark: {
     imageErrorText: "Échec du chargement de l'image de filigrane"
   },
   segmented: {
-    ariaLabel: 'Options'
+    ariaLabel: 'Choix'
   },
   descriptions: {
     colon: ':'
@@ -243,7 +244,8 @@ export const frFR: TigerLocale = {
     publishBlocked: 'Publication bloquée tant que ce n’est pas corrigé'
   },
   workflowDetailShell: {
-    ariaLabel: 'Détail du flux'
+    ariaLabel: 'Détail du flux',
+    title: 'Approbation'
   },
   progress: {
     ariaLabel: 'Progression'
@@ -359,7 +361,7 @@ export const frFR: TigerLocale = {
     finishText: 'Terminer',
     closeAriaLabel: 'Fermer la visite',
     dialogAriaLabel: 'Visite guidée',
-    loadErrorText: 'Impossible de charger cette visite.',
+    loadErrorText: 'Impossible de charger cette visite.'
   },
   calendar: {
     previousMonth: 'Mois précédent',
@@ -468,7 +470,7 @@ export const frFR: TigerLocale = {
     copyLabel: 'Copier',
     copiedLabel: 'Copié',
     copyFailedLabel: 'Échec de la copie',
-    scrollLabel: 'Code'
+    scrollLabel: 'Code source'
   },
   commentThread: {
     emptyText: 'Aucun commentaire',

@@ -36,7 +36,7 @@ import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { HeatBind } from './w9-chart-bind'
 
 export interface HeatmapChartProps extends CoreHeatmapChartProps {
@@ -395,11 +395,12 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
           aria-label={
             formatHeatmapTooltip(
               labels.heatmapTooltip,
-              cells[Math.max(0, visualActive)] ?? cells[0] ?? {
-                xLabel: '',
-                yLabel: '',
-                value: null
-              },
+              cells[Math.max(0, visualActive)] ??
+                cells[0] ?? {
+                  xLabel: '',
+                  yLabel: '',
+                  value: null
+                },
               formatValue((cells[Math.max(0, visualActive)] ?? cells[0])?.value ?? null)
             ) || formatHeatmapSummary(labels.heatmapSummary, layout.rows, layout.cols)
           }

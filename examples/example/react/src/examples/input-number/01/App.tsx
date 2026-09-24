@@ -8,7 +8,13 @@ export default function App() {
     <div className="w-full max-w-xs space-y-2">
       <InputNumber
         value={value}
-        onChange={setValue}
+        onChange={(next) => {
+          if (typeof next === 'number' || next === null) setValue(next)
+          else {
+            const parsed = Number(next)
+            setValue(Number.isNaN(parsed) ? null : parsed)
+          }
+        }}
         min={0}
         max={100}
         step={0.1}

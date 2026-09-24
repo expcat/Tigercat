@@ -59,7 +59,7 @@ import { Pagination } from './Pagination'
 import { Empty } from './Empty'
 import { Loading } from './Loading'
 import { useDrag } from '../composables/useDrag'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 type RawChildren = string | number | boolean | VNode | VNodeArrayChildren
 
@@ -483,10 +483,18 @@ export const List = defineComponent({
           h('div', { class: 'relative', 'aria-busy': props.loading || undefined }, [
             renderItems(),
             props.loading
-              ? h('div', { class: listLoadingOverlayClasses, 'data-tiger-list-skeleton': '', 'aria-hidden': 'true' }, [
-                  h('div', { class: 'h-8 animate-pulse rounded bg-neutral-200' }),
-                  h(Loading, { variant: 'spinner', 'aria-hidden': true, role: 'presentation' })
-                ])
+              ? h(
+                  'div',
+                  {
+                    class: listLoadingOverlayClasses,
+                    'data-tiger-list-skeleton': '',
+                    'aria-hidden': 'true'
+                  },
+                  [
+                    h('div', { class: 'h-8 animate-pulse rounded bg-neutral-200' }),
+                    h(Loading, { variant: 'spinner', 'aria-hidden': true, role: 'presentation' })
+                  ]
+                )
               : null
           ]),
           slots.footer || props.footer != null

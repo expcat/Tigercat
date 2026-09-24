@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { DataExport } from '@expcat/tigercat-react/DataExport'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
-import type { TableColumn } from '@expcat/tigercat-react'
+import type { TableColumn } from '@expcat/tigercat-core'
 import type { DataExportFormat } from '@expcat/tigercat-core'
 
 interface Row extends Record<string, unknown> {

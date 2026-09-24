@@ -39,7 +39,7 @@ import { Button } from './Button'
 import { Popover } from './Popover'
 import { Checkbox } from './Checkbox'
 import { Icon } from './Icon'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 
 export interface ReactTableToolbarFilterRenderContext {

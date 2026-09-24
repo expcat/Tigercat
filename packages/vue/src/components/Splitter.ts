@@ -30,7 +30,7 @@ import {
   type SplitDirection
 } from '@expcat/tigercat-core'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueSplitterProps {
   orientation?: SplitDirection
@@ -141,7 +141,10 @@ export const Splitter = defineComponent({
     const getMins = (count: number) => boundsFor(count).mins
     const getMaxes = (count: number) => boundsFor(count).maxes
 
-    const currentPixels = (liveSize = containerSize.value, count = collectPanes().length): number[] => {
+    const currentPixels = (
+      liveSize = containerSize.value,
+      count = collectPanes().length
+    ): number[] => {
       const bounds = boundsFor(count)
       return layoutDeclaredPanes(
         dragPixels() ?? props.sizes,
@@ -319,7 +322,10 @@ export const Splitter = defineComponent({
                 'aria-controls': `${instanceId}-pane-${i}`,
                 'aria-valuemin': 0,
                 'aria-valuemax': 100,
-                'aria-valuenow': getSplitterGutterValueNow(containerSize.value > 0 ? pixels : [], i),
+                'aria-valuenow': getSplitterGutterValueNow(
+                  containerSize.value > 0 ? pixels : [],
+                  i
+                ),
                 'aria-label':
                   typeof labelledby === 'string'
                     ? undefined

@@ -1,4 +1,14 @@
-import { Comment, Fragment, Text, defineComponent, computed, h, inject, isVNode, PropType } from 'vue'
+import {
+  Comment,
+  Fragment,
+  Text,
+  defineComponent,
+  computed,
+  h,
+  inject,
+  isVNode,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -19,7 +29,7 @@ import {
   type ButtonHtmlType
 } from '@expcat/tigercat-core'
 import { BUTTON_GROUP_INJECTION_KEY, type ButtonGroupContext } from './ButtonGroup'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueButtonProps {
   variant?: ButtonVariant

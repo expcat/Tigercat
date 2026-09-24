@@ -23,7 +23,7 @@ import {
   type QRCodeStatus,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueQRCodeProps {
   value: string
@@ -65,7 +65,7 @@ export const QRCode = defineComponent({
       const modules = result.ok ? result.matrix : []
       const viewBox = qrViewBoxSize(modules.length || 1)
       const overlay = failed || props.status === 'expired' || props.status === 'loading'
-      const scannedText = basicLabel(mergedLocale.value.locale, 'qrcode', 'scanned')
+      const scannedText = basicLabel(mergedLocale.value?.locale, 'qrcode', 'scanned')
       const statusText = failed
         ? labels.value.errorText
         : props.status === 'expired'
@@ -140,13 +140,7 @@ export const QRCode = defineComponent({
             )
           )
         }
-        children.push(
-          h(
-            'div',
-            { class: qrcodeOverlayClasses, role: 'status' },
-            refreshKids
-          )
-        )
+        children.push(h('div', { class: qrcodeOverlayClasses, role: 'status' }, refreshKids))
       }
 
       if (slots.icon) {

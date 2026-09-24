@@ -1,16 +1,17 @@
 import {
   defineComponent,
+  Fragment,
   h,
   ref,
   computed,
   watch,
   onBeforeUnmount,
   nextTick,
-  type PropType
+  type PropType,
+  type VNode
 } from 'vue'
 import {
   applyWheelZoom,
-
   clampLightboxIndex,
   classNames,
   coerceClassValue,
@@ -50,7 +51,6 @@ import {
   resolveLightboxKeyAction,
   resolveLightboxNavIndex,
   resolveLightboxScaleRange,
-
   zoomInIconPath,
   zoomOutIconPath,
   type GestureTransform,
@@ -59,7 +59,7 @@ import {
   type ImagePreviewProps as CoreImagePreviewProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import {
   renderVueBodyTeleport,
   useVueBodyScrollLock,
@@ -453,15 +453,21 @@ export const ImagePreview = defineComponent({
       }
 
       const toolbarLabel = (key: 'flipHorizontal' | 'download' | 'resetScale') =>
-        basicLabel(mergedLocale.value.locale, 'imagePreview', key)
+        basicLabel(mergedLocale.value?.locale, 'imagePreview', key)
 
       const toolbarButton = (
         item: ImagePreviewToolbarItemContext,
         icon: string,
         onClick: () => void
-      ) => {
-        const custom = slots.toolbarItem?.(item)
-        if (custom && custom.length > 0) return custom
+      ): VNode => {
+        const custom = slots.toolbarItem?.(item)?.filter((node): node is VNode => node != null)
+        if (custom && custom.length > 0) {
+          if (custom.length === 1) {
+            const only = custom[0]
+            if (only) return only
+          }
+          return h(Fragment, custom)
+        }
         return h(
           'button',
           {

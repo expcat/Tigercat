@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PieChart } from '@expcat/tigercat-vue/PieChart'
-import type { PieChartDatum } from '@expcat/tigercat-vue'
+import type { PieChartDatum } from '@expcat/tigercat-core'
 
 const data: PieChartDatum[] = [
   { value: 40, label: '产品 A' },

@@ -43,7 +43,7 @@ import {
   type TaskBoardDragController,
   type TaskBoardViewColumn
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 
 function cardMatchesFilter(card: TaskBoardCard, filterText: string): boolean {
@@ -664,11 +664,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     string | number | null
   const kbDragStateId = (dragSnap.kbDrag?.id ?? null) as string | number | null
   const kbGrabbing = dragSnap.kbDrag?.type === 'card'
-  const liveMessage = describeTaskBoardGrabAnnouncement(
-    dragSnap,
-    view,
-    labels.grabAnnouncementText
-  )
+  const liveMessage = describeTaskBoardGrabAnnouncement(dragSnap, view, labels.grabAnnouncementText)
 
   return (
     <div

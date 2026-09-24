@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AreaChart } from '@expcat/tigercat-vue/AreaChart'
-import type { LineChartDatum } from '@expcat/tigercat-vue'
+import type { LineChartDatum } from '@expcat/tigercat-core'
 
 const data: LineChartDatum[] = [
   { x: 'Jan', y: 40 },

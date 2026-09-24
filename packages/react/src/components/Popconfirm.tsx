@@ -28,7 +28,7 @@ import { usePopup } from '../utils/use-popup'
 import { renderOverlayPortal } from '../utils/overlay'
 import { composeRefs, renderOverlayTrigger } from '../utils/overlay-trigger'
 import { Button } from './Button'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
   <svg

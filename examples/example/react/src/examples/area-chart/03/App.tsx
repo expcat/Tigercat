@@ -1,5 +1,5 @@
 import { AreaChart } from '@expcat/tigercat-react/AreaChart'
-import type { AreaChartSeries } from '@expcat/tigercat-react'
+import type { AreaChartSeries } from '@expcat/tigercat-core'
 
 const series: AreaChartSeries[] = [
   {

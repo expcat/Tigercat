@@ -52,7 +52,7 @@ import {
   type TabPosition
 } from '@expcat/tigercat-core'
 import { closeIconPathD, closeIconViewBox } from '@expcat/tigercat-core/icons/common'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Dropdown } from './Dropdown'
 
 export interface TabsContextValue {
@@ -303,7 +303,6 @@ export const Tabs: React.FC<TabsProps> = ({
   destroyInactiveTabPane = false,
   lazy = true,
   swipeable = false,
-  activation = 'automatic',
   className,
   id,
   'aria-label': ariaLabel,
@@ -316,6 +315,7 @@ export const Tabs: React.FC<TabsProps> = ({
   onEdit,
   children
 }) => {
+  const activation: TabActivation = 'automatic'
   const config = useTigerConfig()
   const reactId = useId()
   const idBase = useMemo(() => `tiger-tabs-${reactId.replace(/[^a-zA-Z0-9_-]/g, '')}`, [reactId])

@@ -101,7 +101,7 @@ import {
   chevronRightSolidIcon20PathD,
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core/icons/picker'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { VirtualList, type VirtualListHandle } from './VirtualList'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
@@ -554,7 +554,11 @@ export const TreeSelect = defineComponent({
       }
       if (action.type === 'toggleExpand') {
         const target = visibleItems.value.find((row) => sameTreeKey(row.key, action.key))
-        if (target && nodeGate(target.node) === 'load' && !treeSetHas(expandedSet.value, target.key)) {
+        if (
+          target &&
+          nodeGate(target.node) === 'load' &&
+          !treeSetHas(expandedSet.value, target.key)
+        ) {
           void loadChildren(target.node, 'expand')
         } else {
           toggleExpand(action.key)

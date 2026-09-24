@@ -32,7 +32,7 @@ import {
   type ImageCompareOrientation,
   type ImageFit
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueImageCompareProps {
   beforeSrc?: string
@@ -378,11 +378,18 @@ export const ImageCompare = defineComponent({
               props.afterTitle || slots.afterTitle
                 ? h(
                     'span',
-                    { class: 'pointer-events-none absolute end-2 top-2 text-sm', 'data-compare-after-title': '' },
+                    {
+                      class: 'pointer-events-none absolute end-2 top-2 text-sm',
+                      'data-compare-after-title': ''
+                    },
                     slots.afterTitle ? slots.afterTitle() : props.afterTitle
                   )
                 : null,
-              renderPaneContent(slots.after, props.afterSrc, resolveImageCompareAlt(props.afterAlt, labels.afterAlt))
+              renderPaneContent(
+                slots.after,
+                props.afterSrc,
+                resolveImageCompareAlt(props.afterAlt, labels.afterAlt)
+              )
             ]
           ),
           h(
@@ -396,11 +403,18 @@ export const ImageCompare = defineComponent({
               props.beforeTitle || slots.beforeTitle
                 ? h(
                     'span',
-                    { class: 'pointer-events-none absolute start-2 top-2 text-sm', 'data-compare-before-title': '' },
+                    {
+                      class: 'pointer-events-none absolute start-2 top-2 text-sm',
+                      'data-compare-before-title': ''
+                    },
                     slots.beforeTitle ? slots.beforeTitle() : props.beforeTitle
                   )
                 : null,
-              renderPaneContent(slots.before, props.beforeSrc, resolveImageCompareAlt(props.beforeAlt, labels.beforeAlt))
+              renderPaneContent(
+                slots.before,
+                props.beforeSrc,
+                resolveImageCompareAlt(props.beforeAlt, labels.beforeAlt)
+              )
             ]
           ),
           h(

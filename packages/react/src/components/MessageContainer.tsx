@@ -19,7 +19,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { StatusIcon, StatusIconWithLoading } from './shared/icons'
-import { useResolvedTigerLocale } from './ConfigProvider'
+import { useResolvedTigerLocale } from './tiger-config'
 
 import { OverlayPortal } from '../utils/overlay-outlet'
 
@@ -31,7 +31,13 @@ interface MessageItemProps {
   onResume?: (id: string | number) => void
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, locale, onClose, onPause, onResume }) => {
+const MessageItem: React.FC<MessageItemProps> = ({
+  message,
+  locale,
+  onClose,
+  onPause,
+  onResume
+}) => {
   const colorScheme = getMessageTypeClasses(message.type, defaultMessageThemeColors)
   const messageClasses = classNames(
     messageBaseClasses,

@@ -22,7 +22,7 @@ import {
   type TigerLocale,
   type TigerLocaleRate
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type VueRateProps = InstanceType<typeof Rate>['$props']
 

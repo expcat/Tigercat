@@ -121,7 +121,7 @@ export function useChartInteraction<T = unknown>(
   }
 
   const handlersFor = useCallback(() => {
-    return createChartInteractionHandlers([], stateRef.current, {
+    return createChartInteractionHandlers<T>([], stateRef.current, {
       hoverable,
       showTooltip,
       selectable,

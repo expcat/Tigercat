@@ -16,7 +16,7 @@ import {
 } from '@expcat/tigercat-core'
 import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { LayoutContextKey, type LayoutContextValue } from '../utils/layout-context'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueLayoutProps {
   className?: string

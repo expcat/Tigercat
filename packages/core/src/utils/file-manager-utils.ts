@@ -71,8 +71,7 @@ export const fileManagerItemDisabledClasses = 'cursor-default opacity-60 hover:b
 
 export const fileManagerItemIconClasses = 'text-[var(--tiger-text-secondary)] flex-shrink-0'
 
-export const fileManagerItemNameClasses =
-  'text-sm font-medium text-[var(--tiger-text)] truncate'
+export const fileManagerItemNameClasses = 'text-sm font-medium text-[var(--tiger-text)] truncate'
 
 export const fileManagerItemMetaClasses = 'text-xs text-[var(--tiger-text-secondary)]'
 
@@ -97,7 +96,10 @@ const BIDI_AND_BREAKS = /[\u0000-\u001F\u007F\u200E\u200F\u202A-\u202E\u2066-\u2
 
 /** Strip bidi controls and line breaks so a name cannot disguise the path. */
 export function sanitizeFileDisplayName(name: string): string {
-  return name.replace(BIDI_AND_BREAKS, '').replace(/[ \t]+/g, ' ').trim()
+  return name
+    .replace(BIDI_AND_BREAKS, '')
+    .replace(/[ \t]+/g, ' ')
+    .trim()
 }
 
 function compareModified(a: string | undefined, b: string | undefined): number {
@@ -186,7 +188,10 @@ export function getFileExtension(name: string): string {
 /**
  * Walk `path` (folder **keys**) and return that folder's children.
  */
-export function navigateToFolder(files: FileItem[], path: readonly (string | number)[]): FileItem[] {
+export function navigateToFolder(
+  files: FileItem[],
+  path: readonly (string | number)[]
+): FileItem[] {
   let current = files
   for (const segment of path) {
     const folder = current.find((item) => item.type === 'folder' && fileKeyEquals(item, segment))
@@ -572,23 +577,24 @@ export function getFileManagerWindow(
       virtual: false
     }
   }
-  const range = calculateVirtualRange(
-    scrollTop,
-    viewport > 0 ? viewport : 320,
-    count,
-    rowHeight,
-    4
-  )
+  const range = calculateVirtualRange(scrollTop, viewport > 0 ? viewport : 320, count, rowHeight, 4)
   return { ...range, virtual: true }
 }
 
 /** Variable row heights, keyed by item id. Used when the current layer is large. */
 export function createFileManagerMeasure(estimatedHeight: number): {
   strategy: VirtualListSizeStrategy
-  windowFor(keys: readonly (string | number)[], scrollTop: number, viewport: number): FileManagerWindow
+  windowFor(
+    keys: readonly (string | number)[],
+    scrollTop: number,
+    viewport: number
+  ): FileManagerWindow
   measure(index: number, height: number, key: string | number): void
 } {
   const strategy = dynamicSizeStrategy(estimatedHeight, 0)
+  const setItemKeys = strategy.setItemKeys?.bind(strategy)
+  const getRange = strategy.getRange.bind(strategy)
+  const updateItemHeight = strategy.updateItemHeight?.bind(strategy)
   return {
     strategy,
     windowFor(keys, scrollTop, viewport) {
@@ -601,8 +607,8 @@ export function createFileManagerMeasure(estimatedHeight: number): {
           virtual: false
         }
       }
-      strategy.setItemKeys(keys)
-      const range = strategy.getRange(scrollTop, viewport > 0 ? viewport : 320, keys.length, 4)
+      setItemKeys?.(keys)
+      const range = getRange(scrollTop, viewport > 0 ? viewport : 320, keys.length, 4)
       return {
         start: range.startIndex,
         end: range.endIndex + 1,
@@ -612,7 +618,7 @@ export function createFileManagerMeasure(estimatedHeight: number): {
       }
     },
     measure(index, height, key) {
-      strategy.updateItemHeight(index, height, key)
+      updateItemHeight?.(index, height, key)
     }
   }
 }

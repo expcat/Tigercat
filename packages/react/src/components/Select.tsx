@@ -10,6 +10,8 @@ import {
   selectTagClasses,
   selectTagListClasses,
   selectTagRemoveClasses,
+  selectDoneActionClasses,
+  selectDoneButtonClasses,
   selectDropdownBaseClasses,
   selectTrailingSlotClasses
 } from '@expcat/tigercat-core'
@@ -180,6 +182,14 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
       {hasOptions
         ? renderSelectPanelBody(ctx.renderCtx)
         : (props.panelEmpty ?? renderSelectEmpty(ctx.renderCtx))}
+      <div className={selectDoneActionClasses}>
+        <button
+          type="button"
+          className={selectDoneButtonClasses}
+          onClick={() => ctx.setOpen(false)}>
+          {ctx.doneText}
+        </button>
+      </div>
       {props.panelFooter}
     </div>
   ) : null

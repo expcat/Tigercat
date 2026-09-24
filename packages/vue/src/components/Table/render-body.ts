@@ -39,6 +39,17 @@ import { Input } from '../Input'
 import { InputNumber } from '../InputNumber'
 import { Select } from '../Select'
 
+function isRowRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object'
+}
+
+function cellSpanForUnknown(
+  span: number | ((record: Record<string, unknown>, index: number) => number) | undefined
+): number | ((record: unknown, index: number) => number) | undefined {
+  if (typeof span !== 'function') return span
+  return (record: unknown, index: number) => (isRowRecord(record) ? span(record, index) : 1)
+}
+
 export function renderTableBody(
   ctx: TableContext,
   props: TableInternalProps & {
@@ -234,7 +245,11 @@ export function renderTableBody(
       const dataKey = column.dataKey || column.key
       const cellValue = record[dataKey]
 
-      const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, TABLE_FIXED_CELL_Z_INDEX)
+      const fixedStyle = getFixedColumnStyle(
+        column,
+        ctx.fixedColumnsInfo.value,
+        TABLE_FIXED_CELL_Z_INDEX
+      )
 
       const widthStyle = column.width
         ? {
@@ -318,12 +333,12 @@ export function renderTableBody(
           {
             key: column.key,
             rowspan:
-              resolveCellSpan(column.rowSpan, record, sourceIndex) !== 1
-                ? resolveCellSpan(column.rowSpan, record, sourceIndex)
+              resolveCellSpan(cellSpanForUnknown(column.rowSpan), record, sourceIndex) !== 1
+                ? resolveCellSpan(cellSpanForUnknown(column.rowSpan), record, sourceIndex)
                 : undefined,
             colspan:
-              resolveCellSpan(column.colSpan, record, sourceIndex) !== 1
-                ? resolveCellSpan(column.colSpan, record, sourceIndex)
+              resolveCellSpan(cellSpanForUnknown(column.colSpan), record, sourceIndex) !== 1
+                ? resolveCellSpan(cellSpanForUnknown(column.colSpan), record, sourceIndex)
                 : undefined,
             class: classNames(
               getTableCellClasses(props.size, column.align || 'left', column.className),
@@ -447,7 +462,11 @@ export function renderTableBody(
       const collapsed =
         ctx.groupCollapseEnabled.value && ctx.collapsedGroups.value.includes(String(block.key))
       if (!block.continued) {
-        const headerText = formatTableGroupHeaderText(labels.groupHeaderText, block.key, block.count)
+        const headerText = formatTableGroupHeaderText(
+          labels.groupHeaderText,
+          block.key,
+          block.count
+        )
         groupRows.push(
           h('tr', { key: `group-${block.key}`, class: tableGroupHeaderClasses }, [
             h(

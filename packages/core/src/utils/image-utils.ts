@@ -103,9 +103,10 @@ export function createImageLoadState(src: string | undefined, _lazy = false): Im
 
 export function resetImageLoadState(
   src: string | undefined,
-  _lazy = false,
-  _inView = true
+  lazy = false,
+  inView = true
 ): ImageLoadState {
+  if (lazy && !inView) return { actualSrc: '', error: false, loading: false }
   return createImageLoadState(src)
 }
 
@@ -1027,13 +1028,7 @@ export function downloadCurrentImageUrl(url: string): void {
 }
 
 export type ImagePreviewToolbarAction =
-  | 'zoomOut'
-  | 'reset'
-  | 'zoomIn'
-  | 'rotateLeft'
-  | 'rotateRight'
-  | 'flip'
-  | 'download'
+  'zoomOut' | 'reset' | 'zoomIn' | 'rotateLeft' | 'rotateRight' | 'flip' | 'download'
 
 export interface ImagePreviewToolbarItemContext {
   action: ImagePreviewToolbarAction

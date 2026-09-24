@@ -59,7 +59,7 @@ import {
   type TigerLocaleTaskBoard,
   type TaskBoardDragSnapshot
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 function cardMatchesFilter(card: TaskBoardCard, filterText: string): boolean {
   if (!filterText.trim()) return false

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Inplace } from '@expcat/tigercat-react/Inplace'
 
 export default function App() {

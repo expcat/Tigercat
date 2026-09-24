@@ -1,5 +1,5 @@
 import { AreaChart } from '@expcat/tigercat-react/AreaChart'
-import type { LineChartDatum } from '@expcat/tigercat-react'
+import type { LineChartDatum } from '@expcat/tigercat-core'
 
 const data: LineChartDatum[] = [
   { x: 'Jan', y: 40 },

@@ -104,7 +104,7 @@ import {
   type WorkflowDesignerInspectorTab,
   type WorkflowDesignerNode
 } from '@expcat/tigercat-core/workflow-designer'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Tag } from './Tag'
 
 export interface VueWorkflowDesignerProps extends Omit<
@@ -292,23 +292,24 @@ export const WorkflowDesigner = defineComponent({
           onClick: () => selectNode(node)
         },
         [
-        h('div', { class: workflowDesignerSummaryRowClasses }, [
-          h('span', {
-            class: workflowDesignerKindDotClasses,
-            style: { backgroundColor: workflowDesignerKindColor(node.kind) },
-            'aria-hidden': 'true'
-          }),
-          h('span', { class: workflowDesignerSummaryTitleClasses }, groupName),
-          node.kind === 'approve'
-            ? h(
-                Tag,
-                { variant: 'primary', size: 'sm', pill: true },
-                { default: () => workflowSignModeLabel(node.signMode, timelineLabels.value) }
-              )
-            : null
-        ]),
-        summary ? h('div', { class: workflowDesignerSummaryActorsClasses }, summary) : null
-      ])
+          h('div', { class: workflowDesignerSummaryRowClasses }, [
+            h('span', {
+              class: workflowDesignerKindDotClasses,
+              style: { backgroundColor: workflowDesignerKindColor(node.kind) },
+              'aria-hidden': 'true'
+            }),
+            h('span', { class: workflowDesignerSummaryTitleClasses }, groupName),
+            node.kind === 'approve'
+              ? h(
+                  Tag,
+                  { variant: 'primary', size: 'sm', pill: true },
+                  { default: () => workflowSignModeLabel(node.signMode, timelineLabels.value) }
+                )
+              : null
+          ]),
+          summary ? h('div', { class: workflowDesignerSummaryActorsClasses }, summary) : null
+        ]
+      )
     }
 
     function renderApproversTab(node: WorkflowDesignerNode): VNode {
@@ -826,9 +827,19 @@ export const WorkflowDesigner = defineComponent({
                         })
                       }
                     },
-                    (['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'contains', 'empty', 'notEmpty'] as const).map(
-                      (operator) => h('option', { value: operator }, operator)
-                    )
+                    (
+                      [
+                        'eq',
+                        'neq',
+                        'gt',
+                        'gte',
+                        'lt',
+                        'lte',
+                        'contains',
+                        'empty',
+                        'notEmpty'
+                      ] as const
+                    ).map((operator) => h('option', { value: operator }, operator))
                   ),
                   h('input', {
                     class: workflowDesignerControlClasses,
@@ -970,7 +981,8 @@ export const WorkflowDesigner = defineComponent({
                     ) {
                       return
                     }
-                    const direction = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1
+                    const direction =
+                      event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1
                     const next = nextWorkflowDesignerInspectorTab(
                       tab,
                       direction,
@@ -981,9 +993,7 @@ export const WorkflowDesigner = defineComponent({
                     inspectorTab.value = next
                     const list = (event.currentTarget as HTMLElement | null)?.parentElement
                     queueMicrotask(() => {
-                      list
-                        ?.querySelector<HTMLElement>(`[data-inspector-tab="${next}"]`)
-                        ?.focus()
+                      list?.querySelector<HTMLElement>(`[data-inspector-tab="${next}"]`)?.focus()
                     })
                   }
                 },
@@ -1170,24 +1180,28 @@ export const WorkflowDesigner = defineComponent({
                     () => publish()
                   ),
                   ...WORKFLOW_DESIGNER_PALETTE_KINDS.map((kind) =>
-                  renderActionButton(
-                    kindOptions.value.find((option) => option.value === kind)?.label ?? kind,
-                    locked.value || !view.value.valid,
-                    () => {
-                      const created = createWorkflowDesignerPaletteStep(sourceSteps.value, kind, {
-                        ...timelineLabels.value,
-                        ...labels
-                      })
-                      commit(
-                        insertWorkflowStepAtPath(sourceSteps.value, view.value.parentPath, created)
-                      )
-                      const nextPath = [...view.value.parentPath, created.key]
-                      selectedKey.value = workflowDesignerPathKey(nextPath)
-                      inspectorTab.value = workflowDesignerDefaultInspectorTab(kind)
-                      emit('select', nextPath, created)
-                    }
+                    renderActionButton(
+                      kindOptions.value.find((option) => option.value === kind)?.label ?? kind,
+                      locked.value || !view.value.valid,
+                      () => {
+                        const created = createWorkflowDesignerPaletteStep(sourceSteps.value, kind, {
+                          ...timelineLabels.value,
+                          ...labels
+                        })
+                        commit(
+                          insertWorkflowStepAtPath(
+                            sourceSteps.value,
+                            view.value.parentPath,
+                            created
+                          )
+                        )
+                        const nextPath = [...view.value.parentPath, created.key]
+                        selectedKey.value = workflowDesignerPathKey(nextPath)
+                        inspectorTab.value = workflowDesignerDefaultInspectorTab(kind)
+                        emit('select', nextPath, created)
+                      }
+                    )
                   )
-                )
                 ]
               ),
               showEmpty ? h('p', { class: workflowDesignerEmptyClasses }, emptyCopy) : null,

@@ -5,6 +5,7 @@
 
 import type { TableColumn, TableFixedPosition } from '../types/table'
 import type { ExclusiveVirtualRange } from '../types/virtual-list'
+import type { WaterfallDatum, WaterfallKind } from '../types/chart-visualization'
 import { calculateVirtualColumnRange, type VirtualColumnRange } from './virtual-table-utils'
 import { calculateVirtualRange } from './virtual-list-utils'
 import { tableRowKeyId } from './table-utils'
@@ -172,10 +173,7 @@ export function selectionAnnouncement(
   return formatW9Label(template, { count: nextCount })
 }
 
-export function toggleCollapsedKey(
-  keys: readonly string[],
-  key: string
-): string[] {
+export function toggleCollapsedKey(keys: readonly string[], key: string): string[] {
   return keys.includes(key) ? keys.filter((item) => item !== key) : [...keys, key]
 }
 
@@ -335,7 +333,8 @@ export function buildSummaryCells<T extends Record<string, unknown>>(options: {
     if (options.caller && Object.prototype.hasOwnProperty.call(options.caller, field)) {
       return formatExportCell(options.caller[field], options.caller)
     }
-    const shouldSum = options.sum === true || (sumKeys ? sumKeys.has(column.key) : Boolean(column.sum))
+    const shouldSum =
+      options.sum === true || (sumKeys ? sumKeys.has(column.key) : Boolean(column.sum))
     if (!shouldSum) return ''
     const total = sumNumericColumn(options.records, column)
     return total === null ? '' : String(total)
@@ -385,7 +384,10 @@ export function isLegendHidden(hiddenKeys: readonly string[], key: string): bool
 }
 
 /** Domain stays on the full series. Hidden keys only affect drawing. */
-export function domainExtentIncludingHidden(values: readonly number[]): { min: number; max: number } {
+export function domainExtentIncludingHidden(values: readonly number[]): {
+  min: number
+  max: number
+} {
   const finite = values.filter((value) => Number.isFinite(value))
   if (finite.length === 0) return { min: 0, max: 0 }
   return { min: Math.min(...finite), max: Math.max(...finite) }
@@ -631,7 +633,10 @@ export interface DrillNode {
   children?: readonly DrillNode[]
 }
 
-export function drillVisibleNodes(roots: readonly DrillNode[], path: readonly string[]): DrillNode[] {
+export function drillVisibleNodes(
+  roots: readonly DrillNode[],
+  path: readonly string[]
+): DrillNode[] {
   let level: readonly DrillNode[] = roots
   for (const id of path) {
     const next = level.find((node) => node.id === id)
@@ -639,14 +644,6 @@ export function drillVisibleNodes(roots: readonly DrillNode[], path: readonly st
     level = next.children
   }
   return [...level]
-}
-
-export type WaterfallKind = 'increase' | 'decrease' | 'total'
-
-export interface WaterfallDatum {
-  label: string
-  value: number
-  kind: WaterfallKind
 }
 
 export interface LaidOutWaterfallBar {
@@ -662,7 +659,14 @@ export function layoutWaterfall(data: readonly WaterfallDatum[]): LaidOutWaterfa
   let running = 0
   return data.map((item, index) => {
     if (item.kind === 'total') {
-      const bar = { index, label: item.label, kind: item.kind, y0: 0, y1: item.value, value: item.value }
+      const bar = {
+        index,
+        label: item.label,
+        kind: item.kind,
+        y0: 0,
+        y1: item.value,
+        value: item.value
+      }
       running = item.value
       return bar
     }
@@ -858,7 +862,12 @@ export function findCodeMatches(text: string, query: string): CodeMatch[] {
   return matches
 }
 
-export function replaceCodeMatches(text: string, query: string, replacement: string, all: boolean): string {
+export function replaceCodeMatches(
+  text: string,
+  query: string,
+  replacement: string,
+  all: boolean
+): string {
   if (!query) return text
   if (all) return text.split(query).join(replacement)
   const index = text.indexOf(query)
@@ -942,7 +951,11 @@ export function markdownHeadings(markdown: string): MarkdownHeading[] {
   return headings
 }
 
-export function lockedPaneScroll(scrollTop: number, sourceRange: number, targetRange: number): number {
+export function lockedPaneScroll(
+  scrollTop: number,
+  sourceRange: number,
+  targetRange: number
+): number {
   if (!(sourceRange > 0) || !(targetRange > 0)) return 0
   const ratio = Math.min(1, Math.max(0, scrollTop / sourceRange))
   return ratio * targetRange
@@ -953,8 +966,14 @@ export function htmlToMarkdown(sanitizedHtml: string): string {
     .replace(/<h([1-6])[^>]*>(.*?)<\/h\1>/gi, (_, level: string, text: string) => {
       return `${'#'.repeat(Number(level))} ${stripTags(text)}\n\n`
     })
-    .replace(/<li>\s*<input[^>]*checked[^>]*>\s*(.*?)<\/li>/gi, (_, text: string) => `- [x] ${stripTags(text)}\n`)
-    .replace(/<li>\s*<input[^>]*>\s*(.*?)<\/li>/gi, (_, text: string) => `- [ ] ${stripTags(text)}\n`)
+    .replace(
+      /<li>\s*<input[^>]*checked[^>]*>\s*(.*?)<\/li>/gi,
+      (_, text: string) => `- [x] ${stripTags(text)}\n`
+    )
+    .replace(
+      /<li>\s*<input[^>]*>\s*(.*?)<\/li>/gi,
+      (_, text: string) => `- [ ] ${stripTags(text)}\n`
+    )
     .replace(/<li[^>]*>(.*?)<\/li>/gi, (_, text: string) => `- ${stripTags(text)}\n`)
     .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**')
     .replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*')
@@ -975,14 +994,7 @@ function stripTags(value: string): string {
 }
 
 export type RichTextBlockType =
-  | 'paragraph'
-  | 'heading'
-  | 'list'
-  | 'quote'
-  | 'code'
-  | 'link'
-  | 'image'
-  | 'table'
+  'paragraph' | 'heading' | 'list' | 'quote' | 'code' | 'link' | 'image' | 'table'
 
 export interface RichTextBlock {
   type: RichTextBlockType
@@ -1004,7 +1016,14 @@ export function slashInsertBlock(kind: RichTextBlockType): RichTextBlock {
   if (kind === 'code') return { type: 'code', text: '' }
   if (kind === 'link') return { type: 'link', href: '', text: '' }
   if (kind === 'image') return { type: 'image', src: '', alt: '', width: undefined }
-  if (kind === 'table') return { type: 'table', rows: [['', ''], ['', '']] }
+  if (kind === 'table')
+    return {
+      type: 'table',
+      rows: [
+        ['', ''],
+        ['', '']
+      ]
+    }
   return { type: 'paragraph', text: '' }
 }
 
@@ -1034,8 +1053,10 @@ export function applyMarkdownShortcut(text: string): RichTextBlock | null {
   if (heading) return { type: 'heading', level: heading[1].length, text: heading[2] }
   if (/^>\s+/.test(text)) return { type: 'quote', text: text.replace(/^>\s+/, '') }
   if (/^```/.test(text)) return { type: 'code', text: text.replace(/^```/, '') }
-  if (/^[-*]\s+/.test(text)) return { type: 'list', ordered: false, items: [text.replace(/^[-*]\s+/, '')] }
-  if (/^\d+\.\s+/.test(text)) return { type: 'list', ordered: true, items: [text.replace(/^\d+\.\s+/, '')] }
+  if (/^[-*]\s+/.test(text))
+    return { type: 'list', ordered: false, items: [text.replace(/^[-*]\s+/, '')] }
+  if (/^\d+\.\s+/.test(text))
+    return { type: 'list', ordered: true, items: [text.replace(/^\d+\.\s+/, '')] }
   return null
 }
 
@@ -1142,7 +1163,10 @@ export function undoAnnotation<T>(
 ): { past: AnnotationHistoryEntry<T>[]; annotations: T[] } | null {
   if (past.length === 0) return null
   const entry = past[past.length - 1]
-  return { past: past.slice(0, -1), annotations: entry.annotations.map((item) => structuredCloneSafe(item)) }
+  return {
+    past: past.slice(0, -1),
+    annotations: entry.annotations.map((item) => structuredCloneSafe(item))
+  }
 }
 
 function structuredCloneSafe<T>(value: T): T {
@@ -1206,11 +1230,7 @@ export function appendInfiniteIds<T extends string | number>(
   return appended
 }
 
-export function dragMoveAnnouncement(
-  from: number,
-  to: number,
-  locale?: string
-): string {
+export function dragMoveAnnouncement(from: number, to: number, locale?: string): string {
   return formatW9Label(getW9DataLabels(locale).dragFromTo, { from: from + 1, to: to + 1 })
 }
 
@@ -1258,7 +1278,9 @@ function activityDateTitle(time: string | number | Date | undefined): string {
   return `${date.getFullYear()}-${month}-${day}`
 }
 
-export function latestActivityAnnouncement<T extends { title?: string }>(items: readonly T[]): string | null {
+export function latestActivityAnnouncement<T extends { title?: string }>(
+  items: readonly T[]
+): string | null {
   const latest = items[0]
   if (!latest?.title) return null
   return latest.title
@@ -1386,12 +1408,19 @@ export function calendarWeekNumber(date: Date, weekStartsOn = 1): number {
   return 1 + Math.round((utc.getTime() - firstThursday.getTime()) / 604800000)
 }
 
-export function timelineLabelSide(mode: 'vertical' | 'horizontal', contentSide: 'start' | 'end'): 'start' | 'end' {
+export function timelineLabelSide(
+  mode: 'vertical' | 'horizontal',
+  contentSide: 'start' | 'end'
+): 'start' | 'end' {
   if (mode === 'horizontal') return contentSide === 'start' ? 'end' : 'start'
   return contentSide === 'start' ? 'end' : 'start'
 }
 
-export function collapseLevelKeys(active: readonly (string | number)[], key: string | number, accordion: boolean): (string | number)[] {
+export function collapseLevelKeys(
+  active: readonly (string | number)[],
+  key: string | number,
+  accordion: boolean
+): (string | number)[] {
   const id = String(key)
   const open = active.some((item) => String(item) === id)
   if (accordion) return open ? [] : [key]
@@ -1405,7 +1434,10 @@ export function orgVisibleIds(
 ): string[] {
   const hidden = new Set(collapsed)
   const ids: string[] = []
-  const walk = (list: readonly { id: string; children?: readonly { id: string }[] }[], parentCollapsed: boolean) => {
+  const walk = (
+    list: readonly { id: string; children?: readonly { id: string }[] }[],
+    parentCollapsed: boolean
+  ) => {
     for (const node of list) {
       if (!parentCollapsed) ids.push(node.id)
       walk(node.children ?? [], parentCollapsed || hidden.has(node.id))
@@ -1416,17 +1448,32 @@ export function orgVisibleIds(
 }
 
 export function findOrgMatch(
-  nodes: readonly { id: string; label: string; children?: readonly { id: string; label: string }[] }[],
+  nodes: readonly {
+    id: string
+    label: string
+    children?: readonly { id: string; label: string }[]
+  }[],
   query: string
 ): string | null {
   const needle = query.trim().toLowerCase()
   if (!needle) return null
   const walk = (
-    list: readonly { id: string; label: string; children?: readonly { id: string; label: string }[] }[]
+    list: readonly {
+      id: string
+      label: string
+      children?: readonly { id: string; label: string }[]
+    }[]
   ): string | null => {
     for (const node of list) {
-      if (node.label.toLowerCase().includes(needle) || node.id.toLowerCase().includes(needle)) return node.id
-      const child = walk((node.children ?? []) as { id: string; label: string; children?: { id: string; label: string }[] }[])
+      if (node.label.toLowerCase().includes(needle) || node.id.toLowerCase().includes(needle))
+        return node.id
+      const child = walk(
+        (node.children ?? []) as {
+          id: string
+          label: string
+          children?: { id: string; label: string }[]
+        }[]
+      )
       if (child) return child
     }
     return null

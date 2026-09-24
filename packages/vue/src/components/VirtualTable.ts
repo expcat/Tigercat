@@ -51,4 +51,5 @@ export const VirtualTable = defineComponent({
   }
 })
 
-export type { VirtualTableHandle }
+export type VueVirtualTableProps = InstanceType<typeof VirtualTable>['$props']
+export type { VirtualTableProps, VirtualTableHandle } from '@expcat/tigercat-core'

@@ -9,7 +9,8 @@ import {
   useId,
   type PropType,
   type CSSProperties,
-  type VNode
+  type VNode,
+  type VNodeRef
 } from 'vue'
 import { icon20ViewBox } from '@expcat/tigercat-core/icons/picker'
 import {
@@ -98,7 +99,7 @@ import {
   chevronRightSolidIcon20PathD,
   closeSolidIcon20PathD
 } from '@expcat/tigercat-core/icons/picker'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
@@ -826,9 +827,7 @@ export const Cascader = defineComponent({
           },
           [
             h('span', { class: 'flex-1 truncate' }, option.label),
-            optionLoading
-              ? h('span', { class: 'sr-only' }, selectLabels.value.loadingText)
-              : null,
+            optionLoading ? h('span', { class: 'sr-only' }, selectLabels.value.loadingText) : null,
             isCascaderOptionExpandable(option, hasLoadData.value)
               ? h(
                   'span',
@@ -892,10 +891,10 @@ export const Cascader = defineComponent({
         return h(
           'div',
           {
-            ref: (el: Element | null) => {
+            ref: ((el: Element | null) => {
               if (!(el instanceof HTMLElement)) return
               if (el.scrollTop !== scrollTop) el.scrollTop = scrollTop
-            },
+            }) as VNodeRef | undefined,
             style: { height: `${props.listHeight}px`, overflow: 'auto' },
             onScroll: (event: Event) => onScrollTop((event.target as HTMLElement).scrollTop)
           },

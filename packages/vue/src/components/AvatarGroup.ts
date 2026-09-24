@@ -1,4 +1,14 @@
-import { computed, defineComponent, h, provide, reactive, watch, PropType, Text, type VNode } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  provide,
+  reactive,
+  watch,
+  PropType,
+  Text,
+  type VNode
+} from 'vue'
 import {
   avatarOverflowName,
   basicLabel,
@@ -17,7 +27,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Popover } from './Popover'
 import { flattenSlotVNodes } from '../utils/flatten-vnodes'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export const AVATAR_GROUP_INJECTION_KEY = Symbol('TigerAvatarGroup')
 
@@ -137,11 +147,7 @@ export const AvatarGroup = defineComponent({
                   trigger: 'click',
                   placement: 'top',
                   asChild: true,
-                  ariaLabel: basicLabel(
-                    mergedLocale.value.locale,
-                    'avatarGroup',
-                    'overflowList'
-                  )
+                  ariaLabel: basicLabel(mergedLocale.value?.locale, 'avatarGroup', 'overflowList')
                 },
                 {
                   default: () =>

@@ -42,7 +42,7 @@ import {
   type TigerLocaleSteps
 } from '@expcat/tigercat-core'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 // Steps context key
 export const StepsContextKey = Symbol('StepsContext')
@@ -215,10 +215,11 @@ export const StepsItem = defineComponent({
     })
 
     const handleClick = () => {
-      if (!isStepClickable(Boolean(stepsContext.handleStepClick), props.disabled, stepStatus.value)) {
+      const onStepClick = stepsContext.handleStepClick
+      if (!onStepClick || !isStepClickable(true, props.disabled, stepStatus.value)) {
         return
       }
-      stepsContext.handleStepClick(props.stepIndex)
+      onStepClick(props.stepIndex)
     }
 
     const renderIcon = () => {

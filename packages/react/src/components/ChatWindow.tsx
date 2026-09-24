@@ -42,7 +42,7 @@ import { Input } from './Input'
 import { Button } from './Button'
 import { VirtualList } from './VirtualList'
 import { Empty } from './Empty'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 
 export interface ChatWindowProps
@@ -356,7 +356,11 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
         </div>
       ) : null}
       {messages.length === 0 ? (
-        <div className={classNames(chatMessageListClasses, 'h-full flex items-center justify-center py-8')}>
+        <div
+          className={classNames(
+            chatMessageListClasses,
+            'h-full flex items-center justify-center py-8'
+          )}>
           <Empty description={resolvedEmptyText} />
         </div>
       ) : virtualOn ? (

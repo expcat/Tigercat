@@ -53,7 +53,7 @@ import {
 } from '@expcat/tigercat-core'
 import type { VirtualListHandle } from '../VirtualList'
 import { useControlledState } from '../../hooks/useControlledState'
-import { useTigerConfig } from '../ConfigProvider'
+import { useTigerConfig } from '../tiger-config'
 import { useInputGroupContext } from '../InputGroup'
 import { useFormItemControlContext } from '../FormItemContext'
 import type { TreeSelectProps } from './types'
@@ -502,8 +502,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
         firstChildKey: getFirstVisibleChildKey(visibleItems, current),
         isExpandable: isTreeNodeExpandable(item.node, hasLoadData),
         isExpanded: treeSetHas(expandedSet, current),
-        isParentExpanded:
-          item.parentKey !== undefined && treeSetHas(expandedSet, item.parentKey),
+        isParentExpanded: item.parentKey !== undefined && treeSetHas(expandedSet, item.parentKey),
         isChecked: fully && !half,
         selectable: true,
         checkable: multiple,

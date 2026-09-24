@@ -20,13 +20,13 @@ import {
   observeElementSize,
   resolveResponsiveValue,
   type ComponentSize,
-  type DescriptionsItem,
+  type DescriptionsItem as DescriptionsItemModel,
   type DescriptionsLayout,
   type DescriptionsProps as CoreDescriptionsProps,
   type ResponsiveBreakpoint,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface DescriptionsProps
   extends
@@ -36,7 +36,7 @@ export interface DescriptionsProps
   extra?: React.ReactNode
   labelStyle?: React.CSSProperties
   contentStyle?: React.CSSProperties
-  items?: DescriptionsItem[]
+  items?: DescriptionsItemModel[]
   column?: number | Partial<Record<ResponsiveBreakpoint, number>>
   locale?: Partial<TigerLocale>
 }
@@ -112,7 +112,7 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     )
   }
 
-  const renderLabel = (item: DescriptionsItem) => (
+  const renderLabel = (item: DescriptionsItemModel) => (
     <>
       {item.label}
       {renderColon(colon, colonGlyph)}

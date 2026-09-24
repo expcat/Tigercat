@@ -23,7 +23,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
-import { useResolvedTigerLocale } from './ConfigProvider'
+import { useResolvedTigerLocale } from './tiger-config'
 
 import { OverlayPortal } from '../utils/overlay-outlet'
 
@@ -33,6 +33,14 @@ interface NotificationItemProps {
   onClose?: (id: string | number) => void
   onPause?: (id: string | number) => void
   onResume?: (id: string | number) => void
+}
+
+function notificationContent(value: unknown): React.ReactNode {
+  if (value == null || typeof value === 'boolean') return value
+  if (typeof value === 'string' || typeof value === 'number') return value
+  if (React.isValidElement(value)) return value
+  if (Array.isArray(value)) return value.map((item) => notificationContent(item))
+  return null
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
@@ -81,14 +89,14 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className={classNames(notificationDescriptionClasses, colorScheme.descriptionText)}>
             {notification.description}
           </div>
-        ) : notification.descriptionNode ? (
+        ) : notification.descriptionNode != null ? (
           <div className={classNames(notificationDescriptionClasses, colorScheme.descriptionText)}>
-            {notification.descriptionNode as React.ReactNode}
+            {notificationContent(notification.descriptionNode)}
           </div>
         ) : null}
         {(notification.onClick ||
           (notification.actions && notification.actions.length > 0) ||
-          notification.actionNode) && (
+          notification.actionNode != null) && (
           <div className={notificationActionsClasses}>
             {notification.onClick ? (
               <button
@@ -121,7 +129,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
                 {action.label}
               </button>
             ))}
-            {notification.actionNode ? (notification.actionNode as React.ReactNode) : null}
+            {notificationContent(notification.actionNode)}
           </div>
         )}
       </div>

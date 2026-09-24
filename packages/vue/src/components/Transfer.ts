@@ -63,7 +63,7 @@ import {
   transferPanelHeaderClasses
 } from '@expcat/tigercat-core'
 import type { TigerLocale, TigerLocaleTransfer } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -157,11 +157,7 @@ export const Transfer = markFormItemGroupControl(
       locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
       labels: { type: Object as PropType<Partial<TigerLocaleTransfer>>, default: undefined }
     },
-    emits: [
-      'update:modelValue',
-      'update:searchValue',
-      'update:selectedKeys'
-    ],
+    emits: ['update:modelValue', 'update:searchValue', 'update:selectedKeys'],
     setup(props, { emit, attrs, expose }) {
       const config = useTigerConfig()
       const formItemControl = inject<VueFormItemControlContext | null>(
@@ -203,9 +199,7 @@ export const Transfer = markFormItemGroupControl(
         formItemControl.onChange(dedupeTransferKeys(props.defaultValue))
       }
       const targetValue = computed(() => controlledKeys.value ?? internalTarget.value)
-      const canMutate = computed(
-        () => !effectiveDisabled.value && !props.readOnly
-      )
+      const canMutate = computed(() => !effectiveDisabled.value && !props.readOnly)
       const internalSelected = ref<TransferSelectedKeys>(
         props.defaultSelectedKeys ?? emptyTransferSelectedKeys()
       )
@@ -308,7 +302,11 @@ export const Transfer = markFormItemGroupControl(
       const sourceScroll = ref(0)
       const targetScroll = ref(0)
 
-      function renderTransferRow(item: TransferItem, selectedKeys: (string | number)[], panel: 'source' | 'target') {
+      function renderTransferRow(
+        item: TransferItem,
+        selectedKeys: (string | number)[],
+        panel: 'source' | 'target'
+      ) {
         const isSelected = hasTransferKey(selectedKeys, item.key)
         const itemDisabled = effectiveDisabled.value || Boolean(item.disabled)
         return h(
@@ -351,17 +349,13 @@ export const Transfer = markFormItemGroupControl(
         const scrollTop = panel === 'source' ? sourceScroll.value : targetScroll.value
         const range = getTransferVirtualWindow(items, scrollTop, props.size)
         const slice = items.slice(range.startIndex, range.endIndex + 1)
-        return h(
-          'div',
-          { style: { height: `${range.totalHeight}px`, position: 'relative' } },
-          [
-            h(
-              'div',
-              { style: { transform: `translateY(${range.offsetTop}px)` } },
-              slice.map((item) => renderTransferRow(item, selectedKeys, panel))
-            )
-          ]
-        )
+        return h('div', { style: { height: `${range.totalHeight}px`, position: 'relative' } }, [
+          h(
+            'div',
+            { style: { transform: `translateY(${range.offsetTop}px)` } },
+            slice.map((item) => renderTransferRow(item, selectedKeys, panel))
+          )
+        ])
       }
 
       expose({

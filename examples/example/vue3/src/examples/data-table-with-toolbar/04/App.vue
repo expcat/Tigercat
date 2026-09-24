@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
-import type { TableColumn } from '@expcat/tigercat-vue'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 interface Row extends Record<string, unknown> {
   id: number

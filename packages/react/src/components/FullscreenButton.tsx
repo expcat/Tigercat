@@ -7,7 +7,7 @@ import {
   mergeTigerLocale,
   type FullscreenProps as CoreFullscreenProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFullscreen } from '../hooks/useFullscreen'
 
 export interface FullscreenButtonProps

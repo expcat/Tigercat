@@ -23,7 +23,7 @@ import {
   type TimelineMode,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLUListElement>, 'children'> {
   items?: TimelineItem[]
@@ -149,9 +149,15 @@ export const Timeline: React.FC<TimelineProps> = ({
     }
 
     const contentSide = mode === 'right' ? 'start' : 'end'
-    const labelSide = timelineLabelSide(mode === 'horizontal' ? 'horizontal' : 'vertical', contentSide)
+    const labelSide = timelineLabelSide(
+      mode === 'horizontal' ? 'horizontal' : 'vertical',
+      contentSide
+    )
     const labelNode = item.label ? (
-      <time className={timelineLabelClasses} dateTime={String(item.label)} data-timeline-label-side={labelSide}>
+      <time
+        className={timelineLabelClasses}
+        dateTime={String(item.label)}
+        data-timeline-label-side={labelSide}>
         {item.label}
       </time>
     ) : null
@@ -201,11 +207,7 @@ export const Timeline: React.FC<TimelineProps> = ({
   }
 
   return (
-    <ul
-      {...ulProps}
-      className={containerClasses}
-      role="list"
-      aria-busy={ulProps['aria-busy']}>
+    <ul {...ulProps} className={containerClasses} role="list" aria-busy={ulProps['aria-busy']}>
       {processedItems.map((item, index) => renderTimelineItem(item, index))}
       {renderPendingItem()}
     </ul>

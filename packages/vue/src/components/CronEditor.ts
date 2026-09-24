@@ -53,7 +53,7 @@ import {
   describeCronExpression,
   nextCronRun
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export type VueCronEditorProps = InstanceType<typeof CronEditor>['$props']
@@ -460,9 +460,7 @@ export const CronEditor = markFormItemGroupControl(
                         )
                     },
                     [
-                      fieldsReady.value
-                        ? null
-                        : h('option', { value: '' }, '\u00a0'),
+                      fieldsReady.value ? null : h('option', { value: '' }, '\u00a0'),
                       ...cronFieldModes.map((mode) =>
                         h('option', { key: mode, value: mode }, modeLabels.value[mode])
                       )
@@ -473,11 +471,15 @@ export const CronEditor = markFormItemGroupControl(
                     ? h('div', { id: fieldErrorId, class: cronEditorErrorClasses }, issue.message)
                     : undefined
                 ])
-              }),
+              })
+            ),
             validation.value.valid && expressionDraft.value
               ? h(
                   'p',
-                  { class: 'text-sm text-[var(--tiger-text-secondary)]', 'data-tiger-cron-summary': '' },
+                  {
+                    class: 'text-sm text-[var(--tiger-text-secondary)]',
+                    'data-tiger-cron-summary': ''
+                  },
                   [
                     describeCronExpression(expressionDraft.value),
                     ' ',
@@ -485,7 +487,6 @@ export const CronEditor = markFormItemGroupControl(
                   ]
                 )
               : null
-            )
           ]
         )
       }

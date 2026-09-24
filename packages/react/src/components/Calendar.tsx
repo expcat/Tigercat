@@ -46,7 +46,7 @@ import {
   toIsoDate
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface CalendarProps
   extends
@@ -134,7 +134,9 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
   })
 
   const [view, setView] = useState(() => getInitialCalendarView(selected, today))
-  const [followedYmd, setFollowedYmd] = useState<string | null>(selected ? toIsoDate(selected) : null)
+  const [followedYmd, setFollowedYmd] = useState<string | null>(
+    selected ? toIsoDate(selected) : null
+  )
   const selectedYmd = selected ? toIsoDate(selected) : null
   useEffect(() => {
     const nextFollow = view ? followCalendarValue(view, selected, followedYmd) : null
@@ -305,10 +307,9 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
   if (!view) {
     return (
       <div
-        className={classNames(calendarRootClasses, className)}
+        className={classNames(getCalendarContainerClasses(fullscreen), className)}
         data-tiger-calendar=""
-        aria-label={labels.today}>
-      </div>
+        aria-label={labels.switchToMonth}></div>
     )
   }
 
@@ -321,7 +322,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
       ref={ref}
       className={classNames(getCalendarContainerClasses(fullscreen), className)}
       data-tiger="calendar">
-      <div role="status" aria-live="polite" className="sr-only">
+      <div aria-live="polite" className="sr-only">
         {viewLive}
       </div>
       <div className={calendarHeaderClasses}>
@@ -451,53 +452,53 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                 )
                 return (
                   <div key={iso} className="flex min-w-0 flex-col items-stretch">
-                  <button
-                    type="button"
-                    role="gridcell"
-                    data-date={iso}
-                    aria-label={
-                      eventTitles.length > 0 ? `${dayLabel}. ${eventTitles.join(', ')}` : dayLabel
-                    }
-                    aria-selected={isSelected || isRangeStart || isRangeEnd}
-                    aria-current={isTodayDate ? 'date' : undefined}
-                    disabled={isDisabled}
-                    tabIndex={rovingDayIso === iso && !isDisabled ? 0 : -1}
-                    className={getCalendarDayClasses({
-                      isSelected,
-                      isToday: isTodayDate,
-                      isCurrentMonth,
-                      isDisabled,
-                      isActive: activeIso === iso,
-                      isInRange,
-                      isRangeStart,
-                      isRangeEnd,
-                      hasExtra
-                    })}
-                    onClick={() => selectDay(date)}
-                    onFocus={() => setActiveIso(iso)}>
-                    {formatCalendarDayNumber(date, localeCode)}
-                    {!customCell && extra.events.length > 0 ? (
-                      <span className={calendarDateCellExtraClasses} aria-hidden="true">
-                        {extra.events.map((event, index) => (
-                          <span
-                            key={event.key ?? `${extra.iso}-${index}`}
-                            className={calendarDateCellDotClasses}
-                            style={getCalendarEventDotStyle(event.color)}
-                          />
-                        ))}
-                      </span>
+                    <button
+                      type="button"
+                      role="gridcell"
+                      data-date={iso}
+                      aria-label={
+                        eventTitles.length > 0 ? `${dayLabel}. ${eventTitles.join(', ')}` : dayLabel
+                      }
+                      aria-selected={isSelected || isRangeStart || isRangeEnd}
+                      aria-current={isTodayDate ? 'date' : undefined}
+                      disabled={isDisabled}
+                      tabIndex={rovingDayIso === iso && !isDisabled ? 0 : -1}
+                      className={getCalendarDayClasses({
+                        isSelected,
+                        isToday: isTodayDate,
+                        isCurrentMonth,
+                        isDisabled,
+                        isActive: activeIso === iso,
+                        isInRange,
+                        isRangeStart,
+                        isRangeEnd,
+                        hasExtra
+                      })}
+                      onClick={() => selectDay(date)}
+                      onFocus={() => setActiveIso(iso)}>
+                      {formatCalendarDayNumber(date, localeCode)}
+                      {!customCell && extra.events.length > 0 ? (
+                        <span className={calendarDateCellExtraClasses} aria-hidden="true">
+                          {extra.events.map((event, index) => (
+                            <span
+                              key={event.key ?? `${extra.iso}-${index}`}
+                              className={calendarDateCellDotClasses}
+                              style={getCalendarEventDotStyle(event.color)}
+                            />
+                          ))}
+                        </span>
+                      ) : null}
+                    </button>
+                    {customCell ? <div>{customCell as React.ReactNode}</div> : null}
+                    {eventTitles.length > 0 ? (
+                      <ul className="m-0 list-none p-0 text-[10px] leading-tight text-[var(--tiger-text)]">
+                        {extra.events.map((event, index) =>
+                          event.title ? (
+                            <li key={event.key ?? `${extra.iso}-title-${index}`}>{event.title}</li>
+                          ) : null
+                        )}
+                      </ul>
                     ) : null}
-                  </button>
-                  {customCell ? <div>{customCell as React.ReactNode}</div> : null}
-                  {eventTitles.length > 0 ? (
-                    <ul className="m-0 list-none p-0 text-[10px] leading-tight text-[var(--tiger-text)]">
-                      {extra.events.map((event, index) =>
-                        event.title ? (
-                          <li key={event.key ?? `${extra.iso}-title-${index}`}>{event.title}</li>
-                        ) : null
-                      )}
-                    </ul>
-                  ) : null}
                   </div>
                 )
               })}

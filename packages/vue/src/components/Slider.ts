@@ -49,7 +49,7 @@ import {
   type DocumentDragSession
 } from '@expcat/tigercat-core'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueSliderProps {
   modelValue?: number | string | [number, number] | null
@@ -153,9 +153,7 @@ export const Slider = defineComponent({
     const isControlled = computed(() => resolveBoundValue() !== undefined)
     const initialBound = resolveBoundValue()
     const internalValue = ref<number | [number, number]>(
-      (Array.isArray(initialBound)
-        ? [initialBound[0], initialBound[1]]
-        : initialBound) ??
+      (Array.isArray(initialBound) ? [initialBound[0], initialBound[1]] : initialBound) ??
         (Array.isArray(props.defaultValue)
           ? [props.defaultValue[0], props.defaultValue[1]]
           : props.defaultValue) ??
@@ -422,7 +420,13 @@ export const Slider = defineComponent({
           },
           [
             ...(showThumbTooltip
-              ? [h('div', { class: tooltipClasses }, formatSliderTooltip(value, props.formatTooltip))]
+              ? [
+                  h(
+                    'div',
+                    { class: tooltipClasses },
+                    formatSliderTooltip(value, props.formatTooltip)
+                  )
+                ]
               : []),
             ...(name.suffix
               ? [h('span', { id: `${thumbId ?? 'thumb'}-suffix`, class: 'sr-only' }, name.suffix)]
@@ -457,7 +461,12 @@ export const Slider = defineComponent({
         props.range && Array.isArray(current)
           ? [
               createThumb(current[0], 'min', minName, effectiveId),
-              createThumb(current[1], 'max', maxName, effectiveId ? `${effectiveId}-max` : 'slider-max')
+              createThumb(
+                current[1],
+                'max',
+                maxName,
+                effectiveId ? `${effectiveId}-max` : 'slider-max'
+              )
             ]
           : createThumb(
               typeof current === 'number' ? current : current[0],
@@ -512,8 +521,7 @@ export const Slider = defineComponent({
           class: getSliderRootClasses(
             effectiveDisabled.value,
             classNames(props.className, coerceClassValue(attrs.class)),
-            props.tooltip &&
-              (showTooltip.value || focusedThumb.value !== null || isDragging.value),
+            props.tooltip && (showTooltip.value || focusedThumb.value !== null || isDragging.value),
             status.value
           ),
           style: mergeStyleValues(attrs.style, props.style),

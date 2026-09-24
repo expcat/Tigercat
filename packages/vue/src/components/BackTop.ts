@@ -22,7 +22,7 @@ import {
   type ViewportOffset,
   type ViewportPlacement
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueBackTopProps extends BackTopProps {
   className?: string

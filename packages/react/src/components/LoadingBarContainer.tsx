@@ -9,7 +9,7 @@ import {
   getLoadingLabel,
   type LoadingBarContainerProps as CoreLoadingBarContainerProps
 } from '@expcat/tigercat-core'
-import { useResolvedTigerLocale } from './ConfigProvider'
+import { useResolvedTigerLocale } from './tiger-config'
 
 export interface LoadingBarContainerProps
   extends

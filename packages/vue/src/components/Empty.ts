@@ -14,7 +14,7 @@ import {
   type TigerLocale,
   type EmptyPreset
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueEmptyProps {
   preset?: EmptyPreset

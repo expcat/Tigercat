@@ -105,12 +105,12 @@ describe('lightbox gestures and keys', () => {
     ).toBeNull()
   })
 
-  it('maps minZoom onto minScale', () => {
-    expect(resolveLightboxScaleRange({ minZoom: 0.75, maxZoom: 2 })).toEqual({
+  it('uses minScale and maxScale', () => {
+    expect(resolveLightboxScaleRange({ minScale: 0.75, maxScale: 2 })).toEqual({
       minScale: 0.75,
       maxScale: 2
     })
-    expect(resolveLightboxScaleRange({ minScale: 0.4, minZoom: 0.9 })).toEqual({
+    expect(resolveLightboxScaleRange({ minScale: 0.4 })).toEqual({
       minScale: 0.4,
       maxScale: 5
     })

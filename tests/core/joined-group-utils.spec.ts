@@ -16,8 +16,8 @@ describe('getJoinedGroupItemClasses', () => {
 
   it('uses logical inline rounding so RTL keeps the outer corners', () => {
     const classes = getJoinedGroupItemClasses({ child: 'button' })
-    expect(classes).toContain('rounded-e-none')
-    expect(classes).toContain('rounded-s-none')
+    expect(classes).toContain('rounded-e-[var(--tiger-radius-md)]')
+    expect(classes).toContain('rounded-s-[var(--tiger-radius-md)]')
     expect(classes).toContain('-ms-px')
     expect(classes).not.toContain('rounded-r-none')
     expect(classes).not.toContain('rounded-l-none')

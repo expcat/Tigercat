@@ -70,7 +70,7 @@ import {
   type TigerLocale,
   type FileManagerProps as CoreFileManagerProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useDrag } from '../composables/useDrag'
 
 /**
@@ -254,8 +254,7 @@ export const FileManager = defineComponent({
     const containerStyle = computed(() => {
       const incoming = attrs.style as { height?: unknown } | undefined
       const className = String(props.className ?? '')
-      const explicit =
-        incoming?.height != null || /\b(?:h|min-h|max-h)-/.test(className)
+      const explicit = incoming?.height != null || /\b(?:h|min-h|max-h)-/.test(className)
       return mergeStyleValues(
         explicit ? undefined : { height: FILE_MANAGER_DEFAULT_HEIGHT },
         attrs.style
@@ -406,9 +405,7 @@ export const FileManager = defineComponent({
         const isSelected = model.value.selectedSet.has(item.key)
         const itemClass = getFileItemClasses(props.viewMode, isSelected, Boolean(item.disabled))
         const canDrag = model.value.canReorder && !item.disabled
-        const dragProps = canDrag
-          ? drag.getDragItemAttrs(toFileDragItem(item, index))
-          : null
+        const dragProps = canDrag ? drag.getDragItemAttrs(toFileDragItem(item, index)) : null
         const metaColumns = props.columns ?? DEFAULT_FILE_COLUMNS
         const nameEl = h(
           'span',
@@ -486,9 +483,7 @@ export const FileManager = defineComponent({
       const visible = fileWindow.virtual
         ? model.value.processedItems.slice(fileWindow.start, fileWindow.end)
         : model.value.processedItems
-      const rows = visible.map((item) =>
-        renderItem(item, model.value.processedItems.indexOf(item))
-      )
+      const rows = visible.map((item) => renderItem(item, model.value.processedItems.indexOf(item)))
       const content =
         model.value.processedItems.length > 0
           ? h(
@@ -523,11 +518,7 @@ export const FileManager = defineComponent({
                 }
               },
               fileWindow.virtual
-                ? h(
-                    'div',
-                    { style: { transform: `translateY(${fileWindow.offsetTop}px)` } },
-                    rows
-                  )
+                ? h('div', { style: { transform: `translateY(${fileWindow.offsetTop}px)` } }, rows)
                 : rows
             )
           : h('div', { class: fileManagerEmptyClasses }, [
@@ -535,8 +526,14 @@ export const FileManager = defineComponent({
                 'span',
                 {},
                 props.emptyText ??
-                  mergedLocale.value?.fileManager?.emptyText ??
-                  mergedLocale.value?.common?.emptyText ??
+                  (mergedLocale.value?.fileManager?.emptyText &&
+                  mergedLocale.value.fileManager.emptyText !== 'Empty folder'
+                    ? mergedLocale.value.fileManager.emptyText
+                    : undefined) ??
+                  (mergedLocale.value?.common?.emptyText &&
+                  mergedLocale.value.common.emptyText !== 'No data'
+                    ? mergedLocale.value.common.emptyText
+                    : undefined) ??
                   labels.value.emptyText
               ),
               h('span', { class: 'ms-2' }, countText)
@@ -616,8 +613,12 @@ export const FileManager = defineComponent({
                 }),
                 h('span', { 'data-file-upload': '' }, uploadedName.value),
                 h('span', { 'data-file-preview': '' }, previewLabel.value),
-                ...searchFileTree(props.files ?? [], props.bind.query ?? '', props.bind.recursive === true).map(
-                  (hit) => h('span', { key: hit.path.join('/'), 'data-file-hit': hit.item.name })
+                ...searchFileTree(
+                  props.files ?? [],
+                  props.bind.query ?? '',
+                  props.bind.recursive === true
+                ).map((hit) =>
+                  h('span', { key: hit.path.join('/'), 'data-file-hit': hit.item.name })
                 ),
                 h('span', { 'data-file-action': '' }, fileAction.value)
               ])

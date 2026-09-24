@@ -48,14 +48,22 @@ import {
   uniqueTreeKeys,
   warnControlledExpandedFilter,
   devWarn,
+  type TreeCheckedState,
   type TreeDropPosition,
   type TreeNode,
   type TreeNodeKey,
   type VirtualListHandle
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from '../ConfigProvider'
+import { useTigerConfig } from '../tiger-config'
 import { useDrag } from '../../hooks/useDrag'
 import type { TreeContext, TreeProps } from './types'
+
+function checkedKeysInput(
+  value: TreeNodeKey[] | TreeCheckedState | undefined
+): TreeNodeKey[] | undefined {
+  if (value === undefined) return undefined
+  return Array.isArray(value) ? value : value.checked
+}
 
 function sameKeyList(a: readonly TreeNodeKey[], b: readonly TreeNodeKey[]): boolean {
   if (a.length !== b.length) return false
@@ -171,7 +179,12 @@ export function useTreeState(props: TreeProps): TreeContext & {
     () => controlledSelectedKeys ?? defaultSelectedKeys ?? EMPTY_TREE_KEYS
   )
   const [internalChecked, setInternalChecked] = useState(() =>
-    resolveCheckedInput(derivedTree, controlledCheckedKeys, defaultCheckedKeys, checkStrictly)
+    resolveCheckedInput(
+      derivedTree,
+      checkedKeysInput(controlledCheckedKeys),
+      defaultCheckedKeys,
+      checkStrictly
+    )
   )
   const [loadingIds, setLoadingIds] = useState(() => new Set<string>())
   const [activeKey, setActiveKey] = useState<TreeNodeKey | undefined>(undefined)
@@ -195,7 +208,12 @@ export function useTreeState(props: TreeProps): TreeContext & {
     controlledSelectedKeys !== undefined ? controlledSelectedKeys : internalSelected
   const computedChecked =
     controlledCheckedKeys !== undefined
-      ? resolveCheckedInput(derivedTree, controlledCheckedKeys, undefined, checkStrictly)
+      ? resolveCheckedInput(
+          derivedTree,
+          checkedKeysInput(controlledCheckedKeys),
+          undefined,
+          checkStrictly
+        )
       : internalChecked
 
   const searchQuery = searchValue !== undefined ? searchValue : internalSearch

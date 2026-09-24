@@ -18,8 +18,6 @@ export const virtualListContainerClasses = classNames(
 
 export const virtualListInnerClasses = 'relative w-full'
 
-export type { ExclusiveVirtualRange, VirtualRange }
-
 function emptyExclusiveRange(): ExclusiveVirtualRange {
   return { start: 0, end: 0, offsetTop: 0, totalHeight: 0 }
 }
@@ -142,7 +140,11 @@ export function readMarginBoxBlockSize(element: HTMLElement | null | undefined):
   const style = getComputedStyle(element)
   const marginTop = Number.parseFloat(style.marginTop)
   const marginBottom = Number.parseFloat(style.marginBottom)
-  return height + (Number.isFinite(marginTop) ? marginTop : 0) + (Number.isFinite(marginBottom) ? marginBottom : 0)
+  return (
+    height +
+    (Number.isFinite(marginTop) ? marginTop : 0) +
+    (Number.isFinite(marginBottom) ? marginBottom : 0)
+  )
 }
 
 export function exclusiveRangeToInclusive(range: ExclusiveVirtualRange): VirtualRange {
@@ -456,5 +458,8 @@ export function dynamicSizeStrategy(
 export function warnFixedRowOverflow(key: string, contentHeight: number, itemHeight: number): void {
   if (!Number.isFinite(contentHeight) || !Number.isFinite(itemHeight)) return
   if (contentHeight <= itemHeight + 1) return
-  devWarn(key, `Fixed row height ${itemHeight}px is smaller than the measured content (${contentHeight}px)`)
+  devWarn(
+    key,
+    `Fixed row height ${itemHeight}px is smaller than the measured content (${contentHeight}px)`
+  )
 }

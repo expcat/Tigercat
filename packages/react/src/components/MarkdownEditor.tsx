@@ -50,7 +50,7 @@ import {
   type TigerLocale,
   type TigerLocaleMarkdownEditor
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 
 const modes: MarkdownEditorMode[] = ['edit', 'split', 'preview']
@@ -130,7 +130,11 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
     }
     const pendingSelection = useRef<{ start: number; end: number } | null>(null)
     const composingRef = useRef(false)
-    const narrow = useSyncExternalStore(subscribeMarkdownNarrow, isMarkdownNarrowViewport, () => false)
+    const narrow = useSyncExternalStore(
+      subscribeMarkdownNarrow,
+      isMarkdownNarrowViewport,
+      () => false
+    )
     const [narrowPane, setNarrowPane] = useState<'edit' | 'preview'>('edit')
     const [allowTabExit, setAllowTabExit] = useState(false)
     const [formatToolbarIndex, setFormatToolbarIndex] = useState(0)
@@ -169,7 +173,8 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
     const panes = resolveMarkdownPanes(currentMode, narrow, narrowPane)
     const canEdit = panes.edit
     const showFormattingToolbar = toolbar !== false && canEdit && !readOnly
-    const showTopbar = showFormattingToolbar || showModeSwitch || (narrow && currentMode === 'split')
+    const showTopbar =
+      showFormattingToolbar || showModeSwitch || (narrow && currentMode === 'split')
     const showEditor = panes.edit
     const showPreview = panes.preview
 
@@ -334,14 +339,18 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
               .map((line, index) => (
                 <span
                   key={index}
-                  data-markdown-task={line.includes('[x]') || line.includes('[X]') ? 'done' : 'open'}>
+                  data-markdown-task={
+                    line.includes('[x]') || line.includes('[X]') ? 'done' : 'open'
+                  }>
                   {line}
                 </span>
               ))}
             <button
               type="button"
               data-tiger-md-paste=""
-              onClick={() => commitValue(`${currentValue}${htmlToMarkdown(sanitizeHtml(bind.html ?? ''))}`)}>
+              onClick={() =>
+                commitValue(`${currentValue}${htmlToMarkdown(sanitizeHtml(bind.html ?? ''))}`)
+              }>
               {getW9DataLabels().preview}
             </button>
           </div>

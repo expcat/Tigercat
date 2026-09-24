@@ -118,9 +118,7 @@ export function getCascaderOptionClasses(options: {
       : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover)]',
     options.isSelected &&
       'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)] font-medium',
-    options.isActive &&
-      !options.isDisabled &&
-      'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
+    options.isActive && !options.isDisabled && 'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
   )
 }
 
@@ -173,7 +171,7 @@ export function findCascaderOption(
   options: CascaderOption[],
   value: string | number
 ): CascaderOption | undefined {
-  return options.find((opt) => sameTreeKey(opt.value, value))
+  return options.find((opt) => String(opt.value) === String(value))
 }
 
 export function cascaderPathId(valuePath: CascaderValue): string {
@@ -273,9 +271,7 @@ export function isCascaderValueEmpty(value: CascaderModelValue | null | ''): boo
   return value.length === 0
 }
 
-export function normalizeCascaderValue(
-  value: CascaderModelValue | null | ''
-): CascaderModelValue {
+export function normalizeCascaderValue(value: CascaderModelValue | null | ''): CascaderModelValue {
   if (value === undefined) return undefined
   if (value == null || value === '' || value.length === 0) return EMPTY_CASCADER_PATH
   return value
@@ -320,7 +316,8 @@ export function coerceCascaderFormValue(value: unknown): CascaderModelValue {
   if (typeof value === 'string' && value.startsWith('[')) {
     try {
       const parsed = JSON.parse(value) as unknown
-      if (Array.isArray(parsed)) return normalizeCascaderValue(parsed as CascaderValue) ?? EMPTY_CASCADER_PATH
+      if (Array.isArray(parsed))
+        return normalizeCascaderValue(parsed as CascaderValue) ?? EMPTY_CASCADER_PATH
     } catch {
       return EMPTY_CASCADER_PATH
     }

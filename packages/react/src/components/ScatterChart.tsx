@@ -42,7 +42,7 @@ import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ScatterChartProps extends CoreScatterChartProps {
   data: ScatterChartDatum[]
@@ -259,7 +259,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
             ? legendFormatter(d, i)
             : scatterPointDisplayLabel(d, i, labels.pointAriaLabel),
         getColor: (d, i) => d.color ?? palette[i % palette.length],
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       }),
     [data, legendFormatter, palette, activeIndex, resolvedSelectedIndex, labels.pointAriaLabel]

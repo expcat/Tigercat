@@ -31,7 +31,7 @@ import {
   type GanttTask
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { GanttBind } from './w9-chart-bind'
 
 const GANTT_BAR_CLICK_PX = 4
@@ -480,7 +480,11 @@ export function Gantt({
                     onKeyDown={(event) => {
                       if (isChartNavigationKey(event.key)) {
                         event.preventDefault()
-                        const next = nextChartRovingIndex(task.index, event.key, layout.tasks.length)
+                        const next = nextChartRovingIndex(
+                          task.index,
+                          event.key,
+                          layout.tasks.length
+                        )
                         setFocusedIndex(next)
                         const node = event.currentTarget.ownerSVGElement?.querySelector(
                           `[data-gantt-task-index="${next}"]`
@@ -532,8 +536,12 @@ export function Gantt({
           }
           windowCount={
             ganttVisibleWindow(bind.tasks ?? [], bind.window ?? null).length +
-            ganttRowWindow(0, bind.viewportHeight ?? 0, bind.tasks?.length ?? 0, bind.rowHeight ?? 28)
-              .end
+            ganttRowWindow(
+              0,
+              bind.viewportHeight ?? 0,
+              bind.tasks?.length ?? 0,
+              bind.rowHeight ?? 28
+            ).end
           }
         />
       ) : null}

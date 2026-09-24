@@ -1,5 +1,9 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
-import type { RowSelectionConfig, VirtualTableHandle, VirtualTableProps } from '@expcat/tigercat-core'
+import type {
+  RowSelectionConfig,
+  VirtualTableHandle,
+  VirtualTableProps
+} from '@expcat/tigercat-core'
 import { Table, type TableProps } from './Table'
 
 function VirtualTableInner<T extends Record<string, unknown>>(
@@ -42,3 +46,5 @@ function VirtualTableInner<T extends Record<string, unknown>>(
 export const VirtualTable = forwardRef(VirtualTableInner) as <T extends Record<string, unknown>>(
   props: VirtualTableProps<T> & { ref?: React.ForwardedRef<VirtualTableHandle> }
 ) => React.ReactElement
+
+export type { VirtualTableProps, VirtualTableHandle }

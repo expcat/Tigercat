@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { ScrollSpy } from '@expcat/tigercat-react/ScrollSpy'
-import type { ScrollSpyItem } from '@expcat/tigercat-react'
+import type { ScrollSpyItem } from '@expcat/tigercat-core'
 
 const items: ScrollSpyItem[] = [
   { key: 'audit', href: '#spy-audit', label: '审计' },

@@ -55,7 +55,7 @@ import {
   type DocumentDragSession,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueImageCropperProps {
   locale?: Partial<TigerLocale>
@@ -284,7 +284,6 @@ export const ImageCropper = defineComponent({
     )
 
     onMounted(() => {
-
       loadImage()
       observeContainer()
     })
@@ -382,9 +381,10 @@ export const ImageCropper = defineComponent({
             { rotation: rotation.value, flipX: flipX.value, circular: props.circular }
           )
             .then((blob) => {
-              const extension = (
-                (props.outputType ?? 'image/png').split('/')[1] || 'png'
-              ).replace('jpeg', 'jpg')
+              const extension = ((props.outputType ?? 'image/png').split('/')[1] || 'png').replace(
+                'jpeg',
+                'jpg'
+              )
               const file = new File([blob], `crop.${extension}`, { type: blob.type })
               resolve({ blob, cropRect: { ...rect }, file })
             })
@@ -493,7 +493,7 @@ export const ImageCropper = defineComponent({
                   rotation.value = (rotation.value + 90) % 360
                 }
               },
-              basicLabel(mergedLocale.value.locale, 'imageCropper', 'rotate')
+              basicLabel(mergedLocale.value?.locale, 'imageCropper', 'rotate')
             ),
             h(
               'button',
@@ -504,7 +504,7 @@ export const ImageCropper = defineComponent({
                   aspectChoice.value = '4:3'
                 }
               },
-              basicLabel(mergedLocale.value.locale, 'imageCropper', 'fourThree')
+              basicLabel(mergedLocale.value?.locale, 'imageCropper', 'fourThree')
             ),
             status.value === 'error'
               ? h('div', { class: imageErrorClasses }, [renderErrorIcon()])
@@ -689,56 +689,52 @@ export const ImageCropper = defineComponent({
           'data-crop-aspect': aspectChoice.value ?? ''
         },
         [
-          h(
-            'div',
-            { class: 'mb-2 flex flex-wrap gap-1', 'data-crop-tools': '' },
-            [
-              ...(['1:1', '4:3', '16:9', 'free'] as const).map((preset) =>
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    'data-crop-preset': preset,
-                    'aria-pressed': aspectChoice.value === preset ? 'true' : 'false',
-                    onClick: () => {
-                      aspectChoice.value = preset
-                    }
-                  },
-                  basicLabel(
-                    mergedLocale.value.locale,
-                    'imageCropper',
-                    preset === '1:1'
-                      ? 'square'
-                      : preset === '4:3'
-                        ? 'fourThree'
-                        : preset === '16:9'
-                          ? 'sixteenNine'
-                          : 'free'
-                  )
+          h('div', { class: 'mb-2 flex flex-wrap gap-1', 'data-crop-tools': '' }, [
+            ...(['1:1', '4:3', '16:9', 'free'] as const).map((preset) =>
+              h(
+                'button',
+                {
+                  type: 'button',
+                  'data-crop-preset': preset,
+                  'aria-pressed': aspectChoice.value === preset ? 'true' : 'false',
+                  onClick: () => {
+                    aspectChoice.value = preset
+                  }
+                },
+                basicLabel(
+                  mergedLocale.value?.locale,
+                  'imageCropper',
+                  preset === '1:1'
+                    ? 'square'
+                    : preset === '4:3'
+                      ? 'fourThree'
+                      : preset === '16:9'
+                        ? 'sixteenNine'
+                        : 'free'
                 )
-              ),
-              h(
-                'button',
-                {
-                  type: 'button',
-                  onClick: () => {
-                    rotation.value = (rotation.value + 90) % 360
-                  }
-                },
-                basicLabel(mergedLocale.value.locale, 'imageCropper', 'rotate')
-              ),
-              h(
-                'button',
-                {
-                  type: 'button',
-                  onClick: () => {
-                    flipX.value = !flipX.value
-                  }
-                },
-                basicLabel(mergedLocale.value.locale, 'imageCropper', 'flip')
               )
-            ]
-          ),
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                onClick: () => {
+                  rotation.value = (rotation.value + 90) % 360
+                }
+              },
+              basicLabel(mergedLocale.value?.locale, 'imageCropper', 'rotate')
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                onClick: () => {
+                  flipX.value = !flipX.value
+                }
+              },
+              basicLabel(mergedLocale.value?.locale, 'imageCropper', 'flip')
+            )
+          ]),
           h(
             'div',
             {

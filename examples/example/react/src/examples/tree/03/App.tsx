@@ -1,5 +1,5 @@
 import { Tree } from '@expcat/tigercat-react/Tree'
-import type { TreeNode } from '@expcat/tigercat-react'
+import type { TreeNode } from '@expcat/tigercat-core'
 
 const treeData: TreeNode[] = Array.from({ length: 8 }, (_, group) => ({
   key: `g-${group}`,

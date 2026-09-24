@@ -1,4 +1,3 @@
-import React from 'react'
 import { CopyButton } from '@expcat/tigercat-react/CopyButton'
 
 export default function App() {

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { UploadFile } from '@expcat/tigercat-react'
+import type { UploadFile } from '@expcat/tigercat-core'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { Upload } from '@expcat/tigercat-react/Upload'

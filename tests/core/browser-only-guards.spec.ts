@@ -89,9 +89,9 @@ describe('browser-only utility guards', () => {
   })
 
   it('throws explicit browser-only errors for canvas-producing exports', async () => {
-    expect(() =>
+    await expect(
       cropCanvas({} as HTMLImageElement, { x: 0, y: 0, width: 1, height: 1 }, 1, 1)
-    ).toThrow('Image canvas cropping is only available in the browser')
+    ).rejects.toThrow('Image canvas cropping is only available in the browser')
 
     await expect(exportChartPng({} as SVGSVGElement)).rejects.toThrow(
       'Chart PNG export is only available in the browser'

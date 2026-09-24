@@ -24,6 +24,7 @@ export const idID: TigerLocale = {
     closeMessageAriaLabel: 'Tutup pesan',
     closeNotificationAriaLabel: 'Tutup notifikasi',
     sidebarAriaLabel: 'Bilah sisi',
+    skipToContent: 'Lewati ke konten utama',
     moreOptionsText: 'Opsi lainnya',
     confirmTitle: 'Yakin ingin melanjutkan?'
   },
@@ -71,7 +72,7 @@ export const idID: TigerLocale = {
   text: {
     copyLabel: 'Salin',
     copiedLabel: 'Disalin',
-    copyFailedLabel: 'Gagal menyalin',
+    copyFailedLabel: 'Gagal menyalin'
   },
   watermark: {
     imageErrorText: 'Gambar tanda air gagal dimuat'
@@ -243,7 +244,8 @@ export const idID: TigerLocale = {
     publishBlocked: 'Tidak dapat memublikasikan sampai ini diperbaiki'
   },
   workflowDetailShell: {
-    ariaLabel: 'Detail alur kerja'
+    ariaLabel: 'Detail alur kerja',
+    title: 'Persetujuan'
   },
   progress: {
     ariaLabel: 'Progres'
@@ -359,7 +361,7 @@ export const idID: TigerLocale = {
     finishText: 'Selesai',
     closeAriaLabel: 'Tutup tur',
     dialogAriaLabel: 'Tur panduan',
-    loadErrorText: 'Tur ini tidak dapat dimuat.',
+    loadErrorText: 'Tur ini tidak dapat dimuat.'
   },
   calendar: {
     previousMonth: 'Bulan sebelumnya',
@@ -628,7 +630,7 @@ export const idID: TigerLocale = {
     editModeLabel: 'Sunting',
     splitModeLabel: 'Bagi',
     previewModeLabel: 'Pratinjau',
-    showEditorText: 'Edit',
+    showEditorText: 'Sunting',
     showPreviewText: 'Pratinjau',
     bold: 'Tebal',
     italic: 'Miring',

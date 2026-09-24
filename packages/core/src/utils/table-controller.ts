@@ -34,6 +34,7 @@ import {
   hasTableSelectionColumn,
   orderTableFixedColumns,
   paginateData,
+  getNextTableSelectAllKeys,
   resolveTableRowKeys,
   sortData,
   tableRowKeyId
@@ -514,7 +515,9 @@ export function resolveTableView<T>(input: TableViewInput<T>): TableView<T> {
     input.sourceRowKeys && input.sourceRowKeys.length === dataSource.length
       ? input.sourceRowKeys
       : resolveTableRowKeys(dataSource, rowKey, input.getRowKey)
-  const processedRowKeys = processedRows.map((row) => sourceKeys[row.sourceIndex] ?? row.sourceIndex)
+  const processedRowKeys = processedRows.map(
+    (row) => sourceKeys[row.sourceIndex] ?? row.sourceIndex
+  )
 
   let pageStart = 0
   let pageRows = processedRows

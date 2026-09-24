@@ -27,7 +27,7 @@ import {
   type TigerLocale,
   type TigerLocaleSteps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 // Steps context interface
 export interface StepsContextValue {

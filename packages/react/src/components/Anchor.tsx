@@ -41,7 +41,7 @@ import {
   type TigerLocaleAnchor
 } from '@expcat/tigercat-core'
 import { Affix } from './Affix'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface AnchorContextValue {
   activeLink: string

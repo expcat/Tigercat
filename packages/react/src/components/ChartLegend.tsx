@@ -8,7 +8,7 @@ import {
   type ChartLegendItem,
   type ChartLegendProps as CoreChartLegendProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ChartLegendProps extends CoreChartLegendProps {
   onItemClick?: (index: number, item: ChartLegendItem) => void

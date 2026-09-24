@@ -15,12 +15,12 @@ import {
   kbdDefaultVariantClasses,
   resolveKbdAccessibleName,
   kbdBaseClasses,
+  kbdSizeClasses,
   kbdSubtleVariantClasses,
   normalizeKbdKeys,
   resolveKbdSeparator,
   resolveKbdSize,
-  resolveKbdVariant,
-  tagSizeClasses
+  resolveKbdVariant
 } from '@expcat/tigercat-core'
 
 describe('kbd-utils', () => {
@@ -83,11 +83,11 @@ describe('kbd-utils', () => {
   })
 
   describe('resolveKbdAccessibleName', () => {
-    it('names a keys combo and appends the extra key', () => {
+    it('names a keys combo', () => {
       expect(resolveKbdAccessibleName(['Ctrl', 'K'])).toBe('Ctrl + K')
-      expect(resolveKbdAccessibleName(['Ctrl'], '+', 'S')).toBe('Ctrl + S')
+      expect(resolveKbdAccessibleName(['Ctrl'], '+')).toBe('Ctrl')
       expect(resolveKbdAccessibleName([])).toBeUndefined()
-      expect(resolveKbdAccessibleName(undefined, '+', 'Esc')).toBeUndefined()
+      expect(resolveKbdAccessibleName(undefined, '+')).toBeUndefined()
     })
   })
 
@@ -114,7 +114,7 @@ describe('kbd-utils', () => {
     it('reuses Tag size classes and default chrome', () => {
       const classes = getKbdRootClasses()
       expect(classes).toContain(kbdBaseClasses)
-      expect(classes).toContain(tagSizeClasses.md)
+      expect(classes).toContain(kbdSizeClasses.md)
       expect(classes).toContain(kbdDefaultVariantClasses)
       expect(classes).toContain('--tiger-surface-muted')
       expect(classes).toContain('--tiger-text')
@@ -124,7 +124,7 @@ describe('kbd-utils', () => {
 
     it('applies the subtle variant and extra class names', () => {
       const classes = getKbdRootClasses({ size: 'sm', variant: 'subtle', className: 'extra' })
-      expect(classes).toContain(tagSizeClasses.sm)
+      expect(classes).toContain(kbdSizeClasses.sm)
       expect(classes).toContain(kbdSubtleVariantClasses)
       expect(classes).toContain('extra')
       expect(getKbdVariantClasses('subtle')).toBe(kbdSubtleVariantClasses)

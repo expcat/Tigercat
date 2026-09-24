@@ -31,7 +31,7 @@ import {
   type FloatButtonGroupProps as CoreFloatButtonGroupProps,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Badge } from './Badge'
 import { Tooltip } from './Tooltip'
 import { useControlledState } from '../hooks/useControlledState'
@@ -133,9 +133,43 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
 
   const safeHref = resolveFloatButtonHref(href, disabled)
   const content = children ?? <DefaultPlusIcon size={size} />
+  const {
+    form: _form,
+    formAction: _formAction,
+    formEncType: _formEncType,
+    formMethod: _formMethod,
+    formNoValidate: _formNoValidate,
+    formTarget: _formTarget,
+    name: _name,
+    value: _value,
+    ...sharedProps
+  } = props
+  const anchorProps: React.AnchorHTMLAttributes<HTMLAnchorElement> = {
+    id: sharedProps.id,
+    role: sharedProps.role,
+    tabIndex: sharedProps.tabIndex,
+    title: sharedProps.title,
+    lang: sharedProps.lang,
+    dir: sharedProps.dir,
+    hidden: sharedProps.hidden,
+    inert: sharedProps.inert,
+    autoFocus: sharedProps.autoFocus,
+    accessKey: sharedProps.accessKey,
+    draggable: sharedProps.draggable,
+    spellCheck: sharedProps.spellCheck,
+    translate: sharedProps.translate,
+    slot: sharedProps.slot,
+    contentEditable: sharedProps.contentEditable,
+    inputMode: sharedProps.inputMode,
+    enterKeyHint: sharedProps.enterKeyHint,
+    autoCapitalize: sharedProps.autoCapitalize,
+    autoCorrect: sharedProps.autoCorrect,
+    suppressContentEditableWarning: sharedProps.suppressContentEditableWarning,
+    suppressHydrationWarning: sharedProps.suppressHydrationWarning
+  }
   const control = safeHref ? (
     <a
-      {...props}
+      {...anchorProps}
       ref={ref as React.Ref<HTMLAnchorElement>}
       className={classes}
       href={safeHref}
@@ -145,7 +179,15 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
     </a>
   ) : (
     <button
-      {...props}
+      {...sharedProps}
+      form={_form}
+      formAction={_formAction}
+      formEncType={_formEncType}
+      formMethod={_formMethod}
+      formNoValidate={_formNoValidate}
+      formTarget={_formTarget}
+      name={_name}
+      value={_value}
       ref={ref}
       className={classes}
       type="button"

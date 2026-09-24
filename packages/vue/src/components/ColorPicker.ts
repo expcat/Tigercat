@@ -70,7 +70,7 @@ import {
   useVueBodyScrollLock,
   useVueFocusTrap
 } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 import { ColorSwatch } from './ColorSwatch'
 
@@ -166,9 +166,7 @@ export const ColorPicker = defineComponent({
         if (previewHsva.value) return
         if (textDirty.value && isColorPickerEmpty(committed.value)) return
         const next = describeColorPickerValue(committed.value, props.format, props.showAlpha)
-        baseHsva.value = next.hsva
-          ? mergeHsvaHue(baseHsva.value, next.hsva)
-          : null
+        baseHsva.value = next.hsva ? mergeHsvaHue(baseHsva.value, next.hsva) : null
         if (next.hsva) {
           inputValue.value = next.text
           inputInvalid.value = false
@@ -493,7 +491,10 @@ export const ColorPicker = defineComponent({
                   [
                     h('span', {
                       class: colorPickerSvThumbClasses,
-                      style: { left: `${editingHsva.value.s}%`, top: `${100 - editingHsva.value.v}%` },
+                      style: {
+                        left: `${editingHsva.value.s}%`,
+                        top: `${100 - editingHsva.value.v}%`
+                      },
                       'aria-hidden': 'true'
                     })
                   ]
@@ -511,9 +512,7 @@ export const ColorPicker = defineComponent({
                     'aria-readonly': locked.value || undefined,
                     disabled: effectiveDisabled.value,
                     onInput: (event: Event) => {
-                      previewHsvaValue(
-                        sliderHsva('hue', (event.target as HTMLInputElement).value)
-                      )
+                      previewHsvaValue(sliderHsva('hue', (event.target as HTMLInputElement).value))
                     },
                     onChange: (event: Event) => {
                       commitHsva(sliderHsva('hue', (event.target as HTMLInputElement).value))

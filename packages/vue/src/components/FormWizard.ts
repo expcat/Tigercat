@@ -42,7 +42,7 @@ import { confirmModal } from './Modal'
 import { Steps } from './Steps'
 import { Button } from './Button'
 import { Icon } from './Icon'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormContext } from './Form'
 
 export type { WizardStep }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { DataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolbar'
-import type { TableColumn, TableToolbarFilterValue } from '@expcat/tigercat-react'
+import type { TableColumn, TableToolbarFilterValue } from '@expcat/tigercat-core'
 
 interface Row extends Record<string, unknown> {
   id: number

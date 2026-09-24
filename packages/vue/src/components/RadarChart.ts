@@ -42,7 +42,25 @@ import { ChartTooltip } from './ChartTooltip'
 import { renderRadarBind } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
+
+function isRadarPointerSample(value: unknown): value is {
+  seriesIndex: number
+  x: number
+  y: number
+  clientX: number
+  clientY: number
+} {
+  if (value === null || typeof value !== 'object') return false
+  const sample = value as Record<string, unknown>
+  return (
+    typeof sample.seriesIndex === 'number' &&
+    typeof sample.x === 'number' &&
+    typeof sample.y === 'number' &&
+    typeof sample.clientX === 'number' &&
+    typeof sample.clientY === 'number'
+  )
+}
 
 export interface VueRadarChartProps extends CoreRadarChartProps {
   data?: RadarChartDatum[]
@@ -214,7 +232,9 @@ export const RadarChart = defineComponent({
       clientY: number
     }) => void = () => undefined
     const areaScan = createChartFrameCoalescer({
-      onFrame: (sample) => onAreaFrame(sample)
+      onFrame: (sample) => {
+        if (isRadarPointerSample(sample)) onAreaFrame(sample)
+      }
     })
     const palette = computed(() => resolveChartPalette(props.colors))
     const laid = computed(() =>

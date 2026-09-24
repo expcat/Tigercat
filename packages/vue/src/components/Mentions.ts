@@ -8,7 +8,8 @@ import {
   useId,
   watch,
   type CSSProperties,
-  type PropType
+  type PropType,
+  type VNodeRef
 } from 'vue'
 import type {
   ComponentSize,
@@ -59,7 +60,7 @@ import {
   shouldOpenMentions
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFixedListWindow } from './internal/useFixedListWindow'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
@@ -136,14 +137,7 @@ export const Mentions = defineComponent({
     locale: { type: Object as PropType<Partial<TigerLocale>> },
     className: String
   },
-  emits: [
-    'update:modelValue',
-    'update:open',
-    'select',
-    'search',
-    'focus',
-    'blur'
-  ],
+  emits: ['update:modelValue', 'update:open', 'select', 'search', 'focus', 'blur'],
   setup(props, { emit, attrs, expose }) {
     const config = useTigerConfig()
     const inputGroup = inject<InputGroupContext | null>(INPUT_GROUP_INJECTION_KEY, null)
@@ -637,13 +631,13 @@ export const Mentions = defineComponent({
                           )
                             ? { height: `${props.listHeight}px`, overflow: 'auto' }
                             : getMentionsPanelStyle(props.listHeight),
-                          ref: shouldVirtualizeAutoCompleteList(
+                          ref: (shouldVirtualizeAutoCompleteList(
                             filteredOptions.value.length,
                             props.listHeight,
                             effectiveSize.value
                           )
                             ? mentionWindow.bindRef
-                            : undefined,
+                            : undefined) as VNodeRef | undefined,
                           onScroll: shouldVirtualizeAutoCompleteList(
                             filteredOptions.value.length,
                             props.listHeight,

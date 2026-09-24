@@ -57,7 +57,7 @@ import { Text } from './Text'
 import { Link } from './Link'
 import { Button } from './Button'
 import { Loading } from './Loading'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ActivityFeedProps
   extends
@@ -167,9 +167,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       seenIds.current = new Set(ids)
       return
     }
-    const fresh = flat.filter(
-      (item) => item.id != null && !seenIds.current!.has(String(item.id))
-    )
+    const fresh = flat.filter((item) => item.id != null && !seenIds.current!.has(String(item.id)))
     seenIds.current = new Set(ids)
     const newest = fresh[fresh.length - 1]
     if (!newest) return
@@ -425,7 +423,11 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
               return (
                 <div className="flex items-center gap-2 mb-2">
                   <span className={activityFeedGroupMarkerClasses} />
-                  <Text tag="span" size="sm" weight="bold" className={activityFeedGroupTitleClasses}>
+                  <Text
+                    tag="span"
+                    size="sm"
+                    weight="bold"
+                    className={activityFeedGroupTitleClasses}>
                     {group.title}
                   </Text>
                 </div>
@@ -443,52 +445,54 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
         />
       ) : (
         resolvedGroups.map((group, groupIndex) => {
-        const headerNode = renderGroupHeader?.(group)
-        const groupTitle = group.title
-        const timelineItems = toActivityTimelineItems(group.items)
+          const headerNode = renderGroupHeader?.(group)
+          const groupTitle = group.title
+          const timelineItems = toActivityTimelineItems(group.items)
 
-        return (
-          <div key={group.key ?? groupIndex} className="space-y-3">
-            {showGroupTitle
-              ? (headerNode ??
-                (groupTitle ? (
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={activityFeedGroupMarkerClasses} />
-                    <Text
-                      tag="span"
-                      size="sm"
-                      weight="bold"
-                      className={activityFeedGroupTitleClasses}>
-                      {groupTitle}
-                    </Text>
-                  </div>
-                ) : null))
-              : null}
-            <Timeline
-              items={timelineItems}
-              renderDot={(timelineItem) => {
-                const activity = (timelineItem as ActivityTimelineItem).activity
-                const statusVariant = (activity?.status?.variant ?? 'default') as string
-                const dotClasses = getActivityFeedDotClasses(statusVariant)
+          return (
+            <div key={group.key ?? groupIndex} className="space-y-3">
+              {showGroupTitle
+                ? (headerNode ??
+                  (groupTitle ? (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={activityFeedGroupMarkerClasses} />
+                      <Text
+                        tag="span"
+                        size="sm"
+                        weight="bold"
+                        className={activityFeedGroupTitleClasses}>
+                        {groupTitle}
+                      </Text>
+                    </div>
+                  ) : null))
+                : null}
+              <Timeline
+                items={timelineItems}
+                renderDot={(timelineItem) => {
+                  const activity = (timelineItem as ActivityTimelineItem).activity
+                  const statusVariant = (activity?.status?.variant ?? 'default') as string
+                  const dotClasses = getActivityFeedDotClasses(statusVariant)
 
-                return (
-                  <div className="relative flex items-center justify-center w-2.5 h-2.5">
-                    {dotClasses.pulse ? (
-                      <span className={`${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`} />
-                    ) : null}
-                    <span className={`${activityFeedDotBaseClasses} ${dotClasses.dot}`} />
-                  </div>
-                )
-              }}
-              renderItem={(timelineItem, index) => {
-                const activity = (timelineItem as ActivityTimelineItem).activity
-                if (!activity) return null
-                return renderDefaultItem(activity, index, group)
-              }}
-            />
-          </div>
-        )
-      })
+                  return (
+                    <div className="relative flex items-center justify-center w-2.5 h-2.5">
+                      {dotClasses.pulse ? (
+                        <span
+                          className={`${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`}
+                        />
+                      ) : null}
+                      <span className={`${activityFeedDotBaseClasses} ${dotClasses.dot}`} />
+                    </div>
+                  )
+                }}
+                renderItem={(timelineItem, index) => {
+                  const activity = (timelineItem as ActivityTimelineItem).activity
+                  if (!activity) return null
+                  return renderDefaultItem(activity, index, group)
+                }}
+              />
+            </div>
+          )
+        })
       )}
       {windowed || !hasMore ? null : (
         <div ref={sentinelRef} className={infiniteScrollSentinelClasses} aria-hidden="true" />

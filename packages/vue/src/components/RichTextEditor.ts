@@ -44,7 +44,7 @@ import {
   type TigerLocale,
   type TigerLocaleRichTextEditor
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export interface VueRichTextEditorProps {
@@ -136,7 +136,10 @@ export const RichTextEditor = defineComponent({
     const urlValue = ref<string | null>(null)
     const live = manageLiveRegion('polite')
     const toolbarItems = computed(() =>
-      toolbarForRichTextMode(props.toolbar ?? createDefaultRichTextToolbar(labels.value), props.mode)
+      toolbarForRichTextMode(
+        props.toolbar ?? createDefaultRichTextToolbar(labels.value),
+        props.mode
+      )
     )
     const toolbarButtons = computed(() => getToolbarButtons(toolbarItems.value))
     const effectiveId = computed(() => props.id ?? formItemControl?.id.value)
@@ -380,8 +383,7 @@ export const RichTextEditor = defineComponent({
         ? h(
             'form',
             {
-              class:
-                'flex items-center gap-2 border-b border-[var(--tiger-border)] px-2 py-1.5',
+              class: 'flex items-center gap-2 border-b border-[var(--tiger-border)] px-2 py-1.5',
               onSubmit: (event: Event) => {
                 event.preventDefault()
                 submitUrlPrompt()

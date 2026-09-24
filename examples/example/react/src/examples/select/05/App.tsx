@@ -19,7 +19,9 @@ export default function App() {
       maxTagCount={1}
       options={people}
       value={value}
-      onChange={setValue}
+      onChange={(next) => {
+        if (Array.isArray(next)) setValue(next.map(String))
+      }}
     />
   )
 }

@@ -1,6 +1,6 @@
 import { DataExport } from '@expcat/tigercat-react/DataExport'
 import { DataTableWithToolbar } from '@expcat/tigercat-react/DataTableWithToolbar'
-import type { TableColumn } from '@expcat/tigercat-react'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 interface Row extends Record<string, unknown> {
   id: number

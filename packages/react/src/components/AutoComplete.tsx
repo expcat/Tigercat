@@ -52,7 +52,7 @@ import {
 import { closeSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { useControlledState } from '../hooks/useControlledState'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFixedVirtualWindow } from './internal/useFixedVirtualWindow'
 import { useFormItemControlContext } from './FormItemContext'
 import { useInputGroupContext } from './InputGroup'
@@ -508,14 +508,15 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
     }
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (
-        composingRef.current ||
-        isImeCompositionEvent(event.nativeEvent) ||
-        !canEdit
-      ) {
+      if (composingRef.current || isImeCompositionEvent(event.nativeEvent) || !canEdit) {
         return
       }
-      const intent = getAutoCompleteKeyIntent(event.key, isOpen, activeIndex, filteredOptions.length)
+      const intent = getAutoCompleteKeyIntent(
+        event.key,
+        isOpen,
+        activeIndex,
+        filteredOptions.length
+      )
       switch (intent.type) {
         case 'open':
           event.preventDefault()
@@ -626,7 +627,7 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
             onScroll={virtualizeOptions ? optionWindow.onScroll : undefined}
             data-tiger-autocomplete-virtual={virtualizeOptions ? '' : undefined}
             {...getPickerListboxAria({ id: listboxId })}>
-            {(virtualizeOptions && optionWindow.range
+            {virtualizeOptions && optionWindow.range
               ? [
                   <div
                     key="window"
@@ -641,8 +642,7 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
                     </div>
                   </div>
                 ]
-              : filteredOptions.map((option, index) => renderAutoCompleteOption(option, index))
-            )}
+              : filteredOptions.map((option, index) => renderAutoCompleteOption(option, index))}
           </div>
         ) : (
           <div className={autoCompleteEmptyStateClasses} role="status" aria-live="polite">

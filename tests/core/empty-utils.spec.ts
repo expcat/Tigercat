@@ -41,10 +41,10 @@ describe('empty-utils', () => {
   })
 
   describe('resolveEmptyImageMode', () => {
-    it('keeps a custom image even when showImage is false', () => {
+    it('hides a custom image when showImage is false', () => {
       expect(
         resolveEmptyImageMode({ showImage: false, hasCustomImage: true, preset: 'default' })
-      ).toBe('custom')
+      ).toBe('none')
     })
 
     it('hides the built-in illustration for simple', () => {

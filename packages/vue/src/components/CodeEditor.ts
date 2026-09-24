@@ -35,7 +35,7 @@ import {
   type TigerLocale,
   type TigerLocaleCodeEditor
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export interface VueCodeEditorProps {
@@ -199,7 +199,11 @@ export const CodeEditor = defineComponent({
 
     const containerClasses = computed(() =>
       classNames(
-        getCodeEditorContainerClasses(resolvedTheme.value, effectiveDisabled.value, props.className),
+        getCodeEditorContainerClasses(
+          resolvedTheme.value,
+          effectiveDisabled.value,
+          props.className
+        ),
         coerceClassValue(attrs.class)
       )
     )
@@ -363,12 +367,14 @@ export const CodeEditor = defineComponent({
         [
           props.bind
             ? h('div', { 'data-tiger-code-bind': '' }, [
-                ...findCodeMatches(props.modelValue ?? internalValue.value, props.bind.query ?? '').map(
-                  (match, index) =>
-                    h('span', {
-                      key: index,
-                      'data-code-match': String(match.index)
-                    })
+                ...findCodeMatches(
+                  props.modelValue ?? internalValue.value,
+                  props.bind.query ?? ''
+                ).map((match, index) =>
+                  h('span', {
+                    key: index,
+                    'data-code-match': String(match.index)
+                  })
                 ),
                 h(
                   'button',
@@ -425,33 +431,30 @@ export const CodeEditor = defineComponent({
                 const node = el as HTMLElement | null
                 scrollerRef.value = node
                 const gutter = gutterRef.value
-                if (node && gutter) node.style.setProperty('--tiger-code-gutter', `${gutter.offsetWidth}px`)
+                if (node && gutter)
+                  node.style.setProperty('--tiger-code-gutter', `${gutter.offsetWidth}px`)
               },
               class: codeEditorScrollerClasses,
               style: scrollStyle.value,
               'data-tiger-code-scroller': ''
             },
             [
-              h(
-                'div',
-                { class: 'relative min-w-full', style: { tabSize: String(tabWidth) } },
-                [
-                  h(
-                    'div',
-                    {
-                      class: classNames('grid py-3', wrapClass),
-                      style: {
-                        gridTemplateColumns: props.lineNumbers
-                          ? 'auto minmax(0, 1fr)'
-                          : 'minmax(0, 1fr)'
-                      },
-                      'aria-hidden': 'true'
+              h('div', { class: 'relative min-w-full', style: { tabSize: String(tabWidth) } }, [
+                h(
+                  'div',
+                  {
+                    class: classNames('grid py-3', wrapClass),
+                    style: {
+                      gridTemplateColumns: props.lineNumbers
+                        ? 'auto minmax(0, 1fr)'
+                        : 'minmax(0, 1fr)'
                     },
-                    gridChildren
-                  ),
-                  textareaNode
-                ]
-              )
+                    'aria-hidden': 'true'
+                  },
+                  gridChildren
+                ),
+                textareaNode
+              ])
             ]
           )
         ]

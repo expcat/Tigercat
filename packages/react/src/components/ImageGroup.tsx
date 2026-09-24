@@ -11,7 +11,7 @@ import {
   type ImageGroupItem
 } from '@expcat/tigercat-core'
 import { ImagePreview } from './ImagePreview'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ImageGroupContextValue {
   preview: boolean

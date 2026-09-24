@@ -41,7 +41,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useCartesianSeriesPoints } from '../hooks/useCartesianSeriesPoints'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface AreaChartProps extends CoreAreaChartProps {
   data?: LineChartDatum[]

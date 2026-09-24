@@ -1,5 +1,5 @@
 import { BarChart } from '@expcat/tigercat-react/BarChart'
-import type { BarChartDatum } from '@expcat/tigercat-react'
+import type { BarChartDatum } from '@expcat/tigercat-core'
 
 const data: BarChartDatum[] = [
   { x: 'A', y: 45 },

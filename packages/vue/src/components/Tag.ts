@@ -23,7 +23,7 @@ import {
   type TagSize,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueTagProps {
   locale?: Partial<TigerLocale>
@@ -196,7 +196,10 @@ export const Tag = defineComponent({
                   onClick: handleClose,
                   'aria-label':
                     props.closeAriaLabel ??
-                    formatTagCloseName(labels.value.tagCloseAriaLabel, visibleText(slots.default?.())),
+                    formatTagCloseName(
+                      labels.value.tagCloseAriaLabel,
+                      visibleText(slots.default?.())
+                    ),
                   type: 'button'
                 },
                 CloseIcon()

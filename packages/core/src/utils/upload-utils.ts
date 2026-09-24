@@ -42,8 +42,6 @@ export function getUploadStatusIconClasses(
 
 export type BeforeUploadHandler = (file: File) => boolean | Promise<boolean>
 
-export type { UploadRejectedFile, UploadRejectReason }
-
 export interface PrepareUploadFilesOptions {
   currentCount: number
   incomingFiles: File[]

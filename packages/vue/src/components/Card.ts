@@ -96,7 +96,8 @@ export const Card = defineComponent({
         nodesHaveControl(defaultNodes) ||
         nodesHaveControl(footerNodes) ||
         nodesHaveControl(coverNodes)
-      const target = props.target ?? (typeof attrsRecord.target === 'string' ? attrsRecord.target : undefined)
+      const target =
+        props.target ?? (typeof attrsRecord.target === 'string' ? attrsRecord.target : undefined)
       const rel = props.rel ?? (typeof attrsRecord.rel === 'string' ? attrsRecord.rel : undefined)
       const clickable = typeof attrsRecord.onClick === 'function' || Boolean(props.href?.trim())
       const activation = resolveCardActivation({
@@ -120,7 +121,9 @@ export const Card = defineComponent({
         ? h(
             'div',
             { class: getCardCoverWrapperClasses(isHorizontal.value), 'data-tiger-card-cover': '' },
-            coverNodes ?? [h('img', { src: props.cover, alt: props.coverAlt, class: cardCoverClasses })]
+            coverNodes ?? [
+              h('img', { src: props.cover, alt: props.coverAlt, class: cardCoverClasses })
+            ]
           )
         : null
       const headerNode = headerNodes
@@ -152,7 +155,13 @@ export const Card = defineComponent({
             )
           ]
         : isHorizontal.value
-          ? [h('div', { class: cardHorizontalBodyClasses, 'data-tiger-card-body': '' }, bodyChildren)]
+          ? [
+              h(
+                'div',
+                { class: cardHorizontalBodyClasses, 'data-tiger-card-body': '' },
+                bodyChildren
+              )
+            ]
           : [coverNode, ...bodyChildren]
 
       const onKeydown = (event: KeyboardEvent) => {
@@ -188,20 +197,19 @@ export const Card = defineComponent({
             rel: activation.link.rel,
             'data-tiger-card-link': '',
             'aria-label':
-              activation.link.stretch || props.title || headerNodes ? undefined : activation.link.href
+              activation.link.stretch || props.title || headerNodes
+                ? undefined
+                : activation.link.href
           },
-          activation.link.stretch ? mainChildren : props.title || null
+          activation.link.stretch
+            ? mainChildren.filter((child) => child != null)
+            : props.title || undefined
         )
 
       const beside = activation.link?.stretch
         ? []
         : activation.link
-          ? [
-              coverNode,
-              props.title && !headerNodes ? null : headerNode,
-              bodyNode,
-              footerNode
-            ]
+          ? [coverNode, props.title && !headerNodes ? null : headerNode, bodyNode, footerNode]
           : mainChildren
 
       const content = [linkNode, ...beside, actionsNode]

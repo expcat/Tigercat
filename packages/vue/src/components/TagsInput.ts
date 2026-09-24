@@ -27,7 +27,7 @@ import {
   type ComponentSize,
   type InputStatus
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 import { Icon } from './Icon'
@@ -390,7 +390,9 @@ export const TagsInput = defineComponent({
         )
       }
 
-      if (shouldSubmitNativeField({ name: effectiveName.value, disabled: effectiveDisabled.value })) {
+      if (
+        shouldSubmitNativeField({ name: effectiveName.value, disabled: effectiveDisabled.value })
+      ) {
         if (tags.value.length === 0) {
           children.push(
             h('input', {

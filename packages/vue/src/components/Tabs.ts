@@ -59,7 +59,7 @@ import {
 } from '@expcat/tigercat-core'
 import { closeIconPathD, closeIconViewBox } from '@expcat/tigercat-core/icons/common'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Dropdown } from './Dropdown'
 import type { PopupMenuItem } from '@expcat/tigercat-core'
 

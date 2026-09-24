@@ -63,7 +63,7 @@ import {
   type InputStatus
 } from '@expcat/tigercat-core'
 import type { ComponentSize } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 function TransferItemList({
   items,
@@ -82,8 +82,7 @@ function TransferItemList({
     const el = scrollerRef.current
     if (el && el.scrollTop !== scrollTop) el.scrollTop = scrollTop
   }, [scrollTop])
-  const slice =
-    needsWindow && range ? items.slice(range.startIndex, range.endIndex + 1) : items
+  const slice = needsWindow && range ? items.slice(range.startIndex, range.endIndex + 1) : items
   return (
     <div
       ref={scrollerRef}
@@ -451,9 +450,7 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
           const clearText = mergedLocale?.common?.clearText ?? 'Clear'
           return (
             <div className="flex items-center justify-between gap-2 border-t border-[var(--tiger-border)] px-3 py-1 text-xs">
-              <span role="status">
-                {hidden.length} selected hidden by search
-              </span>
+              <span role="status">{hidden.length} selected hidden by search</span>
               <button
                 type="button"
                 className="text-[var(--tiger-primary)]"
@@ -492,21 +489,26 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
         className
       )}
       onBlur={handleFocusOut}>
-      {fieldName
-        ? targetValue.length > 0
-          ? targetValue.map((key) => (
-              <input
-                key={transferKeyId(key)}
-                type="hidden"
-                name={fieldName}
-                value={String(key)}
-                disabled={effectiveDisabled || undefined}
-              />
-            ))
-          : (
-              <input type="hidden" name={fieldName} value="" disabled={effectiveDisabled || undefined} />
-            )
-        : null}
+      {fieldName ? (
+        targetValue.length > 0 ? (
+          targetValue.map((key) => (
+            <input
+              key={transferKeyId(key)}
+              type="hidden"
+              name={fieldName}
+              value={String(key)}
+              disabled={effectiveDisabled || undefined}
+            />
+          ))
+        ) : (
+          <input
+            type="hidden"
+            name={fieldName}
+            value=""
+            disabled={effectiveDisabled || undefined}
+          />
+        )
+      ) : null}
       {renderPanel('source', labels.sourceTitle, sourceItems, filteredSource, sourceSearch)}
       <div className={transferOperationClasses}>
         <Button

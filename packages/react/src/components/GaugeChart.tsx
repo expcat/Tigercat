@@ -20,7 +20,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { GaugeBind } from './w9-chart-bind'
 
 export interface GaugeChartProps extends CoreGaugeChartProps {

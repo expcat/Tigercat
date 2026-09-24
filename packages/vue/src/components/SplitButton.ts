@@ -23,7 +23,7 @@ import {
 import { flattenSlotVNodes } from '../utils/flatten-vnodes'
 import { Button } from './Button'
 import { BUTTON_GROUP_INJECTION_KEY } from './ButtonGroup'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 
 export interface VueSplitButtonProps {

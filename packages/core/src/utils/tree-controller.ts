@@ -42,9 +42,10 @@ import {
 export const EMPTY_TREE_DATA: TreeNode[] = []
 export const EMPTY_TREE_KEYS: TreeNodeKey[] = []
 
-export function resolveTreeSelection(options: {
-  selectionMode?: TreeSelectionMode
-}): { selectable: boolean; multiple: boolean } {
+export function resolveTreeSelection(options: { selectionMode?: TreeSelectionMode }): {
+  selectable: boolean
+  multiple: boolean
+} {
   const mode = options.selectionMode ?? 'single'
   return {
     selectable: mode !== 'none',
@@ -518,5 +519,3 @@ export function warnControlledExpandedFilter(emitted: boolean): void {
     'Tree filter needs ancestor keys in expandedKeys. Write the emitted keys back, or the matches stay hidden.'
   )
 }
-
-export { getCheckedKeysByStrategy, getDescendantKeys, findNode, getParentKeys }

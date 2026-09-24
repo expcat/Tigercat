@@ -21,7 +21,7 @@ import {
   type CodeCopyButtonStatus,
   type CodeProps as CoreCodeProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 function renderHighlightTokens(lines: HighlightToken[][]): React.ReactNode {
   return lines.map((tokens, lineIndex) => (
@@ -140,7 +140,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
       </pre>
       {showLanguage && language ? (
         <span className={codeBlockLanguageClasses}>
-          {basicLabel(mergedLocale.locale, 'code', 'language')}: {language}
+          {basicLabel(mergedLocale?.locale, 'code', 'language')}: {language}
         </span>
       ) : null}
       {wrapToggle ? (
@@ -149,7 +149,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
           className={classNames(codeBlockWrapButtonClasses, copyable && 'end-28')}
           aria-pressed={wrapped}
           onClick={() => setWrapped((value) => !value)}>
-          {basicLabel(mergedLocale.locale, 'code', wrapped ? 'nowrap' : 'wrap')}
+          {basicLabel(mergedLocale?.locale, 'code', wrapped ? 'nowrap' : 'wrap')}
         </button>
       ) : null}
       {copyable && (

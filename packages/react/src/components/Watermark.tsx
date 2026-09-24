@@ -13,7 +13,7 @@ import {
   type WatermarkRenderController,
   type WatermarkProps as CoreWatermarkProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface WatermarkProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'content'>, CoreWatermarkProps {

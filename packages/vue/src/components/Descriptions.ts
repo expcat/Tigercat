@@ -22,13 +22,13 @@ import {
   observeElementSize,
   resolveResponsiveValue,
   type ComponentSize,
-  type DescriptionsItem,
+  type DescriptionsItem as DescriptionsItemModel,
   type DescriptionsLayout,
   type DescriptionsProps as CoreDescriptionsProps,
   type ResponsiveBreakpoint,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 type HChildren = Parameters<typeof h>[2]
 
@@ -40,7 +40,7 @@ export interface VueDescriptionsProps extends Omit<
   extra?: unknown
   labelStyle?: Record<string, string | number>
   contentStyle?: Record<string, string | number>
-  items?: DescriptionsItem[]
+  items?: DescriptionsItemModel[]
   column?: number | Partial<Record<ResponsiveBreakpoint, number>>
   locale?: Partial<TigerLocale>
   className?: string
@@ -76,7 +76,7 @@ export const Descriptions = defineComponent({
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     },
-    items: { type: Array as PropType<DescriptionsItem[]>, default: () => [] },
+    items: { type: Array as PropType<DescriptionsItemModel[]>, default: () => [] },
     locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     className: { type: String, default: undefined },
     style: {
@@ -126,7 +126,7 @@ export const Descriptions = defineComponent({
       Boolean(props.extra || slots.extra || slots.title || (props.title && !useCaption.value))
     )
 
-    function labelText(item: DescriptionsItem): HChildren {
+    function labelText(item: DescriptionsItemModel): HChildren {
       return [item.label, props.colon ? colonGlyph.value : '']
     }
 

@@ -36,7 +36,7 @@ import {
   type PrintPageSize,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 const PrintLayoutShowPageBreaksKey: InjectionKey<ComputedRef<boolean>> = Symbol(
   'tigerPrintShowPageBreaks'
@@ -142,7 +142,11 @@ export const PrintLayout = defineComponent({
                   marginMm: props.bind.marginMm,
                   manualBreaks: props.bind.manualBreaks
                 }).map((page) =>
-                  h('span', { key: page.index, 'data-page-number': page.numberLabel }, page.numberLabel)
+                  h(
+                    'span',
+                    { key: page.index, 'data-page-number': page.numberLabel },
+                    page.numberLabel
+                  )
                 )
               )
             : null,
@@ -210,11 +214,7 @@ export const PrintPageBreak = defineComponent({
         },
         (showPageBreaks?.value ?? true)
           ? h('div', { class: printLayoutPageBreakClasses }, [
-              h(
-                'span',
-                { class: printLayoutPageBreakLabelClasses },
-                slots.default?.() ?? label
-              )
+              h('span', { class: printLayoutPageBreakLabelClasses }, slots.default?.() ?? label)
             ])
           : undefined
       )

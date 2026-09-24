@@ -24,7 +24,7 @@ import {
   type ResizeAxis,
   type ResizeHandlePosition
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueResizableProps {
   width?: number

@@ -19,7 +19,6 @@ import {
   type WorkflowNodeAdvanced,
   type WorkflowSignMode,
   type WorkflowStepKind,
-
   type WorkflowTimelineStep
 } from '@expcat/tigercat-core'
 import {
@@ -101,7 +100,7 @@ import {
   type WorkflowDesignerInspectorTab,
   type WorkflowDesignerNode
 } from '@expcat/tigercat-core/workflow-designer'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 import { Tag } from './Tag'
 
@@ -815,13 +814,23 @@ function DesignerEditPanel({
                       }
                     })
                   }>
-                  {(['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'contains', 'empty', 'notEmpty'] as const).map(
-                    (operator) => (
-                      <option key={operator} value={operator}>
-                        {operator}
-                      </option>
-                    )
-                  )}
+                  {(
+                    [
+                      'eq',
+                      'neq',
+                      'gt',
+                      'gte',
+                      'lt',
+                      'lte',
+                      'contains',
+                      'empty',
+                      'notEmpty'
+                    ] as const
+                  ).map((operator) => (
+                    <option key={operator} value={operator}>
+                      {operator}
+                    </option>
+                  ))}
                 </select>
                 <input
                   className={workflowDesignerControlClasses}

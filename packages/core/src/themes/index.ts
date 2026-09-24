@@ -32,12 +32,3 @@ export { modernTheme } from './modern/theme'
 export { highContrastTheme } from './high-contrast/theme'
 export { forcedColorsCss } from './forced-colors'
 export { reviewPreset, reviewNamedPreset } from './preset-review'
-
-export type {
-  ThemeConfig,
-  ThemePreset,
-  ThemePresetName,
-  ThemeSemanticColors,
-  ThemeColorScale,
-  ColorScheme
-} from '../types/theme'

@@ -24,6 +24,7 @@ export const thTH: TigerLocale = {
     closeMessageAriaLabel: 'ปิดข้อความ',
     closeNotificationAriaLabel: 'ปิดการแจ้งเตือน',
     sidebarAriaLabel: 'แถบด้านข้าง',
+    skipToContent: 'ข้ามไปยังเนื้อหาหลัก',
     moreOptionsText: 'ตัวเลือกเพิ่มเติม',
     confirmTitle: 'คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?'
   },
@@ -71,7 +72,7 @@ export const thTH: TigerLocale = {
   text: {
     copyLabel: 'คัดลอก',
     copiedLabel: 'คัดลอกแล้ว',
-    copyFailedLabel: 'คัดลอกไม่สำเร็จ',
+    copyFailedLabel: 'คัดลอกไม่สำเร็จ'
   },
   watermark: {
     imageErrorText: 'โหลดรูปภาพลายน้ำไม่สำเร็จ'
@@ -243,7 +244,8 @@ export const thTH: TigerLocale = {
     publishBlocked: 'ยังเผยแพร่ไม่ได้จนกว่าจะแก้รายการที่บล็อก'
   },
   workflowDetailShell: {
-    ariaLabel: 'รายละเอียดเวิร์กโฟลว์'
+    ariaLabel: 'รายละเอียดเวิร์กโฟลว์',
+    title: 'การอนุมัติ'
   },
   progress: {
     ariaLabel: 'ความคืบหน้า'
@@ -359,7 +361,7 @@ export const thTH: TigerLocale = {
     finishText: 'เสร็จสิ้น',
     closeAriaLabel: 'ปิดทัวร์',
     dialogAriaLabel: 'ทัวร์แนะนำ',
-    loadErrorText: 'โหลดทัวร์นี้ไม่สำเร็จ',
+    loadErrorText: 'โหลดทัวร์นี้ไม่สำเร็จ'
   },
   calendar: {
     previousMonth: 'เดือนก่อนหน้า',

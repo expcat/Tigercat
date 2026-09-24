@@ -76,7 +76,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { clockSolidIcon20PathD, closeSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay, useVueFocusTrap } from '../utils/overlay'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
@@ -639,96 +639,92 @@ export const TimePicker = defineComponent({
       )
 
       const desktopColumns = h(
-            'div',
-            { class: timePickerDesktopColumnsClasses },
-            columns.value.map((column) => {
-              const active =
-                column.options.find((option) => option.selected) ??
-                column.options.find((option) => !option.disabled)
-              return h('div', { class: timePickerColumnClasses, key: column.unit }, [
-                h(
-                  'div',
-                  { id: column.headerId, class: timePickerColumnHeaderClasses },
-                  column.label
-                ),
-                h(
+        'div',
+        { class: timePickerDesktopColumnsClasses },
+        columns.value.map((column) => {
+          const active =
+            column.options.find((option) => option.selected) ??
+            column.options.find((option) => !option.disabled)
+          return h('div', { class: timePickerColumnClasses, key: column.unit }, [
+            h('div', { id: column.headerId, class: timePickerColumnHeaderClasses }, column.label),
+            h(
+              'div',
+              {
+                id: column.listId,
+                role: 'listbox',
+                'aria-labelledby': column.headerId,
+                'aria-activedescendant': active
+                  ? `${column.listId}-${String(active.value)}`
+                  : undefined,
+                class: timePickerColumnListClasses,
+                onKeydown: handlePanelKeyDown,
+                onScroll: (event: Event) => {
+                  const list = event.currentTarget as HTMLElement
+                  const item = list.querySelector<HTMLElement>('[role="option"]')
+                  const next = snapTimeColumnScroll(list.scrollTop, item?.offsetHeight ?? 0)
+                  if (next !== list.scrollTop) list.scrollTop = next
+                }
+              },
+              column.options.map((option) => {
+                const selected = option.selected
+                const tabIndex = option.disabled ? -1 : selected || option === active ? 0 : -1
+                return h(
                   'div',
                   {
-                    id: column.listId,
-                    role: 'listbox',
-                    'aria-labelledby': column.headerId,
-                    'aria-activedescendant': active
-                      ? `${column.listId}-${String(active.value)}`
-                      : undefined,
-                    class: timePickerColumnListClasses,
-                    onKeydown: handlePanelKeyDown,
-                    onScroll: (event: Event) => {
-                      const list = event.currentTarget as HTMLElement
-                      const item = list.querySelector<HTMLElement>('[role="option"]')
-                      const next = snapTimeColumnScroll(list.scrollTop, item?.offsetHeight ?? 0)
-                      if (next !== list.scrollTop) list.scrollTop = next
+                    key: String(option.value),
+                    id: `${column.listId}-${String(option.value)}`,
+                    role: 'option',
+                    tabindex: tabIndex,
+                    'aria-selected': selected,
+                    'aria-disabled': option.disabled || undefined,
+                    'aria-label': option.ariaLabel,
+                    'data-tiger-timepicker-unit': column.unit,
+                    class: getTimePickerItemClasses(selected, option.disabled),
+                    onClick: () => {
+                      if (!option.disabled) selectColumn(column.unit, option.value)
                     }
                   },
-                  column.options.map((option) => {
-                    const selected = option.selected
-                    const tabIndex = option.disabled ? -1 : selected || option === active ? 0 : -1
-                    return h(
-                      'div',
-                      {
-                        key: String(option.value),
-                        id: `${column.listId}-${String(option.value)}`,
-                        role: 'option',
-                        tabindex: tabIndex,
-                        'aria-selected': selected,
-                        'aria-disabled': option.disabled || undefined,
-                        'aria-label': option.ariaLabel,
-                        'data-tiger-timepicker-unit': column.unit,
-                        class: getTimePickerItemClasses(selected, option.disabled),
-                        onClick: () => {
-                          if (!option.disabled) selectColumn(column.unit, option.value)
-                        }
-                      },
-                      option.label
-                    )
-                  })
+                  option.label
                 )
-              ])
-            })
-          )
+              })
+            )
+          ])
+        })
+      )
       const mobileSelects = h(
-            'div',
-            { class: getTimePickerMobileSelectRowClasses(columns.value.length as 2 | 3 | 4) },
-            columns.value.map((column) => {
-              const selected = column.options.find((option) => option.selected)
-              return h(
-                'select',
-                {
-                  key: column.unit,
-                  class: timePickerMobileSelectClasses,
-                  'aria-label': column.label,
-                  value: selected ? String(selected.value) : '',
-                  onChange: (event: Event) => {
-                    const raw = (event.target as HTMLSelectElement).value
-                    const option = column.unit === 'period' ? (raw as 'AM' | 'PM') : Number(raw)
-                    selectColumn(column.unit, option)
-                  }
-                },
-                [
-                  selected ? null : h('option', { value: '', disabled: true }),
-                  ...column.options.map((option) =>
-                    h(
-                      'option',
-                      {
-                        value: String(option.value),
-                        disabled: option.disabled
-                      },
-                      option.label
-                    )
-                  )
-                ]
+        'div',
+        { class: getTimePickerMobileSelectRowClasses(columns.value.length as 2 | 3 | 4) },
+        columns.value.map((column) => {
+          const selected = column.options.find((option) => option.selected)
+          return h(
+            'select',
+            {
+              key: column.unit,
+              class: timePickerMobileSelectClasses,
+              'aria-label': column.label,
+              value: selected ? String(selected.value) : '',
+              onChange: (event: Event) => {
+                const raw = (event.target as HTMLSelectElement).value
+                const option = column.unit === 'period' ? (raw as 'AM' | 'PM') : Number(raw)
+                selectColumn(column.unit, option)
+              }
+            },
+            [
+              selected ? null : h('option', { value: '', disabled: true }),
+              ...column.options.map((option) =>
+                h(
+                  'option',
+                  {
+                    value: String(option.value),
+                    disabled: option.disabled
+                  },
+                  option.label
+                )
               )
-            })
+            ]
           )
+        })
+      )
 
       const panel = isOpen.value
         ? [

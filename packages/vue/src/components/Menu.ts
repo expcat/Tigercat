@@ -82,7 +82,7 @@ import {
 } from '@expcat/tigercat-core'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { SidebarContextKey } from '../utils/layout-context'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Icon } from './Icon'
 import { Badge } from './Badge'
 import { Tooltip } from './Tooltip'
@@ -290,7 +290,7 @@ export const Menu = defineComponent({
       const next = nextOpenKeys({
         current: currentOpenKeys.value,
         key,
-        multiple: props.multiple,
+        openMultiple: props.multiple,
         open
       })
       if (props.openKeys === undefined) internalOpenKeys.value = next
@@ -514,7 +514,10 @@ export const MenuItem = defineComponent({
     disabled: { type: Boolean, default: false },
     icon: { type: [String, Object] as PropType<unknown> },
     href: { type: String, default: undefined },
-    badge: { type: [String, Number, Object] as PropType<CoreMenuItem['badge']>, default: undefined },
+    badge: {
+      type: [String, Number, Object] as PropType<CoreMenuItem['badge']>,
+      default: undefined
+    },
     shortcut: { type: String, default: undefined },
     level: { type: Number, default: 0 },
     collapsed: { type: Boolean, default: undefined },
@@ -638,7 +641,12 @@ export const MenuItem = defineComponent({
         : null
       const children = collapsed
         ? [renderMenuIcon(props.icon, true), ...renderCollapsedLabel(label, props.icon)]
-        : [renderMenuIcon(props.icon, false), h('span', { class: 'flex-1' }, slotNodes), badgeNode, shortcutNode]
+        : [
+            renderMenuIcon(props.icon, false),
+            h('span', { class: 'flex-1' }, slotNodes),
+            badgeNode,
+            shortcutNode
+          ]
 
       const inPopupMenu = inPopup.value
       const usesMenuRole = inPopupMenu || menuContext?.mode.value === 'horizontal'

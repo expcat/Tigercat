@@ -10,7 +10,7 @@ import {
   type SidebarLandmark,
   type SidebarProps as CoreSidebarProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { SidebarContext } from '../utils/layout-context'
 
 export interface ReactSidebarProps
@@ -22,7 +22,7 @@ export interface ReactSidebarProps
   onCollapsedChange?: (collapsed: boolean) => void
 }
 
-export const Sidebar = forwardRef<HTMLElement, ReactSidebarProps>(function Sidebar(
+export const Sidebar = forwardRef<HTMLDivElement, ReactSidebarProps>(function Sidebar(
   {
     className,
     width,

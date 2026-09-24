@@ -14,7 +14,7 @@ import {
   type ButtonSize
 } from '@expcat/tigercat-core'
 import { useButtonGroupContext } from './ButtonGroup'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ButtonProps
   extends
@@ -113,7 +113,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const loadingText = config.locale?.common?.loadingText || 'Loading...'
   const chrome = loading ? (
     <span className={slotClass || undefined}>
-      <span className="sr-only">{loadingText}</span>
+      {hasLabel ? null : <span className="sr-only">{loadingText}</span>}
       <span aria-hidden="true">{loadingIcon ?? createDefaultSpinner(resolvedSize)}</span>
     </span>
   ) : icon ? (

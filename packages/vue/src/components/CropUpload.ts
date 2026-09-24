@@ -21,7 +21,7 @@ import { Modal } from './Modal'
 import { ImageCropper, type ImageCropperRef } from './ImageCropper'
 import { Button } from './Button'
 import { Icon } from './Icon'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export interface VueCropUploadProps {
@@ -118,7 +118,7 @@ export const CropUpload = defineComponent({
           session.endCrop()
           return
         }
-        const originalName = session.getState().originalFile?.name ?? raw.file.name
+        const originalName = session.getState().originalFile?.name ?? raw.file?.name ?? ''
         const result = withCropFile(raw, originalName)
         emit('crop-complete', result)
         formItemControl?.setError(null)
@@ -139,7 +139,12 @@ export const CropUpload = defineComponent({
         Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
       )
       const cropper = props.cropperProps ?? {}
-      const { onReady: userReady, onError: userCropperError, locale: cropperLocale, ...restCropper } = cropper
+      const {
+        onReady: userReady,
+        onError: userCropperError,
+        locale: cropperLocale,
+        ...restCropper
+      } = cropper
 
       const trigger = h(
         'button',

@@ -36,7 +36,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueFunnelChartProps extends CoreFunnelChartProps {
   data: FunnelChartDatum[]
@@ -164,7 +164,7 @@ export const FunnelChart = defineComponent({
         getIndex: (segment) => segment.index,
         getLabel: (segment) => stageName(props.data[segment.index], segment.index),
         getColor: (segment) => segment.color,
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       })
     )
@@ -266,7 +266,10 @@ export const FunnelChart = defineComponent({
                   'aria-hidden': interactive.value ? undefined : true,
                   'aria-label': interactive.value
                     ? (() => {
-                        const datum = props.data[seg.index] ?? { value: seg.value, label: seg.label }
+                        const datum = props.data[seg.index] ?? {
+                          value: seg.value,
+                          label: seg.label
+                        }
                         const name = stageName(datum, seg.index)
                         const pct =
                           total.value > 0 ? ((seg.value / total.value) * 100).toFixed(1) : '0'

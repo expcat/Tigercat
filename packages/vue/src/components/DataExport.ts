@@ -20,7 +20,7 @@ import {
   sanitizeDataExportRows,
   yieldDataExportFrame
 } from '@expcat/tigercat-core/utils/data-export'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Dropdown, DropdownMenu, DropdownItem } from './Dropdown'
 
 type DataExportModule = typeof import('@expcat/tigercat-core/utils/data-export')

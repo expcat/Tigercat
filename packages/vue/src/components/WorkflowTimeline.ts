@@ -66,7 +66,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Button } from './Button'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 import { Popconfirm } from './Popconfirm'
 import { Radio } from './Radio'
@@ -643,10 +643,10 @@ export const WorkflowActionBar = defineComponent({
         : false
       const moreConfirmCopy =
         pendingMore &&
-          shouldOpenWorkflowActionLayer(pendingMore, {
-            confirm: props.confirm,
-            commentRequired: props.commentRequired
-          })
+        shouldOpenWorkflowActionLayer(pendingMore, {
+          confirm: props.confirm,
+          commentRequired: props.commentRequired
+        })
           ? getWorkflowActionConfirmCopy(pendingMore.action, labels, {
               commentRequired: moreRequired
             })

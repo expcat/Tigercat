@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Tree } from '@expcat/tigercat-vue/Tree'
-import type { TreeNode } from '@expcat/tigercat-vue'
+import type { TreeNode } from '@expcat/tigercat-core'
 
 const treeData = ref<TreeNode[]>([
   { key: 'design', label: '设计', isLeaf: false },

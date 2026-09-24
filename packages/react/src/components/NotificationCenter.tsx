@@ -54,7 +54,7 @@ import { VirtualList } from './VirtualList'
 import { Text } from './Text'
 import { Button } from './Button'
 import { Loading } from './Loading'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface NotificationCenterProps
   extends CoreNotificationCenterProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {}
@@ -307,35 +307,37 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           className="flex-1 min-w-0 text-start"
           onClick={() => onItemClick?.(item, _index)}>
           <div className="min-w-0">
-          <div className="flex items-baseline justify-between gap-2">
-            <div className="flex items-center gap-1.5">
-              <Text
-                tag="span"
-                size="sm"
-                weight={isRead ? 'normal' : 'semibold'}
-                className={
-                  isRead ? notificationCenterReadTitleClasses : notificationCenterUnreadTitleClasses
-                }>
-                {item.title}
-              </Text>
-              {!isRead && (
-                <span className={notificationCenterUnreadDotClasses} aria-hidden="true" />
-              )}
+            <div className="flex items-baseline justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <Text
+                  tag="span"
+                  size="sm"
+                  weight={isRead ? 'normal' : 'semibold'}
+                  className={
+                    isRead
+                      ? notificationCenterReadTitleClasses
+                      : notificationCenterUnreadTitleClasses
+                  }>
+                  {item.title}
+                </Text>
+                {!isRead && (
+                  <span className={notificationCenterUnreadDotClasses} aria-hidden="true" />
+                )}
+              </div>
+              {timeText ? <span className={notificationCenterTimeClasses}>{timeText}</span> : null}
             </div>
-            {timeText ? <span className={notificationCenterTimeClasses}>{timeText}</span> : null}
+            {item.description ? (
+              <div
+                className={classNames(
+                  'mt-1 text-xs leading-relaxed line-clamp-2',
+                  isRead
+                    ? notificationCenterReadDescriptionClasses
+                    : notificationCenterUnreadDescriptionClasses
+                )}>
+                {item.description}
+              </div>
+            ) : null}
           </div>
-          {item.description ? (
-            <div
-              className={classNames(
-                'mt-1 text-xs leading-relaxed line-clamp-2',
-                isRead
-                  ? notificationCenterReadDescriptionClasses
-                  : notificationCenterUnreadDescriptionClasses
-              )}>
-              {item.description}
-            </div>
-          ) : null}
-        </div>
         </button>
         <Button
           size="sm"

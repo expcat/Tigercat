@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ScrollSpy } from '@expcat/tigercat-vue/ScrollSpy'
-import type { ScrollSpyItem } from '@expcat/tigercat-vue'
+import type { ScrollSpyItem } from '@expcat/tigercat-core'
 
 const items: ScrollSpyItem[] = [
   { key: 'audit', href: '#spy-audit', label: '审计' },

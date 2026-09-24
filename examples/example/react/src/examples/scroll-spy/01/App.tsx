@@ -1,5 +1,5 @@
 import { ScrollSpy } from '@expcat/tigercat-react/ScrollSpy'
-import type { ScrollSpyItem } from '@expcat/tigercat-react'
+import type { ScrollSpyItem } from '@expcat/tigercat-core'
 
 const items: ScrollSpyItem[] = [
   { key: 'overview', href: '#spy-overview', label: '概览' },

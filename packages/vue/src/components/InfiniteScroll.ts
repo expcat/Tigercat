@@ -29,7 +29,7 @@ import {
   infiniteScrollSentinelClasses,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type VueInfiniteScrollProps = InstanceType<typeof InfiniteScroll>['$props']
 export type InfiniteScrollProps = VueInfiniteScrollProps
@@ -146,8 +146,7 @@ export const InfiniteScroll = defineComponent({
         return
       }
 
-      const scrollTarget: EventTarget | null =
-        observerRoot === null ? window : containerRef.value
+      const scrollTarget: EventTarget | null = observerRoot === null ? window : containerRef.value
       if (!scrollTarget) return
       const onScroll = () => checkScroll()
       scrollTarget.addEventListener('scroll', onScroll, { passive: true })
@@ -181,7 +180,8 @@ export const InfiniteScroll = defineComponent({
       })
       if (next.scrollTop !== el.scrollTop) el.scrollTop = next.scrollTop
       if (next.scrollLeft !== el.scrollLeft) el.scrollLeft = next.scrollLeft
-      anchorStart.value = props.orientation === 'horizontal' ? content.offsetLeft : content.offsetTop
+      anchorStart.value =
+        props.orientation === 'horizontal' ? content.offsetLeft : content.offsetTop
     }
 
     onMounted(setupObserver)

@@ -57,7 +57,7 @@ import {
   syncSignatureCanvasBackingStore,
   undoSignatureStroke
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export type VueSignatureProps = InstanceType<typeof Signature>['$props']

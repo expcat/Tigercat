@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { LineChart } from '@expcat/tigercat-vue/LineChart'
-import type { LineChartDatum } from '@expcat/tigercat-vue'
+import type { LineChartDatum } from '@expcat/tigercat-core'
 
 const data: LineChartDatum[] = [
   { x: 'W1', y: 12 },

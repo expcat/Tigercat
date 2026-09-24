@@ -32,7 +32,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface FunnelChartProps extends CoreFunnelChartProps {
   data: FunnelChartDatum[]
@@ -167,7 +167,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
         getIndex: (segment) => segment.index,
         getLabel: (segment) => stageName(data[segment.index], segment.index),
         getColor: (segment) => segment.color,
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       }),
     [segments, data, palette, activeIndex, resolvedSelectedIndex, stageName]
@@ -281,12 +281,16 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
             fill={chartLabelFill(seg.color)}
             aria-hidden={interactive ? true : undefined}>
             {(() => {
-              const name = stageName(data[seg.index] ?? { value: seg.value, label: seg.label }, seg.index)
+              const name = stageName(
+                data[seg.index] ?? { value: seg.value, label: seg.label },
+                seg.index
+              )
               const ratio = ratios[seg.index]
               if (!ratio) return name
               const previous =
                 ratio.versusPrevious === null ? '' : ` ${Math.round(ratio.versusPrevious * 100)}%`
-              const first = ratio.versusFirst === null ? '' : ` ${Math.round(ratio.versusFirst * 100)}%`
+              const first =
+                ratio.versusFirst === null ? '' : ` ${Math.round(ratio.versusFirst * 100)}%`
               return `${name} ${ratio.value}${previous}${first}`
             })()}
           </text>

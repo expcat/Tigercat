@@ -24,6 +24,7 @@ export const deDE: TigerLocale = {
     closeMessageAriaLabel: 'Nachricht schließen',
     closeNotificationAriaLabel: 'Benachrichtigung schließen',
     sidebarAriaLabel: 'Seitenleiste',
+    skipToContent: 'Zum Inhalt springen',
     moreOptionsText: 'Weitere Optionen',
     confirmTitle: 'Möchten Sie fortfahren?'
   },
@@ -71,7 +72,7 @@ export const deDE: TigerLocale = {
   text: {
     copyLabel: 'Kopieren',
     copiedLabel: 'Kopiert',
-    copyFailedLabel: 'Kopieren fehlgeschlagen',
+    copyFailedLabel: 'Kopieren fehlgeschlagen'
   },
   watermark: {
     imageErrorText: 'Wasserzeichenbild konnte nicht geladen werden'
@@ -244,7 +245,8 @@ export const deDE: TigerLocale = {
     publishBlocked: 'Veröffentlichung blockiert, bis dies behoben ist'
   },
   workflowDetailShell: {
-    ariaLabel: 'Workflow-Details'
+    ariaLabel: 'Workflow-Details',
+    title: 'Genehmigung'
   },
   progress: {
     ariaLabel: 'Fortschritt'
@@ -360,7 +362,7 @@ export const deDE: TigerLocale = {
     finishText: 'Fertigstellen',
     closeAriaLabel: 'Tour schließen',
     dialogAriaLabel: 'Rundgang',
-    loadErrorText: 'Diese Tour konnte nicht geladen werden.',
+    loadErrorText: 'Diese Tour konnte nicht geladen werden.'
   },
   calendar: {
     previousMonth: 'Vorheriger Monat',
@@ -469,7 +471,7 @@ export const deDE: TigerLocale = {
     copyLabel: 'Kopieren',
     copiedLabel: 'Kopiert',
     copyFailedLabel: 'Kopieren fehlgeschlagen',
-    scrollLabel: 'Code'
+    scrollLabel: 'Quelltext'
   },
   commentThread: {
     emptyText: 'Keine Kommentare',
@@ -610,11 +612,11 @@ export const deDE: TigerLocale = {
     scatterChartAriaLabel: 'Streudiagramm',
     pieChartAriaLabel: 'Kreisdiagramm',
     radarChartAriaLabel: 'Netzdiagramm',
-    heatmapChartAriaLabel: 'Heatmap',
+    heatmapChartAriaLabel: 'Heatmap-Diagramm',
     heatmapSummary: '{rows} Zeilen und {columns} Spalten',
     funnelChartAriaLabel: 'Trichterdiagramm',
     sunburstChartAriaLabel: 'Sunburst-Diagramm',
-    treemapChartAriaLabel: 'Treemap',
+    treemapChartAriaLabel: 'Treemap-Diagramm',
     gaugeChartAriaLabel: 'Messgerät'
   },
   codeEditor: {

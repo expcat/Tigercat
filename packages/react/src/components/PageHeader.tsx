@@ -29,7 +29,7 @@ import {
 import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { Button } from './Button'
 import { Link } from './Link'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface PageHeaderProps
   extends

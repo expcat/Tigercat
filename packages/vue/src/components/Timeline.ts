@@ -25,7 +25,7 @@ import {
   type TimelineMode,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 type HChildren = Parameters<typeof h>[2]
 
@@ -91,16 +91,22 @@ export const Timeline = defineComponent({
     )
     const pendingSeen = ref<string | null>(null)
     const liveRegion = manageLiveRegion('polite')
-    watch(pendingSignature, (signature) => {
-      const previous = pendingSeen.value
-      if (previous === signature) return
-      pendingSeen.value = signature
-      if (previous === null && !signature) return
-      if (signature) liveRegion.announce(signature)
-      else if (previous) {
-        liveRegion.announce(mergedLocale.value?.timeline?.pendingReplacedText || 'Update finished')
-      }
-    }, { immediate: true })
+    watch(
+      pendingSignature,
+      (signature) => {
+        const previous = pendingSeen.value
+        if (previous === signature) return
+        pendingSeen.value = signature
+        if (previous === null && !signature) return
+        if (signature) liveRegion.announce(signature)
+        else if (previous) {
+          liveRegion.announce(
+            mergedLocale.value?.timeline?.pendingReplacedText || 'Update finished'
+          )
+        }
+      },
+      { immediate: true }
+    )
     onBeforeUnmount(() => liveRegion.destroy())
     const processedItems = computed(() =>
       processTimelineItems(props.items ?? EMPTY_TIMELINE_ITEMS, {

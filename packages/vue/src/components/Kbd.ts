@@ -93,11 +93,7 @@ export const Kbd = defineComponent({
       const parts = getKbdParts(props.keys, props.separator)
       const slotNodes = slots.default?.()
       const hasSlot = hasSlotContent(slotNodes)
-      const accessibleName = resolveKbdAccessibleName(
-        props.keys,
-        props.separator,
-        undefined
-      )
+      const accessibleName = resolveKbdAccessibleName(props.keys, props.separator)
       const isEmpty = !hasSlot && parts.length === 0
       const children: VNodeChild[] = []
 

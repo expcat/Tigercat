@@ -1,10 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CropUpload } from '@expcat/tigercat-react/CropUpload'
 import type { CropResult } from '@expcat/tigercat-core'
 
 export default function App() {
   const [result, setResult] = useState<CropResult | null>(null)
   const [error, setError] = useState('')
+  const [previewUrl, setPreviewUrl] = useState('')
+
+  useEffect(() => {
+    if (!result) {
+      setPreviewUrl('')
+      return
+    }
+    const url = URL.createObjectURL(result.blob)
+    setPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [result])
 
   return (
     <>
@@ -17,9 +28,9 @@ export default function App() {
         />
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         {result ? (
-          <p className="text-sm text-[var(--tiger-text-secondary)]">{result.file.name}</p>
+          <p className="text-sm text-[var(--tiger-text-secondary)]">{result.file?.name}</p>
         ) : null}
-        {result ? <img src={result.dataUrl} className="max-w-48 rounded" alt="裁剪结果" /> : null}
+        {previewUrl ? <img src={previewUrl} className="max-w-48 rounded" alt="裁剪结果" /> : null}
       </div>
     </>
   )

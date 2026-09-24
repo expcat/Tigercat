@@ -54,8 +54,8 @@ describe('qr contrast', () => {
     expect(qrNeedsContrastWarning('#cccccc', '#ffffff')).toBe(true)
   })
 
-  it('skips CSS variables', () => {
-    expect(qrColorContrast('var(--tiger-text)', 'var(--tiger-surface)')).toBeNull()
+  it('resolves theme CSS variables', () => {
+    expect(qrColorContrast('var(--tiger-text)', 'var(--tiger-surface)')).toBeGreaterThan(3)
     expect(qrNeedsContrastWarning('var(--tiger-text)', '#ffffff')).toBe(false)
   })
 })

@@ -13,7 +13,7 @@ import { Layout } from '@expcat/tigercat-react/Layout'
 import { Menu } from '@expcat/tigercat-react/Menu'
 import { Sidebar } from '@expcat/tigercat-react/Sidebar'
 import { Table } from '@expcat/tigercat-react/Table'
-import type { TableColumn } from '@expcat/tigercat-react'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 const backendSchema: MenuSchema = [
   { key: 'dashboard', label: '工作台', icon: 'dashboard', path: '/dashboard' },

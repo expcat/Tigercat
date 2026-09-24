@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AreaChart } from '@expcat/tigercat-vue/AreaChart'
-import type { AreaChartSeries } from '@expcat/tigercat-vue'
+import type { AreaChartSeries } from '@expcat/tigercat-core'
 
 const series: AreaChartSeries[] = [
   {

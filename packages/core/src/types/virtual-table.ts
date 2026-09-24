@@ -59,6 +59,8 @@ export interface VirtualTableProps<T = Record<string, unknown>> {
    * `undefined` is uncontrolled; an array (including `[]`) is controlled.
    */
   rowSelection?: RowSelectionConfig<T>
+  /** Fired when row selection changes. VirtualTable forwards this to Table. */
+  onSelectionChange?: (selectedKeys: (string | number)[]) => void
   /** Striped rows */
   striped?: boolean
   /** Bordered variant */

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { UploadFile } from '@expcat/tigercat-vue'
+import type { UploadFile } from '@expcat/tigercat-core'
 import { Upload } from '@expcat/tigercat-vue/Upload'
 
 const files = ref<UploadFile[]>([

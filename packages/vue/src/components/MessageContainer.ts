@@ -19,7 +19,7 @@ import {
 } from '@expcat/tigercat-core'
 import { createStatusIcon, createStatusIconWithLoading } from '../utils/icon-helpers'
 import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
-import { useResolvedTigerLocale } from './ConfigProvider'
+import { useResolvedTigerLocale } from './tiger-config'
 
 export interface VueMessageContainerProps {
   position?: MessagePosition
@@ -114,14 +114,22 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
           onPointerleave: () => emit('resume', message.id),
           onFocusin: (event: FocusEvent) => {
             const next = event.relatedTarget
-            if (next instanceof Node && event.currentTarget instanceof Node && event.currentTarget.contains(next)) {
+            if (
+              next instanceof Node &&
+              event.currentTarget instanceof Node &&
+              event.currentTarget.contains(next)
+            ) {
               return
             }
             emit('pause', message.id)
           },
           onFocusout: (event: FocusEvent) => {
             const next = event.relatedTarget
-            if (next instanceof Node && event.currentTarget instanceof Node && event.currentTarget.contains(next)) {
+            if (
+              next instanceof Node &&
+              event.currentTarget instanceof Node &&
+              event.currentTarget.contains(next)
+            ) {
               return
             }
             emit('resume', message.id)
@@ -142,9 +150,7 @@ export const MessageContainer = /* @__PURE__ */ defineComponent({
         },
         props.messages.map(renderMessageItem)
       )
-      return props.portal
-        ? renderVueOverlayOutlet(`message-${props.position}`, node)
-        : node
+      return props.portal ? renderVueOverlayOutlet(`message-${props.position}`, node) : node
     }
   }
 })

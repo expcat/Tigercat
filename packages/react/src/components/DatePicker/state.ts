@@ -33,7 +33,7 @@ import {
   type InputStatus
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
-import { useTigerConfig } from '../ConfigProvider'
+import { useTigerConfig } from '../tiger-config'
 import { useInputGroupContext } from '../InputGroup'
 import { useFormItemControlContext } from '../FormItemContext'
 import { isRangeDatePicker, type DatePickerProps, type DatePickerRangeResolvedValue } from './types'
@@ -154,9 +154,7 @@ export function useDatePickerController(props: DatePickerProps) {
   const now = props.now
 
   const calendarValue = isRangeMode
-    ? (previewRange?.[0] ??
-      (Array.isArray(committed) ? committed[0] : null) ??
-      null)
+    ? (previewRange?.[0] ?? (Array.isArray(committed) ? committed[0] : null) ?? null)
     : (committed as Date | null)
   const rangeHighlight = isRangeMode
     ? (previewRange ?? (Array.isArray(committed) ? committed : undefined))

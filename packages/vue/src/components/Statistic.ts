@@ -25,7 +25,7 @@ import {
   coerceClassValue,
   mergeTigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type VueStatisticProps = InstanceType<typeof Statistic>['$props']
 

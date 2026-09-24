@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@expcat/tigercat-vue/Icon'
-import { registerIcon, rocketIcon } from '@expcat/tigercat-core/icons/registry'
-
-registerIcon('rocket', rocketIcon)
+import { rocketIcon } from '@expcat/tigercat-core/icons/registry'
 </script>
 
 <template>
@@ -12,6 +10,6 @@ registerIcon('rocket', rocketIcon)
     <Icon name="bolt" aria-label="闪电" />
     <Icon name="chart-bar" aria-label="图表" />
     <Icon name="database" aria-label="数据库" />
-    <Icon name="rocket" aria-label="注册的 rocket" />
+    <Icon :icon="rocketIcon" aria-label="rocket" />
   </div>
 </template>

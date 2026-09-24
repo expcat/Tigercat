@@ -41,6 +41,17 @@ import { Input } from '../Input'
 import { InputNumber } from '../InputNumber'
 import { Select } from '../Select'
 
+function isRowRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object'
+}
+
+function cellSpanForUnknown(
+  span: number | ((record: Record<string, unknown>, index: number) => number) | undefined
+): number | ((record: unknown, index: number) => number) | undefined {
+  if (typeof span !== 'function') return span
+  return (record: unknown, index: number) => (isRowRecord(record) ? span(record, index) : 1)
+}
+
 export interface RenderBodyViewProps {
   size: TableSize
   hoverable: boolean
@@ -286,7 +297,11 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           const dataKey = column.dataKey || column.key
           const cellValue = record[dataKey]
 
-          const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, TABLE_FIXED_CELL_Z_INDEX)
+          const fixedStyle = getFixedColumnStyle(
+            column,
+            ctx.fixedColumnsInfo,
+            TABLE_FIXED_CELL_Z_INDEX
+          )
 
           const widthStyle = column.width
             ? {
@@ -316,13 +331,13 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
             <td
               key={column.key}
               rowSpan={
-                resolveCellSpan(column.rowSpan, record, sourceIndex) !== 1
-                  ? resolveCellSpan(column.rowSpan, record, sourceIndex)
+                resolveCellSpan(cellSpanForUnknown(column.rowSpan), record, sourceIndex) !== 1
+                  ? resolveCellSpan(cellSpanForUnknown(column.rowSpan), record, sourceIndex)
                   : undefined
               }
               colSpan={
-                resolveCellSpan(column.colSpan, record, sourceIndex) !== 1
-                  ? resolveCellSpan(column.colSpan, record, sourceIndex)
+                resolveCellSpan(cellSpanForUnknown(column.colSpan), record, sourceIndex) !== 1
+                  ? resolveCellSpan(cellSpanForUnknown(column.colSpan), record, sourceIndex)
                   : undefined
               }
               className={classNames(
@@ -353,7 +368,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
                 ) : column.edit === 'text' ? (
                   <Input
                     value={ctx.editingValue}
-                    onChange={(value) => ctx.setEditingValue(value)}
+                    onChange={(value) => ctx.setEditingValue(String(value))}
                     onBlur={ctx.commitEdit}
                   />
                 ) : (
@@ -427,7 +442,11 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
                 rowCursor = index + 1
                 return renderDataRow(record, index)
               })
-          const headerText = formatTableGroupHeaderText(labels.groupHeaderText, block.key, block.count)
+          const headerText = formatTableGroupHeaderText(
+            labels.groupHeaderText,
+            block.key,
+            block.count
+          )
           return (
             <React.Fragment key={`group-${block.key}-${block.continued ? 'cont' : 'new'}`}>
               {block.continued ? null : (

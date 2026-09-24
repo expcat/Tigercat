@@ -26,7 +26,7 @@ import {
   type TextColor,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type VueTextProps = TextProps
 
@@ -153,28 +153,32 @@ export const Text = defineComponent({
           )
         : undefined
 
-      return h(resolveCopyableTextTag(props.tag), { ...attrs, class: [textCopyableRootClasses, attrs.class] }, [
-        h(
-          'span',
-          {
-            ref: bodyRef,
-            class: bodyClass
-          },
-          content
-        ),
-        h(
-          'button',
-          {
-            type: 'button',
-            class: textCopyableButtonClasses,
-            'aria-label': buttonLabel.value,
-            title: buttonLabel.value,
-            onClick: handleCopy
-          },
-          copySvg
-        ),
-        h('span', { class: textCopyableLiveClasses, 'aria-live': 'polite' }, liveText.value)
-      ])
+      return h(
+        resolveCopyableTextTag(props.tag),
+        { ...attrs, class: [textCopyableRootClasses, attrs.class] },
+        [
+          h(
+            'span',
+            {
+              ref: bodyRef,
+              class: bodyClass
+            },
+            content
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              class: textCopyableButtonClasses,
+              'aria-label': buttonLabel.value,
+              title: buttonLabel.value,
+              onClick: handleCopy
+            },
+            copySvg
+          ),
+          h('span', { class: textCopyableLiveClasses, 'aria-live': 'polite' }, liveText.value)
+        ]
+      )
     }
   }
 })

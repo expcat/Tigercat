@@ -39,7 +39,7 @@ import { usePopup } from '../utils/use-popup'
 import { renderOverlayPortal } from '../utils/overlay'
 import { ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ImageProps
   extends

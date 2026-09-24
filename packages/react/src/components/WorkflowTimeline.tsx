@@ -59,7 +59,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Button } from './Button'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 import { Popconfirm } from './Popconfirm'
 import { Radio } from './Radio'
@@ -590,7 +590,10 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
                   ...disableOptions,
                   returnNoTargets: stepLabels.returnNoTargets
                 })
-                const needsDialog = shouldOpenWorkflowActionLayer(item, { confirm, commentRequired })
+                const needsDialog = shouldOpenWorkflowActionLayer(item, {
+                  confirm,
+                  commentRequired
+                })
                 return (
                   <DropdownItem
                     key={item.key}

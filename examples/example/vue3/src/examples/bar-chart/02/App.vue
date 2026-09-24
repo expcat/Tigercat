@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BarChart } from '@expcat/tigercat-vue/BarChart'
-import type { BarChartDatum } from '@expcat/tigercat-vue'
+import type { BarChartDatum } from '@expcat/tigercat-core'
 
 const data: BarChartDatum[] = [
   { x: '一月', y: 3200 },

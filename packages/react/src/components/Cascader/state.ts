@@ -54,7 +54,7 @@ import {
   type InputStatus
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
-import { useTigerConfig } from '../ConfigProvider'
+import { useTigerConfig } from '../tiger-config'
 import { useInputGroupContext } from '../InputGroup'
 import { useFormItemControlContext } from '../FormItemContext'
 import type { CascaderProps } from './types'
@@ -273,11 +273,7 @@ export function useCascaderController(props: CascaderProps) {
   }, [])
 
   const loadChildren = useCallback(
-    async (
-      option: CascaderOption,
-      path: CascaderValue,
-      intent: 'select' | 'expand'
-    ) => {
+    async (option: CascaderOption, path: CascaderValue, intent: 'select' | 'expand') => {
       if (!loadData || option.disabled) return
       const key = cascaderPathId(path)
       const token = nextLoadToken(loadTokensRef.current, key)

@@ -24,7 +24,7 @@ import {
 } from '@expcat/tigercat-core'
 import { createStatusIcon } from '../utils/icon-helpers'
 import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
-import { useResolvedTigerLocale } from './ConfigProvider'
+import { useResolvedTigerLocale } from './tiger-config'
 
 type HArrayChildren = Extract<NonNullable<Parameters<typeof h>[2]>, unknown[]>
 
@@ -240,9 +240,7 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
         },
         props.notifications.map(renderNotificationItem)
       )
-      return props.portal
-        ? renderVueOverlayOutlet(`notification-${props.position}`, node)
-        : node
+      return props.portal ? renderVueOverlayOutlet(`notification-${props.position}`, node) : node
     }
   }
 })

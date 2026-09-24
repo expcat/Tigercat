@@ -36,7 +36,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { RadarBind } from './w9-chart-bind'
 
 export interface RadarChartProps extends CoreRadarChartProps {
@@ -713,7 +713,9 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       ) : null}
       {bind?.indicators ? (
         <RadarBind
-          ratios={bind.indicators.map((indicator, index) => radarRatio(bind.values?.[index] ?? 0, indicator))}
+          ratios={bind.indicators.map((indicator, index) =>
+            radarRatio(bind.values?.[index] ?? 0, indicator)
+          )}
         />
       ) : null}
       {tooltip}

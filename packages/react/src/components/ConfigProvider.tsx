@@ -5,16 +5,15 @@ import {
   resolveTigerLocale,
   resolveTigerConfig,
   createDocumentConfigHandle,
-  readDocumentOwnerLocale,
   devWarn,
   type TigerConfig,
   type ConfigProviderProps as CoreConfigProviderProps,
   type TigerLocale,
   type DocumentConfigHandle
 } from '@expcat/tigercat-core'
-import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import { FeedbackDepthContext, FeedbackHost } from './FeedbackHost'
+import { FALLBACK_CONFIG, TigerConfigContext } from './tiger-config'
 import {
   createTigerLocaleScope,
   createTigerThemeScope,
@@ -25,9 +24,7 @@ import {
 } from '@expcat/tigercat-core'
 
 export type { TigerConfig }
-
-const FALLBACK_CONFIG: TigerConfig = { locale: enUS }
-const TigerConfigContext = React.createContext<TigerConfig>(FALLBACK_CONFIG)
+export { useResolvedTigerLocale, useTigerConfig } from './tiger-config'
 
 export interface ConfigProviderProps extends CoreConfigProviderProps {
   children?: React.ReactNode
@@ -195,16 +192,3 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
 }
 
 ConfigProvider.displayName = 'TigerConfigProvider'
-
-/**
- * Locale for this tree, or the document owner's locale when this tree has no provider.
- */
-export function useResolvedTigerLocale(): Partial<TigerLocale> | undefined {
-  const config = useContext(TigerConfigContext)
-  if (config !== FALLBACK_CONFIG) return config.locale
-  return readDocumentOwnerLocale()
-}
-
-export function useTigerConfig(): TigerConfig {
-  return useContext(TigerConfigContext)
-}

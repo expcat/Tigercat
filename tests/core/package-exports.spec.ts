@@ -23,7 +23,13 @@ describe('package exports', () => {
 
     for (const framework of ['react', 'vue'] as const) {
       const packageJson = readPackageJson(`packages/${framework}/package.json`)
-      const expectedExports = buildFrameworkPackageExports(publicComponents[framework], framework)
+      const indexFile =
+        framework === 'react' ? 'packages/react/src/index.tsx' : 'packages/vue/src/index.ts'
+      const expectedExports = buildFrameworkPackageExports(
+        publicComponents[framework],
+        framework,
+        readFileSync(resolve(root, indexFile), 'utf-8')
+      )
 
       expect(packageJson.exports).toEqual(expectedExports)
       expect(packageJson.exports).not.toHaveProperty('./*')

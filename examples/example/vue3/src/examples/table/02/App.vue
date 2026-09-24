@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Table } from '@expcat/tigercat-vue/Table'
-import type { SortState, TableColumn } from '@expcat/tigercat-vue'
+import type { SortState, TableColumn } from '@expcat/tigercat-core'
 
 const columns: TableColumn[] = [
   { key: 'name', title: '姓名', sortable: true, filter: { type: 'text' } },

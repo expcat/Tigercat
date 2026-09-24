@@ -20,7 +20,7 @@ import {
   type MenuMode
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
-import { useTigerConfig } from '../ConfigProvider'
+import { useTigerConfig } from '../tiger-config'
 import { useSidebarContext } from '../../utils/layout-context'
 import type { MenuContextValue, MenuProps, MenuRootState } from './types'
 import { collectReactMenuKeys } from './render'
@@ -228,10 +228,6 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
     filteredItems,
     items: useItems ? items : undefined,
     children: useItems ? undefined : children,
-    displayedOpenKeys: resolveDisplayedOpenKeys({
-      openKeys,
-      searchExpandKeys: expandKeys
-    }),
     empty
   }
 }

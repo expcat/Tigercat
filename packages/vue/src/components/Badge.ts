@@ -23,7 +23,7 @@ import {
   type BadgePosition,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueBadgeProps extends BadgeProps {
   style?: Record<string, string | number>

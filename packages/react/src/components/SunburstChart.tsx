@@ -27,7 +27,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { DrillHost } from './w9-chart-bind'
 
 export interface SunburstChartProps extends CoreSunburstChartProps {
@@ -153,7 +153,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
         selectedIndex: resolvedSelectedIndex,
         getLabel: (d) => d.label,
         getColor: (_d, i) => roots[i]?.color ?? palette[i % palette.length],
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       }).map((item, i) => ({
         ...item,

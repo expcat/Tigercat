@@ -50,14 +50,9 @@ export function followCalendarValue(
   return { viewYear: next.getFullYear(), viewMonth: next.getMonth() }
 }
 
-export function shiftCalendarMonth(view: CalendarPanelView, delta: number): CalendarPanelView {
+export function shiftCalendarPanel(view: CalendarPanelView, delta: number): CalendarPanelView {
   const next = addMonths(panelDate(view), delta)
   return { viewYear: next.getFullYear(), viewMonth: next.getMonth() }
-}
-
-/** Panel shift. The barrel also exports a year/month helper with the same name. */
-export function shiftCalendarPanel(view: CalendarPanelView, delta: number): CalendarPanelView {
-  return shiftCalendarMonth(view, delta)
 }
 
 export function shiftCalendarYear(view: CalendarPanelView, delta: number): CalendarPanelView {

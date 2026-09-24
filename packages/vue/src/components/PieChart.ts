@@ -31,7 +31,6 @@ import {
   type ChartPadding,
   type PieChartDatum,
   type PieChartProps as CorePieChartProps,
-
   type TigerLocale,
   type TigerLocaleChart
 } from '@expcat/tigercat-core'
@@ -41,7 +40,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { renderPieBind } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VuePieChartProps extends CorePieChartProps {
   data: PieChartDatum[]
@@ -179,7 +178,7 @@ export const PieChart = defineComponent({
         innerRadius: radii.value.innerRadius,
         outerRadius: radii.value.outerRadius,
         startAngle: props.startAngle,
-        endAngle: props.endAngle,
+        endAngle: props.endAngle ?? props.startAngle + Math.PI * 2,
         padAngle: props.padAngle,
         palette: palette.value,
         gradient: props.gradient,
@@ -204,7 +203,7 @@ export const PieChart = defineComponent({
             ? props.legendFormatter(slice.datum, slice.index)
             : sliceName(slice.datum, slice.index),
         getColor: (slice) => slice.color,
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       })
     )
@@ -367,25 +366,26 @@ export const PieChart = defineComponent({
                         'aria-hidden': interactive.value ? 'true' : undefined
                       },
                       [
-                      h('polyline', {
-                        points: slice.outside?.points,
-                        fill: 'none',
-                        stroke: slice.color,
-                        'stroke-width': 1,
-                        opacity: 0.5
-                      }),
-                      h(
-                        'text',
-                        {
-                          x: slice.outside?.x,
-                          y: slice.outside?.y,
-                          'text-anchor': slice.outside?.textAnchor,
-                          'dominant-baseline': 'middle',
-                          class: 'fill-[color:var(--tiger-text)] text-xs'
-                        },
-                        text
-                      )
-                    ])
+                        h('polyline', {
+                          points: slice.outside?.points,
+                          fill: 'none',
+                          stroke: slice.color,
+                          'stroke-width': 1,
+                          opacity: 0.5
+                        }),
+                        h(
+                          'text',
+                          {
+                            x: slice.outside?.x,
+                            y: slice.outside?.y,
+                            'text-anchor': slice.outside?.textAnchor,
+                            'dominant-baseline': 'middle',
+                            class: 'fill-[color:var(--tiger-text)] text-xs'
+                          },
+                          text
+                        )
+                      ]
+                    )
                   })
                 : []
             const insideLabels =

@@ -68,7 +68,7 @@ import {
   useVueFocusTrap,
   useVueOverlayPortalTarget
 } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueDrawerProps {
   open?: boolean
@@ -461,9 +461,7 @@ export const Drawer = defineComponent({
         if (nextVisible) {
           hasOpened.value = true
           leaving.value = false
-          onCleanup(
-            whenOverlayTransitionEnds(dialogRef.value, () => emit('after-enter'))
-          )
+          onCleanup(whenOverlayTransitionEnds(dialogRef.value, () => emit('after-enter')))
           return
         }
         if (prevVisible !== true) return
@@ -525,13 +523,14 @@ export const Drawer = defineComponent({
           }
         : undefined
       const push =
-        layerId.value == null ? { x: 0, y: 0 } : drawerPushOffset(layerId.value, resolvedPlacement.value)
+        layerId.value == null
+          ? { x: 0, y: 0 }
+          : drawerPushOffset(layerId.value, resolvedPlacement.value)
       const follow =
-        sheetOffset.value > 0 ? drawerFollowTransform(resolvedPlacement.value, sheetOffset.value) : ''
-      const transform = [
-        push.x || push.y ? `translate(${push.x}px, ${push.y}px)` : '',
-        follow
-      ]
+        sheetOffset.value > 0
+          ? drawerFollowTransform(resolvedPlacement.value, sheetOffset.value)
+          : ''
+      const transform = [push.x || push.y ? `translate(${push.x}px, ${push.y}px)` : '', follow]
         .filter(Boolean)
         .join(' ')
       const lengthStyle =
@@ -616,13 +615,13 @@ export const Drawer = defineComponent({
 
       const mask =
         props.mask && layerId.value != null && drawerShowsMask(layerId.value, true)
-        ? h('div', {
-            class: maskClasses,
-            onClick: handleMaskClick,
-            'aria-hidden': 'true',
-            'data-tiger-drawer-mask': ''
-          })
-        : null
+          ? h('div', {
+              class: maskClasses,
+              onClick: handleMaskClick,
+              'aria-hidden': 'true',
+              'data-tiger-drawer-mask': ''
+            })
+          : null
 
       const panel = h(
         'div',
@@ -663,7 +662,13 @@ export const Drawer = defineComponent({
                       ? { right: '0', top: '0', bottom: '0', width: '8px', cursor: 'ew-resize' }
                       : resolvedPlacement.value === 'bottom'
                         ? { top: '0', left: '0', right: '0', height: '8px', cursor: 'ns-resize' }
-                        : { bottom: '0', left: '0', right: '0', height: '8px', cursor: 'ns-resize' })
+                        : {
+                            bottom: '0',
+                            left: '0',
+                            right: '0',
+                            height: '8px',
+                            cursor: 'ns-resize'
+                          })
                 },
                 onPointerdown: (event: PointerEvent) => {
                   if (event.button !== 0) return

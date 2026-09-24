@@ -17,7 +17,7 @@ import {
   devWarn,
   type QRCodeProps as CoreQRCodeProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface QRCodeProps
   extends Omit<CoreQRCodeProps, 'icon'>, Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
@@ -53,7 +53,7 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
   const failed = !encoded.ok
   const matrix = encoded.ok ? encoded.matrix : []
   const viewBox = qrViewBoxSize(matrix.length || 1)
-  const scannedText = basicLabel(mergedLocale.locale, 'qrcode', 'scanned')
+  const scannedText = basicLabel(mergedLocale?.locale, 'qrcode', 'scanned')
   const iconPath = typeof icon === 'string' ? icon : undefined
   const iconNode = typeof icon === 'string' ? null : icon
   const statusText = failed

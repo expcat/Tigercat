@@ -48,7 +48,13 @@ import {
 } from '@expcat/tigercat-core'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
+
+function numericInputNumber(value: number | string | null | undefined): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value === 'string') return parseInputNumberValue(value)
+  return null
+}
 
 export interface VueInputNumberProps extends Omit<CoreInputNumberProps, 'value' | 'defaultValue'> {
   modelValue?: number | string | null
@@ -242,7 +248,10 @@ export const InputNumber = defineComponent({
       { flush: 'post' }
     )
 
-    function commit(val: number | string | null, nextFocused = focused.value): number | string | null {
+    function commit(
+      val: number | string | null,
+      nextFocused = focused.value
+    ): number | string | null {
       const { value: next, changed } = commitInputNumberModel(val, currentValue.value, {
         min: props.min,
         max: props.max,
@@ -266,7 +275,16 @@ export const InputNumber = defineComponent({
     ): number | string | null {
       if (effectiveDisabled.value || props.readOnly) return baseValue ?? null
       if (typeof baseValue === 'string') {
-        return commit(stepInputNumberModel(baseValue, props.step, direction, props.min, props.max, props.precision))
+        return commit(
+          stepInputNumberModel(
+            baseValue,
+            props.step,
+            direction,
+            props.min,
+            props.max,
+            props.precision
+          )
+        )
       }
       const next = stepValue(
         baseValue,
@@ -291,15 +309,16 @@ export const InputNumber = defineComponent({
       return (event: PointerEvent) => {
         event.preventDefault()
         if (effectiveDisabled.value || props.readOnly) return
-        if (direction === 'down' && isAtMin(currentValue.value, props.min)) return
-        if (direction === 'up' && isAtMax(currentValue.value, props.max)) return
+        if (direction === 'down' && isAtMin(numericInputNumber(currentValue.value), props.min))
+          return
+        if (direction === 'up' && isAtMax(numericInputNumber(currentValue.value), props.max)) return
 
         suppressNextClick = true
-        repeatValue = currentValue.value
+        repeatValue = numericInputNumber(currentValue.value)
         repeatController.start(() => {
           const baseValue = repeatValue
           const nextValue = handleStep(direction, baseValue)
-          repeatValue = nextValue
+          repeatValue = numericInputNumber(nextValue)
           if (nextValue === baseValue) repeatController.stop()
         })
         inputRef.value?.focus()
@@ -331,13 +350,17 @@ export const InputNumber = defineComponent({
       if (e.key === 'Enter') {
         commit(parseValue(displayValue.value))
       } else {
-        const next = getInputNumberKeyboardNextValue(e.key, currentValue.value, {
-          min: props.min,
-          max: props.max,
-          step: props.step,
-          precision: props.precision,
-          keyboard: props.keyboard && !effectiveDisabled.value && !props.readOnly
-        })
+        const next = getInputNumberKeyboardNextValue(
+          e.key,
+          numericInputNumber(currentValue.value),
+          {
+            min: props.min,
+            max: props.max,
+            step: props.step,
+            precision: props.precision,
+            keyboard: props.keyboard && !effectiveDisabled.value && !props.readOnly
+          }
+        )
         if (next !== undefined) {
           e.preventDefault()
           commit(next)
@@ -346,8 +369,8 @@ export const InputNumber = defineComponent({
       emit('keydown', e)
     }
 
-    const atMin = computed(() => isAtMin(currentValue.value, props.min))
-    const atMax = computed(() => isAtMax(currentValue.value, props.max))
+    const atMin = computed(() => isAtMin(numericInputNumber(currentValue.value), props.min))
+    const atMax = computed(() => isAtMax(numericInputNumber(currentValue.value), props.max))
     const layout = computed(() =>
       resolveInputNumberControlsLayout(props.controls, props.controlsPosition)
     )
@@ -395,7 +418,7 @@ export const InputNumber = defineComponent({
         currentValue.value == null
           ? labels.value.emptyAriaValueText
           : props.formatter
-            ? props.formatter(currentValue.value)
+            ? props.formatter(numericInputNumber(currentValue.value) ?? undefined)
             : String(currentValue.value)
 
       if (layout.value === 'both') {
@@ -530,7 +553,9 @@ export const InputNumber = defineComponent({
         )
       }
 
-      if (shouldSubmitNativeField({ name: effectiveName.value, disabled: effectiveDisabled.value })) {
+      if (
+        shouldSubmitNativeField({ name: effectiveName.value, disabled: effectiveDisabled.value })
+      ) {
         children.push(
           h('input', {
             type: 'hidden',

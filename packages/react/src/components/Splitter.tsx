@@ -36,7 +36,7 @@ import {
   type DocumentDragSession,
   type SplitterProps as CoreSplitterProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface SplitterResizeEvent {
   index: number
@@ -118,10 +118,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
     startSizes: number[]
   } | null>(null)
 
-  const bounds = useMemo(
-    () => normalizeSplitterBounds(paneCount, min, max),
-    [max, min, paneCount]
-  )
+  const bounds = useMemo(() => normalizeSplitterBounds(paneCount, min, max), [max, min, paneCount])
   const boxes = layoutDeclaredPanes(
     dragPixels ?? controlledSizes,
     paneCount,
@@ -315,7 +312,10 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
       aria-label={typeof ariaLabel === 'string' ? ariaLabel : undefined}
       aria-labelledby={typeof ariaLabelledby === 'string' ? ariaLabelledby : undefined}>
       {panes.map((child, i) => {
-        const paneStyle = getPaneStyle(boxes[i] ?? { kind: 'flex', pixels: null, flexGrow: 1 }, orientation)
+        const paneStyle = getPaneStyle(
+          boxes[i] ?? { kind: 'flex', pixels: null, flexGrow: 1 },
+          orientation
+        )
         const paneId = `${instanceId}-pane-${i}`
         const isDragging = draggingIndex === i
 
@@ -345,7 +345,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
                         : restoreSplitterSize(base, i, stored)
                     setCollapsedPrevious((current) => {
                       const copy = current.slice()
-                      copy[i] = stored == null ? (collapseSplitterSizes(base, i).previous) : null
+                      copy[i] = stored == null ? collapseSplitterSizes(base, i).previous : null
                       return copy
                     })
                     const numeric = nextSizes.map((size) => (typeof size === 'number' ? size : 0))

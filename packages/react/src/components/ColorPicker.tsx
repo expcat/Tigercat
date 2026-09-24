@@ -56,7 +56,7 @@ import {
   useFocusTrap
 } from '../utils/overlay'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FormItemControlProvider, useFormItemControlContext } from './FormItemContext'
 import { ColorSwatch } from './ColorSwatch'
 
@@ -594,9 +594,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           <FormItemControlProvider value={null}>
             <ColorSwatch
               colors={presets}
-              value={
-                hasValue ? formatHsva(paintableHsva!, format, showAlpha) : undefined
-              }
+              value={hasValue ? formatHsva(paintableHsva!, format, showAlpha) : undefined}
               columns={Math.min(8, presets.length)}
               size="sm"
               readOnly={readOnly}

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Tree } from '@expcat/tigercat-vue/Tree'
-import type { TreeNode } from '@expcat/tigercat-vue'
+import type { TreeNode } from '@expcat/tigercat-core'
 
 const treeData: TreeNode[] = Array.from({ length: 8 }, (_, group) => ({
   key: `g-${group}`,

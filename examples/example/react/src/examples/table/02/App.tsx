@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Table } from '@expcat/tigercat-react/Table'
-import type { SortState, TableColumn } from '@expcat/tigercat-react'
+import type { SortState, TableColumn } from '@expcat/tigercat-core'
 
 interface Row extends Record<string, unknown> {
   id: number

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { UploadFile } from '@expcat/tigercat-react'
+import type { UploadFile } from '@expcat/tigercat-core'
 import { Upload } from '@expcat/tigercat-react/Upload'
 
 const initialFiles: UploadFile[] = [

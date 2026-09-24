@@ -278,7 +278,8 @@ describe('i18n locale presets', () => {
     expect(getCodeLabels()).toEqual({
       copyLabel: 'Copy',
       copiedLabel: 'Copied',
-      copyFailedLabel: 'Copy failed'
+      copyFailedLabel: 'Copy failed',
+      scrollLabel: 'Code'
     })
   })
 
@@ -287,7 +288,8 @@ describe('i18n locale presets', () => {
     expect(getCodeLabels(zhCN)).toEqual({
       copyLabel: '复制',
       copiedLabel: '已复制',
-      copyFailedLabel: '复制失败'
+      copyFailedLabel: '复制失败',
+      scrollLabel: '代码'
     })
   })
 

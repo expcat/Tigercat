@@ -7,7 +7,6 @@ import {
   getProgressLabels,
   getProgressStrokeClasses,
   getProgressTextColorClasses,
-
   progressCircleBaseClasses,
   progressCircleTextClasses,
   progressCircleTrackStrokeClasses,
@@ -20,7 +19,7 @@ import {
   resolveProgressView,
   type ProgressProps as CoreProgressProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ProgressProps
   extends CoreProgressProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreProgressProps> {}

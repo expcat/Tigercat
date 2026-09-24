@@ -207,9 +207,8 @@ async function smokeExamples(tarballs) {
       [
         'install',
         '--no-audit',
-        '--fund=false',
+        '--fund=false'
         // npm 10 arborist crashes on Nuxt 4's peer tree (`edgesOut` of null).
-
       ],
       example.dir
     )
@@ -585,7 +584,7 @@ function removeDirWithRetry(dir, attempts = 5, waitMs = 1000) {
 async function verifyInstalledPackages(tempDir, version) {
   assertInstalledPackagesHaveNoCjsArtifacts(tempDir)
 
-  const core = await importFromTemp(tempDir, '@expcat/tigercat-core')
+  const tailwind = await importFromTemp(tempDir, '@expcat/tigercat-core/tailwind')
   const vue = await importFromTemp(tempDir, 'vue')
   const vueServer = await importFromTemp(tempDir, '@vue/server-renderer')
   const vueLib = await importFromTemp(tempDir, '@expcat/tigercat-vue')
@@ -593,7 +592,7 @@ async function verifyInstalledPackages(tempDir, version) {
   const reactServer = await importFromTemp(tempDir, 'react-dom/server')
   const reactLib = await importFromTemp(tempDir, '@expcat/tigercat-react')
 
-  if (typeof core.createTigercatPlugin !== 'function') {
+  if (typeof tailwind.createTigercatPlugin !== 'function') {
     throw new Error('core export createTigercatPlugin is missing')
   }
 

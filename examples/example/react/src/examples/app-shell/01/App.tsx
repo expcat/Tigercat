@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AppShell } from '@expcat/tigercat-react'
+import { AppShell } from '@expcat/tigercat-react/AppShell'
 
 const routes = [
   { key: 'home', title: 'Home' },

@@ -103,7 +103,9 @@ export function useTableState(
     () => props.columns.map((column) => `${column.key}\u0001${column.fixed ?? ''}`).join('\0'),
     () => {
       if (isColumnFixedControlled.value) {
-        parentFixed.value = Object.fromEntries(props.columns.map((column) => [column.key, column.fixed]))
+        parentFixed.value = Object.fromEntries(
+          props.columns.map((column) => [column.key, column.fixed])
+        )
         return
       }
       const next = { ...fixedOverrides.value }
@@ -120,7 +122,9 @@ export function useTableState(
         }
       }
       if (changed) fixedOverrides.value = next
-      parentFixed.value = Object.fromEntries(props.columns.map((column) => [column.key, column.fixed]))
+      parentFixed.value = Object.fromEntries(
+        props.columns.map((column) => [column.key, column.fixed])
+      )
     },
     { immediate: true }
   )
@@ -384,7 +388,9 @@ export function useTableState(
       }
     }
     if (props.rowSelection && props.rowSelection.showCheckbox === false) {
-      const selected = selectedRowKeys.value.some((item) => tableRowKeyId(item) === tableRowKeyId(key))
+      const selected = selectedRowKeys.value.some(
+        (item) => tableRowKeyId(item) === tableRowKeyId(key)
+      )
       handleSelectRow(key, !selected)
     }
   }
@@ -485,13 +491,7 @@ export function useTableState(
       column,
       value
     )
-    emit(
-      'cell-change',
-      editingCell.value.rowIndex,
-      editingCell.value.columnKey,
-      value,
-      nextData
-    )
+    emit('cell-change', editingCell.value.rowIndex, editingCell.value.columnKey, value, nextData)
     editingCell.value = null
   }
 
@@ -591,9 +591,10 @@ export function useTableState(
   }
 
   function handleRowDrop(targetKey: string | number) {
-    if (dragRowKey.value === null || dragRowKey.value === targetKey) return
+    const dragging = dragRowKey.value
+    if (dragging === null || dragging === targetKey) return
     const from = sourceRowKeys.value.findIndex(
-      (key) => tableRowKeyId(key) === tableRowKeyId(dragRowKey.value)
+      (key) => tableRowKeyId(key) === tableRowKeyId(dragging)
     )
     const to = sourceRowKeys.value.findIndex(
       (key) => tableRowKeyId(key) === tableRowKeyId(targetKey)

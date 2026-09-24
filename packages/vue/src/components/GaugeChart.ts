@@ -26,7 +26,7 @@ import { ChartCanvas } from './ChartCanvas'
 import { ChartTooltip } from './ChartTooltip'
 import { renderGaugeBind } from './w9-chart-bind'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueGaugeChartProps extends CoreGaugeChartProps {
   padding?: ChartPadding

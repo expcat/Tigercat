@@ -1,5 +1,5 @@
 import { RadarChart } from '@expcat/tigercat-react/RadarChart'
-import type { RadarChartDatum } from '@expcat/tigercat-react'
+import type { RadarChartDatum } from '@expcat/tigercat-core'
 
 const data: RadarChartDatum[] = [
   { label: '速度', value: 80 },

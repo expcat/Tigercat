@@ -51,7 +51,7 @@ import {
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Button } from './Button'
 import { Checkbox } from './Checkbox'
 import { Empty } from './Empty'
@@ -297,7 +297,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           expanded: boolean
         ) => void)
       | undefined,
-    onCellChange,
+    onCellChange: onCellChange
+      ? (rowIndex, columnKey, newValue, nextData) => {
+          onCellChange(rowIndex, columnKey, newValue, nextData as T[])
+        }
+      : undefined,
     onColumnOrderChange: onColumnOrderChange as ((columns: TableColumn[]) => void) | undefined,
     onColumnFixedChange: onColumnFixedChange as TableProps['onColumnFixedChange'],
     onRowOrderChange: onRowOrderChange as ((rows: Record<string, unknown>[]) => void) | undefined,
@@ -358,7 +362,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     if (!previous || !liveRegion.current) return
     if (previous.count !== selectedCount) {
       liveRegion.current.announce(
-        formatTableSelectionCount(tableLabels.selectionCountText, selectedCount, tableLocale?.locale)
+        formatTableSelectionCount(
+          tableLabels.selectionCountText,
+          selectedCount,
+          tableLocale?.locale
+        )
       )
     }
     if (previous.sort !== sortSignature && ctx.sortState.key && ctx.sortState.direction) {
@@ -665,7 +673,6 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         processedRecords={ctx.processedData}
         processedKeys={ctx.processedRowKeys}
         selectedKeys={ctx.selectedRowKeys ?? []}
-        remote={internalRowSelection?.remote === true}
         onSort={(key) => ctx.applyMultiSort(key)}
         onFilter={(key, value) => ctx.handleFilter(key, value)}
         onHide={(key) => {
@@ -749,7 +756,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             </div>
           ) : null}
           {loading ? null : ctx.paginatedData.length === 0 ? (
-            <div className={getTableResponsiveCardClasses(cardPadding)} role="status" aria-live="polite">
+            <div
+              className={getTableResponsiveCardClasses(cardPadding)}
+              role="status"
+              aria-live="polite">
               <Empty showImage={false} description={tableLabels.emptyText} />
             </div>
           ) : (
@@ -767,8 +777,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                   cardHeightWindow
                     ? cardHeightWindow.end
                     : effectiveVirtual && virtualWindow
-                    ? virtualWindow.endIndex + 1
-                    : ctx.paginatedData.length
+                      ? virtualWindow.endIndex + 1
+                      : ctx.paginatedData.length
                 )
                 .map((record, offset) => {
                   const index =

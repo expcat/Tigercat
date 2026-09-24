@@ -44,14 +44,12 @@ export const virtualTableHeaderCellClasses =
 export const virtualTableRowClasses =
   'group tiger-motion-aware [&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]'
 
-export const virtualTableRowHoverClasses =
-  'hover:bg-[var(--tiger-table-hover-bg)]'
+export const virtualTableRowHoverClasses = 'hover:bg-[var(--tiger-table-hover-bg)]'
 
 export const virtualTableRowFocusClasses =
   'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
-export const virtualTableRowStripedClasses =
-  'bg-[var(--tiger-table-stripe-bg)]/50'
+export const virtualTableRowStripedClasses = 'bg-[var(--tiger-table-stripe-bg)]/50'
 
 export const virtualTableRowSelectedClasses = 'bg-[var(--tiger-primary)]/5'
 
@@ -233,7 +231,8 @@ export function scrollTopToRevealVirtualTableRow(input: {
   const scrollTop = Number.isFinite(input.scrollTop) ? Math.max(0, input.scrollTop) : 0
   const viewport = Number.isFinite(input.viewportHeight) ? Math.max(0, input.viewportHeight) : 0
   const header = Number.isFinite(input.headerHeight) ? Math.max(0, input.headerHeight) : 0
-  const itemHeight = Number.isFinite(input.itemHeight) && input.itemHeight > 0 ? input.itemHeight : 0
+  const itemHeight =
+    Number.isFinite(input.itemHeight) && input.itemHeight > 0 ? input.itemHeight : 0
   const offset = Math.max(0, input.index) * itemHeight
   const visibleTop = scrollTop + header
   const visibleBottom = scrollTop + viewport
@@ -270,7 +269,7 @@ export interface VirtualTableRowIdentity {
 export function resolveVirtualTableRowIdentity<T>(
   row: T,
   index: number,
-  rowKey?: keyof T | ((row: T, index: number) => string | number),
+  rowKey?: PropertyKey | ((row: T, index: number) => string | number),
   used: Set<string> = new Set()
 ): VirtualTableRowIdentity {
   const resolved = rowKey ?? ('id' as keyof T)

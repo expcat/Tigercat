@@ -56,7 +56,7 @@ import {
   type ImageAnnotationProps as CoreImageAnnotationProps,
   type ImageAnnotationTool
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 
 export interface ImageAnnotationProps
@@ -386,7 +386,15 @@ export function ImageAnnotation({
       })
       dragSessionRef.current = session
     },
-    [canEdit, commitAnnotation, getPointFromEvent, labels.annotationTooSmallText, minSize, nextId, resolvedTool]
+    [
+      canEdit,
+      commitAnnotation,
+      getPointFromEvent,
+      labels.annotationTooSmallText,
+      minSize,
+      nextId,
+      resolvedTool
+    ]
   )
 
   const handleStageClick = useCallback(
@@ -739,7 +747,10 @@ export function ImageAnnotation({
 
       <div
         ref={sizeHostRef}
-        className={classNames(imageAnnotationStageClasses, drawingStroke && imageAnnotationDrawingClasses)}
+        className={classNames(
+          imageAnnotationStageClasses,
+          drawingStroke && imageAnnotationDrawingClasses
+        )}
         style={getImageAnnotationStageStyle()}
         data-tiger-annotation-stage=""
         role="group"

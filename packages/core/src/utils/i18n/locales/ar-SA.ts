@@ -24,6 +24,7 @@ export const arSA: TigerLocale = {
     closeMessageAriaLabel: 'إغلاق الرسالة',
     closeNotificationAriaLabel: 'إغلاق الإشعار',
     sidebarAriaLabel: 'الشريط الجانبي',
+    skipToContent: 'تخطي إلى المحتوى الرئيسي',
     moreOptionsText: 'المزيد من الخيارات',
     confirmTitle: 'هل أنت متأكد أنك تريد المتابعة؟'
   },
@@ -71,7 +72,7 @@ export const arSA: TigerLocale = {
   text: {
     copyLabel: 'نسخ',
     copiedLabel: 'تم النسخ',
-    copyFailedLabel: 'فشل النسخ',
+    copyFailedLabel: 'فشل النسخ'
   },
   watermark: {
     imageErrorText: 'تعذر تحميل صورة العلامة المائية'
@@ -243,7 +244,8 @@ export const arSA: TigerLocale = {
     publishBlocked: 'لا يمكن النشر حتى إصلاح هذه العناصر'
   },
   workflowDetailShell: {
-    ariaLabel: 'تفاصيل سير العمل'
+    ariaLabel: 'تفاصيل سير العمل',
+    title: 'موافقة'
   },
   progress: {
     ariaLabel: 'التقدم'
@@ -359,7 +361,7 @@ export const arSA: TigerLocale = {
     finishText: 'إنهاء',
     closeAriaLabel: 'إغلاق الجولة',
     dialogAriaLabel: 'الجولة الإرشادية',
-    loadErrorText: 'تعذر تحميل هذه الجولة.',
+    loadErrorText: 'تعذر تحميل هذه الجولة.'
   },
   calendar: {
     previousMonth: 'الشهر السابق',

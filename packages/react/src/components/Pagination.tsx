@@ -41,7 +41,7 @@ import {
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
 import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface PaginationProps
   extends Omit<CorePaginationProps, 'style'>, Omit<React.HTMLAttributes<HTMLElement>, 'onChange'> {

@@ -47,7 +47,7 @@ import {
   useVueEscapeKey,
   useVueFocusTrap
 } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export type VueNumberKeyboardProps = InstanceType<typeof NumberKeyboard>['$props']
@@ -326,7 +326,8 @@ export const NumberKeyboard = defineComponent({
                     keyRefs.value[index] = el instanceof HTMLButtonElement ? el : null
                   },
                   type: 'button',
-                  tabindex: interactive.value.includes(index) && index === activeIndex.value ? 0 : -1,
+                  tabindex:
+                    interactive.value.includes(index) && index === activeIndex.value ? 0 : -1,
                   class: getNumberKeyboardKeyClasses(
                     key,
                     effectiveDisabled.value || !!key.disabled,
@@ -368,11 +369,7 @@ export const NumberKeyboard = defineComponent({
         mergeAriaDescribedBy(attrDescribedBy, invalidValue.value ? errorId : undefined),
         formItemControl?.describedBy.value
       )
-      const groupTabIndex = effectiveDisabled.value
-        ? -1
-        : interactive.value.length > 0
-          ? -1
-          : 0
+      const groupTabIndex = effectiveDisabled.value ? -1 : interactive.value.length > 0 ? -1 : 0
 
       return h(
         'div',

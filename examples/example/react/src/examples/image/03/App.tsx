@@ -7,7 +7,7 @@ export default function App() {
       alt="悬停或聚焦查看大图"
       width={240}
       height={150}
-      previewTrigger="hover"
+      preview
     />
   )
 }

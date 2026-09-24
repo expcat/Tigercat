@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { AppShell } from '@expcat/tigercat-vue'
+import { AppShell } from '@expcat/tigercat-vue/AppShell'
 
 const routes = [
   { key: 'home', title: 'Home' },
@@ -16,8 +16,7 @@ const active = ref('home')
     :tabs="routes"
     :active-tab="active"
     :breadcrumb="[{ title: 'Home' }]"
-    @tab-change="active = $event"
-  >
+    @tab-change="active = $event">
     <template #sidebar>Menu</template>
     <p>{{ active }}</p>
   </AppShell>

@@ -3,7 +3,7 @@ import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 import { Button } from './Button'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import {
   classNames,
   coerceClassValue,
@@ -149,9 +149,9 @@ export const Popconfirm = defineComponent({
     const handleConfirm = async () => {
       if (confirming.value) return
       const event = createDismissActionEvent()
-      const propsRecord = vueInstance?.vnode.props as
-        | { onConfirm?: (event: ReturnType<typeof createDismissActionEvent>) => unknown }
-        | null
+      const propsRecord = vueInstance?.vnode.props as {
+        onConfirm?: (event: ReturnType<typeof createDismissActionEvent>) => unknown
+      } | null
       const handler = propsRecord?.onConfirm
       let result: unknown
       try {
@@ -296,7 +296,6 @@ export const Popconfirm = defineComponent({
                         h(
                           Button,
                           {
-
                             size: 'sm',
                             variant: 'outline',
                             onClick: handleCancel

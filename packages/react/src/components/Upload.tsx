@@ -51,7 +51,7 @@ import {
 
 import { useControlledState } from '../hooks/useControlledState'
 import { Button } from './Button'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 import { Icon } from './Icon'
 import { ImagePreview } from './ImagePreview'
@@ -328,7 +328,8 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   }, [defaultFileList, fileListProp, formItemControl])
 
   const previewUrlFor = useCallback(
-    (file: UploadFile) => filterUploadPreviewUrl(previewUrls.current.get(file), allowedPreviewOrigins),
+    (file: UploadFile) =>
+      filterUploadPreviewUrl(previewUrls.current.get(file), allowedPreviewOrigins),
     [allowedPreviewOrigins]
   )
 
@@ -513,9 +514,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
 
   const renderActions = (file: UploadFile, picture: boolean) => {
     const safePreview = previewUrlFor(file)
-    const canPreview = onPreview
-      ? true
-      : Boolean(isImageUploadFile(file) && safePreview)
+    const canPreview = onPreview ? true : Boolean(isImageUploadFile(file) && safePreview)
     return (
       <>
         {canPreview ? (
@@ -668,21 +667,26 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
         aria-hidden="true"
         tabIndex={-1}
       />
-      {fieldName
-        ? uploadSubmitValues(fileList).length > 0
-          ? uploadSubmitValues(fileList).map((url, index) => (
-              <input
-                key={`${url}-${index}`}
-                type="hidden"
-                name={fieldName}
-                value={url}
-                disabled={effectiveDisabled || undefined}
-              />
-            ))
-          : (
-              <input type="hidden" name={fieldName} value="" disabled={effectiveDisabled || undefined} />
-            )
-        : null}
+      {fieldName ? (
+        uploadSubmitValues(fileList).length > 0 ? (
+          uploadSubmitValues(fileList).map((url, index) => (
+            <input
+              key={`${url}-${index}`}
+              type="hidden"
+              name={fieldName}
+              value={url}
+              disabled={effectiveDisabled || undefined}
+            />
+          ))
+        ) : (
+          <input
+            type="hidden"
+            name={fieldName}
+            value=""
+            disabled={effectiveDisabled || undefined}
+          />
+        )
+      ) : null}
       {singleFileNote ? (
         <p role="status" aria-live="polite">
           {singleFileNote}

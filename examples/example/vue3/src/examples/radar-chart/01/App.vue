@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RadarChart } from '@expcat/tigercat-vue/RadarChart'
-import type { RadarChartSeries } from '@expcat/tigercat-vue'
+import type { RadarChartSeries } from '@expcat/tigercat-core'
 
 const series: RadarChartSeries[] = [
   {

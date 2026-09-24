@@ -42,7 +42,7 @@ import {
   type TigerLocale,
   type TigerLocaleRichTextEditor
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 
 export interface RichTextEditorProps extends Omit<

@@ -2,7 +2,6 @@ import React, {
   useState,
   useRef,
   useEffect,
-
   useCallback,
   useMemo,
   useId,
@@ -53,7 +52,7 @@ import {
   type ImageCropperProps as CoreImageCropperProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ImageCropperProps
   extends
@@ -302,7 +301,17 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           return { blob, cropRect: { ...cropRect }, file }
         }
       }),
-      [circular, cropRect, displayHeight, displayWidth, flipX, outputType, quality, rotation, status]
+      [
+        circular,
+        cropRect,
+        displayHeight,
+        displayWidth,
+        flipX,
+        outputType,
+        quality,
+        rotation,
+        status
+      ]
     )
 
     const startDrag = useCallback(
@@ -393,7 +402,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             status === 'error' ? labels.loadErrorAriaLabel : labels.loadingCropImageAriaLabel
           }>
           <button type="button" onClick={() => setRotation((value) => (value + 90) % 360)}>
-            {basicLabel(mergedLocale.locale, 'imageCropper', 'rotate')}
+            {basicLabel(mergedLocale?.locale, 'imageCropper', 'rotate')}
           </button>
           {status === 'error' ? (
             <div className={imageErrorClasses}>{renderErrorIcon()}</div>
@@ -427,7 +436,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               aria-pressed={preset === item}
               onClick={() => setPreset(item)}>
               {basicLabel(
-                mergedLocale.locale,
+                mergedLocale?.locale,
                 'imageCropper',
                 item === '1:1'
                   ? 'square'
@@ -440,10 +449,10 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             </button>
           ))}
           <button type="button" onClick={() => setRotation((value) => (value + 90) % 360)}>
-            {basicLabel(mergedLocale.locale, 'imageCropper', 'rotate')}
+            {basicLabel(mergedLocale?.locale, 'imageCropper', 'rotate')}
           </button>
           <button type="button" onClick={() => setFlipX((value) => !value)}>
-            {basicLabel(mergedLocale.locale, 'imageCropper', 'flip')}
+            {basicLabel(mergedLocale?.locale, 'imageCropper', 'flip')}
           </button>
         </div>
         <div

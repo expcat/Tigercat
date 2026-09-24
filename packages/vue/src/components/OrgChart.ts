@@ -26,7 +26,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { renderOrgBind } from './w9-chart-bind'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueOrgChartProps extends CoreOrgChartProps {
   padding?: ChartPadding
@@ -275,8 +275,7 @@ export const OrgChart = defineComponent({
                   ]
                 )
             }
-          )
-        ,
+          ),
           props.bind?.nodes
             ? h('div', { 'data-tiger-org-host': '' }, [
                 renderOrgBind({

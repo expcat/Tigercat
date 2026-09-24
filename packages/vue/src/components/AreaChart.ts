@@ -47,7 +47,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { useCartesianSeriesPoints } from '../composables/useCartesianSeriesPoints'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueAreaChartProps extends CoreAreaChartProps {
   data?: LineChartDatum[]
@@ -413,7 +413,7 @@ export const AreaChart = defineComponent({
             ? props.legendFormatter(s, i)
             : (s.name ?? defaultChartSeriesName(i, labels.value.seriesName)),
         getColor: (s, i) => s.color ?? palette.value[i % palette.value.length],
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       })
     )

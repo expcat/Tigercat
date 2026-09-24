@@ -5,6 +5,7 @@ import {
   dismissConfirmModal,
   isBrowser,
   settleConfirmModalOk,
+  type DismissActionEvent,
   type FeedbackScope,
   type ImperativeModalRecord,
   type MessagePosition,
@@ -98,13 +99,7 @@ export function FeedbackHost() {
   )
 }
 
-function ImperativeModal({
-  modal,
-  scope
-}: {
-  modal: ImperativeModalRecord
-  scope: FeedbackScope
-}) {
+function ImperativeModal({ modal, scope }: { modal: ImperativeModalRecord; scope: FeedbackScope }) {
   return (
     <Modal
       open
@@ -114,10 +109,18 @@ function ImperativeModal({
       okText={modal.okText}
       cancelText={modal.cancelText}
       data-tiger-confirm-kind={modal.kind}
-      onOk={(event) => {
-        const result = modal.onOk?.(event)
-        modal.okResult = result
-        return result
+      onOk={(event): void | Promise<void> => {
+        let defaultPrevented = false
+        const dismissEvent: DismissActionEvent = {
+          preventDefault() {
+            defaultPrevented = true
+            event.preventDefault()
+          },
+          get defaultPrevented() {
+            return defaultPrevented
+          }
+        }
+        modal.okResult = modal.onOk?.(dismissEvent)
       }}
       onCancel={() => {
         modal.cancelled = true

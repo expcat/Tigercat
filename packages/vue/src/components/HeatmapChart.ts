@@ -39,7 +39,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { renderHeatBind } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueHeatmapChartProps extends CoreHeatmapChartProps {
   padding?: ChartPadding
@@ -419,7 +419,11 @@ export const HeatmapChart = defineComponent({
                   currentLayout.cols
                 )
               }
-              return formatHeatmapTooltip(labels.value.heatmapTooltip, cell, formatValue(cell.value))
+              return formatHeatmapTooltip(
+                labels.value.heatmapTooltip,
+                cell,
+                formatValue(cell.value)
+              )
             })(),
             'data-heatmap-canvas': 'true',
             'data-heatmap-render-mode': resolvedRenderMode.value,

@@ -62,7 +62,7 @@ import {
 } from '../utils/overlay'
 
 import { Button } from './Button'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface TourProps
   extends
@@ -212,24 +212,27 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
     }
   }, [])
 
-  const measure = useCallback((shouldScroll: boolean) => {
-    if (!open || !step) {
-      setTargetRect(undefined)
-      targetExemptRef.current = null
-      return
-    }
-    const targetEl = resolveTourTarget(step.target)
-    targetExemptRef.current = tourTargetExempt(step) ? (targetEl ?? null) : null
-    if (targetEl) {
-      if (shouldScroll) scrollTourTargetIntoView(targetEl)
-      setTargetRect(getTourRectFromElement(targetEl))
-    } else {
-      setTargetRect(undefined)
-    }
-    const size = getTourSizeFromElement(popoverRef.current)
-    if (size) setPopoverSize(size)
-    syncModalInert()
-  }, [open, step])
+  const measure = useCallback(
+    (shouldScroll: boolean) => {
+      if (!open || !step) {
+        setTargetRect(undefined)
+        targetExemptRef.current = null
+        return
+      }
+      const targetEl = resolveTourTarget(step.target)
+      targetExemptRef.current = tourTargetExempt(step) ? (targetEl ?? null) : null
+      if (targetEl) {
+        if (shouldScroll) scrollTourTargetIntoView(targetEl)
+        setTargetRect(getTourRectFromElement(targetEl))
+      } else {
+        setTargetRect(undefined)
+      }
+      const size = getTourSizeFromElement(popoverRef.current)
+      if (size) setPopoverSize(size)
+      syncModalInert()
+    },
+    [open, step]
+  )
 
   const scrolledKeyRef = useRef('')
   useLayoutEffect(() => {
@@ -346,7 +349,11 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
       <>
         {anchor}
         <OverlayPortal>
-          <div ref={rootRef} className="contents" data-tiger-overlay-layer="" data-tiger-tour-root="">
+          <div
+            ref={rootRef}
+            className="contents"
+            data-tiger-overlay-layer=""
+            data-tiger-tour-root="">
             <div
               ref={popoverRef}
               role="dialog"
@@ -422,7 +429,9 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
             style={
               {
                 ...(tourTargetExempt(step) && targetRect ? getTourMaskHoleStyle(targetRect) : null),
-                ...(targetRect && !tourTargetExempt(step) ? { backgroundColor: 'transparent' } : null)
+                ...(targetRect && !tourTargetExempt(step)
+                  ? { backgroundColor: 'transparent' }
+                  : null)
               } as React.CSSProperties
             }
             onClick={handleMaskClick}
@@ -468,7 +477,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
           <span
             data-tiger-tour-arrow=""
             className={getPopconfirmArrowClasses()}
-            style={getFloatingArrowStyle(step.placement === 'center' ? 'bottom' : (step.placement ?? 'bottom'))}
+            style={getFloatingArrowStyle(step.placement ?? 'bottom')}
           />
         ) : null}
         {closable && (

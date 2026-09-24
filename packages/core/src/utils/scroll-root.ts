@@ -9,8 +9,6 @@ import type { ScrollRootInput } from '../types/scroll-root'
 import { devWarn } from './dev-warn'
 import { isBrowser } from './env'
 
-export type { ScrollRootInput }
-
 export interface ScrollRootRect {
   top: number
   left: number

@@ -84,9 +84,8 @@ export function createStatisticNumberAnimation(
       ? globalThis.cancelAnimationFrame.bind(globalThis)
       : undefined)
 
-  options.onUpdate(options.from)
-
   if (!requestFrame || duration <= 0 || options.from === options.to) {
+    options.onUpdate(options.from)
     if (options.from !== options.to) options.onUpdate(options.to)
     options.onComplete?.()
     return { stop: () => undefined }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VirtualTable } from '@expcat/tigercat-vue/VirtualTable'
-import type { TableColumn } from '@expcat/tigercat-vue'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 const columns: TableColumn[] = [
   { key: 'id', title: 'ID', width: 90, fixed: 'start' },

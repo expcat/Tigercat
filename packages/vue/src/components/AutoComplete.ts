@@ -8,7 +8,8 @@ import {
   nextTick,
   useId,
   type PropType,
-  type CSSProperties
+  type CSSProperties,
+  type VNodeRef
 } from 'vue'
 import type {
   AutoCompleteFilterOption,
@@ -66,7 +67,7 @@ import {
   shouldShowAutoCompleteClear
 } from '@expcat/tigercat-core'
 import { closeSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFixedListWindow } from './internal/useFixedListWindow'
 import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { INPUT_GROUP_INJECTION_KEY, type InputGroupContext } from './InputGroup'
@@ -188,9 +189,7 @@ export const AutoComplete = defineComponent({
         ? sanitizeAutoCompleteExternalValue(rawExternal.value)
         : undefined
     )
-    const initialCommitted = isAutoCompleteEmptyValue(
-      sanitized.value?.value ?? props.defaultValue
-    )
+    const initialCommitted = isAutoCompleteEmptyValue(sanitized.value?.value ?? props.defaultValue)
       ? undefined
       : (sanitized.value?.value ?? props.defaultValue)
     const localValue = ref<AutoCompleteValue | undefined>(initialCommitted)
@@ -387,7 +386,8 @@ export const AutoComplete = defineComponent({
         props.defaultActiveFirstOption
       )
       activeIndex.value = index
-      activeKey.value = index >= 0 ? autoCompleteOptionIdentity(filteredOptions.value[index]) : undefined
+      activeKey.value =
+        index >= 0 ? autoCompleteOptionIdentity(filteredOptions.value[index]) : undefined
     }
 
     function closeDropdown() {
@@ -649,17 +649,9 @@ export const AutoComplete = defineComponent({
         })
         if (!virtualizeOptions) return nodes
         return [
-          h(
-            'div',
-            { style: { height: `${range.totalHeight}px`, position: 'relative' } },
-            [
-              h(
-                'div',
-                { style: { transform: `translateY(${range.offsetTop}px)` } },
-                nodes
-              )
-            ]
-          )
+          h('div', { style: { height: `${range.totalHeight}px`, position: 'relative' } }, [
+            h('div', { style: { transform: `translateY(${range.offsetTop}px)` } }, nodes)
+          ])
         ]
       }
       const dropdown = isOpen.value
@@ -693,13 +685,13 @@ export const AutoComplete = defineComponent({
                         )
                           ? { height: `${props.listHeight}px`, overflow: 'auto' }
                           : getAutoCompletePanelStyle(props.listHeight),
-                        ref: shouldVirtualizeAutoCompleteList(
+                        ref: (shouldVirtualizeAutoCompleteList(
                           options.length,
                           props.listHeight,
                           props.size
                         )
                           ? optionWindow.bindRef
-                          : undefined,
+                          : undefined) as VNodeRef | undefined,
                         onScroll: shouldVirtualizeAutoCompleteList(
                           options.length,
                           props.listHeight,
@@ -720,7 +712,11 @@ export const AutoComplete = defineComponent({
                     )
                   : h(
                       'div',
-                      { class: autoCompleteEmptyStateClasses, role: 'status', 'aria-live': 'polite' },
+                      {
+                        class: autoCompleteEmptyStateClasses,
+                        role: 'status',
+                        'aria-live': 'polite'
+                      },
                       props.loading
                         ? (mergedLocale.value?.common?.loadingText ?? 'Loading...')
                         : resolveLocaleText(emptyLabels.value.noResults, props.emptyText)
@@ -765,11 +761,7 @@ export const AutoComplete = defineComponent({
               })
             : null,
           sanitized.value?.invalid && !formItemControl
-            ? h(
-                'p',
-                { role: 'status', 'aria-live': 'polite' },
-                AUTO_COMPLETE_INVALID_VALUE
-              )
+            ? h('p', { role: 'status', 'aria-live': 'polite' }, AUTO_COMPLETE_INVALID_VALUE)
             : null,
           h('div', { class: 'relative' }, [
             h('input', {

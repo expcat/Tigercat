@@ -5,11 +5,8 @@
 import type { Align, Justify, GutterSize, ColSpan, Breakpoint } from '../types/grid'
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
-import {
-  GRID_BREAKPOINT_ORDER } from './layout-grid-styles'
+import { GRID_BREAKPOINT_ORDER } from './layout-grid-styles'
 import { isResponsiveMap, resolveResponsiveValue } from './responsive'
-
-export { GRID_BREAKPOINT_ORDER }
 
 const ALIGN_CSS: Record<Align, string> = {
   top: 'flex-start',

@@ -11,7 +11,7 @@ import {
   mergeTigerLocale,
   type EmptyProps as CoreEmptyProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface EmptyProps extends React.HTMLAttributes<HTMLDivElement>, CoreEmptyProps {
   /** Custom image / illustration node */

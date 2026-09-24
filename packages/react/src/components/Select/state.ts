@@ -50,7 +50,7 @@ import {
   type SelectValue
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../../hooks/useControlledState'
-import { useTigerConfig } from '../ConfigProvider'
+import { useTigerConfig } from '../tiger-config'
 import { useInputGroupContext } from '../InputGroup'
 import { useFormItemControlContext } from '../FormItemContext'
 import { isMultipleSelect, type SelectProps, type SelectRenderContext } from './types'
@@ -531,6 +531,7 @@ export function useSelectController(props: SelectProps) {
     comboboxAria,
     listboxAria,
     isOpen,
+    setOpen,
     isMultiple,
     readOnly,
     selectFiltered,

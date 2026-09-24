@@ -5,7 +5,6 @@ import {
   getSkeletonClasses,
   getSkeletonInlineStyle,
   getParagraphRowWidth,
-  feedbackLayoutLabels,
   isSkeletonNamed,
   resolveSkeletonAriaHidden,
   mergeStyleValues,
@@ -123,10 +122,7 @@ export const Skeleton = defineComponent({
             ),
             style: mergeStyleValues(inlineStyle, attrsStyle, props.style),
             'data-tiger-skeleton': '',
-            'aria-busy': 'true',
-            'aria-label': feedbackLayoutLabels.skeletonBusy,
-            ...a11y,
-            'aria-hidden': undefined
+            ...a11y
           },
           rows
         )

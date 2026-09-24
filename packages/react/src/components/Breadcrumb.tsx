@@ -34,7 +34,7 @@ import {
   type TigerLocaleBreadcrumb
 } from '@expcat/tigercat-core'
 import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface BreadcrumbContextValue {
   separator: BreadcrumbSeparator
@@ -231,7 +231,8 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                   collapsed.map((itemIndex) => {
                     const child = items[itemIndex]
                     const href =
-                      React.isValidElement(child) && typeof (child.props as { href?: string }).href === 'string'
+                      React.isValidElement(child) &&
+                      typeof (child.props as { href?: string }).href === 'string'
                         ? (child.props as { href?: string }).href
                         : undefined
                     const text =

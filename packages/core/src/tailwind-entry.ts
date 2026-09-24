@@ -11,4 +11,4 @@
  * Injects the default preset's light and dark CSS variables.
  * Pass `createTigercatPlugin({ preset })` for another built-in preset.
  */
-export { tigercatPlugin as default } from './tailwind-plugin'
+export { tigercatPlugin as default, createTigercatPlugin } from './tailwind-plugin'

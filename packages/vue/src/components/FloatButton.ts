@@ -39,7 +39,7 @@ import {
   type ViewportPlacement,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Badge } from './Badge'
 import { Tooltip } from './Tooltip'
 import { renderVueBodyTeleport, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
@@ -232,9 +232,11 @@ export const FloatButton = defineComponent({
       const badged =
         props.badge == null
           ? control
-          : h(Badge, { content: props.badge, type: typeof props.badge === 'number' ? 'number' : 'text' }, () => [
-              control
-            ])
+          : h(
+              Badge,
+              { content: props.badge, type: typeof props.badge === 'number' ? 'number' : 'text' },
+              () => [control]
+            )
       if (inGroup && props.tooltip) {
         return h(Tooltip, { content: props.tooltip, asChild: true }, () => [badged])
       }

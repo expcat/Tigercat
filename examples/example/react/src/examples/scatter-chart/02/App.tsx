@@ -1,5 +1,5 @@
 import { ScatterChart } from '@expcat/tigercat-react/ScatterChart'
-import type { ScatterChartDatum } from '@expcat/tigercat-react'
+import type { ScatterChartDatum } from '@expcat/tigercat-core'
 
 const data: ScatterChartDatum[] = [
   { x: 10, y: 25 },

@@ -5,6 +5,7 @@ import { createRequire } from 'node:module'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { existsSync, readFileSync } from 'node:fs'
 import { CLI_VERSION } from '../constants'
+import requiredCoreExports from '../required-core-exports.json' with { type: 'json' }
 import { logError, logInfo, logSuccess, logWarn } from '../utils/logger'
 import { readFileSafe } from '../utils/fs'
 
@@ -56,9 +57,7 @@ const FRAMEWORK_PEER_RANGES: Record<Framework, { dep: string; major: number }[]>
 }
 
 /** Subpath exports generated from the core entry table. */
-const REQUIRED_CORE_EXPORTS = JSON.parse(
-  readFileSync(resolveAdjacent('../required-core-exports.json'), 'utf8')
-) as string[]
+const REQUIRED_CORE_EXPORTS: readonly string[] = requiredCoreExports
 
 function resolveAdjacent(relativePath: string): string {
   const meta = import.meta.url

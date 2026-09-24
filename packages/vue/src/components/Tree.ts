@@ -93,9 +93,16 @@ import {
 } from '@expcat/tigercat-core'
 import { useDrag } from '../composables/useDrag'
 import { VirtualList } from './VirtualList'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 const spinnerSvg = getSpinnerSVG('spinner')
+
+function checkedKeysInput(
+  value: TreeNodeKey[] | TreeCheckedState | undefined
+): TreeNodeKey[] | undefined {
+  if (value === undefined) return undefined
+  return Array.isArray(value) ? value : value.checked
+}
 
 export interface VueTreeProps {
   treeData?: TreeNode[]
@@ -236,7 +243,7 @@ export const Tree = defineComponent({
     const internalChecked = ref(
       resolveCheckedInput(
         treeDataProp.value,
-        props.checkedKeys,
+        checkedKeysInput(props.checkedKeys),
         props.defaultCheckedKeys,
         props.checkStrictly
       )
@@ -282,7 +289,12 @@ export const Tree = defineComponent({
     const computedSelected = computed(() => props.selectedKeys ?? internalSelected.value)
     const computedChecked = computed(() =>
       props.checkedKeys !== undefined
-        ? resolveCheckedInput(derivedTree.value, props.checkedKeys, undefined, props.checkStrictly)
+        ? resolveCheckedInput(
+            derivedTree.value,
+            checkedKeysInput(props.checkedKeys),
+            undefined,
+            props.checkStrictly
+          )
         : internalChecked.value
     )
     const searchQuery = computed(() =>
@@ -825,7 +837,10 @@ export const Tree = defineComponent({
           props.showIcon && (node.icon != null || node.directory)
             ? h(
                 'span',
-                { class: treeNodeIconClasses, 'data-tiger-tree-directory': node.directory ? '' : undefined },
+                {
+                  class: treeNodeIconClasses,
+                  'data-tiger-tree-directory': node.directory ? '' : undefined
+                },
                 renderNodeIcon(node.icon) ?? (node.directory ? '▸' : undefined)
               )
             : null,
@@ -918,8 +933,7 @@ export const Tree = defineComponent({
                       itemCount: view.value.rows.length,
                       itemHeight: props.itemHeight,
                       height: props.height,
-                      getItemKey: (index: number) =>
-                        view.value.rows[index]?.item.node.key ?? index
+                      getItemKey: (index: number) => view.value.rows[index]?.item.node.key ?? index
                     },
                     {
                       default: ({ index }: { index: number }) => renderRow(index, true)

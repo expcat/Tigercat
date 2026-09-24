@@ -20,7 +20,6 @@ import {
   parseInputNumberValue,
   parseInputNumberModel,
   commitInputNumberModel,
-  stepInputNumberModel,
   addDecimalString,
   getInputNumberKeyboardNextValue,
   resolveInputNumberControlsLayout,
@@ -33,7 +32,7 @@ import {
   type InputNumberProps as CoreInputNumberProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useInputGroupContext } from './InputGroup'
 import { useFormItemControlContext } from './FormItemContext'
 
@@ -60,6 +59,12 @@ export interface InputNumberProps
   readOnly?: boolean
   /** @internal */
   _shakeTrigger?: number
+}
+
+function numericInputNumber(value: number | string | null | undefined): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value === 'string') return parseInputNumberValue(value)
+  return null
 }
 
 export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(function InputNumber(
@@ -176,7 +181,10 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     if (status === 'error') runShakeAnimation(wrapperRef.current)
   }, [status, shakeTrigger])
 
-  const commit = (raw: number | string | null, nextFocused = focusedRef.current): number | string | null => {
+  const commit = (
+    raw: number | string | null,
+    nextFocused = focusedRef.current
+  ): number | string | null => {
     const { value: next, changed } = commitInputNumberModel(raw, currentValue, {
       min,
       max,
@@ -196,12 +204,10 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     direction: 'up' | 'down',
     baseValue: number | string | null | undefined = currentValue
   ): number | null => {
-    if (effectiveDisabled || isReadOnly) return baseValue ?? null
-    if (typeof baseValue === 'string') {
-      return commit(stepInputNumberModel(baseValue, step, direction, min, max, precision))
-    }
-    const next = stepValue(baseValue, step, direction, min, max, precision)
-    return commit(next)
+    const numeric = numericInputNumber(baseValue)
+    if (effectiveDisabled || isReadOnly) return numeric
+    const next = stepValue(numeric, step, direction, min, max, precision)
+    return numericInputNumber(commit(next))
   }
 
   const handleStepClick = (direction: 'up' | 'down') => {
@@ -220,11 +226,11 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     return (event: React.PointerEvent<HTMLButtonElement>) => {
       event.preventDefault()
       if (effectiveDisabled || isReadOnly) return
-      if (direction === 'down' && isAtMin(currentValue, min)) return
-      if (direction === 'up' && isAtMax(currentValue, max)) return
+      if (direction === 'down' && isAtMin(numericInputNumber(currentValue), min)) return
+      if (direction === 'up' && isAtMax(numericInputNumber(currentValue), max)) return
 
       suppressNextClickRef.current = true
-      repeatValueRef.current = currentValue
+      repeatValueRef.current = numericInputNumber(currentValue)
       repeatControllerRef.current.start(() => {
         const baseValue = repeatValueRef.current
         const nextValue = handleStep(direction, baseValue)
@@ -244,7 +250,9 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   }
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const parsed = parser ? parseInputNumberValue(displayValue, { parser }) : parseInputNumberModel(displayValue)
+    const parsed = parser
+      ? parseInputNumberValue(displayValue, { parser })
+      : parseInputNumberModel(displayValue)
     commit(parsed, false)
     setFocused(false)
     formItemControl?.onBlur?.()
@@ -259,9 +267,13 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      commit(parser ? parseInputNumberValue(displayValue, { parser }) : parseInputNumberModel(displayValue))
+      commit(
+        parser
+          ? parseInputNumberValue(displayValue, { parser })
+          : parseInputNumberModel(displayValue)
+      )
     } else {
-      const next = getInputNumberKeyboardNextValue(e.key, currentValue, {
+      const next = getInputNumberKeyboardNextValue(e.key, numericInputNumber(currentValue), {
         min,
         max,
         step,
@@ -276,8 +288,8 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     onKeyDown?.(e)
   }
 
-  const atMin = isAtMin(currentValue, min)
-  const atMax = isAtMax(currentValue, max)
+  const atMin = isAtMin(numericInputNumber(currentValue), min)
+  const atMax = isAtMax(numericInputNumber(currentValue), max)
   const layout = resolveInputNumberControlsLayout(controls, controlsPosition)
   const stepDisabled = effectiveDisabled || isReadOnly
 
@@ -304,7 +316,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     currentValue == null
       ? labels.emptyAriaValueText
       : formatter
-        ? formatter(currentValue)
+        ? formatter(numericInputNumber(currentValue) ?? undefined)
         : String(currentValue)
 
   const describedBy = mergeAriaDescribedBy(
@@ -354,7 +366,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
         autoFocus={autoFocus}
         aria-valuemin={min === -Infinity ? undefined : min}
         aria-valuemax={max === Infinity ? undefined : max}
-        aria-valuenow={currentValue ?? undefined}
+        aria-valuenow={numericInputNumber(currentValue) ?? undefined}
         aria-valuetext={valueText}
         aria-invalid={status === 'error' ? true : undefined}
         aria-describedby={describedBy}

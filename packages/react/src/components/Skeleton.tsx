@@ -4,7 +4,6 @@ import {
   getParagraphRowWidth,
   getSkeletonClasses,
   getSkeletonInlineStyle,
-  feedbackLayoutLabels,
   isSkeletonNamed,
   resolveSkeletonAriaHidden,
   type SkeletonProps as CoreSkeletonProps
@@ -85,8 +84,6 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
         {...divProps}
         ref={ref}
         data-tiger-skeleton=""
-        aria-busy="true"
-        aria-label={feedbackLayoutLabels.skeletonBusy}
         className={classNames('flex flex-col', !width && 'w-full', className)}
         style={{ ...inlineStyle, ...style }}
         {...a11y}>
@@ -100,9 +97,6 @@ export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skele
       {...divProps}
       ref={ref}
       data-tiger-skeleton=""
-      aria-busy="true"
-      aria-label={feedbackLayoutLabels.skeletonBusy}
-      aria-hidden="true"
       className={classNames(
         getSkeletonClasses(variant, animation, shape, { width, height }),
         className

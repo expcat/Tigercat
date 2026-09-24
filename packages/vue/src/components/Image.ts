@@ -43,7 +43,7 @@ import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
 import { IMAGE_GROUP_INJECTION_KEY, type ImageGroupContext } from './ImageGroup'
 import { ImagePreview } from './ImagePreview'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueImageProps {
   src?: string

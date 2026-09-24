@@ -16,7 +16,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Button } from './Button'
 import { ButtonGroupContext } from './ButtonGroup'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Dropdown, DropdownItem, DropdownMenu } from './Dropdown'
 
 export interface SplitButtonProps
@@ -147,62 +147,62 @@ export const SplitButton = forwardRef<HTMLButtonElement, SplitButtonProps>(funct
 
   return (
     <ButtonGroupContext.Provider value={{}}>
-    <div className={rootClasses} style={style} role="group" data-split-button="" {...rest}>
-      <Button
-        ref={forwardedRef}
-        variant={resolvedVariant}
-        size={resolvedSize}
-        disabled={unavailable}
-        loading={loading}
-        danger={danger}
-        type={resolveButtonType(type)}
-        iconPosition={iconPosition}
-        icon={icon}
-        loadingIcon={loadingIcon}
-        className={primaryClasses}
-        aria-label={primaryAriaLabel}
-        data-split-button-primary=""
-        onClick={onClick}>
-        {partitioned.primary}
-      </Button>
-      {hasMenu ? (
-        <Dropdown
-          className={splitButtonDropdownClasses}
-          trigger="click"
-          showArrow={false}
-          asChild
+      <div className={rootClasses} style={style} role="group" data-split-button="" {...rest}>
+        <Button
+          ref={forwardedRef}
+          variant={resolvedVariant}
+          size={resolvedSize}
           disabled={unavailable}
-          open={open}
-          defaultOpen={defaultOpen}
-          closeOnClick={closeOnClick}
-          portal={portal}
-          placement={placement}
-          offset={offset}
-          onOpenChange={(next) => {
-            if (loading) return
-            onOpenChange?.(next)
-          }}
-          renderTrigger={({ open: menuOpen }) => (
-            <Button
-              variant={resolvedVariant}
-              size={resolvedSize}
-              disabled={unavailable}
-              danger={danger}
-              type="button"
-              className={triggerClasses}
-              aria-label={triggerLabel}
-              aria-disabled={loading || undefined}
-              data-split-button-trigger=""
-              onClick={(event) => {
-                if (loading) event.preventDefault()
-              }}>
-              {trigger ?? <Chevron open={menuOpen} size={resolvedSize} />}
-            </Button>
-          )}>
-          {menuNode}
-        </Dropdown>
-      ) : null}
-    </div>
+          loading={loading}
+          danger={danger}
+          type={resolveButtonType(type)}
+          iconPosition={iconPosition}
+          icon={icon}
+          loadingIcon={loadingIcon}
+          className={primaryClasses}
+          aria-label={primaryAriaLabel}
+          data-split-button-primary=""
+          onClick={onClick}>
+          {partitioned.primary}
+        </Button>
+        {hasMenu ? (
+          <Dropdown
+            className={splitButtonDropdownClasses}
+            trigger="click"
+            showArrow={false}
+            asChild
+            disabled={unavailable}
+            open={open}
+            defaultOpen={defaultOpen}
+            closeOnClick={closeOnClick}
+            portal={portal}
+            placement={placement}
+            offset={offset}
+            onOpenChange={(next) => {
+              if (loading) return
+              onOpenChange?.(next)
+            }}
+            renderTrigger={({ open: menuOpen }) => (
+              <Button
+                variant={resolvedVariant}
+                size={resolvedSize}
+                disabled={unavailable}
+                danger={danger}
+                type="button"
+                className={triggerClasses}
+                aria-label={triggerLabel}
+                aria-disabled={loading || undefined}
+                data-split-button-trigger=""
+                onClick={(event) => {
+                  if (loading) event.preventDefault()
+                }}>
+                {trigger ?? <Chevron open={menuOpen} size={resolvedSize} />}
+              </Button>
+            )}>
+            {menuNode}
+          </Dropdown>
+        ) : null}
+      </div>
     </ButtonGroupContext.Provider>
   )
 })

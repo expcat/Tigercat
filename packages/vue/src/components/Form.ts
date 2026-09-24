@@ -40,7 +40,7 @@ import {
   type FormFieldDependencies,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export const FormContextKey = Symbol('FormContext')
 
@@ -400,9 +400,10 @@ export const Form = defineComponent({
             ? h(
                 'ul',
                 {
-                  class: 'tiger-form__error-summary mb-3 list-disc ps-5 text-sm text-[var(--tiger-error)]',
+                  class:
+                    'tiger-form__error-summary mb-3 list-disc ps-5 text-sm text-[var(--tiger-error)]',
                   'aria-label': getW9FormLabels(
-                    mergeTigerLocale(config.value.locale, props.locale).locale
+                    mergeTigerLocale(config.value.locale, props.locale)?.locale
                   ).errorSummary
                 },
                 formErrorSummary(errors.value).map((item) =>

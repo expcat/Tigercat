@@ -9,7 +9,7 @@ import {
   type TigerLocale,
   type TigerLocaleFullscreen
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFullscreen } from '../composables/useFullscreen'
 
 export interface VueFullscreenButtonProps {

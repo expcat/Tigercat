@@ -1173,7 +1173,10 @@ export function resolveWorkflowActionBarItems(options: {
       viewerRole,
       permission: item.permission
     })
-  if (options.items !== undefined) return options.items.filter(visible)
+  if (options.items !== undefined) {
+    if (options.viewerRole == null) return [...options.items]
+    return options.items.filter(visible)
+  }
   if (options.buttonPolicy) {
     return workflowButtonConfigsToActionBarItems(options.buttonPolicy.buttons, options.labels, {
       isStarter: options.isStarter,
@@ -1272,12 +1275,10 @@ export const workflowViewerCardOnPathClasses = 'border-[var(--tiger-primary)]'
 export const workflowViewerCardRollbackClasses = 'border-[var(--tiger-error)]'
 export const workflowViewerCardReturnTargetClasses = 'border-[var(--tiger-warning)]'
 export const workflowViewerCardOffPathClasses = 'opacity-50'
-export const workflowViewerCardActiveClasses =
-  'ring-2 ring-[var(--tiger-primary)] ring-offset-1'
+export const workflowViewerCardActiveClasses = 'ring-2 ring-[var(--tiger-primary)] ring-offset-1'
 export const workflowViewerKindRowClasses = 'flex flex-wrap items-center gap-1'
 export const workflowViewerRollbackLabelClasses = 'mt-1 text-xs text-[var(--tiger-error)]'
-export const workflowViewerReturnTargetLabelClasses =
-  'mt-1 text-xs text-[var(--tiger-warning)]'
+export const workflowViewerReturnTargetLabelClasses = 'mt-1 text-xs text-[var(--tiger-warning)]'
 export const workflowViewerActiveTitleClasses = 'text-[var(--tiger-primary)]'
 export const workflowViewerLegendClasses =
   'mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--tiger-text-secondary)]'
@@ -1285,8 +1286,7 @@ export const workflowViewerLegendItemClasses = 'inline-flex items-center gap-1.5
 export const workflowViewerLegendSwatchClasses =
   'inline-block h-2.5 w-4 shrink-0 rounded-sm border bg-[var(--tiger-surface)]'
 export const workflowViewerLegendCurrentSwatchClasses = 'border-[var(--tiger-primary)]'
-export const workflowViewerLegendOffPathSwatchClasses =
-  'border-[var(--tiger-border)] opacity-50'
+export const workflowViewerLegendOffPathSwatchClasses = 'border-[var(--tiger-border)] opacity-50'
 export const workflowViewerLegendRollbackSwatchClasses = 'border-[var(--tiger-error)]'
 export const workflowViewerLegendReturnSwatchClasses = 'border-[var(--tiger-warning)]'
 export const workflowStepStatusDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'

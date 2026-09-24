@@ -59,7 +59,7 @@ import { Tag } from './Tag'
 import { Button } from './Button'
 import { Textarea } from './Textarea'
 import { Text } from './Text'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { VirtualList, type VirtualListHandle } from './VirtualList'
 
 export interface CommentThreadProps
@@ -253,11 +253,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     return into
   }, [resolvedNodes])
 
-  const renderNode = (
-    node: CommentNode,
-    depth: number,
-    isLast: boolean
-  ) => {
+  const renderNode = (node: CommentNode, depth: number, isLast: boolean) => {
     const children = node.children ?? []
     const hasChildren = children.length > 0 || clippedIds.has(node.id)
     const isExpanded = expandedSet.has(node.id)
@@ -680,9 +676,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       {treeErrors.length > 0 ? (
         <div role="alert">
           {treeErrors.map((error) => (
-            <p key={`${error.code}-${error.id}`}>
-              {formatCommentTreeError(error, labels)}
-            </p>
+            <p key={`${error.code}-${error.id}`}>{formatCommentTreeError(error, labels)}</p>
           ))}
         </div>
       ) : null}

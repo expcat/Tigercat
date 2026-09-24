@@ -35,7 +35,7 @@ import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { PieBind } from './w9-chart-bind'
 
 export interface PieChartProps extends CorePieChartProps {
@@ -188,7 +188,7 @@ export const PieChart: React.FC<PieChartProps> = ({
         innerRadius: radii.innerRadius,
         outerRadius: radii.outerRadius,
         startAngle,
-        endAngle,
+        endAngle: endAngle ?? startAngle + Math.PI * 2,
         padAngle,
         palette,
         gradient,
@@ -227,9 +227,11 @@ export const PieChart: React.FC<PieChartProps> = ({
         selectedIndex: resolvedSelectedIndex,
         getIndex: (slice) => slice.index,
         getLabel: (slice) =>
-          legendFormatter ? legendFormatter(slice.datum, slice.index) : sliceName(slice.datum, slice.index),
+          legendFormatter
+            ? legendFormatter(slice.datum, slice.index)
+            : sliceName(slice.datum, slice.index),
         getColor: (slice) => slice.color,
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       }),
     [slices, legendFormatter, palette, activeIndex, resolvedSelectedIndex, sliceName]

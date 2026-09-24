@@ -1,4 +1,13 @@
-import { defineComponent, computed, ref, watch, onMounted, getCurrentInstance, PropType, h } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  watch,
+  onMounted,
+  getCurrentInstance,
+  PropType,
+  h
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -57,7 +66,7 @@ import { VirtualList } from './VirtualList'
 import { Text } from './Text'
 import { Button } from './Button'
 import { Loading } from './Loading'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 type ReadFilterOption = {
   key: NotificationReadFilter
@@ -370,9 +379,7 @@ export const NotificationCenter = defineComponent({
         const pending = notificationItemsPendingRead(items)
         pending.forEach((item) => next.set(notificationItemKey(item.id), true))
         readStateOverrides.value = next
-        politeText.value = labels.value.markedReadText
-          .split('{count}')
-          .join(String(pending.length))
+        politeText.value = labels.value.markedReadText.split('{count}').join(String(pending.length))
         emit('mark-all-read', undefined, pending)
         return
       }
@@ -471,52 +478,53 @@ export const NotificationCenter = defineComponent({
               onClick: () => handleItemClick(item, _index)
             },
             [
-            h('div', { class: 'flex items-baseline justify-between gap-2' }, [
-              h('div', { class: 'flex items-center gap-1.5' }, [
-                h(
-                  Text,
-                  {
-                    tag: 'span',
-                    size: 'sm',
-                    weight: isRead ? 'normal' : 'semibold',
-                    class: isRead
-                      ? notificationCenterReadTitleClasses
-                      : notificationCenterUnreadTitleClasses
-                  },
-                  { default: () => item.title }
-                ),
-                !isRead
-                  ? h('span', {
-                      class: notificationCenterUnreadDotClasses,
-                      'aria-hidden': 'true'
-                    })
+              h('div', { class: 'flex items-baseline justify-between gap-2' }, [
+                h('div', { class: 'flex items-center gap-1.5' }, [
+                  h(
+                    Text,
+                    {
+                      tag: 'span',
+                      size: 'sm',
+                      weight: isRead ? 'normal' : 'semibold',
+                      class: isRead
+                        ? notificationCenterReadTitleClasses
+                        : notificationCenterUnreadTitleClasses
+                    },
+                    { default: () => item.title }
+                  ),
+                  !isRead
+                    ? h('span', {
+                        class: notificationCenterUnreadDotClasses,
+                        'aria-hidden': 'true'
+                      })
+                    : null
+                ]),
+                timeText
+                  ? h(
+                      'span',
+                      {
+                        class: notificationCenterTimeClasses
+                      },
+                      timeText
+                    )
                   : null
               ]),
-              timeText
+              item.description
                 ? h(
-                    'span',
+                    'div',
                     {
-                      class: notificationCenterTimeClasses
+                      class: classNames(
+                        'mt-1 text-xs leading-relaxed line-clamp-2',
+                        isRead
+                          ? notificationCenterReadDescriptionClasses
+                          : notificationCenterUnreadDescriptionClasses
+                      )
                     },
-                    timeText
+                    item.description
                   )
                 : null
-            ]),
-            item.description
-              ? h(
-                  'div',
-                  {
-                    class: classNames(
-                      'mt-1 text-xs leading-relaxed line-clamp-2',
-                      isRead
-                        ? notificationCenterReadDescriptionClasses
-                        : notificationCenterUnreadDescriptionClasses
-                    )
-                  },
-                  item.description
-                )
-              : null
-          ]),
+            ]
+          ),
           h(
             Button,
             {
@@ -728,23 +736,24 @@ export const NotificationCenter = defineComponent({
                 inert: props.loading ? true : undefined
               },
               [
-              listBody,
-              props.loading
-                ? h(
-                    'div',
-                    {
-                      class:
-                        'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface)]/70'
-                    },
-                    [
-                      h(Loading, {
-                        text: resolveLocaleText(labels.value.loadingText, props.loadingText),
-                        class: notificationCenterLoadingClasses
-                      })
-                    ]
-                  )
-                : null
-            ])
+                listBody,
+                props.loading
+                  ? h(
+                      'div',
+                      {
+                        class:
+                          'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface)]/70'
+                      },
+                      [
+                        h(Loading, {
+                          text: resolveLocaleText(labels.value.loadingText, props.loadingText),
+                          class: notificationCenterLoadingClasses
+                        })
+                      ]
+                    )
+                  : null
+              ]
+            )
 
       const ariaLabel =
         (attrs['aria-label'] as string | undefined) ??

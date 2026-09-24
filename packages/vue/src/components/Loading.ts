@@ -1,4 +1,14 @@
-import { defineComponent, computed, h, nextTick, PropType, ref, useId, watch, onUnmounted } from 'vue'
+import {
+  defineComponent,
+  computed,
+  h,
+  nextTick,
+  PropType,
+  ref,
+  useId,
+  watch,
+  onUnmounted
+} from 'vue'
 import {
   captureRegionFocus,
   classNames,
@@ -25,7 +35,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useVueFocusTrap } from '../utils/overlay'
 import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueLoadingProps extends LoadingProps {
   style?: Record<string, string | number>
@@ -248,7 +258,11 @@ export const Loading = defineComponent({
             'aria-busy': showIndicator.value ? 'true' : undefined
           },
           [
-            h('div', { inert: showIndicator.value && !showFullscreen.value ? true : undefined }, content),
+            h(
+              'div',
+              { inert: showIndicator.value && !showFullscreen.value ? true : undefined },
+              content
+            ),
             showIndicator.value && !showFullscreen.value
               ? h(
                   'div',

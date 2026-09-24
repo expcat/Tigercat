@@ -9,7 +9,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Image } from './Image'
 import { ImagePreview } from './ImagePreview'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface GalleryProps
   extends CoreGalleryProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {

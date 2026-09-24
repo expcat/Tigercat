@@ -15,7 +15,7 @@ import {
   type TigerLocale,
   type TigerLocaleBackTop
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface BackTopProps
   extends CoreBackTopProps, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {

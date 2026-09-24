@@ -8,5 +8,5 @@ import { Image } from '@expcat/tigercat-vue/Image'
     alt="悬停或聚焦查看大图"
     :width="240"
     :height="150"
-    preview-trigger="hover" />
+    preview />
 </template>

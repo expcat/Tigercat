@@ -4,7 +4,7 @@
 
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   applyImageLoadError,
   applyImageLoadSuccess,
@@ -408,6 +408,8 @@ describe('image-utils — getInitialCropRect', () => {
 })
 
 describe('image-utils — cropCanvas', () => {
+  const canvases: HTMLCanvasElement[] = []
+
   function makeImage(naturalW: number, naturalH: number): HTMLImageElement {
     const img = document.createElement('img')
     Object.defineProperty(img, 'naturalWidth', { value: naturalW, configurable: true })
@@ -416,35 +418,51 @@ describe('image-utils — cropCanvas', () => {
   }
 
   beforeEach(() => {
+    canvases.length = 0
     HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
       drawImage: vi.fn()
     })) as unknown as typeof HTMLCanvasElement.prototype.getContext
-    HTMLCanvasElement.prototype.toDataURL = vi.fn(() => 'data:image/png;base64,xx')
+    HTMLCanvasElement.prototype.toBlob = vi.fn((callback: BlobCallback) => {
+      callback(new Blob(['x'], { type: 'image/png' }))
+    }) as unknown as typeof HTMLCanvasElement.prototype.toBlob
+    const original = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation(
+      (tag: string, options?: ElementCreationOptions) => {
+        const el = original(tag, options)
+        if (tag === 'canvas') canvases.push(el as HTMLCanvasElement)
+        return el
+      }
+    )
   })
 
-  it('produces a canvas sized to scaled crop rect', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('produces a canvas sized to scaled crop rect', async () => {
     const img = makeImage(800, 600)
     const rect: CropRect = { x: 10, y: 20, width: 100, height: 50 }
-    const { canvas, dataUrl } = cropCanvas(img, rect, 400, 300)
+    const blob = await cropCanvas(img, rect, 400, 300)
     // displayed 400x300, natural 800x600 → scale 2x
-    expect(canvas.width).toBe(200)
-    expect(canvas.height).toBe(100)
-    expect(typeof dataUrl).toBe('string')
+    expect(canvases.at(-1)?.width).toBe(200)
+    expect(canvases.at(-1)?.height).toBe(100)
+    expect(blob).toBeInstanceOf(Blob)
   })
 
-  it('respects custom output type and quality', () => {
+  it('respects custom output type and quality', async () => {
     const img = makeImage(100, 100)
     const rect: CropRect = { x: 0, y: 0, width: 50, height: 50 }
-    const { canvas } = cropCanvas(img, rect, 100, 100, 'image/jpeg', 0.5)
-    expect(canvas.width).toBe(50)
-    expect(canvas.height).toBe(50)
+    const blob = await cropCanvas(img, rect, 100, 100, 'image/jpeg', 0.5)
+    expect(canvases.at(-1)?.width).toBe(50)
+    expect(canvases.at(-1)?.height).toBe(50)
+    expect(blob.type).toBe('image/png')
   })
 
-  it('throws when display size or crop rect is not a finite area', () => {
+  it('throws when display size or crop rect is not a finite area', async () => {
     const img = makeImage(100, 100)
     const rect: CropRect = { x: 0, y: 0, width: 50, height: 50 }
-    expect(() => cropCanvas(img, rect, 0, 100)).toThrow(/finite display size/)
-    expect(() => cropCanvas(img, { x: 0, y: 0, width: 0, height: 10 }, 100, 100)).toThrow(
+    await expect(cropCanvas(img, rect, 0, 100)).rejects.toThrow(/finite display size/)
+    await expect(cropCanvas(img, { x: 0, y: 0, width: 0, height: 10 }, 100, 100)).rejects.toThrow(
       /finite display size/
     )
   })

@@ -41,7 +41,7 @@ import {
   type InputOTPType,
   type InputStatus
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 
 export type VueInputOTPProps = InstanceType<typeof InputOTP>['$props']
@@ -292,7 +292,8 @@ export const InputOTP = defineComponent({
             tabindex: i === 0 && !effectiveDisabled.value ? 0 : -1,
             id: i === 0 ? fieldId : undefined,
             'aria-hidden': i === 0 ? undefined : 'true',
-            'aria-label': i === 0 ? formatOtpSlotLabel(labels.value.slotLabel, 1, props.length) : undefined,
+            'aria-label':
+              i === 0 ? formatOtpSlotLabel(labels.value.slotLabel, 1, props.length) : undefined,
             'aria-invalid': i === 0 && status.value === 'error' ? true : undefined,
             'aria-required': i === 0 && formItemControl?.required.value ? true : undefined,
             'aria-describedby': i === 0 ? describedBy : undefined,

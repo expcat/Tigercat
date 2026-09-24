@@ -24,6 +24,7 @@ export const viVN: TigerLocale = {
     closeMessageAriaLabel: 'Đóng tin nhắn',
     closeNotificationAriaLabel: 'Đóng thông báo',
     sidebarAriaLabel: 'Thanh bên',
+    skipToContent: 'Chuyển tới nội dung chính',
     moreOptionsText: 'Thêm tùy chọn',
     confirmTitle: 'Bạn có chắc muốn tiếp tục?'
   },
@@ -71,7 +72,7 @@ export const viVN: TigerLocale = {
   text: {
     copyLabel: 'Sao chép',
     copiedLabel: 'Đã sao chép',
-    copyFailedLabel: 'Sao chép thất bại',
+    copyFailedLabel: 'Sao chép thất bại'
   },
   watermark: {
     imageErrorText: 'Không tải được ảnh watermark'
@@ -243,7 +244,8 @@ export const viVN: TigerLocale = {
     publishBlocked: 'Không thể phát hành cho đến khi sửa các mục chặn'
   },
   workflowDetailShell: {
-    ariaLabel: 'Chi tiết quy trình'
+    ariaLabel: 'Chi tiết quy trình',
+    title: 'Phê duyệt'
   },
   progress: {
     ariaLabel: 'Tiến độ'
@@ -359,7 +361,7 @@ export const viVN: TigerLocale = {
     finishText: 'Hoàn thành',
     closeAriaLabel: 'Đóng hướng dẫn',
     dialogAriaLabel: 'Hướng dẫn',
-    loadErrorText: 'Không tải được hướng dẫn này.',
+    loadErrorText: 'Không tải được hướng dẫn này.'
   },
   calendar: {
     previousMonth: 'Tháng trước',

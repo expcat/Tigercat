@@ -66,7 +66,7 @@ import {
 } from '../utils/overlay'
 import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 import { Button } from './Button'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueTourProps {
   steps: TourStep[]
@@ -186,7 +186,7 @@ export const Tour = defineComponent({
       }
       const targetEl = resolveTourTarget(current.target)
       targetExemptRef.value = tourTargetExempt(current) ? (targetEl ?? null) : null
-      bindAdvance(targetEl, current)
+      bindAdvance(targetEl ?? null, current)
       if (targetEl) {
         if (shouldScroll) scrollTourTargetIntoView(targetEl)
         targetRect.value = getTourRectFromElement(targetEl)
@@ -443,7 +443,9 @@ export const Tour = defineComponent({
           h('div', {
             class: 'pointer-events-none',
             'data-tiger-tour-shade': '',
-            style: targetRect.value ? getTourShadeStyle(targetRect.value) : { pointerEvents: 'none' }
+            style: targetRect.value
+              ? getTourShadeStyle(targetRect.value)
+              : { pointerEvents: 'none' }
           })
         )
       }
@@ -483,7 +485,7 @@ export const Tour = defineComponent({
           h('span', {
             'data-tiger-tour-arrow': '',
             class: getPopconfirmArrowClasses(),
-            style: getFloatingArrowStyle(placement === 'center' ? 'bottom' : placement)
+            style: getFloatingArrowStyle(placement)
           })
         )
       }
@@ -507,11 +509,7 @@ export const Tour = defineComponent({
         const footerChildren = []
         if (props.showIndicators) {
           footerChildren.push(
-            h(
-              'span',
-              { class: tourIndicatorClasses },
-              `${current.position + 1} / ${current.total}`
-            )
+            h('span', { class: tourIndicatorClasses }, `${current.position + 1} / ${current.total}`)
           )
         }
         const buttons = []
@@ -582,10 +580,7 @@ export const Tour = defineComponent({
       )
       children.push(h('div', { class: 'contents', 'data-tiger-overlay-host': '' }))
 
-      return [
-        anchor,
-        renderVueOverlayOutlet(instanceId, renderLayer(children), portalTarget.value)
-      ]
+      return [anchor, renderVueOverlayOutlet(instanceId, renderLayer(children), portalTarget.value)]
     }
   }
 })

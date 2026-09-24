@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { computed, h, ref } from 'vue'
 import { DataTableWithToolbar } from '@expcat/tigercat-vue/DataTableWithToolbar'
-import type {
-  TableColumn,
-  TableToolbarFilterValue,
-  VueTableToolbarProps
-} from '@expcat/tigercat-vue'
+import type { VueTableToolbarProps } from '@expcat/tigercat-vue'
+import type { TableColumn, TableToolbarFilterValue } from '@expcat/tigercat-core'
 
 interface Row extends Record<string, unknown> {
   id: number

@@ -31,7 +31,7 @@ import {
   type MasonryLayoutDetail,
   type MasonryProps as CoreMasonryProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface MasonryProps
   extends CoreMasonryProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'className'> {

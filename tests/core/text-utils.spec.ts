@@ -46,16 +46,16 @@ describe('resolveTextAlign', () => {
     warnSpy.mockRestore()
   })
 
-  it('uses logical start/end and maps physical aliases', () => {
+  it('uses logical start/end and rejects physical left/right', () => {
     expect(resolveTextAlign('start')).toBe('start')
     expect(resolveTextAlign('end')).toBe('end')
-    expect(resolveTextAlign('left')).toBe('start')
-    expect(resolveTextAlign('right')).toBe('end')
+    expect(resolveTextAlign('left')).toBeUndefined()
+    expect(resolveTextAlign('right')).toBeUndefined()
     expect(textAlignClasses.start).toBe('text-start')
     expect(textAlignClasses.end).toBe('text-end')
     expect(getTextClasses({ align: 'start' }).split(/\s+/)).toContain('text-start')
     expect(getTextClasses({ align: 'start' }).split(/\s+/)).not.toContain('text-left')
-    expect(warnSpy).toHaveBeenCalled()
+    expect(warnSpy).not.toHaveBeenCalled()
   })
 
   it('falls back without dropping other classes for unknown size/color/align', () => {

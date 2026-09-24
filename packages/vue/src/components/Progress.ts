@@ -24,7 +24,7 @@ import {
   type ProgressType,
   type ProgressVariant
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueProgressProps extends ProgressProps {
   style?: Record<string, string | number>
@@ -145,10 +145,7 @@ export const Progress = defineComponent({
               ? progressStepFilled(view.value.steps, view.value.percentage).map((filled, index) =>
                   h('div', {
                     key: index,
-                    class: classNames(
-                      getProgressFillClasses(view.value),
-                      'inline-block h-full'
-                    ),
+                    class: classNames(getProgressFillClasses(view.value), 'inline-block h-full'),
                     style: {
                       width: `${100 / view.value.steps}%`,
                       opacity: filled ? 1 : 0.25

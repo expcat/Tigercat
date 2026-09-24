@@ -121,7 +121,7 @@ export function useChartInteraction<T = unknown>(
   const handlersFor = () => {
     const hovered = options.hoveredIndexProp?.()
     const selected = options.selectedIndexProp?.()
-    return createChartInteractionHandlers([], state, {
+    return createChartInteractionHandlers<T>([], state, {
       hoverable: isHoverable(),
       showTooltip: isShowTooltip(),
       selectable: isSelectable(),
@@ -171,7 +171,8 @@ export function useChartInteraction<T = unknown>(
     legendHiddenKeys.value = toggleLegendHidden(legendHiddenKeys.value, String(index))
   }
 
-  const isLegendIndexHidden = (index: number) => isLegendHidden(legendHiddenKeys.value, String(index))
+  const isLegendIndexHidden = (index: number) =>
+    isLegendHidden(legendHiddenKeys.value, String(index))
 
   const handleLegendHover = (index: number, _item?: unknown, event?: Event) => {
     const position = event ? tooltipPositionFromEvent(event) : undefined

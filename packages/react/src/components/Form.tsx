@@ -38,7 +38,7 @@ import {
   type FormHandle,
   type FormSubmitEvent
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type { FormHandle, FormSubmitEvent }
 
@@ -86,10 +86,7 @@ export const useFormContext = (): FormContextValue | null => useContext(FormCont
 export interface FormProps<T extends FormValues = FormValues>
   extends
     Omit<CoreFormProps, 'controller' | 'value'>,
-    Omit<
-      React.FormHTMLAttributes<HTMLFormElement>,
-      'onChange' | 'onSubmit' | 'onReset' | 'value'
-    > {
+    Omit<React.FormHTMLAttributes<HTMLFormElement>, 'onChange' | 'onSubmit' | 'onReset' | 'value'> {
   value?: T
   controller?: FormController
   children?: React.ReactNode
@@ -353,7 +350,9 @@ function FormInner<T extends FormValues>(
         {showErrorSummary && errors.length > 0 ? (
           <ul
             className="tiger-form__error-summary mb-3 list-disc ps-5 text-sm text-[var(--tiger-error)]"
-            aria-label={getW9FormLabels(mergeTigerLocale(config.locale, locale).locale).errorSummary}>
+            aria-label={
+              getW9FormLabels(mergeTigerLocale(config.locale, locale)?.locale).errorSummary
+            }>
             {formErrorSummary(errors).map((item) => (
               <li key={item.field}>
                 <button

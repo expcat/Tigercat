@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { Spotlight } from '@expcat/tigercat-vue/Spotlight'
-import type { SpotlightItem } from '@expcat/tigercat-vue'
+import type { SpotlightItem } from '@expcat/tigercat-core'
 
 const items: SpotlightItem[] = [
   {

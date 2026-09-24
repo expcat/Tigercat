@@ -20,7 +20,7 @@ import {
   type MaskInputProps as CoreMaskInputProps
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 import { useInputGroupContext } from './InputGroup'
 import { Icon } from './Icon'

@@ -48,7 +48,7 @@ import {
   type ScrollAreaScrollToOptions,
   type ScrollAreaState
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface ScrollAreaProps
   extends
@@ -273,7 +273,8 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
   )
 
   useEffect(() => {
-    const root = rootRef.current as (HTMLDivElement & { scrollToMarker?: (id: string) => void }) | null
+    const root = rootRef.current as
+      (HTMLDivElement & { scrollToMarker?: (id: string) => void }) | null
     if (root) root.scrollToMarker = scrollToMarker
   }, [scrollToMarker])
 
@@ -348,7 +349,8 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
 
   const renderScrollbar = (barAxis: ScrollAreaAxis) => {
     const axisState = barAxis === 'y' ? state.y : state.x
-    if (nativeBars || !shouldRenderScrollAreaScrollbar(scrollbar, axis, barAxis, axisState)) return null
+    if (nativeBars || !shouldRenderScrollAreaScrollbar(scrollbar, axis, barAxis, axisState))
+      return null
     const otherVisible = barAxis === 'y' ? visibleX : visibleY
     return (
       <div

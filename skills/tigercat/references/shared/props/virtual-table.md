@@ -23,3 +23,5 @@ Note: 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 
 | `columns?`           | `TableColumn<T>[]` | `-`     | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /... |
 | `virtualHeight?`     | `number`           | `400`   | Viewport height in px                                                                     |
 | `virtualItemHeight?` | `number`           | `48`    | Fixed row height in px used by the window. Content is not clipped.                        |
+
+Events/callback props: `onSelectionChange?`.

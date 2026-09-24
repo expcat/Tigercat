@@ -15,7 +15,7 @@ import {
   type TigerLocale,
   type TigerLocaleAvatarGroup
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Popover } from './Popover'
 
 export interface AvatarGroupContextValue {
@@ -111,7 +111,7 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
             trigger="click"
             placement="top"
             asChild
-            ariaLabel={basicLabel(mergedLocale.locale, 'avatarGroup', 'overflowList')}
+            ariaLabel={basicLabel(mergedLocale?.locale, 'avatarGroup', 'overflowList')}
             content={
               <ul className="m-0 list-none p-0">
                 {collapsedNames.map((name) => (

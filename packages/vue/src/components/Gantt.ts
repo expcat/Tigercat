@@ -35,7 +35,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { renderGanttBind } from './w9-chart-bind'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 const GANTT_BAR_CLICK_PX = 4
 
@@ -81,7 +81,10 @@ export const Gantt = defineComponent({
     maxDate: { type: [String, Number, Date] as PropType<GanttDateValue> },
     minBarWidth: { type: Number, default: 6 },
     showToday: { type: Boolean, default: false },
-    now: { type: [Date, Number, String] as PropType<Date | number | string | null>, default: undefined },
+    now: {
+      type: [Date, Number, String] as PropType<Date | number | string | null>,
+      default: undefined
+    },
     showProgress: { type: Boolean, default: true },
     showDependencies: { type: Boolean, default: true },
     hoverable: { type: Boolean, default: false },
@@ -499,8 +502,7 @@ export const Gantt = defineComponent({
                   )
                 ])
             }
-          )
-        ,
+          ),
           props.bind
             ? renderGanttBind({
                 milestones: (props.bind.tasks ?? [])

@@ -2,7 +2,7 @@ import { Highlight } from '@expcat/tigercat-react/Highlight'
 import { Link } from '@expcat/tigercat-react/Link'
 import { Text } from '@expcat/tigercat-react/Text'
 
-const orderId = /#\d+/
+const orderId = ['#42', '#7']
 
 export default function App() {
   return (

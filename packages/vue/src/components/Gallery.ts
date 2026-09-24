@@ -8,7 +8,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Image } from './Image'
 import { ImagePreview } from './ImagePreview'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueGalleryProps {
   items: GalleryItem[]
@@ -80,7 +80,15 @@ export const Gallery = defineComponent({
                     emit('update:open', true)
                   }
                 },
-                [h(Image, { src: current.src, alt: current.alt, preview: false, width: 240, height: 160 })]
+                [
+                  h(Image, {
+                    src: current.src,
+                    alt: current.alt,
+                    preview: false,
+                    width: 240,
+                    height: 160
+                  })
+                ]
               )
             : null,
           h('p', { 'data-gallery-count': '' }, count),
@@ -96,9 +104,7 @@ export const Gallery = defineComponent({
                   role: 'listitem',
                   class: classNames(
                     'border-2 bg-transparent p-0',
-                    itemIndex === index
-                      ? 'border-[var(--tiger-primary)]'
-                      : 'border-transparent'
+                    itemIndex === index ? 'border-[var(--tiger-primary)]' : 'border-transparent'
                   ),
                   'aria-current': itemIndex === index ? 'true' : undefined,
                   onClick: () => select(itemIndex)

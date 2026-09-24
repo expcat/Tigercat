@@ -46,7 +46,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { useFormItemControlContext } from './FormItemContext'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface SliderProps
   extends
@@ -246,12 +246,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     (raw) => coerceSliderFormValue(raw, range)
   )
   const [internalValue, setInternalValue] = useControlledState<number | [number, number]>({
-    value:
-      seeded === null
-        ? range
-          ? [min, max]
-          : min
-        : seeded,
+    value: seeded === null ? (range ? [min, max] : min) : seeded,
     defaultValue: defaultValue ?? (range ? [min, max] : min),
     onChange: (next) => {
       onChange?.(next)
@@ -580,8 +575,8 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 setFocusedThumb(null)
               }}
               getPercentage={getPercentage}
-                formatTooltip={formatTooltip}
-                readOnly={readOnly}
+              formatTooltip={formatTooltip}
+              readOnly={readOnly}
             />
           )}
         </div>

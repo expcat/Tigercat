@@ -56,7 +56,7 @@ import {
   type TigerLocale,
   OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useVueBodyScrollLock, useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
 import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 
@@ -181,10 +181,14 @@ export const Spotlight = defineComponent({
     const resolvedOpen = computed(() => props.open ?? uncontrolledOpen.value)
     const resolvedQuery = computed(() => props.query ?? uncontrolledQuery.value)
     const searchState = computed(() =>
-      getSpotlightSearchState(orderSpotlightWithRecent(props.items ?? [], props.recentIds), resolvedQuery.value, {
-        filterItem: props.filterItem,
-        limit: props.limit
-      })
+      getSpotlightSearchState(
+        orderSpotlightWithRecent(props.items ?? [], props.recentIds),
+        resolvedQuery.value,
+        {
+          filterItem: props.filterItem,
+          limit: props.limit
+        }
+      )
     )
 
     const setOpenValue = (nextOpen: boolean) => {
@@ -487,8 +491,8 @@ export const Spotlight = defineComponent({
               h(
                 'div',
                 { class: 'flex gap-2 px-3 py-2 text-xs', 'data-tiger-spotlight-footer': '' },
-                spotlightFooterShortcuts(state.flatResults.map((result) => result.item)).map((shortcut) =>
-                  h('kbd', { class: 'rounded border px-1' }, shortcut)
+                spotlightFooterShortcuts(state.flatResults.map((result) => result.item)).map(
+                  (shortcut) => h('kbd', { class: 'rounded border px-1' }, shortcut)
                 )
               )
             ]

@@ -70,7 +70,7 @@ import {
   type TigerLocaleCarousel
 } from '@expcat/tigercat-core'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface CarouselProps {
   autoplay?: boolean
@@ -654,7 +654,7 @@ export const Carousel = defineComponent({
             {
               ref: viewportRef,
               class: carouselViewportClasses,
-              'data-tiger-carousel-viewport': '',
+              'data-tiger-carousel-viewport': ''
             },
             track
           ),

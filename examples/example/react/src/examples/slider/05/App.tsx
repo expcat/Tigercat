@@ -10,7 +10,9 @@ export default function App() {
       formatTooltip={(next) => `${next}%`}
       marks={{ 0: '0', 50: '50', 100: '100' }}
       value={value}
-      onChange={setValue}
+      onChange={(next) => {
+        if (typeof next === 'number') setValue(next)
+      }}
     />
   )
 }

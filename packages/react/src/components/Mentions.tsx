@@ -52,7 +52,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFixedVirtualWindow } from './internal/useFixedVirtualWindow'
 import { useFormItemControlContext } from './FormItemContext'
 import { useInputGroupContext } from './InputGroup'
@@ -334,7 +334,16 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
         closeDropdown()
         textarea?.focus()
       },
-      [closeDropdown, commitValue, currentValue, effectiveDisabled, isReadOnly, onSelect, prefix, setQuery]
+      [
+        closeDropdown,
+        commitValue,
+        currentValue,
+        effectiveDisabled,
+        isReadOnly,
+        onSelect,
+        prefix,
+        setQuery
+      ]
     )
 
     const syncFromField = (field?: HTMLTextAreaElement | null) => {

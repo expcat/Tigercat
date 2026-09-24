@@ -47,9 +47,7 @@ export function Drag<T extends DragItem = DragItem>({
     onDragStart,
     onDragOver: (event) => {
       const from = items.findIndex((item) => item.id === event.item.id)
-      const to = event.overItem
-        ? items.findIndex((item) => item.id === event.overItem?.id)
-        : from
+      const to = event.overItem ? items.findIndex((item) => item.id === event.overItem?.id) : from
       setAnnouncement(dragMoveAnnouncement(Math.max(0, from), Math.max(0, to)))
       onDragOver?.(event)
     },
@@ -75,7 +73,7 @@ export function Drag<T extends DragItem = DragItem>({
     () =>
       bindDragContainerItems(drag.containerId, {
         getItems: () => itemsRef.current,
-        commit: (next) => onItemsChangeRef.current?.(next)
+        commit: (next) => onItemsChangeRef.current?.(next as T[])
       }),
     [drag.containerId]
   )

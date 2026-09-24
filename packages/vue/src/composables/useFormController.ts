@@ -83,6 +83,8 @@ export function useFormController(
     resetFields: engine.reset,
     addField: engine.addField,
     removeField: engine.removeField,
+    insertFieldArrayItem: engine.insertFieldArrayItem,
+    removeFieldArrayItem: engine.removeFieldArrayItem,
     undo: engine.undo,
     redo: engine.redo,
     snapshotHistory: engine.snapshotHistory,

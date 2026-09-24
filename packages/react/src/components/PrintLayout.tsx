@@ -28,7 +28,7 @@ import {
   type PrintPageSize,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 const PrintLayoutContext = React.createContext<{
   showPageBreaks: boolean

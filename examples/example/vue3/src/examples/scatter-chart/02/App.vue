@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ScatterChart } from '@expcat/tigercat-vue/ScatterChart'
-import type { ScatterChartDatum } from '@expcat/tigercat-vue'
+import type { ScatterChartDatum } from '@expcat/tigercat-core'
 
 const data: ScatterChartDatum[] = [
   { x: 10, y: 25 },

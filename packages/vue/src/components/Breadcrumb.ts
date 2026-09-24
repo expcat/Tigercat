@@ -39,7 +39,7 @@ import {
 } from '@expcat/tigercat-core'
 import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export const BreadcrumbContextKey = Symbol('BreadcrumbContext')
 
@@ -228,7 +228,10 @@ export const Breadcrumb = defineComponent({
       const items = flattenElementVNodes(slots.default?.() as VNode[] | undefined)
       itemSignature.value = items.map((item) => String(item.key ?? '')).join('|')
       const slotsList = getBreadcrumbSlots(items.length, props.maxItems, false)
-      const collapsed = getBreadcrumbCollapsedItems(items.length, props.maxItems ?? items.length).collapsed
+      const collapsed = getBreadcrumbCollapsedItems(
+        items.length,
+        props.maxItems ?? items.length
+      ).collapsed
       const nodes: VNodeChild[] = []
 
       slotsList.forEach((slot, index) => {
@@ -257,7 +260,8 @@ export const Breadcrumb = defineComponent({
                       collapsed.map((itemIndex) => {
                         const child = items[itemIndex]
                         const propsRecord = (child?.props ?? {}) as Record<string, unknown>
-                        const href = typeof propsRecord.href === 'string' ? propsRecord.href : undefined
+                        const href =
+                          typeof propsRecord.href === 'string' ? propsRecord.href : undefined
                         const rawChildren = child?.children
                         const slotFn =
                           typeof rawChildren === 'function'

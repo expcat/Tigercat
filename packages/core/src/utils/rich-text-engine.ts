@@ -229,7 +229,8 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           }
           const reader = new FileReader()
           reader.onload = () => {
-            const url = typeof reader.result === 'string' ? cappedBitmapDataUrl(reader.result) : null
+            const url =
+              typeof reader.result === 'string' ? cappedBitmapDataUrl(reader.result) : null
             if (!url) {
               ctx.announce?.('Image was not pasted.')
               return
@@ -369,6 +370,3 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
 
 /** Singleton instance used as the default factory. */
 export const builtinRichTextEngine: RichTextEngine = createBuiltinRichTextEngine()
-
-/** Re-exported for convenience so engine authors can default the toolbar. */
-export { defaultToolbar }

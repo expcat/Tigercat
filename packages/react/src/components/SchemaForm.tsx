@@ -42,7 +42,7 @@ import {
   schemaFormNestedGroupClasses,
   schemaFormRootClasses
 } from '@expcat/tigercat-core/schema-form'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Form } from './Form'
 import { FormItem } from './FormItem'
 import { Input } from './Input'
@@ -376,6 +376,9 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
     setInitialValues: (values) => formRef.current?.setInitialValues(values),
     addField: (fieldName, defaultValue) => formRef.current?.addField(fieldName, defaultValue),
     removeField: (fieldName) => formRef.current?.removeField(fieldName),
+    insertFieldArrayItem: (path, index, item) =>
+      formRef.current?.insertFieldArrayItem(path, index, item),
+    removeFieldArrayItem: (path, index) => formRef.current?.removeFieldArrayItem(path, index),
     undo: () => formRef.current?.undo(),
     redo: () => formRef.current?.redo(),
     snapshotHistory: () => formRef.current?.snapshotHistory(),

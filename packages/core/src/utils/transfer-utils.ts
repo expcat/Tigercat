@@ -1,9 +1,9 @@
 import type { ComponentSize } from '../types/base'
 import type { TransferDirection, TransferItem, TransferSelectedKeys } from '../types/transfer'
+import type { VirtualRange } from '../types/virtual-list'
 import { classNames } from './class-names'
 import { resolveButtonClasses } from './button-utils'
-import { treeKeyId } from './tree-utils'
-import { variableSizeStrategy, type VirtualRange } from './virtual-list-utils'
+import { variableSizeStrategy } from './virtual-list-utils'
 
 export const transferBaseClasses = 'flex flex-col sm:flex-row items-stretch gap-4 max-sm:flex-col'
 
@@ -82,8 +82,7 @@ export function getTransferItemClasses(
   isDisabled: boolean,
   size: ComponentSize = 'md'
 ): string {
-  const base =
-    'flex items-start gap-2 tiger-motion-aware [transition:var(--tiger-transition-base)]'
+  const base = 'flex items-start gap-2 tiger-motion-aware [transition:var(--tiger-transition-base)]'
 
   const stateClass = isDisabled
     ? 'text-[var(--tiger-text-secondary)] cursor-not-allowed'
@@ -99,7 +98,7 @@ export function getTransferButtonClasses(disabled: boolean): string {
 }
 
 export function transferKeyId(key: string | number): string {
-  return treeKeyId(key)
+  return String(key)
 }
 
 /** Collapse `1` and `'1'` to one row. First occurrence wins. */
@@ -107,7 +106,7 @@ export function dedupeTransferItems(dataSource: readonly TransferItem[]): Transf
   const seen = new Set<string>()
   const result: TransferItem[] = []
   for (const item of dataSource) {
-    const id = treeKeyId(item.key)
+    const id = transferKeyId(item.key)
     if (seen.has(id)) continue
     seen.add(id)
     result.push(item)
@@ -119,7 +118,7 @@ export function dedupeTransferKeys(keys: readonly (string | number)[]): (string 
   const seen = new Set<string>()
   const result: (string | number)[] = []
   for (const key of keys) {
-    const id = treeKeyId(key)
+    const id = transferKeyId(key)
     if (seen.has(id)) continue
     seen.add(id)
     result.push(key)
@@ -132,7 +131,7 @@ export function sameTransferKeys(
   right: readonly (string | number)[]
 ): boolean {
   if (left.length !== right.length) return false
-  return left.every((key, index) => treeKeyId(key) === treeKeyId(right[index]!))
+  return left.every((key, index) => transferKeyId(key) === transferKeyId(right[index]!))
 }
 
 /** Selected keys split into the current filtered rows and the ones search hid. */
@@ -140,12 +139,12 @@ export function partitionTransferSelection(
   selectedKeys: readonly (string | number)[],
   visibleItems: readonly TransferItem[]
 ): { visible: (string | number)[]; hidden: (string | number)[] } {
-  const visibleIds = new Set(visibleItems.map((item) => treeKeyId(item.key)))
+  const visibleIds = new Set(visibleItems.map((item) => transferKeyId(item.key)))
   const visible: (string | number)[] = []
   const hidden: (string | number)[] = []
   const seen = new Set<string>()
   for (const key of selectedKeys) {
-    const id = treeKeyId(key)
+    const id = transferKeyId(key)
     if (seen.has(id)) continue
     seen.add(id)
     if (visibleIds.has(id)) visible.push(key)

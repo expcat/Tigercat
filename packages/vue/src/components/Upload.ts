@@ -58,7 +58,7 @@ import {
   type InputStatus
 } from '@expcat/tigercat-core'
 
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 import { Button } from './Button'
 import { Icon } from './Icon'
@@ -205,12 +205,7 @@ export const Upload = defineComponent({
     }
 
     watch(
-      () =>
-        [
-          props.fileList,
-          formItemControl?.name.value,
-          formItemControl?.value.value
-        ] as const,
+      () => [props.fileList, formItemControl?.name.value, formItemControl?.value.value] as const,
       () => {
         if (props.fileList !== undefined) {
           localList.value = Array.isArray(props.fileList) ? [...props.fileList] : []
@@ -420,9 +415,7 @@ export const Upload = defineComponent({
         typeof getCurrentInstance()?.vnode.props?.onPreview === 'function' ||
         typeof attrs.onPreview === 'function'
       const safePreview = previewUrlFor(file)
-      const canPreview = customPreview
-        ? true
-        : Boolean(isImageUploadFile(file) && safePreview)
+      const canPreview = customPreview ? true : Boolean(isImageUploadFile(file) && safePreview)
       const actionClass = picture
         ? 'text-[var(--tiger-on-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)] rounded-sm'
         : uploadIconActionClasses
@@ -531,11 +524,7 @@ export const Upload = defineComponent({
                 isDragging.value = result.isDragging
               },
               onDragleave: (event: DragEvent) => {
-                const result = handleUploadDragLeave(
-                  event,
-                  !canMutate.value,
-                  event.currentTarget
-                )
+                const result = handleUploadDragLeave(event, !canMutate.value, event.currentTarget)
                 if (!result.handled) return
                 isDragging.value = result.isDragging
               },

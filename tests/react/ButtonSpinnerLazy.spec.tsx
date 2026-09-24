@@ -35,6 +35,7 @@ vi.mock('@expcat/tigercat-core', () => ({
   getButtonSpinnerClasses: () => 'animate-spin h-4 w-4',
   getSpinnerSVG: getSpinnerSVGMock,
   warnMissingAccessibleName: () => {},
+  hasAccessibleName: () => true,
   TIGER_CHROME_ATTR: 'data-tiger-chrome'
 }))
 
@@ -60,7 +61,7 @@ describe('React Button default spinner lazy creation', () => {
     render(<Button loading>Loading</Button>)
 
     expect(screen.getByRole('button', { name: 'Loading' })).toHaveAttribute('aria-busy', 'true')
-    expect(screen.getByRole('button', { name: 'Loading' })).not.toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Loading' })).toBeDisabled()
     expect(getSpinnerSVGMock).toHaveBeenCalledTimes(1)
     expect(getSpinnerSVGMock).toHaveBeenCalledWith('spinner')
   })

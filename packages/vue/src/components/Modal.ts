@@ -68,7 +68,7 @@ import {
 
 import { Button } from './Button'
 import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import {
   useVueBodyScrollLock,
   useVueEscapeKey,
@@ -397,7 +397,8 @@ export const Modal = defineComponent({
       const event = createDismissActionEvent()
       const raw = (vueInstance?.vnode.props as { onOk?: unknown } | null)?.onOk
       const handlers = (Array.isArray(raw) ? raw : raw ? [raw] : []).filter(
-        (handler): handler is (event: DismissActionEvent) => unknown => typeof handler === 'function'
+        (handler): handler is (event: DismissActionEvent) => unknown =>
+          typeof handler === 'function'
       )
       let result: unknown
       try {
@@ -781,10 +782,7 @@ export const Modal = defineComponent({
         ]
       )
 
-      return [
-        anchor,
-        renderVueOverlayOutlet(instanceId.value, renderedWrapper, portalTarget.value)
-      ]
+      return [anchor, renderVueOverlayOutlet(instanceId.value, renderedWrapper, portalTarget.value)]
     }
   }
 })

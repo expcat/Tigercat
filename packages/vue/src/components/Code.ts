@@ -39,7 +39,7 @@ import {
   type TigerLocale,
   type TigerLocaleCode
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueCodeProps extends CoreCodeProps {
   className?: string
@@ -161,10 +161,7 @@ export const Code = defineComponent({
           h(
             'pre',
             {
-              class: classNames(
-              getCodeBlockPreClasses(wrapped.value),
-              props.lineNumbers && 'flex'
-            ),
+              class: classNames(getCodeBlockPreClasses(wrapped.value), props.lineNumbers && 'flex'),
               tabindex: 0,
               'aria-label': labels.value.scrollLabel
             },
@@ -196,7 +193,7 @@ export const Code = defineComponent({
             ? h(
                 'span',
                 { class: codeBlockLanguageClasses },
-                `${basicLabel(mergedLocale.value.locale, 'code', 'language')}: ${props.language}`
+                `${basicLabel(mergedLocale.value?.locale, 'code', 'language')}: ${props.language}`
               )
             : null,
           props.wrapToggle
@@ -210,7 +207,7 @@ export const Code = defineComponent({
                     wrapped.value = !wrapped.value
                   }
                 },
-                basicLabel(mergedLocale.value.locale, 'code', wrapped.value ? 'nowrap' : 'wrap')
+                basicLabel(mergedLocale.value?.locale, 'code', wrapped.value ? 'nowrap' : 'wrap')
               )
             : null,
           props.copyable

@@ -74,7 +74,7 @@ import { Tag } from './Tag'
 import { Button } from './Button'
 import { Textarea } from './Textarea'
 import { Text } from './Text'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { VirtualList } from './VirtualList'
 
 /**
@@ -679,7 +679,9 @@ export const CommentThread = defineComponent({
                           formatCommentTime(
                             node.time,
                             mergedLocale.value,
-                            documentTimeZone.value ? { timeZone: documentTimeZone.value } : undefined
+                            documentTimeZone.value
+                              ? { timeZone: documentTimeZone.value }
+                              : undefined
                           )
                       }
                     )

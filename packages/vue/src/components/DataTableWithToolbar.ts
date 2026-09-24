@@ -50,7 +50,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Table } from './Table'
 import { tableProps, type VueTableProps } from './Table/props'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Input } from './Input'
 import { Select } from './Select'
 import { Button } from './Button'
@@ -697,7 +697,8 @@ export const DataTableWithToolbar = defineComponent({
       const { toolbar: _toolbarSlot, 'filters-extra': _filtersExtraSlot, ...tableSlots } = slots
       const tablePass: Record<string, unknown> = {}
       for (const key of Object.keys(tableProps)) {
-        tablePass[key] = (props as Record<string, unknown>)[key]
+        const value = (props as Record<string, unknown>)[key]
+        if (value !== undefined) tablePass[key] = value
       }
 
       return h(

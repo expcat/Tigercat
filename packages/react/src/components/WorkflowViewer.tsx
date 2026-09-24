@@ -46,7 +46,7 @@ import {
   type WorkflowViewerProps as CoreWorkflowViewerProps
 } from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Tag } from './Tag'
 
 export interface WorkflowViewerProps

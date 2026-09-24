@@ -65,7 +65,7 @@ import {
   type TigerLocaleCarousel
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 function stripCarouselCloneIds(node: React.ReactNode): React.ReactNode {
   return React.Children.map(node, (child) => {
@@ -528,7 +528,10 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         </div>
       ) : (
         <div
-          className={classNames(carouselTrackScrollClasses, trackInstant && carouselTrackInstantClasses)}
+          className={classNames(
+            carouselTrackScrollClasses,
+            trackInstant && carouselTrackInstantClasses
+          )}
           data-tiger-carousel-track=""
           style={
             {
@@ -566,10 +569,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         onFocus={handleFocus}
         onBlur={handleBlur}
         onKeyDown={handleRootKeyDown}>
-        <div
-          ref={viewportRef}
-          className={carouselViewportClasses}
-          data-tiger-carousel-viewport="">
+        <div ref={viewportRef} className={carouselViewportClasses} data-tiger-carousel-viewport="">
           {track}
         </div>
         <div className={carouselStatusClasses} role="status" aria-live="polite">

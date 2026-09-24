@@ -36,7 +36,7 @@ import { ChartTooltip } from './ChartTooltip'
 import { DrillHost } from './w9-chart-bind'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueTreeMapChartProps extends CoreTreeMapChartProps {
   data: TreeMapChartDatum[]
@@ -154,7 +154,7 @@ export const TreeMapChart = defineComponent({
         selectedIndex: resolvedSelectedIndex.value,
         getLabel: (d) => d.label,
         getColor: (_d, i) => roots.value[i]?.color ?? palette.value[i % palette.value.length],
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       }).map((item, i) => ({ ...item, index: roots.value[i]?.index ?? item.index }))
     )

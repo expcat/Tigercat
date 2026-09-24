@@ -922,8 +922,7 @@ export const NavigationMenu = defineComponent({
     const currentValue = computed(() =>
       resolveNavigationMenuOpenValue({
         value: props.value,
-        internalValue: internalValue.value,
-        open: props.open
+        internalValue: internalValue.value
       })
     )
 

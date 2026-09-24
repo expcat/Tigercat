@@ -3,7 +3,7 @@ import { Highlight } from '@expcat/tigercat-vue/Highlight'
 import { Link } from '@expcat/tigercat-vue/Link'
 import { Text } from '@expcat/tigercat-vue/Text'
 
-const orderId = /#\d+/
+const orderId = ['#42', '#7']
 const keywords = ['Vue', 'React']
 </script>
 

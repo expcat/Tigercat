@@ -29,7 +29,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 const EMPTY_ITEMS: ScrollSpyItem[] = []
 

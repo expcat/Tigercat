@@ -1,7 +1,12 @@
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 
-import { CATEGORIES, CATEGORY_SLUGS, loadComponentRecords, pascalToKebab } from './public-components.mjs'
+import {
+  CATEGORIES,
+  CATEGORY_SLUGS,
+  loadComponentRecords,
+  pascalToKebab
+} from './public-components.mjs'
 import { collectFiles } from '../utils/files.mjs'
 
 export const TEST_GROUPS = Object.freeze([
@@ -21,13 +26,13 @@ const FRAMEWORKS = new Set(['react', 'vue'])
 
 const FRAMEWORK_EXTRAS = {
   basic: ['ButtonSpinnerLazy', 'ImagePreview.ssr'],
-  form: ['custom-text', 'useFormController'],
-  feedback: ['Notification', 'overlay-positioning', 'overlay-ssr'],
+  form: ['custom-text', 'useFormController', 'w9-forms', 'w9-bind'],
+  feedback: ['Notification', 'overlay-positioning', 'overlay-ssr', 'w9-confirm-modal'],
   layout: ['Grid', 'LayoutSections'],
-  data: ['TableState'],
+  data: ['TableState', 'w9-data-components', 'w9-t02'],
   charts: ['ChartSubComponents', 'useChartInteraction', 'useResponsiveChartSize'],
   advanced: ['DragEnhancements', 'useDrag'],
-  composite: ['useControlledState']
+  composite: ['useControlledState', 'w9-render-wire', 'w9-t07']
 }
 
 const CORE_EXTRAS = {

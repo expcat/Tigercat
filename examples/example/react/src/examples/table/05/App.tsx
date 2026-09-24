@@ -1,5 +1,5 @@
 import { Table } from '@expcat/tigercat-react/Table'
-import type { TableColumn } from '@expcat/tigercat-react'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 interface Row extends Record<string, unknown> {
   id: number

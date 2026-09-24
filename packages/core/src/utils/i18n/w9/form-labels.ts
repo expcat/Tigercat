@@ -71,9 +71,3 @@ export function getW9FormLabels(locale?: string): W9FormLabels {
   if (locale?.toLowerCase().startsWith('zh')) return zhCN
   return enUS
 }
-
-export function formatW9Label(template: string, values: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (_, key: string) =>
-    values[key] === undefined ? '' : String(values[key])
-  )
-}

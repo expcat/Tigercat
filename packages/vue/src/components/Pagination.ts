@@ -52,7 +52,7 @@ import {
   type TigerLocalePagination
 } from '@expcat/tigercat-core'
 import { chevronLeftSolidIcon20PathD } from '@expcat/tigercat-core/icons/picker'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type PaginationProps = VuePaginationProps
 
@@ -227,7 +227,10 @@ export const Pagination = defineComponent({
      * @default false
      */
     ellipsisJump: { type: Boolean, default: false },
-    itemRender: { type: Function as PropType<(page: number, kind: string) => VNodeChild>, default: undefined },
+    itemRender: {
+      type: Function as PropType<(page: number, kind: string) => VNodeChild>,
+      default: undefined
+    },
     showLessItems: {
       type: Boolean,
       default: false
@@ -536,9 +539,9 @@ export const Pagination = defineComponent({
                         class: getPaginationEllipsisClasses(size),
                         'aria-label': navLabels.paginationJump,
                         onClick: (event: MouseEvent) => {
-                          const input = (event.currentTarget as HTMLElement).parentElement?.querySelector(
-                            'input'
-                          )
+                          const input = (
+                            event.currentTarget as HTMLElement
+                          ).parentElement?.querySelector('input')
                           input?.focus()
                         }
                       },
@@ -559,7 +562,11 @@ export const Pagination = defineComponent({
                     }),
                     h('span', { class: 'sr-only' }, hidden.join(','))
                   ])
-                : h('span', { class: getPaginationEllipsisClasses(size), 'aria-hidden': 'true' }, '...')
+                : h(
+                    'span',
+                    { class: getPaginationEllipsisClasses(size), 'aria-hidden': 'true' },
+                    '...'
+                  )
             )
           } else {
             const isActive = pageNum === page
@@ -574,7 +581,7 @@ export const Pagination = defineComponent({
                   'aria-current': isActive ? 'page' : undefined,
                   'aria-label': labels.value.pageAriaLabel.replace('{page}', String(pageNum))
                 },
-                props.itemRender ? props.itemRender(pageNum, 'page') : String(pageNum)
+                props.itemRender?.(pageNum, 'page') ?? String(pageNum)
               )
             )
           }

@@ -49,7 +49,7 @@ import { renderAxisBind } from './w9-chart-bind'
 import { useCartesianSeriesPoints } from '../composables/useCartesianSeriesPoints'
 import { useChartInteraction } from '../composables/useChartInteraction'
 import { useResponsiveChartSize } from '../composables/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueLineChartProps extends CoreLineChartProps {
   data?: LineChartDatum[]
@@ -417,7 +417,7 @@ export const LineChart = defineComponent({
             ? props.legendFormatter(s, i)
             : (s.name ?? defaultChartSeriesName(i, labels.value.seriesName)),
         getColor: (s, i) => s.color ?? palette.value[i % palette.value.length],
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       })
     )
@@ -810,7 +810,8 @@ export const LineChart = defineComponent({
                   ? {
                       start: brushDomain(props.bind.domain ?? { min: 0, max: 1 }, props.bind.brush)
                         .min,
-                      end: brushDomain(props.bind.domain ?? { min: 0, max: 1 }, props.bind.brush).max
+                      end: brushDomain(props.bind.domain ?? { min: 0, max: 1 }, props.bind.brush)
+                        .max
                     }
                   : null,
                 secondAxis: props.bind.secondAxis,

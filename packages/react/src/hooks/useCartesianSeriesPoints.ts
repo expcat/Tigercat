@@ -78,7 +78,7 @@ export function useCartesianSeriesPoints<T>({
   }, [])
 
   const handlePointMouseLeave = useCallback(
-    (event?: React.MouseEvent) => {
+    (event?: React.MouseEvent | React.FocusEvent) => {
       if (event && chartPointerRemainsInside(event.currentTarget, event.relatedTarget)) return
       plotScan.cancel()
       setHoveredPointInfo(null)

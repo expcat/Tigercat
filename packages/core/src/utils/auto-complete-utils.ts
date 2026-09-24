@@ -5,10 +5,11 @@ import type {
   AutoCompleteOption,
   AutoCompleteValue
 } from '../types/auto-complete'
+import type { VirtualRange } from '../types/virtual-list'
 import { classNames } from './class-names'
 import { getInitialPickerActiveIndex } from './picker-utils'
 import { getSelectVirtualItemHeight } from './select-utils'
-import { fixedSizeStrategy, scrollTopForVirtualAlign, type VirtualRange } from './virtual-list-utils'
+import { fixedSizeStrategy, scrollTopForVirtualAlign } from './virtual-list-utils'
 import {
   selectBaseClasses,
   selectClearButtonClasses,
@@ -150,8 +151,7 @@ export function getAutoCompleteInputClasses(options: {
     'focus-visible:border-[var(--tiger-primary)]',
     options.disabled &&
       'bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)] border-[var(--tiger-border)] cursor-not-allowed',
-    options.isOpen &&
-      'ring-2 ring-[var(--tiger-focus-ring)]/40 border-[var(--tiger-primary)]'
+    options.isOpen && 'ring-2 ring-[var(--tiger-focus-ring)]/40 border-[var(--tiger-primary)]'
   )
 }
 
@@ -171,9 +171,7 @@ export function getAutoCompleteOptionClasses(options: {
       : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover)]',
     options.isSelected &&
       'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)] font-medium',
-    options.isActive &&
-      !options.isDisabled &&
-      'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
+    options.isActive && !options.isDisabled && 'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
   )
 }
 
@@ -221,9 +219,7 @@ export function resolveAutoCompleteDisplayValue(
   return String(value)
 }
 
-export function isAutoCompleteEmptyValue(
-  value: unknown
-): value is null | undefined | '' {
+export function isAutoCompleteEmptyValue(value: unknown): value is null | undefined | '' {
   return value === undefined || value === null || value === ''
 }
 

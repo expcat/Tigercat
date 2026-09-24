@@ -61,7 +61,7 @@ import {
   type TigerLocale,
   type TigerLocaleInput
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { Button } from './Button'
 import { Checkbox } from './Checkbox'
 import { Empty } from './Empty'
@@ -193,9 +193,13 @@ export const Table = defineComponent({
     const tableLocale = computed(() =>
       mergeTigerLocale(config.value.locale, resolvedTableLocale.value)
     )
-    watch(tableLocale, (locale) => {
-      sortLocale.value = locale?.locale
-    }, { immediate: true })
+    watch(
+      tableLocale,
+      (locale) => {
+        sortLocale.value = locale?.locale
+      },
+      { immediate: true }
+    )
 
     const tableLabels = computed(() => {
       const overrides =
@@ -354,6 +358,7 @@ export const Table = defineComponent({
         uncontrolledCardViewport.value = next
       })
     }
+    subscribeCardViewport()
     onMounted(() => subscribeCardViewport())
     watch(
       () => [props.responsiveMode, props.cardBreakpoint, props.cardViewport] as const,
@@ -398,22 +403,16 @@ export const Table = defineComponent({
           'Table virtual window is off because a measured row does not match virtualItemHeight'
         )
       }
-      const showCardTree =
-        resolvedProps.responsiveMode === 'card' && isCardViewport.value
+      const showCardTree = resolvedProps.responsiveMode === 'card' && isCardViewport.value
       const showTableTree = !showCardTree
       const virtualViewport = resolveScrollportViewport(
         virtualClientHeight.value,
         typeof resolvedProps.virtualHeight === 'number' ? resolvedProps.virtualHeight : 0
       )
       const pageFits =
-        virtualViewport > 0 &&
-        ctx.paginatedData.value.length * declaredRowHeight <= virtualViewport
+        virtualViewport > 0 && ctx.paginatedData.value.length * declaredRowHeight <= virtualViewport
       const effectiveVirtual =
-        virtualRecommendation.enabled &&
-        virtualAllowed &&
-        !unevenRows &&
-        !pageFits &&
-        !showCardTree
+        virtualRecommendation.enabled && virtualAllowed && !unevenRows && !pageFits && !showCardTree
       const wrapperStyle = resolvedProps.maxHeight
         ? {
             maxHeight:
@@ -500,9 +499,7 @@ export const Table = defineComponent({
           'aria-colcount': resolvedProps.virtualizeColumns
             ? String(ctx.displayColumns.value.length)
             : undefined,
-          'data-keyboard-mode': resolvedProps.grid
-            ? resolveTableKeyboardMode(true)
-            : undefined,
+          'data-keyboard-mode': resolvedProps.grid ? resolveTableKeyboardMode(true) : undefined,
           'data-grid-cell': resolvedProps.grid
             ? `${gridCell.value.row}-${gridCell.value.column}`
             : undefined,
@@ -1019,7 +1016,6 @@ export const Table = defineComponent({
             processedRecords: ctx.processedData.value,
             processedKeys: ctx.processedRowKeys.value,
             selectedKeys: ctx.selectedRowKeys.value,
-            remote: resolvedProps.rowSelection?.remote === true,
             onSort: (key: string) => ctx.applyMultiSort(key),
             onFilter: (key: string, value: string) => ctx.handleFilter(key, value),
             onHide: (key: string) => {

@@ -56,7 +56,7 @@ import {
   type ScrollAreaState,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueScrollAreaProps extends CoreScrollAreaProps {}
 
@@ -266,7 +266,6 @@ export const ScrollArea = defineComponent({
 
     expose({
       scrollTo,
-      scrollToMarker,
       scrollToTop: (behavior?: ScrollAreaScrollToOptions['behavior']) =>
         scrollTo({ top: 0, behavior }),
       scrollToBottom: (behavior?: ScrollAreaScrollToOptions['behavior']) =>
@@ -285,18 +284,8 @@ export const ScrollArea = defineComponent({
       }
       const otherVisible =
         axis === 'y'
-          ? shouldRenderScrollAreaScrollbar(
-              props.scrollbar,
-              props.axis,
-              'x',
-              scrollState.value.x
-            )
-          : shouldRenderScrollAreaScrollbar(
-              props.scrollbar,
-              props.axis,
-              'y',
-              scrollState.value.y
-            )
+          ? shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, 'x', scrollState.value.x)
+          : shouldRenderScrollAreaScrollbar(props.scrollbar, props.axis, 'y', scrollState.value.y)
       return h(
         'div',
         {
@@ -360,9 +349,7 @@ export const ScrollArea = defineComponent({
         tabIndex: _t2,
         ...rootAttrs
       } = attrs as Record<string, unknown>
-      const shadows = props.shadow
-        ? getScrollAreaShadowSides(scrollState.value, props.axis)
-        : []
+      const shadows = props.shadow ? getScrollAreaShadowSides(scrollState.value, props.axis) : []
 
       const restRoot: Record<string, unknown> = {}
       const restA11y: Record<string, unknown> = {}

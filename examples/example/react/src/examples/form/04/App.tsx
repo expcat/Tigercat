@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FormRules } from '@expcat/tigercat-react'
+import type { FormRules } from '@expcat/tigercat-core'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'

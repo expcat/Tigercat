@@ -1,5 +1,5 @@
 import { RadarChart } from '@expcat/tigercat-react/RadarChart'
-import type { RadarChartSeries } from '@expcat/tigercat-react'
+import type { RadarChartSeries } from '@expcat/tigercat-core'
 
 const series: RadarChartSeries[] = [
   {

@@ -26,7 +26,7 @@ import {
   type AlertProps as CoreAlertProps
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface AlertProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, CoreAlertProps {

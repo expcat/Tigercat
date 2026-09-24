@@ -16,7 +16,7 @@ import {
   warnStandaloneBadgeChildren,
   type BadgeProps as CoreBadgeProps
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export type BadgeProps = CoreBadgeProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, 'children' | 'content'> & {
@@ -78,7 +78,9 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
       ref={standalone ? ref : undefined}
       className={classNames(badgeClasses, standalone && className)}
       aria-hidden={hideFromAT ? true : ariaHiddenProp}
-      aria-label={hideFromAT ? undefined : ariaLabelProp || (isDot ? statusLabels.badgeLabel : undefined)}
+      aria-label={
+        hideFromAT ? undefined : ariaLabelProp || (isDot ? statusLabels.badgeLabel : undefined)
+      }
       aria-labelledby={hideFromAT ? undefined : ariaLabelledbyProp}>
       {resolved.kind === 'text' ? resolved.value : null}
     </span>
@@ -92,7 +94,9 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
     <span ref={ref} className={classNames(badgeWrapperClasses, className)} {...props}>
       {children}
       {badgeElement}
-      {!isHidden ? <span className="sr-only">{isDot ? statusLabels.badgeLabel : countLabel}</span> : null}
+      {!isHidden ? (
+        <span className="sr-only">{isDot ? statusLabels.badgeLabel : countLabel}</span>
+      ) : null}
     </span>
   )
 })

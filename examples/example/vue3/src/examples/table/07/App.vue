@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { Table } from '@expcat/tigercat-vue/Table'
-import type { TableColumn } from '@expcat/tigercat-vue'
+import type { TableColumn } from '@expcat/tigercat-core'
 
 type DemoState = 'data' | 'loading' | 'empty'
 

@@ -60,7 +60,7 @@ import { Text } from './Text'
 import { Link } from './Link'
 import { Button } from './Button'
 import { Loading } from './Loading'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 type HChildren = Parameters<typeof h>[2]
 
@@ -281,9 +281,13 @@ export const ActivityFeed = defineComponent({
       stopObserver = teardown
     }
     onMounted(bindSentinel)
-    watch(() => [props.hasMore, props.loading, props.loadError, windowRows.value.length], bindSentinel, {
-      flush: 'post'
-    })
+    watch(
+      () => [props.hasMore, props.loading, props.loadError, windowRows.value.length],
+      bindSentinel,
+      {
+        flush: 'post'
+      }
+    )
     onBeforeUnmount(() => stopObserver?.())
 
     watch(resolvedGroups, (groups) => {
@@ -560,11 +564,7 @@ export const ActivityFeed = defineComponent({
               )
             : null,
           props.loading
-            ? h(
-                'p',
-                null,
-                resolveLocaleText(labels.value.loadingText, props.loadingText)
-              )
+            ? h('p', null, resolveLocaleText(labels.value.loadingText, props.loadingText))
             : null,
           ...(compositeListUsesWindow(windowRows.value.length)
             ? [
@@ -614,59 +614,62 @@ export const ActivityFeed = defineComponent({
                 )
               ]
             : resolvedGroups.value.map((group, groupIndex) => {
-          const headerNode = slots.groupHeader?.({ group }) ?? slots.groupTitle?.({ group })
-          const groupTitle = group.title
-          const timelineItems = toActivityTimelineItems(group.items)
-          const renderDot = (timelineItem: ActivityTimelineItem) => {
-            const activity = timelineItem.activity
-            const statusVariant = (activity?.status?.variant ?? 'default') as string
-            const dotClasses = getActivityFeedDotClasses(statusVariant)
-            return h('div', { class: 'relative flex items-center justify-center w-2.5 h-2.5' }, [
-              dotClasses.pulse
-                ? h('span', {
-                    class: `${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`
-                  })
-                : null,
-              h('span', { class: `${activityFeedDotBaseClasses} ${dotClasses.dot}` })
-            ])
-          }
-
-          return h('div', { key: group.key ?? groupIndex, class: 'space-y-3' }, [
-            props.showGroupTitle
-              ? (headerNode ??
-                (groupTitle
-                  ? h('div', { class: 'flex items-center gap-2 mb-2' }, [
-                      h('span', {
-                        class: activityFeedGroupMarkerClasses
-                      }),
-                      h(
-                        Text,
-                        {
-                          tag: 'span',
-                          size: 'sm',
-                          weight: 'bold',
-                          class: activityFeedGroupTitleClasses
-                        },
-                        { default: () => groupTitle }
-                      )
-                    ])
-                  : null))
-              : null,
-            h(
-              Timeline,
-              { items: timelineItems },
-              {
-                dot: ({ item }: { item: ActivityTimelineItem }) => renderDot(item),
-                item: ({ item, index }: { item: ActivityTimelineItem; index: number }) => {
-                  const activity = item.activity
-                  if (!activity) return null
-                  return renderDefaultItem(activity, index, group)
+                const headerNode = slots.groupHeader?.({ group }) ?? slots.groupTitle?.({ group })
+                const groupTitle = group.title
+                const timelineItems = toActivityTimelineItems(group.items)
+                const renderDot = (timelineItem: ActivityTimelineItem) => {
+                  const activity = timelineItem.activity
+                  const statusVariant = (activity?.status?.variant ?? 'default') as string
+                  const dotClasses = getActivityFeedDotClasses(statusVariant)
+                  return h(
+                    'div',
+                    { class: 'relative flex items-center justify-center w-2.5 h-2.5' },
+                    [
+                      dotClasses.pulse
+                        ? h('span', {
+                            class: `${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`
+                          })
+                        : null,
+                      h('span', { class: `${activityFeedDotBaseClasses} ${dotClasses.dot}` })
+                    ]
+                  )
                 }
-              }
-            )
-          ])
-        }))
-          ,
+
+                return h('div', { key: group.key ?? groupIndex, class: 'space-y-3' }, [
+                  props.showGroupTitle
+                    ? (headerNode ??
+                      (groupTitle
+                        ? h('div', { class: 'flex items-center gap-2 mb-2' }, [
+                            h('span', {
+                              class: activityFeedGroupMarkerClasses
+                            }),
+                            h(
+                              Text,
+                              {
+                                tag: 'span',
+                                size: 'sm',
+                                weight: 'bold',
+                                class: activityFeedGroupTitleClasses
+                              },
+                              { default: () => groupTitle }
+                            )
+                          ])
+                        : null))
+                    : null,
+                  h(
+                    Timeline,
+                    { items: timelineItems },
+                    {
+                      dot: ({ item }: { item: ActivityTimelineItem }) => renderDot(item),
+                      item: ({ item, index }: { item: ActivityTimelineItem; index: number }) => {
+                        const activity = item.activity
+                        if (!activity) return null
+                        return renderDefaultItem(activity, index, group)
+                      }
+                    }
+                  )
+                ])
+              })),
           !compositeListUsesWindow(windowRows.value.length) && props.hasMore
             ? h('div', {
                 ref: sentinelRef,

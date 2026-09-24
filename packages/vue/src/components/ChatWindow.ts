@@ -48,7 +48,7 @@ import { Input } from './Input'
 import { Button } from './Button'
 import { VirtualList } from './VirtualList'
 import { Empty } from './Empty'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueChatWindowProps extends Omit<
   CoreChatWindowProps,
@@ -461,8 +461,17 @@ export const ChatWindow = defineComponent({
           messages.value.length === 0
             ? h(
                 'div',
-                { class: classNames(chatMessageListClasses, 'h-full flex items-center justify-center py-8') },
-                [h(Empty, { description: resolveLocaleText(labels.value.emptyText, props.emptyText) })]
+                {
+                  class: classNames(
+                    chatMessageListClasses,
+                    'h-full flex items-center justify-center py-8'
+                  )
+                },
+                [
+                  h(Empty, {
+                    description: resolveLocaleText(labels.value.emptyText, props.emptyText)
+                  })
+                ]
               )
             : virtualOn.value
               ? h(

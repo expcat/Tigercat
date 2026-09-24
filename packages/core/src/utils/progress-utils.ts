@@ -1,10 +1,4 @@
-import type {
-  ProgressProps,
-  ProgressSize,
-  ProgressStatus,
-  ProgressType,
-  ProgressVariant
-} from '../types/progress'
+import type { ProgressSize, ProgressStatus, ProgressType, ProgressVariant } from '../types/progress'
 import { getProgressTextColorClasses, getProgressVariantClasses } from './theme-colors'
 
 /** Stripes, fill transition, and reduced motion. Mounted components do not write to document.head. */
@@ -212,7 +206,8 @@ export function resolveProgressView(input: ProgressViewInput): ProgressView {
   const successMark = input.status === 'success'
   const percentage = successMark ? 100 : passed
   const indeterminate = Boolean(input.indeterminate) && !successMark
-  const steps = Number.isFinite(input.steps) && (input.steps ?? 0) > 1 ? Math.floor(input.steps ?? 0) : 0
+  const steps =
+    Number.isFinite(input.steps) && (input.steps ?? 0) > 1 ? Math.floor(input.steps ?? 0) : 0
   const statusVariant = getStatusVariant(input.status ?? 'normal')
   const effectiveVariant = (statusVariant || input.variant || 'primary') as ProgressVariant
   const shouldShowText = input.showText ?? type === 'line'
@@ -260,11 +255,12 @@ export function getProgressFillClasses(view: ProgressView, extra?: string): stri
 
 export function progressStepFilled(steps: number, percentage: number): boolean[] {
   const count = Math.max(0, Math.floor(steps))
-  return Array.from({ length: count }, (_, index) => ((index + 1) / count) * 100 <= percentage + 0.001)
+  return Array.from(
+    { length: count },
+    (_, index) => ((index + 1) / count) * 100 <= percentage + 0.001
+  )
 }
 
 export function getProgressStrokeClasses(variant: ProgressVariant): string {
   return getProgressTextColorClasses(variant)
 }
-
-export type { ProgressProps }

@@ -24,6 +24,7 @@ export const koKR: TigerLocale = {
     closeMessageAriaLabel: '메시지 닫기',
     closeNotificationAriaLabel: '알림 닫기',
     sidebarAriaLabel: '사이드바',
+    skipToContent: '본문으로 건너뛰기',
     moreOptionsText: '추가 작업',
     confirmTitle: '이 작업을 계속하시겠습니까?'
   },
@@ -71,7 +72,7 @@ export const koKR: TigerLocale = {
   text: {
     copyLabel: '복사',
     copiedLabel: '복사됨',
-    copyFailedLabel: '복사 실패',
+    copyFailedLabel: '복사 실패'
   },
   watermark: {
     imageErrorText: '워터마크 이미지를 불러오지 못했습니다'
@@ -243,7 +244,8 @@ export const koKR: TigerLocale = {
     publishBlocked: '차단 항목이 있어 게시할 수 없습니다'
   },
   workflowDetailShell: {
-    ariaLabel: '워크플로 상세'
+    ariaLabel: '워크플로 상세',
+    title: '승인'
   },
   progress: {
     ariaLabel: '진행률'
@@ -359,7 +361,7 @@ export const koKR: TigerLocale = {
     finishText: '완료',
     closeAriaLabel: '투어 닫기',
     dialogAriaLabel: '둘러보기',
-    loadErrorText: '이 투어를 불러오지 못했습니다.',
+    loadErrorText: '이 투어를 불러오지 못했습니다.'
   },
   calendar: {
     previousMonth: '이전 달',

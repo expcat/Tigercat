@@ -24,6 +24,7 @@ export const esES: TigerLocale = {
     closeMessageAriaLabel: 'Cerrar mensaje',
     closeNotificationAriaLabel: 'Cerrar notificación',
     sidebarAriaLabel: 'Barra lateral',
+    skipToContent: 'Saltar al contenido principal',
     moreOptionsText: 'Más opciones',
     confirmTitle: '¿Seguro que quieres continuar?'
   },
@@ -71,7 +72,7 @@ export const esES: TigerLocale = {
   text: {
     copyLabel: 'Copiar',
     copiedLabel: 'Copiado',
-    copyFailedLabel: 'Error al copiar',
+    copyFailedLabel: 'Error al copiar'
   },
   watermark: {
     imageErrorText: 'No se pudo cargar la imagen de marca de agua'
@@ -244,7 +245,8 @@ export const esES: TigerLocale = {
     publishBlocked: 'No se puede publicar hasta corregir esto'
   },
   workflowDetailShell: {
-    ariaLabel: 'Detalle del flujo'
+    ariaLabel: 'Detalle del flujo',
+    title: 'Aprobación'
   },
   progress: {
     ariaLabel: 'Progreso'
@@ -360,7 +362,7 @@ export const esES: TigerLocale = {
     finishText: 'Finalizar',
     closeAriaLabel: 'Cerrar recorrido',
     dialogAriaLabel: 'Recorrido',
-    loadErrorText: 'No se pudo cargar este recorrido.',
+    loadErrorText: 'No se pudo cargar este recorrido.'
   },
   calendar: {
     previousMonth: 'Mes anterior',

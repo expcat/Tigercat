@@ -33,7 +33,7 @@ import { confirmModal } from './Modal'
 import { Steps } from './Steps'
 import { Button } from './Button'
 import { Icon } from './Icon'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { useFormContext } from './Form'
 import { useControlledState } from '../hooks/useControlledState'
 
@@ -166,11 +166,9 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
       return
     }
     if (prev === undefined) return
-    onStepChange?.(
-      clampStepIndex(current, totalCount),
-      clampStepIndex(prev, totalCount),
-      { skippedValidation: true }
-    )
+    onStepChange?.(clampStepIndex(current, totalCount), clampStepIndex(prev, totalCount), {
+      skippedValidation: true
+    })
   }, [current, onStepChange, totalCount])
 
   const validateAdvance = useCallback(

@@ -226,10 +226,21 @@ export function useFocusTrap({
 // Floating UI positioning hook
 // ============================================================================
 
+interface FloatingClientRect {
+  bottom: number
+  height: number
+  left: number
+  right: number
+  top: number
+  width: number
+  x: number
+  y: number
+}
+
 export type FloatingReference =
   | HTMLElement
   | {
-      getBoundingClientRect: () => DOMRect | DOMRectReadOnly | Record<string, number>
+      getBoundingClientRect: () => FloatingClientRect
       contextElement?: Element
     }
 

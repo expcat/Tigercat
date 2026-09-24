@@ -10,7 +10,12 @@ import {
   type PropType,
   type VNodeChild
 } from 'vue'
-import { calendarWeekNumber, classNames, coerceClassValue, getW9DataLabels } from '@expcat/tigercat-core'
+import {
+  calendarWeekNumber,
+  classNames,
+  coerceClassValue,
+  getW9DataLabels
+} from '@expcat/tigercat-core'
 import type {
   CalendarEvent,
   CalendarMode,
@@ -63,7 +68,7 @@ import {
   toCalendarDate,
   toIsoDate
 } from '@expcat/tigercat-core'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueCalendarProps extends Omit<
   CoreCalendarProps,
@@ -142,9 +147,7 @@ export const Calendar = defineComponent({
     )
 
     const days = computed(() =>
-      view.value
-        ? getMonthDays(view.value.viewYear, view.value.viewMonth, weekStartsOn.value)
-        : []
+      view.value ? getMonthDays(view.value.viewYear, view.value.viewMonth, weekStartsOn.value) : []
     )
     const weeks = computed(() => chunkDaysIntoWeeks(days.value))
     const monthRows = computed(() => chunkMonths(monthNames.value))
@@ -187,9 +190,11 @@ export const Calendar = defineComponent({
     }
 
     function selectMonth(monthIdx: number) {
-      const result = selectCalendarMonth(view.value.viewYear, monthIdx, props.disabledDate)
+      const panel = view.value
+      if (!panel) return
+      const result = selectCalendarMonth(panel.viewYear, monthIdx, props.disabledDate)
       if (!result) return
-      view.value = { viewYear: view.value.viewYear, viewMonth: monthIdx }
+      view.value = { viewYear: panel.viewYear, viewMonth: monthIdx }
       if (props.mode === undefined) innerMode.value = 'month'
       emit('update:mode', 'month')
       commitSelected(result.date)
@@ -287,11 +292,12 @@ export const Calendar = defineComponent({
     })
 
     return () => {
-      if (!view.value) {
+      const panel = view.value
+      if (!panel) {
         return h('div', {
           class: classNames(getCalendarContainerClasses(!!props.fullscreen), props.className),
           'data-tiger-calendar': '',
-          'aria-label': labels.value.today
+          'aria-label': labels.value.switchToMonth
         })
       }
       const attrRecord = attrs as Record<string, unknown>
@@ -302,8 +308,8 @@ export const Calendar = defineComponent({
       )
       const title =
         mode.value === 'month'
-          ? formatMonthYear(view.value.viewYear, view.value.viewMonth, localeCode.value)
-          : `${view.value.viewYear}`
+          ? formatMonthYear(panel.viewYear, panel.viewMonth, localeCode.value)
+          : `${panel.viewYear}`
       const prevLabel =
         mode.value === 'month' ? labels.value.previousMonth : labels.value.previousYear
       const nextLabel = mode.value === 'month' ? labels.value.nextMonth : labels.value.nextYear
@@ -313,13 +319,13 @@ export const Calendar = defineComponent({
         days: days.value,
         selected: selected.value,
         today: today.value,
-        view: view.value,
+        view: panel,
         disabledDate: props.disabledDate,
         activeIso: activeIso.value
       })
       const rovingMonthIdx = resolveCalendarRovingMonth({
-        viewMonth: view.value.viewMonth,
-        viewYear: view.value.viewYear,
+        viewMonth: panel.viewMonth,
+        viewYear: panel.viewYear,
         disabledDate: props.disabledDate,
         activeMonthIdx: activeMonthIdx.value
       })
@@ -336,8 +342,8 @@ export const Calendar = defineComponent({
             onClick: () =>
               navigate(
                 mode.value === 'month'
-                  ? shiftCalendarPanel(view.value, -1)
-                  : shiftCalendarYear(view.value, -1)
+                  ? shiftCalendarPanel(panel, -1)
+                  : shiftCalendarYear(panel, -1)
               )
           },
           prevChar
@@ -364,9 +370,7 @@ export const Calendar = defineComponent({
             'aria-label': nextLabel,
             onClick: () =>
               navigate(
-                mode.value === 'month'
-                  ? shiftCalendarPanel(view.value, 1)
-                  : shiftCalendarYear(view.value, 1)
+                mode.value === 'month' ? shiftCalendarPanel(panel, 1) : shiftCalendarYear(panel, 1)
               )
           },
           nextChar
@@ -390,22 +394,18 @@ export const Calendar = defineComponent({
               { key: ri, class: 'grid grid-cols-3 gap-2', role: 'row' },
               row.map((name, ci) => {
                 const i = ri * 3 + ci
-                const isDisabled = isCalendarMonthDisabled(
-                  view.value.viewYear,
-                  i,
-                  props.disabledDate
-                )
+                const isDisabled = isCalendarMonthDisabled(panel.viewYear, i, props.disabledDate)
                 return h(
                   'button',
                   {
                     key: i,
                     type: 'button',
                     role: 'gridcell',
-                    'aria-selected': view.value.viewMonth === i,
+                    'aria-selected': panel.viewMonth === i,
                     disabled: isDisabled,
                     tabindex: rovingMonthIdx === i && !isDisabled ? 0 : -1,
                     class: getCalendarMonthClasses({
-                      isSelected: view.value.viewMonth === i,
+                      isSelected: panel.viewMonth === i,
                       isDisabled,
                       isActive: activeMonthIdx.value === i
                     }),
@@ -421,33 +421,26 @@ export const Calendar = defineComponent({
         )
       } else {
         const weekGridClass = 'grid grid-cols-8'
-        const weekdayRow = h(
-          'div',
-          { class: weekGridClass, role: 'row' },
-          [
-            h(
-              'div',
-              { class: calendarWeekdayClasses, role: 'columnheader' },
-              getW9DataLabels().weekNumber
-            ),
-            ...weekdayNames.value.map((wd) =>
-              h('div', { key: wd, class: calendarWeekdayClasses, role: 'columnheader' }, wd)
-            )
-          ]
-        )
-        const weekRows = weeks.value.map((week, wi) =>
+        const weekdayRow = h('div', { class: weekGridClass, role: 'row' }, [
           h(
             'div',
-            { key: wi, class: weekGridClass, role: 'row' },
-            [
-              h(
-                'div',
-                { class: calendarWeekdayClasses, 'data-week-number': '' },
-                String(calendarWeekNumber(week[0], weekStartsOn.value))
-              ),
-              ...week.map((date) => {
+            { class: calendarWeekdayClasses, role: 'columnheader' },
+            getW9DataLabels().weekNumber
+          ),
+          ...weekdayNames.value.map((wd) =>
+            h('div', { key: wd, class: calendarWeekdayClasses, role: 'columnheader' }, wd)
+          )
+        ])
+        const weekRows = weeks.value.map((week, wi) =>
+          h('div', { key: wi, class: weekGridClass, role: 'row' }, [
+            h(
+              'div',
+              { class: calendarWeekdayClasses, 'data-week-number': '' },
+              String(calendarWeekNumber(week[0], weekStartsOn.value))
+            ),
+            ...week.map((date) => {
               const iso = toIsoDate(date)
-              const isCurrentMonth = date.getMonth() === view.value.viewMonth
+              const isCurrentMonth = date.getMonth() === panel.viewMonth
               const isSelected = selected.value ? isSameDay(date, selected.value) : false
               const isRangeStart = rangeStart ? isSameDay(date, rangeStart) : false
               const isRangeEnd = rangeEnd ? isSameDay(date, rangeEnd) : false
@@ -493,50 +486,56 @@ export const Calendar = defineComponent({
                   : null
               return h('div', { key: iso, class: 'flex min-w-0 flex-col items-stretch' }, [
                 h(
-                'button',
-                {
-                  type: 'button',
-                  role: 'gridcell',
-                  'data-date': iso,
-                  'aria-label': eventTitles.length
-                    ? `${dayLabel}. ${eventTitles.join(', ')}`
-                    : dayLabel,
-                  'aria-selected': isSelected || isRangeStart || isRangeEnd,
-                  'aria-current': isTodayDate ? 'date' : undefined,
-                  disabled: isDisabled,
-                  tabindex: rovingDayIso === iso && !isDisabled ? 0 : -1,
-                  class: getCalendarDayClasses({
-                    isSelected,
-                    isToday: isTodayDate,
-                    isCurrentMonth,
-                    isDisabled,
-                    isActive: activeIso.value === iso,
-                    isInRange,
-                    isRangeStart,
-                    isRangeEnd,
-                    hasExtra
-                  }),
-                  onClick: () => selectDay(date),
-                  onFocus: () => (activeIso.value = iso)
-                },
-                [formatCalendarDayNumber(date, localeCode.value), defaultDots]
-              ),
-              customCell ? h('div', {}, [customCell as VNodeChild]) : null,
-              eventTitles.length
-                ? h(
-                    'ul',
-                    { class: 'm-0 list-none p-0 text-[10px] leading-tight text-[var(--tiger-text)]' },
-                    extra.events.map((event, index) =>
-                      event.title
-                        ? h('li', { key: event.key ?? `${extra.iso}-title-${index}` }, event.title)
-                        : null
+                  'button',
+                  {
+                    type: 'button',
+                    role: 'gridcell',
+                    'data-date': iso,
+                    'aria-label': eventTitles.length
+                      ? `${dayLabel}. ${eventTitles.join(', ')}`
+                      : dayLabel,
+                    'aria-selected': isSelected || isRangeStart || isRangeEnd,
+                    'aria-current': isTodayDate ? 'date' : undefined,
+                    disabled: isDisabled,
+                    tabindex: rovingDayIso === iso && !isDisabled ? 0 : -1,
+                    class: getCalendarDayClasses({
+                      isSelected,
+                      isToday: isTodayDate,
+                      isCurrentMonth,
+                      isDisabled,
+                      isActive: activeIso.value === iso,
+                      isInRange,
+                      isRangeStart,
+                      isRangeEnd,
+                      hasExtra
+                    }),
+                    onClick: () => selectDay(date),
+                    onFocus: () => (activeIso.value = iso)
+                  },
+                  [formatCalendarDayNumber(date, localeCode.value), defaultDots]
+                ),
+                customCell ? h('div', {}, [customCell as VNodeChild]) : null,
+                eventTitles.length
+                  ? h(
+                      'ul',
+                      {
+                        class:
+                          'm-0 list-none p-0 text-[10px] leading-tight text-[var(--tiger-text)]'
+                      },
+                      extra.events.map((event, index) =>
+                        event.title
+                          ? h(
+                              'li',
+                              { key: event.key ?? `${extra.iso}-title-${index}` },
+                              event.title
+                            )
+                          : null
+                      )
                     )
-                  )
-                : null
+                  : null
               ])
             })
-            ]
-          )
+          ])
         )
         body = h(
           'div',
@@ -562,11 +561,7 @@ export const Calendar = defineComponent({
           style: mergeStyleValues(attrStyle),
           'data-tiger': 'calendar'
         },
-        [
-          h('div', { role: 'status', 'aria-live': 'polite', class: 'sr-only' }, viewLive.value),
-          header,
-          body
-        ]
+        [h('div', { 'aria-live': 'polite', class: 'sr-only' }, viewLive.value), header, body]
       )
     }
   }

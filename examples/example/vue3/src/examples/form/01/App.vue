@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
-import type { UploadFile } from '@expcat/tigercat-vue'
+import type { UploadFile } from '@expcat/tigercat-core'
 import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Input } from '@expcat/tigercat-vue/Input'
@@ -11,7 +11,10 @@ const model = reactive<{ name: string; files: UploadFile[] }>({ name: '', files:
 
 <template>
   <div class="grid gap-4 md:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
-    <Form :model-value="model" label-position="top" @update:model-value="Object.assign(model, $event)">
+    <Form
+      :model-value="model"
+      label-position="top"
+      @update:model-value="Object.assign(model, $event)">
       <FormItem name="name" label="名称">
         <Input placeholder="请输入名称" />
       </FormItem>

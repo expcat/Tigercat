@@ -39,7 +39,7 @@ import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 import { BarBind } from './w9-chart-bind'
 
 export interface BarChartProps extends CoreBarChartProps {
@@ -239,7 +239,7 @@ export const BarChart: React.FC<BarChartProps> = ({
         selectedIndex: resolvedSelectedIndex,
         getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : (d.label ?? String(d.x))),
         getColor: (d, i) => d.color ?? palette[i % palette.length],
-      
+
         isHidden: (index) => isLegendIndexHidden(index)
       }).map((item) => ({ ...item, index: 0, hidden: isLegendIndexHidden(0) })),
     [data, legendFormatter, palette, activeIndex, resolvedSelectedIndex, isLegendIndexHidden]

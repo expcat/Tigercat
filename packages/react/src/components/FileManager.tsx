@@ -55,7 +55,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { useDrag } from '../hooks/useDrag'
-import { useTigerConfig } from './ConfigProvider'
+import { useTigerConfig } from './tiger-config'
 
 export interface FileManagerProps
   extends
@@ -351,8 +351,12 @@ export const FileManager: React.FC<FileManagerProps> = ({
 
   const emptyLabel =
     emptyText ??
-    mergedLocale?.fileManager?.emptyText ??
-    mergedLocale?.common?.emptyText ??
+    (mergedLocale?.fileManager?.emptyText && mergedLocale.fileManager.emptyText !== 'Empty folder'
+      ? mergedLocale.fileManager.emptyText
+      : undefined) ??
+    (mergedLocale?.common?.emptyText && mergedLocale.common.emptyText !== 'No data'
+      ? mergedLocale.common.emptyText
+      : undefined) ??
     labels.emptyText
   const explicitHeight =
     style?.height != null || (className ? /\b(?:h|min-h|max-h)-/.test(className) : false)
@@ -413,7 +417,8 @@ export const FileManager: React.FC<FileManagerProps> = ({
               const uploaded = fileToUploadFile(file)
               setUploadedName(uploaded.name)
               setPreviewLabel(
-                filterUploadPreviewUrl(uploaded.url) ?? (isImageUploadFile(uploaded) ? uploaded.name : '')
+                filterUploadPreviewUrl(uploaded.url) ??
+                  (isImageUploadFile(uploaded) ? uploaded.name : '')
               )
             }}
           />
@@ -513,11 +518,9 @@ export const FileManager: React.FC<FileManagerProps> = ({
     const dragClass = dragProps?.className as string | undefined
     const dragStyle = dragProps?.style as React.CSSProperties | undefined
     const onPointerDown = dragProps?.onPointerDown as
-      | ((event: React.PointerEvent<HTMLDivElement>) => void)
-      | undefined
+      ((event: React.PointerEvent<HTMLDivElement>) => void) | undefined
     const onDragKeyDown = dragProps?.onKeyDown as
-      | ((event: React.KeyboardEvent<HTMLDivElement>) => void)
-      | undefined
+      ((event: React.KeyboardEvent<HTMLDivElement>) => void) | undefined
     return (
       <div
         key={item.key}
