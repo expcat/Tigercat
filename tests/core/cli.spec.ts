@@ -422,12 +422,12 @@ describe('CLI Doctor', () => {
     const projectDir = writePackage('react-pass', {
       packageManager: 'pnpm@11.9.0',
       dependencies: {
-        '@expcat/tigercat-react': '^2.9.4',
+        '@expcat/tigercat-react': '^3.0.0-preview.1',
         react: '^19.2.7',
         'react-dom': '^19.2.7'
       },
       devDependencies: {
-        '@expcat/tigercat-core': '^2.9.4',
+        '@expcat/tigercat-core': '^3.0.0-preview.1',
         '@tailwindcss/vite': '^4.3.1',
         '@vitejs/plugin-react': '^6.0.3',
         tailwindcss: '^4.3.1',

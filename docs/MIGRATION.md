@@ -1,8 +1,12 @@
 # Tigercat 迁移指南
 
-本文集中记录当前仍需要用户处理的 Breaking change 与推荐迁移路径。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
+## 3.0
 
-3.0 进行中，见 [MIGRATION-3.0.md](MIGRATION-3.0.md)。
+从 2.x 改到 3.0 的调用点在终稿 [MIGRATION-3.0.md](MIGRATION-3.0.md)。3.0 不向前兼容。按公开组件列出要换的导入和 prop。组件的完整写法在 `skills/tigercat` 和 `examples`。
+
+## 2.x 档案
+
+下面各节，以及 [MIGRATION-2.5.md](MIGRATION-2.5.md)、[MIGRATION-2.6.md](MIGRATION-2.6.md)、[MIGRATION-2.7.md](MIGRATION-2.7.md)、[MIGRATION-2.8.md](MIGRATION-2.8.md)，只记录已经发布的 2.x。这些档案不再追加。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
 
 ## 未发布
 
@@ -16,37 +20,37 @@
 
 公开契约 breaking。Vue/React 对称。无新必填 prop（若干默认与 payload 翻转）。
 
-| 旧                                                               | 新                                                         |
-| ---------------------------------------------------------------- | ---------------------------------------------------------- |
-| Form / SchemaForm Vue `model` / `v-model:model` / `update:model` | `modelValue` / `v-model` / `update:modelValue`             |
-| Form / SchemaForm React `model`                                  | `value`                                                    |
-| SchemaForm `defaultModel`                                        | `defaultValue`                                             |
-| React Input / Textarea `onChange(event)`                         | `onChange(value)`；原生事件用 `onInput`                    |
-| React Tabs `onActiveKeyChange`                                   | `onChange(activeKey)`                                      |
-| FormWizard `onChange(current, prev)` / Vue `change`              | `onStepChange` / Vue `step-change`                         |
-| FormWizard `finish()` ≡ `next()`                                 | `finish()` 仅最后一步走 Finish                             |
-| Pagination / Tabs `small\|medium\|large`                         | `sm\|md\|lg`（默认 `md`）                                  |
-| Steps / FormWizard `small\|default`                              | `sm\|md\|lg`（默认 `md`）                                  |
-| `Kanban`                                                         | `TaskBoard`（需要时显式 `showCardCount` / `allowAddCard`） |
-| `DonutChart`                                                     | `PieChart innerRadiusRatio={0.6}`                          |
-| `ImageViewer`                                                    | `ImagePreview`（`minScale`/`maxScale`，不要 `minZoom`）    |
-| `Fullscreen`（`as` export）                                      | `FullscreenButton`                                         |
-| TreeSelect `clearable` 默认 false                                | 默认 **true**                                              |
-| TreeSelect `checkStrictly` 默认 true                             | 默认 **false**（与 Tree 级联一致）                         |
-| List `rowKey` 默认 `'key'`                                       | `'id'`                                                     |
-| ActionBar `items={[]}` 回落到 `buttonPolicy`                     | `[]` 表示没有按钮；省略 `items` 才用 policy                |
-| Card leftover `title=` HTML tooltip                              | `title` 是可视标题；tooltip 用 `htmlTitle`                 |
-| Tree `filterValue`                                               | `searchValue`                                              |
-| VirtualTable 无 `id` 不可选                                      | 回落 dataSource 下标，可选                                 |
-| DataExport 默认 `xlsx+markdown`                                  | 默认 `xlsx+csv+markdown`；下拉触发器 `aria-label` 走 `triggerAriaLabel` |
-| DatePicker 空范围 `[null, null]`                                 | `null`（进行中的范围仍是元组）                                     |
-| Cascader `[]` 收成 `undefined`                                   | 受控空是 `[]`                                                  |
-| ColorPicker / CronEditor 清空 `''`                               | `null`                                                       |
-| Space/Card/Steps/… `direction`                                   | `orientation`（Layout 用 `mode`，ScrollArea/Drag 用 `axis`，ConfigProvider 用 `dir`） |
+| 旧                                                               | 新                                                                                                  |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Form / SchemaForm Vue `model` / `v-model:model` / `update:model` | `modelValue` / `v-model` / `update:modelValue`                                                      |
+| Form / SchemaForm React `model`                                  | `value`                                                                                             |
+| SchemaForm `defaultModel`                                        | `defaultValue`                                                                                      |
+| React Input / Textarea `onChange(event)`                         | `onChange(value)`；原生事件用 `onInput`                                                             |
+| React Tabs `onActiveKeyChange`                                   | `onChange(activeKey)`                                                                               |
+| FormWizard `onChange(current, prev)` / Vue `change`              | `onStepChange` / Vue `step-change`                                                                  |
+| FormWizard `finish()` ≡ `next()`                                 | `finish()` 仅最后一步走 Finish                                                                      |
+| Pagination / Tabs `small\|medium\|large`                         | `sm\|md\|lg`（默认 `md`）                                                                           |
+| Steps / FormWizard `small\|default`                              | `sm\|md\|lg`（默认 `md`）                                                                           |
+| `Kanban`                                                         | `TaskBoard`（需要时显式 `showCardCount` / `allowAddCard`）                                          |
+| `DonutChart`                                                     | `PieChart innerRadiusRatio={0.6}`                                                                   |
+| `ImageViewer`                                                    | `ImagePreview`（`minScale`/`maxScale`，不要 `minZoom`）                                             |
+| `Fullscreen`（`as` export）                                      | `FullscreenButton`                                                                                  |
+| TreeSelect `clearable` 默认 false                                | 默认 **true**                                                                                       |
+| TreeSelect `checkStrictly` 默认 true                             | 默认 **false**（与 Tree 级联一致）                                                                  |
+| List `rowKey` 默认 `'key'`                                       | `'id'`                                                                                              |
+| ActionBar `items={[]}` 回落到 `buttonPolicy`                     | `[]` 表示没有按钮；省略 `items` 才用 policy                                                         |
+| Card leftover `title=` HTML tooltip                              | `title` 是可视标题；tooltip 用 `htmlTitle`                                                          |
+| Tree `filterValue`                                               | `searchValue`                                                                                       |
+| VirtualTable 无 `id` 不可选                                      | 回落 dataSource 下标，可选                                                                          |
+| DataExport 默认 `xlsx+markdown`                                  | 默认 `xlsx+csv+markdown`；下拉触发器 `aria-label` 走 `triggerAriaLabel`                             |
+| DatePicker 空范围 `[null, null]`                                 | `null`（进行中的范围仍是元组）                                                                      |
+| Cascader `[]` 收成 `undefined`                                   | 受控空是 `[]`                                                                                       |
+| ColorPicker / CronEditor 清空 `''`                               | `null`                                                                                              |
+| Space/Card/Steps/… `direction`                                   | `orientation`（Layout 用 `mode`，ScrollArea/Drag 用 `axis`，ConfigProvider 用 `dir`）               |
 | SchemaForm widget 仅 8 种                                        | 可写 `date` / `time` / `cascader` / `tree-select` / `slider` / `upload` / `color` / `rate` / `tags` |
-| React TaskBoard `renderCard(card, columnId)`                     | `renderCard({ card, column, isDragging })`                     |
-| Designer locale `emptyText`                                      | 删除；空根用 `emptyHint`                                       |
-| React Image/Tour/… ref 为 DOM 节点                               | 与 Vue 相同的 handle 对象（`{ img }` / `{ close }` 等）        |
+| React TaskBoard `renderCard(card, columnId)`                     | `renderCard({ card, column, isDragging })`                                                          |
+| Designer locale `emptyText`                                      | 删除；空根用 `emptyHint`                                                                            |
+| React Image/Tour/… ref 为 DOM 节点                               | 与 Vue 相同的 handle 对象（`{ img }` / `{ close }` 等）                                             |
 
 ScrollSpy 仍用 `onActiveKeyChange`（不是 Tabs）。Footer `size` 仍是 `default\|compact`。Modal/Drawer `size` 仍是面板宽度（含 `xl\|full`）。
 

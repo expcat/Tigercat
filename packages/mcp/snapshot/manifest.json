@@ -1,5 +1,5 @@
 {
-  "version": "2.9.4",
+  "version": "3.0.0-preview.1",
   "algorithm": "sha256",
   "files": {
     "context7.json": "897a679468f42c1df5f40908c89a42e7ea3a1f4bfdee489f264a5cf44dc4024f",
