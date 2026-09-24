@@ -184,7 +184,16 @@ export interface DragPointerBindingEvent {
   clientX: number
   clientY: number
   currentTarget: EventTarget | null
+  /** Actual hit target. Handle checks use this, not `currentTarget`. */
+  target?: EventTarget | null
   preventDefault(): void
+}
+
+/** Keyboard event accepted by list reorder bindings. */
+export interface DragKeyBindingEvent {
+  key: string
+  preventDefault(): void
+  stopPropagation(): void
 }
 
 // ---------------------------------------------------------------------------
@@ -213,6 +222,11 @@ export interface DocumentDragSessionOptions {
   pointerTarget?: Element | null
   /** Distance in px before `onMove` fires. `0` (default) moves on the first pointermove. */
   dragThreshold?: number
+  /**
+   * When true and `dragThreshold` is positive, pointer capture starts only after
+   * the threshold. A release before that is a cancelled click, not a drop.
+   */
+  activateOnThreshold?: boolean
   lockAxis?: DragAxis
   onMove: (event: DocumentDragSessionEvent) => void
   onEnd?: (event: DocumentDragSessionEvent) => void

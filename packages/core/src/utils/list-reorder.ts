@@ -1,9 +1,9 @@
 /**
  * Shared list reorder controller — HTML5 DnD + touch pointer + drop bindings.
  *
- * One module-level active session so two `useDrag` / List instances can
- * complete a cross-container move. Vue / React only map bindings to
- * class vs className and subscribe for rerenders.
+ * Each controller owns its drag session. `drop` / `endDrag` finish only that
+ * session. A second list can drag at the same time. Cross-container hover
+ * updates the source session and is visible to the list currently targeted.
  */
 
 import type {
@@ -12,6 +12,7 @@ import type {
   DragConfig,
   DragDropEvent,
   DragItem,
+  DragKeyBindingEvent,
   DragMoveResult,
   DragPointerBindingEvent,
   DragReorderResult,
@@ -26,13 +27,12 @@ import {
   handleDragOver,
   handleDragStart,
   handleDrop,
-  isCrossContainerDrag,
   isDragEnabled,
-  isSameContainerDrag,
   isValidDragHandle,
   moveItemBetweenContainers,
   reorderItems,
-  resolveDragConfig
+  resolveDragConfig,
+  updateDragOffset
 } from './drag'
 
 export interface ListReorderControllerOptions {
@@ -48,11 +48,13 @@ export interface ListDragItemBindings {
   'data-drag-container': string
   'data-dragging'?: true
   extraClass?: string
+  style?: { transform: string }
   onDragStart: (event: DragBindingEvent) => void
   onDragOver: (event: DragBindingEvent) => void
   onDrop: (event: DragBindingEvent) => void
   onDragEnd: () => void
   onPointerDown: (event: DragPointerBindingEvent) => void
+  onKeyDown: (event: DragKeyBindingEvent) => void
 }
 
 export interface ListDragZoneBindings {
@@ -77,9 +79,8 @@ export interface ListReorderController {
   dispose(): void
 }
 
-interface ActiveListDrag {
+interface ControllerSession {
   state: DragState
-  ownerId: number
   getConfig: () => DragConfig | undefined
   getCallbacks: () => DragCallbacks
   didDrop: boolean
@@ -87,17 +88,38 @@ interface ActiveListDrag {
   lastDropItem: DragItem | null
 }
 
-let nextControllerId = 1
-let activeDrag: ActiveListDrag | null = null
-const listeners = new Set<() => void>()
+interface RegisteredController {
+  getContainerId: () => string
+  allowsCross: () => boolean
+  getSession: () => ControllerSession | null
+  clearSession: () => void
+  applyDragOver: (
+    item: DragItem | null,
+    event?: DragBindingEvent,
+    containerId?: string
+  ) => void
+  finishDrop: (event?: DragBindingEvent) => DragDropEvent | null
+  notify: () => void
+}
 
-function emit(): void {
-  for (const listener of listeners) listener()
+const registries = new WeakMap<Document, Set<RegisteredController>>()
+
+function registryFor(doc: Document): Set<RegisteredController> {
+  let set = registries.get(doc)
+  if (!set) {
+    set = new Set()
+    registries.set(doc, set)
+  }
+  return set
+}
+
+function activeRegistry(): Set<RegisteredController> | null {
+  if (!isBrowser()) return null
+  return registryFor(document)
 }
 
 function resolveLockAxis(config: DragConfig): 'x' | 'y' | undefined {
   if (config.lockAxis) return config.lockAxis
-  // DragConfig uses `axis` (DragDirection); legacy `direction` was renamed.
   if (config.axis === 'horizontal') return 'x'
   if (config.axis === 'vertical') return 'y'
   return undefined
@@ -108,17 +130,104 @@ function ownerDocumentOf(target: EventTarget | null): Document | undefined {
   return isBrowser() ? document : undefined
 }
 
+function draggingPeers(
+  registry: Set<RegisteredController> | null,
+  self: RegisteredController
+): RegisteredController[] {
+  if (!registry) return []
+  const peers: RegisteredController[] = []
+  for (const peer of registry) {
+    if (peer === self) continue
+    if (!peer.getSession()?.state.isDragging) continue
+    if (!peer.allowsCross()) continue
+    peers.push(peer)
+  }
+  return peers
+}
+
 export function createListReorderController(
   options: ListReorderControllerOptions
 ): ListReorderController {
-  const ownerId = nextControllerId++
+  let session: ControllerSession | null = null
   let pointerSession: DocumentDragSession | null = null
+  const listeners = new Set<() => void>()
+  const registry = activeRegistry()
 
   const configOf = () => resolveDragConfig(options.getConfig())
   const callbacksOf = () => options.getCallbacks()
   const containerOf = () => options.getContainerId()
 
-  const getState = (): DragState => (activeDrag ? { ...activeDrag.state } : createDragState())
+  const emit = () => {
+    for (const listener of listeners) listener()
+  }
+
+  const clearSession = () => {
+    session = null
+    emit()
+  }
+
+  const visibleState = (): DragState => {
+    if (session) return { ...session.state }
+    if (!registry) return createDragState()
+    const containerId = containerOf()
+    for (const peer of registry) {
+      if (peer === record) continue
+      const peerSession = peer.getSession()
+      if (!peerSession?.state.isDragging) continue
+      if (peerSession.state.targetContainerId === containerId) {
+        return { ...peerSession.state }
+      }
+    }
+    return createDragState()
+  }
+
+  const applyDragOver = (
+    item: DragItem | null,
+    event?: DragBindingEvent,
+    containerId?: string
+  ) => {
+    if (!session) return
+    const config = resolveDragConfig(session.getConfig())
+    const nextContainerId = item?.containerId ?? containerId ?? containerOf()
+    if (!config.crossContainer && nextContainerId !== session.state.sourceContainerId) {
+      return
+    }
+    if (event) {
+      event.preventDefault()
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
+    }
+    handleDragOver(session.state, item, nextContainerId, session.getCallbacks())
+    emit()
+  }
+
+  const finishDrop = (event?: DragBindingEvent): DragDropEvent | null => {
+    if (event) event.preventDefault()
+    if (!session?.state.isDragging) return null
+    const callbacks = session.getCallbacks()
+    const result = handleDrop(session.state, callbacks)
+    session.didDrop = result != null
+    session.lastDropItem = result?.item ?? null
+    if (result) {
+      callbacks.onDragEnd?.({ item: result.item, cancelled: false })
+      session.endedAfterDrop = true
+      session = null
+    }
+    emit()
+    return result
+  }
+
+  const record: RegisteredController = {
+    getContainerId: containerOf,
+    allowsCross: () => Boolean(configOf().crossContainer),
+    getSession: () => session,
+    clearSession,
+    applyDragOver,
+    finishDrop,
+    notify: emit
+  }
+  registry?.add(record)
+
+  const getState = (): DragState => visibleState()
 
   const subscribe = (listener: () => void): (() => void) => {
     listeners.add(listener)
@@ -145,12 +254,15 @@ export function createListReorderController(
       }
     }
 
+    if (session?.state.isDragging) {
+      handleDragEnd(session.state, true, session.getCallbacks())
+    }
+
     const state = createDragState()
     const sourceContainerId = item.containerId ?? containerOf()
     handleDragStart(state, item, sourceContainerId, callbacksOf())
-    activeDrag = {
+    session = {
       state,
-      ownerId,
       getConfig: options.getConfig,
       getCallbacks: options.getCallbacks,
       didDrop: false,
@@ -165,97 +277,152 @@ export function createListReorderController(
     event?: DragBindingEvent,
     containerId?: string
   ): void => {
-    if (!activeDrag) return
-    const config = resolveDragConfig(activeDrag.getConfig())
-    const nextContainerId = item?.containerId ?? containerId ?? containerOf()
-    if (!config.crossContainer && nextContainerId !== activeDrag.state.sourceContainerId) {
+    if (session?.state.isDragging) {
+      applyDragOver(item, event, containerId)
       return
     }
-    if (event) {
-      event.preventDefault()
-      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
-    }
-    handleDragOver(activeDrag.state, item, nextContainerId, activeDrag.getCallbacks())
+    if (!configOf().crossContainer) return
+    const peers = draggingPeers(registry, record)
+    if (peers.length !== 1) return
+    peers[0].applyDragOver(item, event, containerId ?? containerOf())
     emit()
   }
 
   const drop = (event?: DragBindingEvent): DragDropEvent | null => {
-    if (event) event.preventDefault()
-    if (!activeDrag?.state.isDragging) return null
-    const callbacks = activeDrag.getCallbacks()
-    const result = handleDrop(activeDrag.state, callbacks)
-    activeDrag.didDrop = result != null
-    activeDrag.lastDropItem = result?.item ?? null
-    if (result) {
-      callbacks.onDragEnd?.({ item: result.item, cancelled: false })
-      activeDrag.endedAfterDrop = true
+    if (session?.state.isDragging) return finishDrop(event)
+    if (!configOf().crossContainer) {
+      if (event) event.preventDefault()
+      return null
     }
-    emit()
-    return result
+    const peers = draggingPeers(registry, record).filter((peer) => {
+      const peerSession = peer.getSession()
+      return peerSession?.state.targetContainerId === containerOf()
+    })
+    if (peers.length !== 1) {
+      if (event) event.preventDefault()
+      return null
+    }
+    return peers[0].finishDrop(event)
   }
 
   const endDrag = (cancelled?: boolean): void => {
-    if (!activeDrag) return
-    if (activeDrag.endedAfterDrop) {
-      activeDrag = null
+    if (!session) return
+    if (session.endedAfterDrop || !session.state.isDragging) {
+      session = null
       emit()
       return
     }
-    if (!activeDrag.state.isDragging) {
-      activeDrag = null
-      emit()
-      return
-    }
-    const isCancelled = cancelled ?? !activeDrag.didDrop
-    handleDragEnd(activeDrag.state, isCancelled, activeDrag.getCallbacks())
-    activeDrag = null
+    const isCancelled = cancelled ?? !session.didDrop
+    handleDragEnd(session.state, isCancelled, session.getCallbacks())
+    session = null
     emit()
+  }
+
+  const hitTestDrag = (doc: Document | undefined, x: number, y: number): void => {
+    if (!doc || typeof doc.elementFromPoint !== 'function') return
+    const el = doc.elementFromPoint(x, y)
+    const node = el?.closest('[data-drag-index]')
+    if (!(node instanceof HTMLElement)) return
+    const index = Number(node.getAttribute('data-drag-index'))
+    if (Number.isNaN(index)) return
+    const id = node.getAttribute('data-drag-id') ?? String(index)
+    const containerId = node.getAttribute('data-drag-container') ?? containerOf()
+    dragOver({ id, index, containerId })
   }
 
   const startPointerReorder = (item: DragItem, event: DragPointerBindingEvent): void => {
     if (event.button !== 0) return
-    const target = event.currentTarget as Element | null
-    if (event.pointerType === 'mouse' && target instanceof HTMLElement && target.draggable) {
+    const host = event.currentTarget instanceof Element ? event.currentTarget : null
+    if (event.pointerType === 'mouse' && host instanceof HTMLElement && host.draggable) {
       return
     }
     const config = configOf()
     if (!isDragEnabled(config)) return
-    if (target && !isValidDragHandle(target, config)) return
-    event.preventDefault()
-    startDrag(item)
+    const hit = event.target instanceof Element ? event.target : null
+    if (!isValidDragHandle(hit, config)) return
     const doc = ownerDocumentOf(event.currentTarget)
     pointerSession?.dispose()
+    let activated = false
+    const threshold = config.dragThreshold
+    if (threshold <= 0) {
+      event.preventDefault()
+      startDrag(item)
+      activated = true
+    }
     pointerSession = createDocumentDragSession({
       startX: event.clientX,
       startY: event.clientY,
       ownerDocument: doc,
       pointerId: event.pointerId,
-      pointerTarget: target,
-      dragThreshold: config.dragThreshold,
+      pointerTarget: host,
+      dragThreshold: threshold,
+      activateOnThreshold: threshold > 0,
       lockAxis: resolveLockAxis(config),
-      onMove: ({ currentX, currentY }) => {
-        if (!doc) return
-        const el = doc.elementFromPoint(currentX, currentY)
-        const node = el?.closest('[data-drag-index]')
-        if (!(node instanceof HTMLElement)) return
-        const index = Number(node.getAttribute('data-drag-index'))
-        if (Number.isNaN(index)) return
-        const id = node.getAttribute('data-drag-id') ?? String(index)
-        const containerId = node.getAttribute('data-drag-container') ?? containerOf()
-        dragOver({ id, index, containerId })
+      onMove: ({ currentX, currentY, deltaX, deltaY }) => {
+        if (!activated) {
+          activated = true
+          startDrag(item)
+        }
+        if (session) updateDragOffset(session.state, deltaX, deltaY)
+        emit()
+        hitTestDrag(doc, currentX, currentY)
       },
-      onEnd: ({ cancelled }) => {
+      onEnd: ({ cancelled, deltaX, deltaY }) => {
         pointerSession = null
-        if (cancelled) endDrag(true)
-        else drop()
+        if (!activated || cancelled) {
+          if (activated) endDrag(true)
+          return
+        }
+        if (session && (deltaX !== 0 || deltaY !== 0)) {
+          updateDragOffset(session.state, deltaX, deltaY)
+        }
+        drop()
       }
     })
+  }
+
+  const onItemKeyDown = (item: DragItem, event: DragKeyBindingEvent): void => {
+    if (!session?.state.isDragging) return
+    if (session.state.draggedItem?.id !== item.id) return
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
+      endDrag(true)
+      return
+    }
+    const axis = resolveDragConfig(session.getConfig()).axis
+    let delta = 0
+    if (event.key === 'ArrowUp') delta = axis === 'horizontal' ? 0 : -1
+    else if (event.key === 'ArrowDown') delta = axis === 'horizontal' ? 0 : 1
+    else if (event.key === 'ArrowLeft') delta = axis === 'vertical' ? 0 : -1
+    else if (event.key === 'ArrowRight') delta = axis === 'vertical' ? 0 : 1
+    if (delta === 0) return
+    event.preventDefault()
+    const next = Math.max(0, session.state.targetIndex + delta)
+    const containerId = session.state.targetContainerId ?? containerOf()
+    const doc = isBrowser() ? document : undefined
+    const selector = `[data-drag-container="${containerId}"][data-drag-index="${next}"]`
+    const node = doc?.querySelector(selector)
+    if (node instanceof HTMLElement) {
+      const id = node.getAttribute('data-drag-id') ?? String(next)
+      dragOver({ id, index: next, containerId })
+      return
+    }
+    dragOver(
+      { id: session.state.draggedItem?.id ?? next, index: next, containerId },
+      undefined,
+      containerId
+    )
   }
 
   const getItemBindings = (item: DragItem): ListDragItemBindings => {
     const config = configOf()
     const state = getState()
     const isThis = state.isDragging && state.draggedItem?.id === item.id
+    const preview =
+      isThis && (state.offsetX !== 0 || state.offsetY !== 0)
+        ? { transform: `translate(${state.offsetX}px, ${state.offsetY}px)` }
+        : undefined
     return {
       draggable: !config.disabled,
       'data-drag-id': item.id,
@@ -263,13 +430,15 @@ export function createListReorderController(
       'data-drag-container': item.containerId ?? containerOf(),
       'data-dragging': isThis || undefined,
       extraClass: isThis ? config.dragClass : undefined,
+      style: preview,
       onDragStart: (event) => startDrag(item, event),
       onDragOver: (event) => dragOver(item, event),
       onDrop: (event) => {
         drop(event)
       },
       onDragEnd: () => endDrag(),
-      onPointerDown: (event) => startPointerReorder(item, event)
+      onPointerDown: (event) => startPointerReorder(item, event),
+      onKeyDown: (event) => onItemKeyDown(item, event)
     }
   }
 
@@ -312,24 +481,60 @@ export function createListReorderController(
     dispose: () => {
       pointerSession?.dispose()
       pointerSession = null
-      if (activeDrag?.ownerId === ownerId) {
-        activeDrag = null
+      registry?.delete(record)
+      if (session) {
+        session = null
         emit()
       }
+      listeners.clear()
     }
   }
 }
 
-export function isActiveListDragSameContainer(): boolean {
-  return activeDrag ? isSameContainerDrag(activeDrag.state) : true
+interface DragContainerItems {
+  getItems: () => readonly DragItem[]
+  commit: (items: DragItem[]) => void
 }
 
-export function isActiveListDragCrossContainer(): boolean {
-  return activeDrag ? isCrossContainerDrag(activeDrag.state) : false
+const dragContainerItems = new Map<string, DragContainerItems>()
+
+/** Remember one list so a cross-container drop can rewrite both arrays. */
+export function bindDragContainerItems(
+  containerId: string,
+  source: DragContainerItems
+): () => void {
+  dragContainerItems.set(containerId, source)
+  return () => {
+    if (dragContainerItems.get(containerId) === source) dragContainerItems.delete(containerId)
+  }
 }
 
-/** Reset the shared session. Used by tests so files do not leak an in-flight drag. */
+/**
+ * Apply a cross-container drop to both registered lists.
+ * Returns false when either side is missing or the move is inside one list.
+ */
+export function commitCrossContainerDrop(event: DragDropEvent): boolean {
+  if (!event.fromContainerId || event.fromContainerId === event.toContainerId) return false
+  const source = dragContainerItems.get(event.fromContainerId)
+  const target = dragContainerItems.get(event.toContainerId)
+  if (!source || !target) return false
+  const result = moveItemBetweenContainers(
+    source.getItems(),
+    target.getItems(),
+    event.fromIndex,
+    event.toIndex
+  )
+  if (!result) return false
+  source.commit(result.sourceItems)
+  target.commit(result.targetItems)
+  return true
+}
+
+/** End every live session in this document. Tests use this between cases. */
 export function clearActiveListDrag(): void {
-  activeDrag = null
-  emit()
+  const registry = activeRegistry()
+  if (!registry) return
+  for (const controller of registry) {
+    controller.clearSession()
+  }
 }

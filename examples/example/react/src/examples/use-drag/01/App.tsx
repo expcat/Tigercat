@@ -50,7 +50,7 @@ export default function App() {
               key={item.id}
               {...itemProps}
               className={[
-                'flex cursor-grab items-center justify-between rounded-md border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#fff)] px-3 py-2 select-none',
+                'flex cursor-grab items-center justify-between rounded-md border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2 select-none',
                 dragClass
               ]
                 .filter(Boolean)
@@ -60,14 +60,14 @@ export default function App() {
                 <Tag color="blue">序号 {item.index + 1}</Tag>
                 <button
                   type="button"
-                  className="text-xs text-[var(--tiger-text-muted,#6b7280)]"
+                  className="text-xs text-[var(--tiger-text-secondary)]"
                   disabled={index === 0}
                   onClick={() => moveBy(index, -1)}>
                   上移
                 </button>
                 <button
                   type="button"
-                  className="text-xs text-[var(--tiger-text-muted,#6b7280)]"
+                  className="text-xs text-[var(--tiger-text-secondary)]"
                   disabled={index === items.length - 1}
                   onClick={() => moveBy(index, 1)}>
                   下移
@@ -77,7 +77,7 @@ export default function App() {
           )
         })}
       </ul>
-      <p className="mt-4 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+      <p className="mt-4 text-sm text-[var(--tiger-text-secondary)]">
         指针拖拽重排（须包一层 drop zone）。键盘请用上移 / 下移。当前拖拽：
         <strong>{draggedTitle}</strong>
       </p>

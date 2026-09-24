@@ -54,6 +54,99 @@ export function restoreFocus(
   return focusElement(previous, options)
 }
 
+const TEXT_EDITING_INPUT_TYPES = new Set([
+  'text',
+  'search',
+  'email',
+  'url',
+  'tel',
+  'password',
+  'number',
+  'date',
+  'time',
+  'datetime-local'
+])
+
+/** Arrow keys inside inputs, textareas, and contenteditable stay with the caret. */
+export function isTextEditingTarget(target: EventTarget | null): boolean {
+  if (!target || typeof Element === 'undefined' || !(target instanceof Element)) return false
+  if ((target as HTMLElement).isContentEditable) return true
+  const tag = target.tagName
+  if (tag === 'TEXTAREA') return true
+  if (tag !== 'INPUT') return false
+  const type = (target.getAttribute('type') ?? 'text').toLowerCase()
+  return TEXT_EDITING_INPUT_TYPES.has(type)
+}
+
+export interface TypeaheadBuffer {
+  push(character: string, now?: number): string
+  reset(): void
+  query(): string
+}
+
+const TYPEAHEAD_TIMEOUT_MS = 500
+
+/**
+ * Shared typeahead buffer for menu, menubar, and tree.
+ * The same letter cycles matches; a pause clears the buffer.
+ */
+export function createTypeaheadBuffer(timeoutMs = TYPEAHEAD_TIMEOUT_MS): TypeaheadBuffer {
+  let buffer = ''
+  let stamp = 0
+  return {
+    push(character: string, now = Date.now()) {
+      if (now - stamp > timeoutMs) buffer = ''
+      stamp = now
+      buffer += character
+      return buffer
+    },
+    reset() {
+      buffer = ''
+      stamp = 0
+    },
+    query() {
+      return buffer
+    }
+  }
+}
+
+/** `1` and `'1'` are different keys. One prefix for menu, tabs, tree, and navigation. */
+export function typedKeyId(key: string | number): string {
+  return typeof key === 'number' ? `n:${key}` : `s:${key}`
+}
+
+export function isTypeaheadCharacter(
+  key: string,
+  modifiers: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean } = {}
+): boolean {
+  if (modifiers.altKey || modifiers.ctrlKey || modifiers.metaKey) return false
+  if (key.length !== 1) return false
+  return key.charCodeAt(0) > 32
+}
+
+/**
+ * Index of the next enabled label that starts with `query`.
+ * A repeated single letter cycles from the item after `fromIndex`.
+ */
+export function findTypeaheadMatchIndex(
+  labels: readonly string[],
+  query: string,
+  fromIndex: number,
+  disabled?: readonly boolean[]
+): number {
+  const raw = query.toLocaleLowerCase()
+  if (!raw || labels.length === 0) return -1
+  const repeated = raw.length > 1 && [...raw].every((char) => char === raw[0])
+  const needle = repeated ? raw[0] : raw
+  const start = repeated ? fromIndex + 1 : fromIndex < 0 ? 0 : fromIndex
+  for (let offset = 0; offset < labels.length; offset++) {
+    const index = (start + offset + labels.length) % labels.length
+    if (disabled?.[index]) continue
+    if (labels[index].trim().toLocaleLowerCase().startsWith(needle)) return index
+  }
+  return -1
+}
+
 function isHiddenOrInert(element: HTMLElement, stopAt: HTMLElement): boolean {
   let current: HTMLElement | null = element
   while (current && current !== stopAt) {
@@ -91,6 +184,7 @@ export function getMenuItems(container: HTMLElement): HTMLElement[] {
  * Returns true if the event was handled
  */
 export function handleMenuNavigation(container: HTMLElement, event: KeyboardEvent): boolean {
+  if (isTextEditingTarget(event.target)) return false
   const items = getMenuItems(container)
   if (items.length === 0) return false
 
@@ -130,11 +224,20 @@ export function handleMenuNavigation(container: HTMLElement, event: KeyboardEven
 /**
  * Focus the first non-disabled menu item in a container
  */
-export function focusFirstMenuItem(container: HTMLElement): boolean {
+export function focusMenuItem(container: HTMLElement, edge: 'first' | 'last'): boolean {
   const items = getMenuItems(container)
   if (items.length === 0) return false
-  items[0].focus()
+  const item = edge === 'last' ? items[items.length - 1] : items[0]
+  item.focus()
   return true
+}
+
+export function focusFirstMenuItem(container: HTMLElement): boolean {
+  return focusMenuItem(container, 'first')
+}
+
+export function focusLastMenuItem(container: HTMLElement): boolean {
+  return focusMenuItem(container, 'last')
 }
 
 /** Focus the first item once the panel is painted (not `hidden` / `visibility:hidden`). */

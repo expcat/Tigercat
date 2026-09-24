@@ -7,15 +7,18 @@
  */
 
 /**
- * Whether warnings should be emitted. Suppressed when `NODE_ENV` is
- * `'production'`. The `process` guard keeps this safe in browser / SSR bundles
- * where `process` may be undefined.
+ * Warnings emit only when `NODE_ENV` is an explicit non-production value.
+ * A missing `process` or missing `NODE_ENV` stays silent.
  */
 function isDevEnvironment(): boolean {
   const proc = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
-  return !proc?.env || proc.env.NODE_ENV !== 'production'
+  const env = proc?.env?.NODE_ENV
+  return typeof env === 'string' && env.length > 0 && env !== 'production'
 }
 
+/** Bounded de-dupe list. Oldest keys are dropped so the set cannot grow without limit. */
+const WARN_KEY_LIMIT = 200
+const warnedOrder: string[] = []
 const warnedKeys = new Set<string>()
 
 /**
@@ -26,36 +29,13 @@ const warnedKeys = new Set<string>()
  */
 export function devWarn(key: string, message: string): void {
   if (!isDevEnvironment() || warnedKeys.has(key)) return
+  if (warnedOrder.length >= WARN_KEY_LIMIT) {
+    const oldest = warnedOrder.shift()
+    if (oldest) warnedKeys.delete(oldest)
+  }
+  warnedOrder.push(key)
   warnedKeys.add(key)
   console.warn(message)
-}
-
-/**
- * Warn (once) when an unsupported `color` prop is passed to a component that
- * only exposes `variant`. Shared by Button and Tag across Vue and React.
- *
- * @param component Component display name (e.g. `'Button'`).
- * @param props     The fallthrough props/attrs to inspect.
- */
-export function warnUnsupportedColorProp(component: string, props: Record<string, unknown>): void {
-  if (!('color' in props)) return
-  devWarn(
-    `${component}.color`,
-    `[Tigercat] ${component} does not support color. Use variant instead.`
-  )
-}
-
-/**
- * Warn about an unsupported `color` prop and drop it so it does not land on DOM.
- */
-export function omitUnsupportedColorProp<T extends Record<string, unknown>>(
-  component: string,
-  props: T
-): Omit<T, 'color'> {
-  warnUnsupportedColorProp(component, props)
-  if (!('color' in props)) return props
-  const { color: _color, ...rest } = props
-  return rest
 }
 
 export function hasAccessibleName(options: {
@@ -85,5 +65,6 @@ export function warnMissingAccessibleName(
  * Reset the de-duplication cache. Intended for tests only.
  */
 export function resetDevWarnCache(): void {
+  warnedOrder.length = 0
   warnedKeys.clear()
 }

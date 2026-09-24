@@ -19,9 +19,25 @@ export const DEFAULT_DATA_EXPORT_FORMATS: readonly DataExportFormat[] = [
   'csv',
   'markdown'
 ]
-export const DATA_EXPORT_SOFT_CELL_LIMIT = 100_000
+/** Hard cap on header + body cells. Exports above this are rejected. */
+export const DATA_EXPORT_MAX_CELLS = 100_000
 export const DATA_EXPORT_MAX_CELL_CHARS = 32_767
-export const DATA_EXPORT_FORMULA_PREFIX = /^[=+\-@]/
+
+const FORMULA_PREFIX = new Set(['=', '+', '-', '@', '＝', '＋', '－', '＠'])
+const LEADING_EXPORT_NOISE = /^[\uFEFF \t\r\n\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]+/
+const LEGAL_NUMBER = /^-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/
+const PHONE_TEXT = /^\+[0-9][0-9\s\-()]{6,19}$/
+const FILENAME_CONTROLS = /[\u0000-\u001F\u007F\\/:*?"<>|]+/g
+const FILENAME_BIDI = /[\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g
+const FILENAME_LINES = /[\r\n\u2028\u2029]+/g
+
+export class DataExportLimitError extends Error {
+  readonly name = 'DataExportLimitError'
+
+  constructor(message: string) {
+    super(message)
+  }
+}
 
 export function isDataExportFormat(value: unknown): value is DataExportFormat {
   return value === 'xlsx' || value === 'markdown' || value === 'csv'
@@ -46,18 +62,61 @@ export function formatDataExportCellValue(value: unknown): unknown {
   return value
 }
 
+export type DataExportCell =
+  | { kind: 'number'; value: number }
+  | { kind: 'text'; value: string }
+
+function isLegalNegative(text: string): boolean {
+  return LEGAL_NUMBER.test(text) && Number.isFinite(Number(text))
+}
+
+function isPhoneText(text: string): boolean {
+  const digits = text.replace(/\D/g, '')
+  return PHONE_TEXT.test(text) && digits.length >= 7
+}
+
 /**
- * Prefix spreadsheet formulas and clip Excel's per-cell character cap.
+ * Neutralize formula-like text. Finite numbers and phone numbers are not prefixed.
+ * Cells over the character cap throw instead of being clipped.
  */
-export function sanitizeDataExportText(value: unknown): string {
-  let str = value === null || value === undefined ? '' : String(value)
-  if (DATA_EXPORT_FORMULA_PREFIX.test(str)) {
-    str = `'${str}`
+export function neutralizeDataExportText(value: string): string {
+  if (value.length > DATA_EXPORT_MAX_CELL_CHARS) {
+    throw new DataExportLimitError(
+      `Cell exceeds ${DATA_EXPORT_MAX_CELL_CHARS} characters`
+    )
   }
-  if (str.length > DATA_EXPORT_MAX_CELL_CHARS) {
-    return str.slice(0, DATA_EXPORT_MAX_CELL_CHARS)
+  const stripped = value.replace(LEADING_EXPORT_NOISE, '')
+  const first = stripped[0]
+  if (!first || !FORMULA_PREFIX.has(first)) return stripped
+  if (isLegalNegative(stripped) || isPhoneText(stripped)) return stripped
+  return `'${stripped}`
+}
+
+/** One cell rule for CSV, Markdown, and xlsx. */
+export function toDataExportCell(value: unknown): DataExportCell {
+  const formatted = formatDataExportCellValue(value)
+  if (typeof formatted === 'number') {
+    if (!Number.isFinite(formatted)) return { kind: 'text', value: '' }
+    return { kind: 'number', value: formatted }
   }
-  return str
+  if (typeof formatted === 'boolean') {
+    return { kind: 'text', value: formatted ? 'true' : 'false' }
+  }
+  const text = formatted == null ? '' : String(formatted)
+  return { kind: 'text', value: neutralizeDataExportText(text) }
+}
+
+export function dataExportCellText(cell: DataExportCell): string {
+  return cell.kind === 'number' ? String(cell.value) : cell.value
+}
+
+export function assertDataExportCellCount(columnCount: number, rowCount: number): void {
+  const cells = columnCount * (rowCount + 1)
+  if (cells > DATA_EXPORT_MAX_CELLS) {
+    throw new DataExportLimitError(
+      `Export has ${cells} cells, above the limit of ${DATA_EXPORT_MAX_CELLS}`
+    )
+  }
 }
 
 function needsCsvQuotes(value: string): boolean {
@@ -69,7 +128,7 @@ function needsCsvQuotes(value: string): boolean {
  * Shared by Table CSV and DataExport CSV.
  */
 export function escapeCsvValue(value: unknown): string {
-  const str = sanitizeDataExportText(formatDataExportCellValue(value))
+  const str = dataExportCellText(toDataExportCell(value))
   if (needsCsvQuotes(str)) {
     return `"${str.replace(/"/g, '""')}"`
   }
@@ -98,6 +157,20 @@ export function resolveDataExportColumns<T>(
   })
 }
 
+/** Cell values a custom serializer receives. Text is already neutralized. */
+export function sanitizeDataExportRows<T>(columns: TableColumn<T>[], data: T[]): T[] {
+  return data.map((record) => {
+    const next = { ...(record as Record<string, unknown>) }
+    for (const column of columns) {
+      const field = column.dataKey || column.key
+      if (!field) continue
+      const cell = toDataExportCell(next[field])
+      next[field] = cell.value
+    }
+    return next as T
+  })
+}
+
 export function getDataExportCellValue<T>(
   record: T,
   column: TableColumn<T>,
@@ -115,7 +188,10 @@ export function getDataExportCellValue<T>(
  */
 export function resolveDataExportFilename(fileName: string | undefined, extension: string): string {
   const trimmed = (fileName ?? '').trim()
-  const cleaned = (trimmed || 'export').replace(/[\\/:*?"<>|]+/g, '-')
+  const cleaned = (trimmed || 'export')
+    .replace(FILENAME_LINES, '-')
+    .replace(FILENAME_CONTROLS, '-')
+    .replace(FILENAME_BIDI, '')
   const suffix = `.${extension}`
   if (cleaned.toLowerCase().endsWith(suffix.toLowerCase())) return cleaned
   return `${cleaned}${suffix}`

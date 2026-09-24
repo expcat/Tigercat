@@ -1,82 +1,46 @@
 import { describe, it, expect } from 'vitest'
-import {
-  builtinCodeHighlighter,
-  escapeHighlightHtml,
-  renderTokenHtml,
-  renderTokensHtml,
-  tokenizeLine,
-  type CodeHighlighter
-} from '../../packages/core/src'
+import { builtinCodeHighlighter, tokenizeLine, type CodeHighlighter } from '../../packages/core/src'
 
 describe('code-highlighter', () => {
-  describe('escapeHighlightHtml', () => {
-    it('escapes HTML special characters', () => {
-      expect(escapeHighlightHtml('<div class="x">&"\'</div>')).toBe(
-        '&lt;div class=&quot;x&quot;&gt;&amp;&quot;&#39;&lt;/div&gt;'
-      )
-    })
-
-    it('returns plain text unchanged when no special chars', () => {
-      expect(escapeHighlightHtml('hello world')).toBe('hello world')
-    })
-  })
-
-  describe('renderTokenHtml', () => {
-    it('wraps tokens with non-empty classes in a span', () => {
-      const html = renderTokenHtml({ type: 'keyword', value: 'const' }, 'light')
-      expect(html.startsWith('<span class="')).toBe(true)
-      expect(html.endsWith('>const</span>')).toBe(true)
-    })
-
-    it('escapes the token value', () => {
-      const html = renderTokenHtml({ type: 'string', value: '"<x>"' }, 'light')
-      expect(html).toContain('&quot;&lt;x&gt;&quot;')
-    })
-
-    it('returns plain escaped text when token type has no class', () => {
-      const html = renderTokenHtml({ type: 'plain', value: 'a < b' }, 'light')
-      expect(html).toBe('a &lt; b')
-    })
-  })
-
-  describe('renderTokensHtml', () => {
-    it('concatenates token HTML in order', () => {
-      const tokens = tokenizeLine('const x = 1', 'javascript')
-      const html = renderTokensHtml(tokens, 'light')
-      expect(html).toContain('const')
-      expect(html).toContain('x')
-      expect(html).toContain('1')
-    })
-  })
-
   describe('builtinCodeHighlighter', () => {
-    it('exposes a highlightLine function', () => {
-      expect(typeof builtinCodeHighlighter.highlightLine).toBe('function')
-    })
-
-    it('produces equivalent HTML to manual tokenizer + render pipeline', () => {
+    it('returns tokens instead of HTML', () => {
       const line = 'const x = "hello"'
-      const expected = renderTokensHtml(tokenizeLine(line, 'javascript'), 'light')
-      const actual = builtinCodeHighlighter.highlightLine!(line, 'javascript', 'light')
-      expect(actual).toBe(expected)
+      const tokens = builtinCodeHighlighter.highlightLine!(line, 'javascript', 'light')
+      expect(tokens.map((token) => token.text).join('')).toBe(line)
+      expect(tokens.some((token) => token.text === 'const' && token.className)).toBe(true)
+      expect(tokens.some((token) => token.text.includes('<'))).toBe(false)
+      expect(JSON.stringify(tokens)).not.toContain('<span')
     })
 
-    it('uses the same token classes for light and dark (theme remaps CSS variables)', () => {
-      const lightHtml = builtinCodeHighlighter.highlightLine!('const x', 'javascript', 'light')
-      const darkHtml = builtinCodeHighlighter.highlightLine!('const x', 'javascript', 'dark')
-      expect(lightHtml).toBe(darkHtml)
-      expect(lightHtml).toContain('--tiger-primary')
+    it('keeps raw characters in the token text', () => {
+      const tokens = builtinCodeHighlighter.highlightLine!('a < b', 'plain', 'light')
+      expect(tokens.map((token) => token.text).join('')).toBe('a < b')
+    })
+
+    it('uses the same token classes for light and dark', () => {
+      const light = builtinCodeHighlighter.highlightLine!('const x', 'javascript', 'light')
+      const dark = builtinCodeHighlighter.highlightLine!('const x', 'javascript', 'dark')
+      expect(light.some((token) => token.className?.includes('--tiger-primary'))).toBe(true)
+      expect(dark.some((token) => token.className?.includes('--tiger-info'))).toBe(true)
+      expect(JSON.stringify(light)).not.toMatch(/#[0-9a-fA-F]{3,8}/)
+      expect(JSON.stringify(dark)).not.toMatch(/#[0-9a-fA-F]{3,8}/)
+    })
+
+    it('matches the built-in tokenizer text', () => {
+      const line = 'const x = 1'
+      const tokens = builtinCodeHighlighter.highlightLine!(line, 'javascript', 'light')
+      expect(tokens.map((token) => token.text)).toEqual(tokenizeLine(line, 'javascript').map((token) => token.value))
     })
   })
 
   describe('CodeHighlighter contract', () => {
-    it('allows engines to omit highlightLine in favour of highlightCode', () => {
+    it('allows engines to return token lines from highlightCode', () => {
       const engine: CodeHighlighter = {
         name: 'block-only',
-        highlightCode: (code) => `<pre>${escapeHighlightHtml(code)}</pre>`
+        highlightCode: (code) => code.split('\n').map((line) => [{ text: line }])
       }
       expect(engine.highlightLine).toBeUndefined()
-      expect(engine.highlightCode!('a<b', 'plain', 'light')).toBe('<pre>a&lt;b</pre>')
+      expect(engine.highlightCode!('a<b', 'plain', 'light')).toEqual([[{ text: 'a<b' }]])
     })
   })
 })

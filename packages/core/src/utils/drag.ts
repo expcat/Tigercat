@@ -261,9 +261,18 @@ export function isCrossContainerDrag(state: DragState): boolean {
 /**
  * Check if a handle element matches the configured handle selector
  */
-export function isValidDragHandle(element: Element, config?: DragConfig): boolean {
+export function isValidDragHandle(element: Element | null, config?: DragConfig): boolean {
   if (!config?.handleSelector) return true
+  if (!element) return false
   return element.closest(config.handleSelector) !== null
+}
+
+let dragContainerSeq = 0
+
+/** Id for one reorder controller when the caller does not pass one. */
+export function createDragContainerId(prefix = 'tiger-drag'): string {
+  dragContainerSeq += 1
+  return `${prefix}-${dragContainerSeq}`
 }
 
 /**
@@ -374,19 +383,33 @@ export function createDocumentDragSession(
 
   let disposed = false
   const threshold = options.dragThreshold ?? 0
+  const activateOnThreshold = options.activateOnThreshold === true && threshold > 0
   let passedThreshold = threshold <= 0
   const pointerId = options.pointerId
   const captureTarget = options.pointerTarget ?? null
   const root = ownerDocument.documentElement
   const previousUserSelect = root.style.userSelect
-  root.style.userSelect = 'none'
+  let userSelectLocked = false
 
-  if (captureTarget && pointerId != null && typeof captureTarget.setPointerCapture === 'function') {
-    try {
-      captureTarget.setPointerCapture(pointerId)
-    } catch {
-      // Element may not be connected (tests / SSR hydrate).
+  const capturePointer = () => {
+    if (captureTarget && pointerId != null && typeof captureTarget.setPointerCapture === 'function') {
+      try {
+        captureTarget.setPointerCapture(pointerId)
+      } catch {
+        // Element may not be connected (tests / SSR hydrate).
+      }
     }
+  }
+
+  const lockUserSelect = () => {
+    if (userSelectLocked) return
+    userSelectLocked = true
+    root.style.userSelect = 'none'
+  }
+
+  if (!activateOnThreshold) {
+    lockUserSelect()
+    capturePointer()
   }
 
   const createPayload = (
@@ -415,7 +438,7 @@ export function createDocumentDragSession(
     ownerDocument.removeEventListener('pointerup', handlePointerUp)
     ownerDocument.removeEventListener('pointercancel', handlePointerCancel)
     ownerDocument.removeEventListener('keydown', handleKeyDown)
-    root.style.userSelect = previousUserSelect
+    if (userSelectLocked) root.style.userSelect = previousUserSelect
     if (
       captureTarget &&
       pointerId != null &&
@@ -441,13 +464,18 @@ export function createDocumentDragSession(
     if (!passedThreshold) {
       if (distance < threshold) return
       passedThreshold = true
+      if (activateOnThreshold) {
+        lockUserSelect()
+        capturePointer()
+      }
     }
     options.onMove(createPayload(event, event.clientX, event.clientY, false))
   }
 
   const handlePointerUp = (event: PointerEvent) => {
     if (disposed || !isMatchingPointer(event, pointerId)) return
-    finish(event, event.clientX, event.clientY, false)
+    const cancelled = activateOnThreshold && !passedThreshold
+    finish(event, event.clientX, event.clientY, cancelled)
   }
 
   const handlePointerCancel = (event: PointerEvent) => {

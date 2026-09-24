@@ -3,12 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import {
-  devWarn,
-  omitUnsupportedColorProp,
-  warnUnsupportedColorProp,
-  resetDevWarnCache
-} from '@expcat/tigercat-core'
+import { devWarn, resetDevWarnCache } from '@expcat/tigercat-core'
 
 describe('devWarn', () => {
   let warnSpy: ReturnType<typeof vi.spyOn>
@@ -39,30 +34,10 @@ describe('devWarn', () => {
     expect(warnSpy).not.toHaveBeenCalled()
   })
 
-  describe('warnUnsupportedColorProp', () => {
-    it('warns when a color prop is present', () => {
-      warnUnsupportedColorProp('Button', { color: 'primary' })
-      expect(warnSpy).toHaveBeenCalledWith(
-        '[Tigercat] Button does not support color. Use variant instead.'
-      )
-    })
-
-    it('does not warn when no color prop is present', () => {
-      warnUnsupportedColorProp('Tag', { variant: 'success' })
-      expect(warnSpy).not.toHaveBeenCalled()
-    })
-
-    it('dedupes per component', () => {
-      warnUnsupportedColorProp('Button', { color: 'red' })
-      warnUnsupportedColorProp('Button', { color: 'blue' })
-      warnUnsupportedColorProp('Tag', { color: 'red' })
-      expect(warnSpy).toHaveBeenCalledTimes(2)
-    })
-
-    it('omits color from the object that should reach the DOM', () => {
-      const rest = omitUnsupportedColorProp('Button', { color: 'primary', id: 'save' })
-      expect(rest).toEqual({ id: 'save' })
-      expect(warnSpy).toHaveBeenCalledTimes(1)
-    })
+  it('is silent when NODE_ENV is missing', () => {
+    delete process.env.NODE_ENV
+    devWarn('missing-env', 'should not appear')
+    expect(warnSpy).not.toHaveBeenCalled()
   })
+
 })

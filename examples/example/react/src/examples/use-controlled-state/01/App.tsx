@@ -26,14 +26,14 @@ export default function App() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="mb-2 text-sm text-[var(--tiger-text-muted,#6b7280)]">受控（可省略 value）</p>
+        <p className="mb-2 text-sm text-[var(--tiger-text-secondary)]">受控（可省略 value）</p>
         <Counter value={count} onChange={setCount} />
         <Button className="mt-2" onClick={() => setCount(undefined)}>
           省略 value
         </Button>
       </div>
       <div>
-        <p className="mb-2 text-sm text-[var(--tiger-text-muted,#6b7280)]">非受控</p>
+        <p className="mb-2 text-sm text-[var(--tiger-text-secondary)]">非受控</p>
         <Counter defaultValue={0} />
       </div>
     </div>

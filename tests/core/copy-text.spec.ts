@@ -5,30 +5,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { copyTextToClipboard } from '@expcat/tigercat-core'
 
-type ExecCommandHost = { execCommand?: unknown }
-
-const originalExecCommand = Object.getOwnPropertyDescriptor(document, 'execCommand')
-
-/** Replace `document.execCommand`, which happy-dom does not implement. */
-function stubExecCommand(impl: () => boolean) {
-  const spy = vi.fn(impl)
-  Object.defineProperty(document, 'execCommand', { configurable: true, value: spy })
-  return spy
-}
-
-/** Force the legacy textarea path by taking the async clipboard API away. */
-function withoutClipboardApi() {
-  vi.stubGlobal('navigator', { clipboard: undefined })
-}
-
 describe('copyTextToClipboard', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
-    if (originalExecCommand) {
-      Object.defineProperty(document, 'execCommand', originalExecCommand)
-    } else {
-      delete (document as ExecCommandHost).execCommand
-    }
   })
 
   it('rejects a non-string value without touching the DOM', async () => {
@@ -44,33 +23,22 @@ describe('copyTextToClipboard', () => {
     expect(writeText).toHaveBeenCalledWith('hello')
   })
 
-  it('falls back to the textarea path when the clipboard API rejects', async () => {
+  it('returns false when the clipboard API rejects and does not move focus', async () => {
+    const previous = document.createElement('button')
+    document.body.appendChild(previous)
+    previous.focus()
     const writeText = vi.fn().mockRejectedValue(new Error('denied'))
     vi.stubGlobal('navigator', { clipboard: { writeText } })
-    const execCommand = stubExecCommand(() => true)
 
-    await expect(copyTextToClipboard('fallback')).resolves.toBe(true)
-    expect(execCommand).toHaveBeenCalledWith('copy')
-  })
-
-  it('removes the fallback textarea after a successful copy', async () => {
-    withoutClipboardApi()
-    stubExecCommand(() => true)
-
-    await expect(copyTextToClipboard('clean')).resolves.toBe(true)
+    await expect(copyTextToClipboard('fallback')).resolves.toBe(false)
     expect(document.querySelector('textarea')).toBeNull()
+    expect(document.activeElement).toBe(previous)
+    previous.remove()
   })
 
-  // Regression: the removal used to sit after `execCommand` inside the same
-  // `try`, so a throw stranded an invisible, focusable textbox in the document
-  // — polluting the a11y tree and every later `getByRole('textbox')` query.
-  it('removes the fallback textarea when execCommand throws', async () => {
-    withoutClipboardApi()
-    stubExecCommand(() => {
-      throw new Error('unsupported')
-    })
-
-    await expect(copyTextToClipboard('leaky')).resolves.toBe(false)
+  it('returns false when the clipboard API is missing', async () => {
+    vi.stubGlobal('navigator', { clipboard: undefined })
+    await expect(copyTextToClipboard('clean')).resolves.toBe(false)
     expect(document.querySelector('textarea')).toBeNull()
   })
 })

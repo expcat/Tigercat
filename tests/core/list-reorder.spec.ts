@@ -153,6 +153,39 @@ describe('createListReorderController', () => {
     expect(controller.moveBetween(items(), items())).toBeNull()
   })
 
+  it('does not start a reorder before the pointer passes the threshold', () => {
+    const onDragStart = vi.fn()
+    const onDrop = vi.fn()
+    const controller = createListReorderController({
+      getContainerId: () => 'left',
+      getConfig: () => ({ dragThreshold: 8 }),
+      getCallbacks: () => ({ onDragStart, onDrop })
+    })
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    controller.getItemBindings(items()[0]).onPointerDown({
+      pointerType: 'mouse',
+      button: 0,
+      pointerId: 1,
+      clientX: 0,
+      clientY: 0,
+      currentTarget: host,
+      target: host,
+      preventDefault: vi.fn()
+    })
+    document.dispatchEvent(
+      new PointerEvent('pointermove', { clientX: 2, clientY: 1, pointerId: 1, bubbles: true })
+    )
+    document.dispatchEvent(
+      new PointerEvent('pointerup', { clientX: 2, clientY: 1, pointerId: 1, bubbles: true })
+    )
+    expect(onDragStart).not.toHaveBeenCalled()
+    expect(onDrop).not.toHaveBeenCalled()
+    expect(controller.getState().isDragging).toBe(false)
+    host.remove()
+    controller.dispose()
+  })
+
   it('does not put listitem or deprecated ARIA on item bindings', () => {
     const controller = createListReorderController({
       getContainerId: () => 'left',
