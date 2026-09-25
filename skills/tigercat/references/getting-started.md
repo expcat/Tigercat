@@ -42,9 +42,9 @@ Tailwind integration must use Tailwind CSS v4 and `@tailwindcss/vite`.
 ```
 
 The plugin also injects Steps connector geometry (vertical/horizontal tails
-centered on the icon column) and the WorkflowDesigner center-axis canvas
-rail. Do not rely on JIT-scanned utilities such as `inset-inline-start-4`
-for those connectors.
+centered on the icon column), ImagePreview chrome (close, previous/next, toolbar),
+and the WorkflowDesigner center-axis canvas rail. Do not rely on JIT-scanned
+utilities such as `inset-inline-start-4` for those positions.
 
 Runtime theme switching uses `ConfigProvider` `theme` / `colorScheme`. `theme="modern"` selects
 the modern preset. The Tailwind entry is only `@plugin "@expcat/tigercat-core/tailwind"`.

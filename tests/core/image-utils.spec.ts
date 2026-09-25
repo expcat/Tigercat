@@ -12,6 +12,10 @@ import {
   createImageLoadState,
   formatImagePreviewAriaLabel,
   getCropperHandleStyle,
+  imagePreviewChromeStyles,
+  imagePreviewCloseBtnClasses,
+  imagePreviewNavNextClasses,
+  imagePreviewNavPrevClasses,
   getCropperDisplaySize,
   planCropperDisplaySize,
   resolveCropperAvailableSize,
@@ -123,6 +127,24 @@ describe('image-utils — class generators', () => {
     expect(getCropperDisplaySize(800, 600, 400, 400)).toEqual({ width: 400, height: 300 })
     expect(getCropperDisplaySize(100, 50, 400, 400)).toEqual({ width: 100, height: 50 })
     expect(getCropperDisplaySize(0, 50, 400, 400)).toBeNull()
+  })
+
+  it('places lightbox chrome with logical insets above the bitmap', () => {
+    expect(imagePreviewNavPrevClasses).toContain('tiger-image-preview-nav--prev')
+    expect(imagePreviewNavNextClasses).toContain('tiger-image-preview-nav--next')
+    expect(imagePreviewCloseBtnClasses).toContain('tiger-image-preview-close')
+    expect(imagePreviewNavPrevClasses).not.toContain('inset-inline-start')
+    expect(imagePreviewChromeStyles['.tiger-image-preview-nav--prev']).toMatchObject({
+      insetInlineStart: '1rem'
+    })
+    expect(imagePreviewChromeStyles['.tiger-image-preview-nav--next']).toMatchObject({
+      insetInlineEnd: '1rem'
+    })
+    expect(imagePreviewChromeStyles['.tiger-image-preview-close']).toMatchObject({
+      insetInlineEnd: '1rem'
+    })
+    expect(imagePreviewChromeStyles['.tiger-image-preview-chrome'].zIndex).toBe('2')
+    expect(imagePreviewChromeStyles['.tiger-image-preview-img'].zIndex).toBe('1')
   })
 
   it('fits by width when height is unconstrained', () => {

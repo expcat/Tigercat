@@ -89,11 +89,11 @@ describe('ImagePreview', () => {
 
   it('places previous at inline-start and close at inline-end', () => {
     render(ImagePreview, { props: { open: true, images } })
-    expect(screen.getByRole('button', { name: labels.previousImageAriaLabel }).className).toMatch(
-      /inset-inline-start/
+    expect(screen.getByRole('button', { name: labels.previousImageAriaLabel }).className).toContain(
+      'tiger-image-preview-nav--prev'
     )
-    expect(screen.getByRole('button', { name: labels.closePreviewAriaLabel }).className).toMatch(
-      /inset-inline-end/
+    expect(screen.getByRole('button', { name: labels.closePreviewAriaLabel }).className).toContain(
+      'tiger-image-preview-close'
     )
   })
 

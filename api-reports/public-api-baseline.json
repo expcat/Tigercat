@@ -2827,6 +2827,7 @@
       "imageLoadingSpinnerPath",
       "ImageLoadState",
       "imageLoadStateFromElement",
+      "imagePreviewChromeStyles",
       "imagePreviewCloseBtnClasses",
       "imagePreviewCounterClasses",
       "imagePreviewCursorClass",

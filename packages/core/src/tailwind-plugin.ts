@@ -13,7 +13,7 @@ import { cardBaseStyles } from './utils/card-utils'
 import { carouselBaseStyles } from './utils/carousel-utils'
 import { dividerBaseStyles } from './utils/divider'
 import { dropdownBaseStyles } from './utils/dropdown-utils'
-import { imageCropperBaseStyles } from './utils/image-utils'
+import { imageCropperBaseStyles, imagePreviewChromeStyles } from './utils/image-utils'
 import { marqueeBaseStyles } from './utils/marquee-utils'
 import { menuBaseStyles } from './utils/menu-utils'
 import { printLayoutBaseStyles } from './utils/print-layout-utils'
@@ -46,6 +46,7 @@ const tigercatComponentStyleParts: Array<Record<string, unknown>> = [
   dividerBaseStyles,
   dropdownBaseStyles,
   imageCropperBaseStyles,
+  imagePreviewChromeStyles,
   marqueeBaseStyles,
   menuBaseStyles,
   printLayoutBaseStyles,

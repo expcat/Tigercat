@@ -194,19 +194,22 @@ export const imagePreviewWrapperClasses = `fixed inset-0 flex items-center justi
 
 /**
  * Preview image classes. Motion duration is added only when not dragging.
+ * Stacking lives in {@link imagePreviewChromeStyles}: a transformed bitmap
+ * paints with positioned siblings, and without an explicit level it covers
+ * the centered chrome and swallows their clicks.
  */
 export const imagePreviewImgClasses =
-  'max-h-[90vh] max-w-[90vw] select-none cursor-grab active:cursor-grabbing touch-none'
+  'tiger-image-preview-img max-h-[90vh] max-w-[90vw] select-none cursor-grab active:cursor-grabbing touch-none'
 
 /** Applied while the bitmap is not being panned or pinched. */
 export const imagePreviewImgMotionClasses =
   'tiger-motion-aware transition-transform duration-[var(--tiger-motion-duration-quick)] ease-[var(--tiger-motion-ease-standard)]'
 
 /**
- * Preview toolbar classes
+ * Preview toolbar classes. Position is plugin CSS, not `left-1/2` / `bottom-6`.
  */
 export const imagePreviewToolbarClasses =
-  'absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 text-white'
+  'tiger-image-preview-chrome tiger-image-preview-toolbar flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 text-white'
 
 /**
  * Preview toolbar button classes
@@ -215,26 +218,69 @@ export const imagePreviewToolbarBtnClasses =
   'flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
 
 /**
- * Preview navigation button classes (prev/next)
+ * Preview navigation button classes (prev/next).
+ *
+ * Horizontal placement used to be the Tailwind v3 utilities
+ * `inset-inline-start-4` / `inset-inline-end-4`. Tailwind v4 does not emit
+ * those names (`start-*` / `end-*` replaced them), so both buttons kept the
+ * flex item's static position — the viewport center — and stacked.
+ * Coordinates now ship with the plugin. See {@link imagePreviewChromeStyles}.
  */
 export const imagePreviewNavBtnClasses =
-  'absolute top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 rounded-full bg-black/60 text-white hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
+  'tiger-image-preview-chrome tiger-image-preview-nav flex items-center justify-center w-10 h-10 rounded-full bg-black/60 text-white hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:opacity-40 disabled:cursor-not-allowed'
 
 export const imagePreviewNavPrevClasses = classNames(
   imagePreviewNavBtnClasses,
-  'inset-inline-start-4'
+  'tiger-image-preview-nav--prev'
 )
 
 export const imagePreviewNavNextClasses = classNames(
   imagePreviewNavBtnClasses,
-  'inset-inline-end-4'
+  'tiger-image-preview-nav--next'
 )
 
 /**
- * Preview close button classes
+ * Preview close button classes. Inline-end offset is plugin CSS.
  */
 export const imagePreviewCloseBtnClasses =
-  'absolute top-4 inset-inline-end-4 flex items-center justify-center w-10 h-10 rounded-full bg-black/60 text-white hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
+  'tiger-image-preview-chrome tiger-image-preview-close flex items-center justify-center w-10 h-10 rounded-full bg-black/60 text-white hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
+
+/**
+ * Lightbox chrome geometry.
+ *
+ * Shipped with `@plugin "@expcat/tigercat-core/tailwind"` so placement does
+ * not depend on purged or renamed inset utilities. The bitmap sits under the
+ * controls; otherwise its transform stacking context receives the click.
+ */
+export const imagePreviewChromeStyles = {
+  '.tiger-image-preview-img': {
+    position: 'relative',
+    zIndex: '1'
+  },
+  '.tiger-image-preview-chrome': {
+    position: 'absolute',
+    zIndex: '2'
+  },
+  '.tiger-image-preview-close': {
+    top: '1rem',
+    insetInlineEnd: '1rem'
+  },
+  '.tiger-image-preview-nav': {
+    top: '50%',
+    transform: 'translateY(-50%)'
+  },
+  '.tiger-image-preview-nav--prev': {
+    insetInlineStart: '1rem'
+  },
+  '.tiger-image-preview-nav--next': {
+    insetInlineEnd: '1rem'
+  },
+  '.tiger-image-preview-toolbar': {
+    bottom: '1.5rem',
+    left: '50%',
+    transform: 'translateX(-50%)'
+  }
+} as const
 
 /**
  * Preview counter text classes
