@@ -121,8 +121,11 @@ describe('W9 T07 navigation', () => {
   it('E11 keeps error steps clickable and dots the marker only', () => {
     expect(isStepClickable(true, false, 'error')).toBe(true)
     expect(isStepClickable(false, false, 'error')).toBe(false)
-    expect(getStepIconClasses('process', 'md', false, false, true)).toContain('tiger-step-icon--dot')
+    expect(getStepIconClasses('process', 'md', false, false, true)).toContain(
+      'tiger-step-icon--dot'
+    )
     expect(getStepIconClasses('process', 'md', false, false, true)).not.toContain('w-10')
+    expect(getStepIconClasses('error', 'md', false, false, true)).not.toContain('ring-4')
   })
 
   it('E12 sorts recent ids ahead and lists footer shortcuts', () => {

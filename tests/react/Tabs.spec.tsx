@@ -329,11 +329,7 @@ describe('Tabs', () => {
       const onChange = vi.fn()
 
       render(
-        <Tabs
-          type="editable-card"
-          closable
-          defaultActiveKey="1"
-          onChange={onChange}>
+        <Tabs type="editable-card" closable defaultActiveKey="1" onChange={onChange}>
           <TabPane tabKey="1" label="Tab 1">
             Content 1
           </TabPane>
@@ -863,6 +859,11 @@ describe('Tabs', () => {
       const active = screen.getByRole('tab', { name: 'Active' })
       expect(active).toHaveClass('rounded-full')
       expect(active.className).toContain('bg-[var(--tiger-primary')
+      expect(active.className).not.toContain('bg-transparent')
+      expect(active.className).not.toContain('text-[var(--tiger-text-secondary)]')
+      const inactive = screen.getByRole('tab', { name: 'Inactive' })
+      expect(inactive.className).toContain('bg-transparent')
+      expect(inactive.className).not.toContain('bg-[var(--tiger-primary)]')
     })
   })
 

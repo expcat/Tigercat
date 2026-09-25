@@ -3,6 +3,7 @@ import {
   canClickWizardStep,
   clampStepIndex,
   findNextUnskippedStep,
+  getFormWizardWrapperClasses,
   isLastAvailableStep,
   runStepValidation,
   type WizardStep
@@ -117,6 +118,13 @@ describe('form-wizard-utils', () => {
       expect(isLastAvailableStep(1, steps)).toBe(true)
       expect(isLastAvailableStep(0, steps)).toBe(false)
       expect(isLastAvailableStep(0, [])).toBe(false)
+    })
+  })
+
+  describe('getFormWizardWrapperClasses', () => {
+    it('clips header and footer edges to the rounded border', () => {
+      expect(getFormWizardWrapperClasses({ bordered: true })).toContain('overflow-hidden')
+      expect(getFormWizardWrapperClasses({ bordered: false })).not.toContain('overflow-hidden')
     })
   })
 

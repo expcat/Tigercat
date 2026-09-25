@@ -3,6 +3,7 @@
  * Vue/React bind DOM and controlled props; they must not copy this machine.
  */
 
+import { resolveTopOverlayDocument } from './anchored-overlay'
 import { devWarn } from './dev-warn'
 import { handleMenuNavigation, isTextEditingTarget } from './focus-utils'
 import { getFocusableElements } from './overlay-utils'
@@ -27,7 +28,13 @@ export function getOpenPanelFromMenubar(menubar: HTMLElement | null): HTMLElemen
   const trigger = menubar.querySelector<HTMLElement>('[aria-expanded="true"][aria-controls]')
   const contentId = trigger?.getAttribute('aria-controls')
   if (!contentId) return null
-  return menubar.ownerDocument.getElementById(contentId)
+  const local = menubar.ownerDocument.getElementById(contentId)
+  if (local) return local
+  // Demo iframes portal the panel onto the top document. The menubar's
+  // document cannot see that node, so focus and hover would treat it as outside.
+  const top = resolveTopOverlayDocument(menubar.ownerDocument)
+  if (top === menubar.ownerDocument) return null
+  return top.getElementById(contentId)
 }
 
 export function resolveElementDir(element: HTMLElement | null | undefined): 'ltr' | 'rtl' {
@@ -202,13 +209,28 @@ export function getNavigationMenuTabExitTarget(
   return shiftKey ? (focusables[index - 1] ?? null) : (focusables[index + 1] ?? null)
 }
 
+function activeElementInside(root: HTMLElement | null): boolean {
+  if (!root) return false
+  const active = root.ownerDocument.activeElement
+  if (!active || active === root.ownerDocument.body) return false
+  return root.contains(active)
+}
+
 export function isFocusInsideNavigationMenu(
   nav: HTMLElement | null,
   menubar: HTMLElement | null,
   relatedTarget: EventTarget | null
 ): boolean {
   if (containsFocusTarget(nav, relatedTarget)) return true
-  return containsFocusTarget(getOpenPanelFromMenubar(menubar), relatedTarget)
+  const panel = getOpenPanelFromMenubar(menubar)
+  if (containsFocusTarget(panel, relatedTarget)) return true
+  // Cross-document focus (a portaled panel) reports a null relatedTarget.
+  // After the focus move settles, the destination document's active element
+  // is the new target. Callers that see a null relatedTarget must defer one
+  // frame before trusting this, because the old element is still active
+  // while focusout is dispatching.
+  if (relatedTarget != null) return false
+  return activeElementInside(nav) || activeElementInside(panel)
 }
 
 export function createNavigationMenuHoverSession(options: {

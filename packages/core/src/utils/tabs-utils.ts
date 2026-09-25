@@ -90,13 +90,13 @@ export const tabItemCardClasses =
   'border border-[var(--tiger-border)] bg-[var(--tiger-surface)] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
 
 export const tabItemCardActiveClasses =
-  'bg-[var(--tiger-surface)] border-[var(--tiger-primary)] text-[var(--tiger-primary)] font-medium z-10'
+  'border bg-[var(--tiger-surface)] border-[var(--tiger-primary)] text-[var(--tiger-primary)] font-medium z-10 shrink-0'
 
 export const tabItemEditableCardClasses =
   'border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] hover:bg-[var(--tiger-surface)] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
 
 export const tabItemEditableCardActiveClasses =
-  'bg-[var(--tiger-surface)] border-[var(--tiger-primary)] text-[var(--tiger-primary)] font-medium z-10'
+  'border bg-[var(--tiger-surface)] border-[var(--tiger-primary)] text-[var(--tiger-primary)] font-medium z-10 shrink-0'
 
 export const tabItemPillsClasses =
   'rounded-full bg-transparent hover:bg-[var(--tiger-primary-subtle)] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
@@ -393,8 +393,7 @@ export function measureTabIndicatorBox(
     list.clientWidth,
     dir
   )
-  const visualDelta =
-    dir === 'rtl' ? listRect.right - tabRect.right : tabRect.left - listRect.left
+  const visualDelta = dir === 'rtl' ? listRect.right - tabRect.right : tabRect.left - listRect.left
   const inlineStart = visualDelta + scrollFromStart
   return {
     inlineStart,
@@ -428,22 +427,27 @@ export function getTabItemClasses(
 
   if (disabled) return `${cls} ${tabItemDisabledClasses}`
 
+  // Inactive and active color utilities are mutually exclusive. Tailwind v4
+  // resolves conflicting utilities by stylesheet order, so keeping both
+  // `bg-transparent` and `bg-primary` on one node paints the inactive color.
   switch (type) {
     case 'line':
-      cls += ` ${tabItemLineClasses}`
-      if (active) cls += ` ${tabItemLineActiveClasses}`
+      cls += active
+        ? ` border-transparent shrink-0 ${tabItemLineActiveClasses}`
+        : ` ${tabItemLineClasses}`
       break
     case 'card':
-      cls += ` ${tabItemCardClasses} ${getCardChromeClasses(position, active)}`
-      if (active) cls += ` ${tabItemCardActiveClasses}`
+      cls += active ? ` ${tabItemCardActiveClasses}` : ` ${tabItemCardClasses}`
+      cls += ` ${getCardChromeClasses(position, active)}`
       break
     case 'editable-card':
-      cls += ` ${tabItemEditableCardClasses} ${getCardChromeClasses(position, active)}`
-      if (active) cls += ` ${tabItemEditableCardActiveClasses}`
+      cls += active ? ` ${tabItemEditableCardActiveClasses}` : ` ${tabItemEditableCardClasses}`
+      cls += ` ${getCardChromeClasses(position, active)}`
       break
     case 'pills':
-      cls += ` ${tabItemPillsClasses}`
-      if (active) cls += ` ${tabItemPillsActiveClasses}`
+      cls += active
+        ? ` rounded-full shrink-0 ${tabItemPillsActiveClasses}`
+        : ` ${tabItemPillsClasses}`
       break
   }
 
@@ -505,11 +509,7 @@ export function splitOverflowTabKeys<K extends string | number>(options: {
   return { visible, overflow }
 }
 
-export function nextTabOrder<K extends string | number>(
-  keys: readonly K[],
-  from: K,
-  to: K
-): K[] {
+export function nextTabOrder<K extends string | number>(keys: readonly K[], from: K, to: K): K[] {
   const next = [...keys]
   const fromIndex = next.findIndex((key) => String(key) === String(from))
   const toIndex = next.findIndex((key) => String(key) === String(to))

@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 import {
   calculateStepStatus,
   clampStepCurrent,
+  getStepIconClasses,
   getStepIconColumnClasses,
   getStepItemClasses,
   getStepSizeDataValue,
@@ -63,6 +64,17 @@ describe('Steps connector class tokens', () => {
     expect(horizontal).toContain('tiger-step-tail--finish')
     expect(horizontal).not.toMatch(/inset-inline-start/)
     expect(horizontal).not.toMatch(/left-1\/2/)
+  })
+
+  it('centers a dot tail on the 10px marker', () => {
+    const tail = getStepTailClasses('horizontal', 'finish', false, 'md', false, true)
+    expect(tail).toContain('tiger-step-tail--dot')
+    expect(tail).not.toContain('tiger-step-tail--md')
+    const dot = getStepIconClasses('error', 'md', false, false, true)
+    expect(dot).toContain('tiger-step-icon--dot')
+    expect(dot).toContain('bg-[var(--tiger-error)]')
+    expect(dot).not.toContain('ring-4')
+    expect(dot).not.toContain('border-2')
   })
 
   it('hides the last tail with a semantic modifier', () => {

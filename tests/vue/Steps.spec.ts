@@ -78,10 +78,7 @@ describe('Steps', () => {
       expect(tail).toHaveClass('tiger-step-tail--sm')
       expect(tail?.className).not.toMatch(/inset-inline-start/)
       expect(container.querySelector('.tiger-step-icon-col')).toHaveClass('tiger-step-icon-col--sm')
-      expect(container.querySelector('.tiger-steps')).toHaveAttribute(
-        'data-tiger-step-size',
-        'sm'
-      )
+      expect(container.querySelector('.tiger-steps')).toHaveAttribute('data-tiger-step-size', 'sm')
     })
   })
 
@@ -167,6 +164,27 @@ describe('Steps', () => {
       // Waiting steps should show numbers 2 and 3
       expect(screen.getByText('2')).toBeInTheDocument()
       expect(screen.getByText('3')).toBeInTheDocument()
+    })
+
+    it('renders progress dots without status glyphs', () => {
+      const { container } = render(Steps, {
+        props: { progressDot: true, current: 1, status: 'error' },
+        slots: {
+          default: () => [
+            h(StepsItem, { title: 'Draft' }),
+            h(StepsItem, { title: 'Check' }),
+            h(StepsItem, { title: 'Ship' })
+          ]
+        }
+      })
+
+      const icons = container.querySelectorAll('.tiger-step-icon--dot')
+      expect(icons).toHaveLength(3)
+      icons.forEach((icon) => {
+        expect(icon.querySelector('svg')).toBeNull()
+        expect(icon.textContent).toBe('')
+      })
+      expect(container.querySelector('.tiger-step-tail--dot')).toBeTruthy()
     })
 
     it('should show checkmark for finished steps', () => {

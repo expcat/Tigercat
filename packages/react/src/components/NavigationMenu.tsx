@@ -184,6 +184,16 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
       root?.handleItemClick()
     }
 
+    const keepTriggerFocus = (
+      event: React.MouseEvent<HTMLElement> | React.PointerEvent<HTMLElement>
+    ) => {
+      if (!inPanel || isDisabled) return
+      // A portaled panel is outside the menubar document. Chrome moves focus
+      // on pointerdown, which fires focusout with a null relatedTarget and
+      // closes the menu before click, so the item action never runs.
+      event.preventDefault()
+    }
+
     const handleFocus = () => {
       if (inPanel) return
       if (!item?.hasPanel) {
@@ -233,6 +243,8 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
       'data-tiger-navigation-menu-link': '',
       'data-active': active ? 'true' : undefined,
       onClick: handleClick,
+      onPointerDown: keepTriggerFocus,
+      onMouseDown: keepTriggerFocus,
       onFocus: handleFocus,
       onKeyDown: handleKeyDown
     }
@@ -822,7 +834,17 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
   )
   setValueRef.current = setValue
 
-  useEffect(() => () => hoverRef.current?.clear(), [])
+  const focusLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(
+    () => () => {
+      hoverRef.current?.clear()
+      if (focusLeaveTimerRef.current != null) {
+        clearTimeout(focusLeaveTimerRef.current)
+        focusLeaveTimerRef.current = null
+      }
+    },
+    []
+  )
 
   const handleItemClick = useCallback(() => {
     if (closeOnClick) setValue(null, { restoreFocus: false })
@@ -830,11 +852,27 @@ export const NavigationMenu: React.FC<NavigationMenuProps> = ({
 
   const handleFocusLeave = useCallback(
     (event: React.FocusEvent<HTMLElement>) => {
-      if (isFocusInsideNavigationMenu(rootRef.current, menubarRef.current, event.relatedTarget)) {
+      const close = () => setValue(null, { restoreFocus: false })
+      if (event.relatedTarget != null) {
+        if (isFocusInsideNavigationMenu(rootRef.current, menubarRef.current, event.relatedTarget)) {
+          return
+        }
+        if (!isNavigationMenuOpen(currentValueRef.current)) return
+        if (focusLeaveTimerRef.current != null) {
+          clearTimeout(focusLeaveTimerRef.current)
+          focusLeaveTimerRef.current = null
+        }
+        close()
         return
       }
       if (!isNavigationMenuOpen(currentValueRef.current)) return
-      setValue(null, { restoreFocus: false })
+      if (focusLeaveTimerRef.current != null) clearTimeout(focusLeaveTimerRef.current)
+      focusLeaveTimerRef.current = setTimeout(() => {
+        focusLeaveTimerRef.current = null
+        if (isFocusInsideNavigationMenu(rootRef.current, menubarRef.current, null)) return
+        if (!isNavigationMenuOpen(currentValueRef.current)) return
+        close()
+      }, 0)
     },
     [setValue]
   )

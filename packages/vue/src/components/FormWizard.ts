@@ -410,7 +410,7 @@ export const FormWizard = defineComponent({
                         size: props.size
                       },
                       {
-                        icon: () => h(Icon, { name: 'arrow-left', class: 'w-3.5 h-3.5' }),
+                        icon: () => h(Icon, { name: 'arrow-left', size: 'sm' }),
                         default: () => resolveLocaleText(labels.value.prevText, props.prevText)
                       }
                     )
@@ -431,7 +431,7 @@ export const FormWizard = defineComponent({
                     icon: () =>
                       h(Icon, {
                         name: isLast.value ? 'check' : 'arrow-right',
-                        class: 'w-3.5 h-3.5'
+                        size: 'sm'
                       }),
                     default: () =>
                       isLast.value

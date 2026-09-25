@@ -98,6 +98,9 @@ export const stepConnectorBaseStyles = {
   '.tiger-step-tail--md': {
     '--tiger-step-icon-size': '2.5rem'
   },
+  '.tiger-step-tail--dot': {
+    '--tiger-step-icon-size': '0.625rem'
+  },
   '.tiger-step-tail--vertical': {
     insetInlineStart: '50%',
     inlineSize: '0.125rem',
@@ -152,7 +155,11 @@ export function getStepItemClasses(direction: StepsDirection, isLast: boolean): 
  * Get Step icon container classes
  */
 /** Error steps stay clickable when `clickable` is set. Current stays on the control. */
-export function isStepClickable(clickable: boolean, disabled: boolean, _status: StepStatus): boolean {
+export function isStepClickable(
+  clickable: boolean,
+  disabled: boolean,
+  _status: StepStatus
+): boolean {
   return clickable && !disabled
 }
 
@@ -167,16 +174,24 @@ export function getStepIconClasses(
     ? 'tiger-step-icon tiger-step-icon--dot relative z-10 flex items-center justify-center rounded-full border-0 w-2.5 h-2.5'
     : 'tiger-step-icon relative z-10 flex items-center justify-center rounded-full border-2'
 
+  if (progressDot) {
+    const dotStatus = {
+      wait: 'bg-[var(--tiger-border)]',
+      process: 'bg-[var(--tiger-primary)]',
+      finish: 'bg-[var(--tiger-primary)]',
+      error: 'bg-[var(--tiger-error)]'
+    }
+    return `${baseClasses} ${dotStatus[status]}`
+  }
+
   // Size classes
-  const sizeClasses = progressDot
-    ? ''
-    : simple
-      ? 'w-6 h-6 text-xs'
-      : size === 'sm'
-        ? 'w-8 h-8 text-sm'
-        : size === 'lg'
-          ? 'w-12 h-12 text-lg'
-          : 'w-10 h-10 text-base'
+  const sizeClasses = simple
+    ? 'w-6 h-6 text-xs'
+    : size === 'sm'
+      ? 'w-8 h-8 text-sm'
+      : size === 'lg'
+        ? 'w-12 h-12 text-lg'
+        : 'w-10 h-10 text-base'
 
   // Custom icon might need less padding
   const iconClasses = isCustomIcon ? '' : 'font-medium'
@@ -207,11 +222,12 @@ export function getStepTailClasses(
   status: StepStatus,
   isLast: boolean,
   size: StepSize,
-  simple: boolean
+  simple: boolean,
+  progressDot = false
 ): string {
   if (isLast) return 'tiger-step-tail tiger-step-tail--last'
 
-  const sizeMod = getStepSizeToken(size, simple)
+  const sizeMod = progressDot ? 'dot' : getStepSizeToken(size, simple)
   const dirMod =
     direction === 'vertical' ? 'tiger-step-tail--vertical' : 'tiger-step-tail--horizontal'
   const colorMod = status === 'finish' ? 'tiger-step-tail--finish' : 'tiger-step-tail--wait'
@@ -248,8 +264,7 @@ export function getStepTitleClasses(
     wait: 'text-[var(--tiger-text-secondary)] transition-colors duration-300 motion-reduce:transition-none',
     process:
       'text-[var(--tiger-text)] font-semibold transition-colors duration-300 motion-reduce:transition-none',
-    finish:
-      'text-[var(--tiger-text)] transition-colors duration-300 motion-reduce:transition-none',
+    finish: 'text-[var(--tiger-text)] transition-colors duration-300 motion-reduce:transition-none',
     error: 'text-[var(--tiger-error)]'
   }
 
@@ -269,9 +284,7 @@ export function getStepDescriptionClasses(status: StepStatus, size: StepSize): s
   const sizeClasses = size === 'sm' ? 'text-xs' : 'text-sm'
 
   const statusClass =
-    status === 'error'
-      ? 'text-[var(--tiger-error)]'
-      : 'text-[var(--tiger-text-secondary)]'
+    status === 'error' ? 'text-[var(--tiger-error)]' : 'text-[var(--tiger-text-secondary)]'
 
   return `${baseClasses} ${sizeClasses} ${statusClass}`
 }

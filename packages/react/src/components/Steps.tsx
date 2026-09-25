@@ -135,7 +135,8 @@ export const StepsItem: React.FC<StepsItemProps> = ({
     stepStatus,
     isLast,
     stepsContext.size,
-    stepsContext.simple
+    stepsContext.simple,
+    stepsContext.progressDot
   )
   const iconColumnClasses = getStepIconColumnClasses(stepsContext.size, stepsContext.simple)
   const sizeDataValue = getStepSizeDataValue(stepsContext.size, stepsContext.simple)
@@ -151,23 +152,25 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   const statusText = getStepStatusText(stepStatus, stepsContext.labels)
 
   const renderIcon = () => {
-    const inner = icon ? (
-      icon
-    ) : stepStatus === 'finish' ? (
-      <svg
-        className="w-4 h-4 shrink-0 tiger-animate-fade-in"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={stepFinishIconStrokeWidth}
-        viewBox={stepFinishIconViewBox}
-        aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d={stepFinishIconPathD} />
-      </svg>
-    ) : stepStatus === 'error' ? (
-      <span aria-hidden="true">!</span>
-    ) : (
-      <span aria-hidden="true">{stepIndex + 1}</span>
-    )
+    let inner: React.ReactNode = null
+    if (icon) inner = icon
+    else if (!stepsContext.progressDot && stepStatus === 'finish') {
+      inner = (
+        <svg
+          className="w-4 h-4 shrink-0 tiger-animate-fade-in"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={stepFinishIconStrokeWidth}
+          viewBox={stepFinishIconViewBox}
+          aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d={stepFinishIconPathD} />
+        </svg>
+      )
+    } else if (!stepsContext.progressDot && stepStatus === 'error') {
+      inner = <span aria-hidden="true">!</span>
+    } else if (!stepsContext.progressDot) {
+      inner = <span aria-hidden="true">{stepIndex + 1}</span>
+    }
     return (
       <div className={iconClasses} aria-hidden="true">
         {inner}

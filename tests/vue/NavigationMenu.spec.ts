@@ -233,6 +233,37 @@ describe('NavigationMenu', () => {
     expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'false')
   })
 
+  it('keeps pointer focus on the trigger so a panel link click can run', () => {
+    renderNav({ defaultValue: 'products' })
+    const overview = screen.getByRole('menuitem', { name: 'Overview' })
+    const panelDown = new PointerEvent('pointerdown', { bubbles: true, cancelable: true })
+    overview.dispatchEvent(panelDown)
+    expect(panelDown.defaultPrevented).toBe(true)
+
+    const about = screen.getByRole('menuitem', { name: 'About' })
+    const barDown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
+    about.dispatchEvent(barDown)
+    expect(barDown.defaultPrevented).toBe(false)
+  })
+
+  it('waits one frame before closing when focusout has no relatedTarget', async () => {
+    const { container } = renderNav({ defaultValue: 'products' })
+    const products = screen.getByRole('menuitem', { name: 'Products' })
+    const overview = screen.getByRole('menuitem', { name: 'Overview' })
+    overview.focus()
+    products.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }))
+    expect(products).toHaveAttribute('aria-expanded', 'true')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(products).toHaveAttribute('aria-expanded', 'true')
+
+    const outside = document.createElement('button')
+    container.appendChild(outside)
+    outside.focus()
+    products.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(products).toHaveAttribute('aria-expanded', 'false')
+  })
+
   it('closes on item click, outside click, and Escape', async () => {
     renderNav({ defaultValue: 'products' })
     expect(getPanel()).not.toHaveAttribute('hidden')

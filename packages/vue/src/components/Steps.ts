@@ -194,7 +194,8 @@ export const StepsItem = defineComponent({
         stepStatus.value,
         props.isLast,
         stepsContext.size,
-        stepsContext.simple
+        stepsContext.simple,
+        stepsContext.progressDot
       )
     })
 
@@ -226,6 +227,7 @@ export const StepsItem = defineComponent({
       let inner: unknown
       if (slots.icon) inner = slots.icon()
       else if (props.icon) inner = props.icon
+      else if (stepsContext.progressDot) inner = undefined
       else if (stepStatus.value === 'finish') {
         inner = h(
           'svg',

@@ -258,6 +258,14 @@ export const NavigationMenuLink = defineComponent({
       root?.handleItemClick()
     }
 
+    const keepTriggerFocus = (event: Event) => {
+      if (!inPanel || disabled.value) return
+      // A portaled panel is outside the menubar document. Chrome moves focus
+      // on pointerdown, which fires focusout with a null relatedTarget and
+      // closes the menu before click, so the item action never runs.
+      if (event.cancelable) event.preventDefault()
+    }
+
     const handleFocus = () => {
       if (inPanel) return
       if (!item || !item.hasPanel.value) {
@@ -319,6 +327,8 @@ export const NavigationMenuLink = defineComponent({
           'data-tiger-navigation-menu-link': '',
           'data-active': props.active ? 'true' : undefined,
           onClick: handleClick,
+          onPointerdown: keepTriggerFocus,
+          onMousedown: keepTriggerFocus,
           onFocus: handleFocus,
           onKeydown: handleKeyDown
         },
@@ -971,15 +981,37 @@ export const NavigationMenu = defineComponent({
       if (props.closeOnClick) setValue(null, { restoreFocus: false })
     }
 
+    let focusLeaveTimer: ReturnType<typeof setTimeout> | null = null
+    const clearFocusLeave = () => {
+      if (focusLeaveTimer == null) return
+      clearTimeout(focusLeaveTimer)
+      focusLeaveTimer = null
+    }
+
     const handleFocusLeave = (event: FocusEvent) => {
-      if (isFocusInsideNavigationMenu(rootRef.value, menubarRef.value, event.relatedTarget)) {
+      if (event.relatedTarget != null) {
+        if (isFocusInsideNavigationMenu(rootRef.value, menubarRef.value, event.relatedTarget)) {
+          return
+        }
+        if (!isNavigationMenuOpen(currentValue.value)) return
+        clearFocusLeave()
+        setValue(null, { restoreFocus: false })
         return
       }
       if (!isNavigationMenuOpen(currentValue.value)) return
-      setValue(null, { restoreFocus: false })
+      clearFocusLeave()
+      focusLeaveTimer = setTimeout(() => {
+        focusLeaveTimer = null
+        if (isFocusInsideNavigationMenu(rootRef.value, menubarRef.value, null)) return
+        if (!isNavigationMenuOpen(currentValue.value)) return
+        setValue(null, { restoreFocus: false })
+      }, 0)
     }
 
-    onBeforeUnmount(hover.clear)
+    onBeforeUnmount(() => {
+      hover.clear()
+      clearFocusLeave()
+    })
 
     onMounted(() => {
       warnNavigationMenuOpenWithoutValue(

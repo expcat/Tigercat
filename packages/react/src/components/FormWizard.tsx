@@ -349,7 +349,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
               onClick={handlePrev}
               disabled={pending}
               size={size}
-              icon={<Icon name="arrow-left" className="w-3.5 h-3.5" />}>
+              icon={<Icon name="arrow-left" size="sm" />}>
               {resolveLocaleText(labels.prevText, prevText)}
             </Button>
           ) : (
@@ -363,7 +363,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
             loading={pending}
             disabled={pending}
             size={size}
-            icon={<Icon name={isLast ? 'check' : 'arrow-right'} className="w-3.5 h-3.5" />}
+            icon={<Icon name={isLast ? 'check' : 'arrow-right'} size="sm" />}
             iconPosition={isLast ? 'start' : 'end'}>
             {isLast
               ? resolveLocaleText(labels.finishText, finishText)

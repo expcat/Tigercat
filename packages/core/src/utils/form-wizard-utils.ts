@@ -150,7 +150,7 @@ export function getFormWizardWrapperClasses(options: {
   return classNames(
     'tiger-form-wizard w-full tiger-motion-aware transition-colors duration-300 motion-reduce:transition-none',
     options.bordered
-      ? 'rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] shadow-sm'
+      ? 'overflow-hidden rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] shadow-sm'
       : 'bg-transparent',
     options.className
   )

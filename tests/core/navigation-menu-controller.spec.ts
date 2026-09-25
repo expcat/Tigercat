@@ -10,7 +10,9 @@ import {
   createNavigationMenuHoverSession,
   getNavigationMenuRovingTabIndex,
   getNavigationMenuTabExitTarget,
+  getOpenPanelFromMenubar,
   handleMenubarNavigation,
+  isFocusInsideNavigationMenu,
   isNavigationMenuValueOpen,
   resolveNavigationMenuTabStopValue
 } from '@expcat/tigercat-core'
@@ -150,5 +152,37 @@ describe('navigation-menu-controller', () => {
 
     expect(getNavigationMenuTabExitTarget(nav, panel, false)).toBe(after)
     expect(getNavigationMenuTabExitTarget(nav, panel, true)).toBe(before)
+  })
+
+  it('finds a portaled panel in an ancestor document', () => {
+    const iframe = document.createElement('iframe')
+    document.body.appendChild(iframe)
+    const child = iframe.contentDocument
+    expect(child).toBeTruthy()
+    if (!child?.defaultView) return
+    // happy-dom leaves frameElement unset; browsers set it for a real iframe.
+    Object.defineProperty(child.defaultView, 'frameElement', {
+      configurable: true,
+      value: iframe
+    })
+    const menubar = child.createElement('div')
+    const trigger = child.createElement('button')
+    trigger.setAttribute('aria-expanded', 'true')
+    trigger.setAttribute('aria-controls', 'panel-portaled')
+    menubar.appendChild(trigger)
+    child.body.appendChild(menubar)
+
+    const panel = document.createElement('div')
+    panel.id = 'panel-portaled'
+    const link = document.createElement('a')
+    link.href = '#pricing'
+    link.tabIndex = -1
+    panel.appendChild(link)
+    document.body.appendChild(panel)
+
+    expect(getOpenPanelFromMenubar(menubar)).toBe(panel)
+    link.focus()
+    expect(isFocusInsideNavigationMenu(child.body, menubar, null)).toBe(true)
+    expect(isFocusInsideNavigationMenu(child.body, menubar, document.body)).toBe(false)
   })
 })
