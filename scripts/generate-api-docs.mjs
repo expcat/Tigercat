@@ -439,7 +439,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Watermark: {
     notes:
-      '`gapX`/`gapY` 是透明间距。默认墨水跟 `--tiger-text`，暗色表面仍可见。`image` 失败回退 `content`。打印带 print-color-adjust。直子 overlay 被卸或覆盖样式被剥才重挂，自身绘制不重挂。'
+      '`gapX`/`gapY` 是透明间距。默认墨水是 `--tiger-text` 的 15% 混合；画布绘制前解析成真实颜色，解析失败时用 `rgba(0,0,0,0.15)`，不会铺成不透明黑。图片水印按同样的 15% alpha 绘制。主题色变化会重绘。`image` 失败回退 `content`。打印带 print-color-adjust。直子 overlay 被卸或覆盖样式被剥才重挂，自身绘制不重挂。'
   },
   Layout: {
     notes:

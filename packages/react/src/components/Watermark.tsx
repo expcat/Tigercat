@@ -65,7 +65,8 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
           gapX: next.gapX,
           gapY: next.gapY,
           rotate: next.rotate,
-          font: resolveWatermarkFont(next.font)
+          font: resolveWatermarkFont(next.font),
+          host: wrapperRef.current
         }
       },
       render: async (options) => {
@@ -93,7 +94,18 @@ export const Watermark = forwardRef<HTMLDivElement, WatermarkProps>(function Wat
 
   useEffect(() => {
     renderControllerRef.current?.render()
-  }, [contentKey, image, width, height, rotate, gapX, gapY, fontKey])
+  }, [
+    contentKey,
+    image,
+    width,
+    height,
+    rotate,
+    gapX,
+    gapY,
+    fontKey,
+    config.theme,
+    config.colorScheme
+  ])
 
   const overlayStyle = getWatermarkOverlayStyle({
     base64Url: base64,

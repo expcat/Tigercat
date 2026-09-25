@@ -5,6 +5,9 @@ import {
   renderWatermarkCanvas,
   renderWatermarkDataUrl,
   resolveWatermarkFont,
+  resolveWatermarkPaintColor,
+  WATERMARK_FALLBACK_INK,
+  WATERMARK_IMAGE_ALPHA,
   watermarkDefaults,
   watermarkFontDefaults,
   type WatermarkFrameCallback,
@@ -23,7 +26,8 @@ describe('watermark-utils', () => {
       fillStyle: '',
       font: '',
       textAlign: '',
-      textBaseline: ''
+      textBaseline: '',
+      globalAlpha: 1
     }
     const canvas = document.createElement('canvas')
     vi.spyOn(canvas, 'getContext').mockReturnValue(ctx as unknown as CanvasRenderingContext2D)
@@ -149,6 +153,70 @@ describe('watermark-utils', () => {
       'data:image/png;base64,canvas'
     )
     expect(ctx.drawImage).toHaveBeenCalled()
+    expect(ctx.globalAlpha).toBe(1)
+
+    createElement.mockRestore()
+  })
+
+  it('resolves theme ink to a canvas color and falls back when it cannot', () => {
+    expect(resolveWatermarkPaintColor('#111827')).toBe('#111827')
+    expect(resolveWatermarkPaintColor('rgba(0, 0, 0, 0.4)')).toBe('rgba(0, 0, 0, 0.4)')
+
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const view = host.ownerDocument.defaultView
+    const computed = vi.spyOn(view!, 'getComputedStyle').mockReturnValue({
+      color: 'rgba(15, 23, 42, 0.15)'
+    } as CSSStyleDeclaration)
+    expect(
+      resolveWatermarkPaintColor('color-mix(in srgb, var(--tiger-text) 15%, transparent)', host)
+    ).toBe('rgba(15, 23, 42, 0.15)')
+    computed.mockReturnValue({
+      color: 'color-mix(in srgb, var(--tiger-text) 15%, transparent)'
+    } as CSSStyleDeclaration)
+    expect(resolveWatermarkPaintColor(watermarkFontDefaults.color, host)).toBe(
+      WATERMARK_FALLBACK_INK
+    )
+    computed.mockRestore()
+    host.remove()
+  })
+
+  it('paints text with the resolved ink instead of the raw theme expression', () => {
+    const { canvas, ctx } = createCanvasMock()
+    const createElement = mockCanvasElement(canvas)
+    const host = document.createElement('div')
+    const view = host.ownerDocument.defaultView
+    vi.spyOn(view!, 'getComputedStyle').mockReturnValue({
+      color: 'rgba(15, 23, 42, 0.15)'
+    } as CSSStyleDeclaration)
+
+    renderWatermarkCanvas({ ...renderOptions(), host })
+    expect(ctx.fillStyle).toBe('rgba(15, 23, 42, 0.15)')
+
+    createElement.mockRestore()
+  })
+
+  it('draws image tiles at the decorative alpha', async () => {
+    const { canvas, ctx } = createCanvasMock()
+    const createElement = mockCanvasElement(canvas)
+    class ImageMock {
+      onload: (() => void) | null = null
+      onerror: (() => void) | null = null
+      crossOrigin = ''
+      set src(_value: string) {
+        this.onload?.()
+      }
+    }
+    vi.stubGlobal('Image', ImageMock)
+    const alphas: number[] = []
+    const original = ctx.drawImage
+    ctx.drawImage = vi.fn((...args: unknown[]) => {
+      alphas.push(ctx.globalAlpha)
+      return original(...(args as []))
+    }) as typeof ctx.drawImage
+
+    await renderWatermarkDataUrl({ ...renderOptions(), image: '/mark.png' })
+    expect(alphas).toEqual([WATERMARK_IMAGE_ALPHA])
 
     createElement.mockRestore()
   })

@@ -88,7 +88,8 @@ export const Watermark = defineComponent({
           gapX: props.gapX,
           gapY: props.gapY,
           rotate: props.rotate,
-          font: resolveWatermarkFont(props.font)
+          font: resolveWatermarkFont(props.font),
+          host: wrapperRef.value
         }),
         render: async (options) => {
           const painted = await paintWatermark(options)
@@ -115,7 +116,9 @@ export const Watermark = defineComponent({
         props.font?.color,
         props.font?.fontSize,
         props.font?.fontFamily,
-        props.font?.fontWeight
+        props.font?.fontWeight,
+        config.value.theme,
+        config.value.colorScheme
       ],
       () => {
         renderController?.render()

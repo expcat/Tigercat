@@ -21,14 +21,54 @@ export const watermarkDefaults = {
   offsetY: 0
 } as const
 
-export const WATERMARK_DEFAULT_INK =
-  'color-mix(in srgb, var(--tiger-text) 15%, transparent)'
+export const WATERMARK_DEFAULT_INK = 'color-mix(in srgb, var(--tiger-text) 15%, transparent)'
+
+/** Canvas cannot resolve `var()` / `color-mix()`. Use this when the probe fails. */
+export const WATERMARK_FALLBACK_INK = 'rgba(0, 0, 0, 0.15)'
+
+/**
+ * Image tiles are drawn at this alpha. Text ink already carries the 15% mix.
+ * Opaque logos stay decorative instead of covering the content underneath.
+ */
+export const WATERMARK_IMAGE_ALPHA = 0.15
 
 export const watermarkFontDefaults: Required<WatermarkFont> = {
   fontSize: 16,
   fontFamily: 'sans-serif',
   fontWeight: 'normal',
   color: WATERMARK_DEFAULT_INK
+}
+
+const CANVAS_PAINT_COLOR = /^(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(|^#[0-9a-fA-F]{3,8}$/
+
+/**
+ * Color string a canvas `fillStyle` will actually use.
+ * `color-mix()` and `var(--tiger-text)` are resolved against `host` (or the
+ * document element). An unresolved theme color falls back to 15% black so the
+ * tile cannot paint as opaque black.
+ */
+export function resolveWatermarkPaintColor(color: string, host?: Element | null): string {
+  const raw = color.trim()
+  if (!raw) return WATERMARK_FALLBACK_INK
+  if (!/var\(|color-mix\(/i.test(raw)) return raw
+  if (!isBrowser() || typeof document === 'undefined') return WATERMARK_FALLBACK_INK
+
+  const parent = host?.isConnected ? host : document.documentElement
+  if (!parent) return WATERMARK_FALLBACK_INK
+
+  const probe = document.createElement('span')
+  probe.setAttribute('aria-hidden', 'true')
+  probe.style.cssText =
+    'position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;color:' + raw
+  parent.appendChild(probe)
+  const view = probe.ownerDocument.defaultView
+  const resolved =
+    view && typeof view.getComputedStyle === 'function'
+      ? view.getComputedStyle(probe).color.trim()
+      : ''
+  probe.remove()
+  if (resolved && CANVAS_PAINT_COLOR.test(resolved)) return resolved
+  return WATERMARK_FALLBACK_INK
 }
 
 // ---------------------------------------------------------------------------
@@ -51,6 +91,8 @@ export interface WatermarkRenderOptions {
   gapY?: number
   rotate: number
   font: Required<WatermarkFont>
+  /** Element whose computed `--tiger-text` the default ink follows. */
+  host?: Element | null
 }
 
 type WatermarkRenderingContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
@@ -77,9 +119,10 @@ function drawWatermarkContent(
   content: string | string[] | undefined,
   width: number,
   height: number,
-  font: Required<WatermarkFont>
+  font: Required<WatermarkFont>,
+  host?: Element | null
 ): void {
-  ctx.fillStyle = font.color
+  ctx.fillStyle = resolveWatermarkPaintColor(font.color, host)
   ctx.font = `${font.fontWeight} ${font.fontSize}px ${font.fontFamily}`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -114,7 +157,7 @@ function renderWatermarkToDomCanvas(
 ): string | undefined {
   if (!isBrowser()) return undefined
 
-  const { content, width, height, rotate, font } = opts
+  const { content, width, height, rotate, font, host } = opts
   const { tileW, tileH } = tileSize(opts)
   const canvas = document.createElement('canvas')
   const dpr = getWatermarkDpr()
@@ -129,9 +172,11 @@ function renderWatermarkToDomCanvas(
   prepareWatermarkContext(ctx, width, height, rotate, dpr)
 
   if (image) {
+    ctx.globalAlpha = WATERMARK_IMAGE_ALPHA
     ctx.drawImage(image, 0, 0, width, height)
+    ctx.globalAlpha = 1
   } else {
-    drawWatermarkContent(ctx, content, width, height, font)
+    drawWatermarkContent(ctx, content, width, height, font, host)
   }
 
   try {
@@ -157,7 +202,7 @@ async function renderWatermarkToOffscreenCanvas(
 ): Promise<string | undefined> {
   if (typeof OffscreenCanvas === 'undefined') return undefined
 
-  const { content, width, height, rotate, font } = opts
+  const { content, width, height, rotate, font, host } = opts
   const { tileW, tileH } = tileSize(opts)
   const dpr = getWatermarkDpr()
   const canvas = new OffscreenCanvas(tileW * dpr, tileH * dpr)
@@ -165,7 +210,7 @@ async function renderWatermarkToOffscreenCanvas(
   if (!ctx) return undefined
 
   prepareWatermarkContext(ctx, width, height, rotate, dpr)
-  drawWatermarkContent(ctx, content, width, height, font)
+  drawWatermarkContent(ctx, content, width, height, font, host)
 
   if (typeof canvas.convertToBlob !== 'function') return undefined
 
@@ -280,7 +325,8 @@ function readStyleNumber(value: string): number {
 export function watermarkOverlayCoversHost(overlay: HTMLElement): boolean {
   if (overlay.hidden) return false
   const view = overlay.ownerDocument.defaultView
-  const computed = view && typeof view.getComputedStyle === 'function' ? view.getComputedStyle(overlay) : null
+  const computed =
+    view && typeof view.getComputedStyle === 'function' ? view.getComputedStyle(overlay) : null
   const display = computed?.display || overlay.style.display
   const visibility = computed?.visibility || overlay.style.visibility
   if (display === 'none' || visibility === 'hidden' || visibility === 'collapse') return false
@@ -442,7 +488,8 @@ export function getWatermarkOverlayStyle(opts: {
   /** Repeat density. Values above 1 pack tiles tighter. CSS only. */
   density?: number
 }): Record<string, string> {
-  const rowGap = typeof opts.rowGap === 'number' && Number.isFinite(opts.rowGap) ? Math.max(0, opts.rowGap) : 0
+  const rowGap =
+    typeof opts.rowGap === 'number' && Number.isFinite(opts.rowGap) ? Math.max(0, opts.rowGap) : 0
   const density =
     typeof opts.density === 'number' && Number.isFinite(opts.density) && opts.density > 0
       ? opts.density
