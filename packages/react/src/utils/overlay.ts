@@ -17,6 +17,7 @@ import {
   computeFloatingPosition,
   autoUpdateFloating,
   resolveAnchoredOverlayTarget,
+  retainPortaledOverlay,
   collectOverlayListenerDocuments,
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
@@ -128,18 +129,34 @@ export function useBackgroundInert({
   }, [enabled, containerRef])
 }
 
-function wrapOverlayLayer(node: React.ReactNode, target: HTMLElement | null): React.ReactElement {
+function PortaledOverlayLayer({
+  target,
+  children
+}: {
+  target: HTMLElement | null
+  children: React.ReactNode
+}): React.ReactElement {
+  const ref = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const node = ref.current
+    if (!node) return
+    return retainPortaledOverlay(node)
+  }, [])
   const dirLang = getOverlayDirLang(target)
   return createElement(
     'div',
-    { className: 'contents', 'data-tiger-overlay-layer': '', ...dirLang },
-    node,
+    { ref, className: 'contents', 'data-tiger-overlay-layer': '', ...dirLang },
+    children,
     createElement('div', {
       key: 'overlay-host',
       className: 'contents',
       'data-tiger-overlay-host': ''
     })
   )
+}
+
+function wrapOverlayLayer(node: React.ReactNode, target: HTMLElement | null): React.ReactElement {
+  return createElement(PortaledOverlayLayer, { target }, node)
 }
 
 export function renderBodyPortal(node: React.ReactNode, disabled = false): React.ReactNode {

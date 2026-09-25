@@ -14,8 +14,10 @@ import {
   type VNodeChild
 } from 'vue'
 import { createRenderOutlet, isBrowser, type RenderOutlet } from '@expcat/tigercat-core'
+import { trackVuePortaledNode } from './overlay'
 
-export const OverlayOutletKey: InjectionKey<RenderOutlet<VNodeChild>> = Symbol('tiger-overlay-outlet')
+export const OverlayOutletKey: InjectionKey<RenderOutlet<VNodeChild>> =
+  Symbol('tiger-overlay-outlet')
 
 let nextOutletId = 0
 
@@ -34,9 +36,7 @@ const OverlayOutletSlot = defineComponent({
       h(
         'div',
         { class: 'contents', 'data-tiger-overlay-root': '', 'data-tiger-overlay-host': '' },
-        items.value.map((item) =>
-          h('div', { key: item.id, class: 'contents' }, item.node as never)
-        )
+        items.value.map((item) => h('div', { key: item.id, class: 'contents' }, item.node as never))
       )
   }
 })
@@ -65,7 +65,7 @@ export function renderVueOverlayOutlet(
   if (!outlet) {
     if (disabled || layer == null || typeof layer === 'boolean') return null
     if (!isBrowser()) return layer
-    return h(Teleport as never, { to: target ?? 'body' }, [layer])
+    return h(Teleport as never, { to: target ?? 'body' }, [trackVuePortaledNode(layer)])
   }
   if (disabled || layer == null || typeof layer === 'boolean') {
     outlet.remove(id)

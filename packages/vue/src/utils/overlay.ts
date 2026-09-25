@@ -6,6 +6,7 @@ import {
   computeFloatingPosition,
   autoUpdateFloating,
   resolveAnchoredOverlayTarget,
+  retainPortaledOverlay,
   collectOverlayListenerDocuments,
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
@@ -24,6 +25,8 @@ import {
 } from '@expcat/tigercat-core'
 import {
   h,
+  isVNode,
+  withDirectives,
   ref,
   computed,
   Teleport,
@@ -163,12 +166,33 @@ export function useVueBackgroundInert(
   )
 }
 
+const portaledLayerReleases = new WeakMap<HTMLElement, () => void>()
+
+const portaledOverlayLifecycle = {
+  mounted(el: HTMLElement) {
+    portaledLayerReleases.set(el, retainPortaledOverlay(el))
+  },
+  unmounted(el: HTMLElement) {
+    portaledLayerReleases.get(el)?.()
+    portaledLayerReleases.delete(el)
+  }
+}
+
 function wrapVueOverlayLayer(children: VNodeChild, target: HTMLElement | null): VNodeChild {
   const dirLang = getOverlayDirLang(target)
-  return h('div', { class: 'contents', 'data-tiger-overlay-layer': '', ...dirLang }, [
-    children,
-    h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
-  ])
+  return withDirectives(
+    h('div', { class: 'contents', 'data-tiger-overlay-layer': '', ...dirLang }, [
+      children,
+      h('div', { class: 'contents', 'data-tiger-overlay-host': '' })
+    ]),
+    [[portaledOverlayLifecycle]]
+  )
+}
+
+/** Tracks a teleported element without inserting a parent node. */
+export function trackVuePortaledNode(layer: VNodeChild): VNodeChild {
+  if (!isVNode(layer)) return layer
+  return withDirectives(layer, [[portaledOverlayLifecycle]])
 }
 
 export function renderVueBodyTeleport(children: VNodeChild, disabled = false): VNodeChild {
