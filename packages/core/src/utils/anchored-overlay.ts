@@ -29,7 +29,9 @@ function parentSameOriginWindow(view: Window): Window | null {
  * Demo iframes portal here so popups paint above the host page chrome.
  */
 export function resolveTopOverlayDocument(doc: Document): Document {
-  let view = doc.defaultView
+  // Annotate as Window | null: Document.defaultView is Window & typeof globalThis,
+  // while frame parent is Window — assignment must not widen to the intersection.
+  let view: Window | null = doc.defaultView
   const seen = new Set<Window>()
   while (view && !seen.has(view)) {
     seen.add(view)
