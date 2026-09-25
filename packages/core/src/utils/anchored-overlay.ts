@@ -46,6 +46,18 @@ function resolveDocumentOverlayTarget(doc: Document): HTMLElement | null {
   return doc.querySelector<HTMLElement>(`[${CONFIG_ROOT_ATTRIBUTE}]`) ?? doc.body ?? null
 }
 
+/**
+ * Mount target for viewport-fixed chrome such as FloatButton.Group.
+ * Stays on this document's ConfigProvider root or body so fixed insets use
+ * this viewport. Anchored popups use {@link resolveAnchoredOverlayTarget},
+ * which may leave a same-origin demo iframe so they paint above host chrome.
+ */
+export function resolveViewportPortalTarget(doc?: Document | null): HTMLElement | null {
+  const owner = doc === undefined ? (typeof document === 'undefined' ? null : document) : doc
+  if (!owner) return null
+  return resolveDocumentOverlayTarget(owner)
+}
+
 /** Documents that should hear outside-click and Escape for a layer that may leave its frame. */
 export function collectOverlayListenerDocuments(
   nodes: Array<{ ownerDocument?: Document | null } | null | undefined> = []

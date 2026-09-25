@@ -137,6 +137,39 @@ describe('FloatButtonGroup (Vue)', () => {
     const group = document.body.querySelector('.portal-default-group')
     expect(group).toBeTruthy()
     expect(group?.className).toContain('fixed')
+    expect(group?.parentElement?.ownerDocument).toBe(document)
+  })
+
+  it('does not portal the group into a parent frame', () => {
+    const iframe = document.createElement('iframe')
+    document.body.appendChild(iframe)
+    const childDocument = iframe.contentDocument
+    const childWindow = iframe.contentWindow
+    if (!childDocument?.body || !childWindow || childWindow.frameElement !== iframe) return
+
+    const hostRoot = document.createElement('div')
+    hostRoot.setAttribute('data-tiger-config-root', '')
+    document.body.appendChild(hostRoot)
+
+    const previousDocument = globalThis.document
+    Object.defineProperty(globalThis, 'document', { configurable: true, value: childDocument })
+    try {
+      render({
+        setup: () => () =>
+          h(
+            FloatButtonGroup,
+            { className: 'iframe-group' },
+            { trigger: () => h(FloatButton, { ariaLabel: 'Open' }) }
+          )
+      })
+    } finally {
+      Object.defineProperty(globalThis, 'document', { configurable: true, value: previousDocument })
+    }
+
+    expect(childDocument.querySelector('.iframe-group')).toBeTruthy()
+    expect(document.querySelector('.iframe-group')).toBeNull()
+    iframe.remove()
+    hostRoot.remove()
   })
 
   it('has no a11y violations when open on document.body', async () => {

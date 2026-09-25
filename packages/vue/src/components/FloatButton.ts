@@ -29,9 +29,11 @@ import {
   getFloatButtonLabels,
   getFloatButtonOffsetStyle,
   mergeTigerLocale,
+  isBrowser,
   resolveFloatButtonAriaLabel,
   resolveFloatButtonHref,
   resolveFloatButtonShape,
+  resolveViewportPortalTarget,
   shouldMergeOverlayTriggerChild,
   type FloatButtonShape,
   type FloatButtonSize,
@@ -42,7 +44,7 @@ import {
 import { useTigerConfig } from './tiger-config'
 import { Badge } from './Badge'
 import { Tooltip } from './Tooltip'
-import { renderVueBodyTeleport, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
+import { renderVueOverlayTeleport, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
 
 function renderDefaultPlusIcon(size: FloatButtonSize) {
   return h(
@@ -448,7 +450,9 @@ export const FloatButtonGroup = defineComponent({
         [trigger, actions]
       )
 
-      return props.portal ? renderVueBodyTeleport(groupRoot) : groupRoot
+      return props.portal
+        ? renderVueOverlayTeleport(groupRoot, isBrowser() ? resolveViewportPortalTarget() : null)
+        : groupRoot
     }
   }
 })

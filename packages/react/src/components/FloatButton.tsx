@@ -22,8 +22,10 @@ import {
   getFloatButtonLabels,
   getFloatButtonOffsetStyle,
   mergeTigerLocale,
+  isBrowser,
   resolveFloatButtonAriaLabel,
   resolveFloatButtonShape,
+  resolveViewportPortalTarget,
   shouldMergeOverlayTriggerChild,
   type FloatButtonShape,
   type FloatButtonSize,
@@ -36,7 +38,7 @@ import { Badge } from './Badge'
 import { Tooltip } from './Tooltip'
 import { useControlledState } from '../hooks/useControlledState'
 import { composeEventHandlers } from '../utils/overlay-trigger'
-import { renderBodyPortal, useClickOutside, useEscapeKey } from '../utils/overlay'
+import { renderOverlayPortal, useClickOutside, useEscapeKey } from '../utils/overlay'
 
 const FloatButtonGroupContext = createContext<{
   shape?: FloatButtonShape
@@ -375,7 +377,9 @@ export const FloatButtonGroup = forwardRef<HTMLDivElement, FloatButtonGroupProps
       </FloatButtonGroupContext.Provider>
     )
 
-    return portal ? renderBodyPortal(content) : content
+    return portal
+      ? renderOverlayPortal(content, isBrowser() ? resolveViewportPortalTarget() : null)
+      : content
   }
 )
 

@@ -8,7 +8,8 @@ import {
   getAnchoredOverlayLayoutClasses,
   getOverlayDirLang,
   resolveAnchoredOverlayTarget,
-  resolveTopOverlayDocument
+  resolveTopOverlayDocument,
+  resolveViewportPortalTarget
 } from '@expcat/tigercat-core'
 
 describe('anchored overlay contract', () => {
@@ -63,6 +64,26 @@ describe('anchored overlay contract', () => {
 
     expect(resolveTopOverlayDocument(childDocument)).toBe(document)
     expect(resolveAnchoredOverlayTarget(reference)).toBe(configRoot)
+  })
+
+  it('keeps viewport chrome in the iframe that created it', () => {
+    const hostRoot = document.createElement('div')
+    hostRoot.setAttribute('data-tiger-config-root', '')
+    document.body.appendChild(hostRoot)
+
+    const iframe = document.createElement('iframe')
+    document.body.appendChild(iframe)
+    const childDocument = iframe.contentDocument
+    if (!childDocument?.body || iframe.contentWindow?.frameElement !== iframe) return
+
+    const childRoot = childDocument.createElement('div')
+    childRoot.setAttribute('data-tiger-config-root', '')
+    childDocument.body.appendChild(childRoot)
+    const reference = childDocument.createElement('button')
+    childRoot.appendChild(reference)
+
+    expect(resolveAnchoredOverlayTarget(reference)).toBe(hostRoot)
+    expect(resolveViewportPortalTarget(childDocument)).toBe(childRoot)
   })
 
   it('copies dir and lang from the nearest ancestor for portaled layers', () => {
