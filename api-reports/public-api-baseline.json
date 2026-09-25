@@ -3937,6 +3937,7 @@
       "progressLineBaseClasses",
       "progressLineInnerClasses",
       "progressLineSizeClasses",
+      "progressMetricVars",
       "ProgressProps",
       "ProgressSize",
       "ProgressStatus",

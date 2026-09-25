@@ -17,7 +17,7 @@ import { imageCropperBaseStyles, imagePreviewChromeStyles } from './utils/image-
 import { marqueeBaseStyles } from './utils/marquee-utils'
 import { menuBaseStyles } from './utils/menu-utils'
 import { printLayoutBaseStyles } from './utils/print-layout-utils'
-import { progressBaseStyles } from './utils/progress-utils'
+import { progressBaseStyles, progressMetricVars } from './utils/progress-utils'
 import { skeletonBaseStyles } from './utils/skeleton-utils'
 import { spaceBaseStyles } from './utils/space'
 import { watermarkBaseStyles } from './utils/watermark-utils'
@@ -128,8 +128,9 @@ const tigercatForcedColorsBase = {
   }
 }
 
-/** Sizes the avatar/badge utilities already reference. Missing vars invalidate width, radius, and type. */
-const avatarBadgeMetricVars = {
+/** Sizes utilities that already reference these vars. Missing vars invalidate width, height, radius, and type. */
+const componentMetricVars = {
+  ...progressMetricVars,
   '--tiger-component-avatar-size-sm': '2rem',
   '--tiger-component-avatar-size-md': '2.5rem',
   '--tiger-component-avatar-size-lg': '3rem',
@@ -152,7 +153,7 @@ const avatarBadgeMetricVars = {
 function pluginBase(preset: ThemePreset): Record<string, unknown> {
   return mergeBase([
     {
-      ':root': { ...cssVarsForPreset(preset, 'light'), ...avatarBadgeMetricVars },
+      ':root': { ...cssVarsForPreset(preset, 'light'), ...componentMetricVars },
       '.dark': cssVarsForPreset(preset, 'dark')
     },
     tigercatReducedMotionBase,

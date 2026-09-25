@@ -46,8 +46,19 @@ export const progressBaseStyles = {
   }
 } as const
 
+/**
+ * Line track metrics. An unset variable makes `height` invalid and the empty
+ * track collapses, so each utility also carries the same length as a fallback.
+ */
+export const progressMetricVars = {
+  '--tiger-component-progress-height-sm': '4px',
+  '--tiger-component-progress-height-md': '8px',
+  '--tiger-component-progress-height-lg': '12px',
+  '--tiger-component-progress-border-radius': '9999px'
+} as const
+
 export const progressLineBaseClasses =
-  'relative overflow-hidden rounded-[var(--tiger-component-progress-border-radius)]'
+  'relative overflow-hidden rounded-[var(--tiger-component-progress-border-radius,9999px)]'
 
 export const progressLineInnerClasses = 'tiger-progress-fill h-full rounded-[inherit]'
 
@@ -56,9 +67,9 @@ export const progressTextBaseClasses = 'font-medium ms-2'
 export const progressCircleBaseClasses = 'relative inline-flex items-center justify-center'
 
 export const progressLineSizeClasses: Record<ProgressSize, string> = {
-  sm: 'h-[var(--tiger-component-progress-height-sm)]',
-  md: 'h-[var(--tiger-component-progress-height-md)]',
-  lg: 'h-[var(--tiger-component-progress-height-lg)]'
+  sm: 'h-[var(--tiger-component-progress-height-sm,4px)]',
+  md: 'h-[var(--tiger-component-progress-height-md,8px)]',
+  lg: 'h-[var(--tiger-component-progress-height-lg,12px)]'
 } as const
 
 export const progressCircleSizeClasses: Record<ProgressSize, number> = {
