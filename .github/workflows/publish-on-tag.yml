@@ -66,6 +66,35 @@ jobs:
             pnpm exec changeset publish
           fi
 
+      - name: Verify npm versions are live
+        env:
+          TAG: ${{ github.ref_name }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          ver=${TAG#v}
+          missing=0
+          for pkg in @expcat/tigercat-core @expcat/tigercat-vue @expcat/tigercat-react @expcat/tigercat-cli @expcat/tigercat-mcp; do
+            ok=0
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              if npm view "$pkg@$ver" version >/dev/null 2>&1; then
+                echo "OK $pkg@$ver"
+                ok=1
+                break
+              fi
+              echo "waiting for $pkg@$ver ($i/10)..."
+              sleep 15
+            done
+            if [[ "$ok" -ne 1 ]]; then
+              echo "MISSING $pkg@$ver" >&2
+              missing=1
+            fi
+          done
+          if [[ "$missing" -ne 0 ]]; then
+            echo "Publish reported success but one or more packages are not on the registry" >&2
+            exit 1
+          fi
+
       - name: Repair latest dist-tag after prerelease
         if: contains(github.ref_name, '-')
         env:
