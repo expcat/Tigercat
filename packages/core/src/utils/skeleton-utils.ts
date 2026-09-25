@@ -7,6 +7,19 @@ import type { SkeletonVariant, SkeletonAnimation, SkeletonShape } from '../types
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
 
+/**
+ * Bone fill when `--tiger-skeleton-bg` is unset.
+ * Mixes text into the surface so bars stay visible on white cards and are not
+ * light-gray stripes on dark cards. `--tiger-surface-muted` sits too close to
+ * `--tiger-surface` to read as a placeholder.
+ */
+const skeletonBoneFill =
+  'var(--tiger-skeleton-bg, color-mix(in srgb, var(--tiger-text) 16%, var(--tiger-surface)))'
+
+/** Wave highlight. Optional `--tiger-skeleton-bg-alt` overrides the softer wash. */
+const skeletonBoneAltFill =
+  'var(--tiger-skeleton-bg-alt, color-mix(in srgb, var(--tiger-text) 7%, var(--tiger-surface)))'
+
 /** Pulse, wave, and reduced motion. Rendering must not write `document.head`. */
 export const skeletonBaseStyles = {
   '@keyframes tiger-skeleton-pulse': {
@@ -17,6 +30,9 @@ export const skeletonBaseStyles = {
     '0%': { backgroundPosition: '100% 0' },
     '100%': { backgroundPosition: '-100% 0' }
   },
+  '.tiger-skeleton': {
+    backgroundColor: skeletonBoneFill
+  },
   '.tiger-skeleton-pulse': {
     animationName: 'tiger-skeleton-pulse',
     animationDuration: '1.5s',
@@ -24,8 +40,7 @@ export const skeletonBaseStyles = {
     animationIterationCount: 'infinite'
   },
   '.tiger-skeleton-wave': {
-    backgroundImage:
-      'linear-gradient(90deg, var(--tiger-skeleton-bg) 0%, var(--tiger-skeleton-bg-alt) 50%, var(--tiger-skeleton-bg) 100%)',
+    backgroundImage: `linear-gradient(90deg, ${skeletonBoneFill} 0%, ${skeletonBoneAltFill} 50%, ${skeletonBoneFill} 100%)`,
     backgroundSize: '200% 100%',
     animationName: 'tiger-skeleton-wave',
     animationDuration: '1.6s',
@@ -55,9 +70,8 @@ export function resolveSkeletonRows(rows: number | undefined): number {
   return Math.max(1, whole)
 }
 
-/** Bar fill: optional `--tiger-skeleton-bg`, then registered `--tiger-surface-muted`. */
-export const skeletonBaseClasses =
-  'tiger-skeleton bg-[var(--tiger-skeleton-bg)] rounded-[var(--tiger-radius-sm)]'
+/** Bar fill utility. Same chain as `.tiger-skeleton` so a scanned class cannot paint transparent over the plugin rule. */
+export const skeletonBaseClasses = `tiger-skeleton bg-[${skeletonBoneFill.replace(/ /g, '_')}] rounded-[var(--tiger-radius-sm)]`
 
 /**
  * Animation classes for skeleton.

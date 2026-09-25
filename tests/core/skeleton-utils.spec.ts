@@ -9,18 +9,26 @@ import {
   resolveSkeletonAriaHidden,
   skeletonAnimationClasses,
   skeletonBaseClasses,
+  skeletonBaseStyles,
   skeletonVariantSizeClasses
 } from '@expcat/tigercat-core'
 
 const OLD_LOCKED_SKELETON_BG = '--tiger-skeleton-bg,#e5e7eb'
 const OLD_LOCKED_SKELETON_BG_ALT = '--tiger-skeleton-bg-alt,#d1d5db'
 
-describe('skeleton-utils surface-muted bars', () => {
-  it('falls back to registered surface-muted for the bar, not fill or locked gray-200', () => {
+describe('skeleton-utils visible bone', () => {
+  it('falls back to a text wash on the surface, not an unset variable or locked gray-200', () => {
+    const bone = skeletonBaseStyles['.tiger-skeleton'].backgroundColor
+    expect(bone).toContain('--tiger-skeleton-bg')
+    expect(bone).toContain('--tiger-text')
+    expect(bone).toContain('--tiger-surface')
+    expect(bone).not.toContain('--tiger-surface-muted')
     expect(skeletonBaseClasses).toContain('--tiger-skeleton-bg')
+    expect(skeletonBaseClasses).toContain('color-mix')
     expect(skeletonBaseClasses).not.toContain('--tiger-fill')
     expect(skeletonBaseClasses).not.toContain(OLD_LOCKED_SKELETON_BG)
     expect(skeletonBaseClasses).not.toContain('--tiger-component-skeleton')
+    expect(skeletonBaseClasses.replace(/_/g, ' ')).toContain(bone)
 
     const classes = getSkeletonClasses()
     expect(classes).toContain('--tiger-skeleton-bg')
@@ -47,6 +55,14 @@ describe('skeleton-utils surface-muted bars', () => {
     const wave = skeletonAnimationClasses.wave
     expect(wave).not.toContain('#d1d5db')
     expect(wave).not.toContain(OLD_LOCKED_SKELETON_BG_ALT)
+
+    const bone = skeletonBaseStyles['.tiger-skeleton'].backgroundColor
+    const gradient = skeletonBaseStyles['.tiger-skeleton-wave'].backgroundImage
+    expect(gradient).toContain(bone)
+    expect(gradient).toContain('--tiger-skeleton-bg-alt')
+    expect(gradient).not.toContain(OLD_LOCKED_SKELETON_BG)
+    expect(gradient).not.toContain(OLD_LOCKED_SKELETON_BG_ALT)
+    expect(gradient).not.toContain('--tiger-surface-muted')
   })
 
   it('keeps pulse as opacity motion, also reduced-motion aware', () => {
