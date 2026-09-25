@@ -71,6 +71,15 @@ describe('DatePicker', () => {
     expect(emitted()['update:open']?.[0]).toEqual([true])
   })
 
+  it('opens a range month grid in a panel that fits the calendar card', async () => {
+    render(DatePicker, { props: { range: true, defaultOpen: true } })
+    expect(await screen.findByRole('grid')).toBeInTheDocument()
+    expect(document.querySelectorAll('[data-date]').length).toBeGreaterThan(20)
+    const panel = document.querySelector('[data-tiger="datepicker-panel"]') as HTMLElement
+    expect(panel.className).toContain('w-fit')
+    expect(panel.className).not.toContain('w-80')
+  })
+
   it('has no axe violations when the dialog is open', async () => {
     const { container } = render(DatePicker, {
       props: { defaultOpen: true, modelValue: june, now: june, 'aria-label': 'Pick a day' }

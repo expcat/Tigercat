@@ -118,9 +118,14 @@ export const Calendar = defineComponent({
     const weekdayNames = computed(() => getShortDayNames(localeCode.value, weekStartsOn.value))
     const monthNames = computed(() => getShortMonthNames(localeCode.value))
 
-    const today = computed(() =>
-      props.now && !Number.isNaN(props.now.getTime()) ? props.now : null
-    )
+    const wallClock = ref<Date | null>(null)
+    onMounted(() => {
+      if (!(props.now && !Number.isNaN(props.now.getTime()))) wallClock.value = new Date()
+    })
+    const today = computed(() => {
+      const source = props.now && !Number.isNaN(props.now.getTime()) ? props.now : wallClock.value
+      return source && !Number.isNaN(source.getTime()) ? source : null
+    })
 
     const innerSelected = ref<Date | null>(toCalendarDate(props.defaultValue) ?? null)
     const selected = computed(() =>
@@ -132,6 +137,12 @@ export const Calendar = defineComponent({
 
     const view = ref(getInitialCalendarView(selected.value, today.value))
     const followedYmd = ref(selected.value ? toIsoDate(selected.value) : null)
+
+    watch(today, (clock) => {
+      if (view.value || !clock) return
+      const next = getInitialCalendarView(selected.value, clock)
+      if (next) view.value = next
+    })
 
     watch(
       () => (selected.value ? toIsoDate(selected.value) : null),

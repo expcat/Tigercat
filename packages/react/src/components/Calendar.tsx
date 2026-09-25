@@ -108,7 +108,12 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
   )
   const monthNames = useMemo(() => getShortMonthNames(localeCode), [localeCode])
 
-  const today = nowProp && !Number.isNaN(nowProp.getTime()) ? nowProp : null
+  const [wallClock, setWallClock] = useState<Date | null>(null)
+  useEffect(() => {
+    if (!(nowProp && !Number.isNaN(nowProp.getTime()))) setWallClock(new Date())
+  }, [nowProp])
+  const clock = nowProp && !Number.isNaN(nowProp.getTime()) ? nowProp : wallClock
+  const today = clock && !Number.isNaN(clock.getTime()) ? clock : null
 
   const selectedIsoFromValue =
     value !== undefined
@@ -134,6 +139,11 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
   })
 
   const [view, setView] = useState(() => getInitialCalendarView(selected, today))
+  useEffect(() => {
+    if (view || !today) return
+    const next = getInitialCalendarView(selected, today)
+    if (next) setView(next)
+  }, [selected, today, view])
   const [followedYmd, setFollowedYmd] = useState<string | null>(
     selected ? toIsoDate(selected) : null
   )

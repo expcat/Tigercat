@@ -125,7 +125,9 @@ describe('DatePicker', () => {
     render(
       <DatePicker
         onChange={onChange}
-        disabledDate={(date) => date.getFullYear() === 2024 && date.getMonth() === 0 && date.getDate() === 15}
+        disabledDate={(date) =>
+          date.getFullYear() === 2024 && date.getMonth() === 0 && date.getDate() === 15
+        }
       />
     )
     const input = screen.getByRole('textbox')
@@ -175,6 +177,15 @@ describe('DatePicker', () => {
     expect(input).toHaveAttribute('aria-controls', dialog.id)
     expect(toggle).toHaveAttribute('aria-controls', dialog.id)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('opens a range month grid in a panel that fits the calendar card', async () => {
+    render(<DatePicker range defaultOpen />)
+    expect(await screen.findByRole('grid')).toBeInTheDocument()
+    expect(document.querySelectorAll('[data-date]').length).toBeGreaterThan(20)
+    const panel = document.querySelector('[data-tiger="datepicker-panel"]') as HTMLElement
+    expect(panel.className).toContain('w-fit')
+    expect(panel.className).not.toContain('w-80')
   })
 
   it('has no axe violations when the dialog is open', async () => {

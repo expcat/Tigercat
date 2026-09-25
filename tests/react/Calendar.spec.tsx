@@ -23,6 +23,12 @@ function dayButton(iso: string): HTMLElement {
 }
 
 describe('Calendar', () => {
+  it('paints the current month when value and now are omitted', async () => {
+    render(<Calendar />)
+    expect(await screen.findByRole('grid')).toBeInTheDocument()
+    expect(document.querySelectorAll('[data-date]').length).toBeGreaterThan(20)
+  })
+
   it('renders the month title and weekday headers', () => {
     render(<Calendar value={testDate} now={now} />)
     expect(screen.getByText('June 2024')).toBeInTheDocument()
