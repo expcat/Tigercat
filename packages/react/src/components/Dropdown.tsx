@@ -437,7 +437,11 @@ export const Dropdown = forwardRef<HTMLElement, DropdownProps>(function Dropdown
         {triggerNode}
         {menuWrapperNode ? (
           portal ? (
-            <OverlayPortal target={overlay.target}>{menuWrapperNode}</OverlayPortal>
+            <OverlayPortal target={overlay.target}>
+              <DropdownContext.Provider value={contextValue}>
+                {menuWrapperNode}
+              </DropdownContext.Provider>
+            </OverlayPortal>
           ) : (
             renderOverlayPortal(menuWrapperNode, null, true)
           )

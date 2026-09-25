@@ -440,23 +440,35 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
 
   useEffect(() => {
     updateRequestRef.current += 1
-    const reference = referenceRef.current
-    const floating = floatingRef.current
+    let stopped = false
+    let attempts = 0
+    let cleanupAuto: (() => void) | undefined
 
-    if (!enabled || !reference || !floating) {
-      setIsPositioned(false)
-      return
+    const attach = () => {
+      if (stopped) return
+      const reference = referenceRef.current
+      const floating = floatingRef.current
+      if (!enabled || !reference || !floating) {
+        // The overlay outlet commits the layer after this effect.
+        if (enabled && attempts < 8) {
+          attempts += 1
+          queueMicrotask(attach)
+          return
+        }
+        setIsPositioned(false)
+        return
+      }
+
+      void update()
+      cleanupAuto = autoUpdateFloating(reference, floating, update)
     }
 
-    // Initial position calculation
-    update()
-
-    // Set up auto-update
-    const cleanup = autoUpdateFloating(reference, floating, update)
+    attach()
 
     return () => {
+      stopped = true
       updateRequestRef.current += 1
-      cleanup()
+      cleanupAuto?.()
     }
   }, [enabled, referenceRef, floatingRef, update, context])
 

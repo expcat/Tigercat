@@ -3,9 +3,10 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { act, render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-react/Dropdown'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import React from 'react'
 import { expectNoA11yViolations } from '../utils/react'
 
@@ -421,6 +422,25 @@ describe('Dropdown', () => {
       expect(wrapper?.closest('[data-tiger-overlay-layer]')?.parentElement).toBe(
         screen.getByTestId('overlay-host')
       )
+    })
+
+    it('shows menu items when opened inside ConfigProvider', async () => {
+      render(
+        <ConfigProvider>
+          <Dropdown trigger="click">
+            <button>Trigger</button>
+            <DropdownMenu>
+              <DropdownItem>Item 1</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </ConfigProvider>
+      )
+
+      fireEvent.click(screen.getByText('Trigger'))
+      const item = await screen.findByText('Item 1')
+      await waitFor(() => {
+        expect(item.closest('[data-positioned]')).toHaveAttribute('data-positioned', 'true')
+      })
     })
 
     it('renders the menu into the ConfigProvider root when there is no overlay-host', () => {
