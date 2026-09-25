@@ -264,7 +264,7 @@ export function getIconDefinition(
 // standalone `IconDefinition` constants used via the `Icon` component's
 // `icon` prop:
 //
-//   import { rocketIcon } from '@expcat/tigercat-core'
+//   import { rocketIcon } from '@expcat/tigercat-core/icons/registry'
 //   <Icon icon={rocketIcon} />
 //
 // Each constant is `/*#__PURE__*/`-annotated and the package declares

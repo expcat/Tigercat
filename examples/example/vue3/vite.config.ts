@@ -25,6 +25,10 @@ const runtimeEntries = {
     path.resolve(__dirname, 'src/playground/runtime-core.ts'),
     '/src/playground/runtime-core.ts'
   ),
+  iconsRegistry: runtimeEntry(
+    path.resolve(sharedPlaygroundDir, 'runtime-icons-registry.ts'),
+    `/@fs/${path.resolve(sharedPlaygroundDir, 'runtime-icons-registry.ts').replace(/^\//, '')}`
+  ),
   shared: runtimeEntry(
     path.resolve(sharedPlaygroundDir, 'runtime-shared.ts'),
     `/@fs/${path.resolve(sharedPlaygroundDir, 'runtime-shared.ts').replace(/^\//, '')}`

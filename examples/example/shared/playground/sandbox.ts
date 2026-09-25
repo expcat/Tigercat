@@ -163,6 +163,8 @@ function createImportMap(
     else if (specifier.startsWith('@expcat/tigercat-react')) map[specifier] = urls.tigercat
     else if (specifier.startsWith('@expcat/tigercat-vue')) map[specifier] = urls.tigercat
     else if (specifier.startsWith('@expcat/tigercat-core/locales/')) map[specifier] = urls.shared
+    else if (specifier === '@expcat/tigercat-core/icons/registry')
+      map[specifier] = urls.iconsRegistry
     else if (specifier.startsWith('@expcat/tigercat-core')) map[specifier] = urls.core
   }
 

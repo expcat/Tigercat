@@ -39,6 +39,7 @@ function sandboxOptions(enableTailwindJit?: boolean) {
       framework: '/vue.js',
       tigercat: '/tigercat.js',
       core: '/core.js',
+      iconsRegistry: '/icons-registry.js',
       shared: '/shared.js',
       tailwind: '/tailwind.js'
     },
@@ -218,6 +219,21 @@ describe('example playground sandbox', () => {
     expect(stock).toContain('data-tiger-modal')
     expect(stock).toContain('data-tiger-message-container')
     expect(stock).toContain(`overlayStageHeight = ${DEMO_OVERLAY_STAGE_HEIGHT}`)
+  })
+
+  it('maps the icons registry subpath to the module that exports rocketIcon', async () => {
+    const { rocketIcon } = await import(
+      '../../examples/example/shared/playground/runtime-icons-registry'
+    )
+    expect(rocketIcon.viewBox).toBe('0 0 24 24')
+    expect(rocketIcon.paths.length).toBeGreaterThan(0)
+
+    const doc = createSandboxDocument({
+      ...sandboxOptions(),
+      imports: ['@expcat/tigercat-core/icons/registry', '@expcat/tigercat-core']
+    })
+    expect(doc).toContain('"@expcat/tigercat-core/icons/registry":"/icons-registry.js"')
+    expect(doc).toContain('"@expcat/tigercat-core":"/core.js"')
   })
 
   it('does not load Tailwind browser Wasm for stock demos', () => {

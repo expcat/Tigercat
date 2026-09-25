@@ -8,6 +8,8 @@
 
 // Re-export all from organized sub-modules
 export * from './helpers'
+// Built-in registry helpers only. Extended `*Icon` constants stay on
+// `@expcat/tigercat-core/icons/registry` so unused glyphs can tree-shake.
 export {
   createIconRegistry,
   getIconDefinition,

@@ -68,6 +68,8 @@ export interface DemoRuntimeUrls {
   jsxRuntime?: string
   tigercat: string
   core: string
+  /** `@expcat/tigercat-core/icons/registry` — extended `*Icon` constants are not on `core`. */
+  iconsRegistry: string
   shared: string
   context?: string
   tailwind: string
