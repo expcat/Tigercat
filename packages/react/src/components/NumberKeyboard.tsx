@@ -184,7 +184,14 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
     }, [formItemControl, invalidValue])
 
     const overlayEnabled = overlayMode && isOpen && !effectiveDisabled
-    useFocusTrap({ enabled: overlayEnabled, containerRef: sheetRef, inert: true, autoFocus: true })
+    useFocusTrap({
+      enabled: overlayEnabled,
+      containerRef: sheetRef,
+      inert: true,
+      autoFocus: true,
+      // The field opens this sheet on focus. Restoring that focus would reopen it.
+      returnFocus: false
+    })
     useEffect(() => {
       if (!overlayEnabled) return
       const active =

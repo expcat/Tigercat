@@ -4,12 +4,14 @@
  */
 import {
   defineComponent,
+  getCurrentInstance,
   h,
   inject,
   onBeforeUnmount,
   provide,
   shallowRef,
   Teleport,
+  type ComponentInternalInstance,
   type InjectionKey,
   type VNodeChild
 } from 'vue'
@@ -54,7 +56,47 @@ export function useVueOverlayOutlet(): RenderOutlet<VNodeChild> | null {
   return inject(OverlayOutletKey, null)
 }
 
-/** Returns an anchor when the layer was moved into the outlet, otherwise the layer itself. */
+const OverlayOutletAnchor = defineComponent({
+  name: 'TigerOverlayOutletAnchor',
+  props: {
+    layerId: { type: String, required: true }
+  },
+  setup(props) {
+    const outlet = inject(OverlayOutletKey, null)
+    onBeforeUnmount(() => outlet?.remove(props.layerId))
+    return () => h('span', { class: 'contents', 'data-tiger-overlay-anchor': '' })
+  }
+})
+
+function isInsideOverlayOutlet(instance: ComponentInternalInstance | null): boolean {
+  let current = instance?.parent
+  while (current) {
+    if (current.type === OverlayOutletSlot) return true
+    current = current.parent
+  }
+  return false
+}
+
+/** Parent overlay-host. The root outlet host is not a nesting target. */
+function isNestedOverlayTarget(target: HTMLElement | null | undefined): boolean {
+  if (!target?.hasAttribute('data-tiger-overlay-host')) return false
+  if (target.hasAttribute('data-tiger-overlay-root')) return false
+  return Boolean(target.closest('[data-tiger-overlay-layer]'))
+}
+
+function renderDomPortal(layer: VNodeChild, target?: HTMLElement | null): VNodeChild {
+  if (layer == null || typeof layer === 'boolean') return null
+  if (!isBrowser()) return layer
+  const resolved = target ?? document.body
+  return h(Teleport as never, { to: resolved }, [trackVuePortaledNode(layer)])
+}
+
+/**
+ * Move `layer` into the outlet. A layer already rendered from inside the outlet
+ * (nested Modal / menu) is teleported to its host instead, so it does not
+ * upsert during the outlet render and restack forever.
+ * The anchor removes the entry when the caller stops rendering it.
+ */
 export function renderVueOverlayOutlet(
   id: string,
   layer: VNodeChild | null,
@@ -62,17 +104,18 @@ export function renderVueOverlayOutlet(
   disabled = false
 ): VNodeChild {
   const outlet = inject(OverlayOutletKey, null)
-  if (!outlet) {
+  const nestInHost = isInsideOverlayOutlet(getCurrentInstance()) || isNestedOverlayTarget(target)
+  if (!outlet || nestInHost) {
+    if (nestInHost) outlet?.remove(id)
     if (disabled || layer == null || typeof layer === 'boolean') return null
-    if (!isBrowser()) return layer
-    return h(Teleport as never, { to: target ?? 'body' }, [trackVuePortaledNode(layer)])
+    return renderDomPortal(layer, target)
   }
   if (disabled || layer == null || typeof layer === 'boolean') {
     outlet.remove(id)
     return null
   }
   outlet.upsert(id, layer)
-  return h('span', { class: 'contents', 'data-tiger-overlay-anchor': '' })
+  return h(OverlayOutletAnchor, { layerId: id })
 }
 
 export function createOverlayOutletId(prefix: string): string {

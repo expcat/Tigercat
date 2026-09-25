@@ -8,6 +8,14 @@ import { createRenderOutlet, isBrowser, type RenderOutlet } from '@expcat/tigerc
 import { renderOverlayPortal } from './overlay'
 
 const OverlayOutletContext = React.createContext<RenderOutlet<React.ReactNode> | null>(null)
+const OutletRenderContext = React.createContext(false)
+
+/** Parent overlay-host. The root outlet host is not a nesting target. */
+function isNestedOverlayTarget(target: HTMLElement | null | undefined): boolean {
+  if (!target?.hasAttribute('data-tiger-overlay-host')) return false
+  if (target.hasAttribute('data-tiger-overlay-root')) return false
+  return Boolean(target.closest('[data-tiger-overlay-layer]'))
+}
 
 export function OverlayOutletProvider({ children }: { children: React.ReactNode }) {
   const storeRef = useRef<RenderOutlet<React.ReactNode> | null>(null)
@@ -24,11 +32,13 @@ export function OverlayOutletProvider({ children }: { children: React.ReactNode 
 function OverlayOutletSlot({ store }: { store: RenderOutlet<React.ReactNode> }) {
   const items = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot)
   return (
-    <div className="contents" data-tiger-overlay-root="" data-tiger-overlay-host="">
-      {items.map((item) => (
-        <React.Fragment key={item.id}>{item.node}</React.Fragment>
-      ))}
-    </div>
+    <OutletRenderContext.Provider value={true}>
+      <div className="contents" data-tiger-overlay-root="" data-tiger-overlay-host="">
+        {items.map((item) => (
+          <React.Fragment key={item.id}>{item.node}</React.Fragment>
+        ))}
+      </div>
+    </OutletRenderContext.Provider>
   )
 }
 
@@ -44,11 +54,17 @@ export function OverlayPortal({
   target?: HTMLElement | null
 }) {
   const outlet = useContext(OverlayOutletContext)
+  const insideOutlet = useContext(OutletRenderContext)
+  const nestInHost = insideOutlet || isNestedOverlayTarget(target)
   const id = useId()
   useEffect(() => {
-    if (disabled || !outlet) return
+    if (disabled || !outlet || nestInHost) return
     return () => outlet.remove(id)
-  }, [disabled, outlet, id])
+  }, [disabled, outlet, id, nestInHost])
+
+  if (nestInHost && !disabled) {
+    return <>{renderOverlayPortal(children, target, false)}</>
+  }
 
   if (outlet && !disabled) {
     outlet.upsert(id, children)

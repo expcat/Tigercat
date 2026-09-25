@@ -241,6 +241,11 @@ export interface UseVueFocusTrapOptions {
   inert?: Ref<boolean> | boolean
   /** Capture the active element, focus the trap, and restore on disable or unmount. */
   autoFocus?: boolean
+  /**
+   * Restore focus when the trap closes. Defaults to `autoFocus`.
+   * Set false when the previously focused control opens the layer on focus.
+   */
+  returnFocus?: boolean
   /** Focus this node instead of the first tabbable control. */
   initialFocusRef?: Ref<HTMLElement | null>
   /** Outside node that stays active (interactive tour target). */
@@ -254,6 +259,7 @@ export function useVueFocusTrap({
   containerRef,
   inert = false,
   autoFocus = false,
+  returnFocus,
   initialFocusRef,
   exemptRef,
   lockScroll = true
@@ -303,12 +309,13 @@ export function useVueFocusTrap({
       }
       activeContainer = container
       activeModal = inertEnabled
+      const restore = returnFocus ?? autoFocus
       scope = createFocusScope(container, {
         modal: inertEnabled,
         moveFocus: autoFocus || Boolean(initialFocusRef?.value),
         initialFocus: initialFocusRef?.value ?? null,
-        returnFocus: autoFocus,
-        previouslyFocused: autoFocus ? (restoreTarget ?? undefined) : null,
+        returnFocus: restore,
+        previouslyFocused: restore ? (restoreTarget ?? undefined) : null,
         lockScroll: toValue(lockScroll) !== false,
         exempt: exemptRef ? () => exemptRef.value : undefined
       })

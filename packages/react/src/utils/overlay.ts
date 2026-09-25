@@ -203,6 +203,11 @@ export interface UseFocusTrapOptions {
   inert?: boolean
   /** Capture the active element, focus the trap, and restore on disable or unmount. */
   autoFocus?: boolean
+  /**
+   * Restore focus when the trap closes. Defaults to `autoFocus`.
+   * Set false when the previously focused control opens the layer on focus.
+   */
+  returnFocus?: boolean
   /** Focus this node instead of the first tabbable control. */
   initialFocusRef?: React.RefObject<HTMLElement | null>
   /** Outside node that stays active (interactive tour target). */
@@ -216,6 +221,7 @@ export function useFocusTrap({
   containerRef,
   inert = false,
   autoFocus = false,
+  returnFocus,
   initialFocusRef,
   exemptRef,
   lockScroll = true
@@ -236,12 +242,13 @@ export function useFocusTrap({
     if (autoFocus && active && !container.contains(active)) {
       restoreTargetRef.current = active
     }
+    const restore = returnFocus ?? autoFocus
     const scope = createFocusScope(container, {
       modal: inert,
       moveFocus: autoFocus || Boolean(initialFocusRef?.current),
       initialFocus: initialFocusRef?.current ?? null,
-      returnFocus: autoFocus,
-      previouslyFocused: autoFocus ? (restoreTargetRef.current ?? undefined) : null,
+      returnFocus: restore,
+      previouslyFocused: restore ? (restoreTargetRef.current ?? undefined) : null,
       lockScroll,
       exempt: exemptRef ? () => exemptRef.current : undefined
     })
@@ -249,7 +256,7 @@ export function useFocusTrap({
     return () => {
       scope.deactivate()
     }
-  }, [enabled, containerRef, inert, autoFocus, initialFocusRef, exemptRef, lockScroll])
+  }, [enabled, containerRef, inert, autoFocus, returnFocus, initialFocusRef, exemptRef, lockScroll])
 }
 
 // ============================================================================

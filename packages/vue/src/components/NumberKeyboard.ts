@@ -189,7 +189,9 @@ export const NumberKeyboard = defineComponent({
       enabled: overlayEnabled,
       containerRef: sheetRef,
       inert: true,
-      autoFocus: true
+      autoFocus: true,
+      // The field opens this sheet on focus. Restoring that focus would reopen it.
+      returnFocus: false
     })
     watch(overlayEnabled, (open) => {
       if (!open) return
