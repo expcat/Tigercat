@@ -23,6 +23,17 @@ const FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-r
 const ERROR_FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-error)]/40'
 
 /**
+ * Ring on the chrome node that owns `border-radius`. A `box-shadow` ring on
+ * the inner field ignores the wrapper radius and paints square corners.
+ * `:has(input:focus-visible)` stays off trailing buttons, which keep their
+ * own rings.
+ */
+const WRAPPER_FOCUS_RING =
+  'has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-[var(--tiger-focus-ring)]/40'
+const WRAPPER_ERROR_FOCUS_RING =
+  'has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-[var(--tiger-error)]/40'
+
+/**
  * Field-only classes (padding, type, disabled text). Chrome lives on the
  * group-child root via {@link getInputChromeClasses}.
  */
@@ -30,16 +41,15 @@ const INPUT_FIELD_BASE_CLASSES = [
   'bg-transparent',
   'text-[var(--tiger-text)]',
   'focus:outline-none',
-  FOCUS_RING,
   'disabled:text-[var(--tiger-text-secondary)]',
   'disabled:cursor-not-allowed',
   'placeholder:text-[var(--tiger-text-secondary)]'
 ] as const
 
 /**
- * Border / radius / surface for a chrome node. Native fields that ARE the
- * chrome node (Textarea, MaskInput) keep `focus-visible`; Input's wrapper
- * does not paint a ring — the nested field does.
+ * Border / radius / surface for a chrome node. The focus ring is painted
+ * here too, so it follows the same radius as the border. Native fields that
+ * ARE the chrome node (Textarea, table filter) use {@link getInputClasses}.
  */
 const INPUT_CHROME_BASE_CLASSES = [
   'border',
@@ -66,15 +76,15 @@ const NATIVE_STATUS_CLASSES: Record<InputStatus, string> = {
 }
 
 const WRAPPER_STATUS_CLASSES: Record<InputStatus, string> = {
-  default: 'border-[var(--tiger-border)]',
-  error: 'border-[var(--tiger-error)]',
-  success: 'border-[var(--tiger-success)]',
-  warning: 'border-[var(--tiger-warning)]'
+  default: classNames('border-[var(--tiger-border)]', WRAPPER_FOCUS_RING),
+  error: classNames('border-[var(--tiger-error)]', WRAPPER_ERROR_FOCUS_RING),
+  success: classNames('border-[var(--tiger-success)]', WRAPPER_FOCUS_RING),
+  warning: classNames('border-[var(--tiger-warning)]', WRAPPER_FOCUS_RING)
 }
 
 const FIELD_STATUS_CLASSES: Record<InputStatus, string> = {
   default: '',
-  error: classNames(errorTextClass, errorPlaceholderClass, ERROR_FOCUS_RING),
+  error: classNames(errorTextClass, errorPlaceholderClass),
   success: classNames(successTextClass, successPlaceholderClass),
   warning: classNames(warningTextClass, warningPlaceholderClass)
 }
@@ -228,8 +238,8 @@ function insetInlineEndClass(size: ComponentSize, offsetSlots = 0): string {
 }
 
 /**
- * Chrome (border / radius / surface / status) for a group-child root.
- * Focus ring lives on the native field (`:focus-visible`).
+ * Chrome (border / radius / surface / status / focus ring) for a group-child root.
+ * The ring is on this node so its corners match `rounded-[var(--tiger-radius-md)]`.
  */
 export function getInputChromeClasses(status: InputStatus = 'default'): string {
   return classNames(
@@ -240,8 +250,8 @@ export function getInputChromeClasses(status: InputStatus = 'default'): string {
 }
 
 /**
- * Native field classes without border / radius / ring. Padding, type color,
- * placeholder, and disabled text stay here.
+ * Native field classes without border, radius, or focus ring. Padding, type
+ * color, placeholder, and disabled text stay here. The wrapper paints the ring.
  */
 export function getInputFieldClasses(options: GetInputClassesOptions = {}): string {
   const { status = 'default', inGroup } = options

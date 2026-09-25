@@ -147,6 +147,19 @@ describe('Input', () => {
       expect(input?.className).not.toContain('border-[var(--tiger-error')
     })
 
+    it('puts the focus ring on the rounded chrome, not the square field', () => {
+      const { container } = render(Input, {
+        props: { placeholder: 'Search' }
+      })
+      const wrapper = container.firstChild as HTMLElement
+      const input = container.querySelector('input')!
+
+      expect(wrapper.className).toContain('rounded-[var(--tiger-radius-md)]')
+      expect(wrapper.className).toContain('has-[input:focus-visible]:ring-2')
+      expect(input.className).not.toContain('focus-visible:ring')
+      expect(input.className).toContain('focus:outline-none')
+    })
+
     it('should render error message below the chrome field', () => {
       const { container } = render(Input, {
         props: { status: 'error', errorMessage: 'Bad input' }

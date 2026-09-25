@@ -104,6 +104,25 @@ describe('input-styles chrome vs field', () => {
     expect(getInputWrapperClasses()).toBe('relative w-full')
   })
 
+  it('paints the focus ring on the rounded wrapper so corners match the border', () => {
+    const wrapper = getInputWrapperClasses('default')
+    const field = getInputFieldClasses()
+    const error = getInputChromeClasses('error')
+    const native = getInputClasses()
+
+    expect(wrapper).toContain('has-[input:focus-visible]:ring-2')
+    expect(wrapper).toContain('has-[input:focus-visible]:ring-[var(--tiger-focus-ring)]/40')
+    expect(wrapper).toContain('rounded-[var(--tiger-radius-md)]')
+    expect(field).not.toContain('focus-visible:ring')
+    expect(field).not.toContain('has-[input:focus-visible]:ring')
+    expect(field).toContain('focus:outline-none')
+    expect(error).toContain('has-[input:focus-visible]:ring-[var(--tiger-error)]/40')
+    expect(error).not.toContain('ring-[var(--tiger-focus-ring)]')
+    expect(native).toContain('rounded-[var(--tiger-radius-md)]')
+    expect(native).toContain('focus-visible:ring-2')
+    expect(native).toContain('focus-visible:ring-[var(--tiger-focus-ring)]/40')
+  })
+
   it('uses flex-1 in a group instead of filling the group width', () => {
     expect(getInputWrapperClasses('default', { inGroup: true })).toContain('flex-1')
     expect(getInputWrapperClasses('default', { inGroup: true })).toContain('min-w-0')
