@@ -4,6 +4,7 @@ import {
   classNames,
   coerceClassValue,
   getPendingDotClasses,
+  getTimelineAxisClasses,
   getTimelineContainerClasses,
   getTimelineContentClasses,
   getTimelineDotClasses,
@@ -17,6 +18,7 @@ import {
   processTimelineItems,
   resolveLocaleText,
   timelineDescriptionClasses,
+  timelineHorizontalLabelClasses,
   timelineLabelClasses,
   timelineLabelSide,
   timelineListClasses,
@@ -161,20 +163,41 @@ export const Timeline = defineComponent({
       return h('div', { class: dotClasses, style: dotStyle })
     }
 
+    function renderRail(dot: ReturnType<typeof h>, isFirst: boolean, isLast: boolean) {
+      const head = h('div', { class: getTimelineHeadClasses(props.mode) }, [dot])
+      const tail = (segment: 'before' | 'after', omitStroke: boolean) =>
+        h('div', {
+          class: getTimelineTailClasses(props.mode, omitStroke, segment),
+          'data-timeline-tail': segment,
+          'aria-hidden': 'true'
+        })
+      const children =
+        props.mode === 'horizontal'
+          ? [tail('before', isFirst), head, tail('after', isLast)]
+          : [head, isLast ? null : tail('after', false)]
+      return h(
+        'div',
+        {
+          class: getTimelineAxisClasses(props.mode),
+          'data-timeline-axis': props.mode
+        },
+        children
+      )
+    }
+
     function renderTimelineItem(item: TimelineItem, index: number) {
       const key = getTimelineItemKey(item, index)
+      const isFirst = index === 0
       const isLast = index === processedItems.value.length - 1 && !props.pending
       const position = item.position
 
       const itemClasses = getTimelineItemClasses(props.mode, position, isLast)
-      const tailClasses = getTimelineTailClasses(props.mode, isLast)
-      const headClasses = getTimelineHeadClasses(props.mode)
       const contentClasses = getTimelineContentClasses(props.mode, position)
+      const rail = renderRail(renderDot(item), isFirst, isLast)
 
       if (slots.item) {
         return h('li', { key, class: itemClasses }, [
-          h('div', { class: tailClasses }),
-          h('div', { class: headClasses }, [renderDot(item)]),
+          rail,
           h('div', { class: contentClasses }, slots.item({ item, index }))
         ])
       }
@@ -188,7 +211,8 @@ export const Timeline = defineComponent({
         ? h(
             'time',
             {
-              class: timelineLabelClasses,
+              class:
+                props.mode === 'horizontal' ? timelineHorizontalLabelClasses : timelineLabelClasses,
               datetime: String(item.label),
               'data-timeline-label-side': labelSide
             },
@@ -208,8 +232,7 @@ export const Timeline = defineComponent({
         },
         [
           labelSide === 'start' ? labelNode : null,
-          h('div', { class: tailClasses }),
-          h('div', { class: headClasses }, [renderDot(item)]),
+          rail,
           h('div', { class: contentClasses }, [contentNode]),
           labelSide === 'end' ? labelNode : null
         ]
@@ -228,18 +251,18 @@ export const Timeline = defineComponent({
           : undefined
 
       const itemClasses = getTimelineItemClasses(props.mode, position, true)
-      const headClasses = getTimelineHeadClasses(props.mode)
       const contentClasses = getTimelineContentClasses(props.mode, position)
+      const rail = renderRail(renderDot({}, true), index === 0, true)
 
       if (slots.pending) {
         return h('li', { key: 'pending', class: itemClasses, 'aria-busy': 'true' }, [
-          h('div', { class: headClasses }, [renderDot({}, true)]),
+          rail,
           h('div', { class: contentClasses }, slots.pending())
         ])
       }
 
       return h('li', { key: 'pending', class: itemClasses, 'aria-busy': 'true' }, [
-        h('div', { class: headClasses }, [renderDot({}, true)]),
+        rail,
         h('div', { class: contentClasses }, [
           h(
             'div',

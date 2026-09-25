@@ -28,6 +28,27 @@ describe('Timeline (Vue)', () => {
     expect(screen.getByTestId('rich-content')).toHaveTextContent('Updated profile')
   })
 
+  it('joins nodes with one rail and does not leave a tail after the last node', () => {
+    const { container } = render(Timeline, {
+      props: {
+        items: [
+          { key: 1, content: 'Event 1', color: '#10b981' },
+          { key: 2, content: 'Event 2' },
+          { key: 3, content: 'Event 3' }
+        ]
+      }
+    })
+    const rows = container.querySelectorAll('li')
+    expect(rows).toHaveLength(3)
+    expect(rows[0].querySelectorAll('[data-timeline-tail="after"]')).toHaveLength(1)
+    expect(rows[1].querySelector('[data-timeline-tail="after"]')).toBeTruthy()
+    expect(rows[2].querySelector('[data-timeline-tail]')).toBeNull()
+    expect(rows[0].querySelector('[data-timeline-axis]')?.className).toContain('inset-y-0')
+    const dot = rows[0].querySelector('[data-timeline-axis] .rounded-full')
+    expect(dot?.className ?? '').not.toContain('border-')
+    expect(rows[0].querySelector('[data-timeline-tail="after"]')?.className).toContain('w-px')
+  })
+
   it('supports mode=right and mode=alternate', () => {
     const items: TimelineItem[] = [
       { key: 1, content: 'Event 1' },

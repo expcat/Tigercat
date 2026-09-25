@@ -3,6 +3,7 @@ import {
   EMPTY_TIMELINE_ITEMS,
   classNames,
   getPendingDotClasses,
+  getTimelineAxisClasses,
   getTimelineContainerClasses,
   getTimelineContentClasses,
   getTimelineDotClasses,
@@ -15,6 +16,7 @@ import {
   processTimelineItems,
   resolveLocaleText,
   timelineDescriptionClasses,
+  timelineHorizontalLabelClasses,
   timelineLabelClasses,
   timelineLabelSide,
   timelineListClasses,
@@ -128,21 +130,47 @@ export const Timeline: React.FC<TimelineProps> = ({
     return <div className={dotClasses} style={dotStyle} />
   }
 
+  const renderRail = (dot: React.ReactNode, isFirst: boolean, isLast: boolean) => {
+    const head = <div className={getTimelineHeadClasses(mode)}>{dot}</div>
+    const tail = (segment: 'before' | 'after', omitStroke: boolean) => (
+      <div
+        className={getTimelineTailClasses(mode, omitStroke, segment)}
+        data-timeline-tail={segment}
+        aria-hidden="true"
+      />
+    )
+    return (
+      <div className={getTimelineAxisClasses(mode)} data-timeline-axis={mode}>
+        {mode === 'horizontal' ? (
+          <>
+            {tail('before', isFirst)}
+            {head}
+            {tail('after', isLast)}
+          </>
+        ) : (
+          <>
+            {head}
+            {isLast ? null : tail('after', false)}
+          </>
+        )}
+      </div>
+    )
+  }
+
   const renderTimelineItem = (item: TimelineItem, index: number) => {
     const key = getTimelineItemKey(item, index)
+    const isFirst = index === 0
     const isLast = index === processedItems.length - 1 && !pending
     const position = item.position as TimelineItemPosition | undefined
 
     const itemClasses = getTimelineItemClasses(mode, position, isLast)
-    const tailClasses = getTimelineTailClasses(mode, isLast)
-    const headClasses = getTimelineHeadClasses(mode)
     const contentClasses = getTimelineContentClasses(mode, position)
+    const rail = renderRail(renderDotElement(item), isFirst, isLast)
 
     if (renderItem) {
       return (
         <li key={key} className={itemClasses}>
-          <div className={tailClasses} />
-          <div className={headClasses}>{renderDotElement(item)}</div>
+          {rail}
           <div className={contentClasses}>{renderItem(item, index)}</div>
         </li>
       )
@@ -155,7 +183,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     )
     const labelNode = item.label ? (
       <time
-        className={timelineLabelClasses}
+        className={mode === 'horizontal' ? timelineHorizontalLabelClasses : timelineLabelClasses}
         dateTime={String(item.label)}
         data-timeline-label-side={labelSide}>
         {item.label}
@@ -164,8 +192,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     return (
       <li key={key} className={itemClasses} data-timeline-mode={mode}>
         {labelSide === 'start' ? labelNode : null}
-        <div className={tailClasses} />
-        <div className={headClasses}>{renderDotElement(item)}</div>
+        {rail}
         <div className={contentClasses}>
           {(item.content as React.ReactNode) ? (
             <div className={timelineDescriptionClasses}>{item.content as React.ReactNode}</div>
@@ -188,8 +215,8 @@ export const Timeline: React.FC<TimelineProps> = ({
         : undefined
 
     const itemClasses = getTimelineItemClasses(mode, position, true)
-    const headClasses = getTimelineHeadClasses(mode)
     const contentClasses = getTimelineContentClasses(mode, position)
+    const rail = renderRail(renderDotElement({}, true), index === 0, true)
     const pendingText = resolveLocaleText(
       'Loading...',
       mergedLocale?.timeline?.pendingText,
@@ -198,7 +225,7 @@ export const Timeline: React.FC<TimelineProps> = ({
 
     return (
       <li key="pending" className={itemClasses} aria-busy="true">
-        <div className={headClasses}>{renderDotElement({}, true)}</div>
+        {rail}
         <div className={contentClasses}>
           {pendingContent || <div className={timelineDescriptionClasses}>{pendingText}</div>}
         </div>

@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest'
 import {
   EMPTY_TIMELINE_ITEMS,
   getPendingDotClasses,
+  getTimelineAxisClasses,
   getTimelineContentClasses,
+  getTimelineDotClasses,
   getTimelineHeadClasses,
   getTimelineItemClasses,
   getTimelineItemKey,
+  getTimelineTailClasses,
   processTimelineItems
 } from '@expcat/tigercat-core'
 
@@ -46,13 +49,40 @@ describe('timeline-utils', () => {
   })
 
   it('uses logical inset for the axis', () => {
-    expect(getTimelineHeadClasses('left')).toContain('start-0')
-    expect(getTimelineHeadClasses('right')).toContain('end-0')
-    expect(getTimelineHeadClasses('alternate')).toContain('start-1/2')
+    expect(getTimelineAxisClasses('left')).toContain('start-0')
+    expect(getTimelineAxisClasses('right')).toContain('end-0')
+    expect(getTimelineAxisClasses('alternate')).toContain('start-1/2')
+    expect(getTimelineAxisClasses('left')).toContain('inset-y-0')
+    expect(getTimelineHeadClasses('left')).not.toContain('start-0')
+  })
+
+  it('runs the connector from node edge to node edge', () => {
+    const tail = getTimelineTailClasses('left', false)
+    expect(tail).toContain('w-px')
+    expect(tail).toContain('flex-1')
+    expect(tail).not.toContain('top-')
+    expect(tail).not.toContain('bottom-')
+    expect(getTimelineTailClasses('left', true)).toBe('hidden')
+    expect(getTimelineTailClasses('alternate', false, 'before')).toBe('hidden')
+    expect(getTimelineDotClasses()).not.toContain('border-')
+    expect(getTimelineDotClasses('#10b981')).not.toContain('border-')
+    expect(getPendingDotClasses()).not.toContain('border-')
+  })
+
+  it('paints horizontal halves only between nodes', () => {
+    expect(getTimelineTailClasses('horizontal', true, 'before')).not.toContain('bg-')
+    expect(getTimelineTailClasses('horizontal', false, 'before')).toContain(
+      'bg-[var(--tiger-border)]'
+    )
+    expect(getTimelineTailClasses('horizontal', true, 'after')).not.toContain('bg-')
+    expect(getTimelineTailClasses('horizontal', false, 'after')).toContain('h-px')
+    expect(getTimelineAxisClasses('horizontal')).toContain('self-stretch')
+    expect(getTimelineContentClasses('horizontal')).toContain('text-center')
   })
 
   it('stops pending pulse under reduced motion', () => {
     expect(getPendingDotClasses()).toContain('motion-reduce:animate-none')
-    expect(getPendingDotClasses()).toContain('tiger-surface')
+    expect(getPendingDotClasses()).toContain('tiger-primary')
+    expect(getPendingDotClasses()).not.toContain('tiger-surface')
   })
 })

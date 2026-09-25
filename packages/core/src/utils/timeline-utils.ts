@@ -5,19 +5,25 @@ export const EMPTY_TIMELINE_ITEMS: TimelineItem[] = []
 export const timelineContainerClasses = 'relative'
 export const timelineListClasses = 'list-none m-0 p-0'
 export const timelineItemClasses = 'relative pb-8'
-export const timelineTailClasses = 'absolute w-0.5 bg-[var(--tiger-border)]'
-export const timelineHeadClasses = 'absolute z-10 flex h-[1.25rem] items-center justify-center'
+/**
+ * Vertical connector. A flex sibling of the node, so it starts on the node's
+ * edge and ends on the next node's edge. A fixed `top`/`bottom` offset left
+ * a stub above the first node and white gaps at each joint.
+ */
+export const timelineTailClasses = 'min-h-0 w-px flex-1 bg-[var(--tiger-border)]'
+export const timelineHeadClasses =
+  'pointer-events-auto relative z-10 flex shrink-0 items-center justify-center'
 export const timelineContentClasses = 'relative'
-export const timelineCustomDotClasses = 'flex items-center justify-center'
+export const timelineCustomDotClasses = 'flex shrink-0 items-center justify-center'
 export const timelineLabelClasses = 'text-sm text-[var(--tiger-text-secondary)] mb-1'
+export const timelineHorizontalLabelClasses = `${timelineLabelClasses} w-full px-4 text-center`
 export const timelineDescriptionClasses = 'text-[var(--tiger-text)]'
 
-const timelineDotBase = 'w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface)]'
+const timelineDotBase = 'block h-2.5 w-2.5 shrink-0 rounded-full'
 const timelineDotBg = 'bg-[var(--tiger-border)]'
 export const timelineDotClasses = `${timelineDotBase} ${timelineDotBg}`
 
-const AXIS_TRANSLATE = '-translate-x-1/2 rtl:translate-x-1/2'
-const AXIS_TRANSLATE_END = 'translate-x-1/2 rtl:-translate-x-1/2'
+export type TimelineRailSegment = 'before' | 'after'
 
 export function getTimelineItemKey(item: TimelineItem, index: number): string | number {
   return item.key ?? index
@@ -58,7 +64,7 @@ export function getTimelineItemClasses(
   isLast = false
 ): string {
   const base = isLast ? 'relative pb-0' : timelineItemClasses
-  if (mode === 'horizontal') return `${base} flex flex-col items-center px-4`
+  if (mode === 'horizontal') return `${base} flex flex-col items-center`
   if (mode === 'right') return `${base} pe-8`
   if (mode === 'alternate') {
     return `${base} grid grid-cols-2`
@@ -66,22 +72,46 @@ export function getTimelineItemClasses(
   return `${base} ps-8`
 }
 
-export function getTimelineTailClasses(mode: TimelineMode, isLast = false): string {
-  if (isLast) return 'hidden'
-  const span = `${timelineTailClasses} top-[1.25rem] -bottom-[1.25rem]`
-  if (mode === 'right') return `${span} end-0 ${AXIS_TRANSLATE_END}`
-  if (mode === 'alternate') return `${span} start-1/2 ${AXIS_TRANSLATE}`
-  return `${span} start-0 ${AXIS_TRANSLATE}`
-}
-
-export function getTimelineHeadClasses(mode: TimelineMode): string {
+/**
+ * Track that holds the node and its connector.
+ * Vertical: a zero-width column on the axis, stretched through the item
+ * (including the gap under the copy) so the stroke meets the next node.
+ * Horizontal: a row as wide as the item; leading and trailing halves meet
+ * the neighboring item at the shared edge.
+ */
+export function getTimelineAxisClasses(mode: TimelineMode): string {
+  if (mode === 'horizontal') return 'relative flex items-center self-stretch'
   if (mode === 'right') {
-    return `${timelineHeadClasses} end-0 ${AXIS_TRANSLATE_END}`
+    return 'pointer-events-none absolute inset-y-0 end-0 flex w-0 flex-col items-center'
   }
   if (mode === 'alternate') {
-    return `${timelineHeadClasses} start-1/2 ${AXIS_TRANSLATE}`
+    return 'pointer-events-none absolute inset-y-0 start-1/2 flex w-0 flex-col items-center'
   }
-  return `${timelineHeadClasses} start-0 ${AXIS_TRANSLATE}`
+  return 'pointer-events-none absolute inset-y-0 start-0 flex w-0 flex-col items-center'
+}
+
+/**
+ * Connector stroke.
+ * `omitStroke` hides the paint. On a horizontal rail the spacer stays so the
+ * node remains centered; pass it for the leading half of the first item and
+ * the trailing half of the last. Vertical rails only paint the `after` segment.
+ */
+export function getTimelineTailClasses(
+  mode: TimelineMode,
+  omitStroke = false,
+  segment: TimelineRailSegment = 'after'
+): string {
+  if (mode === 'horizontal') {
+    const track = 'h-px min-w-0 flex-1'
+    if (omitStroke) return track
+    return `${track} bg-[var(--tiger-border)]`
+  }
+  if (omitStroke || segment === 'before') return 'hidden'
+  return timelineTailClasses
+}
+
+export function getTimelineHeadClasses(_mode: TimelineMode): string {
+  return timelineHeadClasses
 }
 
 export function getTimelineDotClasses(color?: string, isCustom = false): string {
@@ -93,6 +123,7 @@ export function getTimelineContentClasses(
   mode: TimelineMode,
   position?: TimelineItemPosition
 ): string {
+  if (mode === 'horizontal') return `${timelineContentClasses} px-4 pt-2 text-center`
   if (mode === 'right') return `${timelineContentClasses} pe-2`
   if (mode === 'alternate') {
     return position === 'left'
@@ -103,7 +134,7 @@ export function getTimelineContentClasses(
 }
 
 export function getPendingDotClasses(): string {
-  return 'w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface)] bg-[var(--tiger-primary)] animate-pulse motion-reduce:animate-none'
+  return 'block h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--tiger-primary)] animate-pulse motion-reduce:animate-none'
 }
 
 export interface TimelineDotRenderOptions {
