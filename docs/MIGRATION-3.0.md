@@ -246,6 +246,8 @@ reducer 拒绝不属于当前操作者的动作，并拒绝空的必填意见。
 
 省略 `open` 时，关闭按钮和到时由组件自己收起。传入 `open` 时只发事件。
 
+外壳读已经发出的运行时 token：圆角 `--tiger-radius-md`，内边距 `--tiger-spacing-lg`，字号 `--tiger-font-size-base`。图标走字号阶梯，md 是 `h-5 w-5`。倒计时条用 `inset-x-0`。不再读未定义的 `--tiger-component-alert-*`。
+
 ## Loading
 
 全屏盖住视口，高于模态，并占用同一套焦点栈。区域加载在置 `inert` 之前记住焦点，结束后还回去。
@@ -253,6 +255,8 @@ reducer 拒绝不属于当前操作者的动作，并拒绝空的必填意见。
 ## Tooltip / Popover / Popconfirm
 
 悬停只跟指针。焦点还在触发器上时，指针离开不关。`Popover` 和 `Popconfirm` 把焦点留在触发器上，Tab 离开即关。确认的 Promise 在进行中关不掉。
+
+Tooltip 气泡用 `--tiger-text` 作底、`--tiger-surface` 作字，圆角 `--tiger-radius-sm`，阴影 `--tiger-shadow-lg`。箭头跟气泡同色，不再借用 Popconfirm 的白底描边。不再读未定义的 `--tiger-component-tooltip-*`。
 
 ## Modal / Drawer
 
@@ -265,6 +269,8 @@ reducer 拒绝不属于当前操作者的动作，并拒绝空的必填意见。
 ## Message / notification / LoadingBar
 
 只改当前 `ConfigProvider` 里的队列。同一个 `key` 替换。`Message` 默认可关闭，悬停或焦点暂停计时。通知的主动作是按钮，整张卡片不承接点击。`LoadingBar` 的 `error()` 与 `finish()` 共用 `start` 计数。
+
+通知卡片用 `--tiger-spacing-lg`、`--tiger-radius-lg`、`--tiger-shadow-lg`，宽度 `24rem`。角落位置和 Message 一样用 `start-*` / `end-*`；居中用 `inset-x-0`。Tailwind v4 不生成 `inset-inline-start-*` / `inset-inline-end-*`，那些名字会让固定层停在静态位置。不再读未定义的 `--tiger-component-notification-*`。
 
 ## Marquee
 

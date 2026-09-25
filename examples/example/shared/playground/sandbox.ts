@@ -88,8 +88,9 @@ function measureUnconstrainedPanelBottom(panel: HTMLElement, scrollY: number): n
  * stays at least the iframe viewport, so it cannot be used or the frame never
  * shrinks. Open overlays are included so the frame can grow, then shrink again.
  * Viewport-filling shells (modal / drawer) contribute their panel, not the
- * stretched iframe, so a closed trigger stays short. Fixed message toasts do
- * not affect scrollHeight, so an open stack is measured from its box.
+ * stretched iframe, so a closed trigger stays short. Fixed message and
+ * notification toasts do not affect scrollHeight, so an open stack is
+ * measured from its box.
  * `reserveSandboxToastClearance` shifts in-flow content out from under that
  * stack before this measurement, so the frame grows below the toast instead
  * of leaving demo controls underneath it.
@@ -126,7 +127,9 @@ export function measureSandboxContentHeight(doc: Document): number {
     }
     height = Math.max(height, measureUnconstrainedPanelBottom(panel, scrollY))
   }
-  for (const node of doc.querySelectorAll('[data-tiger-message-container]')) {
+  for (const node of doc.querySelectorAll(
+    '[data-tiger-message-container], [data-tiger-notification-container]'
+  )) {
     if (isHiddenOverlay(node)) continue
     const box = node.getBoundingClientRect()
     if (box.height > 0) height = Math.max(height, box.bottom + scrollY)
@@ -137,8 +140,8 @@ export function measureSandboxContentHeight(doc: Document): number {
 }
 
 /**
- * Fixed message stacks paint over the iframe viewport and do not push layout.
- * Pad `#root` so the demo controls clear the stack; fixed toasts stay put.
+ * Fixed message and notification stacks paint over the iframe viewport and
+ * do not push layout. Pad `#root` so the demo controls clear the stack.
  */
 export function reserveSandboxToastClearance(doc: Document): void {
   const root = doc.getElementById('root')
@@ -146,11 +149,16 @@ export function reserveSandboxToastClearance(doc: Document): void {
   const view = doc.defaultView
   let topInset = 0
   let bottomInset = 0
-  for (const node of doc.querySelectorAll('[data-tiger-message-container]')) {
+  for (const node of doc.querySelectorAll(
+    '[data-tiger-message-container], [data-tiger-notification-container]'
+  )) {
     if (isHiddenOverlay(node)) continue
     const box = node.getBoundingClientRect()
     if (box.height <= 0) continue
-    const position = node.getAttribute('data-tiger-message-position') ?? 'top'
+    const position =
+      node.getAttribute('data-tiger-message-position') ??
+      node.getAttribute('data-tiger-notification-position') ??
+      'top'
     if (position.startsWith('bottom')) {
       const viewport = view?.innerHeight ?? box.bottom
       bottomInset = Math.max(bottomInset, Math.max(0, viewport - box.top))

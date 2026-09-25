@@ -24,15 +24,16 @@ export const messageContainerBaseClasses = `fixed ${overlayZIndexClass.message} 
  */
 /**
  * One placement: logical insets and auto margins. Centered top / bottom do
- * not add a translate.
+ * not add a translate. `start-*` / `end-*` / `inset-x-*` are the utilities
+ * Tailwind v4 emits; `inset-inline-*` names are not.
  */
 export const messagePositionClasses: Record<MessagePosition, string> = {
-  top: 'top-6 inset-inline-0 mx-auto w-max max-w-[min(100vw-2rem,36rem)]',
-  'top-left': 'top-6 inset-inline-start-6',
-  'top-right': 'top-6 inset-inline-end-6',
-  bottom: 'bottom-6 inset-inline-0 mx-auto w-max max-w-[min(100vw-2rem,36rem)]',
-  'bottom-left': 'bottom-6 inset-inline-start-6',
-  'bottom-right': 'bottom-6 inset-inline-end-6'
+  top: 'top-6 inset-x-0 mx-auto w-max max-w-[min(100vw-2rem,36rem)]',
+  'top-left': 'top-6 start-6',
+  'top-right': 'top-6 end-6',
+  bottom: 'bottom-6 inset-x-0 mx-auto w-max max-w-[min(100vw-2rem,36rem)]',
+  'bottom-left': 'bottom-6 start-6',
+  'bottom-right': 'bottom-6 end-6'
 }
 
 /**

@@ -12,7 +12,7 @@ import {
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
   getFloatingArrowStyle,
-  getPopconfirmArrowClasses,
+  getTooltipArrowClasses,
   getTooltipContentClasses,
   type TooltipProps as CoreTooltipProps,
   type FloatingPlacement
@@ -139,7 +139,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
             </div>
             <span
               data-tiger-floating-arrow=""
-              className={getPopconfirmArrowClasses()}
+              className={getTooltipArrowClasses()}
               style={getFloatingArrowStyle(actualPlacement)}
             />
           </div>,

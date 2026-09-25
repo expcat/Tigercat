@@ -20,24 +20,24 @@ import type { AlertSize, AlertType } from '../types/alert'
  * `relative overflow-hidden` is the containing block for the countdown bar.
  */
 export const alertBaseClasses =
-  'relative overflow-hidden flex items-start rounded-[var(--tiger-component-alert-border-radius)] border tiger-motion-aware [transition:var(--tiger-transition-base)]'
+  'relative overflow-hidden flex items-start rounded-[var(--tiger-radius-md)] border tiger-motion-aware [transition:var(--tiger-transition-base)]'
 
 /**
  * Size classes for alert variants.
- * `md` reads `--tiger-component-alert-*`; sm/lg stay on the type scale.
+ * `md` reads runtime spacing and type tokens. sm/lg stay on the type scale.
  */
 export const alertSizeClasses: Record<AlertSize, string> = {
   sm: 'p-3 text-sm',
-  md: 'px-[var(--tiger-component-alert-padding-x)] py-[var(--tiger-component-alert-padding-y)] text-[length:var(--tiger-component-alert-font-size)]',
+  md: 'px-[var(--tiger-spacing-lg)] py-[var(--tiger-spacing-lg)] text-[length:var(--tiger-font-size-base)]',
   lg: 'p-5 text-lg'
 } as const
 
 /**
- * Icon size classes
+ * Icon size classes. md is the step between sm and lg on the type scale.
  */
 export const alertIconSizeClasses: Record<AlertSize, string> = {
   sm: 'h-4 w-4',
-  md: 'h-[var(--tiger-component-alert-icon-size)] w-[var(--tiger-component-alert-icon-size)]',
+  md: 'h-5 w-5',
   lg: 'h-6 w-6'
 } as const
 
@@ -144,7 +144,7 @@ export const alertBannerClasses = 'rounded-none border-x-0 w-full'
  * Countdown progress bar container classes
  * @since 0.9.0
  */
-export const alertCountdownContainerClasses = 'absolute inset-inline-0 bottom-0 h-1 overflow-hidden'
+export const alertCountdownContainerClasses = 'absolute inset-x-0 bottom-0 h-1 overflow-hidden'
 
 /**
  * Countdown progress bar classes. Duration is set via `animationDuration`.
@@ -194,8 +194,7 @@ export function createAlertCountdown(options: {
 }): AlertCountdown {
   const listeners = new Set<() => void>()
   const now = options.now ?? (() => Date.now())
-  const schedule =
-    options.setInterval ?? ((handler, timeout) => setInterval(handler, timeout))
+  const schedule = options.setInterval ?? ((handler, timeout) => setInterval(handler, timeout))
   const cancel = options.clearInterval ?? ((id) => clearInterval(id))
   let total = 0
   let remaining = 0

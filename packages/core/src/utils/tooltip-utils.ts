@@ -22,19 +22,33 @@ export function getTooltipTriggerClasses(disabled: boolean): string {
 }
 
 /**
- * Get tooltip content classes
+ * Tooltip bubble. Fill and type read runtime tokens that tokens.css emits.
+ * Light text sits on the text color so the bubble stays dark in light mode
+ * and inverts with the theme.
  */
 export function getTooltipContentClasses(): string {
   return classNames(
     'tiger-tooltip-content',
-    'max-w-[var(--tiger-component-tooltip-max-width)]',
-    'px-[var(--tiger-component-tooltip-padding-x)]',
-    'py-[var(--tiger-component-tooltip-padding-y)]',
-    'text-[length:var(--tiger-component-tooltip-font-size)]',
-    'text-[var(--tiger-component-tooltip-text-color)]',
-    'bg-[var(--tiger-component-tooltip-bg)]',
-    'rounded-[var(--tiger-component-tooltip-border-radius)]',
-    'shadow-[var(--tiger-component-tooltip-shadow)]',
+    'max-w-[280px]',
+    'px-[var(--tiger-spacing-md)]',
+    'py-[var(--tiger-spacing-sm)]',
+    'text-[length:var(--tiger-font-size-sm)]',
+    'text-[var(--tiger-surface)]',
+    'bg-[var(--tiger-text)]',
+    'rounded-[var(--tiger-radius-sm)]',
+    'shadow-[var(--tiger-shadow-lg)]',
     'whitespace-normal break-words'
+  )
+}
+
+/** Caret painted in the bubble color. Position comes from `getFloatingArrowStyle`. */
+export function getTooltipArrowClasses(): string {
+  return classNames(
+    'tiger-tooltip-arrow',
+    'z-10',
+    'box-border',
+    'rotate-45',
+    'pointer-events-none',
+    'bg-[var(--tiger-text)]'
   )
 }

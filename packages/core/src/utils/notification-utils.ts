@@ -17,23 +17,25 @@ import {
 /**
  * Base notification container classes
  */
-export const notificationContainerBaseClasses = `fixed ${overlayZIndexClass.message} flex flex-col gap-3 pointer-events-none w-[var(--tiger-component-notification-width)] max-w-[calc(100vw-2rem)]`
+export const notificationContainerBaseClasses = `fixed ${overlayZIndexClass.message} flex flex-col gap-3 pointer-events-none w-[24rem] max-w-[calc(100vw-2rem)]`
 
 /**
- * Get position classes for notification container
+ * Corner placement. `start-*` / `end-*` are the Tailwind v4 utilities that
+ * set logical insets. `inset-inline-start-*` is not emitted, so a fixed
+ * stack stayed at its static position and covered the trigger.
  */
 export const notificationPositionClasses: Record<NotificationPosition, string> = {
-  'top-left': 'top-6 inset-inline-start-6',
-  'top-right': 'top-6 inset-inline-end-6',
-  'bottom-left': 'bottom-6 inset-inline-start-6',
-  'bottom-right': 'bottom-6 inset-inline-end-6'
+  'top-left': 'top-6 start-6',
+  'top-right': 'top-6 end-6',
+  'bottom-left': 'bottom-6 start-6',
+  'bottom-right': 'bottom-6 end-6'
 }
 
 /**
  * Base notification item classes
  */
 export const notificationBaseClasses =
-  'flex gap-3 p-[var(--tiger-component-notification-padding)] rounded-[var(--tiger-component-notification-border-radius)] shadow-[var(--tiger-component-notification-shadow)] border pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base)]'
+  'flex gap-3 p-[var(--tiger-spacing-lg)] rounded-[var(--tiger-radius-lg)] shadow-[var(--tiger-shadow-lg)] border pointer-events-auto tiger-motion-aware [transition:var(--tiger-transition-base)]'
 
 /**
  * Notification type color schemes
@@ -132,8 +134,7 @@ export const notificationIconClasses = 'w-6 h-6 flex-shrink-0 mt-0.5'
 /**
  * Notification title classes
  */
-export const notificationTitleClasses =
-  '[font-size:var(--tiger-component-notification-title-font-size)] [font-weight:var(--tiger-component-notification-title-font-weight)]'
+export const notificationTitleClasses = 'text-[length:var(--tiger-font-size-base)] font-medium'
 
 /**
  * Notification description classes

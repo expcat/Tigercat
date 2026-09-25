@@ -176,7 +176,7 @@ describe('Message (React)', () => {
       '[data-tiger-message-container][data-tiger-message-position="top"]'
     ) as HTMLElement | null
     expect(host).toBeTruthy()
-    expect(host?.className).toContain('inset-inline-0')
+    expect(host?.className).toContain('inset-x-0')
     expect(host?.className).toContain('mx-auto')
     expect(host?.style.transform).toBe('')
   })

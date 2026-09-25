@@ -13,7 +13,7 @@ import {
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
   getFloatingArrowStyle,
-  getPopconfirmArrowClasses,
+  getTooltipArrowClasses,
   getTooltipContentClasses,
   type TooltipTrigger,
   type FloatingPlacement,
@@ -152,7 +152,7 @@ export const Tooltip = defineComponent({
                     ),
                     h('span', {
                       'data-tiger-floating-arrow': '',
-                      class: getPopconfirmArrowClasses(),
+                      class: getTooltipArrowClasses(),
                       style: getFloatingArrowStyle(actualPlacement.value)
                     })
                   ]

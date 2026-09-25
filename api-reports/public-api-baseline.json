@@ -2587,6 +2587,7 @@
       "getTokenClasses",
       "getToolbarButtonClasses",
       "getToolbarButtons",
+      "getTooltipArrowClasses",
       "getTooltipContainerClasses",
       "getTooltipContentClasses",
       "getTooltipTriggerClasses",

@@ -221,6 +221,28 @@ describe('example playground sandbox', () => {
     expect(measureSandboxContentHeight(document)).toBe(72)
   })
 
+  it('includes an open notification stack that is position fixed', () => {
+    document.body.innerHTML = '<div id="root" style="height:72px">demo</div>'
+    const toast = document.createElement('div')
+    toast.setAttribute('data-tiger-notification-container', '')
+    toast.getBoundingClientRect = () =>
+      ({
+        bottom: 160,
+        height: 120,
+        top: 40,
+        left: 0,
+        right: 0,
+        width: 0,
+        x: 0,
+        y: 40,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    document.body.appendChild(toast)
+    expect(measureSandboxContentHeight(document)).toBe(160)
+  })
+
   it('pads the demo root so controls clear a fixed message stack', () => {
     document.body.innerHTML = '<div id="root" style="height:40px">demo</div>'
     document.body.style.paddingTop = '16px'
@@ -281,12 +303,39 @@ describe('example playground sandbox', () => {
     expect(document.getElementById('root')?.style.paddingTop).toBe('')
   })
 
+  it('pads the demo root so controls clear a fixed notification stack', () => {
+    document.body.innerHTML = '<div id="root" style="height:40px">demo</div>'
+    document.body.style.paddingTop = '16px'
+    const toast = document.createElement('div')
+    toast.setAttribute('data-tiger-notification-container', '')
+    toast.setAttribute('data-tiger-notification-position', 'top-left')
+    toast.getBoundingClientRect = () =>
+      ({
+        bottom: 136,
+        height: 112,
+        top: 24,
+        left: 24,
+        right: 228,
+        width: 204,
+        x: 24,
+        y: 24,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    document.body.appendChild(toast)
+
+    reserveSandboxToastClearance(document)
+    expect(document.getElementById('root')?.style.paddingTop).toBe('128px')
+  })
+
   it('inlines the content-height measurement in the sandbox document', () => {
     const stock = createSandboxDocument(sandboxOptions())
     expect(stock).toContain('function measureSandboxContentHeight')
     expect(stock).toContain('data-tiger-overlay-layer')
     expect(stock).toContain('data-tiger-modal')
     expect(stock).toContain('data-tiger-message-container')
+    expect(stock).toContain('data-tiger-notification-container')
     expect(stock).toContain('function reserveSandboxToastClearance')
     expect(stock).toContain('reserveSandboxToastClearance(document)')
     expect(stock).toContain(`overlayStageHeight = ${DEMO_OVERLAY_STAGE_HEIGHT}`)
