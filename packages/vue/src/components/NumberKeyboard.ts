@@ -330,8 +330,7 @@ export const NumberKeyboard = defineComponent({
                     interactive.value.includes(index) && index === activeIndex.value ? 0 : -1,
                   class: getNumberKeyboardKeyClasses(
                     key,
-                    effectiveDisabled.value || !!key.disabled,
-                    interactive.value.includes(index) && index === activeIndex.value
+                    effectiveDisabled.value || !!key.disabled
                   ),
                   disabled: effectiveDisabled.value || !!key.disabled,
                   'aria-disabled': key.disabled || effectiveDisabled.value || undefined,
@@ -342,6 +341,10 @@ export const NumberKeyboard = defineComponent({
                     interactive.value.includes(index) && index === activeIndex.value
                       ? ''
                       : undefined,
+                  onMousedown: (event: MouseEvent) => {
+                    event.preventDefault()
+                    ;(overlayMode.value ? sheetRef.value : rootRef.value)?.focus()
+                  },
                   onClick: () => {
                     if (key.disabled || props.readOnly) return
                     activeIndex.value = index

@@ -78,7 +78,7 @@ Vue 用 `v-model` / `modelValue`，父级自己写回 `update:modelValue`。Reac
 
 ## Select
 
-单选空是 `null`（`undefined` 表示非受控），多选空是 `[]`。`''` 是合法选项。清空按钮不进 Tab，退格删最后一枚标签。创建项留到 `options` 接过去。小屏列表仍锚在触发器上。`listHeight` 是面板高度。列、返回、展开文案在 `locale.cascader`，不在 Select 语言包。
+单选空是 `null`（`undefined` 表示非受控），多选空是 `[]`。`''` 是合法选项。清空按钮不进 Tab，退格删最后一枚标签。创建项留到 `options` 接过去。小屏列表仍锚在触发器上。`listHeight` 是面板高度。列、返回、展开文案在 `locale.cascader`，不在 Select 语言包。当前项（以及 TreeSelect、Cascader、AutoComplete、Mentions 的同一行）用面板裁切的底色，不再叠一层内描边焦点环。
 
 ## DatePicker
 
@@ -98,7 +98,7 @@ Vue 用 `v-model` / `modelValue`，父级自己写回 `update:modelValue`。Reac
 
 ## NumberKeyboard
 
-打开后焦点在对话框里。进入的值先按模式收成合法串，收不干净当空。可访问 id 走 `useId`。
+打开后焦点在对话框里。进入的值先按模式收成合法串，收不干净当空。可访问 id 走 `useId`。按键焦点环只在键盘聚焦时出现（`focus-visible`，跟按键圆角）。点按不留常驻描边。已删除 `numberKeyboardKeyActiveClasses`；`getNumberKeyboardKeyClasses` 不再接收 active。
 
 ## Cascader
 

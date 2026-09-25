@@ -7,6 +7,7 @@ import type {
 } from '../types/auto-complete'
 import type { VirtualRange } from '../types/virtual-list'
 import { classNames } from './class-names'
+import { getPopupListOptionActiveClasses, popupListOptionActiveClasses } from './interaction-styles'
 import { getInitialPickerActiveIndex } from './picker-utils'
 import { getSelectVirtualItemHeight } from './select-utils'
 import { fixedSizeStrategy, scrollTopForVirtualAlign } from './virtual-list-utils'
@@ -170,8 +171,12 @@ export function getAutoCompleteOptionClasses(options: {
       ? 'opacity-50 cursor-not-allowed'
       : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover)]',
     options.isSelected &&
-      'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)] font-medium',
-    options.isActive && !options.isDisabled && 'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
+      classNames(popupListOptionActiveClasses, 'text-[var(--tiger-primary)] font-medium'),
+    getPopupListOptionActiveClasses({
+      active: options.isActive,
+      disabled: options.isDisabled,
+      selected: options.isSelected
+    })
   )
 }
 

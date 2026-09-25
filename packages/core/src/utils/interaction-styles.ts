@@ -17,9 +17,31 @@ export const focusRingClasses =
 
 /**
  * Focus ring classes for inset elements (dropdown items, menu items)
+ * that have their own radius and sit inset from the popup border.
  */
 export const focusRingInsetClasses =
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset'
+
+/**
+ * Active row inside a bordered popup list (Select, TreeSelect, Cascader,
+ * AutoComplete, Mentions).
+ *
+ * The panel is `overflow-hidden` with `--tiger-radius-lg` and a 1px border.
+ * These rows are not focused (`aria-activedescendant`); the trigger owns the
+ * focus ring. An inset ring on the row is a second box — square, or a smaller
+ * radius — and stacks on that border. The first and last rows show it most.
+ * This fill is clipped by the panel, so the highlight follows the same corners.
+ */
+export const popupListOptionActiveClasses = 'bg-[var(--tiger-outline-bg-hover)]'
+
+export function getPopupListOptionActiveClasses(options: {
+  active?: boolean
+  disabled?: boolean
+  selected?: boolean
+}): string {
+  if (!options.active || options.disabled || options.selected) return ''
+  return popupListOptionActiveClasses
+}
 
 /**
  * Active press effect - subtle scale down on click

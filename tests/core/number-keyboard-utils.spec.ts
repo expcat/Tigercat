@@ -164,6 +164,9 @@ describe('number-keyboard-utils', () => {
     expect(getNumberKeyboardKeyClasses(confirm)).not.toContain('bg-[var(--tiger-surface-muted')
     expect(getNumberKeyboardKeyClasses(digit)).toContain('bg-[var(--tiger-surface-muted')
     expect(getNumberKeyboardKeyClasses(digit)).not.toContain('bg-[var(--tiger-primary')
+    expect(getNumberKeyboardKeyClasses(digit)).toContain('focus-visible:ring-2')
+    expect(getNumberKeyboardKeyClasses(digit)).not.toContain('outline-offset')
+    expect(getNumberKeyboardKeyClasses(digit)).not.toMatch(/(?:^|\s)ring-2(?:\s|$)/)
   })
 
   it('applies a key in one step', () => {

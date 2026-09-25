@@ -32,7 +32,33 @@ describe('NumberKeyboard', () => {
     render(<NumberKeyboard />)
     expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('tabindex', '0')
     expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('tabindex', '-1')
-    expect(screen.getByRole('button', { name: '1' }).className).toMatch(/ring-/)
+    expect(screen.getByRole('button', { name: '1' }).className).toContain('focus-visible:ring-2')
+    expect(screen.getByRole('button', { name: '1' }).className).not.toContain('outline-offset')
+  })
+
+  it('does not keep a focus ring on a pressed digit', () => {
+    render(<NumberKeyboard />)
+    const eight = screen.getByRole('button', { name: '8' })
+    eight.focus()
+    fireEvent.mouseDown(eight)
+    fireEvent.click(eight)
+    expect(document.activeElement).toBe(keypad())
+    expect(eight).toHaveAttribute('tabindex', '0')
+    expect(eight.className).not.toContain('outline-offset')
+    expect(eight.className).not.toMatch(/(?:^|\s)ring-2(?:\s|$)/)
+  })
+
+  it('moves pointer focus off the sheet key that opened focused', async () => {
+    render(<NumberKeyboard defaultOpen />)
+    const dialog = screen.getByRole('dialog')
+    await waitFor(() => {
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: '1' }))
+    })
+    const eight = screen.getByRole('button', { name: '8' })
+    fireEvent.mouseDown(eight)
+    fireEvent.click(eight)
+    expect(document.activeElement).toBe(dialog)
+    expect(eight).toHaveAttribute('tabindex', '0')
   })
 
   it('does not expose the empty spacer as a button', () => {

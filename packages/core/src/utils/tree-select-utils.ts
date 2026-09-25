@@ -3,6 +3,7 @@ import type { InputStatus } from '../types/input'
 import type { TreeCheckStrategy, TreeFilterFn, TreeNode } from '../types/tree'
 import type { TreeSelectValue } from '../types/tree-select'
 import { classNames } from './class-names'
+import { getPopupListOptionActiveClasses, popupListOptionActiveClasses } from './interaction-styles'
 import {
   getSelectTriggerClasses,
   getSelectVirtualItemHeight,
@@ -102,17 +103,19 @@ export function getTreeSelectNodeClasses(options: {
 }): string {
   const size = options.size ?? 'md'
   return classNames(
-    'flex items-center w-full rounded text-start',
+    // Flush row. The popup clips the corners; a local radius would disagree with the panel border.
+    'flex items-center w-full text-start',
     TREE_SELECT_NODE_PAD_Y[size],
     'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     options.isDisabled
       ? 'text-[var(--tiger-text-secondary)] cursor-not-allowed opacity-50'
       : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover)]',
-    options.isSelected &&
-      'bg-[var(--tiger-outline-bg-active)] text-[var(--tiger-primary)]',
-    options.isActive &&
-      !options.isDisabled &&
-      'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
+    options.isSelected && classNames(popupListOptionActiveClasses, 'text-[var(--tiger-primary)]'),
+    getPopupListOptionActiveClasses({
+      active: options.isActive,
+      disabled: options.isDisabled,
+      selected: options.isSelected
+    })
   )
 }
 
@@ -281,7 +284,9 @@ export function getTreeSelectDisplayLabel(
   if (isTreeSelectValueEmpty(value, Array.isArray(value))) return ''
   if (Array.isArray(value)) {
     return value
-      .map((key) => findNode(data, key)?.label ?? readTreeSelectCachedLabel(cache, key) ?? String(key))
+      .map(
+        (key) => findNode(data, key)?.label ?? readTreeSelectCachedLabel(cache, key) ?? String(key)
+      )
       .join(', ')
   }
   if (value == null) return ''

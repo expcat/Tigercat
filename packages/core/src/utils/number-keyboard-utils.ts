@@ -47,7 +47,8 @@ export const numberKeyboardRootClasses = classNames(
   'w-full rounded-[var(--tiger-radius-lg)]',
   'border border-[var(--tiger-border)]',
   'bg-[var(--tiger-surface)] p-2',
-  'shadow-[var(--tiger-shadow-sm)]'
+  'shadow-[var(--tiger-shadow-sm)]',
+  'outline-none'
 )
 
 export const numberKeyboardGridClasses = 'grid grid-cols-3 gap-2'
@@ -62,7 +63,8 @@ export const numberKeyboardSheetClasses = classNames(
   'border-t border-[var(--tiger-border)]',
   'bg-[var(--tiger-surface)] p-2',
   'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
-  'shadow-[var(--tiger-shadow-lg)]'
+  'shadow-[var(--tiger-shadow-lg)]',
+  'outline-none'
 )
 
 export const numberKeyboardScrimClasses = classNames(
@@ -116,9 +118,7 @@ export function sanitizeNumberKeyboardValue(
   if (Number.isFinite(maxLength) && raw.length > maxLength) return ''
   if (precision <= 0) return /^\d+$/.test(raw) ? raw : ''
   const sep = escapeNumberKeyboardSeparator(separator)
-  const pattern = new RegExp(
-    `^(?:\\d+|\\d+${sep}\\d{0,${precision}}|${sep}\\d{1,${precision}})$`
-  )
+  const pattern = new RegExp(`^(?:\\d+|\\d+${sep}\\d{0,${precision}}|${sep}\\d{1,${precision}})$`)
   return pattern.test(raw) ? raw : ''
 }
 
@@ -351,19 +351,16 @@ export function getNumberKeyboardKeys(options: NumberKeyboardLayoutOptions): Num
   return keys
 }
 
-export const numberKeyboardKeyActiveClasses =
-  'ring-2 ring-[var(--tiger-focus-ring)] outline outline-2 outline-offset-2 outline-[var(--tiger-focus-ring)]'
-
-export function getNumberKeyboardKeyClasses(
-  key: NumberKeyboardKey,
-  disabled = false,
-  active = false
-): string {
+/**
+ * Key chrome. The focus ring is `focus-visible` on the key's own radius.
+ * A roving index must not paint `ring` / `outline` — that border stays after
+ * a pointer press.
+ */
+export function getNumberKeyboardKeyClasses(key: NumberKeyboardKey, disabled = false): string {
   if (key.type === 'empty') return numberKeyboardEmptyKeyClasses
   return classNames(
     KEY_LAYOUT,
     key.type === 'confirm' ? CONFIRM_TONE : KEY_TONE,
-    active && numberKeyboardKeyActiveClasses,
     disabled && 'pointer-events-none'
   )
 }

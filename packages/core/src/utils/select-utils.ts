@@ -12,12 +12,17 @@ import type {
 } from '../types/select'
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
+import { getPopupListOptionActiveClasses, popupListOptionActiveClasses } from './interaction-styles'
 import {
   findFirstEnabledIndex,
   findLastEnabledIndex,
   getPickerNavigationIndex
 } from './picker-utils'
-import { fixedSizeStrategy, scrollTopForVirtualAlign, variableSizeStrategy } from './virtual-list-utils'
+import {
+  fixedSizeStrategy,
+  scrollTopForVirtualAlign,
+  variableSizeStrategy
+} from './virtual-list-utils'
 
 export interface ResolveSelectOptionsOptions {
   searchable?: boolean
@@ -213,8 +218,7 @@ export function getSelectTriggerClasses(options: {
     !options.disabled && 'active:scale-[0.99]',
     options.disabled &&
       'bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)] border-[var(--tiger-border)]',
-    options.isOpen &&
-      'ring-2 ring-[var(--tiger-focus-ring)]/40 border-[var(--tiger-primary)]'
+    options.isOpen && 'ring-2 ring-[var(--tiger-focus-ring)]/40 border-[var(--tiger-primary)]'
   )
 }
 
@@ -233,10 +237,12 @@ export function getSelectOptionClasses(options: {
       ? 'opacity-50 cursor-not-allowed'
       : 'cursor-pointer hover:bg-[var(--tiger-outline-bg-hover)]',
     options.isSelected &&
-      'bg-[var(--tiger-outline-bg-hover)] text-[var(--tiger-primary)] font-medium',
-    options.isActive &&
-      !options.isDisabled &&
-      'ring-2 ring-inset ring-[var(--tiger-focus-ring)]'
+      classNames(popupListOptionActiveClasses, 'text-[var(--tiger-primary)] font-medium'),
+    getPopupListOptionActiveClasses({
+      active: options.isActive,
+      disabled: options.isDisabled,
+      selected: options.isSelected
+    })
   )
 }
 
@@ -604,19 +610,28 @@ export function selectAllSelectValues(options: {
   return next
 }
 
-function readOptionField(record: Record<string, unknown>, key: string | undefined, fallback: string): unknown {
+function readOptionField(
+  record: Record<string, unknown>,
+  key: string | undefined,
+  fallback: string
+): unknown {
   const name = key || fallback
   return record[name]
 }
 
-function mapSelectRecord(record: Record<string, unknown>, fields: SelectOptionFields): SelectOption | SelectOptionGroup | null {
+function mapSelectRecord(
+  record: Record<string, unknown>,
+  fields: SelectOptionFields
+): SelectOption | SelectOptionGroup | null {
   const groupKey = fields.options || 'options'
   const nested = record[groupKey]
   if (Array.isArray(nested)) {
     const label = readOptionField(record, fields.label, 'label')
     const options = nested
       .map((item) =>
-        item && typeof item === 'object' ? mapSelectRecord(item as Record<string, unknown>, fields) : null
+        item && typeof item === 'object'
+          ? mapSelectRecord(item as Record<string, unknown>, fields)
+          : null
       )
       .filter((item): item is SelectOption => !!item && !isOptionGroup(item))
     return { label: label == null ? '' : String(label), options }
@@ -644,7 +659,9 @@ export function normalizeSelectOptions(
   if (!fields) return options as SelectOptions
   return options
     .map((item) =>
-      item && typeof item === 'object' ? mapSelectRecord(item as Record<string, unknown>, fields) : null
+      item && typeof item === 'object'
+        ? mapSelectRecord(item as Record<string, unknown>, fields)
+        : null
     )
     .filter((item): item is SelectOption | SelectOptionGroup => item !== null)
 }
@@ -938,7 +955,10 @@ export function coerceSelectFormValue(
   return null
 }
 
-export function selectRowGroupLabel(rows: readonly SelectListRow[], index: number): string | undefined {
+export function selectRowGroupLabel(
+  rows: readonly SelectListRow[],
+  index: number
+): string | undefined {
   for (let cursor = index; cursor >= 0; cursor -= 1) {
     const row = rows[cursor]
     if (row?.kind === 'group') return row.label

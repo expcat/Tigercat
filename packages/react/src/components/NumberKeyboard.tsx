@@ -334,17 +334,17 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
                 }}
                 type="button"
                 tabIndex={active ? 0 : -1}
-                className={getNumberKeyboardKeyClasses(
-                  key,
-                  effectiveDisabled || !!key.disabled,
-                  active
-                )}
+                className={getNumberKeyboardKeyClasses(key, effectiveDisabled || !!key.disabled)}
                 disabled={effectiveDisabled || !!key.disabled}
                 aria-disabled={key.disabled || effectiveDisabled || undefined}
                 aria-label={key.ariaLabel}
                 data-key={key.value}
                 data-active={index === activeIndex ? '' : undefined}
                 data-tiger-number-key-active={active ? '' : undefined}
+                onMouseDown={(event) => {
+                  event.preventDefault()
+                  ;(overlayMode ? sheetRef.current : rootRef.current)?.focus()
+                }}
                 onClick={() => {
                   if (key.disabled || readOnly) return
                   setActiveIndex(index)
