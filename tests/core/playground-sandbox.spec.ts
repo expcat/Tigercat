@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest'
 import { createCompilerClient } from '../../examples/example/shared/playground/compiler-client'
 import {
   createSandboxDocument,
-  measureSandboxContentHeight
+  measureSandboxContentHeight,
+  reserveSandboxToastClearance
 } from '../../examples/example/shared/playground/sandbox'
 import { DEMO_OVERLAY_STAGE_HEIGHT } from '../../examples/example/shared/playground/viewport'
 import {
@@ -212,19 +213,80 @@ describe('example playground sandbox', () => {
     expect(measureSandboxContentHeight(document)).toBe(72)
   })
 
+  it('pads the demo root so controls clear a fixed message stack', () => {
+    document.body.innerHTML = '<div id="root" style="height:40px">demo</div>'
+    document.body.style.paddingTop = '16px'
+    document.body.style.paddingBottom = '16px'
+    const toast = document.createElement('div')
+    toast.setAttribute('data-tiger-message-container', '')
+    toast.setAttribute('data-tiger-message-position', 'top')
+    toast.getBoundingClientRect = () =>
+      ({
+        bottom: 68,
+        height: 44,
+        top: 24,
+        left: 200,
+        right: 420,
+        width: 220,
+        x: 200,
+        y: 24,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    document.body.appendChild(toast)
+
+    reserveSandboxToastClearance(document)
+    expect(document.getElementById('root')?.style.paddingTop).toBe('60px')
+    expect(document.getElementById('root')?.style.paddingBottom).toBe('')
+
+    toast.hidden = true
+    reserveSandboxToastClearance(document)
+    expect(document.getElementById('root')?.style.paddingTop).toBe('')
+  })
+
+  it('pads the demo root above a bottom-fixed message stack', () => {
+    document.body.innerHTML = '<div id="root">demo</div>'
+    document.body.style.paddingBottom = '16px'
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 180 })
+    const toast = document.createElement('div')
+    toast.setAttribute('data-tiger-message-container', '')
+    toast.setAttribute('data-tiger-message-position', 'bottom-left')
+    toast.getBoundingClientRect = () =>
+      ({
+        bottom: 156,
+        height: 44,
+        top: 112,
+        left: 24,
+        right: 244,
+        width: 220,
+        x: 24,
+        y: 112,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    document.body.appendChild(toast)
+
+    reserveSandboxToastClearance(document)
+    expect(document.getElementById('root')?.style.paddingBottom).toBe('60px')
+    expect(document.getElementById('root')?.style.paddingTop).toBe('')
+  })
+
   it('inlines the content-height measurement in the sandbox document', () => {
     const stock = createSandboxDocument(sandboxOptions())
     expect(stock).toContain('function measureSandboxContentHeight')
     expect(stock).toContain('data-tiger-overlay-layer')
     expect(stock).toContain('data-tiger-modal')
     expect(stock).toContain('data-tiger-message-container')
+    expect(stock).toContain('function reserveSandboxToastClearance')
+    expect(stock).toContain('reserveSandboxToastClearance(document)')
     expect(stock).toContain(`overlayStageHeight = ${DEMO_OVERLAY_STAGE_HEIGHT}`)
   })
 
   it('maps the icons registry subpath to the module that exports rocketIcon', async () => {
-    const { rocketIcon } = await import(
-      '../../examples/example/shared/playground/runtime-icons-registry'
-    )
+    const { rocketIcon } =
+      await import('../../examples/example/shared/playground/runtime-icons-registry')
     expect(rocketIcon.viewBox).toBe('0 0 24 24')
     expect(rocketIcon.paths.length).toBeGreaterThan(0)
 

@@ -88,6 +88,9 @@ function measureUnconstrainedPanelBottom(panel: HTMLElement, scrollY: number): n
  * Viewport-filling shells (modal / drawer) contribute their panel, not the
  * stretched iframe, so a closed trigger stays short. Fixed message toasts do
  * not affect scrollHeight, so an open stack is measured from its box.
+ * `reserveSandboxToastClearance` shifts in-flow content out from under that
+ * stack before this measurement, so the frame grows below the toast instead
+ * of leaving demo controls underneath it.
  */
 export function measureSandboxContentHeight(doc: Document): number {
   const html = doc.documentElement
@@ -129,6 +132,40 @@ export function measureSandboxContentHeight(doc: Document): number {
   html.style.minHeight = htmlMin
   body.style.minHeight = bodyMin
   return Math.ceil(height)
+}
+
+/**
+ * Fixed message stacks paint over the iframe viewport and do not push layout.
+ * Pad `#root` so the demo controls clear the stack; fixed toasts stay put.
+ */
+export function reserveSandboxToastClearance(doc: Document): void {
+  const root = doc.getElementById('root')
+  if (!root) return
+  const view = doc.defaultView
+  let topInset = 0
+  let bottomInset = 0
+  for (const node of doc.querySelectorAll('[data-tiger-message-container]')) {
+    if (isHiddenOverlay(node)) continue
+    const box = node.getBoundingClientRect()
+    if (box.height <= 0) continue
+    const position = node.getAttribute('data-tiger-message-position') ?? 'top'
+    if (position.startsWith('bottom')) {
+      const viewport = view?.innerHeight ?? box.bottom
+      bottomInset = Math.max(bottomInset, Math.max(0, viewport - box.top))
+    } else {
+      topInset = Math.max(topInset, box.bottom)
+    }
+  }
+  const gap = 8
+  const body = doc.body
+  const bodyStyle = body && view ? view.getComputedStyle(body) : null
+  const bodyPadTop = Number.parseFloat(bodyStyle?.paddingTop ?? '') || 0
+  const bodyPadBottom = Number.parseFloat(bodyStyle?.paddingBottom ?? '') || 0
+  const topNeeded = topInset > 0 ? Math.max(0, Math.ceil(topInset - bodyPadTop + gap)) : 0
+  const bottomNeeded =
+    bottomInset > 0 ? Math.max(0, Math.ceil(bottomInset - bodyPadBottom + gap)) : 0
+  root.style.paddingTop = topNeeded > 0 ? `${topNeeded}px` : ''
+  root.style.paddingBottom = bottomNeeded > 0 ? `${bottomNeeded}px` : ''
 }
 
 function safeJson(value: unknown): string {
@@ -299,7 +336,11 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
       ${panelStretchesToViewport.toString()}
       ${measureUnconstrainedPanelBottom.toString()}
       const measureSandboxContentHeight = ${measureSandboxContentHeight.toString()}
-      const measureHeight = () => measureSandboxContentHeight(document)
+      const reserveSandboxToastClearance = ${reserveSandboxToastClearance.toString()}
+      const measureHeight = () => {
+        reserveSandboxToastClearance(document)
+        return measureSandboxContentHeight(document)
+      }
       let lastSentHeight = 0
       let resizeFrame = 0
       const sendResize = () => {
