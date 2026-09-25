@@ -2,7 +2,7 @@ import { SplitButton } from '@expcat/tigercat-react/SplitButton'
 import { DropdownItem } from '@expcat/tigercat-react/DropdownItem'
 import { DropdownMenu } from '@expcat/tigercat-react/DropdownMenu'
 
-function Menu() {
+function menu() {
   return (
     <DropdownMenu>
       <DropdownItem>次要操作</DropdownItem>
@@ -17,39 +17,39 @@ export default function App() {
       <div className="flex flex-wrap items-center gap-3">
         <SplitButton variant="primary">
           Primary
-          <Menu />
+          {menu()}
         </SplitButton>
         <SplitButton variant="secondary">
           Secondary
-          <Menu />
+          {menu()}
         </SplitButton>
         <SplitButton variant="outline">
           Outline
-          <Menu />
+          {menu()}
         </SplitButton>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <SplitButton size="sm">
           Small
-          <Menu />
+          {menu()}
         </SplitButton>
         <SplitButton size="md">
           Medium
-          <Menu />
+          {menu()}
         </SplitButton>
         <SplitButton size="lg">
           Large
-          <Menu />
+          {menu()}
         </SplitButton>
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <SplitButton disabled>
           Disabled
-          <Menu />
+          {menu()}
         </SplitButton>
         <SplitButton loading>
           Loading
-          <Menu />
+          {menu()}
         </SplitButton>
       </div>
     </div>

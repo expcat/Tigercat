@@ -88,6 +88,14 @@ describe('example playground sandbox', () => {
     expect(document.documentElement.style.minHeight).toBe('100%')
     expect(document.body.style.minHeight).toBe('100%')
 
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      get() {
+        return 520
+      }
+    })
+    expect(measureSandboxContentHeight(document)).toBe(72)
+
     const layer = document.createElement('div')
     layer.setAttribute('data-tiger-overlay-layer', '')
     layer.getBoundingClientRect = () =>

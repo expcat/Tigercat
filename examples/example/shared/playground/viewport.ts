@@ -1,6 +1,16 @@
 import type { DemoViewport } from './types'
 
-export const DEFAULT_DEMO_MIN_HEIGHT = 120
+/**
+ * Closed demo floor. Short controls (a button row is ~72px with sandbox
+ * padding) used to sit in the old 120px catalog floor and look empty.
+ */
+export const DEFAULT_DEMO_MIN_HEIGHT = 64
+
+/**
+ * `demo.json` files copied this value as `minHeight` when the catalog default
+ * was 120. It is not a deliberate taller stage — resolve it as the shared floor.
+ */
+export const CATALOG_DEFAULT_MIN_HEIGHT = 120
 
 /**
  * Open edge-locked overlays (side drawers) have no intrinsic height — they
@@ -22,7 +32,11 @@ export interface ResolvedDemoViewport {
 
 export function resolveDemoViewport(route: string, viewport?: DemoViewport): ResolvedDemoViewport {
   const mode = viewport?.mode ?? 'auto'
-  const minHeight = viewport?.minHeight ?? DEFAULT_DEMO_MIN_HEIGHT
+  const declaredMin = viewport?.minHeight
+  const minHeight =
+    declaredMin === undefined || declaredMin === CATALOG_DEFAULT_MIN_HEIGHT
+      ? DEFAULT_DEMO_MIN_HEIGHT
+      : declaredMin
   const maxHeight = isChartDemoRoute(route) && mode !== 'fixed' ? undefined : viewport?.maxHeight
   return {
     mode,

@@ -83,8 +83,10 @@ function measureUnconstrainedPanelBottom(panel: HTMLElement, scrollY: number): n
 
 /**
  * Content height of a demo iframe. `html, body { min-height: 100% }` stretches
- * scrollHeight to the current frame, so the measurement clears that stretch
- * first. Open overlays are included so the frame can grow, then shrink again.
+ * the document to the current frame. Clearing that min-height lets
+ * `body.scrollHeight` fall back to in-flow content, but `html.scrollHeight`
+ * stays at least the iframe viewport, so it cannot be used or the frame never
+ * shrinks. Open overlays are included so the frame can grow, then shrink again.
  * Viewport-filling shells (modal / drawer) contribute their panel, not the
  * stretched iframe, so a closed trigger stays short. Fixed message toasts do
  * not affect scrollHeight, so an open stack is measured from its box.
@@ -100,7 +102,7 @@ export function measureSandboxContentHeight(doc: Document): number {
   const bodyMin = body.style.minHeight
   html.style.minHeight = '0'
   body.style.minHeight = '0'
-  let height = Math.max(body.scrollHeight, html.scrollHeight)
+  let height = body.scrollHeight
   const view = doc.defaultView
   const scrollY = view?.scrollY ?? 0
   // Keep this literal equal to DEMO_OVERLAY_STAGE_HEIGHT. The function is
