@@ -58,7 +58,7 @@ describe('avatar paint', () => {
     const a = generateAvatarColor('Jane Doe')
     const b = generateAvatarColor('Jane Doe')
     expect(a).toBe(b)
-    expect(a).toContain('--tiger-')
+    expect(a).toContain('bg-[color-mix(in_srgb,var(--tiger-')
     expect(a).not.toContain('--tiger-avatar-color')
   })
 })

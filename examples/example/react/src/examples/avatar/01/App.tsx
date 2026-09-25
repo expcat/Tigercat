@@ -10,12 +10,7 @@ export default function App() {
       <Avatar>
         <Icon name="user" />
       </Avatar>
-      <Avatar
-        text="TC"
-        shape="square"
-        bgColor="bg-[var(--tiger-primary)]"
-        textColor="text-white"
-      />
+      <Avatar text="TC" shape="square" bgColor="primary" textColor="#ffffff" />
     </div>
   )
 }

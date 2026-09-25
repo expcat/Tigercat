@@ -7,14 +7,17 @@ import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
 import { getFieldMessageClasses } from './form-item-styles'
-import { mixStatusTowardText, mixStatusTowardTextClass } from './status-mix'
+import { mixStatusTowardTextClass } from './status-mix'
 
 const errorTextClass = mixStatusTowardTextClass('text', '--tiger-error', '#dc2626')
 const successTextClass = mixStatusTowardTextClass('text', '--tiger-success', '#16a34a')
 const warningTextClass = mixStatusTowardTextClass('text', '--tiger-warning', '#d97706')
-const errorPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-error', '#dc2626')}]`
-const successPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-success', '#16a34a')}]`
-const warningPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-warning', '#d97706')}]`
+const errorPlaceholderClass =
+  'placeholder:text-[color-mix(in_srgb,var(--tiger-error,#dc2626)_75%,var(--tiger-text))]'
+const successPlaceholderClass =
+  'placeholder:text-[color-mix(in_srgb,var(--tiger-success,#16a34a)_75%,var(--tiger-text))]'
+const warningPlaceholderClass =
+  'placeholder:text-[color-mix(in_srgb,var(--tiger-warning,#d97706)_75%,var(--tiger-text))]'
 
 const FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 const ERROR_FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-error)]/40'

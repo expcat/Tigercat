@@ -128,10 +128,31 @@ const tigercatForcedColorsBase = {
   }
 }
 
+/** Sizes the avatar/badge utilities already reference. Missing vars invalidate width, radius, and type. */
+const avatarBadgeMetricVars = {
+  '--tiger-component-avatar-size-sm': '2rem',
+  '--tiger-component-avatar-size-md': '2.5rem',
+  '--tiger-component-avatar-size-lg': '3rem',
+  '--tiger-component-avatar-size-xl': '4rem',
+  '--tiger-component-avatar-font-size-sm': '0.75rem',
+  '--tiger-component-avatar-font-size-md': '0.875rem',
+  '--tiger-component-avatar-font-size-lg': '1rem',
+  '--tiger-component-avatar-font-size-xl': '1.25rem',
+  '--tiger-component-avatar-icon-size-sm': '1rem',
+  '--tiger-component-avatar-icon-size-md': '1.25rem',
+  '--tiger-component-avatar-icon-size-lg': '1.5rem',
+  '--tiger-component-avatar-icon-size-xl': '2rem',
+  '--tiger-component-avatar-border-radius': '9999px',
+  '--tiger-component-badge-padding-x': '0.375rem',
+  '--tiger-component-badge-font-size': '0.75rem',
+  '--tiger-component-badge-font-weight': '600',
+  '--tiger-component-badge-border-radius': '9999px'
+}
+
 function pluginBase(preset: ThemePreset): Record<string, unknown> {
   return mergeBase([
     {
-      ':root': cssVarsForPreset(preset, 'light'),
+      ':root': { ...cssVarsForPreset(preset, 'light'), ...avatarBadgeMetricVars },
       '.dark': cssVarsForPreset(preset, 'dark')
     },
     tigercatReducedMotionBase,

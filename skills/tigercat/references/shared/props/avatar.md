@@ -20,4 +20,4 @@ Note: `text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` �
 | `src?`     | `string` | `-`     | Image source URL                                                                           |
 | `alt?`     | `string` | `-`     | Alternative text for the image. When omitted, `text` or `aria-label` is used as the acc... |
 | `text?`    | `string` | `-`     | Text content to display (e.g., initials) when src is missing or fails. Also used as the... |
-| `bgColor?` | `string` | `-`     | Background for text/icon avatars. Tailwind class, or a CSS color (`#rgb` / `rgb()` / `v... |
+| `bgColor?` | `string` | `-`     | Background for text/icon avatars. A theme token name (`primary`) or a CSS color (`#rgb`... |

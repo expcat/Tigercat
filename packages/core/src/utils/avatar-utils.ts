@@ -19,10 +19,10 @@ export const avatarBaseClasses =
  * Size classes for avatar
  */
 export const avatarSizeClasses: Record<AvatarSize, string> = {
-  sm: 'w-[var(--tiger-component-avatar-size-sm)] h-[var(--tiger-component-avatar-size-sm)] text-[length:var(--tiger-component-avatar-font-size-sm)]',
-  md: 'w-[var(--tiger-component-avatar-size-md)] h-[var(--tiger-component-avatar-size-md)] text-[length:var(--tiger-component-avatar-font-size-md)]',
-  lg: 'w-[var(--tiger-component-avatar-size-lg)] h-[var(--tiger-component-avatar-size-lg)] text-[length:var(--tiger-component-avatar-font-size-lg)]',
-  xl: 'w-[var(--tiger-component-avatar-size-xl)] h-[var(--tiger-component-avatar-size-xl)] text-[length:var(--tiger-component-avatar-font-size-xl)]'
+  sm: 'w-[var(--tiger-component-avatar-size-sm)] h-[var(--tiger-component-avatar-size-sm)] text-[length:var(--tiger-component-avatar-font-size-sm)] [&_svg]:w-[var(--tiger-component-avatar-icon-size-sm)] [&_svg]:h-[var(--tiger-component-avatar-icon-size-sm)]',
+  md: 'w-[var(--tiger-component-avatar-size-md)] h-[var(--tiger-component-avatar-size-md)] text-[length:var(--tiger-component-avatar-font-size-md)] [&_svg]:w-[var(--tiger-component-avatar-icon-size-md)] [&_svg]:h-[var(--tiger-component-avatar-icon-size-md)]',
+  lg: 'w-[var(--tiger-component-avatar-size-lg)] h-[var(--tiger-component-avatar-size-lg)] text-[length:var(--tiger-component-avatar-font-size-lg)] [&_svg]:w-[var(--tiger-component-avatar-icon-size-lg)] [&_svg]:h-[var(--tiger-component-avatar-icon-size-lg)]',
+  xl: 'w-[var(--tiger-component-avatar-size-xl)] h-[var(--tiger-component-avatar-size-xl)] text-[length:var(--tiger-component-avatar-font-size-xl)] [&_svg]:w-[var(--tiger-component-avatar-icon-size-xl)] [&_svg]:h-[var(--tiger-component-avatar-icon-size-xl)]'
 }
 
 /**

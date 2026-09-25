@@ -11,10 +11,6 @@ import { Icon } from '@expcat/tigercat-vue/Icon'
     <Avatar>
       <Icon name="user" />
     </Avatar>
-    <Avatar
-      text="TC"
-      shape="square"
-      bg-color="bg-[var(--tiger-primary)]"
-      text-color="text-white" />
+    <Avatar text="TC" shape="square" bg-color="primary" text-color="#ffffff" />
   </div>
 </template>

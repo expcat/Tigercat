@@ -2,8 +2,11 @@
  * @vitest-environment node
  */
 
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { resolveBadgeContent } from '@expcat/tigercat-core'
+import { getBadgeVariantClasses, resolveBadgeContent } from '@expcat/tigercat-core'
 
 describe('resolveBadgeContent', () => {
   it('always shows dots', () => {
@@ -53,5 +56,16 @@ describe('resolveBadgeContent', () => {
     expect(resolveBadgeContent({ type: 'number', content: Number.POSITIVE_INFINITY })).toEqual({
       kind: 'hidden'
     })
+  })
+
+  it('uses a source-literal status fill so Tailwind can emit the background', () => {
+    const danger = getBadgeVariantClasses('danger')
+    const fill = 'bg-[color-mix(in_srgb,var(--tiger-error,#dc2626)_75%,var(--tiger-text))]'
+    expect(danger.split(' ')).toContain(fill)
+    const source = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), '../../packages/core/src/utils/status-mix.ts'),
+      'utf8'
+    )
+    expect(source).toContain(`'${fill}'`)
   })
 })

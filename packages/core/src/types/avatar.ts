@@ -48,18 +48,18 @@ export interface AvatarProps {
   text?: string
 
   /**
-   * Background for text/icon avatars. Tailwind class, or a CSS color
-   * (`#rgb` / `rgb()` / `var()`) applied as `background-color`.
+   * Background for text/icon avatars. A theme token name (`primary`) or a CSS
+   * color (`#rgb` / `rgb()` / `var(--tiger-*)`) applied as `background-color`.
    * When omitted and `text` is set, `generateAvatarColor` picks a stable
    * color for that name.
-   * @example 'bg-blue-500' | '#3b82f6'
+   * @example 'primary' | '#3b82f6'
    */
   bgColor?: string
 
   /**
-   * Text color for text/icon avatars. Tailwind class, or a CSS color applied
-   * as `color`.
-   * @example 'text-white' | '#ffffff'
+   * Text color for text/icon avatars. A theme token name or a CSS color
+   * applied as `color`.
+   * @example 'primaryForeground' | '#ffffff'
    */
   textColor?: string
 
