@@ -1,0 +1,44 @@
+/**
+ * @vitest-environment happy-dom
+ */
+
+import { describe, expect, it } from 'vitest'
+import { render, screen } from '@testing-library/vue'
+import { h } from 'vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import CronEditorDemo from '../../examples/example/vue3/src/examples/cron-editor/01/App.vue'
+import DatePickerDemo from '../../examples/example/vue3/src/examples/datepicker/01/App.vue'
+import DataExportDemo from '../../examples/example/vue3/src/examples/data-export/01/App.vue'
+
+function renderDemo(demo: object) {
+  return render({
+    setup() {
+      return () => h(ConfigProvider, { locale: zhCN }, () => h(demo))
+    }
+  })
+}
+
+describe('Vue example pages on zh-CN', () => {
+  it('renders CronEditor with Simplified copy', () => {
+    renderDemo(CronEditorDemo)
+    expect(screen.getByText('执行计划')).toBeInTheDocument()
+    expect(screen.getByText('分钟')).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '选择预设' })).toBeInTheDocument()
+    expect(screen.queryByText('選擇預設')).not.toBeInTheDocument()
+    expect(screen.queryByText('分鐘')).not.toBeInTheDocument()
+  })
+
+  it('renders DatePicker with the Simplified placeholder', () => {
+    const { container } = renderDemo(DatePickerDemo)
+    expect(container.querySelector('input')).toHaveAttribute('placeholder', '请选择日期')
+    expect(screen.queryByText('請選擇日期')).not.toBeInTheDocument()
+  })
+
+  it('renders DataExport with Simplified trigger copy', () => {
+    renderDemo(DataExportDemo)
+    expect(screen.getByRole('button', { name: '导出数据' })).toHaveTextContent('导出')
+    expect(screen.getByText(/默认 formats/)).toBeInTheDocument()
+    expect(screen.queryByText('匯出')).not.toBeInTheDocument()
+  })
+})

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ColorSwatch } from '@expcat/tigercat-vue/ColorSwatch'
-import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
-import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 
 const color = ref('#22c55e')
 const palette = [
@@ -18,9 +16,7 @@ const palette = [
 </script>
 
 <template>
-  <ConfigProvider :locale="zhTW">
-    <div class="space-y-4" dir="rtl">
-      <ColorSwatch v-model="color" :colors="palette" :columns="4" />
-    </div>
-  </ConfigProvider>
+  <div class="space-y-4" dir="rtl">
+    <ColorSwatch v-model="color" :colors="palette" :columns="4" />
+  </div>
 </template>

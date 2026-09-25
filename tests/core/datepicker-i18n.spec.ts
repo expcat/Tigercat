@@ -10,11 +10,20 @@ import { ptBR } from '@expcat/tigercat-core/locales/pt-BR'
 import { idID } from '@expcat/tigercat-core/locales/id-ID'
 import { viVN } from '@expcat/tigercat-core/locales/vi-VN'
 import { ZH_CN_DATEPICKER_LOCALE } from '../../packages/core/src/utils/i18n/datepicker-locales/zh-CN'
-import { DATEPICKER_LOCALES } from '../../packages/core/src/utils/i18n/datepicker-locales/registry'
+import {
+  DATEPICKER_LOCALES,
+  getDatePickerLocalePreset
+} from '../../packages/core/src/utils/i18n/datepicker-locales/registry'
 
 const OK_ALLOWLIST = new Set(['ja-JP', 'fr-FR', 'de-DE', 'pt-BR', 'id-ID', 'vi-VN'])
 
 describe('datepicker-i18n', () => {
+  it('resolves generic Chinese to Simplified and keeps exact zh-TW Traditional', () => {
+    expect(getDatePickerLocalePreset('zh-CN')?.labels.placeholder).toBe('请选择日期')
+    expect(getDatePickerLocalePreset('zh')?.locale).toBe('zh-CN')
+    expect(getDatePickerLocalePreset('zh-TW')?.labels.placeholder).toBe('請選擇日期')
+  })
+
   it('reads labels from the official locale object, not a language id string', () => {
     expect(getDatePickerLocaleCode(zhCN)).toBe('zh-CN')
     expect(getDatePickerLabels(zhCN).placeholder).toBe('请选择日期')

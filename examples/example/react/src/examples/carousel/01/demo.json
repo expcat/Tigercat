@@ -1,7 +1,7 @@
 {
   "id": "carousel-01",
   "title": "默认滚动",
-  "description": "不传 effect / arrows / autoplay。圆点是真正的 tab；非当前页 inert，不能 Tab 到页内按钮。文案走官方 zh-TW。",
+  "description": "不传 effect / arrows / autoplay。圆点是真正的 tab；非当前页 inert，不能 Tab 到页内按钮。按钮文案来自页面 ConfigProvider（中文页是 zh-CN）。",
   "entry": "App.tsx",
   "order": 1
 }

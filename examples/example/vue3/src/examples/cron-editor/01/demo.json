@@ -1,7 +1,7 @@
 {
   "id": "cron-editor-01",
   "title": "基本用法",
-  "description": "FormItem 包裹的 5 段数字 unix Cron。不传 ariaLabel，官方 zhTW 提供默认名。空值不是每分钟。",
+  "description": "FormItem 包裹的 5 段数字 unix Cron。不传 ariaLabel，默认名来自页面 ConfigProvider（中文页是 zh-CN）。空值不是每分钟。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {
