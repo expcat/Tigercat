@@ -9,6 +9,7 @@ import {
   getElementOffsetTop,
   findAnchorLinkElement,
   shouldHandleAnchorClick,
+  replaceAnchorHash,
   scrollToAnchor,
   findActiveAnchor,
   findActiveAnchorAtOffsetLine,
@@ -385,6 +386,44 @@ describe('anchor-utils', () => {
       vi.advanceTimersByTime(1)
       expect(lock.isLocked()).toBe(false)
       clearInterval(interval)
+    })
+  })
+
+  describe('replaceAnchorHash', () => {
+    it('writes an absolute http(s) URL with the hash', () => {
+      const replaceState = vi.spyOn(window.history, 'replaceState').mockImplementation(() => {})
+      replaceAnchorHash('#spy-workflow')
+      expect(replaceState).toHaveBeenCalledWith(
+        window.history.state,
+        '',
+        `${window.location.href.split('#')[0]}#spy-workflow`
+      )
+    })
+
+    it('does not throw when replaceState refuses the write', () => {
+      vi.spyOn(window.history, 'replaceState').mockImplementation(() => {
+        throw new DOMException(
+          "Failed to execute 'replaceState' on 'History': A history state object with URL 'about:srcdoc' cannot be created",
+          'SecurityError'
+        )
+      })
+      expect(() => replaceAnchorHash('#spy-workflow')).not.toThrow()
+    })
+
+    it('skips replaceState when the document URL is about:srcdoc', () => {
+      const happyDOM = (window as unknown as { happyDOM: { setURL: (url: string) => void } })
+        .happyDOM
+      const previous = window.location.href
+      const replaceState = vi.spyOn(window.history, 'replaceState').mockImplementation(() => {})
+      happyDOM.setURL('about:srcdoc')
+      try {
+        expect(window.location.href).toBe('about:srcdoc')
+        replaceState.mockClear()
+        replaceAnchorHash('#spy-workflow')
+        expect(replaceState).not.toHaveBeenCalled()
+      } finally {
+        happyDOM.setURL(previous)
+      }
     })
   })
 

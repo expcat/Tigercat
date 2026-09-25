@@ -187,11 +187,28 @@ export function resolveScrollSpySectionModel(options: {
   return createSectionScrollModel(options)
 }
 
+function scrollSpySectionOrigin(
+  items: ScrollSpyItem[] | undefined,
+  host?: Element | null
+): Element | null {
+  if (isBrowser()) {
+    for (const item of getEnabledScrollSpyItems(items)) {
+      const target = getAnchorTargetElement(item.href)
+      if (target) return target
+    }
+  }
+  return host ?? null
+}
+
 export function resolveScrollSpyContainer(
   input?: ScrollRootInput,
-  from?: Element | null
+  from?: Element | null,
+  items?: ScrollSpyItem[]
 ): HTMLElement | Window {
-  const root = resolveScrollRoot(input, { from })
+  // The nav is often a sibling of the scroller. Walk from the section so an
+  // omitted container is that scroller, not the window behind the nav.
+  const origin = input === undefined ? scrollSpySectionOrigin(items, from) : from
+  const root = resolveScrollRoot(input, { from: origin })
   if (!root.target || root.isWindow) return isBrowser() ? window : (null as unknown as Window)
   return root.target as HTMLElement
 }
@@ -208,8 +225,8 @@ export function activateScrollSpyClick(
   container: HTMLElement | Window,
   offset: number
 ): void {
-  replaceAnchorHash(item.href)
   scrollToScrollSpyItem(item, container, offset)
+  replaceAnchorHash(item.href)
 }
 
 export function createScrollSpyObserver(
@@ -227,7 +244,7 @@ export function createScrollSpyObserver(
     if (!itemByHref.has(item.href)) itemByHref.set(item.href, item)
   }
   const offset = resolveScrollSpyOffset(options.targetOffset, options.offsetTop)
-  const container = resolveScrollSpyContainer(options.container, options.from)
+  const container = resolveScrollSpyContainer(options.container, options.from, items)
   const root = container === window ? null : (container as Element)
 
   return createAnchorObserver(hrefs, {

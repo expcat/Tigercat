@@ -98,12 +98,15 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
     if (typeof ref === 'function') ref(node)
     else if (ref) ref.current = node
   }
-  const resolvedContainer = resolveScrollSpyContainer(getContainer, hostRef.current)
+  const resolvedContainer = resolveScrollSpyContainer(getContainer, hostRef.current, items)
   const containerKey = resolvedContainer === window ? 'window' : (resolvedContainer as HTMLElement)
 
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
-  const resolveContainer = () => resolveScrollSpyContainer(getContainerRef.current, hostRef.current)
+  const itemsRef = useRef(items)
+  itemsRef.current = items
+  const resolveContainer = () =>
+    resolveScrollSpyContainer(getContainerRef.current, hostRef.current, itemsRef.current)
   const scrollLockRef = useRef(createProgrammaticScrollLock(() => resolveContainer()))
 
   const emitActive = useCallback(

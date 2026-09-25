@@ -118,7 +118,8 @@ export const ScrollSpy = defineComponent({
     const flatItems = computed(() => flattenScrollSpyItems(props.items))
     const hostRef = ref<HTMLElement | null>(null)
     let stopObserver: (() => void) | null = null
-    const resolveContainer = () => resolveScrollSpyContainer(props.getContainer, hostRef.value)
+    const resolveContainer = () =>
+      resolveScrollSpyContainer(props.getContainer, hostRef.value, props.items)
     const scrollLock = createProgrammaticScrollLock(() => resolveContainer())
 
     const emitActive = (item: ScrollSpyItem, source: ScrollSpyChangePayload['source']) => {

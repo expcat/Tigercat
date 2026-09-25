@@ -167,6 +167,17 @@ describe('ScrollSpy', () => {
       expect(preventDefaultSpy).toHaveBeenCalled()
     })
 
+    it('scrolls the section container when the nav is outside it', async () => {
+      const scrollToSpy = vi.spyOn(scrollContainer, 'scrollTo')
+      vi.spyOn(window.history, 'replaceState').mockImplementation(() => {
+        throw new DOMException('replaceState', 'SecurityError')
+      })
+      render(ScrollSpy, { props: { items, orientation: 'horizontal' } })
+      await fireEvent.click(screen.getByText('Usage'))
+      expect(scrollToSpy).toHaveBeenCalled()
+      expect(screen.getByText('Usage')).toHaveAttribute('aria-current', 'location')
+    })
+
     it('scrolls to the clicked target', async () => {
       const scrollToSpy = vi.spyOn(scrollContainer, 'scrollTo')
       renderScrollSpy({ targetOffset: 24 })

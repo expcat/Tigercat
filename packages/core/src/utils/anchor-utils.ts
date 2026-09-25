@@ -194,10 +194,38 @@ export function resolveActiveAnchorHref(
   return getCurrentAnchor ? getCurrentAnchor(href) : href
 }
 
+/**
+ * Same-document hash update.
+ *
+ * `about:srcdoc` (sandboxed example iframes) reports `location.href` as
+ * `about:srcdoc` while `location.pathname` can be a parent path such as
+ * `/vue/srcdoc`. Concatenating that path and calling `replaceState` resolves
+ * against the parent base URL and throws SecurityError. Only http(s) document
+ * URLs can be rewritten; a refused write must not escape to the caller.
+ */
 export function replaceAnchorHash(href: string): void {
   if (!isBrowser() || !href.startsWith('#')) return
-  const { pathname, search } = window.location
-  window.history.replaceState(window.history.state, '', `${pathname}${search}${href}`)
+  let current = ''
+  try {
+    current = window.location.href
+  } catch {
+    return
+  }
+  if (!/^https?:/i.test(current)) return
+  let next = ''
+  try {
+    const url = new URL(current)
+    if (url.hash === href) return
+    url.hash = href
+    next = url.href
+  } catch {
+    return
+  }
+  try {
+    window.history.replaceState(window.history.state, '', next)
+  } catch {
+    // Opaque-origin sandboxes can still refuse a same-document hash write.
+  }
 }
 
 export function findAnchorLinkElement(root: Element, href: string): HTMLElement | null {

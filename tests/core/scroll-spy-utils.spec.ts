@@ -16,6 +16,8 @@ import {
   getScrollSpyListClasses,
   getScrollSpyRootClasses,
   getScrollSpyTargetHrefs,
+  activateScrollSpyClick,
+  resolveScrollSpyContainer,
   scrollToScrollSpyItem,
   type ScrollSpyItem
 } from '@expcat/tigercat-core'
@@ -170,6 +172,23 @@ describe('scroll-spy-utils', () => {
         item: items[0],
         source: 'click'
       })
+    })
+
+    it('scrolls a section scroller when the nav is outside it', () => {
+      const nav = document.createElement('nav')
+      document.body.appendChild(nav)
+      const resolved = resolveScrollSpyContainer(undefined, nav, items)
+      expect(resolved).toBe(container)
+      document.body.removeChild(nav)
+    })
+
+    it('scrolls before updating the hash so a history error cannot skip the scroll', () => {
+      const scrollToSpy = vi.spyOn(container, 'scrollTo')
+      vi.spyOn(window.history, 'replaceState').mockImplementation(() => {
+        throw new DOMException('replaceState', 'SecurityError')
+      })
+      expect(() => activateScrollSpyClick(items[1], container, 0)).not.toThrow()
+      expect(scrollToSpy).toHaveBeenCalled()
     })
 
     it('scrolls enabled items into view', () => {
