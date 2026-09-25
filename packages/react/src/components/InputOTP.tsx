@@ -160,17 +160,13 @@ export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function Inp
     if (!isInteractive) return
     const inputType = (event.nativeEvent as InputEvent).inputType
     const sanitized = sanitizeOtpInput(event.currentTarget.value, charOptions)
-    const typed =
-      index === 0 && sanitized.length === 1
-        ? (currentValue + sanitized).slice(0, length)
-        : event.currentTarget.value
-    const result = applyOtpCharInput(currentValue, index, typed, length, {
+    const result = applyOtpCharInput(currentValue, index, event.currentTarget.value, length, {
       ...charOptions,
       distributeFromStart: shouldDistributeOtpInput(index, inputType, sanitized.length)
     })
     event.currentTarget.value = displayChar(result.value, index)
     emitValue(result.value)
-    if (index !== 0) focusSlot(result.nextIndex)
+    if (result.nextIndex !== index) focusSlot(result.nextIndex)
   }
 
   const handleSlotKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -266,11 +262,10 @@ export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function Inp
         maxLength={i === 0 ? undefined : 1}
         value={displayChar(currentValue, i)}
         disabled={effectiveDisabled}
-        readOnly={readonly || i !== 0}
-        tabIndex={i === 0 && !effectiveDisabled ? 0 : -1}
+        readOnly={readonly || undefined}
+        tabIndex={getOtpSlotTabIndex(i, currentTab, effectiveDisabled)}
         id={i === 0 ? (id ?? formItemControl?.id) : undefined}
-        aria-hidden={i === 0 ? undefined : true}
-        aria-label={i === 0 ? formatOtpSlotLabel(labels.slotLabel, 1, length) : undefined}
+        aria-label={formatOtpSlotLabel(labels.slotLabel, i + 1, length)}
         aria-invalid={i === 0 && status === 'error' ? true : undefined}
         aria-required={i === 0 && formItemControl?.required ? true : undefined}
         aria-describedby={i === 0 ? describedBy : undefined}

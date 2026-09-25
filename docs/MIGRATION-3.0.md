@@ -29,6 +29,7 @@
 | `isActiveListDragSameContainer` / `isActiveListDragCrossContainer`                      | 各自的 `createListReorderController`                                       |
 | `injectMarqueeStyles` / `injectPrintLayoutStyles`                                       | Tailwind 插件里的样式                                                      |
 | `getMessagePositionStyle`                                                               | 当前 `ConfigProvider` 的队列                                               |
+| `sliderTooltipReserveClasses`                                                           | 删除。滑块 tooltip 不再用 `pt-12` 撑开轨道                                 |
 
 框架包不再星号再导出 `@expcat/tigercat-core`。`types/composite`、`types/kanban`、`types/image-viewer` 这些兼容入口已删除。版本只读各包的 `package.json`。
 
@@ -74,7 +75,7 @@ Vue 用 `v-model` / `modelValue`，父级自己写回 `update:modelValue`。Reac
 
 ## Input / Textarea / Radio
 
-一次按键一次提交。单颗 `Radio` 写入自己的选项值，与 `RadioGroup` 同一份。缺键、`''`、`null` 是空。提交前让仍聚焦的控件失焦。
+一次按键一次提交。单颗 `Radio` 写入自己的选项值，与 `RadioGroup` 同一份。缺键、`''`、`null` 是空。提交前让仍聚焦的控件失焦。放进 `InputGroup` 的字数和错误不参与同行拉伸，挂在输入 chrome 下方；组用 `data-tiger-field-extra` 留出一行或两行。`Textarea`、`MaskInput`、`Mentions` 同一套。`InputOTP` 每位都可输入，写入一位后焦点移到下一格；整段粘贴和首格一次性验证码仍从当前格铺开。
 
 ## Select
 
@@ -82,7 +83,7 @@ Vue 用 `v-model` / `modelValue`，父级自己写回 `update:modelValue`。Reac
 
 ## DatePicker
 
-存储和 `name` 是公历 `YYYY-MM-DD`（范围 `start|end`）。解析用写出这段文字的同一套历法和数字。点选、键入、快捷方式和确定走同一道边界；结束早于开始会对调。确定提交完整预览，未完成留在面板里。空是 `null`。
+存储和 `name` 是公历 `YYYY-MM-DD`（范围 `start|end`）。解析用写出这段文字的同一套历法和数字。点选、键入、快捷方式和确定走同一道边界；结束早于开始会对调。确定提交完整预览，未完成留在面板里。空是 `null`。「今天」在点击时取 `now`；没传入就用点击时刻的本地日。区间写成当天到当天，面板保持打开。
 
 ## TimePicker
 
@@ -134,11 +135,11 @@ Vue 用 `v-model` / `modelValue`，父级自己写回 `update:modelValue`。Reac
 
 ## Slider
 
-Vue 只认 `modelValue` / `update:modelValue`。方向读最近的 `dir`，否则读 `ConfigProvider`。拖动松手才写入，键盘立即写入。`marks` 过密时最多标两端，刻度不超过 21 个。区间拇指在字段名之外带上最小和最大。
+Vue 只认 `modelValue` / `update:modelValue`。方向读最近的 `dir`，否则读 `ConfigProvider`。拖动松手才写入，键盘立即写入。`marks` 过密时最多标两端，刻度不超过 21 个。区间拇指在字段名之外带上最小和最大。悬停 tooltip 不再给根节点加 `pt-12`。`getSliderRootClasses(disabled, className?, status?)` 不再接收 tooltip 是否打开。
 
 ## InputNumber
 
-两侧按钮是 `controlsPosition="both"`。`snapToStep` 默认关闭，步长只约束按钮和方向键。值是有限数字或数字字符串，`null` 和 `''` 是空。可见输入不带 `name`。可访问名来自可见标签或 `aria-label`。
+两侧按钮是 `controlsPosition="both"`。`snapToStep` 默认关闭，步长只约束按钮和方向键。值是有限数字或数字字符串，`null` 和 `''` 是空。可见输入不带 `name`。可访问名来自可见标签或 `aria-label`。尾侧步进条用 `end-0` 和固定宽度，不盖住数值。Switch 拇指用 `start-*`，选中时滑到阅读方向的末端。
 
 ## TagsInput
 

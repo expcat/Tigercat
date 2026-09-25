@@ -23,6 +23,10 @@ import {
   getInputPasswordToggleClasses,
   getInputCountClasses,
   formatInputCountText,
+  FIELD_EXTRA_ATTR,
+  fieldExtraKind,
+  getFieldExtrasHostClasses,
+  getGroupedFieldExtraStackClasses,
   parseInputValue,
   runShakeAnimation,
   SHAKE_CLASS,
@@ -423,18 +427,27 @@ export const Input = defineComponent({
 
       if (!hasExtras) return chromeNode
 
-      return h(
-        'div',
-        {
-          class: classNames(
-            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-            props.className,
-            coerceClassValue(attrClass)
-          ),
-          style: [attrStyle, props.style]
-        },
-        [chromeNode, ...extras]
-      )
+      const hostProps = {
+        class: classNames(
+          getFieldExtrasHostClasses(inGroup.value),
+          props.className,
+          coerceClassValue(attrClass)
+        ),
+        style: [attrStyle, props.style]
+      }
+      if (!inGroup.value) return h('div', hostProps, [chromeNode, ...extras])
+
+      return h('div', hostProps, [
+        chromeNode,
+        h(
+          'div',
+          {
+            class: getGroupedFieldExtraStackClasses(),
+            [FIELD_EXTRA_ATTR]: fieldExtraKind(extras.length)
+          },
+          extras
+        )
+      ])
     }
   }
 })

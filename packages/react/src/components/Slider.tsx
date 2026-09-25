@@ -455,12 +455,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     <div
       {...divProps}
       ref={setRootRef}
-      className={getSliderRootClasses(
-        effectiveDisabled,
-        className,
-        tooltip && (showTooltip || focusedThumb !== null || isDragging),
-        status
-      )}
+      className={getSliderRootClasses(effectiveDisabled, className, status)}
       data-status={status === 'default' ? undefined : status}
       data-orientation={vertical ? 'vertical' : 'horizontal'}
       data-show-input={showInput || undefined}

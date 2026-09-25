@@ -7,6 +7,10 @@ import {
   formatMaskValue,
   getInputClearButtonClasses,
   getInputErrorClasses,
+  FIELD_EXTRA_ATTR,
+  fieldExtraKind,
+  getFieldExtrasHostClasses,
+  getGroupedFieldExtraStackClasses,
   getInputFieldClasses,
   getInputLabels,
   getInputWrapperClasses,
@@ -268,17 +272,29 @@ export const MaskInput = forwardRef<HTMLInputElement, MaskInputProps>(function M
 
   if (!hasExtras) return chrome
 
+  const hostClassName = classNames(getFieldExtrasHostClasses(inGroup), className)
+  const errorNode = activeError ? (
+    <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)} aria-live="polite">
+      {errorMessage}
+    </div>
+  ) : null
+  if (!inGroup) {
+    return (
+      <div className={hostClassName} style={style}>
+        {chrome}
+        {errorNode}
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={classNames(
-        inGroup ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-        className
-      )}
-      style={style}>
+    <div className={hostClassName} style={style}>
       {chrome}
-      {activeError ? (
-        <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)} aria-live="polite">
-          {errorMessage}
+      {errorNode ? (
+        <div
+          className={getGroupedFieldExtraStackClasses()}
+          {...{ [FIELD_EXTRA_ATTR]: fieldExtraKind(1) }}>
+          {errorNode}
         </div>
       ) : null}
     </div>

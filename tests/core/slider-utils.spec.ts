@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  getSliderRootClasses,
   sliderGetKeyboardValue,
   sliderGetPercentage,
   sliderGetValueFromPosition,
@@ -8,6 +9,13 @@ import {
   sliderSortRange,
   sliderValuesEqual
 } from '@expcat/tigercat-core'
+
+describe('slider root classes', () => {
+  it('does not reserve padding when a tooltip would open', () => {
+    expect(getSliderRootClasses(false, 'extra', 'default')).not.toContain('pt-12')
+    expect(getSliderRootClasses(false, undefined, 'error')).toContain('ring-[var(--tiger-error)]')
+  })
+})
 
 describe('slider-utils', () => {
   it('normalizes invalid domains and steps to finite values', () => {

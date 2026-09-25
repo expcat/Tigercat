@@ -156,9 +156,15 @@ export function getInputNumberSideButtonClasses(
   )
 }
 
-/** End-side stacked controls (logical trailing edge). */
-export const inputNumberControlsRightClasses =
-  'absolute inset-inline-end-0 top-0 h-full flex flex-col'
+/**
+ * End-side stacked controls (logical trailing edge).
+ *
+ * `end-0` is the inset Tailwind v4 emits. `inset-inline-end-0` is not, so the
+ * column stayed at the flex static position — the inline start — and its
+ * divider cut through the value. Width is fixed so the divider cannot grow
+ * with the field.
+ */
+export const inputNumberControlsRightClasses = 'absolute end-0 top-0 z-[1] flex h-full w-7 flex-col'
 
 export const inputNumberUpIconPathD = 'M7 10l5-5 5 5H7z'
 export const inputNumberDownIconPathD = 'M7 7l5 5 5-5H7z'
@@ -236,7 +242,12 @@ function splitDecimal(value: string): { sign: -1 | 1; digits: string; scale: num
   return { sign, digits: `${whole}${frac}`.replace(/^0+(?=\d)/, ''), scale: frac.length }
 }
 
-function formatDecimalParts(sign: -1 | 1, digits: string, scale: number, precision?: number): string {
+function formatDecimalParts(
+  sign: -1 | 1,
+  digits: string,
+  scale: number,
+  precision?: number
+): string {
   let nextScale = scale
   let nextDigits = digits.replace(/^0+(?=\d)/, '') || '0'
   if (precision !== undefined) {

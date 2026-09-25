@@ -19,6 +19,10 @@ import {
   formatMaskValue,
   getInputClearButtonClasses,
   getInputErrorClasses,
+  FIELD_EXTRA_ATTR,
+  fieldExtraKind,
+  getFieldExtrasHostClasses,
+  getGroupedFieldExtraStackClasses,
   getInputFieldClasses,
   getInputLabels,
   getInputWrapperClasses,
@@ -293,31 +297,38 @@ export const MaskInput = defineComponent({
 
       if (!hasExtras) return chrome
 
-      return h(
+      const errorNode = h(
         'div',
         {
-          class: classNames(
-            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-            props.className,
-            coerceClassValue(attrClass)
-          ),
-          style: mergeStyleValues(props.style, attrStyle)
+          id: errorMsgId,
+          class: getInputErrorClasses(effectiveSize.value),
+          'aria-live': 'polite'
         },
-        [
-          chrome,
-          activeError
-            ? h(
-                'div',
-                {
-                  id: errorMsgId,
-                  class: getInputErrorClasses(effectiveSize.value),
-                  'aria-live': 'polite'
-                },
-                props.errorMessage
-              )
-            : null
-        ]
+        props.errorMessage
       )
+      const hostProps = {
+        class: classNames(
+          getFieldExtrasHostClasses(inGroup.value),
+          props.className,
+          coerceClassValue(attrClass)
+        ),
+        style: mergeStyleValues(props.style, attrStyle)
+      }
+      if (!inGroup.value) return h('div', hostProps, [chrome, activeError ? errorNode : null])
+
+      return h('div', hostProps, [
+        chrome,
+        activeError
+          ? h(
+              'div',
+              {
+                class: getGroupedFieldExtraStackClasses(),
+                [FIELD_EXTRA_ATTR]: fieldExtraKind(1)
+              },
+              [errorNode]
+            )
+          : null
+      ])
     }
   }
 })

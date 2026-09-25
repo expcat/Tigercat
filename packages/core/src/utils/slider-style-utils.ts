@@ -8,15 +8,11 @@ import { classNames } from './class-names'
 
 export const sliderBaseClasses = 'relative w-full'
 
-/** Extra top space so the value tooltip is not clipped by overflow ancestors. */
-export const sliderTooltipReserveClasses = 'pt-12'
-
 export const sliderTrackClasses = 'relative w-full rounded-full bg-[var(--tiger-border)]'
 
 export const sliderHitAreaClasses = 'relative w-full py-2 min-h-6'
 
-export const sliderRangeClasses =
-  'bg-[var(--tiger-primary)] rounded-full absolute inset-y-0'
+export const sliderRangeClasses = 'bg-[var(--tiger-primary)] rounded-full absolute inset-y-0'
 
 export const sliderThumbClasses =
   'bg-[var(--tiger-surface)] border-2 border-[var(--tiger-primary)] rounded-full absolute top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer tiger-motion-aware hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]'
@@ -91,16 +87,19 @@ export function getSliderStatusClasses(status: InputStatus = 'default'): string 
   return ''
 }
 
+/**
+ * Root classes. The value tooltip is absolutely positioned on the thumb.
+ * Toggling padding while it opens shifts the track under a stationary
+ * pointer, which hides the tooltip and opens it again.
+ */
 export function getSliderRootClasses(
   disabled: boolean = false,
   className?: string,
-  tooltipOpen: boolean = false,
   status: InputStatus = 'default'
 ): string {
   return classNames(
     sliderBaseClasses,
     disabled && sliderDisabledClasses,
-    tooltipOpen && sliderTooltipReserveClasses,
     getSliderStatusClasses(status),
     className
   )

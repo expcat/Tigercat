@@ -180,17 +180,13 @@ export const InputOTP = defineComponent({
       const target = event.target as HTMLInputElement
       const inputType = (event as InputEvent).inputType
       const sanitized = sanitizeOtpInput(target.value, charOptions.value)
-      const typed =
-        index === 0 && sanitized.length === 1
-          ? (currentValue.value + sanitized).slice(0, props.length)
-          : target.value
-      const result = applyOtpCharInput(currentValue.value, index, typed, props.length, {
+      const result = applyOtpCharInput(currentValue.value, index, target.value, props.length, {
         ...charOptions.value,
         distributeFromStart: shouldDistributeOtpInput(index, inputType, sanitized.length)
       })
       target.value = displayChar(result.value, index)
       emitValue(result.value)
-      if (index !== 0) focusSlot(result.nextIndex)
+      if (result.nextIndex !== index) focusSlot(result.nextIndex)
     }
 
     function handleSlotKeydown(index: number, event: KeyboardEvent) {
@@ -288,12 +284,10 @@ export const InputOTP = defineComponent({
             maxlength: i === 0 ? undefined : 1,
             value: displayChar(currentValue.value, i),
             disabled: effectiveDisabled.value,
-            readonly: props.readonly || i !== 0,
-            tabindex: i === 0 && !effectiveDisabled.value ? 0 : -1,
+            readonly: props.readonly || undefined,
+            tabindex: getOtpSlotTabIndex(i, currentTab, effectiveDisabled.value),
             id: i === 0 ? fieldId : undefined,
-            'aria-hidden': i === 0 ? undefined : 'true',
-            'aria-label':
-              i === 0 ? formatOtpSlotLabel(labels.value.slotLabel, 1, props.length) : undefined,
+            'aria-label': formatOtpSlotLabel(labels.value.slotLabel, i + 1, props.length),
             'aria-invalid': i === 0 && status.value === 'error' ? true : undefined,
             'aria-required': i === 0 && formItemControl?.required.value ? true : undefined,
             'aria-describedby': i === 0 ? describedBy : undefined,

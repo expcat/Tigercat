@@ -14,6 +14,14 @@ import { getJoinedChromeGroupItemClasses } from './joined-group-utils'
 export const inputGroupBaseClasses = 'inline-flex items-stretch w-full'
 
 /**
+ * Padding for messages taken out of the flex line (`data-tiger-field-extra`).
+ * The count stays under the chrome without stretching the addon to that line.
+ * Values are CSS idents so the class name does not contain quotes.
+ */
+export const inputGroupFieldExtraReserveClasses =
+  'has-[[data-tiger-field-extra=line]]:pb-8 has-[[data-tiger-field-extra=stack]]:pb-16'
+
+/**
  * Compact mode classes — joins chrome marked `data-tiger-chrome`.
  */
 export const inputGroupCompactClasses = getJoinedChromeGroupItemClasses({
@@ -46,6 +54,7 @@ export const inputGroupAddonSizeClasses: Record<ComponentSize, string> = {
 export function getInputGroupClasses(compact: boolean, className?: string): string {
   return classNames(
     inputGroupBaseClasses,
+    inputGroupFieldExtraReserveClasses,
     compact ? inputGroupCompactClasses : inputGroupSpacedClasses,
     className
   )

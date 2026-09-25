@@ -21,6 +21,7 @@ import {
   coerceDatePickerSingle,
   commitDatePickerDay,
   commitDatePickerToday,
+  datePickerTodayInstant,
   confirmDatePicker,
   datePickerFooterButtonClasses,
   datePickerFooterClasses,
@@ -346,8 +347,11 @@ export const DatePicker = defineComponent({
     }
 
     function selectToday() {
-      if (!props.now) return
-      const result = commitDatePickerToday(props.range, props.now, bounds.value)
+      const result = commitDatePickerToday(
+        props.range,
+        datePickerTodayInstant(props.now),
+        bounds.value
+      )
       if ('error' in result) return
       writeCommitted(result.nextCommitted)
       previewRange.value = null

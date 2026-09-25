@@ -357,6 +357,31 @@ export function getInputPasswordToggleClasses(
 }
 
 /**
+ * Marker for messages under a field that sits in an InputGroup.
+ * `line` is one message (count or error). `stack` is both.
+ */
+export const FIELD_EXTRA_ATTR = 'data-tiger-field-extra'
+
+export type FieldExtraKind = 'line' | 'stack'
+
+export function fieldExtraKind(count: number): FieldExtraKind {
+  return count > 1 ? 'stack' : 'line'
+}
+
+/**
+ * Host around chrome plus messages. Inside a group the host is only as tall
+ * as the chrome; messages are positioned by {@link getGroupedFieldExtraStackClasses}.
+ */
+export function getFieldExtrasHostClasses(inGroup: boolean): string {
+  return inGroup ? 'relative min-w-0 flex-1' : 'flex w-full flex-col'
+}
+
+/** Out of flow so a compact sibling stretches to the chrome, not the messages. */
+export function getGroupedFieldExtraStackClasses(): string {
+  return 'absolute inset-x-0 top-full flex flex-col'
+}
+
+/**
  * Character count classes — below the input
  * @since 0.5.0
  */

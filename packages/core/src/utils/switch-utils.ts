@@ -24,17 +24,19 @@ export const switchThumbSizeClasses: Record<ComponentSize, string> = {
   lg: 'h-6 w-6'
 }
 
-/** Logical inset so a checked thumb sits at the reading end in LTR and RTL. */
+/**
+ * Logical inset so a checked thumb sits at the reading end in LTR and RTL.
+ * `start-*` is what Tailwind v4 emits; `inset-inline-start-*` is not, and an
+ * omitted inset leaves the thumb on the inline start while the track color
+ * still changes.
+ */
 export const switchThumbCheckedInsetClasses: Record<ComponentSize, string> = {
-  sm: 'inset-inline-start-[calc(100%-1.125rem)]',
-  md: 'inset-inline-start-[calc(100%-1.375rem)]',
-  lg: 'inset-inline-start-[calc(100%-1.625rem)]'
+  sm: 'start-[calc(100%-1.125rem)]',
+  md: 'start-[calc(100%-1.375rem)]',
+  lg: 'start-[calc(100%-1.625rem)]'
 }
 
-export function getSwitchRootClasses(
-  disabled: boolean = false,
-  ...classes: ClassValue[]
-): string {
+export function getSwitchRootClasses(disabled: boolean = false, ...classes: ClassValue[]): string {
   return classNames(
     switchRootBaseClasses,
     disabled ? 'cursor-not-allowed' : 'cursor-pointer',
@@ -77,7 +79,7 @@ export function getSwitchThumbClasses(
   return classNames(
     'absolute top-1/2 -translate-y-1/2 inline-block rounded-full bg-[var(--tiger-surface)] shadow-[var(--tiger-shadow-sm)] tiger-motion-aware [transition:var(--tiger-transition-base)]',
     switchThumbSizeClasses[size],
-    checked ? switchThumbCheckedInsetClasses[size] : 'inset-inline-start-0.5'
+    checked ? switchThumbCheckedInsetClasses[size] : 'start-0.5'
   )
 }
 

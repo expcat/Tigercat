@@ -22,6 +22,10 @@ import {
   getInputClasses,
   getInputCountClasses,
   getInputErrorClasses,
+  FIELD_EXTRA_ATTR,
+  fieldExtraKind,
+  getFieldExtrasHostClasses,
+  getGroupedFieldExtraStackClasses,
   mergeAriaDescribedBy,
   mergeStyleValues,
   runShakeAnimation,
@@ -344,17 +348,25 @@ export const Textarea = defineComponent({
         )
       }
 
-      return h(
-        'div',
-        {
-          class: classNames(
-            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-            props.className,
-            coerceClassValue(attrClass)
-          )
-        },
-        extras
+      const hostClass = classNames(
+        getFieldExtrasHostClasses(inGroup.value),
+        props.className,
+        coerceClassValue(attrClass)
       )
+      if (!inGroup.value) return h('div', { class: hostClass }, extras)
+
+      const [fieldNode, ...messages] = extras
+      return h('div', { class: hostClass }, [
+        fieldNode,
+        h(
+          'div',
+          {
+            class: getGroupedFieldExtraStackClasses(),
+            [FIELD_EXTRA_ATTR]: fieldExtraKind(messages.length)
+          },
+          messages
+        )
+      ])
     }
   }
 })

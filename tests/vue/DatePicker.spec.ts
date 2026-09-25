@@ -71,6 +71,30 @@ describe('DatePicker', () => {
     expect(emitted()['update:open']?.[0]).toEqual([true])
   })
 
+  it('sets a single-day range when Today is clicked without an injected clock', async () => {
+    const onUpdate = vi.fn()
+    const { container } = render(DatePicker, {
+      props: {
+        range: true,
+        defaultOpen: true,
+        'onUpdate:modelValue': onUpdate
+      }
+    })
+    await fireEvent.click(screen.getByRole('button', { name: 'Today' }))
+    expect(onUpdate).toHaveBeenCalledTimes(1)
+    const [start, end] = onUpdate.mock.calls[0][0] as [Date, Date]
+    const today = new Date()
+    expect(start.getFullYear()).toBe(today.getFullYear())
+    expect(start.getMonth()).toBe(today.getMonth())
+    expect(start.getDate()).toBe(today.getDate())
+    expect(end.getMonth()).toBe(start.getMonth())
+    expect(end.getDate()).toBe(start.getDate())
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const iso = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`
+    expect(container.querySelector('input')).toHaveValue(`${iso} - ${iso}`)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
   it('opens a range month grid in a panel that fits the calendar card', async () => {
     render(DatePicker, { props: { range: true, defaultOpen: true } })
     expect(await screen.findByRole('grid')).toBeInTheDocument()

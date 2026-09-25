@@ -521,7 +521,6 @@ export const Slider = defineComponent({
           class: getSliderRootClasses(
             effectiveDisabled.value,
             classNames(props.className, coerceClassValue(attrs.class)),
-            props.tooltip && (showTooltip.value || focusedThumb.value !== null || isDragging.value),
             status.value
           ),
           style: mergeStyleValues(attrs.style, props.style),

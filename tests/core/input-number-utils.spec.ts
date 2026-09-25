@@ -5,6 +5,7 @@ import {
   formatInputNumberEditingDisplay,
   getInputNumberInputClasses,
   getInputNumberKeyboardNextValue,
+  inputNumberControlsRightClasses,
   parseInputNumberValue,
   stepValue
 } from '@expcat/tigercat-core'
@@ -116,6 +117,12 @@ describe('input-number-utils', () => {
       expect(classes).toContain('pe-8')
       expect(classes).toContain('ps-3')
       expect(classes).not.toContain('px-3')
+    })
+
+    it('pins end controls with a Tailwind v4 inset and a fixed column width', () => {
+      expect(inputNumberControlsRightClasses).toContain('end-0')
+      expect(inputNumberControlsRightClasses).toContain('w-7')
+      expect(inputNumberControlsRightClasses).not.toContain('inset-inline-end')
     })
   })
 

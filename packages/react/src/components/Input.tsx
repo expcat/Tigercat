@@ -11,6 +11,10 @@ import {
   getInputPasswordToggleClasses,
   getInputCountClasses,
   formatInputCountText,
+  FIELD_EXTRA_ATTR,
+  fieldExtraKind,
+  getFieldExtrasHostClasses,
+  getGroupedFieldExtraStackClasses,
   parseInputValue,
   runShakeAnimation,
   SHAKE_CLASS,
@@ -303,15 +307,24 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     )
   }
 
+  const hostClassName = classNames(getFieldExtrasHostClasses(inGroup), className)
+  if (!inGroup) {
+    return (
+      <div className={hostClassName} style={style}>
+        {chrome}
+        {extras}
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={classNames(
-        inGroup ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-        className
-      )}
-      style={style}>
+    <div className={hostClassName} style={style}>
       {chrome}
-      {extras}
+      <div
+        className={getGroupedFieldExtraStackClasses()}
+        {...{ [FIELD_EXTRA_ATTR]: fieldExtraKind(extras.length) }}>
+        {extras}
+      </div>
     </div>
   )
 })

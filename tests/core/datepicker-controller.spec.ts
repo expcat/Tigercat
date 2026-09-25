@@ -9,6 +9,7 @@ import {
   acceptDatePickerCandidate,
   commitDatePickerDay,
   commitDatePickerToday,
+  datePickerTodayInstant,
   confirmDatePicker,
   emptyDatePickerValue,
   formatDatePickerDisplay,
@@ -76,6 +77,16 @@ describe('datepicker controller', () => {
     })
   })
 
+  it('uses an injected clock and otherwise reads the click instant', () => {
+    const injected = new Date(2024, 5, 15)
+    expect(datePickerTodayInstant(injected)).toBe(injected)
+    const clock = datePickerTodayInstant(undefined)
+    const now = new Date()
+    expect(clock.getFullYear()).toBe(now.getFullYear())
+    expect(clock.getMonth()).toBe(now.getMonth())
+    expect(clock.getDate()).toBe(now.getDate())
+  })
+
   it('does not treat an earlier range end as disabled', () => {
     const start = new Date(2024, 5, 10)
     expect(resolveDatePickerDisabled(new Date(2024, 5, 9), {})).toBe(false)
@@ -84,10 +95,7 @@ describe('datepicker controller', () => {
   })
 
   it('swaps a range whose end is before the start', () => {
-    const accepted = acceptDatePickerCandidate(true, [
-      new Date(2024, 0, 10),
-      new Date(2024, 0, 1)
-    ])
+    const accepted = acceptDatePickerCandidate(true, [new Date(2024, 0, 10), new Date(2024, 0, 1)])
     expect(accepted).toEqual({
       ok: true,
       value: [new Date(2024, 0, 1), new Date(2024, 0, 10)]

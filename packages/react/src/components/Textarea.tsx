@@ -9,6 +9,10 @@ import {
   getInputClasses,
   getInputCountClasses,
   getInputErrorClasses,
+  FIELD_EXTRA_ATTR,
+  fieldExtraKind,
+  getFieldExtrasHostClasses,
+  getGroupedFieldExtraStackClasses,
   mergeAriaDescribedBy,
   resolveReadOnlyFlag,
   runShakeAnimation,
@@ -192,13 +196,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     if (!hasExtras) return textarea
 
-    return (
-      <div
-        className={classNames(
-          inGroup ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-          className
-        )}>
-        {textarea}
+    const messages = (
+      <>
         {activeError ? (
           <div id={errorMsgId} className={getInputErrorClasses(effectiveSize)} aria-live="polite">
             {errorMessage}
@@ -210,6 +209,27 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             {formatInputCountText(currentLength, maxLength)}
           </div>
         ) : null}
+      </>
+    )
+    const messageCount = Number(activeError) + Number(showCount)
+    const hostClassName = classNames(getFieldExtrasHostClasses(inGroup), className)
+    if (!inGroup) {
+      return (
+        <div className={hostClassName}>
+          {textarea}
+          {messages}
+        </div>
+      )
+    }
+
+    return (
+      <div className={hostClassName}>
+        {textarea}
+        <div
+          className={getGroupedFieldExtraStackClasses()}
+          {...{ [FIELD_EXTRA_ATTR]: fieldExtraKind(messageCount) }}>
+          {messages}
+        </div>
       </div>
     )
   }

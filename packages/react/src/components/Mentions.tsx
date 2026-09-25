@@ -21,6 +21,10 @@ import {
   clearTextareaAutoResize,
   formatInputCountText,
   getInputCountClasses,
+  FIELD_EXTRA_ATTR,
+  fieldExtraKind,
+  getFieldExtrasHostClasses,
+  getGroupedFieldExtraStackClasses,
   extractMentionQuery,
   filterMentionOptions,
   getEmptyLabels,
@@ -576,15 +580,10 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       )
     }
 
-    return (
-      <div
-        className={classNames(
-          inGroup ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-          className
-        )}
-        style={style}>
-        {textarea}
-        {clearable && currentValue && !effectiveDisabled && !isReadOnly ? (
+    const showClear = Boolean(clearable && currentValue && !effectiveDisabled && !isReadOnly)
+    const messages = (
+      <>
+        {showClear ? (
           <button
             type="button"
             className="self-end text-sm text-[var(--tiger-text-secondary)]"
@@ -606,6 +605,28 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
             {formatInputCountText(currentValue.length, maxLength)}
           </div>
         ) : null}
+      </>
+    )
+    const messageCount = Number(showClear) + Number(activeError) + Number(showCount)
+    const hostClassName = classNames(getFieldExtrasHostClasses(inGroup), className)
+    if (!inGroup) {
+      return (
+        <div className={hostClassName} style={style}>
+          {textarea}
+          {messages}
+          {dropdown}
+        </div>
+      )
+    }
+
+    return (
+      <div className={hostClassName} style={style}>
+        {textarea}
+        <div
+          className={getGroupedFieldExtraStackClasses()}
+          {...{ [FIELD_EXTRA_ATTR]: fieldExtraKind(messageCount) }}>
+          {messages}
+        </div>
         {dropdown}
       </div>
     )

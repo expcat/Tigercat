@@ -43,6 +43,18 @@ describe('InputOTP', () => {
       expect(onUpdate).toHaveBeenCalledWith('1')
     })
 
+    it('moves focus to the next slot after a digit', async () => {
+      const { container } = render(InputOTP, { props: { length: 4 } })
+      const slots = getSlots(container)
+      expect(slots[1]).not.toHaveAttribute('readonly')
+      await fireEvent.update(slots[0], '6')
+      expect(slots[0].value).toBe('6')
+      expect(document.activeElement).toBe(slots[1])
+      await fireEvent.update(slots[1], '2')
+      expect(slots[1].value).toBe('2')
+      expect(document.activeElement).toBe(slots[2])
+    })
+
     it('emits complete when the last slot is filled', async () => {
       const onComplete = vi.fn()
       const { container } = render(InputOTP, {

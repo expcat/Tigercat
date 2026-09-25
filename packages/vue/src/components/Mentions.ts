@@ -32,6 +32,10 @@ import {
   formatInputCountText,
   getEmptyLabels,
   getInputCountClasses,
+  FIELD_EXTRA_ATTR,
+  fieldExtraKind,
+  getFieldExtrasHostClasses,
+  getGroupedFieldExtraStackClasses,
   getInitialMentionsActiveIndex,
   getInputErrorClasses,
   getMentionOptionKey,
@@ -659,55 +663,65 @@ export const Mentions = defineComponent({
         return [textarea, dropdown]
       }
 
-      return h(
-        'div',
-        {
-          class: classNames(
-            inGroup.value ? 'flex flex-col flex-1 min-w-0' : 'flex flex-col w-full',
-            props.className,
-            coerceClassValue(attrClass)
-          ),
-          style: mergeStyleValues(undefined, attrStyle)
-        },
-        [
-          textarea,
-          props.clearable && currentValue.value && !effectiveDisabled.value && !isReadOnly.value
-            ? h(
-                'button',
-                {
-                  type: 'button',
-                  class: 'self-end text-sm text-[var(--tiger-text-secondary)]',
-                  'aria-label': mergedLocale.value?.common?.clearText ?? 'Clear',
-                  onClick: () => commitValue('')
-                },
-                '×'
-              )
-            : null,
-          activeError.value
-            ? h(
-                'div',
-                {
-                  id: errorMsgId,
-                  class: getInputErrorClasses(effectiveSize.value),
-                  'aria-live': 'polite'
-                },
-                props.errorMessage
-              )
-            : null,
-          props.showCount
-            ? h(
-                'div',
-                {
-                  class: getInputCountClasses(
-                    props.maxLength !== undefined && currentValue.value.length > props.maxLength
-                  )
-                },
-                formatInputCountText(currentValue.value.length, props.maxLength)
-              )
-            : null,
-          dropdown
-        ]
-      )
+      const messages = [
+        props.clearable && currentValue.value && !effectiveDisabled.value && !isReadOnly.value
+          ? h(
+              'button',
+              {
+                type: 'button',
+                class: 'self-end text-sm text-[var(--tiger-text-secondary)]',
+                'aria-label': mergedLocale.value?.common?.clearText ?? 'Clear',
+                onClick: () => commitValue('')
+              },
+              '×'
+            )
+          : null,
+        activeError.value
+          ? h(
+              'div',
+              {
+                id: errorMsgId,
+                class: getInputErrorClasses(effectiveSize.value),
+                'aria-live': 'polite'
+              },
+              props.errorMessage
+            )
+          : null,
+        props.showCount
+          ? h(
+              'div',
+              {
+                class: getInputCountClasses(
+                  props.maxLength !== undefined && currentValue.value.length > props.maxLength
+                )
+              },
+              formatInputCountText(currentValue.value.length, props.maxLength)
+            )
+          : null
+      ].filter((node) => node != null)
+
+      const hostProps = {
+        class: classNames(
+          getFieldExtrasHostClasses(inGroup.value),
+          props.className,
+          coerceClassValue(attrClass)
+        ),
+        style: mergeStyleValues(undefined, attrStyle)
+      }
+      if (!inGroup.value) return h('div', hostProps, [textarea, ...messages, dropdown])
+
+      return h('div', hostProps, [
+        textarea,
+        h(
+          'div',
+          {
+            class: getGroupedFieldExtraStackClasses(),
+            [FIELD_EXTRA_ATTR]: fieldExtraKind(messages.length)
+          },
+          messages
+        ),
+        dropdown
+      ])
     }
   }
 })

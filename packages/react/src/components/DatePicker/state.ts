@@ -7,6 +7,7 @@ import {
   coerceDatePickerSingle,
   commitDatePickerDay,
   commitDatePickerToday,
+  datePickerTodayInstant,
   confirmDatePicker,
   emptyDatePickerValue,
   formatDatePickerDisplay,
@@ -268,8 +269,7 @@ export function useDatePickerController(props: DatePickerProps) {
   )
 
   const selectToday = useCallback(() => {
-    if (!now) return
-    const result = commitDatePickerToday(isRangeMode, now, bounds)
+    const result = commitDatePickerToday(isRangeMode, datePickerTodayInstant(now), bounds)
     if ('error' in result) return
     writeCommitted(result.nextCommitted)
     setPreviewRange(null)

@@ -132,7 +132,11 @@ describe('InputGroup', () => {
     })
     const group = screen.getByRole('group')
     expect(group.querySelectorAll('[data-tiger-chrome]').length).toBeGreaterThanOrEqual(2)
+    const extra = group.querySelector('[data-tiger-field-extra]')
+    expect(extra).toHaveAttribute('data-tiger-field-extra', 'line')
+    expect(extra?.className).toContain('absolute')
     expect(screen.getByText('2')).toBeInTheDocument()
+    expect(extra).toContainElement(screen.getByText('2'))
   })
 })
 

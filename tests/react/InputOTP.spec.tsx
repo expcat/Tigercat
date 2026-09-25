@@ -48,13 +48,16 @@ describe('InputOTP', () => {
   })
 
   describe('Input behaviour', () => {
-    it('types into the first slot and shows the rest', () => {
+    it('advances focus to the next slot after each digit', async () => {
+      const user = userEvent.setup()
       const { container } = render(<InputOTP length={4} />)
       const slots = getSlots(container)
-      fireEvent.change(slots[0], { target: { value: '1' } })
-      fireEvent.change(slots[0], { target: { value: '2' } })
-      expect(slots[0].value).toBe('1')
+      expect(slots[1]).not.toHaveAttribute('readonly')
+      await user.click(slots[0])
+      await user.keyboard('62')
+      expect(slots[0].value).toBe('6')
       expect(slots[1].value).toBe('2')
+      expect(document.activeElement).toBe(slots[2])
     })
 
     it('filters out characters rejected by the numeric type', async () => {

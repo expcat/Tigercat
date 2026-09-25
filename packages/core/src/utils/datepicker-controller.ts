@@ -75,8 +75,7 @@ export const datePickerMissingStartReason = 'Choose a start date.'
 export const datePickerMissingEndReason = 'Choose an end date.'
 
 export type DatePickerAcceptResult =
-  | { ok: true; value: Date | null | DatePickerRangeTuple }
-  | { ok: false; reason: string }
+  { ok: true; value: Date | null | DatePickerRangeTuple } | { ok: false; reason: string }
 
 export function resolveDatePickerDisabled(
   date: Date,
@@ -163,8 +162,7 @@ export function commitDatePickerDay(input: {
     return { nextCommitted: day, nextPreview: null, close: true, commit: true }
   }
 
-  const current =
-    input.preview ?? (Array.isArray(input.committed) ? input.committed : [null, null])
+  const current = input.preview ?? (Array.isArray(input.committed) ? input.committed : [null, null])
   const [start, end] = current
   if (!start || end) {
     return {
@@ -174,7 +172,8 @@ export function commitDatePickerDay(input: {
       commit: false
     }
   }
-  const ordered: DatePickerRangeTuple = day.getTime() < start.getTime() ? [day, start] : [start, day]
+  const ordered: DatePickerRangeTuple =
+    day.getTime() < start.getTime() ? [day, start] : [start, day]
   const accepted = acceptDatePickerCandidate(true, ordered, bounds)
   if (!accepted.ok) {
     return {
@@ -228,6 +227,16 @@ export function confirmDatePicker(input: {
     return { close: true, nextCommitted: accepted.value, nextPreview: null }
   }
   return { close: true, nextCommitted: input.committed, nextPreview: null }
+}
+
+/**
+ * Clock for the Today action. An injected `now` wins so tests stay
+ * deterministic. Otherwise the instant is read here, on the click — not
+ * during render.
+ */
+export function datePickerTodayInstant(now?: Date | null): Date {
+  if (now instanceof Date && !Number.isNaN(now.getTime())) return now
+  return new Date()
 }
 
 export function commitDatePickerToday(

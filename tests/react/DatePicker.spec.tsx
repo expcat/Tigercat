@@ -179,6 +179,24 @@ describe('DatePicker', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
   })
 
+  it('sets a single-day range when Today is clicked without an injected clock', () => {
+    const onChange = vi.fn()
+    render(<DatePicker range defaultOpen onChange={onChange} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Today' }))
+    expect(onChange).toHaveBeenCalledTimes(1)
+    const [start, end] = onChange.mock.calls[0][0] as [Date, Date]
+    const today = new Date()
+    expect(start.getFullYear()).toBe(today.getFullYear())
+    expect(start.getMonth()).toBe(today.getMonth())
+    expect(start.getDate()).toBe(today.getDate())
+    expect(end.getMonth()).toBe(start.getMonth())
+    expect(end.getDate()).toBe(start.getDate())
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const iso = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`
+    expect(screen.getByRole('textbox')).toHaveValue(`${iso} - ${iso}`)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
   it('opens a range month grid in a panel that fits the calendar card', async () => {
     render(<DatePicker range defaultOpen />)
     expect(await screen.findByRole('grid')).toBeInTheDocument()
