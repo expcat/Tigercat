@@ -122,7 +122,9 @@ describe('input-styles error message', () => {
   it('places error copy below the field, not as an in-field overlay', () => {
     const cls = getInputErrorClasses()
     expect(cls).toContain('--tiger-error')
-    expect(cls).toContain('mt-1')
+    expect(cls).toContain('--tiger-spacing-md')
+    expect(cls).toContain('--tiger-font-size-sm')
+    expect(cls).toContain('--tiger-line-height-normal')
     expect(cls).not.toContain('inset-y-0')
     expect(tokens(cls)).not.toContain('absolute')
     expect(formatInputCountText(3, 10)).toBe('3 / 10')

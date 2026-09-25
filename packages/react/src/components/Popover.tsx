@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useId, useMemo } from 'react'
+import React, { forwardRef, useEffect, useId, useMemo, useRef } from 'react'
 import { usePopup } from '../utils/use-popup'
 import { useTooltipDelayGroup } from '../utils/tooltip-delay'
 import { renderOverlayPortal } from '../utils/overlay'
@@ -12,8 +12,8 @@ import {
   getPopoverContentStyle,
   getPopoverTriggerClasses,
   resolvePopoverWidth,
-  getFloatingArrowStyle,
-  getPopconfirmArrowClasses,
+  getArrowStyles,
+  getOverlayArrowClasses,
   POPOVER_TITLE_CLASSES,
   POPOVER_TEXT_CLASSES,
   type PopoverProps as CorePopoverProps,
@@ -67,6 +67,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
   const contentId = `${popoverId}-content`
 
   const delayGroup = useTooltipDelayGroup()
+  const arrowRef = useRef<HTMLElement>(null)
   const {
     currentVisible,
     setVisible,
@@ -78,7 +79,9 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     actualPlacement,
     positioned,
     overlayTarget,
-    triggerHandlers
+    triggerHandlers,
+    arrowX,
+    arrowY
   } = usePopup({
     open,
     defaultOpen,
@@ -89,6 +92,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
     showDelay,
     hideDelay,
     onOpenChange,
+    arrowRef,
     getSkipShowDelay: () => delayGroup?.shouldSkip() ?? false,
     onShown: () => delayGroup?.noteOpen()
   })
@@ -124,6 +128,11 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
   const hasCustomWidth = Boolean(getPopoverContentStyle(width))
   const contentClasses = useMemo(() => getPopoverContentClasses(hasCustomWidth), [hasCustomWidth])
   const contentStyle = useMemo(() => getPopoverContentStyle(width), [width])
+  const arrowClasses = useMemo(() => getOverlayArrowClasses(actualPlacement), [actualPlacement])
+  const arrowStyle = useMemo(
+    () => getArrowStyles(actualPlacement, { x: arrowX, y: arrowY }) as React.CSSProperties,
+    [actualPlacement, arrowX, arrowY]
+  )
 
   if (!children) return null
 
@@ -165,30 +174,34 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
             style={floatingStyles}
             data-positioned={positioned}
             aria-hidden={false}>
-            <div
-              id={popoverId}
-              role="dialog"
-              aria-modal="false"
-              aria-label={hasTitle ? undefined : ariaLabel}
-              aria-labelledby={hasTitle ? titleId : undefined}
-              aria-describedby={hasContent ? contentId : undefined}
-              className={contentClasses}
-              style={contentStyle}>
-              {hasTitle && (
-                <div id={titleId} className={POPOVER_TITLE_CLASSES}>
-                  {titleContent || title}
-                </div>
-              )}
+            <div className="relative">
               <span
+                ref={arrowRef}
                 data-tiger-floating-arrow=""
-                className={getPopconfirmArrowClasses()}
-                style={getFloatingArrowStyle(actualPlacement)}
+                className={arrowClasses}
+                style={arrowStyle}
+                aria-hidden="true"
               />
-              {hasContent && (
-                <div id={contentId} className={POPOVER_TEXT_CLASSES}>
-                  {content}
-                </div>
-              )}
+              <div
+                id={popoverId}
+                role="dialog"
+                aria-modal="false"
+                aria-label={hasTitle ? undefined : ariaLabel}
+                aria-labelledby={hasTitle ? titleId : undefined}
+                aria-describedby={hasContent ? contentId : undefined}
+                className={contentClasses}
+                style={contentStyle}>
+                {hasTitle && (
+                  <div id={titleId} className={POPOVER_TITLE_CLASSES}>
+                    {titleContent || title}
+                  </div>
+                )}
+                {hasContent && (
+                  <div id={contentId} className={POPOVER_TEXT_CLASSES}>
+                    {content}
+                  </div>
+                )}
+              </div>
             </div>
           </div>,
           overlayTarget

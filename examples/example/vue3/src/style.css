@@ -27,7 +27,7 @@ html {
 }
 
 h2[data-demo-anchor='true'] {
-  scroll-margin-top: 140px;
+  scroll-margin-top: var(--demo-anchor-offset, 3.5rem);
 }
 
 /* Keep scrolling but hide scrollbars to avoid sider width shifting */

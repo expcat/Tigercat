@@ -26,6 +26,7 @@ import {
   getFormItemErrorPopupClasses,
   getFormItemFieldClasses,
   getFormItemLabelClasses,
+  getFieldMessageClasses,
   getFormItemErrorSrOnlyClasses,
   hasRequiredRule,
   isFormItemGroupControl,
@@ -37,12 +38,8 @@ import {
   type FormErrorDisplayMode,
   type InputStatus
 } from '@expcat/tigercat-core'
-import { schemaFormExtraClasses } from '@expcat/tigercat-core/schema-form'
 import { FormContextKey, type FormContext } from './Form'
-import {
-  FORM_ITEM_CONTROL_INJECTION_KEY,
-  type VueFormItemControlContext
-} from './FormItemContext'
+import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
 export { FORM_ITEM_CONTROL_INJECTION_KEY } from './FormItemContext'
 
 const FormItemControlHost = defineComponent({
@@ -222,10 +219,7 @@ export const FormItem = defineComponent({
       ([name, itemDisabled, formDisabled, conditionDisabled]) => {
         const ctx = formContext.value
         if (!ctx || !name) return
-        ctx.registerFieldDisabled(
-          name,
-          Boolean(itemDisabled || formDisabled || conditionDisabled)
-        )
+        ctx.registerFieldDisabled(name, Boolean(itemDisabled || formDisabled || conditionDisabled))
       },
       { immediate: true }
     )
@@ -294,9 +288,9 @@ export const FormItem = defineComponent({
     const controlDisabled = computed(() =>
       Boolean(
         props.disabled ||
-          formContext.value?.disabled ||
-          formContext.value?.loading ||
-          conditionState.value.disabled
+        formContext.value?.disabled ||
+        formContext.value?.loading ||
+        conditionState.value.disabled
       )
     )
     const effectiveFieldId = computed(() => fieldId)
@@ -422,7 +416,8 @@ export const FormItem = defineComponent({
         const announcement = formContext.value?.errorAnnouncement ?? 'polite'
         const popupOpen =
           effectiveShowMessage.value && props.errorDisplayMode === 'popup' && popupActive.value
-        const hidden = !effectiveShowMessage.value || (props.errorDisplayMode === 'popup' && !popupOpen)
+        const hidden =
+          !effectiveShowMessage.value || (props.errorDisplayMode === 'popup' && !popupOpen)
         const errorClass = hidden
           ? getFormItemErrorSrOnlyClasses()
           : props.errorDisplayMode === 'block'
@@ -481,11 +476,26 @@ export const FormItem = defineComponent({
         [
           h('div', fieldWrapper, [
             fieldChildren.length > 0
-              ? h(FormItemControlHost, { control: controlContext }, { default: () => fieldChildren })
+              ? h(
+                  FormItemControlHost,
+                  { control: controlContext },
+                  { default: () => fieldChildren }
+                )
               : null,
             ...defaultSlot.slice(1)
           ]),
-          props.extra ? h('p', { class: schemaFormExtraClasses }, props.extra) : null,
+          props.extra
+            ? h(
+                'p',
+                {
+                  class: classNames(
+                    'tiger-schema-form__extra',
+                    getFieldMessageClasses(actualSize.value, 'hint')
+                  )
+                },
+                props.extra
+              )
+            : null,
           errorElement
         ]
       )

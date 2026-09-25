@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, onBeforeUnmount, PropType, useId, watch } from 'vue'
+import { defineComponent, computed, h, onBeforeUnmount, PropType, ref, useId, watch } from 'vue'
 import { useTooltipDelayGroup } from '../utils/tooltip-delay'
 import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
@@ -13,8 +13,8 @@ import {
   getPopoverContentStyle,
   getPopoverTriggerClasses,
   resolvePopoverWidth,
-  getFloatingArrowStyle,
-  getPopconfirmArrowClasses,
+  getArrowStyles,
+  getOverlayArrowClasses,
   POPOVER_TITLE_CLASSES,
   POPOVER_TEXT_CLASSES,
   type PopoverTrigger,
@@ -64,6 +64,7 @@ export const Popover = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
     const delayGroup = useTooltipDelayGroup()
+    const arrowRef = ref<HTMLElement | null>(null)
 
     const {
       currentVisible,
@@ -76,10 +77,13 @@ export const Popover = defineComponent({
       actualPlacement,
       positioned,
       overlayTarget,
-      triggerHandlers
+      triggerHandlers,
+      arrowX,
+      arrowY
     } = usePopup({
       props,
       emit,
+      arrowRef,
       getSkipShowDelay: () => delayGroup?.shouldSkip() ?? false,
       onShown: () => delayGroup?.noteOpen()
     })
@@ -123,6 +127,10 @@ export const Popover = defineComponent({
     const hasCustomWidth = computed(() => Boolean(getPopoverContentStyle(props.width)))
     const contentClasses = computed(() => getPopoverContentClasses(hasCustomWidth.value))
     const contentStyle = computed(() => getPopoverContentStyle(props.width))
+    const arrowClasses = computed(() => getOverlayArrowClasses(actualPlacement.value))
+    const arrowStyle = computed(() =>
+      getArrowStyles(actualPlacement.value, { x: arrowX.value, y: arrowY.value })
+    )
 
     return () => {
       const triggerSlotContent = slots.trigger
@@ -175,38 +183,42 @@ export const Popover = defineComponent({
                     'aria-hidden': false
                   },
                   [
-                    h(
-                      'div',
-                      {
-                        id: popoverId,
-                        role: 'dialog',
-                        'aria-modal': 'false',
-                        'aria-label': hasTitle ? undefined : props.ariaLabel,
-                        'aria-labelledby': hasTitle ? titleId : undefined,
-                        'aria-describedby': hasContent ? contentId : undefined,
-                        class: contentClasses.value,
-                        style: contentStyle.value
-                      },
-                      [
-                        hasTitle &&
-                          h(
-                            'div',
-                            { id: titleId, class: POPOVER_TITLE_CLASSES },
-                            slots.title ? slots.title() : props.title
-                          ),
-                        h('span', {
-                          'data-tiger-floating-arrow': '',
-                          class: getPopconfirmArrowClasses(),
-                          style: getFloatingArrowStyle(actualPlacement.value)
-                        }),
-                        hasContent &&
-                          h(
-                            'div',
-                            { id: contentId, class: POPOVER_TEXT_CLASSES },
-                            slots.content ? slots.content() : props.content
-                          )
-                      ].filter(Boolean)
-                    )
+                    h('div', { class: 'relative' }, [
+                      h('span', {
+                        ref: arrowRef,
+                        'data-tiger-floating-arrow': '',
+                        class: arrowClasses.value,
+                        style: arrowStyle.value,
+                        'aria-hidden': 'true'
+                      }),
+                      h(
+                        'div',
+                        {
+                          id: popoverId,
+                          role: 'dialog',
+                          'aria-modal': 'false',
+                          'aria-label': hasTitle ? undefined : props.ariaLabel,
+                          'aria-labelledby': hasTitle ? titleId : undefined,
+                          'aria-describedby': hasContent ? contentId : undefined,
+                          class: contentClasses.value,
+                          style: contentStyle.value
+                        },
+                        [
+                          hasTitle &&
+                            h(
+                              'div',
+                              { id: titleId, class: POPOVER_TITLE_CLASSES },
+                              slots.title ? slots.title() : props.title
+                            ),
+                          hasContent &&
+                            h(
+                              'div',
+                              { id: contentId, class: POPOVER_TEXT_CLASSES },
+                              slots.content ? slots.content() : props.content
+                            )
+                        ].filter(Boolean)
+                      )
+                    ])
                   ]
                 ),
                 overlayTarget.value

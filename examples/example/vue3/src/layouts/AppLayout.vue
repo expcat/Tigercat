@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { AnchorLink } from '@expcat/tigercat-vue/AnchorLink'
 import { Breadcrumb } from '@expcat/tigercat-vue/Breadcrumb'
 import { BreadcrumbItem } from '@expcat/tigercat-vue/BreadcrumbItem'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { ScrollSpy } from '@expcat/tigercat-vue/ScrollSpy'
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type { ThemePresetName } from '@expcat/tigercat-core'
+import { overlayZIndexClass, type ThemePresetName } from '@expcat/tigercat-core'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
+import { collectDemoSections, sameDemoSections } from '@demo-shared/demo-sections'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
-import { Anchor } from '@expcat/tigercat-vue/Anchor'
 import {
   getStoredColorScheme,
   getStoredLang,
@@ -26,25 +26,12 @@ import A11yDebugPanel from '../components/A11yDebugPanel.vue'
 
 const isDev = import.meta.env.DEV
 
-interface DemoSection {
-  id: string
-  label: string
-}
-
-function slugify(input: string): string {
-  return input
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9\u4e00-\u9fa5\-]/g, '')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-}
-
 const route = useRoute()
 const pageRootRef = ref<HTMLElement | null>(null)
 const mainScrollRef = ref<HTMLElement | null>(null)
-const sections = ref<DemoSection[]>([])
+const stickyRef = ref<HTMLElement | null>(null)
+const sections = ref<ReturnType<typeof collectDemoSections>>([])
+const anchorOffset = ref(0)
 const pageTitle = ref('')
 const lang = ref<DemoLang>(getStoredLang())
 const theme = ref(getStoredTheme())
@@ -111,13 +98,13 @@ const closeSider = () => {
 
 const getMainContainer = () => mainScrollRef.value || window
 
-const handleAnchorClick = (_event: Event, href: string) => {
-  try {
-    window.history.replaceState(null, '', href)
-  } catch {
-    // ignore
-  }
-}
+const sectionItems = computed(() =>
+  sections.value.map((section) => ({
+    key: section.id,
+    href: `#${section.id}`,
+    label: section.label
+  }))
+)
 
 watch(
   () => lang.value,
@@ -159,34 +146,8 @@ async function collectSections() {
   const h1 = root.querySelector('h1')
   pageTitle.value = (h1?.textContent ?? '').trim()
 
-  const headings = Array.from(root.querySelectorAll('h2'))
-    .map((el) => el as HTMLHeadingElement)
-    .filter((el) => el.textContent && el.textContent.trim().length > 0)
-
-  const usedIds = new Set<string>()
-  const nextSections: DemoSection[] = []
-
-  for (const h2 of headings) {
-    const label = (h2.textContent ?? '').trim()
-    let id = h2.id?.trim()
-    if (!id) id = slugify(label)
-    if (!id) continue
-
-    let uniqueId = id
-    let counter = 2
-    while (usedIds.has(uniqueId) || document.getElementById(uniqueId)) {
-      uniqueId = `${id}-${counter}`
-      counter += 1
-    }
-
-    usedIds.add(uniqueId)
-    h2.id = uniqueId
-    h2.setAttribute('data-demo-anchor', 'true')
-
-    nextSections.push({ id: uniqueId, label })
-  }
-
-  sections.value = nextSections
+  const nextSections = collectDemoSections(root)
+  if (!sameDemoSections(sections.value, nextSections)) sections.value = nextSections
 }
 
 let sectionObserver: MutationObserver | null = null
@@ -206,6 +167,23 @@ function setupSectionObserver() {
   sectionObserver.observe(root, { childList: true, subtree: true })
 }
 
+let stickyResizeObserver: ResizeObserver | null = null
+
+watch(stickyRef, (el) => {
+  stickyResizeObserver?.disconnect()
+  stickyResizeObserver = null
+  if (!el || typeof ResizeObserver === 'undefined') {
+    anchorOffset.value = 0
+    return
+  }
+  const measure = () => {
+    anchorOffset.value = Math.ceil(el.getBoundingClientRect().height)
+  }
+  stickyResizeObserver = new ResizeObserver(measure)
+  stickyResizeObserver.observe(el)
+  measure()
+})
+
 onMounted(() => {
   setupMobileDetection()
   collectSections()
@@ -215,6 +193,7 @@ onMounted(() => {
 onUnmounted(() => {
   mqlCleanup?.()
   sectionObserver?.disconnect()
+  stickyResizeObserver?.disconnect()
   if (sectionDebounceTimer) clearTimeout(sectionDebounceTimer)
 })
 
@@ -256,36 +235,29 @@ watch(
           @close="closeSider" />
 
         <main class="flex-1 min-w-0 h-full overflow-hidden">
-          <div ref="mainScrollRef" class="h-full overflow-y-auto overflow-x-hidden">
+          <div
+            ref="mainScrollRef"
+            class="h-full overflow-y-auto overflow-x-hidden"
+            :style="{ '--demo-anchor-offset': `${anchorOffset + 8}px` }">
             <div
               v-if="!isHome && (headerTitle || sections.length > 0)"
-              class="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
-              <div class="px-6 py-3">
-                <div class="flex items-center justify-between gap-4">
-                  <div
-                    class="min-w-0 text-sm font-semibold text-gray-900 truncate dark:text-gray-100">
-                    <Breadcrumb>
-                      <BreadcrumbItem href="/">{{ homeLabel }}</BreadcrumbItem>
-                      <BreadcrumbItem current>{{ headerTitle }}</BreadcrumbItem>
-                      <template #extra>
-                        <Anchor
-                          v-if="sections.length > 0"
-                          :affix="false"
-                          direction="horizontal"
-                          :getContainer="getMainContainer"
-                          class="flex items-center justify-end"
-                          @click="handleAnchorClick">
-                          <AnchorLink
-                            v-for="s in sections"
-                            :key="s.id"
-                            :href="`#${s.id}`"
-                            :title="s.label"
-                            class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800" />
-                        </Anchor>
-                      </template>
-                    </Breadcrumb>
-                  </div>
-                </div>
+              ref="stickyRef"
+              :class="[
+                'sticky top-0 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80',
+                overlayZIndexClass.viewport
+              ]">
+              <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 px-6 py-2">
+                <Breadcrumb class="w-auto shrink-0">
+                  <BreadcrumbItem href="/">{{ homeLabel }}</BreadcrumbItem>
+                  <BreadcrumbItem current>{{ headerTitle }}</BreadcrumbItem>
+                </Breadcrumb>
+                <ScrollSpy
+                  v-if="sectionItems.length > 0"
+                  :items="sectionItems"
+                  orientation="horizontal"
+                  :target-offset="anchorOffset"
+                  :get-container="getMainContainer"
+                  class="min-w-0 justify-self-end [&_ul]:max-w-full [&_ul]:flex-nowrap [&_ul]:overflow-x-auto [&_li]:shrink-0" />
               </div>
             </div>
 

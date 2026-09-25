@@ -2,6 +2,7 @@
  * Popover utility functions
  */
 import { classNames } from './class-names'
+import { getOverlayPanelClasses } from './overlay-panel'
 
 /** Base popover container classes */
 export function getPopoverContainerClasses(): string {
@@ -21,14 +22,8 @@ export function getPopoverTriggerClasses(disabled: boolean): string {
 export function getPopoverContentClasses(hasCustomWidth = false): string {
   return classNames(
     'tiger-popover-content',
-    hasCustomWidth ? undefined : 'min-w-[200px]',
-    hasCustomWidth ? undefined : 'max-w-[var(--tiger-component-popover-max-width)]',
-    'p-[var(--tiger-component-popover-padding)]',
-    'bg-[var(--tiger-surface)]',
-    'rounded-[var(--tiger-component-popover-border-radius)]',
-    'shadow-[var(--tiger-component-popover-shadow)]',
-    'border',
-    'border-[var(--tiger-border)]'
+    getOverlayPanelClasses(),
+    hasCustomWidth ? undefined : 'min-w-[200px] max-w-[20rem]'
   )
 }
 

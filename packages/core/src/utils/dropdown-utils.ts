@@ -61,14 +61,22 @@ export const DROPDOWN_CHEVRON_PATH = 'M6 9l6 6 6-6'
 export function getDropdownMenuClasses(): string {
   return classNames(
     'tiger-dropdown-menu',
-    'min-w-[var(--tiger-component-dropdown-min-width)]',
-    'py-1.5 px-1',
-    'rounded-[var(--tiger-component-dropdown-border-radius)]',
+    'min-w-[180px]',
+    'py-1.5',
+    'rounded-[var(--tiger-radius-lg)]',
     'bg-[var(--tiger-surface)]',
     'border border-[var(--tiger-border)]',
-    'shadow-[var(--tiger-component-dropdown-shadow)]',
-    'ring-1 ring-black/[0.04]'
+    'shadow-[var(--tiger-shadow-lg)]',
+    'overflow-hidden'
   )
+}
+
+/** Full-width rule between items. Not a border on the rounded row (that clips to a short centered stub). */
+export const dropdownItemDividedClasses =
+  "relative mt-1 before:pointer-events-none before:absolute before:inset-x-0 before:-top-1 before:z-10 before:h-px before:bg-[var(--tiger-border)] before:content-['']"
+
+export function getDropdownSeparatorClasses(): string {
+  return 'my-1 h-px bg-[var(--tiger-border)]'
 }
 
 /**
@@ -85,7 +93,7 @@ export function getDropdownItemClasses(disabled: boolean, divided: boolean): str
     'text-start',
     'focus:outline-none',
     'focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)]/40 focus-visible:ring-inset',
-    divided && 'mt-1 border-t border-[var(--tiger-border)] pt-1',
+    divided && dropdownItemDividedClasses,
     disabled
       ? 'cursor-not-allowed opacity-50'
       : classNames(

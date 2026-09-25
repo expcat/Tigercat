@@ -24,6 +24,7 @@ import {
   getDropdownTriggerClasses,
   getDropdownChevronClasses,
   getDropdownMenuClasses,
+  getDropdownSeparatorClasses,
   getDropdownItemClasses,
   getPopupMenuItemClasses,
   getPopupMenuShortcutClasses,
@@ -284,7 +285,7 @@ function renderPopupItems(
       return h('div', {
         key: item.key,
         role: 'separator',
-        class: 'my-1 h-px bg-[var(--tiger-border)]'
+        class: getDropdownSeparatorClasses()
       })
     }
     if (type === 'submenu') {

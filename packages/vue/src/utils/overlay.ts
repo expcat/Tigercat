@@ -6,6 +6,7 @@ import {
   computeFloatingPosition,
   autoUpdateFloating,
   resolveAnchoredOverlayTarget,
+  collectOverlayListenerDocuments,
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
   getOverlayDirLang,
@@ -36,6 +37,15 @@ import {
 } from 'vue'
 
 const OVERLAY_LAYER_SELECTOR = '[data-tiger-overlay-layer]'
+
+function bindOverlayEscape(onEscape: () => void, getLayer: () => HTMLElement | null): () => void {
+  const releases = collectOverlayListenerDocuments().map((doc) =>
+    registerEscapeDismiss(doc, onEscape, getLayer)
+  )
+  return () => {
+    for (const release of releases) release()
+  }
+}
 
 function resolveOverlayLayer(element: HTMLElement | null): HTMLElement | null {
   return element?.closest<HTMLElement>(OVERLAY_LAYER_SELECTOR) ?? null
@@ -69,8 +79,19 @@ export function useVueClickOutside({
     }
   }
 
-  const attach = () => document.addEventListener('click', handler)
-  const detach = () => document.removeEventListener('click', handler)
+  let listening: Document[] = []
+  const attach = () => {
+    listening = collectOverlayListenerDocuments(
+      (refs?.length ? refs.map((item) => item?.value) : [containerRef?.value]).filter(
+        (node): node is HTMLElement => Boolean(node)
+      )
+    )
+    for (const doc of listening) doc.addEventListener('click', handler)
+  }
+  const detach = () => {
+    for (const doc of listening) doc.removeEventListener('click', handler)
+    listening = []
+  }
 
   if (!defer) {
     attach()
@@ -102,7 +123,7 @@ export function useVueEscapeKey({
     (isEnabled) => {
       removeEntry?.()
       removeEntry = isEnabled
-        ? registerEscapeDismiss(document, onEscape, () => layerRef?.value ?? null)
+        ? bindOverlayEscape(onEscape, () => layerRef?.value ?? null)
         : undefined
     },
     { immediate: true, flush: 'sync' }
@@ -362,6 +383,7 @@ export interface UseVueFloatingReturn {
    */
   update: () => Promise<void>
   isPositioned: Ref<boolean>
+  referenceHidden: Ref<boolean>
   referenceWidth: Ref<number>
 }
 
@@ -399,6 +421,7 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
   const arrowX = ref<number | undefined>(undefined)
   const arrowY = ref<number | undefined>(undefined)
   const isPositioned = ref(false)
+  const referenceHidden = ref(false)
   const referenceWidth = ref(0)
 
   let cleanup: FloatingCleanup | null = null
@@ -437,6 +460,7 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
     referenceWidth.value = Number(reference.getBoundingClientRect().width) || 0
     x.value = result.x
     y.value = result.y
+    referenceHidden.value = result.referenceHidden
 
     if (result.placement !== placement.value) {
       placement.value = result.placement
@@ -499,6 +523,7 @@ export function useVueFloating(options: UseVueFloatingOptions): UseVueFloatingRe
     arrowY,
     update,
     isPositioned,
+    referenceHidden,
     referenceWidth
   }
 }
@@ -630,7 +655,8 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
     '--tiger-overlay-y': `${floating.y.value}px`,
     '--tiger-overlay-reference-width': `${floating.referenceWidth.value}px`,
     zIndex: OVERLAY_Z_INDEX.overlay,
-    transformOrigin: getTransformOrigin(floating.placement.value)
+    transformOrigin: getTransformOrigin(floating.placement.value),
+    ...(floating.referenceHidden.value ? { visibility: 'hidden' as const } : {})
   }))
   const floatingClasses = computed(() =>
     getAnchoredOverlayLayoutClasses(

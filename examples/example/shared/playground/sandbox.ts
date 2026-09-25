@@ -19,6 +19,118 @@ interface SandboxDocumentOptions {
   enableTailwindJit?: boolean
 }
 
+function isHiddenOverlay(node: Element): boolean {
+  if (!(node instanceof HTMLElement)) return true
+  if (node.hidden || node.getAttribute('aria-hidden') === 'true') return true
+  const view = node.ownerDocument.defaultView
+  if (!view) return false
+  const style = view.getComputedStyle(node)
+  return style.display === 'none' || style.visibility === 'hidden'
+}
+
+/** Side drawers pin both edges, so their box is the iframe rather than content. */
+function panelStretchesToViewport(panel: Element): boolean {
+  const view = panel.ownerDocument.defaultView
+  if (!view) return false
+  const style = view.getComputedStyle(panel)
+  if (style.position !== 'absolute' && style.position !== 'fixed') return false
+  const top = Number.parseFloat(style.top)
+  const bottom = Number.parseFloat(style.bottom)
+  return Number.isFinite(top) && Number.isFinite(bottom) && top <= 1 && bottom <= 1
+}
+
+/**
+ * Dialogs cap themselves with `max-height: 90dvh` and `flex-1` bodies, which
+ * collapse to the current iframe. Relax those caps for one measurement so the
+ * frame can grow to the panel, then shrink when it closes.
+ */
+function measureUnconstrainedPanelBottom(panel: HTMLElement, scrollY: number): number {
+  const view = panel.ownerDocument.defaultView
+  const nodes = [panel, ...panel.querySelectorAll<HTMLElement>('*')]
+  const saved = nodes.map((node) => node.style.cssText)
+  for (const node of nodes) {
+    if (!view) break
+    const style = view.getComputedStyle(node)
+    const maxHeight = style.maxHeight
+    const limitedByViewport =
+      /(?:d|s|l)?vh\b/.test(maxHeight) ||
+      (maxHeight.endsWith('px') && Number.parseFloat(maxHeight) <= (view.innerHeight || 0))
+    if (limitedByViewport) node.style.maxHeight = 'none'
+    if (
+      style.overflowY === 'auto' ||
+      style.overflowY === 'scroll' ||
+      style.overflowY === 'hidden'
+    ) {
+      node.style.overflow = 'visible'
+    }
+    if (style.flexGrow !== '0') {
+      node.style.flexGrow = '0'
+      node.style.flexBasis = 'auto'
+    }
+  }
+  const box = panel.getBoundingClientRect()
+  const parent = panel.parentElement
+  const parentStyle = parent && view ? view.getComputedStyle(parent) : null
+  const padding =
+    (Number.parseFloat(parentStyle?.paddingTop ?? '') || 0) +
+    (Number.parseFloat(parentStyle?.paddingBottom ?? '') || 0)
+  const bottom = Math.max(box.bottom + scrollY, box.height + padding)
+  nodes.forEach((node, index) => {
+    node.style.cssText = saved[index] ?? ''
+  })
+  return bottom
+}
+
+/**
+ * Content height of a demo iframe. `html, body { min-height: 100% }` stretches
+ * scrollHeight to the current frame, so the measurement clears that stretch
+ * first. Open overlays are included so the frame can grow, then shrink again.
+ * Viewport-filling shells (modal / drawer) contribute their panel, not the
+ * stretched iframe, so a closed trigger stays short. Fixed message toasts do
+ * not affect scrollHeight, so an open stack is measured from its box.
+ */
+export function measureSandboxContentHeight(doc: Document): number {
+  const html = doc.documentElement
+  const body = doc.body
+  if (!html || !body) return 0
+  const htmlMin = html.style.minHeight
+  const bodyMin = body.style.minHeight
+  html.style.minHeight = '0'
+  body.style.minHeight = '0'
+  let height = Math.max(body.scrollHeight, html.scrollHeight)
+  const view = doc.defaultView
+  const scrollY = view?.scrollY ?? 0
+  // Keep this literal equal to DEMO_OVERLAY_STAGE_HEIGHT. The function is
+  // copied into the iframe via toString(), so it cannot close over imports.
+  const overlayStageHeight = 720
+  for (const node of doc.querySelectorAll('[data-tiger-overlay-layer]')) {
+    if (isHiddenOverlay(node)) continue
+    const box = node.getBoundingClientRect()
+    height = Math.max(height, box.bottom + scrollY)
+    for (const child of node.querySelectorAll('*')) {
+      const childBox = child.getBoundingClientRect()
+      if (childBox.height > 0) height = Math.max(height, childBox.bottom + scrollY)
+    }
+    const panel = node.querySelector(
+      '[data-tiger-modal]:not([data-tiger-overlay-layer]), [data-tiger-drawer]:not([data-tiger-overlay-layer])'
+    )
+    if (!(panel instanceof HTMLElement)) continue
+    if (panelStretchesToViewport(panel)) {
+      height = Math.max(height, overlayStageHeight)
+      continue
+    }
+    height = Math.max(height, measureUnconstrainedPanelBottom(panel, scrollY))
+  }
+  for (const node of doc.querySelectorAll('[data-tiger-message-container]')) {
+    if (isHiddenOverlay(node)) continue
+    const box = node.getBoundingClientRect()
+    if (box.height > 0) height = Math.max(height, box.bottom + scrollY)
+  }
+  html.style.minHeight = htmlMin
+  body.style.minHeight = bodyMin
+  return Math.ceil(height)
+}
+
 function safeJson(value: unknown): string {
   return JSON.stringify(value).replace(/</g, '\\u003c').replace(/-->/g, '--\\u003e')
 }
@@ -181,18 +293,11 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
         if (typeof message === 'string' && ${RESIZE_OBSERVER_LOOP}.test(message)) return
         send({ type: 'runtime-error', message })
       })
-      const measureHeight = () => {
-        let height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-        for (const node of document.querySelectorAll('[data-tiger-overlay-layer]')) {
-          const box = node.getBoundingClientRect()
-          height = Math.max(height, box.bottom + window.scrollY)
-          for (const child of node.querySelectorAll('*')) {
-            const childBox = child.getBoundingClientRect()
-            if (childBox.height > 0) height = Math.max(height, childBox.bottom + window.scrollY)
-          }
-        }
-        return Math.ceil(height)
-      }
+      ${isHiddenOverlay.toString()}
+      ${panelStretchesToViewport.toString()}
+      ${measureUnconstrainedPanelBottom.toString()}
+      const measureSandboxContentHeight = ${measureSandboxContentHeight.toString()}
+      const measureHeight = () => measureSandboxContentHeight(document)
       let lastSentHeight = 0
       let resizeFrame = 0
       const sendResize = () => {

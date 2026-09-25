@@ -1,6 +1,7 @@
 import type { ComponentSize } from '../types/base'
 import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
+import { getFieldMessageClasses } from './form-item-styles'
 
 export interface ExtractTagCandidatesResult {
   /** Complete segments (trimmed, non-empty) that ended with a delimiter */
@@ -117,10 +118,7 @@ export function moveTag(tags: readonly string[], from: number, to: number): stri
   return next
 }
 
-export function formatTagRejectAnnouncement(
-  template: string,
-  rejection: TagRejection
-): string {
+export function formatTagRejectAnnouncement(template: string, rejection: TagRejection): string {
   return template.replace('{tag}', rejection.tag).replace('{reason}', rejection.reason)
 }
 
@@ -290,6 +288,6 @@ export function getTagsInputClearButtonClasses(): string {
   )
 }
 
-export function getTagsInputErrorClasses(): string {
-  return 'mt-1 text-sm text-[var(--tiger-error)]'
+export function getTagsInputErrorClasses(size: ComponentSize = 'md'): string {
+  return getFieldMessageClasses(size, 'error')
 }

@@ -1,5 +1,6 @@
 import type { PopupMenuCheckChange, PopupMenuItem, PopupMenuItemType } from '../types/popup-menu'
 import { classNames } from './class-names'
+import { dropdownItemDividedClasses } from './dropdown-utils'
 import { resolveLinkHref } from './link-utils'
 import { navLabels } from './i18n/w9/nav-labels'
 
@@ -63,19 +64,17 @@ export function applyPopupMenuCheck(
   return items.map((item) => {
     const type = resolvePopupMenuItemType(item)
     if (item.key === change.key) return { ...item, checked: change.checked }
-    if (
-      type === 'radio' &&
-      change.checked &&
-      item.group != null &&
-      item.group === change.group
-    ) {
+    if (type === 'radio' && change.checked && item.group != null && item.group === change.group) {
       return { ...item, checked: false }
     }
     return item
   })
 }
 
-export function popupMenuAccessibleName(item: PopupMenuItem, dangerLabel = navLabels.dangerItem): string {
+export function popupMenuAccessibleName(
+  item: PopupMenuItem,
+  dangerLabel = navLabels.dangerItem
+): string {
   const label = item.label ?? ''
   if (resolvePopupMenuItemType(item) !== 'danger') return label
   if (!label) return dangerLabel
@@ -87,12 +86,16 @@ export function popupMenuItemHref(item: PopupMenuItem): string | undefined {
   return resolveLinkHref(item.href, { disabled: item.disabled })
 }
 
-export function getPopupMenuItemClasses(disabled: boolean, danger: boolean, divided = false): string {
+export function getPopupMenuItemClasses(
+  disabled: boolean,
+  danger: boolean,
+  divided = false
+): string {
   return classNames(
     'flex items-center gap-2 w-full rounded-[var(--tiger-radius-md)] px-3 py-1.5 text-sm text-start',
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)]/40 focus-visible:ring-inset',
     danger ? 'text-[var(--tiger-error)]' : 'text-[var(--tiger-text)]',
-    divided && 'mt-1 border-t border-[var(--tiger-border)] pt-1',
+    divided && dropdownItemDividedClasses,
     disabled
       ? 'cursor-not-allowed opacity-50'
       : 'cursor-pointer hover:bg-[var(--tiger-surface-muted)]'

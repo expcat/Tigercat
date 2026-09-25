@@ -156,6 +156,129 @@ function createFloatingMiddleware({
   return middleware
 }
 
+interface ViewportRect {
+  top: number
+  right: number
+  bottom: number
+  left: number
+  width: number
+  height: number
+}
+
+function toViewportRect(rect: {
+  top: number
+  right: number
+  bottom: number
+  left: number
+  width: number
+  height: number
+}): ViewportRect {
+  return {
+    top: rect.top,
+    right: rect.right,
+    bottom: rect.bottom,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height
+  }
+}
+
+function clippingOverflow(value: string): boolean {
+  return value === 'hidden' || value === 'auto' || value === 'scroll' || value === 'clip'
+}
+
+function fullyOutside(
+  rect: ViewportRect,
+  bound: { top: number; right: number; bottom: number; left: number }
+): boolean {
+  return (
+    rect.bottom <= bound.top ||
+    rect.top >= bound.bottom ||
+    rect.right <= bound.left ||
+    rect.left >= bound.right
+  )
+}
+
+function outsideViewport(rect: ViewportRect, view: Window): boolean {
+  return (
+    rect.bottom <= 0 ||
+    rect.top >= view.innerHeight ||
+    rect.right <= 0 ||
+    rect.left >= view.innerWidth
+  )
+}
+
+function outsideClippingAncestors(node: Element, rect: ViewportRect): boolean {
+  const view = node.ownerDocument.defaultView
+  if (!view) return false
+  let current = node.parentElement
+  while (
+    current &&
+    current !== node.ownerDocument.body &&
+    current !== node.ownerDocument.documentElement
+  ) {
+    const style = view.getComputedStyle(current)
+    const bound = current.getBoundingClientRect()
+    if (
+      clippingOverflow(style.overflowY) &&
+      (rect.bottom <= bound.top || rect.top >= bound.bottom)
+    ) {
+      return true
+    }
+    if (
+      clippingOverflow(style.overflowX) &&
+      (rect.right <= bound.left || rect.left >= bound.right)
+    ) {
+      return true
+    }
+    current = current.parentElement
+  }
+  return false
+}
+
+function frameElementOf(view: Window): HTMLElement | null {
+  try {
+    const frame = view.frameElement
+    if (!frame || frame.nodeType !== 1 || !view.parent || view.parent === view) return null
+    void view.parent.document
+    return frame as HTMLElement
+  } catch {
+    return null
+  }
+}
+
+/**
+ * True when the trigger is fully outside its frame or a clipping scrollport.
+ * Floating UI's hide middleware compares a parent-document rect to the iframe
+ * viewport, so a short demo frame looks clipped even while the trigger is on screen.
+ */
+function isAnchoredReferenceHidden(reference: Element): boolean {
+  const rect = toViewportRect(reference.getBoundingClientRect())
+  if (rect.width <= 0 || rect.height <= 0) return true
+  return isRectHiddenInFrame(reference, rect, new Set())
+}
+
+function isRectHiddenInFrame(node: Element, rect: ViewportRect, seen: Set<Window>): boolean {
+  const view = node.ownerDocument.defaultView
+  if (!view || seen.has(view)) return false
+  seen.add(view)
+  if (outsideViewport(rect, view) || outsideClippingAncestors(node, rect)) return true
+
+  const frame = frameElementOf(view)
+  if (!frame) return false
+  const frameRect = frame.getBoundingClientRect()
+  const mapped = toViewportRect({
+    top: frameRect.top + rect.top,
+    left: frameRect.left + rect.left,
+    right: frameRect.left + rect.right,
+    bottom: frameRect.top + rect.bottom,
+    width: rect.width,
+    height: rect.height
+  })
+  if (fullyOutside(mapped, frameRect)) return true
+  return isRectHiddenInFrame(frame, mapped, seen)
+}
+
 function getFloatingMiddlewareCacheKey({
   offset: offsetDistance,
   flip: enableFlip,
@@ -243,6 +366,10 @@ export interface FloatingResult {
     y?: number
   }
   /**
+   * Trigger is clipped by a scroll container, so the layer should not stay on screen.
+   */
+  referenceHidden: boolean
+  /**
    * Middleware data from Floating UI.
    */
   middlewareData: MiddlewareData
@@ -304,6 +431,7 @@ export async function computeFloatingPosition(
     y: result.y,
     placement: result.placement as FloatingPlacement,
     arrow: result.middlewareData.arrow,
+    referenceHidden: reference instanceof Element ? isAnchoredReferenceHidden(reference) : false,
     middlewareData: result.middlewareData
   }
 }

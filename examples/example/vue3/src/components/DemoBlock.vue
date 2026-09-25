@@ -7,7 +7,7 @@ import { collectTigerCssVars } from '@demo-shared/themes'
 import runtimeUrlsValue from 'virtual:tigercat-playground-runtime'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome, demoModuleTitle } from '@demo-shared/chrome'
-import { resolveDemoViewport } from '@demo-shared/playground/viewport'
+import { clampDemoFrameHeight, resolveDemoViewport } from '@demo-shared/playground/viewport'
 import type {
   DemoCompileSuccess,
   DemoDiagnostic,
@@ -93,7 +93,7 @@ const diagnostics = ref<DemoDiagnostic[]>([])
 const consoleEntries = ref<ConsoleEntry[]>([])
 const compiled = ref<DemoCompileSuccess | null>(null)
 const sandbox = ref<{ channelId: string; document: string } | null>(null)
-const iframeHeight = ref(viewport.value.height ?? viewport.value.minHeight)
+const iframeHeight = ref(clampDemoFrameHeight(undefined, viewport.value))
 const themeVersion = ref(0)
 let latestRun = 0
 let sandboxReady = false
@@ -219,10 +219,7 @@ function onMessage(event: MessageEvent) {
     ].slice(-100)
   }
   if (event.data.type === 'resize' && viewport.value.mode !== 'fixed') {
-    const min = viewport.value.minHeight
-    const next = Math.max(min, event.data.height ?? min)
-    iframeHeight.value =
-      viewport.value.maxHeight === undefined ? next : Math.min(viewport.value.maxHeight, next)
+    iframeHeight.value = clampDemoFrameHeight(event.data.height, viewport.value)
   }
 }
 

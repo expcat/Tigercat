@@ -7,7 +7,8 @@ import {
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
   getOverlayDirLang,
-  resolveAnchoredOverlayTarget
+  resolveAnchoredOverlayTarget,
+  resolveTopOverlayDocument
 } from '@expcat/tigercat-core'
 
 describe('anchored overlay contract', () => {
@@ -45,6 +46,23 @@ describe('anchored overlay contract', () => {
 
     expect(resolveAnchoredOverlayTarget(reference)).toBe(configRoot)
     expect(resolveAnchoredOverlayTarget(null)).toBe(configRoot)
+  })
+
+  it('portals out of a same-origin iframe onto the top document config root', () => {
+    const configRoot = document.createElement('div')
+    configRoot.setAttribute('data-tiger-config-root', '')
+    document.body.appendChild(configRoot)
+
+    const iframe = document.createElement('iframe')
+    document.body.appendChild(iframe)
+    const childDocument = iframe.contentDocument
+    if (!childDocument?.body || iframe.contentWindow?.frameElement !== iframe) return
+
+    const reference = childDocument.createElement('button')
+    childDocument.body.appendChild(reference)
+
+    expect(resolveTopOverlayDocument(childDocument)).toBe(document)
+    expect(resolveAnchoredOverlayTarget(reference)).toBe(configRoot)
   })
 
   it('copies dir and lang from the nearest ancestor for portaled layers', () => {

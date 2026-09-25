@@ -6,6 +6,7 @@ import type { ComponentSize } from '../types/base'
 import type { InputStatus } from '../types/input'
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
+import { getFieldMessageClasses } from './form-item-styles'
 import { mixStatusTowardText, mixStatusTowardTextClass } from './status-mix'
 
 const errorTextClass = mixStatusTowardTextClass('text', '--tiger-error', '#dc2626')
@@ -15,8 +16,7 @@ const errorPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-
 const successPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-success', '#16a34a')}]`
 const warningPlaceholderClass = `placeholder:text-[${mixStatusTowardText('--tiger-warning', '#d97706')}]`
 
-const FOCUS_RING =
-  'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
+const FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 const ERROR_FOCUS_RING = 'focus-visible:ring-2 focus-visible:ring-[var(--tiger-error)]/40'
 
 /**
@@ -48,9 +48,7 @@ const INPUT_CHROME_BASE_CLASSES = [
 
 const NATIVE_CHROME_FOCUS_CLASSES = ['disabled:bg-[var(--tiger-surface-muted)]'] as const
 
-const WRAPPER_CHROME_FOCUS_CLASSES = [
-  'has-[:disabled]:bg-[var(--tiger-surface-muted)]'
-] as const
+const WRAPPER_CHROME_FOCUS_CLASSES = ['has-[:disabled]:bg-[var(--tiger-surface-muted)]'] as const
 
 const NATIVE_STATUS_CLASSES: Record<InputStatus, string> = {
   default: 'border-[var(--tiger-border)] focus-visible:border-transparent',
@@ -60,16 +58,8 @@ const NATIVE_STATUS_CLASSES: Record<InputStatus, string> = {
     errorTextClass,
     errorPlaceholderClass
   ),
-  success: classNames(
-    'border-[var(--tiger-success)]',
-    successTextClass,
-    successPlaceholderClass
-  ),
-  warning: classNames(
-    'border-[var(--tiger-warning)]',
-    warningTextClass,
-    warningPlaceholderClass
-  )
+  success: classNames('border-[var(--tiger-success)]', successTextClass, successPlaceholderClass),
+  warning: classNames('border-[var(--tiger-warning)]', warningTextClass, warningPlaceholderClass)
 }
 
 const WRAPPER_STATUS_CLASSES: Record<InputStatus, string> = {
@@ -314,10 +304,10 @@ export function getInputAffixClasses(
 
 /**
  * Error message classes — below the field (not an in-field overlay).
- * `size` is unused; kept so existing callers do not break.
+ * Same gap, type, and color as FormItem inline errors.
  */
-export function getInputErrorClasses(_size: ComponentSize = 'md'): string {
-  return classNames('text-[var(--tiger-error)] text-sm mt-1 text-start break-words')
+export function getInputErrorClasses(size: ComponentSize = 'md'): string {
+  return getFieldMessageClasses(size, 'error')
 }
 
 function getInputTrailingButtonPositionClasses(size: ComponentSize, offsetSlots = 0): string {

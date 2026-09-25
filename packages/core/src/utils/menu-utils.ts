@@ -117,7 +117,7 @@ export const submenuExpandIconPopupClasses = '-rotate-90'
  * Submenu content classes - popup (horizontal, nested, and collapsed vertical)
  */
 export const submenuContentPopupClasses =
-  'min-w-[180px] bg-[var(--tiger-surface)] text-[var(--tiger-text)] border border-[var(--tiger-border)] rounded shadow-lg'
+  'min-w-[180px] bg-[var(--tiger-surface)] text-[var(--tiger-text)] border border-[var(--tiger-border)] rounded-[var(--tiger-radius-lg)] shadow-[var(--tiger-shadow-lg)] overflow-hidden'
 
 /**
  * Submenu content classes - vertical mode

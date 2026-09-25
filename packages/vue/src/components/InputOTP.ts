@@ -365,7 +365,7 @@ export const InputOTP = defineComponent({
         nodes.push(
           h(
             'div',
-            { id: errorMsgId, class: getOtpErrorClasses(), 'aria-live': 'polite' },
+            { id: errorMsgId, class: getOtpErrorClasses(props.size), 'aria-live': 'polite' },
             props.errorMessage
           )
         )

@@ -6,7 +6,7 @@
   "entry": "App.vue",
   "viewport": {
     "mode": "auto",
-    "minHeight": 280,
+    "minHeight": 120,
     "maxHeight": 720
   }
 }

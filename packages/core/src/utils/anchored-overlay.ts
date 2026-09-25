@@ -12,8 +12,62 @@ function resolveOwnerDocument(reference: HTMLElement | null): Document | null {
   return reference?.ownerDocument ?? (typeof document === 'undefined' ? null : document)
 }
 
+function parentSameOriginWindow(view: Window): Window | null {
+  try {
+    if (!view.frameElement) return null
+    const parent = view.parent
+    if (!parent || parent === view) return null
+    void parent.document
+    return parent
+  } catch {
+    return null
+  }
+}
+
 /**
- * Portal target chain: nearest overlay-host → ConfigProvider root → document.body.
+ * Walk same-origin frames to the top window.
+ * Demo iframes portal here so popups paint above the host page chrome.
+ */
+export function resolveTopOverlayDocument(doc: Document): Document {
+  let view = doc.defaultView
+  const seen = new Set<Window>()
+  while (view && !seen.has(view)) {
+    seen.add(view)
+    const parent = parentSameOriginWindow(view)
+    if (!parent) break
+    view = parent
+  }
+  return view?.document ?? doc
+}
+
+function resolveDocumentOverlayTarget(doc: Document): HTMLElement | null {
+  return doc.querySelector<HTMLElement>(`[${CONFIG_ROOT_ATTRIBUTE}]`) ?? doc.body ?? null
+}
+
+/** Documents that should hear outside-click and Escape for a layer that may leave its frame. */
+export function collectOverlayListenerDocuments(
+  nodes: Array<{ ownerDocument?: Document | null } | null | undefined> = []
+): Document[] {
+  const docs: Document[] = []
+  const seen = new Set<Document>()
+  const add = (doc: Document | null | undefined) => {
+    if (!doc || seen.has(doc)) return
+    seen.add(doc)
+    docs.push(doc)
+    const top = resolveTopOverlayDocument(doc)
+    if (!seen.has(top)) {
+      seen.add(top)
+      docs.push(top)
+    }
+  }
+  if (typeof document !== 'undefined') add(document)
+  for (const node of nodes) add(node?.ownerDocument)
+  return docs
+}
+
+/**
+ * Portal target chain: nearest overlay-host → top-document ConfigProvider root → body.
+ * A same-origin iframe does not keep the layer in the frame; host sticky chrome would cover it.
  */
 export function resolveAnchoredOverlayTarget(reference: HTMLElement | null): HTMLElement | null {
   const ownerDocument = resolveOwnerDocument(reference)
@@ -23,6 +77,11 @@ export function resolveAnchoredOverlayTarget(reference: HTMLElement | null): HTM
     ?.closest(`[${OVERLAY_LAYER_ATTRIBUTE}]`)
     ?.querySelector<HTMLElement>(`:scope > [${OVERLAY_HOST_ATTRIBUTE}]`)
   if (overlayHost) return overlayHost
+
+  const topDocument = resolveTopOverlayDocument(ownerDocument)
+  if (topDocument !== ownerDocument) {
+    return resolveDocumentOverlayTarget(topDocument)
+  }
 
   const themeRoot = reference ? nearestThemeRoot(reference) : null
   if (

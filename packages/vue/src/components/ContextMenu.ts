@@ -24,6 +24,7 @@ import {
   getContextMenuContainerClasses,
   getContextMenuTriggerClasses,
   getContextMenuMenuClasses,
+  getDropdownSeparatorClasses,
   getContextMenuItemClasses,
   getContextMenuSubTriggerClasses,
   getContextMenuSubChevronClasses,
@@ -731,7 +732,7 @@ export const ContextMenu = defineComponent({
             return h('div', {
               key: item.key,
               role: 'separator',
-              class: 'my-1 h-px bg-[var(--tiger-border)]'
+              class: getDropdownSeparatorClasses()
             })
           }
           if (type === 'submenu') {

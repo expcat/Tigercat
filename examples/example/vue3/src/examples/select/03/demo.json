@@ -6,7 +6,7 @@
   "order": 3,
   "viewport": {
     "mode": "auto",
-    "minHeight": 320,
+    "minHeight": 120,
     "maxHeight": 720
   }
 }

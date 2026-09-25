@@ -300,6 +300,42 @@ export function findActiveAnchorAtOffsetLine(
 }
 
 /**
+ * Heading closest to the offset line.
+ *
+ * `findActiveAnchorAtOffsetLine` stays on the last heading already past the
+ * line, so a short page whose next heading never reaches the line never
+ * updates. Distance fixes that: the heading nearest the line wins. Equal
+ * distance prefers the heading at or above the line.
+ */
+export function findNearestAnchorToOffsetLine(
+  links: string[],
+  getSectionTop: (href: string) => number | null,
+  offsetLine: number
+): string {
+  if (links.length === 0) return ''
+
+  let best = ''
+  let bestDistance = Number.POSITIVE_INFINITY
+  let bestAbove = false
+
+  for (const href of links) {
+    const top = getSectionTop(href)
+    if (top === null) continue
+    const distance = Math.abs(top - offsetLine)
+    const above = top <= offsetLine
+    const closer = distance < bestDistance
+    const tiePrefersAbove = distance === bestDistance && above && !bestAbove
+    if (closer || tiePrefersAbove) {
+      best = href
+      bestDistance = distance
+      bestAbove = above
+    }
+  }
+
+  return best || links[0] || ''
+}
+
+/**
  * Find current active anchor based on scroll position
  */
 export function findActiveAnchor(
@@ -474,9 +510,10 @@ export interface AnchorObserverOptions {
 /**
  * Create an IntersectionObserver-based active-anchor tracker.
  *
- * IO is the change trigger. The winner is the last link in document order whose
- * section top is at or above `rootTop + offsetTop + bounds` (same rule as
- * `findActiveAnchor`). Visibility / `isIntersecting` order does not decide.
+ * IO is the change trigger. The winner is the heading closest to
+ * `rootTop + offsetTop + bounds`. Visibility / `isIntersecting` order does not
+ * decide. A heading that never reaches the line can still become active when
+ * it is the closest one.
  *
  * Returns a teardown function. Safe when `IntersectionObserver` is unavailable
  * (returns no-op) or no targets resolve.
@@ -490,7 +527,7 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
   const computeActive = (): string => {
     const rootTop = root ? root.getBoundingClientRect().top : 0
     const offsetLine = rootTop + offsetTop + bounds
-    return findActiveAnchorAtOffsetLine(
+    return findNearestAnchorToOffsetLine(
       links,
       (href) => {
         const el = getAnchorTargetElement(href)

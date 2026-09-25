@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react'
 import {
   createTypeaheadHighlight,
   getContextMenuSubPlacement,
+  getDropdownSeparatorClasses,
   getPopupMenuItemClasses,
   getPopupMenuShortcutClasses,
   markTypeaheadMatch,
@@ -95,7 +96,7 @@ function PopupMenuNode({
   const [submenuOpen, setSubmenuOpen] = useState(false)
 
   if (type === 'separator') {
-    return <div role="separator" className="my-1 h-px bg-[var(--tiger-border)]" />
+    return <div role="separator" className={getDropdownSeparatorClasses()} />
   }
 
   if (type === 'submenu') {

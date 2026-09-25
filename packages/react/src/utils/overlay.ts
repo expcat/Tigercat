@@ -17,6 +17,7 @@ import {
   computeFloatingPosition,
   autoUpdateFloating,
   resolveAnchoredOverlayTarget,
+  collectOverlayListenerDocuments,
   getAnchoredOverlayTabTarget,
   getAnchoredOverlayLayoutClasses,
   getOverlayDirLang,
@@ -60,8 +61,15 @@ export function useClickOutside({
       }
     }
 
-    const attach = () => document.addEventListener('click', handler)
-    const detach = () => document.removeEventListener('click', handler)
+    let listening: Document[] = []
+    const attach = () => {
+      listening = collectOverlayListenerDocuments(refs.map((ref) => ref?.current))
+      for (const doc of listening) doc.addEventListener('click', handler)
+    }
+    const detach = () => {
+      for (const doc of listening) doc.removeEventListener('click', handler)
+      listening = []
+    }
 
     if (!defer) {
       attach()
@@ -85,7 +93,12 @@ export interface UseEscapeKeyOptions {
 export function useEscapeKey({ enabled, onEscape, layerRef }: UseEscapeKeyOptions): void {
   useEffect(() => {
     if (!enabled) return
-    return registerEscapeDismiss(document, onEscape, () => layerRef?.current ?? null)
+    const releases = collectOverlayListenerDocuments([layerRef?.current]).map((doc) =>
+      registerEscapeDismiss(doc, onEscape, () => layerRef?.current ?? null)
+    )
+    return () => {
+      for (const release of releases) release()
+    }
   }, [enabled, layerRef, onEscape])
 }
 
@@ -305,6 +318,7 @@ export interface UseFloatingReturn {
    */
   update: () => Promise<void>
   isPositioned: boolean
+  referenceHidden: boolean
   referenceWidth: number
 }
 
@@ -347,6 +361,7 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
   const [arrowX, setArrowX] = useState<number | undefined>(undefined)
   const [arrowY, setArrowY] = useState<number | undefined>(undefined)
   const [isPositioned, setIsPositioned] = useState(false)
+  const [referenceHidden, setReferenceHidden] = useState(false)
   const [referenceWidth, setReferenceWidth] = useState(0)
   const enabledRef = useRef(enabled)
   const updateRequestRef = useRef(0)
@@ -390,6 +405,7 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
     setReferenceWidth('width' in rect ? Number(rect.width) : 0)
     setX(result.x)
     setY(result.y)
+    setReferenceHidden(result.referenceHidden)
     setPlacement((prev) => {
       if (prev !== result.placement) {
         onPlacementChangeRef.current?.(result.placement)
@@ -435,6 +451,7 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
     arrowY,
     update,
     isPositioned,
+    referenceHidden,
     referenceWidth
   }
 }
@@ -535,6 +552,7 @@ export function useAnchoredOverlay({
     y,
     placement: actualPlacement,
     isPositioned,
+    referenceHidden,
     referenceWidth,
     arrowX,
     arrowY
@@ -601,9 +619,10 @@ export function useAnchoredOverlay({
         '--tiger-overlay-y': `${y}px`,
         '--tiger-overlay-reference-width': `${referenceWidth}px`,
         zIndex: OVERLAY_Z_INDEX.overlay,
-        transformOrigin: getTransformOrigin(actualPlacement)
+        transformOrigin: getTransformOrigin(actualPlacement),
+        ...(referenceHidden ? { visibility: 'hidden' as const } : {})
       }) as React.CSSProperties,
-    [actualPlacement, referenceWidth, x, y]
+    [actualPlacement, referenceHidden, referenceWidth, x, y]
   )
 
   return {

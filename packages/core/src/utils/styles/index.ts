@@ -88,6 +88,7 @@ export * from '../loading-utils'
 export * from '../loading-bar-utils'
 export * from '../floating-popup-utils'
 export * from '../popconfirm-utils'
+export * from '../overlay-panel'
 export * from '../popover-utils'
 export * from '../tooltip-utils'
 

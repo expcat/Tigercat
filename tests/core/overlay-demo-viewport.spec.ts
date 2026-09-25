@@ -8,8 +8,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_DEMO_MIN_HEIGHT,
-  OVERLAY_DEMO_MIN_HEIGHT,
-  isOverlayDemoRoute,
+  clampDemoFrameHeight,
   resolveDemoViewport
 } from '../../examples/example/shared/playground/viewport'
 import type { DemoViewport } from '../../examples/example/shared/playground/types'
@@ -38,26 +37,20 @@ function readDemo(relativePath: string): { viewport?: DemoViewport } {
   }
 }
 
-function routeFromPath(relativePath: string): string {
-  const match = /\/src\/examples\/([^/]+)\//.exec(relativePath)
-  if (!match) throw new Error(`unexpected demo path ${relativePath}`)
-  return match[1]
-}
-
 const allDemos = FRAMEWORK_ROOTS.flatMap(collectDemoJson)
 
 describe('overlay demo viewports', () => {
-  it('raises overlay-class routes so an open layer is not clipped at 120', () => {
-    const overlayDemos = allDemos.filter((path) => isOverlayDemoRoute(routeFromPath(path)))
-    expect(overlayDemos.length).toBeGreaterThan(20)
-
-    for (const relativePath of overlayDemos) {
-      const route = routeFromPath(relativePath)
-      const demo = readDemo(relativePath)
-      const resolved = resolveDemoViewport(route, demo.viewport)
-      expect(resolved.minHeight, relativePath).toBeGreaterThanOrEqual(OVERLAY_DEMO_MIN_HEIGHT)
-      expect(resolved.minHeight, relativePath).toBeGreaterThanOrEqual(200)
-    }
+  it('keeps short demos at their declared minimum instead of a route-wide floor', () => {
+    const splitButton = allDemos.find((path) => path.includes('/split-button/01/demo.json'))
+    expect(splitButton).toBeTruthy()
+    const demo = readDemo(splitButton!)
+    const resolved = resolveDemoViewport('split-button', demo.viewport)
+    expect(resolved.mode).toBe('auto')
+    expect(resolved.minHeight).toBe(120)
+    expect(resolved.maxHeight).toBe(280)
+    expect(clampDemoFrameHeight(88, resolved)).toBe(120)
+    expect(clampDemoFrameHeight(180, resolved)).toBe(180)
+    expect(clampDemoFrameHeight(400, resolved)).toBe(280)
   })
 
   it('leaves non-overlay routes such as button/01 unraised', () => {
@@ -68,6 +61,49 @@ describe('overlay demo viewports', () => {
     })
     expect(resolved.minHeight).toBe(DEFAULT_DEMO_MIN_HEIGHT)
     expect(resolved.minHeight).toBeLessThan(200)
+  })
+
+  it('lets a closed modal shrink to the content floor and still grow up to its cap', () => {
+    const modal = allDemos.find((path) => path.includes('/modal/01/demo.json'))
+    expect(modal).toBeTruthy()
+    const demo = readDemo(modal!)
+    const resolved = resolveDemoViewport('modal', demo.viewport)
+    expect(resolved.mode).toBe('auto')
+    expect(resolved.minHeight).toBe(DEFAULT_DEMO_MIN_HEIGHT)
+    expect(resolved.maxHeight).toBe(720)
+    expect(clampDemoFrameHeight(80, resolved)).toBe(120)
+    expect(clampDemoFrameHeight(360, resolved)).toBe(360)
+    expect(clampDemoFrameHeight(900, resolved)).toBe(720)
+  })
+
+  it('lets message demos shrink to the content floor', () => {
+    const messages = allDemos.filter(
+      (path) => path.includes('/message/') && path.endsWith('/demo.json')
+    )
+    expect(messages).toHaveLength(10)
+    for (const path of messages) {
+      const resolved = resolveDemoViewport('message', readDemo(path).viewport)
+      expect(resolved.mode).toBe('auto')
+      expect(resolved.minHeight).toBe(DEFAULT_DEMO_MIN_HEIGHT)
+      expect(resolved.maxHeight).toBe(720)
+      expect(clampDemoFrameHeight(64, resolved)).toBe(120)
+      expect(clampDemoFrameHeight(160, resolved)).toBe(160)
+    }
+  })
+
+  it('lets a closed select shrink to the content floor', () => {
+    const selects = allDemos.filter(
+      (path) => path.includes('/select/') && path.endsWith('/demo.json')
+    )
+    expect(selects).toHaveLength(10)
+    for (const path of selects) {
+      const resolved = resolveDemoViewport('select', readDemo(path).viewport)
+      expect(resolved.mode).toBe('auto')
+      expect(resolved.minHeight).toBe(DEFAULT_DEMO_MIN_HEIGHT)
+      expect(resolved.maxHeight).toBe(720)
+      expect(clampDemoFrameHeight(82, resolved)).toBe(120)
+      expect(clampDemoFrameHeight(240, resolved)).toBe(240)
+    }
   })
 
   it('does not cap chart iframes at 720 unless the demo asked for a fixed viewport', () => {

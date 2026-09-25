@@ -20,17 +20,24 @@ const LABEL_PADDING_TOP: Record<ComponentSize, string> = {
   lg: 'pt-3'
 }
 
-const ERROR_TEXT_SIZE: Record<ComponentSize, string> = {
-  sm: 'text-xs',
-  md: 'text-xs',
-  lg: 'text-sm'
+/**
+ * One step under the control: sm 12px, md 14px, lg 16px — same scale as the label.
+ * sm has no runtime font-size token, so it reads the primitive xs size.
+ */
+const FIELD_MESSAGE_SIZE: Record<ComponentSize, string> = {
+  sm: 'text-[length:var(--tiger-primitive-font-size-xs)]',
+  md: 'text-[length:var(--tiger-font-size-sm)]',
+  lg: 'text-[length:var(--tiger-font-size-base)]'
 }
 
-const ERROR_MIN_HEIGHT: Record<ComponentSize, string> = {
-  sm: 'min-h-[1rem]',
-  md: 'min-h-[1.25rem]',
-  lg: 'min-h-[1.5rem]'
-}
+const FIELD_MESSAGE_METRICS = classNames(
+  'mt-[var(--tiger-spacing-md)]',
+  'leading-[var(--tiger-line-height-normal)]',
+  'font-[number:var(--tiger-font-weight-normal)]',
+  'text-start',
+  'break-words',
+  'min-w-0'
+)
 
 export interface FormItemClassOptions {
   size?: ComponentSize
@@ -110,6 +117,22 @@ export function getFormItemFieldClasses(): string {
   return classNames('tiger-form-item__field', 'w-full')
 }
 
+/**
+ * Inline tip under a control. Error and helper share the gap and type scale;
+ * only the color changes. Gap is `--tiger-spacing-md` (8px), not 4px, so the
+ * line does not sit on the control border.
+ */
+export function getFieldMessageClasses(
+  size: ComponentSize = 'md',
+  tone: 'error' | 'hint' = 'error'
+): string {
+  return classNames(
+    FIELD_MESSAGE_METRICS,
+    FIELD_MESSAGE_SIZE[size],
+    tone === 'error' ? 'text-[var(--tiger-error)]' : 'text-[var(--tiger-text-secondary)]'
+  )
+}
+
 export function getFormItemErrorClasses(
   size: ComponentSize = 'md',
   options: { visible?: boolean } = {}
@@ -117,10 +140,7 @@ export function getFormItemErrorClasses(
   const { visible = false } = options
   return classNames(
     'tiger-form-item__error',
-    'mt-1',
-    ERROR_TEXT_SIZE[size],
-    ERROR_MIN_HEIGHT[size],
-    'text-[var(--tiger-error)]',
+    getFieldMessageClasses(size, 'error'),
     'tiger-motion-aware',
     'transition-opacity',
     'duration-150',
@@ -133,11 +153,12 @@ export function getFormItemErrorBlockClasses(size: ComponentSize = 'md'): string
   return classNames(
     'tiger-form-item__error',
     'tiger-form-item__error--block',
-    'mt-1 p-2 rounded border',
-    ERROR_TEXT_SIZE[size],
-    'bg-[var(--tiger-error-bg)]',
+    getFieldMessageClasses(size, 'error'),
+    'rounded-[var(--tiger-radius-md)]',
+    'border',
     'border-[var(--tiger-error)]',
-    'text-[var(--tiger-error)]'
+    'bg-[var(--tiger-error-bg-hover)]',
+    'p-[var(--tiger-spacing-md)]'
   )
 }
 

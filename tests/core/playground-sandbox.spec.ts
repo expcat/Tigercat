@@ -4,7 +4,11 @@
 
 import { describe, expect, it } from 'vitest'
 import { createCompilerClient } from '../../examples/example/shared/playground/compiler-client'
-import { createSandboxDocument } from '../../examples/example/shared/playground/sandbox'
+import {
+  createSandboxDocument,
+  measureSandboxContentHeight
+} from '../../examples/example/shared/playground/sandbox'
+import { DEMO_OVERLAY_STAGE_HEIGHT } from '../../examples/example/shared/playground/viewport'
 import {
   diagnosticsIncludeWasmOutOfMemory,
   isBenignSandboxRuntimeError,
@@ -60,6 +64,160 @@ describe('example playground sandbox', () => {
     expect(isWasmOutOfMemoryError(WASM_OOM)).toBe(true)
     expect(diagnosticsIncludeWasmOutOfMemory([{ text: WASM_OOM }])).toBe(true)
     expect(diagnosticsIncludeWasmOutOfMemory([{ text: 'syntax error' }])).toBe(false)
+  })
+
+  it('measures content height instead of the stretched iframe', () => {
+    document.body.innerHTML = '<div id="root" style="height:72px">demo</div>'
+    document.documentElement.style.minHeight = '100%'
+    document.body.style.minHeight = '100%'
+    const scrollHeight = function (this: HTMLElement) {
+      return this.style.minHeight === '0' ? 72 : 520
+    }
+    Object.defineProperty(document.body, 'scrollHeight', {
+      configurable: true,
+      get: scrollHeight
+    })
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      get: scrollHeight
+    })
+
+    expect(measureSandboxContentHeight(document)).toBe(72)
+    expect(document.documentElement.style.minHeight).toBe('100%')
+    expect(document.body.style.minHeight).toBe('100%')
+
+    const layer = document.createElement('div')
+    layer.setAttribute('data-tiger-overlay-layer', '')
+    layer.getBoundingClientRect = () =>
+      ({
+        bottom: 210,
+        height: 120,
+        top: 90,
+        left: 0,
+        right: 0,
+        width: 0,
+        x: 0,
+        y: 90,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    document.body.appendChild(layer)
+    expect(measureSandboxContentHeight(document)).toBe(210)
+
+    const hidden = document.createElement('div')
+    hidden.setAttribute('data-tiger-overlay-layer', '')
+    hidden.hidden = true
+    hidden.getBoundingClientRect = () =>
+      ({
+        bottom: 900,
+        height: 900,
+        top: 0,
+        left: 0,
+        right: 0,
+        width: 0,
+        x: 0,
+        y: 0,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    document.body.appendChild(hidden)
+    expect(measureSandboxContentHeight(document)).toBe(210)
+  })
+
+  it('sizes an open modal to its panel instead of the short iframe', () => {
+    document.body.innerHTML = '<div id="root" style="height:72px">demo</div>'
+    const layer = document.createElement('div')
+    layer.setAttribute('data-tiger-overlay-layer', '')
+    layer.setAttribute('data-tiger-modal-root', '')
+    layer.getBoundingClientRect = () =>
+      ({
+        bottom: 120,
+        height: 120,
+        top: 0,
+        left: 0,
+        right: 0,
+        width: 0,
+        x: 0,
+        y: 0,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    const panel = document.createElement('div')
+    panel.setAttribute('data-tiger-modal', '')
+    panel.style.maxHeight = '90px'
+    panel.getBoundingClientRect = () => {
+      const relaxed = panel.style.maxHeight === 'none'
+      const height = relaxed ? 240 : 90
+      return {
+        bottom: 64 + height,
+        height,
+        top: 64,
+        left: 0,
+        right: 0,
+        width: 0,
+        x: 0,
+        y: 64,
+        toJSON() {
+          return {}
+        }
+      } as DOMRect
+    }
+    layer.appendChild(panel)
+    document.body.appendChild(layer)
+    expect(measureSandboxContentHeight(document)).toBe(304)
+    expect(panel.style.maxHeight).toBe('90px')
+  })
+
+  it('reserves a stage for an open side drawer that stretches to the iframe', () => {
+    document.body.innerHTML = '<div id="root" style="height:72px">demo</div>'
+    const layer = document.createElement('div')
+    layer.setAttribute('data-tiger-overlay-layer', '')
+    layer.setAttribute('data-tiger-drawer-root', '')
+    const panel = document.createElement('div')
+    panel.setAttribute('data-tiger-drawer', '')
+    panel.style.position = 'absolute'
+    panel.style.top = '0px'
+    panel.style.bottom = '0px'
+    layer.appendChild(panel)
+    document.body.appendChild(layer)
+    expect(measureSandboxContentHeight(document)).toBe(DEMO_OVERLAY_STAGE_HEIGHT)
+  })
+
+  it('includes an open message stack that is position fixed', () => {
+    document.body.innerHTML = '<div id="root" style="height:72px">demo</div>'
+    const toast = document.createElement('div')
+    toast.setAttribute('data-tiger-message-container', '')
+    toast.getBoundingClientRect = () =>
+      ({
+        bottom: 148,
+        height: 104,
+        top: 44,
+        left: 0,
+        right: 0,
+        width: 0,
+        x: 0,
+        y: 44,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    document.body.appendChild(toast)
+    expect(measureSandboxContentHeight(document)).toBe(148)
+
+    toast.hidden = true
+    expect(measureSandboxContentHeight(document)).toBe(72)
+  })
+
+  it('inlines the content-height measurement in the sandbox document', () => {
+    const stock = createSandboxDocument(sandboxOptions())
+    expect(stock).toContain('function measureSandboxContentHeight')
+    expect(stock).toContain('data-tiger-overlay-layer')
+    expect(stock).toContain('data-tiger-modal')
+    expect(stock).toContain('data-tiger-message-container')
+    expect(stock).toContain(`overlayStageHeight = ${DEMO_OVERLAY_STAGE_HEIGHT}`)
   })
 
   it('does not load Tailwind browser Wasm for stock demos', () => {

@@ -3,6 +3,7 @@ import {
   classNames,
   devWarn,
   extractFormChangeValue,
+  getFieldMessageClasses,
   getFormItemAsteriskClasses,
   getFormItemClasses,
   getFormItemContentClasses,
@@ -21,7 +22,6 @@ import {
   type FormItemProps as CoreFormItemProps,
   type InputStatus
 } from '@expcat/tigercat-core'
-import { schemaFormExtraClasses } from '@expcat/tigercat-core/schema-form'
 import { useFormContext } from './Form'
 import { FormItemControlProvider } from './FormItemContext'
 export { useFormItemControlContext } from './FormItemContext'
@@ -112,10 +112,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   const formError = name ? formContext?.errorsByField[name] : undefined
   const errorMessage = controlledError !== undefined ? controlledError : (formError ?? '')
   const hasError = !!errorMessage
-  const itemRules = useMemo(
-    () => (required ? withRequiredRule(rules) : rules),
-    [required, rules]
-  )
+  const itemRules = useMemo(() => (required ? withRequiredRule(rules) : rules), [required, rules])
   const formContextRef = useRef(formContext)
   formContextRef.current = formContext
 
@@ -384,7 +381,15 @@ export const FormItem: React.FC<FormItemProps> = ({
           ) : null}
           {childArray.slice(1)}
         </div>
-        {extra ? <p className={schemaFormExtraClasses}>{extra}</p> : null}
+        {extra ? (
+          <p
+            className={classNames(
+              'tiger-schema-form__extra',
+              getFieldMessageClasses(actualSize, 'hint')
+            )}>
+            {extra}
+          </p>
+        ) : null}
         {errorNode}
       </div>
     </div>

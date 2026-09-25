@@ -18,7 +18,7 @@ import {
 import { createCompilerClient, type CompilerClient } from '@demo-shared/playground/compiler-client'
 import { isBenignSandboxRuntimeError } from '@demo-shared/playground/sandbox-errors'
 import { demoChrome, demoModuleTitle } from '@demo-shared/chrome'
-import { resolveDemoViewport } from '@demo-shared/playground/viewport'
+import { clampDemoFrameHeight, resolveDemoViewport } from '@demo-shared/playground/viewport'
 import { useLang } from '../context/lang'
 import stylesheetUrl from '@demo-shared/sandbox.css?url'
 
@@ -93,7 +93,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
     () => resolveDemoViewport(module.route, module.meta.viewport),
     [module.meta.viewport, module.route]
   )
-  const [iframeHeight, setIframeHeight] = useState(viewport.height ?? viewport.minHeight)
+  const [iframeHeight, setIframeHeight] = useState(() => clampDemoFrameHeight(undefined, viewport))
   const chrome = demoChrome(lang)
   const [themeVersion, setThemeVersion] = useState(0)
 
@@ -229,11 +229,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
         )
       }
       if (event.data.type === 'resize' && viewport.mode !== 'fixed') {
-        const min = viewport.minHeight
-        const next = Math.max(min, event.data.height ?? min)
-        setIframeHeight(
-          viewport.maxHeight === undefined ? next : Math.min(viewport.maxHeight, next)
-        )
+        setIframeHeight(clampDemoFrameHeight(event.data.height, viewport))
       }
     }
     window.addEventListener('message', onMessage)

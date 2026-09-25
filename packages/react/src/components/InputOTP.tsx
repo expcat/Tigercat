@@ -316,7 +316,7 @@ export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function Inp
         )}
       </div>
       {activeError && (
-        <div id={errorMsgId} className={getOtpErrorClasses()} aria-live="polite">
+        <div id={errorMsgId} className={getOtpErrorClasses(size)} aria-live="polite">
           {errorMessage}
         </div>
       )}

@@ -2,6 +2,7 @@ import type { ComponentSize } from '../types/base'
 import type { InputStatus } from '../types/input'
 import type { InputOTPType } from '../types/input-otp'
 import { classNames } from './class-names'
+import { getFieldMessageClasses } from './form-item-styles'
 
 export interface InputOTPCharOptions {
   type?: InputOTPType
@@ -279,12 +280,9 @@ export function getOtpSlotClasses(
 }
 
 export function getOtpSeparatorClasses(size: ComponentSize = 'md'): string {
-  return classNames(
-    'select-none text-[var(--tiger-text-secondary)]',
-    OTP_TEXT_SIZE_CLASSES[size]
-  )
+  return classNames('select-none text-[var(--tiger-text-secondary)]', OTP_TEXT_SIZE_CLASSES[size])
 }
 
-export function getOtpErrorClasses(): string {
-  return 'mt-1 text-sm text-[var(--tiger-error)]'
+export function getOtpErrorClasses(size: ComponentSize = 'md'): string {
+  return getFieldMessageClasses(size, 'error')
 }

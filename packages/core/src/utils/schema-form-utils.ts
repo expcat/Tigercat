@@ -8,6 +8,7 @@
  */
 
 import { classNames } from './class-names'
+import { getFieldMessageClasses } from './form-item-styles'
 import { hasRequiredRule } from './form-dependency-utils'
 import { cloneFormValues, getValueByPath, setValueByPath } from './form-validation'
 import type {
@@ -53,8 +54,10 @@ export const schemaFormGroupDescriptionClasses =
   'tiger-schema-form__group-description m-0 text-xs text-[var(--tiger-text-secondary)]'
 export const schemaFormNestedGroupClasses =
   'tiger-schema-form__nested ps-3 border-s border-[var(--tiger-border)] space-y-4'
-export const schemaFormExtraClasses =
-  'tiger-schema-form__extra mt-1 text-xs text-[var(--tiger-text-secondary)] min-w-0'
+export const schemaFormExtraClasses = classNames(
+  'tiger-schema-form__extra',
+  getFieldMessageClasses('md', 'hint')
+)
 export const schemaFormActionsClasses =
   'tiger-schema-form__actions flex items-center justify-end gap-3 pt-2'
 
@@ -101,9 +104,7 @@ export function isSchemaFormWidgetType(value: unknown): value is SchemaFormWidge
  * Omitted `type` is an input. An unknown `type` is empty so the host can
  * supply `renderField`; it is not coerced to input.
  */
-export function resolveSchemaFormWidgetType(
-  field: SchemaFormField
-): SchemaFormWidgetType | null {
+export function resolveSchemaFormWidgetType(field: SchemaFormField): SchemaFormWidgetType | null {
   if (field.type == null) return 'input'
   return isSchemaFormWidgetType(field.type) ? field.type : null
 }
@@ -300,14 +301,19 @@ export function mapSchemaFormValuesOut(
 }
 
 function isPlainFormRecord(value: unknown): value is FormValues {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date)
+  return (
+    Boolean(value) && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date)
+  )
 }
 
 /**
  * Overlay `patch` onto `base` one path at a time. A nested object does not
  * replace sibling paths that the patch omitted.
  */
-export function mergeSchemaFormValuesByPath(base: FormValues, patch: FormValues | undefined): FormValues {
+export function mergeSchemaFormValuesByPath(
+  base: FormValues,
+  patch: FormValues | undefined
+): FormValues {
   if (!patch) return cloneFormValues(base)
   let next = cloneFormValues(base)
   const walk = (value: unknown, path: string) => {

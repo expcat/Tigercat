@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from 'vitest'
 import {
+  computeFloatingPosition,
   getArrowStyles,
   getFloatingMiddleware,
   getPlacementSide,
@@ -66,6 +67,41 @@ describe('floating utilities', () => {
       const customArrowPadding = getFloatingMiddleware({ arrowElement, arrowPadding: 12 })
 
       expect(customArrowPadding).not.toBe(defaultArrowPadding)
+    })
+  })
+
+  describe('anchored reference visibility', () => {
+    function rect(top: number, left: number, width: number, height: number): () => DOMRect {
+      return () =>
+        ({
+          top,
+          left,
+          right: left + width,
+          bottom: top + height,
+          width,
+          height,
+          x: left,
+          y: top,
+          toJSON() {
+            return {}
+          }
+        }) as DOMRect
+    }
+
+    it('hides a trigger scrolled out of a clipping scrollport and shows one inside it', async () => {
+      const scrollport = document.createElement('div')
+      scrollport.style.overflowY = 'auto'
+      scrollport.getBoundingClientRect = rect(64, 0, 800, 836)
+      const trigger = document.createElement('button')
+      const floating = document.createElement('div')
+      scrollport.appendChild(trigger)
+      document.body.append(scrollport, floating)
+
+      trigger.getBoundingClientRect = rect(120, 16, 184, 50)
+      expect((await computeFloatingPosition(trigger, floating)).referenceHidden).toBe(false)
+
+      trigger.getBoundingClientRect = rect(-80, 16, 184, 50)
+      expect((await computeFloatingPosition(trigger, floating)).referenceHidden).toBe(true)
     })
   })
 

@@ -12,6 +12,7 @@ import {
   scrollToAnchor,
   findActiveAnchor,
   findActiveAnchorAtOffsetLine,
+  findNearestAnchorToOffsetLine,
   createAnchorObserver,
   createProgrammaticScrollLock,
   getAnchorWrapperClasses,
@@ -180,6 +181,28 @@ describe('anchor-utils', () => {
 
     it('returns empty string for empty links', () => {
       expect(findActiveAnchorAtOffsetLine([], getTop, 50)).toBe('')
+    })
+  })
+
+  describe('findNearestAnchorToOffsetLine', () => {
+    const links = ['#a', '#b', '#c']
+    const tops: Record<string, number> = {
+      '#a': -113,
+      '#b': 154,
+      '#c': 421
+    }
+    const getTop = (href: string): number | null => tops[href] ?? null
+
+    it('picks the heading closest to the line when the next one never reaches it', () => {
+      expect(findNearestAnchorToOffsetLine(links, getTop, 49)).toBe('#b')
+    })
+
+    it('keeps the heading above the line when it is closer', () => {
+      expect(findNearestAnchorToOffsetLine(links, getTop, 0)).toBe('#a')
+    })
+
+    it('returns empty string for empty links', () => {
+      expect(findNearestAnchorToOffsetLine([], getTop, 49)).toBe('')
     })
   })
 
