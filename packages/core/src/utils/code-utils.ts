@@ -14,14 +14,23 @@ export const codeBlockPreWrapClasses = 'whitespace-pre-wrap break-words'
 export const codeBlockLineNumberClasses =
   'select-none pe-3 text-end text-[var(--tiger-text-secondary)] tabular-nums'
 
+/** In-flow bar above `<pre>`. Language text stays out of the numbered lines. */
+export const codeBlockHeaderClasses =
+  'flex items-center justify-between gap-3 border-b border-[var(--tiger-border)] px-3 py-2'
+
+export const codeBlockHeaderActionsClasses = 'flex shrink-0 items-center gap-2'
+
 export const codeBlockLanguageClasses =
-  'absolute start-3 top-3 text-xs text-[var(--tiger-text-secondary)]'
+  'min-w-0 truncate text-xs leading-5 text-[var(--tiger-text-secondary)]'
+
+/** Corner placement used only when there is no header row to hold the actions. */
+export const codeBlockFloatingActionClasses = 'absolute end-3 top-3'
 
 export const codeBlockWrapButtonClasses =
-  'absolute end-3 top-3 inline-flex items-center justify-center min-h-6 rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-xs text-[var(--tiger-text-secondary)]'
+  'inline-flex items-center justify-center min-h-6 rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-xs text-[var(--tiger-text-secondary)]'
 
 export const codeBlockCopyButtonBaseClasses =
-  'absolute end-3 top-3 inline-flex items-center justify-center min-h-6 min-w-6 rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-xs text-[var(--tiger-text-secondary)] shadow-sm transition-colors hover:text-[var(--tiger-text)] motion-reduce:transition-none'
+  'inline-flex items-center justify-center min-h-6 min-w-6 rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-xs text-[var(--tiger-text-secondary)] shadow-sm transition-colors hover:text-[var(--tiger-text)] motion-reduce:transition-none'
 
 export const codeBlockCopyButtonCopiedClasses =
   'border-[var(--tiger-primary)] text-[var(--tiger-primary)]'
@@ -93,9 +102,7 @@ export function createCopyStatusReset(
  * `light` / `dark` from an explicit scheme, otherwise the document root.
  * `'auto'` and a missing scheme follow `data-tiger-color-scheme` or `.dark`.
  */
-export function resolveCodeHighlightTheme(
-  colorScheme?: ColorScheme | null
-): 'light' | 'dark' {
+export function resolveCodeHighlightTheme(colorScheme?: ColorScheme | null): 'light' | 'dark' {
   if (colorScheme === 'light' || colorScheme === 'dark') return colorScheme
   if (isBrowser()) {
     const root = document.documentElement

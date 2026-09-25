@@ -3,6 +3,9 @@ import {
   basicLabel,
   classNames,
   codeBlockCopyStatusLiveClasses,
+  codeBlockFloatingActionClasses,
+  codeBlockHeaderActionsClasses,
+  codeBlockHeaderClasses,
   codeBlockLanguageClasses,
   codeBlockLineNumberClasses,
   codeBlockWrapButtonClasses,
@@ -110,9 +113,44 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
         ? resolvedCopiedLabel
         : resolvedCopyLabel
   const liveText = copyStatus === 'idle' ? '' : buttonLabel
+  const showHeader = Boolean(showLanguage && language)
+  const wrapButton = wrapToggle ? (
+    <button
+      type="button"
+      className={classNames(
+        codeBlockWrapButtonClasses,
+        !showHeader && codeBlockFloatingActionClasses,
+        !showHeader && copyable && 'end-28'
+      )}
+      aria-pressed={wrapped}
+      onClick={() => setWrapped((value) => !value)}>
+      {basicLabel(mergedLocale?.locale, 'code', wrapped ? 'nowrap' : 'wrap')}
+    </button>
+  ) : null
+  const copyButton = copyable ? (
+    <button
+      type="button"
+      className={classNames(copyButtonClasses, !showHeader && codeBlockFloatingActionClasses)}
+      onClick={handleCopy}>
+      {buttonLabel}
+    </button>
+  ) : null
 
   return (
     <div ref={ref} className={containerClasses} {...props}>
+      {showHeader ? (
+        <div className={codeBlockHeaderClasses}>
+          <span className={codeBlockLanguageClasses}>
+            {basicLabel(mergedLocale?.locale, 'code', 'language')}: {language}
+          </span>
+          {wrapButton || copyButton ? (
+            <div className={codeBlockHeaderActionsClasses}>
+              {wrapButton}
+              {copyButton}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <pre
         className={classNames(getCodeBlockPreClasses(wrapped), lineNumbers && 'flex')}
         tabIndex={0}
@@ -138,30 +176,13 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
           )
         })()}
       </pre>
-      {showLanguage && language ? (
-        <span className={codeBlockLanguageClasses}>
-          {basicLabel(mergedLocale?.locale, 'code', 'language')}: {language}
+      {showHeader ? null : wrapButton}
+      {showHeader ? null : copyButton}
+      {copyable ? (
+        <span className={codeBlockCopyStatusLiveClasses} aria-live="polite">
+          {liveText}
         </span>
       ) : null}
-      {wrapToggle ? (
-        <button
-          type="button"
-          className={classNames(codeBlockWrapButtonClasses, copyable && 'end-28')}
-          aria-pressed={wrapped}
-          onClick={() => setWrapped((value) => !value)}>
-          {basicLabel(mergedLocale?.locale, 'code', wrapped ? 'nowrap' : 'wrap')}
-        </button>
-      ) : null}
-      {copyable && (
-        <>
-          <button type="button" className={copyButtonClasses} onClick={handleCopy}>
-            {buttonLabel}
-          </button>
-          <span className={codeBlockCopyStatusLiveClasses} aria-live="polite">
-            {liveText}
-          </span>
-        </>
-      )}
     </div>
   )
 })

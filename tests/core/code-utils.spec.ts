@@ -9,6 +9,9 @@ import {
   codeBlockCopyButtonBaseClasses,
   codeBlockCopyButtonCopiedClasses,
   codeBlockCopyButtonFailedClasses,
+  codeBlockFloatingActionClasses,
+  codeBlockHeaderClasses,
+  codeBlockLanguageClasses,
   createCopyStatusReset,
   getCodeBlockContainerClasses,
   getCodeBlockCopyButtonClasses
@@ -43,12 +46,23 @@ describe('code-utils', () => {
     expect(failedClasses).not.toContain(codeBlockCopyButtonCopiedClasses)
   })
 
-  it('places the copy control on the logical end edge with a 24px minimum box', () => {
-    const tokens = codeBlockCopyButtonBaseClasses.split(/\s+/)
-    expect(tokens).toContain('end-3')
-    expect(tokens).not.toContain('right-3')
-    expect(tokens).toContain('min-h-6')
-    expect(tokens).toContain('min-w-6')
+  it('places a floating copy control on the logical end edge with a 24px minimum box', () => {
+    const buttonTokens = codeBlockCopyButtonBaseClasses.split(/\s+/)
+    const floatTokens = codeBlockFloatingActionClasses.split(/\s+/)
+    expect(floatTokens).toContain('end-3')
+    expect(floatTokens).toContain('absolute')
+    expect(floatTokens).not.toContain('right-3')
+    expect(buttonTokens).not.toContain('absolute')
+    expect(buttonTokens).toContain('min-h-6')
+    expect(buttonTokens).toContain('min-w-6')
+  })
+
+  it('keeps the language label in a header row instead of covering the first line', () => {
+    const languageTokens = codeBlockLanguageClasses.split(/\s+/)
+    const headerTokens = codeBlockHeaderClasses.split(/\s+/)
+    expect(languageTokens).not.toContain('absolute')
+    expect(headerTokens).toContain('flex')
+    expect(headerTokens).toContain('border-b')
   })
 
   it('resets copy status after the shared timeout', () => {

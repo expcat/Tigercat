@@ -36,7 +36,8 @@ export interface CodeProps {
    */
   lineNumbers?: boolean
   /**
-   * Show the `language` string above the block.
+   * Reserve a header row above the code for the `language` string.
+   * Copy and wrap controls move into that row so they do not cover the lines.
    * @default false
    */
   showLanguage?: boolean

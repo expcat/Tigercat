@@ -49,6 +49,26 @@ describe('Code (React)', () => {
       render(<Code code="x = 1" />)
       expect(screen.getByRole('button')).toBeInTheDocument()
     })
+
+    it('places the language label in a header above the numbered lines', () => {
+      const { container } = render(
+        <Code
+          code={'const alpha = 1\nconst beta = 2'}
+          language="ts"
+          lineNumbers
+          showLanguage
+          wrapToggle
+        />
+      )
+      const label = screen.getByText('Language: ts')
+      const pre = container.querySelector('pre')
+      expect(pre).toBeTruthy()
+      expect(pre!.contains(label)).toBe(false)
+      expect(label.compareDocumentPosition(pre!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      const actions = label.parentElement?.querySelector(':scope > div')
+      expect(actions?.contains(screen.getByRole('button', { name: 'Wrap lines' }))).toBe(true)
+      expect(actions?.contains(screen.getByRole('button', { name: 'Copy' }))).toBe(true)
+    })
   })
 
   describe('Props', () => {

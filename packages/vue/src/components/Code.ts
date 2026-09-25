@@ -17,6 +17,9 @@ import {
   coerceClassValue,
   basicLabel,
   codeBlockCopyStatusLiveClasses,
+  codeBlockFloatingActionClasses,
+  codeBlockHeaderActionsClasses,
+  codeBlockHeaderClasses,
   codeBlockLanguageClasses,
   codeBlockLineNumberClasses,
   codeBlockWrapButtonClasses,
@@ -149,8 +152,42 @@ export const Code = defineComponent({
       reset.dispose()
     })
 
-    return () =>
-      h(
+    return () => {
+      const showHeader = Boolean(props.showLanguage && props.language)
+      const wrapButton = props.wrapToggle
+        ? h(
+            'button',
+            {
+              type: 'button',
+              class: classNames(
+                codeBlockWrapButtonClasses,
+                !showHeader && codeBlockFloatingActionClasses,
+                !showHeader && props.copyable && 'end-28'
+              ),
+              'aria-pressed': wrapped.value ? 'true' : 'false',
+              onClick: () => {
+                wrapped.value = !wrapped.value
+              }
+            },
+            basicLabel(mergedLocale.value?.locale, 'code', wrapped.value ? 'nowrap' : 'wrap')
+          )
+        : null
+      const copyButton = props.copyable
+        ? h(
+            'button',
+            {
+              type: 'button',
+              class: classNames(
+                copyButtonClasses.value,
+                !showHeader && codeBlockFloatingActionClasses
+              ),
+              onClick: handleCopy
+            },
+            buttonLabel.value
+          )
+        : null
+
+      return h(
         'div',
         {
           ...attrs,
@@ -158,6 +195,18 @@ export const Code = defineComponent({
           style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
         },
         [
+          showHeader
+            ? h('div', { class: codeBlockHeaderClasses }, [
+                h(
+                  'span',
+                  { class: codeBlockLanguageClasses },
+                  `${basicLabel(mergedLocale.value?.locale, 'code', 'language')}: ${props.language}`
+                ),
+                wrapButton || copyButton
+                  ? h('div', { class: codeBlockHeaderActionsClasses }, [wrapButton, copyButton])
+                  : null
+              ])
+            : null,
           h(
             'pre',
             {
@@ -189,38 +238,8 @@ export const Code = defineComponent({
               })()
             ]
           ),
-          props.showLanguage && props.language
-            ? h(
-                'span',
-                { class: codeBlockLanguageClasses },
-                `${basicLabel(mergedLocale.value?.locale, 'code', 'language')}: ${props.language}`
-              )
-            : null,
-          props.wrapToggle
-            ? h(
-                'button',
-                {
-                  type: 'button',
-                  class: classNames(codeBlockWrapButtonClasses, props.copyable && 'end-28'),
-                  'aria-pressed': wrapped.value ? 'true' : 'false',
-                  onClick: () => {
-                    wrapped.value = !wrapped.value
-                  }
-                },
-                basicLabel(mergedLocale.value?.locale, 'code', wrapped.value ? 'nowrap' : 'wrap')
-              )
-            : null,
-          props.copyable
-            ? h(
-                'button',
-                {
-                  type: 'button',
-                  class: copyButtonClasses.value,
-                  onClick: handleCopy
-                },
-                buttonLabel.value
-              )
-            : null,
+          showHeader ? null : wrapButton,
+          showHeader ? null : copyButton,
           props.copyable
             ? h(
                 'span',
@@ -233,6 +252,7 @@ export const Code = defineComponent({
             : null
         ]
       )
+    }
   }
 })
 
