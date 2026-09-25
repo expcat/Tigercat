@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-preview.1",
+  "version": "3.0.0-preview.2",
   "algorithm": "sha256",
   "files": {
     "context7.json": "897a679468f42c1df5f40908c89a42e7ea3a1f4bfdee489f264a5cf44dc4024f",
@@ -394,7 +394,7 @@
     "skills/tigercat/references/shared/props/tree.md": "0b273b2e0633eb6d91e73a62cb55c052f4d6078f7708805a23b6587294850376",
     "skills/tigercat/references/shared/props/upload.md": "684e640ee929647d854177377fcdb6744b73d02d1d7464cb3ed5c4c4db8420cf",
     "skills/tigercat/references/shared/props/virtual-list.md": "802d1dcf077e85965b4b4212a1b913cf1afeae0be90c1030c29da3538400e3a6",
-    "skills/tigercat/references/shared/props/virtual-table.md": "cf2223c751f88c369c9637977088d7de7ab2bfbb46f6df5d7dd8e6c0f9b91ef1",
+    "skills/tigercat/references/shared/props/virtual-table.md": "74c14044a836869b108e23c6a7f4329b45dec81f635ac8dc492bc05dc0c0c776",
     "skills/tigercat/references/shared/props/waterfall-chart.md": "d280c99ced6ff124a777d6adb0fbfbc72f5d220918745cae888d9cc2b0a5bae8",
     "skills/tigercat/references/shared/props/watermark.md": "e5debfc9353dab507357760c686eb81df9ea5c52606351bf19c075410023bee8",
     "skills/tigercat/references/shared/props/workflow-action-bar.md": "f0b57c831c0fe5fc86c9a859a8fce1c1bb9c6632f287ed49a6083de8eb494e6a",
@@ -403,7 +403,7 @@
     "skills/tigercat/references/shared/props/workflow-timeline.md": "7e5ed4c231fcbf160a4b9116c97f37daca67cc43c3dfd0e7a53d4edcd476b8f7",
     "skills/tigercat/references/shared/props/workflow-viewer.md": "63b04f5685bbca4a3e8c1cc83bf71c46f8a8fb0eb5ed1c7ff97fba4f41124ee1",
     "skills/tigercat/references/ssr.md": "2888f0584f5207bb71106e2c941b05466dc234856895280e1582824d22076751",
-    "skills/tigercat/references/theme.md": "3c16f6e09a0a8fefc3f43fa3f8484d679068eda262d6b5ad53cb5df8789d9d26",
+    "skills/tigercat/references/theme.md": "d53fc104711ab5447d44f3bcba553159793661c431f2d267e15fb96004b4600a",
     "skills/tigercat/references/tokens.md": "2cf07f020d17dbed625a97b17b20cc64da54e77b80b08e72a030de3f8171e5a4",
     "skills/tigercat/references/vue/index.md": "85a86b9cea9cc5f3fb664ddb6e7c0ff3dae77f4b99d027281f5878bb83a9d4b3"
   }

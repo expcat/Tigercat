@@ -4,6 +4,9 @@ import { enUS } from '@expcat/tigercat-core/locales/en-US'
 
 export const TigerConfigKey: InjectionKey<ComputedRef<TigerConfig>> = Symbol('TigerConfig')
 
+/** True once an ancestor claimed `<html>`. A context-only provider leaves this false. */
+export const TigerDocumentOwnerKey: InjectionKey<boolean> = Symbol('TigerDocumentOwner')
+
 export function useTigerConfig(): ComputedRef<TigerConfig> {
   return inject(
     TigerConfigKey,

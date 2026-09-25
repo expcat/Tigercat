@@ -41,6 +41,9 @@ describe('nested theme roots', () => {
     expect(parent.style.getPropertyValue('--tiger-font-family')).toBe('ParentFont')
     expect(child.style.getPropertyValue('--tiger-font-family')).toBe('')
     expect(child.style.getPropertyValue('--tiger-primary')).toBe(minimalTheme.light.colors?.primary)
+    const css = document.head.querySelector('style[data-tiger-theme-style]')?.textContent ?? ''
+    expect(css).toContain('background-color:var(--tiger-surface)')
+    expect(css).toContain('color:var(--tiger-text)')
     expect(themeConfigOwnCssVars(minimalTheme.light)).not.toHaveProperty('--tiger-font-family')
 
     childScope.dispose()

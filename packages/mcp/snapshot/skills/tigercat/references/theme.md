@@ -26,7 +26,12 @@ later sibling's `dir`.
 does not replace an existing `lang`.
 
 ```ts
-import { createTigerThemeScope, readTigerDocumentTheme, setThemeColors, getThemeColor } from '@expcat/tigercat-core'
+import {
+  createTigerThemeScope,
+  readTigerDocumentTheme,
+  setThemeColors,
+  getThemeColor
+} from '@expcat/tigercat-core'
 
 const scope = createTigerThemeScope()
 scope.setTheme('high-contrast')
@@ -48,15 +53,20 @@ Solid fills use on-color tokens: `--tiger-primary-foreground`, `--tiger-secondar
 
 ## Switches
 
-| Need           | How                                                                                          |
-| -------------- | -------------------------------------------------------------------------------------------- |
-| Dark mode      | `<ConfigProvider colorScheme="dark">` or `<html class="dark">` before paint                 |
-| Modern visuals | `<ConfigProvider theme="modern">` or `createTigercatPlugin({ preset: modernTheme })`        |
-| High contrast  | `<ConfigProvider theme="high-contrast">`                                                    |
-| Reduced motion | One `prefers-reduced-motion` switch sets duration variables to `0ms`                        |
-| RTL            | `dir` on ConfigProvider, or locale `direction`. See [i18n.md](i18n.md)                      |
+| Need           | How                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------ |
+| Dark mode      | `<ConfigProvider colorScheme="dark">` or `<html class="dark">` before paint          |
+| Modern visuals | `<ConfigProvider theme="modern">` or `createTigercatPlugin({ preset: modernTheme })` |
+| High contrast  | `<ConfigProvider theme="high-contrast">`                                             |
+| Reduced motion | One `prefers-reduced-motion` switch sets duration variables to `0ms`                 |
+| RTL            | `dir` on ConfigProvider, or locale `direction`. See [i18n.md](i18n.md)               |
 
-`theme` on the document is `data-tiger-theme`. There is no subtree theme root in this wave.
+`theme` on the document is `data-tiger-theme`. The scope root paints
+`background-color: var(--tiger-surface)` and `color: var(--tiger-text)` with the active scheme.
+
+A nested provider that sets `theme` restyles that subtree. It uses its own `colorScheme`, or the
+parent scheme when it does not set one. `document={false}` supplies context only and lets a
+descendant own `<html>`.
 
 ## Motion
 

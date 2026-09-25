@@ -49,8 +49,16 @@ export interface ConfigProviderProps {
   /**
    * `'light'` or `'dark'` sets `data-tiger-color-scheme` on the document root.
    * `'auto'` leaves the class and attribute already on `<html>` in charge.
+   * The scope root paints `--tiger-surface` and `--tiger-text` with that scheme.
    */
   colorScheme?: ColorScheme
+
+  /**
+   * When false, this provider only supplies context. It does not write
+   * `<html>` and does not block a descendant from owning the document.
+   * Defaults to true for the outermost provider that does not opt out.
+   */
+  document?: boolean
 
   /** App-owned icon registry. Disposed with the provider when it created one. */
   iconRegistry?: IconRegistry

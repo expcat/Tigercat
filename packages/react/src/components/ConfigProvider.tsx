@@ -13,7 +13,7 @@ import {
 } from '@expcat/tigercat-core'
 import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import { FeedbackDepthContext, FeedbackHost } from './FeedbackHost'
-import { FALLBACK_CONFIG, TigerConfigContext } from './tiger-config'
+import { FALLBACK_CONFIG, TigerConfigContext, TigerDocumentOwnerContext } from './tiger-config'
 import {
   createTigerLocaleScope,
   createTigerThemeScope,
@@ -35,11 +35,14 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   dir,
   theme,
   colorScheme,
+  document: documentOwner = true,
   children
 }) => {
   const parent = useContext(TigerConfigContext)
+  const parentOwnsDocument = useContext(TigerDocumentOwnerContext)
   const feedbackDepth = useContext(FeedbackDepthContext) + 1
-  const isDocumentOwner = parent === FALLBACK_CONFIG
+  const isDocumentOwner = documentOwner !== false && !parentOwnsDocument
+  const nestedScheme = colorScheme ?? parent.colorScheme
   const localeScopeRef = useRef(createTigerLocaleScope())
   const localeHandleRef = useRef<TigerLocaleHandle | null>(null)
   const documentHandleRef = useRef<DocumentConfigHandle | null>(null)
@@ -137,7 +140,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   }, [isDocumentOwner])
 
   useLayoutEffect(() => {
-    if (isDocumentOwner) return
+    if (isDocumentOwner || documentOwner === false) return
     const host = hostRef.current
     if (!host || !theme) {
       nestedScopeRef.current?.dispose()
@@ -149,17 +152,17 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
         root: host,
         nested: true,
         theme,
-        colorScheme: colorScheme ?? 'auto'
+        colorScheme: nestedScheme ?? 'auto'
       })
     }
     nestedScopeRef.current.setTheme(theme)
-    if (colorScheme) nestedScopeRef.current.setColorScheme(colorScheme)
+    if (nestedScheme) nestedScopeRef.current.setColorScheme(nestedScheme)
     else nestedScopeRef.current.apply()
     return () => {
       nestedScopeRef.current?.dispose()
       nestedScopeRef.current = null
     }
-  }, [isDocumentOwner, theme, colorScheme])
+  }, [isDocumentOwner, documentOwner, theme, nestedScheme])
 
   useLayoutEffect(() => {
     if (!documentHandleRef.current) return
@@ -174,19 +177,21 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
 
   return (
     <TigerConfigContext.Provider value={value}>
-      <div
-        ref={hostRef}
-        className="tiger-config-root"
-        data-tiger-config-root=""
-        dir={value.direction}
-        lang={layerLang}>
-        <FeedbackDepthContext.Provider value={feedbackDepth}>
-          <OverlayOutletProvider>
-            {children}
-            <FeedbackHost />
-          </OverlayOutletProvider>
-        </FeedbackDepthContext.Provider>
-      </div>
+      <TigerDocumentOwnerContext.Provider value={isDocumentOwner || parentOwnsDocument}>
+        <div
+          ref={hostRef}
+          className="tiger-config-root"
+          data-tiger-config-root=""
+          dir={value.direction}
+          lang={layerLang}>
+          <FeedbackDepthContext.Provider value={feedbackDepth}>
+            <OverlayOutletProvider>
+              {children}
+              <FeedbackHost />
+            </OverlayOutletProvider>
+          </FeedbackDepthContext.Provider>
+        </div>
+      </TigerDocumentOwnerContext.Provider>
     </TigerConfigContext.Provider>
   )
 }

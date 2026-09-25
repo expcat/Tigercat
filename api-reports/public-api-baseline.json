@@ -6816,7 +6816,7 @@
     },
     "ConfigProviderProps": {
       "extends": [],
-      "props": ["colorScheme", "dir", "iconRegistry", "locale", "theme"]
+      "props": ["colorScheme", "dir", "document", "iconRegistry", "locale", "theme"]
     },
     "ContainerProps": {
       "extends": [],

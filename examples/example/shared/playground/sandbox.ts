@@ -244,7 +244,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
             { value: { lang } },
             React.createElement(
               Tiger.ConfigProvider,
-              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme },
+              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme, document: false },
               React.createElement(demo.default)
             )
           )
@@ -259,7 +259,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
             Vue.provide('demo-lang', Vue.ref(lang))
             return () => Vue.h(
               Tiger.ConfigProvider,
-              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme },
+              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme, document: false },
               { default: () => Vue.h(demo.default) }
             )
           }

@@ -5,6 +5,9 @@ import { enUS } from '@expcat/tigercat-core/locales/en-US'
 export const FALLBACK_CONFIG: TigerConfig = { locale: enUS }
 export const TigerConfigContext = React.createContext<TigerConfig>(FALLBACK_CONFIG)
 
+/** True once an ancestor claimed `<html>`. A context-only provider leaves this false. */
+export const TigerDocumentOwnerContext = React.createContext(false)
+
 /**
  * Locale for this tree, or the document owner's locale when this tree has no provider.
  */

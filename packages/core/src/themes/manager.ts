@@ -285,9 +285,13 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
     const light = decls(lightVars)
     const dark = decls(darkVars)
     const selector = `[data-tiger-theme-scope="${scopeId}"]`
+    // A scheme changes text tokens. The same root has to paint the canvas or
+    // light text sits on whatever surface is behind the provider.
+    const canvas = 'background-color:var(--tiger-surface);color:var(--tiger-text)'
     const css = [
-      `${selector}{${light}}`,
+      `${selector}{${light};${canvas}}`,
       `${selector}[data-tiger-color-scheme="dark"],${selector}.dark{${dark}}`,
+      `.dark ${selector}:not([data-tiger-color-scheme="light"]){${dark}}`,
       `@media (prefers-color-scheme: dark){${selector}:not([data-tiger-color-scheme="light"]){${dark}}}`
     ].join('')
 

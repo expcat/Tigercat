@@ -26,7 +26,7 @@ import {
 } from '@expcat/tigercat-core'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { FeedbackDepthKey, FeedbackHost } from './FeedbackHost'
-import { TigerConfigKey } from './tiger-config'
+import { TigerConfigKey, TigerDocumentOwnerKey } from './tiger-config'
 import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import {
   createTigerLocaleScope,
@@ -57,6 +57,10 @@ export const configProviderProps = {
   colorScheme: {
     type: String as PropType<ColorScheme>,
     default: undefined
+  },
+  document: {
+    type: Boolean,
+    default: true
   }
 }
 
@@ -68,7 +72,8 @@ export const ConfigProvider = defineComponent({
   props: configProviderProps,
   setup(props, { slots }) {
     const parentInjected = inject(TigerConfigKey, null)
-    const isDocumentOwner = parentInjected === null
+    const parentOwnsDocument = inject(TigerDocumentOwnerKey, false)
+    const isDocumentOwner = props.document !== false && !parentOwnsDocument
     const parent = parentInjected ?? computed(() => ({ locale: enUS }) as TigerConfig)
     const localeScope: TigerLocaleScope = createTigerLocaleScope()
     let localeHandle: TigerLocaleHandle | null = null
@@ -170,10 +175,10 @@ export const ConfigProvider = defineComponent({
       () => ({
         host: hostRef.value,
         theme: props.theme,
-        colorScheme: props.colorScheme
+        colorScheme: props.colorScheme ?? parent.value.colorScheme
       }),
       (values) => {
-        if (isDocumentOwner) return
+        if (isDocumentOwner || props.document === false) return
         if (!values.host || !values.theme) {
           nestedScope?.dispose()
           nestedScope = null
@@ -204,6 +209,7 @@ export const ConfigProvider = defineComponent({
     })
 
     provide(TigerConfigKey, merged)
+    provide(TigerDocumentOwnerKey, isDocumentOwner || parentOwnsDocument)
     provide(FeedbackDepthKey, inject(FeedbackDepthKey, 0) + 1)
 
     return () =>

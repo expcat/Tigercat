@@ -246,6 +246,42 @@ describe('ConfigProvider', () => {
       expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('vibrant')
     })
 
+    it('paints a dark surface for a nested theme that inherits colorScheme', () => {
+      const { getByTestId } = render(
+        <ConfigProvider theme="vibrant" colorScheme="dark">
+          <ConfigProvider theme="minimal">
+            <span data-testid="inner">inner</span>
+          </ConfigProvider>
+        </ConfigProvider>
+      )
+
+      const host = getByTestId('inner').closest('[data-tiger-config-root]')
+      expect(host).toHaveAttribute('data-tiger-color-scheme', 'dark')
+      expect(host?.classList.contains('dark')).toBe(true)
+      const css = Array.from(document.querySelectorAll('style[data-tiger-theme-style]'))
+        .map((node) => node.textContent ?? '')
+        .join('')
+      expect(css).toContain('background-color:var(--tiger-surface)')
+      expect(css).toContain('color:var(--tiger-text)')
+      expect(document.documentElement.getAttribute('data-tiger-color-scheme')).toBe('dark')
+    })
+
+    it('lets a descendant own the document when the parent opts out', () => {
+      render(
+        <ConfigProvider document={false} theme="default" colorScheme="light">
+          <ConfigProvider theme="vibrant" colorScheme="dark">
+            <span>child</span>
+          </ConfigProvider>
+        </ConfigProvider>
+      )
+
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('vibrant')
+      expect(document.documentElement.getAttribute('data-tiger-color-scheme')).toBe('dark')
+      expect(document.documentElement.classList.contains('dark')).toBe(true)
+      const contextOnly = document.body.querySelector('[data-tiger-config-root]')
+      expect(contextOnly?.getAttribute('data-tiger-theme-scope')).toBeNull()
+    })
+
     it('does not remove an existing html dir when unmounting a locale-only provider', () => {
       document.documentElement.setAttribute('dir', 'rtl')
 
