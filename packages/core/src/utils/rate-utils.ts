@@ -60,14 +60,19 @@ export function getRateStarClasses(
 /** Fill the sized star host so a custom character is not a 0×0 inline glyph. */
 export const rateCharacterGlyphClasses = 'inline-flex h-full w-full items-center justify-center'
 
-/** Inner glyph of a 50% overflow clip: 200% of the clip equals the parent star box. */
-export const rateHalfStarInnerClasses = 'w-[200%] h-full'
+/**
+ * Active half of a star. Same box as the empty glyph underneath, clipped to the
+ * inline-start half. A second width utility on the glyph (w-full vs w-[200%])
+ * lets Tailwind drop one of them, so a character centers in the 50% clip and
+ * ghosts over the empty star.
+ */
+export const rateHalfStarInnerClasses =
+  'absolute inset-0 overflow-hidden [clip-path:inset(0_50%_0_0)] rtl:[clip-path:inset(0_0_0_50%)]'
 
 export const rateActiveColor =
   'text-[color-mix(in_srgb,var(--tiger-warning)_75%,var(--tiger-text))]'
 export const rateInactiveColor = 'text-[var(--tiger-text-disabled)]'
-export const rateHoverColor =
-  'text-[color-mix(in_srgb,var(--tiger-warning)_55%,var(--tiger-text))]'
+export const rateHoverColor = 'text-[color-mix(in_srgb,var(--tiger-warning)_55%,var(--tiger-text))]'
 
 /** True when the pointer is on the inline-start half of the star. */
 export function rateIsInlineStartHalf(

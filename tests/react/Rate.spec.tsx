@@ -114,8 +114,8 @@ describe('Rate', () => {
     expect(onChange).toHaveBeenCalledWith(0)
   })
 
-  // --- Half-star clip (Pages /rate readonly 4.5) ---
-  it('clips the left half of a full-width glyph at 4.5', () => {
+  // --- Half-star clip (Pages /rate) ---
+  it('clips a full-size glyph to the inline-start half at 4.5', () => {
     const { container } = render(<Rate value={4.5} allowHalf disabled />)
     const stars = getStars(container)
     expect(stars).toHaveLength(5)
@@ -126,16 +126,27 @@ describe('Rate', () => {
 
     const fifth = stars[4]
     expect(fifth.children).toHaveLength(2)
+    const [emptyLayer, fillLayer] = Array.from(fifth.children) as HTMLElement[]
+    expect(fillLayer.getAttribute('class')).toContain(rateHalfStarInnerClasses)
+    expect(fillLayer.style.width).toBe('')
 
-    const clip = fifth.querySelector('.overflow-hidden') as HTMLElement | null
-    expect(clip).not.toBeNull()
-    expect(clip!.style.width).toBe('50%')
-    expect(clip!.style.insetInlineStart).toBe('0')
+    const emptyGlyph = emptyLayer.querySelector('svg')
+    const fillGlyph = fillLayer.querySelector('svg')
+    expect(emptyGlyph).not.toBeNull()
+    expect(fillGlyph?.getAttribute('class')).toBe(emptyGlyph?.getAttribute('class'))
+    expect(fillGlyph?.getAttribute('class')).not.toContain('w-[200%]')
+  })
 
-    const glyph = clip!.querySelector('svg') ?? clip!.firstElementChild
-    expect(glyph).not.toBeNull()
-    expect(glyph!.getAttribute('class')).toContain(rateHalfStarInnerClasses)
-    expect(glyph!.getAttribute('class')).toContain('w-[200%]')
+  it('stacks a custom half character on the same box as the empty star', () => {
+    const { container } = render(<Rate value={3.5} allowHalf character="★" />)
+    const fourth = getStars(container)[3]
+    expect(fourth.children).toHaveLength(2)
+    const [emptyLayer, fillLayer] = Array.from(fourth.children) as HTMLElement[]
+    expect(fillLayer.getAttribute('class')).toContain('clip-path:inset(0_50%_0_0)')
+    expect(emptyLayer.firstElementChild?.getAttribute('class')).toBe(
+      fillLayer.firstElementChild?.getAttribute('class')
+    )
+    expect(fillLayer.firstElementChild?.getAttribute('class')).not.toContain('w-[200%]')
   })
 
   // --- Accessibility ---

@@ -123,22 +123,18 @@ export const Rate = defineComponent({
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const isChar = Boolean(slots.character || props.character)
-      const glyph = (extraClass?: string) => {
+      const glyph = () => {
         const slotChar = slots.character?.()
         return slotChar
-          ? h('span', { class: classNames(rateCharacterGlyphClasses, extraClass) }, slotChar)
+          ? h('span', { class: rateCharacterGlyphClasses }, slotChar)
           : isChar
-            ? h(
-                'span',
-                { class: classNames(rateCharacterGlyphClasses, extraClass) },
-                props.character
-              )
+            ? h('span', { class: rateCharacterGlyphClasses }, props.character)
             : h(
                 'svg',
                 {
                   viewBox: starViewBox,
                   fill: 'currentColor',
-                  class: extraClass ?? 'h-full w-full'
+                  class: 'h-full w-full'
                 },
                 [h('path', { d: starPathD })]
               )
@@ -159,12 +155,11 @@ export const Rate = defineComponent({
                 'span',
                 {
                   class: classNames(
-                    'absolute top-0 bottom-0 overflow-hidden',
+                    rateHalfStarInnerClasses,
                     isHovering ? rateHoverColor : rateActiveColor
-                  ),
-                  style: { width: '50%', insetInlineStart: 0 }
+                  )
                 },
-                [glyph(rateHalfStarInnerClasses)]
+                [glyph()]
               )
             ]
           : [h('span', { class: colorClass }, [glyph()])]

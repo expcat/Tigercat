@@ -82,11 +82,11 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
   const displayValue = hoverValue > 0 ? hoverValue : normalized
   const isChar = character != null && character !== false
 
-  const glyph = (extraClass?: string) =>
+  const glyph = () =>
     isChar ? (
-      <span className={classNames(rateCharacterGlyphClasses, extraClass)}>{character}</span>
+      <span className={rateCharacterGlyphClasses}>{character}</span>
     ) : (
-      <svg viewBox={starViewBox} fill="currentColor" className={extraClass ?? 'h-full w-full'}>
+      <svg viewBox={starViewBox} fill="currentColor" className="h-full w-full">
         <path d={starPathD} />
       </svg>
     )
@@ -115,11 +115,10 @@ export const Rate = forwardRef<HTMLDivElement, RateProps>(function Rate(
         <span className={classNames('absolute inset-0', rateInactiveColor)}>{glyph()}</span>
         <span
           className={classNames(
-            'absolute top-0 bottom-0 overflow-hidden',
+            rateHalfStarInnerClasses,
             isHovering ? rateHoverColor : rateActiveColor
-          )}
-          style={{ width: '50%', insetInlineStart: 0 }}>
-          {glyph(rateHalfStarInnerClasses)}
+          )}>
+          {glyph()}
         </span>
       </>
     ) : (
