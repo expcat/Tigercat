@@ -15,7 +15,7 @@ description: Compact generated Tigercat Composite props reference
 
 Uses: `Tag`.
 
-Note: 只读钉钉风审批树，复用 `WorkflowTimelineStep`。children 是并行/抄送/条件分支 stub；会签人用 `actors` 或 `tasks` 列行，不要做成横向子卡。当前节点色点/「进行中」+ 路径图例；加签临时节点、退回目标、未走支可视化。无第二套时间线，无 BPM 引擎。
+Note: 只读审批拓扑，复用 `WorkflowTimelineStep`。顺序节点同一列；两个及以上 `children` 横向分岔再汇合。`loopTo` 指向另一节点 key 时在右侧画退回环，未知 key 与自环忽略。会签人用 `actors` 或 `tasks` 列在卡内，不要做成横向子卡。当前节点色点/「进行中」+ 路径图例；加签临时节点、退回目标、未走支可视化。无第二套时间线，无 BPM 引擎。
 
 | Prop                 | Type                                   | Default | Notes                                                                 |
 | -------------------- | -------------------------------------- | ------- | --------------------------------------------------------------------- |

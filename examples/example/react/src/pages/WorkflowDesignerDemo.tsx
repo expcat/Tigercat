@@ -7,7 +7,7 @@ export default function WorkflowDesignerDemo() {
   return (
     <DemoPage
       title="WorkflowDesigner 流程设计器"
-      description="纵向摘要卡流程画布 + Inspector 同屏。复用 WorkflowTimelineStep，可选子路径。不是 BPMN。"
+      description="中轴摘要卡画布，多分岔横向展开，结构操作在 Inspector。复用 WorkflowTimelineStep，可选子路径。不是 BPMN。"
       modules={modules}
     />
   )

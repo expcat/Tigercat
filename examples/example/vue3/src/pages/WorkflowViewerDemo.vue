@@ -8,6 +8,6 @@ const modules = getDemoModules('workflow-viewer')
 <template>
   <DemoPage
     title="WorkflowViewer 审批树"
-    description="只读钉钉风审批树，复用 WorkflowTimelineStep。不是第二套 Timeline，不是 BPMN。"
+    description="只读审批拓扑：分岔与 loopTo 退回环，复用 WorkflowTimelineStep。不是第二套 Timeline，不是 BPMN。"
     :modules="modules" />
 </template>

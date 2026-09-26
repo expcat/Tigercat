@@ -15,7 +15,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/workflow-designer/` and `examples/example/react/src/examples/workflow-designer/`.
 
-Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。摘要按钮可聚焦，Enter 打开检查器。Inspector 标签用方向键移动。`onChange` 带上 `issues`。有阻塞项时发布按钮不可用，横幅是同一句话。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵，缺省权限与运行时是同一个更严默认。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。
+Note: 简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。摘要卡沿中轴排列，最多约 16rem 宽；两个及以上子节点横向分岔再汇合。摘要按钮可聚焦，Enter 打开检查器。上移/下移/复制/添加子步骤/删除只在选中节点的 Inspector，不重复铺在每张卡上。Inspector 标签用方向键移动。`onChange` 带上 `issues`。有阻塞项时发布按钮不可用，横幅是同一句话。节点间 `+` 打开调色板插入。`schema` 驱动字段权限矩阵，缺省权限与运行时是同一个更严默认。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。中轴与分岔几何由 Tailwind plugin 注入。
 
 Vue: `<WorkflowDesigner v-model="steps" />`
 

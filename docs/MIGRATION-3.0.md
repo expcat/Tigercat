@@ -215,6 +215,12 @@ svg 是 `role="group"`，名字在组上。轴和标记仍可逐条读到。
 
 条件是字段、运算符、值，只进入选中的那一条分支。`onChange` 带上 `issues`。有阻塞项时发布不可用。缺省权限只有 `defaultWorkflowFieldPermission`，更严的一边生效。空画布文案是 locale `emptyHint`。
 
+画布是中轴上的紧凑摘要卡。两个及以上子节点横向分岔再汇合。上移、下移、复制、添加子步骤、删除只在选中节点的 Inspector。节点间 `+` 仍在画布上。中轴与分岔几何由 Tailwind plugin（`.tiger-workflow-designer__flow::before` 等）注入，消费者须加载该 plugin。
+
+## WorkflowViewer
+
+顺序节点同一列。两个及以上 `children` 横向分岔，下一项在分岔下方汇合。`loopTo` 是另一节点的 `key`，查看器在右侧画退回环；未知 key 和自环不画。会签人仍在卡片内，不是横向子卡。无新必填 prop。
+
 ## WorkflowActionBar
 
 reducer 拒绝不属于当前操作者的动作，并拒绝空的必填意见。

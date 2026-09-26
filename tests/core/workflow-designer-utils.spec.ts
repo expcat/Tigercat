@@ -31,6 +31,7 @@ import {
   workflowDesignerCanvasBaseStyles,
   workflowDesignerCardClasses,
   workflowDesignerChildrenClasses,
+  workflowDesignerForkTrackStyle,
   workflowDesignerInsertRowClasses,
   workflowDesignerKindColor,
   workflowDesignerListClasses,
@@ -335,13 +336,17 @@ describe('workflow-designer helpers', () => {
 
 describe('WorkflowDesigner center-rail class tokens', () => {
   it('uses semantic flow/insert/children tokens without a left-edge spine', () => {
-    expect(workflowDesignerListClasses).toBe('tiger-workflow-designer__flow')
-    expect(workflowDesignerInsertRowClasses).toBe('tiger-workflow-designer__insert')
-    expect(workflowDesignerChildrenClasses).toBe('tiger-workflow-designer__children')
+    expect(workflowDesignerListClasses).toContain('tiger-workflow-designer__flow')
+    expect(workflowDesignerInsertRowClasses).toContain('tiger-workflow-designer__insert')
+    expect(workflowDesignerChildrenClasses).toContain('tiger-workflow-designer__children')
     expect(workflowDesignerCardClasses).toContain('tiger-workflow-designer__card')
+    expect(workflowDesignerCardClasses).toContain('max-w-64')
     expect(workflowDesignerListClasses).not.toMatch(/border-s-2/)
     expect(workflowDesignerInsertRowClasses).not.toMatch(/-ms-\[/)
     expect(workflowDesignerChildrenClasses).not.toMatch(/border-s-2/)
+    expect(workflowDesignerForkTrackStyle(2)).toEqual({ width: '50%', marginInline: 'auto' })
+    expect(workflowDesignerForkTrackStyle(1)).toEqual({ width: '0', marginInline: 'auto' })
+    expect(parseFloat(workflowDesignerForkTrackStyle(3).width)).toBeCloseTo(100 - 100 / 3, 5)
   })
 
   it('centers the canvas rail and insert control in plugin CSS', () => {
@@ -368,21 +373,31 @@ describe('WorkflowDesigner center-rail class tokens', () => {
     expect(
       workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__children']
     ).not.toHaveProperty('borderInlineStart')
+    expect(
+      workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__children']
+    ).not.toHaveProperty('paddingInline')
+    expect(workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__card']).toMatchObject({
+      width: 'min(100%, 16rem)'
+    })
+    expect(workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__fork']).toMatchObject({
+      display: 'flex',
+      flexDirection: 'column'
+    })
   })
 
-  it('keeps canvas geometry in the component style module', () => {
+  it('ships the center rail through the tailwind plugin', () => {
     const rules: Record<string, unknown> = {}
     type PluginInstance = {
       handler: (api: { addBase: (rule: Record<string, unknown>) => void }) => void
     }
     const plugin = tigercatPlugin as unknown as PluginInstance
     plugin.handler({ addBase: (rule) => Object.assign(rules, rule) })
-    expect(
-      workflowDesignerCanvasBaseStyles['.tiger-workflow-designer__flow::before']
-    ).toMatchObject({
+    expect(rules['.tiger-workflow-designer__flow::before']).toMatchObject({
       left: '50%',
       transform: 'translateX(-50%)'
     })
-    expect(rules['.tiger-workflow-designer__flow::before']).toBeUndefined()
+    expect(rules['.tiger-workflow-designer__fork']).toMatchObject({
+      display: 'flex'
+    })
   })
 })

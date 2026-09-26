@@ -295,11 +295,11 @@ const COMPONENT_USAGE_NOTES = {
   WorkflowViewer: {
     uses: ['Tag'],
     notes:
-      '只读钉钉风审批树，复用 `WorkflowTimelineStep`。children 是并行/抄送/条件分支 stub；会签人用 `actors` 或 `tasks` 列行，不要做成横向子卡。当前节点色点/「进行中」+ 路径图例；加签临时节点、退回目标、未走支可视化。无第二套时间线，无 BPM 引擎。'
+      '只读审批拓扑，复用 `WorkflowTimelineStep`。顺序节点同一列；两个及以上 `children` 横向分岔再汇合。`loopTo` 指向另一节点 key 时在右侧画退回环，未知 key 与自环忽略。会签人用 `actors` 或 `tasks` 列在卡内，不要做成横向子卡。当前节点色点/「进行中」+ 路径图例；加签临时节点、退回目标、未走支可视化。无第二套时间线，无 BPM 引擎。'
   },
   WorkflowDesigner: {
     notes:
-      '简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。摘要按钮可聚焦，Enter 打开检查器。Inspector 标签用方向键移动。`onChange` 带上 `issues`。有阻塞项时发布按钮不可用，横幅是同一句话。节点间 `+` 打开调色板插入；支持复制/删除。`schema` 驱动字段权限矩阵，缺省权限与运行时是同一个更严默认。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。'
+      '简单 JSON 树流程编辑器，复用 `WorkflowTimelineStep`，不是 BPMN / Flowable / Camunda。摘要卡沿中轴排列，最多约 16rem 宽；两个及以上子节点横向分岔再汇合。摘要按钮可聚焦，Enter 打开检查器。上移/下移/复制/添加子步骤/删除只在选中节点的 Inspector，不重复铺在每张卡上。Inspector 标签用方向键移动。`onChange` 带上 `issues`。有阻塞项时发布按钮不可用，横幅是同一句话。节点间 `+` 打开调色板插入。`schema` 驱动字段权限矩阵，缺省权限与运行时是同一个更严默认。`path` 可选，只编辑该节点的 children 并回写整树。可从 `@expcat/tigercat-core/workflow-designer` tree-shake helpers。空画布文案是 locale `emptyHint`，没有 `emptyText` prop。中轴与分岔几何由 Tailwind plugin 注入。'
   },
   AppShell: {
     uses: ['Layout', 'Sidebar', 'Header', 'Content', 'Breadcrumb', 'Tabs', 'PageHeader'],

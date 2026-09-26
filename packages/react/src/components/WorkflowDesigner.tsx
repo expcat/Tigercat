@@ -62,6 +62,12 @@ import {
   workflowDesignerFieldPermissionLabel,
   workflowDesignerFieldPermissionRows,
   workflowDesignerFieldsClasses,
+  workflowDesignerForkBarClasses,
+  workflowDesignerForkClasses,
+  workflowDesignerForkJoinClasses,
+  workflowDesignerForkTrackStyle,
+  workflowDesignerBranchClasses,
+  workflowDesignerBranchesClasses,
   workflowDesignerHintClasses,
   workflowDesignerInsertButtonClasses,
   workflowDesignerInsertGlyph,
@@ -151,7 +157,7 @@ function ActionButton({
   )
 }
 
-function DesignerNode({
+function DesignerBranch({
   node,
   selectedKey,
   insertMenuPath,
@@ -159,12 +165,8 @@ function DesignerNode({
   labels,
   timelineLabels,
   onSelect,
-  onMove,
-  onAddChild,
-  onCopy,
   onInsertKind,
-  onToggleInsert,
-  onRemove
+  onToggleInsert
 }: {
   node: WorkflowDesignerNode
   selectedKey: string | null
@@ -173,12 +175,104 @@ function DesignerNode({
   labels: Required<TigerLocaleWorkflowDesigner>
   timelineLabels: Required<TigerLocaleWorkflowTimeline>
   onSelect: (node: WorkflowDesignerNode) => void
-  onMove: (path: WorkflowDesignerPath, delta: number) => void
-  onAddChild: (path: WorkflowDesignerPath) => void
-  onCopy: (path: WorkflowDesignerPath) => void
   onInsertKind: (path: WorkflowDesignerPath, kind: WorkflowStepKind) => void
   onToggleInsert: (path: WorkflowDesignerPath) => void
-  onRemove: (path: WorkflowDesignerPath) => void
+}) {
+  return (
+    <DesignerNode
+      node={node}
+      selectedKey={selectedKey}
+      insertMenuPath={insertMenuPath}
+      locked={locked}
+      labels={labels}
+      timelineLabels={timelineLabels}
+      onSelect={onSelect}
+      onInsertKind={onInsertKind}
+      onToggleInsert={onToggleInsert}
+    />
+  )
+}
+
+function DesignerChildren({
+  node,
+  selectedKey,
+  insertMenuPath,
+  locked,
+  labels,
+  timelineLabels,
+  onSelect,
+  onInsertKind,
+  onToggleInsert
+}: {
+  node: WorkflowDesignerNode
+  selectedKey: string | null
+  insertMenuPath: string | null
+  locked: boolean
+  labels: Required<TigerLocaleWorkflowDesigner>
+  timelineLabels: Required<TigerLocaleWorkflowTimeline>
+  onSelect: (node: WorkflowDesignerNode) => void
+  onInsertKind: (path: WorkflowDesignerPath, kind: WorkflowStepKind) => void
+  onToggleInsert: (path: WorkflowDesignerPath) => void
+}) {
+  if (node.children.length === 0) return null
+  const shared = {
+    selectedKey,
+    insertMenuPath,
+    locked,
+    labels,
+    timelineLabels,
+    onSelect,
+    onInsertKind,
+    onToggleInsert
+  }
+  if (node.children.length === 1) {
+    const only = node.children[0]!
+    return (
+      <div className={workflowDesignerChildrenClasses} data-layout="stack">
+        <ol className={workflowDesignerListClasses}>
+          <DesignerBranch key={only.key} node={only} {...shared} />
+        </ol>
+      </div>
+    )
+  }
+  const track = workflowDesignerForkTrackStyle(node.children.length)
+  return (
+    <div className={workflowDesignerForkClasses} data-layout="fork">
+      <div className={workflowDesignerForkBarClasses} style={track} aria-hidden="true" />
+      <div className={workflowDesignerBranchesClasses}>
+        {node.children.map((child) => (
+          <div key={child.key} className={workflowDesignerBranchClasses}>
+            <ol className={workflowDesignerListClasses}>
+              <DesignerBranch node={child} {...shared} />
+            </ol>
+          </div>
+        ))}
+      </div>
+      <div className={workflowDesignerForkJoinClasses} style={track} aria-hidden="true" />
+    </div>
+  )
+}
+
+function DesignerNode({
+  node,
+  selectedKey,
+  insertMenuPath,
+  locked,
+  labels,
+  timelineLabels,
+  onSelect,
+  onInsertKind,
+  onToggleInsert
+}: {
+  node: WorkflowDesignerNode
+  selectedKey: string | null
+  insertMenuPath: string | null
+  locked: boolean
+  labels: Required<TigerLocaleWorkflowDesigner>
+  timelineLabels: Required<TigerLocaleWorkflowTimeline>
+  onSelect: (node: WorkflowDesignerNode) => void
+  onInsertKind: (path: WorkflowDesignerPath, kind: WorkflowStepKind) => void
+  onToggleInsert: (path: WorkflowDesignerPath) => void
 }) {
   const selected = selectedKey === workflowDesignerPathKey(node.path)
   const groupName = node.title || node.key
@@ -213,58 +307,18 @@ function DesignerNode({
           </div>
           {summary ? <div className={workflowDesignerSummaryActorsClasses}>{summary}</div> : null}
         </button>
-        <div className={workflowDesignerToolbarClasses}>
-          <ActionButton
-            label={labels.moveUp}
-            disabled={locked || !node.canMoveUp}
-            onClick={() => onMove(node.path, -1)}
-          />
-          <ActionButton
-            label={labels.moveDown}
-            disabled={locked || !node.canMoveDown}
-            onClick={() => onMove(node.path, 1)}
-          />
-          <ActionButton
-            label={labels.copyStep}
-            disabled={locked}
-            onClick={() => onCopy(node.path)}
-          />
-          <ActionButton
-            label={labels.addChild}
-            disabled={locked}
-            onClick={() => onAddChild(node.path)}
-          />
-          <ActionButton
-            label={labels.removeStep}
-            disabled={locked}
-            onClick={() => onRemove(node.path)}
-          />
-        </div>
       </div>
-      {node.children.length > 0 ? (
-        <div className={workflowDesignerChildrenClasses}>
-          <ol className={workflowDesignerListClasses}>
-            {node.children.map((child) => (
-              <DesignerNode
-                key={child.key}
-                node={child}
-                selectedKey={selectedKey}
-                insertMenuPath={insertMenuPath}
-                locked={locked}
-                labels={labels}
-                timelineLabels={timelineLabels}
-                onSelect={onSelect}
-                onMove={onMove}
-                onAddChild={onAddChild}
-                onCopy={onCopy}
-                onInsertKind={onInsertKind}
-                onToggleInsert={onToggleInsert}
-                onRemove={onRemove}
-              />
-            ))}
-          </ol>
-        </div>
-      ) : null}
+      <DesignerChildren
+        node={node}
+        selectedKey={selectedKey}
+        insertMenuPath={insertMenuPath}
+        locked={locked}
+        labels={labels}
+        timelineLabels={timelineLabels}
+        onSelect={onSelect}
+        onInsertKind={onInsertKind}
+        onToggleInsert={onToggleInsert}
+      />
       <div className={workflowDesignerInsertRowClasses}>
         <ActionButton
           label={workflowDesignerInsertGlyph}
@@ -278,7 +332,10 @@ function DesignerNode({
           <div
             role="menu"
             aria-label={labels.paletteAriaLabel}
-            className={workflowDesignerPaletteClasses}>
+            className={classNames(
+              workflowDesignerPaletteClasses,
+              'col-start-3 ms-1 justify-self-start'
+            )}>
             {WORKFLOW_DESIGNER_PALETTE_KINDS.map((kind) => (
               <button
                 key={kind}
@@ -316,7 +373,10 @@ function DesignerEditPanel({
   onTabChange,
   onPatch,
   onInsertChild,
-  onRemovePath
+  onRemovePath,
+  onMove,
+  onCopy,
+  onAddChild
 }: {
   node: WorkflowDesignerNode
   locked: boolean
@@ -330,6 +390,9 @@ function DesignerEditPanel({
   onPatch: (path: WorkflowDesignerPath, patch: WorkflowDesignerStepPatch) => void
   onInsertChild: (parentPath: WorkflowDesignerPath, step: WorkflowTimelineStep) => void
   onRemovePath: (path: WorkflowDesignerPath) => void
+  onMove: (path: WorkflowDesignerPath, delta: number) => void
+  onCopy: (path: WorkflowDesignerPath) => void
+  onAddChild: (path: WorkflowDesignerPath) => void
 }) {
   const source = workflowDesignerApproverSourceFromStep(node.step)
   const sourceOptions = workflowDesignerApproverSourceOptions(labels)
@@ -883,6 +946,32 @@ function DesignerEditPanel({
       role="region"
       aria-label={labels.editPanelAriaLabel}
       data-slot="inspector">
+      <div
+        className={workflowDesignerToolbarClasses}
+        role="toolbar"
+        aria-label={node.title || node.key}>
+        <ActionButton
+          label={labels.moveUp}
+          disabled={locked || !node.canMoveUp}
+          onClick={() => onMove(node.path, -1)}
+        />
+        <ActionButton
+          label={labels.moveDown}
+          disabled={locked || !node.canMoveDown}
+          onClick={() => onMove(node.path, 1)}
+        />
+        <ActionButton label={labels.copyStep} disabled={locked} onClick={() => onCopy(node.path)} />
+        <ActionButton
+          label={labels.addChild}
+          disabled={locked}
+          onClick={() => onAddChild(node.path)}
+        />
+        <ActionButton
+          label={labels.removeStep}
+          disabled={locked}
+          onClick={() => onRemovePath(node.path)}
+        />
+      </div>
       <div className={workflowDesignerFieldsClasses}>
         <label className={workflowDesignerFieldClasses}>
           <span className={workflowDesignerLabelClasses}>{labels.titleLabel}</span>
@@ -1199,15 +1288,11 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
                   labels={designerLabels}
                   timelineLabels={timelineLabels}
                   onSelect={handleSelect}
-                  onMove={handleMove}
-                  onAddChild={handleAddChild}
-                  onCopy={handleCopy}
                   onInsertKind={handleInsertKind}
                   onToggleInsert={(nodePath) => {
                     const key = workflowDesignerPathKey(nodePath)
                     setInsertMenuPath((current) => (current === key ? null : key))
                   }}
-                  onRemove={handleRemove}
                 />
               ))}
             </ol>
@@ -1234,6 +1319,9 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
               commit(insertWorkflowStepAtPath(steps, parentPath, step))
             }}
             onRemovePath={handleRemove}
+            onMove={handleMove}
+            onCopy={handleCopy}
+            onAddChild={handleAddChild}
           />
         ) : (
           <div

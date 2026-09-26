@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import {
   buildWorkflowViewerTree,
   classNames,
+  layoutWorkflowViewer,
   getWorkflowReturnTargetStep,
   getWorkflowRollbackStep,
   getWorkflowStepActorsPresentation,
@@ -24,15 +25,27 @@ import {
   workflowStepStatusTagVariant,
   workflowTaskRowStatusLabel,
   workflowViewerActiveTitleClasses,
-  workflowViewerBranchClasses,
+  workflowViewerBarClasses,
+  workflowViewerBarStyle,
   workflowViewerCardClassName,
-  workflowViewerChildLayout,
-  workflowViewerConnectorClasses,
-  workflowViewerItemClasses,
+  workflowViewerCardGridStyle,
+  workflowViewerCellClasses,
+  workflowViewerEdgeForkClasses,
+  workflowViewerEdgeGridStyle,
+  workflowViewerEdgeJoinClasses,
+  workflowViewerEdgeSequenceClasses,
+  workflowViewerForkDropClasses,
+  workflowViewerGraphClasses,
+  workflowViewerGridStyle,
+  workflowViewerJoinBarClasses,
   workflowViewerKindRowClasses,
   workflowViewerLegendClasses,
   workflowViewerLegendItemClasses,
-  workflowViewerListClasses,
+  workflowViewerLoopClasses,
+  workflowViewerLoopGridStyle,
+  workflowViewerLoopLabelClasses,
+  workflowViewerLoopRailClasses,
+  workflowViewerLoopRailStyle,
   workflowViewerReturnTargetLabelClasses,
   workflowViewerRollbackLabelClasses,
   workflowViewerRootClasses,
@@ -41,6 +54,8 @@ import {
   type WorkflowTask,
   type WorkflowTimelineStep,
   type WorkflowTimelineStepStatus,
+  type WorkflowViewerLayout,
+  type WorkflowViewerLayoutEdge,
   type WorkflowViewerLegendItem,
   type WorkflowViewerNode,
   type WorkflowViewerProps as CoreWorkflowViewerProps
@@ -239,51 +254,117 @@ function ViewerCard({
   )
 }
 
-function ViewerSequence({
+function ViewerEdge({ edge }: { edge: WorkflowViewerLayoutEdge }) {
+  if (edge.kind === 'loop') return null
+  const bar =
+    edge.kind === 'fork' || edge.kind === 'join' ? (
+      <span
+        className={edge.kind === 'fork' ? workflowViewerBarClasses : workflowViewerJoinBarClasses}
+        style={workflowViewerBarStyle(edge)}
+        aria-hidden="true"
+      />
+    ) : null
+  return (
+    <div
+      className={
+        edge.kind === 'fork'
+          ? workflowViewerEdgeForkClasses
+          : edge.kind === 'join'
+            ? workflowViewerEdgeJoinClasses
+            : workflowViewerEdgeSequenceClasses
+      }
+      style={workflowViewerEdgeGridStyle(edge)}
+      data-workflow-edge={edge.kind}
+      aria-hidden="true">
+      {bar}
+    </div>
+  )
+}
+
+function ViewerLoop({
+  layout,
+  edge,
+  labels
+}: {
+  layout: WorkflowViewerLayout
+  edge: WorkflowViewerLayoutEdge
+  labels: Required<TigerLocaleWorkflowTimeline>
+}) {
+  const style = workflowViewerLoopGridStyle(layout, edge)
+  if (!style) return null
+  const target = layout.placements.find((placement) => placement.key === edge.to)
+  const title = target?.node.step.title ?? target?.node.step.label ?? edge.to
+  return (
+    <div
+      className={workflowViewerLoopClasses}
+      style={style}
+      role="img"
+      aria-label={`${labels.returnTarget}: ${title}`}
+      data-workflow-edge="loop"
+      data-workflow-loop-from={edge.from}
+      data-workflow-loop-to={edge.to}>
+      <div className={workflowViewerLoopRailClasses} style={workflowViewerLoopRailStyle()}>
+        <span className={workflowViewerLoopLabelClasses}>{title}</span>
+      </div>
+    </div>
+  )
+}
+
+function ViewerGraph({
   nodes,
   labels,
   highlightPath,
   showRollbackPoint,
-  layout,
   tasks
 }: {
   nodes: WorkflowViewerNode[]
   labels: Required<TigerLocaleWorkflowTimeline>
   highlightPath: boolean
   showRollbackPoint: boolean
-  layout: 'stack' | 'branch'
   tasks?: WorkflowTask[]
 }) {
+  const layout = useMemo(() => layoutWorkflowViewer(nodes), [nodes])
   return (
-    <ol className={layout === 'branch' ? workflowViewerBranchClasses : workflowViewerListClasses}>
-      {nodes.map((node, index) => (
-        <li key={node.key} className={workflowViewerItemClasses}>
-          {layout === 'stack' && index > 0 ? (
-            <div className={workflowViewerConnectorClasses} aria-hidden="true" />
+    <div
+      className={workflowViewerGraphClasses}
+      style={workflowViewerGridStyle(layout)}
+      data-layout="graph"
+      data-workflow-fork={layout.hasFork ? 'true' : undefined}
+      data-workflow-loop={layout.hasLoop ? 'true' : undefined}>
+      {layout.edges
+        .filter((edge) => edge.kind !== 'loop')
+        .map((edge) => (
+          <ViewerEdge key={`${edge.kind}-${edge.from}-${edge.to}`} edge={edge} />
+        ))}
+      {layout.edges
+        .filter((edge) => edge.kind === 'loop')
+        .map((edge) => (
+          <ViewerLoop
+            key={`loop-${edge.from}-${edge.to}`}
+            layout={layout}
+            edge={edge}
+            labels={labels}
+          />
+        ))}
+      {layout.placements.map((placement) => (
+        <div
+          key={placement.key}
+          className={workflowViewerCellClasses}
+          style={workflowViewerCardGridStyle(placement)}
+          data-workflow-node={placement.key}>
+          {placement.forkChild ? (
+            <div className={workflowViewerForkDropClasses} aria-hidden="true" />
           ) : null}
           <ViewerCard
-            node={node}
+            node={placement.node}
             labels={labels}
             highlightPath={highlightPath}
             showRollbackPoint={showRollbackPoint}
             tasks={tasks}
           />
-          {node.children.length > 0 ? (
-            <>
-              <div className={workflowViewerConnectorClasses} aria-hidden="true" />
-              <ViewerSequence
-                nodes={node.children}
-                labels={labels}
-                highlightPath={highlightPath}
-                showRollbackPoint={showRollbackPoint}
-                layout={workflowViewerChildLayout(node)}
-                tasks={tasks}
-              />
-            </>
-          ) : null}
-        </li>
+        </div>
       ))}
-    </ol>
+    </div>
   )
 }
 
@@ -326,12 +407,11 @@ export const WorkflowViewer: React.FC<WorkflowViewerProps> = ({
       role="region"
       aria-label={ariaLabel ?? stepLabels.viewerAriaLabel}>
       <ViewerLegend items={legendItems} ariaLabel={stepLabels.legendAriaLabel} />
-      <ViewerSequence
+      <ViewerGraph
         nodes={tree}
         labels={stepLabels}
         highlightPath={highlightPath}
         showRollbackPoint={showRollbackPoint}
-        layout="stack"
         tasks={tasks}
       />
     </div>

@@ -7,7 +7,9 @@ import type { WorkflowTask, WorkflowTimelineStep } from './workflow-timeline'
 
 /**
  * Read-only workflow tree. Same {@link WorkflowTimelineStep} model as
- * WorkflowTimeline. Not a second timeline.
+ * WorkflowTimeline. Sequential siblings share a column. A node with two or
+ * more children fans those children into columns. `loopTo` draws a back-edge.
+ * Not a second timeline and not BPMN.
  */
 export interface WorkflowViewerProps {
   /** Approval steps. Children stay nested for the tree. */

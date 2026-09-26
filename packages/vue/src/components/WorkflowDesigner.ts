@@ -66,6 +66,12 @@ import {
   workflowDesignerFieldPermissionLabel,
   workflowDesignerFieldPermissionRows,
   workflowDesignerFieldsClasses,
+  workflowDesignerForkBarClasses,
+  workflowDesignerForkClasses,
+  workflowDesignerForkJoinClasses,
+  workflowDesignerForkTrackStyle,
+  workflowDesignerBranchClasses,
+  workflowDesignerBranchesClasses,
   workflowDesignerHintClasses,
   workflowDesignerInsertButtonClasses,
   workflowDesignerInsertGlyph,
@@ -910,6 +916,7 @@ export const WorkflowDesigner = defineComponent({
           'data-slot': 'inspector'
         },
         [
+          renderStructureToolbar(node),
           h('div', { class: workflowDesignerFieldsClasses, 'data-slot': 'inspector-fields' }, [
             h('label', { class: workflowDesignerFieldClasses }, [
               h('span', { class: workflowDesignerLabelClasses }, labels.titleLabel),
@@ -1020,6 +1027,62 @@ export const WorkflowDesigner = defineComponent({
       )
     }
 
+    function renderChildTopology(node: WorkflowDesignerNode): VNode | null {
+      if (node.children.length === 0) return null
+      if (node.children.length === 1) {
+        return h('div', { class: workflowDesignerChildrenClasses, 'data-layout': 'stack' }, [
+          renderList(node.children)
+        ])
+      }
+      const track = workflowDesignerForkTrackStyle(node.children.length)
+      return h('div', { class: workflowDesignerForkClasses, 'data-layout': 'fork' }, [
+        h('div', { class: workflowDesignerForkBarClasses, style: track, 'aria-hidden': 'true' }),
+        h(
+          'div',
+          { class: workflowDesignerBranchesClasses },
+          node.children.map((child) =>
+            h('div', { key: child.key, class: workflowDesignerBranchClasses }, [
+              renderList([child])
+            ])
+          )
+        ),
+        h('div', { class: workflowDesignerForkJoinClasses, style: track, 'aria-hidden': 'true' })
+      ])
+    }
+
+    function renderStructureToolbar(node: WorkflowDesignerNode): VNode {
+      const labels = designerLabels.value
+      return h(
+        'div',
+        {
+          class: workflowDesignerToolbarClasses,
+          role: 'toolbar',
+          'aria-label': node.title || node.key
+        },
+        [
+          renderActionButton(labels.moveUp, locked.value || !node.canMoveUp, () => {
+            commit(moveWorkflowStepAtPath(sourceSteps.value, node.path, -1))
+          }),
+          renderActionButton(labels.moveDown, locked.value || !node.canMoveDown, () => {
+            commit(moveWorkflowStepAtPath(sourceSteps.value, node.path, 1))
+          }),
+          renderActionButton(labels.copyStep, locked.value, () => copyNode(node.path)),
+          renderActionButton(labels.addChild, locked.value, () => {
+            const created =
+              node.kind === 'condition'
+                ? createWorkflowDesignerStep(sourceSteps.value, {
+                    kind: 'approve',
+                    title: labels.branchLabel,
+                    condition: { field: '', operator: 'eq', value: '' }
+                  })
+                : createWorkflowDesignerStep(sourceSteps.value)
+            commit(insertWorkflowStepAtPath(sourceSteps.value, node.path, created))
+          }),
+          renderActionButton(labels.removeStep, locked.value, () => removeNode(node.path))
+        ]
+      )
+    }
+
     function renderNode(node: WorkflowDesignerNode): VNode {
       const labels = designerLabels.value
       const selected = selectedKey.value === workflowDesignerPathKey(node.path)
@@ -1036,34 +1099,9 @@ export const WorkflowDesigner = defineComponent({
             'aria-selected': selected ? 'true' : undefined,
             onClick: () => selectNode(node)
           },
-          [
-            renderSummary(node),
-            h('div', { class: workflowDesignerToolbarClasses }, [
-              renderActionButton(labels.moveUp, locked.value || !node.canMoveUp, () => {
-                commit(moveWorkflowStepAtPath(sourceSteps.value, node.path, -1))
-              }),
-              renderActionButton(labels.moveDown, locked.value || !node.canMoveDown, () => {
-                commit(moveWorkflowStepAtPath(sourceSteps.value, node.path, 1))
-              }),
-              renderActionButton(labels.copyStep, locked.value, () => copyNode(node.path)),
-              renderActionButton(labels.addChild, locked.value, () => {
-                const created =
-                  node.kind === 'condition'
-                    ? createWorkflowDesignerStep(sourceSteps.value, {
-                        kind: 'approve',
-                        title: labels.branchLabel,
-                        condition: { field: '', operator: 'eq', value: '' }
-                      })
-                    : createWorkflowDesignerStep(sourceSteps.value)
-                commit(insertWorkflowStepAtPath(sourceSteps.value, node.path, created))
-              }),
-              renderActionButton(labels.removeStep, locked.value, () => removeNode(node.path))
-            ])
-          ]
+          [renderSummary(node)]
         ),
-        node.children.length > 0
-          ? h('div', { class: workflowDesignerChildrenClasses }, [renderList(node.children)])
-          : null,
+        renderChildTopology(node),
         h('div', { class: workflowDesignerInsertRowClasses }, [
           renderActionButton(
             workflowDesignerInsertGlyph,
@@ -1081,7 +1119,10 @@ export const WorkflowDesigner = defineComponent({
                 {
                   role: 'menu',
                   'aria-label': labels.paletteAriaLabel,
-                  class: workflowDesignerPaletteClasses
+                  class: classNames(
+                    workflowDesignerPaletteClasses,
+                    'col-start-3 ms-1 justify-self-start'
+                  )
                 },
                 WORKFLOW_DESIGNER_PALETTE_KINDS.map((kind) =>
                   h(

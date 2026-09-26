@@ -39,17 +39,19 @@ export const EMPTY_WORKFLOW_DESIGNER_STEPS: WorkflowTimelineStep[] = []
 /**
  * Plugin CSS for the WorkflowDesigner canvas spine.
  *
- * The 2.6 canvas used a start-edge rail (`border-s-2` + insert `-ms-[1.15rem]`)
- * so the line sat on the cards' left edge. Geometry now ships with the
- * Tailwind plugin: a vertical axis through the horizontal center of each node
- * card, with `+` insert controls on the same axis. Nested lists reuse the
- * same center rail (no left-only orphan border).
+ * Compact summary cards sit on a vertical axis through their horizontal
+ * center. `+` insert controls use the same axis. A node with two or more
+ * children fans those children into columns (`__fork` / `__branch`) and
+ * rejoins; a single child continues on the parent axis (`__children` has no
+ * inline padding, so the nested 50% rail stays aligned). Structure actions
+ * are not part of this geometry — they live on the selected node's inspector.
  */
 export const workflowDesignerCanvasBaseStyles = {
   '.tiger-workflow-designer__flow': {
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center',
     margin: '0',
     padding: '0',
     listStyle: 'none',
@@ -71,6 +73,7 @@ export const workflowDesignerCanvasBaseStyles = {
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center',
     minWidth: '0',
     width: '100%',
     zIndex: '1'
@@ -78,7 +81,8 @@ export const workflowDesignerCanvasBaseStyles = {
   '.tiger-workflow-designer__card': {
     position: 'relative',
     zIndex: '1',
-    width: '100%',
+    width: 'min(100%, 16rem)',
+    marginInline: 'auto',
     boxSizing: 'border-box'
   },
   '.tiger-workflow-designer__insert': {
@@ -87,6 +91,7 @@ export const workflowDesignerCanvasBaseStyles = {
     display: 'grid',
     gridTemplateColumns: '1fr auto 1fr',
     alignItems: 'center',
+    width: '100%',
     paddingBlock: '0.25rem',
     minHeight: '1.75rem'
   },
@@ -103,20 +108,49 @@ export const workflowDesignerCanvasBaseStyles = {
   },
   '.tiger-workflow-designer__children': {
     position: 'relative',
+    zIndex: '1',
     width: '100%',
-    boxSizing: 'border-box',
-    paddingInline: '1.25rem'
+    boxSizing: 'border-box'
+  },
+  '.tiger-workflow-designer__fork': {
+    position: 'relative',
+    zIndex: '1',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    width: '100%',
+    backgroundColor: 'var(--tiger-surface-muted)'
+  },
+  '.tiger-workflow-designer__branches': {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    gap: '0.75rem',
+    width: '100%'
+  },
+  '.tiger-workflow-designer__branch': {
+    position: 'relative',
+    flex: '1 1 0%',
+    minWidth: '0'
+  },
+  '.tiger-workflow-designer__fork-bar, .tiger-workflow-designer__fork-join': {
+    height: '0.125rem',
+    flexShrink: '0',
+    backgroundColor: 'color-mix(in srgb, var(--tiger-primary) 35%, transparent)'
   }
 } as const
 
 export const workflowDesignerRootClasses = 'tiger-workflow-designer w-full'
 export const workflowDesignerShellClasses = 'flex flex-col gap-3 lg:flex-row lg:items-stretch'
 export const workflowDesignerTreeClasses =
-  'tiger-workflow-designer__canvas relative flex min-w-0 flex-1 flex-col gap-2 rounded-lg bg-[var(--tiger-surface-muted)] px-4 py-3'
-export const workflowDesignerListClasses = 'tiger-workflow-designer__flow'
-export const workflowDesignerItemClasses = 'tiger-workflow-designer__node'
+  'tiger-workflow-designer__canvas relative flex min-w-0 flex-1 flex-col gap-2 overflow-x-auto rounded-lg bg-[var(--tiger-surface-muted)] px-4 py-3'
+export const workflowDesignerListClasses =
+  'tiger-workflow-designer__flow relative m-0 flex w-full list-none flex-col items-center p-0'
+export const workflowDesignerItemClasses =
+  'tiger-workflow-designer__node relative z-[1] flex w-full min-w-0 flex-col items-center'
 export const workflowDesignerCardClasses =
-  'tiger-workflow-designer__card min-w-0 cursor-pointer rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2'
+  'tiger-workflow-designer__card mx-auto w-full min-w-0 max-w-64 cursor-pointer rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2'
 export const workflowDesignerCardSelectedClasses =
   'border-[var(--tiger-primary)] bg-[var(--tiger-primary-soft)] ring-2 ring-[var(--tiger-primary)] ring-offset-1'
 export const workflowDesignerSummaryClasses = 'flex min-w-0 flex-col gap-1'
@@ -125,10 +159,12 @@ export const workflowDesignerSummaryTitleClasses =
   'min-w-0 truncate text-sm font-medium text-[var(--tiger-text)]'
 export const workflowDesignerSummaryActorsClasses = 'text-sm text-[var(--tiger-text-secondary)]'
 export const workflowDesignerKindDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'
-export const workflowDesignerToolbarClasses = 'mt-2 flex flex-wrap items-center gap-1'
-export const workflowDesignerInsertRowClasses = 'tiger-workflow-designer__insert'
+export const workflowDesignerToolbarClasses =
+  'mb-3 flex flex-wrap items-center gap-1 border-b border-[var(--tiger-border)] pb-2'
+export const workflowDesignerInsertRowClasses =
+  'tiger-workflow-designer__insert relative z-[1] grid w-full grid-cols-[1fr_auto_1fr] items-center py-1'
 export const workflowDesignerInsertButtonClasses =
-  'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--tiger-border)] bg-[var(--tiger-surface)] text-xs font-medium leading-none text-[var(--tiger-text-secondary)] disabled:cursor-not-allowed disabled:opacity-50'
+  'col-start-2 inline-flex h-6 w-6 shrink-0 items-center justify-center justify-self-center rounded-full border border-[var(--tiger-border)] bg-[var(--tiger-surface)] text-xs font-medium leading-none text-[var(--tiger-text-secondary)] disabled:cursor-not-allowed disabled:opacity-50'
 export const workflowDesignerInsertGlyph = '+'
 export const workflowDesignerEmptyInspectorClasses =
   'flex min-h-[12rem] items-center justify-center px-3 text-center text-sm text-[var(--tiger-text-secondary)]'
@@ -151,14 +187,22 @@ export const workflowDesignerTableCellClasses =
   'border-b border-[var(--tiger-border)] py-1 align-middle'
 export const workflowDesignerFieldsClasses = 'flex flex-col gap-2'
 export const workflowDesignerFieldClasses = 'flex min-w-0 flex-col gap-1'
-export const workflowDesignerLabelClasses =
-  'text-xs font-medium text-[var(--tiger-text-secondary)]'
+export const workflowDesignerLabelClasses = 'text-xs font-medium text-[var(--tiger-text-secondary)]'
 export const workflowDesignerHintClasses = 'text-xs text-[var(--tiger-text-secondary)]'
 export const workflowDesignerControlClasses =
   'w-full rounded-md border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-sm text-[var(--tiger-text)]'
 export const workflowDesignerActorRowClasses = 'flex min-w-0 items-center gap-1'
 export const workflowDesignerEmptyClasses = 'text-sm text-[var(--tiger-text-secondary)]'
-export const workflowDesignerChildrenClasses = 'tiger-workflow-designer__children'
+export const workflowDesignerChildrenClasses =
+  'tiger-workflow-designer__children relative z-[1] w-full'
+export const workflowDesignerForkClasses =
+  'tiger-workflow-designer__fork relative z-[1] flex w-full flex-col bg-[var(--tiger-surface-muted)]'
+export const workflowDesignerBranchesClasses = 'flex w-full flex-row items-start gap-3'
+export const workflowDesignerBranchClasses = 'tiger-workflow-designer__branch min-w-0 flex-1'
+export const workflowDesignerForkBarClasses =
+  'tiger-workflow-designer__fork-bar h-0.5 shrink-0 bg-[color-mix(in_srgb,var(--tiger-primary)_35%,transparent)]'
+export const workflowDesignerForkJoinClasses =
+  'tiger-workflow-designer__fork-join h-0.5 shrink-0 bg-[color-mix(in_srgb,var(--tiger-primary)_35%,transparent)]'
 export const workflowDesignerActionButtonClasses =
   'inline-flex shrink-0 items-center whitespace-nowrap rounded-md border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-2 py-1 text-xs text-[var(--tiger-text)] disabled:cursor-not-allowed disabled:opacity-50'
 
@@ -589,6 +633,19 @@ export function workflowDesignerCardClassName(selected: boolean): string {
     workflowDesignerCardClasses,
     selected ? workflowDesignerCardSelectedClasses : null
   )
+}
+
+/**
+ * Horizontal fork bar from the center of the first equal column to the
+ * center of the last. Branch columns are `flex: 1`, so the inset is `50 / n`.
+ */
+export function workflowDesignerForkTrackStyle(branchCount: number): {
+  width: string
+  marginInline: string
+} {
+  if (branchCount < 2) return { width: '0', marginInline: 'auto' }
+  const inset = 50 / branchCount
+  return { width: `${100 - inset * 2}%`, marginInline: 'auto' }
 }
 
 export function workflowDesignerKindOptions(

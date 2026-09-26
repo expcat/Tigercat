@@ -120,9 +120,15 @@ describe('WorkflowDesigner (React)', () => {
     expect(screen.getByRole('status', { name: 'Publish checks' })).toBeInTheDocument()
     expect(screen.getByText('Add an end node')).toBeInTheDocument()
 
+    fireEvent.click(screen.getByRole('group', { name: 'Manager' }))
     fireEvent.click(
-      within(screen.getByRole('group', { name: 'Manager' })).getByRole('button', { name: 'Copy' })
+      within(screen.getByRole('region', { name: 'Node settings' })).getByRole('button', {
+        name: 'Copy'
+      })
     )
+    expect(
+      within(screen.getByRole('group', { name: 'Submit' })).queryByRole('button', { name: 'Copy' })
+    ).not.toBeInTheDocument()
     const next = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
     expect(next.map((step) => step.key)).toEqual(['start', 'manager', 'manager-copy', 'finance'])
   })
@@ -163,7 +169,13 @@ describe('WorkflowDesigner (React)', () => {
 
     expect(screen.getByRole('region', { name: '流程设计器' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '添加步骤' })).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: '添加子步骤' }).length).toBeGreaterThan(0)
+    expect(screen.queryByRole('button', { name: '添加子步骤' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('group', { name: 'Submit' }))
+    expect(
+      within(screen.getByRole('region', { name: '节点设置' })).getByRole('button', {
+        name: '添加子步骤'
+      })
+    ).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: /在后方插入/ }).length).toBeGreaterThan(0)
   })
 
@@ -185,16 +197,22 @@ describe('WorkflowDesigner (React)', () => {
     const { container } = render(<WorkflowDesigner value={treeSteps} />)
     const flow = container.querySelector('.tiger-workflow-designer__flow')
     const insert = container.querySelector('.tiger-workflow-designer__insert')
-    const children = container.querySelector('.tiger-workflow-designer__children')
-    const nestedFlow = children?.querySelector('.tiger-workflow-designer__flow')
+    const fork = container.querySelector('[data-layout="fork"]')
+    const branches = fork?.querySelectorAll('.tiger-workflow-designer__branch')
     expect(flow).toBeTruthy()
     expect(insert).toBeTruthy()
-    expect(children).toBeTruthy()
-    expect(nestedFlow).toBeTruthy()
+    expect(fork).toBeTruthy()
+    expect(branches).toHaveLength(2)
+    expect(fork?.querySelector('.tiger-workflow-designer__flow')).toBeTruthy()
+    expect(container.querySelector('.tiger-workflow-designer__children')).toBeNull()
     expect(flow?.className).not.toMatch(/border-s-2/)
     expect(insert?.className).not.toMatch(/-ms-\[/)
-    expect(children?.className).not.toMatch(/border-s-2/)
     expect(container.querySelector('.tiger-workflow-designer__card')).toBeTruthy()
+    expect(
+      within(screen.getByRole('group', { name: 'Manager' })).queryByRole('button', {
+        name: 'Remove'
+      })
+    ).not.toBeInTheDocument()
   })
 
   describe('Edge Cases', () => {

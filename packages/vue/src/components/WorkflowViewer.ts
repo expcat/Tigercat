@@ -25,16 +25,29 @@ import {
   workflowStepStatusLabel,
   workflowStepStatusTagVariant,
   workflowTaskRowStatusLabel,
+  layoutWorkflowViewer,
   workflowViewerActiveTitleClasses,
-  workflowViewerBranchClasses,
+  workflowViewerBarClasses,
   workflowViewerCardClassName,
-  workflowViewerChildLayout,
-  workflowViewerConnectorClasses,
-  workflowViewerItemClasses,
+  workflowViewerCardGridStyle,
+  workflowViewerCellClasses,
+  workflowViewerEdgeForkClasses,
+  workflowViewerEdgeGridStyle,
+  workflowViewerEdgeJoinClasses,
+  workflowViewerEdgeSequenceClasses,
+  workflowViewerForkDropClasses,
+  workflowViewerGraphClasses,
+  workflowViewerGridStyle,
+  workflowViewerJoinBarClasses,
+  workflowViewerBarStyle,
   workflowViewerKindRowClasses,
   workflowViewerLegendClasses,
   workflowViewerLegendItemClasses,
-  workflowViewerListClasses,
+  workflowViewerLoopClasses,
+  workflowViewerLoopGridStyle,
+  workflowViewerLoopLabelClasses,
+  workflowViewerLoopRailClasses,
+  workflowViewerLoopRailStyle,
   workflowViewerReturnTargetLabelClasses,
   workflowViewerRollbackLabelClasses,
   workflowViewerRootClasses,
@@ -44,6 +57,8 @@ import {
   type WorkflowTask,
   type WorkflowTimelineStep,
   type WorkflowTimelineStepStatus,
+  type WorkflowViewerLayout,
+  type WorkflowViewerLayoutEdge,
   type WorkflowViewerLegendItem,
   type WorkflowViewerNode,
   type WorkflowViewerProps as CoreWorkflowViewerProps
@@ -241,38 +256,104 @@ function renderViewerCard(
   )
 }
 
-function renderViewerSequence(
+function renderViewerEdge(edge: WorkflowViewerLayoutEdge): VNode | null {
+  if (edge.kind === 'loop') return null
+  const bar =
+    edge.kind === 'fork' || edge.kind === 'join'
+      ? h('span', {
+          class: edge.kind === 'fork' ? workflowViewerBarClasses : workflowViewerJoinBarClasses,
+          style: workflowViewerBarStyle(edge),
+          'aria-hidden': 'true'
+        })
+      : null
+  return h(
+    'div',
+    {
+      key: `${edge.kind}-${edge.from}-${edge.to}`,
+      class:
+        edge.kind === 'fork'
+          ? workflowViewerEdgeForkClasses
+          : edge.kind === 'join'
+            ? workflowViewerEdgeJoinClasses
+            : workflowViewerEdgeSequenceClasses,
+      style: workflowViewerEdgeGridStyle(edge),
+      'data-workflow-edge': edge.kind,
+      'aria-hidden': 'true'
+    },
+    bar ? [bar] : undefined
+  )
+}
+
+function renderViewerLoop(
+  layout: WorkflowViewerLayout,
+  edge: WorkflowViewerLayoutEdge,
+  labels: Required<TigerLocaleWorkflowTimeline>
+): VNode | null {
+  const style = workflowViewerLoopGridStyle(layout, edge)
+  if (!style) return null
+  const target = layout.placements.find((placement) => placement.key === edge.to)
+  const title = target?.node.step.title ?? target?.node.step.label ?? edge.to
+  const aria = `${labels.returnTarget}: ${title}`
+  return h(
+    'div',
+    {
+      key: `loop-${edge.from}-${edge.to}`,
+      class: workflowViewerLoopClasses,
+      style,
+      role: 'img',
+      'aria-label': aria,
+      'data-workflow-edge': 'loop',
+      'data-workflow-loop-from': edge.from,
+      'data-workflow-loop-to': edge.to
+    },
+    [
+      h('div', { class: workflowViewerLoopRailClasses, style: workflowViewerLoopRailStyle() }, [
+        h('span', { class: workflowViewerLoopLabelClasses }, title)
+      ])
+    ]
+  )
+}
+
+function renderViewerGraph(
   nodes: WorkflowViewerNode[],
   labels: Required<TigerLocaleWorkflowTimeline>,
   highlightPath: boolean,
   showRollbackPoint: boolean,
-  layout: 'stack' | 'branch',
   tasks?: WorkflowTask[]
 ): VNode {
+  const layout = layoutWorkflowViewer(nodes)
   return h(
-    'ol',
-    { class: layout === 'branch' ? workflowViewerBranchClasses : workflowViewerListClasses },
-    nodes.map((node, index) =>
-      h('li', { key: node.key, class: workflowViewerItemClasses }, [
-        layout === 'stack' && index > 0
-          ? h('div', { class: workflowViewerConnectorClasses, 'aria-hidden': 'true' })
-          : null,
-        renderViewerCard(node, labels, highlightPath, showRollbackPoint, tasks),
-        node.children.length > 0
-          ? [
-              h('div', { class: workflowViewerConnectorClasses, 'aria-hidden': 'true' }),
-              renderViewerSequence(
-                node.children,
-                labels,
-                highlightPath,
-                showRollbackPoint,
-                workflowViewerChildLayout(node),
-                tasks
-              )
-            ]
-          : null
-      ])
-    )
+    'div',
+    {
+      class: workflowViewerGraphClasses,
+      style: workflowViewerGridStyle(layout),
+      'data-layout': 'graph',
+      'data-workflow-fork': layout.hasFork ? 'true' : undefined,
+      'data-workflow-loop': layout.hasLoop ? 'true' : undefined
+    },
+    [
+      ...layout.edges.filter((edge) => edge.kind !== 'loop').map((edge) => renderViewerEdge(edge)),
+      ...layout.edges
+        .filter((edge) => edge.kind === 'loop')
+        .map((edge) => renderViewerLoop(layout, edge, labels)),
+      ...layout.placements.map((placement) =>
+        h(
+          'div',
+          {
+            key: placement.key,
+            class: workflowViewerCellClasses,
+            style: workflowViewerCardGridStyle(placement),
+            'data-workflow-node': placement.key
+          },
+          [
+            placement.forkChild
+              ? h('div', { class: workflowViewerForkDropClasses, 'aria-hidden': 'true' })
+              : null,
+            renderViewerCard(placement.node, labels, highlightPath, showRollbackPoint, tasks)
+          ]
+        )
+      )
+    ]
   )
 }
 
@@ -352,12 +433,11 @@ export const WorkflowViewer = defineComponent({
         },
         [
           renderViewerLegend(legendItems.value, stepLabels.value.legendAriaLabel),
-          renderViewerSequence(
+          renderViewerGraph(
             tree.value,
             stepLabels.value,
             props.highlightPath !== false,
             props.showRollbackPoint !== false,
-            'stack',
             props.tasks
           )
         ]

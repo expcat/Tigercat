@@ -80,7 +80,8 @@ const steps: WorkflowTimelineStep[] = [
     title: '财务复核',
     status: 'pending',
     actor: { name: '赵六' },
-    order: 7
+    order: 7,
+    loopTo: 'manager'
   }
 ]
 

@@ -369,6 +369,12 @@ export interface WorkflowTimelineStep {
    */
   returnTarget?: boolean
   /**
+   * Key of another step this node returns to. WorkflowViewer draws that
+   * back-edge beside the trunk. Unknown keys and self-links are ignored.
+   * Not a BPMN sequence flow.
+   */
+  loopTo?: string
+  /**
    * Who should approve this node. Keys only; host resolves via `resolveApprovers`.
    */
   approverPolicy?: ApproverSource | ApproverSource[]

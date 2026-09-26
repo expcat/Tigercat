@@ -56,8 +56,8 @@ const steps = ref<WorkflowTimelineStep[]>([
 <template>
   <div class="space-y-3">
     <p class="text-sm text-[var(--tiger-text-secondary)]">
-      纵向摘要卡流程画布（中轴轨道穿过卡片中心）+ 右侧 Inspector 四 Tab（审批人 / 操作按钮 /
-      表单权限 / 高级）。节点间 + 打开调色板插入。不是 BPMN。
+      紧凑摘要卡沿中轴排列；条件分支横向分岔再汇合。选中节点后，上移 / 复制 / 添加子步骤 /
+      删除在右侧 Inspector，不铺在每张卡上。节点间 + 打开调色板插入。不是 BPMN。
     </p>
     <WorkflowDesigner v-model="steps" :schema="schema" />
     <pre class="overflow-auto rounded-md bg-[var(--tiger-surface-muted)] p-3 text-xs">{{

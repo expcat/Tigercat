@@ -252,6 +252,48 @@ describe('WorkflowViewer (Vue)', () => {
     })
   })
 
+  it('places condition branches on one row and draws a return loop', () => {
+    const steps: WorkflowTimelineStep[] = [
+      { key: 'start', kind: 'start', title: 'Submit', status: 'approved' },
+      {
+        key: 'cond',
+        kind: 'condition',
+        title: 'Amount',
+        status: 'approved',
+        children: [
+          { key: 'low', title: 'Low', status: 'approved' },
+          { key: 'high', title: 'High', status: 'pending' }
+        ]
+      },
+      { key: 'end', kind: 'end', title: 'Done', status: 'pending', loopTo: 'start' }
+    ]
+    const { container } = render(WorkflowViewer, { props: { steps } })
+    const low = container.querySelector<HTMLElement>('[data-workflow-node="low"]')
+    const high = container.querySelector<HTMLElement>('[data-workflow-node="high"]')
+    expect(low).toBeTruthy()
+    expect(high).toBeTruthy()
+    expect(low?.style.gridRow).toBe(high?.style.gridRow)
+    expect(low?.style.gridColumn).not.toBe(high?.style.gridColumn)
+    expect(container.querySelector('[data-workflow-edge="fork"]')).toBeTruthy()
+    expect(container.querySelector('[data-workflow-edge="join"]')).toBeTruthy()
+    const loop = container.querySelector('[data-workflow-edge="loop"]')
+    expect(loop).toHaveAttribute('data-workflow-loop-from', 'end')
+    expect(loop).toHaveAttribute('data-workflow-loop-to', 'start')
+    expect(loop).toHaveAccessibleName('Returned here: Submit')
+    expect(loop).toHaveClass('self-stretch')
+    expect(loop).toHaveStyle({ gridRow: '1 / 8', gridColumn: '1 / span 2' })
+    expect((loop?.firstElementChild as HTMLElement | null)?.style.left).toBe(
+      'calc(50% + 9rem + 0.75rem)'
+    )
+    expect(container.querySelector('[data-layout="graph"]')).toHaveStyle({
+      gridTemplateColumns: 'repeat(2, minmax(12rem, 18rem))'
+    })
+    expect(container.querySelector('[data-layout="graph"]')).toHaveAttribute(
+      'data-workflow-fork',
+      'true'
+    )
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(WorkflowViewer, { props: { steps: treeSteps } })

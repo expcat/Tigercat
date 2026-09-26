@@ -22,11 +22,12 @@ export type WorkflowDesignerStepPatch = Omit<Partial<WorkflowTimelineStep>, 'chi
 /**
  * Shared WorkflowDesigner props. Vue binds `modelValue` / `update:modelValue`.
  *
- * Canvas is summary cards (kind color, title, approver summary, signMode).
- * Selecting a node opens the right Inspector (approvers / buttons / field
- * permissions / advanced). Sibling `+` opens a kind palette. Still a JSON
- * tree, not BPMN. Optional `path` scopes editing to that node's children;
- * `onChange` still emits the full tree.
+ * Canvas is compact summary cards on a center spine (kind color, title,
+ * approver summary, signMode). Two or more children fan out side by side and
+ * rejoin. Selecting a node opens the right Inspector; move / copy / add child
+ * / remove live there, not on every card. Sibling `+` opens a kind palette.
+ * Still a JSON tree, not BPMN. Optional `path` scopes editing to that node's
+ * children; `onChange` still emits the full tree.
  */
 export interface WorkflowDesignerProps {
   /**
