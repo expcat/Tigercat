@@ -35,7 +35,9 @@ describe('steps-utils', () => {
 describe('Steps connector class tokens', () => {
   it('maps size + simple to stable modifier tokens', () => {
     expect(getStepSizeToken('md', false)).toBe('md')
+    expect(getStepSizeToken('lg', false)).toBe('lg')
     expect(getStepSizeToken('sm', false)).toBe('sm')
+    expect(getStepSizeToken('lg', true)).toBe('simple')
     expect(getStepSizeToken('sm', true)).toBe('simple')
     expect(getStepSizeDataValue('sm', false)).toBe('sm')
     expect(getStepSizeDataValue('md', true)).toBe('simple')
@@ -87,8 +89,14 @@ describe('Steps connector class tokens', () => {
     expect(getStepIconColumnClasses('sm', false)).toBe(
       'tiger-step-icon-col tiger-step-icon-col--sm'
     )
+    expect(getStepIconColumnClasses('lg', false)).toBe(
+      'tiger-step-icon-col tiger-step-icon-col--lg'
+    )
     expect(getStepIconColumnClasses('md', true)).toBe(
       'tiger-step-icon-col tiger-step-icon-col--simple'
+    )
+    expect(getStepTailClasses('horizontal', 'process', false, 'lg', false)).toContain(
+      'tiger-step-tail--lg'
     )
     expect(getStepItemClasses('vertical', false)).toContain('tiger-step-item--gap')
     expect(getStepItemClasses('vertical', true)).not.toContain('tiger-step-item--gap')
@@ -109,17 +117,35 @@ describe('Steps connector plugin geometry', () => {
     })
   })
 
-  it('keeps connector geometry in the component style module', () => {
+  it('ships connector geometry through the tailwind plugin', () => {
     const rules: Record<string, unknown> = {}
     type PluginInstance = {
       handler: (api: { addBase: (rule: Record<string, unknown>) => void }) => void
     }
     const plugin = tigercatPlugin as unknown as PluginInstance
     plugin.handler({ addBase: (rule) => Object.assign(rules, rule) })
-    expect(stepConnectorBaseStyles['.tiger-step-tail--vertical']).toMatchObject({
+    expect(rules['.tiger-step-tail--vertical']).toMatchObject({
       insetInlineStart: '50%',
-      transform: 'translateX(-50%)'
+      transform: 'translateX(-50%)',
+      inlineSize: '0.125rem',
+      insetBlockStart: 'var(--tiger-step-icon-size)',
+      insetBlockEnd: 'calc(-1 * var(--tiger-step-gap))'
     })
-    expect(rules['.tiger-step-tail--vertical']).toBeUndefined()
+    expect(rules['.tiger-step-tail--horizontal']).toMatchObject({
+      insetInlineStart: '50%',
+      inlineSize: '100%',
+      blockSize: '0.125rem',
+      transform: 'translateY(-50%)'
+    })
+    expect(rules['.tiger-step-icon-col--lg']).toMatchObject({
+      width: '3rem',
+      '--tiger-step-icon-size': '3rem'
+    })
+    expect(rules['.tiger-step-tail--finish']).toMatchObject({
+      backgroundColor: 'var(--tiger-primary)'
+    })
+    expect(rules['.tiger-step-tail--wait']).toMatchObject({
+      backgroundColor: 'var(--tiger-border)'
+    })
   })
 })

@@ -23,15 +23,18 @@ export const stepFinishIconStrokeWidth = '3'
 export const stepFinishIconPathD = 'M4.5 12.75l6 6 9-13.5'
 
 /** Size token used by tail / icon-column modifiers and `data-tiger-step-size`. */
-export type StepSizeToken = 'simple' | 'sm' | 'md'
+export type StepSizeToken = 'simple' | 'sm' | 'md' | 'lg'
 
 /**
  * Map `size` + `simple` to the stable modifier token used by plugin CSS.
- * `simple` wins (24px icon); `sm` → sm (32px); `md`/`lg` → md (40px).
+ * `simple` wins (24px icon); `sm` → 32px; `md` → 40px; `lg` → 48px.
+ * The token must match the icon box so the connector sits on the icon center axis.
  */
 export function getStepSizeToken(size: StepSize, simple: boolean): StepSizeToken {
   if (simple) return 'simple'
-  return size === 'sm' ? 'sm' : 'md'
+  if (size === 'sm') return 'sm'
+  if (size === 'lg') return 'lg'
+  return 'md'
 }
 
 /** Value for `data-tiger-step-size` (`simple` or the `size` prop). */
@@ -73,6 +76,10 @@ export const stepConnectorBaseStyles = {
     width: '2.5rem',
     '--tiger-step-icon-size': '2.5rem'
   },
+  '.tiger-step-icon-col--lg': {
+    width: '3rem',
+    '--tiger-step-icon-size': '3rem'
+  },
   '.tiger-step-item--gap': {
     paddingBottom: 'var(--tiger-step-gap)'
   },
@@ -98,6 +105,9 @@ export const stepConnectorBaseStyles = {
   '.tiger-step-tail--md': {
     '--tiger-step-icon-size': '2.5rem'
   },
+  '.tiger-step-tail--lg': {
+    '--tiger-step-icon-size': '3rem'
+  },
   '.tiger-step-tail--dot': {
     '--tiger-step-icon-size': '0.625rem'
   },
@@ -107,13 +117,16 @@ export const stepConnectorBaseStyles = {
     insetBlockStart: 'var(--tiger-step-icon-size)',
     insetBlockEnd: 'calc(-1 * var(--tiger-step-gap))',
     blockSize: 'auto',
-    transform: 'translateX(-50%)'
+    transform: 'translateX(-50%)',
+    zIndex: '0'
   },
   '.tiger-step-tail--horizontal': {
     insetInlineStart: '50%',
     inlineSize: '100%',
     blockSize: '0.125rem',
-    insetBlockStart: 'calc(var(--tiger-step-icon-size) / 2)'
+    insetBlockStart: 'calc(var(--tiger-step-icon-size) / 2)',
+    transform: 'translateY(-50%)',
+    zIndex: '0'
   }
 } as const
 
