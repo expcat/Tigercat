@@ -279,7 +279,9 @@ export const FunnelChart = defineComponent({
                   onMouseenter: (e: MouseEvent) => handleMouseEnter(seg.index, e),
                   onMousemove: handleMouseMove,
                   onMouseleave: handleMouseLeave,
-                  onFocus: (e: FocusEvent) => handleMouseEnter(seg.index, e),
+                  onFocus: interactive.value
+                    ? (e: FocusEvent) => handleMouseEnter(seg.index, e)
+                    : undefined,
                   onClick: () => handleClick(seg.index),
                   onKeydown: (e: KeyboardEvent) => handleSegmentKeyDown(e, visualIndex)
                 })

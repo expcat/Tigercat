@@ -274,7 +274,9 @@ export const SunburstChart = defineComponent({
                   onMouseenter: (e: MouseEvent) => handleMouseEnter(arc.index, e),
                   onMousemove: handleMouseMove,
                   onMouseleave: handleMouseLeave,
-                  onFocus: (e: FocusEvent) => handleMouseEnter(arc.index, e),
+                  onFocus: interactive.value
+                    ? (e: FocusEvent) => handleMouseEnter(arc.index, e)
+                    : undefined,
                   onClick: () => handleClick(arc.index),
                   onKeydown: (e: KeyboardEvent) => handleArcKeyDown(e, arc.index)
                 })

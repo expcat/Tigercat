@@ -250,7 +250,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
               onMouseEnter={(e) => handleMouseEnter(arc.index, e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              onFocus={(e) => handleMouseEnter(arc.index, e)}
+              onFocus={interactive ? (e) => handleMouseEnter(arc.index, e) : undefined}
               onClick={() => handleClick(arc.index)}
               onKeyDown={(e) => handleArcKeyDown(e, arc.index)}
             />

@@ -106,11 +106,14 @@ export const ChartCanvas = defineComponent({
       syncResponsiveObserver()
     })
     watch(() => props.responsive, syncResponsiveObserver)
-    watch([() => resolvedSize.value.width, () => resolvedSize.value.height], ([nextWidth, nextHeight], prev) => {
-      if (!ready) return
-      if (prev && prev[0] === nextWidth && prev[1] === nextHeight) return
-      emit('resolved-size-change', { width: nextWidth, height: nextHeight })
-    })
+    watch(
+      [() => resolvedSize.value.width, () => resolvedSize.value.height],
+      ([nextWidth, nextHeight], prev) => {
+        if (!ready) return
+        if (prev && prev[0] === nextWidth && prev[1] === nextHeight) return
+        emit('resolved-size-change', { width: nextWidth, height: nextHeight })
+      }
+    )
     onBeforeUnmount(() => resizeController.disconnect())
 
     return () => {
@@ -139,6 +142,7 @@ export const ChartCanvas = defineComponent({
               class: svgClasses.value,
               style: svgStyle.value,
               role: 'group',
+              'data-chart-canvas': '',
               'aria-label': accessibleName,
               'aria-labelledby': titleId,
               'aria-describedby': descId,

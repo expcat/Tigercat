@@ -100,13 +100,16 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
         viewBox={`0 0 ${resolvedSize.width} ${resolvedSize.height}`}
         className={svgClasses}
         role="group"
+        data-chart-canvas=""
         aria-label={accessibleName}
         aria-labelledby={titleId}
         aria-describedby={descId}
         data-chart-plot={plotReady ? 'ready' : 'empty'}>
         {title ? <title id={titleId}>{title}</title> : null}
         {desc ? <desc id={descId}>{desc}</desc> : null}
-        {plotReady ? <g transform={`translate(${innerRect.x}, ${innerRect.y})`}>{content}</g> : null}
+        {plotReady ? (
+          <g transform={`translate(${innerRect.x}, ${innerRect.y})`}>{content}</g>
+        ) : null}
       </svg>
     </div>
   )

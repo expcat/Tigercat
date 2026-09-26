@@ -21,6 +21,7 @@ import { progressBaseStyles, progressMetricVars } from './utils/progress-utils'
 import { skeletonBaseStyles } from './utils/skeleton-utils'
 import { spaceBaseStyles } from './utils/space'
 import { stepConnectorBaseStyles } from './utils/steps-utils'
+import { chartCanvasFocusStyles } from './utils/chart/focus-styles'
 import { watermarkBaseStyles } from './utils/watermark-utils'
 import { workflowDesignerCanvasBaseStyles } from './utils/workflow-designer-utils'
 import { LAYOUT_GRID_CSS } from './utils/layout-grid-styles'
@@ -56,7 +57,8 @@ const tigercatComponentStyleParts: Array<Record<string, unknown>> = [
   spaceBaseStyles,
   stepConnectorBaseStyles,
   watermarkBaseStyles,
-  workflowDesignerCanvasBaseStyles
+  workflowDesignerCanvasBaseStyles,
+  chartCanvasFocusStyles
 ]
 
 function cssVarsForPreset(preset: ThemePreset | undefined, scheme: 'light' | 'dark') {

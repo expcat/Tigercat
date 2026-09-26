@@ -358,7 +358,9 @@ export const HeatmapChart = defineComponent({
                       onMouseenter: (e: MouseEvent) => handleMouseEnter(cell.index, e),
                       onMousemove: handleMouseMove,
                       onMouseleave: handleMouseLeave,
-                      onFocus: (e: FocusEvent) => handleMouseEnter(cell.index, e),
+                      onFocus: interactive.value
+                        ? (e: FocusEvent) => handleMouseEnter(cell.index, e)
+                        : undefined,
                       onClick: () => handleClick(cell.index),
                       onKeydown: (e: KeyboardEvent) => handleCellKeyDown(e, cell.index)
                     })
@@ -401,6 +403,7 @@ export const HeatmapChart = defineComponent({
         ? h('canvas', {
             ref: canvasRef,
             class: classNames(interactive.value && 'cursor-pointer'),
+            'data-chart-canvas': '',
             style: {
               position: 'absolute',
               left: `${rect.x}px`,

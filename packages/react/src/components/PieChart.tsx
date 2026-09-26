@@ -343,7 +343,7 @@ export const PieChart: React.FC<PieChartProps> = ({
               onMouseEnter={(e) => handleMouseEnter(slice.index, e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              onFocus={(e) => handleMouseEnter(slice.index, e)}
+              onFocus={interactive ? (e) => handleMouseEnter(slice.index, e) : undefined}
               onClick={() => handleClick(slice.index)}
               onKeyDown={(e) => handleSliceKeyDown(e, visualIndex)}
             />

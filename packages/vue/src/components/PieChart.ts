@@ -346,7 +346,9 @@ export const PieChart = defineComponent({
                     onMouseenter: (e: MouseEvent) => handleMouseEnter(slice.index, e),
                     onMousemove: handleMouseMove,
                     onMouseleave: handleMouseLeave,
-                    onFocus: (e: FocusEvent) => handleMouseEnter(slice.index, e),
+                    onFocus: interactive.value
+                      ? (e: FocusEvent) => handleMouseEnter(slice.index, e)
+                      : undefined,
                     onClick: () => handleClick(slice.index),
                     onKeydown: (e: KeyboardEvent) => handleSliceKeyDown(e, visualIndex)
                   })

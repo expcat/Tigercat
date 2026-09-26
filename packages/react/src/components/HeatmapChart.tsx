@@ -346,7 +346,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
                 onMouseEnter={(e) => handleMouseEnter(cell.index, e)}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                onFocus={(e) => handleMouseEnter(cell.index, e)}
+                onFocus={interactive ? (e) => handleMouseEnter(cell.index, e) : undefined}
                 onClick={() => handleClick(cell.index)}
                 onKeyDown={(e) => handleCellKeyDown(e, cell.index)}
               />
@@ -389,6 +389,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
         <canvas
           ref={canvasRef}
           data-heatmap-canvas="true"
+          data-chart-canvas=""
           data-heatmap-render-mode={resolvedRenderMode}
           className={classNames(interactive && 'cursor-pointer')}
           tabIndex={interactive ? 0 : undefined}

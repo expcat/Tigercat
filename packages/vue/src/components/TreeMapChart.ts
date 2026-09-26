@@ -282,7 +282,9 @@ export const TreeMapChart = defineComponent({
                     onMouseenter: (e: MouseEvent) => handleMouseEnter(node.index, e),
                     onMousemove: handleMouseMove,
                     onMouseleave: handleMouseLeave,
-                    onFocus: (e: FocusEvent) => handleMouseEnter(node.index, e),
+                    onFocus: interactive.value
+                      ? (e: FocusEvent) => handleMouseEnter(node.index, e)
+                      : undefined,
                     onClick: () => handleClick(node.index),
                     onKeydown: (e: KeyboardEvent) => handleNodeKeyDown(e, visualIndex)
                   })

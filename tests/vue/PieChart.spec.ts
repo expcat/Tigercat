@@ -31,10 +31,19 @@ describe('PieChart', () => {
   })
 
   it('hides decorative slices from the accessibility tree by default', () => {
-    const { container } = renderWithProps(PieChart, { data, ...defaultSize })
+    const onHoveredIndexChange = vi.fn()
+    const { container } = renderWithProps(PieChart, {
+      data,
+      'onUpdate:hoveredIndex': onHoveredIndexChange,
+      ...defaultSize
+    })
     const slices = container.querySelectorAll('path[data-pie-slice]')
     expect(slices[0]).toHaveAttribute('aria-hidden', 'true')
     expect(slices[0]).not.toHaveAttribute('role')
+    expect(container.querySelector('svg')).toHaveAttribute('data-chart-canvas', '')
+    slices[0].dispatchEvent(new FocusEvent('focus', { bubbles: true }))
+    expect(onHoveredIndexChange).not.toHaveBeenCalled()
+    expect(document.body.querySelector('[role="tooltip"]')).toBeNull()
   })
 
   it('uses a single tab stop when selectable', () => {

@@ -615,7 +615,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       onMouseEnter={(e) => handlePointEnter(item.seriesIndex, point.index, e)}
                       onMouseMove={handleMouseMove}
                       onMouseLeave={handlePointLeave}
-                      onFocus={(e) => handlePointEnter(item.seriesIndex, point.index, e)}
+                      onFocus={
+                        focusable
+                          ? (e) => handlePointEnter(item.seriesIndex, point.index, e)
+                          : undefined
+                      }
                       onClick={() => handleSelectIndex(item.seriesIndex)}
                       onKeyDown={(e) => handlePointKeyDown(e, item.seriesIndex, point.index)}
                     />
@@ -647,7 +651,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                     data-radar-point="true"
                     data-series-index={item.seriesIndex}
                     data-point-index={point.index}
-                    onFocus={(e) => handlePointEnter(item.seriesIndex, point.index, e)}
+                    onFocus={
+                      focusable
+                        ? (e) => handlePointEnter(item.seriesIndex, point.index, e)
+                        : undefined
+                    }
                     onKeyDown={(e) => handlePointKeyDown(e, item.seriesIndex, point.index)}
                   />
                 ))}

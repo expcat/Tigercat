@@ -262,7 +262,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               onMouseEnter={(e) => handleMouseEnter(seg.index, e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              onFocus={(e) => handleMouseEnter(seg.index, e)}
+              onFocus={interactive ? (e) => handleMouseEnter(seg.index, e) : undefined}
               onClick={() => handleClick(seg.index)}
               onKeyDown={(e) => handleSegmentKeyDown(e, visualIndex)}
             />

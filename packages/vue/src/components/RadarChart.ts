@@ -569,8 +569,9 @@ export const RadarChart = defineComponent({
                         handlePointEnter(item.seriesIndex, point.index, e),
                       onMousemove: handleMouseMove,
                       onMouseleave: handlePointLeave,
-                      onFocus: (e: FocusEvent) =>
-                        handlePointEnter(item.seriesIndex, point.index, e),
+                      onFocus: focusableMarks
+                        ? (e: FocusEvent) => handlePointEnter(item.seriesIndex, point.index, e)
+                        : undefined,
                       onClick: () => handleSelectIndex(item.seriesIndex),
                       onKeydown: (e: KeyboardEvent) =>
                         handlePointKeyDown(e, item.seriesIndex, point.index)
@@ -603,8 +604,9 @@ export const RadarChart = defineComponent({
                       'data-radar-point': 'true',
                       'data-series-index': item.seriesIndex,
                       'data-point-index': point.index,
-                      onFocus: (e: FocusEvent) =>
-                        handlePointEnter(item.seriesIndex, point.index, e),
+                      onFocus: focusableMarks
+                        ? (e: FocusEvent) => handlePointEnter(item.seriesIndex, point.index, e)
+                        : undefined,
                       onKeydown: (e: KeyboardEvent) =>
                         handlePointKeyDown(e, item.seriesIndex, point.index)
                     })

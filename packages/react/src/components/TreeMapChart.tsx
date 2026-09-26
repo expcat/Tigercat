@@ -264,7 +264,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                 onMouseEnter={(e) => handleMouseEnter(node.index, e)}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                onFocus={(e) => handleMouseEnter(node.index, e)}
+                onFocus={interactive ? (e) => handleMouseEnter(node.index, e) : undefined}
                 onClick={() => handleClick(node.index)}
                 onKeyDown={(e) => handleNodeKeyDown(e, visualIndex)}
               />

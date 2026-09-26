@@ -39,6 +39,11 @@ describe('SunburstChart (Vue)', () => {
   it('renders SVG with arcs', () => {
     const { container } = renderWithProps(SunburstChart, { data: sampleData, ...defaultSize })
     expect(container.querySelectorAll('[data-sunburst-arc]')).toHaveLength(3)
+    expect(container.querySelector('svg')).toHaveAttribute('data-chart-canvas', '')
+    container
+      .querySelector('[data-sunburst-arc]')
+      ?.dispatchEvent(new FocusEvent('focus', { bubbles: true }))
+    expect(document.body.querySelector('[role="tooltip"]')).toBeNull()
   })
 
   it('renders empty state with no data', () => {

@@ -96,10 +96,7 @@ export const DEFAULT_CHART_COLORS = [
  * Optional `--tiger-chart-split-*` overrides; fallbacks mix `--tiger-text` so
  * bands follow light/dark instead of a black-alpha wash.
  */
-export const RADAR_SPLIT_AREA_COLORS = [
-  'var(--tiger-chart-split-1)',
-  'var(--tiger-chart-split-2)'
-]
+export const RADAR_SPLIT_AREA_COLORS = ['var(--tiger-chart-split-1)', 'var(--tiger-chart-split-2)']
 
 // ----------------------------------------------------------------------------
 // Drop shadows (pie / donut emphasis)
@@ -114,8 +111,7 @@ export const PIE_BASE_SHADOW =
 export const pieSliceTransitionClasses =
   'transition-[opacity,filter] motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
 
-export const pieSliceLabelInsideClasses =
-  'text-[11px] font-medium pointer-events-none select-none'
+export const pieSliceLabelInsideClasses = 'text-[11px] font-medium pointer-events-none select-none'
 
 export const funnelSegmentTransitionClasses =
   'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'

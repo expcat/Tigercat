@@ -38,6 +38,8 @@ import {
   PIE_EMPHASIS_SHADOW,
   PIE_BASE_SHADOW
 } from '@expcat/tigercat-core'
+import { chartCanvasFocusStyles } from '../../packages/core/src/utils/chart/focus-styles'
+import { tigercatPlugin } from '../../packages/core/src/tailwind-plugin'
 
 describe('chart-utils', () => {
   beforeEach(() => {
@@ -874,6 +876,39 @@ describe('chart-utils', () => {
       const prefix = getStableChartGradientPrefix('area', ':::')
 
       expect(prefix).toBe('tiger-area-grad-0')
+    })
+  })
+
+  describe('chart canvas focus', () => {
+    it('replaces the browser bounding-box outline with a chart focus halo', () => {
+      expect(
+        chartCanvasFocusStyles['[data-chart-canvas] :focus, [data-chart-canvas] :focus-visible']
+      ).toMatchObject({
+        outline: 'none'
+      })
+      expect(chartCanvasFocusStyles['[data-chart-canvas] :focus-visible']).toMatchObject({
+        filter: 'drop-shadow(0 0 2px var(--tiger-focus-ring))'
+      })
+      expect(chartCanvasFocusStyles['[data-chart-canvas]:focus-visible']).toMatchObject({
+        outline: '2px solid var(--tiger-focus-ring)'
+      })
+
+      type AddBaseFn = (rules: Record<string, unknown>) => void
+      type PluginInstance = { handler: (api: { addBase: AddBaseFn }) => void }
+      const rules: Record<string, unknown> = {}
+      ;(tigercatPlugin as unknown as PluginInstance).handler({
+        addBase: (rule) => Object.assign(rules, rule)
+      })
+      expect(rules['[data-chart-canvas] :focus, [data-chart-canvas] :focus-visible']).toMatchObject(
+        {
+          outline: 'none'
+        }
+      )
+      const forced = rules['@media (forced-colors: active)'] as Record<string, { outline?: string }>
+      expect(forced[':focus, :focus-visible']?.outline).toBe('2px solid Highlight')
+      expect(
+        forced['[data-chart-canvas] :focus-visible, [data-chart-canvas]:focus-visible']?.outline
+      ).toBe('2px solid Highlight')
     })
   })
 })

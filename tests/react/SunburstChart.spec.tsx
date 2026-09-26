@@ -35,6 +35,9 @@ describe('SunburstChart (React)', () => {
   it('renders SVG with arcs', () => {
     const { container } = renderWithProps(SunburstChart, { data: sampleData, ...defaultSize })
     expect(container.querySelectorAll('[data-sunburst-arc]')).toHaveLength(3)
+    expect(container.querySelector('svg')).toHaveAttribute('data-chart-canvas', '')
+    fireEvent.focus(container.querySelector('[data-sunburst-arc]')!)
+    expect(document.body.querySelector('[role="tooltip"]')).toBeNull()
   })
 
   it('renders empty state with no data', () => {
