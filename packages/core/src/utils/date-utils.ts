@@ -14,13 +14,13 @@ const DATE_ONLY_ISO_RE = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/
  * it is NaN for non-ASCII decimal digits.
  */
 const ND_DIGIT_BASES: readonly number[] = [
-  0x30, 0x660, 0x6f0, 0x7c0, 0x966, 0x9e6, 0xa66, 0xae6, 0xb66, 0xbe6, 0xc66, 0xce6, 0xd66,
-  0xde6, 0xe50, 0xed0, 0xf20, 0x1040, 0x1090, 0x17e0, 0x1810, 0x1946, 0x19d0, 0x1a80, 0x1a90,
-  0x1b50, 0x1bb0, 0x1c40, 0x1c50, 0xa620, 0xa8d0, 0xa900, 0xa9d0, 0xa9f0, 0xaa50, 0xabf0, 0xff10,
-  0x104a0, 0x10d30, 0x10d40, 0x11066, 0x110f0, 0x11136, 0x111d0, 0x112f0, 0x11450, 0x114d0,
-  0x11650, 0x116c0, 0x116d0, 0x116da, 0x11730, 0x118e0, 0x11950, 0x11bf0, 0x11c50, 0x11d50,
-  0x11da0, 0x11f50, 0x16130, 0x16a60, 0x16ac0, 0x16b50, 0x16d70, 0x1ccf0, 0x1d7ce, 0x1d7d8,
-  0x1d7e2, 0x1d7ec, 0x1d7f6, 0x1e140, 0x1e2f0, 0x1e4f0, 0x1e5f1, 0x1e950, 0x1fbf0
+  0x30, 0x660, 0x6f0, 0x7c0, 0x966, 0x9e6, 0xa66, 0xae6, 0xb66, 0xbe6, 0xc66, 0xce6, 0xd66, 0xde6,
+  0xe50, 0xed0, 0xf20, 0x1040, 0x1090, 0x17e0, 0x1810, 0x1946, 0x19d0, 0x1a80, 0x1a90, 0x1b50,
+  0x1bb0, 0x1c40, 0x1c50, 0xa620, 0xa8d0, 0xa900, 0xa9d0, 0xa9f0, 0xaa50, 0xabf0, 0xff10, 0x104a0,
+  0x10d30, 0x10d40, 0x11066, 0x110f0, 0x11136, 0x111d0, 0x112f0, 0x11450, 0x114d0, 0x11650, 0x116c0,
+  0x116d0, 0x116da, 0x11730, 0x118e0, 0x11950, 0x11bf0, 0x11c50, 0x11d50, 0x11da0, 0x11f50, 0x16130,
+  0x16a60, 0x16ac0, 0x16b50, 0x16d70, 0x1ccf0, 0x1d7ce, 0x1d7d8, 0x1d7e2, 0x1d7ec, 0x1d7f6, 0x1e140,
+  0x1e2f0, 0x1e4f0, 0x1e5f1, 0x1e950, 0x1fbf0
 ]
 
 function ndDigitToAscii(codePoint: number): string | null {
@@ -135,7 +135,12 @@ function readLatnYmd(fmt: Intl.DateTimeFormat, date: Date): CalendarYmd | null {
   return { year, month, day }
 }
 
-function sameCalendarYmd(formatted: CalendarYmd, year: number, month: number, day: number): boolean {
+function sameCalendarYmd(
+  formatted: CalendarYmd,
+  year: number,
+  month: number,
+  day: number
+): boolean {
   return formatted.year === year && formatted.month === month && formatted.day === day
 }
 
@@ -595,11 +600,10 @@ export function rotateWeekdayNames<T>(names: readonly T[], weekStartsOn: WeekSta
 
 const intlCache = new Map<string, Intl.DateTimeFormat>()
 
-function safeIntlFormat(
+function cachedDateTimeFormat(
   locale: string | undefined,
-  options: Intl.DateTimeFormatOptions,
-  date: Date
-): string {
+  options: Intl.DateTimeFormatOptions
+): Intl.DateTimeFormat | null {
   try {
     const key = `${locale ?? ''}_${JSON.stringify(options)}`
     let fmt = intlCache.get(key)
@@ -611,7 +615,19 @@ function safeIntlFormat(
       fmt = new Intl.DateTimeFormat(locale, options)
       intlCache.set(key, fmt)
     }
-    return fmt.format(date)
+    return fmt
+  } catch {
+    return null
+  }
+}
+
+function safeIntlFormat(
+  locale: string | undefined,
+  options: Intl.DateTimeFormatOptions,
+  date: Date
+): string {
+  try {
+    return cachedDateTimeFormat(locale, options)?.format(date) ?? ''
   } catch {
     return ''
   }
@@ -771,10 +787,26 @@ export function isToday(date: Date, now: Date = new Date()): boolean {
   return isSameDay(date, now)
 }
 
+/**
+ * Day numeral painted in a calendar cell.
+ *
+ * `DateTimeFormat#format({ day: 'numeric' })` keeps a day designator in
+ * zh/ja (`26日`) and ko (`26일`). That glyph's horizontal stroke lines up
+ * across the week and reads as a strikethrough through week numbers and
+ * dates. The cell shows only the `day` part, so locale digits and the
+ * locale calendar stay intact. The full phrase remains the accessible name
+ * from {@link formatCalendarDayLabel}.
+ */
 export function formatCalendarDayNumber(date: Date, locale?: string): string {
   if (locale) {
-    const text = safeIntlFormat(locale, { day: 'numeric' }, date)
-    if (text) return text
+    try {
+      const day = cachedDateTimeFormat(locale, { day: 'numeric' })
+        ?.formatToParts(date)
+        .find((part) => part.type === 'day')?.value
+      if (day) return day
+    } catch {
+      /* invalid date */
+    }
   }
   return String(date.getDate())
 }
@@ -878,11 +910,7 @@ function dateFromIsoWeek(year: number, week: number): Date {
 }
 
 /** Store one explicit calendar unit. `date` is `YYYY-MM-DD`; datetime may carry an offset. */
-export function formatCalendarUnit(
-  date: Date,
-  unit: CalendarUnit,
-  timeZone?: string
-): string {
+export function formatCalendarUnit(date: Date, unit: CalendarUnit, timeZone?: string): string {
   const zoned = timeZone ? dateInTimeZone(date, timeZone) : date
   const y = zoned.getFullYear()
   const m = String(zoned.getMonth() + 1).padStart(2, '0')
@@ -957,14 +985,18 @@ export function dateInTimeZone(date: Date, timeZone: string): Date {
 function timeZoneOffset(date: Date, timeZone: string): string {
   const zoned = dateInTimeZone(date, timeZone)
   const utc = new Date(date.getTime())
-  const diffMinutes = Math.round((zoned.getTime() - Date.UTC(
-    utc.getUTCFullYear(),
-    utc.getUTCMonth(),
-    utc.getUTCDate(),
-    utc.getUTCHours(),
-    utc.getUTCMinutes(),
-    utc.getUTCSeconds()
-  )) / 60000)
+  const diffMinutes = Math.round(
+    (zoned.getTime() -
+      Date.UTC(
+        utc.getUTCFullYear(),
+        utc.getUTCMonth(),
+        utc.getUTCDate(),
+        utc.getUTCHours(),
+        utc.getUTCMinutes(),
+        utc.getUTCSeconds()
+      )) /
+      60000
+  )
   // Compare wall clock in zone against the instant's UTC fields via format offset.
   try {
     const formatted = new Intl.DateTimeFormat('en-US', {
@@ -1025,7 +1057,11 @@ export function toggleCalendarUnitValue(values: readonly string[], next: string)
   return values.includes(next) ? values.filter((item) => item !== next) : [...values, next]
 }
 
-export function shiftCalendarMonth(year: number, month: number, delta: number): { year: number; month: number } {
+export function shiftCalendarMonth(
+  year: number,
+  month: number,
+  delta: number
+): { year: number; month: number } {
   const date = new Date(year, month + delta, 1)
   return { year: date.getFullYear(), month: date.getMonth() }
 }

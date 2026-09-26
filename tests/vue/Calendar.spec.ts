@@ -124,6 +124,9 @@ describe('Calendar', () => {
     })
     expect(screen.getByLabelText('下个月')).toBeInTheDocument()
     expect(screen.getByText('周一')).toBeInTheDocument()
+    expect(dayButton('2024-06-15').textContent).toBe('15')
+    expect(dayButton('2024-06-01').textContent).toBe('1')
+    expect(dayButton('2024-06-15').getAttribute('aria-label')).toContain('2024年6月15日')
   })
 
   it('uses Traditional Chinese navigation copy from zhTW', () => {

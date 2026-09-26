@@ -5,6 +5,7 @@ import {
   addYears,
   clearCalendarMonthDaysCache,
   formatDate,
+  formatCalendarDayNumber,
   formatDateWithLocale,
   toAsciiDigits,
   getCalendarDays,
@@ -68,6 +69,18 @@ describe('date-utils calendar month cache', () => {
     }
 
     expect(getCalendarMonthDaysCacheSize()).toBe(48)
+  })
+
+  it('paints calendar cells with the day numeral and drops the day designator', () => {
+    const date = new Date(2024, 5, 15)
+
+    expect(formatCalendarDayNumber(date)).toBe('15')
+    expect(formatCalendarDayNumber(date, 'en-US')).toBe('15')
+    expect(formatCalendarDayNumber(date, 'zh-CN')).toBe('15')
+    expect(formatCalendarDayNumber(date, 'zh-TW')).toBe('15')
+    expect(formatCalendarDayNumber(date, 'ja-JP')).toBe('15')
+    expect(formatCalendarDayNumber(date, 'ko-KR')).toBe('15')
+    expect(formatCalendarDayNumber(date, 'ar-SA')).toBe('١٥')
   })
 
   it('keeps legacy fixed formatting when no locale is provided', () => {
