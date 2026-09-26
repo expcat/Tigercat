@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-mcp",
-  "version": "3.0.0-preview.4",
+  "version": "3.0.0-preview.5",
   "type": "module",
   "description": "MCP server routing LLMs to the Tigercat skill snapshot shipped with this package",
   "license": "MIT",
