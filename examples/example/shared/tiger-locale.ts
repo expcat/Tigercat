@@ -1,9 +1,12 @@
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import type { TigerLocale } from '@expcat/tigercat-core'
 import type { DemoLang } from './app-config'
 
-/** Example「中文」is the Simplified `zhCN` pack. Demos inherit it from the shell. */
+/** Top-bar language → the official locale object demos inherit. */
 export function getDemoTigerLocale(lang: DemoLang): TigerLocale {
-  return lang === 'zh-CN' ? zhCN : enUS
+  if (lang === 'zh-CN') return zhCN
+  if (lang === 'zh-TW') return zhTW
+  return enUS
 }

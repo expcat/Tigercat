@@ -76,7 +76,6 @@ export default function App() {
         virtualItemHeight={44}
         virtualizeColumns
         loading={view === 'loading'}
-        emptyText="当前没有成员数据"
         bordered
         striped
         rowSelection={{

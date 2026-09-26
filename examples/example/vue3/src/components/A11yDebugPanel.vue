@@ -3,6 +3,7 @@ import { computed, ref, shallowRef } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { Modal } from '@expcat/tigercat-vue/Modal'
 import type { DemoLang } from '@demo-shared/app-config'
+import { toZhHant } from '@demo-shared/zh-hant'
 
 interface AxeViolation {
   id: string
@@ -20,7 +21,11 @@ const ranAt = ref('')
 const results = shallowRef<AxeResults | null>(null)
 const scopedToPreview = ref(true)
 const error = ref('')
-const t = (zh: string, en: string) => ((props.lang ?? 'zh-CN') === 'zh-CN' ? zh : en)
+const t = (zh: string, en: string) => {
+  const lang = props.lang ?? 'zh-CN'
+  if (lang === 'en-US') return en
+  return lang === 'zh-TW' ? toZhHant(zh) : zh
+}
 
 const impactClass = (impact?: string | null) => {
   if (impact === 'critical') return 'bg-red-100 text-red-700'

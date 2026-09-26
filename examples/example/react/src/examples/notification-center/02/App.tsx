@@ -90,8 +90,6 @@ export default function App() {
         activeGroupKey={activeGroupKey}
         readFilter={readFilter}
         loading={view === 'loading'}
-        loadingText="正在同步通知..."
-        emptyText="当前没有通知"
         onGroupChange={setActiveGroupKey}
         onReadFilterChange={setReadFilter}
         onItemReadChange={handleItemReadChange}

@@ -20,7 +20,10 @@ const INTENTIONAL_ZH_TW = new Set([
   'examples/example/vue3/src/examples/pagination/02/App.vue',
   'examples/example/react/src/examples/pagination/02/App.tsx',
   'examples/example/vue3/src/examples/pagination/02/demo.json',
-  'examples/example/react/src/examples/pagination/02/demo.json'
+  'examples/example/react/src/examples/pagination/02/demo.json',
+  // Interactive override starts from the shell locale and can switch to zh-TW.
+  'examples/example/vue3/src/examples/config-provider/01/App.vue',
+  'examples/example/react/src/examples/config-provider/01/App.tsx'
 ])
 
 function collectExampleSources(dir: string): string[] {
@@ -47,6 +50,7 @@ const runtimeUrls = {
 describe('example shell locale', () => {
   it('passes official locale objects, not a six-section overlay', () => {
     expect(getDemoTigerLocale('zh-CN')).toBe(zhCN)
+    expect(getDemoTigerLocale('zh-TW')).toBe(zhTW)
     expect(getDemoTigerLocale('en-US')).toBe(enUS)
     expect(zhCN.table?.emptyText).toBeTruthy()
     expect(zhCN.select?.placeholder).toBeTruthy()
@@ -72,6 +76,7 @@ describe('example shell locale', () => {
 
     expect(html).toContain('"@expcat/tigercat-core/locales/zh-CN":"https://example.test/shared.js"')
     expect(html).toContain('locale: Shared.getDemoTigerLocale(lang), theme, colorScheme')
+    expect(html).not.toContain('document: false')
   })
 
   it('gives Simplified copy to a zh-CN page, and Traditional only to zhTW', () => {
@@ -102,6 +107,43 @@ describe('example shell locale', () => {
         const source = readFileSync(file, 'utf8')
         if (!/zh-TW|zhTW/.test(source)) continue
         if (!INTENTIONAL_ZH_TW.has(rel)) offenders.push(rel)
+      }
+    }
+    expect(offenders).toEqual([])
+  })
+
+  it('does not pin zh-CN on demos that should inherit the shell locale', () => {
+    const allow = new Set([
+      'examples/example/vue3/src/examples/pagination/02/App.vue',
+      'examples/example/react/src/examples/pagination/02/App.tsx'
+    ])
+    const roots = [
+      join(repoRoot, 'examples/example/vue3/src/examples'),
+      join(repoRoot, 'examples/example/react/src/examples')
+    ]
+    const offenders: string[] = []
+    const pin = /locale=\{zhCN\}|:locale="zhCN"/
+    for (const root of roots) {
+      for (const file of collectExampleSources(root)) {
+        const rel = relative(repoRoot, file).split('\\').join('/')
+        if (allow.has(rel) || !pin.test(readFileSync(file, 'utf8'))) continue
+        offenders.push(rel)
+      }
+    }
+    expect(offenders).toEqual([])
+  })
+
+  it('does not override locale empty or loading copy with a fixed string', () => {
+    const roots = [
+      join(repoRoot, 'examples/example/vue3/src/examples'),
+      join(repoRoot, 'examples/example/react/src/examples')
+    ]
+    const offenders: string[] = []
+    const pin = /empty-text=|emptyText=|loading-text=|loadingText=/
+    for (const root of roots) {
+      for (const file of collectExampleSources(root)) {
+        const rel = relative(repoRoot, file).split('\\').join('/')
+        if (pin.test(readFileSync(file, 'utf8'))) offenders.push(rel)
       }
     }
     expect(offenders).toEqual([])

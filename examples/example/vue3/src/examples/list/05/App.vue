@@ -17,6 +17,6 @@ const items = [
       <Button size="sm" @click="loading = !loading">切换加载</Button>
       <Button size="sm" @click="empty = !empty">切换空态</Button>
     </div>
-    <List :data-source="empty ? [] : items" :loading="loading" empty-text="暂无数据" />
+    <List :data-source="empty ? [] : items" :loading="loading" />
   </div>
 </template>

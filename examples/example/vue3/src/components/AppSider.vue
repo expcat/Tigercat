@@ -6,15 +6,21 @@ import { useRoute } from 'vue-router'
 import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
 import { Button } from '@expcat/tigercat-vue/Button'
-import { getStoredCollapsedNavGroups, setStoredCollapsedNavGroups } from '@demo-shared/prefs'
+import {
+  navGroupFromCollapseChange,
+  navGroupKeyForPath,
+  navOpenKeys
+} from '@demo-shared/nav-accordion'
+import { demoCopy } from '@demo-shared/zh-hant'
 
 const props = defineProps<{ lang: DemoLang; isSiderCollapsed: boolean; isMobile: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 const route = useRoute()
 const query = ref('')
-const collapsedGroups = ref<Record<string, boolean>>(getStoredCollapsedNavGroups())
+const openGroup = ref<string | null>(navGroupKeyForPath(route.path))
 const chrome = computed(() => demoChrome(props.lang))
+const appTitle = computed(() => demoCopy(DEMO_APP_TITLE, props.lang))
 
 const isActive = (targetPath: string) => {
   if (targetPath === '/') return route.path === '/'
@@ -28,26 +34,25 @@ const visibleGroups = computed(() => {
     items: needle
       ? group.items.filter(
           (item) =>
-            item.label[props.lang].toLowerCase().includes(needle) || item.key.includes(needle)
+            demoCopy(item.label, props.lang).toLowerCase().includes(needle) ||
+            item.key.includes(needle)
         )
       : group.items
   })).filter((group) => group.items.length > 0)
 })
 
 const openKeys = computed(() =>
-  query.value.trim()
-    ? visibleGroups.value.map((group) => group.key)
-    : DEMO_NAV_GROUPS.filter((group) => !collapsedGroups.value[group.key]).map((group) => group.key)
+  navOpenKeys({
+    query: query.value,
+    visibleGroupKeys: visibleGroups.value.map((group) => group.key),
+    openGroupKey: openGroup.value
+  })
 )
+const accordion = computed(() => !query.value.trim())
 
 const handleCollapseChange = (next: string | number | (string | number)[] | undefined) => {
   if (query.value.trim()) return
-  const nextKeys = Array.isArray(next) ? next : next !== undefined ? [next] : []
-  const nextState: Record<string, boolean> = { ...collapsedGroups.value }
-  DEMO_NAV_GROUPS.forEach((group) => {
-    nextState[group.key] = !nextKeys.includes(group.key)
-  })
-  collapsedGroups.value = nextState
+  openGroup.value = navGroupFromCollapseChange(next)
 }
 
 const getAbbr = (label: string) => {
@@ -58,9 +63,12 @@ const getAbbr = (label: string) => {
 }
 
 watch(
-  () => collapsedGroups.value,
-  (v) => setStoredCollapsedNavGroups(v),
-  { deep: true }
+  () => [route.path, props.isSiderCollapsed] as const,
+  ([path, collapsed], previous) => {
+    const pathChanged = !previous || previous[0] !== path
+    const menuOpened = Boolean(previous && previous[1] && !collapsed)
+    if (pathChanged || menuOpened) openGroup.value = navGroupKeyForPath(path)
+  }
 )
 
 const onDocumentKey = (event: KeyboardEvent) => {
@@ -84,7 +92,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
               to="/"
               class="text-base font-semibold text-gray-900 truncate dark:text-gray-100"
               @click="emit('close')">
-              {{ DEMO_APP_TITLE[props.lang] }}
+              {{ appTitle }}
             </router-link>
             <Button
               type="button"
@@ -107,6 +115,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
               <Collapse
                 :bordered="false"
                 ghost
+                :accordion="accordion"
                 expand-icon-position="end"
                 :activeKey="openKeys"
                 class="space-y-2"
@@ -119,13 +128,13 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
                   <template #header>
                     <div
                       class="w-full flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 justify-between"
-                      :title="group.label[props.lang]">
+                      :title="demoCopy(group.label, props.lang)">
                       <span
                         class="inline-flex items-center justify-center text-[10px] font-bold size-6 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200">
-                        {{ getAbbr(group.label[props.lang]) }}
+                        {{ getAbbr(demoCopy(group.label, props.lang)) }}
                       </span>
                       <span class="min-w-0 flex-1 truncate text-left">{{
-                        group.label[props.lang]
+                        demoCopy(group.label, props.lang)
                       }}</span>
                     </div>
                   </template>
@@ -135,7 +144,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
                       v-for="item in group.items"
                       :key="item.key"
                       :to="item.path"
-                      :title="item.label[props.lang]"
+                      :title="demoCopy(item.label, props.lang)"
                       :class="[
                         'flex items-center rounded-md py-2 text-sm transition-colors overflow-hidden gap-2 pr-3 pl-9',
                         isActive(item.path)
@@ -150,9 +159,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
                           'size-6',
                           isActive(item.path) ? 'text-(--tiger-primary,#2563eb)' : ''
                         ]">
-                        {{ getAbbr(item.label[props.lang]) }}
+                        {{ getAbbr(demoCopy(item.label, props.lang)) }}
                       </span>
-                      <span class="truncate">{{ item.label[props.lang] }}</span>
+                      <span class="truncate">{{ demoCopy(item.label, props.lang) }}</span>
                     </router-link>
                   </div>
                 </CollapsePanel>
@@ -188,6 +197,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
         <Collapse
           :bordered="false"
           ghost
+          :accordion="accordion"
           expand-icon-position="end"
           :activeKey="openKeys"
           class="space-y-2"
@@ -204,7 +214,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
                   'text-gray-500 dark:text-gray-400',
                   props.isSiderCollapsed ? 'justify-center' : 'justify-between'
                 ]"
-                :title="group.label[props.lang]">
+                :title="demoCopy(group.label, props.lang)">
                 <span
                   :class="[
                     'inline-flex items-center justify-center text-[10px] font-bold',
@@ -212,10 +222,10 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
                       ? 'size-9 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
                       : 'size-6 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
                   ]">
-                  {{ getAbbr(group.label[props.lang]) }}
+                  {{ getAbbr(demoCopy(group.label, props.lang)) }}
                 </span>
                 <span v-if="!props.isSiderCollapsed" class="min-w-0 flex-1 truncate text-left">{{
-                  group.label[props.lang]
+                  demoCopy(group.label, props.lang)
                 }}</span>
               </div>
             </template>
@@ -225,7 +235,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
                 v-for="item in group.items"
                 :key="item.key"
                 :to="item.path"
-                :title="item.label[props.lang]"
+                :title="demoCopy(item.label, props.lang)"
                 :class="[
                   'flex items-center rounded-md py-2 text-sm transition-colors overflow-hidden',
                   props.isSiderCollapsed ? 'justify-center px-2' : 'gap-2 pr-3 pl-9',
@@ -240,10 +250,10 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
                     props.isSiderCollapsed ? 'size-7' : 'size-6',
                     isActive(item.path) ? 'text-(--tiger-primary,#2563eb)' : ''
                   ]">
-                  {{ getAbbr(item.label[props.lang]) }}
+                  {{ getAbbr(demoCopy(item.label, props.lang)) }}
                 </span>
                 <span v-if="!props.isSiderCollapsed" class="truncate">{{
-                  item.label[props.lang]
+                  demoCopy(item.label, props.lang)
                 }}</span>
               </router-link>
             </div>

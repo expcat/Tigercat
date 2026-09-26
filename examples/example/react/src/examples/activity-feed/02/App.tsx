@@ -69,8 +69,6 @@ export default function App() {
         items={view === 'grouped' ? undefined : activities}
         groups={view === 'grouped' ? groups : view === 'empty' ? [] : undefined}
         loading={view === 'loading'}
-        loadingText="正在加载团队动态..."
-        emptyText="当前没有动态"
       />
     </div>
   )

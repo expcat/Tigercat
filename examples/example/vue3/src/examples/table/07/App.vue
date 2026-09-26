@@ -37,7 +37,6 @@ const state = ref<DemoState>('data')
       :columns="columns"
       :data-source="state === 'empty' ? [] : rows"
       :loading="state === 'loading'"
-      empty-text="暂无成员"
       :pagination="false" />
   </div>
 </template>

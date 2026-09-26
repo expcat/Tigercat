@@ -6,15 +6,17 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import CronEditorDemo from '../../examples/example/vue3/src/examples/cron-editor/01/App.vue'
 import DatePickerDemo from '../../examples/example/vue3/src/examples/datepicker/01/App.vue'
 import DataExportDemo from '../../examples/example/vue3/src/examples/data-export/01/App.vue'
 
-function renderDemo(demo: object) {
+function renderDemo(demo: object, locale: object = zhCN) {
   return render({
     setup() {
-      return () => h(ConfigProvider, { locale: zhCN }, () => h(demo))
+      return () => h(ConfigProvider, { locale }, () => h(demo))
     }
   })
 }
@@ -33,6 +35,17 @@ describe('Vue example pages on zh-CN', () => {
     const { container } = renderDemo(DatePickerDemo)
     expect(container.querySelector('input')).toHaveAttribute('placeholder', '请选择日期')
     expect(screen.queryByText('請選擇日期')).not.toBeInTheDocument()
+  })
+
+  it('renders DatePicker with the shell locale, including en-US and zh-TW', () => {
+    const english = renderDemo(DatePickerDemo, enUS)
+    expect(english.container.querySelector('input')).toHaveAttribute('placeholder', 'Select date')
+    english.unmount()
+    const traditional = renderDemo(DatePickerDemo, zhTW)
+    expect(traditional.container.querySelector('input')).toHaveAttribute(
+      'placeholder',
+      '請選擇日期'
+    )
   })
 
   it('renders DataExport with Simplified trigger copy', () => {

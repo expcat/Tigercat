@@ -1,3 +1,4 @@
+import type { DemoLang } from '../app-config'
 import type { DemoFramework, DemoModuleMeta, DemoRuntimeUrls, DemoSandboxEvent } from './types'
 import { RESIZE_OBSERVER_LOOP } from './sandbox-errors'
 
@@ -10,7 +11,7 @@ interface SandboxDocumentOptions {
   runtimeUrls: DemoRuntimeUrls
   stylesheetUrl: string
   channelId: string
-  lang: 'zh-CN' | 'en-US'
+  lang: DemoLang
   theme: string
   colorScheme: 'light' | 'dark'
   cssVars: string
@@ -252,7 +253,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
             { value: { lang } },
             React.createElement(
               Tiger.ConfigProvider,
-              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme, document: false },
+              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme },
               React.createElement(demo.default)
             )
           )
@@ -267,7 +268,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
             Vue.provide('demo-lang', Vue.ref(lang))
             return () => Vue.h(
               Tiger.ConfigProvider,
-              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme, document: false },
+              { locale: Shared.getDemoTigerLocale(lang), theme, colorScheme },
               { default: () => Vue.h(demo.default) }
             )
           }

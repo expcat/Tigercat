@@ -18,6 +18,7 @@ import {
 import { createCompilerClient, type CompilerClient } from '@demo-shared/playground/compiler-client'
 import { isBenignSandboxRuntimeError } from '@demo-shared/playground/sandbox-errors'
 import { demoChrome, demoModuleTitle } from '@demo-shared/chrome'
+import { demoProse } from '@demo-shared/zh-hant'
 import { clampDemoFrameHeight, resolveDemoViewport } from '@demo-shared/playground/viewport'
 import { useLang } from '../context/lang'
 import stylesheetUrl from '@demo-shared/sandbox.css?url'
@@ -76,7 +77,6 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const latestRunRef = useRef(0)
-  const sandboxReadyRef = useRef(false)
   const [visible, setVisible] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
   const [originalBundle, setOriginalBundle] = useState<DemoSourceBundle | null>(null)
@@ -129,7 +129,6 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
 
   const rebuildSandbox = useCallback(
     (result: DemoCompileSuccess) => {
-      sandboxReadyRef.current = false
       const channelId = crypto.randomUUID()
       setSandbox({
         channelId,
@@ -154,25 +153,21 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
     [isDirty, lang, module.meta]
   )
 
-  const run = useCallback(
-    async (bundle: DemoSourceBundle) => {
-      const runId = ++latestRunRef.current
-      setStatus('compiling')
-      setDiagnostics([])
-      setConsoleEntries([])
-      try {
-        const result = await compileBundle(bundle)
-        if (runId !== latestRunRef.current) return
-        setCompiled(result)
-        rebuildSandbox(result)
-      } catch (error) {
-        if (runId !== latestRunRef.current) return
-        setDiagnostics(normalizeDiagnostics(error))
-        setStatus('compile-error')
-      }
-    },
-    [rebuildSandbox]
-  )
+  const run = useCallback(async (bundle: DemoSourceBundle) => {
+    const runId = ++latestRunRef.current
+    setStatus('compiling')
+    setDiagnostics([])
+    setConsoleEntries([])
+    try {
+      const result = await compileBundle(bundle)
+      if (runId !== latestRunRef.current) return
+      setCompiled(result)
+    } catch (error) {
+      if (runId !== latestRunRef.current) return
+      setDiagnostics(normalizeDiagnostics(error))
+      setStatus('compile-error')
+    }
+  }, [])
 
   useEffect(() => {
     if (!visible || originalBundle) return
@@ -198,7 +193,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   }, [module, originalBundle, run, visible])
 
   useEffect(() => {
-    if (compiled && sandboxReadyRef.current) rebuildSandbox(compiled)
+    if (compiled) rebuildSandbox(compiled)
     // themeVersion intentionally invalidates the sandbox without recompiling source.
   }, [compiled, rebuildSandbox, themeVersion])
 
@@ -212,7 +207,6 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
         return
       if (event.data.channelId !== sandbox.channelId) return
       if (event.data.type === 'ready') {
-        sandboxReadyRef.current = true
         setStatus(isDirty ? 'dirty' : 'ready')
       }
       if (event.data.type === 'runtime-error') {
@@ -257,8 +251,10 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
         <h2 className="text-2xl font-bold mb-2 dark:text-gray-100">
           {demoModuleTitle(module.meta, lang)}
         </h2>
-        {lang === 'zh-CN' && module.meta.description ? (
-          <p className="text-gray-600 dark:text-gray-400">{module.meta.description}</p>
+        {demoProse(module.meta.description, lang) ? (
+          <p className="text-gray-600 dark:text-gray-400">
+            {demoProse(module.meta.description, lang)}
+          </p>
         ) : null}
       </div>
 

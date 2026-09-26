@@ -84,7 +84,6 @@ const handleSelectionChange = (nextKeys: (string | number)[]) => {
       :virtual-item-height="44"
       virtualize-columns
       :loading="view === 'loading'"
-      empty-text="当前没有成员数据"
       bordered
       striped
       :row-selection="rowSelection"

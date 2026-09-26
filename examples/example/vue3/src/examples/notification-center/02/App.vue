@@ -87,8 +87,6 @@ const handleMarkAllRead = (
       :group-by="view === 'empty' ? undefined : groupBy"
       :group-order="['产品', '系统']"
       :loading="view === 'loading'"
-      loading-text="正在同步通知..."
-      empty-text="当前没有通知"
       @item-read-change="handleItemReadChange"
       @mark-all-read="handleMarkAllRead" />
   </div>

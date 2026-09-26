@@ -42,7 +42,6 @@ export default function App() {
         columns={columns}
         dataSource={state === 'empty' ? [] : rows}
         loading={state === 'loading'}
-        emptyText="暂无成员"
         pagination={false}
       />
     </div>

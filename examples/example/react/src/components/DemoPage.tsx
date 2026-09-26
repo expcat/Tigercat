@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom'
 import type { DemoModuleDescriptor } from '@demo-shared/playground/types'
 import { findDemoNavItem } from '@demo-shared/app-config'
+import { demoCopy, demoProse, toZhHant } from '@demo-shared/zh-hant'
 import { useLang } from '../context/lang'
 import DemoBlock from './DemoBlock'
 
@@ -15,8 +16,8 @@ export default function DemoPage({ title, description, modules }: DemoPageProps)
   const { lang } = useLang()
   const routeKey = location.pathname.replace(/^\//, '')
   const nav = findDemoNavItem(routeKey)
-  const heading = nav?.label[lang] ?? title
-  const lead = lang === 'zh-CN' ? description : undefined
+  const heading = nav ? demoCopy(nav.label, lang) : lang === 'zh-TW' ? toZhHant(title) : title
+  const lead = demoProse(description, lang)
 
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8">

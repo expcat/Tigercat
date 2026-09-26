@@ -1,7 +1,7 @@
 {
   "id": "statistic-01",
   "title": "代表配置",
-  "description": "分组走 Intl + zh-CN locale。title 是指标名。",
+  "description": "分组走 Intl + ConfigProvider locale。title 是指标名。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }

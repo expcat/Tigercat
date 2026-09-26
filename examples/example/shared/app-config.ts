@@ -1,24 +1,35 @@
-export type DemoLang = 'zh-CN' | 'en-US'
+export type DemoLang = 'zh-CN' | 'zh-TW' | 'en-US'
+
+/** Authored shell copy. Traditional is derived; do not add a third string. */
+export interface DemoCopy {
+  'zh-CN': string
+  'en-US': string
+}
+
+export function isDemoLang(value: unknown): value is DemoLang {
+  return value === 'zh-CN' || value === 'zh-TW' || value === 'en-US'
+}
 
 export interface DemoNavItem {
   key: string
   path: string
-  label: Record<DemoLang, string>
+  label: DemoCopy
 }
 
 export interface DemoNavGroup {
   key: string
-  label: Record<DemoLang, string>
+  label: DemoCopy
   items: DemoNavItem[]
 }
 
-export const DEMO_APP_TITLE: Record<DemoLang, string> = {
+export const DEMO_APP_TITLE: DemoCopy = {
   'zh-CN': 'Tigercat 示例',
   'en-US': 'Tigercat Examples'
 }
 
 export const DEMO_LANG_OPTIONS: Array<{ label: string; value: DemoLang }> = [
-  { label: '中文', value: 'zh-CN' },
+  { label: '简体', value: 'zh-CN' },
+  { label: '繁體', value: 'zh-TW' },
   { label: 'English', value: 'en-US' }
 ]
 

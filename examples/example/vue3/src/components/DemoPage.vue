@@ -3,6 +3,7 @@ import { computed, inject, ref, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { DemoLang } from '@demo-shared/app-config'
 import { findDemoNavItem } from '@demo-shared/app-config'
+import { demoCopy, demoProse, toZhHant } from '@demo-shared/zh-hant'
 import type { DemoModuleDescriptor } from '@demo-shared/playground/types'
 import DemoBlock from './DemoBlock.vue'
 
@@ -16,9 +17,10 @@ const route = useRoute()
 const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
 const heading = computed(() => {
   const nav = findDemoNavItem(route.path)
-  return nav?.label[demoLang.value] ?? props.title
+  if (nav) return demoCopy(nav.label, demoLang.value)
+  return demoLang.value === 'zh-TW' ? toZhHant(props.title) : props.title
 })
-const lead = computed(() => (demoLang.value === 'zh-CN' ? props.description : undefined))
+const lead = computed(() => demoProse(props.description, demoLang.value))
 </script>
 
 <template>

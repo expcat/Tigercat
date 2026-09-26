@@ -1,4 +1,5 @@
 import type { DemoLang } from './app-config'
+import { toZhHant } from './zh-hant'
 
 export interface DemoChromeCopy {
   language: string
@@ -36,7 +37,7 @@ export interface DemoChromeCopy {
   homeStart: string
 }
 
-export const DEMO_CHROME: Record<DemoLang, DemoChromeCopy> = {
+export const DEMO_CHROME: Record<'zh-CN' | 'en-US', DemoChromeCopy> = {
   'zh-CN': {
     language: '语言：',
     theme: '主题：',
@@ -110,9 +111,18 @@ export const DEMO_CHROME: Record<DemoLang, DemoChromeCopy> = {
 }
 
 export function demoChrome(lang: DemoLang): DemoChromeCopy {
+  if (lang === 'zh-TW') {
+    const source = DEMO_CHROME['zh-CN']
+    const next = { ...source }
+    for (const key of Object.keys(next) as (keyof DemoChromeCopy)[]) {
+      next[key] = toZhHant(source[key])
+    }
+    return next
+  }
   return DEMO_CHROME[lang]
 }
 
 export function demoModuleTitle(meta: { id: string; title: string }, lang: DemoLang): string {
-  return lang === 'en-US' ? meta.id : meta.title
+  if (lang === 'en-US') return meta.id
+  return lang === 'zh-TW' ? toZhHant(meta.title) : meta.title
 }

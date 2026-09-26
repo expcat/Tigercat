@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { InputNumber } from '@expcat/tigercat-react/InputNumber'
+import { useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
 
-const formatCurrency = (value: number | undefined) =>
-  value === undefined
-    ? ''
-    : `¥ ${new Intl.NumberFormat('zh-CN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }).format(value)}`
+function formatCurrency(value: number | undefined, locale: string | undefined) {
+  if (value === undefined) return ''
+  return `¥ ${new Intl.NumberFormat(locale || 'zh-CN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(value)}`
+}
 
 const parseCurrency = (displayValue: string) => {
   const parsed = Number.parseFloat(displayValue.replace(/[^\d.-]/g, ''))
@@ -15,6 +16,7 @@ const parseCurrency = (displayValue: string) => {
 }
 
 export default function App() {
+  const locale = useTigerConfig().locale?.locale
   const [value, setValue] = useState<number | null>(1288.5)
 
   return (
@@ -32,7 +34,7 @@ export default function App() {
         max={10000}
         step={100}
         precision={2}
-        formatter={formatCurrency}
+        formatter={(next) => formatCurrency(next, locale)}
         parser={parseCurrency}
         controlsPosition="both"
         aria-label="预算"

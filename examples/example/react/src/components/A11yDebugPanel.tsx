@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { Modal } from '@expcat/tigercat-react/Modal'
 import type { DemoLang } from '@demo-shared/app-config'
+import { toZhHant } from '@demo-shared/zh-hant'
 import { demoChrome } from '@demo-shared/chrome'
 
 interface AxeNode {
@@ -58,7 +59,10 @@ export const A11yDebugPanel: React.FC<A11yDebugPanelProps> = ({ lang = 'zh-CN' }
   const [results, setResults] = useState<AxeResults | null>(null)
   const [scopedToPreview, setScopedToPreview] = useState(true)
   const [error, setError] = useState('')
-  const t = (zh: string, en: string) => (lang === 'zh-CN' ? zh : en)
+  const t = (zh: string, en: string) => {
+    if (lang === 'en-US') return en
+    return lang === 'zh-TW' ? toZhHant(zh) : zh
+  }
 
   const runScan = async () => {
     setLoading(true)

@@ -1,9 +1,10 @@
 import type { ThemePresetName } from '@expcat/tigercat-core'
-import type { DemoLang } from './app-config'
+import { THEME_CONFIG_CSS_VARS, THEME_CSS_VARS } from '@expcat/tigercat-core'
+import type { DemoCopy } from './app-config'
 
 export interface DemoThemePreset {
   value: ThemePresetName
-  label: Record<DemoLang, string>
+  label: DemoCopy
 }
 
 /** Product preset names — the example shell does not keep a parallel hex palette. */
@@ -36,16 +37,34 @@ export function resolveDemoTheme(value: string | null | undefined): ThemePresetN
   return 'default'
 }
 
-/** Snapshot computed `--tiger-*` tokens so a sandbox iframe can paint the same theme. */
+const THEME_TOKEN_NAMES: readonly string[] = [
+  ...Object.values(THEME_CSS_VARS),
+  ...Object.values(THEME_CONFIG_CSS_VARS).flatMap((section) => Object.values(section)),
+  '--tiger-transition-quick',
+  '--tiger-transition-base',
+  '--tiger-transition-emphasized',
+  '--tiger-chart-split-1',
+  '--tiger-chart-split-2'
+]
+
+/**
+ * Snapshot computed `--tiger-*` tokens so a sandbox iframe can paint the same
+ * theme before ConfigProvider's document owner writes them. Known token names
+ * are read directly: `CSSStyleDeclaration` enumeration omits custom properties
+ * in some engines, which left previews on the default preset.
+ */
 export function collectTigerCssVars(root: HTMLElement | null | undefined): string {
   if (!root || typeof getComputedStyle === 'undefined') return ''
   const style = getComputedStyle(root)
-  const parts: string[] = []
+  const names = new Set<string>(THEME_TOKEN_NAMES)
   for (let index = 0; index < style.length; index++) {
     const name = style.item(index)
-    if (name.startsWith('--tiger-')) {
-      parts.push(`${name}:${style.getPropertyValue(name).trim()}`)
-    }
+    if (name.startsWith('--tiger-')) names.add(name)
+  }
+  const parts: string[] = []
+  for (const name of names) {
+    const value = style.getPropertyValue(name).trim()
+    if (value) parts.push(`${name}:${value}`)
   }
   return parts.join(';')
 }

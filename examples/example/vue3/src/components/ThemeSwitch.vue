@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Select } from '@expcat/tigercat-vue/Select'
 import { DEMO_THEME_PRESETS, resolveDemoTheme } from '@demo-shared/themes'
+import { demoCopy } from '@demo-shared/zh-hant'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
 import type { ThemePresetName } from '@expcat/tigercat-core'
@@ -18,7 +19,7 @@ const handleThemeChange = (value: string | number | (string | number)[] | undefi
 
 const themeOptions = computed(() =>
   DEMO_THEME_PRESETS.map((preset) => ({
-    label: preset.label[lang.value],
+    label: demoCopy(preset.label, lang.value),
     value: preset.value
   }))
 )

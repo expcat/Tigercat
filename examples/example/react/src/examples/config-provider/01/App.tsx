@@ -1,25 +1,36 @@
 import { useState } from 'react'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { readTigerDocumentTheme, type ColorScheme, type TigerLocaleDirection } from '@expcat/tigercat-core'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import {
+  readTigerDocumentTheme,
+  type ColorScheme,
+  type TigerLocaleDirection
+} from '@expcat/tigercat-core'
 import { Button } from '@expcat/tigercat-react/Button'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
 import { Empty } from '@expcat/tigercat-react/Empty'
 import { Segmented } from '@expcat/tigercat-react/Segmented'
+import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
+import { toZhHant } from '@demo-shared/zh-hant'
 
-type DemoLanguage = 'zh-CN' | 'en-US'
+type DemoLanguage = 'zh-CN' | 'zh-TW' | 'en-US'
 
 const packs = {
   'zh-CN': zhCN,
+  'zh-TW': zhTW,
   'en-US': enUS
 } as const
 
+const simplifiedEmpty = '当前配置下没有匹配结果'
+
 const emptyOverlay = {
-  'zh-CN': { empty: { noResults: '当前配置下没有匹配结果' } },
+  'zh-CN': { empty: { noResults: simplifiedEmpty } },
+  'zh-TW': { empty: { noResults: toZhHant(simplifiedEmpty) } },
   'en-US': { empty: { noResults: 'No matching results for this configuration' } }
 } as const
 
-const chrome = {
+const chromeSource = {
   'zh-CN': {
     language: '语言',
     theme: '主题',
@@ -48,16 +59,31 @@ const chrome = {
   }
 } as const
 
+type ChromeKey = keyof (typeof chromeSource)['zh-CN']
+type ChromeCopy = Record<ChromeKey, string>
+
+function chromeFor(lang: DemoLanguage): ChromeCopy {
+  const source = lang === 'en-US' ? chromeSource['en-US'] : chromeSource['zh-CN']
+  if (lang !== 'zh-TW') return source
+  const next: ChromeCopy = { ...source }
+  for (const key of Object.keys(next) as ChromeKey[]) next[key] = toZhHant(source[key])
+  return next
+}
+
+function shellLanguage(localeId: string | undefined): DemoLanguage {
+  if (localeId === 'zh-TW' || localeId === 'en-US' || localeId === 'zh-CN') return localeId
+  return 'zh-CN'
+}
+
 const languageOptions = [
-  { label: '中文', value: 'zh-CN' },
+  { label: '简体', value: 'zh-CN' },
+  { label: '繁體', value: 'zh-TW' },
   { label: 'English', value: 'en-US' }
 ]
-const themeOptions = [
-  { label: 'default', value: 'default' },
-  { label: 'modern', value: 'modern' },
-  { label: 'vibrant', value: 'vibrant' },
-  { label: 'minimal', value: 'minimal' }
-]
+const themeOptions = DEMO_THEME_PRESETS.map((preset) => ({
+  label: preset.value,
+  value: preset.value
+}))
 const colorSchemeOptions = [
   { label: 'light', value: 'light' },
   { label: 'dark', value: 'dark' },
@@ -68,7 +94,7 @@ const directionOptions = [
   { label: 'RTL', value: 'rtl' }
 ]
 
-function Probe({ copy }: { copy: (typeof chrome)[DemoLanguage] }) {
+function Probe({ copy }: { copy: ChromeCopy }) {
   const config = useTigerConfig()
   return (
     <p style={{ margin: 0, fontSize: 13 }}>
@@ -79,12 +105,15 @@ function Probe({ copy }: { copy: (typeof chrome)[DemoLanguage] }) {
 }
 
 export default function ConfigProviderExample() {
-  const [language, setLanguage] = useState<DemoLanguage>('zh-CN')
-  const [theme, setTheme] = useState('vibrant')
-  const [colorScheme, setColorScheme] = useState<ColorScheme>('light')
+  const parent = useTigerConfig()
+  const [language, setLanguage] = useState<DemoLanguage>(() => shellLanguage(parent.locale?.locale))
+  const [theme, setTheme] = useState(parent.theme || 'default')
+  const [colorScheme, setColorScheme] = useState<ColorScheme>(() =>
+    parent.colorScheme === 'dark' || parent.colorScheme === 'auto' ? parent.colorScheme : 'light'
+  )
   const [direction, setDirection] = useState<TigerLocaleDirection>('ltr')
   const [nested, setNested] = useState(true)
-  const copy = chrome[language]
+  const copy = chromeFor(language)
 
   const preview = (
     <section

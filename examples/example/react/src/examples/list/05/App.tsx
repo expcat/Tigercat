@@ -21,7 +21,7 @@ export default function App() {
           切换空态
         </Button>
       </div>
-      <List dataSource={empty ? [] : items} loading={loading} emptyText="暂无数据" />
+      <List dataSource={empty ? [] : items} loading={loading} />
     </div>
   )
 }

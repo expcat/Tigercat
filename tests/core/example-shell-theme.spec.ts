@@ -54,5 +54,6 @@ describe('example shell theme', () => {
     expect(html).toContain('const theme = "natural"')
     expect(html).toContain('const colorScheme = "light"')
     expect(html).toContain('locale: Shared.getDemoTigerLocale(lang), theme, colorScheme')
+    expect(html).not.toContain('document: false')
   })
 })

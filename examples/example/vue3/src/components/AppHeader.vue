@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
+import { demoCopy } from '@demo-shared/zh-hant'
 import { demoChrome } from '@demo-shared/chrome'
 import type { ThemePresetName } from '@expcat/tigercat-core'
 import { Button } from '@expcat/tigercat-vue/Button'
@@ -24,7 +25,7 @@ const emit = defineEmits<{
   (e: 'toggle-sider'): void
 }>()
 
-const title = computed(() => DEMO_APP_TITLE[props.lang])
+const title = computed(() => demoCopy(DEMO_APP_TITLE, props.lang))
 const chrome = computed(() => demoChrome(props.lang))
 const siderLabel = computed(() => {
   if (props.isMobile) return chrome.value.openMenu

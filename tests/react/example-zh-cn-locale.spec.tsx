@@ -6,14 +6,16 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import type { ReactElement } from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import CronEditorDemo from '../../examples/example/react/src/examples/cron-editor/01/App'
 import DatePickerDemo from '../../examples/example/react/src/examples/datepicker/01/App'
 import DataExportDemo from '../../examples/example/react/src/examples/data-export/01/App'
 
-function renderDemo(Demo: () => ReactElement) {
+function renderDemo(Demo: () => ReactElement, locale: object = zhCN) {
   return render(
-    <ConfigProvider locale={zhCN}>
+    <ConfigProvider locale={locale}>
       <Demo />
     </ConfigProvider>
   )
@@ -32,6 +34,17 @@ describe('React example pages on zh-CN', () => {
   it('renders DatePicker with the Simplified placeholder', () => {
     const { container } = renderDemo(DatePickerDemo)
     expect(container.querySelector('input')).toHaveAttribute('placeholder', '请选择日期')
+  })
+
+  it('renders DatePicker with the shell locale, including en-US and zh-TW', () => {
+    const english = renderDemo(DatePickerDemo, enUS)
+    expect(english.container.querySelector('input')).toHaveAttribute('placeholder', 'Select date')
+    english.unmount()
+    const traditional = renderDemo(DatePickerDemo, zhTW)
+    expect(traditional.container.querySelector('input')).toHaveAttribute(
+      'placeholder',
+      '請選擇日期'
+    )
   })
 
   it('renders DataExport with Simplified trigger copy', () => {

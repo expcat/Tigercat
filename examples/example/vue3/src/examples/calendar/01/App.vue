@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Calendar } from '@expcat/tigercat-vue/Calendar'
+import { useTigerConfig } from '@expcat/tigercat-vue/ConfigProvider'
 
 const june = new Date(2024, 5, 15)
 const august = new Date(2024, 7, 20)
 const date = ref<Date | null>(june)
+const config = useTigerConfig()
+
+function formatSelected(value: Date | null) {
+  if (!value) return '无'
+  return value.toLocaleDateString(config.value.locale?.locale)
+}
 </script>
 
 <template>
@@ -20,7 +27,7 @@ const date = ref<Date | null>(june)
       </button>
       <Calendar v-model="date" :now="june" />
       <p class="mt-2 text-sm text-[var(--tiger-text-secondary)]">
-        选中日期：{{ date?.toLocaleDateString() ?? '无' }}
+        选中日期：{{ formatSelected(date) }}
       </p>
     </div>
   </div>

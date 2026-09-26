@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CollapsePanel } from '@expcat/tigercat-react/CollapsePanel'
 import { Button } from '@expcat/tigercat-react/Button'
 import { createPortal } from 'react-dom'
@@ -6,7 +6,12 @@ import { Link, useLocation } from 'react-router-dom'
 import { Collapse } from '@expcat/tigercat-react/Collapse'
 import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
-import { getStoredCollapsedNavGroups, setStoredCollapsedNavGroups } from '@demo-shared/prefs'
+import { demoCopy } from '@demo-shared/zh-hant'
+import {
+  navGroupFromCollapseChange,
+  navGroupKeyForPath,
+  navOpenKeys
+} from '@demo-shared/nav-accordion'
 
 export interface AppSiderProps {
   lang: DemoLang
@@ -40,13 +45,19 @@ export const AppSider: React.FC<AppSiderProps> = ({
   const location = useLocation()
   const chrome = demoChrome(lang)
   const [query, setQuery] = useState('')
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() =>
-    getStoredCollapsedNavGroups()
+  const [openGroup, setOpenGroup] = useState<string | null>(() =>
+    navGroupKeyForPath(location.pathname)
   )
+  const pathRef = useRef(location.pathname)
+  const collapsedRef = useRef(isSiderCollapsed)
 
   useEffect(() => {
-    setStoredCollapsedNavGroups(collapsedGroups)
-  }, [collapsedGroups])
+    const pathChanged = pathRef.current !== location.pathname
+    const menuOpened = collapsedRef.current && !isSiderCollapsed
+    pathRef.current = location.pathname
+    collapsedRef.current = isSiderCollapsed
+    if (pathChanged || menuOpened) setOpenGroup(navGroupKeyForPath(location.pathname))
+  }, [isSiderCollapsed, location.pathname])
 
   useEffect(() => {
     if (!isMobile || isSiderCollapsed) return
@@ -63,26 +74,22 @@ export const AppSider: React.FC<AppSiderProps> = ({
       ...group,
       items: needle
         ? group.items.filter(
-            (item) => item.label[lang].toLowerCase().includes(needle) || item.key.includes(needle)
+            (item) =>
+              demoCopy(item.label, lang).toLowerCase().includes(needle) || item.key.includes(needle)
           )
         : group.items
     })).filter((group) => group.items.length > 0)
   }, [lang, query])
 
-  const openKeys = query.trim()
-    ? visibleGroups.map((group) => group.key)
-    : DEMO_NAV_GROUPS.filter((group) => !collapsedGroups[group.key]).map((group) => group.key)
+  const openKeys = navOpenKeys({
+    query,
+    visibleGroupKeys: visibleGroups.map((group) => group.key),
+    openGroupKey: openGroup
+  })
 
   const handleCollapseChange = (next: string | number | (string | number)[] | undefined) => {
     if (query.trim()) return
-    const nextKeys = Array.isArray(next) ? next : next !== undefined ? [next] : []
-    setCollapsedGroups((prev) => {
-      const updated = { ...prev }
-      DEMO_NAV_GROUPS.forEach((group) => {
-        updated[group.key] = !nextKeys.includes(group.key)
-      })
-      return updated
-    })
+    setOpenGroup(navGroupFromCollapseChange(next))
   }
 
   const handleItemClick = useCallback(() => {
@@ -110,6 +117,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
         <Collapse
           bordered={false}
           ghost
+          accordion={!query.trim()}
           expandIconPosition="end"
           activeKey={openKeys}
           onChange={handleCollapseChange}
@@ -126,7 +134,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
                     'text-gray-500 dark:text-gray-400',
                     collapsed ? 'justify-center' : 'justify-between'
                   )}
-                  title={group.label[lang]}>
+                  title={demoCopy(group.label, lang)}>
                   <span
                     className={cn(
                       'inline-flex items-center justify-center text-[10px] font-bold',
@@ -134,17 +142,19 @@ export const AppSider: React.FC<AppSiderProps> = ({
                         ? 'size-9 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
                         : 'size-6 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
                     )}>
-                    {getAbbr(group.label[lang])}
+                    {getAbbr(demoCopy(group.label, lang))}
                   </span>
                   {!collapsed && (
-                    <span className="min-w-0 flex-1 truncate text-left">{group.label[lang]}</span>
+                    <span className="min-w-0 flex-1 truncate text-left">
+                      {demoCopy(group.label, lang)}
+                    </span>
                   )}
                 </div>
               }>
               <div className="mt-1 space-y-1">
                 {group.items.map((item) => {
                   const active = isActivePath(location.pathname, item.path)
-                  const label = item.label[lang]
+                  const label = demoCopy(item.label, lang)
 
                   return (
                     <Link
@@ -191,7 +201,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
               to="/"
               onClick={onClose}
               className="text-base font-semibold text-gray-900 truncate dark:text-gray-100">
-              {DEMO_APP_TITLE[lang]}
+              {demoCopy(DEMO_APP_TITLE, lang)}
             </Link>
             <Button
               type="button"

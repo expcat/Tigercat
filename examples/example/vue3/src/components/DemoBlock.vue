@@ -7,6 +7,7 @@ import { collectTigerCssVars } from '@demo-shared/themes'
 import runtimeUrlsValue from 'virtual:tigercat-playground-runtime'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome, demoModuleTitle } from '@demo-shared/chrome'
+import { demoProse } from '@demo-shared/zh-hant'
 import { clampDemoFrameHeight, resolveDemoViewport } from '@demo-shared/playground/viewport'
 import type {
   DemoCompileSuccess,
@@ -96,7 +97,6 @@ const sandbox = ref<{ channelId: string; document: string } | null>(null)
 const iframeHeight = ref(clampDemoFrameHeight(undefined, viewport.value))
 const themeVersion = ref(0)
 let latestRun = 0
-let sandboxReady = false
 let intersectionObserver: IntersectionObserver | null = null
 let themeObserver: MutationObserver | null = null
 
@@ -115,7 +115,6 @@ const editorTheme = computed(() =>
 )
 
 function rebuildSandbox(result: DemoCompileSuccess) {
-  sandboxReady = false
   const channelId = crypto.randomUUID()
   sandbox.value = {
     channelId,
@@ -204,7 +203,6 @@ function onMessage(event: MessageEvent) {
     return
   }
   if (event.data.type === 'ready') {
-    sandboxReady = true
     status.value = isDirty.value ? 'dirty' : 'ready'
   }
   if (event.data.type === 'runtime-error') {
@@ -245,8 +243,9 @@ onMounted(() => {
   window.addEventListener('message', onMessage)
 })
 
-watch([compiled, demoLang, themeVersion], ([result]) => {
-  if (result && sandboxReady) rebuildSandbox(result)
+watch([demoLang, themeVersion], () => {
+  const result = compiled.value
+  if (result) rebuildSandbox(result)
 })
 
 onBeforeUnmount(() => {
@@ -261,9 +260,9 @@ onBeforeUnmount(() => {
     <div class="mb-4">
       <h2 class="text-2xl font-bold mb-2 dark:text-gray-100">{{ moduleTitle }}</h2>
       <p
-        v-if="demoLang === 'zh-CN' && module.meta.description"
+        v-if="demoProse(module.meta.description, demoLang)"
         class="text-gray-600 dark:text-gray-400">
-        {{ module.meta.description }}
+        {{ demoProse(module.meta.description, demoLang) }}
       </p>
     </div>
 

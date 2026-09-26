@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Select } from '@expcat/tigercat-vue/Select'
-import { DEMO_LANG_OPTIONS, type DemoLang } from '@demo-shared/app-config'
+import { DEMO_LANG_OPTIONS, isDemoLang, type DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
 
 const props = defineProps<{ modelValue: DemoLang }>()
@@ -9,7 +9,7 @@ const emit = defineEmits<{ (e: 'update:modelValue', v: DemoLang): void }>()
 const options = DEMO_LANG_OPTIONS.map((o) => ({ label: o.label, value: o.value }))
 
 const handleChange = (value: string) => {
-  if (value === 'zh-CN' || value === 'en-US') emit('update:modelValue', value)
+  if (isDemoLang(value)) emit('update:modelValue', value)
 }
 </script>
 

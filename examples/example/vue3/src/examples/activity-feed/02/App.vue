@@ -68,8 +68,6 @@ const viewOptions: Array<{ value: FeedView; label: string }> = [
     <ActivityFeed
       :items="view === 'grouped' ? undefined : activities"
       :groups="view === 'grouped' ? groups : view === 'empty' ? [] : undefined"
-      :loading="view === 'loading'"
-      loading-text="正在加载团队动态..."
-      empty-text="当前没有动态" />
+      :loading="view === 'loading'" />
   </div>
 </template>

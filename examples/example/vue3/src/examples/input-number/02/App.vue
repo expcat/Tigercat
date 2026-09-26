@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { InputNumber } from '@expcat/tigercat-vue/InputNumber'
+import { useTigerConfig } from '@expcat/tigercat-vue/ConfigProvider'
 
 const value = ref<number | null>(1288.5)
+const config = useTigerConfig()
 
 const formatCurrency = (amount: number | undefined) =>
   amount === undefined
     ? ''
-    : `¥ ${new Intl.NumberFormat('zh-CN', {
+    : `¥ ${new Intl.NumberFormat(config.value.locale?.locale || 'zh-CN', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       }).format(amount)}`

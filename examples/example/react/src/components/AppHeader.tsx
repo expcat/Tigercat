@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@expcat/tigercat-react/Button'
 import type { ThemePresetName } from '@expcat/tigercat-core'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
+import { demoCopy } from '@demo-shared/zh-hant'
 import { demoChrome } from '@demo-shared/chrome'
 import ThemeSwitch from './ThemeSwitch'
 import DarkModeSwitch from './DarkModeSwitch'
@@ -60,9 +61,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </Button>
           <Link
             to="/"
-            aria-label={DEMO_APP_TITLE[lang]}
+            aria-label={demoCopy(DEMO_APP_TITLE, lang)}
             className="text-base sm:text-lg font-semibold text-gray-900 truncate dark:text-gray-100 hover:text-[var(--tiger-primary)]">
-            {DEMO_APP_TITLE[lang]}
+            {demoCopy(DEMO_APP_TITLE, lang)}
           </Link>
           {rightHint && (
             <div className="hidden text-xs text-gray-500 truncate dark:text-gray-400 sm:block">

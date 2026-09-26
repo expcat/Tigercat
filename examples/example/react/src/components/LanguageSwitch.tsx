@@ -1,6 +1,6 @@
 import React from 'react'
 import { Select } from '@expcat/tigercat-react/Select'
-import { DEMO_LANG_OPTIONS, type DemoLang } from '@demo-shared/app-config'
+import { DEMO_LANG_OPTIONS, isDemoLang, type DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
 
 const languageOptions = DEMO_LANG_OPTIONS.map((o) => ({ label: o.label, value: o.value }))
@@ -13,7 +13,7 @@ export interface LanguageSwitchProps {
 export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({ value, onChange }) => {
   const handleChange = (next: string | number | (string | number)[] | undefined) => {
     const v = Array.isArray(next) ? next[0] : next
-    if (v === 'zh-CN' || v === 'en-US') onChange(v)
+    if (isDemoLang(v)) onChange(v)
   }
 
   return (
