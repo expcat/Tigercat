@@ -277,6 +277,29 @@ describe('Tooltip', () => {
     await expectNoA11yViolationsIsolated(container)
   })
 
+  it.each([
+    ['top', 'bottom', 'left', 'top'],
+    ['right', 'left', 'top', 'bottom']
+  ] as const)('pins the %s caret to the bubble edge', async (placement, edge, cross, opposite) => {
+    renderWithChildren(
+      Tooltip,
+      { content: 'Tooltip content', defaultOpen: true, placement },
+      <button>Trigger</button>
+    )
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="tooltip"]')).toBeTruthy()
+    })
+    const bubble = document.querySelector('[role="tooltip"]') as HTMLElement
+    const arrow = bubble.parentElement?.querySelector('[data-tiger-floating-arrow]') as HTMLElement
+    expect(arrow).toBeTruthy()
+    expect(arrow.parentElement).toBe(bubble.parentElement)
+    expect(arrow.style[edge]).toBe('-4px')
+    expect(arrow.style[cross]).not.toBe('')
+    expect(arrow.style[opposite]).toBe('')
+    expect(arrow.getAttribute('aria-hidden')).toBe('true')
+  })
+
   it('supports defaultOpen', async () => {
     const { getByText } = renderWithChildren(
       Tooltip,

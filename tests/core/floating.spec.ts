@@ -127,6 +127,19 @@ describe('floating utilities', () => {
         right: '-4px',
         top: '8px'
       })
+      // No middleware coordinate must still leave the caret on the edge center.
+      // An omitted cross axis would use the static position (corner, or the next line).
+      expect(getArrowStyles('top')).toMatchObject({
+        bottom: '-4px',
+        left: 'calc(50% - 4px)'
+      })
+      expect(getArrowStyles('top').top).toBeUndefined()
+      expect(getArrowStyles('right')).toMatchObject({
+        left: '-4px',
+        top: 'calc(50% - 4px)'
+      })
+      expect(getArrowStyles('right').bottom).toBeUndefined()
+      expect(getArrowStyles('bottom', { x: 0 }).left).toBe('0px')
     })
   })
 })

@@ -45,19 +45,29 @@ export function getFloatingArrowGeometry(
   return geometry
 }
 
+/**
+ * Inline position for the rotated caret.
+ *
+ * The cross axis is always written. Leaving it `auto` uses the static position:
+ * a top/bottom caret then sits in the corner radius, and a left/right caret
+ * drops onto the next line, clear of the bubble. Middleware `x` / `y` replace
+ * the centered fallback so a shifted layer still points at the reference.
+ */
 export function getFloatingArrowStyle(
   placement: string,
   arrow?: { x?: number; y?: number },
   size = FLOATING_ARROW_SIZE_PX
 ): Record<string, string> {
   const geometry = getFloatingArrowGeometry(placement, arrow, size)
+  const centered = `calc(50% - ${geometry.size / 2}px)`
+  const alongHorizontalEdge = geometry.staticSide === 'top' || geometry.staticSide === 'bottom'
   const style: Record<string, string> = {
     position: 'absolute',
     width: `${geometry.size}px`,
     height: `${geometry.size}px`,
     [geometry.staticSide]: geometry.outside
   }
-  if (geometry.x != null) style.left = geometry.x
-  if (geometry.y != null) style.top = geometry.y
+  if (alongHorizontalEdge) style.left = geometry.x ?? centered
+  else style.top = geometry.y ?? centered
   return style
 }

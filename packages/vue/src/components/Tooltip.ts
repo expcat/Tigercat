@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, useId, watch } from 'vue'
+import { defineComponent, computed, h, PropType, ref, useId, watch } from 'vue'
 import { usePopup } from '../utils/use-popup'
 import { TooltipDelayProvider, useTooltipDelayGroup } from '../utils/tooltip-delay'
 export { TooltipDelayProvider }
@@ -56,6 +56,7 @@ export const Tooltip = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
     const delayGroup = useTooltipDelayGroup()
+    const arrowRef = ref<HTMLElement | null>(null)
 
     const {
       currentVisible,
@@ -67,10 +68,13 @@ export const Tooltip = defineComponent({
       actualPlacement,
       positioned,
       overlayTarget,
-      triggerHandlers
+      triggerHandlers,
+      arrowX,
+      arrowY
     } = usePopup({
       props,
       emit,
+      arrowRef,
       getSkipShowDelay: () => delayGroup?.shouldSkip() ?? false,
       onShown: () => delayGroup?.noteOpen()
     })
@@ -93,6 +97,9 @@ export const Tooltip = defineComponent({
     )
     const triggerClasses = computed(() => getTooltipTriggerClasses(props.disabled))
     const contentClasses = computed(() => getTooltipContentClasses())
+    const arrowStyle = computed(() =>
+      getFloatingArrowStyle(actualPlacement.value, { x: arrowX.value, y: arrowY.value })
+    )
 
     return () => {
       const defaultSlot = slots.default?.()
@@ -151,9 +158,11 @@ export const Tooltip = defineComponent({
                       props.content
                     ),
                     h('span', {
+                      ref: arrowRef,
                       'data-tiger-floating-arrow': '',
                       class: getTooltipArrowClasses(),
-                      style: getFloatingArrowStyle(actualPlacement.value)
+                      style: arrowStyle.value,
+                      'aria-hidden': 'true'
                     })
                   ]
                 ),

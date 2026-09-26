@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useId, useMemo } from 'react'
+import React, { forwardRef, useEffect, useId, useMemo, useRef } from 'react'
 import { usePopup } from '../utils/use-popup'
 import { TooltipDelayProvider, useTooltipDelayGroup } from '../utils/tooltip-delay'
 export { TooltipDelayProvider }
@@ -55,6 +55,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
 ) {
   const tooltipId = `tiger-tooltip-${useId()}`
   const delayGroup = useTooltipDelayGroup()
+  const arrowRef = useRef<HTMLElement>(null)
 
   const {
     currentVisible,
@@ -66,7 +67,9 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
     actualPlacement,
     positioned,
     overlayTarget,
-    triggerHandlers
+    triggerHandlers,
+    arrowX,
+    arrowY
   } = usePopup({
     open,
     defaultOpen,
@@ -77,6 +80,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
     showDelay,
     hideDelay,
     onOpenChange,
+    arrowRef,
     getSkipShowDelay: () => delayGroup?.shouldSkip() ?? false,
     onShown: () => delayGroup?.noteOpen()
   })
@@ -98,6 +102,10 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
   )
   const triggerClasses = useMemo(() => getTooltipTriggerClasses(disabled), [disabled])
   const contentClasses = useMemo(() => getTooltipContentClasses(), [])
+  const arrowStyle = useMemo(
+    () => getFloatingArrowStyle(actualPlacement, { x: arrowX, y: arrowY }) as React.CSSProperties,
+    [actualPlacement, arrowX, arrowY]
+  )
 
   if (!children) return null
 
@@ -138,9 +146,11 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
               {content}
             </div>
             <span
+              ref={arrowRef}
               data-tiger-floating-arrow=""
               className={getTooltipArrowClasses()}
-              style={getFloatingArrowStyle(actualPlacement)}
+              style={arrowStyle}
+              aria-hidden="true"
             />
           </div>,
           overlayTarget
