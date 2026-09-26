@@ -287,10 +287,24 @@ describe('WorkflowViewer (React)', () => {
     expect(loop).toHaveAttribute('data-workflow-loop-to', 'start')
     expect(loop).toHaveAccessibleName('Returned here: Submit')
     expect(loop).toHaveClass('self-stretch')
-    expect(loop).toHaveStyle({ gridRow: '1 / 8', gridColumn: '1 / span 2' })
-    expect((loop?.firstElementChild as HTMLElement | null)?.style.left).toBe(
-      'calc(50% + 9rem + 0.75rem)'
-    )
+    expect(loop).toHaveStyle({
+      gridRow: '1 / 8',
+      gridColumn: '1 / span 2',
+      display: 'grid',
+      gridTemplateRows: 'subgrid'
+    })
+    const arm = loop?.querySelector<HTMLElement>('[data-workflow-loop-piece="arm-start"]')
+    const stem = loop?.querySelector<HTMLElement>('[data-workflow-loop-piece="stem-start"]')
+    const stemEnd = loop?.querySelector<HTMLElement>('[data-workflow-loop-piece="stem-end"]')
+    expect(arm).toBeTruthy()
+    expect(arm?.style.alignSelf).toBe('center')
+    expect(arm?.style.height).toBe('2px')
+    expect(stem?.style.alignSelf).toBe('end')
+    expect(stem?.style.height).toBe('50%')
+    expect(stemEnd?.style.alignSelf).toBe('start')
+    expect(container.querySelector('[data-workflow-edge="riser"]')).toBeTruthy()
+    expect(container.querySelector('[data-workflow-edge="fork"] span')).toBeTruthy()
+    expect(container.querySelector('[data-workflow-edge="join"] span')).toBeTruthy()
     expect(container.querySelector('[data-layout="graph"]')).toHaveStyle({
       gridTemplateColumns: 'repeat(2, minmax(12rem, 18rem))'
     })

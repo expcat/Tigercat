@@ -33,6 +33,7 @@ import {
   WORKFLOW_SIGN_MODES,
   WORKFLOW_STEP_KINDS
 } from './workflow-timeline-utils'
+import { WORKFLOW_BRANCH_GAP, workflowForkTrackWidth } from './workflow-branch-geometry'
 
 export const EMPTY_WORKFLOW_DESIGNER_STEPS: WorkflowTimelineStep[] = []
 
@@ -119,14 +120,15 @@ export const workflowDesignerCanvasBaseStyles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     width: '100%',
-    backgroundColor: 'var(--tiger-surface-muted)'
+    backgroundColor: 'var(--tiger-surface-muted)',
+    '--tiger-workflow-branch-gap': WORKFLOW_BRANCH_GAP
   },
   '.tiger-workflow-designer__branches': {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    gap: '0.75rem',
+    gap: 'var(--tiger-workflow-branch-gap, 0.75rem)',
     width: '100%'
   },
   '.tiger-workflow-designer__branch': {
@@ -196,8 +198,9 @@ export const workflowDesignerEmptyClasses = 'text-sm text-[var(--tiger-text-seco
 export const workflowDesignerChildrenClasses =
   'tiger-workflow-designer__children relative z-[1] w-full'
 export const workflowDesignerForkClasses =
-  'tiger-workflow-designer__fork relative z-[1] flex w-full flex-col bg-[var(--tiger-surface-muted)]'
-export const workflowDesignerBranchesClasses = 'flex w-full flex-row items-start gap-3'
+  'tiger-workflow-designer__fork relative z-[1] flex w-full flex-col bg-[var(--tiger-surface-muted)] [--tiger-workflow-branch-gap:0.75rem]'
+export const workflowDesignerBranchesClasses =
+  'flex w-full flex-row items-start gap-[var(--tiger-workflow-branch-gap,0.75rem)]'
 export const workflowDesignerBranchClasses = 'tiger-workflow-designer__branch min-w-0 flex-1'
 export const workflowDesignerForkBarClasses =
   'tiger-workflow-designer__fork-bar h-0.5 shrink-0 bg-[color-mix(in_srgb,var(--tiger-primary)_35%,transparent)]'
@@ -637,15 +640,14 @@ export function workflowDesignerCardClassName(selected: boolean): string {
 
 /**
  * Horizontal fork bar from the center of the first equal column to the
- * center of the last. Branch columns are `flex: 1`, so the inset is `50 / n`.
+ * center of the last. The flex gap is `--tiger-workflow-branch-gap`, so the
+ * width is not `50 / n` percent of the fork.
  */
 export function workflowDesignerForkTrackStyle(branchCount: number): {
   width: string
   marginInline: string
 } {
-  if (branchCount < 2) return { width: '0', marginInline: 'auto' }
-  const inset = 50 / branchCount
-  return { width: `${100 - inset * 2}%`, marginInline: 'auto' }
+  return { width: workflowForkTrackWidth(branchCount), marginInline: 'auto' }
 }
 
 export function workflowDesignerKindOptions(

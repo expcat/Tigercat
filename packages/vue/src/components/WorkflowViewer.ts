@@ -46,8 +46,10 @@ import {
   workflowViewerLoopClasses,
   workflowViewerLoopGridStyle,
   workflowViewerLoopLabelClasses,
-  workflowViewerLoopRailClasses,
-  workflowViewerLoopRailStyle,
+  workflowViewerLoopLineClasses,
+  workflowViewerLoopMarkStyle,
+  workflowViewerLoopPieceStyle,
+  workflowViewerRiserClasses,
   workflowViewerReturnTargetLabelClasses,
   workflowViewerRollbackLabelClasses,
   workflowViewerRootClasses,
@@ -60,6 +62,7 @@ import {
   type WorkflowViewerLayout,
   type WorkflowViewerLayoutEdge,
   type WorkflowViewerLegendItem,
+  type WorkflowViewerLoopPiece,
   type WorkflowViewerNode,
   type WorkflowViewerProps as CoreWorkflowViewerProps
 } from '@expcat/tigercat-core'
@@ -256,8 +259,26 @@ function renderViewerCard(
   )
 }
 
+const WORKFLOW_VIEWER_LOOP_PIECES: WorkflowViewerLoopPiece[] = [
+  'stem-start',
+  'stem-mid',
+  'stem-end',
+  'arm-start',
+  'arm-end',
+  'label'
+]
+
 function renderViewerEdge(edge: WorkflowViewerLayoutEdge): VNode | null {
   if (edge.kind === 'loop') return null
+  if (edge.kind === 'riser') {
+    return h('div', {
+      key: `riser-${edge.from}-${edge.to}`,
+      class: workflowViewerRiserClasses,
+      style: workflowViewerEdgeGridStyle(edge),
+      'data-workflow-edge': 'riser',
+      'aria-hidden': 'true'
+    })
+  }
   const bar =
     edge.kind === 'fork' || edge.kind === 'join'
       ? h('span', {
@@ -306,11 +327,28 @@ function renderViewerLoop(
       'data-workflow-loop-from': edge.from,
       'data-workflow-loop-to': edge.to
     },
-    [
-      h('div', { class: workflowViewerLoopRailClasses, style: workflowViewerLoopRailStyle() }, [
-        h('span', { class: workflowViewerLoopLabelClasses }, title)
-      ])
-    ]
+    WORKFLOW_VIEWER_LOOP_PIECES.map((piece) =>
+      h(
+        'div',
+        {
+          key: piece,
+          style: workflowViewerLoopPieceStyle(piece),
+          'data-workflow-loop-piece': piece,
+          'aria-hidden': 'true'
+        },
+        [
+          h(
+            'span',
+            {
+              class:
+                piece === 'label' ? workflowViewerLoopLabelClasses : workflowViewerLoopLineClasses,
+              style: workflowViewerLoopMarkStyle(piece)
+            },
+            piece === 'label' ? title : undefined
+          )
+        ]
+      )
+    )
   )
 }
 

@@ -344,9 +344,14 @@ describe('WorkflowDesigner center-rail class tokens', () => {
     expect(workflowDesignerListClasses).not.toMatch(/border-s-2/)
     expect(workflowDesignerInsertRowClasses).not.toMatch(/-ms-\[/)
     expect(workflowDesignerChildrenClasses).not.toMatch(/border-s-2/)
-    expect(workflowDesignerForkTrackStyle(2)).toEqual({ width: '50%', marginInline: 'auto' })
-    expect(workflowDesignerForkTrackStyle(1)).toEqual({ width: '0', marginInline: 'auto' })
-    expect(parseFloat(workflowDesignerForkTrackStyle(3).width)).toBeCloseTo(100 - 100 / 3, 5)
+    expect(workflowDesignerForkTrackStyle(2)).toEqual({
+      width: 'calc(100% - (100% - 1 * var(--tiger-workflow-branch-gap, 0.75rem)) / 2)',
+      marginInline: 'auto'
+    })
+    expect(workflowDesignerForkTrackStyle(1)).toEqual({ width: '0px', marginInline: 'auto' })
+    expect(workflowDesignerForkTrackStyle(3).width).toBe(
+      'calc(100% - (100% - 2 * var(--tiger-workflow-branch-gap, 0.75rem)) / 3)'
+    )
   })
 
   it('centers the canvas rail and insert control in plugin CSS', () => {

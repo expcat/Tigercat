@@ -44,8 +44,10 @@ import {
   workflowViewerLoopClasses,
   workflowViewerLoopGridStyle,
   workflowViewerLoopLabelClasses,
-  workflowViewerLoopRailClasses,
-  workflowViewerLoopRailStyle,
+  workflowViewerLoopLineClasses,
+  workflowViewerLoopMarkStyle,
+  workflowViewerLoopPieceStyle,
+  workflowViewerRiserClasses,
   workflowViewerReturnTargetLabelClasses,
   workflowViewerRollbackLabelClasses,
   workflowViewerRootClasses,
@@ -57,6 +59,7 @@ import {
   type WorkflowViewerLayout,
   type WorkflowViewerLayoutEdge,
   type WorkflowViewerLegendItem,
+  type WorkflowViewerLoopPiece,
   type WorkflowViewerNode,
   type WorkflowViewerProps as CoreWorkflowViewerProps
 } from '@expcat/tigercat-core'
@@ -254,8 +257,27 @@ function ViewerCard({
   )
 }
 
+const WORKFLOW_VIEWER_LOOP_PIECES: WorkflowViewerLoopPiece[] = [
+  'stem-start',
+  'stem-mid',
+  'stem-end',
+  'arm-start',
+  'arm-end',
+  'label'
+]
+
 function ViewerEdge({ edge }: { edge: WorkflowViewerLayoutEdge }) {
   if (edge.kind === 'loop') return null
+  if (edge.kind === 'riser') {
+    return (
+      <div
+        className={workflowViewerRiserClasses}
+        style={workflowViewerEdgeGridStyle(edge)}
+        data-workflow-edge="riser"
+        aria-hidden="true"
+      />
+    )
+  }
   const bar =
     edge.kind === 'fork' || edge.kind === 'join' ? (
       <span
@@ -303,9 +325,21 @@ function ViewerLoop({
       data-workflow-edge="loop"
       data-workflow-loop-from={edge.from}
       data-workflow-loop-to={edge.to}>
-      <div className={workflowViewerLoopRailClasses} style={workflowViewerLoopRailStyle()}>
-        <span className={workflowViewerLoopLabelClasses}>{title}</span>
-      </div>
+      {WORKFLOW_VIEWER_LOOP_PIECES.map((piece) => (
+        <div
+          key={piece}
+          style={workflowViewerLoopPieceStyle(piece)}
+          data-workflow-loop-piece={piece}
+          aria-hidden="true">
+          <span
+            className={
+              piece === 'label' ? workflowViewerLoopLabelClasses : workflowViewerLoopLineClasses
+            }
+            style={workflowViewerLoopMarkStyle(piece)}>
+            {piece === 'label' ? title : null}
+          </span>
+        </div>
+      ))}
     </div>
   )
 }

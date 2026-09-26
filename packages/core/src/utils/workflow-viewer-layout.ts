@@ -8,8 +8,9 @@
  */
 
 import type { WorkflowViewerNode } from './workflow-timeline-utils'
+import { workflowColumnCenter, workflowViewerCardHalfValue } from './workflow-branch-geometry'
 
-export type WorkflowViewerEdgeKind = 'sequence' | 'fork' | 'join' | 'loop'
+export type WorkflowViewerEdgeKind = 'sequence' | 'fork' | 'join' | 'loop' | 'riser'
 
 export interface WorkflowViewerPlacement {
   key: string
@@ -34,9 +35,31 @@ export interface WorkflowViewerLayoutEdge {
   row: number
   col: number
   colSpan: number
-  /** Horizontal bar inset, percent of the edge cell. */
+  /**
+   * Column-fraction inset before the branch gap is applied, percent of the
+   * edge cell. Painted bars use `workflowViewerBarStyle`, which shifts these
+   * endpoints onto the column centers.
+   */
   insetStart: number
   insetEnd: number
+  /**
+   * Direct branches of a fork. Join edges copy them, shifted into the join
+   * cell. Risers read `col` / `endRow`.
+   */
+  slots?: WorkflowViewerBranchSlot[]
+  /** Last layout row a riser runs through (the join connector row). */
+  rowEnd?: number
+}
+
+export interface WorkflowViewerBranchSlot {
+  key: string
+  /** 1-based grid column where this branch starts. */
+  col: number
+  cols: number
+  /** Columns before this branch inside the edge cell that paints the bar. */
+  offset: number
+  /** Layout row of this branch's last card. */
+  endRow: number
 }
 
 export interface WorkflowViewerLayout {
@@ -113,18 +136,38 @@ function placeList(
       if (forkEdge) {
         const forkStart = ((forkEdge.col - col) / span) * 100
         const forkWidth = (forkEdge.colSpan / span) * 100
+        const branchOffset = forkEdge.col - col
+        const joinRow = cursor - 1
+        const slots = (forkEdge.slots ?? []).map((slot) => ({
+          ...slot,
+          offset: slot.offset + branchOffset
+        }))
         edges.push({
           kind: 'join',
           from: previous.key,
           to: node.key,
-          row: cursor - 1,
+          row: joinRow,
           col,
           colSpan: span,
           insetStart: roundPercent(forkStart + (forkEdge.insetStart / 100) * forkWidth),
           insetEnd: roundPercent(
             100 - (forkStart + forkWidth) + (forkEdge.insetEnd / 100) * forkWidth
-          )
+          ),
+          slots
         })
+        for (const slot of forkEdge.slots ?? []) {
+          edges.push({
+            kind: 'riser',
+            from: slot.key,
+            to: node.key,
+            row: slot.endRow,
+            rowEnd: joinRow,
+            col: slot.col,
+            colSpan: slot.cols,
+            insetStart: 0,
+            insetEnd: 0
+          })
+        }
       } else {
         edges.push({
           kind: 'sequence',
@@ -183,7 +226,7 @@ function placeNode(
   const forkCol = col + offset
   const firstCols = boxes[0]?.cols ?? 1
   const lastCols = boxes[boxes.length - 1]?.cols ?? 1
-  edges.push({
+  const forkEdge: WorkflowViewerLayoutEdge = {
     kind: 'fork',
     from: node.key,
     to: node.children[node.children.length - 1]!.key,
@@ -191,14 +234,26 @@ function placeNode(
     col: forkCol,
     colSpan: used,
     insetStart: roundPercent((firstCols / 2 / used) * 100),
-    insetEnd: roundPercent((lastCols / 2 / used) * 100)
-  })
+    insetEnd: roundPercent((lastCols / 2 / used) * 100),
+    slots: []
+  }
+  edges.push(forkEdge)
 
   let cursor = forkCol
   let maxRows = 0
+  let slotOffset = 0
   node.children.forEach((child, index) => {
     const box = boxes[index]!
+    const childCol = cursor
     const next = placeNode(child, row + 1, cursor, box.cols, true, placements, edges)
+    forkEdge.slots?.push({
+      key: child.key,
+      col: childCol,
+      cols: box.cols,
+      offset: slotOffset,
+      endRow: next - 1
+    })
+    slotOffset += box.cols
     maxRows = Math.max(maxRows, next - (row + 1))
     cursor += box.cols
   })
@@ -281,16 +336,34 @@ export function workflowViewerGridStyle(layout: WorkflowViewerLayout): Record<st
 export function workflowViewerEdgeGridStyle(
   edge: WorkflowViewerLayoutEdge
 ): Record<string, string | number> {
+  const row =
+    edge.kind === 'riser' && edge.rowEnd !== undefined
+      ? `${workflowViewerConnectorGridRow(edge.row)} / ${workflowViewerConnectorGridRow(edge.rowEnd) + 1}`
+      : workflowViewerConnectorGridRow(edge.row)
   return {
-    gridRow: workflowViewerConnectorGridRow(edge.row),
+    gridRow: row,
     gridColumn: `${edge.col} / span ${edge.colSpan}`
   }
 }
 
+/**
+ * Horizontal fork/join bar. Endpoints are the first and last branch centers,
+ * including the column gap. `insetStart` / `insetEnd` stay the gap-free fraction.
+ */
 export function workflowViewerBarStyle(edge: WorkflowViewerLayoutEdge): Record<string, string> {
+  const slots = edge.slots
+  const first = slots?.[0]
+  const last = slots && slots.length > 1 ? slots[slots.length - 1] : undefined
+  if (!first || !last || edge.colSpan < 1) {
+    return {
+      left: `${edge.insetStart}%`,
+      right: `${edge.insetEnd}%`
+    }
+  }
+  const columnsAfter = edge.colSpan - (last.offset + last.cols)
   return {
-    left: `${edge.insetStart}%`,
-    right: `${edge.insetEnd}%`
+    left: workflowColumnCenter(edge.colSpan, first.offset, first.cols),
+    right: workflowColumnCenter(edge.colSpan, Math.max(0, columnsAfter), last.cols)
   }
 }
 
@@ -318,12 +391,90 @@ export function workflowViewerLoopGridStyle(
   const top = Math.min(from.row, to.row)
   const bottom = Math.max(from.row, to.row)
   return {
+    display: 'grid',
+    gridTemplateRows: 'subgrid',
     gridColumn: `${anchor.col} / span ${anchor.colSpan}`,
     gridRow: `${workflowViewerCardGridRow(top)} / ${workflowViewerConnectorGridRow(bottom)}`
   }
 }
 
-/** Sits just to the right of a centered `max-w-[18rem]` card. */
+export type WorkflowViewerLoopPiece =
+  'stem-start' | 'stem-mid' | 'stem-end' | 'arm-start' | 'arm-end' | 'label'
+
+/**
+ * Expression (no wrapping `calc`) for the right edge of a centered card capped
+ * at twice `--tiger-workflow-card-half`. A narrower column fills the cell,
+ * so that edge is `100%`.
+ */
+function workflowViewerCardRightExpr(): string {
+  return `50% + min(50%, ${workflowViewerCardHalfValue()})`
+}
+
+/** Vertical return rail, one gap past the card's right edge. */
 export function workflowViewerLoopRailStyle(): Record<string, string> {
-  return { left: 'calc(50% + 9rem + 0.75rem)' }
+  return { left: `calc(${workflowViewerCardRightExpr()} + 0.75rem)` }
+}
+
+/**
+ * Grid track for one return-bracket piece. The track stretches the overlay
+ * width and locks to the endpoint card rows via subgrid. The painted line is
+ * `workflowViewerLoopMarkStyle` — a grid item's own percentage margin/inset
+ * resolves against a smaller box, so the mark is absolutely positioned inside
+ * this full-width track.
+ */
+export function workflowViewerLoopPieceStyle(
+  piece: WorkflowViewerLoopPiece
+): Record<string, string> {
+  const track = { position: 'relative', width: '100%', gridColumn: '1 / -1' }
+  if (piece === 'stem-start') {
+    return { ...track, gridRow: '1', alignSelf: 'end', height: '50%' }
+  }
+  if (piece === 'stem-mid') {
+    return { ...track, gridRow: '2 / -2', alignSelf: 'stretch' }
+  }
+  if (piece === 'stem-end') {
+    return { ...track, gridRow: '-1', alignSelf: 'start', height: '50%' }
+  }
+  if (piece === 'arm-start') {
+    return { ...track, gridRow: '1', alignSelf: 'center', height: '2px' }
+  }
+  if (piece === 'arm-end') {
+    return { ...track, gridRow: '-1', alignSelf: 'center', height: '2px' }
+  }
+  return { ...track, gridRow: '1 / -1', alignSelf: 'stretch' }
+}
+
+/**
+ * Painted segment inside a loop track. Arms start at the centered card's right
+ * edge; stems sit one column gap further right and fill their track.
+ */
+export function workflowViewerLoopMarkStyle(
+  piece: WorkflowViewerLoopPiece
+): Record<string, string> {
+  const cardRight = `calc(${workflowViewerCardRightExpr()})`
+  const rail = workflowViewerLoopRailStyle().left ?? '0px'
+  if (piece === 'arm-start' || piece === 'arm-end') {
+    return {
+      position: 'absolute',
+      left: cardRight,
+      top: '0',
+      height: '2px',
+      width: 'calc(0.75rem + 2px)'
+    }
+  }
+  if (piece === 'label') {
+    return {
+      position: 'absolute',
+      left: `calc(${workflowViewerCardRightExpr()} + 0.75rem + 4px)`,
+      top: '50%',
+      transform: 'translateY(-50%)'
+    }
+  }
+  return {
+    position: 'absolute',
+    left: rail,
+    top: '0',
+    bottom: '0',
+    width: '2px'
+  }
 }

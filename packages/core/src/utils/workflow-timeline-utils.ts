@@ -1268,28 +1268,31 @@ export const workflowViewerBranchClasses =
 export const workflowViewerItemClasses = 'flex w-full min-w-0 flex-col items-center'
 export const workflowViewerConnectorClasses = 'h-4 w-px bg-[var(--tiger-border)]'
 export const workflowViewerGraphClasses =
-  'relative grid w-full min-w-0 items-start justify-center gap-x-3 overflow-x-auto'
+  'relative grid w-full min-w-0 items-start justify-center overflow-x-auto [--tiger-workflow-branch-gap:0.75rem] [--tiger-workflow-card-half:9rem] gap-x-[var(--tiger-workflow-branch-gap,0.75rem)]'
 export const workflowViewerCellClasses =
   'flex w-full min-w-0 flex-col items-center justify-self-stretch'
 export const workflowViewerForkDropClasses = 'mx-auto h-3 w-px shrink-0 bg-[var(--tiger-border)]'
 export const workflowViewerEdgeSequenceClasses =
   "relative h-3 w-full before:absolute before:bottom-0 before:left-1/2 before:top-0 before:w-px before:-translate-x-1/2 before:bg-[var(--tiger-border)] before:content-['']"
-export const workflowViewerEdgeForkClasses = 'relative h-3 w-full'
-export const workflowViewerEdgeJoinClasses =
-  "relative h-3 w-full before:absolute before:bottom-0 before:left-1/2 before:top-0 before:w-px before:-translate-x-1/2 before:bg-[var(--tiger-border)] before:content-['']"
-export const workflowViewerBarClasses =
-  'absolute top-1/2 h-px -translate-y-1/2 bg-[var(--tiger-border)]'
-export const workflowViewerJoinBarClasses = 'absolute top-0 h-px bg-[var(--tiger-border)]'
+/** One pixel under the parent card. The child drop hangs from this bar. */
+export const workflowViewerEdgeForkClasses = 'relative h-px w-full'
+/** Neck under the branch cards. The join bar sits on the bottom edge. */
+export const workflowViewerEdgeJoinClasses = 'relative h-3 w-full'
+export const workflowViewerRiserClasses =
+  "pointer-events-none relative self-stretch before:absolute before:bottom-0 before:left-1/2 before:top-0 before:w-px before:-translate-x-1/2 before:bg-[var(--tiger-border)] before:content-['']"
+export const workflowViewerBarClasses = 'absolute top-0 h-px bg-[var(--tiger-border)]'
+export const workflowViewerJoinBarClasses = 'absolute bottom-0 h-px bg-[var(--tiger-border)]'
 export const workflowViewerLoopClasses = 'pointer-events-none relative z-[1] self-stretch'
-/** Rail hugs a centered `max-w-[18rem]` card: half the cap, plus a 0.75rem gap. */
+export const workflowViewerLoopLineClasses = 'bg-[var(--tiger-warning)]'
+/** Kept for callers that still paint a single rail box. Pieces replace it. */
 export const workflowViewerLoopRailClasses =
-  'absolute bottom-0 top-0 flex w-10 flex-col justify-center rounded-e-md border-y-2 border-e-2 border-[var(--tiger-warning)]'
+  'pointer-events-none bg-[var(--tiger-warning)]'
 export const workflowViewerLoopLabelClasses =
   'truncate px-0.5 text-xs leading-tight text-[var(--tiger-text-secondary)] [writing-mode:vertical-rl]'
-export const workflowViewerCardClasses =
-  'w-full min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2 shadow-sm'
-export const workflowViewerCardCcClasses =
-  'w-full min-w-[12rem] max-w-[18rem] rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] px-3 py-2 shadow-none'
+const workflowViewerCardWidthClasses =
+  'w-full min-w-[12rem] max-w-[calc(var(--tiger-workflow-card-half,9rem)*2)]'
+export const workflowViewerCardClasses = `${workflowViewerCardWidthClasses} rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2 shadow-sm`
+export const workflowViewerCardCcClasses = `${workflowViewerCardWidthClasses} rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] px-3 py-2 shadow-none`
 export const workflowViewerCardOnPathClasses = 'border-[var(--tiger-primary)]'
 export const workflowViewerCardRollbackClasses = 'border-[var(--tiger-error)]'
 export const workflowViewerCardReturnTargetClasses = 'border-[var(--tiger-warning)]'

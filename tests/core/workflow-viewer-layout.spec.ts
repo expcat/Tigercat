@@ -3,7 +3,14 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { buildWorkflowViewerTree, layoutWorkflowViewer } from '@expcat/tigercat-core'
+import {
+  buildWorkflowViewerTree,
+  layoutWorkflowViewer,
+  workflowViewerBarStyle,
+  workflowViewerEdgeGridStyle,
+  workflowViewerLoopMarkStyle,
+  workflowViewerLoopPieceStyle
+} from '@expcat/tigercat-core'
 import type { WorkflowTimelineStep } from '@expcat/tigercat-core'
 
 const approval: WorkflowTimelineStep[] = [
@@ -67,7 +74,30 @@ describe('layoutWorkflowViewer', () => {
     expect(byKey.start?.colSpan).toBe(2)
     const fork = layout.edges.find((edge) => edge.kind === 'fork')
     expect(fork).toMatchObject({ from: 'cond', colSpan: 2, insetStart: 25, insetEnd: 25 })
-    expect(layout.edges.some((edge) => edge.kind === 'join' && edge.to === 'manager')).toBe(true)
+    const axis = 'calc(1 * (100% - 1 * var(--tiger-workflow-branch-gap, 0.75rem)) / 4)'
+    expect(workflowViewerBarStyle(fork!)).toEqual({ left: axis, right: axis })
+    const join = layout.edges.find((edge) => edge.kind === 'join' && edge.to === 'manager')
+    expect(join).toBeTruthy()
+    expect(workflowViewerBarStyle(join!)).toEqual({ left: axis, right: axis })
+    const risers = layout.edges.filter((edge) => edge.kind === 'riser')
+    expect(risers.map((edge) => edge.from).sort()).toEqual(['high', 'low'])
+    expect(risers.every((edge) => edge.row === edge.rowEnd && edge.row === join?.row)).toBe(true)
+    expect(workflowViewerEdgeGridStyle(risers[0]!).gridRow).toBe(
+      `${workflowViewerEdgeGridStyle(join!).gridRow} / ${Number(workflowViewerEdgeGridStyle(join!).gridRow) + 1}`
+    )
+    expect(workflowViewerLoopPieceStyle('arm-start')).toMatchObject({
+      alignSelf: 'center',
+      height: '2px',
+      width: '100%'
+    })
+    expect(workflowViewerLoopMarkStyle('arm-start').left).toBe(
+      'calc(50% + min(50%, var(--tiger-workflow-card-half, 9rem)))'
+    )
+    expect(workflowViewerLoopMarkStyle('stem-start').left).toBe(
+      'calc(50% + min(50%, var(--tiger-workflow-card-half, 9rem)) + 0.75rem)'
+    )
+    expect(workflowViewerLoopPieceStyle('stem-start').alignSelf).toBe('end')
+    expect(workflowViewerLoopPieceStyle('stem-end').alignSelf).toBe('start')
   })
 
   it('draws a loop edge for loopTo and ignores unknown or self targets', () => {
