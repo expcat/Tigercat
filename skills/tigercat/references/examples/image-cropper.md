@@ -15,7 +15,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 Runnable modules: `examples/example/vue3/src/examples/image-cropper/` and `examples/example/react/src/examples/image-cropper/`.
 
-Note: `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。
+Note: `src` 必填。产出 `getCropResult()`。坏图错误态。比例、旋转和翻转在裁剪区上方的工具条里，比例是一组可切换按钮。未选手动比例时 `aspectRatio` 重算选区。
 
 Vue: `<ImageCropper :src="src" />`
 

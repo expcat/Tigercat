@@ -11,6 +11,7 @@ import React, {
 import {
   basicLabel,
   classNames,
+  CROP_ASPECT_PRESETS,
   CROP_HANDLES,
   IMAGE_CROPPER_MASK_FILL,
   constrainCropRect,
@@ -24,8 +25,12 @@ import {
   getCropperHandleStyle,
   getImageEditorLabels,
   getInitialCropRect,
+  cropAspectPresetLabelKey,
+  imageCropperAspectGroupClasses,
   imageCropperContainerClasses,
   imageCropperSizeHostClasses,
+  imageCropperToolButtonClasses,
+  imageCropperToolbarClasses,
   planCropperDisplaySize,
   resolveCropperAvailableSize,
   imageCropperDragAreaClasses,
@@ -44,6 +49,7 @@ import {
   moveCropRect,
   remapCropRect,
   resolveCropAspectRatio,
+  resolvePressedCropAspectPreset,
   resizeCropRect,
   type CropHandle,
   type CropRect,
@@ -391,7 +397,7 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
         <div
           {...rest}
           ref={containerRef}
-          className={classNames(containerClasses, 'items-center')}
+          className={classNames(containerClasses, 'justify-center')}
           style={rootStyle}
           data-image-cropper=""
           data-image-cropper-status={status}
@@ -401,9 +407,6 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
           aria-label={
             status === 'error' ? labels.loadErrorAriaLabel : labels.loadingCropImageAriaLabel
           }>
-          <button type="button" onClick={() => setRotation((value) => (value + 90) % 360)}>
-            {basicLabel(mergedLocale?.locale, 'imageCropper', 'rotate')}
-          </button>
           {status === 'error' ? (
             <div className={imageErrorClasses}>{renderErrorIcon()}</div>
           ) : (
@@ -427,31 +430,38 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
         data-crop-flip={flipX ? 'true' : 'false'}
         data-crop-circle={circular ? 'true' : 'false'}
         data-crop-aspect={preset ?? ''}>
-        <div className="mb-2 flex flex-wrap gap-1" data-crop-tools="">
-          {(['1:1', '4:3', '16:9', 'free'] as const).map((item) => (
-            <button
-              key={item}
-              type="button"
-              data-crop-preset={item}
-              aria-pressed={preset === item}
-              onClick={() => setPreset(item)}>
-              {basicLabel(
-                mergedLocale?.locale,
-                'imageCropper',
-                item === '1:1'
-                  ? 'square'
-                  : item === '4:3'
-                    ? 'fourThree'
-                    : item === '16:9'
-                      ? 'sixteenNine'
-                      : 'free'
-              )}
-            </button>
-          ))}
-          <button type="button" onClick={() => setRotation((value) => (value + 90) % 360)}>
+        <div className={imageCropperToolbarClasses} data-crop-tools="">
+          <div
+            className={imageCropperAspectGroupClasses}
+            role="group"
+            aria-label={basicLabel(mergedLocale?.locale, 'imageCropper', 'aspect')}>
+            {CROP_ASPECT_PRESETS.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={imageCropperToolButtonClasses}
+                data-crop-preset={item}
+                aria-pressed={
+                  resolvePressedCropAspectPreset(preset ?? aspectPreset, aspectRatioProp) === item
+                }
+                onClick={() => setPreset(item)}>
+                {basicLabel(mergedLocale?.locale, 'imageCropper', cropAspectPresetLabelKey(item))}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className={imageCropperToolButtonClasses}
+            data-crop-action="rotate"
+            onClick={() => setRotation((value) => (value + 90) % 360)}>
             {basicLabel(mergedLocale?.locale, 'imageCropper', 'rotate')}
           </button>
-          <button type="button" onClick={() => setFlipX((value) => !value)}>
+          <button
+            type="button"
+            className={imageCropperToolButtonClasses}
+            data-crop-action="flip"
+            aria-pressed={flipX}
+            onClick={() => setFlipX((value) => !value)}>
             {basicLabel(mergedLocale?.locale, 'imageCropper', 'flip')}
           </button>
         </div>

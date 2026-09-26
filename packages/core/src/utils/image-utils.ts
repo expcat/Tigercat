@@ -314,7 +314,11 @@ export const imageViewerIcons = {
 // ImageCropper styles
 // ============================================================================
 
-/** Checkerboard behind the crop stage. Wired by the Tailwind plugin. */
+/**
+ * Checkerboard, crop-host column, and the ratio toolbar.
+ * Wired by the Tailwind plugin: the host is a column and the tool strip is a
+ * row of real controls above the stage.
+ */
 export const imageCropperBaseStyles = {
   '.tiger-image-cropper-checkerboard': {
     backgroundColor: 'var(--tiger-surface)',
@@ -322,14 +326,83 @@ export const imageCropperBaseStyles = {
       'linear-gradient(45deg, var(--tiger-surface-muted) 25%, transparent 25%), linear-gradient(-45deg, var(--tiger-surface-muted) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--tiger-surface-muted) 75%), linear-gradient(-45deg, transparent 75%, var(--tiger-surface-muted) 75%)',
     backgroundSize: '16px 16px',
     backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0'
+  },
+  '.tiger-image-cropper': {
+    display: 'flex',
+    flexDirection: 'column',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: '100%',
+    position: 'relative'
+  },
+  '.tiger-image-cropper-toolbar': {
+    display: 'flex',
+    flexFlow: 'row wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.75rem',
+    width: '100%',
+    marginBottom: '0.75rem',
+    flexShrink: '0'
+  },
+  '.tiger-image-cropper-aspect': {
+    display: 'inline-flex',
+    flexFlow: 'row wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.25rem'
+  },
+  '.tiger-image-cropper-tool': {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: '2rem',
+    padding: '0.25rem 0.75rem',
+    borderRadius: 'var(--tiger-radius-md)',
+    border: '1px solid var(--tiger-border)',
+    background: 'var(--tiger-surface)',
+    color: 'var(--tiger-text)',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    lineHeight: '1.25rem',
+    whiteSpace: 'nowrap',
+    cursor: 'pointer',
+    boxShadow: '0 1px 2px color-mix(in srgb, var(--tiger-text) 12%, transparent)'
+  },
+  '.tiger-image-cropper-tool:hover': {
+    background: 'var(--tiger-surface-muted)'
+  },
+  '.tiger-image-cropper-tool[aria-pressed="true"]': {
+    borderColor: 'var(--tiger-primary)',
+    background: 'var(--tiger-primary)',
+    color: 'var(--tiger-primary-foreground)'
+  },
+  '.tiger-image-cropper-tool[aria-pressed="true"]:hover': {
+    background: 'var(--tiger-primary-hover)',
+    borderColor: 'var(--tiger-primary)',
+    color: 'var(--tiger-primary-foreground)'
+  },
+  '.tiger-image-cropper-tool:focus-visible': {
+    outline: '2px solid var(--tiger-focus-ring)',
+    outlineOffset: '2px'
   }
 } as const
 
 /**
- * Observed size host. Width comes from the parent (`w-full`); never write the
- * fitted bitmap size back onto this node or ResizeObserver will chase itself.
+ * Observed size host. A column so the ratio toolbar sits above the stage.
+ * Width comes from the parent (`w-full`); never write the fitted bitmap size
+ * back onto this node or ResizeObserver will chase itself.
  */
-export const imageCropperSizeHostClasses = 'relative flex w-full max-w-full justify-center'
+export const imageCropperSizeHostClasses =
+  'tiger-image-cropper relative flex w-full max-w-full flex-col items-center'
+
+/** Ratio and transform controls. Plugin CSS paints the strip and the buttons. */
+export const imageCropperToolbarClasses = 'tiger-image-cropper-toolbar'
+
+export const imageCropperAspectGroupClasses = 'tiger-image-cropper-aspect'
+
+export const imageCropperToolButtonClasses = 'tiger-image-cropper-tool'
 
 /**
  * Visual crop stage (bitmap-sized). Overflow clip lives on the bitmap frame so
@@ -856,6 +929,28 @@ export const CROP_OUTPUT_MAX_EDGE = 4096
 
 export type CropAspectPreset = '1:1' | '4:3' | '16:9' | 'free'
 
+export const CROP_ASPECT_PRESETS = [
+  '1:1',
+  '4:3',
+  '16:9',
+  'free'
+] as const satisfies readonly CropAspectPreset[]
+
+const CROP_ASPECT_LABEL_KEYS = {
+  '1:1': 'square',
+  '4:3': 'fourThree',
+  '16:9': 'sixteenNine',
+  free: 'free'
+} as const
+
+const CROP_ASPECT_MATCH_EPSILON = 1e-4
+
+export function cropAspectPresetLabelKey(
+  preset: CropAspectPreset
+): (typeof CROP_ASPECT_LABEL_KEYS)[CropAspectPreset] {
+  return CROP_ASPECT_LABEL_KEYS[preset]
+}
+
 export function resolveCropAspectRatio(
   preset?: CropAspectPreset,
   aspectRatio?: number
@@ -867,6 +962,26 @@ export function resolveCropAspectRatio(
   if (typeof aspectRatio === 'number' && Number.isFinite(aspectRatio) && aspectRatio > 0) {
     return aspectRatio
   }
+  return undefined
+}
+
+/**
+ * Which ratio button is on. An explicit preset wins. Otherwise a numeric
+ * ratio highlights 1:1, 4:3, or 16:9, and an unlocked crop highlights Free.
+ * A custom ratio highlights nothing.
+ */
+export function resolvePressedCropAspectPreset(
+  choice: CropAspectPreset | undefined,
+  aspectRatio: number | undefined
+): CropAspectPreset | undefined {
+  if (choice === '1:1' || choice === '4:3' || choice === '16:9' || choice === 'free') {
+    return choice
+  }
+  const ratio = resolveCropAspectRatio(undefined, aspectRatio)
+  if (ratio == null) return 'free'
+  if (Math.abs(ratio - 1) < CROP_ASPECT_MATCH_EPSILON) return '1:1'
+  if (Math.abs(ratio - 4 / 3) < CROP_ASPECT_MATCH_EPSILON) return '4:3'
+  if (Math.abs(ratio - 16 / 9) < CROP_ASPECT_MATCH_EPSILON) return '16:9'
   return undefined
 }
 

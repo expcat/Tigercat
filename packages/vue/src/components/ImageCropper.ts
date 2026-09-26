@@ -13,6 +13,7 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  CROP_ASPECT_PRESETS,
   CROP_HANDLES,
   IMAGE_CROPPER_MASK_FILL,
   constrainCropRect,
@@ -26,8 +27,12 @@ import {
   getCropperHandleStyle,
   getImageEditorLabels,
   getInitialCropRect,
+  cropAspectPresetLabelKey,
+  imageCropperAspectGroupClasses,
   imageCropperContainerClasses,
   imageCropperSizeHostClasses,
+  imageCropperToolButtonClasses,
+  imageCropperToolbarClasses,
   planCropperDisplaySize,
   resolveCropperAvailableSize,
   imageCropperDragAreaClasses,
@@ -44,6 +49,7 @@ import {
   basicLabel,
   nudgeCropHandle,
   resolveCropAspectRatio,
+  resolvePressedCropAspectPreset,
   mergeTigerLocale,
   moveCropRect,
   remapCropRect,
@@ -454,6 +460,61 @@ export const ImageCropper = defineComponent({
         ]
       )
 
+    const renderToolbar = () => {
+      const localeId = mergedLocale.value?.locale
+      const pressed = resolvePressedCropAspectPreset(aspectChoice.value, props.aspectRatio)
+      return h('div', { class: imageCropperToolbarClasses, 'data-crop-tools': '' }, [
+        h(
+          'div',
+          {
+            class: imageCropperAspectGroupClasses,
+            role: 'group',
+            'aria-label': basicLabel(localeId, 'imageCropper', 'aspect')
+          },
+          CROP_ASPECT_PRESETS.map((preset) =>
+            h(
+              'button',
+              {
+                type: 'button',
+                class: imageCropperToolButtonClasses,
+                'data-crop-preset': preset,
+                'aria-pressed': pressed === preset ? 'true' : 'false',
+                onClick: () => {
+                  aspectChoice.value = preset
+                }
+              },
+              basicLabel(localeId, 'imageCropper', cropAspectPresetLabelKey(preset))
+            )
+          )
+        ),
+        h(
+          'button',
+          {
+            type: 'button',
+            class: imageCropperToolButtonClasses,
+            'data-crop-action': 'rotate',
+            onClick: () => {
+              rotation.value = (rotation.value + 90) % 360
+            }
+          },
+          basicLabel(localeId, 'imageCropper', 'rotate')
+        ),
+        h(
+          'button',
+          {
+            type: 'button',
+            class: imageCropperToolButtonClasses,
+            'data-crop-action': 'flip',
+            'aria-pressed': flipX.value ? 'true' : 'false',
+            onClick: () => {
+              flipX.value = !flipX.value
+            }
+          },
+          basicLabel(localeId, 'imageCropper', 'flip')
+        )
+      ])
+    }
+
     return () => {
       const forwardedAttrs = Object.fromEntries(
         Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
@@ -469,7 +530,7 @@ export const ImageCropper = defineComponent({
           {
             ...forwardedAttrs,
             ref: containerRef,
-            class: classNames(containerClasses.value, 'items-center'),
+            class: classNames(containerClasses.value, 'justify-center'),
             style: {
               ...mergedStyle,
               minHeight: mergedStyle.minHeight ?? '200px'
@@ -485,27 +546,6 @@ export const ImageCropper = defineComponent({
                 : labels.value.loadingCropImageAriaLabel
           },
           [
-            h(
-              'button',
-              {
-                type: 'button',
-                onClick: () => {
-                  rotation.value = (rotation.value + 90) % 360
-                }
-              },
-              basicLabel(mergedLocale.value?.locale, 'imageCropper', 'rotate')
-            ),
-            h(
-              'button',
-              {
-                type: 'button',
-                'data-crop-preset': '4:3',
-                onClick: () => {
-                  aspectChoice.value = '4:3'
-                }
-              },
-              basicLabel(mergedLocale.value?.locale, 'imageCropper', 'fourThree')
-            ),
             status.value === 'error'
               ? h('div', { class: imageErrorClasses }, [renderErrorIcon()])
               : renderLoadingSpinner()
@@ -689,52 +729,7 @@ export const ImageCropper = defineComponent({
           'data-crop-aspect': aspectChoice.value ?? ''
         },
         [
-          h('div', { class: 'mb-2 flex flex-wrap gap-1', 'data-crop-tools': '' }, [
-            ...(['1:1', '4:3', '16:9', 'free'] as const).map((preset) =>
-              h(
-                'button',
-                {
-                  type: 'button',
-                  'data-crop-preset': preset,
-                  'aria-pressed': aspectChoice.value === preset ? 'true' : 'false',
-                  onClick: () => {
-                    aspectChoice.value = preset
-                  }
-                },
-                basicLabel(
-                  mergedLocale.value?.locale,
-                  'imageCropper',
-                  preset === '1:1'
-                    ? 'square'
-                    : preset === '4:3'
-                      ? 'fourThree'
-                      : preset === '16:9'
-                        ? 'sixteenNine'
-                        : 'free'
-                )
-              )
-            ),
-            h(
-              'button',
-              {
-                type: 'button',
-                onClick: () => {
-                  rotation.value = (rotation.value + 90) % 360
-                }
-              },
-              basicLabel(mergedLocale.value?.locale, 'imageCropper', 'rotate')
-            ),
-            h(
-              'button',
-              {
-                type: 'button',
-                onClick: () => {
-                  flipX.value = !flipX.value
-                }
-              },
-              basicLabel(mergedLocale.value?.locale, 'imageCropper', 'flip')
-            )
-          ]),
+          renderToolbar(),
           h(
             'div',
             {

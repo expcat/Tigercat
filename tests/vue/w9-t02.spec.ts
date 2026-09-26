@@ -4,7 +4,7 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
-import { fireEvent, render, screen } from '@testing-library/vue'
+import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
 import { ImagePreview } from '@expcat/tigercat-vue/ImagePreview'
 import { Image } from '@expcat/tigercat-vue/Image'
 import { ImageGroup } from '@expcat/tigercat-vue/ImageGroup'
@@ -37,9 +37,13 @@ describe('W9 T02 Vue', () => {
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
     expect(img).toHaveAttribute('alt')
     expect(screen.getByRole('button', { name: 'custom-Zoom out' })).toBeInTheDocument()
-    await fireEvent.click(screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'flipHorizontal') }))
+    await fireEvent.click(
+      screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'flipHorizontal') })
+    )
     expect(img.style.transform).toContain('scaleX(-1)')
-    await fireEvent.click(screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'download') }))
+    await fireEvent.click(
+      screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'download') })
+    )
     expect(download).toHaveBeenCalled()
     await fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }))
     await fireEvent.click(screen.getByRole('button', { name: 'Reset' }))
@@ -67,7 +71,12 @@ describe('W9 T02 Vue', () => {
               }
             },
             () => [
-              h(Image, { src: '/missing.jpg', fallbackSrc: '/fallback.jpg', alt: 'One', preview: true }),
+              h(Image, {
+                src: '/missing.jpg',
+                fallbackSrc: '/fallback.jpg',
+                alt: 'One',
+                preview: true
+              }),
               h(Image, { src: '/two.jpg', alt: 'Two', preview: true })
             ]
           )
@@ -81,7 +90,9 @@ describe('W9 T02 Vue', () => {
     const preview = document.querySelector('[role="dialog"] img') as HTMLImageElement
     expect(preview.getAttribute('src')).toBe('/fallback.jpg')
     preview.focus()
-    await fireEvent.keyDown(preview.closest('[role="dialog"]') as HTMLElement, { key: 'ArrowRight' })
+    await fireEvent.keyDown(preview.closest('[role="dialog"]') as HTMLElement, {
+      key: 'ArrowRight'
+    })
     expect(index.value).toBe(1)
   })
 
@@ -131,23 +142,39 @@ describe('W9 T02 Vue', () => {
   })
 
   it('applies a crop preset and rotates the stage', async () => {
+    vi.stubGlobal(
+      'Image',
+      class {
+        naturalWidth = 200
+        naturalHeight = 100
+        onload: (() => void) | null = null
+        onerror: (() => void) | null = null
+        set src(_value: string) {
+          queueMicrotask(() => this.onload?.())
+        }
+      }
+    )
     const Host = defineComponent({
       setup() {
         return () => h(ImageCropper, { src: '/crop.png', aspectPreset: '1:1' })
       }
     })
     render(Host)
-    const img = document.querySelector('[data-image-cropper] img') as HTMLImageElement | null
-    if (img) {
-      Object.defineProperty(img, 'naturalWidth', { value: 200 })
-      Object.defineProperty(img, 'naturalHeight', { value: 100 })
-      await fireEvent.load(img)
-    }
+    await waitFor(() =>
+      expect(document.querySelector('[data-image-cropper-status="ready"]')).toBeTruthy()
+    )
     const root = document.querySelector('[data-image-cropper]') as HTMLElement
+    const tools = root.querySelector('[data-crop-tools]') as HTMLElement
+    expect(
+      tools.compareDocumentPosition(root.querySelector('[data-image-cropper-stage]')!) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
     await fireEvent.click(screen.getByRole('button', { name: 'Rotate' }))
     expect(root.getAttribute('data-crop-rotation')).toBe('90')
     await fireEvent.click(screen.getByRole('button', { name: '4:3' }))
     expect(root.getAttribute('data-crop-aspect')).toBe('4:3')
+    expect(tools.querySelector('[data-crop-preset="4:3"]')).toHaveAttribute('aria-pressed', 'true')
+    vi.unstubAllGlobals()
   })
 
   it('includes compare titles in the slider value and does not lock the page', () => {
@@ -199,6 +226,9 @@ describe('W9 T02 Vue', () => {
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
     expect(screen.getAllByRole('img', { name: 'One' }).length).toBeGreaterThan(0)
     await fireEvent.click(screen.getByRole('button', { name: 'Open preview' }))
-    expect(document.querySelector('[data-tiger-image-preview] img')).toHaveAttribute('src', '/g1.jpg')
+    expect(document.querySelector('[data-tiger-image-preview] img')).toHaveAttribute(
+      'src',
+      '/g1.jpg'
+    )
   })
 })

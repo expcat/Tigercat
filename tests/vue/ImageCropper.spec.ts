@@ -99,7 +99,8 @@ describe('ImageCropper', () => {
     await waitFor(() =>
       expect(container.querySelector('[data-image-cropper-status="error"]')).toBeInTheDocument()
     )
-    expect(container.querySelector('[role="group"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-image-cropper-stage]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-crop-tools]')).not.toBeInTheDocument()
   })
 
   it('treats invalid intrinsic dimensions as a failed load', async () => {
@@ -129,6 +130,50 @@ describe('ImageCropper', () => {
       props: { src: '/test.jpg', guides: true }
     })
     expect(container.querySelectorAll('[data-guide="true"]')).toHaveLength(4)
+  })
+
+  it('puts aspect presets in a toolbar above the stage', async () => {
+    const { container } = render(ImageCropper, { props: { src: '/test.jpg' } })
+    expect(container.querySelector('[data-crop-tools]')).not.toBeInTheDocument()
+
+    await waitFor(() =>
+      expect(container.querySelector('[data-image-cropper-status="ready"]')).toBeInTheDocument()
+    )
+    const host = container.querySelector('[data-image-cropper]') as HTMLElement
+    const tools = host.querySelector('[data-crop-tools]') as HTMLElement
+    const stage = host.querySelector('[data-image-cropper-stage]') as HTMLElement
+    expect(host.className).toContain('flex-col')
+    expect(tools.className).toContain('tiger-image-cropper-toolbar')
+    expect(tools.compareDocumentPosition(stage) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      Array.from(tools.querySelectorAll('[data-crop-preset]')).map((node) =>
+        node.getAttribute('data-crop-preset')
+      )
+    ).toEqual(['1:1', '4:3', '16:9', 'free'])
+    for (const button of tools.querySelectorAll('[data-crop-preset], [data-crop-action]')) {
+      expect(button.tagName).toBe('BUTTON')
+      expect(button.className).toContain('tiger-image-cropper-tool')
+    }
+    expect(tools.querySelector('[role="group"]')).toHaveAttribute('aria-label', 'Crop ratio')
+    expect(tools.querySelector('[data-crop-preset="free"]')).toHaveAttribute('aria-pressed', 'true')
+
+    await fireEvent.click(tools.querySelector('[data-crop-preset="16:9"]')!)
+    expect(host).toHaveAttribute('data-crop-aspect', '16:9')
+    expect(tools.querySelector('[data-crop-preset="16:9"]')).toHaveAttribute('aria-pressed', 'true')
+    expect(tools.querySelector('[data-crop-preset="free"]')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    )
+  })
+
+  it('highlights a numeric ratio on the matching toolbar button', async () => {
+    const { container } = await renderLoadedCropper({
+      props: { src: '/test.jpg', aspectRatio: 1 }
+    })
+    expect(container.querySelector('[data-crop-preset="1:1"]')).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
   })
 
   it('moves crop area with pointer drag and clamps to image bounds', async () => {
@@ -245,7 +290,10 @@ describe('ImageCropper', () => {
       await waitFor(() =>
         expect(container.querySelector('[data-image-cropper-status="ready"]')).toBeInTheDocument()
       )
-      expect(container.querySelector('[role="group"]')).toHaveAttribute('aria-label', '图片裁剪器')
+      expect(container.querySelector('[data-image-cropper-stage]')).toHaveAttribute(
+        'aria-label',
+        '图片裁剪器'
+      )
       await expectNoA11yViolationsIsolated(container)
     })
   })

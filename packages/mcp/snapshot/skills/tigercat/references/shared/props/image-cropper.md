@@ -13,7 +13,7 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/image.ts` · `ImageCropperProps` · 4/14 props
 
-Note: `src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。
+Note: `src` 必填。产出 `getCropResult()`。坏图错误态。比例、旋转和翻转在裁剪区上方的工具条里，比例是一组可切换按钮。未选手动比例时 `aspectRatio` 重算选区。
 
 | Prop           | Type                                          | Default       | Notes                                                                                      |
 | -------------- | --------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------ |

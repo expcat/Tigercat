@@ -399,7 +399,8 @@ const COMPONENT_USAGE_NOTES = {
       '受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare`。不传宽高且 after 无内容时高度为 0。'
   },
   ImageCropper: {
-    notes: '`src` 必填。产出 `getCropResult()`。坏图错误态。`aspectRatio` 只重算选区。'
+    notes:
+      '`src` 必填。产出 `getCropResult()`。坏图错误态。比例、旋转和翻转在裁剪区上方的工具条里，比例是一组可切换按钮。未选手动比例时 `aspectRatio` 重算选区。'
   },
   Avatar: {
     notes:

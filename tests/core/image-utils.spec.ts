@@ -11,8 +11,15 @@ import {
   clampImageGroupPreviewIndex,
   createImageLoadState,
   formatImagePreviewAriaLabel,
+  CROP_ASPECT_PRESETS,
+  cropAspectPresetLabelKey,
   getCropperHandleStyle,
+  imageCropperBaseStyles,
+  imageCropperSizeHostClasses,
+  imageCropperToolButtonClasses,
+  imageCropperToolbarClasses,
   imagePreviewChromeStyles,
+  resolvePressedCropAspectPreset,
   imagePreviewCloseBtnClasses,
   imagePreviewNavNextClasses,
   imagePreviewNavPrevClasses,
@@ -145,6 +152,38 @@ describe('image-utils — class generators', () => {
     })
     expect(imagePreviewChromeStyles['.tiger-image-preview-chrome'].zIndex).toBe('2')
     expect(imagePreviewChromeStyles['.tiger-image-preview-img'].zIndex).toBe('1')
+  })
+
+  it('keeps the crop ratio toolbar in a column above the stage', () => {
+    expect(imageCropperSizeHostClasses).toContain('tiger-image-cropper')
+    expect(imageCropperSizeHostClasses).toContain('flex-col')
+    expect(imageCropperToolbarClasses).toBe('tiger-image-cropper-toolbar')
+    expect(imageCropperToolButtonClasses).toBe('tiger-image-cropper-tool')
+    expect(imageCropperBaseStyles['.tiger-image-cropper']).toMatchObject({
+      display: 'flex',
+      flexDirection: 'column'
+    })
+    expect(imageCropperBaseStyles['.tiger-image-cropper-toolbar']).toMatchObject({
+      display: 'flex',
+      flexFlow: 'row wrap',
+      width: '100%'
+    })
+    expect(imageCropperBaseStyles['.tiger-image-cropper-tool']).toMatchObject({
+      border: '1px solid var(--tiger-border)',
+      background: 'var(--tiger-surface)'
+    })
+    expect(imageCropperBaseStyles['.tiger-image-cropper-tool[aria-pressed="true"]']).toMatchObject({
+      background: 'var(--tiger-primary)',
+      color: 'var(--tiger-primary-foreground)'
+    })
+    expect(CROP_ASPECT_PRESETS).toEqual(['1:1', '4:3', '16:9', 'free'])
+    expect(cropAspectPresetLabelKey('16:9')).toBe('sixteenNine')
+    expect(resolvePressedCropAspectPreset('4:3', 1)).toBe('4:3')
+    expect(resolvePressedCropAspectPreset(undefined, 1)).toBe('1:1')
+    expect(resolvePressedCropAspectPreset(undefined, 4 / 3)).toBe('4:3')
+    expect(resolvePressedCropAspectPreset(undefined, 16 / 9)).toBe('16:9')
+    expect(resolvePressedCropAspectPreset(undefined, undefined)).toBe('free')
+    expect(resolvePressedCropAspectPreset(undefined, 2)).toBeUndefined()
   })
 
   it('fits by width when height is unconstrained', () => {

@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { useState } from 'react'
 import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
 import { Image } from '@expcat/tigercat-react/Image'
@@ -33,14 +33,18 @@ describe('W9 T02 React', () => {
     const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
     expect(img).toHaveAttribute('alt')
     expect(screen.getByRole('button', { name: 'zoom-slot' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'flipHorizontal') }))
+    fireEvent.click(
+      screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'flipHorizontal') })
+    )
     expect(img.style.transform).toContain('scaleX(-1)')
     const download = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
       this: HTMLAnchorElement
     ) {
       expect(this.getAttribute('href')).toBe('/a.jpg')
     })
-    fireEvent.click(screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'download') }))
+    fireEvent.click(
+      screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'download') })
+    )
     expect(download).toHaveBeenCalled()
     download.mockRestore()
   })
@@ -50,7 +54,11 @@ describe('W9 T02 React', () => {
       const [open, setOpen] = useState(false)
       const [index, setIndex] = useState(0)
       return (
-        <ImageGroup open={open} currentIndex={index} onOpenChange={setOpen} onCurrentIndexChange={setIndex}>
+        <ImageGroup
+          open={open}
+          currentIndex={index}
+          onOpenChange={setOpen}
+          onCurrentIndexChange={setIndex}>
           <Image src="/missing.jpg" fallbackSrc="/fallback.jpg" alt="One" preview />
           <Image src="/two.jpg" alt="Two" preview />
         </ImageGroup>
@@ -100,12 +108,31 @@ describe('W9 T02 React', () => {
     expect(write).toHaveBeenCalledWith('one\ntwo')
   })
 
-  it('rotates the cropper', () => {
+  it('rotates the cropper', async () => {
+    vi.stubGlobal(
+      'Image',
+      class {
+        naturalWidth = 200
+        naturalHeight = 100
+        onload: (() => void) | null = null
+        onerror: (() => void) | null = null
+        set src(_value: string) {
+          queueMicrotask(() => this.onload?.())
+        }
+      }
+    )
     render(<ImageCropper src="/crop.png" aspectPreset="16:9" />)
+    await waitFor(() =>
+      expect(document.querySelector('[data-image-cropper-status="ready"]')).toBeTruthy()
+    )
     const root = document.querySelector('[data-image-cropper]') as HTMLElement
+    const tools = root.querySelector('[data-crop-tools]') as HTMLElement
+    expect(tools.className).toContain('tiger-image-cropper-toolbar')
     fireEvent.click(screen.getByRole('button', { name: 'Rotate' }))
     expect(root.getAttribute('data-crop-rotation')).toBe('90')
     expect(root.getAttribute('data-crop-aspect')).toBe('16:9')
+    expect(tools.querySelector('[data-crop-preset="16:9"]')).toHaveAttribute('aria-pressed', 'true')
+    vi.unstubAllGlobals()
   })
 
   it('puts titles on the compare slider and leaves the page scrollable', () => {
@@ -152,6 +179,9 @@ describe('W9 T02 React', () => {
     )
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Open preview' }))
-    expect(document.querySelector('[data-tiger-image-preview] img')).toHaveAttribute('src', '/g1.jpg')
+    expect(document.querySelector('[data-tiger-image-preview] img')).toHaveAttribute(
+      'src',
+      '/g1.jpg'
+    )
   })
 })
