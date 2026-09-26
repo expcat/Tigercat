@@ -44,6 +44,11 @@ describe('Timeline (React)', () => {
     expect(rows[1].querySelector('[data-timeline-tail="after"]')).toBeTruthy()
     expect(rows[2].querySelector('[data-timeline-tail]')).toBeNull()
     expect(rows[0].querySelector('[data-timeline-axis]')?.className).toContain('inset-y-0')
+    expect(rows[0].querySelector('[data-timeline-axis]')?.className).not.toContain('w-0')
+    expect(rows[0].querySelector('[data-timeline-tail="after"]')?.className).toContain(
+      'tiger-timeline-tail'
+    )
+    expect(rows[0].querySelector('[data-timeline-tail="after"]')?.className).not.toContain('w-px')
     const dot = rows[0].querySelector('[data-timeline-axis] .rounded-full')
     expect(dot?.className ?? '').not.toContain('border-')
   })

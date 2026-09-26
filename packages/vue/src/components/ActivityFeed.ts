@@ -49,6 +49,8 @@ import {
   activityFeedGroupTitleClasses,
   activityFeedDotBaseClasses,
   activityFeedDotPulseBaseClasses,
+  activityFeedTimelineDotWrapClasses,
+  activityFeedTimelineStyle,
   getActivityFeedDotClasses
 } from '../../../core/src/internal/activity-feed-styles'
 import { Timeline } from './Timeline'
@@ -621,18 +623,14 @@ export const ActivityFeed = defineComponent({
                   const activity = timelineItem.activity
                   const statusVariant = (activity?.status?.variant ?? 'default') as string
                   const dotClasses = getActivityFeedDotClasses(statusVariant)
-                  return h(
-                    'div',
-                    { class: 'relative flex items-center justify-center w-2.5 h-2.5' },
-                    [
-                      dotClasses.pulse
-                        ? h('span', {
-                            class: `${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`
-                          })
-                        : null,
-                      h('span', { class: `${activityFeedDotBaseClasses} ${dotClasses.dot}` })
-                    ]
-                  )
+                  return h('div', { class: activityFeedTimelineDotWrapClasses }, [
+                    dotClasses.pulse
+                      ? h('span', {
+                          class: `${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`
+                        })
+                      : null,
+                    h('span', { class: `${activityFeedDotBaseClasses} ${dotClasses.dot}` })
+                  ])
                 }
 
                 return h('div', { key: group.key ?? groupIndex, class: 'space-y-3' }, [
@@ -658,7 +656,10 @@ export const ActivityFeed = defineComponent({
                     : null,
                   h(
                     Timeline,
-                    { items: timelineItems },
+                    {
+                      items: timelineItems,
+                      style: activityFeedTimelineStyle(props.showAvatar)
+                    },
                     {
                       dot: ({ item }: { item: ActivityTimelineItem }) => renderDot(item),
                       item: ({ item, index }: { item: ActivityTimelineItem; index: number }) => {

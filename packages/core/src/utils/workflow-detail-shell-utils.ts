@@ -26,6 +26,18 @@ export const workflowDetailShellBodyClasses =
   'tiger-workflow-detail-shell__body min-h-0 flex-1 overflow-auto px-4 py-4 space-y-4'
 export const workflowDetailShellFormClasses = 'tiger-workflow-detail-shell__form'
 export const workflowDetailShellTabsClasses = 'tiger-workflow-detail-shell__tabs'
+
+/**
+ * The progress timeline is the first block in the tab panel. With no panel
+ * inset, its first node sits on the tab rule. The gap is the shell's, not an
+ * example margin: the rail still starts at the panel content, and the panel
+ * now starts below the tabs.
+ */
+export const workflowDetailShellBaseStyles = {
+  '.tiger-workflow-detail-shell__tabs [role="tabpanel"]:has(.tiger-timeline)': {
+    paddingTop: '1rem'
+  }
+} as const
 export const workflowDetailShellActionClasses =
   'tiger-workflow-detail-shell__action sticky bottom-0 z-10 mt-auto shrink-0 border-t border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-4 py-3'
 

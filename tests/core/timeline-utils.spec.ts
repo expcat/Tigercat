@@ -3,14 +3,17 @@ import {
   EMPTY_TIMELINE_ITEMS,
   getPendingDotClasses,
   getTimelineAxisClasses,
+  getTimelineContainerClasses,
   getTimelineContentClasses,
   getTimelineDotClasses,
   getTimelineHeadClasses,
   getTimelineItemClasses,
   getTimelineItemKey,
   getTimelineTailClasses,
-  processTimelineItems
+  processTimelineItems,
+  timelineBaseStyles
 } from '@expcat/tigercat-core'
+import tigercatPlugin from '../../packages/core/src/tailwind-plugin'
 
 describe('timeline-utils', () => {
   it('keeps key 0 instead of falling back to the index', () => {
@@ -53,20 +56,68 @@ describe('timeline-utils', () => {
     expect(getTimelineAxisClasses('right')).toContain('end-0')
     expect(getTimelineAxisClasses('alternate')).toContain('start-1/2')
     expect(getTimelineAxisClasses('left')).toContain('inset-y-0')
+    expect(getTimelineAxisClasses('left')).not.toContain('w-0')
+    expect(getTimelineAxisClasses('left')).toContain('tiger-timeline-axis')
+    expect(getTimelineContainerClasses('left')).toContain('tiger-timeline')
+    expect(getTimelineHeadClasses('left')).toContain('tiger-timeline-node')
     expect(getTimelineHeadClasses('left')).not.toContain('start-0')
   })
 
-  it('runs the connector from node edge to node edge', () => {
+  it('centers an even stroke on the node column', () => {
     const tail = getTimelineTailClasses('left', false)
-    expect(tail).toContain('w-px')
-    expect(tail).toContain('flex-1')
-    expect(tail).not.toContain('top-')
-    expect(tail).not.toContain('bottom-')
+    expect(tail).toContain('tiger-timeline-tail')
+    expect(tail).not.toContain('w-px')
+    expect(tail).not.toContain('w-0')
     expect(getTimelineTailClasses('left', true)).toBe('hidden')
     expect(getTimelineTailClasses('alternate', false, 'before')).toBe('hidden')
     expect(getTimelineDotClasses()).not.toContain('border-')
     expect(getTimelineDotClasses('#10b981')).not.toContain('border-')
     expect(getPendingDotClasses()).not.toContain('border-')
+
+    const tailSelector = Object.keys(timelineBaseStyles).find((selector) =>
+      selector.includes('> .tiger-timeline-tail')
+    )
+    expect(tailSelector).toBe(
+      ':is(.tiger-timeline-axis[data-timeline-axis="left"], .tiger-timeline-axis[data-timeline-axis="right"], .tiger-timeline-axis[data-timeline-axis="alternate"]) > .tiger-timeline-tail'
+    )
+    const tailRule = tailSelector
+      ? (timelineBaseStyles[tailSelector as keyof typeof timelineBaseStyles] as Record<
+          string,
+          string
+        >)
+      : undefined
+    expect(tailRule).toMatchObject({
+      inlineSize: 'var(--tiger-timeline-stroke)',
+      insetInlineStart: '50%',
+      marginInlineStart: 'calc(var(--tiger-timeline-stroke) / -2)',
+      insetBlockStart: 'var(--tiger-timeline-anchor-center)',
+      insetBlockEnd: 'calc(var(--tiger-timeline-anchor-center) * -1)'
+    })
+    expect(timelineBaseStyles['.tiger-timeline']).toMatchObject({
+      '--tiger-timeline-node-size': '0.625rem',
+      '--tiger-timeline-stroke': '0.125rem'
+    })
+  })
+
+  it('ships rail geometry through the tailwind plugin', () => {
+    const rules: Record<string, unknown> = {}
+    type PluginInstance = {
+      handler: (api: { addBase: (rule: Record<string, unknown>) => void }) => void
+    }
+    const plugin = tigercatPlugin as unknown as PluginInstance
+    plugin.handler({ addBase: (rule) => Object.assign(rules, rule) })
+    const tailRule = Object.entries(rules).find(([selector]) =>
+      selector.includes('> .tiger-timeline-tail')
+    )?.[1]
+    expect(tailRule).toMatchObject({
+      inlineSize: 'var(--tiger-timeline-stroke)',
+      marginInlineStart: 'calc(var(--tiger-timeline-stroke) / -2)'
+    })
+    expect(
+      rules['.tiger-workflow-detail-shell__tabs [role="tabpanel"]:has(.tiger-timeline)']
+    ).toMatchObject({
+      paddingTop: '1rem'
+    })
   })
 
   it('paints horizontal halves only between nodes', () => {

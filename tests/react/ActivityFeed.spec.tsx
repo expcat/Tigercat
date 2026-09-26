@@ -30,9 +30,14 @@ describe('ActivityFeed (React)', () => {
       }
     ]
 
-    render(<ActivityFeed groups={groups} />)
+    const { container } = render(<ActivityFeed groups={groups} />)
 
     expect(screen.getByText('今天')).toBeInTheDocument()
+    const rail = container.querySelector('.tiger-timeline') as HTMLElement | null
+    expect(rail?.style.getPropertyValue('--tiger-timeline-anchor-center')).toContain(
+      '--tiger-component-avatar-size-sm'
+    )
+    expect(rail?.querySelector('.tiger-timeline-node')).toBeTruthy()
     expect(screen.getByText('更新访问策略')).toBeInTheDocument()
     expect(screen.getByText('查看详情')).toBeInTheDocument()
     const statusChip = screen.getByText('已完成').parentElement

@@ -46,6 +46,8 @@ import {
   activityFeedGroupTitleClasses,
   activityFeedDotBaseClasses,
   activityFeedDotPulseBaseClasses,
+  activityFeedTimelineDotWrapClasses,
+  activityFeedTimelineStyle,
   getActivityFeedDotClasses
 } from '../../../core/src/internal/activity-feed-styles'
 import { Timeline } from './Timeline'
@@ -468,13 +470,14 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                 : null}
               <Timeline
                 items={timelineItems}
+                style={activityFeedTimelineStyle(showAvatar)}
                 renderDot={(timelineItem) => {
                   const activity = (timelineItem as ActivityTimelineItem).activity
                   const statusVariant = (activity?.status?.variant ?? 'default') as string
                   const dotClasses = getActivityFeedDotClasses(statusVariant)
 
                   return (
-                    <div className="relative flex items-center justify-center w-2.5 h-2.5">
+                    <div className={activityFeedTimelineDotWrapClasses}>
                       {dotClasses.pulse ? (
                         <span
                           className={`${activityFeedDotPulseBaseClasses} ${dotClasses.pulse}`}
