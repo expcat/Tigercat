@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **Spotlight**：快捷键徽标只出现在对应命令行的行尾。去掉面板底部重复列出同一快捷键的 footer，以及只为它存在的 `spotlightFooterShortcuts` 和 `navLabels.spotlightFooter`。
+
 ## v2.9.4
 
 v2.9.4：2.9.3 的包元数据已写出，但 npm tarball 返回 404。本版只把同一产品内容重新发成可安装的包，没有新的 API。

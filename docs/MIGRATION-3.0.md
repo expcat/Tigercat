@@ -319,6 +319,10 @@ Tooltip 气泡用 `--tiger-text` 作底、`--tiger-surface` 作字，圆角 `--t
 
 传入的 `sizes` 按值受控。拿掉 `sizes` 后停在最后的比例，不重新均分。水平拖拽跟 `dir`。
 
+## Spotlight
+
+命令快捷键只出现在对应结果行的行尾。面板不再另画一份 footer 列表。`spotlightFooterShortcuts` 与 `navLabels.spotlightFooter` 已删除。
+
 ## Menu / Tabs / NavigationMenu
 
 垂直菜单根是 `role="menu"`，同一时刻只有一个 Tab 停靠。页签、树和导航的键按类型区分：`1` 与 `"1"` 是不同项。再点已选项保持选中。`NavigationMenu` 的展开值就是 open 状态。关闭的 `Dropdown`、`ContextMenu` 和导航面板不挂到 portal。`Anchor` 当前项是 `aria-current="location"`。Tailwind 的 `aria-current:` 只匹配 `"true"`，当前项颜色用 `aria-[current=location]:`。

@@ -29,7 +29,6 @@ import {
   getSpotlightOptionClasses,
   getSpotlightSearchState,
   orderSpotlightWithRecent,
-  spotlightFooterShortcuts,
   getSpotlightShortcutLabel,
   isSpotlightHotkeyEnabled,
   isSpotlightToggleHotkey,
@@ -487,14 +486,7 @@ export const Spotlight = defineComponent({
                     { class: spotlightEmptyClasses, role: 'status', 'aria-live': 'polite' },
                     emptyMessage.value
                   )
-                : null,
-              h(
-                'div',
-                { class: 'flex gap-2 px-3 py-2 text-xs', 'data-tiger-spotlight-footer': '' },
-                spotlightFooterShortcuts(state.flatResults.map((result) => result.item)).map(
-                  (shortcut) => h('kbd', { class: 'rounded border px-1' }, shortcut)
-                )
-              )
+                : null
             ]
           ),
           h('div', { id: overlayHostId, class: 'contents', 'data-tiger-overlay-host': '' })

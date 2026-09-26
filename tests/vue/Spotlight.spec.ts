@@ -59,12 +59,18 @@ describe('Spotlight (Vue)', () => {
     expect(document.body).not.toHaveTextContent('Open Dashboard')
   })
 
-  it('renders grouped results and shortcut labels', () => {
+  it('renders grouped results and one shortcut badge on the command row', () => {
     render(Spotlight, { props: { open: true, items } })
 
     expect(document.body).toHaveTextContent('Navigation')
     expect(document.body).toHaveTextContent('Actions')
-    expect(document.body).toHaveTextContent('⌘ D')
+    const dashboard = [...document.querySelectorAll('[role="option"]')].find((option) =>
+      option.textContent?.includes('Open Dashboard')
+    )
+    expect(dashboard?.querySelectorAll('kbd')).toHaveLength(1)
+    expect(dashboard?.querySelector('kbd')).toHaveTextContent('⌘ D')
+    expect(document.querySelectorAll('kbd')).toHaveLength(1)
+    expect(document.querySelector('[data-tiger-spotlight-footer]')).toBeNull()
   })
 
   it('selects active item with Enter and closes by default', async () => {

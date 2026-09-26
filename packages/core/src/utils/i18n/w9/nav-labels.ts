@@ -8,7 +8,6 @@ export interface NavLabels {
   breadcrumbCollapsed: string
   breadcrumbCollapse: string
   paginationJump: string
-  spotlightFooter: string
   menuCollapsedTip: string
   directory: string
 }
@@ -19,7 +18,6 @@ export const navLabels: NavLabels = {
   breadcrumbCollapsed: 'Collapsed links',
   breadcrumbCollapse: 'Collapse',
   paginationJump: 'Go to page',
-  spotlightFooter: 'Shortcuts',
   menuCollapsedTip: 'Menu item',
   directory: 'Directory'
 }

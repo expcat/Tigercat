@@ -126,17 +126,30 @@ describe('vue W9 T07', () => {
     expect(container.querySelector('.tiger-step-icon--dot')).toBeTruthy()
   })
 
-  it('E12 lists footer shortcuts', () => {
-    const { getAllByText } = render(Spotlight, {
+  it('E12 shows each shortcut once on its row', () => {
+    const { getAllByRole } = render(Spotlight, {
       props: {
         open: true,
         recentIds: ['b'],
         items: [
-          { key: 'a', label: 'Alpha' },
-          { key: 'b', label: 'Beta', shortcut: '⌘B' }
+          { key: 'a', label: 'Alpha', shortcut: '⌘A' },
+          { key: 'b', label: 'Beta', shortcut: '⌘B' },
+          { key: 'c', label: 'Gamma', shortcut: '⌘C', disabled: true }
         ]
       }
     })
-    expect(getAllByText('⌘B').length).toBeGreaterThan(0)
+    const options = getAllByRole('option')
+    expect(options.map((option) => option.textContent)).toEqual([
+      expect.stringContaining('Beta'),
+      expect.stringContaining('Alpha'),
+      expect.stringContaining('Gamma')
+    ])
+    expect(options.map((option) => option.querySelector('kbd')?.textContent)).toEqual([
+      '⌘B',
+      '⌘A',
+      '⌘C'
+    ])
+    expect(document.querySelectorAll('kbd')).toHaveLength(3)
+    expect(document.querySelector('[data-tiger-spotlight-footer]')).toBeNull()
   })
 })

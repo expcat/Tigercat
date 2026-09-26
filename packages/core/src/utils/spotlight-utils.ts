@@ -150,21 +150,6 @@ export function orderSpotlightWithRecent(
   })
 }
 
-export function spotlightFooterShortcuts(
-  items: readonly SpotlightItem[]
-): string[] {
-  const seen = new Set<string>()
-  const labels: string[] = []
-  for (const item of items) {
-    if (item.disabled || !item.shortcut) continue
-    const label = getSpotlightShortcutLabel(item.shortcut)
-    if (!label || seen.has(label)) continue
-    seen.add(label)
-    labels.push(label)
-  }
-  return labels
-}
-
 export function getSpotlightSearchState(
   items: readonly SpotlightItem[] = [],
   query: string = '',

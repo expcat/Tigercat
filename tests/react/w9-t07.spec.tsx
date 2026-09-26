@@ -294,20 +294,31 @@ describe('react W9 T07', () => {
     expect(onChange).toHaveBeenCalledWith(0)
   })
 
-  it('E12 sorts recent ids ahead and shows footer keys', () => {
+  it('E12 shows each shortcut once on its row', () => {
     render(
       <Spotlight
         open
         recentIds={['recent']}
         items={[
-          { key: 'late', label: 'Late' },
-          { key: 'recent', label: 'Recent', shortcut: '⌘K' }
+          { key: 'late', label: 'Late', shortcut: '⌘L' },
+          { key: 'recent', label: 'Recent', shortcut: '⌘K' },
+          { key: 'locked', label: 'Locked', shortcut: '⌘X', disabled: true }
         ]}
       />
     )
     const options = screen.getAllByRole('option')
-    expect(options[0]).toHaveTextContent('Recent')
-    expect(document.querySelector('[data-tiger-spotlight-footer] kbd')).toHaveTextContent('⌘K')
+    expect(options.map((option) => option.textContent)).toEqual([
+      expect.stringContaining('Recent'),
+      expect.stringContaining('Late'),
+      expect.stringContaining('Locked')
+    ])
+    expect(options.map((option) => option.querySelector('kbd')?.textContent)).toEqual([
+      '⌘K',
+      '⌘L',
+      '⌘X'
+    ])
+    expect(document.querySelectorAll('kbd')).toHaveLength(3)
+    expect(document.querySelector('[data-tiger-spotlight-footer]')).toBeNull()
   })
 
   it('E13 renders the shared section scroll model', () => {

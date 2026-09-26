@@ -20,7 +20,6 @@ import {
   resolveSectionActiveHref,
   sectionScrollBehavior,
   splitOverflowTabKeys,
-  spotlightFooterShortcuts,
   tabActivationSelectsOnArrow,
   typeaheadShortcutColumn
 } from '@expcat/tigercat-core'
@@ -128,14 +127,13 @@ describe('W9 T07 navigation', () => {
     expect(getStepIconClasses('error', 'md', false, false, true)).not.toContain('ring-4')
   })
 
-  it('E12 sorts recent ids ahead and lists footer shortcuts', () => {
+  it('E12 sorts recent ids ahead of the other commands', () => {
     const items = [
       { key: 'a', label: 'A' },
       { key: 'b', label: 'B', shortcut: '⌘B' },
       { key: 'c', label: 'C', shortcut: '⌘C', disabled: true }
     ]
     expect(orderSpotlightWithRecent(items, ['b']).map((item) => item.key)).toEqual(['b', 'a', 'c'])
-    expect(spotlightFooterShortcuts(items)).toEqual(['⌘B'])
   })
 
   it('E13 shares the section scroll model', () => {
