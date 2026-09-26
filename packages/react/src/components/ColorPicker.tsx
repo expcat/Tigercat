@@ -12,10 +12,12 @@ import {
   applyColorPickerHue,
   classNames,
   COLOR_PICKER_INVALID_VALUE_TEXT,
+  COLOR_PICKER_PRESET_COLUMNS,
   colorPickerBaseClasses,
   colorPickerCheckerboardStyle,
   colorPickerChromeLabelClasses,
   colorPickerClearButtonClasses,
+  colorPickerFieldClasses,
   colorPickerHueTrackStyle,
   colorPickerInputClasses,
   colorPickerPanelClasses,
@@ -24,6 +26,7 @@ import {
   colorPickerSvPlaneClasses,
   colorPickerSvThumbClasses,
   colorPickerTriggerSwatchClasses,
+  colorPickerValueClasses,
   commitPresetColor,
   createDocumentDragSession,
   cssColorFromHsva,
@@ -461,7 +464,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         data-positioned={overlay.positioned}
         data-tiger-colorpicker-panel=""
         onBlur={handleFocusOut}>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center justify-between gap-2">
           <span className="text-xs font-medium text-[var(--tiger-text)]">{labels.panelTitle}</span>
           {showClear ? (
             <button
@@ -496,7 +499,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           />
         </div>
 
-        <div>
+        <div className={colorPickerFieldClasses}>
           <label className={colorPickerChromeLabelClasses}>{labels.hue}</label>
           <input
             type="range"
@@ -520,7 +523,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         </div>
 
         {showAlpha ? (
-          <div>
+          <div className={colorPickerFieldClasses}>
             <label className={colorPickerChromeLabelClasses}>{labels.alpha}</label>
             <input
               type="range"
@@ -544,7 +547,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           </div>
         ) : null}
 
-        <div>
+        <div className={colorPickerFieldClasses}>
           <label className={classNames(colorPickerChromeLabelClasses, 'uppercase')}>
             {getColorPickerFormatLabel(format, labels)}
           </label>
@@ -571,7 +574,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           ) : null}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <div
             className={colorPickerPreviewClasses}
             style={{
@@ -581,7 +584,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
             role="img"
             aria-hidden="true"
           />
-          <span className="text-xs font-mono text-[var(--tiger-text)]">
+          <span className={colorPickerValueClasses}>
             {previewHsva
               ? formatHsva(previewHsva, format, showAlpha)
               : hasValue
@@ -595,7 +598,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
             <ColorSwatch
               colors={presets}
               value={hasValue ? formatHsva(paintableHsva!, format, showAlpha) : undefined}
-              columns={Math.min(8, presets.length)}
+              columns={Math.min(COLOR_PICKER_PRESET_COLUMNS, presets.length)}
               size="sm"
               readOnly={readOnly}
               ariaLabel={labels.swatches}

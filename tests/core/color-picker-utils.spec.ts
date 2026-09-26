@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import {
+  COLOR_PICKER_PRESET_COLUMNS,
+  colorPickerFieldClasses,
+  colorPickerInputClasses,
+  colorPickerPanelClasses,
+  colorPickerSliderTrackClasses,
+  colorPickerSvPlaneClasses,
+  colorPickerValueClasses,
   formatColorString,
   formatHsva,
   hexToRgb,
@@ -144,6 +151,22 @@ describe('color-picker-utils — HSV source of truth', () => {
       value: null
     })
     expect(resolveColorPickerDrag('commit', next, 'hex', false).value).toMatch(/^#[0-9a-f]{6}$/)
+  })
+})
+
+describe('color-picker-utils — panel geometry', () => {
+  it('keeps a definite panel width so the color string cannot resize the SV plane', () => {
+    expect(colorPickerPanelClasses).toContain('w-56')
+    expect(colorPickerPanelClasses).toContain('max-sm:w-full')
+    expect(colorPickerSvPlaneClasses).toContain('w-full')
+    expect(colorPickerSvPlaneClasses).toContain('overflow-hidden')
+    expect(colorPickerSliderTrackClasses).toContain('w-full')
+    expect(colorPickerSliderTrackClasses).toContain('min-w-0')
+    expect(colorPickerInputClasses).toContain('min-w-0')
+    expect(colorPickerFieldClasses).toBe('min-w-0')
+    expect(colorPickerValueClasses).toContain('min-w-0')
+    expect(colorPickerValueClasses).toContain('truncate')
+    expect(COLOR_PICKER_PRESET_COLUMNS).toBe(6)
   })
 })
 

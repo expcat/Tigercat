@@ -28,9 +28,7 @@ export function getColorPickerTriggerClasses(
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     'focus-visible:ring-[var(--tiger-focus-ring)]',
     triggerSizes[size],
-    status === 'error'
-      ? 'border-[var(--tiger-error)]'
-      : 'border-[var(--tiger-border)]',
+    status === 'error' ? 'border-[var(--tiger-error)]' : 'border-[var(--tiger-border)]',
     disabled
       ? 'opacity-50 cursor-not-allowed'
       : 'cursor-pointer hover:border-[var(--tiger-primary)]'
@@ -41,16 +39,18 @@ export const colorPickerTriggerSwatchClasses =
   'block h-full w-full overflow-hidden rounded-[calc(var(--tiger-radius-md)-1px)]'
 
 export const colorPickerPanelClasses = classNames(
-  'flex flex-col gap-3 p-3',
+  // Shrink-to-fit width tracked the preview string, so a pick resized the SV plane.
+  // w-56 is a definite box; sliders and the plane are both w-full inside it.
+  'flex w-56 min-w-0 flex-col gap-3 p-3',
   'rounded-[var(--tiger-radius-md)]',
   'shadow-[var(--tiger-shadow-md)]',
   'bg-[var(--tiger-surface)]',
   'border border-[var(--tiger-border)]',
-  'max-sm:h-full max-sm:max-h-none max-sm:rounded-none max-sm:shadow-none'
+  'max-sm:h-full max-sm:w-full max-sm:max-h-none max-sm:rounded-none max-sm:shadow-none'
 )
 
 export const colorPickerInputClasses = classNames(
-  'w-full rounded-[var(--tiger-radius-sm)] border px-2 py-1 text-xs font-mono',
+  'w-full min-w-0 rounded-[var(--tiger-radius-sm)] border px-2 py-1 text-xs font-mono',
   'bg-[var(--tiger-surface)]',
   'border-[var(--tiger-border)]',
   'text-[var(--tiger-text)]',
@@ -60,7 +60,7 @@ export const colorPickerInputClasses = classNames(
 )
 
 export const colorPickerSliderTrackClasses = classNames(
-  'w-full h-3 rounded-full cursor-pointer appearance-none',
+  'w-full min-w-0 h-3 rounded-full cursor-pointer appearance-none',
   'border border-[var(--tiger-border)]',
   '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3',
   '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--tiger-surface)]',
@@ -84,7 +84,8 @@ export const colorPickerCheckerboardStyle = {
 } as const
 
 export const colorPickerSvPlaneClasses = classNames(
-  'relative h-36 w-full cursor-crosshair rounded-[var(--tiger-radius-sm)]',
+  // Clip the thumb. It is translated -50% and otherwise paints outside the plane.
+  'relative h-36 w-full min-w-0 overflow-hidden cursor-crosshair rounded-[var(--tiger-radius-sm)]',
   'border border-[var(--tiger-border)] outline-none',
   'focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 )
@@ -99,14 +100,22 @@ export const colorPickerPreviewClasses = classNames(
   'border border-[var(--tiger-border)]'
 )
 
+/** Readout beside the preview swatch. Must not contribute max-content width. */
+export const colorPickerValueClasses =
+  'min-w-0 flex-1 truncate text-xs font-mono text-[var(--tiger-text)]'
+
+export const colorPickerFieldClasses = 'min-w-0'
+
+/** sm swatches (1.5rem) plus gap-2 fit the w-56 content box; extras wrap. */
+export const COLOR_PICKER_PRESET_COLUMNS = 6
+
 export const colorPickerClearButtonClasses = classNames(
   'text-xs text-[var(--tiger-primary)] hover:underline',
   'rounded-sm outline-none focus-visible:ring-2',
   'focus-visible:ring-[var(--tiger-focus-ring)]'
 )
 
-export const colorPickerChromeLabelClasses =
-  'block text-xs text-[var(--tiger-text-secondary)] mb-1'
+export const colorPickerChromeLabelClasses = 'block text-xs text-[var(--tiger-text-secondary)] mb-1'
 
 export const DEFAULT_COLOR_PICKER_HSVA: HsvaColor = { h: 0, s: 100, v: 100, a: 1 }
 

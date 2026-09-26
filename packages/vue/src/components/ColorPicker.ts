@@ -27,15 +27,18 @@ import {
   classNames,
   coerceClassValue,
   COLOR_PICKER_INVALID_VALUE_TEXT,
+  COLOR_PICKER_PRESET_COLUMNS,
   colorPickerBaseClasses,
   colorPickerCheckerboardStyle,
   colorPickerChromeLabelClasses,
   colorPickerClearButtonClasses,
+  colorPickerFieldClasses,
   colorPickerHueTrackStyle,
   colorPickerInputClasses,
   colorPickerPanelClasses,
   colorPickerPreviewClasses,
   colorPickerSliderTrackClasses,
+  colorPickerValueClasses,
   colorPickerSvPlaneClasses,
   colorPickerSvThumbClasses,
   colorPickerTriggerSwatchClasses,
@@ -444,7 +447,7 @@ export const ColorPicker = defineComponent({
                 onFocusout: handleFocusout
               },
               [
-                h('div', { class: 'flex items-center justify-between gap-2' }, [
+                h('div', { class: 'flex min-w-0 items-center justify-between gap-2' }, [
                   h(
                     'span',
                     { class: 'text-xs font-medium text-[var(--tiger-text)]' },
@@ -499,7 +502,7 @@ export const ColorPicker = defineComponent({
                     })
                   ]
                 ),
-                h('div', [
+                h('div', { class: colorPickerFieldClasses }, [
                   h('label', { class: colorPickerChromeLabelClasses }, labels.value.hue),
                   h('input', {
                     type: 'range',
@@ -520,7 +523,7 @@ export const ColorPicker = defineComponent({
                   })
                 ]),
                 props.showAlpha
-                  ? h('div', [
+                  ? h('div', { class: colorPickerFieldClasses }, [
                       h('label', { class: colorPickerChromeLabelClasses }, labels.value.alpha),
                       h('input', {
                         type: 'range',
@@ -543,7 +546,7 @@ export const ColorPicker = defineComponent({
                       })
                     ])
                   : null,
-                h('div', [
+                h('div', { class: colorPickerFieldClasses }, [
                   h(
                     'label',
                     { class: classNames(colorPickerChromeLabelClasses, 'uppercase') },
@@ -587,7 +590,7 @@ export const ColorPicker = defineComponent({
                       )
                     : null
                 ]),
-                h('div', { class: 'flex items-center gap-2' }, [
+                h('div', { class: 'flex min-w-0 items-center gap-2' }, [
                   h('div', {
                     class: colorPickerPreviewClasses,
                     style: {
@@ -601,7 +604,7 @@ export const ColorPicker = defineComponent({
                   }),
                   h(
                     'span',
-                    { class: 'text-xs font-mono text-[var(--tiger-text)]' },
+                    { class: colorPickerValueClasses },
                     previewHsva.value
                       ? formatHsva(previewHsva.value, props.format, props.showAlpha)
                       : hasValue.value
@@ -615,7 +618,7 @@ export const ColorPicker = defineComponent({
                       modelValue: hasValue.value
                         ? formatHsva(paintableHsva.value!, props.format, props.showAlpha)
                         : undefined,
-                      columns: Math.min(8, props.presets.length),
+                      columns: Math.min(COLOR_PICKER_PRESET_COLUMNS, props.presets.length),
                       size: 'sm',
                       readOnly: locked.value,
                       ariaLabel: labels.value.swatches,
