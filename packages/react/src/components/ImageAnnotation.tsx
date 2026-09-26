@@ -23,20 +23,23 @@ import {
   finishImageAnnotationDraw,
   getAnnotationDisplaySize,
   getImageAnnotationCenter,
+  getImageAnnotationFrameStyle,
   getImageAnnotationPathData,
   getImageAnnotationPointFromClient,
+  getImageAnnotationShapePaint,
+  getImageAnnotationViewBox,
   getImageAnnotationShapeAriaLabel,
   getImageAnnotationStrokeColor,
   getImageAnnotationToolButtonClasses,
   getImageAnnotationToolTypeLabel,
   getImageEditorLabels,
-  getNextImageAnnotationTool,
-  getPreviousImageAnnotationTool,
   imageAnnotationContainerClasses,
   imageAnnotationDeleteButtonClasses,
+  imageAnnotationFrameClasses,
   imageAnnotationImageClasses,
   imageAnnotationLabelClasses,
   imageAnnotationOverlayClasses,
+  imageAnnotationOverlayPreserveAspectRatio,
   imageAnnotationReadonlyOverlayClasses,
   imageAnnotationShapeClasses,
   imageAnnotationStageClasses,
@@ -45,6 +48,7 @@ import {
   imageErrorIconPath,
   imageLoadingSpinnerClasses,
   imageLoadingSpinnerPath,
+  isImageAnnotationShapeTarget,
   isImageAnnotationShapeTool,
   mergeTigerLocale,
   moveImageAnnotationDraw,
@@ -406,7 +410,9 @@ export function ImageAnnotation({
       }
       if (!canEdit && !canSelect) return
       if (resolvedTool === 'select') {
-        selectAnnotation(null)
+        // pointerdown on a shape already selected it. This click bubbles to the
+        // canvas; clearing here dropped the selection before Delete could enable.
+        if (!isImageAnnotationShapeTarget(event.target)) selectAnnotation(null)
         return
       }
       if (!canEdit || resolvedTool !== 'polygon' || event.detail > 1) return
@@ -510,9 +516,16 @@ export function ImageAnnotation({
   const renderAnnotation = useCallback(
     (annotation: CoreImageAnnotation, isDraft = false) => {
       const selected = !isDraft && annotation.id === activeSelectedId
-      const stroke = getImageAnnotationStrokeColor(annotation)
+      const paint = getImageAnnotationShapePaint(annotation, selected, strokeWidth)
       const index = annotations.findIndex((item) => item.id === annotation.id)
-      const tabIndex = -1
+      const paintProps = {
+        stroke: paint.stroke,
+        strokeWidth: paint.strokeWidth,
+        fill: paint.fill,
+        fillOpacity: paint.fillOpacity,
+        strokeLinecap: paint.strokeLinecap,
+        strokeLinejoin: paint.strokeLinejoin
+      }
       const onKeyDown = (event: React.KeyboardEvent<SVGElement>) => {
         if (isDraft || disabled) return
         if (
@@ -547,70 +560,82 @@ export function ImageAnnotation({
           removeAnnotation(annotation)
         }
       }
-      const commonProps = {
-        stroke,
-        strokeWidth: selected ? strokeWidth + 1 : strokeWidth,
-        fill: stroke,
-        fillOpacity: annotation.type === 'freehand' ? 0 : selected ? 0.18 : 0.1,
-        role: 'option' as const,
-        tabIndex,
-        'aria-label': getImageAnnotationShapeAriaLabel(annotation, labels),
-        'aria-selected': selected,
-        'aria-disabled': disabled || undefined,
-        ref: (node: SVGElement | null) => {
-          if (!isDraft && index >= 0) shapeRefs.current[index] = node
-        },
-        className: classNames(!isDraft && !disabled && imageAnnotationShapeClasses),
-        onKeyDown: isDraft ? undefined : onKeyDown,
-        onPointerDown: isDraft
-          ? undefined
-          : (event: React.PointerEvent<SVGElement>) => {
-              if (disabled) return
-              if (canEdit && isImageAnnotationShapeTool(resolvedTool)) return
-              event.stopPropagation()
-              selectAnnotation(annotation)
-              setFocusedShape(index)
-            }
-      }
 
+      let geometry: React.ReactNode
+      let hit: React.ReactNode = null
       if (annotation.type === 'rectangle') {
-        return (
+        geometry = (
           <rect
-            key={annotation.id}
-            {...commonProps}
+            {...paintProps}
             x={annotation.x * displayWidth}
             y={annotation.y * displayHeight}
             width={annotation.width * displayWidth}
             height={annotation.height * displayHeight}
           />
         )
-      }
-
-      if (annotation.type === 'ellipse') {
-        return (
+      } else if (annotation.type === 'ellipse') {
+        geometry = (
           <ellipse
-            key={annotation.id}
-            {...commonProps}
+            {...paintProps}
             cx={(annotation.x + annotation.width / 2) * displayWidth}
             cy={(annotation.y + annotation.height / 2) * displayHeight}
             rx={(annotation.width * displayWidth) / 2}
             ry={(annotation.height * displayHeight) / 2}
           />
         )
+      } else {
+        const d = getImageAnnotationPathData(annotation, displayWidth, displayHeight)
+        geometry = (
+          <path
+            {...paintProps}
+            d={d}
+            pointerEvents={annotation.type === 'freehand' ? 'none' : undefined}
+          />
+        )
+        if (!isDraft && annotation.type === 'freehand') {
+          hit = (
+            <path
+              d={d}
+              fill="none"
+              stroke="transparent"
+              strokeWidth={paint.hitStrokeWidth}
+              strokeLinecap={paint.strokeLinecap}
+              strokeLinejoin={paint.strokeLinejoin}
+              pointerEvents="stroke"
+              aria-hidden="true"
+            />
+          )
+        }
       }
 
-      const pathAnnotation = annotation as Extract<
-        CoreImageAnnotation,
-        { type: 'polygon' | 'freehand' }
-      >
-
       return (
-        <path
+        <g
           key={annotation.id}
-          {...commonProps}
-          d={getImageAnnotationPathData(pathAnnotation, displayWidth, displayHeight)}
-          fillOpacity={pathAnnotation.type === 'polygon' ? commonProps.fillOpacity : 0}
-        />
+          role="option"
+          tabIndex={-1}
+          aria-label={getImageAnnotationShapeAriaLabel(annotation, labels)}
+          aria-selected={selected}
+          aria-disabled={disabled || undefined}
+          ref={(node: SVGElement | null) => {
+            if (!isDraft && index >= 0) shapeRefs.current[index] = node
+          }}
+          className={classNames(!isDraft && !disabled && imageAnnotationShapeClasses)}
+          {...(isDraft ? {} : { 'data-tiger-annotation-shape': annotation.type })}
+          onKeyDown={isDraft ? undefined : onKeyDown}
+          onPointerDown={
+            isDraft
+              ? undefined
+              : (event: React.PointerEvent<SVGElement>) => {
+                  if (disabled) return
+                  if (canEdit && isImageAnnotationShapeTool(resolvedTool)) return
+                  event.stopPropagation()
+                  selectAnnotation(annotation)
+                  setFocusedShape(index)
+                }
+          }>
+          {geometry}
+          {hit}
+        </g>
       )
     },
     [
@@ -620,7 +645,6 @@ export function ImageAnnotation({
       disabled,
       displayHeight,
       displayWidth,
-      focusedShapeIndex,
       isRtl,
       labels,
       removeAnnotation,
@@ -777,13 +801,16 @@ export function ImageAnnotation({
             )}
           </div>
         ) : (
-          <>
+          <div
+            className={imageAnnotationFrameClasses}
+            style={getImageAnnotationFrameStyle(displayWidth, displayHeight)}
+            data-tiger-annotation-frame="">
             <img
               src={src}
               alt=""
               aria-hidden="true"
               className={imageAnnotationImageClasses}
-              style={{ width: `${displayWidth}px`, height: `${displayHeight}px` }}
+              style={{ width: '100%', height: '100%' }}
               draggable={false}
             />
             <svg
@@ -793,9 +820,10 @@ export function ImageAnnotation({
                 (!canEdit || resolvedTool === 'select') && imageAnnotationReadonlyOverlayClasses,
                 disabled && 'pointer-events-none'
               )}
-              width={displayWidth}
-              height={displayHeight}
-              viewBox={`0 0 ${displayWidth} ${displayHeight}`}
+              width="100%"
+              height="100%"
+              preserveAspectRatio={imageAnnotationOverlayPreserveAspectRatio}
+              viewBox={getImageAnnotationViewBox(displayWidth, displayHeight)}
               tabIndex={disabled ? -1 : 0}
               role="listbox"
               aria-multiselectable="false"
@@ -807,7 +835,7 @@ export function ImageAnnotation({
               {draft ? renderAnnotation(draft, true) : null}
               {renderedLabels}
             </svg>
-          </>
+          </div>
         )}
       </div>
     </div>

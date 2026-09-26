@@ -7,17 +7,23 @@ import {
   finishImageAnnotationDraw,
   getAnnotationDisplaySize,
   imageAnnotationDrawingClasses,
+  imageAnnotationOverlayPreserveAspectRatio,
   imageAnnotationStageClasses,
+  isImageAnnotationShapeTarget,
   getImageAnnotationCenter,
+  getImageAnnotationFrameStyle,
   getImageAnnotationPathData,
   getImageAnnotationPointFromClient,
   getImageAnnotationShapeAriaLabel,
+  getImageAnnotationShapePaint,
+  getImageAnnotationViewBox,
   getImageAnnotationToolButtonClasses,
   getImageEditorLabels,
   getNextImageAnnotationTool,
   normalizeImageAnnotationBox,
   shouldCommitImageAnnotationBox,
   shouldCommitImageAnnotationPath,
+  moveImageAnnotationDraw,
   startImageAnnotationDraw
 } from '@expcat/tigercat-core'
 
@@ -153,6 +159,61 @@ describe('image-annotation-utils', () => {
   it('fits the image to the host width and allows upscale', () => {
     expect(getAnnotationDisplaySize(800, 600, 400)).toEqual({ width: 400, height: 300 })
     expect(getAnnotationDisplaySize(100, 50, 400)).toEqual({ width: 400, height: 200 })
+  })
+
+  it('paints freehand as an open round stroke and boxes as translucent fills', () => {
+    const freehand = createImageAnnotationPath('freehand', 'draw', [
+      { x: 0.1, y: 0.2 },
+      { x: 0.4, y: 0.2 },
+      { x: 0.2, y: 0.5 }
+    ])
+    const pen = getImageAnnotationShapePaint(freehand, false, 2)
+    expect(pen.fill).toBe('none')
+    expect(pen.fillOpacity).toBe(0)
+    expect(pen.strokeLinecap).toBe('round')
+    expect(pen.strokeLinejoin).toBe('round')
+    expect(pen.hitStrokeWidth).toBeGreaterThan(pen.strokeWidth)
+    expect(getImageAnnotationPathData(freehand, 200, 100).endsWith('Z')).toBe(false)
+
+    const rect = createImageAnnotationBox('rectangle', 'rect', { x: 0, y: 0 }, { x: 0.2, y: 0.2 })
+    expect(getImageAnnotationShapePaint(rect, false, 2)).toMatchObject({
+      fill: 'var(--tiger-primary)',
+      fillOpacity: 0.1,
+      strokeWidth: 2
+    })
+    expect(getImageAnnotationShapePaint(rect, true, 2)).toMatchObject({
+      fillOpacity: 0.18,
+      strokeWidth: 3
+    })
+  })
+
+  it('keeps freehand samples in pointer order', () => {
+    let drawing = startImageAnnotationDraw('freehand', { x: 0.1, y: 0.2 })
+    drawing = moveImageAnnotationDraw(drawing, { x: 0.4, y: 0.2 })
+    drawing = moveImageAnnotationDraw(drawing, { x: 0.4, y: 0.5 })
+    drawing = moveImageAnnotationDraw(drawing, { x: 0.2, y: 0.4 })
+    expect(drawing.points).toEqual([
+      { x: 0.1, y: 0.2 },
+      { x: 0.4, y: 0.2 },
+      { x: 0.4, y: 0.5 },
+      { x: 0.2, y: 0.4 }
+    ])
+  })
+
+  it('maps the overlay box onto the viewBox without letterboxing', () => {
+    expect(getImageAnnotationFrameStyle(800, 500)).toEqual({ width: '800px', height: '500px' })
+    expect(getImageAnnotationViewBox(800, 500)).toBe('0 0 800 500')
+    expect(imageAnnotationOverlayPreserveAspectRatio).toBe('none')
+  })
+
+  it('treats only committed shape nodes as selection targets', () => {
+    const shape = document.createElement('div')
+    shape.setAttribute('data-tiger-annotation-shape', 'rectangle')
+    const ink = document.createElement('span')
+    shape.append(ink)
+    expect(isImageAnnotationShapeTarget(ink)).toBe(true)
+    expect(isImageAnnotationShapeTarget(document.createElement('svg'))).toBe(false)
+    expect(isImageAnnotationShapeTarget(null)).toBe(false)
   })
 
   it('rejects a freehand stroke that never moved', () => {

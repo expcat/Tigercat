@@ -27,6 +27,22 @@ export const imageAnnotationOverlayClasses = 'absolute inset-0 cursor-crosshair'
 
 export const imageAnnotationReadonlyOverlayClasses = 'cursor-default'
 
+/**
+ * Image frame that owns the overlay. The stage scrolls; the frame is the image.
+ * An overlay pinned to the stage is only the scrollport, while the viewBox is the
+ * whole image, so freehand points sampled from the CSS box land in the wrong place.
+ */
+export const imageAnnotationFrameClasses = 'relative'
+
+/**
+ * Inverse of {@link getImageAnnotationPointFromClient}: fractions of the SVG box
+ * are fractions of the viewBox. The default `meet` letterboxes when those aspect
+ * ratios differ and bends the stroke away from the pointer.
+ */
+export const imageAnnotationOverlayPreserveAspectRatio = 'none'
+
+const IMAGE_ANNOTATION_FREEHAND_HIT_STROKE = 16
+
 export const imageAnnotationToolbarClasses = 'flex flex-wrap items-center gap-2'
 
 const annotationFocusRing =
@@ -36,8 +52,7 @@ export const imageAnnotationToolButtonClasses = `inline-flex items-center justif
 
 export const imageAnnotationDeleteButtonClasses = `inline-flex items-center justify-center rounded-[var(--tiger-radius-sm)] border border-[var(--tiger-error)] px-3 py-1.5 text-sm font-medium text-[var(--tiger-error)] transition-colors hover:bg-[var(--tiger-error-bg-hover)] ${annotationFocusRing} disabled:cursor-not-allowed disabled:opacity-50`
 
-export const imageAnnotationLabelClasses =
-  'pointer-events-none select-none text-[11px] font-medium'
+export const imageAnnotationLabelClasses = 'pointer-events-none select-none text-[11px] font-medium'
 
 export const imageAnnotationShapeClasses = 'cursor-pointer outline-none focus-visible:outline-none'
 
@@ -359,6 +374,70 @@ export function getAnnotationDisplaySize(
 
 export function getImageAnnotationStageStyle(): { maxHeight: string } {
   return { maxHeight: `${IMAGE_ANNOTATION_MAX_STAGE_HEIGHT}px` }
+}
+
+export function getImageAnnotationFrameStyle(
+  width: number,
+  height: number
+): { width: string; height: string } {
+  return { width: `${width}px`, height: `${height}px` }
+}
+
+export function getImageAnnotationViewBox(width: number, height: number): string {
+  return `0 0 ${width} ${height}`
+}
+
+export interface ImageAnnotationShapePaint {
+  stroke: string
+  strokeWidth: number
+  fill: string
+  fillOpacity: number
+  strokeLinecap: 'round' | 'butt'
+  strokeLinejoin: 'round' | 'miter'
+  /** Pointer target in viewBox units. Wider than the ink for an open freehand stroke. */
+  hitStrokeWidth: number
+}
+
+/**
+ * Freehand is an open pen stroke. Filling it closes the path back to the start,
+ * which is the self-intersecting blob. Boxes and polygons stay translucent fills.
+ */
+export function getImageAnnotationShapePaint(
+  annotation: ImageAnnotation,
+  selected: boolean,
+  strokeWidth: number
+): ImageAnnotationShapePaint {
+  const stroke = getImageAnnotationStrokeColor(annotation)
+  const width = selected ? strokeWidth + 1 : strokeWidth
+  if (annotation.type === 'freehand') {
+    const pen = Number.isFinite(width) && width > 0 ? width : 2
+    return {
+      stroke,
+      strokeWidth: pen,
+      fill: 'none',
+      fillOpacity: 0,
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+      hitStrokeWidth: Math.max(pen, IMAGE_ANNOTATION_FREEHAND_HIT_STROKE)
+    }
+  }
+  return {
+    stroke,
+    strokeWidth: width,
+    fill: stroke,
+    fillOpacity: selected ? 0.18 : 0.1,
+    strokeLinecap: 'butt',
+    strokeLinejoin: 'miter',
+    hitStrokeWidth: width
+  }
+}
+
+const IMAGE_ANNOTATION_SHAPE_SELECTOR = '[data-tiger-annotation-shape]'
+
+/** True when the event target is a committed shape (or a node inside one). */
+export function isImageAnnotationShapeTarget(target: EventTarget | null): boolean {
+  if (typeof Element === 'undefined' || !(target instanceof Element)) return false
+  return Boolean(target.closest(IMAGE_ANNOTATION_SHAPE_SELECTOR))
 }
 
 export interface ImageAnnotationDrawState {

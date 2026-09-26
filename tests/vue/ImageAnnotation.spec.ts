@@ -209,7 +209,80 @@ describe('ImageAnnotation', () => {
       props: { src: '/scene.jpg', modelValue: annotations }
     })
 
-    expect(container.querySelectorAll('path')).toHaveLength(2)
+    const paths = [...container.querySelectorAll('path')].map(
+      (node) => node.getAttribute('d') ?? ''
+    )
+    expect(paths.filter((d) => d.endsWith('Z'))).toHaveLength(1)
+    const freehand = container.querySelector('[data-tiger-annotation-shape="freehand"]')
+    const ink = [...(freehand?.querySelectorAll('path') ?? [])].find(
+      (node) => node.getAttribute('stroke') !== 'transparent'
+    )
+    expect(ink).toHaveAttribute('fill', 'none')
+    expect(ink).toHaveAttribute('stroke-linejoin', 'round')
+    expect(ink?.getAttribute('d')).not.toContain('Z')
+  })
+
+  it('keeps a clicked shape selected so Delete enables', async () => {
+    const annotations: CoreImageAnnotation[] = [
+      { id: 'face', type: 'rectangle', x: 0.1, y: 0.1, width: 0.2, height: 0.2 }
+    ]
+    const { getByRole, getByLabelText, emitted } = await renderLoadedAnnotation({
+      props: { src: '/scene.jpg', defaultValue: annotations }
+    })
+    const shape = getByRole('option', { name: 'Rectangle annotation' })
+    const remove = getByRole('button', { name: 'Delete' })
+    expect(remove).toBeDisabled()
+    expect(shape.querySelector('rect')).toHaveAttribute('fill-opacity', '0.1')
+    expect(shape.querySelector('rect')).toHaveAttribute('stroke-width', '2')
+
+    await fireEvent.pointerDown(shape)
+    await fireEvent.click(shape)
+
+    expect(remove).toBeEnabled()
+    expect(emitted().select.at(-1)).toEqual([annotations[0]])
+    expect(shape.querySelector('rect')).toHaveAttribute('stroke-width', '3')
+
+    await fireEvent.click(getByLabelText(/Image annotation canvas/))
+    expect(remove).toBeDisabled()
+    expect(emitted().select.at(-1)).toEqual([null])
+  })
+
+  it('draws a freehand stroke that follows the pointer and stays open', async () => {
+    const { getByRole, getByLabelText, container, emitted } = await renderLoadedAnnotation({
+      props: { src: '/scene.jpg' }
+    })
+    await fireEvent.click(getByRole('button', { name: 'Freehand' }))
+    const canvas = getByLabelText(/Image annotation canvas/)
+    await drawBox(canvas, { x: 80, y: 60 }, { x: 240, y: 180 })
+
+    const [annotations] = emitted().change.at(-1) as [CoreImageAnnotation[], unknown]
+    const stroke = annotations[0]
+    expect(stroke.type).toBe('freehand')
+    if (stroke.type !== 'freehand') return
+    expect(stroke.points[0].x).toBeCloseTo(0.1)
+    expect(stroke.points[0].y).toBeCloseTo(0.1)
+    const end = stroke.points[stroke.points.length - 1]
+    expect(end.x).toBeCloseTo(0.3)
+    expect(end.y).toBeCloseTo(0.3)
+    expect(
+      stroke.points.every((point, index) => index === 0 || point.x >= stroke.points[index - 1].x)
+    ).toBe(true)
+
+    const ink = [
+      ...container.querySelectorAll('[data-tiger-annotation-shape="freehand"] path')
+    ].find((node) => node.getAttribute('stroke') !== 'transparent')
+    expect(ink).toHaveAttribute('fill', 'none')
+    const numbers = (ink?.getAttribute('d') ?? '').match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? []
+    expect(numbers[0]).toBeCloseTo(80)
+    expect(numbers[1]).toBeCloseTo(60)
+    expect(numbers.at(-2)).toBeCloseTo(240)
+    expect(numbers.at(-1)).toBeCloseTo(180)
+    expect(ink?.getAttribute('d')).not.toContain('Z')
+    expect(canvas).toHaveAttribute('preserveAspectRatio', 'none')
+    expect(canvas.getAttribute('viewBox')).toBe('0 0 800 600')
+    expect(canvas.parentElement).toHaveAttribute('data-tiger-annotation-frame')
+    expect((canvas.parentElement as HTMLElement).style.width).toBe('800px')
+    expect((canvas.parentElement as HTMLElement).style.height).toBe('600px')
   })
 
   it('has no accessibility violations', async () => {
