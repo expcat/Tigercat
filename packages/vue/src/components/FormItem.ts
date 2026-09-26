@@ -116,7 +116,7 @@ export const FormItem = defineComponent({
       default: false
     }
   },
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     const formContextRef = inject<ComputedRef<FormContext> | null>(FormContextKey, null)
     const formContext = computed(() => formContextRef?.value ?? null)
 
@@ -502,7 +502,11 @@ export const FormItem = defineComponent({
 
       return h(
         'div',
-        { class: formItemClasses.value, 'data-tiger-field': props.name || undefined },
+        {
+          class: formItemClasses.value,
+          style: attrs.style as string | Record<string, string | number> | undefined,
+          'data-tiger-field': props.name || undefined
+        },
         [labelElement, contentElement]
       )
     }

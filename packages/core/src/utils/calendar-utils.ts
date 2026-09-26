@@ -10,11 +10,11 @@ function eventIso(value: Date | string): string | null {
 const FOCUS_RING =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
-export function getCalendarContainerClasses(_fullscreen?: boolean): string {
+export function getCalendarContainerClasses(fullscreen?: boolean): string {
   return classNames(
     'bg-[var(--tiger-surface)]',
     'border border-[var(--tiger-border)]',
-    'w-72 p-3',
+    fullscreen ? 'w-full min-w-0 p-4' : 'w-72 p-3',
     'rounded-[var(--tiger-radius-md)]'
   )
 }
@@ -44,6 +44,40 @@ export const calendarWeekdayClasses = classNames(
 )
 
 export const calendarGridClasses = 'grid grid-cols-7'
+
+/**
+ * Week number is its own track. Equal `grid-cols-8` inside the card width
+ * let the week label collide with the first date.
+ */
+export function getCalendarWeekGridClasses(fullscreen = false): string {
+  return fullscreen
+    ? 'grid grid-cols-[3.25rem_repeat(7,minmax(0,1fr))] gap-x-[var(--tiger-spacing-md)]'
+    : 'grid grid-cols-8'
+}
+
+export function getCalendarWeekNumberClasses(fullscreen = false): string {
+  return classNames(
+    calendarWeekdayClasses,
+    fullscreen && 'flex w-full min-h-8 items-center justify-center self-start'
+  )
+}
+
+/**
+ * Fullscreen cells share one height so a custom date cell cannot stretch one
+ * week and shove the rest of the month out of line. Extra content clips in
+ * {@link calendarDateCellBodyClasses}.
+ */
+export function getCalendarDateCellClasses(fullscreen = false): string {
+  return classNames(
+    'flex min-w-0 flex-col items-center',
+    fullscreen && 'h-[4.5rem] overflow-hidden'
+  )
+}
+
+export const calendarDateCellBodyClasses =
+  'mt-0.5 flex max-h-8 w-full min-h-0 min-w-0 flex-col items-center gap-0.5 overflow-hidden text-center text-[10px] leading-tight text-[var(--tiger-text)]'
+
+export const calendarDateCellTitleClasses = 'w-full min-w-0 truncate'
 
 export interface CalendarDayClassState {
   isSelected: boolean

@@ -5,6 +5,7 @@ import {
   buildChartSeriesKeys,
   resolveChartTooltipContent,
   getChartTooltipTransform,
+  mapChartTooltipPointToDocument,
   resolveChartTooltipPosition,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
@@ -161,6 +162,49 @@ describe('resolveChartTooltipContent', () => {
   it('uses custom formatter over default', () => {
     const custom = (d: (typeof data)[0]) => `custom-${d.label}`
     expect(resolveChartTooltipContent(1, data, custom, () => 'default')).toBe('custom-B')
+  })
+})
+
+describe('mapChartTooltipPointToDocument', () => {
+  it('keeps a point that is already in the tooltip document', () => {
+    expect(mapChartTooltipPointToDocument({ x: 12, y: 8 }, document, document)).toEqual({
+      x: 12,
+      y: 8
+    })
+  })
+
+  it('adds each same-origin frame origin on the way to the tooltip document', () => {
+    const iframe = document.createElement('iframe')
+    iframe.getBoundingClientRect = () =>
+      ({
+        x: 30,
+        y: 90,
+        left: 30,
+        top: 90,
+        right: 230,
+        bottom: 290,
+        width: 200,
+        height: 200,
+        toJSON() {
+          return {}
+        }
+      }) as DOMRect
+    const parentView = window
+    const childDocument = document.implementation.createHTMLDocument('frame')
+    Object.defineProperty(childDocument, 'defaultView', {
+      configurable: true,
+      value: {
+        document: childDocument,
+        parent: parentView,
+        get frameElement() {
+          return iframe
+        }
+      }
+    })
+    expect(mapChartTooltipPointToDocument({ x: 4, y: 6 }, childDocument, document)).toEqual({
+      x: 34,
+      y: 96
+    })
   })
 })
 

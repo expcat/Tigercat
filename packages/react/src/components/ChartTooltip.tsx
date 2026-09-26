@@ -3,8 +3,10 @@ import {
   classNames,
   chartTooltipBaseClasses,
   chartTooltipLines,
+  chartTooltipViewport,
   getChartTooltipTransform,
   isBrowser,
+  mapChartTooltipPointToDocument,
   registerEscapeDismiss,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
@@ -53,33 +55,28 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   useEffect(() => {
     if (!open || !isBrowser()) return
 
-    const initialPosition = resolveChartTooltipPosition({
-      x,
-      y,
-      rect: { width: 0, height: 0 },
-      viewport: {
-        width: window.innerWidth,
-        height: window.innerHeight
-      }
-    })
+    const place = () => {
+      const node = tooltipRef.current
+      const host = node?.ownerDocument ?? target?.ownerDocument ?? document
+      const point = mapChartTooltipPointToDocument({ x, y }, document, host)
+      const rect = node ? node.getBoundingClientRect() : { width: 0, height: 0 }
+      return resolveChartTooltipPosition({
+        x: point.x,
+        y: point.y,
+        rect,
+        viewport: chartTooltipViewport(host)
+      })
+    }
+
+    setAdjustedPosition(place())
 
     const frameHandle = requestAnimationFrame(() => {
       if (!tooltipRef.current) return
-
-      const rect = tooltipRef.current.getBoundingClientRect()
-      setAdjustedPosition(
-        resolveChartTooltipPosition({
-          x,
-          y,
-          rect,
-          viewport: { width: window.innerWidth, height: window.innerHeight }
-        })
-      )
+      setAdjustedPosition(place())
     })
 
-    setAdjustedPosition(initialPosition)
     return () => cancelAnimationFrame(frameHandle)
-  }, [x, y, open, body])
+  }, [x, y, open, body, mounted, target])
 
   const tooltipClasses = useMemo(() => classNames(chartTooltipBaseClasses, className), [className])
 

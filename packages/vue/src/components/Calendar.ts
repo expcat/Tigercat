@@ -26,8 +26,10 @@ import type {
 import {
   appendCalendarEventCountLabel,
   buildCalendarDateCellExtra,
+  calendarDateCellBodyClasses,
   calendarDateCellDotClasses,
   calendarDateCellExtraClasses,
+  calendarDateCellTitleClasses,
   calendarHeaderClasses,
   calendarNavButtonClasses,
   calendarTitleClasses,
@@ -40,13 +42,15 @@ import {
   getCalendarEventDotStyle,
   formatMonthYear,
   getCalendarContainerClasses,
+  getCalendarDateCellClasses,
   getCalendarDayClasses,
   getCalendarDayKeyAction,
   getCalendarLabels,
   getCalendarMonthClasses,
   getCalendarMonthKeyAction,
+  getCalendarWeekGridClasses,
+  getCalendarWeekNumberClasses,
   getInitialCalendarView,
-  getLocaleDirection,
   getMonthDays,
   getShortDayNames,
   getShortMonthNames,
@@ -431,12 +435,13 @@ export const Calendar = defineComponent({
           )
         )
       } else {
-        const weekGridClass = 'grid grid-cols-8'
+        const weekGridClass = getCalendarWeekGridClasses(!!props.fullscreen)
+        const weekNumberClass = getCalendarWeekNumberClasses(!!props.fullscreen)
         const weekdayRow = h('div', { class: weekGridClass, role: 'row' }, [
           h(
             'div',
-            { class: calendarWeekdayClasses, role: 'columnheader' },
-            getW9DataLabels().weekNumber
+            { class: weekNumberClass, role: 'columnheader' },
+            getW9DataLabels(localeCode.value).weekNumber
           ),
           ...weekdayNames.value.map((wd) =>
             h('div', { key: wd, class: calendarWeekdayClasses, role: 'columnheader' }, wd)
@@ -446,7 +451,7 @@ export const Calendar = defineComponent({
           h('div', { key: wi, class: weekGridClass, role: 'row' }, [
             h(
               'div',
-              { class: calendarWeekdayClasses, 'data-week-number': '' },
+              { class: weekNumberClass, 'data-week-number': '' },
               String(calendarWeekNumber(week[0], weekStartsOn.value))
             ),
             ...week.map((date) => {
@@ -495,7 +500,33 @@ export const Calendar = defineComponent({
                       )
                     )
                   : null
-              return h('div', { key: iso, class: 'flex min-w-0 flex-col items-stretch' }, [
+              const cellBody =
+                customCell || eventTitles.length
+                  ? h('div', { class: calendarDateCellBodyClasses }, [
+                      customCell
+                        ? h('div', { class: 'w-full min-w-0 truncate' }, [customCell as VNodeChild])
+                        : null,
+                      eventTitles.length
+                        ? h(
+                            'ul',
+                            { class: 'm-0 w-full min-w-0 list-none p-0' },
+                            extra.events.map((event, index) =>
+                              event.title
+                                ? h(
+                                    'li',
+                                    {
+                                      key: event.key ?? `${extra.iso}-title-${index}`,
+                                      class: calendarDateCellTitleClasses
+                                    },
+                                    event.title
+                                  )
+                                : null
+                            )
+                          )
+                        : null
+                    ])
+                  : null
+              return h('div', { key: iso, class: getCalendarDateCellClasses(!!props.fullscreen) }, [
                 h(
                   'button',
                   {
@@ -525,25 +556,7 @@ export const Calendar = defineComponent({
                   },
                   [formatCalendarDayNumber(date, localeCode.value), defaultDots]
                 ),
-                customCell ? h('div', {}, [customCell as VNodeChild]) : null,
-                eventTitles.length
-                  ? h(
-                      'ul',
-                      {
-                        class:
-                          'm-0 list-none p-0 text-[10px] leading-tight text-[var(--tiger-text)]'
-                      },
-                      extra.events.map((event, index) =>
-                        event.title
-                          ? h(
-                              'li',
-                              { key: event.key ?? `${extra.iso}-title-${index}` },
-                              event.title
-                            )
-                          : null
-                      )
-                    )
-                  : null
+                cellBody
               ])
             })
           ])
@@ -553,7 +566,7 @@ export const Calendar = defineComponent({
           {
             role: 'grid',
             'aria-rowcount': 7,
-            'aria-colcount': 7,
+            'aria-colcount': 8,
             'aria-labelledby': titleId,
             ref: dayGridEl,
             onKeydown: handleDayGridKeyDown

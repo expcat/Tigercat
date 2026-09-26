@@ -86,6 +86,28 @@ describe('NotificationCenter (Vue)', () => {
     expect(screen.getByText('加载中...')).toBeInTheDocument()
   })
 
+  it('covers an existing list with a pointer-blocking mask while loading', () => {
+    const items: NotificationItem[] = [
+      { id: 1, title: '发布检查已通过', description: 'gate', type: '产品', read: false }
+    ]
+    render(NotificationCenter, {
+      props: {
+        items,
+        loading: true,
+        loadingText: '正在同步通知...',
+        groupBy: (item: NotificationItem) => String(item.type)
+      }
+    })
+    const mask = document.querySelector('.pointer-events-auto')
+    expect(mask).not.toBeNull()
+    expect(mask?.className).toContain('pointer-events-auto')
+    expect(mask.className).toContain('color-mix')
+    expect(mask.className).toContain('z-20')
+    const title = screen.getByText('发布检查已通过')
+    expect(title.closest('[inert]')).not.toBeNull()
+    expect(mask.contains(title)).toBe(false)
+  })
+
   it('renders custom title', () => {
     const items: NotificationItem[] = [{ id: 1, title: '通知', type: '系统', read: false }]
 

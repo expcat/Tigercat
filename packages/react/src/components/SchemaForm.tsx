@@ -15,6 +15,7 @@ import {
   narrowWidgetParams,
   mergeTigerLocale,
   type FormHandle,
+  type FormLabelPosition,
   type FormRules,
   type FormSubmitEvent,
   type FormValues,
@@ -31,6 +32,9 @@ import {
   createSchemaFormModel,
   getSchemaFormFieldSpanClasses,
   getSchemaFormFieldsClasses,
+  schemaFormLabelColumnFieldStyle,
+  schemaFormLabelColumnItemStyle,
+  schemaFormUsesLabelColumns,
   mapSchemaFormValuesOut,
   overlaySchemaFormDirtyValues,
   resolveSchemaFormLayout,
@@ -168,20 +172,30 @@ function renderWidget(field: SchemaFormField): React.ReactNode {
 function SchemaFormFieldCell({
   field,
   columns,
+  labelPosition,
   renderField,
   fieldRules,
   values
 }: {
   field: SchemaFormField
   columns: 1 | 2 | 3
+  labelPosition?: FormLabelPosition
   renderField?: (field: SchemaFormField) => React.ReactNode
   fieldRules?: FormRules
   values?: FormValues
 }): React.ReactElement {
+  const aligned = schemaFormUsesLabelColumns(labelPosition)
+  const className = getSchemaFormFieldSpanClasses(
+    clampSchemaFormSpan(field.span, columns),
+    columns,
+    labelPosition
+  )
+  const style = aligned ? schemaFormLabelColumnFieldStyle : undefined
   if (field.readOnly) {
     return (
       <div
-        className={getSchemaFormFieldSpanClasses(clampSchemaFormSpan(field.span, columns), columns)}
+        className={className}
+        style={style}
         data-schema-field={field.name}
         data-schema-readonly="">
         {field.label ? <span>{field.label}</span> : null}
@@ -192,9 +206,7 @@ function SchemaFormFieldCell({
   const custom = renderField?.(field)
   const control = custom ?? renderWidget(field)
   return (
-    <div
-      className={getSchemaFormFieldSpanClasses(clampSchemaFormSpan(field.span, columns), columns)}
-      data-schema-field={field.name}>
+    <div className={className} style={style} data-schema-field={field.name}>
       <FormItem
         name={field.name}
         label={field.label}
@@ -202,7 +214,8 @@ function SchemaFormFieldCell({
         rules={field.disabled || field.readOnly ? undefined : fieldRules?.[field.name]}
         disabled={field.disabled}
         condition={field.condition}
-        extra={field.extra}>
+        extra={field.extra}
+        style={aligned ? schemaFormLabelColumnItemStyle : undefined}>
         {control}
       </FormItem>
     </div>
@@ -212,12 +225,14 @@ function SchemaFormFieldCell({
 function SchemaFormGroupView({
   group,
   nested,
+  labelPosition,
   renderField,
   fieldRules,
   values
 }: {
   group: SchemaFormLayoutGroup
   nested: boolean
+  labelPosition?: FormLabelPosition
   renderField?: (field: SchemaFormField) => React.ReactNode
   fieldRules?: FormRules
   values?: FormValues
@@ -231,12 +246,13 @@ function SchemaFormGroupView({
         <p className={schemaFormGroupDescriptionClasses}>{group.description}</p>
       ) : null}
       {group.fields.length > 0 ? (
-        <div className={getSchemaFormFieldsClasses(group.columns)}>
+        <div className={getSchemaFormFieldsClasses(group.columns, labelPosition)}>
           {group.fields.map((field) => (
             <SchemaFormFieldCell
               key={field.name}
               field={field}
               columns={group.columns}
+              labelPosition={labelPosition}
               renderField={renderField}
               fieldRules={fieldRules}
               values={values}
@@ -249,6 +265,7 @@ function SchemaFormGroupView({
           key={child.key}
           group={child}
           nested
+          labelPosition={labelPosition}
           renderField={renderField}
           fieldRules={fieldRules}
           values={values}
@@ -422,6 +439,7 @@ export const SchemaForm = forwardRef<FormHandle, SchemaFormProps>(function Schem
           key={group.key}
           group={group}
           nested={false}
+          labelPosition={labelPosition}
           renderField={renderField}
           fieldRules={formRules}
           values={formModel}

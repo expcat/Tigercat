@@ -9,6 +9,8 @@ import {
   collectSchemaFormRules,
   createSchemaFormModel,
   flattenSchemaFormFields,
+  getSchemaFormFieldSpanClasses,
+  getSchemaFormFieldsClasses,
   mapSchemaFormValuesIn,
   mapSchemaFormValuesOut,
   resolveSchemaFormLayout,
@@ -46,6 +48,22 @@ const schema: SchemaFormSchema = {
 }
 
 describe('schema-form helpers', () => {
+  it('gives horizontal fields a shared label track and a row gap', () => {
+    const fields = getSchemaFormFieldsClasses(1)
+    expect(fields).toContain('gap-y-[var(--tiger-spacing-lg)]')
+    expect(fields).toContain('grid-cols-[max-content_minmax(0,1fr)]')
+    expect(fields).not.toContain('gap-y-0')
+    expect(getSchemaFormFieldSpanClasses(1, 1)).toContain('col-span-2')
+    expect(getSchemaFormFieldSpanClasses(1, 1)).toContain('tiger-form-item__content')
+  })
+
+  it('keeps top labels in a stacked field grid', () => {
+    expect(getSchemaFormFieldsClasses(2, 'top')).toContain('sm:grid-cols-2')
+    expect(getSchemaFormFieldsClasses(2, 'top')).not.toContain('max-content')
+    expect(getSchemaFormFieldSpanClasses(2, 2, 'top')).toContain('sm:col-span-2')
+    expect(getSchemaFormFieldSpanClasses(2, 2, 'top')).not.toContain('col-span-4')
+  })
+
   it('flattens visible fields including nested groups and skips hidden', () => {
     const fields = flattenSchemaFormFields(schema)
     expect(fields.map((field) => field.name)).toEqual(['title', 'name', 'role', 'address.city'])

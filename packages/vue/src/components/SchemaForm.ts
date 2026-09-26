@@ -45,6 +45,9 @@ import {
   createSchemaFormModel,
   getSchemaFormFieldSpanClasses,
   getSchemaFormFieldsClasses,
+  schemaFormLabelColumnFieldStyle,
+  schemaFormLabelColumnItemStyle,
+  schemaFormUsesLabelColumns,
   mapSchemaFormValuesOut,
   overlaySchemaFormDirtyValues,
   resolveSchemaFormLayout,
@@ -415,13 +418,28 @@ export const SchemaForm = defineComponent({
       emit('reset')
     }
 
+    const labelAxis = () => props.labelPosition
+    const fieldLayout = (span: number | undefined, columns: 1 | 2 | 3) => {
+      const aligned = schemaFormUsesLabelColumns(labelAxis())
+      return {
+        class: getSchemaFormFieldSpanClasses(
+          clampSchemaFormSpan(span, columns),
+          columns,
+          labelAxis()
+        ),
+        style: aligned ? schemaFormLabelColumnFieldStyle : undefined
+      }
+    }
+
     const renderField = (field: SchemaFormField, columns: 1 | 2 | 3): VNode => {
+      const layout = fieldLayout(field.span, columns)
       if (field.readOnly) {
         const raw = formModel.value?.[field.name]
         return h(
           'div',
           {
-            class: getSchemaFormFieldSpanClasses(clampSchemaFormSpan(field.span, columns), columns),
+            class: layout.class,
+            style: layout.style,
             'data-schema-field': field.name,
             'data-schema-readonly': ''
           },
@@ -437,7 +455,8 @@ export const SchemaForm = defineComponent({
       return h(
         'div',
         {
-          class: getSchemaFormFieldSpanClasses(clampSchemaFormSpan(field.span, columns), columns),
+          class: layout.class,
+          style: layout.style,
           'data-schema-field': field.name
         },
         [
@@ -450,7 +469,10 @@ export const SchemaForm = defineComponent({
               rules: field.disabled || field.readOnly ? undefined : formRules.value?.[field.name],
               disabled: field.disabled,
               condition: field.condition,
-              extra: field.extra
+              extra: field.extra,
+              style: schemaFormUsesLabelColumns(labelAxis())
+                ? schemaFormLabelColumnItemStyle
+                : undefined
             },
             { default: () => control }
           )
@@ -473,7 +495,7 @@ export const SchemaForm = defineComponent({
           group.fields.length > 0
             ? h(
                 'div',
-                { class: getSchemaFormFieldsClasses(group.columns) },
+                { class: getSchemaFormFieldsClasses(group.columns, props.labelPosition) },
                 group.fields.map((field) => renderField(field, group.columns))
               )
             : null,

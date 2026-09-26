@@ -1,4 +1,5 @@
 // CommentThread visual recipes shared by the React and Vue bindings.
+import { classNames } from '../utils/class-names'
 const buttonBaseClasses =
   'tiger-motion-aware px-2 py-0.5 h-auto min-h-0 text-xs rounded-[var(--tiger-radius-md)] [transition:var(--tiger-transition-base)]'
 
@@ -14,7 +15,41 @@ export const commentThreadNeutralButtonClasses =
   'hover:text-[var(--tiger-text)] hover:bg-[var(--tiger-surface-muted)]'
 export const commentThreadLikeIconClasses =
   'tiger-motion-aware w-3.5 h-3.5 transition-transform active:scale-125'
-export const commentThreadDividerClasses = 'border-b border-[var(--tiger-border)]'
+/** Shared reply indent: parent avatar (2.5rem) plus the row gap (0.75rem). */
+export const commentThreadListClasses = '[--tiger-comment-reply-indent:3.25rem]'
+
+export const commentThreadReplyItemClasses =
+  'mt-4 border-s-2 border-s-[var(--tiger-border)] ps-[var(--tiger-spacing-lg)]'
+
+/**
+ * Inset rule between root comments. It starts under the parent text, not at the card edge,
+ * and is not drawn between a comment and its replies.
+ */
+export const commentThreadDividerClasses =
+  "relative before:pointer-events-none before:absolute before:top-0 before:z-0 before:start-[var(--tiger-comment-reply-indent)] before:end-0 before:h-px before:bg-[var(--tiger-border)] before:content-['']"
+
+export function getCommentThreadItemClasses(options: {
+  depth: number
+  showDivider: boolean
+  hasPreviousRoot: boolean
+}): string {
+  const reply = options.depth > 1
+  return classNames(
+    'tiger-comment-thread-item',
+    !reply && 'py-5',
+    !reply && options.hasPreviousRoot && options.showDivider && commentThreadDividerClasses,
+    reply && commentThreadReplyItemClasses
+  )
+}
+
+export function getCommentThreadItemStyle(
+  depth: number
+): { marginInlineStart: string } | undefined {
+  if (depth <= 1) return undefined
+  return {
+    marginInlineStart: `calc(${depth - 1} * var(--tiger-comment-reply-indent))`
+  }
+}
 export const commentThreadAvatarClasses =
   'tiger-motion-aware shrink-0 mt-0.5 ring-1 ring-[var(--tiger-border)] shadow-sm [transition:var(--tiger-transition-base)] hover:scale-105'
 export const commentThreadAuthorClasses =

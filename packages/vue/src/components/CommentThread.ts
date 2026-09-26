@@ -55,7 +55,9 @@ import {
   commentThreadReplyButtonClasses,
   commentThreadNeutralButtonClasses,
   commentThreadLikeIconClasses,
-  commentThreadDividerClasses,
+  commentThreadListClasses,
+  getCommentThreadItemClasses,
+  getCommentThreadItemStyle,
   commentThreadAvatarClasses,
   commentThreadAuthorClasses,
   commentThreadUserTitleClasses,
@@ -65,7 +67,6 @@ import {
   commentThreadReplyTextareaClasses,
   commentThreadCancelButtonClasses,
   commentThreadSubmitButtonClasses,
-  commentThreadRepliesClasses,
   commentThreadEmptyClasses,
   commentThreadEmptyIconClasses
 } from '../../../core/src/internal/comment-thread-styles'
@@ -308,6 +309,7 @@ export const CommentThread = defineComponent({
     const wrapperClasses = computed(() =>
       classNames(
         'tiger-comment-thread flex flex-col',
+        commentThreadListClasses,
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -389,7 +391,7 @@ export const CommentThread = defineComponent({
     const renderNode = (
       node: CommentNode,
       depth: number,
-      isLast: boolean,
+      hasPreviousRoot: boolean,
       pos: { current: number; total: number }
     ): ReturnType<typeof h> => {
       const children = node.children ?? []
@@ -576,11 +578,12 @@ export const CommentThread = defineComponent({
       return h(
         'article',
         {
-          class: classNames(
-            'tiger-comment-thread-item',
-            depth === 1 && 'py-5',
-            depth === 1 && !isLast && props.showDivider && commentThreadDividerClasses
-          ),
+          class: getCommentThreadItemClasses({
+            depth,
+            showDivider: props.showDivider,
+            hasPreviousRoot
+          }),
+          style: getCommentThreadItemStyle(depth),
           key: node.id,
           id: articleId,
           'aria-posinset': posinset,
@@ -899,9 +902,12 @@ export const CommentThread = defineComponent({
         : null
 
       flatCount.value = flat.length
-      const articles = flat.map(({ node, depth }, index) =>
-        renderNode(node, depth, index === flat.length - 1, pos)
-      )
+      let seenRoot = false
+      const articles = flat.map(({ node, depth }) => {
+        const hasPreviousRoot = depth === 1 && seenRoot
+        if (depth === 1) seenRoot = true
+        return renderNode(node, depth, hasPreviousRoot, pos)
+      })
       const pageSentinel = props.hasMore
         ? h('div', {
             ref: sentinelRef,

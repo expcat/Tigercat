@@ -89,8 +89,7 @@ export interface BuildLegendItemsOptions<T> {
 
 /** Build `ChartLegendItem[]` from data/series array. */
 export function buildChartLegendItems<T>(options: BuildLegendItemsOptions<T>): ChartLegendItem[] {
-  const { data, palette, activeIndex, selectedIndex = null, getLabel, getColor, getIndex } =
-    options
+  const { data, palette, activeIndex, selectedIndex = null, getLabel, getColor, getIndex } = options
 
   return data.map((datum, index) => {
     const markIndex = getIndex ? getIndex(datum, index) : index
@@ -156,6 +155,64 @@ export function resolveChartTooltipContent<T>(
 
 export function getChartTooltipTransform(position: { x: number; y: number }): string {
   return `translate3d(${position.x}px, ${position.y}px, 0)`
+}
+
+function finitePoint(value: number): number {
+  return Number.isFinite(value) ? value : 0
+}
+
+function frameElementOf(view: Window): HTMLElement | null {
+  try {
+    const frame = view.frameElement
+    if (!frame || frame.nodeType !== 1 || !view.parent || view.parent === view) return null
+    void view.parent.document
+    return frame as HTMLElement
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Chart tooltips portal to the top document so they paint above demo chrome.
+ * Pointer `clientX/clientY` stay in the event document. Walk same-origin frames
+ * and add each frame's viewport origin until the point is in `target`.
+ */
+export function mapChartTooltipPointToDocument(
+  point: { x: number; y: number },
+  source: Document | null | undefined,
+  target: Document | null | undefined
+): { x: number; y: number } {
+  let x = finitePoint(point.x)
+  let y = finitePoint(point.y)
+  if (!source || !target || source === target) return { x, y }
+
+  let view: Window | null = source.defaultView
+  const seen = new Set<Window>()
+  while (view && view.document !== target && !seen.has(view)) {
+    seen.add(view)
+    const frame = frameElementOf(view)
+    if (!frame) break
+    const rect = frame.getBoundingClientRect()
+    x += rect.left
+    y += rect.top
+    const next = frame.ownerDocument.defaultView
+    if (!next || next === view) break
+    view = next
+  }
+  return { x, y }
+}
+
+export function chartTooltipViewport(doc: Document | null | undefined): {
+  width: number
+  height: number
+} {
+  const view = doc?.defaultView
+  const width = view?.innerWidth
+  const height = view?.innerHeight
+  return {
+    width: typeof width === 'number' && Number.isFinite(width) ? width : 0,
+    height: typeof height === 'number' && Number.isFinite(height) ? height : 0
+  }
 }
 
 export interface ChartTooltipPositionInput {

@@ -4,8 +4,10 @@ import type { CalendarMode, CalendarProps as CoreCalendarProps } from '@expcat/t
 import {
   appendCalendarEventCountLabel,
   buildCalendarDateCellExtra,
+  calendarDateCellBodyClasses,
   calendarDateCellDotClasses,
   calendarDateCellExtraClasses,
+  calendarDateCellTitleClasses,
   calendarHeaderClasses,
   calendarNavButtonClasses,
   calendarTitleClasses,
@@ -18,13 +20,15 @@ import {
   getCalendarEventDotStyle,
   formatMonthYear,
   getCalendarContainerClasses,
+  getCalendarDateCellClasses,
   getCalendarDayClasses,
   getCalendarDayKeyAction,
   getCalendarLabels,
   getCalendarMonthClasses,
   getCalendarMonthKeyAction,
+  getCalendarWeekGridClasses,
+  getCalendarWeekNumberClasses,
   getInitialCalendarView,
-  getLocaleDirection,
   getMonthDays,
   getShortDayNames,
   getShortMonthNames,
@@ -411,9 +415,9 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
           aria-labelledby={titleId}
           ref={dayGridRef}
           onKeyDown={handleDayGridKeyDown}>
-          <div className="grid grid-cols-8" role="row">
-            <div className={calendarWeekdayClasses} role="columnheader">
-              {getW9DataLabels().weekNumber}
+          <div className={getCalendarWeekGridClasses(fullscreen)} role="row">
+            <div className={getCalendarWeekNumberClasses(fullscreen)} role="columnheader">
+              {getW9DataLabels(localeCode).weekNumber}
             </div>
             {weekdayNames.map((wd) => (
               <div key={wd} className={calendarWeekdayClasses} role="columnheader">
@@ -422,8 +426,8 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
             ))}
           </div>
           {weeks.map((week, wi) => (
-            <div key={wi} className="grid grid-cols-8" role="row">
-              <div className={calendarWeekdayClasses} data-week-number="">
+            <div key={wi} className={getCalendarWeekGridClasses(fullscreen)} role="row">
+              <div className={getCalendarWeekNumberClasses(fullscreen)} data-week-number="">
                 {calendarWeekNumber(week[0], weekStartsOn)}
               </div>
               {week.map((date) => {
@@ -460,8 +464,31 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                   extra.events.length,
                   labels.eventCountText
                 )
+                const cellBody =
+                  customCell || eventTitles.length > 0 ? (
+                    <div className={calendarDateCellBodyClasses}>
+                      {customCell ? (
+                        <div className="w-full min-w-0 truncate">
+                          {customCell as React.ReactNode}
+                        </div>
+                      ) : null}
+                      {eventTitles.length > 0 ? (
+                        <ul className="m-0 w-full min-w-0 list-none p-0">
+                          {extra.events.map((event, index) =>
+                            event.title ? (
+                              <li
+                                key={event.key ?? `${extra.iso}-title-${index}`}
+                                className={calendarDateCellTitleClasses}>
+                                {event.title}
+                              </li>
+                            ) : null
+                          )}
+                        </ul>
+                      ) : null}
+                    </div>
+                  ) : null
                 return (
-                  <div key={iso} className="flex min-w-0 flex-col items-stretch">
+                  <div key={iso} className={getCalendarDateCellClasses(fullscreen)}>
                     <button
                       type="button"
                       role="gridcell"
@@ -499,16 +526,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                         </span>
                       ) : null}
                     </button>
-                    {customCell ? <div>{customCell as React.ReactNode}</div> : null}
-                    {eventTitles.length > 0 ? (
-                      <ul className="m-0 list-none p-0 text-[10px] leading-tight text-[var(--tiger-text)]">
-                        {extra.events.map((event, index) =>
-                          event.title ? (
-                            <li key={event.key ?? `${extra.iso}-title-${index}`}>{event.title}</li>
-                          ) : null
-                        )}
-                      </ul>
-                    ) : null}
+                    {cellBody}
                   </div>
                 )
               })}

@@ -13,17 +13,30 @@ export const notificationCenterUnreadDotClasses =
 export const notificationCenterTimeClasses =
   'text-[11px] text-[var(--tiger-text-secondary)] font-medium whitespace-nowrap flex-shrink-0 self-center'
 export const notificationCenterReadDescriptionClasses = 'text-[var(--tiger-text-secondary)]'
-export const notificationCenterUnreadDescriptionClasses =
-  'text-[var(--tiger-text-secondary)]'
+export const notificationCenterUnreadDescriptionClasses = 'text-[var(--tiger-text-secondary)]'
 export const notificationCenterItemActionClasses =
   'tiger-motion-aware rounded-full px-2.5 py-1 text-[11px] font-semibold bg-[var(--tiger-surface-muted)] hover:bg-[var(--tiger-ghost-bg-hover)] text-[var(--tiger-text-secondary)] border-0 flex-shrink-0 self-center [transition:var(--tiger-transition-base)]'
 export const notificationCenterEmptyIconWrapperClasses =
   'p-3.5 bg-[var(--tiger-surface-muted)] rounded-full mb-3 shadow-inner'
 export const notificationCenterEmptyIconClasses =
   'tiger-motion-aware w-8 h-8 text-[var(--tiger-text-secondary)] animate-pulse'
-export const notificationCenterEmptyTextClasses =
-  'font-semibold text-[var(--tiger-text-secondary)]'
+export const notificationCenterEmptyTextClasses = 'font-semibold text-[var(--tiger-text-secondary)]'
 export const notificationCenterLoadingClasses = 'text-[var(--tiger-primary)] font-medium'
+
+/**
+ * One bleed that cancels the card padding. The mask is a sibling of the list
+ * inside this shell, so `inset-0` covers the rows instead of the padded box
+ * the negative margin used to overflow.
+ */
+export const notificationCenterListShellClasses = 'relative -mx-4 -mb-4'
+
+/**
+ * Opaque surface scrim. `bg-[var(--tiger-surface)]/70` does not mix alpha onto
+ * a CSS variable, so the list stayed fully visible and received clicks above
+ * the unlayered spinner.
+ */
+export const notificationCenterLoadingOverlayClasses =
+  'pointer-events-auto absolute inset-0 z-20 flex items-center justify-center bg-[color-mix(in_srgb,var(--tiger-surface)_92%,transparent)]'
 export const notificationCenterCardClasses =
   'tiger-motion-aware w-full rounded-[var(--tiger-radius-xl)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] shadow-[var(--tiger-shadow-lg)] [transition:var(--tiger-transition-base)] overflow-hidden'
 export const notificationCenterTitleClasses = 'text-[var(--tiger-text)]'

@@ -34,6 +34,13 @@ describe('CommentThread (Vue)', () => {
 
     expect(screen.getByText('Root comment')).toBeInTheDocument()
     expect(screen.getByText('Child reply')).toBeInTheDocument()
+    const root = screen.getByText('Root comment').closest('article')
+    const reply = screen.getByText('Child reply').closest('article')
+    expect(root?.className).not.toContain('border-b')
+    expect(reply?.className).toContain('border-s-2')
+    expect(reply?.getAttribute('style') ?? '').toContain(
+      'calc(1 * var(--tiger-comment-reply-indent))'
+    )
   })
 
   it('emits update:expandedKeys when toggling replies', async () => {

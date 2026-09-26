@@ -36,6 +36,8 @@ import {
   notificationCenterEmptyIconClasses,
   notificationCenterEmptyTextClasses,
   notificationCenterLoadingClasses,
+  notificationCenterListShellClasses,
+  notificationCenterLoadingOverlayClasses,
   notificationCenterCardClasses,
   notificationCenterTitleClasses,
   notificationCenterUnreadBadgeClasses,
@@ -403,38 +405,34 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const renderNotificationScroller = (listItems: NotificationItem[]) => {
     if (compositeListUsesWindow(listItems.length)) {
       return (
-        <div className="-mx-4 -mb-4">
-          <VirtualList
-            data-tiger-notification-window=""
-            itemCount={listItems.length}
-            estimatedItemHeight={COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT}
-            height={COMPOSITE_LIST_VIEWPORT}
-            getItemKey={(index) => notificationItemKey(listItems[index]?.id ?? index)}
-            renderItem={({ index }) => renderItem(listItems[index], index)}
-            role="list"
-          />
-        </div>
+        <VirtualList
+          data-tiger-notification-window=""
+          itemCount={listItems.length}
+          estimatedItemHeight={COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT}
+          height={COMPOSITE_LIST_VIEWPORT}
+          getItemKey={(index) => notificationItemKey(listItems[index]?.id ?? index)}
+          renderItem={({ index }) => renderItem(listItems[index], index)}
+          role="list"
+        />
       )
     }
-    return <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">{renderList(listItems)}</div>
+    return <div className="max-h-[380px] overflow-y-auto">{renderList(listItems)}</div>
   }
 
   const listBody = shouldUseNotificationTabs(groups, groupBy) ? (
     resolvedGroups.length > 0 ? (
-      <div className="-mx-4 -mb-4">
-        <Tabs
-          type="line"
-          size="sm"
-          swipeable={false}
-          activeKey={currentGroupKey}
-          onChange={handleGroupChange}>
-          {groupTabData.map((tab) => (
-            <TabPane key={String(tab.key)} tabKey={tab.key} label={tab.label}>
-              {tab.key === currentGroupKey ? renderNotificationScroller(tab.filteredItems) : null}
-            </TabPane>
-          ))}
-        </Tabs>
-      </div>
+      <Tabs
+        type="line"
+        size="sm"
+        swipeable={false}
+        activeKey={currentGroupKey}
+        onChange={handleGroupChange}>
+        {groupTabData.map((tab) => (
+          <TabPane key={String(tab.key)} tabKey={tab.key} label={tab.label}>
+            {tab.key === currentGroupKey ? renderNotificationScroller(tab.filteredItems) : null}
+          </TabPane>
+        ))}
+      </Tabs>
     ) : (
       renderNotificationScroller([])
     )
@@ -451,10 +449,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
       </div>
     ) : (
-      <div className="relative" aria-busy={loading || undefined} inert={loading || undefined}>
-        {listBody}
+      <div className={notificationCenterListShellClasses}>
+        <div aria-busy={loading || undefined} inert={loading || undefined}>
+          {listBody}
+        </div>
         {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface)]/70">
+          <div className={notificationCenterLoadingOverlayClasses}>
             <Loading text={resolvedLoadingText} className={notificationCenterLoadingClasses} />
           </div>
         ) : null}

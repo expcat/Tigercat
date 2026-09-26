@@ -14,6 +14,7 @@ import { cloneFormValues, getValueByPath, setValueByPath } from './form-validati
 import type {
   FormConditions,
   FormFieldCondition,
+  FormLabelPosition,
   FormRule,
   FormRules,
   FormValues
@@ -73,6 +74,60 @@ const SPAN_CLASSES: Record<1 | 2 | 3, string> = {
   3: 'sm:col-span-2 lg:col-span-3'
 }
 
+const FIELD_GAP_CLASSES = 'gap-x-[var(--tiger-spacing-lg)] gap-y-[var(--tiger-spacing-lg)]'
+
+/** One label track + one control track, repeated per field column. */
+const ALIGNED_COLUMN_CLASSES: Record<1 | 2 | 3, Record<'left' | 'right', string>> = {
+  1: {
+    left: 'grid-cols-[max-content_minmax(0,1fr)]',
+    right: 'grid-cols-[minmax(0,1fr)_max-content]'
+  },
+  2: {
+    left: 'grid-cols-[max-content_minmax(0,1fr)] sm:grid-cols-[max-content_minmax(0,1fr)_max-content_minmax(0,1fr)]',
+    right:
+      'grid-cols-[minmax(0,1fr)_max-content] sm:grid-cols-[minmax(0,1fr)_max-content_minmax(0,1fr)_max-content]'
+  },
+  3: {
+    left: 'grid-cols-[max-content_minmax(0,1fr)] sm:grid-cols-[max-content_minmax(0,1fr)_max-content_minmax(0,1fr)] lg:grid-cols-[max-content_minmax(0,1fr)_max-content_minmax(0,1fr)_max-content_minmax(0,1fr)]',
+    right:
+      'grid-cols-[minmax(0,1fr)_max-content] sm:grid-cols-[minmax(0,1fr)_max-content_minmax(0,1fr)_max-content] lg:grid-cols-[minmax(0,1fr)_max-content_minmax(0,1fr)_max-content_minmax(0,1fr)_max-content]'
+  }
+}
+
+/** Field span measured in label+control pairs, so each step is two tracks. */
+const ALIGNED_SPAN_CLASSES: Record<1 | 2 | 3, string> = {
+  1: 'col-span-2',
+  2: 'col-span-2 sm:col-span-4',
+  3: 'col-span-2 sm:col-span-4 lg:col-span-6'
+}
+
+const ALIGNED_LABEL_LEFT_CLASSES =
+  '[&_.tiger-form-item__label]:col-start-1 [&_.tiger-form-item__label]:col-end-2 [&_.tiger-form-item__label]:row-start-1 [&_.tiger-form-item__content]:col-start-2 [&_.tiger-form-item__content]:col-end-[-1] [&_.tiger-form-item__content]:row-start-1'
+
+const ALIGNED_LABEL_RIGHT_CLASSES =
+  '[&_.tiger-form-item__label]:col-start-[-2] [&_.tiger-form-item__label]:col-end-[-1] [&_.tiger-form-item__label]:row-start-1 [&_.tiger-form-item__content]:col-start-1 [&_.tiger-form-item__content]:col-end-[-2] [&_.tiger-form-item__content]:row-start-1'
+
+/**
+ * Horizontal labels share one max-content track via subgrid, so controls line up.
+ * `top` keeps the stacked field grid. Omitted position matches Form's `left` default.
+ */
+export function schemaFormUsesLabelColumns(labelPosition?: FormLabelPosition): boolean {
+  return labelPosition !== 'top'
+}
+
+export const schemaFormLabelColumnFieldStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'subgrid'
+} as const
+
+export const schemaFormLabelColumnItemStyle = {
+  display: 'grid',
+  gridTemplateColumns: 'subgrid',
+  gridColumn: '1 / -1',
+  margin: 0,
+  alignItems: 'start'
+} as const
+
 export function clampSchemaFormColumns(value: number | undefined): 1 | 2 | 3 {
   if (value === 2 || value === 3) return value
   return 1
@@ -85,13 +140,33 @@ export function clampSchemaFormSpan(span: number | undefined, columns: 1 | 2 | 3
   return 1
 }
 
-export function getSchemaFormFieldsClasses(columns: 1 | 2 | 3): string {
-  return classNames('tiger-schema-form__fields grid gap-x-4 gap-y-0', COLUMN_CLASSES[columns])
+export function getSchemaFormFieldsClasses(
+  columns: 1 | 2 | 3,
+  labelPosition?: FormLabelPosition
+): string {
+  const aligned = schemaFormUsesLabelColumns(labelPosition)
+  const side = labelPosition === 'right' ? 'right' : 'left'
+  return classNames(
+    'tiger-schema-form__fields grid min-w-0 items-start',
+    FIELD_GAP_CLASSES,
+    aligned ? ALIGNED_COLUMN_CLASSES[columns][side] : COLUMN_CLASSES[columns]
+  )
 }
 
-export function getSchemaFormFieldSpanClasses(span: 1 | 2 | 3, columns: 1 | 2 | 3): string {
+export function getSchemaFormFieldSpanClasses(
+  span: 1 | 2 | 3,
+  columns: 1 | 2 | 3,
+  labelPosition?: FormLabelPosition
+): string {
   const clamped = clampSchemaFormSpan(span, columns)
-  return classNames('tiger-schema-form__field min-w-0', SPAN_CLASSES[clamped])
+  if (!schemaFormUsesLabelColumns(labelPosition)) {
+    return classNames('tiger-schema-form__field min-w-0', SPAN_CLASSES[clamped])
+  }
+  return classNames(
+    'tiger-schema-form__field min-w-0',
+    ALIGNED_SPAN_CLASSES[clamped],
+    labelPosition === 'right' ? ALIGNED_LABEL_RIGHT_CLASSES : ALIGNED_LABEL_LEFT_CLASSES
+  )
 }
 
 export function isSchemaFormWidgetType(value: unknown): value is SchemaFormWidgetType {

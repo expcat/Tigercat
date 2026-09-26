@@ -168,6 +168,36 @@ describe('Calendar', () => {
     expect(cell.querySelector('[aria-hidden="true"]')).not.toBeNull()
   })
 
+  it('keeps a fullscreen month grid stable around week numbers and custom cells', () => {
+    const { container } = render({
+      setup() {
+        return () =>
+          h(ConfigProvider, { locale: zhCN }, () =>
+            h(
+              Calendar,
+              {
+                fullscreen: true,
+                modelValue: testDate,
+                now,
+                events: [{ title: 'Ship', date: '2024-06-15' }]
+              },
+              {
+                dateCell: () => '1'
+              }
+            )
+          )
+      }
+    })
+    expect(screen.getByRole('columnheader', { name: '周' })).toBeInTheDocument()
+    expect(container.querySelector('[data-tiger="calendar"]')?.className).toContain('w-full')
+    expect(container.querySelector('[data-tiger="calendar"]')?.className).not.toContain('w-72')
+    const cell = dayButton('2024-06-15').parentElement
+    expect(cell?.className).toContain('h-[4.5rem]')
+    expect(cell?.className).toContain('overflow-hidden')
+    expect(cell?.textContent).toContain('1')
+    expect(cell?.textContent).toContain('Ship')
+  })
+
   it('uses the dateCell slot instead of default dots', () => {
     render(Calendar, {
       props: {

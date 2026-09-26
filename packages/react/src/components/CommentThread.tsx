@@ -40,7 +40,9 @@ import {
   commentThreadReplyButtonClasses,
   commentThreadNeutralButtonClasses,
   commentThreadLikeIconClasses,
-  commentThreadDividerClasses,
+  commentThreadListClasses,
+  getCommentThreadItemClasses,
+  getCommentThreadItemStyle,
   commentThreadAvatarClasses,
   commentThreadAuthorClasses,
   commentThreadUserTitleClasses,
@@ -136,7 +138,6 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   const [replyInFlight, setReplyInFlight] = useState(false)
   const [documentTimeZone, setDocumentTimeZone] = useState<string | null>(timeZone ?? null)
   const flightRef = useRef(createInfiniteScrollFlight())
-  const wasLoadingRef = useRef(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<VirtualListHandle | null>(null)
   const onLoadRootRef = useRef(onLoadRoot)
@@ -253,7 +254,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     return into
   }, [resolvedNodes])
 
-  const renderNode = (node: CommentNode, depth: number, isLast: boolean) => {
+  const renderNode = (node: CommentNode, depth: number, hasPreviousRoot: boolean) => {
     const children = node.children ?? []
     const hasChildren = children.length > 0 || clippedIds.has(node.id)
     const isExpanded = expandedSet.has(node.id)
@@ -396,11 +397,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       <article
         key={node.id}
         id={articleId}
-        className={classNames(
-          'tiger-comment-thread-item',
-          depth === 1 && 'py-5',
-          depth === 1 && !isLast && showDivider && commentThreadDividerClasses
-        )}
+        className={getCommentThreadItemClasses({
+          depth,
+          showDivider,
+          hasPreviousRoot
+        })}
+        style={getCommentThreadItemStyle(depth)}
         aria-posinset={posinset}
         aria-setsize={positionMap.size}>
         <div className="flex gap-3">
@@ -636,7 +638,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
 
   return (
     <div
-      className={classNames('tiger-comment-thread flex flex-col', className)}
+      className={classNames(
+        'tiger-comment-thread flex flex-col',
+        commentThreadListClasses,
+        className
+      )}
       role="region"
       data-tiger-comment-thread
       aria-label={
@@ -711,7 +717,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           renderItem={({ index }) => {
             const entry = flatComments[index]
             return entry
-              ? renderNode(entry.node, entry.depth, index === flatComments.length - 1)
+              ? renderNode(
+                  entry.node,
+                  entry.depth,
+                  entry.depth === 1 && flatComments.slice(0, index).some((item) => item.depth === 1)
+                )
               : null
           }}
           role="presentation"
@@ -726,7 +736,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
               (divProps['aria-labelledby'] ? undefined : labels.listAriaLabel)
             }>
             {flatComments.map(({ node, depth }, index) =>
-              renderNode(node, depth, index === flatComments.length - 1)
+              renderNode(
+                node,
+                depth,
+                depth === 1 && flatComments.slice(0, index).some((item) => item.depth === 1)
+              )
             )}
           </div>
           {pageSentinel}

@@ -4,7 +4,6 @@ import {
   ref,
   watch,
   onMounted,
-  getCurrentInstance,
   PropType,
   h
 } from 'vue'
@@ -48,6 +47,8 @@ import {
   notificationCenterEmptyIconClasses,
   notificationCenterEmptyTextClasses,
   notificationCenterLoadingClasses,
+  notificationCenterListShellClasses,
+  notificationCenterLoadingOverlayClasses,
   notificationCenterCardClasses,
   notificationCenterTitleClasses,
   notificationCenterUnreadBadgeClasses,
@@ -193,8 +194,6 @@ export const NotificationCenter = defineComponent({
     'item-read-change'
   ],
   setup(props, { emit, attrs }) {
-    const instance = getCurrentInstance()
-    const vnodeProps = () => (instance?.vnode.props ?? {}) as Record<string, unknown>
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const documentTimeZone = ref<string | null>(props.timeZone ?? null)
@@ -610,24 +609,22 @@ export const NotificationCenter = defineComponent({
 
     const renderNotificationScroller = (items: NotificationItem[]) => {
       if (compositeListUsesWindow(items.length)) {
-        return h('div', { class: '-mx-4 -mb-4' }, [
-          h(
-            VirtualList,
-            {
-              'data-tiger-notification-window': '',
-              itemCount: items.length,
-              estimatedItemHeight: COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
-              height: COMPOSITE_LIST_VIEWPORT,
-              getItemKey: (index: number) => notificationItemKey(items[index]?.id ?? index),
-              role: 'list'
-            },
-            {
-              default: ({ index }: { index: number }) => renderListItem(items[index], index)
-            }
-          )
-        ])
+        return h(
+          VirtualList,
+          {
+            'data-tiger-notification-window': '',
+            itemCount: items.length,
+            estimatedItemHeight: COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
+            height: COMPOSITE_LIST_VIEWPORT,
+            getItemKey: (index: number) => notificationItemKey(items[index]?.id ?? index),
+            role: 'list'
+          },
+          {
+            default: ({ index }: { index: number }) => renderListItem(items[index], index)
+          }
+        )
       }
-      return h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [renderList(items)])
+      return h('div', { class: 'max-h-[380px] overflow-y-auto' }, [renderList(items)])
     }
 
     const renderTabs = () =>
@@ -714,7 +711,7 @@ export const NotificationCenter = defineComponent({
 
       const listBody = shouldUseNotificationTabs(props.groups, props.groupBy)
         ? resolvedGroups.value.length > 0
-          ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])
+          ? renderTabs()
           : renderNotificationScroller([])
         : renderNotificationScroller(filteredFlatItems.value)
       const hasList = shouldUseNotificationTabs(props.groups, props.groupBy)
@@ -728,32 +725,30 @@ export const NotificationCenter = defineComponent({
                 class: notificationCenterLoadingClasses
               })
             ])
-          : h(
-              'div',
-              {
-                class: 'relative',
-                'aria-busy': props.loading ? 'true' : undefined,
-                inert: props.loading ? true : undefined
-              },
-              [
-                listBody,
-                props.loading
-                  ? h(
-                      'div',
-                      {
-                        class:
-                          'absolute inset-0 flex items-center justify-center bg-[var(--tiger-surface)]/70'
-                      },
-                      [
-                        h(Loading, {
-                          text: resolveLocaleText(labels.value.loadingText, props.loadingText),
-                          class: notificationCenterLoadingClasses
-                        })
-                      ]
-                    )
-                  : null
-              ]
-            )
+          : h('div', { class: notificationCenterListShellClasses }, [
+              h(
+                'div',
+                {
+                  'aria-busy': props.loading ? 'true' : undefined,
+                  inert: props.loading ? true : undefined
+                },
+                [listBody]
+              ),
+              props.loading
+                ? h(
+                    'div',
+                    {
+                      class: notificationCenterLoadingOverlayClasses
+                    },
+                    [
+                      h(Loading, {
+                        text: resolveLocaleText(labels.value.loadingText, props.loadingText),
+                        class: notificationCenterLoadingClasses
+                      })
+                    ]
+                  )
+                : null
+            ])
 
       const ariaLabel =
         (attrs['aria-label'] as string | undefined) ??

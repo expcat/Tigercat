@@ -48,6 +48,12 @@ describe('SchemaForm (Vue)', () => {
     expect(screen.getByLabelText(/Bio/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
+    const fields = document.querySelector('.tiger-schema-form__fields')
+    expect(fields?.className).toContain('gap-y-[var(--tiger-spacing-lg)]')
+    expect(fields?.className).toContain('max-content')
+    const item = document.querySelector('.tiger-form-item') as HTMLElement | null
+    expect(item?.style.display).toBe('grid')
+    expect(item?.style.gridTemplateColumns).toBe('subgrid')
   })
 
   it('edits a field and emits the form model', async () => {

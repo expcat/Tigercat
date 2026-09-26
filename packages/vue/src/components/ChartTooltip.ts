@@ -4,8 +4,10 @@ import {
   coerceClassValue,
   chartTooltipBaseClasses,
   chartTooltipLines,
+  chartTooltipViewport,
   getChartTooltipTransform,
   isBrowser,
+  mapChartTooltipPointToDocument,
   registerEscapeDismiss,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
@@ -58,32 +60,31 @@ export const ChartTooltip = defineComponent({
       mounted.value = true
     })
 
+    const placeTooltip = () => {
+      const node = tooltipRef.value
+      const host = node?.ownerDocument ?? target.value?.ownerDocument ?? document
+      const point = mapChartTooltipPointToDocument({ x: props.x, y: props.y }, document, host)
+      const rect = node ? node.getBoundingClientRect() : { width: 0, height: 0 }
+      return resolveChartTooltipPosition({
+        x: point.x,
+        y: point.y,
+        rect,
+        viewport: chartTooltipViewport(host)
+      })
+    }
+
     watch(
-      () => [props.x, props.y, props.open, props.content] as const,
+      () => [props.x, props.y, props.open, props.content, mounted.value, target.value] as const,
       (_value, _oldValue, onCleanup) => {
         if (!props.open || !isBrowser()) return
 
-        const initialPosition = resolveChartTooltipPosition({
-          x: props.x,
-          y: props.y,
-          rect: { width: 0, height: 0 },
-          viewport: { width: window.innerWidth, height: window.innerHeight }
-        })
+        adjustedPosition.value = placeTooltip()
 
         const frameHandle = requestAnimationFrame(() => {
           if (!tooltipRef.value) return
-
-          const rect = tooltipRef.value.getBoundingClientRect()
-          adjustedPosition.value = resolveChartTooltipPosition({
-            x: props.x,
-            y: props.y,
-            rect,
-            viewport: { width: window.innerWidth, height: window.innerHeight }
-          })
+          adjustedPosition.value = placeTooltip()
         })
         onCleanup(() => cancelAnimationFrame(frameHandle))
-
-        adjustedPosition.value = initialPosition
       },
       { immediate: true }
     )
@@ -141,9 +142,7 @@ export const ChartTooltip = defineComponent({
 
       return [
         h('span', { ref: anchorRef, hidden: true }),
-        tooltip
-          ? renderVueOverlayTeleport(tooltip, mounted.value ? target.value : null)
-          : null
+        tooltip ? renderVueOverlayTeleport(tooltip, mounted.value ? target.value : null) : null
       ]
     }
   }
