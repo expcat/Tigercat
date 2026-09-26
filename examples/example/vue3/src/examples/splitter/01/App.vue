@@ -12,8 +12,8 @@ const sizes = ref<(number | string)[]>(['30%', '70%'])
       orientation="horizontal"
       :gutter-size="6"
       style="height: 200px; border: 1px solid var(--tiger-border); border-radius: 8px">
-      <div class="p-4">左侧 30%</div>
-      <div class="p-4">右侧 70%</div>
+      <div class="p-4">左侧 {{ sizes[0] }}</div>
+      <div class="p-4">右侧 {{ sizes[1] }}</div>
     </Splitter>
   </div>
 </template>

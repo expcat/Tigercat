@@ -269,6 +269,53 @@ describe('Splitter', () => {
   })
 
   describe('Parent writeback', () => {
+    it('writes percentage sizes back as percentages and refreshes pane labels', async () => {
+      function Host() {
+        const [sizes, setSizes] = useState<(number | string)[]>(['30%', '70%'])
+        return (
+          <Splitter sizes={sizes} onSizesChange={setSizes}>
+            <div>左侧 {sizes[0]}</div>
+            <div>右侧 {sizes[1]}</div>
+          </Splitter>
+        )
+      }
+      const { container } = render(<Host />)
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(240, 0)
+      fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      expect(container.textContent).toContain('左侧 31.25%')
+      expect(container.textContent).toContain('右侧 68.75%')
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(250, 0)
+
+      stubElementSize(1604, 400)
+      act(() => {
+        MockResizeObserver.instances[0].trigger(1604, 400)
+      })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(500, 0)
+      })
+      expect(container.textContent).toContain('左侧 31.25%')
+    })
+
+    it('updates the bound labels when the gutter is dragged', () => {
+      function Host() {
+        const [sizes, setSizes] = useState<(number | string)[]>(['30%', '70%'])
+        return (
+          <Splitter sizes={sizes} onSizesChange={setSizes}>
+            <div>左侧 {sizes[0]}</div>
+            <div>右侧 {sizes[1]}</div>
+          </Splitter>
+        )
+      }
+      const { container } = render(<Host />)
+      const bar = gutter(container)
+      fireEvent.pointerDown(bar, { clientX: 240, button: 0, pointerId: 1 })
+      fireEvent.pointerMove(document, { clientX: 400, pointerId: 1 })
+      fireEvent.pointerUp(document, { clientX: 400, pointerId: 1 })
+      expect(container.textContent).toContain('左侧 50%')
+      expect(container.textContent).toContain('右侧 50%')
+      expect(container.textContent).not.toContain('左侧 30%')
+    })
+
     it('stays in sync when the parent writes sizes from onSizesChange', () => {
       function Host() {
         const [sizes, setSizes] = useState<(number | string)[]>([400, 400])

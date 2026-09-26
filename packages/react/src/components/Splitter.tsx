@@ -25,12 +25,14 @@ import {
   collapseSplitterSizes,
   feedbackLayoutLabels,
   layoutDeclaredPanes,
-  restoreSplitterSize,
   measureSplitterContainer,
   normalizeSplitterBounds,
+  parsePaneSize,
+  projectControlledPaneSizes,
   resizePanes,
   resolveSplitterSeparatorKey,
   serializePaneSizes,
+  splitterContentSize,
   splitterPaneBaseClasses,
   createDocumentDragSession,
   type DocumentDragSession,
@@ -50,7 +52,7 @@ export interface SplitterProps
   onResizeStart?: (event: SplitterResizeEvent) => void
   onResize?: (event: SplitterResizeEvent) => void
   onResizeEnd?: (event: SplitterResizeEvent) => void
-  onSizesChange?: (sizes: number[]) => void
+  onSizesChange?: (sizes: (number | string)[]) => void
   children?: React.ReactNode
   style?: React.CSSProperties
   collapsible?: boolean
@@ -105,6 +107,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
   const containerRef = useRef<HTMLDivElement | null>(null)
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const [containerSize, setContainerSize] = useState(0)
+  const containerSizeRef = useRef(0)
   const sizesKey = serializePaneSizes(controlledSizes)
   const [override, setOverride] = useState<{ key: string | undefined; pixels: number[] } | null>(
     null
@@ -154,7 +157,10 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
 
   const applyMeasure = useCallback(() => {
     const size = measureSplitterContainer(containerRef.current, orientation)
-    if (size > 0) setContainerSize(size)
+    if (size > 0) {
+      containerSizeRef.current = size
+      setContainerSize(size)
+    }
   }, [orientation])
 
   useLayoutEffect(() => {
@@ -182,13 +188,20 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
   const commitSizes = useCallback(
     (nextPixels: number[], index: number, phase: 'move' | 'end' | 'keyboard') => {
       setOverride({ key: sizesKey, pixels: nextPixels })
-      onSizesChange?.(nextPixels)
+      onSizesChange?.(
+        projectControlledPaneSizes(
+          controlledSizes,
+          nextPixels,
+          containerSizeRef.current,
+          gutterSize
+        )
+      )
       onResize?.({ index, sizes: nextPixels })
       if (phase === 'end' || phase === 'keyboard') {
         onResizeEnd?.({ index, sizes: nextPixels })
       }
     },
-    [onResize, onResizeEnd, onSizesChange, sizesKey]
+    [controlledSizes, gutterSize, onResize, onResizeEnd, onSizesChange, sizesKey]
   )
 
   const pixelsFor = useCallback(
@@ -216,7 +229,10 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
       e.preventDefault()
       cleanupDragSession()
       const liveSize = measureSplitterContainer(containerRef.current, orientation)
-      if (liveSize > 0 && liveSize !== containerSize) setContainerSize(liveSize)
+      if (liveSize > 0) {
+        containerSizeRef.current = liveSize
+        if (liveSize !== containerSize) setContainerSize(liveSize)
+      }
       const startSizes = currentPixels(liveSize > 0 ? liveSize : containerSize)
       draggingRef.current = {
         index,
@@ -337,20 +353,35 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
                       : feedbackLayoutLabels.splitterCollapse
                   }
                   onClick={() => {
+                    const available = splitterContentSize(containerSize, paneCount, gutterSize)
                     const base = (dragPixels ?? controlledSizes ?? panePixels).slice()
                     const stored = collapsedPrevious[i]
-                    const nextSizes =
-                      stored == null
-                        ? collapseSplitterSizes(base, i).sizes
-                        : restoreSplitterSize(base, i, stored)
-                    setCollapsedPrevious((current) => {
-                      const copy = current.slice()
-                      copy[i] = stored == null ? collapseSplitterSizes(base, i).previous : null
-                      return copy
-                    })
-                    const numeric = nextSizes.map((size) => (typeof size === 'number' ? size : 0))
-                    setOverride({ key: sizesKey, pixels: numeric })
-                    onSizesChange?.(numeric)
+                    const nextPixels = base.map((size) => parsePaneSize(size, available))
+                    if (stored == null) {
+                      const collapsed = collapseSplitterSizes(base, i)
+                      nextPixels[i] = 0
+                      setCollapsedPrevious((current) => {
+                        const copy = current.slice()
+                        copy[i] = collapsed.previous
+                        return copy
+                      })
+                    } else {
+                      nextPixels[i] = parsePaneSize(stored, available)
+                      setCollapsedPrevious((current) => {
+                        const copy = current.slice()
+                        copy[i] = null
+                        return copy
+                      })
+                    }
+                    setOverride({ key: sizesKey, pixels: nextPixels })
+                    onSizesChange?.(
+                      projectControlledPaneSizes(
+                        controlledSizes,
+                        nextPixels,
+                        containerSize,
+                        gutterSize
+                      )
+                    )
                   }}>
                   {collapsedPrevious[i] != null
                     ? feedbackLayoutLabels.splitterExpand

@@ -13,7 +13,7 @@ description: Compact generated Tigercat Layout props reference
 
 `packages/core/src/types/splitter.ts` · `SplitterProps` · 4/10 props
 
-Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值不会清拖拽）；百分比跟容器走。水平几何读 `dir`。gutter 是带名字的 `separator`。
+Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值不会清拖拽）；百分比跟容器走。拖动 gutter 经 `update:sizes` / `onSizesChange` 回写，并保持各 pane 的单位（百分比仍是百分比，像素仍是像素），比例继续跟容器走。`resize` 事件里的 sizes 是像素。水平几何读 `dir`。gutter 是带名字的 `separator`。
 
 | Prop          | Type                   | Default | Notes                                                                                      |
 | ------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------ |

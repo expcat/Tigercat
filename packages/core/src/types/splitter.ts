@@ -21,8 +21,11 @@ export interface SplitterProps {
    * Numbers are pixels. `'30%'` is a percent of available space (container minus gutters).
    * `'200px'` and bare numeric strings (`'250'`) are pixels.
    * Passed `sizes` is controlled by value (not array identity): the same numbers
-   * or percents must not reset a drag. Omit to stay uncontrolled; dropping
-   * `sizes` keeps the last ratios instead of equal-splitting.
+   * or percents must not reset a drag. A drag writes sizes back in the same unit:
+   * a percentage stays a percentage of the content box (container minus gutters),
+   * and a pixel size stays pixels, so the ratio still follows the container.
+   * Omit to stay uncontrolled; dropping `sizes` keeps the last ratios instead of
+   * equal-splitting.
    */
   sizes?: (number | string)[]
   /**

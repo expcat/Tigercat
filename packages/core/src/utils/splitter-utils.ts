@@ -383,9 +383,10 @@ export interface SplitterPaneBox {
   flexGrow: number
 }
 
-export function classifySplitterSize(
-  size: number | string | undefined
-): { kind: SplitterPaneKind; amount: number } {
+export function classifySplitterSize(size: number | string | undefined): {
+  kind: SplitterPaneKind
+  amount: number
+} {
   if (size === undefined) return { kind: 'flex', amount: 1 }
   if (typeof size === 'number') {
     if (!Number.isFinite(size)) return { kind: 'flex', amount: 1 }
@@ -442,7 +443,9 @@ export function layoutDeclaredPanes(
   maxes: Array<number | undefined> = []
 ): SplitterPaneBox[] {
   if (paneCount <= 0) return []
-  const specs = Array.from({ length: paneCount }, (_, index) => classifySplitterSize(sizes?.[index]))
+  const specs = Array.from({ length: paneCount }, (_, index) =>
+    classifySplitterSize(sizes?.[index])
+  )
   if (!(containerSize > 0)) {
     return specs.map((spec) => {
       if (spec.kind === 'fixed') {
@@ -460,7 +463,7 @@ export function layoutDeclaredPanes(
     })
   }
 
-  const available = containerSize - Math.max(0, paneCount - 1) * gutterSize
+  const available = splitterContentSize(containerSize, paneCount, gutterSize)
   if (available <= 0) {
     return specs.map((spec) => ({ kind: spec.kind, pixels: 0, flexGrow: 0 }))
   }
@@ -469,7 +472,11 @@ export function layoutDeclaredPanes(
   const minSum = paneMins.reduce((total, value) => total + value, 0)
   if (minSum > available) {
     const scaled = scaleToAvailable(paneMins, available)
-    return specs.map((spec, index) => ({ kind: spec.kind, pixels: scaled[index] ?? 0, flexGrow: 0 }))
+    return specs.map((spec, index) => ({
+      kind: spec.kind,
+      pixels: scaled[index] ?? 0,
+      flexGrow: 0
+    }))
   }
 
   const desired = specs.map((spec) => {
@@ -522,7 +529,10 @@ export function layoutDeclaredPanes(
   }))
 }
 
-export function getPaneStyle(box: SplitterPaneBox, direction: SplitDirection): Record<string, string> {
+export function getPaneStyle(
+  box: SplitterPaneBox,
+  direction: SplitDirection
+): Record<string, string> {
   const prop = direction === 'horizontal' ? 'width' : 'height'
   if (box.pixels != null) {
     return {
@@ -580,8 +590,7 @@ export function jumpSplitterGutter(
   const leftMin = mins[left] ?? 0
   const rightMin = mins[right] ?? 0
   const leftMax = maxes[left]
-  let newLeft =
-    edge === 'start' ? leftMin : (leftMax ?? Math.max(leftMin, pair - rightMin))
+  let newLeft = edge === 'start' ? leftMin : (leftMax ?? Math.max(leftMin, pair - rightMin))
   newLeft = clampPaneSize(newLeft, leftMin, leftMax)
   let newRight = clampPaneSize(pair - newLeft, rightMin, maxes[right])
   newLeft = clampPaneSize(pair - newRight, leftMin, leftMax)
@@ -598,6 +607,71 @@ export function sizesToPercentages(sizes: number[]): number[] {
   const total = sizes.reduce((a, b) => a + b, 0)
   if (total === 0) return sizes.map(() => 0)
   return sizes.map((s) => (s / total) * 100)
+}
+
+/** Content box used for percentage panes: container minus gutters. */
+export function splitterContentSize(
+  containerSize: number,
+  paneCount: number,
+  gutterSize: number
+): number {
+  if (!(containerSize > 0) || paneCount <= 0) return 0
+  return Math.max(0, containerSize - Math.max(0, paneCount - 1) * gutterSize)
+}
+
+const CONTROLLED_PERCENT_SCALE = 1000
+
+function formatControlledPercent(value: number): string {
+  const safe = Number.isFinite(value) ? Math.max(0, value) : 0
+  const rounded = Math.round(safe * CONTROLLED_PERCENT_SCALE) / CONTROLLED_PERCENT_SCALE
+  return `${Object.is(rounded, -0) ? 0 : rounded}%`
+}
+
+function rebalancePercentSizes(values: string[]): string[] {
+  const numbers = values.map((value) => Number.parseFloat(value))
+  const sum = numbers.reduce((total, value) => total + value, 0)
+  const drift = Math.round((100 - sum) * CONTROLLED_PERCENT_SCALE) / CONTROLLED_PERCENT_SCALE
+  if (drift === 0) return values
+  const next = values.slice()
+  const last = numbers.length - 1
+  next[last] = formatControlledPercent(numbers[last] + drift)
+  return next
+}
+
+/**
+ * Map resolved pane pixels back onto the controlled `sizes` declaration.
+ * Percentage panes stay percentages of the content box, so a v-model write
+ * keeps following the container. Pixel numbers stay numbers. `'200px'` and
+ * bare numeric strings stay strings. Unmeasured containers return the pixels.
+ */
+export function projectControlledPaneSizes(
+  declared: Array<number | string | undefined> | undefined,
+  pixels: number[],
+  containerSize: number,
+  gutterSize: number
+): (number | string)[] {
+  const available = splitterContentSize(containerSize, pixels.length, gutterSize)
+  if (!declared || declared.length === 0 || !(available > 0)) return pixels.slice()
+
+  const projected = pixels.map((px, index) => {
+    if (index >= declared.length) return px
+    const spec = declared[index]
+    if (spec === undefined) return px
+    if (isPercentagePaneSize(spec)) return formatControlledPercent((px / available) * 100)
+    if (typeof spec === 'string') {
+      const trimmed = spec.trim()
+      return trimmed.endsWith('px') ? `${px}px` : String(px)
+    }
+    return px
+  })
+
+  const pixelSum = pixels.reduce((total, value) => total + value, 0)
+  const fillsContent = Math.abs(pixelSum - available) <= 0.5
+  const allPercent =
+    projected.length === declared.length &&
+    projected.every((value) => typeof value === 'string' && isPercentagePaneSize(value))
+  if (!fillsContent || !allPercent) return projected
+  return rebalancePercentSizes(projected as string[])
 }
 
 export function panePixelsToRatios(sizes: number[]): number[] {

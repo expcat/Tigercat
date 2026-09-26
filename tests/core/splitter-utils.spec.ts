@@ -17,7 +17,9 @@ import {
   getSplitterPointerDelta,
   getSplitterKeyboardDelta,
   panePixelsToRatios,
+  projectControlledPaneSizes,
   serializePaneSizes,
+  splitterContentSize,
   splitterBaseClasses,
   splitterHorizontalClasses,
   splitterVerticalClasses,
@@ -388,6 +390,48 @@ describe('splitter-utils', () => {
       const dropped = reconcileSplitterRatios(first, 2, undefined)
       expect(dropped.ratios[0]).toBeCloseTo(0.3)
       expect(dropped.sizesKey).toBeUndefined()
+    })
+  })
+
+  describe('projectControlledPaneSizes', () => {
+    it('measures the content box as container minus gutters', () => {
+      expect(splitterContentSize(804, 2, 4)).toBe(800)
+      expect(splitterContentSize(0, 2, 4)).toBe(0)
+    })
+
+    it('keeps pixel numbers as pixels', () => {
+      expect(projectControlledPaneSizes([400, 400], [410, 390], 804, 4)).toEqual([410, 390])
+    })
+
+    it('writes a percentage drag back as percentages that sum to 100', () => {
+      expect(projectControlledPaneSizes(['30%', '70%'], [250, 550], 804, 4)).toEqual([
+        '31.25%',
+        '68.75%'
+      ])
+    })
+
+    it('does not stretch a collapsed pane to fill the content box', () => {
+      expect(projectControlledPaneSizes(['30%', '70%'], [0, 560], 804, 4)).toEqual(['0%', '70%'])
+    })
+
+    it('keeps px strings and bare numeric strings in their own unit', () => {
+      expect(projectControlledPaneSizes(['200px', '600px'], [250, 550], 804, 4)).toEqual([
+        '250px',
+        '550px'
+      ])
+      expect(projectControlledPaneSizes(['200', '600'], [250, 550], 804, 4)).toEqual(['250', '550'])
+    })
+
+    it('returns pixels until the container is measured', () => {
+      expect(projectControlledPaneSizes(['30%', '70%'], [240, 560], 0, 4)).toEqual([240, 560])
+    })
+
+    it('absorbs rounding drift into the last percentage pane', () => {
+      expect(projectControlledPaneSizes(['33%', '33%', '34%'], [1, 1, 1], 11, 4)).toEqual([
+        '33.333%',
+        '33.333%',
+        '33.334%'
+      ])
     })
   })
 

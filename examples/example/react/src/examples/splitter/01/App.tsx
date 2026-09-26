@@ -11,8 +11,8 @@ export default function App() {
       gutterSize={6}
       onSizesChange={setSizes}
       style={{ height: 200, border: '1px solid var(--tiger-border)', borderRadius: 8 }}>
-      <div className="p-4">左侧 30%</div>
-      <div className="p-4">右侧 70%</div>
+      <div className="p-4">左侧 {sizes[0]}</div>
+      <div className="p-4">右侧 {sizes[1]}</div>
     </Splitter>
   )
 }

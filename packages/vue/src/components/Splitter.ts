@@ -18,13 +18,15 @@ import {
   collapseSplitterSizes,
   feedbackLayoutLabels,
   layoutDeclaredPanes,
-  restoreSplitterSize,
   measureSplitterContainer,
   mergeStyleValues,
   normalizeSplitterBounds,
+  parsePaneSize,
+  projectControlledPaneSizes,
   resizePanes,
   resolveSplitterSeparatorKey,
   serializePaneSizes,
+  splitterContentSize,
   splitterPaneBaseClasses,
   type DocumentDragSession,
   type SplitDirection
@@ -162,7 +164,10 @@ export const Splitter = defineComponent({
       phase: 'move' | 'end' | 'keyboard'
     ) => {
       override.value = { key: sizesKey.value, pixels: nextPixels }
-      emit('update:sizes', nextPixels)
+      emit(
+        'update:sizes',
+        projectControlledPaneSizes(props.sizes, nextPixels, containerSize.value, props.gutterSize)
+      )
       emit('resize', { index, sizes: nextPixels })
       if (phase === 'end' || phase === 'keyboard') {
         emit('resize-end', { index, sizes: nextPixels })
@@ -252,23 +257,25 @@ export const Splitter = defineComponent({
       if (root) root.getSizes = () => pixels.slice()
 
       const toggleCollapse = (index: number) => {
+        const available = splitterContentSize(containerSize.value, panes.length, props.gutterSize)
         const base = (dragPixels() ?? props.sizes ?? pixels).slice()
         const stored = collapsedPrevious.value[index]
-        const nextSizes =
-          stored == null
-            ? collapseSplitterSizes(base, index).sizes
-            : restoreSplitterSize(base, index, stored)
+        const nextPixels = base.map((size) => parsePaneSize(size, available))
         if (stored == null) {
           const collapsed = collapseSplitterSizes(base, index)
+          nextPixels[index] = 0
           collapsedPrevious.value = collapsedPrevious.value.slice()
           collapsedPrevious.value[index] = collapsed.previous
         } else {
+          nextPixels[index] = parsePaneSize(stored, available)
           collapsedPrevious.value = collapsedPrevious.value.slice()
           collapsedPrevious.value[index] = null
         }
-        const numeric = nextSizes.map((size) => (typeof size === 'number' ? size : 0))
-        override.value = { key: sizesKey.value, pixels: numeric }
-        emit('update:sizes', numeric)
+        override.value = { key: sizesKey.value, pixels: nextPixels }
+        emit(
+          'update:sizes',
+          projectControlledPaneSizes(props.sizes, nextPixels, containerSize.value, props.gutterSize)
+        )
       }
 
       panes.forEach((child, i) => {

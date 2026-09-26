@@ -230,6 +230,70 @@ describe('Splitter', () => {
   })
 
   describe('v-model:sizes', () => {
+    it('writes percentage sizes back as percentages and refreshes pane labels', async () => {
+      const sizes = ref<(number | string)[]>(['30%', '70%'])
+      const { container } = render({
+        setup() {
+          return () =>
+            h(
+              Splitter,
+              {
+                sizes: sizes.value,
+                'onUpdate:sizes': (next: (number | string)[]) => {
+                  sizes.value = next
+                }
+              },
+              () => [h('div', `左侧 ${sizes.value[0]}`), h('div', `右侧 ${sizes.value[1]}`)]
+            )
+        }
+      })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(240, 0)
+      })
+      await fireEvent.keyDown(gutter(container), { key: 'ArrowRight' })
+      expect(sizes.value).toEqual(['31.25%', '68.75%'])
+      expect(container.textContent).toContain('左侧 31.25%')
+      expect(container.textContent).toContain('右侧 68.75%')
+      expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(250, 0)
+
+      stubElementSize(1604, 400)
+      MockResizeObserver.instances[0].trigger(1604, 400)
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(500, 0)
+      })
+      expect(sizes.value).toEqual(['31.25%', '68.75%'])
+    })
+
+    it('updates the bound labels when the gutter is dragged', async () => {
+      const sizes = ref<(number | string)[]>(['30%', '70%'])
+      const { container } = render({
+        setup() {
+          return () =>
+            h(
+              Splitter,
+              {
+                sizes: sizes.value,
+                'onUpdate:sizes': (next: (number | string)[]) => {
+                  sizes.value = next
+                }
+              },
+              () => [h('div', `左侧 ${sizes.value[0]}`), h('div', `右侧 ${sizes.value[1]}`)]
+            )
+        }
+      })
+      await waitFor(() => {
+        expect(parseFloat(paneBox(container, 0).style.width)).toBeCloseTo(240, 0)
+      })
+      const bar = gutter(container)
+      await fireEvent.pointerDown(bar, { clientX: 240, button: 0, pointerId: 1 })
+      await fireEvent.pointerMove(document, { clientX: 400, pointerId: 1 })
+      await fireEvent.pointerUp(document, { clientX: 400, pointerId: 1 })
+      expect(sizes.value[0]).toBe('50%')
+      expect(sizes.value[1]).toBe('50%')
+      expect(container.textContent).toContain('左侧 50%')
+      expect(container.textContent).not.toContain('左侧 30%')
+    })
+
     it('keeps dragging when the parent writes the emitted pixels back', async () => {
       const sizes = ref<(number | string)[]>([400, 400])
       const { container } = render({
