@@ -70,6 +70,8 @@ describe('loading-bar-utils', () => {
   describe('class and style builders', () => {
     it('builds container and fill classes', () => {
       expect(getLoadingBarContainerClasses('extra')).toContain('fixed')
+      expect(getLoadingBarContainerClasses('extra')).toContain('inset-x-0')
+      expect(getLoadingBarContainerClasses('extra')).not.toContain('inset-inline')
       expect(getLoadingBarContainerClasses('extra')).toContain('extra')
       expect(getLoadingBarFillClasses('loading', 'primary')).toContain('origin-left')
       expect(getLoadingBarFillClasses('loading', 'primary')).toContain('rtl:origin-right')

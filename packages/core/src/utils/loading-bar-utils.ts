@@ -27,7 +27,12 @@ export const LOADING_BAR_TRICKLE_INTERVAL_MS = 200
 export const LOADING_BAR_FINISH_HIDE_DELAY_MS = 300
 export const DEFAULT_LOADING_BAR_MIN_DISPLAY_MS = 200
 
-export const loadingBarContainerBaseClasses = `fixed top-0 inset-inline-0 ${overlayZIndexClass.loadingBar} pointer-events-none overflow-hidden`
+/**
+ * Full-bleed track. `inset-x-0` is the pair Tailwind v4 emits.
+ * `inset-inline-0` is not, and a fixed bar with no horizontal inset
+ * shrinks to 0 width.
+ */
+export const loadingBarContainerBaseClasses = `fixed top-0 inset-x-0 ${overlayZIndexClass.loadingBar} pointer-events-none overflow-hidden`
 
 export const loadingBarFillBaseClasses =
   'block w-full origin-left rtl:origin-right tiger-motion-aware transition-transform duration-200 ease-out motion-reduce:transition-none'

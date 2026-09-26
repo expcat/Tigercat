@@ -52,15 +52,17 @@ export const anchorLinkListHorizontalClasses = 'flex items-center gap-x-4 pb-2'
 export const anchorNestedListClasses = 'ps-3 mt-1 space-y-1'
 
 /**
- * Anchor link base classes
+ * Active color uses the location token. Tailwind's `aria-current:` variant
+ * only matches `aria-current="true"`, and a second plain `text-*` utility
+ * loses to the base color in stylesheet order.
  */
 export const anchorLinkBaseClasses =
-  'block text-sm text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-primary)] transition-colors duration-200 motion-reduce:transition-none whitespace-nowrap'
+  'block text-sm text-[var(--tiger-text-secondary)] hover:text-[var(--tiger-primary)] aria-[current=location]:text-[var(--tiger-primary)] aria-[current=location]:font-medium transition-colors duration-200 motion-reduce:transition-none whitespace-nowrap'
 
 /**
  * Anchor link active classes
  */
-export const anchorLinkActiveClasses = 'text-[var(--tiger-primary)] font-medium'
+export const anchorLinkActiveClasses = 'font-medium'
 
 /**
  * Get anchor nav classes. Affix is a real Affix wrapper, not a naked `fixed`.

@@ -5,10 +5,10 @@ export default function App() {
   return (
     <div className="grid gap-4 md:grid-cols-[1fr_160px]">
       <div id="anchor-scroll-container" className="h-64 overflow-auto rounded border">
-        <section id="anchor-audit" className="h-52 bg-blue-50 p-4">
+        <section id="anchor-audit" className="min-h-96 bg-blue-50 p-4">
           审计
         </section>
-        <section id="anchor-release" className="h-52 bg-green-50 p-4">
+        <section id="anchor-release" className="min-h-96 bg-green-50 p-4">
           发布
         </section>
       </div>

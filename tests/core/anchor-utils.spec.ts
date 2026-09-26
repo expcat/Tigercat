@@ -516,12 +516,13 @@ describe('anchor-utils', () => {
 
     describe('getAnchorLinkClasses', () => {
       it('should include active classes when active', () => {
-        const classes = getAnchorLinkClasses(true)
+        const classes = getAnchorLinkClasses(true).split(/\s+/)
         expect(classes).toContain('font-medium')
+        expect(classes).toContain('aria-[current=location]:text-[var(--tiger-primary)]')
       })
 
       it('should not include active classes when not active', () => {
-        const classes = getAnchorLinkClasses(false)
+        const classes = getAnchorLinkClasses(false).split(/\s+/)
         expect(classes).not.toContain('font-medium')
       })
 

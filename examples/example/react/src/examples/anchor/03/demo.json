@@ -1,7 +1,7 @@
 {
   "id": "anchor-03",
   "title": "嵌套锚点",
-  "description": "父子 AnchorLink 对应页面里真实 id。链接按 DOM 序，子节可以成为当前项。",
+  "description": "父子 AnchorLink 对应滚动区里的真实 id。节高于视口，子节可以成为当前项。",
   "entry": "App.tsx",
   "order": 3,
   "viewport": {

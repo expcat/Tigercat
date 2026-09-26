@@ -1,7 +1,7 @@
 {
   "id": "anchor-01",
   "title": "文档锚点",
-  "description": "默认 Affix 占位固定，带墨水。点链接会 onChange 并写入 hash。",
+  "description": "滚动区高度固定，每节都高于视口。点链接滚动并高亮；Affix 把目录钉在滚动区顶部。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

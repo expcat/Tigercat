@@ -1,7 +1,7 @@
 {
   "id": "affix-02",
   "title": "固定到底部",
-  "description": "target 是滚动根选择器，节点必须在容器内。offsetBottom 钉在容器底；非法选择器回退 window 且不抛。",
+  "description": "标签的文档位置在容器底边之下，打开即钉在底边。继续滚动会回到文档流。target 是滚动根。",
   "entry": "App.vue",
   "order": 2,
   "viewport": { "mode": "fixed", "height": 200 }

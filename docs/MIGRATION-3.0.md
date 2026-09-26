@@ -269,7 +269,7 @@ Tooltip 气泡用 `--tiger-text` 作底、`--tiger-surface` 作字，圆角 `--t
 
 ## Message / notification / LoadingBar
 
-只改当前 `ConfigProvider` 里的队列。同一个 `key` 替换。`Message` 默认可关闭，悬停或焦点暂停计时。通知的主动作是按钮，整张卡片不承接点击。`LoadingBar` 的 `error()` 与 `finish()` 共用 `start` 计数。
+只改当前 `ConfigProvider` 里的队列。同一个 `key` 替换。`Message` 默认可关闭，悬停或焦点暂停计时。通知的主动作是按钮，整张卡片不承接点击。`LoadingBar` 的 `error()` 与 `finish()` 共用 `start` 计数。轨道用 `inset-x-0` 铺满视口顶边。Tailwind v4 不生成 `inset-inline-0`，缺左右 inset 时固定条宽度是 0。
 
 通知卡片用 `--tiger-spacing-lg`、`--tiger-radius-lg`、`--tiger-shadow-lg`，宽度 `24rem`。角落位置和 Message 一样用 `start-*` / `end-*`；居中用 `inset-x-0`。Tailwind v4 不生成 `inset-inline-start-*` / `inset-inline-end-*`，那些名字会让固定层停在静态位置。不再读未定义的 `--tiger-component-notification-*`。
 
@@ -315,7 +315,7 @@ Tooltip 气泡用 `--tiger-text` 作底、`--tiger-surface` 作字，圆角 `--t
 
 ## Menu / Tabs / NavigationMenu
 
-垂直菜单根是 `role="menu"`，同一时刻只有一个 Tab 停靠。页签、树和导航的键按类型区分：`1` 与 `"1"` 是不同项。再点已选项保持选中。`NavigationMenu` 的展开值就是 open 状态。关闭的 `Dropdown`、`ContextMenu` 和导航面板不挂到 portal。
+垂直菜单根是 `role="menu"`，同一时刻只有一个 Tab 停靠。页签、树和导航的键按类型区分：`1` 与 `"1"` 是不同项。再点已选项保持选中。`NavigationMenu` 的展开值就是 open 状态。关闭的 `Dropdown`、`ContextMenu` 和导航面板不挂到 portal。`Anchor` 当前项是 `aria-current="location"`。Tailwind 的 `aria-current:` 只匹配 `"true"`，当前项颜色用 `aria-[current=location]:`。
 
 ## Layout
 

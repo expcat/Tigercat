@@ -6,8 +6,8 @@ import { AnchorLink } from '@expcat/tigercat-vue/AnchorLink'
 <template>
   <div class="grid gap-4 md:grid-cols-[1fr_160px]">
     <div id="anchor-scroll-container" class="h-64 overflow-auto rounded border">
-      <section id="anchor-audit" class="h-52 bg-blue-50 p-4">审计</section>
-      <section id="anchor-release" class="h-52 bg-green-50 p-4">发布</section>
+      <section id="anchor-audit" class="min-h-96 bg-blue-50 p-4">审计</section>
+      <section id="anchor-release" class="min-h-96 bg-green-50 p-4">发布</section>
     </div>
     <Anchor :affix="false" get-container="#anchor-scroll-container" orientation="horizontal">
       <AnchorLink href="#anchor-audit" title="审计" />
