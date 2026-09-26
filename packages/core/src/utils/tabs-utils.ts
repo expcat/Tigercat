@@ -38,10 +38,10 @@ export const tabsBaseClasses = 'w-full'
 export const tabNavBaseClasses = 'flex'
 
 export const tabNavPositionClasses = {
-  top: 'flex-row',
-  bottom: 'flex-row',
-  left: 'flex-col',
-  right: 'flex-col'
+  top: 'w-full min-w-0 flex-row',
+  bottom: 'w-full min-w-0 flex-row',
+  left: 'max-w-full shrink-0 flex-col',
+  right: 'max-w-full shrink-0 flex-col'
 }
 
 export const tabNavLineBorderClasses = {
@@ -51,7 +51,22 @@ export const tabNavLineBorderClasses = {
   right: 'border-s border-[var(--tiger-border)]'
 }
 
-export const tabNavListBaseClasses = 'relative flex gap-1 overflow-auto'
+export const tabNavListBaseClasses = 'relative flex gap-1'
+
+/**
+ * Scroll on the tab axis only.
+ * `overflow-x: auto` computes a visible cross axis to `auto`, so a horizontal
+ * bar that is 1px shorter than its tabs paints a vertical scrollbar between
+ * the last tab and the add button. `clip` does not do that.
+ * Vertical lists stay content-sized (`shrink-0`); they must not shrink to 0
+ * and must not scroll on the inline axis.
+ */
+const tabNavListScrollClasses: Record<TabPosition, string> = {
+  top: 'min-h-min min-w-0 flex-1 overflow-x-auto overflow-y-clip',
+  bottom: 'min-h-min min-w-0 flex-1 overflow-x-auto overflow-y-clip',
+  left: 'w-max max-w-full shrink-0 overflow-x-clip overflow-y-auto',
+  right: 'w-max max-w-full shrink-0 overflow-x-clip overflow-y-auto'
+}
 
 export const tabNavListPositionClasses = {
   top: 'flex-row',
@@ -313,8 +328,8 @@ export function readTabPaneKey(props: Record<string, unknown>): string | number 
 }
 
 export function getTabsContainerClasses(position: TabPosition): string {
-  if (position === 'right') return `${tabsBaseClasses} flex flex-row-reverse`
-  if (position === 'left') return `${tabsBaseClasses} flex`
+  if (position === 'right') return `${tabsBaseClasses} flex min-w-0 flex-row-reverse`
+  if (position === 'left') return `${tabsBaseClasses} flex min-w-0`
   return tabsBaseClasses
 }
 
@@ -323,11 +338,29 @@ export function getTabNavClasses(position: TabPosition, type: TabType): string {
   return type === 'line' ? `${base} ${tabNavLineBorderClasses[position]}` : base
 }
 
-export function getTabNavListClasses(position: TabPosition, centered: boolean): string {
-  const base = `${tabNavListBaseClasses} ${tabNavListPositionClasses[position]}`
-  return centered && (position === 'top' || position === 'bottom')
-    ? `${base} ${tabNavListCenteredClasses}`
-    : base
+function tabListSeamPadding(position: TabPosition, type: TabType): string {
+  if (type !== 'card' && type !== 'editable-card') return ''
+  // Card tabs use a 1px negative margin to cover the shared edge. The clip
+  // scrollport needs that pixel inside the padding box or the seam is cut off.
+  if (position === 'bottom') return 'pt-px'
+  if (position === 'left') return 'pe-px'
+  if (position === 'right') return 'ps-px'
+  return 'pb-px'
+}
+
+export function getTabNavListClasses(
+  position: TabPosition,
+  centered: boolean,
+  type: TabType = 'line'
+): string {
+  const parts = [
+    tabNavListBaseClasses,
+    tabNavListPositionClasses[position],
+    tabNavListScrollClasses[position],
+    tabListSeamPadding(position, type),
+    centered && (position === 'top' || position === 'bottom') ? tabNavListCenteredClasses : ''
+  ]
+  return parts.filter(Boolean).join(' ')
 }
 
 export function getTabNavListStyle(
@@ -477,11 +510,15 @@ export function splitOverflowTabKeys<K extends string | number>(options: {
   available: number
   activeKey?: K
   moreWidth?: number
+  /** Main-axis gap between tabs. Omitted gaps look like a leftover scrollbar. */
+  gap?: number
 }): { visible: K[]; overflow: K[] } {
   const moreWidth = options.moreWidth ?? 48
+  const gap = options.gap ?? 0
   const widths = options.keys.map((key, index) => options.widths[index] ?? 0)
-  const total = widths.reduce((sum, width) => sum + width, 0)
-  if (options.available <= 0 || total <= options.available) {
+  const total = widths.reduce((sum, width) => sum + width, 0) + gap * Math.max(0, widths.length - 1)
+  // 1px of subpixel rounding is not overflow. A not-yet-laid-out port is 0.
+  if (options.available <= 0 || total <= options.available + 1) {
     return { visible: [...options.keys], overflow: [] }
   }
   const budget = Math.max(0, options.available - moreWidth)
@@ -489,9 +526,10 @@ export function splitOverflowTabKeys<K extends string | number>(options: {
   let used = 0
   options.keys.forEach((key, index) => {
     const width = widths[index]
-    if (used + width <= budget) {
+    const next = visible.length === 0 ? width : used + gap + width
+    if (next <= budget + 1) {
       visible.push(key)
-      used += width
+      used = next
     }
   })
   if (
@@ -507,6 +545,34 @@ export function splitOverflowTabKeys<K extends string | number>(options: {
   const visibleSet = new Set(visible.map((key) => String(key)))
   const overflow = options.keys.filter((key) => !visibleSet.has(String(key)))
   return { visible, overflow }
+}
+
+/**
+ * Overflow uses the tab axis. Vertical tabs are stacked, so summing their
+ * widths always exceeds the nav width and hides the whole column into More.
+ * The More control sits outside the scrollport, so `moreSize` defaults to 0;
+ * pass it only when that control is inside the measured port.
+ */
+export function resolveTabListOverflow<K extends string | number>(options: {
+  position: TabPosition
+  keys: readonly K[]
+  inlineSizes: readonly number[]
+  blockSizes: readonly number[]
+  clientWidth: number
+  clientHeight: number
+  activeKey?: K
+  moreSize?: number
+  gap?: number
+}): { visible: K[]; overflow: K[] } {
+  const vertical = options.position === 'left' || options.position === 'right'
+  return splitOverflowTabKeys({
+    keys: options.keys,
+    widths: vertical ? options.blockSizes : options.inlineSizes,
+    available: vertical ? options.clientHeight : options.clientWidth,
+    activeKey: options.activeKey,
+    moreWidth: options.moreSize ?? 0,
+    gap: options.gap
+  })
 }
 
 export function nextTabOrder<K extends string | number>(keys: readonly K[], from: K, to: K): K[] {

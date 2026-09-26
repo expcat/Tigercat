@@ -41,7 +41,7 @@ import {
   parseTabKey,
   resolveDisplayedActiveKey,
   navLabels,
-  splitOverflowTabKeys,
+  resolveTabListOverflow,
   isTabPaneType,
   isTabPaneChildProps,
   readTabPaneKey,
@@ -419,7 +419,7 @@ export const Tabs = defineComponent({
     const swipeStart = ref<ReturnType<typeof getGestureTouchPoint> | null>(null)
     const tabListEl = ref<HTMLElement | null>(null)
     const overflowKeys = ref<Array<string | number>>([])
-    const tabWidthCache = new Map<string, number>()
+    const tabSizeCache = new Map<string, { inline: number; block: number }>()
     const indicatorBox = ref<TabIndicatorStyle>({ opacity: '0' })
     let lastTabRecords: TabRecord[] = []
     let resizeObserver: ResizeObserver | null = null
@@ -451,17 +451,30 @@ export const Tabs = defineComponent({
       const keys = buttons.map(
         (button) => parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id
       )
-      const widths = buttons.map((button, index) => {
-        const measured = button.getBoundingClientRect().width
+      const inlineSizes: number[] = []
+      const blockSizes: number[] = []
+      buttons.forEach((button, index) => {
+        const rect = button.getBoundingClientRect()
         const cacheKey = String(keys[index])
-        if (measured > 0) tabWidthCache.set(cacheKey, measured)
-        return tabWidthCache.get(cacheKey) ?? measured
+        if (rect.width > 0 && rect.height > 0) {
+          tabSizeCache.set(cacheKey, { inline: rect.width, block: rect.height })
+        }
+        const cached = tabSizeCache.get(cacheKey)
+        inlineSizes.push(cached?.inline ?? rect.width)
+        blockSizes.push(cached?.block ?? rect.height)
       })
-      const split = splitOverflowTabKeys({
+      const vertical = props.tabPosition === 'left' || props.tabPosition === 'right'
+      const gapRaw = vertical ? getComputedStyle(list).rowGap : getComputedStyle(list).columnGap
+      const gapValue = Number.parseFloat(gapRaw)
+      const split = resolveTabListOverflow({
+        position: props.tabPosition,
         keys,
-        widths,
-        available: list.getBoundingClientRect().width,
-        activeKey: currentActiveKey.value
+        inlineSizes,
+        blockSizes,
+        clientWidth: list.clientWidth,
+        clientHeight: list.clientHeight,
+        activeKey: resolveDisplayedActiveKey(currentActiveKey.value, lastTabRecords),
+        gap: Number.isFinite(gapValue) ? gapValue : 0
       })
       const same =
         overflowKeys.value.length === split.overflow.length &&
@@ -655,7 +668,7 @@ export const Tabs = defineComponent({
             ref: (el) => {
               tabListEl.value = el as HTMLElement | null
             },
-            class: getTabNavListClasses(props.tabPosition, props.centered),
+            class: getTabNavListClasses(props.tabPosition, props.centered, props.type),
             role: 'tablist',
             dir: dir.value,
             'aria-label':

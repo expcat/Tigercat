@@ -158,11 +158,25 @@ describe('react W9 T07', () => {
 
   it('E4 overflows into a more menu, keeps manual activation, and renders label nodes', () => {
     const rect = HTMLElement.prototype.getBoundingClientRect
+    const clientWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')
+    const clientHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientHeight')
     HTMLElement.prototype.getBoundingClientRect = function () {
       if (this.getAttribute('role') === 'tab') return new DOMRect(0, 0, 80, 32)
       if (this.getAttribute('role') === 'tablist') return new DOMRect(0, 0, 100, 32)
       return rect.call(this)
     }
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get() {
+        return this.getAttribute('role') === 'tablist' ? 100 : 0
+      }
+    })
+    Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+      configurable: true,
+      get() {
+        return this.getAttribute('role') === 'tablist' ? 32 : 0
+      }
+    })
     render(
       <Tabs activation="manual" defaultActiveKey="a">
         <TabPane tabKey="a" label="Alpha" />
@@ -176,6 +190,8 @@ describe('react W9 T07', () => {
     fireEvent.keyDown(alpha, { key: 'ArrowRight' })
     expect(alpha).toHaveAttribute('aria-selected', 'true')
     HTMLElement.prototype.getBoundingClientRect = rect
+    if (clientWidth) Object.defineProperty(HTMLElement.prototype, 'clientWidth', clientWidth)
+    if (clientHeight) Object.defineProperty(HTMLElement.prototype, 'clientHeight', clientHeight)
   })
 
   it('E5 shift-selects a range and expands on title click', () => {

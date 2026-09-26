@@ -14,8 +14,10 @@ import {
   getTabSwipeDelta,
   formatTabKey,
   parseTabKey,
+  getTabNavListClasses,
   getTabNavListStyle,
   getTabIndicatorStyleFromBox,
+  resolveTabListOverflow,
   isTabPaneChildProps,
   type TabRecord
 } from '@expcat/tigercat-core'
@@ -81,6 +83,48 @@ describe('tabs-utils', () => {
       insetInlineStart: '40px',
       opacity: '1'
     })
+  })
+
+  it('scrolls only on the tab axis so the cross axis cannot grow a scrollbar', () => {
+    const horizontal = getTabNavListClasses('top', false, 'editable-card')
+    expect(horizontal).toContain('overflow-x-auto')
+    expect(horizontal).toContain('overflow-y-clip')
+    expect(horizontal).toContain('min-w-0')
+    expect(horizontal).toContain('pb-px')
+    expect(horizontal.split(/\s+/)).not.toContain('overflow-auto')
+
+    const vertical = getTabNavListClasses('left', false, 'line')
+    expect(vertical).toContain('overflow-y-auto')
+    expect(vertical).toContain('overflow-x-clip')
+    expect(vertical).toContain('shrink-0')
+    expect(vertical.split(/\s+/)).not.toContain('overflow-auto')
+  })
+
+  it('measures vertical overflow on the block axis', () => {
+    const stacked = resolveTabListOverflow({
+      position: 'left',
+      keys: ['a', 'b', 'c'],
+      inlineSizes: [96, 96, 96],
+      blockSizes: [40, 40, 40],
+      clientWidth: 96,
+      clientHeight: 128,
+      activeKey: 'b',
+      gap: 4
+    })
+    expect(stacked.overflow).toEqual([])
+    expect(stacked.visible).toEqual(['a', 'b', 'c'])
+
+    const crowded = resolveTabListOverflow({
+      position: 'top',
+      keys: ['a', 'b', 'c'],
+      inlineSizes: [80, 80, 80],
+      blockSizes: [40, 40, 40],
+      clientWidth: 100,
+      clientHeight: 40,
+      gap: 4
+    })
+    expect(crowded.overflow.length).toBeGreaterThan(0)
+    expect(crowded.visible.length).toBeGreaterThan(0)
   })
 
   it('recognizes tab pane children by tabKey and label', () => {

@@ -4381,6 +4381,7 @@
       "resolveTableSelectLoadedKeys",
       "resolveTableView",
       "resolveTableVirtualStrategy",
+      "resolveTabListOverflow",
       "resolveTagsPaste",
       "resolveTaskBoardView",
       "ResolveTaskBoardViewOptions",

@@ -494,6 +494,48 @@ describe('Tabs', () => {
 
       expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical')
     })
+
+    it('keeps a vertical tab list on the block axis and does not fold every tab into More', () => {
+      render(
+        <Tabs tabPosition="left">
+          <TabPane tabKey="a" label="基础信息" disabled>
+            A
+          </TabPane>
+          <TabPane tabKey="b" label="安全设置">
+            B
+          </TabPane>
+          <TabPane tabKey="c" label="通知">
+            C
+          </TabPane>
+        </Tabs>
+      )
+
+      const tablist = screen.getByRole('tablist')
+      expect(tablist.className).toContain('overflow-y-auto')
+      expect(tablist.className).toContain('overflow-x-clip')
+      expect(tablist.className.split(/\s+/)).not.toContain('overflow-auto')
+      expect(screen.getByRole('tab', { name: '安全设置' })).not.toHaveAttribute('hidden')
+      expect(screen.getByRole('tab', { name: '通知' })).not.toHaveAttribute('hidden')
+      expect(screen.queryByRole('button', { name: 'More' })).not.toBeInTheDocument()
+    })
+
+    it('clips the cross axis of a horizontal editable tab list', () => {
+      const { container } = render(
+        <Tabs type="editable-card" closable>
+          <TabPane tabKey="1" label="标签 1">
+            A
+          </TabPane>
+          <TabPane tabKey="2" label="标签 2">
+            B
+          </TabPane>
+        </Tabs>
+      )
+
+      const tablist = container.querySelector('[role="tablist"]')
+      expect(tablist?.className).toContain('overflow-x-auto')
+      expect(tablist?.className).toContain('overflow-y-clip')
+      expect(tablist?.className.split(/\s+/)).not.toContain('overflow-auto')
+    })
   })
 
   describe('TabPane', () => {

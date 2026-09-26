@@ -35,7 +35,7 @@ import {
   parseTabKey,
   resolveDisplayedActiveKey,
   navLabels,
-  splitOverflowTabKeys,
+  resolveTabListOverflow,
   tabActivationSelectsOnArrow,
   isTabPaneType,
   isTabPaneChildProps,
@@ -335,12 +335,12 @@ export const Tabs: React.FC<TabsProps> = ({
   const swipeStartRef = useRef<ReturnType<typeof getGestureTouchPoint> | null>(null)
   const tabListRef = useRef<HTMLDivElement>(null)
   const indicatorRef = useRef<HTMLDivElement>(null)
-  const tabWidthCache = useRef(new Map<string, number>())
+  const tabSizeCache = useRef(new Map<string, { inline: number; block: number }>())
   const [overflowKeys, setOverflowKeys] = useState<Array<string | number>>([])
 
   const containerClasses = classNames(getTabsContainerClasses(tabPosition), className)
   const tabNavClasses = getTabNavClasses(tabPosition, type)
-  const tabNavListClasses = getTabNavListClasses(tabPosition, centered)
+  const tabNavListClasses = getTabNavListClasses(tabPosition, centered, type)
 
   const { tabItems, tabPanes, tabRecords, labelByKey } = useMemo(() => {
     const items: ReactElement[] = []
@@ -420,13 +420,64 @@ export const Tabs: React.FC<TabsProps> = ({
     updateIndicator()
   }, [updateIndicator, activeKey, tabRecords])
 
+  const measureOverflow = useCallback(() => {
+    const list = tabListRef.current
+    if (!list) return
+    const buttons = Array.from(list.querySelectorAll<HTMLElement>('[role="tab"]'))
+    const keys = buttons.map(
+      (button) => parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id
+    )
+    const inlineSizes: number[] = []
+    const blockSizes: number[] = []
+    buttons.forEach((button, index) => {
+      const rect = button.getBoundingClientRect()
+      const cacheKey = String(keys[index])
+      if (rect.width > 0 && rect.height > 0) {
+        tabSizeCache.current.set(cacheKey, { inline: rect.width, block: rect.height })
+      }
+      const cached = tabSizeCache.current.get(cacheKey)
+      inlineSizes.push(cached?.inline ?? rect.width)
+      blockSizes.push(cached?.block ?? rect.height)
+    })
+    const vertical = tabPosition === 'left' || tabPosition === 'right'
+    const gapRaw = vertical ? getComputedStyle(list).rowGap : getComputedStyle(list).columnGap
+    const gapValue = Number.parseFloat(gapRaw)
+    const split = resolveTabListOverflow({
+      position: tabPosition,
+      keys,
+      inlineSizes,
+      blockSizes,
+      clientWidth: list.clientWidth,
+      clientHeight: list.clientHeight,
+      activeKey,
+      gap: Number.isFinite(gapValue) ? gapValue : 0
+    })
+    setOverflowKeys((previous) => {
+      if (
+        previous.length === split.overflow.length &&
+        previous.every((key, index) => isKeyActive(key, split.overflow[index]))
+      ) {
+        return previous
+      }
+      return split.overflow
+    })
+  }, [activeKey, tabPosition])
+
+  useLayoutEffect(() => {
+    measureOverflow()
+  }, [measureOverflow, tabItems])
+
   useEffect(() => {
     const list = tabListRef.current
-    if (!list || type !== 'line' || typeof ResizeObserver === 'undefined') return
-    const observer = new ResizeObserver(() => updateIndicator())
+    if (!list || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() => {
+      updateIndicator()
+      measureOverflow()
+    })
     observer.observe(list)
+    Array.from(list.querySelectorAll('[role="tab"]')).forEach((node) => observer.observe(node))
     return () => observer.disconnect()
-  }, [type, updateIndicator])
+  }, [measureOverflow, updateIndicator, tabItems])
 
   const pendingFocusKey = useRef<string | number | null>(null)
   const focusTab = useCallback(
@@ -514,37 +565,6 @@ export const Tabs: React.FC<TabsProps> = ({
     },
     [activeKey, dir, handleTabClick, swipeable, tabPosition, tabRecords]
   )
-
-  useLayoutEffect(() => {
-    const list = tabListRef.current
-    if (!list) return
-    const buttons = Array.from(list.querySelectorAll<HTMLElement>('[role="tab"]'))
-    const keys = buttons.map(
-      (button) => parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id
-    )
-    const widths = buttons.map((button, index) => {
-      const measured = button.getBoundingClientRect().width
-      const cacheKey = String(keys[index])
-      if (measured > 0) tabWidthCache.current.set(cacheKey, measured)
-      return tabWidthCache.current.get(cacheKey) ?? measured
-    })
-    const available = list.getBoundingClientRect().width
-    const split = splitOverflowTabKeys({
-      keys,
-      widths,
-      available,
-      activeKey
-    })
-    setOverflowKeys((previous) => {
-      if (
-        previous.length === split.overflow.length &&
-        previous.every((key, index) => isKeyActive(key, split.overflow[index]))
-      ) {
-        return previous
-      }
-      return split.overflow
-    })
-  }, [activeKey, tabItems])
 
   const contextValue = useMemo<TabsContextValue>(
     () => ({
