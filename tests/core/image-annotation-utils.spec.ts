@@ -9,6 +9,7 @@ import {
   imageAnnotationDrawingClasses,
   imageAnnotationOverlayPreserveAspectRatio,
   imageAnnotationStageClasses,
+  isImageAnnotationPath,
   isImageAnnotationShapeTarget,
   getImageAnnotationCenter,
   getImageAnnotationFrameStyle,
@@ -106,6 +107,8 @@ describe('image-annotation-utils', () => {
       { x: 0.3, y: 0.4 }
     ])
 
+    expect(isImageAnnotationPath(polygon)).toBe(true)
+    expect(isImageAnnotationPath(freehand)).toBe(true)
     expect(getImageAnnotationPathData(polygon, 200, 100)).toBe('M 20 10 L 80 10 L 80 50 Z')
     expect(getImageAnnotationPathData(freehand, 200, 100)).toBe('M 20 20 L 60 40')
   })
@@ -122,6 +125,7 @@ describe('image-annotation-utils', () => {
       { x: 0.3, y: 0.4 }
     ])
 
+    expect(isImageAnnotationPath(rect)).toBe(false)
     expect(getImageAnnotationCenter(rect, 1000, 500).x).toBeCloseTo(300)
     expect(getImageAnnotationCenter(rect, 1000, 500).y).toBeCloseTo(200)
     expect(getImageAnnotationCenter(path, 1000, 500).x).toBeCloseTo(200)

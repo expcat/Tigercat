@@ -48,6 +48,7 @@ import {
   imageErrorIconPath,
   imageLoadingSpinnerClasses,
   imageLoadingSpinnerPath,
+  isImageAnnotationPath,
   isImageAnnotationShapeTarget,
   isImageAnnotationShapeTool,
   mergeTigerLocale,
@@ -561,7 +562,7 @@ export function ImageAnnotation({
         }
       }
 
-      let geometry: React.ReactNode
+      let geometry: React.ReactNode = null
       let hit: React.ReactNode = null
       if (annotation.type === 'rectangle') {
         geometry = (
@@ -583,7 +584,7 @@ export function ImageAnnotation({
             ry={(annotation.height * displayHeight) / 2}
           />
         )
-      } else {
+      } else if (isImageAnnotationPath(annotation)) {
         const d = getImageAnnotationPathData(annotation, displayWidth, displayHeight)
         geometry = (
           <path

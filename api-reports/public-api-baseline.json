@@ -3017,6 +3017,7 @@
       "isHTMLElement",
       "isHttpResultStatus",
       "isIllegalTabKey",
+      "isImageAnnotationPath",
       "isImageAnnotationPathClosed",
       "isImageAnnotationShapeTarget",
       "isImageAnnotationShapeTool",

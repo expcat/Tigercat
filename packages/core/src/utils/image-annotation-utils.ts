@@ -230,6 +230,13 @@ export function createImageAnnotationPath(
   }
 }
 
+/** Polygon and freehand. Box types stay out so path geometry is not fed a rectangle. */
+export function isImageAnnotationPath(
+  annotation: ImageAnnotation
+): annotation is ImageAnnotationPath {
+  return annotation.type === 'polygon' || annotation.type === 'freehand'
+}
+
 export function isImageAnnotationPathClosed(annotation: ImageAnnotationPath): boolean {
   return annotation.type === 'polygon' && annotation.points.length >= 3
 }
@@ -263,18 +270,18 @@ export function getImageAnnotationCenter(
     }
   }
 
-  const pathAnnotation = annotation as ImageAnnotationPath
+  if (!isImageAnnotationPath(annotation) || annotation.points.length === 0) {
+    return { x: 0, y: 0 }
+  }
 
-  if (pathAnnotation.points.length === 0) return { x: 0, y: 0 }
-
-  const total = pathAnnotation.points.reduce(
+  const total = annotation.points.reduce(
     (acc, point) => ({ x: acc.x + point.x, y: acc.y + point.y }),
     { x: 0, y: 0 }
   )
 
   return {
-    x: (total.x / pathAnnotation.points.length) * width,
-    y: (total.y / pathAnnotation.points.length) * height
+    x: (total.x / annotation.points.length) * width,
+    y: (total.y / annotation.points.length) * height
   }
 }
 

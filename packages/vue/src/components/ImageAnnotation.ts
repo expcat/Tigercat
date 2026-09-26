@@ -49,6 +49,7 @@ import {
   imageErrorIconPath,
   imageLoadingSpinnerClasses,
   imageLoadingSpinnerPath,
+  isImageAnnotationPath,
   isImageAnnotationShapeTarget,
   isImageAnnotationShapeTool,
   mergeTigerLocale,
@@ -473,7 +474,7 @@ export const ImageAnnotation = defineComponent({
       }
       const width = displayWidth.value
       const height = displayHeight.value
-      let geometry: ReturnType<typeof h>
+      let geometry: ReturnType<typeof h> | null = null
       let hit: ReturnType<typeof h> | null = null
 
       if (annotation.type === 'rectangle') {
@@ -492,7 +493,7 @@ export const ImageAnnotation = defineComponent({
           rx: (annotation.width * width) / 2,
           ry: (annotation.height * height) / 2
         })
-      } else {
+      } else if (isImageAnnotationPath(annotation)) {
         const d = getImageAnnotationPathData(annotation, width, height)
         geometry = h('path', {
           ...paintAttrs,
