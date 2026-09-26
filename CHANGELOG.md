@@ -5,6 +5,7 @@
 ## 未发布
 
 - **Spotlight**：快捷键徽标只出现在对应命令行的行尾。去掉面板底部重复列出同一快捷键的 footer，以及只为它存在的 `spotlightFooterShortcuts` 和 `navLabels.spotlightFooter`。
+- **OrgChart**：节点左侧色条改为与卡片圆角同心的内缩条，边框画在色条之上。各节点色条长度和与左边框的间距一致。Vue/React 对称。无新 prop。
 
 ## v2.9.4
 

@@ -57,8 +57,79 @@ interface InternalLayoutNode {
 export const orgChartNodeClasses =
   'transition-[filter,opacity,stroke] motion-reduce:transition-none duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
 
-export const orgChartNodeRectClasses =
-  'stroke-[var(--tiger-border)] fill-[var(--tiger-surface)] drop-shadow-sm'
+export const orgChartNodeRectClasses = 'fill-[var(--tiger-surface)] drop-shadow-sm'
+
+/** Border drawn after the accent so the stroke is never covered by the bar. */
+export const orgChartNodeStrokeClasses =
+  'pointer-events-none fill-none stroke-[var(--tiger-border)]'
+
+/** Card corner radius. The accent clip shares this corner center. */
+const ORG_CHART_NODE_RADIUS = 8
+
+/** Resting border, centered on the card edge. */
+const ORG_CHART_NODE_STROKE_WIDTH = 1
+
+/** Selected border, still centered. The accent inset stays outside half of this. */
+const ORG_CHART_NODE_SELECTED_STROKE_WIDTH = 2
+
+const ORG_CHART_NODE_MARKER_WIDTH = 4
+
+/**
+ * Gap between the card edge and the accent. Half the selected stroke is 1,
+ * so 2 keeps the bar inside the border instead of covering it.
+ */
+const ORG_CHART_NODE_MARKER_INSET = 2
+
+export interface OrgChartNodeMarkerGeometry {
+  radius: number
+  strokeWidth: number
+  selectedStrokeWidth: number
+  marker: { x: number; y: number; width: number; height: number }
+  clip: { x: number; y: number; width: number; height: number; rx: number }
+}
+
+/**
+ * Left accent for one org node.
+ *
+ * A full-height bar on the outer edge crosses the centered stroke and the
+ * corner radius, so rasterization makes bars look short, gapped, or painted
+ * over the border. The clip is inset by the same amount on every side and
+ * uses `radius - inset`, which places its corners on the card's corner
+ * center. The bar then fills that clip from the left with one gap.
+ */
+export function getOrgChartNodeMarkerGeometry(
+  nodeWidth: number,
+  nodeHeight: number
+): OrgChartNodeMarkerGeometry {
+  const inset = ORG_CHART_NODE_MARKER_INSET
+  const radius = ORG_CHART_NODE_RADIUS
+  const clipWidth = Math.max(0, nodeWidth - inset * 2)
+  const clipHeight = Math.max(0, nodeHeight - inset * 2)
+  const innerRadius = Math.max(0, Math.min(radius - inset, clipWidth / 2, clipHeight / 2))
+  return {
+    radius,
+    strokeWidth: ORG_CHART_NODE_STROKE_WIDTH,
+    selectedStrokeWidth: ORG_CHART_NODE_SELECTED_STROKE_WIDTH,
+    marker: {
+      x: inset,
+      y: inset,
+      width: Math.min(ORG_CHART_NODE_MARKER_WIDTH, clipWidth),
+      height: clipHeight
+    },
+    clip: {
+      x: inset,
+      y: inset,
+      width: clipWidth,
+      height: clipHeight,
+      rx: innerRadius
+    }
+  }
+}
+
+export function getOrgChartNodeClipId(instanceId: string): string {
+  const normalized = instanceId.replace(/[^A-Za-z0-9_-]/g, '-').replace(/^-+|-+$/g, '')
+  return `tiger-org-node-${normalized || '0'}`
+}
 
 export const orgChartNodeLabelClasses =
   'pointer-events-none select-none fill-[var(--tiger-text)] text-sm font-semibold'

@@ -5,7 +5,7 @@
 import { fireEvent, render } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import { OrgChart } from '@expcat/tigercat-vue/OrgChart'
-import type { OrgChartNode } from '@expcat/tigercat-core'
+import { getOrgChartNodeMarkerGeometry, type OrgChartNode } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 const data: OrgChartNode = {
@@ -63,6 +63,62 @@ describe('OrgChart', () => {
     await fireEvent.keyDown(getByRole('button', { name: 'Mira, Operations' }), { key: 'Enter' })
 
     expect(emitted()['update:selectedId']).toEqual([['ops']])
+  })
+
+  it.each([
+    { orientation: 'vertical' as const, nodeWidth: 160, nodeHeight: 72 },
+    { orientation: 'horizontal' as const, nodeWidth: 180, nodeHeight: 48 }
+  ])(
+    'keeps every left accent inside the $orientation card',
+    ({ orientation, nodeWidth, nodeHeight }) => {
+      const { container } = render(OrgChart, {
+        props: { data, orientation, nodeWidth, nodeHeight }
+      })
+      const nodes = [...container.querySelectorAll('[data-org-chart-nodes="true"] > g')]
+      expect(nodes.length).toBeGreaterThan(1)
+      const markerBoxes = nodes.map((node) => {
+        const card = node.querySelector('[data-org-node-part="card"]')
+        const marker = node.querySelector('[data-org-node-part="marker"]')
+        const stroke = node.querySelector('[data-org-node-part="stroke"]')
+        const geometry = getOrgChartNodeMarkerGeometry(nodeWidth, nodeHeight)
+        expect(card).toHaveAttribute('width', String(nodeWidth))
+        expect(card).toHaveAttribute('height', String(nodeHeight))
+        expect(card).toHaveAttribute('rx', String(geometry.radius))
+        expect(marker).toHaveAttribute('x', String(geometry.marker.x))
+        expect(marker).toHaveAttribute('y', String(geometry.marker.y))
+        expect(marker).toHaveAttribute('width', String(geometry.marker.width))
+        expect(marker).toHaveAttribute('height', String(geometry.marker.height))
+        expect(marker).not.toHaveAttribute('rx')
+        expect(marker).toHaveAttribute('stroke', 'none')
+        const clipRef = marker?.getAttribute('clip-path') ?? ''
+        expect(clipRef).toMatch(/^url\(#tiger-org-node-.+\)$/)
+        const clip = node.querySelector(`#${clipRef.slice(5, -1)} rect`)
+        expect(clip).toHaveAttribute('rx', String(geometry.clip.rx))
+        expect(clip).toHaveAttribute('x', String(geometry.clip.x))
+        expect(clip).toHaveAttribute('width', String(geometry.clip.width))
+        expect(clip).toHaveAttribute('height', String(geometry.clip.height))
+        expect(stroke).toHaveAttribute('fill', 'none')
+        expect(stroke).toHaveAttribute('stroke-width', String(geometry.strokeWidth))
+        expect(
+          [...node.querySelectorAll('[data-org-node-part]')].map((el) =>
+            el.getAttribute('data-org-node-part')
+          )
+        ).toEqual(['card', 'marker', 'stroke'])
+        return ['x', 'y', 'width', 'height'].map((attr) => marker?.getAttribute(attr)).join(',')
+      })
+      expect(new Set(markerBoxes).size).toBe(1)
+    }
+  )
+
+  it('paints a thicker border on the selected node only', () => {
+    const { container } = render(OrgChart, {
+      props: { data, selectable: true, selectedId: 'eng' }
+    })
+    const strokes = [...container.querySelectorAll('[data-org-node-part="stroke"]')]
+    const selected = strokes.filter((node) => node.getAttribute('stroke-width') === '2')
+    expect(selected).toHaveLength(1)
+    expect(selected[0]?.getAttribute('style')).toContain('stroke')
+    expect(strokes.filter((node) => node.getAttribute('stroke-width') === '1')).toHaveLength(2)
   })
 
   it('supports horizontal direction', () => {

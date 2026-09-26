@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useId, useMemo, useState } from 'react'
 import {
   computeOrgChartLayout,
   findOrgMatch,
@@ -8,11 +8,14 @@ import {
   mergeTigerLocale,
   normalizeChartPadding,
   getOrgChartNodeAriaLabel,
+  getOrgChartNodeClipId,
+  getOrgChartNodeMarkerGeometry,
   resolveLinkHref,
   getOrgChartNodeClasses,
   orgChartLinkClasses,
   orgChartNodeLabelClasses,
   orgChartNodeRectClasses,
+  orgChartNodeStrokeClasses,
   orgChartNodeSubtitleClasses,
   orgChartNodeTitleClasses,
   type ChartPadding,
@@ -68,6 +71,7 @@ export function OrgChart({
   bind
 }: OrgChartProps): React.ReactElement {
   const config = useTigerConfig()
+  const markerClipPrefix = getOrgChartNodeClipId(useId())
   const [orgZoom, setOrgZoom] = useState(1)
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -153,6 +157,8 @@ export function OrgChart({
               const interactive = canClick && !node.node.disabled
               const avatarHref = showAvatars ? resolveLinkHref(node.node.avatar) : undefined
               const textStart = avatarHref ? 58 : 16
+              const geometry = getOrgChartNodeMarkerGeometry(node.width, node.height)
+              const clipId = `${markerClipPrefix}-${node.index}`
               return (
                 <g
                   key={node.id}
@@ -177,15 +183,45 @@ export function OrgChart({
                       selectNode(node)
                     }
                   }}>
+                  <defs>
+                    <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+                      <rect
+                        x={geometry.clip.x}
+                        y={geometry.clip.y}
+                        width={geometry.clip.width}
+                        height={geometry.clip.height}
+                        rx={geometry.clip.rx}
+                      />
+                    </clipPath>
+                  </defs>
                   <rect
+                    data-org-node-part="card"
                     width={node.width}
                     height={node.height}
-                    rx={8}
+                    rx={geometry.radius}
                     className={orgChartNodeRectClasses}
-                    stroke={selected ? node.color : undefined}
-                    strokeWidth={selected ? 2 : 1}
                   />
-                  <rect width={4} height={node.height} rx={2} fill={node.color} />
+                  <rect
+                    data-org-node-part="marker"
+                    x={geometry.marker.x}
+                    y={geometry.marker.y}
+                    width={geometry.marker.width}
+                    height={geometry.marker.height}
+                    fill={node.color}
+                    stroke="none"
+                    clipPath={`url(#${clipId})`}
+                    aria-hidden
+                  />
+                  <rect
+                    data-org-node-part="stroke"
+                    width={node.width}
+                    height={node.height}
+                    rx={geometry.radius}
+                    className={orgChartNodeStrokeClasses}
+                    fill="none"
+                    strokeWidth={selected ? geometry.selectedStrokeWidth : geometry.strokeWidth}
+                    style={selected ? { stroke: node.color } : undefined}
+                  />
                   {avatarHref ? (
                     <image
                       href={avatarHref}

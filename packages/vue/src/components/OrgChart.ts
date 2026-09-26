@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, PropType, ref } from 'vue'
+import { computed, defineComponent, h, PropType, ref, useId } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -10,11 +10,14 @@ import {
   mergeTigerLocale,
   normalizeChartPadding,
   getOrgChartNodeAriaLabel,
+  getOrgChartNodeClipId,
+  getOrgChartNodeMarkerGeometry,
   resolveLinkHref,
   getOrgChartNodeClasses,
   orgChartLinkClasses,
   orgChartNodeLabelClasses,
   orgChartNodeRectClasses,
+  orgChartNodeStrokeClasses,
   orgChartNodeSubtitleClasses,
   orgChartNodeTitleClasses,
   type ChartPadding,
@@ -79,6 +82,7 @@ export const OrgChart = defineComponent({
   emits: ['update:selectedId', 'node-click', 'node-hover'],
   setup(props, { emit, attrs }) {
     const config = useTigerConfig()
+    const markerClipPrefix = getOrgChartNodeClipId(useId())
     const orgZoom = ref(1)
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
@@ -208,6 +212,8 @@ export const OrgChart = defineComponent({
                           ? resolveLinkHref(node.node.avatar)
                           : undefined
                         const textStart = avatarHref ? 58 : 16
+                        const geometry = getOrgChartNodeMarkerGeometry(node.width, node.height)
+                        const clipId = `${markerClipPrefix}-${node.index}`
                         return h(
                           'g',
                           {
@@ -229,15 +235,47 @@ export const OrgChart = defineComponent({
                             }
                           },
                           [
+                            h('defs', [
+                              h('clipPath', { id: clipId, clipPathUnits: 'userSpaceOnUse' }, [
+                                h('rect', {
+                                  x: geometry.clip.x,
+                                  y: geometry.clip.y,
+                                  width: geometry.clip.width,
+                                  height: geometry.clip.height,
+                                  rx: geometry.clip.rx
+                                })
+                              ])
+                            ]),
                             h('rect', {
+                              'data-org-node-part': 'card',
                               width: node.width,
                               height: node.height,
-                              rx: 8,
-                              class: orgChartNodeRectClasses,
-                              stroke: selected ? node.color : undefined,
-                              strokeWidth: selected ? 2 : 1
+                              rx: geometry.radius,
+                              class: orgChartNodeRectClasses
                             }),
-                            h('rect', { width: 4, height: node.height, rx: 2, fill: node.color }),
+                            h('rect', {
+                              'data-org-node-part': 'marker',
+                              x: geometry.marker.x,
+                              y: geometry.marker.y,
+                              width: geometry.marker.width,
+                              height: geometry.marker.height,
+                              fill: node.color,
+                              stroke: 'none',
+                              'clip-path': `url(#${clipId})`,
+                              'aria-hidden': 'true'
+                            }),
+                            h('rect', {
+                              'data-org-node-part': 'stroke',
+                              width: node.width,
+                              height: node.height,
+                              rx: geometry.radius,
+                              class: orgChartNodeStrokeClasses,
+                              fill: 'none',
+                              'stroke-width': selected
+                                ? geometry.selectedStrokeWidth
+                                : geometry.strokeWidth,
+                              style: selected ? { stroke: node.color } : undefined
+                            }),
                             avatarHref
                               ? h('image', {
                                   href: avatarHref,

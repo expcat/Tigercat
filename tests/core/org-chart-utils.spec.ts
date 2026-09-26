@@ -3,9 +3,12 @@ import {
   computeOrgChartLayout,
   getOrgChartLinkPath,
   getOrgChartNodeAriaLabel,
+  getOrgChartNodeClipId,
+  getOrgChartNodeMarkerGeometry,
   normalizeOrgChartData,
   orgChartNodeLabelClasses,
   orgChartNodeRectClasses,
+  orgChartNodeStrokeClasses,
   orgChartNodeSubtitleClasses,
   orgChartNodeTitleClasses
 } from '@expcat/tigercat-core'
@@ -140,9 +143,47 @@ describe('org-chart-utils', () => {
   it('uses registered surface and text tokens', () => {
     expect(orgChartNodeRectClasses).toContain('--tiger-surface')
     expect(orgChartNodeRectClasses).not.toContain('--tiger-org-node-bg')
+    expect(orgChartNodeRectClasses).not.toContain('stroke')
+    expect(orgChartNodeStrokeClasses).toContain('--tiger-border')
+    expect(orgChartNodeStrokeClasses).toContain('fill-none')
     expect(orgChartNodeLabelClasses).toContain('--tiger-text')
     expect(orgChartNodeLabelClasses).not.toContain('--tiger-org-label')
     expect(orgChartNodeTitleClasses).toContain('--tiger-text-secondary')
     expect(orgChartNodeSubtitleClasses).toContain('--tiger-text-secondary')
+  })
+
+  it('insets the accent on the card corner center', () => {
+    const geometry = getOrgChartNodeMarkerGeometry(160, 72)
+
+    expect(geometry.radius).toBe(8)
+    expect(geometry.strokeWidth).toBe(1)
+    expect(geometry.selectedStrokeWidth).toBe(2)
+    expect(geometry.marker).toEqual({ x: 2, y: 2, width: 4, height: 68 })
+    expect(geometry.clip).toEqual({ x: 2, y: 2, width: 156, height: 68, rx: 6 })
+    expect(geometry.clip.x + geometry.clip.rx).toBe(geometry.radius)
+    expect(geometry.marker.x).toBeGreaterThan(geometry.selectedStrokeWidth / 2)
+    expect(geometry.marker.y).toBe(geometry.clip.y)
+    expect(geometry.marker.height).toBe(geometry.clip.height)
+  })
+
+  it('keeps the accent inside a shorter card', () => {
+    const geometry = getOrgChartNodeMarkerGeometry(100, 40)
+
+    expect(geometry.marker).toEqual({ x: 2, y: 2, width: 4, height: 36 })
+    expect(geometry.clip.rx).toBe(6)
+    expect(geometry.clip.x + geometry.clip.rx).toBe(geometry.radius)
+  })
+
+  it('clamps the accent when the card is smaller than the inset', () => {
+    const geometry = getOrgChartNodeMarkerGeometry(2, 2)
+
+    expect(geometry.marker.width).toBe(0)
+    expect(geometry.marker.height).toBe(0)
+    expect(geometry.clip.rx).toBe(0)
+  })
+
+  it('builds a clip id that is safe in a url reference', () => {
+    expect(getOrgChartNodeClipId(':r1:')).toBe('tiger-org-node-r1')
+    expect(getOrgChartNodeClipId('')).toBe('tiger-org-node-0')
   })
 })
