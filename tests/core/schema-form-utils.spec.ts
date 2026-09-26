@@ -11,6 +11,9 @@ import {
   flattenSchemaFormFields,
   getSchemaFormFieldSpanClasses,
   getSchemaFormFieldsClasses,
+  schemaFormGroupClasses,
+  schemaFormGroupTitleClasses,
+  schemaFormNestedGroupClasses,
   mapSchemaFormValuesIn,
   mapSchemaFormValuesOut,
   resolveSchemaFormLayout,
@@ -55,6 +58,15 @@ describe('schema-form helpers', () => {
     expect(fields).not.toContain('gap-y-0')
     expect(getSchemaFormFieldSpanClasses(1, 1)).toContain('col-span-2')
     expect(getSchemaFormFieldSpanClasses(1, 1)).toContain('tiger-form-item__content')
+  })
+
+  it('renders group titles as full-width headings outside the nested field frame', () => {
+    expect(schemaFormGroupTitleClasses).toContain('w-full')
+    expect(schemaFormGroupTitleClasses).toContain('block')
+    expect(schemaFormNestedGroupClasses).toContain('border-s')
+    expect(schemaFormNestedGroupClasses).toContain('flex-col')
+    expect(schemaFormGroupClasses).toContain('flex-col')
+    expect(schemaFormGroupClasses).not.toContain('space-y-')
   })
 
   it('keeps top labels in a stacked field grid', () => {

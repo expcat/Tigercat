@@ -193,6 +193,17 @@ describe('SchemaForm (Vue)', () => {
     expect(screen.getByText('City block')).toBeInTheDocument()
     const city = screen.getByLabelText(/City$/) as HTMLInputElement
     expect(city.value).toBe('Shanghai')
+    expect(document.querySelector('legend, fieldset')).toBeNull()
+    const titles = [...document.querySelectorAll('.tiger-schema-form__group-title')].map(
+      (node) => node.textContent
+    )
+    expect(titles).toEqual(['Account', 'Address', 'City block'])
+    const cityGroup = document.querySelector('[data-schema-group="city-block"]')
+    const cityTitle = cityGroup?.querySelector('.tiger-schema-form__group-title')
+    const cityFrame = cityGroup?.querySelector('.tiger-schema-form__nested')
+    expect(cityTitle?.className).toContain('w-full')
+    expect(cityFrame?.contains(cityTitle ?? null)).toBe(false)
+    expect(cityFrame?.querySelectorAll('.tiger-form-item__label')).toHaveLength(1)
 
     await fireEvent.update(city, 'Beijing')
     const next = onUpdate.mock.calls.at(-1)?.[0] as { address?: { city?: string } }
@@ -225,8 +236,59 @@ describe('SchemaForm (Vue)', () => {
     expect(screen.getByPlaceholderText('Pick a day')).toBeInTheDocument()
   })
 
+  it('shows one group heading and one field label when a nested title matches the field', () => {
+    render(SchemaForm, {
+      props: {
+        schema: {
+          groups: [
+            {
+              key: 'address',
+              title: '地址',
+              groups: [
+                {
+                  key: 'city',
+                  title: '城市',
+                  fields: [
+                    { name: 'address.city', label: '城市', required: true, defaultValue: '上海' },
+                    { name: 'notify', label: '邮件通知', type: 'switch' }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        labelPosition: 'top',
+        showActions: false
+      }
+    })
+
+    expect(
+      [...document.querySelectorAll('.tiger-schema-form__group-title')].map(
+        (node) => node.textContent
+      )
+    ).toEqual(['地址', '城市'])
+    expect(
+      [...document.querySelectorAll('.tiger-form-item__label')].map((node) =>
+        (node.textContent ?? '').replace(/\s+/g, '')
+      )
+    ).toEqual(['*城市', '邮件通知'])
+    expect(document.querySelectorAll('.tiger-form-item__asterisk')).toHaveLength(1)
+    const cityLabel = document.querySelector(
+      '[data-tiger-field="address.city"] .tiger-form-item__label'
+    )
+    expect(cityLabel?.closest('.tiger-schema-form__group-title')).toBeNull()
+    expect(cityLabel?.closest('[data-schema-group="city"]')).toBeTruthy()
+  })
+
   it('has no obvious a11y violations', async () => {
     const { container } = render(SchemaForm, { props: { schema: basicSchema } })
+    await expectNoA11yViolations(container)
+  })
+
+  it('has no obvious a11y violations in nested groups', async () => {
+    const { container } = render(SchemaForm, {
+      props: { schema: groupSchema, showActions: false }
+    })
     await expectNoA11yViolations(container)
   })
 })

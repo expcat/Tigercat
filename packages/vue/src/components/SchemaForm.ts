@@ -4,6 +4,7 @@ import {
   h,
   reactive,
   ref,
+  useId,
   watch,
   type PropType,
   type VNode,
@@ -418,6 +419,7 @@ export const SchemaForm = defineComponent({
       emit('reset')
     }
 
+    const groupTitleBaseId = `tiger-schema-group-${useId().replace(/[^A-Za-z0-9_-]/g, '')}`
     const labelAxis = () => props.labelPosition
     const fieldLayout = (span: number | undefined, columns: 1 | 2 | 3) => {
       const aligned = schemaFormUsesLabelColumns(labelAxis())
@@ -480,26 +482,36 @@ export const SchemaForm = defineComponent({
       )
     }
 
-    const renderGroup = (group: SchemaFormLayoutGroup, nested: boolean): VNode => {
+    const renderGroup = (group: SchemaFormLayoutGroup, nested: boolean, path: string): VNode => {
+      const titleId = group.title ? `${groupTitleBaseId}-${path}` : undefined
+      const fields =
+        group.fields.length > 0
+          ? h(
+              'div',
+              { class: getSchemaFormFieldsClasses(group.columns, props.labelPosition) },
+              group.fields.map((field) => renderField(field, group.columns))
+            )
+          : null
+      const children = group.groups.map((child, index) =>
+        renderGroup(child, true, `${path}-${index}`)
+      )
+      const content = [fields, ...children]
       return h(
-        'fieldset',
+        'div',
         {
-          class: nested ? schemaFormNestedGroupClasses : schemaFormGroupClasses,
+          class: schemaFormGroupClasses,
+          role: titleId ? 'group' : undefined,
+          'aria-labelledby': titleId,
           'data-schema-group': group.key
         },
         [
-          group.title ? h('legend', { class: schemaFormGroupTitleClasses }, group.title) : null,
+          group.title
+            ? h('div', { id: titleId, class: schemaFormGroupTitleClasses }, group.title)
+            : null,
           group.description
             ? h('p', { class: schemaFormGroupDescriptionClasses }, group.description)
             : null,
-          group.fields.length > 0
-            ? h(
-                'div',
-                { class: getSchemaFormFieldsClasses(group.columns, props.labelPosition) },
-                group.fields.map((field) => renderField(field, group.columns))
-              )
-            : null,
-          ...group.groups.map((child) => renderGroup(child, true))
+          ...(nested ? [h('div', { class: schemaFormNestedGroupClasses }, content)] : content)
         ]
       )
     }
@@ -545,7 +557,7 @@ export const SchemaForm = defineComponent({
         },
         {
           default: () => [
-            ...layout.value.map((group) => renderGroup(group, false)),
+            ...layout.value.map((group, index) => renderGroup(group, false, String(index))),
             props.showActions
               ? h('div', { class: schemaFormActionsClasses }, [
                   h(

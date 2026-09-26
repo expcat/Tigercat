@@ -48,13 +48,19 @@ export const SCHEMA_FORM_WIDGET_TYPES: readonly SchemaFormWidgetType[] = [
 ]
 
 export const schemaFormRootClasses = 'tiger-schema-form w-full'
-export const schemaFormGroupClasses = 'tiger-schema-form__group space-y-4'
+/**
+ * Section stack. Titles are normal blocks, not `<legend>`: a legend shrink-wraps
+ * to its text and sits in the field-label column, so nested titles pile up as
+ * extra labels beside the first control.
+ */
+export const schemaFormGroupClasses = 'tiger-schema-form__group flex min-w-0 flex-col gap-4'
 export const schemaFormGroupTitleClasses =
-  'tiger-schema-form__group-title m-0 text-sm font-medium text-[var(--tiger-text)]'
+  'tiger-schema-form__group-title m-0 block w-full min-w-0 border-b border-[var(--tiger-border)] pb-2 text-sm font-semibold leading-6 text-[var(--tiger-text)]'
 export const schemaFormGroupDescriptionClasses =
   'tiger-schema-form__group-description m-0 text-xs text-[var(--tiger-text-secondary)]'
+/** Frames nested fields under the heading. The heading stays outside this rule. */
 export const schemaFormNestedGroupClasses =
-  'tiger-schema-form__nested ps-3 border-s border-[var(--tiger-border)] space-y-4'
+  'tiger-schema-form__nested flex min-w-0 flex-col gap-4 border-s border-[var(--tiger-border)] ps-3'
 export const schemaFormExtraClasses = classNames(
   'tiger-schema-form__extra',
   getFieldMessageClasses('md', 'hint')

@@ -2,6 +2,7 @@ import React, {
   forwardRef,
   useCallback,
   useEffect,
+  useId,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -237,14 +238,10 @@ function SchemaFormGroupView({
   fieldRules?: FormRules
   values?: FormValues
 }): React.ReactElement {
-  return (
-    <fieldset
-      className={nested ? schemaFormNestedGroupClasses : schemaFormGroupClasses}
-      data-schema-group={group.key}>
-      {group.title ? <legend className={schemaFormGroupTitleClasses}>{group.title}</legend> : null}
-      {group.description ? (
-        <p className={schemaFormGroupDescriptionClasses}>{group.description}</p>
-      ) : null}
+  const titleId = useId()
+  const labelled = Boolean(group.title)
+  const content = (
+    <>
       {group.fields.length > 0 ? (
         <div className={getSchemaFormFieldsClasses(group.columns, labelPosition)}>
           {group.fields.map((field) => (
@@ -271,7 +268,24 @@ function SchemaFormGroupView({
           values={values}
         />
       ))}
-    </fieldset>
+    </>
+  )
+  return (
+    <div
+      className={schemaFormGroupClasses}
+      role={labelled ? 'group' : undefined}
+      aria-labelledby={labelled ? titleId : undefined}
+      data-schema-group={group.key}>
+      {group.title ? (
+        <div id={titleId} className={schemaFormGroupTitleClasses}>
+          {group.title}
+        </div>
+      ) : null}
+      {group.description ? (
+        <p className={schemaFormGroupDescriptionClasses}>{group.description}</p>
+      ) : null}
+      {nested ? <div className={schemaFormNestedGroupClasses}>{content}</div> : content}
+    </div>
   )
 }
 
