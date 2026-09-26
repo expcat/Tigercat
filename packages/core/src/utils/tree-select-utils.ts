@@ -16,7 +16,8 @@ import {
   selectSearchInputClasses,
   selectSearchWrapClasses,
   selectStandaloneClasses,
-  selectTrailingSlotClasses
+  selectTrailingSlotClasses,
+  POPUP_LIST_INLINE_PADDING
 } from './select-utils'
 import {
   calculateCheckedState,
@@ -29,6 +30,7 @@ import {
   handleNodeCheck,
   resolveOutwardCheckedKeys,
   sameTreeKey,
+  TREE_INDENT_SLOT_PX,
   treeKeyId,
   type VisibleTreeItem
 } from './tree-utils'
@@ -119,10 +121,27 @@ export function getTreeSelectNodeClasses(options: {
   )
 }
 
+/**
+ * Floors the panel at the trigger width. The list used to shrink-wrap its
+ * labels, so the chevron sat in the clipped corner of a content-sized box.
+ */
+export function getTreeSelectDropdownMinWidth(): string {
+  return 'var(--tiger-overlay-reference-width, 0px)'
+}
+
 export function getTreeSelectNodeIndentStyle(level: number): {
   paddingInlineStart: string
+  paddingInlineEnd: string
 } {
-  return { paddingInlineStart: `${Math.max(0, level - 1) * 20 + 8}px` }
+  const depth = Math.max(0, level - 1)
+  const paddingInlineStart =
+    depth === 0
+      ? POPUP_LIST_INLINE_PADDING
+      : `calc(${POPUP_LIST_INLINE_PADDING} + ${depth * TREE_INDENT_SLOT_PX}px)`
+  return {
+    paddingInlineStart,
+    paddingInlineEnd: POPUP_LIST_INLINE_PADDING
+  }
 }
 
 export function getTreeSelectExpandIconClasses(

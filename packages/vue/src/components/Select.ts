@@ -28,6 +28,7 @@ import {
   selectDropdownBaseClasses,
   selectGroupLabelClasses,
   selectEmptyStateClasses,
+  popupListInlinePaddingClass,
   selectListboxClasses,
   selectTagClasses,
   selectTagListClasses,
@@ -1032,8 +1033,10 @@ export const Select = defineComponent({
                       'button',
                       {
                         type: 'button',
-                        class:
-                          'w-full px-3 py-2 text-start text-sm text-[var(--tiger-primary)] hover:bg-[var(--tiger-outline-bg-hover)]',
+                        class: classNames(
+                          'w-full py-2 text-start text-sm text-[var(--tiger-primary)] hover:bg-[var(--tiger-outline-bg-hover)]',
+                          popupListInlinePaddingClass
+                        ),
                         'data-tiger-select-all': '',
                         disabled: isReadOnly.value || undefined,
                         onClick: () => {

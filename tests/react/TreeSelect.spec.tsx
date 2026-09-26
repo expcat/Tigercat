@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { fireEvent, render, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useRef } from 'react'
 import { TreeSelect, type TreeSelectRef } from '@expcat/tigercat-react/TreeSelect'
@@ -27,6 +27,21 @@ const treeData = [
 ]
 
 describe('TreeSelect', () => {
+  it('insets tree rows and floors the panel at the trigger width', async () => {
+    const user = userEvent.setup()
+    render(<TreeSelect treeData={treeData} defaultExpandAll aria-label="Inset" />)
+    await user.click(screen.getByRole('combobox'))
+    const items = Array.from(document.querySelectorAll('[role="treeitem"]')) as HTMLElement[]
+    const parent = items.find((item) => item.textContent?.includes('Fruits'))
+    const child = items.find((item) => item.textContent?.includes('Apple'))
+    expect(parent?.style.paddingInlineStart).toBe('0.75rem')
+    expect(parent?.style.paddingInlineEnd).toBe('0.75rem')
+    expect(child?.style.paddingInlineStart).toBe('calc(0.75rem + 24px)')
+    expect(child?.style.paddingInlineEnd).toBe('0.75rem')
+    const dropdown = document.querySelector('[data-tiger-treeselect-dropdown]') as HTMLElement
+    expect(dropdown.style.minWidth).toBe('var(--tiger-overlay-reference-width, 0px)')
+  })
+
   it('keeps an uncontrolled selection after choosing a leaf', async () => {
     const user = userEvent.setup()
     const { getByRole, rerender } = render(

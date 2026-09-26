@@ -3,6 +3,7 @@ import {
   getIconDefinition,
   getMenuCollapsedInitial,
   getMenuPlainText,
+  menuCollapsedGlyphClasses,
   menuCollapsedIconClasses,
   menuItemIconClasses,
   resolveMenuIconKind,
@@ -33,7 +34,10 @@ export function renderCollapsedLabel(text: string | null, icon: unknown): React.
   return (
     <>
       {initial ? (
-        <span className="flex-1 text-center" aria-hidden="true">
+        <span
+          className={menuCollapsedGlyphClasses}
+          data-tiger-menu-collapsed-glyph=""
+          aria-hidden="true">
           {initial}
         </span>
       ) : null}

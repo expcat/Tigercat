@@ -224,7 +224,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   return (
     <li role={wrapperRole}>
       {collapsedTip ? (
-        <Tooltip asChild content={collapsedTip} trigger="hover">
+        <Tooltip asChild className="w-full" content={collapsedTip} trigger="hover">
           {control}
         </Tooltip>
       ) : (

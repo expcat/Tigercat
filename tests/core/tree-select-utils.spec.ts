@@ -8,6 +8,8 @@ import {
   resolveTreeSelectListHeight,
   alignTreeSelectVirtualScroll,
   getTreeSelectDisplayLabel,
+  getTreeSelectDropdownMinWidth,
+  getTreeSelectNodeIndentStyle,
   getTreeSelectOpenExpandedKeys,
   getTreeSelectTriggerKeyIntent,
   getTreeSelectVisibleIndex,
@@ -37,6 +39,18 @@ const treeData: TreeNode[] = [
 describe('tree-select helpers', () => {
   it('keeps overlay-family virtual defaults', () => {
     expect(TREE_SELECT_DEFAULT_HEIGHT).toBe(256)
+  })
+
+  it('insets every row by the shared popup padding and floors the panel on the trigger', () => {
+    expect(getTreeSelectDropdownMinWidth()).toBe('var(--tiger-overlay-reference-width, 0px)')
+    expect(getTreeSelectNodeIndentStyle(1)).toEqual({
+      paddingInlineStart: '0.75rem',
+      paddingInlineEnd: '0.75rem'
+    })
+    expect(getTreeSelectNodeIndentStyle(2)).toEqual({
+      paddingInlineStart: 'calc(0.75rem + 24px)',
+      paddingInlineEnd: '0.75rem'
+    })
   })
 
   it('resolves listHeight and ignores any legacy height alias', () => {
@@ -87,9 +101,13 @@ describe('tree-select helpers', () => {
 
   it('applies defaultExpandAll only when the tree becomes non-empty', () => {
     expect(shouldApplyTreeSelectDefaultExpandAll(0, countTreeNodes(treeData), true)).toBe(true)
-    expect(shouldApplyTreeSelectDefaultExpandAll(countTreeNodes(treeData), countTreeNodes(treeData), true)).toBe(
-      false
-    )
+    expect(
+      shouldApplyTreeSelectDefaultExpandAll(
+        countTreeNodes(treeData),
+        countTreeNodes(treeData),
+        true
+      )
+    ).toBe(false)
     expect(shouldApplyTreeSelectDefaultExpandAll(0, 0, true)).toBe(false)
     expect(shouldApplyTreeSelectDefaultExpandAll(2, 0, true)).toBe(false)
     expect(shouldApplyTreeSelectDefaultExpandAll(0, 2, false)).toBe(false)

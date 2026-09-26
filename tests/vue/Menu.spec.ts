@@ -112,6 +112,34 @@ describe('Menu', () => {
       })
       expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
     })
+
+    it('keeps collapsed text-only glyphs inside a fixed rail', () => {
+      const { container } = render(Menu, {
+        attrs: { 'aria-label': 'Site' },
+        props: {
+          collapsed: true,
+          items: [
+            { key: 'dashboard', label: '仪表盘' },
+            {
+              key: 'team',
+              label: '团队',
+              children: [{ key: 'members', label: '成员' }]
+            }
+          ]
+        }
+      })
+      const menu = container.querySelector('[data-tiger-menu]')
+      expect(menu?.className).toContain('w-[64px]')
+      const glyphs = container.querySelectorAll('[data-tiger-menu-collapsed-glyph]')
+      expect(Array.from(glyphs).map((node) => node.textContent)).toEqual(['仪', '团'])
+      for (const glyph of glyphs) {
+        expect(glyph.className).not.toContain('flex-1')
+      }
+      const title = container.querySelector('[data-tiger-submenu-title]')
+      expect(title?.className).toContain('justify-center')
+      expect(title?.className).not.toContain('justify-between')
+      expect(container.querySelector('.tiger-tooltip')?.className).toContain('w-full')
+    })
   })
 
   describe('Selection', () => {

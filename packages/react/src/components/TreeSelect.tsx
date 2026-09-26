@@ -6,6 +6,7 @@ import {
   selectChevronWrapClasses,
   selectClearButtonClasses,
   selectTrailingSlotClasses,
+  getTreeSelectDropdownMinWidth,
   treeSelectDropdownClasses
 } from '@expcat/tigercat-core'
 import { renderOverlayPortal, useAnchoredOverlay } from '../utils/overlay'
@@ -116,7 +117,7 @@ export const TreeSelect = forwardRef<TreeSelectRef, TreeSelectProps>(
           overlay.floatingClasses,
           props.dropdownClassName
         )}
-        style={overlay.floatingStyles}
+        style={{ ...overlay.floatingStyles, minWidth: getTreeSelectDropdownMinWidth() }}
         data-positioned={overlay.positioned}
         data-tiger-treeselect-dropdown=""
         onMouseDown={(event) => event.preventDefault()}

@@ -11,6 +11,7 @@ import type {
   MenuSchemaBadge,
   MenuTheme
 } from '../types/menu'
+import { classNames } from './class-names'
 import { typedKeyId } from './focus-utils'
 import { getIconDefinition } from './icons/registry'
 import { prefersReducedMotion } from './transition'
@@ -47,10 +48,16 @@ export const menuLightThemeClasses = ''
 export const menuDarkThemeClasses = 'dark'
 
 /**
+ * Shared item chrome. Padding and justify are applied separately so a collapsed
+ * rail does not keep `px-4` / `justify-between` fighting `justify-center`.
+ */
+const menuItemChromeClasses =
+  'flex w-full items-center py-2 text-start bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset active:opacity-90'
+
+/**
  * Menu item base classes
  */
-export const menuItemBaseClasses =
-  'flex w-full items-center px-4 py-2 text-start bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset active:opacity-90'
+export const menuItemBaseClasses = classNames(menuItemChromeClasses, 'px-4')
 
 /**
  * Menu item hover classes - light theme
@@ -94,8 +101,7 @@ export const menuCollapsedIconClasses = 'flex-shrink-0'
 /**
  * Submenu title classes
  */
-export const submenuTitleClasses =
-  'flex w-full items-center justify-between px-4 py-2 text-start bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset active:opacity-90'
+export const submenuTitleClasses = classNames(menuItemChromeClasses, 'justify-between px-4')
 
 /**
  * Submenu expand icon classes. `rtl:-scale-x-100` flips the inline-end chevron.
@@ -159,14 +165,19 @@ export const menuSearchEmptyClasses =
   'px-4 py-6 text-sm text-center text-[var(--tiger-text-secondary)]'
 
 /**
- * Menu collapsed classes
+ * Collapsed rail. A block-level menu with only `min-width` stretches to the
+ * container, which scatters first-letter glyphs and anchors submenu popups
+ * to the far edge of that stretched row.
  */
-export const menuCollapsedClasses = 'min-w-[64px]'
+export const menuCollapsedClasses = 'w-[64px] shrink-0'
 
 /**
- * Menu collapsed item classes
+ * Menu collapsed item classes. Mutually exclusive with expanded padding / justify.
  */
 export const menuCollapsedItemClasses = 'justify-center px-2'
+
+/** Text-only collapsed glyph. Not `flex-1`: that stretches one character across the row. */
+export const menuCollapsedGlyphClasses = 'shrink-0 text-center'
 
 export const MENU_POPUP_HOVER_CLOSE_MS = 120
 
@@ -210,7 +221,7 @@ export function getMenuItemClasses(
   theme: MenuTheme,
   collapsed?: boolean
 ): string {
-  const classes = [menuItemBaseClasses]
+  const classes = [collapsed ? menuItemChromeClasses : menuItemBaseClasses]
 
   if (collapsed) {
     classes.push(menuCollapsedItemClasses)
@@ -237,7 +248,7 @@ export function getSubMenuTitleClasses(
   disabled?: boolean,
   options?: { collapsed?: boolean; childSelected?: boolean }
 ): string {
-  const classes = [submenuTitleClasses]
+  const classes = [options?.collapsed ? menuItemChromeClasses : submenuTitleClasses]
 
   if (options?.collapsed) {
     classes.push(menuCollapsedItemClasses)
@@ -495,7 +506,10 @@ export function resolveMenuIconKind(icon: unknown): MenuIconKind {
   return 'node'
 }
 
-export function menuCollapsedTooltip(collapsed: boolean, label: string | null | undefined): string | null {
+export function menuCollapsedTooltip(
+  collapsed: boolean,
+  label: string | null | undefined
+): string | null {
   if (!collapsed) return null
   const text = label?.trim()
   return text ? text : null
@@ -842,7 +856,10 @@ export function resolveMenuTabStopKey(options: {
   const enabled = options.itemKeys.filter((key) => !disabled?.has(menuKeyId(key)))
   if (enabled.length === 0) return undefined
   if (options.preferFirst) return enabled[0]
-  if (options.current != null && enabled.some((key) => sameMenuKey(key, options.current as MenuKey))) {
+  if (
+    options.current != null &&
+    enabled.some((key) => sameMenuKey(key, options.current as MenuKey))
+  ) {
     return enabled.find((key) => sameMenuKey(key, options.current as MenuKey))
   }
   const selected = enabled.find((key) => isKeySelected(key, options.selectedKeys))

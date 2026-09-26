@@ -116,6 +116,14 @@ export const selectDropdownBaseClasses = classNames(
 
 export const selectListboxClasses = 'overflow-auto min-h-0 flex-1'
 
+/**
+ * Horizontal inset for popup list chrome (Select, Cascader, TreeSelect).
+ * Tailwind `px-3` is 0.75rem. That clears `--tiger-radius-lg` (10px) so the
+ * first glyph is outside the corner the panel clips with `overflow-hidden`.
+ */
+export const popupListInlinePaddingClass = 'px-3'
+export const POPUP_LIST_INLINE_PADDING = '0.75rem'
+
 export const selectTagListClasses = 'flex min-w-0 flex-1 flex-wrap items-center gap-1'
 export const selectTagClasses = classNames(
   'inline-flex max-w-full items-center gap-1 rounded-[var(--tiger-radius-sm)]',
@@ -127,12 +135,17 @@ export const selectTagRemoveClasses = classNames(
 )
 export const selectSearchWrapClasses =
   'shrink-0 border-b border-[var(--tiger-border)] bg-[var(--tiger-surface)]'
-export const selectEmptyStateClasses =
-  'px-3 py-8 text-center text-[var(--tiger-text-secondary)] text-sm'
-export const selectGroupLabelClasses =
-  'sticky top-0 z-10 px-3 py-2 text-xs font-semibold text-[var(--tiger-text-secondary)] uppercase bg-[var(--tiger-surface-muted)] truncate'
+export const selectEmptyStateClasses = classNames(
+  popupListInlinePaddingClass,
+  'py-8 text-center text-[var(--tiger-text-secondary)] text-sm'
+)
+export const selectGroupLabelClasses = classNames(
+  'sticky top-0 z-10 py-2 text-xs font-semibold text-[var(--tiger-text-secondary)] uppercase bg-[var(--tiger-surface-muted)] truncate',
+  popupListInlinePaddingClass
+)
 export const selectSearchInputClasses = classNames(
-  'w-full px-3 py-2 bg-transparent',
+  'w-full py-2 bg-transparent',
+  popupListInlinePaddingClass,
   'text-[var(--tiger-text)]',
   'placeholder:text-[var(--tiger-text-secondary)]',
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset',
@@ -230,7 +243,8 @@ export function getSelectOptionClasses(options: {
 }): string {
   const size = options.size ?? 'md'
   return classNames(
-    'w-full px-3 text-start truncate',
+    'w-full text-start truncate',
+    popupListInlinePaddingClass,
     SELECT_OPTION_PAD_Y[size],
     'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     options.isDisabled

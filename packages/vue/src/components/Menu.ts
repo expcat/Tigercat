@@ -45,6 +45,7 @@ import {
   isMenuRoving,
   isSubmenuPopup,
   MENU_POPUP_HOVER_CLOSE_MS,
+  menuCollapsedGlyphClasses,
   menuCollapsedIconClasses,
   menuItemGroupTitleClasses,
   menuItemIconClasses,
@@ -170,7 +171,17 @@ function renderCollapsedLabel(text: string | null, icon: unknown) {
   const initial = getMenuCollapsedInitial(text)
   const nodes = []
   if (initial) {
-    nodes.push(h('span', { class: 'flex-1 text-center', 'aria-hidden': 'true' }, initial))
+    nodes.push(
+      h(
+        'span',
+        {
+          class: menuCollapsedGlyphClasses,
+          'data-tiger-menu-collapsed-glyph': '',
+          'aria-hidden': 'true'
+        },
+        initial
+      )
+    )
   }
   if (text) nodes.push(h('span', { class: 'sr-only' }, text))
   return nodes
@@ -700,7 +711,9 @@ export const MenuItem = defineComponent({
 
       const tip = menuCollapsedTooltip(collapsed, label)
       const wrapped = tip
-        ? h(Tooltip, { content: tip, trigger: 'hover', asChild: true }, () => [node])
+        ? h(Tooltip, { content: tip, trigger: 'hover', asChild: true, className: 'w-full' }, () => [
+            node
+          ])
         : node
       return h('li', { role: usesMenuRole ? 'none' : undefined }, [wrapped])
     }

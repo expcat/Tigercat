@@ -6,7 +6,9 @@ import {
   focusMenuEdge,
   getMenuButtons,
   getMenuClasses,
+  getMenuItemClasses,
   getMenuItemIndent,
+  getSubMenuTitleClasses,
   getMenuNavigationKeys,
   getMenuSearchExpandKeys,
   getInitialSubmenuHeightTransitionStyle,
@@ -240,8 +242,26 @@ describe('menu-utils classes', () => {
   it('uses the collapsed width without retaining the default vertical min width', () => {
     const classes = getMenuClasses('vertical', 'light', true)
 
-    expect(classes).toContain('min-w-[64px]')
+    expect(classes).toContain('w-[64px]')
+    expect(classes).not.toContain('min-w-[64px]')
     expect(classes).not.toContain('min-w-[200px]')
+  })
+
+  it('centers a collapsed item without the expanded padding or submenu justify', () => {
+    const item = getMenuItemClasses(false, false, 'light', true)
+    const title = getSubMenuTitleClasses('light', false, { collapsed: true })
+
+    for (const classes of [item, title]) {
+      expect(classes).toContain('justify-center')
+      expect(classes).toContain('px-2')
+      expect(classes).not.toContain('px-4')
+      expect(classes).not.toContain('justify-between')
+    }
+
+    expect(getMenuItemClasses(false, false, 'light', false)).toContain('px-4')
+    expect(getSubMenuTitleClasses('light', false, { collapsed: false })).toContain(
+      'justify-between'
+    )
   })
 
   it('does not lock default light theme tokens to light hexes', () => {

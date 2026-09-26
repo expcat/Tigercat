@@ -44,6 +44,23 @@ describe('TreeSelect', () => {
     expect(getByRole('treeitem', { name: /Apple/ })).toBeInTheDocument()
   })
 
+  it('insets tree rows and floors the panel at the trigger width', async () => {
+    const { getByRole } = render(TreeSelect, {
+      props: { treeData, defaultExpandAll: true, 'aria-label': 'Inset' }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    expect(getByRole('treeitem', { name: /Fruits/ })).toHaveStyle({
+      paddingInlineStart: '0.75rem',
+      paddingInlineEnd: '0.75rem'
+    })
+    expect(getByRole('treeitem', { name: /Apple/ })).toHaveStyle({
+      paddingInlineStart: 'calc(0.75rem + 24px)',
+      paddingInlineEnd: '0.75rem'
+    })
+    const dropdown = document.querySelector('[data-tiger-treeselect-dropdown]') as HTMLElement
+    expect(dropdown.style.minWidth).toBe('var(--tiger-overlay-reference-width, 0px)')
+  })
+
   it('applies listHeight as the overlay height', async () => {
     const { getByRole } = render(TreeSelect, {
       props: {

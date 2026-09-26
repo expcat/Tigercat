@@ -24,7 +24,8 @@ import {
   selectSearchInputClasses,
   selectSearchWrapClasses,
   selectStandaloneClasses,
-  selectTrailingSlotClasses
+  selectTrailingSlotClasses,
+  popupListInlinePaddingClass
 } from './select-utils'
 import { fixedSizeStrategy, scrollTopForVirtualAlign } from './virtual-list-utils'
 import {
@@ -61,7 +62,8 @@ export const cascaderTrailingSlotClasses = selectTrailingSlotClasses
 
 export const cascaderColumnsClasses = 'flex min-w-0 max-sm:block'
 export const cascaderBackButtonClasses = classNames(
-  'hidden max-sm:flex items-center gap-1 shrink-0 px-3 py-2 text-sm',
+  'hidden max-sm:flex items-center gap-1 shrink-0 py-2 text-sm',
+  popupListInlinePaddingClass,
   'text-start text-[var(--tiger-text)]',
   'border-b border-[var(--tiger-border)]',
   'bg-[var(--tiger-surface)]',
@@ -111,7 +113,8 @@ export function getCascaderOptionClasses(options: {
 }): string {
   const size = options.size ?? 'md'
   return classNames(
-    'w-full px-3 flex items-center justify-between gap-2 text-start',
+    'w-full flex items-center justify-between gap-2 text-start',
+    popupListInlinePaddingClass,
     CASCADER_OPTION_PAD_Y[size],
     'tiger-motion-aware [transition:var(--tiger-transition-base)]',
     options.isDisabled

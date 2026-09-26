@@ -34,6 +34,7 @@ import {
   getTreeSelectDisplayLabel,
   getTreeSelectExpandIconClasses,
   getTreeSelectNodeClasses,
+  getTreeSelectDropdownMinWidth,
   getTreeSelectNodeIndentStyle,
   getTreeSelectOpenExpandedKeys,
   getTreeSelectRootClasses,
@@ -985,7 +986,10 @@ export const TreeSelect = defineComponent({
                   overlay.floatingClasses.value,
                   props.dropdownClassName
                 ),
-                style: overlay.floatingStyles.value as CSSProperties,
+                style: {
+                  ...(overlay.floatingStyles.value as CSSProperties),
+                  minWidth: getTreeSelectDropdownMinWidth()
+                },
                 'data-positioned': overlay.positioned.value,
                 'data-tiger-treeselect-dropdown': '',
                 onMousedown: (event: MouseEvent) => event.preventDefault(),

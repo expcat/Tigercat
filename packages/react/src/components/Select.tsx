@@ -5,6 +5,7 @@ import {
   classNames,
   SHAKE_CLASS,
   runShakeAnimation,
+  popupListInlinePaddingClass,
   selectChevronWrapClasses,
   selectClearButtonClasses,
   selectTagClasses,
@@ -173,7 +174,10 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
         <button
           type="button"
           data-tiger-select-all=""
-          className="w-full px-3 py-2 text-start text-sm text-[var(--tiger-primary)] hover:bg-[var(--tiger-outline-bg-hover)]"
+          className={classNames(
+            'w-full py-2 text-start text-sm text-[var(--tiger-primary)] hover:bg-[var(--tiger-outline-bg-hover)]',
+            popupListInlinePaddingClass
+          )}
           disabled={ctx.readOnly}
           onClick={ctx.selectFiltered}>
           {getW9FormLabels(props.locale?.locale).selectAll}
