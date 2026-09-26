@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Button / Icon**：纯图标按钮按 size 收成正方形并清掉文字内边距，图标在按钮里居中。Icon 的尺寸类画在 SVG 上，写在组件上的宽高只约束外层；外层现在把字形居中，并且允许比默认字形更小的盒子把宽和高一起缩进去，不再只挤扁宽度、让多出来的高度从底部溢出。列设置齿轮和同样把 Icon 放进按钮的列表控件走这一套。Vue/React 对称。无新 prop。
 - **ImageAnnotation**：选择工具点在标注上会保持选中，删除按钮随之可用；只有点在空白画布上才取消选中。自由绘制按未闭合圆头描边渲染，不再把开路径填充成自交色块。标注层贴在图片框上，并用 `preserveAspectRatio="none"` 把指针换算回 viewBox，舞台滚动时笔迹不再被拉歪。Vue 写出真实的 `stroke-width` / `fill-opacity`。Vue/React 对称。无新 prop。
 - **Splitter**：拖动 gutter 回写 `update:sizes` / `onSizesChange` 时保持各 pane 的单位。百分比仍是内容区（容器减去 gutter）的百分比，所以 `v-model:sizes` 之后比例继续跟容器走；像素仍是像素。`resize` 事件里的 sizes 仍是像素。示例水平分割把面板文案绑到这份受控值。Vue/React 对称。无新 prop。
 - **Spotlight**：快捷键徽标只出现在对应命令行的行尾。去掉面板底部重复列出同一快捷键的 footer，以及只为它存在的 `spotlightFooterShortcuts` 和 `navLabels.spotlightFooter`。

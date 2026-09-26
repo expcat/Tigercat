@@ -115,6 +115,22 @@ describe('Icon (Vue)', () => {
     expect(container.querySelector('span')).toBeInTheDocument()
   })
 
+  it('centers a built-in glyph when the wrapper is sized smaller than the svg', () => {
+    const { container } = render(Icon, {
+      props: { name: 'settings' },
+      attrs: { class: 'w-3.5 h-3.5' }
+    })
+    const wrapper = container.querySelector('span')!
+    const svg = container.querySelector('svg')!
+    expect(wrapper.className).toContain('items-center')
+    expect(wrapper.className).toContain('justify-center')
+    expect(wrapper.className).toContain('w-3.5')
+    expect(svg.className).toContain('max-w-full')
+    expect(svg.className).toContain('max-h-full')
+    expect(svg.className).toContain('min-w-0')
+    expect(svg.className).toContain('min-h-0')
+  })
+
   it('renders a built-in icon by name', () => {
     const { container } = renderWithProps(Icon, { name: 'check' })
     const svg = container.querySelector('svg')

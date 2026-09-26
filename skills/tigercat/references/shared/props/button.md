@@ -13,7 +13,7 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/button.ts` · `ButtonProps` · 4/12 props
 
-Note: `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。icon-only 必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。
+Note: `htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。无可见文字的 icon-only 按钮按 size 为正方形且 padding 为 0，图标居中；必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。
 
 | Prop        | Type            | Default     | Notes                                                                                      |
 | ----------- | --------------- | ----------- | ------------------------------------------------------------------------------------------ |

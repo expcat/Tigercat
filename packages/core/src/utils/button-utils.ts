@@ -26,6 +26,27 @@ export const buttonSizeClasses: Record<ButtonSize, string> = {
   xl: 'px-8 py-4 text-xl'
 }
 
+/**
+ * Icon-only controls. Text padding is wider than it is tall, so a glyph in
+ * that box cannot sit in the optical center. `!p-0` wins over the size padding
+ * and over a caller `px-*` that is not itself important.
+ */
+const buttonIconOnlySizeClasses: Record<ButtonSize, string> = {
+  xs: 'h-6 w-6 !p-0',
+  sm: 'h-8 w-8 !p-0',
+  md: 'h-10 w-10 !p-0',
+  lg: 'h-12 w-12 !p-0',
+  xl: 'h-14 w-14 !p-0'
+}
+
+const buttonIconOnlyBlockSizeClasses: Record<ButtonSize, string> = {
+  xs: 'h-6 !p-0',
+  sm: 'h-8 !p-0',
+  md: 'h-10 !p-0',
+  lg: 'h-12 !p-0',
+  xl: 'h-14 !p-0'
+}
+
 export const buttonDisabledClasses =
   'pointer-events-none cursor-not-allowed opacity-60 active:!scale-100'
 
@@ -54,6 +75,11 @@ export interface ResolveButtonClassesInput {
   block?: boolean
   /** Group or split seam owns the radius. */
   joined?: boolean
+  /**
+   * No visible label. Square hit target, padding cleared, glyph centered by
+   * the button's flex alignment.
+   */
+  iconOnly?: boolean
   className?: ClassValue
 }
 
@@ -73,6 +99,8 @@ export function resolveButtonClasses(input: ResolveButtonClassesInput = {}): str
     !input.joined && buttonRadiusClasses,
     variantClasses,
     buttonSizeClasses[size],
+    input.iconOnly &&
+      (input.block ? buttonIconOnlyBlockSizeClasses[size] : buttonIconOnlySizeClasses[size]),
     (input.disabled || input.loading) && buttonDisabledClasses,
     input.block && 'w-full',
     input.className
@@ -108,7 +136,7 @@ export function getButtonIconSlotClasses(
   placement: ButtonIconPlacement,
   hasLabel: boolean
 ): string {
-  if (!hasLabel) return ''
+  if (!hasLabel) return 'inline-flex shrink-0 items-center justify-center leading-none'
   return placement === 'end' ? 'ms-2' : 'me-2'
 }
 

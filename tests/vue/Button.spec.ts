@@ -32,8 +32,6 @@ describe('Button', () => {
     expect(button).toHaveAttribute('aria-label', 'Custom')
   })
 
-
-
   it('respects type prop (submit/reset/button)', () => {
     const first = render(Button, {
       props: { type: 'submit' },
@@ -210,6 +208,38 @@ describe('Button', () => {
   })
 
   describe('iconPosition prop', () => {
+    it('squares an icon-only button even when a caller adds horizontal padding', () => {
+      const { container } = render(Button, {
+        props: { size: 'sm' },
+        attrs: { 'aria-label': 'Settings', class: 'px-2 shrink-0' },
+        slots: { icon: '<span data-testid="icon">★</span>' }
+      })
+      const button = container.querySelector('button')!
+      expect(button.className).toContain('h-8')
+      expect(button.className).toContain('w-8')
+      expect(button.className).toContain('!p-0')
+      expect(button.className).toContain('shrink-0')
+      const icon = container.querySelector('[data-testid="icon"]')!
+      expect(icon.parentElement!.className).toContain('items-center')
+      expect(icon.parentElement!.className).toContain('justify-center')
+    })
+
+    it('keeps text padding when the button has a label', () => {
+      const { container } = render(Button, {
+        props: { size: 'sm' },
+        slots: {
+          default: 'Save',
+          icon: '<span data-testid="icon">★</span>'
+        }
+      })
+      const button = container.querySelector('button')!
+      expect(button.className).not.toContain('!p-0')
+      expect(button.className).not.toMatch(/(?:^|\s)w-8(?:\s|$)/)
+      expect(container.querySelector('[data-testid="icon"]')!.parentElement!.className).toContain(
+        'me-2'
+      )
+    })
+
     it('renders icon slot before the label by default', () => {
       const { container } = render(Button, {
         slots: {

@@ -352,7 +352,7 @@ export const DataTableWithToolbar = defineComponent({
               {
                 size: 'sm',
                 variant: 'outline',
-                class: 'shrink-0 px-2',
+                class: 'shrink-0',
                 'aria-label': tableLabels.value.columnSettingsAriaLabel
               },
               { default: () => h(Icon, { name: 'settings', class: 'w-3.5 h-3.5' }) }

@@ -356,7 +356,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         <Button
           size="sm"
           variant="outline"
-          className="shrink-0 px-2"
+          className="shrink-0"
           aria-label={tableLabels.columnSettingsAriaLabel}>
           <Icon name="settings" className="w-3.5 h-3.5" />
         </Button>

@@ -111,22 +111,6 @@ export const Button = defineComponent({
     const config = useTigerConfig()
     const resolvedSize = computed<ButtonSize>(() => props.size ?? group?.size ?? 'md')
 
-    const buttonClasses = computed(() =>
-      classNames(
-        resolveButtonClasses({
-          variant: props.variant,
-          danger: props.danger,
-          size: resolvedSize.value,
-          disabled: props.disabled,
-          loading: props.loading,
-          joined: group != null,
-          block: props.block,
-          className: props.className
-        }),
-        coerceClassValue(attrs.class)
-      )
-    )
-
     const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     return () => {
@@ -155,6 +139,20 @@ export const Button = defineComponent({
         return null
       }
       const hasLabel = visibleText.length > 0
+      const buttonClasses = classNames(
+        resolveButtonClasses({
+          variant: props.variant,
+          danger: props.danger,
+          size: resolvedSize.value,
+          disabled: props.disabled,
+          loading: props.loading,
+          joined: group != null,
+          block: props.block,
+          iconOnly: !hasLabel,
+          className: props.className
+        }),
+        coerceClassValue(attrs.class)
+      )
 
       const placement = resolveButtonIconPlacement(props.iconPosition)
       const slotClass = getButtonIconSlotClasses(placement, hasLabel)
@@ -183,7 +181,7 @@ export const Button = defineComponent({
         {
           ...domAttrs,
           [TIGER_CHROME_ATTR]: '',
-          class: buttonClasses.value,
+          class: buttonClasses,
           style: mergedStyle.value,
           'aria-busy': attrs['aria-busy'] ?? (props.loading ? 'true' : undefined),
           'aria-disabled':

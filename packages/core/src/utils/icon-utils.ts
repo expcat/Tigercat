@@ -2,9 +2,20 @@ import { type IconSize } from '../types/icon'
 import { devWarn } from './dev-warn'
 import { ICON_STROKE_LINECAP, ICON_STROKE_LINEJOIN, ICON_STROKE_WIDTH } from './svg-attrs'
 
-export const iconWrapperClasses = 'inline-flex align-middle'
+/**
+ * Center the glyph in the wrapper. `leading-none` drops the text strut so a
+ * sized box does not sit on the baseline. A className width/height sizes this
+ * wrapper; the SVG is centered inside it instead of pinning to the start edge.
+ */
+export const iconWrapperClasses =
+  'inline-flex items-center justify-center align-middle leading-none'
 
-export const iconSvgBaseClasses = 'inline-block'
+/**
+ * `max-*` plus `min-*-0` let a smaller wrapper shrink both axes. Flex shrink
+ * only affects the main axis, which is how a 20px glyph in a 14px box became
+ * 14×20 and hung out the bottom. An unsized wrapper still uses the size classes.
+ */
+export const iconSvgBaseClasses = 'block max-h-full max-w-full min-h-0 min-w-0'
 
 export const iconSizeClasses: Record<IconSize, string> = {
   sm: 'w-4 h-4',

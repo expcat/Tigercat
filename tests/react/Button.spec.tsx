@@ -190,6 +190,30 @@ describe('Button', () => {
   })
 
   describe('iconPosition prop', () => {
+    it('squares an icon-only button even when a caller adds horizontal padding', () => {
+      render(
+        <Button size="sm" className="px-2 shrink-0" aria-label="Settings" icon={<span>★</span>} />
+      )
+      const button = screen.getByRole('button', { name: 'Settings' })
+      expect(button.className).toContain('h-8')
+      expect(button.className).toContain('w-8')
+      expect(button.className).toContain('!p-0')
+      expect(button.className).toContain('shrink-0')
+      expect(button.querySelector('span')!.className).toContain('items-center')
+      expect(button.querySelector('span')!.className).toContain('justify-center')
+    })
+
+    it('keeps text padding when the button has a label', () => {
+      render(
+        <Button size="sm" icon={<span>★</span>}>
+          Save
+        </Button>
+      )
+      const button = screen.getByRole('button', { name: 'Save' })
+      expect(button.className).not.toContain('!p-0')
+      expect(button.className).not.toMatch(/(?:^|\s)w-8(?:\s|$)/)
+    })
+
     it('renders icon before the label by default', () => {
       render(<Button icon={<span data-testid="icon">★</span>}>Star</Button>)
       const button = screen.getByRole('button', { name: 'Star' })

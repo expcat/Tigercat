@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buttonBaseClasses,
   buttonDangerClasses,
+  getButtonIconSlotClasses,
   getButtonVariantClasses,
   resolveButtonClasses,
   resolveButtonType,
@@ -46,6 +47,40 @@ describe('resolveButtonType', () => {
     expect(resolveButtonType('reset')).toBe('reset')
     expect(resolveButtonType(undefined)).toBe('button')
     expect(resolveButtonType('nope')).toBe('button')
+  })
+})
+
+describe('icon-only buttons', () => {
+  it('uses a square box and clears text padding', () => {
+    const classes = resolveButtonClasses({ size: 'sm', iconOnly: true, className: 'px-2' })
+    expect(classes).toContain('h-8')
+    expect(classes).toContain('w-8')
+    expect(classes).toContain('!p-0')
+    expect(classes).toContain('items-center')
+    expect(classes).toContain('justify-center')
+  })
+
+  it('keeps text padding when the button has a label', () => {
+    const classes = resolveButtonClasses({ size: 'sm' })
+    expect(classes).not.toContain('!p-0')
+    expect(classes).not.toMatch(/(?:^|\s)w-8(?:\s|$)/)
+    expect(classes).toContain('px-3')
+    expect(classes).toContain('py-1.5')
+  })
+
+  it('stays full width when an icon-only button is also block', () => {
+    const classes = resolveButtonClasses({ size: 'sm', iconOnly: true, block: true })
+    expect(classes).toContain('h-8')
+    expect(classes).toContain('!p-0')
+    expect(classes).toContain('w-full')
+    expect(classes).not.toMatch(/(?:^|\s)w-8(?:\s|$)/)
+  })
+
+  it('centers the icon slot when there is no label', () => {
+    expect(getButtonIconSlotClasses('start', false)).toContain('items-center')
+    expect(getButtonIconSlotClasses('start', false)).toContain('justify-center')
+    expect(getButtonIconSlotClasses('end', true)).toBe('ms-2')
+    expect(getButtonIconSlotClasses('start', true)).toBe('me-2')
   })
 })
 

@@ -98,9 +98,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         loading,
         joined: group != null,
         block,
+        iconOnly: !hasLabel,
         className
       }),
-    [variant, danger, resolvedSize, disabled, loading, group, block, className]
+    [variant, danger, resolvedSize, disabled, loading, group, block, hasLabel, className]
   )
 
   if (!named) {

@@ -7,7 +7,9 @@ import { icon24StrokeWidth, closeIconPathStrokeWidth } from '@expcat/tigercat-co
 import {
   ICON_STROKE_WIDTH,
   getSvgDefaultAttrs,
+  iconSvgBaseClasses,
   iconSvgDefaultStrokeWidth,
+  iconWrapperClasses,
   mergeChildSvgAttrs,
   resolveIconPaintMode,
   resolveIconSize,
@@ -72,6 +74,18 @@ describe('icon svg construction', () => {
     expect(vueAttrs['stroke-width']).toBe(ICON_STROKE_WIDTH)
     expect(vueAttrs['stroke-linecap']).toBe('round')
     expect(vueAttrs.strokeWidth).toBeUndefined()
+  })
+})
+
+describe('icon alignment classes', () => {
+  it('centers the glyph and lets a smaller wrapper shrink both axes', () => {
+    expect(iconWrapperClasses).toContain('items-center')
+    expect(iconWrapperClasses).toContain('justify-center')
+    expect(iconWrapperClasses).toContain('leading-none')
+    expect(iconSvgBaseClasses).toContain('max-w-full')
+    expect(iconSvgBaseClasses).toContain('max-h-full')
+    expect(iconSvgBaseClasses).toContain('min-w-0')
+    expect(iconSvgBaseClasses).toContain('min-h-0')
   })
 })
 
