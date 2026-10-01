@@ -124,8 +124,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
           className={closeButtonClasses}
           onClick={handleClose}
           aria-label={closeName}
-          type="button"
-          tabIndex={-1}>
+          type="button">
           <CloseIcon />
         </button>
       )}

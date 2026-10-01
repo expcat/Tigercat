@@ -134,8 +134,12 @@ describe('SplitButton', () => {
         </SplitButton>
       )
 
+      // happy-dom has no layout; provide the visible trigger's bounds for positioning.
+      vi.spyOn(getTrigger(container), 'getBoundingClientRect').mockReturnValue(
+        new DOMRect(20, 20, 32, 32)
+      )
       await userEvent.click(getTrigger(container))
-      await userEvent.click(screen.getByRole('menuitem', { name: 'Draft' }))
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Draft' }))
       expect(onItem).toHaveBeenCalledTimes(1)
       expect(onClick).not.toHaveBeenCalled()
     })

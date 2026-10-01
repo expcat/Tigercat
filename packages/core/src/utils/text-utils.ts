@@ -21,12 +21,6 @@ import {
 
 const TEXT_TAG_SET: ReadonlySet<string> = new Set(TEXT_TAGS)
 
-/** Copyable text cannot use a paragraph, because a button is not valid inside `p`. */
-export function resolveCopyableTextTag(tag?: string | null): 'div' | 'span' {
-  if (tag === 'div') return 'div'
-  return 'span'
-}
-
 export function resolveTextTag(tag?: string | null): TextTag {
   if (tag && TEXT_TAG_SET.has(tag)) return tag as TextTag
   if (tag) {

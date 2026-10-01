@@ -1,8 +1,12 @@
 {
   "id": "gallery-01",
   "title": "缩略图画廊",
-  "description": "缩略图列表、当前项和计数。点开复用 ImagePreview，不另写手势。",
+  "description": "用 Tab + Enter / Space 选择缩略图，aria-current 标记当前项；打开当前图复用 ImagePreview。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": { "mode": "auto", "minHeight": 360, "maxHeight": 560 }
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 360,
+    "maxHeight": 560
+  }
 }

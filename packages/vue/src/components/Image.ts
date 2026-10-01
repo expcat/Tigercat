@@ -4,7 +4,6 @@ import {
   ref,
   computed,
   watch,
-  onMounted,
   onBeforeUnmount,
   inject,
   useId,
@@ -36,8 +35,7 @@ import {
   resolveImagePreviewEnabled,
   resolveImagePreviewSrc,
   toCSSSize,
-  type ImageFit,
-  type ImagePreviewTrigger
+  type ImageFit
 } from '@expcat/tigercat-core'
 import { usePopup } from '../utils/use-popup'
 import { renderVueOverlayTeleport } from '../utils/overlay'
@@ -162,8 +160,6 @@ export const Image = defineComponent({
     const containerRef = ref<HTMLElement | null>(null)
     const imgRef = ref<HTMLImageElement | null>(null)
     const previewVisible = ref(false)
-    const inView = ref(!props.lazy)
-    let observer: IntersectionObserver | null = null
     const instanceId = `tiger-image-${useId()}`
 
     const group = inject<ImageGroupContext | null>(IMAGE_GROUP_INJECTION_KEY, null)
@@ -209,37 +205,10 @@ export const Image = defineComponent({
       hoverTriggerRef.value = el as HTMLElement | null
     }
 
-    const disconnectObserver = () => {
-      observer?.disconnect()
-      observer = null
-    }
-
-    const observeLazy = () => {
-      disconnectObserver()
-      if (!props.lazy || inView.value || !containerRef.value) return
-      observer = new IntersectionObserver(
-        (entries) => {
-          if (!entries[0]?.isIntersecting) return
-          inView.value = true
-          loadState.value = resetImageLoadState(props.src, true, true)
-          disconnectObserver()
-        },
-        { threshold: 0.01 }
-      )
-      observer.observe(containerRef.value)
-    }
-
     watch(
       () => [props.src, props.lazy] as const,
       () => {
-        if (!props.lazy) {
-          inView.value = true
-          loadState.value = resetImageLoadState(props.src, false, true)
-          disconnectObserver()
-          return
-        }
-        loadState.value = resetImageLoadState(props.src, true, inView.value)
-        if (!inView.value) observeLazy()
+        loadState.value = resetImageLoadState(props.src)
       }
     )
 
@@ -260,16 +229,7 @@ export const Image = defineComponent({
       { immediate: true }
     )
 
-    watch(containerRef, () => {
-      if (props.lazy && !inView.value) observeLazy()
-    })
-
-    onMounted(() => {
-      if (props.lazy && !inView.value) observeLazy()
-    })
-
     onBeforeUnmount(() => {
-      disconnectObserver()
       group?.unregister(instanceId)
     })
 

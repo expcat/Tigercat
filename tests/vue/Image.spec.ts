@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
 import { Image } from '@expcat/tigercat-vue/Image'
@@ -10,7 +10,6 @@ import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { expectNoA11yViolationsIsolated } from '../utils'
-import { MockIntersectionObserver } from '../utils/mock-observers'
 
 describe('Image', () => {
   it('renders image with src and keeps alt on the bitmap when preview is off', () => {
@@ -257,28 +256,18 @@ describe('Image', () => {
 })
 
 describe('Image lazy loading', () => {
-  beforeEach(() => {
-    MockIntersectionObserver.reset()
-    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
-  })
-
   afterEach(() => {
     vi.unstubAllGlobals()
-    MockIntersectionObserver.reset()
   })
 
   it('clears error and loads the new src when a lazy image changes', async () => {
+    vi.stubGlobal('IntersectionObserver', undefined)
     const { container, rerender } = render(Image, {
       props: { src: '/broken.jpg', lazy: true, preview: false },
       slots: { error: () => h('div', { 'data-testid': 'err' }, 'err') }
     })
 
-    await waitFor(() => expect(MockIntersectionObserver.instances.length).toBeGreaterThan(0))
-    MockIntersectionObserver.instances[0]?.trigger({
-      isIntersecting: true,
-      intersectionRatio: 1
-    })
-    await waitFor(() => expect(container.querySelector('img')).toBeTruthy())
+    expect(container.querySelector('img')).toHaveAttribute('loading', 'lazy')
 
     await fireEvent.error(container.querySelector('img') as Element)
     expect(screen.getByTestId('err')).toBeInTheDocument()

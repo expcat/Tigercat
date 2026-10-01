@@ -4,7 +4,6 @@ import {
   clampGalleryIndex,
   classNames,
   formatGalleryCount,
-  type GalleryItem,
   type GalleryProps as CoreGalleryProps
 } from '@expcat/tigercat-core'
 import { Image } from './Image'
@@ -59,22 +58,30 @@ export const Gallery: React.FC<GalleryProps> = ({
         </button>
       ) : null}
       <p data-gallery-count="">{count}</p>
-      <div role="list" aria-label={listLabel} className="flex flex-wrap gap-2">
+      <ul aria-label={listLabel} className="m-0 flex list-none flex-wrap gap-2 p-0">
         {items.map((item, itemIndex) => (
-          <button
-            key={`${item.src}-${itemIndex}`}
-            type="button"
-            role="listitem"
-            className={classNames(
-              'border-2 bg-transparent p-0',
-              itemIndex === index ? 'border-[var(--tiger-primary)]' : 'border-transparent'
-            )}
-            aria-current={itemIndex === index ? 'true' : undefined}
-            onClick={() => select(itemIndex)}>
-            <Image src={item.src} alt={item.alt} preview={false} width={64} height={64} />
-          </button>
+          <li key={`${item.src}-${itemIndex}`}>
+            <button
+              type="button"
+              className={classNames(
+                'border-2 bg-transparent p-0 focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]',
+                itemIndex === index ? 'border-[var(--tiger-primary)]' : 'border-transparent'
+              )}
+              aria-label={
+                item.alt ||
+                formatGalleryCount(
+                  basicLabel(config.locale?.locale, 'gallery', 'count'),
+                  itemIndex + 1,
+                  items.length
+                )
+              }
+              aria-current={itemIndex === index ? 'true' : undefined}
+              onClick={() => select(itemIndex)}>
+              <Image src={item.src} alt={item.alt} preview={false} width={64} height={64} />
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
       <ImagePreview
         open={open}
         images={items.map((item) => ({ src: item.src, alt: item.alt }))}

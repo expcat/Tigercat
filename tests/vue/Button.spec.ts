@@ -5,10 +5,18 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
+import { defineComponent, h } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Button', () => {
+  it('renders and activates a label supplied by a child component', async () => {
+    const Label = defineComponent({ setup: () => () => h('span', 'Save') })
+    const { emitted } = render(Button, { slots: { default: () => h(Label) } })
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
+    expect(emitted().click).toHaveLength(1)
+  })
+
   it('renders and merges class/style from props and attrs', () => {
     const { container } = render(Button, {
       props: { className: 'from-prop', style: { color: 'red' } },

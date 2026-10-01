@@ -87,12 +87,12 @@ const COMPONENT_USAGE_NOTES = {
   },
   Button: {
     notes:
-      '`htmlType` 与原生 `type` 是同一属性（`htmlType ?? type ?? "button"`，冲突时 htmlType 胜出）。`size` 未设时：组 size → `md`。无可见文字的 icon-only 按钮按 size 为正方形且 padding 为 0，图标居中；必须 `aria-label`。loading 可聚焦并设 `aria-busy`，不设原生 disabled。'
+      '`type` 是原生按钮类型（button / submit / reset），默认 button；3.0 不再提供 `htmlType`。`size` 未设时：组 size → `md`。纯图标用 icon prop / slot，并提供 `aria-label` 或 `aria-labelledby`；按钮按 size 为正方形。文字也可以来自子组件。loading 设置原生 disabled 和 `aria-busy`。'
   },
   SplitButton: {
     uses: ['Button', 'Dropdown', 'DropdownMenu', 'DropdownItem'],
     notes:
-      '主按钮吃 `htmlType` / `type`（htmlType 胜出），chevron 固定 `type="button"`。不要把 SplitButton 塞进 ButtonGroup。'
+      '`type` 只写到主按钮，chevron 固定 `type="button"`。loading 时两颗按钮都禁用。不要把 SplitButton 塞进 ButtonGroup。'
   },
   Breadcrumb: {
     notes:
@@ -112,7 +112,8 @@ const COMPONENT_USAGE_NOTES = {
     notes: '项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。'
   },
   NavigationMenu: {
-    notes: '链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferrer`。危险协议和禁用项不输出 `href`。'
+    notes:
+      '链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferrer`。危险协议和禁用项不输出 `href`。'
   },
   ContextMenu: {
     notes: '项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。'
@@ -163,7 +164,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Signature: {
     notes:
-      "受控值是空，或当前笔画导出的 SVG。解析不了的字符串当空，不提交原文。单点在画布、受控值和 `toDataURL()` 里是同一笔。Escape 和 `pointercancel` 丢掉当前笔。一次落笔写一次。只读用 `readOnly`：可聚焦、可提交、不能画。`disabled` 才离开 Tab 序。读 FormItem；id/aria 在画板 widget 上。"
+      '受控值是空，或当前笔画导出的 SVG。解析不了的字符串当空，不提交原文。单点在画布、受控值和 `toDataURL()` 里是同一笔。Escape 和 `pointercancel` 丢掉当前笔。一次落笔写一次。只读用 `readOnly`：可聚焦、可提交、不能画。`disabled` 才离开 Tab 序。读 FormItem；id/aria 在画板 widget 上。'
   },
   Form: {
     notes:
@@ -171,7 +172,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   FormItem: {
     notes:
-      "具名 FormItem 只把值和校验接到第一个控件。`required` 合并成一条规则。错误文本一直在文档里：字段校验是 `role=\"status\"`，提交失败是 `role=\"alert\"`。省略公开 value/`checked`/`fileList` 时从模型取值（boolean/list/tuple 不会把 `''` 当成字符串）。单颗 Radio 写入自己的选项值。"
+      '具名 FormItem 只把值和校验接到第一个控件。`required` 合并成一条规则。错误文本一直在文档里：字段校验是 `role="status"`，提交失败是 `role="alert"`。省略公开 value/`checked`/`fileList` 时从模型取值（boolean/list/tuple 不会把 `\'\'` 当成字符串）。单颗 Radio 写入自己的选项值。'
   },
   Input: {
     notes:
@@ -238,7 +239,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Transfer: {
     notes:
-      '目标只留 `value`，初始值只留 `defaultValue`。数据源按字符串键收成一条，`1` 和 `\'1\'` 是同一行。搜索、全选和移动只处理当前可见项。搜索框的 Enter 不提交外层表单。滤掉的已选项单独成条，可以一次清掉。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`。'
+      "目标只留 `value`，初始值只留 `defaultValue`。数据源按字符串键收成一条，`1` 和 `'1'` 是同一行。搜索、全选和移动只处理当前可见项。搜索框的 Enter 不提交外层表单。滤掉的已选项单独成条，可以一次清掉。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`。"
   },
   Icon: {
     notes:
@@ -250,7 +251,16 @@ const COMPONENT_USAGE_NOTES = {
   },
   Text: {
     notes:
-      '`tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 只用 `start` / `center` / `end` / `justify`。`label` 需自备 `htmlFor`。'
+      '`tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。copyable 保留指定标签，复制按钮可用 Tab + Enter / Space。`align` 只用 `start` / `center` / `end` / `justify`。`label` 需自备 `htmlFor`。'
+  },
+  CopyButton: {
+    notes:
+      '按钮文字优先 children / 默认插槽，再读 `label`，缺省与复制结果读 ConfigProvider 的 text 文案。复制失败保留焦点。'
+  },
+  Gallery: {
+    uses: ['Image', 'ImagePreview'],
+    notes:
+      '缩略图是列表里的原生按钮，可用 Tab + Enter / Space 选择；`aria-current` 标记当前项。图片 `alt` 用作缩略图名，省略时使用图片序号。'
   },
   Code: {
     notes: '`code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。'
@@ -329,7 +339,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Image: {
     notes:
-      '默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。'
+      '默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`zoomOnHover` 开启悬停 / focus 放大，点击仍打开全屏预览；组内由 ImageGroup 统一预览。lazy 使用原生 `loading="lazy"`。`onLoad` / `srcSet` 落在内层 `<img>`。'
   },
   ImageGroup: {
     notes:
@@ -475,7 +485,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Tag: {
     notes:
-      '默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。'
+      '默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `open={false}`。关闭按钮可用 Tab + Enter / Space，关闭名走 locale。`pill` 全圆角。'
   },
   Space: {
     notes: '`wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基类。'
@@ -662,7 +672,7 @@ React \`filtersExtra\` age range:
 
 const COMPONENT_SNIPPETS = {
   Vue: {
-    Button: '<Button html-type="submit">Save</Button>',
+    Button: '<Button type="submit">Save</Button>',
     ButtonGroup:
       '<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>',
     Icon: '<Icon name="search" />',
@@ -726,7 +736,7 @@ const COMPONENT_SNIPPETS = {
     Col: '<Col :span="12">A</Col>'
   },
   React: {
-    Button: '<Button htmlType="submit">Save</Button>',
+    Button: '<Button type="submit">Save</Button>',
     ButtonGroup:
       '<ButtonGroup aria-label="Pages" size="sm"><Button>Prev</Button><Button>Next</Button></ButtonGroup>',
     Icon: '<Icon name="search" />',
@@ -1551,9 +1561,7 @@ async function main() {
         if (pascalToKebab(entry.component) !== slug) {
           await writeFile(
             join(PROPS_DIR, file),
-            await formatMarkdown(
-              generatePublicPropsReference(category, [entry], interfaceDetails)
-            ),
+            await formatMarkdown(generatePublicPropsReference(category, [entry], interfaceDetails)),
             'utf8'
           )
         }
@@ -1620,11 +1628,7 @@ async function stampPublishFace(componentCount) {
     homeHtml.replace(/class="version-badge">v[^<]*/, `class="version-badge">v${version}`),
     'utf8'
   )
-  await writeFile(
-    mcp,
-    mcpHtml.replace(/\d+\+? 组件索引/, `${componentCount} 组件索引`),
-    'utf8'
-  )
+  await writeFile(mcp, mcpHtml.replace(/\d+\+? 组件索引/, `${componentCount} 组件索引`), 'utf8')
 }
 
 function collectSkillFiles() {

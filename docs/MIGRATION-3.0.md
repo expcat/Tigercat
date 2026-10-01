@@ -30,6 +30,7 @@
 | `injectMarqueeStyles` / `injectPrintLayoutStyles`                                       | Tailwind 插件里的样式                                                      |
 | `getMessagePositionStyle`                                                               | 当前 `ConfigProvider` 的队列                                               |
 | `sliderTooltipReserveClasses`                                                           | 删除。滑块 tooltip 不再用 `pt-12` 撑开轨道                                 |
+| `resolveCopyableTextTag`（早期 preview）                                                | `resolveTextTag`；copyable 保留指定标签                                    |
 
 框架包不再星号再导出 `@expcat/tigercat-core`。`types/composite`、`types/kanban`、`types/image-viewer` 这些兼容入口已删除。版本只读各包的 `package.json`。
 
@@ -291,6 +292,8 @@ Tooltip 气泡用 `--tiger-text` 作底、`--tiger-surface` 作字，圆角 `--t
 
 `loading` 设置原生 `disabled`，并带 `aria-busy`。`SplitButton` 在 loading 时两颗按钮都禁用。菜单在打开前不挂载。
 
+原生按钮类型只用 `type="button|submit|reset"`，删除 `htmlType`。Button 的文字可以来自子组件；纯图标用 icon prop / slot，并提供可访问名称。
+
 ## Avatar / AvatarGroup
 
 溢出头像是按钮。非 Avatar 子节点仍留在组里。
@@ -359,6 +362,6 @@ CLI 与 MCP 的对外版本等于各自 `package.json`。`doctor` 要求技能�
 
 这些名字在 2.x 不存在：`Inplace`、`CopyButton`、`Gallery`、`WaterfallChart`、`SankeyChart`、`NotificationBell`、`AssigneePicker`、`AppShell`。
 
-`CopyButton` 只调用 `copyTextToClipboard`。`Gallery` 组合缩略图和 `ImagePreview`。`NotificationBell` 不读命令式提示队列。`AssigneePicker` 只消费调用方给的目录。
+`CopyButton` 只调用 `copyTextToClipboard`，默认按钮和结果文案读 ConfigProvider 的 text 文案；两框架均可用 `label` 覆盖按钮文字。`Gallery` 组合可用键盘选择的缩略图按钮和 `ImagePreview`。`NotificationBell` 不读命令式提示队列。`AssigneePicker` 只消费调用方给的目录。
 
 其余增强是可选 prop。旧调用点不用补上这些 prop。

@@ -1,8 +1,12 @@
 {
   "id": "divider-04",
   "title": "竖向、颜色与粗细",
-  "description": "orientation=\"vertical\" 作行内分隔；color 与 thickness 自定义颜色和线宽。",
+  "description": "竖向普通线与渐变线拉伸分隔同行内容；color 与 thickness 设置颜色和粗细。",
   "entry": "App.tsx",
   "order": 4,
-  "viewport": { "mode": "auto", "minHeight": 160, "maxHeight": 720 }
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 160,
+    "maxHeight": 720
+  }
 }

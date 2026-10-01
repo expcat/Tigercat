@@ -4,7 +4,6 @@ import {
   copyTextToClipboard,
   createCopyStatusReset,
   getTextLabels,
-  resolveCopyableTextTag,
   getIconDefinition,
   getTextClasses,
   isTextCopyable,
@@ -134,7 +133,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
   }
 
   return React.createElement(
-    resolveCopyableTextTag(tag),
+    resolvedTag,
     { ...props, ref, className: classNames(textCopyableRootClasses, className) },
     <span
       ref={bodyRef}

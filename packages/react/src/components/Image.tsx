@@ -137,7 +137,6 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
   const [previewVisible, setPreviewVisible] = useState(false)
   const imgRef = useRef<HTMLImageElement | null>(null)
   const containerRef = useRef<HTMLElement | null>(null)
-  const inViewRef = useRef(!lazy)
   const group = useContext(ImageGroupContext)
   const instanceId = useId()
 

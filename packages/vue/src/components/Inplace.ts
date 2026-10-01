@@ -1,6 +1,8 @@
 import { defineComponent, h, ref, computed, type PropType } from 'vue'
 import { resolveButtonClasses, toggleInplace } from '@expcat/tigercat-core'
 
+export type VueInplaceProps = InstanceType<typeof Inplace>['$props']
+
 export const Inplace = defineComponent({
   name: 'TigerInplace',
   inheritAttrs: false,

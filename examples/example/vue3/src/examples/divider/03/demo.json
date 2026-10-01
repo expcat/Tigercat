@@ -1,7 +1,7 @@
 {
   "id": "divider-03",
   "title": "线型与间距",
-  "description": "solid/dashed/dotted/gradient；gradient 同时绑 color 与 thickness。",
+  "description": "solid / dashed / dotted / gradient；渐变支持 CSS 颜色、主题 token、粗细和文字标签。",
   "entry": "App.vue",
   "order": 3,
   "viewport": {

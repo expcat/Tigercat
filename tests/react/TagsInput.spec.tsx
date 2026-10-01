@@ -146,14 +146,16 @@ describe('TagsInput', () => {
       await expectNoA11yViolationsIsolated(container)
     })
 
-    it('keeps tag close buttons out of the tab order', () => {
-      const { getByRole, container } = render(
+    it('closes a tag with the keyboard and returns focus to the input', async () => {
+      const user = userEvent.setup()
+      const { getByRole, queryByText } = render(
         <TagsInput defaultValue={['vue', 'react']} aria-label="Tags" />
       )
-      expect(getByRole('textbox').tabIndex).not.toBe(-1)
-      const closes = Array.from(container.querySelectorAll('button'))
-      expect(closes.length).toBeGreaterThan(0)
-      expect(closes.every((button) => button.tabIndex === -1)).toBe(true)
+      await user.tab()
+      expect(getByRole('button', { name: /vue/ })).toHaveFocus()
+      await user.keyboard('{Enter}')
+      expect(queryByText('vue')).not.toBeInTheDocument()
+      expect(getByRole('textbox')).toHaveFocus()
     })
   })
 

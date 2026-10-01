@@ -44,7 +44,7 @@ describe('Tag', () => {
     expect(container.querySelector('button')).not.toBeInTheDocument()
   })
 
-  it('calls onClose and stays visible unless the parent unmounts it', async () => {
+  it('closes from the keyboard and stays visible unless the parent unmounts it', async () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
 
@@ -54,7 +54,9 @@ describe('Tag', () => {
       </Tag>
     )
 
-    await user.click(screen.getByRole('button', { name: 'Close Closable Tag' }))
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Close Closable Tag' })).toHaveFocus()
+    await user.keyboard('{Enter}')
     expect(onClose).toHaveBeenCalledTimes(1)
     expect(screen.getByText('Closable Tag')).toBeInTheDocument()
   })

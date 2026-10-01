@@ -6,7 +6,13 @@ export default function App() {
     <div className="space-y-4">
       <Space size="sm">
         <span>首页</span>
-        <Divider orientation="vertical" spacing="none" />
+        <Divider
+          orientation="vertical"
+          lineStyle="gradient"
+          color="primary"
+          thickness="3px"
+          spacing="none"
+        />
         <span>文档</span>
         <Divider orientation="vertical" spacing="none" />
         <span>关于</span>

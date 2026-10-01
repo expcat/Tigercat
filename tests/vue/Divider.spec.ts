@@ -52,7 +52,9 @@ describe('Divider (Vue)', () => {
       spacing: 'none'
     })
     const divider = getRoot(container)
-    expect(divider.style.backgroundImage).toContain('var(--tiger-primary)')
+    expect(divider.style.backgroundImage).toContain(
+      'linear-gradient(90deg, transparent, var(--tiger-primary), transparent)'
+    )
     expect(divider.style.height).toBe('4px')
     expect(divider.style.borderWidth).toBe('0px')
   })

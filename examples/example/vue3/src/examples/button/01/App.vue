@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { defineComponent, h } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
+
+const SaveLabel = defineComponent({ setup: () => () => h('span', '保存') })
 </script>
 
 <template>
   <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
-    <Button>保存</Button>
+    <Button><SaveLabel /></Button>
     <Button size="sm">小号</Button>
     <Button disabled>禁用</Button>
     <Button danger>删除</Button>

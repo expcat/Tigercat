@@ -303,6 +303,7 @@ describe('ImageCropper', () => {
       </>
     )
 
+    await waitFor(() => expect(container.querySelectorAll('mask')).toHaveLength(2))
     const masks = Array.from(container.querySelectorAll('mask')).map((mask) => mask.id)
     expect(masks).toHaveLength(2)
     expect(new Set(masks).size).toBe(2)

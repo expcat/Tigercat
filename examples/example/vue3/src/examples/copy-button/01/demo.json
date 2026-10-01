@@ -1,8 +1,12 @@
 {
   "id": "copy-button-01",
   "title": "复制",
-  "description": "只调用 copyTextToClipboard。失败时按钮保持焦点并露出错误。",
+  "description": "缺省按钮和结果文字跟随 ConfigProvider locale；label 覆盖按钮文字，失败时保留焦点。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": { "mode": "auto", "minHeight": 80, "maxHeight": 200 }
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 80,
+    "maxHeight": 200
+  }
 }

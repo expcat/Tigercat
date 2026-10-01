@@ -3,6 +3,7 @@ import {
   basicLabel,
   clampGalleryIndex,
   classNames,
+  coerceClassValue,
   formatGalleryCount,
   type GalleryItem
 } from '@expcat/tigercat-core'
@@ -64,7 +65,7 @@ export const Gallery = defineComponent({
         'div',
         {
           ...attrs,
-          class: classNames('flex flex-col gap-2', props.className),
+          class: classNames('flex flex-col gap-2', props.className, coerceClassValue(attrs.class)),
           'data-gallery': ''
         },
         [
@@ -93,24 +94,39 @@ export const Gallery = defineComponent({
             : null,
           h('p', { 'data-gallery-count': '' }, count),
           h(
-            'div',
-            { role: 'list', 'aria-label': listLabel, class: 'flex flex-wrap gap-2' },
+            'ul',
+            { 'aria-label': listLabel, class: 'm-0 flex list-none flex-wrap gap-2 p-0' },
             items.map((item, itemIndex) =>
-              h(
-                'button',
-                {
-                  key: `${item.src}-${itemIndex}`,
-                  type: 'button',
-                  role: 'listitem',
-                  class: classNames(
-                    'border-2 bg-transparent p-0',
-                    itemIndex === index ? 'border-[var(--tiger-primary)]' : 'border-transparent'
-                  ),
-                  'aria-current': itemIndex === index ? 'true' : undefined,
-                  onClick: () => select(itemIndex)
-                },
-                [h(Image, { src: item.src, alt: item.alt, preview: false, width: 64, height: 64 })]
-              )
+              h('li', { key: `${item.src}-${itemIndex}` }, [
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: classNames(
+                      'border-2 bg-transparent p-0 focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]',
+                      itemIndex === index ? 'border-[var(--tiger-primary)]' : 'border-transparent'
+                    ),
+                    'aria-label':
+                      item.alt ||
+                      formatGalleryCount(
+                        basicLabel(config.value.locale?.locale, 'gallery', 'count'),
+                        itemIndex + 1,
+                        items.length
+                      ),
+                    'aria-current': itemIndex === index ? 'true' : undefined,
+                    onClick: () => select(itemIndex)
+                  },
+                  [
+                    h(Image, {
+                      src: item.src,
+                      alt: item.alt,
+                      preview: false,
+                      width: 64,
+                      height: 64
+                    })
+                  ]
+                )
+              ])
             )
           ),
           h(ImagePreview, {

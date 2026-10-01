@@ -1,8 +1,12 @@
 {
   "id": "text-04",
   "title": "可复制",
-  "description": "copyable 在文本旁放可键盘操作的复制钮。对象形态可覆盖复制内容和 tooltip。",
+  "description": "copyable 保留段落和标题标签，复制钮支持 Tab + Enter / Space。对象形态可覆盖复制内容和 tooltip。",
   "entry": "App.tsx",
   "order": 4,
-  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
 }

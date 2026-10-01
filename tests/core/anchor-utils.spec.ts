@@ -410,21 +410,24 @@ describe('anchor-utils', () => {
       expect(() => replaceAnchorHash('#spy-workflow')).not.toThrow()
     })
 
-    it('skips replaceState when the document URL is about:srcdoc', () => {
-      const happyDOM = (window as unknown as { happyDOM: { setURL: (url: string) => void } })
-        .happyDOM
-      const previous = window.location.href
-      const replaceState = vi.spyOn(window.history, 'replaceState').mockImplementation(() => {})
-      happyDOM.setURL('about:srcdoc')
-      try {
-        expect(window.location.href).toBe('about:srcdoc')
-        replaceState.mockClear()
-        replaceAnchorHash('#spy-workflow')
-        expect(replaceState).not.toHaveBeenCalled()
-      } finally {
-        happyDOM.setURL(previous)
+    it.each(['about:srcdoc', 'http://localhost/#/divider'])(
+      'preserves the document URL when its fragment cannot be replaced: %s',
+      (url) => {
+        const happyDOM = (window as unknown as { happyDOM: { setURL: (url: string) => void } })
+          .happyDOM
+        const previous = window.location.href
+        const replaceState = vi.spyOn(window.history, 'replaceState').mockImplementation(() => {})
+        happyDOM.setURL(url)
+        try {
+          expect(window.location.href).toBe(url)
+          replaceState.mockClear()
+          replaceAnchorHash('#spy-workflow')
+          expect(replaceState).not.toHaveBeenCalled()
+        } finally {
+          happyDOM.setURL(previous)
+        }
       }
-    })
+    )
   })
 
   describe('scrollToAnchor', () => {

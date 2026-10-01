@@ -1,6 +1,5 @@
 import React, { forwardRef, useMemo } from 'react'
 import {
-  hasAccessibleName,
   resolveButtonClasses,
   resolveButtonType,
   resolveButtonIconPlacement,
@@ -43,17 +42,19 @@ const createDefaultSpinner = (size: ButtonSize): React.ReactNode => {
   )
 }
 
-function visibleButtonText(node: React.ReactNode): string {
-  if (node == null || typeof node === 'boolean') return ''
-  if (typeof node === 'string' || typeof node === 'number') return String(node)
-  if (Array.isArray(node)) return node.map(visibleButtonText).join('')
+function hasLabelContent(node: React.ReactNode): boolean {
+  if (node == null || typeof node === 'boolean') return false
+  if (typeof node === 'string' || typeof node === 'number') return String(node).trim().length > 0
+  if (Array.isArray(node)) return node.some(hasLabelContent)
   if (React.isValidElement(node)) {
     const props = node.props as { children?: React.ReactNode; 'aria-hidden'?: unknown }
     const hidden = props['aria-hidden']
-    if (hidden === true || hidden === '' || hidden === 'true') return ''
-    return visibleButtonText(props.children)
+    if (hidden === true || hidden === '' || hidden === 'true') return false
+    // A component's rendered content is only known after it renders.
+    if (typeof node.type !== 'string' && node.type !== React.Fragment) return true
+    return hasLabelContent(props.children)
   }
-  return ''
+  return false
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -84,9 +85,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const config = useTigerConfig()
   const resolvedSize = size ?? group?.size ?? 'md'
   const resolvedType = resolveButtonType(type)
-  const visibleText = visibleButtonText(children).trim()
-  const named = hasAccessibleName({ text: visibleText, ariaLabel, ariaLabelledby })
-  const hasLabel = visibleText.length > 0
+  const hasLabel = hasLabelContent(children)
+  warnMissingAccessibleName('Button', { text: hasLabel ? 'named' : '', ariaLabel, ariaLabelledby })
 
   const buttonClasses = useMemo(
     () =>
@@ -103,11 +103,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       }),
     [variant, danger, resolvedSize, disabled, loading, group, block, hasLabel, className]
   )
-
-  if (!named) {
-    warnMissingAccessibleName('Button', { text: '', ariaLabel, ariaLabelledby })
-    return null
-  }
 
   const placement = resolveButtonIconPlacement(iconPosition)
   const slotClass = getButtonIconSlotClasses(placement, hasLabel)

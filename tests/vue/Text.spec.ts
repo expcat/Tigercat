@@ -76,7 +76,7 @@ describe('Text (Vue)', () => {
     style.remove()
   })
 
-  it('copies the rendered text from a keyboard-operable button', async () => {
+  it('keeps heading semantics when copying the rendered text from the keyboard', async () => {
     const user = userEvent.setup()
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
@@ -84,10 +84,13 @@ describe('Text (Vue)', () => {
       configurable: true
     })
     const { emitted } = render(Text, {
-      props: { copyable: true },
+      props: { tag: 'h2', copyable: true },
       slots: { default: 'user-42' }
     })
-    await user.click(screen.getByRole('button', { name: 'Copy' }))
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('user-42')
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Copy' })).toHaveFocus()
+    await user.keyboard('{Enter}')
     expect(writeText).toHaveBeenCalledWith('user-42')
     expect(emitted().copy?.[0]?.[0]).toBe('user-42')
     expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument()

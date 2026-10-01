@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
-import { copyTextToClipboard, getSpaceClasses, resolveButtonClasses } from '@expcat/tigercat-core'
+import {
+  copyTextToClipboard,
+  getSpaceClasses,
+  getTextLabels,
+  resolveButtonClasses,
+  type CopyButtonProps as CoreCopyButtonProps
+} from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 
-export interface CopyButtonProps extends Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  'onCopy'
-> {
-  text: string
+export interface CopyButtonProps
+  extends
+    CoreCopyButtonProps,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, keyof CoreCopyButtonProps | 'onCopy'> {
   onCopy?: (ok: boolean) => void
 }
 
 export const CopyButton: React.FC<CopyButtonProps> = ({
   text,
+  label,
   onCopy,
   children,
   disabled,
@@ -18,16 +25,16 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   className,
   ...rest
 }) => {
-  const [failed, setFailed] = useState(false)
-  const [status, setStatus] = useState('')
+  const config = useTigerConfig()
+  const labels = getTextLabels(config.locale)
+  const [status, setStatus] = useState<'copied' | 'failed' | null>(null)
 
   async function handleClick(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
     onClick?.(event)
     if (disabled || event.defaultPrevented) return
     const button = event.currentTarget
     const ok = await copyTextToClipboard(text)
-    setFailed(!ok)
-    setStatus(ok ? 'Copied' : 'Copy failed')
+    setStatus(ok ? 'copied' : 'failed')
     onCopy?.(ok)
     button.focus()
   }
@@ -39,11 +46,15 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
         {...rest}
         className={resolveButtonClasses({ variant: 'outline', size: 'sm', disabled, className })}
         disabled={disabled}
-        aria-invalid={failed ? true : undefined}
+        aria-invalid={status === 'failed' ? true : undefined}
         onClick={handleClick}>
-        {children ?? 'Copy'}
+        {children ?? label ?? labels.copyLabel}
       </button>
-      {status ? <span role="status">{status}</span> : null}
+      {status ? (
+        <span role="status">
+          {status === 'copied' ? labels.copiedLabel : labels.copyFailedLabel}
+        </span>
+      ) : null}
     </span>
   )
 }

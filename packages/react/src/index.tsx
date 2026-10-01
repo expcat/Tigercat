@@ -454,7 +454,9 @@ export type { InputGroupProps, InputGroupAddonProps } from './components/InputGr
 // PrintLayout (v0.9.0+)
 export { PrintLayout, PrintPageBreak } from './components/PrintLayout'
 export { Inplace } from './components/Inplace'
+export type { InplaceProps } from './components/Inplace'
 export { CopyButton } from './components/CopyButton'
+export type { CopyButtonProps } from './components/CopyButton'
 export { Gallery } from './components/Gallery'
 export type { GalleryProps } from './components/Gallery'
 export { WaterfallChart } from './components/WaterfallChart'

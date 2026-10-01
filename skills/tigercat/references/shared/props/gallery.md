@@ -13,6 +13,10 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/image.ts` · `GalleryProps` · 3/4 props
 
+Uses: `Image`, `ImagePreview`.
+
+Note: 缩略图是列表里的原生按钮，可用 Tab + Enter / Space 选择；`aria-current` 标记当前项。图片 `alt` 用作缩略图名，省略时使用图片序号。
+
 | Prop                   | Type            | Default | Notes                        |
 | ---------------------- | --------------- | ------- | ---------------------------- |
 | `items`                | `GalleryItem[]` | `-`     | -                            |

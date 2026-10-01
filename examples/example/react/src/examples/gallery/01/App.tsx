@@ -7,5 +7,5 @@ const items = [
 ]
 
 export default function App() {
-  return <Gallery items={items} />
+  return <Gallery items={items} className="max-w-full" />
 }

@@ -1,11 +1,14 @@
 import { Button } from '@expcat/tigercat-react/Button'
 
 const star = <span aria-hidden="true">★</span>
+const SaveLabel = () => <span>保存</span>
 
 export default function App() {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
-      <Button>保存</Button>
+      <Button>
+        <SaveLabel />
+      </Button>
       <Button size="sm">小号</Button>
       <Button disabled>禁用</Button>
       <Button danger>删除</Button>

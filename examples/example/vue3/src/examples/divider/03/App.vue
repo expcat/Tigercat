@@ -14,5 +14,6 @@ const styles = ['solid', 'dashed', 'dotted', 'gradient'] as const
         :color="lineStyle === 'gradient' ? '#7c3aed' : undefined"
         :thickness="lineStyle === 'gradient' ? '3px' : undefined" />
     </div>
+    <Divider line-style="gradient" color="primary" thickness="3px">章节</Divider>
   </div>
 </template>

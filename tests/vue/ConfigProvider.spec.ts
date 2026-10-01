@@ -115,6 +115,25 @@ describe('ConfigProvider', () => {
   })
 
   describe('async locale', () => {
+    it('keeps a synchronous locale selected while an older loader finishes', async () => {
+      let finish!: (locale: Partial<TigerLocale>) => void
+      const pending = new Promise<Partial<TigerLocale>>((resolve) => {
+        finish = resolve
+      })
+      const { getByTestId, rerender } = render(ConfigProvider, {
+        props: { locale: () => pending },
+        slots: { default: () => h(LocaleDisplay) }
+      })
+      expect(getByTestId('loading')).toHaveTextContent('loading')
+      await rerender({ locale: { common: { okText: 'Current' } } })
+      finish({ common: { okText: 'Stale' } })
+      await pending
+      await Promise.resolve()
+      await nextTick()
+      expect(getByTestId('ok')).toHaveTextContent('Current')
+      expect(getByTestId('loading')).toHaveTextContent('ready')
+    })
+
     it('resolves a loader function', async () => {
       const loader = () =>
         Promise.resolve({

@@ -13,7 +13,6 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
-  hasAccessibleName,
   resolveButtonClasses,
   resolveButtonType,
   resolveButtonIconPlacement,
@@ -44,16 +43,18 @@ export interface VueButtonProps {
   style?: Record<string, unknown>
 }
 
-function visibleButtonText(nodes: unknown): string {
-  if (nodes == null || nodes === false || nodes === true) return ''
-  if (typeof nodes === 'string' || typeof nodes === 'number') return String(nodes)
-  if (Array.isArray(nodes)) return nodes.map(visibleButtonText).join('')
-  if (!isVNode(nodes)) return ''
-  if (nodes.type === Comment) return ''
+function hasLabelContent(nodes: unknown): boolean {
+  if (nodes == null || typeof nodes === 'boolean') return false
+  if (typeof nodes === 'string' || typeof nodes === 'number') return String(nodes).trim().length > 0
+  if (Array.isArray(nodes)) return nodes.some(hasLabelContent)
+  if (!isVNode(nodes) || nodes.type === Comment) return false
   const hidden = nodes.props?.['aria-hidden']
-  if (hidden === true || hidden === '' || hidden === 'true') return ''
-  if (nodes.type === Text || nodes.type === Fragment) return visibleButtonText(nodes.children)
-  return visibleButtonText(nodes.children)
+  if (hidden === true || hidden === '' || hidden === 'true') return false
+  if (nodes.type === Text || nodes.type === Fragment || typeof nodes.type === 'string') {
+    return hasLabelContent(nodes.children)
+  }
+  // A component's rendered content is only known after it renders.
+  return true
 }
 
 const createLoadingSpinner = (size: ButtonSize) => {
@@ -124,21 +125,12 @@ export const Button = defineComponent({
       } = restAttrs
       const buttonType = resolveButtonType(props.type ?? attrType)
       const label = slots.default?.()
-      const visibleText = visibleButtonText(label).trim()
-      const named = hasAccessibleName({
-        text: visibleText,
+      const hasLabel = hasLabelContent(label)
+      warnMissingAccessibleName('Button', {
+        text: hasLabel ? 'named' : '',
         ariaLabel: domAttrs['aria-label'],
         ariaLabelledby: domAttrs['aria-labelledby']
       })
-      if (!named) {
-        warnMissingAccessibleName('Button', {
-          text: '',
-          ariaLabel: domAttrs['aria-label'],
-          ariaLabelledby: domAttrs['aria-labelledby']
-        })
-        return null
-      }
-      const hasLabel = visibleText.length > 0
       const buttonClasses = classNames(
         resolveButtonClasses({
           variant: props.variant,

@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **基础组件复审（对比 2.9.4）**：恢复 Divider 水平、竖向渐变与 CSS 自定义颜色；Button 支持子组件提供文字，缺少可访问名称时提示而不隐藏按钮；Text 可复制标题保留标签，删除 `resolveCopyableTextTag`。React Tag 关闭钮恢复 Tab 操作。Vue Image 复用原生懒加载，删除重复 observer；Gallery 缩略图保留按钮语义与焦点提示，Vue 根合并 class。CopyButton 复用已有 locale 文案，React 补齐 `label`，Vue 结果 id 按实例生成；补齐 CopyButton 与 Inplace 的框架 Props 导出。Vue ConfigProvider 作废旧语言加载结果。章节滚动保留 hash router 路由，修复 Example 章节导航跳转 404。Skill 与双框架 Example 同步。
 - **默认样式（Vue / React）**：补齐 Tag、Collapse、Modal、Drawer 的默认尺寸与遮罩变量，为表格、编辑器、树、工作流和图表的可选主题变量提供语义回退；减轻装饰边线与进度轨道，改善暗色禁用文字和图表块内标签。步骤、分页、胶囊标签与其他实底状态使用配对前景色。按钮组和输入框组的连接选择器改为可被 Tailwind 完整扫描的类名。浮层触发器的重置样式降低优先级，保留内部按钮的颜色与间距。
 - **组合组件**：CopyButton、Inplace、AssigneePicker、NotificationBell 与两种图表复用既有按钮、输入框和选项样式；通知铃铛显示图标与未读徽标。SankeyChart 按流量宽度描绘连线，WaterfallChart 的负值使用错误色。React NavigationMenu 在浮层出口保留面板上下文，恢复纵向菜单项与选择后关闭。
 - **Example**：Vue / React 补齐八个已有组件的页面入口及 LoadingBar 受控容器示例；修复 ConfigProvider 预览所需导出、Tabs 初始键值和暗色示例背景。窄屏的面包屑与章节导航分行排列，避免重叠。索引生成器复用仓库 Prettier 配置。

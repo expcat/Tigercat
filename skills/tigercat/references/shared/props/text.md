@@ -13,7 +13,7 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/text.ts` · `TextProps` · 4/10 props
 
-Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。`align` 只用 `start` / `center` / `end` / `justify`。`label` 需自备 `htmlFor`。
+Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。copyable 保留指定标签，复制按钮可用 Tab + Enter / Space。`align` 只用 `start` / `center` / `end` / `justify`。`label` 需自备 `htmlFor`。
 
 | Prop        | Type        | Default     | Notes                                  |
 | ----------- | ----------- | ----------- | -------------------------------------- |

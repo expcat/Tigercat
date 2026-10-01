@@ -130,16 +130,16 @@ export function getDividerStyle(
 ): Record<string, string> | undefined {
   const isH = isDividerHorizontal(orientation)
   if (lineStyle === 'gradient') {
-    const c = resolveDividerColorToken(color) || 'var(--tiger-border)'
+    const c = resolveDividerColorToken(color) || color || 'var(--tiger-border)'
     const thick = thickness || '1px'
     return isH
       ? {
-          backgroundImage: `linear-gradient(to inline-end, transparent, ${c}, transparent)`,
+          backgroundImage: `linear-gradient(90deg, transparent, ${c}, transparent)`,
           height: thick,
           borderWidth: '0px'
         }
       : {
-          backgroundImage: `linear-gradient(to block-end, transparent, ${c}, transparent)`,
+          backgroundImage: `linear-gradient(180deg, transparent, ${c}, transparent)`,
           width: thick,
           borderWidth: '0px'
         }

@@ -21,7 +21,6 @@ import {
   downloadCurrentImageUrl,
   downloadIconPath,
   flipHorizontalIconPath,
-  focusFirst,
   formatLightboxImageAlt,
   getImageTransformStyle,
   getImageViewerLabels,
@@ -132,7 +131,6 @@ export const ImagePreview = defineComponent({
     const index = ref(props.currentIndex)
     const dragging = ref(false)
     const rootRef = ref<HTMLElement | null>(null)
-    const closeButtonRef = ref<HTMLButtonElement | null>(null)
     let gestureSession: ReturnType<typeof createLightboxGestureSession> | null = null
     let detachWheel: (() => void) | undefined
 
@@ -415,7 +413,6 @@ export const ImagePreview = defineComponent({
         h(
           'button',
           {
-            ref: closeButtonRef,
             class: imagePreviewCloseBtnClasses,
             onClick: handleClose,
             'aria-label': labels.value.closePreviewAriaLabel,

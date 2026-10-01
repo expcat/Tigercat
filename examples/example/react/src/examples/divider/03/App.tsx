@@ -18,6 +18,9 @@ export default function App() {
           />
         </div>
       ))}
+      <Divider lineStyle="gradient" color="primary" thickness="3px">
+        章节
+      </Divider>
     </div>
   )
 }

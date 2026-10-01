@@ -1,8 +1,12 @@
 {
   "id": "tag-02",
-  "title": "阻止关闭",
-  "description": "在 close 事件中调用 preventDefault，可在校验或确认完成前保留标签。",
+  "title": "保留标签",
+  "description": "关闭按钮只发出 close 事件；父组件未卸载标签时仍然显示。",
   "entry": "App.tsx",
   "order": 2,
-  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
 }

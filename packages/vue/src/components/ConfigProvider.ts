@@ -93,6 +93,7 @@ export const ConfigProvider = defineComponent({
     watch(
       () => props.locale,
       (locale) => {
+        const thisId = ++loadId
         if (!isLazyTigerLocale(locale)) {
           resolvedLocale.value = getImmediateTigerLocale(locale)
           localeLoading.value = false
@@ -100,7 +101,6 @@ export const ConfigProvider = defineComponent({
           return
         }
 
-        const thisId = ++loadId
         localeLoading.value = true
         localeLoadError.value = undefined
 

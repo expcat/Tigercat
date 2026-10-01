@@ -83,7 +83,7 @@ describe('Text (React)', () => {
     expect(ref.current).toBeInstanceOf(HTMLSpanElement)
   })
 
-  it('copies the rendered text from a keyboard-operable button', async () => {
+  it('keeps heading semantics when copying the rendered text from the keyboard', async () => {
     const user = userEvent.setup()
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
@@ -92,12 +92,15 @@ describe('Text (React)', () => {
     })
     const onCopy = vi.fn()
     render(
-      <Text copyable onCopy={onCopy}>
+      <Text tag="h2" copyable onCopy={onCopy}>
         user-42
       </Text>
     )
     const button = screen.getByRole('button', { name: 'Copy' })
-    await user.click(button)
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('user-42')
+    await user.tab()
+    expect(button).toHaveFocus()
+    await user.keyboard('{Enter}')
     expect(writeText).toHaveBeenCalledWith('user-42')
     expect(onCopy).toHaveBeenCalledWith('user-42')
     expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument()

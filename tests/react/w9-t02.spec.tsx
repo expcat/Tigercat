@@ -4,6 +4,7 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { ImagePreview } from '@expcat/tigercat-react/ImagePreview'
 import { Image } from '@expcat/tigercat-react/Image'
@@ -168,7 +169,8 @@ describe('W9 T02 React', () => {
     expect(root).not.toHaveAttribute('role')
   })
 
-  it('opens the shared preview from a thumbnail gallery', () => {
+  it('selects a thumbnail from the keyboard and opens its preview', async () => {
+    const user = userEvent.setup()
     render(
       <Gallery
         items={[
@@ -178,10 +180,18 @@ describe('W9 T02 React', () => {
       />
     )
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Open preview' }))
+    expect(screen.getByRole('list', { name: 'Thumbnails' })).toBeInTheDocument()
+    await user.tab()
+    await user.tab()
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Two' })).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(screen.getByText('2 / 2')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Two' })).toHaveAttribute('aria-current', 'true')
+    await user.click(screen.getByRole('button', { name: 'Open preview' }))
     expect(document.querySelector('[data-tiger-image-preview] img')).toHaveAttribute(
       'src',
-      '/g1.jpg'
+      '/g2.jpg'
     )
   })
 })

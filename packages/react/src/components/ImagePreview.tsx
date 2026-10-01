@@ -15,7 +15,6 @@ import {
   downloadIconPath,
   flipHorizontalIconPath,
   createLightboxGestureSession,
-  focusFirst,
   formatLightboxImageAlt,
   getImageTransformStyle,
   getImageViewerLabels,
@@ -120,7 +119,6 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const [dragging, setDragging] = useState(false)
 
   const rootRef = useRef<HTMLDivElement | null>(null)
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
   const transformRef = useRef(transform)
   const indexRef = useRef(index)
   const resolvedRef = useRef(resolved)
@@ -407,7 +405,6 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         onPointerDown={handlePointerDown}
       />
       <button
-        ref={closeButtonRef}
         className={imagePreviewCloseBtnClasses}
         onClick={handleClose}
         aria-label={labels.closePreviewAriaLabel}

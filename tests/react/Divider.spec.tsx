@@ -54,15 +54,27 @@ describe('Divider (React)', () => {
     }
   })
 
-  it('applies color and thickness to a gradient line', () => {
-    const { container } = render(
-      <Divider lineStyle="gradient" color="primary" thickness="4px" spacing="none" />
-    )
-    const divider = getRoot(container)
-    expect(divider.style.backgroundImage).toContain('var(--tiger-primary)')
-    expect(divider.style.height).toBe('4px')
-    expect(divider.style.borderWidth).toBe('0px')
-  })
+  it.each(['horizontal', 'vertical'] as const)(
+    'paints a %s gradient with a CSS color',
+    (orientation) => {
+      const { container } = render(
+        <Divider
+          orientation={orientation}
+          lineStyle="gradient"
+          color="#7c3aed"
+          thickness="4px"
+          spacing="none"
+        />
+      )
+      const divider = getRoot(container)
+      expect(divider.style.backgroundImage).toContain('#7c3aed')
+      expect(divider.style.backgroundImage).toContain(
+        orientation === 'horizontal' ? '90deg' : '180deg'
+      )
+      expect(orientation === 'horizontal' ? divider.style.height : divider.style.width).toBe('4px')
+      expect(divider.style.borderWidth).toBe('0px')
+    }
+  )
 
   it('uses logical thickness on a vertical rule', () => {
     const { container } = renderWithProps(Divider, {

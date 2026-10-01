@@ -1,11 +1,15 @@
-import { defineComponent, h, ref } from 'vue'
+import { defineComponent, h, ref, useId } from 'vue'
 import {
   classNames,
   coerceClassValue,
   copyTextToClipboard,
   getSpaceClasses,
+  getTextLabels,
   resolveButtonClasses
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
+
+export type VueCopyButtonProps = InstanceType<typeof CopyButton>['$props']
 
 export const CopyButton = defineComponent({
   name: 'TigerCopyButton',
@@ -13,19 +17,19 @@ export const CopyButton = defineComponent({
   props: {
     text: { type: String, required: true },
     disabled: { type: Boolean, default: false },
-    label: { type: String, default: 'Copy' }
+    label: { type: String, default: undefined }
   },
   emits: ['copy'],
   setup(props, { slots, emit, attrs }) {
-    const failed = ref(false)
-    const status = ref('')
+    const config = useTigerConfig()
+    const statusId = `tiger-copy-status-${useId()}`
+    const status = ref<'copied' | 'failed' | null>(null)
 
     async function onClick(event: MouseEvent): Promise<void> {
       if (props.disabled) return
       const button = event.currentTarget
       const ok = await copyTextToClipboard(props.text)
-      failed.value = !ok
-      status.value = ok ? 'Copied' : 'Copy failed'
+      status.value = ok ? 'copied' : 'failed'
       emit('copy', ok)
       if (button instanceof HTMLElement) button.focus()
     }
@@ -52,13 +56,21 @@ export const CopyButton = defineComponent({
                 disabled: props.disabled
               }),
               disabled: props.disabled,
-              'aria-invalid': failed.value ? 'true' : undefined,
-              'aria-describedby': failed.value ? 'tiger-copy-status' : undefined,
+              'aria-invalid': status.value === 'failed' ? 'true' : undefined,
+              'aria-describedby': status.value === 'failed' ? statusId : undefined,
               onClick
             },
-            slots.default?.() ?? props.label
+            slots.default?.() ?? props.label ?? getTextLabels(config.value.locale).copyLabel
           ),
-          status.value ? h('span', { id: 'tiger-copy-status', role: 'status' }, status.value) : null
+          status.value
+            ? h(
+                'span',
+                { id: statusId, role: 'status' },
+                status.value === 'copied'
+                  ? getTextLabels(config.value.locale).copiedLabel
+                  : getTextLabels(config.value.locale).copyFailedLabel
+              )
+            : null
         ]
       )
   }

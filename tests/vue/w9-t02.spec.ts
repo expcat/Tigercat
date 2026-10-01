@@ -5,6 +5,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
 import { fireEvent, render, screen, waitFor } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { ImagePreview } from '@expcat/tigercat-vue/ImagePreview'
 import { Image } from '@expcat/tigercat-vue/Image'
 import { ImageGroup } from '@expcat/tigercat-vue/ImageGroup'
@@ -214,7 +215,8 @@ describe('W9 T02 Vue', () => {
     expect(root).not.toHaveAttribute('role')
   })
 
-  it('lists thumbnails, a count, and opens ImagePreview', async () => {
+  it('selects a thumbnail from the keyboard and opens its preview', async () => {
+    const user = userEvent.setup()
     render(Gallery, {
       props: {
         items: [
@@ -224,11 +226,18 @@ describe('W9 T02 Vue', () => {
       }
     })
     expect(screen.getByText('1 / 2')).toBeInTheDocument()
-    expect(screen.getAllByRole('img', { name: 'One' }).length).toBeGreaterThan(0)
-    await fireEvent.click(screen.getByRole('button', { name: 'Open preview' }))
+    expect(screen.getByRole('list', { name: 'Thumbnails' })).toBeInTheDocument()
+    await user.tab()
+    await user.tab()
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Two' })).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(screen.getByText('2 / 2')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Two' })).toHaveAttribute('aria-current', 'true')
+    await user.click(screen.getByRole('button', { name: 'Open preview' }))
     expect(document.querySelector('[data-tiger-image-preview] img')).toHaveAttribute(
       'src',
-      '/g1.jpg'
+      '/g2.jpg'
     )
   })
 })

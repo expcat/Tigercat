@@ -11,6 +11,18 @@ import { resetDevWarnCache } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Button', () => {
+  it('renders and activates a label supplied by a child component', async () => {
+    const Label = () => <span>Save</span>
+    const onClick = vi.fn()
+    render(
+      <Button onClick={onClick}>
+        <Label />
+      </Button>
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
   it('renders a button and merges className', () => {
     render(<Button className="custom-class">Click me</Button>)
 

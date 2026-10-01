@@ -7,7 +7,7 @@ import type { AnchorDirection } from '../types/anchor'
 import type { ScrollRootInput } from '../types/scroll-root'
 import { isBrowser } from './env'
 import { prefersReducedMotion } from './transition'
-import { createSectionScrollModel, sectionScrollBehavior } from './section-scroll-utils'
+import { sectionScrollBehavior } from './section-scroll-utils'
 import { resolveScrollRoot } from './scroll-root'
 
 /**
@@ -217,7 +217,8 @@ export function replaceAnchorHash(href: string): void {
   let next = ''
   try {
     const url = new URL(current)
-    if (url.hash === href) return
+    // Hash routers own this fragment; scrolling must not replace their route.
+    if (url.hash === href || url.hash.startsWith('#/')) return
     url.hash = href
     next = url.href
   } catch {

@@ -9,5 +9,5 @@ const items = [
 </script>
 
 <template>
-  <Gallery :items="items" />
+  <Gallery :items="items" class="max-w-full" />
 </template>

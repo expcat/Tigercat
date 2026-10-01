@@ -1,8 +1,12 @@
 {
   "id": "tag-01",
   "title": "从数据里关闭",
-  "description": "closable 只发 close。父级从列表删掉该项；组件不会自己藏起来。",
+  "description": "Tab 聚焦关闭钮，Enter / Space 或点击发出 close；父组件删除列表项。",
   "entry": "App.vue",
   "order": 1,
-  "viewport": { "mode": "auto", "minHeight": 120, "maxHeight": 720 }
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 720
+  }
 }
