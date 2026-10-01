@@ -6,7 +6,6 @@ import type {
 import { classNames } from './class-names'
 import { formatPaginationTotal, getPaginationLabels } from './locale-utils'
 
-
 type IdleCallbackHandle = number
 type IdleCallbackScheduler = (
   callback: () => void,
@@ -338,8 +337,8 @@ export function getPaginationButtonActiveClasses(): string {
   return classNames(
     'border-[var(--tiger-primary)]',
     'bg-[var(--tiger-primary)]',
-    'text-white',
-    'hover:border-[var(--tiger-primary-hover)] hover:bg-[var(--tiger-primary-hover)] hover:text-white'
+    'text-[var(--tiger-primary-foreground)]',
+    'hover:border-[var(--tiger-primary-hover)] hover:bg-[var(--tiger-primary-hover)] hover:text-[var(--tiger-primary-foreground)]'
   )
 }
 

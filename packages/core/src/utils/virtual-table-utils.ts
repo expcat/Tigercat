@@ -34,22 +34,24 @@ export const EMPTY_VIRTUAL_TABLE_COLUMNS: readonly never[] = Object.freeze([])
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
-export const virtualTableContainerClasses = `tiger-virtual-table relative overflow-auto border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-table-bg)]`
+export const virtualTableContainerClasses = `tiger-virtual-table relative overflow-auto border border-[var(--tiger-border)]/30 rounded-[var(--tiger-radius-md)] bg-[var(--tiger-table-bg,var(--tiger-surface))]`
 
-export const virtualTableHeaderClasses = `${tableHeaderBackgroundClasses} sticky top-0 z-20 [&_th]:border-b [&_th]:border-[var(--tiger-border)]`
+export const virtualTableHeaderClasses = `${tableHeaderBackgroundClasses} sticky top-0 z-20 [&_th]:border-b [&_th]:border-[var(--tiger-border)]/30`
 
 export const virtualTableHeaderCellClasses =
   'px-4 py-3 text-start text-xs font-semibold uppercase tracking-wider text-[var(--tiger-text-secondary)] overflow-hidden'
 
 export const virtualTableRowClasses =
-  'group tiger-motion-aware [&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]'
+  'group tiger-motion-aware [&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]/30'
 
-export const virtualTableRowHoverClasses = 'hover:bg-[var(--tiger-table-hover-bg)]'
+export const virtualTableRowHoverClasses =
+  'hover:bg-[var(--tiger-table-hover-bg,var(--tiger-outline-bg-hover))]'
 
 export const virtualTableRowFocusClasses =
   'outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring)]/40'
 
-export const virtualTableRowStripedClasses = 'bg-[var(--tiger-table-stripe-bg)]/50'
+export const virtualTableRowStripedClasses =
+  'bg-[var(--tiger-table-stripe-bg,var(--tiger-surface-muted))]/50'
 
 export const virtualTableRowSelectedClasses = 'bg-[var(--tiger-primary)]/5'
 
@@ -62,7 +64,7 @@ export const virtualTableRowSelectedClasses = 'bg-[var(--tiger-primary)]/5'
  * 5% primary overlay sitting on the table background.
  */
 export const virtualTableFixedCellSelectedClasses =
-  'bg-[color-mix(in_srgb,var(--tiger-primary)_5%,var(--tiger-table-bg))]'
+  'bg-[color-mix(in_srgb,var(--tiger-primary)_5%,var(--tiger-table-bg,var(--tiger-surface)))]'
 
 export const virtualTableCellClasses =
   'px-4 py-0 text-sm text-[var(--tiger-text)] whitespace-nowrap'
@@ -74,7 +76,7 @@ export const virtualTableEmptyClasses =
   'absolute inset-0 flex items-center justify-center py-12 text-sm text-[var(--tiger-text-secondary)]'
 
 export const virtualTableLoadingClasses =
-  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-table-bg)]/60 z-20'
+  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-table-bg,var(--tiger-surface))]/60 z-20'
 
 /** Visible column window for horizontal (column) virtualization. */
 export interface VirtualColumnRange {

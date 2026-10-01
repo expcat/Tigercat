@@ -1,7 +1,7 @@
 {
   "id": "assignee-picker-01",
-  "title": "Assignee picker",
-  "description": "Search and multi-select people supplied by the caller.",
+  "title": "受理人选择",
+  "description": "调用方提供人员列表，组件发出已选 id。",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

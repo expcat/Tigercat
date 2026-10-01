@@ -77,7 +77,7 @@ export function getSwitchThumbClasses(
   checked: boolean = false
 ): string {
   return classNames(
-    'absolute top-1/2 -translate-y-1/2 inline-block rounded-full bg-[var(--tiger-surface)] shadow-[var(--tiger-shadow-sm)] tiger-motion-aware [transition:var(--tiger-transition-base)]',
+    'absolute top-1/2 -translate-y-1/2 inline-block rounded-full bg-[var(--tiger-surface)] shadow-[var(--tiger-shadow-sm)] tiger-motion-aware [transition:var(--tiger-transition-base),inset-inline-start_var(--tiger-motion-duration-base)_var(--tiger-motion-ease-standard)]',
     switchThumbSizeClasses[size],
     checked ? switchThumbCheckedInsetClasses[size] : 'start-0.5'
   )

@@ -7,7 +7,7 @@ const sizes = ['sm', 'md', 'lg'] as const
 </script>
 
 <template>
-  <div class="space-y-3">
+  <div class="flex flex-wrap items-start gap-3">
     <InputGroup
       v-for="size in sizes"
       :key="size"

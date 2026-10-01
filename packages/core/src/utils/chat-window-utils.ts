@@ -76,7 +76,7 @@ const chatStatusBarVariantText: Record<BadgeVariant, string> = {
   primary: 'text-[var(--tiger-primary)]',
   success: 'text-[var(--tiger-success)]',
   warning: 'text-[var(--tiger-warning)]',
-  danger: 'text-[var(--tiger-danger)]',
+  danger: 'text-[var(--tiger-danger,var(--tiger-error))]',
   info: 'text-[var(--tiger-info)]'
 }
 
@@ -104,7 +104,7 @@ export function getChatBubbleClasses(isSelf: boolean): string {
   return classNames(
     'rounded-[var(--tiger-radius-lg)] px-4 py-2.5 text-sm break-words shadow-sm tiger-motion-aware motion-reduce:transition-none',
     isSelf
-      ? 'bg-[var(--tiger-primary)] text-white rounded-tr-[var(--tiger-radius-sm)]'
+      ? 'bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] rounded-tr-[var(--tiger-radius-sm)]'
       : 'bg-[var(--tiger-surface)] border border-[var(--tiger-border)] text-[var(--tiger-text)] rounded-tl-[var(--tiger-radius-sm)]'
   )
 }

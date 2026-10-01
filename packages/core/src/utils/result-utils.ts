@@ -67,29 +67,25 @@ function mixStatusWash(cssVar: string, fallbackHex: string): string {
   return `color-mix(in srgb, var(${cssVar}, ${fallbackHex}) 12%, transparent)`
 }
 
-function statusTextClass(cssVar: string, fallbackHex: string): string {
-  return `text-[var(${cssVar},${fallbackHex})]`
-}
-
 const SEMANTIC_RESULT_STATUSES = ['success', 'error', 'warning', 'info'] as const
 type SemanticResultStatus = (typeof SEMANTIC_RESULT_STATUSES)[number]
 
 const semanticColors: Record<SemanticResultStatus, ResultColorScheme> = {
   success: {
     iconBg: mixStatusWash('--tiger-success', '#16a34a'),
-    iconColor: statusTextClass('--tiger-success', '#16a34a')
+    iconColor: 'text-[var(--tiger-success,#16a34a)]'
   },
   error: {
     iconBg: mixStatusWash('--tiger-error', '#dc2626'),
-    iconColor: statusTextClass('--tiger-error', '#dc2626')
+    iconColor: 'text-[var(--tiger-error,#dc2626)]'
   },
   warning: {
     iconBg: mixStatusWash('--tiger-warning', '#d97706'),
-    iconColor: statusTextClass('--tiger-warning', '#d97706')
+    iconColor: 'text-[var(--tiger-warning,#d97706)]'
   },
   info: {
     iconBg: mixStatusWash('--tiger-info', '#3b82f6'),
-    iconColor: statusTextClass('--tiger-info', '#3b82f6')
+    iconColor: 'text-[var(--tiger-info,#3b82f6)]'
   }
 }
 

@@ -69,7 +69,7 @@ const CARD_LIST_CLASSES: Record<TableCardBreakpoint, string> = {
 }
 
 export const tableResponsiveCardClasses =
-  'rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] shadow-sm'
+  'rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)]/30 bg-[var(--tiger-surface)] shadow-sm'
 
 export function getTableResponsiveCardClasses(cardPadding: string | false | undefined): string {
   return classNames(
@@ -79,7 +79,7 @@ export function getTableResponsiveCardClasses(cardPadding: string | false | unde
 }
 
 export const tableResponsiveCardRowClasses =
-  'grid grid-cols-[minmax(7rem,40%)_1fr] gap-3 border-b border-[var(--tiger-border)] py-2 last:border-b-0'
+  'grid grid-cols-[minmax(7rem,40%)_1fr] gap-3 border-b border-[var(--tiger-border)]/30 py-2 last:border-b-0'
 
 export const tableResponsiveCardLabelClasses =
   'text-xs font-medium uppercase tracking-wider text-[var(--tiger-text-secondary)]'
@@ -90,20 +90,19 @@ export const tableResponsiveCardValueClasses =
 export const tableResponsiveCardTitleClasses =
   'mb-2 text-sm font-semibold text-[var(--tiger-text)] break-words'
 
-export const tableBackgroundClasses =
-  'bg-[var(--tiger-table-bg)]'
+export const tableBackgroundClasses = 'bg-[var(--tiger-table-bg,var(--tiger-surface))]'
 
 export const tableHeaderBackgroundClasses =
-  'bg-[var(--tiger-table-header-bg)]'
+  'bg-[var(--tiger-table-header-bg,var(--tiger-surface-muted))]'
 
 export const tableRowHoverClasses =
-  'hover:bg-[var(--tiger-table-hover-bg)] transition-colors'
+  'hover:bg-[var(--tiger-table-hover-bg,var(--tiger-outline-bg-hover))] transition-colors'
 
 export const tableRowGroupHoverClasses =
-  'group-hover:bg-[var(--tiger-table-hover-bg)]'
+  'group-hover:bg-[var(--tiger-table-hover-bg,var(--tiger-outline-bg-hover))]'
 
 export const tableRowStripedClasses =
-  'bg-[var(--tiger-table-stripe-bg)]/50'
+  'bg-[var(--tiger-table-stripe-bg,var(--tiger-surface-muted))]/50'
 
 /**
  * Opaque striped background for sticky fixed cells.
@@ -114,7 +113,7 @@ export const tableRowStripedClasses =
  * 50% stripe overlay sitting on the table background.
  */
 export const tableFixedCellStripedClasses =
-  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg)_50%,var(--tiger-table-bg))]'
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-surface-muted))_50%,var(--tiger-table-bg,var(--tiger-surface)))]'
 
 export function getTableResponsiveTableClasses(
   mode: TableResponsiveMode,
@@ -783,7 +782,7 @@ export function getTableWrapperClasses(
     'relative w-full',
     scrollable && 'overflow-auto',
     bordered &&
-      'border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden',
+      'border border-[var(--tiger-border)]/30 rounded-[var(--tiger-radius-md)] overflow-hidden',
     scrollable && maxHeight && 'overflow-y-auto'
   )
 }
@@ -795,7 +794,7 @@ export function getTableHeaderClasses(stickyHeader: boolean): string {
   return classNames(
     tableHeaderBackgroundClasses,
     // border on cells, not <thead> — the table is `border-separate`
-    '[&_th]:border-b [&_th]:border-[var(--tiger-border)]',
+    '[&_th]:border-b [&_th]:border-[var(--tiger-border)]/30',
     stickyHeader && 'sticky top-0 z-20'
   )
 }
@@ -826,7 +825,7 @@ export function getTableHeaderCellClasses(
     paddingClasses[size],
     alignClasses[align],
     sortable &&
-      'cursor-pointer select-none hover:bg-[var(--tiger-table-bg)]/60 transition-colors',
+      'cursor-pointer select-none hover:bg-[var(--tiger-table-bg,var(--tiger-surface))]/60 transition-colors',
     customClassName
   )
 }
@@ -843,7 +842,7 @@ export function getTableRowClasses(
   return classNames(
     // border on cells, not <tr> — the table is `border-separate`; `:not(:last-child)`
     // reproduces the old `last:border-b-0` (every row except the last gets a bottom rule)
-    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]',
+    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]/30',
     hoverable && tableRowHoverClasses,
     striped && isEven && tableRowStripedClasses,
     customClassName
@@ -1184,7 +1183,7 @@ export function getExpandIconClasses(expanded: boolean): string {
 export function getExpandedRowClasses(): string {
   return classNames(
     // border on cells, not <tr> — the table is `border-separate`
-    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]',
+    '[&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-[var(--tiger-border)]/30',
     'bg-[var(--tiger-surface-muted)]/30'
   )
 }
@@ -1269,9 +1268,7 @@ export function createTableRowKeyCache<T>(
     }
 
     const raw =
-      typeof rowKey === 'function'
-        ? rowKey(record)
-        : (record as Record<string, unknown>)[rowKey]
+      typeof rowKey === 'function' ? rowKey(record) : (record as Record<string, unknown>)[rowKey]
     const key = readTableRowKeyValue(raw)
 
     if (key !== undefined) {
@@ -1331,7 +1328,7 @@ export function resolveTableRowKeys<T>(
  * Summary row footer classes
  */
 export const tableSummaryRowClasses =
-  'bg-[var(--tiger-surface-muted)] font-semibold [&>td]:border-t-2 [&>td]:border-[var(--tiger-border)]'
+  'bg-[var(--tiger-surface-muted)] font-semibold [&>td]:border-t-2 [&>td]:border-[var(--tiger-border)]/30'
 
 /**
  * Editable cell classes

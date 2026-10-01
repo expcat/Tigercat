@@ -1,5 +1,5 @@
 import { defineComponent, h, ref, computed, type PropType } from 'vue'
-import { toggleInplace } from '@expcat/tigercat-core'
+import { resolveButtonClasses, toggleInplace } from '@expcat/tigercat-core'
 
 export const Inplace = defineComponent({
   name: 'TigerInplace',
@@ -46,7 +46,16 @@ export const Inplace = defineComponent({
           ? h('span', { onKeydown }, slots.input?.())
           : h(
               'button',
-              { type: 'button', disabled: props.disabled, onClick: startEdit },
+              {
+                type: 'button',
+                class: resolveButtonClasses({
+                  variant: 'ghost',
+                  size: 'sm',
+                  disabled: props.disabled
+                }),
+                disabled: props.disabled,
+                onClick: startEdit
+              },
               slots.display?.()
             )
       )

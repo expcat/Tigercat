@@ -2,6 +2,7 @@ import { defineComponent, h, ref, type PropType } from 'vue'
 import {
   downloadChartSvg,
   getW9DataLabels,
+  resolveButtonClasses,
   layoutWaterfall,
   type WaterfallChartProps as CoreWaterfallChartProps,
   type WaterfallDatum
@@ -12,7 +13,7 @@ export type WaterfallChartProps = CoreWaterfallChartProps
 
 const KIND_COLOR: Record<WaterfallDatum['kind'], string> = {
   increase: 'var(--tiger-success, #16a34a)',
-  decrease: 'var(--tiger-danger, #dc2626)',
+  decrease: 'var(--tiger-error, #dc2626)',
   total: 'var(--tiger-text-secondary, #64748b)'
 }
 
@@ -46,7 +47,11 @@ export const WaterfallChart = defineComponent({
       return h('div', { ref: hostRef, class: props.className, ...attrs }, [
         h(
           'button',
-          { type: 'button', onClick: exportChart },
+          {
+            type: 'button',
+            class: resolveButtonClasses({ variant: 'outline', size: 'sm' }),
+            onClick: exportChart
+          },
           getW9DataLabels().exportChart
         ),
         h(

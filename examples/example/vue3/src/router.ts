@@ -12,6 +12,7 @@ const router = createRouter({
       children: [
         { path: '', component: Home },
         // Basic
+        { path: 'copy-button', component: () => import('./pages/CopyButtonDemo.vue') },
         { path: 'button', component: () => import('./pages/ButtonDemo.vue') },
         { path: 'split-button', component: () => import('./pages/SplitButtonDemo.vue') },
         {
@@ -20,6 +21,7 @@ const router = createRouter({
         },
         { path: 'icon', component: () => import('./pages/IconDemo.vue') },
         { path: 'link', component: () => import('./pages/LinkDemo.vue') },
+        { path: 'inplace', component: () => import('./pages/InplaceDemo.vue') },
         { path: 'text', component: () => import('./pages/TextDemo.vue') },
         { path: 'code', component: () => import('./pages/CodeDemo.vue') },
         { path: 'kbd', component: () => import('./pages/KbdDemo.vue') },
@@ -34,6 +36,7 @@ const router = createRouter({
           path: 'image-cropper',
           component: () => import('./pages/ImageCropperDemo.vue')
         },
+        { path: 'gallery', component: () => import('./pages/GalleryDemo.vue') },
         { path: 'image-preview', component: () => import('./pages/ImagePreviewDemo.vue') },
         { path: 'avatar', component: () => import('./pages/AvatarDemo.vue') },
         { path: 'badge', component: () => import('./pages/BadgeDemo.vue') },
@@ -142,6 +145,7 @@ const router = createRouter({
         { path: 'loading', component: () => import('./pages/LoadingDemo.vue') },
         { path: 'loading-bar', component: () => import('./pages/LoadingBarDemo.vue') },
         // Charts
+        { path: 'waterfall-chart', component: () => import('./pages/WaterfallChartDemo.vue') },
         { path: 'bar-chart', component: () => import('./pages/BarChartDemo.vue') },
         { path: 'line-chart', component: () => import('./pages/LineChartDemo.vue') },
         { path: 'area-chart', component: () => import('./pages/AreaChartDemo.vue') },
@@ -151,6 +155,7 @@ const router = createRouter({
           component: () => import('./pages/ScatterChartDemo.vue')
         },
         { path: 'radar-chart', component: () => import('./pages/RadarChartDemo.vue') },
+        { path: 'sankey-chart', component: () => import('./pages/SankeyChartDemo.vue') },
         { path: 'funnel-chart', component: () => import('./pages/FunnelChartDemo.vue') },
         { path: 'gauge-chart', component: () => import('./pages/GaugeChartDemo.vue') },
         {
@@ -190,6 +195,7 @@ const router = createRouter({
           component: () => import('./pages/ImageAnnotationDemo.vue')
         },
         // Composite
+        { path: 'app-shell', component: () => import('./pages/AppShellDemo.vue') },
         {
           path: 'data-table-with-toolbar',
           component: () => import('./pages/DataTableWithToolbarDemo.vue')
@@ -221,6 +227,8 @@ const router = createRouter({
           path: 'activity-feed',
           component: () => import('./pages/ActivityFeedDemo.vue')
         },
+        { path: 'assignee-picker', component: () => import('./pages/AssigneePickerDemo.vue') },
+        { path: 'notification-bell', component: () => import('./pages/NotificationBellDemo.vue') },
         {
           path: 'notification-center',
           component: () => import('./pages/NotificationCenterDemo.vue')

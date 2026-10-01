@@ -13,7 +13,6 @@ import type {
 } from '../types/rich-text-editor'
 import type { TigerLocaleRichTextEditor } from '../types/locale'
 
-
 // ─── Toolbar item helpers ─────────────────────────────────────────
 
 /** Type guard: check if a toolbar item is a separator */
@@ -137,13 +136,13 @@ export const defaultToolbar: ToolbarItem[] = createDefaultRichTextToolbar(
 
 /** Container fill: optional `--tiger-rte-bg`, then registered `--tiger-surface`. */
 export const richTextContainerBase =
-  'flex flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-rte-bg)]'
+  'flex flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-rte-bg,var(--tiger-surface))]'
 
 export const richTextContainerDisabled = 'opacity-50 cursor-not-allowed'
 
 /** Toolbar fill: optional `--tiger-rte-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const richTextToolbarClasses =
-  'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-[var(--tiger-border)] bg-[var(--tiger-rte-toolbar-bg)]'
+  'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-[var(--tiger-border)] bg-[var(--tiger-rte-toolbar-bg,var(--tiger-surface-muted))]'
 
 export const richTextToolbarButtonBase =
   'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary)] hover:bg-[var(--tiger-outline-bg-hover)] hover:text-[var(--tiger-text)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--tiger-primary)]'
@@ -537,7 +536,8 @@ function serializeAllowedAttrs(tag: string, attrs: Array<[string, string]>): str
     }
     if (URL_ATTR_NAMES.has(rawName)) {
       const canonical =
-        canonicalizeUrl(rawValue) ?? (tag === 'img' && rawName === 'src' ? cappedBitmapDataUrl(rawValue) : null)
+        canonicalizeUrl(rawValue) ??
+        (tag === 'img' && rawName === 'src' ? cappedBitmapDataUrl(rawValue) : null)
       if (!canonical) continue
       out += ` ${rawName}="${escapeHtml(canonical)}"`
       continue

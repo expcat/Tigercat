@@ -154,7 +154,7 @@ export const workflowDesignerItemClasses =
 export const workflowDesignerCardClasses =
   'tiger-workflow-designer__card mx-auto w-full min-w-0 max-w-64 cursor-pointer rounded-lg border border-[var(--tiger-border)] bg-[var(--tiger-surface)] px-3 py-2'
 export const workflowDesignerCardSelectedClasses =
-  'border-[var(--tiger-primary)] bg-[var(--tiger-primary-soft)] ring-2 ring-[var(--tiger-primary)] ring-offset-1'
+  'border-[var(--tiger-primary)] bg-[var(--tiger-primary-soft,var(--tiger-outline-bg-hover))] ring-2 ring-[var(--tiger-primary)] ring-offset-1'
 export const workflowDesignerSummaryClasses = 'flex min-w-0 flex-col gap-1'
 export const workflowDesignerSummaryRowClasses = 'flex min-w-0 items-center gap-2'
 export const workflowDesignerSummaryTitleClasses =
@@ -178,9 +178,9 @@ export const workflowDesignerTabListClasses =
 export const workflowDesignerTabClasses =
   'inline-flex items-center rounded-md px-2 py-1 text-xs text-[var(--tiger-text)] disabled:cursor-not-allowed disabled:opacity-50'
 export const workflowDesignerTabSelectedClasses =
-  'bg-[var(--tiger-primary-soft)] text-[var(--tiger-primary)]'
+  'bg-[var(--tiger-primary-soft,var(--tiger-outline-bg-hover))] text-[var(--tiger-primary)]'
 export const workflowDesignerIssueBannerClasses =
-  'rounded-md border border-[var(--tiger-error)] bg-[var(--tiger-error-soft)] px-3 py-2 text-sm text-[var(--tiger-error)]'
+  'rounded-md border border-[var(--tiger-error)] bg-[var(--tiger-error-soft,var(--tiger-error-bg-hover))] px-3 py-2 text-sm text-[var(--tiger-error)]'
 export const workflowDesignerIssueListClasses = 'm-0 list-disc space-y-1 ps-4'
 export const workflowDesignerTableClasses = 'w-full border-collapse text-sm'
 export const workflowDesignerTableHeadClasses =

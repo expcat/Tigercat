@@ -167,7 +167,7 @@ export const AppLayout: React.FC = () => {
                   <div
                     ref={stickyRef}
                     className={`sticky top-0 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80 ${overlayZIndexClass.viewport}`}>
-                    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 px-6 py-2">
+                    <div className="grid grid-cols-1 items-center gap-2 px-6 py-2 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-4">
                       <Breadcrumb className="w-auto shrink-0">
                         <BreadcrumbItem href="/">{homeLabel}</BreadcrumbItem>
                         <BreadcrumbItem current>{headerTitle}</BreadcrumbItem>
@@ -178,7 +178,7 @@ export const AppLayout: React.FC = () => {
                           orientation="horizontal"
                           targetOffset={anchorOffset}
                           getContainer={() => scrollContainerRef.current || window}
-                          className="min-w-0 justify-self-end [&_ul]:max-w-full [&_ul]:flex-nowrap [&_ul]:overflow-x-auto [&_li]:shrink-0"
+                          className="min-w-0 w-full sm:w-auto sm:justify-self-end [&_ul]:max-w-full [&_ul]:flex-nowrap [&_ul]:overflow-x-auto [&_li]:shrink-0"
                         />
                       ) : null}
                     </div>

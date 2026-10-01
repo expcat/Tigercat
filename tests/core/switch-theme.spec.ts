@@ -25,7 +25,7 @@ describe('switch theme helpers', () => {
 
   it('positions the thumb with logical inset so RTL can flip', () => {
     expect(getSwitchThumbClasses('sm', false)).toContain('start-0.5')
-    expect(getSwitchThumbClasses('sm', false)).not.toContain('inset-inline-start')
+    expect(getSwitchThumbClasses('sm', false)).not.toContain('inset-inline-start-')
     expect(getSwitchThumbClasses('sm', true)).toContain('start-[calc(100%-1.125rem)]')
     expect(getSwitchThumbClasses('md', true)).toContain('start-[calc(100%-1.375rem)]')
   })

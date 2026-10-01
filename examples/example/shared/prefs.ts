@@ -50,7 +50,7 @@ export function getStoredDarkMode(): boolean {
   const raw = window.localStorage.getItem(DEMO_DARK_MODE_STORAGE_KEY)
   if (raw === '1') return true
   if (raw === '0') return false
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+  return false
 }
 
 export function setStoredDarkMode(enabled: boolean) {

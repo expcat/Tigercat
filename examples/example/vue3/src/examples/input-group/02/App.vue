@@ -5,7 +5,7 @@ import { Input } from '@expcat/tigercat-vue/Input'
 </script>
 
 <template>
-  <div class="space-y-3">
+  <div class="flex flex-wrap items-start gap-3">
     <InputGroup compact class="w-full max-w-md" aria-label="网址">
       <InputGroupAddon>https://</InputGroupAddon>
       <Input aria-label="站点域名" placeholder="example" />

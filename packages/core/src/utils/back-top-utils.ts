@@ -91,10 +91,7 @@ export function shouldShowBackTop(
 /**
  * Scroll to top. `duration <= 0` is instant; any positive value is native smooth.
  */
-export function scrollToTop(
-  target: HTMLElement | Window,
-  behavior?: BackTopScrollBehavior
-): void {
+export function scrollToTop(target: HTMLElement | Window, behavior?: BackTopScrollBehavior): void {
   const resolved = resolveBackTopScrollBehavior(behavior)
 
   if (isWindowTarget(target)) {
@@ -143,7 +140,7 @@ export function createBackTopVisibilityController(
 /**
  * Base CSS classes for the BackTop button (without positioning)
  */
-export const backTopBaseClasses = `${overlayZIndexClass.viewport} tiger-motion-aware flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary)] text-white shadow-lg transition-opacity duration-300 hover:bg-[var(--tiger-primary-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)] focus-visible:ring-offset-2`
+export const backTopBaseClasses = `${overlayZIndexClass.viewport} tiger-motion-aware flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] shadow-lg transition-opacity duration-300 hover:bg-[var(--tiger-primary-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary)] focus-visible:ring-offset-2`
 
 export const backTopStickyClasses = `sticky bottom-4 ms-auto me-4 ${backTopBaseClasses}`
 

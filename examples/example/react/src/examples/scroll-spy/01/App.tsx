@@ -12,10 +12,10 @@ export default function App() {
       <ScrollSpy items={items} orientation="horizontal" />
       <div className="grid gap-4 md:grid-cols-[1fr_160px]">
         <div className="max-h-64 overflow-auto rounded border">
-          <section id="spy-overview" className="min-h-[28rem] bg-blue-50 p-4">
+          <section id="spy-overview" className="min-h-[28rem] bg-[var(--tiger-primary)]/10 p-4">
             概览
           </section>
-          <section id="spy-workflow" className="min-h-[28rem] bg-green-50 p-4">
+          <section id="spy-workflow" className="min-h-[28rem] bg-[var(--tiger-success)]/10 p-4">
             工作流
           </section>
         </div>

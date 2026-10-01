@@ -14,7 +14,8 @@ export function getDropdownTriggerClasses(disabled: boolean): string {
   return classNames(
     'tiger-dropdown-trigger',
     'inline-flex items-center gap-1.5 h-full',
-    'select-none bg-transparent p-0 border-0 font-inherit text-inherit',
+    'select-none',
+    '[:where(&)]:bg-transparent [:where(&)]:p-0 [:where(&)]:border-0 [:where(&)]:[font:inherit] [:where(&)]:text-inherit',
     disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
   )
 }

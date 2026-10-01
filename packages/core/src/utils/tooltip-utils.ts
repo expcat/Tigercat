@@ -16,7 +16,8 @@ export function getTooltipContainerClasses(): string {
 export function getTooltipTriggerClasses(disabled: boolean): string {
   return classNames(
     'tiger-tooltip-trigger',
-    'inline-flex items-center bg-transparent p-0 border-0 font-inherit text-inherit',
+    'inline-flex items-center',
+    '[:where(&)]:bg-transparent [:where(&)]:p-0 [:where(&)]:border-0 [:where(&)]:[font:inherit] [:where(&)]:text-inherit',
     disabled ? 'cursor-not-allowed opacity-50' : undefined
   )
 }

@@ -211,14 +211,14 @@ export function getStepIconClasses(
 
   // Status-based colors using CSS variables with fallbacks
   const activeClasses =
-    'bg-[var(--tiger-primary)] border-[var(--tiger-primary)] text-white ring-4 ring-[var(--tiger-primary)]/15 scale-105 shadow-sm [transition:var(--tiger-transition-base)] motion-reduce:transition-none'
+    'bg-[var(--tiger-primary)] border-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] ring-4 ring-[var(--tiger-primary)]/15 scale-105 shadow-sm [transition:var(--tiger-transition-base)] motion-reduce:transition-none'
   const statusClasses = {
     wait: 'bg-[var(--tiger-surface-muted)] border-[var(--tiger-border)] text-[var(--tiger-text-secondary)] [transition:var(--tiger-transition-base)] motion-reduce:transition-none',
     process: activeClasses,
     finish:
-      'bg-[var(--tiger-primary)] border-[var(--tiger-primary)] text-white shadow-sm [transition:var(--tiger-transition-base)] motion-reduce:transition-none',
+      'bg-[var(--tiger-primary)] border-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] shadow-sm [transition:var(--tiger-transition-base)] motion-reduce:transition-none',
     error:
-      'bg-[var(--tiger-error-bg)] border-[var(--tiger-error)] text-[var(--tiger-error)] [transition:var(--tiger-transition-base)]'
+      'bg-[var(--tiger-error-bg,var(--tiger-error-bg-hover))] border-[var(--tiger-error)] text-[var(--tiger-error)] [transition:var(--tiger-transition-base)]'
   }
 
   return `${baseClasses} ${sizeClasses} ${iconClasses} ${statusClasses[status]}`

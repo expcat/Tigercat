@@ -27,7 +27,7 @@ export const DEFAULT_FILE_GRID_COLUMNS = 4
 
 /** Container fill: optional `--tiger-file-manager-bg`, then registered `--tiger-surface`. */
 export const fileManagerContainerClasses =
-  'tiger-file-manager relative flex h-full min-h-0 flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-file-manager-bg)] overflow-hidden'
+  'tiger-file-manager relative flex h-full min-h-0 flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-file-manager-bg,var(--tiger-surface))] overflow-hidden'
 
 export const FILE_MANAGER_DEFAULT_HEIGHT = '20rem'
 export const FILE_MANAGER_LIST_ROW_HEIGHT = 40
@@ -36,7 +36,7 @@ export const FILE_BREADCRUMB_SEPARATOR = '›'
 
 /** Toolbar fill: optional `--tiger-file-manager-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const fileManagerToolbarClasses =
-  'flex items-center gap-2 px-3 py-2 border-b border-[var(--tiger-border)] bg-[var(--tiger-file-manager-toolbar-bg)]'
+  'flex items-center gap-2 px-3 py-2 border-b border-[var(--tiger-border)] bg-[var(--tiger-file-manager-toolbar-bg,var(--tiger-surface-muted))]'
 
 export const fileManagerBreadcrumbClasses =
   'flex items-center gap-1 text-sm text-[var(--tiger-text-secondary)]'
@@ -80,10 +80,10 @@ export const fileManagerEmptyClasses =
 
 /** Loading overlay: same surface chain as the container, at 60% opacity. */
 export const fileManagerLoadingClasses =
-  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-file-manager-bg)]/60 z-10'
+  'absolute inset-0 flex items-center justify-center bg-[var(--tiger-file-manager-bg,var(--tiger-surface))]/60 z-10'
 
 /** Search field fill: same surface chain as the container. */
-export const fileManagerSearchClasses = `px-3 py-1.5 text-sm border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-file-manager-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-focus-ring)]`
+export const fileManagerSearchClasses = `px-3 py-1.5 text-sm border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] bg-[var(--tiger-file-manager-bg,var(--tiger-surface))] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-focus-ring)]`
 
 // ─── File operations ──────────────────────────────────────────────
 

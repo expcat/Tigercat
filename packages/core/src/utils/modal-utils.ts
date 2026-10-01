@@ -6,7 +6,11 @@ import { classNames } from './class-names'
 import type { ModalSize } from '../types/modal'
 import type { SwipeGesture } from './gesture-utils'
 export { acquireOverlayZ, overlayZCeiling, overlayZOpenCount, resetOverlayZ } from './overlay-z'
-export { getFloatingArrowGeometry, getFloatingArrowStyle, FLOATING_ARROW_SIZE_PX } from './floating-arrow'
+export {
+  getFloatingArrowGeometry,
+  getFloatingArrowStyle,
+  FLOATING_ARROW_SIZE_PX
+} from './floating-arrow'
 
 /**
  * Base modal wrapper classes
@@ -58,7 +62,7 @@ export const modalSizeClasses: Record<ModalSize, string> = {
  * Modal header classes
  */
 export const modalHeaderClasses =
-  'flex items-center justify-between px-6 py-4 border-b border-[var(--tiger-border)]'
+  'flex items-center justify-between px-6 py-4 border-b border-[var(--tiger-border)]/30'
 
 /**
  * Modal title classes
@@ -74,14 +78,13 @@ export const modalCloseButtonClasses =
 /**
  * Modal body classes
  */
-export const modalBodyClasses =
-  'min-h-0 flex-1 overflow-y-auto px-6 py-4 text-[var(--tiger-text)]'
+export const modalBodyClasses = 'min-h-0 flex-1 overflow-y-auto px-6 py-4 text-[var(--tiger-text)]'
 
 /**
  * Modal footer classes
  */
 export const modalFooterClasses =
-  'flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--tiger-border)]'
+  'flex items-center justify-end gap-3 px-6 py-4 border-t border-[var(--tiger-border)]/30'
 
 /**
  * Get complete modal content classes

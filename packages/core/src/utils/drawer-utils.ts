@@ -143,7 +143,7 @@ export function isDrawerSwipeCloseGesture(
  * Get drawer header classes
  */
 export function getDrawerHeaderClasses(): string {
-  return 'flex items-center justify-between px-6 py-4 border-b border-[var(--tiger-border)]'
+  return 'flex items-center justify-between px-6 py-4 border-b border-[var(--tiger-border)]/30'
 }
 
 /**
@@ -159,7 +159,7 @@ export function getDrawerBodyClasses(customClass?: string, bodyPadding?: boolean
  * Get drawer footer classes
  */
 export function getDrawerFooterClasses(): string {
-  return 'px-6 py-4 border-t border-[var(--tiger-border)]'
+  return 'px-6 py-4 border-t border-[var(--tiger-border)]/30'
 }
 
 /**
@@ -208,9 +208,10 @@ export function subscribeDrawerLayers(listener: () => void): () => void {
   }
 }
 
-export function registerDrawerLayer(
-  placement: Exclude<DrawerPlacement, 'start' | 'end'>
-): { id: number; release: () => void } {
+export function registerDrawerLayer(placement: Exclude<DrawerPlacement, 'start' | 'end'>): {
+  id: number
+  release: () => void
+} {
   const id = drawerLayers.length === 0 ? 1 : drawerLayers[drawerLayers.length - 1].id + 1
   drawerLayers.push({ id, placement })
   emitDrawerLayers()

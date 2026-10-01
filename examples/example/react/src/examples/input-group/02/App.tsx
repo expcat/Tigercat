@@ -4,7 +4,7 @@ import { Input } from '@expcat/tigercat-react/Input'
 
 export default function App() {
   return (
-    <div className="space-y-3">
+    <div className="flex flex-wrap items-start gap-3">
       <InputGroup compact className="w-full max-w-md" aria-label="网址">
         <InputGroupAddon>https://</InputGroupAddon>
         <Input aria-label="站点域名" placeholder="example" />

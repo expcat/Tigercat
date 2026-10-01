@@ -54,7 +54,7 @@ export const cronFieldModes: CronFieldMode[] = ['any', 'every', 'specific', 'ran
 
 export const cronEditorBaseClasses = classNames(
   'inline-flex w-full flex-col gap-3 rounded-[var(--tiger-radius-md)] border p-3',
-  'border-[var(--tiger-border)]',
+  'border-[var(--tiger-border)]/30',
   'bg-[var(--tiger-surface)]',
   'text-[var(--tiger-text)]'
 )
@@ -63,7 +63,7 @@ export const cronEditorFieldsClasses = 'grid gap-2 md:grid-cols-5'
 
 export const cronEditorFieldClasses = classNames(
   'flex min-w-0 flex-col gap-2 rounded-[var(--tiger-radius-md)] border p-2',
-  'border-[var(--tiger-border)]',
+  'border-[var(--tiger-border)]/30',
   'bg-[var(--tiger-surface-muted)]'
 )
 
@@ -584,8 +584,10 @@ export function describeCronExpression(expression: string): string | null {
   const schedule = parseCronSchedule(expression)
   if (!schedule) return null
   const parts = getCronExpressionParts(expression)
-  const minute = parts[0].trim() === '*' ? 'every minute' : `minute ${listPhrase([...schedule.minute], false)}`
-  const hour = parts[1].trim() === '*' ? 'every hour' : `hour ${listPhrase([...schedule.hour], false)}`
+  const minute =
+    parts[0].trim() === '*' ? 'every minute' : `minute ${listPhrase([...schedule.minute], false)}`
+  const hour =
+    parts[1].trim() === '*' ? 'every hour' : `hour ${listPhrase([...schedule.hour], false)}`
   const day =
     schedule.dayOfMonthAny && schedule.dayOfWeekAny
       ? 'every day'
@@ -595,6 +597,7 @@ export function describeCronExpression(expression: string): string | null {
         ]
           .filter(Boolean)
           .join(' or ')
-  const month = parts[3].trim() === '*' ? 'every month' : `month ${listPhrase([...schedule.month], false)}`
+  const month =
+    parts[3].trim() === '*' ? 'every month' : `month ${listPhrase([...schedule.month], false)}`
   return `Runs at ${minute}, ${hour}, ${day}, ${month}.`
 }

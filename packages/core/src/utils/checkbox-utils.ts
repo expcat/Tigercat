@@ -57,7 +57,7 @@ export function getCheckboxVisualClasses({
     disabled
       ? 'cursor-not-allowed border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
       : filled
-        ? 'cursor-pointer border-[var(--tiger-primary)] bg-[var(--tiger-primary)] text-[var(--tiger-on-primary)]'
+        ? 'cursor-pointer border-[var(--tiger-primary)] bg-[var(--tiger-primary)] text-[var(--tiger-on-primary,var(--tiger-primary-foreground))]'
         : error
           ? 'cursor-pointer border-[var(--tiger-error)] bg-[var(--tiger-surface)]'
           : 'cursor-pointer border-[var(--tiger-border)] bg-[var(--tiger-surface)]'

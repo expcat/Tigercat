@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import {
   downloadChartSvg,
   getW9DataLabels,
+  resolveButtonClasses,
   layoutSankey,
   readPageWritingDirection,
   type SankeyChartProps as CoreSankeyChartProps
@@ -27,12 +28,21 @@ export function SankeyChart({
   }
   return (
     <div ref={hostRef} className={className}>
-      <button type="button" onClick={exportChart}>
+      <button
+        type="button"
+        className={resolveButtonClasses({ variant: 'outline', size: 'sm' })}
+        onClick={exportChart}>
         {getW9DataLabels().exportChart}
       </button>
       <ChartCanvas width={width} height={height} title={title} responsive={responsive} padding={16}>
         {(ctx) => {
-          const laid = layoutSankey(nodes, links, ctx.innerRect.width, ctx.innerRect.height, direction)
+          const laid = layoutSankey(
+            nodes,
+            links,
+            ctx.innerRect.width,
+            ctx.innerRect.height,
+            direction
+          )
           return (
             <>
               {laid.links.map((link, index) => (
@@ -40,7 +50,9 @@ export function SankeyChart({
                   key={`link-${index}`}
                   data-sankey-link=""
                   d={link.path}
-                  fill="var(--tiger-primary, #2563eb)"
+                  fill="none"
+                  stroke="var(--tiger-primary, #2563eb)"
+                  strokeWidth={link.width}
                   opacity={0.35}
                 />
               ))}
@@ -52,7 +64,7 @@ export function SankeyChart({
                   y={node.y}
                   width={node.width}
                   height={node.height}
-                  fill="var(--tiger-text, #0f172a)"
+                  fill="var(--tiger-primary, #2563eb)"
                 />
               ))}
             </>

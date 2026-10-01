@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import {
   downloadChartSvg,
   getW9DataLabels,
+  resolveButtonClasses,
   layoutWaterfall,
   type WaterfallChartProps as CoreWaterfallChartProps,
   type WaterfallDatum
@@ -12,7 +13,7 @@ export type WaterfallChartProps = CoreWaterfallChartProps
 
 const KIND_COLOR: Record<WaterfallDatum['kind'], string> = {
   increase: 'var(--tiger-success, #16a34a)',
-  decrease: 'var(--tiger-danger, #dc2626)',
+  decrease: 'var(--tiger-error, #dc2626)',
   total: 'var(--tiger-text-secondary, #64748b)'
 }
 
@@ -37,7 +38,10 @@ export function WaterfallChart({
   }
   return (
     <div ref={hostRef} className={className}>
-      <button type="button" onClick={exportChart}>
+      <button
+        type="button"
+        className={resolveButtonClasses({ variant: 'outline', size: 'sm' })}
+        onClick={exportChart}>
         {getW9DataLabels().exportChart}
       </button>
       <ChartCanvas width={width} height={height} title={title} responsive={responsive} padding={24}>

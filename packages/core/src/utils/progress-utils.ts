@@ -168,11 +168,11 @@ export function getCircleSize(
   return { width, height, radius, cx, cy, strokeWidth: safeStroke }
 }
 
-export const progressTrackBgClasses = 'bg-[color:var(--tiger-border)]'
+export const progressTrackBgClasses = 'bg-[color:var(--tiger-border)]/20'
 
 export const progressCircleTextClasses = 'absolute inset-0 flex items-center justify-center'
 
-export const progressCircleTrackStrokeClasses = 'text-[color:var(--tiger-border)]'
+export const progressCircleTrackStrokeClasses = 'text-[color:var(--tiger-border)]/20'
 
 export interface ProgressViewInput {
   percentage?: number

@@ -187,12 +187,12 @@
   <body>
     <div class="header">
       <h1>Tigercat <span class="version-badge">v3.0.0-preview.6</span></h1>
-      <p>Tailwind CSS 驱动的跨框架 UI 组件库。入口清单来自示例站导航，共 139 个可打开的示例页。</p>
+      <p>Tailwind CSS 驱动的跨框架 UI 组件库。入口清单来自示例站导航，共 146 个可打开的示例页。</p>
     </div>
 
     <div class="stats">
       <div class="stat">
-        <div class="stat-value">138</div>
+        <div class="stat-value">146</div>
         <div class="stat-label">示例页</div>
       </div>
     </div>
@@ -225,6 +225,9 @@
     <div class="section" id="basic">
       <h2>基础组件 (Basics)</h2>
       <div class="component-grid" data-category="basic">
+        <a class="component-tag" href="./vue/#/copy-button" data-react="./react/#/copy-button"
+          >CopyButton</a
+        >
         <a class="component-tag" href="./vue/#/button" data-react="./react/#/button">Button</a>
         <a class="component-tag" href="./vue/#/split-button" data-react="./react/#/split-button"
           >SplitButton</a
@@ -237,6 +240,7 @@
         >
         <a class="component-tag" href="./vue/#/icon" data-react="./react/#/icon">Icon</a>
         <a class="component-tag" href="./vue/#/link" data-react="./react/#/link">Link</a>
+        <a class="component-tag" href="./vue/#/inplace" data-react="./react/#/inplace">Inplace</a>
         <a class="component-tag" href="./vue/#/text" data-react="./react/#/text">Text</a>
         <a class="component-tag" href="./vue/#/code" data-react="./react/#/code">Code</a>
         <a class="component-tag" href="./vue/#/kbd" data-react="./react/#/kbd">Kbd</a>
@@ -251,6 +255,7 @@
         <a class="component-tag" href="./vue/#/image-cropper" data-react="./react/#/image-cropper"
           >ImageCropper</a
         >
+        <a class="component-tag" href="./vue/#/gallery" data-react="./react/#/gallery">Gallery</a>
         <a class="component-tag" href="./vue/#/image-preview" data-react="./react/#/image-preview"
           >ImagePreview</a
         >
@@ -480,6 +485,12 @@
     <div class="section" id="charts">
       <h2>图表 (Charts)</h2>
       <div class="component-grid" data-category="charts">
+        <a
+          class="component-tag"
+          href="./vue/#/waterfall-chart"
+          data-react="./react/#/waterfall-chart"
+          >WaterfallChart</a
+        >
         <a class="component-tag" href="./vue/#/bar-chart" data-react="./react/#/bar-chart"
           >BarChart</a
         >
@@ -497,6 +508,9 @@
         >
         <a class="component-tag" href="./vue/#/radar-chart" data-react="./react/#/radar-chart"
           >RadarChart</a
+        >
+        <a class="component-tag" href="./vue/#/sankey-chart" data-react="./react/#/sankey-chart"
+          >SankeyChart</a
         >
         <a class="component-tag" href="./vue/#/funnel-chart" data-react="./react/#/funnel-chart"
           >FunnelChart</a
@@ -569,6 +583,9 @@
     <div class="section" id="composite">
       <h2>组合组件 (Composite)</h2>
       <div class="component-grid" data-category="composite">
+        <a class="component-tag" href="./vue/#/app-shell" data-react="./react/#/app-shell"
+          >AppShell</a
+        >
         <a
           class="component-tag"
           href="./vue/#/data-table-with-toolbar"
@@ -616,6 +633,18 @@
         >
         <a
           class="component-tag"
+          href="./vue/#/assignee-picker"
+          data-react="./react/#/assignee-picker"
+          >AssigneePicker</a
+        >
+        <a
+          class="component-tag"
+          href="./vue/#/notification-bell"
+          data-react="./react/#/notification-bell"
+          >NotificationBell</a
+        >
+        <a
+          class="component-tag"
           href="./vue/#/notification-center"
           data-react="./react/#/notification-center"
           >NotificationCenter</a
@@ -660,9 +689,7 @@
       const html = document.documentElement
       const darkKey = 'tigercat-example-dark'
       const savedDark = localStorage.getItem(darkKey)
-      const preferDark =
-        savedDark === '1' ||
-        (savedDark !== '0' && matchMedia('(prefers-color-scheme: dark)').matches)
+      const preferDark = savedDark === '1'
       if (preferDark) html.classList.add('dark')
       toggle.textContent = html.classList.contains('dark') ? '☀️ 浅色模式' : '🌙 暗色模式'
       toggle.addEventListener('click', () => {

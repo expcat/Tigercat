@@ -19,7 +19,7 @@ export const kanbanSwimlaneClasses = 'border-b border-[var(--tiger-border)] last
 
 /** Swimlane header (click / keyboard toggles collapsed) */
 export const kanbanSwimlaneHeaderClasses =
-  'flex items-center gap-2 w-full px-4 py-2 text-sm font-medium text-[var(--tiger-text)] cursor-pointer select-none hover:bg-[var(--tiger-bg-hover)]'
+  'flex items-center gap-2 w-full px-4 py-2 text-sm font-medium text-[var(--tiger-text)] cursor-pointer select-none hover:bg-[var(--tiger-bg-hover,var(--tiger-ghost-bg-hover))]'
 
 /** Swimlane color dot */
 export const kanbanSwimlaneDotClasses = 'w-2.5 h-2.5 rounded-full shrink-0'
@@ -44,8 +44,6 @@ export function filterCards(cards: TaskBoardCard[], filterText: string): TaskBoa
     return title.includes(lower) || desc.includes(lower)
   })
 }
-
-
 
 export interface SwimlaneGroup {
   swimlane: TaskBoardSwimlane

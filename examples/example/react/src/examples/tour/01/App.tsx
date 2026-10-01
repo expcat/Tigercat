@@ -15,7 +15,7 @@ export default function App() {
       <Button id="tour-start-react" onClick={() => setOpen(true)}>
         开始引导
       </Button>
-      <span id="tour-result-react" className="rounded bg-gray-100 px-3 py-2">
+      <span id="tour-result-react" className="rounded bg-[var(--tiger-surface-muted)] px-3 py-2">
         结果区域
       </span>
       <Tour open={open} steps={steps} showIndicators onOpenChange={setOpen} />

@@ -14,7 +14,7 @@ import {
 export const listBaseClasses = 'w-full'
 
 export const listBorderedClasses =
-  'bg-[var(--tiger-surface)] rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] overflow-hidden'
+  'bg-[var(--tiger-surface)] rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)]/30 overflow-hidden'
 
 export const listWrapperClasses = 'w-full'
 
@@ -41,8 +41,7 @@ export const listItemBaseClasses = 'flex w-full tiger-motion-aware transition-co
 
 export const listItemHoverClasses = 'hover:bg-[var(--tiger-surface-muted)]'
 
-export const listItemDividedClasses =
-  'border-b border-[var(--tiger-border)] last:border-b-0'
+export const listItemDividedClasses = 'border-b border-[var(--tiger-border)]/30 last:border-b-0'
 
 export const listItemLayoutClasses: Record<ListItemLayout, string> = {
   horizontal: 'flex-row items-center',
@@ -50,7 +49,7 @@ export const listItemLayoutClasses: Record<ListItemLayout, string> = {
 } as const
 
 export const listHeaderFooterBaseClasses =
-  'border-b border-[var(--tiger-border)] font-medium text-[var(--tiger-text)]'
+  'border-b border-[var(--tiger-border)]/30 font-medium text-[var(--tiger-text)]'
 
 export const listFooterClasses = 'border-t border-b-0'
 
@@ -127,7 +126,12 @@ export function resolveListGridColumnCount(
   const value = listGridResponsiveMap(grid)
   if (value == null) return 1
   if (typeof value === 'number') return clampGridColumns(value) ?? 1
-  const resolved = resolveResponsiveValue(value, width, value.xs ?? value.sm ?? value.md ?? value.lg ?? value.xl ?? value['2xl'] ?? 1, minWidths)
+  const resolved = resolveResponsiveValue(
+    value,
+    width,
+    value.xs ?? value.sm ?? value.md ?? value.lg ?? value.xl ?? value['2xl'] ?? 1,
+    minWidths
+  )
   return clampGridColumns(resolved) ?? 1
 }
 

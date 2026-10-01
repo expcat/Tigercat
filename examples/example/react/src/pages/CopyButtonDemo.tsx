@@ -1,0 +1,14 @@
+import DemoPage from '../components/DemoPage'
+import { getDemoModules } from '../playground/registry'
+
+const modules = getDemoModules('copy-button')
+
+export default function CopyButtonDemo() {
+  return (
+    <DemoPage
+      title="CopyButton 复制按钮"
+      description="基础复制按钮，显示复制结果与失败提示。"
+      modules={modules}
+    />
+  )
+}

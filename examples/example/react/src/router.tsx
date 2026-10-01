@@ -5,11 +5,13 @@ import AppLayout from './layouts/AppLayout'
 const Home = lazy(() => import('./pages/Home'))
 
 // Basic
+const CopyButtonDemo = lazy(() => import('./pages/CopyButtonDemo'))
 const ButtonDemo = lazy(() => import('./pages/ButtonDemo'))
 const SplitButtonDemo = lazy(() => import('./pages/SplitButtonDemo'))
 const ConfigProviderDemo = lazy(() => import('./pages/ConfigProviderDemo'))
 const IconDemo = lazy(() => import('./pages/IconDemo'))
 const LinkDemo = lazy(() => import('./pages/LinkDemo'))
+const InplaceDemo = lazy(() => import('./pages/InplaceDemo'))
 const TextDemo = lazy(() => import('./pages/TextDemo'))
 const CodeDemo = lazy(() => import('./pages/CodeDemo'))
 const KbdDemo = lazy(() => import('./pages/KbdDemo'))
@@ -18,6 +20,7 @@ const MarqueeDemo = lazy(() => import('./pages/MarqueeDemo'))
 const ImageDemo = lazy(() => import('./pages/ImageDemo'))
 const ImageCompareDemo = lazy(() => import('./pages/ImageCompareDemo'))
 const ImageCropperDemo = lazy(() => import('./pages/ImageCropperDemo'))
+const GalleryDemo = lazy(() => import('./pages/GalleryDemo'))
 const ImagePreviewDemo = lazy(() => import('./pages/ImagePreviewDemo'))
 const AvatarDemo = lazy(() => import('./pages/AvatarDemo'))
 const BadgeDemo = lazy(() => import('./pages/BadgeDemo'))
@@ -117,12 +120,14 @@ const LoadingDemo = lazy(() => import('./pages/LoadingDemo'))
 const LoadingBarDemo = lazy(() => import('./pages/LoadingBarDemo'))
 
 // Charts
+const WaterfallChartDemo = lazy(() => import('./pages/WaterfallChartDemo'))
 const BarChartDemo = lazy(() => import('./pages/BarChartDemo'))
 const LineChartDemo = lazy(() => import('./pages/LineChartDemo'))
 const AreaChartDemo = lazy(() => import('./pages/AreaChartDemo'))
 const PieChartDemo = lazy(() => import('./pages/PieChartDemo'))
 const ScatterChartDemo = lazy(() => import('./pages/ScatterChartDemo'))
 const RadarChartDemo = lazy(() => import('./pages/RadarChartDemo'))
+const SankeyChartDemo = lazy(() => import('./pages/SankeyChartDemo'))
 const FunnelChartDemo = lazy(() => import('./pages/FunnelChartDemo'))
 const GaugeChartDemo = lazy(() => import('./pages/GaugeChartDemo'))
 const HeatmapChartDemo = lazy(() => import('./pages/HeatmapChartDemo'))
@@ -143,6 +148,7 @@ const FileManagerDemo = lazy(() => import('./pages/FileManagerDemo'))
 const ImageAnnotationDemo = lazy(() => import('./pages/ImageAnnotationDemo'))
 
 // Composite
+const AppShellDemo = lazy(() => import('./pages/AppShellDemo'))
 const DataTableWithToolbarDemo = lazy(() => import('./pages/DataTableWithToolbarDemo'))
 const FormWizardDemo = lazy(() => import('./pages/FormWizardDemo'))
 const SchemaFormDemo = lazy(() => import('./pages/SchemaFormDemo'))
@@ -153,6 +159,8 @@ const WorkflowDetailShellDemo = lazy(() => import('./pages/WorkflowDetailShellDe
 const ChatWindowDemo = lazy(() => import('./pages/ChatWindowDemo'))
 const CommentThreadDemo = lazy(() => import('./pages/CommentThreadDemo'))
 const ActivityFeedDemo = lazy(() => import('./pages/ActivityFeedDemo'))
+const AssigneePickerDemo = lazy(() => import('./pages/AssigneePickerDemo'))
+const NotificationBellDemo = lazy(() => import('./pages/NotificationBellDemo'))
 const NotificationCenterDemo = lazy(() => import('./pages/NotificationCenterDemo'))
 const CropUploadDemo = lazy(() => import('./pages/CropUploadDemo'))
 const TaskBoardDemo = lazy(() => import('./pages/TaskBoardDemo'))
@@ -169,11 +177,13 @@ const router = createHashRouter([
     children: [
       { index: true, element: <Home /> },
       // Basic
+      { path: 'copy-button', element: <CopyButtonDemo /> },
       { path: 'button', element: <ButtonDemo /> },
       { path: 'split-button', element: <SplitButtonDemo /> },
       { path: 'config-provider', element: <ConfigProviderDemo /> },
       { path: 'icon', element: <IconDemo /> },
       { path: 'link', element: <LinkDemo /> },
+      { path: 'inplace', element: <InplaceDemo /> },
       { path: 'text', element: <TextDemo /> },
       { path: 'code', element: <CodeDemo /> },
       { path: 'kbd', element: <KbdDemo /> },
@@ -182,6 +192,7 @@ const router = createHashRouter([
       { path: 'image', element: <ImageDemo /> },
       { path: 'image-compare', element: <ImageCompareDemo /> },
       { path: 'image-cropper', element: <ImageCropperDemo /> },
+      { path: 'gallery', element: <GalleryDemo /> },
       { path: 'image-preview', element: <ImagePreviewDemo /> },
       { path: 'avatar', element: <AvatarDemo /> },
       { path: 'badge', element: <BadgeDemo /> },
@@ -275,12 +286,14 @@ const router = createHashRouter([
       { path: 'loading', element: <LoadingDemo /> },
       { path: 'loading-bar', element: <LoadingBarDemo /> },
       // Charts
+      { path: 'waterfall-chart', element: <WaterfallChartDemo /> },
       { path: 'bar-chart', element: <BarChartDemo /> },
       { path: 'line-chart', element: <LineChartDemo /> },
       { path: 'area-chart', element: <AreaChartDemo /> },
       { path: 'pie-chart', element: <PieChartDemo /> },
       { path: 'scatter-chart', element: <ScatterChartDemo /> },
       { path: 'radar-chart', element: <RadarChartDemo /> },
+      { path: 'sankey-chart', element: <SankeyChartDemo /> },
       { path: 'funnel-chart', element: <FunnelChartDemo /> },
       { path: 'gauge-chart', element: <GaugeChartDemo /> },
       { path: 'heatmap-chart', element: <HeatmapChartDemo /> },
@@ -299,6 +312,7 @@ const router = createHashRouter([
       { path: 'file-manager', element: <FileManagerDemo /> },
       { path: 'image-annotation', element: <ImageAnnotationDemo /> },
       // Composite
+      { path: 'app-shell', element: <AppShellDemo /> },
       { path: 'data-table-with-toolbar', element: <DataTableWithToolbarDemo /> },
       { path: 'form-wizard', element: <FormWizardDemo /> },
       { path: 'schema-form', element: <SchemaFormDemo /> },
@@ -309,6 +323,8 @@ const router = createHashRouter([
       { path: 'chat-window', element: <ChatWindowDemo /> },
       { path: 'comment-thread', element: <CommentThreadDemo /> },
       { path: 'activity-feed', element: <ActivityFeedDemo /> },
+      { path: 'assignee-picker', element: <AssigneePickerDemo /> },
+      { path: 'notification-bell', element: <NotificationBellDemo /> },
       { path: 'notification-center', element: <NotificationCenterDemo /> },
       { path: 'crop-upload', element: <CropUploadDemo /> },
       { path: 'task-board', element: <TaskBoardDemo /> },

@@ -157,7 +157,23 @@ const componentMetricVars = {
   '--tiger-component-badge-padding-x': '0.375rem',
   '--tiger-component-badge-font-size': '0.75rem',
   '--tiger-component-badge-font-weight': '600',
-  '--tiger-component-badge-border-radius': '9999px'
+  '--tiger-component-badge-border-radius': '9999px',
+  '--tiger-component-tag-border-radius': 'var(--tiger-radius-md)',
+  '--tiger-component-collapse-border-color':
+    'color-mix(in srgb, var(--tiger-border) 30%, transparent)',
+  '--tiger-component-collapse-header-padding-x': 'var(--tiger-spacing-md)',
+  '--tiger-component-collapse-header-padding-y': '0.75rem',
+  '--tiger-component-collapse-content-padding': 'var(--tiger-spacing-md)',
+  '--tiger-component-modal-overlay-bg': 'rgb(0 0 0 / 0.45)',
+  '--tiger-component-modal-width-sm': '24rem',
+  '--tiger-component-modal-width-md': '32rem',
+  '--tiger-component-modal-width-lg': '48rem',
+  '--tiger-component-modal-width-xl': '64rem',
+  '--tiger-component-drawer-overlay-bg': 'rgb(0 0 0 / 0.45)',
+  '--tiger-component-drawer-width-sm': '16rem',
+  '--tiger-component-drawer-width-md': '24rem',
+  '--tiger-component-drawer-width-lg': '32rem',
+  '--tiger-component-drawer-width-xl': '40rem'
 }
 
 function pluginBase(preset: ThemePreset): Record<string, unknown> {

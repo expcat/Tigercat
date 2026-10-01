@@ -35,7 +35,7 @@ export const floatButtonSizeClasses: Record<FloatButtonSize, string> = {
 
 export const floatButtonTypeClasses = {
   primary:
-    'bg-[var(--tiger-primary)] text-white hover:bg-[var(--tiger-primary-hover)] active:bg-[var(--tiger-primary-active)]',
+    'bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] hover:bg-[var(--tiger-primary-hover)] active:bg-[var(--tiger-primary-active)]',
   default:
     'bg-[var(--tiger-surface-raised)] text-[var(--tiger-text)] border border-[var(--tiger-border)] hover:border-[var(--tiger-border-strong)] hover:shadow-xl'
 }
@@ -120,7 +120,10 @@ export function getFloatButtonClasses(options: {
   )
 }
 
-export function resolveFloatButtonHref(href: string | undefined, disabled?: boolean): string | undefined {
+export function resolveFloatButtonHref(
+  href: string | undefined,
+  disabled?: boolean
+): string | undefined {
   return resolveLinkHref(href, { disabled })
 }
 

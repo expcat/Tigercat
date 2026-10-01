@@ -13,13 +13,13 @@ export { parseHeight as parseMarkdownHeight }
 
 /** Container fill: optional `--tiger-md-bg`, then registered `--tiger-surface`. */
 export const markdownEditorContainerBase =
-  'flex flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-md-bg)] text-[var(--tiger-text)]'
+  'flex flex-col border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-md-bg,var(--tiger-surface))] text-[var(--tiger-text)]'
 
 export const markdownEditorContainerDisabled = 'opacity-50 cursor-not-allowed'
 
 /** Toolbar fill: optional `--tiger-md-toolbar-bg`, then registered `--tiger-surface-muted`. */
 export const markdownEditorToolbarClasses =
-  'flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 border-b border-[var(--tiger-border)] bg-[var(--tiger-md-toolbar-bg)]'
+  'flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 border-b border-[var(--tiger-border)] bg-[var(--tiger-md-toolbar-bg,var(--tiger-surface-muted))]'
 
 export const markdownEditorToolbarGroupClasses = 'flex flex-wrap items-center gap-1'
 
@@ -29,12 +29,11 @@ export const markdownEditorToolbarButtonBase =
 export const markdownEditorToolbarButtonActive =
   'bg-[var(--tiger-primary)]/10 text-[var(--tiger-primary)]'
 
-export const markdownEditorToolbarSeparatorClasses =
-  'w-px h-5 mx-1 bg-[var(--tiger-border)]'
+export const markdownEditorToolbarSeparatorClasses = 'w-px h-5 mx-1 bg-[var(--tiger-border)]'
 
 /** Body fill: same surface chain as the container. */
 export const markdownEditorBodyClasses =
-  'grid flex-1 min-h-0 bg-[var(--tiger-md-bg)]'
+  'grid flex-1 min-h-0 bg-[var(--tiger-md-bg,var(--tiger-surface))]'
 
 export const markdownEditorTextareaClasses =
   'w-full h-full min-h-0 resize-none border-0 outline-none bg-transparent p-4 font-mono text-sm leading-7 text-[var(--tiger-text)] placeholder:text-[var(--tiger-text-secondary)] disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--tiger-primary)]'

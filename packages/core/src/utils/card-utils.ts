@@ -39,13 +39,14 @@ export const cardBaseStyles = {
     {
       backgroundColor: 'var(--tiger-surface)',
       borderStyle: 'solid',
-      borderColor: 'var(--tiger-border)'
+      borderColor: 'color-mix(in srgb, var(--tiger-border) 30%, transparent)'
     },
   '.tiger-card-variant-default, .tiger-card-variant-shadow, .tiger-card-variant-elevated': {
     borderWidth: '1px'
   },
   '.tiger-card-variant-bordered': {
-    borderWidth: '2px'
+    borderWidth: '2px',
+    borderColor: 'var(--tiger-border)'
   },
   '.tiger-card-variant-shadow': {
     boxShadow: 'var(--tiger-shadow-md)'
@@ -82,24 +83,22 @@ export const cardSizeClasses: Record<CardSize, string> = {
   lg: 'p-6'
 } as const
 
-const CARD_SHADOW_MD =
-  'shadow-[var(--tiger-shadow-md)]'
-const CARD_SHADOW_LG =
-  'shadow-[var(--tiger-shadow-lg)]'
+const CARD_SHADOW_MD = 'shadow-[var(--tiger-shadow-md)]'
+const CARD_SHADOW_LG = 'shadow-[var(--tiger-shadow-lg)]'
 
 export const cardVariantClasses: Record<CardVariant, string> = {
   default: classNames(
-    'tiger-card-variant-default bg-[var(--tiger-surface)] border border-[var(--tiger-border)]'
+    'tiger-card-variant-default bg-[var(--tiger-surface)] border border-[var(--tiger-border)]/30'
   ),
   bordered: classNames(
     'tiger-card-variant-bordered bg-[var(--tiger-surface)] border-2 border-[var(--tiger-border)]'
   ),
   shadow: classNames(
-    'tiger-card-variant-shadow bg-[var(--tiger-surface)] border border-[var(--tiger-border)]',
+    'tiger-card-variant-shadow bg-[var(--tiger-surface)] border border-[var(--tiger-border)]/30',
     CARD_SHADOW_MD
   ),
   elevated: classNames(
-    'tiger-card-variant-elevated bg-[var(--tiger-surface)] border border-[var(--tiger-border)]',
+    'tiger-card-variant-elevated bg-[var(--tiger-surface)] border border-[var(--tiger-border)]/30',
     CARD_SHADOW_LG
   ),
   transparent: 'tiger-card-variant-transparent bg-transparent border-0 shadow-none'
@@ -121,9 +120,9 @@ export const cardDirectionClasses: Record<NonNullable<BaseLayoutProps['orientati
 
 export const cardHorizontalBodyClasses = 'flex flex-col flex-1 min-w-0'
 
-export const cardHeaderClasses = 'border-b border-[var(--tiger-border)] pb-3 mb-3'
+export const cardHeaderClasses = 'border-b border-[var(--tiger-border)]/30 pb-3 mb-3'
 
-export const cardFooterClasses = 'border-t border-[var(--tiger-border)] pt-3 mt-3'
+export const cardFooterClasses = 'border-t border-[var(--tiger-border)]/30 pt-3 mt-3'
 
 /** Cover media fills its wrapper. Wrapper holds the only size. */
 export const cardCoverClasses = 'h-full w-full object-cover'

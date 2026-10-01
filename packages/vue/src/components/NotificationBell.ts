@@ -3,8 +3,11 @@ import {
   formatW9Label,
   getW9DataLabels,
   notificationItemsPendingRead,
+  resolveButtonClasses,
   type NotificationItem
 } from '@expcat/tigercat-core'
+import { Badge } from './Badge'
+import { Icon } from './Icon'
 import { NotificationCenter } from './NotificationCenter'
 import { Popover } from './Popover'
 
@@ -41,16 +44,14 @@ export const NotificationBell = defineComponent({
     return () => {
       const unread = notificationItemsPendingRead(props.items).length
       return h('div', [
-        h(
-          'div',
-          { class: 'sr-only', 'aria-live': 'polite' },
-          announced.value
-        ),
+        h('div', { class: 'sr-only', 'aria-live': 'polite' }, announced.value),
         h(
           Popover,
           {
             open: open.value,
-            title: labels().unreadCount,
+            placement: 'bottom-end',
+            width: '20rem',
+            title: formatW9Label(labels().unreadCount, { count: unread }),
             ariaLabel: formatW9Label(labels().unreadCount, { count: unread }),
             'onUpdate:open': (value: boolean) => {
               open.value = value
@@ -63,24 +64,27 @@ export const NotificationBell = defineComponent({
                 {
                   ref: buttonRef,
                   type: 'button',
+                  class: resolveButtonClasses({ variant: 'ghost', iconOnly: true }),
                   'data-tiger-notification-bell': '',
                   'aria-label': formatW9Label(labels().unreadCount, { count: unread })
                 },
-                String(unread)
+                [
+                  h(
+                    Badge,
+                    { content: unread, standalone: false, size: 'sm' },
+                    { default: () => h(Icon, { name: 'bell' }) }
+                  )
+                ]
               ),
             content: () =>
-              h(
-                'div',
-                { 'data-tiger-notification-bell-panel': '' },
-                [
-                  h(NotificationCenter, {
-                    items: props.items,
-                    onItemReadChange: (item: NotificationItem, nextRead: boolean) => {
-                      emit('item-read-change', item, nextRead)
-                    }
-                  })
-                ]
-              )
+              h('div', { 'data-tiger-notification-bell-panel': '' }, [
+                h(NotificationCenter, {
+                  items: props.items,
+                  onItemReadChange: (item: NotificationItem, nextRead: boolean) => {
+                    emit('item-read-change', item, nextRead)
+                  }
+                })
+              ])
           }
         )
       ])

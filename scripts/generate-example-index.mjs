@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createJiti } from 'jiti'
+import { format, resolveConfig } from 'prettier'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const jiti = createJiti(import.meta.url)
@@ -277,9 +278,7 @@ ${sections}
       const html = document.documentElement
       const darkKey = 'tigercat-example-dark'
       const savedDark = localStorage.getItem(darkKey)
-      const preferDark =
-        savedDark === '1' ||
-        (savedDark !== '0' && matchMedia('(prefers-color-scheme: dark)').matches)
+      const preferDark = savedDark === '1'
       if (preferDark) html.classList.add('dark')
       toggle.textContent = html.classList.contains('dark') ? '☀️ 浅色模式' : '🌙 暗色模式'
       toggle.addEventListener('click', () => {
@@ -309,14 +308,18 @@ ${sections}
 `
 
 const target = join(root, 'examples/index.html')
+const formattedHtml = await format(html, {
+  ...(await resolveConfig(target)),
+  filepath: target
+})
 if (check) {
   const current = readFileSync(target, 'utf8')
-  if (current !== html) {
+  if (current !== formattedHtml) {
     console.error('examples/index.html is stale; run node ./scripts/generate-example-index.mjs')
     process.exit(1)
   }
   console.log(`examples/index.html matches DEMO_NAV_GROUPS (${items.length} pages).`)
 } else {
-  writeFileSync(target, html)
+  writeFileSync(target, formattedHtml)
   console.log(`Wrote examples/index.html (${items.length} pages, v${version}).`)
 }

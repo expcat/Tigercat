@@ -90,14 +90,14 @@ export const defaultThemeColors: ThemeColors = {
     bgHover: 'hover:bg-[var(--tiger-primary-hover)]',
     text: 'text-[var(--tiger-primary-foreground)]',
     focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
-    disabled: 'disabled:bg-[var(--tiger-primary-disabled)]'
+    disabled: 'disabled:bg-[var(--tiger-primary-disabled)] disabled:text-[var(--tiger-text)]'
   },
   secondary: {
     bg: 'bg-[var(--tiger-secondary)]',
     bgHover: 'hover:bg-[var(--tiger-secondary-hover)]',
     text: 'text-[var(--tiger-secondary-foreground)]',
     focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
-    disabled: 'disabled:bg-[var(--tiger-secondary-disabled)]'
+    disabled: 'disabled:bg-[var(--tiger-secondary-disabled)] disabled:text-[var(--tiger-text)]'
   },
   outline: {
     bg: 'bg-transparent',
@@ -105,29 +105,28 @@ export const defaultThemeColors: ThemeColors = {
     text: 'text-[var(--tiger-primary)]',
     border: 'border-2 border-[var(--tiger-primary)]',
     focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
-    disabled:
-      'disabled:border-[var(--tiger-primary-disabled)] disabled:text-[var(--tiger-primary-disabled)]'
+    disabled: 'disabled:border-[var(--tiger-primary-disabled)] disabled:text-[var(--tiger-text)]'
   },
   ghost: {
     bg: 'bg-transparent',
     bgHover: 'hover:bg-[var(--tiger-ghost-bg-hover)]',
     text: 'text-[var(--tiger-primary)]',
     focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
-    disabled: 'disabled:text-[var(--tiger-primary-disabled)]'
+    disabled: 'disabled:text-[var(--tiger-text)]'
   },
   link: {
     bg: 'bg-transparent',
     bgHover: 'hover:underline',
     text: 'text-[var(--tiger-primary)]',
     focus: 'focus-visible:ring-[var(--tiger-focus-ring)]',
-    disabled: 'disabled:text-[var(--tiger-primary-disabled)]'
+    disabled: 'disabled:text-[var(--tiger-text)]'
   },
   danger: {
     bg: 'bg-[var(--tiger-error)]',
     bgHover: 'hover:bg-[var(--tiger-error-hover)]',
     text: 'text-[var(--tiger-error-foreground)]',
     focus: 'focus-visible:ring-[var(--tiger-error)]',
-    disabled: 'disabled:bg-[var(--tiger-error-disabled)]'
+    disabled: 'disabled:bg-[var(--tiger-error-disabled)] disabled:text-[var(--tiger-text)]'
   },
   dangerOutline: {
     bg: 'bg-transparent',
@@ -135,22 +134,21 @@ export const defaultThemeColors: ThemeColors = {
     text: 'text-[var(--tiger-error)]',
     border: 'border-2 border-[var(--tiger-error)]',
     focus: 'focus-visible:ring-[var(--tiger-error)]',
-    disabled:
-      'disabled:border-[var(--tiger-error-disabled)] disabled:text-[var(--tiger-error-disabled)]'
+    disabled: 'disabled:border-[var(--tiger-error-disabled)] disabled:text-[var(--tiger-text)]'
   },
   dangerGhost: {
     bg: 'bg-transparent',
     bgHover: 'hover:bg-[var(--tiger-error-bg-hover)]',
     text: 'text-[var(--tiger-error)]',
     focus: 'focus-visible:ring-[var(--tiger-error)]',
-    disabled: 'disabled:text-[var(--tiger-error-disabled)]'
+    disabled: 'disabled:text-[var(--tiger-text)]'
   },
   dangerLink: {
     bg: 'bg-transparent',
     bgHover: 'hover:underline',
     text: 'text-[var(--tiger-error)]',
     focus: 'focus-visible:ring-[var(--tiger-error)]',
-    disabled: 'disabled:text-[var(--tiger-error-disabled)]'
+    disabled: 'disabled:text-[var(--tiger-text)]'
   }
 }
 
@@ -286,13 +284,13 @@ export const defaultLinkThemeColors: LinkThemeColors = {
     text: 'text-[var(--tiger-primary)]',
     textHover: 'hover:text-[var(--tiger-primary-hover)]',
     focus: 'focus:ring-[var(--tiger-primary)]',
-    disabled: 'text-[var(--tiger-primary-disabled)]'
+    disabled: 'text-[var(--tiger-text-disabled)]'
   },
   secondary: {
     text: 'text-[var(--tiger-secondary)]',
     textHover: 'hover:text-[var(--tiger-secondary-hover)]',
     focus: 'focus:ring-[var(--tiger-secondary)]',
-    disabled: 'text-[var(--tiger-secondary-disabled)]'
+    disabled: 'text-[var(--tiger-text-disabled)]'
   },
   default: {
     text: 'text-[var(--tiger-text)]',

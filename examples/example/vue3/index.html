@@ -11,12 +11,7 @@
           var lang = localStorage.getItem('tigercat-example-lang')
           if (lang === 'zh-CN' || lang === 'en-US') document.documentElement.lang = lang
           var dark = localStorage.getItem('tigercat-example-dark')
-          if (
-            dark === '1' ||
-            (dark !== '0' &&
-              window.matchMedia &&
-              window.matchMedia('(prefers-color-scheme: dark)').matches)
-          ) {
+          if (dark === '1') {
             document.documentElement.classList.add('dark')
           }
         } catch (e) {}

@@ -41,7 +41,7 @@ export function resolveDividerColorToken(color?: string): string | undefined {
   return undefined
 }
 
-const BORDER_COLOR = 'border-[var(--tiger-border)]' as const
+const BORDER_COLOR = 'border-[var(--tiger-border)]/30' as const
 
 const SPACING_H: Record<DividerSpacing, string> = {
   none: '',

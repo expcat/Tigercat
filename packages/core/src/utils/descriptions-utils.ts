@@ -23,7 +23,7 @@ export const descriptionsSizeClasses: Record<ComponentSize, string> = {
 export const descriptionsTableClasses = 'w-full border-collapse'
 
 export const descriptionsTableBorderedClasses =
-  'border border-[var(--tiger-border)] overflow-hidden rounded-[var(--tiger-radius-md)]'
+  'border border-[var(--tiger-border)]/30 overflow-hidden rounded-[var(--tiger-radius-md)]'
 
 export const descriptionsCellSizeClasses: Record<ComponentSize, string> = {
   sm: 'px-3 py-2',
@@ -34,16 +34,16 @@ export const descriptionsCellSizeClasses: Record<ComponentSize, string> = {
 export const descriptionsLabelClasses =
   'w-[1%] whitespace-nowrap align-middle font-medium bg-[var(--tiger-surface-muted)] text-[var(--tiger-text-secondary)]'
 
-export const descriptionsLabelBorderedClasses = 'border border-[var(--tiger-border)]'
+export const descriptionsLabelBorderedClasses = 'border border-[var(--tiger-border)]/30'
 
 export const descriptionsContentClasses = 'text-[var(--tiger-text)]'
 
-export const descriptionsContentBorderedClasses = 'border border-[var(--tiger-border)]'
+export const descriptionsContentBorderedClasses = 'border border-[var(--tiger-border)]/30'
 
 export const descriptionsVerticalGridClasses = 'grid w-full'
 
 export const descriptionsVerticalItemClasses =
-  'border-b border-[var(--tiger-border)] last:border-b-0 min-w-0'
+  'border-b border-[var(--tiger-border)]/30 last:border-b-0 min-w-0'
 
 export const descriptionsVerticalLabelClasses =
   'whitespace-nowrap font-medium mb-1 text-[var(--tiger-text-secondary)]'

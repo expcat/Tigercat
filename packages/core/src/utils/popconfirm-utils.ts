@@ -17,7 +17,8 @@ export function getPopconfirmContainerClasses(): string {
 export function getPopconfirmTriggerClasses(disabled: boolean): string {
   return classNames(
     'tiger-popconfirm-trigger',
-    'inline-flex items-center bg-transparent p-0 border-0 font-inherit text-inherit',
+    'inline-flex items-center',
+    '[:where(&)]:bg-transparent [:where(&)]:p-0 [:where(&)]:border-0 [:where(&)]:[font:inherit] [:where(&)]:text-inherit',
     disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
   )
 }
@@ -157,13 +158,13 @@ export function getPopconfirmOkButtonClasses(okType: 'primary' | 'danger'): stri
     okType === 'danger'
       ? classNames(
           'bg-[var(--tiger-error)]',
-          'text-white',
+          'text-[var(--tiger-error-foreground)]',
           'hover:bg-[var(--tiger-error-hover)]',
           'focus:ring-[var(--tiger-error)]'
         )
       : classNames(
           'bg-[var(--tiger-primary)]',
-          'text-white',
+          'text-[var(--tiger-primary-foreground)]',
           'hover:bg-[var(--tiger-primary-hover)]',
           'focus:ring-[var(--tiger-primary)]'
         )

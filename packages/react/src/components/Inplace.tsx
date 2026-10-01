@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { toggleInplace } from '@expcat/tigercat-core'
+import { resolveButtonClasses, toggleInplace } from '@expcat/tigercat-core'
 
 export interface InplaceProps {
   editing?: boolean
@@ -45,7 +45,11 @@ export const Inplace: React.FC<InplaceProps> = ({
       {isEditing ? (
         <span onKeyDown={onKeyDown}>{input ?? children}</span>
       ) : (
-        <button type="button" disabled={disabled} onClick={() => !disabled && publish('edit')}>
+        <button
+          type="button"
+          className={resolveButtonClasses({ variant: 'ghost', size: 'sm', disabled })}
+          disabled={disabled}
+          onClick={() => !disabled && publish('edit')}>
           {display ?? children}
         </button>
       )}

@@ -8,10 +8,10 @@ import { variableSizeStrategy } from './virtual-list-utils'
 export const transferBaseClasses = 'flex flex-col sm:flex-row items-stretch gap-4 max-sm:flex-col'
 
 export const transferPanelClasses =
-  'flex-1 min-w-0 border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] flex flex-col bg-[var(--tiger-surface)]'
+  'flex-1 min-w-0 border border-[var(--tiger-border)]/30 rounded-[var(--tiger-radius-md)] flex flex-col bg-[var(--tiger-surface)]'
 
 export const transferPanelHeaderClasses =
-  'flex items-center justify-between gap-2 px-3 py-2 border-b border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)]'
+  'flex items-center justify-between gap-2 px-3 py-2 border-b border-[var(--tiger-border)]/30 bg-[var(--tiger-surface-muted)]'
 
 /** Fixed usable height. Rows past this box use the shared virtual window. */
 export const TRANSFER_PANEL_BODY_HEIGHT = 256

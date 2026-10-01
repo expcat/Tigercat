@@ -1,6 +1,13 @@
 import React, { useState } from 'react'
 import {
   filterAssignees,
+  getInputClasses,
+  getSelectOptionClasses,
+  getSpaceClasses,
+  selectDropdownBaseClasses,
+  selectEmptyStateClasses,
+  classNames,
+  focusRingInsetClasses,
   getW9DataLabels,
   nextListboxIndex,
   toggleAssignee,
@@ -38,9 +45,10 @@ export function AssigneePicker({
     }
   }
   return (
-    <div>
+    <div className={getSpaceClasses({ orientation: 'vertical', size: 'sm', align: 'stretch' })}>
       <input
         type="search"
+        className={getInputClasses({ size: 'sm' })}
         value={query}
         aria-label={labels.assigneeList}
         onChange={(event) => {
@@ -49,9 +57,10 @@ export function AssigneePicker({
         }}
       />
       {filtered.length === 0 ? (
-        <p>{labels.emptyDirectory}</p>
+        <p className={selectEmptyStateClasses}>{labels.emptyDirectory}</p>
       ) : (
         <div
+          className={classNames(selectDropdownBaseClasses, focusRingInsetClasses)}
           role="listbox"
           aria-label={labels.assigneeList}
           aria-multiselectable="true"
@@ -60,6 +69,12 @@ export function AssigneePicker({
           {filtered.map((option, index) => (
             <div
               key={option.id}
+              className={getSelectOptionClasses({
+                isSelected: selectedIds.includes(option.id),
+                isDisabled: false,
+                isActive: index === active,
+                size: 'sm'
+              })}
               role="option"
               id={`tiger-assignee-${option.id}`}
               aria-selected={selectedIds.includes(option.id)}

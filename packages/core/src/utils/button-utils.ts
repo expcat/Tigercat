@@ -5,7 +5,6 @@ import {
   type ButtonVariant
 } from '../types/button'
 import { classNames, type ClassValue } from './class-names'
-import { getJoinedGroupItemClasses } from './joined-group-utils'
 import { getButtonVariantClasses } from './theme-colors'
 
 /**
@@ -161,12 +160,23 @@ export const buttonGroupHorizontalClasses = 'flex-row'
  * Child-selector classes for a horizontal ButtonGroup. Targets `button` roots
  * so a Tooltip wrapper is not shaved; a lone child keeps all four radii.
  */
-export const buttonGroupItemClasses = getJoinedGroupItemClasses({ child: 'button' })
+export const buttonGroupItemClasses = classNames(
+  '[&>button:only-child]:rounded-[var(--tiger-radius-md)]',
+  '[&>button:first-child:not(:last-child)]:rounded-s-[var(--tiger-radius-md)]',
+  '[&>button:last-child:not(:first-child)]:rounded-e-[var(--tiger-radius-md)]',
+  '[&>button:not(:first-child)]:-ms-px',
+  '[&>button:focus]:z-10',
+  '[&>button:focus]:relative'
+)
 
 /**
  * Child-selector classes for a vertical ButtonGroup root.
  */
-export const buttonGroupItemVerticalClasses = getJoinedGroupItemClasses({
-  orientation: 'vertical',
-  child: 'button'
-})
+export const buttonGroupItemVerticalClasses = classNames(
+  '[&>button:only-child]:rounded-[var(--tiger-radius-md)]',
+  '[&>button:first-child:not(:last-child)]:rounded-t-[var(--tiger-radius-md)]',
+  '[&>button:last-child:not(:first-child)]:rounded-b-[var(--tiger-radius-md)]',
+  '[&>button:not(:first-child)]:-mt-px',
+  '[&>button:focus]:z-10',
+  '[&>button:focus]:relative'
+)

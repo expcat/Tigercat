@@ -2,6 +2,7 @@ import { defineComponent, h, ref, type PropType } from 'vue'
 import {
   downloadChartSvg,
   getW9DataLabels,
+  resolveButtonClasses,
   layoutSankey,
   readPageWritingDirection,
   type SankeyChartProps as CoreSankeyChartProps,
@@ -35,7 +36,11 @@ export const SankeyChart = defineComponent({
       return h('div', { ref: hostRef, class: props.className, ...attrs }, [
         h(
           'button',
-          { type: 'button', onClick: exportChart },
+          {
+            type: 'button',
+            class: resolveButtonClasses({ variant: 'outline', size: 'sm' }),
+            onClick: exportChart
+          },
           getW9DataLabels().exportChart
         ),
         h(
@@ -62,7 +67,9 @@ export const SankeyChart = defineComponent({
                     key: `link-${index}`,
                     'data-sankey-link': '',
                     d: link.path,
-                    fill: 'var(--tiger-primary, #2563eb)',
+                    fill: 'none',
+                    stroke: 'var(--tiger-primary, #2563eb)',
+                    'stroke-width': link.width,
                     opacity: 0.35
                   })
                 ),
@@ -74,7 +81,7 @@ export const SankeyChart = defineComponent({
                     y: node.y,
                     width: node.width,
                     height: node.height,
-                    fill: 'var(--tiger-text, #0f172a)'
+                    fill: 'var(--tiger-primary, #2563eb)'
                   })
                 )
               ]

@@ -15,7 +15,7 @@ export const linkSizeClasses: Record<LinkSize, string> = {
   lg: 'text-lg'
 }
 
-export const linkDisabledClasses = 'cursor-not-allowed opacity-60 pointer-events-none'
+export const linkDisabledClasses = 'cursor-not-allowed pointer-events-none'
 
 const BLANK_REL_TOKENS = ['noopener', 'noreferrer'] as const
 

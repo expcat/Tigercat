@@ -5,6 +5,7 @@
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -70,6 +71,20 @@ describe('NavigationMenu', () => {
     render(<Demo />)
     const wrapper = document.querySelector('[data-tiger-navigation-menu-content]')
     expect(wrapper).toHaveAttribute('hidden')
+  })
+
+  it('keeps panel styling and item dismissal inside a ConfigProvider outlet', async () => {
+    render(
+      <ConfigProvider>
+        <Demo />
+      </ConfigProvider>
+    )
+    const trigger = screen.getByRole('menuitem', { name: 'Products' })
+    fireEvent.click(trigger)
+    const overview = await screen.findByRole('menuitem', { name: 'Overview' })
+    expect(overview).toHaveClass('tiger-dropdown-item', 'w-full')
+    fireEvent.click(overview)
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
   })
 
   it('does not open on focus and toggles on click', () => {

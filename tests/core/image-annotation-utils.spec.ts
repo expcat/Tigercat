@@ -41,11 +41,11 @@ describe('image-annotation-utils', () => {
     expect(inactive.indexOf('--tiger-annotation-tool-bg')).toBeGreaterThan(-1)
   })
 
-  it('keeps active tool buttons on primary with white text', () => {
+  it('keeps active tool buttons on primary with the paired foreground', () => {
     const active = getImageAnnotationToolButtonClasses(true)
     expect(active).toContain('bg-[var(--tiger-primary)]')
     expect(active).toContain('border-[var(--tiger-primary)]')
-    expect(active).toContain('text-white')
+    expect(active).toContain('text-[var(--tiger-primary-foreground)]')
     expect(active).not.toContain('--tiger-annotation-tool-bg')
     expect(active).not.toContain('bg-[var(--tiger-surface)]')
   })

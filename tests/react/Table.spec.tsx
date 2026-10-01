@@ -23,12 +23,10 @@ const dataSource = [
   { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' }
 ]
 
-const tableHeaderBgClass =
-  'bg-[var(--tiger-table-header-bg)]'
-const tableStripeBgClass =
-  'bg-[var(--tiger-table-stripe-bg)]/50'
+const tableHeaderBgClass = 'bg-[var(--tiger-table-header-bg,var(--tiger-surface-muted))]'
+const tableStripeBgClass = 'bg-[var(--tiger-table-stripe-bg)]/50'
 const tableFixedStripeBgClass =
-  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg)_50%,var(--tiger-table-bg))]'
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-surface-muted))_50%,var(--tiger-table-bg,var(--tiger-surface)))]'
 
 function stubCardViewport(isCard: boolean) {
   window.matchMedia = ((query: string) => ({

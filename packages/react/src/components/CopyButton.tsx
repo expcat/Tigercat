@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { copyTextToClipboard } from '@expcat/tigercat-core'
+import { copyTextToClipboard, getSpaceClasses, resolveButtonClasses } from '@expcat/tigercat-core'
 
 export interface CopyButtonProps extends Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -15,6 +15,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   children,
   disabled,
   onClick,
+  className,
   ...rest
 }) => {
   const [failed, setFailed] = useState(false)
@@ -32,10 +33,11 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   }
 
   return (
-    <span data-tiger-copy="">
+    <span data-tiger-copy="" className={getSpaceClasses({ size: 'sm', align: 'center' })}>
       <button
         type="button"
         {...rest}
+        className={resolveButtonClasses({ variant: 'outline', size: 'sm', disabled, className })}
         disabled={disabled}
         aria-invalid={failed ? true : undefined}
         onClick={handleClick}>

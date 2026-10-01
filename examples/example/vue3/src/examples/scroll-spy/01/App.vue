@@ -13,8 +13,12 @@ const items: ScrollSpyItem[] = [
     <ScrollSpy :items="items" orientation="horizontal" />
     <div class="grid gap-4 md:grid-cols-[1fr_160px]">
       <div class="max-h-64 overflow-auto rounded border">
-        <section id="spy-overview" class="min-h-[28rem] bg-blue-50 p-4">概览</section>
-        <section id="spy-workflow" class="min-h-[28rem] bg-green-50 p-4">工作流</section>
+        <section id="spy-overview" class="min-h-[28rem] bg-[var(--tiger-primary)]/10 p-4">
+          概览
+        </section>
+        <section id="spy-workflow" class="min-h-[28rem] bg-[var(--tiger-success)]/10 p-4">
+          工作流
+        </section>
       </div>
       <ScrollSpy :items="items" sticky orientation="vertical" />
     </div>

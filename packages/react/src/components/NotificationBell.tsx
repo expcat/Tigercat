@@ -3,8 +3,11 @@ import {
   formatW9Label,
   getW9DataLabels,
   notificationItemsPendingRead,
+  resolveButtonClasses,
   type NotificationItem
 } from '@expcat/tigercat-core'
+import { Badge } from './Badge'
+import { Icon } from './Icon'
 import { NotificationCenter } from './NotificationCenter'
 import { Popover } from './Popover'
 
@@ -14,11 +17,7 @@ export interface NotificationBellProps {
   onItemReadChange?: (item: NotificationItem, read: boolean) => void
 }
 
-export function NotificationBell({
-  items = [],
-  locale,
-  onItemReadChange
-}: NotificationBellProps) {
+export function NotificationBell({ items = [], locale, onItemReadChange }: NotificationBellProps) {
   const [open, setOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const wasOpen = useRef(false)
@@ -44,6 +43,8 @@ export function NotificationBell({
       </div>
       <Popover
         open={open}
+        placement="bottom-end"
+        width="20rem"
         title={formatW9Label(labels.unreadCount, { count: unread })}
         ariaLabel={formatW9Label(labels.unreadCount, { count: unread })}
         onOpenChange={setOpen}
@@ -55,9 +56,12 @@ export function NotificationBell({
         <button
           ref={buttonRef}
           type="button"
+          className={resolveButtonClasses({ variant: 'ghost', iconOnly: true })}
           data-tiger-notification-bell=""
           aria-label={formatW9Label(labels.unreadCount, { count: unread })}>
-          {unread}
+          <Badge content={unread} standalone={false} size="sm">
+            <Icon name="bell" />
+          </Badge>
         </button>
       </Popover>
     </div>

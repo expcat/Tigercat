@@ -1,0 +1,10 @@
+import DemoPage from '../components/DemoPage'
+import { getDemoModules } from '../playground/registry'
+
+const modules = getDemoModules('sankey-chart')
+
+export default function SankeyChartDemo() {
+  return (
+    <DemoPage title="SankeyChart 桑基图" description="用节点与流量带展示流向。" modules={modules} />
+  )
+}

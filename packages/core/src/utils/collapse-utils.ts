@@ -13,7 +13,7 @@ import { prefersReducedMotion } from './transition'
  * Base collapse container classes
  */
 export const collapseBaseClasses =
-  'w-full bg-[var(--tiger-surface)] border border-[var(--tiger-component-collapse-border-color)] rounded overflow-hidden'
+  'w-full bg-[var(--tiger-surface)] border border-[var(--tiger-component-collapse-border-color)] rounded-[var(--tiger-radius-md)] overflow-hidden'
 
 /**
  * Collapse ghost mode classes (transparent without border)

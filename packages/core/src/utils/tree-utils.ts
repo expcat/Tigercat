@@ -333,14 +333,15 @@ export function getTreeKeyboardAction(ctx: TreeKeyboardContext): TreeKeyboardAct
 export const TREE_INDENT_SLOT_PX = 24
 
 export const treeBaseClasses =
-  'w-full bg-[var(--tiger-tree-bg)] text-[var(--tiger-text)] rounded-[var(--tiger-radius-md)]'
+  'w-full bg-[var(--tiger-tree-bg,var(--tiger-surface))] text-[var(--tiger-text)] rounded-[var(--tiger-radius-md)]'
 
 export const treeNodeWrapperClasses = 'select-none'
 
 export const treeNodeContentClasses =
   'flex items-center px-2 py-1.5 rounded tiger-motion-aware transition-colors duration-200 motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--tiger-focus-ring)]'
 
-export const treeNodeHoverClasses = 'hover:bg-[var(--tiger-tree-node-hover)]'
+export const treeNodeHoverClasses =
+  'hover:bg-[var(--tiger-tree-node-hover,var(--tiger-outline-bg-hover))]'
 
 export const treeNodeSelectedClasses =
   'bg-[color-mix(in_srgb,var(--tiger-primary)_10%,transparent)] text-[var(--tiger-primary)]'

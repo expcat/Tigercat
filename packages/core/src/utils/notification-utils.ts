@@ -162,7 +162,7 @@ export const notificationActionButtonClasses =
  */
 export const notificationActionButtonTypeClasses = {
   primary:
-    'bg-[var(--tiger-primary)] text-white hover:bg-[var(--tiger-primary-hover)] disabled:hover:bg-[var(--tiger-primary)]',
+    'bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] hover:bg-[var(--tiger-primary-hover)] disabled:hover:bg-[var(--tiger-primary)]',
   default:
     'border border-[var(--tiger-border)] bg-[var(--tiger-surface)] text-[var(--tiger-text)] hover:bg-[var(--tiger-surface-muted)]'
 }

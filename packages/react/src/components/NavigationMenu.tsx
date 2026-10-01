@@ -484,17 +484,30 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
     }
   }
 
+  const panelChildren = useMemo(
+    () => (
+      <NavigationMenuContext.Provider value={root}>
+        <NavigationMenuItemContext.Provider value={item}>
+          <NavigationMenuContentContext.Provider value={{ inPanel: true }}>
+            {children}
+          </NavigationMenuContentContext.Provider>
+        </NavigationMenuItemContext.Provider>
+      </NavigationMenuContext.Provider>
+    ),
+    [children, item, root]
+  )
+
   useLayoutEffect(() => {
     if (!root?.viewport || mega || !item || !isOpen) return
     const owner = String(item.value)
     root.setViewportContent(
       owner,
       <div role="menu" data-tiger-navigation-menu-content="">
-        {children}
+        {panelChildren}
       </div>
     )
     return () => root.clearViewportContent(owner)
-  }, [root, mega, item, isOpen, children])
+  }, [root, mega, item, isOpen, panelChildren])
 
   if (!item || !root) return null
   if (root.viewport && !mega) return null
@@ -517,19 +530,15 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
         className={classNames(getNavigationMenuContentClasses(mega), className)}
         style={mega ? { minWidth: '28rem', ...style } : style}
         role={mega ? undefined : 'menu'}>
-        {children}
+        {panelChildren}
       </div>
     </div>
   )
 
-  return (
-    <NavigationMenuContentContext.Provider value={{ inPanel: true }}>
-      {isOpen && portalEnabled ? (
-        <OverlayPortal target={overlay.target}>{popup}</OverlayPortal>
-      ) : (
-        popup
-      )}
-    </NavigationMenuContentContext.Provider>
+  return isOpen && portalEnabled ? (
+    <OverlayPortal target={overlay.target}>{popup}</OverlayPortal>
+  ) : (
+    popup
   )
 }
 

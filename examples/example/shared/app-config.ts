@@ -38,6 +38,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     key: 'basic',
     label: { 'zh-CN': '基础组件', 'en-US': 'Basics' },
     items: [
+      {
+        key: 'copy-button',
+        path: '/copy-button',
+        label: { 'zh-CN': 'CopyButton 复制按钮', 'en-US': 'CopyButton' }
+      },
       { key: 'button', path: '/button', label: { 'zh-CN': 'Button 按钮', 'en-US': 'Button' } },
       {
         key: 'split-button',
@@ -51,6 +56,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
       },
       { key: 'icon', path: '/icon', label: { 'zh-CN': 'Icon 图标', 'en-US': 'Icon' } },
       { key: 'link', path: '/link', label: { 'zh-CN': 'Link 链接', 'en-US': 'Link' } },
+      {
+        key: 'inplace',
+        path: '/inplace',
+        label: { 'zh-CN': 'Inplace 原位编辑', 'en-US': 'Inplace' }
+      },
       { key: 'text', path: '/text', label: { 'zh-CN': 'Text 文本', 'en-US': 'Text' } },
       { key: 'code', path: '/code', label: { 'zh-CN': 'Code 代码', 'en-US': 'Code' } },
       { key: 'kbd', path: '/kbd', label: { 'zh-CN': 'Kbd 按键', 'en-US': 'Kbd' } },
@@ -74,6 +84,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'image-cropper',
         path: '/image-cropper',
         label: { 'zh-CN': 'ImageCropper 裁剪', 'en-US': 'ImageCropper' }
+      },
+      {
+        key: 'gallery',
+        path: '/gallery',
+        label: { 'zh-CN': 'Gallery 画廊', 'en-US': 'Gallery' }
       },
       {
         key: 'image-preview',
@@ -414,6 +429,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     label: { 'zh-CN': '图表', 'en-US': 'Charts' },
     items: [
       {
+        key: 'waterfall-chart',
+        path: '/waterfall-chart',
+        label: { 'zh-CN': 'WaterfallChart 瀑布图', 'en-US': 'WaterfallChart' }
+      },
+      {
         key: 'bar-chart',
         path: '/bar-chart',
         label: { 'zh-CN': 'BarChart 柱状图', 'en-US': 'BarChart' }
@@ -442,6 +462,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'radar-chart',
         path: '/radar-chart',
         label: { 'zh-CN': 'RadarChart 雷达图', 'en-US': 'RadarChart' }
+      },
+      {
+        key: 'sankey-chart',
+        path: '/sankey-chart',
+        label: { 'zh-CN': 'SankeyChart 桑基图', 'en-US': 'SankeyChart' }
       },
       {
         key: 'funnel-chart',
@@ -541,6 +566,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     label: { 'zh-CN': '组合组件', 'en-US': 'Composite' },
     items: [
       {
+        key: 'app-shell',
+        path: '/app-shell',
+        label: { 'zh-CN': 'AppShell 应用壳', 'en-US': 'AppShell' }
+      },
+      {
         key: 'data-table-with-toolbar',
         path: '/data-table-with-toolbar',
         label: { 'zh-CN': 'DataTableWithToolbar', 'en-US': 'DataTableWithToolbar' }
@@ -589,6 +619,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'activity-feed',
         path: '/activity-feed',
         label: { 'zh-CN': 'ActivityFeed 动态', 'en-US': 'ActivityFeed' }
+      },
+      {
+        key: 'assignee-picker',
+        path: '/assignee-picker',
+        label: { 'zh-CN': 'AssigneePicker 受理人选择', 'en-US': 'AssigneePicker' }
+      },
+      {
+        key: 'notification-bell',
+        path: '/notification-bell',
+        label: { 'zh-CN': 'NotificationBell 通知铃铛', 'en-US': 'NotificationBell' }
       },
       {
         key: 'notification-center',

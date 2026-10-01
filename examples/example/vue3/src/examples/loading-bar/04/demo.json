@@ -1,0 +1,12 @@
+{
+  "id": "loading-bar-04",
+  "title": "受控容器",
+  "description": "直接传入 percentage 和 status，展示确定的加载进度。",
+  "entry": "App.vue",
+  "order": 4,
+  "viewport": {
+    "mode": "auto",
+    "minHeight": 120,
+    "maxHeight": 240
+  }
+}

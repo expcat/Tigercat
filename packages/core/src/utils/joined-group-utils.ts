@@ -57,18 +57,16 @@ export function getJoinedGroupItemClasses(options: JoinedGroupItemClassesOptions
 export function getJoinedChromeGroupItemClasses(
   options: { focus?: JoinedGroupFocus } = {}
 ): string {
-  const focus = options.focus ?? 'focus-within'
-  const chrome = `[${TIGER_CHROME_ATTR}]`
-
   return classNames(
-    `[&>:not(:first-child):not(:last-child)_${chrome}]:!rounded-none`,
-    `[&>:first-child:not(:last-child)_${chrome}]:!rounded-e-none`,
-    `[&>:last-child:not(:first-child)_${chrome}]:!rounded-s-none`,
-    `[&>${chrome}:not(:first-child):not(:last-child)]:!rounded-none`,
-    `[&>${chrome}:first-child:not(:last-child)]:!rounded-e-none`,
-    `[&>${chrome}:last-child:not(:first-child)]:!rounded-s-none`,
+    '[&>:not(:first-child):not(:last-child)_[data-tiger-chrome]]:!rounded-none',
+    '[&>:first-child:not(:last-child)_[data-tiger-chrome]]:!rounded-e-none',
+    '[&>:last-child:not(:first-child)_[data-tiger-chrome]]:!rounded-s-none',
+    '[&>[data-tiger-chrome]:not(:first-child):not(:last-child)]:!rounded-none',
+    '[&>[data-tiger-chrome]:first-child:not(:last-child)]:!rounded-e-none',
+    '[&>[data-tiger-chrome]:last-child:not(:first-child)]:!rounded-s-none',
     `[&>:not(:first-child)]:-ms-px`,
-    `[&>:${focus}]:z-10`,
-    `[&>:${focus}]:relative`
+    options.focus === 'focus'
+      ? '[&>:focus]:z-10 [&>:focus]:relative'
+      : '[&>:focus-within]:z-10 [&>:focus-within]:relative'
   )
 }

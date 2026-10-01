@@ -1,5 +1,11 @@
 import { defineComponent, h, ref } from 'vue'
-import { copyTextToClipboard } from '@expcat/tigercat-core'
+import {
+  classNames,
+  coerceClassValue,
+  copyTextToClipboard,
+  getSpaceClasses,
+  resolveButtonClasses
+} from '@expcat/tigercat-core'
 
 export const CopyButton = defineComponent({
   name: 'TigerCopyButton',
@@ -25,20 +31,36 @@ export const CopyButton = defineComponent({
     }
 
     return () =>
-      h('span', { ...attrs, 'data-tiger-copy': '' }, [
-        h(
-          'button',
-          {
-            type: 'button',
-            disabled: props.disabled,
-            'aria-invalid': failed.value ? 'true' : undefined,
-            'aria-describedby': failed.value ? 'tiger-copy-status' : undefined,
-            onClick
-          },
-          slots.default?.() ?? props.label
-        ),
-        status.value ? h('span', { id: 'tiger-copy-status', role: 'status' }, status.value) : null
-      ])
+      h(
+        'span',
+        {
+          ...attrs,
+          class: classNames(
+            getSpaceClasses({ size: 'sm', align: 'center' }),
+            coerceClassValue(attrs.class)
+          ),
+          'data-tiger-copy': ''
+        },
+        [
+          h(
+            'button',
+            {
+              type: 'button',
+              class: resolveButtonClasses({
+                variant: 'outline',
+                size: 'sm',
+                disabled: props.disabled
+              }),
+              disabled: props.disabled,
+              'aria-invalid': failed.value ? 'true' : undefined,
+              'aria-describedby': failed.value ? 'tiger-copy-status' : undefined,
+              onClick
+            },
+            slots.default?.() ?? props.label
+          ),
+          status.value ? h('span', { id: 'tiger-copy-status', role: 'status' }, status.value) : null
+        ]
+      )
   }
 })
 

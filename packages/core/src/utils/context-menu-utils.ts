@@ -95,7 +95,8 @@ export function getContextMenuContainerClasses(): string {
 export function getContextMenuTriggerClasses(disabled: boolean): string {
   return classNames(
     'tiger-context-menu-trigger',
-    'inline-block w-full text-start bg-transparent p-0 border-0 font-inherit text-inherit',
+    'inline-block w-full text-start',
+    '[:where(&)]:bg-transparent [:where(&)]:p-0 [:where(&)]:border-0 [:where(&)]:[font:inherit] [:where(&)]:text-inherit',
     disabled ? 'cursor-not-allowed opacity-50' : undefined
   )
 }

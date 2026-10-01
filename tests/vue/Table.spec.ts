@@ -21,12 +21,10 @@ const dataSource = [
   { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' }
 ]
 
-const tableHeaderBgClass =
-  'bg-[var(--tiger-table-header-bg)]'
-const tableStripeBgClass =
-  'bg-[var(--tiger-table-stripe-bg)]/50'
+const tableHeaderBgClass = 'bg-[var(--tiger-table-header-bg,var(--tiger-surface-muted))]'
+const tableStripeBgClass = 'bg-[var(--tiger-table-stripe-bg)]/50'
 const tableFixedStripeBgClass =
-  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg)_50%,var(--tiger-table-bg))]'
+  'bg-[color-mix(in_srgb,var(--tiger-table-stripe-bg,var(--tiger-surface-muted))_50%,var(--tiger-table-bg,var(--tiger-surface)))]'
 
 async function renderSettled(
   props: Record<string, unknown>,
@@ -53,7 +51,7 @@ function stubCardViewport(isCard: boolean) {
 describe('Table', () => {
   describe('Rendering', () => {
     it('should render column headers', async () => {
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns,
         dataSource
       })
@@ -64,7 +62,7 @@ describe('Table', () => {
     })
 
     it('should render data rows', async () => {
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns,
         dataSource
       })
@@ -75,7 +73,7 @@ describe('Table', () => {
     })
 
     it('should render empty state when no data', async () => {
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns,
         dataSource: []
       })
@@ -84,7 +82,7 @@ describe('Table', () => {
     })
 
     it('should render custom empty text', async () => {
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns,
         dataSource: [],
         emptyText: 'No records found'
@@ -95,7 +93,7 @@ describe('Table', () => {
 
     it('renders mobile card markup when responsiveMode is card', async () => {
       stubCardViewport(true)
-      const { container, getAllByText } = await renderSettled( {
+      const { container, getAllByText } = await renderSettled({
         columns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -111,7 +109,7 @@ describe('Table', () => {
 
     it('keeps a single accessible table tree on the desktop card breakpoint', async () => {
       stubCardViewport(false)
-      const { container, getAllByText } = await renderSettled( {
+      const { container, getAllByText } = await renderSettled({
         columns,
         dataSource,
         responsiveMode: 'card',
@@ -125,7 +123,7 @@ describe('Table', () => {
 
     it('hides hideInCard columns in card mode while keeping them in the table', async () => {
       stubCardViewport(true)
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: [
           { key: 'name', title: 'Name' },
           { key: 'age', title: 'Age', hideInCard: true }
@@ -142,7 +140,7 @@ describe('Table', () => {
 
     it('orders card body columns by cardPriority', async () => {
       stubCardViewport(true)
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: [
           { key: 'name', title: 'Name', cardPriority: 2 },
           { key: 'age', title: 'Age', cardPriority: 1 }
@@ -160,7 +158,7 @@ describe('Table', () => {
 
     it('renders a cardTitle column as the card heading instead of a row', async () => {
       stubCardViewport(true)
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: [
           { key: 'name', title: 'Name', cardTitle: true },
           { key: 'age', title: 'Age' }
@@ -178,7 +176,7 @@ describe('Table', () => {
 
     it('respects a configurable cardBreakpoint', async () => {
       stubCardViewport(true)
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         responsiveMode: 'card',
@@ -198,7 +196,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', cardGrid: { colSpan: 6 } }
       ]
 
-      const def = await renderSettled( {
+      const def = await renderSettled({
         columns: cardColumns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -208,7 +206,7 @@ describe('Table', () => {
         def.container.querySelector('[data-tiger-table-mobile="card"] .grid-cols-12')
       ).toHaveClass('gap-3')
 
-      const custom = await renderSettled( {
+      const custom = await renderSettled({
         columns: cardColumns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -227,7 +225,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', cardGrid: { colSpan: 6, labelPosition: 'top' } },
         { key: 'age', title: 'Age', cardGrid: { colSpan: 4, hideLabel: true } }
       ]
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: cardColumns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -260,7 +258,7 @@ describe('Table', () => {
           }
         }
       ]
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: cardColumns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -296,7 +294,7 @@ describe('Table', () => {
 
     it('supports inline selection controls and configurable card padding', async () => {
       stubCardViewport(true)
-      const { container, getByLabelText } = await renderSettled( {
+      const { container, getByLabelText } = await renderSettled({
         columns: [
           { key: 'name', title: 'Name', cardTitle: true },
           { key: 'age', title: 'Age' }
@@ -319,7 +317,7 @@ describe('Table', () => {
 
     it('uses custom card padding classes', async () => {
       stubCardViewport(true)
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -335,7 +333,7 @@ describe('Table', () => {
     it('uses table labels and themed selection controls in card mode', async () => {
       stubCardViewport(true)
       const onSelectionChange = vi.fn()
-      const { getByText, getByLabelText, container } = await renderSettled( {
+      const { getByText, getByLabelText, container } = await renderSettled({
         columns,
         dataSource: [dataSource[0]],
         responsiveMode: 'card',
@@ -367,7 +365,7 @@ describe('Table', () => {
 
     it('renders Empty and custom card slot in card mode', async () => {
       stubCardViewport(true)
-      const empty = await renderSettled( {
+      const empty = await renderSettled({
         columns,
         dataSource: [],
         responsiveMode: 'card',
@@ -403,7 +401,7 @@ describe('Table', () => {
         { key: 'name', title: 'Name', sortable: true },
         { key: 'age', title: 'Age', sortable: true }
       ]
-      const { container, getByText } = await renderSettled( {
+      const { container, getByText } = await renderSettled({
         columns: sortableColumns,
         dataSource,
         responsiveMode: 'card',
@@ -425,7 +423,7 @@ describe('Table', () => {
 
   describe('Props', async () => {
     it('should show border when bordered is true', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         bordered: true
@@ -437,7 +435,7 @@ describe('Table', () => {
       expect(borderWrapper).toBeTruthy()
     })
     it('should disable pagination when pagination is false', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         pagination: false
@@ -455,7 +453,7 @@ describe('Table', () => {
         email: `user${index}@example.com`
       }))
 
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource: largeData,
         pagination: false,
@@ -477,7 +475,7 @@ describe('Table', () => {
         email: `user${index}@example.com`
       }))
 
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource: largeData,
         pagination: false,
@@ -496,7 +494,7 @@ describe('Table', () => {
         email: `user${index}@example.com`
       }))
 
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource: largeData,
         pagination: false,
@@ -516,7 +514,7 @@ describe('Table', () => {
         email: `user${index}@example.com`
       }))
 
-      const { container, getByText } = await renderSettled( {
+      const { container, getByText } = await renderSettled({
         columns,
         dataSource: rows,
         virtual: true,
@@ -556,7 +554,7 @@ describe('Table', () => {
         age: index,
         email: `user${index}@example.com`
       }))
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource: rows,
         pagination: false,
@@ -578,7 +576,7 @@ describe('Table', () => {
         { key: 'age', title: 'Age' }
       ]
 
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns: sortableColumns,
         dataSource
       })
@@ -685,7 +683,7 @@ describe('Table', () => {
         { key: 'ageCol', title: 'Age', dataKey: 'age', filter: { type: 'text' } }
       ]
 
-      const { container, getByText } = await renderSettled( {
+      const { container, getByText } = await renderSettled({
         columns: splitColumns,
         dataSource,
         pagination: false
@@ -721,7 +719,7 @@ describe('Table', () => {
         { key: 'age', title: 'Age' }
       ]
 
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: filterColumns,
         dataSource
       })
@@ -746,7 +744,7 @@ describe('Table', () => {
         }
       ]
 
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: filterColumns,
         dataSource: [
           { id: 1, status: 'active' },
@@ -759,7 +757,7 @@ describe('Table', () => {
     })
 
     it('binds controlled filters and names the filter control', async () => {
-      const { getByLabelText, container } = await renderSettled( {
+      const { getByLabelText, container } = await renderSettled({
         columns: [{ key: 'name', title: 'Name', filter: { type: 'text' } }],
         dataSource,
         filters: { name: 'Jane' },
@@ -772,7 +770,7 @@ describe('Table', () => {
 
     it('sorts when the header cell is clicked', async () => {
       const onSortChange = vi.fn()
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns: [{ key: 'name', title: 'Name', sortable: true }],
         dataSource,
         pagination: false,
@@ -874,7 +872,7 @@ describe('Table', () => {
         email: `person${i + 11}@example.com`
       }))
 
-      const { container, getByText, getByRole, getByLabelText } = await renderSettled( {
+      const { container, getByText, getByRole, getByLabelText } = await renderSettled({
         columns,
         dataSource: pageTwoRows,
         pagination: { remote: true, current: 2, pageSize: 10, total: 48 }
@@ -899,7 +897,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns: fixedColumns,
         dataSource,
         striped: true,
@@ -930,7 +928,7 @@ describe('Table', () => {
         { key: 'age', title: 'Age', width: 120 }
       ]
 
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns: fixedColumns,
         dataSource,
         pagination: false,
@@ -947,7 +945,7 @@ describe('Table', () => {
 
   describe('Hidden Columns', () => {
     it('hides columns listed in defaultHiddenColumnKeys (uncontrolled)', async () => {
-      const { queryByText, getByText } = await renderSettled( {
+      const { queryByText, getByText } = await renderSettled({
         columns,
         dataSource,
         defaultHiddenColumnKeys: ['email']
@@ -959,7 +957,7 @@ describe('Table', () => {
     })
 
     it('hides columns via the controlled hiddenColumnKeys prop and reacts to updates', async () => {
-      const { queryByText, getByText, rerender } = await renderSettled( {
+      const { queryByText, getByText, rerender } = await renderSettled({
         columns,
         dataSource,
         hiddenColumnKeys: ['age']
@@ -979,7 +977,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns: fixedColumns,
         dataSource,
         pagination: false,
@@ -1000,7 +998,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { container, getByLabelText, getByText } = await renderSettled( {
+      const { container, getByLabelText, getByText } = await renderSettled({
         columns: lockableColumns,
         dataSource,
         pagination: false,
@@ -1034,7 +1032,7 @@ describe('Table', () => {
         { key: 'email', title: 'Email', width: 220 }
       ]
 
-      const { container, getByLabelText } = await renderSettled( {
+      const { container, getByLabelText } = await renderSettled({
         columns: lockableColumns,
         dataSource,
         pagination: false,
@@ -1064,7 +1062,7 @@ describe('Table', () => {
         { key: 'role', title: 'Role', width: 240 }
       ]
 
-      const { container, getByLabelText, getByText } = await renderSettled( {
+      const { container, getByLabelText, getByText } = await renderSettled({
         columns: lockableColumns,
         dataSource,
         pagination: false,
@@ -1086,7 +1084,7 @@ describe('Table', () => {
     })
 
     it('does not render a colgroup for a plain table without fixed or lockable columns', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         pagination: false
@@ -1098,7 +1096,7 @@ describe('Table', () => {
 
   describe('Row Selection', () => {
     it('should render checkbox column when rowSelection is provided', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         rowSelection: {
@@ -1164,7 +1162,7 @@ describe('Table', () => {
     })
 
     it('should support radio selection', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         rowSelection: {
@@ -1182,7 +1180,7 @@ describe('Table', () => {
     })
 
     it('keeps radio, expand, and summary chrome in the same order', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         pagination: false,
@@ -1205,7 +1203,7 @@ describe('Table', () => {
 
   describe('Loading State', () => {
     it('should show loading overlay when loading is true', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         loading: true
@@ -1226,7 +1224,7 @@ describe('Table', () => {
         }
       ]
 
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: customColumns,
         dataSource
       })
@@ -1244,7 +1242,7 @@ describe('Table', () => {
         }
       ]
 
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: customColumns,
         dataSource
       })
@@ -1257,7 +1255,7 @@ describe('Table', () => {
 
   describe('Accessibility', () => {
     it('should have no a11y violations without row selection', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         pagination: false // Disable pagination to avoid selector label issues in test
@@ -1267,7 +1265,7 @@ describe('Table', () => {
     })
 
     it('should have proper table structure', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         pagination: false
@@ -1369,7 +1367,7 @@ describe('Table', () => {
         h('div', { class: 'expanded-content' }, `Details for ${record.name}`)
     }
     it('should expand row on clicking expand button', async () => {
-      const { getAllByRole, getByText } = await renderSettled( {
+      const { getAllByRole, getByText } = await renderSettled({
         columns,
         dataSource,
         expandable: expandableConfig
@@ -1423,7 +1421,7 @@ describe('Table', () => {
     })
 
     it('should respect rowExpandable function', async () => {
-      const { getAllByRole, container } = await renderSettled( {
+      const { getAllByRole, container } = await renderSettled({
         columns,
         dataSource,
         expandable: {
@@ -1442,7 +1440,7 @@ describe('Table', () => {
     })
 
     it('should expand row by clicking entire row when expandRowByClick is true', async () => {
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns,
         dataSource,
         expandable: {
@@ -1461,7 +1459,7 @@ describe('Table', () => {
     it('should reuse cached row keys when expanding by row click', async () => {
       const rowKey = vi.fn((record: Record<string, unknown>) => record.id as number)
 
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns,
         dataSource,
         rowKey,
@@ -1501,7 +1499,7 @@ describe('Table', () => {
     })
 
     it('should set aria-expanded attribute on expand button', async () => {
-      const { getAllByRole } = await renderSettled( {
+      const { getAllByRole } = await renderSettled({
         columns,
         dataSource,
         expandable: expandableConfig
@@ -1523,7 +1521,7 @@ describe('Table', () => {
 
   describe('v0.6.0 - Advanced Filtering', async () => {
     it('should filter data with advanced rules', async () => {
-      const { queryByText } = await renderSettled( {
+      const { queryByText } = await renderSettled({
         columns,
         dataSource,
         filterMode: 'advanced',
@@ -1539,7 +1537,7 @@ describe('Table', () => {
 
   describe('v0.6.0 - Editable Cells', async () => {
     it('should enter edit mode on double-click', async () => {
-      const { container, getByText } = await renderSettled( {
+      const { container, getByText } = await renderSettled({
         columns,
         dataSource,
         editable: true,
@@ -1558,7 +1556,7 @@ describe('Table', () => {
 
   describe('v0.6.0 - Summary Row', async () => {
     it('should render summary row when summaryRow.show is true', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         summaryRow: { show: true, data: { name: 'Total', age: '105', email: '-' } },
@@ -1584,7 +1582,7 @@ describe('Table', () => {
     ]
 
     it('should render group headers when groupBy is set', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns: groupColumns,
         dataSource: groupData,
         groupBy: 'dept',
@@ -1600,7 +1598,7 @@ describe('Table', () => {
 
   describe('v0.6.0 - Export', () => {
     it('should render export button when exportable is true', async () => {
-      const { getByText } = await renderSettled( {
+      const { getByText } = await renderSettled({
         columns,
         dataSource,
         exportable: true,
@@ -1613,7 +1611,7 @@ describe('Table', () => {
 
   describe('v0.6.0 - Column Draggable', () => {
     it('should set draggable attribute on headers when columnDraggable is true', async () => {
-      const { container } = await renderSettled( {
+      const { container } = await renderSettled({
         columns,
         dataSource,
         columnDraggable: true,

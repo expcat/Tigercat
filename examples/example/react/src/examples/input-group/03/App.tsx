@@ -6,7 +6,7 @@ const sizes = ['sm', 'md', 'lg'] as const
 
 export default function App() {
   return (
-    <div className="space-y-3">
+    <div className="flex flex-wrap items-start gap-3">
       {sizes.map((size) => (
         <InputGroup
           key={size}

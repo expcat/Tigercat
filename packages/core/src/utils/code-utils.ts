@@ -4,7 +4,7 @@ import { type ClassValue, classNames } from './class-names'
 import { isBrowser } from './env'
 
 export const codeBlockContainerClasses =
-  'relative rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface-muted)] text-[var(--tiger-text)]'
+  'relative rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)]/30 bg-[var(--tiger-surface-muted)] text-[var(--tiger-text)]'
 
 export const codeBlockPreClasses =
   'm-0 overflow-auto p-4 text-sm leading-relaxed font-mono whitespace-pre'
@@ -16,7 +16,7 @@ export const codeBlockLineNumberClasses =
 
 /** In-flow bar above `<pre>`. Language text stays out of the numbered lines. */
 export const codeBlockHeaderClasses =
-  'flex items-center justify-between gap-3 border-b border-[var(--tiger-border)] px-3 py-2'
+  'flex items-center justify-between gap-3 border-b border-[var(--tiger-border)]/30 px-3 py-2'
 
 export const codeBlockHeaderActionsClasses = 'flex shrink-0 items-center gap-2'
 

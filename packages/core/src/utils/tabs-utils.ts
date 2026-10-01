@@ -114,10 +114,10 @@ export const tabItemEditableCardActiveClasses =
   'border bg-[var(--tiger-surface)] border-[var(--tiger-primary)] text-[var(--tiger-primary)] font-medium z-10 shrink-0'
 
 export const tabItemPillsClasses =
-  'rounded-full bg-transparent hover:bg-[var(--tiger-primary-subtle)] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
+  'rounded-full bg-transparent hover:bg-[var(--tiger-primary-subtle,var(--tiger-outline-bg-hover))] hover:text-[var(--tiger-primary)] text-[var(--tiger-text-secondary)] shrink-0'
 
 export const tabItemPillsActiveClasses =
-  'bg-[var(--tiger-primary)] text-white font-medium shadow-sm'
+  'bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] font-medium shadow-sm'
 
 export const tabItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-events-none'
 

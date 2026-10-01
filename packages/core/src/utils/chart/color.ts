@@ -17,16 +17,16 @@ export const chartCanvasBaseClasses = 'block overflow-visible'
 export const chartCanvasHostClasses = 'block min-w-0 w-full overflow-visible'
 
 export const chartAxisLineClasses =
-  'stroke-[color:var(--tiger-border)] [stroke-opacity:var(--tiger-chart-axis-line-opacity)]'
+  'stroke-[color:var(--tiger-border)] [stroke-opacity:var(--tiger-chart-axis-line-opacity,0.6)]'
 export const chartAxisTickLineClasses =
-  'stroke-[color:var(--tiger-border)] [stroke-opacity:var(--tiger-chart-axis-tick-opacity)]'
+  'stroke-[color:var(--tiger-border)] [stroke-opacity:var(--tiger-chart-axis-tick-opacity,0.4)]'
 export const chartAxisTickTextClasses =
   'fill-[color:var(--tiger-text-secondary)] text-xs tabular-nums'
 export const chartAxisLabelClasses =
   'fill-[color:var(--tiger-text)] text-xs font-medium tabular-nums'
 
 export const chartGridLineClasses =
-  'stroke-[color:var(--tiger-border)] [stroke-opacity:var(--tiger-chart-grid-line-opacity)]'
+  'stroke-[color:var(--tiger-border)] [stroke-opacity:var(--tiger-chart-grid-line-opacity,0.2)]'
 
 export const chartLegendListClasses = 'flex flex-wrap'
 
@@ -35,10 +35,10 @@ export function getChartLegendItemClasses(options: {
   dimmed: boolean
 }): string {
   return classNames(
-    'flex items-center gap-2 text-sm rounded-[var(--tiger-chart-legend-row-radius)]',
+    'flex items-center gap-2 text-sm rounded-[var(--tiger-chart-legend-row-radius,var(--tiger-radius-md))]',
     'text-[color:var(--tiger-text-secondary)]',
     options.interactive
-      ? 'cursor-pointer hover:text-[color:var(--tiger-text)] hover:bg-[var(--tiger-chart-legend-row-hover-bg)] transition-colors motion-reduce:transition-none'
+      ? 'cursor-pointer hover:text-[color:var(--tiger-text)] hover:bg-[var(--tiger-chart-legend-row-hover-bg,var(--tiger-outline-bg-hover))] transition-colors motion-reduce:transition-none'
       : 'cursor-default',
     options.dimmed ? 'opacity-50' : undefined
   )
@@ -47,8 +47,8 @@ export function getChartLegendItemClasses(options: {
 export const chartTooltipBaseClasses = classNames(
   `fixed left-0 top-0 ${overlayZIndexClass.overlay} pointer-events-none will-change-transform`,
   'max-w-xs px-3 py-2 rounded-[var(--tiger-radius-md)] shadow-[var(--tiger-shadow-lg)]',
-  'bg-[color:var(--tiger-bg-elevated)]',
-  'text-[color:var(--tiger-text-inverse)]',
+  'bg-[color:var(--tiger-bg-elevated,var(--tiger-surface-raised))]',
+  'text-[color:var(--tiger-text-inverse,var(--tiger-text))]',
   'text-sm',
   'transition-opacity duration-150 motion-reduce:transition-none'
 )
@@ -96,7 +96,10 @@ export const DEFAULT_CHART_COLORS = [
  * Optional `--tiger-chart-split-*` overrides; fallbacks mix `--tiger-text` so
  * bands follow light/dark instead of a black-alpha wash.
  */
-export const RADAR_SPLIT_AREA_COLORS = ['var(--tiger-chart-split-1)', 'var(--tiger-chart-split-2)']
+export const RADAR_SPLIT_AREA_COLORS = [
+  'var(--tiger-chart-split-1,color-mix(in srgb,var(--tiger-text) 3%,transparent))',
+  'var(--tiger-chart-split-2,color-mix(in srgb,var(--tiger-text) 6%,transparent))'
+]
 
 // ----------------------------------------------------------------------------
 // Drop shadows (pie / donut emphasis)
@@ -130,7 +133,7 @@ export const barValueLabelClasses =
 
 /** CSS classes for value labels inside bars (needs contrasting color) */
 export const barValueLabelInsideClasses =
-  'fill-[color:var(--tiger-text-inverse)] text-[11px] font-medium pointer-events-none select-none'
+  'fill-[color:var(--tiger-text-inverse,var(--tiger-primary-foreground))] text-[11px] font-medium pointer-events-none select-none'
 
 export const barInteractiveClasses =
   'cursor-pointer hover:brightness-110 motion-reduce:hover:brightness-100'
@@ -148,7 +151,7 @@ export const scatterPointTransitionClasses =
  * `4px`) so modern preset can amplify slightly without changing default visual.
  */
 export function getScatterHoverShadow(): string {
-  return 'drop-shadow(0 0 var(--tiger-chart-scatter-halo-radius) var(--tiger-series-color))'
+  return 'drop-shadow(0 0 var(--tiger-chart-scatter-halo-radius,4px) var(--tiger-series-color))'
 }
 
 /** Compute the hovered size for a scatter point. */

@@ -127,8 +127,7 @@ function srgbChannelToLinear(channel: number): number {
 
 function linearToSrgbChannel(value: number): number {
   const clamped = Math.min(1, Math.max(0, value))
-  const encoded =
-    clamped <= 0.0031308 ? clamped * 12.92 : 1.055 * clamped ** (1 / 2.4) - 0.055
+  const encoded = clamped <= 0.0031308 ? clamped * 12.92 : 1.055 * clamped ** (1 / 2.4) - 0.055
   return Math.round(Math.min(1, Math.max(0, encoded)) * 255)
 }
 
@@ -187,12 +186,19 @@ export function interpolateColorOklch(minColor: string, maxColor: string, t: num
   const maxRgb = parseHexColor(maxHex) ?? parseHexColor(DEFAULT_HEATMAP_MAX_COLOR)!
   const [l1, a1, b1] = rgbToOklab(minRgb[0], minRgb[1], minRgb[2])
   const [l2, a2, b2] = rgbToOklab(maxRgb[0], maxRgb[1], maxRgb[2])
-  const [r, g, b] = oklabToRgb(l1 + (l2 - l1) * clamped, a1 + (a2 - a1) * clamped, b1 + (b2 - b1) * clamped)
+  const [r, g, b] = oklabToRgb(
+    l1 + (l2 - l1) * clamped,
+    a1 + (a2 - a1) * clamped,
+    b1 + (b2 - b1) * clamped
+  )
   return rgbToHex(r, g, b)
 }
 
-/** Label color from the fill's luminance. Unresolved fills use the paired token, not a constant. */
+/** CSS fills follow the live theme; concrete fills use their resolved luminance. */
 export function chartLabelFill(fill: string): string {
+  if (readCssVar(fill)) {
+    return `oklch(from ${fill} clamp(0, (0.62 - l) * 1000, 1) 0 0)`
+  }
   const hex = resolveChartColorHex(fill)
   const rgb = hex ? parseHexColor(hex) : null
   if (!rgb) return '#111827'
@@ -347,10 +353,7 @@ export function layoutHeatmap(
       xLabels.some((label) => label === String(datum.x)) &&
       yLabels.some((label) => label === String(datum.y))
     const matchesIndex =
-      isNumericIndex(datum.x) &&
-      isNumericIndex(datum.y) &&
-      datum.x < cols &&
-      datum.y < rows
+      isNumericIndex(datum.x) && isNumericIndex(datum.y) && datum.x < cols && datum.y < rows
     if (matchesLabel) {
       if (byLabel.has(labelKey)) {
         devWarn(
@@ -382,10 +385,7 @@ export function layoutHeatmap(
   }
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      place(
-        row * cols + col,
-        byLabel.get(heatmapLookupKey(xLabels[col], yLabels[row]))
-      )
+      place(row * cols + col, byLabel.get(heatmapLookupKey(xLabels[col], yLabels[row])))
     }
   }
   for (let row = 0; row < rows; row++) {

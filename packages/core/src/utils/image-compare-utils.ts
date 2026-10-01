@@ -65,7 +65,7 @@ export const imageCompareLineVerticalClasses = 'inset-x-0 top-1/2 h-0.5 -transla
 
 /** Circular grabber on the divider */
 export const imageCompareKnobClasses =
-  'tiger-image-compare-knob relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--tiger-primary)] text-white shadow pointer-events-none group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-[var(--tiger-focus-ring)]'
+  'tiger-image-compare-knob relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[var(--tiger-primary)] text-[var(--tiger-primary-foreground)] shadow pointer-events-none group-focus-visible:ring-2 group-focus-visible:ring-offset-2 group-focus-visible:ring-[var(--tiger-focus-ring)]'
 
 const IMAGE_COMPARE_ORIENTATIONS = new Set<ImageCompareOrientation>(['horizontal', 'vertical'])
 
