@@ -556,6 +556,7 @@ export const ptBR: TigerLocale = {
     accentGroup: 'Destaque'
   },
   tabs: {
+    moreTabs: 'Mais',
     addTabAriaLabel: 'Adicionar aba',
     closeTabAriaLabel: 'Fechar {label}',
     tablistAriaLabel: 'Abas'

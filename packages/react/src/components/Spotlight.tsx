@@ -9,10 +9,8 @@ import React, {
   useState
 } from 'react'
 import {
-  captureActiveElement,
   classNames,
   findSpotlightShortcutItem,
-  focusFirst,
   getEmptyLabels,
   getInitialPickerActiveIndex,
   getPickerComboboxAria,
@@ -31,7 +29,6 @@ import {
   releaseSpotlightHotkey,
   resolveSpotlightIconKind,
   mergeTigerLocale,
-  restoreFocus,
   shouldCloseOnMaskClick,
   spotlightEmptyClasses,
   spotlightGroupClasses,
@@ -50,7 +47,7 @@ import {
   type SpotlightItem,
   type SpotlightProps as CoreSpotlightProps
 } from '@expcat/tigercat-core'
-import { useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import { useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { OverlayPortal } from '../utils/overlay-outlet'
 import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
@@ -137,10 +134,8 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
   const overlayHostId = `${dialogId}-overlay-host`
 
   const rootRef = useRef<HTMLDivElement | null>(null)
-  const dialogRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const listRef = useRef<HTMLDivElement | null>(null)
-  const previousActiveElementRef = useRef<HTMLElement | null>(null)
 
   const searchState = useMemo(
     () =>
@@ -173,8 +168,13 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
   )
 
   useEscapeKey({ enabled: resolvedOpen, onEscape: closeSpotlight, layerRef: rootRef })
-  useBodyScrollLock({ enabled: resolvedOpen })
-  useFocusTrap({ enabled: resolvedOpen, containerRef: rootRef, inert: true })
+  useFocusTrap({
+    enabled: resolvedOpen,
+    containerRef: rootRef,
+    inert: true,
+    autoFocus: true,
+    initialFocusRef: inputRef
+  })
 
   const hotkeyOwnerRef = useRef<object>({})
   useEffect(() => {
@@ -192,20 +192,6 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
       releaseSpotlightHotkey(owner)
     }
   }, [hotkey, toggleSpotlight])
-
-  useEffect(() => {
-    if (!resolvedOpen) {
-      restoreFocus(previousActiveElementRef.current)
-      return
-    }
-
-    previousActiveElementRef.current = captureActiveElement()
-    const timer = window.setTimeout(() => {
-      focusFirst([inputRef.current, dialogRef.current])
-    }, 0)
-
-    return () => window.clearTimeout(timer)
-  }, [resolvedOpen])
 
   useEffect(() => {
     if (!resolvedOpen) {
@@ -339,7 +325,6 @@ export const Spotlight = forwardRef<SpotlightHandle, SpotlightProps>(function Sp
       )}
       <div
         {...rest}
-        ref={dialogRef}
         id={dialogId}
         role="dialog"
         aria-modal="true"

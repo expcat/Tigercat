@@ -557,6 +557,7 @@ export const esES: TigerLocale = {
     accentGroup: 'Acento'
   },
   tabs: {
+    moreTabs: 'Más',
     addTabAriaLabel: 'Añadir pestaña',
     closeTabAriaLabel: 'Cerrar {label}',
     tablistAriaLabel: 'Pestañas'

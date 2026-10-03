@@ -556,6 +556,7 @@ export const frFR: TigerLocale = {
     accentGroup: 'Accent'
   },
   tabs: {
+    moreTabs: 'Plus',
     addTabAriaLabel: 'Ajouter un onglet',
     closeTabAriaLabel: 'Fermer {label}',
     tablistAriaLabel: 'Onglets'

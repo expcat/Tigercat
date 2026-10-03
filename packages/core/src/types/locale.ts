@@ -893,6 +893,8 @@ export interface TigerLocaleColorPicker {
 }
 
 export interface TigerLocaleTabs {
+  /** Overflow menu trigger text */
+  moreTabs?: string
   addTabAriaLabel?: string
   /** Template: supports {label} */
   closeTabAriaLabel?: string

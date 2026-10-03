@@ -2,7 +2,9 @@
  * @vitest-environment happy-dom
  */
 import React, { useState } from 'react'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { hydrateRoot } from 'react-dom/client'
+import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { ContextMenu, ContextMenuItem, ContextMenuMenu } from '@expcat/tigercat-react/ContextMenu'
@@ -12,10 +14,77 @@ import { NumberKeyboard } from '@expcat/tigercat-react/NumberKeyboard'
 import { Spotlight } from '@expcat/tigercat-react/Spotlight'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { flushOverlayOutsideDismiss } from '../utils/frame-scheduler'
+import { OverlayOutletProvider, OverlayPortal } from '../../packages/react/src/utils/overlay-outlet'
 
 const confirmName = enUS.common!.okText!
 
 describe('overlay dismiss inside ConfigProvider', () => {
+  it('keeps committed layers mounted through StrictMode replay and reopening', async () => {
+    function Demo() {
+      const [open, setOpen] = useState(true)
+      return (
+        <OverlayOutletProvider>
+          <button type="button" onClick={() => setOpen(true)}>
+            Open commands
+          </button>
+          {open ? (
+            <OverlayPortal>
+              <div role="dialog" aria-label="Strict mode commands">
+                <button type="button" onClick={() => setOpen(false)}>
+                  Close commands
+                </button>
+              </div>
+            </OverlayPortal>
+          ) : null}
+        </OverlayOutletProvider>
+      )
+    }
+    const { unmount } = render(
+      <React.StrictMode>
+        <Demo />
+      </React.StrictMode>
+    )
+    await screen.findByRole('dialog', { name: 'Strict mode commands' })
+    fireEvent.click(screen.getByRole('button', { name: 'Close commands' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    fireEvent.click(screen.getByRole('button', { name: 'Open commands' }))
+    await screen.findByRole('dialog', { name: 'Strict mode commands' })
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+    unmount()
+    await waitFor(() => expect(document.querySelector('[role="dialog"]')).toBeNull())
+  })
+
+  it('hydrates a server-rendered open layer without replacing its DOM', async () => {
+    const tree = (
+      <OverlayOutletProvider>
+        <OverlayPortal>
+          <div role="dialog" aria-label="Server layer">
+            Open content
+          </div>
+        </OverlayPortal>
+      </OverlayOutletProvider>
+    )
+    const container = document.createElement('div')
+    container.innerHTML = renderToString(tree)
+    document.body.appendChild(container)
+    const serverLayer = container.querySelector('[role="dialog"]')
+    expect(serverLayer).toBeTruthy()
+    const recoverable: unknown[] = []
+    let root: ReturnType<typeof hydrateRoot> | undefined
+    try {
+      await act(async () => {
+        root = hydrateRoot(container, tree, {
+          onRecoverableError: (error) => recoverable.push(error)
+        })
+      })
+      expect(recoverable).toEqual([])
+      expect(container.querySelector('[role="dialog"]')).toBe(serverLayer)
+    } finally {
+      await act(async () => root?.unmount())
+      container.remove()
+    }
+  })
+
   it('keeps a number keyboard closed after confirm and scrim when focus opens it', async () => {
     function Demo() {
       const [value, setValue] = useState('4558')

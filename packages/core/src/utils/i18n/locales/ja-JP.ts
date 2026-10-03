@@ -556,6 +556,7 @@ export const jaJP: TigerLocale = {
     accentGroup: 'アクセント'
   },
   tabs: {
+    moreTabs: 'その他',
     addTabAriaLabel: 'タブを追加',
     closeTabAriaLabel: '{label} を閉じる',
     tablistAriaLabel: 'タブ'

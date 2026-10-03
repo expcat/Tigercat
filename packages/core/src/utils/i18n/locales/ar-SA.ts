@@ -556,6 +556,7 @@ export const arSA: TigerLocale = {
     accentGroup: 'تمييز'
   },
   tabs: {
+    moreTabs: 'المزيد',
     addTabAriaLabel: 'إضافة علامة تبويب',
     closeTabAriaLabel: 'إغلاق {label}',
     tablistAriaLabel: 'علامات التبويب'

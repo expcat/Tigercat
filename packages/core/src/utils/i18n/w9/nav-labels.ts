@@ -4,7 +4,6 @@
 
 export interface NavLabels {
   dangerItem: string
-  moreTabs: string
   breadcrumbCollapsed: string
   breadcrumbCollapse: string
   paginationJump: string
@@ -14,7 +13,6 @@ export interface NavLabels {
 
 export const navLabels: NavLabels = {
   dangerItem: 'Danger',
-  moreTabs: 'More',
   breadcrumbCollapsed: 'Collapsed links',
   breadcrumbCollapse: 'Collapse',
   paginationJump: 'Go to page',

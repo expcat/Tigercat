@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, PropType, ref, type VNodeChild } from 'vue'
+import { computed, defineComponent, h, nextTick, PropType, ref, watch, type VNodeChild } from 'vue'
 import {
   assertWorkflowActionComment,
   buildWorkflowActionPayload,
@@ -17,7 +17,6 @@ import {
   resolveWorkflowActionButtonProps,
   resolveWorkflowSignMode,
   resolveWorkflowStepKind,
-  shouldConfirmWorkflowAction,
   shouldOpenWorkflowActionLayer,
   shouldShowWorkflowActionCommentInput,
   shouldShowWorkflowActions,
@@ -352,6 +351,9 @@ export const WorkflowActionBar = defineComponent({
     const drafts = ref<Record<string, ActionDraft>>({})
     const moreItem = ref<WorkflowActionBarItem | null>(null)
     const moreWrapEl = ref<HTMLElement | null>(null)
+    watch(moreItem, (next, previous) => {
+      if (!next && previous) nextTick(() => moreWrapEl.value?.querySelector('button')?.focus())
+    })
 
     const resolvedItems = computed(() =>
       resolveWorkflowActionBarItems({
@@ -662,50 +664,14 @@ export const WorkflowActionBar = defineComponent({
           workflowActionNeedsPicker(pendingMore.action) != null ||
           (pendingMore.action === 'addsign' && positions.value.length > 1))
 
+      const moreButton = h(
+        Button,
+        { size: 'sm', variant: 'outline' },
+        () => props.moreLabel ?? labels.moreActions
+      )
       const moreNode =
         splitItems.value.more.length > 0
-          ? h('div', { ref: moreWrapEl, class: 'relative inline-flex' }, [
-              h(
-                Dropdown,
-                { asChild: true },
-                {
-                  default: () => [
-                    h(
-                      Button,
-                      { size: 'sm', variant: 'outline' },
-                      () => props.moreLabel ?? labels.moreActions
-                    ),
-                    h(DropdownMenu, null, {
-                      default: () =>
-                        splitItems.value.more.map((item) => {
-                          const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
-                          const reason = workflowActionBarItemDisabledReason(item, {
-                            ...disableOptions,
-                            returnNoTargets: labels.returnNoTargets
-                          })
-                          const needsDialog = shouldOpenWorkflowActionLayer(item, {
-                            confirm: props.confirm,
-                            commentRequired: props.commentRequired
-                          })
-                          return h(
-                            DropdownItem,
-                            {
-                              key: item.key,
-                              disabled: itemDisabled,
-                              title: reason,
-                              onClick: () => {
-                                if (itemDisabled) return
-                                if (needsDialog) moreItem.value = item
-                                else emitReadyAction(item)
-                              }
-                            },
-                            { default: () => item.label }
-                          )
-                        })
-                    })
-                  ]
-                }
-              ),
+          ? h('div', { ref: moreWrapEl, class: 'inline-flex' }, [
               pendingMore
                 ? h(
                     Popconfirm,
@@ -718,34 +684,59 @@ export const WorkflowActionBar = defineComponent({
                       icon: moreConfirmCopy?.icon,
                       placement: 'top-end',
                       'onUpdate:open': (open: boolean) => {
-                        if (!open) {
-                          moreItem.value = null
-                          moreWrapEl.value?.querySelector('button')?.focus()
-                        }
-                      },
-                      'onOpen-change': (open: boolean) => {
-                        if (!open) {
-                          moreItem.value = null
-                          moreWrapEl.value?.querySelector('button')?.focus()
-                        }
+                        if (!open) moreItem.value = null
                       },
                       onConfirm: (event?: { preventDefault: () => void }) => {
-                        if (!moreItem.value) return
-                        if (emitReadyAction(moreItem.value, event)) moreItem.value = null
+                        if (emitReadyAction(pendingMore, event)) moreItem.value = null
                       }
                     },
                     {
-                      default: () =>
-                        h('span', {
-                          class: 'pointer-events-none absolute inset-0',
-                          'aria-hidden': 'true'
-                        }),
+                      default: () => moreButton,
                       description: moreExtra
                         ? () => renderPickerFields(pendingMore, moreConfirmCopy?.description)
                         : undefined
                     }
                   )
-                : null
+                : h(
+                    Dropdown,
+                    { asChild: true },
+                    {
+                      default: () => [
+                        moreButton,
+                        h(DropdownMenu, null, {
+                          default: () =>
+                            splitItems.value.more.map((item) => {
+                              const itemDisabled = isWorkflowActionBarItemDisabled(
+                                item,
+                                disableOptions
+                              )
+                              const reason = workflowActionBarItemDisabledReason(item, {
+                                ...disableOptions,
+                                returnNoTargets: labels.returnNoTargets
+                              })
+                              const needsDialog = shouldOpenWorkflowActionLayer(item, {
+                                confirm: props.confirm,
+                                commentRequired: props.commentRequired
+                              })
+                              return h(
+                                DropdownItem,
+                                {
+                                  key: item.key,
+                                  disabled: itemDisabled,
+                                  title: reason,
+                                  onClick: () => {
+                                    if (itemDisabled) return
+                                    if (needsDialog) moreItem.value = item
+                                    else emitReadyAction(item)
+                                  }
+                                },
+                                { default: () => item.label }
+                              )
+                            })
+                        })
+                      ]
+                    }
+                  )
             ])
           : null
 

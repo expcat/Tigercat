@@ -2,7 +2,6 @@ import {
   computed,
   defineComponent,
   h,
-  nextTick,
   onBeforeUnmount,
   onMounted,
   ref,
@@ -12,12 +11,10 @@ import {
   type VNodeChild
 } from 'vue'
 import {
-  captureActiveElement,
   classNames,
   coerceClassValue,
   claimSpotlightHotkey,
   findSpotlightShortcutItem,
-  focusFirst,
   getEmptyLabels,
   getInitialPickerActiveIndex,
   getPickerComboboxAria,
@@ -36,7 +33,6 @@ import {
   resolveSpotlightIconKind,
   mergeStyleValues,
   mergeTigerLocale,
-  restoreFocus,
   shouldCloseOnMaskClick,
   spotlightEmptyClasses,
   spotlightGroupClasses,
@@ -56,7 +52,7 @@ import {
   OVERLAY_Z_INDEX
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
-import { useVueBodyScrollLock, useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
+import { useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
 import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
 
 export type VueSpotlightProps = InstanceType<typeof Spotlight>['$props']
@@ -173,9 +169,7 @@ export const Spotlight = defineComponent({
     const listboxId = `${dialogId}-listbox`
     const overlayHostId = `${dialogId}-overlay-host`
     const rootRef = ref<HTMLElement | null>(null)
-    const dialogRef = ref<HTMLElement | null>(null)
     const inputRef = ref<HTMLInputElement | null>(null)
-    const previousActiveElement = ref<HTMLElement | null>(null)
 
     const resolvedOpen = computed(() => props.open ?? uncontrolledOpen.value)
     const resolvedQuery = computed(() => props.query ?? uncontrolledQuery.value)
@@ -262,8 +256,13 @@ export const Spotlight = defineComponent({
       }
     }
 
-    useVueBodyScrollLock(resolvedOpen)
-    useVueFocusTrap({ enabled: resolvedOpen, containerRef: rootRef, inert: true })
+    useVueFocusTrap({
+      enabled: resolvedOpen,
+      containerRef: rootRef,
+      inert: true,
+      autoFocus: true,
+      initialFocusRef: inputRef
+    })
     let cleanupEscape: (() => void) | undefined
 
     const hotkeyOwner = {}
@@ -313,21 +312,6 @@ export const Spotlight = defineComponent({
       ],
       updateActiveIndex,
       { immediate: true }
-    )
-
-    watch(
-      resolvedOpen,
-      async (isOpen) => {
-        if (!isOpen) {
-          restoreFocus(previousActiveElement.value)
-          return
-        }
-
-        previousActiveElement.value = captureActiveElement()
-        await nextTick()
-        focusFirst([inputRef.value, dialogRef.value])
-      },
-      { flush: 'post', immediate: true }
     )
 
     watch(activeIndex, (index) => {
@@ -408,7 +392,6 @@ export const Spotlight = defineComponent({
             'div',
             {
               ...attrs,
-              ref: dialogRef,
               id: dialogId,
               role: 'dialog',
               'aria-modal': 'true',

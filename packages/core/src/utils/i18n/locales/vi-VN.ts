@@ -556,6 +556,7 @@ export const viVN: TigerLocale = {
     accentGroup: 'Nhấn'
   },
   tabs: {
+    moreTabs: 'Thêm',
     addTabAriaLabel: 'Thêm tab',
     closeTabAriaLabel: 'Đóng {label}',
     tablistAriaLabel: 'Thẻ'

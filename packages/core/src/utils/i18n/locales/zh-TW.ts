@@ -72,7 +72,7 @@ export const zhTW: TigerLocale = {
   text: {
     copyLabel: '複製',
     copiedLabel: '已複製',
-    copyFailedLabel: '複製失敗',
+    copyFailedLabel: '複製失敗'
   },
   watermark: {
     imageErrorText: '浮水印圖片載入失敗'
@@ -361,7 +361,7 @@ export const zhTW: TigerLocale = {
     finishText: '完成',
     closeAriaLabel: '關閉導覽',
     dialogAriaLabel: '導覽',
-    loadErrorText: '無法載入這次導覽。',
+    loadErrorText: '無法載入這次導覽。'
   },
   calendar: {
     previousMonth: '上個月',
@@ -556,6 +556,7 @@ export const zhTW: TigerLocale = {
     accentGroup: '強調色'
   },
   tabs: {
+    moreTabs: '更多',
     addTabAriaLabel: '新增分頁',
     closeTabAriaLabel: '關閉{label}',
     tablistAriaLabel: '標籤頁'

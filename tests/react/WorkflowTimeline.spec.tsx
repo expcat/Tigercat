@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -119,7 +119,14 @@ describe('WorkflowTimeline (React)', () => {
 
   it('emits action when an enabled action is clicked', () => {
     const onAction = vi.fn()
-    render(<WorkflowTimeline steps={mixedSteps} actions={actions} viewerRole="approver" onAction={onAction} />)
+    render(
+      <WorkflowTimeline
+        steps={mixedSteps}
+        actions={actions}
+        viewerRole="approver"
+        onAction={onAction}
+      />
+    )
 
     fireEvent.click(screen.getByRole('button', { name: 'Approve' }))
     expect(onAction).toHaveBeenCalledWith(
@@ -221,6 +228,13 @@ describe('WorkflowTimeline (React)', () => {
   })
 
   describe('WorkflowActionBar', () => {
+    beforeEach(() => {
+      vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+        DOMRect.fromRect({ x: 20, y: 100, width: 120, height: 32 })
+      )
+    })
+    afterEach(() => vi.restoreAllMocks())
+
     it('renders labelled buttons and emits the clicked item', () => {
       const onAction = vi.fn()
       render(<WorkflowActionBar viewerRole="approver" items={actions} onAction={onAction} />)
@@ -257,7 +271,7 @@ describe('WorkflowTimeline (React)', () => {
       )
     })
 
-    it('shows reject confirm description, danger OK, and required comment copy', async () => {
+    it('shows reject confirm description, OK, and required comment copy', async () => {
       const user = userEvent.setup()
       const onAction = vi.fn()
       render(
@@ -271,15 +285,15 @@ describe('WorkflowTimeline (React)', () => {
       expect(screen.getByText('意见将通知发起人。')).toBeVisible()
       expect(screen.queryByText(/该步骤/)).not.toBeInTheDocument()
       expect(screen.getByPlaceholderText('请输入审批意见')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: '确定' }).className).toContain(
-        'bg-[var(--tiger-error)]'
-      )
+      expect(screen.getByRole('button', { name: '确定' })).toBeEnabled()
     })
 
     it('passes typed comment on confirm', async () => {
       const user = userEvent.setup()
       const onAction = vi.fn()
-      render(<WorkflowActionBar viewerRole="approver" items={actions} confirm onAction={onAction} />)
+      render(
+        <WorkflowActionBar viewerRole="approver" items={actions} confirm onAction={onAction} />
+      )
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
       const textarea = await screen.findByPlaceholderText('Comment required')
@@ -295,7 +309,15 @@ describe('WorkflowTimeline (React)', () => {
     it('blocks empty submit when commentRequired and keeps the dialog open', async () => {
       const user = userEvent.setup()
       const onAction = vi.fn()
-      render(<WorkflowActionBar viewerRole="approver" items={actions} confirm commentRequired onAction={onAction} />)
+      render(
+        <WorkflowActionBar
+          viewerRole="approver"
+          items={actions}
+          confirm
+          commentRequired
+          onAction={onAction}
+        />
+      )
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
       await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
@@ -319,7 +341,14 @@ describe('WorkflowTimeline (React)', () => {
       const optionalReject: WorkflowActionBarItem[] = [
         { key: 'reject', label: 'Reject', action: 'reject', commentRequired: false }
       ]
-      render(<WorkflowActionBar viewerRole="approver" items={optionalReject} confirm onAction={onAction} />)
+      render(
+        <WorkflowActionBar
+          viewerRole="approver"
+          items={optionalReject}
+          confirm
+          onAction={onAction}
+        />
+      )
 
       await user.click(screen.getByRole('button', { name: 'Reject' }))
       await user.click(await screen.findByRole('button', { name: 'OK' }))
@@ -347,7 +376,8 @@ describe('WorkflowTimeline (React)', () => {
         { key: 'manager', title: 'Manager', actorName: 'Lin' }
       ]
       render(
-        <WorkflowActionBar viewerRole="approver"
+        <WorkflowActionBar
+          viewerRole="approver"
           items={full}
           confirm
           returnTargets={targets}
@@ -410,13 +440,15 @@ describe('WorkflowTimeline (React)', () => {
       expect(screen.getByRole('button', { name: 'Add approver' })).toBeDisabled()
     })
 
-    it('does not render a nameless 0×0 overflow confirm trigger', () => {
+    it('anchors overflow confirmation to More and restores focus on dismissal', async () => {
+      const user = userEvent.setup()
       const items: WorkflowActionBarItem[] = [
         { key: 'approve', label: 'Approve', action: 'approve' },
         { key: 'return', label: 'Return', action: 'return', placement: 'more' }
       ]
       render(
-        <WorkflowActionBar viewerRole="approver"
+        <WorkflowActionBar
+          viewerRole="approver"
           items={items}
           confirm
           returnTargets={[{ key: 'start', title: 'Start' }]}
@@ -426,12 +458,30 @@ describe('WorkflowTimeline (React)', () => {
       const buttons = within(toolbar).getAllByRole('button')
       expect(buttons.map((button) => button.textContent?.trim())).toEqual(['Approve', 'More'])
       expect(buttons.every((button) => Boolean(button.textContent?.trim()))).toBe(true)
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Return' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Return this request?' })
+      expect(screen.getByRole('button', { name: 'More' })).toHaveAttribute(
+        'aria-controls',
+        dialog.id
+      )
+      expect(within(toolbar).getAllByRole('button')).toHaveLength(2)
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+      await waitFor(() => expect(screen.getByRole('button', { name: 'More' })).toHaveFocus())
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Return' }))
+      await screen.findByRole('dialog', { name: 'Return this request?' })
+      await user.keyboard('{Escape}')
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      expect(screen.getByRole('button', { name: 'More' })).toHaveFocus()
     })
   })
 
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
-      const { container } = render(<WorkflowTimeline steps={mixedSteps} actions={actions} viewerRole="approver" />)
+      const { container } = render(
+        <WorkflowTimeline steps={mixedSteps} actions={actions} viewerRole="approver" />
+      )
       expect(screen.getByRole('list', { name: 'Workflow timeline' })).toBeInTheDocument()
       expect(screen.getByRole('toolbar', { name: 'Workflow actions' })).toBeInTheDocument()
       await expectNoA11yViolations(container)

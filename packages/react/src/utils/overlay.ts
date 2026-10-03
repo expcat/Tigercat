@@ -236,25 +236,34 @@ export function useFocusTrap({
 
   useLayoutEffect(() => {
     if (!enabled) return
-    const container = containerRef.current
-    if (!container) return
-    const active = captureActiveElement()
-    if (autoFocus && active && !container.contains(active)) {
-      restoreTargetRef.current = active
+    let frame: number | undefined
+    let scope: ReturnType<typeof createFocusScope> | undefined
+    const attach = () => {
+      const container = containerRef.current
+      if (!container) {
+        frame = requestAnimationFrame(attach)
+        return
+      }
+      const active = captureActiveElement()
+      if (autoFocus && active && !container.contains(active)) {
+        restoreTargetRef.current = active
+      }
+      const restore = returnFocus ?? autoFocus
+      scope = createFocusScope(container, {
+        modal: inert,
+        moveFocus: autoFocus || Boolean(initialFocusRef?.current),
+        initialFocus: initialFocusRef?.current ?? null,
+        returnFocus: restore,
+        previouslyFocused: restore ? (restoreTargetRef.current ?? undefined) : null,
+        lockScroll,
+        exempt: exemptRef ? () => exemptRef.current : undefined
+      })
+      scope.activate()
     }
-    const restore = returnFocus ?? autoFocus
-    const scope = createFocusScope(container, {
-      modal: inert,
-      moveFocus: autoFocus || Boolean(initialFocusRef?.current),
-      initialFocus: initialFocusRef?.current ?? null,
-      returnFocus: restore,
-      previouslyFocused: restore ? (restoreTargetRef.current ?? undefined) : null,
-      lockScroll,
-      exempt: exemptRef ? () => exemptRef.current : undefined
-    })
-    scope.activate()
+    attach()
     return () => {
-      scope.deactivate()
+      if (frame !== undefined) cancelAnimationFrame(frame)
+      scope?.deactivate()
     }
   }, [enabled, containerRef, inert, autoFocus, returnFocus, initialFocusRef, exemptRef, lockScroll])
 }
@@ -448,21 +457,17 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
   useEffect(() => {
     updateRequestRef.current += 1
     let stopped = false
-    let attempts = 0
+    let frame: number | undefined
     let cleanupAuto: (() => void) | undefined
+    setIsPositioned(false)
 
     const attach = () => {
       if (stopped) return
       const reference = referenceRef.current
       const floating = floatingRef.current
       if (!enabled || !reference || !floating) {
-        // The overlay outlet commits the layer after this effect.
-        if (enabled && attempts < 8) {
-          attempts += 1
-          queueMicrotask(attach)
-          return
-        }
-        setIsPositioned(false)
+        // Wait for the outlet's commit, which may happen in a later render frame.
+        if (enabled) frame = requestAnimationFrame(attach)
         return
       }
 
@@ -474,6 +479,7 @@ export function useFloating(options: UseFloatingOptions): UseFloatingReturn {
 
     return () => {
       stopped = true
+      if (frame !== undefined) cancelAnimationFrame(frame)
       updateRequestRef.current += 1
       cleanupAuto?.()
     }

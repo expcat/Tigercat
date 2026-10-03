@@ -105,6 +105,10 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       '项上的 `href` 和 schema 的 `path` / `href` / `iframeSrc` 走 `link-utils`。`path` 只作站内路径。危险协议和禁用项不输出 `href`。'
   },
+  Tabs: {
+    notes:
+      '溢出菜单按钮文案走 `locale.tabs.moreTabs`，组件 `labels.moreTabs` 优先于组件 locale、ConfigProvider locale 和 en-US 默认值。'
+  },
   PageHeader: {
     notes: '返回地址走 `Link`，因此同样只接受 `link-utils` 的协议。危险地址不输出 `href`。'
   },
@@ -117,6 +121,10 @@ const COMPONENT_USAGE_NOTES = {
   },
   ContextMenu: {
     notes: '项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。'
+  },
+  Spotlight: {
+    notes:
+      '打开后等待输入节点挂载并自动聚焦。焦点约束、关闭后的焦点返回和滚动锁由共享 focus scope 管理。'
   },
   Modal: {
     notes:
@@ -300,7 +308,7 @@ const COMPONENT_USAGE_NOTES = {
   WorkflowActionBar: {
     uses: ['Button', 'Popconfirm', 'Textarea', 'Dropdown', 'Radio'],
     notes:
-      '完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。`items={[]}` / 空数组回落到 `buttonPolicy`；要覆盖策略请传非空 `items`。'
+      '完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）；确认层锚在真实“更多”按钮，关闭后焦点返回按钮。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。显式 `items` 覆盖 `buttonPolicy`，`items={[]}` / 空数组表示不显示动作。'
   },
   WorkflowViewer: {
     uses: ['Tag'],

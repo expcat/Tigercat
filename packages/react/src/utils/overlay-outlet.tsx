@@ -2,13 +2,14 @@
  * Renders open layers after the provider's children so server HTML and the
  * hydrated tree share one mount point.
  */
-import React, { useContext, useEffect, useId, useRef, useSyncExternalStore } from 'react'
+import React, { useContext, useId, useLayoutEffect, useRef, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { createRenderOutlet, isBrowser, type RenderOutlet } from '@expcat/tigercat-core'
 import { renderOverlayPortal } from './overlay'
 
 const OverlayOutletContext = React.createContext<RenderOutlet<React.ReactNode> | null>(null)
 const OutletRenderContext = React.createContext(false)
+const subscribeRenderPhase = () => () => undefined
 
 /** Parent overlay-host. The root outlet host is not a nesting target. */
 function isNestedOverlayTarget(target: HTMLElement | null | undefined): boolean {
@@ -57,7 +58,17 @@ export function OverlayPortal({
   const insideOutlet = useContext(OutletRenderContext)
   const nestInHost = insideOutlet || isNestedOverlayTarget(target)
   const id = useId()
-  useEffect(() => {
+  const clientRender = useSyncExternalStore(
+    subscribeRenderPhase,
+    () => true,
+    () => false
+  )
+  useLayoutEffect(() => {
+    if (disabled || !outlet || nestInHost) return
+    outlet.upsert(id, children)
+  }, [disabled, outlet, id, nestInHost, children])
+
+  useLayoutEffect(() => {
     if (disabled || !outlet || nestInHost) return
     return () => outlet.remove(id)
   }, [disabled, outlet, id, nestInHost])
@@ -67,7 +78,8 @@ export function OverlayPortal({
   }
 
   if (outlet && !disabled) {
-    outlet.upsert(id, children)
+    // Collect server HTML and its hydration snapshot; browser updates register on commit.
+    if (!clientRender) outlet.upsert(id, children)
     return null
   }
   if (!disabled && isBrowser() && !target) return createPortal(children, document.body)

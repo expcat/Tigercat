@@ -556,6 +556,7 @@ export const koKR: TigerLocale = {
     accentGroup: '강조'
   },
   tabs: {
+    moreTabs: '더 보기',
     addTabAriaLabel: '탭 추가',
     closeTabAriaLabel: '{label} 닫기',
     tablistAriaLabel: '탭'

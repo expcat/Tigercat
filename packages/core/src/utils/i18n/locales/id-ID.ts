@@ -556,6 +556,7 @@ export const idID: TigerLocale = {
     accentGroup: 'Aksen'
   },
   tabs: {
+    moreTabs: 'Lainnya',
     addTabAriaLabel: 'Tambah tab',
     closeTabAriaLabel: 'Tutup {label}',
     tablistAriaLabel: 'Tab'

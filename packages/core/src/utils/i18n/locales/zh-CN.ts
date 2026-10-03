@@ -71,7 +71,7 @@ export const zhCN: TigerLocale = {
   text: {
     copyLabel: '复制',
     copiedLabel: '已复制',
-    copyFailedLabel: '复制失败',
+    copyFailedLabel: '复制失败'
   },
   watermark: {
     imageErrorText: '水印图片加载失败'
@@ -361,7 +361,7 @@ export const zhCN: TigerLocale = {
     finishText: '完成',
     closeAriaLabel: '关闭导览',
     dialogAriaLabel: '导览',
-    loadErrorText: '无法加载这次引导。',
+    loadErrorText: '无法加载这次引导。'
   },
   calendar: {
     previousMonth: '上个月',
@@ -556,6 +556,7 @@ export const zhCN: TigerLocale = {
     accentGroup: '强调色'
   },
   tabs: {
+    moreTabs: '更多',
     addTabAriaLabel: '新增标签页',
     closeTabAriaLabel: '关闭{label}',
     tablistAriaLabel: '标签页'

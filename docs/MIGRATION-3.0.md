@@ -328,6 +328,8 @@ Tooltip 气泡用 `--tiger-text` 作底、`--tiger-surface` 作字，圆角 `--t
 
 ## Menu / Tabs / NavigationMenu
 
+Tabs 溢出按钮文案从 `navLabels.moreTabs` 迁到 `locale.tabs.moreTabs`；全局传 `ConfigProvider locale`，单个实例用 `Tabs labels={{ moreTabs: '更多' }}`（Vue：`:labels="{ moreTabs: '更多' }"`）。删除对 `navLabels.moreTabs` 的直接赋值。覆盖顺序见 [i18n](../skills/tigercat/references/i18n.md#text-resolution)。
+
 垂直菜单根是 `role="menu"`，同一时刻只有一个 Tab 停靠。页签、树和导航的键按类型区分：`1` 与 `"1"` 是不同项。再点已选项保持选中。`NavigationMenu` 的展开值就是 open 状态。关闭的 `Dropdown`、`ContextMenu` 和导航面板不挂到 portal。`Anchor` 当前项是 `aria-current="location"`。Tailwind 的 `aria-current:` 只匹配 `"true"`，当前项颜色用 `aria-[current=location]:`。
 
 ## Layout

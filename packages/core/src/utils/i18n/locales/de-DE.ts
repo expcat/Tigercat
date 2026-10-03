@@ -557,6 +557,7 @@ export const deDE: TigerLocale = {
     accentGroup: 'Akzent'
   },
   tabs: {
+    moreTabs: 'Mehr',
     addTabAriaLabel: 'Tab hinzufügen',
     closeTabAriaLabel: '{label} schließen',
     tablistAriaLabel: 'Registerkarten'

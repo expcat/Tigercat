@@ -40,7 +40,6 @@ import {
   formatTabKey,
   parseTabKey,
   resolveDisplayedActiveKey,
-  navLabels,
   resolveTabListOverflow,
   isTabPaneType,
   isTabPaneChildProps,
@@ -704,7 +703,7 @@ export const Tabs = defineComponent({
                 })),
                 onSelect: (item: PopupMenuItem) => handleTabClick(item.key)
               },
-              { default: () => navLabels.moreTabs }
+              { default: () => labels.value.moreTabs }
             )
           : null,
         ...tabRecords

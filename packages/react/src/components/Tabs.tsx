@@ -34,7 +34,6 @@ import {
   formatTabKey,
   parseTabKey,
   resolveDisplayedActiveKey,
-  navLabels,
   resolveTabListOverflow,
   tabActivationSelectsOnArrow,
   isTabPaneType,
@@ -44,7 +43,6 @@ import {
   getTabsLabels,
   type TabActivation,
   type TabRecord,
-  type TabIndicatorStyle,
   type TigerLocale,
   type TigerLocaleTabs,
   type TabType,
@@ -633,7 +631,7 @@ export const Tabs: React.FC<TabsProps> = ({
           }))}
           onItemSelect={(item) => handleTabClick(item.key)}>
           <button type="button" data-tiger-tabs-more="">
-            {navLabels.moreTabs}
+            {labels.moreTabs}
           </button>
         </Dropdown>
       ) : null}

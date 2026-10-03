@@ -25,7 +25,7 @@ export const enUS: TigerLocale = {
     confirmTitle: 'Are you sure you want to continue?',
     loadingFinishedText: 'Loading finished',
     loadingFailedText: 'Loading failed',
-    viewText: 'View',
+    viewText: 'View'
   },
   empty: {
     noData: 'No data',
@@ -556,6 +556,7 @@ export const enUS: TigerLocale = {
     accentGroup: 'Accent'
   },
   tabs: {
+    moreTabs: 'More',
     addTabAriaLabel: 'Add tab',
     closeTabAriaLabel: 'Close {label}',
     tablistAriaLabel: 'Tabs'

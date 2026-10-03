@@ -15,6 +15,8 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/tabs/` and `examples/example/react/src/examples/tabs/`.
 
+Note: 溢出菜单按钮文案走 `locale.tabs.moreTabs`，组件 `labels.moreTabs` 优先于组件 locale、ConfigProvider locale 和 en-US 默认值。
+
 Vue: `<Tabs v-model:active-key="activeKey"><TabPane :tab-key="1" label="Overview">Panel</TabPane></Tabs>`
 
 React: `<Tabs activeKey={activeKey}><TabPane tabKey={1} label="Overview">Panel</TabPane></Tabs>`

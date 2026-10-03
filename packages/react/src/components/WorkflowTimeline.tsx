@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   assertWorkflowActionComment,
   buildWorkflowActionPayload,
@@ -16,7 +16,6 @@ import {
   sortWorkflowActionBarItems,
   resolveWorkflowSignMode,
   resolveWorkflowStepKind,
-  shouldConfirmWorkflowAction,
   shouldOpenWorkflowActionLayer,
   shouldShowWorkflowActionCommentInput,
   shouldShowWorkflowActions,
@@ -304,7 +303,12 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
   )
   const [drafts, setDrafts] = useState<Record<string, ActionDraft>>({})
   const [moreItem, setMoreItem] = useState<WorkflowActionBarItem | null>(null)
-  const moreWrapRef = useRef<HTMLDivElement>(null)
+  const moreButtonRef = useRef<HTMLButtonElement>(null)
+  const wasConfirmingMore = useRef(false)
+  useLayoutEffect(() => {
+    if (!moreItem && wasConfirmingMore.current) moreButtonRef.current?.focus()
+    wasConfirmingMore.current = Boolean(moreItem)
+  }, [moreItem])
 
   const disableOptions = {
     barDisabled: disabled,
@@ -569,6 +573,12 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       workflowActionNeedsPicker(moreItem.action) != null ||
       (moreItem.action === 'addsign' && positions.length > 1))
 
+  const moreButton = (
+    <Button ref={moreButtonRef} size="sm" variant="outline">
+      {moreLabel ?? stepLabels.moreActions}
+    </Button>
+  )
+
   return (
     <div
       {...rest}
@@ -578,11 +588,29 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       aria-label={ariaLabel ?? ariaLabelAttr ?? stepLabels.actionsAriaLabel}>
       {bar.map((item) => renderBarButton(item))}
       {more.length > 0 ? (
-        <div ref={moreWrapRef} className="relative inline-flex">
+        moreItem ? (
+          <Popconfirm
+            open
+            asChild
+            onOpenChange={(open) => {
+              if (!open) setMoreItem(null)
+            }}
+            title={moreConfirmCopy?.title}
+            description={moreExtra ? undefined : moreConfirmCopy?.description}
+            descriptionContent={
+              moreExtra ? renderPickerFields(moreItem, moreConfirmCopy?.description) : undefined
+            }
+            okType={moreConfirmCopy?.okType}
+            icon={moreConfirmCopy?.icon}
+            placement="top-end"
+            onConfirm={(event) => {
+              if (emitReadyAction(moreItem, event)) setMoreItem(null)
+            }}>
+            {moreButton}
+          </Popconfirm>
+        ) : (
           <Dropdown asChild>
-            <Button size="sm" variant="outline">
-              {moreLabel ?? stepLabels.moreActions}
-            </Button>
+            {moreButton}
             <DropdownMenu>
               {more.map((item) => {
                 const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
@@ -610,32 +638,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
               })}
             </DropdownMenu>
           </Dropdown>
-          {moreItem ? (
-            <Popconfirm
-              open
-              asChild
-              onOpenChange={(open) => {
-                if (!open) {
-                  setMoreItem(null)
-                  const trigger = moreWrapRef.current?.querySelector('button')
-                  trigger?.focus()
-                }
-              }}
-              title={moreConfirmCopy?.title}
-              description={moreExtra ? undefined : moreConfirmCopy?.description}
-              descriptionContent={
-                moreExtra ? renderPickerFields(moreItem, moreConfirmCopy?.description) : undefined
-              }
-              okType={moreConfirmCopy?.okType}
-              icon={moreConfirmCopy?.icon}
-              placement="top-end"
-              onConfirm={(event) => {
-                if (emitReadyAction(moreItem, event)) setMoreItem(null)
-              }}>
-              <span className="pointer-events-none absolute inset-0" aria-hidden="true" />
-            </Popconfirm>
-          ) : null}
-        </div>
+        )
       ) : null}
     </div>
   )

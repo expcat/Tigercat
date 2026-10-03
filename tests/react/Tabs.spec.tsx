@@ -12,6 +12,46 @@ import { zhTW } from '../../packages/core/src/utils/i18n/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Tabs', () => {
+  it('localizes overflow copy through provider, component locale, and labels', async () => {
+    const width = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(100)
+    const rect = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue(DOMRect.fromRect({ width: 100, height: 32 }))
+    const panes = [
+      <TabPane key="a" tabKey="a" label="Overview">
+        A
+      </TabPane>,
+      <TabPane key="b" tabKey="b" label="Details">
+        B
+      </TabPane>
+    ]
+    try {
+      const { rerender } = render(
+        <ConfigProvider locale={zhCN}>
+          <Tabs>{panes}</Tabs>
+        </ConfigProvider>
+      )
+      expect(await screen.findByRole('button', { name: '更多', exact: true })).toBeInTheDocument()
+      rerender(
+        <ConfigProvider locale={zhCN}>
+          <Tabs locale={{ tabs: { moreTabs: 'Other tabs' } }}>{panes}</Tabs>
+        </ConfigProvider>
+      )
+      expect(await screen.findByRole('button', { name: 'Other tabs' })).toBeInTheDocument()
+      rerender(
+        <ConfigProvider locale={zhCN}>
+          <Tabs locale={{ tabs: { moreTabs: 'Other tabs' } }} labels={{ moreTabs: 'All pages' }}>
+            {panes}
+          </Tabs>
+        </ConfigProvider>
+      )
+      expect(await screen.findByRole('button', { name: 'All pages' })).toBeInTheDocument()
+    } finally {
+      rect.mockRestore()
+      width.mockRestore()
+    }
+  })
+
   describe('Rendering', () => {
     it('should render with default props', () => {
       render(

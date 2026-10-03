@@ -556,6 +556,7 @@ export const thTH: TigerLocale = {
     accentGroup: 'เน้น'
   },
   tabs: {
+    moreTabs: 'เพิ่มเติม',
     addTabAriaLabel: 'เพิ่มแท็บ',
     closeTabAriaLabel: 'ปิด {label}',
     tablistAriaLabel: 'แท็บ'

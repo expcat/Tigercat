@@ -244,11 +244,13 @@ describe('Spotlight (Vue)', () => {
           ])
       }
     })
-    const { getByRole } = render(App)
+    const { getByRole } = render({
+      setup: () => () => h(ConfigProvider, null, () => h(App))
+    })
     const opener = getByRole('button', { name: 'Before' })
     opener.focus()
     await fireEvent.click(opener)
-    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+    await waitFor(() => expect(getByRole('combobox')).toHaveFocus())
     await fireEvent.keyDown(document, { key: 'Escape' })
     await waitFor(() => {
       expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
