@@ -1,6 +1,6 @@
 # Tigercat 迁移指南
 
-## v3.0.0-preview.7
+## v3.0.0-preview.8
 
 从 2.x 改到 3.0 的调用点在终稿 [MIGRATION-3.0.md](MIGRATION-3.0.md)。3.0 不向前兼容。按公开组件列出要换的导入和 prop。组件的完整写法在 `skills/tigercat` 和 `examples`。
 

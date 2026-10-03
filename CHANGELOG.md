@@ -4,6 +4,10 @@
 
 ## 未发布
 
+## v3.0.0-preview.8（2026-10-03）
+
+3.0 preview 阶段的调整见下列条目；从 2.x 迁移见 [MIGRATION-3.0.md](docs/MIGRATION-3.0.md)。
+
 - **React 浮层生命周期**：OverlayPortal 在提交阶段注册、更新，并在卸载时移除，StrictMode 重放后仍保留打开的层；SSR 与 hydration 继续共用 outlet 内容。共享定位与焦点适配器等待节点实际挂载，关闭、卸载时取消等待，覆盖 Modal、Drawer、菜单与选择器等调用方。
 - **WorkflowActionBar（Vue / React）**：更多菜单与确认层使用真实“更多”按钮作为触发器，删除空 span 锚点。取消、Escape 或确认成功后焦点返回按钮。
 - **Spotlight（Vue / React）**：聚焦、焦点返回和滚动锁统一交给共享 focus scope；输入节点挂载后自动聚焦，修复 Vue outlet 延迟挂载时漏聚焦。
