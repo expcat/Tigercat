@@ -21,7 +21,6 @@ import {
   readTableRowKeyValue,
   tableHeaderBackgroundClasses,
   tableRowKeyId,
-  tableVirtualSpacerCellClasses,
   TABLE_FIXED_CELL_Z_INDEX,
   TABLE_FIXED_HEADER_Z_INDEX
 } from './table-utils'

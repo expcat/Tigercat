@@ -224,17 +224,19 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
   const handleLinkClick = useCallback(
     (href: string, event: React.MouseEvent, targetAttr?: string) => {
       const hasTargetElement = Boolean(getAnchorTargetElement(href))
-      if (
-        !shouldHandleAnchorClick(event.nativeEvent, {
-          target: targetAttr,
-          hasTargetElement
-        })
-      ) {
-        onClick?.(event, href)
+      const canHandle = shouldHandleAnchorClick(event.nativeEvent, {
+        target: targetAttr,
+        hasTargetElement
+      })
+      onClick?.(event, href)
+      if (event.defaultPrevented) {
+        // Caller owns navigation (e.g. switches tabs); still reflect the click
+        // intent so the highlight can follow once external state settles.
+        applyActive(href)
         return
       }
+      if (!canHandle) return
       event.preventDefault()
-      onClick?.(event, href)
       const finalHref = applyActive(href)
       scrollLockRef.current.lock()
       scrollTo(finalHref)
@@ -242,6 +244,16 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
     },
     [applyActive, onClick, scrollTo]
   )
+
+  // Re-resolve the highlight when the consumer's getCurrentAnchor changes
+  // identity (e.g. an external tab switch), so consumers do not have to
+  // remount the anchor to sync aria-current.
+  const activeLinkRef = useRef(activeLink)
+  activeLinkRef.current = activeLink
+  useEffect(() => {
+    if (!getCurrentAnchor) return
+    applyActive(activeLinkRef.current)
+  }, [getCurrentAnchor, applyActive])
 
   const resolved = resolveScrollRoot(getContainer, { from: anchorRef.current })
   const resolvedKey = resolved.isWindow ? 'window' : resolved.target

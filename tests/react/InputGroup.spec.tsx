@@ -83,7 +83,7 @@ describe('InputGroup', () => {
     expect(group.className).not.toContain('[&>*:focus]:z-10')
   })
 
-  it('joins compact Input chrome on the group-child root, not a nested capsule', () => {
+  it('joins compact Input chrome inside its stable group-child host', () => {
     render(
       <InputGroup compact aria-label="Query">
         <Input aria-label="q" />
@@ -96,9 +96,10 @@ describe('InputGroup', () => {
     const input = screen.getByLabelText('q')
 
     expect(group.className).toContain(':first-child:not(:last-child)')
-    expect(first).toBe(input.parentElement)
-    expect(first).toHaveAttribute('data-tiger-chrome')
-    expect(first.className).toContain('border')
+    const chrome = input.parentElement!
+    expect(first).toBe(chrome.parentElement)
+    expect(chrome).toHaveAttribute('data-tiger-chrome')
+    expect(chrome.className).toContain('border')
     expect(input.className).not.toContain('rounded-[var(--tiger-radius-md')
     expect(last.tagName).toBe('BUTTON')
   })

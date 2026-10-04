@@ -109,11 +109,11 @@ export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
       return
     }
 
-    onClick?.(event)
-
     if (context?.closeOnClick) {
       context.handleItemClick()
     }
+
+    onClick?.(event)
   }
 
   const itemClasses = classNames(getContextMenuItemClasses(disabled, divided), className)
@@ -350,7 +350,9 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
       </button>
       {isExpanded ? (
         portalEnabled ? (
-          <OverlayPortal target={overlay.target}>{popup}</OverlayPortal>
+          <OverlayPortal target={overlay.target}>
+            <ContextMenuContext.Provider value={context}>{popup}</ContextMenuContext.Provider>
+          </OverlayPortal>
         ) : (
           popup
         )
@@ -595,7 +597,11 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         })}
         {menuWrapperNode ? (
           portal ? (
-            <OverlayPortal target={overlay.target}>{menuWrapperNode}</OverlayPortal>
+            <OverlayPortal target={overlay.target}>
+              <ContextMenuContext.Provider value={contextValue}>
+                {menuWrapperNode}
+              </ContextMenuContext.Provider>
+            </OverlayPortal>
           ) : (
             menuWrapperNode
           )

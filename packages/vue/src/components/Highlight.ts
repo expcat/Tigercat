@@ -1,27 +1,13 @@
-import {
-  Comment,
-  Fragment,
-  Text,
-  cloneVNode,
-  defineComponent,
-  h,
-  isVNode,
-  PropType,
-  type VNode,
-  type VNodeChild
-} from 'vue'
+import { Comment, defineComponent, h, PropType, type VNode, type VNodeChild } from 'vue'
 import {
   classNames,
   coerceClassValue,
-  findHighlightRanges,
   getHighlightMarkClasses,
   getHighlightRootClasses,
   getHighlightSegments,
   mergeStyleValues,
   resolveHighlightText,
-  sliceTextByHighlightRanges,
   type HighlightKeywords,
-  type HighlightRange,
   type StyleValue
 } from '@expcat/tigercat-core'
 
@@ -78,55 +64,6 @@ function renderMark(text: string, markClasses: string, markStyle: StyleValue | u
     },
     text
   )
-}
-
-function highlightVueNode(
-  input: unknown,
-  ranges: HighlightRange[],
-  offset: { value: number },
-  markClasses: string,
-  markStyle: StyleValue | undefined
-): VNodeChild {
-  if (input == null || typeof input === 'boolean') return null
-  if (typeof input === 'string' || typeof input === 'number') {
-    const text = String(input)
-    const pieces = sliceTextByHighlightRanges(text, offset.value, ranges)
-    offset.value += text.length
-    if (pieces.length === 1 && !pieces[0].highlighted) return text
-    return pieces.map((piece) =>
-      piece.highlighted ? renderMark(piece.text, markClasses, markStyle) : piece.text
-    )
-  }
-  if (Array.isArray(input)) {
-    return input.map((item) => highlightVueNode(item, ranges, offset, markClasses, markStyle))
-  }
-  if (!isVNode(input)) return null
-  if (input.type === Comment) return input
-  if (input.type === Text) {
-    return highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
-  }
-  if (input.type === Fragment) {
-    return highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
-  }
-  if (typeof input.children === 'string' || typeof input.children === 'number') {
-    const highlighted = highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
-    return h(input.type as string, input.props ?? undefined, highlighted ?? undefined)
-  }
-  if (Array.isArray(input.children)) {
-    const highlighted = highlightVueNode(input.children, ranges, offset, markClasses, markStyle)
-    if (typeof input.type === 'string') {
-      return h(input.type, input.props ?? undefined, highlighted ?? undefined)
-    }
-    return cloneVNode(input, null, true)
-  }
-  if (input.children && typeof input.children === 'object') {
-    const slots = input.children as { default?: () => unknown }
-    if (typeof slots.default === 'function') {
-      const highlighted = highlightVueNode(slots.default(), ranges, offset, markClasses, markStyle)
-      return h(input.type as never, input.props, () => highlighted)
-    }
-  }
-  return input
 }
 
 export const Highlight = defineComponent({

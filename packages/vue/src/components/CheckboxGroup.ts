@@ -147,7 +147,6 @@ export const CheckboxGroup = markFormItemGroupControl(
             : undefined,
           formItemControl?.describedBy.value
         )
-        const status = props.status ?? formItemControl?.status.value ?? 'default'
 
         return h(
           'div',

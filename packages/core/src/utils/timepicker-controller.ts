@@ -15,7 +15,6 @@ import {
   generateHours,
   generateMinutes,
   generateSeconds,
-  getTimePeriodLabels,
   isTimeInRange,
   padTwo,
   parseTime,
@@ -193,8 +192,7 @@ export const timePickerMissingStartReason = 'Choose a start time.'
 export const timePickerMissingEndReason = 'Choose an end time.'
 
 export type TimePickerAcceptResult =
-  | { ok: true; value: string | null | TimePickerRangeTuple }
-  | { ok: false; reason: string }
+  { ok: true; value: string | null | TimePickerRangeTuple } | { ok: false; reason: string }
 
 export function acceptTimePickerValue(
   range: boolean,
@@ -738,5 +736,3 @@ export function snapTimeColumnScroll(scrollTop: number, itemHeight: number): num
   if (!Number.isFinite(itemHeight) || itemHeight <= 0 || !Number.isFinite(scrollTop)) return 0
   return Math.max(0, Math.round(scrollTop / itemHeight) * itemHeight)
 }
-
-

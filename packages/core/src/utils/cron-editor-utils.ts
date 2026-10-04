@@ -56,10 +56,15 @@ export const cronEditorBaseClasses = classNames(
   'inline-flex w-full flex-col gap-3 rounded-[var(--tiger-radius-md)] border p-3',
   'border-[var(--tiger-border)]/30',
   'bg-[var(--tiger-surface)]',
-  'text-[var(--tiger-text)]'
+  'text-[var(--tiger-text)] [&_[data-tiger-cron-summary]]:[overflow-wrap:anywhere]'
 )
 
-export const cronEditorFieldsClasses = 'grid gap-2 md:grid-cols-5'
+/**
+ * Fields track the container, not the viewport: in a narrow drawer the
+ * five fields reflow to fewer columns so each mode select stays readable.
+ */
+export const cronEditorFieldsClasses =
+  'grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))]'
 
 export const cronEditorFieldClasses = classNames(
   'flex min-w-0 flex-col gap-2 rounded-[var(--tiger-radius-md)] border p-2',

@@ -21,8 +21,6 @@ import {
   sliderGetPercentage,
   sliderGetValueFromClientX,
   sliderGetKeyboardValue,
-  sliderGetValueFromClientY,
-  sliderPushApartRange,
   formatSliderTooltip,
   sliderResolveMarks,
   sliderValuesEqual,

@@ -154,10 +154,6 @@ export function menuSchemaToMenuItems(nodes: readonly MenuSchemaNode[]): MenuIte
   return nodes.map(schemaNodeToMenuItem)
 }
 
-function isNonEmptyString(value: string | undefined): value is string {
-  return value != null && value !== ''
-}
-
 function isRoutableNode(node: MenuSchemaNode): boolean {
   if (isDividerNode(node) || isGroupNode(node)) return false
   return safeInternalPath(node.path) != null || resolveLinkHref(node.iframeSrc) != null

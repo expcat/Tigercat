@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-preview.8",
+  "version": "3.0.0-preview.9",
   "commit": "",
   "algorithm": "sha256",
   "files": {
@@ -210,7 +210,7 @@
     "skills/tigercat/references/release.md": "ac76f12cd2d9c69554033279d59e71c25afd9fe64947b6ec961005b5ec1b4f9f",
     "skills/tigercat/references/shared/api-summary.md": "dacfe3de7595bc39ea21d0834e387ee8f9c2a8acdc1d850734468bd3289d6565",
     "skills/tigercat/references/shared/glossary.md": "083dcc7d07a7611fb5d720612e9efb2291e3f8d83ba5617242e831a1dd1b27b3",
-    "skills/tigercat/references/shared/patterns/common.md": "155a9026009cd08a3881fa62cc2106b84493ee82b0f68c4017737fbcde71eab1",
+    "skills/tigercat/references/shared/patterns/common.md": "071aafa44d0e752074e5dcbb192e9c8d2471dcc2e98a608826a669c1e9c84733",
     "skills/tigercat/references/shared/props/activity-feed.md": "a52159d4db67f0ef2b3f3b54d9f5665ac5672ef06a6ebc7fd61e1a84d9cf7117",
     "skills/tigercat/references/shared/props/advanced.md": "ccbb4224c7d4369a8ead710b783a0f8ec61fa5478be3cc5cbc6a1f3b4285a015",
     "skills/tigercat/references/shared/props/affix.md": "404bf249e67b21c62a7de2a2613d35668fcad4450ed75f4bcb2e2e3a083ee700",

@@ -12,7 +12,6 @@ import {
   classNames,
   mergeTigerLocale,
   captureActiveElement,
-  focusFirst,
   restoreFocus,
   tourPopoverClasses,
   tourTitleClasses,

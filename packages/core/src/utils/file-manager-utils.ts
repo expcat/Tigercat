@@ -92,6 +92,7 @@ export function fileKeyEquals(item: FileItem, segment: string | number): boolean
   return item.key === segment
 }
 
+// eslint-disable-next-line no-control-regex -- Display names must not contain hidden control characters.
 const BIDI_AND_BREAKS = /[\u0000-\u001F\u007F\u200E\u200F\u202A-\u202E\u2066-\u2069\u2028\u2029]/g
 
 /** Strip bidi controls and line breaks so a name cannot disguise the path. */

@@ -2,8 +2,9 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
 import { DatePicker } from '@expcat/tigercat-vue/DatePicker'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -14,6 +15,26 @@ import { expectNoA11yViolations } from '../utils'
 const june = new Date(2024, 5, 15)
 
 describe('DatePicker', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+  afterEach(() => vi.restoreAllMocks())
+
+  it.each([false, true])('restores the input after Escape (range=%s)', async (range) => {
+    render(DatePicker, { props: { range, now: june } })
+    const input = screen.getByRole('textbox')
+    await userEvent.click(screen.getByLabelText('Toggle calendar'))
+    const panel = await screen.findByRole('dialog')
+    const day = panel.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]')!
+    day.focus()
+    expect(day).toHaveFocus()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(input).toHaveFocus())
+    expect(input).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
   it('renders a closed field with the locale placeholder', () => {
     const { container } = render(DatePicker)
     expect(container.querySelector('input')).toHaveAttribute('placeholder', 'Select date')

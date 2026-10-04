@@ -156,7 +156,7 @@ function PortaledOverlayLayer({
 }
 
 function wrapOverlayLayer(node: React.ReactNode, target: HTMLElement | null): React.ReactElement {
-  return createElement(PortaledOverlayLayer, { target }, node)
+  return createElement(PortaledOverlayLayer, { target, children: node })
 }
 
 export function renderBodyPortal(node: React.ReactNode, disabled = false): React.ReactNode {
@@ -515,6 +515,7 @@ export interface UseAnchoredOverlayOptions {
   dismissOnOutside?: boolean
   dismissOnEscape?: boolean
   restoreFocusOnDismiss?: boolean
+  restoreFocusRef?: React.RefObject<HTMLElement | null>
   arrowRef?: React.RefObject<HTMLElement | null>
   onDismiss?: (reason: AnchoredOverlayDismissReason) => void
   /** Bust positioning when a virtual reference moves without changing identity. */
@@ -558,6 +559,7 @@ export function useAnchoredOverlay({
   dismissOnOutside = false,
   dismissOnEscape = false,
   restoreFocusOnDismiss = false,
+  restoreFocusRef,
   arrowRef,
   onDismiss,
   revision
@@ -612,10 +614,13 @@ export function useAnchoredOverlay({
     (reason: AnchoredOverlayDismissReason) => {
       onDismiss?.(reason)
       if (restoreFocusOnDismiss && reason === 'escape') {
-        window.setTimeout(() => restoreFocus(referenceRef.current, { preventScroll: true }), 0)
+        window.setTimeout(
+          () => restoreFocus((restoreFocusRef ?? referenceRef).current, { preventScroll: true }),
+          0
+        )
       }
     },
-    [onDismiss, referenceRef, restoreFocusOnDismiss]
+    [onDismiss, referenceRef, restoreFocusOnDismiss, restoreFocusRef]
   )
 
   const dismissOutside = useCallback(() => dismiss('outside'), [dismiss])

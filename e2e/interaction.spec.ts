@@ -10,6 +10,7 @@ for (const { framework, baseUrl } of exampleApps) {
       await preview.getByRole('button', { name: '编辑资料', exact: true }).click()
       const dialog = preview.getByRole('dialog').filter({ hasText: '编辑资料' })
       await expect(dialog).toBeVisible()
+      await revealDemoIframe(moduleRoot)
 
       const initialDialogBox = await dialog.boundingBox()
       await dialog.locator('[aria-haspopup="listbox"]').click()

@@ -86,7 +86,7 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   })
 
   const currentVisible = computed(() => {
-    version.value
+    void version.value
     return controller.getOpen()
   })
 

@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, onBeforeUnmount, PropType, ref, useId } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, PropType, ref } from 'vue'
 import {
   classNames,
   coerceClassValue,

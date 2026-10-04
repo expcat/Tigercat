@@ -8,6 +8,12 @@ export const notificationCenterReadItemClasses =
   'border-s-[3px] border-s-transparent -ms-[3px] ps-[calc(0.875rem-3px)]'
 export const notificationCenterReadTitleClasses = 'text-[var(--tiger-text-secondary)]'
 export const notificationCenterUnreadTitleClasses = 'text-[var(--tiger-text)]'
+/**
+ * Title row: the timestamp wraps to its own line on narrow screens instead
+ * of crushing the title into a one-character column.
+ */
+export const notificationCenterItemHeadClasses =
+  'flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5'
 export const notificationCenterUnreadDotClasses =
   'tiger-motion-aware w-1.5 h-1.5 rounded-full bg-[var(--tiger-primary)] shrink-0 shadow-sm animate-pulse'
 export const notificationCenterTimeClasses =

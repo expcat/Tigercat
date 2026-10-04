@@ -606,16 +606,6 @@ export const AreaChart = defineComponent({
                     label: props.yAxisLabel
                   })
                 : null,
-              trackPointHover
-                ? h('rect', {
-                    width: innerRect.value.width,
-                    height: innerRect.value.height,
-                    fill: 'transparent',
-                    'data-plot-hit': '',
-                    onMousemove: handlePlotMouseMove,
-                    onMouseleave: handlePointMouseLeave
-                  })
-                : null,
               // Layer 1: area fills + line strokes (reverse order for proper stacking visual)
               ...reversedSeriesData.map((sd) =>
                 h(
@@ -759,7 +749,19 @@ export const AreaChart = defineComponent({
                       })
                     })
                   )
-                )
+                ),
+              // Topmost transparent hit layer: the whole plot reports the same
+              // nearest-point hover regardless of fills below (React parity).
+              trackPointHover
+                ? h('rect', {
+                    width: innerRect.value.width,
+                    height: innerRect.value.height,
+                    fill: 'transparent',
+                    'data-plot-hit': '',
+                    onMousemove: handlePlotMouseMove,
+                    onMouseleave: handlePointMouseLeave
+                  })
+                : null
             ].filter(Boolean)
         }
       )

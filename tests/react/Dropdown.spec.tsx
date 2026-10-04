@@ -1,8 +1,7 @@
 /**
  * @vitest-environment happy-dom
  */
-
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-react/Dropdown'
@@ -11,6 +10,16 @@ import React from 'react'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Dropdown', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('renders trigger and menu content', () => {
     render(
       <Dropdown>

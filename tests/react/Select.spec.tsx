@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useRef } from 'react'
@@ -36,6 +36,12 @@ function getCombobox(container: HTMLElement) {
 }
 
 describe('Select', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+  afterEach(() => vi.restoreAllMocks())
   it('exposes data-state on the combobox', async () => {
     const { container } = render(<Select options={testOptions} aria-label="Fruit" />)
     const trigger = getCombobox(container)

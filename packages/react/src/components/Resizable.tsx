@@ -13,7 +13,6 @@ import {
   getResizeHandleOrientation,
   getResizeKeyboardDelta,
   getResizableLabels,
-  isCornerResizeHandle,
   isSplitterRtl,
   mergeResizableBoxStyle,
   resizableBaseClasses,

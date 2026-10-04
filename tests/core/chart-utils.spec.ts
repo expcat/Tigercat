@@ -168,6 +168,26 @@ describe('chart-utils', () => {
   // ==========================================================================
 
   describe('getChartAxisTicks', () => {
+    it('samples ordinal domains by tick count while explicit values keep priority', () => {
+      const domain = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+      for (const scale of [createPointScale(domain, [0, 100]), createBandScale(domain, [0, 100])]) {
+        expect(getChartAxisTicks(scale, { tickCount: 3 }).map((tick) => tick.value)).toEqual([
+          'a',
+          'd',
+          'g'
+        ])
+        expect(getChartAxisTicks(scale, { tickCount: 2.5 }).map((tick) => tick.value)).toEqual([
+          'a',
+          'g'
+        ])
+        expect(getChartAxisTicks(scale, { tickCount: 0.5 }).map((tick) => tick.value)).toEqual([
+          'a'
+        ])
+        expect(
+          getChartAxisTicks(scale, { tickCount: 2, tickValues: domain }).map((tick) => tick.value)
+        ).toEqual(domain)
+      }
+    })
     it('generates linear ticks', () => {
       const scale = createLinearScale([0, 100], [0, 200])
       const ticks = getChartAxisTicks(scale, { tickCount: 5 })

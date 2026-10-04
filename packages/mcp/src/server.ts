@@ -504,11 +504,6 @@ function stringArg(value: unknown): string {
   return value
 }
 
-function optionalStringArg(value: unknown): string | undefined {
-  if (value === undefined) return undefined
-  return stringArg(value)
-}
-
 function frameworkArg(value: unknown): TigercatFramework | undefined {
   if (value === undefined) return undefined
   if (value === 'react' || value === 'vue') return value

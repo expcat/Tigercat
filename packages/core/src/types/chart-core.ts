@@ -481,7 +481,9 @@ export interface ChartAxisProps {
   scale: ChartScale
 
   /**
-   * Number of ticks (only for linear scale)
+   * Number of ticks. Linear scales receive evenly spaced numeric ticks;
+   * point/band scales sample the domain down to about this many entries,
+   * keeping the first and last values.
    * @default 5
    */
   ticks?: number

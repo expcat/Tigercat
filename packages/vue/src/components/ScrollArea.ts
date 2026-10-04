@@ -41,7 +41,6 @@ import {
   readInlineDirection,
   readScrollAreaMetrics,
   resolveScrollAreaViewportTabIndex,
-  scrollAreaHasFocusable,
   scrollAreaRootClasses,
   shouldRenderScrollAreaScrollbar,
   SCROLL_AREA_MIN_THUMB_SIZE,

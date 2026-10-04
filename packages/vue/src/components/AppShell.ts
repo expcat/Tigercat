@@ -14,6 +14,8 @@ import { PageHeader } from './PageHeader'
 import { Breadcrumb, BreadcrumbItem } from './Breadcrumb'
 import { Tabs, TabPane } from './Tabs'
 
+export type VueAppShellProps = InstanceType<typeof AppShell>['$props']
+
 export const AppShell = defineComponent({
   name: 'TigerAppShell',
   props: {

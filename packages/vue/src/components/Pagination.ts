@@ -523,7 +523,11 @@ export const Pagination = defineComponent({
               localeCode.value
             )
         elements.push(
-          h('span', { class: classNames('mx-2', getSizeTextClasses(size)) }, indicatorText)
+          h(
+            'span',
+            { class: classNames('mx-2 whitespace-nowrap', getSizeTextClasses(size)) },
+            indicatorText
+          )
         )
       } else {
         getPageNumbers(page, pages, props.showLessItems).forEach((pageNum, tokenIndex, tokens) => {

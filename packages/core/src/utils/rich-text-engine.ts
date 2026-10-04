@@ -22,7 +22,6 @@
  * keeps current behaviour 1:1.
  */
 import {
-  defaultToolbar,
   mapToolbarAction,
   canonicalizeUrl,
   cappedBitmapDataUrl,

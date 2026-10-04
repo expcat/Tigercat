@@ -1,4 +1,4 @@
-import type { axe as runAxe, AxeResults } from 'jest-axe'
+import type { axe, AxeResults, axe as runAxe } from 'jest-axe'
 import { expect } from 'vitest'
 
 type AxeOptions = NonNullable<Parameters<typeof runAxe>[1]>

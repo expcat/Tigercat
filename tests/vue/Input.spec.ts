@@ -15,6 +15,21 @@ import {
 } from '../utils'
 
 describe('Input', () => {
+  it('preserves the input, value and focus when error and count appear or disappear', async () => {
+    const { rerender } = render(Input, { props: { modelValue: 'draft' } })
+    const input = screen.getByRole('textbox')
+    await userEvent.click(input)
+    await rerender({ status: 'error', errorMessage: 'Invalid', showCount: true })
+    expect(screen.getByText('Invalid')).toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBe(input)
+    expect(input).toHaveFocus()
+    expect(input).toHaveValue('draft')
+    await rerender({ status: 'default', errorMessage: undefined, showCount: false })
+    expect(screen.queryByText('Invalid')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBe(input)
+    expect(input).toHaveFocus()
+    expect(input).toHaveValue('draft')
+  })
   describe('Rendering', () => {
     it('should render with placeholder', () => {
       const { getByPlaceholderText } = renderWithProps(Input, {
@@ -141,7 +156,7 @@ describe('Input', () => {
       const { container } = render(Input, {
         props: { status: 'error' }
       })
-      const wrapper = container.firstChild as HTMLElement
+      const wrapper = container.querySelector('[data-tiger-chrome]') as HTMLElement
       const input = container.querySelector('input')
       expect(wrapper.className).toContain('--tiger-error')
       expect(input?.className).not.toContain('border-[var(--tiger-error')
@@ -151,7 +166,7 @@ describe('Input', () => {
       const { container } = render(Input, {
         props: { placeholder: 'Search' }
       })
-      const wrapper = container.firstChild as HTMLElement
+      const wrapper = container.querySelector('[data-tiger-chrome]') as HTMLElement
       const input = container.querySelector('input')!
 
       expect(wrapper.className).toContain('rounded-[var(--tiger-radius-md)]')
@@ -594,7 +609,7 @@ describe('Input', () => {
 
       await rerender({ status: 'error' })
 
-      const wrapper = container.firstChild as HTMLElement
+      const wrapper = container.querySelector('[data-tiger-chrome]') as HTMLElement
       // The shake class should be applied
       expect(wrapper.className).toContain('tiger-animate-shake')
     })
@@ -604,7 +619,7 @@ describe('Input', () => {
         props: { status: 'error' }
       })
 
-      const wrapper = container.firstChild as HTMLElement
+      const wrapper = container.querySelector('[data-tiger-chrome]') as HTMLElement
 
       // Simulate animation end
       await fireEvent.animationEnd(wrapper)

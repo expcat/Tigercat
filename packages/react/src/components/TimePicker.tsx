@@ -54,6 +54,7 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
       dismissOnOutside: true,
       dismissOnEscape: true,
       restoreFocusOnDismiss: true,
+      restoreFocusRef: ctx.inputRef,
       getContainer: ctx.getPopupContainer,
       onDismiss: () => ctx.setOpenSafe(false)
     })

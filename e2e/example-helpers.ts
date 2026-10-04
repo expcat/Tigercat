@@ -50,7 +50,7 @@ export async function openDemo(
       }
       node = node.parentElement
     }
-    document.scrollingElement && (document.scrollingElement.scrollTop -= overlap)
+    if (document.scrollingElement) document.scrollingElement.scrollTop -= overlap
   })
   try {
     await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })

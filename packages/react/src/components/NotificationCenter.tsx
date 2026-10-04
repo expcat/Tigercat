@@ -23,6 +23,7 @@ import {
 } from '@expcat/tigercat-core'
 import {
   notificationCenterItemClasses,
+  notificationCenterItemHeadClasses,
   notificationCenterUnreadItemClasses,
   notificationCenterReadItemClasses,
   notificationCenterReadTitleClasses,
@@ -309,7 +310,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           className="flex-1 min-w-0 text-start"
           onClick={() => onItemClick?.(item, _index)}>
           <div className="min-w-0">
-            <div className="flex items-baseline justify-between gap-2">
+            <div className={notificationCenterItemHeadClasses}>
               <div className="flex items-center gap-1.5">
                 <Text
                   tag="span"

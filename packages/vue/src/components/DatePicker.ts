@@ -315,6 +315,7 @@ export const DatePicker = defineComponent({
       dismissOnOutside: true,
       dismissOnEscape: true,
       restoreFocusOnDismiss: true,
+      restoreFocusRef: inputRef,
       getContainer: () => props.getPopupContainer?.() ?? null,
       onDismiss: () => setOpenSafe(false)
     })

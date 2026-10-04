@@ -605,7 +605,10 @@ export const TreeSelect = defineComponent({
         case 'close':
           if (event.key !== 'Tab') event.preventDefault()
           closeDropdown()
-          triggerRef.value?.focus()
+          // Defer: in search mode the input trigger unmounts on close and the
+          // div trigger takes its place, so focus must land after the swap.
+          if (event.key !== 'Tab') nextTick(() => triggerRef.value?.focus())
+          else triggerRef.value?.focus()
           return
         case 'clear':
           event.preventDefault()

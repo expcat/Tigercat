@@ -18,7 +18,6 @@ import {
   getModalContentClasses,
   clampSheetDragDistance,
   getGestureTouchPoint,
-  isModalSheetSwipeCloseGesture,
   prefersReducedMotion,
   resolveSheetReducedMotion,
   resolveSheetRelease,

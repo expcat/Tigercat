@@ -3,7 +3,7 @@
  */
 
 import { defineComponent, h } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/vue'
 import { Inplace } from '../../packages/vue/src/components/Inplace'
 
@@ -19,7 +19,10 @@ const Harness = defineComponent({
 
 describe('Inplace', () => {
   it('enters edit on click, commits with Enter, and cancels with Escape', async () => {
-    const { getByRole, getByTestId, queryByTestId } = render(Harness)
+    const onEditingChange = vi.fn()
+    const { getByRole, getByTestId, queryByTestId } = render(Harness, {
+      attrs: { onEditingChange }
+    })
     await fireEvent.click(getByRole('button', { name: 'Hello' }))
     expect(getByTestId('field')).toBeTruthy()
     await fireEvent.keyDown(getByTestId('field'), { key: 'Enter' })
@@ -29,5 +32,6 @@ describe('Inplace', () => {
     await fireEvent.keyDown(getByTestId('field'), { key: 'Escape' })
     expect(queryByTestId('field')).toBeNull()
     expect(getByRole('button', { name: 'Hello' })).toBeTruthy()
+    expect(onEditingChange.mock.calls).toEqual([[true], [false], [true], [false]])
   })
 })

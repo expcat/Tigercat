@@ -41,7 +41,6 @@ import {
   resolveTreeSelection,
   alignTreeVirtualScroll,
   createTreeEdgeScroll,
-  resolveDisplayedExpandedKeys,
   resolveTreeView,
   sameTreeKey,
   treeKeyId,

@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useRef } from 'react'
@@ -27,6 +27,24 @@ const treeData = [
 ]
 
 describe('TreeSelect', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+  afterEach(() => vi.restoreAllMocks())
+  it('closes an expanded searchable tree with Escape and restores the trigger', async () => {
+    render(<TreeSelect treeData={treeData} defaultExpandAll searchable aria-label="Tree" />)
+    await userEvent.click(screen.getByRole('combobox'))
+    expect(screen.getByRole('treeitem', { name: /Fruits/ })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    )
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(screen.getByRole('combobox')).toHaveFocus())
+    expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('tree')).not.toBeInTheDocument()
+  })
   it('insets tree rows and floors the panel at the trigger width', async () => {
     const user = userEvent.setup()
     render(<TreeSelect treeData={treeData} defaultExpandAll aria-label="Inset" />)

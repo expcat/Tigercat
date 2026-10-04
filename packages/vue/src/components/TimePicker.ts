@@ -355,6 +355,7 @@ export const TimePicker = defineComponent({
       dismissOnOutside: true,
       dismissOnEscape: true,
       restoreFocusOnDismiss: true,
+      restoreFocusRef: inputRef,
       getContainer: () => props.getPopupContainer?.() ?? null,
       onDismiss: () => setOpenSafe(false)
     })

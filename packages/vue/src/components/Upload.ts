@@ -16,7 +16,6 @@ import {
   coerceClassValue,
   mergeStyleValues,
   mergeAriaDescribedBy,
-  resolveFormItemSeed,
   mergeTigerLocale,
   getUploadLabels,
   interpolateUploadLabel,

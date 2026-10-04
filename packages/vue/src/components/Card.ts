@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, isVNode, PropType, type VNode, type VNodeChild } from 'vue'
+import { defineComponent, computed, h, isVNode, PropType, type VNodeChild } from 'vue'
 import {
   classNames,
   coerceClassValue,

@@ -270,7 +270,6 @@ export const InputOTP = defineComponent({
 
       const children: ReturnType<typeof h>[] = []
       for (let i = 0; i < props.length; i++) {
-        const isTabStop = i === currentTab
         children.push(
           h('input', {
             key: `slot-${i}`,

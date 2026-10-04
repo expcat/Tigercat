@@ -5,7 +5,6 @@ import {
   mergeStyleValues,
   mergeTigerLocale,
   getQRCodeLabels,
-  generateQRMatrix,
   resolveQRMatrix,
   qrDarkModulesPath,
   qrcodeContainerClasses,
@@ -15,7 +14,6 @@ import {
   QRCODE_DEFAULT_COLOR,
   QRCODE_DEFAULT_BG,
   basicLabel,
-  QR_QUIET_ZONE,
   qrViewBoxSize,
   qrNeedsContrastWarning,
   devWarn,
@@ -64,7 +62,6 @@ export const QRCode = defineComponent({
       const failed = !result.ok
       const modules = result.ok ? result.matrix : []
       const viewBox = qrViewBoxSize(modules.length || 1)
-      const overlay = failed || props.status === 'expired' || props.status === 'loading'
       const scannedText = basicLabel(mergedLocale.value?.locale, 'qrcode', 'scanned')
       const statusText = failed
         ? labels.value.errorText

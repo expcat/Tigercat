@@ -35,6 +35,7 @@ const ALLOWED_LINK_PROTOCOLS = new Set<string>(LINK_URL_PROTOCOLS)
  * Stripping them before the protocol check closes `java\nscript:` and `java\tscript:`.
  */
 function stripSchemeNoise(value: string): string {
+  // eslint-disable-next-line no-control-regex -- Match the control characters browsers ignore in URL schemes.
   return value.replace(/[\u0000-\u0020\u007F\\]+/g, '')
 }
 

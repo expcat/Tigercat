@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
-import { afterEach, beforeAll, afterAll } from 'vitest'
+import { expect, afterEach, beforeAll, afterAll } from 'vitest'
 import { cleanup as cleanupVue } from '@testing-library/vue'
 import { cleanup as cleanupReact } from '@testing-library/react'
 import { resetTestDocument } from './utils/dom-cleanup'

@@ -189,7 +189,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   }
 
   const activeError = status === 'error' && !!errorMessage
-  const hasExtras = activeError || showCount
   const effectiveType =
     showPassword && type === 'password' ? (passwordVisible ? 'text' : 'password') : type
 
@@ -206,11 +205,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     <div
       ref={wrapperRef}
       {...{ [TIGER_CHROME_ATTR]: '' }}
-      className={classNames(
-        getInputWrapperClasses(status, { inGroup: inGroup && !hasExtras }),
-        !hasExtras ? className : undefined
-      )}
-      style={!hasExtras ? style : undefined}
+      className={getInputWrapperClasses(status)}
       onAnimationEnd={handleAnimationEnd}>
       {prefix ? (
         <div className={getInputAffixClasses('prefix', effectiveSize)}>{prefix}</div>
@@ -282,8 +277,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     </div>
   )
 
-  if (!hasExtras) return chrome
-
   const extras: React.ReactNode[] = []
   if (activeError) {
     extras.push(
@@ -307,24 +300,22 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     )
   }
 
+  // Always render the same host shape: when an error or the counter appears
+  // or disappears, the chrome (and the focused input inside it) must keep
+  // its DOM node instead of being rebuilt under a new root.
   const hostClassName = classNames(getFieldExtrasHostClasses(inGroup), className)
-  if (!inGroup) {
-    return (
-      <div className={hostClassName} style={style}>
-        {chrome}
-        {extras}
-      </div>
-    )
-  }
-
   return (
     <div className={hostClassName} style={style}>
       {chrome}
-      <div
-        className={getGroupedFieldExtraStackClasses()}
-        {...{ [FIELD_EXTRA_ATTR]: fieldExtraKind(extras.length) }}>
-        {extras}
-      </div>
+      {inGroup && extras.length > 0 ? (
+        <div
+          className={getGroupedFieldExtraStackClasses()}
+          {...{ [FIELD_EXTRA_ATTR]: fieldExtraKind(extras.length) }}>
+          {extras}
+        </div>
+      ) : (
+        extras
+      )}
     </div>
   )
 })

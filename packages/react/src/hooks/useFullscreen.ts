@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   exitElementFullscreen,
-  getFullscreenElement,
   isElementFullscreen,
   isFullscreenSupported,
   requestElementFullscreen,

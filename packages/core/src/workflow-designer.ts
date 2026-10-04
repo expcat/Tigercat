@@ -114,7 +114,9 @@ export {
   workflowDesignerTabSelectedClasses,
   workflowDesignerTableCellClasses,
   workflowDesignerTableClasses,
+  workflowDesignerButtonsTableClasses,
   workflowDesignerTableHeadClasses,
+  workflowDesignerTableScrollClasses,
   workflowDesignerToolbarClasses,
   workflowDesignerTreeClasses
 } from './utils/workflow-designer-utils'

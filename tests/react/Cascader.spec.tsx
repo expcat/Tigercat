@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useRef } from 'react'
@@ -35,6 +35,12 @@ const simpleOptions = [
 ]
 
 describe('Cascader', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+  afterEach(() => vi.restoreAllMocks())
   it('keeps an uncontrolled selection after choosing a leaf', async () => {
     const user = userEvent.setup()
     const { getByRole, rerender } = render(<Cascader options={simpleOptions} aria-label="Region" />)

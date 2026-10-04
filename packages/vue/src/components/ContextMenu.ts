@@ -64,8 +64,7 @@ import type {
   ContextMenuItemProps as CoreContextMenuItemProps,
   ContextMenuSubProps as CoreContextMenuSubProps
 } from '@expcat/tigercat-core'
-import { useVueAnchoredOverlay } from '../utils/overlay'
-import { renderVueOverlayOutlet } from '../utils/overlay-outlet'
+import { renderVueOverlayTeleport, useVueAnchoredOverlay } from '../utils/overlay'
 import { assignOverlayTriggerRef, renderOverlayTrigger } from '../utils/overlay-trigger'
 
 export interface VueContextMenuMenuProps extends CoreContextMenuMenuProps {}
@@ -168,11 +167,11 @@ export const ContextMenuItem = defineComponent({
         return
       }
 
-      emit('click', event)
-
       if (context?.closeOnClick) {
         context.handleItemClick()
       }
+
+      emit('click', event)
     }
 
     const itemClasses = computed(() =>
@@ -497,7 +496,7 @@ export const ContextMenuSub = defineComponent({
           trigger,
           isExpanded.value
             ? portalEnabled.value
-              ? renderVueOverlayOutlet(subMenuId, popup, overlay.target.value)
+              ? renderVueOverlayTeleport(popup, overlay.target.value)
               : popup
             : null
         ]
@@ -871,7 +870,7 @@ export const ContextMenu = defineComponent({
       const menu = !menuWrapper
         ? null
         : props.portal
-          ? renderVueOverlayOutlet(menuId, menuWrapper, overlay.target.value)
+          ? renderVueOverlayTeleport(menuWrapper, overlay.target.value)
           : menuWrapper
 
       const {

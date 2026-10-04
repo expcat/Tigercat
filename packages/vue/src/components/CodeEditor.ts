@@ -9,7 +9,6 @@ import {
   getActiveLineIndex,
   getCodeEditorActiveLineClasses,
   codeEditorTextareaClasses,
-  codeEditorHighlightClasses,
   codeEditorScrollerClasses,
   getCodeEditorWrapClass,
   resolveCodeEditorTheme,

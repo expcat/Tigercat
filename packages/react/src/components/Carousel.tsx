@@ -26,7 +26,6 @@ import {
   getCarouselDotClasses,
   getCarouselDotMarkClasses,
   getCarouselDotsClasses,
-  getCarouselDotsOrientation,
   getCarouselLabels,
   getCarouselLoopTarget,
   getCarouselPointerPoint,
@@ -40,7 +39,6 @@ import {
   carouselTrackInstantClasses,
   formatCarouselSlideStatus,
   isCarouselAutoplayEnabled,
-  isCarouselAutoplayRequested,
   isCarouselChromeTarget,
   isCarouselFocusInside,
   isCarouselHorizontalLock,
@@ -55,7 +53,6 @@ import {
   resolveCarouselLoopSnap,
   resolveCarouselRegion,
   resolveCarouselSwipeDirection,
-  resolveCarouselTabKeyboardNavigation,
   shouldLoopCarousel,
   type CarouselMethods,
   type CarouselProps as CoreCarouselProps,
@@ -146,7 +143,6 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       setReducedMotion(prefersReducedMotion())
       return subscribePrefersReducedMotion(setReducedMotion)
     }, [])
-    const autoplayRequested = isCarouselAutoplayRequested(autoplay, autoplaySpeed)
     const autoplayEnabled = isCarouselAutoplayEnabled(autoplay, autoplaySpeed, reducedMotion)
 
     const [currentIndex, setCurrentIndexValue] = useControlledState({
@@ -423,30 +419,6 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       else if (action === 'prev') prev()
       else if (action === 'first') goTo(0)
       else goTo(slideCount - 1)
-    }
-
-    const handleTablistKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-      const action = resolveCarouselTabKeyboardNavigation(
-        event.key,
-        getCarouselDotsOrientation(dotPosition),
-        dir
-      )
-      if (!action) return
-      event.preventDefault()
-      event.stopPropagation()
-      const nextIndex =
-        action === 'next'
-          ? getNextSlideIndex(currentIndex, slideCount, true)
-          : action === 'prev'
-            ? getPrevSlideIndex(currentIndex, slideCount, true)
-            : action === 'first'
-              ? 0
-              : slideCount - 1
-      goTo(nextIndex)
-      const tab = event.currentTarget.querySelector<HTMLElement>(
-        `[data-tiger-carousel-tab="${nextIndex}"]`
-      )
-      tab?.focus()
     }
 
     const isPrevArrowDisabled = isPrevDisabled(currentIndex, slideCount, infinite)

@@ -14,11 +14,7 @@ function columnField<T>(column: TableColumn<T>): string {
 }
 
 export const DATA_EXPORT_FORMATS: readonly DataExportFormat[] = ['xlsx', 'markdown', 'csv']
-export const DEFAULT_DATA_EXPORT_FORMATS: readonly DataExportFormat[] = [
-  'xlsx',
-  'csv',
-  'markdown'
-]
+export const DEFAULT_DATA_EXPORT_FORMATS: readonly DataExportFormat[] = ['xlsx', 'csv', 'markdown']
 /** Hard cap on header + body cells. Exports above this are rejected. */
 export const DATA_EXPORT_MAX_CELLS = 100_000
 export const DATA_EXPORT_MAX_CELL_CHARS = 32_767
@@ -27,6 +23,7 @@ const FORMULA_PREFIX = new Set(['=', '+', '-', '@', '＝', '＋', '－', '＠'])
 const LEADING_EXPORT_NOISE = /^[\uFEFF \t\r\n\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]+/
 const LEGAL_NUMBER = /^-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/
 const PHONE_TEXT = /^\+[0-9][0-9\s\-()]{6,19}$/
+// eslint-disable-next-line no-control-regex -- Filenames must exclude ASCII control characters.
 const FILENAME_CONTROLS = /[\u0000-\u001F\u007F\\/:*?"<>|]+/g
 const FILENAME_BIDI = /[\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g
 const FILENAME_LINES = /[\r\n\u2028\u2029]+/g
@@ -62,9 +59,7 @@ export function formatDataExportCellValue(value: unknown): unknown {
   return value
 }
 
-export type DataExportCell =
-  | { kind: 'number'; value: number }
-  | { kind: 'text'; value: string }
+export type DataExportCell = { kind: 'number'; value: number } | { kind: 'text'; value: string }
 
 function isLegalNegative(text: string): boolean {
   return LEGAL_NUMBER.test(text) && Number.isFinite(Number(text))
@@ -81,9 +76,7 @@ function isPhoneText(text: string): boolean {
  */
 export function neutralizeDataExportText(value: string): string {
   if (value.length > DATA_EXPORT_MAX_CELL_CHARS) {
-    throw new DataExportLimitError(
-      `Cell exceeds ${DATA_EXPORT_MAX_CELL_CHARS} characters`
-    )
+    throw new DataExportLimitError(`Cell exceeds ${DATA_EXPORT_MAX_CELL_CHARS} characters`)
   }
   const stripped = value.replace(LEADING_EXPORT_NOISE, '')
   const first = stripped[0]

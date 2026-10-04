@@ -11,6 +11,16 @@ source: tigercat-review-v3/00-decisions.md（2026-09-23）
 
 版本变更史见 [CHANGELOG.md](../CHANGELOG.md)。2.x 迁移档案见 [MIGRATION.md](MIGRATION.md)。3.0 迁移文档怎么写见 [plan/14-migration.md](plan/14-migration.md)。组件维护规则见 [Tigercat Skill](../skills/tigercat/SKILL.md)。
 
+## preview 后续任务（2026-10-04）
+
+preview.9 的显示、hover、焦点和关闭回归已实现并通过本地行为测试、五包构建与 tarball 消费检查；已完成修复只记录在 Changelog。以下保留尚未完成的门禁治理与组件增强，不把发布候选的验收写成完整 `quality:release` 通过。
+
+| 任务              | 当前事实与最小范围                                                                                                                                                              | 验收条件                                                                                    | 状态       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------- |
+| 本地覆盖率治理    | Statements 81.52%、Branches 72.83%、Functions 84.96%、Lines 84.78%；优先核对数据 / 工作流错误分支、Vue TreeSelect / Cascader 异步与受控路径、时间选择器边界、菜单键盘与浮层分支 | 保持统计范围和 83% / 76% / 84% / 85% 阈值，测试实际可观察行为；对应分组收敛后再验证全局门禁 | 待实施     |
+| 包体积治理        | 原 HEAD preview.8 与 preview.9 均有相同 7 项超限；本轮仅增 0–186 bytes。按实际依赖分析缩减 Core 完整输出、框架默认依赖、Menu 链、Tailwind 样式和 zh-CN 文案数据                 | 保持现有公开能力与原 size budget，五包打包、消费构建和 SSR 继续通过，7 项回到预算内         | 待实施     |
+| Cron 中文范围摘要 | 当前说明为英文，分钟范围会展开全部值；复用既有 locale 与解析能力提供中文范围 / 步长摘要                                                                                         | 任意 / 指定 / 范围 / 步长含义准确，0–59 保留范围语义，320px 可读，Vue / React 一致          | 待组件增强 |
+
 ## 目标
 
 - 公开面最小化，默认可访问，SSR 安全，扩展只走 token、class / style、组合与插槽。
@@ -38,23 +48,23 @@ source: tigercat-review-v3/00-decisions.md（2026-09-23）
 
 ## 计划
 
-| 篇 | 内容 |
-| --- | --- |
-| [00 范围](plan/00-scope.md) | 目标、编号、波次、验收、preview.1 |
-| [01 地基与基础组件](plan/01-foundation.md) | T01、T02 |
-| [02 表单](plan/02-forms.md) | T03、T04 |
-| [03 反馈](plan/03-feedback.md) | T05 |
-| [04 布局](plan/04-layout.md) | T06 |
-| [05 导航](plan/05-navigation.md) | T07 |
-| [06 数据与表格](plan/06-data-table.md) | T08 |
-| [07 虚拟窗口](plan/07-virtual.md) | T10 的窗口算术，以及引用约定 |
-| [08 图表](plan/08-charts.md) | T09 |
-| [09 编辑器与画布](plan/09-editors.md) | T10 里窗口以外的部分 |
-| [10 复合与中后台](plan/10-composite.md) | T11，含工作流正确性 |
-| [11 工具链与发布](plan/11-tooling.md) | T12，本地测试与 preview.1 |
-| [12 增强核对](plan/12-enhancements-backlog.md) | 132 条增强的落点 |
-| [13 波次](plan/13-waves.md) | 依赖与执行顺序 |
-| [14 迁移文档](plan/14-migration.md) | 增量记录，终局改成总结 |
+| 篇                                             | 内容                              |
+| ---------------------------------------------- | --------------------------------- |
+| [00 范围](plan/00-scope.md)                    | 目标、编号、波次、验收、preview.1 |
+| [01 地基与基础组件](plan/01-foundation.md)     | T01、T02                          |
+| [02 表单](plan/02-forms.md)                    | T03、T04                          |
+| [03 反馈](plan/03-feedback.md)                 | T05                               |
+| [04 布局](plan/04-layout.md)                   | T06                               |
+| [05 导航](plan/05-navigation.md)               | T07                               |
+| [06 数据与表格](plan/06-data-table.md)         | T08                               |
+| [07 虚拟窗口](plan/07-virtual.md)              | T10 的窗口算术，以及引用约定      |
+| [08 图表](plan/08-charts.md)                   | T09                               |
+| [09 编辑器与画布](plan/09-editors.md)          | T10 里窗口以外的部分              |
+| [10 复合与中后台](plan/10-composite.md)        | T11，含工作流正确性               |
+| [11 工具链与发布](plan/11-tooling.md)          | T12，本地测试与 preview.1         |
+| [12 增强核对](plan/12-enhancements-backlog.md) | 132 条增强的落点                  |
+| [13 波次](plan/13-waves.md)                    | 依赖与执行顺序                    |
+| [14 迁移文档](plan/14-migration.md)            | 增量记录，终局改成总结            |
 
 ## 中台里尚未做完的部分
 

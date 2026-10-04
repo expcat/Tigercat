@@ -33,7 +33,7 @@ export function getChartAxisTicks(
     tickValues ??
     (scale.type === 'linear'
       ? getLinearChartTickValues(scale.domain as number[], tickCount)
-      : scale.domain)
+      : sampleOrdinalChartTickValues(scale.domain, tickCount))
 
   const ticks: ChartAxisTick[] = []
   for (const value of resolvedTickValues) {
@@ -62,6 +62,29 @@ export function getChartAxisTicks(
 
 function getLinearTickCacheKey(min: number, max: number, count: number): string {
   return `${min}:${max}:${count}`
+}
+
+/**
+ * Thin a point/band domain to about "count" evenly spaced values, always
+ * keeping the first and last entries, so dense category labels do not
+ * overlap. Domains within the count are returned unchanged.
+ */
+function sampleOrdinalChartTickValues(
+  domain: readonly ChartScaleValue[],
+  count: number
+): ChartScaleValue[] {
+  const values = [...domain]
+  if (!Number.isFinite(count) || count <= 0) return values
+  const n = Math.max(1, Math.floor(count))
+  if (values.length <= n) return values
+  if (n === 1) return values.slice(0, 1)
+
+  const lastIndex = values.length - 1
+  const picked = new Set<number>()
+  for (let i = 0; i < n; i += 1) {
+    picked.add(Math.min(lastIndex, Math.round((i * lastIndex) / (n - 1))))
+  }
+  return [...picked].sort((a, b) => a - b).map((index) => values[index])
 }
 
 export function clearChartAxisTickCache(): void {

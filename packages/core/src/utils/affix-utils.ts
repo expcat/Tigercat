@@ -5,7 +5,6 @@
 
 import type { ScrollRootInput } from '../types/scroll-root'
 import { isBrowser } from './env'
-import { OVERLAY_Z_INDEX } from './floating'
 import { observeSize } from './responsive'
 import { getScrollRootEventTarget, resolveScrollRoot, type ResolvedScrollRoot } from './scroll-root'
 

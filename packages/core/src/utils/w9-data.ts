@@ -1295,7 +1295,10 @@ export function commentEditRequest(id: string | number, body: string): CommentEd
   return { id, body }
 }
 
-export function commentDisplayHtml(mode: 'plain' | 'rich', sanitized: string): 'text' | 'fragment' {
+export function commentDisplayHtml(
+  mode: 'plain' | 'rich',
+  _sanitized: string
+): 'text' | 'fragment' {
   return mode === 'rich' ? 'fragment' : 'text'
 }
 

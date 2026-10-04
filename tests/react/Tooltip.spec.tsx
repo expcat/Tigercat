@@ -14,6 +14,16 @@ import { renderWithProps, renderWithChildren, expectNoA11yViolationsIsolated } f
 import React from 'react'
 
 describe('Tooltip', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('renders trigger element', () => {
     const { getByText } = renderWithChildren(
       Tooltip,
@@ -281,6 +291,11 @@ describe('Tooltip', () => {
     ['top', 'bottom', 'left', 'top'],
     ['right', 'left', 'top', 'bottom']
   ] as const)('pins the %s caret to the bubble edge', async (placement, edge, cross, opposite) => {
+    vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024)
+    vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768)
+    vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockReturnValue(
+      new DOMRect(320, 320, 120, 32)
+    )
     renderWithChildren(
       Tooltip,
       { content: 'Tooltip content', defaultOpen: true, placement },
@@ -294,7 +309,7 @@ describe('Tooltip', () => {
     const arrow = bubble.parentElement?.querySelector('[data-tiger-floating-arrow]') as HTMLElement
     expect(arrow).toBeTruthy()
     expect(arrow.parentElement).toBe(bubble.parentElement)
-    expect(arrow.style[edge]).toBe('-4px')
+    await waitFor(() => expect(arrow.style[edge]).toBe('-4px'))
     expect(arrow.style[cross]).not.toBe('')
     expect(arrow.style[opposite]).toBe('')
     expect(arrow.getAttribute('aria-hidden')).toBe('true')

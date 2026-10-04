@@ -1,7 +1,6 @@
 import { classNames } from './class-names'
 import { DEFAULT_CHART_COLORS } from './chart/color'
 import { createChartTreeVisit } from './chart/tree-visit'
-import { devWarn } from './dev-warn'
 import type { OrgChartDirection, OrgChartNode } from '../types/org-chart'
 
 export interface OrgChartLayoutOptions {

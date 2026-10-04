@@ -287,7 +287,7 @@ export function getPaginationContainerClasses(
   }
 
   return classNames(
-    'flex items-center gap-1 motion-reduce:transition-none',
+    'flex flex-wrap items-center gap-1 motion-reduce:transition-none',
     alignClasses[resolvePaginationAlign(align)],
     className
   )
@@ -445,7 +445,13 @@ export function getSizeTextClasses(size: PaginationSize = 'md'): string {
  * Get total text classes
  */
 export function getTotalTextClasses(size: PaginationSize = 'md'): string {
-  return classNames('text-[var(--tiger-text-secondary)]', 'me-2', getSizeTextClasses(size))
+  // Nowrap keeps the total phrase whole on narrow screens; the flex-wrap
+  // container moves it to its own line instead of squeezing it per character.
+  return classNames(
+    'whitespace-nowrap text-[var(--tiger-text-secondary)]',
+    'me-2',
+    getSizeTextClasses(size)
+  )
 }
 
 export function getQuickJumperPrefixClasses(size: PaginationSize = 'md'): string {

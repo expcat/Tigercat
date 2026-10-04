@@ -1,8 +1,7 @@
 /**
  * @vitest-environment happy-dom
  */
-
-import { afterEach, describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
@@ -54,8 +53,15 @@ function getPanel(name: 'Products' | 'Docs' = 'Products') {
 }
 
 describe('NavigationMenu', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
   afterEach(() => {
     vi.useRealTimers()
+    vi.restoreAllMocks()
   })
 
   it('renders a menubar with triggers and a top-level link', () => {

@@ -13,7 +13,7 @@ import {
 } from '@expcat/tigercat-core'
 import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import { FeedbackDepthContext, FeedbackHost } from './FeedbackHost'
-import { FALLBACK_CONFIG, TigerConfigContext, TigerDocumentOwnerContext } from './tiger-config'
+import { TigerConfigContext, TigerDocumentOwnerContext } from './tiger-config'
 import {
   createTigerLocaleScope,
   createTigerThemeScope,

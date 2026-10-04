@@ -11,7 +11,6 @@ import {
   resolveHeatmapRenderMode,
   formatHeatmapTooltip,
   formatHeatmapSummary,
-  heatmapLabelFill,
   heatmapCellTransitionClasses,
   getChartElementOpacity,
   getCartesianChartShellClasses,

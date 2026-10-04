@@ -52,6 +52,7 @@ export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
       dismissOnOutside: true,
       dismissOnEscape: true,
       restoreFocusOnDismiss: true,
+      restoreFocusRef: ctx.inputRef,
       getContainer: ctx.getPopupContainer,
       onDismiss: () => ctx.setOpenSafe(false)
     })

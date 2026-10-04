@@ -12,8 +12,7 @@ import type {
   TableQueryField,
   TableToolbarFilter,
   TableToolbarFilterValue,
-  TableToolbarProps,
-  TableToolbarSearchMode
+  TableToolbarProps
 } from '../types/table-toolbar'
 
 type ToolbarSearchBits = Pick<

@@ -83,7 +83,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   showLessItems = false,
   ellipsisJump = false,
   itemRender,
-  quickJumperValidation,
+  quickJumperValidation: _quickJumperValidation,
   className,
   style,
   onChange,
@@ -299,7 +299,9 @@ export const Pagination: React.FC<PaginationProps> = ({
           localeCode
         )
     elements.push(
-      <span key="current" className={classNames('mx-2', getSizeTextClasses(size))}>
+      <span
+        key="current"
+        className={classNames('mx-2 whitespace-nowrap', getSizeTextClasses(size))}>
         {indicatorText}
       </span>
     )

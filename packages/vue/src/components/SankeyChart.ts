@@ -12,6 +12,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 
 export type SankeyChartProps = CoreSankeyChartProps
+export type VueSankeyChartProps = InstanceType<typeof SankeyChart>['$props']
 
 export const SankeyChart = defineComponent({
   name: 'TigerSankeyChart',

@@ -23,11 +23,6 @@ function hasRenderableChildren(children: React.ReactNode): boolean {
   return true
 }
 
-function extraKeyText(children: React.ReactNode): string | undefined {
-  if (typeof children === 'string' || typeof children === 'number') return String(children)
-  return undefined
-}
-
 export const Kbd = forwardRef<HTMLElement, KbdProps>(
   (
     { keys, separator, size = 'md', variant = 'default', className, style, children, ...rest },

@@ -576,6 +576,7 @@ export interface UseVueAnchoredOverlayOptions {
   dismissOnOutside?: Ref<boolean> | boolean
   dismissOnEscape?: Ref<boolean> | boolean
   restoreFocusOnDismiss?: boolean
+  restoreFocusRef?: Ref<HTMLElement | null>
   arrowRef?: MaybeRefOrGetter<HTMLElement | null>
   onDismiss?: (reason: AnchoredOverlayDismissReason) => void
 }
@@ -633,7 +634,13 @@ export function useVueAnchoredOverlay(options: UseVueAnchoredOverlayOptions) {
   const dismiss = (reason: AnchoredOverlayDismissReason) => {
     options.onDismiss?.(reason)
     if (options.restoreFocusOnDismiss && reason === 'escape') {
-      window.setTimeout(() => restoreFocus(options.referenceRef.value, { preventScroll: true }), 0)
+      window.setTimeout(
+        () =>
+          restoreFocus((options.restoreFocusRef ?? options.referenceRef).value, {
+            preventScroll: true
+          }),
+        0
+      )
     }
   }
 

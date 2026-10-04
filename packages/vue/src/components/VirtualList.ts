@@ -71,7 +71,6 @@ export const VirtualList = defineComponent({
     const measureVersion = ref(0)
     const containerRef = ref<HTMLElement | null>(null)
     const itemEls = new Map<number, HTMLElement>()
-    const itemCleanups = new Map<number, () => void>()
     let dynamicHeld: VirtualListSizeStrategy | null = null
     let variableHeld: VirtualListSizeStrategy | null = null
     let fixedHeld: VirtualListSizeStrategy | null = null
@@ -276,7 +275,10 @@ export const VirtualList = defineComponent({
               props.stickyIndexes,
               props.itemCount
             )
-          : Array.from({ length: Math.max(0, endIndex - startIndex + 1) }, (_, offset) => startIndex + offset)
+          : Array.from(
+              { length: Math.max(0, endIndex - startIndex + 1) },
+              (_, offset) => startIndex + offset
+            )
       if (dynamic) itemEls.clear()
       for (const i of indexes) {
         const itemH = currentStrategy.getItemHeight(i)

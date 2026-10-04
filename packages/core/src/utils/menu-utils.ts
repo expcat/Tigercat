@@ -167,9 +167,11 @@ export const menuSearchEmptyClasses =
 /**
  * Collapsed rail. A block-level menu with only `min-width` stretches to the
  * container, which scatters first-letter glyphs and anchors submenu popups
- * to the far edge of that stretched row.
+ * to the far edge of that stretched row. max-w-full lets a bordered 64px
+ * sidebar (63px content box) shrink the rail instead of overflowing by 1px
+ * and showing a horizontal scrollbar.
  */
-export const menuCollapsedClasses = 'w-[64px] shrink-0'
+export const menuCollapsedClasses = 'w-[64px] max-w-full shrink-0'
 
 /**
  * Menu collapsed item classes. Mutually exclusive with expanded padding / justify.

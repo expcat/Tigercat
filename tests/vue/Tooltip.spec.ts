@@ -14,6 +14,16 @@ import { Tooltip } from '@expcat/tigercat-vue/Tooltip'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Tooltip', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('renders trigger element', () => {
     const { getByText } = renderWithSlots(
       Tooltip,

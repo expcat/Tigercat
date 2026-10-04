@@ -3,7 +3,6 @@ import {
   classNames,
   getSecureRel,
   resolveLinkHref,
-  focusMenuEdge,
   getMenuButtons,
   getMenuItemClasses,
   getMenuItemIndent,

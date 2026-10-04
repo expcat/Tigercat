@@ -1,8 +1,7 @@
 /**
  * @vitest-environment happy-dom
  */
-
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -74,6 +73,16 @@ const actions: WorkflowActionBarItem[] = [
 ]
 
 describe('WorkflowViewer (React)', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('renders start, approval, CC, condition stub, and sign mode', () => {
     render(<WorkflowViewer steps={treeSteps} />)
 

@@ -2,7 +2,8 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import userEvent from '@testing-library/user-event'
 import { defineComponent, h, ref } from 'vue'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { TreeSelect } from '@expcat/tigercat-vue/TreeSelect'
@@ -25,6 +26,23 @@ const treeData = [
 ]
 
 describe('TreeSelect', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+  afterEach(() => vi.restoreAllMocks())
+  it('closes an expanded searchable tree with Escape and restores the trigger', async () => {
+    const { getByRole, queryByRole } = render(TreeSelect, {
+      props: { treeData, defaultExpandAll: true, searchable: true, 'aria-label': 'Tree' }
+    })
+    await userEvent.click(getByRole('combobox'))
+    expect(getByRole('treeitem', { name: /Fruits/ })).toHaveAttribute('aria-expanded', 'true')
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(getByRole('combobox')).toHaveFocus())
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
+    expect(queryByRole('tree')).not.toBeInTheDocument()
+  })
   it('keeps an uncontrolled selection after choosing a leaf', async () => {
     const { getByRole } = render(TreeSelect, {
       props: { treeData, defaultExpandAll: true, 'aria-label': 'Team' }

@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { format, resolveConfig } from 'prettier'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const TOKENS_DIR = join(__dirname, '..', 'tokens')
@@ -20,13 +21,14 @@ function inferType(value, key) {
   if (/^#([0-9a-fA-F]{3,8})$/.test(value) || /^rgba?\(/i.test(value) || key.includes('color')) {
     return 'color'
   }
-  if (
-    /shadow/i.test(key) ||
-    (/rgba?\([^)]+\)/.test(value) && value.includes('px'))
-  ) {
+  if (/shadow/i.test(key) || (/rgba?\([^)]+\)/.test(value) && value.includes('px'))) {
     return 'shadow'
   }
-  if (/^-?\d*\.?\d+(px|rem|em|ms|s)$/.test(value) || key.includes('radius') || key.includes('space')) {
+  if (
+    /^-?\d*\.?\d+(px|rem|em|ms|s)$/.test(value) ||
+    key.includes('radius') ||
+    key.includes('space')
+  ) {
     return 'dimension'
   }
   if (value.startsWith('primitive.color') || value.startsWith('semantic.color')) return 'color'
@@ -117,7 +119,9 @@ if (!isCli) {
   if (JSON.stringify(JSON.parse(previous)) !== JSON.stringify(plain)) {
     writeJson(plainPath, plain)
   }
-  writeFileSync(join(TOKENS_DIR, 'tokens.emitted.css'), emitCss(dtcg))
+  const cssPath = join(TOKENS_DIR, 'tokens.emitted.css')
+  const prettierConfig = await resolveConfig(cssPath)
+  writeFileSync(cssPath, await format(emitCss(dtcg), { ...prettierConfig, filepath: cssPath }))
   writeJson(join(TOKENS_DIR, 'figma.tokens.json'), emitFigma(dtcg))
   console.log('✓ tokens.json, tokens.emitted.css, figma.tokens.json')
 }

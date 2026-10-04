@@ -16,7 +16,6 @@ import {
   getActiveFeedbackScope,
   getModalContentClasses,
   getGestureTouchPoint,
-  isModalSheetSwipeCloseGesture,
   getModalLabels,
   modalWrapperClasses,
   modalMaskClasses,

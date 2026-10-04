@@ -20,6 +20,10 @@ description: Common patterns and framework differences for Tigercat UI component
 
 Use `open` for display state. Do not introduce new `visible` / `onVisibleChange` APIs.
 
+Anchor click handlers can call `event.preventDefault()` to own navigation without component scrolling or hash updates. `getCurrentAnchor` keeps `aria-current` synchronized with external state: use the current render's callback in React or a getter reading reactive state in Vue; do not remount links to update their highlight.
+
+Point/band chart axes honor `xTicks` / `ticks` by sampling categories (multiple ticks retain both ends). Explicit `xTickValues` / `tickValues` take priority; pass the full domain to show every category.
+
 ## Content And Styling
 
 | Need            | Vue                      | React                   |

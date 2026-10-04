@@ -1,8 +1,7 @@
 /**
  * @vitest-environment happy-dom
  */
-
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -15,6 +14,16 @@ import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolations, expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('Modal', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   describe('Rendering', () => {
     it('should not render when open is false', () => {
       const { container } = render(<Modal open={false} title="Test Modal" />)

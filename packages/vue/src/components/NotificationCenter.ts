@@ -1,12 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  ref,
-  watch,
-  onMounted,
-  PropType,
-  h
-} from 'vue'
+import { defineComponent, computed, ref, watch, onMounted, PropType, h } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -34,6 +26,7 @@ import {
 } from '@expcat/tigercat-core'
 import {
   notificationCenterItemClasses,
+  notificationCenterItemHeadClasses,
   notificationCenterUnreadItemClasses,
   notificationCenterReadItemClasses,
   notificationCenterReadTitleClasses,
@@ -477,7 +470,7 @@ export const NotificationCenter = defineComponent({
               onClick: () => handleItemClick(item, _index)
             },
             [
-              h('div', { class: 'flex items-baseline justify-between gap-2' }, [
+              h('div', { class: notificationCenterItemHeadClasses }, [
                 h('div', { class: 'flex items-center gap-1.5' }, [
                   h(
                     Text,

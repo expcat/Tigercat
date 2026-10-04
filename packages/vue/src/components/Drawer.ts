@@ -37,7 +37,6 @@ import {
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
   getGestureTouchPoint,
-  isDrawerSwipeCloseGesture,
   resolveSwipeGesture,
   shouldRenderOverlay,
   isOverlayVisuallyHidden,

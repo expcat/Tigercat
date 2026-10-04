@@ -359,12 +359,13 @@ export function useTreeSelectController(props: TreeSelectProps) {
       } catch {
         if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
       } finally {
-        if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
-        setLoadingKeys((current) => {
-          const next = new Set(current)
-          next.delete(id)
-          return next
-        })
+        if (isCurrentLoadToken(loadTokensRef.current, id, token)) {
+          setLoadingKeys((current) => {
+            const next = new Set(current)
+            next.delete(id)
+            return next
+          })
+        }
       }
     },
     [commitKey, expandedSet, loadData, setExpanded, treeDataProp]
@@ -600,7 +601,10 @@ export function useTreeSelectController(props: TreeSelectProps) {
       case 'close':
         if (event.key !== 'Tab') event.preventDefault()
         closeDropdown()
-        triggerRef.current?.focus()
+        // Defer: in search mode the input trigger unmounts on close and the
+        // div trigger takes its place, so focus must land after the swap.
+        if (event.key !== 'Tab') requestAnimationFrame(() => triggerRef.current?.focus())
+        else triggerRef.current?.focus()
         return
       case 'clear':
         event.preventDefault()

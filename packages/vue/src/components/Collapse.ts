@@ -7,7 +7,6 @@ import {
   normalizeActiveKeys,
   collapseLevelKeys,
   type CollapseHeaderFocusAction,
-  type CollapseHeaderRecord,
   type ExpandIconPosition
 } from '@expcat/tigercat-core'
 

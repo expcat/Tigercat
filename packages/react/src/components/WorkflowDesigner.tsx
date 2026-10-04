@@ -98,7 +98,9 @@ import {
   workflowDesignerTabListClasses,
   workflowDesignerTableCellClasses,
   workflowDesignerTableClasses,
+  workflowDesignerButtonsTableClasses,
   workflowDesignerTableHeadClasses,
+  workflowDesignerTableScrollClasses,
   workflowDesignerToolbarClasses,
   workflowDesignerTreeClasses,
   WORKFLOW_DESIGNER_INSPECTOR_TABS,
@@ -609,88 +611,90 @@ function DesignerEditPanel({
     }
     return (
       <div className={workflowDesignerFieldsClasses}>
-        <table className={workflowDesignerTableClasses}>
-          <thead>
-            <tr>
-              <th className={workflowDesignerTableHeadClasses}>{labels.buttonEnabled}</th>
-              <th className={workflowDesignerTableHeadClasses}>{labels.kindLabel}</th>
-              <th className={workflowDesignerTableHeadClasses}>{labels.buttonDisplayName}</th>
-              <th className={workflowDesignerTableHeadClasses}>{labels.buttonCommentRequired}</th>
-              <th className={workflowDesignerTableHeadClasses}>{labels.buttonPlacement}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {buttonPolicy.buttons.map((button) => (
-              <tr key={button.action}>
-                <td className={workflowDesignerTableCellClasses}>
-                  <input
-                    type="checkbox"
-                    checked={button.enabled}
-                    disabled={locked}
-                    aria-label={`${workflowDesignerActionLabel(button.action, timelineLabels)} ${labels.buttonEnabled}`}
-                    onChange={(event) =>
-                      onPatch(node.path, {
-                        buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
-                          enabled: event.target.checked
-                        })
-                      })
-                    }
-                  />
-                </td>
-                <td className={workflowDesignerTableCellClasses}>
-                  {workflowDesignerActionLabel(button.action, timelineLabels)}
-                </td>
-                <td className={workflowDesignerTableCellClasses}>
-                  <input
-                    className={workflowDesignerControlClasses}
-                    value={button.label ?? ''}
-                    disabled={locked}
-                    aria-label={`${workflowDesignerActionLabel(button.action, timelineLabels)} ${labels.buttonDisplayName}`}
-                    onChange={(event) =>
-                      onPatch(node.path, {
-                        buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
-                          label: event.target.value
-                        })
-                      })
-                    }
-                  />
-                </td>
-                <td className={workflowDesignerTableCellClasses}>
-                  <input
-                    type="checkbox"
-                    checked={Boolean(button.commentRequired)}
-                    disabled={locked}
-                    aria-label={`${workflowDesignerActionLabel(button.action, timelineLabels)} ${labels.buttonCommentRequired}`}
-                    onChange={(event) =>
-                      onPatch(node.path, {
-                        buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
-                          commentRequired: event.target.checked
-                        })
-                      })
-                    }
-                  />
-                </td>
-                <td className={workflowDesignerTableCellClasses}>
-                  <select
-                    className={workflowDesignerControlClasses}
-                    value={button.placement ?? 'bar'}
-                    disabled={locked}
-                    aria-label={`${workflowDesignerActionLabel(button.action, timelineLabels)} ${labels.buttonPlacement}`}
-                    onChange={(event) =>
-                      onPatch(node.path, {
-                        buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
-                          placement: event.target.value as 'bar' | 'more'
-                        })
-                      })
-                    }>
-                    <option value="bar">{labels.buttonPlacementBar}</option>
-                    <option value="more">{labels.buttonPlacementMore}</option>
-                  </select>
-                </td>
+        <div className={workflowDesignerTableScrollClasses}>
+          <table className={workflowDesignerButtonsTableClasses}>
+            <thead>
+              <tr>
+                <th className={workflowDesignerTableHeadClasses}>{labels.buttonEnabled}</th>
+                <th className={workflowDesignerTableHeadClasses}>{labels.kindLabel}</th>
+                <th className={workflowDesignerTableHeadClasses}>{labels.buttonDisplayName}</th>
+                <th className={workflowDesignerTableHeadClasses}>{labels.buttonCommentRequired}</th>
+                <th className={workflowDesignerTableHeadClasses}>{labels.buttonPlacement}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {buttonPolicy.buttons.map((button) => (
+                <tr key={button.action}>
+                  <td className={workflowDesignerTableCellClasses}>
+                    <input
+                      type="checkbox"
+                      checked={button.enabled}
+                      disabled={locked}
+                      aria-label={`${workflowDesignerActionLabel(button.action, timelineLabels)} ${labels.buttonEnabled}`}
+                      onChange={(event) =>
+                        onPatch(node.path, {
+                          buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
+                            enabled: event.target.checked
+                          })
+                        })
+                      }
+                    />
+                  </td>
+                  <td className={workflowDesignerTableCellClasses}>
+                    {workflowDesignerActionLabel(button.action, timelineLabels)}
+                  </td>
+                  <td className={workflowDesignerTableCellClasses}>
+                    <input
+                      className={workflowDesignerControlClasses}
+                      value={button.label ?? ''}
+                      disabled={locked}
+                      aria-label={`${workflowDesignerActionLabel(button.action, timelineLabels)} ${labels.buttonDisplayName}`}
+                      onChange={(event) =>
+                        onPatch(node.path, {
+                          buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
+                            label: event.target.value
+                          })
+                        })
+                      }
+                    />
+                  </td>
+                  <td className={workflowDesignerTableCellClasses}>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(button.commentRequired)}
+                      disabled={locked}
+                      aria-label={`${workflowDesignerActionLabel(button.action, timelineLabels)} ${labels.buttonCommentRequired}`}
+                      onChange={(event) =>
+                        onPatch(node.path, {
+                          buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
+                            commentRequired: event.target.checked
+                          })
+                        })
+                      }
+                    />
+                  </td>
+                  <td className={workflowDesignerTableCellClasses}>
+                    <select
+                      className={workflowDesignerControlClasses}
+                      value={button.placement ?? 'bar'}
+                      disabled={locked}
+                      aria-label={`${workflowDesignerActionLabel(button.action, timelineLabels)} ${labels.buttonPlacement}`}
+                      onChange={(event) =>
+                        onPatch(node.path, {
+                          buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
+                            placement: event.target.value as 'bar' | 'more'
+                          })
+                        })
+                      }>
+                      <option value="bar">{labels.buttonPlacementBar}</option>
+                      <option value="more">{labels.buttonPlacementMore}</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {buttonPolicy.buttons.some((button) => button.action === 'addsign' && button.enabled) ? (
           <fieldset className={workflowDesignerFieldClasses}>
             <legend className={workflowDesignerLabelClasses}>{labels.addsignPositions}</legend>

@@ -25,8 +25,6 @@ import {
   sliderGetPercentage,
   sliderGetValueFromClientX,
   sliderGetKeyboardValue,
-  sliderGetValueFromClientY,
-  sliderPushApartRange,
   formatSliderTooltip,
   sliderResolveMarks,
   sliderValuesEqual,
@@ -150,7 +148,6 @@ export const Slider = defineComponent({
       )
     }
 
-    const isControlled = computed(() => resolveBoundValue() !== undefined)
     const initialBound = resolveBoundValue()
     const internalValue = ref<number | [number, number]>(
       (Array.isArray(initialBound) ? [initialBound[0], initialBound[1]] : initialBound) ??

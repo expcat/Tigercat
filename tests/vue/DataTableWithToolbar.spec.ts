@@ -1,8 +1,7 @@
 /**
  * @vitest-environment happy-dom
  */
-
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { h } from 'vue'
 import { render, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
@@ -35,6 +34,16 @@ function stubCardViewport(isCard: boolean) {
 }
 
 describe('DataTableWithToolbar (Vue)', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('emits filter and pagination changes', async () => {
     const onFiltersChange = vi.fn()
     const onPageChange = vi.fn()

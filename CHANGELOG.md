@@ -2,9 +2,17 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
-## 未发布
+## v3.0.0-preview.9（2026-10-04）
 
-- **测试与构建脚本**：发布门禁先执行静态与漂移检查，再构建一次包；复用 tarball 的四个示例构建与 SSR 产物检查，消除工作区重复构建和 hydration 重跑。文档/API 基线检查改为只读比较，文档生成只写变更文件。删除测试名和 a11y helper 字符串检查、冗余门禁别名与入口处理死代码；测试扫描覆盖 MCP，并按需加载 axe。Vue/React 的 build/watch 共用入口处理，MCP 构建同步技能快照。API 双端检查复用公开组件事实源，移除空校验；修正 LoadingBar 的体积检查路径。
+- **DatePicker / TimePicker / TreeSelect（Vue / React）**：Escape 关闭最上层选择面板并恢复原触发输入框；TreeSelect 不再把 Escape 当作节点折叠，搜索触发器替换后再恢复焦点。
+- **Input（Vue / React）**：错误信息与字数提示出现或消失时保留原生输入框、值与焦点，输入框组继续使用原有布局。
+- **ContextMenu（Vue / React）**：浮层保留菜单上下文，选择菜单项先关闭菜单再执行回调，修复打开 Modal 后菜单仍然停留的问题；子菜单同步处理。
+- **Anchor（Vue / React）**：尊重调用方 `preventDefault()`，取消组件滚动与 hash 更新；外部页签变化后同步 `getCurrentAnchor` 与 `aria-current`，无需重建链接。
+- **图表**：Vue AreaChart / LineChart 的整幅绘图区统一处理点命中。分类轴按 `xTicks` / `ticks` 均匀抽样，多个刻度保留首尾；显式 `xTickValues` / `tickValues` 优先。非整数数量安全取整。
+- **窄容器布局（Vue / React）**：折叠 Menu 不溢出带边框侧栏；Pagination 的统计与控件合理换行；NotificationCenter 的标题与时间可换行；CronEditor 按容器宽度重排，长分钟列表说明可换行；WorkflowDesigner 操作表保留可读列宽并在内部横向滚动。
+- **发布类型检查**：React 浮层包装通过 props 传入必需的 children，修复构建类型错误。
+- **公开类型与维护**：补齐 AppShell、AssigneePicker、NotificationBell、SankeyChart 和 WaterfallChart 缺失的框架 Props 出口。Vue Inplace 发出的事件统一为 `editing-change`，现有 `onEditingChange` 监听不变。清理未使用代码，Vue Carousel 卸载时取消动态减少动画监听，异步分支加载清理不再从 finally 返回。
+- **测试与构建脚本**：发布门禁先执行静态与漂移检查，再构建一次包；复用 tarball 的四个示例构建与 SSR 产物检查，消除工作区重复构建和 hydration 重跑。文档/API 基线检查改为只读比较，文档生成只写变更文件。删除测试名和 a11y helper 字符串检查、冗余门禁别名与入口处理死代码；测试扫描覆盖 MCP，并按需加载 axe。Vue/React 的 build/watch 共用入口处理，MCP 构建同步技能快照。API 双端检查复用公开组件事实源，移除空校验；修正 LoadingBar 的体积检查路径。修复浮层测试的零尺寸布局夹具，统一现有格式并让 token emitter 复用仓库格式配置。
 
 ## v3.0.0-preview.8（2026-10-03）
 

@@ -434,7 +434,9 @@ export function getTreeSelectTriggerKeyIntent(options: {
 }): TreeSelectTriggerKeyIntent {
   const { key, open, searchable, fromSearchInput } = options
   if (key === 'Escape') {
-    return open ? { type: 'tree-key', key } : { type: 'none' }
+    // Escape closes the popup like every other picker; it must not fall
+    // through to tree-node collapse, which kept the dropdown open.
+    return open ? { type: 'close' } : { type: 'none' }
   }
   if (key === 'Tab') {
     return open ? { type: 'close' } : { type: 'none' }

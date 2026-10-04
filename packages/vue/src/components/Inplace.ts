@@ -11,7 +11,7 @@ export const Inplace = defineComponent({
     defaultEditing: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false }
   },
-  emits: ['editingChange', 'update:editing'],
+  emits: ['editing-change', 'update:editing'],
   setup(props, { slots, emit, attrs }) {
     const unmanaged = ref(props.defaultEditing)
     const isControlled = computed(() => props.editing !== undefined)
@@ -21,7 +21,7 @@ export const Inplace = defineComponent({
       const state = toggleInplace({ editing: editing.value }, action)
       const value = state.editing && next ? true : state.editing
       if (!isControlled.value) unmanaged.value = value
-      emit('editingChange', value)
+      emit('editing-change', value)
       emit('update:editing', value)
     }
 

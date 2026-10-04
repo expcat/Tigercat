@@ -215,7 +215,7 @@ export const NumberKeyboard = defineComponent({
       emit('update:open', next)
     }
 
-    function writeValue(next: string, payload: NumberKeyboardChangePayload) {
+    function writeValue(next: string, _payload: NumberKeyboardChangePayload) {
       if (next === currentValue.value) return
       if (props.modelValue === undefined) innerValue.value = next
       emit('update:modelValue', next)

@@ -182,11 +182,20 @@ export const workflowDesignerTabSelectedClasses =
 export const workflowDesignerIssueBannerClasses =
   'rounded-md border border-[var(--tiger-error)] bg-[var(--tiger-error-soft,var(--tiger-error-bg-hover))] px-3 py-2 text-sm text-[var(--tiger-error)]'
 export const workflowDesignerIssueListClasses = 'm-0 list-disc space-y-1 ps-4'
+/**
+ * Scroll host for the buttons table: below the table's min width the rows
+ * keep readable cells and scroll instead of crushing headers per character.
+ */
+export const workflowDesignerTableScrollClasses = 'overflow-x-auto'
 export const workflowDesignerTableClasses = 'w-full border-collapse text-sm'
+/** Buttons (actions) table: five columns including text/select controls, so
+ * below 24rem the cells stay usable and the scroll host takes over instead
+ * of crushing headers and truncating the placement select. */
+export const workflowDesignerButtonsTableClasses = `${workflowDesignerTableClasses} min-w-[24rem]`
 export const workflowDesignerTableHeadClasses =
-  'border-b border-[var(--tiger-border)] py-1 text-start text-xs font-medium text-[var(--tiger-text-secondary)]'
+  'whitespace-nowrap border-b border-[var(--tiger-border)] py-1 pe-2 text-start text-xs font-medium text-[var(--tiger-text-secondary)]'
 export const workflowDesignerTableCellClasses =
-  'border-b border-[var(--tiger-border)] py-1 align-middle'
+  'border-b border-[var(--tiger-border)] py-1 pe-2 align-middle'
 export const workflowDesignerFieldsClasses = 'flex flex-col gap-2'
 export const workflowDesignerFieldClasses = 'flex min-w-0 flex-col gap-1'
 export const workflowDesignerLabelClasses = 'text-xs font-medium text-[var(--tiger-text-secondary)]'

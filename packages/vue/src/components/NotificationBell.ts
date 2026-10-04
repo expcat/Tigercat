@@ -11,6 +11,8 @@ import { Icon } from './Icon'
 import { NotificationCenter } from './NotificationCenter'
 import { Popover } from './Popover'
 
+export type VueNotificationBellProps = InstanceType<typeof NotificationBell>['$props']
+
 export const NotificationBell = defineComponent({
   name: 'TigerNotificationBell',
   props: {

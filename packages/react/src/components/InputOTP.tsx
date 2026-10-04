@@ -250,7 +250,6 @@ export const InputOTP = forwardRef<HTMLInputElement, InputOTPProps>(function Inp
 
   const slots: React.ReactNode[] = []
   for (let i = 0; i < length; i++) {
-    const isTabStop = i === currentTab
     slots.push(
       <input
         key={`slot-${i}`}

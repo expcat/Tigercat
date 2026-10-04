@@ -8,7 +8,6 @@ import {
 } from 'vue'
 import {
   exitElementFullscreen,
-  getFullscreenElement,
   isElementFullscreen,
   isFullscreenSupported,
   requestElementFullscreen,

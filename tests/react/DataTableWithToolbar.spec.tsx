@@ -3,7 +3,7 @@
  */
 
 import React from 'react'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
@@ -22,6 +22,16 @@ interface RowData extends Record<string, unknown> {
 const columns: TableColumn<RowData>[] = [{ key: 'name', title: 'Name' }]
 
 describe('DataTableWithToolbar (React)', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('emits filter and pagination changes', async () => {
     const onFiltersChange = vi.fn()
     const onPageChange = vi.fn()

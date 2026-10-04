@@ -19,6 +19,16 @@ import {
 import React from 'react'
 
 describe('Popover', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   describe('Rendering', () => {
     it('should render trigger element', () => {
       const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
@@ -303,7 +313,9 @@ describe('Popover', () => {
         expect(getByText('Hover content')).toBeVisible()
 
         fireEvent.mouseLeave(trigger)
-        const floating = document.querySelector('[role="dialog"]')?.parentElement as HTMLElement
+        const floating = document
+          .querySelector('[role="dialog"]')
+          ?.closest('[data-positioned]') as HTMLElement
         expect(floating).toBeTruthy()
 
         fireEvent.mouseEnter(floating)

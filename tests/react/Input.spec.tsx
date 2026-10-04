@@ -17,6 +17,21 @@ import {
 } from '../utils/react'
 
 describe('Input', () => {
+  it('preserves the input, value and focus when error and count appear or disappear', async () => {
+    const { rerender } = render(<Input defaultValue="draft" />)
+    const input = screen.getByRole('textbox')
+    await userEvent.click(input)
+    rerender(<Input defaultValue="draft" status="error" errorMessage="Invalid" showCount />)
+    expect(screen.getByText('Invalid')).toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBe(input)
+    expect(input).toHaveFocus()
+    expect(input).toHaveValue('draft')
+    rerender(<Input defaultValue="draft" />)
+    expect(screen.queryByText('Invalid')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBe(input)
+    expect(input).toHaveFocus()
+    expect(input).toHaveValue('draft')
+  })
   describe('Rendering', () => {
     it('should render with placeholder', () => {
       const { getByPlaceholderText } = render(<Input placeholder="Enter text" />)
@@ -87,7 +102,7 @@ describe('Input', () => {
   describe('Validation', () => {
     it('should render error status style', () => {
       const { container } = render(<Input status="error" />)
-      const wrapper = container.firstChild as HTMLElement
+      const wrapper = container.querySelector('[data-tiger-chrome]') as HTMLElement
       const input = container.querySelector('input')
       expect(wrapper.className).toContain('--tiger-error')
       expect(input?.className).not.toContain('border-[var(--tiger-error')
@@ -95,7 +110,7 @@ describe('Input', () => {
 
     it('puts the focus ring on the rounded chrome, not the square field', () => {
       const { container } = render(<Input placeholder="Search" />)
-      const wrapper = container.firstChild as HTMLElement
+      const wrapper = container.querySelector('[data-tiger-chrome]') as HTMLElement
       const input = container.querySelector('input')!
 
       expect(wrapper.className).toContain('rounded-[var(--tiger-radius-md)]')
@@ -477,7 +492,7 @@ describe('Input', () => {
 
       rerender(<Input status="error" />)
 
-      const wrapper = container.firstChild as HTMLElement
+      const wrapper = container.querySelector('[data-tiger-chrome]') as HTMLElement
       // The shake class should be applied
       expect(wrapper.className).toContain('tiger-animate-shake')
     })
@@ -485,7 +500,7 @@ describe('Input', () => {
     it('should remove shake class after animation ends', () => {
       const { container } = render(<Input status="error" />)
 
-      const wrapper = container.firstChild as HTMLElement
+      const wrapper = container.querySelector('[data-tiger-chrome]') as HTMLElement
 
       // Simulate animation end
       wrapper.dispatchEvent(new Event('animationend', { bubbles: true }))

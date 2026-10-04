@@ -102,7 +102,9 @@ import {
   workflowDesignerTabListClasses,
   workflowDesignerTableCellClasses,
   workflowDesignerTableClasses,
+  workflowDesignerButtonsTableClasses,
   workflowDesignerTableHeadClasses,
+  workflowDesignerTableScrollClasses,
   workflowDesignerToolbarClasses,
   workflowDesignerTreeClasses,
   WORKFLOW_DESIGNER_INSPECTOR_TABS,
@@ -543,95 +545,97 @@ export const WorkflowDesigner = defineComponent({
       const buttonPolicy = workflowDesignerEditableButtonPolicy(node.step)
       const timeline = timelineLabels.value
       return h('div', { class: workflowDesignerFieldsClasses }, [
-        h('table', { class: workflowDesignerTableClasses }, [
-          h('thead', [
-            h('tr', [
-              h('th', { class: workflowDesignerTableHeadClasses }, labels.buttonEnabled),
-              h('th', { class: workflowDesignerTableHeadClasses }, labels.kindLabel),
-              h('th', { class: workflowDesignerTableHeadClasses }, labels.buttonDisplayName),
-              h('th', { class: workflowDesignerTableHeadClasses }, labels.buttonCommentRequired),
-              h('th', { class: workflowDesignerTableHeadClasses }, labels.buttonPlacement)
-            ])
-          ]),
-          h(
-            'tbody',
-            buttonPolicy.buttons.map((button) =>
-              h('tr', { key: button.action }, [
-                h('td', { class: workflowDesignerTableCellClasses }, [
-                  h('input', {
-                    type: 'checkbox',
-                    checked: button.enabled,
-                    disabled: lockedNow,
-                    'aria-label': `${workflowDesignerActionLabel(button.action, timeline)} ${labels.buttonEnabled}`,
-                    onChange: (event: Event) => {
-                      patchNode(node.path, {
-                        buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
-                          enabled: (event.target as HTMLInputElement).checked
-                        })
-                      })
-                    }
-                  })
-                ]),
-                h(
-                  'td',
-                  { class: workflowDesignerTableCellClasses },
-                  workflowDesignerActionLabel(button.action, timeline)
-                ),
-                h('td', { class: workflowDesignerTableCellClasses }, [
-                  h('input', {
-                    class: workflowDesignerControlClasses,
-                    value: button.label ?? '',
-                    disabled: lockedNow,
-                    'aria-label': `${workflowDesignerActionLabel(button.action, timeline)} ${labels.buttonDisplayName}`,
-                    onInput: (event: Event) => {
-                      patchNode(node.path, {
-                        buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
-                          label: (event.target as HTMLInputElement).value
-                        })
-                      })
-                    }
-                  })
-                ]),
-                h('td', { class: workflowDesignerTableCellClasses }, [
-                  h('input', {
-                    type: 'checkbox',
-                    checked: Boolean(button.commentRequired),
-                    disabled: lockedNow,
-                    'aria-label': `${workflowDesignerActionLabel(button.action, timeline)} ${labels.buttonCommentRequired}`,
-                    onChange: (event: Event) => {
-                      patchNode(node.path, {
-                        buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
-                          commentRequired: (event.target as HTMLInputElement).checked
-                        })
-                      })
-                    }
-                  })
-                ]),
-                h('td', { class: workflowDesignerTableCellClasses }, [
-                  h(
-                    'select',
-                    {
-                      class: workflowDesignerControlClasses,
-                      value: button.placement ?? 'bar',
+        h('div', { class: workflowDesignerTableScrollClasses }, [
+          h('table', { class: workflowDesignerButtonsTableClasses }, [
+            h('thead', [
+              h('tr', [
+                h('th', { class: workflowDesignerTableHeadClasses }, labels.buttonEnabled),
+                h('th', { class: workflowDesignerTableHeadClasses }, labels.kindLabel),
+                h('th', { class: workflowDesignerTableHeadClasses }, labels.buttonDisplayName),
+                h('th', { class: workflowDesignerTableHeadClasses }, labels.buttonCommentRequired),
+                h('th', { class: workflowDesignerTableHeadClasses }, labels.buttonPlacement)
+              ])
+            ]),
+            h(
+              'tbody',
+              buttonPolicy.buttons.map((button) =>
+                h('tr', { key: button.action }, [
+                  h('td', { class: workflowDesignerTableCellClasses }, [
+                    h('input', {
+                      type: 'checkbox',
+                      checked: button.enabled,
                       disabled: lockedNow,
-                      'aria-label': `${workflowDesignerActionLabel(button.action, timeline)} ${labels.buttonPlacement}`,
+                      'aria-label': `${workflowDesignerActionLabel(button.action, timeline)} ${labels.buttonEnabled}`,
                       onChange: (event: Event) => {
                         patchNode(node.path, {
                           buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
-                            placement: (event.target as HTMLSelectElement).value as 'bar' | 'more'
+                            enabled: (event.target as HTMLInputElement).checked
                           })
                         })
                       }
-                    },
-                    [
-                      h('option', { value: 'bar' }, labels.buttonPlacementBar),
-                      h('option', { value: 'more' }, labels.buttonPlacementMore)
-                    ]
-                  )
+                    })
+                  ]),
+                  h(
+                    'td',
+                    { class: workflowDesignerTableCellClasses },
+                    workflowDesignerActionLabel(button.action, timeline)
+                  ),
+                  h('td', { class: workflowDesignerTableCellClasses }, [
+                    h('input', {
+                      class: workflowDesignerControlClasses,
+                      value: button.label ?? '',
+                      disabled: lockedNow,
+                      'aria-label': `${workflowDesignerActionLabel(button.action, timeline)} ${labels.buttonDisplayName}`,
+                      onInput: (event: Event) => {
+                        patchNode(node.path, {
+                          buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
+                            label: (event.target as HTMLInputElement).value
+                          })
+                        })
+                      }
+                    })
+                  ]),
+                  h('td', { class: workflowDesignerTableCellClasses }, [
+                    h('input', {
+                      type: 'checkbox',
+                      checked: Boolean(button.commentRequired),
+                      disabled: lockedNow,
+                      'aria-label': `${workflowDesignerActionLabel(button.action, timeline)} ${labels.buttonCommentRequired}`,
+                      onChange: (event: Event) => {
+                        patchNode(node.path, {
+                          buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
+                            commentRequired: (event.target as HTMLInputElement).checked
+                          })
+                        })
+                      }
+                    })
+                  ]),
+                  h('td', { class: workflowDesignerTableCellClasses }, [
+                    h(
+                      'select',
+                      {
+                        class: workflowDesignerControlClasses,
+                        value: button.placement ?? 'bar',
+                        disabled: lockedNow,
+                        'aria-label': `${workflowDesignerActionLabel(button.action, timeline)} ${labels.buttonPlacement}`,
+                        onChange: (event: Event) => {
+                          patchNode(node.path, {
+                            buttonPolicy: patchWorkflowDesignerButton(buttonPolicy, button.action, {
+                              placement: (event.target as HTMLSelectElement).value as 'bar' | 'more'
+                            })
+                          })
+                        }
+                      },
+                      [
+                        h('option', { value: 'bar' }, labels.buttonPlacementBar),
+                        h('option', { value: 'more' }, labels.buttonPlacementMore)
+                      ]
+                    )
+                  ])
                 ])
-              ])
+              )
             )
-          )
+          ])
         ]),
         buttonPolicy.buttons.some((button) => button.action === 'addsign' && button.enabled)
           ? h('fieldset', { class: workflowDesignerFieldClasses }, [

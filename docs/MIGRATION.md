@@ -1,6 +1,12 @@
 # Tigercat 迁移指南
 
-## v3.0.0-preview.8
+## v3.0.0-preview.9
+
+分类轴（point / band）现在遵循 `xTicks` / `ticks` 数量，默认最多约 5 个刻度；多个刻度保留首尾。需要显示全部分类时传完整 `xTickValues` / `tickValues`，或将数量设为数据项数。显式刻度值仍优先，线性轴算法不变。
+
+Anchor 的 `onClick` / `@click` 可用 `event.preventDefault()` 取消组件滚动和 hash 更新。`getCurrentAnchor` 随外部状态同步高亮：React 回调使用当前 render 的状态，Vue 支持稳定函数读取响应式状态；不再需要 keyed remount。
+
+Vue Inplace 的原始发出事件名从 `editingChange` 改为 `editing-change`。模板 `@editing-change`、`onEditingChange` 和 `v-model:editing` 的使用不变；直接读取 `wrapper.emitted('editingChange')` 的测试改为 `wrapper.emitted('editing-change')`。
 
 从 2.x 改到 3.0 的调用点在终稿 [MIGRATION-3.0.md](MIGRATION-3.0.md)。3.0 不向前兼容。按公开组件列出要换的导入和 prop。组件的完整写法在 `skills/tigercat` 和 `examples`。
 

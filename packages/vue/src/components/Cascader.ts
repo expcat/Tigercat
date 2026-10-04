@@ -411,10 +411,11 @@ export const Cascader = defineComponent({
       } catch {
         if (!isCurrentLoadToken(loadTokens, key, token)) return
       } finally {
-        if (!isCurrentLoadToken(loadTokens, key, token)) return
-        const after = new Set(loadingKeys.value)
-        after.delete(key)
-        loadingKeys.value = after
+        if (isCurrentLoadToken(loadTokens, key, token)) {
+          const after = new Set(loadingKeys.value)
+          after.delete(key)
+          loadingKeys.value = after
+        }
       }
     }
 

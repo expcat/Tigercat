@@ -5,7 +5,6 @@ import {
   watch,
   onMounted,
   onUnmounted,
-  nextTick,
   useId,
   PropType,
   h
@@ -28,7 +27,6 @@ import {
   getCarouselDotClasses,
   getCarouselDotMarkClasses,
   getCarouselDotsClasses,
-  getCarouselDotsOrientation,
   getCarouselLabels,
   getCarouselLoopTarget,
   getCarouselPointerPoint,
@@ -50,15 +48,12 @@ import {
   mergeTigerLocale,
   prefersReducedMotion,
   subscribePrefersReducedMotion,
-  isCarouselAutoplayRequested,
   carouselStatusClasses,
-  carouselTrackInstantClasses,
   formatCarouselSlideStatus,
   resolveCarouselKeyboardNavigation,
   resolveCarouselLoopSnap,
   resolveCarouselRegion,
   resolveCarouselSwipeDirection,
-  resolveCarouselTabKeyboardNavigation,
   shouldLoopCarousel,
   type CarouselAutoplayController,
   type CarouselDotPosition,
@@ -234,9 +229,6 @@ export const Carousel = defineComponent({
         reducedMotion.value = value
       })
     })
-    const autoplayRequested = computed(() =>
-      isCarouselAutoplayRequested(props.autoplay, props.autoplaySpeed)
-    )
     const autoplayEnabled = computed(() =>
       isCarouselAutoplayEnabled(props.autoplay, props.autoplaySpeed, reducedMotion.value)
     )
@@ -411,6 +403,7 @@ export const Carousel = defineComponent({
     })
 
     onUnmounted(() => {
+      stopMotion?.()
       stopAutoplay()
       resetPointer()
       viewportNode?.removeEventListener('pointerdown', handlePointerDown)
@@ -580,32 +573,6 @@ export const Carousel = defineComponent({
         else if (action === 'prev') prev()
         else if (action === 'first') goTo(0, 'goto')
         else goTo(count - 1, 'goto')
-      }
-
-      const handleTablistKeyDown = (event: KeyboardEvent) => {
-        const action = resolveCarouselTabKeyboardNavigation(
-          event.key,
-          getCarouselDotsOrientation(props.dotPosition),
-          dir.value
-        )
-        if (!action) return
-        event.preventDefault()
-        event.stopPropagation()
-        const nextIndex =
-          action === 'next'
-            ? getNextSlideIndex(current, count, true)
-            : action === 'prev'
-              ? getPrevSlideIndex(current, count, true)
-              : action === 'first'
-                ? 0
-                : count - 1
-        goTo(nextIndex, 'goto')
-        nextTick(() => {
-          const tab = (event.currentTarget as HTMLElement | null)?.querySelector<HTMLElement>(
-            `[data-tiger-carousel-tab="${nextIndex}"]`
-          )
-          tab?.focus()
-        })
       }
 
       return h(

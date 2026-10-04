@@ -1,8 +1,7 @@
 /**
  * @vitest-environment happy-dom
  */
-
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Menu, MenuItem, MenuItemGroup, SubMenu } from '@expcat/tigercat-react/Menu'
@@ -30,6 +29,16 @@ function getItem(name: string) {
 }
 
 describe('Menu', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   describe('Rendering', () => {
     it('renders a named nav list without putting items in a popup menu role', () => {
       const { container } = render(

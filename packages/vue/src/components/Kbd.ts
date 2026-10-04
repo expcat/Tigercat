@@ -26,16 +26,6 @@ function hasSlotContent(nodes: unknown): boolean {
   return Array.isArray(nodes) && nodes.length > 0
 }
 
-function extraKeyText(nodes: unknown): string | undefined {
-  if (!Array.isArray(nodes) || nodes.length !== 1) return undefined
-  const node = nodes[0] as { children?: unknown; type?: unknown }
-  if (typeof node === 'string' || typeof node === 'number') return String(node)
-  if (node && (typeof node.children === 'string' || typeof node.children === 'number')) {
-    return String(node.children)
-  }
-  return undefined
-}
-
 export const Kbd = defineComponent({
   name: 'TigerKbd',
   inheritAttrs: false,

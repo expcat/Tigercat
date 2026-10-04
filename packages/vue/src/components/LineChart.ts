@@ -518,16 +518,6 @@ export const LineChart = defineComponent({
                   })
                 : null,
               // Gradient defs and animation styles
-              trackPointHover
-                ? h('rect', {
-                    width: innerRect.value.width,
-                    height: innerRect.value.height,
-                    fill: 'transparent',
-                    'data-plot-hit': '',
-                    onMousemove: handlePlotMouseMove,
-                    onMouseleave: handlePointMouseLeave
-                  })
-                : null,
               seriesData.value.some((sd) => sd.showArea) ||
               props.strokeGradient ||
               props.pointGradient
@@ -756,7 +746,19 @@ export const LineChart = defineComponent({
                     ]
                   }
                 )
-              )
+              ),
+              // Topmost transparent hit layer: the whole plot reports the same
+              // nearest-point hover regardless of fills below (React parity).
+              trackPointHover
+                ? h('rect', {
+                    width: innerRect.value.width,
+                    height: innerRect.value.height,
+                    fill: 'transparent',
+                    'data-plot-hit': '',
+                    onMousemove: handlePlotMouseMove,
+                    onMouseleave: handlePointMouseLeave
+                  })
+                : null
             ].filter(Boolean)
         }
       )

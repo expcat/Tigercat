@@ -25,7 +25,6 @@ import {
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
   getGestureTouchPoint,
-  isDrawerSwipeCloseGesture,
   resolveDrawerPlacement,
   getDrawerSwipeCloseDirection,
   getDrawerLabels,

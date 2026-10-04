@@ -47,7 +47,6 @@ import {
   nextTreeSelectedKeys,
   nextTreeRangeSelection,
   createTypeaheadHighlight,
-  markTypeaheadMatch,
   normalizeSvgAttrs,
   reconcileUncontrolledExpandedKeys,
   resolveCheckedInput,

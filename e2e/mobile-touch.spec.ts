@@ -67,7 +67,10 @@ test.describe('Mobile touch interactions', () => {
     await expect(carousel).toBeVisible()
     const viewport = carousel.locator('[data-tiger-carousel-viewport]')
     await dispatchPointerSwipe(viewport, 320, 80)
-    await expect(preview.getByRole('tab').nth(1)).toHaveAttribute('aria-selected', 'true')
+    await expect(carousel.locator('[data-tiger-carousel-tab="1"]')).toHaveAttribute(
+      'aria-current',
+      'true'
+    )
   })
 
   test('drawer closes with an outward swipe on mobile Chromium', async ({ page }, testInfo) => {
@@ -76,7 +79,7 @@ test.describe('Mobile touch interactions', () => {
     await preview.getByRole('button', { name: '打开抽屉', exact: true }).click()
     const drawer = preview.locator('[data-tiger-drawer]')
     await expect(drawer).toBeVisible()
-    await dispatchTouchSwipe(drawer, 260, 360)
+    await dispatchTouchSwipe(drawer.locator('[data-tiger-overlay-handle]'), 80, 360)
     await expect(preview.locator('[data-tiger-drawer-root]')).toBeHidden()
   })
 })

@@ -1,8 +1,7 @@
 /**
  * @vitest-environment happy-dom
  */
-
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, waitFor, screen } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Popconfirm } from '@expcat/tigercat-vue/Popconfirm'
@@ -10,6 +9,16 @@ import { renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 import { h } from 'vue'
 
 describe.sequential('Popconfirm', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('opens on trigger click and closes on cancel/confirm', async () => {
     const user = userEvent.setup()
     const { getByText, queryByText } = render(Popconfirm, {

@@ -6,7 +6,7 @@ for (const app of exampleApps) {
     test.setTimeout(45_000)
     const { moduleRoot, preview } = await openDemo(page, app.baseUrl, 'button', 'button-01')
     const editedLabel = `${app.framework} 已编辑按钮`
-    const sourceLabel = '提交中'
+    const sourceLabel = '小号'
 
     await expect(preview.getByRole('button', { name: sourceLabel, exact: true })).toBeVisible()
     await moduleRoot.getByTestId('demo-edit-source').click()

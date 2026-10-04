@@ -14,6 +14,8 @@ import {
   type AssigneeOption
 } from '@expcat/tigercat-core'
 
+export type VueAssigneePickerProps = InstanceType<typeof AssigneePicker>['$props']
+
 export const AssigneePicker = defineComponent({
   name: 'TigerAssigneePicker',
   props: {

@@ -4,7 +4,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
+import userEvent from '@testing-library/user-event'
 import { Anchor, AnchorLink } from '@expcat/tigercat-vue/Anchor'
 import { expectNoA11yViolationsIsolated } from '../utils'
 import { MockIntersectionObserver } from '../utils/mock-observers'
@@ -30,6 +31,45 @@ describe('Anchor', () => {
   })
 
   describe('Rendering', () => {
+    it('lets keyboard navigation be cancelled and tracks a stable getter reading external state', async () => {
+      const scroll = vi.spyOn(scrollContainer, 'scrollTo')
+      const replace = vi.spyOn(window.history, 'replaceState')
+      const active = ref('#section1')
+      const getCurrentAnchor = () => active.value
+      render(Anchor, {
+        props: {
+          affix: false,
+          getContainer: () => scrollContainer,
+          getCurrentAnchor,
+          onClick: (event: Event, href: string) => {
+            event.preventDefault()
+            active.value = href
+          }
+        },
+        slots: {
+          default: () => [
+            h(AnchorLink, { href: '#section1', title: 'Overview' }),
+            h(AnchorLink, { href: '#section2', title: 'Members' }),
+            h(AnchorLink, { href: '#not-mounted', title: 'Activity' })
+          ]
+        }
+      })
+      const members = screen.getByRole('link', { name: 'Members' })
+      active.value = '#section2'
+      await waitFor(() => expect(members).toHaveAttribute('aria-current', 'location'))
+      const activity = screen.getByRole('link', { name: 'Activity' })
+      for (const link of [members, activity]) {
+        link.focus()
+        await userEvent.keyboard('{Enter}')
+        expect(link).toHaveFocus()
+        expect(link).toHaveAttribute('aria-current', 'location')
+      }
+      expect(screen.getByRole('link', { name: 'Members' })).toBe(members)
+      expect(scroll).not.toHaveBeenCalled()
+      expect(replace).not.toHaveBeenCalled()
+      scroll.mockRestore()
+      replace.mockRestore()
+    })
     it('should render with default props', () => {
       const { container } = render(Anchor, {
         props: {

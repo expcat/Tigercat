@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useState } from 'react'
@@ -38,6 +38,23 @@ async function openPicker() {
 describe('TimePicker', () => {
   beforeEach(() => {
     mockLayout(true)
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+  afterEach(() => vi.restoreAllMocks())
+
+  it.each([false, true])('restores the input after Escape (range=%s)', async (range) => {
+    render(<TimePicker range={range} />)
+    const input = screen.getByRole('textbox')
+    const panel = await openPicker()
+    const hour = panel.querySelector<HTMLElement>('[data-tiger-timepicker-unit="hour"]')!
+    hour.focus()
+    expect(hour).toHaveFocus()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(input).toHaveFocus())
+    expect(input).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('renders a closed field with the locale placeholder', () => {

@@ -128,9 +128,6 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
   const [documentTimeZone, setDocumentTimeZone] = useState<string | null>(timeZone ?? null)
   const clockZone = timeZone ?? documentTimeZone
   const virtualOn = virtual ?? messages.length >= CHAT_VIRTUAL_THRESHOLD
-  const previousScrollHeightRef = useRef(0)
-  const previousFirstIdRef = useRef<string | number | undefined>(messages[0]?.id)
-  const previousLengthRef = useRef(messages.length)
 
   const hasSendHandler = typeof onSend === 'function'
   const canSend = canSendChatMessage({
@@ -337,11 +334,6 @@ export const ChatWindow = forwardRef<ChatWindowHandle, ChatWindowProps>(function
     }
     return () => cancelAnimationFrame(raf)
   }, [autoScrollToBottom, messages, virtualOn])
-
-  const listA11y = {
-    role: 'list' as const,
-    'aria-label': listLabel
-  }
 
   return (
     <div className={wrapperClasses} data-tiger-chat-window {...props}>

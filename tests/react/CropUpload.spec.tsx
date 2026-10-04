@@ -4,7 +4,6 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen, fireEvent } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { CropUpload } from '@expcat/tigercat-react/CropUpload'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'

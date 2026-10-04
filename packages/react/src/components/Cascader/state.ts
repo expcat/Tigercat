@@ -295,12 +295,13 @@ export function useCascaderController(props: CascaderProps) {
       } catch {
         if (!isCurrentLoadToken(loadTokensRef.current, key, token)) return
       } finally {
-        if (!isCurrentLoadToken(loadTokensRef.current, key, token)) return
-        setLoadingKeys((current) => {
-          const next = new Set(current)
-          next.delete(key)
-          return next
-        })
+        if (isCurrentLoadToken(loadTokensRef.current, key, token)) {
+          setLoadingKeys((current) => {
+            const next = new Set(current)
+            next.delete(key)
+            return next
+          })
+        }
       }
     },
     [changeOnSelect, commitPath, focusColumnAfterLoad, loadData, optionsProp]

@@ -2,12 +2,7 @@
  * Upload utility functions
  */
 
-import type {
-  UploadFile,
-  UploadFileStatus,
-  UploadRejectedFile,
-  UploadRejectReason
-} from '../types/upload'
+import type { UploadFile, UploadFileStatus, UploadRejectedFile } from '../types/upload'
 import { classNames } from './class-names'
 import { isBrowser } from './env'
 import { formatBytes, getFileExtensionName } from './file-utils'

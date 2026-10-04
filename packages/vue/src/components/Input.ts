@@ -260,7 +260,6 @@ export const Input = defineComponent({
         valueLength: currentValStr.length,
         hasCustomSuffix: hasCustomSuffix.value
       })
-      const hasExtras = activeError.value || props.showCount
       const inputClasses = getInputFieldClasses({
         size: effectiveSize.value,
         status: effectiveStatus.value,
@@ -385,14 +384,7 @@ export const Input = defineComponent({
         {
           ref: wrapperRef,
           [TIGER_CHROME_ATTR]: '',
-          class: classNames(
-            getInputWrapperClasses(effectiveStatus.value, {
-              inGroup: inGroup.value && !hasExtras
-            }),
-            !hasExtras ? props.className : undefined,
-            !hasExtras ? coerceClassValue(attrClass) : undefined
-          ),
-          style: !hasExtras ? [attrStyle, props.style] : undefined,
+          class: getInputWrapperClasses(effectiveStatus.value),
           onAnimationend: handleAnimationEnd
         },
         wrapperChildren
@@ -425,8 +417,9 @@ export const Input = defineComponent({
         )
       }
 
-      if (!hasExtras) return chromeNode
-
+      // Always render the same host shape: when an error or the counter
+      // appears or disappears, the chrome (and the focused input inside it)
+      // must keep its DOM node instead of being rebuilt under a new root.
       const hostProps = {
         class: classNames(
           getFieldExtrasHostClasses(inGroup.value),
@@ -439,14 +432,16 @@ export const Input = defineComponent({
 
       return h('div', hostProps, [
         chromeNode,
-        h(
-          'div',
-          {
-            class: getGroupedFieldExtraStackClasses(),
-            [FIELD_EXTRA_ATTR]: fieldExtraKind(extras.length)
-          },
-          extras
-        )
+        extras.length > 0
+          ? h(
+              'div',
+              {
+                class: getGroupedFieldExtraStackClasses(),
+                [FIELD_EXTRA_ATTR]: fieldExtraKind(extras.length)
+              },
+              extras
+            )
+          : null
       ])
     }
   }

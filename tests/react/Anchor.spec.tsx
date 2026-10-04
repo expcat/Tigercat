@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
+import userEvent from '@testing-library/user-event'
 import { Anchor, AnchorLink } from '@expcat/tigercat-react/Anchor'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 import { MockIntersectionObserver } from '../utils/mock-observers'
@@ -30,6 +31,46 @@ describe('Anchor', () => {
   })
 
   describe('Rendering', () => {
+    it('lets keyboard navigation be cancelled and synchronizes an external tab without remounting', async () => {
+      const scroll = vi.spyOn(scrollContainer, 'scrollTo')
+      const replace = vi.spyOn(window.history, 'replaceState')
+      function Harness() {
+        const [active, setActive] = React.useState('#section1')
+        return (
+          <>
+            <button onClick={() => setActive('#section2')}>External tab</button>
+            <Anchor
+              affix={false}
+              getContainer={() => scrollContainer}
+              getCurrentAnchor={() => active}
+              onClick={(event, href) => {
+                event.preventDefault()
+                setActive(href)
+              }}>
+              <AnchorLink href="#section1" title="Overview" />
+              <AnchorLink href="#section2" title="Members" />
+              <AnchorLink href="#not-mounted" title="Activity" />
+            </Anchor>
+          </>
+        )
+      }
+      render(<Harness />)
+      const members = screen.getByRole('link', { name: 'Members' })
+      await userEvent.click(screen.getByRole('button', { name: 'External tab' }))
+      expect(members).toHaveAttribute('aria-current', 'location')
+      const activity = screen.getByRole('link', { name: 'Activity' })
+      for (const link of [members, activity]) {
+        link.focus()
+        await userEvent.keyboard('{Enter}')
+        expect(link).toHaveFocus()
+        expect(link).toHaveAttribute('aria-current', 'location')
+      }
+      expect(screen.getByRole('link', { name: 'Members' })).toBe(members)
+      expect(scroll).not.toHaveBeenCalled()
+      expect(replace).not.toHaveBeenCalled()
+      scroll.mockRestore()
+      replace.mockRestore()
+    })
     it('should render with default props', () => {
       const { container } = render(
         <Anchor getContainer={() => scrollContainer}>

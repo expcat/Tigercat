@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useRef, useState } from 'react'
@@ -35,6 +35,12 @@ const cityOptions = [
 const jumpOptions = [{ label: 'Apple', value: 'app' }]
 
 describe('AutoComplete', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(20, 20, 240, 32)
+    )
+  })
+  afterEach(() => vi.restoreAllMocks())
   it('renders a combobox input', () => {
     const { getByRole } = render(<AutoComplete options={options} aria-label="Fruit" />)
     const input = getByRole('combobox')

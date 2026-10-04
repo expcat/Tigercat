@@ -1,25 +1,13 @@
-import {
-  computed,
-  defineComponent,
-  h,
-  inject,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-  PropType
-} from 'vue'
+import { computed, defineComponent, h, inject, ref, watch, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
   collapseExtraClasses,
   collapseHeaderRowClasses,
   collapseHeaderTextClasses,
-  collapseKeyOf,
   collapsePanelContentBaseClasses,
   collapsePanelContentWrapperClasses,
   createAriaIdScope,
-  createCollapseTransitionController,
   getCollapseIconClasses,
   getCollapsePanelClasses,
   getCollapsePanelHeaderClasses,
@@ -105,12 +93,9 @@ export const CollapsePanel = defineComponent({
 
     const contentRef = ref<HTMLElement>()
     const headerRef = ref<HTMLButtonElement>()
-    const controllerReady = ref(false)
-    const initialActive = isActive.value
     const ariaIds = createAriaIdScope()
     const headerId = ariaIds.next({ prefix: 'tiger-collapse-header' })
     const contentId = ariaIds.next({ prefix: 'tiger-collapse-content' })
-    let transitionController: ReturnType<typeof createCollapseTransitionController> | undefined
 
     const panelClasses = computed(() => {
       return classNames(

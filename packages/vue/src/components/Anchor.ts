@@ -292,17 +292,19 @@ export const Anchor = defineComponent({
 
     const handleLinkClick = (href: string, event: Event, targetAttr?: string) => {
       const hasTargetElement = Boolean(getAnchorTargetElement(href))
-      if (
-        !shouldHandleAnchorClick(event as MouseEvent, {
-          target: targetAttr,
-          hasTargetElement
-        })
-      ) {
-        emit('click', event, href)
+      const canHandle = shouldHandleAnchorClick(event as MouseEvent, {
+        target: targetAttr,
+        hasTargetElement
+      })
+      emit('click', event, href)
+      if (event.defaultPrevented) {
+        // Caller owns navigation (e.g. switches tabs); still reflect the click
+        // intent so the highlight can follow once external state settles.
+        applyActive(href)
         return
       }
+      if (!canHandle) return
       event.preventDefault()
-      emit('click', event, href)
       const finalHref = applyActive(href)
       scrollLock.lock()
       scrollTo(finalHref)
@@ -336,6 +338,13 @@ export const Anchor = defineComponent({
     watch([links, scrollOffset, resolvedKey, () => props.bounds], () => {
       nextTick(() => setupObserver())
     })
+    watch(
+      () => props.getCurrentAnchor?.(activeLink.value),
+      (href) => {
+        if (href !== undefined) applyActive(activeLink.value)
+      },
+      { immediate: true }
+    )
 
     onMounted(() => {
       nextTick(() => {
@@ -359,7 +368,7 @@ export const Anchor = defineComponent({
     const showInk = computed(() => !props.affix || props.showInkInFixed)
 
     const contextValue = reactive<AnchorContext>({
-      activeLink: '',
+      activeLink: activeLink.value,
       orientation: props.orientation,
       registerLink,
       unregisterLink,

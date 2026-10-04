@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useId, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
@@ -10,14 +10,12 @@ import {
   getTagsArrowDelta,
   getTagsInputClearButtonClasses,
   getTagsInputContainerClasses,
-  getTagsInputErrorClasses,
   getTagsInputHighlightClasses,
   getTagsInputInnerInputClasses,
   getTagsInputLabels,
   mergeAriaDescribedBy,
   moveTagsHighlight,
   removeTagAt,
-  resolveReadOnlyFlag,
   resolveTagsPaste,
   shouldSubmitNativeField,
   runShakeAnimation,
@@ -99,8 +97,6 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
         : undefined
   const dir = config.direction === 'rtl' ? 'rtl' : 'ltr'
   const labels = getTagsInputLabels(config.locale)
-  const reactId = useId()
-  const errorMsgId = `tiger-tags-input-error-${reactId}`
 
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)

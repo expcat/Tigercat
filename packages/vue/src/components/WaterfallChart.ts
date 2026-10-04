@@ -10,6 +10,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 
 export type WaterfallChartProps = CoreWaterfallChartProps
+export type VueWaterfallChartProps = InstanceType<typeof WaterfallChart>['$props']
 
 const KIND_COLOR: Record<WaterfallDatum['kind'], string> = {
   increase: 'var(--tiger-success, #16a34a)',

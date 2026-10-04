@@ -186,7 +186,9 @@ const componentsWithOpen = new Set()
 const OPEN_PARITY_SKIP_COMPONENTS = new Set([
   'ChartTooltip',
   'BaseFloatingPopup',
-  'ImageViewerBase'
+  'ImageViewerBase',
+  // Tag is not an overlay: close requests are cancellable by the parent, which owns visibility.
+  'Tag'
 ])
 
 for (const filename of typeFiles) {

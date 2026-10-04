@@ -24,6 +24,9 @@ const data = [
 let createObjectURLSpy: ReturnType<typeof vi.fn>
 
 beforeEach(() => {
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+    new DOMRect(20, 20, 240, 32)
+  )
   createObjectURLSpy = vi.fn(() => 'blob:mock')
   URL.createObjectURL = createObjectURLSpy as typeof URL.createObjectURL
   URL.revokeObjectURL = vi.fn() as typeof URL.revokeObjectURL
