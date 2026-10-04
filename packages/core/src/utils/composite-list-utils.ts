@@ -43,7 +43,8 @@ export function flattenCompositeGroupRows(
     }
     ;(group.items ?? []).forEach((item, itemIndex) => {
       rows.push({
-        key: item.id != null && item.id !== '' ? String(item.id) : `item:${groupIndex}:${itemIndex}`,
+        key:
+          item.id != null && item.id !== '' ? String(item.id) : `item:${groupIndex}:${itemIndex}`,
         kind: 'item',
         groupIndex,
         itemIndex

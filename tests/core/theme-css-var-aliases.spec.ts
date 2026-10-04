@@ -9,7 +9,11 @@ import {
   createTigerThemeScope,
   defaultTheme
 } from '@expcat/tigercat-core'
-import { tigercatTheme, tigercatDarkTheme, tigercatPlugin } from '../../packages/core/src/tailwind-plugin'
+import {
+  tigercatTheme,
+  tigercatDarkTheme,
+  tigercatPlugin
+} from '../../packages/core/src/tailwind-plugin'
 
 const lightColors = defaultTheme.light.colors
 const darkColors = defaultTheme.dark.colors

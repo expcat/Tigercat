@@ -117,9 +117,7 @@ export const Radio = defineComponent({
       () => props.status ?? formItemControl?.status.value ?? 'default'
     )
 
-    const formBound = computed(
-      () => !isInGroup.value && Boolean(formItemControl?.name.value)
-    )
+    const formBound = computed(() => !isInGroup.value && Boolean(formItemControl?.name.value))
     const isChecked = computed(() => {
       if (isInGroup.value) return groupContext.value?.value === props.value
       if (formBound.value) {

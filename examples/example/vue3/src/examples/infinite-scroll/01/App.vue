@@ -25,10 +25,7 @@ const loadMore = () => {
     root="container"
     class-name="rounded border border-[var(--tiger-border)]"
     @load-more="loadMore">
-    <div
-      v-for="item in items"
-      :key="item"
-      class="border-b border-[var(--tiger-border)] px-4 py-3">
+    <div v-for="item in items" :key="item" class="border-b border-[var(--tiger-border)] px-4 py-3">
       项目 {{ item }}
     </div>
   </InfiniteScroll>

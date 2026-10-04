@@ -122,20 +122,16 @@ export const Drag = defineComponent({
         },
         [
           drag.draggedItem.value
-            ? h(
-                'div',
-                { 'data-tiger-drag-preview': '' },
-                String(drag.draggedItem.value.id)
-              )
+            ? h('div', { 'data-tiger-drag-preview': '' }, String(drag.draggedItem.value.id))
             : null,
           h('div', { role: 'status', 'data-tiger-drag-live': '' }, announcement.value),
           ...props.items.map((item) => {
-          const itemAttrs = drag.getDragItemAttrs(item)
-          const isDragging = drag.draggedItem.value?.id === item.id
-          const custom = slots.item?.({ item, attrs: itemAttrs, isDragging })
-          if (custom) return custom
-          return h('li', { ...itemAttrs, key: item.id, role: 'listitem' }, String(item.id))
-        })
+            const itemAttrs = drag.getDragItemAttrs(item)
+            const isDragging = drag.draggedItem.value?.id === item.id
+            const custom = slots.item?.({ item, attrs: itemAttrs, isDragging })
+            if (custom) return custom
+            return h('li', { ...itemAttrs, key: item.id, role: 'listitem' }, String(item.id))
+          })
         ]
       )
     }

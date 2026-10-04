@@ -86,7 +86,10 @@ describe('CronEditor', () => {
     render(<CronEditor defaultValue="* * * * *" onChange={onChange} />)
 
     fireEvent.change(screen.getByLabelText('Minute mode'), { target: { value: 'every' } })
-    expect(onChange).toHaveBeenLastCalledWith('*/1 * * * *', expect.objectContaining({ valid: true }))
+    expect(onChange).toHaveBeenLastCalledWith(
+      '*/1 * * * *',
+      expect.objectContaining({ valid: true })
+    )
     fireEvent.change(screen.getByLabelText('Minute step'), { target: { value: '15' } })
     expect(onChange).toHaveBeenLastCalledWith(
       '*/15 * * * *',

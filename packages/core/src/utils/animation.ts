@@ -120,7 +120,9 @@ export function getComponentMotionStyle(
 }
 
 export function getComponentMotionTransition(
-  properties: string | string[] = 'color, background-color, border-color, outline-color, text-decoration-color, box-shadow, opacity, transform',
+  properties:
+    | string
+    | string[] = 'color, background-color, border-color, outline-color, text-decoration-color, box-shadow, opacity, transform',
   config: ComponentMotionConfig = {}
 ): string {
   const props = Array.isArray(properties) ? properties : [properties]

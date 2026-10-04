@@ -29,7 +29,9 @@ describe('code-highlighter', () => {
     it('matches the built-in tokenizer text', () => {
       const line = 'const x = 1'
       const tokens = builtinCodeHighlighter.highlightLine!(line, 'javascript', 'light')
-      expect(tokens.map((token) => token.text)).toEqual(tokenizeLine(line, 'javascript').map((token) => token.value))
+      expect(tokens.map((token) => token.text)).toEqual(
+        tokenizeLine(line, 'javascript').map((token) => token.value)
+      )
     })
   })
 

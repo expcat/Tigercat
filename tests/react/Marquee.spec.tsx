@@ -116,9 +116,9 @@ describe('Marquee', () => {
       const sign = getComputedStyle(root).getPropertyValue(MARQUEE_INLINE_SIGN_VAR).trim()
       if (sign) expect(sign).toBe('-1')
       expect(root.className).toContain('tiger-marquee-horizontal')
-      expect(marqueeBaseStyles['.tiger-marquee-horizontal > .tiger-marquee-track'].flexDirection).toBe(
-        'row'
-      )
+      expect(
+        marqueeBaseStyles['.tiger-marquee-horizontal > .tiger-marquee-track'].flexDirection
+      ).toBe('row')
     })
 
     it('writes duration and gap onto the track as CSS variables', () => {

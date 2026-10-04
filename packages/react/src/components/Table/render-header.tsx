@@ -106,7 +106,11 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                 : 'none'
             : undefined
 
-          const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo, TABLE_FIXED_HEADER_Z_INDEX)
+          const fixedStyle = getFixedColumnStyle(
+            column,
+            ctx.fixedColumnsInfo,
+            TABLE_FIXED_HEADER_Z_INDEX
+          )
 
           const measuredWidth = ctx.widthMap[column.key]
           const widthStyle =
@@ -225,7 +229,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
                     e.stopPropagation()
                   }}>
                   {column.filter.type === 'custom' && column.filter.render ? (
-                    column.filter.render() as React.ReactNode
+                    (column.filter.render() as React.ReactNode)
                   ) : column.filter.type === 'select' && column.filter.options ? (
                     <select
                       className={getInputClasses({ size: 'sm' })}

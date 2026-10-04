@@ -235,7 +235,8 @@ export function resolveSheetRelease(
 ): SheetRelease {
   const traveled = clampSheetDragDistance(distance)
   if (!(size > 0)) return traveled >= 48 ? 'close' : 'snap'
-  const ratio = Number.isFinite(threshold) && threshold > 0 ? threshold : SHEET_CLOSE_THRESHOLD_RATIO
+  const ratio =
+    Number.isFinite(threshold) && threshold > 0 ? threshold : SHEET_CLOSE_THRESHOLD_RATIO
   return traveled / size >= ratio ? 'close' : 'snap'
 }
 

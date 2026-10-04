@@ -236,7 +236,11 @@ function radarDatumForIndicator(
   if (labeled) return labeled
   const positional = data[indicator.index]
   if (!positional) return null
-  if (positional.label && positional.label !== indicator.label && positional.label !== indicator.key) {
+  if (
+    positional.label &&
+    positional.label !== indicator.label &&
+    positional.label !== indicator.key
+  ) {
     return null
   }
   return positional

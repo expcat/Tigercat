@@ -36,8 +36,7 @@ export const colorSwatchBaseClasses = classNames(
 
 export const colorSwatchGroupClasses = 'flex flex-col gap-2'
 
-export const colorSwatchGroupLabelClasses =
-  'text-xs font-medium text-[var(--tiger-text-secondary)]'
+export const colorSwatchGroupLabelClasses = 'text-xs font-medium text-[var(--tiger-text-secondary)]'
 
 export const colorSwatchGridClasses = 'grid gap-2'
 

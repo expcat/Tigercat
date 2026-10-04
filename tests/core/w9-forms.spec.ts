@@ -70,12 +70,8 @@ describe('W9 form core', () => {
     const removed = removeFieldArrayItem(inserted, 'rows', 0)
     expect(getValueByPath(removed, 'rows[0].name')).toBe('b')
     expect(
-      shiftFieldArrayErrors(
-        [{ field: 'rows[2].name', message: 'bad' }],
-        'rows',
-        0,
-        'remove'
-      )[0].field
+      shiftFieldArrayErrors([{ field: 'rows[2].name', message: 'bad' }], 'rows', 0, 'remove')[0]
+        .field
     ).toBe('rows[1].name')
     const engine = createFormEngine({ initialValues: { rows: [{ name: 'a' }] } })
     engine.insertFieldArrayItem('rows', 1, { name: 'b' })
@@ -135,12 +131,24 @@ describe('W9 form core', () => {
     const real = new File(['x'], 'a.txt', { type: 'text/plain' })
     expect(filesFromDirectoryList([directory, real])).toEqual([real])
     expect(pressureLineWidth(2, 1)).toBeGreaterThan(pressureLineWidth(2, 0))
-    const bounds = signatureInkBounds([{ points: [{ x: 2, y: 3 }, { x: 6, y: 8 }], color: '#000', lineWidth: 1 }])
+    const bounds = signatureInkBounds([
+      {
+        points: [
+          { x: 2, y: 3 },
+          { x: 6, y: 8 }
+        ],
+        color: '#000',
+        lineWidth: 1
+      }
+    ])
     expect(bounds?.width).toBe(4)
     const redone = signatureRedo(signatureUndo({ past: [1], present: 2, future: [] }))
     expect(redone.present).toBe(2)
-    expect(formErrorSummary([{ field: 'name', message: 'Required' }, { field: 'name', message: 'Again' }])).toEqual([
-      { field: 'name', message: 'Required' }
-    ])
+    expect(
+      formErrorSummary([
+        { field: 'name', message: 'Required' },
+        { field: 'name', message: 'Again' }
+      ])
+    ).toEqual([{ field: 'name', message: 'Required' }])
   })
 })

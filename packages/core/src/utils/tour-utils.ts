@@ -479,10 +479,7 @@ export function tourTargetExempt(step: TourStep | undefined): boolean {
   return Boolean(step && (step.interact || tourStepAdvancesOnTarget(step)))
 }
 
-export function tourArrowKey(
-  key: string,
-  target: EventTarget | null
-): 'prev' | 'next' | null {
+export function tourArrowKey(key: string, target: EventTarget | null): 'prev' | 'next' | null {
   if (key !== 'ArrowLeft' && key !== 'ArrowRight') return null
   if (target instanceof Element) {
     const field = target.closest('input, textarea, select, [contenteditable="true"]')

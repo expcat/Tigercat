@@ -38,7 +38,12 @@ export interface CardProps
 }
 
 function nodeHasControl(node: React.ReactNode): boolean {
-  if (node == null || typeof node === 'boolean' || typeof node === 'string' || typeof node === 'number') {
+  if (
+    node == null ||
+    typeof node === 'boolean' ||
+    typeof node === 'string' ||
+    typeof node === 'number'
+  ) {
     return false
   }
   if (Array.isArray(node)) return node.some(nodeHasControl)
@@ -151,7 +156,9 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     <>
       {coverNode}
       {hasCover ? (
-        <div className={classNames(cardHorizontalBodyClasses, paddingClass)} data-tiger-card-body="">
+        <div
+          className={classNames(cardHorizontalBodyClasses, paddingClass)}
+          data-tiger-card-body="">
           {headerNode}
           {bodyNode}
           {footerNode}

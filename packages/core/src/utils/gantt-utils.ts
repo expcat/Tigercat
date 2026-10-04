@@ -82,10 +82,8 @@ export const ganttAxisTextClasses =
   'pointer-events-none select-none fill-[var(--tiger-text-secondary)] text-[11px]'
 export const ganttBarClasses =
   'transition-[filter,opacity,stroke] motion-reduce:transition-none duration-150 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
-export const ganttProgressClasses =
-  'fill-[color-mix(in_oklab,var(--tiger-text)_20%,transparent)]'
-export const ganttDependencyClasses =
-  'fill-none stroke-[var(--tiger-text-secondary)] stroke-[1.5]'
+export const ganttProgressClasses = 'fill-[color-mix(in_oklab,var(--tiger-text)_20%,transparent)]'
+export const ganttDependencyClasses = 'fill-none stroke-[var(--tiger-text-secondary)] stroke-[1.5]'
 export const ganttTodayLineClasses = 'stroke-[var(--tiger-error)] stroke-2'
 
 export function normalizeGanttDate(value: GanttDateValue): number {

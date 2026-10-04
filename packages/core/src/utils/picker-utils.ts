@@ -200,10 +200,7 @@ export function getPickerComboboxAria({
 }
 
 /** IME composition must not be treated as a list action. */
-export function isImeCompositionEvent(event: {
-  isComposing?: boolean
-  keyCode?: number
-}): boolean {
+export function isImeCompositionEvent(event: { isComposing?: boolean; keyCode?: number }): boolean {
   return Boolean(event.isComposing) || event.keyCode === 229
 }
 

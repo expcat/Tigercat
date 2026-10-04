@@ -1285,8 +1285,7 @@ export const workflowViewerJoinBarClasses = 'absolute bottom-0 h-px bg-[var(--ti
 export const workflowViewerLoopClasses = 'pointer-events-none relative z-[1] self-stretch'
 export const workflowViewerLoopLineClasses = 'bg-[var(--tiger-warning)]'
 /** Kept for callers that still paint a single rail box. Pieces replace it. */
-export const workflowViewerLoopRailClasses =
-  'pointer-events-none bg-[var(--tiger-warning)]'
+export const workflowViewerLoopRailClasses = 'pointer-events-none bg-[var(--tiger-warning)]'
 export const workflowViewerLoopLabelClasses =
   'truncate px-0.5 text-xs leading-tight text-[var(--tiger-text-secondary)] [writing-mode:vertical-rl]'
 const workflowViewerCardWidthClasses =

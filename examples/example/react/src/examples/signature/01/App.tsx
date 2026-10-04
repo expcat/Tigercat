@@ -14,11 +14,7 @@ export default function App() {
         {value ? '已签名（受控值为 SVG data URL）' : '等待签名'}
       </p>
       {value ? (
-        <img
-          src={value}
-          alt=""
-          className="w-full rounded border border-[var(--tiger-border)]"
-        />
+        <img src={value} alt="" className="w-full rounded border border-[var(--tiger-border)]" />
       ) : null}
     </div>
   )

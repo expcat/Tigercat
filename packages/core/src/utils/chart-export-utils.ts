@@ -32,7 +32,10 @@ export function sanitizeChartSvgTree(root: Element): void {
   }
 }
 
-export function chartExportBasename(filename: string | undefined, extension: 'svg' | 'png'): string {
+export function chartExportBasename(
+  filename: string | undefined,
+  extension: 'svg' | 'png'
+): string {
   return resolveDataExportFilename(filename, extension)
 }
 

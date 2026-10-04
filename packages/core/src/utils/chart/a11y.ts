@@ -96,11 +96,7 @@ export function chartHoverShadowStyle(
  * `color-mix` whose second color is `--tiger-series-color`.
  * `base` is a fixed token (`var(--tiger-surface)`), never series data.
  */
-export function chartTokenColorMix(
-  space: 'oklab' | 'oklch',
-  base: string,
-  amount: string
-): string {
+export function chartTokenColorMix(space: 'oklab' | 'oklch', base: string, amount: string): string {
   return `color-mix(in ${space}, ${base} ${amount}, var(${CHART_SERIES_COLOR_PROPERTY}))`
 }
 

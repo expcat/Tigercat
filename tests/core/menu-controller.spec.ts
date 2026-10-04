@@ -51,7 +51,9 @@ describe('menu-controller keys', () => {
     expect(nextOpenKeys({ current: ['a'], key: 'b', openMultiple: true })).toEqual(['a', 'b'])
     expect(nextOpenKeys({ current: ['a'], key: 'b', openMultiple: false })).toEqual(['b'])
     expect(nextOpenKeys({ current: ['a'], key: 'a', openMultiple: true })).toEqual([])
-    expect(nextOpenKeys({ current: ['a'], key: 'a', openMultiple: true, open: true })).toEqual(['a'])
+    expect(nextOpenKeys({ current: ['a'], key: 'a', openMultiple: true, open: true })).toEqual([
+      'a'
+    ])
   })
 
   it('inline+collapsed resolves to vertical popup mode', () => {

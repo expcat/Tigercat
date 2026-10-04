@@ -221,12 +221,13 @@ describe('marquee-utils', () => {
       ] as Record<string, string>
       expect(horizontal[MARQUEE_INLINE_SIGN_VAR]).toBe('-1')
       expect(
-        marqueeBaseStyles['.tiger-marquee-horizontal > .tiger-marquee-track > .tiger-marquee-content']
-          .paddingInlineEnd
+        marqueeBaseStyles[
+          '.tiger-marquee-horizontal > .tiger-marquee-track > .tiger-marquee-content'
+        ].paddingInlineEnd
       ).toContain(MARQUEE_GAP_VAR)
-      expect(marqueeBaseStyles['.tiger-marquee-horizontal > .tiger-marquee-track'].flexDirection).toBe(
-        'row'
-      )
+      expect(
+        marqueeBaseStyles['.tiger-marquee-horizontal > .tiger-marquee-track'].flexDirection
+      ).toBe('row')
       expect(
         marqueeBaseStyles['.tiger-marquee-vertical > .tiger-marquee-track > .tiger-marquee-clone']
           .position

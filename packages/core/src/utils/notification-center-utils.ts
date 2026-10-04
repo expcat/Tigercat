@@ -68,7 +68,8 @@ export function moveNotificationReadFilter(
   const index = NOTIFICATION_READ_FILTER_ORDER.indexOf(current)
   if (index < 0) return null
   if (key === 'Home') return NOTIFICATION_READ_FILTER_ORDER[0]
-  if (key === 'End') return NOTIFICATION_READ_FILTER_ORDER[NOTIFICATION_READ_FILTER_ORDER.length - 1]
+  if (key === 'End')
+    return NOTIFICATION_READ_FILTER_ORDER[NOTIFICATION_READ_FILTER_ORDER.length - 1]
   if (key === 'ArrowRight' || key === 'ArrowDown') {
     return NOTIFICATION_READ_FILTER_ORDER[
       Math.min(NOTIFICATION_READ_FILTER_ORDER.length - 1, index + 1)

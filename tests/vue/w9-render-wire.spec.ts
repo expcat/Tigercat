@@ -29,9 +29,13 @@ describe('w9 render wiring', () => {
           return () =>
             h(TooltipDelayProvider, () => [
               h(Drawer, { open: true, resizable: true, title: 'Panel' }, { default: () => 'body' }),
-              h(Alert, { title: 'Heads up', type: 'info' }, {
-                action: () => h('button', { type: 'button' }, 'Retry')
-              }),
+              h(
+                Alert,
+                { title: 'Heads up', type: 'info' },
+                {
+                  action: () => h('button', { type: 'button' }, 'Retry')
+                }
+              ),
               h(Tooltip, { open: true, content: 'Hint' }, { default: () => h('button', 'Tip') }),
               h(
                 Popover,
@@ -84,32 +88,59 @@ describe('w9 render wiring', () => {
                 ]
               }),
               h(LoadingBarContainer, { percentage: 40, status: 'loading', minimumDisplayMs: 400 }),
-              h(Splitter, { collapsible: true, sizes: [120, 80] }, {
-                default: () => [h('div', 'A'), h('div', 'B')]
-              }),
-              h(Resizable, { lockAspectRatio: '16/9', width: 160, height: 90 }, {
-                default: () => 'box'
-              }),
-              h(ScrollArea, { nativeBars: true, height: 80 }, {
-                default: () => h('div', { id: 'marker-1', style: { height: '200px' } }, 'scroll')
-              }),
-              h(Carousel, { axis: 'vertical', slidesPerView: 2, thumbnails: true, dots: false }, {
-                default: () => [h('div', 'One'), h('div', 'Two'), h('div', 'Three')]
-              }),
-              h(List, { dataSource: [{ title: 'Ada' }], loading: false }, {
-                item: () => 'Ada Lovelace',
-                meta: () => 'Scientist',
-                actions: () => h('button', { type: 'button' }, 'Edit')
-              }),
+              h(
+                Splitter,
+                { collapsible: true, sizes: [120, 80] },
+                {
+                  default: () => [h('div', 'A'), h('div', 'B')]
+                }
+              ),
+              h(
+                Resizable,
+                { lockAspectRatio: '16/9', width: 160, height: 90 },
+                {
+                  default: () => 'box'
+                }
+              ),
+              h(
+                ScrollArea,
+                { nativeBars: true, height: 80 },
+                {
+                  default: () => h('div', { id: 'marker-1', style: { height: '200px' } }, 'scroll')
+                }
+              ),
+              h(
+                Carousel,
+                { axis: 'vertical', slidesPerView: 2, thumbnails: true, dots: false },
+                {
+                  default: () => [h('div', 'One'), h('div', 'Two'), h('div', 'Three')]
+                }
+              ),
+              h(
+                List,
+                { dataSource: [{ title: 'Ada' }], loading: false },
+                {
+                  item: () => 'Ada Lovelace',
+                  meta: () => 'Scientist',
+                  actions: () => h('button', { type: 'button' }, 'Edit')
+                }
+              ),
               h(Skeleton, { loading: false }, { default: () => 'Ready' }),
-              h(Descriptions, { items: [] }, {
-                default: () =>
-                  h(DescriptionsItem, { label: 'Name' }, { default: () => 'Ada' })
-              }),
-              h(Space, { size: 8, verticalSize: 4, split: true }, {
-                default: () => [h('span', 'Left'), h('span', 'Right')],
-                split: () => '/'
-              }),
+              h(
+                Descriptions,
+                { items: [] },
+                {
+                  default: () => h(DescriptionsItem, { label: 'Name' }, { default: () => 'Ada' })
+                }
+              ),
+              h(
+                Space,
+                { size: 8, verticalSize: 4, split: true },
+                {
+                  default: () => [h('span', 'Left'), h('span', 'Right')],
+                  split: () => '/'
+                }
+              ),
               h(Row, { gutter: { xs: 4, lg: [12, 8] } }, { default: () => h('div', 'cell') })
             ])
         }
@@ -119,9 +150,9 @@ describe('w9 render wiring', () => {
     expect(view.getByText('Details here')).toBeTruthy()
     expect(document.querySelector('[data-tiger-tour-cover]')).toBeTruthy()
     expect(document.querySelector('[data-tiger-tour-arrow]')).toBeTruthy()
-    expect(document.querySelector('[data-minimum-display-ms]')?.getAttribute('data-minimum-display-ms')).toBe(
-      '400'
-    )
+    expect(
+      document.querySelector('[data-minimum-display-ms]')?.getAttribute('data-minimum-display-ms')
+    ).toBe('400')
     expect(document.querySelector('[data-tiger-splitter-collapse]')).toBeTruthy()
     expect(document.querySelector('[data-resizable]')).toBeTruthy()
     expect(document.querySelector('[data-native-bars]')).toBeTruthy()

@@ -137,7 +137,9 @@ export function focusFormField(root: ParentNode | null | undefined, field: strin
     focusFirstInvalidField(root)
     return
   }
-  const marked = host.matches('[aria-invalid="true"]') ? host : host.querySelector<HTMLElement>('[aria-invalid="true"]')
+  const marked = host.matches('[aria-invalid="true"]')
+    ? host
+    : host.querySelector<HTMLElement>('[aria-invalid="true"]')
   const target = firstFocusableInvalid(marked ?? host) ?? firstFocusableInvalid(host)
   if (!target) return
   target.focus()
@@ -173,9 +175,6 @@ export function commitFocusedFormControl(root: ParentNode | null | undefined): v
 }
 
 /** Disabled fields stay out of the native submit set. Read-only fields stay in. */
-export function shouldSubmitNativeField(options: {
-  name?: string
-  disabled?: boolean
-}): boolean {
+export function shouldSubmitNativeField(options: { name?: string; disabled?: boolean }): boolean {
   return Boolean(options.name) && !options.disabled
 }

@@ -88,7 +88,9 @@ export const buildActivityGroups = (
  * `content` is the body only when both title and description are empty.
  * Otherwise the title and description stand on their own.
  */
-export function resolveActivityCopy(item: Pick<ActivityItem, 'title' | 'description' | 'content'>): {
+export function resolveActivityCopy(
+  item: Pick<ActivityItem, 'title' | 'description' | 'content'>
+): {
   title?: string
   body?: string
 } {

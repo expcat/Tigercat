@@ -13,7 +13,9 @@ export default function App() {
     <NotificationBell
       items={items}
       onItemReadChange={(item, read) => {
-        setItems((current) => current.map((entry) => (entry.id === item.id ? { ...entry, read } : entry)))
+        setItems((current) =>
+          current.map((entry) => (entry.id === item.id ? { ...entry, read } : entry))
+        )
       }}
     />
   )

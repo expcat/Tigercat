@@ -362,7 +362,9 @@ function generateCSS() {
   lines.push(`    --tiger-transition-base: ${transitionValue('0ms', 'linear')};`)
   lines.push(`    --tiger-transition-emphasized: ${transitionValue('0ms', 'linear')};`)
   lines.push('  }')
-  lines.push('  .tiger-motion-aware, .tiger-motion-aware::before, .tiger-motion-aware::after, [data-tiger-motion] {')
+  lines.push(
+    '  .tiger-motion-aware, .tiger-motion-aware::before, .tiger-motion-aware::after, [data-tiger-motion] {'
+  )
   lines.push('    animation-duration: 0ms;')
   lines.push('    animation-iteration-count: 1;')
   lines.push('    transition-duration: 0ms;')
@@ -479,7 +481,9 @@ function generateTS() {
   lines.push('')
 
   lines.push('/** Breakpoints from tokens.json runtime.breakpoints */')
-  lines.push(`export const runtimeBreakpoints = ${emitJsObject(tokens.runtime?.breakpoints ?? {})} as const`)
+  lines.push(
+    `export const runtimeBreakpoints = ${emitJsObject(tokens.runtime?.breakpoints ?? {})} as const`
+  )
   lines.push('')
 
   const lightRuntime = resolveRuntimeConfig('light')

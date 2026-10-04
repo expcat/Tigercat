@@ -29,9 +29,7 @@ export function renderBarBind(
           'data-bar-y1': String(bar.y1)
         })
       ),
-      line?.length
-        ? h('span', { 'data-combo-line': line.map((point) => point.y).join(',') })
-        : null
+      line?.length ? h('span', { 'data-combo-line': line.map((point) => point.y).join(',') }) : null
     ]
   )
 }
@@ -46,9 +44,7 @@ export function renderAxisBind(input: {
   exportSvg?: SVGSVGElement | null
 }): VNode {
   const labels = getW9DataLabels()
-  const rows = input.tooltip
-    ? structuredTooltipRows(input.tooltip, input.tooltipTotal ?? 0)
-    : []
+  const rows = input.tooltip ? structuredTooltipRows(input.tooltip, input.tooltipTotal ?? 0) : []
   return h('div', { 'data-tiger-axis-bind': '' }, [
     ...(input.ticks ?? []).map((tick, index) =>
       h('span', { key: index, 'data-time-tick': formatChartTimeTick(tick) })
@@ -68,7 +64,10 @@ export function renderAxisBind(input: {
       : null,
     input.secondAxis ? h('span', { 'data-second-axis': '' }) : null,
     ...rows.map((row, index) =>
-      h('span', { key: `tip-${index}`, 'data-tooltip-row': `${row.name}:${row.value}:${row.percent}` })
+      h('span', {
+        key: `tip-${index}`,
+        'data-tooltip-row': `${row.name}:${row.value}:${row.percent}`
+      })
     ),
     input.exportSvg
       ? h(
@@ -90,7 +89,11 @@ export function renderPieBind(input: {
 }): VNode {
   return h('div', { 'data-tiger-pie-bind': '' }, [
     ...input.labels.map((label) =>
-      h('span', { key: label.index, 'data-pie-label': String(label.index), 'data-pie-label-y': String(label.y) })
+      h('span', {
+        key: label.index,
+        'data-pie-label': String(label.index),
+        'data-pie-label-y': String(label.y)
+      })
     ),
     ...input.radii.map((radius, index) =>
       h('span', { key: `r-${index}`, 'data-pie-radius': String(radius) })
@@ -107,7 +110,11 @@ export function renderRadarBind(ratios: readonly number[]): VNode {
 }
 
 export function renderGaugeBind(pointer: boolean, arc: string): VNode {
-  return h('div', { 'data-tiger-gauge-bind': '', 'data-gauge-pointer': pointer ? 'true' : 'false' }, arc)
+  return h(
+    'div',
+    { 'data-tiger-gauge-bind': '', 'data-gauge-pointer': pointer ? 'true' : 'false' },
+    arc
+  )
 }
 
 export function renderHeatBind(stops: { offset: string; color: string }[], label: string): VNode {

@@ -4,13 +4,7 @@
  */
 
 export type PopupMenuItemType =
-  | 'item'
-  | 'link'
-  | 'danger'
-  | 'separator'
-  | 'checkbox'
-  | 'radio'
-  | 'submenu'
+  'item' | 'link' | 'danger' | 'separator' | 'checkbox' | 'radio' | 'submenu'
 
 export interface PopupMenuItem {
   key: string | number

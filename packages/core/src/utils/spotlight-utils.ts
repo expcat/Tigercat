@@ -69,7 +69,12 @@ export function resolveSpotlightIconKind(icon: unknown): SpotlightIconKind {
   if (typeof icon === 'number') return 'text'
   if (typeof icon === 'string') return getIconDefinition(icon) ? 'name' : 'text'
   if (typeof icon === 'object') {
-    const record = icon as { $$typeof?: unknown; __v_isVNode?: boolean; type?: unknown; props?: unknown }
+    const record = icon as {
+      $$typeof?: unknown
+      __v_isVNode?: boolean
+      type?: unknown
+      props?: unknown
+    }
     if (record.$$typeof != null || record.__v_isVNode) return 'node'
     if ('type' in record && 'props' in record) return 'node'
   }

@@ -35,7 +35,9 @@ export const tagSizeClasses = {
 export function formatTagCloseName(template: string, label: string): string {
   const text = label.trim()
   if (template.includes('{label}')) {
-    return text ? template.replaceAll('{label}', text) : template.replaceAll('{label}', '').replace(/\s+/g, ' ').trim()
+    return text
+      ? template.replaceAll('{label}', text)
+      : template.replaceAll('{label}', '').replace(/\s+/g, ' ').trim()
   }
   return text ? `${template} ${text}` : template
 }

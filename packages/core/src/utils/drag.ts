@@ -392,7 +392,11 @@ export function createDocumentDragSession(
   let userSelectLocked = false
 
   const capturePointer = () => {
-    if (captureTarget && pointerId != null && typeof captureTarget.setPointerCapture === 'function') {
+    if (
+      captureTarget &&
+      pointerId != null &&
+      typeof captureTarget.setPointerCapture === 'function'
+    ) {
       try {
         captureTarget.setPointerCapture(pointerId)
       } catch {

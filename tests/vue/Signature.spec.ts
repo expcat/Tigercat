@@ -114,7 +114,10 @@ describe('Signature', () => {
     expect(emitted()['update:modelValue']).toHaveLength(1)
     expect(emitted().end).toHaveLength(1)
     expect(emitted()['update:modelValue'][0][0]).toContain('data:image/svg+xml')
-    expect(emitted()['update:modelValue'][0][1]).toMatchObject({ empty: false, exportType: 'image/png' })
+    expect(emitted()['update:modelValue'][0][1]).toMatchObject({
+      empty: false,
+      exportType: 'image/png'
+    })
   })
 
   it('emits update:modelValue after drawing', async () => {
@@ -190,7 +193,10 @@ describe('Signature', () => {
     await fireEvent.pointerDown(pad(), { pointerId: 1, clientX: 110, clientY: 70 })
     await fireEvent.pointerUp(pad(), { pointerId: 1 })
 
-    expect(emitted()['update:modelValue'][0][1].strokes[0].points[0]).toMatchObject({ x: 50, y: 25 })
+    expect(emitted()['update:modelValue'][0][1].strokes[0].points[0]).toMatchObject({
+      x: 50,
+      y: 25
+    })
   })
 
   it('uses custom pen color and line width', async () => {
@@ -200,7 +206,10 @@ describe('Signature', () => {
 
     await drawSignature(pad())
 
-    expect(emitted()['update:modelValue'][0][1].strokes[0]).toMatchObject({ color: '#dc2626', lineWidth: 6 })
+    expect(emitted()['update:modelValue'][0][1].strokes[0]).toMatchObject({
+      color: '#dc2626',
+      lineWidth: 6
+    })
   })
 
   it('hides the toolbar when clearable is false', () => {

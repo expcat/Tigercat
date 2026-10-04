@@ -48,8 +48,7 @@ export function generateQRMatrix(value: string, ecc: QREccLevel = 'M'): boolean[
 export type QRMatrixFailure = 'empty' | 'capacity'
 
 export type QRMatrixResult =
-  | { ok: true; matrix: boolean[][] }
-  | { ok: false; reason: QRMatrixFailure }
+  { ok: true; matrix: boolean[][] } | { ok: false; reason: QRMatrixFailure }
 
 /**
  * Component-facing encode. Empty and over-capacity values are a failure

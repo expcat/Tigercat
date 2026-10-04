@@ -13,7 +13,12 @@ export default function App() {
         inputMode="none"
         onChange={(v) => setValue(String(v ?? ''))}
       />
-      <NumberKeyboard mode="id-card" value={value} onChange={(v) => setValue(String(v ?? ''))} showConfirm={false} />
+      <NumberKeyboard
+        mode="id-card"
+        value={value}
+        onChange={(v) => setValue(String(v ?? ''))}
+        showConfirm={false}
+      />
     </div>
   )
 }

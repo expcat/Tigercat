@@ -13,7 +13,11 @@ mkdirSync(dest, { recursive: true })
 cpSync(join(repoRoot, 'context7.json'), join(dest, 'context7.json'))
 cpSync(join(repoRoot, 'skills'), join(dest, 'skills'), { recursive: true })
 
-const result = spawnSync(process.execPath, [join(repoRoot, 'scripts', 'write-mcp-manifest.mjs'), dest], {
-  stdio: 'inherit'
-})
+const result = spawnSync(
+  process.execPath,
+  [join(repoRoot, 'scripts', 'write-mcp-manifest.mjs'), dest],
+  {
+    stdio: 'inherit'
+  }
+)
 process.exit(result.status ?? 1)

@@ -639,9 +639,7 @@ function focusScopeTarget(entry: FocusScopeEntry, initialFocus?: HTMLElement | n
 
 function isExemptFromFocusScope(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false
-  return Boolean(
-    target.closest('[data-tiger-toast]') || target.closest('[data-tiger-live-region]')
-  )
+  return Boolean(target.closest('[data-tiger-toast]') || target.closest('[data-tiger-live-region]'))
 }
 
 interface OwnedInert {

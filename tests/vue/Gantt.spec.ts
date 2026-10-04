@@ -52,8 +52,12 @@ describe('Gantt', () => {
   it('emits hover events when hoverable', async () => {
     const { getByRole, emitted } = render(Gantt, { props: { data, hoverable: true } })
 
-    await fireEvent.mouseEnter(getByRole('button', { name: 'Build, 2026-01-05 to 2026-01-12, 70%' }))
-    await fireEvent.mouseLeave(getByRole('button', { name: 'Build, 2026-01-05 to 2026-01-12, 70%' }))
+    await fireEvent.mouseEnter(
+      getByRole('button', { name: 'Build, 2026-01-05 to 2026-01-12, 70%' })
+    )
+    await fireEvent.mouseLeave(
+      getByRole('button', { name: 'Build, 2026-01-05 to 2026-01-12, 70%' })
+    )
 
     expect(emitted()['task-hover']).toEqual([[data[1]], [null]])
   })

@@ -240,7 +240,12 @@ export function createInfiniteScrollFlight() {
     get awaitingExit() {
       return awaitingExit
     },
-    canRequest(input: { disabled?: boolean; hasMore?: boolean; error?: boolean; loading?: boolean }) {
+    canRequest(input: {
+      disabled?: boolean
+      hasMore?: boolean
+      error?: boolean
+      loading?: boolean
+    }) {
       if (input.disabled || input.hasMore === false || input.error || input.loading) return false
       if (inFlight || awaitingExit) return false
       return true

@@ -108,9 +108,7 @@ export default function App() {
             <Tag variant="primary" size="sm">
               审批中
             </Tag>
-            <span className="text-sm text-[var(--tiger-text-secondary)]">
-              金额字段对本节点隐藏
-            </span>
+            <span className="text-sm text-[var(--tiger-text-secondary)]">金额字段对本节点隐藏</span>
           </div>
         }
         form={<SchemaForm schema={schema} value={model} onChange={setModel} showActions={false} />}

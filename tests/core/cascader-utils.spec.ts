@@ -140,7 +140,9 @@ describe('cascader columns, flatten, and display', () => {
   })
 
   it('treats numeric and string option values as the same key', () => {
-    const numeric: CascaderOption[] = [{ label: 'One', value: 1, children: [{ label: 'Child', value: '1-1' }] }]
+    const numeric: CascaderOption[] = [
+      { label: 'One', value: 1, children: [{ label: 'Child', value: '1-1' }] }
+    ]
     expect(getCascaderDisplayLabel(numeric, ['1', '1-1'], ' / ')).toBe('One / Child')
   })
 

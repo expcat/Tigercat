@@ -200,7 +200,10 @@ export function getNavigationMenuChevronClasses(open: boolean): string {
 /**
  * Get dropdown / MegaMenu panel classes (reuses dropdown chrome)
  */
-export function getNavigationMenuIndicatorStyle(start: number, size: number): Record<string, string> {
+export function getNavigationMenuIndicatorStyle(
+  start: number,
+  size: number
+): Record<string, string> {
   return {
     insetInlineStart: `${start}px`,
     inlineSize: `${size}px`

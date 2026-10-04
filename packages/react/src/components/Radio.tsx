@@ -85,8 +85,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
     : formBound
       ? coerceChoiceFormValue(formItemControl?.value) === value
       : checkedState
-  const ownsInvalid =
-    status === 'error' && (!isInGroup || groupContext?.invalidValue === value)
+  const ownsInvalid = status === 'error' && (!isInGroup || groupContext?.invalidValue === value)
 
   useEffect(() => {
     if (!isInGroup || value === undefined) return
@@ -153,11 +152,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
 
   const describedBy = mergeAriaDescribedBy(
     typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
-    isInGroup
-      ? ownsInvalid
-        ? groupContext?.describedBy
-        : undefined
-      : formItemControl?.describedBy
+    isInGroup ? (ownsInvalid ? groupContext?.describedBy : undefined) : formItemControl?.describedBy
   )
   const effectiveId = isInGroup ? id : (id ?? formItemControl?.id)
 

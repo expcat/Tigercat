@@ -62,9 +62,9 @@ describe('W9 view bindings', () => {
     await fireEvent.submit(container.querySelector('[data-tiger-filter-menu]')!)
     expect(container.textContent).not.toContain('b')
     await fireEvent.click(container.querySelector('[data-tiger-sort="name"]')!)
-    expect(container.querySelector('[data-tiger-sort="name"]')?.getAttribute('data-sort-direction')).toBe(
-      'asc'
-    )
+    expect(
+      container.querySelector('[data-tiger-sort="name"]')?.getAttribute('data-sort-direction')
+    ).toBe('asc')
     await fireEvent.click(container.querySelector('[data-tiger-hide="qty"]')!)
     expect(container.querySelector('[data-tiger-table-column-key="qty"]')).toBeNull()
     await fireEvent.change(container.querySelector('[data-tiger-resize="name"]')!, {
@@ -96,7 +96,9 @@ describe('W9 view bindings', () => {
     await fireEvent.click(container.querySelector('[data-tiger-select-page]')!)
     expect(container.querySelector('[data-tiger-selection-live]')?.textContent).toBe(announced)
     await fireEvent.click(container.querySelector('[data-tiger-shift-key="1"]')!)
-    await fireEvent.click(container.querySelector('[data-tiger-shift-key="3"]')!, { shiftKey: true })
+    await fireEvent.click(container.querySelector('[data-tiger-shift-key="3"]')!, {
+      shiftKey: true
+    })
     const keys = emitted()['selection-change'].at(-1)?.[0] as number[]
     expect(keys).toEqual([1, 3])
   })
@@ -192,7 +194,9 @@ describe('W9 view bindings', () => {
         columnDraggable: true
       }
     })
-    const window = container.querySelector('[data-tiger-card-window]')?.getAttribute('data-tiger-card-window')
+    const window = container
+      .querySelector('[data-tiger-card-window]')
+      ?.getAttribute('data-tiger-card-window')
     expect(window).toBeTruthy()
     expect(window).not.toBe('0-30')
     expect(container.textContent).not.toContain('row-29')
@@ -255,15 +259,27 @@ describe('W9 view bindings', () => {
     const Host = defineComponent({
       setup() {
         return () =>
-          h(Collapse, { defaultActiveKey: ['outer'] }, {
-            default: () =>
-              h(CollapsePanel, { panelKey: 'outer', header: 'Outer' }, {
-                default: () =>
-                  h(Collapse, { defaultActiveKey: [] }, {
-                    default: () => h(CollapsePanel, { panelKey: 'inner', header: 'Inner' })
-                  })
-              })
-          })
+          h(
+            Collapse,
+            { defaultActiveKey: ['outer'] },
+            {
+              default: () =>
+                h(
+                  CollapsePanel,
+                  { panelKey: 'outer', header: 'Outer' },
+                  {
+                    default: () =>
+                      h(
+                        Collapse,
+                        { defaultActiveKey: [] },
+                        {
+                          default: () => h(CollapsePanel, { panelKey: 'inner', header: 'Inner' })
+                        }
+                      )
+                  }
+                )
+            }
+          )
       }
     })
     const { getByRole } = render(Host)
@@ -291,7 +307,9 @@ describe('W9 view bindings', () => {
       }
     })
     expect(bar.container.querySelector('[data-tiger-bar-layout="stacked"]')).toBeTruthy()
-    expect(bar.container.querySelector('[data-combo-line]')?.getAttribute('data-combo-line')).toBe('5')
+    expect(bar.container.querySelector('[data-combo-line]')?.getAttribute('data-combo-line')).toBe(
+      '5'
+    )
 
     const line = render(LineChart, {
       props: {
@@ -310,15 +328,19 @@ describe('W9 view bindings', () => {
         }
       }
     })
-    expect(line.container.querySelector('[data-time-tick]')?.getAttribute('data-time-tick')).toMatch(
-      /2024/
+    expect(
+      line.container.querySelector('[data-time-tick]')?.getAttribute('data-time-tick')
+    ).toMatch(/2024/)
+    expect(line.container.querySelector('[data-reference]')?.getAttribute('data-reference')).toBe(
+      '4'
     )
-    expect(line.container.querySelector('[data-reference]')?.getAttribute('data-reference')).toBe('4')
-    expect(line.container.querySelector('[data-brush-start]')?.getAttribute('data-brush-start')).toBe('1')
+    expect(
+      line.container.querySelector('[data-brush-start]')?.getAttribute('data-brush-start')
+    ).toBe('1')
     expect(line.container.querySelector('[data-second-axis]')).toBeTruthy()
-    expect(line.container.querySelector('[data-tooltip-row]')?.getAttribute('data-tooltip-row')).toContain(
-      'A:2:'
-    )
+    expect(
+      line.container.querySelector('[data-tooltip-row]')?.getAttribute('data-tooltip-row')
+    ).toContain('A:2:')
 
     const pie = render(PieChart, {
       props: {
@@ -356,16 +378,16 @@ describe('W9 view bindings', () => {
         bind: { values: [50], indicators: [{ name: 'A', max: 100 }] }
       }
     })
-    expect(radar.container.querySelector('[data-radar-ratio]')?.getAttribute('data-radar-ratio')).toBe(
-      '0.5'
-    )
+    expect(
+      radar.container.querySelector('[data-radar-ratio]')?.getAttribute('data-radar-ratio')
+    ).toBe('0.5')
 
     const gauge = render(GaugeChart, {
       props: { responsive: false, width: 160, height: 100, value: 40, bind: { display: 'arc' } }
     })
-    expect(gauge.container.querySelector('[data-gauge-pointer]')?.getAttribute('data-gauge-pointer')).toBe(
-      'false'
-    )
+    expect(
+      gauge.container.querySelector('[data-gauge-pointer]')?.getAttribute('data-gauge-pointer')
+    ).toBe('false')
 
     const heat = render(HeatmapChart, {
       props: {
@@ -385,7 +407,9 @@ describe('W9 view bindings', () => {
         }
       }
     })
-    expect(heat.container.querySelector('[data-heat-label]')?.getAttribute('data-heat-label')).toBeTruthy()
+    expect(
+      heat.container.querySelector('[data-heat-label]')?.getAttribute('data-heat-label')
+    ).toBeTruthy()
     expect(heat.container.querySelector('[data-calendar-tick]')).toBeTruthy()
 
     const sun = render(SunburstChart, {
@@ -434,9 +458,9 @@ describe('W9 view bindings', () => {
     })
     expect(gantt.container.querySelector('[data-gantt-milestone="m"]')).toBeTruthy()
     expect(gantt.container.querySelector('[data-gantt-milestone="bar"]')).toBeNull()
-    expect(gantt.container.querySelector('[data-gantt-anchor]')?.getAttribute('data-gantt-anchor')).toBe(
-      '0,20'
-    )
+    expect(
+      gantt.container.querySelector('[data-gantt-anchor]')?.getAttribute('data-gantt-anchor')
+    ).toBe('0,20')
 
     const org = render(OrgChart, {
       props: {
@@ -455,7 +479,9 @@ describe('W9 view bindings', () => {
       }
     })
     expect(org.container.querySelector('[data-org-visible="bea"]')).toBeNull()
-    expect(org.container.querySelector('[data-org-match]')?.getAttribute('data-org-match')).toBe('bea')
+    expect(org.container.querySelector('[data-org-match]')?.getAttribute('data-org-match')).toBe(
+      'bea'
+    )
     await fireEvent.click(org.container.querySelector('[data-tiger-org-zoom-in]')!)
 
     const code = render(CodeEditor, {
@@ -474,10 +500,12 @@ describe('W9 view bindings', () => {
       }
     })
     expect(code.container.querySelector('[data-code-match="0"]')).toBeTruthy()
-    expect(code.container.querySelector('[data-bracket]')?.getAttribute('data-bracket')).toContain('-')
-    expect(code.container.querySelector('[data-line-window]')?.getAttribute('data-line-window')).toContain(
-      'demo'
+    expect(code.container.querySelector('[data-bracket]')?.getAttribute('data-bracket')).toContain(
+      '-'
     )
+    expect(
+      code.container.querySelector('[data-line-window]')?.getAttribute('data-line-window')
+    ).toContain('demo')
     await fireEvent.click(code.container.querySelector('[data-tiger-replace]')!)
     expect(code.emitted()['update:modelValue']?.[0]?.[0]).toBe('omega (beta)')
 
@@ -506,19 +534,35 @@ describe('W9 view bindings', () => {
     await fireEvent.click(rich.container.querySelector('[data-tiger-slash="table"]')!)
     await fireEvent.click(rich.container.querySelector('[data-tiger-slash="image"]')!)
     expect(rich.container.querySelector('[data-tiger-rte-serial]')?.textContent).toContain('|')
-    expect(rich.container.querySelector('[data-shortcut]')?.getAttribute('data-shortcut')).toBe('heading')
+    expect(rich.container.querySelector('[data-shortcut]')?.getAttribute('data-shortcut')).toBe(
+      'heading'
+    )
 
     const files = render(FileManager, {
       props: {
         files: [
           { key: 'a', name: 'Alpha', type: 'file' },
-          { key: 'b', name: 'Beta', type: 'folder', children: [{ key: 'c', name: 'Gamma', type: 'file' }] }
+          {
+            key: 'b',
+            name: 'Beta',
+            type: 'folder',
+            children: [{ key: 'c', name: 'Gamma', type: 'file' }]
+          }
         ],
-        bind: { query: 'gamma', recursive: true, name: 'Alpha\n', permission: { readable: false, writable: false } }
+        bind: {
+          query: 'gamma',
+          recursive: true,
+          name: 'Alpha\n',
+          permission: { readable: false, writable: false }
+        }
       }
     })
-    expect(files.container.querySelector('[data-tiger-file-open]')?.hasAttribute('disabled')).toBe(true)
-    expect(files.container.querySelector('[data-tiger-file-rename]')?.hasAttribute('disabled')).toBe(true)
+    expect(files.container.querySelector('[data-tiger-file-open]')?.hasAttribute('disabled')).toBe(
+      true
+    )
+    expect(
+      files.container.querySelector('[data-tiger-file-rename]')?.hasAttribute('disabled')
+    ).toBe(true)
     expect(files.container.querySelector('[data-file-hit="Gamma"]')).toBeTruthy()
     const photo = new File(['x'], 'photo.png', { type: 'image/png' })
     const upload = files.container.querySelector('[data-tiger-file-upload]') as HTMLInputElement
@@ -539,9 +583,9 @@ describe('W9 view bindings', () => {
 
     const note = render(ImageAnnotation, { props: { src: '', bind: true } })
     await fireEvent.click(note.container.querySelector('[data-tiger-nudge]')!)
-    expect(Number(note.container.querySelector('[data-annotation-box]')?.textContent?.split(',')[0])).toBeGreaterThan(
-      0.2
-    )
+    expect(
+      Number(note.container.querySelector('[data-annotation-box]')?.textContent?.split(',')[0])
+    ).toBeGreaterThan(0.2)
     await fireEvent.click(note.container.querySelector('[data-tiger-vertex]')!)
     expect(note.container.querySelector('[data-annotation-vertex]')?.textContent).toBe('0.5')
     await fireEvent.click(note.container.querySelector('[data-tiger-undo]')!)
@@ -580,7 +624,9 @@ describe('W9 view bindings', () => {
         items: [{ id: 'c1', content: '<script>x</script><b>ok</b>' }]
       }
     })
-    expect(comments.container.querySelector('[data-comment-html]')?.innerHTML).not.toContain('script')
+    expect(comments.container.querySelector('[data-comment-html]')?.innerHTML).not.toContain(
+      'script'
+    )
     await fireEvent.click(comments.container.querySelector('[data-comment-edit="c1"]')!)
     expect(comments.emitted().edit?.[0]?.[0]).toMatchObject({ id: 'c1' })
     await fireEvent.click(comments.container.querySelector('[data-comment-delete="c1"]')!)

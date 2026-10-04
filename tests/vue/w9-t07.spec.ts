@@ -15,7 +15,11 @@ import { FloatButton } from '@expcat/tigercat-vue/FloatButton'
 import { Pagination } from '@expcat/tigercat-vue/Pagination'
 import { Steps, StepsItem } from '@expcat/tigercat-vue/Steps'
 import { Spotlight } from '@expcat/tigercat-vue/Spotlight'
-import { NavigationMenu, NavigationMenuItem, NavigationMenuLink } from '@expcat/tigercat-vue/NavigationMenu'
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink
+} from '@expcat/tigercat-vue/NavigationMenu'
 
 describe('vue W9 T07', () => {
   it('E1 renders a shared dropdown item', async () => {
@@ -45,7 +49,9 @@ describe('vue W9 T07', () => {
       props: { current: 'home', viewport: true },
       slots: {
         default: () =>
-          h(NavigationMenuItem, { value: 'home' }, () => h(NavigationMenuLink, { href: '/home' }, () => 'Home'))
+          h(NavigationMenuItem, { value: 'home' }, () =>
+            h(NavigationMenuLink, { href: '/home' }, () => 'Home')
+          )
       }
     })
     expect(container.querySelector('[data-tiger-navigation-viewport="true"]')).toBeTruthy()
@@ -56,7 +62,10 @@ describe('vue W9 T07', () => {
     const { getByRole } = render(Tabs, {
       props: { activation: 'manual', defaultActiveKey: 'a' },
       slots: {
-        default: () => [h(TabPane, { tabKey: 'a', label: 'Alpha' }), h(TabPane, { tabKey: 'b', label: 'Beta' })]
+        default: () => [
+          h(TabPane, { tabKey: 'a', label: 'Alpha' }),
+          h(TabPane, { tabKey: 'b', label: 'Beta' })
+        ]
       }
     })
     const first = getByRole('tab', { name: 'Alpha' })

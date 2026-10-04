@@ -78,7 +78,11 @@ export function renderTableHeader(
           : 'none'
       : undefined
 
-    const fixedStyle = getFixedColumnStyle(column, ctx.fixedColumnsInfo.value, TABLE_FIXED_HEADER_Z_INDEX)
+    const fixedStyle = getFixedColumnStyle(
+      column,
+      ctx.fixedColumnsInfo.value,
+      TABLE_FIXED_HEADER_Z_INDEX
+    )
 
     const measuredWidth = ctx.widthMap.value[column.key]
     const widthStyle =
@@ -223,35 +227,35 @@ export function renderTableHeader(
                     column.filter.type === 'custom' && column.filter.render
                       ? (column.filter.render() as VNodeChild)
                       : column.filter.type === 'select' && column.filter.options
-                      ? h(
-                          'select',
-                          {
-                            class: getInputClasses({ size: 'sm' }),
-                            'aria-label': formatTableFilterColumnAriaLabel(
+                        ? h(
+                            'select',
+                            {
+                              class: getInputClasses({ size: 'sm' }),
+                              'aria-label': formatTableFilterColumnAriaLabel(
+                                labels.filterColumnAriaLabel,
+                                String(column.title)
+                              ),
+                              value: filterText,
+                              draggable: false,
+                              onChange: (e: Event) =>
+                                ctx.handleFilter(column.key, (e.target as HTMLSelectElement).value)
+                            },
+                            [
+                              h('option', { value: '' }, labels.allText),
+                              ...column.filter.options.map((opt) =>
+                                h('option', { value: opt.value }, opt.label)
+                              )
+                            ]
+                          )
+                        : h(TableTextFilter, {
+                            value: filterText,
+                            label: formatTableFilterColumnAriaLabel(
                               labels.filterColumnAriaLabel,
                               String(column.title)
                             ),
-                            value: filterText,
-                            draggable: false,
-                            onChange: (e: Event) =>
-                              ctx.handleFilter(column.key, (e.target as HTMLSelectElement).value)
-                          },
-                          [
-                            h('option', { value: '' }, labels.allText),
-                            ...column.filter.options.map((opt) =>
-                              h('option', { value: opt.value }, opt.label)
-                            )
-                          ]
-                        )
-                      : h(TableTextFilter, {
-                          value: filterText,
-                          label: formatTableFilterColumnAriaLabel(
-                            labels.filterColumnAriaLabel,
-                            String(column.title)
-                          ),
-                          placeholder: column.filter.placeholder || labels.filterPlaceholder,
-                          onCommit: (value: string) => ctx.handleFilter(column.key, value)
-                        })
+                            placeholder: column.filter.placeholder || labels.filterPlaceholder,
+                            onCommit: (value: string) => ctx.handleFilter(column.key, value)
+                          })
                   ]
                 )
               ]

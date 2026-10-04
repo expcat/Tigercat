@@ -383,7 +383,9 @@ async function exportDataYielding<T>(
     for (let index = 0; index < data.length; index++) {
       await yieldBetweenExportChunks(index)
       rows.push(
-        columns.map((column) => escapeCsvValue(getCellValue(data[index]!, column, options))).join(',')
+        columns
+          .map((column) => escapeCsvValue(getCellValue(data[index]!, column, options)))
+          .join(',')
       )
     }
     return `\uFEFF${[headers.join(','), ...rows].join('\r\n')}`

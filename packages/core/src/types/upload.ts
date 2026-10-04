@@ -34,13 +34,7 @@ export interface UploadQueueItem {
 export type UploadListType = 'text' | 'picture' | 'picture-card'
 
 export type UploadRejectReason =
-  | 'exceed'
-  | 'type'
-  | 'size'
-  | 'before-upload'
-  | 'before-upload-error'
-  | 'directory'
-  | 'single'
+  'exceed' | 'type' | 'size' | 'before-upload' | 'before-upload-error' | 'directory' | 'single'
 
 export interface UploadRejectedFile {
   file: File

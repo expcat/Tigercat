@@ -32,7 +32,11 @@ function walk(dir) {
 
 walk(dest)
 
-const ordered = Object.fromEntries(Object.keys(files).sort().map((key) => [key, files[key]]))
+const ordered = Object.fromEntries(
+  Object.keys(files)
+    .sort()
+    .map((key) => [key, files[key]])
+)
 writeFileSync(
   join(dest, 'version.json'),
   `${JSON.stringify(

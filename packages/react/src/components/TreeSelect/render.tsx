@@ -26,7 +26,9 @@ type Ctx = ReturnType<typeof useTreeSelectController>
 function renderNode(ctx: Ctx, item: VisibleTreeItem) {
   const checked = ctx.checkedState.checked.some((key) => sameTreeKey(key, item.key))
   const halfChecked = ctx.checkedState.halfChecked.some((key) => sameTreeKey(key, item.key))
-  const selected = ctx.multiple ? checked : ctx.selectedKeys.some((key) => sameTreeKey(key, item.key))
+  const selected = ctx.multiple
+    ? checked
+    : ctx.selectedKeys.some((key) => sameTreeKey(key, item.key))
   const isActive = ctx.activeKey !== undefined && sameTreeKey(ctx.activeKey, item.key)
   const expandable = ctx.isExpandable(item.node)
   const expanded = ctx.isExpanded(item.key)

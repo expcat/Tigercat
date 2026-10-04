@@ -75,25 +75,28 @@ export const Collapse: React.FC<CollapseProps> = ({
     [activeKeys, accordion, controlledActiveKey, onChange]
   )
 
-  const moveHeaderFocus = useCallback((current: HTMLButtonElement, action: CollapseHeaderFocusAction) => {
-    const root = rootRef.current
-    if (!root) return
-    const buttons = Array.from(
-      root.querySelectorAll<HTMLButtonElement>('[data-tiger-collapse-header]')
-    ).filter(
-      (button) =>
-        button.closest('[data-tiger-collapse]') === root &&
-        !button.disabled &&
-        button.getAttribute('aria-disabled') !== 'true'
-    )
-    const index = buttons.indexOf(current)
-    const next = getCollapseHeaderTarget(
-      buttons.map(() => ({ disabled: false })),
-      index,
-      action
-    )
-    if (next >= 0) buttons[next]?.focus()
-  }, [])
+  const moveHeaderFocus = useCallback(
+    (current: HTMLButtonElement, action: CollapseHeaderFocusAction) => {
+      const root = rootRef.current
+      if (!root) return
+      const buttons = Array.from(
+        root.querySelectorAll<HTMLButtonElement>('[data-tiger-collapse-header]')
+      ).filter(
+        (button) =>
+          button.closest('[data-tiger-collapse]') === root &&
+          !button.disabled &&
+          button.getAttribute('aria-disabled') !== 'true'
+      )
+      const index = buttons.indexOf(current)
+      const next = getCollapseHeaderTarget(
+        buttons.map(() => ({ disabled: false })),
+        index,
+        action
+      )
+      if (next >= 0) buttons[next]?.focus()
+    },
+    []
+  )
 
   const containerClasses = useMemo(() => {
     return classNames(getCollapseContainerClasses(bordered, ghost, className))
@@ -124,7 +127,12 @@ export const Collapse: React.FC<CollapseProps> = ({
 
   return (
     <CollapseContext.Provider value={contextValue}>
-      <div ref={rootRef} className={containerClasses} style={style} data-tiger-collapse="" {...rest}>
+      <div
+        ref={rootRef}
+        className={containerClasses}
+        style={style}
+        data-tiger-collapse=""
+        {...rest}>
         {children}
       </div>
     </CollapseContext.Provider>

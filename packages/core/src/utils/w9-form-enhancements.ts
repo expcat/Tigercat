@@ -75,9 +75,14 @@ export function shuffleInPlace<T>(items: readonly T[], random: () => number = Ma
   return next
 }
 
-export function mentionAtCaret(text: string, caret: number, prefix: string | string[] = '@'): ParsedMention | null {
+export function mentionAtCaret(
+  text: string,
+  caret: number,
+  prefix: string | string[] = '@'
+): ParsedMention | null {
   return (
-    parseMentions(text, prefix).find((mention) => caret > mention.start && caret <= mention.end) ?? null
+    parseMentions(text, prefix).find((mention) => caret > mention.start && caret <= mention.end) ??
+    null
   )
 }
 
@@ -102,7 +107,11 @@ export interface CaretAnchor {
 }
 
 /** Popup origin is the caret, not the textarea box. */
-export function caretAnchorFromMirror(mirror: { left: number; top: number; lineHeight: number }): CaretAnchor {
+export function caretAnchorFromMirror(mirror: {
+  left: number
+  top: number
+  lineHeight: number
+}): CaretAnchor {
   return { left: mirror.left, top: mirror.top + mirror.lineHeight }
 }
 
@@ -133,11 +142,18 @@ export function filterCheckedPaths(
   if (strategy === 'all') return list
   if (strategy === 'child') {
     return list.filter(
-      (path) => !list.some((other) => other.length > path.length && path.every((part, index) => other[index] === part))
+      (path) =>
+        !list.some(
+          (other) =>
+            other.length > path.length && path.every((part, index) => other[index] === part)
+        )
     )
   }
   return list.filter(
-    (path) => !list.some((other) => other.length < path.length && other.every((part, index) => path[index] === part))
+    (path) =>
+      !list.some(
+        (other) => other.length < path.length && other.every((part, index) => path[index] === part)
+      )
   )
 }
 
@@ -157,7 +173,8 @@ export function eyeDropperAvailable(scope: { EyeDropper?: unknown } | undefined)
 }
 
 export function reorderList<T>(items: readonly T[], from: number, to: number): T[] {
-  if (from === to || from < 0 || to < 0 || from >= items.length || to >= items.length) return items.slice()
+  if (from === to || from < 0 || to < 0 || from >= items.length || to >= items.length)
+    return items.slice()
   const next = items.slice()
   const [item] = next.splice(from, 1)
   next.splice(to, 0, item)
@@ -184,11 +201,15 @@ export function filesFromClipboard(items: DataTransferItemList | null | undefine
 }
 
 export function pressureLineWidth(base: number, pressure: number | undefined): number {
-  const force = pressure === undefined || !Number.isFinite(pressure) ? 0.5 : Math.min(1, Math.max(0, pressure))
+  const force =
+    pressure === undefined || !Number.isFinite(pressure) ? 0.5 : Math.min(1, Math.max(0, pressure))
   return Math.max(0.5, base * (0.4 + force * 1.2))
 }
 
-export function limitSignatureStrokes(strokes: readonly SignatureStroke[], max?: number): SignatureStroke[] {
+export function limitSignatureStrokes(
+  strokes: readonly SignatureStroke[],
+  max?: number
+): SignatureStroke[] {
   if (max === undefined || max < 0 || strokes.length <= max) return strokes.slice()
   return strokes.slice(strokes.length - max)
 }
@@ -248,7 +269,9 @@ export interface FormErrorSummaryItem {
   message: string
 }
 
-export function formErrorSummary(errors: readonly { field: string; message: string }[]): FormErrorSummaryItem[] {
+export function formErrorSummary(
+  errors: readonly { field: string; message: string }[]
+): FormErrorSummaryItem[] {
   const seen = new Set<string>()
   const items: FormErrorSummaryItem[] = []
   for (const error of errors) {

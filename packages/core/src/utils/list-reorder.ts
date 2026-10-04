@@ -93,11 +93,7 @@ interface RegisteredController {
   allowsCross: () => boolean
   getSession: () => ControllerSession | null
   clearSession: () => void
-  applyDragOver: (
-    item: DragItem | null,
-    event?: DragBindingEvent,
-    containerId?: string
-  ) => void
+  applyDragOver: (item: DragItem | null, event?: DragBindingEvent, containerId?: string) => void
   finishDrop: (event?: DragBindingEvent) => DragDropEvent | null
   notify: () => void
 }
@@ -181,11 +177,7 @@ export function createListReorderController(
     return createDragState()
   }
 
-  const applyDragOver = (
-    item: DragItem | null,
-    event?: DragBindingEvent,
-    containerId?: string
-  ) => {
+  const applyDragOver = (item: DragItem | null, event?: DragBindingEvent, containerId?: string) => {
     if (!session) return
     const config = resolveDragConfig(session.getConfig())
     const nextContainerId = item?.containerId ?? containerId ?? containerOf()

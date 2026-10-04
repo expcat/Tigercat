@@ -1,4 +1,14 @@
-import { computed, defineComponent, h, onBeforeUnmount, onMounted, PropType, ref, useId, watch } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  PropType,
+  ref,
+  useId,
+  watch
+} from 'vue'
 import {
   COUNTDOWN_DEFAULT_FORMAT,
   COUNTDOWN_DEFAULT_INTERVAL_MS,

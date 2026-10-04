@@ -14,7 +14,10 @@ const dataSource = [
 </script>
 
 <template>
-  <Form :model-value="model" label-position="top" @update:model-value="Object.assign(model, $event)">
+  <Form
+    :model-value="model"
+    label-position="top"
+    @update:model-value="Object.assign(model, $event)">
     <FormItem name="team" label="团队">
       <Transfer v-model="model.team" :data-source="dataSource" searchable class="max-w-2xl" />
     </FormItem>

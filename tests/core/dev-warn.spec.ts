@@ -39,5 +39,4 @@ describe('devWarn', () => {
     devWarn('missing-env', 'should not appear')
     expect(warnSpy).not.toHaveBeenCalled()
   })
-
 })

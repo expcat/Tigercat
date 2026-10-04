@@ -60,7 +60,10 @@ export function getCodeEditorWrapClass(wordWrap: boolean): string {
  */
 export function resolveCodeEditorTheme(
   theme: CodeEditorTheme | 'auto' | undefined,
-  root?: { classList?: { contains(name: string): boolean }; getAttribute?(name: string): string | null } | null
+  root?: {
+    classList?: { contains(name: string): boolean }
+    getAttribute?(name: string): string | null
+  } | null
 ): CodeEditorTheme {
   if (theme === 'light' || theme === 'dark') return theme
   const host = root ?? (isBrowser() ? document.documentElement : null)
@@ -664,10 +667,7 @@ export interface CodeEditorLineModel {
   tokens: HighlightToken[]
 }
 
-function toHighlightTokens(
-  tokens: Token[],
-  theme: CodeEditorTheme
-): HighlightToken[] {
+function toHighlightTokens(tokens: Token[], theme: CodeEditorTheme): HighlightToken[] {
   return tokens.map((token) => {
     const className = getTokenClasses(token.type, theme)
     return className ? { text: token.value, className } : { text: token.value }
@@ -690,9 +690,7 @@ function rowsFromHighlighter(
   if (highlighter?.highlightCode) {
     const rows = highlighter.highlightCode(value, language, theme)
     if (Array.isArray(rows)) {
-      return lines.map((text, index) =>
-        Array.isArray(rows[index]) ? rows[index] : [{ text }]
-      )
+      return lines.map((text, index) => (Array.isArray(rows[index]) ? rows[index] : [{ text }]))
     }
   }
   return lines.map((text) => toHighlightTokens(tokenizeLine(text, language), theme))

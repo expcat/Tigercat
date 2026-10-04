@@ -426,7 +426,8 @@ export function useTableState(input: UseTableStateInput): TableContext {
     }
     emitChange({
       filters: newFilterState,
-      pagination: paginationMerged !== false ? { current: nextPage, pageSize: currentPageSize } : null
+      pagination:
+        paginationMerged !== false ? { current: nextPage, pageSize: currentPageSize } : null
     })
   }
 
@@ -639,9 +640,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   function handleRowDrop(targetKey: string | number) {
     if (dragRowKey === null || dragRowKey === targetKey) return
-    const from = sourceRowKeys.findIndex(
-      (key) => tableRowKeyId(key) === tableRowKeyId(dragRowKey)
-    )
+    const from = sourceRowKeys.findIndex((key) => tableRowKeyId(key) === tableRowKeyId(dragRowKey))
     const to = sourceRowKeys.findIndex((key) => tableRowKeyId(key) === tableRowKeyId(targetKey))
     const nextRows = reorderByHandle(sourceData, from, to)
     setDragLive(dragMoveAnnouncement(from, to))

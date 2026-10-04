@@ -243,13 +243,16 @@ describe('MarkdownEditor utilities', () => {
     })
 
     it('finds matching toolbar button', () => {
-      const match = findMarkdownHotkeyMatch(createDefaultMarkdownToolbar(getMarkdownEditorLabels()), {
-        ctrlKey: true,
-        metaKey: false,
-        shiftKey: false,
-        altKey: false,
-        key: 'k'
-      })
+      const match = findMarkdownHotkeyMatch(
+        createDefaultMarkdownToolbar(getMarkdownEditorLabels()),
+        {
+          ctrlKey: true,
+          metaKey: false,
+          shiftKey: false,
+          altKey: false,
+          key: 'k'
+        }
+      )
       expect(match?.name).toBe('link')
     })
   })

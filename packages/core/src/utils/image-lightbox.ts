@@ -74,16 +74,20 @@ export function formatLightboxImageAlt(
   return template.replace(/\{index\}/g, String(index + 1)).replace(/\{total\}/g, String(total))
 }
 
-export function resolveLightboxScaleRange(input: {
-  minScale?: number
-  maxScale?: number
-}): { minScale: number; maxScale: number } {
+export function resolveLightboxScaleRange(input: { minScale?: number; maxScale?: number }): {
+  minScale: number
+  maxScale: number
+} {
   const minRaw = input.minScale
   const maxRaw = input.maxScale
   const minScale =
-    typeof minRaw === 'number' && Number.isFinite(minRaw) && minRaw > 0 ? minRaw : LIGHTBOX_MIN_SCALE
+    typeof minRaw === 'number' && Number.isFinite(minRaw) && minRaw > 0
+      ? minRaw
+      : LIGHTBOX_MIN_SCALE
   const maxScale =
-    typeof maxRaw === 'number' && Number.isFinite(maxRaw) && maxRaw > 0 ? maxRaw : LIGHTBOX_MAX_SCALE
+    typeof maxRaw === 'number' && Number.isFinite(maxRaw) && maxRaw > 0
+      ? maxRaw
+      : LIGHTBOX_MAX_SCALE
   if (maxScale < minScale) return { minScale, maxScale: minScale }
   return { minScale, maxScale }
 }

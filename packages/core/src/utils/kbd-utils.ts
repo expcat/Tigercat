@@ -17,7 +17,6 @@ import {
 } from '../types/kbd'
 import { classNames } from './class-names'
 
-
 /** Segment of a rendered key combo */
 export type KbdPart = { type: 'key'; value: string } | { type: 'separator'; value: string }
 

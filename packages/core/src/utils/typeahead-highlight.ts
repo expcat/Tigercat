@@ -14,7 +14,13 @@ export interface TypeaheadHighlight {
 
 export function createTypeaheadHighlight(timeoutMs?: number): {
   buffer: TypeaheadBuffer
-  push(character: string, labels: readonly string[], fromIndex: number, disabled?: readonly boolean[], now?: number): TypeaheadHighlight | null
+  push(
+    character: string,
+    labels: readonly string[],
+    fromIndex: number,
+    disabled?: readonly boolean[],
+    now?: number
+  ): TypeaheadHighlight | null
   reset(): void
 } {
   const buffer = createTypeaheadBuffer(timeoutMs)

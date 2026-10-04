@@ -88,8 +88,10 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
   const pendingAlignRef = useRef<{ index: number; align: VirtualScrollAlign } | null>(null)
   const activeIndexRef = useRef(0)
 
-  const fixedHeight = itemHeight != null && estimatedItemHeight == null && !getItemHeight && !customStrategy
-  const dynamicEstimate = estimatedItemHeight ?? (fixedHeight || getItemHeight || customStrategy ? undefined : 40)
+  const fixedHeight =
+    itemHeight != null && estimatedItemHeight == null && !getItemHeight && !customStrategy
+  const dynamicEstimate =
+    estimatedItemHeight ?? (fixedHeight || getItemHeight || customStrategy ? undefined : 40)
 
   let strategy: VirtualListSizeStrategy
   if (customStrategy) {
@@ -190,7 +192,16 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
     }
     if (changed) bumpMeasuredLayout()
     return undefined
-  }, [canMeasure, getItemKey, itemCount, range.endIndex, range.startIndex, scrollTop, strategy, viewport])
+  }, [
+    canMeasure,
+    getItemKey,
+    itemCount,
+    range.endIndex,
+    range.startIndex,
+    scrollTop,
+    strategy,
+    viewport
+  ])
 
   const applyScrollTop = useCallback(
     (next: number) => {
@@ -233,7 +244,9 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return
     const st =
-      orientation === 'horizontal' ? containerRef.current.scrollLeft : containerRef.current.scrollTop
+      orientation === 'horizontal'
+        ? containerRef.current.scrollLeft
+        : containerRef.current.scrollTop
     setScrollTop(st)
     onScroll?.(st)
   }, [onScroll, orientation])
@@ -268,7 +281,10 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
           stickyIndexes,
           itemCount
         )
-      : Array.from({ length: Math.max(0, endIndex - startIndex + 1) }, (_, offset) => startIndex + offset)
+      : Array.from(
+          { length: Math.max(0, endIndex - startIndex + 1) },
+          (_, offset) => startIndex + offset
+        )
   const resolvedRole = role ?? 'list'
   const asList = resolvedRole === 'list'
 
@@ -297,7 +313,11 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
               observeSize(el, () => {
                 const measured = readMarginBoxBlockSize(el)
                 if (measured > 0) {
-                  strategy.updateItemHeight?.(index, measured, getItemKey ? getItemKey(index) : index)
+                  strategy.updateItemHeight?.(
+                    index,
+                    measured,
+                    getItemKey ? getItemKey(index) : index
+                  )
                   bumpMeasuredLayout()
                 }
               })
@@ -330,7 +350,12 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (!keyboardScroll || event.target !== event.currentTarget) return
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && event.key !== 'Home' && event.key !== 'End') {
+    if (
+      event.key !== 'ArrowDown' &&
+      event.key !== 'ArrowUp' &&
+      event.key !== 'Home' &&
+      event.key !== 'End'
+    ) {
       return
     }
     event.preventDefault()

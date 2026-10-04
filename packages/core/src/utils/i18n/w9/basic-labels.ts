@@ -4,13 +4,7 @@
  */
 
 export type BasicLabelGroup =
-  | 'imagePreview'
-  | 'avatarGroup'
-  | 'qrcode'
-  | 'code'
-  | 'imageCropper'
-  | 'imageCompare'
-  | 'gallery'
+  'imagePreview' | 'avatarGroup' | 'qrcode' | 'code' | 'imageCropper' | 'imageCompare' | 'gallery'
 
 const ZH: Record<BasicLabelGroup, Record<string, string>> = {
   imagePreview: {

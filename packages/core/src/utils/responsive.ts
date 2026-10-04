@@ -161,11 +161,7 @@ export function resolveResponsiveValue<T>(
 
   const map = value
   if (!Number.isFinite(width) || width <= 0) {
-    return (
-      smallestDefinedResponsive(map, true) ??
-      smallestDefinedResponsive(map, false) ??
-      fallback
-    )
+    return smallestDefinedResponsive(map, true) ?? smallestDefinedResponsive(map, false) ?? fallback
   }
 
   for (let i = RESPONSIVE_BREAKPOINT_ORDER.length - 1; i >= 0; i--) {

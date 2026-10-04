@@ -19,8 +19,12 @@ function expectModernScope(element: HTMLElement): void {
   const scope = createTigerThemeScope({ root: element })
   scope.setTheme('modern')
   expect(element.getAttribute('data-tiger-theme')).toBe('modern')
-  expect(element.style.getPropertyValue('--tiger-radius-md').trim()).toBe(modernTheme.light.radius?.md)
-  expect(element.style.getPropertyValue('--tiger-radius-lg').trim()).toBe(modernTheme.light.radius?.lg)
+  expect(element.style.getPropertyValue('--tiger-radius-md').trim()).toBe(
+    modernTheme.light.radius?.md
+  )
+  expect(element.style.getPropertyValue('--tiger-radius-lg').trim()).toBe(
+    modernTheme.light.radius?.lg
+  )
   expect(element.style.getPropertyValue('--tiger-transition-base')).toContain('200ms')
   expect(element.style.getPropertyValue('--tiger-transition-base')).not.toContain('all ')
   expect(element.getAttribute('data-tiger-style')).toBeNull()

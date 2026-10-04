@@ -26,9 +26,15 @@ export const TableW9Panel = defineComponent({
     selectedKeys: { type: Array as PropType<(string | number)[]>, default: () => [] },
     remote: { type: Boolean, default: false },
     onSort: { type: Function as PropType<(key: string) => void>, default: undefined },
-    onFilter: { type: Function as PropType<(key: string, value: string) => void>, default: undefined },
+    onFilter: {
+      type: Function as PropType<(key: string, value: string) => void>,
+      default: undefined
+    },
     onHide: { type: Function as PropType<(key: string) => void>, default: undefined },
-    onResize: { type: Function as PropType<(key: string, width: number) => void>, default: undefined },
+    onResize: {
+      type: Function as PropType<(key: string, width: number) => void>,
+      default: undefined
+    },
     onSelection: {
       type: Function as PropType<(keys: (string | number)[], announcement: string) => void>,
       default: undefined
@@ -45,11 +51,7 @@ export const TableW9Panel = defineComponent({
     const labels = getW9DataLabels()
 
     function announce(keys: (string | number)[]) {
-      const text = selectionAnnouncement(
-        previousCount.value,
-        keys.length,
-        labels.selectionCount
-      )
+      const text = selectionAnnouncement(previousCount.value, keys.length, labels.selectionCount)
       previousCount.value = keys.length
       if (text) live.value = text
       props.onSelection?.(keys, live.value)
@@ -86,7 +88,8 @@ export const TableW9Panel = defineComponent({
               type: 'button',
               key: `sort-${column.key}`,
               'data-tiger-sort': column.key,
-              'data-sort-direction': props.sorts.find((level) => level.key === column.key)?.direction,
+              'data-sort-direction': props.sorts.find((level) => level.key === column.key)
+                ?.direction,
               onClick: () => props.onSort?.(column.key)
             },
             column.title || column.key

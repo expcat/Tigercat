@@ -363,9 +363,9 @@ describe('Tour', () => {
       return node!
     })
     expect(shade).toBeInTheDocument()
-    expect(
-      (document.querySelector('[data-tiger-tour-mask]') as HTMLElement).style.clipPath
-    ).toBe('')
+    expect((document.querySelector('[data-tiger-tour-mask]') as HTMLElement).style.clipPath).toBe(
+      ''
+    )
     expect(dialog.style.top).not.toBe('50%')
     target.remove()
   })

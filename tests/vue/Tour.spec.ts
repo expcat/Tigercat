@@ -355,9 +355,9 @@ describe('Tour', () => {
       expect(node?.style.top).toBe('96px')
       expect(node?.style.pointerEvents).toBe('none')
     })
-    expect(
-      (document.querySelector('[data-tiger-tour-mask]') as HTMLElement).style.clipPath
-    ).toBe('')
+    expect((document.querySelector('[data-tiger-tour-mask]') as HTMLElement).style.clipPath).toBe(
+      ''
+    )
     expect(dialog.style.top).not.toBe('50%')
     target.remove()
   })

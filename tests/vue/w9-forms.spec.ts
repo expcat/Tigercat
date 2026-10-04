@@ -85,8 +85,15 @@ describe('W9 vue forms', () => {
     const FormHost = defineComponent({
       setup() {
         return () =>
-          h(Form, { showErrorSummary: true, modelValue: { name: '' }, rules: { name: [{ required: true, message: 'Name required' }] } }, () =>
-            h(FormItem, { name: 'name', label: 'Name' }, () => h(Input, { 'aria-label': 'Name' }))
+          h(
+            Form,
+            {
+              showErrorSummary: true,
+              modelValue: { name: '' },
+              rules: { name: [{ required: true, message: 'Name required' }] }
+            },
+            () =>
+              h(FormItem, { name: 'name', label: 'Name' }, () => h(Input, { 'aria-label': 'Name' }))
           )
       }
     })

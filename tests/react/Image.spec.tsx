@@ -234,9 +234,7 @@ describe('Image', () => {
   })
 
   it('uses the successful fallback url for hover and click preview', async () => {
-    render(
-      <Image src="/broken.jpg" fallbackSrc="/fallback.jpg" alt="Harbor" preview zoomOnHover />
-    )
+    render(<Image src="/broken.jpg" fallbackSrc="/fallback.jpg" alt="Harbor" preview zoomOnHover />)
     const button = screen.getByRole('button')
     fireEvent.error(button.querySelector('img') as Element)
 

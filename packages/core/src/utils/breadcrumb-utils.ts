@@ -156,7 +156,13 @@ function allItemSlots(totalItems: number): BreadcrumbSlot[] {
 
 export function breadcrumbCollapsedMenuItems(
   items: readonly { key: string | number; label: string; href?: string; disabled?: boolean }[]
-): { key: string | number; type: 'link' | 'item'; label: string; href?: string; disabled?: boolean }[] {
+): {
+  key: string | number
+  type: 'link' | 'item'
+  label: string
+  href?: string
+  disabled?: boolean
+}[] {
   return items.map((item) => ({
     key: item.key,
     type: item.href ? 'link' : 'item',

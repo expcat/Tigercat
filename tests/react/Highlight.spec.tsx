@@ -45,9 +45,7 @@ describe('Highlight', () => {
     })
 
     it('matches string keywords literally and does not run a RegExp', () => {
-      const { container } = render(
-        <Highlight text="Order #42 and #7" keywords={['#42', '#7']} />
-      )
+      const { container } = render(<Highlight text="Order #42 and #7" keywords={['#42', '#7']} />)
       const labels = [...getRoot(container).querySelectorAll('mark')].map(
         (node) => node.textContent
       )

@@ -6,7 +6,13 @@
  * queue; the provider renders it.
  */
 
-import type { MessageConfig, MessageInstance, MessageOptions, MessagePosition, MessageType } from '../types/message'
+import type {
+  MessageConfig,
+  MessageInstance,
+  MessageOptions,
+  MessagePosition,
+  MessageType
+} from '../types/message'
 import type {
   NotificationConfig,
   NotificationInstance,
@@ -104,10 +110,7 @@ type ScopeHost = HTMLElement & { [FEEDBACK_SCOPE_STACK]?: FeedbackScope[] }
 export function createFeedbackScope(depth = 0): FeedbackScope {
   return {
     depth,
-    messages: createToastQueue<MessageQueueItem>(
-      {},
-      { groupOf: (item) => String(item.position) }
-    ),
+    messages: createToastQueue<MessageQueueItem>({}, { groupOf: (item) => String(item.position) }),
     notifications: createToastQueue<NotificationInstance>(
       {},
       { groupOf: (item) => String(item.position) }
@@ -189,9 +192,7 @@ export function enqueueNotification(
 ): () => void {
   if (!isBrowser() || !scope) return missingHost('notification')
   const normalized =
-    typeof options === 'string'
-      ? ({ title: options } as NotificationConfig)
-      : options
+    typeof options === 'string' ? ({ title: options } as NotificationConfig) : options
   const position: NotificationPosition = normalized.position ?? 'top-right'
   const instance = scope.notifications.add({
     id: normalized.key,

@@ -14,7 +14,6 @@ import type {
 import type { TigerLocaleFormValidation } from '../types/locale'
 import { enUS } from './i18n/locales/en-US'
 
-
 export type FormValidationPreset = Extract<FormRuleType, 'email' | 'phone' | 'url' | 'id-card'>
 
 /**
@@ -156,7 +155,8 @@ export function setValueByPath(values: FormValues, path: string, value: unknown)
     const nextIsIndex = nextKey !== undefined && isArrayIndexSegment(nextKey)
     let child: unknown
     if (Array.isArray(existing)) child = existing.slice()
-    else if (existing && typeof existing === 'object') child = { ...(existing as Record<string, unknown>) }
+    else if (existing && typeof existing === 'object')
+      child = { ...(existing as Record<string, unknown>) }
     else child = nextIsIndex ? [] : {}
 
     if (parentIsArray) {

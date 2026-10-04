@@ -26,7 +26,12 @@ export interface UseCartesianSeriesPointsOptions<T> {
 export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOptions<T>) {
   const hoveredPointInfo: Ref<ChartPointRef | null> = ref(null)
   const tooltipPosition = ref({ x: 0, y: 0 })
-  const plotScan = createChartFrameCoalescer<{ x: number; y: number; clientX: number; clientY: number }>({
+  const plotScan = createChartFrameCoalescer<{
+    x: number
+    y: number
+    clientX: number
+    clientY: number
+  }>({
     onFrame: (sample) => {
       const nearest = findNearestSeriesPoint(
         options.getSeriesPoints().map((sd) => sd.points),

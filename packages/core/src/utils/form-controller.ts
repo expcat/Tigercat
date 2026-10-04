@@ -182,7 +182,9 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
 
   function normalizeRuleList(rules?: FormRule | FormRule[]): FormRule[] {
     if (!rules) return []
-    return (Array.isArray(rules) ? rules : [rules]).filter((rule): rule is FormRule => Boolean(rule))
+    return (Array.isArray(rules) ? rules : [rules]).filter((rule): rule is FormRule =>
+      Boolean(rule)
+    )
   }
 
   function mergeRuleLists(

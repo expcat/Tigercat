@@ -64,39 +64,39 @@ function nodeValue(
     return null
   }
   try {
-  const children = datum.children
-  if (children && children.length > 0) {
-    let sum = 0
-    let any = false
-    for (const child of children) {
-      const childValue = nodeValue(child, visit)
-      if (childValue === null) continue
-      any = true
-      sum += childValue
-    }
-    if (any) {
-      if (isFiniteNumber(datum.value) && datum.value !== sum) {
-        devWarn(
-          'SunburstChart.parentValue',
-          'SunburstChart parent value differs from the sum of children; children sum is used for sweep'
-        )
+    const children = datum.children
+    if (children && children.length > 0) {
+      let sum = 0
+      let any = false
+      for (const child of children) {
+        const childValue = nodeValue(child, visit)
+        if (childValue === null) continue
+        any = true
+        sum += childValue
       }
-      return sum
+      if (any) {
+        if (isFiniteNumber(datum.value) && datum.value !== sum) {
+          devWarn(
+            'SunburstChart.parentValue',
+            'SunburstChart parent value differs from the sum of children; children sum is used for sweep'
+          )
+        }
+        return sum
+      }
     }
-  }
-  if (!isFiniteNumber(datum.value)) {
-    devWarn('SunburstChart.nonFinite', 'SunburstChart skipped a datum with a non-finite value')
-    return null
-  }
-  if (datum.value < 0) {
-    devWarn('SunburstChart.negative', 'SunburstChart skipped a datum with a negative value')
-    return null
-  }
-  if (datum.value === 0) {
-    devWarn('SunburstChart.zero', 'SunburstChart skipped a datum with value 0')
-    return null
-  }
-  return datum.value
+    if (!isFiniteNumber(datum.value)) {
+      devWarn('SunburstChart.nonFinite', 'SunburstChart skipped a datum with a non-finite value')
+      return null
+    }
+    if (datum.value < 0) {
+      devWarn('SunburstChart.negative', 'SunburstChart skipped a datum with a negative value')
+      return null
+    }
+    if (datum.value === 0) {
+      devWarn('SunburstChart.zero', 'SunburstChart skipped a datum with value 0')
+      return null
+    }
+    return datum.value
   } finally {
     visit.leave(key)
   }

@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { prefersReducedMotion, getAccessibleTransitionClasses, themeTransitionValue } from '@expcat/tigercat-core'
+import {
+  prefersReducedMotion,
+  getAccessibleTransitionClasses,
+  themeTransitionValue
+} from '@expcat/tigercat-core'
 import { createTigercatPlugin } from '../../packages/core/src/tailwind-plugin'
 
 /**
@@ -116,7 +120,10 @@ describe('createTigercatPlugin() — reduced-motion CSS block', () => {
             body &&
             typeof body === 'object'
           ) {
-            rules[sel] = { ...(previous as object), ...(body as object) } as Record<string, CssBlock>
+            rules[sel] = { ...(previous as object), ...(body as object) } as Record<
+              string,
+              CssBlock
+            >
           } else {
             rules[sel] = body as CssBlock
           }

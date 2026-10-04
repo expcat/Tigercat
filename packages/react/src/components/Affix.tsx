@@ -1,4 +1,11 @@
-import React, { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState, useMemo } from 'react'
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useMemo
+} from 'react'
 import {
   classNames,
   createAffixController,

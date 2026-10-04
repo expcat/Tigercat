@@ -779,7 +779,10 @@ export function buildFrameworkTsupEntries(components, framework, indexContent) {
   const hookDir = framework === 'react' ? 'hooks' : 'composables'
   const runtime = collectFrameworkRuntimeSubpaths(indexContent, framework)
   for (const [subpath, target] of Object.entries(runtime)) {
-    const file = target.import.split('/').pop().replace(/\.mjs$/, '')
+    const file = target.import
+      .split('/')
+      .pop()
+      .replace(/\.mjs$/, '')
     const dir = target.import.includes(`/${hookDir}/`) ? hookDir : 'components'
     const sourceExt = dir === 'components' ? ext : 'ts'
     entries.add(`src/${dir}/${file}.${sourceExt}`)

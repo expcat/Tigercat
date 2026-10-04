@@ -472,5 +472,7 @@ export function resolveResizableAspectRatio(
 }
 
 export function formatResizableLiveText(width: number, height: number, template: string): string {
-  return template.replace('{width}', String(Math.round(width))).replace('{height}', String(Math.round(height)))
+  return template
+    .replace('{width}', String(Math.round(width)))
+    .replace('{height}', String(Math.round(height)))
 }

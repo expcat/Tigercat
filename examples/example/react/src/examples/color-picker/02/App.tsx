@@ -18,7 +18,11 @@ export default function App() {
       <div className="flex flex-wrap items-center gap-4">
         {formats.map((format) => (
           <div key={format} className="flex items-center gap-2">
-            <ColorPicker value={values[format]} onChange={(v) => setters[format](v ?? '')} format={format} />
+            <ColorPicker
+              value={values[format]}
+              onChange={(v) => setters[format](v ?? '')}
+              format={format}
+            />
             <span className="text-sm text-gray-500">{format}</span>
             <code className="text-xs text-[var(--tiger-text-secondary)]">{values[format]}</code>
           </div>
@@ -26,7 +30,12 @@ export default function App() {
       </div>
       <div className="flex flex-wrap items-center gap-4">
         {sizes.map((size) => (
-          <ColorPicker key={size} value={sizeColor} onChange={(v) => setSizeColor(v ?? '')} size={size} />
+          <ColorPicker
+            key={size}
+            value={sizeColor}
+            onChange={(v) => setSizeColor(v ?? '')}
+            size={size}
+          />
         ))}
       </div>
     </div>

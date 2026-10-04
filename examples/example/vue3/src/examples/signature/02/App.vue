@@ -20,9 +20,7 @@ const dark = ref('')
         background-color="#0f172a"
         :line-width="4"
         v-model="dark" />
-      <p class="text-xs text-[var(--tiger-text-secondary)]">
-        backgroundColor 深色 · lineWidth 4
-      </p>
+      <p class="text-xs text-[var(--tiger-text-secondary)]">backgroundColor 深色 · lineWidth 4</p>
     </div>
   </div>
 </template>

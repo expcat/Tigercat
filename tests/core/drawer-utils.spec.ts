@@ -41,7 +41,10 @@ describe('drawer-utils', () => {
     expect(isDrawerSwipeCloseGesture({ placement: 'top' }, swipe('up'))).toBe(true)
     expect(isDrawerSwipeCloseGesture({ placement: 'bottom' }, null)).toBe(false)
     expect(
-      isDrawerSwipeCloseGesture({ placement: 'left', fullscreen: true, direction: 'ltr' }, swipe('right'))
+      isDrawerSwipeCloseGesture(
+        { placement: 'left', fullscreen: true, direction: 'ltr' },
+        swipe('right')
+      )
     ).toBe(true)
     expect(
       isDrawerSwipeCloseGesture({ placement: 'start', direction: 'rtl' }, swipe('right'))

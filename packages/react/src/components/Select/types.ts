@@ -25,7 +25,9 @@ export interface SelectBaseProps
   panelHeader?: React.ReactNode
   panelFooter?: React.ReactNode
   panelEmpty?: React.ReactNode
-  maxTagPlaceholder?: (items: { value: SelectValue; label: string; key: string }[]) => React.ReactNode
+  maxTagPlaceholder?: (
+    items: { value: SelectValue; label: string; key: string }[]
+  ) => React.ReactNode
   className?: string
 }
 

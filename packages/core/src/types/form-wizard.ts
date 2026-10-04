@@ -151,11 +151,7 @@ export interface FormWizardProps {
    * `detail.skippedValidation` is true when the parent wrote `current` directly
    * and this move did not run the step gate.
    */
-  onStepChange?: (
-    current: number,
-    prev: number,
-    detail?: { skippedValidation: boolean }
-  ) => void
+  onStepChange?: (current: number, prev: number, detail?: { skippedValidation: boolean }) => void
   /**
    * Finish callback. When the wizard sits in a Form, `values` is the current
    * model after a successful `validate` / submit.

@@ -43,9 +43,9 @@ describe('W9 basic helpers', () => {
   })
 
   it('puts compare titles into the slider value text', () => {
-    expect(formatImageCompareValueText('{percent}% before', 40, { before: 'Raw', after: 'Edited' })).toBe(
-      'Raw 40% before Edited'
-    )
+    expect(
+      formatImageCompareValueText('{percent}% before', 40, { before: 'Raw', after: 'Edited' })
+    ).toBe('Raw 40% before Edited')
   })
 
   it('changes watermark style vars without a canvas hook', () => {

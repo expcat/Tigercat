@@ -68,39 +68,39 @@ function nodeValue(
     return null
   }
   try {
-  const children = datum.children
-  if (children && children.length > 0) {
-    let sum = 0
-    let any = false
-    for (const child of children) {
-      const childValue = nodeValue(child, visit)
-      if (childValue === null) continue
-      any = true
-      sum += childValue
-    }
-    if (any) {
-      if (isFiniteNumber(datum.value) && datum.value !== sum) {
-        devWarn(
-          'TreeMapChart.parentValue',
-          'TreeMapChart parent value differs from the sum of children; children sum is used for area'
-        )
+    const children = datum.children
+    if (children && children.length > 0) {
+      let sum = 0
+      let any = false
+      for (const child of children) {
+        const childValue = nodeValue(child, visit)
+        if (childValue === null) continue
+        any = true
+        sum += childValue
       }
-      return sum
+      if (any) {
+        if (isFiniteNumber(datum.value) && datum.value !== sum) {
+          devWarn(
+            'TreeMapChart.parentValue',
+            'TreeMapChart parent value differs from the sum of children; children sum is used for area'
+          )
+        }
+        return sum
+      }
     }
-  }
-  if (!isFiniteNumber(datum.value)) {
-    devWarn('TreeMapChart.nonFinite', 'TreeMapChart skipped a datum with a non-finite value')
-    return null
-  }
-  if (datum.value < 0) {
-    devWarn('TreeMapChart.negative', 'TreeMapChart skipped a datum with a negative value')
-    return null
-  }
-  if (datum.value === 0) {
-    devWarn('TreeMapChart.zero', 'TreeMapChart skipped a datum with value 0')
-    return null
-  }
-  return datum.value
+    if (!isFiniteNumber(datum.value)) {
+      devWarn('TreeMapChart.nonFinite', 'TreeMapChart skipped a datum with a non-finite value')
+      return null
+    }
+    if (datum.value < 0) {
+      devWarn('TreeMapChart.negative', 'TreeMapChart skipped a datum with a negative value')
+      return null
+    }
+    if (datum.value === 0) {
+      devWarn('TreeMapChart.zero', 'TreeMapChart skipped a datum with value 0')
+      return null
+    }
+    return datum.value
   } finally {
     visit.leave(key)
   }
@@ -201,7 +201,17 @@ function layoutItem(
   if (childW <= 0 || childH <= 0) return
   const childItems = sizeItems(children, item.depth + 1, item.color)
   if (childItems.length === 0) return
-  squarify(childItems, node.x + inset, node.y + header, childW, childH, gap, minLabelSize, out, node.index)
+  squarify(
+    childItems,
+    node.x + inset,
+    node.y + header,
+    childW,
+    childH,
+    gap,
+    minLabelSize,
+    out,
+    node.index
+  )
 }
 
 function squarify(

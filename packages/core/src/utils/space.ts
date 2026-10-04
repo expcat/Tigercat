@@ -53,7 +53,10 @@ export function resolveSpaceSize(size: SpaceSize = 'md'): {
 } {
   if (typeof size === 'number') {
     if (!Number.isFinite(size) || size < 0) {
-      devWarn('Space.size', `Space size ${String(size)} is not a finite non-negative number. Using md.`)
+      devWarn(
+        'Space.size',
+        `Space size ${String(size)} is not a finite non-negative number. Using md.`
+      )
       return { className: SIZE_CLASS.md }
     }
     return { gap: `${size}px` }

@@ -36,7 +36,9 @@ describe('CodeEditor', () => {
       document.documentElement.setAttribute('data-tiger-color-scheme', 'dark')
       const { container } = render(<CodeEditor value="a" />)
       expect(container.firstElementChild?.getAttribute('data-theme')).toBe('dark')
-      expect(container.firstElementChild?.getAttribute('style') ?? '').not.toMatch(/#(?:[0-9a-f]{3,8})/i)
+      expect(container.firstElementChild?.getAttribute('style') ?? '').not.toMatch(
+        /#(?:[0-9a-f]{3,8})/i
+      )
       document.documentElement.removeAttribute('data-tiger-color-scheme')
     })
 

@@ -58,10 +58,7 @@ describe('exportTableToCsv', () => {
 
   it('skips render-only columns without a record field', () => {
     const csv = exportTableToCsv(
-      [
-        ...columns,
-        { key: 'actions', title: 'Actions', render: () => 'edit' }
-      ],
+      [...columns, { key: 'actions', title: 'Actions', render: () => 'edit' }],
       data
     )
     expect(csv).toContain('姓名,Age,City')

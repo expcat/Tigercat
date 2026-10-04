@@ -50,10 +50,7 @@ const LoadingBarHost = /* @__PURE__ */ defineComponent({
 
     return () => {
       const current = state.value
-      const notice = getLoadingBarNoticeText(
-        current.notice,
-        readDocumentOwnerLocale() ?? undefined
-      )
+      const notice = getLoadingBarNoticeText(current.notice, readDocumentOwnerLocale() ?? undefined)
       if (!current.visible) {
         return notice ? h('span', { class: 'sr-only', role: 'status' }, notice) : null
       }

@@ -24,8 +24,7 @@ export const splitButtonRootBlockClasses = 'w-full'
  * Join the primary button to the trigger. The button itself has no radius
  * when it is inside the split group; these classes own the outer corner.
  */
-export const splitButtonPrimaryClasses =
-  'rounded-s-[var(--tiger-radius-md)] rounded-e-none'
+export const splitButtonPrimaryClasses = 'rounded-s-[var(--tiger-radius-md)] rounded-e-none'
 
 /** Let the primary action fill remaining width in block layout */
 export const splitButtonPrimaryBlockClasses = 'min-w-0 flex-1'

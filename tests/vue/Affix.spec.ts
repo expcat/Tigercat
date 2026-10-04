@@ -85,9 +85,9 @@ describe('Affix', () => {
 
     unmount()
     expect(observer.disconnect).toHaveBeenCalledTimes(1)
-    expect(MockResizeObserver.instances.some((instance) => instance.disconnect.mock.calls.length > 0)).toBe(
-      true
-    )
+    expect(
+      MockResizeObserver.instances.some((instance) => instance.disconnect.mock.calls.length > 0)
+    ).toBe(true)
     document.body.removeChild(root)
   })
 
@@ -351,9 +351,9 @@ describe('Affix', () => {
     unmount()
 
     expect(latestIntersection().disconnect).toHaveBeenCalled()
-    expect(MockResizeObserver.instances.some((instance) => instance.disconnect.mock.calls.length > 0)).toBe(
-      true
-    )
+    expect(
+      MockResizeObserver.instances.some((instance) => instance.disconnect.mock.calls.length > 0)
+    ).toBe(true)
   })
 
   it('does not throw when the target selector is illegal', async () => {

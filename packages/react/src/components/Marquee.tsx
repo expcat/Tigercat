@@ -66,8 +66,7 @@ export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
       focused
     })
     const { 'aria-label': ariaLabelAttr, 'aria-labelledby': ariaLabelledByAttr, ...domProps } = rest
-    const labelledBy =
-      typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined
+    const labelledBy = typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined
     const dedicatedAria =
       (typeof ariaLabelAttr === 'string' ? ariaLabelAttr : undefined) ??
       ariaLabel ??

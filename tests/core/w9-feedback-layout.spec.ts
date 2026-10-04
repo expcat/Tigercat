@@ -27,16 +27,28 @@ import {
   enqueueMessage,
   settleMessage
 } from '../../packages/core/src/utils/feedback-scope'
-import { formatProgressPercent, resolveProgressView } from '../../packages/core/src/utils/progress-utils'
+import {
+  formatProgressPercent,
+  resolveProgressView
+} from '../../packages/core/src/utils/progress-utils'
 import { resolveResizableAspectRatio } from '../../packages/core/src/utils/resizable-utils'
-import { collapseSplitterSizes, restoreSplitterSize } from '../../packages/core/src/utils/splitter-utils'
+import {
+  collapseSplitterSizes,
+  restoreSplitterSize
+} from '../../packages/core/src/utils/splitter-utils'
 import { resolveResponsiveGutter } from '../../packages/core/src/utils/grid'
-import { CONTAINER_READING_MAX_WIDTH, getContainerMaxWidthStyle } from '../../packages/core/src/utils/container-utils'
+import {
+  CONTAINER_READING_MAX_WIDTH,
+  getContainerMaxWidthStyle
+} from '../../packages/core/src/utils/container-utils'
 import { cardTitleTag } from '../../packages/core/src/utils/card-utils'
 import { createTooltipDelayGroup } from '../../packages/core/src/utils/floating-popup-utils'
 import { tourArrowKey, tourTargetExempt } from '../../packages/core/src/utils/tour-utils'
 import { scrollAreaMotionBehavior } from '../../packages/core/src/utils/scroll-area-utils'
-import { getCarouselAxisTransform, getCarouselSlidesPerView } from '../../packages/core/src/utils/carousel-utils'
+import {
+  getCarouselAxisTransform,
+  getCarouselSlidesPerView
+} from '../../packages/core/src/utils/carousel-utils'
 import { feedbackLayoutLabels } from '../../packages/core/src/utils/i18n/w9/feedback-layout-labels'
 
 describe('W9 feedback and layout core', () => {

@@ -196,7 +196,15 @@ export function hasSelectOptionRows(ctx: SelectRenderContext): boolean {
 export function renderSelectPanelBody(ctx: SelectRenderContext): React.ReactNode {
   const rows = buildSelectListRows(ctx.filteredOptions, ctx.creatableOption)
   if (!rows.some((row) => row.kind === 'option')) return null
-  if (ctx.virtual || shouldVirtualizeSelectList({ rowCount: rows.length, listHeight: ctx.listHeight, size: ctx.size, rows })) {
+  if (
+    ctx.virtual ||
+    shouldVirtualizeSelectList({
+      rowCount: rows.length,
+      listHeight: ctx.listHeight,
+      size: ctx.size,
+      rows
+    })
+  ) {
     return <VirtualSelectRows ctx={ctx} rows={rows} />
   }
   return (

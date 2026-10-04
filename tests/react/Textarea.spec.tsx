@@ -170,14 +170,7 @@ describe('Textarea', () => {
       const user = userEvent.setup()
       const TestComponent = () => {
         const [value, setValue] = React.useState('ab')
-        return (
-          <Textarea
-            value={value}
-            onChange={setValue}
-            showCount
-            maxLength={10}
-          />
-        )
+        return <Textarea value={value} onChange={setValue} showCount maxLength={10} />
       }
       render(<TestComponent />)
       expect(screen.getByText('2 / 10')).toBeInTheDocument()

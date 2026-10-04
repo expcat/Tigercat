@@ -264,10 +264,7 @@ export function sliderPushApartRange(
   return pushed > lo ? [lo, pushed] : [lo, hi]
 }
 
-export function formatSliderTooltip(
-  value: number,
-  formatter?: (value: number) => string
-): string {
+export function formatSliderTooltip(value: number, formatter?: (value: number) => string): string {
   if (formatter) return formatter(value)
   return String(value)
 }

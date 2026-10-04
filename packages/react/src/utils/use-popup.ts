@@ -89,11 +89,7 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   }
   const controller = controllerRef.current
 
-  const currentVisible = useSyncExternalStore(
-    controller.subscribe,
-    controller.getOpen,
-    () => false
-  )
+  const currentVisible = useSyncExternalStore(controller.subscribe, controller.getOpen, () => false)
 
   const disabled = Boolean(options.disabled)
   useEffect(() => {
@@ -119,9 +115,7 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   const relatedInside = (event?: { relatedTarget?: EventTarget | null }) => {
     const related = event?.relatedTarget
     if (!(related instanceof Node)) return false
-    return Boolean(
-      floatingRef.current?.contains(related) || triggerRef.current?.contains(related)
-    )
+    return Boolean(floatingRef.current?.contains(related) || triggerRef.current?.contains(related))
   }
 
   const handleToggle = useCallback(() => {

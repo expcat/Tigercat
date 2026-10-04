@@ -11,9 +11,7 @@ export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
  * Gutter size type (in px or Tailwind spacing scale)
  */
 export type GutterSize =
-  | number
-  | [number, number]
-  | Partial<Record<Breakpoint, number | [number, number]>>
+  number | [number, number] | Partial<Record<Breakpoint, number | [number, number]>>
 
 export type ResponsiveAlign = Align | Partial<Record<Breakpoint, Align>>
 

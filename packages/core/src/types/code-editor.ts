@@ -33,11 +33,7 @@ export interface CodeHighlighter {
    * Tokens for the whole block, one array per line. Used when
    * `highlightLine` is not provided. Strings are not HTML.
    */
-  highlightCode?(
-    code: string,
-    language: CodeLanguage,
-    theme: CodeEditorTheme
-  ): HighlightToken[][]
+  highlightCode?(code: string, language: CodeLanguage, theme: CodeEditorTheme): HighlightToken[][]
 }
 
 /**

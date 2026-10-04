@@ -91,7 +91,11 @@ export function PieBind({
   return (
     <div data-tiger-pie-bind="">
       {labels.map((label) => (
-        <span key={label.index} data-pie-label={String(label.index)} data-pie-label-y={String(label.y)} />
+        <span
+          key={label.index}
+          data-pie-label={String(label.index)}
+          data-pie-label-y={String(label.y)}
+        />
       ))}
       {radii.map((radius, index) => (
         <span key={`r-${index}`} data-pie-radius={String(radius)} />
@@ -153,7 +157,11 @@ export function DrillBind({
         </button>
       ))}
       {nodes.map((node) => (
-        <button type="button" key={node.id} data-drill-node={node.id} onClick={() => onOpen?.(node.id)}>
+        <button
+          type="button"
+          key={node.id}
+          data-drill-node={node.id}
+          onClick={() => onOpen?.(node.id)}>
           {node.id}
         </button>
       ))}
@@ -203,7 +211,10 @@ export function OrgBind({
 export function DrillHost({
   roots
 }: {
-  roots: readonly { id: string; children?: readonly { id: string; children?: readonly { id: string }[] }[] }[]
+  roots: readonly {
+    id: string
+    children?: readonly { id: string; children?: readonly { id: string }[] }[]
+  }[]
 }) {
   const [path, setPath] = useState<string[]>([])
   return (
