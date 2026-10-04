@@ -107,6 +107,7 @@ const forkOnlyInclude = isCoverageRun
 
 const sharedTestOptions = {
   globals: true,
+  forbidOnly: true,
   environment: 'happy-dom' as const,
   setupFiles: ['./tests/setup.ts']
 }

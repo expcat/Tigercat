@@ -15,6 +15,8 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/spotlight/` and `examples/example/react/src/examples/spotlight/`.
 
+Note: 打开后等待输入节点挂载并自动聚焦。焦点约束、关闭后的焦点返回和滚动锁由共享 focus scope 管理。
+
 Vue: `<Spotlight :items="items" />`
 
 React: `<Spotlight items={items} />`

@@ -12,8 +12,8 @@ stay aligned. Version history belongs in CHANGELOG, not this page.
 ## Flow
 
 1. Metadata: `pnpm release:check` (fixed versions, runtime `version` exports, required exports,
-   Changesets fixed groups, root scripts, docs entry points).
-2. Full local gate for RC and production: `pnpm quality:release` then `pnpm build`. Do **not** add
+   Changesets fixed groups, docs entry points).
+2. Full local gate for RC and production: `pnpm quality:release` (includes one package build). Do **not** add
    this (or coverage / SSR / publish smoke) to publish workflows.
 3. Release Candidate: `pnpm release:next` or `pnpm release:canary`; install the prerelease in clean Vue, React,
    Nuxt, and Next projects.
@@ -24,9 +24,11 @@ stay aligned. Version history belongs in CHANGELOG, not this page.
    package.json) and deploys Pages.
 5. After publish: `pnpm smoke:published`.
 
-`pnpm quality:release` is the one heavy gate: API/type checks, size-limit, local tarball smoke
+`pnpm quality:release` is the one heavy gate: API/type checks, coverage and special tests,
+one package build, size-limit, local tarball smoke
 (ESM entries, Button subpath budgets, no unused DatePicker locale presets on `defineText` /
-DatePicker subpaths), test checklist, Vue/React examples, and the Nuxt/Next SSR matrix. For
+DatePicker subpaths), test source checks, and one Vue/React/Nuxt/Next example build per tarball.
+SSR HTML/CSS is checked there; hydration runs in the coverage suite. For
 component-batch work, start with `pnpm test:group:<group>` (`basic`, `form`, `feedback`, `layout`,
 `navigation`, `data`, `charts`, `advanced`, `composite`, `core`) plus `pnpm docs:api:check` before
 escalating.
@@ -63,6 +65,6 @@ Token source is `packages/core/tokens/tokens.json`; after token edits `pnpm toke
 `./figma-variables.json`. See [tokens.md](tokens.md).
 
 Hydration audit focus: DatePicker locale/timezone, chart SVG ids, closed overlays, client-only
-theme bootstrap. SSR commands are inside `quality:release` (`pnpm quality:ssr`).
+theme bootstrap. Use `pnpm example:ssr:check` for a focused workspace SSR check.
 
 Next: [tokens.md](tokens.md)

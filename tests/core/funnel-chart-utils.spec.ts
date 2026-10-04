@@ -35,7 +35,7 @@ describe('computeFunnelSegments', () => {
 
   it('keeps a missing label empty so locale can fill it', () => {
     const noLabel = [{ value: 50 }]
-    const result = computeFunnelSegments(noLabel as any, { width: 200, height: 300 })
+    const result = computeFunnelSegments(noLabel, { width: 200, height: 300 })
     expect(result[0].label).toBeUndefined()
   })
 
@@ -134,7 +134,11 @@ describe('computeFunnelSegments', () => {
   })
 
   it('lays out a horizontal funnel on a different axis than vertical', () => {
-    const vertical = computeFunnelSegments(data, { width: 200, height: 300, orientation: 'vertical' })
+    const vertical = computeFunnelSegments(data, {
+      width: 200,
+      height: 300,
+      orientation: 'vertical'
+    })
     const horizontal = computeFunnelSegments(data, {
       width: 200,
       height: 300,

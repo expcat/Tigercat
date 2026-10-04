@@ -3,30 +3,10 @@
 import { spawnSync } from 'node:child_process'
 import { readFileSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
-import { collectFiles } from './utils/files.mjs'
+import { assertSsrArtifacts } from './lib/ssr-artifacts.mjs'
 
 const root = join(import.meta.dirname, '..')
 const nextEnvPath = join(root, 'examples/nextjs/next-env.d.ts')
-
-const COMPONENT_MARKERS = [
-  { component: 'Button', kind: 'HTML', needles: ['保存'] },
-  { component: 'DatePicker', kind: 'HTML', needles: ['2024-01-15'] },
-  { component: 'BarChart', kind: 'HTML', needles: ['tiger-bar-grad-', 'url(#'] },
-  { component: 'BarChart', kind: 'CSS', needles: ['--tiger-primary'] }
-]
-
-const ARTIFACTS = [
-  {
-    label: 'Next.js',
-    htmlDirs: [join(root, 'examples/nextjs/.next/server/app')],
-    cssDirs: [join(root, 'examples/nextjs/.next/static')]
-  },
-  {
-    label: 'Nuxt',
-    htmlDirs: [join(root, 'examples/nuxt/.output/public')],
-    cssDirs: [join(root, 'examples/nuxt/.output/public/_nuxt')]
-  }
-]
 
 const pnpmExecPath = process.env.npm_execpath
 const command = pnpmExecPath ? process.execPath : process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
@@ -48,23 +28,6 @@ function run(spawnArgs) {
   if (result.status !== 0) fail(`command failed: ${spawnArgs.join(' ')}`, result.status ?? 1)
 }
 
-function readJoined(dirs, extensions) {
-  return dirs
-    .flatMap((dir) => collectFiles(dir, extensions, { skip: ['node_modules'] }))
-    .map((file) => readFileSync(file, 'utf8'))
-    .join('\n')
-}
-
-function assertComponentMarkers(label, html, css) {
-  for (const marker of COMPONENT_MARKERS) {
-    const content = marker.kind === 'CSS' ? css : html
-    const missing = marker.needles.filter((needle) => !content.includes(needle))
-    if (missing.length > 0) {
-      fail(`${label} ${marker.component} ${marker.kind} is missing: ${missing.join(', ')}`)
-    }
-  }
-}
-
 function cleanupBuildOutput() {
   rmSync(join(root, 'examples/nextjs/.next'), { recursive: true, force: true })
   rmSync(join(root, 'examples/nuxt/.output'), { recursive: true, force: true })
@@ -83,11 +46,8 @@ try {
     )
   }
 
-  for (const artifact of ARTIFACTS) {
-    const html = readJoined(artifact.htmlDirs, ['.html'])
-    const css = readJoined(artifact.cssDirs, ['.css'])
-    assertComponentMarkers(artifact.label, html, css)
-  }
+  assertSsrArtifacts('next', join(root, 'examples/nextjs'))
+  assertSsrArtifacts('nuxt', join(root, 'examples/nuxt'))
 
   run(
     pnpmExecPath

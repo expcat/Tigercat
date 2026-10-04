@@ -1,13 +1,16 @@
-import { axe, type AxeResults } from 'jest-axe'
+import type { axe as runAxe, AxeResults } from 'jest-axe'
 import { expect } from 'vitest'
 
-type AxeOptions = NonNullable<Parameters<typeof axe>[1]>
+type AxeOptions = NonNullable<Parameters<typeof runAxe>[1]>
 
 /**
- * Configure axe for accessibility testing
- * Note: toHaveNoViolations matcher is extended globally in tests/setup.ts
+ * Load the scanner and matcher only when a test actually runs axe.
  */
-export { axe }
+export async function axe(...args: Parameters<typeof runAxe>): Promise<AxeResults> {
+  const scanner = await import('jest-axe')
+  expect.extend(scanner.toHaveNoViolations)
+  return scanner.axe(...args)
+}
 
 const DEDICATED_A11Y_SPEC =
   /a11y-aa-regression|a11y-interactive-regression|composite-a11y-roles|a11y-utils/

@@ -39,7 +39,7 @@ describe('chart export utilities', () => {
       download: '',
       style: { display: '' },
       click: clickSpy
-    } as any)
+    } as unknown as HTMLAnchorElement)
     const appendSpy = vi.spyOn(document.body, 'appendChild').mockImplementation((node) => node)
     const removeSpy = vi.spyOn(document.body, 'removeChild').mockImplementation((node) => node)
     const revokeSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})

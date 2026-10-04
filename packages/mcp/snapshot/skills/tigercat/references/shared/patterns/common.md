@@ -48,10 +48,10 @@ Applies to `Steps` / `StepsItem`, `Breadcrumb` / `BreadcrumbItem`, `Tabs` / `Tab
 
 Tooltip, Popover, and Popconfirm share the floating-popup layer; Dropdown, Select, and combobox-style components follow the same open/trigger semantics.
 
-| Layer          | File                                 | Role                                    |
-| -------------- | ------------------------------------ | --------------------------------------- |
-| Core types     | `core/types/floating-popup.ts`       | shared props and trigger types          |
-| Core utils     | `core/utils/floating-popup-utils.ts` | ids and trigger handler maps            |
+| Layer          | File                                 | Role                                         |
+| -------------- | ------------------------------------ | -------------------------------------------- |
+| Core types     | `core/types/floating-popup.ts`       | shared props and trigger types               |
+| Core utils     | `core/utils/floating-popup-utils.ts` | ids and trigger handler maps                 |
 | Vue composable | `vue/utils/use-popup.ts`             | binds refs and events to the core controller |
 | React hook     | `react/utils/use-popup.ts`           | binds refs and events to the core controller |
 
@@ -90,11 +90,11 @@ These are binding or seed differences, not two products. Compact Notes on each c
 | Named content               | slots (`#header`, `#content`)                            | node / render props (`header`, `renderContent`)           |
 | Uncontrolled seed           | Input/Textarea and other fields accept `defaultValue`    | Input/Textarea already have `defaultValue`                |
 | Readonly spelling           | Rate/Signature/Mentions accept `readonly` and `readOnly` | same via `resolveReadOnlyFlag` (conflict uses `readonly`) |
-| Native `type` on Button     | attr `type`                                              | `htmlType` wins over `type`                               |
+| Native `type` on Button     | prop `type`                                              | prop `type`                                               |
 | SchemaForm submit errors    | action Submit copies engine errors                       | native submit fills engine errors                         |
 | RichTextEditor FormItem     | seeds the engine from context                            | seeds the engine from FormItem when `value` is omitted    |
 | RichTextEditor `style`      | merges after height                                      | same merge on the height box                              |
-| SplitButton `type`          | lands on the primary                                     | `type` / `htmlType` land on the primary (`htmlType` wins) |
+| SplitButton `type`          | lands on the primary                                     | lands on the primary                                      |
 
 Size **strings** are three families and are not interchangeable: Form/Rate `sm\|md\|lg`, Steps/Wizard `small\|default`, Pagination `small\|medium\|large`.
 

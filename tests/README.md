@@ -32,7 +32,7 @@ pnpm test:group:form             # 指定组件分组
 pnpm test:group -- --group data --framework react
 pnpm test:coverage               # 本地发布检查使用的 coverage
 pnpm test:coverage:report        # 按需生成 JSON/HTML 报告
-pnpm test:validate               # 测试质量检查
+pnpm test:validate               # 测试源码检查（含 MCP）
 pnpm e2e                         # Playwright：Chromium + mobile
 pnpm e2e:full                    # Playwright：全部浏览器引擎
 pnpm test:watch                  # watch mode
@@ -110,12 +110,11 @@ e2e 只留真实浏览器才有意义的路径（playground iframe、portal/over
 
 - spec 没有收集到测试；
 - 存在 `.only`；
-- 非注释代码中使用 `: any`。
+- 显式使用 `any` 类型。
 
-以下仅为建议警告：
-
-- 少于一半测试名包含可识别的行为动词；
-- React/Vue 组件 spec 没有 `expectNoA11yViolations`。
+扫描使用 TypeScript 语法树，忽略字符串与注释，支持 `it.each` 和链式 `.only`。
+不再统计英文测试名或检查 a11y helper 字符串；无障碍行为由实际 axe / ARIA
+测试验证。Vitest 同时启用 `forbidOnly`，单文件执行也会拒绝 `.only`。
 
 Coverage 阈值由 `vitest.config.ts` 统一维护，当前为 lines 85%、statements 83%、functions 84%、branches 76%。不要在文档或单个 spec 中另设一套阈值。
 

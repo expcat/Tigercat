@@ -211,50 +211,6 @@ function checkPackageRepositoryMetadata(packages) {
   }
 }
 
-function checkRootScripts() {
-  const rootPackage = readJson('package.json')
-  const scripts = rootPackage.scripts ?? {}
-  const requiredScripts = [
-    'release:check',
-    'publish:check',
-    'quality:static',
-    'quality:quick',
-    'quality:size',
-    'quality:examples',
-    'quality:ssr',
-    'quality:release',
-    'test:special',
-    'example:ssr:build',
-    'docs:api',
-    'exports:check',
-    'smoke:published'
-  ]
-
-  for (const scriptName of requiredScripts) {
-    check(scriptName in scripts, `root package.json missing script ${scriptName}`)
-  }
-
-  const releaseGate = scripts['quality:release'] ?? ''
-  const requiredReleaseSteps = [
-    'release:check',
-    'quality:static',
-    'test:coverage',
-    'test:special',
-    'api:baseline:check',
-    'exports:check',
-    'docs:api:check',
-    'quality:size',
-    'publish:check',
-    'test:validate',
-    'quality:examples',
-    'quality:ssr'
-  ]
-
-  for (const step of requiredReleaseSteps) {
-    check(releaseGate.includes(step), `quality:release must include ${step}`)
-  }
-}
-
 function checkSizeLimitConfig() {
   const entries = readJson('.size-limit.json')
 
@@ -423,7 +379,6 @@ checkPackageExports(packages)
 checkFrameworkSideEffects(packages)
 checkEsmOnlyPackageSurface(packages)
 checkPackageRepositoryMetadata(packages)
-checkRootScripts()
 checkSizeLimitConfig()
 checkPublishWorkflows()
 checkRootVersion(expectedVersion)

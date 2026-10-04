@@ -29,6 +29,10 @@ const ROOT = join(__dirname, '..')
 const TYPES_DIR = join(ROOT, 'packages', 'core', 'src', 'types')
 const SKILL_REFERENCES_DIR = join(ROOT, 'skills', 'tigercat', 'references')
 const jsonMode = process.argv.includes('--json')
+const publicExports = loadPublicComponentExports(ROOT)
+const vuePublicComponents = new Set(publicExports.vue)
+const reactPublicComponents = new Set(publicExports.react)
+const allPublicComponents = new Set(publicExports.all)
 
 function expectedSplitReference(dir, componentSlug, groupSlug) {
   const componentPath = `skills/tigercat/references/${dir}/${componentSlug}.md`
@@ -39,12 +43,6 @@ function expectedSplitReference(dir, componentSlug, groupSlug) {
 
 // ----- Rules -----
 
-const DISABLED_PATTERN = /\bisDisabled\b/
-const VISIBLE_PATTERN = /\bvisible\s*[\?]?\s*:/
-const OPEN_OK = /\bopen\s*[\?]?\s*:/
-const SIZE_VALUES = new Set(['xs', 'sm', 'md', 'lg', 'xl'])
-const SIZE_PROP_REGEX = /size\s*[\?]?\s*:\s*(['"][\w'"| ]+['"]|[\w|' ]+)/
-
 // Standard prop names (should NOT use alternatives)
 const PROP_ALTERNATIVES = [
   { bad: 'isDisabled', good: 'disabled', regex: /\bisDisabled\b/ },
@@ -53,9 +51,6 @@ const PROP_ALTERNATIVES = [
   { bad: 'isVisible', good: 'open', regex: /\bisVisible\b/ },
   { bad: 'visible', good: 'open', regex: /\bvisible\s*[\?]?\s*:/ }
 ]
-
-// Vue events should be kebab-case style (in emits arrays)
-const VUE_EMIT_REGEX = /emits\s*:\s*\[([^\]]+)\]/g
 
 // Collect issues
 const issues = []
@@ -103,28 +98,6 @@ for (const filename of typeFiles) {
     for (const alt of PROP_ALTERNATIVES) {
       if (alt.regex.test(line) && !isDeprecated) {
         addIssue(filepath, lineNum, 'naming', `使用 "${alt.bad}" 应改为 "${alt.good}"`)
-      }
-    }
-
-    // Check size values are from standard set
-    const sizeMatch = line.match(SIZE_PROP_REGEX)
-    if (sizeMatch && line.includes('size')) {
-      const sizeStr = sizeMatch[1]
-      const values = sizeStr.match(/'([^']+)'/g)
-      if (values) {
-        const extracted = values.map((v) => v.replace(/'/g, ''))
-        for (const val of extracted) {
-          if (
-            !SIZE_VALUES.has(val) &&
-            val !== 'default' &&
-            val !== 'small' &&
-            val !== 'large' &&
-            val !== 'full' &&
-            val !== 'auto'
-          ) {
-            // Allow some common extra values, but flag unusual ones
-          }
-        }
       }
     }
   })
@@ -189,18 +162,15 @@ for (const filename of reactFiles) {
 
 // ----- Cross-framework consistency check -----
 
-// Check that Vue and React have matching component files
-const vueComponentNames = new Set(vueFiles.map((f) => f.replace('.ts', '')))
-const reactComponentNames = new Set(reactFiles.map((f) => f.replace('.tsx', '')))
-
-for (const name of vueComponentNames) {
-  if (!reactComponentNames.has(name)) {
+// Compare public components; framework-local helper files are not components.
+for (const name of vuePublicComponents) {
+  if (!reactPublicComponents.has(name)) {
     addIssue('cross-framework', 0, 'missing-react', `Vue 组件 "${name}" 在 React 中缺失`)
   }
 }
 
-for (const name of reactComponentNames) {
-  if (!vueComponentNames.has(name)) {
+for (const name of reactPublicComponents) {
+  if (!vuePublicComponents.has(name)) {
     addIssue('cross-framework', 0, 'missing-vue', `React 组件 "${name}" 在 Vue 中缺失`)
   }
 }
@@ -986,11 +956,6 @@ function hasHeadingOrMention(content, target) {
   )
 }
 
-const publicExports = loadPublicComponentExports(ROOT)
-const vuePublicComponents = new Set(publicExports.vue)
-const reactPublicComponents = new Set(publicExports.react)
-const allPublicComponents = new Set(publicExports.all)
-
 const sharedPropsDocs = collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'shared', 'props'))
 const generatedExampleDocs = collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'examples'))
 const routeIndexDocs = `${collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'vue'))}\n${collectMarkdownContent(join(SKILL_REFERENCES_DIR, 'react'))}`
@@ -1059,8 +1024,13 @@ function collectComponentIndexRows() {
   return rows
 }
 
+const expectedComponentEntries = buildPublicComponentEntries(
+  ROOT,
+  coreFileInfoByName,
+  publicExports
+)
 const expectedComponentRows = new Map(
-  buildPublicComponentEntries(ROOT, coreFileInfoByName, publicExports).map((entry) => [
+  expectedComponentEntries.map((entry) => [
     entry.component,
     {
       category: entry.category,
@@ -1069,11 +1039,6 @@ const expectedComponentRows = new Map(
       packageSubpath: getComponentPackageSubpath(entry.component)
     }
   ])
-)
-const expectedComponentEntries = buildPublicComponentEntries(
-  ROOT,
-  coreFileInfoByName,
-  publicExports
 )
 const actualComponentRows = collectComponentIndexRows()
 
@@ -1351,7 +1316,8 @@ if (existsSync(context7Path)) {
   for (const entry of expectedComponentEntries) {
     const component = metadata[entry.component]
     const slug = entry.slug
-    const testGroup = entry.testGroup || CATEGORY_SLUGS[entry.category] || entry.category.toLowerCase()
+    const testGroup =
+      entry.testGroup || CATEGORY_SLUGS[entry.category] || entry.category.toLowerCase()
 
     if (!component) {
       addIssue('context7.json', 0, 'docs-route', `context7 缺少公开组件 "${entry.component}"`)

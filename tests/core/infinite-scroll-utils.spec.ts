@@ -251,8 +251,7 @@ describe('infinite-scroll-utils', () => {
     })
 
     it('returns null when IntersectionObserver is unavailable', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (globalThis as any).IntersectionObserver
+      Reflect.deleteProperty(globalThis, 'IntersectionObserver')
       const sentinel = document.createElement('div')
       const result = createInfiniteScrollObserver(sentinel, { onLoadMore: vi.fn() })
       expect(result).toBeNull()

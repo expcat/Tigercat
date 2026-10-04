@@ -13,7 +13,7 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/image.ts` · `ImageProps` · 4/19 props
 
-Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`previewTrigger="hover"` 仍可用 focus / 点击打开；组内由 ImageGroup 统一全屏预览。`onLoad` / `srcSet` 落在内层 `<img>`。
+Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`zoomOnHover` 开启悬停 / focus 放大，点击仍打开全屏预览；组内由 ImageGroup 统一预览。lazy 使用原生 `loading="lazy"`。`onLoad` / `srcSet` 落在内层 `<img>`。
 
 | Prop       | Type      | Default | Notes                                                                                      |
 | ---------- | --------- | ------- | ------------------------------------------------------------------------------------------ |

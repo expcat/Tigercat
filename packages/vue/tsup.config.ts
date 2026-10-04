@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'tsup'
@@ -21,6 +22,16 @@ export default defineConfig({
     }
   },
   clean: true,
+  onSuccess: async () => {
+    execFileSync(
+      process.execPath,
+      [
+        fileURLToPath(new URL('../../scripts/rewrite-framework-root-index.mjs', import.meta.url)),
+        'vue'
+      ],
+      { stdio: 'inherit' }
+    )
+  },
   splitting: true,
   external
 })

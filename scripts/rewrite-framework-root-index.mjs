@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 
 const framework = process.argv[2]
 
@@ -29,8 +29,6 @@ const distPath = join(packageDir, 'dist', 'index.mjs')
 const source = readFileSync(sourcePath, 'utf8')
 const lines = source.split(/\r?\n/)
 const output = []
-const localRuntimeExportNames = collectLocalRuntimeExportNames(lines)
-void localRuntimeExportNames
 
 let isTypeExportBlock = false
 let wroteMessageRoot = false
@@ -55,87 +53,6 @@ function assertRelativeTarget(specifier) {
   if (!existsSync(targetPath)) {
     throw new Error(`Missing root export target for ${framework}: ${targetPath}`)
   }
-}
-
-function collectLocalRuntimeExportNames(sourceLines) {
-  const names = new Set()
-  let isCollectingTypeBlock = false
-
-  for (let index = 0; index < sourceLines.length; index += 1) {
-    const trimmed = sourceLines[index].trim()
-
-    if (isCollectingTypeBlock) {
-      if (trimmed.includes('} from ')) {
-        isCollectingTypeBlock = false
-      }
-
-      continue
-    }
-
-    if (trimmed.startsWith('export type {')) {
-      if (!trimmed.includes('} from ')) {
-        isCollectingTypeBlock = true
-      }
-
-      continue
-    }
-
-    if (!trimmed.startsWith('export {')) {
-      continue
-    }
-
-    let statement = trimmed
-
-    while (!statement.includes(' from ') && index + 1 < sourceLines.length) {
-      index += 1
-      statement = `${statement} ${sourceLines[index].trim()}`
-    }
-
-    for (const name of parseNamedExports(statement)) {
-      names.add(name)
-    }
-  }
-
-  return names
-}
-
-function parseNamedExports(statement) {
-  const match = statement.replace(/\s+/g, ' ').match(/^export \{(.+)\} from /)
-
-  if (!match) {
-    return []
-  }
-
-  return match[1]
-    .split(',')
-    .map((name) => name.trim())
-    .filter(Boolean)
-    .map((name) => {
-      const aliasMatch = name.match(/\s+as\s+([A-Za-z_$][\w$]*)$/)
-      return aliasMatch ? aliasMatch[1] : name
-    })
-}
-
-async function collectCoreRuntimeExportNames() {
-  if (!existsSync(coreDistPath)) {
-    throw new Error(
-      `Missing core dist index for ${framework}: ${coreDistPath}. Run the workspace build so @expcat/tigercat-core is built first.`
-    )
-  }
-
-  const namespace = await import(pathToFileURL(coreDistPath).href)
-
-  return Object.keys(namespace)
-    .filter((name) => !name.startsWith('type '))
-    .filter((name) => {
-      const aliasMatch = name.match(/\s+as\s+([A-Za-z_$][\w$]*)$/)
-      const exportedName = aliasMatch ? aliasMatch[1] : name
-      return !localRuntimeExportNames.has(exportedName)
-    })
-}
-
-function createCoreRuntimeExport() {
-  return `export {\n  ${coreRuntimeExportNames.join(',\n  ')}\n} from '@expcat/tigercat-core';`
 }
 
 function createMessageRootExport() {

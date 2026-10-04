@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
@@ -42,13 +42,13 @@ export async function* walkFiles(dir, { skip = DEFAULT_SKIP } = {}) {
 export function collectFiles(dir, extensions, { skip = DEFAULT_SKIP } = {}) {
   const results = []
   if (!existsSync(dir)) return results
-  for (const entry of readdirSync(dir)) {
-    const full = join(dir, entry)
-    if (statSync(full).isDirectory()) {
-      if (!skip.includes(entry)) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      if (!skip.includes(entry.name)) {
         results.push(...collectFiles(full, extensions, { skip }))
       }
-    } else if (extensions.some((ext) => entry.endsWith(ext))) {
+    } else if (entry.isFile() && extensions.some((ext) => entry.name.endsWith(ext))) {
       results.push(full)
     }
   }

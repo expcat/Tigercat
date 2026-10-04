@@ -25,9 +25,16 @@ export const TEST_GROUPS = Object.freeze([
 const FRAMEWORKS = new Set(['react', 'vue'])
 
 const FRAMEWORK_EXTRAS = {
-  basic: ['ButtonSpinnerLazy', 'ImagePreview.ssr'],
+  basic: ['ButtonSpinnerLazy', 'ImagePreview.ssr', 'example-zh-cn-locale'],
   form: ['custom-text', 'useFormController', 'w9-forms', 'w9-bind'],
-  feedback: ['Notification', 'overlay-positioning', 'overlay-ssr', 'w9-confirm-modal'],
+  feedback: [
+    'Notification',
+    'overlay-positioning',
+    'overlay-ssr',
+    'overlay-outlet-dismiss',
+    'portaled-overlay-lifecycle',
+    'w9-confirm-modal'
+  ],
   layout: ['Grid', 'LayoutSections'],
   data: ['TableState', 'w9-data-components', 'w9-t02'],
   charts: ['ChartSubComponents', 'useChartInteraction', 'useResponsiveChartSize'],
@@ -155,17 +162,6 @@ function normalizeFramework(framework) {
   return [normalized]
 }
 
-function getCategorySlugByTypeName() {
-  const entries = []
-  for (const [category, typeNames] of Object.entries(CATEGORIES)) {
-    const slug = CATEGORY_SLUGS[category]
-    for (const typeName of typeNames) {
-      entries.push([typeName, slug])
-    }
-  }
-  return new Map(entries)
-}
-
 function buildComponentGroups(rootDir) {
   const groups = Object.fromEntries(TEST_GROUPS.map((group) => [group, new Set()]))
 
@@ -243,20 +239,15 @@ export function getComponentTestGroupFiles({
     allFiles.push(...coreFiles.filter((filePath) => coreSpecMatches(filePath, keywords, extras)))
 
     for (const currentFramework of frameworks) {
-      for (const component of components) {
-        const extension = currentFramework === 'react' ? 'tsx' : 'ts'
+      const extension = currentFramework === 'react' ? 'tsx' : 'ts'
+      const names = new Set([...components, ...(FRAMEWORK_EXTRAS[normalizedGroup] || [])])
+      for (const component of names) {
         const filePath = path.join(
           rootDir,
           'tests',
           currentFramework,
           `${component}.spec.${extension}`
         )
-        if (existsSync(filePath)) allFiles.push(filePath)
-      }
-
-      for (const extra of FRAMEWORK_EXTRAS[normalizedGroup] || []) {
-        const extension = currentFramework === 'react' ? 'tsx' : 'ts'
-        const filePath = path.join(rootDir, 'tests', currentFramework, `${extra}.spec.${extension}`)
         if (existsSync(filePath)) allFiles.push(filePath)
       }
     }

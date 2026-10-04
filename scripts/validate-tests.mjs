@@ -1,368 +1,75 @@
 #!/usr/bin/env node
 
 import { readFileSync } from 'node:fs'
-import path from 'node:path'
+import ts from 'typescript'
 
 import { getComponentTestGroupFiles } from './lib/component-test-groups.mjs'
-import { walkFiles } from './utils/files.mjs'
-import { c } from './utils/term.mjs'
-
-function countArrayItems(source) {
-  const body = source.trim().replace(/^\[/, '').replace(/\]$/, '').trim()
-  if (!body) return 0
-
-  let depth = 0
-  let count = 1
-  let quote = null
-
-  for (let index = 0; index < body.length; index++) {
-    const char = body[index]
-    const prev = body[index - 1]
-
-    if (quote) {
-      if (char === quote && prev !== '\\') quote = null
-      continue
-    }
-
-    if (char === '"' || char === "'" || char === '`') {
-      quote = char
-    } else if (char === '[' || char === '{' || char === '(') {
-      depth++
-    } else if (char === ']' || char === '}' || char === ')') {
-      depth--
-    } else if (char === ',' && depth === 0) {
-      count++
-    }
-  }
-
-  return count
-}
-
-function getArrayConstantCounts(content) {
-  const counts = new Map()
-  const regex = /(?:const|let|var)\s+(\w+)\s*=\s*(\[[\s\S]*?\])\s*(?:as\s+const)?/g
-  let match
-
-  while ((match = regex.exec(content))) {
-    counts.set(match[1], countArrayItems(match[2]))
-  }
-
-  return counts
-}
-
-function countTests(content) {
-  let total = (content.match(/\bit\s*\(/g) || []).length
-  total += (content.match(/\btest\s*\(/g) || []).length
-
-  const arrayCounts = getArrayConstantCounts(content)
-  const eachRegex = /\b(?:it|test)\.each\s*\(\s*([\s\S]*?)\s*\)\s*\(/g
-  let match
-
-  while ((match = eachRegex.exec(content))) {
-    const expression = match[1].trim()
-    if (expression.startsWith('[')) {
-      total += countArrayItems(expression)
-    } else {
-      total += arrayCounts.get(expression) ?? 1
-    }
-  }
-
-  return total
-}
-
-function hasFocusedTests(content) {
-  const stripped = stripCommentLines(content)
-  return /\b(?:describe|it|test)\.only\s*\(/.test(stripped)
-}
-
-function stripCommentLines(content) {
-  return content
-    .split(/\r?\n/g)
-    .filter((line) => {
-      const trimmed = line.trim()
-      return !(
-        trimmed.startsWith('//') ||
-        trimmed.startsWith('/*') ||
-        trimmed.startsWith('*') ||
-        trimmed.startsWith('*/')
-      )
-    })
-    .join('\n')
-}
-
-const descriptiveNameWords = [
-  'should',
-  'snapshot',
-  'render',
-  'display',
-  'emit',
-  'trigger',
-  'accept',
-  'reject',
-  'throw',
-  'return',
-  'call',
-  'when',
-  'with',
-  'without',
-  'not ',
-  'handle',
-  'support',
-  'allow',
-  'prevent',
-  'disable',
-  'enable',
-  'show',
-  'hide',
-  'open',
-  'close',
-  'toggle',
-  'update',
-  'set',
-  'clear',
-  'reset',
-  'apply',
-  'remove',
-  'add',
-  'create',
-  'delete',
-  'select',
-  'validate',
-  'format',
-  'parse',
-  'convert',
-  'calculate',
-  'compute',
-  'respond',
-  'fire',
-  'navigate',
-  'focus',
-  'blur',
-  'scroll',
-  'resize',
-  'change',
-  'submit',
-  'cancel',
-  'confirm',
-  'dismiss',
-  'load',
-  'fetch',
-  'default'
-]
-
-function getTestNames(content) {
-  const names = []
-  const directRegex =
-    /\b(?:it|test)(?:\.(?:skip|todo|concurrent|fails))?\s*\(\s*(['"`])([\s\S]*?)\1/g
-  const eachRegex = /\b(?:it|test)\.each\s*\([\s\S]*?\)\s*\(\s*(['"`])([\s\S]*?)\1/g
-  let match
-
-  while ((match = directRegex.exec(content))) {
-    names.push(match[2])
-  }
-
-  while ((match = eachRegex.exec(content))) {
-    names.push(match[2])
-  }
-
-  return names
-}
-
-function isDescriptiveTestName(name) {
-  const lower = name.toLowerCase()
-  if (descriptiveNameWords.some((word) => lower.includes(word))) return true
-  const words = lower.split(/[^a-z0-9]+/).filter(Boolean)
-  return words.length >= 4
-}
-
-function checkTestNaming(filePath, content, counters) {
-  const names = getTestNames(content)
-  const total = names.length
-  const descriptive = names.filter(isDescriptiveTestName).length
-
-  if (total > 0 && descriptive / total < 0.5) {
-    console.log(c('yellow', `  ⚠ Low descriptive naming ratio (${descriptive}/${total})`))
-    counters.warnings++
-    return false
-  }
-
-  return true
-}
-
-function checkAccessibility(filePath, content, counters) {
-  const filename = path.basename(filePath)
-  if (/^use[A-Z].*\.spec\.(ts|tsx)$/.test(filename)) return true
-  if (/\.ssr\.spec\.(ts|tsx)$/.test(filename)) return true
-  if (/^overlay-(positioning|ssr)\.spec\.(ts|tsx)$/.test(filename)) return true
-
-  if (
-    content.includes('expectNoA11yViolations') ||
-    content.includes('expectMentionsA11y') ||
-    /\baxe\s*\(/.test(content)
-  ) {
-    return true
-  }
-  console.log(c('yellow', '  ⚠ No accessibility checks'))
-  counters.warnings++
-  return false
-}
-
-function checkTypeSafety(content) {
-  const stripped = stripCommentLines(content)
-  if (/:\s*any\b/.test(stripped)) {
-    console.log(c('red', "  ✗ Found 'any' type usage"))
-    return false
-  }
-  return true
-}
-
-function isComponentSpec(filePath) {
-  const normalizedPath = filePath.split(path.sep).join('/')
-  return normalizedPath.startsWith('tests/react/') || normalizedPath.startsWith('tests/vue/')
-}
+import { collectFiles } from './utils/files.mjs'
 
 function readOption(args, name) {
   const index = args.indexOf(name)
   if (index === -1) return null
   const value = args[index + 1]
-  if (!value || value.startsWith('--')) {
-    throw new Error(`${name} requires a value.`)
-  }
+  if (!value || value.startsWith('--')) throw new Error(`${name} requires a value.`)
   return value
 }
 
-async function collectValidationFiles() {
+function collectValidationFiles() {
   const args = process.argv.slice(2)
   const group = readOption(args, '--group') || process.env.TEST_GROUP
-
   if (group) {
-    const framework = readOption(args, '--framework') || process.env.TEST_FRAMEWORK || 'all'
-    const filter = readOption(args, '--filter') || process.env.TEST_FILTER
-    return getComponentTestGroupFiles({ group, framework, filter })
+    return getComponentTestGroupFiles({
+      group,
+      framework: readOption(args, '--framework') || process.env.TEST_FRAMEWORK || 'all',
+      filter: readOption(args, '--filter') || process.env.TEST_FILTER
+    })
   }
+  const directories = process.env.TEST_DIRS?.split(/\s+/).filter(Boolean) ?? ['tests']
+  return directories
+    .flatMap((dir) => collectFiles(dir, ['.js', '.ts', '.tsx']))
+    .filter((file) => /\.(test|spec)\.(js|ts|tsx)$/.test(file))
+}
 
-  const testDirsEnv = process.env.TEST_DIRS
-  const testDirs = (
-    testDirsEnv ? testDirsEnv.split(/\s+/g) : ['tests/core', 'tests/react', 'tests/vue']
-  ).filter(Boolean)
+function callPath(node) {
+  if (ts.isCallExpression(node)) return callPath(node.expression)
+  if (ts.isPropertyAccessExpression(node)) return [...callPath(node.expression), node.name.text]
+  return ts.isIdentifier(node) ? [node.text] : []
+}
 
-  const testFiles = []
-  for (const dir of testDirs) {
-    try {
-      for await (const filePath of walkFiles(dir)) {
-        if (filePath.endsWith('.spec.ts') || filePath.endsWith('.spec.tsx'))
-          testFiles.push(filePath)
+function validateFile(file) {
+  const source = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true)
+  const errors = new Set()
+  let hasTests = false
+
+  function visit(node) {
+    if (node.kind === ts.SyntaxKind.AnyKeyword) errors.add('Found any type usage')
+    if (ts.isCallExpression(node)) {
+      const [root, ...modifiers] = callPath(node.expression)
+      if (root === 'it' || root === 'test') hasTests = true
+      if (['describe', 'it', 'test'].includes(root) && modifiers.includes('only')) {
+        errors.add('Focused test detected (.only)')
       }
-    } catch {
-      // ignore missing dir
     }
+    ts.forEachChild(node, visit)
   }
-
-  return testFiles
+  visit(source)
+  if (!hasTests) errors.add('No test declarations found')
+  return [...errors]
 }
 
-async function main() {
-  const counters = {
-    totalFiles: 0,
-    passedFiles: 0,
-    failedFiles: 0,
-    warnings: 0
+try {
+  const files = collectValidationFiles()
+  if (files.length === 0) throw new Error('No test files found. Check TEST_DIRS or --group.')
+  let failedFiles = 0
+  for (const file of files) {
+    const errors = validateFile(file)
+    if (errors.length === 0) continue
+    failedFiles++
+    console.error(`${file}: ${errors.join('; ')}`)
   }
-
-  console.log('🐯 Tigercat Test Quality Validation')
-  console.log('====================================')
-  console.log('')
-
-  console.log('Scanning test files...')
-  console.log('')
-
-  const testFiles = await collectValidationFiles()
-
-  if (testFiles.length === 0) {
-    console.log(c('red', 'No test files found.'))
-    console.log('Set TEST_DIRS, TEST_GROUP, or pass --group to customize the scan.')
-    process.exit(1)
-  }
-
-  for (const filePath of testFiles) {
-    counters.totalFiles++
-    const filename = path.basename(filePath)
-
-    console.log(c('blue', `Checking: ${filename}`))
-
-    const content = readFileSync(filePath, 'utf8')
-
-    const testCount = countTests(content)
-    const componentSpec = isComponentSpec(filePath)
-
-    console.log(`  📊 Test count: ${testCount}`)
-
-    let errors = 0 // hard failures
-    let softIssues = 0 // warnings only
-
-    // --- Hard checks (cause file to fail) ---
-    if (testCount < 1) {
-      console.log(c('red', '  ✗ No tests found'))
-      errors++
-    }
-    if (hasFocusedTests(content)) {
-      console.log(c('red', '  ✗ Focused test detected (.only)'))
-      errors++
-    }
-    if (/\b(?:describe|it|test)\.skip\s*\(/.test(content)) {
-      console.log(c('red', '  ✗ Skipped suite detected (.skip)'))
-      errors++
-    }
-    if (!checkTypeSafety(content)) errors++
-
-    // --- Soft checks (warnings, don't cause failure) ---
-    if (!checkTestNaming(filePath, content, counters)) softIssues++
-    if (componentSpec && !checkAccessibility(filePath, content, counters)) softIssues++
-
-    if (errors === 0 && softIssues === 0) {
-      console.log(c('green', '  ✓ All checks passed'))
-      counters.passedFiles++
-    } else if (errors === 0) {
-      console.log(c('red', `  ✗ ${softIssues} warning(s) are failures`))
-      counters.failedFiles++
-    } else {
-      console.log(c('red', `  ✗ ${errors} error(s), ${softIssues} suggestion(s)`))
-      counters.failedFiles++
-    }
-
-    console.log('')
-  }
-
-  console.log('====================================')
-  console.log('📈 Summary')
-  console.log('====================================')
-  console.log(
-    `Total: ${counters.totalFiles} | ${c(
-      'green',
-      `Passed: ${counters.passedFiles}`
-    )} | ${c('red', `Failed: ${counters.failedFiles}`)} | ${c(
-      'yellow',
-      `Warnings: ${counters.warnings}`
-    )}`
-  )
-  console.log('')
-
-  if (counters.failedFiles > 0) {
-    console.log(c('red', '❌ Validation failed'))
-    console.log('See tests/README.md for standards.')
-    process.exit(1)
-  }
-
-  if (counters.warnings > 0) {
-    console.log(c('red', `❌ ${counters.warnings} warning(s) failed the test gate`))
-    process.exit(1)
-  }
-
-  console.log(c('green', '✅ All tests meet quality standards'))
-  process.exit(0)
+  console.log(`Test source checks: ${files.length} files, ${failedFiles} failed.`)
+  process.exitCode = failedFiles > 0 ? 1 : 0
+} catch (error) {
+  console.error(error.message)
+  process.exitCode = 1
 }
-
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})

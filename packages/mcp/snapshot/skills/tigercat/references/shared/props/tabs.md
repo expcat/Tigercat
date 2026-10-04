@@ -13,6 +13,8 @@ description: Compact generated Tigercat Navigation props reference
 
 `packages/core/src/types/tabs.ts` · `TabsProps` · 4/20 props
 
+Note: 溢出菜单按钮文案走 `locale.tabs.moreTabs`，组件 `labels.moreTabs` 优先于组件 locale、ConfigProvider locale 和 en-US 默认值。
+
 | Prop                      | Type               | Default | Notes                                                                                      |
 | ------------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
 | `activeKey?`              | `string \| number` | `-`     | Currently active tab key                                                                   |

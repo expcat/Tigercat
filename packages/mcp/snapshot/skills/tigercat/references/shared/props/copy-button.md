@@ -13,8 +13,10 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/copy-button.ts` · `CopyButtonProps`
 
-| Prop        | Type      | Default | Notes                                                 |
-| ----------- | --------- | ------- | ----------------------------------------------------- |
-| `text`      | `string`  | `-`     | Text passed to the shared clipboard helper.           |
-| `disabled?` | `boolean` | `false` | When true the button does not write to the clipboard. |
-| `label?`    | `string`  | `Copy`  | Accessible name when no children are provided.        |
+Note: 按钮文字优先 children / 默认插槽，再读 `label`，缺省与复制结果读 ConfigProvider 的 text 文案。复制失败保留焦点。
+
+| Prop        | Type      | Default | Notes                                                                           |
+| ----------- | --------- | ------- | ------------------------------------------------------------------------------- |
+| `text`      | `string`  | `-`     | Text passed to the shared clipboard helper.                                     |
+| `disabled?` | `boolean` | `false` | When true the button does not write to the clipboard.                           |
+| `label?`    | `string`  | `-`     | Button text when no children are provided. Defaults to the locale's copy label. |

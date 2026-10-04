@@ -4,7 +4,7 @@
  * generate-api-baseline.mjs — 公共 API 基线快照生成器
  *
  * 产出 api-reports/public-api-baseline.json：一份确定性的公共 API 快照，配合
- * 「生成 + git diff」式护栏（与 docs:api 漂移闸同范式）捕捉版本间破坏性变更——
+ * `--check` 护栏（与 docs:api 漂移闸同范式）捕捉未同步的公共 API 变更——
  * 删除导出 / 删 prop / 改名 / 改 extends 都会让快照产生 diff，必须有意（regenerate
  * 并记入 docs/MIGRATION.md）。与 validate-api.mjs（当下双端一致性）层次互补：本快照
  * 防的是「与上一提交版相比」的回归。
@@ -22,7 +22,7 @@
  *   pnpm api:baseline                                # 同上
  */
 
-import { readFileSync, readdirSync, writeFileSync, existsSync, statSync, mkdirSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync } from 'fs'
 import { dirname, join, relative, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import prettier from 'prettier'
@@ -30,6 +30,7 @@ import {
   buildFrameworkPackageSubpathFacts,
   loadPublicComponentExports
 } from './lib/public-components.mjs'
+import { collectFiles } from './utils/files.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -75,30 +76,6 @@ function walkExportNames(entryFile) {
 
   visit(entryFile)
   return uniqSorted(names)
-}
-
-function collectFiles(dir, exts) {
-  const out = []
-  if (!existsSync(dir)) return out
-  if (statSync(dir).isFile()) return exts.some((e) => dir.endsWith(e)) ? [dir] : []
-  for (const entry of readdirSync(dir)) {
-    if (entry === 'node_modules' || entry === 'dist' || entry === '.nuxt') continue
-    const full = join(dir, entry)
-    if (statSync(full).isDirectory()) out.push(...collectFiles(full, exts))
-    else if (exts.some((e) => entry.endsWith(e))) out.push(full)
-  }
-  return out
-}
-
-// Resolve a core re-export target that may be a directory or a single `.ts(x)` file.
-function resolveTarget(name) {
-  const dir = join(CORE_SRC, name)
-  if (existsSync(dir) && statSync(dir).isDirectory()) return collectFiles(dir, ['.ts', '.tsx'])
-  for (const ext of ['.ts', '.tsx']) {
-    const file = join(CORE_SRC, name + ext)
-    if (existsSync(file)) return [file]
-  }
-  return []
 }
 
 // Names exported from a source file: declaration exports + `export { ... }` specifiers
@@ -256,11 +233,19 @@ const formattedSnapshot = await prettier.format(JSON.stringify(snapshot, null, 2
   parser: 'json'
 })
 
-if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true })
-writeFileSync(OUT_FILE, formattedSnapshot)
+const checkOnly = process.argv.includes('--check')
+if (checkOnly) {
+  if (!existsSync(OUT_FILE) || readFileSync(OUT_FILE, 'utf8') !== formattedSnapshot) {
+    console.error('Public API baseline is out of date. Run pnpm api:baseline.')
+    process.exit(1)
+  }
+} else {
+  mkdirSync(OUT_DIR, { recursive: true })
+  writeFileSync(OUT_FILE, formattedSnapshot)
+}
 
 console.log(
-  `Public API baseline written to ${relative(ROOT, OUT_FILE)} — ` +
+  `Public API baseline ${checkOnly ? 'checked' : 'written'}: ${relative(ROOT, OUT_FILE)} — ` +
     `${Object.keys(propsInterfaces).length} props interfaces, ` +
     `${snapshot.core.exports.length} core exports, ` +
     `${snapshot.vue.components.length} vue / ${snapshot.react.components.length} react components.`

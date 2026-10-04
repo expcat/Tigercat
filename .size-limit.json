@@ -253,14 +253,14 @@
   },
   {
     "name": "Vue LoadingBar subpath",
-    "path": "packages/vue/dist/components/LoadingBar.mjs",
+    "path": "packages/vue/dist/components/LoadingBarRoot.mjs",
     "limit": "19 kB",
     "gzip": true,
     "ignore": ["@expcat/tigercat-core", "vue"]
   },
   {
     "name": "React LoadingBar subpath",
-    "path": "packages/react/dist/components/LoadingBar.mjs",
+    "path": "packages/react/dist/components/LoadingBarRoot.mjs",
     "limit": "19 kB",
     "gzip": true,
     "ignore": [

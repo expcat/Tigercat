@@ -15,6 +15,10 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 Runnable modules: `examples/example/vue3/src/examples/gallery/` and `examples/example/react/src/examples/gallery/`.
 
+Uses: `Image`, `ImagePreview`.
+
+Note: 缩略图是列表里的原生按钮，可用 Tab + Enter / Space 选择；`aria-current` 标记当前项。图片 `alt` 用作缩略图名，省略时使用图片序号。
+
 Vue: `<Gallery :items="items" />`
 
 React: `<Gallery items={items} />`

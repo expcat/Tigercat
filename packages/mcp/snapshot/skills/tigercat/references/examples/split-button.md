@@ -17,7 +17,7 @@ Runnable modules: `examples/example/vue3/src/examples/split-button/` and `exampl
 
 Uses: `Button`, `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
-Note: 主按钮吃 `htmlType` / `type`（htmlType 胜出），chevron 固定 `type="button"`。不要把 SplitButton 塞进 ButtonGroup。
+Note: `type` 只写到主按钮，chevron 固定 `type="button"`。loading 时两颗按钮都禁用。不要把 SplitButton 塞进 ButtonGroup。
 
 Vue: `<SplitButton @click="onSave">Save<DropdownItem>Save as</DropdownItem></SplitButton>`
 

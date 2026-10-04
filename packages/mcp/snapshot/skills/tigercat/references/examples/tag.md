@@ -15,7 +15,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 Runnable modules: `examples/example/vue3/src/examples/tag/` and `examples/example/react/src/examples/tag/`.
 
-Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。
+Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `open={false}`。关闭按钮可用 Tab + Enter / Space，关闭名走 locale。`pill` 全圆角。
 
 Vue: `<Tag closable>标签</Tag>`
 

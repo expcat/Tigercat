@@ -993,8 +993,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup --config tsup.config.ts && node ../../scripts/rewrite-framework-root-index.mjs vue",
-    "dev": "tsup --config tsup.config.ts --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {

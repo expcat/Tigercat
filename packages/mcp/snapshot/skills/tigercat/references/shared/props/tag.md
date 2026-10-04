@@ -13,7 +13,7 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/tag.ts` · `TagProps` · 4/9 props
 
-Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `visible={false}`。关闭名走 locale。`pill` 全圆角。
+Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `open={false}`。关闭按钮可用 Tab + Enter / Space，关闭名走 locale。`pill` 全圆角。
 
 | Prop        | Type         | Default     | Notes                         |
 | ----------- | ------------ | ----------- | ----------------------------- |

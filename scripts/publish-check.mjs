@@ -18,10 +18,12 @@ import { pathToFileURL } from 'node:url'
 import { build as esbuild } from 'esbuild'
 
 import { readJson, readJsonc, writeJson } from './utils/files.mjs'
+import { assertSsrArtifacts } from './lib/ssr-artifacts.mjs'
 
 const rootDir = process.cwd()
 const argv = process.argv.slice(2)
 const publishedOnly = argv.includes('--published')
+const skipBuild = argv.includes('--skip-build')
 const version = getRootVersion(rootDir)
 const tempDir = mkdtempSync(path.join(tmpdir(), 'tigercat-publish-check-'))
 const tarballsDir = path.join(tempDir, 'tarballs')
@@ -59,12 +61,14 @@ const exampleProjects = [
   },
   {
     name: 'nuxt example',
+    ssr: 'nuxt',
     dir: path.join(examplesDir, 'nuxt'),
     buildArgs: ['run', 'build'],
     prepare: prepareStandardExample
   },
   {
     name: 'nextjs example',
+    ssr: 'next',
     dir: path.join(examplesDir, 'nextjs'),
     buildArgs: ['run', 'build'],
     prepare: prepareNextExample
@@ -106,8 +110,12 @@ async function main() {
     console.log(`Running local publish check for Tigercat v${version}`)
 
     console.log('')
-    console.log('1/4 Building publishable packages...')
-    runOrThrow('pnpm', ['build'], { cwd: rootDir })
+    if (skipBuild) {
+      console.log('1/4 Reusing packages built by the release gate...')
+    } else {
+      console.log('1/4 Building publishable packages...')
+      runOrThrow('pnpm', ['build'], { cwd: rootDir })
+    }
 
     console.log('')
     console.log('2/4 Packing local tarballs...')
@@ -213,6 +221,7 @@ async function smokeExamples(tarballs) {
       example.dir
     )
     runOrThrow('npm', example.buildArgs, { cwd: example.dir })
+    if (example.ssr) assertSsrArtifacts(example.ssr, example.dir)
   }
 }
 
@@ -238,7 +247,7 @@ function copyDir(sourceDir, destinationDir) {
     recursive: true,
     filter: (sourcePath) => {
       const name = path.basename(sourcePath)
-      return !['node_modules', 'dist', '.nuxt', '.next'].includes(name)
+      return !['node_modules', 'dist', '.nuxt', '.next', '.output'].includes(name)
     }
   })
 }

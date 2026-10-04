@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **测试与构建脚本**：发布门禁先执行静态与漂移检查，再构建一次包；复用 tarball 的四个示例构建与 SSR 产物检查，消除工作区重复构建和 hydration 重跑。文档/API 基线检查改为只读比较，文档生成只写变更文件。删除测试名和 a11y helper 字符串检查、冗余门禁别名与入口处理死代码；测试扫描覆盖 MCP，并按需加载 axe。Vue/React 的 build/watch 共用入口处理，MCP 构建同步技能快照。API 双端检查复用公开组件事实源，移除空校验；修正 LoadingBar 的体积检查路径。
+
 ## v3.0.0-preview.8（2026-10-03）
 
 3.0 preview 阶段的调整见下列条目；从 2.x 迁移见 [MIGRATION-3.0.md](docs/MIGRATION-3.0.md)。

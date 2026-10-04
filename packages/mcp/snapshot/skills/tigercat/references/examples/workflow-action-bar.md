@@ -17,7 +17,7 @@ Runnable modules: `examples/example/vue3/src/examples/workflow-action-bar/` and 
 
 Uses: `Button`, `Popconfirm`, `Textarea`, `Dropdown`, `Radio`.
 
-Note: 完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。`items={[]}` / 空数组回落到 `buttonPolicy`；要覆盖策略请传非空 `items`。
+Note: 完整审批按钮条。默认视觉序同意→拒绝→转交→退回→加签→撤回→评论。`placement: more` 进溢出菜单（Esc / 方向键 / 焦点返回）；确认层锚在真实“更多”按钮，关闭后焦点返回按钮。`commentRequired` 空意见会拦住 `onAction`（相对 2.4.2 有意升级）。`return` 需 `returnTargets` 或 `renderReturnPicker` / `#returnPicker`，否则禁用；`addsign`/`transfer` 需 `renderAssigneePicker` / `#assigneePicker`。加签确认层可选 before/after。无组织树、无 BPM 引擎。显式 `items` 覆盖 `buttonPolicy`，`items={[]}` / 空数组表示不显示动作。
 
 Vue: `<WorkflowActionBar :items="actions" />`
 
