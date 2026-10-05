@@ -15,7 +15,7 @@ import {
 
 /** Root page-header landmark */
 export const pageHeaderRootClasses =
-  'tiger-page-header flex w-full flex-col gap-3 border-b border-[var(--tiger-border)] pb-4'
+  'tiger-page-header flex w-full flex-col gap-3 border-b border-[var(--tiger-border)]/30 pb-4'
 
 /** Heading row: left cluster (back + title/crumb) and right actions */
 export const pageHeaderHeadingRowClasses =

@@ -20,7 +20,7 @@ import { prefersReducedMotion } from './transition'
  * Base menu container classes
  */
 export const menuBaseClasses =
-  'flex border bg-[var(--tiger-surface)] text-[var(--tiger-text)] border-[var(--tiger-border)]'
+  'flex bg-[var(--tiger-surface)] text-[var(--tiger-text)] border-[var(--tiger-border)]/30'
 
 /**
  * Menu mode classes
@@ -52,7 +52,7 @@ export const menuDarkThemeClasses = 'dark'
  * rail does not keep `px-4` / `justify-between` fighting `justify-center`.
  */
 const menuItemChromeClasses =
-  'flex w-full items-center py-2 text-start bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset active:opacity-90'
+  'flex w-full items-center py-2 text-start border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 focus-visible:ring-inset active:opacity-90'
 
 /**
  * Menu item base classes
@@ -123,7 +123,7 @@ export const submenuExpandIconPopupClasses = '-rotate-90'
  * Submenu content classes - popup (horizontal, nested, and collapsed vertical)
  */
 export const submenuContentPopupClasses =
-  'min-w-[180px] bg-[var(--tiger-surface)] text-[var(--tiger-text)] border border-[var(--tiger-border)] rounded-[var(--tiger-radius-lg)] shadow-[var(--tiger-shadow-lg)] overflow-hidden'
+  'min-w-[180px] bg-[var(--tiger-surface)] text-[var(--tiger-text)] border border-[var(--tiger-border)]/30 rounded-[var(--tiger-radius-lg)] shadow-[var(--tiger-shadow-lg)] overflow-hidden'
 
 /**
  * Submenu content classes - vertical mode
@@ -229,6 +229,10 @@ export function getMenuItemClasses(
     classes.push(menuCollapsedItemClasses)
   }
 
+  if (!selected || disabled) {
+    classes.push('bg-transparent')
+  }
+
   if (disabled) {
     classes.push(menuItemDisabledClasses)
   } else {
@@ -254,6 +258,10 @@ export function getSubMenuTitleClasses(
 
   if (options?.collapsed) {
     classes.push(menuCollapsedItemClasses)
+  }
+
+  if (!options?.childSelected || disabled) {
+    classes.push('bg-transparent')
   }
 
   if (disabled) {

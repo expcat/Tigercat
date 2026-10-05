@@ -381,7 +381,15 @@ function renderViewerGraph(
             key: placement.key,
             class: workflowViewerCellClasses,
             style: workflowViewerCardGridStyle(placement),
-            'data-workflow-node': placement.key
+            'data-workflow-node': placement.key,
+            'data-workflow-outgoing': layout.edges.some(
+              (edge) =>
+                edge.row === placement.row &&
+                edge.col === placement.col &&
+                edge.colSpan === placement.colSpan
+            )
+              ? 'true'
+              : undefined
           },
           [
             placement.forkChild

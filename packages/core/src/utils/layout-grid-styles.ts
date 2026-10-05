@@ -169,7 +169,7 @@ export const LAYOUT_GRID_CSS = `
   height: 4rem;
   padding-inline: 1rem;
   box-sizing: border-box;
-  border-bottom: 1px solid var(--tiger-border);
+  border-bottom: 1px solid color-mix(in srgb, var(--tiger-border) 30%, transparent);
 }
 .tiger-header-default {
   background-color: var(--tiger-surface);
@@ -205,14 +205,14 @@ export const LAYOUT_GRID_CSS = `
   overflow-y: auto;
   box-sizing: border-box;
   background-color: var(--tiger-surface);
-  border-inline-end: 1px solid var(--tiger-border);
+  border-inline-end: 1px solid color-mix(in srgb, var(--tiger-border) 30%, transparent);
   transition-property: width, min-width;
   transition-duration: var(--tiger-motion-duration-base);
 }
 .tiger-sidebar-end {
   order: 1;
   border-inline-end: 0;
-  border-inline-start: 1px solid var(--tiger-border);
+  border-inline-start: 1px solid color-mix(in srgb, var(--tiger-border) 30%, transparent);
 }
 .tiger-sidebar-default-width {
   width: 16rem;

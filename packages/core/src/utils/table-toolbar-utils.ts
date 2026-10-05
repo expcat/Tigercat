@@ -211,7 +211,7 @@ export function getDataTableToolbarWrapperClasses(options: {
   return classNames(
     'tiger-data-table-with-toolbar flex flex-col',
     options.bordered
-      ? 'border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-surface)] shadow-sm'
+      ? 'border border-[var(--tiger-border)]/30 rounded-[var(--tiger-radius-md)] overflow-hidden bg-[var(--tiger-surface)] shadow-sm'
       : 'gap-3.5',
     options.className
   )
@@ -224,8 +224,8 @@ export function getDataTableToolbarBarClasses(options: {
   return classNames(
     'tiger-data-table-toolbar flex flex-wrap items-center gap-3 px-4 py-3.5',
     options.bordered
-      ? 'bg-[var(--tiger-surface-muted)] border-b border-[var(--tiger-border)]'
-      : 'bg-[var(--tiger-surface-muted)]/80 border border-[var(--tiger-border)] rounded-[var(--tiger-radius-md)] shadow-sm',
+      ? 'bg-[var(--tiger-surface-muted)] border-b border-[var(--tiger-border)]/30'
+      : 'bg-[var(--tiger-surface-muted)]/80 border border-[var(--tiger-border)]/30 rounded-[var(--tiger-radius-md)] shadow-sm',
     options.className
   )
 }

@@ -8,7 +8,8 @@ export const activityFeedItemSurfaceClasses =
 export const activityFeedAvatarClasses =
   'tiger-motion-aware shrink-0 ring-2 ring-[var(--tiger-surface)] shadow-[var(--tiger-shadow-sm)] [transition:var(--tiger-transition-base)] hover:scale-105'
 
-export const activityFeedTitleClasses = 'tiger-motion-aware text-[var(--tiger-text)] truncate'
+export const activityFeedTitleClasses =
+  'tiger-motion-aware min-w-0 break-words text-[var(--tiger-text)]'
 
 export const activityFeedTimeClasses =
   'shrink-0 whitespace-nowrap font-medium text-[var(--tiger-text-secondary)]'

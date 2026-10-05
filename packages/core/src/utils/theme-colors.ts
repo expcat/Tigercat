@@ -452,7 +452,7 @@ export const defaultTagThemeColors: TagThemeColors = {
   default: {
     bg: 'bg-[var(--tiger-surface-muted)]',
     text: 'text-[var(--tiger-text)]',
-    border: 'border-[var(--tiger-border)]',
+    border: 'border-[var(--tiger-border)]/30',
     closeBgHover: 'hover:bg-[var(--tiger-border)]'
   },
   primary: {
@@ -464,13 +464,13 @@ export const defaultTagThemeColors: TagThemeColors = {
   success: {
     bg: 'bg-[var(--tiger-surface-muted)]',
     text: mixStatusTowardTextClass('text', '--tiger-success', '#16a34a'),
-    border: 'border-[var(--tiger-border)]',
+    border: 'border-[var(--tiger-border)]/30',
     closeBgHover: 'hover:bg-[var(--tiger-border)]'
   },
   warning: {
     bg: 'bg-[var(--tiger-surface-muted)]',
     text: mixStatusTowardTextClass('text', '--tiger-warning', '#d97706'),
-    border: 'border-[var(--tiger-border)]',
+    border: 'border-[var(--tiger-border)]/30',
     closeBgHover: 'hover:bg-[var(--tiger-border)]'
   },
   danger: {

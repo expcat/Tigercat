@@ -120,21 +120,39 @@ export const workflowDesignerCanvasBaseStyles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     width: '100%',
+    paddingTop: '0.75rem',
     backgroundColor: 'var(--tiger-surface-muted)',
     '--tiger-workflow-branch-gap': WORKFLOW_BRANCH_GAP
+  },
+  '.tiger-workflow-designer__fork::before, .tiger-workflow-designer__branch::before': {
+    content: '""',
+    position: 'absolute',
+    top: '0',
+    left: '50%',
+    width: '0.125rem',
+    height: '0.75rem',
+    transform: 'translateX(-50%)',
+    backgroundColor: 'color-mix(in srgb, var(--tiger-primary) 35%, transparent)',
+    pointerEvents: 'none'
   },
   '.tiger-workflow-designer__branches': {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
     justifyContent: 'center',
     gap: 'var(--tiger-workflow-branch-gap, 0.75rem)',
     width: '100%'
   },
   '.tiger-workflow-designer__branch': {
     position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
     flex: '1 1 0%',
-    minWidth: '0'
+    minWidth: '0',
+    paddingTop: '0.75rem'
+  },
+  '.tiger-workflow-designer__branch > .tiger-workflow-designer__flow': {
+    flex: '1 1 auto'
   },
   '.tiger-workflow-designer__fork-bar, .tiger-workflow-designer__fork-join': {
     height: '0.125rem',
@@ -156,9 +174,9 @@ export const workflowDesignerCardClasses =
 export const workflowDesignerCardSelectedClasses =
   'border-[var(--tiger-primary)] bg-[var(--tiger-primary-soft,var(--tiger-outline-bg-hover))] ring-2 ring-[var(--tiger-primary)] ring-offset-1'
 export const workflowDesignerSummaryClasses = 'flex min-w-0 flex-col gap-1'
-export const workflowDesignerSummaryRowClasses = 'flex min-w-0 items-center gap-2'
+export const workflowDesignerSummaryRowClasses = 'flex min-w-0 flex-wrap items-center gap-2'
 export const workflowDesignerSummaryTitleClasses =
-  'min-w-0 truncate text-sm font-medium text-[var(--tiger-text)]'
+  'min-w-0 break-words text-sm font-medium text-[var(--tiger-text)]'
 export const workflowDesignerSummaryActorsClasses = 'text-sm text-[var(--tiger-text-secondary)]'
 export const workflowDesignerKindDotClasses = 'inline-block h-2 w-2 shrink-0 rounded-full'
 export const workflowDesignerToolbarClasses =
@@ -207,10 +225,11 @@ export const workflowDesignerEmptyClasses = 'text-sm text-[var(--tiger-text-seco
 export const workflowDesignerChildrenClasses =
   'tiger-workflow-designer__children relative z-[1] w-full'
 export const workflowDesignerForkClasses =
-  'tiger-workflow-designer__fork relative z-[1] flex w-full flex-col bg-[var(--tiger-surface-muted)] [--tiger-workflow-branch-gap:0.75rem]'
+  'tiger-workflow-designer__fork relative z-[1] flex w-full flex-col pt-3 bg-[var(--tiger-surface-muted)] [--tiger-workflow-branch-gap:0.75rem]'
 export const workflowDesignerBranchesClasses =
-  'flex w-full flex-row items-start gap-[var(--tiger-workflow-branch-gap,0.75rem)]'
-export const workflowDesignerBranchClasses = 'tiger-workflow-designer__branch min-w-0 flex-1'
+  'tiger-workflow-designer__branches flex w-full flex-row items-stretch gap-[var(--tiger-workflow-branch-gap,0.75rem)]'
+export const workflowDesignerBranchClasses =
+  'tiger-workflow-designer__branch flex min-w-0 flex-1 flex-col pt-3'
 export const workflowDesignerForkBarClasses =
   'tiger-workflow-designer__fork-bar h-0.5 shrink-0 bg-[color-mix(in_srgb,var(--tiger-primary)_35%,transparent)]'
 export const workflowDesignerForkJoinClasses =

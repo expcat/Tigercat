@@ -19,8 +19,9 @@ export interface ActivityTimelineItem extends TimelineItem {
 export const activityItemClasses = 'tiger-activity-item'
 export const activityItemLayoutClasses = 'flex gap-3 items-start'
 export const activityItemBodyClasses = 'flex-1 min-w-0'
-export const activityItemHeaderClasses = 'flex items-center justify-between gap-2 mb-1'
-export const activityItemTitleGroupClasses = 'flex items-center gap-2 min-w-0'
+export const activityItemHeaderClasses =
+  'flex flex-col items-start gap-1 mb-1 sm:flex-row sm:items-center sm:justify-between sm:gap-2'
+export const activityItemTitleGroupClasses = 'flex flex-wrap items-center gap-2 min-w-0'
 export const activityItemDescriptionClasses = 'mb-2 break-words'
 export const activityItemActionsClasses = 'flex flex-wrap gap-2'
 

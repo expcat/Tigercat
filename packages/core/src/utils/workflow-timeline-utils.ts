@@ -1268,20 +1268,22 @@ export const workflowViewerBranchClasses =
 export const workflowViewerItemClasses = 'flex w-full min-w-0 flex-col items-center'
 export const workflowViewerConnectorClasses = 'h-4 w-px bg-[var(--tiger-border)]'
 export const workflowViewerGraphClasses =
-  'relative grid w-full min-w-0 items-start justify-center overflow-x-auto [--tiger-workflow-branch-gap:0.75rem] [--tiger-workflow-card-half:9rem] gap-x-[var(--tiger-workflow-branch-gap,0.75rem)]'
+  'relative grid w-full min-w-0 items-start justify-center-safe overflow-x-auto [--tiger-workflow-branch-gap:0.75rem] [--tiger-workflow-card-half:9rem] gap-x-[var(--tiger-workflow-branch-gap,0.75rem)]'
+/** Continue a shorter card to an outgoing connector without stretching the card. */
 export const workflowViewerCellClasses =
-  'flex w-full min-w-0 flex-col items-center justify-self-stretch'
+  "flex w-full min-w-0 flex-col items-center self-stretch justify-self-stretch after:w-px after:flex-1 after:bg-[var(--tiger-border)] after:content-none data-[workflow-outgoing=true]:after:content-['']"
 export const workflowViewerForkDropClasses = 'mx-auto h-3 w-px shrink-0 bg-[var(--tiger-border)]'
 export const workflowViewerEdgeSequenceClasses =
   "relative h-3 w-full before:absolute before:bottom-0 before:left-1/2 before:top-0 before:w-px before:-translate-x-1/2 before:bg-[var(--tiger-border)] before:content-['']"
-/** One pixel under the parent card. The child drop hangs from this bar. */
-export const workflowViewerEdgeForkClasses = 'relative h-px w-full'
-/** Neck under the branch cards. The join bar sits on the bottom edge. */
-export const workflowViewerEdgeJoinClasses = 'relative h-3 w-full'
+/** Parent neck above the fork bar; child drops continue below it. */
+export const workflowViewerEdgeForkClasses = workflowViewerEdgeSequenceClasses
+/** Branch risers meet halfway down, leaving a neck above the next card. */
+export const workflowViewerEdgeJoinClasses =
+  "relative h-6 w-full before:absolute before:bottom-0 before:left-1/2 before:top-1/2 before:w-px before:-translate-x-1/2 before:bg-[var(--tiger-border)] before:content-['']"
 export const workflowViewerRiserClasses =
-  "pointer-events-none relative self-stretch before:absolute before:bottom-0 before:left-1/2 before:top-0 before:w-px before:-translate-x-1/2 before:bg-[var(--tiger-border)] before:content-['']"
-export const workflowViewerBarClasses = 'absolute top-0 h-px bg-[var(--tiger-border)]'
-export const workflowViewerJoinBarClasses = 'absolute bottom-0 h-px bg-[var(--tiger-border)]'
+  "pointer-events-none relative self-stretch before:absolute before:bottom-3 before:left-1/2 before:top-0 before:w-px before:-translate-x-1/2 before:bg-[var(--tiger-border)] before:content-['']"
+export const workflowViewerBarClasses = 'absolute bottom-0 h-px bg-[var(--tiger-border)]'
+export const workflowViewerJoinBarClasses = 'absolute top-1/2 h-px bg-[var(--tiger-border)]'
 export const workflowViewerLoopClasses = 'pointer-events-none relative z-[1] self-stretch'
 export const workflowViewerLoopLineClasses = 'bg-[var(--tiger-warning)]'
 /** Kept for callers that still paint a single rail box. Pieces replace it. */

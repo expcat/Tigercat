@@ -2,6 +2,15 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v3.0.0-rc.1（2026-10-05）
+
+- **结构分隔线（Vue / React）**：Layout 头部与侧栏、Menu、PageHeader 和 DataTableWithToolbar 的结构边线改用 30% 的 `--tiger-border`，default / success / warning Tag 描边同样处理；输入框边框保持完整对比度。
+- **Menu（Vue / React）**：去掉冗余外框；未选中或禁用项显式使用透明背景，选中项与选中父项的背景不再和默认透明背景竞争。
+- **ActivityFeed（Vue / React）**：标题在窄容器内可换行保持可读，移动端时间戳换到标题下方。
+- **WorkflowDesigner（Vue / React）**：摘要标题与审批徽章在窄分支卡片内换行；分支改为等高拉伸，分叉 / 汇合间距修正，分支连线在不同高度卡片之间保持连续。
+- **WorkflowViewer（Vue / React）**：分叉 / 汇合连接线同样修正；较短的卡片用延伸线接到出口连线；窄屏下溢出的列从滚动区起点即可到达。
+- **仓库**：删除已完成的 3.0 波次计划文档（`docs/plan/`），ROADMAP 只登记尚未完成的任务。
+
 ## v3.0.0-preview.9（2026-10-04）
 
 - **DatePicker / TimePicker / TreeSelect（Vue / React）**：Escape 关闭最上层选择面板并恢复原触发输入框；TreeSelect 不再把 Escape 当作节点折叠，搜索触发器替换后再恢复焦点。
