@@ -17,6 +17,7 @@ import {
   formatImagePreviewAriaLabel,
   getImageImgClasses,
   getImageLabels,
+  imageLoadStateFromElement,
   imageBaseClasses,
   imageFrameClasses,
   imageErrorClasses,
@@ -194,13 +195,18 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
 
   useEffect(() => {
     const img = imgRef.current
-    if (!img?.complete || !src) return
-    setLoadState(
-      img.naturalWidth > 0
-        ? { actualSrc: src, error: false, loading: false }
-        : { actualSrc: src, error: true, loading: false }
-    )
-  }, [src, loadState.actualSrc])
+    if (!img) return
+    // Resolve the address the element is actually showing. Reading the prop
+    // src here would write a completed fallback back onto the original
+    // address or stamp a new src with the old element's cache metadata.
+    const displayed = loadState.actualSrc
+    const next = imageLoadStateFromElement(img, displayed)
+    if (!next) return
+    setLoadState((current) => {
+      if (current.actualSrc !== displayed) return current
+      return next.error ? applyImageLoadError(current, fallbackSrc) : applyImageLoadSuccess(current)
+    })
+  }, [src, loadState.actualSrc, fallbackSrc])
 
   const handleLoad = useCallback(
     (event: React.SyntheticEvent<HTMLImageElement>) => {
@@ -294,6 +300,10 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
     </div>
   )
 
+  // Only a real fallback swap drops the main image candidates; a main src
+  // that merely equals fallbackSrc keeps its responsive candidates.
+  const showingFallback =
+    Boolean(fallbackSrc) && loadState.actualSrc === fallbackSrc && loadState.actualSrc !== src
   let content: React.ReactNode
   if (loadState.error) {
     content = errorPlaceholder
@@ -308,8 +318,8 @@ export const Image = forwardRef<ImageHandle, ImageProps>(function Image(
           alt={previewEnabled ? '' : alt}
           loading={lazy ? 'lazy' : undefined}
           className={imgClasses}
-          srcSet={srcSet}
-          sizes={sizes}
+          srcSet={showingFallback ? undefined : srcSet}
+          sizes={showingFallback ? undefined : sizes}
           crossOrigin={crossOrigin}
           decoding={decoding}
           referrerPolicy={referrerPolicy}

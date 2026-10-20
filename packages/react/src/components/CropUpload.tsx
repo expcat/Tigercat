@@ -150,22 +150,36 @@ export const CropUpload = forwardRef<CropUploadRef, CropUploadProps>(function Cr
 
   const handleConfirm = async () => {
     if (!session.beginCrop()) return
+    // Snapshot the session identity: whatever resolves after the await must
+    // only touch the session that started this crop. Cancel, reselect, and
+    // dispose all bump the generation.
+    const generation = session.getState().generation
+    const snapshotName = session.getState().originalFile?.name ?? ''
+    const isCurrent = () => session.getState().generation === generation
     try {
       const raw = await cropperRef.current?.getCropResult()
+      if (!isCurrent()) return
       if (!raw) {
         session.endCrop()
         return
       }
-      const originalName = session.getState().originalFile?.name ?? raw.file?.name ?? ''
-      const result = withCropFile(raw, originalName)
+      const result = withCropFile(raw, snapshotName || (raw.file?.name ?? ''))
       onCropComplete?.(result)
+      // Every external call above and below may synchronously cancel,
+      // reselect, or unmount; only touch the session while it is current.
+      if (!isCurrent()) return
       formItemControl?.setError?.(null)
+      if (!isCurrent()) return
       formItemControl?.onChange?.(result.file)
+      if (!isCurrent()) return
       session.close()
     } catch (error) {
+      if (!isCurrent()) return
       const failure = error instanceof Error ? error : new Error(String(error))
       formItemControl?.setError?.(failure.message)
+      if (!isCurrent()) return
       onError?.(failure)
+      if (!isCurrent()) return
       session.endCrop()
     }
   }

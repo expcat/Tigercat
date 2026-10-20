@@ -19,5 +19,5 @@ Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `loc
 | ---------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
 | `src?`     | `string`  | `-`     | Image source URL                                                                           |
 | `alt?`     | `string`  | `-`     | Alternative text for image                                                                 |
-| `preview?` | `boolean` | `false` | Whether an explicit preview action opens the fullscreen viewer. The bitmap itself stays... |
-| `lazy?`    | `boolean` | `false` | Whether to lazy load the image using IntersectionObserver                                  |
+| `preview?` | `boolean` | `true`  | Whether an explicit preview action opens the fullscreen viewer. The host becomes a butt... |
+| `lazy?`    | `boolean` | `false` | Whether to lazy load the image with the native `loading="lazy"` attribute                  |

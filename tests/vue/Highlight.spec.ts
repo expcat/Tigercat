@@ -3,8 +3,17 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/vue'
-import { defineComponent, h } from 'vue'
+import { fireEvent, render, screen } from '@testing-library/vue'
+import {
+  createElementBlock,
+  createElementVNode,
+  createTextVNode,
+  defineComponent,
+  h,
+  nextTick,
+  openBlock,
+  ref
+} from 'vue'
 import { Highlight } from '@expcat/tigercat-vue/Highlight'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -29,20 +38,62 @@ describe('Highlight', () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument()
     })
 
-    it('highlights flattened slot text as one segment path', () => {
-      const { container } = render(Highlight, {
-        props: { keywords: 'Vue' },
-        slots: {
-          default: () => ['Learn ', h('a', { href: '/vue' }, 'Vue'), ' today']
+    it('keeps nested links live across dynamic updates', async () => {
+      // Block-compiled anchor with real dynamicChildren: the highlight clone
+      // must invalidate that cache or updates patch the replaced children.
+      const label = ref('Vue')
+      let clicks = 0
+      const App = defineComponent({
+        setup() {
+          return () =>
+            h(
+              Highlight,
+              { keywords: label.value },
+              {
+                default: () => {
+                  openBlock()
+                  return [
+                    createElementBlock(
+                      'a',
+                      {
+                        href: '/vue',
+                        onClick: (event: Event) => {
+                          event.preventDefault()
+                          clicks++
+                        }
+                      },
+                      [
+                        createElementVNode('b', null, label.value, 1 /* TEXT */),
+                        createTextVNode(` and ${label.value}`, 1 /* TEXT */)
+                      ]
+                    )
+                  ]
+                }
+              }
+            )
         }
       })
+      const { container } = render(App)
       const root = getRoot(container)
-      expect(root.querySelector('a')).toBeNull()
-      expect(root).toHaveTextContent('Learn Vue today')
-      expect(root.querySelector('mark')).toHaveTextContent('Vue')
+      const link = root.querySelector('a') as HTMLElement
+      expect(link).toHaveAttribute('href', '/vue')
+      expect(link).toHaveTextContent('Vue and Vue')
+      expect(link.querySelectorAll('mark[data-highlight-mark]')).toHaveLength(2)
+      await fireEvent.click(link)
+
+      label.value = 'React'
+      await nextTick()
+
+      expect(link).toHaveTextContent('React and React')
+      const marks = [...link.querySelectorAll('mark[data-highlight-mark]')].map(
+        (mark) => mark.textContent
+      )
+      expect(marks).toEqual(['React', 'React'])
+      await fireEvent.click(link)
+      expect(clicks).toBe(2)
     })
 
-    it('flattens text from nested component default slots', () => {
+    it('keeps child components sealed and highlights later native text', () => {
       const Wrapper = defineComponent({
         name: 'NestedHighlightText',
         setup(_, { slots }) {
@@ -51,10 +102,15 @@ describe('Highlight', () => {
       })
       const { container } = render(Highlight, {
         props: { keywords: 'Vue' },
-        slots: { default: () => h(Wrapper, () => 'Learn Vue today') }
+        slots: { default: () => [h(Wrapper, () => 'Learn Vue today'), ' and Vue again'] }
       })
       const root = getRoot(container)
-      expect(root).toHaveTextContent('Learn Vue today')
+      expect(root).toHaveTextContent('Learn Vue today and Vue again')
+      // the child component renders intact and its sealed text is never
+      // measured or marked; the match after it still lands correctly
+      const nested = root.querySelector('span')
+      expect(nested).not.toBeNull()
+      expect(nested).toHaveTextContent('Learn Vue today')
       const marks = [...root.querySelectorAll('mark[data-highlight-mark]')]
       expect(marks).toHaveLength(1)
       expect(marks[0]).toHaveTextContent('Vue')

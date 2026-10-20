@@ -84,7 +84,7 @@ export function getSegmentedOptionClasses(
   }
 
   return classNames(
-    'relative z-10 inline-flex items-center justify-center gap-1 rounded-[var(--tiger-radius-md)] font-medium transition-colors duration-200 whitespace-nowrap',
+    'relative z-10 inline-flex min-w-0 items-center justify-center gap-1 overflow-hidden rounded-[var(--tiger-radius-md)] font-medium transition-colors duration-200 whitespace-nowrap',
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     'focus-visible:ring-[var(--tiger-focus-ring)]/40',
     sizePad[size],

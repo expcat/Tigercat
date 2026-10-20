@@ -99,9 +99,10 @@ export interface ImageProps {
   fallbackSrc?: string
 
   /**
-   * Whether an explicit preview action opens the fullscreen viewer.
-   * The bitmap itself stays an image and keeps `alt`.
-   * @default false
+   * Whether an explicit preview action opens the fullscreen viewer. The host
+   * becomes a button that carries the accessible name; the inner bitmap's
+   * `alt` is emptied so the name is not announced twice.
+   * @default true
    */
   preview?: boolean
 
@@ -112,7 +113,7 @@ export interface ImageProps {
   zoomOnHover?: boolean
 
   /**
-   * Whether to lazy load the image using IntersectionObserver
+   * Whether to lazy load the image with the native `loading="lazy"` attribute
    * @default false
    */
   lazy?: boolean

@@ -338,6 +338,12 @@ export const Image = defineComponent({
             ])
           ]
 
+      // Only a real fallback swap drops the main image candidates; a main src
+      // that merely equals fallbackSrc keeps its responsive candidates.
+      const showingFallback =
+        Boolean(props.fallbackSrc) &&
+        loadState.value.actualSrc === props.fallbackSrc &&
+        loadState.value.actualSrc !== props.src
       let content
       if (loadState.value.error) {
         content = errorPlaceholder
@@ -351,8 +357,9 @@ export const Image = defineComponent({
             alt: previewEnabled.value ? '' : props.alt,
             loading: props.lazy ? 'lazy' : undefined,
             class: imgClasses.value,
-            srcset: props.srcSet,
-            sizes: props.sizes,
+            // fallback art must not keep the main image candidates
+            srcset: showingFallback ? undefined : props.srcSet,
+            sizes: showingFallback ? undefined : props.sizes,
             crossorigin: props.crossOrigin,
             decoding: props.decoding,
             referrerpolicy: props.referrerPolicy,

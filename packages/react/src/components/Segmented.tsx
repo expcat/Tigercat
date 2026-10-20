@@ -130,7 +130,7 @@ export const Segmented = forwardRef<
             {opt.icon ? (
               <svg
                 viewBox={icon24ViewBox}
-                className="h-4 w-4"
+                className="h-4 w-4 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 aria-hidden="true"
@@ -138,7 +138,7 @@ export const Segmented = forwardRef<
                 <path d={opt.icon} />
               </svg>
             ) : null}
-            <span>{opt.label}</span>
+            <span className="min-w-0 truncate">{opt.label}</span>
           </button>
         )
       })}

@@ -583,7 +583,20 @@ export const ImageCropper = defineComponent({
           h('defs', null, [
             h('mask', { id: maskId }, [
               h('rect', { width: dw, height: dh, fill: 'white' }),
-              h('rect', { x: cr.x, y: cr.y, width: cr.width, height: cr.height, fill: 'black' })
+              props.circular
+                ? h('circle', {
+                    cx: cr.x + cr.width / 2,
+                    cy: cr.y + cr.height / 2,
+                    r: Math.min(cr.width, cr.height) / 2,
+                    fill: 'black'
+                  })
+                : h('rect', {
+                    x: cr.x,
+                    y: cr.y,
+                    width: cr.width,
+                    height: cr.height,
+                    fill: 'black'
+                  })
             ])
           ]),
           h('rect', {
@@ -604,14 +617,25 @@ export const ImageCropper = defineComponent({
         [img, mask]
       )
 
+      // circular crops a true inscribed circle, so the outline follows the
+      // same circle instead of the rectangular selection box
+      const selectionSide = Math.min(cr.width, cr.height)
       const selection = h('div', {
         class: imageCropperSelectionClasses,
-        style: {
-          left: `${cr.x}px`,
-          top: `${cr.y}px`,
-          width: `${cr.width}px`,
-          height: `${cr.height}px`
-        }
+        style: props.circular
+          ? {
+              left: `${cr.x + (cr.width - selectionSide) / 2}px`,
+              top: `${cr.y + (cr.height - selectionSide) / 2}px`,
+              width: `${selectionSide}px`,
+              height: `${selectionSide}px`,
+              borderRadius: '50%'
+            }
+          : {
+              left: `${cr.x}px`,
+              top: `${cr.y}px`,
+              width: `${cr.width}px`,
+              height: `${cr.height}px`
+            }
       })
 
       const dragArea = h('div', {

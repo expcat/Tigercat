@@ -495,7 +495,16 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               <defs>
                 <mask id={maskId}>
                   <rect width={displayWidth} height={displayHeight} fill="white" />
-                  <rect x={cr.x} y={cr.y} width={cr.width} height={cr.height} fill="black" />
+                  {circular ? (
+                    <circle
+                      cx={cr.x + cr.width / 2}
+                      cy={cr.y + cr.height / 2}
+                      r={Math.min(cr.width, cr.height) / 2}
+                      fill="black"
+                    />
+                  ) : (
+                    <rect x={cr.x} y={cr.y} width={cr.width} height={cr.height} fill="black" />
+                  )}
                 </mask>
               </defs>
               <rect
@@ -509,12 +518,24 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
 
           <div
             className={imageCropperSelectionClasses}
-            style={{
-              left: cr.x,
-              top: cr.y,
-              width: cr.width,
-              height: cr.height
-            }}
+            style={
+              // circular crops a true inscribed circle, so the outline follows
+              // the same circle instead of the rectangular selection box
+              circular
+                ? {
+                    left: cr.x + (cr.width - Math.min(cr.width, cr.height)) / 2,
+                    top: cr.y + (cr.height - Math.min(cr.width, cr.height)) / 2,
+                    width: Math.min(cr.width, cr.height),
+                    height: Math.min(cr.width, cr.height),
+                    borderRadius: '50%'
+                  }
+                : {
+                    left: cr.x,
+                    top: cr.y,
+                    width: cr.width,
+                    height: cr.height
+                  }
+            }
           />
 
           <div

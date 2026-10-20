@@ -14,6 +14,12 @@
 - **i18n（Core）**：懒加载直接返回完整语言包对象时，不再把 datePicker 分区误当整个包而丢掉 common 等其余分区。
 - **高亮与 typeahead（Core）**：大小写折叠改变 UTF-16 长度（如 İ 折叠为 i 加组合符）时，Highlight 命中区间正确映射回原文偏移；typeahead 重复字母循环按每个字符的完整折叠串比较。
 - **Vue**：`useFullscreen` 在组件卸载时解除 document 全屏事件监听；删除未使用的内部 `coerce-class-value` 文件与 `createFilledIcon` 工具。
+- **ImageCropper（Core / Vue / React）**：锁定比例拖动手柄到图片边缘时，选区按锚定点可用空间计算保持比例的最终尺寸，空间不足时可保持原位，不再溢出边界或破坏比例。导出与预览一致：旋转 / 翻转后的导出内容就是选框内看到的画面，90° 旋转不再交换宽高，circular 裁剪按选区内切圆生效；圆形选框描边与遮罩挖孔同步改为内切圆。
+- **CropUpload（Vue / React）**：裁剪导出等待期间取消、换图或卸载后，迟到结果不再覆盖新会话状态、误发事件或关闭新裁剪会话。
+- **Image（Vue / React）**：React 缓存检查不再把已完成的 fallback 地址写回主图 src；显示备用图时不再绑定主图的 `srcSet` / `sizes` 候选。
+- **Segmented（Vue / React）**：选项文字超长时在选项内截断为省略号，图标不再被压缩，相邻选项不再互相重叠。
+- **Highlight（Vue）**：默认 slot 的 VNode 子树改为原位克隆并插入高亮，保留嵌套元素与链接结构（与 React 行为一致），不再先拍平成纯文本重建；子组件内容保持不透明、不参与高亮，其前后的原生文本仍正常命中。
+- **Image 文档**：`preview` 默认值更正为 `true` 并改写交互描述，`lazy` 说明更正为原生 `loading="lazy"`；Skill references 与 MCP 快照同步。
 
 ## v3.0.0-rc.1（2026-10-05）
 

@@ -573,7 +573,9 @@ export function constrainCropRect(
 
 /**
  * Resize a crop rect by dragging a handle. Aspect-locked resizes keep the
- * opposite edge/corner fixed (nw locks se, e locks the west edge).
+ * opposite edge/corner fixed (nw locks se, e locks the west edge) and fit the
+ * ratio-exact size inside the room that anchor leaves on the bitmap, so
+ * clamping to the edges can no longer break the ratio afterwards.
  */
 export function resizeCropRect(
   rect: CropRect,
@@ -616,27 +618,57 @@ export function resizeCropRect(
   }
 
   if (aspectRatio && aspectRatio > 0) {
+    const horizontalOnly = handle === 'e' || handle === 'w'
+    const verticalOnly = handle === 'n' || handle === 's'
+    const centerX = (startLeft + startRight) / 2
+    const centerY = (startTop + startBottom) / 2
+
+    // Room the fixed opposite edge/corner leaves on the bitmap. Side handles
+    // grow around the start center on the axis they do not drag.
+    const roomW = verticalOnly
+      ? Math.max(0, 2 * Math.min(centerX, imageWidth - centerX))
+      : Math.max(0, lockLeft ? imageWidth - startLeft : startRight)
+    const roomH = horizontalOnly
+      ? Math.max(0, 2 * Math.min(centerY, imageHeight - centerY))
+      : Math.max(0, lockTop ? imageHeight - startTop : startBottom)
+
+    // Desired size follows the drag as before: side handles follow the
+    // dragged axis, corners follow the dragged height.
     let width = right - left
     let height = bottom - top
-    const horizontalOnly =
-      (handle === 'e' || handle === 'w') && !handle.includes('n') && !handle.includes('s')
-    const verticalOnly = handle === 'n' || handle === 's'
+    if (horizontalOnly) height = width / aspectRatio
+    else width = height * aspectRatio
 
-    if (verticalOnly) {
-      width = height * aspectRatio
-      const cx = (startLeft + startRight) / 2
-      left = cx - width / 2
-      right = left + width
-    } else if (horizontalOnly) {
+    // Fit inside the room without changing the ratio, then restore the
+    // minimums while the room allows; the bitmap bounds win over minimums.
+    if (width > roomW) {
+      width = roomW
       height = width / aspectRatio
-      const cy = (startTop + startBottom) / 2
-      top = cy - height / 2
-      bottom = top + height
-    } else {
-      width = height * aspectRatio
-      if (lockLeft) right = left + width
-      else left = right - width
     }
+    if (height > roomH) {
+      height = roomH
+      width = height * aspectRatio
+    }
+    if (width < maxW && maxW <= roomW) {
+      width = maxW
+      height = width / aspectRatio
+      if (height > roomH) {
+        height = roomH
+        width = height * aspectRatio
+      }
+    }
+    if (height < maxH && maxH <= roomH) {
+      height = maxH
+      width = height * aspectRatio
+      if (width > roomW) {
+        width = roomW
+        height = width / aspectRatio
+      }
+    }
+
+    const x = verticalOnly ? centerX - width / 2 : lockLeft ? startLeft : startRight - width
+    const y = horizontalOnly ? centerY - height / 2 : lockTop ? startTop : startBottom - height
+    return { x, y, width, height }
   }
 
   left = Math.max(0, left)
@@ -1043,13 +1075,14 @@ export async function cropCanvas(
   const flipX = Boolean(options?.flipX)
   const circular = Boolean(options?.circular)
   const transformed = rotation !== 0 || flipX || circular
-  const rotated = transformed ? cropOutputSize(rawW, rawH, rotation) : { width: rawW, height: rawH }
-  const longest = Math.max(rotated.width, rotated.height)
+  // The selection lives in display coordinates over the transformed preview,
+  // so the output keeps the crop-rect size; rotation no longer swaps edges.
+  const longest = Math.max(rawW, rawH)
   const scaleDown = longest > CROP_OUTPUT_MAX_EDGE ? CROP_OUTPUT_MAX_EDGE / longest : 1
 
   const canvas = document.createElement('canvas')
-  canvas.width = Math.max(1, Math.round(rotated.width * scaleDown))
-  canvas.height = Math.max(1, Math.round(rotated.height * scaleDown))
+  canvas.width = Math.max(1, Math.round(rawW * scaleDown))
+  canvas.height = Math.max(1, Math.round(rawH * scaleDown))
 
   const ctx = canvas.getContext('2d')
   if (!ctx) {
@@ -1058,19 +1091,31 @@ export async function cropCanvas(
   if (!transformed) {
     ctx.drawImage(image, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height)
   } else {
-    ctx.save()
-    ctx.translate(canvas.width / 2, canvas.height / 2)
-    ctx.rotate((rotation * Math.PI) / 180)
-    if (flipX) ctx.scale(-1, 1)
     if (circular) {
+      ctx.save()
       ctx.beginPath()
-      ctx.arc(0, 0, Math.min(canvas.width, canvas.height) / 2, 0, Math.PI * 2)
+      ctx.arc(
+        canvas.width / 2,
+        canvas.height / 2,
+        Math.min(canvas.width, canvas.height) / 2,
+        0,
+        Math.PI * 2
+      )
       ctx.clip()
     }
-    const drawW = Math.max(1, Math.round(rawW * scaleDown))
-    const drawH = Math.max(1, Math.round(rawH * scaleDown))
-    ctx.drawImage(image, sx, sy, sw, sh, -drawW / 2, -drawH / 2, drawW, drawH)
+    // Replay the preview: stretch the bitmap to the display frame, rotate and
+    // flip about the frame center, then copy the axis-aligned crop rect.
+    ctx.save()
+    ctx.scale(canvas.width / cropRect.width, canvas.height / cropRect.height)
+    ctx.translate(-cropRect.x, -cropRect.y)
+    ctx.translate(displayWidth / 2, displayHeight / 2)
+    ctx.rotate((rotation * Math.PI) / 180)
+    if (flipX) ctx.scale(-1, 1)
+    ctx.translate(-displayWidth / 2, -displayHeight / 2)
+    ctx.scale(1 / scaleX, 1 / scaleY)
+    ctx.drawImage(image, 0, 0)
     ctx.restore()
+    if (circular) ctx.restore()
   }
 
   const blob = await new Promise<Blob | null>((resolve) => {

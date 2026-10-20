@@ -409,6 +409,29 @@ describe('image-utils — resizeCropRect', () => {
     expect(out.x).toBe(50)
     expect(out.y).toBe(50)
   })
+
+  it.each([
+    // e handle with the rect hugging the top edge: height cannot grow past
+    // the centered room, so the width must follow instead of breaking 1:1
+    [{ x: 10, y: 0, width: 40, height: 40 }, 'e', 40, 0, { x: 10, y: 0, width: 40, height: 40 }],
+    // se corner near the bottom-right bitmap corner: the anchor stays put
+    [
+      { x: 60, y: 60, width: 20, height: 20 },
+      'se',
+      80,
+      80,
+      { x: 60, y: 60, width: 40, height: 40 }
+    ],
+    // s handle with the rect hugging the left edge: width follows the room
+    [{ x: 0, y: 10, width: 40, height: 40 }, 's', 0, 40, { x: 0, y: 10, width: 40, height: 40 }]
+  ] as const)(
+    'keeps the locked ratio when %s handle hits the edge',
+    (rect, handle, dx, dy, want) => {
+      const out = resizeCropRect(rect, handle, dx, dy, 100, 100, 1)
+      expect(out.width / out.height).toBeCloseTo(1)
+      expect(out).toEqual(want)
+    }
+  )
 })
 
 describe('image-utils — moveCropRect', () => {
@@ -481,7 +504,15 @@ describe('image-utils — cropCanvas', () => {
   beforeEach(() => {
     canvases.length = 0
     HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
-      drawImage: vi.fn()
+      drawImage: vi.fn(),
+      save: vi.fn(),
+      restore: vi.fn(),
+      translate: vi.fn(),
+      rotate: vi.fn(),
+      scale: vi.fn(),
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      clip: vi.fn()
     })) as unknown as typeof HTMLCanvasElement.prototype.getContext
     HTMLCanvasElement.prototype.toBlob = vi.fn((callback: BlobCallback) => {
       callback(new Blob(['x'], { type: 'image/png' }))
@@ -517,6 +548,15 @@ describe('image-utils — cropCanvas', () => {
     expect(canvases.at(-1)?.width).toBe(50)
     expect(canvases.at(-1)?.height).toBe(50)
     expect(blob.type).toBe('image/png')
+  })
+
+  it('keeps the crop-rect size when rotating, matching the preview selection', async () => {
+    const img = makeImage(100, 100)
+    const rect: CropRect = { x: 0, y: 0, width: 50, height: 100 }
+    await cropCanvas(img, rect, 100, 100, 'image/png', 0.92, { rotation: 90 })
+    // The selection stays in display coordinates: 90° no longer swaps edges.
+    expect(canvases.at(-1)?.width).toBe(50)
+    expect(canvases.at(-1)?.height).toBe(100)
   })
 
   it('throws when display size or crop rect is not a finite area', async () => {

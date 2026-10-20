@@ -160,7 +160,7 @@ export const Segmented = defineComponent({
                       'svg',
                       {
                         viewBox: icon24ViewBox,
-                        class: 'h-4 w-4',
+                        class: 'h-4 w-4 shrink-0',
                         fill: 'none',
                         stroke: 'currentColor',
                         'aria-hidden': 'true',
@@ -169,7 +169,7 @@ export const Segmented = defineComponent({
                       [h('path', { d: opt.icon })]
                     )
                   : null,
-                h('span', null, opt.label)
+                h('span', { class: 'min-w-0 truncate' }, opt.label)
               ]
             )
           })
