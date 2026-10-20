@@ -8,6 +8,11 @@ import {
   themeConfigToCssVars,
   themeTransitionValue
 } from './themes/manager'
+import {
+  forcedColorsActiveVars,
+  forcedColorsContrastVars,
+  forcedColorsFocusOutline
+} from './themes/forced-colors'
 import { aspectRatioBaseStyles } from './utils/aspect-ratio-utils'
 import { cardBaseStyles } from './utils/card-utils'
 import { carouselBaseStyles } from './utils/carousel-utils'
@@ -101,39 +106,17 @@ const tigercatReducedMotionBase = {
 
 const tigercatForcedColorsBase = {
   '@media (forced-colors: active)': {
-    ':root, .dark': {
-      '--tiger-text': 'CanvasText',
-      '--tiger-text-secondary': 'LinkText',
-      '--tiger-surface': 'Canvas',
-      '--tiger-surface-muted': 'Canvas',
-      '--tiger-surface-raised': 'Canvas',
-      '--tiger-border': 'CanvasText',
-      '--tiger-border-strong': 'CanvasText',
-      '--tiger-focus-ring': 'Highlight',
-      '--tiger-primary': 'LinkText',
-      '--tiger-primary-foreground': 'Canvas',
-      '--tiger-success': 'LinkText',
-      '--tiger-warning': 'CanvasText',
-      '--tiger-error': 'CanvasText',
-      '--tiger-info': 'LinkText',
-      '--tiger-text-disabled': 'GrayText',
-      colorScheme: 'light dark'
-    },
-    ':focus, :focus-visible': {
-      outline: '2px solid Highlight',
-      outlineOffset: '2px'
-    }
+    ':root, .dark': { ...forcedColorsActiveVars },
+    ':focus, :focus-visible': { ...forcedColorsFocusOutline }
   },
   '@media (prefers-contrast: more)': {
     ':root': {
       ...highContrastLight,
-      '--tiger-border': 'var(--tiger-border-strong)',
-      '--tiger-text-secondary': 'var(--tiger-text)'
+      ...forcedColorsContrastVars
     },
     '.dark': {
       ...highContrastDark,
-      '--tiger-border': 'var(--tiger-border-strong)',
-      '--tiger-text-secondary': 'var(--tiger-text)'
+      ...forcedColorsContrastVars
     }
   }
 }

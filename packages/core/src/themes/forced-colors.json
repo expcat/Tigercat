@@ -1,0 +1,28 @@
+{
+  "contrastVars": {
+    "--tiger-border": "var(--tiger-border-strong)",
+    "--tiger-text-secondary": "var(--tiger-text)"
+  },
+  "activeVars": {
+    "--tiger-text": "CanvasText",
+    "--tiger-text-secondary": "LinkText",
+    "--tiger-surface": "Canvas",
+    "--tiger-surface-muted": "Canvas",
+    "--tiger-surface-raised": "Canvas",
+    "--tiger-border": "CanvasText",
+    "--tiger-border-strong": "CanvasText",
+    "--tiger-focus-ring": "Highlight",
+    "--tiger-primary": "LinkText",
+    "--tiger-primary-foreground": "Canvas",
+    "--tiger-success": "LinkText",
+    "--tiger-warning": "CanvasText",
+    "--tiger-error": "CanvasText",
+    "--tiger-info": "LinkText",
+    "--tiger-text-disabled": "GrayText",
+    "colorScheme": "light dark"
+  },
+  "focusOutline": {
+    "outline": "2px solid Highlight",
+    "outlineOffset": "2px"
+  }
+}

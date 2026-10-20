@@ -91,21 +91,21 @@ describe('theme scope writes canonical variables', () => {
   afterEach(() => {
     document.documentElement.removeAttribute('style')
     document.documentElement.classList.remove('dark')
+    document.querySelectorAll('style[data-tiger-theme-style]').forEach((node) => node.remove())
   })
 
   it('setTheme writes --tiger-surface and not the removed aliases', () => {
     const scope = createTigerThemeScope()
     scope.setColorScheme('light')
     scope.setTheme('default')
-    const root = document.documentElement
-    expect(root.style.getPropertyValue(THEME_CSS_VARS.surface)).toBe(lightColors?.surface)
+    const scopeCss = Array.from(document.querySelectorAll('style[data-tiger-theme-style]'))
+      .map((node) => node.textContent ?? '')
+      .join('\n')
+    expect(scopeCss).toContain(`--tiger-surface:${lightColors?.surface}`)
+    expect(scopeCss).toContain(`--tiger-surface:${darkColors?.surface}`)
     for (const alias of REMOVED_ALIAS_VARS) {
-      expect(root.style.getPropertyValue(alias)).toBe('')
+      expect(scopeCss).not.toContain(alias)
     }
-
-    scope.setColorScheme('dark')
-    expect(root.style.getPropertyValue(THEME_CSS_VARS.surface)).toBe(darkColors?.surface)
-    expect(root.style.getPropertyValue(THEME_CSS_VARS.surface)).not.toBe('#ffffff')
     scope.dispose()
   })
 })

@@ -2,6 +2,14 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## 未发布
+
+- **主题运行时（Core）**：主题变量改为只写作用域样式表，删除并行的 inline 写入路径和与公开契约相悖的 `prefers-color-scheme` 死规则。dark/light 切回 `auto` 与 `dispose` 时按快照只释放本 scope 写入的 class、`data-tiger-color-scheme` 与 `color-scheme`，保留调用前和外部后续的修改。`auto` 下显式 `data-tiger-color-scheme="light"` 优先于 `<html>` 上的 `dark` class，样式表选择器与 `getResolvedColorScheme()` 保持一致。
+- **嵌套主题（Core）**：嵌套 scope 的 motion duration 现在派生出 transition shorthand，easing 未设置时继承父级的 `--tiger-motion-ease-standard`。
+- **ConfigProvider（Vue / React）**：document ownership 改为响应式，ownership 变化时交接 document handle 与嵌套 scope。接通已公开的 `iconRegistry` 配置（Core 类型与 React Props 此前已存在），Vue ConfigProvider 补齐同名 runtime prop，两端 Icon 实际消费：应用传入的注册表优先于父级，provider 只 dispose 自己创建的注册表。移除无生产读者的 locale scope 接线。
+- **forced-colors（Core）**：forced-colors 规则收成单一事实源，tailwind 插件、`tokens.css` 与公开 `forcedColorsCss` 同源生成；插件的完整规则不变，`forcedColorsCss` 与 `tokens.css` 补齐了此前缺失的对比度变量与焦点轮廓。
+- **包内容**：`@expcat/tigercat-core` 删除 `tokens.dtcg.json` / `tokens.emitted.css` / `figma.tokens.json` 三个未列入 `exports` 的附带文件，迁移说明见 [MIGRATION.md](docs/MIGRATION.md)。
+
 ## v3.0.0-rc.1（2026-10-05）
 
 - **结构分隔线（Vue / React）**：Layout 头部与侧栏、Menu、PageHeader 和 DataTableWithToolbar 的结构边线改用 30% 的 `--tiger-border`，default / success / warning Tag 描边同样处理；输入框边框保持完整对比度。

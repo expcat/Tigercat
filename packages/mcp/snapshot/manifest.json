@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-preview.9",
+  "version": "3.0.0-rc.1",
   "algorithm": "sha256",
   "files": {
     "context7.json": "897a679468f42c1df5f40908c89a42e7ea3a1f4bfdee489f264a5cf44dc4024f",
@@ -254,7 +254,7 @@
     "skills/tigercat/references/shared/props/color-swatch.md": "95e8569df9478dbeca91dbe34b4cf37f4d729fb332d1f088e9efb323718031fd",
     "skills/tigercat/references/shared/props/comment-thread.md": "e7d0076fcaa03cd0d18dea453a70d74cfea2eb5f24a076a4eff8100f7e5b0528",
     "skills/tigercat/references/shared/props/composite.md": "962b60b225b8e07e2169cab543aeda05a0aabd791d809bd2f6b199174b1771be",
-    "skills/tigercat/references/shared/props/config-provider.md": "e60f31e3c19df1f85bb44489aea08d90374df59399688f34d6d4383dd5294ef6",
+    "skills/tigercat/references/shared/props/config-provider.md": "fc06b5b9cb87abcb577925b22f7ea61f8965127fa7ba199ec2d710f4d3609657",
     "skills/tigercat/references/shared/props/container.md": "1779ce9b59e46926f11bc8416c243578ca51fa719a7e366dbd6a5b763dc00a2c",
     "skills/tigercat/references/shared/props/content.md": "bfa84d9ed688bb831c1c65b4dfbc0abc5696677b357823e8b3d758246bc480ae",
     "skills/tigercat/references/shared/props/context-menu-item.md": "0baf83262396059887810ca18dc782601a5d6aaa40075ac0b6869d63a3af9a6d",
@@ -403,7 +403,7 @@
     "skills/tigercat/references/shared/props/workflow-timeline.md": "7e5ed4c231fcbf160a4b9116c97f37daca67cc43c3dfd0e7a53d4edcd476b8f7",
     "skills/tigercat/references/shared/props/workflow-viewer.md": "f67578ecdea69578b461fafcee5e8187a8aba13c28a4b693d8c928b6a6c78416",
     "skills/tigercat/references/ssr.md": "2888f0584f5207bb71106e2c941b05466dc234856895280e1582824d22076751",
-    "skills/tigercat/references/theme.md": "d53fc104711ab5447d44f3bcba553159793661c431f2d267e15fb96004b4600a",
+    "skills/tigercat/references/theme.md": "28e02171cb3ebeaa6ec6b43c5e098afb3928aa2310cc1052ba251f911ebfce24",
     "skills/tigercat/references/tokens.md": "2cf07f020d17dbed625a97b17b20cc64da54e77b80b08e72a030de3f8171e5a4",
     "skills/tigercat/references/vue/index.md": "85a86b9cea9cc5f3fb664ddb6e7c0ff3dae77f4b99d027281f5878bb83a9d4b3"
   }

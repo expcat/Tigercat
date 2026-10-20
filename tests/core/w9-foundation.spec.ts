@@ -39,7 +39,6 @@ import { naturalThemeScale } from '../../packages/core/src/themes/natural/theme'
 import { modernThemeScale } from '../../packages/core/src/themes/modern/theme'
 import { highContrastThemeScale } from '../../packages/core/src/themes/high-contrast/theme'
 import { filterUnreadComponentTokens } from '../../packages/core/scripts/check-contrast.mjs'
-import { dtcgToPlain, emitCss } from '../../packages/core/scripts/emit-tokens.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -125,12 +124,15 @@ describe('semantic tailwind theme', () => {
 })
 
 describe('forced colors', () => {
-  it('includes forced-colors and CanvasText', () => {
-    const css = readFileSync(join(root, 'packages/core/src/themes/forced-colors.css'), 'utf8')
-    expect(css).toContain('forced-colors')
-    expect(css).toContain('CanvasText')
-    expect(forcedColorsCss).toContain('forced-colors')
-    expect(forcedColorsCss).toContain('CanvasText')
+  it('ships one forced-colors fact in tokens.css and the public CSS export', () => {
+    const tokensCss = readFileSync(join(root, 'packages/core/tokens/tokens.css'), 'utf8')
+    for (const css of [tokensCss, forcedColorsCss]) {
+      expect(css).toContain('forced-colors')
+      expect(css).toContain('CanvasText')
+      // The full system-color set the plugin always had.
+      expect(css).toContain('GrayText')
+      expect(css).toContain('--tiger-surface-raised')
+    }
   })
 })
 
@@ -179,18 +181,5 @@ describe('unread component tokens', () => {
     expect(filterUnreadComponentTokens({ button: { bg: '#fff' }, ghost: { bg: '#000' } })).toEqual(
       {}
     )
-  })
-})
-
-describe('dtcg emitter', () => {
-  it('round-trips a typed token to css variables', () => {
-    const dtcg = {
-      color: { brand: { $value: '#2563eb', $type: 'color' } },
-      radius: { base: { $value: '6px', $type: 'dimension' } }
-    }
-    expect(dtcgToPlain(dtcg)).toEqual({ color: { brand: '#2563eb' }, radius: { base: '6px' } })
-    const css = emitCss(dtcg)
-    expect(css).toContain('--tiger-color-brand: #2563eb;')
-    expect(css).toContain('--tiger-radius-base: 6px;')
   })
 })

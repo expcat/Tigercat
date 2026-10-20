@@ -16,9 +16,10 @@ import {
   type IconName,
   type IconDefinition
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 
 export interface VueIconProps {
-  name?: IconName
+  name?: IconName | (string & {})
   icon?: IconDefinition
   size?: IconSize
   color?: string
@@ -61,6 +62,7 @@ export const Icon = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    const config = useTigerConfig()
     const wrapperClasses = computed(() =>
       classNames(iconWrapperClasses, coerceClassValue(attrs.class))
     )
@@ -76,7 +78,8 @@ export const Icon = defineComponent({
         attrs['aria-label'] == null && attrs['aria-labelledby'] == null && attrs.role == null
 
       const definition = !hasSlotContent
-        ? (props.icon ?? (props.name ? getIconDefinition(props.name) : undefined))
+        ? (props.icon ??
+          (props.name ? getIconDefinition(props.name, config.value.iconRegistry) : undefined))
         : undefined
 
       if (!hasSlotContent && !definition && props.name) {

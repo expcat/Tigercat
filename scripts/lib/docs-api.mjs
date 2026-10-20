@@ -311,7 +311,7 @@ export const COMPONENT_PROP_PRIORITY = {
     'open?',
     'asChild?'
   ],
-  ConfigProvider: ['locale?', 'theme?', 'colorScheme?', 'direction?'],
+  ConfigProvider: ['locale?', 'dir?', 'theme?', 'colorScheme?', 'document?', 'iconRegistry?'],
   Affix: ['offsetTop?', 'offsetBottom?', 'target?', 'zIndex?'],
   Anchor: ['getContainer?', 'direction?', 'targetOffset?', 'affix?', 'offsetTop?'],
   AnchorLink: ['href', 'title?', 'target?'],

@@ -11,11 +11,11 @@ description: Compact generated Tigercat Basic props reference
 
 ## ConfigProvider
 
-`packages/core/src/types/config-provider.ts` · `ConfigProviderProps`
+`packages/core/src/types/config-provider.ts` · `ConfigProviderProps` · 4/6 props
 
-| Prop           | Type                   | Default | Notes                                                                          |
-| -------------- | ---------------------- | ------- | ------------------------------------------------------------------------------ |
-| `locale?`      | `TigerLocaleInput`     | `-`     | Locale object, Promise, or loader. Nested providers merge onto the parent.     |
-| `theme?`       | `string`               | `-`     | Theme name applied to the document by the outermost provider                   |
-| `colorScheme?` | `ColorScheme`          | `-`     | Color scheme. 'auto' is light on first paint / SSR                             |
-| `direction?`   | `TigerLocaleDirection` | `-`     | Explicit text direction. Wins over locale.direction and language-id inference. |
+| Prop           | Type                   | Default | Notes                                                                                                   |
+| -------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| `locale?`      | `TigerLocaleInput`     | `-`     | Locale object, Promise, or loader. Nested providers merge onto the parent.                              |
+| `dir?`         | `TigerLocaleDirection` | `-`     | Explicit text direction. Wins over locale.direction and language-id inference.                          |
+| `theme?`       | `string`               | `-`     | Theme name applied to the document by the outermost provider                                            |
+| `colorScheme?` | `ColorScheme`          | `-`     | Color scheme. 'auto' follows the class/attr already on <html>; light when neither is set (SSR default). |

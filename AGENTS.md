@@ -49,12 +49,12 @@ packages: core, vue, react, cli, mcp
 
 ### 生成物：只能重跑生成器，不得手改
 
-| 生成物                                                                                                                                         | 生成命令            | 漂移闸                    |
-| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------------- |
-| `skills/tigercat/references/{component-index.md,examples/*,shared/props/*,shared/api-summary.md,vue/index.md,react/index.md}`、`context7.json` | `pnpm docs:api`     | `pnpm docs:api:check`     |
-| `api-reports/*`                                                                                                                                | `pnpm api:baseline` | `pnpm api:baseline:check` |
-| `packages/*/package.json` 的 `exports`                                                                                                         | `pnpm exports:sync` | `pnpm exports:check`      |
-| `packages/core/src/tokens/*`                                                                                                                   | `pnpm tokens:build` | `pnpm tokens:check`       |
+| 生成物                                                                                                                                                                  | 生成命令            | 漂移闸                    |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------------- |
+| `skills/tigercat/references/{component-index.md,examples/*,shared/props/*,shared/api-summary.md,vue/index.md,react/index.md}`、`context7.json`                          | `pnpm docs:api`     | `pnpm docs:api:check`     |
+| `api-reports/*`                                                                                                                                                         | `pnpm api:baseline` | `pnpm api:baseline:check` |
+| `packages/*/package.json` 的 `exports`                                                                                                                                  | `pnpm exports:sync` | `pnpm exports:check`      |
+| `packages/core/src/tokens/*`、`packages/core/src/themes/forced-colors.ts`（事实源 `packages/core/tokens/tokens.json` 与 `packages/core/src/themes/forced-colors.json`） | `pnpm tokens:build` | `pnpm tokens:check`       |
 
 组件路由事实源是 `scripts/lib/public-components.mjs`；改公开组件先改事实源再重跑生成器。
 `skills/tigercat/references/` 下其余手写文档受 `pnpm api:validate` 的行数与体积预算约束。

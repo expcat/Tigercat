@@ -2,20 +2,13 @@
  * Request-scoped theme application.
  *
  * Each browser root (and each server render) owns a scope. CSS variables are
- * written into a style element on that root so light, `.dark`, and
- * `prefers-color-scheme` can disagree without a process-wide singleton.
- * `auto` does not stamp `.dark`; the first paint follows the class or
- * `data-tiger-color-scheme` already on the root.
+ * written into a style element on that root so light and `.dark` can disagree
+ * without a process-wide singleton. `auto` does not stamp `.dark`; the first
+ * paint follows the class or `data-tiger-color-scheme` already on the root.
  */
 
 import type { ThemeConfig, ThemePreset, ColorScheme } from '../types/theme'
-import {
-  THEME_CSS_VARS,
-  semanticColorsToCssVars,
-  isAllowedThemeValue,
-  setCssVarsCached,
-  removeCssVarsCached
-} from '../theme-runtime'
+import { THEME_CSS_VARS, semanticColorsToCssVars, isAllowedThemeValue } from '../theme-runtime'
 import { isBrowser } from '../utils/env'
 import { devWarn } from '../utils/dev-warn'
 import { defaultTheme } from './default/theme'
@@ -112,6 +105,34 @@ export function themeTransitionValue(duration: string, easing: string): string {
   return `${THEME_TRANSITION_PROPERTIES} ${duration} ${easing}`
 }
 
+const DEFAULT_TRANSITION_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)'
+/**
+ * Nested scopes compose shorthands against the easing custom property so an
+ * easing set on a parent keeps flowing until the nested config sets its own.
+ */
+const INHERITED_TRANSITION_EASING = 'var(--tiger-motion-ease-standard)'
+
+/** Derived transition shorthands for the motion durations the config sets. */
+function motionTransitionCssVars(
+  motion: ThemeConfig['motion'],
+  fallbackEasing: string
+): Record<string, string> {
+  const vars: Record<string, string> = {}
+  if (!motion) return vars
+  const easing = motion.easing ?? fallbackEasing
+  if (!isAllowedThemeValue(easing)) return vars
+  if (motion.durationBase) {
+    vars[THEME_TRANSITION_CSS_VARS.durationBase] = themeTransitionValue(motion.durationBase, easing)
+  }
+  if (motion.durationFast) {
+    vars[THEME_TRANSITION_CSS_VARS.durationFast] = themeTransitionValue(motion.durationFast, easing)
+  }
+  if (motion.durationSlow) {
+    vars[THEME_TRANSITION_CSS_VARS.durationSlow] = themeTransitionValue(motion.durationSlow, easing)
+  }
+  return vars
+}
+
 export function themeConfigToCssVars(config: ThemeConfig): Record<string, string> {
   const vars: Record<string, string> = {
     ...semanticColorsToCssVars(config.colors)
@@ -127,28 +148,7 @@ export function themeConfigToCssVars(config: ThemeConfig): Record<string, string
     }
   }
 
-  const motion = config.motion
-  if (motion) {
-    const easing = motion.easing ?? 'cubic-bezier(0.4, 0, 0.2, 1)'
-    if (motion.durationBase && isAllowedThemeValue(easing)) {
-      vars[THEME_TRANSITION_CSS_VARS.durationBase] = themeTransitionValue(
-        motion.durationBase,
-        easing
-      )
-    }
-    if (motion.durationFast && isAllowedThemeValue(easing)) {
-      vars[THEME_TRANSITION_CSS_VARS.durationFast] = themeTransitionValue(
-        motion.durationFast,
-        easing
-      )
-    }
-    if (motion.durationSlow && isAllowedThemeValue(easing)) {
-      vars[THEME_TRANSITION_CSS_VARS.durationSlow] = themeTransitionValue(
-        motion.durationSlow,
-        easing
-      )
-    }
-  }
+  Object.assign(vars, motionTransitionCssVars(config.motion, DEFAULT_TRANSITION_EASING))
 
   return vars
 }
@@ -191,6 +191,7 @@ export function themeConfigOwnCssVars(config: ThemeConfig): Record<string, strin
       if (varName && value && isAllowedThemeValue(value)) vars[varName] = value
     }
   }
+  Object.assign(vars, motionTransitionCssVars(config.motion, INHERITED_TRANSITION_EASING))
   return vars
 }
 
@@ -222,12 +223,33 @@ export interface TigerThemeScope {
 
 let nextScopeId = 0
 
+/** Root state the scope found before its first write, restored on release/dispose. */
+interface RootSnapshot {
+  themeScopeAttr: string | null
+  themeAttr: string | null
+  darkClass: boolean
+  colorSchemeStyle: string
+  colorSchemeAttr: string | null
+}
+
 function readExplicitScheme(root: HTMLElement | null): 'light' | 'dark' | null {
   if (!root) return null
   const attr = root.getAttribute('data-tiger-color-scheme')
   if (attr === 'dark' || attr === 'light') return attr
   if (root.classList.contains('dark')) return 'dark'
   return null
+}
+
+/**
+ * Scheme the scoped stylesheet actually paints for an `auto` scope: the root's
+ * own attribute/class wins, then the `.dark <scope>` rule — an ancestor dark
+ * class — applies unless the root explicitly says light.
+ */
+function readScopedScheme(root: HTMLElement | null): 'light' | 'dark' {
+  const own = readExplicitScheme(root)
+  if (own) return own
+  if (root?.parentElement?.closest('.dark')) return 'dark'
+  return 'light'
 }
 
 function decls(vars: Record<string, string>): string {
@@ -248,12 +270,13 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
     options.root === undefined ? (isBrowser() ? document.documentElement : null) : options.root
   const scopeId = `tiger-theme-${++nextScopeId}`
   let styleEl: HTMLStyleElement | null = null
-  let inlineNames: string[] = []
+  let rootSnapshot: RootSnapshot | null = null
+  let schemeStamp: { attr: string; darkClass: boolean; colorSchemeStyle: string } | null = null
   const listeners: ThemeChangeListener[] = []
 
   function resolved(): 'light' | 'dark' {
     if (colorScheme === 'dark' || colorScheme === 'light') return colorScheme
-    return readExplicitScheme(root) ?? 'light'
+    return readScopedScheme(root)
   }
 
   function ensureStyle(): HTMLStyleElement | null {
@@ -265,6 +288,38 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
       doc.head.appendChild(styleEl)
     }
     return styleEl
+  }
+
+  /**
+   * Release the class/attribute/colorScheme this scope stamped, keeping prior
+   * state. Each field is restored only while it still holds what this scope
+   * wrote, so external changes made after the stamp survive.
+   */
+  function releaseScheme(): void {
+    if (!root || !rootSnapshot || !schemeStamp) return
+    if (root.classList.contains('dark') === schemeStamp.darkClass) {
+      root.classList.toggle('dark', rootSnapshot.darkClass)
+    }
+    if (root.style.colorScheme === schemeStamp.colorSchemeStyle) {
+      root.style.colorScheme = rootSnapshot.colorSchemeStyle
+    }
+    if (root.getAttribute('data-tiger-color-scheme') === schemeStamp.attr) {
+      if (rootSnapshot.colorSchemeAttr === null) root.removeAttribute('data-tiger-color-scheme')
+      else root.setAttribute('data-tiger-color-scheme', rootSnapshot.colorSchemeAttr)
+    }
+    schemeStamp = null
+  }
+
+  /** Restore every marker this scope wrote — only while the root is still ours. */
+  function releaseRoot(): void {
+    if (!root || !rootSnapshot) return
+    if (root.getAttribute('data-tiger-theme-scope') !== scopeId) return
+    releaseScheme()
+    if (rootSnapshot.themeAttr === null) root.removeAttribute('data-tiger-theme')
+    else root.setAttribute('data-tiger-theme', rootSnapshot.themeAttr)
+    if (rootSnapshot.themeScopeAttr === null) root.removeAttribute('data-tiger-theme-scope')
+    else root.setAttribute('data-tiger-theme-scope', rootSnapshot.themeScopeAttr)
+    rootSnapshot = null
   }
 
   function apply(): void {
@@ -290,30 +345,34 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
     const canvas = 'background-color:var(--tiger-surface);color:var(--tiger-text)'
     const css = [
       `${selector}{${light};${canvas}}`,
-      `${selector}[data-tiger-color-scheme="dark"],${selector}.dark{${dark}}`,
-      `.dark ${selector}:not([data-tiger-color-scheme="light"]){${dark}}`,
-      `@media (prefers-color-scheme: dark){${selector}:not([data-tiger-color-scheme="light"]){${dark}}}`
+      `${selector}[data-tiger-color-scheme="dark"],${selector}.dark:not([data-tiger-color-scheme="light"]){${dark}}`,
+      `.dark ${selector}:not([data-tiger-color-scheme="light"]){${dark}}`
     ].join('')
 
     if (root && isBrowser()) {
+      rootSnapshot ??= {
+        themeScopeAttr: root.getAttribute('data-tiger-theme-scope'),
+        themeAttr: root.getAttribute('data-tiger-theme'),
+        darkClass: root.classList.contains('dark'),
+        colorSchemeStyle: root.style.colorScheme,
+        colorSchemeAttr: root.getAttribute('data-tiger-color-scheme')
+      }
       root.setAttribute('data-tiger-theme-scope', scopeId)
       root.setAttribute('data-tiger-theme', currentThemeName)
       if (colorScheme === 'auto') {
-        root.removeAttribute('data-tiger-color-scheme')
+        releaseScheme()
       } else {
         root.setAttribute('data-tiger-color-scheme', colorScheme)
         root.classList.toggle('dark', colorScheme === 'dark')
         root.style.colorScheme = colorScheme
+        schemeStamp = {
+          attr: colorScheme,
+          darkClass: colorScheme === 'dark',
+          colorSchemeStyle: colorScheme
+        }
       }
       const style = ensureStyle()
       if (style) style.textContent = css
-      const nextVars = resolved() === 'dark' ? darkVars : lightVars
-      if (nested) {
-        const stale = inlineNames.filter((name) => !(name in nextVars))
-        if (stale.length > 0) removeCssVarsCached(root, stale)
-        inlineNames = Object.keys(nextVars)
-      }
-      setCssVarsCached(root, nextVars)
     }
 
     const event: ThemeChangeEvent = { theme: currentThemeName, colorScheme: resolved() }
@@ -367,11 +426,7 @@ export function createTigerThemeScope(options: TigerThemeScopeOptions = {}): Tig
     dispose() {
       styleEl?.remove()
       styleEl = null
-      if (root && inlineNames.length > 0) removeCssVarsCached(root, inlineNames)
-      inlineNames = []
-      if (root?.getAttribute('data-tiger-theme-scope') === scopeId) {
-        root.removeAttribute('data-tiger-theme-scope')
-      }
+      releaseRoot()
       listeners.length = 0
       root = null
     }

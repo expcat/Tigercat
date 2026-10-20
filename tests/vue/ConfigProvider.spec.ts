@@ -341,6 +341,33 @@ describe('ConfigProvider', () => {
       expect(contextOnly?.getAttribute('data-tiger-theme-scope')).toBeNull()
     })
 
+    it('applies and releases the document when the document prop changes', async () => {
+      const ownsDocument = ref(false)
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ConfigProvider, { document: ownsDocument.value, theme: 'vibrant' }, () =>
+                h('span', 'child')
+              )
+          }
+        })
+      )
+
+      await nextTick()
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBeNull()
+
+      ownsDocument.value = true
+      await waitFor(() => {
+        expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('vibrant')
+      })
+
+      ownsDocument.value = false
+      await waitFor(() => {
+        expect(document.documentElement.getAttribute('data-tiger-theme')).toBeNull()
+      })
+    })
+
     it('does not remove an existing html dir when unmounting a locale-only provider', () => {
       document.documentElement.setAttribute('dir', 'rtl')
 

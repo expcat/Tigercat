@@ -1,5 +1,11 @@
 # Tigercat 迁移指南
 
+## 未发布（v3.0.0-rc.1 之后）
+
+公开组件 API 只有新增：`iconRegistry` 配置此前已在 Core 类型与 React Props 上公开，本轮 Vue ConfigProvider 补齐同名 runtime prop（应用自建的图标注册表，优先于父级注册表），两端 Icon 实际消费；Vue `VueIconProps.name` 与运行时对齐为 `IconName | (string & {})`。无破坏性 API 变化。
+
+包内容变化：`@expcat/tigercat-core` 不再附带 `tokens/tokens.dtcg.json`、`tokens/tokens.emitted.css` 和 `tokens/figma.tokens.json`。这三个文件从未列入包 `exports`，但随 tarball 分发；直接按路径引用它们的用法请改用 token 事实源 `tokens.json`、CSS 变量产物 `./tokens.css`（`tokens/tokens.css`）和 Figma 变量产物 `./figma-variables.json`（`tokens/figma-variables.json`）。
+
 ## v3.0.0-rc.1
 
 本版只有视觉修正，没有需要迁移的 API 变化。

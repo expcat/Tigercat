@@ -13,7 +13,8 @@ The runtime variables components read (`--tiger-primary`, `--tiger-radius-md`,
 Do not load a second palette, alias variables, or a `data-tiger-style` layer.
 
 First paint comes from the plugin (`:root` / `.dark`). `colorScheme="auto"` does not stamp
-`.dark`; it follows the class or `data-tiger-color-scheme` already on `<html>`.
+`.dark`; it follows the class or `data-tiger-color-scheme` already on `<html>`. When both
+are present, `data-tiger-color-scheme="light"` wins over a `dark` class.
 
 ## Runtime API
 
@@ -50,6 +51,14 @@ typography, motion, and spacing. Switching scheme does not drop radius or motion
 
 Solid fills use on-color tokens: `--tiger-primary-foreground`, `--tiger-secondary-foreground`,
 `--tiger-error-foreground`.
+
+Layout, Menu, PageHeader and DataTableWithToolbar structural separators use 30% of
+`--tiger-border`; default/success/warning Tag outlines follow the same treatment.
+Input borders retain their full token contrast. Menu selected backgrounds use the
+outline-hover token without a competing transparent background.
+
+ActivityFeed stacks timestamps below wrapping titles on narrow screens. WorkflowDesigner
+summary titles and type badges wrap without squeezing their labels.
 
 ## Switches
 

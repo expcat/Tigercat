@@ -15,10 +15,8 @@ import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import { FeedbackDepthContext, FeedbackHost } from './FeedbackHost'
 import { TigerConfigContext, TigerDocumentOwnerContext } from './tiger-config'
 import {
-  createTigerLocaleScope,
   createTigerThemeScope,
   createIconRegistry,
-  type TigerLocaleHandle,
   type TigerThemeScope,
   type IconRegistry
 } from '@expcat/tigercat-core'
@@ -36,6 +34,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   theme,
   colorScheme,
   document: documentOwner = true,
+  iconRegistry: iconRegistryProp,
   children
 }) => {
   const parent = useContext(TigerConfigContext)
@@ -43,15 +42,14 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
   const feedbackDepth = useContext(FeedbackDepthContext) + 1
   const isDocumentOwner = documentOwner !== false && !parentOwnsDocument
   const nestedScheme = colorScheme ?? parent.colorScheme
-  const localeScopeRef = useRef(createTigerLocaleScope())
-  const localeHandleRef = useRef<TigerLocaleHandle | null>(null)
   const documentHandleRef = useRef<DocumentConfigHandle | null>(null)
   const nestedScopeRef = useRef<TigerThemeScope | null>(null)
   const hostRef = useRef<HTMLDivElement | null>(null)
-  const iconRegistryRef = useRef<IconRegistry | null>(null)
-  if (!iconRegistryRef.current) {
-    iconRegistryRef.current = parent.iconRegistry ?? createIconRegistry()
-  }
+  // Explicit prop wins over the parent registry; the fallback is created once
+  // and disposed on unmount. Registries passed in stay owned by the caller.
+  const ownRegistryRef = useRef<IconRegistry | null>(null)
+  const registry =
+    iconRegistryProp ?? parent.iconRegistry ?? (ownRegistryRef.current ??= createIconRegistry())
 
   const isLazy = isLazyTigerLocale(locale)
   const [lazyLocale, setLazyLocale] = useState<Partial<TigerLocale> | undefined>(undefined)
@@ -107,27 +105,18 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
         direction: dir,
         theme,
         colorScheme,
-        iconRegistry: iconRegistryRef.current ?? undefined,
+        iconRegistry: registry,
         parent
       }),
-    [resolvedLocale, localeLoading, localeLoadError, dir, theme, colorScheme, parent]
+    [resolvedLocale, localeLoading, localeLoadError, dir, theme, colorScheme, registry, parent]
   )
 
-  if (!localeHandleRef.current) {
-    localeHandleRef.current = localeScopeRef.current.createHandle(value.locale)
-  } else {
-    localeHandleRef.current.update(value.locale)
-  }
-
   useLayoutEffect(() => {
-    const registry = iconRegistryRef.current
-    const ownsRegistry = parent.iconRegistry == null
     return () => {
-      localeHandleRef.current?.dispose()
-      localeHandleRef.current = null
-      if (ownsRegistry) registry?.dispose()
+      ownRegistryRef.current?.dispose()
+      ownRegistryRef.current = null
     }
-  }, [parent.iconRegistry])
+  }, [])
 
   useLayoutEffect(() => {
     if (!isDocumentOwner) return
@@ -156,8 +145,8 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
       })
     }
     nestedScopeRef.current.setTheme(theme)
-    if (nestedScheme) nestedScopeRef.current.setColorScheme(nestedScheme)
-    else nestedScopeRef.current.apply()
+    // Reset to auto instead of re-applying a stale explicit scheme.
+    nestedScopeRef.current.setColorScheme(nestedScheme ?? 'auto')
     return () => {
       nestedScopeRef.current?.dispose()
       nestedScopeRef.current = null
@@ -173,7 +162,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({
       lang: layerLang
     })
     documentHandleRef.current.setLocale(value.locale)
-  }, [value.theme, value.colorScheme, value.direction, layerLang, value.locale])
+  }, [isDocumentOwner, value.theme, value.colorScheme, value.direction, layerLang, value.locale])
 
   return (
     <TigerConfigContext.Provider value={value}>

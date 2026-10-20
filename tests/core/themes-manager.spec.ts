@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
   createTigerThemeScope,
   defaultTheme,
+  vibrantTheme,
   themeConfigToCssVars,
   setCssVarsCached,
   removeCssVarsCached,
@@ -14,33 +15,27 @@ import {
 } from '@expcat/tigercat-core'
 import type { ThemePreset } from '@expcat/tigercat-core'
 
-const ALL_VAR_NAMES = [
-  '--tiger-primary',
-  '--tiger-primary-hover',
-  '--tiger-surface',
-  '--tiger-text',
-  '--tiger-border',
-  '--tiger-success',
-  '--tiger-chart-1',
-  '--tiger-font-family',
-  '--tiger-radius-md',
-  '--tiger-shadow-md',
-  '--tiger-spacing-md',
-  '--tiger-transition-normal'
-]
-
-function clearAllInlineVars(): void {
-  for (const name of ALL_VAR_NAMES) {
-    document.documentElement.style.removeProperty(name)
-  }
+function clearRootState(): void {
+  document.documentElement.removeAttribute('style')
+  document.documentElement.removeAttribute('data-tiger-theme')
+  document.documentElement.removeAttribute('data-tiger-theme-scope')
+  document.documentElement.removeAttribute('data-tiger-color-scheme')
   document.documentElement.classList.remove('dark')
+  document.querySelectorAll('style[data-tiger-theme-style]').forEach((node) => node.remove())
+}
+
+/** Stylesheet text written by the live scope(s). */
+function scopeCss(): string {
+  return Array.from(document.querySelectorAll('style[data-tiger-theme-style]'))
+    .map((node) => node.textContent ?? '')
+    .join('\n')
 }
 
 describe('themes/manager — theme scope', () => {
   let ThemeManager: TigerThemeScope
 
   beforeEach(() => {
-    clearAllInlineVars()
+    clearRootState()
     ThemeManager = createTigerThemeScope({
       root: document.documentElement,
       theme: 'default',
@@ -52,7 +47,7 @@ describe('themes/manager — theme scope', () => {
 
   afterEach(() => {
     ThemeManager.dispose()
-    clearAllInlineVars()
+    clearRootState()
   })
 
   // -------------------------------------------------------------------------
@@ -132,7 +127,8 @@ describe('themes/manager — theme scope', () => {
     it('defineTheme() registers and immediately applies the preset', () => {
       ThemeManager.defineTheme(customPreset)
       expect(ThemeManager.getCurrentTheme()).toBe('unit-test-custom')
-      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('#ff00ff')
+      expect(scopeCss()).toContain('--tiger-primary:#ff00ff')
+      expect(scopeCss()).toContain('--tiger-primary:#ff66ff')
     })
   })
 
@@ -144,9 +140,7 @@ describe('themes/manager — theme scope', () => {
     it('switches the current theme and applies its CSS variables', () => {
       ThemeManager.setTheme('vibrant')
       expect(ThemeManager.getCurrentTheme()).toBe('vibrant')
-      // vibrant preset must apply *some* primary color
-      const primary = document.documentElement.style.getPropertyValue('--tiger-primary')
-      expect(primary).not.toBe('')
+      expect(scopeCss()).toContain(`--tiger-primary:${vibrantTheme.light.colors?.primary}`)
     })
 
     it('warns and is a no-op for an unregistered theme name', () => {
@@ -172,44 +166,34 @@ describe('themes/manager — theme scope', () => {
           colors: { primary: '#fedcba' }
         }
       })
-      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe('#abcdef')
-      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe('12px')
+      expect(scopeCss()).toContain('--tiger-primary:#abcdef')
+      expect(scopeCss()).toContain('--tiger-radius-md:12px')
       ThemeManager.defineTheme({
         name: 'without-primary',
         label: 'Without',
         light: { colors: { surface: '#111111' } },
         dark: { colors: { surface: '#000000' } }
       })
-      expect(document.documentElement.style.getPropertyValue('--tiger-surface')).toBe('#111111')
-      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe(
-        defaultTheme.light.colors?.primary
-      )
-      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
-        defaultTheme.light.radius?.md
-      )
+      expect(scopeCss()).toContain('--tiger-surface:#111111')
+      expect(scopeCss()).toContain(`--tiger-primary:${defaultTheme.light.colors?.primary}`)
+      expect(scopeCss()).toContain(`--tiger-radius-md:${defaultTheme.light.radius?.md}`)
     })
 
     it('setTheme("modern") writes the modern preset on the scope root', () => {
       ThemeManager.setTheme('modern')
       expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('modern')
       expect(document.documentElement.getAttribute('data-tiger-style')).toBeNull()
-      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe('12px')
+      expect(scopeCss()).toContain('--tiger-radius-md:12px')
       ThemeManager.setTheme('default')
       expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('default')
-      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
-        defaultTheme.light.radius?.md
-      )
+      expect(scopeCss()).toContain(`--tiger-radius-md:${defaultTheme.light.radius?.md}`)
     })
 
     it('keeps default radius when switching the default theme to dark', () => {
       ThemeManager.setTheme('default')
       ThemeManager.setColorScheme('dark')
-      expect(document.documentElement.style.getPropertyValue('--tiger-radius-md')).toBe(
-        defaultTheme.dark.radius?.md
-      )
-      expect(document.documentElement.style.getPropertyValue('--tiger-primary')).toBe(
-        defaultTheme.dark.colors?.primary
-      )
+      expect(scopeCss()).toContain(`--tiger-radius-md:${defaultTheme.dark.radius?.md}`)
+      expect(scopeCss()).toContain(`--tiger-primary:${defaultTheme.dark.colors?.primary}`)
     })
 
     it('maps non-color ThemeConfig sections to runtime CSS variables', () => {
@@ -280,9 +264,35 @@ describe('themes/manager — theme scope', () => {
 
     it('applies the dark color set when current preset has dark colors', () => {
       ThemeManager.setColorScheme('dark')
-      const primary = document.documentElement.style.getPropertyValue('--tiger-primary')
-      // default preset must specify a dark primary; non-empty is enough.
-      expect(primary).not.toBe('')
+      expect(document.documentElement.getAttribute('data-tiger-color-scheme')).toBe('dark')
+      expect(scopeCss()).toContain(`--tiger-primary:${defaultTheme.dark.colors?.primary}`)
+    })
+
+    it('releases scope-stamped scheme markers when switching back to auto', () => {
+      ThemeManager.setColorScheme('dark')
+      expect(document.documentElement.classList.contains('dark')).toBe(true)
+      ThemeManager.setColorScheme('auto')
+      expect(document.documentElement.classList.contains('dark')).toBe(false)
+      expect(document.documentElement.hasAttribute('data-tiger-color-scheme')).toBe(false)
+      expect(document.documentElement.style.colorScheme).toBe('')
+    })
+
+    it('dispose restores theme markers and scheme state the scope found', () => {
+      document.documentElement.setAttribute('data-tiger-theme', 'outside')
+      document.documentElement.classList.add('dark')
+      const outerScopeId = document.documentElement.getAttribute('data-tiger-theme-scope')
+      const scope = createTigerThemeScope({
+        root: document.documentElement,
+        theme: 'vibrant',
+        colorScheme: 'light'
+      })
+      scope.apply()
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('vibrant')
+      expect(document.documentElement.classList.contains('dark')).toBe(false)
+      scope.dispose()
+      expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('outside')
+      expect(document.documentElement.getAttribute('data-tiger-theme-scope')).toBe(outerScopeId)
+      expect(document.documentElement.classList.contains('dark')).toBe(true)
     })
   })
 
@@ -346,6 +356,19 @@ describe('themes/manager — theme scope', () => {
       document.documentElement.classList.add('dark')
       ThemeManager.setColorScheme('auto')
       expect(ThemeManager.getResolvedColorScheme()).toBe('dark')
+    })
+
+    it('resolves dark from an ancestor .dark class, matching the scoped stylesheet', () => {
+      const host = document.createElement('div')
+      document.body.append(host)
+      document.documentElement.classList.add('dark')
+      const scope = createTigerThemeScope({ root: host, theme: 'vibrant', colorScheme: 'auto' })
+      scope.apply()
+      expect(scope.getResolvedColorScheme()).toBe('dark')
+      scope.setColorScheme('light')
+      expect(scope.getResolvedColorScheme()).toBe('light')
+      scope.dispose()
+      host.remove()
     })
 
     it('does not subscribe a matchMedia listener for auto', () => {

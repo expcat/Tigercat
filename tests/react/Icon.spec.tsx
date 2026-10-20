@@ -6,8 +6,9 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { Icon } from '@expcat/tigercat-react/Icon'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import type { IconDefinition } from '@expcat/tigercat-core'
-import { resetDevWarnCache } from '@expcat/tigercat-core'
+import { createIconRegistry, resetDevWarnCache } from '@expcat/tigercat-core'
 import { renderWithProps, renderWithChildren } from '../utils/render-helpers-react'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -214,5 +215,37 @@ describe('Icon (React)', () => {
     expect(wrapper).toHaveAttribute('aria-label', 'Search')
     expect(wrapper).toHaveAttribute('aria-labelledby', 'label-id')
     expect(wrapper).not.toHaveAttribute('aria-hidden')
+  })
+
+  describe('iconRegistry from ConfigProvider', () => {
+    const reviewIcon: IconDefinition = {
+      viewBox: '0 0 24 24',
+      paths: ['M2 2h20v20H2z'],
+      mode: 'fill'
+    }
+
+    it('follows registry swaps and keeps app registries alive after unmount', () => {
+      const first = createIconRegistry()
+      const second = createIconRegistry()
+      first.register('review-only', reviewIcon)
+      second.register('review-only', { ...reviewIcon, paths: ['M4 4h16v16H4z'] })
+      const { container, rerender, unmount } = render(
+        <ConfigProvider iconRegistry={first}>
+          <Icon name="review-only" />
+        </ConfigProvider>
+      )
+      expect(container.querySelector('svg path')).toHaveAttribute('d', 'M2 2h20v20H2z')
+
+      rerender(
+        <ConfigProvider iconRegistry={second}>
+          <Icon name="review-only" />
+        </ConfigProvider>
+      )
+      expect(container.querySelector('svg path')).toHaveAttribute('d', 'M4 4h16v16H4z')
+
+      unmount()
+      expect(first.get('review-only')).toEqual(reviewIcon)
+      expect(second.get('review-only')?.paths).toEqual(['M4 4h16v16H4z'])
+    })
   })
 })

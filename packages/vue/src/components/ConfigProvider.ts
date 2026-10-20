@@ -29,13 +29,10 @@ import { FeedbackDepthKey, FeedbackHost } from './FeedbackHost'
 import { TigerConfigKey, TigerDocumentOwnerKey } from './tiger-config'
 import { OverlayOutletProvider } from '../utils/overlay-outlet'
 import {
-  createTigerLocaleScope,
   createTigerThemeScope,
   createIconRegistry,
-  type TigerLocaleScope,
   type TigerThemeScope,
-  type IconRegistry,
-  type TigerLocaleHandle
+  type IconRegistry
 } from '@expcat/tigercat-core'
 
 export type { TigerConfig }
@@ -61,6 +58,14 @@ export const configProviderProps = {
   document: {
     type: Boolean,
     default: true
+  },
+  /**
+   * App-owned icon registry. Wins over the parent registry; never disposed
+   * by this provider.
+   */
+  iconRegistry: {
+    type: Object as PropType<IconRegistry>,
+    default: undefined
   }
 }
 
@@ -72,16 +77,22 @@ export const ConfigProvider = defineComponent({
   props: configProviderProps,
   setup(props, { slots }) {
     const parentInjected = inject(TigerConfigKey, null)
-    const parentOwnsDocument = inject(TigerDocumentOwnerKey, false)
-    const isDocumentOwner = props.document !== false && !parentOwnsDocument
+    const parentOwnerRef = inject(TigerDocumentOwnerKey, null)
+    const parentOwnsDocument = computed(() => parentOwnerRef?.value ?? false)
+    const isDocumentOwner = computed(() => props.document !== false && !parentOwnsDocument.value)
     const parent = parentInjected ?? computed(() => ({ locale: enUS }) as TigerConfig)
-    const localeScope: TigerLocaleScope = createTigerLocaleScope()
-    let localeHandle: TigerLocaleHandle | null = null
     let documentHandle: DocumentConfigHandle | null = null
     let nestedScope: TigerThemeScope | null = null
     const hostRef = ref<HTMLElement | null>(null)
-    const ownedIcons = !parentInjected
-    const iconRegistry: IconRegistry = parentInjected?.value.iconRegistry ?? createIconRegistry()
+    // Explicit prop wins over the parent registry; the fallback is created on
+    // first use and disposed on unmount. Registries passed in stay caller-owned.
+    let ownedRegistry: IconRegistry | null = null
+    const iconRegistry = computed<IconRegistry>(() => {
+      const provided = props.iconRegistry ?? parent.value.iconRegistry
+      if (provided) return provided
+      ownedRegistry ??= createIconRegistry()
+      return ownedRegistry
+    })
 
     const resolvedLocale = ref<Partial<TigerLocale> | undefined>(
       isLazyTigerLocale(props.locale) ? undefined : getImmediateTigerLocale(props.locale)
@@ -135,22 +146,14 @@ export const ConfigProvider = defineComponent({
         direction: props.dir,
         theme: props.theme,
         colorScheme: props.colorScheme,
-        iconRegistry,
+        iconRegistry: iconRegistry.value,
         parent: parent.value
       })
     )
 
     watch(
-      () => merged.value.locale,
-      (locale) => {
-        if (!localeHandle) localeHandle = localeScope.createHandle(locale)
-        else localeHandle.update(locale)
-      },
-      { immediate: true }
-    )
-
-    watch(
       () => ({
+        ownsDocument: isDocumentOwner.value,
         theme: merged.value.theme,
         colorScheme: merged.value.colorScheme,
         direction: merged.value.direction,
@@ -158,7 +161,11 @@ export const ConfigProvider = defineComponent({
         locale: merged.value.locale
       }),
       (values) => {
-        if (!isDocumentOwner) return
+        if (!values.ownsDocument) {
+          documentHandle?.dispose()
+          documentHandle = null
+          return
+        }
         if (!documentHandle) documentHandle = createDocumentConfigHandle()
         documentHandle.apply({
           theme: values.theme,
@@ -173,12 +180,17 @@ export const ConfigProvider = defineComponent({
 
     watch(
       () => ({
+        blocked: isDocumentOwner.value || props.document === false,
         host: hostRef.value,
         theme: props.theme,
         colorScheme: props.colorScheme ?? parent.value.colorScheme
       }),
       (values) => {
-        if (isDocumentOwner || props.document === false) return
+        if (values.blocked) {
+          nestedScope?.dispose()
+          nestedScope = null
+          return
+        }
         if (!values.host || !values.theme) {
           nestedScope?.dispose()
           nestedScope = null
@@ -193,15 +205,14 @@ export const ConfigProvider = defineComponent({
           })
         }
         nestedScope.setTheme(values.theme)
-        if (values.colorScheme) nestedScope.setColorScheme(values.colorScheme)
-        else nestedScope.apply()
+        // Reset to auto instead of re-applying a stale explicit scheme.
+        nestedScope.setColorScheme(values.colorScheme ?? 'auto')
       }
     )
 
     onBeforeUnmount(() => {
-      localeHandle?.dispose()
-      localeHandle = null
-      if (ownedIcons) iconRegistry.dispose()
+      ownedRegistry?.dispose()
+      ownedRegistry = null
       documentHandle?.dispose()
       documentHandle = null
       nestedScope?.dispose()
@@ -209,7 +220,10 @@ export const ConfigProvider = defineComponent({
     })
 
     provide(TigerConfigKey, merged)
-    provide(TigerDocumentOwnerKey, isDocumentOwner || parentOwnsDocument)
+    provide(
+      TigerDocumentOwnerKey,
+      computed(() => isDocumentOwner.value || parentOwnsDocument.value)
+    )
     provide(FeedbackDepthKey, inject(FeedbackDepthKey, 0) + 1)
 
     return () =>

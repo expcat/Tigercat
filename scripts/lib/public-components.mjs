@@ -183,6 +183,13 @@ export const FRAMEWORK_COMPONENTS = {
         description: 'Locale object, Promise, or loader. Nested providers merge onto the parent.'
       },
       {
+        name: 'dir?',
+        type: 'TigerLocaleDirection',
+        defaultValue: '-',
+        description:
+          'Explicit text direction. Wins over locale.direction and language-id inference.'
+      },
+      {
         name: 'theme?',
         type: 'string',
         defaultValue: '-',
@@ -192,14 +199,20 @@ export const FRAMEWORK_COMPONENTS = {
         name: 'colorScheme?',
         type: 'ColorScheme',
         defaultValue: '-',
-        description: "Color scheme. 'auto' is light on first paint / SSR"
+        description:
+          "Color scheme. 'auto' follows the class/attr already on <html>; light when neither is set (SSR default)."
       },
       {
-        name: 'direction?',
-        type: 'TigerLocaleDirection',
+        name: 'document?',
+        type: 'boolean',
         defaultValue: '-',
-        description:
-          'Explicit text direction. Wins over locale.direction and language-id inference.'
+        description: 'When false, this provider only supplies context and does not write <html>.'
+      },
+      {
+        name: 'iconRegistry?',
+        type: 'IconRegistry',
+        defaultValue: '-',
+        description: 'App-owned icon registry. Wins over the parent registry.'
       }
     ]
   },

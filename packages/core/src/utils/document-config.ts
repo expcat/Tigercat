@@ -107,7 +107,7 @@ function paintOwner(root: HTMLElement, state: OwnerState): void {
   const values = current.values
   if (values.theme) current.themeScope.setTheme(values.theme)
   if (values.colorScheme) current.themeScope.setColorScheme(values.colorScheme)
-  else current.themeScope.apply()
+  else current.themeScope.setColorScheme('auto')
   if (values.direction) {
     root.setAttribute('dir', values.direction)
     root.setAttribute('data-tiger-dir', values.direction)

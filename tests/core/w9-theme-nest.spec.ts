@@ -7,9 +7,11 @@ import { resolveAnchoredOverlayTarget } from '@expcat/tigercat-core'
 import {
   createTigerThemeScope,
   nearestThemeRoot,
-  themeConfigOwnCssVars
+  themeConfigOwnCssVars,
+  THEME_TRANSITION_PROPERTIES
 } from '../../packages/core/src/themes/manager'
 import { minimalTheme } from '../../packages/core/src/themes/minimal/theme'
+import { modernTheme } from '../../packages/core/src/themes/modern/theme'
 
 describe('nested theme roots', () => {
   afterEach(() => {
@@ -40,14 +42,35 @@ describe('nested theme roots', () => {
     expect(nearestThemeRoot(parent)).toBe(parent)
     expect(parent.style.getPropertyValue('--tiger-font-family')).toBe('ParentFont')
     expect(child.style.getPropertyValue('--tiger-font-family')).toBe('')
-    expect(child.style.getPropertyValue('--tiger-primary')).toBe(minimalTheme.light.colors?.primary)
-    const css = document.head.querySelector('style[data-tiger-theme-style]')?.textContent ?? ''
-    expect(css).toContain('background-color:var(--tiger-surface)')
-    expect(css).toContain('color:var(--tiger-text)')
+    const childScopeId = child.getAttribute('data-tiger-theme-scope')
+    const childCss =
+      document.head.querySelector(`style[data-tiger-theme-style="${childScopeId}"]`)?.textContent ??
+      ''
+    expect(childCss).toContain(`--tiger-primary:${minimalTheme.light.colors?.primary}`)
+    expect(childCss).toContain('background-color:var(--tiger-surface)')
+    expect(childCss).toContain('color:var(--tiger-text)')
     expect(themeConfigOwnCssVars(minimalTheme.light)).not.toHaveProperty('--tiger-font-family')
 
     childScope.dispose()
     parentScope.dispose()
+  })
+
+  it('derives nested transition shorthands for the motion durations a layer sets', () => {
+    const vars = themeConfigOwnCssVars(modernTheme.light)
+    expect(vars['--tiger-transition-quick']).toBe(
+      `${THEME_TRANSITION_PROPERTIES} 150ms cubic-bezier(0.2, 0, 0, 1)`
+    )
+    expect(vars['--tiger-transition-base']).toBe(
+      `${THEME_TRANSITION_PROPERTIES} 200ms cubic-bezier(0.2, 0, 0, 1)`
+    )
+    // Unset duration keys keep inheriting the parent shorthand.
+    expect(themeConfigOwnCssVars({ motion: { durationBase: '240ms' } })).not.toHaveProperty(
+      '--tiger-transition-quick'
+    )
+    // A layer without its own easing composes against the inherited easing variable.
+    expect(
+      themeConfigOwnCssVars({ motion: { durationBase: '240ms' } })['--tiger-transition-base']
+    ).toBe(`${THEME_TRANSITION_PROPERTIES} 240ms var(--tiger-motion-ease-standard)`)
   })
 
   it('sends a portal to the nearest theme root instead of documentElement', () => {

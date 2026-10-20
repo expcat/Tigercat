@@ -12,6 +12,7 @@ import {
   warnUnknownIconName,
   type IconProps as CoreIconProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 
 export interface IconProps extends CoreIconProps, React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode
@@ -54,6 +55,7 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
   { name, icon, size = 'md', color, className, style, children, ...props },
   ref
 ) {
+  const config = useTigerConfig()
   const resolvedSize = resolveIconSize(size)
   const iconClasses = classNames(iconWrapperClasses, className)
   const iconStyle = resolveIconWrapperStyle(color, style as Record<string, unknown> | undefined) as
@@ -63,7 +65,7 @@ export const Icon = forwardRef<HTMLSpanElement, IconProps>(function Icon(
 
   const hasChildren = React.Children.count(children) > 0
   const definition = !hasChildren
-    ? (icon ?? (name ? getIconDefinition(name) : undefined))
+    ? (icon ?? (name ? getIconDefinition(name, config.iconRegistry) : undefined))
     : undefined
 
   if (!hasChildren && !definition && name) {

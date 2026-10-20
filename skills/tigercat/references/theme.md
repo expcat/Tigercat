@@ -13,7 +13,8 @@ The runtime variables components read (`--tiger-primary`, `--tiger-radius-md`,
 Do not load a second palette, alias variables, or a `data-tiger-style` layer.
 
 First paint comes from the plugin (`:root` / `.dark`). `colorScheme="auto"` does not stamp
-`.dark`; it follows the class or `data-tiger-color-scheme` already on `<html>`.
+`.dark`; it follows the class or `data-tiger-color-scheme` already on `<html>`. When both
+are present, `data-tiger-color-scheme="light"` wins over a `dark` class.
 
 ## Runtime API
 

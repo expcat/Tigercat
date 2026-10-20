@@ -53,14 +53,16 @@ describe('Modern theme preset application', () => {
     const scope = createTigerThemeScope()
     scope.setTheme('modern')
     expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('modern')
-    expect(document.documentElement.style.getPropertyValue('--tiger-radius-md').trim()).toBe('12px')
+    const scopeCss = (): string =>
+      Array.from(document.querySelectorAll('style[data-tiger-theme-style]'))
+        .map((node) => node.textContent ?? '')
+        .join('')
+    expect(scopeCss()).toContain('--tiger-radius-md:12px')
     expect(document.documentElement.getAttribute('data-tiger-style')).toBeNull()
 
     scope.setTheme('default')
     expect(document.documentElement.getAttribute('data-tiger-theme')).toBe('default')
-    expect(document.documentElement.style.getPropertyValue('--tiger-radius-md').trim()).toBe(
-      defaultTheme.light.radius?.md
-    )
+    expect(scopeCss()).toContain(`--tiger-radius-md:${defaultTheme.light.radius?.md}`)
     scope.dispose()
   })
 })
