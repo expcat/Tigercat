@@ -5,6 +5,7 @@ import {
   clampPaginationJump,
   createSectionScrollModel,
   createTypeaheadHighlight,
+  findTypeaheadMatchIndex,
   isStepClickable,
   isTypeaheadHighlight,
   measureNavigationIndicator,
@@ -94,6 +95,14 @@ describe('W9 T07 navigation', () => {
     expect(match?.index).toBe(1)
     expect(isTypeaheadHighlight('Beta', 'b')).toBe(true)
     expect(typeaheadShortcutColumn('⌘K')).toBe('⌘K')
+  })
+
+  it('E6b cycles a repeated letter whose lowercase form expands', () => {
+    const labels = ['İstanbul', 'İzmir', 'Island']
+    expect(findTypeaheadMatchIndex(labels, 'İ', 0)).toBe(0)
+    expect(findTypeaheadMatchIndex(labels, 'İİ', 0)).toBe(1)
+    expect(findTypeaheadMatchIndex(labels, 'İİ', 1)).toBe(0)
+    expect(findTypeaheadMatchIndex(['Apple', 'Apricot'], 'Aa', 0)).toBe(1)
   })
 
   it('E7 builds a menu from collapsed breadcrumb items', () => {

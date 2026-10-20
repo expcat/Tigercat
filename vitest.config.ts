@@ -28,7 +28,13 @@ function buildHookAliases(framework: 'vue' | 'react') {
   const hookDir = framework === 'vue' ? 'composables' : 'hooks'
   const names =
     framework === 'vue'
-      ? ['useDrag', 'useFormController', 'useChartInteraction', 'useResponsiveChartSize']
+      ? [
+          'useDrag',
+          'useFormController',
+          'useChartInteraction',
+          'useResponsiveChartSize',
+          'useFullscreen'
+        ]
       : [
           'useDrag',
           'useControlledState',

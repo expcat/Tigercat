@@ -109,6 +109,11 @@ function hasTigerLocaleShape(value: unknown): value is Partial<TigerLocale> {
 function resolveTigerLocaleModule(module: TigerLocaleLazyModule): Partial<TigerLocale> | undefined {
   if (!isRecord(module)) return undefined
 
+  // A complete locale object is itself the result. Scanning its sections would
+  // mistake the datePicker preset (the first section with a locale key) for the
+  // whole pack and drop common and every other section.
+  if (hasTigerLocaleShape(module)) return module
+
   const moduleRecord = module as Record<string, unknown>
   const defaultExport = moduleRecord.default
   if (hasTigerLocaleShape(defaultExport)) return defaultExport

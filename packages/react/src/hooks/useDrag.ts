@@ -53,24 +53,38 @@ export function useDrag(options: UseDragOptions = {}): UseDragReturn {
 
   const ownIdRef = useRef<string | null>(null)
   if (ownIdRef.current === null) ownIdRef.current = createDragContainerId()
-  const controllerRef = useRef<ListReorderController | null>(null)
-  if (controllerRef.current === null) {
-    controllerRef.current = createListReorderController({
+
+  const createController = () =>
+    createListReorderController({
       getContainerId: () => optionsRef.current.containerId ?? ownIdRef.current ?? 'tiger-drag',
       getConfig: () => optionsRef.current.config,
       getCallbacks: () => callbacksOf(optionsRef.current)
     })
-  }
 
+  // Created during render so SSR and the first commit already expose complete
+  // bindings and state. Construction has no global side effects; the controller
+  // joins the cross-container registry only once the effect below subscribes.
+  const controllerRef = useRef<ListReorderController | null>(null)
+  if (controllerRef.current === null) {
+    controllerRef.current = createController()
+  }
   const [, rerender] = useReducer((count: number) => count + 1, 0)
 
   useEffect(() => {
     const controller = controllerRef.current
     if (!controller) return undefined
     const unsubscribe = controller.subscribe(rerender)
+    // Align the render snapshot with the live controller: StrictMode replays
+    // this effect after the cleanup replaced the disposed render-time instance,
+    // and the next render must read the replacement.
+    rerender()
     return () => {
       unsubscribe()
       controller.dispose()
+      // Never leave a disposed instance behind: a replayed effect (StrictMode)
+      // or a later render must find a live controller. The replacement stays
+      // inert until the next effect subscribes it.
+      controllerRef.current = createController()
     }
   }, [])
 

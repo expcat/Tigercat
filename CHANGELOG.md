@@ -9,6 +9,11 @@
 - **ConfigProvider（Vue / React）**：document ownership 改为响应式，ownership 变化时交接 document handle 与嵌套 scope。接通已公开的 `iconRegistry` 配置（Core 类型与 React Props 此前已存在），Vue ConfigProvider 补齐同名 runtime prop，两端 Icon 实际消费：应用传入的注册表优先于父级，provider 只 dispose 自己创建的注册表。移除无生产读者的 locale scope 接线。
 - **forced-colors（Core）**：forced-colors 规则收成单一事实源，tailwind 插件、`tokens.css` 与公开 `forcedColorsCss` 同源生成；插件的完整规则不变，`forcedColorsCss` 与 `tokens.css` 补齐了此前缺失的对比度变量与焦点轮廓。
 - **包内容**：`@expcat/tigercat-core` 删除 `tokens.dtcg.json` / `tokens.emitted.css` / `figma.tokens.json` 三个未列入 `exports` 的附带文件，迁移说明见 [MIGRATION.md](docs/MIGRATION.md)。
+- **拖拽会话（Core / React）**：跨容器拖拽在切换目标、结束、取消和源容器销毁时同步更新相关列表的状态。React `useDrag` 在 StrictMode 重放 effect 后保持完整的跨容器交互，SSR 与首帧绑定保持不变。
+- **useControlledState（React）**：`postState` 每次返回新引用的受控用法不再触发无限重渲染；释放控制时保留最后实际显示的值，包括规范化规则动态变化的场景。
+- **i18n（Core）**：懒加载直接返回完整语言包对象时，不再把 datePicker 分区误当整个包而丢掉 common 等其余分区。
+- **高亮与 typeahead（Core）**：大小写折叠改变 UTF-16 长度（如 İ 折叠为 i 加组合符）时，Highlight 命中区间正确映射回原文偏移；typeahead 重复字母循环按每个字符的完整折叠串比较。
+- **Vue**：`useFullscreen` 在组件卸载时解除 document 全屏事件监听；删除未使用的内部 `coerce-class-value` 文件与 `createFilledIcon` 工具。
 
 ## v3.0.0-rc.1（2026-10-05）
 

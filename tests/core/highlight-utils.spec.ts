@@ -95,6 +95,16 @@ describe('highlight-utils', () => {
       expect(findHighlightRanges('testing', ['test', 'sting'])).toEqual([{ start: 0, end: 7 }])
     })
 
+    it('maps case-folding length changes back to original text offsets', () => {
+      expect(
+        getHighlightSegments('İstanbul', 'stan').filter((segment) => segment.highlighted)
+      ).toEqual([{ text: 'stan', highlighted: true, start: 1, end: 5 }])
+      expect(findHighlightRanges('İXİ', 'x')).toEqual([{ start: 1, end: 2 }])
+      expect(getHighlightSegments('😀İX', '😀').filter((segment) => segment.highlighted)).toEqual([
+        { text: '😀', highlighted: true, start: 0, end: 2 }
+      ])
+    })
+
     it('escapes string keywords so punctuation is literal', () => {
       expect(findHighlightRanges('a+b and aab', 'a+b')).toEqual([{ start: 0, end: 3 }])
     })

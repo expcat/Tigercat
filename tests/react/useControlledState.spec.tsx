@@ -214,4 +214,38 @@ describe('useControlledState', () => {
     expect(result.current[0]).toBe(0)
     expect(onChange).toHaveBeenCalledWith(0)
   })
+
+  it('controlled with a fresh-reference postState renders, notifies, and releases cleanly', () => {
+    const onChange = vi.fn()
+    type Rect = { x: number }
+    const controlled = { x: 150 }
+    const { result, rerender } = renderHook(
+      ({ value, limit }: { value?: Rect; limit: number }) =>
+        useControlledState<Rect>({
+          value,
+          defaultValue: { x: 0 },
+          onChange,
+          postState: (next) => ({ x: Math.min(limit, Math.max(0, next.x)) })
+        }),
+      { initialProps: { value: controlled as Rect | undefined, limit: 100 } }
+    )
+
+    expect(result.current[0]).toEqual({ x: 100 })
+
+    act(() => result.current[1]({ x: 120 }))
+    expect(onChange).toHaveBeenCalledWith({ x: 100 })
+    expect(result.current[0]).toEqual({ x: 100 })
+
+    // Same controlled reference, tighter rule: display renormalizes and the
+    // release below must keep this displayed value, not a stale snapshot.
+    rerender({ value: controlled, limit: 50 })
+    expect(result.current[0]).toEqual({ x: 50 })
+
+    rerender({ value: undefined, limit: 200 })
+    expect(result.current[0]).toEqual({ x: 50 })
+
+    act(() => result.current[1]({ x: -5 }))
+    expect(result.current[0]).toEqual({ x: 0 })
+    expect(onChange).toHaveBeenLastCalledWith({ x: 0 })
+  })
 })

@@ -50,16 +50,29 @@ export function useControlledState<T, Args extends unknown[] = []>(
     return fn ? fn(next) : next
   }
 
-  const [internalValue, setInternalValue] = useState(() => applyPostState(defaultValue))
   const isControlled = controlledValue !== undefined
+  const [internalValue, setInternalValue] = useState(() =>
+    applyPostState(isControlled ? (controlledValue as T) : defaultValue)
+  )
   const raw = isControlled ? (controlledValue as T) : internalValue
   const value = applyPostState(raw)
 
-  // Keep internal as the last displayed value so dropping `value` does not
-  // snap back to defaultValue. React allows this render-phase sync.
-  if (isControlled && !Object.is(internalValue, value)) {
-    setInternalValue(value)
+  // On the controlled -> uncontrolled edge, seed internal with the last value
+  // actually displayed, so dropping `value` keeps it instead of snapping back
+  // to defaultValue. The snapshot is only written during render: setter
+  // requests the parent did not accept never reach it, and a postState
+  // returning a fresh reference per call cannot loop this one-time sync.
+  const wasControlledRef = useRef(isControlled)
+  const displayedRef = useRef(value)
+  if (
+    !isControlled &&
+    wasControlledRef.current &&
+    !Object.is(internalValue, displayedRef.current)
+  ) {
+    setInternalValue(displayedRef.current)
   }
+  wasControlledRef.current = isControlled
+  displayedRef.current = value
 
   const valueRef = useRef(value)
   valueRef.current = value

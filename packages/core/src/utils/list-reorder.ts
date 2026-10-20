@@ -4,6 +4,11 @@
  * Each controller owns its drag session. `drop` / `endDrag` finish only that
  * session. A second list can drag at the same time. Cross-container hover
  * updates the source session and is visible to the list currently targeted.
+ *
+ * Construction has no global side effect: a controller joins the document
+ * registry when it is subscribed or starts a session, and leaves it only when
+ * disposed. Ending a session also notifies peers, so a list showing that
+ * session as an incoming drag releases it on drop, cancel, or dispose.
  */
 
 import type {
@@ -146,6 +151,7 @@ export function createListReorderController(
 ): ListReorderController {
   let session: ControllerSession | null = null
   let pointerSession: DocumentDragSession | null = null
+  let disposed = false
   const listeners = new Set<() => void>()
   const registry = activeRegistry()
 
@@ -160,6 +166,14 @@ export function createListReorderController(
   const clearSession = () => {
     session = null
     emit()
+    notifyPeers()
+  }
+
+  const notifyPeers = (): void => {
+    if (!registry) return
+    for (const peer of registry) {
+      if (peer !== record) peer.notify()
+    }
   }
 
   const visibleState = (): DragState => {
@@ -188,8 +202,16 @@ export function createListReorderController(
       event.preventDefault()
       if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
     }
-    handleDragOver(session.state, item, nextContainerId, session.getCallbacks())
+    const activeSession = session
+    const previousTarget = activeSession.state.targetContainerId
+    handleDragOver(activeSession.state, item, nextContainerId, activeSession.getCallbacks())
     emit()
+    // A peer showing this session as its incoming drag must re-read the state
+    // when the hover moves to another container. The onDragOver callback may
+    // have ended or replaced this session; those paths already notify peers.
+    if (session === activeSession && activeSession.state.targetContainerId !== previousTarget) {
+      notifyPeers()
+    }
   }
 
   const finishDrop = (event?: DragBindingEvent): DragDropEvent | null => {
@@ -205,6 +227,7 @@ export function createListReorderController(
       session = null
     }
     emit()
+    if (result) notifyPeers()
     return result
   }
 
@@ -217,18 +240,20 @@ export function createListReorderController(
     finishDrop,
     notify: emit
   }
-  registry?.add(record)
 
   const getState = (): DragState => visibleState()
 
   const subscribe = (listener: () => void): (() => void) => {
+    if (disposed) return () => {}
     listeners.add(listener)
+    registry?.add(record)
     return () => {
       listeners.delete(listener)
     }
   }
 
   const startDrag = (item: DragItem, event?: DragBindingEvent): void => {
+    if (disposed) return
     const config = configOf()
     if (!isDragEnabled(config)) {
       event?.preventDefault()
@@ -246,6 +271,7 @@ export function createListReorderController(
       }
     }
 
+    const replacedLiveSession = Boolean(session?.state.isDragging)
     if (session?.state.isDragging) {
       handleDragEnd(session.state, true, session.getCallbacks())
     }
@@ -261,7 +287,10 @@ export function createListReorderController(
       endedAfterDrop: false,
       lastDropItem: null
     }
+    registry?.add(record)
     emit()
+    // Peers may still show the session this one replaced.
+    if (replacedLiveSession) notifyPeers()
   }
 
   const dragOver = (
@@ -302,12 +331,14 @@ export function createListReorderController(
     if (session.endedAfterDrop || !session.state.isDragging) {
       session = null
       emit()
+      notifyPeers()
       return
     }
     const isCancelled = cancelled ?? !session.didDrop
     handleDragEnd(session.state, isCancelled, session.getCallbacks())
     session = null
     emit()
+    notifyPeers()
   }
 
   const hitTestDrag = (doc: Document | undefined, x: number, y: number): void => {
@@ -471,12 +502,15 @@ export function createListReorderController(
     getItemBindings,
     getZoneBindings,
     dispose: () => {
+      if (disposed) return
+      disposed = true
       pointerSession?.dispose()
       pointerSession = null
       registry?.delete(record)
       if (session) {
         session = null
         emit()
+        notifyPeers()
       }
       listeners.clear()
     }

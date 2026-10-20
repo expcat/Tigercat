@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, render, renderHook, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { useDrag } from '@expcat/tigercat-react/useDrag'
-import { clearActiveListDrag, type DragItem } from '@expcat/tigercat-core'
+import { clearActiveListDrag, type DragDropEvent, type DragItem } from '@expcat/tigercat-core'
 
 function makeItems(containerId = 'list-a'): DragItem[] {
   return [
@@ -214,5 +214,54 @@ describe('useDrag', () => {
     act(() => result.current.startDrag(item, makeDragEvent()))
     expect(result.current.isDragging).toBe(false)
     expect(result.current.getDragItemProps(item).draggable).toBe(false)
+  })
+
+  it('keeps cross-container hover, drop, and cancel in sync under StrictMode', () => {
+    const drags = {} as Record<'list-a' | 'list-b' | 'list-c', ReturnType<typeof useDrag>>
+
+    function Probe({ id }: { id: 'list-a' | 'list-b' | 'list-c' }) {
+      drags[id] = useDrag({ containerId: id, config: { crossContainer: true } })
+      return null
+    }
+
+    render(
+      <React.StrictMode>
+        <Probe id="list-a" />
+        <Probe id="list-b" />
+        <Probe id="list-c" />
+      </React.StrictMode>
+    )
+
+    const itemsA = makeItems('list-a')
+    act(() => drags['list-a'].startDrag(itemsA[0]))
+    act(() => drags['list-b'].dragOver({ id: 'x', index: 0, containerId: 'list-b' }))
+    expect(drags['list-a'].state.targetContainerId).toBe('list-b')
+    expect(drags['list-b'].state.isDragging).toBe(true)
+
+    // Hover moves on to another container: the previous target releases the
+    // incoming-drag state immediately.
+    act(() => drags['list-c'].dragOver({ id: 'x', index: 0, containerId: 'list-c' }))
+    expect(drags['list-a'].state.targetContainerId).toBe('list-c')
+    expect(drags['list-b'].state.isDragging).toBe(false)
+    expect(drags['list-c'].state.isDragging).toBe(true)
+
+    let dropResult: DragDropEvent | null = null
+    act(() => {
+      dropResult = drags['list-c'].drop(makeDragEvent())
+    })
+    expect(dropResult).toMatchObject({
+      item: expect.objectContaining({ id: 'a' }),
+      fromContainerId: 'list-a',
+      toContainerId: 'list-c'
+    })
+    expect(drags['list-a'].state.isDragging).toBe(false)
+    expect(drags['list-c'].state.isDragging).toBe(false)
+
+    act(() => drags['list-a'].startDrag(itemsA[1]))
+    act(() => drags['list-b'].dragOver({ id: 'x', index: 0, containerId: 'list-b' }))
+    expect(drags['list-b'].state.isDragging).toBe(true)
+    act(() => drags['list-a'].endDrag(true))
+    expect(drags['list-a'].state.isDragging).toBe(false)
+    expect(drags['list-b'].state.isDragging).toBe(false)
   })
 })

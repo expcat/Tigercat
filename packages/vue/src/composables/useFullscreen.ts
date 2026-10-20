@@ -78,11 +78,12 @@ export function useFullscreen(
       sync()
       stop = subscribeFullscreenChange(sync)
     })
-  } else if (typeof window !== 'undefined') {
-    supported.value = isFullscreenSupported()
     onBeforeUnmount(() => {
       stop?.()
+      stop = undefined
     })
+  } else if (typeof window !== 'undefined') {
+    supported.value = isFullscreenSupported()
   }
 
   return {

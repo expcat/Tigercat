@@ -136,8 +136,13 @@ export function findTypeaheadMatchIndex(
 ): number {
   const raw = query.toLocaleLowerCase()
   if (!raw || labels.length === 0) return -1
-  const repeated = raw.length > 1 && [...raw].every((char) => char === raw[0])
-  const needle = repeated ? raw[0] : raw
+  // Repetition compares each typed character's own fold: folding can expand
+  // one typed char into several code units (U+0130 'İ' -> 'i' + U+0307), so the
+  // folded query's code units are not the typed sequence. The cycle needle is
+  // the first character's complete fold.
+  const foldedChars = [...query].map((char) => char.toLocaleLowerCase())
+  const repeated = foldedChars.length > 1 && foldedChars.every((entry) => entry === foldedChars[0])
+  const needle = repeated ? foldedChars[0] : raw
   const start = repeated ? fromIndex + 1 : fromIndex < 0 ? 0 : fromIndex
   for (let offset = 0; offset < labels.length; offset++) {
     const index = (start + offset + labels.length) % labels.length

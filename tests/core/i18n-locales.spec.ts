@@ -424,6 +424,15 @@ describe('i18n locale presets', () => {
     expect(locale?.dataExport?.triggerText).toBe('Download')
   })
 
+  it('resolves a lazy module that resolves to a complete locale object', async () => {
+    const fromPromise = await resolveTigerLocale(Promise.resolve(zhCN))
+    expect(fromPromise?.common?.okText).toBe('确定')
+    expect(fromPromise?.datePicker?.locale).toBe(zhCN.datePicker?.locale)
+
+    const fromLoader = await resolveTigerLocale(() => Promise.resolve(zhCN))
+    expect(fromLoader?.common?.okText).toBe('确定')
+  })
+
   it('mergeTigerLocale keeps colorPicker blocks', () => {
     const merged = mergeTigerLocale(
       { colorPicker: { trigger: 'Base trigger', clear: 'Base clear' } },

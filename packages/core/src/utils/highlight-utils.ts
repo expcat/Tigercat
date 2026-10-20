@@ -89,12 +89,29 @@ function collectStringRanges(
   const needle = caseSensitive ? keyword : keyword.toLowerCase()
   if (!needle) return []
 
+  // Case folding can change UTF-16 length (U+0130 'İ' -> 'i' + U+0307), so a
+  // folded offset is not an original offset. Map each folded unit back to the
+  // original index. The folded string itself stays a whole-string toLowerCase,
+  // keeping context-sensitive mappings (e.g. Greek final sigma) intact.
+  let foldMap: number[] | null = null
+  if (!caseSensitive && source.length !== text.length) {
+    foldMap = []
+    for (let index = 0; index < text.length; index++) {
+      // Per-unit fold length is 2 only for U+0130; astral case mappings keep
+      // surrogate-pair length, so per-unit lengths stay aligned with source.
+      const foldedLength = text[index].toLowerCase().length
+      for (let offset = 0; offset < foldedLength; offset++) foldMap.push(index)
+    }
+  }
+
   const ranges: HighlightRange[] = []
   let from = 0
   while (from <= source.length - needle.length) {
     const index = source.indexOf(needle, from)
     if (index === -1) break
-    ranges.push({ start: index, end: index + needle.length })
+    const start = foldMap ? foldMap[index] : index
+    const end = foldMap ? foldMap[index + needle.length - 1] + 1 : index + needle.length
+    ranges.push({ start, end })
     if (!global) break
     from = index + needle.length
   }
