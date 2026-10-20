@@ -19,11 +19,13 @@ export const splitterPaneBaseClasses = 'tiger-splitter-pane relative overflow-au
 export const splitterGutterBaseClasses =
   'relative flex-shrink-0 bg-[var(--tiger-border)] tiger-motion-aware transition-colors duration-150 hover:bg-[var(--tiger-primary)] z-10 touch-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring)]'
 
+// Centered with physical left-1/2 + negative half-width translate: logical
+// start-1/2 anchors on the right in RTL and pushes the hit area off-center.
 export const splitterGutterHorizontalClasses =
-  "cursor-col-resize w-[var(--tiger-splitter-gutter)] h-full before:absolute before:content-[''] before:inset-block-0 before:w-6 before:start-1/2 before:-translate-x-1/2"
+  "cursor-col-resize w-[var(--tiger-splitter-gutter)] h-full before:absolute before:content-[''] before:inset-y-0 before:w-6 before:left-1/2 before:-translate-x-1/2"
 
 export const splitterGutterVerticalClasses =
-  "cursor-row-resize h-[var(--tiger-splitter-gutter)] w-full before:absolute before:content-[''] before:inset-inline-0 before:h-6 before:top-1/2 before:-translate-y-1/2"
+  "cursor-row-resize h-[var(--tiger-splitter-gutter)] w-full before:absolute before:content-[''] before:inset-x-0 before:h-6 before:top-1/2 before:-translate-y-1/2"
 
 export const splitterGutterDraggingClasses = 'bg-[var(--tiger-primary)]'
 
@@ -33,10 +35,10 @@ export const splitterGutterHandleClasses =
   'absolute rounded bg-[var(--tiger-text-secondary)] tiger-motion-aware transition-colors duration-150 pointer-events-none'
 
 export const splitterGutterHandleHorizontalClasses =
-  'w-0.5 h-6 top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2'
+  'w-0.5 h-6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
 
 export const splitterGutterHandleVerticalClasses =
-  'h-0.5 w-6 top-1/2 start-1/2 -translate-x-1/2 -translate-y-1/2'
+  'h-0.5 w-6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
 
 export const SPLITTER_GUTTER_HIT_SIZE = 24
 

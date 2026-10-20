@@ -238,7 +238,9 @@ describe('resizable-utils', () => {
   describe('origin and RTL', () => {
     it('shifts origin when resizing from the start edge', () => {
       expect(getResizeOriginShift('left', 40, 0, false)).toEqual({ offsetX: -40, offsetY: 0 })
-      expect(getResizeOriginShift('left', 40, 0, true)).toEqual({ offsetX: 40, offsetY: 0 })
+      // Logical margin delta: calculateResizeDelta already mapped RTL, so the
+      // shift is applied verbatim — flipping again would drag the opposite edge.
+      expect(getResizeOriginShift('left', 40, 0, true)).toEqual({ offsetX: -40, offsetY: 0 })
       expect(getResizeOriginShift('top', 0, 20, false)).toEqual({ offsetX: 0, offsetY: -20 })
       expect(getResizeOriginShift('right', 40, 0, false)).toEqual({ offsetX: 0, offsetY: 0 })
     })
@@ -260,6 +262,25 @@ describe('resizable-utils', () => {
       })
       expect(next.height).toBe(150)
       expect(next.width).toBe(300)
+    })
+
+    it('clamps a preset ratio against itself, not the start ratio', () => {
+      const grown = applyResizeSize('right', 100, 100, 80, 0, 'both', {
+        aspectRatio: 16 / 9,
+        minWidth: 0,
+        minHeight: 0
+      })
+      expect(grown.width).toBe(180)
+      expect(grown.height).toBe(101.25)
+
+      const capped = applyResizeSize('right', 100, 100, 80, 0, 'both', {
+        aspectRatio: 16 / 9,
+        minWidth: 0,
+        minHeight: 0,
+        maxHeight: 90
+      })
+      expect(capped.width).toBe(160)
+      expect(capped.height).toBe(90)
     })
   })
 

@@ -31,7 +31,9 @@ export const Space = forwardRef<HTMLDivElement, SpaceProps>(function Space(
 ) {
   const gapStyle =
     verticalSize != null
-      ? getSpaceGapStyle(typeof size === 'number' ? size : 0, verticalSize)
+      ? // Named sizes own the column gap via class; only the vertical gap is
+        // written inline. Coercing the name to 0 would wipe the class gap.
+        getSpaceGapStyle(size, verticalSize)
       : getSpaceStyle(size)
   const nodes = React.Children.toArray(children)
   const content =

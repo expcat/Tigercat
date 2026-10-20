@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo, useState } from 'react'
+import React, { forwardRef, useMemo } from 'react'
 import {
   classNames,
   feedbackLayoutLabels,
@@ -12,6 +12,7 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
 import { SidebarContext } from '../utils/layout-context'
+import { useControlledState } from '../hooks/useControlledState'
 
 export interface ReactSidebarProps
   extends CoreSidebarProps, Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'width'> {
@@ -27,7 +28,7 @@ export const Sidebar = forwardRef<HTMLDivElement, ReactSidebarProps>(function Si
     className,
     width,
     collapsedWidth = '64px',
-    collapsed = false,
+    collapsed,
     side = 'start',
     style,
     children,
@@ -41,8 +42,12 @@ export const Sidebar = forwardRef<HTMLDivElement, ReactSidebarProps>(function Si
   const config = useTigerConfig()
   const fallbackName = useMemo(() => getSidebarAriaLabel(config.locale), [config.locale])
 
-  const [localCollapsed, setLocalCollapsed] = useState(collapsed)
-  const effectiveCollapsed = collapsible ? localCollapsed : collapsed
+  // Controlled when `collapsed` is passed: the trigger only requests a change.
+  const [effectiveCollapsed, setEffectiveCollapsed] = useControlledState({
+    value: collapsed,
+    defaultValue: false,
+    onChange: onCollapsedChange
+  })
   const fullyHidden = isSidebarFullyHidden(effectiveCollapsed, collapsedWidth)
   const sidebarClasses = classNames(
     getLayoutSidebarClasses({
@@ -97,8 +102,7 @@ export const Sidebar = forwardRef<HTMLDivElement, ReactSidebarProps>(function Si
         aria-label={triggerLabel}
         onClick={() => {
           const next = !effectiveCollapsed
-          setLocalCollapsed(next)
-          onCollapsedChange?.(next)
+          setEffectiveCollapsed(next)
         }}>
         {triggerLabel}
       </button>

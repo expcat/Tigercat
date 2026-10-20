@@ -3,8 +3,8 @@
  */
 
 import React from 'react'
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
 import { Content } from '@expcat/tigercat-react/Content'
 import { Footer } from '@expcat/tigercat-react/Footer'
@@ -132,6 +132,28 @@ describe('Layout Sections', () => {
     expect(aside.style.width).toBe('192px')
   })
 
+  it('keeps a controlled Sidebar expanded until the parent accepts the collapse', () => {
+    const onCollapsedChange = vi.fn()
+    const { container, rerender } = render(
+      <Sidebar width="240px" collapsed={false} collapsible onCollapsedChange={onCollapsedChange}>
+        Nav
+      </Sidebar>
+    )
+    const aside = container.querySelector('aside') as HTMLElement
+    expect(aside.style.width).toBe('240px')
+
+    fireEvent.click(container.querySelector('[data-tiger-sidebar-trigger]') as HTMLElement)
+    expect(onCollapsedChange).toHaveBeenCalledWith(true)
+    expect(aside.style.width).toBe('240px')
+
+    rerender(
+      <Sidebar width="240px" collapsed collapsible onCollapsedChange={onCollapsedChange}>
+        Nav
+      </Sidebar>
+    )
+    expect(aside.style.width).toBe('64px')
+  })
+
   it('follows Sidebar collapsed for a nested Menu that omitted collapsed', () => {
     const { container, rerender } = render(
       <Sidebar>
@@ -222,6 +244,37 @@ describe('Layout Sections', () => {
     const header = container.querySelector('header')
     expect(header?.className).toContain('tiger-header-blur')
     expect(header?.className).toContain('tiger-header-sticky')
+  })
+
+  it('keeps text children inside fragments and still emits the skip link', () => {
+    const { container } = render(
+      <Layout>
+        <>
+          {'plain '}
+          {7}
+          <Content>Body</Content>
+        </>
+      </Layout>
+    )
+    const skip = container.querySelector('a.tiger-skip-link') as HTMLAnchorElement
+    expect(skip.getAttribute('href')).toBe('#tiger-main')
+    expect(container.textContent).toContain('plain 7Body')
+  })
+
+  it('targets a statically known nested explicit main with the skip link', () => {
+    const { container } = render(
+      <Layout>
+        <Layout>
+          <Content as="main" id="nested-main">
+            Body
+          </Content>
+        </Layout>
+      </Layout>
+    )
+    const skip = container.querySelector('a.tiger-skip-link') as HTMLAnchorElement
+    expect(skip.getAttribute('href')).toBe('#nested-main')
+    expect(container.querySelectorAll('main')).toHaveLength(1)
+    expect(container.querySelector('main')?.id).toBe('nested-main')
   })
 
   it('forwards Layout ref to the root node', () => {

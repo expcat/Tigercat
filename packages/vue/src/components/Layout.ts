@@ -7,7 +7,7 @@ import {
   getLayoutSkipLinkClasses,
   getSkipToContentLabel,
   isLayoutSiderTypeName,
-  LAYOUT_MAIN_ID,
+  resolveContentMainId,
   resolveLayoutHasSider,
   resolveSidebarLandmark,
   warnIfLayoutSiderMissed,
@@ -34,6 +34,39 @@ function vnodeTypeName(vnode: VNode): string | undefined {
 
 function vnodeIsSider(vnode: VNode): boolean {
   return isLayoutSiderTypeName(vnodeTypeName(vnode))
+}
+
+/**
+ * Skip link target: the id of the first Content that renders a `main`.
+ * Statically known nested Layout subtrees are resolved with nested
+ * semantics (their Content defaults to `div` unless `as="main"`).
+ * Without a target no link is emitted.
+ */
+function resolveSkipTargetId(vnodes: VNode[], nested: boolean): string | null {
+  for (const vnode of vnodes) {
+    const name = vnodeTypeName(vnode)
+    if (name === 'TigerContent') {
+      const vnodeProps = (vnode.props ?? {}) as { as?: unknown; id?: unknown }
+      const mainId = resolveContentMainId({
+        nested,
+        explicit: typeof vnodeProps.as === 'string' ? vnodeProps.as : undefined,
+        id: typeof vnodeProps.id === 'string' ? vnodeProps.id : undefined
+      })
+      if (mainId) return mainId
+      continue
+    }
+    if (name === 'TigerLayout') {
+      const slots = (vnode.children ?? {}) as { default?: () => VNode[] | VNode }
+      if (typeof slots.default !== 'function') continue
+      const inner = slots.default()
+      const mainId = resolveSkipTargetId(
+        flattenSlotVNodes(Array.isArray(inner) ? inner : [inner]),
+        true
+      )
+      if (mainId) return mainId
+    }
+  }
+  return null
 }
 
 function vnodeHasOwnSidebarName(vnode: VNode): boolean {
@@ -118,16 +151,17 @@ export const Layout = defineComponent({
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
 
-      const skip = nested.value
-        ? null
-        : h(
+      const skipTarget = nested.value ? null : resolveSkipTargetId(vnodes, false)
+      const skip = skipTarget
+        ? h(
             'a',
             {
               class: getLayoutSkipLinkClasses(),
-              href: `#${LAYOUT_MAIN_ID}`
+              href: `#${skipTarget}`
             },
             getSkipToContentLabel(config.value.locale)
           )
+        : null
 
       return h('div', { ...attrs, class: layoutClasses, style: props.style }, [skip, ...rendered])
     }

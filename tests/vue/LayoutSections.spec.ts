@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { h } from 'vue'
+import { Fragment, h } from 'vue'
 import { expectNoA11yViolationsIsolated } from '../utils/a11y-helpers'
 import { Content } from '@expcat/tigercat-vue/Content'
 import { Footer } from '@expcat/tigercat-vue/Footer'
@@ -222,6 +222,33 @@ describe('Layout Sections', () => {
     const header = container.querySelector('header')
     expect(header?.className).toContain('tiger-header-blur')
     expect(header?.className).toContain('tiger-header-sticky')
+  })
+
+  it('keeps text children inside fragments and still emits the skip link', () => {
+    const { container } = render({
+      setup() {
+        return () =>
+          h(Layout, null, () => [h(Fragment, null, ['plain ', 7, h(Content, null, () => 'Body')])])
+      }
+    })
+    const skip = container.querySelector('a.tiger-skip-link') as HTMLAnchorElement
+    expect(skip.getAttribute('href')).toBe('#tiger-main')
+    expect(container.textContent).toContain('plain 7Body')
+  })
+
+  it('targets a statically known nested explicit main with the skip link', () => {
+    const { container } = render({
+      setup() {
+        return () =>
+          h(Layout, null, () =>
+            h(Layout, null, () => h(Content, { as: 'main', id: 'nested-main' }, () => 'Body'))
+          )
+      }
+    })
+    const skip = container.querySelector('a.tiger-skip-link') as HTMLAnchorElement
+    expect(skip.getAttribute('href')).toBe('#nested-main')
+    expect(container.querySelectorAll('main')).toHaveLength(1)
+    expect(container.querySelector('main')?.id).toBe('nested-main')
   })
 
   it('has no basic accessibility violations', async () => {

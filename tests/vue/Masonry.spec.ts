@@ -139,6 +139,9 @@ describe('Masonry', () => {
       expect(lefts[0]).toBe(lefts[3])
       expect(lefts[0]).toBe(lefts[4])
       expect(lefts[1]).toBe(lefts[2])
+      // Column offsets must come from a real measure: all-zero lefts would
+      // also satisfy the equalities above (happy-dom reports boxes as 0).
+      expect(lefts[1]).toBeGreaterThan(0)
       spy.mockRestore()
     })
 

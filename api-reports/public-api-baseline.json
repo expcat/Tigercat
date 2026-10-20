@@ -4213,6 +4213,7 @@
       "resolveCompositeTimeLocale",
       "resolveConditionalFormRules",
       "resolveConfigDirection",
+      "resolveContentMainId",
       "resolveCreatableSelectOption",
       "ResolveCreatableSelectOptionOptions",
       "resolveCropAspectRatio",

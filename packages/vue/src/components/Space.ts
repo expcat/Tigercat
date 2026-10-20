@@ -53,7 +53,9 @@ export const Space = defineComponent({
     const classes = computed(() => getSpaceClasses(props))
     const gapStyle = computed(() => {
       if (props.verticalSize != null) {
-        return getSpaceGapStyle(typeof props.size === 'number' ? props.size : 0, props.verticalSize)
+        // Named sizes own the column gap via class; only the vertical gap is
+        // written inline. Coercing the name to 0 would wipe the class gap.
+        return getSpaceGapStyle(props.size, props.verticalSize)
       }
       return getSpaceStyle(props.size)
     })

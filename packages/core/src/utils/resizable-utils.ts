@@ -19,7 +19,9 @@ export const resizableHandleDisabledClasses = 'pointer-events-none opacity-0'
 
 /**
  * Handle position → cursor + placement styles.
- * Horizontal placement uses logical inset so `left` is inline-start.
+ * `start` / `end` stay logical (so `left` is inline-start); the cross-axis
+ * span uses physical `inset-x` / `inset-y` — logical `inset-inline` /
+ * `inset-block` utilities do not exist and left edge handles with zero size.
  */
 export const resizableHandlePositionStyles: Record<
   ResizeHandlePosition,
@@ -27,19 +29,19 @@ export const resizableHandlePositionStyles: Record<
 > = {
   top: {
     cursor: 'cursor-n-resize',
-    classes: 'top-0 inset-inline-0 h-6'
+    classes: 'top-0 inset-x-0 h-6'
   },
   right: {
     cursor: 'cursor-e-resize rtl:cursor-w-resize',
-    classes: 'inset-block-0 end-0 w-6'
+    classes: 'inset-y-0 end-0 w-6'
   },
   bottom: {
     cursor: 'cursor-s-resize',
-    classes: 'bottom-0 inset-inline-0 h-6'
+    classes: 'bottom-0 inset-x-0 h-6'
   },
   left: {
     cursor: 'cursor-w-resize rtl:cursor-e-resize',
-    classes: 'inset-block-0 start-0 w-6'
+    classes: 'inset-y-0 start-0 w-6'
   },
   'top-left': {
     cursor: 'cursor-nw-resize rtl:cursor-ne-resize',
@@ -140,7 +142,10 @@ export function calculateResizeDelta(
 
 /**
  * Layout shift so the grabbed start edge moves and the opposite edge stays.
- * Values are logical margin deltas (inline-start / block-start), not a transform.
+ * Values are logical margin deltas written to `marginInlineStart` /
+ * `marginTop`. `calculateResizeDelta` already mapped the pointer onto the
+ * logical axis, so the delta is applied verbatim — flipping it again for RTL
+ * double-reverses and drags the opposite edge.
  */
 export function getResizeOriginShift(
   handle: ResizeHandlePosition,
@@ -152,7 +157,7 @@ export function getResizeOriginShift(
   const fromTop = handle === 'top' || handle === 'top-left' || handle === 'top-right'
   const inline = fromStart ? -deltaWidth : 0
   return {
-    offsetX: _rtl ? -inline : inline,
+    offsetX: inline,
     offsetY: fromTop ? -deltaHeight : 0
   }
 }
@@ -250,7 +255,8 @@ export function applyAspectRatio(
 
 /**
  * Clamp a ratio-locked size so both axes stay in bounds and width/height
- * still match the original ratio (error well under 1px at typical sizes).
+ * still match the locked ratio — passed as originalWidth/originalHeight
+ * (error well under 1px at typical sizes).
  */
 export function clampDimensionsWithRatio(
   width: number,
@@ -317,8 +323,8 @@ export function applyResizeSize(
     const clamped = clampDimensionsWithRatio(
       locked.width,
       locked.height,
-      startWidth,
-      startHeight,
+      lockedRatio,
+      1,
       options.minWidth,
       options.minHeight,
       options.maxWidth,
@@ -400,8 +406,8 @@ export function applyResizeJump(
     const clamped = clampDimensionsWithRatio(
       locked.width,
       locked.height,
-      startWidth,
-      startHeight,
+      jumpRatio,
+      1,
       options.minWidth,
       options.minHeight,
       options.maxWidth,

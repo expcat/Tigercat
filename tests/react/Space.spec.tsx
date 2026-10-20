@@ -74,6 +74,17 @@ describe('Space (React)', () => {
     expect(getRoot(container).style.gap).toBe('16px')
   })
 
+  it('keeps the named column gap on the class when verticalSize is set', () => {
+    const { container } = render(
+      <Space size="md" verticalSize={8}>
+        <span>Item</span>
+      </Space>
+    )
+    const root = getRoot(container)
+    expect(root.style.rowGap).toBe('8px')
+    expect(root.style.columnGap).toBe('')
+  })
+
   it('wraps items in a narrow container', () => {
     const { container } = render(
       <div style={{ width: 80 }}>

@@ -20,6 +20,10 @@
 - **Segmented（Vue / React）**：选项文字超长时在选项内截断为省略号，图标不再被压缩，相邻选项不再互相重叠。
 - **Highlight（Vue）**：默认 slot 的 VNode 子树改为原位克隆并插入高亮，保留嵌套元素与链接结构（与 React 行为一致），不再先拍平成纯文本重建；子组件内容保持不透明、不参与高亮，其前后的原生文本仍正常命中。
 - **Image 文档**：`preview` 默认值更正为 `true` 并改写交互描述，`lazy` 说明更正为原生 `loading="lazy"`；Skill references 与 MCP 快照同步。
+- **Layout 跳转链接（Vue / React）**：最外层 Layout 的跳转链接只在存在真实 `main` 目标时输出，href 指向实际渲染成 `main` 的那个 Content 的 id（自定义 `id`、Fragment 子树、嵌套 Layout 里显式 `as="main"` 的 Content 都算）；React Layout 现在能识别 Fragment 中的 Sidebar 并正确横排。
+- **拖拽隔离（Core / Vue / React）**：List 的拖拽容器 id 改为按实例生成，同页多个 List 的同 id 项不再互相串扰；跨容器拖拽时目标列表的同 id 项不再继承 `data-dragging` 标记与位移预览，Drag 自定义渲染拿到的 `isDragging` 与共享绑定一致；指针拖拽的命中测试跳过拖动源自身。
+- **Resizable / Splitter（Core / Vue / React）**：边把手命中区恢复真实尺寸（原 `inset-inline-0` / `inset-block-0` 在 Tailwind v4 不存在导致把手 0 尺寸）；预设宽高比按预设自身钳制而不是起点比例（方形起点设 16/9 后拖宽得到 16/9 结果）；RTL 下 origin 偏移不再二次翻转拖动对边。
+- **Space / ScrollArea / Masonry / Sidebar / Descriptions（Vue / React）**：Space 命名 `size` 搭配 `verticalSize` 时列间距不再被压成 0；ScrollArea `scrollToMarker` 在有相对定位祖先时定位正确；Vue Masonry 子项动态增删后重新测量分布；React Sidebar 受控 `collapsed` 时 trigger 只发 `onCollapsedChange` 请求、不自行改宽；Vue Descriptions 标题 id 改用 SSR 安全的 `useId`。
 
 ## v3.0.0-rc.1（2026-10-05）
 

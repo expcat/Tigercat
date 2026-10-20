@@ -151,6 +151,7 @@ export function createListReorderController(
 ): ListReorderController {
   let session: ControllerSession | null = null
   let pointerSession: DocumentDragSession | null = null
+  let pointerSource: Element | null = null
   let disposed = false
   const listeners = new Set<() => void>()
   const registry = activeRegistry()
@@ -343,14 +344,25 @@ export function createListReorderController(
 
   const hitTestDrag = (doc: Document | undefined, x: number, y: number): void => {
     if (!doc || typeof doc.elementFromPoint !== 'function') return
-    const el = doc.elementFromPoint(x, y)
-    const node = el?.closest('[data-drag-index]')
-    if (!(node instanceof HTMLElement)) return
-    const index = Number(node.getAttribute('data-drag-index'))
-    if (Number.isNaN(index)) return
-    const id = node.getAttribute('data-drag-id') ?? String(index)
-    const containerId = node.getAttribute('data-drag-container') ?? containerOf()
-    dragOver({ id, index, containerId })
+    // The dragged item follows the pointer as a translate preview, so the top
+    // hit is usually the source itself. Walk the stack past the real source
+    // host (DOM identity, not the id-matched `data-dragging` marker) to the
+    // candidate below.
+    const stack =
+      typeof doc.elementsFromPoint === 'function'
+        ? doc.elementsFromPoint(x, y)
+        : [doc.elementFromPoint(x, y)]
+    for (const el of stack) {
+      const node = el?.closest('[data-drag-index]')
+      if (!(node instanceof HTMLElement)) continue
+      if (pointerSource && (node === pointerSource || pointerSource.contains(node))) continue
+      const index = Number(node.getAttribute('data-drag-index'))
+      if (Number.isNaN(index)) return
+      const id = node.getAttribute('data-drag-id') ?? String(index)
+      const containerId = node.getAttribute('data-drag-container') ?? containerOf()
+      dragOver({ id, index, containerId })
+      return
+    }
   }
 
   const startPointerReorder = (item: DragItem, event: DragPointerBindingEvent): void => {
@@ -365,6 +377,10 @@ export function createListReorderController(
     if (!isValidDragHandle(hit, config)) return
     const doc = ownerDocumentOf(event.currentTarget)
     pointerSession?.dispose()
+    // List binds pointerdown on an inner handle button while the translate
+    // preview lives on the ancestor `[data-drag-index]` item — exclude that
+    // item element, not the handle. Pointer capture still targets `host`.
+    pointerSource = host?.closest('[data-drag-index]') ?? host
     let activated = false
     const threshold = config.dragThreshold
     if (threshold <= 0) {
@@ -392,6 +408,7 @@ export function createListReorderController(
       },
       onEnd: ({ cancelled, deltaX, deltaY }) => {
         pointerSession = null
+        pointerSource = null
         if (!activated || cancelled) {
           if (activated) endDrag(true)
           return
@@ -441,7 +458,13 @@ export function createListReorderController(
   const getItemBindings = (item: DragItem): ListDragItemBindings => {
     const config = configOf()
     const state = getState()
-    const isThis = state.isDragging && state.draggedItem?.id === item.id
+    // `state` may be a peer session shown here as the incoming drag: only the
+    // source container owns the dragged item, so a same-id item in the target
+    // list must not inherit the marker or the translate preview.
+    const isThis =
+      state.isDragging &&
+      state.draggedItem?.id === item.id &&
+      state.sourceContainerId === (item.containerId ?? containerOf())
     const preview =
       isThis && (state.offsetX !== 0 || state.offsetY !== 0)
         ? { transform: `translate(${state.offsetX}px, ${state.offsetY}px)` }
@@ -506,6 +529,7 @@ export function createListReorderController(
       disposed = true
       pointerSession?.dispose()
       pointerSession = null
+      pointerSource = null
       registry?.delete(record)
       if (session) {
         session = null

@@ -187,13 +187,28 @@ export const Masonry = defineComponent({
       }
     }
 
+    // Children inserted after mount reset the signature during render; measure
+    // and rebind once the DOM patch lands. The mount-time assignment is skipped
+    // via measuredSignature so onMounted stays the single initial measure.
+    let measuredSignature: string | null = null
     onMounted(() => {
+      measuredSignature = childrenSignature.value
       bindRoot()
       nextTick(() => {
         measure()
         bindItems()
       })
     })
+    watch(
+      childrenSignature,
+      (signature) => {
+        if (!alive || measuredSignature === null || signature === measuredSignature) return
+        measuredSignature = signature
+        measure()
+        bindItems()
+      },
+      { flush: 'post' }
+    )
     onBeforeUnmount(() => {
       alive = false
       stopRoot?.()

@@ -476,7 +476,7 @@ const COMPONENT_USAGE_NOTES = {
   },
   Layout: {
     notes:
-      '默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSider` / `direction="horizontal"`）时改横排。嵌套内层 `flex-1 min-h-0`，`fullHeight` 只作用在最外层。最外层有一条跳到 `#tiger-main` 的链接，目标是那一个 `main`。'
+      '默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSider` / `direction="horizontal"`）时改横排。嵌套内层 `flex-1 min-h-0`，`fullHeight` 只作用在最外层。最外层的跳转链接指向实际渲染成 `main` 的那个 Content 的 id（Fragment 或嵌套 Layout 里显式 `as="main"` 也算）；没有任何 `main` 时不输出链接。'
   },
   Header: {
     notes:

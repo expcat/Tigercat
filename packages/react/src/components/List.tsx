@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo, useRef, useState, useLayoutEffect } from 'react'
+import React, { forwardRef, useId, useMemo, useRef, useState, useLayoutEffect } from 'react'
 import {
   classNames,
   reorderSequence,
@@ -130,8 +130,10 @@ function ListInner<T extends ListItem>(
   const currentPageSize =
     paginationCfg?.pageSize !== undefined ? paginationCfg.pageSize : internalCurrentPageSize
 
+  // Per-instance container id: two Lists must never see each other's drag.
+  const listDragContainerId = `tiger-list-${useId()}`
   const drag = useDrag({
-    containerId: 'list',
+    containerId: listDragContainerId,
     config: { handleSelector: '[data-list-drag-handle]' },
     onDrop: (event) => {
       if (event.fromIndex === event.toIndex) return
@@ -244,7 +246,11 @@ function ListInner<T extends ListItem>(
     const itemClasses = getListItemClasses(size, itemLayout, divided, hoverable)
     const clickable = typeof onItemClick === 'function'
     const bindings = isDraggable
-      ? drag.getDragItemProps({ id: String(key), index: sourceIndex, containerId: 'list' })
+      ? drag.getDragItemProps({
+          id: String(key),
+          index: sourceIndex,
+          containerId: listDragContainerId
+        })
       : {}
     const {
       className: dragClassName,

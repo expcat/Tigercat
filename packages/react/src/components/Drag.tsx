@@ -97,7 +97,7 @@ export function Drag<T extends DragItem = DragItem>({
         const itemProps = drag.getDragItemProps(item)
         const node = render?.(item, {
           dragItemProps: itemProps,
-          isDragging: drag.draggedItem?.id === item.id
+          isDragging: itemProps['data-dragging'] === true
         })
         return (
           <React.Fragment key={item.id}>

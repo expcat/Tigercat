@@ -53,6 +53,17 @@ describe('Space (Vue)', () => {
     expect(getRoot(container).style.gap).toBe('16px')
   })
 
+  it('keeps the named column gap on the class when verticalSize is set', () => {
+    const { container } = renderWithProps(
+      Space,
+      { size: 'md', verticalSize: 8 },
+      { slots: { default: ItemSlot } }
+    )
+    const root = getRoot(container)
+    expect(root.style.rowGap).toBe('8px')
+    expect(root.style.columnGap).toBe('')
+  })
+
   it('wraps items in a narrow container', () => {
     const { container } = render({
       template:

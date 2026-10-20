@@ -5,7 +5,7 @@ import {
   getLayoutSkipLinkClasses,
   getSkipToContentLabel,
   isLayoutSiderTypeName,
-  LAYOUT_MAIN_ID,
+  resolveContentMainId,
   resolveLayoutHasSider,
   resolveSidebarLandmark,
   warnIfLayoutSiderMissed,
@@ -30,6 +30,63 @@ function isSiderChild(child: React.ReactNode): boolean {
   return isLayoutSiderTypeName(siderTypeName(child))
 }
 
+/**
+ * Flatten Fragments so sider/landmark/skip detection sees real children.
+ * Text and number children are kept; Fragment element children get a
+ * composed key to stay unique after the lift.
+ */
+function flattenLayoutChildren(children: React.ReactNode): React.ReactNode[] {
+  const out: React.ReactNode[] = []
+  for (const child of React.Children.toArray(children)) {
+    if (React.isValidElement(child) && child.type === React.Fragment) {
+      const inner = flattenLayoutChildren((child.props as { children?: React.ReactNode }).children)
+      for (const nestedChild of inner) {
+        if (React.isValidElement(nestedChild)) {
+          out.push(
+            React.cloneElement(nestedChild, {
+              key: `${String(child.key)}/${String(nestedChild.key)}`
+            })
+          )
+        } else {
+          out.push(nestedChild)
+        }
+      }
+      continue
+    }
+    out.push(child)
+  }
+  return out
+}
+
+/**
+ * Skip link target: the id of the first Content that renders a `main`.
+ * Statically known nested Layout subtrees are resolved with nested
+ * semantics (their Content defaults to `div` unless `as="main"`).
+ * Without a target no link is emitted.
+ */
+function resolveSkipTargetId(children: React.ReactNode[], nested: boolean): string | null {
+  for (const child of children) {
+    if (!React.isValidElement(child)) continue
+    const name = siderTypeName(child)
+    if (name === 'TigerContent') {
+      const childProps = child.props as { as?: unknown; id?: unknown }
+      const mainId = resolveContentMainId({
+        nested,
+        explicit: typeof childProps.as === 'string' ? childProps.as : undefined,
+        id: typeof childProps.id === 'string' ? childProps.id : undefined
+      })
+      if (mainId) return mainId
+      continue
+    }
+    if (name === 'TigerLayout') {
+      const inner = (child.props as { children?: React.ReactNode }).children
+      const mainId = resolveSkipTargetId(flattenLayoutChildren(inner), true)
+      if (mainId) return mainId
+    }
+  }
+  return null
+}
+
 function childHasOwnSidebarName(child: React.ReactElement): boolean {
   const props = child.props as { 'aria-label'?: unknown; 'aria-labelledby'?: unknown }
   const label = typeof props['aria-label'] === 'string' ? props['aria-label'].trim() : ''
@@ -46,7 +103,7 @@ export const Layout = forwardRef<HTMLDivElement, ReactLayoutProps>(function Layo
   const config = useTigerConfig()
   const nested = parent != null
   const shellFullHeight = fullHeight && !nested
-  const childArray = React.Children.toArray(children)
+  const childArray = flattenLayoutChildren(children)
   const childNames = childArray.map((child) =>
     React.isValidElement(child) ? siderTypeName(child) : undefined
   )
@@ -66,6 +123,8 @@ export const Layout = forwardRef<HTMLDivElement, ReactLayoutProps>(function Layo
     if (landmark === 'default') claimed = true
     return React.cloneElement(child, { landmark } as Partial<unknown>)
   })
+
+  const skipTarget = nested ? null : resolveSkipTargetId(childArray, false)
 
   const contextValue = useMemo<LayoutContextValue>(
     () => ({
@@ -89,11 +148,11 @@ export const Layout = forwardRef<HTMLDivElement, ReactLayoutProps>(function Layo
   return (
     <LayoutContext.Provider value={contextValue}>
       <div ref={ref} className={layoutClasses} style={style} {...props}>
-        {nested ? null : (
-          <a className={getLayoutSkipLinkClasses()} href={`#${LAYOUT_MAIN_ID}`}>
+        {skipTarget ? (
+          <a className={getLayoutSkipLinkClasses()} href={`#${skipTarget}`}>
             {getSkipToContentLabel(config.locale)}
           </a>
-        )}
+        ) : null}
         {rendered}
       </div>
     </LayoutContext.Provider>

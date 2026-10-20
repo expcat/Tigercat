@@ -1,4 +1,14 @@
-import { computed, defineComponent, h, onBeforeUnmount, onMounted, ref, watch, PropType } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useId,
+  watch,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -49,8 +59,6 @@ export interface VueDescriptionsProps extends Omit<
 
 export type DescriptionsProps = VueDescriptionsProps
 
-let descriptionsId = 0
-
 export const Descriptions = defineComponent({
   name: 'TigerDescriptions',
   inheritAttrs: false,
@@ -88,7 +96,8 @@ export const Descriptions = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const colonGlyph = computed(() => getDescriptionsLabels(mergedLocale.value).colon)
-    const titleId = `tiger-descriptions-title-${++descriptionsId}`
+    // useId stays per-app and SSR-stable; a module counter leaks across apps.
+    const titleId = `tiger-descriptions-title-${useId()}`
     const rootRef = ref<HTMLElement | null>(null)
     const containerWidth = ref(0)
     let stopSize: (() => void) | undefined

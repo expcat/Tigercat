@@ -145,14 +145,13 @@ export const Resizable = defineComponent({
       if (phase !== 'move') emit('resize-end', event)
     }
 
-    const resizeOptions = () => ({
+    // Ratio resolves from the actual resize origin: drag-start box for the
+    // pointer path, the current box for keyboard. Stale drag-start values
+    // would poison `lockAspectRatio: true` after an external size change.
+    const resizeOptions = (baseWidth: number, baseHeight: number) => ({
       rtl: rtl.value,
       lockAspectRatio: props.lockAspectRatio === true || typeof props.lockAspectRatio === 'string',
-      aspectRatio: resolveResizableAspectRatio(
-        props.lockAspectRatio,
-        startWidth.value,
-        startHeight.value
-      ),
+      aspectRatio: resolveResizableAspectRatio(props.lockAspectRatio, baseWidth, baseHeight),
       minWidth: props.minWidth,
       minHeight: props.minHeight,
       maxWidth: props.maxWidth,
@@ -193,7 +192,7 @@ export const Resizable = defineComponent({
             currentX - startMouseX.value,
             currentY - startMouseY.value,
             props.axis,
-            resizeOptions()
+            resizeOptions(startWidth.value, startHeight.value)
           )
           commitSize(next, handle, startWidth.value, startHeight.value, 'move')
         },
@@ -212,7 +211,7 @@ export const Resizable = defineComponent({
                 currentX - startMouseX.value,
                 currentY - startMouseY.value,
                 props.axis,
-                resizeOptions()
+                resizeOptions(startWidth.value, startHeight.value)
               )
           commitSize(next, handle, startWidth.value, startHeight.value, 'end')
           draggingHandle.value = null
@@ -232,7 +231,7 @@ export const Resizable = defineComponent({
         box.width,
         box.height,
         props.axis,
-        resizeOptions()
+        resizeOptions(box.width, box.height)
       )
       if (jumped) {
         e.preventDefault()
@@ -249,7 +248,7 @@ export const Resizable = defineComponent({
         delta.deltaX,
         delta.deltaY,
         props.axis,
-        resizeOptions()
+        resizeOptions(box.width, box.height)
       )
       commitSize(next, handle, box.width, box.height, 'keyboard')
     }

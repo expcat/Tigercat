@@ -253,7 +253,13 @@ export const ScrollArea = forwardRef<ScrollAreaInstance, ScrollAreaProps>(functi
     const marker = viewport.querySelector(`[id="${CSS.escape(id)}"]`)
     if (!(marker instanceof HTMLElement)) return
     viewport.scrollTo({
-      top: marker.offsetTop - viewport.offsetTop,
+      // offsetTop measures against the offsetParent, not the viewport — a
+      // relatively-positioned wrapper breaks it. Rect math is parent-proof.
+      top:
+        marker.getBoundingClientRect().top -
+        viewport.getBoundingClientRect().top +
+        viewport.scrollTop -
+        viewport.clientTop,
       behavior: scrollAreaMotionBehavior(prefersReducedMotion())
     })
   }, [])

@@ -6,6 +6,7 @@ import {
   h,
   onBeforeUnmount,
   onMounted,
+  useId,
   watch,
   PropType,
   type VNode,
@@ -180,8 +181,10 @@ export const List = defineComponent({
         : internalCurrentPageSize.value
     )
 
+    // Per-instance container id: two Lists must never see each other's drag.
+    const listDragContainerId = `tiger-list-${useId()}`
     const drag = useDrag({
-      containerId: 'list',
+      containerId: listDragContainerId,
       config: { handleSelector: '[data-list-drag-handle]' },
       onDrop: (event) => {
         if (event.fromIndex === event.toIndex) return
@@ -282,7 +285,11 @@ export const List = defineComponent({
       )
       const clickable = hasItemClickListener.value
       const bindings = props.draggable
-        ? drag.getDragItemAttrs({ id: String(key), index: sourceIndex, containerId: 'list' })
+        ? drag.getDragItemAttrs({
+            id: String(key),
+            index: sourceIndex,
+            containerId: listDragContainerId
+          })
         : {}
       const {
         class: dragClass,

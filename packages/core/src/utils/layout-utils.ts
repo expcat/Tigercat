@@ -51,6 +51,26 @@ export function resolveLayoutSectionTag(options: {
   return 'main'
 }
 
+/**
+ * Id of the `main` element a direct Content child renders, or null when that
+ * child renders something else (nested layout or explicit `as`). The outer
+ * skip link points here; without a real target no link is emitted.
+ */
+export function resolveContentMainId(options: {
+  nested: boolean
+  explicit?: string | null
+  id?: string | null
+}): string | null {
+  const tag = resolveLayoutSectionTag({
+    kind: 'content',
+    nested: options.nested,
+    explicit: options.explicit
+  })
+  if (tag !== 'main') return null
+  const id = typeof options.id === 'string' ? options.id.trim() : ''
+  return id || LAYOUT_MAIN_ID
+}
+
 /** Second unnamed sidebar is not another complementary landmark. */
 export function resolveSidebarLandmark(options: {
   hasOwnName: boolean

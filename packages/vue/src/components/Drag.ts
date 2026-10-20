@@ -127,7 +127,7 @@ export const Drag = defineComponent({
           h('div', { role: 'status', 'data-tiger-drag-live': '' }, announcement.value),
           ...props.items.map((item) => {
             const itemAttrs = drag.getDragItemAttrs(item)
-            const isDragging = drag.draggedItem.value?.id === item.id
+            const isDragging = itemAttrs['data-dragging'] === true
             const custom = slots.item?.({ item, attrs: itemAttrs, isDragging })
             if (custom) return custom
             return h('li', { ...itemAttrs, key: item.id, role: 'listitem' }, String(item.id))
