@@ -3,9 +3,6 @@ import {
   getRowAlignJustifyVars,
   getRowClasses,
   getRowGutterStyleVars,
-  resolveResponsiveAlign,
-  resolveResponsiveGutter,
-  resolveResponsiveJustify,
   type RowProps as CoreRowProps
 } from '@expcat/tigercat-core'
 
@@ -27,14 +24,9 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   const rowClasses = useMemo(() => getRowClasses({ wrap, className }), [wrap, className])
 
   const mergedStyle = useMemo<React.CSSProperties>(() => {
-    const width = typeof window !== 'undefined' ? window.innerWidth : 0
-    const resolved = resolveResponsiveGutter(gutter, width)
     return {
-      ...getRowGutterStyleVars([resolved.x, resolved.y]),
-      ...getRowAlignJustifyVars(
-        resolveResponsiveAlign(align, width),
-        resolveResponsiveJustify(justify, width)
-      ),
+      ...getRowGutterStyleVars(gutter),
+      ...getRowAlignJustifyVars(align, justify),
       ...style
     }
   }, [gutter, align, justify, style])

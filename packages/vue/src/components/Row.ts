@@ -5,18 +5,17 @@ import {
   getRowAlignJustifyVars,
   getRowClasses,
   getRowGutterStyleVars,
-  resolveResponsiveAlign,
-  resolveResponsiveGutter,
-  resolveResponsiveJustify,
   type Align,
   type Justify,
-  type GutterSize
+  type GutterSize,
+  type ResponsiveAlign,
+  type ResponsiveJustify
 } from '@expcat/tigercat-core'
 
 export interface VueRowProps {
   gutter?: GutterSize
-  align?: Align
-  justify?: Justify
+  align?: ResponsiveAlign
+  justify?: ResponsiveJustify
   wrap?: boolean
   className?: string
 }
@@ -30,11 +29,11 @@ export const Row = defineComponent({
       default: 0
     },
     align: {
-      type: String as PropType<Align>,
+      type: [String, Object] as PropType<ResponsiveAlign>,
       default: 'top' as Align
     },
     justify: {
-      type: String as PropType<Justify>,
+      type: [String, Object] as PropType<ResponsiveJustify>,
       default: 'start' as Justify
     },
     wrap: {
@@ -48,13 +47,9 @@ export const Row = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const rowStyle = computed(() => {
-      const width = typeof window !== 'undefined' ? window.innerWidth : 0
-      const gutter = resolveResponsiveGutter(props.gutter, width)
-      const align = resolveResponsiveAlign(props.align as Align, width)
-      const justify = resolveResponsiveJustify(props.justify as Justify, width)
       return {
-        ...getRowGutterStyleVars([gutter.x, gutter.y]),
-        ...getRowAlignJustifyVars(align, justify)
+        ...getRowGutterStyleVars(props.gutter),
+        ...getRowAlignJustifyVars(props.align, props.justify)
       }
     })
 

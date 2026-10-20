@@ -22,23 +22,37 @@ describe('grid gutter css variable helpers', () => {
   it('keeps a numeric gutter on the horizontal axis only', () => {
     expect(resolveGutter(16)).toEqual({ x: 16, y: 0 })
     expect(getRowGutterStyleVars(16)).toEqual({
-      '--tiger-row-gutter-x': '16px'
+      '--tiger-row-gutter-x-base': '16px'
     })
     expect(getRowGutterStyleVars([16, 24])).toEqual({
-      '--tiger-row-gutter-x': '16px',
-      '--tiger-row-gutter-y': '24px'
+      '--tiger-row-gutter-x-base': '16px',
+      '--tiger-row-gutter-y-base': '24px'
     })
     expect(getRowGutterStyleVars([16, 0])).toEqual({
-      '--tiger-row-gutter-x': '16px'
+      '--tiger-row-gutter-x-base': '16px'
     })
     expect(getRowGutterStyleVars([0, 16])).toEqual({
-      '--tiger-row-gutter-y': '16px'
+      '--tiger-row-gutter-y-base': '16px'
     })
   })
 
   it('clamps negative gutter CSS variables to zero', () => {
     expect(getRowGutterStyleVars([-8, 12])).toEqual({
-      '--tiger-row-gutter-y': '12px'
+      '--tiger-row-gutter-y-base': '12px'
+    })
+  })
+
+  it('writes responsive gutter maps as breakpoint variables', () => {
+    expect(getRowGutterStyleVars({ xs: [4, 2], md: [24, 12] })).toEqual({
+      '--tiger-row-gutter-x-base': '4px',
+      '--tiger-row-gutter-x-md': '24px',
+      '--tiger-row-gutter-y-base': '2px',
+      '--tiger-row-gutter-y-md': '12px'
+    })
+    // the smallest authored breakpoint is the base, even when it is not xs
+    expect(getRowGutterStyleVars({ md: 8 })).toEqual({
+      '--tiger-row-gutter-x-base': '8px',
+      '--tiger-row-gutter-y-base': '0px'
     })
   })
 })
@@ -114,13 +128,24 @@ describe('grid col css variable helpers', () => {
 describe('grid row alignment helpers', () => {
   it('maps align and justify onto row CSS variables', () => {
     expect(getRowAlignJustifyVars('top', 'start')).toEqual({
-      '--tiger-row-align': 'flex-start',
-      '--tiger-row-justify': 'flex-start'
+      '--tiger-row-align-base': 'flex-start',
+      '--tiger-row-justify-base': 'flex-start'
     })
-    expect(getRowAlignJustifyVars('middle', 'center')['--tiger-row-align']).toBe('center')
-    expect(getRowAlignJustifyVars('bottom', 'end')['--tiger-row-align']).toBe('flex-end')
-    expect(getRowAlignJustifyVars('stretch', 'space-between')['--tiger-row-justify']).toBe(
+    expect(getRowAlignJustifyVars('middle', 'center')['--tiger-row-align-base']).toBe('center')
+    expect(getRowAlignJustifyVars('bottom', 'end')['--tiger-row-align-base']).toBe('flex-end')
+    expect(getRowAlignJustifyVars('stretch', 'space-between')['--tiger-row-justify-base']).toBe(
       'space-between'
+    )
+  })
+
+  it('maps responsive align and justify onto breakpoint variables', () => {
+    expect(getRowAlignJustifyVars({ xs: 'top', md: 'bottom' }, { xs: 'start', md: 'end' })).toEqual(
+      {
+        '--tiger-row-align-base': 'flex-start',
+        '--tiger-row-align-md': 'flex-end',
+        '--tiger-row-justify-base': 'flex-start',
+        '--tiger-row-justify-md': 'flex-end'
+      }
     )
   })
 })

@@ -6,6 +6,8 @@
 
 包内容变化：`@expcat/tigercat-core` 不再附带 `tokens/tokens.dtcg.json`、`tokens/tokens.emitted.css` 和 `tokens/figma.tokens.json`。这三个文件从未列入包 `exports`，但随 tarball 分发；直接按路径引用它们的用法请改用 token 事实源 `tokens.json`、CSS 变量产物 `./tokens.css`（`tokens/tokens.css`）和 Figma 变量产物 `./figma-variables.json`（`tokens/figma-variables.json`）。
 
+Core 布局 helper 返回键调整：`getRowGutterStyleVars` / `getRowAlignJustifyVars` 现在输出响应式输入变量（`--tiger-row-gutter-x-base`、`--tiger-row-gutter-x-md`、`--tiger-row-align-base` 等），不再直接输出 `--tiger-row-gutter-x` / `--tiger-row-align` / `--tiger-row-justify` 这些由样式表按视口提升的输出变量。把返回对象 spread 到 Row 根元素 `style` 的用法不受影响；按旧键名硬编码读取返回值的调用方改用新键名。用户仍可在 Row 的 `style` 上直接写输出变量（如 `--tiger-row-gutter-x: 24px`）覆盖全部断点。
+
 ## v3.0.0-rc.1
 
 本版只有视觉修正，没有需要迁移的 API 变化。

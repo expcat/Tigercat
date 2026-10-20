@@ -26,8 +26,8 @@ describe('Grid (Vue)', () => {
       }
     })
     const row = screen.getByTestId('row') as HTMLElement
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-base')).toBe('16px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-base')).toBe('')
   })
 
   it('uses flex when flex is passed without span=0', () => {
@@ -86,8 +86,28 @@ describe('Grid (Vue)', () => {
       }
     })
     const row = screen.getByTestId('row') as HTMLElement
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('24px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-base')).toBe('16px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-base')).toBe('24px')
+  })
+
+  it('accepts responsive maps without a prop warning and writes breakpoint variables', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    render(Row, {
+      props: {
+        gutter: { xs: [4, 2], md: [24, 12] },
+        align: { xs: 'top', md: 'bottom' },
+        justify: { xs: 'start', md: 'end' }
+      },
+      attrs: { 'data-testid': 'row' }
+    })
+    const row = screen.getByTestId('row') as HTMLElement
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-base')).toBe('4px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-md')).toBe('24px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-md')).toBe('12px')
+    expect(row.style.getPropertyValue('--tiger-row-align-md')).toBe('flex-end')
+    expect(row.style.getPropertyValue('--tiger-row-justify-md')).toBe('flex-end')
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
   })
 
   it('merges className without replacing the row/col base class and clicks once', async () => {

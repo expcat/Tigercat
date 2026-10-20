@@ -106,5 +106,10 @@ describe('layout grid static css', () => {
     expect(LAYOUT_GRID_CSS).toContain('column-gap: var(--tiger-row-gutter-x')
     expect(LAYOUT_GRID_CSS).toContain('border-inline-end')
     expect(LAYOUT_GRID_CSS).toContain('--tiger-breakpoint-2xl')
+    // Row responsive inputs resolve per viewport: base assignment plus media-query promotion
+    expect(LAYOUT_GRID_CSS).toContain('--tiger-row-gutter-x: var(--tiger-row-gutter-x-base, 0px)')
+    expect(LAYOUT_GRID_CSS).toContain('--tiger-row-gutter-x: var(--tiger-row-gutter-x-md,')
+    expect(LAYOUT_GRID_CSS).toContain('--tiger-row-align: var(--tiger-row-align-md,')
+    expect(LAYOUT_GRID_CSS).toContain('--tiger-row-gutter-x-md: initial;')
   })
 })

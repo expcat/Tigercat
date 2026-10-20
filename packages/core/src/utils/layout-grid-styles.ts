@@ -77,6 +77,12 @@ function breakpointBlock(bp: Breakpoint): string {
   }
 }
 @media (min-width: ${min}px) {
+  .tiger-row {
+    --tiger-row-gutter-x: ${buildTokenCascade('--tiger-row-gutter-x', '0px', bp)};
+    --tiger-row-gutter-y: ${buildTokenCascade('--tiger-row-gutter-y', '0px', bp)};
+    --tiger-row-align: ${buildTokenCascade('--tiger-row-align', 'flex-start', bp)};
+    --tiger-row-justify: ${buildTokenCascade('--tiger-row-justify', 'flex-start', bp)};
+  }
   .tiger-container-pad {
     padding-inline: ${bp === 'sm' || bp === 'md' ? '1.5rem' : '2rem'};
   }
@@ -113,6 +119,25 @@ function buildDisplayCascade(upto: Breakpoint): string {
     if (bp === upto) break
   }
   return expr
+}
+
+const ROW_RESPONSIVE_INPUTS = ['row-gutter-x', 'row-gutter-y', 'row-align', 'row-justify'] as const
+
+/**
+ * Every Row owns its responsive inputs: resetting them to the guaranteed-invalid
+ * value keeps a nested Row from inheriting a parent Row's authored map, while
+ * inline styles from the component still win over this rule.
+ */
+function rowResponsiveInputResets(): string {
+  const decls: string[] = []
+  for (const name of ROW_RESPONSIVE_INPUTS) {
+    decls.push(`--tiger-${name}-base: initial;`)
+    for (const bp of GRID_BREAKPOINT_ORDER) {
+      if (bp === 'xs') continue
+      decls.push(`--tiger-${name}-${bp}: initial;`)
+    }
+  }
+  return decls.join('\n  ')
 }
 
 function breakpointCss(): string {
@@ -263,6 +288,11 @@ export const LAYOUT_GRID_CSS = `
   box-sizing: border-box;
   container-type: inline-size;
   container-name: tiger-row;
+  ${rowResponsiveInputResets()}
+  --tiger-row-gutter-x: var(--tiger-row-gutter-x-base, 0px);
+  --tiger-row-gutter-y: var(--tiger-row-gutter-y-base, 0px);
+  --tiger-row-align: var(--tiger-row-align-base, flex-start);
+  --tiger-row-justify: var(--tiger-row-justify-base, flex-start);
   column-gap: var(--tiger-row-gutter-x, 0px);
   row-gap: var(--tiger-row-gutter-y, 0px);
   align-items: var(--tiger-row-align, flex-start);

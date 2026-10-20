@@ -36,8 +36,8 @@ describe('Grid (React)', () => {
     )
     const parent = screen.getByTestId('parent')
     const row = screen.getByTestId('row')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-base')).toBe('16px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-base')).toBe('')
     const parentBox = box(parent)
     const rowBox = box(row)
     if (parentBox.width > 0) {
@@ -97,8 +97,26 @@ describe('Grid (React)', () => {
       </Row>
     )
     const row = screen.getByTestId('row')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).toBe('16px')
-    expect(row.style.getPropertyValue('--tiger-row-gutter-y')).toBe('24px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-base')).toBe('16px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-base')).toBe('24px')
+  })
+
+  it('writes responsive gutter, align and justify as breakpoint variables', () => {
+    render(
+      <Row
+        data-testid="row"
+        gutter={{ xs: [4, 2], md: [24, 12] }}
+        align={{ xs: 'top', md: 'bottom' }}
+        justify={{ xs: 'start', md: 'end' }}>
+        <Col data-testid="col">Content</Col>
+      </Row>
+    )
+    const row = screen.getByTestId('row')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-base')).toBe('4px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-md')).toBe('24px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-md')).toBe('12px')
+    expect(row.style.getPropertyValue('--tiger-row-align-md')).toBe('flex-end')
+    expect(row.style.getPropertyValue('--tiger-row-justify-md')).toBe('flex-end')
   })
 
   it('forwards ref, className, and a single click on Row and Col', () => {

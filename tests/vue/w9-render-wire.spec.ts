@@ -164,7 +164,7 @@ describe('w9 render wiring', () => {
     expect(view.getByText('Ada')).toBeTruthy()
     expect(document.querySelector('[data-tiger-space-split]')?.textContent).toBe('/')
     const row = view.getByText('cell').parentElement as HTMLElement
-    expect(row.style.getPropertyValue('--tiger-row-gutter-x')).not.toBe('')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-base')).not.toBe('')
     const root = document.querySelector('[data-scroll-area]') as HTMLElement & {
       scrollToMarker?: (id: string) => void
     }

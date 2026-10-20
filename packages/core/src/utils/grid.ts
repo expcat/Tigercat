@@ -2,11 +2,19 @@
  * Grid utility functions — 24-column flex grid with CSS gap.
  */
 
-import type { Align, Justify, GutterSize, ColSpan, Breakpoint } from '../types/grid'
+import type {
+  Align,
+  Justify,
+  GutterSize,
+  ColSpan,
+  Breakpoint,
+  ResponsiveAlign,
+  ResponsiveJustify
+} from '../types/grid'
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
 import { GRID_BREAKPOINT_ORDER } from './layout-grid-styles'
-import { isResponsiveMap, resolveResponsiveValue } from './responsive'
+import { isResponsiveMap, resolveResponsiveValue, responsiveContainerVars } from './responsive'
 
 const ALIGN_CSS: Record<Align, string> = {
   top: 'flex-start',
@@ -93,20 +101,56 @@ export function hasGutter(gutter: GutterSize | undefined | null): boolean {
 export function getRowGutterStyleVars(
   gutter: GutterSize | undefined | null
 ): Record<string, string> {
+  if (isResponsiveMap(gutter)) {
+    const xMap: Partial<Record<Breakpoint, number>> = {}
+    const yMap: Partial<Record<Breakpoint, number>> = {}
+    let authored = false
+    for (const bp of GRID_BREAKPOINT_ORDER) {
+      const raw = gutter[bp]
+      if (raw === undefined) continue
+      authored = true
+      const resolved = resolveGutter(raw)
+      xMap[bp] = resolved.x
+      yMap[bp] = resolved.y
+    }
+    if (!authored) return {}
+    return {
+      ...responsiveContainerVars('row-gutter-x', xMap, { unit: 'px' }),
+      ...responsiveContainerVars('row-gutter-y', yMap, { unit: 'px' })
+    }
+  }
   const { x, y } = resolveGutter(gutter)
   const vars: Record<string, string> = {}
-  if (x > 0) vars['--tiger-row-gutter-x'] = `${x}px`
-  if (y > 0) vars['--tiger-row-gutter-y'] = `${y}px`
+  if (x > 0) vars['--tiger-row-gutter-x-base'] = `${x}px`
+  if (y > 0) vars['--tiger-row-gutter-y-base'] = `${y}px`
   return vars
 }
 
+function rowKeywordVars<T extends string>(
+  name: string,
+  value: T | Partial<Record<Breakpoint, T>>,
+  fallback: T,
+  css: Record<T, string>
+): Record<string, string> {
+  const toCss = (raw: T): string => css[raw] ?? css[fallback]
+  if (!isResponsiveMap(value)) {
+    return { [`--tiger-${name}-base`]: toCss(value) }
+  }
+  const map: Partial<Record<Breakpoint, string>> = {}
+  for (const bp of GRID_BREAKPOINT_ORDER) {
+    const raw = value[bp]
+    if (raw !== undefined) map[bp] = toCss(raw)
+  }
+  return responsiveContainerVars(name, map)
+}
+
 export function getRowAlignJustifyVars(
-  align: Align = 'top',
-  justify: Justify = 'start'
+  align: ResponsiveAlign = 'top',
+  justify: ResponsiveJustify = 'start'
 ): Record<string, string> {
   return {
-    '--tiger-row-align': ALIGN_CSS[align] ?? ALIGN_CSS.top,
-    '--tiger-row-justify': JUSTIFY_CSS[justify] ?? JUSTIFY_CSS.start
+    ...rowKeywordVars('row-align', align, 'top', ALIGN_CSS),
+    ...rowKeywordVars('row-justify', justify, 'start', JUSTIFY_CSS)
   }
 }
 

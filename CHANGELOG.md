@@ -24,6 +24,7 @@
 - **拖拽隔离（Core / Vue / React）**：List 的拖拽容器 id 改为按实例生成，同页多个 List 的同 id 项不再互相串扰；跨容器拖拽时目标列表的同 id 项不再继承 `data-dragging` 标记与位移预览，Drag 自定义渲染拿到的 `isDragging` 与共享绑定一致；指针拖拽的命中测试跳过拖动源自身。
 - **Resizable / Splitter（Core / Vue / React）**：边把手命中区恢复真实尺寸（原 `inset-inline-0` / `inset-block-0` 在 Tailwind v4 不存在导致把手 0 尺寸）；预设宽高比按预设自身钳制而不是起点比例（方形起点设 16/9 后拖宽得到 16/9 结果）；RTL 下 origin 偏移不再二次翻转拖动对边。
 - **Space / ScrollArea / Masonry / Sidebar / Descriptions（Vue / React）**：Space 命名 `size` 搭配 `verticalSize` 时列间距不再被压成 0；ScrollArea `scrollToMarker` 在有相对定位祖先时定位正确；Vue Masonry 子项动态增删后重新测量分布；React Sidebar 受控 `collapsed` 时 trigger 只发 `onCollapsedChange` 请求、不自行改宽；Vue Descriptions 标题 id 改用 SSR 安全的 `useId`。
+- **Row（Vue / React）**：响应式 `gutter` / `align` / `justify` 从一次性读取 `window.innerWidth` 改为静态 CSS 变量级联——输入变量按现有断点 token 经 `@media` 提升，窗口缩放实时生效，SSR 输出不再依赖视口；嵌套 Row 拥有自身默认与断点值，不再继承父 Row 的响应式地图；Vue 的 `align` / `justify` prop 类型修正为接受响应式地图，消除运行时告警。Core `getRowGutterStyleVars` / `getRowAlignJustifyVars` 的返回键改为输入变量名，迁移说明见 [MIGRATION.md](docs/MIGRATION.md)。
 
 ## v3.0.0-rc.1（2026-10-05）
 

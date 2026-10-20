@@ -174,22 +174,25 @@ export function resolveResponsiveValue<T>(
 }
 
 /**
- * CSS variables for one container-query property.
+ * CSS variables for one breakpoint-cascaded property.
  * The smallest authored breakpoint is the base (including a 0-width container).
  * Larger breakpoints are `--tiger-{name}-{bp}` and the stylesheet promotes them.
- * A bare number only sets the base. It does not invent xs / 3 / 1.
+ * A bare number or keyword only sets the base. It does not invent xs / 3 / 1.
+ * The unit applies to numbers only; string values (e.g. alignment keywords) pass through.
  */
 export function responsiveContainerVars(
   name: string,
-  value: number | Partial<Record<ResponsiveBreakpoint, number>> | undefined,
+  value: number | string | Partial<Record<ResponsiveBreakpoint, number | string>> | undefined,
   options: { unit?: string } = {}
 ): Record<string, string> {
   if (value == null) return {}
   const unit = options.unit ?? ''
-  const write = (n: number) => `${n}${unit}`
+  const valid = (v: number | string): boolean =>
+    typeof v === 'number' ? Number.isFinite(v) : v !== ''
+  const write = (v: number | string): string => (typeof v === 'number' ? `${v}${unit}` : v)
   const baseKey = `--tiger-${name}-base`
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) return {}
+  if (typeof value === 'number' || typeof value === 'string') {
+    if (!valid(value)) return {}
     return { [baseKey]: write(value) }
   }
   const base = smallestDefinedResponsive(value, false)
@@ -198,7 +201,7 @@ export function responsiveContainerVars(
   let skippedBase = false
   for (const bp of RESPONSIVE_BREAKPOINT_ORDER) {
     const raw = value[bp]
-    if (raw === undefined || !Number.isFinite(raw)) continue
+    if (raw === undefined || !valid(raw)) continue
     if (!skippedBase) {
       skippedBase = true
       continue
