@@ -42,10 +42,12 @@ export interface TableContext {
   hiddenColumnKeys: ComputedRef<string[]>
   selectedRowKeys: ComputedRef<(string | number)[]>
   expandedRowKeys: ComputedRef<(string | number)[]>
+  /** Loaded rows that pass getCheckboxProps (disabled rows excluded). */
+  loadedSelectableRowKeys: ComputedRef<(string | number)[]>
 
   // --- Local refs ---
   editingCell: Ref<{ rowIndex: number; columnKey: string } | null>
-  editingValue: Ref<string>
+  editingValue: Ref<string | number>
   virtualScrollTop: Ref<number>
 
   // --- Handlers ---
@@ -63,7 +65,7 @@ export interface TableContext {
   handleSelectLoaded: (checked?: boolean) => void
   isCellEditable: (columnKey: string, rowIndex: number) => boolean
   startEditing: (rowIndex: number, columnKey: string, currentValue: unknown) => void
-  commitEdit: () => void
+  commitEdit: (rawOverride?: unknown) => void
   cancelEdit: () => void
   handleExport: () => void
   handleDragStart: (columnKey: string) => void

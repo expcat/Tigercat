@@ -1652,3 +1652,128 @@ describe('Table', () => {
     })
   })
 })
+
+describe('R11 regressions', () => {
+  it('does not select a disabled row on row click (F01)', async () => {
+    const onSelectionChange = vi.fn()
+    const { container } = render(Table, {
+      props: {
+        columns,
+        dataSource,
+        rowSelection: {
+          showCheckbox: false,
+          getCheckboxProps: (record: Record<string, unknown>) => ({ disabled: record.id === 1 })
+        }
+      },
+      attrs: { onSelectionChange }
+    })
+
+    const rows = container.querySelectorAll('tbody tr')
+    await fireEvent.click(rows[0])
+    expect(onSelectionChange).not.toHaveBeenCalled()
+
+    await fireEvent.click(rows[1])
+    expect(onSelectionChange).toHaveBeenCalledTimes(1)
+    expect(onSelectionChange.mock.calls[0][0]).toEqual([2])
+  })
+
+  it('keeps header, summary and colgroup aligned while the column window scrolls (F08)', async () => {
+    const wide: TableColumn[] = Array.from({ length: 10 }, (_, i) => ({
+      key: `c${i}`,
+      title: `C${i}`,
+      width: 120
+    }))
+    const rows = Array.from({ length: 5 }, (_, i) => {
+      const record: Record<string, unknown> = { id: i + 1 }
+      wide.forEach((col) => {
+        record[col.key] = `${col.key}-${i}`
+      })
+      return record
+    })
+    const { container } = render(Table, {
+      props: {
+        columns: wide,
+        dataSource: rows,
+        width: 400,
+        virtualizeColumns: true,
+        pagination: false,
+        summaryRow: { show: true, data: { c0: 'S0' } }
+      }
+    })
+    await nextTick()
+
+    const wrapper = container.querySelector(
+      '[data-tiger-table-layout="table"]'
+    ) as HTMLElement | null
+    expect(wrapper).toBeTruthy()
+
+    const headerText = () =>
+      Array.from(container.querySelectorAll('thead th:not([aria-hidden])')).map(
+        (th) => th.textContent
+      )
+
+    expect(headerText()).toContain('C0')
+    expect(headerText()).not.toContain('C9')
+
+    wrapper!.scrollLeft = 900
+    await fireEvent.scroll(wrapper!)
+    await nextTick()
+
+    const headers = headerText()
+    expect(headers).not.toContain('C0')
+    expect(headers).toContain('C9')
+    const headerCells = container.querySelectorAll('thead th')
+    expect(container.querySelectorAll('tfoot td').length).toBe(headerCells.length)
+    expect(container.querySelectorAll('colgroup col').length).toBe(headerCells.length)
+  })
+
+  const editSelectColumns: TableColumn[] = [
+    {
+      key: 'name',
+      title: 'Name',
+      edit: 'select',
+      editOptions: [
+        { label: 'Alpha', value: 'Alpha' },
+        { label: 'Beta', value: 'Beta' }
+      ]
+    }
+  ]
+
+  it('commits the picked select value once (F10)', async () => {
+    const onCellChange = vi.fn()
+    const { getByRole, getByText } = render(Table, {
+      props: {
+        columns: editSelectColumns,
+        dataSource: [{ id: 1, name: 'Alpha' }],
+        rowKey: 'id',
+        pagination: false
+      },
+      attrs: { onCellChange }
+    })
+
+    await fireEvent.dblClick(getByText('Alpha').closest('td')!)
+    await fireEvent.click(getByRole('combobox'))
+    await fireEvent.click(getByRole('option', { name: 'Beta' }))
+    expect(onCellChange).toHaveBeenCalledTimes(1)
+    expect(onCellChange.mock.calls[0][2]).toBe('Beta')
+  })
+
+  it('cancels a select cell edit on closed Escape (F10)', async () => {
+    const onCellChange = vi.fn()
+    const { container, getByRole, getByText } = render(Table, {
+      props: {
+        columns: editSelectColumns,
+        dataSource: [{ id: 1, name: 'Alpha' }],
+        rowKey: 'id',
+        pagination: false
+      },
+      attrs: { onCellChange }
+    })
+
+    await fireEvent.dblClick(getByText('Alpha').closest('td')!)
+    const combobox = getByRole('combobox')
+    await fireEvent.keyDown(combobox, { key: 'Escape' })
+    expect(onCellChange).not.toHaveBeenCalled()
+    expect(container.querySelector('[role="combobox"]')).toBeNull()
+  })
+})

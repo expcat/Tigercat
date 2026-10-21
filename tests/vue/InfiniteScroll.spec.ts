@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/vue'
 import { InfiniteScroll } from '@expcat/tigercat-vue/InfiniteScroll'
-import { h } from 'vue'
+import { h, nextTick } from 'vue'
 import { expectNoA11yViolations } from '../utils'
+import { MockIntersectionObserver } from '../utils/mock-observers'
 
 describe('InfiniteScroll (Vue)', () => {
   it('renders children via default slot', () => {
@@ -243,5 +244,48 @@ describe('InfiniteScroll (Vue)', () => {
       await rerender({ hasMore: false, loading: false, height: 288 })
       await expectNoA11yViolations(container)
     })
+  })
+})
+
+describe('R11 regressions', () => {
+  it('does not request again while a load-more listener promise is pending (F09)', async () => {
+    MockIntersectionObserver.reset()
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+    let resolveLoad: (() => void) | undefined
+    const onLoadMore = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveLoad = resolve
+        })
+    )
+    render(InfiniteScroll, {
+      props: { hasMore: true, root: null, onLoadMore },
+      slots: { default: () => h('div', 'content') }
+    })
+    await nextTick()
+    const observer = MockIntersectionObserver.instances.at(-1)!
+    expect(observer).toBeTruthy()
+
+    observer.trigger({ isIntersecting: true })
+    await nextTick()
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+
+    // While the first request is pending, a leave/re-enter cycle must not retrigger.
+    observer.trigger({ isIntersecting: false })
+    observer.trigger({ isIntersecting: true })
+    await nextTick()
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+
+    resolveLoad!()
+    // The pending state settles through promise handlers; use a macrotask to
+    // get past the microtask chain before re-arming the sentinel.
+    await new Promise<void>((resolve) => setTimeout(resolve, 0))
+    await nextTick()
+    // After a settled load the sentinel must leave before the next request.
+    observer.trigger({ isIntersecting: false })
+    observer.trigger({ isIntersecting: true })
+    await nextTick()
+    expect(onLoadMore).toHaveBeenCalledTimes(2)
+    vi.unstubAllGlobals()
   })
 })

@@ -89,6 +89,8 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(props, r
       aria-label={ctx.ariaLabel}
       aria-labelledby={ctx.labelledBy}
       aria-multiselectable={ctx.multiple || undefined}
+      onFocus={ctx.handleTreeFocusIn}
+      onBlur={ctx.handleTreeFocusOut}
       onKeyDown={(event) => {
         const attr = (event.target as HTMLElement)
           .closest('[data-tiger-treeitem-key]')

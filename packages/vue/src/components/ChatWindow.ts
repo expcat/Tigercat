@@ -49,6 +49,7 @@ import { Button } from './Button'
 import { VirtualList } from './VirtualList'
 import { Empty } from './Empty'
 import { useTigerConfig } from './tiger-config'
+import { emitWithReturn, hasEmitHandler } from '../utils/emit-with-return'
 
 export interface VueChatWindowProps extends Omit<
   CoreChatWindowProps,
@@ -216,8 +217,7 @@ export const ChatWindow = defineComponent({
       }
     )
 
-    const hasSendHandler = () =>
-      typeof (instance?.vnode.props as { onSend?: unknown } | undefined)?.onSend === 'function'
+    const hasSendHandler = () => hasEmitHandler(instance, 'send')
 
     const inputValue = computed(() =>
       props.modelValue !== undefined ? props.modelValue : localValue.value
@@ -306,9 +306,7 @@ export const ChatWindow = defineComponent({
       sendingNow = true
       sending.value = true
       try {
-        const returned = emit('send', payload) as unknown
-        const tasks = Array.isArray(returned) ? returned : [returned]
-        await Promise.all(tasks.map((task) => Promise.resolve(task)))
+        await emitWithReturn(instance, 'send', [payload])
         if (props.clearOnSend) handleValueChange('')
       } catch {
         // Keep the draft so the same text can be sent again.

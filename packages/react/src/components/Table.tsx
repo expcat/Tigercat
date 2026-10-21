@@ -17,6 +17,7 @@ import {
   devWarn,
   resolveScrollportViewport,
   virtualizeMiddleColumns,
+  getTableColumnRenderEntries,
   parseWidthToPx,
   cardVirtualWindow,
   nextGridCell,
@@ -508,10 +509,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     scrollLeft: columnScrollLeft,
     viewportWidth: typeof width === 'number' ? width : 0,
     overscan,
+    dir: config.direction === 'rtl' ? 'rtl' : 'ltr',
     enabled: virtualizeColumns
   })
-  const renderedColumns = columnSlice.active
-    ? [...columnSlice.start, ...columnSlice.middle, ...columnSlice.end]
+  const columnEntries = columnSlice.active
+    ? getTableColumnRenderEntries(ctx.displayColumns, columnSlice)
     : undefined
 
   const tableInner = (
@@ -549,17 +551,24 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       aria-rowcount={virtual ? ctx.paginatedData.length + 1 : undefined}
       aria-colcount={virtualizeColumns ? ctx.displayColumns.length : undefined}
       style={
-        ctx.fixedColumnsInfo.hasFixedColumns && ctx.fixedColumnsInfo.minTableWidth
+        (ctx.fixedColumnsInfo.hasFixedColumns || columnSlice.active) &&
+        ctx.fixedColumnsInfo.minTableWidth
           ? {
               ...(props as React.HTMLAttributes<HTMLTableElement>).style,
               minWidth: `${ctx.fixedColumnsInfo.minTableWidth}px`
             }
           : (props as React.HTMLAttributes<HTMLTableElement>).style
       }>
-      {(columnLockable || ctx.fixedColumnsInfo.hasFixedColumns) && (
+      {(columnLockable || ctx.fixedColumnsInfo.hasFixedColumns || columnEntries) && (
         <colgroup>
           {getTableColgroup({
-            columns: ctx.displayColumns,
+            columns: columnEntries
+              ? columnEntries.map((entry) =>
+                  entry.kind === 'spacer'
+                    ? ({ key: entry.key, title: '', width: entry.width } as TableColumn)
+                    : entry.column
+                )
+              : ctx.displayColumns,
             frozenWidths: ctx.frozenColumnWidths,
             size,
             hasSelectionColumn: hasTableSelectionColumn(internalRowSelection),
@@ -584,7 +593,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         labels: tableLabels,
         selectionName: selectionGroupName,
         filterMode,
-        renderedColumns
+        columnEntries
       })}
       {renderTableBody(ctx, {
         size,
@@ -600,7 +609,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         interactiveRows: !!onRowClick || !!internalRowSelection,
         virtualWindow,
         virtualItemHeight,
-        renderedColumns,
+        columnEntries,
         selectionName: selectionGroupName,
         activeRowIndex,
         onActiveRowIndex: setActiveRowIndex,
@@ -610,7 +619,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         size,
         rowSelection: internalRowSelection,
         expandable: internalExpandable,
-        summaryRow
+        summaryRow,
+        columnEntries
       })}
     </table>
   )
@@ -650,6 +660,15 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       ref={wrapperRef}
       className={getTableWrapperClasses(bordered, maxHeight, !effectiveVirtual)}
       style={wrapperStyle}
+      // Without a row window the wrapper itself is the horizontal
+      // scrollport, so it owns the column-window scroll position.
+      onScroll={
+        virtualizeColumns && !effectiveVirtual
+          ? (e) => {
+              setColumnScrollLeft((e.target as HTMLDivElement).scrollLeft)
+            }
+          : undefined
+      }
       data-tiger-virtual={effectiveVirtual ? 'enabled' : undefined}
       data-tiger-virtual-recommended={virtualRecommendation.recommended ? 'true' : undefined}
       data-tiger-virtual-threshold={
@@ -663,7 +682,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         columns={ctx.displayColumns}
         sorts={ctx.multiSort}
         pageKeys={ctx.pageRowKeys}
-        loadedKeys={ctx.processedRowKeys}
+        loadedKeys={ctx.loadedSelectableRowKeys}
         disabledKeys={ctx.paginatedData.flatMap((record, index) => {
           const key = ctx.pageRowKeys[index]
           const checkbox = internalRowSelection?.getCheckboxProps?.(record)

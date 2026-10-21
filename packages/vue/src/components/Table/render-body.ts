@@ -27,6 +27,9 @@ import {
   tableVirtualSpacerCellClasses,
   isVirtualTableCellControlTarget,
   resolveCellSpan,
+  getTableColumnRenderEntries,
+  getTableColumnSpacerStyle,
+  type TableColumnRenderEntry,
   type TableVirtualWindow,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
@@ -238,10 +241,21 @@ export function renderTableBody(
 
     cells.push(...chrome.leading.map((slot) => chromeTd(slot)))
 
-    const bodyColumns =
-      (props as TableInternalProps & { renderedColumns?: TableInternalProps['columns'] })
-        .renderedColumns ?? ctx.displayColumns.value
-    bodyColumns.forEach((column) => {
+    const bodyEntries =
+      (props as TableInternalProps & { columnEntries?: TableColumnRenderEntry[] }).columnEntries ??
+      getTableColumnRenderEntries(ctx.displayColumns.value)
+    bodyEntries.forEach((entry) => {
+      if (entry.kind === 'spacer') {
+        cells.push(
+          h('td', {
+            key: entry.key,
+            'aria-hidden': 'true',
+            style: getTableColumnSpacerStyle(entry.width)
+          })
+        )
+        return
+      }
+      const column = entry.column
       const dataKey = column.dataKey || column.key
       const cellValue = record[dataKey]
 
@@ -302,9 +316,13 @@ export function renderTableBody(
                 modelValue: ctx.editingValue.value,
                 options: column.editOptions ?? [],
                 'onUpdate:modelValue': (value: string | number | undefined) => {
-                  ctx.editingValue.value = value == null ? '' : String(value)
+                  // Select keys/blur stay inside the trigger; commit the picked
+                  // value once, keeping numeric option types intact.
+                  const raw = value == null ? '' : value
+                  ctx.editingValue.value = raw
+                  ctx.commitEdit(raw)
                 },
-                ...editorEvents
+                onBlur: editorEvents.onBlur
               })
             : column.edit === 'text'
               ? h(Input, {
@@ -349,6 +367,19 @@ export function renderTableBody(
             onDblclick:
               isEditableCell && !isEditing
                 ? () => ctx.startEditing(sourceIndex, column.key, cellValue)
+                : undefined,
+            onKeydown:
+              isEditing && column.edit === 'select'
+                ? (e: KeyboardEvent) => {
+                    // Closed-select Escape is not prevented by the trigger;
+                    // cancel here without touching the Select key contract.
+                    if (isEscapeKey(e) && !e.defaultPrevented) {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      e.stopImmediatePropagation()
+                      ctx.cancelEdit()
+                    }
+                  }
                 : undefined
           },
           [cellContent]

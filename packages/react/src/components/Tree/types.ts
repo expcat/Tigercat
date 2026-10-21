@@ -109,6 +109,8 @@ export interface TreeContext {
   handleSelect: (nodeKey: TreeNodeKey) => void
   handleCheck: (nodeKey: TreeNodeKey, checked: boolean) => void
   handleKeyDown: (event: React.KeyboardEvent, nodeKey: TreeNodeKey) => void
+  handleTreeFocusIn: () => void
+  handleTreeFocusOut: (event: React.FocusEvent<HTMLElement>) => void
   handleNodeClick: (node: TreeNode, event: React.MouseEvent) => void
   startTreeDrag: (nodeKey: TreeNodeKey, event: React.DragEvent) => void
   overTreeDrag: (nodeKey: TreeNodeKey, event: React.DragEvent) => void

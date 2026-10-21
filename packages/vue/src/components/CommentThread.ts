@@ -77,6 +77,7 @@ import { Textarea } from './Textarea'
 import { Text } from './Text'
 import { useTigerConfig } from './tiger-config'
 import { VirtualList } from './VirtualList'
+import { emitWithReturn, hasEmitHandler } from '../utils/emit-with-return'
 
 /**
  * Vue CommentThread props. The React-only `onExpandedChange` callback is
@@ -264,12 +265,7 @@ export const CommentThread = defineComponent({
         onLoadMore: () => {
           flight.noteSentinel(true)
           if (!flight.canRequest({ hasMore: props.hasMore, error: props.loadError })) return
-          const returned = emit('load-root') as unknown
-          const tasks = Array.isArray(returned) ? returned : [returned]
-          const pending = tasks.filter(
-            (task) => task && typeof (task as { then?: unknown }).then === 'function'
-          )
-          flight.begin(pending.length > 0 ? Promise.all(pending) : undefined)
+          flight.begin(emitWithReturn(instance, 'load-root'))
         },
         onLeave: () => flight.noteSentinel(false)
       })
@@ -302,7 +298,7 @@ export const CommentThread = defineComponent({
     )
 
     const hasLoadMoreHandler = computed(() => typeof vnodeProps().onLoadMore === 'function')
-    const hasReplyHandler = () => typeof vnodeProps().onReply === 'function'
+    const hasReplyHandler = () => hasEmitHandler(instance, 'reply')
     const hasMoreHandler = computed(() => typeof vnodeProps().onMore === 'function')
     const hasUserClickHandler = computed(() => typeof vnodeProps().onUserClick === 'function')
 
@@ -369,9 +365,7 @@ export const CommentThread = defineComponent({
       const text = source.trim()
       replyInFlight.value = true
       try {
-        const returned = emit('reply', node, text) as unknown
-        const tasks = Array.isArray(returned) ? returned : [returned]
-        await Promise.all(tasks.map((task) => Promise.resolve(task)))
+        await emitWithReturn(instance, 'reply', [node, text])
         if (node) {
           replyValue.value = ''
           replyingTo.value = null

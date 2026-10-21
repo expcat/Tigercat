@@ -7,6 +7,7 @@ import {
   normalizeActiveKeys,
   collapseLevelKeys,
   type CollapseHeaderFocusAction,
+  type CollapseProps as CoreCollapseProps,
   type ExpandIconPosition
 } from '@expcat/tigercat-core'
 
@@ -34,6 +35,7 @@ export interface VueCollapseProps {
   bordered?: boolean
   expandIconPosition?: ExpandIconPosition
   ghost?: boolean
+  headingLevel?: CoreCollapseProps['headingLevel']
   className?: string
   style?: Record<string, string | number>
 }
@@ -121,7 +123,7 @@ export const Collapse = defineComponent({
     const currentActiveKeys = computed(() => {
       return props.activeKey !== undefined
         ? normalizeActiveKeys(props.activeKey, { accordion: props.accordion })
-        : internalActiveKeys.value
+        : normalizeActiveKeys(internalActiveKeys.value, { accordion: props.accordion })
     })
 
     const handlePanelClick = (key: string | number) => {

@@ -11,12 +11,15 @@ import {
   TABLE_FIXED_HEADER_Z_INDEX,
   getInputClasses,
   getTableChromeSlots,
+  getTableColumnRenderEntries,
+  getTableColumnSpacerStyle,
   getTableFixedHeaderCellClasses,
   getTableHeaderCellClasses,
   getTableHeaderClasses,
   hasTableSelectionColumn,
   resolveTableExpandSlot,
   tableSortButtonClasses,
+  type TableColumnRenderEntry,
   type ExpandableConfig,
   type RowSelectionConfig,
   type TableSize,
@@ -39,7 +42,7 @@ export interface RenderHeaderViewProps {
   labels: Required<TigerLocaleTable>
   selectionName?: string
   filterMode?: 'basic' | 'advanced'
-  renderedColumns?: TableContext['displayColumns']
+  columnEntries?: TableColumnRenderEntry[]
 }
 
 function isHeaderSortClickTarget(target: EventTarget | null): boolean {
@@ -59,9 +62,9 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
     unlockColumnAriaLabel,
     labels,
     filterMode = 'basic',
-    renderedColumns
+    columnEntries
   } = view
-  const headerColumns = renderedColumns ?? ctx.displayColumns
+  const headerEntries = columnEntries ?? getTableColumnRenderEntries(ctx.displayColumns)
   const chrome = getTableChromeSlots({
     hasSelectionColumn: hasTableSelectionColumn(rowSelection),
     expand: resolveTableExpandSlot(expandable)
@@ -94,7 +97,17 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
           <React.Fragment key={slot}>{renderChromeTh(slot)}</React.Fragment>
         ))}
 
-        {headerColumns.map((column) => {
+        {headerEntries.map((entry) => {
+          if (entry.kind === 'spacer') {
+            return (
+              <th
+                key={entry.key}
+                aria-hidden="true"
+                style={getTableColumnSpacerStyle(entry.width) as React.CSSProperties}
+              />
+            )
+          }
+          const column = entry.column
           const isSorted = ctx.sortState.key === column.key
           const sortDirection = isSorted ? ctx.sortState.direction : null
 

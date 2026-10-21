@@ -88,9 +88,14 @@ export const Timeline = defineComponent({
   setup(props, { slots, attrs }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
-    const pendingSignature = computed(() =>
-      props.pending ? mergedLocale.value?.timeline?.pendingText || 'Loading...' : ''
+    const pendingText = computed(() =>
+      resolveLocaleText(
+        'Loading...',
+        mergedLocale.value?.timeline?.pendingText,
+        mergedLocale.value?.common?.loadingText
+      )
     )
+    const pendingSignature = computed(() => (props.pending ? pendingText.value : ''))
     const pendingSeen = ref<string | null>(null)
     const liveRegion = manageLiveRegion('polite')
     watch(
@@ -264,15 +269,7 @@ export const Timeline = defineComponent({
       return h('li', { key: 'pending', class: itemClasses, 'aria-busy': 'true' }, [
         rail,
         h('div', { class: contentClasses }, [
-          h(
-            'div',
-            { class: timelineDescriptionClasses },
-            resolveLocaleText(
-              'Loading...',
-              mergedLocale.value?.timeline?.pendingText,
-              mergedLocale.value?.common?.loadingText
-            )
-          )
+          h('div', { class: timelineDescriptionClasses }, pendingText.value)
         ])
       ])
     }

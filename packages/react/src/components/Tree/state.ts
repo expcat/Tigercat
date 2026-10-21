@@ -189,6 +189,8 @@ export function useTreeState(props: TreeProps): TreeContext & {
   const [loadingIds, setLoadingIds] = useState(() => new Set<string>())
   const [activeKey, setActiveKey] = useState<TreeNodeKey | undefined>(undefined)
   const [internalSearch, setInternalSearch] = useState(defaultSearchValue ?? '')
+  const focusInsideTreeRef = useRef(false)
+  const lastAlignedKeyRef = useRef<TreeNodeKey | undefined>(undefined)
 
   if (treeDataRef.current !== treeData) {
     treeDataRef.current = treeData
@@ -589,6 +591,8 @@ export function useTreeState(props: TreeProps): TreeContext & {
       handleSelect,
       handleCheck,
       virtual,
+      itemHeight,
+      height,
       loadedIds,
       loadingIds,
       requestLoad
@@ -632,11 +636,29 @@ export function useTreeState(props: TreeProps): TreeContext & {
     if (virtual) {
       alignTreeVirtualScroll(virtualRef.current?.getScrollElement(), index, itemHeight, height)
     }
+    const activeKeyChanged = !sameTreeKey(lastAlignedKeyRef.current, activeKey)
+    lastAlignedKeyRef.current = activeKey
+    if (!activeKeyChanged && !focusInsideTreeRef.current) return
     const focus = () => itemRefs.current.get(treeKeyId(activeKey))?.focus()
     focus()
     const frame = requestAnimationFrame(focus)
     return () => cancelAnimationFrame(frame)
-  }, [activeKey, view.visibleItems, virtual])
+  }, [activeKey, view.visibleItems, virtual, itemHeight, height])
+
+  const handleTreeFocusIn = useCallback(() => {
+    focusInsideTreeRef.current = true
+  }, [])
+
+  const handleTreeFocusOut = useCallback((event: React.FocusEvent<HTMLElement>) => {
+    const next = event.relatedTarget
+    // A blur caused by removing the focused row (window re-render, element
+    // swap) is transient; the tree still logically owns focus, keep the latch.
+    // An explicit blur() on a connected row means the user left the tree.
+    const target = event.target
+    if (target instanceof Node && !target.isConnected) return
+    if (next instanceof Node && event.currentTarget.contains(next)) return
+    focusInsideTreeRef.current = false
+  }, [])
 
   const setSearchQuery = useCallback(
     (value: string) => {
@@ -697,6 +719,8 @@ export function useTreeState(props: TreeProps): TreeContext & {
     handleSelect,
     handleCheck,
     handleKeyDown,
+    handleTreeFocusIn,
+    handleTreeFocusOut,
     handleNodeClick: (node, event) => {
       if (node.disabled) return
       setActiveKey(node.key)

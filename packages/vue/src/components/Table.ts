@@ -37,6 +37,7 @@ import {
   getTableVirtualWindow,
   resolveScrollportViewport,
   virtualizeMiddleColumns,
+  getTableColumnRenderEntries,
   parseWidthToPx,
   cardVirtualWindow,
   nextGridCell,
@@ -436,10 +437,11 @@ export const Table = defineComponent({
         scrollLeft: columnScrollLeft.value,
         viewportWidth: typeof resolvedProps.width === 'number' ? resolvedProps.width : 0,
         overscan: resolvedProps.overscan,
+        dir: config.value.direction === 'rtl' ? 'rtl' : 'ltr',
         enabled: resolvedProps.virtualizeColumns
       })
-      const renderedColumns = columnSlice.active
-        ? [...columnSlice.start, ...columnSlice.middle, ...columnSlice.end]
+      const columnEntries = columnSlice.active
+        ? getTableColumnRenderEntries(ctx.displayColumns.value, columnSlice)
         : undefined
 
       const renderProps = {
@@ -450,7 +452,7 @@ export const Table = defineComponent({
         interactiveRows:
           !!resolvedProps.rowSelection || typeof instance?.vnode.props?.onRowClick === 'function',
         virtualWindow,
-        renderedColumns,
+        columnEntries,
         selectionName: selectionGroupName,
         activeRowIndex: activeRowIndex.value,
         onActiveRowIndex: (index: number) => {
@@ -462,12 +464,20 @@ export const Table = defineComponent({
       }
 
       const shouldPinColumns =
-        resolvedProps.columnLockable || ctx.fixedColumnsInfo.value.hasFixedColumns
+        resolvedProps.columnLockable ||
+        ctx.fixedColumnsInfo.value.hasFixedColumns ||
+        !!columnEntries
       const colgroup = shouldPinColumns
         ? h(
             'colgroup',
             getTableColgroup({
-              columns: ctx.displayColumns.value,
+              columns: columnEntries
+                ? columnEntries.map((entry) =>
+                    entry.kind === 'spacer'
+                      ? ({ key: entry.key, title: '', width: entry.width } as TableColumn)
+                      : entry.column
+                  )
+                : ctx.displayColumns.value,
               frozenWidths: ctx.frozenColumnWidths.value,
               size: resolvedProps.size,
               hasSelectionColumn: hasTableSelectionColumn(resolvedProps.rowSelection),
@@ -530,7 +540,8 @@ export const Table = defineComponent({
             resolvedProps.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
           ),
           style:
-            ctx.fixedColumnsInfo.value.hasFixedColumns && ctx.fixedColumnsInfo.value.minTableWidth
+            (ctx.fixedColumnsInfo.value.hasFixedColumns || columnSlice.active) &&
+            ctx.fixedColumnsInfo.value.minTableWidth
               ? { minWidth: `${ctx.fixedColumnsInfo.value.minTableWidth}px` }
               : undefined
         },
@@ -991,6 +1002,14 @@ export const Table = defineComponent({
             !effectiveVirtual
           ),
           style: wrapperStyle,
+          // Without a row window the wrapper itself is the horizontal
+          // scrollport, so it owns the column-window scroll position.
+          onScroll:
+            resolvedProps.virtualizeColumns && !effectiveVirtual
+              ? (event: Event) => {
+                  columnScrollLeft.value = (event.target as HTMLElement).scrollLeft
+                }
+              : undefined,
           'data-tiger-virtual': effectiveVirtual ? 'enabled' : undefined,
           'data-tiger-virtual-recommended': virtualRecommendation.recommended ? 'true' : undefined,
           'data-tiger-virtual-threshold': virtualRecommendation.recommended
@@ -1006,7 +1025,7 @@ export const Table = defineComponent({
             columns: ctx.displayColumns.value,
             sorts: ctx.multiSort.value,
             pageKeys: ctx.paginatedRowKeys.value,
-            loadedKeys: ctx.processedRowKeys.value,
+            loadedKeys: ctx.loadedSelectableRowKeys.value,
             disabledKeys: ctx.paginatedData.value.flatMap((record, index) => {
               const key = ctx.paginatedRowKeys.value[index]
               const checkbox = resolvedProps.rowSelection?.getCheckboxProps?.(record)

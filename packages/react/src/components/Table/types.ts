@@ -46,11 +46,13 @@ export interface TableContext {
   currentPageSize: number
   hiddenColumnKeys: string[]
   selectedRowKeys: (string | number)[]
+  /** Loaded rows that pass getCheckboxProps (disabled rows excluded). */
+  loadedSelectableRowKeys: (string | number)[]
 
   // editable state
   editingCell: { rowIndex: number; columnKey: string } | null
-  editingValue: string
-  setEditingValue: (value: string) => void
+  editingValue: string | number
+  setEditingValue: (value: string | number) => void
 
   // handlers
   toggleColumnLock: (key: string) => void
@@ -67,7 +69,7 @@ export interface TableContext {
   handleSelectLoaded: (checked?: boolean) => void
   isCellEditable: (columnKey: string, rowIndex: number) => boolean
   startEditing: (rowIndex: number, columnKey: string, currentValue: unknown) => void
-  commitEdit: () => void
+  commitEdit: (rawOverride?: unknown) => void
   cancelEdit: () => void
   handleExport: () => void
   handleDragStart: (columnKey: string) => void

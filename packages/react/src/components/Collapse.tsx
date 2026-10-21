@@ -59,7 +59,7 @@ export const Collapse: React.FC<CollapseProps> = ({
   const activeKeys = useMemo(() => {
     return controlledActiveKey !== undefined
       ? normalizeActiveKeys(controlledActiveKey, { accordion })
-      : internalActiveKeys
+      : normalizeActiveKeys(internalActiveKeys, { accordion })
   }, [controlledActiveKey, internalActiveKeys, accordion])
 
   const handlePanelClick = useCallback(

@@ -1,5 +1,9 @@
-import { defineComponent, h, ref } from 'vue'
+import { camelize, defineComponent, h, ref, toHandlerKey } from 'vue'
 import type { RowSelectionConfig, VirtualTableHandle } from '@expcat/tigercat-core'
+import {
+  getVirtualTableColumnWidths,
+  resolveVirtualTableColumnVirtualization
+} from '@expcat/tigercat-core'
 import { Table } from './Table'
 import { tableEmits, tableProps } from './Table/props'
 
@@ -18,6 +22,15 @@ export const VirtualTable = defineComponent({
       }
     } satisfies VirtualTableHandle)
 
+    // Forward every Table emit. tableEmits is the single source of truth, so
+    // newly added Table events keep flowing without a second hand-written list.
+    const forwardedEmits = Object.fromEntries(
+      tableEmits.map((name) => [
+        toHandlerKey(camelize(name)),
+        (...args: unknown[]) => emit(name, ...args)
+      ])
+    )
+
     return () => {
       const rowSelection = props.rowSelection
         ? ({
@@ -25,25 +38,26 @@ export const VirtualTable = defineComponent({
             showCheckbox: props.rowSelection.showCheckbox ?? false
           } as RowSelectionConfig)
         : undefined
+      // The wrapper contract only virtualizes plain numeric-width columns;
+      // fixed columns or unresolved widths fall back to full rendering.
+      const columnGuard = resolveVirtualTableColumnVirtualization({
+        virtualizeColumns: props.virtualizeColumns,
+        hasFixedColumns: (props.columns ?? []).some((column) => !!column.fixed),
+        widths: getVirtualTableColumnWidths([...(props.columns ?? [])]),
+        viewportWidth: typeof props.width === 'number' ? props.width : 0
+      })
       return h(
         Table,
         {
           ...attrs,
           ...props,
           virtual: true,
+          virtualizeColumns: columnGuard.active,
           overscan: props.overscan ?? 2,
           pagination: props.pagination === undefined ? false : props.pagination,
           rowSelection,
           scrollToIndex: scrollIndex.value,
-          onRowClick: (...args: unknown[]) => emit('row-click', ...args),
-          onSelectionChange: (...args: unknown[]) => emit('selection-change', ...args),
-          onSortChange: (...args: unknown[]) => emit('sort-change', ...args),
-          onFilterChange: (...args: unknown[]) => emit('filter-change', ...args),
-          onCellChange: (...args: unknown[]) => emit('cell-change', ...args),
-          onPageChange: (...args: unknown[]) => emit('page-change', ...args),
-          onExpandChange: (...args: unknown[]) => emit('expand-change', ...args),
-          onExport: (...args: unknown[]) => emit('export', ...args),
-          onSelectLoaded: (...args: unknown[]) => emit('select-loaded', ...args)
+          ...forwardedEmits
         },
         slots
       )

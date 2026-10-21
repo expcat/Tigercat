@@ -4,7 +4,7 @@
 
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { defineComponent, h, nextTick } from 'vue'
 import { ChatWindow } from '@expcat/tigercat-vue/ChatWindow'
@@ -54,9 +54,10 @@ async function flushScrollFrames(): Promise<void> {
 
 describe('ChatWindow (Vue)', () => {
   it('renders empty state and emits send', async () => {
-    const { emitted } = render(ChatWindow, {
+    const onSend = vi.fn()
+    render(ChatWindow, {
       props: { messages: [] },
-      attrs: { onSend: () => undefined }
+      attrs: { onSend }
     })
 
     expect(screen.getByText('No messages')).toBeInTheDocument()
@@ -65,20 +66,20 @@ describe('ChatWindow (Vue)', () => {
     await fireEvent.update(textarea, 'Hello')
     await fireEvent.keyDown(textarea, { key: 'Enter' })
 
-    expect(emitted().send).toBeTruthy()
-    expect(emitted().send?.[0]).toEqual(['Hello'])
+    expect(onSend).toHaveBeenCalledWith('Hello')
   })
 
   it('allows sending empty message when allowEmpty is true', async () => {
-    const { emitted } = render(ChatWindow, {
+    const onSend = vi.fn()
+    render(ChatWindow, {
       props: { allowEmpty: true },
-      attrs: { onSend: () => undefined }
+      attrs: { onSend }
     })
 
     const sendButton = screen.getByRole('button', { name: 'Send' })
     await fireEvent.click(sendButton)
 
-    expect(emitted().send?.[0]).toEqual([''])
+    expect(onSend).toHaveBeenCalledWith('')
   })
 
   it('does not send when disabled', async () => {
@@ -93,16 +94,17 @@ describe('ChatWindow (Vue)', () => {
   })
 
   it('handles shift+enter in textarea without sending', async () => {
-    const { emitted } = render(ChatWindow, { attrs: { onSend: () => undefined } })
+    const onSend = vi.fn()
+    render(ChatWindow, { attrs: { onSend } })
 
     const textarea = screen.getByPlaceholderText('Type a message') as HTMLTextAreaElement
     await fireEvent.update(textarea, 'Hello')
     await fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: true })
 
-    expect(emitted().send).toBeFalsy()
+    expect(onSend).not.toHaveBeenCalled()
 
     await fireEvent.keyDown(textarea, { key: 'Enter' })
-    expect(emitted().send?.[0]).toEqual(['Hello'])
+    expect(onSend).toHaveBeenCalledWith('Hello')
   })
 
   it('renders status and time metadata', () => {
@@ -145,16 +147,17 @@ describe('ChatWindow (Vue)', () => {
   })
 
   it('keeps input value when clearOnSend is false', async () => {
-    const { emitted } = render(ChatWindow, {
+    const onSend = vi.fn()
+    render(ChatWindow, {
       props: { inputType: 'input', clearOnSend: false },
-      attrs: { onSend: () => undefined }
+      attrs: { onSend }
     })
 
     const input = screen.getByPlaceholderText('Type a message') as HTMLInputElement
     await fireEvent.update(input, 'Ping')
     await fireEvent.keyDown(input, { key: 'Enter' })
 
-    expect(emitted().send?.[0]).toEqual(['Ping'])
+    expect(onSend).toHaveBeenCalledWith('Ping')
     expect(input.value).toBe('Ping')
   })
 

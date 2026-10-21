@@ -8,7 +8,6 @@ import { WaterfallChart } from '../../packages/react/src/components/WaterfallCha
 import { SankeyChart } from '../../packages/react/src/components/SankeyChart'
 import { NotificationBell } from '../../packages/react/src/components/NotificationBell'
 import { AssigneePicker } from '../../packages/react/src/components/AssigneePicker'
-import { VirtualList } from '@expcat/tigercat-react/VirtualList'
 
 describe('W9 react data components', () => {
   it('renders waterfall bars and sankey links', () => {
@@ -68,21 +67,6 @@ describe('W9 react data components', () => {
     expect(view.getByRole('listbox')).toBeTruthy()
     fireEvent.click(view.getByRole('option', { name: /Ada/ }))
     expect(onChange.ids).toEqual(['a'])
-  })
-
-  it('uses one virtual window for a multi-column list', () => {
-    const view = render(
-      <VirtualList
-        itemCount={12}
-        itemHeight={40}
-        height={80}
-        columns={3}
-        overscan={0}
-        renderItem={({ index }) => <span>Item {index}</span>}
-      />
-    )
-    expect(view.container.querySelector('[data-tiger-virtual-columns="3"]')).toBeTruthy()
-    expect(view.container.textContent).not.toContain('Item 11')
   })
 })
 

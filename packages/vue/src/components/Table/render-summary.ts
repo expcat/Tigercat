@@ -2,10 +2,13 @@ import { h, type VNodeChild } from 'vue'
 import {
   buildSummaryCells,
   getTableCellClasses,
+  getTableColumnRenderEntries,
+  getTableColumnSpacerStyle,
   getTableChromeSlots,
   hasTableSelectionColumn,
   resolveTableExpandSlot,
-  tableSummaryRowClasses
+  tableSummaryRowClasses,
+  type TableColumnRenderEntry
 } from '@expcat/tigercat-core'
 import type { TableContext, TableInternalProps } from './types'
 
@@ -24,14 +27,27 @@ export function renderSummaryRow(ctx: TableContext, props: TableInternalProps): 
     caller: props.summaryRow?.data,
     sum: props.summaryRow?.sum
   })
-  const dataCells = ctx.displayColumns.value.map((col, index) => {
+  const summaryEntries =
+    (props as TableInternalProps & { columnEntries?: TableColumnRenderEntry[] }).columnEntries ??
+    getTableColumnRenderEntries(ctx.displayColumns.value)
+  const indexByKey = new Map(ctx.displayColumns.value.map((col, index) => [col.key, index]))
+  const dataCells = summaryEntries.map((entry) => {
+    if (entry.kind === 'spacer') {
+      return h('td', {
+        key: entry.key,
+        'aria-hidden': 'true',
+        style: getTableColumnSpacerStyle(entry.width)
+      })
+    }
+    const col = entry.column
+    const index = indexByKey.get(col.key) ?? -1
     return h(
       'td',
       {
         key: col.key,
         class: getTableCellClasses(props.size, col.align || 'left', col.className)
       },
-      summaryCells[index] ?? ''
+      index >= 0 ? (summaryCells[index] ?? '') : ''
     )
   })
   return h('tfoot', { 'data-tiger-summary': '', style: { position: 'sticky', bottom: '0' } }, [

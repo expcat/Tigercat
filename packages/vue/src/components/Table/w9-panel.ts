@@ -170,6 +170,7 @@ export const TableW9Panel = defineComponent({
               type: 'button',
               key: `shift-${key}`,
               'data-tiger-shift-key': String(key),
+              disabled: props.disabledKeys.some((item) => String(item) === String(key)),
               onClick: (event: MouseEvent) => {
                 if (event.shiftKey) {
                   announce(

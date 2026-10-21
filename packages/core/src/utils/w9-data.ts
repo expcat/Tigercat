@@ -141,6 +141,45 @@ export function virtualizeMiddleColumns<T>(options: {
   }
 }
 
+/**
+ * One rendered data-column slot: a real column, or an aria-hidden spacer that
+ * holds the inline width of the skipped middle columns.
+ */
+export type TableColumnRenderEntry<T = Record<string, unknown>> =
+  { kind: 'column'; column: TableColumn<T> } | { kind: 'spacer'; key: string; width: number }
+
+/**
+ * Flatten a pinned column slice into render order for the header, body,
+ * summary, and colgroup. Inactive slices keep the given column order. Spacers
+ * carry the skipped middle widths so the table keeps its full inline size and
+ * the window can follow the horizontal scrollport.
+ */
+export function getTableColumnRenderEntries<T>(
+  columns: readonly TableColumn<T>[],
+  slice?: PinnedVirtualColumns<T> | null
+): TableColumnRenderEntry<T>[] {
+  if (!slice || !slice.active) return columns.map((column) => ({ kind: 'column', column }))
+  const entries: TableColumnRenderEntry<T>[] = []
+  for (const column of slice.start) entries.push({ kind: 'column', column })
+  if (slice.range.inlineBefore > 0) {
+    entries.push({ kind: 'spacer', key: '__virtual-pad-before__', width: slice.range.inlineBefore })
+  }
+  for (const column of slice.middle) entries.push({ kind: 'column', column })
+  if (slice.range.inlineAfter > 0) {
+    entries.push({ kind: 'spacer', key: '__virtual-pad-after__', width: slice.range.inlineAfter })
+  }
+  for (const column of slice.end) entries.push({ kind: 'column', column })
+  return entries
+}
+
+/**
+ * Style for spacer cells holding skipped virtual-column width. Padding and
+ * borders are zeroed so the spacer adds exactly `width` to the table.
+ */
+export function getTableColumnSpacerStyle(width: number): Record<string, string> {
+  return { width: `${width}px`, minWidth: `${width}px`, padding: '0', border: 'none' }
+}
+
 export function shiftSelectTableKeys(options: {
   orderedKeys: readonly (string | number)[]
   anchor: string | number | null

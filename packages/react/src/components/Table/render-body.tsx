@@ -27,6 +27,9 @@ import {
   tableVirtualSpacerCellClasses,
   isVirtualTableCellControlTarget,
   resolveCellSpan,
+  getTableColumnRenderEntries,
+  getTableColumnSpacerStyle,
+  type TableColumnRenderEntry,
   type RowSelectionConfig,
   type ExpandableConfig,
   type TableSize,
@@ -68,7 +71,7 @@ export interface RenderBodyViewProps {
   /** When set, only the windowed row slice is rendered (virtual scrolling). */
   virtualWindow?: TableVirtualWindow
   virtualItemHeight?: number
-  renderedColumns?: TableContext['displayColumns']
+  columnEntries?: TableColumnRenderEntry[]
   selectionName?: string
   activeRowIndex?: number
   onActiveRowIndex?: (index: number) => void
@@ -90,7 +93,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     interactiveRows,
     virtualWindow,
     virtualItemHeight,
-    renderedColumns,
+    columnEntries,
     selectionName,
     activeRowIndex = 0,
     grid = false,
@@ -293,7 +296,17 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           <React.Fragment key={slot}>{renderChromeTd(slot)}</React.Fragment>
         ))}
 
-        {(renderedColumns ?? ctx.displayColumns).map((column) => {
+        {(columnEntries ?? getTableColumnRenderEntries(ctx.displayColumns)).map((entry) => {
+          if (entry.kind === 'spacer') {
+            return (
+              <td
+                key={entry.key}
+                aria-hidden="true"
+                style={getTableColumnSpacerStyle(entry.width) as React.CSSProperties}
+              />
+            )
+          }
+          const column = entry.column
           const dataKey = column.dataKey || column.key
           const cellValue = record[dataKey]
 
@@ -350,33 +363,84 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
                 cellEditable
                   ? () => ctx.startEditing(sourceIndex, column.key, cellValue)
                   : undefined
+              }
+              onKeyDown={
+                isEditing && column.edit === 'select'
+                  ? (e) => {
+                      // Closed-select Escape is not prevented by the trigger;
+                      // cancel here without touching the Select key contract.
+                      if (isEscapeKey(e) && !e.defaultPrevented) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        e.nativeEvent.stopImmediatePropagation()
+                        ctx.cancelEdit()
+                      }
+                    }
+                  : undefined
               }>
               {isEditing ? (
                 column.edit === 'number' ? (
-                  <InputNumber
-                    value={Number(ctx.editingValue)}
-                    onChange={(value) => ctx.setEditingValue(value == null ? '' : String(value))}
-                    onBlur={ctx.commitEdit}
-                  />
+                  (() => {
+                    // InputNumber commits (Enter/blur) and raises onChange
+                    // before the adapter onKeyDown/onBlur run in the same
+                    // event; the setState from that onChange is not visible
+                    // to this render commitEdit closure yet, so the adapter
+                    // hands the just-delivered value to commitEdit directly.
+                    let latestRaw: string | undefined
+                    return (
+                      <InputNumber
+                        value={Number(ctx.editingValue)}
+                        onChange={(value) => {
+                          latestRaw = value == null ? '' : String(value)
+                          ctx.setEditingValue(latestRaw)
+                        }}
+                        onBlur={() => ctx.commitEdit(latestRaw)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') ctx.commitEdit(latestRaw)
+                          if (isEscapeKey(e)) {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            e.nativeEvent.stopImmediatePropagation()
+                            ctx.cancelEdit()
+                          }
+                        }}
+                      />
+                    )
+                  })()
                 ) : column.edit === 'select' ? (
                   <Select
                     value={ctx.editingValue}
                     options={column.editOptions ?? []}
-                    onChange={(value) => ctx.setEditingValue(value == null ? '' : String(value))}
-                    onBlur={ctx.commitEdit}
+                    onChange={(value) => {
+                      // Select keys/blur stay inside the trigger; commit the
+                      // picked value once, keeping numeric option types intact.
+                      const raw = value == null ? '' : value
+                      ctx.setEditingValue(raw)
+                      ctx.commitEdit(raw)
+                    }}
+                    onBlur={() => ctx.commitEdit()}
                   />
                 ) : column.edit === 'text' ? (
                   <Input
                     value={ctx.editingValue}
                     onChange={(value) => ctx.setEditingValue(String(value))}
-                    onBlur={ctx.commitEdit}
+                    onBlur={() => ctx.commitEdit()}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') ctx.commitEdit()
+                      if (isEscapeKey(e)) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        e.nativeEvent.stopImmediatePropagation()
+                        ctx.cancelEdit()
+                      }
+                    }}
                   />
                 ) : (
                   <input
                     className={editableCellInputClasses}
                     value={ctx.editingValue}
                     onChange={(e) => ctx.setEditingValue(e.target.value)}
-                    onBlur={ctx.commitEdit}
+                    onBlur={() => ctx.commitEdit()}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') ctx.commitEdit()
                       if (isEscapeKey(e)) {

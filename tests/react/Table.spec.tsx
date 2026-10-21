@@ -1583,3 +1583,34 @@ describe('Table', () => {
     })
   })
 })
+
+describe('R11 regressions', () => {
+  it('commits the typed number on Enter and blur, not the pre-edit value (F10)', () => {
+    const onCellChange = vi.fn()
+    const editColumns: TableColumn[] = [{ key: 'qty', title: 'Qty', edit: 'number' }]
+    const { container, getByText } = render(
+      <Table
+        columns={editColumns}
+        dataSource={[{ id: 1, qty: 10 }]}
+        rowKey="id"
+        pagination={false}
+        onCellChange={onCellChange}
+      />
+    )
+
+    fireEvent.doubleClick(getByText('10').closest('td')!)
+    const input = container.querySelector('input')!
+    fireEvent.change(input, { target: { value: '25' } })
+    fireEvent.keyDown(input, { key: 'Enter' })
+    expect(onCellChange).toHaveBeenCalledTimes(1)
+    expect(onCellChange.mock.calls[0][2]).toBe(25)
+    expect((onCellChange.mock.calls[0][3] as Array<{ qty: number }>)[0].qty).toBe(25)
+
+    fireEvent.doubleClick(getByText('10').closest('td')!)
+    const inputAgain = container.querySelector('input')!
+    fireEvent.change(inputAgain, { target: { value: '30' } })
+    fireEvent.blur(inputAgain)
+    expect(onCellChange).toHaveBeenCalledTimes(2)
+    expect(onCellChange.mock.calls[1][2]).toBe(30)
+  })
+})

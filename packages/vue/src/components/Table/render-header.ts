@@ -11,12 +11,15 @@ import {
   TABLE_FIXED_HEADER_Z_INDEX,
   getInputClasses,
   getTableChromeSlots,
+  getTableColumnRenderEntries,
+  getTableColumnSpacerStyle,
   getTableFixedHeaderCellClasses,
   getTableHeaderCellClasses,
   getTableHeaderClasses,
   hasTableSelectionColumn,
   resolveTableExpandSlot,
   tableSortButtonClasses,
+  type TableColumnRenderEntry,
   type TigerLocaleTable
 } from '@expcat/tigercat-core'
 import { Checkbox } from '../Checkbox'
@@ -63,10 +66,21 @@ export function renderTableHeader(
 
   const headerCells: VNodeChild[] = chrome.leading.map((slot) => chromeTh(slot))
 
-  const headerColumns =
-    (props as TableInternalProps & { renderedColumns?: TableInternalProps['columns'] })
-      .renderedColumns ?? ctx.displayColumns.value
-  headerColumns.forEach((column) => {
+  const headerEntries =
+    (props as TableInternalProps & { columnEntries?: TableColumnRenderEntry[] }).columnEntries ??
+    getTableColumnRenderEntries(ctx.displayColumns.value)
+  headerEntries.forEach((entry) => {
+    if (entry.kind === 'spacer') {
+      headerCells.push(
+        h('th', {
+          key: entry.key,
+          'aria-hidden': 'true',
+          style: getTableColumnSpacerStyle(entry.width)
+        })
+      )
+      return
+    }
+    const column = entry.column
     const isSorted = ctx.sortState.value.key === column.key
     const sortDirection = isSorted ? ctx.sortState.value.direction : null
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## VirtualList
 
-`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/15 props
+`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/12 props
 
 | Prop          | Type                                           | Default | Notes                                                                                      |
 | ------------- | ---------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |

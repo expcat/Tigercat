@@ -144,6 +144,7 @@ export function TableW9Panel({
           type="button"
           key={`shift-${key}`}
           data-tiger-shift-key={String(key)}
+          disabled={disabledKeys.some((item) => String(item) === String(key))}
           onClick={(event) => {
             if (event.shiftKey) {
               announce(

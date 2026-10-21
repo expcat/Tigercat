@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  getCurrentInstance,
   h,
   ref,
   computed,
@@ -30,6 +31,7 @@ import {
   type TigerLocale
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
+import { emitWithReturn } from '../utils/emit-with-return'
 
 export type VueInfiniteScrollProps = InstanceType<typeof InfiniteScroll>['$props']
 export type InfiniteScrollProps = VueInfiniteScrollProps
@@ -61,8 +63,9 @@ export const InfiniteScroll = defineComponent({
     className: { type: String, default: undefined }
   },
   emits: ['load-more'],
-  setup(props, { emit, slots, attrs }) {
+  setup(props, { slots, attrs }) {
     const config = useTigerConfig()
+    const instance = getCurrentInstance()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const dir = computed(() => (config.value.direction === 'rtl' ? 'rtl' : 'ltr'))
     const containerRef = ref<HTMLElement | null>(null)
@@ -79,12 +82,7 @@ export const InfiniteScroll = defineComponent({
     )
 
     function beginLoad() {
-      const returned = emit('load-more') as unknown
-      const tasks = Array.isArray(returned) ? returned : [returned]
-      const pending = tasks.filter(
-        (task) => task && typeof (task as { then?: unknown }).then === 'function'
-      )
-      flight.begin(pending.length > 0 ? Promise.all(pending) : undefined)
+      flight.begin(emitWithReturn(instance, 'load-more'))
     }
 
     function requestLoad() {

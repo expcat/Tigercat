@@ -402,8 +402,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
           onClick={() => {
             const flight = flightRef.current
             if (!flight.canRequest({ hasMore, loading, error: loadError })) return
-            flight.begin(undefined)
-            onLoadMore?.()
+            flight.begin(onLoadMore?.())
           }}>
           next
         </button>

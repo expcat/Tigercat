@@ -470,7 +470,22 @@ export function useTableState(input: UseTableStateInput): TableContext {
     }
   }
 
+  const loadedSelectableRowKeys = useMemo(
+    () =>
+      getTableSelectionState({
+        records: view.processedData,
+        rowKeys: view.processedRowKeys,
+        selectedRowKeys,
+        getCheckboxProps: rowSelection?.getCheckboxProps
+      }).selectableRowKeys,
+    [view, selectedRowKeys, rowSelection]
+  )
+
   function handleSelectRow(key: string | number, checked: boolean) {
+    const selectable = view.selectableRowKeys.some(
+      (item) => tableRowKeyId(item) === tableRowKeyId(key)
+    )
+    if (!selectable) return
     const newKeys = getNextTableSelectRowKeys({
       selectedRowKeys,
       key,
@@ -493,16 +508,10 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   function handleSelectLoaded(checked = true) {
     const remote = shouldSkipTableLocalProcessing(paginationMerged)
-    const loaded = getTableSelectionState({
-      records: view.processedData,
-      rowKeys: view.processedRowKeys,
-      selectedRowKeys,
-      getCheckboxProps: rowSelection?.getCheckboxProps
-    })
     const result = resolveTableSelectLoadedKeys({
       remote,
       selectedKeys: selectedRowKeys,
-      loadedSelectableKeys: loaded.selectableRowKeys,
+      loadedSelectableKeys: loadedSelectableRowKeys,
       checked
     })
     if (result.emitOnly) {
@@ -518,7 +527,10 @@ export function useTableState(input: UseTableStateInput): TableContext {
   const [editingCell, setEditingCell] = useState<{ rowIndex: number; columnKey: string } | null>(
     null
   )
-  const [editingValue, setEditingValue] = useState('')
+  // Select editors keep the raw option type (string | number) so blur commits
+  // and validation retries do not stringify numeric options. Text and number
+  // editors always store strings.
+  const [editingValue, setEditingValue] = useState<string | number>('')
 
   function isCellEditable(columnKey: string, rowIndex: number): boolean {
     const column = columns.find((item) => item.key === columnKey)
@@ -530,18 +542,24 @@ export function useTableState(input: UseTableStateInput): TableContext {
 
   function startEditing(rowIndex: number, columnKey: string, currentValue: unknown) {
     setEditingCell({ rowIndex, columnKey })
-    setEditingValue(String(currentValue ?? ''))
+    const column = columns.find((item) => item.key === columnKey)
+    setEditingValue(
+      column?.edit === 'select' && typeof currentValue === 'number'
+        ? currentValue
+        : String(currentValue ?? '')
+    )
   }
 
-  function commitEdit() {
+  function commitEdit(rawOverride?: unknown) {
     if (!editingCell) return
+    const raw = rawOverride !== undefined ? rawOverride : editingValue
     const column = columns.find((item) => item.key === editingCell.columnKey)
     if (column?.edit || column?.validate) {
       const result = commitValidatedCellEdit({
         data: sourceData as Record<string, unknown>[],
         rowIndex: editingCell.rowIndex,
         column,
-        raw: editingValue
+        raw
       })
       if (!result.ok) return
       onCellChange?.(editingCell.rowIndex, editingCell.columnKey, result.value, result.nextData)
@@ -551,7 +569,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     const original = column
       ? getTableCellValue(sourceData[editingCell.rowIndex] ?? {}, column)
       : undefined
-    const value = coerceTableEditValue(original, editingValue)
+    const value = coerceTableEditValue(original, String(raw ?? ''))
     const nextData = commitTableCellEdit(sourceData, editingCell.rowIndex, column, value)
     onCellChange?.(editingCell.rowIndex, editingCell.columnKey, value, nextData)
     setEditingCell(null)
@@ -614,8 +632,15 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }
 
   function replaceSelectedKeys(keys: (string | number)[]) {
-    if (!selectionControl.controlled) setUncontrolledSelectedRowKeys(keys)
-    onSelectionChange?.(keys)
+    // Panel announcements bypass the single-row path; route them through the
+    // loaded selectable set so disabled rows can neither be selected nor
+    // cleared, and keys outside the loaded set stay untouched.
+    const selectableIds = new Set(loadedSelectableRowKeys.map((key) => tableRowKeyId(key)))
+    const requested = keys.filter((key) => selectableIds.has(tableRowKeyId(key)))
+    const preserved = getNextTableSelectAllKeys(selectedRowKeys, loadedSelectableRowKeys, false)
+    const nextKeys = getNextTableSelectAllKeys(preserved, requested, true)
+    if (!selectionControl.controlled) setUncontrolledSelectedRowKeys(nextKeys)
+    onSelectionChange?.(nextKeys)
   }
 
   function handleDrop(targetKey: string) {
@@ -671,6 +696,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     currentPageSize,
     hiddenColumnKeys: effectiveHiddenColumnKeys,
     selectedRowKeys,
+    loadedSelectableRowKeys,
     editingCell,
     editingValue,
     setEditingValue,

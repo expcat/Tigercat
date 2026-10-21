@@ -1,4 +1,14 @@
-import { defineComponent, computed, h, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
+import {
+  defineComponent,
+  computed,
+  getCurrentInstance,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  PropType,
+  ref,
+  watch
+} from 'vue'
 import {
   classNames,
   buildActivityGroups,
@@ -60,6 +70,7 @@ import { Tag } from './Tag'
 import { Card } from './Card'
 import { Text } from './Text'
 import { Link } from './Link'
+import { emitWithReturn } from '../utils/emit-with-return'
 import { Button } from './Button'
 import { Loading } from './Loading'
 import { useTigerConfig } from './tiger-config'
@@ -179,8 +190,9 @@ export const ActivityFeed = defineComponent({
     }
   },
   emits: ['load-more'],
-  setup(props, { slots, attrs, emit }) {
+  setup(props, { slots, attrs }) {
     const config = useTigerConfig()
+    const instance = getCurrentInstance()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getActivityFeedLabels(mergedLocale.value, props.labels))
 
@@ -271,12 +283,7 @@ export const ActivityFeed = defineComponent({
           ) {
             return
           }
-          const returned = emit('load-more') as unknown
-          const tasks = Array.isArray(returned) ? returned : [returned]
-          const pending = tasks.filter(
-            (task) => task && typeof (task as { then?: unknown }).then === 'function'
-          )
-          flight.begin(pending.length > 0 ? Promise.all(pending) : undefined)
+          flight.begin(emitWithReturn(instance, 'load-more'))
         },
         onLeave: () => flight.noteSentinel(false)
       })
@@ -558,8 +565,7 @@ export const ActivityFeed = defineComponent({
                     ) {
                       return
                     }
-                    flight.begin(undefined)
-                    emit('load-more')
+                    flight.begin(emitWithReturn(instance, 'load-more'))
                   }
                 },
                 'next'

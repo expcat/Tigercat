@@ -2570,6 +2570,8 @@
       "getTableChromeSlots",
       "getTableColgroup",
       "getTableColumnDataKey",
+      "getTableColumnRenderEntries",
+      "getTableColumnSpacerStyle",
       "getTableFixedCellClasses",
       "getTableFixedHeaderCellClasses",
       "getTableHeaderCellClasses",
@@ -5063,6 +5065,7 @@
       "TableColgroupOptions",
       "TableColumn",
       "TableColumnCardGrid",
+      "TableColumnRenderEntry",
       "tableContainerClasses",
       "TableEditFailure",
       "TableEditKind",
@@ -9182,17 +9185,14 @@
       "props": [
         "ariaLabel",
         "className",
-        "columns",
         "estimatedItemHeight",
         "getItemHeight",
         "getItemKey",
         "height",
         "itemCount",
         "itemHeight",
-        "orientation",
         "overscan",
-        "sizeStrategy",
-        "stickyIndexes"
+        "sizeStrategy"
       ]
     },
     "VirtualTableProps": {

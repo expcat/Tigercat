@@ -4,6 +4,10 @@ import type {
   VirtualTableHandle,
   VirtualTableProps
 } from '@expcat/tigercat-core'
+import {
+  getVirtualTableColumnWidths,
+  resolveVirtualTableColumnVirtualization
+} from '@expcat/tigercat-core'
 import { Table, type TableProps } from './Table'
 
 function VirtualTableInner<T extends Record<string, unknown>>(
@@ -27,9 +31,18 @@ function VirtualTableInner<T extends Record<string, unknown>>(
       } as RowSelectionConfig)
     : undefined
   const testId = (props as { 'data-testid'?: string })['data-testid']
+  // The wrapper contract only virtualizes plain numeric-width columns;
+  // fixed columns or unresolved widths fall back to full rendering.
+  const columnGuard = resolveVirtualTableColumnVirtualization({
+    virtualizeColumns: props.virtualizeColumns,
+    hasFixedColumns: (props.columns ?? []).some((column) => !!column.fixed),
+    widths: getVirtualTableColumnWidths([...(props.columns ?? [])]),
+    viewportWidth: typeof props.width === 'number' ? props.width : 0
+  })
   const tableProps = {
     ...(props as unknown as TableProps<T>),
     virtual: true,
+    virtualizeColumns: columnGuard.active,
     overscan: props.overscan ?? 2,
     pagination: false as const,
     rowSelection,

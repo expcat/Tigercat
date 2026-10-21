@@ -3,6 +3,7 @@ import {
   computed,
   ref,
   h,
+  onBeforeUpdate,
   onUnmounted,
   toRaw,
   watch,
@@ -261,6 +262,18 @@ export const Tree = defineComponent({
     const itemRefs = new Map<string, HTMLElement>()
     const virtualRef = ref<VirtualListHandle | null>(null)
     const edgeScroll = createTreeEdgeScroll()
+    let focusInsideTree = false
+    let lastAlignedKey: TreeNodeKey | undefined = undefined
+    const treeRootRef = ref<HTMLElement | null>(null)
+    // Focus ownership snapshot taken before each render: a window update can
+    // remove the focused row, which fires focusout while the element is still
+    // connected and is indistinguishable from an explicit blur() at that
+    // moment. The pre-render ownership is the fact that decides whether a
+    // geometry-driven loss should be restored.
+    let focusBeforeUpdate = false
+    onBeforeUpdate(() => {
+      focusBeforeUpdate = treeRootRef.value?.contains(document.activeElement) ?? false
+    })
 
     watch(
       () => props.treeData,
@@ -597,21 +610,35 @@ export const Tree = defineComponent({
       }
     })
 
-    watch(activeKey, async (key) => {
-      if (key === undefined) return
-      const index = view.value.visibleItems.findIndex((item) => sameTreeKey(item.key, key))
-      if (index < 0) return
-      if (props.virtual) {
-        alignTreeVirtualScroll(
-          virtualRef.value?.getScrollElement(),
-          index,
-          props.itemHeight,
-          props.height
-        )
-      }
-      await nextTick()
-      itemRefs.get(treeKeyId(key))?.focus()
-    })
+    watch(
+      [
+        activeKey,
+        () => props.itemHeight,
+        () => props.height,
+        () => props.virtual,
+        () => view.value.visibleItems
+      ],
+      async () => {
+        const key = activeKey.value
+        if (key === undefined) return
+        const index = view.value.visibleItems.findIndex((item) => sameTreeKey(item.key, key))
+        if (index < 0) return
+        if (props.virtual) {
+          alignTreeVirtualScroll(
+            virtualRef.value?.getScrollElement(),
+            index,
+            props.itemHeight,
+            props.height
+          )
+        }
+        const activeKeyChanged = !sameTreeKey(lastAlignedKey, key)
+        lastAlignedKey = key
+        if (!activeKeyChanged && !focusInsideTree && !focusBeforeUpdate) return
+        await nextTick()
+        itemRefs.get(treeKeyId(key))?.focus()
+      },
+      { flush: 'post' }
+    )
 
     function setSearchQuery(value: string): void {
       if (props.searchValue === undefined) {
@@ -923,9 +950,20 @@ export const Tree = defineComponent({
             'div',
             {
               role: 'tree',
+              ref: treeRootRef,
               'aria-label': name,
               'aria-labelledby': labelledBy,
               'aria-multiselectable': selection.value.multiple || undefined,
+              onFocusin: () => {
+                focusInsideTree = true
+              },
+              onFocusout: (event: FocusEvent) => {
+                const next = event.relatedTarget
+                if (next instanceof Node && (event.currentTarget as HTMLElement).contains(next)) {
+                  return
+                }
+                focusInsideTree = false
+              },
               onKeydown: (event: KeyboardEvent) => {
                 const attr = (event.target as HTMLElement)
                   .closest('[data-tiger-treeitem-key]')

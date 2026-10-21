@@ -16,6 +16,8 @@ Core `getInputNumberKeyboardNextValue` 的 `current` 参数与返回值扩展支
 
 LoadingBar 公开 props 删除 `renderBar`：该字段自引入起只被存入状态，两端宿主从不读取，传入没有任何可见效果。调整外观请使用现有的 `color` / `height` / `className` / `style` 选项；需要自定义布局时在应用侧沿用 `LoadingBarContainer` 自行渲染。
 
+VirtualList 公开 props 删除 `columns` / `orientation` / `stickyIndexes`：这三个字段只参与窗口索引计算，当前实现从未兑现所声明的网格布局、横向滚动轴与吸顶渲染契约——配置后实际得到的是损坏输出（如视口空白、行错位、横向滚动轴不生效），不是可用的网格或横向列表。本轮连同根元素上的 `data-tiger-virtual-columns` / `data-tiger-virtual-orientation` 属性一并移除。未传这三个字段的默认纵向列表路径保持不变。需要多列网格时请改用原生 CSS grid 自行布局，横向滚动场景使用横向 ScrollArea，必须在窗口外常驻的内容放在列表外的额外内容区（如 footer）。Core 数学函数 `virtualGridWindow` / `stickyIndexesInWindow` 仍是公开导出，直接消费它们的调用方不受影响。
+
 ## v3.0.0-rc.1
 
 本版只有视觉修正，没有需要迁移的 API 变化。
