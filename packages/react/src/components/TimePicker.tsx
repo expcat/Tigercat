@@ -145,12 +145,17 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
           />
           <TimePickerMobileSelects columns={ctx.columns} onSelect={ctx.selectColumn} />
           <div className={timePickerFooterClasses}>
-            <button type="button" className={timePickerFooterButtonClasses} onClick={ctx.selectNow}>
+            <button
+              type="button"
+              className={timePickerFooterButtonClasses}
+              disabled={ctx.locked}
+              onClick={ctx.selectNow}>
               {ctx.labels.now}
             </button>
             <button
               type="button"
               className={timePickerFooterButtonClasses}
+              disabled={ctx.locked}
               onClick={ctx.confirmDraft}>
               {ctx.labels.ok}
             </button>

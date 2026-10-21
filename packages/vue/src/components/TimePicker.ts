@@ -190,6 +190,7 @@ export const TimePicker = defineComponent({
     const effectiveDisabled = computed(
       () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
+    const locked = computed(() => effectiveDisabled.value || isReadOnly.value)
     const status = computed<InputStatus>(
       () => props.status ?? formItemControl?.status.value ?? 'default'
     )
@@ -248,6 +249,7 @@ export const TimePicker = defineComponent({
     }
 
     function writeCommitted(next: string | null | TimePickerRangeTuple) {
+      if (locked.value) return
       const same = isSameTimePickerValue(props.range, committed.value, next)
       clearPickerError()
       draftText.value = null
@@ -271,7 +273,7 @@ export const TimePicker = defineComponent({
     }
 
     function setOpenSafe(next: boolean) {
-      if (effectiveDisabled.value || isReadOnly.value) return
+      if (next && locked.value) return
       const changed = isOpen.value !== next
       if (props.open === undefined) localOpen.value = next
       if (changed) emit('update:open', next)
@@ -385,7 +387,22 @@ export const TimePicker = defineComponent({
       (open) => {
         if (!open) return
         activePart.value = 'start'
-        seedPanel(committed.value, 'start')
+        let seedValue = committed.value
+        if (!locked.value && draftText.value != null) {
+          const typed = resolveTypedTimePickerCommit(
+            draftText.value,
+            constraints.value,
+            props.range,
+            periodLabels.value
+          )
+          if (typed.ok) {
+            writeCommitted(typed.value)
+            seedValue = typed.value
+          } else {
+            reportPickerError(typed.reason)
+          }
+        }
+        seedPanel(seedValue, 'start')
         nextTick(focusPanel)
       },
       { immediate: true }
@@ -395,6 +412,7 @@ export const TimePicker = defineComponent({
     })
 
     function selectColumn(unit: TimePickerFocusUnit, option: number | 'AM' | 'PM') {
+      if (locked.value) return
       if (props.range) {
         const next = applyTimePickerRangeColumn({
           draftRange: draftRange.value,
@@ -413,6 +431,7 @@ export const TimePicker = defineComponent({
     }
 
     function confirmDraft() {
+      if (locked.value) return
       if (draftText.value != null) {
         const typed = resolveTypedTimePickerCommit(
           draftText.value,
@@ -443,6 +462,7 @@ export const TimePicker = defineComponent({
     }
 
     function selectNow() {
+      if (locked.value) return
       const result = commitTimePickerNow(props.range, props.now ?? new Date(), constraints.value)
       if ('error' in result) {
         reportPickerError(result.error)
@@ -454,12 +474,14 @@ export const TimePicker = defineComponent({
     }
 
     function clearValue() {
+      if (locked.value) return
       writeCommitted(emptyTimePickerValue(props.range))
       emit('clear')
       inputRef.value?.focus()
     }
 
     function parseDraft() {
+      if (locked.value) return
       if (draftText.value == null) return
       const result = resolveTypedTimePickerCommit(
         draftText.value,
@@ -789,6 +811,7 @@ export const TimePicker = defineComponent({
                     {
                       type: 'button',
                       class: timePickerFooterButtonClasses,
+                      disabled: locked.value,
                       onClick: selectNow
                     },
                     labels.value.now
@@ -798,6 +821,7 @@ export const TimePicker = defineComponent({
                     {
                       type: 'button',
                       class: timePickerFooterButtonClasses,
+                      disabled: locked.value,
                       onClick: confirmDraft
                     },
                     labels.value.ok

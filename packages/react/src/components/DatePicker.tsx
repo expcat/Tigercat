@@ -114,6 +114,7 @@ export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
                   key={shortcut.label}
                   type="button"
                   className={datePickerShortcutButtonClasses}
+                  disabled={ctx.locked}
                   onClick={() => ctx.applyShortcut(shortcut)}>
                   {shortcut.label}
                 </button>
@@ -124,6 +125,7 @@ export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
             <button
               type="button"
               className={datePickerFooterButtonClasses}
+              disabled={ctx.locked}
               onClick={ctx.selectToday}>
               {ctx.labels.today}
             </button>
@@ -131,6 +133,7 @@ export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
               <button
                 type="button"
                 className={datePickerFooterButtonClasses}
+                disabled={ctx.locked}
                 onClick={ctx.confirmOpen}>
                 {ctx.labels.ok}
               </button>

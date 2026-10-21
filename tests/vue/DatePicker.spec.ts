@@ -47,6 +47,30 @@ describe('DatePicker', () => {
     expect(container.querySelector('input')).toHaveValue('2024-06-20')
   })
 
+  it('ignores panel commits and drafts after readOnly is set on an open picker', async () => {
+    const onUpdate = vi.fn()
+    const june10 = new Date(2024, 5, 10)
+    const { container, rerender } = render(DatePicker, {
+      props: {
+        defaultOpen: true,
+        defaultValue: june10,
+        now: june,
+        shortcuts: [{ label: 'Next day', value: () => new Date(2024, 5, 11) }],
+        'onUpdate:modelValue': onUpdate
+      }
+    })
+    await screen.findByRole('dialog')
+    await rerender({ readOnly: true })
+    fireEvent.click(screen.getByRole('button', { name: 'Today' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next day' }))
+    fireEvent.click(document.querySelector('[data-date="2024-06-20"]') as HTMLElement)
+    expect(onUpdate).not.toHaveBeenCalled()
+    expect(container.querySelector('input[type="text"]')).toHaveValue('2024-06-10')
+    ;(document.querySelector('[role="gridcell"][tabindex="0"]') as HTMLElement).focus()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
   it('supports v-model:open', async () => {
     const onOpen = vi.fn()
     render(DatePicker, {

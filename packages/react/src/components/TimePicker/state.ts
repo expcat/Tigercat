@@ -76,6 +76,7 @@ export function useTimePickerController(props: TimePickerProps) {
   const inGroup = inputGroup != null
   const effectiveSize = size ?? inputGroup?.size ?? 'md'
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const locked = effectiveDisabled || isReadOnly
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
   const shakeTrigger = formItemControl?.shakeTrigger
   const effectiveId = id ?? formItemControl?.id
@@ -216,6 +217,8 @@ export function useTimePickerController(props: TimePickerProps) {
   const panelId = `tiger-timepicker-panel-${instanceId}`
 
   const mountedRef = useRef(false)
+  const lockedRef = useRef(locked)
+  lockedRef.current = locked
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true
@@ -253,33 +256,47 @@ export function useTimePickerController(props: TimePickerProps) {
 
   const setOpenSafe = useCallback(
     (next: boolean) => {
-      if (effectiveDisabled || isReadOnly) return
+      if (next && lockedRef.current) return
       setOpen(next)
       if (!next) setDraftText(null)
     },
-    [effectiveDisabled, isReadOnly, setOpen]
+    [setOpen]
+  )
+
+  const writeCommitted = useCallback(
+    (next: string | null | TimePickerRangeTuple) => {
+      if (lockedRef.current) return
+      clearError()
+      setDraftText(null)
+      // Deduplicate against the synchronous latest value inside the setter:
+      // the open effect and the focus-migration blur can both commit the same
+      // typed value in one tick, and each resolve produces a fresh range tuple.
+      setCommitted((prev) => (isSameTimePickerValue(isRangeMode, prev, next) ? prev : next))
+    },
+    [clearError, isRangeMode, setCommitted]
   )
 
   useEffect(() => {
     if (!isOpen) return
     setActivePart('start')
-    seedPanel(committed, 'start')
-    // Seed from the committed value only when the panel opens.
+    let seedValue = committed
+    if (!lockedRef.current && draftText != null) {
+      const typed = resolveTypedTimePickerCommit(draftText, constraints, isRangeMode, periodLabels)
+      if (typed.ok) {
+        writeCommitted(typed.value)
+        seedValue = typed.value
+      } else {
+        reportError(typed.reason)
+      }
+    }
+    seedPanel(seedValue, 'start')
+    // Seed from the current edited text (committing it) or the committed value
+    // only when the panel opens, through every open path (internal and controlled).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
-  const writeCommitted = useCallback(
-    (next: string | null | TimePickerRangeTuple) => {
-      const same = isSameTimePickerValue(isRangeMode, committed, next)
-      clearError()
-      setDraftText(null)
-      if (same) return
-      setCommitted(next)
-    },
-    [clearError, committed, isRangeMode, setCommitted]
-  )
-
   const confirmDraft = useCallback(() => {
+    if (lockedRef.current) return
     if (draftText != null) {
       const typed = resolveTypedTimePickerCommit(draftText, constraints, isRangeMode, periodLabels)
       if (!typed.ok) {
@@ -316,6 +333,7 @@ export function useTimePickerController(props: TimePickerProps) {
 
   const selectColumn = useCallback(
     (unit: TimePickerFocusUnit, option: number | 'AM' | 'PM') => {
+      if (lockedRef.current) return
       if (isRangeMode) {
         const next = applyTimePickerRangeColumn({
           draftRange,
@@ -336,6 +354,7 @@ export function useTimePickerController(props: TimePickerProps) {
   )
 
   const selectNow = useCallback(() => {
+    if (lockedRef.current) return
     const result = commitTimePickerNow(isRangeMode, props.now ?? new Date(), constraints)
     if ('error' in result) {
       reportError(result.error)
@@ -347,12 +366,14 @@ export function useTimePickerController(props: TimePickerProps) {
   }, [constraints, isRangeMode, props.now, reportError, seedPanel, setOpenSafe, writeCommitted])
 
   const clearValue = useCallback(() => {
+    if (lockedRef.current) return
     writeCommitted(emptyTimePickerValue(isRangeMode))
     onClear?.()
     inputRef.current?.focus()
   }, [isRangeMode, onClear, writeCommitted])
 
   const parseDraftInput = useCallback(() => {
+    if (lockedRef.current) return
     if (draftText == null) return
     const result = resolveTypedTimePickerCommit(draftText, constraints, isRangeMode, periodLabels)
     if (!result.ok) {
@@ -377,18 +398,21 @@ export function useTimePickerController(props: TimePickerProps) {
 
   const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (effectiveDisabled || isReadOnly) return
-    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
-      if (event.key === 'Enter' && draftText != null) {
-        event.preventDefault()
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setOpenSafe(true)
+      return
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      if (draftText != null) {
         parseDraftInput()
         return
       }
-      if (event.key === 'Enter' && isOpen) {
-        event.preventDefault()
+      if (isOpen) {
         confirmDraft()
         return
       }
-      event.preventDefault()
       setOpenSafe(true)
     }
   }
@@ -478,6 +502,7 @@ export function useTimePickerController(props: TimePickerProps) {
     placeholder,
     effectiveDisabled,
     isReadOnly,
+    locked,
     required: required || Boolean(formItemControl?.required),
     effectiveId,
     effectiveName,

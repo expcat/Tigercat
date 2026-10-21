@@ -174,6 +174,7 @@ export const DatePicker = defineComponent({
     const effectiveDisabled = computed(
       () => props.disabled || (formItemControl?.disabled.value ?? false)
     )
+    const locked = computed(() => effectiveDisabled.value || isReadOnly.value)
     const status = computed<InputStatus>(
       () => props.status ?? formItemControl?.status.value ?? 'default'
     )
@@ -219,6 +220,7 @@ export const DatePicker = defineComponent({
     }
 
     function writeCommitted(next: Date | null | RangeTuple) {
+      if (locked.value) return
       const same = isSameDatePickerValue(props.range, committed.value, next)
       clearPickerError()
       draftText.value = null
@@ -231,7 +233,7 @@ export const DatePicker = defineComponent({
     }
 
     function setOpenSafe(next: boolean) {
-      if (effectiveDisabled.value || isReadOnly.value) return
+      if (next && locked.value) return
       const changed = isOpen.value !== next
       if (props.open === undefined) localOpen.value = next
       if (changed) emit('update:open', next)
@@ -329,6 +331,7 @@ export const DatePicker = defineComponent({
     })
 
     function selectDay(date: Date) {
+      if (locked.value) return
       const result = commitDatePickerDay({
         range: props.range,
         picked: date,
@@ -348,6 +351,7 @@ export const DatePicker = defineComponent({
     }
 
     function selectToday() {
+      if (locked.value) return
       const result = commitDatePickerToday(
         props.range,
         datePickerTodayInstant(props.now),
@@ -360,6 +364,7 @@ export const DatePicker = defineComponent({
     }
 
     function applyShortcut(shortcut: DatePickerShortcut) {
+      if (locked.value) return
       const parsed = parseDatePickerShortcut(shortcut, props.range)
       if (parsed == null) return
       const accepted = acceptDatePickerCandidate(props.range, parsed, bounds.value)
@@ -373,6 +378,7 @@ export const DatePicker = defineComponent({
     }
 
     function confirmRange() {
+      if (locked.value) return
       if (draftText.value != null) {
         const typed = resolveTypedDatePickerCommit(
           draftText.value,
@@ -406,6 +412,7 @@ export const DatePicker = defineComponent({
     }
 
     function clearValue() {
+      if (locked.value) return
       writeCommitted(emptyDatePickerValue(props.range))
       previewRange.value = null
       draftText.value = null
@@ -414,6 +421,7 @@ export const DatePicker = defineComponent({
     }
 
     function parseDraft() {
+      if (locked.value) return
       if (draftText.value == null) return
       const result = resolveTypedDatePickerCommit(
         draftText.value,
@@ -592,6 +600,7 @@ export const DatePicker = defineComponent({
                             key: shortcut.label,
                             type: 'button',
                             class: datePickerShortcutButtonClasses,
+                            disabled: locked.value,
                             onClick: () => applyShortcut(shortcut)
                           },
                           shortcut.label
@@ -605,6 +614,7 @@ export const DatePicker = defineComponent({
                     {
                       type: 'button',
                       class: datePickerFooterButtonClasses,
+                      disabled: locked.value,
                       onClick: selectToday
                     },
                     labels.value.today
@@ -615,6 +625,7 @@ export const DatePicker = defineComponent({
                         {
                           type: 'button',
                           class: datePickerFooterButtonClasses,
+                          disabled: locked.value,
                           onClick: confirmRange
                         },
                         labels.value.ok

@@ -88,6 +88,52 @@ describe('TimePicker', () => {
     expect(screen.getByRole('textbox')).toHaveValue('11:00')
   })
 
+  it('ignores panel commits and drafts after readOnly is set on an open picker', async () => {
+    const onChange = vi.fn()
+    const now = new Date(2024, 5, 15, 14, 25)
+    const { rerender } = render(
+      <TimePicker defaultOpen defaultValue="09:30" now={now} onChange={onChange} />
+    )
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    rerender(<TimePicker defaultOpen defaultValue="09:30" now={now} readOnly onChange={onChange} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Now' }))
+    fireEvent.click(document.querySelector('[aria-label="10 Hour"]') as HTMLElement)
+    await userEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.getByRole('textbox')).toHaveValue('09:30')
+    ;(document.querySelector('[data-tiger-timepicker-unit="hour"]') as HTMLElement).focus()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('commits the typed time when ArrowDown opens the panel', async () => {
+    const onChange = vi.fn()
+    const { container } = render(<TimePicker defaultValue="09:30" name="at" onChange={onChange} />)
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: '10:30' } })
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith('10:30')
+    expect(input).toHaveValue('10:30')
+    expect(container.querySelector('input[name="at"]')).toHaveValue('10:30')
+    await userEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('commits a typed draft on Space without opening the panel', () => {
+    const onChange = vi.fn()
+    render(<TimePicker defaultValue="09:30" onChange={onChange} />)
+    const input = screen.getByRole('textbox')
+    fireEvent.change(input, { target: { value: '10:30' } })
+    fireEvent.keyDown(input, { key: ' ' })
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith('10:30')
+    expect(input).toHaveValue('10:30')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
   it('does not emit onChange until OK', async () => {
     const onChange = vi.fn()
     render(<TimePicker onChange={onChange} />)

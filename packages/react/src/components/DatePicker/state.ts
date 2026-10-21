@@ -68,6 +68,7 @@ export function useDatePickerController(props: DatePickerProps) {
   const inGroup = inputGroup != null
   const effectiveSize = size ?? inputGroup?.size ?? 'md'
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
+  const locked = effectiveDisabled || isReadOnly
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
   const shakeTrigger = formItemControl?.shakeTrigger
   const effectiveId = id ?? formItemControl?.id
@@ -196,6 +197,8 @@ export function useDatePickerController(props: DatePickerProps) {
   const panelId = `tiger-datepicker-panel-${instanceId}`
 
   const mountedRef = useRef(false)
+  const lockedRef = useRef(locked)
+  lockedRef.current = locked
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true
@@ -206,11 +209,11 @@ export function useDatePickerController(props: DatePickerProps) {
 
   const setOpenSafe = useCallback(
     (next: boolean) => {
-      if (effectiveDisabled || isReadOnly) return
+      if (next && lockedRef.current) return
       setOpen(next)
       if (!next) setPreviewRange(null)
     },
-    [effectiveDisabled, isReadOnly, setOpen]
+    [setOpen]
   )
 
   const reportError = useCallback(
@@ -228,6 +231,7 @@ export function useDatePickerController(props: DatePickerProps) {
 
   const writeCommitted = useCallback(
     (next: Date | null | DatePickerRangeResolvedValue) => {
+      if (lockedRef.current) return
       const same = isSameDatePickerValue(isRangeMode, committed, next)
       clearError()
       setDraftText(null)
@@ -239,6 +243,7 @@ export function useDatePickerController(props: DatePickerProps) {
 
   const selectDay = useCallback(
     (date: Date) => {
+      if (lockedRef.current) return
       const result = commitDatePickerDay({
         range: isRangeMode,
         picked: date,
@@ -269,6 +274,7 @@ export function useDatePickerController(props: DatePickerProps) {
   )
 
   const selectToday = useCallback(() => {
+    if (lockedRef.current) return
     const result = commitDatePickerToday(isRangeMode, datePickerTodayInstant(now), bounds)
     if ('error' in result) return
     writeCommitted(result.nextCommitted)
@@ -278,6 +284,7 @@ export function useDatePickerController(props: DatePickerProps) {
 
   const applyShortcut = useCallback(
     (shortcut: DatePickerShortcut) => {
+      if (lockedRef.current) return
       const parsed = parseDatePickerShortcut(shortcut, isRangeMode)
       if (parsed == null) return
       const accepted = acceptDatePickerCandidate(isRangeMode, parsed, bounds)
@@ -293,6 +300,7 @@ export function useDatePickerController(props: DatePickerProps) {
   )
 
   const clearValue = useCallback(() => {
+    if (lockedRef.current) return
     writeCommitted(emptyDatePickerValue(isRangeMode))
     setPreviewRange(null)
     onClear?.()
@@ -300,6 +308,7 @@ export function useDatePickerController(props: DatePickerProps) {
   }, [isRangeMode, onClear, writeCommitted])
 
   const confirmOpen = useCallback(() => {
+    if (lockedRef.current) return
     if (draftText != null) {
       const typed = resolveTypedDatePickerCommit(draftText, format, isRangeMode, localeCode, bounds)
       if (!typed.ok) {
@@ -338,6 +347,7 @@ export function useDatePickerController(props: DatePickerProps) {
   ])
 
   const parseDraft = useCallback(() => {
+    if (lockedRef.current) return
     if (draftText == null) return
     const result = resolveTypedDatePickerCommit(draftText, format, isRangeMode, localeCode, bounds)
     if (!result.ok) {
@@ -404,6 +414,7 @@ export function useDatePickerController(props: DatePickerProps) {
     placeholder,
     effectiveDisabled,
     isReadOnly,
+    locked,
     required: required || Boolean(formItemControl?.required),
     effectiveId,
     effectiveName,

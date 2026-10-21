@@ -97,6 +97,26 @@ describe('CronEditor', () => {
     )
   })
 
+  it('keeps an unfinished field draft when another field commits', () => {
+    render(<CronEditor defaultValue="*/5 1 * * *" />)
+
+    fireEvent.change(screen.getByLabelText('Minute step'), { target: { value: '' } })
+    fireEvent.change(screen.getByLabelText('Hour value'), { target: { value: '2' } })
+
+    expect(screen.getByLabelText('Cron expression')).toHaveValue('*/5 2 * * *')
+    expect(screen.getByLabelText('Minute step')).toHaveValue('')
+  })
+
+  it('reseeds all fields when the external value changes', () => {
+    const { rerender } = render(<CronEditor value="*/5 1 * * *" />)
+    expect(screen.getByLabelText('Hour value')).toHaveValue('1')
+
+    rerender(<CronEditor value="*/10 3 * * *" />)
+
+    expect(screen.getByLabelText('Minute step')).toHaveValue('10')
+    expect(screen.getByLabelText('Hour value')).toHaveValue('3')
+  })
+
   it('supports range editing', () => {
     const onChange = vi.fn()
     render(<CronEditor defaultValue="* * * * *" onChange={onChange} />)

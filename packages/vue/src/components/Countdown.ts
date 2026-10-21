@@ -108,14 +108,6 @@ export const Countdown = defineComponent({
       timerId = null
     }
 
-    const syncRemainingFromSnapshot = () => {
-      remaining.value =
-        props.now !== undefined || !mounted
-          ? getCountdownRemaining(props.value, props.now)
-          : getCountdownRemaining(props.value)
-      finished = remaining.value <= 0
-    }
-
     const tick = () => {
       const nextRemaining = getCountdownRemaining(props.value)
       const payload = createCountdownPayload(nextRemaining, props.format)
@@ -142,14 +134,15 @@ export const Countdown = defineComponent({
     watch(
       () => parseCountdownTimestamp(props.value),
       () => {
-        syncRemainingFromSnapshot()
+        remaining.value = getCountdownRemaining(props.value)
         total.value = Math.max(remaining.value, 0)
+        finished = remaining.value <= 0
         setupTimer()
       }
     )
 
     watch(
-      () => props.now,
+      () => parseCountdownTimestamp(props.now),
       () => {
         remaining.value = getCountdownRemaining(props.value, props.now)
         finished = remaining.value <= 0

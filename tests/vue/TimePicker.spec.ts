@@ -64,6 +64,44 @@ describe('TimePicker', () => {
     expect(container.querySelector('input')).toHaveValue('11:00')
   })
 
+  it('ignores panel commits and drafts after readOnly is set on an open picker', async () => {
+    const onUpdate = vi.fn()
+    const { container, rerender } = render(TimePicker, {
+      props: {
+        defaultOpen: true,
+        defaultValue: '09:30',
+        now: new Date(2024, 5, 15, 14, 25),
+        'onUpdate:modelValue': onUpdate
+      }
+    })
+    await screen.findByRole('dialog')
+    await rerender({ readOnly: true })
+    fireEvent.click(screen.getByRole('button', { name: 'Now' }))
+    fireEvent.click(document.querySelector('[aria-label="10 Hour"]') as HTMLElement)
+    await fireEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(onUpdate).not.toHaveBeenCalled()
+    expect(container.querySelector('input[type="text"]')).toHaveValue('09:30')
+    ;(document.querySelector('[data-tiger-timepicker-unit="hour"]') as HTMLElement).focus()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('commits the typed time when ArrowDown opens the panel', async () => {
+    const { container, emitted } = render(TimePicker, {
+      props: { defaultValue: '09:30', name: 'at' }
+    })
+    const input = container.querySelector('input[type="text"]') as HTMLInputElement
+    await fireEvent.update(input, '10:30')
+    await fireEvent.keyDown(input, { key: 'ArrowDown' })
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+    expect(emitted()['update:modelValue']).toEqual([['10:30']])
+    expect(input).toHaveValue('10:30')
+    expect(container.querySelector('input[name="at"]')).toHaveValue('10:30')
+    await fireEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(emitted()['update:modelValue']).toEqual([['10:30']])
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
   it('does not emit until OK', async () => {
     const { emitted } = render(TimePicker, { props: { defaultOpen: true } })
     await fireEvent.click(document.querySelector('[aria-label="09 Hour"]') as HTMLElement)

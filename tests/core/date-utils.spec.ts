@@ -309,6 +309,17 @@ describe('parseDate', () => {
     expect(withOffset).not.toBeNull()
     expect(withOffset!.getTime()).not.toBeNaN()
   })
+
+  it('rejects garbage inside formatted segments instead of stripping it', () => {
+    expect(parseDate('2024-01-15abc', 'yyyy-MM-dd')).toBeNull()
+    expect(parseDate('2024x-01-15', 'yyyy-MM-dd')).toBeNull()
+    expect(parseDate('2024-0!1-15', 'yyyy-MM-dd')).toBeNull()
+    expect(parseDate('2024-01-1 5', 'yyyy-MM-dd')).toBeNull()
+    expect(parseDate('2024-01-15 GMT', 'yyyy-MM-dd')).toBeNull()
+    expect(parseDate('2024-01-15', 'yyyy-MM-dd')).toEqual(new Date(2024, 0, 15))
+    expect(parseDate('2024-1-5', 'yyyy-MM-dd')).toEqual(new Date(2024, 0, 5))
+    expect(parseDate('2024-\u200e01\u200f-15', 'yyyy-MM-dd')).toEqual(new Date(2024, 0, 15))
+  })
 })
 
 describe('date-utils arithmetic', () => {

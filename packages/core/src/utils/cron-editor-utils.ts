@@ -527,8 +527,10 @@ export interface CronSchedule {
 }
 
 export function parseCronSchedule(expression: string): CronSchedule | null {
+  if (isCronExpressionEmpty(expression)) return null
   if (!validateCronExpression(expression).valid) return null
   const parts = getCronExpressionParts(expression)
+  if (parts.length !== cronFieldMetas.length) return null
   const minute = cronFieldMatches(parts[0], 0, 59)
   const hour = cronFieldMatches(parts[1], 0, 23)
   const dayOfMonth = cronFieldMatches(parts[2], 1, 31)
@@ -557,7 +559,14 @@ function cronDayMatches(schedule: CronSchedule, date: Date): boolean {
   return dom || dow
 }
 
-/** Next fire time after `from`, using the same 5-field rules as validation. */
+/**
+ * Next fire time after `from`, using the same 5-field rules as validation.
+ *
+ * Non-matching days and hours are skipped whole instead of scanning minute by
+ * minute. The 8-year window covers the widest Gregorian leap-day gap (8 years,
+ * e.g. 2096 -> 2104), so every valid 5-field schedule with a match fires within
+ * it; impossible dates such as Feb 31 return null after the bounded scan.
+ */
 export function nextCronRun(expression: string, from: Date = new Date()): Date | null {
   const schedule = parseCronSchedule(expression)
   if (!schedule) return null
@@ -565,14 +574,24 @@ export function nextCronRun(expression: string, from: Date = new Date()): Date |
   cursor.setSeconds(0, 0)
   cursor.setMinutes(cursor.getMinutes() + 1)
   const limit = new Date(cursor.getTime())
-  limit.setFullYear(limit.getFullYear() + 2)
-  while (cursor < limit) {
-    if (
-      cronDayMatches(schedule, cursor) &&
-      schedule.hour.has(cursor.getHours()) &&
-      schedule.minute.has(cursor.getMinutes())
-    ) {
-      return cursor
+  limit.setFullYear(limit.getFullYear() + 8)
+  while (cursor.getTime() < limit.getTime()) {
+    if (!cronDayMatches(schedule, cursor)) {
+      cursor.setDate(cursor.getDate() + 1)
+      cursor.setHours(0, 0, 0, 0)
+      continue
+    }
+    if (!schedule.hour.has(cursor.getHours())) {
+      cursor.setHours(cursor.getHours() + 1, 0, 0, 0)
+      continue
+    }
+    if (schedule.minute.has(cursor.getMinutes())) {
+      // During a DST fall-back hour, wall-clock setters normalize ambiguous
+      // local times to the earlier offset, so a matching candidate can land
+      // before `from`. Compare timestamps and keep scanning past stale ones.
+      if (cursor.getTime() > from.getTime()) {
+        return new Date(cursor.getTime())
+      }
     }
     cursor.setMinutes(cursor.getMinutes() + 1)
   }

@@ -51,6 +51,40 @@ describe('DatePicker', () => {
     expect(container.querySelector('input')).toHaveValue('2024-06-20')
   })
 
+  it('ignores panel commits and drafts after readOnly is set on an open picker', async () => {
+    const onChange = vi.fn()
+    const june10 = new Date(2024, 5, 10)
+    const shortcuts = [{ label: 'Next day', value: () => new Date(2024, 5, 11) }]
+    const { rerender } = render(
+      <DatePicker
+        defaultOpen
+        defaultValue={june10}
+        now={june}
+        shortcuts={shortcuts}
+        onChange={onChange}
+      />
+    )
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    rerender(
+      <DatePicker
+        defaultOpen
+        defaultValue={june10}
+        now={june}
+        shortcuts={shortcuts}
+        readOnly
+        onChange={onChange}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Today' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next day' }))
+    fireEvent.click(document.querySelector('[data-date="2024-06-20"]') as HTMLElement)
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.getByRole('textbox')).toHaveValue('2024-06-10')
+    ;(document.querySelector('[role="gridcell"][tabindex="0"]') as HTMLElement).focus()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
   it('supports controlled open', async () => {
     function Harness() {
       const [open, setOpen] = useState(false)

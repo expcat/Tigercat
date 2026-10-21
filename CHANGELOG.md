@@ -31,6 +31,9 @@
 - **Space / ScrollArea / Masonry / Sidebar / Descriptions（Vue / React）**：Space 命名 `size` 搭配 `verticalSize` 时列间距不再被压成 0；ScrollArea `scrollToMarker` 在有相对定位祖先时定位正确；Vue Masonry 子项动态增删后重新测量分布；React Sidebar 受控 `collapsed` 时 trigger 只发 `onCollapsedChange` 请求、不自行改宽；Vue Descriptions 标题 id 改用 SSR 安全的 `useId`。
 - **Row（Vue / React）**：响应式 `gutter` / `align` / `justify` 从一次性读取 `window.innerWidth` 改为静态 CSS 变量级联——输入变量按现有断点 token 经 `@media` 提升，窗口缩放实时生效，SSR 输出不再依赖视口；嵌套 Row 拥有自身默认与断点值，不再继承父 Row 的响应式地图；Vue 的 `align` / `justify` prop 类型修正为接受响应式地图，消除运行时告警。Core `getRowGutterStyleVars` / `getRowAlignJustifyVars` 的返回键改为输入变量名，迁移说明见 [MIGRATION.md](docs/MIGRATION.md)。
 - **Carousel（Core / Vue / React）**：滚动窗口改为同一批真实 slide 的循环重排，删除首尾 clone 轨道——跨页保留组件实例（内部状态不丢），DOM/Tab 顺序与可见顺序一致，循环换页沿主轴滑动不倒带，finite 尾部夹紧不留空。`axis="vertical"` 补默认高 16rem（内联样式/工具类可覆盖）与上下方向键、主轴触摸滑动；显式根 `dir` 优先于 ConfigProvider 的 `dir`，RTL 位移方向修正（见 [MIGRATION.md](docs/MIGRATION.md)）。`speed<=0` 或 reduced-motion 时换页立即落地（含动画中途切换），连续导航从渲染位置续跑不跳变。
+- **DatePicker / TimePicker（Vue / React）**：只读或禁用时拦截面板与草稿的改值入口，仍可用 Escape 关闭。TimePicker 打开时从当前键入值初始化面板，非法文本则从已提交值初始化；Space / Enter 有草稿时只提交，ArrowDown 提交并打开，确认后不再回退旧值。React 同拍重复提交同一时间范围时只发出一次更新。
+- **Countdown（Vue / React）**：按时间戳识别目标与 `now` 的变化，相同时间的 Date 对象替换不再重置计时；更新已过期目标保持归零，更新 `now` 快照不重启计时器。
+- **日期解析 / Cron（Core / Vue / React）**：显式 `format` 的日期解析拒绝夹杂非数字的分段，删除失败后回退原生宽松解析的路径。Cron 空白输入返回 `null`，编辑器不再抛异常；React CronEditor 保留其他字段未完成的局部编辑。`nextCronRun` 跳过不匹配的日期和小时，覆盖世纪闰日间隔，返回时间严格晚于起点，并保留夏令时缺时与回拨后的调度语义。
 
 ## v3.0.0-rc.1（2026-10-05）
 

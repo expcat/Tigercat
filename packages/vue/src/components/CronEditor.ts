@@ -473,7 +473,7 @@ export const CronEditor = markFormItemGroupControl(
                 ])
               })
             ),
-            validation.value.valid && expressionDraft.value
+            validation.value.valid && !isCronExpressionEmpty(expressionDraft.value)
               ? h(
                   'p',
                   {

@@ -150,6 +150,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     if (next === draftRef.current) return
     if (next === '' && (cronFormValue(draftRef.current) ?? '') === '') return
     setExpressionDraft(next)
+    setDrafts(seedCronFieldDrafts(next, stickyModes.current))
   }, [externalRaw, valueControlled])
 
   const validation = useMemo(
@@ -166,10 +167,6 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     seedCronFieldDrafts(expressionDraft, stickyModes.current)
   )
   const lastErrorRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    setDrafts(seedCronFieldDrafts(expressionDraft, stickyModes.current))
-  }, [expressionDraft])
 
   useEffect(() => {
     const message = cronDraftErrorMessage(expressionDraft, validation)
@@ -198,6 +195,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     if (readOnly) return
     stickyModes.current = {}
     commit(nextValue)
+    setDrafts(seedCronFieldDrafts(nextValue, stickyModes.current))
   }
 
   function writeField(meta: CronFieldMeta, draft: CronFieldDraft) {
@@ -388,7 +386,9 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
             onChange={(event) => {
               if (readOnly || !event.target.value) return
               stickyModes.current = {}
-              commit(event.target.value)
+              const nextValue = event.target.value
+              commit(nextValue)
+              setDrafts(seedCronFieldDrafts(nextValue, stickyModes.current))
             }}>
             <option value="">{labels.presetPlaceholder}</option>
             {resolvedPresets.map((preset) => (
@@ -444,7 +444,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
           )
         })}
       </div>
-      {validation.valid && expressionDraft ? (
+      {validation.valid && !isCronExpressionEmpty(expressionDraft) ? (
         <p className="text-sm text-[var(--tiger-text-secondary)]" data-tiger-cron-summary="">
           {describeCronExpression(expressionDraft)}{' '}
           {nextCronRun(expressionDraft)?.toISOString() ?? ''}

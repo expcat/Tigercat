@@ -60,7 +60,9 @@ export const Countdown: React.FC<CountdownProps> = ({
 }) => {
   const [remaining, setRemaining] = useState(() => initialRemaining(value, now))
   const [total, setTotal] = useState(() => Math.max(initialRemaining(value, now), 0))
-  const seenTarget = useRef(parseCountdownTimestamp(value))
+  const seenTargetRef = useRef(parseCountdownTimestamp(value))
+  const seenNowRef = useRef(parseCountdownTimestamp(now))
+  const mountedRef = useRef(false)
   const finishedRef = useRef(remaining <= 0)
   const onChangeRef = useRef(onChange)
   const onFinishRef = useRef(onFinish)
@@ -73,14 +75,20 @@ export const Countdown: React.FC<CountdownProps> = ({
   const timerName = typeof title === 'string' && title ? title : ariaLabel || 'Countdown'
 
   useEffect(() => {
-    const nextRemaining =
-      now === undefined ? getCountdownRemaining(value) : getCountdownRemaining(value, now)
-    setRemaining(nextRemaining)
     const nextTarget = parseCountdownTimestamp(value)
-    if (nextTarget !== seenTarget.current) {
-      seenTarget.current = nextTarget
-      setTotal(Math.max(nextRemaining, 0))
-    }
+    const nextNow = parseCountdownTimestamp(now)
+    const targetChanged = nextTarget !== seenTargetRef.current
+    const nowChanged = nextNow !== seenNowRef.current
+    seenTargetRef.current = nextTarget
+    seenNowRef.current = nextNow
+    if (mountedRef.current && !targetChanged && !nowChanged) return
+    mountedRef.current = true
+    const nextRemaining =
+      targetChanged && !nowChanged
+        ? getCountdownRemaining(value)
+        : getCountdownRemaining(value, now)
+    setRemaining(nextRemaining)
+    if (targetChanged) setTotal(Math.max(nextRemaining, 0))
     finishedRef.current = nextRemaining <= 0
   }, [value, now])
 

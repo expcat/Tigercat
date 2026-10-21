@@ -7,11 +7,14 @@ import {
   cronFormValue,
   defaultCronExpression,
   defaultCronPresetValues,
+  describeCronExpression,
   getCronExpressionParts,
   getCronFieldIssue,
   getCronFieldValue,
   isCronExpressionEmpty,
   normalizeCronExpression,
+  nextCronRun,
+  parseCronSchedule,
   parseCronFieldControl,
   seedCronFieldDraft,
   seedCronFieldDrafts,
@@ -90,6 +93,20 @@ describe('cron-editor-utils', () => {
     expect(validateCronExpression('* * * * *').valid).toBe(true)
     expect(validateCronExpression('*/5 9-17 * * 1-5').valid).toBe(true)
     expect(validateCronExpression('').valid).toBe(true)
+  })
+
+  it('treats blank expressions as valid forms but unparseable schedules', () => {
+    expect(validateCronExpression('   ').valid).toBe(true)
+    for (const expression of ['', '   ']) {
+      expect(parseCronSchedule(expression)).toBeNull()
+      expect(nextCronRun(expression)).toBeNull()
+      expect(describeCronExpression(expression)).toBeNull()
+    }
+  })
+
+  it('finds the next leap day beyond a two-year window', () => {
+    expect(nextCronRun('0 0 29 2 *', new Date(2024, 2, 1))).toEqual(new Date(2028, 1, 29))
+    expect(nextCronRun('0 0 29 2 *', new Date(2096, 2, 1))).toEqual(new Date(2104, 1, 29))
   })
 
   it('rejects expressions with the wrong number of fields without rewriting them', () => {

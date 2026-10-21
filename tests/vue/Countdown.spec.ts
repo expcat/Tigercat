@@ -192,6 +192,32 @@ describe('Countdown', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('00:00:03')
   })
 
+  it('compares parsed timestamps instead of object identity', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(baseTime)
+
+    const { emitted, rerender } = renderWithProps(Countdown, {
+      value: baseTime + 2000,
+      now: baseTime,
+      interval: 1000
+    })
+    vi.advanceTimersByTime(2300)
+    await nextTick()
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+    expect(emitted().finish).toHaveLength(1)
+
+    await rerender({ value: new Date(baseTime + 2000), now: baseTime })
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+    await rerender({ value: new Date(baseTime + 2000), now: new Date(baseTime) })
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+
+    await rerender({ value: baseTime + 1000, now: baseTime })
+    vi.advanceTimersByTime(3000)
+    await nextTick()
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+    expect(emitted().finish).toHaveLength(1)
+  })
+
   it('does not tick or finish when the target is already elapsed', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(baseTime)

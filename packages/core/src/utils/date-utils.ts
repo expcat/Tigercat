@@ -8,6 +8,9 @@ import type { DateFormat } from '../types/datepicker'
 /** Date-only ISO (`YYYY-MM-DD`) with optional surrounding whitespace. */
 const DATE_ONLY_ISO_RE = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/
 
+/** Bidirectional marks Intl may place around formatted digit segments. */
+const DATE_BIDI_MARKS_RE = /[\u200e\u200f\u061c\u202a-\u202e\u2066-\u2069]/g
+
 /**
  * Starts of contiguous Unicode Nd blocks of length 10.
  * Offset from the base is the digit 0–9. Do not use `Number(char)` —
@@ -79,8 +82,8 @@ export function toCalendarDate(value: Date | string | null | undefined): Date | 
 }
 
 function readDatePart(part: string): number {
-  const digits = toAsciiDigits(part).replace(/\D/g, '')
-  if (!digits) return Number.NaN
+  const digits = toAsciiDigits(part).replace(DATE_BIDI_MARKS_RE, '').trim()
+  if (!/^\d+$/.test(digits)) return Number.NaN
   return Number(digits)
 }
 
@@ -281,10 +284,9 @@ export function parseDate(
   if (typeof value !== 'string') return null
   const ascii = toAsciiDigits(value)
   if (format) {
-    const formatted = parseFormattedDate(ascii, format, locale)
-    if (formatted) return formatted
-    if (locale && !isGregorianCalendarLocale(locale)) return null
-    if (format !== 'yyyy-MM-dd') return null
+    // Typed input is interpreted by the explicit format only; falling back to
+    // the lenient native parser would accept garbage like "2024-01-15 GMT".
+    return parseFormattedDate(ascii, format, locale)
   }
   const dateOnly = parseDateOnlyLocal(ascii)
   if (dateOnly !== undefined) return dateOnly

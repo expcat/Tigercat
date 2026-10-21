@@ -153,6 +153,46 @@ describe('Countdown', () => {
     expect(screen.getByRole('timer')).toHaveTextContent('00:00:03')
   })
 
+  it('compares parsed timestamps instead of object identity', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(baseTime)
+    const onFinish = vi.fn()
+
+    const { rerender } = render(
+      <Countdown value={baseTime + 2000} now={baseTime} interval={1000} onFinish={onFinish} />
+    )
+    act(() => vi.advanceTimersByTime(2300))
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+    expect(onFinish).toHaveBeenCalledTimes(1)
+
+    rerender(
+      <Countdown
+        value={new Date(baseTime + 2000)}
+        now={baseTime}
+        interval={1000}
+        onFinish={onFinish}
+      />
+    )
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+
+    rerender(
+      <Countdown
+        value={baseTime + 2000}
+        now={new Date(baseTime)}
+        interval={1000}
+        onFinish={onFinish}
+      />
+    )
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+
+    rerender(
+      <Countdown value={baseTime + 1000} now={baseTime} interval={1000} onFinish={onFinish} />
+    )
+    act(() => vi.advanceTimersByTime(3000))
+    expect(screen.getByRole('timer')).toHaveTextContent('00:00:00')
+    expect(onFinish).toHaveBeenCalledTimes(1)
+  })
+
   it('does not tick or finish when the target is already elapsed', () => {
     vi.useFakeTimers()
     vi.setSystemTime(baseTime)
