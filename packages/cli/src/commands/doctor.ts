@@ -1,13 +1,13 @@
 import { Command } from 'commander'
 import pc from 'picocolors'
-import { dirname, join } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { createRequire } from 'node:module'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { existsSync, readFileSync } from 'node:fs'
 import { CLI_VERSION } from '../constants'
 import requiredCoreExports from '../required-core-exports.json' with { type: 'json' }
 import { logError, logInfo, logSuccess, logWarn } from '../utils/logger'
-import { readFileSafe } from '../utils/fs'
+import { readFileSafe, resolveCliPackageRoot } from '../utils/fs'
 
 export type DoctorStatus = 'pass' | 'warn' | 'fail'
 
@@ -58,13 +58,6 @@ const FRAMEWORK_PEER_RANGES: Record<Framework, { dep: string; major: number }[]>
 
 /** Subpath exports generated from the core entry table. */
 const REQUIRED_CORE_EXPORTS: readonly string[] = requiredCoreExports
-
-function resolveAdjacent(relativePath: string): string {
-  const meta = import.meta.url
-  if (meta.startsWith('file:')) return fileURLToPath(new URL(relativePath, meta))
-  if (meta.startsWith('/')) return join(dirname(meta), relativePath)
-  return fileURLToPath(new URL(relativePath, pathToFileURL(meta)))
-}
 
 const VERSION_COMPATIBILITY_MATRIX = [
   {
@@ -121,7 +114,7 @@ export function collectDoctorChecks(options: DoctorOptions = {}): DoctorCheck[] 
   checks.push(createTailwindCheck(packageResult.packageJson, cwd))
   checks.push(createPeerDepsCheck(packageResult.packageJson, cwd))
   checks.push(createTemplateCompatibilityCheck(packageResult.packageJson))
-  checks.push(createCompatibilityMatrixCheck(packageResult.packageJson))
+  checks.push(createCompatibilityMatrixCheck(packageResult.packageJson, cwd))
 
   const coreExportsCheck = createCoreExportsCheck(
     packageResult.packageJson,
@@ -137,11 +130,64 @@ export function collectDoctorChecks(options: DoctorOptions = {}): DoctorCheck[] 
   return checks
 }
 
+/**
+ * Locate the skill catalog of the @expcat/tigercat-mcp installed in the
+ * consuming project, using Node package resolution so hoisted installs in an
+ * ancestor node_modules are found. Returns the snapshot version.json path.
+ */
+function resolveInstalledSkillCatalog(cwd: string): string | null {
+  try {
+    const requireFromProject = createRequire(pathToFileURL(join(cwd, 'package.json')))
+    const entry = requireFromProject.resolve('@expcat/tigercat-mcp')
+    let dir = dirname(entry)
+    for (let depth = 0; depth < 6; depth++) {
+      const content = readFileSafe(join(dir, 'package.json'))
+      if (content) {
+        const parsed = JSON.parse(content) as { name?: string }
+        if (parsed.name === '@expcat/tigercat-mcp') {
+          return join(dir, 'snapshot', 'version.json')
+        }
+      }
+      const parent = dirname(dir)
+      if (parent === dir) break
+      dir = parent
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * When the CLI runs inside this repository (source modules or the built dist),
+ * the sibling packages/mcp snapshot is the same catalog the CLI was built
+ * from. The package.json name is verified so an unrelated directory that
+ * happens to be called mcp is never inspected.
+ */
+function resolveMonorepoSkillCatalog(cwd: string): string | null {
+  const pkgRoot = resolveCliPackageRoot(dirname(fileURLToPath(import.meta.url)))
+  if (!pkgRoot) return null
+  const repoRoot = resolve(pkgRoot, '..', '..')
+  // Only trust the sibling snapshot when the CLI runs for a project inside its
+  // own workspace; a repo-built CLI invoked from an unrelated consumer must
+  // not read the repository snapshot.
+  const rel = relative(repoRoot, resolve(cwd))
+  if (rel.startsWith('..') || isAbsolute(rel)) return null
+  const mcpRoot = join(pkgRoot, '..', 'mcp')
+  const raw = readFileSafe(join(mcpRoot, 'package.json'))
+  if (!raw) return null
+  try {
+    if ((JSON.parse(raw) as { name?: string }).name !== '@expcat/tigercat-mcp') return null
+  } catch {
+    return null
+  }
+  return join(mcpRoot, 'snapshot', 'version.json')
+}
+
 function createSkillCatalogCheck(cwd: string): DoctorCheck {
-  const candidates = [
-    join(cwd, 'node_modules', '@expcat', 'tigercat-mcp', 'snapshot', 'version.json'),
-    resolveAdjacent('../../../mcp/snapshot/version.json')
-  ]
+  const candidates = [resolveInstalledSkillCatalog(cwd), resolveMonorepoSkillCatalog(cwd)].filter(
+    (path): path is string => path !== null
+  )
   const versionPath = candidates.find((path) => existsSync(path))
   if (!versionPath) {
     return {
@@ -485,7 +531,7 @@ function createTemplateCompatibilityCheck(packageJson: ProjectPackage): DoctorCh
   }
 }
 
-function createCompatibilityMatrixCheck(packageJson: ProjectPackage): DoctorCheck {
+function createCompatibilityMatrixCheck(packageJson: ProjectPackage, cwd: string): DoctorCheck {
   const dependencies = collectDependencies(packageJson)
   const details = VERSION_COMPATIBILITY_MATRIX.map(
     (item) => `${item.name} ${item.range} - ${item.reason}`
@@ -503,9 +549,24 @@ function createCompatibilityMatrixCheck(packageJson: ProjectPackage): DoctorChec
   }
 
   const incompatible = frameworks.flatMap((framework) =>
-    FRAMEWORK_PEER_RANGES[framework]
-      .filter(({ dep, major }) => isOlderMajor(dependencies[dep], major))
-      .map(({ dep, major }) => `${dep}@${dependencies[dep]} is below the supported major ${major}`)
+    FRAMEWORK_PEER_RANGES[framework].flatMap(({ dep, major }) => {
+      const declared = dependencies[dep]
+      const resolved = unwrapCatalogRange(declared, dep, cwd)
+      if (isOlderMajor(resolved, major)) {
+        return [
+          declared === resolved
+            ? `${dep}@${declared} is below the supported major ${major}`
+            : `${dep}@${declared} resolves to ${resolved}, which is below the supported major ${major}`
+        ]
+      }
+      // A catalog range that cannot be resolved is not a verified pass.
+      if (declared?.startsWith('catalog:') && !resolved) {
+        return [
+          `${dep}@${declared} could not be resolved from pnpm-workspace.yaml; cannot verify major ${major}`
+        ]
+      }
+      return []
+    })
   )
 
   if (incompatible.length > 0) {
@@ -666,11 +727,16 @@ function unwrapCatalogRange(
 ): string | undefined {
   if (!range || !range.startsWith('catalog:')) return range
   const named = range.slice('catalog:'.length)
-  const catalog = loadPnpmCatalog(cwd)
-  return catalog[named || packageName]
+  const catalogs = loadPnpmCatalog(cwd)
+  return named ? catalogs.named[named]?.[packageName] : catalogs.default[packageName]
 }
 
-function loadPnpmCatalog(start: string): Record<string, string> {
+interface PnpmCatalogs {
+  default: Record<string, string>
+  named: Record<string, Record<string, string>>
+}
+
+function loadPnpmCatalog(start: string): PnpmCatalogs {
   let dir = start
   for (let hop = 0; hop < 8; hop += 1) {
     const file = join(dir, 'pnpm-workspace.yaml')
@@ -679,24 +745,57 @@ function loadPnpmCatalog(start: string): Record<string, string> {
     if (parent === dir) break
     dir = parent
   }
-  return {}
+  return { default: {}, named: {} }
 }
 
-function parsePnpmCatalog(yaml: string): Record<string, string> {
-  const catalog: Record<string, string> = {}
-  let inCatalog = false
+const CATALOG_ENTRY_RE = /^(?:'([^']+)'|"([^"]+)"|([A-Za-z0-9@/_.-]+))\s*:\s*(\S+)/
+
+/**
+ * Parse the default `catalog:` map and the named `catalogs:` maps. Entries are
+ * indented `key: range` lines; named catalogs are the two-space indented keys
+ * without a value inside `catalogs:`.
+ */
+function parsePnpmCatalog(yaml: string): PnpmCatalogs {
+  const catalogs: PnpmCatalogs = { default: {}, named: {} }
+  let section: 'none' | 'default' | 'catalogs' = 'none'
+  let currentNamed: string | null = null
   for (const line of yaml.split('\n')) {
-    if (!inCatalog) {
-      if (/^catalog:\s*$/.test(line)) inCatalog = true
+    if (/^catalog:\s*$/.test(line)) {
+      section = 'default'
+      currentNamed = null
       continue
     }
-    if (line && !/^[\s#]/.test(line)) break
-    const match = /^\s+(?:'([^']+)'|"([^"]+)"|([A-Za-z0-9@/_.-]+))\s*:\s*(\S+)/.exec(line)
-    if (!match) continue
-    const key = match[1] || match[2] || match[3]
-    if (key) catalog[key] = match[4]
+    if (/^catalogs:\s*$/.test(line)) {
+      section = 'catalogs'
+      currentNamed = null
+      continue
+    }
+    if (line && !/^[\s#]/.test(line)) {
+      section = 'none'
+      currentNamed = null
+      continue
+    }
+    if (section === 'none') continue
+    const content = line.trim()
+    if (!content || content.startsWith('#')) continue
+    const indent = line.length - line.trimStart().length
+    if (section === 'catalogs' && indent === 2) {
+      const name = /^([\w.-]+):\s*$/.exec(content)
+      currentNamed = name ? name[1] : null
+      if (currentNamed && !catalogs.named[currentNamed]) catalogs.named[currentNamed] = {}
+      continue
+    }
+    const entry = CATALOG_ENTRY_RE.exec(content)
+    if (!entry) continue
+    const key = entry[1] || entry[2] || entry[3]
+    if (!key) continue
+    if (section === 'default') {
+      catalogs.default[key] = entry[4]
+    } else if (currentNamed && indent > 2) {
+      catalogs.named[currentNamed][key] = entry[4]
+    }
   }
-  return catalog
+  return catalogs
 }
 
 function formatFramework(framework: Framework): string {

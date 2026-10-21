@@ -1,13 +1,26 @@
 {
   "names": {
     "Kanban": "TaskBoard",
-    "KanbanProps": "TaskBoardProps",
     "ImageViewer": "ImagePreview",
     "DonutChart": "PieChart",
-    "Stepper": "InputNumber"
+    "Stepper": "InputNumber",
+    "DonutChartProps": "PieChartProps",
+    "TigerLocaleStepper": "TigerLocaleInputNumber"
+  },
+  "namesByPackage": {
+    "KanbanProps": {
+      "vue": "VueTaskBoardProps",
+      "react": "TaskBoardProps",
+      "core": "TaskBoardProps"
+    },
+    "StepperProps": {
+      "vue": "VueInputNumberProps",
+      "react": "InputNumberProps",
+      "core": "InputNumberProps"
+    }
   },
   "specifiers": {
-    "@expcat/tigercat-core/tailwind/modern": "@expcat/tigercat-core",
+    "@expcat/tigercat-core/tailwind/modern": "@expcat/tigercat-core/tailwind",
     "@expcat/tigercat-core/datepicker-locales": "@expcat/tigercat-core/locales"
   }
 }

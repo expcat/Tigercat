@@ -9,7 +9,8 @@ import {
   getComponentPackageTarget,
   loadPublicComponentExports,
   REMOVED_IMPORT_SPECIFIERS,
-  REMOVED_PUBLIC_NAMES
+  REMOVED_PUBLIC_NAMES,
+  REMOVED_PUBLIC_NAMES_BY_PACKAGE
 } from './lib/public-components.mjs'
 import { readJson, writeJson } from './utils/files.mjs'
 
@@ -127,7 +128,11 @@ syncRemovedNames()
 function syncRemovedNames() {
   const namesPath = join(root, 'packages/cli/src/removed-names.json')
   const payload = `${JSON.stringify(
-    { names: REMOVED_PUBLIC_NAMES, specifiers: REMOVED_IMPORT_SPECIFIERS },
+    {
+      names: REMOVED_PUBLIC_NAMES,
+      namesByPackage: REMOVED_PUBLIC_NAMES_BY_PACKAGE,
+      specifiers: REMOVED_IMPORT_SPECIFIERS
+    },
     null,
     2
   )}\n`

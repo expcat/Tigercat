@@ -12,7 +12,8 @@ export function getReactTemplate(
     'src/main.tsx': reactMain(),
     'src/App.tsx': preset === 'shell' ? reactShellApp() : reactApp(),
     'src/routes.ts': preset === 'shell' ? reactRoutes() : '',
-    'src/style.css': commonStyleCss()
+    'src/style.css': commonStyleCss(),
+    'src/env.d.ts': reactEnvDts()
   }
   if (!files['src/routes.ts']) delete files['src/routes.ts']
   return files
@@ -74,7 +75,6 @@ function reactTsconfig(): string {
         noUnusedParameters: true,
         noFallthroughCasesInSwitch: true,
         forceConsistentCasingInFileNames: true,
-        baseUrl: '.',
         paths: {
           '@/*': ['./src/*']
         }
@@ -142,6 +142,11 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 )
+`
+}
+
+function reactEnvDts(): string {
+  return `/// <reference types="vite/client" />
 `
 }
 
@@ -226,7 +231,7 @@ export default function App() {
         </div>
 
         <div className="space-y-4">
-          <Alert variant="info">
+          <Alert type="info">
             Welcome to your Tigercat project! Edit src/App.tsx to get started.
             Toggle <code>Modern</code> to switch the theme preset.
           </Alert>

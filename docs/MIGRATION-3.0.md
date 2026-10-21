@@ -2,35 +2,35 @@
 
 3.0 不向前兼容。本文只列从 2.x 调用点改到 3.0 要换的导入、prop，以及会改变默认结果的约定。组件的完整 props 在 `skills/tigercat`，示例在 `examples`。
 
-`tigercat migrate` 只改导入说明符和 `scripts/lib/public-components.mjs` 里的 `REMOVED_PUBLIC_NAMES`。它不改 props，运行时也不留旧名字。
+`tigercat migrate` 只改导入说明符和 `scripts/lib/public-components.mjs` 里的 `REMOVED_PUBLIC_NAMES` / `REMOVED_PUBLIC_NAMES_BY_PACKAGE`。它不改 props，运行时也不留旧名字。
 
 下面没有点名的公开组件，导入名和 prop 名与 2.x 相同。
 
 ## 删除的名字
 
-| 2.x                                                                                     | 3.0                                                                        |
-| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `Kanban` / `KanbanProps`                                                                | `TaskBoard` / `TaskBoardProps`                                             |
-| `ImageViewer`                                                                           | `ImagePreview`（`minScale` / `maxScale`）                                  |
-| `DonutChart` / `DonutChartProps`                                                        | `PieChart`，环形用 `innerRadiusRatio`                                      |
-| `Stepper` / `StepperProps` / `TigerLocaleStepper`                                       | `InputNumber`                                                              |
-| `@expcat/tigercat-core/tailwind/modern`                                                 | `@expcat/tigercat-core` 的 `createTigercatPlugin({ preset: modernTheme })` |
-| `@expcat/tigercat-core/datepicker-locales`                                              | `@expcat/tigercat-core/locales/<id>`，日期文案在 `locale.datePicker`       |
-| `ThemeManager` / `registerBuiltInThemes` / `data-tiger-style`                           | `ConfigProvider` 的 `theme`                                                |
-| `targetKeys` / `defaultTargetKeys`                                                      | `value` / `defaultValue`                                                   |
-| `Drawer` 的 `panelClassName`                                                            | `className`                                                                |
-| `exportFormat`                                                                          | 表内导出是 CSV；xlsx 用 `DataExport`                                       |
-| `columnClassName`（Masonry）                                                            | `layout`                                                                   |
-| `WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL`                                              | locale 或 `ariaLabel`                                                      |
-| `createFocusTrap`                                                                       | `createFocusScope`                                                         |
-| `announceToScreenReader`                                                                | `manageLiveRegion`                                                         |
-| `renderCodeHighlightHtml` 等 HTML 高亮函数                                              | `{ text, className? }` token                                               |
-| `DATA_EXPORT_SOFT_CELL_LIMIT` / `DATA_EXPORT_FORMULA_PREFIX` / `sanitizeDataExportText` | 超限抛 `DataExportLimitError`                                              |
-| `isActiveListDragSameContainer` / `isActiveListDragCrossContainer`                      | 各自的 `createListReorderController`                                       |
-| `injectMarqueeStyles` / `injectPrintLayoutStyles`                                       | Tailwind 插件里的样式                                                      |
-| `getMessagePositionStyle`                                                               | 当前 `ConfigProvider` 的队列                                               |
-| `sliderTooltipReserveClasses`                                                           | 删除。滑块 tooltip 不再用 `pt-12` 撑开轨道                                 |
-| `resolveCopyableTextTag`（早期 preview）                                                | `resolveTextTag`；copyable 保留指定标签                                    |
+| 2.x                                                                                     | 3.0                                                                                                                                                          |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Kanban` / `KanbanProps`                                                                | `TaskBoard` / `TaskBoardProps`                                                                                                                               |
+| `ImageViewer`                                                                           | `ImagePreview`（`minScale` / `maxScale`）                                                                                                                    |
+| `DonutChart` / `DonutChartProps`                                                        | `PieChart`，环形用 `innerRadiusRatio`                                                                                                                        |
+| `Stepper` / `StepperProps` / `TigerLocaleStepper`                                       | `InputNumber`                                                                                                                                                |
+| `@expcat/tigercat-core/tailwind/modern`                                                 | `@expcat/tigercat-core/tailwind` 的 `createTigercatPlugin`；保留 Modern 行为需显式 `createTigercatPlugin({ preset: modernTheme })`，`modernTheme` 从包根导出 |
+| `@expcat/tigercat-core/datepicker-locales`                                              | `@expcat/tigercat-core/locales/<id>`，日期文案在 `locale.datePicker`                                                                                         |
+| `ThemeManager` / `registerBuiltInThemes` / `data-tiger-style`                           | `ConfigProvider` 的 `theme`                                                                                                                                  |
+| `targetKeys` / `defaultTargetKeys`                                                      | `value` / `defaultValue`                                                                                                                                     |
+| `Drawer` 的 `panelClassName`                                                            | `className`                                                                                                                                                  |
+| `exportFormat`                                                                          | 表内导出是 CSV；xlsx 用 `DataExport`                                                                                                                         |
+| `columnClassName`（Masonry）                                                            | `layout`                                                                                                                                                     |
+| `WORKFLOW_DETAIL_SHELL_DEFAULT_ARIA_LABEL`                                              | locale 或 `ariaLabel`                                                                                                                                        |
+| `createFocusTrap`                                                                       | `createFocusScope`                                                                                                                                           |
+| `announceToScreenReader`                                                                | `manageLiveRegion`                                                                                                                                           |
+| `renderCodeHighlightHtml` 等 HTML 高亮函数                                              | `{ text, className? }` token                                                                                                                                 |
+| `DATA_EXPORT_SOFT_CELL_LIMIT` / `DATA_EXPORT_FORMULA_PREFIX` / `sanitizeDataExportText` | 超限抛 `DataExportLimitError`                                                                                                                                |
+| `isActiveListDragSameContainer` / `isActiveListDragCrossContainer`                      | 各自的 `createListReorderController`                                                                                                                         |
+| `injectMarqueeStyles` / `injectPrintLayoutStyles`                                       | Tailwind 插件里的样式                                                                                                                                        |
+| `getMessagePositionStyle`                                                               | 当前 `ConfigProvider` 的队列                                                                                                                                 |
+| `sliderTooltipReserveClasses`                                                           | 删除。滑块 tooltip 不再用 `pt-12` 撑开轨道                                                                                                                   |
+| `resolveCopyableTextTag`（早期 preview）                                                | `resolveTextTag`；copyable 保留指定标签                                                                                                                      |
 
 框架包不再星号再导出 `@expcat/tigercat-core`。`types/composite`、`types/kanban`、`types/image-viewer` 这些兼容入口已删除。版本只读各包的 `package.json`。
 
@@ -358,7 +358,7 @@ Tabs 溢出按钮文案从 `navLabels.moreTabs` 迁到 `locale.tabs.moreTabs`；
 
 ## CLI / MCP
 
-CLI 与 MCP 的对外版本等于各自 `package.json`。`doctor` 要求技能目录的版本和文件摘要与 CLI 一致，并要求 Tigercat 依赖的主版本与 CLI 主版本相同。MCP 默认读随包发布的技能快照；显式 https 基址必须与包的版本和文件摘要一致。`tigercat add` 写入可运行用法，并安装锁定版本。`tigercat create` 覆盖前列出将写入的文件；`--preset shell` 带上可运行的 `AppShell`。`tigercat_example` 只读示例。文档由 `pnpm docs:api` 生成，一组件一页。
+CLI 与 MCP 的对外版本等于各自 `package.json`。`doctor` 要求技能目录的版本和文件摘要与 CLI 一致，并要求 Tigercat 依赖的主版本与 CLI 主版本相同。MCP 默认读随包发布的技能快照；显式 https 基址必须与包的版本和文件摘要一致。`tigercat add` 写入可运行用法，并安装锁定版本。`tigercat create` 覆盖前列出将写入的文件；`--preset shell` 带上可运行的 `AppShell`。`tigercat_example` 只读示例。文档由 `pnpm docs:api` 生成，一组件一页。从未真正生成文档的 `tigercat generate docs` 子命令已删除。
 
 ## 3.0 新增的组件
 

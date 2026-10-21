@@ -80,5 +80,8 @@ export async function runPlayground(
   const safePort = /^\d+$/.test(port) ? port : '3456'
   const viteArgs = ['exec', 'vite', '--port', safePort]
   if (open) viteArgs.push('--open')
-  runArgv('pnpm', viteArgs, { cwd: projectDir, allowFailure: true })
+  runArgv('pnpm', viteArgs, {
+    cwd: projectDir,
+    failureMessage: 'Failed to start the Vite dev server. Check the playground output above.'
+  })
 }

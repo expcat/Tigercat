@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { existsSync, mkdirSync, rmSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, mkdirSync, rmSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 
@@ -19,16 +19,13 @@ import {
 
 // Test utils
 import { ensureDir, writeFileSafe, isDirEmpty, readFileSafe } from '@expcat/tigercat-cli/utils/fs'
-import { runCommand } from '@expcat/tigercat-cli/utils/exec'
+import { runArgv } from '@expcat/tigercat-cli/utils/exec'
 import { validateProjectName, suggestProjectName } from '@expcat/tigercat-cli/utils/validate'
 import { runCreate } from '@expcat/tigercat-cli/commands/create'
 import { runAdd } from '@expcat/tigercat-cli/commands/add'
 import { runPlayground } from '@expcat/tigercat-cli/commands/playground'
-import {
-  runGenerateDocs,
-  runGenerateTest,
-  runGenerateDocTemplate
-} from '@expcat/tigercat-cli/commands/generate'
+import { runGenerateTest, runGenerateDocTemplate } from '@expcat/tigercat-cli/commands/generate'
+import { rewriteSource } from '@expcat/tigercat-cli/commands/migrate'
 import { collectDoctorChecks } from '@expcat/tigercat-cli/commands/doctor'
 
 function readWorkspaceCatalogValue(packageName: string): string | undefined {
@@ -779,19 +776,6 @@ describe('CLI Dry Run', () => {
     expect(readFileSync(join(projectDir, 'package.json'), 'utf-8')).toBe('{"name":"stale"}')
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('dependency lock'))
   })
-
-  it('previews docs generation without writing markdown files', async () => {
-    writeFileSafe(
-      join(testDir, 'types/button.ts'),
-      `export interface ButtonProps {
-  label?: string
-}
-`
-    )
-
-    await expect(runGenerateDocs('types', 'api', true)).rejects.toThrow('pnpm docs:api')
-    expect(existsSync(join(testDir, 'api'))).toBe(false)
-  })
 })
 
 describe('CLI Generate - existing files', () => {
@@ -914,20 +898,6 @@ describe('CLI E2E Output', () => {
     expect(output).toContain('NotARealWidget')
     expect(output).toContain('Button')
     errorSpy.mockRestore()
-  })
-
-  it('generates component markdown and index output from generate docs', async () => {
-    writeFileSafe(
-      join(testDir, 'types/button.ts'),
-      `export interface ButtonProps {
-  /** Button label */
-  label?: string
-  variant: 'primary' | 'secondary'
-}
-`
-    )
-
-    await expect(runGenerateDocs('types', 'api')).rejects.toThrow('pnpm docs:api')
   })
 })
 
@@ -1073,7 +1043,7 @@ describe('CLI Cross-Platform Paths', () => {
   })
 })
 
-describe('CLI runCommand', () => {
+describe('CLI runArgv', () => {
   let exitSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
@@ -1086,22 +1056,277 @@ describe('CLI runCommand', () => {
     exitSpy.mockRestore()
   })
 
-  it('runs a successful command without throwing', () => {
-    expect(() => runCommand('node -e ""')).not.toThrow()
+  it('runs a successful argv command without throwing', () => {
+    expect(() => runArgv('node', ['-e', ''])).not.toThrow()
   })
 
   it('rethrows by default when the command exits non-zero', () => {
-    expect(() => runCommand('node -e "process.exit(1)"')).toThrow()
-  })
-
-  it('swallows a non-zero exit when allowFailure is set', () => {
-    expect(() => runCommand('node -e "process.exit(1)"', { allowFailure: true })).not.toThrow()
+    expect(() => runArgv('node', ['-e', 'process.exit(1)'])).toThrow()
   })
 
   it('logs the failure message and exits when failureMessage is set', () => {
-    expect(() => runCommand('node -e "process.exit(1)"', { failureMessage: 'boom' })).toThrow(
+    expect(() => runArgv('node', ['-e', 'process.exit(1)'], { failureMessage: 'boom' })).toThrow(
       'process.exit:1'
     )
     expect(exitSpy).toHaveBeenCalledWith(1)
+  })
+})
+
+describe('CLI Migrate - rewriteSource', () => {
+  it('rewrites named bindings and component subpaths while preserving local bindings', () => {
+    const source = `import { Kanban } from '@expcat/tigercat-react/Kanban'
+import { Kanban as Board } from '@expcat/tigercat-react'
+import KanbanDefault from '@expcat/tigercat-react/Kanban'
+export { Kanban as PublicBoard } from '@expcat/tigercat-react'
+`
+    const next = rewriteSource(source)
+
+    expect(next).toContain(`import { TaskBoard as Kanban } from '@expcat/tigercat-react/TaskBoard'`)
+    expect(next).toContain(`import { TaskBoard as Board } from '@expcat/tigercat-react'`)
+    expect(next).toContain(`import KanbanDefault from '@expcat/tigercat-react/TaskBoard'`)
+    expect(next).toContain(`export { TaskBoard as PublicBoard } from '@expcat/tigercat-react'`)
+
+    const tsx = `import { Kanban } from '@expcat/tigercat-react/Kanban'\n`
+    expect(rewriteSource(tsx, false, true)).toContain(
+      `import { TaskBoard as Kanban } from '@expcat/tigercat-react/TaskBoard'`
+    )
+  })
+
+  it('rewrites type-only props per package', () => {
+    expect(rewriteSource(`import type { KanbanProps } from '@expcat/tigercat-vue'`)).toContain(
+      'VueTaskBoardProps as KanbanProps'
+    )
+    expect(rewriteSource(`import type { StepperProps } from '@expcat/tigercat-react'`)).toContain(
+      'InputNumberProps as StepperProps'
+    )
+  })
+
+  it('keeps aliases, comments and multiline clauses intact', () => {
+    const source = `import {
+  // board
+  Kanban,
+  /* old */ Stepper as NumberStepper
+} from '@expcat/tigercat-react'
+`
+    const next = rewriteSource(source)
+
+    expect(next).toContain('// board')
+    expect(next).toContain('TaskBoard as Kanban')
+    expect(next).toContain('/* old */ InputNumber as NumberStepper')
+  })
+
+  it('rewrites a commented named binding together with its component subpath', () => {
+    const source = `import { /* board */ Kanban } from '@expcat/tigercat-react/Kanban'`
+
+    expect(rewriteSource(source)).toBe(
+      `import { /* board */ TaskBoard as Kanban } from '@expcat/tigercat-react/TaskBoard'`
+    )
+  })
+
+  it('never touches strings, comments, regex literals, template literal or JSX text content', () => {
+    const source = `const text = "import { Kanban } from '@expcat/tigercat-react'"
+// import { Kanban } from '@expcat/tigercat-react'
+/* import { Kanban } from '@expcat/tigercat-react' */
+export const tpl = \`from '@expcat/tigercat-react/Kanban'\`
+`
+    expect(rewriteSource(source)).toBe(source)
+
+    const regexSource = String.raw`const quotePattern = /["']/
+export const quoteText = "import '@expcat/tigercat-react/Kanban'"
+const escapedPattern = /[\\/"']/u
+if (true) /["']/.test('x')
+{ const ready = true }
+/["']/.test('x')
+const fraction = 4 / 2
+const quotient = call() / 2 / 3
+const property = obj.return / 2
+const patternQuotient = /["']/ / 2
+export const otherText = "import '@expcat/tigercat-react/Kanban'"
+`
+    const real = `import { Kanban } from '@expcat/tigercat-react/Kanban'\n`
+    const migrated = `import { TaskBoard as Kanban } from '@expcat/tigercat-react/TaskBoard'\n`
+    expect(rewriteSource(source + regexSource + real)).toBe(source + regexSource + migrated)
+
+    const jsxText = `export const Guide = () => <code>import '@expcat/tigercat-react/Kanban'</code>\n`
+    const jsxExprText = `export const Guide = () => <code>{1}import '@expcat/tigercat-react/Kanban'</code>\n`
+    const jsxNested = `const el = <div>{ok ? <b>import '@expcat/tigercat-react/Kanban'</b> : null}</div>\n`
+    const jsxAttr = `const el = <a title="import '@expcat/tigercat-react/Kanban'">x</a>\n`
+    const jsxRegex = `const el = <code>{/["']/.test('x')}import '@expcat/tigercat-react/Kanban'</code>\n`
+    const jsxComment = `export function Guide(){ return /* render */ <code>import '@expcat/tigercat-react/Kanban'</code> }\n`
+    for (const jsx of [jsxText, jsxExprText, jsxNested, jsxAttr, jsxRegex, jsxComment]) {
+      expect(rewriteSource(jsx + real, false, true)).toBe(jsx + migrated)
+    }
+  })
+
+  it('rewrites side-effect and dynamic import specifiers', () => {
+    const source = `import '@expcat/tigercat-core/tailwind/modern'
+const locales = import('@expcat/tigercat-core/datepicker-locales')
+`
+    const next = rewriteSource(source)
+
+    expect(next).toContain(`import '@expcat/tigercat-core/tailwind'`)
+    expect(next).toContain(`import('@expcat/tigercat-core/locales')`)
+
+    const jsxExpr = `<div>{import('@expcat/tigercat-core/datepicker-locales')}</div>\n`
+    expect(rewriteSource(jsxExpr, false, true)).toContain(`import('@expcat/tigercat-core/locales')`)
+  })
+
+  it('only rewrites script blocks in Vue SFCs', () => {
+    const source = `<template><Kanban /></template>
+<script setup lang="ts">
+import { Kanban } from '@expcat/tigercat-vue/Kanban'
+</script>
+`
+    const next = rewriteSource(source, true)
+
+    expect(next).toContain('<template><Kanban /></template>')
+    expect(next).toContain(`import { TaskBoard as Kanban } from '@expcat/tigercat-vue/TaskBoard'`)
+  })
+
+  it('is idempotent', () => {
+    const source = `import { Kanban, type KanbanProps } from '@expcat/tigercat-react'
+import '@expcat/tigercat-core/tailwind/modern'
+`
+    const once = rewriteSource(source)
+
+    expect(rewriteSource(once)).toBe(once)
+  })
+})
+
+describe('CLI Add - portable examples', () => {
+  const originalCwd = process.cwd()
+  const testDir = join(tmpdir(), `tigercat-add-portable-${Date.now()}`)
+  let logSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    ensureDir(testDir)
+    process.chdir(testDir)
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    logSpy.mockRestore()
+    process.chdir(originalCwd)
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  it('skips the demo file when no portable example exists and explains why', async () => {
+    writeFileSafe(
+      join(testDir, 'package.json'),
+      JSON.stringify({ dependencies: { '@expcat/tigercat-react': '^1.0.0' } })
+    )
+    ensureDir(join(testDir, 'src/components'))
+
+    await runAdd(['ConfigProvider'])
+
+    expect(existsSync(join(testDir, 'src/components/ConfigProviderDemo.tsx'))).toBe(false)
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('no standalone ConfigProvider example')
+    )
+  })
+})
+
+describe('CLI Doctor - catalogs and skill catalog', () => {
+  const testDir = join(tmpdir(), `tigercat-doctor-catalog-${Date.now()}`)
+
+  afterEach(() => {
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  function writeCatalogProject(name: string, pkg: Record<string, unknown>) {
+    const projectDir = join(testDir, name)
+    ensureDir(projectDir)
+    writeFileSafe(join(projectDir, 'package.json'), JSON.stringify(pkg, null, 2))
+    return projectDir
+  }
+
+  function matrixOf(projectDir: string) {
+    return collectDoctorChecks({ cwd: projectDir, nodeVersion: '22.23.1', env: {} }).find(
+      (check) => check.name === 'Version compatibility matrix'
+    )
+  }
+
+  it('fails when the default catalog resolves below the supported major', () => {
+    const projectDir = writeCatalogProject('catalog-default-old', {
+      dependencies: {
+        '@expcat/tigercat-react': '^1.0.0',
+        react: 'catalog:',
+        'react-dom': 'catalog:'
+      }
+    })
+    writeFileSafe(
+      join(projectDir, 'pnpm-workspace.yaml'),
+      'catalog:\n  react: ^18.2.0\n  react-dom: ^18.2.0\n'
+    )
+
+    const matrix = matrixOf(projectDir)
+
+    expect(matrix?.status).toBe('fail')
+    expect(
+      matrix?.details?.some(
+        (detail) => detail.includes('react@catalog:') && detail.includes('^18.2.0')
+      )
+    ).toBe(true)
+  })
+
+  it('fails when a named catalog resolves below the supported major', () => {
+    const projectDir = writeCatalogProject('catalog-named-old', {
+      dependencies: {
+        '@expcat/tigercat-react': '^1.0.0',
+        react: 'catalog:legacy',
+        'react-dom': 'catalog:legacy'
+      }
+    })
+    writeFileSafe(
+      join(projectDir, 'pnpm-workspace.yaml'),
+      'catalogs:\n  legacy:\n    react: ^18.2.0\n    react-dom: ^18.2.0\n'
+    )
+
+    const matrix = matrixOf(projectDir)
+
+    expect(matrix?.status).toBe('fail')
+    expect(matrix?.details?.some((detail) => detail.includes('catalog:legacy'))).toBe(true)
+  })
+
+  it('passes when a named catalog resolves to the supported major', () => {
+    const projectDir = writeCatalogProject('catalog-named-current', {
+      dependencies: {
+        '@expcat/tigercat-react': '^1.0.0',
+        react: 'catalog:current',
+        'react-dom': 'catalog:current'
+      }
+    })
+    writeFileSafe(
+      join(projectDir, 'pnpm-workspace.yaml'),
+      'catalogs:\n  current:\n    react: ^19.2.7\n    react-dom: ^19.2.7\n'
+    )
+
+    expect(matrixOf(projectDir)?.status).toBe('pass')
+  })
+
+  it('fails the skill catalog check when a hoisted install ships an older snapshot', () => {
+    const appDir = writeCatalogProject('hoisted-consumer/app', {
+      dependencies: { '@expcat/tigercat-mcp': '^2.0.0' }
+    })
+    const mcpDir = join(testDir, 'hoisted-consumer', 'node_modules', '@expcat', 'tigercat-mcp')
+    ensureDir(join(mcpDir, 'dist'))
+    ensureDir(join(mcpDir, 'snapshot'))
+    writeFileSafe(
+      join(mcpDir, 'package.json'),
+      JSON.stringify({ name: '@expcat/tigercat-mcp', version: '2.0.0', main: './dist/index.js' })
+    )
+    writeFileSafe(join(mcpDir, 'dist', 'index.js'), 'export {}\n')
+    writeFileSafe(join(mcpDir, 'snapshot', 'version.json'), JSON.stringify({ version: '2.0.0' }))
+
+    const catalog = collectDoctorChecks({ cwd: appDir, nodeVersion: '22.23.1', env: {} }).find(
+      (check) => check.name === 'Skill catalog'
+    )
+
+    expect(catalog?.status).toBe('fail')
+    expect(catalog?.message).toContain('2.0.0')
   })
 })

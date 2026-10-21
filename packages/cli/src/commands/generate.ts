@@ -1,7 +1,7 @@
 import { Command } from 'commander'
 import { resolve } from 'node:path'
 import { existsSync } from 'node:fs'
-import { ALL_COMPONENTS } from '../constants'
+import { ALL_COMPONENTS, componentImportSpecifier } from '../constants'
 import { logSuccess, logError, logInfo, logWarn } from '../utils/logger'
 import { assertInsideProject, writeFileSafe } from '../utils/fs'
 
@@ -9,16 +9,6 @@ type FrameworkTarget = 'vue3' | 'react' | 'both'
 
 export function createGenerateCommand() {
   const cmd = new Command('generate').description('Code generation utilities')
-
-  cmd
-    .command('docs')
-    .option('-i, --input <dir>', 'Types directory', 'packages/core/src/types')
-    .option('-o, --output <dir>', 'Output directory', 'docs/api')
-    .option('--dry-run', 'Preview generated docs without writing files')
-    .description('Generate API documentation from component type definitions')
-    .action(async (opts: { input: string; output: string; dryRun?: boolean }) => {
-      await runGenerateDocs(opts.input, opts.output, Boolean(opts.dryRun))
-    })
 
   cmd
     .command('test <component>')
@@ -42,14 +32,6 @@ export function createGenerateCommand() {
     })
 
   return cmd
-}
-
-export async function runGenerateDocs(
-  _inputDir: string,
-  _outputDir: string,
-  _dryRun = false
-): Promise<void> {
-  throw new Error('Component docs are generated only by `pnpm docs:api`.')
 }
 
 export async function runGenerateTest(
@@ -130,75 +112,46 @@ function normalizeFrameworkTarget(value: string): FrameworkTarget | null {
   return null
 }
 
-function generateVueTest(component: string): string {
-  return `/**
- * @vitest-environment happy-dom
+/**
+ * Starter specs import the component from its public subpath entry so the file
+ * typechecks as-is. Rendering is left as an honest todo: components with
+ * required props (such as Table and its columns prop) cannot be rendered with
+ * an empty-props assertion, and a scaffold should not invent one.
  */
+function generateVueTest(component: string): string {
+  const specifier = componentImportSpecifier('@expcat/tigercat-vue', component)
+  return `import { describe, it } from 'vitest'
+import { ${component} } from '${specifier}'
 
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/vue'
-import { ${component} } from '@expcat/tigercat-vue'
-import { expectNoA11yViolationsIsolated } from '../utils'
+// Referenced so the import compiles under noUnusedLocals before the test below
+// is implemented.
+void ${component}
 
 describe('${component}', () => {
-  it('renders without crashing', () => {
-    const { container } = render(${component}, {
-      attrs: { 'data-testid': '${component.toLowerCase()}' }
-    })
-
-    expect(screen.getByTestId('${component.toLowerCase()}')).toBeInTheDocument()
-    expect(container.firstElementChild).toBeTruthy()
-  })
-
-  describe('a11y', () => {
-    it('has no accessibility violations', async () => {
-      const { container } = render(${component})
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-
-  describe('Edge Cases', () => {
-    it('keeps rendering with empty props', () => {
-      const { container } = render(${component})
-      expect(container.firstElementChild).toBeTruthy()
-    })
-  })
+  // TODO: render ${component} with @testing-library/vue using its real required
+  // props (check the component's *Props type), then assert the behavior your
+  // app relies on. Do not assert empty-props rendering: components like Table
+  // declare required props such as \`columns\`.
+  it.todo('renders and behaves as expected')
 })
 `
 }
 
 function generateReactTest(component: string): string {
-  return `/**
- * @vitest-environment happy-dom
- */
+  const specifier = componentImportSpecifier('@expcat/tigercat-react', component)
+  return `import { describe, it } from 'vitest'
+import { ${component} } from '${specifier}'
 
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import React from 'react'
-import { ${component} } from '@expcat/tigercat-react'
-import { expectNoA11yViolationsIsolated } from '../utils/react'
+// Referenced so the import compiles under noUnusedLocals before the test below
+// is implemented.
+void ${component}
 
 describe('${component}', () => {
-  it('renders without crashing', () => {
-    const { container } = render(<${component} data-testid="${component.toLowerCase()}" />)
-
-    expect(screen.getByTestId('${component.toLowerCase()}')).toBeInTheDocument()
-    expect(container.firstElementChild).toBeTruthy()
-  })
-
-  describe('a11y', () => {
-    it('has no accessibility violations', async () => {
-      const { container } = render(<${component} />)
-      await expectNoA11yViolationsIsolated(container)
-    })
-  })
-
-  describe('Edge Cases', () => {
-    it('keeps rendering with empty props', () => {
-      const { container } = render(<${component} />)
-      expect(container.firstElementChild).toBeTruthy()
-    })
-  })
+  // TODO: render ${component} with @testing-library/react using its real required
+  // props (check the component's *Props type), then assert the behavior your
+  // app relies on. Do not assert empty-props rendering: components like Table
+  // declare required props such as \`columns\`.
+  it.todo('renders and behaves as expected')
 })
 `
 }

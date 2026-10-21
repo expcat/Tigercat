@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from 'node:fs'
-import { dirname, isAbsolute, relative, resolve } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 
 export function ensureDir(dir: string) {
   if (!existsSync(dir)) {
@@ -20,6 +20,29 @@ export function isDirEmpty(dir: string): boolean {
 export function readFileSafe(filePath: string): string | null {
   if (!existsSync(filePath)) return null
   return readFileSync(filePath, 'utf-8')
+}
+
+/**
+ * Resolve the @expcat/tigercat-cli package root by walking up from a module
+ * directory to the nearest package.json that names this package. Works the same
+ * from bundled dist output, source modules and an installed node_modules copy;
+ * returns null when the boundary cannot be found.
+ */
+export function resolveCliPackageRoot(fromDir: string): string | null {
+  let dir = resolve(fromDir)
+  for (;;) {
+    const raw = readFileSafe(join(dir, 'package.json'))
+    if (raw) {
+      try {
+        if ((JSON.parse(raw) as { name?: unknown }).name === '@expcat/tigercat-cli') return dir
+      } catch {
+        // keep walking past unreadable package.json files
+      }
+    }
+    const parent = dirname(dir)
+    if (parent === dir) return null
+    dir = parent
+  }
 }
 
 /** Refuse a write whose resolved path leaves the target project. */

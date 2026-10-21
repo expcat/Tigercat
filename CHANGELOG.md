@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **CLI 根因修复**：`playground` 的 Vite 启动失败现在以非零码退出，不再静默成功；`doctor` 解析 pnpm 默认与命名 catalog，monorepo skill 快照回退限制在 CLI 所属工作区内，安装态快照经 Node 解析定位（覆盖提升的 node_modules）；`add` 复制随包发布的 portable 示例，无独立示例的组件说明跳过并只打印导入行；`migrate` 改为 token 级声明解析，只改写真实 import/export 声明的说明符与具名绑定（保留别名、type-only 与行内注释），字符串、注释与模板字面量内容不再误伤；删除从未真正生成文档的 `generate docs`；模板 tsconfig 移除多余 `baseUrl`，React 模板补 `src/env.d.ts`，示例 Alert 改用 `type` prop；`generate test` 生成可运行的公共子路径导入骨架，不再断言空 props 渲染。
 - **组合组件（Core / Vue / React）**：Vue ActivityFeed / NotificationCenter 第一次新增正常播报且不回放挂载前条目；CommentThread、TaskBoard 与 DataTableWithToolbar 按 Vue 真实 emit 语义识别函数、数组和 Once 监听器，More 不再因自定义 actions 渲染空按钮。双端 AssigneePicker 使用实例级选项 id，并在过滤后保持活动项、ARIA 引用和 Enter / Space 选择一致；TaskBoard 在异步批准期间数据失效或卸载时取消旧移动，保留合法原地更新；DataTableWithToolbar 查询动作复用现有 tableLabels。
 - **工作流（Core / Vue / React）**：统一校验任务归属、可操作状态与活动节点，修复长抄送 / 自动通过链被截断的问题。修正退回和前加签的暂停、恢复及签署模式处理，保留已完成任务，避免提前推进或重复恢复；详情提交按当前表单值计算条件分支。动作栏确认层跟随当前动作与候选项，失效时关闭，转交 / 加签未选人时显示本地化提示。设计器新增分支在全树分配唯一 key。
 - **FileManager、拖拽与标注（Core / Vue / React）**：FileManager 跟随实际挂载的视口，虚拟网格按行测量并分离滚动区、完整内容与窗口偏移，动态行高、列数和模式变化后的尾部滚动及 Home / End 焦点保持正确。拖拽落下按当前稳定 id 重解位置并保留数字 key 类型，失效会话不再错移替换项。ImageAnnotation 在权限、工具、图片或组件生命周期失效时统一取消草稿、帧和文档会话，正常受控值更新不打断合法笔画。

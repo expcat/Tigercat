@@ -70,7 +70,6 @@ function vue3Tsconfig(): string {
         noUnusedLocals: true,
         noUnusedParameters: true,
         noFallthroughCasesInSwitch: true,
-        baseUrl: '.',
         paths: {
           '@/*': ['./src/*']
         }
@@ -156,7 +155,7 @@ function toggleDark(value: boolean) {
       </div>
 
       <div class="space-y-4">
-        <Alert variant="info">
+        <Alert type="info">
           Welcome to your Tigercat project! Edit src/App.vue to get started.
           Toggle <code>Modern</code> to switch the theme preset.
         </Alert>

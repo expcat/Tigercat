@@ -1059,15 +1059,26 @@ export function categoryTestGroup(category) {
  */
 export const REMOVED_PUBLIC_NAMES = {
   Kanban: 'TaskBoard',
-  KanbanProps: 'TaskBoardProps',
   ImageViewer: 'ImagePreview',
   DonutChart: 'PieChart',
-  Stepper: 'InputNumber'
+  Stepper: 'InputNumber',
+  DonutChartProps: 'PieChartProps',
+  TigerLocaleStepper: 'TigerLocaleInputNumber'
+}
+
+/**
+ * Removed names whose replacement differs between packages, keyed by the
+ * tigercat package suffix. Vue only exports the Vue-prefixed props types, so
+ * emitting the core/react name there would break the migrated import.
+ */
+export const REMOVED_PUBLIC_NAMES_BY_PACKAGE = {
+  KanbanProps: { vue: 'VueTaskBoardProps', react: 'TaskBoardProps', core: 'TaskBoardProps' },
+  StepperProps: { vue: 'VueInputNumberProps', react: 'InputNumberProps', core: 'InputNumberProps' }
 }
 
 /** Old import specifiers rewritten by `tigercat migrate`. */
 export const REMOVED_IMPORT_SPECIFIERS = {
-  '@expcat/tigercat-core/tailwind/modern': '@expcat/tigercat-core',
+  '@expcat/tigercat-core/tailwind/modern': '@expcat/tigercat-core/tailwind',
   '@expcat/tigercat-core/datepicker-locales': '@expcat/tigercat-core/locales'
 }
 

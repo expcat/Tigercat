@@ -10,9 +10,15 @@ import {
   resolveAddableComponents
 } from '../constants'
 import { logSuccess, logError, logInfo, logWarn } from '../utils/logger'
-import { assertInsideProject, readFileSafe, writeFileSafe } from '../utils/fs'
+import {
+  assertInsideProject,
+  readFileSafe,
+  resolveCliPackageRoot,
+  writeFileSafe
+} from '../utils/fs'
 import { runArgv } from '../utils/exec'
 import { isFramework, type Framework } from '../utils/validate'
+import { isPortableExample } from '../utils/portable-example'
 
 interface AddOptions {
   dryRun?: boolean
@@ -221,19 +227,6 @@ export async function runAdd(components: string[], options: AddOptions = {}) {
     }
   }
 
-  if (framework === 'vue3') {
-    logInfo('Vue 3 usage example:\n')
-    for (const comp of valid) {
-      console.log(`  <${comp} />`)
-    }
-  } else {
-    logInfo('React usage example:\n')
-    for (const comp of valid) {
-      console.log(`  <${comp} />`)
-    }
-  }
-  console.log()
-
   // Generate a sample file if requested
   const sampleDir = resolve(cwd, 'src', 'components')
   if (!existsSync(sampleDir)) {
@@ -257,8 +250,14 @@ export async function runAdd(components: string[], options: AddOptions = {}) {
       continue
     }
 
-    const content =
-      framework === 'vue3' ? generateVue3Demo(comp, pkgName) : generateReactDemo(comp, pkgName)
+    const examplePath = componentExamplePath(comp, framework)
+    const content = examplePath ? readFileSafe(examplePath) : null
+    if (!content || !isPortableExample(content)) {
+      logInfo(
+        `Skipped ${sampleFile}: no standalone ${comp} example is bundled with the CLI. Use the printed import line as the starting point.`
+      )
+      continue
+    }
     writeFileSafe(sampleFile, content)
     logSuccess(`Created ${sampleFile}`)
   }
@@ -277,46 +276,36 @@ ${components.map((component) => `  ${component}`).join(',\n')}
 `
 }
 
-function componentExamplePath(component: string, framework: Framework): string {
-  const here = dirname(fileURLToPath(import.meta.url))
-  const root = resolve(here, '../../../..')
+/**
+ * The example location follows the module boundary: bundled dist output reads
+ * the portable examples copied next to it at build time (tsup onSuccess),
+ * while source modules in this repository read the live examples/example tree.
+ * A standalone dist never reaches into an unrelated consumer's directory tree.
+ */
+function componentExamplePath(component: string, framework: Framework): string | null {
+  const moduleDir = dirname(fileURLToPath(import.meta.url))
+  const pkgRoot = resolveCliPackageRoot(moduleDir)
+  if (!pkgRoot) return null
   const kebab = component
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
     .toLowerCase()
   const side = framework === 'vue3' ? 'vue3' : 'react'
   const entry = framework === 'vue3' ? 'App.vue' : 'App.tsx'
-  return join(root, 'examples/example', side, 'src/examples', kebab, '01', entry)
-}
-
-function generateVue3Demo(component: string, pkg: string): string {
-  const example = readFileSafe(componentExamplePath(component, 'vue3'))
-  if (example?.includes(`from '`)) return example
-  return `<script setup lang="ts">
-import { ${component} } from '${componentImportSpecifier(pkg, component)}'
-</script>
-
-<template>
-  <div class="p-4">
-    <h2 class="text-lg font-semibold mb-4">${component} Demo</h2>
-    <${component} />
-  </div>
-</template>
-`
-}
-
-function generateReactDemo(component: string, pkg: string): string {
-  const example = readFileSafe(componentExamplePath(component, 'react'))
-  if (example?.includes(`from '`)) return example
-  return `import { ${component} } from '${componentImportSpecifier(pkg, component)}'
-
-export default function ${component}Demo() {
-  return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4">${component} Demo</h2>
-      <${component} />
-    </div>
+  if (moduleDir.startsWith(join(pkgRoot, 'dist'))) {
+    return join(pkgRoot, 'dist', 'examples', side, kebab, entry)
+  }
+  return join(
+    pkgRoot,
+    '..',
+    '..',
+    'examples',
+    'example',
+    side,
+    'src',
+    'examples',
+    kebab,
+    '01',
+    entry
   )
-}
-`
 }

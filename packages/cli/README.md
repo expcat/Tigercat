@@ -68,14 +68,14 @@ Playground files are created under `.tigercat-playground/` in the current workin
 tigercat playground --template react --port 3457 --dry-run
 ```
 
-### Generate API docs from type definitions
+### Generate starter tests and doc templates
 
 ```bash
-tigercat generate docs --input packages/core/src/types --output docs/api
-tigercat generate docs --input packages/core/src/types --output docs/api --dry-run
 tigercat generate test Button --framework both
 tigercat generate doc-template Button --output docs/components
 ```
+
+API reference docs are generated inside the monorepo with `pnpm docs:api`; the CLI does not bundle that generator.
 
 ### Check project compatibility
 
