@@ -202,10 +202,8 @@ function FormInner<T extends FormValues>(
   }, [engine])
 
   useEffect(() => {
-    const owned = ownedEngineRef.current
     return () => {
-      owned?.dispose()
-      ownedEngineRef.current = null
+      ownedEngineRef.current?.dispose()
     }
   }, [])
 

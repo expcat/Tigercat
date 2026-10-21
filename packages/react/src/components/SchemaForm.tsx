@@ -12,6 +12,7 @@ import {
   classNames,
   devWarn,
   formatExportCell,
+  getValueByPath,
   getSchemaFormLabels,
   narrowWidgetParams,
   mergeTigerLocale,
@@ -200,7 +201,7 @@ function SchemaFormFieldCell({
         data-schema-field={field.name}
         data-schema-readonly="">
         {field.label ? <span>{field.label}</span> : null}
-        <span>{formatExportCell(values?.[field.name], values ?? {})}</span>
+        <span>{formatExportCell(getValueByPath(values, field.name), values ?? {})}</span>
       </div>
     )
   }

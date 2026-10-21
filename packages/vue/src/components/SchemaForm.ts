@@ -16,6 +16,7 @@ import {
   devWarn,
   formValuesEqual,
   formatExportCell,
+  getValueByPath,
   narrowWidgetParams,
   getSchemaFormLabels,
   mergeStyleValues,
@@ -436,7 +437,7 @@ export const SchemaForm = defineComponent({
     const renderField = (field: SchemaFormField, columns: 1 | 2 | 3): VNode => {
       const layout = fieldLayout(field.span, columns)
       if (field.readOnly) {
-        const raw = formModel.value?.[field.name]
+        const raw = getValueByPath(formModel.value, field.name)
         return h(
           'div',
           {

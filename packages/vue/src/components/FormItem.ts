@@ -184,6 +184,14 @@ export const FormItem = defineComponent({
     const registeredName = ref<string | undefined>(undefined)
 
     const itemRules = () => (props.required ? withRequiredRule(props.rules) : props.rules)
+    const controlDisabled = computed(() =>
+      Boolean(
+        props.disabled ||
+        formContext.value?.disabled ||
+        formContext.value?.loading ||
+        conditionState.value.disabled
+      )
+    )
 
     const unregisterName = (name: string | undefined) => {
       const ctx = formContext.value
@@ -209,17 +217,11 @@ export const FormItem = defineComponent({
     )
 
     watch(
-      () =>
-        [
-          props.name,
-          props.disabled,
-          formContext.value?.disabled,
-          conditionState.value.disabled
-        ] as const,
-      ([name, itemDisabled, formDisabled, conditionDisabled]) => {
+      () => [props.name, controlDisabled.value] as const,
+      ([name, disabled]) => {
         const ctx = formContext.value
         if (!ctx || !name) return
-        ctx.registerFieldDisabled(name, Boolean(itemDisabled || formDisabled || conditionDisabled))
+        ctx.registerFieldDisabled(name, disabled)
       },
       { immediate: true }
     )
@@ -285,14 +287,6 @@ export const FormItem = defineComponent({
       if (!props.name) return undefined
       return formContext.value?.getFieldValue(props.name) ?? ''
     })
-    const controlDisabled = computed(() =>
-      Boolean(
-        props.disabled ||
-        formContext.value?.disabled ||
-        formContext.value?.loading ||
-        conditionState.value.disabled
-      )
-    )
     const effectiveFieldId = computed(() => fieldId)
 
     const controlContext: VueFormItemControlContext = {

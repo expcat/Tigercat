@@ -38,7 +38,7 @@ export interface FormRule {
    * - `email` / `phone` / `url` / `id-card` require a string.
    * - `phone` is an international-ish pattern: optional leading `+`, at least
    *   7 digits.
-   * - `id-card` is a mainland China 15- or 18-digit ID number.
+   * - `id-card` is a mainland China 18-digit ID number.
    * - `date` rejects `Invalid Date` and non-date values.
    */
   type?: FormRuleType

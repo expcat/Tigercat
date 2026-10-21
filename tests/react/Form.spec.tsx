@@ -946,6 +946,23 @@ describe('Form', () => {
       expect(input.value).toBe('initial')
     })
 
+    it('keeps owned values after StrictMode effect replay', async () => {
+      const value = { name: 'old' }
+      render(
+        <React.StrictMode>
+          <Form value={value}>
+            <FormItem name="name" label="Name">
+              <input aria-label="name" />
+            </FormItem>
+          </Form>
+        </React.StrictMode>
+      )
+
+      const input = screen.getByLabelText('name')
+      fireEvent.change(input, { target: { value: 'new' } })
+      await waitFor(() => expect(input).toHaveValue('new'))
+    })
+
     it('calls onValidate when field is validated', async () => {
       const onValidate = vi.fn()
       const formRef = React.createRef<FormHandle>()

@@ -16,6 +16,7 @@ import {
   getFormWizardHeaderClasses,
   getFormWizardLabels,
   getFormWizardWrapperClasses,
+  isFormValidationSuperseded,
   isLastAvailableStep,
   mergeTigerLocale,
   resolveLocaleText,
@@ -200,8 +201,14 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
       if (form) {
         const fields = steps[index]?.fields
         const names = fields?.length ? fields : form.getMountedFieldNames()
-        const valid = names.length ? await form.validateFields(names) : await form.validate()
-        if (!valid) return
+        if (names.length === 0) {
+          try {
+            if (!(await form.validate())) return
+          } catch (error) {
+            if (isFormValidationSuperseded(error)) return
+            throw error
+          }
+        }
         const submitted = await form.submit()
         if (!submitted) return
       }

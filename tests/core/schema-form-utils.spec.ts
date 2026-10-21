@@ -97,12 +97,17 @@ describe('schema-form helpers', () => {
   })
 
   it('collects required rules and overlay rules', () => {
-    const rules = collectSchemaFormRules(schema, {
-      name: [{ required: true, message: 'Name is required' }]
-    })
+    const rules = collectSchemaFormRules(
+      { ...schema, fields: [...(schema.fields ?? []), { name: 'readonly', readOnly: true }] },
+      {
+        name: [{ required: true, message: 'Name is required' }],
+        readonly: { required: true }
+      }
+    )
     expect(rules?.title).toEqual({ required: true })
     expect(rules?.name).toEqual([{ required: true, message: 'Name is required' }])
     expect(rules?.['address.city']).toBeUndefined()
+    expect(rules?.readonly).toBeUndefined()
   })
 
   it('collects field conditions', () => {

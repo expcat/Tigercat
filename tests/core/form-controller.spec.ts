@@ -229,6 +229,30 @@ describe('trigger and validate generation', () => {
     await expect(second).resolves.toBe(true)
   })
 
+  it('ignores an older field result after the value changes', async () => {
+    const pending: Array<(result: boolean | string) => void> = []
+    const engine = createFormEngine({
+      initialValues: { name: 'old' },
+      rules: {
+        name: {
+          validator: () =>
+            new Promise<boolean | string>((resolve) => {
+              pending.push(resolve)
+            })
+        }
+      }
+    })
+
+    const first = engine.validateField('name')
+    engine.setFieldValue('name', 'new')
+    const second = engine.validateField('name')
+    pending[1]?.(true)
+    await expect(second).resolves.toBeNull()
+    pending[0]?.('old error')
+    await expect(first).resolves.toBeNull()
+    expect(engine.errors).toEqual([])
+  })
+
   it('does not push history when the value is unchanged', () => {
     const engine = createFormEngine({ initialValues: { name: 'Ada' }, undoable: true })
     engine.setFieldValue('name', 'Ada')

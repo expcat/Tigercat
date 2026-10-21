@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **表单校验（Core / Vue / React）**：共享引擎在值、结构或清理状态变化后拒绝旧异步结果写回，保留独立字段并发与 trigger 合并；整表校验跳过已登记禁用字段，Vue 的 loading 也复用同一禁用登记。双端 SchemaForm 只读点路径按嵌套值显示且公开规则收集排除只读 overlay，FormWizard 删除最后一步的重复 partial 校验；React Form 在 StrictMode 重放清理后保留 owned engine 与已输入值。
 - **懒加载（Core / Vue / React）**：Cascader、TreeSelect 与 Tree 在替换数据源或卸载后使旧请求失效；Cascader / TreeSelect 进入只读或禁用状态时同步失效。Tree 换源清除旧子节点缓存，受控父组件原样回写加载结果时保留缓存（包括 Vue 响应式数组）；React Tree 使用当前回调与状态，多个节点同批完成时保留全部已加载子节点。
 - **Select（Vue / React）**：所有用户改值入口统一遵守只读与禁用状态，关闭态 Backspace / Delete 不再修改只读值，禁用标签按钮不可删除；移动端 Done 复用统一关闭逻辑并清除搜索。同步修正选择器空值、Vue Transfer 回调和 `readOnly` 拼写的过期说明。
 - **表单基础输入（Core / Vue / React）**：InputNumber 字符串模型与数字路径兑现同一契约——超大整数字符串提交按有限边界夹紧、按 `precision` 定点格式化并对齐 `snapToStep` 网格，`1e-7` 等科学记数法步长真实生效；两端单击、长按与方向键 / PageUp / PageDown / Home / End 全程走同一模型，不再先丢精度转 Number。Slider 兑现 `showRange` / `pushApart` 契约（`showRange=false` 不渲染选区填充；`pushApart=true` 时指针、键盘与刻度提议一致复用 `sliderPushApartRange`），删除从未实现的 `vertical` / `showInput` props 与对应 data 属性（迁移见 [MIGRATION.md](docs/MIGRATION.md)）。React Slider 方向键回调补上 `readOnly` 依赖；两端拖动中变 `readOnly` / `disabled` 时立即释放拖拽会话并清除预览，不再迟到提交；React InputNumber 长按在不可交互后立即停止重复，聚焦不再用旧值覆盖步进显示。React Signature 每笔提交只触发表单 onChange 一次。Vue Upload 成功删除只调用一次 `onRemove` 守卫，移除已无调用方的 `remove` emit 声明（`onRemove` 仍是删除前守卫，返回 `false` 可取消）。

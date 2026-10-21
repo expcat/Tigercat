@@ -296,7 +296,7 @@ export function collectSchemaFormRules(
   if (overlay) {
     for (const [name, rule] of Object.entries(overlay)) {
       const field = fields.find((item) => item.name === name)
-      if (field?.disabled) continue
+      if (field?.disabled || field?.readOnly) continue
       rules[name] = rule
     }
   }
