@@ -127,7 +127,7 @@ describe('NavigationMenu', () => {
 
     await fireEvent.keyDown(docs, { key: 'ArrowDown' })
     await waitFor(() => {
-      expect(screen.getByRole('menuitem', { name: 'Guide' })).toHaveFocus()
+      expect(screen.getByRole('link', { name: 'Guide' })).toHaveFocus()
     })
     expect(docs.tabIndex).toBe(0)
     expect(products.tabIndex).toBe(-1)
@@ -412,18 +412,40 @@ describe('NavigationMenu', () => {
   })
 
   describe('a11y', () => {
-    it('exposes menubar semantics and a menu panel for mega content', async () => {
+    it('exposes menubar semantics and a disclosure panel for mega content', async () => {
       renderNav({ defaultValue: 'docs' })
       const menubar = screen.getByRole('menubar')
       expect(menubar).toBeInTheDocument()
 
       const trigger = screen.getByRole('menuitem', { name: 'Docs' })
-      expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
+      expect(trigger).not.toHaveAttribute('aria-haspopup')
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
       const controlsId = trigger.getAttribute('aria-controls')
       expect(controlsId).toBeTruthy()
-      const menu = document.querySelector(`[id="${controlsId}"]`)
-      expect(menu).toHaveAttribute('role', 'menu')
+      const panel = document.querySelector(`[id="${controlsId}"]`)
+      expect(panel).not.toHaveAttribute('role', 'menu')
+      const guide = screen.getByRole('link', { name: 'Guide' })
+      expect(guide).not.toHaveAttribute('role', 'menuitem')
+      expect(guide).not.toHaveAttribute('tabindex', '-1')
+    })
+
+    it('keeps an open panel when the pointer leaves while focus is in the panel', async () => {
+      vi.useFakeTimers()
+      renderNav({ defaultValue: 'docs', openOnHover: true, skipDelayDuration: 200 })
+      const trigger = screen.getByRole('menuitem', { name: 'Docs' })
+      const panel = getPanel('Docs')
+      expect(panel).not.toHaveAttribute('hidden')
+
+      screen.getByRole('link', { name: 'Guide' }).focus()
+      await fireEvent.mouseLeave(panel as HTMLElement)
+      await vi.advanceTimersByTimeAsync(200)
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      expect(panel).not.toHaveAttribute('hidden')
+
+      screen.getByRole('menuitem', { name: 'About' }).focus()
+      await fireEvent.mouseLeave(panel as HTMLElement)
+      await vi.advanceTimersByTimeAsync(200)
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
     })
 
     it('should have no accessibility violations with an open panel', async () => {

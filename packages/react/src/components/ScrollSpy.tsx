@@ -15,6 +15,7 @@ import {
   getScrollSpyListClasses,
   getScrollSpyRootClasses,
   getScrollSpyRootStyle,
+  isBrowser,
   mergeTigerLocale,
   resolveLinkHref,
   resolveScrollSpyContainer,
@@ -99,7 +100,8 @@ export const ScrollSpy = forwardRef<HTMLElement, ScrollSpyProps>(function Scroll
     else if (ref) ref.current = node
   }
   const resolvedContainer = resolveScrollSpyContainer(getContainer, hostRef.current, items)
-  const containerKey = resolvedContainer === window ? 'window' : (resolvedContainer as HTMLElement)
+  const containerKey =
+    isBrowser() && resolvedContainer === window ? 'window' : (resolvedContainer as HTMLElement)
 
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer

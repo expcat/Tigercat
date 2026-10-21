@@ -214,7 +214,7 @@ export interface VueMenuProps {
   openKeys?: MenuKey[]
   defaultOpenKeys?: MenuKey[]
   collapsed?: boolean
-  multiple?: boolean
+  openMultiple?: boolean
   inlineIndent?: number
   popupPortal?: boolean
   className?: string
@@ -241,7 +241,7 @@ export const Menu = defineComponent({
     openKeys: { type: Array as PropType<MenuKey[]>, default: undefined },
     defaultOpenKeys: { type: Array as PropType<MenuKey[]>, default: () => [] },
     collapsed: { type: Boolean, default: undefined },
-    multiple: { type: Boolean, default: true },
+    openMultiple: { type: Boolean, default: true },
     inlineIndent: { type: Number, default: 24 },
     popupPortal: { type: Boolean, default: true },
     className: { type: String, default: undefined },
@@ -301,7 +301,7 @@ export const Menu = defineComponent({
       const next = nextOpenKeys({
         current: currentOpenKeys.value,
         key,
-        openMultiple: props.multiple,
+        openMultiple: props.openMultiple,
         open
       })
       if (props.openKeys === undefined) internalOpenKeys.value = next
@@ -592,7 +592,12 @@ export const MenuItem = defineComponent({
         const nodes = Array.from(list.querySelectorAll<HTMLElement>('[data-tiger-menuitem="true"]'))
         const labels = nodes.map((node) => node.textContent ?? '')
         const from = nodes.indexOf(current)
-        const highlight = menuContext.typeahead.push(event.key, labels, from)
+        const highlight = menuContext.typeahead.push(
+          event.key,
+          labels,
+          from,
+          nodes.map((node) => node.getAttribute('aria-disabled') === 'true')
+        )
         if (highlight && highlight.index >= 0) {
           event.preventDefault()
           markTypeaheadMatch(nodes, highlight.index)

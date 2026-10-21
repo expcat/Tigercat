@@ -489,6 +489,32 @@ describe('Tabs', () => {
       expect(screen.getByText('Content 3')).toBeVisible()
     })
 
+    it('moves focus without selecting when activation is manual', async () => {
+      render(
+        <Tabs activation="manual" defaultActiveKey="1">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+        </Tabs>
+      )
+
+      const tab1 = screen.getByRole('tab', { name: 'Tab 1' })
+      const tab2 = screen.getByRole('tab', { name: 'Tab 2' })
+
+      tab1.focus()
+      await fireEvent.keyDown(tab1, { key: 'ArrowRight' })
+      expect(tab2).toHaveFocus()
+      expect(tab1).toHaveAttribute('aria-selected', 'true')
+      expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+
+      await fireEvent.keyDown(tab2, { key: 'Enter' })
+      expect(tab2).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByText('Content 2')).toBeVisible()
+    })
+
     it('should link tabs and panels with aria attributes', () => {
       render(
         <Tabs defaultActiveKey="1">

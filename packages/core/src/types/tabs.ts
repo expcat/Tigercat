@@ -81,11 +81,6 @@ export interface TabsProps {
    */
   activation?: 'automatic' | 'manual'
   /**
-   * Emit the next key order once when a drag finishes.
-   * @default false
-   */
-  reorderable?: boolean
-  /**
    * Additional CSS classes
    */
   className?: string

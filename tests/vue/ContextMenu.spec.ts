@@ -206,6 +206,53 @@ describe('ContextMenu', () => {
     })
   })
 
+  describe('items schema', () => {
+    it('keeps nested submenu ancestors open and blocks disabled branches', async () => {
+      render(ContextMenu, {
+        props: {
+          defaultOpen: true,
+          portal: false,
+          items: [
+            {
+              key: 'root',
+              label: 'Root',
+              children: [
+                {
+                  key: 'nested',
+                  label: 'Nested',
+                  children: [{ key: 'leaf', label: 'Leaf' }]
+                },
+                { key: 'plain', label: 'Plain' }
+              ]
+            },
+            {
+              key: 'blocked',
+              label: 'Blocked',
+              disabled: true,
+              children: [{ key: 'never', label: 'Never' }]
+            }
+          ]
+        }
+      })
+
+      const root = screen.getByRole('menuitem', { name: 'Root' })
+      await fireEvent.mouseEnter(root.closest('.relative') as HTMLElement)
+      expect(root).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByText('Plain')).toBeInTheDocument()
+
+      const nested = screen.getByRole('menuitem', { name: 'Nested' })
+      await fireEvent.mouseEnter(nested.closest('.relative') as HTMLElement)
+      expect(nested).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByText('Leaf')).toBeInTheDocument()
+      expect(root).toHaveAttribute('aria-expanded', 'true')
+
+      const blocked = screen.getByRole('menuitem', { name: 'Blocked' })
+      await fireEvent.mouseEnter(blocked.closest('.relative') as HTMLElement)
+      expect(blocked).toHaveAttribute('aria-expanded', 'false')
+      expect(screen.queryByText('Never')).not.toBeInTheDocument()
+    })
+  })
+
   describe('className', () => {
     it('merges custom className', () => {
       const { container } = renderMenu({ className: 'my-context-menu' })

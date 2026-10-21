@@ -235,6 +235,7 @@ export const Breadcrumb = defineComponent({
       const nodes: VNodeChild[] = []
 
       slotsList.forEach((slot, index) => {
+        let childSeparator: BreadcrumbSeparator | undefined
         if (slot.type === 'ellipsis') {
           nodes.push(
             h('li', { key: '__tiger-breadcrumb-ellipsis', class: getBreadcrumbItemClasses() }, [
@@ -304,6 +305,7 @@ export const Breadcrumb = defineComponent({
           const child = items[slot.index]
           const isLast = slot.index === items.length - 1
           const childProps = (child.props ?? {}) as Record<string, unknown>
+          childSeparator = childProps.separator as BreadcrumbSeparator | undefined
           const childType =
             typeof child.type === 'string' || typeof child.type === 'object' ? child.type : 'li'
           nodes.push(
@@ -323,7 +325,7 @@ export const Breadcrumb = defineComponent({
             h(
               'li',
               { key: `sep-${index}`, class: getBreadcrumbItemClasses(), 'aria-hidden': 'true' },
-              [renderSeparator(props.separator)]
+              [renderSeparator(childSeparator ?? props.separator)]
             )
           )
         }

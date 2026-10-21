@@ -53,6 +53,16 @@ describe('Breadcrumb', () => {
       expect(sep(container)).toHaveTextContent(expected)
     })
 
+    it('lets an item separator override the parent separator', () => {
+      const { container } = renderBc({ separator: '/' }, () => [
+        h(BreadcrumbItem, { href: '/' }, () => 'Home'),
+        h(BreadcrumbItem, { href: '/docs', separator: '|' }, () => 'Docs'),
+        h(BreadcrumbItem, { current: true }, () => 'Details')
+      ])
+      const separators = Array.from(container.querySelectorAll('li[aria-hidden="true"] > span'))
+      expect(separators.map((node) => node.textContent)).toEqual(['/', '|'])
+    })
+
     it('does not render a separator after the last item', () => {
       const { container } = renderBc()
       const items = container.querySelectorAll('li')

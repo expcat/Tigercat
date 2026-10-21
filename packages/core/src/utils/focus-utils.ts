@@ -245,8 +245,16 @@ export function focusLastMenuItem(container: HTMLElement): boolean {
   return focusMenuItem(container, 'last')
 }
 
-/** Focus the first item once the panel is painted (not `hidden` / `visibility:hidden`). */
-export function focusFirstMenuItemWhenVisible(container: HTMLElement, attempts = 16): boolean {
+/**
+ * Focus the first item once the panel is painted (not `hidden` / `visibility:hidden`).
+ * `collectItems` defaults to the menu-item roving set; disclosure panels pass
+ * a native-focus collector instead.
+ */
+export function focusFirstMenuItemWhenVisible(
+  container: HTMLElement,
+  attempts = 16,
+  collectItems: (container: HTMLElement) => HTMLElement[] = getMenuItems
+): boolean {
   const tryFocus = (): boolean => {
     if (container.hidden || container.hasAttribute('hidden')) return false
     if (
@@ -255,7 +263,10 @@ export function focusFirstMenuItemWhenVisible(container: HTMLElement, attempts =
     ) {
       return false
     }
-    return focusFirstMenuItem(container)
+    const items = collectItems(container)
+    if (items.length === 0) return false
+    items[0].focus()
+    return true
   }
   if (tryFocus()) return true
   if (typeof requestAnimationFrame !== 'function' || attempts <= 0) return false

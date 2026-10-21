@@ -264,12 +264,6 @@ export interface VueDropdownProps extends CoreDropdownProps {
   items?: PopupMenuItem[]
 }
 
-function itemLabels(root: HTMLElement): string[] {
-  return Array.from(root.querySelectorAll<HTMLElement>('[role^="menuitem"]')).map(
-    (node) => node.textContent ?? ''
-  )
-}
-
 function renderPopupItems(
   items: PopupMenuItem[],
   emitCheck: (key: string | number, checked: boolean) => void,
@@ -506,12 +500,17 @@ export const Dropdown = defineComponent({
       }
       if (isTextEditingTarget(event.target)) return
       if (!floatingRef.value) return
-      const highlight = typeahead.push(event.key, itemLabels(floatingRef.value), -1)
+      const nodes = Array.from(
+        floatingRef.value.querySelectorAll<HTMLElement>('[role^="menuitem"]')
+      )
+      const highlight = typeahead.push(
+        event.key,
+        nodes.map((node) => node.textContent ?? ''),
+        -1,
+        nodes.map((node) => node.getAttribute('aria-disabled') === 'true')
+      )
       if (highlight && highlight.index >= 0) {
         event.preventDefault()
-        const nodes = Array.from(
-          floatingRef.value.querySelectorAll<HTMLElement>('[role^="menuitem"]')
-        )
         markTypeaheadMatch(nodes, highlight.index)
         nodes[highlight.index]?.focus()
         return

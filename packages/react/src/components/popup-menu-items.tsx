@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react'
 import {
   createTypeaheadHighlight,
-  getContextMenuSubPlacement,
   getDropdownSeparatorClasses,
   getPopupMenuItemClasses,
   getPopupMenuShortcutClasses,
+  POPUP_MENU_SUBMENU_SURFACE_CLASSES,
   markTypeaheadMatch,
   navLabels,
   nextPopupMenuCheck,
@@ -100,20 +100,19 @@ function PopupMenuNode({
   }
 
   if (type === 'submenu') {
-    const placement = getContextMenuSubPlacement(
-      typeof document === 'undefined' ? 'ltr' : document.documentElement.dir
-    )
-    const alignEnd = placement.endsWith('end')
+    const expanded = submenuOpen && !item.disabled
     return (
       <div
         className="relative"
-        onMouseEnter={() => setSubmenuOpen(true)}
+        onMouseEnter={() => {
+          if (!item.disabled) setSubmenuOpen(true)
+        }}
         onMouseLeave={() => setSubmenuOpen(false)}>
         <button
           type="button"
           role="menuitem"
           aria-haspopup="menu"
-          aria-expanded={submenuOpen}
+          aria-expanded={expanded}
           data-tiger-popup-item=""
           data-tiger-popup-key={String(item.key)}
           disabled={item.disabled}
@@ -123,15 +122,11 @@ function PopupMenuNode({
             <span className={getPopupMenuShortcutClasses()}>{item.shortcut}</span>
           ) : null}
         </button>
-        {submenuOpen && item.children && item.children.length > 0 ? (
+        {expanded && item.children && item.children.length > 0 ? (
           <div
             role="menu"
             data-tiger-popup-submenu=""
-            className={
-              alignEnd
-                ? 'absolute top-0 end-full z-10 min-w-40 rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] p-1'
-                : 'absolute top-0 start-full z-10 min-w-40 rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)] p-1'
-            }>
+            className={`absolute top-0 start-full z-10 min-w-40 ${POPUP_MENU_SUBMENU_SURFACE_CLASSES} p-1`}>
             <PopupMenuList
               items={item.children}
               onCheck={onCheck}

@@ -13,7 +13,7 @@ import {
   applyNavigationMenuPanelKey,
   classNames,
   createNavigationMenuHoverSession,
-  focusFirstMenuItemWhenVisible,
+  focusFirstNavigationMenuPanelItem,
   captureActiveElement,
   restoreFocus,
   getNavigationMenuBarItems,
@@ -99,6 +99,7 @@ export interface NavigationMenuItemContextValue {
   isOpen: boolean
   disabled: boolean
   hasPanel: boolean
+  mega: boolean
   triggerRef: React.RefObject<HTMLElement | null>
   contentRef: React.RefObject<HTMLElement | null>
   contentId: string
@@ -112,6 +113,7 @@ export interface NavigationMenuItemContextValue {
 
 export interface NavigationMenuContentContextValue {
   inPanel: true
+  mega: boolean
 }
 
 export const NavigationMenuContext = createContext<NavigationMenuContextValue | null>(null)
@@ -131,7 +133,7 @@ function hasNavigationMenuList(children: React.ReactNode): boolean {
   })
 }
 
-function childIsContent(child: React.ReactNode): boolean {
+function childIsContent(child: React.ReactNode): child is React.ReactElement<{ mega?: boolean }> {
   return React.isValidElement(child) && child.type === NavigationMenuContent
 }
 
@@ -169,8 +171,11 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
     const content = useContext(NavigationMenuContentContext)
     const inPanel = Boolean(content)
     const isDisabled = disabled || Boolean(item?.disabled) || Boolean(!inPanel && root?.disabled)
+    // Mega panels are disclosures: links keep native anchor/button semantics.
     const tabIndex = inPanel
-      ? -1
+      ? content?.mega
+        ? undefined
+        : -1
       : getNavigationMenuRovingTabIndex(item?.value ?? '', root?.tabStopValue)
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -234,7 +239,7 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
       ...rest,
       className: linkClasses,
       style,
-      role: 'menuitem' as const,
+      role: inPanel && content?.mega ? undefined : ('menuitem' as const),
       tabIndex,
       [NAVIGATION_MENU_BAR_ITEM_ATTR]: inPanel || isDisabled ? undefined : '',
       [NAVIGATION_MENU_ITEM_VALUE_ATTR]: inPanel ? undefined : String(item?.value ?? ''),
@@ -364,7 +369,7 @@ export const NavigationMenuTrigger = React.forwardRef<
       tabIndex={tabIndex}
       {...{ [NAVIGATION_MENU_BAR_ITEM_ATTR]: isDisabled ? undefined : '' }}
       {...{ [NAVIGATION_MENU_ITEM_VALUE_ATTR]: String(item.value) }}
-      aria-haspopup="menu"
+      aria-haspopup={item.mega ? undefined : 'menu'}
       aria-expanded={item.isOpen}
       aria-controls={item.contentId}
       aria-disabled={isDisabled || undefined}
@@ -488,13 +493,13 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
     () => (
       <NavigationMenuContext.Provider value={root}>
         <NavigationMenuItemContext.Provider value={item}>
-          <NavigationMenuContentContext.Provider value={{ inPanel: true }}>
+          <NavigationMenuContentContext.Provider value={{ inPanel: true, mega }}>
             {children}
           </NavigationMenuContentContext.Provider>
         </NavigationMenuItemContext.Provider>
       </NavigationMenuContext.Provider>
     ),
-    [children, item, root]
+    [children, item, mega, root]
   )
 
   useLayoutEffect(() => {
@@ -564,7 +569,9 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
   const itemValue = valueProp ?? autoValue
   const triggerRef = useRef<HTMLElement | null>(null)
   const contentRef = useRef<HTMLElement | null>(null)
-  const hasPanel = React.Children.toArray(children).some(childIsContent)
+  const contentNodes = React.Children.toArray(children).filter(childIsContent)
+  const hasPanel = contentNodes.length > 0
+  const mega = contentNodes.some((child) => Boolean(child.props.mega))
 
   const isOpen = Boolean(root && !disabled && isNavigationMenuValueOpen(itemValue, root.value))
 
@@ -579,10 +586,10 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
       if (!focusPanel) return
       queueMicrotask(() => {
         const panel = contentRef.current ?? document.getElementById(contentId)
-        if (panel) focusFirstMenuItemWhenVisible(panel)
+        if (panel) focusFirstNavigationMenuPanelItem(panel, mega)
       })
     },
-    [contentId, disabled, itemValue, root]
+    [contentId, disabled, itemValue, mega, root]
   )
 
   const close = useCallback(
@@ -612,6 +619,7 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
       isOpen,
       disabled,
       hasPanel,
+      mega,
       triggerRef,
       contentRef,
       contentId,
@@ -630,6 +638,7 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
       hasPanel,
       isOpen,
       itemValue,
+      mega,
       open,
       root?.showArrow,
       scheduleClose,

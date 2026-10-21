@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
 import { TabPane, Tabs } from '@expcat/tigercat-vue/Tabs'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -383,6 +383,7 @@ describe('Tabs', () => {
       const tab = screen.getByRole('tab', { name: 'Tab 1', exact: true })
       expect(closeButton.tagName).toBe('BUTTON')
       expect(tab.tagName).toBe('BUTTON')
+      expect(closeButton).toHaveAttribute('tabindex', '-1')
       expect(tab.contains(closeButton)).toBe(false)
       expect(closeButton.closest('[role="tablist"]')).toBeNull()
     })
@@ -429,6 +430,44 @@ describe('Tabs', () => {
 
       await fireEvent.keyDown(tab1, { key: 'Delete' })
       expect(onEdit).toHaveBeenCalledWith({ targetKey: '1', action: 'remove' })
+    })
+
+    it('proposes and focuses the next tab when the active tab is deleted', async () => {
+      const onUpdateActiveKey = vi.fn()
+      const onChange = vi.fn()
+      const onEdit = vi.fn()
+
+      render(Tabs, {
+        props: {
+          type: 'editable-card',
+          closable: true,
+          defaultActiveKey: 'a',
+          'onUpdate:activeKey': onUpdateActiveKey,
+          onChange,
+          onEdit
+        },
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: 'a', label: 'Alpha' }, () => 'Content A'),
+            h(TabPane, { tabKey: 'b', label: 'Beta' }, () => 'Content B')
+          ]
+        }
+      })
+
+      const alpha = screen.getByRole('tab', { name: 'Alpha' })
+      alpha.focus()
+      await fireEvent.keyDown(alpha, { key: 'Delete' })
+
+      expect(onUpdateActiveKey).toHaveBeenCalledWith('b')
+      expect(onChange).toHaveBeenCalledWith('b')
+      expect(onEdit).toHaveBeenCalledWith({ targetKey: 'a', action: 'remove' })
+      expect(onUpdateActiveKey.mock.invocationCallOrder[0]).toBeLessThan(
+        onEdit.mock.invocationCallOrder[0]
+      )
+      expect(screen.getByRole('tab', { name: 'Beta' })).toHaveAttribute('aria-selected', 'true')
+      await waitFor(() => {
+        expect(screen.getByRole('tab', { name: 'Beta' })).toHaveFocus()
+      })
     })
 
     it('should emit edit add when add button is clicked', async () => {

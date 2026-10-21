@@ -222,6 +222,31 @@ describe('Menu', () => {
       expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
     })
 
+    it('keeps one inline submenu open at a time when openMultiple is false', async () => {
+      render(Menu, {
+        props: { mode: 'inline', openMultiple: false, defaultOpenKeys: ['a'] },
+        slots: {
+          default: () => [
+            h(SubMenu, { itemKey: 'a', title: 'Alpha' }, () =>
+              h(MenuItem, { itemKey: 'a1' }, () => 'Alpha Item')
+            ),
+            h(SubMenu, { itemKey: 'b', title: 'Beta' }, () =>
+              h(MenuItem, { itemKey: 'b1' }, () => 'Beta Item')
+            )
+          ]
+        }
+      })
+
+      expect(screen.getByRole('button', { name: 'Alpha' })).toHaveAttribute('aria-expanded', 'true')
+
+      await fireEvent.click(screen.getByRole('button', { name: 'Beta' }))
+      expect(screen.getByRole('button', { name: 'Beta' })).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByRole('button', { name: 'Alpha' })).toHaveAttribute(
+        'aria-expanded',
+        'false'
+      )
+    })
+
     it('does not open a disabled submenu on hover', async () => {
       render(Menu, {
         props: { mode: 'horizontal' },

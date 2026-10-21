@@ -150,7 +150,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         submenuScope.titleRef.current?.focus()
       }
     },
-    [menuContext, submenuScope]
+    [itemKey, menuContext, setLayerStop, submenuScope]
   )
 
   const label = getReactMenuPlainText(children)

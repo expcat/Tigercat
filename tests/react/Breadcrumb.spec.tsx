@@ -51,6 +51,20 @@ describe('Breadcrumb', () => {
       expect(container.querySelector('[aria-hidden="true"]')).toHaveTextContent(expected)
     })
 
+    it('lets an item separator override the parent separator', () => {
+      const { container } = render(
+        <Breadcrumb separator="/">
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem href="/docs" separator="|">
+            Docs
+          </BreadcrumbItem>
+          <BreadcrumbItem current>Current</BreadcrumbItem>
+        </Breadcrumb>
+      )
+      const separators = Array.from(container.querySelectorAll('[aria-hidden="true"]'))
+      expect(separators.map((node) => node.textContent)).toEqual(['/', '|'])
+    })
+
     it('renders directional separators as graphics that flip with dir', () => {
       const { container } = render(
         <Breadcrumb separator="chevron">

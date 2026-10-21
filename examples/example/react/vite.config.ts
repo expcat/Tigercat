@@ -6,10 +6,22 @@ import {
   playgroundRuntimePlugin,
   type PlaygroundRuntimeEntry
 } from '../shared/playground/vite-runtime-plugin'
+import {
+  buildFrameworkPackageSubpathFacts,
+  loadPublicComponentExports
+} from '../../../scripts/lib/public-components.mjs'
 
 const workspaceRoot = path.resolve(__dirname, '../../..')
 const reactComponentsDir = path.resolve(workspaceRoot, 'packages/react/src/components')
 const reactComponentAlias = (component: string) => path.resolve(reactComponentsDir, component)
+const componentAliases = buildFrameworkPackageSubpathFacts(
+  loadPublicComponentExports(workspaceRoot).react
+)
+  .filter((fact) => fact.component !== fact.target)
+  .map((fact) => ({
+    find: `@expcat/tigercat-react/${fact.component}`,
+    replacement: reactComponentAlias(fact.target)
+  }))
 const sharedPlaygroundDir = path.resolve(__dirname, '../shared/playground')
 const runtimeEntry = (file: string, devUrl: string): PlaygroundRuntimeEntry => ({ file, devUrl })
 const runtimeEntries = {
@@ -61,58 +73,7 @@ export default defineConfig(({ command }) => ({
   resolve: {
     alias: [
       { find: '@demo-shared', replacement: path.resolve(__dirname, '../shared') },
-      {
-        find: '@expcat/tigercat-react/AnchorLink',
-        replacement: reactComponentAlias('Anchor')
-      },
-      {
-        find: '@expcat/tigercat-react/BreadcrumbItem',
-        replacement: reactComponentAlias('Breadcrumb')
-      },
-      {
-        find: '@expcat/tigercat-react/DropdownItem',
-        replacement: reactComponentAlias('Dropdown')
-      },
-      {
-        find: '@expcat/tigercat-react/DropdownMenu',
-        replacement: reactComponentAlias('Dropdown')
-      },
-      {
-        find: '@expcat/tigercat-react/FloatButtonGroup',
-        replacement: reactComponentAlias('FloatButton')
-      },
-      {
-        find: '@expcat/tigercat-react/InputGroupAddon',
-        replacement: reactComponentAlias('InputGroup')
-      },
-      {
-        find: '@expcat/tigercat-react/MenuItem',
-        replacement: reactComponentAlias('Menu')
-      },
-      {
-        find: '@expcat/tigercat-react/MenuItemGroup',
-        replacement: reactComponentAlias('Menu')
-      },
-      {
-        find: '@expcat/tigercat-react/PrintPageBreak',
-        replacement: reactComponentAlias('PrintLayout')
-      },
-      {
-        find: '@expcat/tigercat-react/StepsItem',
-        replacement: reactComponentAlias('Steps')
-      },
-      {
-        find: '@expcat/tigercat-react/SubMenu',
-        replacement: reactComponentAlias('Menu')
-      },
-      {
-        find: '@expcat/tigercat-react/TabPane',
-        replacement: reactComponentAlias('Tabs')
-      },
-      {
-        find: '@expcat/tigercat-react/WorkflowActionBar',
-        replacement: reactComponentAlias('WorkflowTimeline')
-      },
+      ...componentAliases,
       {
         find: /^@expcat\/tigercat-react\/(.+)$/,
         replacement: `${reactComponentsDir}/$1`

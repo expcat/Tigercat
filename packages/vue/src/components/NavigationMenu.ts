@@ -53,11 +53,13 @@ import {
   resolveElementDir,
   isNavigationMenuTriggerOpenKey,
   handleMenubarNavigation,
-  focusFirstMenuItemWhenVisible,
+  focusFirstNavigationMenuPanelItem,
   captureActiveElement,
   restoreFocus,
   resolveLinkAddress,
   isFocusInsideNavigationMenu,
+  getOpenPanelFromMenubar,
+  shouldKeepNavigationMenuOpen,
   warnNavigationMenuOpenWithoutValue,
   type NavigationMenuValue,
   type FloatingPlacement
@@ -124,6 +126,7 @@ export interface NavigationMenuItemContext {
   isOpen: ComputedRef<boolean>
   disabled: boolean
   hasPanel: Ref<boolean>
+  mega: Ref<boolean>
   triggerRef: Ref<HTMLElement | null>
   contentRef: Ref<HTMLElement | null>
   contentId: string
@@ -137,6 +140,7 @@ export interface NavigationMenuItemContext {
 
 export interface NavigationMenuContentContext {
   inPanel: true
+  mega: boolean
 }
 
 export function useNavigationMenuContext(): NavigationMenuContext | null {
@@ -168,6 +172,17 @@ function nodesHaveList(nodes: unknown[]): boolean {
     }
   }
   return false
+}
+
+function isNavigationMenuContentNode(node: VNode): boolean {
+  return node.type === NavigationMenuContent
+}
+
+/** Template shorthand `mega` passes the raw empty-string attr on the vnode. */
+function navigationMenuContentNodeIsMega(node: VNode): boolean {
+  if (!isNavigationMenuContentNode(node)) return false
+  const mega = (node.props as { mega?: boolean | string } | null)?.mega
+  return mega === true || mega === ''
 }
 
 function commitMenubarKey(root: NavigationMenuContext | null, event: KeyboardEvent): boolean {
@@ -301,8 +316,11 @@ export const NavigationMenuLink = defineComponent({
         disabled: isDisabled
       })
       const isAnchor = Boolean(address.href)
+      const inMegaPanel = inPanel && Boolean(content?.mega)
       const tabIndex = inPanel
-        ? -1
+        ? inMegaPanel
+          ? undefined
+          : -1
         : getNavigationMenuRovingTabIndex(item?.value ?? '', root?.tabStopValue.value)
 
       const tag = isAnchor ? 'a' : props.href ? 'span' : 'button'
@@ -317,7 +335,7 @@ export const NavigationMenuLink = defineComponent({
           type: tag === 'button' ? 'button' : undefined,
           class: linkClasses.value,
           style: mergedStyle.value,
-          role: 'menuitem',
+          role: inMegaPanel ? undefined : 'menuitem',
           tabindex: tabIndex,
           [NAVIGATION_MENU_BAR_ITEM_ATTR]: inPanel || isDisabled ? undefined : '',
           [NAVIGATION_MENU_ITEM_VALUE_ATTR]: inPanel ? undefined : String(item?.value ?? ''),
@@ -455,7 +473,7 @@ export const NavigationMenuTrigger = defineComponent({
           tabindex: getNavigationMenuRovingTabIndex(item.value, root?.tabStopValue.value),
           [NAVIGATION_MENU_BAR_ITEM_ATTR]: disabled.value ? undefined : '',
           [NAVIGATION_MENU_ITEM_VALUE_ATTR]: String(item.value),
-          'aria-haspopup': 'menu',
+          'aria-haspopup': item.mega.value ? undefined : 'menu',
           'aria-expanded': item.isOpen.value,
           'aria-controls': item.contentId,
           'aria-disabled': disabled.value || undefined,
@@ -498,7 +516,12 @@ export const NavigationMenuContent = defineComponent({
     const root = inject<NavigationMenuContext | null>(NavigationMenuContextKey, null)
     const item = inject<NavigationMenuItemContext | null>(NavigationMenuItemContextKey, null)
 
-    const panelContext: NavigationMenuContentContext = { inPanel: true }
+    const panelContext: NavigationMenuContentContext = {
+      inPanel: true,
+      get mega() {
+        return props.mega
+      }
+    }
     provide(NavigationMenuContentContextKey, panelContext)
 
     const portalEnabled = computed(() => Boolean(root?.portal.value))
@@ -537,7 +560,12 @@ export const NavigationMenuContent = defineComponent({
       if (!panel.contains(event.target as Node | null)) return
 
       const dir = resolveElementDir(root.rootRef.value ?? root.menubarRef.value)
-      const action = applyNavigationMenuPanelKey({ event, panel, dir })
+      const action = applyNavigationMenuPanelKey({
+        event,
+        panel,
+        dir,
+        mode: props.mega ? 'mega' : 'menu'
+      })
       if (!action || action === 'menu-nav') return
 
       event.stopPropagation()
@@ -614,7 +642,7 @@ export const NavigationMenuContent = defineComponent({
               id: item.contentId,
               class: innerClasses.value,
               style: mergedStyle.value,
-              role: 'menu'
+              role: props.mega ? undefined : 'menu'
             },
             slots.default?.()
           )
@@ -667,6 +695,7 @@ export const NavigationMenuItem = defineComponent({
     const triggerRef = ref<HTMLElement | null>(null)
     const contentRef = ref<HTMLElement | null>(null)
     const hasPanel = ref(false)
+    const mega = ref(false)
 
     const isOpen = computed(
       () =>
@@ -685,7 +714,7 @@ export const NavigationMenuItem = defineComponent({
       if (!focusPanel) return
       nextTick(() => {
         const panel = contentRef.value ?? document.getElementById(contentId)
-        if (panel) focusFirstMenuItemWhenVisible(panel)
+        if (panel) focusFirstNavigationMenuPanelItem(panel, mega.value)
       })
     }
 
@@ -717,6 +746,7 @@ export const NavigationMenuItem = defineComponent({
         return props.disabled
       },
       hasPanel,
+      mega,
       triggerRef,
       contentRef,
       contentId,
@@ -746,6 +776,7 @@ export const NavigationMenuItem = defineComponent({
     return () => {
       const children = slots.default?.() ?? []
       hasPanel.value = children.some((node: VNode) => node.type === NavigationMenuContent)
+      mega.value = children.some((node: VNode) => navigationMenuContentNodeIsMega(node))
       const { restAttrs } = splitClassStyleAttrs(attrsRecord)
       return h(
         'li',
@@ -974,7 +1005,15 @@ export const NavigationMenu = defineComponent({
       getSkipDelayDuration: () => props.skipDelayDuration,
       getValue: () => currentValue.value,
       setValue,
-      isDisabled: () => props.disabled
+      isDisabled: () => props.disabled,
+      shouldStayOpen: () => {
+        const panel = getOpenPanelFromMenubar(menubarRef.value)
+        return shouldKeepNavigationMenuOpen({
+          nav: rootRef.value,
+          panel,
+          active: panel?.ownerDocument.activeElement ?? null
+        })
+      }
     })
 
     const handleItemClick = () => {

@@ -106,5 +106,9 @@ export function getPopupMenuShortcutClasses(): string {
   return 'ms-auto text-xs text-[var(--tiger-text-secondary)]'
 }
 
+/** Shared surface chrome for schema-driven popup submenus (Vue + React). */
+export const POPUP_MENU_SUBMENU_SURFACE_CLASSES =
+  'rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)] bg-[var(--tiger-surface)]'
+
 export const POPUP_MENU_TYPEAHEAD_MATCH_CLASS =
   'bg-[var(--tiger-surface-muted)] outline outline-1 outline-[var(--tiger-primary)]'

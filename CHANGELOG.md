@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **导航 a11y 根因修复（Core / Vue / React）**：NavigationMenu mega 面板两端统一为真实 disclosure——Trigger 的 `aria-haspopup` 与实际模式一致，mega 内容不再挂 `role="menu"`，面板链接保留原生 anchor/button 语义与 Tab 顺序，Enter / ArrowDown 初始聚焦落在面板内第一个真实可聚焦节点，Escape 关闭并回 Trigger；Vue 悬停会话在焦点留在面板（含 portal 文档）时不再被指针离开关闭。Vue Menu `multiple` 更名 `openMultiple`；Vue Menu / Dropdown / ContextMenu typeahead 在同一批真实节点上同步 disabled 标志。Vue ContextMenu schema 子菜单改为每层独立展开状态（保留祖先、关闭兄弟；React 原本就按层展开）；两端共享子菜单表面样式常量，disabled 分支悬停不展开、已展开后变 disabled 也不再保持子层可激活。BreadcrumbItem `separator` 覆盖父级分隔符真正生效；React ScrollSpy 容器 key 计算 SSR 安全。
+- **Tabs 与示例别名（Core / Vue / React）**：删除 Core `TabsProps` 与 Vue Tabs 从未实现的 `reorderable`；React Tabs 公开 `activation`（默认 `automatic`），Vue 补齐类型导出；Vue 关闭当前页签时按 React 契约先发 `update:activeKey` / `change` 再发 `edit`，焦点落到下一页签，方向键 / Home / End 只遍历可见页签，sr-only 关闭钮不再占据 Tab 停点；React 关闭当前页签回调不再闭包旧 `onChange`，Menu 键盘回调补齐 `itemKey` / `setLayerStop` 依赖。两端示例 Vite 别名改用公开组件事实源生成，Context / Navigation 示例子路径导入不再失败。
 - **主题运行时（Core）**：主题变量改为只写作用域样式表，删除并行的 inline 写入路径和与公开契约相悖的 `prefers-color-scheme` 死规则。dark/light 切回 `auto` 与 `dispose` 时按快照只释放本 scope 写入的 class、`data-tiger-color-scheme` 与 `color-scheme`，保留调用前和外部后续的修改。`auto` 下显式 `data-tiger-color-scheme="light"` 优先于 `<html>` 上的 `dark` class，样式表选择器与 `getResolvedColorScheme()` 保持一致。
 - **嵌套主题（Core）**：嵌套 scope 的 motion duration 现在派生出 transition shorthand，easing 未设置时继承父级的 `--tiger-motion-ease-standard`。
 - **ConfigProvider（Vue / React）**：document ownership 改为响应式，ownership 变化时交接 document handle 与嵌套 scope。接通已公开的 `iconRegistry` 配置（Core 类型与 React Props 此前已存在），Vue ConfigProvider 补齐同名 runtime prop，两端 Icon 实际消费：应用传入的注册表优先于父级，provider 只 dispose 自己创建的注册表。移除无生产读者的 locale scope 接线。

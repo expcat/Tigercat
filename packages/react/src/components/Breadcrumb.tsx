@@ -256,7 +256,13 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       } else {
         const child = items[slot.index]
         const isLast = slot.index === items.length - 1
-        const trailing = index !== slots.length - 1 ? <SeparatorMark separator={separator} /> : null
+        const childSeparator = React.isValidElement(child)
+          ? (child.props as { separator?: BreadcrumbSeparator }).separator
+          : undefined
+        const trailing =
+          index !== slots.length - 1 ? (
+            <SeparatorMark separator={childSeparator ?? separator} />
+          ) : null
         nodes.push(
           React.isValidElement(child)
             ? React.cloneElement(child as React.ReactElement<BreadcrumbItemProps>, {

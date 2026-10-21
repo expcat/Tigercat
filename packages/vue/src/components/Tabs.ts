@@ -96,6 +96,7 @@ export interface VueTabsProps {
   destroyInactiveTabPane?: boolean
   lazy?: boolean
   swipeable?: boolean
+  activation?: 'automatic' | 'manual'
   className?: string
   style?: Record<string, string | number>
 }
@@ -229,7 +230,9 @@ export const TabPane = defineComponent({
       if (delta == null) return
       event.preventDefault()
 
-      const tabButtons = Array.from(tabList?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])
+      const tabButtons = Array.from(
+        tabList?.querySelectorAll<HTMLElement>('[role="tab"]') ?? []
+      ).filter((button) => !button.hasAttribute('hidden'))
       const records: TabRecord[] = tabButtons.map((button) => ({
         key: parseTabKey(button.getAttribute('data-tiger-tab-key')) ?? button.id,
         disabled: button.getAttribute('aria-disabled') === 'true'
@@ -368,7 +371,6 @@ export const Tabs = defineComponent({
       type: String as PropType<'automatic' | 'manual'>,
       default: 'automatic'
     },
-    reorderable: { type: Boolean, default: false },
     closable: {
       type: Boolean,
       default: false
@@ -415,6 +417,7 @@ export const Tabs = defineComponent({
     const dir = computed(() => getLocaleDirection(mergedLocale.value))
 
     const internalActiveKey = ref<string | number | undefined>(props.defaultActiveKey)
+    const pendingFocusKey = ref<string | number | null>(null)
     const swipeStart = ref<ReturnType<typeof getGestureTouchPoint> | null>(null)
     const tabListEl = ref<HTMLElement | null>(null)
     const overflowKeys = ref<Array<string | number>>([])
@@ -437,10 +440,28 @@ export const Tabs = defineComponent({
 
     const handleTabClose = (key: string | number, event: Event) => {
       event.stopPropagation()
-      if (props.activeKey === undefined && isKeyActive(key, currentActiveKey.value)) {
-        internalActiveKey.value = getNextActiveKey(key, currentActiveKey.value, lastTabRecords)
+      if (isKeyActive(key, currentActiveKey.value)) {
+        const next = getNextActiveKey(key, currentActiveKey.value, lastTabRecords)
+        if (next !== undefined) {
+          pendingFocusKey.value = next
+          if (props.activeKey === undefined) internalActiveKey.value = next
+          emit('update:activeKey', next)
+          emit('change', next)
+        }
       }
       emit('edit', { targetKey: key, action: 'remove' })
+    }
+
+    const focusPendingTab = () => {
+      const pending = pendingFocusKey.value
+      if (pending == null) return
+      if (!isKeyActive(pending, currentActiveKey.value)) {
+        pendingFocusKey.value = null
+        return
+      }
+      pendingFocusKey.value = null
+      const tabId = `${idBase}-tab-${String(pending)}`
+      tabListEl.value?.querySelector<HTMLElement>(`#${CSS.escape(tabId)}`)?.focus()
     }
 
     const measureOverflow = () => {
@@ -512,6 +533,7 @@ export const Tabs = defineComponent({
     }
 
     onUpdated(measureOverflow)
+    onUpdated(focusPendingTab)
 
     onMounted(bindIndicatorObserver)
     onBeforeUnmount(() => resizeObserver?.disconnect())
@@ -715,6 +737,7 @@ export const Tabs = defineComponent({
                 key: `close-${String(tab.key)}`,
                 type: 'button',
                 class: 'sr-only',
+                tabindex: -1,
                 'aria-label': labels.value.closeTabAriaLabel.replace(
                   '{label}',
                   String(tab.label ?? tab.key)

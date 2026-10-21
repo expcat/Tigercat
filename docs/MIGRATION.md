@@ -206,9 +206,9 @@ BackTop `duration` 不是毫秒：`0` 立刻滚到顶，正数用浏览器原生
 
 Anchor 默认 `affix` 使用 Affix（有占位），不再给根加裸 `fixed`。默认有 ink。根是 `<nav>`，链接在 `ul > li`，当前项 `aria-current="location"`。点链接会 `onChange` 并写入 hash；`ctrl`/`meta`/`_blank` 不 preventDefault。`getContainer` 与 Affix `target` 同一套输入。删除 `AnchorClickInfo` / `AnchorChangeInfo` / `getContainerHeight`。Vue 从主入口引 `AffixProps` / `BackTopProps` / `AnchorProps` / `AnchorContextKey`。
 
-NavigationMenu 默认不再悬停或聚焦就开层。用点击或 Enter / Space / ArrowDown；需要悬停请显式 `openOnHover`。再点同一 Trigger 会关上。不要依赖默认 `aria-label="Main"`，多个导航请各自命名。`1` 与 `'1'` 是同一项。Mega 面板是 `menu` 不是孤立 `group`。Vue 从主入口引 `NavigationMenuProps` 和 `NavigationMenuList`。
+NavigationMenu 默认不再悬停或聚焦就开层。用点击或 Enter / Space / ArrowDown；需要悬停请显式 `openOnHover`。再点同一 Trigger 会关上。不要依赖默认 `aria-label="Main"`，多个导航请各自命名。`1` 与 `'1'` 是同一项。普通面板是 `menu` / `menuitem`（箭头漫游、Tab 退出）；Mega 面板是 disclosure——无 `role="menu"`，Trigger 不挂 `aria-haspopup="menu"`，链接保留原生 anchor / button 语义与 Tab 顺序，Enter / ArrowDown 初始聚焦落在面板内第一个真实可聚焦节点。Vue 从主入口引 `NavigationMenuProps` 和 `NavigationMenuList`。
 
-Menu 点选永远是单选：`selectedKeys` 长度 0/1，再点已选项变成 `[]`。`multiple` 只表示可否同时打开多个 submenu，不再让初值多选、一点就塌成一项。`1` 与 `'1'` 是同一 key。
+Menu 点选永远是单选：`selectedKeys` 长度 0/1，再点已选项变成 `[]`。Vue `multiple` 更名为 `openMultiple`（与 Core / React 一致），只表示可否同时打开多个 submenu，不再让初值多选、一点就塌成一项。`1` 与 `'1'` 是同一 key。
 
 `popupPortal` 默认 `true`。popup（horizontal / collapsed vertical）也读写 `openKeys`，点 horizontal 标题会 toggle。搜索会把匹配子孙的祖先写进 `openKeys`；受控时请回写。未传 `searchPlaceholder` / `emptyText` 走 locale `common`。
 
@@ -575,14 +575,7 @@ Upload 的上传队列、分片和断点续传 helper 已从内部 `upload-utils
 
 ### Navigation 受控回调与子组件子路径收敛
 
-React Navigation 组件的非表单受控量统一使用 `on<Prop>Change`。Tabs / ScrollSpy 不再使用通用 `onChange` 作为 active key 受控出口：
-
-```diff
-- <Tabs activeKey={tab} onChange={setTab}>
-+ <Tabs activeKey={tab} onActiveKeyChange={setTab}>
-    <TabPane tabKey="overview" label="Overview">...</TabPane>
-  </Tabs>
-```
+ScrollSpy 的 active key 受控出口使用 `onActiveKeyChange`，不再用通用 `onChange`（Tabs 保持 `onChange`，见开头改名表）：
 
 ```diff
 - <ScrollSpy activeKey={section} onChange={setSection} items={items} />
@@ -633,6 +626,8 @@ import { TabPane } from '@expcat/tigercat-vue/TabPane'
 ```
 
 源码级深路径（如 `packages/react/src/components/MenuItem`）不再保留；库内部或源码级集成应从父组件文件导入。
+
+Core `TabsProps` 与 Vue Tabs 删除 `reorderable`：该 prop 从未生效（全仓没有实现、事件或消费者），移除即可，无需替代写法。Vue Tabs 关闭当前页签且存在下一可用页签时，与 React 同契约：先发 `update:activeKey` / `change`（受控只提议，不自行改 prop；非受控同时更新内部值），`edit` 仍在其后，焦点在实际 DOM 更新后落到下一页签。方向键 / Home / End 只遍历可见页签；独立 sr-only 关闭按钮保留动作但 `tabindex="-1"`，不再占据 1×1 的 Tab 停点。
 
 ### Pagination 页容量事件与 simple 样式 helpers 收敛
 

@@ -5,7 +5,11 @@
 
 import { resolveTopOverlayDocument } from './anchored-overlay'
 import { devWarn } from './dev-warn'
-import { handleMenuNavigation, isTextEditingTarget } from './focus-utils'
+import {
+  focusFirstMenuItemWhenVisible,
+  handleMenuNavigation,
+  isTextEditingTarget
+} from './focus-utils'
 import { getFocusableElements } from './overlay-utils'
 import {
   NAVIGATION_MENU_BAR_ITEM_ATTR,
@@ -189,6 +193,14 @@ export function shouldKeepNavigationMenuOpen(options: {
   if (!active) return false
   if (options.panel?.contains(active)) return true
   return false
+}
+
+/**
+ * Ordinary panels are menus and focus their first menu item. Mega panels are
+ * disclosures over rich content, so focus follows native tab semantics there.
+ */
+export function focusFirstNavigationMenuPanelItem(panel: HTMLElement, mega: boolean): boolean {
+  return focusFirstMenuItemWhenVisible(panel, 16, mega ? getFocusableElements : undefined)
 }
 
 export function getNavigationMenuTabExitTarget(

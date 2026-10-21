@@ -45,11 +45,13 @@ import {
   popupMenuAccessibleName,
   getPopupMenuItemClasses,
   getPopupMenuShortcutClasses,
+  POPUP_MENU_SUBMENU_SURFACE_CLASSES,
   nextPopupMenuCheck,
   navLabels,
   createTypeaheadHighlight,
   markTypeaheadMatch,
   type PopupMenuItem,
+  type PopupMenuCheckChange,
   handleMenuNavigation,
   focusFirstMenuItem,
   captureActiveElement,
@@ -505,6 +507,127 @@ export const ContextMenuSub = defineComponent({
   }
 })
 
+/**
+ * Schema popup branch. Each nesting level owns its open key so opening a
+ * nested submenu keeps its ancestors open and closes only its siblings.
+ */
+const ContextMenuPopupBranch = defineComponent({
+  name: 'TigerContextMenuPopupBranch',
+  props: {
+    entries: { type: Array as PropType<PopupMenuItem[]>, required: true },
+    onCheck: {
+      type: Function as PropType<(change: PopupMenuCheckChange) => void>,
+      default: undefined
+    },
+    onClose: {
+      type: Function as PropType<() => void>,
+      default: undefined
+    }
+  },
+  setup(props) {
+    const openKey = ref<string | number | null>(null)
+
+    return (): VNode[] =>
+      props.entries.map((item) => {
+        const type = resolvePopupMenuItemType(item)
+        if (type === 'separator') {
+          return h('div', {
+            key: item.key,
+            role: 'separator',
+            class: getDropdownSeparatorClasses()
+          })
+        }
+        if (type === 'submenu') {
+          const expanded = openKey.value === item.key && !item.disabled
+          return h(
+            'div',
+            {
+              key: item.key,
+              class: 'relative',
+              onMouseenter: () => {
+                if (!item.disabled) openKey.value = item.key
+              },
+              onMouseleave: () => {
+                if (openKey.value === item.key) openKey.value = null
+              }
+            },
+            [
+              h(
+                'button',
+                {
+                  type: 'button',
+                  role: 'menuitem',
+                  'aria-haspopup': 'menu',
+                  'aria-expanded': expanded,
+                  'aria-disabled': item.disabled || undefined,
+                  class: getPopupMenuItemClasses(Boolean(item.disabled), false),
+                  'data-tiger-popup-item': '',
+                  disabled: item.disabled
+                },
+                item.label
+              ),
+              expanded
+                ? h(
+                    'div',
+                    {
+                      role: 'menu',
+                      'data-tiger-popup-submenu': '',
+                      class: `absolute top-0 start-full z-10 min-w-40 ${POPUP_MENU_SUBMENU_SURFACE_CLASSES} p-1`
+                    },
+                    [
+                      h(ContextMenuPopupBranch, {
+                        entries: item.children ?? [],
+                        onCheck: props.onCheck,
+                        onClose: props.onClose
+                      })
+                    ]
+                  )
+                : null
+            ]
+          )
+        }
+        const href = popupMenuItemHref(item)
+        const danger = type === 'danger'
+        return h(
+          href ? 'a' : 'button',
+          {
+            key: item.key,
+            type: href ? undefined : 'button',
+            href,
+            role: popupMenuItemRole(type),
+            'aria-checked':
+              type === 'checkbox' || type === 'radio' ? Boolean(item.checked) : undefined,
+            'aria-label': danger ? popupMenuAccessibleName(item) : undefined,
+            'aria-disabled': item.disabled || undefined,
+            disabled: href ? undefined : item.disabled,
+            class: getPopupMenuItemClasses(Boolean(item.disabled), danger),
+            'data-tiger-popup-item': '',
+            onClick: (event: MouseEvent) => {
+              if (item.disabled) {
+                event.preventDefault()
+                return
+              }
+              if (type === 'checkbox' || type === 'radio') {
+                event.preventDefault()
+                const change = nextPopupMenuCheck(props.entries, item.key)
+                if (change) props.onCheck?.(change)
+                return
+              }
+              if (popupMenuItemCloses(type)) props.onClose?.()
+            }
+          },
+          [
+            item.label,
+            item.shortcut
+              ? h('span', { class: getPopupMenuShortcutClasses() }, item.shortcut)
+              : null,
+            danger ? h('span', { class: 'sr-only' }, `, ${navLabels.dangerItem}`) : null
+          ]
+        )
+      })
+  }
+})
+
 export interface VueContextMenuProps extends CoreContextMenuProps {
   /**
    * Menu placement relative to the cursor point
@@ -656,7 +779,6 @@ export const ContextMenu = defineComponent({
     }
 
     const typeahead = createTypeaheadHighlight()
-    const openSubKey = ref<string | number | null>(null)
 
     const handleMenuKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
@@ -664,15 +786,17 @@ export const ContextMenu = defineComponent({
         return
       }
       if (!floatingRef.value) return
-      const labels = Array.from(
+      const nodes = Array.from(
         floatingRef.value.querySelectorAll<HTMLElement>('[role^="menuitem"]')
-      ).map((node) => node.textContent ?? '')
-      const highlight = typeahead.push(event.key, labels, -1)
+      )
+      const highlight = typeahead.push(
+        event.key,
+        nodes.map((node) => node.textContent ?? ''),
+        -1,
+        nodes.map((node) => node.getAttribute('aria-disabled') === 'true')
+      )
       if (highlight && highlight.index >= 0) {
         event.preventDefault()
-        const nodes = Array.from(
-          floatingRef.value.querySelectorAll<HTMLElement>('[role^="menuitem"]')
-        )
         markTypeaheadMatch(nodes, highlight.index)
         nodes[highlight.index]?.focus()
         return
@@ -724,102 +848,14 @@ export const ContextMenu = defineComponent({
       let triggerNodes: VNode[] = []
       let menuNode: VNode | null = null
 
-      const renderPopupBranch = (entries: PopupMenuItem[]): VNode[] =>
-        entries.map((item) => {
-          const type = resolvePopupMenuItemType(item)
-          if (type === 'separator') {
-            return h('div', {
-              key: item.key,
-              role: 'separator',
-              class: getDropdownSeparatorClasses()
-            })
-          }
-          if (type === 'submenu') {
-            const placement = getContextMenuSubPlacement(
-              typeof document === 'undefined' ? 'ltr' : document.documentElement.dir
-            )
-            return h(
-              'div',
-              {
-                key: item.key,
-                class: 'relative',
-                onMouseenter: () => {
-                  openSubKey.value = item.key
-                },
-                onMouseleave: () => {
-                  if (openSubKey.value === item.key) openSubKey.value = null
-                }
-              },
-              [
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    role: 'menuitem',
-                    'aria-haspopup': 'menu',
-                    'aria-expanded': openSubKey.value === item.key,
-                    class: getPopupMenuItemClasses(Boolean(item.disabled), false),
-                    'data-tiger-popup-item': ''
-                  },
-                  item.label
-                ),
-                openSubKey.value === item.key
-                  ? h(
-                      'div',
-                      {
-                        role: 'menu',
-                        'data-tiger-popup-submenu': '',
-                        class: placement.endsWith('end')
-                          ? 'absolute top-0 end-full z-10 min-w-40 p-1'
-                          : 'absolute top-0 start-full z-10 min-w-40 p-1'
-                      },
-                      renderPopupBranch(item.children ?? [])
-                    )
-                  : null
-              ]
-            )
-          }
-          const href = popupMenuItemHref(item)
-          const danger = type === 'danger'
-          return h(
-            href ? 'a' : 'button',
-            {
-              key: item.key,
-              type: href ? undefined : 'button',
-              href,
-              role: popupMenuItemRole(type),
-              'aria-checked':
-                type === 'checkbox' || type === 'radio' ? Boolean(item.checked) : undefined,
-              'aria-label': danger ? popupMenuAccessibleName(item) : undefined,
-              disabled: href ? undefined : item.disabled,
-              class: getPopupMenuItemClasses(Boolean(item.disabled), danger),
-              'data-tiger-popup-item': '',
-              onClick: (event: MouseEvent) => {
-                if (item.disabled) {
-                  event.preventDefault()
-                  return
-                }
-                if (type === 'checkbox' || type === 'radio') {
-                  event.preventDefault()
-                  const change = nextPopupMenuCheck(entries, item.key)
-                  if (change) emit('check', change)
-                  return
-                }
-                if (popupMenuItemCloses(type)) handleItemClick()
-              }
-            },
-            [
-              item.label,
-              item.shortcut
-                ? h('span', { class: getPopupMenuShortcutClasses() }, item.shortcut)
-                : null,
-              danger ? h('span', { class: 'sr-only' }, `, ${navLabels.dangerItem}`) : null
-            ]
-          )
-        })
-
       if (props.items && props.items.length > 0 && !menuNode) {
-        menuNode = h(ContextMenuMenu, {}, () => renderPopupBranch(props.items ?? []))
+        menuNode = h(ContextMenuMenu, {}, () =>
+          h(ContextMenuPopupBranch, {
+            entries: props.items ?? [],
+            onCheck: (change: PopupMenuCheckChange) => emit('check', change),
+            onClose: handleItemClick
+          })
+        )
       }
 
       defaultSlot.forEach((node: VNode) => {
