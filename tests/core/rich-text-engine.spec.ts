@@ -346,6 +346,66 @@ describe('rich-text-engine', () => {
     exec.mockRestore()
   })
 
+  describe('image paste lifecycle', () => {
+    const flushReader = (): Promise<void> =>
+      new Promise((resolve) => {
+        setTimeout(resolve, 20)
+      })
+
+    function pasteBitmap(element: HTMLElement): void {
+      const file = new File([new Uint8Array([137, 80, 78, 71])], 'tiny.png', {
+        type: 'image/png'
+      })
+      const paste = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent
+      Object.defineProperty(paste, 'clipboardData', {
+        value: { files: [file], getData: () => '' }
+      })
+      element.dispatchEvent(paste)
+    }
+
+    it('inserts a pasted bitmap and reports one change', async () => {
+      const { ctx, changes } = makeContext()
+      instance = builtinRichTextEngine.create(ctx)
+      pasteBitmap(ctx.element)
+      await flushReader()
+      expect(ctx.element.querySelectorAll('img')).toHaveLength(1)
+      expect(changes).toHaveLength(1)
+    })
+
+    it('ignores a late load after destroy', async () => {
+      const { ctx, changes } = makeContext()
+      instance = builtinRichTextEngine.create(ctx)
+      pasteBitmap(ctx.element)
+      instance.destroy()
+      instance = null
+      await flushReader()
+      expect(ctx.element.querySelectorAll('img')).toHaveLength(0)
+      expect(changes).toHaveLength(0)
+    })
+
+    it('stays cancelled when read-only turns off again before the load', async () => {
+      const { ctx, changes } = makeContext()
+      instance = builtinRichTextEngine.create(ctx)
+      pasteBitmap(ctx.element)
+      instance.setReadOnly(true, false)
+      instance.setReadOnly(false, false)
+      await flushReader()
+      expect(ctx.element.querySelectorAll('img')).toHaveLength(0)
+      expect(changes).toHaveLength(0)
+    })
+
+    it('ignores a late load after setValue replaced the content', async () => {
+      const { ctx, changes } = makeContext()
+      instance = builtinRichTextEngine.create(ctx)
+      pasteBitmap(ctx.element)
+      instance.setValue('<p>Replaced</p>')
+      await flushReader()
+      expect(ctx.element.innerHTML).toBe('<p>Replaced</p>')
+      expect(ctx.element.querySelectorAll('img')).toHaveLength(0)
+      expect(changes).toHaveLength(0)
+    })
+  })
+
   it('setMode re-emits the current host HTML in the new public mode', () => {
     const { ctx, changes } = makeContext({
       mode: 'html',

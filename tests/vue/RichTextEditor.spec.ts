@@ -4,9 +4,11 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { h } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { RichTextEditor } from '@expcat/tigercat-vue/RichTextEditor'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -252,6 +254,28 @@ describe('RichTextEditor', () => {
       const { container } = renderEditor({ readOnly: true })
       const editor = container.querySelector('[role="textbox"]') as HTMLElement
       expect(editor.tabIndex).toBe(0)
+    })
+  })
+
+  describe('Form integration', () => {
+    it('follows FormItem value changes after mount', async () => {
+      const model = ref({ body: '<p>Original</p>' })
+      const Host = defineComponent({
+        setup() {
+          return () =>
+            h(Form, { modelValue: model.value }, () =>
+              h(FormItem, { name: 'body', label: 'Body' }, () => h(RichTextEditor))
+            )
+        }
+      })
+      const { container } = render(Host)
+      const editor = container.querySelector('[role="textbox"]') as HTMLElement
+      await nextTick()
+      expect(editor.innerHTML).toContain('Original')
+
+      model.value = { body: '<p>Replacement</p>' }
+      await nextTick()
+      expect(editor.innerHTML).toContain('Replacement')
     })
   })
 })

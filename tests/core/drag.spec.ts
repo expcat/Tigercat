@@ -639,6 +639,31 @@ describe('createDocumentDragSession', () => {
     expect(onMove).not.toHaveBeenCalled()
     expect(onEnd).not.toHaveBeenCalled()
   })
+
+  it('restores user-select only after the last overlapping session ends', () => {
+    const root = document.documentElement
+    root.style.userSelect = 'text'
+    const a = createDocumentDragSession({
+      startX: 0,
+      startY: 0,
+      ownerDocument: document,
+      onMove: vi.fn()
+    })
+    const b = createDocumentDragSession({
+      startX: 0,
+      startY: 0,
+      ownerDocument: document,
+      onMove: vi.fn()
+    })
+    expect(root.style.userSelect).toBe('none')
+
+    a.dispose()
+    expect(root.style.userSelect).toBe('none')
+    b.dispose()
+    expect(root.style.userSelect).toBe('text')
+
+    root.style.userSelect = ''
+  })
 })
 
 // ---------------------------------------------------------------------------

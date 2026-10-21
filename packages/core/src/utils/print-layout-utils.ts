@@ -167,6 +167,50 @@ export function printPrintLayoutRoot(root: HTMLElement | null): void {
     destroy()
     return
   }
+
+  // Ancestor-dependent selectors (theme classes / data attributes on
+  // <html>/<body>) must match the cloned tree the same way.
+  for (const attr of Array.from(doc.documentElement.attributes)) {
+    frameDoc.documentElement.setAttribute(attr.name, attr.value)
+  }
+  for (const attr of Array.from(doc.body.attributes)) {
+    frameDoc.body.setAttribute(attr.name, attr.value)
+  }
+
+  // Copy the stylesheets the source tree consumes. Constructed sheets cannot
+  // cross documents, so they are serialized into a plain <style> instead.
+  const pendingResources: Promise<void>[] = []
+  for (const node of Array.from(doc.head.querySelectorAll('style, link[rel~="stylesheet"]'))) {
+    const copy = node.cloneNode(true)
+    if (copy instanceof HTMLLinkElement) {
+      pendingResources.push(
+        new Promise<void>((resolve) => {
+          if (copy.sheet) {
+            resolve()
+            return
+          }
+          copy.addEventListener('load', () => resolve(), { once: true })
+          copy.addEventListener('error', () => resolve(), { once: true })
+        })
+      )
+    }
+    frameDoc.head.appendChild(copy)
+  }
+  for (const sheet of Array.from(doc.adoptedStyleSheets ?? [])) {
+    try {
+      const cssText = Array.from(sheet.cssRules)
+        .map((rule) => rule.cssText)
+        .join('\n')
+      if (cssText) {
+        const adopted = frameDoc.createElement('style')
+        adopted.textContent = cssText
+        frameDoc.head.appendChild(adopted)
+      }
+    } catch {
+      // Unreadable sheet — skip it rather than aborting the print.
+    }
+  }
+
   const style = frameDoc.createElement('style')
   const instanceId = root.getAttribute('data-tiger-print-instance') ?? 'sheet'
   const declared = root.getAttribute('data-tiger-print-size')
@@ -184,8 +228,49 @@ export function printPrintLayoutRoot(root: HTMLElement | null): void {
   .tiger-print-layout tfoot { display: table-footer-group; }
 }`
   frameDoc.head.appendChild(style)
-  frameDoc.body.appendChild(root.cloneNode(true))
+
+  const clone = root.cloneNode(true) as HTMLElement
+  // The hidden frame never intersects a viewport, so lazy images would never
+  // start loading. The print copy must fetch eagerly.
+  for (const image of Array.from(clone.querySelectorAll('img'))) {
+    image.setAttribute('loading', 'eager')
+  }
+  // CSS custom properties resolved on ancestors do not survive the move into
+  // the frame; pin the computed values onto the clone so descendants inherit.
+  const view = doc.defaultView
+  if (view) {
+    const computed = view.getComputedStyle(root)
+    for (let i = 0; i < computed.length; i += 1) {
+      const name = computed.item(i)
+      if (name.startsWith('--')) {
+        clone.style.setProperty(
+          name,
+          computed.getPropertyValue(name),
+          computed.getPropertyPriority(name)
+        )
+      }
+    }
+  }
+  frameDoc.body.appendChild(clone)
+  for (const image of Array.from(clone.querySelectorAll('img'))) {
+    if (image.complete) continue
+    pendingResources.push(
+      new Promise<void>((resolve) => {
+        image.addEventListener('load', () => resolve(), { once: true })
+        image.addEventListener('error', () => resolve(), { once: true })
+      })
+    )
+  }
+
   win.addEventListener('afterprint', destroy)
-  if (typeof win.print === 'function') win.print()
-  else destroy()
+  const startPrint = (): void => {
+    try {
+      if (typeof win.print === 'function') win.print()
+      else destroy()
+    } catch {
+      destroy()
+    }
+  }
+  if (pendingResources.length > 0) Promise.all(pendingResources).then(startPrint, destroy)
+  else startPrint()
 }

@@ -186,10 +186,27 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
       let toolbar = ctx.toolbar
       let readOnly = ctx.readOnly
       let disabled = ctx.disabled
+      let destroyed = false
       element.contentEditable = String(!(readOnly || disabled))
 
       const initial = richTextModeToHtml(ctx.initialValue, mode)
       if (initial) element.innerHTML = initial
+
+      // Bitmap paste reads files asynchronously. A late `onload` must not
+      // write into an editor that was destroyed, made non-editable, or whose
+      // content was replaced since the paste started.
+      const pendingReaders = new Set<FileReader>()
+      const cancelPendingReaders = (): void => {
+        for (const reader of pendingReaders) {
+          reader.onload = null
+          try {
+            reader.abort()
+          } catch {
+            // Not loading anymore; the dropped onload already neutralizes it.
+          }
+        }
+        pendingReaders.clear()
+      }
 
       const handleInput = () => {
         ctx.notifyChange(richTextHtmlToMode(sanitizeHtml(element.innerHTML), mode))
@@ -227,7 +244,9 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
             return
           }
           const reader = new FileReader()
+          pendingReaders.add(reader)
           reader.onload = () => {
+            if (destroyed || readOnly || disabled) return
             const url =
               typeof reader.result === 'string' ? cappedBitmapDataUrl(reader.result) : null
             if (!url) {
@@ -237,6 +256,11 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
             insertSanitizedHtml(element, `<img src="${url}" alt="">`)
             handleInput()
             refreshActiveFormats()
+          }
+          // loadend fires after load, error, and abort alike: release the
+          // record for every termination path, not just success.
+          reader.onloadend = () => {
+            pendingReaders.delete(reader)
           }
           reader.readAsDataURL(file)
           return
@@ -333,6 +357,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           const current = richTextHtmlToMode(element.innerHTML, mode)
           const next = richTextHtmlToMode(sanitized, mode)
           if (current === next) return
+          cancelPendingReaders()
           element.innerHTML = sanitized
         },
         getValue() {
@@ -343,6 +368,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         setReadOnly(nextReadOnly, nextDisabled) {
           readOnly = nextReadOnly
           disabled = nextDisabled
+          if (readOnly || disabled) cancelPendingReaders()
           element.contentEditable = String(!(readOnly || disabled))
         },
         setMode(nextMode) {
@@ -355,6 +381,9 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           toolbar = nextToolbar
         },
         destroy() {
+          if (destroyed) return
+          destroyed = true
+          cancelPendingReaders()
           element.removeEventListener('input', handleInput)
           element.removeEventListener('paste', handlePaste)
           element.removeEventListener('drop', handleDrop)

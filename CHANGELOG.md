@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **富文本 / 打印 / 拖拽会话（Core / Vue / React）**：默认富文本引擎的图片粘贴在销毁、转为只读 / 禁用或 setValue 真正替换正文后不再迟到写入（恢复可编辑不复活旧粘贴，同值受控回声不取消）。PrintLayout.print() 的打印 iframe 复制消费样式表、constructed stylesheets、文档根匹配状态与根节点继承的 CSS 自定义变量，克隆图片改为 eager 加载并在资源就绪后才打印。Vue RichTextEditor 跟随 FormItem 表单值的后续变化；React RichTextEditor 替换等价引擎时保留当前非受控正文。Vue useDrag 的 containerId 实时跟随响应式 props，挂载后改 id 的跨容器落下正常提交；Core 文档拖拽会话的 user-select 锁按 document 引用计数，重叠会话只在最后一场结束后恢复第一场加锁前的值。
 - **数据选择与编辑（Vue / React）**：Table / VirtualTable 的行点击、键盘与工具栏选择统一遵守禁用行设置，保留未加载的已选键。文本与数字编辑支持 Enter 提交、Escape 取消；数字输入在提交事件内使用本次值，Select 选值只提交一次并保留数字类型，打开态 Escape 只关闭下拉框，关闭态 Escape 取消编辑。Vue VirtualTable 从 Table 的事件事实源完整转发事件。
 - **虚拟列表与表格（Core / Vue / React）**：列虚拟化保留跳过列的实际宽度，表头、表体、汇总与 colgroup 使用同一窗口，横向滚动可到达末列；VirtualTable 按既有契约在固定列或非数字宽度时回退。Tree 行高或视口变化后重新对齐活动行，保留树内焦点且不抢走外部或主动移除的焦点。删除 VirtualList 从未兑现的 `columns` / `orientation` / `stickyIndexes` 配置及旧分支，迁移见 [MIGRATION.md](docs/MIGRATION.md)。
 - **异步事件与数据展示（Vue / React）**：Vue InfiniteScroll、ActivityFeed、CommentThread 与 ChatWindow 统一读取当前监听器返回的 Promise，等待全部监听器完成后再释放请求或清空草稿，失败保留草稿；数组、单次与动态监听器沿用同一适配，双端 ActivityFeed 手动加载也等待 Promise。Collapse 动态切为手风琴时统一裁剪受控和非受控面板，Vue 公开 `headingLevel` 类型；Vue Timeline 可见待办文案与 live 播报共用本地化解析。

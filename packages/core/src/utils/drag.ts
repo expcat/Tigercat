@@ -344,6 +344,41 @@ function isMatchingPointer(event: PointerEvent, pointerId: number | undefined): 
   return pointerId == null || event.pointerId === pointerId
 }
 
+/**
+ * Per-document-root user-select locks. Overlapping sessions share one lock:
+ * the value captured before the first lock is restored only when the last
+ * session releases, so an early-finishing session cannot resurrect a stale
+ * value and a late one cannot leave `none` behind.
+ */
+interface UserSelectLock {
+  count: number
+  previous: string
+}
+
+const userSelectLocks = new WeakMap<HTMLElement, UserSelectLock>()
+
+function acquireUserSelectLock(root: HTMLElement): () => void {
+  let lock = userSelectLocks.get(root)
+  if (!lock) {
+    lock = { count: 0, previous: root.style.userSelect }
+    userSelectLocks.set(root, lock)
+  }
+  lock.count += 1
+  root.style.userSelect = 'none'
+  let released = false
+  return () => {
+    if (released) return
+    released = true
+    const active = userSelectLocks.get(root)
+    if (!active) return
+    active.count -= 1
+    if (active.count <= 0) {
+      userSelectLocks.delete(root)
+      root.style.userSelect = active.previous
+    }
+  }
+}
+
 function applyLockAxis(
   startX: number,
   startY: number,
@@ -388,8 +423,7 @@ export function createDocumentDragSession(
   const pointerId = options.pointerId
   const captureTarget = options.pointerTarget ?? null
   const root = ownerDocument.documentElement
-  const previousUserSelect = root.style.userSelect
-  let userSelectLocked = false
+  let releaseUserSelect: (() => void) | null = null
 
   const capturePointer = () => {
     if (
@@ -406,9 +440,8 @@ export function createDocumentDragSession(
   }
 
   const lockUserSelect = () => {
-    if (userSelectLocked) return
-    userSelectLocked = true
-    root.style.userSelect = 'none'
+    if (releaseUserSelect) return
+    releaseUserSelect = acquireUserSelectLock(root)
   }
 
   if (!activateOnThreshold) {
@@ -442,7 +475,11 @@ export function createDocumentDragSession(
     ownerDocument.removeEventListener('pointerup', handlePointerUp)
     ownerDocument.removeEventListener('pointercancel', handlePointerCancel)
     ownerDocument.removeEventListener('keydown', handleKeyDown)
-    if (userSelectLocked) root.style.userSelect = previousUserSelect
+    if (releaseUserSelect) {
+      const release = releaseUserSelect
+      releaseUserSelect = null
+      release()
+    }
     if (
       captureTarget &&
       pointerId != null &&

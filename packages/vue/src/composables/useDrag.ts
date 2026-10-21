@@ -142,6 +142,10 @@ export function useDrag(options: MaybeRefOrGetter<UseDragOptions> = {}): UseDrag
     isCrossContainer: computed(() => isCrossContainerDrag(state)),
     getDragItemAttrs,
     getDropZoneAttrs,
-    containerId: getOptions().containerId ?? ownId
+    // Live getter: keeps the public string API while tracking a reactive
+    // options.containerId so watchers see post-mount id changes.
+    get containerId(): string {
+      return getOptions().containerId ?? ownId
+    }
   }
 }

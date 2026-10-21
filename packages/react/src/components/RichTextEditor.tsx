@@ -151,9 +151,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
     }, [])
 
     const createOptionsRef = useRef({
-      isControlled,
-      value: resolvedValue,
-      defaultValue,
+      currentContent,
       mode,
       readOnly,
       effectiveDisabled,
@@ -163,9 +161,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       setContent
     })
     createOptionsRef.current = {
-      isControlled,
-      value: resolvedValue,
-      defaultValue,
+      currentContent,
       mode,
       readOnly,
       effectiveDisabled,
@@ -181,7 +177,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
       const factory = engine ?? builtinRichTextEngine
       const instance = factory.create({
         element: editorRef.current,
-        initialValue: options.value ?? options.defaultValue ?? '',
+        initialValue: options.currentContent,
         mode: options.mode,
         readOnly: options.readOnly,
         disabled: options.effectiveDisabled,

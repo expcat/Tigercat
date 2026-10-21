@@ -122,7 +122,9 @@ export const RichTextEditor = defineComponent({
     let engineInstance: RichTextEngineInstance | null = null
 
     const formValue = computed(() => formItemControl?.value.value)
-    const isControlled = computed(() => props.modelValue !== undefined)
+    const isControlled = computed(
+      () => props.modelValue !== undefined || typeof formValue.value === 'string'
+    )
     const currentContent = computed(() => {
       if (props.modelValue !== undefined) return props.modelValue
       if (typeof formValue.value === 'string') return formValue.value
@@ -183,9 +185,9 @@ export const RichTextEditor = defineComponent({
     }
 
     watch(
-      () => props.modelValue,
+      () => (props.modelValue !== undefined ? props.modelValue : formValue.value),
       (newVal) => {
-        if (newVal !== undefined && engineInstance) {
+        if (typeof newVal === 'string' && engineInstance) {
           engineInstance.setValue(newVal)
         }
       }

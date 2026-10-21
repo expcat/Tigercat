@@ -8,6 +8,7 @@ import {
   getPrintLayoutClasses,
   getPrintLayoutPageKey,
   mountPrintInstanceStyle,
+  printPrintLayoutRoot,
   printLayoutHeaderClasses,
   printLayoutPageBreakClasses,
   resolvePrintPageBox
@@ -53,5 +54,59 @@ describe('print-layout-utils', () => {
     expect(printLayoutHeaderClasses).not.toContain('hidden')
     expect(getPrintLayoutClasses()).toContain('tiger-print-layout')
     expect(getPrintLayoutClasses()).not.toContain('--tiger-print-ink')
+  })
+
+  it('printPrintLayoutRoot copies consuming styles and root match state into the frame', () => {
+    document.documentElement.className = 'dark'
+    const consumer = document.createElement('style')
+    consumer.textContent = '.proof { font-size: 31px }'
+    document.head.appendChild(consumer)
+    const root = document.createElement('div')
+    root.className = 'tiger-print-layout'
+    root.innerHTML = '<p class="proof">Styled</p>'
+    document.body.appendChild(root)
+
+    let captured: { styles: (string | null)[]; htmlClass: string; proof: string | null } | null =
+      null
+    const originalAppend = Node.prototype.appendChild
+    Node.prototype.appendChild = function <T extends Node>(this: Node, node: T): T {
+      const result = originalAppend.call(this, node)
+      if (node instanceof HTMLIFrameElement && node.hasAttribute('data-tiger-print-frame')) {
+        const win = node.contentWindow
+        if (win) {
+          win.print = () => {
+            const frame = node.contentDocument
+            captured = frame
+              ? {
+                  styles: Array.from(frame.querySelectorAll('style')).map((s) => s.textContent),
+                  htmlClass: frame.documentElement.className,
+                  proof: frame.querySelector('.proof')?.textContent ?? null
+                }
+              : null
+            win.dispatchEvent(new win.Event('afterprint'))
+          }
+        }
+      }
+      return result as T
+    }
+    try {
+      printPrintLayoutRoot(root)
+      expect(captured).not.toBeNull()
+      const shot = captured as unknown as {
+        styles: (string | null)[]
+        htmlClass: string
+        proof: string | null
+      }
+      expect(shot.styles.some((text) => text?.includes('.proof'))).toBe(true)
+      expect(shot.htmlClass).toBe('dark')
+      expect(shot.proof).toBe('Styled')
+      // afterprint (fired by the stub above) removes the frame
+      expect(document.body.querySelector('[data-tiger-print-frame]')).toBeNull()
+    } finally {
+      Node.prototype.appendChild = originalAppend
+      document.documentElement.className = ''
+      consumer.remove()
+      root.remove()
+    }
   })
 })

@@ -9,6 +9,7 @@ import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { RichTextEditor } from '@expcat/tigercat-react/RichTextEditor'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { createBuiltinRichTextEngine } from '@expcat/tigercat-core'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -231,6 +232,23 @@ describe('RichTextEditor', () => {
       editor.innerHTML = '<p>Hello <strong>world</strong></p>'
       fireEvent.input(editor)
       expect(onChange).toHaveBeenCalledWith('Hello world')
+    })
+  })
+
+  describe('Engine lifecycle', () => {
+    it('keeps uncontrolled edits when the engine factory is replaced', () => {
+      const { container, rerender } = render(
+        <RichTextEditor defaultValue="<p>Original</p>" engine={createBuiltinRichTextEngine()} />
+      )
+      const editor = container.querySelector('[role="textbox"]') as HTMLElement
+      editor.innerHTML = '<p>Edited</p>'
+      fireEvent.input(editor)
+      expect(editor.innerHTML).toContain('Edited')
+
+      rerender(
+        <RichTextEditor defaultValue="<p>Original</p>" engine={createBuiltinRichTextEngine()} />
+      )
+      expect(editor.innerHTML).toContain('Edited')
     })
   })
 })
