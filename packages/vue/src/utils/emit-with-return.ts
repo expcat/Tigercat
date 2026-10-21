@@ -17,6 +17,17 @@ interface ResolvedEmitHandlers {
 }
 
 /**
+ * Vue tracks consumed once listeners on the private `emitted` instance field
+ * (null until the first once listener fires, then a map keyed by handler
+ * name). The public d.ts omits the field; the installed runtime source
+ * (runtime-core emit, vue 3.5.39) confirms this exact shape and shares the
+ * same state with Vue's own emit, so model it here instead of duplicating it.
+ */
+type InstanceWithEmitted = ComponentInternalInstance & {
+  emitted: Record<string, boolean> | null
+}
+
+/**
  * Resolve the listeners of the current vnode for an event, mirroring emit's
  * lookup: raw event key first, then camelized; the once variant follows the
  * resolved key. Dynamic listener updates are picked up because the current
@@ -48,7 +59,7 @@ export function hasEmitHandler(instance: ComponentInternalInstance | null, event
   // A consumed once listener will not be invoked again; without a plain
   // handler alongside it the event has no usable listener left.
   if (!onceHandler) return false
-  return !instance.emitted?.[handlerName]
+  return !(instance as InstanceWithEmitted).emitted?.[handlerName]
 }
 
 /**
@@ -88,9 +99,10 @@ export function emitWithReturn(
   invoke(handler)
 
   if (onceHandler) {
-    if (!instance.emitted) instance.emitted = {}
-    if (!instance.emitted[handlerName]) {
-      instance.emitted[handlerName] = true
+    const target = instance as InstanceWithEmitted
+    if (!target.emitted) target.emitted = {}
+    if (!target.emitted[handlerName]) {
+      target.emitted[handlerName] = true
       invoke(onceHandler)
     }
   }
