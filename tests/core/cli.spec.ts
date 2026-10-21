@@ -1169,6 +1169,9 @@ const locales = import('@expcat/tigercat-core/datepicker-locales')
 
     const jsxExpr = `<div>{import('@expcat/tigercat-core/datepicker-locales')}</div>\n`
     expect(rewriteSource(jsxExpr, false, true)).toContain(`import('@expcat/tigercat-core/locales')`)
+
+    const similarlyNamed = `import { locale } from '@expcat/tigercat-core/datepicker-locales-legacy/zh-CN'\n`
+    expect(rewriteSource(similarlyNamed)).toBe(similarlyNamed)
   })
 
   it('only rewrites script blocks in Vue SFCs', () => {

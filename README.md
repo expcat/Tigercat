@@ -53,11 +53,12 @@ pnpm add @expcat/tigercat-react @expcat/tigercat-core
 pnpm add -D tailwindcss @tailwindcss/vite
 ```
 
-在 Vite 中启用 `@tailwindcss/vite`，然后在全局样式中引入 Tigercat 插件：
+在 Vite 中启用 `@tailwindcss/vite`，然后在全局样式中引入 Tigercat 插件，并用 `@source` 注册已安装包的 dist（Tailwind v4 不会自动扫描 `node_modules`）。下方 `../node_modules/...` 相对路径以 `src/style.css` 为准；样式文件放在其他位置时，请按实际位置调整：
 
 ```css
 @import 'tailwindcss';
 @plugin "@expcat/tigercat-core/tailwind";
+@source '../node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}';
 ```
 
 可运行 `pnpm dlx @expcat/tigercat-cli doctor` 检查 Node.js、pnpm、Tailwind CSS、框架 peer dependency 与模板工具链。

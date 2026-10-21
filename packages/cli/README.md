@@ -64,6 +64,8 @@ tigercat playground --template react --no-open
 
 Playground files are created under `.tigercat-playground/` in the current working directory.
 
+Re-running `playground` in an existing directory only refreshes `package.json` and `.gitignore`; your `src/style.css` edits are preserved. For an older playground, register the installed Tigercat dist files in its existing `src/style.css` while preserving your custom CSS; see [manual installation](../../README.md#手动安装).
+
 ```bash
 tigercat playground --template react --port 3457 --dry-run
 ```

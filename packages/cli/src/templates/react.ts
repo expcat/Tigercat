@@ -12,7 +12,7 @@ export function getReactTemplate(
     'src/main.tsx': reactMain(),
     'src/App.tsx': preset === 'shell' ? reactShellApp() : reactApp(),
     'src/routes.ts': preset === 'shell' ? reactRoutes() : '',
-    'src/style.css': commonStyleCss(),
+    'src/style.css': commonStyleCss('react'),
     'src/env.d.ts': reactEnvDts()
   }
   if (!files['src/routes.ts']) delete files['src/routes.ts']
@@ -20,6 +20,7 @@ export function getReactTemplate(
 }
 
 import { TEMPLATE_GITIGNORE, TEMPLATE_PACKAGE_MANAGER, TEMPLATE_VERSIONS as V } from '../constants'
+import { commonStyleCss } from './style-css'
 
 function reactPackageJson(name: string): string {
   return JSON.stringify(
@@ -245,27 +246,6 @@ export default function App() {
       </div>
     </ConfigProvider>
   )
-}
-`
-}
-
-function commonStyleCss(): string {
-  return `@import "tailwindcss";
-@plugin "@expcat/tigercat-core/tailwind";
-@custom-variant dark (&:where(.dark, .dark *));
-
-/*
- * The tigercat tailwind plugin injects the default preset's --tiger-* tokens
- * for :root and .dark. ConfigProvider theme / colorScheme switches presets
- * at runtime. The rules below keep native controls in sync with .dark.
- */
-
-html {
-  color-scheme: light;
-}
-
-html.dark {
-  color-scheme: dark;
 }
 `
 }

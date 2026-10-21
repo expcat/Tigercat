@@ -28,12 +28,18 @@ function replacementName(oldName: string, pkg: TigercatPackage): string | undefi
 }
 
 /**
- * Rewrite only the module specifier: exact replacements for removed subpaths,
- * then a trailing segment that is a removed module name (component subpaths).
+ * Rewrite only the module specifier: a removed subpath owns its exact path and
+ * any slash-delimited suffix, then a trailing segment can be a removed module
+ * name (component subpaths).
  */
 function rewriteSpecifier(specifier: string): string {
   const exact = REMOVED_SPECIFIERS[specifier]
   if (exact) return exact
+  for (const [oldSpecifier, newSpecifier] of Object.entries(REMOVED_SPECIFIERS)) {
+    if (specifier.startsWith(`${oldSpecifier}/`)) {
+      return `${newSpecifier}${specifier.slice(oldSpecifier.length)}`
+    }
+  }
   for (const [oldName, newName] of Object.entries(REMOVED_NAMES)) {
     if (specifier.endsWith(`/${oldName}`)) {
       return `${specifier.slice(0, -oldName.length)}${newName}`

@@ -11,7 +11,7 @@ export function getVue3Template(
     'src/main.ts': vue3Main(),
     'src/App.vue': preset === 'shell' ? vue3ShellApp() : vue3App(),
     'src/routes.ts': preset === 'shell' ? vue3Routes() : '',
-    'src/style.css': commonStyleCss(),
+    'src/style.css': commonStyleCss('vue'),
     'src/env.d.ts': vue3EnvDts()
   }
   if (!files['src/routes.ts']) delete files['src/routes.ts']
@@ -19,6 +19,7 @@ export function getVue3Template(
 }
 
 import { TEMPLATE_GITIGNORE, TEMPLATE_PACKAGE_MANAGER, TEMPLATE_VERSIONS as V } from '../constants'
+import { commonStyleCss } from './style-css'
 
 function vue3PackageJson(name: string): string {
   return JSON.stringify(
@@ -228,27 +229,6 @@ declare module '*.vue' {
   import type { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, unknown>
   export default component
-}
-`
-}
-
-function commonStyleCss(): string {
-  return `@import "tailwindcss";
-@plugin "@expcat/tigercat-core/tailwind";
-@custom-variant dark (&:where(.dark, .dark *));
-
-/*
- * The tigercat tailwind plugin injects the default preset's --tiger-* tokens
- * for :root and .dark. ConfigProvider theme / colorScheme switches presets
- * at runtime. The rules below keep native controls in sync with .dark.
- */
-
-html {
-  color-scheme: light;
-}
-
-html.dark {
-  color-scheme: dark;
 }
 `
 }
