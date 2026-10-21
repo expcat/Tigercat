@@ -10,6 +10,8 @@ Core 布局 helper 返回键调整：`getRowGutterStyleVars` / `getRowAlignJusti
 
 Core Carousel 轨道位移 helper 修正：`getScrollTransform(index, dir)` 此前忽略 `dir` 参数，RTL 下位移方向错误，本轮修正为 RTL 返回正位移；曾按旧的错误方向手工反向补偿的外部消费者应移除补偿。`getCarouselAxisTransform(index, axis, perView, dir?)` 新增可选 `dir` 参数，只影响水平 RTL 的符号；省略该参数的既有调用行为不变，无需迁移。
 
+拖拽与 FileManager 的公开 helper 调整：`ListDragItemBindings` 新增 `data-drag-id-type`，用于 DOM 往返时保留数字 id。自定义拖拽渲染请继续展开完整 bindings；此前只手动转发 `data-drag-id` / `data-drag-index` 的用法需改为转发完整 bindings，否则数字 key 会按字符串处理。`createFileManagerMeasure(...).windowFor(keys, scrollTop, viewport, columns?)` 新增可选 `columns`，省略时仍按单列计算，既有调用无需迁移。
+
 Slider 公开 props 删除 `vertical` 与 `showInput`：这两个配置自引入起没有任何实际能力（无纵向轨道布局、不渲染旁路数值输入），本轮连同根元素上的 `data-orientation` / `data-show-input` 属性一并移除。原先传入它们的用法本来就是水平滑块，删除后外观与行为不变；需要数值输入时可在应用侧自行组合 InputNumber。
 
 Core `getInputNumberKeyboardNextValue` 的 `current` 参数与返回值扩展支持 `InputNumberModel`，使超出安全整数的精确字符串也能走键盘步进模型。数字输入的运行时结果不变；TS 重载保留了 `number` 调用原有的 `number | undefined` 静态契约，只有显式传入字符串模型的调用方才拿到 `InputNumberModel | undefined`。

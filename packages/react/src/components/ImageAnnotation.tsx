@@ -166,6 +166,7 @@ export function ImageAnnotation({
   const sizeHostRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<SVGSVGElement>(null)
   const drawingRef = useRef<ReturnType<typeof startImageAnnotationDraw> | null>(null)
+  const drawFramesRef = useRef<{ cancel: () => void } | null>(null)
   const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const swallowClickRef = useRef(false)
   const naturalRef = useRef({ w: 0, h: 0 })
@@ -207,12 +208,25 @@ export function ImageAnnotation({
   const canSelect = !disabled
   const imageAlt = alt ?? labels.defaultAnnotationAlt
   const focusedShapeIndex = clampImageAnnotationShapeIndex(focusedShape, annotations.length)
+  const canEditRef = useRef(canEdit)
+  const resolvedToolRef = useRef(resolvedTool)
+  canEditRef.current = canEdit
+  resolvedToolRef.current = resolvedTool
+
+  const cancelDrawing = useCallback(() => {
+    drawFramesRef.current?.cancel()
+    drawFramesRef.current = null
+    dragSessionRef.current?.dispose()
+    dragSessionRef.current = null
+    drawingRef.current = null
+    setDraft(null)
+    setDrawingStroke(false)
+  }, [])
 
   useEffect(() => {
     const loader = loaderRef.current
+    cancelDrawing()
     setStatus('loading')
-    setDraft(null)
-    drawingRef.current = null
     loader.load(src, {
       onLoad: (_image, naturalWidth, naturalHeight) => {
         naturalRef.current = { w: naturalWidth, h: naturalHeight }
@@ -237,7 +251,7 @@ export function ImageAnnotation({
       }
     })
     return () => loader.dispose()
-  }, [src, loadAttempt])
+  }, [src, loadAttempt, cancelDrawing])
 
   useEffect(() => {
     const region = manageLiveRegion('polite')
@@ -262,7 +276,12 @@ export function ImageAnnotation({
     return () => observer.disconnect()
   }, [status])
 
-  useEffect(() => () => dragSessionRef.current?.dispose(), [])
+  useEffect(() => () => cancelDrawing(), [cancelDrawing])
+
+  useEffect(() => {
+    const current = drawingRef.current
+    if (current && (!canEdit || current.tool !== resolvedTool)) cancelDrawing()
+  }, [canEdit, cancelDrawing, resolvedTool])
 
   const commitAnnotations = useCallback(
     (next: CoreImageAnnotation[], meta: ImageAnnotationChangeMeta) => {
@@ -286,11 +305,10 @@ export function ImageAnnotation({
         setActiveToolState(nextTool)
         return
       }
-      setDraft(null)
-      drawingRef.current = null
+      cancelDrawing()
       setActiveToolState(nextTool)
     },
-    [resolvedTool, setActiveToolState]
+    [cancelDrawing, resolvedTool, setActiveToolState]
   )
 
   const getPointFromEvent = useCallback((clientX: number, clientY: number) => {
@@ -316,10 +334,18 @@ export function ImageAnnotation({
       ),
     [annotations]
   )
+  const commitAnnotationRef = useRef(commitAnnotation)
+  const nextIdRef = useRef(nextId)
+  commitAnnotationRef.current = commitAnnotation
+  nextIdRef.current = nextId
 
   const commitPolygon = useCallback(() => {
     const drawing = drawingRef.current
     if (!drawing) return
+    if (!canEdit || drawing.tool !== resolvedTool) {
+      cancelDrawing()
+      return
+    }
     const annotation = commitImageAnnotationPolygon(drawing, nextId('polygon'))
     drawingRef.current = null
     setDraft(null)
@@ -329,7 +355,14 @@ export function ImageAnnotation({
     }
     swallowClickRef.current = true
     commitAnnotation(annotation)
-  }, [commitAnnotation, labels.annotationPolygonIncompleteText, nextId])
+  }, [
+    canEdit,
+    cancelDrawing,
+    commitAnnotation,
+    labels.annotationPolygonIncompleteText,
+    nextId,
+    resolvedTool
+  ])
 
   const handleStagePointerDown = useCallback(
     (event: React.PointerEvent<SVGSVGElement>) => {
@@ -339,10 +372,10 @@ export function ImageAnnotation({
       }
 
       event.preventDefault()
+      cancelDrawing()
       const point = getPointFromEvent(event.clientX, event.clientY)
       drawingRef.current = startImageAnnotationDraw(resolvedTool, point)
       setDrawingStroke(true)
-      dragSessionRef.current?.dispose()
       const frames = createAnnotationFrameCoalescer(
         (payload: { currentX: number; currentY: number }) => {
           const drawing = drawingRef.current
@@ -355,6 +388,7 @@ export function ImageAnnotation({
           setDraft(draftImageAnnotationFromDraw(next))
         }
       )
+      drawFramesRef.current = frames
       const session = createDocumentDragSession({
         startX: event.clientX,
         startY: event.clientY,
@@ -366,24 +400,30 @@ export function ImageAnnotation({
         },
         onEnd: (payload) => {
           frames.cancel()
+          if (drawFramesRef.current === frames) drawFramesRef.current = null
           setDrawingStroke(false)
           const drawing = drawingRef.current
           drawingRef.current = null
           dragSessionRef.current = null
-          if (!drawing || payload.cancelled) {
+          if (
+            !drawing ||
+            payload.cancelled ||
+            !canEditRef.current ||
+            drawing.tool !== resolvedToolRef.current
+          ) {
             setDraft(null)
             return
           }
           const annotation = finishImageAnnotationDraw(
             drawing,
             getPointFromEvent(payload.currentX, payload.currentY),
-            nextId(drawing.tool),
+            nextIdRef.current(drawing.tool),
             minSize
           )
           setDraft(null)
           if (annotation) {
             swallowClickRef.current = true
-            commitAnnotation(annotation)
+            commitAnnotationRef.current(annotation)
             return
           }
           liveRef.current?.announce(labels.annotationTooSmallText)
@@ -393,11 +433,10 @@ export function ImageAnnotation({
     },
     [
       canEdit,
-      commitAnnotation,
+      cancelDrawing,
       getPointFromEvent,
       labels.annotationTooSmallText,
       minSize,
-      nextId,
       resolvedTool
     ]
   )
@@ -456,11 +495,7 @@ export function ImageAnnotation({
         if (drawingRef.current || draft) {
           event.preventDefault()
           event.stopPropagation()
-          dragSessionRef.current?.dispose()
-          dragSessionRef.current = null
-          drawingRef.current = null
-          setDraft(null)
-          setDrawingStroke(false)
+          cancelDrawing()
         }
         return
       }
@@ -497,7 +532,15 @@ export function ImageAnnotation({
         removeSelectedAnnotation()
       }
     },
-    [annotations.length, commitPolygon, draft, focusedShapeIndex, isRtl, removeSelectedAnnotation]
+    [
+      annotations.length,
+      cancelDrawing,
+      commitPolygon,
+      draft,
+      focusedShapeIndex,
+      isRtl,
+      removeSelectedAnnotation
+    ]
   )
 
   const handleToolbarKeyDown = useCallback(

@@ -5,7 +5,6 @@ import {
   coerceClassValue,
   commitCrossContainerDrop,
   dragMoveAnnouncement,
-  reorderSequence,
   type DragConfig,
   type DragDropEvent,
   type DragEndEvent,
@@ -70,12 +69,10 @@ export const Drag = defineComponent({
           commitCrossContainerDrop(event)
           return
         }
-        if (event.fromIndex === event.toIndex) return
-        const next = reorderSequence(props.items, event.fromIndex, event.toIndex).map(
-          (item, index) => ({ ...item, index })
-        )
-        emit('update:items', next)
-        emit('items-change', next)
+        const result = drag.reorder(props.items)
+        if (!result || result.fromIndex === result.toIndex) return
+        emit('update:items', result.items)
+        emit('items-change', result.items)
       }
     }))
 

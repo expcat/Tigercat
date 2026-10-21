@@ -13,6 +13,7 @@ import {
   getFileManagerContainerClasses,
   getFileItemClasses,
   getFileManagerContentClasses,
+  fileManagerContentClasses,
   getFileManagerGridStyle,
   deriveFileManagerModel,
   selectFileItem,
@@ -21,8 +22,10 @@ import {
   createFileManagerMeasure,
   FILE_MANAGER_DEFAULT_HEIGHT,
   FILE_MANAGER_LIST_ROW_HEIGHT,
+  FILE_MANAGER_VIRTUAL_MIN_COUNT,
   FILE_BREADCRUMB_SEPARATOR,
   manageLiveRegion,
+  scrollTopForVirtualAlign,
   resolveFileOpen,
   buildFileBreadcrumb,
   applyFileManagerReorder,
@@ -123,6 +126,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const contentRef = useRef<HTMLDivElement>(null)
   const liveRef = useRef<ReturnType<typeof manageLiveRegion> | null>(null)
   const measureRef = useRef(createFileManagerMeasure(FILE_MANAGER_LIST_ROW_HEIGHT))
+  const followBottomRef = useRef(false)
   const [measureTick, setMeasureTick] = useState(0)
   const [keys, setKeys] = useControlledState({
     value: selectedKeys,
@@ -163,7 +167,11 @@ export const FileManager: React.FC<FileManagerProps> = ({
     [tree, path, keys, sortField, sortOrder, showHidden, query, draggable]
   )
 
-  const viewKey = `${path.join('/')}\0${query}\0${model.processedItems.length}`
+  const pathKey = JSON.stringify(path)
+  const viewKey = `${pathKey}\0${query}\0${model.processedItems.length}`
+  useLayoutEffect(() => {
+    followBottomRef.current = false
+  }, [gridColumns, sortField, sortOrder, viewKey, viewMode])
   useEffect(() => {
     setFocusedIndex(0)
   }, [viewKey])
@@ -171,18 +179,21 @@ export const FileManager: React.FC<FileManagerProps> = ({
   const drag = useDrag({
     onDrop: (event) => {
       if (!model.canReorder) return
-      const result = applyFileManagerReorder(
-        tree,
-        path,
-        event.fromIndex,
-        event.toIndex,
-        model.processedItems
-      )
+      const fromIndex = model.processedItems.findIndex((item) => item.key === event.item.id)
+      const toIndex = event.overItem
+        ? model.processedItems.findIndex((item) => item.key === event.overItem?.id)
+        : event.toIndex
+      if (fromIndex < 0 || toIndex < 0) return
+      const result = applyFileManagerReorder(tree, path, fromIndex, toIndex, model.processedItems)
       if (!result) return
-      onReorder?.(result.layer, event.fromIndex, event.toIndex)
+      onReorder?.(result.layer, fromIndex, toIndex)
       onFilesChange?.(result.files)
     }
   })
+  const endDrag = drag.endDrag
+  useLayoutEffect(() => {
+    endDrag(true)
+  }, [endDrag, pathKey])
 
   const containerClasses = useMemo(() => getFileManagerContainerClasses(className), [className])
   const contentClass = getFileManagerContentClasses(viewMode)
@@ -234,11 +245,41 @@ export const FileManager: React.FC<FileManagerProps> = ({
     [commitPath, loading, onOpen, path]
   )
 
-  const focusItemAt = useCallback((index: number) => {
-    requestAnimationFrame(() => {
-      contentRef.current?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)?.focus()
-    })
-  }, [])
+  const focusItemAt = useCallback(
+    (index: number, followEnd = false) => {
+      followBottomRef.current = followEnd
+      const host = contentRef.current
+      if (host && model.processedItems.length >= FILE_MANAGER_VIRTUAL_MIN_COUNT) {
+        const columns = Math.max(1, Math.floor(gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+        const row = viewMode === 'grid' ? Math.floor(index / columns) : index
+        const offset =
+          viewMode === 'grid'
+            ? measureRef.current.strategy.getItemOffset(row)
+            : index * FILE_MANAGER_LIST_ROW_HEIGHT
+        const size =
+          viewMode === 'grid'
+            ? measureRef.current.strategy.getItemHeight(row)
+            : FILE_MANAGER_LIST_ROW_HEIGHT
+        const next = followEnd
+          ? Math.max(0, host.scrollHeight - host.clientHeight)
+          : scrollTopForVirtualAlign({
+              scrollTop: host.scrollTop,
+              viewport: host.clientHeight,
+              offset,
+              size,
+              align: 'auto'
+            })
+        if (next !== host.scrollTop) {
+          host.scrollTop = next
+          setScrollTop(next)
+        }
+      }
+      requestAnimationFrame(() => {
+        contentRef.current?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)?.focus()
+      })
+    },
+    [gridColumns, model.processedItems.length, viewMode]
+  )
 
   const handleItemKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>, item: FileItem, index: number) => {
@@ -257,7 +298,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
       event.preventDefault()
       if (action.type === 'move' || action.type === 'home' || action.type === 'end') {
         setFocusedIndex(action.index)
-        focusItemAt(action.index)
+        focusItemAt(action.index, action.type === 'end')
         return
       }
       if (action.type === 'select') {
@@ -321,7 +362,8 @@ export const FileManager: React.FC<FileManagerProps> = ({
       return measureRef.current.windowFor(
         model.processedItems.map((item) => item.key),
         scrollTop,
-        viewport
+        viewport,
+        gridColumns
       )
     }
     return getFileManagerWindow(
@@ -330,24 +372,41 @@ export const FileManager: React.FC<FileManagerProps> = ({
       viewport,
       FILE_MANAGER_LIST_ROW_HEIGHT
     )
-  }, [measureTick, model.processedItems, scrollTop, viewMode, viewport])
+  }, [measureTick, model.processedItems, scrollTop, viewMode, viewport, gridColumns])
 
   useLayoutEffect(() => {
-    if (viewMode !== 'grid' || !fileWindow.virtual || !contentRef.current) return
+    const host = contentRef.current
+    if (viewMode !== 'grid' || !fileWindow.virtual || !host) return
+    if (followBottomRef.current) {
+      const next = Math.max(0, host.scrollHeight - host.clientHeight)
+      if (next !== host.scrollTop) {
+        host.scrollTop = next
+        setScrollTop(next)
+      }
+    }
+    const columns = Math.max(1, Math.floor(gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+    const rowHeights = new Map<number, number>()
+    let rowGap = 0
     let changed = false
-    contentRef.current.querySelectorAll<HTMLElement>('[data-option-index]').forEach((node) => {
+    host.querySelectorAll<HTMLElement>('[data-option-index]').forEach((node) => {
       const index = Number(node.dataset.optionIndex)
-      const item = model.processedItems[index]
-      if (!item) return
-      const next = node.getBoundingClientRect().height
-      const prev = measureRef.current.strategy.getItemHeight(index)
+      const row = Math.floor(index / columns)
+      const height = node.getBoundingClientRect().height
+      rowHeights.set(row, Math.max(rowHeights.get(row) ?? 0, height))
+      if (node.parentElement) {
+        rowGap = Number.parseFloat(getComputedStyle(node.parentElement).rowGap) || 0
+      }
+    })
+    rowHeights.forEach((height, row) => {
+      const next = height + rowGap
+      const prev = measureRef.current.strategy.getItemHeight(row)
       if (next > 0 && Math.abs(next - prev) > 1) {
-        measureRef.current.measure(index, next, item.key)
+        measureRef.current.measure(row, next)
         changed = true
       }
     })
     if (changed) setMeasureTick((tick) => tick + 1)
-  }, [fileWindow, model.processedItems, viewMode])
+  }, [fileWindow, gridColumns, viewMode])
 
   const emptyLabel =
     emptyText ??
@@ -472,20 +531,24 @@ export const FileManager: React.FC<FileManagerProps> = ({
       {model.processedItems.length > 0 ? (
         <div
           ref={contentRef}
-          className={contentClass}
-          style={
-            fileWindow.virtual
-              ? { height: fileWindow.totalHeight, position: 'relative' }
-              : gridStyle
-          }
+          className={fileWindow.virtual ? fileManagerContentClasses : contentClass}
+          style={fileWindow.virtual ? undefined : gridStyle}
           role="listbox"
           aria-label={`${labels.listboxAriaLabel}, ${resultCount}`}
           aria-multiselectable={multiple || undefined}
           aria-disabled={loading || undefined}
-          onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}>
+          onScroll={(event) => {
+            const host = event.currentTarget
+            followBottomRef.current = host.scrollTop + host.clientHeight >= host.scrollHeight - 1
+            setScrollTop(host.scrollTop)
+          }}>
           {fileWindow.virtual ? (
-            <div style={{ transform: `translateY(${fileWindow.offsetTop}px)` }}>
-              {visibleItems.map((item) => renderFileOption(item))}
+            <div style={{ height: fileWindow.totalHeight, position: 'relative' }}>
+              <div
+                className={viewMode === 'grid' ? 'grid gap-2' : undefined}
+                style={{ ...gridStyle, transform: `translateY(${fileWindow.offsetTop}px)` }}>
+                {visibleItems.map((item) => renderFileOption(item))}
+              </div>
             </div>
           ) : (
             visibleItems.map((item) => renderFileOption(item))
@@ -533,6 +596,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
         data-option-index={index}
         data-disabled={item.disabled || undefined}
         data-drag-id={dragProps?.['data-drag-id'] as string | number | undefined}
+        data-drag-id-type={dragProps?.['data-drag-id-type'] as 'string' | 'number' | undefined}
         data-drag-index={dragProps?.['data-drag-index'] as number | undefined}
         data-drag-container={dragProps?.['data-drag-container'] as string | undefined}
         onFocus={() => {

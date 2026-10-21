@@ -187,13 +187,16 @@ export const List = defineComponent({
       containerId: listDragContainerId,
       config: { handleSelector: '[data-list-drag-handle]' },
       onDrop: (event) => {
-        if (event.fromIndex === event.toIndex) return
-        emit(
-          'reorder',
-          reorderSequence(props.dataSource, event.fromIndex, event.toIndex),
-          event.fromIndex,
-          event.toIndex
+        const from = props.dataSource.findIndex(
+          (item, index) => getItemKey(item, index) === event.item.id
         )
+        const to = event.overItem
+          ? props.dataSource.findIndex(
+              (item, index) => getItemKey(item, index) === event.overItem?.id
+            )
+          : event.toIndex
+        if (from < 0 || to < 0 || from === to) return
+        emit('reorder', reorderSequence(props.dataSource, from, to), from, to)
       }
     })
 
@@ -230,7 +233,7 @@ export const List = defineComponent({
     }
     function getItemKey(item: ListItem, index: number): string | number {
       if (typeof props.rowKey === 'function') return props.rowKey(item, index)
-      return (item[props.rowKey] as string | number) || index
+      return (item[props.rowKey] as string | number) ?? index
     }
 
     function renderDefault(item: ListItem) {
@@ -286,7 +289,7 @@ export const List = defineComponent({
       const clickable = hasItemClickListener.value
       const bindings = props.draggable
         ? drag.getDragItemAttrs({
-            id: String(key),
+            id: key,
             index: sourceIndex,
             containerId: listDragContainerId
           })

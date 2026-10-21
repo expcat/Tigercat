@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
 import { FileManager } from '@expcat/tigercat-vue/FileManager'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import type { FileItem } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
+import { MockResizeObserver } from '../utils/mock-observers'
 
 const files: FileItem[] = [
   {
@@ -119,6 +120,25 @@ describe('FileManager (Vue)', () => {
       props: { files: [], emptyText: 'Nothing here' }
     })
     expect(getByText('Nothing here')).toBeTruthy()
+  })
+
+  it('observes content inserted after an empty state and cleans it up', async () => {
+    MockResizeObserver.reset()
+    vi.stubGlobal('ResizeObserver', MockResizeObserver)
+    try {
+      const { getByRole, rerender } = render(FileManager, { props: { files: [] } })
+      expect(MockResizeObserver.instances).toHaveLength(0)
+      await rerender({ files })
+      const content = getByRole('listbox')
+      await waitFor(() => expect(MockResizeObserver.instances).toHaveLength(1))
+      const observer = MockResizeObserver.instances[0]!
+      expect(observer.observe).toHaveBeenCalledWith(content)
+      await rerender({ files: [] })
+      expect(observer.disconnect).toHaveBeenCalledTimes(1)
+    } finally {
+      vi.unstubAllGlobals()
+      MockResizeObserver.reset()
+    }
   })
 
   it('shows loading overlay', () => {

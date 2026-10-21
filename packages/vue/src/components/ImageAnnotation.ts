@@ -162,6 +162,7 @@ export const ImageAnnotation = defineComponent({
     const natural = { w: 0, h: 0 }
     const loader = createCropperImageLoader()
     let dragSession: DocumentDragSession | null = null
+    let drawFrames: { cancel: () => void } | null = null
     let resizeObserver: ResizeObserver | null = null
 
     const annotations = computed(() =>
@@ -209,10 +210,19 @@ export const ImageAnnotation = defineComponent({
     const shapeEls: Array<SVGElement | null> = []
     const live = manageLiveRegion('polite')
 
-    const loadImage = () => {
-      status.value = 'loading'
-      draft.value = null
+    const cancelDrawing = () => {
+      drawFrames?.cancel()
+      drawFrames = null
+      dragSession?.dispose()
+      dragSession = null
       drawing.value = null
+      draft.value = null
+      drawingStroke.value = false
+    }
+
+    const loadImage = () => {
+      cancelDrawing()
+      status.value = 'loading'
       loader.load(props.src, {
         onLoad: (_image, naturalWidth, naturalHeight) => {
           natural.w = naturalWidth
@@ -235,10 +245,13 @@ export const ImageAnnotation = defineComponent({
 
     onMounted(loadImage)
     watch([() => props.src, loadAttempt], loadImage)
+    watch([canEdit, resolvedTool], () => {
+      const current = drawing.value
+      if (current && (!canEdit.value || current.tool !== resolvedTool.value)) cancelDrawing()
+    })
     onBeforeUnmount(() => {
       loader.dispose()
-      dragSession?.dispose()
-      dragSession = null
+      cancelDrawing()
       resizeObserver?.disconnect()
     })
 
@@ -256,10 +269,7 @@ export const ImageAnnotation = defineComponent({
     }
 
     const setActiveTool = (nextTool: ImageAnnotationTool) => {
-      if (nextTool !== resolvedTool.value) {
-        draft.value = null
-        drawing.value = null
-      }
+      if (nextTool !== resolvedTool.value) cancelDrawing()
       if (props.tool === undefined) innerTool.value = nextTool
       emit('tool-change', nextTool)
       emit('update:tool', nextTool)
@@ -286,8 +296,13 @@ export const ImageAnnotation = defineComponent({
     const isRtl = computed(() => mergedLocale.value?.direction === 'rtl')
 
     const commitPolygon = () => {
-      if (!drawing.value) return
-      const annotation = commitImageAnnotationPolygon(drawing.value, nextId('polygon'))
+      const current = drawing.value
+      if (!current) return
+      if (!canEdit.value || current.tool !== resolvedTool.value) {
+        cancelDrawing()
+        return
+      }
+      const annotation = commitImageAnnotationPolygon(current, nextId('polygon'))
       drawing.value = null
       draft.value = null
       if (!annotation) {
@@ -309,10 +324,10 @@ export const ImageAnnotation = defineComponent({
       }
 
       event.preventDefault()
+      cancelDrawing()
       const point = getPointFromEvent(event.clientX, event.clientY)
       drawing.value = startImageAnnotationDraw(resolvedTool.value, point)
       drawingStroke.value = true
-      dragSession?.dispose()
       const frames = createAnnotationFrameCoalescer(
         (payload: { currentX: number; currentY: number }) => {
           if (!drawing.value) return
@@ -323,6 +338,7 @@ export const ImageAnnotation = defineComponent({
           draft.value = draftImageAnnotationFromDraw(drawing.value)
         }
       )
+      drawFrames = frames
       dragSession = createDocumentDragSession({
         startX: event.clientX,
         startY: event.clientY,
@@ -334,11 +350,17 @@ export const ImageAnnotation = defineComponent({
         },
         onEnd: (payload) => {
           frames.cancel()
+          if (drawFrames === frames) drawFrames = null
           drawingStroke.value = false
           const current = drawing.value
           drawing.value = null
           dragSession = null
-          if (!current || payload.cancelled) {
+          if (
+            !current ||
+            payload.cancelled ||
+            !canEdit.value ||
+            current.tool !== resolvedTool.value
+          ) {
             draft.value = null
             return
           }
@@ -406,11 +428,7 @@ export const ImageAnnotation = defineComponent({
         if (drawing.value || draft.value) {
           event.preventDefault()
           event.stopPropagation()
-          dragSession?.dispose()
-          dragSession = null
-          drawing.value = null
-          draft.value = null
-          drawingStroke.value = false
+          cancelDrawing()
         }
         return
       }

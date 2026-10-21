@@ -582,15 +582,16 @@ export function getFileManagerWindow(
   return { ...range, virtual: true }
 }
 
-/** Variable row heights, keyed by item id. Used when the current layer is large. */
+/** Variable row heights, keyed by item id. Grid windows measure rows and return item indexes. */
 export function createFileManagerMeasure(estimatedHeight: number): {
   strategy: VirtualListSizeStrategy
   windowFor(
     keys: readonly (string | number)[],
     scrollTop: number,
-    viewport: number
+    viewport: number,
+    columns?: number
   ): FileManagerWindow
-  measure(index: number, height: number, key: string | number): void
+  measure(index: number, height: number, key?: string | number): void
 } {
   const strategy = dynamicSizeStrategy(estimatedHeight, 0)
   const setItemKeys = strategy.setItemKeys?.bind(strategy)
@@ -598,21 +599,29 @@ export function createFileManagerMeasure(estimatedHeight: number): {
   const updateItemHeight = strategy.updateItemHeight?.bind(strategy)
   return {
     strategy,
-    windowFor(keys, scrollTop, viewport) {
+    windowFor(keys, scrollTop, viewport, columns = 1) {
+      const columnCount = Math.max(1, Math.floor(columns) || 1)
+      const rowCount = Math.ceil(keys.length / columnCount)
       if (keys.length < FILE_MANAGER_VIRTUAL_MIN_COUNT) {
         return {
           start: 0,
           end: keys.length,
           offsetTop: 0,
-          totalHeight: keys.length * estimatedHeight,
+          totalHeight: rowCount * estimatedHeight,
           virtual: false
         }
       }
-      setItemKeys?.(keys)
-      const range = getRange(scrollTop, viewport > 0 ? viewport : 320, keys.length, 4)
+      const rowKeys = Array.from({ length: rowCount }, (_, row) => {
+        const start = row * columnCount
+        return columnCount === 1
+          ? (keys[start] ?? row)
+          : JSON.stringify(keys.slice(start, start + columnCount))
+      })
+      setItemKeys?.(rowKeys)
+      const range = getRange(scrollTop, viewport > 0 ? viewport : 320, rowCount, 4)
       return {
-        start: range.startIndex,
-        end: range.endIndex + 1,
+        start: Math.min(keys.length, range.startIndex * columnCount),
+        end: Math.min(keys.length, (range.endIndex + 1) * columnCount),
         offsetTop: range.offsetTop,
         totalHeight: range.totalHeight,
         virtual: true

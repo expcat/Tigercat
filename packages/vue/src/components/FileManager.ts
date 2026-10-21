@@ -5,7 +5,7 @@ import {
   computed,
   nextTick,
   watch,
-  onMounted,
+  onUpdated,
   onBeforeUnmount,
   PropType
 } from 'vue'
@@ -25,6 +25,7 @@ import {
   getFileManagerContainerClasses,
   getFileItemClasses,
   getFileManagerContentClasses,
+  fileManagerContentClasses,
   getFileManagerGridStyle,
   deriveFileManagerModel,
   selectFileItem,
@@ -33,8 +34,10 @@ import {
   createFileManagerMeasure,
   FILE_MANAGER_DEFAULT_HEIGHT,
   FILE_MANAGER_LIST_ROW_HEIGHT,
+  FILE_MANAGER_VIRTUAL_MIN_COUNT,
   FILE_BREADCRUMB_SEPARATOR,
   manageLiveRegion,
+  scrollTopForVirtualAlign,
   resolveFileOpen,
   buildFileBreadcrumb,
   applyFileManagerReorder,
@@ -171,19 +174,24 @@ export const FileManager = defineComponent({
     const measureTick = ref(0)
     const contentRef = ref<HTMLElement | null>(null)
     const measure = createFileManagerMeasure(FILE_MANAGER_LIST_ROW_HEIGHT)
+    let followBottom = false
     const live = manageLiveRegion('polite')
     onBeforeUnmount(() => live.destroy())
-    onMounted(() => {
-      const el = contentRef.value
-      if (!el || typeof ResizeObserver === 'undefined') return
-      const read = () => {
-        viewport.value = el.clientHeight
-      }
-      read()
-      const observer = new ResizeObserver(read)
-      observer.observe(el)
-      onBeforeUnmount(() => observer.disconnect())
-    })
+    watch(
+      contentRef,
+      (el, _previous, onCleanup) => {
+        if (!el) return
+        const read = () => {
+          viewport.value = el.clientHeight
+        }
+        read()
+        if (typeof ResizeObserver === 'undefined') return
+        const observer = new ResizeObserver(read)
+        observer.observe(el)
+        onCleanup(() => observer.disconnect())
+      },
+      { immediate: true, flush: 'post' }
+    )
     watch(
       () => props.loading,
       (loading) => {
@@ -205,6 +213,7 @@ export const FileManager = defineComponent({
     const resolvedPath = computed(() =>
       isPathControlled.value ? (props.currentPath ?? EMPTY_FILE_PATH) : innerPath.value
     )
+    const pathKey = computed(() => JSON.stringify(resolvedPath.value))
     const resolvedSearch = computed(() =>
       isSearchControlled.value ? (props.searchText ?? '') : innerSearch.value
     )
@@ -213,15 +222,20 @@ export const FileManager = defineComponent({
     const drag = useDrag({
       onDrop: (event) => {
         if (!model.value.canReorder) return
+        const fromIndex = model.value.processedItems.findIndex((item) => item.key === event.item.id)
+        const toIndex = event.overItem
+          ? model.value.processedItems.findIndex((item) => item.key === event.overItem?.id)
+          : event.toIndex
+        if (fromIndex < 0 || toIndex < 0) return
         const result = applyFileManagerReorder(
           tree.value,
           resolvedPath.value,
-          event.fromIndex,
-          event.toIndex,
+          fromIndex,
+          toIndex,
           model.value.processedItems
         )
         if (!result) return
-        emit('reorder', result.layer, event.fromIndex, event.toIndex)
+        emit('reorder', result.layer, fromIndex, toIndex)
         emit('update:files', result.files)
       }
     })
@@ -240,13 +254,20 @@ export const FileManager = defineComponent({
     )
 
     const viewKey = computed(
-      () =>
-        `${resolvedPath.value.join('/')}\0${resolvedSearch.value}\0${model.value.processedItems.length}`
+      () => `${pathKey.value}\0${resolvedSearch.value}\0${model.value.processedItems.length}`
     )
 
+    watch(pathKey, () => drag.endDrag(true))
     watch(viewKey, () => {
+      followBottom = false
       focusedIndex.value = 0
     })
+    watch(
+      [() => props.viewMode, () => props.gridColumns, () => props.sortField, () => props.sortOrder],
+      () => {
+        followBottom = false
+      }
+    )
 
     const containerClasses = computed(() =>
       classNames(getFileManagerContainerClasses(props.className), coerceClassValue(attrs.class))
@@ -293,7 +314,34 @@ export const FileManager = defineComponent({
       }
     }
 
-    function focusItemAt(index: number) {
+    function focusItemAt(index: number, followEnd = false) {
+      followBottom = followEnd
+      const host = contentRef.value
+      if (host && model.value.processedItems.length >= FILE_MANAGER_VIRTUAL_MIN_COUNT) {
+        const columns = Math.max(1, Math.floor(props.gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+        const row = props.viewMode === 'grid' ? Math.floor(index / columns) : index
+        const offset =
+          props.viewMode === 'grid'
+            ? measure.strategy.getItemOffset(row)
+            : index * FILE_MANAGER_LIST_ROW_HEIGHT
+        const size =
+          props.viewMode === 'grid'
+            ? measure.strategy.getItemHeight(row)
+            : FILE_MANAGER_LIST_ROW_HEIGHT
+        const next = followEnd
+          ? Math.max(0, host.scrollHeight - host.clientHeight)
+          : scrollTopForVirtualAlign({
+              scrollTop: host.scrollTop,
+              viewport: host.clientHeight,
+              offset,
+              size,
+              align: 'auto'
+            })
+        if (next !== host.scrollTop) {
+          host.scrollTop = next
+          scrollTop.value = next
+        }
+      }
       nextTick(() => {
         contentRef.value?.querySelector<HTMLElement>(`[data-option-index="${index}"]`)?.focus()
       })
@@ -315,7 +363,7 @@ export const FileManager = defineComponent({
       event.preventDefault()
       if (action.type === 'move' || action.type === 'home' || action.type === 'end') {
         focusedIndex.value = action.index
-        focusItemAt(action.index)
+        focusItemAt(action.index, action.type === 'end')
         return
       }
       if (action.type === 'select') {
@@ -329,6 +377,48 @@ export const FileManager = defineComponent({
       }
       commitPath(action.path)
     }
+
+    function measureGridRows() {
+      const host = contentRef.value
+      if (
+        !host ||
+        props.viewMode !== 'grid' ||
+        model.value.processedItems.length < FILE_MANAGER_VIRTUAL_MIN_COUNT
+      ) {
+        return
+      }
+      const columns = Math.max(1, Math.floor(props.gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+      if (followBottom) {
+        const next = Math.max(0, host.scrollHeight - host.clientHeight)
+        if (next !== host.scrollTop) {
+          host.scrollTop = next
+          scrollTop.value = next
+        }
+      }
+      const rowHeights = new Map<number, number>()
+      let rowGap = 0
+      let changed = false
+      host.querySelectorAll<HTMLElement>('[data-option-index]').forEach((node) => {
+        const index = Number(node.dataset.optionIndex)
+        const row = Math.floor(index / columns)
+        const height = node.getBoundingClientRect().height
+        rowHeights.set(row, Math.max(rowHeights.get(row) ?? 0, height))
+        if (node.parentElement) {
+          rowGap = Number.parseFloat(getComputedStyle(node.parentElement).rowGap) || 0
+        }
+      })
+      rowHeights.forEach((height, row) => {
+        const next = height + rowGap
+        const prev = measure.strategy.getItemHeight(row)
+        if (next > 0 && Math.abs(next - prev) > 1) {
+          measure.measure(row, next)
+          changed = true
+        }
+      })
+      if (changed) measureTick.value += 1
+    }
+
+    onUpdated(measureGridRows)
 
     return () => {
       const forwardedAttrs = Object.fromEntries(
@@ -455,6 +545,7 @@ export const FileManager = defineComponent({
             onClick: () => handleSelect(item),
             onDblclick: () => handleOpen(item),
             'data-drag-id': dragProps?.['data-drag-id'],
+            'data-drag-id-type': dragProps?.['data-drag-id-type'],
             'data-drag-index': dragProps?.['data-drag-index'],
             'data-drag-container': dragProps?.['data-drag-container'],
             onPointerdown: dragProps?.onPointerdown as ((event: PointerEvent) => void) | undefined
@@ -472,7 +563,8 @@ export const FileManager = defineComponent({
           ? measure.windowFor(
               model.value.processedItems.map((item) => item.key),
               scrollTop.value,
-              viewport.value
+              viewport.value,
+              props.gridColumns
             )
           : getFileManagerWindow(
               model.value.processedItems.length,
@@ -490,35 +582,42 @@ export const FileManager = defineComponent({
               'div',
               {
                 ref: contentRef,
-                class: getFileManagerContentClasses(props.viewMode),
+                class: fileWindow.virtual
+                  ? fileManagerContentClasses
+                  : getFileManagerContentClasses(props.viewMode),
                 style: fileWindow.virtual
-                  ? { height: `${fileWindow.totalHeight}px`, position: 'relative' }
+                  ? undefined
                   : getFileManagerGridStyle(props.viewMode, props.gridColumns),
                 role: 'listbox',
                 'aria-label': `${labels.value.listboxAriaLabel}, ${countText}`,
                 'aria-multiselectable': props.multiple || undefined,
                 'aria-disabled': props.loading || undefined,
                 onScroll: (event: Event) => {
-                  scrollTop.value = (event.currentTarget as HTMLElement).scrollTop
-                  if (props.viewMode !== 'grid' || !fileWindow.virtual) return
                   const host = event.currentTarget as HTMLElement
-                  let changed = false
-                  host.querySelectorAll<HTMLElement>('[data-option-index]').forEach((node) => {
-                    const index = Number(node.dataset.optionIndex)
-                    const item = model.value.processedItems[index]
-                    if (!item) return
-                    const next = node.getBoundingClientRect().height
-                    const prev = measure.strategy.getItemHeight(index)
-                    if (next > 0 && Math.abs(next - prev) > 1) {
-                      measure.measure(index, next, item.key)
-                      changed = true
-                    }
-                  })
-                  if (changed) measureTick.value += 1
+                  followBottom = host.scrollTop + host.clientHeight >= host.scrollHeight - 1
+                  scrollTop.value = host.scrollTop
                 }
               },
               fileWindow.virtual
-                ? h('div', { style: { transform: `translateY(${fileWindow.offsetTop}px)` } }, rows)
+                ? h(
+                    'div',
+                    {
+                      style: { height: `${fileWindow.totalHeight}px`, position: 'relative' }
+                    },
+                    [
+                      h(
+                        'div',
+                        {
+                          class: props.viewMode === 'grid' ? 'grid gap-2' : undefined,
+                          style: {
+                            ...getFileManagerGridStyle(props.viewMode, props.gridColumns),
+                            transform: `translateY(${fileWindow.offsetTop}px)`
+                          }
+                        },
+                        rows
+                      )
+                    ]
+                  )
                 : rows
             )
           : h('div', { class: fileManagerEmptyClasses }, [

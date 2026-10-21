@@ -153,6 +153,62 @@ describe('createListReorderController', () => {
     expect(controller.moveBetween(items(), items())).toBeNull()
   })
 
+  it('reorders the current array by dragged and hovered ids', () => {
+    const controller = createListReorderController({
+      getContainerId: () => 'left',
+      getConfig: () => ({}),
+      getCallbacks: () => ({})
+    })
+    const list = items()
+    controller.startDrag(list[0])
+    controller.dragOver(list[2])
+    const current = [
+      { id: 'x', index: 0, containerId: 'left' },
+      ...list.map((item, index) => ({ ...item, index: index + 1 }))
+    ]
+    expect(controller.reorder(current)?.items.map((item) => item.id)).toEqual(['x', 'b', 'c', 'a'])
+    controller.dispose()
+  })
+
+  it('moves between current arrays by dragged and hovered ids', () => {
+    const controller = createListReorderController({
+      getContainerId: () => 'left',
+      getConfig: () => ({ crossContainer: true }),
+      getCallbacks: () => ({})
+    })
+    const list = items()
+    controller.startDrag(list[0])
+    controller.dragOver({ id: 'x', index: 0, containerId: 'right' })
+    const source = [
+      { id: 'new', index: 0, containerId: 'left' },
+      ...list.map((item, index) => ({ ...item, index: index + 1 }))
+    ]
+    const target = [
+      { id: 'x', index: 0, containerId: 'right' },
+      { id: 'y', index: 1, containerId: 'right' }
+    ]
+    const result = controller.moveBetween(source, target)
+    expect(result?.sourceItems.map((item) => item.id)).toEqual(['new', 'b', 'c'])
+    expect(result?.targetItems.map((item) => item.id)).toEqual(['a', 'x', 'y'])
+    controller.dispose()
+  })
+
+  it('does not revive a removed numeric source as a string id', () => {
+    const controller = createListReorderController({
+      getContainerId: () => 'left',
+      getConfig: () => ({}),
+      getCallbacks: () => ({})
+    })
+    controller.startDrag({ id: 0, index: 0, containerId: 'left' })
+    controller.dragOver({ id: 'b', index: 1, containerId: 'left' })
+    const current = [
+      { id: '0', index: 0, containerId: 'left' },
+      { id: 'b', index: 1, containerId: 'left' }
+    ]
+    expect(controller.reorder(current)).toBeNull()
+    controller.dispose()
+  })
+
   it('does not start a reorder before the pointer passes the threshold', () => {
     const onDragStart = vi.fn()
     const onDrop = vi.fn()

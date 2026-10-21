@@ -136,12 +136,12 @@ function ListInner<T extends ListItem>(
     containerId: listDragContainerId,
     config: { handleSelector: '[data-list-drag-handle]' },
     onDrop: (event) => {
-      if (event.fromIndex === event.toIndex) return
-      onReorder?.(
-        reorderSequence(dataSource, event.fromIndex, event.toIndex),
-        event.fromIndex,
-        event.toIndex
-      )
+      const from = dataSource.findIndex((item, index) => getItemKey(item, index) === event.item.id)
+      const to = event.overItem
+        ? dataSource.findIndex((item, index) => getItemKey(item, index) === event.overItem?.id)
+        : event.toIndex
+      if (from < 0 || to < 0 || from === to) return
+      onReorder?.(reorderSequence(dataSource, from, to), from, to)
     }
   })
 
@@ -177,7 +177,7 @@ function ListInner<T extends ListItem>(
 
   const getItemKey = (item: T, index: number): string | number => {
     if (typeof rowKey === 'function') return rowKey(item, index)
-    return (item[rowKey] as string | number) || index
+    return (item[rowKey] as string | number) ?? index
   }
 
   const renderDefaultListItem = (item: T) => {
@@ -247,7 +247,7 @@ function ListInner<T extends ListItem>(
     const clickable = typeof onItemClick === 'function'
     const bindings = isDraggable
       ? drag.getDragItemProps({
-          id: String(key),
+          id: key,
           index: sourceIndex,
           containerId: listDragContainerId
         })

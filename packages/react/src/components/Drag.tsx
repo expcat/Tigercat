@@ -4,7 +4,6 @@ import {
   classNames,
   commitCrossContainerDrop,
   dragMoveAnnouncement,
-  reorderSequence,
   type DragItem,
   type DragProps as CoreDragProps
 } from '@expcat/tigercat-core'
@@ -61,11 +60,9 @@ export function Drag<T extends DragItem = DragItem>({
         commitCrossContainerDrop(event)
         return
       }
-      if (event.fromIndex === event.toIndex) return
-      const next = reorderSequence(itemsRef.current, event.fromIndex, event.toIndex).map(
-        (item, index) => ({ ...item, index })
-      )
-      onItemsChangeRef.current?.(next)
+      const result = drag.reorder(itemsRef.current)
+      if (!result || result.fromIndex === result.toIndex) return
+      onItemsChangeRef.current?.(result.items)
     }
   })
 

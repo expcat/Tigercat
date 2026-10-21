@@ -49,6 +49,7 @@ export interface ListReorderControllerOptions {
 export interface ListDragItemBindings {
   draggable: boolean
   'data-drag-id': string | number
+  'data-drag-id-type': 'string' | 'number'
   'data-drag-index': number
   'data-drag-container': string
   'data-dragging'?: true
@@ -144,6 +145,22 @@ function draggingPeers(
     peers.push(peer)
   }
   return peers
+}
+
+function currentDragIndex<T extends DragItem>(
+  items: readonly T[],
+  item: DragItem | null,
+  fallback: number
+): number {
+  if (!item) return fallback
+  return items.findIndex((candidate) => candidate.id === item.id)
+}
+
+function readDragItemId(node: Element, fallback: number): string | number {
+  const id = node.getAttribute('data-drag-id') ?? String(fallback)
+  if (node.getAttribute('data-drag-id-type') !== 'number') return id
+  const numeric = Number(id)
+  return Number.isNaN(numeric) ? id : numeric
 }
 
 export function createListReorderController(
@@ -358,7 +375,7 @@ export function createListReorderController(
       if (pointerSource && (node === pointerSource || pointerSource.contains(node))) continue
       const index = Number(node.getAttribute('data-drag-index'))
       if (Number.isNaN(index)) return
-      const id = node.getAttribute('data-drag-id') ?? String(index)
+      const id = readDragItemId(node, index)
       const containerId = node.getAttribute('data-drag-container') ?? containerOf()
       dragOver({ id, index, containerId })
       return
@@ -444,7 +461,7 @@ export function createListReorderController(
     const selector = `[data-drag-container="${containerId}"][data-drag-index="${next}"]`
     const node = doc?.querySelector(selector)
     if (node instanceof HTMLElement) {
-      const id = node.getAttribute('data-drag-id') ?? String(next)
+      const id = readDragItemId(node, next)
       dragOver({ id, index: next, containerId })
       return
     }
@@ -472,6 +489,7 @@ export function createListReorderController(
     return {
       draggable: !config.disabled,
       'data-drag-id': item.id,
+      'data-drag-id-type': typeof item.id === 'number' ? 'number' : 'string',
       'data-drag-index': item.index,
       'data-drag-container': item.containerId ?? containerOf(),
       'data-dragging': isThis || undefined,
@@ -507,7 +525,10 @@ export function createListReorderController(
     reorder: <T extends DragItem>(items: readonly T[]): DragReorderResult<T> | null => {
       const state = getState()
       if (!state.isDragging) return null
-      return reorderItems(items, state.sourceIndex, state.targetIndex)
+      const fromIndex = currentDragIndex(items, state.draggedItem, state.sourceIndex)
+      const toIndex = currentDragIndex(items, state.hoveredItem, state.targetIndex)
+      if (fromIndex < 0 || toIndex < 0) return null
+      return reorderItems(items, fromIndex, toIndex)
     },
     moveBetween: <T extends DragItem>(
       sourceItems: readonly T[],
@@ -515,12 +536,10 @@ export function createListReorderController(
     ): DragMoveResult<T> | null => {
       const state = getState()
       if (!state.isDragging) return null
-      return moveItemBetweenContainers(
-        sourceItems,
-        targetItems,
-        state.sourceIndex,
-        state.targetIndex
-      )
+      const fromIndex = currentDragIndex(sourceItems, state.draggedItem, state.sourceIndex)
+      const toIndex = currentDragIndex(targetItems, state.hoveredItem, state.targetIndex)
+      if (fromIndex < 0 || toIndex < 0) return null
+      return moveItemBetweenContainers(sourceItems, targetItems, fromIndex, toIndex)
     },
     getItemBindings,
     getZoneBindings,
@@ -568,12 +587,12 @@ export function commitCrossContainerDrop(event: DragDropEvent): boolean {
   const source = dragContainerItems.get(event.fromContainerId)
   const target = dragContainerItems.get(event.toContainerId)
   if (!source || !target) return false
-  const result = moveItemBetweenContainers(
-    source.getItems(),
-    target.getItems(),
-    event.fromIndex,
-    event.toIndex
-  )
+  const sourceItems = source.getItems()
+  const targetItems = target.getItems()
+  const fromIndex = currentDragIndex(sourceItems, event.item, event.fromIndex)
+  const toIndex = currentDragIndex(targetItems, event.overItem, event.toIndex)
+  if (fromIndex < 0 || toIndex < 0) return false
+  const result = moveItemBetweenContainers(sourceItems, targetItems, fromIndex, toIndex)
   if (!result) return false
   source.commit(result.sourceItems)
   target.commit(result.targetItems)
