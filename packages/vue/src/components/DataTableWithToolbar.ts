@@ -57,6 +57,7 @@ import { Button } from './Button'
 import { Popover } from './Popover'
 import { Checkbox } from './Checkbox'
 import { Icon } from './Icon'
+import { hasEmitHandler } from '../utils/emit-with-return'
 
 export interface VueTableToolbarProps extends Omit<
   CoreTableToolbarProps,
@@ -128,6 +129,7 @@ export const DataTableWithToolbar = defineComponent({
     'hidden-column-keys-change': (_hiddenKeys: string[]) => true
   },
   setup(props, { attrs, emit, slots, expose }) {
+    const instance = getCurrentInstance()
     const config = useTigerConfig()
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
     const internalHiddenKeys = ref<string[]>(props.defaultHiddenColumnKeys ?? [])
@@ -204,8 +206,7 @@ export const DataTableWithToolbar = defineComponent({
       resolveToolbarFilterMap(props.toolbar?.filters, internalFilters.value, extraFilterKeys.value)
     )
     const searchListener = () => {
-      const vnodeProps = (getCurrentInstance()?.vnode.props ?? {}) as Record<string, unknown>
-      return Boolean(vnodeProps.onSearch || vnodeProps.onSearchChange)
+      return hasEmitHandler(instance, 'search') || hasEmitHandler(instance, 'search-change')
     }
     const resolveHasSearch = (): boolean => {
       if (props.toolbar?.search === false) return false
@@ -664,7 +665,11 @@ export const DataTableWithToolbar = defineComponent({
                 )
               ]),
           h('div', { class: 'flex gap-2' }, [
-            h(Button, { type: 'button', onClick: submitQuery }, { default: () => 'Search' }),
+            h(
+              Button,
+              { type: 'button', onClick: submitQuery },
+              { default: () => tableLabels.value.searchButtonText }
+            ),
             h(
               Button,
               { type: 'button', variant: 'outline', onClick: resetQuery },
@@ -681,7 +686,10 @@ export const DataTableWithToolbar = defineComponent({
                   props.query?.onCollapsedChange?.(next)
                 }
               },
-              { default: () => (collapsed ? 'Expand' : 'Collapse') }
+              {
+                default: () =>
+                  collapsed ? tableLabels.value.expandText : tableLabels.value.collapseText
+              }
             )
           ])
         ]

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/vue'
+import { render, screen, waitFor } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
 import { ActivityFeed } from '@expcat/tigercat-vue/ActivityFeed'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -49,6 +49,18 @@ describe('ActivityFeed (Vue)', () => {
     render(ActivityFeed, { props: { items: [], emptyText: '暂无活动' } })
 
     expect(screen.getByText('暂无活动')).toBeInTheDocument()
+  })
+
+  it('announces the first item added after mount without replaying initial items', async () => {
+    const initial = [{ id: 1, title: 'Initial' }]
+    const { container, rerender } = render(ActivityFeed, { props: { items: initial } })
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe('')
+
+    await rerender({ items: [...initial, { id: 2, title: 'Fresh item' }] })
+
+    await waitFor(() =>
+      expect(container.querySelector('[aria-live="polite"]')?.textContent).toContain('Fresh item')
+    )
   })
 
   it('groups items with groupBy and groupOrder', () => {

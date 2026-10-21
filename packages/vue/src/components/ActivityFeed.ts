@@ -299,21 +299,25 @@ export const ActivityFeed = defineComponent({
     )
     onBeforeUnmount(() => stopObserver?.())
 
-    watch(resolvedGroups, (groups) => {
-      const flat = groups.flatMap((group) => group.items ?? [])
-      const ids = flat.map((item) => String(item.id ?? ''))
-      if (seenIds.value === null) {
+    watch(
+      resolvedGroups,
+      (groups) => {
+        const flat = groups.flatMap((group) => group.items ?? [])
+        const ids = flat.map((item) => String(item.id ?? ''))
+        if (seenIds.value === null) {
+          seenIds.value = new Set(ids)
+          return
+        }
+        const fresh = flat.filter((item) => item.id != null && !seenIds.value!.has(String(item.id)))
         seenIds.value = new Set(ids)
-        return
-      }
-      const fresh = flat.filter((item) => item.id != null && !seenIds.value!.has(String(item.id)))
-      seenIds.value = new Set(ids)
-      const newest = fresh[fresh.length - 1]
-      if (!newest) return
-      const copy = resolveActivityCopy(newest)
-      const title = copy.title || copy.body || ''
-      announcement.value = labels.value.newItemText.split('{title}').join(title)
-    })
+        const newest = fresh[fresh.length - 1]
+        if (!newest) return
+        const copy = resolveActivityCopy(newest)
+        const title = copy.title || copy.body || ''
+        announcement.value = labels.value.newItemText.split('{title}').join(title)
+      },
+      { immediate: true }
+    )
 
     const liveRegion = () =>
       h('div', { class: 'sr-only', 'aria-live': 'polite' }, announcement.value)

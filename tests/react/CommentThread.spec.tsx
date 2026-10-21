@@ -239,6 +239,22 @@ describe('CommentThread (React)', () => {
     expect(screen.getByText('Level 2')).toBeInTheDocument()
   })
 
+  it('renders custom actions without an empty More control', async () => {
+    const onEdit = vi.fn()
+    const nodes: CommentNode[] = [
+      {
+        id: 1,
+        content: 'Root',
+        actions: [{ key: 'edit', label: 'Edit', onClick: onEdit }]
+      }
+    ]
+    render(<CommentThread nodes={nodes} showComposer={false} showMore moreText="More actions" />)
+
+    expect(screen.queryByRole('button', { name: 'More actions' })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    expect(onEdit).toHaveBeenCalledTimes(1)
+  })
+
   it('shows like button with count', () => {
     const nodes: CommentNode[] = [
       { id: 1, content: 'Likeable', user: { name: 'A' }, likes: 5, liked: false }

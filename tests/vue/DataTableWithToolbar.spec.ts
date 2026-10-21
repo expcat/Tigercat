@@ -330,6 +330,32 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(screen.getByPlaceholderText('Search')).toBeInTheDocument()
   })
 
+  it.each(['onSearchOnce', 'onSearchChangeOnce'])('renders search input with %s', (listener) => {
+    render(DataTableWithToolbar, {
+      props: { columns, dataSource: [], toolbar: {} },
+      attrs: { [listener]: vi.fn() }
+    })
+
+    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument()
+  })
+
+  it('uses table labels for query actions', async () => {
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [],
+        labels: { searchButtonText: 'Find', expandText: 'Show query', collapseText: 'Hide query' },
+        query: { fields: [{ key: 'name', label: 'Name' }], defaultCollapsed: true },
+        pagination: false
+      }
+    })
+
+    expect(screen.getByRole('button', { name: 'Find' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Show query' }))
+    expect(screen.getByRole('button', { name: 'Hide query' })).toBeInTheDocument()
+  })
+
   it('submits search on enter without search button', async () => {
     const onSearch = vi.fn()
 

@@ -565,7 +565,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 query.onSubmit?.(values)
                 resetPageToFirst()
               }}>
-              Search
+              {tableLabels.searchButtonText}
             </Button>
             <Button
               type="button"
@@ -589,7 +589,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 if (query.collapsed === undefined) setQueryCollapsed(next)
                 query.onCollapsedChange?.(next)
               }}>
-              {(query.collapsed ?? queryCollapsed) ? 'Expand' : 'Collapse'}
+              {(query.collapsed ?? queryCollapsed)
+                ? tableLabels.expandText
+                : tableLabels.collapseText}
             </Button>
           </div>
         </div>

@@ -59,7 +59,9 @@ import {
   type TigerLocaleTaskBoard,
   type TaskBoardDragSnapshot
 } from '@expcat/tigercat-core'
+import { createTaskBoardMoveGuard } from '../../../core/src/internal/task-board-move'
 import { useTigerConfig } from './tiger-config'
+import { hasEmitHandler } from '../utils/emit-with-return'
 
 function cardMatchesFilter(card: TaskBoardCard, filterText: string): boolean {
   if (!filterText.trim()) return false
@@ -199,13 +201,12 @@ export const TaskBoard = defineComponent({
       emit('update:columns', next)
     }
 
-    const hasListener = (propName: string): boolean =>
-      typeof (instance?.vnode.props as Record<string, unknown> | undefined)?.[propName] ===
-      'function'
+    const hasListener = (eventName: string): boolean => hasEmitHandler(instance, eventName)
 
     const addCardToColumn = (columnId: string | number) => {
+      const handled = hasListener('card-add')
       emit('card-add', columnId)
-      if (!hasListener('onCardAdd')) {
+      if (!handled) {
         const col = currentColumns.value.find((item) => item.id === columnId)
         if (
           props.enforceWipLimit &&
@@ -223,8 +224,9 @@ export const TaskBoard = defineComponent({
     }
 
     const addColumn = () => {
+      const handled = hasListener('column-add')
       emit('column-add')
-      if (!hasListener('onColumnAdd')) {
+      if (!handled) {
         updateColumns(
           appendDefaultTaskBoardColumn(currentColumns.value, labels.value.newColumnTitle)
         )
@@ -232,8 +234,9 @@ export const TaskBoard = defineComponent({
     }
 
     const toggleSwimlane = (laneId: string | number, collapsed: boolean) => {
+      const handled = hasListener('swimlane-collapse')
       emit('swimlane-collapse', laneId, collapsed)
-      if (!hasListener('onSwimlaneCollapse')) {
+      if (!handled) {
         collapsedOverride.value = { ...collapsedOverride.value, [String(laneId)]: collapsed }
       }
     }
@@ -242,6 +245,7 @@ export const TaskBoard = defineComponent({
     const boardRef = ref<HTMLElement | null>(null)
     const rovingCardIds = ref(new Map<string, string | number>())
     const columnRovingKey = (id: string | number) => `${typeof id}:${String(id)}`
+    let unmounted = false
 
     const applyCardMove = async (
       cardId: string | number,
@@ -249,14 +253,17 @@ export const TaskBoard = defineComponent({
       toColumnId: string | number,
       toIdx: number
     ) => {
-      const result = moveCard(currentColumns.value, cardId, fromColumnId, toColumnId, toIdx, {
+      const sourceColumns = currentColumns.value
+      const result = moveCard(sourceColumns, cardId, fromColumnId, toColumnId, toIdx, {
         enforceWipLimit: props.enforceWipLimit
       })
       if (!result) return
 
-      if (props.beforeCardMove) {
-        const ok = await props.beforeCardMove(result.event)
-        if (!ok) return
+      const beforeMove = props.beforeCardMove
+      if (beforeMove) {
+        const isCurrent = createTaskBoardMoveGuard(sourceColumns, result.event)
+        const ok = await beforeMove(result.event)
+        if (!ok || unmounted || !isCurrent(currentColumns.value)) return
       }
 
       updateColumns(result.columns)
@@ -264,12 +271,15 @@ export const TaskBoard = defineComponent({
     }
 
     const applyColumnMove = async (fromIdx: number, toIdx: number) => {
-      const result = reorderColumns(currentColumns.value, fromIdx, toIdx)
+      const sourceColumns = currentColumns.value
+      const result = reorderColumns(sourceColumns, fromIdx, toIdx)
       if (!result) return
 
-      if (props.beforeColumnMove) {
-        const ok = await props.beforeColumnMove(result.event)
-        if (!ok) return
+      const beforeMove = props.beforeColumnMove
+      if (beforeMove) {
+        const isCurrent = createTaskBoardMoveGuard(sourceColumns)
+        const ok = await beforeMove(result.event)
+        if (!ok || unmounted || !isCurrent(currentColumns.value)) return
       }
 
       updateColumns(result.columns)
@@ -301,6 +311,7 @@ export const TaskBoard = defineComponent({
       dragCtrl.init()
     })
     onBeforeUnmount(() => {
+      unmounted = true
       dragCtrl.dispose()
     })
 
@@ -606,7 +617,7 @@ export const TaskBoard = defineComponent({
         cards
       )
 
-      const showAddCard = props.allowAddCard || hasListener('onCardAdd')
+      const showAddCard = props.allowAddCard || hasListener('card-add')
       const atWip =
         props.enforceWipLimit &&
         column.wipLimit != null &&

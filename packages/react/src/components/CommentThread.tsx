@@ -341,7 +341,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       )
     }
 
-    if (showMore && (onMore || (node.actions && node.actions.length > 0))) {
+    if (showMore && onMore) {
       actions.push(
         <Button
           key="more"

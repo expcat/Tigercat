@@ -83,6 +83,11 @@ function resolveSkipTargetId(children: React.ReactNode[], nested: boolean): stri
       const mainId = resolveSkipTargetId(flattenLayoutChildren(inner), true)
       if (mainId) return mainId
     }
+    if (typeof child.type === 'string') {
+      const inner = (child.props as { children?: React.ReactNode }).children
+      const mainId = resolveSkipTargetId(flattenLayoutChildren(inner), nested)
+      if (mainId) return mainId
+    }
   }
   return null
 }

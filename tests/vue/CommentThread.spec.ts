@@ -264,6 +264,40 @@ describe('CommentThread (Vue)', () => {
     expect(screen.getByText('Level 2')).toBeInTheDocument()
   })
 
+  it('uses array listeners for more and user click actions', async () => {
+    const onMore = vi.fn()
+    const onUserClick = vi.fn()
+    const nodes: CommentNode[] = [{ id: 1, content: 'Root', user: { name: 'Author' } }]
+    render(CommentThread, {
+      props: { nodes, showComposer: false, showMore: true, moreText: 'More actions' },
+      attrs: { onMore: [onMore, onMore], onUserClick: [onUserClick, onUserClick] }
+    })
+
+    await fireEvent.click(screen.getByRole('button', { name: 'More actions' }))
+    await fireEvent.click(screen.getByRole('button', { name: 'Author' }))
+
+    expect(onMore).toHaveBeenCalledTimes(2)
+    expect(onUserClick).toHaveBeenCalledTimes(2)
+  })
+
+  it('renders custom actions without an empty More control', async () => {
+    const onEdit = vi.fn()
+    const nodes: CommentNode[] = [
+      {
+        id: 1,
+        content: 'Root',
+        actions: [{ key: 'edit', label: 'Edit', onClick: onEdit }]
+      }
+    ]
+    render(CommentThread, {
+      props: { nodes, showComposer: false, showMore: true, moreText: 'More actions' }
+    })
+
+    expect(screen.queryByRole('button', { name: 'More actions' })).not.toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: 'Edit' }))
+    expect(onEdit).toHaveBeenCalledTimes(1)
+  })
+
   it('shows like button with count', () => {
     const nodes: CommentNode[] = [
       { id: 1, content: 'Likeable', user: { name: 'A' }, likes: 5, liked: false }

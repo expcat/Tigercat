@@ -65,6 +65,10 @@ function resolveSkipTargetId(vnodes: VNode[], nested: boolean): string | null {
       )
       if (mainId) return mainId
     }
+    if (typeof vnode.type === 'string' && Array.isArray(vnode.children)) {
+      const mainId = resolveSkipTargetId(flattenSlotVNodes(vnode.children as VNode[]), nested)
+      if (mainId) return mainId
+    }
   }
   return null
 }

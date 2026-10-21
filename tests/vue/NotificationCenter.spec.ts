@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
 import { NotificationCenter } from '@expcat/tigercat-vue/NotificationCenter'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -79,6 +79,20 @@ describe('NotificationCenter (Vue)', () => {
   it('renders empty state with emptyText', () => {
     render(NotificationCenter, { props: { items: [], emptyText: '暂无通知' } })
     expect(screen.getByText('暂无通知')).toBeInTheDocument()
+  })
+
+  it('announces the first notification added after mount without replaying initial items', async () => {
+    const initial: NotificationItem[] = [{ id: 1, title: 'Initial', read: false }]
+    const { container, rerender } = render(NotificationCenter, { props: { items: initial } })
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe('')
+
+    await rerender({ items: [...initial, { id: 2, title: 'Fresh notification', read: false }] })
+
+    await waitFor(() =>
+      expect(container.querySelector('[aria-live="polite"]')?.textContent).toContain(
+        'Fresh notification'
+      )
+    )
   })
 
   it('renders loading state', () => {

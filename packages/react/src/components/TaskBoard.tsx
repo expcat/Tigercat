@@ -43,6 +43,7 @@ import {
   type TaskBoardDragController,
   type TaskBoardViewColumn
 } from '@expcat/tigercat-core'
+import { createTaskBoardMoveGuard } from '../../../core/src/internal/task-board-move'
 import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 
@@ -522,6 +523,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
   const columnsRef = useRef(currentColumns)
   columnsRef.current = currentColumns
+  const mountedRef = useRef(true)
   const viewRef = useRef(view)
   viewRef.current = view
   const dirRef = useRef(dir)
@@ -594,14 +596,17 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       toColumnId: string | number,
       toIdx: number
     ) => {
-      const result = moveCard(columnsRef.current, cardId, fromColumnId, toColumnId, toIdx, {
+      const sourceColumns = columnsRef.current
+      const result = moveCard(sourceColumns, cardId, fromColumnId, toColumnId, toIdx, {
         enforceWipLimit: enforceWipLimitRef.current
       })
       if (!result) return
 
-      if (beforeCardMoveRef.current) {
-        const ok = await beforeCardMoveRef.current(result.event)
-        if (!ok) return
+      const beforeMove = beforeCardMoveRef.current
+      if (beforeMove) {
+        const isCurrent = createTaskBoardMoveGuard(sourceColumns, result.event)
+        const ok = await beforeMove(result.event)
+        if (!ok || !mountedRef.current || !isCurrent(columnsRef.current)) return
       }
 
       setCurrentColumns(result.columns)
@@ -612,12 +617,15 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
 
   const applyColumnMove = useCallback(
     async (fromIdx: number, toIdx: number) => {
-      const result = reorderColumns(columnsRef.current, fromIdx, toIdx)
+      const sourceColumns = columnsRef.current
+      const result = reorderColumns(sourceColumns, fromIdx, toIdx)
       if (!result) return
 
-      if (beforeColumnMoveRef.current) {
-        const ok = await beforeColumnMoveRef.current(result.event)
-        if (!ok) return
+      const beforeMove = beforeColumnMoveRef.current
+      if (beforeMove) {
+        const isCurrent = createTaskBoardMoveGuard(sourceColumns)
+        const ok = await beforeMove(result.event)
+        if (!ok || !mountedRef.current || !isCurrent(columnsRef.current)) return
       }
 
       setCurrentColumns(result.columns)
@@ -653,8 +661,12 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   }, [draggable, columnDraggable, dragCtrl])
 
   useEffect(() => {
+    mountedRef.current = true
     dragCtrl.init()
-    return () => dragCtrl.dispose()
+    return () => {
+      mountedRef.current = false
+      dragCtrl.dispose()
+    }
   }, [dragCtrl])
 
   const wrapperClasses = useMemo(() => classNames(taskBoardBaseClasses, className), [className])

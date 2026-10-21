@@ -239,6 +239,39 @@ describe('TaskBoard (Vue)', () => {
       expect(screen.queryByText('New task')).not.toBeInTheDocument()
     })
 
+    it('gives array and once listeners exclusive ownership of add actions', async () => {
+      const onCardAdd = vi.fn()
+      const onColumnAdd = vi.fn()
+      const onUpdate = vi.fn()
+      const Wrapper = defineComponent({
+        setup() {
+          const cols = ref(columns)
+          return () =>
+            h(TaskBoard, {
+              columns: cols.value,
+              allowAddCard: true,
+              allowAddColumn: true,
+              onCardAdd: [onCardAdd, onCardAdd],
+              onColumnAddOnce: onColumnAdd,
+              'onUpdate:columns': (next: TaskBoardColumn[]) => {
+                onUpdate(next)
+                cols.value = next
+              }
+            })
+        }
+      })
+      const { container } = render(Wrapper)
+
+      await fireEvent.click(screen.getAllByText('Add task')[0])
+      await fireEvent.click(screen.getByRole('button', { name: '+ Add column' }))
+
+      expect(onCardAdd).toHaveBeenCalledTimes(2)
+      expect(onColumnAdd).toHaveBeenCalledTimes(1)
+      expect(onUpdate).not.toHaveBeenCalled()
+      expect(container.querySelectorAll('[data-tiger-taskboard-card]')).toHaveLength(3)
+      expect(container.querySelectorAll('[data-tiger-taskboard-column]')).toHaveLength(3)
+    })
+
     it('inserts a default card from inner state when only defaultColumns is provided', async () => {
       const { container } = render(TaskBoard, {
         props: { defaultColumns: columns, allowAddCard: true }

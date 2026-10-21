@@ -223,7 +223,6 @@ export const CommentThread = defineComponent({
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getCommentThreadLabels(mergedLocale.value, props.labels))
-    const vnodeProps = () => (instance?.vnode.props ?? {}) as Record<string, unknown>
 
     const innerExpandedKeys = ref<Array<string | number>>([...props.defaultExpandedKeys])
     const revealedCounts = ref(new Map<string | number, number>())
@@ -297,10 +296,10 @@ export const CommentThread = defineComponent({
       }
     )
 
-    const hasLoadMoreHandler = computed(() => typeof vnodeProps().onLoadMore === 'function')
+    const hasLoadMoreHandler = () => hasEmitHandler(instance, 'load-more')
     const hasReplyHandler = () => hasEmitHandler(instance, 'reply')
-    const hasMoreHandler = computed(() => typeof vnodeProps().onMore === 'function')
-    const hasUserClickHandler = computed(() => typeof vnodeProps().onUserClick === 'function')
+    const hasMoreHandler = () => hasEmitHandler(instance, 'more')
+    const hasUserClickHandler = () => hasEmitHandler(instance, 'user-click')
 
     const wrapperClasses = computed(() =>
       classNames(
@@ -334,7 +333,7 @@ export const CommentThread = defineComponent({
       const view = getCommentRepliesView(children, {
         maxReplies: props.maxReplies,
         revealedCount: current,
-        hasLoadMoreHandler: hasLoadMoreHandler.value
+        hasLoadMoreHandler: hasLoadMoreHandler()
       })
       if (view.loadMoreKind === 'remaining') {
         const next = new Map(revealedCounts.value)
@@ -394,7 +393,7 @@ export const CommentThread = defineComponent({
       const repliesView = getCommentRepliesView(children, {
         maxReplies: props.maxReplies,
         revealedCount: revealedCounts.value.get(node.id) ?? props.maxReplies,
-        hasLoadMoreHandler: hasLoadMoreHandler.value
+        hasLoadMoreHandler: hasLoadMoreHandler()
       })
       const showReplies = hasChildren && isExpanded && children.length > 0
       const articleId = `tiger-comment-${instance?.uid ?? 0}-article-${commentIdKey(node.id)}`
@@ -502,7 +501,7 @@ export const CommentThread = defineComponent({
         )
       }
 
-      if (props.showMore && (hasMoreHandler.value || (node.actions && node.actions.length > 0))) {
+      if (props.showMore && hasMoreHandler()) {
         actions.push(
           h(
             Button,
@@ -597,7 +596,7 @@ export const CommentThread = defineComponent({
             h('div', { class: 'flex-1 min-w-0' }, [
               h('div', { class: 'flex items-center gap-2 flex-wrap' }, [
                 node.user?.name
-                  ? hasUserClickHandler.value
+                  ? hasUserClickHandler()
                     ? h(
                         'button',
                         {
@@ -841,7 +840,7 @@ export const CommentThread = defineComponent({
         const view = getCommentRepliesView(node.children, {
           maxReplies: props.maxReplies,
           revealedCount: revealedCounts.value.get(node.id) ?? props.maxReplies,
-          hasLoadMoreHandler: hasLoadMoreHandler.value
+          hasLoadMoreHandler: hasLoadMoreHandler()
         })
         flattenVisible(view.visible, depth + 1, into)
       }

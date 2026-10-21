@@ -323,6 +323,23 @@ describe('DataTableWithToolbar (React)', () => {
     expect(onSearchChange).toHaveBeenCalled()
   })
 
+  it('uses table labels for query actions', async () => {
+    render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[]}
+        labels={{ searchButtonText: 'Find', expandText: 'Show query', collapseText: 'Hide query' }}
+        query={{ fields: [{ key: 'name', label: 'Name' }], defaultCollapsed: true }}
+        pagination={false}
+      />
+    )
+
+    expect(screen.getByRole('button', { name: 'Find' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reset' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Show query' }))
+    expect(screen.getByRole('button', { name: 'Hide query' })).toBeInTheDocument()
+  })
+
   it('submits search on enter without search button', async () => {
     const onSearch = vi.fn()
 

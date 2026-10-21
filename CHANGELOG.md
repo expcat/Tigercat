@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **组合组件（Core / Vue / React）**：Vue ActivityFeed / NotificationCenter 第一次新增正常播报且不回放挂载前条目；CommentThread、TaskBoard 与 DataTableWithToolbar 按 Vue 真实 emit 语义识别函数、数组和 Once 监听器，More 不再因自定义 actions 渲染空按钮。双端 AssigneePicker 使用实例级选项 id，并在过滤后保持活动项、ARIA 引用和 Enter / Space 选择一致；TaskBoard 在异步批准期间数据失效或卸载时取消旧移动，保留合法原地更新；DataTableWithToolbar 查询动作复用现有 tableLabels。
 - **工作流（Core / Vue / React）**：统一校验任务归属、可操作状态与活动节点，修复长抄送 / 自动通过链被截断的问题。修正退回和前加签的暂停、恢复及签署模式处理，保留已完成任务，避免提前推进或重复恢复；详情提交按当前表单值计算条件分支。动作栏确认层跟随当前动作与候选项，失效时关闭，转交 / 加签未选人时显示本地化提示。设计器新增分支在全树分配唯一 key。
 - **FileManager、拖拽与标注（Core / Vue / React）**：FileManager 跟随实际挂载的视口，虚拟网格按行测量并分离滚动区、完整内容与窗口偏移，动态行高、列数和模式变化后的尾部滚动及 Home / End 焦点保持正确。拖拽落下按当前稳定 id 重解位置并保留数字 key 类型，失效会话不再错移替换项。ImageAnnotation 在权限、工具、图片或组件生命周期失效时统一取消草稿、帧和文档会话，正常受控值更新不打断合法笔画。
 - **富文本 / 打印 / 拖拽会话（Core / Vue / React）**：默认富文本引擎的图片粘贴在销毁、转为只读 / 禁用或 setValue 真正替换正文后不再迟到写入（恢复可编辑不复活旧粘贴，同值受控回声不取消）。PrintLayout.print() 的打印 iframe 复制消费样式表、constructed stylesheets、文档根匹配状态与根节点继承的 CSS 自定义变量，克隆图片改为 eager 加载并在资源就绪后才打印。Vue RichTextEditor 跟随 FormItem 表单值的后续变化；React RichTextEditor 替换等价引擎时保留当前非受控正文。Vue useDrag 的 containerId 实时跟随响应式 props，挂载后改 id 的跨容器落下正常提交；Core 文档拖拽会话的 user-select 锁按 document 引用计数，重叠会话只在最后一场结束后恢复第一场加锁前的值。
@@ -33,7 +34,7 @@
 - **Segmented（Vue / React）**：选项文字超长时在选项内截断为省略号，图标不再被压缩，相邻选项不再互相重叠。
 - **Highlight（Vue）**：默认 slot 的 VNode 子树改为原位克隆并插入高亮，保留嵌套元素与链接结构（与 React 行为一致），不再先拍平成纯文本重建；子组件内容保持不透明、不参与高亮，其前后的原生文本仍正常命中。
 - **Image 文档**：`preview` 默认值更正为 `true` 并改写交互描述，`lazy` 说明更正为原生 `loading="lazy"`；Skill references 与 MCP 快照同步。
-- **Layout 跳转链接（Vue / React）**：最外层 Layout 的跳转链接只在存在真实 `main` 目标时输出，href 指向实际渲染成 `main` 的那个 Content 的 id（自定义 `id`、Fragment 子树、嵌套 Layout 里显式 `as="main"` 的 Content 都算）；React Layout 现在能识别 Fragment 中的 Sidebar 并正确横排。
+- **Layout 跳转链接（Vue / React）**：最外层 Layout 的跳转链接只在存在真实 `main` 目标时输出，href 指向实际渲染成 `main` 的那个 Content 的 id（自定义 `id`、Fragment 或静态原生 wrapper 子树、嵌套 Layout 里显式 `as="main"` 的 Content 都算）；React Layout 现在能识别 Fragment 中的 Sidebar 并正确横排。
 - **拖拽隔离（Core / Vue / React）**：List 的拖拽容器 id 改为按实例生成，同页多个 List 的同 id 项不再互相串扰；跨容器拖拽时目标列表的同 id 项不再继承 `data-dragging` 标记与位移预览，Drag 自定义渲染拿到的 `isDragging` 与共享绑定一致；指针拖拽的命中测试跳过拖动源自身。
 - **Resizable / Splitter（Core / Vue / React）**：边把手命中区恢复真实尺寸（原 `inset-inline-0` / `inset-block-0` 在 Tailwind v4 不存在导致把手 0 尺寸）；预设宽高比按预设自身钳制而不是起点比例（方形起点设 16/9 后拖宽得到 16/9 结果）；RTL 下 origin 偏移不再二次翻转拖动对边。
 - **Space / ScrollArea / Masonry / Sidebar / Descriptions（Vue / React）**：Space 命名 `size` 搭配 `verticalSize` 时列间距不再被压成 0；ScrollArea `scrollToMarker` 在有相对定位祖先时定位正确；Vue Masonry 子项动态增删后重新测量分布；React Sidebar 受控 `collapsed` 时 trigger 只发 `onCollapsedChange` 请求、不自行改宽；Vue Descriptions 标题 id 改用 SSR 安全的 `useId`。

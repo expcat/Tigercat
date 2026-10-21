@@ -236,6 +236,31 @@ describe('Layout Sections', () => {
     expect(container.textContent).toContain('plain 7Body')
   })
 
+  it('finds main through native wrappers without changing nested Layout semantics', () => {
+    const wrapped = render({
+      setup() {
+        return () =>
+          h(Layout, null, () =>
+            h('section', null, [h('div', null, [h(Content, { id: 'wrapped-main' }, () => 'Body')])])
+          )
+      }
+    })
+    expect(wrapped.container.querySelector('a.tiger-skip-link')?.getAttribute('href')).toBe(
+      '#wrapped-main'
+    )
+
+    const nested = render({
+      setup() {
+        return () =>
+          h(Layout, null, () =>
+            h('section', null, [h(Layout, null, () => h(Content, null, () => 'Nested'))])
+          )
+      }
+    })
+    expect(nested.container.querySelector('a.tiger-skip-link')).toBeNull()
+    expect(nested.container.querySelector('main')).toBeNull()
+  })
+
   it('targets a statically known nested explicit main with the skip link', () => {
     const { container } = render({
       setup() {

@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, type PropType } from 'vue'
+import { computed, defineComponent, h, ref, useId, type PropType } from 'vue'
 import {
   filterAssignees,
   getInputClasses,
@@ -27,23 +27,33 @@ export const AssigneePicker = defineComponent({
   setup(props, { emit }) {
     const query = ref('')
     const active = ref(0)
+    const instanceId = useId()
+    const listboxId = `tiger-assignee-${instanceId}`
+    const getOptionId = (id: string) => `${listboxId}-${id}`
+    const filtered = computed(() => filterAssignees(props.options, query.value))
+    const activeIndex = computed(() => {
+      if (filtered.value.length === 0) return -1
+      return Math.min(Math.max(active.value, 0), filtered.value.length - 1)
+    })
+    const activeOption = computed(() =>
+      activeIndex.value >= 0 ? filtered.value[activeIndex.value] : undefined
+    )
     const labels = () => getW9DataLabels(props.locale)
     const emitIds = (ids: string[]) => {
       emit('update:selectedIds', ids)
       emit('change', ids)
     }
     return () => {
-      const filtered = filterAssignees(props.options, query.value)
       const onKeyDown = (event: KeyboardEvent) => {
-        const next = nextListboxIndex(active.value, event.key, filtered.length)
-        if (next !== active.value) {
+        const next = nextListboxIndex(activeIndex.value, event.key, filtered.value.length)
+        if (next !== activeIndex.value) {
           event.preventDefault()
           active.value = next
           return
         }
-        if ((event.key === 'Enter' || event.key === ' ') && filtered[active.value]) {
+        if ((event.key === 'Enter' || event.key === ' ') && activeOption.value) {
           event.preventDefault()
-          emitIds(toggleAssignee(props.selectedIds, filtered[active.value].id))
+          emitIds(toggleAssignee(props.selectedIds, activeOption.value.id))
         }
       }
       return h(
@@ -60,7 +70,7 @@ export const AssigneePicker = defineComponent({
               active.value = 0
             }
           }),
-          filtered.length === 0
+          filtered.value.length === 0
             ? h('p', { class: selectEmptyStateClasses }, labels().emptyDirectory)
             : h(
                 'div',
@@ -69,10 +79,13 @@ export const AssigneePicker = defineComponent({
                   role: 'listbox',
                   'aria-label': labels().assigneeList,
                   'aria-multiselectable': 'true',
+                  'aria-activedescendant': activeOption.value
+                    ? getOptionId(activeOption.value.id)
+                    : undefined,
                   tabindex: 0,
                   onKeydown: onKeyDown
                 },
-                filtered.map((option, index) =>
+                filtered.value.map((option, index) =>
                   h(
                     'div',
                     {
@@ -80,13 +93,13 @@ export const AssigneePicker = defineComponent({
                       class: getSelectOptionClasses({
                         isSelected: props.selectedIds.includes(option.id),
                         isDisabled: false,
-                        isActive: index === active.value,
+                        isActive: index === activeIndex.value,
                         size: 'sm'
                       }),
                       role: 'option',
-                      id: `tiger-assignee-${option.id}`,
+                      id: getOptionId(option.id),
                       'aria-selected': props.selectedIds.includes(option.id) ? 'true' : 'false',
-                      'data-active': index === active.value ? 'true' : undefined,
+                      'data-active': index === activeIndex.value ? 'true' : undefined,
                       onClick: () => emitIds(toggleAssignee(props.selectedIds, option.id))
                     },
                     `${option.name}${option.department ? ` · ${option.department}` : ''}`

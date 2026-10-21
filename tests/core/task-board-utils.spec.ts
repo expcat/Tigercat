@@ -16,6 +16,7 @@ import {
   type TaskBoardCard,
   type TaskBoardColumn
 } from '@expcat/tigercat-core'
+import { createTaskBoardMoveGuard } from '../../packages/core/src/internal/task-board-move'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -570,5 +571,36 @@ describe('createTouchDragTracker', () => {
     expect(tracker.getState().active).toBe(true)
     tracker.cancel()
     expect(tracker.getState().active).toBe(false)
+  })
+})
+
+describe('createTaskBoardMoveGuard', () => {
+  it('invalidates changes to fields and card references copied by a card move', () => {
+    const cols = makeCols()
+    const result = moveCard(cols, 'c1', 'todo', 'doing', 0)!
+    const isCurrent = createTaskBoardMoveGuard(cols, result.event)
+
+    expect(isCurrent(cols)).toBe(true)
+    cols[0].cards[0].title = 'Revised in place'
+    expect(isCurrent(cols)).toBe(true)
+    cols[0].description = 'Changed after approval started'
+    expect(isCurrent(cols)).toBe(false)
+
+    const replacedCards = makeCols()
+    const cardGuard = createTaskBoardMoveGuard(replacedCards, result.event)
+    replacedCards[0].cards[0] = { ...replacedCards[0].cards[0], title: 'Replacement' }
+    expect(cardGuard(replacedCards)).toBe(false)
+    expect(cardGuard(replacedCards.map((column) => ({ ...column })))).toBe(false)
+  })
+
+  it('allows in-place column changes during a reorder but rejects replacement or reordering', () => {
+    const cols = makeCols()
+    const isCurrent = createTaskBoardMoveGuard(cols)
+
+    cols[0].description = 'Current detail'
+    cols[0].cards[0] = { ...cols[0].cards[0], title: 'Current card' }
+    expect(isCurrent(cols)).toBe(true)
+    expect(isCurrent(cols.map((column) => ({ ...column })))).toBe(false)
+    expect(isCurrent([cols[1], cols[0], cols[2]])).toBe(false)
   })
 })

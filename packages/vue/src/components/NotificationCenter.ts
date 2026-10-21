@@ -302,20 +302,24 @@ export const NotificationCenter = defineComponent({
       return grouped.length > 0 ? grouped : effectiveItems.value
     })
     const seenNotificationIds = ref<Set<string> | null>(null)
-    watch(allManagedItems, (items) => {
-      const ids = items.map((item) => notificationItemKey(item.id))
-      if (seenNotificationIds.value === null) {
+    watch(
+      allManagedItems,
+      (items) => {
+        const ids = items.map((item) => notificationItemKey(item.id))
+        if (seenNotificationIds.value === null) {
+          seenNotificationIds.value = new Set(ids)
+          return
+        }
+        const fresh = items.filter(
+          (item) => !seenNotificationIds.value!.has(notificationItemKey(item.id))
+        )
         seenNotificationIds.value = new Set(ids)
-        return
-      }
-      const fresh = items.filter(
-        (item) => !seenNotificationIds.value!.has(notificationItemKey(item.id))
-      )
-      seenNotificationIds.value = new Set(ids)
-      const newest = fresh[fresh.length - 1]
-      if (!newest) return
-      politeText.value = labels.value.newItemText.split('{title}').join(newest.title ?? '')
-    })
+        const newest = fresh[fresh.length - 1]
+        if (!newest) return
+        politeText.value = labels.value.newItemText.split('{title}').join(newest.title ?? '')
+      },
+      { immediate: true }
+    )
 
     const hasUnread = computed(() => allManagedItems.value.some((item) => !item.read))
 

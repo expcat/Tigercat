@@ -68,6 +68,42 @@ describe('W9 react data components', () => {
     fireEvent.click(view.getByRole('option', { name: /Ada/ }))
     expect(onChange.ids).toEqual(['a'])
   })
+
+  it('keeps assignee option ids unique and the active descendant valid after options shrink', () => {
+    const all = [
+      { id: 'a', name: 'Alice' },
+      { id: 'b', name: 'Bob' },
+      { id: 'c', name: 'Carol' }
+    ]
+    const onChange = viChange()
+    const view = render(
+      <div>
+        <AssigneePicker options={all} onChange={onChange.fn} />
+        <AssigneePicker options={all} />
+      </div>
+    )
+    const listbox = view.getAllByRole('listbox')[0]
+    const initialIds = view.getAllByRole('option').map((option) => option.id)
+    expect(new Set(initialIds).size).toBe(initialIds.length)
+
+    fireEvent.keyDown(listbox, { key: 'End' })
+    const carol = listbox.querySelectorAll('[role="option"]')[2]
+    expect(listbox.getAttribute('aria-activedescendant')).toBe(carol.id)
+
+    view.rerender(
+      <div>
+        <AssigneePicker options={[all[0]]} onChange={onChange.fn} />
+        <AssigneePicker options={all} />
+      </div>
+    )
+    const alice = listbox.querySelector('[role="option"]')!
+    expect(alice.textContent).toBe('Alice')
+    expect(alice.id).toBe(initialIds[0])
+    expect(listbox.getAttribute('aria-activedescendant')).toBe(alice.id)
+
+    fireEvent.keyDown(listbox, { key: 'Enter' })
+    expect(onChange.ids).toEqual(['a'])
+  })
 })
 
 function viChange() {
