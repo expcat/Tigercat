@@ -757,6 +757,14 @@ export interface LaidOutSankey {
   links: LaidOutSankeyLink[]
 }
 
+/**
+ * Layout a sankey diagram. Valid input is a DAG of finite positive links
+ * between known node ids; other links are dropped. Columns follow the longest
+ * path from a source node. When the graph contains a cycle no longest path
+ * exists: the acyclic part keeps its longest-path columns and every node still
+ * waiting on a cyclic incoming link shares one finite remainder column right
+ * after the deepest acyclic column, so layout always terminates.
+ */
 export function layoutSankey(
   nodes: readonly SankeyNodeInput[],
   links: readonly SankeyLinkInput[],
@@ -781,17 +789,28 @@ export function layoutSankey(
     outgoing.set(link.source, (outgoing.get(link.source) ?? 0) + link.value)
     incoming.set(link.target, (incoming.get(link.target) ?? 0) + link.value)
   }
-  const column = new Map<string, number>()
-  const sources = nodes.filter((node) => (incoming.get(node.id) ?? 0) === 0)
-  const queue = (sources.length > 0 ? sources : nodes.slice(0, 1)).map((node) => node.id)
-  for (const id of queue) column.set(id, 0)
   const bySource = new Map<string, string[]>()
   for (const link of finiteLinks) {
     const list = bySource.get(link.source) ?? []
     list.push(link.target)
     bySource.set(link.source, list)
   }
-  const pending = [...queue]
+  // Topological relaxation: a node is dequeued at most once, after all of its
+  // acyclic predecessors have been processed, so its column is the final
+  // longest-path column. Re-relaxing an already placed node cannot happen.
+  const column = new Map<string, number>()
+  const remainingIncoming = new Map<string, number>()
+  for (const node of nodes) remainingIncoming.set(node.id, 0)
+  for (const link of finiteLinks) {
+    remainingIncoming.set(link.target, (remainingIncoming.get(link.target) ?? 0) + 1)
+  }
+  const pending: string[] = []
+  for (const node of nodes) {
+    if ((remainingIncoming.get(node.id) ?? 0) === 0) {
+      column.set(node.id, 0)
+      pending.push(node.id)
+    }
+  }
   while (pending.length > 0) {
     const id = pending.shift() as string
     const nextColumn = (column.get(id) ?? 0) + 1
@@ -799,13 +818,29 @@ export function layoutSankey(
       const existing = column.get(target)
       if (existing === undefined || existing < nextColumn) {
         column.set(target, nextColumn)
-        pending.push(target)
       }
+      const remaining = (remainingIncoming.get(target) ?? 0) - 1
+      remainingIncoming.set(target, remaining)
+      if (remaining === 0) pending.push(target)
+    }
+  }
+  // A node with remainingIncoming > 0 was never dequeued: it still waits on a
+  // cyclic incoming link, so any column it holds is tentative and is replaced
+  // by the shared remainder column. The remainder is one past the deepest
+  // final column of the fully processed (acyclic) part.
+  let remainderColumn = 0
+  for (const node of nodes) {
+    if ((remainingIncoming.get(node.id) ?? 0) === 0) {
+      remainderColumn = Math.max(remainderColumn, (column.get(node.id) ?? 0) + 1)
+    }
+  }
+  for (const node of nodes) {
+    if ((remainingIncoming.get(node.id) ?? 0) > 0) {
+      column.set(node.id, remainderColumn)
     }
   }
   let maxColumn = 0
   for (const node of nodes) {
-    if (!column.has(node.id)) column.set(node.id, 0)
     maxColumn = Math.max(maxColumn, column.get(node.id) ?? 0)
   }
   const columns: string[][] = Array.from({ length: maxColumn + 1 }, () => [])

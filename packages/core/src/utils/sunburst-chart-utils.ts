@@ -49,69 +49,69 @@ export interface LayoutSunburstOptions {
   colors?: string[]
 }
 
-function nodeValue(
-  datum: SunburstChartDatum,
-  visit: ChartTreeVisit = createChartTreeVisit()
-): number | null {
-  const key = chartTreeNodeKey(datum)
-  if (
-    !visit.enter(
-      key,
-      ['SunburstChart.cycle', 'SunburstChart skipped a cyclic node'],
-      ['SunburstChart.duplicate', 'SunburstChart skipped a duplicate node']
-    )
-  ) {
-    return null
-  }
-  try {
-    const children = datum.children
-    if (children && children.length > 0) {
-      let sum = 0
-      let any = false
-      for (const child of children) {
-        const childValue = nodeValue(child, visit)
-        if (childValue === null) continue
-        any = true
-        sum += childValue
-      }
-      if (any) {
-        if (isFiniteNumber(datum.value) && datum.value !== sum) {
-          devWarn(
-            'SunburstChart.parentValue',
-            'SunburstChart parent value differs from the sum of children; children sum is used for sweep'
-          )
-        }
-        return sum
-      }
-    }
-    if (!isFiniteNumber(datum.value)) {
-      devWarn('SunburstChart.nonFinite', 'SunburstChart skipped a datum with a non-finite value')
-      return null
-    }
-    if (datum.value < 0) {
-      devWarn('SunburstChart.negative', 'SunburstChart skipped a datum with a negative value')
-      return null
-    }
-    if (datum.value === 0) {
-      devWarn('SunburstChart.zero', 'SunburstChart skipped a datum with value 0')
-      return null
-    }
-    return datum.value
-  } finally {
-    visit.leave(key)
-  }
+interface SizedSunburstNode {
+  datum: SunburstChartDatum
+  value: number
+  children: SizedSunburstNode[]
 }
 
-function maxDrawnDepth(data: readonly SunburstChartDatum[]): number {
+/**
+ * Resolve the effective tree in a single DFS holding one visit. A back-edge or
+ * a repeated object is skipped while its first appearance is kept, and
+ * every value aggregates over exactly the participating children, so depth,
+ * totals and layout all consume the same safe tree.
+ */
+function resolveSunburstTree(
+  data: readonly SunburstChartDatum[],
+  visit: ChartTreeVisit
+): SizedSunburstNode[] {
+  const nodes: SizedSunburstNode[] = []
+  for (const datum of data) {
+    const key = chartTreeNodeKey(datum)
+    if (
+      !visit.enter(
+        key,
+        ['SunburstChart.cycle', 'SunburstChart skipped a cyclic node'],
+        ['SunburstChart.duplicate', 'SunburstChart skipped a duplicate node']
+      )
+    ) {
+      continue
+    }
+    const children =
+      datum.children && datum.children.length > 0 ? resolveSunburstTree(datum.children, visit) : []
+    visit.leave(key)
+    let value: number | null = null
+    if (children.length > 0) {
+      value = children.reduce((sum, child) => sum + child.value, 0)
+      if (isFiniteNumber(datum.value) && datum.value !== value) {
+        devWarn(
+          'SunburstChart.parentValue',
+          'SunburstChart parent value differs from the sum of children; children sum is used for sweep'
+        )
+      }
+    } else if (!isFiniteNumber(datum.value)) {
+      devWarn('SunburstChart.nonFinite', 'SunburstChart skipped a datum with a non-finite value')
+    } else if (datum.value < 0) {
+      devWarn('SunburstChart.negative', 'SunburstChart skipped a datum with a negative value')
+    } else if (datum.value === 0) {
+      devWarn('SunburstChart.zero', 'SunburstChart skipped a datum with value 0')
+    } else {
+      value = datum.value
+    }
+    if (value !== null) nodes.push({ datum, value, children })
+  }
+  return nodes
+}
+
+function maxDrawnDepth(nodes: readonly SizedSunburstNode[]): number {
   let max = 0
-  const walk = (items: readonly SunburstChartDatum[], depth: number) => {
+  const walk = (items: readonly SizedSunburstNode[], depth: number) => {
     for (const item of items) {
-      if (nodeValue(item) === null) continue
       max = Math.max(max, depth)
-      if (item.children && item.children.length > 0) walk(item.children, depth + 1)
+      if (item.children.length > 0) walk(item.children, depth + 1)
     }
   }
-  walk(data, 0)
+  walk(nodes, 0)
   return max
 }
 
@@ -158,33 +158,31 @@ export function layoutSunburst(
     : safeInner
   if (!(safeOuter > safeInner) && safeOuter <= 0) return []
   const palette = opts.colors && opts.colors.length > 0 ? opts.colors : DEFAULT_CHART_COLORS
-  const depth = maxDrawnDepth(data)
+  const sized = resolveSunburstTree(data, createChartTreeVisit())
+  const depth = maxDrawnDepth(sized)
   const ringCount = depth + 1
   const ringWidth = ringCount > 0 ? (safeOuter - safeInner) / ringCount : 0
   const arcs: SunburstArc[] = []
-  const rootTotal = data.reduce((sum, item) => sum + (nodeValue(item) ?? 0), 0)
+  const rootTotal = sized.reduce((sum, item) => sum + item.value, 0)
   if (!(rootTotal > 0)) return []
 
   const layoutLevel = (
-    items: readonly SunburstChartDatum[],
+    items: readonly SizedSunburstNode[],
     startAngle: number,
     endAngle: number,
     level: number,
     parentIndex: number | null,
     parentColor: string
   ): number[] => {
-    const sized = items
-      .map((datum) => ({ datum, value: nodeValue(datum) }))
-      .filter((item): item is { datum: SunburstChartDatum; value: number } => item.value !== null)
-    const total = sized.reduce((sum, item) => sum + item.value, 0)
+    const total = items.reduce((sum, item) => sum + item.value, 0)
     if (!(total > 0)) return []
     const childIndices: number[] = []
     let angle = startAngle
-    sized.forEach((item, i) => {
+    items.forEach((item, i) => {
       const sweep = ((endAngle - startAngle) * item.value) / total
       const sa = angle
       const ea = angle + sweep
-      const hasChildren = Boolean(item.datum.children && item.datum.children.length > 0)
+      const hasChildren = item.children.length > 0
       const iR = safeInner + level * ringWidth
       const oR = hasChildren ? Math.max(iR, iR + ringWidth - 1) : safeOuter
       const color = item.datum.color ?? (level === 0 ? palette[i % palette.length] : parentColor)
@@ -228,21 +226,14 @@ export function layoutSunburst(
       })
       childIndices.push(index)
       if (hasChildren) {
-        arcs[index].childIndices = layoutLevel(
-          item.datum.children!,
-          sa,
-          ea,
-          level + 1,
-          index,
-          color
-        )
+        arcs[index].childIndices = layoutLevel(item.children, sa, ea, level + 1, index, color)
       }
       angle = ea
     })
     return childIndices
   }
 
-  layoutLevel(data, DEFAULT_SUNBURST_START_ANGLE, DEFAULT_SUNBURST_END_ANGLE, 0, null, palette[0])
+  layoutLevel(sized, DEFAULT_SUNBURST_START_ANGLE, DEFAULT_SUNBURST_END_ANGLE, 0, null, palette[0])
   return arcs
 }
 

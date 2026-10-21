@@ -523,10 +523,23 @@ function createStepPath(points: Array<{ x: number; y: number }>, t: number): str
 }
 
 /**
+ * Splines divide by adjacent x differences; a zero or non-finite difference
+ * makes slopes undefined, so such input falls back to straight segments.
+ */
+function hasDegenerateSplineSegment(points: Array<{ x: number; y: number }>): boolean {
+  for (let i = 0; i < points.length - 1; i++) {
+    const dx = points[i + 1].x - points[i].x
+    if (dx === 0 || !Number.isFinite(dx)) return true
+  }
+  return false
+}
+
+/**
  * Create a monotone cubic spline path (preserves monotonicity)
  */
 function createMonotonePath(points: Array<{ x: number; y: number }>): string {
   if (points.length < 2) return createLinearPath(points)
+  if (hasDegenerateSplineSegment(points)) return createLinearPath(points)
 
   const n = points.length
   const tangents: number[] = []
@@ -593,6 +606,7 @@ function createMonotonePath(points: Array<{ x: number; y: number }>): string {
 function createNaturalPath(points: Array<{ x: number; y: number }>): string {
   if (points.length < 2) return createLinearPath(points)
   if (points.length === 2) return createLinearPath(points)
+  if (hasDegenerateSplineSegment(points)) return createLinearPath(points)
 
   const n = points.length - 1
 

@@ -110,9 +110,27 @@ export function getLinearChartTickValues(domain: number[], count: number): reado
   const start = Math.ceil(min / step) * step
   const end = Math.floor(max / step) * step
   const ticks: number[] = []
+  // Generate by finite tick index: repeated float addition (value += step) is not
+  // guaranteed to advance, e.g. a step of 1 cannot move past 1e16.
+  const lastIndex = step > 0 && Number.isFinite(step) ? Math.round((end - start) / step) : NaN
 
-  for (let value = start; value <= end + step / 2; value += step) {
-    ticks.push(roundTick(value, step))
+  // Past the safe-integer boundary index++ itself cannot advance, so the loop
+  // would never terminate; such domains degenerate to the endpoints branch.
+  if (Number.isSafeInteger(lastIndex) && lastIndex >= 0) {
+    for (let index = 0; index <= lastIndex; index++) {
+      const value = roundTick(start + index * step, step)
+      const last = ticks[ticks.length - 1]
+      // Skip indices that land on an already-represented float; later indices
+      // can still cross the current spacing.
+      if (last !== undefined && !(value > last)) continue
+      ticks.push(value)
+    }
+  } else {
+    // The step computation degenerated for this domain (e.g. the raw step
+    // underflowed to zero) and no tick landed inside it. Values between the
+    // endpoints may still be representable, but the endpoints are the ticks
+    // this domain can reliably produce.
+    ticks.push(min, max)
   }
 
   if (linearTickValuesCache.size >= maxLinearTickValuesCacheSize) {
@@ -138,6 +156,8 @@ function getNiceStep(step: number): number {
 
 function roundTick(value: number, step: number): number {
   const precision = Math.max(0, -Math.floor(Math.log10(step)) + 1)
+  // toFixed only accepts 0-100 digits; beyond that the raw value is the precise one.
+  if (precision > 100) return value
   return Number(value.toFixed(precision))
 }
 

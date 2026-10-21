@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { computeTreeMapNodes, layoutTreeMap } from '@expcat/tigercat-core'
+import type { TreeMapChartDatum } from '@expcat/tigercat-core'
 
 const baseOpts = { width: 400, height: 300 }
 
@@ -76,6 +77,22 @@ describe('layoutTreeMap', () => {
       { ...baseOpts, gap: -8 }
     )
     expect(nodes.map((node) => node.label)).toEqual(['Good'])
+    warn.mockRestore()
+  })
+
+  it('skips cyclic and repeated nodes instead of nesting forever', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const self: TreeMapChartDatum = { label: 'A', value: 3 }
+    self.children = [self]
+    const selfNodes = layoutTreeMap([self], baseOpts)
+    expect(selfNodes).toHaveLength(1)
+    expect(selfNodes[0].label).toBe('A')
+
+    const x: TreeMapChartDatum = { label: 'X', value: 2 }
+    const y: TreeMapChartDatum = { label: 'Y', value: 5, children: [x] }
+    x.children = [y]
+    const twoNodes = layoutTreeMap([x], baseOpts)
+    expect(twoNodes.map((node) => node.label)).toEqual(['X', 'Y'])
     warn.mockRestore()
   })
 

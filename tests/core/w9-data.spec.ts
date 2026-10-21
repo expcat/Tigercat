@@ -69,6 +69,39 @@ describe('w9 data helpers', () => {
     expect(sankey.nodes).toHaveLength(2)
     expect(sankey.links[0].path.startsWith('M')).toBe(true)
     expect(sankey.nodes[0].x).toBeLessThan(sankey.nodes[1].x)
+
+    const cyclic = layoutSankey(
+      [
+        { id: 'a', label: 'A' },
+        { id: 'b', label: 'B' }
+      ],
+      [
+        { source: 'a', target: 'a', value: 5 },
+        { source: 'a', target: 'b', value: 5 },
+        { source: 'b', target: 'a', value: 3 }
+      ],
+      400,
+      200
+    )
+    expect(cyclic.nodes).toHaveLength(2)
+    expect(cyclic.links).toHaveLength(3)
+    const columnOf = (id: string) => cyclic.nodes.find((node) => node.id === id)?.column
+    expect(columnOf('a')).toBe(columnOf('b'))
+
+    const headThenCycle = layoutSankey(
+      [{ id: 'a' }, { id: 'b' }, { id: 'c' }],
+      [
+        { source: 'a', target: 'b', value: 5 },
+        { source: 'b', target: 'c', value: 5 },
+        { source: 'c', target: 'b', value: 5 }
+      ],
+      400,
+      200
+    )
+    const headColumnOf = (id: string) => headThenCycle.nodes.find((node) => node.id === id)?.column
+    expect(headColumnOf('a')).toBe(0)
+    expect(headColumnOf('b')).toBe(1)
+    expect(headColumnOf('c')).toBe(1)
   })
 
   it('windows a multi-column grid with the shared range', () => {

@@ -208,6 +208,30 @@ describe('chart-utils', () => {
       expect(getChartAxisTickCacheSize()).toBe(1)
     })
 
+    it('generates ticks by index when repeated addition cannot advance', () => {
+      // The float spacing at 1e16 is 2, so a step of 1 never advances by addition.
+      const ticks = getLinearChartTickValues([1e16, 1e16 + 8], 5)
+      expect(ticks.length).toBeGreaterThan(1)
+      expect(ticks[0]).toBe(1e16)
+      expect(ticks[ticks.length - 1]).toBe(1e16 + 8)
+      for (let i = 1; i < ticks.length; i++) {
+        expect(ticks[i]).toBeGreaterThan(ticks[i - 1])
+      }
+    })
+
+    it('keeps tiny-domain ticks finite without toFixed precision overflow', () => {
+      const ticks = getLinearChartTickValues([1e-100, 2e-100], 5)
+      expect(ticks.length).toBeGreaterThan(1)
+      expect(ticks.every((tick) => Number.isFinite(tick))).toBe(true)
+    })
+
+    it('falls back to the domain endpoints when no computed tick lands inside', () => {
+      expect(getLinearChartTickValues([Number.MIN_VALUE, 2 * Number.MIN_VALUE], 5)).toEqual([
+        Number.MIN_VALUE,
+        2 * Number.MIN_VALUE
+      ])
+    })
+
     it('reuses cached tick values while recalculating scale positions', () => {
       const firstScale = createLinearScale([0, 100], [0, 200])
       const secondScale = createLinearScale([0, 100], [0, 400])
@@ -756,6 +780,21 @@ describe('chart-utils', () => {
     it('creates natural curve', () => {
       const path = createLinePath(points, 'natural')
       expect(path).toContain('C')
+    })
+
+    it('falls back to straight segments when a spline meets a repeated numeric x', () => {
+      const duplicated = [
+        { x: 0, y: 2 },
+        { x: 0, y: 4 },
+        { x: 2, y: 3 }
+      ]
+      const linear = createLinePath(duplicated, 'linear')
+      for (const curve of ['monotone', 'natural'] as const) {
+        const path = createLinePath(duplicated, curve)
+        expect(path).not.toContain('NaN')
+        expect(path).not.toContain('Infinity')
+        expect(path).toBe(linear)
+      }
     })
   })
 

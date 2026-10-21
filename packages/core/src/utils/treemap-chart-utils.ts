@@ -49,61 +49,63 @@ export interface LayoutTreeMapOptions {
 interface SizedItem {
   datum: TreeMapChartDatum
   value: number
+  children: ResolvedTreeMapNode[]
   depth: number
   color: string
 }
 
-function nodeValue(
-  datum: TreeMapChartDatum,
-  visit: ChartTreeVisit = createChartTreeVisit()
-): number | null {
-  const key = chartTreeNodeKey(datum)
-  if (
-    !visit.enter(
-      key,
-      ['TreeMapChart.cycle', 'TreeMapChart skipped a cyclic node'],
-      ['TreeMapChart.duplicate', 'TreeMapChart skipped a duplicate node']
-    )
-  ) {
-    return null
-  }
-  try {
-    const children = datum.children
-    if (children && children.length > 0) {
-      let sum = 0
-      let any = false
-      for (const child of children) {
-        const childValue = nodeValue(child, visit)
-        if (childValue === null) continue
-        any = true
-        sum += childValue
-      }
-      if (any) {
-        if (isFiniteNumber(datum.value) && datum.value !== sum) {
-          devWarn(
-            'TreeMapChart.parentValue',
-            'TreeMapChart parent value differs from the sum of children; children sum is used for area'
-          )
-        }
-        return sum
-      }
+interface ResolvedTreeMapNode {
+  datum: TreeMapChartDatum
+  value: number
+  children: ResolvedTreeMapNode[]
+}
+
+/**
+ * Resolve the effective tree in a single DFS holding one visit. A back-edge or
+ * a repeated object is skipped while its first appearance is kept, and
+ * every value aggregates over exactly the participating children, so sizing and
+ * layout consume the same safe tree instead of nesting until geometry runs out.
+ */
+function resolveTreeMapTree(
+  data: readonly TreeMapChartDatum[],
+  visit: ChartTreeVisit
+): ResolvedTreeMapNode[] {
+  const nodes: ResolvedTreeMapNode[] = []
+  for (const datum of data) {
+    const key = chartTreeNodeKey(datum)
+    if (
+      !visit.enter(
+        key,
+        ['TreeMapChart.cycle', 'TreeMapChart skipped a cyclic node'],
+        ['TreeMapChart.duplicate', 'TreeMapChart skipped a duplicate node']
+      )
+    ) {
+      continue
     }
-    if (!isFiniteNumber(datum.value)) {
-      devWarn('TreeMapChart.nonFinite', 'TreeMapChart skipped a datum with a non-finite value')
-      return null
-    }
-    if (datum.value < 0) {
-      devWarn('TreeMapChart.negative', 'TreeMapChart skipped a datum with a negative value')
-      return null
-    }
-    if (datum.value === 0) {
-      devWarn('TreeMapChart.zero', 'TreeMapChart skipped a datum with value 0')
-      return null
-    }
-    return datum.value
-  } finally {
+    const children =
+      datum.children && datum.children.length > 0 ? resolveTreeMapTree(datum.children, visit) : []
     visit.leave(key)
+    let value: number | null = null
+    if (children.length > 0) {
+      value = children.reduce((sum, child) => sum + child.value, 0)
+      if (isFiniteNumber(datum.value) && datum.value !== value) {
+        devWarn(
+          'TreeMapChart.parentValue',
+          'TreeMapChart parent value differs from the sum of children; children sum is used for area'
+        )
+      }
+    } else if (!isFiniteNumber(datum.value)) {
+      devWarn('TreeMapChart.nonFinite', 'TreeMapChart skipped a datum with a non-finite value')
+    } else if (datum.value < 0) {
+      devWarn('TreeMapChart.negative', 'TreeMapChart skipped a datum with a negative value')
+    } else if (datum.value === 0) {
+      devWarn('TreeMapChart.zero', 'TreeMapChart skipped a datum with value 0')
+    } else {
+      value = datum.value
+    }
+    if (value !== null) nodes.push({ datum, value, children })
   }
+  return nodes
 }
 
 function worst(row: number[], side: number): number {
@@ -192,15 +194,13 @@ function layoutItem(
   parentIndex: number | null
 ): void {
   const node = pushNode(item, x, y, w, h, gap, minLabelSize, out, parentIndex)
-  const children = item.datum.children
-  if (!children || children.length === 0) return
+  if (item.children.length === 0) return
   const header = Math.min(18, Math.max(0, node.h * 0.22))
   const inset = Math.max(gap, 2)
   const childW = node.w - inset * 2
   const childH = node.h - header - inset
   if (childW <= 0 || childH <= 0) return
-  const childItems = sizeItems(children, item.depth + 1, item.color)
-  if (childItems.length === 0) return
+  const childItems = sizeItems(item.children, item.depth + 1, item.color)
   squarify(
     childItems,
     node.x + inset,
@@ -276,22 +276,17 @@ function squarify(
 }
 
 function sizeItems(
-  data: readonly TreeMapChartDatum[],
+  nodes: readonly ResolvedTreeMapNode[],
   depth: number,
   parentColor: string
 ): SizedItem[] {
-  const items: SizedItem[] = []
-  for (const datum of data) {
-    const value = nodeValue(datum)
-    if (value === null) continue
-    items.push({
-      datum,
-      value,
-      depth,
-      color: datum.color ?? parentColor
-    })
-  }
-  return items
+  return nodes.map((node) => ({
+    datum: node.datum,
+    value: node.value,
+    children: node.children,
+    depth,
+    color: node.datum.color ?? parentColor
+  }))
 }
 
 export function layoutTreeMap(
@@ -306,13 +301,19 @@ export function layoutTreeMap(
     : DEFAULT_TREEMAP_MIN_LABEL_SIZE
   if (safeWidth <= 0 || safeHeight <= 0) return []
   const palette = opts.colors && opts.colors.length > 0 ? opts.colors : DEFAULT_CHART_COLORS
+  const resolvedRoots = resolveTreeMapTree(data, createChartTreeVisit())
+  // Roots keep the palette slot of their position in the raw data, including
+  // positions whose datum was skipped; resolvedRoots is a subsequence of data.
   const items: SizedItem[] = []
+  let cursor = 0
   data.forEach((datum, index) => {
-    const value = nodeValue(datum)
-    if (value === null) return
+    const node = resolvedRoots[cursor]
+    if (!node || node.datum !== datum) return
+    cursor += 1
     items.push({
       datum,
-      value,
+      value: node.value,
+      children: node.children,
       depth: 0,
       color: datum.color ?? palette[index % palette.length]
     })

@@ -5,6 +5,7 @@ import {
   layoutSunburst,
   nextSunburstArcIndex
 } from '@expcat/tigercat-core'
+import type { SunburstChartDatum } from '@expcat/tigercat-core'
 
 const baseOpts = { cx: 100, cy: 100, innerRadius: 30, outerRadius: 90 }
 
@@ -93,6 +94,24 @@ describe('layoutSunburst', () => {
     )
     expect(arcs.map((arc) => arc.label)).toEqual(['Good'])
     expect(arcs.every((arc) => arc.path.length > 0 && !arc.path.includes('NaN'))).toBe(true)
+    warn.mockRestore()
+  })
+
+  it('skips cyclic and repeated nodes instead of recursing forever', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const self: SunburstChartDatum = { label: 'A', value: 3 }
+    self.children = [self]
+    const selfArcs = layoutSunburst([self], baseOpts)
+    expect(selfArcs).toHaveLength(1)
+    expect(selfArcs[0].label).toBe('A')
+    expect(selfArcs[0].percent).toBe(100)
+
+    const x: SunburstChartDatum = { label: 'X', value: 2 }
+    const y: SunburstChartDatum = { label: 'Y', value: 5, children: [x] }
+    x.children = [y]
+    const twoArcs = layoutSunburst([x], baseOpts)
+    expect(twoArcs.map((arc) => arc.label)).toEqual(['X', 'Y'])
+    expect(twoArcs[0].percent).toBe(100)
     warn.mockRestore()
   })
 
