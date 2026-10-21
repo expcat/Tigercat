@@ -8,6 +8,7 @@ import {
   getChartTooltipTransform,
   isBrowser,
   mapChartTooltipPointToDocument,
+  observeElementSize,
   registerEscapeDismiss,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
@@ -55,10 +56,17 @@ export const ChartTooltip = defineComponent({
     const adjustedPosition = ref({ x: props.x, y: props.y })
     const mounted = ref(false)
     let releaseEscape: (() => void) | undefined
+    let stopTooltipSize: (() => void) | undefined
 
     onMounted(() => {
       mounted.value = true
     })
+
+    const writePosition = (next: { x: number; y: number }) => {
+      if (adjustedPosition.value.x !== next.x || adjustedPosition.value.y !== next.y) {
+        adjustedPosition.value = next
+      }
+    }
 
     const placeTooltip = () => {
       const node = tooltipRef.value
@@ -78,15 +86,33 @@ export const ChartTooltip = defineComponent({
       (_value, _oldValue, onCleanup) => {
         if (!props.open || !isBrowser()) return
 
-        adjustedPosition.value = placeTooltip()
+        writePosition(placeTooltip())
 
         const frameHandle = requestAnimationFrame(() => {
           if (!tooltipRef.value) return
-          adjustedPosition.value = placeTooltip()
+          writePosition(placeTooltip())
         })
         onCleanup(() => cancelAnimationFrame(frameHandle))
       },
       { immediate: true }
+    )
+
+    // Re-place when the tooltip's real border box changes, including slot
+    // content that resizes itself without prop or children identity changes.
+    // The observer follows the tooltip node itself: it may appear, be
+    // replaced, or disappear while open stays true.
+    watch(
+      () => [tooltipRef.value, props.open] as const,
+      () => {
+        stopTooltipSize?.()
+        stopTooltipSize = undefined
+        if (!props.open || !isBrowser()) return
+        stopTooltipSize = observeElementSize(tooltipRef.value, () => {
+          if (!props.open) return
+          writePosition(placeTooltip())
+        })
+      },
+      { immediate: true, flush: 'post' }
     )
 
     watch(
@@ -103,7 +129,10 @@ export const ChartTooltip = defineComponent({
       },
       { immediate: true }
     )
-    onBeforeUnmount(() => releaseEscape?.())
+    onBeforeUnmount(() => {
+      releaseEscape?.()
+      stopTooltipSize?.()
+    })
 
     const tooltipClasses = computed(() =>
       classNames(chartTooltipBaseClasses, coerceClassValue(attrs.class), props.className)

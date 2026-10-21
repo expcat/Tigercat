@@ -1,4 +1,13 @@
-import { computed, defineComponent, h, onBeforeUnmount, PropType, ref } from 'vue'
+import {
+  computed,
+  defineComponent,
+  h,
+  onBeforeUnmount,
+  PropType,
+  ref,
+  shallowRef,
+  watch
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -10,6 +19,7 @@ import {
   isGanttMilestone,
   ganttAxisTextClasses,
   ganttDateValuesEqual,
+  normalizeGanttDate,
   ganttDependencyClasses,
   ganttLabelClasses,
   ganttProgressClasses,
@@ -45,6 +55,8 @@ interface GanttBarDragSession {
   scale: number
   task: GanttLayoutTask
   sourceTask: GanttTask
+  sourceStartMs: number
+  sourceEndMs: number
   barX: number
   barWidth: number
   taskLabelWidth: number
@@ -129,7 +141,9 @@ export const Gantt = defineComponent({
     const labels = computed(() => getChartLabels(mergedLocale.value, props.labels))
     const innerSelectedId = ref<string | number | null>(null)
     const hoveredId = ref<string | number | null>(null)
-    const dragSession = ref<GanttBarDragSession | null>(null)
+    // shallowRef keeps sourceTask identity comparable to plain (non-reactive)
+    // props items; a deep ref would wrap them in reactive proxies.
+    const dragSession = shallowRef<GanttBarDragSession | null>(null)
     const dragPreview = ref<{ id: string | number; deltaX: number } | null>(null)
     let documentPointerListening = false
     let suppressClick = false
@@ -224,9 +238,37 @@ export const Gantt = defineComponent({
       }
     }
 
+    // A session goes stale when dragging is turned off or the source task
+    // was replaced, removed, disabled, or had its dates rewritten mid-drag;
+    // never let it overwrite current data with the old snapshot.
+    const isBarDragStale = (session: GanttBarDragSession): boolean => {
+      const currentTask = props.data.find((item) => item.id === session.sourceTask.id)
+      return (
+        !canDrag.value ||
+        !currentTask ||
+        currentTask !== session.sourceTask ||
+        currentTask.disabled === true ||
+        normalizeGanttDate(currentTask.start) !== session.sourceStartMs ||
+        normalizeGanttDate(currentTask.end) !== session.sourceEndMs
+      )
+    }
+
+    const cancelBarDrag = (session: GanttBarDragSession) => {
+      dragSession.value = null
+      dragPreview.value = null
+      detachDocumentPointerListeners()
+      releaseBarPointer(session.captureTarget, session.pointerId)
+    }
+
     const moveBarDrag = (event: PointerEvent) => {
       const session = dragSession.value
       if (!session || event.pointerId !== session.pointerId) return
+      // Mutations without reactive notification (e.g. an in-place Date
+      // rewrite) surface here at the latest instead of committing later.
+      if (isBarDragStale(session)) {
+        cancelBarDrag(session)
+        return
+      }
       const rawDelta = (event.clientX - session.startClientX) * session.scale
       const deltaX = clampGanttDragDeltaX(
         rawDelta,
@@ -242,7 +284,14 @@ export const Gantt = defineComponent({
     const finishBarDrag = (event: PointerEvent) => {
       const session = dragSession.value
       if (!session || event.pointerId !== session.pointerId) return
+      // pointercancel only discards the session; it never commits.
+      if (event.type === 'pointercancel') {
+        cancelBarDrag(session)
+        return
+      }
       moveBarDrag(event)
+      // The move above cancels the session when it detects staleness.
+      if (dragSession.value === null) return
       const deltaX = session.deltaX
       dragSession.value = null
       dragPreview.value = null
@@ -254,6 +303,8 @@ export const Gantt = defineComponent({
         selectTask(session.task)
         return
       }
+
+      if (isBarDragStale(session)) return
 
       const nextTask = moveGanttTaskByPx(session.sourceTask, deltaX, {
         minMs: session.minMs,
@@ -309,6 +360,10 @@ export const Gantt = defineComponent({
         scale: pointerScale(event),
         task,
         sourceTask: task.task,
+        // Immutable ms snapshots: an in-place Date mutation of the caller's
+        // task object must still invalidate this session.
+        sourceStartMs: normalizeGanttDate(task.task.start),
+        sourceEndMs: normalizeGanttDate(task.task.end),
         barX: task.x,
         barWidth: task.width,
         taskLabelWidth: props.taskLabelWidth,
@@ -333,6 +388,22 @@ export const Gantt = defineComponent({
       }
       selectTask(task)
     }
+
+    // Cancel the active session as soon as tracked state makes it stale:
+    // draggable toggled off, or the source task replaced/removed/disabled/
+    // rewritten through reactive data. The getter tracks exactly the inputs
+    // of isBarDragStale (identity, disabled, start/end), not layout output,
+    // so an in-place disabled=true on a reactive task is caught too.
+    watch(
+      () => {
+        const session = dragSession.value
+        return session !== null && isBarDragStale(session)
+      },
+      (stale) => {
+        const session = dragSession.value
+        if (stale && session) cancelBarDrag(session)
+      }
+    )
 
     onBeforeUnmount(() => {
       detachDocumentPointerListeners()

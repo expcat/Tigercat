@@ -80,6 +80,21 @@ describe('SunburstChart (Vue)', () => {
     expect(container.querySelector('[data-legend-hidden="true"]')).toBeTruthy()
   })
 
+  it('maps legend selection state by preorder arc index for nested roots', () => {
+    // pagesData preorder: 亚洲=0, 中国=1, 日本=2, 印度=3, 欧洲=4, ..., 美洲=8
+    const { container } = renderWithProps(SunburstChart, {
+      data: pagesData,
+      showLegend: true,
+      selectable: true,
+      selectedIndex: 4,
+      ...defaultSize
+    })
+    const legendButtons = container.querySelectorAll('[data-legend-item]')
+    expect(legendButtons[0].getAttribute('aria-pressed')).toBe('false')
+    expect(legendButtons[1].getAttribute('aria-pressed')).toBe('true')
+    expect(legendButtons[2].getAttribute('aria-pressed')).toBe('false')
+  })
+
   it('applies className on the outer wrapper', () => {
     const { container } = renderWithProps(SunburstChart, {
       data: sampleData,

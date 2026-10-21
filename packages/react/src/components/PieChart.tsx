@@ -234,7 +234,15 @@ export const PieChart: React.FC<PieChartProps> = ({
 
         isHidden: (index) => isLegendIndexHidden(index)
       }),
-    [slices, legendFormatter, palette, activeIndex, resolvedSelectedIndex, sliceName]
+    [
+      slices,
+      legendFormatter,
+      palette,
+      activeIndex,
+      resolvedSelectedIndex,
+      sliceName,
+      isLegendIndexHidden
+    ]
   )
 
   const tooltipContent = useMemo(
@@ -319,10 +327,14 @@ export const PieChart: React.FC<PieChartProps> = ({
             <path
               d={slice.path}
               fill={slice.fill}
-              opacity={getChartElementOpacity(slice.index, activeIndex, {
-                activeOpacity,
-                inactiveOpacity
-              })}
+              opacity={
+                isLegendIndexHidden(slice.index)
+                  ? 0
+                  : getChartElementOpacity(slice.index, activeIndex, {
+                      activeOpacity,
+                      inactiveOpacity
+                    })
+              }
               stroke={borderColor}
               strokeWidth={borderWidth}
               strokeLinejoin="round"
@@ -357,7 +369,10 @@ export const PieChart: React.FC<PieChartProps> = ({
             ? labelFormatter(slice.value, slice.datum, slice.index)
             : `${sliceName(slice.datum, slice.index)} ${slice.percent.toFixed(1)}%`
           return (
-            <g key={`label-group-${slice.index}`} aria-hidden={interactive ? true : undefined}>
+            <g
+              key={`label-group-${slice.index}`}
+              opacity={isLegendIndexHidden(slice.index) ? 0 : undefined}
+              aria-hidden={interactive ? true : undefined}>
               <polyline
                 points={slice.outside?.points}
                 fill="none"
@@ -387,6 +402,7 @@ export const PieChart: React.FC<PieChartProps> = ({
               key={`label-${slice.index}`}
               x={slice.labelX}
               y={slice.labelY}
+              opacity={isLegendIndexHidden(slice.index) ? 0 : undefined}
               className={pieSliceLabelInsideClasses}
               fill={slice.labelFill}
               textAnchor="middle"

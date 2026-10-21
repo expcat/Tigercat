@@ -198,6 +198,48 @@ describe('layoutAreaSeries', () => {
     const reversedLowerTop = reverseSvgPath(laidOut[0].linePath).replace(/^M/, 'L')
     expect(laidOut[1].areaPath).toContain(reversedLowerTop)
   })
+
+  it('keeps only real datums as interactive points in sparse stacks', () => {
+    const xScale = createPointScale(['A', 'B', 'C'], [0, 100], { padding: 0 })
+    const yScale = createLinearScale([0, 20], [100, 0])
+    const series = [
+      {
+        data: [
+          { x: 'A', y: 4 },
+          { x: 'B', y: 8 },
+          { x: 'C', y: 3 }
+        ]
+      },
+      {
+        data: [
+          { x: 'A', y: 2 },
+          { x: 'C', y: 6 }
+        ]
+      }
+    ]
+    const stacked = stackSeriesData(series.map((item) => item.data))
+    const laidOut = layoutAreaSeries(series, xScale, yScale, {
+      curve: 'linear',
+      palette: ['#111', '#222'],
+      activeIndex: null,
+      showArea: true,
+      areaOpacity: 0.2,
+      strokeWidth: 2,
+      showPoints: true,
+      pointSize: 4,
+      pointHollow: false,
+      stacked: true,
+      fillOpacity: 0.2,
+      stackedData: stacked
+    })
+
+    // Synthetic zero-fill slots align the band geometry but never become
+    // interactive points; pointIndex is the datum's original series index.
+    expect(laidOut[1].points).toHaveLength(2)
+    expect(laidOut[1].points[0].datum).toBe(series[1].data[0])
+    expect(laidOut[1].points[1].datum).toBe(series[1].data[1])
+    expect(laidOut[1].points.map((point) => point.pointIndex)).toEqual([0, 1])
+  })
 })
 
 describe('stackSeriesData', () => {

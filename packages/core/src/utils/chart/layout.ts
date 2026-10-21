@@ -565,17 +565,27 @@ export function layoutAreaSeries(
 
     if (options.stacked && options.stackedData) {
       const stackedSeries = options.stackedData[seriesIndex] ?? []
-      points = stackedSeries.map((sd, pointIndex) => ({
-        x: scaleX(xScale, sd.original.x as ChartScaleValue),
-        y: yScale.map(sd.y1),
-        datum: sd.original,
-        pointIndex
-      }))
-      const topPoints = points.map((p) => ({ x: p.x, y: p.y }))
-      const bottomPoints = stackedSeries.map((sd) => ({
-        x: scaleX(xScale, sd.original.x as ChartScaleValue),
-        y: yScale.map(sd.y0)
-      }))
+      // Zero-fill entries keep the band geometry aligned, but only datums that
+      // really exist in the series become interactive points. Synthetic
+      // zero-fill points never stand in for a real datum.
+      const sourceIndexByDatum = new Map<LineChartDatum, number>()
+      s.data.forEach((datum, sourceIndex) => {
+        if (!sourceIndexByDatum.has(datum)) sourceIndexByDatum.set(datum, sourceIndex)
+      })
+      const interactivePoints: LaidOutLinePoint[] = []
+      const topPoints: Array<{ x: number; y: number }> = []
+      const bottomPoints: Array<{ x: number; y: number }> = []
+      for (const sd of stackedSeries) {
+        const x = scaleX(xScale, sd.original.x as ChartScaleValue)
+        const topY = yScale.map(sd.y1)
+        topPoints.push({ x, y: topY })
+        bottomPoints.push({ x, y: yScale.map(sd.y0) })
+        const sourceIndex = sourceIndexByDatum.get(sd.original)
+        if (sourceIndex !== undefined) {
+          interactivePoints.push({ x, y: topY, datum: sd.original, pointIndex: sourceIndex })
+        }
+      }
+      points = interactivePoints
       areaPath = createStackedAreaPath(topPoints, bottomPoints, options.curve)
       linePath = createLinePath(topPoints, options.curve)
     } else {

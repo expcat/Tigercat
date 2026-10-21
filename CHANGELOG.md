@@ -40,6 +40,8 @@
 - **Countdown（Vue / React）**：按时间戳识别目标与 `now` 的变化，相同时间的 Date 对象替换不再重置计时；更新已过期目标保持归零，更新 `now` 快照不重启计时器。
 - **日期解析 / Cron（Core / Vue / React）**：显式 `format` 的日期解析拒绝夹杂非数字的分段，删除失败后回退原生宽松解析的路径。Cron 空白输入返回 `null`，编辑器不再抛异常；React CronEditor 保留其他字段未完成的局部编辑。`nextCronRun` 跳过不匹配的日期和小时，覆盖世纪闰日间隔，返回时间严格晚于起点，并保留夏令时缺时与回拨后的调度语义。
 - **图表 Core 根因修复（Core）**：线性刻度按有限安全索引生成，跳过浮点重复值并避开 `toFixed` 精度越界；步长退化或索引无法安全枚举时使用域端点，`[0, 100]` 等普通域与缓存不变。`monotone` / `natural` 曲线在相邻数值 x 差为零或非有限时整条回退直线路径，不再输出 NaN / Infinity，严格变化 x 的样条不变。`layoutSankey` 列分配改为每节点至多处理一次的有限拓扑放松，正常 DAG 最长路径列不变，仍等待循环入边的节点共用无环最深列之后的一个余项列，布局必定终止。Sunburst / TreeMap 先用 `createChartTreeVisit` 一次解析有效子树再做深度、汇总与布局，回边与重复对象保留首次出现，自环与双节点环不再栈溢出或嵌套到几何耗尽。
+- **图表组件绘制与命中（Core / Vue / React）**：图例隐藏只影响绘制，对应系列的点、路径与数值标签透明为 0，DOM、键盘导航、域与总量保持不变；Sunburst / TreeMap 图例根项改用 preorder 节点索引映射 active / selected / hidden（修复第二根起选中态错位），祖先隐藏沿树传给后代；React 七处图例 memo 补齐真实依赖，焦点停留图例直接 Space 立即更新。排序 / 过滤 / ordinal 去重后的最近点命中按 `pointIndex` 映射回原始 datum，tooltip 与 point-hover 不再错指；堆叠 Area 的补零只服务几何，交互点 / 键盘 / tooltip 只含原始数据对象。Line / Area 的 `data-plot-hit` 改为无监听的背景层，hover 职责收拢到真实 plot 边界，恢复点与系列的真实 click 及冒泡，空白与填充上的最近点 hover 保留。
+- **图表交互与生命周期（Core / Vue / React）**：`observeElementSize` 改为按 border-box 观察（`observeSize` 保持 content-box 语义），双端 ChartTooltip 在内容自增宽或 padding 变化后重新定位，位置数值不变时不写状态，React 移除对每次新建 body 节点的 effect 依赖，关闭或卸载清理观察。Vue Cartesian 与双端 Radar 的帧扫描在卸载时取消。Gantt 拖拽会话在 draggable 关闭、任务禁用 / 移除 / 同 id 替换或日期重写时立即取消并清预览 / 监听 / 指针捕获，不再以旧快照覆盖新数据（Vue 会话改用 shallowRef 保持源任务身份可比），无通知的原地 Date 变异最迟在下一次 pointermove / finish 校验取消；正常拖拽与无关重渲染照常提交。React Gantt 键盘 roving 只遍历可用任务并在落点失效时恢复合法 Tab 入口；React OrgChart 对齐 Vue，每个可交互节点 `tabindex=0`。
 
 ## v3.0.0-rc.1（2026-10-05）
 

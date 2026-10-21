@@ -267,5 +267,42 @@ describe('Gantt', () => {
       expect(onTaskChange).not.toHaveBeenCalled()
       expect(Number(bar.querySelector('rect')?.getAttribute('x'))).toBe(startX)
     })
+
+    it('cancels an in-flight drag when the source task is disabled mid-drag', () => {
+      const onTaskChange = vi.fn()
+      const onDataChange = vi.fn()
+      const disabledData: GanttTask[] = [{ ...dragData[0], disabled: true }]
+      const { container, rerender } = render(
+        <Gantt
+          data={dragData}
+          draggable
+          minDate="2026-01-01"
+          maxDate="2026-01-31"
+          onTaskChange={onTaskChange}
+          onDataChange={onDataChange}
+        />
+      )
+      const bar = container.querySelector('[data-gantt-task-id="design"]') as SVGElement
+
+      fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+      fireEvent.pointerMove(document, { pointerId: 1, clientX: 240 })
+      expect(bar.getAttribute('transform')).toContain('translate')
+
+      rerender(
+        <Gantt
+          data={disabledData}
+          draggable
+          minDate="2026-01-01"
+          maxDate="2026-01-31"
+          onTaskChange={onTaskChange}
+          onDataChange={onDataChange}
+        />
+      )
+      expect(bar.getAttribute('transform')).toBeNull()
+
+      fireEvent.pointerUp(document, { pointerId: 1, clientX: 240 })
+      expect(onDataChange).not.toHaveBeenCalled()
+      expect(onTaskChange).not.toHaveBeenCalled()
+    })
   })
 })

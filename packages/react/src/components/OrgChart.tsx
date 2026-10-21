@@ -166,13 +166,7 @@ export function OrgChart({
                   className={getOrgChartNodeClasses(interactive, selected)}
                   opacity={getNodeOpacity(node)}
                   role={interactive ? 'button' : 'group'}
-                  tabIndex={
-                    interactive
-                      ? activeId === node.id || (activeId === null && node.index === 0)
-                        ? 0
-                        : -1
-                      : undefined
-                  }
+                  tabIndex={interactive ? 0 : undefined}
                   aria-label={getOrgChartNodeAriaLabel(node.node)}
                   onMouseEnter={() => setHoveredNode(node)}
                   onMouseLeave={() => setHoveredNode(null)}

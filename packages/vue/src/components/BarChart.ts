@@ -439,7 +439,7 @@ export const BarChart = defineComponent({
                   'text-anchor': 'middle',
                   'dominant-baseline': isInside ? 'central' : bar.negative ? 'hanging' : 'auto',
                   class: isInside ? barValueLabelInsideClasses : barValueLabelClasses,
-                  opacity: bar.opacity,
+                  opacity: isLegendIndexHidden(0) ? 0 : bar.opacity,
                   'data-value-label': ''
                 },
                 labelText

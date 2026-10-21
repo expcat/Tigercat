@@ -152,12 +152,22 @@ export const TreeMapChart = defineComponent({
         palette: palette.value,
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
+        getIndex: (_d, i) => roots.value[i]?.index ?? i,
         getLabel: (d) => d.label,
-        getColor: (_d, i) => roots.value[i]?.color ?? palette.value[i % palette.value.length],
+        getColor: (_d, i) => nodes.value[i]?.color ?? palette.value[i % palette.value.length],
 
         isHidden: (index) => isLegendIndexHidden(index)
-      }).map((item, i) => ({ ...item, index: roots.value[i]?.index ?? item.index }))
+      })
     )
+    // Legend toggles only list root nodes; a hidden root hides its descendants.
+    const isNodeHidden = (node: (typeof nodes.value)[number]): boolean => {
+      let current: (typeof nodes.value)[number] | null = node
+      while (current) {
+        if (isLegendIndexHidden(current.index)) return true
+        current = current.parentIndex === null ? null : (nodes.value[current.parentIndex] ?? null)
+      }
+      return false
+    }
     const tooltipContent = computed(() => {
       if (resolvedHoveredIndex.value === null) return ''
       const node = nodes.value[resolvedHoveredIndex.value]
@@ -246,10 +256,12 @@ export const TreeMapChart = defineComponent({
               'g',
               { 'data-series-type': 'treemap' },
               current.flatMap((node, visualIndex) => {
-                const opacity = getChartElementOpacity(node.index, activeIndex.value, {
-                  activeOpacity: props.activeOpacity,
-                  inactiveOpacity: props.inactiveOpacity
-                })
+                const opacity = isNodeHidden(node)
+                  ? 0
+                  : getChartElementOpacity(node.index, activeIndex.value, {
+                      activeOpacity: props.activeOpacity,
+                      inactiveOpacity: props.inactiveOpacity
+                    })
                 const percent =
                   rootTotal.value > 0 ? ((node.value / rootTotal.value) * 100).toFixed(1) : '0'
                 const ariaLabel = formatChartTemplate(labels.value.treemapTooltip, {
@@ -297,6 +309,7 @@ export const TreeMapChart = defineComponent({
                         key: `label-${node.index}`,
                         x: node.x + node.w / 2,
                         y: node.y + Math.min(14, node.h / 2),
+                        opacity: isNodeHidden(node) ? 0 : undefined,
                         fill: node.labelFill,
                         class: 'pointer-events-none select-none',
                         'text-anchor': 'middle',

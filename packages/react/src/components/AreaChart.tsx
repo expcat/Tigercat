@@ -303,7 +303,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       palette,
       activeIndex,
       resolvedSelectedIndex,
-      labels.seriesName
+      labels.seriesName,
+      isLegendIndexHidden
     ]
   )
 
@@ -444,151 +445,161 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           label={yAxisLabel}
         />
       )}
-      {reversedSeriesData.map((sd) => {
-        const canAnimateStroke = animated && !sd.strokeDasharray
-        return (
-          <ChartSeries
-            key={sd.seriesKey}
-            data={sd.series.data}
-            name={sd.series.name}
-            type="area"
-            opacity={sd.opacity}
-            data-series-key={sd.seriesKey}
-            className={classNames(
-              sd.series.className,
-              (hoverable || selectable) && 'cursor-pointer',
-              'outline-none'
-            )}
-            onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
-            onMouseLeave={handleSeriesHoverLeave}
-            onClick={() => handleSeriesSelect(sd.seriesIndex)}>
-            <path
-              d={sd.areaPath}
-              fill={gradient ? `url(#${gradientPrefix}-${sd.seriesKey})` : sd.fillColor}
-              fillOpacity={gradient ? 1 : sd.fillOpacity}
-              stroke="none"
-              className="transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]"
-              data-area-series={sd.seriesIndex}
+      {/* Plot group owns nearest-point hover; the transparent rect is a
+          background layer under fills/lines/points so their pointer and click
+          events reach their real targets and bubble up here. */}
+      <g
+        onMouseMove={trackPointHover ? handlePlotMouseMove : undefined}
+        onMouseLeave={trackPointHover ? handlePointMouseLeave : undefined}>
+        {trackPointHover ? (
+          <rect
+            width={innerRect.width}
+            height={innerRect.height}
+            fill="transparent"
+            data-plot-hit=""
+          />
+        ) : null}
+        {reversedSeriesData.map((sd) => {
+          const canAnimateStroke = animated && !sd.strokeDasharray
+          return (
+            <ChartSeries
+              key={sd.seriesKey}
+              data={sd.series.data}
+              name={sd.series.name}
+              type="area"
+              opacity={isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity}
               data-series-key={sd.seriesKey}
-            />
-            <path
-              d={sd.linePath}
-              fill="none"
-              stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})` : sd.color}
-              strokeWidth={sd.strokeWidth}
-              strokeDasharray={sd.strokeDasharray}
-              strokeDashoffset={canAnimateStroke ? '1' : undefined}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              pathLength={canAnimateStroke ? 1 : undefined}
               className={classNames(
-                canAnimateStroke
-                  ? AREA_DRAW_CLASS
-                  : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
+                sd.series.className,
+                (hoverable || selectable) && 'cursor-pointer',
+                'outline-none'
               )}
-            />
-          </ChartSeries>
-        )
-      })}
-      {/* Layer 2: data points on top of all areas (prevents coverage) */}
-      {seriesData.map(
-        (sd) =>
-          sd.showPoints && (
-            <g key={`points-${sd.seriesKey}`} opacity={sd.opacity} data-series-key={sd.seriesKey}>
-              {sd.points.map((point) => {
-                const isHovered =
-                  hoveredPointInfo?.seriesIndex === sd.seriesIndex &&
-                  hoveredPointInfo?.pointIndex === point.pointIndex
-                const hoverSize = sd.pointSize + 2
-                const datum = point.datum
-                const pointInteractive = hoverable || selectable || pointClickable
-                return (
-                  <circle
-                    key={`point-${sd.seriesKey}-${point.pointIndex}`}
-                    cx={point.x}
-                    cy={point.y}
-                    r={isHovered ? hoverSize : sd.pointSize}
-                    fill={
-                      sd.pointHollow
-                        ? CHART_SURFACE_FILL
-                        : pointGradient
-                          ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
-                          : sd.pointColor
-                    }
-                    stroke={sd.pointHollow ? sd.pointColor : 'none'}
-                    strokeWidth={sd.pointHollow ? 2 : 0}
-                    className={classNames(
-                      animated ? linePointTransitionClasses : undefined,
-                      pointInteractive && 'cursor-pointer'
-                    )}
-                    style={isHovered ? chartHoverShadowStyle(sd.color) : undefined}
-                    role={pointInteractive ? 'button' : undefined}
-                    aria-hidden={pointInteractive ? undefined : true}
-                    aria-label={
-                      pointInteractive
-                        ? (datum?.label ??
-                          formatChartTemplate(labels.pointAriaLabel, {
-                            index: point.pointIndex + 1,
-                            x: String(datum?.x ?? ''),
-                            y: String(datum?.y ?? '')
-                          }))
-                        : undefined
-                    }
-                    tabIndex={
-                      pointInteractive
-                        ? chartPointTabIndex(
-                            sd.seriesIndex,
-                            point.pointIndex,
-                            hoveredPointInfo,
-                            flatPoints
-                          )
-                        : undefined
-                    }
-                    data-point-index={point.pointIndex}
-                    data-series-key={sd.seriesKey}
-                    onMouseEnter={
-                      trackPointHover
-                        ? (e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
-                        : undefined
-                    }
-                    onMouseMove={trackPointHover ? handlePointMouseMove : undefined}
-                    onMouseLeave={trackPointHover ? handlePointMouseLeave : undefined}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handlePointClick(sd.seriesIndex, point.pointIndex)
-                    }}
-                    onFocus={
-                      trackPointHover
-                        ? (e) =>
-                            showPointTooltipFromElement(
-                              e.currentTarget,
-                              sd.seriesIndex,
-                              point.pointIndex
-                            )
-                        : undefined
-                    }
-                    onBlur={trackPointHover ? handlePointMouseLeave : undefined}
-                    onKeyDown={
-                      pointInteractive
-                        ? (e) => handlePointKeydown(e, sd.seriesIndex, point.pointIndex)
-                        : undefined
-                    }
-                  />
-                )
-              })}
-            </g>
+              onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
+              onMouseLeave={handleSeriesHoverLeave}
+              onClick={() => handleSeriesSelect(sd.seriesIndex)}>
+              <path
+                d={sd.areaPath}
+                fill={gradient ? `url(#${gradientPrefix}-${sd.seriesKey})` : sd.fillColor}
+                fillOpacity={gradient ? 1 : sd.fillOpacity}
+                stroke="none"
+                className="transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]"
+                data-area-series={sd.seriesIndex}
+                data-series-key={sd.seriesKey}
+              />
+              <path
+                d={sd.linePath}
+                fill="none"
+                stroke={
+                  strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})` : sd.color
+                }
+                strokeWidth={sd.strokeWidth}
+                strokeDasharray={sd.strokeDasharray}
+                strokeDashoffset={canAnimateStroke ? '1' : undefined}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                pathLength={canAnimateStroke ? 1 : undefined}
+                className={classNames(
+                  canAnimateStroke
+                    ? AREA_DRAW_CLASS
+                    : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
+                )}
+              />
+            </ChartSeries>
           )
-      )}
-      {trackPointHover ? (
-        <rect
-          width={innerRect.width}
-          height={innerRect.height}
-          fill="transparent"
-          data-plot-hit=""
-          onMouseMove={handlePlotMouseMove}
-          onMouseLeave={handlePointMouseLeave}
-        />
-      ) : null}
+        })}
+        {/* Layer 2: data points on top of all areas (prevents coverage) */}
+        {seriesData.map(
+          (sd) =>
+            sd.showPoints && (
+              <g
+                key={`points-${sd.seriesKey}`}
+                opacity={isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity}
+                data-series-key={sd.seriesKey}>
+                {sd.points.map((point) => {
+                  const isHovered =
+                    hoveredPointInfo?.seriesIndex === sd.seriesIndex &&
+                    hoveredPointInfo?.pointIndex === point.pointIndex
+                  const hoverSize = sd.pointSize + 2
+                  const datum = point.datum
+                  const pointInteractive = hoverable || selectable || pointClickable
+                  return (
+                    <circle
+                      key={`point-${sd.seriesKey}-${point.pointIndex}`}
+                      cx={point.x}
+                      cy={point.y}
+                      r={isHovered ? hoverSize : sd.pointSize}
+                      fill={
+                        sd.pointHollow
+                          ? CHART_SURFACE_FILL
+                          : pointGradient
+                            ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
+                            : sd.pointColor
+                      }
+                      stroke={sd.pointHollow ? sd.pointColor : 'none'}
+                      strokeWidth={sd.pointHollow ? 2 : 0}
+                      className={classNames(
+                        animated ? linePointTransitionClasses : undefined,
+                        pointInteractive && 'cursor-pointer'
+                      )}
+                      style={isHovered ? chartHoverShadowStyle(sd.color) : undefined}
+                      role={pointInteractive ? 'button' : undefined}
+                      aria-hidden={pointInteractive ? undefined : true}
+                      aria-label={
+                        pointInteractive
+                          ? (datum?.label ??
+                            formatChartTemplate(labels.pointAriaLabel, {
+                              index: point.pointIndex + 1,
+                              x: String(datum?.x ?? ''),
+                              y: String(datum?.y ?? '')
+                            }))
+                          : undefined
+                      }
+                      tabIndex={
+                        pointInteractive
+                          ? chartPointTabIndex(
+                              sd.seriesIndex,
+                              point.pointIndex,
+                              hoveredPointInfo,
+                              flatPoints
+                            )
+                          : undefined
+                      }
+                      data-point-index={point.pointIndex}
+                      data-series-key={sd.seriesKey}
+                      onMouseEnter={
+                        trackPointHover
+                          ? (e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
+                          : undefined
+                      }
+                      onMouseMove={trackPointHover ? handlePointMouseMove : undefined}
+                      onMouseLeave={trackPointHover ? handlePointMouseLeave : undefined}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handlePointClick(sd.seriesIndex, point.pointIndex)
+                      }}
+                      onFocus={
+                        trackPointHover
+                          ? (e) =>
+                              showPointTooltipFromElement(
+                                e.currentTarget,
+                                sd.seriesIndex,
+                                point.pointIndex
+                              )
+                          : undefined
+                      }
+                      onBlur={trackPointHover ? handlePointMouseLeave : undefined}
+                      onKeyDown={
+                        pointInteractive
+                          ? (e) => handlePointKeydown(e, sd.seriesIndex, point.pointIndex)
+                          : undefined
+                      }
+                    />
+                  )
+                })}
+              </g>
+            )
+        )}
+      </g>
     </ChartCanvas>
   )
 

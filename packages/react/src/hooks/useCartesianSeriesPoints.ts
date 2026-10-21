@@ -14,7 +14,7 @@ export interface UseCartesianSeriesPointsOptions<T> {
   showTooltip: boolean
   hoverable: boolean
   innerRect: { width: number; height: number }
-  getSeriesPoints: () => Array<{ points: Array<{ x: number; y: number }> }>
+  getSeriesPoints: () => Array<{ points: Array<{ x: number; y: number; pointIndex: number }> }>
   getDatum: (seriesIndex: number, pointIndex: number) => T | undefined
   getSeriesKeys: () => string[]
   getFlatPoints: () => ChartPointRef[]
@@ -43,19 +43,24 @@ export function useCartesianSeriesPoints<T>({
     createChartFrameCoalescer<{ x: number; y: number; clientX: number; clientY: number }>({
       onFrame: (sample) => {
         const current = scanRef.current
+        const laidOutSeries = current.getSeriesPoints()
         const nearest = findNearestSeriesPoint(
-          current.getSeriesPoints().map((sd) => sd.points),
+          laidOutSeries.map((sd) => sd.points),
           sample.x,
           sample.y
         )
         if (!nearest) return
-        setHoveredPointInfo(nearest)
+        // The scan position indexes the laid-out point array; map it back to
+        // the original data index carried by the laid-out point.
+        const point = laidOutSeries[nearest.seriesIndex]?.points[nearest.pointIndex]
+        if (!point) return
+        setHoveredPointInfo({ seriesIndex: nearest.seriesIndex, pointIndex: point.pointIndex })
         setTooltipPosition({ x: sample.clientX, y: sample.clientY })
         if (current.hoverable) {
           current.onPointHover?.(
             nearest.seriesIndex,
-            nearest.pointIndex,
-            current.getDatum(nearest.seriesIndex, nearest.pointIndex) ?? null
+            point.pointIndex,
+            current.getDatum(nearest.seriesIndex, point.pointIndex) ?? null
           )
         }
       }
@@ -101,12 +106,15 @@ export function useCartesianSeriesPoints<T>({
   )
 
   const handlePlotMouseMove = useCallback(
-    (event: React.MouseEvent<SVGRectElement>) => {
+    (event: React.MouseEvent<SVGElement>) => {
       if (!trackHover) return
+      // Anchor the coordinate mapping to the background hit rect (the exact
+      // plot area); the handler itself lives on the plot group so marks bubble.
+      const anchor = event.currentTarget.querySelector('[data-plot-hit]') ?? event.currentTarget
       const mapped = mapPointerToPlotPoint(
         event.clientX,
         event.clientY,
-        event.currentTarget.getBoundingClientRect(),
+        anchor.getBoundingClientRect(),
         innerRect
       )
       if (!mapped) return

@@ -157,13 +157,23 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
+        getIndex: (_d, i) => roots[i]?.index ?? i,
         getLabel: (d) => d.label,
-        getColor: (_d, i) => roots[i]?.color ?? palette[i % palette.length],
+        getColor: (_d, i) => nodes[i]?.color ?? palette[i % palette.length],
 
         isHidden: (index) => isLegendIndexHidden(index)
-      }).map((item, i) => ({ ...item, index: roots[i]?.index ?? item.index })),
-    [roots, palette, activeIndex, resolvedSelectedIndex]
+      }),
+    [roots, nodes, palette, activeIndex, resolvedSelectedIndex, isLegendIndexHidden]
   )
+  // Legend toggles only list root nodes; a hidden root hides its descendants.
+  const isNodeHidden = (node: (typeof nodes)[number]): boolean => {
+    let current: (typeof nodes)[number] | null = node
+    while (current) {
+      if (isLegendIndexHidden(current.index)) return true
+      current = current.parentIndex === null ? null : (nodes[current.parentIndex] ?? null)
+    }
+    return false
+  }
   const tooltipContent = useMemo(() => {
     if (resolvedHoveredIndex === null) return ''
     const node = nodes[resolvedHoveredIndex]
@@ -227,10 +237,12 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
       </defs>
       <g data-series-type="treemap">
         {nodes.map((node, visualIndex) => {
-          const opacity = getChartElementOpacity(node.index, activeIndex, {
-            activeOpacity,
-            inactiveOpacity
-          })
+          const opacity = isNodeHidden(node)
+            ? 0
+            : getChartElementOpacity(node.index, activeIndex, {
+                activeOpacity,
+                inactiveOpacity
+              })
           const percent = rootTotal > 0 ? ((node.value / rootTotal) * 100).toFixed(1) : '0'
           const ariaLabel = formatChartTemplate(labels.treemapTooltip, {
             label: node.label,
@@ -272,6 +284,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                 <text
                   x={node.x + node.w / 2}
                   y={node.y + Math.min(14, node.h / 2)}
+                  opacity={isNodeHidden(node) ? 0 : undefined}
                   fill={node.labelFill}
                   className="pointer-events-none select-none"
                   textAnchor="middle"

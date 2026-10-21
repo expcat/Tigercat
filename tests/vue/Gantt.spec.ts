@@ -4,6 +4,7 @@
 
 import { fireEvent, render } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
+import { nextTick, reactive } from 'vue'
 import { Gantt } from '@expcat/tigercat-vue/Gantt'
 import type { GanttTask } from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -212,6 +213,28 @@ describe('Gantt', () => {
       expect(emitted()['update:data']).toBeUndefined()
       expect(emitted()['task-change']).toBeUndefined()
       expect(Number(bar.querySelector('rect')?.getAttribute('x'))).toBe(startX)
+    })
+
+    it('cancels an in-flight drag when the source task is disabled mid-drag', async () => {
+      const reactiveData = reactive<GanttTask[]>([
+        { id: 'design', label: 'Design', start: '2026-01-01', end: '2026-01-05' }
+      ])
+      const { container, emitted } = render(Gantt, {
+        props: { ...dragProps, data: reactiveData }
+      })
+      const bar = container.querySelector('[data-gantt-task-id="design"]') as SVGElement
+
+      await fireEvent.pointerDown(bar, { pointerId: 1, clientX: 200, button: 0 })
+      await fireEvent.pointerMove(document, { pointerId: 1, clientX: 240 })
+      expect(bar.getAttribute('transform')).toContain('translate')
+
+      reactiveData[0].disabled = true
+      await nextTick()
+      expect(bar.getAttribute('transform')).toBeNull()
+
+      await fireEvent.pointerUp(document, { pointerId: 1, clientX: 240 })
+      expect(emitted()['update:data']).toBeUndefined()
+      expect(emitted()['task-change']).toBeUndefined()
     })
   })
 })

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo, useId } from 'react'
+import React, { useRef, useEffect, useState, useMemo, useCallback, useId } from 'react'
 import {
   classNames,
   chartTooltipBaseClasses,
@@ -7,6 +7,7 @@ import {
   getChartTooltipTransform,
   isBrowser,
   mapChartTooltipPointToDocument,
+  observeElementSize,
   registerEscapeDismiss,
   resolveChartTooltipPosition
 } from '@expcat/tigercat-core'
@@ -34,6 +35,13 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   children
 }) => {
   const tooltipRef = useRef<HTMLDivElement>(null)
+  // Track the real tooltip node: it may appear, be replaced, or disappear
+  // while open stays true, and the size observer must follow it.
+  const [tooltipNode, setTooltipNode] = useState<HTMLDivElement | null>(null)
+  const bindTooltipRef = useCallback((node: HTMLDivElement | null) => {
+    tooltipRef.current = node
+    setTooltipNode(node)
+  }, [])
   const { anchorRef, target } = useOverlayPortalTarget()
   const [adjustedPosition, setAdjustedPosition] = useState({ x, y })
   const [mounted, setMounted] = useState(false)
@@ -52,31 +60,53 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
       content
     ))
 
+  const place = useCallback(() => {
+    const node = tooltipRef.current
+    const host = node?.ownerDocument ?? target?.ownerDocument ?? document
+    const point = mapChartTooltipPointToDocument({ x, y }, document, host)
+    const rect = node ? node.getBoundingClientRect() : { width: 0, height: 0 }
+    return resolveChartTooltipPosition({
+      x: point.x,
+      y: point.y,
+      rect,
+      viewport: chartTooltipViewport(host)
+    })
+  }, [x, y, target])
+
+  // Skip state writes (and the render they would schedule) when the resolved
+  // position is unchanged; multi-line bodies used to loop through new element
+  // identities and unbounded setState.
+  const writePosition = useCallback(
+    (write: (prev: { x: number; y: number }) => { x: number; y: number }) => {
+      setAdjustedPosition((prev) => {
+        const next = write(prev)
+        return prev.x === next.x && prev.y === next.y ? prev : next
+      })
+    },
+    []
+  )
+
   useEffect(() => {
     if (!open || !isBrowser()) return
 
-    const place = () => {
-      const node = tooltipRef.current
-      const host = node?.ownerDocument ?? target?.ownerDocument ?? document
-      const point = mapChartTooltipPointToDocument({ x, y }, document, host)
-      const rect = node ? node.getBoundingClientRect() : { width: 0, height: 0 }
-      return resolveChartTooltipPosition({
-        x: point.x,
-        y: point.y,
-        rect,
-        viewport: chartTooltipViewport(host)
-      })
-    }
-
-    setAdjustedPosition(place())
+    writePosition(() => place())
 
     const frameHandle = requestAnimationFrame(() => {
       if (!tooltipRef.current) return
-      setAdjustedPosition(place())
+      writePosition(() => place())
     })
 
     return () => cancelAnimationFrame(frameHandle)
-  }, [x, y, open, body, mounted, target])
+  }, [open, mounted, place, writePosition])
+
+  // Re-place when the tooltip's real border box changes, including children
+  // that resize themselves without prop or children identity changes.
+  useEffect(() => {
+    if (!open || !isBrowser() || !tooltipNode) return undefined
+    return observeElementSize(tooltipNode, () => {
+      writePosition(() => place())
+    })
+  }, [open, tooltipNode, place, writePosition])
 
   const tooltipClasses = useMemo(() => classNames(chartTooltipBaseClasses, className), [className])
 
@@ -95,7 +125,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
       {open && body
         ? renderOverlayPortal(
             <div
-              ref={tooltipRef}
+              ref={bindTooltipRef}
               id={tooltipId}
               className={tooltipClasses}
               style={{

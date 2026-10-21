@@ -249,10 +249,12 @@ export const FunnelChart = defineComponent({
                   key: `seg-${seg.index}`,
                   d: seg.path,
                   fill: props.gradient ? `url(#${gradientPrefix}-${seg.index})` : seg.color,
-                  opacity: getChartElementOpacity(seg.index, activeIndex.value, {
-                    activeOpacity: props.activeOpacity,
-                    inactiveOpacity: props.inactiveOpacity
-                  }),
+                  opacity: isLegendIndexHidden(seg.index)
+                    ? 0
+                    : getChartElementOpacity(seg.index, activeIndex.value, {
+                        activeOpacity: props.activeOpacity,
+                        inactiveOpacity: props.inactiveOpacity
+                      }),
                   class: classNames(
                     interactive.value && 'cursor-pointer',
                     funnelSegmentTransitionClasses
@@ -295,6 +297,7 @@ export const FunnelChart = defineComponent({
                       key: `label-${seg.index}`,
                       x: seg.cx,
                       y: seg.cy,
+                      opacity: isLegendIndexHidden(seg.index) ? 0 : undefined,
                       class: pieSliceLabelInsideClasses,
                       'text-anchor': 'middle',
                       'dominant-baseline': 'middle',

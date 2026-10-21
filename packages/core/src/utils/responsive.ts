@@ -127,7 +127,14 @@ export function observeElementSize(
     })
   }
   emit()
-  return observeSize(element, () => emit())
+  let stopped = false
+  const observer = new ResizeObserver(() => emit())
+  observer.observe(element, { box: 'border-box' })
+  return () => {
+    if (stopped) return
+    stopped = true
+    observer.disconnect()
+  }
 }
 
 function smallestDefinedResponsive<T>(

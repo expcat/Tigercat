@@ -154,15 +154,14 @@ export const SunburstChart = defineComponent({
         palette: palette.value,
         activeIndex: activeIndex.value,
         selectedIndex: resolvedSelectedIndex.value,
+        // Legend items address root arcs by their preorder arc index so
+        // active/selected/hidden comparisons match arc-level indices.
+        getIndex: (_d, i) => roots.value[i]?.index ?? i,
         getLabel: (d) => d.label,
-        getColor: (_d, i) => roots.value[i]?.color ?? palette.value[i % palette.value.length],
+        getColor: (_d, i) => arcs.value[i]?.color ?? palette.value[i % palette.value.length],
 
         isHidden: (index) => isLegendIndexHidden(index)
-      }).map((item, i) => ({
-        ...item,
-        index: roots.value[i]?.index ?? item.index,
-        hidden: isLegendIndexHidden(roots.value[i]?.index ?? item.index)
-      }))
+      })
     )
     const tooltipContent = computed(() => {
       if (resolvedHoveredIndex.value === null) return ''
@@ -188,6 +187,16 @@ export const SunburstChart = defineComponent({
         return
       }
       handleKeyDown(event, index)
+    }
+
+    // Legend toggles only list root arcs; a hidden root hides its descendants.
+    const isArcHidden = (arc: (typeof arcs.value)[number]): boolean => {
+      let current: (typeof arcs.value)[number] | null = arc
+      while (current) {
+        if (isLegendIndexHidden(current.index)) return true
+        current = current.parentIndex === null ? null : (arcs.value[current.parentIndex] ?? null)
+      }
+      return false
     }
 
     return () => {
@@ -245,7 +254,7 @@ export const SunburstChart = defineComponent({
                   key: `arc-${arc.index}`,
                   d: arc.path,
                   fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color,
-                  opacity: isLegendIndexHidden(arc.index)
+                  opacity: isArcHidden(arc)
                     ? 0
                     : getChartElementOpacity(arc.index, activeIndex.value, {
                         activeOpacity: props.activeOpacity,
@@ -291,6 +300,7 @@ export const SunburstChart = defineComponent({
                           key: `label-${arc.index}`,
                           x: arc.labelX,
                           y: arc.labelY,
+                          opacity: isArcHidden(arc) ? 0 : undefined,
                           fill: arc.labelFill,
                           class: 'text-xs pointer-events-none select-none',
                           'text-anchor': 'middle',

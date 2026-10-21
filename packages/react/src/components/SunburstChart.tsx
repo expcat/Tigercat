@@ -151,16 +151,15 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
         palette,
         activeIndex,
         selectedIndex: resolvedSelectedIndex,
+        // Legend items address root arcs by their preorder arc index so
+        // active/selected/hidden comparisons match arc-level indices.
+        getIndex: (_d, i) => roots[i]?.index ?? i,
         getLabel: (d) => d.label,
-        getColor: (_d, i) => roots[i]?.color ?? palette[i % palette.length],
+        getColor: (_d, i) => arcs[i]?.color ?? palette[i % palette.length],
 
         isHidden: (index) => isLegendIndexHidden(index)
-      }).map((item, i) => ({
-        ...item,
-        index: roots[i]?.index ?? item.index,
-        hidden: isLegendIndexHidden(roots[i]?.index ?? item.index)
-      })),
-    [roots, palette, activeIndex, resolvedSelectedIndex, isLegendIndexHidden]
+      }),
+    [roots, arcs, palette, activeIndex, resolvedSelectedIndex, isLegendIndexHidden]
   )
   const tooltipContent = useMemo(() => {
     if (resolvedHoveredIndex === null) return ''
@@ -187,6 +186,16 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       return
     }
     handleKeyDown(event, index)
+  }
+
+  // Legend toggles only list root arcs; a hidden root hides its descendants.
+  const isArcHidden = (arc: (typeof arcs)[number]): boolean => {
+    let current: (typeof arcs)[number] | null = arc
+    while (current) {
+      if (isLegendIndexHidden(current.index)) return true
+      current = current.parentIndex === null ? null : (arcs[current.parentIndex] ?? null)
+    }
+    return false
   }
 
   const chart = (
@@ -217,7 +226,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       )}
       <g data-series-type="sunburst">
         {arcs.map((arc, visualIndex) => {
-          const opacity = isLegendIndexHidden(arc.index)
+          const opacity = isArcHidden(arc)
             ? 0
             : getChartElementOpacity(arc.index, activeIndex, {
                 activeOpacity,
@@ -264,6 +273,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
                   key={`label-${arc.index}`}
                   x={arc.labelX}
                   y={arc.labelY}
+                  opacity={isArcHidden(arc) ? 0 : undefined}
                   fill={arc.labelFill}
                   className="text-xs pointer-events-none select-none"
                   textAnchor="middle"

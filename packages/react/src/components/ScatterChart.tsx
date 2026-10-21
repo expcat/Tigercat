@@ -262,7 +262,15 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
 
         isHidden: (index) => isLegendIndexHidden(index)
       }),
-    [data, legendFormatter, palette, activeIndex, resolvedSelectedIndex, labels.pointAriaLabel]
+    [
+      data,
+      legendFormatter,
+      palette,
+      activeIndex,
+      resolvedSelectedIndex,
+      labels.pointAriaLabel,
+      isLegendIndexHidden
+    ]
   )
 
   const tooltipContent = useMemo(
@@ -350,7 +358,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
           const visualActive = points.findIndex((item) => item.index === (activeIndex ?? 0))
           const sharedProps = {
             fill: point.fill,
-            opacity: point.opacity,
+            opacity: isLegendIndexHidden(point.index) ? 0 : point.opacity,
             stroke: pointBorderColor,
             strokeWidth: pointBorderWidth,
             className: classNames(

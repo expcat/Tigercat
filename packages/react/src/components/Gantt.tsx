@@ -8,6 +8,7 @@ import {
   isGanttMilestone,
   ganttAxisTextClasses,
   ganttDateValuesEqual,
+  normalizeGanttDate,
   ganttDependencyClasses,
   ganttLabelClasses,
   ganttProgressClasses,
@@ -42,6 +43,8 @@ interface GanttBarDragSession {
   scale: number
   task: GanttLayoutTask
   sourceTask: GanttTask
+  sourceStartMs: number
+  sourceEndMs: number
   barX: number
   barWidth: number
   taskLabelWidth: number
@@ -211,6 +214,16 @@ export function Gantt({
   const plotHeight = Math.max(height, layout.height + resolvedPadding.top + resolvedPadding.bottom)
   const activeId = resolvedSelectedId ?? hoveredId
 
+  // Roving tabindex walks enabled tasks only; when the current focus target
+  // turns disabled (or the first task is disabled), fall back to the first
+  // enabled task so a Tab entry always exists.
+  const enabledTaskIndexes = layout.tasks
+    .filter((task) => !task.task.disabled)
+    .map((task) => task.index)
+  const resolvedFocusedIndex = enabledTaskIndexes.includes(focusedIndex)
+    ? focusedIndex
+    : (enabledTaskIndexes[0] ?? null)
+
   const selectTask = (task: GanttLayoutTask) => {
     if (task.task.disabled) return
     if (selectableRef.current) {
@@ -265,9 +278,37 @@ export function Gantt({
     }
   }
 
+  // A session goes stale when dragging is turned off or the source task
+  // was replaced, removed, disabled, or had its dates rewritten mid-drag;
+  // never let it overwrite current data with the old snapshot.
+  const isBarDragStale = (session: GanttBarDragSession): boolean => {
+    const currentTask = dataRef.current.find((item) => item.id === session.sourceTask.id)
+    return (
+      !canDrag ||
+      !currentTask ||
+      currentTask !== session.sourceTask ||
+      currentTask.disabled === true ||
+      normalizeGanttDate(currentTask.start) !== session.sourceStartMs ||
+      normalizeGanttDate(currentTask.end) !== session.sourceEndMs
+    )
+  }
+
+  const cancelBarDrag = (session: GanttBarDragSession) => {
+    dragSessionRef.current = null
+    setDragPreview(null)
+    detachDocumentPointerListeners()
+    releaseBarPointer(session.captureTarget, session.pointerId)
+  }
+
   const moveBarDrag = (event: PointerEvent) => {
     const session = dragSessionRef.current
     if (!session || event.pointerId !== session.pointerId) return
+    // Mutations without notification (e.g. an in-place Date rewrite that did
+    // not re-render) surface here at the latest instead of committing later.
+    if (isBarDragStale(session)) {
+      cancelBarDrag(session)
+      return
+    }
     const rawDelta = (event.clientX - session.startClientX) * session.scale
     const deltaX = clampGanttDragDeltaX(
       rawDelta,
@@ -291,7 +332,14 @@ export function Gantt({
   const finishBarDrag = (event: PointerEvent) => {
     const session = dragSessionRef.current
     if (!session || event.pointerId !== session.pointerId) return
+    // pointercancel only discards the session; it never commits.
+    if (event.type === 'pointercancel') {
+      cancelBarDrag(session)
+      return
+    }
     moveBarDrag(event)
+    // The move above cancels the session when it detects staleness.
+    if (dragSessionRef.current === null) return
     const deltaX = session.deltaX
     dragSessionRef.current = null
     setDragPreview(null)
@@ -303,6 +351,8 @@ export function Gantt({
       selectTask(session.task)
       return
     }
+
+    if (isBarDragStale(session)) return
 
     const nextTask = moveGanttTaskByPx(session.sourceTask, deltaX, {
       minMs: session.minMs,
@@ -325,6 +375,14 @@ export function Gantt({
   dragFnsRef.current.move = moveBarDrag
   dragFnsRef.current.finish = finishBarDrag
 
+  // Updates that invalidate the active session (draggable toggled off, or the
+  // source task replaced/removed/disabled/rewritten) cancel it immediately
+  // instead of letting the preview, listeners, and capture linger or commit.
+  useEffect(() => {
+    const session = dragSessionRef.current
+    if (session && isBarDragStale(session)) cancelBarDrag(session)
+  })
+
   const attachDocumentPointerListeners = () => {
     if (documentPointerListeningRef.current || !isBrowser()) return
     document.addEventListener('pointermove', onDocumentPointerMove)
@@ -344,6 +402,10 @@ export function Gantt({
       scale: pointerScale(event.currentTarget),
       task,
       sourceTask: task.task,
+      // Immutable ms snapshots: an in-place Date mutation of the caller's
+      // task object must still invalidate this session.
+      sourceStartMs: normalizeGanttDate(task.task.start),
+      sourceEndMs: normalizeGanttDate(task.task.end),
       barX: task.x,
       barWidth: task.width,
       taskLabelWidth,
@@ -462,7 +524,9 @@ export function Gantt({
                   <g
                     className={getGanttTaskClasses(interactive, selected, movable, grabbing)}
                     role={interactive ? 'button' : 'group'}
-                    tabIndex={interactive ? chartMarkTabIndex(task.index, focusedIndex) : undefined}
+                    tabIndex={
+                      interactive ? chartMarkTabIndex(task.index, resolvedFocusedIndex) : undefined
+                    }
                     data-gantt-task-index={task.index}
                     aria-label={getGanttTaskAriaLabel(task.task, {
                       template: labels.ganttTaskAriaLabel,
@@ -480,11 +544,12 @@ export function Gantt({
                     onKeyDown={(event) => {
                       if (isChartNavigationKey(event.key)) {
                         event.preventDefault()
-                        const next = nextChartRovingIndex(
-                          task.index,
-                          event.key,
-                          layout.tasks.length
-                        )
+                        const currentPos = enabledTaskIndexes.indexOf(task.index)
+                        if (currentPos < 0) return
+                        const next =
+                          enabledTaskIndexes[
+                            nextChartRovingIndex(currentPos, event.key, enabledTaskIndexes.length)
+                          ]
                         setFocusedIndex(next)
                         const node = event.currentTarget.ownerSVGElement?.querySelector(
                           `[data-gantt-task-index="${next}"]`

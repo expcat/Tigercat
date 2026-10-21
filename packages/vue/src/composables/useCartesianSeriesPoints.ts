@@ -1,4 +1,4 @@
-import { ref, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
+import { getCurrentScope, onScopeDispose, ref, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
 import {
   chartPointerRemainsInside,
   createChartFrameCoalescer,
@@ -14,7 +14,7 @@ export interface UseCartesianSeriesPointsOptions<T> {
   showTooltip: MaybeRefOrGetter<boolean>
   hoverable: MaybeRefOrGetter<boolean>
   innerRect: MaybeRefOrGetter<{ width: number; height: number }>
-  getSeriesPoints: () => Array<{ points: Array<{ x: number; y: number }> }>
+  getSeriesPoints: () => Array<{ points: Array<{ x: number; y: number; pointIndex: number }> }>
   getDatum: (seriesIndex: number, pointIndex: number) => T | undefined
   getSeriesKeys: () => string[]
   getFlatPoints: () => ChartPointRef[]
@@ -33,23 +33,32 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
     clientY: number
   }>({
     onFrame: (sample) => {
+      const laidOutSeries = options.getSeriesPoints()
       const nearest = findNearestSeriesPoint(
-        options.getSeriesPoints().map((sd) => sd.points),
+        laidOutSeries.map((sd) => sd.points),
         sample.x,
         sample.y
       )
       if (!nearest) return
-      hoveredPointInfo.value = nearest
+      // The scan position indexes the laid-out point array; map it back to the
+      // original data index carried by the laid-out point.
+      const point = laidOutSeries[nearest.seriesIndex]?.points[nearest.pointIndex]
+      if (!point) return
+      hoveredPointInfo.value = { seriesIndex: nearest.seriesIndex, pointIndex: point.pointIndex }
       tooltipPosition.value = { x: sample.clientX, y: sample.clientY }
       if (toValue(options.hoverable)) {
         options.onPointHover?.(
           nearest.seriesIndex,
-          nearest.pointIndex,
-          options.getDatum(nearest.seriesIndex, nearest.pointIndex) ?? null
+          point.pointIndex,
+          options.getDatum(nearest.seriesIndex, point.pointIndex) ?? null
         )
       }
     }
   })
+
+  if (getCurrentScope()) {
+    onScopeDispose(() => plotScan.cancel())
+  }
 
   const trackHover = () => toValue(options.showTooltip) || toValue(options.hoverable)
 
@@ -94,10 +103,13 @@ export function useCartesianSeriesPoints<T>(options: UseCartesianSeriesPointsOpt
     if (!trackHover()) return
     const target = event.currentTarget
     if (!(target instanceof Element)) return
+    // Anchor the coordinate mapping to the background hit rect (the exact plot
+    // area); the handler itself lives on the plot group so marks bubble to it.
+    const anchor = target.querySelector('[data-plot-hit]') ?? target
     const mapped = mapPointerToPlotPoint(
       event.clientX,
       event.clientY,
-      target.getBoundingClientRect(),
+      anchor.getBoundingClientRect(),
       toValue(options.innerRect)
     )
     if (!mapped) return

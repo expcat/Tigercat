@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, PropType, useId } from 'vue'
+import { defineComponent, computed, h, ref, PropType, useId, onScopeDispose } from 'vue'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -236,6 +236,7 @@ export const RadarChart = defineComponent({
         if (isRadarPointerSample(sample)) onAreaFrame(sample)
       }
     })
+    onScopeDispose(() => areaScan.cancel())
     const palette = computed(() => resolveChartPalette(props.colors))
     const laid = computed(() =>
       layoutRadar(resolvedSeries.value, {
@@ -618,7 +619,7 @@ export const RadarChart = defineComponent({
                   'data-series-type': 'radar',
                   'data-series-key': item.seriesKey,
                   'data-series-name': item.series.name,
-                  opacity: item.opacity,
+                  opacity: isLegendIndexHidden(item.seriesIndex) ? 0 : item.opacity,
                   onMouseenter: (e: MouseEvent) => handleHoverEnter(item.seriesIndex, e),
                   onMouseleave: handlePointLeave,
                   onClick: () => handleSelectIndex(item.seriesIndex),

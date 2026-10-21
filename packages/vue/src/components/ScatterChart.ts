@@ -391,7 +391,7 @@ export const ScatterChart = defineComponent({
 
                       const shared = {
                         fill: point.fill,
-                        opacity: point.opacity,
+                        opacity: isLegendIndexHidden(point.index) ? 0 : point.opacity,
                         stroke: props.pointBorderColor,
                         'stroke-width': props.pointBorderWidth,
                         class: classNames(

@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -318,6 +318,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       }
     })
   )
+  useEffect(() => () => areaScan.cancel(), [areaScan])
   const handleAreaMove = useCallback(
     (seriesIndex: number, event: React.MouseEvent<SVGPathElement>) => {
       if (!trackPointer) return
@@ -386,7 +387,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       resolvedActiveIndex,
       resolvedSelectedIndex,
       legendFormatter,
-      seriesName
+      seriesName,
+      isLegendIndexHidden
     ]
   )
 
@@ -534,7 +536,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             data-series-type="radar"
             data-series-key={item.seriesKey}
             data-series-name={item.series.name}
-            opacity={item.opacity}
+            opacity={isLegendIndexHidden(item.seriesIndex) ? 0 : item.opacity}
             onMouseEnter={(e) => handleHoverEnter(item.seriesIndex, e)}
             onMouseLeave={handlePointLeave}
             onClick={() => handleSelectIndex(item.seriesIndex)}

@@ -607,161 +607,171 @@ export const AreaChart = defineComponent({
                   })
                 : null,
               // Layer 1: area fills + line strokes (reverse order for proper stacking visual)
-              ...reversedSeriesData.map((sd) =>
-                h(
-                  ChartSeries,
-                  {
-                    key: sd.seriesKey,
-                    data: sd.series.data,
-                    name: sd.series.name,
-                    type: 'area',
-                    opacity: sd.opacity,
-                    'data-series-key': sd.seriesKey,
-                    class: classNames(
-                      sd.series.className,
-                      (props.hoverable || props.selectable) && 'cursor-pointer',
-                      'outline-none'
-                    ),
-                    onMouseenter: (e: MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e),
-                    onMouseleave: handleSeriesHoverLeave,
-                    onClick: () => handleSeriesSelect(sd.seriesIndex)
-                  },
-                  {
-                    default: () => [
-                      // Area fill
-                      h('path', {
-                        d: sd.areaPath,
-                        fill: props.gradient
-                          ? `url(#${gradientPrefix}-${sd.seriesKey})`
-                          : sd.fillColor,
-                        'fill-opacity': props.gradient ? 1 : sd.fillOpacity,
-                        stroke: 'none',
-                        class:
-                          'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]',
-                        'data-area-series': sd.seriesIndex,
-                        'data-series-key': sd.seriesKey
-                      }),
-                      // Line stroke
-                      h('path', {
-                        d: sd.linePath,
-                        fill: 'none',
-                        stroke: props.strokeGradient
-                          ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})`
-                          : sd.color,
-                        'stroke-width': sd.strokeWidth,
-                        'stroke-dasharray': sd.strokeDasharray,
-                        'stroke-dashoffset':
-                          props.animated && !sd.strokeDasharray ? '1' : undefined,
-                        'stroke-linecap': 'round',
-                        'stroke-linejoin': 'round',
-                        pathLength: props.animated && !sd.strokeDasharray ? 1 : undefined,
-                        class: classNames(
-                          props.animated && !sd.strokeDasharray
-                            ? AREA_DRAW_CLASS
-                            : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
-                        )
+              // Plot group owns nearest-point hover; the transparent rect is a
+              // background layer under fills/lines/points so their pointer and
+              // click events reach their real targets and bubble up here.
+              h(
+                'g',
+                {
+                  onMousemove: trackPointHover ? handlePlotMouseMove : undefined,
+                  onMouseleave: trackPointHover ? handlePointMouseLeave : undefined
+                },
+                [
+                  trackPointHover
+                    ? h('rect', {
+                        width: innerRect.value.width,
+                        height: innerRect.value.height,
+                        fill: 'transparent',
+                        'data-plot-hit': ''
                       })
-                    ]
-                  }
-                )
-              ),
-              // Layer 2: data points on top of all areas (prevents coverage)
-              ...seriesData.value
-                .filter((sd) => sd.showPoints)
-                .map((sd) =>
-                  h(
-                    'g',
-                    {
-                      key: `points-${sd.seriesKey}`,
-                      opacity: sd.opacity,
-                      'data-series-key': sd.seriesKey
-                    },
-                    sd.points.map((point) => {
-                      const isHovered =
-                        hoveredPointInfo.value?.seriesIndex === sd.seriesIndex &&
-                        hoveredPointInfo.value?.pointIndex === point.pointIndex
-                      const hoverSize = sd.pointSize + 2
-                      const datum = point.datum
-                      const pointInteractive = props.hoverable || props.selectable || pointClickable
-                      return h('circle', {
-                        key: `point-${sd.seriesKey}-${point.pointIndex}`,
-                        cx: point.x,
-                        cy: point.y,
-                        r: isHovered ? hoverSize : sd.pointSize,
-                        fill: sd.pointHollow
-                          ? CHART_SURFACE_FILL
-                          : props.pointGradient
-                            ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
-                            : sd.pointColor,
-                        stroke: sd.pointHollow ? sd.pointColor : 'none',
-                        'stroke-width': sd.pointHollow ? 2 : 0,
-                        class: classNames(
-                          props.animated ? linePointTransitionClasses : undefined,
-                          pointInteractive && 'cursor-pointer'
-                        ),
-                        style: isHovered ? chartHoverShadowStyle(sd.color) : undefined,
-                        role: pointInteractive ? 'button' : undefined,
-                        'aria-hidden': pointInteractive ? undefined : true,
-                        'aria-label': pointInteractive
-                          ? (datum?.label ??
-                            formatChartTemplate(labels.value.pointAriaLabel, {
-                              index: point.pointIndex + 1,
-                              x: String(datum?.x ?? ''),
-                              y: String(datum?.y ?? '')
-                            }))
-                          : undefined,
-                        tabindex: pointInteractive
-                          ? chartPointTabIndex(
-                              sd.seriesIndex,
-                              point.pointIndex,
-                              hoveredPointInfo.value,
-                              flatPoints.value
-                            )
-                          : undefined,
-                        'data-point-index': point.pointIndex,
+                    : null,
+                  // Layer 1: area fills + line strokes (reverse order for proper stacking visual)
+                  ...reversedSeriesData.map((sd) =>
+                    h(
+                      ChartSeries,
+                      {
+                        key: sd.seriesKey,
+                        data: sd.series.data,
+                        name: sd.series.name,
+                        type: 'area',
+                        opacity: isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity,
                         'data-series-key': sd.seriesKey,
-                        onMouseenter: trackPointHover
-                          ? (e: MouseEvent) =>
-                              handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
-                          : undefined,
-                        onMousemove: trackPointHover ? handlePointMouseMove : undefined,
-                        onMouseleave: trackPointHover ? handlePointMouseLeave : undefined,
-                        onClick: (e: MouseEvent) => {
-                          e.stopPropagation()
-                          handlePointClick(sd.seriesIndex, point.pointIndex)
+                        class: classNames(
+                          sd.series.className,
+                          (props.hoverable || props.selectable) && 'cursor-pointer',
+                          'outline-none'
+                        ),
+                        onMouseenter: (e: MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e),
+                        onMouseleave: handleSeriesHoverLeave,
+                        onClick: () => handleSeriesSelect(sd.seriesIndex)
+                      },
+                      {
+                        default: () => [
+                          // Area fill
+                          h('path', {
+                            d: sd.areaPath,
+                            fill: props.gradient
+                              ? `url(#${gradientPrefix}-${sd.seriesKey})`
+                              : sd.fillColor,
+                            'fill-opacity': props.gradient ? 1 : sd.fillOpacity,
+                            stroke: 'none',
+                            class:
+                              'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]',
+                            'data-area-series': sd.seriesIndex,
+                            'data-series-key': sd.seriesKey
+                          }),
+                          // Line stroke
+                          h('path', {
+                            d: sd.linePath,
+                            fill: 'none',
+                            stroke: props.strokeGradient
+                              ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})`
+                              : sd.color,
+                            'stroke-width': sd.strokeWidth,
+                            'stroke-dasharray': sd.strokeDasharray,
+                            'stroke-dashoffset':
+                              props.animated && !sd.strokeDasharray ? '1' : undefined,
+                            'stroke-linecap': 'round',
+                            'stroke-linejoin': 'round',
+                            pathLength: props.animated && !sd.strokeDasharray ? 1 : undefined,
+                            class: classNames(
+                              props.animated && !sd.strokeDasharray
+                                ? AREA_DRAW_CLASS
+                                : 'transition-opacity motion-reduce:transition-none [transition-duration:var(--tiger-motion-duration-base)]'
+                            )
+                          })
+                        ]
+                      }
+                    )
+                  ),
+                  // Layer 2: data points on top of all areas (prevents coverage)
+                  ...seriesData.value
+                    .filter((sd) => sd.showPoints)
+                    .map((sd) =>
+                      h(
+                        'g',
+                        {
+                          key: `points-${sd.seriesKey}`,
+                          opacity: isLegendIndexHidden(sd.seriesIndex) ? 0 : sd.opacity,
+                          'data-series-key': sd.seriesKey
                         },
-                        onFocus: trackPointHover
-                          ? (e: FocusEvent) => {
-                              if (e.currentTarget instanceof SVGElement) {
-                                showPointTooltipFromElement(
-                                  e.currentTarget,
+                        sd.points.map((point) => {
+                          const isHovered =
+                            hoveredPointInfo.value?.seriesIndex === sd.seriesIndex &&
+                            hoveredPointInfo.value?.pointIndex === point.pointIndex
+                          const hoverSize = sd.pointSize + 2
+                          const datum = point.datum
+                          const pointInteractive =
+                            props.hoverable || props.selectable || pointClickable
+                          return h('circle', {
+                            key: `point-${sd.seriesKey}-${point.pointIndex}`,
+                            cx: point.x,
+                            cy: point.y,
+                            r: isHovered ? hoverSize : sd.pointSize,
+                            fill: sd.pointHollow
+                              ? CHART_SURFACE_FILL
+                              : props.pointGradient
+                                ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
+                                : sd.pointColor,
+                            stroke: sd.pointHollow ? sd.pointColor : 'none',
+                            'stroke-width': sd.pointHollow ? 2 : 0,
+                            class: classNames(
+                              props.animated ? linePointTransitionClasses : undefined,
+                              pointInteractive && 'cursor-pointer'
+                            ),
+                            style: isHovered ? chartHoverShadowStyle(sd.color) : undefined,
+                            role: pointInteractive ? 'button' : undefined,
+                            'aria-hidden': pointInteractive ? undefined : true,
+                            'aria-label': pointInteractive
+                              ? (datum?.label ??
+                                formatChartTemplate(labels.value.pointAriaLabel, {
+                                  index: point.pointIndex + 1,
+                                  x: String(datum?.x ?? ''),
+                                  y: String(datum?.y ?? '')
+                                }))
+                              : undefined,
+                            tabindex: pointInteractive
+                              ? chartPointTabIndex(
                                   sd.seriesIndex,
-                                  point.pointIndex
+                                  point.pointIndex,
+                                  hoveredPointInfo.value,
+                                  flatPoints.value
                                 )
-                              }
-                            }
-                          : undefined,
-                        onBlur: trackPointHover ? handlePointMouseLeave : undefined,
-                        onKeydown: pointInteractive
-                          ? (e: KeyboardEvent) =>
-                              handlePointKeydown(e, sd.seriesIndex, point.pointIndex)
-                          : undefined
-                      })
-                    })
-                  )
-                ),
-              // Topmost transparent hit layer: the whole plot reports the same
-              // nearest-point hover regardless of fills below (React parity).
-              trackPointHover
-                ? h('rect', {
-                    width: innerRect.value.width,
-                    height: innerRect.value.height,
-                    fill: 'transparent',
-                    'data-plot-hit': '',
-                    onMousemove: handlePlotMouseMove,
-                    onMouseleave: handlePointMouseLeave
-                  })
-                : null
+                              : undefined,
+                            'data-point-index': point.pointIndex,
+                            'data-series-key': sd.seriesKey,
+                            onMouseenter: trackPointHover
+                              ? (e: MouseEvent) =>
+                                  handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)
+                              : undefined,
+                            onMousemove: trackPointHover ? handlePointMouseMove : undefined,
+                            onMouseleave: trackPointHover ? handlePointMouseLeave : undefined,
+                            onClick: (e: MouseEvent) => {
+                              e.stopPropagation()
+                              handlePointClick(sd.seriesIndex, point.pointIndex)
+                            },
+                            onFocus: trackPointHover
+                              ? (e: FocusEvent) => {
+                                  if (e.currentTarget instanceof SVGElement) {
+                                    showPointTooltipFromElement(
+                                      e.currentTarget,
+                                      sd.seriesIndex,
+                                      point.pointIndex
+                                    )
+                                  }
+                                }
+                              : undefined,
+                            onBlur: trackPointHover ? handlePointMouseLeave : undefined,
+                            onKeydown: pointInteractive
+                              ? (e: KeyboardEvent) =>
+                                  handlePointKeydown(e, sd.seriesIndex, point.pointIndex)
+                              : undefined
+                          })
+                        })
+                      )
+                    )
+                ]
+              )
             ].filter(Boolean)
         }
       )

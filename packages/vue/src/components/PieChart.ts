@@ -317,10 +317,12 @@ export const PieChart = defineComponent({
                   h('path', {
                     d: slice.path,
                     fill: slice.fill,
-                    opacity: getChartElementOpacity(slice.index, activeIndex.value, {
-                      activeOpacity: props.activeOpacity,
-                      inactiveOpacity: props.inactiveOpacity
-                    }),
+                    opacity: isLegendIndexHidden(slice.index)
+                      ? 0
+                      : getChartElementOpacity(slice.index, activeIndex.value, {
+                          activeOpacity: props.activeOpacity,
+                          inactiveOpacity: props.inactiveOpacity
+                        }),
                     stroke: props.borderColor,
                     'stroke-width': props.borderWidth,
                     'stroke-linejoin': 'round',
@@ -365,6 +367,7 @@ export const PieChart = defineComponent({
                       'g',
                       {
                         key: `label-group-${slice.index}`,
+                        opacity: isLegendIndexHidden(slice.index) ? 0 : undefined,
                         'aria-hidden': interactive.value ? 'true' : undefined
                       },
                       [
@@ -402,6 +405,7 @@ export const PieChart = defineComponent({
                         key: `label-${slice.index}`,
                         x: slice.labelX,
                         y: slice.labelY,
+                        opacity: isLegendIndexHidden(slice.index) ? 0 : undefined,
                         class: pieSliceLabelInsideClasses,
                         fill: slice.labelFill,
                         'text-anchor': 'middle',

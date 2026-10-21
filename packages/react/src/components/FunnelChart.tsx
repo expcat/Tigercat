@@ -170,7 +170,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
 
         isHidden: (index) => isLegendIndexHidden(index)
       }),
-    [segments, data, palette, activeIndex, resolvedSelectedIndex, stageName]
+    [segments, data, palette, activeIndex, resolvedSelectedIndex, stageName, isLegendIndexHidden]
   )
   const tooltipContent = useMemo(
     () =>
@@ -231,10 +231,12 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
       )}
       <g data-series-type="funnel">
         {segments.map((seg, visualIndex) => {
-          const opacity = getChartElementOpacity(seg.index, activeIndex, {
-            activeOpacity,
-            inactiveOpacity
-          })
+          const opacity = isLegendIndexHidden(seg.index)
+            ? 0
+            : getChartElementOpacity(seg.index, activeIndex, {
+                activeOpacity,
+                inactiveOpacity
+              })
           return (
             <path
               key={`seg-${seg.index}`}
@@ -275,6 +277,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
             key={`label-${seg.index}`}
             x={seg.cx}
             y={seg.cy}
+            opacity={isLegendIndexHidden(seg.index) ? 0 : undefined}
             className={pieSliceLabelInsideClasses}
             textAnchor="middle"
             dominantBaseline="middle"
