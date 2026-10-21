@@ -199,18 +199,21 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
   )
 
   let indexPromise: Promise<SkillIndex> | undefined
-  const getIndex = () => {
-    indexPromise ??= loadSkillIndex(options)
+  const getIndex = (): Promise<SkillIndex> => {
+    indexPromise ??= loadSkillIndex(options).catch((error: unknown) => {
+      indexPromise = undefined
+      throw error
+    })
     return indexPromise
   }
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TIGERCAT_TOOLS }))
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const index = await getIndex()
-    const args = (request.params.arguments ?? {}) as Record<string, unknown>
-
     try {
+      const index = await getIndex()
+      const args = (request.params.arguments ?? {}) as Record<string, unknown>
+
       if (request.params.name === 'tigercat_search') {
         return renderToolResult(
           await searchTigercat(index, {
@@ -310,13 +313,8 @@ export function createTigercatMcpServer(options: TigercatMcpOptions = {}): Serve
   }))
 
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    const uri = request.params.uri
-    try {
-      const index = await getIndex()
-      return await readMcpResource(index, uri)
-    } catch (error) {
-      return resourceText(uri, `Error: ${formatError(error)}`, 'text/plain')
-    }
+    const index = await getIndex()
+    return readMcpResource(index, request.params.uri)
   })
 
   async function readMcpResource(index: SkillIndex, uri: string) {
@@ -430,7 +428,30 @@ function jsonContent(value: unknown, isError = false) {
 // source 以 {path, reason, inlined} 元数据出现;inlined=false 即指针。
 export function renderToolResult(value: unknown) {
   const blocks: Array<{ type: 'text'; text: string }> = []
-  const seen = new Set<string>()
+  const inlinedKeys = new Set<string>()
+
+  // 先收集整份响应的正文,嵌套 source 可能先于带正文的顶层 source 出现。
+  const collect = (node: unknown): void => {
+    if (!node || typeof node !== 'object') return
+
+    const record = node as Record<string, unknown>
+    if (isReferenceSource(record)) {
+      if (typeof record.text !== 'string') return
+
+      const section = typeof record.section === 'string' ? record.section : undefined
+      const key = `${record.path}#${section ?? ''}`
+      if (!inlinedKeys.has(key)) {
+        inlinedKeys.add(key)
+        blocks.push({
+          type: 'text',
+          text: formatSourceBlock(record.path, section, record.truncated, record.text)
+        })
+      }
+      return
+    }
+
+    Object.values(record).forEach(collect)
+  }
 
   const visit = (node: unknown): unknown => {
     if (Array.isArray(node)) return node.map(visit)
@@ -438,24 +459,15 @@ export function renderToolResult(value: unknown) {
 
     const record = node as Record<string, unknown>
     if (isReferenceSource(record)) {
-      const { text, ...rest } = record
-      if (typeof text !== 'string') return { ...rest, inlined: false }
-
+      const { text: _text, ...rest } = record
       const section = typeof record.section === 'string' ? record.section : undefined
-      const key = `${record.path}#${section ?? ''}`
-      if (!seen.has(key)) {
-        seen.add(key)
-        blocks.push({
-          type: 'text',
-          text: formatSourceBlock(record.path, section, record.truncated, text)
-        })
-      }
-      return { ...rest, inlined: true }
+      return { ...rest, inlined: inlinedKeys.has(`${record.path}#${section ?? ''}`) }
     }
 
     return Object.fromEntries(Object.entries(record).map(([k, v]) => [k, visit(v)]))
   }
 
+  collect(value)
   const summary = visit(value)
 
   return {

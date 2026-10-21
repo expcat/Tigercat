@@ -3,7 +3,7 @@ export type TigercatFramework = 'react' | 'vue'
 export interface TigercatMcpOptions {
   /** 本地 Tigercat 仓库根目录;提供时优先于 baseUrl,走文件系统读取。 */
   root?: string
-  /** 远程 skills 基地址(GitHub Pages /mcp/ 路由或其镜像);缺省用官方地址。 */
+  /** 显式 HTTPS skills 镜像,版本与文件摘要须匹配本包;未指定 root/baseUrl 时读取随包快照。 */
   baseUrl?: string
   /** 远程 fetch 超时毫秒数。 */
   timeoutMs?: number

@@ -145,6 +145,48 @@ describe('Tigercat MCP remote skill index', () => {
     expect(Buffer.byteLength(truncated?.text ?? '', 'utf8')).toBeLessThanOrEqual(300)
   })
 
+  it('rejects changed context7 bytes before parsing and accepts the restored mirror', async () => {
+    skillServer.overrides.set('context7.json', 'tampered context7')
+    try {
+      await expect(loadSkillIndex({ baseUrl })).rejects.toThrow(
+        'Remote skill digest does not match the packaged snapshot: context7.json'
+      )
+    } finally {
+      skillServer.overrides.delete('context7.json')
+    }
+
+    expect((await loadSkillIndex({ baseUrl })).components.size).toBe(185)
+  })
+
+  it('checks full reference bytes for reads and probes, retries failures, and caches success', async () => {
+    const index = await loadSkillIndex({ baseUrl })
+    const path = 'skills/tigercat/references/shared/props/button.md'
+    const original = await readFile(join(root, 'packages/mcp/snapshot', path), 'utf8')
+    skillServer.overrides.set(path, `${original}\nTAMPERED_BODY\n`)
+    try {
+      await expect(
+        getTigercatComponent(index, { component: 'Button', framework: 'react', maxBytes: 300 })
+      ).rejects.toThrow(`Remote skill digest does not match the packaged snapshot: ${path}`)
+      await expect(index.source.probe(path)).rejects.toThrow('Remote skill digest')
+
+      skillServer.overrides.delete(path)
+      const restored = await getTigercatComponent(index, {
+        component: 'Button',
+        framework: 'react',
+        maxBytes: 300
+      })
+      expect(restored.found).toBe(true)
+      expect(restored.matches[0].sources.find((source) => source.path === path)?.text).toContain(
+        'ButtonProps'
+      )
+
+      skillServer.overrides.set(path, 'changed after successful read')
+      expect(await index.source.readText(path)).toBe(original)
+    } finally {
+      skillServer.overrides.delete(path)
+    }
+  })
+
   it('rejects parent segments and non-allow-listed paths without fetching', async () => {
     const index = await loadSkillIndex({ baseUrl })
 
@@ -217,6 +259,40 @@ describe('Tigercat MCP remote skill index', () => {
 })
 
 describe('Tigercat MCP stdio server (remote mode)', () => {
+  it('recovers tools and resources in the same session after index initialization fails', async () => {
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: [resolve(root, 'packages/mcp/dist/index.js'), '--base-url', baseUrl]
+    })
+    const client = new Client({ name: 'tigercat-mcp-recovery-test', version: '0.0.0' })
+    skillServer.failPaths.add('context7.json')
+    try {
+      await client.connect(transport)
+      const failed = await client.callTool({
+        name: 'tigercat_search',
+        arguments: { query: 'Button' }
+      })
+      expect(failed.isError).toBe(true)
+      expect(JSON.parse(String(failed.content[0].text)).error).toContain('HTTP 404')
+      await expect(client.readResource({ uri: 'tigercat://inventory' })).rejects.toThrow('HTTP 404')
+
+      skillServer.failPaths.delete('context7.json')
+      const [recovered, inventory] = await Promise.all([
+        client.callTool({ name: 'tigercat_search', arguments: { query: 'Button' } }),
+        client.readResource({ uri: 'tigercat://inventory' })
+      ])
+      expect(recovered.isError).not.toBe(true)
+      expect(JSON.parse(String(recovered.content[0].text)).results[0].name).toBe('Button')
+      expect(JSON.parse(String(inventory.contents[0].text)).componentCount).toBe(185)
+
+      skillServer.failPaths.add('context7.json')
+      await expect(client.readResource({ uri: 'tigercat://inventory' })).resolves.toEqual(inventory)
+    } finally {
+      skillServer.failPaths.delete('context7.json')
+      await client.close()
+    }
+  })
+
   it('serves tools over stdio with --base-url and doctors via the env fallback', async () => {
     const serverPath = resolve(root, 'packages/mcp/dist/index.js')
     if (!existsSync(serverPath)) {

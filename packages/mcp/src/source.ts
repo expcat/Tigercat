@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readFile, realpath } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { isAbsolute, join, relative } from 'node:path'
@@ -5,7 +6,6 @@ import { isAbsolute, join, relative } from 'node:path'
 import { PACKAGE_VERSION } from './version'
 import type { SkillSource } from './types'
 
-export const DEFAULT_REMOTE_BASE_URL = 'https://expcat.github.io/Tigercat/mcp/'
 export const DEFAULT_FETCH_TIMEOUT_MS = 15_000
 
 /** Skill snapshot shipped next to this package (src/ and dist/ are both one level down). */
@@ -74,7 +74,7 @@ export function createFsSource(root: string): SkillSource {
 
 export function createHttpSource(
   baseUrl: string,
-  options: { timeoutMs?: number } = {}
+  options: { timeoutMs?: number; digests: Record<string, string> }
 ): SkillSource {
   const base = normalizeBaseUrl(baseUrl)
   const timeoutMs =
@@ -120,7 +120,14 @@ export function createHttpSource(
       throw new Error(fetchFailureMessage(url, `HTTP ${response.status}`))
     }
 
-    return response.text()
+    const bytes = Buffer.from(await response.arrayBuffer())
+    if (path !== 'version.json' && path !== 'manifest.json') {
+      const expected = options.digests[path]
+      if (!expected || createHash('sha256').update(bytes).digest('hex') !== expected) {
+        throw new Error(`Remote skill digest does not match the packaged snapshot: ${path}`)
+      }
+    }
+    return bytes.toString('utf8')
   }
 
   const readText = (path: string): Promise<string> => {
@@ -183,5 +190,5 @@ export function normalizeBaseUrl(input: string): string {
 }
 
 function fetchFailureMessage(url: URL, reason: string): string {
-  return `Failed to fetch Tigercat skill source (${reason}): ${url}. Use --root <repo> for local mode, or --base-url <mirror> if GitHub Pages is unreachable.`
+  return `Failed to fetch Tigercat skill source (${reason}): ${url}. If the selected mirror is unreachable, remove --base-url / TIGERCAT_MCP_BASE_URL to use the packaged snapshot, use --root <repo> for a local checkout, or select another --base-url <mirror>.`
 }

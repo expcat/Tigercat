@@ -196,8 +196,8 @@
     <div class="header">
       <h1>Tigercat MCP 技能源<span class="version-badge" id="versionBadge" hidden></span></h1>
       <p>
-        本站是 <code>@expcat/tigercat-mcp</code> 默认读取的静态技能源：context7 组件清单 + skills
-        markdown 文档，随每次 release 自动部署。
+        本站提供可显式选择的静态技能源：context7 组件清单 + skills markdown 文档，随每次 release
+        自动部署。<code>@expcat/tigercat-mcp</code> 默认读取随包快照，可离线使用。
       </p>
     </div>
 
@@ -208,7 +208,7 @@
     <div class="section">
       <div class="card">
         <h2>快速开始</h2>
-        <p>Claude Code 一行接入（默认远程读取本站，无需克隆仓库）：</p>
+        <p>Claude Code 一行接入（默认读取随包快照，无需克隆仓库）：</p>
         <pre class="code-block">claude mcp add tigercat -- npx -y @expcat/tigercat-mcp</pre>
         <p>或在任意 MCP 客户端的 <code>mcpServers</code> 配置中加入：</p>
         <pre class="code-block">
@@ -220,12 +220,16 @@
     }
   }
 }</pre>
-        <p>本地 / 镜像模式（离线开发或 GitHub Pages 不可达时）：</p>
+        <p>本地开发 / 显式镜像（镜像版本与文件 SHA-256 须匹配已安装包，读取时校验实际正文）：</p>
         <pre class="code-block">
 tigercat-mcp --root /path/to/Tigercat        # 读取本地仓库 checkout
 tigercat-mcp --base-url https://mirror.example.com/mcp/   # 指向镜像站
-TIGERCAT_MCP_BASE_URL=…                      # 环境变量等价于 --base-url
+TIGERCAT_MCP_BASE_URL=…                      # 未提供 --base-url 时使用
 tigercat-mcp --doctor                        # 校验技能源可达性与完整性</pre>
+        <p>
+          来源优先级：<code>--root</code> &gt; <code>--base-url</code> &gt;
+          <code>TIGERCAT_MCP_BASE_URL</code> &gt; 随包快照。移除镜像配置即可回到默认离线快照。
+        </p>
       </div>
     </div>
 

@@ -5,7 +5,7 @@
 
 Read-only stdio MCP server that routes LLM clients to Tigercat skill references.
 
-Default skill source is GitHub Pages: <https://expcat.github.io/Tigercat/mcp/>.
+By default, skills come from the snapshot shipped with the installed package and work offline.
 
 ```bash
 npx -y @expcat/tigercat-mcp
@@ -17,8 +17,8 @@ tigercat-mcp --base-url https://mirror.example.com/mcp/
 tigercat-mcp --doctor
 ```
 
-`--root` reads a local checkout. `--base-url` (or `TIGERCAT_MCP_BASE_URL`) fetches a mirror.
-`--doctor` checks inventory reachability and exits.
+`--root` reads a local checkout. `--base-url` (or `TIGERCAT_MCP_BASE_URL`) selects an explicit mirror whose version and file SHA-256 digests must match the package.
+`--doctor` checks the selected source's inventory and readability, including remote body digests, and exits.
 
 Full client config (`claude mcp add`, `mcpServers` JSON):
 [root README MCP section](https://github.com/expcat/Tigercat/blob/main/README.md#mcp-接入ai-agent).

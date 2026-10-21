@@ -299,4 +299,42 @@ describe('server surface', () => {
     expect(tagBlock?.text).toContain('TagProps')
     expect(tagBlock?.text.startsWith('===== reference material:')).toBe(true)
   })
+
+  it('keeps nested route flags consistent with the actual response bodies', async () => {
+    const route = await routeTigercatTask(index, { task: 'Button theme', framework: 'react' })
+    const [summary, ...blocks] = renderToolResult(route).content
+    type Source = { path: string; section?: string; text?: string; inlined: boolean }
+    const parsed = JSON.parse(summary.text) as {
+      sources: Source[]
+      matches: Array<{ sources: Source[] }>
+      topics: Array<{ sources: Source[] }>
+    }
+
+    expect(blocks).toHaveLength(4)
+    expect(parsed.sources.filter((source) => source.inlined).map((source) => source.path)).toEqual(
+      expect.arrayContaining([
+        'skills/tigercat/references/shared/props/button.md',
+        'skills/tigercat/references/examples/button.md',
+        'skills/tigercat/references/react/index.md',
+        'skills/tigercat/references/theme.md'
+      ])
+    )
+    for (const source of [...parsed.matches, ...parsed.topics].flatMap((item) => item.sources)) {
+      const top = parsed.sources.find(
+        (candidate) => candidate.path === source.path && candidate.section === source.section
+      )
+      expect(top).toBeDefined()
+      expect(source.text).toBeUndefined()
+      expect(source.inlined).toBe(top?.inlined)
+    }
+    for (const path of [
+      'skills/tigercat/references/component-index.md',
+      'skills/tigercat/references/shared/glossary.md',
+      'skills/tigercat/references/shared/patterns/common.md'
+    ]) {
+      expect(parsed.sources.find((source) => source.path === path)?.inlined).toBe(false)
+    }
+    const headings = blocks.map((block) => block.text.split('\n')[0])
+    expect(new Set(headings).size).toBe(blocks.length)
+  })
 })

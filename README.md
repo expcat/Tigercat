@@ -14,7 +14,7 @@
 
 > **📘 AI Agent 文档**
 > 组件 API、使用示例和配置指南请参考 [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md)。
-> LLM 客户端可通过 `@expcat/tigercat-mcp` 按任务路由并读取最小必要上下文（默认从 GitHub Pages 远程读取，无需克隆仓库）。
+> LLM 客户端可通过 `@expcat/tigercat-mcp` 按任务路由并读取最小必要上下文（默认读取随包快照，可离线使用，无需克隆仓库）。
 
 ## 特性
 
@@ -134,9 +134,10 @@ claude mcp add tigercat -- npx -y @expcat/tigercat-mcp
 }
 ```
 
-- 默认从 GitHub Pages（<https://expcat.github.io/Tigercat/mcp/>）远程读取 skills，无需克隆仓库。
-- 本地/离线：`tigercat-mcp --root /path/to/Tigercat`（仓库内开发与测试走此模式）。
-- 镜像：`--base-url <url>` 或环境变量 `TIGERCAT_MCP_BASE_URL`。
+- 默认读取与已安装包版本固定的 skills 快照，可离线使用，无需克隆仓库。
+- 本地开发：`tigercat-mcp --root /path/to/Tigercat` 读取可编辑的仓库 checkout。
+- 可选远程镜像：`--base-url <url>` 或环境变量 `TIGERCAT_MCP_BASE_URL`，例如 <https://expcat.github.io/Tigercat/mcp/>。镜像版本与文件 SHA-256 必须匹配随包快照，实际正文在读取时校验。
+- 来源优先级：`--root` > `--base-url` > `TIGERCAT_MCP_BASE_URL` > 随包快照。镜像不可达时，移除镜像配置即可使用随包快照。
 - 诊断：`tigercat-mcp --doctor`。
 - 仓库内启动：`pnpm mcp:build` 后 `pnpm mcp:serve`。
 
@@ -144,13 +145,13 @@ claude mcp add tigercat -- npx -y @expcat/tigercat-mcp
 
 ## 包
 
-| Package                                                | Description                                                                          |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| [`@expcat/tigercat-core`](./packages/core/README.md)   | 共享类型、设计 token、主题与 Tailwind 插件                                           |
-| [`@expcat/tigercat-vue`](./packages/vue/README.md)     | Vue 3 组件与 composables                                                             |
-| [`@expcat/tigercat-react`](./packages/react/README.md) | React 组件与 hooks                                                                   |
-| [`@expcat/tigercat-cli`](./packages/cli/README.md)     | 项目脚手架、组件辅助、playground 与环境诊断                                          |
-| [`@expcat/tigercat-mcp`](./packages/mcp/README.md)     | 面向 LLM 的 Skill reference 路由服务（默认远程读取 GitHub Pages，`--root` 本地模式） |
+| Package                                                | Description                                                                        |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| [`@expcat/tigercat-core`](./packages/core/README.md)   | 共享类型、设计 token、主题与 Tailwind 插件                                         |
+| [`@expcat/tigercat-vue`](./packages/vue/README.md)     | Vue 3 组件与 composables                                                           |
+| [`@expcat/tigercat-react`](./packages/react/README.md) | React 组件与 hooks                                                                 |
+| [`@expcat/tigercat-cli`](./packages/cli/README.md)     | 项目脚手架、组件辅助、playground 与环境诊断                                        |
+| [`@expcat/tigercat-mcp`](./packages/mcp/README.md)     | 面向 LLM 的 Skill reference 路由服务（默认读取随包快照，支持 checkout 与显式镜像） |
 
 ## 本地开发
 

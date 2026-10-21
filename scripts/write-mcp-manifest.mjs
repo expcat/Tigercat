@@ -3,7 +3,7 @@
 import { createHash } from 'node:crypto'
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, URL } from 'node:url'
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url))
 const dest = resolve(process.argv[2] ?? '')
@@ -14,11 +14,14 @@ if (!process.argv[2]) {
 }
 
 const version = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8')).version
-const files = {}
+const files = {
+  'context7.json': createHash('sha256')
+    .update(readFileSync(join(dest, 'context7.json')))
+    .digest('hex')
+}
 
 function walk(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === 'manifest.json' || entry.name === 'version.json') continue
     const full = join(dir, entry.name)
     if (entry.isDirectory()) {
       walk(full)
@@ -30,7 +33,7 @@ function walk(dir) {
   }
 }
 
-walk(dest)
+walk(join(dest, 'skills'))
 
 const ordered = Object.fromEntries(
   Object.keys(files)

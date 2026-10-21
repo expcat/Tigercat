@@ -86,8 +86,11 @@ async function loadFsSkillIndex(resolvedRoot: string): Promise<SkillIndex> {
 }
 
 async function loadHttpSkillIndex(baseUrl: string, timeoutMs?: number): Promise<SkillIndex> {
-  const source = createHttpSource(baseUrl, { timeoutMs })
-  await assertRemoteMirror(source)
+  const local = JSON.parse(await readFile(join(packagedSkillRoot(), 'manifest.json'), 'utf8')) as {
+    files: Record<string, string>
+  }
+  const source = createHttpSource(baseUrl, { timeoutMs, digests: local.files })
+  await assertRemoteMirror(source, local.files)
   const raw = await source.readText('context7.json')
 
   let context7: TigercatContext7
@@ -109,7 +112,10 @@ async function loadHttpSkillIndex(baseUrl: string, timeoutMs?: number): Promise<
   return buildSkillIndex(context7, source, allowedReferencePaths)
 }
 
-async function assertRemoteMirror(source: SkillSource): Promise<void> {
+async function assertRemoteMirror(
+  source: SkillSource,
+  localFiles: Record<string, string>
+): Promise<void> {
   const version = JSON.parse(await source.readText('version.json')) as { version?: unknown }
   if (version.version !== PACKAGE_VERSION) {
     throw new Error(
@@ -120,11 +126,7 @@ async function assertRemoteMirror(source: SkillSource): Promise<void> {
   const remote = JSON.parse(await source.readText('manifest.json')) as {
     files?: Record<string, string>
   }
-  const local = JSON.parse(await readFile(join(packagedSkillRoot(), 'manifest.json'), 'utf8')) as {
-    files?: Record<string, string>
-  }
   const remoteFiles = remote.files ?? {}
-  const localFiles = local.files ?? {}
   if (!sameDigest(remoteFiles, localFiles)) {
     throw new Error('Remote skill digest does not match the packaged snapshot')
   }
@@ -369,16 +371,6 @@ export function createReferencePointer(
   }
 
   return { path: normalizedPath, reason, truncated: false }
-}
-
-export async function readContext7Source(index: SkillIndex): Promise<ReferenceSource> {
-  const text = await index.source.readText('context7.json')
-  return {
-    path: 'context7.json',
-    reason: 'Generated Tigercat MCP inventory and route map.',
-    truncated: false,
-    text
-  }
 }
 
 // 保留 CJK 统一表意文字:中文别名/任务词(如 表单、日期选择器)归一化后不再被清空,

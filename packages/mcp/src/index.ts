@@ -144,17 +144,19 @@ function helpText(): string {
     'Runs the Tigercat skill MCP server over stdio.',
     'By default skill references come from the snapshot shipped with this package.',
     '',
-    '  --root <repo-root>       read skills from a local Tigercat checkout (dev/offline mode).',
+    '  --root <repo-root>       read skills from a local Tigercat checkout for development.',
     '  --base-url <https-url>   explicit https mirror. Version and file digests must match this package.',
     '  --doctor                 validate the skill inventory and exit without starting stdio.',
     '  TIGERCAT_MCP_BASE_URL    environment fallback for --base-url.',
     '',
+    'Source priority: --root > --base-url > TIGERCAT_MCP_BASE_URL > packaged snapshot.',
+    '',
     'Examples:',
-    '  tigercat-mcp                                   # remote skills (default)',
+    '  tigercat-mcp                                   # packaged snapshot (offline default)',
     '  tigercat-mcp --root /path/to/Tigercat          # local checkout',
     '  tigercat-mcp --base-url https://mirror.example.com/mcp/',
     '',
-    'If GitHub Pages is unreachable (offline, proxy, regional block), use --root or --base-url.'
+    'If the selected mirror is unreachable, remove --base-url / TIGERCAT_MCP_BASE_URL to use the packaged snapshot, or use --root for a local checkout.'
   ].join('\n')
 }
 

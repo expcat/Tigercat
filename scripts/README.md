@@ -77,21 +77,22 @@ TEST_GROUP=form pnpm test:validate
 
 ## MCP 服务
 
-`@expcat/tigercat-mcp` 是只读的 stdio MCP 服务。默认从 GitHub Pages 的
-`https://expcat.github.io/Tigercat/mcp/` 远程读取 `context7.json` 和
-`skills/tigercat/**`（随 Pages 部署发布，见 `.github/workflows/deploy.yml`）。
+`@expcat/tigercat-mcp` 是只读的 stdio MCP 服务，默认读取随包技能快照。
 服务只做组件/任务到最小 skill references 的路由，不运行 `docs:api` 也不修改生成文档。
 
-客户端 JSON / `claude mcp add` 片段见 [README.md](../README.md#mcp-接入ai-agent)。
+来源优先级与客户端 JSON / `claude mcp add` 片段见 [README.md](../README.md#mcp-接入ai-agent)。
+MCP 构建通过 `sync-mcp-snapshot.mjs` 复制 `context7.json` 与 `skills/**`；
+Pages 部署也复制相同技能源（见 `.github/workflows/deploy.yml`）。两者共用
+`write-mcp-manifest.mjs`，只为这些技能文件生成版本与 SHA-256 清单，不包含展示页 HTML。
 
 ```bash
 pnpm mcp:build
 pnpm mcp:serve          # 等价于 --root .（本地模式）
 ```
 
-- 本地/离线：`tigercat-mcp --root /path/to/Tigercat`（读取仓库 checkout；`pnpm mcp:serve` 即此模式）。
-- 镜像：`--base-url <url>` 或环境变量 `TIGERCAT_MCP_BASE_URL`。
-- 诊断：`tigercat-mcp --doctor` 校验技能源可达性、清单完整性与远程版本。
+- 本地开发：`tigercat-mcp --root /path/to/Tigercat`（读取仓库 checkout；`pnpm mcp:serve` 即此模式）。
+- 显式镜像：`--base-url <url>` 或环境变量 `TIGERCAT_MCP_BASE_URL`，版本与文件摘要须匹配随包快照；移除镜像配置可回到默认离线快照。
+- 诊断：`tigercat-mcp --doctor` 校验所选技能源的可读性、清单完整性与远程版本及实际正文摘要。
 
 远程 allow-list 由 `context7.json` 的 `skill_files` 清单驱动，`pnpm docs:api` 生成、`pnpm api:validate` 与磁盘双向校验。改动 skill 文件集合后必须重跑 `pnpm docs:api`，否则远程模式会读不到新文件。工具调用顺序见 [SKILL.md](../skills/tigercat/SKILL.md)，本文不重复。
 

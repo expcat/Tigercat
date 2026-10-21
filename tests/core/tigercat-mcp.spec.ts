@@ -206,6 +206,19 @@ describe('Tigercat MCP stdio server', () => {
       })
       expect(blocked.isError).toBe(true)
       expect(JSON.parse(String(blocked.content[0].text)).error).toContain('parent segments')
+
+      const inventory = await client.readResource({ uri: 'tigercat://inventory' })
+      expect(JSON.parse(String(inventory.contents[0].text)).componentCount).toBe(185)
+      const reference = await client.readResource({
+        uri: 'tigercat://reference/skills/tigercat/SKILL.md'
+      })
+      expect(reference.contents[0].text).toContain('Tigercat UI Component Library')
+      await expect(
+        client.readResource({ uri: 'tigercat://reference/../package.json' })
+      ).rejects.toThrow('parent segments')
+      await expect(client.readResource({ uri: 'tigercat://unknown' })).rejects.toThrow(
+        'Unknown Tigercat MCP resource'
+      )
     } finally {
       await client.close()
     }
