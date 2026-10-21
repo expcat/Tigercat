@@ -261,12 +261,11 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
       sessionRef.current = createSignatureSession(session.strokes)
       setStrokes(session.strokes)
       setCommitted(payload.value, payload)
-      formItemControl?.onChange?.(payload.value)
       if (extra?.clear) onClear?.()
       if (extra?.undo) onUndo?.()
       return payload
     },
-    [exportOptions, formItemControl, onClear, onUndo, setCommitted]
+    [exportOptions, onClear, onUndo, setCommitted]
   )
 
   const clear = useCallback(() => {

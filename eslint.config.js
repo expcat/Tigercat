@@ -37,6 +37,10 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-empty-object-type': 'off', // Allow empty interfaces for type aliases
       'no-undef': 'off', // TypeScript handles this
+      // The base rule flags TS function overloads as redeclarations; the
+      // extension rule keeps genuine duplicates as errors while allowing them.
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': 'error',
       // ESLint v10 enables this in `recommended`, but it produces false positives
       // for the common `let x = 0; if (...) x = a; else x = b` pattern, where
       // the initial assignment exists to satisfy TS strict initialization.

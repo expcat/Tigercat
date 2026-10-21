@@ -42,6 +42,13 @@ describe('Slider', () => {
       const { container } = render(Slider, { props: { className: 'custom-slider' } })
       expect(container.querySelector('.custom-slider')).toBeInTheDocument()
     })
+
+    it('should keep the painted fill by default and drop it when showRange is false', () => {
+      const filled = render(Slider, { props: { modelValue: 40 } }).container
+      expect(filled.querySelector('.absolute.inset-y-0')).not.toBeNull()
+      const empty = render(Slider, { props: { modelValue: 40, showRange: false } }).container
+      expect(empty.querySelector('.absolute.inset-y-0')).toBeNull()
+    })
   })
 
   describe('Value and ARIA', () => {
@@ -172,6 +179,21 @@ describe('Slider', () => {
       const thumbs = getThumbs(container)
       expect(thumbs[0].getAttribute('aria-label')).toContain('Minimum')
       expect(thumbs[1].getAttribute('aria-label')).toContain('Maximum')
+    })
+
+    it('should push the other thumb one step away when pushApart is set', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          defaultValue: [40, 50],
+          range: true,
+          pushApart: true,
+          step: 10,
+          'onUpdate:modelValue': onUpdate
+        }
+      })
+      await fireEvent.keyDown(getThumbs(container)[0], { key: 'ArrowRight' })
+      expect(onUpdate).toHaveBeenCalledWith([50, 60])
     })
   })
 

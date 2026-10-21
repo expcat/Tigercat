@@ -52,12 +52,6 @@ export interface SliderProps {
   readOnly?: boolean
 
   /**
-   * Vertical track. The bottom edge is `min`.
-   * @default false
-   */
-  vertical?: boolean
-
-  /**
    * When range thumbs meet, push the other thumb one step away.
    * @default false
    */
@@ -68,12 +62,6 @@ export interface SliderProps {
    * @default true
    */
   showRange?: boolean
-
-  /**
-   * Show the current value in an InputNumber beside the track.
-   * @default false
-   */
-  showInput?: boolean
 
   /**
    * Tooltip and `aria-valuetext` text.

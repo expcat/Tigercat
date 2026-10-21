@@ -147,7 +147,6 @@ export const Upload = defineComponent({
   },
   emits: {
     'update:fileList': (files: UploadFile[]) => Array.isArray(files),
-    remove: (_file: UploadFile, _fileList: UploadFile[]) => true,
     preview: (_file: UploadFile) => true,
     progress: (progress: number, _file: UploadFile) => typeof progress === 'number',
     success: (_response: unknown, _file: UploadFile) => true,
@@ -311,8 +310,7 @@ export const Upload = defineComponent({
 
     const handleRemove = async (file: UploadFile) => {
       if (!canMutate.value) return
-      const removed = await controller.remove(file)
-      if (removed) emit('remove', file, fileListValue.value)
+      await controller.remove(file)
     }
 
     const handleRetry = (file: UploadFile) => {

@@ -49,6 +49,13 @@ describe('Slider', () => {
       const { container } = render(<Slider className="custom-class" />)
       expect(container.querySelector('.custom-class')).toBeInTheDocument()
     })
+
+    it('should keep the painted fill by default and drop it when showRange is false', () => {
+      const filled = render(<Slider value={40} />).container
+      expect(filled.querySelector('.absolute.inset-y-0')).not.toBeNull()
+      const empty = render(<Slider value={40} showRange={false} />).container
+      expect(empty.querySelector('.absolute.inset-y-0')).toBeNull()
+    })
   })
 
   describe('Value and ARIA', () => {
@@ -90,6 +97,20 @@ describe('Slider', () => {
       await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
       expect(onChange).not.toHaveBeenCalled()
     })
+
+    it('should stop arrow-key edits after readOnly flips on', async () => {
+      const onChange = vi.fn()
+      const { container, rerender } = render(<Slider value={40} onChange={onChange} />)
+      await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
+      expect(onChange).toHaveBeenCalledTimes(1)
+
+      onChange.mockClear()
+      rerender(<Slider value={40} readOnly onChange={onChange} />)
+      await fireEvent.keyDown(getThumb(container), { key: 'ArrowRight' })
+      expect(onChange).not.toHaveBeenCalled()
+      expect(getThumb(container)).toHaveAttribute('aria-valuenow', '40')
+    })
+
     it.each([
       ['ArrowRight', 100],
       ['ArrowLeft', 0]
@@ -167,6 +188,15 @@ describe('Slider', () => {
       const fallback = getThumbs(noLabel)
       expect(fallback[0]).toHaveAttribute('aria-label', 'Slider, Minimum value')
       expect(fallback[1]).toHaveAttribute('aria-label', 'Slider, Maximum value')
+    })
+
+    it('should push the other thumb one step away when pushApart is set', async () => {
+      const onChange = vi.fn()
+      const { container } = render(
+        <Slider defaultValue={[40, 50]} range pushApart step={10} onChange={onChange} />
+      )
+      await fireEvent.keyDown(getThumbs(container)[0], { key: 'ArrowRight' })
+      expect(onChange).toHaveBeenCalledWith([50, 60])
     })
   })
 

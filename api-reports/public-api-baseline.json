@@ -8543,14 +8543,12 @@
         "pushApart",
         "range",
         "readOnly",
-        "showInput",
         "showRange",
         "size",
         "status",
         "step",
         "tooltip",
-        "value",
-        "vertical"
+        "value"
       ]
     },
     "SpaceProps": {

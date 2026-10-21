@@ -9,6 +9,7 @@ import { Signature, type SignatureRef } from '@expcat/tigercat-react/Signature'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
+import { FormItemControlProvider } from '../../packages/react/src/components/FormItemContext'
 import {
   signatureStrokesToSvg,
   signatureSvgToDataUrl,
@@ -352,6 +353,18 @@ describe('Signature', () => {
     await waitFor(() => expect(clearButton).not.toBeDisabled())
     fireEvent.click(clearButton)
     await waitFor(() => expect(onChange.mock.calls.at(-1)?.[0]).toBe(''))
+  })
+
+  it('notifies FormItem change once per stroke', async () => {
+    const onFormChange = vi.fn()
+    render(
+      <FormItemControlProvider value={{ onChange: onFormChange }}>
+        <Signature width={480} height={180} />
+      </FormItemControlProvider>
+    )
+    drawSignature(pad())
+    await waitFor(() => expect(onFormChange).toHaveBeenCalled())
+    expect(onFormChange).toHaveBeenCalledTimes(1)
   })
 
   it('does not treat moving focus to Clear as a field blur', async () => {

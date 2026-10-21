@@ -25,6 +25,7 @@ import {
   sliderGetPercentage,
   sliderGetValueFromClientX,
   sliderGetKeyboardValue,
+  sliderPushApartRange,
   formatSliderTooltip,
   sliderResolveMarks,
   sliderValuesEqual,
@@ -99,10 +100,8 @@ export const Slider = defineComponent({
     step: { type: Number, default: 1 },
     disabled: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
-    vertical: { type: Boolean, default: false },
     pushApart: { type: Boolean, default: false },
     showRange: { type: Boolean, default: true },
-    showInput: { type: Boolean, default: false },
     formatTooltip: { type: Function as PropType<(value: number) => string>, default: undefined },
     marks: {
       type: [Boolean, Object] as PropType<boolean | Record<number, string>>,
@@ -234,6 +233,22 @@ export const Slider = defineComponent({
       showTooltip.value = false
     }
 
+    watch([effectiveDisabled, () => props.readOnly], () => {
+      if (!isDragging.value) return
+      if (!effectiveDisabled.value && !props.readOnly) return
+      stopDrag()
+      preview.value = null
+    })
+
+    const applyThumbProposal = (
+      current: number | [number, number],
+      next: number,
+      thumb: 'min' | 'max' | null
+    ): number | [number, number] =>
+      props.pushApart && props.range && thumb && Array.isArray(current)
+        ? sliderPushApartRange(current, next, thumb, props.min, props.max, props.step)
+        : sliderApplyThumbValue(current, next, thumb, props.range)
+
     onBeforeUnmount(stopDrag)
 
     const handlePointerDown = (event: PointerEvent, thumb: 'min' | 'max' | null) => {
@@ -262,7 +277,7 @@ export const Slider = defineComponent({
       activeThumb.value = which
       isDragging.value = true
       if (props.tooltip) showTooltip.value = true
-      preview.value = sliderApplyThumbValue(current, pointerValue, which, props.range)
+      preview.value = applyThumbProposal(current, pointerValue, which)
       ;(event.currentTarget as HTMLElement).focus()
 
       dragSession?.dispose()
@@ -285,11 +300,10 @@ export const Slider = defineComponent({
             props.step,
             dir
           )
-          preview.value = sliderApplyThumbValue(
+          preview.value = applyThumbProposal(
             preview.value ?? displayed.value,
             moved,
-            activeThumbLive,
-            props.range
+            activeThumbLive
           )
         },
         onEnd: () => {
@@ -412,7 +426,7 @@ export const Slider = defineComponent({
               )
               if (newValue === null) return
               e.preventDefault()
-              commit(sliderApplyThumbValue(displayed.value, newValue, thumbType, props.range))
+              commit(applyThumbProposal(displayed.value, newValue, thumbType))
             }
           },
           [
@@ -489,14 +503,13 @@ export const Slider = defineComponent({
                     onClick: () => {
                       if (effectiveDisabled.value || props.readOnly) return
                       commit(
-                        props.range && Array.isArray(displayed.value)
-                          ? (sliderApplyThumbValue(
-                              displayed.value,
-                              Number(key),
-                              sliderPickRangeThumb(displayed.value, Number(key)),
-                              true
-                            ) as [number, number])
-                          : Number(key)
+                        applyThumbProposal(
+                          displayed.value,
+                          Number(key),
+                          props.range && Array.isArray(displayed.value)
+                            ? sliderPickRangeThumb(displayed.value, Number(key))
+                            : null
+                        )
                       )
                     }
                   },
@@ -510,9 +523,7 @@ export const Slider = defineComponent({
         {
           ...restAttrs,
           ref: rootElement,
-          'data-orientation': props.vertical ? 'vertical' : 'horizontal',
           'data-readonly': props.readOnly || undefined,
-          'data-show-input': props.showInput || undefined,
           'data-show-range': props.showRange || undefined,
           'data-push-apart': props.pushApart || undefined,
           class: getSliderRootClasses(
@@ -546,7 +557,12 @@ export const Slider = defineComponent({
                     handlePointerDown(e, null)
                   }
                 },
-                [h('div', { class: sliderRangeClasses, style: rangeStyles }), thumbs]
+                [
+                  props.showRange
+                    ? h('div', { class: sliderRangeClasses, style: rangeStyles })
+                    : null,
+                  thumbs
+                ]
               )
             ]
           ),

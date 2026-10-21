@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
+  addDecimalString,
+  commitInputNumberModel,
   commitInputNumberValue,
   formatInputNumberDisplay,
   formatInputNumberEditingDisplay,
@@ -7,6 +9,7 @@ import {
   getInputNumberKeyboardNextValue,
   inputNumberControlsRightClasses,
   parseInputNumberValue,
+  stepInputNumberModel,
   stepValue
 } from '@expcat/tigercat-core'
 
@@ -108,6 +111,36 @@ describe('input-number-utils', () => {
     it('ignores Home/End when bounds are infinite', () => {
       expect(getInputNumberKeyboardNextValue('Home', 4, { step: 1 })).toBeUndefined()
       expect(getInputNumberKeyboardNextValue('End', 4, { step: 1 })).toBeUndefined()
+    })
+  })
+
+  describe('string model contracts', () => {
+    it('applies the same clamp, snap and precision contract as the number path', () => {
+      expect(commitInputNumberModel('9007199254740993', null, { max: 100 }).value).toBe(100)
+      expect(commitInputNumberModel('-9007199254740993', null, { min: -100.5 }).value).toBe(-100.5)
+      expect(commitInputNumberModel('9.999', null, { max: 1.5, precision: 2 }).value).toBe('1.50')
+      expect(
+        commitInputNumberModel('9007199254740993', null, { max: 94, step: 10, snapToStep: true })
+          .value
+      ).toBe(commitInputNumberValue(100, null, { max: 94, step: 10, snapToStep: true }).value)
+      expect(
+        commitInputNumberModel('9007199254740993', null, { snapToStep: true, step: 10 }).value
+      ).toBe('9007199254740990')
+      expect(
+        commitInputNumberModel('9007199254740993.93', null, { snapToStep: true, step: 0.1 }).value
+      ).toBe('9007199254740993.90')
+    })
+
+    it('steps exact decimal strings including scientific-notation deltas', () => {
+      expect(addDecimalString('9007199254740993', 1e-7)).toBe('9007199254740993.0000001')
+      expect(addDecimalString('9007199254740993', 1e21)).toBe('1000009007199254740993')
+      expect(stepInputNumberModel('9007199254740993', 1, 'up')).toBe('9007199254740994')
+      expect(stepInputNumberModel('9007199254740993', 1, 'up', -Infinity, 100)).toBe(100)
+      expect(stepInputNumberModel('1.25', 0.1, 'up', -Infinity, 1.2, 2)).toBe('1.20')
+      expect(getInputNumberKeyboardNextValue('ArrowUp', '9007199254740993')).toBe(
+        '9007199254740994'
+      )
+      expect(getInputNumberKeyboardNextValue('PageUp', '9007199254740993')).toBe('9007199254741003')
     })
   })
 

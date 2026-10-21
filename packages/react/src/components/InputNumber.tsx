@@ -12,7 +12,6 @@ import {
   inputNumberDownIconPathD,
   inputNumberMinusIconPathD,
   inputNumberPlusIconPathD,
-  stepValue,
   isAtMin,
   isAtMax,
   formatInputNumberDisplay,
@@ -20,6 +19,7 @@ import {
   parseInputNumberValue,
   parseInputNumberModel,
   commitInputNumberModel,
+  stepInputNumberModel,
   addDecimalString,
   getInputNumberKeyboardNextValue,
   resolveInputNumberControlsLayout,
@@ -135,7 +135,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   const mountedRef = useRef(false)
   const focusedRef = useRef(false)
   const repeatControllerRef = useRef(createRafRepeatActionController())
-  const repeatValueRef = useRef<number | null>(null)
+  const repeatValueRef = useRef<number | string | null>(null)
   const suppressNextClickRef = useRef(false)
   const [focused, setFocused] = useState(false)
   const [currentValue, setValue] = useControlledState<number | string | null>({
@@ -174,6 +174,10 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   useEffect(() => () => repeatControllerRef.current.stop(), [])
 
   useEffect(() => {
+    if (effectiveDisabled || isReadOnly) repeatControllerRef.current.stop()
+  }, [effectiveDisabled, isReadOnly])
+
+  useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true
       return
@@ -203,11 +207,9 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   const handleStep = (
     direction: 'up' | 'down',
     baseValue: number | string | null | undefined = currentValue
-  ): number | null => {
-    const numeric = numericInputNumber(baseValue)
-    if (effectiveDisabled || isReadOnly) return numeric
-    const next = stepValue(numeric, step, direction, min, max, precision)
-    return numericInputNumber(commit(next))
+  ): number | string | null => {
+    if (effectiveDisabled || isReadOnly) return baseValue ?? null
+    return commit(stepInputNumberModel(baseValue, step, direction, min, max, precision))
   }
 
   const handleStepClick = (direction: 'up' | 'down') => {
@@ -230,14 +232,14 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
       if (direction === 'up' && isAtMax(numericInputNumber(currentValue), max)) return
 
       suppressNextClickRef.current = true
-      repeatValueRef.current = numericInputNumber(currentValue)
+      focusInput()
+      repeatValueRef.current = currentValue
       repeatControllerRef.current.start(() => {
         const baseValue = repeatValueRef.current
         const nextValue = handleStep(direction, baseValue)
         repeatValueRef.current = nextValue
         if (nextValue === baseValue) repeatControllerRef.current.stop()
       })
-      focusInput()
     }
   }
 
@@ -273,7 +275,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
           : parseInputNumberModel(displayValue)
       )
     } else {
-      const next = getInputNumberKeyboardNextValue(e.key, numericInputNumber(currentValue), {
+      const next = getInputNumberKeyboardNextValue(e.key, currentValue, {
         min,
         max,
         step,

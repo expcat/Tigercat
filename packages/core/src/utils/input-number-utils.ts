@@ -242,6 +242,105 @@ function splitDecimal(value: string): { sign: -1 | 1; digits: string; scale: num
   return { sign, digits: `${whole}${frac}`.replace(/^0+(?=\d)/, ''), scale: frac.length }
 }
 
+/** Expand a finite number into plain decimal text so `1e-7` can be scaled by BigInt. */
+function toDecimalString(value: number): string {
+  if (!Number.isFinite(value)) return '0'
+  const text = String(value)
+  if (!text.includes('e') && !text.includes('E')) return text
+  const negative = text.startsWith('-')
+  const body = negative ? text.slice(1) : text
+  const [mantissa, exponentText] = body.split(/e/i)
+  const exponent = Number(exponentText)
+  const [whole, frac = ''] = mantissa.split('.')
+  const digits = `${whole}${frac}`.replace(/^0+(?=\d)/, '') || '0'
+  const point = whole.length + exponent
+  let expanded: string
+  if (point <= 0) {
+    expanded = `0.${'0'.repeat(-point)}${digits}`
+  } else if (point >= digits.length) {
+    expanded = `${digits}${'0'.repeat(point - digits.length)}`
+  } else {
+    expanded = `${digits.slice(0, point)}.${digits.slice(point)}`
+  }
+  return negative ? `-${expanded}` : expanded
+}
+
+function compareDecimalStrings(left: string, right: string): number {
+  const a = splitDecimal(left)
+  const b = splitDecimal(right)
+  if (!a || !b) return 0
+  if (a.sign !== b.sign) return a.sign < b.sign ? -1 : 1
+  const scale = Math.max(a.scale, b.scale)
+  const leftInt = BigInt(a.digits || '0') * 10n ** BigInt(scale - a.scale)
+  const rightInt = BigInt(b.digits || '0') * 10n ** BigInt(scale - b.scale)
+  const magnitude = leftInt === rightInt ? 0 : leftInt < rightInt ? -1 : 1
+  return a.sign < 0 ? -magnitude : magnitude
+}
+
+/**
+ * Clamp a decimal string to finite bounds. A clamped value returns the numeric
+ * bound itself; unclamped values keep their exact string form.
+ */
+function clampDecimalModel(value: string, min: number, max: number): string | number {
+  if (Number.isFinite(min) && compareDecimalStrings(value, toDecimalString(min)) < 0) return min
+  if (Number.isFinite(max) && compareDecimalStrings(value, toDecimalString(max)) > 0) return max
+  return value
+}
+
+function clampDecimalResult(value: string | number, min: number, max: number): string | number {
+  return typeof value === 'number'
+    ? clampValue(value, min, max)
+    : clampDecimalModel(value, min, max)
+}
+
+function snapDecimalModelToStep(
+  value: string | number,
+  min: number,
+  step: number,
+  precision?: number
+): string | number {
+  return typeof value === 'number'
+    ? snapInputNumberToStep(value, min, step, precision)
+    : snapDecimalStringToStep(value, min, step, precision)
+}
+
+function formatDecimalModelPrecision(value: string | number, precision: number): string {
+  return addDecimalString(typeof value === 'number' ? toDecimalString(value) : value, 0, precision)
+}
+
+function floorDivBigInt(numerator: bigint, denominator: bigint): bigint {
+  const quotient = numerator / denominator
+  return numerator % denominator !== 0n && numerator < 0n !== denominator < 0n
+    ? quotient - 1n
+    : quotient
+}
+
+/** Snap a decimal string onto the same grid as `snapInputNumberToStep`. */
+function snapDecimalStringToStep(
+  value: string,
+  min: number,
+  step: number,
+  precision?: number
+): string {
+  const origin = Number.isFinite(min) ? min : 0
+  const safeStep = Number.isFinite(step) && step > 0 ? step : 1
+  const base = splitDecimal(value)
+  const originParts = splitDecimal(toDecimalString(origin))
+  const stepParts = splitDecimal(toDecimalString(safeStep))
+  if (!base || !originParts || !stepParts) return value
+  const places = Math.max(base.scale, originParts.scale, stepParts.scale, precision ?? 0)
+  const toScaled = (parts: { sign: -1 | 1; digits: string; scale: number }): bigint =>
+    BigInt(parts.digits || '0') * 10n ** BigInt(places - parts.scale) * BigInt(parts.sign)
+  const stepInt = toScaled(stepParts)
+  if (stepInt === 0n) return value
+  const originInt = toScaled(originParts)
+  const offset = toScaled(base) - originInt
+  const rounded = floorDivBigInt(offset * 2n + stepInt, stepInt * 2n)
+  const snapped = originInt + rounded * stepInt
+  const sign: -1 | 1 = snapped < 0n ? -1 : 1
+  return formatDecimalParts(sign, (snapped < 0n ? -snapped : snapped).toString(), places)
+}
+
 function formatDecimalParts(
   sign: -1 | 1,
   digits: string,
@@ -279,7 +378,7 @@ function formatDecimalParts(
 export function addDecimalString(current: string, delta: number, precision?: number): string {
   const base = splitDecimal(current)
   if (!base) return current
-  const deltaText = String(delta)
+  const deltaText = toDecimalString(delta)
   const step = splitDecimal(deltaText)
   if (!step) return current
   const scale = Math.max(base.scale, step.scale, precision ?? 0)
@@ -300,7 +399,9 @@ export function stepInputNumberModel(
 ): InputNumberModel {
   if (typeof current === 'string') {
     const delta = direction === 'up' ? Math.abs(step || 1) : -Math.abs(step || 1)
-    return addDecimalString(current, delta, precision)
+    let next: string | number = clampDecimalModel(addDecimalString(current, delta), min, max)
+    if (precision !== undefined) next = formatDecimalModelPrecision(next, precision)
+    return next
   }
   return stepValue(current, step, direction, min, max, precision)
 }
@@ -311,8 +412,17 @@ export function commitInputNumberModel(
   options: CommitInputNumberOptions = {}
 ): { value: InputNumberModel; changed: boolean } {
   if (typeof raw === 'string') {
-    let next: InputNumberModel = raw
-    if (options.precision !== undefined) next = addDecimalString(raw, 0, options.precision)
+    const min = options.min ?? -Infinity
+    const max = options.max ?? Infinity
+    let next: string | number = clampDecimalModel(raw, min, max)
+    if (options.snapToStep) {
+      next = clampDecimalResult(
+        snapDecimalModelToStep(next, min, options.step ?? 1, options.precision),
+        min,
+        max
+      )
+    }
+    if (options.precision !== undefined) next = formatDecimalModelPrecision(next, options.precision)
     return { value: next, changed: next !== current }
   }
   const numericCurrent = typeof current === 'number' ? current : null
@@ -431,12 +541,24 @@ export interface InputNumberKeyboardOptions {
 /**
  * Next committed value for a key, or `undefined` if the key is not handled.
  * Same value at a bound is still returned — callers skip emit via `changed`.
+ * Number callers keep the original `number | undefined` static contract via
+ * the first overload; the string model steps exactly without Number coercion.
  */
 export function getInputNumberKeyboardNextValue(
   key: string,
   current: number | null,
+  options?: InputNumberKeyboardOptions
+): number | undefined
+export function getInputNumberKeyboardNextValue(
+  key: string,
+  current: InputNumberModel,
+  options?: InputNumberKeyboardOptions
+): InputNumberModel | undefined
+export function getInputNumberKeyboardNextValue(
+  key: string,
+  current: InputNumberModel,
   options: InputNumberKeyboardOptions = {}
-): number | undefined {
+): InputNumberModel | undefined {
   if (options.keyboard === false) return undefined
   const min = options.min ?? -Infinity
   const max = options.max ?? Infinity
@@ -446,13 +568,13 @@ export function getInputNumberKeyboardNextValue(
 
   switch (key) {
     case 'ArrowUp':
-      return stepValue(current, step, 'up', min, max, precision)
+      return stepInputNumberModel(current, step, 'up', min, max, precision)
     case 'ArrowDown':
-      return stepValue(current, step, 'down', min, max, precision)
+      return stepInputNumberModel(current, step, 'down', min, max, precision)
     case 'PageUp':
-      return stepValue(current, largeStep, 'up', min, max, precision)
+      return stepInputNumberModel(current, largeStep, 'up', min, max, precision)
     case 'PageDown':
-      return stepValue(current, largeStep, 'down', min, max, precision)
+      return stepInputNumberModel(current, largeStep, 'down', min, max, precision)
     case 'Home':
       if (!Number.isFinite(min)) return undefined
       return precision !== undefined ? formatPrecision(min, precision) : min

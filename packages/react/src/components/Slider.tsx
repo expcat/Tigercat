@@ -21,6 +21,7 @@ import {
   sliderGetPercentage,
   sliderGetValueFromClientX,
   sliderGetKeyboardValue,
+  sliderPushApartRange,
   formatSliderTooltip,
   sliderResolveMarks,
   sliderValuesEqual,
@@ -195,10 +196,8 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     step = 1,
     disabled = false,
     readOnly = false,
-    vertical = false,
     pushApart = false,
     showRange = true,
-    showInput = false,
     formatTooltip,
     marks = false,
     tooltip = true,
@@ -326,6 +325,25 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
 
   useEffect(() => () => stopDrag(), [stopDrag])
 
+  useEffect(() => {
+    if (!isDragging || (!effectiveDisabled && !readOnly)) return
+    stopDrag()
+    previewRef.current = null
+    setPreview(null)
+  }, [isDragging, effectiveDisabled, readOnly, stopDrag])
+
+  const applyThumbProposal = useCallback(
+    (
+      current: number | [number, number],
+      next: number,
+      thumb: 'min' | 'max' | null
+    ): number | [number, number] =>
+      pushApart && range && thumb && Array.isArray(current)
+        ? sliderPushApartRange(current, next, thumb, min, max, step)
+        : sliderApplyThumbValue(current, next, thumb, range),
+    [pushApart, range, min, max, step]
+  )
+
   const handlePointerDown = (event: React.PointerEvent, thumb: 'min' | 'max' | null) => {
     onPointerDown?.(event)
     if (event.defaultPrevented || effectiveDisabled || readOnly) return
@@ -345,7 +363,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
     setActiveThumb(which)
     setIsDragging(true)
     if (tooltip) setShowTooltip(true)
-    rememberPreview(sliderApplyThumbValue(current, pointerValue, which, range))
+    rememberPreview(applyThumbProposal(current, pointerValue, which))
     ;(event.currentTarget as HTMLElement).focus()
 
     dragSessionRef.current?.dispose()
@@ -362,12 +380,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
         const dir = getElementTextDirection(trackRef.current) === 'rtl'
         const moved = sliderGetValueFromClientX(currentX, box, min, max, step, dir)
         rememberPreview(
-          sliderApplyThumbValue(
-            previewRef.current ?? valueRef.current,
-            moved,
-            activeThumbRef.current,
-            range
-          )
+          applyThumbProposal(previewRef.current ?? valueRef.current, moved, activeThumbRef.current)
         )
       },
       onEnd: () => {
@@ -400,10 +413,10 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
       if (newValue === null) return
       e.preventDefault()
       const current = valueRef.current
-      const next = sliderApplyThumbValue(current, newValue, thumbType, range)
+      const next = applyThumbProposal(current, newValue, thumbType)
       commit(next)
     },
-    [effectiveDisabled, min, max, step, range, commit]
+    [effectiveDisabled, readOnly, min, max, step, range, commit, applyThumbProposal]
   )
 
   const trackClasses = useMemo(
@@ -455,8 +468,6 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
       ref={setRootRef}
       className={getSliderRootClasses(effectiveDisabled, className, status)}
       data-status={status === 'default' ? undefined : status}
-      data-orientation={vertical ? 'vertical' : 'horizontal'}
-      data-show-input={showInput || undefined}
       data-show-range={showRange || undefined}
       data-push-apart={pushApart || undefined}
       data-readonly={readOnly || undefined}
@@ -468,7 +479,7 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
       }}>
       <div className={sliderHitAreaClasses} onPointerDown={handleTrackPointerDown}>
         <div ref={trackRef} className={trackClasses} onPointerDown={handleTrackPointerDown}>
-          <div className={sliderRangeClasses} style={rangeStyles} />
+          {showRange ? <div className={sliderRangeClasses} style={rangeStyles} /> : null}
           {range && Array.isArray(displayed) ? (
             <>
               <Thumb
@@ -589,14 +600,13 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                   if (effectiveDisabled || readOnly) return
                   const current = valueRef.current
                   commit(
-                    range && Array.isArray(current)
-                      ? (sliderApplyThumbValue(
-                          current,
-                          markValue,
-                          sliderPickRangeThumb(current, markValue),
-                          true
-                        ) as [number, number])
-                      : markValue
+                    applyThumbProposal(
+                      current,
+                      markValue,
+                      range && Array.isArray(current)
+                        ? sliderPickRangeThumb(current, markValue)
+                        : null
+                    )
                   )
                 }}>
                 {label}

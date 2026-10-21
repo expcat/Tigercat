@@ -24,7 +24,6 @@ import {
   inputNumberDownIconPathD,
   inputNumberMinusIconPathD,
   inputNumberPlusIconPathD,
-  stepValue,
   isAtMin,
   isAtMax,
   formatInputNumberDisplay,
@@ -187,7 +186,7 @@ export const InputNumber = defineComponent({
     const focused = ref(false)
     const displayValue = ref('')
     const repeatController = createRafRepeatActionController()
-    let repeatValue: number | null = null
+    let repeatValue: number | string | null = null
     let suppressNextClick = false
 
     expose({
@@ -274,27 +273,16 @@ export const InputNumber = defineComponent({
       baseValue: number | string | null | undefined = currentValue.value
     ): number | string | null {
       if (effectiveDisabled.value || props.readOnly) return baseValue ?? null
-      if (typeof baseValue === 'string') {
-        return commit(
-          stepInputNumberModel(
-            baseValue,
-            props.step,
-            direction,
-            props.min,
-            props.max,
-            props.precision
-          )
+      return commit(
+        stepInputNumberModel(
+          baseValue ?? null,
+          props.step,
+          direction,
+          props.min,
+          props.max,
+          props.precision
         )
-      }
-      const next = stepValue(
-        baseValue,
-        props.step,
-        direction,
-        props.min,
-        props.max,
-        props.precision
       )
-      return commit(next)
     }
 
     function handleStepClick(direction: 'up' | 'down') {
@@ -314,11 +302,11 @@ export const InputNumber = defineComponent({
         if (direction === 'up' && isAtMax(numericInputNumber(currentValue.value), props.max)) return
 
         suppressNextClick = true
-        repeatValue = numericInputNumber(currentValue.value)
+        repeatValue = currentValue.value
         repeatController.start(() => {
           const baseValue = repeatValue
           const nextValue = handleStep(direction, baseValue)
-          repeatValue = numericInputNumber(nextValue)
+          repeatValue = nextValue
           if (nextValue === baseValue) repeatController.stop()
         })
         inputRef.value?.focus()
@@ -350,17 +338,13 @@ export const InputNumber = defineComponent({
       if (e.key === 'Enter') {
         commit(parseValue(displayValue.value))
       } else {
-        const next = getInputNumberKeyboardNextValue(
-          e.key,
-          numericInputNumber(currentValue.value),
-          {
-            min: props.min,
-            max: props.max,
-            step: props.step,
-            precision: props.precision,
-            keyboard: props.keyboard && !effectiveDisabled.value && !props.readOnly
-          }
-        )
+        const next = getInputNumberKeyboardNextValue(e.key, currentValue.value, {
+          min: props.min,
+          max: props.max,
+          step: props.step,
+          precision: props.precision,
+          keyboard: props.keyboard && !effectiveDisabled.value && !props.readOnly
+        })
         if (next !== undefined) {
           e.preventDefault()
           commit(next)

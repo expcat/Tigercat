@@ -10,6 +10,10 @@ Core 布局 helper 返回键调整：`getRowGutterStyleVars` / `getRowAlignJusti
 
 Core Carousel 轨道位移 helper 修正：`getScrollTransform(index, dir)` 此前忽略 `dir` 参数，RTL 下位移方向错误，本轮修正为 RTL 返回正位移；曾按旧的错误方向手工反向补偿的外部消费者应移除补偿。`getCarouselAxisTransform(index, axis, perView, dir?)` 新增可选 `dir` 参数，只影响水平 RTL 的符号；省略该参数的既有调用行为不变，无需迁移。
 
+Slider 公开 props 删除 `vertical` 与 `showInput`：这两个配置自引入起没有任何实际能力（无纵向轨道布局、不渲染旁路数值输入），本轮连同根元素上的 `data-orientation` / `data-show-input` 属性一并移除。原先传入它们的用法本来就是水平滑块，删除后外观与行为不变；需要数值输入时可在应用侧自行组合 InputNumber。
+
+Core `getInputNumberKeyboardNextValue` 的 `current` 参数与返回值扩展支持 `InputNumberModel`，使超出安全整数的精确字符串也能走键盘步进模型。数字输入的运行时结果不变；TS 重载保留了 `number` 调用原有的 `number | undefined` 静态契约，只有显式传入字符串模型的调用方才拿到 `InputNumberModel | undefined`。
+
 ## v3.0.0-rc.1
 
 本版只有视觉修正，没有需要迁移的 API 变化。

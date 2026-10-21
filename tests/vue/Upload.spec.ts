@@ -249,7 +249,7 @@ describe('Upload', () => {
       })
     })
 
-    it('should emit remove event when file is removed', async () => {
+    it('should call onRemove once when a file is removed', async () => {
       const onRemove = vi.fn()
       const { container } = renderWithProps(Upload, {
         fileList: [
@@ -265,7 +265,28 @@ describe('Upload', () => {
       const removeButton = container.querySelector('[aria-label*="Remove"]') as HTMLButtonElement
       await fireEvent.click(removeButton)
 
-      expect(onRemove).toHaveBeenCalled()
+      expect(onRemove).toHaveBeenCalledTimes(1)
+      expect(onRemove.mock.calls[0][1]).toEqual([])
+    })
+
+    it('should keep the file when onRemove returns false', async () => {
+      const onRemove = vi.fn(() => false)
+      const { container } = renderWithProps(Upload, {
+        fileList: [
+          {
+            uid: 'file-1',
+            name: 'test.jpg',
+            status: 'success'
+          }
+        ],
+        onRemove
+      })
+
+      const removeButton = container.querySelector('[aria-label*="Remove"]') as HTMLButtonElement
+      await fireEvent.click(removeButton)
+
+      expect(onRemove).toHaveBeenCalledTimes(1)
+      expect(container.textContent).toContain('test.jpg')
     })
 
     it('should emit exceed event when file limit is exceeded', async () => {
