@@ -1,7 +1,7 @@
 {
   "id": "select-01",
   "title": "单选",
-  "description": "FormItem 给 combobox 可见名。Clear 发 undefined，不要收成空串。",
+  "description": "FormItem 给 combobox 可见名。Clear 发 null（多选 []），不要收成空串。",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

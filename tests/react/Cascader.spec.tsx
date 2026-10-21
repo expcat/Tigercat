@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { fireEvent, render, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useRef } from 'react'
 import { Cascader, type CascaderRef } from '@expcat/tigercat-react/Cascader'
@@ -235,5 +235,37 @@ describe('Cascader', () => {
     )
     await user.click(getByRole('combobox'))
     expect(getByRole('combobox').tagName).toBe('INPUT')
+  })
+
+  it('drops an in-flight lazy load when options are replaced', async () => {
+    let resolveLoad!: (children: { label: string; value: string; isLeaf?: boolean }[]) => void
+    const loadData = () =>
+      new Promise<{ label: string; value: string; isLeaf?: boolean }[]>((resolve) => {
+        resolveLoad = resolve
+      })
+    const onChange = vi.fn()
+    const { getByRole, rerender } = render(
+      <Cascader
+        options={[{ label: 'Parent', value: 'p', isLeaf: false }]}
+        defaultOpen
+        loadData={loadData}
+        onChange={onChange}
+        aria-label="Lazy"
+      />
+    )
+    fireEvent.click(getByRole('option', { name: 'Parent' }))
+    rerender(
+      <Cascader
+        options={[{ label: 'Replacement', value: 'p', isLeaf: true }]}
+        defaultOpen
+        loadData={loadData}
+        onChange={onChange}
+        aria-label="Lazy"
+      />
+    )
+    await act(async () => {
+      resolveLoad([])
+    })
+    expect(onChange).not.toHaveBeenCalled()
   })
 })

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { defineComponent, h, ref } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { Cascader } from '@expcat/tigercat-vue/Cascader'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -207,5 +207,29 @@ describe('Cascader', () => {
     const { container, getByRole } = render(Wrapper)
     await fireEvent.click(getByRole('combobox'))
     await expectNoA11yViolations(container)
+  })
+
+  it('drops an in-flight lazy load when options are replaced', async () => {
+    let resolveLoad!: (children: { label: string; value: string; isLeaf?: boolean }[]) => void
+    const loadData = () =>
+      new Promise<{ label: string; value: string; isLeaf?: boolean }[]>((resolve) => {
+        resolveLoad = resolve
+      })
+    const onChange = vi.fn()
+    const props = {
+      options: [{ label: 'Parent', value: 'p', isLeaf: false }],
+      modelValue: [] as (string | number)[],
+      loadData,
+      'aria-label': 'Lazy',
+      'onUpdate:modelValue': onChange
+    }
+    const { getByRole, rerender } = render(Cascader, { props })
+    await fireEvent.click(getByRole('combobox'))
+    await fireEvent.click(getByRole('option', { name: 'Parent' }))
+    await rerender({ ...props, options: [{ label: 'Replacement', value: 'p', isLeaf: true }] })
+    resolveLoad([])
+    await nextTick()
+    await nextTick()
+    expect(onChange).not.toHaveBeenCalled()
   })
 })

@@ -4,6 +4,7 @@ import {
   ref,
   h,
   inject,
+  onUnmounted,
   watch,
   nextTick,
   useId,
@@ -29,6 +30,7 @@ import {
   cascaderPathId,
   cascaderValuesEqual,
   coerceCascaderFormValue,
+  createLoadGuard,
   coerceClassValue,
   decideAfterBranchLoad,
   filterCascaderOptions,
@@ -59,13 +61,11 @@ import {
   initialCascaderColumnActiveIndices,
   isCascaderOptionExpandable,
   isCascaderValueEmpty,
-  isCurrentLoadToken,
   isSelectTypeaheadCharacter,
   mergeAriaDescribedBy,
   mergeTigerLocale,
   navigateCascaderColumnIndex,
   nextCascaderBrowsePath,
-  nextLoadToken,
   normalizeCascaderValue,
   rememberCascaderLabel,
   sameTreeKey,
@@ -215,7 +215,7 @@ export const Cascader = defineComponent({
     const instanceId = useId()
     const listboxId = computed(() => `tiger-cascader-listbox-${instanceId}`)
 
-    const loadTokens = new Map<string, number>()
+    const loadGuard = createLoadGuard()
     const loadedIds = new Set<string>()
     let seeded = false
     const formNamed = Boolean(formItemControl?.name.value)
@@ -321,8 +321,22 @@ export const Cascader = defineComponent({
       () => {
         loadedOptions.value = null
         loadedIds.clear()
+        loadGuard.invalidate()
+        loadingKeys.value = new Set()
       }
     )
+    let commitBlocked = false
+    watch(
+      () => isReadOnly.value || effectiveDisabled.value,
+      (blocked) => {
+        if (blocked === commitBlocked) return
+        commitBlocked = blocked
+        if (!blocked) return
+        loadGuard.invalidate()
+        loadingKeys.value = new Set()
+      }
+    )
+    onUnmounted(() => loadGuard.invalidate())
 
     function setOpen(next: boolean) {
       if (next === isOpen.value) return
@@ -390,11 +404,11 @@ export const Cascader = defineComponent({
     ) {
       if (!props.loadData || option.disabled) return
       const key = cascaderPathId(path)
-      const token = nextLoadToken(loadTokens, key)
+      const load = loadGuard.begin(key)
       loadingKeys.value = new Set(loadingKeys.value).add(key)
       try {
         const children = await props.loadData(option)
-        if (!isCurrentLoadToken(loadTokens, key, token)) return
+        if (!loadGuard.isCurrent(load)) return
         loadedIds.add(key)
         loadedOptions.value = setCascaderOptionChildren(
           loadedOptions.value ?? props.options,
@@ -409,9 +423,9 @@ export const Cascader = defineComponent({
         if (decision.expand && children.length > 0) focusedColumnIndex.value = path.length
         if (decision.commit) commitPath(path, children.length === 0)
       } catch {
-        if (!isCurrentLoadToken(loadTokens, key, token)) return
+        if (!loadGuard.isCurrent(load)) return
       } finally {
-        if (isCurrentLoadToken(loadTokens, key, token)) {
+        if (loadGuard.isCurrent(load)) {
           const after = new Set(loadingKeys.value)
           after.delete(key)
           loadingKeys.value = after

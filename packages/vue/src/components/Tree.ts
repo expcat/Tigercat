@@ -3,6 +3,8 @@ import {
   computed,
   ref,
   h,
+  onUnmounted,
+  toRaw,
   watch,
   nextTick,
   useId,
@@ -23,6 +25,7 @@ import {
   checkboxIconSizeClasses,
   checkboxIconViewBox,
   checkboxIndeterminatePathD,
+  createLoadGuard,
   createTreeKeyIdSet,
   decideAfterBranchLoad,
   gateBranchLoad,
@@ -37,9 +40,7 @@ import {
   highlightMarkClasses,
   lookupTreeNode,
   mergeLoadedChildren,
-  isCurrentLoadToken,
   mergeTigerLocale,
-  nextLoadToken,
   nextCheckedFromTreeRow,
   nextTreeCheckedState,
   nodeHasChildren,
@@ -77,6 +78,7 @@ import {
   uniqueTreeKeys,
   warnControlledExpandedFilter,
   devWarn,
+  type LoadGuardHandle,
   type TigerLocale,
   type TreeCheckStrategy,
   type TreeCheckedState,
@@ -251,7 +253,8 @@ export const Tree = defineComponent({
     const activeKey = ref<TreeNodeKey | undefined>(undefined)
     const internalSearch = ref(props.defaultSearchValue ?? '')
     const savedExpanded = ref<TreeNodeKey[] | null>(null)
-    const loadTokens = new Map<string, number>()
+    const loadGuard = createLoadGuard()
+    let lastEmittedTree: TreeNode[] | undefined
     const dragContainerId = `tiger-tree-${useId()}`
     const dropIndicator = ref<{ key: TreeNodeKey; position: TreeDropPosition } | null>(null)
     const dropPos = ref<TreeDropPosition>('inside')
@@ -266,8 +269,17 @@ export const Tree = defineComponent({
           dropTree.value = undefined
           dropTreeFrom.value = undefined
         }
+        // A tree identical to our own emit is the controlled echo of it, not a
+        // replacement; only a genuinely new source invalidates loads and cache.
+        // A normal parent ref rewraps the emitted array in a proxy; compare
+        // raw identities so both shallow and deep storage count as an echo.
+        if (toRaw(next) === toRaw(lastEmittedTree)) return
+        loadedMap.value = new Map()
+        loadingIds.value = new Set()
+        loadGuard.invalidate()
       }
     )
+    onUnmounted(() => loadGuard.invalidate())
 
     const derivedTree = computed(() =>
       mergeLoadedChildren(dropTree.value ?? treeDataProp.value, loadedMap.value)
@@ -372,11 +384,11 @@ export const Tree = defineComponent({
     function finishLoaded(
       node: TreeNode,
       children: TreeNode[],
-      token: number,
+      load: LoadGuardHandle,
       intent: 'select' | 'expand'
     ): void {
       const id = treeKeyId(node.key)
-      if (!isCurrentLoadToken(loadTokens, id, token)) return
+      if (!loadGuard.isCurrent(load)) return
       const nextMap = new Map(loadedMap.value)
       nextMap.set(id, children)
       loadedMap.value = nextMap
@@ -386,6 +398,7 @@ export const Tree = defineComponent({
       const nextTree = applyLoadedChildren(derivedTree.value, node.key, children)
       emit('load', node, children)
       emit('update:loadedKeys', uniqueTreeKeys([...(props.loadedKeys ?? []), node.key]))
+      lastEmittedTree = nextTree
       emit('update:treeData', nextTree)
       const decision = decideAfterBranchLoad({
         childCount: children.length,
@@ -398,7 +411,7 @@ export const Tree = defineComponent({
     function requestLoad(node: TreeNode, intent: 'select' | 'expand'): void {
       if (!props.loadData || node.disabled) return
       const id = treeKeyId(node.key)
-      const token = nextLoadToken(loadTokens, id)
+      const load = loadGuard.begin(id)
       const expanded = computedExpanded.value.some((key) => sameTreeKey(key, node.key))
       if (!expanded) {
         commitExpanded(nextTreeExpandedKeys(computedExpanded.value, node.key, true), node, true)
@@ -406,9 +419,9 @@ export const Tree = defineComponent({
       loadingIds.value = new Set(loadingIds.value).add(id)
       props
         .loadData(node)
-        .then((children) => finishLoaded(node, children, token, intent))
+        .then((children) => finishLoaded(node, children, load, intent))
         .catch(() => {
-          if (!isCurrentLoadToken(loadTokens, id, token)) return
+          if (!loadGuard.isCurrent(load)) return
           const nextSet = new Set(loadingIds.value)
           nextSet.delete(id)
           loadingIds.value = nextSet

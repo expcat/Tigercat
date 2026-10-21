@@ -1,7 +1,7 @@
 {
   "id": "cascader-01",
   "title": "基本用法",
-  "description": "逐级选择路径，未选是 undefined",
+  "description": "逐级选择路径，清空后路径为 []；undefined 表示非受控",
   "entry": "App.tsx",
   "order": 1,
   "viewport": {

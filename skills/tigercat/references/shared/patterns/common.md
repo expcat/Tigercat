@@ -85,20 +85,20 @@ Custom trigger state is available through Vue `#trigger="{ open }"` slots and Re
 
 These are binding or seed differences, not two products. Compact Notes on each component stay the source of traps.
 
-| Topic                       | Vue                                                      | React                                                     |
-| --------------------------- | -------------------------------------------------------- | --------------------------------------------------------- |
-| Field value                 | `v-model` / `modelValue`                                 | `value` / `checked` + `onChange`                          |
-| Input / Textarea `onChange` | emits the next string                                    | next string / number (not a DOM event)                    |
-| Form values                 | `v-model` / `modelValue`                                 | `value` + `onChange`                                      |
-| Overlay open                | `v-model:open`                                           | `open` + `onOpenChange`                                   |
-| Named content               | slots (`#header`, `#content`)                            | node / render props (`header`, `renderContent`)           |
-| Uncontrolled seed           | Input/Textarea and other fields accept `defaultValue`    | Input/Textarea already have `defaultValue`                |
-| Readonly spelling           | Rate/Signature/Mentions accept `readonly` and `readOnly` | same via `resolveReadOnlyFlag` (conflict uses `readonly`) |
-| Native `type` on Button     | prop `type`                                              | prop `type`                                               |
-| SchemaForm submit errors    | action Submit copies engine errors                       | native submit fills engine errors                         |
-| RichTextEditor FormItem     | seeds the engine from context                            | seeds the engine from FormItem when `value` is omitted    |
-| RichTextEditor `style`      | merges after height                                      | same merge on the height box                              |
-| SplitButton `type`          | lands on the primary                                     | lands on the primary                                      |
+| Topic                       | Vue                                                            | React                                                  |
+| --------------------------- | -------------------------------------------------------------- | ------------------------------------------------------ |
+| Field value                 | `v-model` / `modelValue`                                       | `value` / `checked` + `onChange`                       |
+| Input / Textarea `onChange` | emits the next string                                          | next string / number (not a DOM event)                 |
+| Form values                 | `v-model` / `modelValue`                                       | `value` + `onChange`                                   |
+| Overlay open                | `v-model:open`                                                 | `open` + `onOpenChange`                                |
+| Named content               | slots (`#header`, `#content`)                                  | node / render props (`header`, `renderContent`)        |
+| Uncontrolled seed           | Input/Textarea and other fields accept `defaultValue`          | Input/Textarea already have `defaultValue`             |
+| Readonly spelling           | Rate/Signature/Mentions use `readOnly` (模板可写 `:read-only`) | 同一 `readOnly` prop                                   |
+| Native `type` on Button     | prop `type`                                                    | prop `type`                                            |
+| SchemaForm submit errors    | action Submit copies engine errors                             | native submit fills engine errors                      |
+| RichTextEditor FormItem     | seeds the engine from context                                  | seeds the engine from FormItem when `value` is omitted |
+| RichTextEditor `style`      | merges after height                                            | same merge on the height box                           |
+| SplitButton `type`          | lands on the primary                                           | lands on the primary                                   |
 
 Size **strings** are three families and are not interchangeable: Form/Rate `sm\|md\|lg`, Steps/Wizard `small\|default`, Pagination `small\|medium\|large`.
 

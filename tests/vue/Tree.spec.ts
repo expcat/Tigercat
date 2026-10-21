@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { h, nextTick } from 'vue'
+import { h, nextTick, reactive } from 'vue'
 import { Tree } from '@expcat/tigercat-vue/Tree'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
@@ -784,5 +784,62 @@ describe('Tree', () => {
       expect(items.length).toBeGreaterThan(0)
       expect(items.length).toBeLessThan(50)
     })
+  })
+
+  it('discards a completed lazy cache when treeData is replaced', async () => {
+    let resolveLoad!: (children: { key: string; label: string; isLeaf?: boolean }[]) => void
+    const loadData = vi.fn(
+      () =>
+        new Promise<{ key: string; label: string; isLeaf?: boolean }[]>((resolve) => {
+          resolveLoad = resolve
+        })
+    )
+    const props = {
+      treeData: [{ key: '1', label: 'Parent 1', isLeaf: false }],
+      loadData,
+      selectionMode: 'single' as const
+    }
+    const { getByRole, rerender } = render(Tree, { props })
+    await fireEvent.click(getByRole('treeitem', { name: 'Parent 1' }))
+    expect(loadData).toHaveBeenCalledTimes(1)
+    resolveLoad([{ key: '1-1', label: 'Child 1-1', isLeaf: true }])
+    await nextTick()
+    await nextTick()
+    expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+    await rerender({ ...props, treeData: [{ key: '1', label: 'Replacement', isLeaf: false }] })
+    await nextTick()
+    await nextTick()
+    expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument()
+    await fireEvent.click(getByRole('treeitem', { name: 'Replacement' }))
+    expect(loadData).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps the loaded state when the parent echoes the emitted tree', async () => {
+    let resolveLoad!: (children: { key: string; label: string; isLeaf?: boolean }[]) => void
+    const loadData = vi.fn(
+      () =>
+        new Promise<{ key: string; label: string; isLeaf?: boolean }[]>((resolve) => {
+          resolveLoad = resolve
+        })
+    )
+    type LazyNode = { key: string; label: string; isLeaf?: boolean; children?: unknown[] }
+    let echoed: LazyNode[] | undefined
+    const props = {
+      treeData: [{ key: '1', label: 'Parent 1', isLeaf: false }] as LazyNode[],
+      loadData,
+      selectionMode: 'single' as const,
+      'onUpdate:treeData': (next: LazyNode[]) => {
+        echoed = next
+      }
+    }
+    const { getByRole, rerender } = render(Tree, { props })
+    await fireEvent.click(getByRole('treeitem', { name: 'Parent 1' }))
+    expect(loadData).toHaveBeenCalledTimes(1)
+    resolveLoad([])
+    await nextTick()
+    await nextTick()
+    await rerender({ ...props, treeData: reactive(echoed!) })
+    await fireEvent.click(getByRole('treeitem', { name: 'Parent 1' }))
+    expect(loadData).toHaveBeenCalledTimes(1)
   })
 })

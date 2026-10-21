@@ -10,21 +10,19 @@ import React, {
 import {
   EMPTY_TREE_DATA,
   EMPTY_TREE_KEYS,
-  applyLoadedChildren,
   applyTreeDrop,
   applyTreeFilter,
   applyTreeKeyboard,
   createTreeKeyIdSet,
   decideAfterBranchLoad,
+  createLoadGuard,
   filterTreeNodes,
   formatTreeSelectNodeLabel,
   gateBranchLoad,
   getTreeLabels,
-  isCurrentLoadToken,
   lookupTreeNode,
   mergeLoadedChildren,
   mergeTigerLocale,
-  nextLoadToken,
   nextTreeCheckedState,
   nextTreeExpandedKeys,
   nextTreeRangeSelection,
@@ -47,6 +45,7 @@ import {
   uniqueTreeKeys,
   warnControlledExpandedFilter,
   devWarn,
+  type LoadGuardHandle,
   type TreeCheckedState,
   type TreeDropPosition,
   type TreeNode,
@@ -140,7 +139,8 @@ export function useTreeState(props: TreeProps): TreeContext & {
   const virtualRef = useRef<VirtualListHandle | null>(null)
   const dropPosRef = useRef<TreeDropPosition>('inside')
   const savedExpandRef = useRef<TreeNodeKey[] | null>(null)
-  const loadTokensRef = useRef(new Map<string, number>())
+  const loadGuardRef = useRef(createLoadGuard())
+  const appliedChildrenRef = useRef(new Map<string, TreeNode[]>())
   const selectionAnchorRef = useRef<TreeNodeKey | null>(null)
   const typeaheadRef = useRef(createTypeaheadHighlight())
   const reactId = useId()
@@ -153,11 +153,12 @@ export function useTreeState(props: TreeProps): TreeContext & {
   const [loadedMap, setLoadedMap] = useState(() => new Map<string, TreeNode[]>())
   const [dropTree, setDropTree] = useState<TreeNode[] | undefined>(undefined)
   const [dropTreeFrom, setDropTreeFrom] = useState<TreeNode[] | undefined>(undefined)
+  const treeDataRef = useRef(treeData)
+  const lastEmittedTreeRef = useRef<TreeNode[] | undefined>(undefined)
   if (dropTreeFrom !== undefined && dropTreeFrom !== treeData && dropTree !== undefined) {
     setDropTree(undefined)
     setDropTreeFrom(undefined)
   }
-
   const sourceTree = dropTree ?? treeData
   const derivedTree = useMemo(
     () => mergeLoadedChildren(sourceTree, loadedMap),
@@ -188,6 +189,19 @@ export function useTreeState(props: TreeProps): TreeContext & {
   const [loadingIds, setLoadingIds] = useState(() => new Set<string>())
   const [activeKey, setActiveKey] = useState<TreeNodeKey | undefined>(undefined)
   const [internalSearch, setInternalSearch] = useState(defaultSearchValue ?? '')
+
+  if (treeDataRef.current !== treeData) {
+    treeDataRef.current = treeData
+    // A tree identical to our own emit is the controlled echo of it, not a
+    // replacement; only a genuinely new source invalidates loads and cache.
+    if (treeData !== lastEmittedTreeRef.current) {
+      setLoadedMap(new Map())
+      appliedChildrenRef.current = new Map()
+      setLoadingIds(new Set())
+      loadGuardRef.current.invalidate()
+    }
+  }
+  useEffect(() => () => loadGuardRef.current.invalidate(), [])
 
   useEffect(() => {
     if (controlledExpandedKeys !== undefined) return
@@ -298,69 +312,71 @@ export function useTreeState(props: TreeProps): TreeContext & {
     [controlledExpandedKeys, onExpandedKeysChange, onExpand, onNodeExpand, onNodeCollapse]
   )
 
-  const applyLoadedNode = useCallback(
-    (node: TreeNode, children: TreeNode[], token: number, intent: 'select' | 'expand') => {
-      const id = treeKeyId(node.key)
-      if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
-      setLoadedMap((prev) => {
-        const nextMap = new Map(prev)
-        nextMap.set(id, children)
-        return nextMap
+  const selectedNowRef = useRef(computedSelected)
+  selectedNowRef.current = computedSelected
+
+  // A load settles long after the render that started it, and several loads
+  // can settle in the same tick. The latest-ref closure always reads the
+  // current tree, callbacks, and selection; the applied-children snapshot and
+  // selectedNowRef advance inside each completion so they never wait for a
+  // render that has not happened yet.
+  const completeLoadRef = useRef<
+    (
+      node: TreeNode,
+      children: TreeNode[],
+      load: LoadGuardHandle,
+      intent: 'select' | 'expand'
+    ) => void
+  >(() => {})
+  completeLoadRef.current = (node, children, load, intent) => {
+    const id = treeKeyId(node.key)
+    if (!loadGuardRef.current.isCurrent(load)) return
+    const applied = new Map(appliedChildrenRef.current)
+    applied.set(id, children)
+    appliedChildrenRef.current = applied
+    setLoadedMap(applied)
+    setLoadingIds((prev) => {
+      const nextSet = new Set(prev)
+      nextSet.delete(id)
+      return nextSet
+    })
+    const nextTree = mergeLoadedChildren(sourceTree, applied)
+    onLoad?.(node, children)
+    onLoadedKeysChange?.(uniqueTreeKeys([...(controlledLoadedKeys ?? []), node.key]))
+    lastEmittedTreeRef.current = nextTree
+    onTreeDataChange?.(nextTree)
+    const decision = decideAfterBranchLoad({
+      childCount: children.length,
+      intent,
+      commitLoadedBranch: intent === 'select'
+    })
+    if (decision.commit && selection.selectable) {
+      const next = nextTreeSelectedKeys({
+        current: selectedNowRef.current,
+        key: node.key,
+        multiple: selection.multiple,
+        allowDeselect
       })
-      setLoadingIds((prev) => {
-        const nextSet = new Set(prev)
-        nextSet.delete(id)
-        return nextSet
-      })
-      const nextTree = applyLoadedChildren(derivedTree, node.key, children)
-      onLoad?.(node, children)
-      onLoadedKeysChange?.(uniqueTreeKeys([...(controlledLoadedKeys ?? []), node.key]))
-      onTreeDataChange?.(nextTree)
-      const decision = decideAfterBranchLoad({
-        childCount: children.length,
-        intent,
-        commitLoadedBranch: intent === 'select'
-      })
-      if (decision.commit && selection.selectable) {
-        const next = nextTreeSelectedKeys({
-          current: computedSelected,
-          key: node.key,
-          multiple: selection.multiple,
-          allowDeselect
-        })
-        if (controlledSelectedKeys === undefined) setInternalSelected(next)
-        onSelectedKeysChange?.(next)
-        onSelect?.(next, {
-          selected: next.some((key) => sameTreeKey(key, node.key)),
-          selectedNodes: next
-            .map((key) => lookupTreeNode(view.index, key))
-            .filter((item): item is TreeNode => Boolean(item)),
-          node
-        })
+      if (controlledSelectedKeys === undefined) {
+        setInternalSelected(next)
+        selectedNowRef.current = next
       }
-    },
-    [
-      derivedTree,
-      onLoad,
-      onLoadedKeysChange,
-      controlledLoadedKeys,
-      onTreeDataChange,
-      selection.selectable,
-      selection.multiple,
-      computedSelected,
-      allowDeselect,
-      controlledSelectedKeys,
-      onSelectedKeysChange,
-      onSelect,
-      view.index
-    ]
-  )
+      onSelectedKeysChange?.(next)
+      onSelect?.(next, {
+        selected: next.some((key) => sameTreeKey(key, node.key)),
+        selectedNodes: next
+          .map((key) => lookupTreeNode(view.index, key))
+          .filter((item): item is TreeNode => Boolean(item)),
+        node
+      })
+    }
+  }
 
   const requestLoad = useCallback(
     (node: TreeNode, intent: 'select' | 'expand') => {
       if (!loadData || node.disabled) return
       const id = treeKeyId(node.key)
-      const token = nextLoadToken(loadTokensRef.current, id)
+      const load = loadGuardRef.current.begin(id)
       const expanded = computedExpanded.some((key) => sameTreeKey(key, node.key))
       if (!expanded) {
         commitExpanded(nextTreeExpandedKeys(computedExpanded, node.key, true), node, true)
@@ -368,10 +384,10 @@ export function useTreeState(props: TreeProps): TreeContext & {
       setLoadingIds((prev) => new Set(prev).add(id))
       loadData(node)
         .then((children) => {
-          applyLoadedNode(node, children, token, intent)
+          completeLoadRef.current(node, children, load, intent)
         })
         .catch(() => {
-          if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
+          if (!loadGuardRef.current.isCurrent(load)) return
           setLoadingIds((prev) => {
             const nextSet = new Set(prev)
             nextSet.delete(id)
@@ -380,7 +396,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
           devWarn('Tree.loadData', 'Tree loadData rejected; the node is not mutated.')
         })
     },
-    [loadData, computedExpanded, commitExpanded, applyLoadedNode]
+    [loadData, computedExpanded, commitExpanded]
   )
 
   const handleExpand = useCallback(

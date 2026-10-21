@@ -369,6 +369,7 @@ export const Select = defineComponent({
     }
 
     function setSelected(next: SelectModelValue) {
+      if (isReadOnly.value || effectiveDisabled.value) return
       const normalized = normalizeSelectValue(next, props.multiple)
       if (props.modelValue === undefined) localValue.value = normalized
       emit('update:modelValue', normalized)
@@ -514,7 +515,7 @@ export const Select = defineComponent({
         open: isOpen.value,
         searchable: props.searchable,
         clearable: props.clearable,
-        hasValue: showClear.value,
+        hasValue: !isSelectValueEmpty(selected.value, props.multiple),
         multiple: props.multiple,
         fromSearchInput
       })
@@ -862,11 +863,12 @@ export const Select = defineComponent({
                           type: 'button',
                           tabindex: -1,
                           class: selectTagRemoveClasses,
+                          disabled: isReadOnly.value || effectiveDisabled.value || undefined,
                           'aria-label': `${labels.value.clearAriaLabel} ${tag.label}`,
                           onMousedown: (event: MouseEvent) => event.preventDefault(),
                           onClick: (event: MouseEvent) => {
                             event.stopPropagation()
-                            if (isReadOnly.value) return
+                            if (isReadOnly.value || effectiveDisabled.value) return
                             setSelected(removeSelectValue(selected.value, tag.value))
                           }
                         },
@@ -1038,9 +1040,9 @@ export const Select = defineComponent({
                           popupListInlinePaddingClass
                         ),
                         'data-tiger-select-all': '',
-                        disabled: isReadOnly.value || undefined,
+                        disabled: isReadOnly.value || effectiveDisabled.value || undefined,
                         onClick: () => {
-                          if (isReadOnly.value) return
+                          if (isReadOnly.value || effectiveDisabled.value) return
                           setSelected(
                             selectAllSelectValues({
                               value: selected.value,
@@ -1061,9 +1063,7 @@ export const Select = defineComponent({
                     {
                       type: 'button',
                       class: selectDoneButtonClasses,
-                      onClick: () => {
-                        setOpen(false)
-                      }
+                      onClick: closeDropdown
                     },
                     labels.value.doneText
                   )

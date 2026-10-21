@@ -5,6 +5,7 @@ import {
   coerceTreeSelectFormValue,
   commitTreeSelectNode,
   countTreeNodes,
+  createLoadGuard,
   decideAfterBranchLoad,
   gateBranchLoad,
   getEmptyLabels,
@@ -24,13 +25,11 @@ import {
   getFixedVirtualRange,
   getTreeSelectVirtualItemHeight,
   getTreeSelectVisibleIndex,
-  isCurrentLoadToken,
   isSelectTypeaheadCharacter,
   isTreeNodeExpandable,
   isTreeSelectValueEmpty,
   mergeAriaDescribedBy,
   mergeTigerLocale,
-  nextLoadToken,
   nodeHasChildren,
   normalizeTreeSelectValue,
   rememberTreeSelectLabel,
@@ -188,7 +187,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
   )
   const [activeKey, setActiveKey] = useState<string | number | undefined>(undefined)
   const labelCacheRef = useRef(new Map<string | number, string>())
-  const loadTokensRef = useRef(new Map<string, number>())
+  const loadGuardRef = useRef(createLoadGuard())
   const loadedIdsRef = useRef(new Set<string>())
   const treeCountRef = useRef(0)
   const seededRef = useRef(false)
@@ -202,7 +201,21 @@ export function useTreeSelectController(props: TreeSelectProps) {
     treeDataPropRef.current = treeDataProp
     setLoadedData(null)
     loadedIdsRef.current = new Set()
+    loadGuardRef.current.invalidate()
+    setLoadingKeys(new Set())
   }
+
+  const commitBlockedRef = useRef(false)
+  const commitBlocked = isReadOnly || effectiveDisabled
+  if (commitBlockedRef.current !== commitBlocked) {
+    commitBlockedRef.current = commitBlocked
+    if (commitBlocked) {
+      loadGuardRef.current.invalidate()
+      setLoadingKeys(new Set())
+    }
+  }
+
+  useEffect(() => () => loadGuardRef.current.invalidate(), [])
 
   const treeData = loadedData ?? treeDataProp
   const hasLoadData = typeof loadData === 'function'
@@ -329,14 +342,14 @@ export function useTreeSelectController(props: TreeSelectProps) {
     async (node: TreeNode, intent: 'select' | 'expand') => {
       if (!loadData || node.disabled) return
       const id = treeKeyId(node.key)
-      const token = nextLoadToken(loadTokensRef.current, id)
+      const load = loadGuardRef.current.begin(id)
       setLoadingKeys((current) => new Set(current).add(id))
       if (!treeSetHas(expandedSet, node.key)) {
         setExpanded(toggleTreeSelectExpandedKey(expandedSet, node.key))
       }
       try {
         const children = await loadData(node)
-        if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
+        if (!loadGuardRef.current.isCurrent(load)) return
         loadedIdsRef.current.add(id)
         const inject = (nodes: TreeNode[]): TreeNode[] =>
           nodes.map((item) =>
@@ -346,7 +359,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
                 ? { ...item, children: inject(item.children) }
                 : item
           )
-        setLoadedData((current) => inject(current ?? treeDataProp))
+        setLoadedData((current) => inject(current ?? treeDataPropRef.current))
         const decision = decideAfterBranchLoad({
           childCount: children.length,
           intent,
@@ -357,9 +370,9 @@ export function useTreeSelectController(props: TreeSelectProps) {
         }
         if (decision.commit) commitKey(node.key)
       } catch {
-        if (!isCurrentLoadToken(loadTokensRef.current, id, token)) return
+        if (!loadGuardRef.current.isCurrent(load)) return
       } finally {
-        if (isCurrentLoadToken(loadTokensRef.current, id, token)) {
+        if (loadGuardRef.current.isCurrent(load)) {
           setLoadingKeys((current) => {
             const next = new Set(current)
             next.delete(id)
@@ -368,7 +381,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
         }
       }
     },
-    [commitKey, expandedSet, loadData, setExpanded, treeDataProp]
+    [commitKey, expandedSet, loadData, setExpanded]
   )
 
   const handleNodeSelect = useCallback(

@@ -125,11 +125,12 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
                 type="button"
                 tabIndex={-1}
                 className={selectTagRemoveClasses}
+                disabled={ctx.readOnly || ctx.effectiveDisabled || undefined}
                 aria-label={ctx.clearAriaLabel ? `${ctx.clearAriaLabel} ${tag.label}` : tag.label}
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={(event) => {
                   event.stopPropagation()
-                  if (ctx.readOnly) return
+                  if (ctx.readOnly || ctx.effectiveDisabled) return
                   ctx.removeTag(tag.value)
                 }}>
                 ×
@@ -178,7 +179,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
             'w-full py-2 text-start text-sm text-[var(--tiger-primary)] hover:bg-[var(--tiger-outline-bg-hover)]',
             popupListInlinePaddingClass
           )}
-          disabled={ctx.readOnly}
+          disabled={ctx.readOnly || ctx.effectiveDisabled}
           onClick={ctx.selectFiltered}>
           {getW9FormLabels(props.locale?.locale).selectAll}
         </button>
@@ -187,10 +188,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
         ? renderSelectPanelBody(ctx.renderCtx)
         : (props.panelEmpty ?? renderSelectEmpty(ctx.renderCtx))}
       <div className={selectDoneActionClasses}>
-        <button
-          type="button"
-          className={selectDoneButtonClasses}
-          onClick={() => ctx.setOpen(false)}>
+        <button type="button" className={selectDoneButtonClasses} onClick={ctx.closeDropdown}>
           {ctx.doneText}
         </button>
       </div>

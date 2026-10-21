@@ -296,4 +296,73 @@ describe('Select', () => {
     )
     expect(getByText('请选择')).toBeInTheDocument()
   })
+
+  it('keeps a closed readOnly value off the keyboard', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const single = render(
+      <Select options={testOptions} defaultValue="1" readOnly aria-label="RO" onChange={onChange} />
+    )
+    const trigger = single.getByRole('combobox')
+    trigger.focus()
+    await user.keyboard('{Backspace}')
+    expect(onChange).not.toHaveBeenCalled()
+    expect(single.getByText('Option 1')).toBeInTheDocument()
+    single.unmount()
+
+    const multi = render(
+      <Select
+        options={testOptions}
+        multiple
+        defaultValue={['1', '2']}
+        readOnly
+        aria-label="ROM"
+        onChange={onChange}
+      />
+    )
+    const multiTrigger = multi.getByRole('combobox')
+    multiTrigger.focus()
+    await user.keyboard('{Backspace}')
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('disables tag removal while the field is disabled', () => {
+    const onChange = vi.fn()
+    const { getAllByRole } = render(
+      <Select
+        options={testOptions}
+        multiple
+        defaultValue={['1', '2']}
+        disabled
+        aria-label="Dis"
+        onChange={onChange}
+      />
+    )
+    const remove = getAllByRole('button', { name: 'Clear selection Option 1' })[0]
+    expect(remove).toBeDisabled()
+    fireEvent.click(remove)
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('clears the search through Done', async () => {
+    const user = userEvent.setup()
+    const onSearchValueChange = vi.fn()
+    const { getByRole } = render(
+      <Select
+        options={testOptions}
+        searchable
+        aria-label="Done"
+        onSearchValueChange={onSearchValueChange}
+      />
+    )
+    await user.click(getByRole('combobox'))
+    const input = document.body.querySelector('input[role="combobox"]') as HTMLInputElement
+    await user.type(input, 'Opt')
+    expect(input.value).toBe('Opt')
+    await user.click(getByRole('button', { name: 'Done' }))
+    expect(onSearchValueChange).toHaveBeenCalledWith('')
+    await user.click(getByRole('combobox'))
+    const reopened = document.body.querySelector('input[role="combobox"]') as HTMLInputElement
+    expect(reopened.value).toBe('')
+  })
 })

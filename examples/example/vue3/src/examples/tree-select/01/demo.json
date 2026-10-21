@@ -1,7 +1,7 @@
 {
   "id": "tree-select-01",
   "title": "基本用法",
-  "description": "选中的是节点 key，未选是 undefined",
+  "description": "选中的是节点 key，单选未选是 null",
   "entry": "App.vue",
   "order": 1,
   "viewport": {

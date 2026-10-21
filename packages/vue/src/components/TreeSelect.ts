@@ -4,6 +4,7 @@ import {
   ref,
   h,
   inject,
+  onUnmounted,
   watch,
   nextTick,
   useId,
@@ -22,6 +23,7 @@ import {
   coerceTreeSelectFormValue,
   commitTreeSelectNode,
   countTreeNodes,
+  createLoadGuard,
   getEmptyLabels,
   getFirstVisibleChildKey,
   getPickerComboboxAria,
@@ -47,12 +49,10 @@ import {
   getTreeSelectVirtualItemHeight,
   getTreeSelectVisibleIndex,
   isSelectTypeaheadCharacter,
-  isCurrentLoadToken,
   isTreeNodeExpandable,
   isTreeSelectValueEmpty,
   mergeAriaDescribedBy,
   mergeTigerLocale,
-  nextLoadToken,
   nodeHasChildren,
   normalizeTreeSelectValue,
   rememberTreeSelectLabel,
@@ -239,7 +239,7 @@ export const TreeSelect = defineComponent({
     const instanceId = useId()
     const treeId = computed(() => `tiger-treeselect-tree-${instanceId}`)
 
-    const loadTokens = new Map<string, number>()
+    const loadGuard = createLoadGuard()
     const loadedIds = new Set<string>()
     let seeded = false
     let seenTreeCount = 0
@@ -351,8 +351,19 @@ export const TreeSelect = defineComponent({
       () => {
         loadedData.value = null
         loadedIds.clear()
+        loadGuard.invalidate()
       }
     )
+    let commitBlocked = false
+    watch(
+      () => isReadOnly.value || effectiveDisabled.value,
+      (blocked) => {
+        if (blocked === commitBlocked) return
+        commitBlocked = blocked
+        if (blocked) loadGuard.invalidate()
+      }
+    )
+    onUnmounted(() => loadGuard.invalidate())
     watch(
       () => props.treeData,
       (data) => {
@@ -466,13 +477,13 @@ export const TreeSelect = defineComponent({
     async function loadChildren(node: TreeNode, intent: 'select' | 'expand') {
       if (!props.loadData || node.disabled) return
       const id = treeKeyId(node.key)
-      const token = nextLoadToken(loadTokens, id)
+      const load = loadGuard.begin(id)
       if (!treeSetHas(expandedSet.value, node.key)) {
         setExpanded(toggleTreeSelectExpandedKey(expandedSet.value, node.key))
       }
       try {
         const children = await props.loadData(node)
-        if (!isCurrentLoadToken(loadTokens, id, token)) return
+        if (!loadGuard.isCurrent(load)) return
         loadedIds.add(id)
         const inject = (nodes: TreeNode[]): TreeNode[] =>
           nodes.map((item) =>
@@ -491,7 +502,7 @@ export const TreeSelect = defineComponent({
         if (decision.expand) setExpanded(new Set(expandedSet.value).add(node.key))
         if (decision.commit) commitKey(node.key)
       } catch {
-        if (!isCurrentLoadToken(loadTokens, id, token)) return
+        if (!loadGuard.isCurrent(load)) return
       }
     }
 

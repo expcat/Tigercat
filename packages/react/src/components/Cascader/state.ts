@@ -6,6 +6,7 @@ import {
   cascaderPathId,
   cascaderValuesEqual,
   coerceCascaderFormValue,
+  createLoadGuard,
   decideAfterBranchLoad,
   filterCascaderOptions,
   flattenCascaderOptions,
@@ -32,13 +33,11 @@ import {
   initialCascaderColumnActiveIndices,
   isCascaderOptionExpandable,
   isCascaderValueEmpty,
-  isCurrentLoadToken,
   isSelectTypeaheadCharacter,
   mergeAriaDescribedBy,
   mergeTigerLocale,
   navigateCascaderColumnIndex,
   nextCascaderBrowsePath,
-  nextLoadToken,
   normalizeCascaderValue,
   rememberCascaderLabel,
   sameTreeKey,
@@ -183,7 +182,7 @@ export function useCascaderController(props: CascaderProps) {
   const [columnScrollTops, setColumnScrollTops] = useState<number[]>([])
   const [searchScrollTop, setSearchScrollTop] = useState(0)
   const labelCacheRef = useRef(new Map<string, string>())
-  const loadTokensRef = useRef(new Map<string, number>())
+  const loadGuardRef = useRef(createLoadGuard())
   const loadedIdsRef = useRef(new Set<string>())
   const seededRef = useRef(false)
   const openWasRef = useRef(false)
@@ -197,7 +196,21 @@ export function useCascaderController(props: CascaderProps) {
     optionsPropRef.current = optionsProp
     setLoadedOptions(null)
     loadedIdsRef.current = new Set()
+    loadGuardRef.current.invalidate()
+    setLoadingKeys(new Set())
   }
+
+  const commitBlockedRef = useRef(false)
+  const commitBlocked = isReadOnly || effectiveDisabled
+  if (commitBlockedRef.current !== commitBlocked) {
+    commitBlockedRef.current = commitBlocked
+    if (commitBlocked) {
+      loadGuardRef.current.invalidate()
+      setLoadingKeys(new Set())
+    }
+  }
+
+  useEffect(() => () => loadGuardRef.current.invalidate(), [])
 
   const options = loadedOptions ?? optionsProp
   const hasLoadData = typeof loadData === 'function'
@@ -276,14 +289,14 @@ export function useCascaderController(props: CascaderProps) {
     async (option: CascaderOption, path: CascaderValue, intent: 'select' | 'expand') => {
       if (!loadData || option.disabled) return
       const key = cascaderPathId(path)
-      const token = nextLoadToken(loadTokensRef.current, key)
+      const load = loadGuardRef.current.begin(key)
       setLoadingKeys((current) => new Set(current).add(key))
       try {
         const children = await loadData(option)
-        if (!isCurrentLoadToken(loadTokensRef.current, key, token)) return
+        if (!loadGuardRef.current.isCurrent(load)) return
         loadedIdsRef.current.add(key)
         setLoadedOptions((current) =>
-          setCascaderOptionChildren(current ?? optionsProp, path, children)
+          setCascaderOptionChildren(current ?? optionsPropRef.current, path, children)
         )
         const decision = decideAfterBranchLoad({
           childCount: children.length,
@@ -293,9 +306,9 @@ export function useCascaderController(props: CascaderProps) {
         if (decision.expand) focusColumnAfterLoad(path, children.length)
         if (decision.commit) commitPath(path, children.length === 0)
       } catch {
-        if (!isCurrentLoadToken(loadTokensRef.current, key, token)) return
+        if (!loadGuardRef.current.isCurrent(load)) return
       } finally {
-        if (isCurrentLoadToken(loadTokensRef.current, key, token)) {
+        if (loadGuardRef.current.isCurrent(load)) {
           setLoadingKeys((current) => {
             const next = new Set(current)
             next.delete(key)
@@ -304,7 +317,7 @@ export function useCascaderController(props: CascaderProps) {
         }
       }
     },
-    [changeOnSelect, commitPath, focusColumnAfterLoad, loadData, optionsProp]
+    [changeOnSelect, commitPath, focusColumnAfterLoad, loadData]
   )
 
   const activateOption = useCallback(

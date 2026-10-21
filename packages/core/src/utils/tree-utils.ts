@@ -142,7 +142,6 @@ export function gateBranchLoad(options: {
     options.hasLoadData
   )
   if (!expandable || options.hasChildren || !options.hasLoadData || options.loaded) return 'ready'
-  if (options.loading) return 'load'
   return 'load'
 }
 
@@ -171,6 +170,43 @@ export function isCurrentLoadToken(
   token: number
 ): boolean {
   return tokens.get(id) === token
+}
+
+/** Handle for a lazy load started through a {@link createLoadGuard}. */
+export interface LoadGuardHandle {
+  key: string
+  epoch: number
+  token: number
+}
+
+/**
+ * Per-key tokens plus a monotonic epoch for lazy loads. Tokens cover a newer
+ * load for the same key; the epoch covers data-source replacement and
+ * component teardown, which per-key tokens cannot see. Epochs only grow, so
+ * an invalidated generation can never match a later load.
+ */
+export interface LoadGuard {
+  begin(key: string): LoadGuardHandle
+  isCurrent(handle: LoadGuardHandle): boolean
+  invalidate(): void
+}
+
+export function createLoadGuard(): LoadGuard {
+  let epoch = 0
+  const tokens = new Map<string, number>()
+  return {
+    begin(key: string): LoadGuardHandle {
+      const token = nextLoadToken(tokens, key)
+      return { key, epoch, token }
+    },
+    isCurrent(handle: LoadGuardHandle): boolean {
+      return handle.epoch === epoch && isCurrentLoadToken(tokens, handle.key, handle.token)
+    },
+    invalidate(): void {
+      epoch += 1
+      tokens.clear()
+    }
+  }
 }
 
 /** Half-checked completes the enabled branch. Fully checked clears it. */

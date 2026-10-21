@@ -842,4 +842,74 @@ describe('Tree', () => {
       await waitFor(() => expect(screen.getByText('Child 1-1')).toBeInTheDocument())
     })
   })
+
+  it('discards a completed lazy cache when treeData is replaced', async () => {
+    let resolveLoad!: (children: { key: string; label: string; isLeaf?: boolean }[]) => void
+    const loadData = vi.fn(
+      () =>
+        new Promise<{ key: string; label: string; isLeaf?: boolean }[]>((resolve) => {
+          resolveLoad = resolve
+        })
+    )
+    const { getByRole, rerender } = render(
+      <Tree
+        treeData={[{ key: '1', label: 'Parent 1', isLeaf: false }]}
+        loadData={loadData}
+        selectionMode="single"
+        aria-label="Lazy"
+      />
+    )
+    fireEvent.click(getByRole('treeitem', { name: 'Parent 1' }))
+    expect(loadData).toHaveBeenCalledTimes(1)
+    await act(async () => {
+      resolveLoad([{ key: '1-1', label: 'Child 1-1', isLeaf: true }])
+    })
+    expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+    rerender(
+      <Tree
+        treeData={[{ key: '1', label: 'Replacement', isLeaf: false }]}
+        loadData={loadData}
+        selectionMode="single"
+        aria-label="Lazy"
+      />
+    )
+    expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument()
+    fireEvent.click(getByRole('treeitem', { name: 'Replacement' }))
+    expect(loadData).toHaveBeenCalledTimes(2)
+  })
+
+  it('notifies the latest tree callback when a load settles', async () => {
+    let resolveLoad!: (children: { key: string; label: string; isLeaf?: boolean }[]) => void
+    const loadData = () =>
+      new Promise<{ key: string; label: string; isLeaf?: boolean }[]>((resolve) => {
+        resolveLoad = resolve
+      })
+    const stale = vi.fn()
+    const fresh = vi.fn()
+    const initialTree = [{ key: '1', label: 'Parent 1', isLeaf: false }]
+    const { getByRole, rerender } = render(
+      <Tree
+        treeData={initialTree}
+        loadData={loadData}
+        selectionMode="single"
+        onTreeDataChange={stale}
+        aria-label="Callback"
+      />
+    )
+    fireEvent.click(getByRole('treeitem', { name: 'Parent 1' }))
+    rerender(
+      <Tree
+        treeData={initialTree}
+        loadData={loadData}
+        selectionMode="single"
+        onTreeDataChange={fresh}
+        aria-label="Callback"
+      />
+    )
+    await act(async () => {
+      resolveLoad([])
+    })
+    expect(stale).not.toHaveBeenCalled()
+    expect(fresh).toHaveBeenCalledTimes(1)
+  })
 })

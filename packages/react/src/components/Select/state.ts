@@ -159,6 +159,14 @@ export function useSelectController(props: SelectProps) {
     postState: (next) => normalizeSelectValue(next, isMultiple)
   })
 
+  const commitSelected = useCallback(
+    (next: SelectModelValue) => {
+      if (readOnly || effectiveDisabled) return
+      setSelected(next)
+    },
+    [effectiveDisabled, readOnly, setSelected]
+  )
+
   const [isOpen, setOpen] = useControlledState({
     value: open,
     defaultValue: defaultOpen,
@@ -287,7 +295,7 @@ export function useSelectController(props: SelectProps) {
         maxCount,
         readOnly
       })
-      setSelected(next)
+      commitSelected(next)
       activeValueRef.current = option.value
       if (isMultiple) {
         const nextIndex = flatSelectableOptions.findIndex((item) => item.value === option.value)
@@ -303,6 +311,7 @@ export function useSelectController(props: SelectProps) {
     },
     [
       autoClearSearchValue,
+      commitSelected,
       closeDropdown,
       creatableOption,
       effectiveDisabled,
@@ -312,25 +321,24 @@ export function useSelectController(props: SelectProps) {
       onCreate,
       readOnly,
       selected,
-      setSearchQuery,
-      setSelected
+      setSearchQuery
     ]
   )
 
   const clearSelection = useCallback(
     (event?: { stopPropagation: () => void }) => {
       event?.stopPropagation()
-      setSelected(clearSelectValue(isMultiple))
+      commitSelected(clearSelectValue(isMultiple))
       focusAfterPaint(() => triggerRef.current)
     },
-    [isMultiple, setSelected]
+    [commitSelected, isMultiple]
   )
 
   const removeTag = useCallback(
     (target: SelectValue) => {
-      setSelected(removeSelectValue(selected, target))
+      commitSelected(removeSelectValue(selected, target))
     },
-    [selected, setSelected]
+    [commitSelected, selected]
   )
 
   const updateSearchValue = useCallback(
@@ -403,12 +411,7 @@ export function useSelectController(props: SelectProps) {
       open: isOpen,
       searchable,
       clearable,
-      hasValue: shouldShowSelectClear({
-        clearable: true,
-        disabled: false,
-        value: selected,
-        multiple: isMultiple
-      }),
+      hasValue: !isSelectValueEmpty(selected, isMultiple),
       multiple: isMultiple,
       fromSearchInput
     })
@@ -429,7 +432,7 @@ export function useSelectController(props: SelectProps) {
         return
       case 'remove-last':
         event.preventDefault()
-        setSelected(removeLastSelectValue(selected))
+        commitSelected(removeLastSelectValue(selected))
         return
       case 'prevent-scroll': {
         event.preventDefault()
@@ -512,7 +515,7 @@ export function useSelectController(props: SelectProps) {
 
   const selectFiltered = useCallback(() => {
     if (readOnly || effectiveDisabled) return
-    setSelected(
+    commitSelected(
       selectAllSelectValues({
         value: selected,
         options: filteredOptions,
@@ -520,7 +523,7 @@ export function useSelectController(props: SelectProps) {
         readOnly
       })
     )
-  }, [effectiveDisabled, filteredOptions, maxCount, readOnly, selected, setSelected])
+  }, [commitSelected, effectiveDisabled, filteredOptions, maxCount, readOnly, selected])
 
   return {
     rootRef,

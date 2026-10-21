@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   calculateCheckedState,
   checkedSetsFromState,
+  createLoadGuard,
   filterTreeNodes,
   findNode,
   getAllKeys,
@@ -396,6 +397,25 @@ describe('tree-utils filtering', () => {
       'root',
       'child-b'
     ])
+  })
+})
+
+describe('createLoadGuard', () => {
+  it('suppresses same-key loads by token and retires all handles on invalidate', () => {
+    const guard = createLoadGuard()
+    const first = guard.begin('node-a')
+    const second = guard.begin('node-a')
+
+    expect(guard.isCurrent(first)).toBe(false)
+    expect(guard.isCurrent(second)).toBe(true)
+
+    guard.invalidate()
+    expect(guard.isCurrent(second)).toBe(false)
+
+    const third = guard.begin('node-a')
+    expect(guard.isCurrent(third)).toBe(true)
+    expect(third.epoch).toBeGreaterThan(second.epoch)
+    expect(guard.isCurrent(second)).toBe(false)
   })
 })
 

@@ -215,4 +215,77 @@ describe('Select', () => {
     const { getByText } = render(Wrapper)
     expect(getByText('请选择')).toBeInTheDocument()
   })
+
+  it('keeps a closed readOnly value off the keyboard', async () => {
+    const onChange = vi.fn()
+    const single = render(Select, {
+      props: {
+        options: testOptions,
+        modelValue: '1',
+        readOnly: true,
+        'aria-label': 'RO',
+        'onUpdate:modelValue': onChange
+      }
+    })
+    const trigger = single.getByRole('combobox')
+    trigger.focus()
+    await fireEvent.keyDown(trigger, { key: 'Backspace' })
+    expect(onChange).not.toHaveBeenCalled()
+    expect(single.getByText('Option 1')).toBeInTheDocument()
+    single.unmount()
+
+    const multi = render(Select, {
+      props: {
+        options: testOptions,
+        modelValue: ['1', '2'],
+        multiple: true,
+        readOnly: true,
+        'aria-label': 'ROM',
+        'onUpdate:modelValue': onChange
+      }
+    })
+    const multiTrigger = multi.getByRole('combobox')
+    multiTrigger.focus()
+    await fireEvent.keyDown(multiTrigger, { key: 'Backspace' })
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('disables tag removal while the field is disabled', async () => {
+    const onChange = vi.fn()
+    const { getAllByRole } = render(Select, {
+      props: {
+        options: testOptions,
+        modelValue: ['1', '2'],
+        multiple: true,
+        disabled: true,
+        'aria-label': 'Dis',
+        'onUpdate:modelValue': onChange
+      }
+    })
+    const remove = getAllByRole('button', { name: 'Clear selection Option 1' })[0]
+    expect(remove).toBeDisabled()
+    await fireEvent.click(remove)
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('clears the search through Done', async () => {
+    const onSearch = vi.fn()
+    const { getByRole } = render(Select, {
+      props: {
+        options: testOptions,
+        searchable: true,
+        'aria-label': 'Done',
+        'onUpdate:searchValue': onSearch
+      }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    const input = document.body.querySelector('input[role="combobox"]') as HTMLInputElement
+    await fireEvent.update(input, 'Opt')
+    expect(input.value).toBe('Opt')
+    await fireEvent.click(getByRole('button', { name: 'Done' }))
+    expect(onSearch).toHaveBeenCalledWith('')
+    await fireEvent.click(getByRole('combobox'))
+    const reopened = document.body.querySelector('input[role="combobox"]') as HTMLInputElement
+    expect(reopened.value).toBe('')
+  })
 })

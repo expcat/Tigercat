@@ -168,7 +168,7 @@ describe('select-utils', () => {
       ).toBe('Alpha +1 more')
     })
 
-    it('commits single, toggles multiple, and clears to undefined / []', () => {
+    it('commits single, toggles multiple, and clears to null / []', () => {
       expect(
         commitSelectOption({ option: options[0] as never, value: undefined, multiple: false })
       ).toBe('alpha')
