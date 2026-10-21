@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **Feedback 浮层与 SSR（Core / Vue / React）**：React 共享 focus trap 在容器节点被 portal 目标替换后重新绑定当前节点，DatePicker / TimePicker / ColorPicker 初始默认打开不再遗留 inert 与失效的焦点圈，普通重渲染不抢焦点。Vue Modal / Drawer / Tour 的 immediate watch 先判断浏览器全局再读取，关闭态 SSR 不再抛错；Vue Modal / Drawer 打开态 SSR 不再向进程级单例登记层叠计数与 Drawer 层（浏览器行为与样式兜底不变）。删除 LoadingBar 从未生效的公开 `renderBar` 字段（迁移见 [MIGRATION.md](docs/MIGRATION.md)）。
 - **表单校验（Core / Vue / React）**：共享引擎在值、结构或清理状态变化后拒绝旧异步结果写回，保留独立字段并发与 trigger 合并；整表校验跳过已登记禁用字段，Vue 的 loading 也复用同一禁用登记。双端 SchemaForm 只读点路径按嵌套值显示且公开规则收集排除只读 overlay，FormWizard 删除最后一步的重复 partial 校验；React Form 在 StrictMode 重放清理后保留 owned engine 与已输入值。
 - **懒加载（Core / Vue / React）**：Cascader、TreeSelect 与 Tree 在替换数据源或卸载后使旧请求失效；Cascader / TreeSelect 进入只读或禁用状态时同步失效。Tree 换源清除旧子节点缓存，受控父组件原样回写加载结果时保留缓存（包括 Vue 响应式数组）；React Tree 使用当前回调与状态，多个节点同批完成时保留全部已加载子节点。
 - **Select（Vue / React）**：所有用户改值入口统一遵守只读与禁用状态，关闭态 Backspace / Delete 不再修改只读值，禁用标签按钮不可删除；移动端 Done 复用统一关闭逻辑并清除搜索。同步修正选择器空值、Vue Transfer 回调和 `readOnly` 拼写的过期说明。

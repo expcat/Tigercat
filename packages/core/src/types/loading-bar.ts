@@ -58,11 +58,6 @@ export interface LoadingBarProps {
    * @default 200
    */
   minimumDisplayMs?: number
-
-  /**
-   * Replaces the bar look. Start, fail, and finish announcements stay.
-   */
-  renderBar?: unknown
 }
 
 /**

@@ -55,7 +55,9 @@ import {
   enqueueConfirmModal,
   getActiveFeedbackScope,
   type ConfirmModalInput,
-  type ConfirmModalKind
+  type ConfirmModalKind,
+  isBrowser,
+  isHTMLElement
 } from '@expcat/tigercat-core'
 import {
   closeIconViewBox,
@@ -452,6 +454,10 @@ export const Modal = defineComponent({
           stackedZ.value = props.zIndex
           return
         }
+        // SSR renders never release the process-level overlay z serial
+        // (renderToString does not run onBeforeUnmount); the static
+        // OVERLAY_Z_INDEX fallback already styles the layer, matching React.
+        if (!isBrowser()) return
         const layer = acquireOverlayZ()
         stackedZ.value = layer.zIndex
         releaseOverlayZ = layer.release
@@ -524,7 +530,7 @@ export const Modal = defineComponent({
       () => {
         const root = dialogRef.value
         const found = props.initialFocus && root ? root.querySelector(props.initialFocus) : null
-        focusTarget.value = found instanceof HTMLElement ? found : root
+        focusTarget.value = isHTMLElement(found) ? found : root
       },
       { flush: 'post', immediate: true }
     )

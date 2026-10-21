@@ -260,9 +260,10 @@ export const Tour = defineComponent({
       (isVisible) => {
         resizeObserver?.disconnect()
         resizeObserver = undefined
+        if (typeof window === 'undefined') return
         window.removeEventListener('resize', onViewportChange)
         window.removeEventListener('scroll', onViewportChange, true)
-        if (!isVisible || typeof window === 'undefined') return
+        if (!isVisible) return
         window.addEventListener('resize', onViewportChange)
         window.addEventListener('scroll', onViewportChange, true)
         if (typeof ResizeObserver !== 'function') return

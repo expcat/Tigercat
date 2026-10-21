@@ -60,7 +60,6 @@ export interface LoadingBarRuntimeState extends Required<
   notice: LoadingBarNotice
   noticeToken: number
   minimumDisplayMs: number
-  renderBar?: unknown
 }
 
 export function createInitialLoadingBarState(): LoadingBarRuntimeState {
@@ -217,8 +216,7 @@ function mergeStartOptions(
       Number.isFinite(options.minimumDisplayMs) &&
       options.minimumDisplayMs >= 0
         ? options.minimumDisplayMs
-        : state.minimumDisplayMs,
-    renderBar: options?.renderBar !== undefined ? options.renderBar : state.renderBar
+        : state.minimumDisplayMs
   }
 }
 

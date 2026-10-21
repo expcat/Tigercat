@@ -14,6 +14,8 @@ Slider 公开 props 删除 `vertical` 与 `showInput`：这两个配置自引入
 
 Core `getInputNumberKeyboardNextValue` 的 `current` 参数与返回值扩展支持 `InputNumberModel`，使超出安全整数的精确字符串也能走键盘步进模型。数字输入的运行时结果不变；TS 重载保留了 `number` 调用原有的 `number | undefined` 静态契约，只有显式传入字符串模型的调用方才拿到 `InputNumberModel | undefined`。
 
+LoadingBar 公开 props 删除 `renderBar`：该字段自引入起只被存入状态，两端宿主从不读取，传入没有任何可见效果。调整外观请使用现有的 `color` / `height` / `className` / `style` 选项；需要自定义布局时在应用侧沿用 `LoadingBarContainer` 自行渲染。
+
 ## v3.0.0-rc.1
 
 本版只有视觉修正，没有需要迁移的 API 变化。

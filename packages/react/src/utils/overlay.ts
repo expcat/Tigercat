@@ -228,44 +228,94 @@ export function useFocusTrap({
 }: UseFocusTrapOptions): void {
   const restoreTargetRef = useRef<HTMLElement | null>(null)
   const wasEnabledRef = useRef(false)
+  const boundScopeRef = useRef<{
+    node: HTMLElement
+    scope: ReturnType<typeof createFocusScope>
+  } | null>(null)
+  const configRef = useRef({
+    inert,
+    autoFocus,
+    returnFocus,
+    initialFocusRef,
+    exemptRef,
+    lockScroll
+  })
+  configRef.current = { inert, autoFocus, returnFocus, initialFocusRef, exemptRef, lockScroll }
 
   if (autoFocus && enabled && !wasEnabledRef.current) {
     restoreTargetRef.current = captureActiveElement()
   }
   wasEnabledRef.current = enabled
 
+  const unbindScope = useCallback(() => {
+    boundScopeRef.current?.scope.deactivate()
+    boundScopeRef.current = null
+  }, [])
+
+  const bindScope = useCallback((container: HTMLElement, captureRestoreTarget: boolean) => {
+    if (boundScopeRef.current?.node === container) return
+    boundScopeRef.current?.scope.deactivate()
+    const config = configRef.current
+    if (captureRestoreTarget) {
+      const active = captureActiveElement()
+      if (config.autoFocus && active && !container.contains(active)) {
+        restoreTargetRef.current = active
+      }
+    }
+    const restore = config.returnFocus ?? config.autoFocus
+    const scope = createFocusScope(container, {
+      modal: config.inert,
+      moveFocus: config.autoFocus || Boolean(config.initialFocusRef?.current),
+      initialFocus: config.initialFocusRef?.current ?? null,
+      returnFocus: restore,
+      previouslyFocused: restore ? (restoreTargetRef.current ?? undefined) : null,
+      lockScroll: config.lockScroll,
+      exempt: config.exemptRef ? () => config.exemptRef?.current ?? null : undefined
+    })
+    scope.activate()
+    boundScopeRef.current = { node: container, scope }
+  }, [])
+
   useLayoutEffect(() => {
     if (!enabled) return
     let frame: number | undefined
-    let scope: ReturnType<typeof createFocusScope> | undefined
     const attach = () => {
       const container = containerRef.current
       if (!container) {
         frame = requestAnimationFrame(attach)
         return
       }
-      const active = captureActiveElement()
-      if (autoFocus && active && !container.contains(active)) {
-        restoreTargetRef.current = active
-      }
-      const restore = returnFocus ?? autoFocus
-      scope = createFocusScope(container, {
-        modal: inert,
-        moveFocus: autoFocus || Boolean(initialFocusRef?.current),
-        initialFocus: initialFocusRef?.current ?? null,
-        returnFocus: restore,
-        previouslyFocused: restore ? (restoreTargetRef.current ?? undefined) : null,
-        lockScroll,
-        exempt: exemptRef ? () => exemptRef.current : undefined
-      })
-      scope.activate()
+      bindScope(container, true)
     }
     attach()
     return () => {
       if (frame !== undefined) cancelAnimationFrame(frame)
-      scope?.deactivate()
+      unbindScope()
     }
-  }, [enabled, containerRef, inert, autoFocus, returnFocus, initialFocusRef, exemptRef, lockScroll])
+  }, [
+    enabled,
+    containerRef,
+    inert,
+    autoFocus,
+    returnFocus,
+    initialFocusRef,
+    exemptRef,
+    lockScroll,
+    bindScope,
+    unbindScope
+  ])
+
+  // Anchored overlays first render inline, then move into the resolved portal
+  // target on the next commit, which swaps the container node without changing
+  // any effect dependency. Re-bind the scope to the live node after every
+  // commit; the node identity check keeps ordinary re-renders from stealing
+  // focus or re-capturing the restore target.
+  useLayoutEffect(() => {
+    if (!enabled) return
+    const container = containerRef.current
+    if (!container) return
+    bindScope(container, false)
+  })
 }
 
 // ============================================================================

@@ -51,7 +51,9 @@ import {
   type DrawerPlacement,
   type DrawerSize,
   type StyleValue,
-  OVERLAY_Z_INDEX
+  OVERLAY_Z_INDEX,
+  isBrowser,
+  isHTMLElement
 } from '@expcat/tigercat-core'
 import {
   closeIconViewBox,
@@ -302,6 +304,11 @@ export const Drawer = defineComponent({
       ([open, placement, zIndex]) => {
         releaseStack()
         if (!open) return
+        // SSR renders never release the process-level overlay z serial or the
+        // drawer layer registry (renderToString does not run onBeforeUnmount).
+        // Static fallbacks (OVERLAY_Z_INDEX, null layerId) already cover SSR,
+        // matching React, whose registration effect does not run on the server.
+        if (!isBrowser()) return
         if (zIndex === undefined) {
           const layer = acquireOverlayZ()
           stackedZ.value = layer.zIndex
@@ -430,7 +437,7 @@ export const Drawer = defineComponent({
       () => {
         const root = dialogRef.value
         const found = props.initialFocus && root ? root.querySelector(props.initialFocus) : null
-        focusTarget.value = found instanceof HTMLElement ? found : root
+        focusTarget.value = isHTMLElement(found) ? found : root
       },
       { flush: 'post', immediate: true }
     )

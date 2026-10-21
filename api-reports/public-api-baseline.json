@@ -7736,7 +7736,6 @@
         "container",
         "height",
         "minimumDisplayMs",
-        "renderBar",
         "style"
       ]
     },
