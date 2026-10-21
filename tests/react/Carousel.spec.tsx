@@ -143,7 +143,7 @@ describe('Carousel', () => {
       expect(screen.getByRole('link', { name: 'Slide 2 link' })).toBeInTheDocument()
     })
 
-    it('animates onto a clone when wrapping instead of rewinding the track', async () => {
+    it('slides one slot through the cyclic window when wrapping instead of rewinding', async () => {
       const onChange = vi.fn()
       const { container } = render(
         <Carousel arrows defaultCurrentIndex={2} infinite onChange={onChange}>
@@ -154,7 +154,7 @@ describe('Carousel', () => {
       await fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
       expect(onChange).toHaveBeenCalledWith(0, 2)
       const track = container.querySelector('[data-tiger-carousel-track]') as HTMLElement
-      expect(track.style.transform).toBe('translateX(-400%)')
+      expect(track.style.transform).toBe('translate3d(-100%, 0, 0)')
       expect(container.querySelector('[data-tiger-carousel-slide="active"]')).toHaveAttribute(
         'aria-label',
         'Slide 1 of 3'
@@ -164,7 +164,47 @@ describe('Carousel', () => {
       act(() => {
         vi.advanceTimersByTime(32)
       })
-      expect(track.style.transform).toBe('translateX(-100%)')
+      expect(track.style.transform).toBe('translate3d(0%, 0, 0)')
+    })
+
+    it('continues through the same cyclic window when rapid nexts interrupt a transition', () => {
+      const onChange = vi.fn()
+      const { container } = render(
+        <Carousel arrows infinite onChange={onChange}>
+          {slides()}
+        </Carousel>
+      )
+      const track = container.querySelector('[data-tiger-carousel-track]') as HTMLElement
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
+      expect(track.style.transform).toBe('translate3d(-100%, 0, 0)')
+
+      fireEvent.click(screen.getByRole('button', { name: 'Next slide' }))
+      // The second step resumes the same window instead of rebasing mid-flight
+      // and yanking the entering slide across the viewport.
+      expect(track.style.transform).toBe('translate3d(-200%, 0, 0)')
+      expect(onChange.mock.calls.map(([current]) => current)).toEqual([1, 2])
+    })
+
+    it('re-clamps a finite window when slidesPerView grows', () => {
+      const { container, rerender } = render(
+        <Carousel defaultCurrentIndex={2} infinite={false} slidesPerView={1}>
+          {slides()}
+        </Carousel>
+      )
+
+      rerender(
+        <Carousel defaultCurrentIndex={2} infinite={false} slidesPerView={2}>
+          {slides()}
+        </Carousel>
+      )
+      const rendered = container.querySelectorAll('[data-tiger-carousel-slide]')
+      expect(rendered[0]).toHaveAttribute('aria-label', 'Slide 2 of 3')
+      expect(rendered[0]).not.toHaveAttribute('inert')
+      expect(rendered[1]).toHaveAttribute('aria-label', 'Slide 3 of 3')
+      expect(rendered[1]).not.toHaveAttribute('inert')
+      expect(rendered[2]).toHaveAttribute('aria-label', 'Slide 1 of 3')
+      expect(rendered[2]).toHaveAttribute('inert')
     })
 
     it('does not wrap the track when infinite is false', async () => {

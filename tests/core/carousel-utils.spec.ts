@@ -2,19 +2,24 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   clampSlideIndex,
   createCarouselAutoplayController,
+  getCarouselAxisTransform,
   getCarouselDisplayIndex,
   getCarouselLoopTarget,
   getCarouselTouchPoint,
+  getCarouselWindowStart,
   getNextSlideIndex,
   getPrevSlideIndex,
   getScrollTransform,
   isCarouselAutoplayEnabled,
   isCarouselHorizontalLock,
   isCarouselPaused,
+  isCarouselSlideVisible,
   resolveCarouselKeyboardNavigation,
   resolveCarouselLoopSnap,
   resolveCarouselRegion,
   resolveCarouselSwipeDirection,
+  resolveCarouselSlideOrder,
+  resolveCarouselWindowTransition,
   shouldLoopCarousel,
   type CarouselVisibilityDocument
 } from '@expcat/tigercat-core'
@@ -189,9 +194,114 @@ describe('carousel-utils track geometry', () => {
     expect(getScrollTransform(1, 'ltr')).toBe('translateX(-100%)')
   })
 
-  it('uses one translate sign and lets dir reverse the axis', () => {
-    expect(getScrollTransform(2, 'rtl')).toBe('translateX(-200%)')
+  it('flips the horizontal sign in rtl because the track grows toward inline-start', () => {
+    expect(getScrollTransform(2, 'rtl')).toBe('translateX(200%)')
     expect(getScrollTransform(2, 'ltr')).toBe('translateX(-200%)')
+    expect(getCarouselAxisTransform(2, 'horizontal', 1, 'rtl')).toBe('translate3d(200%, 0, 0)')
+    expect(getCarouselAxisTransform(2, 'horizontal', 2, 'ltr')).toBe('translate3d(-100%, 0, 0)')
+  })
+
+  it('windows real slides cyclically and plans wrap steps without clones', () => {
+    expect(getCarouselWindowStart(3, 4, 2, false)).toBe(2)
+    expect(getCarouselWindowStart(3, 4, 2, true)).toBe(3)
+    expect(isCarouselSlideVisible(0, 3, 4, 2, true)).toBe(true)
+    expect(isCarouselSlideVisible(1, 3, 4, 2, true)).toBe(false)
+    expect(resolveCarouselSlideOrder(4, 3)).toEqual([3, 0, 1, 2])
+    expect(resolveCarouselSlideOrder(4, 0)).toEqual([0, 1, 2, 3])
+
+    expect(
+      resolveCarouselWindowTransition({
+        from: 3,
+        to: 0,
+        count: 4,
+        perView: 2,
+        looping: true,
+        source: 'step'
+      })
+    ).toEqual({ base: 3, fromOffset: 0, toOffset: 1, windowStart: 0, normalizeAfter: true })
+    expect(
+      resolveCarouselWindowTransition({
+        from: 0,
+        to: 3,
+        count: 4,
+        perView: 2,
+        looping: true,
+        source: 'step'
+      })
+    ).toEqual({ base: 3, fromOffset: 1, toOffset: 0, windowStart: 3, normalizeAfter: false })
+    expect(
+      resolveCarouselWindowTransition({
+        from: 0,
+        to: 3,
+        count: 4,
+        perView: 2,
+        looping: false,
+        source: 'goto'
+      })
+    ).toEqual({ base: 0, fromOffset: 0, toOffset: 2, windowStart: 2, normalizeAfter: true })
+    // Backward goto past the cyclic edge slides the short way instead.
+    expect(
+      resolveCarouselWindowTransition({
+        from: 0,
+        to: 3,
+        count: 4,
+        perView: 2,
+        looping: true,
+        source: 'goto'
+      })
+    ).toEqual({ base: 3, fromOffset: 1, toOffset: 0, windowStart: 3, normalizeAfter: false })
+  })
+
+  it('resumes an interrupted transition from the live track state', () => {
+    // Forward continuation keeps the live base so the running animation
+    // retargets through the same window instead of rebasing mid-flight.
+    expect(
+      resolveCarouselWindowTransition({
+        from: 1,
+        to: 2,
+        count: 4,
+        perView: 1,
+        looping: true,
+        source: 'step',
+        start: { base: 0, offset: 0.25 }
+      })
+    ).toEqual({ base: 0, fromOffset: 0.25, toOffset: 2, windowStart: 2, normalizeAfter: true })
+    // Backward plans fold the sampled offset into the pre-applied base.
+    expect(
+      resolveCarouselWindowTransition({
+        from: 1,
+        to: 0,
+        count: 4,
+        perView: 1,
+        looping: true,
+        source: 'step',
+        start: { base: 1, offset: 0.25 }
+      })
+    ).toEqual({ base: 0, fromOffset: 1.25, toOffset: 0, windowStart: 0, normalizeAfter: false })
+    // Reverting to the current window glides back instead of snapping.
+    expect(
+      resolveCarouselWindowTransition({
+        from: 1,
+        to: 0,
+        count: 4,
+        perView: 1,
+        looping: true,
+        source: 'goto',
+        start: { base: 0, offset: 0.25 }
+      })
+    ).toEqual({ base: 0, fromOffset: 0.25, toOffset: 0, windowStart: 0, normalizeAfter: false })
+    // An invalid base left by a layout change re-clamps to a steady window.
+    expect(
+      resolveCarouselWindowTransition({
+        from: 3,
+        to: 3,
+        count: 4,
+        perView: 2,
+        looping: false,
+        source: 'goto',
+        start: { base: 3, offset: 0 }
+      })
+    ).toEqual({ base: 2, fromOffset: 0, toOffset: 0, windowStart: 2, normalizeAfter: false })
   })
 })
 

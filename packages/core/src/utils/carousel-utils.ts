@@ -22,6 +22,8 @@ export type CarouselSwipeDirection = 'prev' | 'next'
 
 export type CarouselDir = 'ltr' | 'rtl' | (string & {})
 
+export type CarouselAxis = 'horizontal' | 'vertical'
+
 export interface CarouselTouchPoint {
   x: number
   y: number
@@ -31,6 +33,7 @@ export interface CarouselSwipeOptions {
   minSwipeDistance?: number
   dir?: CarouselDir
   maxCrossAxisRatio?: number
+  axis?: CarouselAxis
 }
 
 export interface CarouselLoopTarget {
@@ -106,6 +109,16 @@ export function isCarouselRtl(dir?: string | null): boolean {
 }
 
 /**
+ * Effective reading direction of a carousel root. An explicit root dir
+ * attribute wins over the provider direction so DOM order, transforms,
+ * keyboard, and gestures all read the same direction. SSR-safe: no DOM read.
+ */
+export function resolveCarouselRootDir(rootDir: unknown, configDir?: string | null): 'ltr' | 'rtl' {
+  if (rootDir === 'rtl' || rootDir === 'ltr') return rootDir
+  return resolveCarouselDir(configDir)
+}
+
+/**
  * Non-finite / non-positive intervals disable autoplay. Never treat 0 as
  * "every frame".
  */
@@ -133,6 +146,20 @@ export const carouselViewportClasses = 'relative overflow-hidden w-full touch-pa
 export const carouselTrackScrollClasses =
   'tiger-carousel-track flex flex-row tiger-motion-aware ease-in-out'
 
+/** Viewport chrome for the main axis. Vertical lets the page pan horizontally. */
+export function getCarouselViewportClasses(axis: CarouselAxis = 'horizontal'): string {
+  return axis === 'vertical'
+    ? 'relative overflow-hidden w-full h-full touch-pan-x'
+    : carouselViewportClasses
+}
+
+/** Track layout for the main axis. Vertical stacks slides in a full-height column. */
+export function getCarouselTrackScrollClasses(axis: CarouselAxis = 'horizontal'): string {
+  return axis === 'vertical'
+    ? 'tiger-carousel-track flex h-full flex-col tiger-motion-aware ease-in-out'
+    : carouselTrackScrollClasses
+}
+
 export const carouselTrackInstantClasses = 'tiger-carousel-track-instant'
 
 /** Track motion. Reduced motion wins over a custom duration variable. */
@@ -143,6 +170,16 @@ export const carouselBaseStyles = {
     transitionTimingFunction: 'var(--tiger-motion-ease-standard)'
   },
   '.tiger-carousel-track-instant': {
+    // property: none cancels a transition already in flight; a bare 0ms
+    // duration only affects transitions that start after the class applies.
+    transitionProperty: 'none',
+    transitionDuration: '0ms'
+  },
+  '.tiger-carousel-track-instant > .tiger-carousel-slide': {
+    // Fade slides carry the opacity transition; under an instant track the
+    // same property removal cancels a crossfade already in flight. Direct
+    // children only, so a nested carousel keeps its own motion.
+    transitionProperty: 'none',
     transitionDuration: '0ms'
   },
   '.tiger-carousel-slide': {
@@ -150,8 +187,16 @@ export const carouselBaseStyles = {
     transitionDuration: 'var(--tiger-carousel-duration, var(--tiger-motion-duration-base))',
     transitionTimingFunction: 'var(--tiger-motion-ease-standard)'
   },
+  // Vertical carousels need a definite main-axis size; a user height on the
+  // root (inline style or utility class) wins over this zero-specificity default.
+  ':where([data-tiger-carousel][data-axis=vertical])': {
+    height: '16rem'
+  },
   '@media (prefers-reduced-motion: reduce)': {
     '.tiger-carousel-track, .tiger-carousel-slide': {
+      // property: none cancels a transition already in flight; a bare 0ms
+      // duration only affects transitions that start after the change.
+      transitionProperty: 'none',
       transitionDuration: '0ms',
       transitionDelay: '0ms'
     }
@@ -164,10 +209,10 @@ export const carouselSlideBaseClasses =
   'min-w-full max-w-full w-full flex-[0_0_100%] overflow-hidden'
 
 export const carouselSlideFadeActiveClasses =
-  'relative w-full tiger-motion-aware transition-opacity ease-in-out opacity-100'
+  'relative w-full tiger-motion-aware tiger-carousel-slide ease-in-out opacity-100'
 
 export const carouselSlideFadeInactiveClasses =
-  'absolute inset-0 w-full overflow-hidden tiger-motion-aware transition-opacity ease-in-out opacity-0'
+  'absolute inset-0 w-full overflow-hidden tiger-motion-aware tiger-carousel-slide ease-in-out opacity-0'
 
 export const carouselDotsBaseClasses = 'absolute flex gap-1 z-10'
 
@@ -331,29 +376,234 @@ export function getCarouselLoopTarget(
 }
 
 /**
- * Move the track along the inline axis. The track follows `dir`, so RTL does
- * not force LTR and does not flip the sign. The next page sits at the inline
- * end and enters along the reading direction.
+ * Slides visible along the main axis. Never exceeds the slide count.
  */
 export function getCarouselSlidesPerView(perView: number | undefined, total: number): number {
   if (!Number.isFinite(perView) || (perView ?? 0) < 1) return 1
   return Math.min(total || 1, Math.floor(perView as number))
 }
 
+/**
+ * First slide of the visible window. Looping windows start at the current
+ * index and wrap cyclically; finite windows clamp so the tail never shows
+ * empty space.
+ */
+export function getCarouselWindowStart(
+  logicalIndex: number,
+  count: number,
+  perView = 1,
+  looping = false
+): number {
+  const index = clampSlideIndex(logicalIndex, count)
+  if (looping) return index
+  const span = count - getCarouselSlidesPerView(perView, count)
+  return Math.min(index, Math.max(0, span))
+}
+
+/**
+ * Whether a real slide sits inside the visible window. Only visible slides
+ * stay focusable; everything else is aria-hidden and inert.
+ */
+export function isCarouselSlideVisible(
+  logicalIndex: number,
+  windowStart: number,
+  count: number,
+  perView = 1,
+  looping = false
+): boolean {
+  if (count <= 0) return false
+  const size = getCarouselSlidesPerView(perView, count)
+  const distance = looping
+    ? (logicalIndex - windowStart + count) % count
+    : logicalIndex - windowStart
+  return distance >= 0 && distance < size
+}
+
+/**
+ * Real slide indexes in display order for the given rotation base. The slide
+ * at the base renders first along the main axis, so DOM reading and tab
+ * order match the visible window and boundary windows keep the same real
+ * component instances instead of clones.
+ */
+export function resolveCarouselSlideOrder(count: number, base: number): number[] {
+  const size = Math.max(0, Math.floor(count))
+  if (size === 0) return []
+  const start = clampSlideIndex(base, size)
+  return Array.from({ length: size }, (_, position) => (start + position) % size)
+}
+
+/**
+ * Live track state at the moment a transition is planned: the rotation base
+ * and the rendered offset in slide slots. Steady state is always offset 0;
+ * a mid-animation input passes the sampled offset so the next plan resumes
+ * from the visible position instead of jumping to a stale start.
+ */
+export interface CarouselWindowTrackState {
+  base: number
+  offset: number
+}
+
+/**
+ * Track position for one window transition. The base selects the slide
+ * rendered first; the offset is measured in slide slots along the main
+ * axis. Forward plans keep the current base and normalize to the target
+ * window after the transition ends; backward plans pre-apply the target
+ * base with an instant offset, then animate back to zero.
+ */
+export interface CarouselWindowTransition {
+  base: number
+  fromOffset: number
+  toOffset: number
+  windowStart: number
+  normalizeAfter: boolean
+}
+
+export function resolveCarouselWindowTransition(input: {
+  from: number
+  to: number
+  count: number
+  perView?: number
+  looping?: boolean
+  source?: 'step' | 'goto'
+  start?: CarouselWindowTrackState
+}): CarouselWindowTransition {
+  const count = Math.max(0, input.count)
+  const perView = getCarouselSlidesPerView(input.perView, count)
+  const looping = Boolean(input.looping) && count > 1
+  const from = clampSlideIndex(input.from, count)
+  const to = clampSlideIndex(input.to, count)
+  const maxOffset = count - perView
+  const windowStart = getCarouselWindowStart(to, count, perView, looping)
+  // A live base stays valid through the same clamp a steady base passes, so
+  // an invalid base left by a layout change re-clamps to a steady window.
+  const previousStart = getCarouselWindowStart(input.start?.base ?? from, count, perView, looping)
+  const startOffset =
+    input.start && Number.isFinite(input.start.offset)
+      ? Math.min(Math.max(input.start.offset, 0), Math.max(0, maxOffset))
+      : 0
+  const snap: CarouselWindowTransition = {
+    base: windowStart,
+    fromOffset: 0,
+    toOffset: 0,
+    windowStart,
+    normalizeAfter: false
+  }
+  if (windowStart === previousStart) {
+    // Same window: glide back to the origin from a mid-flight offset.
+    return startOffset > 0
+      ? {
+          base: previousStart,
+          fromOffset: startOffset,
+          toOffset: 0,
+          windowStart,
+          normalizeAfter: false
+        }
+      : snap
+  }
+
+  let forward: boolean
+  let distance: number
+  if (!looping) {
+    forward = windowStart > previousStart
+    distance = Math.abs(windowStart - previousStart)
+  } else if (input.source === 'step') {
+    forward = to === (from + 1) % count
+    distance = forward
+      ? (windowStart - previousStart + count) % count
+      : (previousStart - windowStart + count) % count
+  } else {
+    const forwardDistance = (windowStart - previousStart + count) % count
+    forward = windowStart > previousStart
+    distance = forward ? forwardDistance : count - forwardDistance
+  }
+  if (looping && (forward ? distance > maxOffset : distance + startOffset > maxOffset)) {
+    // The logical direction crosses the cyclic edge or cannot carry the
+    // in-flight offset through the window; take the short way.
+    forward = !forward
+    distance = count - distance
+  }
+  if (distance <= 0 || distance > maxOffset) return snap
+
+  if (forward) {
+    return {
+      base: previousStart,
+      fromOffset: startOffset,
+      toOffset: distance,
+      windowStart,
+      normalizeAfter: true
+    }
+  }
+  return {
+    base: windowStart,
+    fromOffset: distance + startOffset,
+    toOffset: 0,
+    windowStart,
+    normalizeAfter: false
+  }
+}
+
+/**
+ * Move the track along the main axis by offset slide slots. The track
+ * follows dir, so RTL flips the horizontal sign without forcing LTR, and
+ * the next page enters along the reading direction.
+ */
 export function getCarouselAxisTransform(
   displayIndex: number,
   axis: 'horizontal' | 'vertical' = 'horizontal',
-  perView = 1
+  perView = 1,
+  dir?: string | null
 ): string {
   const span = Math.max(1, perView)
-  const offset = (displayIndex * 100) / span
+  const offset = ((Number.isFinite(displayIndex) ? displayIndex : 0) * 100) / span
   if (axis === 'vertical') return `translate3d(0, ${-offset}%, 0)`
-  return `translate3d(${-offset}%, 0, 0)`
+  const signed = isCarouselRtl(dir) ? offset : -offset
+  return `translate3d(${signed}%, 0, 0)`
 }
 
-export function getScrollTransform(displayIndex: number, _dir?: string | null): string {
+/** Horizontal track transform. RTL flips the sign: the flex track lays
+ * slides toward inline-start, so the next page enters along dir. */
+export function getScrollTransform(displayIndex: number, dir?: string | null): string {
   const offset = (Number.isFinite(displayIndex) ? displayIndex : 0) * 100
-  return `translateX(-${offset}%)`
+  return isCarouselRtl(dir) ? `translateX(${offset}%)` : `translateX(-${offset}%)`
+}
+
+/**
+ * Rendered track offset in slide slots, sampled from the computed transform
+ * so an interrupted animation resumes from the visible position instead of a
+ * stale state target. Returns 0 when there is nothing to measure (SSR, test
+ * renderers without layout, or no running transform).
+ */
+export function getCarouselTrackRenderedOffset(
+  track: HTMLElement | null | undefined,
+  axis: CarouselAxis = 'horizontal',
+  perView = 1,
+  dir?: string | null
+): number {
+  if (!track || typeof getComputedStyle !== 'function') return 0
+  const match = /^matrix(3d)?\((.+)\)$/.exec(getComputedStyle(track).transform)
+  if (!match) return 0
+  const parts = match[2].split(',').map((value) => Number.parseFloat(value.trim()))
+  const tx = parts[match[1] ? 12 : 4] || 0
+  const ty = parts[match[1] ? 13 : 5] || 0
+  const rect = track.getBoundingClientRect()
+  const size = axis === 'vertical' ? rect.height : rect.width
+  if (!Number.isFinite(size) || size <= 0) return 0
+  // The translate percentage is relative to the track's own main-axis size,
+  // so a fraction of it spans perView slide slots.
+  const px = axis === 'vertical' ? -ty : isCarouselRtl(dir) ? tx : -tx
+  return (px / size) * Math.max(1, perView)
+}
+
+/**
+ * Main-axis size of one slide. Horizontal slides keep content-driven
+ * height; vertical slides share the definite viewport height.
+ */
+export function getCarouselSlideSizeStyle(axis: CarouselAxis, perView = 1): Record<string, string> {
+  const size = `${100 / Math.max(1, perView)}%`
+  if (axis === 'vertical') {
+    return { flex: `0 0 ${size}`, height: size, minHeight: size, maxHeight: size }
+  }
+  return { flex: `0 0 ${size}`, width: size, minWidth: size, maxWidth: size }
 }
 
 export function formatCarouselSlideStatus(template: string, index: number, total: number): string {
@@ -391,20 +641,37 @@ export function resolveCarouselSwipeDirection(
   )
 
   if (!gesture) return null
+  if (options.axis === 'vertical') {
+    if (gesture.direction === 'up') return 'next'
+    if (gesture.direction === 'down') return 'prev'
+    return null
+  }
   const rtl = isCarouselRtl(options.dir)
   if (gesture.direction === 'left') return rtl ? 'prev' : 'next'
   if (gesture.direction === 'right') return rtl ? 'next' : 'prev'
   return null
 }
 
-export function isCarouselHorizontalLock(
+/** Pointer lock along the main axis once the gesture dominates it. */
+export function isCarouselAxisLock(
   startPoint: CarouselTouchPoint | null,
-  currentPoint: CarouselTouchPoint | null
+  currentPoint: CarouselTouchPoint | null,
+  axis: CarouselAxis = 'horizontal'
 ): boolean {
   if (!startPoint || !currentPoint) return false
   const deltaX = Math.abs(currentPoint.x - startPoint.x)
   const deltaY = Math.abs(currentPoint.y - startPoint.y)
+  if (axis === 'vertical') {
+    return deltaY >= HORIZONTAL_LOCK_DISTANCE && deltaY > deltaX
+  }
   return deltaX >= HORIZONTAL_LOCK_DISTANCE && deltaX > deltaY
+}
+
+export function isCarouselHorizontalLock(
+  startPoint: CarouselTouchPoint | null,
+  currentPoint: CarouselTouchPoint | null
+): boolean {
+  return isCarouselAxisLock(startPoint, currentPoint, 'horizontal')
 }
 
 export function isCarouselChromeTarget(target: EventTarget | null): boolean {
@@ -417,13 +684,19 @@ export function isCarouselKeyboardIgnoredTarget(target: EventTarget | null): boo
 
 export function resolveCarouselKeyboardNavigation(
   key: string,
-  dir?: string | null
+  dir?: string | null,
+  axis: CarouselAxis = 'horizontal'
 ): 'prev' | 'next' | 'first' | 'last' | null {
+  if (key === 'Home') return 'first'
+  if (key === 'End') return 'last'
+  if (axis === 'vertical') {
+    if (key === 'ArrowUp') return 'prev'
+    if (key === 'ArrowDown') return 'next'
+    return null
+  }
   const rtl = isCarouselRtl(dir)
   if (key === 'ArrowLeft') return rtl ? 'next' : 'prev'
   if (key === 'ArrowRight') return rtl ? 'prev' : 'next'
-  if (key === 'Home') return 'first'
-  if (key === 'End') return 'last'
   return null
 }
 

@@ -12,8 +12,7 @@ import {
 import {
   carouselPauseButtonClasses,
   carouselTrackFadeClasses,
-  carouselTrackScrollClasses,
-  carouselViewportClasses,
+  carouselTrackInstantClasses,
   carouselNextArrowPath,
   carouselPrevArrowPath,
   clampSlideIndex,
@@ -21,27 +20,29 @@ import {
   coerceClassValue,
   createCarouselAutoplayController,
   getCarouselArrowClasses,
-  getCarouselCloneAttributes,
   getCarouselContainerClasses,
-  getCarouselDisplayIndex,
   getCarouselDotClasses,
   getCarouselDotMarkClasses,
   getCarouselDotsClasses,
   getCarouselLabels,
-  getCarouselLoopTarget,
   getCarouselPointerPoint,
   getCarouselSlideClasses,
+  getCarouselSlideSizeStyle,
+  getCarouselTrackRenderedOffset,
+  getCarouselTrackScrollClasses,
+  getCarouselViewportClasses,
+  getCarouselWindowStart,
   getNextSlideIndex,
   getPrevSlideIndex,
   getCarouselAxisTransform,
   getCarouselSlidesPerView,
-  getScrollTransform,
   isCarouselAutoplayEnabled,
+  isCarouselAxisLock,
   isCarouselChromeTarget,
   isCarouselFocusInside,
-  isCarouselHorizontalLock,
   isCarouselKeyboardIgnoredTarget,
   isCarouselPaused,
+  isCarouselSlideVisible,
   isNextDisabled,
   isPrevDisabled,
   mergeStyleValues,
@@ -51,39 +52,30 @@ import {
   carouselStatusClasses,
   formatCarouselSlideStatus,
   resolveCarouselKeyboardNavigation,
-  resolveCarouselLoopSnap,
   resolveCarouselRegion,
+  resolveCarouselRootDir,
+  resolveCarouselSlideOrder,
   resolveCarouselSwipeDirection,
+  resolveCarouselWindowTransition,
   shouldLoopCarousel,
   type CarouselAutoplayController,
   type CarouselDotPosition,
   type CarouselEffect,
   type CarouselMethods,
+  type CarouselProps as CoreCarouselProps,
   type CarouselSwipeDirection,
   type CarouselTouchPoint,
+  type CarouselWindowTransition,
   type TigerLocale,
   type TigerLocaleCarousel
 } from '@expcat/tigercat-core'
 import { flattenElementVNodes } from '../utils/flatten-vnodes'
 import { useTigerConfig } from './tiger-config'
 
-export interface CarouselProps {
-  autoplay?: boolean
-  autoplaySpeed?: number
-  dots?: boolean
-  dotPosition?: CarouselDotPosition
-  effect?: CarouselEffect
-  arrows?: boolean
-  infinite?: boolean
-  speed?: number
-  currentIndex?: number
-  defaultCurrentIndex?: number
-  pauseOnHover?: boolean
-  pauseOnFocus?: boolean
-  className?: string
-  style?: Record<string, string | number>
+export interface CarouselProps extends CoreCarouselProps {
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleCarousel>
+  thumbnails?: boolean
 }
 
 export type VueCarouselProps = CarouselProps
@@ -192,12 +184,17 @@ export const Carousel = defineComponent({
     const userPaused = ref(false)
     const snapPending = ref(false)
     const wrapping = ref(false)
-    const displayIndex = ref(0)
+    // Rotation base of the cyclic window and the animated offset in slide
+    // slots. Steady state is always baseIndex === windowStart, trackOffset 0.
+    const baseIndex = ref(0)
+    const trackOffset = ref(0)
     const containerRef = ref<HTMLElement | null>(null)
     const viewportRef = ref<HTMLElement | null>(null)
+    const trackRef = ref<HTMLElement | null>(null)
     const requestedIndex = ref(
       props.currentIndex !== undefined ? props.currentIndex : props.defaultCurrentIndex
     )
+    let pendingTransition: CarouselWindowTransition | null = null
 
     let autoplayController: CarouselAutoplayController | null = null
     let pointerSession: {
@@ -220,7 +217,13 @@ export const Carousel = defineComponent({
     const looping = computed(() =>
       shouldLoopCarousel(props.infinite, slideCount.value, props.effect)
     )
-    const dir = computed(() => config.value.direction)
+    const perView = computed(() => getCarouselSlidesPerView(props.slidesPerView, slideCount.value))
+    // An explicit root dir attribute wins over the provider direction so the
+    // DOM, transforms, keyboard, and gestures read one direction.
+    const dir = computed(() => resolveCarouselRootDir(attrs.dir, config.value.direction))
+    const windowStart = computed(() =>
+      getCarouselWindowStart(currentIndex.value, slideCount.value, perView.value, looping.value)
+    )
     const reducedMotion = ref(false)
     let stopMotion: (() => void) | undefined
     onMounted(() => {
@@ -243,15 +246,73 @@ export const Carousel = defineComponent({
     )
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
     const labels = computed(() => getCarouselLabels(mergedLocale.value, props.labels))
-    const transitionDuration = computed(() =>
+    const carouselDuration = computed(() =>
       snapPending.value || props.speed <= 0 ? '0ms' : `${props.speed}ms`
     )
-
-    displayIndex.value = getCarouselDisplayIndex(
-      currentIndex.value,
-      slideCount.value,
-      looping.value
+    const trackInstant = computed(() => snapPending.value || props.speed <= 0)
+    // Reduced motion forces a 0ms duration through the shared CSS rule, so a
+    // wrap must not wait for a transitionend that never fires.
+    const effectiveDuration = computed(() =>
+      props.speed <= 0 || reducedMotion.value ? 0 : props.speed
     )
+
+    const applyWindowPlan = (plan: CarouselWindowTransition) => {
+      pendingTransition = null
+      if (plan.fromOffset === plan.toOffset || effectiveDuration.value === 0) {
+        wrapping.value = false
+        snapPending.value = false
+        baseIndex.value = plan.windowStart
+        trackOffset.value = 0
+        return
+      }
+      wrapping.value = true
+      pendingTransition = plan
+      if (plan.normalizeAfter) {
+        snapPending.value = false
+        baseIndex.value = plan.base
+        trackOffset.value = plan.toOffset
+        return
+      }
+      snapPending.value = true
+      baseIndex.value = plan.base
+      trackOffset.value = plan.fromOffset
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (pendingTransition !== plan) return
+          snapPending.value = false
+          trackOffset.value = plan.toOffset
+        })
+      })
+    }
+
+    // Re-plan the window from the live track state. An in-flight plan already
+    // heading to the same window absorbs the input; otherwise the rendered
+    // offset is sampled so the next plan resumes from the visible position.
+    const syncWindow = (to: number, source: 'step' | 'goto', from: number) => {
+      const count = slideCount.value
+      const target = getCarouselWindowStart(to, count, perView.value, looping.value)
+      if (wrapping.value) {
+        if (pendingTransition?.windowStart === target) return
+      } else if (baseIndex.value === target && trackOffset.value === 0) return
+      applyWindowPlan(
+        resolveCarouselWindowTransition({
+          from,
+          to,
+          count,
+          perView: perView.value,
+          looping: looping.value,
+          source,
+          start: {
+            base: baseIndex.value,
+            offset: wrapping.value
+              ? getCarouselTrackRenderedOffset(trackRef.value, props.axis, perView.value, dir.value)
+              : 0
+          }
+        })
+      )
+    }
+
+    baseIndex.value = windowStart.value
 
     const goTo = (index: number, source: 'step' | 'goto' = 'goto') => {
       const count = slideCount.value
@@ -260,22 +321,13 @@ export const Carousel = defineComponent({
       if (clampedIndex === current) return
 
       emit('before-change', current, clampedIndex)
-      const loopingNow = looping.value
-      const target =
-        source === 'step'
-          ? getCarouselLoopTarget(current, clampedIndex, count, loopingNow)
-          : {
-              displayIndex: getCarouselDisplayIndex(clampedIndex, count, loopingNow),
-              logicalIndex: clampedIndex,
-              needsSnap: false
-            }
-      wrapping.value = target.needsSnap
-      snapPending.value = false
-      displayIndex.value = target.displayIndex
-      requestedIndex.value = clampedIndex
+      // Controlled carousels re-plan from the prop watcher once the parent
+      // accepts the requested index.
       if (!isControlled.value) {
+        syncWindow(clampedIndex, source, current)
         internalCurrentIndex.value = clampedIndex
       }
+      requestedIndex.value = clampedIndex
       emit('update:currentIndex', clampedIndex)
       emit('change', clampedIndex, current)
     }
@@ -327,11 +379,6 @@ export const Carousel = defineComponent({
         current: point,
         locked: false
       }
-      try {
-        viewportNode.setPointerCapture(event.pointerId)
-      } catch {
-        /* ignore */
-      }
     }
 
     const handlePointerMove = (event: PointerEvent) => {
@@ -339,8 +386,15 @@ export const Carousel = defineComponent({
       const point = getCarouselPointerPoint(event)
       if (!point) return
       pointerSession.current = point
-      if (!pointerSession.locked && isCarouselHorizontalLock(pointerSession.start, point)) {
+      if (!pointerSession.locked && isCarouselAxisLock(pointerSession.start, point, props.axis)) {
         pointerSession.locked = true
+        // Capture only once the gesture is a drag so plain clicks on slide
+        // content keep their native target.
+        try {
+          viewportNode?.setPointerCapture(event.pointerId)
+        } catch {
+          /* ignore */
+        }
       }
       if (pointerSession.locked && event.cancelable) {
         event.preventDefault()
@@ -351,7 +405,8 @@ export const Carousel = defineComponent({
       if (!pointerSession || pointerSession.id !== event.pointerId) return
       const end = getCarouselPointerPoint(event) ?? pointerSession.current
       const direction = resolveCarouselSwipeDirection(pointerSession.start, end, {
-        dir: dir.value
+        dir: dir.value,
+        axis: props.axis
       })
       resetPointer()
       if (direction) navigateByDirection(direction)
@@ -363,20 +418,27 @@ export const Carousel = defineComponent({
 
     watch(
       () => props.currentIndex,
-      (value) => {
-        if (value !== undefined) {
-          internalCurrentIndex.value = value
-          requestedIndex.value = value
-          if (!wrapping.value) {
-            displayIndex.value = getCarouselDisplayIndex(
-              currentIndex.value,
-              slideCount.value,
-              looping.value
-            )
-          }
-        }
+      (value, oldValue) => {
+        if (value === undefined) return
+        internalCurrentIndex.value = value
+        requestedIndex.value = value
+        syncWindow(value, 'goto', clampSlideIndex(oldValue ?? value, slideCount.value))
       }
     )
+
+    // Layout input changes re-clamp the window so the current page stays
+    // inside the visible span instead of leaking a stale rotation.
+    watch([perView, looping], () => {
+      syncWindow(currentIndex.value, 'goto', currentIndex.value)
+    })
+
+    // A reduced-motion switch or a zero speed does not cancel an already
+    // running CSS transition; settle the pending plan through the instant
+    // path so the current page becomes visible immediately.
+    watch(effectiveDuration, (duration) => {
+      if (duration !== 0 || !pendingTransition) return
+      applyWindowPlan(pendingTransition)
+    })
 
     watch(slideCount, (count) => {
       const requested = isControlled.value ? (props.currentIndex as number) : requestedIndex.value
@@ -385,7 +447,13 @@ export const Carousel = defineComponent({
         requestedIndex.value = clamped
         goTo(clamped, 'goto')
       } else if (!wrapping.value) {
-        displayIndex.value = getCarouselDisplayIndex(currentIndex.value, count, looping.value)
+        baseIndex.value = getCarouselWindowStart(
+          currentIndex.value,
+          count,
+          perView.value,
+          looping.value
+        )
+        trackOffset.value = 0
       }
     })
 
@@ -473,26 +541,30 @@ export const Carousel = defineComponent({
           )
         )
 
-      const renderSlide = (
-        slide: (typeof currentSlides)[number],
-        logicalIndex: number,
-        clone: boolean
-      ) => {
-        const active = !clone && logicalIndex === current
+      const renderSlide = (slide: (typeof currentSlides)[number], logicalIndex: number) => {
+        const active = logicalIndex === current
         const slideId = `${instanceId}-slide-${logicalIndex}`
-        const hidden = !active
+        const visible =
+          props.effect === 'fade'
+            ? active
+            : isCarouselSlideVisible(
+                logicalIndex,
+                windowStart.value,
+                count,
+                perView.value,
+                isLooping
+              )
+        const hidden = !visible
         return h(
           'div',
           {
-            key: clone
-              ? `clone-${logicalIndex}-${logicalIndex === 0 ? 'trailing' : 'leading'}`
-              : slideId,
-            id: clone ? undefined : slideId,
+            key: slideId,
+            id: slideId,
             class: getCarouselSlideClasses({ effect: props.effect, active }),
             style:
               props.effect === 'fade'
-                ? { transitionDuration: transitionDuration.value }
-                : undefined,
+                ? { '--tiger-carousel-duration': carouselDuration.value }
+                : getCarouselSlideSizeStyle(props.axis, perView.value),
             role: 'group',
             'aria-roledescription': labels.value.slideRoleDescription,
             'aria-label': labels.value.slideAriaLabel
@@ -500,32 +572,32 @@ export const Carousel = defineComponent({
               .replace('{total}', String(count)),
             'aria-hidden': hidden ? true : undefined,
             inert: hidden ? true : undefined,
-            'data-tiger-carousel-slide': clone ? 'clone' : active ? 'active' : 'inactive',
-            ...(clone ? getCarouselCloneAttributes() : {})
+            'data-tiger-carousel-slide': active ? 'active' : 'inactive'
           },
           slide
         )
       }
 
-      const slideNodes = isLooping
-        ? [
-            renderSlide(currentSlides[count - 1], count - 1, true),
-            ...currentSlides.map((slide, index) => renderSlide(slide, index, false)),
-            renderSlide(currentSlides[0], 0, true)
-          ]
-        : currentSlides.map((slide, index) => renderSlide(slide, index, false))
+      // Real slides render in cyclic display order so DOM reading and tab
+      // order match the visible window; keyed moves keep one component
+      // instance per slide across wraps.
+      const slideNodes =
+        props.effect === 'fade'
+          ? currentSlides.map((slide, index) => renderSlide(slide, index))
+          : resolveCarouselSlideOrder(count, baseIndex.value).map((index) =>
+              renderSlide(currentSlides[index], index)
+            )
 
       const handleTrackTransitionEnd = (event: TransitionEvent) => {
         if (event.target !== event.currentTarget) return
         if (!wrapping.value) return
-        const snap = resolveCarouselLoopSnap(displayIndex.value, count)
-        if (snap === null) {
-          wrapping.value = false
-          return
-        }
         wrapping.value = false
+        const plan = pendingTransition
+        pendingTransition = null
+        if (!plan || !plan.normalizeAfter) return
         snapPending.value = true
-        displayIndex.value = snap
+        baseIndex.value = plan.windowStart
+        trackOffset.value = 0
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             snapPending.value = false
@@ -537,24 +609,32 @@ export const Carousel = defineComponent({
         props.effect === 'fade'
           ? h(
               'div',
-              { class: carouselTrackFadeClasses, 'data-tiger-carousel-track': '' },
+              {
+                class: classNames(
+                  carouselTrackFadeClasses,
+                  trackInstant.value ? carouselTrackInstantClasses : ''
+                ),
+                'data-tiger-carousel-track': ''
+              },
               slideNodes
             )
           : h(
               'div',
               {
-                class: carouselTrackScrollClasses,
+                ref: trackRef,
+                class: classNames(
+                  getCarouselTrackScrollClasses(props.axis),
+                  trackInstant.value ? carouselTrackInstantClasses : ''
+                ),
                 'data-tiger-carousel-track': '',
                 style: {
-                  transform:
-                    props.axis === 'vertical' || props.slidesPerView > 1
-                      ? getCarouselAxisTransform(
-                          displayIndex.value,
-                          props.axis,
-                          getCarouselSlidesPerView(props.slidesPerView, count)
-                        )
-                      : getScrollTransform(displayIndex.value, dir.value),
-                  transitionDuration: transitionDuration.value
+                  transform: getCarouselAxisTransform(
+                    trackOffset.value,
+                    props.axis,
+                    perView.value,
+                    dir.value
+                  ),
+                  '--tiger-carousel-duration': carouselDuration.value
                 },
                 onTransitionend: handleTrackTransitionEnd
               },
@@ -566,7 +646,7 @@ export const Carousel = defineComponent({
         if (event.defaultPrevented || count <= 1) return
         if (isCarouselKeyboardIgnoredTarget(event.target)) return
         if ((event.target as Element | null)?.closest?.('[role="tablist"]')) return
-        const action = resolveCarouselKeyboardNavigation(event.key, dir.value)
+        const action = resolveCarouselKeyboardNavigation(event.key, dir.value, props.axis)
         if (!action) return
         event.preventDefault()
         if (action === 'next') next()
@@ -620,7 +700,7 @@ export const Carousel = defineComponent({
             'div',
             {
               ref: viewportRef,
-              class: carouselViewportClasses,
+              class: getCarouselViewportClasses(props.axis),
               'data-tiger-carousel-viewport': ''
             },
             track

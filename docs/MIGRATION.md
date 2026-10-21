@@ -8,6 +8,8 @@
 
 Core 布局 helper 返回键调整：`getRowGutterStyleVars` / `getRowAlignJustifyVars` 现在输出响应式输入变量（`--tiger-row-gutter-x-base`、`--tiger-row-gutter-x-md`、`--tiger-row-align-base` 等），不再直接输出 `--tiger-row-gutter-x` / `--tiger-row-align` / `--tiger-row-justify` 这些由样式表按视口提升的输出变量。把返回对象 spread 到 Row 根元素 `style` 的用法不受影响；按旧键名硬编码读取返回值的调用方改用新键名。用户仍可在 Row 的 `style` 上直接写输出变量（如 `--tiger-row-gutter-x: 24px`）覆盖全部断点。
 
+Core Carousel 轨道位移 helper 修正：`getScrollTransform(index, dir)` 此前忽略 `dir` 参数，RTL 下位移方向错误，本轮修正为 RTL 返回正位移；曾按旧的错误方向手工反向补偿的外部消费者应移除补偿。`getCarouselAxisTransform(index, axis, perView, dir?)` 新增可选 `dir` 参数，只影响水平 RTL 的符号；省略该参数的既有调用行为不变，无需迁移。
+
 ## v3.0.0-rc.1
 
 本版只有视觉修正，没有需要迁移的 API 变化。

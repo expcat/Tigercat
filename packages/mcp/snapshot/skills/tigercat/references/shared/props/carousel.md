@@ -13,7 +13,7 @@ description: Compact generated Tigercat Layout props reference
 
 `packages/core/src/types/carousel.ts` · `CarouselProps` · 4/20 props
 
-Note: 子节点才是 slides。`infinite` 在 scroll 下走首尾 clone，不会整段倒带。无名不是 landmark。非当前页 `inert`。开 autoplay 时有可聚焦暂停；`autoplaySpeed<=0` 和 reduced-motion 都不自动播。
+Note: 子节点才是 slides，滚动窗口始终是同一批真实内容实例（无 clone），窗口内 slide 可交互、其余 `inert`（fade 仅 active 可见）。`infinite` 循环换页沿主轴滑动不倒带；finite 尾部窗口夹紧不留空。`axis=vertical` 默认高 16rem，可被内联样式或工具类高度覆盖，支持上下方向键与主轴触摸滑动。显式根 `dir` 优先于 ConfigProvider 的 `dir`。`speed<=0` 或 reduced-motion 时换页立即落地。无名不是 landmark。开 autoplay 时有可聚焦暂停；`autoplaySpeed<=0` 和 reduced-motion 都不自动播。
 
 | Prop             | Type      | Default | Notes                                       |
 | ---------------- | --------- | ------- | ------------------------------------------- |

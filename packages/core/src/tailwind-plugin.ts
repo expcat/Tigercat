@@ -173,9 +173,14 @@ function pluginBase(preset: ThemePreset): Record<string, unknown> {
 
 function mergeBase(parts: Array<Record<string, unknown>>): Record<string, unknown> {
   const merged: Record<string, unknown> = {}
+  // Media blocks carry overrides (reduced motion, forced colors, contrast)
+  // that must win over the plain component rules, so emit them last instead
+  // of at the position of their first occurrence.
+  const media: Record<string, unknown> = {}
   for (const part of parts) {
     for (const [selector, body] of Object.entries(part)) {
-      const previous = merged[selector]
+      const bucket = selector.startsWith('@media') ? media : merged
+      const previous = bucket[selector]
       if (
         previous &&
         typeof previous === 'object' &&
@@ -184,13 +189,13 @@ function mergeBase(parts: Array<Record<string, unknown>>): Record<string, unknow
         !Array.isArray(previous) &&
         !Array.isArray(body)
       ) {
-        merged[selector] = { ...(previous as object), ...(body as object) }
+        bucket[selector] = { ...(previous as object), ...(body as object) }
       } else {
-        merged[selector] = body
+        bucket[selector] = body
       }
     }
   }
-  return merged
+  return { ...merged, ...media }
 }
 
 function asBase(value: Record<string, unknown>): Parameters<PluginAPI['addBase']>[0] {

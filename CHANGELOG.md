@@ -25,6 +25,7 @@
 - **Resizable / Splitter（Core / Vue / React）**：边把手命中区恢复真实尺寸（原 `inset-inline-0` / `inset-block-0` 在 Tailwind v4 不存在导致把手 0 尺寸）；预设宽高比按预设自身钳制而不是起点比例（方形起点设 16/9 后拖宽得到 16/9 结果）；RTL 下 origin 偏移不再二次翻转拖动对边。
 - **Space / ScrollArea / Masonry / Sidebar / Descriptions（Vue / React）**：Space 命名 `size` 搭配 `verticalSize` 时列间距不再被压成 0；ScrollArea `scrollToMarker` 在有相对定位祖先时定位正确；Vue Masonry 子项动态增删后重新测量分布；React Sidebar 受控 `collapsed` 时 trigger 只发 `onCollapsedChange` 请求、不自行改宽；Vue Descriptions 标题 id 改用 SSR 安全的 `useId`。
 - **Row（Vue / React）**：响应式 `gutter` / `align` / `justify` 从一次性读取 `window.innerWidth` 改为静态 CSS 变量级联——输入变量按现有断点 token 经 `@media` 提升，窗口缩放实时生效，SSR 输出不再依赖视口；嵌套 Row 拥有自身默认与断点值，不再继承父 Row 的响应式地图；Vue 的 `align` / `justify` prop 类型修正为接受响应式地图，消除运行时告警。Core `getRowGutterStyleVars` / `getRowAlignJustifyVars` 的返回键改为输入变量名，迁移说明见 [MIGRATION.md](docs/MIGRATION.md)。
+- **Carousel（Core / Vue / React）**：滚动窗口改为同一批真实 slide 的循环重排，删除首尾 clone 轨道——跨页保留组件实例（内部状态不丢），DOM/Tab 顺序与可见顺序一致，循环换页沿主轴滑动不倒带，finite 尾部夹紧不留空。`axis="vertical"` 补默认高 16rem（内联样式/工具类可覆盖）与上下方向键、主轴触摸滑动；显式根 `dir` 优先于 ConfigProvider 的 `dir`，RTL 位移方向修正（见 [MIGRATION.md](docs/MIGRATION.md)）。`speed<=0` 或 reduced-motion 时换页立即落地（含动画中途切换），连续导航从渲染位置续跑不跳变。
 
 ## v3.0.0-rc.1（2026-10-05）
 

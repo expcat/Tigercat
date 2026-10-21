@@ -12,68 +12,60 @@ import React, {
 import {
   carouselPauseButtonClasses,
   carouselTrackFadeClasses,
-  carouselTrackScrollClasses,
-  carouselViewportClasses,
   carouselNextArrowPath,
   carouselPrevArrowPath,
   clampSlideIndex,
   classNames,
   createCarouselAutoplayController,
   getCarouselArrowClasses,
-  getCarouselCloneAttributes,
   getCarouselContainerClasses,
-  getCarouselDisplayIndex,
   getCarouselDotClasses,
   getCarouselDotMarkClasses,
   getCarouselDotsClasses,
   getCarouselLabels,
-  getCarouselLoopTarget,
   getCarouselPointerPoint,
   getCarouselSlideClasses,
+  getCarouselSlideSizeStyle,
+  getCarouselTrackRenderedOffset,
+  getCarouselTrackScrollClasses,
+  getCarouselViewportClasses,
+  getCarouselWindowStart,
   getNextSlideIndex,
   getPrevSlideIndex,
   getCarouselAxisTransform,
   getCarouselSlidesPerView,
-  getScrollTransform,
   carouselStatusClasses,
   carouselTrackInstantClasses,
   formatCarouselSlideStatus,
   isCarouselAutoplayEnabled,
+  isCarouselAxisLock,
   isCarouselChromeTarget,
   isCarouselFocusInside,
-  isCarouselHorizontalLock,
   isCarouselKeyboardIgnoredTarget,
   isCarouselPaused,
+  isCarouselSlideVisible,
   isNextDisabled,
   isPrevDisabled,
   mergeTigerLocale,
   prefersReducedMotion,
   subscribePrefersReducedMotion,
   resolveCarouselKeyboardNavigation,
-  resolveCarouselLoopSnap,
   resolveCarouselRegion,
+  resolveCarouselRootDir,
+  resolveCarouselSlideOrder,
   resolveCarouselSwipeDirection,
+  resolveCarouselWindowTransition,
   shouldLoopCarousel,
   type CarouselMethods,
   type CarouselProps as CoreCarouselProps,
   type CarouselSwipeDirection,
   type CarouselTouchPoint,
+  type CarouselWindowTransition,
   type TigerLocale,
   type TigerLocaleCarousel
 } from '@expcat/tigercat-core'
 import { useControlledState } from '../hooks/useControlledState'
 import { useTigerConfig } from './tiger-config'
-
-function stripCarouselCloneIds(node: React.ReactNode): React.ReactNode {
-  return React.Children.map(node, (child) => {
-    if (!React.isValidElement(child)) return child
-    const props = child.props as { id?: string; children?: React.ReactNode }
-    return React.cloneElement(child, {
-      id: undefined,
-      children: props.children != null ? stripCarouselCloneIds(props.children) : props.children
-    } as Partial<unknown> & React.Attributes)
-  })
-}
 
 export interface CarouselProps
   extends
@@ -124,6 +116,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       onFocus,
       onBlur,
       onKeyDown,
+      dir: rootDir,
       ...rest
     },
     ref
@@ -137,7 +130,10 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     )
     const slideCount = slides.length
     const looping = shouldLoopCarousel(infinite, slideCount, effect)
-    const dir = config.direction
+    const perView = getCarouselSlidesPerView(slidesPerView, slideCount)
+    // An explicit root dir attribute wins over the provider direction so the
+    // DOM, transforms, keyboard, and gestures read one direction.
+    const dir = resolveCarouselRootDir(rootDir, config.direction)
     const [reducedMotion, setReducedMotion] = useState(false)
     useEffect(() => {
       setReducedMotion(prefersReducedMotion())
@@ -154,9 +150,12 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     const [hovered, setHovered] = useState(false)
     const [focused, setFocused] = useState(false)
     const [userPaused, setUserPaused] = useState(false)
-    const [displayIndex, setDisplayIndex] = useState(() =>
-      getCarouselDisplayIndex(currentIndex, slideCount, looping)
+    // Rotation base of the cyclic window and the animated offset in slide
+    // slots. Steady state is always baseIndex === windowStart, trackOffset 0.
+    const [baseIndex, setBaseIndex] = useState(() =>
+      getCarouselWindowStart(currentIndex, slideCount, perView, looping)
     )
+    const [trackOffset, setTrackOffset] = useState(0)
     const [snapPending, setSnapPending] = useState(false)
 
     const paused = isCarouselPaused({
@@ -169,7 +168,9 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
 
     const containerRef = useRef<HTMLDivElement | null>(null)
     const viewportRef = useRef<HTMLDivElement | null>(null)
+    const trackRef = useRef<HTMLDivElement | null>(null)
     const wrappingRef = useRef(false)
+    const pendingTransitionRef = useRef<CarouselWindowTransition | null>(null)
     const requestedIndexRef = useRef(
       controlledCurrentIndex !== undefined ? controlledCurrentIndex : defaultCurrentIndex
     )
@@ -201,6 +202,10 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     onBeforeChangeRef.current = onBeforeChange
     const currentIndexRef = useRef(currentIndex)
     currentIndexRef.current = currentIndex
+    const baseIndexRef = useRef(baseIndex)
+    baseIndexRef.current = baseIndex
+    const trackOffsetRef = useRef(trackOffset)
+    trackOffsetRef.current = trackOffset
     const infiniteRef = useRef(infinite)
     infiniteRef.current = infinite
     const effectRef = useRef(effect)
@@ -209,6 +214,82 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     slideCountRef.current = slideCount
     const dirRef = useRef(dir)
     dirRef.current = dir
+    const axisRef = useRef(axis)
+    axisRef.current = axis
+    const speedRef = useRef(speed)
+    speedRef.current = speed
+    const perViewRef = useRef(perView)
+    perViewRef.current = perView
+    const reducedMotionRef = useRef(reducedMotion)
+    reducedMotionRef.current = reducedMotion
+
+    const applyWindowPlan = useCallback((plan: CarouselWindowTransition) => {
+      pendingTransitionRef.current = null
+      // Reduced motion forces a 0ms duration through the shared CSS rule, so
+      // a wrap must not wait for a transitionend that never fires.
+      const duration = speedRef.current <= 0 || reducedMotionRef.current ? 0 : speedRef.current
+      if (plan.fromOffset === plan.toOffset || duration === 0) {
+        wrappingRef.current = false
+        setSnapPending(false)
+        setBaseIndex(plan.windowStart)
+        setTrackOffset(0)
+        return
+      }
+      wrappingRef.current = true
+      pendingTransitionRef.current = plan
+      if (plan.normalizeAfter) {
+        setSnapPending(false)
+        setBaseIndex(plan.base)
+        setTrackOffset(plan.toOffset)
+        return
+      }
+      setSnapPending(true)
+      setBaseIndex(plan.base)
+      setTrackOffset(plan.fromOffset)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (pendingTransitionRef.current !== plan) return
+          setSnapPending(false)
+          setTrackOffset(plan.toOffset)
+        })
+      })
+    }, [])
+
+    // Re-plan the window from the live track state. An in-flight plan already
+    // heading to the same window absorbs the input; otherwise the rendered
+    // offset is sampled so the next plan resumes from the visible position.
+    const syncWindow = useCallback(
+      (to: number, source: 'step' | 'goto', from: number) => {
+        const count = slideCountRef.current
+        const loopingNow = shouldLoopCarousel(infiniteRef.current, count, effectRef.current)
+        const target = getCarouselWindowStart(to, count, perViewRef.current, loopingNow)
+        if (wrappingRef.current) {
+          if (pendingTransitionRef.current?.windowStart === target) return
+        } else if (baseIndexRef.current === target && trackOffsetRef.current === 0) return
+        applyWindowPlan(
+          resolveCarouselWindowTransition({
+            from,
+            to,
+            count,
+            perView: perViewRef.current,
+            looping: loopingNow,
+            source,
+            start: {
+              base: baseIndexRef.current,
+              offset: wrappingRef.current
+                ? getCarouselTrackRenderedOffset(
+                    trackRef.current,
+                    axisRef.current,
+                    perViewRef.current,
+                    dirRef.current
+                  )
+                : 0
+            }
+          })
+        )
+      },
+      [applyWindowPlan]
+    )
 
     const navigateToIndex = useCallback(
       (index: number, source: 'step' | 'goto' = 'goto') => {
@@ -218,23 +299,16 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         if (clampedIndex === current) return
 
         onBeforeChangeRef.current?.(current, clampedIndex)
-        const loopingNow = shouldLoopCarousel(infiniteRef.current, count, effectRef.current)
-        const target =
-          source === 'step'
-            ? getCarouselLoopTarget(current, clampedIndex, count, loopingNow)
-            : {
-                displayIndex: getCarouselDisplayIndex(clampedIndex, count, loopingNow),
-                logicalIndex: clampedIndex,
-                needsSnap: false
-              }
-        wrappingRef.current = target.needsSnap
-        setSnapPending(false)
-        setDisplayIndex(target.displayIndex)
+        // Controlled carousels re-plan from the prop-driven layout effect once
+        // the parent accepts the requested index.
+        if (controlledCurrentIndex === undefined) {
+          syncWindow(clampedIndex, source, current)
+        }
         requestedIndexRef.current = clampedIndex
         setCurrentIndexValue(clampedIndex)
         onChangeRef.current?.(clampedIndex, current)
       },
-      [setCurrentIndexValue]
+      [controlledCurrentIndex, setCurrentIndexValue, syncWindow]
     )
 
     const navigateByDirection = useCallback(
@@ -268,10 +342,17 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     useImperativeHandle(ref, () => ({ next, prev, goTo }), [next, prev, goTo])
 
     useLayoutEffect(() => {
-      if (wrappingRef.current) return
-      const nextDisplay = getCarouselDisplayIndex(currentIndex, slideCount, looping)
-      setDisplayIndex((prevDisplay) => (prevDisplay === nextDisplay ? prevDisplay : nextDisplay))
-    }, [currentIndex, slideCount, looping])
+      syncWindow(currentIndex, 'goto', currentIndex)
+    }, [currentIndex, slideCount, looping, perView, syncWindow])
+
+    const effectiveDuration = speed <= 0 || reducedMotion ? 0 : speed
+    // A reduced-motion switch or a zero speed does not cancel an already
+    // running CSS transition; settle the pending plan through the instant
+    // path so the current page becomes visible immediately.
+    useEffect(() => {
+      if (effectiveDuration !== 0 || !pendingTransitionRef.current) return
+      applyWindowPlan(pendingTransitionRef.current)
+    }, [effectiveDuration, applyWindowPlan])
 
     useEffect(() => {
       const requested =
@@ -315,11 +396,6 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           current: point,
           locked: false
         }
-        try {
-          viewport.setPointerCapture(event.pointerId)
-        } catch {
-          /* happy-dom and some SVG targets omit capture */
-        }
       }
 
       const handlePointerMove = (event: PointerEvent) => {
@@ -328,8 +404,15 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         const point = getCarouselPointerPoint(event)
         if (!point) return
         session.current = point
-        if (!session.locked && isCarouselHorizontalLock(session.start, point)) {
+        if (!session.locked && isCarouselAxisLock(session.start, point, axisRef.current)) {
           session.locked = true
+          // Capture only once the gesture is a drag so plain clicks on slide
+          // content keep their native target.
+          try {
+            viewport.setPointerCapture(event.pointerId)
+          } catch {
+            /* happy-dom and some SVG targets omit capture */
+          }
         }
         if (session.locked && event.cancelable) {
           event.preventDefault()
@@ -341,7 +424,8 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         if (!session || session.id !== event.pointerId) return
         const end = getCarouselPointerPoint(event) ?? session.current
         const direction = resolveCarouselSwipeDirection(session.start, end, {
-          dir: dirRef.current
+          dir: dirRef.current,
+          axis: axisRef.current
         })
         resetPointer()
         if (direction) navigateByDirection(direction)
@@ -368,14 +452,13 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     const handleTrackTransitionEnd = (event: React.TransitionEvent<HTMLDivElement>) => {
       if (event.target !== event.currentTarget) return
       if (!wrappingRef.current) return
-      const snap = resolveCarouselLoopSnap(displayIndex, slideCount)
-      if (snap === null) {
-        wrappingRef.current = false
-        return
-      }
       wrappingRef.current = false
+      const plan = pendingTransitionRef.current
+      pendingTransitionRef.current = null
+      if (!plan || !plan.normalizeAfter) return
       setSnapPending(true)
-      setDisplayIndex(snap)
+      setBaseIndex(plan.windowStart)
+      setTrackOffset(0)
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setSnapPending(false))
       })
@@ -412,7 +495,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       if (event.defaultPrevented || slideCount <= 1) return
       if (isCarouselKeyboardIgnoredTarget(event.target)) return
       if ((event.target as Element | null)?.closest?.('[role="tablist"]')) return
-      const action = resolveCarouselKeyboardNavigation(event.key, dir)
+      const action = resolveCarouselKeyboardNavigation(event.key, dir, axis)
       if (!action) return
       event.preventDefault()
       if (action === 'next') next()
@@ -455,21 +538,25 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       </button>
     )
 
-    const renderSlide = (slide: React.ReactNode, logicalIndex: number, clone: boolean) => {
-      const active = !clone && logicalIndex === currentIndex
+    const windowStart = getCarouselWindowStart(currentIndex, slideCount, perView, looping)
+
+    const renderSlide = (slide: React.ReactNode, logicalIndex: number) => {
+      const active = logicalIndex === currentIndex
       const slideId = `${instanceId}-slide-${logicalIndex}`
-      const hidden = !active
+      const visible =
+        effect === 'fade'
+          ? active
+          : isCarouselSlideVisible(logicalIndex, windowStart, slideCount, perView, looping)
+      const hidden = !visible
       return (
         <div
-          key={
-            clone ? `clone-${logicalIndex}-${logicalIndex === 0 ? 'trailing' : 'leading'}` : slideId
-          }
-          id={clone ? undefined : slideId}
+          key={slideId}
+          id={slideId}
           className={getCarouselSlideClasses({ effect, active })}
           style={
             effect === 'fade'
               ? ({ ['--tiger-carousel-duration']: carouselDuration } as React.CSSProperties)
-              : undefined
+              : (getCarouselSlideSizeStyle(axis, perView) as React.CSSProperties)
           }
           role="group"
           aria-roledescription={labels.slideRoleDescription}
@@ -478,43 +565,43 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
             .replace('{total}', String(slideCount))}
           aria-hidden={hidden || undefined}
           inert={hidden || undefined}
-          data-tiger-carousel-slide={clone ? 'clone' : active ? 'active' : 'inactive'}
-          {...(clone ? getCarouselCloneAttributes() : {})}>
-          {clone ? stripCarouselCloneIds(slide) : slide}
+          data-tiger-carousel-slide={active ? 'active' : 'inactive'}>
+          {slide}
         </div>
       )
     }
 
-    const slideNodes = looping
-      ? [
-          renderSlide(slides[slideCount - 1], slideCount - 1, true),
-          ...slides.map((slide, index) => renderSlide(slide, index, false)),
-          renderSlide(slides[0], 0, true)
-        ]
-      : slides.map((slide, index) => renderSlide(slide, index, false))
+    // Real slides render in cyclic display order so DOM reading and tab
+    // order match the visible window; keyed moves keep one component
+    // instance per slide across wraps.
+    const slideNodes =
+      effect === 'fade'
+        ? slides.map((slide, index) => renderSlide(slide, index))
+        : resolveCarouselSlideOrder(slideCount, baseIndex).map((index) =>
+            renderSlide(slides[index], index)
+          )
 
     const track =
       effect === 'fade' ? (
-        <div className={carouselTrackFadeClasses} data-tiger-carousel-track="">
+        <div
+          className={classNames(
+            carouselTrackFadeClasses,
+            trackInstant && carouselTrackInstantClasses
+          )}
+          data-tiger-carousel-track="">
           {slideNodes}
         </div>
       ) : (
         <div
+          ref={trackRef}
           className={classNames(
-            carouselTrackScrollClasses,
+            getCarouselTrackScrollClasses(axis),
             trackInstant && carouselTrackInstantClasses
           )}
           data-tiger-carousel-track=""
           style={
             {
-              transform:
-                axis === 'vertical' || slidesPerView > 1
-                  ? getCarouselAxisTransform(
-                      displayIndex,
-                      axis,
-                      getCarouselSlidesPerView(slidesPerView, slideCount)
-                    )
-                  : getScrollTransform(displayIndex, dir),
+              transform: getCarouselAxisTransform(trackOffset, axis, perView, dir),
               ['--tiger-carousel-duration']: carouselDuration
             } as React.CSSProperties
           }
@@ -536,12 +623,16 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         aria-roledescription={labels.roleDescription}
         aria-label={region.ariaLabel}
         aria-labelledby={typeof ariaLabelledByAttr === 'string' ? ariaLabelledByAttr : undefined}
+        dir={rootDir}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onFocus={handleFocus}
         onBlur={handleBlur}
         onKeyDown={handleRootKeyDown}>
-        <div ref={viewportRef} className={carouselViewportClasses} data-tiger-carousel-viewport="">
+        <div
+          ref={viewportRef}
+          className={getCarouselViewportClasses(axis)}
+          data-tiger-carousel-viewport="">
           {track}
         </div>
         <div className={carouselStatusClasses} role="status" aria-live="polite">
