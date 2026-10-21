@@ -349,11 +349,8 @@ export const WorkflowActionBar = defineComponent({
     )
     const toolbarStyle = computed(() => mergeStyleValues(attrs.style, props.style))
     const drafts = ref<Record<string, ActionDraft>>({})
-    const moreItem = ref<WorkflowActionBarItem | null>(null)
+    const moreKey = ref<string | null>(null)
     const moreWrapEl = ref<HTMLElement | null>(null)
-    watch(moreItem, (next, previous) => {
-      if (!next && previous) nextTick(() => moreWrapEl.value?.querySelector('button')?.focus())
-    })
 
     const resolvedItems = computed(() =>
       resolveWorkflowActionBarItems({
@@ -368,23 +365,50 @@ export const WorkflowActionBar = defineComponent({
     const positions = computed(() =>
       resolveAddsignPositions(props.addsignPositions, props.buttonPolicy)
     )
+    const disableOptions = computed(() => ({
+      barDisabled: props.disabled,
+      hasReturnPicker:
+        props.renderReturnPicker != null ||
+        slots.returnPicker != null ||
+        props.returnTargets != null,
+      hasAssigneePicker: props.renderAssigneePicker != null || slots.assigneePicker != null,
+      returnTargetCount: props.returnTargets == null ? undefined : props.returnTargets.length
+    }))
+    // Only the key is stored from the dropdown click; the confirming item is
+    // re-derived from the current items so a label, action or disabled change
+    // that lands while the layer is open applies to the confirm. A removed or
+    // disabled item closes the layer instead of confirming a stale snapshot.
+    const pendingMoreItem = computed(() => {
+      if (moreKey.value == null) return null
+      const item = resolvedItems.value.find((entry) => entry.key === moreKey.value)
+      if (!item || isWorkflowActionBarItemDisabled(item, disableOptions.value)) return null
+      return item
+    })
+    watch(pendingMoreItem, (next, previous) => {
+      if (next || !previous) return
+      moreKey.value = null
+      nextTick(() => moreWrapEl.value?.querySelector('button')?.focus())
+    })
 
     return () => {
       const labels = stepLabels.value
       const targets = props.returnTargets ?? []
       const returnPickerFn = props.renderReturnPicker ?? slots.returnPicker
       const assigneePickerFn = props.renderAssigneePicker ?? slots.assigneePicker
-      const hasReturnPicker = returnPickerFn != null || props.returnTargets != null
-      const hasAssigneePicker = assigneePickerFn != null
-      const disableOptions = {
-        barDisabled: props.disabled,
-        hasReturnPicker,
-        hasAssigneePicker,
-        returnTargetCount: props.returnTargets == null ? undefined : targets.length
-      }
 
-      const getDraft = (item: WorkflowActionBarItem): ActionDraft =>
-        drafts.value[item.key] ?? emptyActionDraft(item, targets, positions.value)
+      const getDraft = (item: WorkflowActionBarItem): ActionDraft => {
+        const draft = drafts.value[item.key] ?? emptyActionDraft(item, targets, positions.value)
+        // A position picked from a list that changed since is stale; fall
+        // back to the current default instead of emitting the old value.
+        if (
+          item.action === 'addsign' &&
+          draft.position != null &&
+          !positions.value.includes(draft.position)
+        ) {
+          return { ...draft, position: positions.value[0] }
+        }
+        return draft
+      }
 
       const patchDraft = (item: WorkflowActionBarItem, patch: Partial<ActionDraft>) => {
         drafts.value = {
@@ -404,7 +428,6 @@ export const WorkflowActionBar = defineComponent({
         item: WorkflowActionBarItem,
         event?: { preventDefault: () => void }
       ): boolean => {
-        if (isWorkflowActionBarItemDisabled(item, disableOptions)) return false
         const confirming = shouldOpenWorkflowActionLayer(item, {
           confirm: props.confirm,
           commentRequired: props.commentRequired
@@ -426,12 +449,18 @@ export const WorkflowActionBar = defineComponent({
           event?.preventDefault()
           return false
         }
-        if (picker === 'return' && !draft.targetNodeKey) {
+        if (
+          picker === 'return' &&
+          (!draft.targetNodeKey ||
+            (props.returnTargets != null &&
+              !targets.some((target) => target.key === draft.targetNodeKey)))
+        ) {
           patchDraft(item, { error: labels.returnNoTargets })
           event?.preventDefault()
           return false
         }
         if (picker === 'assignee' && !draft.assignee) {
+          patchDraft(item, { error: labels.assigneeRequired })
           event?.preventDefault()
           return false
         }
@@ -578,9 +607,9 @@ export const WorkflowActionBar = defineComponent({
 
       const renderBarButton = (item: WorkflowActionBarItem) => {
         const buttonProps = resolveWorkflowActionButtonProps(item)
-        const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions)
+        const itemDisabled = isWorkflowActionBarItemDisabled(item, disableOptions.value)
         const reason = workflowActionBarItemDisabledReason(item, {
-          ...disableOptions,
+          ...disableOptions.value,
           returnNoTargets: labels.returnNoTargets
         })
         const required = workflowActionBarCommentRequired(item, props.commentRequired)
@@ -639,7 +668,7 @@ export const WorkflowActionBar = defineComponent({
         )
       }
 
-      const pendingMore = moreItem.value
+      const pendingMore = pendingMoreItem.value
       const moreRequired = pendingMore
         ? workflowActionBarCommentRequired(pendingMore, props.commentRequired)
         : false
@@ -684,10 +713,10 @@ export const WorkflowActionBar = defineComponent({
                       icon: moreConfirmCopy?.icon,
                       placement: 'top-end',
                       'onUpdate:open': (open: boolean) => {
-                        if (!open) moreItem.value = null
+                        if (!open) moreKey.value = null
                       },
                       onConfirm: (event?: { preventDefault: () => void }) => {
-                        if (emitReadyAction(pendingMore, event)) moreItem.value = null
+                        if (emitReadyAction(pendingMore, event)) moreKey.value = null
                       }
                     },
                     {
@@ -708,10 +737,10 @@ export const WorkflowActionBar = defineComponent({
                             splitItems.value.more.map((item) => {
                               const itemDisabled = isWorkflowActionBarItemDisabled(
                                 item,
-                                disableOptions
+                                disableOptions.value
                               )
                               const reason = workflowActionBarItemDisabledReason(item, {
-                                ...disableOptions,
+                                ...disableOptions.value,
                                 returnNoTargets: labels.returnNoTargets
                               })
                               const needsDialog = shouldOpenWorkflowActionLayer(item, {
@@ -726,7 +755,7 @@ export const WorkflowActionBar = defineComponent({
                                   title: reason,
                                   onClick: () => {
                                     if (itemDisabled) return
-                                    if (needsDialog) moreItem.value = item
+                                    if (needsDialog) moreKey.value = item.key
                                     else emitReadyAction(item)
                                   }
                                 },

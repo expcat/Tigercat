@@ -171,7 +171,8 @@ export const jaJP: TigerLocale = {
     emptyApproverTransferUser: '指定者へ転送',
     moreActions: 'その他',
     taskBlocked: '追加承認の待ち',
-    commentRequiredBlock: 'コメントが必要です'
+    commentRequiredBlock: 'コメントが必要です',
+    assigneeRequired: '担当者を選択してください'
   },
   workflowDesigner: {
     ariaLabel: 'ワークフロー設計',

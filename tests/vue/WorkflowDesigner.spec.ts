@@ -144,6 +144,49 @@ describe('WorkflowDesigner (Vue)', () => {
     expect(next.map((step) => step.key)).toEqual(['start', 'manager', 'manager-copy', 'finance'])
   })
 
+  it('allocates advanced-tab branch keys without duplicating the full tree', async () => {
+    const onUpdate = vi.fn()
+    render(WorkflowDesigner, {
+      props: {
+        defaultValue: [
+          { key: 'start', kind: 'start', title: 'Submit' },
+          { key: 'step-1', title: 'Manager' },
+          {
+            key: 'gate',
+            kind: 'condition',
+            title: 'Gate',
+            children: [{ key: 'branch-a', title: 'Branch A' }]
+          }
+        ],
+        'onUpdate:modelValue': onUpdate
+      }
+    })
+
+    await fireEvent.click(screen.getByRole('group', { name: 'Gate' }))
+    await fireEvent.click(
+      within(screen.getByRole('region', { name: 'Node settings' })).getByRole('tab', {
+        name: 'Advanced'
+      })
+    )
+    await fireEvent.click(
+      within(screen.getByRole('region', { name: 'Node settings' })).getByRole('button', {
+        name: 'Add branch'
+      })
+    )
+    await fireEvent.click(
+      within(screen.getByRole('region', { name: 'Node settings' })).getByRole('button', {
+        name: 'Add branch'
+      })
+    )
+
+    const next = onUpdate.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
+    const collectKeys = (steps: WorkflowTimelineStep[]): string[] =>
+      steps.flatMap((step) => [step.key, ...collectKeys(step.children ?? [])])
+    const keys = collectKeys(next)
+    expect(new Set(keys).size).toBe(keys.length)
+    expect(next.find((step) => step.key === 'gate')?.children).toHaveLength(3)
+  })
+
   it.each(['cc', 'start', 'condition'] as const)('hides sign mode for kind=%s', async (kind) => {
     render(WorkflowDesigner, { props: { modelValue: [{ key: 'n', kind, title: 'Node' }] } })
     await fireEvent.click(screen.getByRole('group', { name: 'Node' }))

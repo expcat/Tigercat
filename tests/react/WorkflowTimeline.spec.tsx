@@ -475,6 +475,133 @@ describe('WorkflowTimeline (React)', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
       expect(screen.getByRole('button', { name: 'More' })).toHaveFocus()
     })
+
+    it('confirms the current More item when the same key changed underneath', async () => {
+      const user = userEvent.setup()
+      const onAction = vi.fn()
+      const approve: WorkflowActionBarItem = { key: 'approve', label: 'Approve', action: 'approve' }
+      const selected: WorkflowActionBarItem = {
+        key: 'selected',
+        label: 'Reject',
+        action: 'reject',
+        placement: 'more',
+        commentRequired: false
+      }
+      const renderAssigneePicker = ({
+        onChange
+      }: {
+        onChange: (actor: WorkflowTimelineActor | undefined) => void
+      }) => (
+        <button type="button" onClick={() => onChange({ id: 'x', name: 'X' })}>
+          Pick X
+        </button>
+      )
+      const { rerender } = render(
+        <WorkflowActionBar
+          viewerRole="approver"
+          items={[approve, selected]}
+          confirm
+          onAction={onAction}
+          renderAssigneePicker={renderAssigneePicker}
+        />
+      )
+
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reject' }))
+      await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
+
+      rerender(
+        <WorkflowActionBar
+          viewerRole="approver"
+          items={[approve, { ...selected, label: 'Transfer now', action: 'transfer' }]}
+          confirm
+          onAction={onAction}
+          renderAssigneePicker={renderAssigneePicker}
+        />
+      )
+      await waitFor(() => expect(screen.getByText('Transfer this request?')).toBeVisible())
+      await user.click(screen.getByRole('button', { name: 'Pick X' }))
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+
+      await waitFor(() => expect(onAction).toHaveBeenCalledTimes(1))
+      expect(onAction).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'transfer', label: 'Transfer now' }),
+        expect.objectContaining({ assignee: expect.objectContaining({ id: 'x' }) })
+      )
+    })
+
+    it('closes the More confirm without emitting when the item is removed or disabled', async () => {
+      const user = userEvent.setup()
+      const onAction = vi.fn()
+      const approve: WorkflowActionBarItem = { key: 'approve', label: 'Approve', action: 'approve' }
+      const selected: WorkflowActionBarItem = {
+        key: 'selected',
+        label: 'Reject',
+        action: 'reject',
+        placement: 'more',
+        commentRequired: false
+      }
+      const renderBar = (items: WorkflowActionBarItem[]) => (
+        <WorkflowActionBar viewerRole="approver" items={items} confirm onAction={onAction} />
+      )
+      const { rerender } = render(renderBar([approve, selected]))
+
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reject' }))
+      await screen.findByRole('dialog')
+
+      rerender(renderBar([approve, { ...selected, disabled: true }]))
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+
+      // Re-adding the same key must not resurrect the closed confirm layer.
+      rerender(renderBar([approve, selected]))
+      expect(screen.queryByRole('dialog')).toBeNull()
+
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reject' }))
+      await screen.findByRole('dialog')
+      rerender(renderBar([approve]))
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      expect(onAction).not.toHaveBeenCalled()
+    })
+
+    it('requires an assignee before confirming transfer', async () => {
+      const user = userEvent.setup()
+      const onAction = vi.fn()
+      const items: WorkflowActionBarItem[] = [
+        { key: 'transfer', label: 'Transfer', action: 'transfer' }
+      ]
+      render(
+        <WorkflowActionBar
+          viewerRole="approver"
+          items={items}
+          confirm
+          onAction={onAction}
+          renderAssigneePicker={({ onChange }) => (
+            <button type="button" onClick={() => onChange({ id: 'x', name: 'X' })}>
+              Pick X
+            </button>
+          )}
+        />
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Transfer' }))
+      await waitFor(() => expect(screen.getByText('Transfer this request?')).toBeVisible())
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Select an assignee first')
+      )
+      expect(onAction).not.toHaveBeenCalled()
+
+      await user.click(screen.getByRole('button', { name: 'Pick X' }))
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() =>
+        expect(onAction).toHaveBeenCalledWith(
+          expect.objectContaining({ action: 'transfer' }),
+          expect.objectContaining({ assignee: expect.objectContaining({ id: 'x' }) })
+        )
+      )
+    })
   })
 
   describe('Accessibility', () => {

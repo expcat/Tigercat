@@ -55,7 +55,7 @@ export interface WorkflowActionBarProps {
   isStarter?: boolean
   /**
    * Viewer role used when deriving items from `buttonPolicy`.
-   * @default 'approver'
+   * @default 'readonly'
    */
   viewerRole?: WorkflowActionBarViewerRole
   /** Overflow menu trigger label. */

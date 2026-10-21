@@ -171,7 +171,8 @@ export const arSA: TigerLocale = {
     emptyApproverTransferUser: 'تحويل إلى مستخدم',
     moreActions: 'المزيد',
     taskBlocked: 'بانتظار المعتمد المضاف',
-    commentRequiredBlock: 'التعليق مطلوب'
+    commentRequiredBlock: 'التعليق مطلوب',
+    assigneeRequired: 'اختر المكلف أولاً'
   },
   workflowDesigner: {
     ariaLabel: 'مصمم سير العمل',

@@ -170,7 +170,8 @@ export const enUS: TigerLocale = {
     emptyApproverTransferUser: 'Transfer to user',
     moreActions: 'More',
     taskBlocked: 'Waiting on added approver',
-    commentRequiredBlock: 'A comment is required'
+    commentRequiredBlock: 'A comment is required',
+    assigneeRequired: 'Select an assignee first'
   },
   workflowDesigner: {
     ariaLabel: 'Workflow designer',

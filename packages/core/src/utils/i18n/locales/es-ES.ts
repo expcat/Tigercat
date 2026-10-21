@@ -172,7 +172,8 @@ export const esES: TigerLocale = {
     emptyApproverTransferUser: 'Transferir al usuario',
     moreActions: 'Más',
     taskBlocked: 'Esperando al aprobador añadido',
-    commentRequiredBlock: 'Se requiere un comentario'
+    commentRequiredBlock: 'Se requiere un comentario',
+    assigneeRequired: 'Seleccione primero un destinatario'
   },
   workflowDesigner: {
     ariaLabel: 'Diseñador de flujo de trabajo',

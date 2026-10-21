@@ -133,6 +133,49 @@ describe('WorkflowDesigner (React)', () => {
     expect(next.map((step) => step.key)).toEqual(['start', 'manager', 'manager-copy', 'finance'])
   })
 
+  it('allocates advanced-tab branch keys without duplicating the full tree', () => {
+    const onChange = vi.fn()
+    render(
+      <WorkflowDesigner
+        defaultValue={[
+          { key: 'start', kind: 'start', title: 'Submit' },
+          { key: 'step-1', title: 'Manager' },
+          {
+            key: 'gate',
+            kind: 'condition',
+            title: 'Gate',
+            children: [{ key: 'branch-a', title: 'Branch A' }]
+          }
+        ]}
+        onChange={onChange}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('group', { name: 'Gate' }))
+    fireEvent.click(
+      within(screen.getByRole('region', { name: 'Node settings' })).getByRole('tab', {
+        name: 'Advanced'
+      })
+    )
+    fireEvent.click(
+      within(screen.getByRole('region', { name: 'Node settings' })).getByRole('button', {
+        name: 'Add branch'
+      })
+    )
+    fireEvent.click(
+      within(screen.getByRole('region', { name: 'Node settings' })).getByRole('button', {
+        name: 'Add branch'
+      })
+    )
+
+    const next = onChange.mock.calls.at(-1)?.[0] as WorkflowTimelineStep[]
+    const collectKeys = (steps: WorkflowTimelineStep[]): string[] =>
+      steps.flatMap((step) => [step.key, ...collectKeys(step.children ?? [])])
+    const keys = collectKeys(next)
+    expect(new Set(keys).size).toBe(keys.length)
+    expect(next.find((step) => step.key === 'gate')?.children).toHaveLength(3)
+  })
+
   it.each(['cc', 'start', 'condition'] as const)('hides sign mode for kind=%s', (kind) => {
     render(<WorkflowDesigner value={[{ key: 'n', kind, title: 'Node' }]} />)
     fireEvent.click(screen.getByRole('group', { name: 'Node' }))

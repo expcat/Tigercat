@@ -365,19 +365,30 @@ function currentTask(
   action: WorkflowRuntimeAction
 ): WorkflowTask | undefined {
   const tasks = nodeTasks(draft, node.key)
-  if (action.taskId) return tasks.find((task) => task.id === action.taskId)
-  if (action.actorId != null) {
-    return tasks.find(
-      (task) =>
-        sameActorId(task.assignee.id, action.actorId) &&
-        (isOpenTask(task) || task.status === 'blocked')
-    )
+  if (action.taskId) {
+    const found = tasks.find((task) => task.id === action.taskId)
+    if (!found || !sameActorId(found.assignee.id, action.actorId)) return undefined
+    // Explicit selection obeys the same actionable rule as the default pick:
+    // a blocked or out-of-turn task cannot be booked, whatever the action.
+    return isTaskActionable(node, found, draft.tasks) ? found : undefined
   }
-  const signMode = resolveWorkflowSignMode(node)
-  if (signMode === 'sequential') {
-    return tasks.find((task) => task.status === 'active') ?? tasks.find(isOpenTask)
-  }
-  return tasks.find(isOpenTask)
+  return ownedActionableTask(draft, node, action.actorId)
+}
+
+/**
+ * The single task-selection predicate for admission and bookkeeping: the
+ * actor's own task on this node that is currently allowed to act. Blocked
+ * tasks never qualify; a transferred-in open task does.
+ */
+function ownedActionableTask(
+  draft: WorkflowInstance,
+  node: WorkflowTimelineStep,
+  actorId: unknown
+): WorkflowTask | undefined {
+  if (actorId == null) return undefined
+  return nodeTasks(draft, node.key).find(
+    (task) => sameActorId(task.assignee.id, actorId) && isTaskActionable(node, task, draft.tasks)
+  )
 }
 
 function isTaskActionable(
@@ -388,7 +399,12 @@ function isTaskActionable(
   if (!isOpenTask(task)) return false
   if (resolveWorkflowSignMode(node) !== 'sequential') return true
   if (task.status === 'active') return true
-  const open = (allTasks ?? []).filter((item) => item.nodeKey === node.key && isOpenTask(item))
+  const waiting = (allTasks ?? []).filter(
+    (item) => item.nodeKey === node.key && (isOpenTask(item) || item.status === 'blocked')
+  )
+  // A blocked predecessor still holds the sequence; nobody behind it may act.
+  if (waiting.some((item) => item.status === 'blocked')) return false
+  const open = waiting.filter(isOpenTask)
   const active = open.find((item) => item.status === 'active')
   return (active ?? open[0])?.id === task.id
 }
@@ -535,14 +551,7 @@ function workflowActorMayAct(
     return instance.starter != null && sameActorId(instance.starter.id, action.actorId)
   }
   if (workflowInstanceUsesTasks(instance)) {
-    const tasks = nodeTasks(instance, node.key)
-    const owned = tasks.find(
-      (task) =>
-        sameActorId(task.assignee.id, action.actorId) &&
-        (isOpenTask(task) || task.status === 'blocked')
-    )
-    if (!owned) return false
-    return isTaskActionable(node, owned, instance.tasks)
+    return ownedActionableTask(instance, node, action.actorId) != null
   }
   return resolveWorkflowStepActors(node).some((actor) => sameActorId(actor.id, action.actorId))
 }
@@ -551,9 +560,11 @@ function enterNode(
   draft: WorkflowInstance,
   nodeKey: string,
   action: WorkflowRuntimeAction,
-  depth: number
+  entered: Set<string>
 ): void {
-  if (depth > 32) return
+  // Cycle guard: within one advance round a node is entered at most once.
+  if (entered.has(nodeKey)) return
+  entered.add(nodeKey)
   const node = findWorkflowStepByKey(draft.steps, nodeKey)
   if (!node) return
   const kind = resolveWorkflowStepKind(node)
@@ -568,7 +579,7 @@ function enterNode(
   }
   if (kind === 'cc') {
     markNode(draft, nodeKey, 'approved')
-    completeNode(draft, nodeKey, action, depth + 1)
+    completeNode(draft, nodeKey, action, entered)
     return
   }
   if (kind === 'condition') {
@@ -580,14 +591,14 @@ function enterNode(
       return
     }
     markNode(draft, nodeKey, 'approved')
-    enterNode(draft, branch.key, action, depth + 1)
+    enterNode(draft, branch.key, action, entered)
     return
   }
 
   const autoDecide = node.advanced?.autoDecide
   if (autoDecide === 'auto_pass') {
     markNode(draft, nodeKey, 'approved', { action: 'approve' })
-    completeNode(draft, nodeKey, action, depth + 1)
+    completeNode(draft, nodeKey, action, entered)
     return
   }
   if (autoDecide === 'auto_reject') {
@@ -607,7 +618,7 @@ function enterNode(
       const empty = node.advanced?.emptyApprover ?? 'pause'
       if (empty === 'skip_pass') {
         markNode(draft, nodeKey, 'approved')
-        completeNode(draft, nodeKey, action, depth + 1)
+        completeNode(draft, nodeKey, action, entered)
       }
       return
     }
@@ -631,7 +642,7 @@ function enterNode(
         replaceNodeTasks(draft, nodeKey, seeded)
       } else {
         markNode(draft, nodeKey, 'approved')
-        completeNode(draft, nodeKey, action, depth + 1)
+        completeNode(draft, nodeKey, action, entered)
         return
       }
     } else {
@@ -645,9 +656,8 @@ function completeNode(
   draft: WorkflowInstance,
   nodeKey: string,
   action: WorkflowRuntimeAction,
-  depth: number
+  entered: Set<string>
 ): void {
-  if (depth > 32) return
   const node = findWorkflowStepByKey(draft.steps, nodeKey)
   if (!node) return
   markNode(draft, nodeKey, 'approved', { pendingAfterAddsign: undefined })
@@ -669,14 +679,19 @@ function completeNode(
   }
 
   if (node.temporary && node.origin?.type === 'addsign' && node.origin.position === 'before') {
-    restoreBeforeAddsign(draft, node.origin.fromNodeKey, node.origin.fromTaskId)
-    return
+    // Only an origin still waiting on this temp add-sign is restored. An origin
+    // that already completed (or-sign sibling, later return) keeps its state and
+    // this temp simply follows the current advance / resume path.
+    if (beforeAddsignOriginWaiting(draft, node.origin.fromNodeKey, node.origin.fromTaskId)) {
+      restoreBeforeAddsign(draft, node.origin.fromNodeKey, node.origin.fromTaskId)
+      return
+    }
   }
 
   if (draft.resumeToNodeKey && draft.resumeToNodeKey !== nodeKey) {
     const resumeKey = draft.resumeToNodeKey
     draft.resumeToNodeKey = undefined
-    enterNode(draft, resumeKey, action, depth + 1)
+    enterNode(draft, resumeKey, action, entered)
     return
   }
 
@@ -685,7 +700,24 @@ function completeNode(
     draft.cursor = { nodeKey }
     return
   }
-  enterNode(draft, nextKey, action, depth + 1)
+  enterNode(draft, nextKey, action, entered)
+}
+
+function beforeAddsignOriginWaiting(
+  draft: WorkflowInstance,
+  fromNodeKey: string,
+  fromTaskId?: string
+): boolean {
+  const origin = findWorkflowStepByKey(draft.steps, fromNodeKey)
+  if (!origin) return false
+  // An origin suspended by a direct return waits on the resume, not on this
+  // temp: completing the temp must consume that resume instead of restoring.
+  if (draft.resumeToNodeKey === fromNodeKey) return false
+  if (fromTaskId) {
+    return draft.tasks?.some((task) => task.id === fromTaskId && task.status === 'blocked') === true
+  }
+  const status = resolveWorkflowStepStatus(origin)
+  return status === 'active' || status === 'pending'
 }
 
 function restoreBeforeAddsign(
@@ -794,7 +826,11 @@ function eligibleReturnNode(step: WorkflowTimelineStep, currentKey: string): boo
 export function getWorkflowReturnCandidates(instance: WorkflowInstance): WorkflowTimelineStep[] {
   const currentKey = instance.cursor?.nodeKey ?? getCurrentWorkflowStep(instance.steps)?.key
   if (!currentKey) return []
-  return flattenRuntimeSteps(instance.steps).filter((step) => eligibleReturnNode(step, currentKey))
+  const flat = flattenRuntimeSteps(instance.steps)
+  const currentIndex = flat.findIndex((step) => step.key === currentKey)
+  if (currentIndex < 0) return []
+  // Same predicate as applyReturn: only nodes strictly before the current one.
+  return flat.filter((step, index) => index < currentIndex && eligibleReturnNode(step, currentKey))
 }
 
 export function workflowReturnTargetFromStep(step: WorkflowTimelineStep): WorkflowReturnTarget {
@@ -876,6 +912,9 @@ function applyReturn(
   if (resume === 'direct') {
     draft.resumeToNodeKey = current.key
     resetNodeForReturn(draft, targetKey, 'return')
+    // Suspend the returner until the target completes and resumes it. While
+    // suspended the node is not active, so direct actions on it are refused.
+    markNode(draft, current.key, 'pending')
   } else {
     draft.resumeToNodeKey = undefined
     for (let i = targetIndex; i <= currentIndex; i += 1) {
@@ -886,7 +925,7 @@ function applyReturn(
       resetNodeForReturn(draft, step.key, 'return')
     }
   }
-  enterNode(draft, targetKey, action, 0)
+  enterNode(draft, targetKey, action, new Set())
   return true
 }
 
@@ -906,12 +945,14 @@ function applyApproveTask(
   }))
   syncActorStatuses(draft, node.key)
   const signMode = resolveWorkflowSignMode(node)
-  const remaining = nodeTasks(draft, node.key).filter(isOpenTask)
   if (signMode === 'orsign') {
+    cancelStaleBeforeAddsigns(draft, node.key)
     draft.tasks = (draft.tasks ?? []).map((item) =>
-      item.nodeKey === node.key && isOpenTask(item) ? { ...item, status: 'canceled' } : item
+      item.nodeKey === node.key && (isOpenTask(item) || item.status === 'blocked')
+        ? { ...item, status: 'canceled' }
+        : item
     )
-    completeNode(draft, node.key, action, 0)
+    completeNode(draft, node.key, action, new Set())
     return true
   }
   if (signMode === 'sequential') {
@@ -919,19 +960,49 @@ function applyApproveTask(
     if (next) {
       patchTask(draft, next.id, (item) => ({ ...item, status: 'active' }))
       markNode(draft, node.key, 'active')
-      draft.cursor = { nodeKey: node.key }
       return true
     }
-    completeNode(draft, node.key, action, 0)
+    if (nodeTasks(draft, node.key).some((item) => item.status === 'blocked')) {
+      markNode(draft, node.key, 'active')
+      return true
+    }
+    completeNode(draft, node.key, action, new Set())
     return true
   }
+  const remaining = nodeTasks(draft, node.key).filter(
+    (item) => isOpenTask(item) || item.status === 'blocked'
+  )
   if (remaining.length === 0) {
-    completeNode(draft, node.key, action, 0)
+    completeNode(draft, node.key, action, new Set())
   } else {
     markNode(draft, node.key, 'active')
-    draft.cursor = { nodeKey: node.key }
   }
   return true
+}
+
+/**
+ * An or-sign node completed by one peer voids its unfinished before-add-sign
+ * temps: the blocked operator task and the temp approval no longer gate anything.
+ */
+function cancelStaleBeforeAddsigns(draft: WorkflowInstance, fromNodeKey: string): void {
+  const stale = flattenRuntimeSteps(draft.steps).filter(
+    (step) =>
+      step.temporary &&
+      step.origin?.type === 'addsign' &&
+      step.origin.position === 'before' &&
+      step.origin.fromNodeKey === fromNodeKey &&
+      (resolveWorkflowStepStatus(step) === 'active' ||
+        resolveWorkflowStepStatus(step) === 'pending')
+  )
+  for (const step of stale) {
+    markNode(draft, step.key, 'canceled')
+    if (!draft.tasks) continue
+    draft.tasks = draft.tasks.map((task) =>
+      task.nodeKey === step.key && (isOpenTask(task) || task.status === 'blocked')
+        ? { ...task, status: 'canceled' }
+        : task
+    )
+  }
 }
 
 function applyApproveNode(
@@ -944,7 +1015,7 @@ function applyApproveNode(
     comment: action.comment,
     time: action.at
   })
-  completeNode(draft, node.key, action, 0)
+  completeNode(draft, node.key, action, new Set())
   return true
 }
 
@@ -1007,7 +1078,6 @@ function applyTransfer(
       }
       return next
     })
-    draft.cursor = { nodeKey: node.key }
     return true
   }
   patchStep(draft, node.key, (step) => {
@@ -1143,6 +1213,14 @@ export function reduceWorkflowAction(
 
   const gateNode = currentNode(instance, action)
   if (!gateNode) return instance
+  if (
+    action.action !== 'cancel' &&
+    action.action !== 'comment' &&
+    resolveWorkflowStepStatus(gateNode) !== 'active'
+  ) {
+    // Future or already-decided nodes refuse every mutating action.
+    return instance
+  }
   if (!workflowButtonEnabled(gateNode, action.action)) return instance
   if (
     !assertWorkflowActionComment(
@@ -1160,28 +1238,32 @@ export function reduceWorkflowAction(
 
   const usesTasks = workflowInstanceUsesTasks(draft)
   const task = node && usesTasks ? currentTask(draft, node, action) : undefined
+  const nodeLevel = action.action === 'cancel' || action.action === 'comment'
+  if (!nodeLevel && usesTasks && !task) {
+    // Task-driven instances refuse every mutating action that has no
+    // actionable task owned by the actor; refused once here, not per case.
+    return instance
+  }
 
   let ok = false
   switch (action.action) {
     case 'approve':
       if (!node) break
-      ok = usesTasks
-        ? task
-          ? applyApproveTask(draft, node, task, action)
-          : false
+      ok = task
+        ? applyApproveTask(draft, node, task, action)
         : applyApproveNode(draft, node, action)
       break
     case 'reject':
       if (!node) break
-      ok = applyReject(draft, node, usesTasks ? task : undefined, action)
+      ok = applyReject(draft, node, task, action)
       break
     case 'transfer':
       if (!node) break
-      ok = applyTransfer(draft, node, usesTasks ? task : undefined, action)
+      ok = applyTransfer(draft, node, task, action)
       break
     case 'addsign':
       if (!node) break
-      ok = applyAddsign(draft, node, usesTasks ? task : undefined, action)
+      ok = applyAddsign(draft, node, task, action)
       break
     case 'return':
       if (!node) break

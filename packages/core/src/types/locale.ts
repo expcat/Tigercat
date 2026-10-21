@@ -273,6 +273,8 @@ export interface TigerLocaleWorkflowTimeline {
   taskBlocked?: string
   /** Intercept copy when commentRequired is set and the comment is empty */
   commentRequiredBlock?: string
+  /** Confirm blocked: transfer / add-sign needs a chosen assignee */
+  assigneeRequired?: string
 }
 
 export interface TigerLocaleWorkflowDesigner {

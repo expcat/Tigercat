@@ -171,7 +171,8 @@ export const koKR: TigerLocale = {
     emptyApproverTransferUser: '지정인에게 전달',
     moreActions: '더 보기',
     taskBlocked: '추가 결재 대기',
-    commentRequiredBlock: '결재 의견을 입력하세요'
+    commentRequiredBlock: '결재 의견을 입력하세요',
+    assigneeRequired: '담당자를 선택하세요'
   },
   workflowDesigner: {
     ariaLabel: '워크플로 설계기',

@@ -171,7 +171,8 @@ export const thTH: TigerLocale = {
     emptyApproverTransferUser: 'โอนให้ผู้ที่กำหนด',
     moreActions: 'เพิ่มเติม',
     taskBlocked: 'รอผู้อนุมัติที่เพิ่ม',
-    commentRequiredBlock: 'ต้องระบุความเห็น'
+    commentRequiredBlock: 'ต้องระบุความเห็น',
+    assigneeRequired: 'เลือกผู้รับมอบหมายก่อน'
   },
   workflowDesigner: {
     ariaLabel: 'ตัวออกแบบเวิร์กโฟลว์',

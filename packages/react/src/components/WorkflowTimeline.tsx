@@ -302,13 +302,9 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
     [addsignPositions, buttonPolicy]
   )
   const [drafts, setDrafts] = useState<Record<string, ActionDraft>>({})
-  const [moreItem, setMoreItem] = useState<WorkflowActionBarItem | null>(null)
+  const [moreKey, setMoreKey] = useState<string | null>(null)
   const moreButtonRef = useRef<HTMLButtonElement>(null)
   const wasConfirmingMore = useRef(false)
-  useLayoutEffect(() => {
-    if (!moreItem && wasConfirmingMore.current) moreButtonRef.current?.focus()
-    wasConfirmingMore.current = Boolean(moreItem)
-  }, [moreItem])
 
   const disableOptions = {
     barDisabled: disabled,
@@ -317,8 +313,35 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
     returnTargetCount: returnTargets == null ? undefined : targets.length
   }
 
-  const getDraft = (item: WorkflowActionBarItem): ActionDraft =>
-    drafts[item.key] ?? emptyDraft(item, targets, positions)
+  // Only the key is stored from the dropdown click; the confirming item is
+  // re-derived from the current items so a label, action or disabled change
+  // that lands while the layer is open applies to the confirm. A removed or
+  // disabled item closes the layer instead of confirming a stale snapshot.
+  const moreCandidate =
+    moreKey == null ? null : (resolvedItems.find((entry) => entry.key === moreKey) ?? null)
+  const moreItem =
+    moreCandidate != null && !isWorkflowActionBarItemDisabled(moreCandidate, disableOptions)
+      ? moreCandidate
+      : null
+  useLayoutEffect(() => {
+    if (moreItem == null && moreKey != null) setMoreKey(null)
+    if (moreItem == null && wasConfirmingMore.current) moreButtonRef.current?.focus()
+    wasConfirmingMore.current = moreItem != null
+  }, [moreItem, moreKey])
+
+  const getDraft = (item: WorkflowActionBarItem): ActionDraft => {
+    const draft = drafts[item.key] ?? emptyDraft(item, targets, positions)
+    // A position picked from a list that changed since is stale; fall back to
+    // the current default instead of emitting the old value.
+    if (
+      item.action === 'addsign' &&
+      draft.position != null &&
+      !positions.includes(draft.position)
+    ) {
+      return { ...draft, position: positions[0] }
+    }
+    return draft
+  }
 
   const patchDraft = (item: WorkflowActionBarItem, patch: Partial<ActionDraft>) => {
     setDrafts((prev) => ({
@@ -343,7 +366,6 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
     item: WorkflowActionBarItem,
     event?: { preventDefault: () => void }
   ): boolean => {
-    if (isWorkflowActionBarItemDisabled(item, disableOptions)) return false
     const confirming = shouldOpenWorkflowActionLayer(item, { confirm, commentRequired })
     if (!confirming) {
       onAction?.(item)
@@ -359,12 +381,17 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
       event?.preventDefault()
       return false
     }
-    if (picker === 'return' && !draft.targetNodeKey) {
+    if (
+      picker === 'return' &&
+      (!draft.targetNodeKey ||
+        (returnTargets != null && !targets.some((target) => target.key === draft.targetNodeKey)))
+    ) {
       patchDraft(item, { error: stepLabels.returnNoTargets })
       event?.preventDefault()
       return false
     }
     if (picker === 'assignee' && !draft.assignee) {
+      patchDraft(item, { error: stepLabels.assigneeRequired })
       event?.preventDefault()
       return false
     }
@@ -593,7 +620,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
             open
             asChild
             onOpenChange={(open) => {
-              if (!open) setMoreItem(null)
+              if (!open) setMoreKey(null)
             }}
             title={moreConfirmCopy?.title}
             description={moreExtra ? undefined : moreConfirmCopy?.description}
@@ -604,7 +631,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
             icon={moreConfirmCopy?.icon}
             placement="top-end"
             onConfirm={(event) => {
-              if (emitReadyAction(moreItem, event)) setMoreItem(null)
+              if (emitReadyAction(moreItem, event)) setMoreKey(null)
             }}>
             {moreButton}
           </Popconfirm>
@@ -629,7 +656,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
                     title={reason}
                     onClick={() => {
                       if (itemDisabled) return
-                      if (needsDialog) setMoreItem(item)
+                      if (needsDialog) setMoreKey(item.key)
                       else emitReadyAction(item)
                     }}>
                     {item.label}

@@ -171,7 +171,8 @@ export const zhTW: TigerLocale = {
     emptyApproverTransferUser: '轉交指定人',
     moreActions: '更多',
     taskBlocked: '等待加簽人',
-    commentRequiredBlock: '請填寫審批意見'
+    commentRequiredBlock: '請填寫審批意見',
+    assigneeRequired: '請選擇辦理人'
   },
   workflowDesigner: {
     ariaLabel: '流程設計器',

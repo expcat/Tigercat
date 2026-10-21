@@ -170,7 +170,8 @@ export const zhCN: TigerLocale = {
     emptyApproverTransferUser: '转交指定人',
     moreActions: '更多',
     taskBlocked: '等待加签人',
-    commentRequiredBlock: '请填写审批意见'
+    commentRequiredBlock: '请填写审批意见',
+    assigneeRequired: '请选择办理人'
   },
   workflowDesigner: {
     ariaLabel: '流程设计器',

@@ -365,6 +365,7 @@ function DesignerNode({
 
 function DesignerEditPanel({
   node,
+  steps,
   locked,
   labels,
   timelineLabels,
@@ -381,6 +382,7 @@ function DesignerEditPanel({
   onAddChild
 }: {
   node: WorkflowDesignerNode
+  steps: WorkflowTimelineStep[]
   locked: boolean
   labels: Required<TigerLocaleWorkflowDesigner>
   timelineLabels: Required<TigerLocaleWorkflowTimeline>
@@ -927,7 +929,7 @@ function DesignerEditPanel({
               onClick={() =>
                 onInsertChild(
                   node.path,
-                  createWorkflowDesignerStep([node.step, ...(node.step.children ?? [])], {
+                  createWorkflowDesignerStep(steps, {
                     kind: 'approve',
                     title: `${labels.branchLabel} ${(node.step.children?.length ?? 0) + 1}`,
                     condition: { field: '', operator: 'eq', value: '' }
@@ -1310,6 +1312,7 @@ export const WorkflowDesigner: React.FC<WorkflowDesignerProps> = ({
         {selectedNode ? (
           <DesignerEditPanel
             node={selectedNode}
+            steps={steps}
             locked={locked}
             labels={designerLabels}
             timelineLabels={timelineLabels}

@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **工作流（Core / Vue / React）**：统一校验任务归属、可操作状态与活动节点，修复长抄送 / 自动通过链被截断的问题。修正退回和前加签的暂停、恢复及签署模式处理，保留已完成任务，避免提前推进或重复恢复；详情提交按当前表单值计算条件分支。动作栏确认层跟随当前动作与候选项，失效时关闭，转交 / 加签未选人时显示本地化提示。设计器新增分支在全树分配唯一 key。
 - **FileManager、拖拽与标注（Core / Vue / React）**：FileManager 跟随实际挂载的视口，虚拟网格按行测量并分离滚动区、完整内容与窗口偏移，动态行高、列数和模式变化后的尾部滚动及 Home / End 焦点保持正确。拖拽落下按当前稳定 id 重解位置并保留数字 key 类型，失效会话不再错移替换项。ImageAnnotation 在权限、工具、图片或组件生命周期失效时统一取消草稿、帧和文档会话，正常受控值更新不打断合法笔画。
 - **富文本 / 打印 / 拖拽会话（Core / Vue / React）**：默认富文本引擎的图片粘贴在销毁、转为只读 / 禁用或 setValue 真正替换正文后不再迟到写入（恢复可编辑不复活旧粘贴，同值受控回声不取消）。PrintLayout.print() 的打印 iframe 复制消费样式表、constructed stylesheets、文档根匹配状态与根节点继承的 CSS 自定义变量，克隆图片改为 eager 加载并在资源就绪后才打印。Vue RichTextEditor 跟随 FormItem 表单值的后续变化；React RichTextEditor 替换等价引擎时保留当前非受控正文。Vue useDrag 的 containerId 实时跟随响应式 props，挂载后改 id 的跨容器落下正常提交；Core 文档拖拽会话的 user-select 锁按 document 引用计数，重叠会话只在最后一场结束后恢复第一场加锁前的值。
 - **数据选择与编辑（Vue / React）**：Table / VirtualTable 的行点击、键盘与工具栏选择统一遵守禁用行设置，保留未加载的已选键。文本与数字编辑支持 Enter 提交、Escape 取消；数字输入在提交事件内使用本次值，Select 选值只提交一次并保留数字类型，打开态 Escape 只关闭下拉框，关闭态 Escape 取消编辑。Vue VirtualTable 从 Table 的事件事实源完整转发事件。

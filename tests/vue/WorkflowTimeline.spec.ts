@@ -433,6 +433,120 @@ describe('WorkflowTimeline (Vue)', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
       expect(screen.getByRole('button', { name: 'More' })).toHaveFocus()
     })
+
+    it('confirms the current More item when the same key changed underneath', async () => {
+      const user = userEvent.setup()
+      const approve: WorkflowActionBarItem = { key: 'approve', label: 'Approve', action: 'approve' }
+      const selected: WorkflowActionBarItem = {
+        key: 'selected',
+        label: 'Reject',
+        action: 'reject',
+        placement: 'more',
+        commentRequired: false
+      }
+      const renderAssigneePicker = ({
+        onChange
+      }: {
+        onChange: (actor: WorkflowTimelineActor | undefined) => void
+      }) =>
+        h('button', { type: 'button', onClick: () => onChange({ id: 'x', name: 'X' }) }, 'Pick X')
+      const { emitted, rerender } = render(WorkflowActionBar, {
+        props: {
+          viewerRole: 'approver',
+          items: [approve, selected],
+          confirm: true,
+          renderAssigneePicker
+        }
+      })
+
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reject' }))
+      await waitFor(() => expect(screen.getByText('Reject this request?')).toBeVisible())
+
+      await rerender({
+        items: [approve, { ...selected, label: 'Transfer now', action: 'transfer' }]
+      })
+      await waitFor(() => expect(screen.getByText('Transfer this request?')).toBeVisible())
+      await user.click(screen.getByRole('button', { name: 'Pick X' }))
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+
+      await waitFor(() => expect(emitted().action).toHaveLength(1))
+      expect(emitted().action?.[0]?.[0]).toMatchObject({
+        action: 'transfer',
+        label: 'Transfer now'
+      })
+      expect(emitted().action?.[0]?.[1]).toMatchObject({ assignee: { id: 'x', name: 'X' } })
+    })
+
+    it('closes the More confirm without emitting when the item is removed or disabled', async () => {
+      const user = userEvent.setup()
+      const approve: WorkflowActionBarItem = { key: 'approve', label: 'Approve', action: 'approve' }
+      const selected: WorkflowActionBarItem = {
+        key: 'selected',
+        label: 'Reject',
+        action: 'reject',
+        placement: 'more',
+        commentRequired: false
+      }
+      const { emitted, rerender } = render(WorkflowActionBar, {
+        props: { viewerRole: 'approver', items: [approve, selected], confirm: true }
+      })
+
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reject' }))
+      await screen.findByRole('dialog')
+
+      await rerender({ items: [approve, { ...selected, disabled: true }] })
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+
+      // Re-adding the same key must not resurrect the closed confirm layer.
+      await rerender({ items: [approve, selected] })
+      expect(screen.queryByRole('dialog')).toBeNull()
+
+      await user.click(screen.getByRole('button', { name: 'More' }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reject' }))
+      await screen.findByRole('dialog')
+      await rerender({ items: [approve] })
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      expect(emitted().action).toBeFalsy()
+    })
+
+    it('requires an assignee before confirming transfer', async () => {
+      const user = userEvent.setup()
+      const items: WorkflowActionBarItem[] = [
+        { key: 'transfer', label: 'Transfer', action: 'transfer' }
+      ]
+      const { emitted } = render(WorkflowActionBar, {
+        props: {
+          viewerRole: 'approver',
+          items,
+          confirm: true,
+          renderAssigneePicker: ({
+            onChange
+          }: {
+            onChange: (actor: WorkflowTimelineActor | undefined) => void
+          }) =>
+            h(
+              'button',
+              { type: 'button', onClick: () => onChange({ id: 'x', name: 'X' }) },
+              'Pick X'
+            )
+        }
+      })
+
+      await user.click(screen.getByRole('button', { name: 'Transfer' }))
+      await waitFor(() => expect(screen.getByText('Transfer this request?')).toBeVisible())
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Select an assignee first')
+      )
+      expect(emitted().action).toBeFalsy()
+
+      await user.click(screen.getByRole('button', { name: 'Pick X' }))
+      await user.click(screen.getByRole('button', { name: 'OK' }))
+      await waitFor(() => expect(emitted().action).toHaveLength(1))
+      expect(emitted().action?.[0]?.[1]).toMatchObject({ assignee: { id: 'x', name: 'X' } })
+    })
   })
 
   describe('Accessibility', () => {

@@ -873,14 +873,11 @@ export const WorkflowDesigner = defineComponent({
                 ])
               ),
               renderActionButton(labels.addBranch, lockedNow, () => {
-                const created = createWorkflowDesignerStep(
-                  [node.step, ...(node.step.children ?? [])],
-                  {
-                    kind: 'approve',
-                    title: `${labels.branchLabel} ${(node.step.children?.length ?? 0) + 1}`,
-                    condition: { field: '', operator: 'eq', value: '' }
-                  }
-                )
+                const created = createWorkflowDesignerStep(sourceSteps.value, {
+                  kind: 'approve',
+                  title: `${labels.branchLabel} ${(node.step.children?.length ?? 0) + 1}`,
+                  condition: { field: '', operator: 'eq', value: '' }
+                })
                 commit(insertWorkflowStepAtPath(sourceSteps.value, node.path, created))
               })
             ])

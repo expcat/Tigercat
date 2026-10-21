@@ -172,7 +172,8 @@ export const deDE: TigerLocale = {
     emptyApproverTransferUser: 'An Benutzer weiterleiten',
     moreActions: 'Mehr',
     taskBlocked: 'Wartet auf zusätzlichen Freigeber',
-    commentRequiredBlock: 'Ein Kommentar ist erforderlich'
+    commentRequiredBlock: 'Ein Kommentar ist erforderlich',
+    assigneeRequired: 'Wählen Sie zuerst eine Person aus'
   },
   workflowDesigner: {
     ariaLabel: 'Workflow-Designer',

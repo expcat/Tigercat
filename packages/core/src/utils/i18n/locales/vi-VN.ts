@@ -171,7 +171,8 @@ export const viVN: TigerLocale = {
     emptyApproverTransferUser: 'Chuyển cho người chỉ định',
     moreActions: 'Khác',
     taskBlocked: 'Đang chờ người duyệt bổ sung',
-    commentRequiredBlock: 'Cần nhập ý kiến phê duyệt'
+    commentRequiredBlock: 'Cần nhập ý kiến phê duyệt',
+    assigneeRequired: 'Hãy chọn người được giao trước'
   },
   workflowDesigner: {
     ariaLabel: 'Trình thiết kế quy trình',

@@ -171,7 +171,8 @@ export const idID: TigerLocale = {
     emptyApproverTransferUser: 'Alihkan ke pengguna',
     moreActions: 'Lainnya',
     taskBlocked: 'Menunggu pemberi persetujuan tambahan',
-    commentRequiredBlock: 'Komentar wajib diisi'
+    commentRequiredBlock: 'Komentar wajib diisi',
+    assigneeRequired: 'Pilih penerima terlebih dahulu'
   },
   workflowDesigner: {
     ariaLabel: 'Perancang alur kerja',

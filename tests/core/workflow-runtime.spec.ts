@@ -618,3 +618,243 @@ describe('reduceWorkflowAction — purity and no-ops', () => {
     expect(act(src, 'comment', { actorId: 'ada', comment: 'closed' })).toBe(src)
   })
 })
+
+describe('reduceWorkflowAction — unified admission (R14)', () => {
+  const countersignBase = (): WorkflowInstance =>
+    instance({
+      cursor: { nodeKey: 'current' },
+      steps: [
+        { key: 'start', kind: 'start', status: 'approved', actor: ada },
+        {
+          key: 'current',
+          kind: 'approve',
+          status: 'active',
+          signMode: 'countersign',
+          actors: [lin, chen]
+        },
+        { key: 'future', kind: 'approve', status: 'pending', actors: [wu] },
+        { key: 'end', kind: 'end', status: 'pending' }
+      ],
+      tasks: [
+        task({ id: 't-lin', nodeKey: 'current', assignee: lin }),
+        task({ id: 't-chen', nodeKey: 'current', assignee: chen }),
+        task({ id: 't-wu', nodeKey: 'future', assignee: wu })
+      ]
+    })
+
+  it('refuses foreign or unknown taskIds on every task action', () => {
+    const src = countersignBase()
+    for (const action of ['approve', 'reject', 'transfer', 'addsign', 'return'] as const) {
+      for (const taskId of ['t-chen', 'missing']) {
+        const next = act(src, action, {
+          actorId: 'lin',
+          taskId,
+          comment: 'reason',
+          assignee: wu,
+          assignees: [wu],
+          targetNodeKey: 'start'
+        })
+        expect(next).toBe(src)
+      }
+    }
+  })
+
+  it('refuses actions on pending future or completed nodes', () => {
+    const src = countersignBase()
+    expect(act(src, 'approve', { actorId: 'wu', nodeKey: 'future', taskId: 't-wu' })).toBe(src)
+    expect(act(src, 'approve', { actorId: 'ada', nodeKey: 'start' })).toBe(src)
+  })
+
+  it('lets a transferred-in task act while the operator task is blocked', () => {
+    const src = countersignBase()
+    const added = act(src, 'addsign', {
+      actorId: 'lin',
+      taskId: 't-lin',
+      position: 'before',
+      assignees: [expert],
+      tempNodeKey: 'temp'
+    })
+    const moved = act(added, 'transfer', {
+      actorId: 'chen',
+      taskId: 't-chen',
+      nodeKey: 'current',
+      assignee: lin
+    })
+    expect(moved.cursor).toEqual({ nodeKey: 'temp' })
+    const approved = act(moved, 'approve', { actorId: 'lin', nodeKey: 'current' })
+    expect(tasksOf(approved, 'current').find((item) => item.id === 't-chen')?.status).toBe(
+      'approved'
+    )
+    expect(approved.cursor).toEqual({ nodeKey: 'temp' })
+    // The still-blocked task cannot be booked explicitly either.
+    expect(
+      act(moved, 'return', {
+        actorId: 'lin',
+        taskId: 't-lin',
+        nodeKey: 'current',
+        targetNodeKey: 'start',
+        comment: 'x'
+      })
+    ).toBe(moved)
+  })
+})
+
+describe('reduceWorkflowAction — auto advance (R14)', () => {
+  it('runs long cc and auto_pass chains to the end', () => {
+    for (const kind of ['cc', 'auto'] as const) {
+      const steps: WorkflowTimelineStep[] = [
+        { key: 'first', kind: 'approve', status: 'active', actor: ada },
+        ...Array.from({ length: 40 }, (_, index): WorkflowTimelineStep => {
+          const key = `n${index}`
+          return kind === 'cc'
+            ? { key, kind: 'cc', status: 'pending' }
+            : { key, kind: 'approve', status: 'pending', advanced: { autoDecide: 'auto_pass' } }
+        }),
+        { key: 'end', kind: 'end', status: 'pending' }
+      ]
+      const next = act(instance({ cursor: { nodeKey: 'first' }, steps }), 'approve', {
+        actorId: 'ada'
+      })
+      expect(next.status).toBe('approved')
+      expect(next.cursor).toEqual({ nodeKey: 'end' })
+      expect(next.steps.every((step) => step.status !== 'pending')).toBe(true)
+    }
+  })
+})
+
+describe('reduceWorkflowAction — return lifecycle (R14)', () => {
+  const chain = (): WorkflowInstance =>
+    instance({
+      cursor: { nodeKey: 'c' },
+      starter: ada,
+      steps: [
+        { key: 'start', kind: 'start', status: 'approved', actor: ada },
+        { key: 'a', kind: 'approve', status: 'approved', actors: [lin] },
+        { key: 'b', kind: 'approve', status: 'approved', actors: [chen] },
+        { key: 'c', kind: 'approve', status: 'active', actors: [wu] }
+      ],
+      tasks: [
+        task({ id: 't-lin', nodeKey: 'a', assignee: lin, status: 'approved' }),
+        task({ id: 't-chen', nodeKey: 'b', assignee: chen, status: 'approved' }),
+        task({ id: 't-wu', nodeKey: 'c', assignee: wu })
+      ]
+    })
+
+  it('suspends the direct returner and resumes it after the target', () => {
+    const returned = act(chain(), 'return', {
+      actorId: 'wu',
+      taskId: 't-wu',
+      targetNodeKey: 'a',
+      resume: 'direct',
+      comment: 'back'
+    })
+    expect(returned.cursor).toEqual({ nodeKey: 'a' })
+    expect(nodeOf(returned, 'c')?.status).toBe('pending')
+    // Candidates share the reducer predicate: only nodes before the current one.
+    expect(getWorkflowReturnCandidates(returned).map((step) => step.key)).toEqual(['start'])
+    // Explicit actions on the suspended returner are refused.
+    expect(act(returned, 'approve', { actorId: 'wu', nodeKey: 'c', taskId: 't-wu' })).toBe(returned)
+    const resumed = act(returned, 'approve', { actorId: 'lin', nodeKey: 'a', taskId: 't-lin' })
+    expect(resumed.cursor).toEqual({ nodeKey: 'c' })
+    expect(nodeOf(resumed, 'c')?.status).toBe('active')
+  })
+
+  it('re-reviewed temp follows the current resume instead of restoring a decided origin', () => {
+    let inst = instance({
+      cursor: { nodeKey: 'original' },
+      steps: [
+        { key: 'start', kind: 'start', status: 'approved', actor: ada },
+        { key: 'original', kind: 'approve', status: 'active', actor: lin },
+        { key: 'later', kind: 'approve', status: 'pending', actor: chen },
+        { key: 'end', kind: 'end', status: 'pending' }
+      ],
+      tasks: [task({ id: 't-lin', nodeKey: 'original', assignee: lin })]
+    })
+    inst = act(inst, 'addsign', {
+      actorId: 'lin',
+      position: 'before',
+      assignees: [expert],
+      tempNodeKey: 'temp'
+    })
+    inst = act(inst, 'approve', { actorId: 'expert', nodeKey: 'temp' })
+    inst = act(inst, 'approve', { actorId: 'lin', nodeKey: 'original' })
+    inst = act(inst, 'return', {
+      actorId: 'chen',
+      nodeKey: 'later',
+      targetNodeKey: 'temp',
+      resume: 'direct',
+      comment: 'redo temp'
+    })
+    inst = act(inst, 'approve', { actorId: 'expert', nodeKey: 'temp' })
+    expect(inst.cursor).toEqual({ nodeKey: 'later' })
+    expect(nodeOf(inst, 'original')?.status).toBe('approved')
+    expect(inst.steps.filter((step) => step.status === 'active').map((step) => step.key)).toEqual([
+      'later'
+    ])
+  })
+})
+
+describe('reduceWorkflowAction — sign modes with before-addsign (R14)', () => {
+  const base = (mode: 'sequential' | 'countersign' | 'orsign'): WorkflowInstance =>
+    instance({
+      cursor: { nodeKey: 'current' },
+      steps: [
+        {
+          key: 'current',
+          kind: 'approve',
+          status: 'active',
+          signMode: mode,
+          actors: [lin, chen]
+        },
+        { key: 'future', kind: 'approve', status: 'pending', actor: wu }
+      ],
+      tasks: [
+        task({
+          id: 't-lin',
+          nodeKey: 'current',
+          assignee: lin,
+          status: mode === 'sequential' ? 'active' : 'pending'
+        }),
+        task({ id: 't-chen', nodeKey: 'current', assignee: chen })
+      ]
+    })
+
+  const addBefore = (src: WorkflowInstance): WorkflowInstance =>
+    act(src, 'addsign', {
+      actorId: 'lin',
+      taskId: 't-lin',
+      position: 'before',
+      assignees: [expert],
+      tempNodeKey: 'temp'
+    })
+
+  it('sequential peers cannot skip a blocked predecessor', () => {
+    const added = addBefore(base('sequential'))
+    expect(act(added, 'approve', { actorId: 'chen', taskId: 't-chen', nodeKey: 'current' })).toBe(
+      added
+    )
+  })
+
+  it('countersign peers book their own task but the node waits for the blocked one', () => {
+    const added = addBefore(base('countersign'))
+    const peer = act(added, 'approve', { actorId: 'chen', taskId: 't-chen', nodeKey: 'current' })
+    expect(tasksOf(peer, 'current').find((item) => item.id === 't-chen')?.status).toBe('approved')
+    expect(nodeOf(peer, 'current')?.status).toBe('active')
+    expect(nodeOf(peer, 'future')?.status).toBe('pending')
+    expect(peer.cursor).toEqual({ nodeKey: 'temp' })
+    const restored = act(peer, 'approve', { actorId: 'expert', nodeKey: 'temp' })
+    expect(restored.cursor).toEqual({ nodeKey: 'current' })
+    expect(nodeOf(restored, 'future')?.status).toBe('pending')
+  })
+
+  it('orsign peer completes the node and cancels the stale blocked temp', () => {
+    const added = addBefore(base('orsign'))
+    const peer = act(added, 'approve', { actorId: 'chen', taskId: 't-chen', nodeKey: 'current' })
+    expect(nodeOf(peer, 'current')?.status).toBe('approved')
+    expect(nodeOf(peer, 'future')?.status).toBe('active')
+    expect(nodeOf(peer, 'temp')?.status).toBe('canceled')
+    expect(tasksOf(peer, 'current').find((item) => item.id === 't-lin')?.status).toBe('canceled')
+    // A late expert approval cannot resurrect the completed node.
+    expect(act(peer, 'approve', { actorId: 'expert', nodeKey: 'temp' })).toBe(peer)
+  })
+})

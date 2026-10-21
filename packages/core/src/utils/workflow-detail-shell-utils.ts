@@ -82,8 +82,12 @@ export function submitWorkflowDetailAction(input: {
   action: WorkflowRuntimeAction
 }): { values: FormValues; instance: WorkflowInstance } {
   const values = submitWorkflowDetailForm(input)
+  // The reducer runs with the merged values so editable answers steer
+  // condition branches; a refused action keeps the caller's instance.
+  const merged: WorkflowInstance = { ...input.instance, formValues: values }
+  const next = reduceWorkflowAction(merged, input.action)
   return {
     values,
-    instance: reduceWorkflowAction(input.instance, input.action)
+    instance: next === merged ? input.instance : next
   }
 }

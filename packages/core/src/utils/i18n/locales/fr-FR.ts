@@ -171,7 +171,8 @@ export const frFR: TigerLocale = {
     emptyApproverTransferUser: 'Transférer à un utilisateur',
     moreActions: 'Plus',
     taskBlocked: 'En attente de l’approbateur ajouté',
-    commentRequiredBlock: 'Un commentaire est obligatoire'
+    commentRequiredBlock: 'Un commentaire est obligatoire',
+    assigneeRequired: 'Sélectionnez d’abord un destinataire'
   },
   workflowDesigner: {
     ariaLabel: 'Concepteur de workflow',
