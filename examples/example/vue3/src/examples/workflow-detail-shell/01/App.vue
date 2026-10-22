@@ -109,7 +109,11 @@ function onAction(item: WorkflowActionBarItem, payload?: WorkflowActionPayload) 
         </div>
       </template>
       <template #form>
-        <SchemaForm :schema="schema" :model-value="model" :show-actions="false" />
+        <SchemaForm
+          :schema="schema"
+          :model-value="model"
+          :show-actions="false"
+          @update:model-value="Object.assign(model, $event)" />
       </template>
       <template #tabs>
         <Tabs default-active-key="timeline">

@@ -282,7 +282,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     if (!currentStep) return null
     if (typeof children === 'function') return children(currentStep, currentIndex)
     if (renderStep) return renderStep(currentStep, currentIndex)
-    return (currentStep.content as React.ReactNode) ?? null
+    return children ?? (currentStep.content as React.ReactNode) ?? null
   }, [children, currentIndex, currentStep, renderStep])
 
   const stepItems = useMemo(

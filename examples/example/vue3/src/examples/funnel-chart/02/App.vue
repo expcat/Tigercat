@@ -11,7 +11,7 @@ const data = [
 
 <template>
   <div>
-    <p class="mb-1 text-sm text-gray-500">direction="vertical"（默认）+ gradient + 提示</p>
+    <p class="mb-1 text-sm text-gray-500">orientation="vertical"（默认）+ gradient + 提示</p>
     <FunnelChart
       :data="data"
       :width="420"

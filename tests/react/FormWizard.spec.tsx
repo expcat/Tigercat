@@ -65,6 +65,24 @@ describe('FormWizard (React)', () => {
     expect(screen.getByRole('button', { name: 'Finish' })).toBeInTheDocument()
   })
 
+  it('renders ordinary children before step content and falls back when omitted', () => {
+    const contentSteps = [{ title: 'Step 1', content: 'Step content' }]
+    const { rerender } = render(
+      <FormWizard steps={contentSteps}>
+        <div>Ordinary child</div>
+      </FormWizard>
+    )
+    expect(screen.getByText('Ordinary child')).toBeInTheDocument()
+    expect(screen.queryByText('Step content')).not.toBeInTheDocument()
+
+    rerender(<FormWizard steps={contentSteps}>{0}</FormWizard>)
+    expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.queryByText('Step content')).not.toBeInTheDocument()
+
+    rerender(<FormWizard steps={contentSteps} />)
+    expect(screen.getByText('Step content')).toBeInTheDocument()
+  })
+
   it('blocks next step when beforeNext returns false', async () => {
     const user = userEvent.setup()
     const beforeNext = vi.fn().mockReturnValue(false)

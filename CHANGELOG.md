@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **FormWizard（React）**：兑现普通 `children` 的公开契约，支持元素和 `0`，仅在 `null` / `undefined` 时回退到步骤内容，保留函数 `children` 与 `renderStep` 的优先级。
+- **示例与编译（Vue / React）**：FunnelChart 纵向示例文案统一使用 `orientation`；Vue WorkflowDetailShell 示例将 SchemaForm 变更回写当前值，提交保留隐藏金额和只读原因；移除 React SankeyChart、WaterfallChart 与图表绑定文件未使用的默认 React 导入，恢复完整 Example 编译。
 - **示例与 Playground（Vue / React）**：两端 runtime bridge 显式转发 Modal 子路径的六个命令，修复命令式 Modal 示例加载失败；React Dropdown 共用菜单项示例改用现有 `items` 模型，展示快捷键、勾选和危险项，两端删除未演示的子菜单说明；Space 方向示例文案统一使用 `orientation`。移除 React NotificationBell 与 Table 面板未使用的默认 React 导入。
 - **Button / Form 示例（Vue）**：四处重置或提交按钮改用现行 `type` 属性，恢复原生表单重置、提交与校验。
 - **ImageCropper 示例（Vue / React）**：JPEG 导出预览随结果替换和示例卸载回收 blob URL，卸载后完成的导出不再创建预览 URL。
