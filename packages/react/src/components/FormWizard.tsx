@@ -125,7 +125,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
   const snapshot = useRef(stableModelSnapshot(model))
   const confirmLeave = useCallback(async () => {
     if (!wizardStepIsDirty(snapshot.current, model)) return true
-    const copy = getW9DataLabels()
+    const copy = getW9DataLabels(mergedLocale?.locale)
     try {
       await confirmModal({
         title: copy.leaveStepTitle,
@@ -137,7 +137,7 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
     } catch {
       return false
     }
-  }, [model])
+  }, [mergedLocale, model])
   const setCurrent = useCallback(
     async (next: number) => {
       const prev = currentIndex

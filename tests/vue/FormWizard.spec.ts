@@ -3,18 +3,50 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { h, ref } from 'vue'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/vue'
+import { h, nextTick, ref } from 'vue'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import type { TigerLocale, WizardStep } from '@expcat/tigercat-core'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { FormWizard } from '@expcat/tigercat-vue/FormWizard'
 import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Input } from '@expcat/tigercat-vue/Input'
-import type { WizardStep } from '@expcat/tigercat-core'
 import { expectNoA11yViolations } from '../utils'
 
 const steps: WizardStep[] = [{ title: 'Step 1' }, { title: 'Step 2' }]
 
 describe('FormWizard (Vue)', () => {
+  it('keeps a dirty wizard open using the current provider or component locale', async () => {
+    const wizard = ref<{ requestClose: () => Promise<boolean> }>()
+    const providerLocale = ref<Partial<TigerLocale>>(zhCN)
+    const locale = ref<Partial<TigerLocale>>()
+    const model = ref({ name: 'initial' })
+    render({
+      setup: () => () =>
+        h(ConfigProvider, { locale: providerLocale.value }, () =>
+          h(FormWizard, { ref: wizard, steps, model: model.value, locale: locale.value })
+        )
+    })
+    model.value = { name: 'edited' }
+
+    for (const [provider, component, title, stay] of [
+      [zhCN, undefined, '离开此步骤', '留在此步骤'],
+      [enUS, undefined, 'Leave this step', 'Stay on this step'],
+      [zhCN, undefined, '离开此步骤', '留在此步骤'],
+      [zhCN, enUS, 'Leave this step', 'Stay on this step']
+    ] as const) {
+      providerLocale.value = provider
+      locale.value = component
+      await nextTick()
+      const closing = wizard.value!.requestClose()
+      const dialog = await screen.findByRole('dialog', { name: title })
+      await fireEvent.click(within(dialog).getByRole('button', { name: stay }))
+      await expect(closing).resolves.toBe(false)
+    }
+  })
+
   it('renders step content and moves to next step', async () => {
     render(FormWizard, {
       props: { steps },

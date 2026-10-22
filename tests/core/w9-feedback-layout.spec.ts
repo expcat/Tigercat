@@ -23,6 +23,7 @@ import {
 import {
   createFeedbackScope,
   destroyAllConfirmModals,
+  dismissConfirmModal,
   enqueueConfirmModal,
   enqueueMessage,
   settleMessage
@@ -117,6 +118,17 @@ describe('W9 feedback and layout core', () => {
     record?.resolve(ok)
     await expect(pending).resolves.toBe('saved')
     destroyAllConfirmModals(scope)
+  })
+
+  it.each(['cancel', 'destroy'] as const)('rejects the modal promise on %s', async (action) => {
+    const scope = createFeedbackScope()
+    const pending = enqueueConfirmModal(scope, { title: 'Sure?' })
+    const rejected = expect(pending).rejects.toThrow('cancel')
+
+    if (action === 'cancel') dismissConfirmModal(scope.modals.getSnapshot()[0]!)
+    else destroyAllConfirmModals(scope)
+
+    await rejected
   })
 
   it('formats progress without rewriting a non-success value', () => {

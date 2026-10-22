@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **Modal / FormWizard（Core / Vue / React）**：取消或销毁命令式 Modal 时正常拒绝调用方 Promise，删除重复写入完成状态的私有路径；FormWizard 离开确认使用当前合并语言，动态切换 provider 或组件 locale 后仍正确显示，选择留在当前步骤会返回 `false`。
+- **Example**：Vue DemoBlock 在模块内共享现有编译器 client，避免页面切换后遗留实例 Worker，保留并发编译、定期轮换和 OOM 恢复；双端 ConfigProvider 说明与主题文档统一为内层 theme 作用于子树、`document=false` 仅提供 context。Vue 受控状态示例片段与实际 Counter 保持一致，不再用 `??` 吞掉合法空值。
 - **共享工具（Core / Vue / React）**：`getUploadLabels` 恢复 en-US 缺键回退；Upload 的排队、重试与单文件提示统一走 locale / labels，补齐 13 个语言包，已显示提示随语言切换更新，三个英文常量删除并提供迁移说明。Markdown 预览支持单列表格及其对齐标记，仍将无管道符的 `---` 识别为横线；Space 删除重复列间距赋值，输出保持不变。
 - **文档类型来源与配置清理**：仅由真实公开组件继承触发框架 runtime props 替换，Select 文档恢复 Core `SelectProps` 来源及 `value` 紧凑行，完整解析仍合并框架自有字段；删除已下线组件的 props 优先级、无入口的 TableToolbar 说明与片段，以及未使用的 mixin 收集器。
 - **发布检查与 API 基线**：临时 Vue/React Vite 配置移除仓库组件 facts 的导入与顶层求值，四种 tarball 消费示例可独立构建；API 基线只递归星号再导出，具名再导出只记录外部名，清除误收录的内部符号，产品 API 不变。

@@ -239,12 +239,6 @@ export interface ConfirmModalInput {
   onOk?: (event: DismissActionEvent) => unknown
 }
 
-function rejectModal(item: ImperativeModalRecord): void {
-  if (item.settled) return
-  item.settled = true
-  item.reject(new Error('cancel'))
-}
-
 /**
  * OK adopts `onOk`'s return value, including an existing Promise.
  * Cancel and destroyAll reject.
@@ -297,7 +291,7 @@ export function settleConfirmModalOk(record: ImperativeModalRecord, value: unkno
 
 export function dismissConfirmModal(record: ImperativeModalRecord): void {
   record.cancelled = true
-  rejectModal(record)
+  record.reject(new Error('cancel'))
 }
 
 export function destroyAllConfirmModals(scope: FeedbackScope | null): void {

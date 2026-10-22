@@ -43,7 +43,7 @@ const chromeSource = {
     contextTheme: '树内 theme',
     documentTheme: 'document theme',
     caption:
-      '应用根上只挂一个 ConfigProvider。theme / colorScheme / direction / lang 写的是 document（本 iframe 的 html），不是这块预览盒。内层只改 context。colorScheme=auto 首屏当 light。'
+      '应用根 ConfigProvider 管理 document（本 iframe 的 html）的 theme / colorScheme / dir / lang。内层 theme 作用于子树；document=false 时仅提供 context。colorScheme=auto 首屏当 light。'
   },
   'en-US': {
     language: 'Language',
@@ -56,7 +56,7 @@ const chromeSource = {
     contextTheme: 'tree theme',
     documentTheme: 'document theme',
     caption:
-      'Mount one ConfigProvider at the app root. theme / colorScheme / direction / lang write the document (this iframe html), not this preview box. Nested providers only change context. colorScheme=auto is light on first paint.'
+      'The root ConfigProvider manages document theme / colorScheme / dir / lang (this iframe html). Nested themes apply to their subtree; document=false provides context only. colorScheme=auto is light on first paint.'
   }
 } as const
 

@@ -175,7 +175,7 @@ export const FormWizard = defineComponent({
     const snapshot = ref(stableModelSnapshot(props.model))
     const confirmLeave = async (): Promise<boolean> => {
       if (!wizardStepIsDirty(snapshot.value, props.model)) return true
-      const copy = getW9DataLabels()
+      const copy = getW9DataLabels(mergedLocale.value?.locale)
       try {
         await confirmModal({
           title: copy.leaveStepTitle,

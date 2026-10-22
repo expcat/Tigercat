@@ -1,3 +1,20 @@
+<script lang="ts">
+import { createCompilerClient, type CompilerClient } from '@demo-shared/playground/compiler-client'
+
+let compiler: CompilerClient | null = null
+
+function getCompiler(): CompilerClient {
+  if (compiler) return compiler
+  compiler = createCompilerClient(
+    () =>
+      new Worker(new URL('../playground/compiler.worker.ts', import.meta.url), {
+        type: 'module'
+      })
+  )
+  return compiler
+}
+</script>
+
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
@@ -20,7 +37,6 @@ import {
   getSandboxAttribute,
   isSandboxEvent
 } from '@demo-shared/playground/sandbox'
-import { createCompilerClient, type CompilerClient } from '@demo-shared/playground/compiler-client'
 import { isBenignSandboxRuntimeError } from '@demo-shared/playground/sandbox-errors'
 import stylesheetUrl from '@demo-shared/sandbox.css?url'
 
@@ -32,19 +48,6 @@ const props = defineProps<{
 interface ConsoleEntry {
   level: string
   message: string
-}
-
-let compiler: CompilerClient | null = null
-
-function getCompiler(): CompilerClient {
-  if (compiler) return compiler
-  compiler = createCompilerClient(
-    () =>
-      new Worker(new URL('../playground/compiler.worker.ts', import.meta.url), {
-        type: 'module'
-      })
-  )
-  return compiler
 }
 
 function compileBundle(bundle: DemoSourceBundle): Promise<DemoCompileSuccess> {

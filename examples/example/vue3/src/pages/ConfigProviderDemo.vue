@@ -8,6 +8,6 @@ const modules = getDemoModules('config-provider')
 <template>
   <DemoPage
     title="ConfigProvider 全局配置"
-    description="应用根 ConfigProvider 写入 document 的 locale / theme / dir / lang；内层只改 context。"
+    description="应用根 ConfigProvider 管理 document 的 theme / colorScheme / dir / lang；内层 theme 作用于子树，document=false 时仅提供 context。"
     :modules="modules" />
 </template>

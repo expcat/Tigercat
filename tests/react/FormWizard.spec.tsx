@@ -3,10 +3,13 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useState } from 'react'
-import { FormWizard } from '@expcat/tigercat-react/FormWizard'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { FormWizard, type FormWizardHandle } from '@expcat/tigercat-react/FormWizard'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { Input } from '@expcat/tigercat-react/Input'
@@ -15,6 +18,37 @@ import { expectNoA11yViolations } from '../utils/react'
 const steps = [{ title: 'Step 1' }, { title: 'Step 2' }]
 
 describe('FormWizard (React)', () => {
+  it('keeps a dirty wizard open using the current provider or component locale', async () => {
+    const user = userEvent.setup()
+    const wizard = React.createRef<FormWizardHandle>()
+    const model = { name: 'edited' }
+    const { rerender } = render(
+      <ConfigProvider locale={zhCN}>
+        <FormWizard ref={wizard} steps={steps} model={{ name: 'initial' }} />
+      </ConfigProvider>
+    )
+
+    for (const [providerLocale, locale, title, stay] of [
+      [zhCN, undefined, '离开此步骤', '留在此步骤'],
+      [enUS, undefined, 'Leave this step', 'Stay on this step'],
+      [zhCN, undefined, '离开此步骤', '留在此步骤'],
+      [zhCN, enUS, 'Leave this step', 'Stay on this step']
+    ] as const) {
+      rerender(
+        <ConfigProvider locale={providerLocale}>
+          <FormWizard ref={wizard} steps={steps} model={model} locale={locale} />
+        </ConfigProvider>
+      )
+      let closing!: Promise<boolean>
+      act(() => {
+        closing = wizard.current!.requestClose()
+      })
+      const dialog = await screen.findByRole('dialog', { name: title })
+      await user.click(within(dialog).getByRole('button', { name: stay }))
+      await expect(closing).resolves.toBe(false)
+    }
+  })
+
   it('renders step content and moves to next step', async () => {
     const user = userEvent.setup()
 
