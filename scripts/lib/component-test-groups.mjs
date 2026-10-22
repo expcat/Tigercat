@@ -29,6 +29,8 @@ const FRAMEWORK_EXTRAS = {
   form: ['custom-text', 'useFormController', 'w9-forms', 'w9-bind'],
   feedback: [
     'Notification',
+    'focus-trap-rebind',
+    'feedback-ssr',
     'overlay-positioning',
     'overlay-ssr',
     'overlay-outlet-dismiss',

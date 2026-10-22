@@ -59,7 +59,7 @@ pnpm vitest run -t "opens the menu"
 7. 测试必须独立，不依赖执行顺序或跨测试共享的可变状态。
 8. 默认环境是 `happy-dom`。不需要 DOM 的 spec 必须用文件头 docblock 显式声明 `@vitest-environment node`，不要在 node 环境 spec 里依赖 `window`。
 
-`tests/react/ComponentTemplate.spec.tsx.template` 与 `tests/vue/ComponentTemplate.spec.ts.template` 提供最小模板。共享 helper 从 `tests/utils` 导入；新增 helper 前先检查现有 render、a11y、theme、observer 和 frame 工具。
+新 spec 的导入方式可参考 [React Button](react/Button.spec.tsx) 与 [Vue Button](vue/Button.spec.ts)；只参考当前所需行为和对应框架的 helper，不复制整套用例。新增 helper 前先检查现有 render、a11y、theme、observer 和 frame 工具。
 
 组件 spec 从已发布子路径导入（`@expcat/tigercat-vue/Button` / `@expcat/tigercat-react/Button`），避免根 barrel 求值全部组件。不要在 spec 里 `import('@expcat/tigercat-react')` 动态拉整包。
 
@@ -75,10 +75,13 @@ pnpm vitest run -t "opens the menu"
 `FORK_ONLY_SPECS` 目前包含：
 
 - `tests/core/cli.spec.ts` —— 用 `process.chdir()`，worker thread 不支持。
-- `tests/core/imperative-side-effects.spec.ts`、`tests/react/Notification.spec.tsx`、
-  `tests/vue/Message.spec.ts`、`tests/vue/Notification.spec.ts` —— 挂载进程级
+- `tests/core/imperative-side-effects.spec.ts` —— 保留独立进程；包根命令会懒加载实现，
+  助手必须在同一次异步 `act` 中明确等待 `vi.dynamicImportSettled()`。
+  fork 本身没有消除该根入口挂载超时。
+- `tests/react/Notification.spec.tsx`、`tests/vue/Message.spec.ts`、
+  `tests/vue/Notification.spec.ts` —— 挂载进程级
   Message/Notification 容器并依赖真实定时器，共享 worker 线程的事件循环争用会让
-  1s `waitFor` 偶发超时。用独立进程消除争用，而不是放宽超时。
+  1s `waitFor` 偶发超时，使用独立进程隔离争用。
 
 新 spec 若需要 `process.chdir()`、原生模块、其他线程不安全 API，或挂载进程级全局
 容器，请加入 `FORK_ONLY_SPECS` 并在此登记；不要为它关闭全局隔离，也不要靠调大

@@ -1,7 +1,7 @@
 /**
  * @vitest-environment happy-dom
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
 import { Table } from '../../packages/vue/src/components/Table'
@@ -602,10 +602,12 @@ describe('W9 view bindings', () => {
     })
     expect(print.container.querySelectorAll('[data-page-number]').length).toBeGreaterThan(1)
 
+    const onLoadMore = vi.fn()
     const feed = render(ActivityFeed, {
       props: {
         groupByDate: true,
         hasMore: true,
+        onLoadMore,
         items: [
           { id: '1', title: 'Newest', time: '2024-05-02T00:00:00Z' },
           { id: '2', title: 'Older', time: '2024-05-01T00:00:00Z' }
@@ -615,7 +617,7 @@ describe('W9 view bindings', () => {
     expect(feed.container.querySelector('[data-activity-date="2024-05-02"]')).toBeTruthy()
     expect(feed.container.querySelector('[aria-live="polite"]')?.textContent).toContain('Newest')
     await fireEvent.click(feed.container.querySelector('[data-tiger-next-page]')!)
-    expect(feed.emitted()['load-more']).toBeTruthy()
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
 
     const comments = render(CommentThread, {
       props: {

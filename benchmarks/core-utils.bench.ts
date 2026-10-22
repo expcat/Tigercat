@@ -79,7 +79,7 @@ describe('Chart Scales', () => {
 
   bench('createBandScale (50 categories)', () => {
     const domain = Array.from({ length: 50 }, (_, i) => `cat-${i}`)
-    createBandScale(domain, [0, 800], { padding: 0.2 })
+    createBandScale(domain, [0, 800], { paddingInner: 0.2 })
   })
 
   bench('createLinearScale + map 1000 values', () => {
@@ -262,17 +262,6 @@ describe('TreeMap Layout', () => {
   bench('computeTreeMapNodes (2000 leaves, 3-level)', () => {
     computeTreeMapNodes(large, { width: 1200, height: 900 })
   })
-
-  bench('computeTreeMapNodes (2000 leaves, memo hit)', () => {
-    // Same reference → should return cached result
-    computeTreeMapNodes(large, { width: 1200, height: 900 })
-  })
-
-  bench('computeTreeMapNodes (2000 leaves, new allocation)', () => {
-    // Fresh data each iteration to bypass memo
-    const fresh = generateTreeMapData(2000, 3)
-    computeTreeMapNodes(fresh, { width: 1200, height: 900 })
-  })
 })
 
 describe('Sunburst Layout', () => {
@@ -280,25 +269,16 @@ describe('Sunburst Layout', () => {
   const medium = generateSunburstData(200, 3)
   const large = generateSunburstData(1000, 4)
 
-  bench('computeSunburstArcs (30 nodes, 2-level)', () => {
+  bench('computeSunburstArcs (30 leaves, 2-level)', () => {
     computeSunburstArcs(small, { cx: 200, cy: 200, innerRadius: 40, outerRadius: 180 })
   })
 
-  bench('computeSunburstArcs (200 nodes, 3-level)', () => {
+  bench('computeSunburstArcs (200 leaves, 3-level)', () => {
     computeSunburstArcs(medium, { cx: 300, cy: 300, innerRadius: 50, outerRadius: 250 })
   })
 
-  bench('computeSunburstArcs (1000 nodes, 4-level)', () => {
+  bench('computeSunburstArcs (1000 leaves, 4-level)', () => {
     computeSunburstArcs(large, { cx: 400, cy: 400, innerRadius: 60, outerRadius: 350 })
-  })
-
-  bench('computeSunburstArcs (1000 nodes, memo hit)', () => {
-    computeSunburstArcs(large, { cx: 400, cy: 400, innerRadius: 60, outerRadius: 350 })
-  })
-
-  bench('computeSunburstArcs (1000 nodes, new allocation)', () => {
-    const fresh = generateSunburstData(1000, 4)
-    computeSunburstArcs(fresh, { cx: 400, cy: 400, innerRadius: 60, outerRadius: 350 })
   })
 })
 

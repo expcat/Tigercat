@@ -72,10 +72,10 @@ const testAliases = {
 // - cli.spec.ts calls `process.chdir()`, which worker threads do not support.
 // - The imperative-API specs mount process-global Message/Notification
 //   containers and drive real timers, so they are sensitive to the event-loop
-//   contention a shared worker thread brings. Measured 2026-07-26: under
-//   `threads` the React root-entry mount blew its 1s `waitFor` in ~1 of 5
-//   `pnpm test:core` runs. Isolating the process fixes the cause instead of
-//   widening the timeout.
+//   contention a shared worker thread brings.
+// - imperative-side-effects.spec.ts must also explicitly await the root
+//   entry's lazy imports inside async `act`; fork isolation alone did not
+//   eliminate its mount timeout.
 const FORK_ONLY_SPECS = [
   'tests/core/cli.spec.ts',
   'tests/core/imperative-side-effects.spec.ts',

@@ -29,9 +29,9 @@ async function flushMicrotasks() {
 }
 
 async function actImperativeReact(callback: () => void) {
-  act(callback)
   await act(async () => {
-    await flushMicrotasks()
+    callback()
+    await vi.dynamicImportSettled()
   })
 }
 
