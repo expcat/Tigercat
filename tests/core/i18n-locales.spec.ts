@@ -24,6 +24,8 @@ import {
   getWorkflowDesignerLabels,
   getWorkflowTimelineLabels,
   getTimePickerLabels,
+  getUploadLabels,
+  interpolateUploadLabel,
   getLocaleDirection,
   isRtlLocale,
   mergeTigerLocale,
@@ -133,6 +135,33 @@ describe('i18n locale presets', () => {
     expect(getTimePickerLabels(esES).selectTime).toBe('Seleccionar hora')
     expect(getTimePickerLabels(zhTW).selectTime).toBe('請選擇時間')
     expect(getTimePickerLabels('es-ES').selectTime).toBe('Select time')
+  })
+
+  it('getUploadLabels fills missing labels from English before locale and overrides', () => {
+    const defaults = getUploadLabels()
+    expect(defaults).toEqual(enUS.upload)
+    expect(interpolateUploadLabel(defaults.previewFileAriaLabel, { fileName: 'demo.png' })).toBe(
+      'Preview demo.png'
+    )
+    expect(getUploadLabels({ upload: { selectFileText: 'Choose' } })).toEqual({
+      ...defaults,
+      selectFileText: 'Choose'
+    })
+    expect(
+      getUploadLabels(
+        { upload: { selectFileText: 'Choose', queuedStatusText: 'Waiting' } },
+        {
+          selectFileText: undefined,
+          queuedStatusText: 'Pending',
+          retryFileAriaLabel: 'Again {fileName}'
+        }
+      )
+    ).toEqual({
+      ...defaults,
+      selectFileText: 'Choose',
+      queuedStatusText: 'Pending',
+      retryFileAriaLabel: 'Again {fileName}'
+    })
   })
 
   it('enUS common.okText is "OK"', () => {

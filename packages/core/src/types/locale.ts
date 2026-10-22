@@ -462,9 +462,16 @@ export interface TigerLocaleUpload {
   errorAriaLabel?: string
   uploadingAriaLabel?: string
 
+  /** Visible queued status */
+  queuedStatusText?: string
+
   /** Templates: support {fileName} */
   removeFileAriaLabel?: string
   previewFileAriaLabel?: string
+  retryFileAriaLabel?: string
+
+  /** Notice when a single-file upload keeps only the first file */
+  singleFileText?: string
 }
 
 export interface TigerLocalePagination {

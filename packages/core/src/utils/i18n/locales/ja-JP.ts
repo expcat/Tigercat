@@ -270,7 +270,10 @@ export const jaJP: TigerLocale = {
     errorAriaLabel: 'エラー',
     uploadingAriaLabel: 'アップロード中',
     removeFileAriaLabel: '{fileName} を削除',
-    previewFileAriaLabel: '{fileName} をプレビュー'
+    previewFileAriaLabel: '{fileName} をプレビュー',
+    queuedStatusText: 'アップロード待ち',
+    retryFileAriaLabel: '{fileName} を再試行',
+    singleFileText: '最初のファイルのみ保持しました。'
   },
   pagination: {
     totalText: '全 {total} 件',

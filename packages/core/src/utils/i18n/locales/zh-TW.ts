@@ -270,7 +270,10 @@ export const zhTW: TigerLocale = {
     errorAriaLabel: '錯誤',
     uploadingAriaLabel: '上傳中',
     removeFileAriaLabel: '移除 {fileName}',
-    previewFileAriaLabel: '預覽 {fileName}'
+    previewFileAriaLabel: '預覽 {fileName}',
+    queuedStatusText: '排隊中',
+    retryFileAriaLabel: '重試 {fileName}',
+    singleFileText: '僅保留第一個檔案。'
   },
   pagination: {
     totalText: '共 {total} 筆',

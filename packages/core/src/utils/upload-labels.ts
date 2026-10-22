@@ -1,5 +1,6 @@
 import type { TigerLocale } from '../types/locale'
 import type { UploadLabels } from '../types/upload'
+import { enUS } from './i18n/locales/en-US'
 import { resolveLocaleSection } from './locale-utils'
 
 export type UploadLabelOverrides = Partial<UploadLabels>
@@ -11,13 +12,9 @@ export function interpolateUploadLabel(template: string, params: Record<string, 
   })
 }
 
-export const uploadQueuedStatusText = 'Queued'
-export const uploadRetryFileAriaLabel = 'Retry {fileName}'
-export const uploadSingleFileText = 'Only the first file was kept.'
-
 export function getUploadLabels(
   locale?: Partial<TigerLocale>,
   overrides?: UploadLabelOverrides
 ): UploadLabels {
-  return resolveLocaleSection((locale?.upload ?? {}) as UploadLabels, undefined, overrides)
+  return resolveLocaleSection(enUS.upload as UploadLabels, locale?.upload, overrides)
 }

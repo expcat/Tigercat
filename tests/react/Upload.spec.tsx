@@ -12,6 +12,7 @@ import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import type { UploadFile } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { expectNoA11yViolations } from '../utils/react'
 
 async function dispatchUploadEvent(action: () => Promise<boolean>): Promise<void> {
@@ -167,6 +168,48 @@ describe('Upload', () => {
       expect(container).toHaveTextContent('或拖拽到此处')
       expect(container).toHaveTextContent('支持：image/*')
     })
+  })
+
+  it('updates queue, retry and an existing single-file notice with locale and labels', async () => {
+    const files: UploadFile[] = [
+      { uid: 'queued', name: 'queued.txt', status: 'queued' },
+      { uid: 'failed', name: 'failed.txt', status: 'error' }
+    ]
+    const { container, getByRole, getByText, rerender } = render(
+      <Upload drag autoUpload={false} fileList={files} locale={zhCN} />
+    )
+    expect(getByText('排队中')).toBeInTheDocument()
+    expect(getByRole('button', { name: '重试 failed.txt' })).toBeInTheDocument()
+
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement
+    await dispatchUploadEvent(() =>
+      fireEvent.change(input, {
+        target: { files: [new File(['a'], 'first.txt'), new File(['b'], 'second.txt')] }
+      })
+    )
+    expect(getByText('仅保留了第一个文件。')).toBeInTheDocument()
+
+    rerender(<Upload drag autoUpload={false} fileList={files} locale={enUS} />)
+    expect(getByText('Queued')).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Retry failed.txt' })).toBeInTheDocument()
+    expect(getByText('Only the first file was kept.')).toBeInTheDocument()
+
+    rerender(
+      <Upload
+        drag
+        autoUpload={false}
+        fileList={files}
+        locale={enUS}
+        labels={{
+          queuedStatusText: '待处理',
+          retryFileAriaLabel: '再次上传 {fileName}',
+          singleFileText: '只保留首项'
+        }}
+      />
+    )
+    expect(getByText('待处理')).toBeInTheDocument()
+    expect(getByRole('button', { name: '再次上传 failed.txt' })).toBeInTheDocument()
+    expect(getByText('只保留首项')).toBeInTheDocument()
   })
 
   describe('Props', () => {

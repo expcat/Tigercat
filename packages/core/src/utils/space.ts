@@ -103,9 +103,6 @@ export function getSpaceGapStyle(
   const style: Record<string, string> = {}
   if (horizontal !== undefined) style.columnGap = `${horizontal}px`
   if (vertical !== undefined) style.rowGap = `${vertical}px`
-  else if (horizontal !== undefined && typeof size === 'number') {
-    style.columnGap = `${horizontal}px`
-  }
   return style
 }
 

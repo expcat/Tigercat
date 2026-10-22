@@ -30,9 +30,6 @@ import {
   mergeTigerLocale,
   readUploadDropFiles,
   runShakeAnimation,
-  uploadQueuedStatusText,
-  uploadRetryFileAriaLabel,
-  uploadSingleFileText,
   uploadSubmitValues,
   uploadFileInputClasses,
   uploadIconActionClasses,
@@ -197,7 +194,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   const seededRef = useRef(false)
   const [isDragging, setIsDragging] = useState(false)
   const [previewSrc, setPreviewSrc] = useState<string | null>(null)
-  const [singleFileNote, setSingleFileNote] = useState('')
+  const [showSingleFileNote, setShowSingleFileNote] = useState(false)
 
   const [fileList, setFileList] = useControlledState<UploadFile[], [UploadFile?]>({
     value: resolveFormItemSeed(
@@ -302,9 +299,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
         onExceed: (files, list) => callbacksRef.current.onExceed?.(files, list),
         onReject: (files) => {
           callbacksRef.current.onReject?.(files)
-          setSingleFileNote(
-            files.some((item) => item.reason === 'single') ? uploadSingleFileText : ''
-          )
+          setShowSingleFileNote(files.some((item) => item.reason === 'single'))
         },
         onQueueChange: (queueItems) => callbacksRef.current.onQueueChange?.(queueItems),
         onChunkProgress: (chunk, progress, file) =>
@@ -541,7 +536,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
             disabled={!canMutate}
             tabIndex={effectiveDisabled ? -1 : 0}
             onClick={() => handleRetry(file)}
-            aria-label={interpolateUploadLabel(uploadRetryFileAriaLabel, { fileName: file.name })}>
+            aria-label={interpolateUploadLabel(labels.retryFileAriaLabel, { fileName: file.name })}>
             <Icon name="refresh" className={picture ? 'w-6 h-6' : 'w-5 h-5'} aria-hidden />
           </button>
         ) : null}
@@ -590,7 +585,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
             ) : null}
             {file.status === 'queued' ? (
               <p className="text-xs text-[var(--tiger-text-secondary)]" role="status">
-                {uploadQueuedStatusText}
+                {labels.queuedStatusText}
               </p>
             ) : null}
             {renderProgress(file, errorId)}
@@ -687,9 +682,9 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
           />
         )
       ) : null}
-      {singleFileNote ? (
+      {showSingleFileNote ? (
         <p role="status" aria-live="polite">
-          {singleFileNote}
+          {labels.singleFileText}
         </p>
       ) : null}
       {renderTrigger()}

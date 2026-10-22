@@ -270,7 +270,10 @@ export const frFR: TigerLocale = {
     errorAriaLabel: 'Erreur',
     uploadingAriaLabel: 'Téléversement',
     removeFileAriaLabel: 'Supprimer {fileName}',
-    previewFileAriaLabel: 'Prévisualiser {fileName}'
+    previewFileAriaLabel: 'Prévisualiser {fileName}',
+    queuedStatusText: 'En attente',
+    retryFileAriaLabel: 'Réessayer {fileName}',
+    singleFileText: 'Seul le premier fichier a été conservé.'
   },
   pagination: {
     totalText: 'Total {total} éléments',

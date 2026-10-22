@@ -270,7 +270,10 @@ export const arSA: TigerLocale = {
     errorAriaLabel: 'خطأ',
     uploadingAriaLabel: 'جار الرفع',
     removeFileAriaLabel: 'إزالة {fileName}',
-    previewFileAriaLabel: 'معاينة {fileName}'
+    previewFileAriaLabel: 'معاينة {fileName}',
+    queuedStatusText: 'في قائمة الانتظار',
+    retryFileAriaLabel: 'إعادة محاولة {fileName}',
+    singleFileText: 'تم الاحتفاظ بالملف الأول فقط.'
   },
   pagination: {
     totalText: 'الإجمالي {total} عنصرًا',

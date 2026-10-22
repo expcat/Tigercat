@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **共享工具（Core / Vue / React）**：`getUploadLabels` 恢复 en-US 缺键回退；Upload 的排队、重试与单文件提示统一走 locale / labels，补齐 13 个语言包，已显示提示随语言切换更新，三个英文常量删除并提供迁移说明。Markdown 预览支持单列表格及其对齐标记，仍将无管道符的 `---` 识别为横线；Space 删除重复列间距赋值，输出保持不变。
 - **文档类型来源与配置清理**：仅由真实公开组件继承触发框架 runtime props 替换，Select 文档恢复 Core `SelectProps` 来源及 `value` 紧凑行，完整解析仍合并框架自有字段；删除已下线组件的 props 优先级、无入口的 TableToolbar 说明与片段，以及未使用的 mixin 收集器。
 - **发布检查与 API 基线**：临时 Vue/React Vite 配置移除仓库组件 facts 的导入与顶层求值，四种 tarball 消费示例可独立构建；API 基线只递归星号再导出，具名再导出只记录外部名，清除误收录的内部符号，产品 API 不变。
 - **CLI 公开组件清单**：`exports:sync` 从公开组件事实生成随包记录，`exports:check` 检查完整内容；补齐 AppShell、AssigneePicker、NotificationBell、CopyButton、Gallery、Inplace、SankeyChart 与 WaterfallChart，供 `add`、`generate` 与交互列表使用。

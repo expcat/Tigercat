@@ -271,7 +271,10 @@ export const esES: TigerLocale = {
     errorAriaLabel: 'Fallido',
     uploadingAriaLabel: 'Subiendo',
     removeFileAriaLabel: 'Eliminar {fileName}',
-    previewFileAriaLabel: 'Vista previa de {fileName}'
+    previewFileAriaLabel: 'Vista previa de {fileName}',
+    queuedStatusText: 'En cola',
+    retryFileAriaLabel: 'Reintentar {fileName}',
+    singleFileText: 'Solo se conservó el primer archivo.'
   },
   pagination: {
     totalText: 'Total {total} elementos',

@@ -269,7 +269,10 @@ export const zhCN: TigerLocale = {
     errorAriaLabel: '错误',
     uploadingAriaLabel: '上传中',
     removeFileAriaLabel: '移除 {fileName}',
-    previewFileAriaLabel: '预览 {fileName}'
+    previewFileAriaLabel: '预览 {fileName}',
+    queuedStatusText: '排队中',
+    retryFileAriaLabel: '重试 {fileName}',
+    singleFileText: '仅保留了第一个文件。'
   },
   pagination: {
     totalText: '共 {total} 条',

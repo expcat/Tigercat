@@ -264,7 +264,11 @@ function renderTable(lines: string[], startIndex: number): { html: string; next:
   if (startIndex + 1 >= lines.length) return null
   const header = lines[startIndex]
   const divider = lines[startIndex + 1]
-  if (!header.includes('|') || !/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(divider)) {
+  if (
+    !header.includes('|') ||
+    !divider.includes('|') ||
+    !/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$/.test(divider)
+  ) {
     return null
   }
 

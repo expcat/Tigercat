@@ -33,9 +33,6 @@ import {
   createUploadPreviewUrlCache,
   filterUploadPreviewUrl,
   runShakeAnimation,
-  uploadQueuedStatusText,
-  uploadRetryFileAriaLabel,
-  uploadSingleFileText,
   uploadSubmitValues,
   uploadFileInputClasses,
   uploadIconActionClasses,
@@ -164,7 +161,7 @@ export const Upload = defineComponent({
     const rootRef = ref<HTMLElement | null>(null)
     const isDragging = ref(false)
     const previewSrc = ref<string | null>(null)
-    const singleFileNote = ref('')
+    const showSingleFileNote = ref(false)
     const seeded = ref(false)
     const previewUrls = createUploadPreviewUrlCache()
 
@@ -284,9 +281,7 @@ export const Upload = defineComponent({
         onExceed: (files, list) => emit('exceed', files, list),
         onReject: (files) => {
           emit('reject', files)
-          singleFileNote.value = files.some((item) => item.reason === 'single')
-            ? uploadSingleFileText
-            : ''
+          showSingleFileNote.value = files.some((item) => item.reason === 'single')
         },
         onQueueChange: (queue) => emit('queue-change', queue),
         onChunkProgress: (chunk, progress, file) => emit('chunk-progress', chunk, progress, file)
@@ -381,7 +376,7 @@ export const Upload = defineComponent({
         ? h(
             'p',
             { class: 'text-xs text-[var(--tiger-text-secondary)]', role: 'status' },
-            uploadQueuedStatusText
+            labels.value.queuedStatusText
           )
         : null,
       file.status === 'uploading'
@@ -448,7 +443,7 @@ export const Upload = defineComponent({
                 disabled: !canMutate.value,
                 tabindex: effectiveDisabled.value ? -1 : 0,
                 onClick: () => handleRetry(file),
-                'aria-label': interpolateUploadLabel(uploadRetryFileAriaLabel, {
+                'aria-label': interpolateUploadLabel(labels.value.retryFileAriaLabel, {
                   fileName: file.name
                 })
               },
@@ -745,8 +740,8 @@ export const Upload = defineComponent({
                   disabled: effectiveDisabled.value || undefined
                 })
             : null,
-          singleFileNote.value
-            ? h('p', { role: 'status', 'aria-live': 'polite' }, singleFileNote.value)
+          showSingleFileNote.value
+            ? h('p', { role: 'status', 'aria-live': 'polite' }, labels.value.singleFileText)
             : null,
           trigger,
           list,

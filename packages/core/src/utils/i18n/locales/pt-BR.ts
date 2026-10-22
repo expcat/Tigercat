@@ -270,7 +270,10 @@ export const ptBR: TigerLocale = {
     errorAriaLabel: 'Erro',
     uploadingAriaLabel: 'Enviando',
     removeFileAriaLabel: 'Remover {fileName}',
-    previewFileAriaLabel: 'Visualizar {fileName}'
+    previewFileAriaLabel: 'Visualizar {fileName}',
+    queuedStatusText: 'Na fila',
+    retryFileAriaLabel: 'Tentar novamente {fileName}',
+    singleFileText: 'Apenas o primeiro arquivo foi mantido.'
   },
   pagination: {
     totalText: 'Total de {total} itens',

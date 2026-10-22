@@ -270,7 +270,10 @@ export const thTH: TigerLocale = {
     errorAriaLabel: 'ข้อผิดพลาด',
     uploadingAriaLabel: 'กำลังอัปโหลด',
     removeFileAriaLabel: 'ลบ {fileName}',
-    previewFileAriaLabel: 'ดูตัวอย่าง {fileName}'
+    previewFileAriaLabel: 'ดูตัวอย่าง {fileName}',
+    queuedStatusText: 'อยู่ในคิว',
+    retryFileAriaLabel: 'ลอง {fileName} อีกครั้ง',
+    singleFileText: 'เก็บเฉพาะไฟล์แรกไว้เท่านั้น'
   },
   pagination: {
     totalText: 'ทั้งหมด {total} รายการ',

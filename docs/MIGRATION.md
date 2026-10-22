@@ -2,7 +2,9 @@
 
 ## 未发布（v3.0.0-rc.1 之后）
 
-公开组件 API 只有新增：`iconRegistry` 配置此前已在 Core 类型与 React Props 上公开，本轮 Vue ConfigProvider 补齐同名 runtime prop（应用自建的图标注册表，优先于父级注册表），两端 Icon 实际消费；Vue `VueIconProps.name` 与运行时对齐为 `IconName | (string & {})`。无破坏性 API 变化。
+Core 删除 `uploadQueuedStatusText`、`uploadRetryFileAriaLabel`、`uploadSingleFileText` 三个英文常量，改用 `getUploadLabels(locale, overrides)` 返回的 `queuedStatusText`、`retryFileAriaLabel`、`singleFileText`。直接构造完整 `UploadLabels` 对象时需补齐这三个字段；`locale.upload` 与 Upload 的 `labels` prop 仍接受部分对象。`getUploadLabels()` 及部分 locale 的缺键现在回退 en-US，组件已经显示的单文件提示也会随 locale / labels 更新。
+
+ConfigProvider / Icon：`iconRegistry` 配置此前已在 Core 类型与 React Props 上公开，本轮 Vue ConfigProvider 补齐同名 runtime prop（应用自建的图标注册表，优先于父级注册表），两端 Icon 实际消费；Vue `VueIconProps.name` 与运行时对齐为 `IconName | (string & {})`。此次补齐不改变既有调用。
 
 包内容变化：`@expcat/tigercat-core` 不再附带 `tokens/tokens.dtcg.json`、`tokens/tokens.emitted.css` 和 `tokens/figma.tokens.json`。这三个文件从未列入包 `exports`，但随 tarball 分发；直接按路径引用它们的用法请改用 token 事实源 `tokens.json`、CSS 变量产物 `./tokens.css`（`tokens/tokens.css`）和 Figma 变量产物 `./figma-variables.json`（`tokens/figma-variables.json`）。
 

@@ -270,7 +270,10 @@ export const viVN: TigerLocale = {
     errorAriaLabel: 'Lỗi',
     uploadingAriaLabel: 'Đang tải lên',
     removeFileAriaLabel: 'Xóa {fileName}',
-    previewFileAriaLabel: 'Xem trước {fileName}'
+    previewFileAriaLabel: 'Xem trước {fileName}',
+    queuedStatusText: 'Đang chờ',
+    retryFileAriaLabel: 'Thử lại {fileName}',
+    singleFileText: 'Chỉ giữ lại tệp đầu tiên.'
   },
   pagination: {
     totalText: 'Tổng {total} mục',

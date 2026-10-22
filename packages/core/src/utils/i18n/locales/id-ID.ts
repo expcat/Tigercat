@@ -270,7 +270,10 @@ export const idID: TigerLocale = {
     errorAriaLabel: 'Galat',
     uploadingAriaLabel: 'Mengunggah',
     removeFileAriaLabel: 'Hapus {fileName}',
-    previewFileAriaLabel: 'Pratinjau {fileName}'
+    previewFileAriaLabel: 'Pratinjau {fileName}',
+    queuedStatusText: 'Dalam antrean',
+    retryFileAriaLabel: 'Coba lagi {fileName}',
+    singleFileText: 'Hanya berkas pertama yang disimpan.'
   },
   pagination: {
     totalText: 'Total {total} item',

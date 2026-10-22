@@ -151,6 +151,16 @@ describe('MarkdownEditor utilities', () => {
       expect(html).toContain('<td>2</td>')
     })
 
+    it('renders single-column tables while keeping bare horizontal rules', () => {
+      for (const divider of ['---', ':---', '---:', ':---:']) {
+        const html = renderMarkdownToHtml(`| Header |\n| ${divider} |\n| **Row** |`)
+        expect(html).toBe(
+          '<table><thead><tr><th>Header</th></tr></thead><tbody><tr><td><strong>Row</strong></td></tr></tbody></table>'
+        )
+      }
+      expect(renderMarkdownToHtml('foo | bar\n---')).toBe('<p>foo | bar</p>\n<hr>')
+    })
+
     it('sanitizes custom renderer output', () => {
       const html = renderMarkdownToHtml('x', {
         render: () => '<p onclick="alert(1)">x</p><script>alert(1)</script>'

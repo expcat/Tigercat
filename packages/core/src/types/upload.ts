@@ -328,8 +328,11 @@ export interface UploadLabels {
   successAriaLabel: string
   errorAriaLabel: string
   uploadingAriaLabel: string
+  queuedStatusText: string
   removeFileAriaLabel: string
   previewFileAriaLabel: string
+  retryFileAriaLabel: string
+  singleFileText: string
 }
 
 /**

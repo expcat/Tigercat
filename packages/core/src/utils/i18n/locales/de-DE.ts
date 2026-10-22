@@ -271,7 +271,10 @@ export const deDE: TigerLocale = {
     errorAriaLabel: 'Fehler',
     uploadingAriaLabel: 'Wird hochgeladen',
     removeFileAriaLabel: '{fileName} entfernen',
-    previewFileAriaLabel: '{fileName} vorschau'
+    previewFileAriaLabel: '{fileName} vorschau',
+    queuedStatusText: 'In Warteschlange',
+    retryFileAriaLabel: '{fileName} erneut versuchen',
+    singleFileText: 'Nur die erste Datei wurde beibehalten.'
   },
   pagination: {
     totalText: 'Gesamt {total} Einträge',

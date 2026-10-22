@@ -270,7 +270,10 @@ export const koKR: TigerLocale = {
     errorAriaLabel: '오류',
     uploadingAriaLabel: '업로드 중',
     removeFileAriaLabel: '{fileName} 제거',
-    previewFileAriaLabel: '{fileName} 미리보기'
+    previewFileAriaLabel: '{fileName} 미리보기',
+    queuedStatusText: '대기 중',
+    retryFileAriaLabel: '{fileName} 다시 시도',
+    singleFileText: '첫 번째 파일만 유지했습니다.'
   },
   pagination: {
     totalText: '총 {total}개',
