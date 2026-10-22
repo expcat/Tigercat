@@ -11,13 +11,15 @@ description: Compact generated Tigercat Form props reference
 
 ## Select
 
-`packages/vue/src/components/Select.ts` · `VueSelectProps` · 4/33 props
+`packages/core/src/types/select.ts` · `SelectProps` · 4/37 props
 
 Note: 单选未选是 `null`（`undefined` 表示非受控），多选未选是 `[]`。`''` 是合法选项值。Clear 发出 `null` 或 `[]`。创建项留在列表里，直到 `options` 接过去；完全相同才不算新建。小屏列表仍锚在触发器上。搜索防抖读最新回调。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）。列、返回和展开文案不在 Select 语言包。
 
-| Prop            | Type               | Default | Notes                                      |
-| --------------- | ------------------ | ------- | ------------------------------------------ |
-| `options?`      | `SelectOptions`    | `[]`    | Options list (can be flat list or grouped) |
-| `defaultValue?` | `SelectModelValue` | `-`     | -                                          |
-| `multiple?`     | `boolean`          | `false` | Whether to allow multiple selection        |
-| `searchable?`   | `boolean`          | `false` | Whether to allow search/filter             |
+| Prop            | Type               | Default | Notes                                                                                 |
+| --------------- | ------------------ | ------- | ------------------------------------------------------------------------------------- |
+| `options?`      | `SelectOptions`    | `-`     | Options list (can be flat list or grouped)                                            |
+| `value?`        | `SelectModelValue` | `-`     | Selected value(s). `undefined` is empty / uncontrolled; `''` is a legal option value. |
+| `defaultValue?` | `SelectModelValue` | `-`     | Initial value when `value` is omitted.                                                |
+| `multiple?`     | `boolean`          | `false` | Whether to allow multiple selection                                                   |
+
+Events/callback props: `onOpenChange?`.

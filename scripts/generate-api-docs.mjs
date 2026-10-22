@@ -551,11 +551,6 @@ const COMPONENT_USAGE_NOTES = {
     notes:
       "分页默认关（与 Table 默认开、`pageSize` 10 相反）。传入 `pagination` 才渲染 Pagination：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`（与 Table `pagination.remote`、工具栏 `toolbar.searchMode: 'remote'` 是三套独立开关）：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。虚拟窗高是 `virtualHeight`，不是 TreeSelect overlay `height` / Select `listHeight`。"
   },
-  TableToolbar: {
-    uses: ['Input', 'Select', 'Button', 'Popover', 'Checkbox'],
-    notes:
-      '这是 `DataTableWithToolbar` 的 toolbar 配置接口，框架实现中不作为独立组件导出。`filters` 默认渲染 Select；需要 Input、DatePicker、年龄段等复合控件时用 `filters[].render(context)`，或在尾部注入 Vue `#filters-extra` / React `toolbar.filtersExtra`。`showColumnSettings` 开启列设置面板（Popover + Checkbox），可用 `columnSettings.lockedColumnKeys` 或列级 `hideable: false` 锁定不可隐藏的列——这是「可见性锁定」，与 Table 的 `columnLockable` / `column.fixed`（横向滚动钉列的「位置锁定」）是两个不同概念。'
-  },
   DataTableWithToolbar: {
     uses: ['Table', 'Input', 'Select', 'Button', 'Popover', 'Checkbox'],
     notes:
@@ -717,8 +712,6 @@ const COMPONENT_SNIPPETS = {
     CommentThread: '<CommentThread :nodes="nodes" @reply="onReply" />',
     NotificationCenter: '<NotificationCenter :items="items" />',
     DataExport: '<DataExport :columns="columns" :data-source="rows" file-name="users" />',
-    TableToolbar:
-      '<DataTableWithToolbar :columns="columns" :data-source="rows" :toolbar="toolbar" />',
     DataTableWithToolbar:
       '<DataTableWithToolbar :columns="cardColumns" :data-source="rows" responsive-mode="card" card-breakpoint="lg" :card-layout="cardLayout" :toolbar="toolbar" />',
     Table: '<Table :columns="columns" :data-source="rows" row-key="id" :pagination="false" />',
@@ -781,7 +774,6 @@ const COMPONENT_SNIPPETS = {
     CommentThread: '<CommentThread nodes={nodes} onReply={onReply} />',
     NotificationCenter: '<NotificationCenter items={items} />',
     DataExport: '<DataExport columns={columns} dataSource={rows} fileName="users" />',
-    TableToolbar: '<DataTableWithToolbar columns={columns} dataSource={rows} toolbar={toolbar} />',
     DataTableWithToolbar:
       '<DataTableWithToolbar columns={cardColumns} dataSource={rows} responsiveMode="card" cardBreakpoint="lg" cardLayout={cardLayout} toolbar={toolbar} />',
     Table: '<Table columns={columns} dataSource={rows} rowKey="id" pagination={false} />',
@@ -1172,7 +1164,7 @@ function mergeMembers(details, kind) {
   return members
 }
 
-function getResolvedComponentRows(entry, interfaceDetails, coreByName) {
+function getResolvedComponentRows(entry, interfaceDetails, coreByName, publicComponentNames) {
   const component = entry.component
   const coreName = entry.propsInterfaces?.[0]
   const vueName = `Vue${component}Props`
@@ -1183,7 +1175,8 @@ function getResolvedComponentRows(entry, interfaceDetails, coreByName) {
   const useFrameworkRuntime = shouldUseFrameworkRuntimeProps(
     coreName,
     coreByName,
-    frameworkRuntime?.heritage
+    frameworkRuntime?.heritage,
+    publicComponentNames
   )
 
   if (useFrameworkRuntime && frameworkRuntime) {
@@ -1231,7 +1224,12 @@ function getPropsExtra(component) {
   return extras.filter(Boolean).join('\n\n')
 }
 
-function generatePublicPropsReference(category, componentEntries, interfaceDetails) {
+function generatePublicPropsReference(
+  category,
+  componentEntries,
+  interfaceDetails,
+  publicComponentNames
+) {
   const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
   const coreByName = coreDetailsByName(interfaceDetails)
   let markdownText = '---\n'
@@ -1252,7 +1250,7 @@ function generatePublicPropsReference(category, componentEntries, interfaceDetai
           eventRows: mergeMembers(getComponentDetails(entry, interfaceDetails), 'event'),
           methodRows: mergeMembers(getComponentDetails(entry, interfaceDetails), 'method')
         }
-      : getResolvedComponentRows(entry, interfaceDetails, coreByName)
+      : getResolvedComponentRows(entry, interfaceDetails, coreByName, publicComponentNames)
     const { details, propRows, eventRows, methodRows } = resolved
     const typeSource = resolved.typeSource || entry.typeSource
     const visiblePropRows = getVisiblePropRows(component, propRows)
@@ -1300,11 +1298,11 @@ function generatePublicPropsReference(category, componentEntries, interfaceDetai
   return markdownText
 }
 
-function getRequiredPropNames(entry, interfaceDetails, coreByName) {
+function getRequiredPropNames(entry, interfaceDetails, coreByName, publicComponentNames) {
   if (!entry) return []
   const propRows = entry.propsRows
     ? entry.propsRows
-    : getResolvedComponentRows(entry, interfaceDetails, coreByName).propRows
+    : getResolvedComponentRows(entry, interfaceDetails, coreByName, publicComponentNames).propRows
   return propRows
     .filter((member) => !String(member.name).endsWith('?'))
     .map((member) => member.name)
@@ -1357,7 +1355,7 @@ function getReactSnippet(component, category, requiredNames) {
   return `<${component} />`
 }
 
-function generateExamples(category, componentEntries, interfaceDetails) {
+function generateExamples(category, componentEntries, interfaceDetails, publicComponentNames) {
   const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
   const coreByName = coreDetailsByName(interfaceDetails)
   const components = componentEntries.map((entry) => entry.component)
@@ -1376,7 +1374,8 @@ function generateExamples(category, componentEntries, interfaceDetails) {
     const requiredNames = getRequiredPropNames(
       entriesByComponent.get(component),
       interfaceDetails,
-      coreByName
+      coreByName,
+      publicComponentNames
     )
     const vue = getVueSnippet(component, category, requiredNames)
     const react = getReactSnippet(component, category, requiredNames)
@@ -1500,7 +1499,7 @@ async function main() {
       [EXAMPLES_DIR, 'examples', 'Examples', generateExamples]
     ]) {
       const embeddedSource = colliding.length
-        ? generateReference(category, colliding, interfaceDetails)
+        ? generateReference(category, colliding, interfaceDetails, publicComponentNames)
         : ''
       const sectionStart = embeddedSource.search(/^## /m)
       const embedded = sectionStart >= 0 ? embeddedSource.slice(sectionStart) : ''
@@ -1528,11 +1527,15 @@ async function main() {
       if (pascalToKebab(entry.component) !== slug) {
         await writeGeneratedFile(
           join(PROPS_DIR, file),
-          await formatMarkdown(generatePublicPropsReference(category, [entry], interfaceDetails))
+          await formatMarkdown(
+            generatePublicPropsReference(category, [entry], interfaceDetails, publicComponentNames)
+          )
         )
         await writeGeneratedFile(
           join(EXAMPLES_DIR, file),
-          await formatMarkdown(generateExamples(category, [entry], interfaceDetails))
+          await formatMarkdown(
+            generateExamples(category, [entry], interfaceDetails, publicComponentNames)
+          )
         )
       }
       entry.docProps = `skills/tigercat/references/shared/props/${file}`

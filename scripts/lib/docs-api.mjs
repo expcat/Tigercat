@@ -5,7 +5,7 @@
  * the type file's first N members. Full fields stay in `packages/core/src/types`.
  */
 
-import { pascalToKebab } from './public-components.mjs'
+import { pascalToKebab, propsInterfaceToComponentName } from './public-components.mjs'
 
 export const MIN_COMPACT_PROPS = 3
 export const MAX_COMPACT_PROPS = 4
@@ -78,7 +78,6 @@ export const COMPONENT_PROP_PRIORITY = {
     'height?'
   ],
   ImagePreview: ['images', 'open?', 'minScale?', 'maxScale?', 'currentIndex?', 'maskClosable?'],
-  ImageViewer: ['images', 'open?', 'currentIndex?', 'showNav?', 'minZoom?', 'locale?'],
   ImageCompare: [
     'beforeSrc?',
     'afterSrc?',
@@ -320,7 +319,6 @@ export const COMPONENT_PROP_PRIORITY = {
   FloatButtonGroup: ['trigger?', 'open?', 'portal?', 'placement?', 'shape?'],
   Spotlight: ['items?', 'open?', 'hotkey?', 'query?'],
   ScrollSpy: ['items?', 'getContainer?', 'direction?', 'activeKey?'],
-  Notification: ['actions?', 'type?', 'position?', 'duration?', 'closable?', 'closeAriaLabel?'],
   NotificationContainer: ['position?', 'notifications?', 'onClose?'],
   LoadingBar: ['container?', 'ariaLabel?', 'color?', 'height?'],
   LoadingBarContainer: ['percentage?', 'status?', 'height?', 'ariaLabel?'],
@@ -600,16 +598,6 @@ export const COMPONENT_PROP_PRIORITY = {
     'showTooltip?',
     'title?'
   ],
-  DonutChart: [
-    'innerRadiusRatio?',
-    'centerValue?',
-    'centerLabel?',
-    'animated?',
-    'showLabels?',
-    'labelPosition?',
-    'showLegend?',
-    'gradient?'
-  ],
   RadarChart: [
     'data?',
     'series?',
@@ -805,7 +793,6 @@ export const COMPONENT_PROP_PRIORITY = {
     'enforceWipLimit?',
     'locale?'
   ],
-  Kanban: ['swimlanes?', 'swimlaneField?', 'columns?', 'locale?', 'labels?'],
   Gantt: [
     'scale?',
     'rowHeight?',
@@ -856,29 +843,25 @@ export function uniqueMembers(lists) {
   return members
 }
 
-export function collectMixinInterfaceNames(detailsByName) {
-  const mixins = new Set()
-
-  for (const detail of detailsByName.values()) {
-    for (const parent of detail.heritage || []) {
-      if (detailsByName.has(parent)) mixins.add(parent)
-    }
-  }
-
-  return mixins
-}
-
 export function isDistinctRuntimeProps(frameworkHeritage, coreName) {
   return !(frameworkHeritage || []).some(
     (name) => name === coreName || name === `Core${coreName}` || name.endsWith(coreName)
   )
 }
 
-export function shouldUseFrameworkRuntimeProps(coreName, coreByName, frameworkHeritage) {
+export function shouldUseFrameworkRuntimeProps(
+  coreName,
+  coreByName,
+  frameworkHeritage,
+  publicComponentNames
+) {
   if (!coreName || !coreByName.has(coreName)) return false
 
   const usedAsParent = [...coreByName.values()].some(
-    (detail) => detail.name !== coreName && (detail.heritage || []).includes(coreName)
+    (detail) =>
+      detail.name !== coreName &&
+      publicComponentNames.has(propsInterfaceToComponentName(detail.name)) &&
+      (detail.heritage || []).includes(coreName)
   )
 
   return usedAsParent && isDistinctRuntimeProps(frameworkHeritage, coreName)

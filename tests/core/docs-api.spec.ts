@@ -45,8 +45,8 @@ describe('mergeHeritageMembers', () => {
 })
 
 describe('getVisiblePropRows', () => {
-  it('keeps required inherited data and Donut priority hole fields', () => {
-    const visible = getVisiblePropRows('DonutChart', [
+  it('keeps required inherited data and PieChart priority hole fields', () => {
+    const visible = getVisiblePropRows('PieChart', [
       row('innerRadiusRatio?', 'inherited'),
       row('centerValue?', 'inherited'),
       row('centerLabel?', 'inherited'),
@@ -109,7 +109,14 @@ describe('shouldUseFrameworkRuntimeProps', () => {
       ['PieChartProps', { name: 'PieChartProps', heritage: ['ChartLegendProps'] }]
     ])
 
-    expect(shouldUseFrameworkRuntimeProps('ChartLegendProps', coreByName, [])).toBe(true)
+    expect(
+      shouldUseFrameworkRuntimeProps(
+        'ChartLegendProps',
+        coreByName,
+        [],
+        new Set(['ChartLegend', 'PieChart'])
+      )
+    ).toBe(true)
   })
 
   it('does not treat Donut extending Pie as a reason to drop Pie core fields', () => {
@@ -118,7 +125,23 @@ describe('shouldUseFrameworkRuntimeProps', () => {
       ['DonutChartProps', { name: 'DonutChartProps', heritage: ['PieChartProps'] }]
     ])
 
-    expect(shouldUseFrameworkRuntimeProps('PieChartProps', coreByName, ['CorePieChartProps'])).toBe(
+    expect(
+      shouldUseFrameworkRuntimeProps(
+        'PieChartProps',
+        coreByName,
+        ['CorePieChartProps'],
+        new Set(['PieChart', 'DonutChart'])
+      )
+    ).toBe(false)
+  })
+
+  it('does not replace Select core props when only GenericSelectProps inherits them', () => {
+    const coreByName = new Map([
+      ['SelectProps', { name: 'SelectProps', heritage: [] }],
+      ['GenericSelectProps', { name: 'GenericSelectProps', heritage: ['SelectProps'] }]
+    ])
+
+    expect(shouldUseFrameworkRuntimeProps('SelectProps', coreByName, [], new Set(['Select']))).toBe(
       false
     )
   })

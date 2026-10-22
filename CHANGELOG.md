@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **文档类型来源与配置清理**：仅由真实公开组件继承触发框架 runtime props 替换，Select 文档恢复 Core `SelectProps` 来源及 `value` 紧凑行，完整解析仍合并框架自有字段；删除已下线组件的 props 优先级、无入口的 TableToolbar 说明与片段，以及未使用的 mixin 收集器。
 - **发布检查与 API 基线**：临时 Vue/React Vite 配置移除仓库组件 facts 的导入与顶层求值，四种 tarball 消费示例可独立构建；API 基线只递归星号再导出，具名再导出只记录外部名，清除误收录的内部符号，产品 API 不变。
 - **CLI 公开组件清单**：`exports:sync` 从公开组件事实生成随包记录，`exports:check` 检查完整内容；补齐 AppShell、AssigneePicker、NotificationBell、CopyButton、Gallery、Inplace、SankeyChart 与 WaterfallChart，供 `add`、`generate` 与交互列表使用。
 - **MCP 技能源与协议**：统一默认随包快照的入口说明；显式远程镜像在解析或缓存前校验实际正文 SHA-256，Pages 与随包清单只包含 `context7.json` 和 `skills/**`。索引初始化失败后可在同一会话重试，tool 返回结构化错误，resource 读取失败走协议错误；route 嵌套与顶层 source 的 `inlined` 标记按响应中的实际正文保持一致，每份正文仍只输出一次。
