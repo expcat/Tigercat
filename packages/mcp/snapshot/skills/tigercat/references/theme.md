@@ -19,9 +19,9 @@ are present, `data-tiger-color-scheme="light"` wins over a `dark` class.
 ## Runtime API
 
 `ConfigProvider` (`theme` / `colorScheme` / `dir`) is the app entry. The outermost mounted
-provider owns `<html>`: theme, color scheme, `dir`, and `lang`. Nested providers only change
-`useTigerConfig()`. Each root keeps its own scope. An earlier root unmounting does not clear a
-later sibling's `dir`.
+provider owns `<html>`: theme, color scheme, `dir`, and `lang`. Nested providers update
+`useTigerConfig()` and apply an explicit theme to their subtree. Each root keeps its own scope.
+An earlier root unmounting does not clear a later sibling's `dir`.
 
 `lang` on `<html>` is this layer's locale id (`locale.locale`). A locale overlay with no id
 does not replace an existing `lang`.
