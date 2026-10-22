@@ -22,7 +22,7 @@ function onReset() {
     </label>
     <div style="display: flex; gap: 8px; margin-top: 12px">
       <Button type="submit">提交</Button>
-      <Button html-type="reset">重置</Button>
+      <Button type="reset">重置</Button>
     </div>
     <p v-if="submitted">已提交 {{ submitted }}</p>
   </form>

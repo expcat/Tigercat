@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { ImageCropper } from '@expcat/tigercat-react/ImageCropper'
 import type { ImageCropperRef } from '@expcat/tigercat-react/ImageCropper'
@@ -9,12 +9,20 @@ const source = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
 
 export default function App() {
   const cropperRef = useRef<ImageCropperRef>(null)
+  const [blob, setBlob] = useState<Blob | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!blob) return
+    const url = URL.createObjectURL(blob)
+    setPreview(url)
+    return () => URL.revokeObjectURL(url)
+  }, [blob])
 
   const exportJpeg = async () => {
     const result = await cropperRef.current?.getCropResult()
     if (!result) return
-    setPreview(URL.createObjectURL(result.blob))
+    setBlob(result.blob)
   }
 
   return (

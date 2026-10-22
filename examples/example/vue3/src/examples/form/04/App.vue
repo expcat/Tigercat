@@ -32,6 +32,6 @@ const rules: FormRules = {
         <option value="user">用户</option>
       </select>
     </FormItem>
-    <Button html-type="submit" variant="primary">提交</Button>
+    <Button type="submit" variant="primary">提交</Button>
   </Form>
 </template>

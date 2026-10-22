@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **Button / Form 示例（Vue）**：四处重置或提交按钮改用现行 `type` 属性，恢复原生表单重置、提交与校验。
+- **ImageCropper 示例（Vue / React）**：JPEG 导出预览随结果替换和示例卸载回收 blob URL，卸载后完成的导出不再创建预览 URL。
 - **Modal / FormWizard（Core / Vue / React）**：取消或销毁命令式 Modal 时正常拒绝调用方 Promise，删除重复写入完成状态的私有路径；FormWizard 离开确认使用当前合并语言，动态切换 provider 或组件 locale 后仍正确显示，选择留在当前步骤会返回 `false`。
 - **Example**：Vue DemoBlock 在模块内共享现有编译器 client，避免页面切换后遗留实例 Worker，保留并发编译、定期轮换和 OOM 恢复；双端 ConfigProvider 说明与主题文档统一为内层 theme 作用于子树、`document=false` 仅提供 context。Vue 受控状态示例片段与实际 Counter 保持一致，不再用 `??` 吞掉合法空值。
 - **共享工具（Core / Vue / React）**：`getUploadLabels` 恢复 en-US 缺键回退；Upload 的排队、重试与单文件提示统一走 locale / labels，补齐 13 个语言包，已显示提示随语言切换更新，三个英文常量删除并提供迁移说明。Markdown 预览支持单列表格及其对齐标记，仍将无管道符的 `---` 识别为横线；Space 删除重复列间距赋值，输出保持不变。

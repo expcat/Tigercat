@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Button } from '@expcat/tigercat-vue/Button'
 import { ImageCropper } from '@expcat/tigercat-vue/ImageCropper'
 import type { ImageCropperRef } from '@expcat/tigercat-vue/ImageCropper'
@@ -9,12 +9,21 @@ const source = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
 )}`
 
 const cropper = ref<ImageCropperRef | null>(null)
+const blob = ref<Blob | null>(null)
 const preview = ref<string | null>(null)
+
+watch(blob, (value, _previous, onCleanup) => {
+  const url = value ? URL.createObjectURL(value) : null
+  preview.value = url
+  onCleanup(() => {
+    if (url) URL.revokeObjectURL(url)
+  })
+})
 
 const exportJpeg = async () => {
   const result = await cropper.value?.getCropResult()
   if (!result) return
-  preview.value = URL.createObjectURL(result.blob)
+  blob.value = result.blob
 }
 </script>
 

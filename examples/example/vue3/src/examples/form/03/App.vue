@@ -29,6 +29,6 @@ const rules: FormRules = {
     <FormItem name="username" label="用户名">
       <Input placeholder="输入 admin 观察异步错误" />
     </FormItem>
-    <Button html-type="submit" variant="primary">异步校验</Button>
+    <Button type="submit" variant="primary">异步校验</Button>
   </Form>
 </template>

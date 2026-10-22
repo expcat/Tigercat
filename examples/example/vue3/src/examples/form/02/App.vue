@@ -24,6 +24,6 @@ const rules: FormRules = {
     <FormItem name="email" label="邮箱">
       <Input placeholder="name@example.com" />
     </FormItem>
-    <Button html-type="submit" variant="primary">校验并提交</Button>
+    <Button type="submit" variant="primary">校验并提交</Button>
   </Form>
 </template>
