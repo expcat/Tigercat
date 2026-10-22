@@ -53,10 +53,8 @@ function resolveTsSpecifier(fromFile, specifier) {
 function relativeSpecifiers(content) {
   const specs = []
   const star = /export\s+\*\s+from\s+['"](\.[^'"]+)['"]/g
-  const named = /export\s+(?:type\s+)?\{[^}]*\}\s+from\s+['"](\.[^'"]+)['"]/g
   let match
   while ((match = star.exec(content)) !== null) specs.push(match[1])
-  while ((match = named.exec(content)) !== null) specs.push(match[1])
   return specs
 }
 

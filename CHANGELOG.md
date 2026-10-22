@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- **发布检查与 API 基线**：临时 Vue/React Vite 配置移除仓库组件 facts 的导入与顶层求值，四种 tarball 消费示例可独立构建；API 基线只递归星号再导出，具名再导出只记录外部名，清除误收录的内部符号，产品 API 不变。
+- **CLI 公开组件清单**：`exports:sync` 从公开组件事实生成随包记录，`exports:check` 检查完整内容；补齐 AppShell、AssigneePicker、NotificationBell、CopyButton、Gallery、Inplace、SankeyChart 与 WaterfallChart，供 `add`、`generate` 与交互列表使用。
 - **MCP 技能源与协议**：统一默认随包快照的入口说明；显式远程镜像在解析或缓存前校验实际正文 SHA-256，Pages 与随包清单只包含 `context7.json` 和 `skills/**`。索引初始化失败后可在同一会话重试，tool 返回结构化错误，resource 读取失败走协议错误；route 嵌套与顶层 source 的 `inlined` 标记按响应中的实际正文保持一致，每份正文仍只输出一次。
 - **CLI 模板与文档**：生成的 `src/style.css` 通过 `@source` 注册已安装的 `@expcat/tigercat-{vue,react}` 与 `@expcat/tigercat-core` dist，修复 Tailwind v4 不自动扫描 `node_modules` 导致组件 utility 样式缺失的问题；Vue/React 模板共用同一份 CSS 构建函数。根 README 手动安装片段补齐同一 `@source` 契约，并说明相对路径以 `src/style.css` 为准。`playground` 不重写已存在目录的 `src/style.css`，旧 playground 按根 README 在保留自定义 CSS 的情况下补注册即可。
 - **CLI 根因修复**：`playground` 的 Vite 启动失败现在以非零码退出，不再静默成功；`doctor` 解析 pnpm 默认与命名 catalog，monorepo skill 快照回退限制在 CLI 所属工作区内，安装态快照经 Node 解析定位（覆盖提升的 node_modules）；`add` 复制随包发布的 portable 示例，无独立示例的组件说明跳过并只打印导入行；`migrate` 改为 token 级声明解析，只改写真实 import/export 声明的说明符与具名绑定（保留别名、type-only 与行内注释），字符串、注释与模板字面量内容不再误伤；删除从未真正生成文档的 `generate docs`；模板 tsconfig 移除多余 `baseUrl`，React 模板补 `src/env.d.ts`，示例 Alert 改用 `type` prop；`generate test` 生成可运行的公共子路径导入骨架，不再断言空 props 渲染。

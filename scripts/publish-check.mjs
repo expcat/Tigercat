@@ -348,6 +348,15 @@ function rewriteViteExampleConfig(filePath) {
     .replace(/resolve:\s*\{\s*alias:\s*\[[\s\S]*?\r?\n    \]\r?\n  \},/m, aliasReplacement)
 
   const next = withAlias
+    .replace(
+      /import\s*\{[^}]*\}\s*from\s*['"][^'"]*\/scripts\/lib\/public-components\.mjs['"]\r?\n/,
+      ''
+    )
+    .replace(/^const (?:vue|react)Component(?:sDir|Alias) = .*\r?\n/gm, '')
+    .replace(
+      /^const componentAliases = buildFrameworkPackageSubpathFacts\([\s\S]*?^ {2}\}\)\)\r?\n/m,
+      ''
+    )
     .replace(/chunkSizeWarningLimit:\s*\d+/, 'chunkSizeWarningLimit: 1024')
     .replaceAll(
       "'../shared/playground/vite-runtime-plugin'",
@@ -360,6 +369,13 @@ function rewriteViteExampleConfig(filePath) {
 
   if (withAlias === source) {
     throw new Error(`Could not rewrite Vite aliases in ${filePath}`)
+  }
+  if (
+    /public-components\.mjs|\b(?:buildFrameworkPackageSubpathFacts|loadPublicComponentExports|componentAliases|(?:vue|react)Component(?:sDir|Alias))\b/.test(
+      next
+    )
+  ) {
+    throw new Error(`Could not remove workspace component facts in ${filePath}`)
   }
 
   writeFileSync(filePath, next)

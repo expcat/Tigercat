@@ -34,6 +34,8 @@
 | `pnpm docs:api`                             | `scripts/generate-api-docs.mjs`             | 生成 skills API 摘要                                                                         |
 | `pnpm docs:links`                           | `scripts/check-doc-links.mjs`               | 校验全部 Markdown 的相对链接目标与 `#anchor` 片段（外部 http 链接不发请求）                  |
 | `pnpm api:baseline:check`                   | `scripts/generate-api-baseline.mjs --check` | 只读比较当前源码与保存的公共 API 基线                                                        |
+| `pnpm exports:sync`                         | `scripts/sync-package-exports.mjs`          | 从公开事实同步包 exports 与 CLI 随包清单                                                     |
+| `pnpm exports:check`                        | `scripts/sync-package-exports.mjs --check`  | 只读检查包 exports 与 CLI 随包清单的完整内容漂移                                             |
 | `pnpm docs:api:check`                       | `scripts/generate-api-docs.mjs --check`     | 只读比较生成文档、清单与页面标记，检查缺失、多余或过期产物                                   |
 | `pnpm mcp:build`                            | `packages/mcp`                              | 构建 `@expcat/tigercat-mcp` 本地 stdio MCP 服务                                              |
 | `pnpm mcp:serve`                            | `packages/mcp/dist/index.js`                | 从当前仓库根目录启动 MCP 服务，供 LLM 客户端路由 skill references                            |
@@ -47,6 +49,11 @@
 文档与基线的 `--check` 不写文件，也不依赖 Git 工作区是否有未提交改动。
 `docs:api` 只写内容发生变化的文件并删除过期生成页。Vue/React 入口处理与 MCP
 技能快照同步通过 tsup 的 `onSuccess` 执行，build 与 watch 共用同一流程。
+
+`exports:sync` 生成包 `exports`，以及 CLI 随包的 `required-core-exports.json`、
+`removed-names.json` 和 `public-component-records.json`；这些清单不得手改。
+组件记录由 `loadComponentRecords()` 投影为 `component`、`testGroup`、`packageSubpath`，
+保留事实源的确定性顺序与仓库 Prettier 格式。`exports:check` 比较完整内容。
 
 ```bash
 pnpm example:all

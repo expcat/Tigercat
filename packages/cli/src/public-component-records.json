@@ -90,6 +90,11 @@
     "packageSubpath": "./ConfigProvider"
   },
   {
+    "component": "CopyButton",
+    "testGroup": "basic",
+    "packageSubpath": "./CopyButton"
+  },
+  {
     "component": "CropUpload",
     "testGroup": "basic",
     "packageSubpath": "./CropUpload"
@@ -103,6 +108,11 @@
     "component": "Empty",
     "testGroup": "basic",
     "packageSubpath": "./Empty"
+  },
+  {
+    "component": "Gallery",
+    "testGroup": "basic",
+    "packageSubpath": "./Gallery"
   },
   {
     "component": "Highlight",
@@ -138,6 +148,11 @@
     "component": "ImagePreview",
     "testGroup": "basic",
     "packageSubpath": "./ImagePreview"
+  },
+  {
+    "component": "Inplace",
+    "testGroup": "basic",
+    "packageSubpath": "./Inplace"
   },
   {
     "component": "Kbd",
@@ -280,6 +295,11 @@
     "packageSubpath": "./RadarChart"
   },
   {
+    "component": "SankeyChart",
+    "testGroup": "charts",
+    "packageSubpath": "./SankeyChart"
+  },
+  {
     "component": "ScatterChart",
     "testGroup": "charts",
     "packageSubpath": "./ScatterChart"
@@ -295,9 +315,24 @@
     "packageSubpath": "./TreeMapChart"
   },
   {
+    "component": "WaterfallChart",
+    "testGroup": "charts",
+    "packageSubpath": "./WaterfallChart"
+  },
+  {
     "component": "ActivityFeed",
     "testGroup": "composite",
     "packageSubpath": "./ActivityFeed"
+  },
+  {
+    "component": "AppShell",
+    "testGroup": "composite",
+    "packageSubpath": "./AppShell"
+  },
+  {
+    "component": "AssigneePicker",
+    "testGroup": "composite",
+    "packageSubpath": "./AssigneePicker"
   },
   {
     "component": "ChatWindow",
@@ -318,6 +353,11 @@
     "component": "FormWizard",
     "testGroup": "composite",
     "packageSubpath": "./FormWizard"
+  },
+  {
+    "component": "NotificationBell",
+    "testGroup": "composite",
+    "packageSubpath": "./NotificationBell"
   },
   {
     "component": "NotificationCenter",

@@ -66,12 +66,23 @@ describe('CLI Constants', () => {
     )
   })
 
-  it('should flatten all components correctly', () => {
-    expect(ALL_COMPONENTS.length).toBeGreaterThan(50)
-    expect(ALL_COMPONENTS).toContain('Button')
-    expect(ALL_COMPONENTS).toContain('Input')
-    expect(ALL_COMPONENTS).toContain('Table')
-    expect(ALL_COMPONENTS).toContain('BarChart')
+  it('includes public components in the CLI catalog', () => {
+    expect(ALL_COMPONENTS).toEqual(
+      expect.arrayContaining([
+        'Button',
+        'Input',
+        'Table',
+        'BarChart',
+        'AppShell',
+        'AssigneePicker',
+        'NotificationBell',
+        'CopyButton',
+        'Gallery',
+        'Inplace',
+        'SankeyChart',
+        'WaterfallChart'
+      ])
+    )
   })
 
   it('should not have duplicate components', () => {

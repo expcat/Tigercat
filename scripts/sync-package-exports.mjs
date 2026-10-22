@@ -2,11 +2,13 @@
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import prettier from 'prettier'
 
 import {
   buildCorePackageExports,
   buildFrameworkPackageExports,
   getComponentPackageTarget,
+  loadComponentRecords,
   loadPublicComponentExports,
   REMOVED_IMPORT_SPECIFIERS,
   REMOVED_PUBLIC_NAMES,
@@ -124,6 +126,29 @@ for (const [framework, info] of Object.entries(frameworkPackages)) {
 }
 syncCorePackageExports()
 syncRemovedNames()
+await syncCliComponentRecords()
+
+async function syncCliComponentRecords() {
+  const recordsPath = join(root, 'packages/cli/src/public-component-records.json')
+  const records = loadComponentRecords(root).map(({ component, testGroup, packageSubpath }) => ({
+    component,
+    testGroup,
+    packageSubpath
+  }))
+  const prettierConfig = (await prettier.resolveConfig(recordsPath)) ?? {}
+  const payload = await prettier.format(JSON.stringify(records, null, 2), {
+    ...prettierConfig,
+    parser: 'json'
+  })
+
+  if (checkMode) {
+    if (!existsSync(recordsPath) || readFileSync(recordsPath, 'utf8') !== payload) {
+      addIssue('packages/cli/src/public-component-records.json drifted from public-components.mjs')
+    }
+    return
+  }
+  writeFileSync(recordsPath, payload)
+}
 
 function syncRemovedNames() {
   const namesPath = join(root, 'packages/cli/src/removed-names.json')
