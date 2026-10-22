@@ -119,6 +119,10 @@ e2e 只留真实浏览器才有意义的路径（playground iframe、portal/over
 回归。Vitest 启用 `forbidOnly` 拒绝 `.only`，未收集到测试的 spec 由实际测试运行
 报错。
 
+API 基线、exports 与生成文档分别由对应的 `--check` 负责，生成文档检查纳入
+`quality:static`。不再用历史迁移规则或源码字符串测试重复锁定这些内容；Example
+来源检查只维护元数据、导入范围和页面覆盖，语法、类型与编译由现有工具验证。
+
 Coverage 与全量 size-limit 是按需诊断，不阻塞 `quality:release`。Coverage 阈值仍由
 `vitest.config.ts` 统一维护：lines 85%、statements 83%、functions 84%、branches 76%；
 `pnpm size` 使用现有 `.size-limit.json` 与当前构建产物。真实 tarball 消费、Button
@@ -130,7 +134,7 @@ Coverage 与全量 size-limit 是按需诊断，不阻塞 `quality:release`。Co
 
 | 改动范围                     | 运行                                                                                                                                         |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| 单组件                       | 对应单文件 + `pnpm test:group:<group>`；必要时用 `--framework` / `--filter` 再缩小                                                           |
+| 单组件                       | 对应单文件；跨组件影响时运行 `pnpm test:group:<group>`，用 `--framework` / `--filter` 缩小范围                                               |
 | 跨组共享 helper              | 所有受影响 group 的 `pnpm test:group:<group>`，再补 focused `vitest run` core spec                                                           |
 | 文档或 Example               | `pnpm docs:links`、`pnpm docs:api:check`、`pnpm example:sources:check`、相关 examples 检查与 changed-file Prettier；无需运行无关的完整测试集 |
 | public API、发布面或门禁策略 | `pnpm quality:release`，并按需 `pnpm e2e`                                                                                                    |

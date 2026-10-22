@@ -43,7 +43,6 @@ const props = { Kanban: true }
     const files = getVue3Template('demo', 'shell')
     expect(files['src/App.vue']).toContain('AppShell')
     expect(files['src/routes.ts']).toContain("title: 'Home'")
-    expect(files['src/style.css']).toContain('@plugin "@expcat/tigercat-core/tailwind"')
   })
 
   it('submits detail values and the action together', () => {

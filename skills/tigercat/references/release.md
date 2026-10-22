@@ -14,8 +14,8 @@ stay aligned. Version history belongs in CHANGELOG, not this page.
 1. Prepare both Release Candidate and Stable with `pnpm sync:version <version>` (for example,
    `3.0.0-rc.2` or `3.0.0`). Update CHANGELOG and MIGRATION for that version and remove consumed
    `.changeset/*.md` notes during release preparation.
-2. Metadata: `pnpm release:check` (fixed versions, absence of runtime `version` exports,
-   ESM-only surface, sideEffects, repository metadata, Changesets fixed groups, docs and workflows).
+2. Metadata: `pnpm release:check` (fixed versions, ESM-only surface, sideEffects, repository
+   metadata, Changesets fixed groups, CHANGELOG and MIGRATION version entries).
 3. Complete the relevant focused checks and formatting, then commit the prepared release.
 4. On that same committed HEAD, run `pnpm quality:release` (includes the package build and four
    tarball consumers) and `pnpm e2e` (includes full Vue/React type checks, workspace example
@@ -31,7 +31,7 @@ stay aligned. Version history belongs in CHANGELOG, not this page.
    `release:canary` wrappers.
 6. After publish: `pnpm smoke:published`.
 
-`pnpm quality:release` is the one heavy gate: static/API/type checks, exports/tokens/docs drift,
+`pnpm quality:release` is the one heavy gate: static/API/type/docs checks, exports/tokens drift,
 example sources and all example module compilation, one package build, full behavior tests
 (`pnpm test`, including all fork-only specs), independent axe/ARIA tests (`pnpm test:a11y`),
 and local tarball smoke (ESM entries, Button subpath budgets, tree-shaking, no unused DatePicker
@@ -50,6 +50,7 @@ API specs; the default `pnpm test` already includes them with isolated fork proc
 ## API Freeze
 
 - `pnpm release:check`, `pnpm types:check`, `pnpm api:validate`.
+- Historical migration scans are retired; API/exports/docs drift each have one owning check.
 - Exports: core `.` / `./tailwind` / `./tokens.css` / `./figma-variables.json`
   and locale subpaths; Vue/React root and component subpaths; matching props type exports.
 - Do not rename props, events, slots, children, or subpath imports after freeze unless listed as

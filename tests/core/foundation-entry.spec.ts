@@ -19,7 +19,7 @@ const builtIndex = readFileSync(
 )
 const packageJson = JSON.parse(
   readFileSync(new URL('../../packages/core/package.json', import.meta.url), 'utf8')
-) as { sideEffects: boolean; exports: Record<string, unknown> }
+) as { sideEffects: boolean }
 
 describe('foundation entry', () => {
   it('keeps Tailwind and heavy subpath modules out of the main entry', () => {
@@ -27,11 +27,6 @@ describe('foundation entry', () => {
     expect(indexSource).not.toMatch(/export const version/)
     expect(builtIndex).not.toMatch(/from ["']tailwindcss/)
     expect(packageJson.sideEffects).toBe(false)
-    expect(packageJson.exports['./tailwind']).toBeTruthy()
-    expect(packageJson.exports['./tailwind/modern']).toBeUndefined()
-    expect(
-      Object.keys(packageJson.exports).some((key) => key.startsWith('./datepicker-locales'))
-    ).toBe(false)
   })
 
   it('does not re-export reducers from the styles barrel', () => {

@@ -11,12 +11,12 @@
 | `pnpm setup`                                | `scripts/setup.mjs`                         | 安装依赖、构建包并运行环境检查                                                                  |
 | `pnpm dev:check`                            | `scripts/check-env.mjs`                     | 检查 Node、pnpm、依赖安装和构建产物                                                             |
 | `pnpm example:all`                          | `scripts/run-examples.mjs`                  | 同时运行 Vue3 与 React 示例                                                                     |
-| `pnpm quality:static`                       | 根 package scripts                          | 静态门禁：格式、lint、公开类型/API、文档链接与示例索引                                          |
+| `pnpm quality:static`                       | 根 package scripts                          | 静态门禁：格式、lint、公开类型/API、生成文档漂移、文档链接与示例索引                            |
 | `pnpm quality:quick`                        | 根 package scripts                          | 静态门禁与 core 单测                                                                            |
 | `pnpm size`                                 | size-limit                                  | 按需包体积诊断，保留原预算并使用当前构建产物                                                    |
 | `pnpm quality:examples`                     | 根 package scripts                          | 校验示例来源与全部模块编译，再构建 React 与 Vue3 example                                        |
 | `pnpm quality:release`                      | 根 package scripts                          | 发布元数据与静态/漂移检查 → 示例来源/全部编译 → 一次包构建 → 完整单测与 a11y → tarball 示例/SSR |
-| `pnpm release:check`                        | `scripts/check-release-readiness.mjs`       | 检查版本、ESM、sideEffects、仓库元数据、Changesets fixed group、发布文档与 workflow             |
+| `pnpm release:check`                        | `scripts/check-release-readiness.mjs`       | 检查版本、ESM、sideEffects、仓库元数据、Changesets fixed group 与版本变更记录                   |
 | `pnpm publish:check`                        | `scripts/publish-check.mjs`                 | 构建并打包本地 tarball，验证包 smoke、四个示例和 SSR 产物；门禁用 `--skip-build` 复用构建       |
 | `pnpm smoke:published`                      | `scripts/publish-check.mjs --published`     | 使用同一发布检查脚本校验 npm 上已发布版本                                                       |
 | `pnpm test:core`                            | 根 package scripts                          | 运行 core 测试集合                                                                              |
@@ -29,7 +29,7 @@
 | `pnpm e2e:full`                             | Playwright                                  | 本地 E2E：全部浏览器引擎，发版前抽查                                                            |
 | `pnpm e2e:smoke`                            | Playwright                                  | 仅 Chromium 跑 example shell 烟雾                                                               |
 | `pnpm example:ssr:check`                    | `scripts/check-ssr-examples.mjs`            | 构建 Nuxt/Next.js SSR 示例，校验产物 HTML、主题 CSS、`next-env.d.ts` 未改写，并跑 hydrate 测    |
-| `pnpm example:sources:check`                | `scripts/validate-example-sources.mjs`      | 校验 React/Vue 独立模块的元数据、入口、导入白名单、数量和 DemoBlock 契约                        |
+| `pnpm example:sources:check`                | `scripts/validate-example-sources.mjs`      | 校验 React/Vue 模块元数据、导入白名单、页面覆盖与双端一致性；编译和类型交给对应工具             |
 | `node ./scripts/generate-example-index.mjs` | `scripts/generate-example-index.mjs`        | 从 `DEMO_NAV_GROUPS` 生成 `examples/index.html`；`--check` 校验未漂移                           |
 | `pnpm docs:api`                             | `scripts/generate-api-docs.mjs`             | 生成 skills API 摘要                                                                            |
 | `pnpm docs:links`                           | `scripts/check-doc-links.mjs`               | 校验全部 Markdown 的相对链接目标与 `#anchor` 片段（外部 http 链接不发请求）                     |
@@ -100,7 +100,7 @@ pnpm mcp:serve          # 等价于 --root .（本地模式）
 - 显式镜像：`--base-url <url>` 或环境变量 `TIGERCAT_MCP_BASE_URL`，版本与文件摘要须匹配随包快照；移除镜像配置可回到默认离线快照。
 - 诊断：`tigercat-mcp --doctor` 校验所选技能源的可读性、清单完整性与远程版本及实际正文摘要。
 
-远程 allow-list 由 `context7.json` 的 `skill_files` 清单驱动，`pnpm docs:api` 生成、`pnpm api:validate` 与磁盘双向校验。改动 skill 文件集合后必须重跑 `pnpm docs:api`，否则远程模式会读不到新文件。工具调用顺序见 [SKILL.md](../skills/tigercat/SKILL.md)，本文不重复。
+远程 allow-list 由 `context7.json` 的 `skill_files` 清单驱动，`pnpm docs:api` 生成、`pnpm docs:api:check` 与磁盘校验。改动 skill 文件集合后必须重跑 `pnpm docs:api`，否则远程模式会读不到新文件。工具调用顺序见 [SKILL.md](../skills/tigercat/SKILL.md)，本文不重复。
 
 ## 内部 helper（仅限仓库脚本）
 

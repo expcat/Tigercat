@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { existsSync } from 'node:fs'
-import { basename, dirname, join, relative, resolve, sep } from 'node:path'
+import { basename, dirname, join, relative, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { collectFiles, readJson, readText } from './utils/files.mjs'
 import { c } from './utils/term.mjs'
@@ -115,12 +115,6 @@ function sourceReferencesComponent(source, name) {
   return new RegExp(`import\\s*\\{[^}]*\\b${token}\\b|<${token}\\b`).test(source)
 }
 
-function relativeImportExists(importer, requested) {
-  const candidate = resolve(dirname(importer), requested)
-  const extensions = ['', '.ts', '.tsx', '.js', '.jsx', '.vue', '.json', '.css']
-  return extensions.some((extension) => existsSync(`${candidate}${extension}`))
-}
-
 for (const framework of frameworks) {
   const metadataFiles = collectFiles(framework.root, ['.json'])
     .filter((file) => basename(file) === 'demo.json')
@@ -176,24 +170,11 @@ for (const framework of frameworks) {
       continue
     }
     const source = readText(entryFile)
-    if (/\bDemoBlock\b|\?raw/.test(source)) {
-      failures.push(`${displayPath(entryFile)}: legacy DemoBlock or ?raw source found`)
-    }
-    if (framework.name === 'React' && !/export\s+default\s+function/.test(source)) {
-      failures.push(`${displayPath(entryFile)}: React entry must default-export a function`)
-    }
-    if (framework.name === 'Vue' && !/<script\s+setup/.test(source)) {
-      failures.push(`${displayPath(entryFile)}: Vue entry must use <script setup>`)
-    }
-
     const importPattern = /(?:import|export)\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g
     for (const match of source.matchAll(importPattern)) {
       const specifier = match[1]
       if (isBareImport(specifier) && !isAllowedImport(specifier)) {
         failures.push(`${displayPath(entryFile)}: forbidden import ${specifier}`)
-      }
-      if (!isBareImport(specifier) && !relativeImportExists(entryFile, specifier)) {
-        failures.push(`${displayPath(entryFile)}: missing relative import ${specifier}`)
       }
       if (
         specifier.startsWith('@expcat/tigercat-') &&
@@ -232,12 +213,6 @@ for (const framework of frameworks) {
       }
       failures.push(`${path}: example page must render DemoPage`)
       continue
-    }
-    if (!source.includes('getDemoModules')) {
-      failures.push(`${path}: migrated page must use getDemoModules`)
-    }
-    if (/\bDemoBlock\b|\bfullPageSnippet\b|\?raw/.test(source)) {
-      failures.push(`${path}: migrated page contains legacy demo source wiring`)
     }
     const routeMatch = /getDemoModules\(\s*['"]([^'"]+)['"]\s*\)/.exec(source)
     if (!routeMatch) {
@@ -299,18 +274,6 @@ if (reactInventory && vueInventory) {
       }
     }
   }
-}
-
-const reactBlock = readText('examples/example/react/src/components/DemoBlock.tsx')
-const vueBlock = readText('examples/example/vue3/src/components/DemoBlock.vue')
-if (
-  !reactBlock.includes('module: DemoModuleDescriptor') ||
-  /children:\s*React\.ReactNode/.test(reactBlock)
-) {
-  failures.push('React DemoBlock must use the DemoModuleDescriptor contract without children')
-}
-if (!vueBlock.includes('module: DemoModuleDescriptor') || /\bcode:\s*string/.test(vueBlock)) {
-  failures.push('Vue DemoBlock must use the DemoModuleDescriptor contract without a code prop')
 }
 
 if (failures.length > 0) {

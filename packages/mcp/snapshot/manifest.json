@@ -3,7 +3,7 @@
   "algorithm": "sha256",
   "files": {
     "context7.json": "897a679468f42c1df5f40908c89a42e7ea3a1f4bfdee489f264a5cf44dc4024f",
-    "skills/tigercat/ROADMAP.md": "bd92cb9ea4ee782f2b2ffedf12006cc533d61669a239f44f2f0dc40be6da6ae4",
+    "skills/tigercat/ROADMAP.md": "eb29c4b9deb101a766c23ce8dcf137edd4216e39e739ba0475a3d8092b27f0cf",
     "skills/tigercat/SKILL.md": "fc363d562a265add3df540e1e21c6ea379eb48ee062e35b4aeb9775b664123ee",
     "skills/tigercat/references/accessibility.md": "7ec86bd8da6445d3dda1765492edf8184a9817689322478c8054503bab4006f0",
     "skills/tigercat/references/cli.md": "2822a031295f5305004928bc359b550ef3a4d59ffb5dc61f09a57cbcc54ff457",
@@ -206,7 +206,7 @@
     "skills/tigercat/references/performance.md": "bfc47ba1d5357ac19fd935ed57be25e01feb9281c5eb1ba24198426d2c11dd99",
     "skills/tigercat/references/react/index.md": "bd03853a1ebd65d0ff73036c8af80d70e906fd6e6a714c9b92b4d5f105724681",
     "skills/tigercat/references/recipes/building-apps.md": "fd24ebd4d146dcbc2956a1ac303be3f17baa878d00435c0357ce7a9e130105e0",
-    "skills/tigercat/references/release.md": "ccc20ef57d5bbbf0c49148b081ad421a7afafbe7e1f64c6dbbaf65cdb345a8b5",
+    "skills/tigercat/references/release.md": "edb2226a3b4af638212e39c12d08aeedac66bdb085cd1f67a2987212ba0080f8",
     "skills/tigercat/references/shared/api-summary.md": "dacfe3de7595bc39ea21d0834e387ee8f9c2a8acdc1d850734468bd3289d6565",
     "skills/tigercat/references/shared/glossary.md": "083dcc7d07a7611fb5d720612e9efb2291e3f8d83ba5617242e831a1dd1b27b3",
     "skills/tigercat/references/shared/patterns/common.md": "33eaca5f2d4f6c07b2377898b63d78caaf5c46515974fc707bd109b45155558e",

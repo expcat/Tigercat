@@ -17,12 +17,6 @@ function readText(path: string) {
   return readFileSync(resolve(process.cwd(), path), 'utf-8')
 }
 
-function readPackageJson(path: string) {
-  return JSON.parse(readText(path)) as {
-    sideEffects?: boolean | string[]
-  }
-}
-
 async function flushMicrotasks() {
   await Promise.resolve()
   await Promise.resolve()
@@ -59,16 +53,6 @@ describe('imperative API sideEffects regression', () => {
   afterEach(async () => {
     await actImperativeReact(clearImperativeDom)
     vi.useRealTimers()
-  })
-
-  it('marks React and Vue framework packages as side-effect free', () => {
-    for (const packagePath of ['packages/react/package.json', 'packages/vue/package.json']) {
-      const packageJson = readPackageJson(packagePath)
-
-      expect(packageJson.sideEffects).toBe(false)
-      expect(JSON.stringify(packageJson.sideEffects)).not.toContain('dist/chunk-*')
-      expect(JSON.stringify(packageJson.sideEffects)).not.toContain('dist/components/*')
-    }
   })
 
   it.each([
