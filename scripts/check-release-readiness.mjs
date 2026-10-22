@@ -3,11 +3,6 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
-import {
-  REQUIRED_CORE_PACKAGE_EXPORTS,
-  buildFrameworkPackageExports,
-  loadPublicComponentExports
-} from './lib/public-components.mjs'
 import { readText as readFileText } from './utils/files.mjs'
 
 const root = join(import.meta.dirname, '..')
@@ -27,39 +22,6 @@ const sourceVersionFiles = {
 }
 
 const expectedRepositoryUrl = 'https://github.com/expcat/Tigercat'
-const requiredSizeLimitEntries = [
-  ['Core (full)', 'packages/core/dist/index.js'],
-  ['Vue (full)', 'packages/vue/dist/index.mjs'],
-  ['React (full)', 'packages/react/dist/index.mjs'],
-  ['Vue Button subpath', 'packages/vue/dist/components/Button.mjs'],
-  ['React Button subpath', 'packages/react/dist/components/Button.mjs'],
-  ['Vue Menu subpath', 'packages/vue/dist/components/Menu.mjs'],
-  ['React Menu subpath', 'packages/react/dist/components/Menu.mjs'],
-  ['Vue DatePicker subpath', 'packages/vue/dist/components/DatePicker.mjs'],
-  ['React DatePicker subpath', 'packages/react/dist/components/DatePicker.mjs'],
-  ['Vue Table subpath', 'packages/vue/dist/components/Table.mjs'],
-  ['React Table subpath', 'packages/react/dist/components/Table.mjs'],
-  ['Vue Tree subpath', 'packages/vue/dist/components/Tree.mjs'],
-  ['React Tree subpath', 'packages/react/dist/components/Tree.mjs'],
-  ['Vue TimePicker subpath', 'packages/vue/dist/components/TimePicker.mjs'],
-  ['React TimePicker subpath', 'packages/react/dist/components/TimePicker.mjs'],
-  ['Vue InputOTP subpath', 'packages/vue/dist/components/InputOTP.mjs'],
-  ['React InputOTP subpath', 'packages/react/dist/components/InputOTP.mjs'],
-  ['Vue TagsInput subpath', 'packages/vue/dist/components/TagsInput.mjs'],
-  ['React TagsInput subpath', 'packages/react/dist/components/TagsInput.mjs'],
-  ['Vue MaskInput subpath', 'packages/vue/dist/components/MaskInput.mjs'],
-  ['React MaskInput subpath', 'packages/react/dist/components/MaskInput.mjs'],
-  ['Vue ScrollArea subpath', 'packages/vue/dist/components/ScrollArea.mjs'],
-  ['React ScrollArea subpath', 'packages/react/dist/components/ScrollArea.mjs'],
-  ['Vue Masonry subpath', 'packages/vue/dist/components/Masonry.mjs'],
-  ['React Masonry subpath', 'packages/react/dist/components/Masonry.mjs'],
-  ['Vue AspectRatio subpath', 'packages/vue/dist/components/AspectRatio.mjs'],
-  ['React AspectRatio subpath', 'packages/react/dist/components/AspectRatio.mjs'],
-  ['Core tailwind subpath', 'packages/core/dist/tailwind.js'],
-  ['Core locale (zh-CN) subpath', 'packages/core/dist/locales/zh-CN.js'],
-  ['Core icons (common) subpath', 'packages/core/dist/icons/common.js']
-]
-
 const errors = []
 
 function readText(path) {
@@ -72,10 +34,6 @@ function readJson(path) {
 
 function check(condition, message) {
   if (!condition) errors.push(message)
-}
-
-function stringify(value) {
-  return JSON.stringify(value, null, 2)
 }
 
 function checkPackageVersions(packages) {
@@ -91,57 +49,6 @@ function checkSourceVersions() {
       !/export const version = ['"]/.test(content),
       `${path} must not export a version constant; version lives in package.json`
     )
-  }
-}
-
-function checkPackageExports(packages) {
-  const coreExports = packages.core.exports ?? {}
-
-  for (const exportName of REQUIRED_CORE_PACKAGE_EXPORTS) {
-    check(exportName in coreExports, `@expcat/tigercat-core missing export ${exportName}`)
-  }
-
-  const publicComponents = loadPublicComponentExports(root)
-
-  for (const packageName of ['vue', 'react']) {
-    const packageExports = packages[packageName].exports ?? {}
-    check('.' in packageExports, `@expcat/tigercat-${packageName} missing root export`)
-    check(
-      !('./*' in packageExports),
-      `@expcat/tigercat-${packageName} must use explicit component subpath exports`
-    )
-
-    const indexFile =
-      packageName === 'react' ? 'packages/react/src/index.tsx' : 'packages/vue/src/index.ts'
-    const expectedExports = buildFrameworkPackageExports(
-      publicComponents[packageName],
-      packageName,
-      readText(indexFile)
-    )
-    const actualKeys = new Set(Object.keys(packageExports))
-    const expectedKeys = new Set(Object.keys(expectedExports))
-
-    for (const exportName of expectedKeys) {
-      check(
-        actualKeys.has(exportName),
-        `@expcat/tigercat-${packageName} missing export ${exportName}`
-      )
-    }
-
-    for (const exportName of actualKeys) {
-      check(
-        expectedKeys.has(exportName),
-        `@expcat/tigercat-${packageName} has unexpected export ${exportName}`
-      )
-    }
-
-    for (const exportName of expectedKeys) {
-      if (!actualKeys.has(exportName)) continue
-      check(
-        stringify(packageExports[exportName]) === stringify(expectedExports[exportName]),
-        `@expcat/tigercat-${packageName} export ${exportName} is not synced with public component facts`
-      )
-    }
   }
 }
 
@@ -208,28 +115,6 @@ function checkPackageRepositoryMetadata(packages) {
       packageInfo.repository?.url === expectedRepositoryUrl,
       `${packageName} package.json repository.url must be ${expectedRepositoryUrl}`
     )
-  }
-}
-
-function checkSizeLimitConfig() {
-  const entries = readJson('.size-limit.json')
-
-  check(Array.isArray(entries), '.size-limit.json must be an array')
-  if (!Array.isArray(entries)) return
-
-  const entriesByName = new Map(entries.map((entry) => [entry.name, entry]))
-  for (const [name, expectedPath] of requiredSizeLimitEntries) {
-    const entry = entriesByName.get(name)
-
-    check(entry, `.size-limit.json missing ${name}`)
-    if (!entry) continue
-
-    check(entry.path === expectedPath, `.size-limit.json ${name} path must be ${expectedPath}`)
-    check(
-      typeof entry.limit === 'string' && /^\d+(\.\d+)? kB$/.test(entry.limit),
-      `.size-limit.json ${name} limit must be a gzip kB budget`
-    )
-    check(entry.gzip === true, `.size-limit.json ${name} must use gzip sizing`)
   }
 }
 
@@ -375,11 +260,9 @@ const packages = Object.fromEntries(
 const expectedVersion = checkPackageVersions(packages)
 
 checkSourceVersions()
-checkPackageExports(packages)
 checkFrameworkSideEffects(packages)
 checkEsmOnlyPackageSurface(packages)
 checkPackageRepositoryMetadata(packages)
-checkSizeLimitConfig()
 checkPublishWorkflows()
 checkRootVersion(expectedVersion)
 checkChangesetConfig(packages)

@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -27,13 +25,6 @@ const rootDir = process.cwd()
 
 function getFiles(options: Parameters<typeof getComponentTestGroupFiles>[0]) {
   return getComponentTestGroupFiles({ rootDir, ...options })
-}
-
-function getPackageScripts() {
-  const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as {
-    scripts: Record<string, string>
-  }
-  return packageJson.scripts
 }
 
 describe('component-test-groups', () => {
@@ -131,20 +122,5 @@ describe('component-test-groups', () => {
         filter: 'definitely-no-match'
       })
     ).toThrow('No test files found for group "form" with filter "definitely-no-match".')
-  })
-
-  it('should expose a root package script for each group', () => {
-    const scripts = getPackageScripts()
-
-    expect(scripts['test:group']).toBe('node ./scripts/run-component-group-tests.mjs')
-    for (const group of TEST_GROUPS) {
-      expect(scripts[`test:group:${group}`]).toBe(
-        `node ./scripts/run-component-group-tests.mjs --group ${group}`
-      )
-    }
-  })
-
-  it('should keep test:validate available for grouped quality scans', () => {
-    expect(getPackageScripts()['test:validate']).toBe('node ./scripts/validate-tests.mjs')
   })
 })

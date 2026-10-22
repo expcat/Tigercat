@@ -1,6 +1,6 @@
 # Tigercat 测试指南
 
-本目录包含 framework-agnostic core 测试、React/Vue 绑定测试和共享测试工具。本文是测试约定的唯一入口；脚本行为以 `package.json`、`vitest.config.ts` 与 `scripts/validate-tests.mjs` 为准。
+本目录包含 framework-agnostic core 测试、React/Vue 绑定测试和共享测试工具。本文是测试约定的唯一入口；脚本行为以 `package.json` 与 `vitest.config.ts` 为准。
 
 下一跳：脚本与门禁清单见 [scripts/README.md](../scripts/README.md)；代理约束见 [AGENTS.md](../AGENTS.md)。「按改动范围验证」见下文。
 
@@ -30,9 +30,9 @@ pnpm test:a11y                   # 跨组件 axe / ARIA 回归
 TIGER_A11Y=1 pnpm test            # 对全部组件 spec 跑 jest-axe
 pnpm test:group:form             # 指定组件分组
 pnpm test:group -- --group data --framework react
-pnpm test:coverage               # 本地发布检查使用的 coverage
+pnpm test:coverage               # 按需 coverage 诊断（保留原阈值）
 pnpm test:coverage:report        # 按需生成 JSON/HTML 报告
-pnpm test:validate               # 测试源码检查（含 MCP）
+pnpm test:special                # coverage 后定向补跑被排除的 4 个 spec
 pnpm e2e                         # Playwright：Chromium + mobile
 pnpm e2e:full                    # Playwright：全部浏览器引擎
 pnpm test:watch                  # watch mode
@@ -87,11 +87,12 @@ pnpm vitest run -t "opens the menu"
 容器，请加入 `FORK_ONLY_SPECS` 并在此登记；不要为它关闭全局隔离，也不要靠调大
 timeout 掩盖。
 
-coverage 运行额外排除上面 4 个命令式 API spec（`COVERAGE_EXCLUDED_SPECS`），它们由
-`pnpm test:special` 单独运行。排除项写在配置里而不是 CLI `--exclude`：`projects`
-不继承 CLI 的 include/exclude 过滤器。因此默认 `pnpm test` 覆盖除 fork-only
-以外的 unit spec，并排除 a11y 专用三件套（它们只走 `pnpm test:a11y`）；
-`pnpm test:coverage` 再少那 4 个命令式 API spec。
+默认 `pnpm test` 同时运行 `unit` 与 `fork-only` 两个 project，包含全部 5 个
+fork-only spec；仅排除 a11y 专用三件套（它们只走 `pnpm test:a11y`）。
+coverage 运行额外排除上面 4 个命令式 API spec（`COVERAGE_EXCLUDED_SPECS`），
+保留 `cli.spec.ts` 的独立 fork；按需运行 coverage 后，用 `pnpm test:special`
+定向补跑这 4 个 spec。排除项写在配置里而不是 CLI `--exclude`：`projects`
+不继承 CLI 的 include/exclude 过滤器。
 
 **文件级隔离保持开启**：每个 spec 文件都拿到干净的模块注册表。测试之间不得依赖
 执行顺序或跨文件共享的可变状态（模块级缓存、全局 registry、未清理的事件监听）。
@@ -114,17 +115,14 @@ e2e 只留真实浏览器才有意义的路径（playground iframe、portal/over
 
 ## 自动门禁（仅本地）
 
-`pnpm test:validate` 的硬错误：
+发布门禁运行 `pnpm test` 与 `pnpm test:a11y`，覆盖完整行为单测和独立 axe / ARIA
+回归。Vitest 启用 `forbidOnly` 拒绝 `.only`，未收集到测试的 spec 由实际测试运行
+报错。
 
-- spec 没有收集到测试；
-- 存在 `.only`；
-- 显式使用 `any` 类型。
-
-扫描使用 TypeScript 语法树，忽略字符串与注释，支持 `it.each` 和链式 `.only`。
-不再统计英文测试名或检查 a11y helper 字符串；无障碍行为由实际 axe / ARIA
-测试验证。Vitest 同时启用 `forbidOnly`，单文件执行也会拒绝 `.only`。
-
-Coverage 阈值由 `vitest.config.ts` 统一维护，当前为 lines 85%、statements 83%、functions 84%、branches 76%。不要在文档或单个 spec 中另设一套阈值。
+Coverage 与全量 size-limit 是按需诊断，不阻塞 `quality:release`。Coverage 阈值仍由
+`vitest.config.ts` 统一维护：lines 85%、statements 83%、functions 84%、branches 76%；
+`pnpm size` 使用现有 `.size-limit.json` 与当前构建产物。真实 tarball 消费、Button
+子路径预算与 tree-shaking 检查继续由发布门禁中的 `publish:check` 执行。
 
 ## 按改动范围验证
 

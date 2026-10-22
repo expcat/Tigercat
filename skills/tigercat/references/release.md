@@ -11,35 +11,41 @@ stay aligned. Version history belongs in CHANGELOG, not this page.
 
 ## Flow
 
-1. Metadata: `pnpm release:check` (fixed versions, runtime `version` exports, required exports,
-   Changesets fixed groups, docs entry points).
-2. Full local gate for RC and production: `pnpm quality:release` (includes one package build). Do **not** add
-   this (or coverage / SSR / publish smoke) to publish workflows.
-3. Release Candidate: `pnpm release:next` or `pnpm release:canary`; install the prerelease in clean Vue, React,
-   Nuxt, and Next projects.
-4. Stable: write the target with `node scripts/sync-version.mjs <version>`, update CHANGELOG and
-   MIGRATION by hand, remove consumed `.changeset/*.md` so a future `changeset version` cannot
-   mis-bump, run `pnpm quality:release` and `pnpm e2e`, commit `chore: 发布 v<version>`, tag
-   `v<version>`. Pushing the tag publishes (`changeset publish` uses versions already in
-   package.json) and deploys Pages.
-5. After publish: `pnpm smoke:published`.
+1. Prepare both Release Candidate and Stable with `pnpm sync:version <version>` (for example,
+   `3.0.0-rc.2` or `3.0.0`). Update CHANGELOG and MIGRATION for that version and remove consumed
+   `.changeset/*.md` notes during release preparation.
+2. Metadata: `pnpm release:check` (fixed versions, absence of runtime `version` exports,
+   ESM-only surface, sideEffects, repository metadata, Changesets fixed groups, docs and workflows).
+3. Complete the relevant focused checks and formatting, then commit the prepared release.
+4. On that same committed HEAD, run `pnpm quality:release` (includes the package build and four
+   tarball consumers) and `pnpm e2e` (includes full Vue/React type checks, workspace example
+   builds and production previews). Manually validate the built examples' interactions,
+   console errors and failed requests in the browser. Commit any fixes and repeat these checks
+   on the resulting HEAD. Keep release validation local; publish workflows install, build and
+   publish. For a focused workspace example build without E2E, use `pnpm example:build`.
+5. Ensure the validated commit has entered `main`, then create and push `v<version>` at that
+   commit. If merging changes the source or commit, validate the resulting HEAD first. Tag
+   workflows require ancestry on the default branch: prereleases publish to npm `next`, Stable
+   publishes to `latest`, and both deploy Pages. Package publishing belongs to the tag workflow;
+   do not run local `npm publish`, `changeset publish`, or the `release` / `release:next` /
+   `release:canary` wrappers.
+6. After publish: `pnpm smoke:published`.
 
-`pnpm quality:release` is the one heavy gate: API/type checks, coverage and special tests,
-one package build, size-limit, local tarball smoke
-(ESM entries, Button subpath budgets, no unused DatePicker locale presets on `defineText` /
-DatePicker subpaths), test source checks, and one Vue/React/Nuxt/Next example build per tarball.
-SSR HTML/CSS is checked there; hydration runs in the coverage suite. For
+`pnpm quality:release` is the one heavy gate: static/API/type checks, exports/tokens/docs drift,
+example sources and all example module compilation, one package build, full behavior tests
+(`pnpm test`, including all fork-only specs), independent axe/ARIA tests (`pnpm test:a11y`),
+and local tarball smoke (ESM entries, Button subpath budgets, tree-shaking, no unused DatePicker
+locale presets on `defineText` / DatePicker subpaths). `publish:check --skip-build` reuses that
+package build and builds each Vue/React/Nuxt/Next tarball consumer once.
+SSR HTML/CSS is checked there; hydration runs in the default unit suite. For
 component-batch work, start with `pnpm test:group:<group>` (`basic`, `form`, `feedback`, `layout`,
 `navigation`, `data`, `charts`, `advanced`, `composite`, `core`) plus `pnpm docs:api:check` before
 escalating.
 
-```bash
-pnpm changeset
-pnpm version-packages
-pnpm release
-```
-
-Stable and RC releases are cut manually, not by `changeset version`.
+Coverage (`pnpm test:coverage` / `pnpm test:coverage:report`) and full size-limit (`pnpm size`)
+are on-demand diagnostics with their existing thresholds and configuration. They do not block
+`quality:release`. After a coverage run, use `pnpm test:special` for its four excluded imperative
+API specs; the default `pnpm test` already includes them with isolated fork processes.
 
 ## API Freeze
 

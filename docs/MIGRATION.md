@@ -1,6 +1,6 @@
 # Tigercat 迁移指南
 
-## 未发布（v3.0.0-rc.1 之后）
+## v3.0.0-rc.2
 
 Core 删除 `uploadQueuedStatusText`、`uploadRetryFileAriaLabel`、`uploadSingleFileText` 三个英文常量，改用 `getUploadLabels(locale, overrides)` 返回的 `queuedStatusText`、`retryFileAriaLabel`、`singleFileText`。直接构造完整 `UploadLabels` 对象时需补齐这三个字段；`locale.upload` 与 Upload 的 `labels` prop 仍接受部分对象。`getUploadLabels()` 及部分 locale 的缺键现在回退 en-US，组件已经显示的单文件提示也会随 locale / labels 更新。
 

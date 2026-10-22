@@ -2,9 +2,10 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
-## 未发布
+## v3.0.0-rc.2（2026-10-22）
 
-- **全仓根因审查**：完成 20 个责任域、175 项采纳修复，保留现有视觉风格并同步双端 API、消费者与迁移说明；9,363 个单测、50 个 Chromium / mobile E2E、五包 tarball 和四种消费示例 / SSR 验证通过。原覆盖率与包体积欠账继续登记在 [路线图](docs/ROADMAP.md)。
+- **全仓根因审查**：完成 20 个责任域、175 项采纳修复，保留现有视觉风格并同步双端 API、消费者与迁移说明；该轮 9,363 个单测、50 个 Chromium / mobile E2E、五包 tarball 和四种消费示例 / SSR 验证通过。
+- **发布门禁精简**：`quality:release` 改跑完整行为单测与独立 a11y，移除重复导出检查、测试脚本字符串断言和测试源码扫描。Coverage 与全量 size-limit 保留原配置、阈值和诊断入口，改为按需执行；真实 tarball 消费、Button 子路径预算、tree-shaking、静态/API/漂移与示例检查继续阻塞发布。RC 与 Stable 统一先同步版本，提交后在同一 HEAD 重新构建包与 Example 并完成浏览器验证，再从已进入 main 的提交打标签。
 - **E2E**：改用每次重新构建的 Vue / React production preview，统一构建基础路径与专用严格端口；删除用例内递归恢复和动态导入重试，保留首个失败。
 - **测试与 benchmark**：feedback 分组补登记焦点重绑与 SSR 回归；根入口命令式测试明确等待动态导入，ActivityFeed 改验实际加载回调。删除失效组件模板并改引现有用例，清理不存在 memo 的重复 benchmark，修正 band scale 参数与 Sunburst 叶子数标题。
 - **FormWizard（React）**：兑现普通 `children` 的公开契约，支持元素和 `0`，仅在 `null` / `undefined` 时回退到步骤内容，保留函数 `children` 与 `renderStep` 的优先级。
