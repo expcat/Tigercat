@@ -7,7 +7,7 @@ export default function App() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="mb-2 text-sm text-gray-500">direction=&quot;vertical&quot;</p>
+        <p className="mb-2 text-sm text-gray-500">orientation=&quot;vertical&quot;</p>
         <Space orientation="vertical" size="md">
           {items.map((t) => (
             <span key={t} className={chip}>

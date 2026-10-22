@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **示例与 Playground（Vue / React）**：两端 runtime bridge 显式转发 Modal 子路径的六个命令，修复命令式 Modal 示例加载失败；React Dropdown 共用菜单项示例改用现有 `items` 模型，展示快捷键、勾选和危险项，两端删除未演示的子菜单说明；Space 方向示例文案统一使用 `orientation`。移除 React NotificationBell 与 Table 面板未使用的默认 React 导入。
 - **Button / Form 示例（Vue）**：四处重置或提交按钮改用现行 `type` 属性，恢复原生表单重置、提交与校验。
 - **ImageCropper 示例（Vue / React）**：JPEG 导出预览随结果替换和示例卸载回收 blob URL，卸载后完成的导出不再创建预览 URL。
 - **Modal / FormWizard（Core / Vue / React）**：取消或销毁命令式 Modal 时正常拒绝调用方 Promise，删除重复写入完成状态的私有路径；FormWizard 离开确认使用当前合并语言，动态切换 provider 或组件 locale 后仍正确显示，选择留在当前步骤会返回 `false`。

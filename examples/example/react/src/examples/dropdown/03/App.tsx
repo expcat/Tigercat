@@ -1,16 +1,11 @@
 import { Dropdown } from '@expcat/tigercat-react/Dropdown'
-import { DropdownMenu } from '@expcat/tigercat-react/DropdownMenu'
-import { DropdownItem } from '@expcat/tigercat-react/DropdownItem'
+
+const items = [
+  { key: 'edit', label: '编辑', shortcut: 'E' },
+  { key: 'pin', type: 'checkbox' as const, label: '固定', checked: true },
+  { key: 'drop', type: 'danger' as const, label: '删除' }
+]
 
 export default function App() {
-  return (
-    <Dropdown>
-      操作
-      <DropdownMenu>
-        <DropdownItem>编辑</DropdownItem>
-        <DropdownItem>固定</DropdownItem>
-        <DropdownItem>删除</DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
-  )
+  return <Dropdown items={items}>操作</Dropdown>
 }
