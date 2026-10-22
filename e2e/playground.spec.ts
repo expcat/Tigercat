@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test'
 import { exampleApps, openDemo } from './example-helpers'
 
+const [vueApp, reactApp] = exampleApps
+
 for (const app of exampleApps) {
   test(`${app.framework} example source can be edited, run and reset`, async ({ page }) => {
     test.setTimeout(45_000)
@@ -29,7 +31,7 @@ for (const app of exampleApps) {
 
 test('Vue overlay remains inside its independent sandbox', async ({ page }) => {
   test.setTimeout(45_000)
-  const { preview } = await openDemo(page, 'http://127.0.0.1:5173', 'modal', 'modal-01')
+  const { preview } = await openDemo(page, vueApp.baseUrl, 'modal', 'modal-01')
   await preview.getByRole('button', { name: '打开对话框', exact: true }).click()
   await expect(preview.getByRole('dialog', { name: '基本对话框', exact: true })).toBeVisible()
   await expect(page.locator('body > [role="dialog"]')).toHaveCount(0)
@@ -37,12 +39,7 @@ test('Vue overlay remains inside its independent sandbox', async ({ page }) => {
 
 test('compile errors preserve the last successful preview', async ({ page }) => {
   test.setTimeout(45_000)
-  const { moduleRoot, preview } = await openDemo(
-    page,
-    'http://127.0.0.1:5174',
-    'button',
-    'button-01'
-  )
+  const { moduleRoot, preview } = await openDemo(page, reactApp.baseUrl, 'button', 'button-01')
   await expect(preview.getByRole('button', { name: '提交中', exact: true })).toBeVisible()
   await moduleRoot.getByTestId('demo-edit-source').click()
   await moduleRoot

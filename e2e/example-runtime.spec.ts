@@ -2,67 +2,52 @@ import { expect, test, type Page } from '@playwright/test'
 import { DEMO_NAV_GROUPS } from '../examples/example/shared/app-config'
 import { demoUrl, exampleApps } from './example-helpers'
 
-const transientRuntimeFailure =
-  /Failed to fetch dynamically imported module|Importing a module script failed|Element is not attached|toBeAttached|toBeVisible|toHaveText|ERR_|NS_ERROR_|Timeout was reached|page\.goto/i
-
 async function inspectRoute(
   page: Page,
   framework: (typeof exampleApps)[number]['framework'],
   baseUrl: string,
-  route: string,
-  attempt = 0
+  route: string
 ): Promise<void> {
-  try {
-    const routeUrl = new URL(demoUrl(baseUrl, route))
-    routeUrl.searchParams.set('runtime-sweep', route)
-    routeUrl.searchParams.set('runtime-attempt', String(attempt))
-    await page.goto(routeUrl.toString(), {
-      waitUntil: 'domcontentloaded',
-      timeout: 30_000
-    })
+  const routeUrl = new URL(demoUrl(baseUrl, route))
+  routeUrl.searchParams.set('runtime-sweep', route)
+  await page.goto(routeUrl.toString(), {
+    waitUntil: 'domcontentloaded',
+    timeout: 30_000
+  })
 
-    if (framework === 'Vue' && route === 'use-controlled-state') {
-      await expect(page.getByText(/React 独有 hook/)).toBeVisible({ timeout: 30_000 })
-      await expect(page.locator('[data-demo-id]')).toHaveCount(0)
-      return
-    }
-
-    // A fresh document keeps compiler workers, iframes and overlays isolated per route.
-    // Compile of every DemoBlock file is `pnpm example:compile:check`; the browser
-    // job only needs one sandbox per route to prove the iframe actually runs.
-    const moduleRoot = page.locator(`[data-demo-id^="${route}-"]`).first()
-    await expect(moduleRoot).toBeAttached({ timeout: 30_000 })
-    await moduleRoot.scrollIntoViewIfNeeded()
-    await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })
-    const status = moduleRoot.locator('[aria-live="polite"]')
-    await expect(status).toHaveText(/^(ready|compile-error|runtime-error)$/, {
-      timeout: 60_000
-    })
-    const finalStatus = await status.textContent()
-    if (finalStatus !== 'ready') {
-      const diagnostics = await moduleRoot.locator('[role="alert"]').allTextContents()
-      const detail = diagnostics.join(' | ')
-      if (transientRuntimeFailure.test(detail)) {
-        throw new Error(detail)
-      }
-      expect(finalStatus, `${framework} ${route}: ${detail}`).toBe('ready')
-    }
-    await moduleRoot
-      .frameLocator('iframe')
-      .locator('body')
-      .evaluate(
-        () =>
-          new Promise<void>((resolve) => {
-            requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-          })
-      )
-    await expect(moduleRoot.locator('[role="alert"]')).toHaveCount(0)
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    if (attempt >= 2 || !transientRuntimeFailure.test(message)) throw error
-    await page.goto('about:blank')
-    await inspectRoute(page, framework, baseUrl, route, attempt + 1)
+  if (framework === 'Vue' && route === 'use-controlled-state') {
+    await expect(page.getByText(/React 独有 hook/)).toBeVisible({ timeout: 30_000 })
+    await expect(page.locator('[data-demo-id]')).toHaveCount(0)
+    return
   }
+
+  // A fresh document keeps compiler workers, iframes and overlays isolated per route.
+  // Compile of every DemoBlock file is `pnpm example:compile:check`; the browser
+  // job only needs one sandbox per route to prove the iframe actually runs.
+  const moduleRoot = page.locator(`[data-demo-id^="${route}-"]`).first()
+  await expect(moduleRoot).toBeAttached({ timeout: 30_000 })
+  await moduleRoot.scrollIntoViewIfNeeded()
+  await expect(moduleRoot.locator('iframe')).toBeVisible({ timeout: 60_000 })
+  const status = moduleRoot.locator('[aria-live="polite"]')
+  await expect(status).toHaveText(/^(ready|compile-error|runtime-error)$/, {
+    timeout: 60_000
+  })
+  const finalStatus = await status.textContent()
+  if (finalStatus !== 'ready') {
+    const diagnostics = await moduleRoot.locator('[role="alert"]').allTextContents()
+    const detail = diagnostics.join(' | ')
+    expect(finalStatus, `${framework} ${route}: ${detail}`).toBe('ready')
+  }
+  await moduleRoot
+    .frameLocator('iframe')
+    .locator('body')
+    .evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+        })
+    )
+  await expect(moduleRoot.locator('[role="alert"]')).toHaveCount(0)
 }
 
 for (const { framework, baseUrl } of exampleApps) {

@@ -4,6 +4,7 @@
 
 ## 未发布
 
+- **E2E**：改用每次重新构建的 Vue / React production preview，统一构建基础路径与专用严格端口；删除用例内递归恢复和动态导入重试，保留首个失败。
 - **测试与 benchmark**：feedback 分组补登记焦点重绑与 SSR 回归；根入口命令式测试明确等待动态导入，ActivityFeed 改验实际加载回调。删除失效组件模板并改引现有用例，清理不存在 memo 的重复 benchmark，修正 band scale 参数与 Sunburst 叶子数标题。
 - **FormWizard（React）**：兑现普通 `children` 的公开契约，支持元素和 `0`，仅在 `null` / `undefined` 时回退到步骤内容，保留函数 `children` 与 `renderStep` 的优先级。
 - **示例与编译（Vue / React）**：FunnelChart 纵向示例文案统一使用 `orientation`；Vue WorkflowDetailShell 示例将 SchemaForm 变更回写当前值，提交保留隐藏金额和只读原因；移除 React SankeyChart、WaterfallChart 与图表绑定文件未使用的默认 React 导入，恢复完整 Example 编译。

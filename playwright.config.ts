@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { exampleApps } from './e2e/example-helpers'
 
 export default defineConfig({
   testDir: './e2e',
@@ -6,7 +7,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  // Keep the two Vite example servers stable across browser engines.
+  // Use the same built examples across browser engines.
   // `pnpm e2e` is Chromium-only; `pnpm e2e:full` runs every project below.
   workers: 1,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'html',
@@ -36,18 +37,14 @@ export default defineConfig({
       use: { ...devices['Pixel 5'] }
     }
   ],
-  webServer: [
-    {
-      command: 'pnpm --filter @expcat/tigercat-example-vue3 dev --host 127.0.0.1',
-      url: 'http://127.0.0.1:5173',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000
-    },
-    {
-      command: 'pnpm --filter @expcat/tigercat-example-react dev --host 127.0.0.1',
-      url: 'http://127.0.0.1:5174',
-      reuseExistingServer: !process.env.CI,
+  // Playwright waits for each server before starting the next build.
+  webServer: exampleApps.map(({ packageName, baseUrl }) => {
+    const url = new URL(baseUrl)
+    return {
+      command: `pnpm --filter ${packageName} build && pnpm --filter ${packageName} preview --host ${url.hostname} --port ${url.port} --strictPort --base ${url.pathname}`,
+      url: baseUrl,
+      reuseExistingServer: false,
       timeout: 120_000
     }
-  ]
+  })
 })

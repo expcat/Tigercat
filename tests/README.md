@@ -101,6 +101,11 @@ coverage 运行额外排除上面 4 个命令式 API spec（`COVERAGE_EXCLUDED_S
 
 ## E2E
 
+Playwright 按顺序构建 Vue 与 React 示例（包含各自完整类型检查），再在专用严格端口
+4173 / 4174 启动 production preview，测试 `/Tigercat/vue/` 与 `/Tigercat/react/` 下的
+真实构建产物。每次运行重新构建，不复用已有服务器；开发服务器不参与 E2E。
+测试直接保留首个导航或断言错误，不在用例内恢复导航或递归重试。
+
 默认 `pnpm e2e` 只跑 Chromium 与 `mobile-chromium`（触控 spec）。
 `pnpm e2e:full` 才跑 Firefox / WebKit，供本地发版前抽查。`pnpm e2e:smoke` 只跑
 example shell。不要把与单测重复的按钮点击、输入填值、图表 SVG 冒烟写进 e2e；

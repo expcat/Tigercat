@@ -1,7 +1,7 @@
 import { expect, test, type Locator } from '@playwright/test'
-import { openDemo } from './example-helpers'
+import { exampleApps, openDemo } from './example-helpers'
 
-const REACT_URL = 'http://127.0.0.1:5174'
+const REACT_URL = exampleApps[1].baseUrl
 
 async function dispatchPointerSwipe(
   target: Locator,
