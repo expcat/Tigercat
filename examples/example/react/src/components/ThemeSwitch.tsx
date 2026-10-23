@@ -29,6 +29,7 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN', value, onChan
         {demoChrome(lang).theme}
       </span>
       <Select
+        aria-label={demoChrome(lang).theme}
         value={value}
         onChange={handleThemeChange}
         options={themeOptions}

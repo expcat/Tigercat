@@ -4,18 +4,19 @@ import { AnchorLink } from '@expcat/tigercat-vue/AnchorLink'
 </script>
 
 <template>
-  <div class="grid grid-cols-[minmax(0,1fr)_11rem] gap-4">
+  <div
+    class="grid grid-cols-[minmax(0,1fr)_max-content] gap-2 sm:grid-cols-[minmax(0,1fr)_11rem] sm:gap-4">
     <div id="anchor-guide" class="h-80 overflow-auto rounded border">
-      <section id="guide" class="min-h-96 bg-blue-50 p-4">
+      <section id="guide" class="min-h-96 bg-blue-50 dark:bg-blue-950 p-4">
         <h3 class="font-semibold">指南</h3>
       </section>
-      <section id="guide-install" class="min-h-96 bg-blue-50/60 p-4">
+      <section id="guide-install" class="min-h-96 bg-blue-50/60 dark:bg-blue-950/60 p-4">
         <h3 class="font-semibold">安装</h3>
       </section>
-      <section id="guide-theme" class="min-h-96 bg-blue-50/40 p-4">
+      <section id="guide-theme" class="min-h-96 bg-blue-50/40 dark:bg-blue-950/40 p-4">
         <h3 class="font-semibold">主题</h3>
       </section>
-      <section id="api-reference" class="min-h-96 bg-green-50 p-4">
+      <section id="api-reference" class="min-h-96 bg-green-50 dark:bg-green-950 p-4">
         <h3 class="font-semibold">API 参考</h3>
       </section>
     </div>

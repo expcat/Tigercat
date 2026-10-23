@@ -279,6 +279,11 @@ describe('Drawer', () => {
     })
 
     const dialog = screen.getByRole('dialog')
+    await fireEvent.touchStart(dialog, { touches: [{ clientX: 330, clientY: 120 }] })
+    await fireEvent.touchMove(dialog, { touches: [{ clientX: 260, clientY: 124 }] })
+    await fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 260, clientY: 124 }] })
+    expect(onUpdateOpen).not.toHaveBeenCalled()
+
     await fireEvent.touchStart(dialog, { touches: [{ clientX: 260, clientY: 120 }] })
     await fireEvent.touchMove(dialog, { touches: [{ clientX: 330, clientY: 124 }] })
     await fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 330, clientY: 124 }] })

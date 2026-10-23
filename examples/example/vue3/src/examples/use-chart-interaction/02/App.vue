@@ -54,7 +54,9 @@ const legendItems = computed(() => [
     index: 0,
     label: '订单量',
     color: '#2563eb',
-    selected: interaction.resolvedSelectedIndex.value === 0
+    selected: interaction.resolvedSelectedIndex.value === 0,
+    hidden: interaction.isLegendIndexHidden(0),
+    active: !interaction.isLegendIndexHidden(0)
   }
 ])
 </script>
@@ -82,7 +84,12 @@ const legendItems = computed(() => [
           orientation="left"
           :tick-values="[0, 25, 50, 75, 100]"
           label="订单" />
-        <ChartSeries :data="data" name="orders" color="#2563eb" type="bar">
+        <ChartSeries
+          :data="data"
+          name="orders"
+          color="#2563eb"
+          type="bar"
+          :visibility="interaction.isLegendIndexHidden(0) ? 'hidden' : undefined">
           <rect
             v-for="(item, index) in data"
             :key="item.x"

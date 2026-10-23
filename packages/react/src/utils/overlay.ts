@@ -257,8 +257,17 @@ export function useFocusTrap({
     boundScopeRef.current?.scope.deactivate()
     const config = configRef.current
     if (captureRestoreTarget) {
-      const active = captureActiveElement()
-      if (config.autoFocus && active && !container.contains(active)) {
+      const doc = container.ownerDocument
+      const active = captureActiveElement(doc)
+      // A portal may live in another document. Keep the captured trigger when
+      // that document only focuses the containing iframe or its body.
+      if (
+        config.autoFocus &&
+        active &&
+        active !== doc.body &&
+        active.tagName !== 'IFRAME' &&
+        !container.contains(active)
+      ) {
         restoreTargetRef.current = active
       }
     }

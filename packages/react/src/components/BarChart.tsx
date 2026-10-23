@@ -199,9 +199,12 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   const resolvedYScale = useMemo(() => {
     if (yScale) return yScale
-    const extent = getNumberExtent(yValues, { includeZero: true })
+    const extent = getNumberExtent(yValues, {
+      includeZero: true,
+      padding: showValueLabels && valueLabelPosition === 'top' ? 0.2 : 0
+    })
     return createLinearScale(extent, [innerRect.height, 0])
-  }, [yScale, yValues, innerRect.height])
+  }, [yScale, yValues, innerRect.height, showValueLabels, valueLabelPosition])
 
   const palette = useMemo(() => resolveChartPalette(colors, barColor), [colors, barColor])
 

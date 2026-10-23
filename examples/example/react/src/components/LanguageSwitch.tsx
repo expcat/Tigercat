@@ -22,6 +22,7 @@ export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({ value, onChange 
         {demoChrome(value).language}
       </span>
       <Select
+        aria-label={demoChrome(value).language}
         value={value}
         onChange={handleChange}
         options={languageOptions}

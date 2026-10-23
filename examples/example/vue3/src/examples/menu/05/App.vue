@@ -9,10 +9,7 @@ import {
   type MenuSchema,
   type MenuSchemaBadge
 } from '@expcat/tigercat-core'
-import { Content } from '@expcat/tigercat-vue/Content'
-import { Layout } from '@expcat/tigercat-vue/Layout'
 import { Menu } from '@expcat/tigercat-vue/Menu'
-import { Sidebar } from '@expcat/tigercat-vue/Sidebar'
 import { Table } from '@expcat/tigercat-vue/Table'
 import type { TableColumn } from '@expcat/tigercat-core'
 
@@ -113,16 +110,17 @@ const rows = flattenRecords(schemaToRouteRecords(backendSchema))
     <p class="text-sm text-[var(--tiger-text-secondary)]">
       侧栏走 Menu；表是 schemaToRouteRecords 的纯数据，宿主自己 addRoute。
     </p>
-    <Layout class="h-80 overflow-hidden rounded border border-[var(--tiger-border)]">
-      <Layout>
-        <Sidebar width="168px">
-          <Menu
-            v-model:selected-keys="selectedKeys"
-            v-model:open-keys="openKeys"
-            :items="items"
-            aria-label="后台导航" />
-        </Sidebar>
-        <Content as="div" class="min-w-0 overflow-auto p-3">
+    <div
+      class="grid overflow-hidden rounded border border-[var(--tiger-border)] sm:grid-cols-[200px_minmax(0,1fr)]">
+      <div class="min-w-0 overflow-auto sm:h-80">
+        <Menu
+          v-model:selected-keys="selectedKeys"
+          v-model:open-keys="openKeys"
+          :items="items"
+          aria-label="后台导航" />
+      </div>
+      <div class="min-w-0 overflow-auto p-3 sm:h-80">
+        <div class="min-w-[32rem]">
           <Table
             :columns="columns"
             :data-source="rows"
@@ -131,8 +129,8 @@ const rows = flattenRecords(schemaToRouteRecords(backendSchema))
             size="sm"
             table-layout="fixed"
             :pagination="false" />
-        </Content>
-      </Layout>
-    </Layout>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

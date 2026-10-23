@@ -11,6 +11,7 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
 import { Empty } from '@expcat/tigercat-react/Empty'
 import { Segmented } from '@expcat/tigercat-react/Segmented'
+import { Select } from '@expcat/tigercat-react/Select'
 import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
 import { toZhHant } from '@demo-shared/zh-hant'
 
@@ -143,7 +144,7 @@ export default function ConfigProviderExample() {
         <p style={{ margin: 0, fontSize: 13, color: 'var(--tiger-text-secondary)' }}>
           {copy.caption}
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div style={{ display: 'grid', gap: 6 }}>
             <span>{copy.language}</span>
             <Segmented
@@ -157,12 +158,11 @@ export default function ConfigProviderExample() {
           </div>
           <div style={{ display: 'grid', gap: 6 }}>
             <span>{copy.theme}</span>
-            <Segmented
+            <Select
               aria-label={copy.theme}
               value={theme}
               options={themeOptions}
               size="sm"
-              block
               onChange={(value) => setTheme(String(value))}
             />
           </div>

@@ -15,7 +15,7 @@ const DarkModeSwitch: React.FC<DarkModeSwitchProps> = ({ lang = 'zh-CN', checked
       <span className="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
         {demoChrome(lang).dark}
       </span>
-      <Switch checked={checked} size="sm" onChange={onChange} />
+      <Switch aria-label={demoChrome(lang).dark} checked={checked} size="sm" onChange={onChange} />
     </div>
   )
 }

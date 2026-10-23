@@ -1,12 +1,12 @@
 {
   "id": "slider-05",
-  "title": "垂直滑块与刻度",
-  "description": "只读时值仍可见。刻度可以点，气泡使用格式化文本。",
+  "title": "格式化提示与刻度",
+  "description": "拖动滑块或点击刻度调整值，提示气泡显示格式化的百分比。",
   "entry": "App.tsx",
   "order": 5,
   "viewport": {
     "mode": "auto",
-    "minHeight": 280,
+    "minHeight": 120,
     "maxHeight": 640
   }
 }

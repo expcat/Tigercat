@@ -1,5 +1,17 @@
 # Tigercat 迁移指南
 
+## v3.0.0-rc.3
+
+本版修复现有视觉、交互和示例行为，没有删除或重命名组件、props、事件及导入路径；从 rc.2 升级无需更改常规调用。五个 `@expcat/tigercat-{core,vue,react,cli,mcp}` 包应一起升级。
+
+AspectRatio 的已有 `fit="contain"` / `"cover"` / `"fill"` 现在实际作用于内容层中的直接媒体，并在比例盒内裁切；默认 / `fit="none"` 保留媒体自然尺寸与可见溢出。曾为显式 fit 手工补内容绝对定位或媒体尺寸的用法可移除重复样式；需要原始尺寸时省略 fit 或使用 none。
+
+图表自动布局会变化：BarChart 顶部标签自动留白；轴标题、Radar / Heatmap 刻度避让标签；Pie 外标签在未指定 `outerRadius` 时参与半径和圆心拟合。显式外半径与自定义 BarChart scale 继续优先。依赖旧图形像素位置的应用应按实际数据复核布局。
+
+拖放自定义渲染应继续展开完整 `ListDragItemBindings`，包括 `style`：启用拖拽时该对象现在还包含 `touchAction: 'none'`，用于在原生手势开始前声明拖放行为。TaskBoard 的可拖卡片和列头采用同一约束，触摸这些拖动区域用于排序；滚动使用列表 / 看板的非拖动区域。直接使用 `createTouchDragTracker()` 的调用方应由自己的非 passive 监听负责取消默认行为，tracker 只记录位移。
+
+Masonry 的共享 style helper 现在返回 `--tiger-masonry-gap`，source 模式据此提供纵向间距，packed 模式置零；将完整返回对象绑定到根元素即可。Sidebar 的自带折叠按钮与侧栏放在同一容器，依赖旧 `display: contents` DOM 布局的外部选择器应按实际容器结构调整。移动 Modal / Drawer 的反向滑动保持打开，原有正向关闭手势不变。
+
 ## v3.0.0-rc.2
 
 Core 删除 `uploadQueuedStatusText`、`uploadRetryFileAriaLabel`、`uploadSingleFileText` 三个英文常量，改用 `getUploadLabels(locale, overrides)` 返回的 `queuedStatusText`、`retryFileAriaLabel`、`singleFileText`。直接构造完整 `UploadLabels` 对象时需补齐这三个字段；`locale.upload` 与 Upload 的 `labels` prop 仍接受部分对象。`getUploadLabels()` 及部分 locale 的缺键现在回退 en-US，组件已经显示的单文件提示也会随 locale / labels 更新。

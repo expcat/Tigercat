@@ -418,7 +418,7 @@ export const Modal = React.forwardRef<HTMLDivElement, ModalProps>(function Modal
       )
 
       const allowed = swipeAllowedRef.current
-      const distance = sheetOffset || gesture?.distance || 0
+      const distance = sheetOffset || clampSheetDragDistance(gesture?.deltaY ?? 0)
       const size = dialogRef.current?.offsetHeight ?? 0
       resetTouchGesture()
       if (!allowed || !mobileSheet) return

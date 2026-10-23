@@ -11,7 +11,7 @@ const getItemHeight = (index: number) => (index % 5 === 0 ? 64 : 40)
     :height="400"
     aria-label="Variable rows">
     <template #default="{ index }">
-      <div class="flex h-full items-center px-4">
+      <div class="flex items-center px-4" :style="{ height: `${getItemHeight(index)}px` }">
         第 {{ index + 1 }} 行 · {{ getItemHeight(index) }}px
       </div>
     </template>

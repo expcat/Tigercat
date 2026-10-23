@@ -113,7 +113,7 @@ describe('cron-editor-utils', () => {
     const result = validateCronExpression('0 0 0 * * *')
 
     expect(result.valid).toBe(false)
-    expect(result.issues[0]).toMatchObject({ field: 'expression' })
+    expect(result.issues.map((issue) => issue.field)).toEqual(['expression'])
   })
 
   it('rejects out of range values instead of clamping them', () => {

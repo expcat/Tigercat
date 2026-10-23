@@ -19,6 +19,29 @@ import { OverlayOutletProvider, OverlayPortal } from '../../packages/react/src/u
 const confirmName = enUS.common!.okText!
 
 describe('overlay dismiss inside ConfigProvider', () => {
+  it('renders a cross-document target outside the provider outlet', () => {
+    const iframe = document.createElement('iframe')
+    document.body.appendChild(iframe)
+    const target = iframe.contentDocument!.body
+    const { container, unmount } = render(
+      <OverlayOutletProvider>
+        <OverlayPortal target={target}>
+          <div role="menu" aria-label="Portaled menu">
+            <button role="menuitem">Members</button>
+          </div>
+        </OverlayPortal>
+      </OverlayOutletProvider>
+    )
+    try {
+      expect(target.querySelector('[role="menuitem"]')?.textContent).toBe('Members')
+      expect(container.querySelector('[role="menu"]')).toBeNull()
+    } finally {
+      unmount()
+      expect(target.querySelector('[role="menu"]')).toBeNull()
+      iframe.remove()
+    }
+  })
+
   it('keeps committed layers mounted through StrictMode replay and reopening', async () => {
     function Demo() {
       const [open, setOpen] = useState(true)

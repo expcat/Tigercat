@@ -46,6 +46,12 @@ describe('FloatButton (Vue)', () => {
     await fireEvent.click(screen.getByRole('button'))
     expect(onClick).not.toHaveBeenCalled()
   })
+
+  it('keeps the link visible when a badge is attached', () => {
+    render(FloatButton, { props: { href: '/inbox', ariaLabel: '收件箱', badge: 3 } })
+    expect(screen.getByRole('link', { name: '收件箱' })).toHaveAttribute('href', '/inbox')
+    expect(screen.getByText('3')).toBeInTheDocument()
+  })
 })
 
 describe('FloatButtonGroup (Vue)', () => {

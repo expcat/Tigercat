@@ -198,8 +198,8 @@ export const MarkdownEditor = defineComponent({
       syncEditorTextareaValue(textareaRef.value, currentValue.value, false)
     })
     watch(
-      currentValue,
-      (value) => {
+      [currentValue, textareaRef],
+      ([value]) => {
         syncEditorTextareaValue(textareaRef.value, value, composing.value)
       },
       { flush: 'post' }

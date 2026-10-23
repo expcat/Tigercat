@@ -3,5 +3,6 @@
   "title": "下拉与单按钮",
   "description": "默认 xlsx+markdown 下拉；单一 formats 才是一颗按钮。不跑 render 列，隐藏列需 hiddenColumnKeys。",
   "entry": "App.vue",
-  "order": 1
+  "order": 1,
+  "permissions": ["downloads"]
 }

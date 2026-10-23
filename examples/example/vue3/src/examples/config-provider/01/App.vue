@@ -12,6 +12,7 @@ import { Button } from '@expcat/tigercat-vue/Button'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-vue/ConfigProvider'
 import { Empty } from '@expcat/tigercat-vue/Empty'
 import { Segmented } from '@expcat/tigercat-vue/Segmented'
+import { Select } from '@expcat/tigercat-vue/Select'
 import { DEMO_THEME_PRESETS } from '@demo-shared/themes'
 import { toZhHant } from '@demo-shared/zh-hant'
 
@@ -160,7 +161,7 @@ const Preview = defineComponent({
       <p style="margin: 0; font-size: 13px; color: var(--tiger-text-secondary)">
         {{ copy.caption }}
       </p>
-      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div style="display: grid; gap: 6px">
           <span>{{ copy.language }}</span>
           <Segmented
@@ -172,12 +173,7 @@ const Preview = defineComponent({
         </div>
         <div style="display: grid; gap: 6px">
           <span>{{ copy.theme }}</span>
-          <Segmented
-            v-model="theme"
-            :options="themeOptions"
-            size="sm"
-            block
-            :aria-label="copy.theme" />
+          <Select v-model="theme" :options="themeOptions" size="sm" :aria-label="copy.theme" />
         </div>
         <div style="display: grid; gap: 6px">
           <span>{{ copy.scheme }}</span>

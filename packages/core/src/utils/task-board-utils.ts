@@ -18,7 +18,7 @@ export const taskBoardColumnClasses =
 
 /** Column header (sticky, never scrolls) */
 export const taskBoardColumnHeaderClasses =
-  'flex items-center justify-between px-4 py-3.5 border-b border-[var(--tiger-border)]/60 text-sm font-semibold text-[var(--tiger-text)] select-none transition-colors'
+  'flex items-center justify-between px-4 py-3.5 border-b border-[var(--tiger-border)]/60 text-sm font-semibold text-[var(--tiger-text)] select-none transition-colors [&[draggable=true]]:touch-none'
 
 /** Scrollable card area */
 export const taskBoardColumnBodyClasses =
@@ -26,7 +26,7 @@ export const taskBoardColumnBodyClasses =
 
 /** Card base styles */
 export const taskBoardCardClasses =
-  'tiger-task-board-card rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)]/80 bg-[var(--tiger-surface)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),_0_1px_2px_rgba(0,0,0,0.02)] cursor-grab select-none [transition:var(--tiger-transition-quick)] hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--tiger-primary)]/30 active:cursor-grabbing'
+  'tiger-task-board-card rounded-[var(--tiger-radius-md)] border border-[var(--tiger-border)]/80 bg-[var(--tiger-surface)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04),_0_1px_2px_rgba(0,0,0,0.02)] cursor-grab select-none [transition:var(--tiger-transition-quick)] hover:-translate-y-0.5 hover:shadow-md hover:border-[var(--tiger-primary)]/30 active:cursor-grabbing [&[draggable=true]]:touch-none'
 
 /** Card while being dragged */
 export const taskBoardCardDraggingClasses = 'opacity-40 shadow-xl scale-[0.98] rotate-1'
@@ -391,7 +391,7 @@ export function getColumnDropIndex(
 // Touch drag tracker (lightweight pointer-based fallback)
 // ============================================================================
 
-/** Pointer must move this far before a touch becomes a drag. Shorter moves scroll. */
+/** Pointer must move this far before a touch becomes a drag. */
 export const TASK_BOARD_DRAG_THRESHOLD_PX = 8
 
 export interface TouchDragState {
@@ -523,7 +523,6 @@ export function createTouchDragTracker(): TouchDragTracker {
         }
         state.engaged = true
       }
-      e.preventDefault()
     },
 
     onTouchEnd() {

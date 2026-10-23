@@ -35,6 +35,14 @@ describe('focus-utils', () => {
     it('returns true for HTMLElement', () => {
       const el = document.createElement('div')
       expect(isHTMLElement(el)).toBe(true)
+      const iframe = document.createElement('iframe')
+      document.body.appendChild(iframe)
+      cleanup.push(iframe)
+      const button = iframe.contentDocument!.createElement('button')
+      iframe.contentDocument!.body.appendChild(button)
+      button.focus()
+      expect(isHTMLElement(button)).toBe(true)
+      expect(captureActiveElement(iframe.contentDocument!)).toBe(button)
     })
 
     it('returns false for null', () => {

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { h } from 'vue'
+import { createTextVNode, h } from 'vue'
 import userEvent from '@testing-library/user-event'
 import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue/Breadcrumb'
 import { expectNoA11yViolations } from '../utils'
@@ -188,7 +188,7 @@ describe('Breadcrumb', () => {
   describe('maxItems collapse', () => {
     const items = () => [
       h(BreadcrumbItem, { href: '/' }, () => 'Home'),
-      h(BreadcrumbItem, { href: '/a' }, () => 'A'),
+      h(BreadcrumbItem, { href: '/a' }, () => [createTextVNode('A')]),
       h(BreadcrumbItem, { href: '/b' }, () => 'B'),
       h(BreadcrumbItem, { href: '/c' }, () => 'C'),
       h(BreadcrumbItem, { current: true }, () => 'Current')

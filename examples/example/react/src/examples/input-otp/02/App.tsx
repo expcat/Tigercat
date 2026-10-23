@@ -10,6 +10,7 @@ export default function App() {
         value={value}
         onChange={setValue}
         type="alphanumeric"
+        size="sm"
         masked
         groups={[3, 3]}
         separator="-"

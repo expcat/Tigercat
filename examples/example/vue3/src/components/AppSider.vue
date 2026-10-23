@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Collapse } from '@expcat/tigercat-vue/Collapse'
 import { CollapsePanel } from '@expcat/tigercat-vue/CollapsePanel'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { createFocusScope } from '@expcat/tigercat-core'
 import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
 import { Button } from '@expcat/tigercat-vue/Button'
@@ -21,6 +22,7 @@ const query = ref('')
 const openGroup = ref<string | null>(navGroupKeyForPath(route.path))
 const chrome = computed(() => demoChrome(props.lang))
 const appTitle = computed(() => demoCopy(DEMO_APP_TITLE, props.lang))
+const mobileMenuRef = ref<HTMLElement | null>(null)
 
 const isActive = (targetPath: string) => {
   if (targetPath === '/') return route.path === '/'
@@ -71,18 +73,33 @@ watch(
   }
 )
 
-const onDocumentKey = (event: KeyboardEvent) => {
-  if (props.isMobile && !props.isSiderCollapsed && event.key === 'Escape') emit('close')
-}
-
-onMounted(() => document.addEventListener('keydown', onDocumentKey))
-onBeforeUnmount(() => document.removeEventListener('keydown', onDocumentKey))
+watch(
+  [() => props.isMobile, () => props.isSiderCollapsed, mobileMenuRef],
+  ([mobile, collapsed, container], _previous, onCleanup) => {
+    if (!mobile || collapsed || !container) return
+    const scope = createFocusScope(container, {
+      modal: true,
+      moveFocus: true,
+      returnFocus: true,
+      onEscape: () => emit('close')
+    })
+    scope.activate()
+    onCleanup(() => scope.deactivate())
+  },
+  { flush: 'post' }
+)
 </script>
 
 <template>
   <Teleport to="body" v-if="props.isMobile">
     <Transition name="sider-overlay">
-      <div v-if="!props.isSiderCollapsed" class="fixed inset-0 z-50">
+      <div
+        v-if="!props.isSiderCollapsed"
+        ref="mobileMenuRef"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="appTitle"
+        class="fixed inset-0 z-50">
         <div class="absolute inset-0 bg-black/30 transition-opacity" @click="emit('close')" />
         <aside
           class="absolute inset-inline-start-0 top-0 bottom-0 w-56 bg-white border-e border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col">

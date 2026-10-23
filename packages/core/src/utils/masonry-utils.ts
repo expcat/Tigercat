@@ -19,7 +19,8 @@ export const MASONRY_DEFAULT_GAP = 16
 
 export const masonryRootClasses = 'tiger-masonry relative w-full'
 
-export const masonryItemClasses = 'tiger-masonry-item min-w-0 break-inside-avoid'
+export const masonryItemClasses =
+  'tiger-masonry-item min-w-0 break-inside-avoid [margin-block-end:var(--tiger-masonry-gap,0px)]'
 
 // ─── Resolution ───────────────────────────────────────────────────
 
@@ -254,17 +255,20 @@ export function getMasonryColumnStyle(gap: number): { rowGap: string } {
 export function getMasonryPackedRootStyle(height: number): {
   position: 'relative'
   height: string
+  '--tiger-masonry-gap': string
 } {
-  return { position: 'relative', height: `${Math.max(height, 0)}px` }
+  return { position: 'relative', height: `${Math.max(height, 0)}px`, '--tiger-masonry-gap': '0px' }
 }
 
 export function getMasonryFlowRootStyle(
   columnCount: number,
   gap: number
-): { columnCount: number; columnGap: string } {
+): { columnCount: number; columnGap: string; '--tiger-masonry-gap': string } {
+  const spacing = `${clampMasonryGap(gap)}px`
   return {
     columnCount: clampMasonryColumnCount(columnCount),
-    columnGap: `${clampMasonryGap(gap)}px`
+    columnGap: spacing,
+    '--tiger-masonry-gap': spacing
   }
 }
 

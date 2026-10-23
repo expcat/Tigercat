@@ -4,6 +4,7 @@ import { Button } from '@expcat/tigercat-react/Button'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
 import { Collapse } from '@expcat/tigercat-react/Collapse'
+import { createFocusScope } from '@expcat/tigercat-core'
 import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
 import { demoCopy } from '@demo-shared/zh-hant'
@@ -50,6 +51,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
   )
   const pathRef = useRef(location.pathname)
   const collapsedRef = useRef(isSiderCollapsed)
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const pathChanged = pathRef.current !== location.pathname
@@ -60,12 +62,16 @@ export const AppSider: React.FC<AppSiderProps> = ({
   }, [isSiderCollapsed, location.pathname])
 
   useEffect(() => {
-    if (!isMobile || isSiderCollapsed) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    const container = mobileMenuRef.current
+    if (!isMobile || isSiderCollapsed || !container) return
+    const scope = createFocusScope(container, {
+      modal: true,
+      moveFocus: true,
+      returnFocus: true,
+      onEscape: onClose
+    })
+    scope.activate()
+    return () => scope.deactivate()
   }, [isMobile, isSiderCollapsed, onClose])
 
   const visibleGroups = useMemo(() => {
@@ -193,7 +199,12 @@ export const AppSider: React.FC<AppSiderProps> = ({
   if (isMobile) {
     if (isSiderCollapsed) return null
     return createPortal(
-      <div className="fixed inset-0 z-50 demo-sider-overlay-enter">
+      <div
+        ref={mobileMenuRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={demoCopy(DEMO_APP_TITLE, lang)}
+        className="fixed inset-0 z-50 demo-sider-overlay-enter">
         <div className="absolute inset-0 bg-black/30" onClick={onClose} />
         <aside className="absolute inset-inline-start-0 top-0 bottom-0 w-56 bg-white border-e border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col demo-sider-slide-enter">
           <div className="shrink-0 h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800">

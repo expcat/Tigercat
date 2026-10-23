@@ -11,7 +11,7 @@ export const datePickerPanelClasses = classNames(
   'border border-[var(--tiger-border)]',
   'rounded-[var(--tiger-radius-md)]',
   'shadow-[var(--tiger-shadow-md)]',
-  'p-4',
+  'p-4 max-[20rem]:p-1',
   // Calendar card is w-72. A fixed w-80 plus this padding is narrower than that
   // card, so overflow-auto draws a horizontal scrollbar across an empty body.
   'w-fit max-w-[var(--tiger-overlay-available-width)]',

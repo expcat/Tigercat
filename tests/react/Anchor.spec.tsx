@@ -226,19 +226,50 @@ describe('Anchor', () => {
       expect(onClick).toHaveBeenCalledWith(expect.any(Object), '#section1')
     })
 
-    it('emits onChange when a link is clicked', async () => {
+    it('emits onChange safely when the consumer updates state', async () => {
       const onChange = vi.fn()
+      const consoleError = vi.spyOn(console, 'error')
+      function Harness() {
+        const [active, setActive] = React.useState('')
+        return (
+          <>
+            <output>{active}</output>
+            <Anchor
+              affix={false}
+              onChange={(href) => {
+                setActive(href)
+                onChange(href)
+              }}
+              getContainer={() => scrollContainer}>
+              <AnchorLink href="#section1" title="Link 1" />
+              <AnchorLink href="#section2" title="Link 2" />
+            </Anchor>
+          </>
+        )
+      }
 
-      render(
-        <Anchor affix={false} onChange={onChange} getContainer={() => scrollContainer}>
-          <AnchorLink href="#section1" title="Link 1" />
-          <AnchorLink href="#section2" title="Link 2" />
-        </Anchor>
-      )
-
-      await fireEvent.click(screen.getByText('Link 2'))
-      expect(onChange).toHaveBeenCalledWith('#section2')
-      expect(screen.getByText('Link 2')).toHaveAttribute('aria-current', 'location')
+      try {
+        render(
+          <React.StrictMode>
+            <Harness />
+          </React.StrictMode>
+        )
+        for (const [name, href] of [
+          ['Link 2', '#section2'],
+          ['Link 1', '#section1']
+        ]) {
+          onChange.mockClear()
+          await fireEvent.click(screen.getByText(name))
+          expect(onChange).toHaveBeenCalledExactlyOnceWith(href)
+          expect(screen.getByRole('status')).toHaveTextContent(href)
+          expect(screen.getByText(name)).toHaveAttribute('aria-current', 'location')
+          await fireEvent.click(screen.getByText(name))
+          expect(onChange).toHaveBeenCalledTimes(1)
+        }
+        expect(consoleError.mock.calls.flat().join(' ')).not.toContain('Cannot update a component')
+      } finally {
+        consoleError.mockRestore()
+      }
     })
 
     it('does not preventDefault on ctrl+click', async () => {

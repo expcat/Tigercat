@@ -582,7 +582,11 @@ export const DataTableWithToolbar = defineComponent({
           'aria-label': tableLabels.value.toolbarAriaLabel
         },
         [
-          h('div', { class: 'flex items-center gap-3 flex-wrap flex-1 min-w-0' }, leftNodes),
+          h(
+            'div',
+            { class: 'flex items-center gap-3 flex-wrap flex-1 min-w-0 basis-full sm:basis-auto' },
+            leftNodes
+          ),
           hasBulkActions.value
             ? h(
                 'div',

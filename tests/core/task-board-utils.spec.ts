@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   moveCard,
   reorderColumns,
@@ -556,7 +556,10 @@ describe('createTouchDragTracker', () => {
     expect(tracker.getState().active).toBe(true)
     expect(tracker.getState().startX).toBe(10)
 
-    tracker.onTouchMove(makeTouch(50, 60))
+    const move = makeTouch(50, 60)
+    const preventDefault = vi.spyOn(move, 'preventDefault')
+    tracker.onTouchMove(move)
+    expect(preventDefault).not.toHaveBeenCalled()
     expect(tracker.getState().currentX).toBe(50)
     expect(tracker.getState().currentY).toBe(60)
 

@@ -5,9 +5,8 @@
  * Vue and React AspectRatio implementations. All helpers are string/number
  * only, so they stay safe to evaluate during server-side rendering.
  *
- * Overflow clipping and replaced-element fill live in the injected
- * stylesheet so rounded corners and media do not depend on the caller
- * adding `overflow-hidden`.
+ * Explicit media fit and clipping live in the shared stylesheet. Without
+ * a fit, callers retain control of media sizing and overflow.
  */
 
 import type { AspectRatioFit, AspectRatioStyle, AspectRatioValue } from '../types/aspect-ratio'
@@ -41,19 +40,21 @@ export const aspectRatioBaseStyles = {
     minWidth: '0',
     minHeight: '0'
   },
-  '.tiger-aspect-ratio-fit-contain > img, .tiger-aspect-ratio-fit-contain > video, .tiger-aspect-ratio-fit-contain > iframe':
+  '.tiger-aspect-ratio-fit-contain > .tiger-aspect-ratio-content, .tiger-aspect-ratio-fit-cover > .tiger-aspect-ratio-content, .tiger-aspect-ratio-fit-fill > .tiger-aspect-ratio-content':
+    { position: 'absolute', inset: '0' },
+  '.tiger-aspect-ratio-fit-contain > .tiger-aspect-ratio-content > img, .tiger-aspect-ratio-fit-contain > .tiger-aspect-ratio-content > video, .tiger-aspect-ratio-fit-contain > .tiger-aspect-ratio-content > iframe':
     {
       objectFit: 'contain',
       width: '100%',
       height: '100%'
     },
-  '.tiger-aspect-ratio-fit-cover > img, .tiger-aspect-ratio-fit-cover > video, .tiger-aspect-ratio-fit-cover > iframe':
+  '.tiger-aspect-ratio-fit-cover > .tiger-aspect-ratio-content > img, .tiger-aspect-ratio-fit-cover > .tiger-aspect-ratio-content > video, .tiger-aspect-ratio-fit-cover > .tiger-aspect-ratio-content > iframe':
     {
       objectFit: 'cover',
       width: '100%',
       height: '100%'
     },
-  '.tiger-aspect-ratio-fit-fill > img, .tiger-aspect-ratio-fit-fill > video, .tiger-aspect-ratio-fit-fill > iframe':
+  '.tiger-aspect-ratio-fit-fill > .tiger-aspect-ratio-content > img, .tiger-aspect-ratio-fit-fill > .tiger-aspect-ratio-content > video, .tiger-aspect-ratio-fit-fill > .tiger-aspect-ratio-content > iframe':
     {
       objectFit: 'fill',
       width: '100%',
@@ -63,7 +64,7 @@ export const aspectRatioBaseStyles = {
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
-export const aspectRatioRootClasses = 'tiger-aspect-ratio relative w-full overflow-visible'
+export const aspectRatioRootClasses = 'tiger-aspect-ratio relative w-full'
 
 export const aspectRatioContentClasses = 'tiger-aspect-ratio-content h-full w-full min-h-0 min-w-0'
 
@@ -175,7 +176,13 @@ export function getAspectRatioStyle(ratio?: AspectRatioValue): AspectRatioStyle 
  * Classes for the root ratio box.
  */
 export function getAspectRatioRootClasses(className?: string, fit?: AspectRatioFit | null): string {
-  return classNames(aspectRatioRootClasses, getAspectRatioFitClasses(fit), className)
+  const fitClass = getAspectRatioFitClasses(fit)
+  return classNames(
+    aspectRatioRootClasses,
+    fitClass ? 'overflow-hidden' : 'overflow-visible',
+    fitClass,
+    className
+  )
 }
 
 /**

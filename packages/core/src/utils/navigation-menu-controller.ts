@@ -24,7 +24,9 @@ export function containsFocusTarget(
   container: HTMLElement | null | undefined,
   target: EventTarget | null
 ): boolean {
-  return Boolean(container && target instanceof Node && container.contains(target))
+  // Adopted nodes keep their original realm's prototype in the destination document.
+  const node = target as Node | null
+  return Boolean(container && typeof node?.nodeType === 'number' && container.contains(node))
 }
 
 export function getOpenPanelFromMenubar(menubar: HTMLElement | null): HTMLElement | null {

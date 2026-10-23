@@ -19,6 +19,7 @@ import {
   pieSliceLabelInsideClasses,
   pieOuterRadius,
   resolvePieRadii,
+  getPieArcs,
   separatePieLabels,
   DEFAULT_PIE_START_ANGLE,
   DONUT_ENTRANCE_CLASS,
@@ -168,6 +169,19 @@ export const PieChart: React.FC<PieChartProps> = ({
         outerRadius,
         innerRadiusRatio,
         labelPosition,
+        outsideLabels: showLabels
+          ? getPieArcs(data, {
+              startAngle,
+              endAngle: endAngle ?? startAngle + Math.PI * 2,
+              padAngle
+            }).map((arc) => ({
+              startAngle: arc.startAngle,
+              endAngle: arc.endAngle,
+              text: labelFormatter
+                ? labelFormatter(arc.value, arc.data, arc.index)
+                : `${pieSliceDisplayLabel(arc.data, arc.index, labels.sliceName)} 100.0%`
+            }))
+          : undefined,
         hoverOffset
       }),
     [
@@ -177,7 +191,14 @@ export const PieChart: React.FC<PieChartProps> = ({
       outerRadius,
       innerRadiusRatio,
       labelPosition,
-      hoverOffset
+      hoverOffset,
+      data,
+      labelFormatter,
+      labels.sliceName,
+      showLabels,
+      startAngle,
+      endAngle,
+      padAngle
     ]
   )
   const slices = useMemo(

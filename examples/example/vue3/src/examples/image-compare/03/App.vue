@@ -21,7 +21,7 @@ const clicked = ref(false)
           <img :src="after" alt="插槽 after" class="block h-full w-full object-cover" />
           <button
             type="button"
-            class="absolute bottom-3 end-3 rounded bg-white px-2 py-1 text-sm shadow"
+            class="absolute bottom-3 end-3 rounded bg-white px-2 py-1 text-sm text-gray-900 shadow"
             @click="clicked = true">
             查看 after
           </button>

@@ -4,6 +4,7 @@
  * Split out of `chart-utils.ts` (PR-12).
  */
 
+import { estimateChartTextWidth } from './text'
 import { devWarn } from '../dev-warn'
 import type {
   ChartAxisOrientation,
@@ -217,13 +218,17 @@ export function getChartAxisGeometry(
   const rangeStart = scale.range[0]
   const rangeEnd = scale.range[1]
   const tickDirection = isTopOrLeft ? -1 : 1
-  const labelBase = tickSize + tickPadding + labelOffset
   const labelPosition = (rangeStart + rangeEnd) / 2
   const ticks = getChartAxisTicks(scale, {
     tickCount: options.tickCount ?? 5,
     tickValues: options.tickValues,
     tickFormat: options.tickFormat
   })
+
+  const tickWidth = isHorizontal
+    ? 0
+    : Math.max(0, ...ticks.map((tick) => estimateChartTextWidth(tick.label)))
+  const labelBase = tickSize + tickPadding + Math.max(labelOffset, tickWidth + 12)
 
   return {
     axisLine: isHorizontal

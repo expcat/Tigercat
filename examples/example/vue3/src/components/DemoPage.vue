@@ -26,7 +26,9 @@ const lead = computed(() => demoProse(props.description, demoLang.value))
 <template>
   <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-2 dark:text-gray-100">{{ heading }}</h1>
+      <h1 class="text-3xl font-bold mb-2 [overflow-wrap:anywhere] dark:text-gray-100">
+        {{ heading }}
+      </h1>
       <p v-if="lead" class="text-gray-600 dark:text-gray-400">{{ lead }}</p>
     </div>
     <DemoBlock v-for="demoModule in modules" :key="demoModule.meta.id" :module="demoModule" />

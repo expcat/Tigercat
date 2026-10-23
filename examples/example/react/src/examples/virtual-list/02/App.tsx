@@ -10,7 +10,7 @@ export default function App() {
       height={400}
       aria-label="Variable rows"
       renderItem={({ index }) => (
-        <div className="flex h-full items-center px-4">
+        <div className="flex items-center px-4" style={{ height: getItemHeight(index) }}>
           第 {index + 1} 行 · {getItemHeight(index)}px
         </div>
       )}

@@ -236,7 +236,11 @@ export const FloatButton = defineComponent({
           ? control
           : h(
               Badge,
-              { content: props.badge, type: typeof props.badge === 'number' ? 'number' : 'text' },
+              {
+                content: props.badge,
+                type: typeof props.badge === 'number' ? 'number' : 'text',
+                standalone: false
+              },
               () => [control]
             )
       if (inGroup && props.tooltip) {

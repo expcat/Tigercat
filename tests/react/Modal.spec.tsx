@@ -229,6 +229,12 @@ describe('Modal', () => {
       )
 
       const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+      fireEvent.touchStart(dialog, { touches: [{ clientX: 120, clientY: 240 }] })
+      fireEvent.touchMove(dialog, { touches: [{ clientX: 124, clientY: 160 }] })
+      fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 124, clientY: 160 }] })
+      expect(onOpenChange).not.toHaveBeenCalled()
+      expect(onCancel).not.toHaveBeenCalled()
+
       fireEvent.touchStart(dialog, { touches: [{ clientX: 120, clientY: 160 }] })
       fireEvent.touchMove(dialog, { touches: [{ clientX: 124, clientY: 240 }] })
       fireEvent.touchEnd(dialog, { changedTouches: [{ clientX: 124, clientY: 240 }] })

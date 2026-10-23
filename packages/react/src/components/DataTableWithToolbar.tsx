@@ -398,7 +398,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
         style={toolbar?.style as React.CSSProperties | undefined}
         role="toolbar"
         aria-label={tableLabels.toolbarAriaLabel}>
-        <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
+        <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0 basis-full sm:basis-auto">
           {hasSearch ? (
             <div
               className={classNames(

@@ -20,7 +20,7 @@ import { computed, inject, onBeforeUnmount, onMounted, ref, watch, type Ref } fr
 import { Button } from '@expcat/tigercat-vue/Button'
 import { CodeEditor } from '@expcat/tigercat-vue/CodeEditor'
 import { copyTextToClipboard, readTigerDocumentTheme } from '@expcat/tigercat-core'
-import { collectTigerCssVars } from '@demo-shared/themes'
+import { collectTigerCssVars, observeDemoTheme } from '@demo-shared/themes'
 import runtimeUrlsValue from 'virtual:tigercat-playground-runtime'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome, demoModuleTitle } from '@demo-shared/chrome'
@@ -101,7 +101,7 @@ const iframeHeight = ref(clampDemoFrameHeight(undefined, viewport.value))
 const themeVersion = ref(0)
 let latestRun = 0
 let intersectionObserver: IntersectionObserver | null = null
-let themeObserver: MutationObserver | null = null
+let stopThemeObserver: (() => void) | null = null
 
 const isDirty = computed(() => {
   if (!originalBundle.value) return false
@@ -238,11 +238,7 @@ onMounted(() => {
     )
     intersectionObserver.observe(sectionRef.value)
   }
-  themeObserver = new MutationObserver(() => themeVersion.value++)
-  themeObserver.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['class', 'data-tiger-theme', 'data-tiger-color-scheme', 'style']
-  })
+  stopThemeObserver = observeDemoTheme(() => themeVersion.value++)
   window.addEventListener('message', onMessage)
 })
 
@@ -253,7 +249,7 @@ watch([demoLang, themeVersion], () => {
 
 onBeforeUnmount(() => {
   intersectionObserver?.disconnect()
-  themeObserver?.disconnect()
+  stopThemeObserver?.()
   window.removeEventListener('message', onMessage)
 })
 </script>

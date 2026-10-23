@@ -132,8 +132,7 @@ export const ChartLegend = defineComponent({
                 style: {
                   width: `${props.markerSize}px`,
                   height: `${props.markerSize}px`,
-                  background: `var(--tiger-chart-legend-marker-image)`,
-                  '--tiger-chart-legend-marker-color': item.color
+                  background: item.color
                 } as Record<string, string>,
                 'aria-hidden': 'true',
                 'data-legend-marker': 'true'

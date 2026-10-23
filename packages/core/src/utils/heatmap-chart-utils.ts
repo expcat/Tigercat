@@ -3,6 +3,7 @@
  * Vue/React only bind the returned geometry.
  */
 
+import { estimateChartTextWidth } from './chart/text'
 import type { ChartScaleValue, HeatmapChartDatum } from '../types/chart'
 import { getChartElementOpacity } from './chart-interaction'
 import { formatChartTemplate, isFiniteNumber } from './chart/layout'
@@ -407,7 +408,9 @@ export function layoutHeatmap(
   const xAxisLabels: HeatmapAxisLabel[] = []
   const yAxisLabels: HeatmapAxisLabel[] = []
 
-  for (let col = 0; col < cols; col++) {
+  const labelWidth = Math.max(...xLabels.map(estimateChartTextWidth)) + 8
+  const labelStep = cols <= 2 ? 1 : Math.max(1, Math.ceil(labelWidth / (cellW + usedGapX)))
+  for (let col = 0; col < cols; col += labelStep) {
     const x = col * (cellW + usedGapX)
     xAxisLabels.push({
       text: xLabels[col],

@@ -13,7 +13,7 @@ description: Compact generated Tigercat Layout props reference
 
 `packages/core/src/types/aspect-ratio.ts` · `AspectRatioProps` · 3/4 props
 
-Note: 根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `overflow-hidden`。
+Note: 默认保留媒体自然尺寸且不裁切。显式 `fit="contain"` / `"cover"` / `"fill"` 时，内容层填满比例盒，直系 `img`/`video`/`iframe` 按 fit 填充并裁进根元素圆角。
 
 | Prop         | Type               | Default  | Notes                                                       |
 | ------------ | ------------------ | -------- | ----------------------------------------------------------- |

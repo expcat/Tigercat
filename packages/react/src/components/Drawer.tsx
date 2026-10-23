@@ -326,7 +326,9 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
       )
 
       const allowed = swipeAllowedRef.current
-      const distance = sheetOffset || gesture?.distance || 0
+      const distance =
+        sheetOffset ||
+        (gesture ? drawerFollowDistance(resolvedPlacement, gesture.deltaX, gesture.deltaY) : 0)
       const size =
         resolvedPlacement === 'left' || resolvedPlacement === 'right'
           ? (dialogRef.current?.offsetWidth ?? 0)

@@ -335,10 +335,15 @@ export function validateCronExpressionWithLabels(
   const issues: CronValidationIssue[] = []
 
   if (parts.length !== cronFieldMetas.length) {
-    issues.push({
-      field: 'expression',
-      message: labels?.expressionFieldsError ?? 'Cron expression must contain 5 fields'
-    })
+    return {
+      valid: false,
+      issues: [
+        {
+          field: 'expression',
+          message: labels?.expressionFieldsError ?? 'Cron expression must contain 5 fields'
+        }
+      ]
+    }
   }
 
   cronFieldMetas.forEach((meta, index) => {

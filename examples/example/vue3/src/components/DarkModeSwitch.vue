@@ -16,6 +16,7 @@ const lang = computed<DemoLang>(() => props.lang ?? 'zh-CN')
       {{ demoChrome(lang).dark }}
     </span>
     <Switch
+      :aria-label="demoChrome(lang).dark"
       :model-value="props.modelValue"
       size="sm"
       @update:model-value="(next: boolean) => emit('update:modelValue', next)" />

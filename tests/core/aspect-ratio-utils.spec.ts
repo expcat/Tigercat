@@ -86,19 +86,25 @@ describe('aspect-ratio-utils', () => {
   })
 
   describe('class helpers', () => {
-    it('does not clip the ratio box by default', () => {
-      expect(aspectRatioRootClasses).toContain('overflow-visible')
-      expect(aspectRatioRootClasses).not.toContain('overflow-hidden')
+    it('clips the ratio box only for an explicit media fit', () => {
+      expect(getAspectRatioRootClasses()).toContain('overflow-visible')
+      expect(getAspectRatioRootClasses(undefined, 'none')).toContain('overflow-visible')
+      expect(getAspectRatioRootClasses(undefined, 'cover')).toContain('overflow-hidden')
+      expect(getAspectRatioRootClasses(undefined, 'cover')).not.toContain('overflow-visible')
     })
 
     it('appends extra class names after the base classes', () => {
-      expect(getAspectRatioRootClasses('rounded-lg')).toBe(aspectRatioRootClasses + ' rounded-lg')
+      expect(getAspectRatioRootClasses('rounded-lg')).toBe(
+        aspectRatioRootClasses + ' overflow-visible rounded-lg'
+      )
       expect(getAspectRatioContentClasses('p-2')).toBe(aspectRatioContentClasses + ' p-2')
     })
 
     it('returns the bare base classes without extras', () => {
-      expect(getAspectRatioRootClasses()).toBe(aspectRatioRootClasses)
-      expect(getAspectRatioRootClasses(undefined)).toBe(aspectRatioRootClasses)
+      expect(getAspectRatioRootClasses()).toBe(aspectRatioRootClasses + ' overflow-visible')
+      expect(getAspectRatioRootClasses(undefined)).toBe(
+        aspectRatioRootClasses + ' overflow-visible'
+      )
       expect(getAspectRatioContentClasses()).toBe(aspectRatioContentClasses)
     })
   })

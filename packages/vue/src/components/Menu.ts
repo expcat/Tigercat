@@ -644,11 +644,16 @@ export const MenuItem = defineComponent({
       const label = getVueSlotPlainText(slotNodes)
       const collapsed = effectiveCollapsed.value
       const badgeModel = normalizeMenuItemBadge(props.badge)
+      const labelChildren = collapsed
+        ? [renderMenuIcon(props.icon, true), ...renderCollapsedLabel(label, props.icon)]
+        : [renderMenuIcon(props.icon, false), h('span', { class: 'min-w-0 flex-1' }, slotNodes)]
       const badgeNode = badgeModel
         ? h(Badge, {
+            class: collapsed ? undefined : 'ms-2 shrink-0',
             content: badgeModel.content,
             type: badgeModel.type,
             variant: badgeModel.variant as 'danger' | undefined,
+            size: collapsed ? 'sm' : 'md',
             standalone: true
           })
         : null
@@ -656,13 +661,15 @@ export const MenuItem = defineComponent({
         ? h('span', { class: 'ms-auto text-xs text-[var(--tiger-text-secondary)]' }, props.shortcut)
         : null
       const children = collapsed
-        ? [renderMenuIcon(props.icon, true), ...renderCollapsedLabel(label, props.icon)]
-        : [
-            renderMenuIcon(props.icon, false),
-            h('span', { class: 'flex-1' }, slotNodes),
-            badgeNode,
-            shortcutNode
-          ]
+        ? badgeNode
+          ? [
+              h('span', { class: 'inline-flex flex-col items-center gap-1' }, [
+                ...labelChildren,
+                badgeNode
+              ])
+            ]
+          : labelChildren
+        : [...labelChildren, badgeNode, shortcutNode]
 
       const inPopupMenu = inPopup.value
       const usesMenuRole = inPopupMenu || menuContext?.mode.value === 'horizontal'

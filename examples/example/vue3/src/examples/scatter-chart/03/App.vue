@@ -38,7 +38,12 @@ const onPointClick = (index: number, datum: ScatterChartDatum) => {
     </div>
     <div>
       <p class="mb-1 text-sm text-gray-500">只传 onPointClick，不必再开 selectable</p>
-      <ScatterChart :data="data" :width="460" :height="220" @point-click="onPointClick" />
+      <ScatterChart
+        :data="data"
+        :width="460"
+        :height="220"
+        :size-scale="{ minRadius: 4, maxRadius: 10 }"
+        @point-click="onPointClick" />
     </div>
   </div>
 </template>

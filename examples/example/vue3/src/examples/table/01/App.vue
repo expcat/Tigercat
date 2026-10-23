@@ -3,7 +3,7 @@ import { Table } from '@expcat/tigercat-vue/Table'
 import type { TableColumn } from '@expcat/tigercat-core'
 
 const columns: TableColumn[] = [
-  { key: 'name', title: '姓名', width: 160 },
+  { key: 'name', title: '姓名' },
   { key: 'role', title: '角色' }
 ]
 

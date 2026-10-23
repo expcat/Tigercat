@@ -41,7 +41,7 @@ export interface AspectRatioProps {
   className?: string
 
   /**
-   * Additional CSS class name for the absolutely positioned content wrapper
+   * Additional CSS class name for the content wrapper
    */
   contentClassName?: string
 }

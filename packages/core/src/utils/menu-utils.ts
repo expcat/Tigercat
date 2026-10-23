@@ -26,7 +26,7 @@ export const menuBaseClasses =
  * Menu mode classes
  */
 export const menuModeClasses = {
-  horizontal: 'flex-row border-b',
+  horizontal: 'flex-row border-b [&>ul]:flex [&>ul]:flex-wrap',
   vertical: 'flex-col border-e min-w-[200px]',
   inline: 'flex-col min-w-[200px]'
 }

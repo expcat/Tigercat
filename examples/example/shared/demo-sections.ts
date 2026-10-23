@@ -58,3 +58,16 @@ export function sameDemoSections(current: DemoSection[], next: DemoSection[]): b
     (section, index) => section.id === next[index]?.id && section.label === next[index]?.label
   )
 }
+
+/** Keep the active chapter visible in the shell's single-row section nav. */
+export function revealDemoActiveSection(root: HTMLElement | null): void {
+  const active = root?.querySelector<HTMLElement>('[aria-current="location"]')
+  const list = active?.closest('ul')
+  if (!active || !list || list.scrollWidth <= list.clientWidth) return
+
+  const itemRect = active.getBoundingClientRect()
+  const left = list.getBoundingClientRect().left + list.clientLeft
+  const right = left + list.clientWidth
+  list.scrollLeft +=
+    itemRect.left < left ? itemRect.left - left : Math.max(0, itemRect.right - right)
+}

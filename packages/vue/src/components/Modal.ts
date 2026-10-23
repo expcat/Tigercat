@@ -509,7 +509,10 @@ export const Modal = defineComponent({
       resetTouchGesture()
 
       if (!allowed || !props.mobileSheet) return
-      const release = resolveSheetRelease(distance || (gesture?.distance ?? 0), size)
+      const release = resolveSheetRelease(
+        distance || clampSheetDragDistance(gesture?.deltaY ?? 0),
+        size
+      )
       const motion = resolveSheetReducedMotion(release, prefersReducedMotion())
       if (motion === 'close') handleClose()
     }

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@expcat/tigercat-react/Button'
 import { CodeEditor } from '@expcat/tigercat-react/CodeEditor'
 import { copyTextToClipboard, readTigerDocumentTheme } from '@expcat/tigercat-core'
-import { collectTigerCssVars } from '@demo-shared/themes'
+import { collectTigerCssVars, observeDemoTheme } from '@demo-shared/themes'
 import runtimeUrlsValue from 'virtual:tigercat-playground-runtime'
 import type {
   DemoCompileSuccess,
@@ -114,12 +114,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   }, [])
 
   useEffect(() => {
-    const observer = new MutationObserver(() => setThemeVersion((value) => value + 1))
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class', 'data-tiger-theme', 'data-tiger-color-scheme', 'style']
-    })
-    return () => observer.disconnect()
+    return observeDemoTheme(() => setThemeVersion((value) => value + 1))
   }, [])
 
   const isDirty = useMemo(() => {

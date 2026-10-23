@@ -15,10 +15,10 @@ export default function App() {
     <div>
       <div className="grid gap-4 md:grid-cols-[1fr_160px]">
         <div ref={containerRef} className="h-64 overflow-auto rounded border">
-          <section id="spy-audit" className="min-h-[20rem] bg-blue-50 p-4">
+          <section id="spy-audit" className="min-h-[20rem] bg-blue-50 dark:bg-blue-950 p-4">
             审计
           </section>
-          <section id="spy-release" className="min-h-[20rem] bg-green-50 p-4">
+          <section id="spy-release" className="min-h-[20rem] bg-green-50 dark:bg-green-950 p-4">
             发布
           </section>
         </div>

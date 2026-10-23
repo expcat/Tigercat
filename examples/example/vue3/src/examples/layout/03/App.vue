@@ -29,7 +29,7 @@ const items = [
       <Header>后台管理</Header>
       <Layout>
         <Sidebar
-          width="192px"
+          width="min(192px, 40%)"
           :collapsed-width="hidden ? '0px' : '64px'"
           :collapsed="collapsed || hidden">
           <Menu :items="items" />

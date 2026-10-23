@@ -58,7 +58,7 @@ const controlledCount = ref(5)
 
     <Card title="哨兵" class="mt-6">
       <pre
-        class="text-sm overflow-x-auto bg-gray-50 p-4 rounded"><code>const isControlled = computed(() => props.modelValue !== undefined)
+        class="text-sm overflow-x-auto bg-[var(--tiger-surface-muted)] text-[var(--tiger-text)] p-4 rounded"><code>const isControlled = computed(() => props.modelValue !== undefined)
 const inner = ref(props.defaultValue)
 const value = computed(() =>
   isControlled.value ? props.modelValue : inner.value

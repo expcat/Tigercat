@@ -19,6 +19,7 @@ const handleChange = (value: string) => {
       {{ demoChrome(props.modelValue).language }}
     </span>
     <Select
+      :aria-label="demoChrome(props.modelValue).language"
       :model-value="props.modelValue"
       @update:model-value="handleChange"
       :options="options"

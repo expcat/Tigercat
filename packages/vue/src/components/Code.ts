@@ -17,7 +17,6 @@ import {
   coerceClassValue,
   basicLabel,
   codeBlockCopyStatusLiveClasses,
-  codeBlockFloatingActionClasses,
   codeBlockHeaderActionsClasses,
   codeBlockHeaderClasses,
   codeBlockLanguageClasses,
@@ -153,17 +152,15 @@ export const Code = defineComponent({
     })
 
     return () => {
-      const showHeader = Boolean(props.showLanguage && props.language)
+      const showHeader = Boolean(
+        (props.showLanguage && props.language) || props.copyable || props.wrapToggle
+      )
       const wrapButton = props.wrapToggle
         ? h(
             'button',
             {
               type: 'button',
-              class: classNames(
-                codeBlockWrapButtonClasses,
-                !showHeader && codeBlockFloatingActionClasses,
-                !showHeader && props.copyable && 'end-28'
-              ),
+              class: codeBlockWrapButtonClasses,
               'aria-pressed': wrapped.value ? 'true' : 'false',
               onClick: () => {
                 wrapped.value = !wrapped.value
@@ -177,10 +174,7 @@ export const Code = defineComponent({
             'button',
             {
               type: 'button',
-              class: classNames(
-                copyButtonClasses.value,
-                !showHeader && codeBlockFloatingActionClasses
-              ),
+              class: copyButtonClasses.value,
               onClick: handleCopy
             },
             buttonLabel.value
@@ -200,7 +194,9 @@ export const Code = defineComponent({
                 h(
                   'span',
                   { class: codeBlockLanguageClasses },
-                  `${basicLabel(mergedLocale.value?.locale, 'code', 'language')}: ${props.language}`
+                  props.showLanguage && props.language
+                    ? `${basicLabel(mergedLocale.value?.locale, 'code', 'language')}: ${props.language}`
+                    : undefined
                 ),
                 wrapButton || copyButton
                   ? h('div', { class: codeBlockHeaderActionsClasses }, [wrapButton, copyButton])
@@ -238,8 +234,6 @@ export const Code = defineComponent({
               })()
             ]
           ),
-          showHeader ? null : wrapButton,
-          showHeader ? null : copyButton,
           props.copyable
             ? h(
                 'span',

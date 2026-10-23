@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { isBrowser } from '@expcat/tigercat-core'
 import { AppShell } from '@expcat/tigercat-react/AppShell'
 
 const routes = [
@@ -11,6 +12,7 @@ export default function App() {
   return (
     <AppShell
       title="Home"
+      defaultCollapsed={isBrowser() && window.matchMedia('(max-width: 639px)').matches}
       headerSticky
       tabs={routes}
       activeTab={active}

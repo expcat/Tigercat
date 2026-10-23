@@ -517,7 +517,8 @@ const COMPONENT_USAGE_NOTES = {
       '竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradient 也生效。子节点是居中标签。'
   },
   AspectRatio: {
-    notes: '根默认裁切；直系 `img`/`video`/`iframe` 铺满。不必再写 `overflow-hidden`。'
+    notes:
+      '默认保留媒体自然尺寸且不裁切。显式 `fit="contain"` / `"cover"` / `"fill"` 时，内容层填满比例盒，直系 `img`/`video`/`iframe` 按 fit 填充并裁进根元素圆角。'
   },
   Skeleton: {
     notes:

@@ -44,7 +44,7 @@ const handleSend = (content: string) => {
     </label>
     <ChatWindow
       v-model="input"
-      class="h-[32rem]"
+      :style="{ height: '32rem' }"
       :messages="messages"
       :input-type="inputType"
       :input-rows="2"

@@ -328,7 +328,10 @@ export const BarChart = defineComponent({
 
     const resolvedYScale = computed(() => {
       if (props.yScale) return props.yScale
-      const extent = getNumberExtent(yValues.value, { includeZero: true })
+      const extent = getNumberExtent(yValues.value, {
+        includeZero: true,
+        padding: props.showValueLabels && props.valueLabelPosition === 'top' ? 0.2 : 0
+      })
       return createLinearScale(extent, [innerRect.value.height, 0])
     })
 

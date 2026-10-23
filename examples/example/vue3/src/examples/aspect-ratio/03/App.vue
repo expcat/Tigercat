@@ -11,6 +11,7 @@ const cover = 'https://picsum.photos/seed/tiger-overlay/640/360'
   <div class="w-full max-w-md space-y-3">
     <AspectRatio
       :ratio="ratio"
+      fit="cover"
       class="rounded-xl border border-gray-200 shadow-sm dark:border-gray-700">
       <img :src="cover" alt="" />
       <div class="absolute inset-x-0 bottom-0 bg-black/40 px-4 py-3 backdrop-blur-sm">

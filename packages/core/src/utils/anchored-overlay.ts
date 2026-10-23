@@ -178,8 +178,8 @@ export function getAnchoredOverlayLayoutClasses(
         ? 'w-[var(--tiger-overlay-reference-width)]'
         : 'sm:w-[var(--tiger-overlay-reference-width)]'),
     layout === 'fullscreen-sm' &&
-      'max-sm:data-[positioned=true]:visible max-sm:fixed max-sm:inset-0 max-sm:left-auto max-sm:top-auto max-sm:max-w-none! max-sm:max-h-none!',
+      'max-sm:data-[positioned=true]:visible max-sm:fixed max-sm:inset-0 max-sm:left-0 max-sm:top-0 max-sm:w-full max-sm:max-w-none! max-sm:max-h-none!',
     layout === 'bottom-sheet-sm' &&
-      'max-sm:data-[positioned=true]:visible max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:left-auto max-sm:top-auto max-sm:max-w-none! max-sm:max-h-none!'
+      'max-sm:data-[positioned=true]:visible max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:top-auto max-sm:w-full max-sm:max-w-full! max-sm:max-h-dvh!'
   )
 }

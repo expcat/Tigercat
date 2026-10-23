@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } 
 import { useAnchoredOverlay } from './overlay'
 import {
   buildOverlayTriggerHandlerMap,
+  containsFocusTarget,
   createOverlayPopupController,
   restoreFocus,
   type FloatingPlacement,
@@ -113,9 +114,11 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   }, [controller, effectiveTrigger, restoreTriggerFocus])
 
   const relatedInside = (event?: { relatedTarget?: EventTarget | null }) => {
-    const related = event?.relatedTarget
-    if (!(related instanceof Node)) return false
-    return Boolean(floatingRef.current?.contains(related) || triggerRef.current?.contains(related))
+    const related = event?.relatedTarget ?? null
+    return (
+      containsFocusTarget(floatingRef.current, related) ||
+      containsFocusTarget(triggerRef.current, related)
+    )
   }
 
   const handleToggle = useCallback(() => {
@@ -142,7 +145,21 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     (event?: React.SyntheticEvent) => {
       const type = event?.type
       if (type === 'blur' || type === 'focusout') {
-        controller.focusLeave(relatedInside(event as React.FocusEvent))
+        const focusEvent = event as React.FocusEvent
+        if (focusEvent.relatedTarget == null) {
+          // Cross-document focus changes omit relatedTarget until focus settles.
+          window.setTimeout(() => {
+            controller.focusLeave(
+              [floatingRef.current, triggerRef.current].some(
+                (node) =>
+                  node?.ownerDocument.hasFocus() &&
+                  containsFocusTarget(node, node.ownerDocument.activeElement)
+              )
+            )
+          }, 0)
+        } else {
+          controller.focusLeave(relatedInside(focusEvent))
+        }
         return
       }
       controller.pointerLeave()

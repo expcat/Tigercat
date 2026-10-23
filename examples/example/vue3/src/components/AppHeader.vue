@@ -70,7 +70,7 @@ const handleLangChange = (v: DemoLang) => {
         </div>
       </div>
 
-      <div v-if="!props.isCompactHeader" class="hidden items-center gap-3 sm:flex">
+      <div v-if="!props.isCompactHeader" class="hidden items-center gap-3 lg:flex">
         <LanguageSwitch :model-value="props.lang" @update:model-value="handleLangChange" />
         <ThemeSwitch
           :lang="props.lang"
@@ -82,7 +82,7 @@ const handleLangChange = (v: DemoLang) => {
           @update:model-value="(v: boolean) => emit('update:dark', v)" />
       </div>
 
-      <details v-else class="relative shrink-0 sm:hidden">
+      <details v-else class="relative shrink-0 lg:hidden">
         <summary
           class="flex size-8 cursor-pointer list-none select-none items-center justify-center rounded-[var(--tiger-radius-md)] border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900 [&::-webkit-details-marker]:hidden">
           <span aria-hidden="true" class="text-base leading-none">⚙</span>

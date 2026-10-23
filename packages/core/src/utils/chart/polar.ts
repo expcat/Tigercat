@@ -23,6 +23,7 @@ import {
 } from './path'
 import { DEFAULT_CHART_COLORS, RADAR_SPLIT_AREA_COLORS } from './color'
 import { chartLabelFill } from '../heatmap-chart-utils'
+import { estimateChartTextWidth } from './text'
 
 export const PIE_OUTSIDE_RADIUS_RATIO = 0.72
 export const DEFAULT_PIE_START_ANGLE = -Math.PI / 2
@@ -60,6 +61,7 @@ export function resolvePieRadii(options: {
   outerRadius?: number
   innerRadiusRatio?: number
   labelPosition?: 'inside' | 'outside'
+  outsideLabels?: Array<{ text: string; startAngle: number; endAngle: number }>
   hoverOffset?: number
 }): {
   cx: number
@@ -68,8 +70,8 @@ export function resolvePieRadii(options: {
   outerRadius: number
   maxRadius: number
 } {
-  const cx = options.innerWidth / 2
-  const cy = options.innerHeight / 2
+  let cx = options.innerWidth / 2
+  let cy = options.innerHeight / 2
   const hover = Math.max(0, options.hoverOffset ?? 0)
   const maxRadius = Math.max(0, Math.min(options.innerWidth, options.innerHeight) / 2 - hover)
   let outerRadius: number
@@ -78,6 +80,53 @@ export function resolvePieRadii(options: {
   } else {
     outerRadius =
       options.labelPosition === 'outside' ? maxRadius * PIE_OUTSIDE_RADIUS_RATIO : maxRadius
+    if (options.labelPosition === 'outside' && options.outsideLabels?.length) {
+      const labels = options.outsideLabels
+      const boundsAt = (radius: number) => {
+        const xs = [0]
+        const ys = [0]
+        for (const label of labels) {
+          const angles = [label.startAngle, label.endAngle]
+          for (
+            let angle = Math.ceil(label.startAngle / (Math.PI / 2)) * (Math.PI / 2);
+            angle < label.endAngle;
+            angle += Math.PI / 2
+          )
+            angles.push(angle)
+          for (const angle of angles) {
+            const point = polarToCartesian(0, 0, radius, angle)
+            xs.push(point.x)
+            ys.push(point.y)
+          }
+          const line = computePieLabelLine(0, 0, radius, label.startAngle, label.endAngle)
+          const width = estimateChartTextWidth(label.text)
+          xs.push(line.label.x, line.label.x + (line.textAnchor === 'start' ? width : -width))
+          ys.push(line.label.y - 6, line.label.y + 6)
+        }
+        return {
+          left: Math.min(...xs),
+          right: Math.max(...xs),
+          top: Math.min(...ys),
+          bottom: Math.max(...ys)
+        }
+      }
+      let low = 0
+      let high = outerRadius
+      for (let iteration = 0; iteration < 16; iteration++) {
+        const radius = (low + high) / 2
+        const bounds = boundsAt(radius)
+        if (
+          bounds.right - bounds.left <= options.innerWidth - hover * 2 &&
+          bounds.bottom - bounds.top <= options.innerHeight - hover * 2
+        )
+          low = radius
+        else high = radius
+      }
+      outerRadius = low
+      const bounds = boundsAt(outerRadius)
+      cx = (options.innerWidth - bounds.left - bounds.right) / 2
+      cy = (options.innerHeight - bounds.top - bounds.bottom) / 2
+    }
   }
   let innerRadius = 0
   if (isFiniteNumber(options.innerRadius)) {
@@ -452,7 +501,7 @@ export function layoutRadar(
       const position = polarToCartesian(
         cx,
         cy,
-        radius * ratio + levelLabelOffset,
+        Math.max(0, radius * ratio - levelLabelOffset),
         options.startAngle
       )
       levelLabels.push({ x: position.x, y: position.y, text: formatLevel(value, index) })

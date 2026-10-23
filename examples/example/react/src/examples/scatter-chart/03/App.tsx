@@ -36,6 +36,7 @@ export default function App() {
           data={data}
           width={460}
           height={220}
+          sizeScale={{ minRadius: 4, maxRadius: 10 }}
           onPointClick={(index, datum) => {
             console.info(index, datum.label)
           }}

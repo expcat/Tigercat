@@ -49,7 +49,7 @@ export default function AsyncTourExample() {
         <Button id="tour-optional-react" onClick={() => setIncludeOptional((value) => !value)}>
           可选步骤：{includeOptional ? '启用' : '跳过'}
         </Button>
-        <span id="tour-finish-react" className="rounded bg-gray-100 px-3 py-2">
+        <span id="tour-finish-react" className="rounded bg-gray-100 dark:bg-gray-800 px-3 py-2">
           最终目标
         </span>
       </div>

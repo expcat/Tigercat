@@ -5,8 +5,9 @@ export interface FocusElementOptions {
 }
 
 export function isHTMLElement(value: unknown): value is HTMLElement {
-  if (typeof HTMLElement === 'undefined') return false
-  return value instanceof HTMLElement
+  if (typeof HTMLElement !== 'undefined' && value instanceof HTMLElement) return true
+  const constructor = (value as HTMLElement | null)?.ownerDocument?.defaultView?.HTMLElement
+  return typeof constructor === 'function' && value instanceof constructor
 }
 
 export function getActiveElement(doc?: Document): HTMLElement | null {

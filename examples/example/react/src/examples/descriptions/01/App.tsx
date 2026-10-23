@@ -8,5 +8,5 @@ const items = [
 ]
 
 export default function App() {
-  return <Descriptions title="用户信息" items={items} />
+  return <Descriptions title="用户信息" items={items} column={{ xs: 1, sm: 2, lg: 3 }} />
 }

@@ -246,7 +246,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
         const Tiger = await import('${options.runtimeUrls.tigercat}')
         const Shared = await import('${options.runtimeUrls.shared}')
         const Context = await import('@demo-runtime/context')
-        const root = createRoot(document.getElementById('root'))
+        const root = createRoot(document.getElementById('root'), { identifierPrefix: channelId + '-' })
         root.render(
           React.createElement(
             Context.LangContext.Provider,
@@ -273,7 +273,9 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
             )
           }
         })
-        Vue.createApp(Root).mount('#root')
+        const app = Vue.createApp(Root)
+        app.config.idPrefix = channelId + '-'
+        app.mount('#root')
       `
 
   return `<!doctype html>

@@ -55,7 +55,21 @@ describe('useFocusTrap container rebind', () => {
     expect(document.body.querySelector('[inert]')).toBeNull()
     expect(document.activeElement).toBe(launcher)
 
+    const iframe = document.createElement('iframe')
+    document.body.appendChild(iframe)
+    const iframeDocument = iframe.contentDocument!
+    const iframeLauncher = iframeDocument.createElement('button')
+    iframeDocument.body.append(iframeLauncher, target)
+    iframeLauncher.focus()
+    view.rerender(<Probe open />)
+    expect(
+      target.querySelector('[data-testid="panel"]')?.contains(iframeDocument.activeElement)
+    ).toBe(true)
+    view.rerender(<Probe open={false} />)
+    expect(iframeDocument.activeElement).toBe(iframeLauncher)
+
     view.unmount()
+    iframe.remove()
     launcher.remove()
     root.remove()
     target.remove()

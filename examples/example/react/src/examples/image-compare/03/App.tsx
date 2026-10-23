@@ -26,7 +26,7 @@ export default function App() {
             <img src={after} alt="插槽 after" className="block h-full w-full object-cover" />
             <button
               type="button"
-              className="absolute bottom-3 end-3 rounded bg-white px-2 py-1 text-sm shadow"
+              className="absolute bottom-3 end-3 rounded bg-white px-2 py-1 text-sm text-gray-900 shadow"
               onClick={() => setClicked(true)}>
               查看 after
             </button>

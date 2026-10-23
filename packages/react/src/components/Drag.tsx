@@ -85,9 +85,11 @@ export function Drag<T extends DragItem = DragItem>({
       data-tiger-drag=""
       role="list">
       {drag.draggedItem ? (
-        <div data-tiger-drag-preview="">{String(drag.draggedItem.id)}</div>
+        <div className="sr-only" aria-hidden="true" data-tiger-drag-preview="">
+          {String(drag.draggedItem.id)}
+        </div>
       ) : null}
-      <div role="status" data-tiger-drag-live="">
+      <div role="status" className="sr-only" data-tiger-drag-live="">
         {announcement}
       </div>
       {items.map((item) => {

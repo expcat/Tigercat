@@ -58,7 +58,12 @@ export default function ChartPrimitivesExample() {
                 tickValues={[0, 25, 50, 75, 100]}
                 label="订单"
               />
-              <ChartSeries data={data} name="orders" color="#2563eb" type="bar">
+              <ChartSeries
+                data={data}
+                name="orders"
+                color="#2563eb"
+                type="bar"
+                visibility={interaction.isLegendIndexHidden(0) ? 'hidden' : undefined}>
                 {({ color }) =>
                   data.map((item, index) => {
                     const y = yScale.map(item.y)
@@ -95,7 +100,9 @@ export default function ChartPrimitivesExample() {
             index: 0,
             label: '订单量',
             color: '#2563eb',
-            selected: interaction.resolvedSelectedIndex === 0
+            selected: interaction.resolvedSelectedIndex === 0,
+            hidden: interaction.isLegendIndexHidden(0),
+            active: !interaction.isLegendIndexHidden(0)
           }
         ]}
         interactive

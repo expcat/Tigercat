@@ -4,12 +4,12 @@ export default function App() {
   return (
     <div className="flex flex-wrap gap-4">
       <Resizable defaultWidth={160} defaultHeight={160} minWidth={120} lockAspectRatio>
-        <div className="flex h-full w-full items-center justify-center rounded border border-green-200 bg-green-50 text-sm">
+        <div className="flex h-full w-full items-center justify-center rounded border border-green-200 bg-green-50 text-green-700 text-sm">
           锁定比例
         </div>
       </Resizable>
       <Resizable defaultWidth={200} defaultHeight={120} axis="horizontal" minWidth={80}>
-        <div className="flex h-full w-full items-center justify-center rounded border border-blue-200 bg-blue-50 text-sm">
+        <div className="flex h-full w-full items-center justify-center rounded border border-blue-200 bg-blue-50 text-blue-700 text-sm">
           仅水平 axis
         </div>
       </Resizable>

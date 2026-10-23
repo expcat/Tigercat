@@ -14,7 +14,7 @@ export function getCalendarContainerClasses(fullscreen?: boolean): string {
   return classNames(
     'bg-[var(--tiger-surface)]',
     'border border-[var(--tiger-border)]',
-    fullscreen ? 'w-full min-w-0 p-4' : 'w-72 p-3',
+    fullscreen ? 'w-full min-w-0 p-4 max-[20rem]:p-1' : 'w-72 max-w-full p-3 max-[20rem]:p-1',
     'rounded-[var(--tiger-radius-md)]'
   )
 }
@@ -39,7 +39,7 @@ export const calendarTitleClasses = classNames(
 )
 
 export const calendarWeekdayClasses = classNames(
-  'text-xs font-medium text-center py-1',
+  'min-w-0 text-xs font-medium text-center py-1',
   'text-[var(--tiger-text-secondary)]'
 )
 
@@ -51,8 +51,8 @@ export const calendarGridClasses = 'grid grid-cols-7'
  */
 export function getCalendarWeekGridClasses(fullscreen = false): string {
   return fullscreen
-    ? 'grid grid-cols-[3.25rem_repeat(7,minmax(0,1fr))] gap-x-[var(--tiger-spacing-md)]'
-    : 'grid grid-cols-8'
+    ? 'grid grid-cols-[3.25rem_repeat(7,minmax(0,1fr))] gap-x-[var(--tiger-spacing-md)] max-[20rem]:grid-cols-[1.75rem_repeat(7,minmax(0,1fr))] max-[20rem]:gap-x-0'
+    : 'grid grid-cols-[2rem_repeat(7,minmax(0,1fr))]'
 }
 
 export function getCalendarWeekNumberClasses(fullscreen = false): string {
@@ -105,7 +105,7 @@ export function getCalendarDayClasses(state: CalendarDayClassState): string {
   } = state
   const selected = isSelected || isRangeStart || isRangeEnd
   return classNames(
-    'inline-flex items-center justify-center w-8 text-sm',
+    'inline-flex items-center justify-center w-8 max-w-full text-sm',
     hasExtra
       ? 'h-auto min-h-8 flex-col gap-0.5 rounded-[var(--tiger-radius-md)] py-0.5'
       : 'h-8 rounded-full',

@@ -7,7 +7,11 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { overlayZIndexClass } from '@expcat/tigercat-core'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
-import { collectDemoSections, sameDemoSections } from '@demo-shared/demo-sections'
+import {
+  collectDemoSections,
+  revealDemoActiveSection,
+  sameDemoSections
+} from '@demo-shared/demo-sections'
 import {
   getStoredColorScheme,
   getStoredLang,
@@ -32,6 +36,7 @@ export const AppLayout: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const stickyRef = useRef<HTMLDivElement | null>(null)
   const [sections, setSections] = useState<ReturnType<typeof collectDemoSections>>([])
+  const [activeSection, setActiveSection] = useState<string | number>()
   const [anchorOffset, setAnchorOffset] = useState(0)
   const [pageTitle, setPageTitle] = useState('')
   const [lang, setLang] = useState<DemoLang>(() => getStoredLang())
@@ -45,7 +50,7 @@ export const AppLayout: React.FC = () => {
 
   useEffect(() => {
     const mql = window.matchMedia('(max-width: 767px)')
-    const compactMql = window.matchMedia('(max-width: 639px)')
+    const compactMql = window.matchMedia('(max-width: 1023px)')
     const handler = (e: MediaQueryListEvent | MediaQueryList) => {
       setIsMobile(e.matches)
       if (e.matches) setIsSiderCollapsed(true)
@@ -121,10 +126,15 @@ export const AppLayout: React.FC = () => {
   )
 
   useEffect(() => {
+    revealDemoActiveSection(stickyRef.current)
+  }, [activeSection])
+
+  useEffect(() => {
     const el = stickyRef.current
     if (!el || typeof ResizeObserver === 'undefined') return undefined
     const measure = () => {
       setAnchorOffset(Math.ceil(el.getBoundingClientRect().height))
+      revealDemoActiveSection(el)
     }
     const observer = new ResizeObserver(measure)
     observer.observe(el)
@@ -158,7 +168,7 @@ export const AppLayout: React.FC = () => {
               onClose={() => setIsSiderCollapsed(true)}
             />
 
-            <main className="flex-1 min-w-0 h-full overflow-hidden">
+            <main className="isolate flex-1 min-w-0 h-full overflow-hidden">
               <div
                 ref={scrollContainerRef}
                 className="h-full overflow-y-auto overflow-x-hidden"
@@ -169,7 +179,7 @@ export const AppLayout: React.FC = () => {
                     className={`sticky top-0 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80 ${overlayZIndexClass.viewport}`}>
                     <div className="grid grid-cols-1 items-center gap-2 px-6 py-2 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-4">
                       <Breadcrumb className="w-auto shrink-0">
-                        <BreadcrumbItem href="/">{homeLabel}</BreadcrumbItem>
+                        <BreadcrumbItem href="#/">{homeLabel}</BreadcrumbItem>
                         <BreadcrumbItem current>{headerTitle}</BreadcrumbItem>
                       </Breadcrumb>
                       {sectionItems.length > 0 ? (
@@ -178,6 +188,7 @@ export const AppLayout: React.FC = () => {
                           orientation="horizontal"
                           targetOffset={anchorOffset}
                           getContainer={() => scrollContainerRef.current || window}
+                          onActiveKeyChange={setActiveSection}
                           className="min-w-0 w-full sm:w-auto sm:justify-self-end [&_ul]:max-w-full [&_ul]:flex-nowrap [&_ul]:overflow-x-auto [&_li]:shrink-0"
                         />
                       ) : null}

@@ -93,7 +93,7 @@ export const Sidebar = forwardRef<HTMLDivElement, ReactSidebarProps>(function Si
     ? feedbackLayoutLabels.sidebarExpand
     : feedbackLayoutLabels.sidebarCollapse
   return (
-    <div className="contents" data-tiger-sidebar-shell="">
+    <div data-tiger-sidebar-shell="" data-side={side}>
       {aside}
       <button
         type="button"
@@ -104,7 +104,7 @@ export const Sidebar = forwardRef<HTMLDivElement, ReactSidebarProps>(function Si
           const next = !effectiveCollapsed
           setEffectiveCollapsed(next)
         }}>
-        {triggerLabel}
+        <span aria-hidden="true">☰</span>
       </button>
     </div>
   )

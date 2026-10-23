@@ -114,7 +114,9 @@ export function getChartLegendShellClasses(position: ChartLegendPosition = 'bott
   const atStart = position === 'left' || position === 'top'
   return classNames(
     'inline-flex',
-    position === 'left' || position === 'right' ? 'flex-row items-start gap-4' : 'flex-col gap-2',
+    position === 'left' || position === 'right'
+      ? 'flex-row items-start gap-4 [&>:first-child]:flex-1 [&>:first-child]:min-w-0 [&>[data-chart-legend]]:shrink-0'
+      : 'flex-col gap-2',
     atStart && '[&>:first-child]:order-2 [&>:nth-child(2)]:order-1'
   )
 }

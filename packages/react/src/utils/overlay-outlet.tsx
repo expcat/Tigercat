@@ -51,12 +51,15 @@ export function OverlayPortal({
 }: {
   children: React.ReactNode
   disabled?: boolean
-  /** DOM portal target used when this tree has no ConfigProvider outlet. */
+  /** Cross-document targets bypass the local ConfigProvider outlet. */
   target?: HTMLElement | null
 }) {
   const outlet = useContext(OverlayOutletContext)
   const insideOutlet = useContext(OutletRenderContext)
-  const nestInHost = insideOutlet || isNestedOverlayTarget(target)
+  const nestInHost =
+    insideOutlet ||
+    isNestedOverlayTarget(target) ||
+    (target != null && isBrowser() && target.ownerDocument !== document)
   const id = useId()
   const clientRender = useSyncExternalStore(
     subscribeRenderPhase,

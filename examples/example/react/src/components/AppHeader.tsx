@@ -73,7 +73,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         </div>
 
         {isCompactHeader ? (
-          <details className="relative shrink-0 sm:hidden">
+          <details className="relative shrink-0 lg:hidden">
             <summary className="flex size-8 cursor-pointer list-none select-none items-center justify-center rounded-[var(--tiger-radius-md)] border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring)]/40 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900 [&::-webkit-details-marker]:hidden">
               <span aria-hidden="true" className="text-base leading-none">
                 ⚙
@@ -89,7 +89,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             </div>
           </details>
         ) : (
-          <div className="hidden items-center gap-3 sm:flex">
+          <div className="hidden items-center gap-3 lg:flex">
             <LanguageSwitch value={lang} onChange={onLangChange} />
             <ThemeSwitch lang={lang} value={theme} onChange={onThemeChange} />
             <DarkModeSwitch lang={lang} checked={dark} onChange={onDarkChange} />

@@ -19,7 +19,6 @@ import {
   mergeTigerLocale,
   funnelLayerRatios,
   funnelStageDisplayLabel,
-  chartLabelFill,
   funnelSegmentTransitionClasses,
   pieSliceLabelInsideClasses,
   DEFAULT_FUNNEL_HEIGHT,
@@ -301,7 +300,10 @@ export const FunnelChart = defineComponent({
                       class: pieSliceLabelInsideClasses,
                       'text-anchor': 'middle',
                       'dominant-baseline': 'middle',
-                      fill: chartLabelFill(seg.color),
+                      fill: 'var(--tiger-text)',
+                      stroke: 'var(--tiger-surface)',
+                      'stroke-width': 3,
+                      'paint-order': 'stroke',
                       'aria-hidden': interactive.value ? 'true' : undefined
                     },
                     layerLabel(

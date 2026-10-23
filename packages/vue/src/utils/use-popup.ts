@@ -6,6 +6,7 @@ import { computed, onBeforeUnmount, ref, watch, type Ref } from 'vue'
 import { useVueAnchoredOverlay } from './overlay'
 import {
   buildOverlayTriggerHandlerMap,
+  containsFocusTarget,
   createOverlayPopupController,
   restoreFocus,
   type FloatingPlacement,
@@ -115,9 +116,11 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   }
 
   const relatedInside = (event?: Event) => {
-    const related = (event as FocusEvent | undefined)?.relatedTarget
-    if (!(related instanceof Node)) return false
-    return Boolean(floatingRef.value?.contains(related) || triggerRef.value?.contains(related))
+    const related = (event as FocusEvent | undefined)?.relatedTarget ?? null
+    return (
+      containsFocusTarget(floatingRef.value, related) ||
+      containsFocusTarget(triggerRef.value, related)
+    )
   }
 
   const handleToggle = () => controller.activate()
@@ -136,7 +139,20 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   const handleHide = (event?: Event) => {
     const type = event?.type
     if (type === 'blur' || type === 'focusout') {
-      controller.focusLeave(relatedInside(event))
+      if ((event as FocusEvent).relatedTarget == null) {
+        // Cross-document focus changes omit relatedTarget until focus settles.
+        window.setTimeout(() => {
+          controller.focusLeave(
+            [floatingRef.value, triggerRef.value].some(
+              (node) =>
+                node?.ownerDocument.hasFocus() &&
+                containsFocusTarget(node, node.ownerDocument.activeElement)
+            )
+          )
+        }, 0)
+      } else {
+        controller.focusLeave(relatedInside(event))
+      }
       return
     }
     controller.pointerLeave()

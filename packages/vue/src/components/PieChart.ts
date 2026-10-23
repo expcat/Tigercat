@@ -21,6 +21,7 @@ import {
   pieSliceTransitionClasses,
   pieSliceLabelInsideClasses,
   resolvePieRadii,
+  getPieArcs,
   DEFAULT_PIE_START_ANGLE,
   DONUT_ENTRANCE_CLASS,
   PIE_BASE_SHADOW,
@@ -168,6 +169,19 @@ export const PieChart = defineComponent({
         outerRadius: props.outerRadius,
         innerRadiusRatio: props.innerRadiusRatio,
         labelPosition: props.labelPosition,
+        outsideLabels: props.showLabels
+          ? getPieArcs(props.data, {
+              startAngle: props.startAngle,
+              endAngle: props.endAngle ?? props.startAngle + Math.PI * 2,
+              padAngle: props.padAngle
+            }).map((arc) => ({
+              startAngle: arc.startAngle,
+              endAngle: arc.endAngle,
+              text: props.labelFormatter
+                ? props.labelFormatter(arc.value, arc.data, arc.index)
+                : `${pieSliceDisplayLabel(arc.data, arc.index, labels.value.sliceName)} 100.0%`
+            }))
+          : undefined,
         hoverOffset: props.hoverOffset
       })
     )

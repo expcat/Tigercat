@@ -8,7 +8,11 @@ import { useRoute } from 'vue-router'
 import { overlayZIndexClass, type ThemePresetName } from '@expcat/tigercat-core'
 import type { DemoLang } from '@demo-shared/app-config'
 import { demoChrome } from '@demo-shared/chrome'
-import { collectDemoSections, sameDemoSections } from '@demo-shared/demo-sections'
+import {
+  collectDemoSections,
+  revealDemoActiveSection,
+  sameDemoSections
+} from '@demo-shared/demo-sections'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
 import {
   getStoredColorScheme,
@@ -46,7 +50,7 @@ let mqlCleanup: (() => void) | null = null
 
 function setupMobileDetection() {
   const mql = window.matchMedia('(max-width: 767px)')
-  const compactMql = window.matchMedia('(max-width: 639px)')
+  const compactMql = window.matchMedia('(max-width: 1023px)')
   const handler = (e: MediaQueryListEvent | MediaQueryList) => {
     isMobile.value = e.matches
     if (e.matches) isSiderCollapsed.value = true
@@ -105,6 +109,10 @@ const sectionItems = computed(() =>
     label: section.label
   }))
 )
+
+function revealActiveSection(): void {
+  nextTick(() => revealDemoActiveSection(stickyRef.value))
+}
 
 watch(
   () => lang.value,
@@ -178,6 +186,7 @@ watch(stickyRef, (el) => {
   }
   const measure = () => {
     anchorOffset.value = Math.ceil(el.getBoundingClientRect().height)
+    revealDemoActiveSection(el)
   }
   stickyResizeObserver = new ResizeObserver(measure)
   stickyResizeObserver.observe(el)
@@ -234,7 +243,7 @@ watch(
           :is-mobile="isMobile"
           @close="closeSider" />
 
-        <main class="flex-1 min-w-0 h-full overflow-hidden">
+        <main class="isolate flex-1 min-w-0 h-full overflow-hidden">
           <div
             ref="mainScrollRef"
             class="h-full overflow-y-auto overflow-x-hidden"
@@ -249,7 +258,7 @@ watch(
               <div
                 class="grid grid-cols-1 items-center gap-2 px-6 py-2 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-4">
                 <Breadcrumb class="w-auto shrink-0">
-                  <BreadcrumbItem href="/">{{ homeLabel }}</BreadcrumbItem>
+                  <BreadcrumbItem href="#/">{{ homeLabel }}</BreadcrumbItem>
                   <BreadcrumbItem current>{{ headerTitle }}</BreadcrumbItem>
                 </Breadcrumb>
                 <ScrollSpy
@@ -258,6 +267,7 @@ watch(
                   orientation="horizontal"
                   :target-offset="anchorOffset"
                   :get-container="getMainContainer"
+                  @change="revealActiveSection"
                   class="min-w-0 w-full sm:w-auto sm:justify-self-end [&_ul]:max-w-full [&_ul]:flex-nowrap [&_ul]:overflow-x-auto [&_li]:shrink-0" />
               </div>
             </div>

@@ -132,7 +132,7 @@ export const cardCoverWrapperClasses = 'tiger-card-cover overflow-hidden'
 export const cardCoverVerticalWrapperClasses = 'tiger-card-cover-vertical w-full h-48'
 
 export const cardCoverHorizontalWrapperClasses =
-  'tiger-card-cover-horizontal shrink-0 w-48 self-stretch'
+  'tiger-card-cover-horizontal shrink-0 w-48 max-w-[40%] self-stretch'
 
 export const cardActionsClasses = 'flex gap-2 justify-end'
 

@@ -43,7 +43,7 @@ export default function App() {
         </select>
       </label>
       <ChatWindow
-        className="h-[32rem]"
+        style={{ height: '32rem' }}
         messages={messages}
         value={value}
         onChange={setValue}

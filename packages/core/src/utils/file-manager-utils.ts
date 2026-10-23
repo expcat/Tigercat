@@ -62,7 +62,7 @@ export const fileManagerListItemClasses = `flex items-center gap-3 px-3 py-2 rou
 export const fileManagerListItemSelectedClasses =
   'bg-[var(--tiger-primary)]/10 hover:bg-[var(--tiger-primary)]/15'
 
-export const fileManagerGridItemClasses = `flex flex-col items-center gap-2 p-3 rounded-[var(--tiger-radius-md)] cursor-pointer transition-colors hover:bg-[var(--tiger-surface-muted)] text-center ${fileItemFocusRing}`
+export const fileManagerGridItemClasses = `flex min-w-0 flex-col items-center gap-2 p-3 rounded-[var(--tiger-radius-md)] cursor-pointer transition-colors hover:bg-[var(--tiger-surface-muted)] text-center ${fileItemFocusRing}`
 
 export const fileManagerGridItemSelectedClasses =
   'bg-[var(--tiger-primary)]/10 hover:bg-[var(--tiger-primary)]/15'
@@ -71,7 +71,8 @@ export const fileManagerItemDisabledClasses = 'cursor-default opacity-60 hover:b
 
 export const fileManagerItemIconClasses = 'text-[var(--tiger-text-secondary)] flex-shrink-0'
 
-export const fileManagerItemNameClasses = 'text-sm font-medium text-[var(--tiger-text)] truncate'
+export const fileManagerItemNameClasses =
+  'min-w-0 max-w-full text-sm font-medium text-[var(--tiger-text)] truncate'
 
 export const fileManagerItemMetaClasses = 'text-xs text-[var(--tiger-text-secondary)]'
 

@@ -408,7 +408,11 @@ export const Drawer = defineComponent({
       )
 
       const allowed = swipeAllowed
-      const distance = sheetOffset.value || gesture?.distance || 0
+      const distance =
+        sheetOffset.value ||
+        (gesture
+          ? drawerFollowDistance(resolvedPlacement.value, gesture.deltaX, gesture.deltaY)
+          : 0)
       const size =
         resolvedPlacement.value === 'left' || resolvedPlacement.value === 'right'
           ? (dialogRef.value?.offsetWidth ?? 0)

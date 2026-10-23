@@ -16,7 +16,6 @@ import {
   getChartLabels,
   mergeTigerLocale,
   funnelStageDisplayLabel,
-  chartLabelFill,
   resolveChartWritingDirection,
   readPageWritingDirection,
   funnelSegmentTransitionClasses,
@@ -281,7 +280,10 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
             className={pieSliceLabelInsideClasses}
             textAnchor="middle"
             dominantBaseline="middle"
-            fill={chartLabelFill(seg.color)}
+            fill="var(--tiger-text)"
+            stroke="var(--tiger-surface)"
+            strokeWidth={3}
+            paintOrder="stroke"
             aria-hidden={interactive ? true : undefined}>
             {(() => {
               const name = stageName(

@@ -8,7 +8,7 @@ interface Row extends Record<string, unknown> {
 }
 
 const columns: TableColumn<Row>[] = [
-  { key: 'name', title: '姓名', width: 160 },
+  { key: 'name', title: '姓名' },
   { key: 'role', title: '角色' }
 ]
 

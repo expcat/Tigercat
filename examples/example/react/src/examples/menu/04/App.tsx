@@ -8,11 +8,8 @@ import {
 } from '@expcat/tigercat-core'
 import { Checkbox } from '@expcat/tigercat-react/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
-import { Content } from '@expcat/tigercat-react/Content'
-import { Layout } from '@expcat/tigercat-react/Layout'
 import { Menu } from '@expcat/tigercat-react/Menu'
 import { Segmented } from '@expcat/tigercat-react/Segmented'
-import { Sidebar } from '@expcat/tigercat-react/Sidebar'
 
 const backendSchema: MenuSchema = [
   { key: 'dashboard', label: '工作台', icon: 'dashboard', path: '/dashboard' },
@@ -151,21 +148,19 @@ export default function App() {
       <p className="text-sm text-[var(--tiger-text-secondary)]">
         当前权限：{permissions.length ? permissions.join(', ') : '无'}
       </p>
-      <Layout className="h-72 overflow-hidden rounded border border-[var(--tiger-border)]">
-        <Layout>
-          <Sidebar width="192px">
-            <Menu
-              selectedKeys={selectedKeys}
-              onSelectedKeysChange={setSelectedKeys}
-              openKeys={openKeys}
-              onOpenKeysChange={setOpenKeys}
-              items={items}
-              aria-label="后台导航"
-            />
-          </Sidebar>
-          <Content as="div">选中 {selectedKeys[0]}</Content>
-        </Layout>
-      </Layout>
+      <div className="grid overflow-hidden rounded border border-[var(--tiger-border)] sm:grid-cols-[200px_minmax(0,1fr)]">
+        <div className="min-w-0 overflow-auto sm:h-72">
+          <Menu
+            selectedKeys={selectedKeys}
+            onSelectedKeysChange={setSelectedKeys}
+            openKeys={openKeys}
+            onOpenKeysChange={setOpenKeys}
+            items={items}
+            aria-label="后台导航"
+          />
+        </div>
+        <div className="min-w-0 break-words p-3">选中 {selectedKeys[0]}</div>
+      </div>
     </div>
   )
 }

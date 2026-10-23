@@ -25,6 +25,7 @@ import type {
   DocumentDragSession
 } from '../types/drag'
 import { isBrowser } from './env'
+import { isHTMLElement } from './focus-utils'
 import {
   createDocumentDragSession,
   createDragState,
@@ -54,7 +55,7 @@ export interface ListDragItemBindings {
   'data-drag-container': string
   'data-dragging'?: true
   extraClass?: string
-  style?: { transform: string }
+  style?: { transform?: string; touchAction?: 'none' }
   onDragStart: (event: DragBindingEvent) => void
   onDragOver: (event: DragBindingEvent) => void
   onDrop: (event: DragBindingEvent) => void
@@ -128,7 +129,8 @@ function resolveLockAxis(config: DragConfig): 'x' | 'y' | undefined {
 }
 
 function ownerDocumentOf(target: EventTarget | null): Document | undefined {
-  if (target instanceof Element) return target.ownerDocument
+  const doc = (target as Node | null)?.ownerDocument
+  if (doc) return doc
   return isBrowser() ? document : undefined
 }
 
@@ -371,7 +373,7 @@ export function createListReorderController(
         : [doc.elementFromPoint(x, y)]
     for (const el of stack) {
       const node = el?.closest('[data-drag-index]')
-      if (!(node instanceof HTMLElement)) continue
+      if (!isHTMLElement(node)) continue
       if (pointerSource && (node === pointerSource || pointerSource.contains(node))) continue
       const index = Number(node.getAttribute('data-drag-index'))
       if (Number.isNaN(index)) return
@@ -384,13 +386,13 @@ export function createListReorderController(
 
   const startPointerReorder = (item: DragItem, event: DragPointerBindingEvent): void => {
     if (event.button !== 0) return
-    const host = event.currentTarget instanceof Element ? event.currentTarget : null
-    if (event.pointerType === 'mouse' && host instanceof HTMLElement && host.draggable) {
+    const host = event.currentTarget as Element | null
+    if (event.pointerType === 'mouse' && isHTMLElement(host) && host.draggable) {
       return
     }
     const config = configOf()
     if (!isDragEnabled(config)) return
-    const hit = event.target instanceof Element ? event.target : null
+    const hit = event.target as Element | null
     if (!isValidDragHandle(hit, config)) return
     const doc = ownerDocumentOf(event.currentTarget)
     pointerSession?.dispose()
@@ -460,7 +462,7 @@ export function createListReorderController(
     const doc = isBrowser() ? document : undefined
     const selector = `[data-drag-container="${containerId}"][data-drag-index="${next}"]`
     const node = doc?.querySelector(selector)
-    if (node instanceof HTMLElement) {
+    if (isHTMLElement(node)) {
       const id = readDragItemId(node, next)
       dragOver({ id, index: next, containerId })
       return
@@ -494,7 +496,7 @@ export function createListReorderController(
       'data-drag-container': item.containerId ?? containerOf(),
       'data-dragging': isThis || undefined,
       extraClass: isThis ? config.dragClass : undefined,
-      style: preview,
+      style: config.disabled ? preview : { ...preview, touchAction: 'none' },
       onDragStart: (event) => startDrag(item, event),
       onDragOver: (event) => dragOver(item, event),
       onDrop: (event) => {

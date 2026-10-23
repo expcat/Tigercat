@@ -37,10 +37,12 @@ describe('vue W9 T07', () => {
     expect(await findByRole('menuitemcheckbox', { name: /Pin/ })).toBeTruthy()
   })
 
-  it('E2 shows a badge on a menu item', () => {
-    const { getByText } = render(Menu, {
+  it('E2 keeps a badge when the menu is collapsed', async () => {
+    const { getByText, rerender } = render(Menu, {
       props: { items: [{ key: 'inbox', label: 'Inbox', badge: 2 }] }
     })
+    expect(getByText('2')).toBeTruthy()
+    await rerender({ collapsed: true })
     expect(getByText('2')).toBeTruthy()
   })
 

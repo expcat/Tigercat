@@ -120,7 +120,7 @@ export const Sidebar = defineComponent({
       const triggerLabel = props.collapsed
         ? feedbackLayoutLabels.sidebarExpand
         : feedbackLayoutLabels.sidebarCollapse
-      return h('div', { class: 'contents', 'data-tiger-sidebar-shell': '' }, [
+      return h('div', { 'data-tiger-sidebar-shell': '', 'data-side': props.side }, [
         aside,
         h(
           'button',
@@ -131,7 +131,7 @@ export const Sidebar = defineComponent({
             'aria-label': triggerLabel,
             onClick: () => emit('update:collapsed', !props.collapsed)
           },
-          triggerLabel
+          h('span', { 'aria-hidden': 'true' }, '☰')
         )
       ])
     }

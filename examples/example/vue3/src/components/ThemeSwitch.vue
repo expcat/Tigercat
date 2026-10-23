@@ -31,6 +31,7 @@ const themeOptions = computed(() =>
       {{ demoChrome(lang).theme }}
     </span>
     <Select
+      :aria-label="demoChrome(lang).theme"
       :model-value="props.modelValue"
       @update:model-value="handleThemeChange"
       :options="themeOptions"

@@ -68,3 +68,27 @@ export function collectTigerCssVars(root: HTMLElement | null | undefined): strin
   }
   return parts.join(';')
 }
+
+/** Scroll locks also change root styles; only effective theme changes rebuild demos. */
+export function observeDemoTheme(onChange: () => void): () => void {
+  const root = document.documentElement
+  const snapshot = (): string =>
+    JSON.stringify([
+      root.classList.contains('dark'),
+      root.getAttribute('data-tiger-theme'),
+      root.getAttribute('data-tiger-color-scheme'),
+      collectTigerCssVars(root)
+    ])
+  let previous = snapshot()
+  const observer = new MutationObserver(() => {
+    const next = snapshot()
+    if (next === previous) return
+    previous = next
+    onChange()
+  })
+  observer.observe(root, {
+    attributes: true,
+    attributeFilter: ['class', 'data-tiger-theme', 'data-tiger-color-scheme', 'style']
+  })
+  return () => observer.disconnect()
+}

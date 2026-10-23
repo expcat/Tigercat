@@ -3,18 +3,18 @@ import { AnchorLink } from '@expcat/tigercat-react/AnchorLink'
 
 export default function App() {
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_11rem] gap-4">
+    <div className="grid grid-cols-[minmax(0,1fr)_max-content] gap-2 sm:grid-cols-[minmax(0,1fr)_11rem] sm:gap-4">
       <div id="anchor-guide" className="h-80 overflow-auto rounded border">
-        <section id="guide" className="min-h-96 bg-blue-50 p-4">
+        <section id="guide" className="min-h-96 bg-blue-50 dark:bg-blue-950 p-4">
           <h3 className="font-semibold">指南</h3>
         </section>
-        <section id="guide-install" className="min-h-96 bg-blue-50/60 p-4">
+        <section id="guide-install" className="min-h-96 bg-blue-50/60 dark:bg-blue-950/60 p-4">
           <h3 className="font-semibold">安装</h3>
         </section>
-        <section id="guide-theme" className="min-h-96 bg-blue-50/40 p-4">
+        <section id="guide-theme" className="min-h-96 bg-blue-50/40 dark:bg-blue-950/40 p-4">
           <h3 className="font-semibold">主题</h3>
         </section>
-        <section id="api-reference" className="min-h-96 bg-green-50 p-4">
+        <section id="api-reference" className="min-h-96 bg-green-50 dark:bg-green-950 p-4">
           <h3 className="font-semibold">API 参考</h3>
         </section>
       </div>

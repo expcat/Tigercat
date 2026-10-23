@@ -3,7 +3,6 @@ import {
   basicLabel,
   classNames,
   codeBlockCopyStatusLiveClasses,
-  codeBlockFloatingActionClasses,
   codeBlockHeaderActionsClasses,
   codeBlockHeaderClasses,
   codeBlockLanguageClasses,
@@ -113,25 +112,18 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
         ? resolvedCopiedLabel
         : resolvedCopyLabel
   const liveText = copyStatus === 'idle' ? '' : buttonLabel
-  const showHeader = Boolean(showLanguage && language)
+  const showHeader = Boolean((showLanguage && language) || copyable || wrapToggle)
   const wrapButton = wrapToggle ? (
     <button
       type="button"
-      className={classNames(
-        codeBlockWrapButtonClasses,
-        !showHeader && codeBlockFloatingActionClasses,
-        !showHeader && copyable && 'end-28'
-      )}
+      className={codeBlockWrapButtonClasses}
       aria-pressed={wrapped}
       onClick={() => setWrapped((value) => !value)}>
       {basicLabel(mergedLocale?.locale, 'code', wrapped ? 'nowrap' : 'wrap')}
     </button>
   ) : null
   const copyButton = copyable ? (
-    <button
-      type="button"
-      className={classNames(copyButtonClasses, !showHeader && codeBlockFloatingActionClasses)}
-      onClick={handleCopy}>
+    <button type="button" className={copyButtonClasses} onClick={handleCopy}>
       {buttonLabel}
     </button>
   ) : null
@@ -141,7 +133,9 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
       {showHeader ? (
         <div className={codeBlockHeaderClasses}>
           <span className={codeBlockLanguageClasses}>
-            {basicLabel(mergedLocale?.locale, 'code', 'language')}: {language}
+            {showLanguage && language
+              ? `${basicLabel(mergedLocale?.locale, 'code', 'language')}: ${language}`
+              : null}
           </span>
           {wrapButton || copyButton ? (
             <div className={codeBlockHeaderActionsClasses}>
@@ -176,8 +170,6 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
           )
         })()}
       </pre>
-      {showHeader ? null : wrapButton}
-      {showHeader ? null : copyButton}
       {copyable ? (
         <span className={codeBlockCopyStatusLiveClasses} aria-live="polite">
           {liveText}

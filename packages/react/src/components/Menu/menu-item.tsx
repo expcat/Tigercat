@@ -155,14 +155,36 @@ export const MenuItem: React.FC<MenuItemProps> = ({
 
   const label = getReactMenuPlainText(children)
   const badgeModel = normalizeMenuItemBadge(badge)
-  const content = (
+  const labelContent = (
     <>
       {renderMenuIcon(icon, effectiveCollapsed)}
       {effectiveCollapsed ? (
         renderCollapsedLabel(label, icon)
       ) : (
-        <span className="flex-1">{children}</span>
+        <span className="min-w-0 flex-1">{children}</span>
       )}
+    </>
+  )
+  const badgeContent = badgeModel ? (
+    <Badge
+      className={effectiveCollapsed ? undefined : 'ms-2 shrink-0'}
+      content={badgeModel.content}
+      type={badgeModel.type}
+      variant={typeof badge === 'object' ? badge.variant : undefined}
+      size={effectiveCollapsed ? 'sm' : 'md'}
+    />
+  ) : null
+  const content = (
+    <>
+      {effectiveCollapsed && badgeContent ? (
+        <span className="inline-flex flex-col items-center gap-1">
+          {labelContent}
+          {badgeContent}
+        </span>
+      ) : (
+        labelContent
+      )}
+      {!effectiveCollapsed ? badgeContent : null}
       {!effectiveCollapsed && shortcut ? (
         <span
           data-tiger-menu-shortcut=""
@@ -171,13 +193,6 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         </span>
       ) : null}
     </>
-  )
-  const badged = badgeModel ? (
-    <Badge content={badgeModel.content} type={badgeModel.type ?? 'number'} standalone={false}>
-      {content}
-    </Badge>
-  ) : (
-    content
   )
   const collapsedTip = menuCollapsedTooltip(effectiveCollapsed, label)
 
@@ -208,7 +223,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       role={role}
       aria-current={isSelected ? 'page' : undefined}
       aria-disabled={disabled ? true : undefined}>
-      {badged}
+      {content}
     </a>
   ) : (
     <button
@@ -216,7 +231,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       type="button"
       role={role}
       disabled={disabled}>
-      {badged}
+      {content}
     </button>
   )
 

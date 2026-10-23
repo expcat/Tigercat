@@ -18,6 +18,7 @@ export const AspectRatio = forwardRef<HTMLDivElement, AspectRatioProps>(
   (
     {
       ratio = ASPECT_RATIO_DEFAULT,
+      fit,
       className,
       contentClassName,
       children,
@@ -26,7 +27,7 @@ export const AspectRatio = forwardRef<HTMLDivElement, AspectRatioProps>(
     },
     ref
   ) => {
-    const rootClasses = useMemo(() => getAspectRatioRootClasses(className), [className])
+    const rootClasses = useMemo(() => getAspectRatioRootClasses(className, fit), [className, fit])
     const contentClasses = useMemo(
       () => classNames(getAspectRatioContentClasses(), contentClassName),
       [contentClassName]

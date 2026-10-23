@@ -10,5 +10,5 @@ const items = [
 </script>
 
 <template>
-  <Descriptions title="用户信息" :items="items" />
+  <Descriptions title="用户信息" :items="items" :column="{ xs: 1, sm: 2, lg: 3 }" />
 </template>

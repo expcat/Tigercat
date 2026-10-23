@@ -71,6 +71,15 @@ describe('MarkdownEditor', () => {
       expect(emitted()['update:mode'][0]).toEqual(['preview'])
       expect(emitted()['mode-change'][0]).toEqual(['preview'])
     })
+
+    it('restores edited content when returning from preview', async () => {
+      const { getByRole, queryByRole } = renderEditor({ modelValue: undefined })
+      await fireEvent.update(getByRole('textbox'), '# Edited content')
+      await fireEvent.click(getByRole('button', { name: 'Preview' }))
+      expect(queryByRole('textbox')).toBeNull()
+      await fireEvent.click(getByRole('button', { name: 'Edit', exact: true }))
+      expect((getByRole('textbox') as HTMLTextAreaElement).value).toBe('# Edited content')
+    })
   })
 
   describe('Preview', () => {

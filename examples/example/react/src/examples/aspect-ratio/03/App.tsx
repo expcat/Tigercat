@@ -11,6 +11,7 @@ export default function App() {
     <div className="w-full max-w-md space-y-3">
       <AspectRatio
         ratio={ratio}
+        fit="cover"
         className="rounded-xl border border-gray-200 shadow-sm dark:border-gray-700">
         <img src={cover} alt="" />
         <div className="absolute inset-x-0 bottom-0 bg-black/40 px-4 py-3 backdrop-blur-sm">

@@ -6,7 +6,7 @@ const marks = { 0: '0°', 25: '25°', 50: '50°', 75: '75°', 100: '100°' }
 
 export default function App() {
   const [a, setA] = useState<number | [number, number]>(50)
-  const [b, setB] = useState<number | [number, number]>(30)
+  const [b, setB] = useState<number | [number, number]>(40)
 
   return (
     <div className="w-full max-w-lg space-y-8">
@@ -14,7 +14,7 @@ export default function App() {
         <Slider value={a} onChange={setA} marks={marks} step={25} />
       </FormItem>
       <FormItem label="按 step 自动刻度">
-        <Slider value={b} onChange={setB} marks step={10} />
+        <Slider value={b} onChange={setB} marks step={20} />
       </FormItem>
     </div>
   )

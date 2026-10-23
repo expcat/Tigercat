@@ -8,10 +8,7 @@ import {
   type MenuSchema,
   type MenuSchemaBadge
 } from '@expcat/tigercat-core'
-import { Content } from '@expcat/tigercat-react/Content'
-import { Layout } from '@expcat/tigercat-react/Layout'
 import { Menu } from '@expcat/tigercat-react/Menu'
-import { Sidebar } from '@expcat/tigercat-react/Sidebar'
 import { Table } from '@expcat/tigercat-react/Table'
 import type { TableColumn } from '@expcat/tigercat-core'
 
@@ -114,19 +111,19 @@ export default function App() {
       <p className="text-sm text-[var(--tiger-text-secondary)]">
         侧栏走 Menu；表是 schemaToRouteRecords 的纯数据，宿主自己 addRoute。
       </p>
-      <Layout className="h-80 overflow-hidden rounded border border-[var(--tiger-border)]">
-        <Layout>
-          <Sidebar width="168px">
-            <Menu
-              selectedKeys={selectedKeys}
-              onSelectedKeysChange={setSelectedKeys}
-              openKeys={openKeys}
-              onOpenKeysChange={setOpenKeys}
-              items={items}
-              aria-label="后台导航"
-            />
-          </Sidebar>
-          <Content as="div" className="min-w-0 overflow-auto p-3">
+      <div className="grid overflow-hidden rounded border border-[var(--tiger-border)] sm:grid-cols-[200px_minmax(0,1fr)]">
+        <div className="min-w-0 overflow-auto sm:h-80">
+          <Menu
+            selectedKeys={selectedKeys}
+            onSelectedKeysChange={setSelectedKeys}
+            openKeys={openKeys}
+            onOpenKeysChange={setOpenKeys}
+            items={items}
+            aria-label="后台导航"
+          />
+        </div>
+        <div className="min-w-0 overflow-auto p-3 sm:h-80">
+          <div className="min-w-[32rem]">
             <Table<RouteRow>
               columns={columns}
               dataSource={rows}
@@ -136,9 +133,9 @@ export default function App() {
               tableLayout="fixed"
               pagination={false}
             />
-          </Content>
-        </Layout>
-      </Layout>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -5,7 +5,7 @@ import { FormItem } from '@expcat/tigercat-vue/FormItem'
 
 const marks = { 0: '0°', 25: '25°', 50: '50°', 75: '75°', 100: '100°' }
 const a = ref<number | [number, number]>(50)
-const b = ref<number | [number, number]>(30)
+const b = ref<number | [number, number]>(40)
 </script>
 
 <template>
@@ -14,7 +14,7 @@ const b = ref<number | [number, number]>(30)
       <Slider v-model="a" :marks="marks" :step="25" />
     </FormItem>
     <FormItem label="按 step 自动刻度">
-      <Slider v-model="b" marks :step="10" />
+      <Slider v-model="b" marks :step="20" />
     </FormItem>
   </div>
 </template>

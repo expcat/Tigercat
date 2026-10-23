@@ -164,6 +164,7 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
   ref
 ) {
   const [activeLink, setActiveLink] = useState('')
+  const activeLinkRef = useRef('')
   const [linkEntries, setLinkEntries] = useState<Array<{ href: string; node: Element }>>([])
   const anchorRef = useRef<HTMLElement | null>(null)
   const inkRef = useRef<HTMLDivElement>(null)
@@ -203,13 +204,11 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
 
   const applyActive = useCallback((href: string) => {
     const finalHref = resolveActiveAnchorHref(href, getCurrentAnchorRef.current)
-    setActiveLink((prev) => {
-      if (finalHref !== prev) {
-        onChangeRef.current?.(finalHref)
-        return finalHref
-      }
-      return prev
-    })
+    if (finalHref !== activeLinkRef.current) {
+      activeLinkRef.current = finalHref
+      setActiveLink(finalHref)
+      onChangeRef.current?.(finalHref)
+    }
     return finalHref
   }, [])
 
@@ -248,8 +247,6 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
   // Re-resolve the highlight when the consumer's getCurrentAnchor changes
   // identity (e.g. an external tab switch), so consumers do not have to
   // remount the anchor to sync aria-current.
-  const activeLinkRef = useRef(activeLink)
-  activeLinkRef.current = activeLink
   useEffect(() => {
     if (!getCurrentAnchor) return
     applyActive(activeLinkRef.current)

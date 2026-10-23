@@ -119,9 +119,17 @@ export const Drag = defineComponent({
         },
         [
           drag.draggedItem.value
-            ? h('div', { 'data-tiger-drag-preview': '' }, String(drag.draggedItem.value.id))
+            ? h(
+                'div',
+                { class: 'sr-only', 'aria-hidden': 'true', 'data-tiger-drag-preview': '' },
+                String(drag.draggedItem.value.id)
+              )
             : null,
-          h('div', { role: 'status', 'data-tiger-drag-live': '' }, announcement.value),
+          h(
+            'div',
+            { role: 'status', class: 'sr-only', 'data-tiger-drag-live': '' },
+            announcement.value
+          ),
           ...props.items.map((item) => {
             const itemAttrs = drag.getDragItemAttrs(item)
             const isDragging = itemAttrs['data-dragging'] === true

@@ -11,7 +11,7 @@ export default function App() {
         当前 {active || '（滚动或点锚点）'}
       </p>
       <div id="anchor-doc" className="h-80 overflow-auto rounded border">
-        <div className="grid grid-cols-[minmax(0,1fr)_9rem] gap-4 p-4">
+        <div className="grid grid-cols-[minmax(0,1fr)_max-content] gap-2 p-2 sm:grid-cols-[minmax(0,1fr)_9rem] sm:gap-4 sm:p-4">
           <div className="space-y-4">
             <section
               id="anchor-overview"

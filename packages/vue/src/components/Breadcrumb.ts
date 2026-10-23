@@ -6,6 +6,7 @@ import {
   reactive,
   ref,
   watch,
+  isVNode,
   PropType,
   h,
   type VNode,
@@ -275,10 +276,18 @@ export const Breadcrumb = defineComponent({
                               : null
                         const rendered = slotFn ? slotFn() : rawChildren
                         const text =
-                          typeof rendered === 'string'
-                            ? rendered
+                          typeof rendered === 'string' || typeof rendered === 'number'
+                            ? String(rendered)
                             : Array.isArray(rendered)
-                              ? rendered.filter((part) => typeof part === 'string').join('')
+                              ? rendered
+                                  .map((part) =>
+                                    typeof part === 'string' || typeof part === 'number'
+                                      ? String(part)
+                                      : isVNode(part) && typeof part.children === 'string'
+                                        ? part.children
+                                        : ''
+                                  )
+                                  .join('')
                               : ''
                         return {
                           key: itemIndex,

@@ -17,6 +17,7 @@ const columns: TableColumn<Row>[] = [
     title: '状态',
     filter: {
       type: 'select',
+      filterFn: (value, filterValue) => value === filterValue,
       options: [
         { value: 'active', label: '启用' },
         { value: 'inactive', label: '停用' }

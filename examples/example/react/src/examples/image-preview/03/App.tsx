@@ -8,7 +8,7 @@ const images = [
 ]
 
 export default function App() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   return (
     <>
       <Button onClick={() => setOpen(true)}>打开预览</Button>

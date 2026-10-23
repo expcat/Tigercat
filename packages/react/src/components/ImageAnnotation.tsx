@@ -196,7 +196,6 @@ export function ImageAnnotation({
     onChange: onToolChange
   })
   const [draft, setDraft] = useState<CoreImageAnnotation | null>(null)
-  const [drawingStroke, setDrawingStroke] = useState(false)
   const [loadAttempt, setLoadAttempt] = useState(0)
   const [focusedShape, setFocusedShape] = useState(0)
   const [toolIndex, setToolIndex] = useState(0)
@@ -220,7 +219,6 @@ export function ImageAnnotation({
     dragSessionRef.current = null
     drawingRef.current = null
     setDraft(null)
-    setDrawingStroke(false)
   }, [])
 
   useEffect(() => {
@@ -375,7 +373,6 @@ export function ImageAnnotation({
       cancelDrawing()
       const point = getPointFromEvent(event.clientX, event.clientY)
       drawingRef.current = startImageAnnotationDraw(resolvedTool, point)
-      setDrawingStroke(true)
       const frames = createAnnotationFrameCoalescer(
         (payload: { currentX: number; currentY: number }) => {
           const drawing = drawingRef.current
@@ -401,7 +398,6 @@ export function ImageAnnotation({
         onEnd: (payload) => {
           frames.cancel()
           if (drawFramesRef.current === frames) drawFramesRef.current = null
-          setDrawingStroke(false)
           const drawing = drawingRef.current
           drawingRef.current = null
           dragSessionRef.current = null
@@ -817,7 +813,7 @@ export function ImageAnnotation({
         ref={sizeHostRef}
         className={classNames(
           imageAnnotationStageClasses,
-          drawingStroke && imageAnnotationDrawingClasses
+          canEdit && resolvedTool !== 'select' && imageAnnotationDrawingClasses
         )}
         style={getImageAnnotationStageStyle()}
         data-tiger-annotation-stage=""

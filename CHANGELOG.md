@@ -2,6 +2,17 @@
 
 本文档记录 Tigercat UI 组件库的所有版本变更。
 
+## v3.0.0-rc.3（2026-10-24）
+
+- **Example 视觉与交互修复（Vue / React）**：完成外壳、基础、表单、浮层、数据、图表和复杂交互三阶段模型视觉验收；证据由初始矩阵与定向修复复验组成。移动菜单接入已有焦点作用域，修复层级遮挡、窄屏设置、长标题和章节导航；面包屑首页跳转保留部署 base。Playground 只订阅有效主题变化，避免滚动锁重建 iframe；两端主题、语言与明暗继续同步。
+- **媒体与布局（Core / Vue / React）**：AspectRatio 兑现已有 `fit`，显式 contain / cover / fill 让内容层与媒体填满比例盒并裁切，默认 / none 保留自然尺寸与可见溢出；同步生成文档和示例。Masonry source 模式补齐纵向间距，packed 模式不重复加距；横向 Card 封面限制窄屏占比，Code 工具栏进入正常文档流，Sidebar 的折叠按钮与侧栏共用纵向容器，恢复 AppShell 主区宽度。
+- **浮层、焦点与手势（Core / Vue / React）**：共享移动浮层几何修复 fullscreen / bottom sheet 偏移与宽度，Calendar / DatePicker 在 320px 下收紧边距。跨 document 的元素和焦点判断使用实际 ownerDocument，React 显式跨 document portal target 正确绕过本地 outlet；popup 等焦点落定后判断离开，嵌套浮层保留原触发器。Modal / Drawer 按带方向的位移判断松手，反向上滑不再误关闭。
+- **导航与表单**：Menu 横向模式布局作用到内部列表，徽标在展开 / 折叠状态均可见；React Anchor 在事件 / observer 入口去重并回调，消除状态 updater 内触发消费者更新的告警。Vue FloatButton 带徽标时保留链接，Breadcrumb 正确读取折叠项的 Text VNode；Cron 字段数错误只报告 expression issue。双端 OTP、Slider 和菜单示例修复窄屏布局及文案。
+- **图表（Core / Vue / React）**：轴标题避让刻度，Heatmap 按标签宽度降低刻度密度，Radar 层级标签放入半径内，横向图例给绘图区保留可收缩空间。BarChart 顶部数值标签使用自动域留白，Funnel 标签采用主题文本与描边；Pie 在未指定外半径时按真实扇区和外标签边界拟合半径与圆心，避免窄屏裁切，两端绑定保持一致。
+- **拖放与编辑（Core / Vue / React）**：共享文档拖拽会话跟随 pointer target 的 ownerDocument，列表命中与焦点兼容 iframe，启用拖拽的列表项 / TaskBoard 卡片预先声明 touch-action。TaskBoard touch tracker 仅跟踪位移，取消默认行为留给已有非 passive 监听，消除移动排序的 passive 错误。ImageAnnotation 在可绘制状态提前声明触控行为，Vue MarkdownEditor 切回编辑时恢复当前正文。
+- **数据与示例**：FileManager 长文件名约束在网格项内，DataTableWithToolbar 窄屏工具栏换行；Table 示例按完整状态精确筛选，Chat 示例采用真实固定行高，VirtualList 动态行高与 Resizable 刻度接线正确，WorkflowViewer 的内部横滚经真实触摸复验。Avatar 正常 / 恢复图源改为自包含资源；打印、导出和 AppShell 的示例权限通过既有 sandbox 机制显式声明。
+- **发布准备**：根包与五个发布包统一为 `3.0.0-rc.3`，两个私有 SPA Example 保持 `1.5.0`；本版不删除或重命名组件 API。最终发布门禁与 production preview 的结果记录在本地发布报告，发布由既有 tag Actions 执行。
+
 ## v3.0.0-rc.2（2026-10-22）
 
 - **全仓根因审查**：完成 20 个责任域、175 项采纳修复，保留现有视觉风格并同步双端 API、消费者与迁移说明；该轮 9,363 个单测、50 个 Chromium / mobile E2E、五包 tarball 和四种消费示例 / SSR 验证通过。

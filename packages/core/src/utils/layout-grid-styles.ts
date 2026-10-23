@@ -242,6 +242,34 @@ export const LAYOUT_GRID_CSS = `
 .tiger-sidebar-default-width {
   width: 16rem;
 }
+[data-tiger-sidebar-shell] {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 0;
+  background-color: var(--tiger-surface);
+}
+[data-tiger-sidebar-shell][data-side="end"] {
+  order: 1;
+}
+[data-tiger-sidebar-shell] > .tiger-sidebar {
+  flex: 1;
+}
+[data-tiger-sidebar-trigger] {
+  align-self: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  margin: 0.5rem;
+  border: 1px solid var(--tiger-border);
+  border-radius: var(--tiger-radius-sm);
+  color: var(--tiger-text);
+  cursor: pointer;
+}
+[data-tiger-sidebar-trigger]:focus-visible {
+  outline: 2px solid var(--tiger-focus-ring);
+  outline-offset: 2px;
+}
 @media (prefers-reduced-motion: reduce) {
   .tiger-sidebar {
     transition-duration: 0ms;

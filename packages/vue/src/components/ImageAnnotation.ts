@@ -204,7 +204,6 @@ export const ImageAnnotation = defineComponent({
       resizeObserver.observe(host)
     }
 
-    const drawingStroke = ref(false)
     const loadAttempt = ref(0)
     const toolIndex = ref(0)
     const shapeEls: Array<SVGElement | null> = []
@@ -217,7 +216,6 @@ export const ImageAnnotation = defineComponent({
       dragSession = null
       drawing.value = null
       draft.value = null
-      drawingStroke.value = false
     }
 
     const loadImage = () => {
@@ -327,7 +325,6 @@ export const ImageAnnotation = defineComponent({
       cancelDrawing()
       const point = getPointFromEvent(event.clientX, event.clientY)
       drawing.value = startImageAnnotationDraw(resolvedTool.value, point)
-      drawingStroke.value = true
       const frames = createAnnotationFrameCoalescer(
         (payload: { currentX: number; currentY: number }) => {
           if (!drawing.value) return
@@ -351,7 +348,6 @@ export const ImageAnnotation = defineComponent({
         onEnd: (payload) => {
           frames.cancel()
           if (drawFrames === frames) drawFrames = null
-          drawingStroke.value = false
           const current = drawing.value
           drawing.value = null
           dragSession = null
@@ -904,7 +900,7 @@ export const ImageAnnotation = defineComponent({
               ref: sizeHostRef,
               class: classNames(
                 imageAnnotationStageClasses,
-                drawingStroke.value && imageAnnotationDrawingClasses
+                canEdit.value && resolvedTool.value !== 'select' && imageAnnotationDrawingClasses
               ),
               style: getImageAnnotationStageStyle(),
               'data-tiger-annotation-stage': '',

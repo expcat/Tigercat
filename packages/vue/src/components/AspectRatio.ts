@@ -7,11 +7,13 @@ import {
   getAspectRatioRootClasses,
   getAspectRatioStyle,
   ASPECT_RATIO_DEFAULT,
-  type AspectRatioValue
+  type AspectRatioValue,
+  type AspectRatioFit
 } from '@expcat/tigercat-core'
 
 export interface VueAspectRatioProps {
   ratio?: AspectRatioValue
+  fit?: AspectRatioFit
   className?: string
   contentClassName?: string
 }
@@ -24,6 +26,7 @@ export const AspectRatio = defineComponent({
       type: [Number, String] as PropType<AspectRatioValue>,
       default: ASPECT_RATIO_DEFAULT
     },
+    fit: { type: String as PropType<AspectRatioFit>, default: undefined },
     className: { type: String, default: undefined },
     contentClassName: { type: String, default: undefined }
   },
@@ -34,7 +37,7 @@ export const AspectRatio = defineComponent({
         {
           ...attrs,
           class: classNames(
-            getAspectRatioRootClasses(),
+            getAspectRatioRootClasses(undefined, props.fit),
             props.className,
             coerceClassValue(attrs.class)
           ),
