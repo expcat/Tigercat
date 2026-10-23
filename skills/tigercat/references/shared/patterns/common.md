@@ -65,6 +65,7 @@ Stable behavior:
 - Floating UI position state: `x`, `y`, `actualPlacement`, `floatingStyles`. Vue `placement` / `offset` are reactive after open.
 - Click-outside and Escape dismissal.
 - Trigger modes: `click`, `hover`, `focus`, `manual`. Dropdown defaults to `click`. Hover is co-joined with click (touch) and focus (keyboard). Popconfirm is click-only.
+- Menu popup submenus hover only with a mouse pointer. Touch taps toggle open state without synthetic mouse hover reopening or closing the submenu.
 - Overlay triggers are the focus node: `asChild` (or a unique native `button`/`a`) merges `ref`, click/keyboard, and `aria-haspopup` / `aria-expanded` / `aria-controls` / `data-state` onto that child. Otherwise the component renders `<button type="button">`. Do not put haspopup on a wrapping div.
 - Root trigger exposes `data-state="open" | "closed"` for CSS state styling.
 - Interactive triggers also expose `aria-expanded`. Tooltip writes `aria-describedby` on the focus node only while open.

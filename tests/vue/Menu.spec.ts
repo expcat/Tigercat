@@ -217,9 +217,16 @@ describe('Menu', () => {
       })
 
       const trigger = screen.getByRole('menuitem', { name: 'Submenu' })
+      await fireEvent.pointerEnter(trigger.parentElement!, { pointerType: 'touch' })
+      await fireEvent.mouseEnter(trigger.parentElement!)
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
       await fireEvent.click(trigger)
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
       expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
+      await fireEvent.click(trigger)
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+      await fireEvent.pointerEnter(trigger.parentElement!, { pointerType: 'mouse' })
+      expect(trigger).toHaveAttribute('aria-expanded', 'true')
     })
 
     it('keeps one inline submenu open at a time when openMultiple is false', async () => {
@@ -260,7 +267,7 @@ describe('Menu', () => {
       })
 
       const trigger = screen.getByRole('menuitem', { name: 'Submenu' })
-      await fireEvent.mouseEnter(trigger)
+      await fireEvent.pointerEnter(trigger.parentElement!, { pointerType: 'mouse' })
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
     })
 

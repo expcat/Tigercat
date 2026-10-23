@@ -176,19 +176,25 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     [disabled, menuContext, itemKey, isInlineOrVertical, isPopup, isExpanded]
   )
 
-  const handleMouseEnter = useCallback(() => {
-    if (!menuContext || disabled || !isPopup) return
-    clearCloseTimer()
-    menuContext.handleOpenChange(itemKey, true)
-  }, [menuContext, disabled, isPopup, itemKey])
+  const handlePointerEnter = useCallback(
+    (event: React.PointerEvent<HTMLElement>) => {
+      if (event.pointerType !== 'mouse' || !menuContext || disabled || !isPopup) return
+      clearCloseTimer()
+      menuContext.handleOpenChange(itemKey, true)
+    },
+    [menuContext, disabled, isPopup, itemKey]
+  )
 
-  const handleMouseLeave = useCallback(() => {
-    if (!menuContext || !isPopup) return
-    clearCloseTimer()
-    popupCloseTimerRef.current = setTimeout(() => {
-      menuContext.handleOpenChange(itemKey, false)
-    }, MENU_POPUP_HOVER_CLOSE_MS)
-  }, [menuContext, isPopup, itemKey])
+  const handlePointerLeave = useCallback(
+    (event: React.PointerEvent<HTMLElement>) => {
+      if (event.pointerType !== 'mouse' || !menuContext || !isPopup) return
+      clearCloseTimer()
+      popupCloseTimerRef.current = setTimeout(() => {
+        menuContext.handleOpenChange(itemKey, false)
+      }, MENU_POPUP_HOVER_CLOSE_MS)
+    },
+    [menuContext, isPopup, itemKey]
+  )
 
   useLayoutEffect(() => {
     if (!isPopup || !isExpanded) return
@@ -384,8 +390,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
           aria-hidden={isExpanded ? undefined : 'true'}
           data-tiger-menu-list=""
           data-tiger-submenu-popup=""
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}>
+          onPointerEnter={handlePointerEnter}
+          onPointerLeave={handlePointerLeave}>
           {enhancedChildren}
         </ul>
       )
@@ -420,8 +426,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   return (
     <li
       className={isPopup && !popupPortal ? 'relative' : ''}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
       role={inPopup || menuContext.mode === 'horizontal' ? 'none' : undefined}
       data-tiger-submenu=""
       data-child-selected={childSelected ? 'true' : undefined}>

@@ -973,14 +973,14 @@ export const SubMenu = defineComponent({
       menuContext.handleOpenChange(props.itemKey)
     }
 
-    const handleMouseEnter = () => {
-      if (!menuContext || props.disabled || !isPopup.value) return
+    const handlePointerEnter = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' || !menuContext || props.disabled || !isPopup.value) return
       clearCloseTimer()
       menuContext.handleOpenChange(props.itemKey, true)
     }
 
-    const handleMouseLeave = () => {
-      if (!menuContext || !isPopup.value) return
+    const handlePointerLeave = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse' || !menuContext || !isPopup.value) return
       clearCloseTimer()
       popupCloseTimer = setTimeout(() => {
         menuContext.handleOpenChange(props.itemKey, false)
@@ -1138,8 +1138,8 @@ export const SubMenu = defineComponent({
             role: listRole,
             'aria-labelledby': titleId,
             'aria-hidden': isExpanded.value ? undefined : 'true',
-            onMouseenter: handleMouseEnter,
-            onMouseleave: handleMouseLeave,
+            onPointerenter: handlePointerEnter,
+            onPointerleave: handlePointerLeave,
             'data-tiger-menu-list': '',
             'data-tiger-submenu-popup': ''
           },
@@ -1180,8 +1180,8 @@ export const SubMenu = defineComponent({
         'li',
         {
           class: isPopup.value && !popupPortal.value ? 'relative' : '',
-          onMouseenter: handleMouseEnter,
-          onMouseleave: handleMouseLeave,
+          onPointerenter: handlePointerEnter,
+          onPointerleave: handlePointerLeave,
           role: inPopup || menuContext.mode.value === 'horizontal' ? 'none' : undefined,
           'data-tiger-submenu': '',
           'data-child-selected': childSelected.value ? 'true' : undefined
