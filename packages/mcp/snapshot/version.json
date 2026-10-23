@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-rc.2",
+  "version": "3.0.0-rc.3",
   "commit": "",
   "algorithm": "sha256",
   "files": {
@@ -18,7 +18,7 @@
     "skills/tigercat/references/examples/anchor.md": "980d671e09d829bce3a318e484a0a805c14421139a31426d9e064e29352487d6",
     "skills/tigercat/references/examples/app-shell.md": "c18822f7efabd257c3eff44b6b716e1a8666a020e2493f9c1e8e890f253e514f",
     "skills/tigercat/references/examples/area-chart.md": "b8e18efa78362c9d2ebe379c4684e0cbaecb4a216e0343ef5b0188242b276b32",
-    "skills/tigercat/references/examples/aspect-ratio.md": "992f77acde9231cf1fab27afa2d9f5d0f0766e995ecf0fbe649791c571d502a4",
+    "skills/tigercat/references/examples/aspect-ratio.md": "222e15ab416f8a04b97fd02b04bbda610c8d8b489569b085e217093d6be17217",
     "skills/tigercat/references/examples/assignee-picker.md": "d7a8fa615be6e762a55b57fce016cf84945741f03a22a75903105c53c45542ae",
     "skills/tigercat/references/examples/auto-complete.md": "d4b0c0b6e1295dd56c710ef24f12bbad167db61b328bc3fc665b9060d7042ffb",
     "skills/tigercat/references/examples/avatar-group.md": "7eaeeb3a89d9629d84dba2bb34c4d2c2b11a976b9ba74530b946315d540ed22d",
@@ -219,7 +219,7 @@
     "skills/tigercat/references/shared/props/anchor.md": "0450234fae605648c515609722ecc007d14d6ad1ecf2f49eab686265a3d1c2e8",
     "skills/tigercat/references/shared/props/app-shell.md": "b1ef39492388a55a384267109ee91ba643ffa2917be39781dc27d30d9706518e",
     "skills/tigercat/references/shared/props/area-chart.md": "b1581e41f440170f6e1ee8c5a0c4db9280ff6ff9a105e35dd3dda48703842d74",
-    "skills/tigercat/references/shared/props/aspect-ratio.md": "9c301e3057485d4a9bbac64cf9fb2de4195c85f6518878985e48fc00628e22f6",
+    "skills/tigercat/references/shared/props/aspect-ratio.md": "f749e440d0125c7fe685b2e34ea4f56fca1cc549c536b416b6e27d964b70f8e2",
     "skills/tigercat/references/shared/props/assignee-picker.md": "bfbbed8309892afb03808b15ee49e2911708b81cd8c443ace50be6ee38ec5a3a",
     "skills/tigercat/references/shared/props/auto-complete.md": "5060b91020a954572953617161dd813c6cc03924bfe23f3d263904087cdd0301",
     "skills/tigercat/references/shared/props/avatar-group.md": "4e5be62b10a3fb3f16049acf83d947ba12ae9c356af8a6efe33ee61b3da857e9",
