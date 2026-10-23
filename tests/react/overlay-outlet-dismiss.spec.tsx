@@ -8,6 +8,7 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { ContextMenu, ContextMenuItem, ContextMenuMenu } from '@expcat/tigercat-react/ContextMenu'
+import { Drawer } from '@expcat/tigercat-react/Drawer'
 import { Input } from '@expcat/tigercat-react/Input'
 import { Modal } from '@expcat/tigercat-react/Modal'
 import { NumberKeyboard } from '@expcat/tigercat-react/NumberKeyboard'
@@ -19,6 +20,35 @@ import { OverlayOutletProvider, OverlayPortal } from '../../packages/react/src/u
 const confirmName = enUS.common!.okText!
 
 describe('overlay dismiss inside ConfigProvider', () => {
+  it('keeps modal and drawer layers in their ConfigProvider document', async () => {
+    const iframe = document.createElement('iframe')
+    document.body.appendChild(iframe)
+    const doc = iframe.contentDocument!
+    try {
+      for (const Layer of [Modal, Drawer]) {
+        const container = doc.createElement('div')
+        doc.body.appendChild(container)
+        const { unmount } = render(
+          <ConfigProvider>
+            <Layer open title="Sandbox layer" />
+          </ConfigProvider>,
+          { container }
+        )
+        try {
+          await waitFor(() => {
+            expect(doc.querySelector('[role="dialog"]')?.ownerDocument).toBe(doc)
+            expect(document.querySelector('[role="dialog"]')).toBeNull()
+          })
+        } finally {
+          unmount()
+          container.remove()
+        }
+      }
+    } finally {
+      iframe.remove()
+    }
+  })
+
   it('renders a cross-document target outside the provider outlet', () => {
     const iframe = document.createElement('iframe')
     document.body.appendChild(iframe)

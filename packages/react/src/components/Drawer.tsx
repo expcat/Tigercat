@@ -206,7 +206,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
   const ariaLabel = ariaLabelFromRest ?? (hasTitle ? undefined : drawerLabels.dialogAriaLabel)
   const ariaDescribedby = ariaDescribedbyFromRest ?? (children ? bodyId : undefined)
 
-  const { anchorRef, target: portalTarget } = useOverlayPortalTarget()
+  const { anchorRef, target: portalTarget } = useOverlayPortalTarget('viewport')
   const dialogRef = useRef<HTMLDivElement | null>(null)
   const rootRef = useRef<HTMLDivElement | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)

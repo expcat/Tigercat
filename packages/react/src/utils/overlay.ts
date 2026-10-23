@@ -17,6 +17,7 @@ import {
   computeFloatingPosition,
   autoUpdateFloating,
   resolveAnchoredOverlayTarget,
+  resolveViewportPortalTarget,
   retainPortaledOverlay,
   collectOverlayListenerDocuments,
   getAnchoredOverlayTabTarget,
@@ -167,21 +168,29 @@ export function renderBodyPortal(node: React.ReactNode, disabled = false): React
   return createPortal(layeredNode, target)
 }
 
-/** Resolve the overlay-host chain from an in-tree anchor so nested Modal/Drawer enter the parent host. */
-export function useOverlayPortalTarget(): {
+/** Viewport layers stay in their document; anchored popups may leave it. Nested layers use their parent host. */
+export function useOverlayPortalTarget(layout: 'anchored' | 'viewport' = 'anchored'): {
   anchorRef: React.RefObject<HTMLSpanElement | null>
   target: HTMLElement | null
 } {
   const anchorRef = useRef<HTMLSpanElement | null>(null)
   const [target, setTarget] = useState<HTMLElement | null>(null)
+  const resolveTarget = useCallback(() => {
+    const anchor = anchorRef.current
+    const resolved = resolveAnchoredOverlayTarget(anchor)
+    const owner = anchor?.ownerDocument ?? (isBrowser() ? document : null)
+    return layout === 'viewport' && resolved?.ownerDocument !== owner
+      ? resolveViewportPortalTarget(owner)
+      : resolved
+  }, [layout])
 
   useLayoutEffect(() => {
-    setTarget(resolveAnchoredOverlayTarget(anchorRef.current))
-  }, [])
+    setTarget(resolveTarget())
+  }, [resolveTarget])
 
   return {
     anchorRef,
-    target: target ?? (isBrowser() ? resolveAnchoredOverlayTarget(anchorRef.current) : null)
+    target: target ?? (isBrowser() ? resolveTarget() : null)
   }
 }
 

@@ -157,7 +157,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   const reactId = useId()
   const titleId = `tiger-tour-${reactId}-title`
   const descriptionId = `tiger-tour-${reactId}-description`
-  const { anchorRef } = useOverlayPortalTarget()
+  const { anchorRef } = useOverlayPortalTarget('viewport')
   const targetExemptRef = useRef<HTMLElement | null>(null)
 
   useLayoutEffect(() => {

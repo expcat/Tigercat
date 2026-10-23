@@ -272,7 +272,7 @@ export const Drawer = defineComponent({
     const hasOpened = ref(props.open)
     const leaving = ref(false)
 
-    const { anchorRef, target: portalTarget } = useVueOverlayPortalTarget()
+    const { anchorRef, target: portalTarget } = useVueOverlayPortalTarget('viewport')
     const dialogRef = ref<HTMLElement | null>(null)
     const rootRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)

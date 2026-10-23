@@ -6,6 +6,7 @@ import {
   computeFloatingPosition,
   autoUpdateFloating,
   resolveAnchoredOverlayTarget,
+  resolveViewportPortalTarget,
   retainPortaledOverlay,
   collectOverlayListenerDocuments,
   getAnchoredOverlayTabTarget,
@@ -216,8 +217,8 @@ export function renderVueOverlayTeleport(
   return h(Teleport as never, { to: target }, [layeredChildren])
 }
 
-/** Resolve the overlay-host chain from an in-tree anchor so nested Modal/Drawer enter the parent host. */
-export function useVueOverlayPortalTarget(): {
+/** Viewport layers stay in their document; anchored popups may leave it. Nested layers use their parent host. */
+export function useVueOverlayPortalTarget(layout: 'anchored' | 'viewport' = 'anchored'): {
   anchorRef: Ref<HTMLElement | null>
   target: Ref<HTMLElement | null>
 } {
@@ -225,7 +226,13 @@ export function useVueOverlayPortalTarget(): {
   const target = ref<HTMLElement | null>(isBrowser() ? resolveAnchoredOverlayTarget(null) : null)
 
   const resolveTarget = () => {
-    target.value = isBrowser() ? resolveAnchoredOverlayTarget(anchorRef.value) : null
+    const anchor = anchorRef.value
+    const resolved = isBrowser() ? resolveAnchoredOverlayTarget(anchor) : null
+    const owner = anchor?.ownerDocument ?? (isBrowser() ? document : null)
+    target.value =
+      layout === 'viewport' && resolved?.ownerDocument !== owner
+        ? resolveViewportPortalTarget(owner)
+        : resolved
   }
 
   onMounted(resolveTarget)

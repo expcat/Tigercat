@@ -10,7 +10,7 @@ AspectRatio 的已有 `fit="contain"` / `"cover"` / `"fill"` 现在实际作用�
 
 拖放自定义渲染应继续展开完整 `ListDragItemBindings`，包括 `style`：启用拖拽时该对象现在还包含 `touchAction: 'none'`，用于在原生手势开始前声明拖放行为。TaskBoard 的可拖卡片和列头采用同一约束，触摸这些拖动区域用于排序；滚动使用列表 / 看板的非拖动区域。直接使用 `createTouchDragTracker()` 的调用方应由自己的非 passive 监听负责取消默认行为，tracker 只记录位移。
 
-Masonry 的共享 style helper 现在返回 `--tiger-masonry-gap`，source 模式据此提供纵向间距，packed 模式置零；将完整返回对象绑定到根元素即可。Sidebar 的自带折叠按钮与侧栏放在同一容器，依赖旧 `display: contents` DOM 布局的外部选择器应按实际容器结构调整。移动 Modal / Drawer 的反向滑动保持打开，原有正向关闭手势不变。
+Masonry 的共享 style helper 现在返回 `--tiger-masonry-gap`，source 模式据此提供纵向间距，packed 模式置零；将完整返回对象绑定到根元素即可。Sidebar 的自带折叠按钮与侧栏放在同一容器，依赖旧 `display: contents` DOM 布局的外部选择器应按实际容器结构调整。普通 Modal / Drawer 与 Tour 保持在自身 ConfigProvider 所在 document，锚定菜单和 ChartTooltip 仍可跨同源 iframe 定位。移动 Modal / Drawer 的反向滑动保持打开，原有正向关闭手势不变。
 
 ## v3.0.0-rc.2
 
