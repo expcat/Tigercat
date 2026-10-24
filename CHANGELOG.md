@@ -14,7 +14,8 @@
 - **图表（Core / Vue / React）**：轴标题避让刻度，Heatmap 按标签宽度降低刻度密度，Radar 层级标签放入半径内，横向图例给绘图区保留可收缩空间。BarChart 顶部数值标签使用自动域留白，Funnel 标签采用主题文本与描边；Pie 在未指定外半径时按真实扇区和外标签边界拟合半径与圆心，避免窄屏裁切，两端绑定保持一致。
 - **拖放与编辑（Core / Vue / React）**：共享文档拖拽会话跟随 pointer target 的 ownerDocument，列表命中与焦点兼容 iframe，启用拖拽的列表项 / TaskBoard 卡片预先声明 touch-action。TaskBoard touch tracker 仅跟踪位移，取消默认行为留给已有非 passive 监听，消除移动排序的 passive 错误。ImageAnnotation 在可绘制状态提前声明触控行为，Vue MarkdownEditor 切回编辑时恢复当前正文。
 - **数据与示例**：FileManager 长文件名约束在网格项内，DataTableWithToolbar 窄屏工具栏换行；Table 示例按完整状态精确筛选，Chat 示例采用真实固定行高，VirtualList 动态行高与 Resizable 刻度接线正确，WorkflowViewer 的内部横滚经真实触摸复验。Avatar 正常 / 恢复图源改为自包含资源；打印、导出和 AppShell 的示例权限通过既有 sandbox 机制显式声明。
-- **发布准备**：根包与五个发布包统一为 `3.0.0-rc.3`，两个私有 SPA Example 保持 `1.5.0`；本版不删除或重命名组件 API。最终发布门禁与 production preview 的结果记录在本地发布报告，发布由既有 tag Actions 执行。
+- **Admin 升级与发布**：真实应用完成本地包迁移、用法更新及全功能验收，闭合 17 项缺陷，其中 7 项上游问题以原组件根因修复并多轮重新打包消费复验。正式注册表 rc.3 升级后，158 项静态 E2E、本地 22 个关键场景通过；已提交、推送并由既有 Action 发布 [Admin Pages](https://expcat.github.io/Tigercat_Admin/)，实际部署 SHA、线上资源及 20 个选定交互 / 视觉条件已核验。
+- **发布与验收**：`v3.0.0-rc.3` 已由既有 tag Actions 发布五包及 Example Pages，五包 `next=3.0.0-rc.3`、`latest=2.9.4`，正式注册表消费 smoke 通过。最终候选通过 9321 项单测、独立 45 项 a11y、50 项 Chromium / mobile E2E，以及五包与四种消费示例 / SSR 门禁；线上关键流程按组合证据接受。两个私有 SPA Example 保持 `1.5.0`；本版不删除或重命名组件 API。验收记录与历史证据限制见 [rc.3 验收档案](docs/RC3-VISUAL-VALIDATION.md)。
 
 ## v3.0.0-rc.2（2026-10-22）
 

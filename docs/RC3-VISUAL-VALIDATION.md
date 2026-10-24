@@ -1,21 +1,25 @@
-# 3.0.0-rc.3 Example 视觉验收
+# 3.0.0-rc.3 Example / Admin 视觉验收与发布
 
-本次活动计划，核实于 2026-10-24。总控依次开启下表对话并综合验收；执行对话不再派生对话。UI-00 计划与 UI-01 / UI-02 / UI-03 三阶段已完成总控模型视觉验收；覆盖由全矩阵初始采集和定向修复复验合成，不代表全部条件在最后修改后重新采集。RELEASE-01 曾在候选 `f6892893f49f6851814d558fce3285f3f277086b` 完成本地完整发布门禁、E2E 和 production preview。2026-10-24 最终 E2E 使用默认输出目录时清理了 `test-results/`，其中旧 Example 截图、阶段报告和日志未恢复；下文阶段数字保留为历史执行记录，不能当作当前仍可核验的原始证据。Admin 的 `artifacts/` 完整保留；最终发布门禁重新运行并另存于隔离输出目录之外。2026-10-24 用户调整顺序：先完成 Tigercat_Admin 本地引用、迁移与全功能视觉验收，反复修复和复测上游原组件，再发布 rc.3，最后由 Admin 升级注册表包并发布 Pages。远程发布尚未开始。
+状态：已归档。核实日期为 2026-10-25，完成记录见 [CHANGELOG](../CHANGELOG.md#v300-rc32026-10-24)。
+
+本次活动核实于 2026-10-24 至 25 日。Admin 本地迁移与全功能验收已完成，17 项已发现缺陷全部闭合，其中 7 项上游原组件问题已在真实消费中复验。用户回复指定口令「确认」后，最终候选 `ca6fa5f2bd525152f461590f04dc10567f291c6d` 已进入远程 main，`v3.0.0-rc.3` 已推送，五包与 Example Pages 的 tag Actions 均成功；注册表消费 smoke 与线上 Example 关键流程的组合验收已通过。Admin 已升级正式注册表包并提交、推送、发布 Pages；完整静态 E2E 为 158 / 158，本地关键流程 22 个不同场景和部署后 20 个选定条件均已验收。
+
+UI-00 计划与 UI-01 / UI-02 / UI-03 三阶段已完成总控模型视觉验收；覆盖由全矩阵初始采集和定向修复复验合成，不代表全部条件在最后修改后重新采集。RELEASE-01 曾在候选 `f6892893f49f6851814d558fce3285f3f277086b` 完成本地完整发布门禁、E2E 和 production preview。2026-10-24 最终 E2E 使用默认输出目录时清理了 `test-results/`，其中旧 Example 截图、阶段报告和日志未恢复；下文阶段数字保留为历史执行记录，不能当作当前仍可核验的原始证据。Admin 的 `artifacts/` 完整保留；最终发布门禁重新运行并另存于隔离输出目录之外。
 
 ## 顺序阶段
 
 每个阶段输入为本文件、当前工作区 / 分支差异及前阶段报告；开工时重新核对实际源码和状态。视觉阶段都包含发现、根因定位、最小修复和同条件复验，不把缺陷留到最后集中打补丁。历史证据根目录为 ignored 的 `test-results/visual-rc.3/`。后续 Playwright 显式指定独立 `--output` 子目录；报告、日志和本地包放在该输出目录之外，避免测试启动时清理验收资料。无需新增测试框架、永久截图基线或依赖。
 
-| 对话                          | 负责范围                                                                               | 验收与输出                                                                                                                                                                                                                                                                     | 当前状态            |
-| ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- |
-| UI-01 外壳与基础              | 首页、basic、layout，共 40 页 / 框架；导航、主题、语言、章节锚点和 Playground 共用外壳 | 下文矩阵中本范围全部页面 / 演示区块；展开与折叠侧栏、移动菜单遮罩关闭、设置、主题与语言持久化、内层滚动和源码编辑 / 运行 / 重置 / 编译错误保留上次预览。产出 `ui-01/report.md`、覆盖清单、前后截图及定向检查日志                                                               | 总控视觉验收通过    |
-| UI-02 表单与浮层              | form、navigation、feedback，共 53 页 / 框架；下拉、焦点与嵌套层一起验收                | 全范围基础矩阵；表单校验 / 提交 / loading、选择器 / 日期时间、菜单键盘、Modal / Drawer 中的选择器、边缘碰撞 / 滚动 / 关闭 / 焦点返回。产出 `ui-02/` 下同类证据                                                                                                                 | 总控视觉验收通过    |
-| UI-03 数据与复杂交互          | data、charts、advanced、composite、hooks，共 54 页 / 框架                              | 全范围基础矩阵；表格 / 虚拟列表 / 图表的滚动与选择、编辑器、拖放 / 缩放 / 触控、工作流 / 任务板 / 文件管理、组合表单和通知。复验前两阶段共享修复的本阶段消费者；产出 `ui-03/` 下同类证据                                                                                       | 总控视觉验收通过    |
-| RELEASE-01 本地验收与发布准备 | 输入三份视觉报告及累计 diff；核完缺陷、版本和发布记录，验证最终候选提交                | 全路由矩阵无未处理缺口；相关现有测试通过；rc.3 版本与文档准备完整；在同一最终提交运行 `quality:release`、`e2e`，并在 production preview 复验受改动页面。输出 `release-01/report.md`、最终 SHA、命令退出码 / 日志、发布 diff / 包清单 / tag / dist-tag 和待执行命令，交总控审阅 | 本地验收完成        |
-| ADMIN-01 本地引用与迁移       | 在 Tigercat_Admin 新对话消费已验证本地包，核对用法与新增能力                           | 类型、相关现有测试和构建通过，给出真实路由、组件及交互验收清单                                                                                                                                                                                                                 | 本地接入完成        |
-| ADMIN-02 全功能视觉验收       | ADMIN-01 完成后启动；Admin 修复业务用法，上游由本对话根因修复                          | desktop / mobile、明暗和真实互动证据完整；每轮重新构建、引用与复测，全部已发现问题闭合后复核最终发布候选                                                                                                                                                                       | 执行中              |
-| RELEASE-02 发布与远程验收     | 输入 Admin 验收、最终候选发布门禁及总控取得的有效确认口令                              | 推送已验证提交与 tag，跟进 Publish Packages / Pages；五包版本和 dist-tag 正确，`smoke:published` 通过，线上 Example 可访问且关键状态可用                                                                                                                                       | 待 Admin 验收与口令 |
-| ADMIN-03 rc.3 升级与 Pages    | 输入 rc.3 tag / SHA、Action 与注册表消费验证结果                                       | 移除临时本地引用，升级注册表 rc.3；本地门禁与关键交互复测通过后提交、推送并验证 Pages 实际部署                                                                                                                                                                                 | 待 rc.3 发布        |
+| 对话                          | 负责范围                                                                               | 验收与输出                                                                                                                                                                                                                                                                     | 当前状态           |
+| ----------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------ |
+| UI-01 外壳与基础              | 首页、basic、layout，共 40 页 / 框架；导航、主题、语言、章节锚点和 Playground 共用外壳 | 下文矩阵中本范围全部页面 / 演示区块；展开与折叠侧栏、移动菜单遮罩关闭、设置、主题与语言持久化、内层滚动和源码编辑 / 运行 / 重置 / 编译错误保留上次预览。产出 `ui-01/report.md`、覆盖清单、前后截图及定向检查日志                                                               | 总控视觉验收通过   |
+| UI-02 表单与浮层              | form、navigation、feedback，共 53 页 / 框架；下拉、焦点与嵌套层一起验收                | 全范围基础矩阵；表单校验 / 提交 / loading、选择器 / 日期时间、菜单键盘、Modal / Drawer 中的选择器、边缘碰撞 / 滚动 / 关闭 / 焦点返回。产出 `ui-02/` 下同类证据                                                                                                                 | 总控视觉验收通过   |
+| UI-03 数据与复杂交互          | data、charts、advanced、composite、hooks，共 54 页 / 框架                              | 全范围基础矩阵；表格 / 虚拟列表 / 图表的滚动与选择、编辑器、拖放 / 缩放 / 触控、工作流 / 任务板 / 文件管理、组合表单和通知。复验前两阶段共享修复的本阶段消费者；产出 `ui-03/` 下同类证据                                                                                       | 总控视觉验收通过   |
+| RELEASE-01 本地验收与发布准备 | 输入三份视觉报告及累计 diff；核完缺陷、版本和发布记录，验证最终候选提交                | 全路由矩阵无未处理缺口；相关现有测试通过；rc.3 版本与文档准备完整；在同一最终提交运行 `quality:release`、`e2e`，并在 production preview 复验受改动页面。输出 `release-01/report.md`、最终 SHA、命令退出码 / 日志、发布 diff / 包清单 / tag / dist-tag 和待执行命令，交总控审阅 | 本地验收完成       |
+| ADMIN-01 本地引用与迁移       | 在 Tigercat_Admin 新对话消费已验证本地包，核对用法与新增能力                           | 类型、相关现有测试和构建通过，给出真实路由、组件及交互验收清单                                                                                                                                                                                                                 | 本地接入完成       |
+| ADMIN-02 全功能视觉验收       | ADMIN-01 完成后启动；Admin 修复业务用法，上游由本对话根因修复                          | desktop / mobile、明暗和真实互动证据完整；每轮重新构建、引用与复测，全部已发现问题闭合后复核最终发布候选                                                                                                                                                                       | 本地验收完成       |
+| RELEASE-02 发布与远程验收     | 输入 Admin 验收、最终候选发布门禁及总控取得的有效确认口令                              | 推送已验证提交与 tag，跟进 Publish Packages / Pages；五包版本和 dist-tag 正确，`smoke:published` 通过，线上 Example 可访问且关键状态可用                                                                                                                                       | 发布与远程验收完成 |
+| ADMIN-03 rc.3 升级与 Pages    | 输入 rc.3 tag / SHA、Action 与注册表消费验证结果                                       | 移除临时本地引用，升级注册表 rc.3；本地门禁与关键交互复测通过后提交、推送并验证 Pages 实际部署                                                                                                                                                                                 | 发布与线上验收完成 |
 
 ADMIN-01 已核验本地三包内容与 peer 来源，完成双端 AspectRatio 用法、折叠菜单与真实安装版本展示迁移。类型、API / Mock 双端构建、12 项现有交互和 8 项局部布局断言通过；新增验收文档链接 17 / 17 通过，全量文档末次有两个既有 GitHub 外链返回 Status 0，未冒称全量通过。Admin 已登记双端各 37 页及 43 个公共组件文件，清单见 `Tigercat_Admin/docs/frontend-rc3-validation.md`；ADMIN-02 已启动，用户已明确授权现有 Playwright。上游已复现并修复 React Upload StrictMode 控制器重用、挂载阶段 ref 提交被忽略，以及自定义上传取消后仍显示上传中。React / Vue / Core Upload 定向测试 129 项通过；第二轮包的双端桌面 / 手机实际上传路径和 68 张重要状态原图已复验通过，ADMIN-UP-01 / 02 闭合。FunnelChart 比例口径与 FileManager 加载后播报修复已在第三轮真实消费复验闭合，相关 181 项测试及三包构建通过。WorkflowActionBar 的操作与“更多”确认气泡首选起端对齐，第四轮双端 14 条条件、56 张原图及实际互动复验通过；ADMIN-UP-01 至 05 全部闭合。
 
@@ -25,7 +29,7 @@ UI-02 已完成总控验收：424 个页面条件、1368 个演示条件、342 �
 
 UI-03 前置定向验证已完成：Table01 窄屏列宽及 DemoPage 长标题折行修复见 `orchestrator/narrow-ui03/report.md`；WorkflowViewer 真实触摸内部横滚见该目录 `viewer-scroll/accepted/`；BarChart 六主题 24 条条件 / 48 图见 `orchestrator/themes-bar-chart/review-final.json`。UI-03 引用这些证据并检查其余全部页面和交互，不重复采集已验收的定向矩阵。
 
-阶段报告分别记录「已实现」「自动门禁通过」「等待人工验收」，总控看过有效截图和报告才确认视觉通过。最终完成后把交付摘要归入 [CHANGELOG](../CHANGELOG.md)，从 [ROADMAP](ROADMAP.md) 删除本任务；本活动文档标记「已归档」并链接完成记录，不把历史复制回路线图。既有 Cron 摘要增强不自动并入此次任务；若视觉证据显示该页面存在实际缺陷，按缺陷处理。
+历史阶段报告分别记录「已实现」「自动门禁通过」「等待人工验收」，总控看过有效截图和报告才确认视觉通过。交付摘要已归入 [CHANGELOG](../CHANGELOG.md)，本任务已从 [ROADMAP](ROADMAP.md) 删除；本活动文档归档保留事实与证据限制。既有 Cron 摘要增强继续单独登记。
 
 ## 路由与分组清单
 
@@ -96,17 +100,21 @@ pnpm e2e --output test-results/e2e-rc3
 
 ## 版本、远程与发布边界
 
-初始基线与远程 main 为 `804fb3a55fc83893af085b55d617e26b256cd7ea`，origin 为 `https://github.com/expcat/Tigercat.git`。本地最初候选为 `f6892893f49f6851814d558fce3285f3f277086b`，Admin 复验后的包源码候选为 `58b00c4568941b7d5bc5c110f3f1ce74a4296066`；根包与五个发布包已统一为 `3.0.0-rc.3`，两个私有 SPA Example 版本为 `1.5.0`。最终候选及同一提交的本地完整门禁结果记录在 `test-results/visual-rc.3/release-02/`。发布前重新核对远程与最终候选，Admin 验收产生上游修复时更新候选及发布门禁。
+初始基线与远程 main 为 `804fb3a55fc83893af085b55d617e26b256cd7ea`，origin 为 `https://github.com/expcat/Tigercat.git`。本地最初候选为 `f6892893f49f6851814d558fce3285f3f277086b`，Admin 复验后的包源码候选为 `58b00c4568941b7d5bc5c110f3f1ce74a4296066`；根包与五个发布包已统一为 `3.0.0-rc.3`，两个私有 SPA Example 版本为 `1.5.0`。最终发布候选为 `ca6fa5f2bd525152f461590f04dc10567f291c6d`。同一干净提交的 `quality:release` 通过（9321 项单测 / 561 个文件，另跑 45 项 a11y / 3 个文件，五包构建与 tarball、四种消费示例 / SSR）；完整 Chromium / mobile E2E 为 50 / 50。最终日志和报告单独保存于本对话的 `rc3-release/` 归档目录，位于 Playwright 清理目录之外。
 
-发布包固定为 `@expcat/tigercat-{core,vue,react,cli,mcp}`。2026-10-24 重新查询 npm registry：五包均有 rc.2、没有 rc.3，均为 `next=3.0.0-rc.2`、`latest=2.9.4`。`git ls-remote` 发现 rc.1 / rc.2 tag，没有 rc.3；GitHub rc.3 Release 查询返回 404。本地 `pnpm release:check` 对 rc.3 通过，不代表远程已发布。发布前必须重新查远程，避免覆盖后来出现的版本或 tag。
+发布包固定为 `@expcat/tigercat-{core,vue,react,cli,mcp}`。五包 `3.0.0-rc.3` 均已在 npm registry 核验，均为 `next=3.0.0-rc.3`、`latest=2.9.4`；`pnpm smoke:published` 已实际安装注册表包并通过导出、tree-shaking、Vue / React SSR、CLI / MCP 检查。初始传播期间的部分 404 保留为历史，后续完整 packument 已确认五包全部上线。
 
 准备命令为 `pnpm sync:version 3.0.0-rc.3`，事实源是 [sync-version.mjs](../scripts/sync-version.mjs)：同步根包、五包和 `examples/index.html` 版本标记。再补齐 `CHANGELOG.md` 与 `docs/MIGRATION.md` 的 `## v3.0.0-rc.3`；无 breaking 也据实说明。按实际变更同步 API / Example / skill 文档，生成物只重跑生成器；检查 lockfile 是否实际受影响，不无故改写。消费掉的 changeset notes 按现有 [release 流程](../skills/tigercat/references/release.md) 处理。
 
 [真实 tag workflow](https://github.com/expcat/Tigercat/blob/main/.github/workflows/publish-on-tag.yml) 在 push `v*` 时确认 tag 位于默认分支历史，安装、构建并执行 `pnpm exec changeset publish --tag next` 发布预发布版本；五包上线后调整 / 检查 dist-tag。稳定版才走 latest。Pages 同 tag 触发 [deploy workflow](https://github.com/expcat/Tigercat/blob/main/.github/workflows/deploy.yml)。另外两个手动 workflow 仅拒绝分支发布 / 自动升版，不是 rc.3 入口。
 
-已核实 rc.2 的 [Publish Packages run](https://github.com/expcat/Tigercat/actions/runs/39775713102) 与 [Pages run](https://github.com/expcat/Tigercat/actions/runs/39775712981) 均 success；新版本必须核验自己的 run 和 head SHA。无 `gh` CLI，可继续用现有 GitHub connector 读取 runs / jobs / logs，不安装工具。
+rc.3 的 [Publish Packages run](https://github.com/expcat/Tigercat/actions/runs/40106835987) 与 [Example Pages run](https://github.com/expcat/Tigercat/actions/runs/40106835980) 均为 success，head SHA 均为最终候选。GitHub Deployments API 另核实 Pages deployment `7300576126`、环境 `github-pages`、ref `v3.0.0-rc.3` 与相同 SHA；最新状态 `20492466045` 为 success，并指向该 run 的 deploy job `120910486698`。
 
-RELEASE-01 先准备完整 diff、候选提交、门禁结果、五包清单、tag、dist-tag、以下命令及影响范围，之后才由总控索取用户指定并回复的确认口令。当前没有有效口令，不得推送触发发布的 tag 或执行 npm publish；不在计划阶段提问。口令匹配后，确认本地 main 就是已验证候选提交，方可执行：
+线上根页与 `/index.html` 均为 HTTP 200，正文与候选 `examples/index.html` 完全一致（SHA-256 `6d6c35d1a7511cea47ae81d3b22a602e9dad659615a38c65fa9a952298e3f7b2`）。MCP manifest 为 rc.3，version commit 为最终候选，404 个镜像文件摘要均与候选清单一致。Vue / React × 1440 浅色桌面 / 375 暗色触控手机的 Funnel 比例与明暗切换、Upload 成功 / 移除、FileManager 搜索 / 清空 / 播报、Workflow 确认气泡 / 取消 / 焦点返回、Tour 步骤 / 完成 / 焦点返回，共 20 条部署后条件经组合证据接受：19 条为自动互动加实际原图检查，React 桌面静态 Funnel 为正确渲染原图加实际主题切换记录；不能称为一次 20 / 20 自动通过。证据索引为本对话 `rc3-release/live-example-acceptance.json`。
+
+线上首次及补采的模块加载超时、错误测试断言和被终止的运行均保留：静态 Funnel 不支持选择，早期脚本错误断言其交互属性，未改写原失败；手机 Vue 上传成功项最初不在可见截图内，立即滚动的补图仍未有效绘制，另在滚动稳定后确认成功条目和原生移除。部分 GitHub Pages IP 在本机连接超时，后续浏览器使用可连接的 `185.199.109.153`，保留真实 origin 且不拦截正文；未宣称冷加载始终成功。旧 React 手机图的设置面板处于打开状态，关键组件控件可见；关闭态外壳由后续 Funnel 图补证。该线上定向矩阵不替代历史全量本地视觉矩阵。
+
+RELEASE-01 已先完成完整 diff、候选提交、门禁结果、五包清单、tag、dist-tag 与待执行命令的具体审阅。用户随后直接回复指定口令「确认」，授权完整 tag / Action 发布和 Admin 升级、提交、推送、Pages 链。以下三条命令已成功执行；未强推或重打标签：
 
 ```bash
 git push origin HEAD:main
@@ -125,3 +133,15 @@ git push origin refs/tags/v3.0.0-rc.3
 Admin 业务问题在 Admin 根因修复；上游原组件问题报告到本对话，定位责任层并修复全部同类消费者，随后重新构建本地包、交回 Admin 重新引用与复测，直到已发现问题全部闭合。不用 Admin CSS 覆盖或兼容层掩盖上游问题。发布前核实 Admin 消费的包与最终候选一致，不把 workspace Example 验收当成 Admin 验收。
 
 rc.3 远程验收成功后，交接 tag / SHA、两条 Action run、五包与 dist-tag / smoke 结果、修复清单及证据。Admin 移除临时本地覆盖，升级注册表 `3.0.0-rc.3`，完成本地门禁和关键流程复测，再按用户授权提交、推送并发布 Pages；最终核实实际部署 SHA 和线上页面。
+
+正式升级已完成：React / Vue / MockApi 清单、release-age 例外与 lock 均固定注册表 rc.3，三个临时 file overrides 已移除。普通与冻结安装、双端类型检查、API / Mock / Pages 构建通过；现有静态 E2E 为 158 / 158。关键流程 22 个不同场景按首次 21 / 22 与 Vue 320 定向 1 / 1 组合接受，首次等待超时保留，未改产品源码。已验收的生产源码集合摘要继续为 `a6de8e0c67baca84417914a110601b714cd66b5138db7a4b1726ec0e52512560`；此前后端 271 / 271 和真实 API 28 / 28 不改称本轮重跑。
+
+Core / React / Vue 的 74 / 534 / 532 个实际安装文件逐个匹配正式 registry tarball，SHA512 与 registry 及 lock 一致，框架 peers 和共享 Core 实例均正确。正式构建与历史本地包并非逐字节相同：Core 与 Vue Tour 只有调用换行，后者使 chunk 改名并更新入口 import；React 7 / Vue 143 个声明文件的顺序差异经 TypeScript AST 核对等价。上游生产源码在已消费的 `58b00c4` 至发布候选 `ca6fa5f` 之间未变；不能据此把不同构建归档说成字节相同。详细来源和差异记录在 Admin 的 `artifacts/admin-02/registry-rc3/`。
+
+Admin [提交 `be8a2a6`](https://github.com/expcat/Tigercat_Admin/commit/be8a2a6b7218a78fca9294649fa45e872a89cea1) 已普通推送 main；总控独立核对 58 个提交文件均与已审候选摘要一致，未改手动工作流。[Pages run 40110051841](https://github.com/expcat/Tigercat_Admin/actions/runs/40110051841) 为 success；GitHub Deployments API 的 `github-pages` deployment `7301056234`、status `20494404909` 和 deploy job `120919796631` 均成功并关联相同提交。总控另取得 [Admin 入口](https://expcat.github.io/Tigercat_Admin/) 及 `/react/`、`/vue/` 的 HTTP 200 正文，首次 React 连接超时与定向成功分别保留。入口正文 SHA-256 为 `1dcaf97686b30af1860657ce98ace31d904ddf02346bf53ce5e72bd4ae381e30`；两端 HTML、主 JS 和 CSS 共 6 个线上资源与已验本地构建一致。
+
+部署后，React / Vue × 1440 浅色桌面 / 375 暗色触控手机的五类流程，共 20 个唯一条件经真实操作与原图检查接受：登录并完成全部 Tour 步骤；批量状态取消、禁用持久化、恢复和禁止停用当前用户；通知铃铛与页面未读数同步；文件搜索 3 → 1 → 0 → 3；审批确认、转交人选择、Escape 关闭和焦点返回。手机实际触控参数已核对，Tour 和转交气泡边界与按钮完整可见。总控独立检查选定条件的原图、结果来源和摘要。
+
+该结果由多次有效运行合成，不冒称一次 20 / 20 自动运行。桌面批量状态取 `online-round-03`，React 手机四条业务流取 `online-round-01`；React 桌面 Tour 使用 `online-round-03` 与 `online-session-04` 的有效记录，其余三条流程取 `online-session-04`，Vue 桌面其余流程取 `online-vue-session-04`，React 手机 Tour 取 `online-react-mobile-session-05`；Vue 手机五项取本对话 `rc3-release/admin-live-vue/results.json` 与 `admin-online-vue-mobile-acceptance.json`。前述 Admin 相对路径均位于 `artifacts/admin-02/registry-rc3/`，完整索引为 `online-acceptance.json` 与 `online-visual-review.json`；总控独立索引为本对话 `rc3-release/admin-online-parent-acceptance.json`，逐源核对结果为 `admin-online-index-audit.json`。模块加载超时、同文档跳转返回空 response 的脚本错误和未稳定的加载截图均保留并排除；部分后续截图保留前一步成功通知，关键正文与互动状态实际可见。线上定向复验不替代此前 74 个功能页面、43 个公共组件文件与 296 个历史默认条件的本地全量验收。
+
+Admin 最终归档[提交 `cddbf31`](https://github.com/expcat/Tigercat_Admin/commit/cddbf312e2131a8a50a84a2badf7d576b8081623) 已普通推送，独立查询远程 main 精确匹配；仅更新 `Roadmap.md` 与 `docs/frontend-rc3-validation.md`，工作区干净。该文档提交不重新部署产品，实际 Pages 仍对应已验收的 `be8a2a6`。上游归档同样只更新文档，`v3.0.0-rc.3` 保持指向发布候选 `ca6fa5f`。
