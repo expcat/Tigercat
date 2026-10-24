@@ -15,7 +15,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 Runnable modules: `examples/example/vue3/src/examples/tour/` and `examples/example/react/src/examples/tour/`.
 
-Note: `current` 是 `steps` 的原始下标。关掉后非受控下标回到第一个未跳过的步骤；受控时发出回到该下标。同一次打开只加载一次 `loadSteps`，失败有可见状态，不先闪 `steps`。只在打开和换步时把目标滚进视口一次。默认洞只是视觉，点击落在遮罩上，目标保持 inert；`interact` 才把该目标排除在 inert 之外。换步时焦点回到气泡。`start` / `end` 按书写方向，left / right 是物理边。`closable={false}` 只藏 X。无标题仍有 locale dialog 名。文案只读 `locale.tour`。
+Note: `current` 是 `steps` 的原始下标。关掉后非受控下标回到第一个未跳过的步骤；受控时发出回到该下标。同一次打开只加载一次 `loadSteps`，失败有可见状态，不先闪 `steps`。只在打开和换步时把目标滚进视口一次。默认洞只是视觉，点击落在遮罩上，目标保持 inert；`interact` 才把该目标排除在 inert 之外。换步时焦点回到气泡。`start` / `end` 按书写方向，left / right 是物理边。气泡沿边移入视口，首选与相反侧均放不下时尝试垂直侧；箭头跟随实际位置指向目标。`closable={false}` 只藏 X。无标题仍有 locale dialog 名。文案只读 `locale.tour`。
 
 Vue: `<Tour v-model:open="open" :steps="steps" />`
 
