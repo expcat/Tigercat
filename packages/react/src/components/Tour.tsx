@@ -145,6 +145,11 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
   const [popoverSize, setPopoverSize] = useState<TourSize | undefined>()
   const rootRef = useRef<HTMLDivElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
+  const [popoverElement, setPopoverElement] = useState<HTMLDivElement | null>(null)
+  const setPopoverRef = useCallback((element: HTMLDivElement | null) => {
+    popoverRef.current = element
+    setPopoverElement(element)
+  }, [])
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
   const wasOpenRef = useRef(false)
@@ -243,7 +248,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
     const shouldScroll = scrolledKeyRef.current !== key
     scrolledKeyRef.current = key
     measure(shouldScroll)
-  }, [visible, currentStep, measure])
+  }, [visible, currentStep, measure, popoverElement])
 
   useEffect(() => {
     if (!visible) return
@@ -259,7 +264,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
       window.removeEventListener('resize', handler)
       window.removeEventListener('scroll', handler, true)
     }
-  }, [visible, measure, step?.target])
+  }, [visible, measure, step?.target, popoverElement])
 
   const focusKeyRef = useRef('')
   useLayoutEffect(() => {
@@ -279,7 +284,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
       }
     }
     root.focus()
-  }, [visible, currentStep, initialFocus])
+  }, [visible, currentStep, initialFocus, popoverElement])
 
   const applyNavEvents = useCallback(
     (events: TourNavEvent[]) => {
@@ -354,7 +359,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
             data-tiger-overlay-layer=""
             data-tiger-tour-root="">
             <div
-              ref={popoverRef}
+              ref={setPopoverRef}
               role="dialog"
               aria-modal="true"
               aria-label={labels.loadErrorText}
@@ -449,7 +454,7 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
 
       <div
         {...dialogRest}
-        ref={popoverRef}
+        ref={setPopoverRef}
         className={classNames(tourPopoverClasses, className)}
         style={popoverStyle}
         role="dialog"

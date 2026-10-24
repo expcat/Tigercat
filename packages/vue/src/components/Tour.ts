@@ -240,7 +240,7 @@ export const Tour = defineComponent({
     )
 
     watch(
-      [visible, currentStep, () => step.value?.target],
+      [visible, currentStep, () => step.value?.target, popoverRef],
       () => {
         if (!visible.value) return
         const key = String(currentStep.value)
@@ -256,8 +256,8 @@ export const Tour = defineComponent({
     }
 
     watch(
-      visible,
-      (isVisible) => {
+      [visible, popoverRef, () => step.value?.target],
+      ([isVisible]) => {
         resizeObserver?.disconnect()
         resizeObserver = undefined
         if (typeof window === 'undefined') return
@@ -277,7 +277,7 @@ export const Tour = defineComponent({
 
     const focusKey = ref('')
     watch(
-      [visible, currentStep, () => props.initialFocus],
+      [visible, currentStep, () => props.initialFocus, popoverRef],
       () => {
         if (!visible.value) {
           focusKey.value = ''
