@@ -554,7 +554,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
         descriptionContent={extra ? renderPickerFields(item, confirmCopy.description) : undefined}
         okType={confirmCopy.okType}
         icon={confirmCopy.icon}
-        placement="top-end"
+        placement="top-start"
         disabled={itemDisabled}
         onConfirm={(event) => {
           emitReadyAction(item, event)
@@ -629,7 +629,7 @@ export const WorkflowActionBar: React.FC<WorkflowActionBarProps> = ({
             }
             okType={moreConfirmCopy?.okType}
             icon={moreConfirmCopy?.icon}
-            placement="top-end"
+            placement="top-start"
             onConfirm={(event) => {
               if (emitReadyAction(moreItem, event)) setMoreKey(null)
             }}>

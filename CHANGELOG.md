@@ -5,7 +5,7 @@
 ## v3.0.0-rc.3（2026-10-24）
 
 - **Upload（Core / React）**：React 上传控制器随 layout effect 创建并清理，StrictMode 生命周期重放后使用新的有效控制器，父组件挂载阶段的 ref 提交也正常执行，无需关闭应用的 StrictMode。Core 统一结算自定义请求的取消：条目进入可重试的错误状态，忽略完成后的进度，不再登记同步完成请求的失效 abort 句柄；卸载清理不回写条目。
-- **Admin 消费复验（Core / Vue / React）**：FunnelChart 图内只显示首阶段转化率，默认提示与无障碍描述明确标注首阶段、上一阶段比例，使用同一取整口径；删除错误的阶段总和分母，保留自定义 formatter。FileManager 在加载完成、结果数量和语言变化时更新状态播报，修复列表已加载而读屏仍提示“加载中 0 项”的残留。
+- **Admin 消费复验（Core / Vue / React）**：FunnelChart 图内只显示首阶段转化率，默认提示与无障碍描述明确标注首阶段、上一阶段比例，使用同一取整口径；删除错误的阶段总和分母，保留自定义 formatter。FileManager 在加载完成、结果数量和语言变化时更新状态播报，修复列表已加载而读屏仍提示“加载中 0 项”的残留。WorkflowActionBar 的操作及“更多”确认气泡首选起端对齐，避免左侧操作把气泡伸进侧栏，继续由共享浮层处理视口碰撞。
 - **Example 视觉与交互修复（Vue / React）**：完成外壳、基础、表单、浮层、数据、图表和复杂交互三阶段模型视觉验收；证据由初始矩阵与定向修复复验组成。移动菜单接入已有焦点作用域，修复层级遮挡、窄屏设置、长标题和章节导航；面包屑首页跳转保留部署 base。Playground 只订阅有效主题变化，避免滚动锁重建 iframe；两端主题、语言与明暗继续同步。
 - **媒体与布局（Core / Vue / React）**：AspectRatio 兑现已有 `fit`，显式 contain / cover / fill 让内容层与媒体填满比例盒并裁切，默认 / none 保留自然尺寸与可见溢出；同步生成文档和示例。Masonry source 模式补齐纵向间距，packed 模式不重复加距；横向 Card 封面限制窄屏占比，Code 工具栏进入正常文档流，Sidebar 的折叠按钮与侧栏共用纵向容器，恢复 AppShell 主区宽度。
 - **浮层、焦点与手势（Core / Vue / React）**：共享移动浮层几何修复 fullscreen / bottom sheet 偏移与宽度，Calendar / DatePicker 在 320px 下收紧边距。跨 document 的元素和焦点判断使用实际 ownerDocument，React 显式跨 document portal target 正确绕过本地 outlet；普通 Modal / Drawer 和 Tour 使用本 document 视口，保留 sandbox 隔离；popup 等焦点落定后判断离开，嵌套浮层保留原触发器。Modal / Drawer 按带方向的位移判断松手，反向上滑不再误关闭。
