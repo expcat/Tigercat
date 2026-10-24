@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useId,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState
@@ -277,7 +278,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
 
   const controllerRef = useRef<ReturnType<typeof createUploadController> | null>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const controller = createUploadController({
       host: {
         getFileList: () => fileListRef.current,

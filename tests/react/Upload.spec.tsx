@@ -7,7 +7,7 @@ import { act, render, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
-import { Upload } from '@expcat/tigercat-react/Upload'
+import { Upload, type UploadRef } from '@expcat/tigercat-react/Upload'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import type { UploadFile } from '@expcat/tigercat-core'
@@ -897,6 +897,28 @@ describe('Upload', () => {
         expect(container.querySelector('[role="list"]')).toBeInTheDocument()
       })
       expect(container.querySelector('[aria-label="Success"]')).not.toBeInTheDocument()
+    })
+
+    it('submits seeded files from a parent layout effect', async () => {
+      const customRequest = vi.fn()
+      const file = new File(['content'], 'seeded.txt', { type: 'text/plain' })
+      const Harness = () => {
+        const uploadRef = React.useRef<UploadRef>(null)
+        React.useLayoutEffect(() => {
+          void uploadRef.current?.submit()
+        }, [])
+        return (
+          <Upload
+            ref={uploadRef}
+            autoUpload={false}
+            defaultFileList={[{ uid: 'seeded', name: file.name, status: 'ready', file }]}
+            customRequest={customRequest}
+          />
+        )
+      }
+      const { unmount } = render(<Harness />)
+      await waitFor(() => expect(customRequest).toHaveBeenCalledOnce())
+      unmount()
     })
 
     it('reaches success in uncontrolled StrictMode with a synchronous abort handle', async () => {

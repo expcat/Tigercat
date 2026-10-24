@@ -16,7 +16,8 @@ import {
   runUploadQueue,
   validateFileType,
   type UploadDragEventLike,
-  type UploadFile
+  type UploadFile,
+  type UploadRequestOptions
 } from '@expcat/tigercat-core'
 
 function createDragEvent(files: File[] = []): UploadDragEventLike & { preventDefault: () => void } {
@@ -280,6 +281,39 @@ describe('createUploadController', () => {
     await process
     expect(host.snapshot()).toEqual([])
     controller.dispose()
+  })
+
+  it('settles an aborted custom upload as retryable and ignores late progress', async () => {
+    const host = createHost()
+    const abort = vi.fn()
+    let pending: UploadRequestOptions | undefined
+    const controller = createUploadController({
+      host,
+      getConfig: () => ({
+        autoUpload: true,
+        queue: false,
+        maxConcurrent: 2,
+        resumable: false,
+        customRequest: (request) => {
+          if (pending) request.onSuccess?.({})
+          else pending = request
+          return { abort }
+        }
+      }),
+      callbacks: {}
+    })
+    const uploading = controller.processFiles([new File(['a'], 'cancel.txt')])
+    await vi.waitFor(() => expect(pending).toBeDefined())
+    controller.abort()
+    await uploading
+    expect(abort).toHaveBeenCalledOnce()
+    expect(host.snapshot()[0]?.status).toBe('error')
+    pending?.onProgress?.(100)
+    expect(host.snapshot()[0]?.status).toBe('error')
+    await controller.retry(host.snapshot()[0]!)
+    expect(host.snapshot()[0]?.status).toBe('success')
+    controller.dispose()
+    expect(abort).toHaveBeenCalledOnce()
   })
 })
 

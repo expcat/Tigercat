@@ -111,7 +111,7 @@ export function createUploadController(options: {
   }
 
   function patchUid(uid: string, patch: Partial<UploadFile>): UploadFile | undefined {
-    if (removedUids.has(uid)) return undefined
+    if (disposed || removedUids.has(uid)) return undefined
     const list = liveList()
     let changed: UploadFile | undefined
     const next = list.map((item) => {
@@ -146,6 +146,7 @@ export function createUploadController(options: {
       }
 
       const applyProgress = (progress: number): void => {
+        if (settled) return
         const nextProgress = extra.chunk
           ? Math.round(((extra.chunk.index + progress / 100) / (extra.totalChunks ?? 1)) * 100)
           : progress
@@ -196,9 +197,13 @@ export function createUploadController(options: {
           })
         },
         onAbort: (abort) => {
+          if (settled) return
           abortByUid.set(uploadFile.uid, () => {
-            abort()
-            finish(() => reject(new Error('Upload aborted')))
+            try {
+              abort()
+            } finally {
+              request.onError?.(new Error('Upload aborted'))
+            }
           })
         }
       }
@@ -226,10 +231,7 @@ export function createUploadController(options: {
 
       const abort = abortHandle?.abort
       if (typeof abort === 'function') {
-        abortByUid.set(uploadFile.uid, () => {
-          abort()
-          finish(() => reject(new Error('Upload aborted')))
-        })
+        request.onAbort?.(abort)
       }
     })
   }

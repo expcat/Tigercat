@@ -4,7 +4,7 @@
 
 本版修复现有视觉、交互和示例行为，没有删除或重命名组件、props、事件及导入路径；从 rc.2 升级无需更改常规调用。五个 `@expcat/tigercat-{core,vue,react,cli,mcp}` 包应一起升级。
 
-React Upload 在 StrictMode 下重新创建已清理的上传控制器，文件选择和上传恢复正常。现有 `customRequest` 与 ref API 不变，应用保持 StrictMode 即可。
+React Upload 在 StrictMode 下重新创建已清理的上传控制器，文件选择和上传恢复正常，父组件 layout effect 中的 ref 提交也可执行。现有 `customRequest` 与 ref API 不变，应用保持 StrictMode 即可。两端取消进行中的自定义请求后，条目按既有默认 XHR 契约进入 `error`（`Upload aborted`），可通过已有重试入口恢复；已结算请求的晚到进度不再把条目改回上传中。
 
 AspectRatio 的已有 `fit="contain"` / `"cover"` / `"fill"` 现在实际作用于内容层中的直接媒体，并在比例盒内裁切；默认 / `fit="none"` 保留媒体自然尺寸与可见溢出。曾为显式 fit 手工补内容绝对定位或媒体尺寸的用法可移除重复样式；需要原始尺寸时省略 fit 或使用 none。
 
