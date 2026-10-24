@@ -2595,6 +2595,7 @@
       "getTotalPages",
       "getTotalTextClasses",
       "getTouchDistance",
+      "getTourArrowStyle",
       "getTourCenteredPosition",
       "getTourLabels",
       "getTourMaskHoleStyle",

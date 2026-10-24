@@ -7,6 +7,7 @@ import type { TourPlacement, TourStep, TourStepContext, TourTarget } from '../ty
 import { devWarn } from './dev-warn'
 import { isBrowser } from './env'
 import { overlayZIndexClass } from './floating'
+import { FLOATING_ARROW_SIZE_PX, getFloatingArrowStyle } from './floating-arrow'
 
 // ---------------------------------------------------------------------------
 // Classes
@@ -357,33 +358,80 @@ export function clampTourPopoverPosition(
   }
 }
 
-/**
- * Viewport-fixed popover position relative to the target rect.
- * Flips to the opposite side when the preferred placement overflows, then clamps.
- */
+function resolveTourPopoverPosition(
+  targetRect: TourRect,
+  popoverWidth: number,
+  popoverHeight: number,
+  placement: TourPlacement
+): { top: number; left: number; placement: TourPlacement } {
+  const viewport = getTourViewportSize()
+  const vertical = placement.startsWith('top') || placement.startsWith('bottom')
+  const candidates: TourPlacement[] = [
+    placement,
+    getOppositeTourPlacement(placement),
+    ...(vertical ? (['right', 'left'] as const) : (['bottom', 'top'] as const))
+  ]
+  for (const candidate of candidates) {
+    const raw = rawTourPopoverPosition(targetRect, popoverWidth, popoverHeight, candidate)
+    const clamped = clampTourPopoverPosition(raw, popoverWidth, popoverHeight, viewport)
+    const alongVertical = candidate.startsWith('top') || candidate.startsWith('bottom')
+    const shifted = alongVertical
+      ? { top: raw.top, left: clamped.left }
+      : { top: clamped.top, left: raw.left }
+    if (!tourPopoverOverflows(shifted, popoverWidth, popoverHeight, viewport)) {
+      return { ...shifted, placement: candidate }
+    }
+  }
+  return {
+    ...clampTourPopoverPosition(
+      rawTourPopoverPosition(targetRect, popoverWidth, popoverHeight, placement),
+      popoverWidth,
+      popoverHeight,
+      viewport
+    ),
+    placement
+  }
+}
+
+/** Shift across the target, then try another side before clamping over it. */
 export function getTourPopoverPosition(
   targetRect: TourRect,
   popoverWidth: number,
   popoverHeight: number,
   placement: TourPlacement
 ): { top: number; left: number } {
-  const viewport = getTourViewportSize()
-  const preferred = rawTourPopoverPosition(targetRect, popoverWidth, popoverHeight, placement)
-  if (!tourPopoverOverflows(preferred, popoverWidth, popoverHeight, viewport)) {
-    return clampTourPopoverPosition(preferred, popoverWidth, popoverHeight, viewport)
-  }
-
-  const flipped = rawTourPopoverPosition(
+  const { top, left } = resolveTourPopoverPosition(
     targetRect,
     popoverWidth,
     popoverHeight,
-    getOppositeTourPlacement(placement)
+    placement
   )
-  if (!tourPopoverOverflows(flipped, popoverWidth, popoverHeight, viewport)) {
-    return clampTourPopoverPosition(flipped, popoverWidth, popoverHeight, viewport)
-  }
+  return { top, left }
+}
 
-  return clampTourPopoverPosition(preferred, popoverWidth, popoverHeight, viewport)
+/** Keep the caret aimed at the target after shifting or changing sides. */
+export function getTourArrowStyle(
+  targetRect: TourRect | undefined,
+  popoverSize: TourSize | undefined,
+  placement: TourPlacement,
+  direction: 'ltr' | 'rtl' = 'ltr'
+): Record<string, string> {
+  const resolved = resolveTourLogicalPlacement(placement, direction)
+  if (!targetRect || !popoverSize) return getFloatingArrowStyle(resolved)
+  const position = resolveTourPopoverPosition(
+    targetRect,
+    popoverSize.width,
+    popoverSize.height,
+    resolved
+  )
+  const vertical = position.placement.startsWith('top') || position.placement.startsWith('bottom')
+  const offset = vertical
+    ? targetRect.left + targetRect.width / 2 - position.left
+    : targetRect.top + targetRect.height / 2 - position.top
+  const size = FLOATING_ARROW_SIZE_PX
+  const edge = vertical ? popoverSize.width : popoverSize.height
+  const coordinate = Math.max(8, Math.min(offset - size / 2, edge - size - 8))
+  return getFloatingArrowStyle(position.placement, vertical ? { x: coordinate } : { y: coordinate })
 }
 
 export function getTourCenteredPosition(

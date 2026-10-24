@@ -8,6 +8,7 @@ import {
   getActiveTourSteps,
   getCurrentActiveTourStep,
   getTourCenteredPosition,
+  getTourArrowStyle,
   getTourMaskHoleStyle,
   getTourShadeStyle,
   resolveTourLogicalPlacement,
@@ -114,6 +115,20 @@ describe('tour utilities', () => {
     )
 
     expect(position.top).toBeLessThan(360)
+  })
+
+  it('keeps a narrow-screen popover clear of its target with its arrow aligned', () => {
+    Object.defineProperty(window, 'innerWidth', { value: 375, configurable: true })
+    Object.defineProperty(window, 'innerHeight', { value: 900, configurable: true })
+    const target = { top: 12, left: 232, width: 40, height: 40 }
+    const position = getTourPopoverPosition(target, 320, 150, 'left')
+
+    expect(position.top).toBeGreaterThanOrEqual(target.top + target.height + 12)
+    expect(position.left).toBeGreaterThanOrEqual(8)
+    expect(position.left + 320).toBeLessThanOrEqual(367)
+    const arrow = getTourArrowStyle(target, { width: 320, height: 150 }, 'left')
+    expect(arrow.top).toBe('-4px')
+    expect(position.left + Number.parseFloat(arrow.left) + 4).toBe(target.left + target.width / 2)
   })
 
   it('centers using the measured popover size', () => {

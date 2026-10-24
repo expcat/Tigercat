@@ -39,7 +39,7 @@ import {
   tourArrowKey,
   tourStepAdvancesOnTarget,
   tourTargetExempt,
-  getFloatingArrowStyle,
+  getTourArrowStyle,
   getPopconfirmArrowClasses,
   shouldCloseOnMaskClick,
   getTourLabels,
@@ -481,7 +481,12 @@ export const Tour = React.forwardRef<TourHandle, TourProps>(function Tour(
           <span
             data-tiger-tour-arrow=""
             className={getPopconfirmArrowClasses()}
-            style={getFloatingArrowStyle(step.placement ?? 'bottom')}
+            style={getTourArrowStyle(
+              targetRect,
+              popoverSize,
+              placement,
+              mergedLocale?.direction === 'rtl' ? 'rtl' : 'ltr'
+            )}
           />
         ) : null}
         {closable && (

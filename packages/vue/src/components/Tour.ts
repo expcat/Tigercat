@@ -40,7 +40,7 @@ import {
   tourArrowKey,
   tourStepAdvancesOnTarget,
   tourTargetExempt,
-  getFloatingArrowStyle,
+  getTourArrowStyle,
   getPopconfirmArrowClasses,
   shouldCloseOnMaskClick,
   getTourLabels,
@@ -486,7 +486,12 @@ export const Tour = defineComponent({
           h('span', {
             'data-tiger-tour-arrow': '',
             class: getPopconfirmArrowClasses(),
-            style: getFloatingArrowStyle(placement)
+            style: getTourArrowStyle(
+              targetRect.value,
+              popoverSize.value,
+              placement,
+              direction.value
+            )
           })
         )
       }
