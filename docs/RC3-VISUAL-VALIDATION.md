@@ -19,7 +19,7 @@
 
 ADMIN-01 已核验本地三包内容与 peer 来源，完成双端 AspectRatio 用法、折叠菜单与真实安装版本展示迁移。类型、API / Mock 双端构建、12 项现有交互和 8 项局部布局断言通过；新增验收文档链接 17 / 17 通过，全量文档末次有两个既有 GitHub 外链返回 Status 0，未冒称全量通过。Admin 已登记双端各 37 页及 43 个公共组件文件，清单见 `Tigercat_Admin/docs/frontend-rc3-validation.md`；ADMIN-02 已启动，用户已明确授权现有 Playwright。上游已复现并修复 React Upload StrictMode 控制器重用、挂载阶段 ref 提交被忽略，以及自定义上传取消后仍显示上传中。React / Vue / Core Upload 定向测试 129 项通过；第二轮包的双端桌面 / 手机实际上传路径和 68 张重要状态原图已复验通过，ADMIN-UP-01 / 02 闭合。FunnelChart 比例口径与 FileManager 加载后播报修复已在第三轮真实消费复验闭合，相关 181 项测试及三包构建通过。WorkflowActionBar 的操作与“更多”确认气泡首选起端对齐，第四轮双端 14 条条件、56 张原图及实际互动复验通过；ADMIN-UP-01 至 05 全部闭合。
 
-Shell 补验发现 ADMIN-UP-06：Tour 在 ConfigProvider 延后挂载气泡时漏掉初次测量，手机首步的下一步 / 关闭按钮落在屏外。第五轮包已在真实消费中验证首步、全部步骤、缩放、关闭、完成持久化与焦点恢复；实际检查 38 张原图时又发现 ADMIN-UP-07：375px 手机目标步骤的箭头不随气泡偏移，左右空间均不足时客服气泡覆盖目标。Core 已统一修复方向选择和箭头偏移，两框架绑定同一 helper；87 项相关测试通过，等待第六轮包消费复验。Admin 业务修复与证据总表仍在收尾。不据此前测试或截图宣称最终候选已验收。
+Shell 补验发现 ADMIN-UP-06：Tour 在 ConfigProvider 延后挂载气泡时漏掉初次测量，手机首步的下一步 / 关闭按钮落在屏外。第五轮包已在真实消费中验证首步、全部步骤、缩放、关闭、完成持久化与焦点恢复；实际检查 38 张原图时又发现 ADMIN-UP-07：375px 手机目标步骤的箭头不随气泡偏移，左右空间均不足时客服气泡覆盖目标。Core 已统一修复方向选择和箭头偏移，两框架绑定同一 helper；87 项相关测试、三包构建与独立代码审查通过。第六轮三包已核对实际安装字节和 Core peer；React / Vue × 1440 浅色、375 / 320 暗色的实际步骤、缩放、关闭、完成持久化与焦点复验通过，56 张原图已按原像素检查，目标零重叠且箭头中心误差不超过 1px。证据为 `Tigercat_Admin/artifacts/admin-02/parent-visual-review/shell-remaining/round-06-tour/`；ADMIN-UP-01 至 07 全部闭合。Admin 默认 296 条页面条件已绑定实际图审；其余业务互动、组件总表与本地门禁的最新关闭状态由 `Tigercat_Admin/docs/frontend-rc3-validation.md` 及 `artifacts/admin-02/coverage.json` 记录。不据此前门禁宣称最终候选已验收。
 
 UI-02 已完成总控验收：424 个页面条件、1368 个演示条件、342 个真实 demo；before 400 表 / 2388 图、after 68 表 / 392 图及 Anchor 补证均已实际图审。最终 212 条交互为 196 条普通视觉通过及 16 条组合证据通过，逐源索引包含 876 张实际审阅图片；18 项缺陷闭合，未处理项为零。总控核对 4384 个文件引用、全部来源与替代关系后记录 `orchestrator/ui02-acceptance.json`，详细报告为 `ui-02/report.md`。历史失败保留，212 条聚合不冒称一次整体 exit 0。Input / Modal 六主题、320px 日期与表单、章节导航的独立补证已计入相应索引，完整发布门禁结果见 RELEASE-01 报告。
 
@@ -96,7 +96,7 @@ pnpm e2e
 
 ## 版本、远程与发布边界
 
-初始基线与远程 main 为 `804fb3a55fc83893af085b55d617e26b256cd7ea`，origin 为 `https://github.com/expcat/Tigercat.git`。本地候选为 `f6892893f49f6851814d558fce3285f3f277086b`，根包与五个发布包已统一为 `3.0.0-rc.3`；两个私有 SPA Example 版本为 `1.5.0`。发布前重新核对远程与最终候选，Admin 验收产生上游修复时更新候选及发布门禁。
+初始基线与远程 main 为 `804fb3a55fc83893af085b55d617e26b256cd7ea`，origin 为 `https://github.com/expcat/Tigercat.git`。本地最初候选为 `f6892893f49f6851814d558fce3285f3f277086b`，Admin 复验后的包源码候选为 `58b00c4568941b7d5bc5c110f3f1ce74a4296066`；根包与五个发布包已统一为 `3.0.0-rc.3`，两个私有 SPA Example 版本为 `1.5.0`。最终候选及同一提交的本地完整门禁结果记录在 `test-results/visual-rc.3/release-02/`。发布前重新核对远程与最终候选，Admin 验收产生上游修复时更新候选及发布门禁。
 
 发布包固定为 `@expcat/tigercat-{core,vue,react,cli,mcp}`。2026-10-24 重新查询 npm registry：五包均有 rc.2、没有 rc.3，均为 `next=3.0.0-rc.2`、`latest=2.9.4`。`git ls-remote` 发现 rc.1 / rc.2 tag，没有 rc.3；GitHub rc.3 Release 查询返回 404。本地 `pnpm release:check` 对 rc.3 通过，不代表远程已发布。发布前必须重新查远程，避免覆盖后来出现的版本或 tag。
 
