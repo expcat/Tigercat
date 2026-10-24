@@ -4,6 +4,8 @@
 
 本版修复现有视觉、交互和示例行为，没有删除或重命名组件、props、事件及导入路径；从 rc.2 升级无需更改常规调用。五个 `@expcat/tigercat-{core,vue,react,cli,mcp}` 包应一起升级。
 
+React Upload 在 StrictMode 下重新创建已清理的上传控制器，文件选择和上传恢复正常。现有 `customRequest` 与 ref API 不变，应用保持 StrictMode 即可。
+
 AspectRatio 的已有 `fit="contain"` / `"cover"` / `"fill"` 现在实际作用于内容层中的直接媒体，并在比例盒内裁切；默认 / `fit="none"` 保留媒体自然尺寸与可见溢出。曾为显式 fit 手工补内容绝对定位或媒体尺寸的用法可移除重复样式；需要原始尺寸时省略 fit 或使用 none。
 
 图表自动布局会变化：BarChart 顶部标签自动留白；轴标题、Radar / Heatmap 刻度避让标签；Pie 外标签在未指定 `outerRadius` 时参与半径和圆心拟合。显式外半径与自定义 BarChart scale 继续优先。依赖旧图形像素位置的应用应按实际数据复核布局。

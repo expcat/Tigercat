@@ -899,18 +899,22 @@ describe('Upload', () => {
       expect(container.querySelector('[aria-label="Success"]')).not.toBeInTheDocument()
     })
 
-    it('reaches success in uncontrolled mode with customRequest without onChange', async () => {
+    it('reaches success in uncontrolled StrictMode with a synchronous abort handle', async () => {
       let finishRequest: (() => void) | undefined
+      const abort = vi.fn()
 
       const { container } = render(
-        <Upload
-          customRequest={({ onProgress, onSuccess }) => {
-            finishRequest = () => {
-              onProgress?.(100)
-              onSuccess?.({ name: 'test.txt' })
-            }
-          }}
-        />
+        <React.StrictMode>
+          <Upload
+            customRequest={({ onProgress, onSuccess }) => {
+              finishRequest = () => {
+                onProgress?.(100)
+                onSuccess?.({ name: 'test.txt' })
+              }
+              return { abort }
+            }}
+          />
+        </React.StrictMode>
       )
 
       const input = container.querySelector('input[type="file"]') as HTMLInputElement
@@ -936,6 +940,7 @@ describe('Upload', () => {
       await waitFor(() => {
         expect(container.querySelector('[aria-label="Success"]')).toBeInTheDocument()
       })
+      expect(abort).not.toHaveBeenCalled()
     })
   })
 

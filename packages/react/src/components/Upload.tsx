@@ -275,8 +275,10 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
     beforeUpload
   }
 
-  const controllerRef = useRef(
-    createUploadController({
+  const controllerRef = useRef<ReturnType<typeof createUploadController> | null>(null)
+
+  useEffect(() => {
+    const controller = createUploadController({
       host: {
         getFileList: () => fileListRef.current,
         setFileList: (list, changed) => {
@@ -306,7 +308,12 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
           callbacksRef.current.onChunkProgress?.(chunk, progress, file)
       }
     })
-  )
+    controllerRef.current = controller
+    return () => {
+      controller.dispose()
+      controllerRef.current = null
+    }
+  }, [setFileList])
 
   useEffect(() => {
     previewUrls.current.sync(fileList)
@@ -331,7 +338,6 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   useEffect(
     () => () => {
       previewUrls.current.dispose()
-      controllerRef.current.dispose()
     },
     []
   )
@@ -344,9 +350,9 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
     ref,
     () => ({
       focus: () => triggerRef.current?.focus(),
-      submit: () => controllerRef.current.submit(),
-      abort: (uid) => controllerRef.current.abort(uid),
-      retry: (file) => controllerRef.current.retry(file)
+      submit: () => controllerRef.current?.submit() ?? Promise.resolve(),
+      abort: (uid) => controllerRef.current?.abort(uid),
+      retry: (file) => controllerRef.current?.retry(file) ?? Promise.resolve()
     }),
     []
   )
@@ -359,18 +365,18 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation()
     const files = Array.from(event.target.files || [])
-    await controllerRef.current.processFiles(files)
+    await controllerRef.current?.processFiles(files)
     event.target.value = ''
   }
 
   const handleRemove = async (file: UploadFile) => {
     if (!canMutate) return
-    await controllerRef.current.remove(file)
+    await controllerRef.current?.remove(file)
   }
 
   const handleRetry = (file: UploadFile) => {
     if (!canMutate) return
-    void controllerRef.current.retry(file)
+    void controllerRef.current?.retry(file)
   }
 
   const handlePreview = (file: UploadFile) => {
@@ -436,7 +442,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
                 read.rejectedDirectories.map((file) => ({ file, reason: 'directory' as const }))
               )
             }
-            await controllerRef.current.processFiles(read.files)
+            await controllerRef.current?.processFiles(read.files)
           }}
           role="button"
           tabIndex={effectiveDisabled ? -1 : 0}
