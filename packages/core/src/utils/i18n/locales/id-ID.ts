@@ -601,6 +601,8 @@ export const idID: TigerLocale = {
     sliceName: 'Irisan {index}',
     sliceAriaLabel: '{label}: {value} ({percent} %)',
     stageName: 'Tahap {index}',
+    funnelFirstRate: 'Dari tahap pertama: {percent}%',
+    funnelPreviousRate: 'Dari tahap sebelumnya: {percent}%',
     heatmapTooltip: '{x} × {y} = {value}',
     treemapTooltip: '{label}: {value} ({percent} %)',
     sunburstTooltip: '{label}: {value} ({percent} %)',

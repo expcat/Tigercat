@@ -10,6 +10,8 @@ AspectRatio 的已有 `fit="contain"` / `"cover"` / `"fill"` 现在实际作用�
 
 图表自动布局会变化：BarChart 顶部标签自动留白；轴标题、Radar / Heatmap 刻度避让标签；Pie 外标签在未指定 `outerRadius` 时参与半径和圆心拟合。显式外半径与自定义 BarChart scale 继续优先。依赖旧图形像素位置的应用应按实际数据复核布局。
 
+FunnelChart 图内百分比现在统一为相对首阶段的转化率，默认提示和无障碍描述分别标明首阶段与上一阶段比例，按图内相同口径取整，不再按阶段总和计算。已有 `tooltipFormatter` 继续优先；自定义图表文案可覆盖新增的 `chart.funnelFirstRate` / `chart.funnelPreviousRate` 模板（`{percent}`）。FileManager 加载完成后会播报当前结果数量，应用无需手动清理加载状态播报。
+
 拖放自定义渲染应继续展开完整 `ListDragItemBindings`，包括 `style`：启用拖拽时该对象现在还包含 `touchAction: 'none'`，用于在原生手势开始前声明拖放行为。TaskBoard 的可拖卡片和列头采用同一约束，触摸这些拖动区域用于排序；滚动使用列表 / 看板的非拖动区域。直接使用 `createTouchDragTracker()` 的调用方应由自己的非 passive 监听负责取消默认行为，tracker 只记录位移。
 
 Masonry 的共享 style helper 现在返回 `--tiger-masonry-gap`，source 模式据此提供纵向间距，packed 模式置零；将完整返回对象绑定到根元素即可。Sidebar 的自带折叠按钮与侧栏放在同一容器，依赖旧 `display: contents` DOM 布局的外部选择器应按实际容器结构调整。普通 Modal / Drawer 与 Tour 保持在自身 ConfigProvider 所在 document，锚定菜单和 ChartTooltip 仍可跨同源 iframe 定位。移动 Modal / Drawer 的反向滑动保持打开，原有正向关闭手势不变。

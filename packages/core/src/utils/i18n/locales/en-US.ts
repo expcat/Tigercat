@@ -601,6 +601,8 @@ export const enUS: TigerLocale = {
     sliceName: 'Slice {index}',
     sliceAriaLabel: '{label}: {value} ({percent}%)',
     stageName: 'Stage {index}',
+    funnelFirstRate: 'Of first: {percent}%',
+    funnelPreviousRate: 'Of previous: {percent}%',
     heatmapTooltip: '{x} × {y}: {value}',
     treemapTooltip: '{label}: {value} ({percent}%)',
     sunburstTooltip: '{label}: {value} ({percent}%)',

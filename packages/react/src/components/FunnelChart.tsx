@@ -2,6 +2,7 @@ import React, { useCallback, useId, useMemo } from 'react'
 import {
   classNames,
   funnelLayerRatios,
+  formatFunnelStageMetrics,
   layoutFunnel,
   getChartElementOpacity,
   getStableChartGradientPrefix,
@@ -144,12 +145,16 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
       }),
     [data, innerRect.width, innerRect.height, gap, pinch, palette, orientation, direction]
   )
-  const total = useMemo(() => segments.reduce((sum, segment) => sum + segment.value, 0), [segments])
   const ratios = useMemo(() => funnelLayerRatios(data.map((item) => item.value)), [data])
   const stageName = useCallback(
     (datum: FunnelChartDatum, index: number) =>
       funnelStageDisplayLabel(datum, index, labels.stageName),
     [labels.stageName]
+  )
+  const stageMetrics = useCallback(
+    (datum: FunnelChartDatum, index: number) =>
+      formatFunnelStageMetrics(stageName(datum, index), ratios[index], labels),
+    [stageName, ratios, labels]
   )
   const gradientId = useId()
   const gradientPrefix = useMemo(
@@ -173,11 +178,13 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   )
   const tooltipContent = useMemo(
     () =>
-      resolveChartTooltipContent(resolvedHoveredIndex, data, tooltipFormatter, (datum, index) => {
-        const pct = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
-        return `${stageName(datum, index)}: ${datum.value} (${pct}%)`
-      }),
-    [resolvedHoveredIndex, data, tooltipFormatter, total, stageName]
+      resolveChartTooltipContent(
+        resolvedHoveredIndex,
+        data,
+        tooltipFormatter,
+        (datum, index) => stageMetrics(datum, index).description
+      ),
+    [resolvedHoveredIndex, data, tooltipFormatter, stageMetrics]
   )
   const visualActive = segments.findIndex(
     (segment) => segment.index === (activeIndex ?? resolvedHoveredIndex)
@@ -257,7 +264,10 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
               aria-hidden={interactive ? undefined : true}
               aria-label={
                 interactive
-                  ? `${stageName(data[seg.index] ?? { value: seg.value, label: seg.label }, seg.index)}: ${seg.value} (${total > 0 ? ((seg.value / total) * 100).toFixed(1) : '0'}%)`
+                  ? stageMetrics(
+                      data[seg.index] ?? { value: seg.value, label: seg.label },
+                      seg.index
+                    ).description
                   : undefined
               }
               onMouseEnter={(e) => handleMouseEnter(seg.index, e)}
@@ -285,19 +295,10 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
             strokeWidth={3}
             paintOrder="stroke"
             aria-hidden={interactive ? true : undefined}>
-            {(() => {
-              const name = stageName(
-                data[seg.index] ?? { value: seg.value, label: seg.label },
-                seg.index
-              )
-              const ratio = ratios[seg.index]
-              if (!ratio) return name
-              const previous =
-                ratio.versusPrevious === null ? '' : ` ${Math.round(ratio.versusPrevious * 100)}%`
-              const first =
-                ratio.versusFirst === null ? '' : ` ${Math.round(ratio.versusFirst * 100)}%`
-              return `${name} ${ratio.value}${previous}${first}`
-            })()}
+            {
+              stageMetrics(data[seg.index] ?? { value: seg.value, label: seg.label }, seg.index)
+                .label
+            }
           </text>
         ))}
     </ChartCanvas>

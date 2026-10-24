@@ -1,5 +1,25 @@
 import { describe, it, expect, vi } from 'vitest'
-import { computeFunnelSegments } from '@expcat/tigercat-core'
+import {
+  computeFunnelSegments,
+  formatFunnelStageMetrics,
+  funnelLayerRatios
+} from '@expcat/tigercat-core'
+
+it('formats named funnel conversions from stages instead of a sum of stages', () => {
+  const ratios = funnelLayerRatios([1000, 620, 340])
+  const labels = {
+    funnelFirstRate: '首阶段: {percent}%',
+    funnelPreviousRate: '上一阶段: {percent}%'
+  }
+  expect(formatFunnelStageMetrics('曝光', ratios[0], labels)).toEqual({
+    label: '曝光 1000 (100%)',
+    description: '曝光: 1000 (首阶段: 100%)'
+  })
+  expect(formatFunnelStageMetrics('加购', ratios[2], labels)).toEqual({
+    label: '加购 340 (34%)',
+    description: '加购: 340 (首阶段: 34%; 上一阶段: 55%)'
+  })
+})
 
 describe('computeFunnelSegments', () => {
   const data = [

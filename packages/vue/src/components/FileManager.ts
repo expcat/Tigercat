@@ -192,15 +192,6 @@ export const FileManager = defineComponent({
       },
       { immediate: true, flush: 'post' }
     )
-    watch(
-      () => props.loading,
-      (loading) => {
-        if (!loading) return
-        const count = model.value.processedItems.length
-        const text = labels.value.resultCountText.replace('{count}', String(count))
-        live.announce(`${mergedLocale.value?.common?.loadingText ?? ''} ${text}`.trim())
-      }
-    )
     const innerSelectedKeys = ref<(string | number)[]>([...(props.defaultSelectedKeys ?? [])])
     const innerPath = ref<(string | number)[]>([...(props.defaultCurrentPath ?? EMPTY_FILE_PATH)])
     const innerSearch = ref(props.defaultSearchText ?? '')
@@ -255,6 +246,18 @@ export const FileManager = defineComponent({
 
     const viewKey = computed(
       () => `${pathKey.value}\0${resolvedSearch.value}\0${model.value.processedItems.length}`
+    )
+
+    watch(
+      () => {
+        const count = model.value.processedItems.length
+        const text = labels.value.resultCountText.replace('{count}', String(count))
+        return props.loading
+          ? `${mergedLocale.value?.common?.loadingText ?? ''} ${text}`.trim()
+          : text
+      },
+      (message) => live.announce(message),
+      { immediate: true }
     )
 
     watch(pathKey, () => drag.endDrag(true))

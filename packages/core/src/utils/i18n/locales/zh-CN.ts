@@ -601,6 +601,8 @@ export const zhCN: TigerLocale = {
     sliceName: '切片 {index}',
     sliceAriaLabel: '{label}：{value}（{percent}%）',
     stageName: '阶段 {index}',
+    funnelFirstRate: '首阶段: {percent}%',
+    funnelPreviousRate: '上一阶段: {percent}%',
     heatmapTooltip: '{x} × {y}：{value}',
     treemapTooltip: '{label}：{value}（{percent}%）',
     sunburstTooltip: '{label}：{value}（{percent}%）',

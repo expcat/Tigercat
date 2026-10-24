@@ -342,8 +342,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
   )
 
   useEffect(() => {
-    if (!loading) return
-    liveRef.current?.announce(`${loadingLabel ?? ''} ${resultCount}`.trim())
+    liveRef.current?.announce(loading ? `${loadingLabel ?? ''} ${resultCount}`.trim() : resultCount)
   }, [loading, loadingLabel, resultCount])
 
   useLayoutEffect(() => {

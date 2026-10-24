@@ -67,13 +67,14 @@ export interface FunnelChartProps
   gradient?: boolean
 
   /**
-   * Whether to draw stage labels on the segments
+   * Draw stage name, value and conversion percentage relative to the first stage.
    * @default true
    */
   showLabels?: boolean
 
   /**
-   * Tooltip formatter
+   * Tooltip formatter. The default names conversion rates relative to the first
+   * and previous stages; percentages are rounded to match the stage labels.
    */
   tooltipFormatter?: (datum: FunnelChartDatum, index: number) => string
 }

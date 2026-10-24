@@ -601,6 +601,8 @@ export const arSA: TigerLocale = {
     sliceName: 'الشريحة {index}',
     sliceAriaLabel: '{label}: {value} ({percent}٪)',
     stageName: 'المرحلة {index}',
+    funnelFirstRate: 'من المرحلة الأولى: {percent}%',
+    funnelPreviousRate: 'من المرحلة السابقة: {percent}%',
     heatmapTooltip: '{x} × {y} = {value}',
     treemapTooltip: '{label}: {value} ({percent}٪)',
     sunburstTooltip: '{label}: {value} ({percent}٪)',

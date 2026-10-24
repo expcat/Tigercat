@@ -601,6 +601,8 @@ export const koKR: TigerLocale = {
     sliceName: '슬라이스 {index}',
     sliceAriaLabel: '{label}: {value} ({percent}％)',
     stageName: '단계 {index}',
+    funnelFirstRate: '첫 단계 대비: {percent}%',
+    funnelPreviousRate: '이전 단계 대비: {percent}%',
     heatmapTooltip: '{x} × {y}：{value}',
     treemapTooltip: '{label}: {value} ({percent}％)',
     sunburstTooltip: '{label}: {value} ({percent}％)',

@@ -1574,6 +1574,7 @@
       "formatFileSize",
       "formatFileSizeLabel",
       "FormatFileSizeOptions",
+      "formatFunnelStageMetrics",
       "formatGalleryCount",
       "formatGanttDate",
       "formatHeatmapSummary",

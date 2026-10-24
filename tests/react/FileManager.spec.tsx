@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, waitFor } from '@testing-library/react'
 import React, { useState } from 'react'
 import { FileManager } from '@expcat/tigercat-react/FileManager'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
@@ -119,11 +119,15 @@ describe('FileManager (React)', () => {
     expect(getByText('Nothing here')).toBeTruthy()
   })
 
-  it('shows loading overlay', () => {
-    const { getByRole, getByText, container } = render(<FileManager files={files} loading />)
+  it('announces the current result count after loading completes', async () => {
+    const { getByRole, getByText, container, rerender } = render(<FileManager files={[]} loading />)
     expect(container.querySelector('[role="status"]')).toBeNull()
     expect(getByText('Loading...')).toBeTruthy()
-    expect(getByRole('listbox')).toHaveAttribute('aria-disabled', 'true')
+    const status = document.querySelector('[data-tiger-live-region="polite"]')!
+    await waitFor(() => expect(status).toHaveTextContent('Loading... 0 items'))
+    rerender(<FileManager files={files} loading={false} />)
+    expect(getByRole('listbox')).not.toHaveAttribute('aria-disabled')
+    await waitFor(() => expect(status).toHaveTextContent(/^2 items$/))
   })
 
   it('renders search input when searchable', () => {

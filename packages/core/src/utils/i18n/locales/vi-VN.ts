@@ -601,6 +601,8 @@ export const viVN: TigerLocale = {
     sliceName: 'Lát {index}',
     sliceAriaLabel: '{label}: {value} ({percent} %)',
     stageName: 'Giai đoạn {index}',
+    funnelFirstRate: 'So với bước đầu: {percent}%',
+    funnelPreviousRate: 'So với bước trước: {percent}%',
     heatmapTooltip: '{x} × {y} = {value}',
     treemapTooltip: '{label}: {value} ({percent} %)',
     sunburstTooltip: '{label}: {value} ({percent} %)',

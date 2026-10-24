@@ -1012,6 +1012,10 @@ export interface TigerLocaleChart {
   sliceAriaLabel?: string
   /** Template: supports {index} */
   stageName?: string
+  /** Template: supports {percent}; conversion relative to the first stage. */
+  funnelFirstRate?: string
+  /** Template: supports {percent}; conversion relative to the previous stage. */
+  funnelPreviousRate?: string
   /** Template: supports {x}, {y}, {value} */
   heatmapTooltip?: string
   /** Template: supports {label}, {value}, {percent} */

@@ -18,6 +18,7 @@ import {
   getChartLabels,
   mergeTigerLocale,
   funnelLayerRatios,
+  formatFunnelStageMetrics,
   funnelStageDisplayLabel,
   funnelSegmentTransitionClasses,
   pieSliceLabelInsideClasses,
@@ -142,18 +143,11 @@ export const FunnelChart = defineComponent({
         direction: direction.value
       })
     )
-    const total = computed(() => segments.value.reduce((sum, segment) => sum + segment.value, 0))
     const stageName = (datum: FunnelChartDatum, index: number) =>
       funnelStageDisplayLabel(datum, index, labels.value.stageName)
     const ratios = computed(() => funnelLayerRatios(props.data.map((item) => item.value)))
-    const layerLabel = (index: number, name: string) => {
-      const ratio = ratios.value[index]
-      if (!ratio) return name
-      const previous =
-        ratio.versusPrevious === null ? '' : ` ${Math.round(ratio.versusPrevious * 100)}%`
-      const first = ratio.versusFirst === null ? '' : ` ${Math.round(ratio.versusFirst * 100)}%`
-      return `${name} ${ratio.value}${previous}${first}`
-    }
+    const stageMetrics = (datum: FunnelChartDatum, index: number) =>
+      formatFunnelStageMetrics(stageName(datum, index), ratios.value[index], labels.value)
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
         data: segments.value,
@@ -172,10 +166,7 @@ export const FunnelChart = defineComponent({
         resolvedHoveredIndex.value,
         props.data,
         props.tooltipFormatter,
-        (datum, index) => {
-          const pct = total.value > 0 ? ((datum.value / total.value) * 100).toFixed(1) : '0'
-          return `${stageName(datum, index)}: ${datum.value} (${pct}%)`
-        }
+        (datum, index) => stageMetrics(datum, index).description
       )
     )
 
@@ -266,16 +257,10 @@ export const FunnelChart = defineComponent({
                   role: interactive.value ? 'button' : undefined,
                   'aria-hidden': interactive.value ? undefined : true,
                   'aria-label': interactive.value
-                    ? (() => {
-                        const datum = props.data[seg.index] ?? {
-                          value: seg.value,
-                          label: seg.label
-                        }
-                        const name = stageName(datum, seg.index)
-                        const pct =
-                          total.value > 0 ? ((seg.value / total.value) * 100).toFixed(1) : '0'
-                        return `${name}: ${seg.value} (${pct}%)`
-                      })()
+                    ? stageMetrics(
+                        props.data[seg.index] ?? { value: seg.value, label: seg.label },
+                        seg.index
+                      ).description
                     : undefined,
                   onMouseenter: (e: MouseEvent) => handleMouseEnter(seg.index, e),
                   onMousemove: handleMouseMove,
@@ -306,13 +291,10 @@ export const FunnelChart = defineComponent({
                       'paint-order': 'stroke',
                       'aria-hidden': interactive.value ? 'true' : undefined
                     },
-                    layerLabel(
-                      seg.index,
-                      stageName(
-                        props.data[seg.index] ?? { value: seg.value, label: seg.label },
-                        seg.index
-                      )
-                    )
+                    stageMetrics(
+                      props.data[seg.index] ?? { value: seg.value, label: seg.label },
+                      seg.index
+                    ).label
                   )
                 )
               : [])

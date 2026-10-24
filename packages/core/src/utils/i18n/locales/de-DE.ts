@@ -602,6 +602,8 @@ export const deDE: TigerLocale = {
     sliceName: 'Segment {index}',
     sliceAriaLabel: '{label}: {value} ({percent} %)',
     stageName: 'Stufe {index}',
+    funnelFirstRate: 'Zur ersten Stufe: {percent}%',
+    funnelPreviousRate: 'Zur vorherigen Stufe: {percent}%',
     heatmapTooltip: '{x} × {y} = {value}',
     treemapTooltip: '{label}: {value} ({percent} %)',
     sunburstTooltip: '{label}: {value} ({percent} %)',

@@ -601,6 +601,8 @@ export const ptBR: TigerLocale = {
     sliceName: 'Fatia {index}',
     sliceAriaLabel: '{label}: {value} ({percent} %)',
     stageName: 'Etapa {index}',
+    funnelFirstRate: 'Em relação à primeira etapa: {percent}%',
+    funnelPreviousRate: 'Em relação à etapa anterior: {percent}%',
     heatmapTooltip: '{x} × {y} = {value}',
     treemapTooltip: '{label}: {value} ({percent} %)',
     sunburstTooltip: '{label}: {value} ({percent} %)',

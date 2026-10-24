@@ -601,6 +601,8 @@ export const jaJP: TigerLocale = {
     sliceName: 'スライス {index}',
     sliceAriaLabel: '{label}：{value}（{percent}%）',
     stageName: 'ステージ {index}',
+    funnelFirstRate: '最初の段階比: {percent}%',
+    funnelPreviousRate: '前の段階比: {percent}%',
     heatmapTooltip: '{x} × {y}：{value}',
     treemapTooltip: '{label}：{value}（{percent}%）',
     sunburstTooltip: '{label}：{value}（{percent}%）',

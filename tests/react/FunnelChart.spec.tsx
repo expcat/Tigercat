@@ -45,9 +45,9 @@ describe('FunnelChart (React)', () => {
     const paths = container.querySelector('g[data-series-type="funnel"]')!.querySelectorAll('path')
     expect(paths).toHaveLength(3)
   })
-  it('triggers hover events when hoverable', () => {
+  it('binds stage conversion labels to hover and accessible content', async () => {
     const onHoveredIndexChange = vi.fn()
-    const { container } = renderWithProps(FunnelChart, {
+    const { container, findByRole } = renderWithProps(FunnelChart, {
       data: sampleData,
       hoverable: true,
       onHoveredIndexChange,
@@ -55,8 +55,11 @@ describe('FunnelChart (React)', () => {
     })
 
     const paths = container.querySelector('g[data-series-type="funnel"]')!.querySelectorAll('path')
-    fireEvent.mouseEnter(paths[0])
-    expect(onHoveredIndexChange).toHaveBeenCalledWith(0)
+    fireEvent.mouseEnter(paths[2])
+    expect(onHoveredIndexChange).toHaveBeenCalledWith(2)
+    expect(container.textContent).toContain('Purchase 20 (20%)')
+    expect(paths[2]).toHaveAttribute('aria-label', 'Purchase: 20 (Of first: 20%; Of previous: 33%)')
+    expect(await findByRole('tooltip')).toHaveTextContent(paths[2].getAttribute('aria-label')!)
   })
 
   it('triggers click events when selectable', () => {

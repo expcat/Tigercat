@@ -4,9 +4,33 @@
  */
 
 import type { FunnelChartDatum } from '../types/chart'
+import type { TigerLocaleChart } from '../types/locale'
+import type { FunnelRatio } from './w9-data'
 import { DEFAULT_CHART_COLORS } from './chart/color'
+import { formatChartTemplate } from './chart/layout'
 import { devWarn } from './dev-warn'
 import { scanFiniteExtent } from './chart/scale'
+
+/** Compact stage label and named conversion rates for tooltips and accessibility. */
+export function formatFunnelStageMetrics(
+  name: string,
+  ratio: FunnelRatio,
+  labels: Pick<Required<TigerLocaleChart>, 'funnelFirstRate' | 'funnelPreviousRate'>
+): { label: string; description: string } {
+  const first = ratio.versusFirst === null ? null : Math.round(ratio.versusFirst * 100)
+  const previous = ratio.versusPrevious === null ? null : Math.round(ratio.versusPrevious * 100)
+  const rates: string[] = []
+  if (first !== null) {
+    rates.push(formatChartTemplate(labels.funnelFirstRate, { percent: first }))
+  }
+  if (previous !== null) {
+    rates.push(formatChartTemplate(labels.funnelPreviousRate, { percent: previous }))
+  }
+  return {
+    label: `${name} ${ratio.value}${first === null ? '' : ` (${first}%)`}`,
+    description: `${name}: ${ratio.value}${rates.length ? ` (${rates.join('; ')})` : ''}`
+  }
+}
 
 export interface FunnelSegment {
   /** Index in original data */

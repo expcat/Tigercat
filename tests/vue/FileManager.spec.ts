@@ -141,13 +141,17 @@ describe('FileManager (Vue)', () => {
     }
   })
 
-  it('shows loading overlay', () => {
-    const { getByRole, getByText, container } = render(FileManager, {
-      props: { files, loading: true }
+  it('announces the current result count after loading completes', async () => {
+    const { getByRole, getByText, container, rerender } = render(FileManager, {
+      props: { files: [], loading: true }
     })
     expect(container.querySelector('[role="status"]')).toBeNull()
     expect(getByText('Loading...')).toBeTruthy()
-    expect(getByRole('listbox')).toHaveAttribute('aria-disabled', 'true')
+    const status = document.querySelector('[data-tiger-live-region="polite"]')!
+    await waitFor(() => expect(status).toHaveTextContent('Loading... 0 items'))
+    await rerender({ files, loading: false })
+    expect(getByRole('listbox')).not.toHaveAttribute('aria-disabled')
+    await waitFor(() => expect(status).toHaveTextContent(/^2 items$/))
   })
 
   it('renders search input when searchable', () => {
