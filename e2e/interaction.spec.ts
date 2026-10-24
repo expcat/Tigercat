@@ -98,7 +98,7 @@ for (const { framework, baseUrl } of exampleApps) {
               gap <= 12 &&
               popup.x >= 0 &&
               popup.x + popup.width <= width &&
-              (width === 390 || Math.abs(popup.x + popup.width - anchor.x - anchor.width) < 2)
+              (width === 390 || Math.abs(popup.x - anchor.x) < 2)
             )
           })
           .toBe(true)
