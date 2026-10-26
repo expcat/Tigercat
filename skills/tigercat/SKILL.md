@@ -1,11 +1,11 @@
 ---
 name: tigercat
-description: Tigercat React/Vue app recipes and component docs: shell, routing, theme, i18n, SSR, props, examples, a11y, CLI.
+description: Build React and Vue 3 apps with Tigercat, or look up its component APIs, themes, i18n, SSR, accessibility, and CLI.
 ---
 
 # Tigercat UI Component Library
 
-Tailwind CSS 驱动的 React + Vue 3 组件库。先按任务定位 reference，不要整库读取。
+Tailwind CSS v4 驱动的 React 19 + Vue 3 组件库。先按任务定位 reference，不要整库读取。
 
 ## MCP First
 
@@ -19,7 +19,9 @@ Tailwind CSS 驱动的 React + Vue 3 组件库。先按任务定位 reference，
 ## Routes
 
 - App shell: [building-apps.md](references/recipes/building-apps.md)
-- Setup/CLI/theme/i18n/SSR/a11y/perf: `references/{getting-started,cli,theme,i18n,ssr,accessibility,performance}.md`
+- Setup: [getting-started.md](references/getting-started.md); CLI: [cli.md](references/cli.md)
+- Theme / i18n: [theme.md](references/theme.md) / [i18n.md](references/i18n.md)
+- SSR / a11y / performance: [ssr.md](references/ssr.md) / [accessibility.md](references/accessibility.md) / [performance.md](references/performance.md)
 - Components: [component-index.md](references/component-index.md) → each component's props and examples file from `context7.json` (category files split by component when over the line budget)
 - Vue/React notes: [vue/index.md](references/vue/index.md) / [react/index.md](references/react/index.md)
 - Bindings: [common.md](references/shared/patterns/common.md); terms: [glossary.md](references/shared/glossary.md)

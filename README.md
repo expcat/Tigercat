@@ -8,7 +8,7 @@
 
 基于 Tailwind CSS v4 的 Vue 3 / React UI 组件库。两套框架共享设计 token、类型与交互约定。公开组件权威清单见 [skills/tigercat/references/component-index.md](./skills/tigercat/references/component-index.md)（生成物）。
 
-当前稳定系列为 **v2**，所有官方包保持相同版本并遵循 SemVer；具体最新版本以顶部 npm 徽章为准。
+五个官方包版本对齐，遵循 SemVer。npm `latest` 是稳定版 **2.9.4**（v2，顶部徽章指向它），`next` 是预览版 **3.0.0-rc.3**（v3，当前 `main` 的文档与 API）。使用的 Tigercat 包应保持同一版本。
 
 > **🚀 在线示例**：<https://expcat.github.io/Tigercat/> — Vue 3 与 React 组件示例、主题切换与暗色模式实时预览。
 
@@ -28,12 +28,12 @@
 
 ### 使用 CLI 创建项目（推荐）
 
-CLI 会生成已配置 Tailwind CSS v4 的 Vue 3 或 React Vite 项目：
+CLI 会生成已配置 Tailwind CSS v4 的 Vue 3 或 React Vite 项目。下方命令使用预览通道 `@next`，与当前文档一致；使用稳定版时去掉 `@next`，并参阅对应版本的文档。
 
 ```bash
-pnpm dlx @expcat/tigercat-cli create my-app --template vue3
+pnpm dlx @expcat/tigercat-cli@next create my-app --template vue3
 # 或
-pnpm dlx @expcat/tigercat-cli create my-app --template react
+pnpm dlx @expcat/tigercat-cli@next create my-app --template react
 
 cd my-app
 pnpm install
@@ -44,10 +44,9 @@ pnpm dev
 
 ```bash
 # Vue 3
-pnpm add @expcat/tigercat-vue @expcat/tigercat-core
-
+pnpm add @expcat/tigercat-vue@next @expcat/tigercat-core@next
 # React
-pnpm add @expcat/tigercat-react @expcat/tigercat-core
+pnpm add @expcat/tigercat-react@next @expcat/tigercat-core@next
 
 # Tailwind CSS v4（两套框架均需要）
 pnpm add -D tailwindcss @tailwindcss/vite
@@ -61,7 +60,7 @@ pnpm add -D tailwindcss @tailwindcss/vite
 @source '../node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}';
 ```
 
-可运行 `pnpm dlx @expcat/tigercat-cli doctor` 检查 Node.js、pnpm、Tailwind CSS、框架 peer dependency 与模板工具链。
+用与上面相同的 dist-tag 运行 `pnpm dlx @expcat/tigercat-cli@next doctor`（稳定版去掉 `@next`），检查 Node.js、pnpm、Tailwind CSS、框架 peer dependency 与模板工具链。
 
 ### Vue 3 示例
 
@@ -98,7 +97,8 @@ export function App() {
 | [tests/README.md](./tests/README.md)                   | 测试约定与「按改动范围验证」                    |
 | [scripts/README.md](./scripts/README.md)               | 脚本与门禁命令清单                              |
 | [docs/ROADMAP.md](./docs/ROADMAP.md)                   | 当前状态、发布边界与后续任务规则                |
-| [docs/MIGRATION.md](./docs/MIGRATION.md)               | v2 breaking changes 与迁移路径                  |
+| [docs/MIGRATION-3.0.md](./docs/MIGRATION-3.0.md)       | 2.x → 3.0 迁移                                  |
+| [docs/MIGRATION.md](./docs/MIGRATION.md)               | 预览版间迁移与历史版本档案                      |
 | [CHANGELOG.md](./CHANGELOG.md)                         | 版本变更与发布历史                              |
 | [examples/README.md](./examples/README.md)             | Vue / React 示例应用运行说明                    |
 
@@ -118,17 +118,18 @@ export function App() {
 `@expcat/tigercat-mcp` 是只读 stdio MCP 服务。接入后 Agent 可按任务路由到导入子路径、props/事件与 React/Vue 绑定差异（支持中文别名，如 表单、日期选择、表格），单次只内联所需小节：
 
 ```bash
-claude mcp add tigercat -- npx -y @expcat/tigercat-mcp
+# 预览版 next（3.0.0-rc.3）。稳定版 latest（2.9.4）去掉 @next
+claude mcp add tigercat -- npx -y @expcat/tigercat-mcp@next
 ```
 
-或在任意 MCP 客户端的 `mcpServers` 中配置：
+或在任意 MCP 客户端的 `mcpServers` 中配置（稳定版把包名改成 `@expcat/tigercat-mcp`）：
 
 ```json
 {
   "mcpServers": {
     "tigercat": {
       "command": "npx",
-      "args": ["-y", "@expcat/tigercat-mcp"]
+      "args": ["-y", "@expcat/tigercat-mcp@next"]
     }
   }
 }
@@ -184,7 +185,7 @@ pnpm example:react  # http://localhost:5174
 
 ## 参与贡献
 
-请先运行 `corepack pnpm setup` 完成依赖安装、构建和环境检查。提交前按 [tests/README.md](./tests/README.md#按改动范围验证) 选择命令；涉及公共 API、生成文档或发布面的改动应运行 `pnpm quality:release`。
+请先运行 `corepack pnpm setup` 完成依赖安装、构建和环境检查。提交前按 [tests/README.md](./tests/README.md#按改动范围验证) 选择命令；涉及公共 API、发布面或门禁策略的改动应运行 `pnpm quality:release`。
 
 开发与评审必须遵守 [CONTRIBUTING.md](./CONTRIBUTING.md) 的“根因修复与架构约束”；组件 API、示例与自动化维护规则以 [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) 为准，当前项目状态与后续任务规则见 [docs/ROADMAP.md](./docs/ROADMAP.md)。
 

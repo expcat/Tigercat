@@ -5,16 +5,18 @@
 
 React UI components for [Tigercat](https://github.com/expcat/Tigercat) - A Tailwind CSS based component library.
 
-## 📖 Documentation
+## Documentation
 
 **[Live Demo & Docs →](https://expcat.github.io/Tigercat/react/)**
 
 ## Installation
 
+These commands use the preview channel `@next`. Omit it for stable; keep core on the same version. Current versions and setup are in the [root README](https://github.com/expcat/Tigercat/blob/main/README.md#快速开始).
+
 ```bash
-pnpm add @expcat/tigercat-react
+pnpm add @expcat/tigercat-react@next @expcat/tigercat-core@next
 # or
-npm install @expcat/tigercat-react
+npm install @expcat/tigercat-react@next @expcat/tigercat-core@next
 ```
 
 **Requirements:** React / React DOM 19.x, Tailwind CSS 4.x, Node.js ≥22.13.0

@@ -10,17 +10,17 @@ description: Recipe for building a complete general-purpose web app with Tigerca
 
 ## 1. Scaffold
 
-优先用 CLI 模板（Tailwind v4 已接好）：
+优先用 CLI 模板（Tailwind v4 已接好）。稳定版和预览版见 [root README](https://github.com/expcat/Tigercat/blob/main/README.md)；应用与 CLI 使用同一版本。本仓库文档对应 `@next`。
 
 ```bash
-tigercat create my-app --template react   # 或 --template vue3
+pnpm dlx @expcat/tigercat-cli@next create my-app --template react   # 或 --template vue3
 ```
 
 模板只给最小 App。手动接入、CSS、`doctor` 与组件导入见 [../getting-started.md](../getting-started.md)。
 
 ## 2. App Shell
 
-根部包一层 `ConfigProvider`（注入 locale / 主题），内部用布局组件拼出 Header + Sidebar + Content：
+根部包一层 `ConfigProvider`（注入 locale / 主题）。完整后台壳可用 `AppShell`（页签标题由调用方传入），也可用下面的布局组件自行组合，并把路由出口放进 `Content`：
 
 - 容器：`Layout` / `Header` / `Sidebar` / `Content` / `Footer`（props/examples 见 layout 分类）。
 - 导航：侧栏 `Menu` + `MenuItem` / `SubMenu`，顶部 `Breadcrumb`，页内目录 `Anchor`。
@@ -74,7 +74,7 @@ Tigercat 不绑定数据层：表单值、弹层 `open`、表格选择 / 分页�
 
 ## 7. SSR / a11y
 
-Nuxt / Next 直接用包入口，不要在模块顶层读浏览器 API，见 [../ssr.md](../ssr.md)。键盘 / 对比度 / role 默认达标，自定义交互补充见 [../accessibility.md](../accessibility.md)。
+SSR 接入见 [../ssr.md](../ssr.md)：Next.js 中的 React 组件放在应用的 `'use client'` 边界内；Nuxt 中的浏览器逻辑放在 `onMounted`。模块顶层不要读浏览器 API。键盘 / 对比度 / role 默认达标，自定义交互补充见 [../accessibility.md](../accessibility.md)。
 
 完整页面以 `examples/example/{react,vue3}/src` 为事实源；本配方只保留可直接搭应用的稳定路径。
 

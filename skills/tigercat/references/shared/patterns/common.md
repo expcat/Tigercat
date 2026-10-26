@@ -105,6 +105,6 @@ Size **strings** are three families and are not interchangeable: Form/Rate `sm\|
 
 Empty sentinels are per widget: text `''`; number `null`; date/time single `null`; date/time range empty `null` (partial range is a tuple); multi/path arrays `[]` controlled empty (omit/`undefined` uncontrolled); ColorPicker/CronEditor clear `null`; Rate clear `0`. ImagePreview omit `open` is closed; Alert omit `open` is shown.
 
-Kanban / DonutChart / ImageViewer remain importable aliases of TaskBoard / PieChart / ImagePreview.
+Kanban, ImageViewer, DonutChart, and Stepper are removed names, not importable aliases. Use TaskBoard, ImagePreview, PieChart, and InputNumber. `tigercat migrate` rewrites the old imports; see [cli.md](../../cli.md).
 
 Next: [../glossary.md](../glossary.md) · [../../component-index.md](../../component-index.md) · [../../command-apis.md](../../command-apis.md)

@@ -82,12 +82,10 @@ SSR 示例（Next 16 / Nuxt 4）必须接上面的 Tailwind 配方。页面 HTML
 ```css
 @import 'tailwindcss';
 @plugin '@expcat/tigercat-core/tailwind';
-@source '../node_modules/@expcat/tigercat-react/dist';
-@source '../node_modules/@expcat/tigercat-core/dist';
+@source '../node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}';
 ```
 
-运行时换肤走 `ConfigProvider` 的 `theme` / `colorScheme`。`theme="modern"` 选择 modern 预设。
-Tailwind 入口只有 `@plugin '@expcat/tigercat-core/tailwind'`。
+路径以 `src/style.css` 为基准。应用安装方式见 [根 README](../README.md#手动安装)；本目录示例使用 workspace 依赖。运行时换肤走 `ConfigProvider` 的 `theme` / `colorScheme`。`theme="modern"` 选择 modern 预设。Tailwind 入口只有 `@plugin '@expcat/tigercat-core/tailwind'`。
 
 通用接入步骤见 [getting-started.md](../skills/tigercat/references/getting-started.md)。
 

@@ -5,18 +5,18 @@ description: Tigercat setup, package imports, Tailwind CSS v4 integration, and d
 
 # Getting Started
 
-Use the CLI template for new apps whenever possible; templates are Tailwind CSS v4-only and wire Vite, Tigercat, and framework peers together.
+Use the CLI template for new apps whenever possible; templates are Tailwind CSS v4-only and wire Vite, Tigercat, and framework peers together. Stable and preview versions: [root README](https://github.com/expcat/Tigercat/blob/main/README.md); match app and CLI version. Commands here use `@next` so they match this checkout.
 
 ```bash
-tigercat create my-app --template vue3
-tigercat create my-app --template react
+pnpm dlx @expcat/tigercat-cli@next create my-app --template vue3
+pnpm dlx @expcat/tigercat-cli@next create my-app --template react
 ```
 
-For manual installation, install the shared core package and exactly one framework package.
+For manual installation, install the shared core package and exactly one framework package, on that same tag.
 
 ```bash
-pnpm add @expcat/tigercat-core @expcat/tigercat-vue
-pnpm add @expcat/tigercat-core @expcat/tigercat-react
+pnpm add @expcat/tigercat-core@next @expcat/tigercat-vue@next
+pnpm add @expcat/tigercat-core@next @expcat/tigercat-react@next
 ```
 
 Vue and React should prefer PascalCase subpaths for on-demand bundles.
@@ -49,6 +49,6 @@ utilities such as `inset-inline-start-4` for those positions.
 Runtime theme switching uses `ConfigProvider` `theme` / `colorScheme`. `theme="modern"` selects
 the modern preset. The Tailwind entry is only `@plugin "@expcat/tigercat-core/tailwind"`.
 
-Run `tigercat doctor --json` in an application to verify Node, pnpm, Tailwind v4, framework peers, and template dependencies.
+Run `pnpm dlx @expcat/tigercat-cli@next doctor --json` in an application to verify Node, pnpm, Tailwind v4, framework peers, and template dependencies.
 
 Next: [cli.md](cli.md) · [theme.md](theme.md) · [recipes/building-apps.md](recipes/building-apps.md)

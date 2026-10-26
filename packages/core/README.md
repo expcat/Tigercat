@@ -5,21 +5,22 @@
 
 Core utilities and shared types for [Tigercat](https://github.com/expcat/Tigercat) UI library.
 
-> ⚠️ **Internal Package** - This package is used internally by `@expcat/tigercat-vue` and `@expcat/tigercat-react`. You typically don't need to install it directly.
+The Vue and React packages depend on the matching core version. Install core directly when an app imports its Tailwind plugin, tokens, locales, or shared helpers.
 
 ## Installation
 
 ```bash
-pnpm add @expcat/tigercat-core
+# Preview channel; omit @next for stable
+pnpm add @expcat/tigercat-core@next
 # or
-npm install @expcat/tigercat-core
+npm install @expcat/tigercat-core@next
 ```
 
 ## Exports
 
 | Module              | Description                                                                                                                                                    |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Utils**           | `classNames`, `coerceClassValue`, `copyText`, animation helpers, a11y utilities                                                                                |
+| **Utils**           | `classNames`, `coerceClassValue`, `copyTextToClipboard`, animation helpers, a11y utilities                                                                     |
 | **Types**           | Shared TypeScript types for all components (Button, Input, Modal, Table, etc.)                                                                                 |
 | **Workflow**        | `reduceWorkflowAction`, `applyWorkflowFieldPermissions`, Designer / Timeline helpers; tree-shake `@expcat/tigercat-core/workflow-designer` and `./schema-form` |
 | **Theme**           | CSS variables (`THEME_CSS_VARS`), color utilities, component theme configs                                                                                     |

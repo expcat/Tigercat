@@ -1,6 +1,6 @@
 # Tigercat Scripts
 
-此目录只保留跨平台 Node 脚本；旧的 shell 包装脚本已移除，日常使用优先走根目录 `package.json` scripts。
+此目录维护跨平台 Node 脚本，日常使用优先走根目录 `package.json` scripts。
 
 下一跳：测试约定与「按改动范围验证」见 [tests/README.md](../tests/README.md#按改动范围验证)；代理约束见 [AGENTS.md](../AGENTS.md)。
 

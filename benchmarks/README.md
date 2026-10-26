@@ -4,9 +4,9 @@ Agent-facing performance guidance:
 [performance.md](../skills/tigercat/references/performance.md).
 
 Tigercat benchmarks are advisory performance probes. They are not a PR release
-gate and do not define hard regression thresholds because shared CI runners make
-micro-benchmark timings noisy. Use `pnpm bench --run` locally or the scheduled
-`.github/workflows/bench.yml` artifact to compare JSON output between runs.
+gate and do not define hard regression thresholds because timings depend on the
+runtime and hardware. Use `pnpm bench --run` locally and compare results in the
+same environment.
 
 ## Suites
 
@@ -28,5 +28,4 @@ micro-benchmark timings noisy. Use `pnpm bench --run` locally or the scheduled
   preparation work.
 - Prefer adding regular tests for correctness; benchmarks should only describe
   performance-sensitive paths.
-- Keep CI benchmark output advisory unless a future task defines a stable
-  hardware-independent threshold.
+- Local commands and result output are described in [the performance guide](../skills/tigercat/references/performance.md).

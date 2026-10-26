@@ -7,8 +7,11 @@ Read-only stdio MCP server that routes LLM clients to Tigercat skill references.
 
 By default, skills come from the snapshot shipped with the installed package and work offline.
 
+Use the preview channel `@next` with the current documentation, or omit it for stable. Match the MCP version to the Tigercat version used by your app; see the [root README](https://github.com/expcat/Tigercat/blob/main/README.md).
+
 ```bash
-npx -y @expcat/tigercat-mcp
+npx -y @expcat/tigercat-mcp@next
+# Stable: npx -y @expcat/tigercat-mcp
 ```
 
 ```bash

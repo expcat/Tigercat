@@ -4,10 +4,12 @@ CLI tooling for the [Tigercat](https://github.com/expcat/Tigercat) UI component 
 
 ## Installation
 
+The commands below use the preview channel `@next`; omit it for stable. Current versions and compatibility are in the [root README](https://github.com/expcat/Tigercat/blob/main/README.md).
+
 ```bash
-pnpm add -g @expcat/tigercat-cli
+pnpm add -g @expcat/tigercat-cli@next
 # or
-npx @expcat/tigercat-cli
+npx @expcat/tigercat-cli@next
 ```
 
 ## Usage Examples
@@ -64,7 +66,7 @@ tigercat playground --template react --no-open
 
 Playground files are created under `.tigercat-playground/` in the current working directory.
 
-Re-running `playground` in an existing directory only refreshes `package.json` and `.gitignore`; your `src/style.css` edits are preserved. For an older playground, register the installed Tigercat dist files in its existing `src/style.css` while preserving your custom CSS; see [manual installation](../../README.md#手动安装).
+Re-running `playground` in an existing directory refreshes `package.json` and `.gitignore`, then runs `pnpm install`. It does not rewrite `src/style.css` or other template files. For an older playground, register the installed Tigercat dist files in its existing `src/style.css` while preserving your custom CSS; see [manual installation](../../README.md#手动安装).
 
 ```bash
 tigercat playground --template react --port 3457 --dry-run
@@ -90,6 +92,15 @@ tigercat doctor --json
 template dependency compatibility, and the supported version compatibility matrix. JSON output is
 designed for CI and automated diagnostics.
 
+### Rewrite deleted import names
+
+`migrate` previews replacements for removed export names and obsolete import paths. It preserves local bindings and does not migrate props. Pass `--write` to update the listed files:
+
+```bash
+tigercat migrate
+tigercat migrate --write
+```
+
 The full command matrix for agents is
 [cli.md](https://github.com/expcat/Tigercat/blob/main/skills/tigercat/references/cli.md).
 
@@ -104,11 +115,11 @@ with backslash paths, paths containing spaces, and UNC paths.
 When installed globally or locally, each package manager creates platform-specific shims
 so that `tigercat` can be invoked directly from PowerShell, CMD, or Git Bash:
 
-| Package manager | Global install                     | Shim files created                              |
-| --------------- | ---------------------------------- | ----------------------------------------------- |
-| **pnpm**        | `pnpm add -g @expcat/tigercat-cli` | `tigercat.cmd`, `tigercat` (sh)                 |
-| **npm**         | `npm i -g @expcat/tigercat-cli`    | `tigercat.cmd`, `tigercat` (sh), `tigercat.ps1` |
-| **bun**         | `bun add -g @expcat/tigercat-cli`  | `tigercat.cmd`, `tigercat` (sh)                 |
+| Package manager | Global install                          | Shim files created                              |
+| --------------- | --------------------------------------- | ----------------------------------------------- |
+| **pnpm**        | `pnpm add -g @expcat/tigercat-cli@next` | `tigercat.cmd`, `tigercat` (sh)                 |
+| **npm**         | `npm i -g @expcat/tigercat-cli@next`    | `tigercat.cmd`, `tigercat` (sh), `tigercat.ps1` |
+| **bun**         | `bun add -g @expcat/tigercat-cli@next`  | `tigercat.cmd`, `tigercat` (sh)                 |
 
 For local (non-global) installs, run via `npx tigercat`, `pnpm exec tigercat`, or
 `bunx tigercat`. The `#!/usr/bin/env node` shebang in the built output is used by all

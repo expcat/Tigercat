@@ -11,9 +11,10 @@ stay aligned. Version history belongs in CHANGELOG, not this page.
 
 ## Flow
 
-1. Prepare both Release Candidate and Stable with `pnpm sync:version <version>` (for example,
-   `3.0.0-rc.2` or `3.0.0`). Update CHANGELOG and MIGRATION for that version and remove consumed
-   `.changeset/*.md` notes during release preparation.
+1. Record the cut with `pnpm changeset`, then cut a Release Candidate or Stable with
+   `pnpm sync:version <version>`. Update CHANGELOG and MIGRATION for that version. After the
+   cut, move the new `.changeset/*.md` into `.changeset/published/`. Do not delete it. See
+   [.changeset/README.md](https://github.com/expcat/Tigercat/blob/main/.changeset/README.md).
 2. Metadata: `pnpm release:check` (fixed versions, ESM-only surface, sideEffects, repository
    metadata, Changesets fixed groups, CHANGELOG and MIGRATION version entries).
 3. Complete the relevant focused checks and formatting, then commit the prepared release.
@@ -62,10 +63,8 @@ Centralize in [docs/MIGRATION.md](https://github.com/expcat/Tigercat/blob/main/d
 and [CHANGELOG.md](https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md): affected
 package/component, removed API, replacement, minimal diff.
 
-v2.0.19 is a historical patch that still changed `@expcat/tigercat-mcp` (no-arg calls default to
-remote skill loading; long references are session pointers). Component packages were unaffected.
-This is why `pnpm release:check` requires `## v<version>` in CHANGELOG and MIGRATION — a patch
-number is not evidence that nothing user-visible changed.
+`pnpm release:check` requires `## v<version>` in both CHANGELOG.md and docs/MIGRATION.md
+(`scripts/check-release-readiness.mjs`).
 
 Token source is `packages/core/tokens/tokens.json`; after token edits `pnpm tokens:build` then
 `pnpm build`. Confirm core still exports `./tailwind`, `./tokens.css`, and

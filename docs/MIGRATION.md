@@ -1,5 +1,7 @@
 # Tigercat 迁移指南
 
+从 2.x 升级到 3.0 请先读 [3.0 迁移指南](MIGRATION-3.0.md)，再按下方版本补充调整。当前组件用法以 [Tigercat Skill](../skills/tigercat/SKILL.md) 为准；历史版本的兼容说明不适用于 3.0。
+
 ## v3.0.0-rc.3
 
 本版修复现有视觉、交互和示例行为，没有删除或重命名组件、props、事件及导入路径；从 rc.2 升级无需更改常规调用。五个 `@expcat/tigercat-{core,vue,react,cli,mcp}` 包应一起升级。
@@ -59,10 +61,6 @@ Vue Inplace 的原始发出事件名从 `editingChange` 改为 `editing-change`�
 ## 2.x 档案
 
 下面各节，以及 [MIGRATION-2.5.md](MIGRATION-2.5.md)、[MIGRATION-2.6.md](MIGRATION-2.6.md)、[MIGRATION-2.7.md](MIGRATION-2.7.md)、[MIGRATION-2.8.md](MIGRATION-2.8.md)，只记录已经发布的 2.x。这些档案不再追加。完整发布历史见 [CHANGELOG.md](../CHANGELOG.md)。
-
-## 未发布
-
-本轮已收入 **v2.9.0**。Breaking map 见下方。不是 BPMN。无 `file:` 双轨。
 
 ## v2.9.4
 

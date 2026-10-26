@@ -20,7 +20,7 @@ packages: core, vue, react, cli, mcp
 3. 验证命令：[tests/README.md](tests/README.md#按改动范围验证)。
 4. 脚本与门禁名称：`scripts/README.md`。
 5. PR / Issue / 根因修复：`CONTRIBUTING.md`。
-6. 当前任务：`docs/ROADMAP.md`；breaking change：`docs/MIGRATION.md`；完成历史：`CHANGELOG.md`。
+6. 当前任务：`docs/ROADMAP.md`；2.x → 3.0：`docs/MIGRATION-3.0.md`；版本间迁移：`docs/MIGRATION.md`；完成历史：`CHANGELOG.md`。
 
 ## 核心规则
 
@@ -55,24 +55,26 @@ packages: core, vue, react, cli, mcp
 | `api-reports/*`                                                                                                                                                         | `pnpm api:baseline` | `pnpm api:baseline:check` |
 | `packages/*/package.json` 的 `exports`                                                                                                                                  | `pnpm exports:sync` | `pnpm exports:check`      |
 | `packages/core/src/tokens/*`、`packages/core/src/themes/forced-colors.ts`（事实源 `packages/core/tokens/tokens.json` 与 `packages/core/src/themes/forced-colors.json`） | `pnpm tokens:build` | `pnpm tokens:check`       |
+| `packages/mcp/snapshot/**`（事实源 `context7.json` 与 `skills/**`）                                                                                                     | `pnpm mcp:build`    | 随包清单与 MCP 定向测试   |
 
 组件路由事实源是 `scripts/lib/public-components.mjs`；改公开组件先改事实源再重跑生成器。
 `skills/tigercat/references/` 下其余手写文档受 `pnpm api:validate` 的行数与体积预算约束。
 
 ### 文档分层：一件事只在一处展开
 
-| 文档                   | 拥有的内容                                               |
-| ---------------------- | -------------------------------------------------------- |
-| `README.md`            | 用户入口：安装、快速开始、兼容性、包清单、MCP 客户端片段 |
-| `AGENTS.md`            | 代理约束：目录职责、代码风格、交付清单、生成物边界       |
-| `CONTRIBUTING.md`      | 流程与架构约束：分支、PR、根因修复与架构约束             |
-| `tests/README.md`      | 测试约定、执行模型与「按改动范围验证」命令表             |
-| `scripts/README.md`    | 脚本与门禁命令清单                                       |
-| `packages/*/README.md` | npm 落地页；安装/兼容性链回根 README，不复制正文         |
-| `docs/ROADMAP.md`      | 当前可执行任务与任务登记规则（不存完成历史）             |
-| `docs/MIGRATION.md`    | breaking change 与迁移路径                               |
-| `CHANGELOG.md`         | 版本变更与完成历史                                       |
-| `skills/tigercat/`     | 组件 API、Props、示例、主题、i18n、命令式 API            |
+| 文档                    | 拥有的内容                                               |
+| ----------------------- | -------------------------------------------------------- |
+| `README.md`             | 用户入口：安装、快速开始、兼容性、包清单、MCP 客户端片段 |
+| `AGENTS.md`             | 代理约束：目录职责、代码风格、交付清单、生成物边界       |
+| `CONTRIBUTING.md`       | 流程与架构约束：分支、PR、根因修复与架构约束             |
+| `tests/README.md`       | 测试约定、执行模型与「按改动范围验证」命令表             |
+| `scripts/README.md`     | 脚本与门禁命令清单                                       |
+| `packages/*/README.md`  | npm 落地页；安装/兼容性链回根 README，不复制正文         |
+| `docs/ROADMAP.md`       | 当前可执行任务与任务登记规则（不存完成历史）             |
+| `docs/MIGRATION-3.0.md` | 2.x → 3.0 的 breaking change 与迁移路径                  |
+| `docs/MIGRATION.md`     | 预览版间迁移与历史版本档案                               |
+| `CHANGELOG.md`          | 版本变更与完成历史                                       |
+| `skills/tigercat/`      | 组件 API、Props、示例、主题、i18n、命令式 API            |
 
 其他文档引用这些内容时只放链接，不复制正文。
 

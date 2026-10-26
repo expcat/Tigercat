@@ -3,10 +3,10 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: remaining preview tasks
-verified-date: 2026-10-25
+verified-date: 2026-10-26
 -->
 
-3.0 波次已经做完，已发布预览版本是 `3.0.0-rc.3`。完成记录在 [CHANGELOG.md](../CHANGELOG.md)。从 2.x 改到 3.0 的调用点在 [MIGRATION-3.0.md](MIGRATION-3.0.md)，2.x 档案在 [MIGRATION.md](MIGRATION.md)。组件维护规则见 [Tigercat Skill](../skills/tigercat/SKILL.md)。
+3.0 波次已经做完，已发布预览版本是 `3.0.0-rc.3`。完成记录在 [CHANGELOG.md](../CHANGELOG.md)。从 2.x 改到 3.0 的调用点在 [MIGRATION-3.0.md](MIGRATION-3.0.md)，预览版间迁移与历史档案在 [MIGRATION.md](MIGRATION.md)。组件维护规则见 [Tigercat Skill](../skills/tigercat/SKILL.md)。
 
 本文件只登记还没做的事。做完后从这里删掉，不在这里留完成史。
 

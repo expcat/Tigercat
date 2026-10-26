@@ -6,7 +6,8 @@
 
 - 当前执行计划：<https://github.com/expcat/Tigercat/blob/main/docs/ROADMAP.md>
 - 版本与完成记录：<https://github.com/expcat/Tigercat/blob/main/CHANGELOG.md>
-- breaking change：<https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md>
+- 2.x → 3.0：<https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION-3.0.md>
+- 预览版间迁移与历史档案：<https://github.com/expcat/Tigercat/blob/main/docs/MIGRATION.md>
 - 生成器：<https://github.com/expcat/Tigercat/blob/main/scripts/generate-api-docs.mjs>
 - Skill 护栏：<https://github.com/expcat/Tigercat/blob/main/scripts/validate-api.mjs>
 
