@@ -10,7 +10,7 @@ import type { InputStatus } from '../types/input'
 export const switchRootBaseClasses = 'inline-flex items-center gap-2'
 
 export const switchTrackBaseClasses =
-  'relative inline-flex items-center rounded-full tiger-motion-aware [transition:var(--tiger-transition-base)] peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring)] peer-focus-visible:ring-offset-[var(--tiger-surface)]'
+  'relative inline-flex items-center rounded-full border tiger-motion-aware [transition:var(--tiger-transition-base)] peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-focus-ring)] peer-focus-visible:ring-offset-[var(--tiger-surface)]'
 
 export const switchSizeClasses: Record<ComponentSize, string> = {
   sm: 'h-5 w-9',
@@ -53,7 +53,9 @@ export function getSwitchTrackClasses(
   return classNames(
     switchTrackBaseClasses,
     switchSizeClasses[size],
-    checked ? 'bg-[var(--tiger-primary)]' : 'bg-[var(--tiger-surface-muted)]',
+    checked
+      ? 'border-transparent bg-[var(--tiger-primary)]'
+      : 'border-[var(--tiger-border)]/40 bg-[var(--tiger-text-secondary)]/20',
     disabled && 'opacity-50',
     status === 'error' && !disabled && 'ring-1 ring-[var(--tiger-error)]'
   )
