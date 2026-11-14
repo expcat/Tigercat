@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Window } from 'happy-dom'
 import {
   ACCENT_STEP_COUNT,
   SHADOW_STEP_COUNT,
@@ -99,6 +100,24 @@ describe('color scheme script', () => {
     expect(script).toContain('tiger-mode')
     expect(script).toContain('nonce="abc"')
     expect(script).not.toContain('document.write')
+  })
+
+  it('keeps a storage key containing a script end tag inside one script', async () => {
+    const storageKey = '</script><p id=x01-breakout>breakout</p><script>'
+    const markup = colorSchemeInitScript({ storageKey })
+    const browser = new Window({ url: 'https://example.test' })
+    try {
+      browser.localStorage.setItem(storageKey, 'dark')
+      browser.document.write(`<!doctype html><html><head>${markup}</head><body></body></html>`)
+      expect(browser.document.getElementById('x01-breakout')).toBeNull()
+      expect(browser.document.querySelectorAll('p')).toHaveLength(0)
+      const scripts = browser.document.querySelectorAll('script')
+      expect(scripts).toHaveLength(1)
+      browser.eval(scripts[0].textContent ?? '')
+      expect(browser.document.documentElement.getAttribute('data-tiger-color-scheme')).toBe('dark')
+    } finally {
+      await browser.happyDOM.close()
+    }
   })
 })
 

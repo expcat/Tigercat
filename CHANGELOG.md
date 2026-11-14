@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **颜色方案初始化脚本（Core，X01-F021）**：`colorSchemeInitScript` 先把脚本正文里的 `<` 编成 `\u003c`，再包进 `<script>`。`storageKey` 含 `</script><p id=x01-breakout>` 时，按 HTML 插入后仍只有一个 script，不会多出一个 p。脚本执行时读到的 storageKey 和 attribute 仍是原来的字符串。
+
 - **菜单 items 子菜单（React，X01-F016）**：Dropdown 与 ContextMenu 的 items 子菜单可用 ArrowRight 或点击展开。聚焦 More 后按 ArrowRight 或点击，expanded 为 true，子菜单出现，并把焦点送进第一项。RTL 下展开键是 ArrowLeft。悬停展开不变，禁用项不会展开。
 
 - **TimePicker（React，X01-F015）**：桌面列的焦点选项可用 Enter 或 Space 写入草稿。初始 10:00，聚焦 10 Hour 按下键到 11 Hour 再 Enter、确定，提交 11:00 并触发 onChange。方向键仍只移动焦点，禁用选项不会被选中。

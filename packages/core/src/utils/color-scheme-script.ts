@@ -17,5 +17,6 @@ export function colorSchemeInitScript(options: ColorSchemeInitOptions): string {
   const storageKey = JSON.stringify(options.storageKey)
   const attributeName = JSON.stringify(attribute)
   const body = `(function(){try{var k=${storageKey};var a=${attributeName};var stored=null;try{stored=localStorage.getItem(k);}catch(e){}var systemDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var mode=stored==='light'||stored==='dark'?stored:(systemDark?'dark':'light');var root=document.documentElement;if(stored==='light'||stored==='dark'){root.setAttribute(a,stored);}else{root.setAttribute(a,'system');}root.classList.toggle('dark',mode==='dark');root.style.colorScheme=mode;}catch(e){}})();`
-  return `<script${nonce}>${body}</script>`
+  // Prevent configuration strings from closing the script element during HTML parsing.
+  return `<script${nonce}>${body.replace(/</g, '\\u003c')}</script>`
 }
