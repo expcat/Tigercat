@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **菜单 items 子菜单（React，X01-F016）**：Dropdown 与 ContextMenu 的 items 子菜单可用 ArrowRight 或点击展开。聚焦 More 后按 ArrowRight 或点击，expanded 为 true，子菜单出现，并把焦点送进第一项。RTL 下展开键是 ArrowLeft。悬停展开不变，禁用项不会展开。
+
 - **TimePicker（React，X01-F015）**：桌面列的焦点选项可用 Enter 或 Space 写入草稿。初始 10:00，聚焦 10 Hour 按下键到 11 Hour 再 Enter、确定，提交 11:00 并触发 onChange。方向键仍只移动焦点，禁用选项不会被选中。
 
 - **工作流字段权限（Core，X01-F003）**：initiate 下 schema `disabled: true` 的字段保持禁用，不进入可写名单，提交保留 original。源 schema `readOnly: true` 同样不接受客户端覆盖，仍按文本渲染。节点权限把字段标成只读或隐藏的行为不变。

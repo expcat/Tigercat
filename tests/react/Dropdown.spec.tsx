@@ -639,4 +639,40 @@ describe('Dropdown', () => {
       expect(container.querySelector('.tiger-dropdown-container')).toBeInTheDocument()
     })
   })
+
+  it('opens an items submenu from More with ArrowRight or click', () => {
+    const items = [
+      {
+        key: 'more',
+        type: 'submenu' as const,
+        label: 'More',
+        children: [{ key: 'nested', label: 'Nested' }]
+      }
+    ]
+
+    const keyboard = render(
+      <Dropdown open items={items}>
+        <button type="button">Open</button>
+      </Dropdown>
+    )
+    const more = screen.getByRole('menuitem', { name: 'More' })
+    more.focus()
+    expect(more).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.keyDown(more, { key: 'ArrowRight' })
+    expect(more).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('menuitem', { name: 'Nested' })).toHaveFocus()
+    expect(document.querySelector('[data-tiger-popup-submenu]')).toBeTruthy()
+    keyboard.unmount()
+
+    render(
+      <Dropdown open items={items}>
+        <button type="button">Open</button>
+      </Dropdown>
+    )
+    const moreClick = screen.getByRole('menuitem', { name: 'More' })
+    expect(moreClick).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(moreClick)
+    expect(moreClick).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('menuitem', { name: 'Nested' })).toBeTruthy()
+  })
 })

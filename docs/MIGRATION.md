@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React 的 Dropdown 与 ContextMenu 在 `items` 含 `type: 'submenu'` 时，聚焦该项后按 ArrowRight，或直接点击，就会展开子菜单。`aria-expanded` 变为 `true`，子菜单出现，键盘展开还会把焦点移到第一项可用子项。阅读方向为 RTL 时，展开键是 ArrowLeft。此前只有鼠标悬停能展开。悬停展开、移出关闭，以及禁用项不展开，都保持原样。Vue 的 items 子菜单仍只在悬停时展开。
+
 React TimePicker 的桌面列现在可以用 Enter 或 Space 把当前焦点选项写入草稿。初始值为 10:00 时，聚焦 10 Hour，按下键到 11 Hour 再按 Enter，然后确定，会提交 11:00 并触发 `onChange`。此前方向键只移动焦点，确定后仍是原来的时间。禁用选项仍然不会写入草稿。手机上的原生 select、鼠标点击，以及 Vue 桌面列的点击选择不变。
 
 工作流字段权限不再打开 schema 里已经禁用或只读的字段。`applyWorkflowFieldPermissions` 在 initiate 下保留源 `disabled: true`，节点 map 把该字段标成 editable 也不能重新打开。`listWorkflowEditableFieldNames`、`mergeWorkflowFormValues`，以及 WorkflowDetailShell 的 `submit()` / `submitAction()`，会同时排除 `disabled` 和 `readOnly`：这些路径提交时保留 original，客户端改写被丢掉。源 `readOnly` 仍渲染为文本，不会被改成禁用控件。节点权限的 readonly 仍把字段设为 disabled，hidden 仍隐藏。此前 initiate 会把 schema disabled 改成 false，并把 schema readOnly 算进可写名单。

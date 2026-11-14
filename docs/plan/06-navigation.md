@@ -16,7 +16,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ## 依赖与顺序
 
-- ContextMenu 与 Dropdown 共用实现：C088-F01、C088-F03、C088-F06 和 [02](02-core-theme-i18n.md) 的 X01-F016、X01-F017 一起做。
+- ContextMenu 与 Dropdown 共用实现：C088-F01、C088-F03、C088-F06 和 [02](02-core-theme-i18n.md) 的 X01-F017 一起做。
 - Menu：先 C098-F01、C098-F02，再做 MenuItem、MenuItemGroup、SubMenu 的条目。
 - NavigationMenu：先 C102-F01、C102-F02、C102-F03，再做 Content、Item、Link、List、Trigger 的条目。
 - Breadcrumb：C086-F01 与 C087-F01 同批。
@@ -104,7 +104,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C088 ContextMenu
 
-报告 `groups/navigation/ContextMenu.md`，队列状态 needs-evidence。另受 S01、X01-F016、X01-F017 影响。
+报告 `groups/navigation/ContextMenu.md`，队列状态 needs-evidence。另受 S01、X01-F017 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别   | 条目                                                 | 验收                                                                                               |
 | -------- | ---- | ---- | ----- | ------ | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
@@ -125,7 +125,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C092 Dropdown
 
-报告 `groups/navigation/Dropdown.md`，队列状态 needs-evidence。另受 S01、C088-F01、C088-F03、C088-F04、C088-F06、X01-F016、X01-F017 影响。
+报告 `groups/navigation/Dropdown.md`，队列状态 needs-evidence。另受 S01、C088-F01、C088-F03、C088-F04、C088-F06、X01-F017 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                   | 验收                                                                               |
 | -------- | ---- | ---- | ---- | ---- | ------------------------------------------------------ | ---------------------------------------------------------------------------------- |

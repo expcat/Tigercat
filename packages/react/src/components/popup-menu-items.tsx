@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   createTypeaheadHighlight,
   getDropdownSeparatorClasses,
+  getMenuItems,
   getPopupMenuItemClasses,
   getPopupMenuShortcutClasses,
   POPUP_MENU_SUBMENU_SURFACE_CLASSES,
@@ -98,6 +99,16 @@ function PopupMenuNode({
   const navLabels = getNavLabels(config.locale)
   const type = resolvePopupMenuItemType(item)
   const [submenuOpen, setSubmenuOpen] = useState(false)
+  const submenuRef = useRef<HTMLDivElement>(null)
+  const focusSubmenuOnOpenRef = useRef(false)
+
+  useEffect(() => {
+    if (!submenuOpen || !focusSubmenuOnOpenRef.current) return
+    focusSubmenuOnOpenRef.current = false
+    const menu = submenuRef.current
+    if (!menu) return
+    getMenuItems(menu)[0]?.focus()
+  }, [submenuOpen])
 
   if (type === 'separator') {
     return <div role="separator" className={getDropdownSeparatorClasses()} />
@@ -105,6 +116,22 @@ function PopupMenuNode({
 
   if (type === 'submenu') {
     const expanded = submenuOpen && !item.disabled
+    const openKey =
+      (config.direction ?? config.locale?.direction) === 'rtl' ? 'ArrowLeft' : 'ArrowRight'
+    const openSubmenu = (focusChild: boolean) => {
+      if (item.disabled) return
+      if (!focusChild) {
+        setSubmenuOpen(true)
+        return
+      }
+      focusSubmenuOnOpenRef.current = true
+      if (submenuOpen && submenuRef.current) {
+        getMenuItems(submenuRef.current)[0]?.focus()
+        focusSubmenuOnOpenRef.current = false
+        return
+      }
+      setSubmenuOpen(true)
+    }
     return (
       <div
         className="relative"
@@ -120,7 +147,14 @@ function PopupMenuNode({
           data-tiger-popup-item=""
           data-tiger-popup-key={String(item.key)}
           disabled={item.disabled}
-          className={getPopupMenuItemClasses(Boolean(item.disabled), false)}>
+          className={getPopupMenuItemClasses(Boolean(item.disabled), false)}
+          onClick={() => openSubmenu(false)}
+          onKeyDown={(event) => {
+            if (event.key !== openKey) return
+            event.preventDefault()
+            event.stopPropagation()
+            openSubmenu(true)
+          }}>
           <span className="flex-1">{item.label}</span>
           {item.shortcut ? (
             <span className={getPopupMenuShortcutClasses()}>{item.shortcut}</span>
@@ -128,6 +162,7 @@ function PopupMenuNode({
         </button>
         {expanded && item.children && item.children.length > 0 ? (
           <div
+            ref={submenuRef}
             role="menu"
             data-tiger-popup-submenu=""
             className={`absolute top-0 start-full z-10 min-w-40 ${POPUP_MENU_SUBMENU_SURFACE_CLASSES} p-1`}>
