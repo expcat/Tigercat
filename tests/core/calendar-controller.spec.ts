@@ -100,16 +100,22 @@ describe('calendar controller', () => {
     })
   })
 
-  it('month-grid focus skips a fully disabled month', () => {
-    const next = moveCalendarMonthFocus({
-      current: 1,
-      kind: 'delta',
-      delta: 1,
-      viewYear: 2024,
-      disabledDate: (date) => date.getMonth() === 2
-    })
-    expect(next).toBe(3)
-  })
+  it.each([
+    { current: 1, delta: 1, expected: 3 },
+    { current: 0, delta: 3, expected: 3 }
+  ])(
+    'month-grid focus preserves a $delta-month offset and skips disabled months',
+    ({ current, delta, expected }) => {
+      const next = moveCalendarMonthFocus({
+        current,
+        kind: 'delta',
+        delta,
+        viewYear: 2024,
+        disabledDate: (date) => date.getMonth() === 2
+      })
+      expect(next).toBe(expected)
+    }
+  )
 
   it('picks a tab stop even when selected and today are disabled', () => {
     const days = Array.from({ length: 3 }, (_, i) => new Date(2024, 5, 14 + i))

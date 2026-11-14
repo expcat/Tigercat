@@ -104,6 +104,19 @@ describe('Calendar', () => {
     expect(screen.getByRole('button', { name: /March 2024/ })).toBeInTheDocument()
   })
 
+  it('moves year-view focus by a row with vertical arrows', async () => {
+    renderCalendar({ mode: 'year', modelValue: new Date(2024, 0, 1) })
+    const january = screen.getByRole('gridcell', { name: 'Jan' })
+    const april = screen.getByRole('gridcell', { name: 'Apr' })
+
+    january.focus()
+    await fireEvent.keyDown(january, { key: 'ArrowDown' })
+    expect(april).toHaveFocus()
+
+    await fireEvent.keyDown(april, { key: 'ArrowUp' })
+    expect(january).toHaveFocus()
+  })
+
   it('moves focus with arrows and skips disabled days', async () => {
     renderCalendar({
       modelValue: new Date(2024, 5, 14),

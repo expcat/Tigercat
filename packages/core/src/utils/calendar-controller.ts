@@ -218,11 +218,11 @@ export function moveCalendarMonthFocus(input: {
   if (input.kind === 'end') return enabled[enabled.length - 1]
 
   const delta = input.delta ?? 0
-  const from = enabled.indexOf(input.current)
-  const start = from < 0 ? (delta > 0 ? -1 : enabled.length) : from
-  const next = start + Math.sign(delta)
-  if (next < 0 || next >= enabled.length) return enabled[from < 0 ? 0 : from]
-  return enabled[next]
+  const step = Math.sign(delta) || 1
+  for (let month = input.current + delta; month >= 0 && month < 12; month += step) {
+    if (enabled.includes(month)) return month
+  }
+  return enabled.includes(input.current) ? input.current : enabled[0]
 }
 
 export type CalendarDayKeyKind = 'delta' | 'home' | 'end' | 'page-month' | 'page-year' | 'none'

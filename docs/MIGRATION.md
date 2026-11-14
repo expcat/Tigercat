@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Calendar 年视图的 ArrowDown / ArrowUp 现在移动三个日历月（网格一行），例如 January 与 April 之间往返；此前只移动一个月。调用方式不用改，依赖旧单月步长的键盘脚本需按行导航更新。
+
 双端 ActivityFeed、CommentThread、NotificationCenter 在满 40 行自动开窗后，滚动窗口现在带本地化名称并进入 Tab 顺序，可用 ArrowUp / ArrowDown / Home / End 滚动，再用 Tab 进入窗口内的动作。ActivityFeed 保留 `list`、CommentThread 保留 `feed` 语义。调用方式不用改，依赖旧 Tab 顺序的键盘脚本需加入窗口入口。
 
 双端 NavigationMenu 共享 viewport 下的普通面板现在带 id、`role=menu` 和完整键盘处理：`aria-controls` 指向实际面板，Enter / ArrowDown 打开后聚焦首项，面板内方向键、Escape 与焦点离开和普通面板一致。item value 的 DOM 属性 `data-tiger-navigation-menu-value` 改为带类型前缀的 id（数值 `n:1`、字符串 `s:1`），`1` 与 `"1"` 不再互串，纯数值 value 的菜单恢复唯一 Tab 入口。调用方式不用改；直接读取该属性原始值的测试或选择器请改用组件 API 或 `navigationMenuValueId`。

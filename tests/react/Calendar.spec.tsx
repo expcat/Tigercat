@@ -117,6 +117,19 @@ describe('Calendar', () => {
     expect(screen.getByRole('gridcell', { name: 'Mar' })).toBeInTheDocument()
   })
 
+  it('moves year-view focus by a row with vertical arrows', () => {
+    render(<Calendar mode="year" value={new Date(2024, 0, 1)} now={now} />)
+    const january = screen.getByRole('gridcell', { name: 'Jan' })
+    const april = screen.getByRole('gridcell', { name: 'Apr' })
+
+    act(() => january.focus())
+    fireEvent.keyDown(january, { key: 'ArrowDown' })
+    expect(april).toHaveFocus()
+
+    fireEvent.keyDown(april, { key: 'ArrowUp' })
+    expect(january).toHaveFocus()
+  })
+
   it('moves focus with arrows and skips disabled days', () => {
     render(
       <Calendar
