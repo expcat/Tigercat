@@ -16,7 +16,7 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 依赖与顺序
 
-- TimePicker 的键盘选入是 [02](02-core-theme-i18n.md) 的 X01-F015；Date 字段丢值是 X01-F001；Select 关闭抢焦点是 X01-F013；TreeSelect 选中禁用节点是 X01-F014；Upload 的两条是 X01-F008、X01-F009。
+- TimePicker 的键盘选入是 [02](02-core-theme-i18n.md) 的 X01-F015；Select 关闭抢焦点是 X01-F013；TreeSelect 选中禁用节点是 X01-F014；Upload 的两条是 X01-F008、X01-F009。
 - S10 波及 13 个表单组件，先做 S10 再做这些组件里其余的受控条目。
 - InputGroup 的尺寸继承（C059-F01、C063-F01）一批做，Mentions、TimePicker、TreeSelect 同验。
 

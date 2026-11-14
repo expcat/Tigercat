@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **表单 Date 字段（Core，X01-F001）**：表单值相等比较按时间区分 Date。字段已是 1 月 1 日时，`setFieldValue` 写入 2 月 1 日会更新模型，并各触发一次 `onValuesChange` 与订阅。相同时间点的 Date 仍视为未变化，不进入撤销历史。
+
 - **Vue Props 类型（Vue / Core，S13）**：Breadcrumb、Card、ContextMenu、DataExport、Drawer、FloatButton、Form、FormItem、Kbd、Modal、Pagination、Popover、Select、Sidebar、Slider、Space、Splitter、Steps、StepsItem、Tabs、Tooltip、Tree 与 TreeSelect 导出的 `Vue*Props` 与运行时 props 键一致。`VueTreeSelectProps` / `TreeSelectProps` 不再声明 `height`，列表高度用 `listHeight`。Kbd 的 `keys` 接受只读数组。Core `PopoverProps` 增加可选 `closeOnScroll`。这 23 个接口少一个字段或多一个字段时，`pnpm types:check` 失败。
 
 - **动态 class（Vue，S12 / C089-F01）**：ContextMenuItem、ContextMenuMenu、ContextMenuSub、Dropdown、DropdownItem 与 DropdownMenu 每次渲染读取当前 `class` 再合并。同一实例从 attr-before 改为 attr-after 后，DOM 类名为 attr-after。

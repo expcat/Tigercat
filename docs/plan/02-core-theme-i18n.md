@@ -22,10 +22,10 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 ## 概览
 
-本篇 22 条：P1 5、P2 15、P3 2。
-按波次：W1 6、W2 15、W9 1。
+本篇 21 条：P1 4、P2 15、P3 2。
+按波次：W1 5、W2 15、W9 1。
 
-本篇的 P1：X01-F001、X01-F002、X01-F003、X01-F015、X01-F016。
+本篇的 P1：X01-F002、X01-F003、X01-F015、X01-F016。
 
 ## 波及多个组件的条目
 
@@ -44,28 +44,27 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 报告 `project/shared-core.md`，队列状态 complete。
 
-| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                | 验收                                                                                           |
-| -------- | ---- | ---- | ----- | ---- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| X01-F001 | P1   | W1   | Core  | 行为 | Date 字段的新值被表单引擎丢弃                       | 字段已是 1 月 1 日的 Date，setFieldValue 写入 2 月 1 日后模型更新，onValuesChange 与订阅各触发 |
-| X01-F002 | P1   | W1   | Vue   | 行为 | Vue 浮层触发器清除子按钮的 disabled                 | Vue Tooltip/Popover/Popconfirm/Dropdown/ContextMenu 内 disabled 按钮仍禁用                     |
-| X01-F003 | P1   | W1   | Core  | 行为 | 工作流权限派生重新启用 schema 已禁用字段            | initiate 下 schema disabled:true 字段仍禁用、不在 editable names、提交保留 original            |
-| X01-F004 | P2   | W2   | Core  | 键盘 | Calendar 年视图上下键只移动一个月                   | 双端 Calendar 年视图 January 按下键到 April，April 按上键到 January                            |
-| X01-F005 | P2   | W2   | Core  | 行为 | 图表系列 key 的去重结果仍会重复                     | 系列名 ['x','x','x-2'] 生成三个互不相同的 key（LineChart/AreaChart/RadarChart）                |
-| X01-F006 | P2   | W2   | Core  | 行为 | Toast 自动编号覆盖显式数字 key 的条目               | 先加 key:1 再加未指定 key 的消息，队列保留两条（Message/NotificationContainer）                |
-| X01-F007 | P2   | W2   | Core  | 行为 | 空 OR 高级筛选条件放行全部记录                      | 已有 name = Alice 再加空值、logic 为 or 的规则，Table 仍只保留 Alice                           |
-| X01-F008 | P2   | W2   | Core  | 行为 | 异步确认移除上传文件时丢失后来加入的文件            | Upload 移除 A 等待异步确认时加入 B，允许移除后列表为 [b.txt] 而非空数组                        |
-| X01-F009 | P2   | W2   | Core  | 行为 | customRequest 同步抛错后上传状态无法重试            | Upload 的 customRequest 同步抛错后状态为 error、onError 触发一次，retry 能再次发起请求         |
-| X01-F010 | P2   | W2   | Core  | 行为 | 表格重复对象引用行丢失各自源索引                    | 同一无 id 对象出现在 dataSource 两处且开启本地处理时，Table 源索引为 [0,1]                     |
-| X01-F011 | P2   | W2   | Vue   | 行为 | Vue Table 排序复位页码时漏发 page-change            | Vue Table 非受控第 2 页排序复位到第 1 页时发出一次 page-change，与 React 一致                  |
-| X01-F012 | P2   | W2   | Core  | 行为 | 工作流成功 action 的结果共享旧实例嵌套数据          | 新实例 amount 改 999 后旧实例仍为 100（WorkflowDetailShell/WorkflowTimeline 宿主）             |
-| X01-F013 | P2   | W2   | React | 键盘 | React Select 关闭时把 Tab 已移出的焦点拉回          | 打开 React Select 后按 Tab，下拉关闭且等帧后焦点仍停在后续控件 After                           |
-| X01-F014 | P2   | W2   | React | 键盘 | React TreeSelect 可用 Enter 选中禁用节点            | defaultOpen 且首节点 disabled:true 时按 Enter 不触发 onChange，显示值不变                      |
-| X01-F015 | P1   | W1   | React | 键盘 | React TimePicker 桌面选项无法通过键盘选入草稿       | 初始 10:00，聚焦 10 Hour 按下键到 11 Hour 再 Enter、确定，提交 11:00 并触发 onChange           |
-| X01-F016 | P1   | W1   | React | 键盘 | React items 子菜单只有悬停打开路径                  | items 含 submenu 时，聚焦 More 后 ArrowRight 或 click 使 expanded 为 true、子菜单出现          |
-| X01-F017 | P2   | W2   | React | 键盘 | React popup typeahead 的数据索引与 DOM 索引错位     | React Dropdown items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu           |
-| X01-F018 | P2   | W2   | React | 行为 | React Tree 的 loaded keys 回调丢失先前完成项        | React Tree 先后完成 A、B 加载，第二次 onLoadedKeysChange 含 a 与 b；受控同批完成回写不丢键     |
-| X01-F021 | P3   | W1   | Core  | 安全 | 初始化脚本未编码 HTML script 结束边界               | storageKey 含 \</script>\<p id=x01-breakout> 时不产生额外 p，scriptCount 为 1                  |
-| X01-F022 | P2   | W2   | React | 行为 | React FeedbackHost 在未提交 render 后残留活动作用域 | Suspense 中 FeedbackHost 执行后子节点挂起再卸载，无残留活动 scope，通知不进无渲染者队列        |
+| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                | 验收                                                                                       |
+| -------- | ---- | ---- | ----- | ---- | --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| X01-F002 | P1   | W1   | Vue   | 行为 | Vue 浮层触发器清除子按钮的 disabled                 | Vue Tooltip/Popover/Popconfirm/Dropdown/ContextMenu 内 disabled 按钮仍禁用                 |
+| X01-F003 | P1   | W1   | Core  | 行为 | 工作流权限派生重新启用 schema 已禁用字段            | initiate 下 schema disabled:true 字段仍禁用、不在 editable names、提交保留 original        |
+| X01-F004 | P2   | W2   | Core  | 键盘 | Calendar 年视图上下键只移动一个月                   | 双端 Calendar 年视图 January 按下键到 April，April 按上键到 January                        |
+| X01-F005 | P2   | W2   | Core  | 行为 | 图表系列 key 的去重结果仍会重复                     | 系列名 ['x','x','x-2'] 生成三个互不相同的 key（LineChart/AreaChart/RadarChart）            |
+| X01-F006 | P2   | W2   | Core  | 行为 | Toast 自动编号覆盖显式数字 key 的条目               | 先加 key:1 再加未指定 key 的消息，队列保留两条（Message/NotificationContainer）            |
+| X01-F007 | P2   | W2   | Core  | 行为 | 空 OR 高级筛选条件放行全部记录                      | 已有 name = Alice 再加空值、logic 为 or 的规则，Table 仍只保留 Alice                       |
+| X01-F008 | P2   | W2   | Core  | 行为 | 异步确认移除上传文件时丢失后来加入的文件            | Upload 移除 A 等待异步确认时加入 B，允许移除后列表为 [b.txt] 而非空数组                    |
+| X01-F009 | P2   | W2   | Core  | 行为 | customRequest 同步抛错后上传状态无法重试            | Upload 的 customRequest 同步抛错后状态为 error、onError 触发一次，retry 能再次发起请求     |
+| X01-F010 | P2   | W2   | Core  | 行为 | 表格重复对象引用行丢失各自源索引                    | 同一无 id 对象出现在 dataSource 两处且开启本地处理时，Table 源索引为 [0,1]                 |
+| X01-F011 | P2   | W2   | Vue   | 行为 | Vue Table 排序复位页码时漏发 page-change            | Vue Table 非受控第 2 页排序复位到第 1 页时发出一次 page-change，与 React 一致              |
+| X01-F012 | P2   | W2   | Core  | 行为 | 工作流成功 action 的结果共享旧实例嵌套数据          | 新实例 amount 改 999 后旧实例仍为 100（WorkflowDetailShell/WorkflowTimeline 宿主）         |
+| X01-F013 | P2   | W2   | React | 键盘 | React Select 关闭时把 Tab 已移出的焦点拉回          | 打开 React Select 后按 Tab，下拉关闭且等帧后焦点仍停在后续控件 After                       |
+| X01-F014 | P2   | W2   | React | 键盘 | React TreeSelect 可用 Enter 选中禁用节点            | defaultOpen 且首节点 disabled:true 时按 Enter 不触发 onChange，显示值不变                  |
+| X01-F015 | P1   | W1   | React | 键盘 | React TimePicker 桌面选项无法通过键盘选入草稿       | 初始 10:00，聚焦 10 Hour 按下键到 11 Hour 再 Enter、确定，提交 11:00 并触发 onChange       |
+| X01-F016 | P1   | W1   | React | 键盘 | React items 子菜单只有悬停打开路径                  | items 含 submenu 时，聚焦 More 后 ArrowRight 或 click 使 expanded 为 true、子菜单出现      |
+| X01-F017 | P2   | W2   | React | 键盘 | React popup typeahead 的数据索引与 DOM 索引错位     | React Dropdown items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu       |
+| X01-F018 | P2   | W2   | React | 行为 | React Tree 的 loaded keys 回调丢失先前完成项        | React Tree 先后完成 A、B 加载，第二次 onLoadedKeysChange 含 a 与 b；受控同批完成回写不丢键 |
+| X01-F021 | P3   | W1   | Core  | 安全 | 初始化脚本未编码 HTML script 结束边界               | storageKey 含 \</script>\<p id=x01-breakout> 时不产生额外 p，scriptCount 为 1              |
+| X01-F022 | P2   | W2   | React | 行为 | React FeedbackHost 在未提交 render 后残留活动作用域 | Suspense 中 FeedbackHost 执行后子节点挂起再卸载，无残留活动 scope，通知不进无渲染者队列    |
 
 ### X02 主题、样式与 i18n
 

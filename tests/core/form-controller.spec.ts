@@ -44,6 +44,23 @@ describe('createFormEngine', () => {
     expect(engine.values['user.email']).toBeUndefined()
   })
 
+  it('replaces an existing Date and notifies listeners', () => {
+    const onValuesChange = vi.fn()
+    const engine = createFormEngine({
+      initialValues: { when: new Date('2026-01-01') },
+      onValuesChange
+    })
+    const listener = vi.fn()
+    engine.subscribe(listener)
+
+    engine.setFieldValue('when', new Date('2026-02-01'))
+
+    expect(engine.getFieldValue('when')).toEqual(new Date('2026-02-01'))
+    expect(onValuesChange).toHaveBeenCalledTimes(1)
+    expect(onValuesChange.mock.calls[0][0].when).toEqual(new Date('2026-02-01'))
+    expect(listener).toHaveBeenCalledTimes(1)
+  })
+
   it('validateField does not throw on circular fieldDependencies', async () => {
     const engine = createFormEngine({
       initialValues: { a: '1', b: '2' },

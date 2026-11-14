@@ -279,13 +279,21 @@ export function cloneFormValues(values: FormValues): FormValues {
   }
 }
 
-/** Structural equality for form models. Same contents do not enter undo history. */
+/**
+ * Structural equality for form models. Dates compare by epoch time.
+ * Same contents do not enter undo history.
+ */
 export function formValuesEqual(left: unknown, right: unknown): boolean {
   if (Object.is(left, right)) return true
   if (left === null || right === null || left === undefined || right === undefined) return false
   if (Array.isArray(left) || Array.isArray(right)) {
     if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) return false
     return left.every((item, index) => formValuesEqual(item, right[index]))
+  }
+  if (left instanceof Date || right instanceof Date) {
+    return (
+      left instanceof Date && right instanceof Date && Object.is(left.getTime(), right.getTime())
+    )
   }
   if (typeof left === 'object' && typeof right === 'object') {
     const leftRecord = left as Record<string, unknown>

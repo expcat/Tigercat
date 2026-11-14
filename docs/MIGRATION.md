@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+表单引擎按时间比较 Date。字段已有某个 Date 时，`setFieldValue`、批量写入或替换模型中的另一个时间会更新值，并触发 `onValuesChange` 与 `subscribe`。此前两个 Date 没有可枚举键，会被当成相等，新值被丢弃且不通知。相同时间点的 Date 仍然不会重复通知，普通对象和数组的比较不变。直接调用 `formValuesEqual` 时，Date 与非 Date 不再相等。
+
 Vue 的 TreeSelect 公开类型不再包含 `height`。`VueTreeSelectProps` 与 `TreeSelectProps` 改用 `listHeight`；`listHeight` 为 80 时，树列表的内联 `max-height` 仍是 `80px`。运行时原本就不读取 `height`。
 
 同一批导出类型补上了运行时已经接受的可选字段，Kbd 的 `keys` 同时接受只读数组。现有调用不用改。Core `PopoverProps` 增加可选 `closeOnScroll`（默认 `false`），页面滚动时关闭浮层；不传时行为与以前相同。
