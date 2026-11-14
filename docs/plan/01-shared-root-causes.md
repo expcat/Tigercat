@@ -2,7 +2,7 @@
 
 [路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
-同一个根因在很多组件的报告里重复出现。这里把它们收成 10 个任务（S04–S13），共 36 条发现加 1 条沿用任务（T01），全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
+同一个根因在很多组件的报告里重复出现。这里把它们收成 8 个任务（S06–S13），共 34 条发现加 1 条沿用任务（T01），全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
 
 ## 目标
 
@@ -16,7 +16,6 @@
 
 ## 依赖与顺序
 
-- S04、S05 改主题运行时和 token 生成器，一批做。
 - S06 先于各组件的 i18n 条目。
 - S07–S10 是两端的同一种写法问题，可以按组件分给多人并行，但每个 S 要先在主发现的组件上定好写法。
 - 「并入」的意思是那份组件报告确认了同一个问题。清单来自各报告的归并记录，个别组件只是部分适用，以报告原文为准。
@@ -25,8 +24,6 @@
 
 | 任务 | 根因                                    | 主发现                                  | 波及组件数 |
 | ---- | --------------------------------------- | --------------------------------------- | ---------- |
-| S04  | 过渡 shorthand 只有最后一项拿到时长     | X02-F001                                | 50         |
-| S05  | 运行时主题 scope 盖掉辅助媒体偏好       | X02-F002                                | 7          |
 | S06  | W9 辅助文案绕过标准 locale              | X02-F003                                | 44         |
 | S07  | 根节点 style 与原生属性没有透传         | C056-F04                                | 38         |
 | S08  | 数值 0 被真值判断吞掉                   | C039-F03                                | 28         |
@@ -35,34 +32,6 @@
 | S11  | 运行时回退把原型继承键当成合法值        | C004-F001、C003-F003、C002-F002 等 5 条 | 10         |
 | S12  | Vue 动态 class 停在初始值               | C089-F01                                | 6          |
 | S13  | Vue 手写导出的 Props 类型与运行时不一致 | C022-F03、C034-F04、C048-F02 等 23 条   | 23         |
-
-## S04 过渡 shorthand 只有最后一项拿到时长
-
-**现状。** 运行时和 token 生成器把 8 个 property 的逗号串与单份 duration / easing 拼在一起，只有末项 `transform` 得到时长和 easing。
-
-**做法。** 在运行时与生成器事实源里为每个 property 分别生成 duration / easing，重跑 `pnpm tokens:build`。[02](02-core-theme-i18n.md) 的 X01-F019、X01-F020 在同一段代码上，同批看。
-
-**做完的标准。** 下表验收通过后，在并入清单里各抽一个组件核对计算样式。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                | 验收                                                                         |
-| -------- | ---- | ---- | ---- | ---- | --------------------------------------------------- | ---------------------------------------------------------------------------- |
-| X02-F001 | P2   | W0   | Core | 样式 | 过渡 shorthand 仅最后的 transform 获得时长与 easing | Button/Input/InputOTP/InputNumber 等过渡的 8 项 transitionDuration 均为 0.2s |
-
-并入的组件（50）：ActivityFeed、Alert、AssigneePicker、Button、ButtonGroup、Calendar、Checkbox、CheckboxGroup、ColorPicker、ColorSwatch、CommentThread、CopyButton、CronEditor、DataExport、DatePicker、Drawer、FloatButton、FloatButtonGroup、Inplace、Input、InputNumber、InputOTP、MaskInput、Mentions、Message、MessageContainer、Modal、NavigationMenu、NavigationMenuTrigger、NotificationBell、NotificationCenter、NotificationContainer、NumberKeyboard、Radio、RadioGroup、Select、Signature、Steps、StepsItem、Switch、TabPane、Tabs、TagsInput、TaskBoard、Textarea、TimePicker、Transfer、Tree、TreeSelect、Upload。
-
-## S05 运行时主题 scope 盖掉辅助媒体偏好
-
-**现状。** scope 写的是普通 preset 变量，没有同 scope 的媒体覆盖；reduce-motion、contrast、forced-colors 的变量只在 `:root, .dark` 上。经 ConfigProvider 就能走到。
-
-**做法。** 让辅助媒体规则同样覆盖运行时 scope 和嵌套 scope，核对应用、切换、释放之后的计算值。
-
-**做完的标准。** 见下表。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                    | 验收                                                                            |
-| -------- | ---- | ---- | ---- | ---- | --------------------------------------- | ------------------------------------------------------------------------------- |
-| X02-F002 | P2   | W0   | Core | 样式 | 运行时主题 scope 覆盖辅助媒体偏好的变量 | reduce 下 scope apply 后 duration 仍 0ms；contrast/forced-colors 变量保持媒体值 |
-
-并入的组件（7）：Badge、Button、ButtonGroup、Code、ConfigProvider、CopyButton、Text。
 
 ## S06 W9 辅助文案绕过标准 locale
 

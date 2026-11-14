@@ -1,10 +1,78 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { Window } from 'happy-dom'
 import {
+  createTigerThemeScope,
   prefersReducedMotion,
   getAccessibleTransitionClasses,
   themeTransitionValue
 } from '@expcat/tigercat-core'
 import { createTigercatPlugin } from '../../packages/core/src/tailwind-plugin'
+
+describe('theme scopes retain auxiliary media preferences', () => {
+  it.each(['prefers-reduced-motion: reduce', 'prefers-contrast: more', 'forced-colors: active'])(
+    'keeps %s through applying, switching and disposing scopes',
+    async (preference) => {
+      const browser = new Window()
+      const doc = browser.document
+      const style = doc.createElement('style')
+      // Select the matching block explicitly: happy-dom does not implement prefers-contrast.
+      style.textContent = readFileSync('packages/core/tokens/tokens.css', 'utf8').replace(
+        /@media\s*[^{]+/g,
+        (query) => (query.includes(preference) ? '@media all' : '@media not all')
+      )
+      doc.head.append(style)
+      const child = doc.createElement('section')
+      doc.body.append(child)
+      const scopes = [
+        createTigerThemeScope({ root: doc.documentElement as unknown as HTMLElement }),
+        createTigerThemeScope({
+          root: child as unknown as HTMLElement,
+          theme: 'modern',
+          nested: true
+        })
+      ]
+      const check = (): void => {
+        for (const root of [doc.documentElement, child]) {
+          const value = (name: string): string => {
+            const property = '--tiger-' + name
+            // happy-dom omits inherited custom properties from getPropertyValue().
+            return (
+              browser.getComputedStyle(root).getPropertyValue(property) ||
+              browser.getComputedStyle(doc.documentElement).getPropertyValue(property)
+            ).trim()
+          }
+          if (preference.startsWith('prefers-reduced-motion')) {
+            expect(value('motion-duration-base')).toBe('0ms')
+          } else if (preference.startsWith('prefers-contrast')) {
+            expect(value('border')).toBe(value('border-strong'))
+            expect(value('text-secondary')).toBe(value('text'))
+          } else {
+            expect(value('text')).toBe('CanvasText')
+            expect(value('text-secondary')).toBe('LinkText')
+            expect(value('surface')).toBe('Canvas')
+          }
+        }
+      }
+      try {
+        check()
+        scopes.forEach((scope) => scope.apply())
+        check()
+        scopes.forEach((scope) => scope.setTheme('vibrant'))
+        check()
+        scopes.forEach((scope) => scope.setColorScheme('dark'))
+        check()
+        scopes[1].dispose()
+        check()
+        scopes[0].dispose()
+        check()
+      } finally {
+        scopes.forEach((scope) => scope.dispose())
+        await browser.close()
+      }
+    }
+  )
+})
 
 /**
  * Reduced motion uses one switch: `prefers-reduced-motion: reduce` pins
@@ -137,7 +205,7 @@ describe('createTigercatPlugin() — reduced-motion CSS block', () => {
     const rules = captureRules(createTigercatPlugin() as PluginInstance)
     const mediaRule = rules['@media (prefers-reduced-motion: reduce)'] as Record<string, CssBlock>
     expect(mediaRule).toBeDefined()
-    expect(mediaRule[':root, .dark']).toBeDefined()
+    expect(mediaRule[':root, .dark, [data-tiger-theme-scope]']).toBeDefined()
     expect(mediaRule[':root, [data-tiger-style="modern"]']).toBeUndefined()
     expect(
       mediaRule[
@@ -149,14 +217,20 @@ describe('createTigercatPlugin() — reduced-motion CSS block', () => {
   it('pins duration tokens to 0ms and does not use transition: all', () => {
     const rules = captureRules(createTigercatPlugin() as PluginInstance)
     const inner = (rules['@media (prefers-reduced-motion: reduce)'] as Record<string, CssBlock>)[
-      ':root, .dark'
+      ':root, .dark, [data-tiger-theme-scope]'
     ]
-    expect(inner['--tiger-motion-duration-quick']).toBe('0ms')
-    expect(inner['--tiger-motion-duration-base']).toBe('0ms')
-    expect(inner['--tiger-motion-duration-slow']).toBe('0ms')
-    expect(inner['--tiger-transition-base']).toBe(themeTransitionValue('0ms', 'linear'))
-    expect(inner['--tiger-transition-quick']).toBe(themeTransitionValue('0ms', 'linear'))
-    expect(inner['--tiger-transition-emphasized']).toBe(themeTransitionValue('0ms', 'linear'))
+    expect(inner['--tiger-motion-duration-quick']).toBe('0ms !important')
+    expect(inner['--tiger-motion-duration-base']).toBe('0ms !important')
+    expect(inner['--tiger-motion-duration-slow']).toBe('0ms !important')
+    expect(inner['--tiger-transition-base']).toBe(
+      `${themeTransitionValue('0ms', 'linear')} !important`
+    )
+    expect(inner['--tiger-transition-quick']).toBe(
+      `${themeTransitionValue('0ms', 'linear')} !important`
+    )
+    expect(inner['--tiger-transition-emphasized']).toBe(
+      `${themeTransitionValue('0ms', 'linear')} !important`
+    )
     expect(inner['--tiger-transition-base']).not.toContain('all ')
   })
 })

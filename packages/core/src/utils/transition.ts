@@ -110,10 +110,10 @@ export const transitionPresets: Record<TransitionType, TransitionClasses> = {
   },
   collapse: {
     enterFrom: 'opacity-0 max-h-0 overflow-hidden',
-    enterActive: `[transition:var(--tiger-transition-base)] ${EASING_ENTER}`,
+    enterActive: `[transition-property:max-height,opacity] duration-[var(--tiger-motion-duration-base)] ${EASING_ENTER}`,
     enterTo: 'opacity-100 max-h-[var(--tiger-collapse-height)]',
     leaveFrom: 'opacity-100 max-h-[var(--tiger-collapse-height)]',
-    leaveActive: `[transition:var(--tiger-transition-base)] ${EASING_LEAVE}`,
+    leaveActive: `[transition-property:max-height,opacity] duration-[var(--tiger-motion-duration-base)] ${EASING_LEAVE}`,
     leaveTo: 'opacity-0 max-h-0 overflow-hidden'
   }
 }
@@ -134,6 +134,10 @@ export function getTransitionClasses(
   }
 
   const durationClass = typeOrConfig.duration ? `duration-[${typeOrConfig.duration}ms]` : undefined
+  const properties =
+    typeOrConfig.type === 'collapse'
+      ? 'max-height,opacity'
+      : 'color,background-color,border-color,outline-color,text-decoration-color,box-shadow,opacity,transform'
 
   const enterEasing = typeOrConfig.enterEasing ?? EASING_ENTER
   const leaveEasing = typeOrConfig.leaveEasing ?? EASING_LEAVE
@@ -141,13 +145,13 @@ export function getTransitionClasses(
   return {
     enterFrom: preset.enterFrom,
     enterActive: durationClass
-      ? `[transition-property:color,background-color,border-color,outline-color,text-decoration-color,box-shadow,opacity,transform] ${durationClass} ${enterEasing}`
-      : preset.enterActive,
+      ? `[transition-property:${properties}] ${durationClass} ${enterEasing}`
+      : preset.enterActive.replace(EASING_ENTER, enterEasing),
     enterTo: preset.enterTo,
     leaveFrom: preset.leaveFrom,
     leaveActive: durationClass
-      ? `[transition-property:color,background-color,border-color,outline-color,text-decoration-color,box-shadow,opacity,transform] ${durationClass} ${leaveEasing}`
-      : preset.leaveActive,
+      ? `[transition-property:${properties}] ${durationClass} ${leaveEasing}`
+      : preset.leaveActive.replace(EASING_LEAVE, leaveEasing),
     leaveTo: preset.leaveTo
   }
 }

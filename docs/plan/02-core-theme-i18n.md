@@ -12,7 +12,7 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 ## 非目标
 
 - 不为单个组件在框架层加分支。
-- X02-F001、X02-F002、X02-F003 已移到 01，这里不重复。
+- X02-F003 已移到 01，这里不重复。
 
 ## 依赖与顺序
 
@@ -20,14 +20,14 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 - X01-F016、X01-F017 先于 06 里 ContextMenu、Dropdown 的 `items` 分支条目（C088-F03、C088-F06）。
 - X01-F015 与 [05](05-form.md) 的 TimePicker 条目同批。C078 的报告补充：Vue 桌面列同样只绑了 click。
 - X01-F003 的 readOnly 合并契约还没确认，见 [14](14-waves.md#开工前要先定方向的条目)。
-- X01-F019、X01-F020 与 S04 同批；X02-F004 与 S06 同批。
+- X02-F004 与 S06 同批。
 
 ## 概览
 
-本篇 25 条：P1 5、P2 16、P3 4。
-按波次：W1 6、W2 16、W9 3。
+本篇 23 条：P1 5、P2 16、P3 2。
+按波次：W1 6、W2 16、W9 1。
 
-已移到 [01](01-shared-root-causes.md) 的条目：X02-F001（S04）、X02-F002（S05）、X02-F003（S06）。
+已移到 [01](01-shared-root-causes.md) 的条目：X02-F003（S06）。
 
 本篇的 P1：X01-F001、X01-F002、X01-F003、X01-F015、X01-F016。
 
@@ -68,14 +68,12 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 | X01-F016 | P1   | W1   | React | 键盘 | React items 子菜单只有悬停打开路径                  | items 含 submenu 时，聚焦 More 后 ArrowRight 或 click 使 expanded 为 true、子菜单出现          |
 | X01-F017 | P2   | W2   | React | 键盘 | React popup typeahead 的数据索引与 DOM 索引错位     | React Dropdown items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu           |
 | X01-F018 | P2   | W2   | React | 行为 | React Tree 的 loaded keys 回调丢失先前完成项        | React Tree 先后完成 A、B 加载，第二次 onLoadedKeysChange 含 a 与 b；受控同批完成回写不丢键     |
-| X01-F019 | P3   | W9   | Core  | 样式 | 仅指定 easing 的过渡配置被忽略                      | type:'fade' 只设两个 easing 为 ease-linear 时，返回类含 ease-linear 且保留预设时长             |
-| X01-F020 | P3   | W9   | Core  | 样式 | collapse 过渡 helper 没有声明 max-height 过渡       | 默认 collapse 预设或 duration:500 配置下，返回类生效的过渡属性包含 max-height                  |
 | X01-F021 | P3   | W1   | Core  | 安全 | 初始化脚本未编码 HTML script 结束边界               | storageKey 含 \</script>\<p id=x01-breakout> 时不产生额外 p，scriptCount 为 1                  |
 | X01-F022 | P2   | W2   | React | 行为 | React FeedbackHost 在未提交 render 后残留活动作用域 | Suspense 中 FeedbackHost 执行后子节点挂起再卸载，无残留活动 scope，通知不进无渲染者队列        |
 
 ### X02 主题、样式与 i18n
 
-报告 `project/themes-styling-i18n.md`，队列状态 complete。另受 X01-F019、X01-F020、X01-F021、X01-F022 影响。
+报告 `project/themes-styling-i18n.md`，队列状态 complete。另受 X01-F021、X01-F022 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                        | 验收                                                                              |
 | -------- | ---- | ---- | ---- | ---- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |

@@ -70,6 +70,27 @@ describe('Transition System', () => {
       expect(result.leaveActive).toContain('duration-[500ms]')
       expect(result.enterFrom).toBe(transitionPresets.fade.enterFrom)
     })
+
+    it('overrides easing without replacing the preset duration', () => {
+      const result = getTransitionClasses({
+        type: 'fade',
+        enterEasing: 'ease-linear',
+        leaveEasing: 'ease-linear'
+      })
+      for (const active of [result.enterActive, result.leaveActive]) {
+        expect(active).toContain('ease-linear')
+        expect(active).toContain('duration-300')
+      }
+    })
+
+    it('transitions collapse height with both preset and custom durations', () => {
+      for (const config of ['collapse', { type: 'collapse', duration: 500 }] as const) {
+        const result = getTransitionClasses(config)
+        for (const active of [result.enterActive, result.leaveActive]) {
+          expect(active).toContain('transition-property:max-height,opacity')
+        }
+      }
+    })
   })
 
   describe('componentTransitionMap', () => {

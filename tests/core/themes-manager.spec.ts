@@ -8,6 +8,7 @@ import {
   defaultTheme,
   vibrantTheme,
   themeConfigToCssVars,
+  themeTransitionValue,
   setCssVarsCached,
   removeCssVarsCached,
   type ThemeChangeEvent,
@@ -212,11 +213,18 @@ describe('themes/manager — theme scope', () => {
           '--tiger-shadow-md': '0 8px 16px rgb(0 0 0 / 0.2)',
           '--tiger-spacing-md': '1rem',
           '--tiger-motion-duration-base': '240ms',
-          '--tiger-transition-base':
-            'color, background-color, border-color, outline-color, text-decoration-color, box-shadow, opacity, transform 240ms cubic-bezier(0.4, 0, 0.2, 1)',
+          '--tiger-transition-base': themeTransitionValue('240ms', 'cubic-bezier(0.4, 0, 0.2, 1)'),
           '--tiger-breakpoint-md': '768px'
         })
       )
+    })
+
+    it('assigns the duration and easing to every transition property', () => {
+      const transitions = themeTransitionValue('200ms', 'linear').split(', ')
+      expect(transitions).toHaveLength(8)
+      for (const transition of transitions) {
+        expect(transition).toMatch(/^\S+ 200ms linear$/)
+      }
     })
   })
 

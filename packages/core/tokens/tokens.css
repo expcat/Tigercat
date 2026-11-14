@@ -248,14 +248,26 @@
   --tiger-motion-duration-slow: 300ms;
   --tiger-motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --tiger-transition-base:
-    color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-    opacity, transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    color 200ms cubic-bezier(0.4, 0, 0.2, 1), background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    outline-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    text-decoration-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --tiger-transition-quick:
-    color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-    opacity, transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    color 150ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    outline-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    text-decoration-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --tiger-transition-emphasized:
-    color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-    opacity, transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    color 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    outline-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    text-decoration-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
   --tiger-breakpoint-xs: 0px;
   --tiger-breakpoint-sm: 640px;
   --tiger-breakpoint-md: 768px;
@@ -337,14 +349,26 @@
   --tiger-motion-duration-slow: 300ms;
   --tiger-motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --tiger-transition-base:
-    color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-    opacity, transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    color 200ms cubic-bezier(0.4, 0, 0.2, 1), background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    outline-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    text-decoration-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --tiger-transition-quick:
-    color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-    opacity, transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    color 150ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    outline-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    text-decoration-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --tiger-transition-emphasized:
-    color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-    opacity, transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    color 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    outline-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    text-decoration-color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
   --tiger-breakpoint-xs: 0px;
   --tiger-breakpoint-sm: 640px;
   --tiger-breakpoint-md: 768px;
@@ -355,19 +379,23 @@
 
 @media (prefers-reduced-motion: reduce) {
   :root,
-  .dark {
-    --tiger-motion-duration-quick: 0ms;
-    --tiger-motion-duration-base: 0ms;
-    --tiger-motion-duration-slow: 0ms;
+  .dark,
+  [data-tiger-theme-scope] {
+    --tiger-motion-duration-quick: 0ms !important;
+    --tiger-motion-duration-base: 0ms !important;
+    --tiger-motion-duration-slow: 0ms !important;
     --tiger-transition-quick:
-      color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-      opacity, transform 0ms linear;
+      color 0ms linear, background-color 0ms linear, border-color 0ms linear,
+      outline-color 0ms linear, text-decoration-color 0ms linear, box-shadow 0ms linear,
+      opacity 0ms linear, transform 0ms linear !important;
     --tiger-transition-base:
-      color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-      opacity, transform 0ms linear;
+      color 0ms linear, background-color 0ms linear, border-color 0ms linear,
+      outline-color 0ms linear, text-decoration-color 0ms linear, box-shadow 0ms linear,
+      opacity 0ms linear, transform 0ms linear !important;
     --tiger-transition-emphasized:
-      color, background-color, border-color, outline-color, text-decoration-color, box-shadow,
-      opacity, transform 0ms linear;
+      color 0ms linear, background-color 0ms linear, border-color 0ms linear,
+      outline-color 0ms linear, text-decoration-color 0ms linear, box-shadow 0ms linear,
+      opacity 0ms linear, transform 0ms linear !important;
   }
   .tiger-motion-aware,
   .tiger-motion-aware::before,
@@ -381,31 +409,33 @@
 
 @media (prefers-contrast: more) {
   :root,
-  .dark {
-    --tiger-border: var(--tiger-border-strong);
-    --tiger-text-secondary: var(--tiger-text);
+  .dark,
+  [data-tiger-theme-scope] {
+    --tiger-border: var(--tiger-border-strong) !important;
+    --tiger-text-secondary: var(--tiger-text) !important;
   }
 }
 
 @media (forced-colors: active) {
   :root,
-  .dark {
-    --tiger-text: CanvasText;
-    --tiger-text-secondary: LinkText;
-    --tiger-surface: Canvas;
-    --tiger-surface-muted: Canvas;
-    --tiger-surface-raised: Canvas;
-    --tiger-border: CanvasText;
-    --tiger-border-strong: CanvasText;
-    --tiger-focus-ring: Highlight;
-    --tiger-primary: LinkText;
-    --tiger-primary-foreground: Canvas;
-    --tiger-success: LinkText;
-    --tiger-warning: CanvasText;
-    --tiger-error: CanvasText;
-    --tiger-info: LinkText;
-    --tiger-text-disabled: GrayText;
-    color-scheme: light dark;
+  .dark,
+  [data-tiger-theme-scope] {
+    --tiger-text: CanvasText !important;
+    --tiger-text-secondary: LinkText !important;
+    --tiger-surface: Canvas !important;
+    --tiger-surface-muted: Canvas !important;
+    --tiger-surface-raised: Canvas !important;
+    --tiger-border: CanvasText !important;
+    --tiger-border-strong: CanvasText !important;
+    --tiger-focus-ring: Highlight !important;
+    --tiger-primary: LinkText !important;
+    --tiger-primary-foreground: Canvas !important;
+    --tiger-success: LinkText !important;
+    --tiger-warning: CanvasText !important;
+    --tiger-error: CanvasText !important;
+    --tiger-info: LinkText !important;
+    --tiger-text-disabled: GrayText !important;
+    color-scheme: light dark !important;
   }
   :focus,
   :focus-visible {

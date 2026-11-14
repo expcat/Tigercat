@@ -102,7 +102,9 @@ const THEME_TRANSITION_CSS_VARS = {
 } as const
 
 export function themeTransitionValue(duration: string, easing: string): string {
-  return `${THEME_TRANSITION_PROPERTIES} ${duration} ${easing}`
+  return THEME_TRANSITION_PROPERTIES.split(', ')
+    .map((property) => `${property} ${duration} ${easing}`)
+    .join(', ')
 }
 
 const DEFAULT_TRANSITION_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)'

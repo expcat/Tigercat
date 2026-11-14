@@ -36,30 +36,30 @@ export const forcedColorsFocusOutline = {
 
 export const forcedColorsCss = `
 @media (prefers-contrast: more) {
-  :root, .dark {
-    --tiger-border: var(--tiger-border-strong);
-    --tiger-text-secondary: var(--tiger-text);
+  :root, .dark, [data-tiger-theme-scope] {
+    --tiger-border: var(--tiger-border-strong) !important;
+    --tiger-text-secondary: var(--tiger-text) !important;
   }
 }
 
 @media (forced-colors: active) {
-  :root, .dark {
-    --tiger-text: CanvasText;
-    --tiger-text-secondary: LinkText;
-    --tiger-surface: Canvas;
-    --tiger-surface-muted: Canvas;
-    --tiger-surface-raised: Canvas;
-    --tiger-border: CanvasText;
-    --tiger-border-strong: CanvasText;
-    --tiger-focus-ring: Highlight;
-    --tiger-primary: LinkText;
-    --tiger-primary-foreground: Canvas;
-    --tiger-success: LinkText;
-    --tiger-warning: CanvasText;
-    --tiger-error: CanvasText;
-    --tiger-info: LinkText;
-    --tiger-text-disabled: GrayText;
-    color-scheme: light dark;
+  :root, .dark, [data-tiger-theme-scope] {
+    --tiger-text: CanvasText !important;
+    --tiger-text-secondary: LinkText !important;
+    --tiger-surface: Canvas !important;
+    --tiger-surface-muted: Canvas !important;
+    --tiger-surface-raised: Canvas !important;
+    --tiger-border: CanvasText !important;
+    --tiger-border-strong: CanvasText !important;
+    --tiger-focus-ring: Highlight !important;
+    --tiger-primary: LinkText !important;
+    --tiger-primary-foreground: Canvas !important;
+    --tiger-success: LinkText !important;
+    --tiger-warning: CanvasText !important;
+    --tiger-error: CanvasText !important;
+    --tiger-info: LinkText !important;
+    --tiger-text-disabled: GrayText !important;
+    color-scheme: light dark !important;
   }
   :focus, :focus-visible {
     outline: 2px solid Highlight;

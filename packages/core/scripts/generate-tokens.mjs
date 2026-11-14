@@ -125,7 +125,9 @@ const TRANSITION_PROPERTIES =
   'color, background-color, border-color, outline-color, text-decoration-color, box-shadow, opacity, transform'
 
 function transitionValue(duration, easing) {
-  return `${TRANSITION_PROPERTIES} ${duration} ${easing}`
+  return TRANSITION_PROPERTIES.split(', ')
+    .map((property) => `${property} ${duration} ${easing}`)
+    .join(', ')
 }
 
 const RUNTIME_BREAKPOINT_CSS_VARS = {
@@ -293,13 +295,23 @@ function cssRule(selector, decls, pad) {
 }
 
 function renderForcedColorsCss() {
+  const preferenceVars = (vars) =>
+    Object.fromEntries(Object.entries(vars).map(([name, value]) => [name, `${value} !important`]))
   return [
     '@media (prefers-contrast: more) {',
-    cssRule(':root, .dark', forcedColorsFact.contrastVars, '  '),
+    cssRule(
+      ':root, .dark, [data-tiger-theme-scope]',
+      preferenceVars(forcedColorsFact.contrastVars),
+      '  '
+    ),
     '}',
     '',
     '@media (forced-colors: active) {',
-    cssRule(':root, .dark', forcedColorsFact.activeVars, '  '),
+    cssRule(
+      ':root, .dark, [data-tiger-theme-scope]',
+      preferenceVars(forcedColorsFact.activeVars),
+      '  '
+    ),
     cssRule(':focus, :focus-visible', forcedColorsFact.focusOutline, '  '),
     '}'
   ].join('\n')
@@ -412,13 +424,13 @@ function generateCSS() {
   lines.push('}')
   lines.push('')
   lines.push('@media (prefers-reduced-motion: reduce) {')
-  lines.push('  :root, .dark {')
-  lines.push('    --tiger-motion-duration-quick: 0ms;')
-  lines.push('    --tiger-motion-duration-base: 0ms;')
-  lines.push('    --tiger-motion-duration-slow: 0ms;')
-  lines.push(`    --tiger-transition-quick: ${transitionValue('0ms', 'linear')};`)
-  lines.push(`    --tiger-transition-base: ${transitionValue('0ms', 'linear')};`)
-  lines.push(`    --tiger-transition-emphasized: ${transitionValue('0ms', 'linear')};`)
+  lines.push('  :root, .dark, [data-tiger-theme-scope] {')
+  lines.push('    --tiger-motion-duration-quick: 0ms !important;')
+  lines.push('    --tiger-motion-duration-base: 0ms !important;')
+  lines.push('    --tiger-motion-duration-slow: 0ms !important;')
+  lines.push(`    --tiger-transition-quick: ${transitionValue('0ms', 'linear')} !important;`)
+  lines.push(`    --tiger-transition-base: ${transitionValue('0ms', 'linear')} !important;`)
+  lines.push(`    --tiger-transition-emphasized: ${transitionValue('0ms', 'linear')} !important;`)
   lines.push('  }')
   lines.push(
     '  .tiger-motion-aware, .tiger-motion-aware::before, .tiger-motion-aware::after, [data-tiger-motion] {'

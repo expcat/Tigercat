@@ -80,18 +80,25 @@ export const tigercatDarkTheme = cssVarsForPreset(defaultTheme, 'dark')
 const highContrastLight = cssVarsForPreset(highContrastTheme, 'light')
 const highContrastDark = cssVarsForPreset(highContrastTheme, 'dark')
 
-const reducedMotionVars = {
+/** Media preferences must also beat the unlayered rules written by runtime scopes. */
+function mediaVars(vars: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(vars).map(([name, value]) => [name, `${value} !important`])
+  )
+}
+
+const reducedMotionVars = mediaVars({
   '--tiger-motion-duration-quick': '0ms',
   '--tiger-motion-duration-base': '0ms',
   '--tiger-motion-duration-slow': '0ms',
   '--tiger-transition-quick': themeTransitionValue('0ms', 'linear'),
   '--tiger-transition-base': themeTransitionValue('0ms', 'linear'),
   '--tiger-transition-emphasized': themeTransitionValue('0ms', 'linear')
-}
+})
 
 const tigercatReducedMotionBase = {
   '@media (prefers-reduced-motion: reduce)': {
-    ':root, .dark': reducedMotionVars,
+    ':root, .dark, [data-tiger-theme-scope]': reducedMotionVars,
     '.tiger-motion-aware, .tiger-motion-aware::before, .tiger-motion-aware::after, [data-tiger-motion]':
       {
         animationDuration: '0ms',
@@ -105,19 +112,20 @@ const tigercatReducedMotionBase = {
 }
 
 const tigercatForcedColorsBase = {
-  '@media (forced-colors: active)': {
-    ':root, .dark': { ...forcedColorsActiveVars },
-    ':focus, :focus-visible': { ...forcedColorsFocusOutline }
-  },
   '@media (prefers-contrast: more)': {
-    ':root': {
+    ':where(:root, [data-tiger-theme-scope])': mediaVars({
       ...highContrastLight,
       ...forcedColorsContrastVars
-    },
-    '.dark': {
-      ...highContrastDark,
-      ...forcedColorsContrastVars
-    }
+    }),
+    ':where(.dark, .dark [data-tiger-theme-scope]:not([data-tiger-color-scheme="light"]), [data-tiger-theme-scope][data-tiger-color-scheme="dark"])':
+      mediaVars({
+        ...highContrastDark,
+        ...forcedColorsContrastVars
+      })
+  },
+  '@media (forced-colors: active)': {
+    ':root, .dark, [data-tiger-theme-scope]': mediaVars(forcedColorsActiveVars),
+    ':focus, :focus-visible': { ...forcedColorsFocusOutline }
   }
 }
 
@@ -165,8 +173,8 @@ function pluginBase(preset: ThemePreset): Record<string, unknown> {
       ':root': { ...cssVarsForPreset(preset, 'light'), ...componentMetricVars },
       '.dark': cssVarsForPreset(preset, 'dark')
     },
-    tigercatReducedMotionBase,
     tigercatForcedColorsBase,
+    tigercatReducedMotionBase,
     ...tigercatComponentStyleParts
   ])
 }
