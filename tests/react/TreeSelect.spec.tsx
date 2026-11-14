@@ -102,6 +102,34 @@ describe('TreeSelect', () => {
     expect(getByRole('combobox')).toHaveTextContent('Apple')
   })
 
+  it('does not select an initially active disabled node with Enter', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <TreeSelect
+        treeData={[
+          { key: 'blocked', label: 'Blocked', disabled: true },
+          { key: 'enabled', label: 'Enabled' }
+        ]}
+        defaultOpen
+        placeholder="Select a node"
+        onChange={onChange}
+        aria-label="Disabled node"
+      />
+    )
+    const trigger = screen.getByRole('combobox')
+    const blocked = screen.getByRole('treeitem', { name: 'Blocked' })
+    expect(blocked).toHaveAttribute('aria-disabled', 'true')
+    expect(trigger).toHaveAttribute('aria-activedescendant', blocked.id)
+    expect(trigger).toHaveTextContent('Select a node')
+
+    trigger.focus()
+    await user.keyboard('{Enter}')
+
+    expect(onChange).not.toHaveBeenCalled()
+    expect(trigger).toHaveTextContent('Select a node')
+  })
+
   it('expands selected ancestors when opening without defaultExpandAll', async () => {
     const user = userEvent.setup()
     const { getByRole } = render(

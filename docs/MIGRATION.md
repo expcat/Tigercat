@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React TreeSelect 默认展开且首节点禁用时，Enter 不再提交该节点或触发 `onChange`，显示值保持原样。调用方式不用改。
+
 React Select 打开后按 Tab 关闭面板时，焦点现在停在原生 Tab 移到的后续控件。搜索模式会先让 Tab 完成焦点移动，再卸载输入框；关闭后不再异步把焦点拉回 combobox。调用方式不用改，Escape 关闭和选项提交后的回焦不变。
 
 工作流成功 action 返回实例中的 `formValues` 现在与旧实例深隔离。成功 comment 后把新实例的 `formValues.details.amount` 从 100 改为 999，旧实例仍为 100。WorkflowDetailShell 与 WorkflowTimeline 宿主继续通过返回的新实例更新状态，调用方式不用改。

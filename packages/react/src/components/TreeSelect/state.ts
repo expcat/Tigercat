@@ -303,6 +303,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
     (key: string | number) => {
       if (isReadOnly || effectiveDisabled) return
       const node = visibleItems.find((item) => sameTreeKey(item.key, key))?.node
+      if (node?.disabled) return
       if (node) rememberTreeSelectLabel(labelCacheRef.current, key, node.label)
       const next = commitTreeSelectNode({
         treeData,

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **TreeSelect 禁用节点键盘（React，X01-F014）**：最终提交时检查节点的 disabled 状态。defaultOpen 且首节点禁用时，聚焦后按 Enter 不触发 onChange，显示值保持不变；方向键处理不变。
+
 - **Select Tab 关闭焦点（React，X01-F013）**：Tab 先完成原生焦点移动再关闭面板，关闭流程不再异步回焦 combobox。普通与 searchable Select 按 Tab 后，下拉关闭且等帧后焦点仍在后续 After 控件；Escape 关闭和选择后回焦保留。
 
 - **工作流实例快照（Core / Vue / React，X01-F012）**：成功 action 返回实例时深拷贝 `formValues`，复用表单值快照的克隆工具。成功 comment 后把新实例 `details.amount` 改为 999，旧实例仍保留 100；WorkflowDetailShell 与 WorkflowTimeline 宿主不再共享这部分嵌套数据。
