@@ -640,6 +640,26 @@ describe('Dropdown', () => {
     })
   })
 
+  it('moves typeahead focus past separators in items', () => {
+    render(
+      <Dropdown
+        open
+        items={[
+          { key: 'alpha', label: 'Alpha' },
+          { key: 'separator', type: 'separator' },
+          { key: 'zulu', label: 'Zulu' }
+        ]}>
+        <button type="button">Open</button>
+      </Dropdown>
+    )
+
+    const alpha = screen.getByRole('menuitem', { name: 'Alpha' })
+    alpha.focus()
+    expect(alpha).toHaveFocus()
+    fireEvent.keyDown(alpha, { key: 'z' })
+    expect(screen.getByRole('menuitem', { name: 'Zulu' })).toHaveFocus()
+  })
+
   it('opens an items submenu from More with ArrowRight or click', () => {
     const items = [
       {

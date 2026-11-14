@@ -164,6 +164,26 @@ describe('ContextMenu', () => {
   })
 
   describe('keyboard', () => {
+    it('moves typeahead focus past separators in items', () => {
+      render(
+        <ContextMenu
+          open
+          items={[
+            { key: 'alpha', label: 'Alpha' },
+            { key: 'separator', type: 'separator' },
+            { key: 'zulu', label: 'Zulu' }
+          ]}>
+          <div>Surface</div>
+        </ContextMenu>
+      )
+
+      const alpha = screen.getByRole('menuitem', { name: 'Alpha' })
+      alpha.focus()
+      expect(alpha).toHaveFocus()
+      fireEvent.keyDown(alpha, { key: 'z' })
+      expect(screen.getByRole('menuitem', { name: 'Zulu' })).toHaveFocus()
+    })
+
     it('opens on Shift+F10 and moves focus with arrows', async () => {
       render(<Demo />)
       const trigger = screen.getByText('Surface').closest('[data-tiger-context-menu-trigger]')!

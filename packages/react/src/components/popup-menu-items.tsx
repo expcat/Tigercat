@@ -35,14 +35,14 @@ export function PopupMenuList({ items, onCheck, onSelect, onClose }: PopupMenuLi
     const nodes = Array.from(
       listRef.current?.querySelectorAll<HTMLElement>('[data-tiger-popup-item]') ?? []
     )
-    const labels = items.map((item) => item.label ?? '')
+    const labels = nodes.map((node) => node.textContent ?? '')
     const current = event.target instanceof HTMLElement ? event.target : null
     const from = current ? Math.max(0, nodes.indexOf(current)) : 0
     const hit = typeaheadRef.current.push(
       event.key,
       labels,
       from,
-      items.map((item) => Boolean(item.disabled))
+      nodes.map((node) => node.matches(':disabled, [aria-disabled="true"]'))
     )
     if (hit && hit.index >= 0) {
       event.preventDefault()

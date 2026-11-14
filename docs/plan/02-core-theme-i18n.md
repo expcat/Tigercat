@@ -13,14 +13,10 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 - 不为单个组件在框架层加分支。
 
-## 依赖与顺序
-
-- X01-F017 先于 06 里 ContextMenu、Dropdown 的 `items` 分支条目（C088-F03、C088-F06）。
-
 ## 概览
 
-本篇 5 条：P1 0、P2 4、P3 1。
-按波次：W2 4、W9 1。
+本篇 4 条：P1 0、P2 3、P3 1。
+按波次：W2 3、W9 1。
 
 ## 波及多个组件的条目
 
@@ -28,7 +24,6 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 | 条目                                                         | 归属                 | 同验                              |
 | ------------------------------------------------------------ | -------------------- | --------------------------------- |
-| X01-F017 React popup typeahead 的数据索引与 DOM 索引错位     | 共享 Core 与框架基础 | ContextMenu、Dropdown             |
 | X01-F022 React FeedbackHost 在未提交 render 后残留活动作用域 | 共享 Core 与框架基础 | ConfigProvider、主题、样式与 i18n |
 
 ## 条目
@@ -39,7 +34,6 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                | 验收                                                                                       |
 | -------- | ---- | ---- | ----- | ---- | --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| X01-F017 | P2   | W2   | React | 键盘 | React popup typeahead 的数据索引与 DOM 索引错位     | React Dropdown items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu       |
 | X01-F018 | P2   | W2   | React | 行为 | React Tree 的 loaded keys 回调丢失先前完成项        | React Tree 先后完成 A、B 加载，第二次 onLoadedKeysChange 含 a 与 b；受控同批完成回写不丢键 |
 | X01-F022 | P2   | W2   | React | 行为 | React FeedbackHost 在未提交 render 后残留活动作用域 | Suspense 中 FeedbackHost 执行后子节点挂起再卸载，无残留活动 scope，通知不进无渲染者队列    |
 

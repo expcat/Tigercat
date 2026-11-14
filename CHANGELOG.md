@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **菜单 items 字符定位（React，X01-F017）**：Dropdown 与 ContextMenu 的 typeahead 从已渲染菜单项读取匹配文本和禁用状态，与焦点目标共用 DOM 索引。items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu，不再停在 Alpha。
+
 - **TreeSelect 禁用节点键盘（React，X01-F014）**：最终提交时检查节点的 disabled 状态。defaultOpen 且首节点禁用时，聚焦后按 Enter 不触发 onChange，显示值保持不变；方向键处理不变。
 
 - **Select Tab 关闭焦点（React，X01-F013）**：Tab 先完成原生焦点移动再关闭面板，关闭流程不再异步回焦 combobox。普通与 searchable Select 按 Tab 后，下拉关闭且等帧后焦点仍在后续 After 控件；Escape 关闭和选择后回焦保留。

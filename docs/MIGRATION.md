@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React Dropdown 与 ContextMenu 的 `items` 含 separator 时，字符定位现在按已渲染菜单项匹配并移动焦点。items 为 Alpha、separator、Zulu，聚焦 Alpha 输入 z 后会到 Zulu；此前焦点留在 Alpha。调用方式不用改。
+
 React TreeSelect 默认展开且首节点禁用时，Enter 不再提交该节点或触发 `onChange`，显示值保持原样。调用方式不用改。
 
 React Select 打开后按 Tab 关闭面板时，焦点现在停在原生 Tab 移到的后续控件。搜索模式会先让 Tab 完成焦点移动，再卸载输入框；关闭后不再异步把焦点拉回 combobox。调用方式不用改，Escape 关闭和选项提交后的回焦不变。
