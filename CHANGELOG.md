@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **BreadcrumbItem 动作项（Vue，C087-F01）**：从组件 vnode 读取 click 监听器，无 href、非 current、带 `@click` 的子项现在输出 `button type="button"`，点击回调一次。
+
 - **Breadcrumb 折叠点击（Vue / React，C086-F01）**：折叠菜单保留原 BreadcrumbItem 的点击处理器与 target，并复用链接地址门禁补齐安全 rel。Demo03 点击「一级目录」与可见「首页」一样，在事件到达 body 前取消原生导航。
 
 - **Upload 预览来源（Core，C081-F05）**：白名单改为完整 origin 严格匹配。允许 `https://cdn.example` 的图片，同时拒绝 `https://cdn.example.evil.test/a.png`，不再把 URL 字符串前缀当成允许的来源。

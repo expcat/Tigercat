@@ -1,6 +1,7 @@
 import {
   defineComponent,
   computed,
+  getCurrentInstance,
   inject,
   provide,
   reactive,
@@ -119,7 +120,7 @@ export const BreadcrumbItem = defineComponent({
   },
   setup(props, { slots, emit, attrs }) {
     const isCurrent = computed(() => resolveBreadcrumbItemCurrent(props.current, props.isLast))
-    const hasHandler = typeof (attrs as { onClick?: unknown }).onClick === 'function'
+    const instance = getCurrentInstance()
 
     const handleClick = (event: MouseEvent) => {
       if (!isCurrent.value) emit('click', event)
@@ -146,7 +147,7 @@ export const BreadcrumbItem = defineComponent({
           },
           contentElements
         )
-      } else if (hasHandler) {
+      } else if (instance?.vnode.props?.onClick) {
         control = h(
           'button',
           { type: 'button', class: linkClasses, onClick: handleClick },

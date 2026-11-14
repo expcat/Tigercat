@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+Vue BreadcrumbItem 在没有合法 `href`、非 current 且带 `@click` 时，现在输出 `button type="button"`，点击触发一次回调；此前输出不可交互的 span。调用方式不用改，依赖该项 span 标签的样式选择器请适配 button。
+
 双端 Breadcrumb 的折叠菜单现在保留原 BreadcrumbItem 的 `onClick` / `@click` 与 `target`，`target="_blank"` 同样补齐安全 `rel`。点击折叠项会执行原处理器，`preventDefault()` 可取消原生导航；Demo03 的「一级目录」与可见「首页」行为一致。调用方式不用改。
 
 Upload 的 `allowedPreviewOrigins` 现在与 URL 解析后的完整 origin 严格比较。`['https://cdn.example']` 允许 `https://cdn.example/a.png`，拒绝 `https://cdn.example.evil.test/a.png`。此前传完整 URL 或路径前缀的调用点请改传 origin（协议、主机与非默认端口）。未传或传空白名单时仍允许 http(s) URL，`blob:` 对象 URL 始终允许。

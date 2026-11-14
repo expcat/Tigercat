@@ -118,6 +118,23 @@ describe('Breadcrumb', () => {
   })
 
   describe('Events', () => {
+    it('renders a button and emits click once for an action item without href', async () => {
+      const handleClick = vi.fn()
+      const user = userEvent.setup()
+      render(Breadcrumb, {
+        slots: {
+          default: () => [
+            h(BreadcrumbItem, { current: false, onClick: handleClick }, () => 'Action'),
+            h(BreadcrumbItem, {}, () => 'Current')
+          ]
+        }
+      })
+      const button = screen.getByRole('button', { name: 'Action' })
+      expect(button).toHaveAttribute('type', 'button')
+      await user.click(button)
+      expect(handleClick).toHaveBeenCalledTimes(1)
+    })
+
     it('emits click when a link item is clicked', async () => {
       const handleClick = vi.fn()
       const user = userEvent.setup()
