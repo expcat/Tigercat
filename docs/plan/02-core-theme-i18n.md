@@ -1,0 +1,84 @@
+# 02 共享 Core、主题与 i18n
+
+[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
+
+X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份专题里，没有移到 [01](01-shared-root-causes.md) 的条目。这两份专题没有主责 Demo，证据是源码执行、happy-dom 和 Chromium 计算样式。
+
+## 目标
+
+- 表单引擎、浮层触发器、工作流权限、菜单 schema 这几处共享层的错在源头修掉，组件层不各自绕。
+- 主题和 i18n 的剩余项补齐，生成物由生成器重出。
+
+## 非目标
+
+- 不为单个组件在框架层加分支。
+- X02-F001、X02-F002、X02-F003 已移到 01，这里不重复。
+
+## 依赖与顺序
+
+- X01-F002 先做。[07](07-feedback.md) 的 Tooltip、Popover、Popconfirm 和 [06](06-navigation.md) 的 Dropdown、ContextMenu 在 Vue 侧都经过这个触发器。
+- X01-F016、X01-F017 先于 06 里 ContextMenu、Dropdown 的 `items` 分支条目（C088-F03、C088-F06）。
+- X01-F015 与 [05](05-form.md) 的 TimePicker 条目同批。C078 的报告补充：Vue 桌面列同样只绑了 click。
+- X01-F003 的 readOnly 合并契约还没确认，见 [14](14-waves.md#开工前要先定方向的条目)。
+- X01-F019、X01-F020 与 S04 同批；X02-F004 与 S06 同批。
+
+## 概览
+
+本篇 25 条：P1 5、P2 16、P3 4。
+按波次：W1 6、W2 16、W9 3。
+
+已移到 [01](01-shared-root-causes.md) 的条目：X02-F001（S04）、X02-F002（S05）、X02-F003（S06）。
+
+本篇的 P1：X01-F001、X01-F002、X01-F003、X01-F015、X01-F016。
+
+## 波及多个组件的条目
+
+这些条目的行在下面各组件的表里。修的时候把右列的组件一起验。
+
+| 条目                                                         | 归属                 | 同验                              |
+| ------------------------------------------------------------ | -------------------- | --------------------------------- |
+| X01-F002 Vue 浮层触发器清除子按钮的 disabled                 | 共享 Core 与框架基础 | Button、ContextMenu、Dropdown     |
+| X01-F016 React items 子菜单只有悬停打开路径                  | 共享 Core 与框架基础 | ContextMenu、Dropdown             |
+| X01-F017 React popup typeahead 的数据索引与 DOM 索引错位     | 共享 Core 与框架基础 | ContextMenu、Dropdown             |
+| X01-F022 React FeedbackHost 在未提交 render 后残留活动作用域 | 共享 Core 与框架基础 | ConfigProvider、主题、样式与 i18n |
+
+## 条目
+
+### X01 共享 Core 与框架基础
+
+报告 `project/shared-core.md`，队列状态 complete。
+
+| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                | 验收                                                                                           |
+| -------- | ---- | ---- | ----- | ---- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| X01-F001 | P1   | W1   | Core  | 行为 | Date 字段的新值被表单引擎丢弃                       | 字段已是 1 月 1 日的 Date，setFieldValue 写入 2 月 1 日后模型更新，onValuesChange 与订阅各触发 |
+| X01-F002 | P1   | W1   | Vue   | 行为 | Vue 浮层触发器清除子按钮的 disabled                 | Vue Tooltip/Popover/Popconfirm/Dropdown/ContextMenu 内 disabled 按钮仍禁用                     |
+| X01-F003 | P1   | W1   | Core  | 行为 | 工作流权限派生重新启用 schema 已禁用字段            | initiate 下 schema disabled:true 字段仍禁用、不在 editable names、提交保留 original            |
+| X01-F004 | P2   | W2   | Core  | 键盘 | Calendar 年视图上下键只移动一个月                   | 双端 Calendar 年视图 January 按下键到 April，April 按上键到 January                            |
+| X01-F005 | P2   | W2   | Core  | 行为 | 图表系列 key 的去重结果仍会重复                     | 系列名 ['x','x','x-2'] 生成三个互不相同的 key（LineChart/AreaChart/RadarChart）                |
+| X01-F006 | P2   | W2   | Core  | 行为 | Toast 自动编号覆盖显式数字 key 的条目               | 先加 key:1 再加未指定 key 的消息，队列保留两条（Message/NotificationContainer）                |
+| X01-F007 | P2   | W2   | Core  | 行为 | 空 OR 高级筛选条件放行全部记录                      | 已有 name = Alice 再加空值、logic 为 or 的规则，Table 仍只保留 Alice                           |
+| X01-F008 | P2   | W2   | Core  | 行为 | 异步确认移除上传文件时丢失后来加入的文件            | Upload 移除 A 等待异步确认时加入 B，允许移除后列表为 [b.txt] 而非空数组                        |
+| X01-F009 | P2   | W2   | Core  | 行为 | customRequest 同步抛错后上传状态无法重试            | Upload 的 customRequest 同步抛错后状态为 error、onError 触发一次，retry 能再次发起请求         |
+| X01-F010 | P2   | W2   | Core  | 行为 | 表格重复对象引用行丢失各自源索引                    | 同一无 id 对象出现在 dataSource 两处且开启本地处理时，Table 源索引为 [0,1]                     |
+| X01-F011 | P2   | W2   | Vue   | 行为 | Vue Table 排序复位页码时漏发 page-change            | Vue Table 非受控第 2 页排序复位到第 1 页时发出一次 page-change，与 React 一致                  |
+| X01-F012 | P2   | W2   | Core  | 行为 | 工作流成功 action 的结果共享旧实例嵌套数据          | 新实例 amount 改 999 后旧实例仍为 100（WorkflowDetailShell/WorkflowTimeline 宿主）             |
+| X01-F013 | P2   | W2   | React | 键盘 | React Select 关闭时把 Tab 已移出的焦点拉回          | 打开 React Select 后按 Tab，下拉关闭且等帧后焦点仍停在后续控件 After                           |
+| X01-F014 | P2   | W2   | React | 键盘 | React TreeSelect 可用 Enter 选中禁用节点            | defaultOpen 且首节点 disabled:true 时按 Enter 不触发 onChange，显示值不变                      |
+| X01-F015 | P1   | W1   | React | 键盘 | React TimePicker 桌面选项无法通过键盘选入草稿       | 初始 10:00，聚焦 10 Hour 按下键到 11 Hour 再 Enter、确定，提交 11:00 并触发 onChange           |
+| X01-F016 | P1   | W1   | React | 键盘 | React items 子菜单只有悬停打开路径                  | items 含 submenu 时，聚焦 More 后 ArrowRight 或 click 使 expanded 为 true、子菜单出现          |
+| X01-F017 | P2   | W2   | React | 键盘 | React popup typeahead 的数据索引与 DOM 索引错位     | React Dropdown items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu           |
+| X01-F018 | P2   | W2   | React | 行为 | React Tree 的 loaded keys 回调丢失先前完成项        | React Tree 先后完成 A、B 加载，第二次 onLoadedKeysChange 含 a 与 b；受控同批完成回写不丢键     |
+| X01-F019 | P3   | W9   | Core  | 样式 | 仅指定 easing 的过渡配置被忽略                      | type:'fade' 只设两个 easing 为 ease-linear 时，返回类含 ease-linear 且保留预设时长             |
+| X01-F020 | P3   | W9   | Core  | 样式 | collapse 过渡 helper 没有声明 max-height 过渡       | 默认 collapse 预设或 duration:500 配置下，返回类生效的过渡属性包含 max-height                  |
+| X01-F021 | P3   | W1   | Core  | 安全 | 初始化脚本未编码 HTML script 结束边界               | storageKey 含 \</script>\<p id=x01-breakout> 时不产生额外 p，scriptCount 为 1                  |
+| X01-F022 | P2   | W2   | React | 行为 | React FeedbackHost 在未提交 render 后残留活动作用域 | Suspense 中 FeedbackHost 执行后子节点挂起再卸载，无残留活动 scope，通知不进无渲染者队列        |
+
+### X02 主题、样式与 i18n
+
+报告 `project/themes-styling-i18n.md`，队列状态 complete。另受 X01-F019、X01-F020、X01-F021、X01-F022 影响。
+
+| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                        | 验收                                                                              |
+| -------- | ---- | ---- | ---- | ---- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| X02-F004 | P2   | W2   | Core | i18n | 所有语言包共同缺少重复 key 校验文案                         | zh-CN/zh-TW/fr-FR 下 WorkflowDesigner 的 duplicate_key 校验文案为对应语言而非英语 |
+| X02-F005 | P3   | W9   | Core | 样式 | Figma 的 4 个 lineHeight CSS 变量名不存在                   | Figma 4 个行高变量名为 --tiger-primitive-font-lh-\*，167 个变量都在 tokens.css 中 |
+| X02-F006 | P2   | W2   | Core | i18n | 公开 DatePicker 文案 helper 缺少兜底且 undefined 覆盖有效值 | getDatePickerLabels() 返回完整英语文案；zhCN 加 {today:undefined} 仍得「今天」    |
