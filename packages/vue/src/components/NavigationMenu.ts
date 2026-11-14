@@ -40,6 +40,8 @@ import {
   getNavigationMenuItemValue,
   getNavigationMenuRovingTabIndex,
   getNavigationMenuTabExitTarget,
+  navigationMenuValueId,
+  sameNavigationMenuValue,
   NAVIGATION_MENU_ENTER_CLASS,
   NAVIGATION_MENU_CHEVRON_PATH,
   NAVIGATION_MENU_BAR_ITEM_ATTR,
@@ -81,7 +83,7 @@ function indicatorStyle(
 ): Record<string, string> {
   if (!list || current == null) return getNavigationMenuIndicatorStyle(0, 0)
   const trigger = list.querySelector<HTMLElement>(
-    `[data-tiger-navigation-menu-value="${String(current)}"]`
+    `[data-tiger-navigation-menu-value="${navigationMenuValueId(current)}"]`
   )
   if (!trigger) return getNavigationMenuIndicatorStyle(0, 0)
   const dir = getComputedStyle(list).direction === 'rtl' ? 'rtl' : 'ltr'
@@ -339,7 +341,9 @@ export const NavigationMenuLink = defineComponent({
           role: inMegaPanel ? undefined : 'menuitem',
           tabindex: tabIndex,
           [NAVIGATION_MENU_BAR_ITEM_ATTR]: inPanel || isDisabled ? undefined : '',
-          [NAVIGATION_MENU_ITEM_VALUE_ATTR]: inPanel ? undefined : String(item?.value ?? ''),
+          [NAVIGATION_MENU_ITEM_VALUE_ATTR]: inPanel
+            ? undefined
+            : navigationMenuValueId(item?.value),
           'aria-disabled': isDisabled || undefined,
           'aria-current': props.active ? 'page' : undefined,
           disabled: tag === 'button' ? isDisabled : undefined,
@@ -485,7 +489,7 @@ export const NavigationMenuTrigger = defineComponent({
           role: 'menuitem',
           tabindex: getNavigationMenuRovingTabIndex(item.value, root?.tabStopValue.value),
           [NAVIGATION_MENU_BAR_ITEM_ATTR]: disabled.value ? undefined : '',
-          [NAVIGATION_MENU_ITEM_VALUE_ATTR]: String(item.value),
+          [NAVIGATION_MENU_ITEM_VALUE_ATTR]: navigationMenuValueId(item.value),
           'aria-haspopup': item.mega.value ? undefined : 'menu',
           'aria-expanded': item.isOpen.value,
           'aria-controls': item.contentId,
@@ -686,10 +690,16 @@ export const NavigationMenuContent = defineComponent({
             'div',
             {
               ...restAttrs,
+              id: item.contentId,
+              ref: item.contentRef,
               class: innerClasses.value,
               style: mergedStyle.value,
               role: 'menu',
-              'data-tiger-navigation-menu-content': ''
+              'data-tiger-navigation-menu-content': '',
+              onMouseenter: handleMouseEnter,
+              onMouseleave: handleMouseLeave,
+              onFocusout: handleFocusOut,
+              onKeydown: handleKeyDown
             },
             slots.default?.()
           )
@@ -864,7 +874,7 @@ export const NavigationMenuList = defineComponent({
         items: getNavigationMenuBarItems(listRef.value),
         tabStopValue: root.tabStopValue.value
       })
-      if (next != null && next !== String(root.tabStopValue.value ?? '')) {
+      if (next != null && !sameNavigationMenuValue(next, root.tabStopValue.value)) {
         root.setTabStopValue(next)
       }
     }

@@ -16,6 +16,7 @@ import {
   NAVIGATION_MENU_ITEM_VALUE_ATTR,
   getNavigationMenuBarItems,
   isNavigationMenuValueOpen,
+  parseNavigationMenuValueId,
   sameNavigationMenuValue
 } from './navigation-menu-utils'
 import type { NavigationMenuValue } from '../types/navigation-menu'
@@ -51,9 +52,11 @@ export function resolveElementDir(element: HTMLElement | null | undefined): 'ltr
   return marked === 'rtl' ? 'rtl' : 'ltr'
 }
 
-export function getNavigationMenuItemValue(element: HTMLElement | null): string | null {
+export function getNavigationMenuItemValue(
+  element: HTMLElement | null
+): NavigationMenuValue | null {
   if (!element) return null
-  return element.getAttribute(NAVIGATION_MENU_ITEM_VALUE_ATTR)
+  return parseNavigationMenuValueId(element.getAttribute(NAVIGATION_MENU_ITEM_VALUE_ATTR))
 }
 
 export function getNavigationMenuRovingTabIndex(
@@ -67,12 +70,12 @@ export function getNavigationMenuRovingTabIndex(
 export function resolveNavigationMenuTabStopValue(options: {
   items: HTMLElement[]
   tabStopValue: NavigationMenuValue | null | undefined
-}): string | null {
+}): NavigationMenuValue | null {
   const { items, tabStopValue } = options
   if (items.length === 0) return null
   if (tabStopValue != null && tabStopValue !== '') {
     const match = items.find((el) =>
-      sameNavigationMenuValue(getNavigationMenuItemValue(el) ?? '', tabStopValue)
+      sameNavigationMenuValue(getNavigationMenuItemValue(el), tabStopValue)
     )
     if (match) return getNavigationMenuItemValue(match)
   }

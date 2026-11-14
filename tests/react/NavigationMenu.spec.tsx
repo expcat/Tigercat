@@ -248,6 +248,76 @@ describe('NavigationMenu', () => {
     expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'false')
   })
 
+  it('keeps one tab stop when every item value is numeric', () => {
+    render(
+      <NavigationMenu delayDuration={0} skipDelayDuration={0}>
+        <NavigationMenuList>
+          <NavigationMenuItem value={1}>
+            <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <NavigationMenuLink href="/overview">Overview</NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem value={2}>
+            <NavigationMenuTrigger>Docs</NavigationMenuTrigger>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    )
+
+    expect(screen.getByRole('menuitem', { name: 'Products' }).tabIndex).toBe(0)
+    expect(screen.getByRole('menuitem', { name: 'Docs' }).tabIndex).toBe(-1)
+  })
+
+  it('targets only the type-matching item for the current indicator', () => {
+    render(
+      <NavigationMenu delayDuration={0} skipDelayDuration={0} current={1}>
+        <NavigationMenuList>
+          <NavigationMenuItem value="1">
+            <NavigationMenuTrigger>String one</NavigationMenuTrigger>
+          </NavigationMenuItem>
+          <NavigationMenuItem value={1}>
+            <NavigationMenuTrigger>Number one</NavigationMenuTrigger>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    )
+
+    screen.getByRole('menuitem', { name: 'String one' }).getBoundingClientRect = () =>
+      new DOMRect(0, 0, 10, 32)
+    screen.getByRole('menuitem', { name: 'Number one' }).getBoundingClientRect = () =>
+      new DOMRect(40, 0, 10, 32)
+    screen.getByRole('menubar').getBoundingClientRect = () => new DOMRect(0, 0, 100, 32)
+    fireEvent.focus(screen.getByRole('menuitem', { name: 'Number one' }))
+
+    const indicator = document.querySelector('[data-tiger-navigation-indicator]')
+    expect(indicator?.style.insetInlineStart).toBe('40px')
+  })
+
+  it('keeps keyboard focus and panel keys inside a shared viewport', async () => {
+    render(<Demo viewport />)
+    const trigger = screen.getByRole('menuitem', { name: 'Products' })
+    trigger.focus()
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+
+    const controlsId = trigger.getAttribute('aria-controls')
+    expect(controlsId).toBeTruthy()
+    const panel = document.getElementById(controlsId ?? '')
+    expect(panel).toHaveAttribute('role', 'menu')
+    await waitFor(() => {
+      expect(screen.getByRole('menuitem', { name: 'Overview' })).toHaveFocus()
+    })
+
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Overview' }), { key: 'ArrowDown' })
+    expect(screen.getByRole('menuitem', { name: 'Pricing' })).toHaveFocus()
+
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Pricing' }), { key: 'Escape' })
+    await waitFor(() => {
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+    expect(trigger).toHaveFocus()
+  })
+
   it('keeps pointer focus on the trigger so a panel link click can run', () => {
     render(<Demo defaultValue="products" />)
     const overview = screen.getByRole('menuitem', { name: 'Overview' })

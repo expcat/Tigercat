@@ -17,31 +17,27 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 ## 依赖与顺序
 
 - ContextMenu 与 Dropdown 共用实现：C088-F03、C088-F06 和 [02](02-core-theme-i18n.md) 的 X01-F017 一起做。
-- NavigationMenu：先 C102-F01、C102-F02、C102-F03，再做 Content、Item、Link、List、Trigger 的条目。
+- NavigationMenu：先 C102-F03，再做 Item、Link、List、Trigger 的条目。
 - Affix 的 16 格没有任何浏览器证据，见 [13](13-evidence.md) 的 E03。
 
 ## 概览
 
-本篇 72 条：P1 2、P2 54、P3 16。
-按波次：W1 2、W4 54、W9 16。
+本篇 70 条：P2 54、P3 16。
+按波次：W4 54、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
-
-本篇的 P1：C102-F01、C102-F02。
 
 ## 波及多个组件的条目
 
 这些条目的行在下面各组件的表里。修的时候把右列的组件一起验。
 
-| 条目                                                            | 归属           | 同验                                                                                 |
-| --------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------ |
-| C082-F01 固定后从已写死尺寸的占位反读，宽高不能跟随布局变化     | Affix          | Anchor、AnchorLink                                                                   |
-| C084-F01 两端丢弃调用方 rel，`_blank` 时自定义 token 也丢失     | AnchorLink     | Breadcrumb、BreadcrumbItem                                                           |
-| C088-F03 React items 分支忽略 closeOnClick=false                | ContextMenu    | Dropdown、DropdownItem                                                               |
-| C088-F06 schema 菜单方向键跳过 checkbox 和 radio 项             | ContextMenu    | Dropdown、DropdownItem                                                               |
-| C102-F01 共享 viewport 丢失面板 id、焦点入口与键盘处理          | NavigationMenu | NavigationMenuContent、NavigationMenuItem、NavigationMenuLink、NavigationMenuTrigger |
-| C102-F02 DOM 字符串化破坏数值键的 tab stop，并混淆 current 类型 | NavigationMenu | NavigationMenuItem、NavigationMenuLink、NavigationMenuList、NavigationMenuTrigger    |
-| C102-F03 React 现有 axe 用例命中 menubar 必需子角色违规         | NavigationMenu | NavigationMenuLink、NavigationMenuList                                               |
+| 条目                                                        | 归属           | 同验                                   |
+| ----------------------------------------------------------- | -------------- | -------------------------------------- |
+| C082-F01 固定后从已写死尺寸的占位反读，宽高不能跟随布局变化 | Affix          | Anchor、AnchorLink                     |
+| C084-F01 两端丢弃调用方 rel，`_blank` 时自定义 token 也丢失 | AnchorLink     | Breadcrumb、BreadcrumbItem             |
+| C088-F03 React items 分支忽略 closeOnClick=false            | ContextMenu    | Dropdown、DropdownItem                 |
+| C088-F06 schema 菜单方向键跳过 checkbox 和 radio 项         | ContextMenu    | Dropdown、DropdownItem                 |
+| C102-F03 React 现有 axe 用例命中 menubar 必需子角色违规     | NavigationMenu | NavigationMenuLink、NavigationMenuList |
 
 ## 条目
 
@@ -160,10 +156,10 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 报告 `groups/navigation/Menu.md`，队列状态 needs-evidence。另受 S01 影响。
 
-| 编号     | 级别 | 波次 | 端        | 类别   | 条目                                    | 验收                                                                                          |
-| -------- | ---- | ---- | --------- | ------ | --------------------------------------- | --------------------------------------------------------------------------------------------- |
-| C098-F03 | P2   | W4   | 双端      | 行为   | items 与默认内容混用规则在双端相反      | 同时传 items（Data item）与默认内容（Slot item）时双端渲染结果相同，且 Props 文档写明混用规则 |
-| C098-F04 | P3   | W9   | Core+测试 | 文档   | 数字 key 的注释与测试名反向描述实际契约 | menu-utils.ts 注释与 menu-controller.spec.ts 测试名均写明 1 与「1」不相等，断言不变           |
+| 编号     | 级别 | 波次 | 端        | 类别 | 条目                                    | 验收                                                                                          |
+| -------- | ---- | ---- | --------- | ---- | --------------------------------------- | --------------------------------------------------------------------------------------------- |
+| C098-F03 | P2   | W4   | 双端      | 行为 | items 与默认内容混用规则在双端相反      | 同时传 items（Data item）与默认内容（Slot item）时双端渲染结果相同，且 Props 文档写明混用规则 |
+| C098-F04 | P3   | W9   | Core+测试 | 文档 | 数字 key 的注释与测试名反向描述实际契约 | menu-utils.ts 注释与 menu-controller.spec.ts 测试名均写明 1 与「1」不相等，断言不变           |
 
 ### C099 MenuItem
 
@@ -197,15 +193,13 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 报告 `groups/navigation/NavigationMenu.md`，队列状态 needs-evidence。另受 S01、S04 影响。
 
-| 编号     | 级别 | 波次 | 端        | 类别   | 条目                                                   | 验收                                                                                     |
-| -------- | ---- | ---- | --------- | ------ | ------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| C102-F01 | P1   | W1   | 双端      | 键盘   | 共享 viewport 丢失面板 id、焦点入口与键盘处理          | 开 viewport 后打开普通 Content：aria-controls 指向实际面板，键盘打开聚焦首项，面板键生效 |
-| C102-F02 | P1   | W1   | Core+双端 | 键盘   | DOM 字符串化破坏数值键的 tab stop，并混淆 current 类型 | 纯数值 item value 首次 Tab 有一项 tabIndex=0；1 与「1」并存时 current 只选类型匹配项     |
-| C102-F03 | P2   | W4   | React     | 无障碍 | React 现有 axe 用例命中 menubar 必需子角色违规         | TIGER_A11Y=1 下 React NavigationMenu spec 的 axe 用例通过（现 29 过 1 败）               |
+| 编号     | 级别 | 波次 | 端    | 类别   | 条目                                           | 验收                                                                       |
+| -------- | ---- | ---- | ----- | ------ | ---------------------------------------------- | -------------------------------------------------------------------------- |
+| C102-F03 | P2   | W4   | React | 无障碍 | React 现有 axe 用例命中 menubar 必需子角色违规 | TIGER_A11Y=1 下 React NavigationMenu spec 的 axe 用例通过（现 29 过 1 败） |
 
 ### C104 NavigationMenuItem
 
-报告 `groups/navigation/NavigationMenuItem.md`，队列状态 needs-evidence。另受 S01、S02、S07、C102-F01、C102-F02 影响。
+报告 `groups/navigation/NavigationMenuItem.md`，队列状态 needs-evidence。另受 S01、S02、S07 影响。
 
 | 编号     | 级别 | 波次 | 端          | 类别 | 条目                                                        | 验收                                                                         |
 | -------- | ---- | ---- | ----------- | ---- | ----------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -214,7 +208,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C105 NavigationMenuLink
 
-报告 `groups/navigation/NavigationMenuLink.md`，队列状态 needs-evidence。另受 S01、S02、C102-F01、C102-F02、C102-F03 影响。
+报告 `groups/navigation/NavigationMenuLink.md`，队列状态 needs-evidence。另受 S01、S02、C102-F03 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                  | 验收                                                                                    |
 | -------- | ---- | ---- | ---- | ---- | ------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -222,7 +216,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C106 NavigationMenuList
 
-报告 `groups/navigation/NavigationMenuList.md`，队列状态 needs-evidence。另受 S02、C102-F02、C102-F03、C104-F02 影响。
+报告 `groups/navigation/NavigationMenuList.md`，队列状态 needs-evidence。另受 S02、C102-F03、C104-F02 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                 | 验收                                                                               |
 | -------- | ---- | ---- | ----- | ---- | ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -231,7 +225,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C107 NavigationMenuTrigger
 
-报告 `groups/navigation/NavigationMenuTrigger.md`，队列状态 needs-evidence。另受 S01、S02、S04、C102-F01、C102-F02 影响。
+报告 `groups/navigation/NavigationMenuTrigger.md`，队列状态 needs-evidence。另受 S01、S02、S04 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                 | 验收                                                                                |
 | -------- | ---- | ---- | ----- | ---- | ------------------------------------ | ----------------------------------------------------------------------------------- |

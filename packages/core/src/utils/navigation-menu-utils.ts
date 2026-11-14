@@ -53,6 +53,22 @@ export function navigationMenuValueId(
 }
 
 /**
+ * Decode a `navigationMenuValueId` DOM attribute back to its typed value.
+ * Values without a type prefix are treated as plain strings.
+ */
+export function parseNavigationMenuValueId(
+  id: string | null | undefined
+): NavigationMenuValue | null {
+  if (id == null || id === '') return null
+  if (id.startsWith('n:')) {
+    const numeric = Number(id.slice(2))
+    return Number.isFinite(numeric) ? numeric : null
+  }
+  if (id.startsWith('s:')) return id.slice(2)
+  return id
+}
+
+/**
  * Whether two item keys identify the same panel / trigger.
  */
 export function sameNavigationMenuValue(

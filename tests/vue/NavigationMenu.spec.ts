@@ -4,7 +4,7 @@
 
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { h } from 'vue'
+import { h, nextTick } from 'vue'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -231,6 +231,88 @@ describe('NavigationMenu', () => {
       }
     })
     expect(screen.getByRole('menuitem', { name: 'One' })).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('keeps one tab stop when every item value is numeric', async () => {
+    render(NavigationMenu, {
+      props: { delayDuration: 0, skipDelayDuration: 0 },
+      slots: {
+        default: () => [
+          h(NavigationMenuList, null, () => [
+            h(NavigationMenuItem, { value: 1 }, () => [
+              h(NavigationMenuTrigger, null, () => 'Products'),
+              h(NavigationMenuContent, null, () => [
+                h(NavigationMenuLink, { href: '/overview' }, () => 'Overview')
+              ])
+            ]),
+            h(NavigationMenuItem, { value: 2 }, () => [
+              h(NavigationMenuTrigger, null, () => 'Docs')
+            ])
+          ])
+        ]
+      }
+    })
+
+    expect((await screen.findByRole('menuitem', { name: 'Products' })).tabIndex).toBe(0)
+    expect(screen.getByRole('menuitem', { name: 'Docs' }).tabIndex).toBe(-1)
+  })
+
+  it('targets only the type-matching item for the current indicator', async () => {
+    const view = render(NavigationMenu, {
+      props: { delayDuration: 0, skipDelayDuration: 0, current: 2 },
+      slots: {
+        default: () => [
+          h(NavigationMenuList, null, () => [
+            h(NavigationMenuItem, { value: '1' }, () => [
+              h(NavigationMenuTrigger, null, () => 'String one')
+            ]),
+            h(NavigationMenuItem, { value: 1 }, () => [
+              h(NavigationMenuTrigger, null, () => 'Number one')
+            ])
+          ])
+        ]
+      }
+    })
+
+    const stringOne = await screen.findByRole('menuitem', { name: 'String one' })
+    const numberOne = screen.getByRole('menuitem', { name: 'Number one' })
+    stringOne.getBoundingClientRect = () => new DOMRect(0, 0, 10, 32)
+    numberOne.getBoundingClientRect = () => new DOMRect(40, 0, 10, 32)
+    screen.getByRole('menubar').getBoundingClientRect = () => new DOMRect(0, 0, 100, 32)
+    fireEvent.focus(numberOne)
+    await nextTick()
+    view.rerender({ delayDuration: 0, skipDelayDuration: 0, current: 1 })
+    await nextTick()
+
+    const indicator = document.querySelector('[data-tiger-navigation-indicator]')
+    expect(indicator?.style.insetInlineStart).toBe('40px')
+  })
+
+  it('keeps keyboard focus and panel keys inside a shared viewport', async () => {
+    renderNav({ viewport: true })
+    const trigger = screen.getByRole('menuitem', { name: 'Products' })
+    trigger.focus()
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+
+    const controlsId = trigger.getAttribute('aria-controls')
+    expect(controlsId).toBeTruthy()
+    await waitFor(() => {
+      expect(document.getElementById(controlsId ?? '')).toBeTruthy()
+    })
+    const panel = document.getElementById(controlsId ?? '')
+    expect(panel).toHaveAttribute('role', 'menu')
+    await waitFor(() => {
+      expect(screen.getByRole('menuitem', { name: 'Overview' })).toHaveFocus()
+    })
+
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Overview' }), { key: 'ArrowDown' })
+    expect(screen.getByRole('menuitem', { name: 'Pricing' })).toHaveFocus()
+
+    fireEvent.keyDown(screen.getByRole('menuitem', { name: 'Pricing' }), { key: 'Escape' })
+    await waitFor(() => {
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+    expect(trigger).toHaveFocus()
   })
 
   it('keeps pointer focus on the trigger so a panel link click can run', () => {

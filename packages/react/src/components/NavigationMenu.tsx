@@ -38,6 +38,8 @@ import {
   isNavigationMenuOpen,
   isNavigationMenuTriggerOpenKey,
   isNavigationMenuValueOpen,
+  navigationMenuValueId,
+  sameNavigationMenuValue,
   NAVIGATION_MENU_BAR_ITEM_ATTR,
   NAVIGATION_MENU_CHEVRON_PATH,
   NAVIGATION_MENU_DEFAULT_DELAY_DURATION,
@@ -242,7 +244,7 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
       role: inPanel && content?.mega ? undefined : ('menuitem' as const),
       tabIndex,
       [NAVIGATION_MENU_BAR_ITEM_ATTR]: inPanel || isDisabled ? undefined : '',
-      [NAVIGATION_MENU_ITEM_VALUE_ATTR]: inPanel ? undefined : String(item?.value ?? ''),
+      [NAVIGATION_MENU_ITEM_VALUE_ATTR]: inPanel ? undefined : navigationMenuValueId(item?.value),
       'aria-disabled': isDisabled || undefined,
       'aria-current': active ? ('page' as const) : undefined,
       'data-tiger-navigation-menu-link': '',
@@ -380,7 +382,7 @@ export const NavigationMenuTrigger = React.forwardRef<
       role="menuitem"
       tabIndex={tabIndex}
       {...{ [NAVIGATION_MENU_BAR_ITEM_ATTR]: isDisabled ? undefined : '' }}
-      {...{ [NAVIGATION_MENU_ITEM_VALUE_ATTR]: String(item.value) }}
+      {...{ [NAVIGATION_MENU_ITEM_VALUE_ATTR]: navigationMenuValueId(item.value) }}
       aria-haspopup={item.mega ? undefined : 'menu'}
       aria-expanded={item.isOpen}
       aria-controls={item.contentId}
@@ -464,57 +466,63 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
     onDismiss: () => item?.close({ restoreFocus: false })
   })
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     item?.cancelClose()
-  }
+  }, [item])
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     if (!root?.openOnHover) return
     item?.scheduleClose()
-  }
+  }, [root?.openOnHover, item])
 
-  const handleFocusOut = (event: React.FocusEvent<HTMLDivElement>) => {
-    root?.handleFocusLeave(event)
-  }
+  const handleFocusOut = useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      root?.handleFocusLeave(event)
+    },
+    [root]
+  )
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const panel = contentRef.current
-    if (!panel || !item || !root) return
-    const dir = resolveElementDir(root.rootRef.current ?? root.menubarRef.current)
-    const action = applyNavigationMenuPanelKey({
-      event: event.nativeEvent,
-      panel,
-      dir,
-      mode: mega ? 'mega' : 'menu'
-    })
-    if (!action || action === 'menu-nav') return
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const panel = contentRef.current
+      if (!panel || !item || !root) return
+      const dir = resolveElementDir(root.rootRef.current ?? root.menubarRef.current)
+      const action = applyNavigationMenuPanelKey({
+        event: event.nativeEvent,
+        panel,
+        dir,
+        mode: mega ? 'mega' : 'menu'
+      })
+      if (!action || action === 'menu-nav') return
 
-    event.stopPropagation()
+      event.stopPropagation()
 
-    if (action === 'close-to-trigger') {
-      item.close()
-      item.triggerRef.current?.focus()
-      return
-    }
+      if (action === 'close-to-trigger') {
+        item.close()
+        item.triggerRef.current?.focus()
+        return
+      }
 
-    if (action === 'move-menubar-next' && root.menubarRef.current) {
-      item.close({ restoreFocus: false })
-      item.triggerRef.current?.focus()
-      const next = handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
-      const value = getNavigationMenuItemValue(next)
-      if (value != null) root.setTabStopValue(value)
-      return
-    }
+      if (action === 'move-menubar-next' && root.menubarRef.current) {
+        item.close({ restoreFocus: false })
+        item.triggerRef.current?.focus()
+        const next = handleMenubarNavigation(root.menubarRef.current, event.nativeEvent)
+        const value = getNavigationMenuItemValue(next)
+        if (value != null) root.setTabStopValue(value)
+        return
+      }
 
-    if (action === 'tab-exit' || action === 'shift-tab-exit') {
-      const nav = root.rootRef.current
-      const target = nav
-        ? getNavigationMenuTabExitTarget(nav, panel, action === 'shift-tab-exit')
-        : null
-      item.close({ restoreFocus: false })
-      target?.focus()
-    }
-  }
+      if (action === 'tab-exit' || action === 'shift-tab-exit') {
+        const nav = root.rootRef.current
+        const target = nav
+          ? getNavigationMenuTabExitTarget(nav, panel, action === 'shift-tab-exit')
+          : null
+        item.close({ restoreFocus: false })
+        target?.focus()
+      }
+    },
+    [contentRef, item, mega, root]
+  )
 
   const panelChildren = useMemo(
     () => (
@@ -536,15 +544,35 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
       owner,
       <div
         {...divProps}
+        id={item.contentId}
+        ref={contentRef as React.RefObject<HTMLDivElement>}
         className={classNames(getNavigationMenuContentClasses(mega), className)}
         style={style}
         role="menu"
-        data-tiger-navigation-menu-content="">
+        data-tiger-navigation-menu-content=""
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onBlur={handleFocusOut}
+        onKeyDown={handleKeyDown}>
         {panelChildren}
       </div>
     )
     return () => root.clearViewportContent(owner)
-  }, [root, mega, item, isOpen, panelChildren, divProps, className, style])
+  }, [
+    root,
+    mega,
+    item,
+    isOpen,
+    panelChildren,
+    divProps,
+    className,
+    style,
+    contentRef,
+    handleFocusOut,
+    handleKeyDown,
+    handleMouseEnter,
+    handleMouseLeave
+  ])
 
   if (!item || !root) return null
   if (root.viewport && !mega) return null
@@ -730,7 +758,7 @@ export const NavigationMenuList: React.FC<NavigationMenuListProps> = ({
       return
     }
     const trigger = list.querySelector<HTMLElement>(
-      `[${NAVIGATION_MENU_ITEM_VALUE_ATTR}="${String(root.current)}"]`
+      `[${NAVIGATION_MENU_ITEM_VALUE_ATTR}="${navigationMenuValueId(root.current)}"]`
     )
     if (!trigger) {
       setIndicatorStyle(undefined)
@@ -756,7 +784,7 @@ export const NavigationMenuList: React.FC<NavigationMenuListProps> = ({
       items: getNavigationMenuBarItems(list),
       tabStopValue: root.tabStopValue
     })
-    if (next != null && next !== String(root.tabStopValue ?? '')) {
+    if (next != null && !sameNavigationMenuValue(next, root.tabStopValue)) {
       root.setTabStopValue(next)
     }
   })
