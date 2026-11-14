@@ -5,12 +5,13 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import { fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { nextTick } from 'vue'
+import { h, nextTick } from 'vue'
 import {
   DEFAULT_FLOATING_HOVER_HIDE_DELAY_MS,
   DEFAULT_FLOATING_HOVER_SHOW_DELAY_MS
 } from '@expcat/tigercat-core'
 import { Tooltip } from '@expcat/tigercat-vue/Tooltip'
+import { Button } from '@expcat/tigercat-vue/Button'
 import { renderWithProps, renderWithSlots, expectNoA11yViolationsIsolated } from '../utils'
 
 describe('Tooltip', () => {
@@ -32,6 +33,28 @@ describe('Tooltip', () => {
     )
 
     expect(getByText('Trigger')).toBeInTheDocument()
+  })
+
+  it('keeps a disabled child button disabled', () => {
+    for (const disabled of [true, ''] as const) {
+      const view = renderWithSlots(
+        Tooltip,
+        {
+          default: () => h('button', { disabled: disabled as boolean }, 'Unavailable')
+        },
+        { content: 'Reason unavailable' }
+      )
+
+      expect(view.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
+      view.unmount()
+    }
+
+    const buttonChild = renderWithSlots(
+      Tooltip,
+      { default: () => h(Button, { disabled: true }, () => 'Unavailable') },
+      { content: 'Reason unavailable' }
+    )
+    expect(buttonChild.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
   })
 
   it('does not render without trigger element', () => {

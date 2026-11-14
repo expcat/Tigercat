@@ -51,6 +51,10 @@ function isSingleVNode(child: OverlayTriggerRenderOptions['child']): child is VN
   return isVNode(child)
 }
 
+function isOverlayChildDisabled(value: unknown): boolean {
+  return value === '' || Boolean(value)
+}
+
 export function renderOverlayTrigger(options: OverlayTriggerRenderOptions): VNode {
   const {
     asChild,
@@ -92,15 +96,14 @@ export function renderOverlayTrigger(options: OverlayTriggerRenderOptions): VNod
   }
 
   if (mergeable && isSingleVNode(single)) {
+    const childProps = single.props as { class?: unknown; disabled?: unknown } | null
+    const mergedDisabled = Boolean(disabled) || isOverlayChildDisabled(childProps?.disabled)
     return cloneVNode(single, {
       ref: setTriggerRef,
-      class: classNames(
-        (single.props as { class?: unknown } | null)?.class as string | undefined,
-        className
-      ),
-      disabled: disabled || undefined,
+      class: classNames(childProps?.class as string | undefined, className),
       ...aria,
-      ...mergedHandlers
+      ...mergedHandlers,
+      ...(mergedDisabled ? { disabled: true } : {})
     })
   }
 

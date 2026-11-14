@@ -19,6 +19,20 @@ describe.sequential('Popconfirm', () => {
     vi.restoreAllMocks()
   })
 
+  it('keeps a disabled child button disabled', () => {
+    for (const disabled of [true, ''] as const) {
+      const view = render(Popconfirm, {
+        props: { title: 'Confirm?' },
+        slots: {
+          default: () => h('button', { disabled: disabled as boolean }, 'Unavailable')
+        }
+      })
+
+      expect(view.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
+      view.unmount()
+    }
+  })
+
   it('opens on trigger click and closes on cancel/confirm', async () => {
     const user = userEvent.setup()
     const { getByText, queryByText } = render(Popconfirm, {

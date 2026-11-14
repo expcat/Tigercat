@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **浮层触发器（Vue，X01-F002）**：Tooltip、Popover、Popconfirm、Dropdown 与 ContextMenu 合并子按钮时保留 disabled。浮层未禁用时，子按钮的 `disabled: true` 和静态 `disabled` 仍保持禁用；浮层自身禁用时触发器继续禁用。
+
 - **表单 Date 字段（Core，X01-F001）**：表单值相等比较按时间区分 Date。字段已是 1 月 1 日时，`setFieldValue` 写入 2 月 1 日会更新模型，并各触发一次 `onValuesChange` 与订阅。相同时间点的 Date 仍视为未变化，不进入撤销历史。
 
 - **Vue Props 类型（Vue / Core，S13）**：Breadcrumb、Card、ContextMenu、DataExport、Drawer、FloatButton、Form、FormItem、Kbd、Modal、Pagination、Popover、Select、Sidebar、Slider、Space、Splitter、Steps、StepsItem、Tabs、Tooltip、Tree 与 TreeSelect 导出的 `Vue*Props` 与运行时 props 键一致。`VueTreeSelectProps` / `TreeSelectProps` 不再声明 `height`，列表高度用 `listHeight`。Kbd 的 `keys` 接受只读数组。Core `PopoverProps` 增加可选 `closeOnScroll`。这 23 个接口少一个字段或多一个字段时，`pnpm types:check` 失败。

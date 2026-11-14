@@ -51,6 +51,22 @@ describe('ContextMenu', () => {
     expect(screen.getByText('Delete')).toBeInTheDocument()
   })
 
+  it('keeps a disabled child button disabled', () => {
+    for (const disabled of [true, ''] as const) {
+      const view = render(ContextMenu, {
+        slots: {
+          default: () => [
+            h('button', { disabled: disabled as boolean }, 'Unavailable'),
+            h(ContextMenuMenu, null, () => h(ContextMenuItem, null, () => 'Copy'))
+          ]
+        }
+      })
+
+      expect(view.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
+      view.unmount()
+    }
+  })
+
   it('is absent until opened', () => {
     renderMenu()
     expect(document.querySelector('[data-tiger-context-menu]')).toBeNull()

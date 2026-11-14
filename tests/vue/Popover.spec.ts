@@ -40,6 +40,21 @@ describe('Popover', () => {
       expect(getByText('Trigger')).toBeInTheDocument()
     })
 
+    it('keeps a disabled child button disabled', () => {
+      for (const disabled of [true, ''] as const) {
+        const view = renderWithSlots(
+          Popover,
+          {
+            default: () => h('button', { disabled: disabled as boolean }, 'Unavailable')
+          },
+          { content: 'Popover content' }
+        )
+
+        expect(view.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
+        view.unmount()
+      }
+    })
+
     it('should not show popover content initially', () => {
       const { queryByText } = renderWithSlots(
         Popover,

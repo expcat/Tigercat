@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+Vue 的 Tooltip、Popover、Popconfirm、Dropdown 和 ContextMenu 合并触发器时保留子按钮自己的 disabled。浮层本身未禁用时，包住的 `<button disabled>` 或 `disabled` 的 Button 仍然不可点击。此前合并会清掉子节点的 disabled，按钮变成可点。浮层自身的 disabled 仍会禁用触发器。
+
 表单引擎按时间比较 Date。字段已有某个 Date 时，`setFieldValue`、批量写入或替换模型中的另一个时间会更新值，并触发 `onValuesChange` 与 `subscribe`。此前两个 Date 没有可枚举键，会被当成相等，新值被丢弃且不通知。相同时间点的 Date 仍然不会重复通知，普通对象和数组的比较不变。直接调用 `formValuesEqual` 时，Date 与非 Date 不再相等。
 
 Vue 的 TreeSelect 公开类型不再包含 `height`。`VueTreeSelectProps` 与 `TreeSelectProps` 改用 `listHeight`；`listHeight` 为 80 时，树列表的内联 `max-height` 仍是 `80px`。运行时原本就不读取 `height`。

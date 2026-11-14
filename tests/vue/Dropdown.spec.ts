@@ -31,6 +31,22 @@ describe('Dropdown', () => {
     expect(screen.queryByText('Item 2')).not.toBeInTheDocument()
   })
 
+  it('keeps a disabled child button disabled', () => {
+    for (const disabled of [true, ''] as const) {
+      const view = render(Dropdown, {
+        slots: {
+          default: () => [
+            h('button', { disabled: disabled as boolean }, 'Unavailable'),
+            h(DropdownMenu, null, () => h(DropdownItem, null, () => 'Item 1'))
+          ]
+        }
+      })
+
+      expect(view.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
+      view.unmount()
+    }
+  })
+
   it('exposes data-state on the trigger reflecting open state', async () => {
     const { container } = render(Dropdown, {
       props: { trigger: 'click' },
