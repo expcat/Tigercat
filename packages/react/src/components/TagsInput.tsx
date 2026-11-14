@@ -339,8 +339,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(function T
           className={getTagsInputClearButtonClasses()}
           onMouseDown={(event) => event.preventDefault()}
           onClick={handleClear}
-          aria-label={labels.clearAllLabel}
-          tabIndex={-1}>
+          aria-label={labels.clearAllLabel}>
           <Icon name="close" size="sm" aria-hidden />
         </button>
       )}

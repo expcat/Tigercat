@@ -378,8 +378,7 @@ export const TagsInput = defineComponent({
               class: getTagsInputClearButtonClasses(),
               onMousedown: (event: Event) => event.preventDefault(),
               onClick: handleClear,
-              'aria-label': labels.value.clearAllLabel,
-              tabindex: -1
+              'aria-label': labels.value.clearAllLabel
             },
             [h(Icon, { name: 'close', size: 'sm', 'aria-hidden': true })]
           )

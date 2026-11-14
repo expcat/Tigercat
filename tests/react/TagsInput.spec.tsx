@@ -125,6 +125,34 @@ describe('TagsInput', () => {
   })
 
   describe('Accessibility', () => {
+    it.each(['{Enter}', ' '])(
+      'clears once with %s after Tab and returns focus to the input',
+      async (key) => {
+        const user = userEvent.setup()
+        const onChange = vi.fn()
+        const onClear = vi.fn()
+        const { getByRole, queryByRole, queryAllByRole } = render(
+          <TagsInput
+            defaultValue={['a', 'b']}
+            clearable
+            onChange={onChange}
+            onClear={onClear}
+            aria-label="Tags"
+          />
+        )
+        const input = getByRole('textbox', { name: 'Tags' })
+        input.focus()
+        await user.tab()
+        expect(getByRole('button', { name: 'Clear all tags' })).toHaveFocus()
+        await user.keyboard(key)
+        expect(onChange).toHaveBeenCalledExactlyOnceWith([])
+        expect(onClear).toHaveBeenCalledTimes(1)
+        expect(queryAllByRole('listitem')).toHaveLength(0)
+        expect(queryByRole('button', { name: 'Clear all tags' })).not.toBeInTheDocument()
+        expect(input).toHaveFocus()
+      }
+    )
+
     it('marks the input invalid and links the FormItem error message', () => {
       const { getByRole, getByText } = render(
         <Form>

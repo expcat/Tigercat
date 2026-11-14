@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **TagsInput 清空按钮（Vue / React，C076-F03）**：有标签且 `clearable=true` 时，清空按钮进入自然 Tab 顺序，Enter / Space 各触发一次清空并把焦点送回输入框。
+
 - **Mentions 键盘（Vue / React，C068-F01）**：提及位置、前缀与查询内容未变化时，keyup 保留当前候选和面板状态。输入 `@` 后完整按松 ArrowDown 停在 Bob、End 停在 Charlie，Escape 后面板保持关闭；继续输入新查询仍能打开候选。
 
 - **List 键盘与加载态（Vue / React，C043-F01、C043-F02、C043-F03）**：虚拟容器保留命名列表语义与 Tab / 方向键入口，每行仅输出一个列表项。`renderItem` 配行点击时可聚焦并用 Enter / Space 激活，内部按钮独立响应。加载内容区设为 inert、内置按钮禁用，保留 aria-busy，加载结束后恢复交互。

@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { TagsInput } from '@expcat/tigercat-vue/TagsInput'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -84,6 +85,34 @@ describe('TagsInput', () => {
   })
 
   describe('Accessibility', () => {
+    it.each(['{Enter}', ' '])(
+      'clears once with %s after Tab and returns focus to the input',
+      async (key) => {
+        const user = userEvent.setup()
+        const onUpdate = vi.fn()
+        const onClear = vi.fn()
+        const { getByRole, queryByRole, queryAllByRole } = render(TagsInput, {
+          props: {
+            defaultValue: ['a', 'b'],
+            clearable: true,
+            'onUpdate:modelValue': onUpdate,
+            onClear
+          },
+          attrs: { 'aria-label': 'Tags' }
+        })
+        const input = getByRole('textbox', { name: 'Tags' })
+        input.focus()
+        await user.tab()
+        expect(getByRole('button', { name: 'Clear all tags' })).toHaveFocus()
+        await user.keyboard(key)
+        expect(onUpdate).toHaveBeenCalledExactlyOnceWith([])
+        expect(onClear).toHaveBeenCalledTimes(1)
+        expect(queryAllByRole('listitem')).toHaveLength(0)
+        expect(queryByRole('button', { name: 'Clear all tags' })).not.toBeInTheDocument()
+        expect(input).toHaveFocus()
+      }
+    )
+
     it('has no a11y violations', async () => {
       const { container } = render(TagsInput, {
         props: { modelValue: ['a'], placeholder: 'Add' },
