@@ -1,4 +1,5 @@
 import { classNames } from './class-names'
+import { ownRecordValue } from './own-record'
 import { THEME_CSS_VARS, TIGER_BREAKPOINT_CSS_VALUES } from '../theme-runtime'
 import { type ContainerMaxWidth } from '../types/container'
 
@@ -48,9 +49,9 @@ export function getContainerMaxWidthStyle(
 ): Record<string, string> {
   if (maxWidth === false) return {}
   if (maxWidth === 'full') return { maxWidth: '100%' }
-  const varName = MAX_WIDTH_VAR[maxWidth]
-  const fallback = MAX_WIDTH_FALLBACK[maxWidth]
-  if (!varName) return {}
+  const varName = ownRecordValue<string>(MAX_WIDTH_VAR, maxWidth)
+  const fallback = ownRecordValue<string>(MAX_WIDTH_FALLBACK, maxWidth)
+  if (varName === undefined || fallback === undefined) return {}
   return { maxWidth: `var(${varName}, ${fallback})` }
 }
 

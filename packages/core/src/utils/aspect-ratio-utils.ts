@@ -12,6 +12,7 @@
 import type { AspectRatioFit, AspectRatioStyle, AspectRatioValue } from '../types/aspect-ratio'
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
+import { ownRecordValue } from './own-record'
 
 /** Ratio applied when ratio is omitted or invalid */
 export const ASPECT_RATIO_DEFAULT = '16/9'
@@ -76,7 +77,7 @@ const ASPECT_FIT_CLASSES: Record<Exclude<AspectRatioFit, 'none'>, string> = {
 
 export function getAspectRatioFitClasses(fit?: AspectRatioFit | null): string | undefined {
   if (!fit || fit === 'none') return undefined
-  return ASPECT_FIT_CLASSES[fit]
+  return ownRecordValue<string>(ASPECT_FIT_CLASSES, fit)
 }
 
 /**

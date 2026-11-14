@@ -1,6 +1,7 @@
 import type { BaseLayoutProps, CardSize, CardVariant } from '../types'
 import { isActivationKey } from './a11y-utils'
 import { classNames } from './class-names'
+import { ownRecordValue } from './own-record'
 import { resolveLinkAddress, type ResolvedLinkAddress } from './link-utils'
 
 /** Card geometry previously injected at runtime. Wire into the tailwind plugin. */
@@ -166,7 +167,7 @@ export function resolveCardPadding(
 ): string | undefined {
   if (padding === false) return undefined
   if (typeof padding === 'string') return padding
-  return cardSizeClasses[size]
+  return ownRecordValue<string>(cardSizeClasses, size)
 }
 
 export function getCardClasses(
@@ -176,7 +177,7 @@ export function getCardClasses(
 ): string {
   return classNames(
     cardBaseClasses,
-    cardVariantClasses[variant] ?? cardVariantClasses.default,
+    ownRecordValue<string>(cardVariantClasses, variant) ?? cardVariantClasses.default,
     hoverable && cardHoverClasses,
     clickable && cardClickableClasses
   )

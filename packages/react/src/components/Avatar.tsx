@@ -85,8 +85,12 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
     () =>
       classNames(
         avatarBaseClasses,
-        avatarSizeClasses[resolvedSize],
-        avatarShapeClasses[resolvedShape],
+        Object.hasOwn(avatarSizeClasses, resolvedSize)
+          ? avatarSizeClasses[resolvedSize]
+          : undefined,
+        Object.hasOwn(avatarShapeClasses, resolvedShape)
+          ? avatarShapeClasses[resolvedShape]
+          : undefined,
         group?.itemClass,
         !hasImage && bgPaint.className,
         !hasImage && textPaint.className,

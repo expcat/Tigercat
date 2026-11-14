@@ -92,6 +92,20 @@ describe('Icon (React)', () => {
     warnSpy.mockRestore()
   })
 
+  it('renders an empty span for inherited icon names', () => {
+    resetDevWarnCache()
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    for (const name of ['toString', 'constructor', '__proto__'] as const) {
+      const { container } = render(<Icon name={name as 'check'} />)
+      expect(container.querySelector('svg')).toBeFalsy()
+      const span = container.querySelector('span')
+      expect(span).toHaveAttribute('aria-hidden', 'true')
+      expect(span?.textContent).toBe('')
+      expect(warnSpy).toHaveBeenCalledWith('[Tigercat] Icon name "' + name + '" is not registered.')
+    }
+    warnSpy.mockRestore()
+  })
+
   it('prefers custom children over the icon prop', () => {
     const { container } = render(<Icon icon={logo}>{SimpleSVG}</Icon>)
     expect(container.querySelector('svg path')).toHaveAttribute('d', 'M5 12h14')

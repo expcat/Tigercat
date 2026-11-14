@@ -1,4 +1,5 @@
 import { type ClassValue, classNames } from './class-names'
+import { ownRecordValue } from './own-record'
 
 import {
   avatarGroupBaseClasses,
@@ -67,8 +68,8 @@ export function getAvatarGroupOverflowClasses(
   return classNames(
     avatarGroupOverflowBaseClasses,
     overlap && '-ms-2',
-    avatarSizeClasses[size],
-    avatarShapeClasses[shape],
+    ownRecordValue<string>(avatarSizeClasses, size),
+    ownRecordValue<string>(avatarShapeClasses, shape),
     ...classes
   )
 }

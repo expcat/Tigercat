@@ -137,8 +137,12 @@ export const Avatar = defineComponent({
 
       const avatarClasses = classNames(
         avatarBaseClasses,
-        avatarSizeClasses[resolvedSize.value],
-        avatarShapeClasses[resolvedShape.value],
+        Object.hasOwn(avatarSizeClasses, resolvedSize.value)
+          ? avatarSizeClasses[resolvedSize.value]
+          : undefined,
+        Object.hasOwn(avatarShapeClasses, resolvedShape.value)
+          ? avatarShapeClasses[resolvedShape.value]
+          : undefined,
         group?.itemClass,
         !hasImage.value && bgPaint.className,
         !hasImage.value && textPaint.className,

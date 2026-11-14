@@ -1,5 +1,6 @@
 import { classNames } from './class-names'
 import { devWarn } from './dev-warn'
+import { ownRecordValue } from './own-record'
 import {
   textSizeClasses,
   textWeightClasses,
@@ -30,17 +31,17 @@ export function resolveTextTag(tag?: string | null): TextTag {
 }
 
 export function resolveTextSize(size?: string | null): TextSize {
-  if (size && size in textSizeClasses) return size as TextSize
+  if (ownRecordValue(textSizeClasses, size) !== undefined) return size as TextSize
   return 'base'
 }
 
 export function resolveTextWeight(weight?: string | null): TextWeight {
-  if (weight && weight in textWeightClasses) return weight as TextWeight
+  if (ownRecordValue(textWeightClasses, weight) !== undefined) return weight as TextWeight
   return 'normal'
 }
 
 export function resolveTextColor(color?: string | null): TextColor {
-  if (color && color in textColorClasses) return color as TextColor
+  if (ownRecordValue(textColorClasses, color) !== undefined) return color as TextColor
   return 'default'
 }
 

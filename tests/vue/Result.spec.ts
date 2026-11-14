@@ -5,6 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
+import { renderToString } from '@vue/server-renderer'
 import { RESULT_ICON_SIZE_PX } from '@expcat/tigercat-core'
 import { Result } from '@expcat/tigercat-vue/Result'
 import { expectNoA11yViolationsIsolated } from '../utils'
@@ -15,6 +16,15 @@ describe('Result (Vue)', () => {
       const { container } = render(Result, { props: { status: 'success', title: 'Done' } })
       expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
       expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    })
+
+    it('renders an inherited status on the server as info', async () => {
+      for (const status of ['toString', 'constructor', '__proto__'] as const) {
+        const html = await renderToString(h(Result, { status: status as 'info', title: 'Done' }))
+        expect(html).toContain('Done')
+        expect(html).not.toContain('function')
+        expect(html).not.toContain('[object Object]')
+      }
     })
 
     it('lets the caller opt into a role', () => {

@@ -39,6 +39,24 @@ describe('Container (Vue)', () => {
     expect(smEl.style.maxWidth).toContain('--tiger-breakpoint-sm')
   })
 
+  it('ignores inherited maxWidth keys the same way as unknown values', () => {
+    const unknown = render(Container, {
+      props: { maxWidth: 'nope' as 'sm' },
+      slots: { default: ContentSlot }
+    })
+    const unknownEl = unknown.container.querySelector('.tiger-container') as HTMLElement
+    for (const maxWidth of ['toString', 'constructor'] as const) {
+      const view = render(Container, {
+        props: { maxWidth: maxWidth as 'sm' },
+        slots: { default: ContentSlot }
+      })
+      const el = view.container.querySelector('.tiger-container') as HTMLElement
+      expect(el.style.maxWidth).toBe(unknownEl.style.maxWidth)
+      expect(el.style.maxWidth).toBe('')
+      expect(el.getAttribute('style') ?? '').not.toContain('function')
+    }
+  })
+
   it('centers and pads by default, and both can be turned off', () => {
     const on = render(Container, { slots: { default: ContentSlot } })
     const onEl = on.container.querySelector('.tiger-container') as HTMLElement

@@ -153,6 +153,20 @@ describe('Icon (Vue)', () => {
     warnSpy.mockRestore()
   })
 
+  it('renders an empty span for inherited icon names', () => {
+    resetDevWarnCache()
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    for (const name of ['toString', 'constructor', '__proto__'] as const) {
+      const { container } = renderWithProps(Icon, { name: name as 'check' })
+      expect(container.querySelector('svg')).toBeFalsy()
+      const span = container.querySelector('span')
+      expect(span).toHaveAttribute('aria-hidden', 'true')
+      expect(span?.textContent).toBe('')
+      expect(warnSpy).toHaveBeenCalledWith('[Tigercat] Icon name "' + name + '" is not registered.')
+    }
+    warnSpy.mockRestore()
+  })
+
   it('prefers custom children over the name prop', () => {
     const { container } = renderWithProps(
       Icon,

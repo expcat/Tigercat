@@ -4,6 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import React, { createRef } from 'react'
 import { RESULT_ICON_SIZE_PX } from '@expcat/tigercat-core'
 import { Result } from '@expcat/tigercat-react/Result'
@@ -15,6 +16,15 @@ describe('Result (React)', () => {
       const { container } = render(<Result status="success" title="Done" />)
       expect(container.querySelector('[role="status"]')).not.toBeInTheDocument()
       expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    })
+
+    it('renders an inherited status on the server as info', () => {
+      for (const status of ['toString', 'constructor', '__proto__'] as const) {
+        const html = renderToStaticMarkup(<Result status={status as 'info'} title="Done" />)
+        expect(html).toContain('Done')
+        expect(html).not.toContain('function')
+        expect(html).not.toContain('[object Object]')
+      }
     })
 
     it('lets the caller opt into a role', () => {

@@ -19,6 +19,22 @@ describe('Avatar', () => {
     expect(screen.getByRole('img', { name: 'John Doe' })).toBeInTheDocument()
   })
 
+  it('omits size and shape classes for inherited keys', () => {
+    const unknown = render(Avatar, {
+      props: { text: 'A', size: 'nope' as 'md', shape: 'nope' as 'circle' }
+    })
+    const inherited = render(Avatar, {
+      props: { text: 'B', size: 'toString' as 'md', shape: 'constructor' as 'circle' }
+    })
+    const unknownClass = (unknown.container.querySelector('span') as HTMLElement).className
+    const inheritedClass = (inherited.container.querySelector('span') as HTMLElement).className
+    expect(unknownClass).not.toContain('--tiger-component-avatar-size-')
+    expect(inheritedClass).not.toContain('--tiger-component-avatar-size-')
+    expect(inheritedClass).not.toContain('function')
+    expect(inheritedClass).not.toContain('[object Object]')
+    expect(inheritedClass).not.toContain('rounded-[var(--tiger-component-avatar-border-radius)]')
+  })
+
   it('renders a no-space two-letter token as-is', () => {
     render(Avatar, { props: { text: 'TC' } })
     expect(screen.getByText('TC')).toBeInTheDocument()

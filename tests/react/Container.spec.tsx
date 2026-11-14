@@ -33,6 +33,18 @@ describe('Container (React)', () => {
     expect(smEl.style.maxWidth).not.toBe(noneEl.style.maxWidth)
   })
 
+  it('ignores inherited maxWidth keys the same way as unknown values', () => {
+    const unknown = render(<Container maxWidth={'nope' as 'sm'}>{Content}</Container>)
+    const unknownEl = unknown.container.querySelector('.tiger-container') as HTMLElement
+    for (const maxWidth of ['toString', 'constructor'] as const) {
+      const view = render(<Container maxWidth={maxWidth as 'sm'}>{Content}</Container>)
+      const el = view.container.querySelector('.tiger-container') as HTMLElement
+      expect(el.style.maxWidth).toBe(unknownEl.style.maxWidth)
+      expect(el.style.maxWidth).toBe('')
+      expect(el.getAttribute('style') ?? '').not.toContain('function')
+    }
+  })
+
   it('follows a changed breakpoint CSS variable', () => {
     const { container } = render(<Container maxWidth="md">{Content}</Container>)
     const el = container.querySelector('.tiger-container') as HTMLElement

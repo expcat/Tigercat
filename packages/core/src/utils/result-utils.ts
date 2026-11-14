@@ -11,6 +11,7 @@ import {
 } from './icons/status'
 
 import type { ResultHeadingLevel, ResultStatus } from '../types/result'
+import { ownRecordValue } from './own-record'
 
 // ---------------------------------------------------------------------------
 // Layout / container classes
@@ -101,7 +102,7 @@ function resolveSemanticStatus(
   if (status && (SEMANTIC_RESULT_STATUSES as readonly string[]).includes(status)) {
     return status as SemanticResultStatus
   }
-  return HTTP_COLOR_BY_STATUS[status ?? ''] ?? 'info'
+  return ownRecordValue<SemanticResultStatus>(HTTP_COLOR_BY_STATUS, status) ?? 'info'
 }
 
 /**

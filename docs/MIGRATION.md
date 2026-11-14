@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+运行时的样式、尺寸和图标查找现在只认映射自身的键。`toString`、`constructor`、`__proto__` 与其他未知值一样走原有回退：Button 的 variant / size 回到 primary / md，Text 的 size / weight / color 回到 base / normal / default，Result 的未知 status 回到 info，Container 的未知 maxWidth 不输出 max-width。Card、AspectRatio、Avatar 与 AvatarGroup 会忽略这些键，不再把函数文本写进 class。与原型键同名的图标不再阻断自定义注册，注册后按该名称渲染。
+
 ColorPicker、CronEditor、Input、InputNumber、InputOTP、MaskInput、Mentions、Radio、RadioGroup、Signature、Switch、Textarea、Transfer 与 Upload 在受控时，已提交的显示跟随外部值。父级不回写时，色块、文本、hidden 和 checked 回到原来的值，不再停在被拒收的那次提交上。拖动中的颜色预览、非法颜色文本、聚焦时尚未提交的数字、未完成的 Cron 字段，以及 Mentions 正在输入的查询，仍作为草稿保留。未传 value / modelValue、且表单项没有提供值的用法保持原样，输入后立即更新。
 
 MaskInput 与本轮修复的 17 个组件现在会调用调用方传入的同名原生监听。内部处理先执行，因此监听收到的事件可能已经被 `preventDefault()`；组件行为、公开 props 和事件名不变。应用侧为绕过旧覆盖而增加的重复转发可以移除，调用方监听不能取消已经开始的内部处理。

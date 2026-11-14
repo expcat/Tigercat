@@ -4,6 +4,7 @@
  */
 
 import { mixStatusTowardTextClass } from './status-mix'
+import { ownRecordValue } from './own-record'
 
 /**
  * Button color scheme interface
@@ -161,8 +162,7 @@ export function getButtonVariantClasses(
   variant?: string,
   colors: ThemeColors = defaultThemeColors
 ): string {
-  const scheme =
-    variant && variant in colors ? colors[variant as keyof ThemeColors] : colors.primary
+  const scheme = ownRecordValue<ButtonColorScheme>(colors, variant) ?? colors.primary
   const classes = [
     scheme.bg,
     scheme.bgHover,

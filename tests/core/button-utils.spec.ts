@@ -4,6 +4,7 @@ import {
   buttonDangerClasses,
   getButtonIconSlotClasses,
   getButtonVariantClasses,
+  getButtonSpinnerClasses,
   resolveButtonClasses,
   resolveButtonType,
   resolveButtonIconPlacement
@@ -16,6 +17,22 @@ describe('resolveButtonClasses', () => {
     )
     expect(() => getButtonVariantClasses('not-a-variant')).not.toThrow()
     expect(getButtonVariantClasses('not-a-variant')).toBe(getButtonVariantClasses('primary'))
+  })
+
+  it('treats inherited variant and size keys like other unknown values', () => {
+    const fallback = resolveButtonClasses({ variant: 'primary', size: 'md' })
+    for (const key of ['toString', 'constructor', '__proto__'] as const) {
+      const classes = resolveButtonClasses({ variant: key, size: key as never })
+      expect(classes).toBe(fallback)
+      expect(classes).toBe(
+        resolveButtonClasses({ variant: 'not-a-variant', size: 'nope' as never })
+      )
+      expect(classes).not.toContain('function')
+      expect(classes).not.toContain('[object Object]')
+      expect(getButtonVariantClasses(key)).toBe(getButtonVariantClasses('primary'))
+      expect(getButtonSpinnerClasses(key as never)).toBe(getButtonSpinnerClasses('md'))
+      expect(getButtonSpinnerClasses(key as never)).not.toContain('function')
+    }
   })
 
   it('uses on-color tokens for solid primary text', () => {

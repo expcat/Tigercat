@@ -53,6 +53,12 @@ describe('icon registry', () => {
     expect(getIconDefinition('definitely-not-an-icon')).toBeUndefined()
   })
 
+  it('returns undefined for inherited prototype names', () => {
+    expect(getIconDefinition('toString')).toBeUndefined()
+    expect(getIconDefinition('constructor')).toBeUndefined()
+    expect(getIconDefinition('__proto__')).toBeUndefined()
+  })
+
   it('registers application-level names without overwriting built-ins', () => {
     const registry = createIconRegistry()
     const custom = { viewBox: '0 0 24 24', paths: ['M4 4h16v16H4z'], mode: 'stroke' as const }

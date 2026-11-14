@@ -29,6 +29,12 @@ describe('result-utils', () => {
       expect(getResultColorScheme('foo').iconColor).toBe(getResultColorScheme('info').iconColor)
       expect(getResultColorScheme('').iconColor).toBe(getResultColorScheme('info').iconColor)
     })
+
+    it('falls back to info for inherited status keys', () => {
+      for (const status of ['toString', 'constructor', '__proto__']) {
+        expect(getResultColorScheme(status).iconColor).toBe(getResultColorScheme('info').iconColor)
+      }
+    })
   })
 
   describe('getResultIconPath', () => {

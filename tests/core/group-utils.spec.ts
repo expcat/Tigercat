@@ -44,6 +44,17 @@ describe('group-utils', () => {
     expect(getAvatarGroupOverflowText(3)).toBe('+3')
   })
 
+  it('omits avatar size and shape classes for inherited keys', () => {
+    const unknown = getAvatarGroupOverflowClasses('nope' as never, 'nope' as never)
+    const inherited = getAvatarGroupOverflowClasses('toString' as never, 'constructor' as never)
+    expect(inherited).toBe(unknown)
+    expect(inherited).not.toContain('function')
+    expect(inherited).not.toContain('[object Object]')
+    expect(getAvatarGroupOverflowClasses('__proto__' as never, '__proto__' as never)).not.toContain(
+      '[object Object]'
+    )
+  })
+
   it('composes button group classes by orientation', () => {
     expect(getButtonGroupClasses(false, 'custom')).toContain('flex-row')
     expect(getButtonGroupClasses(false, 'custom')).toContain('custom')

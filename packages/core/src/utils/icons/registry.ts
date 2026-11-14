@@ -14,6 +14,7 @@
  */
 
 import { closeIconPathD } from './common'
+import { ownRecordValue } from '../own-record'
 import {
   statusSuccessIconPath,
   statusWarningIconPath,
@@ -208,6 +209,10 @@ export const iconNames = Object.keys(iconRegistry) as IconName[]
 
 const builtInIcons = iconRegistry as Record<string, IconDefinition>
 
+function builtInIcon(name: string): IconDefinition | undefined {
+  return ownRecordValue<IconDefinition>(builtInIcons, name)
+}
+
 export interface IconRegistry {
   register(name: string, definition: IconDefinition): void
   registerMany(icons: Record<string, IconDefinition>): void
@@ -226,14 +231,14 @@ export function createIconRegistry(): IconRegistry {
   return {
     register(name, definition) {
       const trimmed = name.trim()
-      if (!trimmed || builtInIcons[trimmed]) return
+      if (!trimmed || builtInIcon(trimmed)) return
       custom.set(trimmed, definition)
     },
     registerMany(icons) {
       for (const [name, definition] of Object.entries(icons)) this.register(name, definition)
     },
     get(name) {
-      return custom.get(name) ?? builtInIcons[name]
+      return custom.get(name) ?? builtInIcon(name)
     },
     unregister(name) {
       custom.delete(name)
@@ -254,7 +259,7 @@ export function getIconDefinition(
   name: string,
   registry?: IconRegistry | null
 ): IconDefinition | undefined {
-  return registry?.get(name) ?? builtInIcons[name]
+  return registry?.get(name) ?? builtInIcon(name)
 }
 
 // ---------------------------------------------------------------------------

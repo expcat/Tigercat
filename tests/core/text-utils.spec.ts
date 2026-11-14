@@ -68,4 +68,18 @@ describe('resolveTextAlign', () => {
     expect(classes).toContain('--tiger-text')
     expect(classes.split(/\s+/)).not.toContain('undefined')
   })
+
+  it('falls back to base, normal, and default for inherited keys', () => {
+    const fallback = getTextClasses({})
+    for (const key of ['toString', 'constructor', '__proto__'] as const) {
+      const classes = getTextClasses({
+        size: key as never,
+        weight: key as never,
+        color: key as never
+      })
+      expect(classes).toBe(fallback)
+      expect(classes).not.toContain('function')
+      expect(classes).not.toContain('[object Object]')
+    }
+  })
 })

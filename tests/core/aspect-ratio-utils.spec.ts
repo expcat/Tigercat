@@ -93,6 +93,18 @@ describe('aspect-ratio-utils', () => {
       expect(getAspectRatioRootClasses(undefined, 'cover')).not.toContain('overflow-visible')
     })
 
+    it('ignores an inherited fit key the same way as an unknown fit', () => {
+      const classes = getAspectRatioRootClasses(undefined, 'toString' as never)
+      expect(classes).toBe(getAspectRatioRootClasses(undefined, 'nope' as never))
+      expect(classes).toContain('overflow-visible')
+      expect(classes).not.toContain('overflow-hidden')
+      expect(classes).not.toContain('function')
+      expect(getAspectRatioRootClasses(undefined, 'constructor' as never)).not.toContain('function')
+      expect(getAspectRatioRootClasses(undefined, '__proto__' as never)).not.toContain(
+        '[object Object]'
+      )
+    })
+
     it('appends extra class names after the base classes', () => {
       expect(getAspectRatioRootClasses('rounded-lg')).toBe(
         aspectRatioRootClasses + ' overflow-visible rounded-lg'

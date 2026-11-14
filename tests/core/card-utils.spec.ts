@@ -45,6 +45,15 @@ describe('getCardClasses', () => {
     expect(classes).toContain('bg-transparent')
     expect(classes).not.toContain('bg-[var(--tiger-surface')
   })
+
+  it('falls back to the default variant for an inherited key', () => {
+    expect(getCardClasses('toString' as never, false)).toBe(getCardClasses('default', false))
+    expect(getCardClasses('constructor' as never, false)).toBe(
+      getCardClasses('nope' as never, false)
+    )
+    expect(getCardClasses('__proto__' as never, false)).not.toContain('function')
+    expect(getCardClasses('__proto__' as never, false)).not.toContain('[object Object]')
+  })
 })
 
 describe('resolveCardRoot', () => {

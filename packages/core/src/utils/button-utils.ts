@@ -6,6 +6,7 @@ import {
 } from '../types/button'
 import { classNames, type ClassValue } from './class-names'
 import { getButtonVariantClasses } from './theme-colors'
+import { ownRecordValue } from './own-record'
 
 /**
  * Keyboard ring only (`focus-visible`). Radius / transition follow theme tokens.
@@ -91,7 +92,10 @@ export function resolveButtonClasses(input: ResolveButtonClassesInput = {}): str
   const variantClasses = input.danger
     ? getButtonVariantClasses(dangerKeyFor(variant))
     : getButtonVariantClasses(variant)
-  const size = input.size && input.size in buttonSizeClasses ? input.size : 'md'
+  const size: ButtonSize =
+    ownRecordValue<string>(buttonSizeClasses, input.size) !== undefined
+      ? (input.size as ButtonSize)
+      : 'md'
 
   return classNames(
     buttonBaseClasses,
@@ -142,7 +146,7 @@ export function getButtonIconSlotClasses(
 export function getButtonSpinnerClasses(size: ButtonSize = 'md'): string {
   return classNames(
     'tiger-motion-aware animate-spin',
-    buttonSpinnerSizeClasses[size] ?? buttonSpinnerSizeClasses.md
+    ownRecordValue<string>(buttonSpinnerSizeClasses, size) ?? buttonSpinnerSizeClasses.md
   )
 }
 
