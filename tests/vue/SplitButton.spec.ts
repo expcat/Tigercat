@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
 import { SplitButton } from '@expcat/tigercat-vue/SplitButton'
@@ -138,6 +138,51 @@ describe('SplitButton', () => {
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Draft' }))
       expect(onItem).toHaveBeenCalledTimes(1)
       expect(emitted().click).toBeUndefined()
+    })
+  })
+
+  describe('keyboard focus', () => {
+    it.each([
+      ['ArrowDown', 'Save as draft'],
+      ['ArrowUp', 'Save and publish']
+    ])('focuses the menu edge after %s opens and positions the menu', async (key, label) => {
+      // happy-dom does not reject focus on CSS-invisible, unpositioned overlays.
+      const nativeFocus = HTMLElement.prototype.focus
+      const focus = vi.spyOn(HTMLElement.prototype, 'focus').mockImplementation(function (
+        this: HTMLElement,
+        options?: FocusOptions
+      ) {
+        if (this.closest('[data-positioned="false"]')) return
+        nativeFocus.call(this, options)
+      })
+      try {
+        const { container } = renderSplitButton()
+        const trigger = getTrigger(container)
+        vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 20, 32, 32))
+        trigger.focus()
+        await fireEvent.keyDown(trigger, { key })
+        await waitFor(() => expect(screen.getByRole('menuitem', { name: label })).toHaveFocus())
+      } finally {
+        focus.mockRestore()
+      }
+    })
+
+    it('closes the menu on Tab and focuses the successor after the trigger', async () => {
+      const { container } = renderSplitButton()
+      const next = document.createElement('button')
+      next.textContent = 'Next action'
+      container.appendChild(next)
+      const trigger = getTrigger(container)
+      vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 20, 32, 32))
+      await userEvent.click(trigger)
+      const first = await screen.findByRole('menuitem', { name: 'Save as draft' })
+      first.focus()
+      expect(first).toHaveFocus()
+
+      await userEvent.tab()
+
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+      await waitFor(() => expect(next).toHaveFocus())
     })
   })
 

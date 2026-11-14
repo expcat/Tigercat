@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest'
-import { act, render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { SplitButton } from '@expcat/tigercat-react/SplitButton'
@@ -142,6 +142,26 @@ describe('SplitButton', () => {
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Draft' }))
       expect(onItem).toHaveBeenCalledTimes(1)
       expect(onClick).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('keyboard focus', () => {
+    it('closes the menu on Tab and focuses the successor after the trigger', async () => {
+      const { container } = renderSplitButton()
+      const next = document.createElement('button')
+      next.textContent = 'Next action'
+      container.appendChild(next)
+      const trigger = getTrigger(container)
+      vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 20, 32, 32))
+      await userEvent.click(trigger)
+      const first = await screen.findByRole('menuitem', { name: 'Save as draft' })
+      first.focus()
+      expect(first).toHaveFocus()
+
+      await userEvent.tab()
+
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+      await waitFor(() => expect(next).toHaveFocus())
     })
   })
 

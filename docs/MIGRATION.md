@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+SplitButton 与 Dropdown 的键盘焦点恢复正常：Vue 从 trigger 按 ArrowDown / ArrowUp 打开菜单后，等定位完成再聚焦首个 / 最后一个可用菜单项。双端菜单内按 Tab 会关闭菜单，并聚焦 trigger 之后的可聚焦控件；Shift+Tab 到 trigger 之前的控件。共享锚定浮层在没有 layer 祖先时使用 trigger 自己的 document，因此同源 iframe 的菜单 portal 到父页时也遵守此顺序。调用方式不用改。
+
 共享链接门禁现在拒绝 `/\outside.example/path`、`\/outside.example/path` 和 `\\outside.example/path`，与 `//outside.example/path` 一致。受门禁保护的链接不再输出这些 `href`，菜单 schema 也不再把它们视为站内 `path`。跨站地址请改用完整的 `https://outside.example/path`；站内地址请使用 `/path` 这类普通路径。
 
 React Gallery、Image、ImageGroup 与 ImagePreview 的预览挂到同源父文档时，Tab 现在按预览内的控件顺序前进。Gallery 选第二图后按 Enter 打开预览，第一次 Tab 从「关闭预览」移到「上一张图片」；此前跨 document 的焦点被误判为预览外部，Tab 会再次停在关闭按钮。调用方式不用改。

@@ -8,7 +8,6 @@ import {
   PropType,
   h,
   onBeforeUnmount,
-  nextTick,
   VNode,
   cloneVNode,
   watch,
@@ -417,15 +416,7 @@ export const Dropdown = defineComponent({
       emit('update:open', visible)
       emit('open-change', visible)
 
-      if (visible) {
-        const edge = focusEdge.value
-        focusEdge.value = null
-        if (!edge) return
-        nextTick(() => {
-          if (floatingRef.value) focusMenuItem(floatingRef.value, edge)
-        })
-        return
-      }
+      if (visible) return
 
       hoverController.cancel()
       if (!skipRestore.value) {
@@ -434,16 +425,6 @@ export const Dropdown = defineComponent({
       previousActiveElement.value = null
       skipRestore.value = false
     }
-
-    watch(currentVisible, (visible) => {
-      if (!visible) return
-      const edge = focusEdge.value
-      if (!edge) return
-      focusEdge.value = null
-      nextTick(() => {
-        if (floatingRef.value) focusMenuItem(floatingRef.value, edge)
-      })
-    })
 
     const handleItemClick = () => {
       skipRestore.value = false
@@ -490,7 +471,6 @@ export const Dropdown = defineComponent({
         setVisible(true)
         return
       }
-      if (floatingRef.value) focusMenuItem(floatingRef.value, edge)
     }
 
     const typeahead = createTypeaheadHighlight()
@@ -537,6 +517,20 @@ export const Dropdown = defineComponent({
         setVisible(false)
       }
     })
+
+    watch(
+      [currentVisible, overlay.positioned, focusEdge],
+      ([visible, positioned, edge]) => {
+        if (!visible) {
+          focusEdge.value = null
+          return
+        }
+        if (!positioned || !edge || !floatingRef.value) return
+        focusEdge.value = null
+        focusMenuItem(floatingRef.value, edge)
+      },
+      { flush: 'post' }
+    )
 
     onBeforeUnmount(() => hoverController.dispose())
 

@@ -132,6 +132,22 @@ describe('anchored overlay contract', () => {
     expect(getAnchoredOverlayTabTarget(reference, floating, true)).toBe(nextInput)
   })
 
+  it('resolves Tab focus in the anchor document without an enclosing overlay layer', () => {
+    const previous = document.createElement('button')
+    const reference = document.createElement('button')
+    const next = document.createElement('input')
+    const floating = document.createElement('div')
+    const item = document.createElement('button')
+    item.tabIndex = -1
+    item.setAttribute('role', 'menuitem')
+    floating.appendChild(item)
+    document.body.append(previous, reference, next, floating)
+    item.focus()
+
+    expect(getAnchoredOverlayTabTarget(reference, floating)).toBe(next)
+    expect(getAnchoredOverlayTabTarget(reference, floating, true)).toBe(previous)
+  })
+
   it('lets Tab move through internal controls before leaving the floating panel', () => {
     const layer = document.createElement('div')
     layer.setAttribute('data-tiger-overlay-layer', '')

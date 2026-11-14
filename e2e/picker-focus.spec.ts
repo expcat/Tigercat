@@ -2,6 +2,55 @@ import { expect, test } from '@playwright/test'
 import { exampleApps, openDemo } from './example-helpers'
 
 for (const { framework, baseUrl } of exampleApps) {
+  test(`${framework} SplitButton opens at the menu edge and tabs to the trigger successor`, async ({
+    page
+  }) => {
+    const { moduleRoot, preview } = await openDemo(page, baseUrl, 'button', 'button-01')
+    const imports = ['SplitButton', 'DropdownMenu', 'DropdownItem', 'Drawer']
+      .map(
+        (name) => `import { ${name} } from '@expcat/tigercat-${framework.toLowerCase()}/${name}'`
+      )
+      .join('\n')
+    const splitButton = `<SplitButton>Save<DropdownMenu><DropdownItem>Draft</DropdownItem><DropdownItem>Publish</DropdownItem></DropdownMenu></SplitButton><button>After save</button><button>Last action</button>`
+    await moduleRoot.getByTestId('demo-edit-source').click()
+    for (const nested of [false, true]) {
+      const content = nested
+        ? `<Drawer open title="Nested actions">${splitButton}</Drawer>`
+        : `<section aria-label="Page actions">${splitButton}</section>`
+      const source =
+        framework === 'React'
+          ? `${imports}\nexport default function App() { return <>${content}</> }`
+          : `<script setup lang="ts">${imports}</script><template>${content}</template>`
+      await moduleRoot.getByRole('textbox', { name: /Code editor|代码编辑器/ }).fill(source)
+      await moduleRoot.getByTestId('demo-run').click()
+      const scope = nested
+        ? preview.getByRole('dialog', { name: 'Nested actions' })
+        : preview.getByRole('region', { name: 'Page actions' })
+      await expect(scope).toBeVisible()
+      const trigger = scope.locator('[data-split-button-trigger]')
+      const menu = nested ? preview.getByRole('menu') : page.getByRole('menu')
+      for (const [key, label] of [
+        ['ArrowDown', 'Draft'],
+        ['ArrowUp', 'Publish']
+      ]) {
+        await trigger.focus()
+        await trigger.press(key)
+        await expect(menu.getByRole('menuitem', { name: label, exact: true })).toBeFocused()
+        await page.keyboard.press('Tab')
+        await expect(menu).toHaveCount(0)
+        await expect(scope.getByRole('button', { name: 'After save' })).toBeFocused()
+        await page.keyboard.press('Tab')
+        await expect(scope.getByRole('button', { name: 'Last action' })).toBeFocused()
+      }
+      await trigger.focus()
+      await trigger.press('ArrowDown')
+      await expect(menu.getByRole('menuitem', { name: 'Draft', exact: true })).toBeFocused()
+      await page.keyboard.press('Shift+Tab')
+      await expect(menu).toHaveCount(0)
+      await expect(scope.locator('[data-split-button-primary]')).toBeFocused()
+    }
+  })
+
   test(`${framework} pickers restore focus inside a Drawer and preserve the next Tab stop`, async ({
     page
   }) => {

@@ -128,7 +128,7 @@ export function getOverlayDirLang(target: HTMLElement | null): { dir?: string; l
   }
 }
 
-/** Resolve Tab focus relative to the anchor while keeping it inside the active layer. */
+/** Resolve Tab focus relative to the anchor in its active layer or owner document. */
 export function getAnchoredOverlayTabTarget(
   reference: HTMLElement | null,
   floating: HTMLElement | null,
@@ -137,7 +137,6 @@ export function getAnchoredOverlayTabTarget(
   if (!reference || !floating) return null
 
   const layer = reference.closest<HTMLElement>(`[${OVERLAY_LAYER_ATTRIBUTE}]`)
-  if (!layer) return null
 
   const floatingFocusables = getFocusableElements(floating)
   const activeElement = floating.ownerDocument.activeElement
@@ -147,13 +146,18 @@ export function getAnchoredOverlayTabTarget(
     if (activeIndex !== boundaryIndex) return null
   }
 
-  const focusables = getFocusableElements(layer).filter((element) => !floating.contains(element))
+  const focusables = getFocusableElements(layer ?? reference.ownerDocument.body).filter(
+    (element) => !floating.contains(element)
+  )
   if (focusables.length === 0) return null
 
   const referenceIndex = focusables.findIndex(
     (element) => element === reference || reference.contains(element)
   )
-  if (referenceIndex < 0) return shiftKey ? focusables[focusables.length - 1] : focusables[0]
+  if (referenceIndex < 0) {
+    return layer ? (shiftKey ? focusables[focusables.length - 1] : focusables[0]) : null
+  }
+  if (!layer) return focusables[referenceIndex + (shiftKey ? -1 : 1)] ?? null
 
   const nextIndex = shiftKey
     ? (referenceIndex - 1 + focusables.length) % focusables.length
