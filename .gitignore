@@ -37,6 +37,9 @@ coverage/
 # CLI playground written into the repo when run from the workspace root
 .tigercat-playground/
 
+# Local session artifacts
+.local/
+
 # Playwright
 playwright-report/
 test-results/
