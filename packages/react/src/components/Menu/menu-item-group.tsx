@@ -5,7 +5,7 @@ import {
   menuItemGroupTitleClasses,
   shouldIndentMenuItem
 } from '@expcat/tigercat-core'
-import { useMenuContext, useSubMenuScope } from './context'
+import { useMenuContext } from './context'
 import { mapMenuChildren } from './render'
 import type { MenuItemGroupProps } from './types'
 
@@ -19,10 +19,9 @@ export const MenuItemGroup: React.FC<MenuItemGroupProps> = ({
   ...rest
 }) => {
   const menuContext = useMenuContext()
-  const submenuScope = useSubMenuScope()
   const titleId = useId()
   const hidden = Boolean(collapsed ?? menuContext?.collapsed)
-  const usesMenuRole = Boolean(submenuScope?.popup) || menuContext?.mode === 'horizontal'
+  const usesMenuRole = Boolean(menuContext)
   const indentStyle =
     menuContext && shouldIndentMenuItem(menuContext.mode, level)
       ? getMenuItemIndent(level, menuContext.inlineIndent)
@@ -33,6 +32,7 @@ export const MenuItemGroup: React.FC<MenuItemGroupProps> = ({
       {title ? (
         <div
           id={titleId}
+          role={usesMenuRole ? 'presentation' : undefined}
           className={classNames(menuItemGroupTitleClasses, hidden && 'sr-only')}
           style={indentStyle}>
           {title}

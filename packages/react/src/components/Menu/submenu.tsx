@@ -411,7 +411,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         className={submenuHeightTransitionClasses}
         aria-hidden={isHidden ? 'true' : undefined}
         data-tiger-menu-hidden={isHidden ? 'true' : undefined}
-        data-tiger-submenu-motion="height">
+        data-tiger-submenu-motion="height"
+        role="group">
         <ul
           id={listId}
           className={contentClasses}
@@ -429,7 +430,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
       className={isPopup && !popupPortal ? 'relative' : ''}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
-      role={inPopup || menuContext.mode === 'horizontal' ? 'none' : undefined}
+      role="none"
       data-tiger-submenu=""
       data-child-selected={childSelected ? 'true' : undefined}>
       <button

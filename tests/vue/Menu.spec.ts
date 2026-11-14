@@ -28,6 +28,15 @@ function getItem(name: string) {
   return screen.queryByRole('menuitem', { name }) ?? screen.getByRole('button', { name })
 }
 
+function enabledTabStops(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>('[data-tiger-menuitem="true"]')).filter(
+    (el) =>
+      el.getAttribute('tabindex') === '0' &&
+      el.getAttribute('aria-disabled') !== 'true' &&
+      !(el instanceof HTMLButtonElement && el.disabled)
+  )
+}
+
 describe('Menu', () => {
   describe('Rendering', () => {
     it('renders a named vertical menu with one tab stop', () => {
@@ -68,7 +77,7 @@ describe('Menu', () => {
         }
       })
 
-      expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/home')
+      expect(screen.getByRole('menuitem', { name: 'Home' })).toHaveAttribute('href', '/home')
       expect(screen.getByText('Team')).toBeInTheDocument()
       expect(getItem('Users')).toBeInTheDocument()
     })
@@ -201,6 +210,39 @@ describe('Menu', () => {
         expect(getItem('Sub Item 1')).toHaveFocus()
       })
     })
+
+    it('keeps one enabled tab stop when items are only a group or the first item is disabled', () => {
+      const grouped = render(Menu, {
+        props: {
+          items: [
+            {
+              type: 'group',
+              title: 'Group',
+              children: [
+                { key: 'a', label: 'Alpha' },
+                { key: 'b', label: 'Beta' }
+              ]
+            }
+          ]
+        }
+      })
+      expect(enabledTabStops(grouped.container)).toHaveLength(1)
+      grouped.unmount()
+
+      const disabledFirst = render(Menu, {
+        props: {
+          items: [
+            { key: 'a', label: 'Alpha', disabled: true },
+            { key: 'b', label: 'Beta' }
+          ]
+        }
+      })
+      expect(enabledTabStops(disabledFirst.container)).toHaveLength(1)
+      const beta = Array.from(
+        disabledFirst.container.querySelectorAll<HTMLElement>('[data-tiger-menuitem="true"]')
+      ).find((el) => el.textContent?.includes('Beta'))
+      expect(beta).toHaveAttribute('tabindex', '0')
+    })
   })
 
   describe('SubMenu', () => {
@@ -244,11 +286,11 @@ describe('Menu', () => {
         }
       })
 
-      expect(screen.getByRole('button', { name: 'Alpha' })).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByRole('menuitem', { name: 'Alpha' })).toHaveAttribute('aria-expanded', 'true')
 
-      await fireEvent.click(screen.getByRole('button', { name: 'Beta' }))
-      expect(screen.getByRole('button', { name: 'Beta' })).toHaveAttribute('aria-expanded', 'true')
-      expect(screen.getByRole('button', { name: 'Alpha' })).toHaveAttribute(
+      await fireEvent.click(screen.getByRole('menuitem', { name: 'Beta' }))
+      expect(screen.getByRole('menuitem', { name: 'Beta' })).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByRole('menuitem', { name: 'Alpha' })).toHaveAttribute(
         'aria-expanded',
         'false'
       )

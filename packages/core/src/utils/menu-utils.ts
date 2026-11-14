@@ -853,6 +853,35 @@ export function initRovingTabIndex(root: HTMLElement): void {
   setRovingTabIndex(items, next)
 }
 
+/**
+ * Root roving candidates for a data-driven menu.
+ * Groups and dividers are not focusable. Children of a submenu stay on that
+ * submenu's own layer, so only the submenu key is a root candidate.
+ */
+export function collectMenuRootTabStops(items: readonly MenuItem[]): {
+  itemKeys: MenuKey[]
+  disabledKeys: ReadonlySet<string>
+} {
+  const itemKeys: MenuKey[] = []
+  const disabledKeys = new Set<string>()
+  const walk = (nodes: readonly MenuItem[]) => {
+    for (const item of nodes) {
+      const kind = getMenuItemKind(item)
+      if (kind === 'divider') continue
+      if (kind === 'group') {
+        if (item.children) walk(item.children)
+        continue
+      }
+      if (item.key != null) {
+        itemKeys.push(item.key)
+        if (item.disabled) disabledKeys.add(menuKeyId(item.key))
+      }
+    }
+  }
+  walk(items)
+  return { itemKeys, disabledKeys }
+}
+
 export function resolveMenuTabStopKey(options: {
   itemKeys: readonly MenuKey[]
   selectedKeys: readonly MenuKey[]

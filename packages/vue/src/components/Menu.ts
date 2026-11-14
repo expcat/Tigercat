@@ -17,6 +17,7 @@ import {
 } from 'vue'
 import {
   classNames,
+  collectMenuRootTabStops,
   getSecureRel,
   resolveLinkHref,
   coerceClassValue,
@@ -63,6 +64,7 @@ import {
   resolveMenuCollapsed,
   resolveMenuIconKind,
   resolveMenuMode,
+  resolveMenuTabStopKey,
   resolveSearchFilter,
   sameMenuKey,
   shouldIndentMenuItem,
@@ -366,12 +368,15 @@ export const Menu = defineComponent({
     })
 
     const tabStopKey = computed(() => {
-      const rootKeys =
+      const root =
         props.items && props.items.length > 0
-          ? props.items.map((item) => item.key).filter((key): key is MenuKey => key != null)
-          : collectVueMenuKeys(slots.default?.())
-      const selected = rootKeys.find((key) => isKeySelected(key, currentSelectedKeys.value))
-      return selected ?? rootKeys[0]
+          ? collectMenuRootTabStops(filteredItems.value)
+          : { itemKeys: collectVueMenuKeys(slots.default?.()), disabledKeys: undefined }
+      return resolveMenuTabStopKey({
+        itemKeys: root.itemKeys,
+        selectedKeys: currentSelectedKeys.value,
+        disabledKeys: root.disabledKeys
+      })
     })
 
     provide<MenuContext>(MenuContextKey, {
@@ -671,8 +676,7 @@ export const MenuItem = defineComponent({
           : labelChildren
         : [...labelChildren, badgeNode, shortcutNode]
 
-      const inPopupMenu = inPopup.value
-      const usesMenuRole = inPopupMenu || menuContext?.mode.value === 'horizontal'
+      const usesMenuRole = Boolean(menuContext)
       const role = usesMenuRole ? 'menuitem' : undefined
       const tabIndex = props.disabled
         ? -1
@@ -761,11 +765,8 @@ export const MenuItemGroup = defineComponent({
       const { class: _class, style: _style, ...rest } = attrs
       return rest
     })
-    const submenuScope = inject<SubMenuScope | null>(SubMenuScopeKey, null)
     const hidden = computed(() => props.collapsed ?? menuContext?.collapsed.value ?? false)
-    const usesMenuRole = computed(
-      () => Boolean(submenuScope?.popup) || menuContext?.mode.value === 'horizontal'
-    )
+    const usesMenuRole = computed(() => Boolean(menuContext))
     const indentStyle = computed(() => {
       if (!menuContext || !shouldIndentMenuItem(menuContext.mode.value, props.level))
         return undefined
@@ -779,6 +780,7 @@ export const MenuItemGroup = defineComponent({
               'div',
               {
                 id: titleId,
+                role: usesMenuRole.value ? 'presentation' : undefined,
                 class: classNames(menuItemGroupTitleClasses, hidden.value && 'sr-only'),
                 style: indentStyle.value
               },
@@ -1077,7 +1079,7 @@ export const SubMenu = defineComponent({
         roving &&
         menuContext.tabStopKey.value != null &&
         sameMenuKey(props.itemKey, menuContext.tabStopKey.value)
-      const titleRole = inPopup || menuContext.mode.value === 'horizontal' ? 'menuitem' : undefined
+      const titleRole = 'menuitem' as const
       const listRole = getMenuListRole(menuContext.mode.value, { popup: isPopup.value })
       const collapsed = effectiveCollapsed.value
 
@@ -1158,7 +1160,8 @@ export const SubMenu = defineComponent({
                 class: submenuHeightTransitionClasses,
                 'aria-hidden': isExpanded.value ? undefined : 'true',
                 'data-tiger-menu-hidden': isExpanded.value ? undefined : 'true',
-                'data-tiger-submenu-motion': 'height'
+                'data-tiger-submenu-motion': 'height',
+                role: 'group'
               },
               [
                 h(
@@ -1182,7 +1185,7 @@ export const SubMenu = defineComponent({
           class: isPopup.value && !popupPortal.value ? 'relative' : '',
           onPointerenter: handlePointerEnter,
           onPointerleave: handlePointerLeave,
-          role: inPopup || menuContext.mode.value === 'horizontal' ? 'none' : undefined,
+          role: 'none',
           'data-tiger-submenu': '',
           'data-child-selected': childSelected.value ? 'true' : undefined
         },

@@ -28,6 +28,15 @@ function getItem(name: string) {
   return screen.queryByRole('menuitem', { name }) ?? screen.getByRole('button', { name })
 }
 
+function enabledTabStops(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>('[data-tiger-menuitem="true"]')).filter(
+    (el) =>
+      el.getAttribute('tabindex') === '0' &&
+      el.getAttribute('aria-disabled') !== 'true' &&
+      !(el instanceof HTMLButtonElement && el.disabled)
+  )
+}
+
 describe('Menu', () => {
   beforeEach(() => {
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
@@ -235,6 +244,36 @@ describe('Menu', () => {
       getItem('Submenu').focus()
       await user.keyboard('{ArrowRight}')
       expect(getItem('Sub Item 1')).toHaveFocus()
+    })
+
+    it('keeps one enabled tab stop when items are only a group or the first item is disabled', () => {
+      const grouped = render(
+        <Menu
+          items={[
+            {
+              type: 'group',
+              title: 'Group',
+              children: [
+                { key: 'a', label: 'Alpha' },
+                { key: 'b', label: 'Beta' }
+              ]
+            }
+          ]}
+        />
+      )
+      expect(enabledTabStops(grouped.container)).toHaveLength(1)
+      grouped.unmount()
+
+      const disabledFirst = render(
+        <Menu
+          items={[
+            { key: 'a', label: 'Alpha', disabled: true },
+            { key: 'b', label: 'Beta' }
+          ]}
+        />
+      )
+      expect(enabledTabStops(disabledFirst.container)).toHaveLength(1)
+      expect(screen.getByRole('menuitem', { name: 'Beta' })).toHaveAttribute('tabindex', '0')
     })
   })
 

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  collectMenuRootTabStops,
   getMenuClasses,
   getMenuListRole,
   mergeTigerLocale,
@@ -151,16 +152,15 @@ export function useMenuRootState(props: MenuProps): MenuRootState {
   }, [resolvedMode, theme, collapsed, className])
 
   const slotKeys = useMemo(() => collectReactMenuKeys(children), [children])
-  const rootKeys = useMemo(() => {
-    if (items && items.length > 0) {
-      return items.map((item) => item.key).filter((key): key is MenuKey => key != null)
-    }
-    return slotKeys
-  }, [items, slotKeys])
+  const rootTabStops = useMemo(() => {
+    if (items && items.length > 0) return collectMenuRootTabStops(filteredItems)
+    return { itemKeys: slotKeys, disabledKeys: undefined }
+  }, [filteredItems, items, slotKeys])
   const [tabStopKey, setTabStopKeyState] = useState<MenuKey | undefined>(undefined)
   const resolvedTabStop = resolveMenuTabStopKey({
-    itemKeys: rootKeys,
+    itemKeys: rootTabStops.itemKeys,
     selectedKeys,
+    disabledKeys: rootTabStops.disabledKeys,
     current: tabStopKey
   })
   const setTabStopKey = useCallback((key: MenuKey) => {

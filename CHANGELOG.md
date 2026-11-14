@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Menu 键盘入口与树语义（Core / Vue / React，C098-F01、C098-F02）**：items 根的 roving Tab 入口穿透顶层分组并跳过禁用项，组内只剩分组或首项禁用时双端仍恰有一个 enabled 项 `tabindex=0`。子菜单标题在菜单上下文中统一输出 `menuitem`，内容层输出 `role=group`，双端 filled-tree axe 用例（TIGER_A11Y=1）不再有可聚焦元素缺少可见焦点等违规。
+
 - **FloatButtonGroup 自定义触发器（Vue / React，C096-F01）**：非交互自定义触发器现在渲染为可聚焦的 `button type="button"`。React 的 `triggerNode` 为 span，以及 Vue 的 trigger 插槽为文本或数值 `0` 时，Enter / Space 展开动作组。原生 button、链接和组件触发器仍合并到原元素。
 
 - **BreadcrumbItem 动作项（Vue，C087-F01）**：从组件 vnode 读取 click 监听器，无 href、非 current、带 `@click` 的子项现在输出 `button type="button"`，点击回调一次。
