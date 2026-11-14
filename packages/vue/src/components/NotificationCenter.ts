@@ -614,7 +614,8 @@ export const NotificationCenter = defineComponent({
             estimatedItemHeight: COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
             height: COMPOSITE_LIST_VIEWPORT,
             getItemKey: (index: number) => notificationItemKey(items[index]?.id ?? index),
-            role: 'list'
+            role: 'list',
+            ariaLabel: labels.value.title
           },
           {
             default: ({ index }: { index: number }) => renderListItem(items[index], index)

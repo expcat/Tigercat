@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 ActivityFeed、CommentThread、NotificationCenter 在满 40 行自动开窗后，滚动窗口现在带本地化名称并进入 Tab 顺序，可用 ArrowUp / ArrowDown / Home / End 滚动，再用 Tab 进入窗口内的动作。ActivityFeed 保留 `list`、CommentThread 保留 `feed` 语义。调用方式不用改，依赖旧 Tab 顺序的键盘脚本需加入窗口入口。
+
 双端 NavigationMenu 共享 viewport 下的普通面板现在带 id、`role=menu` 和完整键盘处理：`aria-controls` 指向实际面板，Enter / ArrowDown 打开后聚焦首项，面板内方向键、Escape 与焦点离开和普通面板一致。item value 的 DOM 属性 `data-tiger-navigation-menu-value` 改为带类型前缀的 id（数值 `n:1`、字符串 `s:1`），`1` 与 `"1"` 不再互串，纯数值 value 的菜单恢复唯一 Tab 入口。调用方式不用改；直接读取该属性原始值的测试或选择器请改用组件 API 或 `navigationMenuValueId`。
 
 双端 Menu 的 items 根 Tab 入口现在穿透顶层 group 并跳过禁用项：组内只剩分组、或首项禁用时，仍然恰有一个 enabled 菜单项 `tabindex=0`，键盘可从它进入菜单。子菜单标题在菜单上下文中统一为 `menuitem`，子菜单内容层为 `role=group`，TIGER_A11Y=1 下双端 filled-tree axe 用例无违规。调用方式不用改；依赖子菜单标题旧 role 的样式或测试请改用 `[role="menuitem"]`。

@@ -724,7 +724,8 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 )
               : null
           }}
-          role="presentation"
+          role="feed"
+          ariaLabel={labels.listAriaLabel}
           footer={pageSentinel}
         />
       ) : (

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { NotificationCenter } from '@expcat/tigercat-react/NotificationCenter'
@@ -13,6 +13,28 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('NotificationCenter (React)', () => {
+  it('keeps the automatic virtual list on the keyboard path', () => {
+    const items: NotificationItem[] = Array.from({ length: 45 }, (_, index) => ({
+      id: index + 1,
+      title: `Notification ${index + 1}`
+    }))
+    render(<NotificationCenter items={items} />)
+
+    const scroller = screen.getByRole('list', { name: 'Notifications' })
+    expect(scroller).toHaveAttribute('tabindex', '0')
+    expect(screen.queryByText('Notification 45')).not.toBeInTheDocument()
+    scroller.focus()
+    expect(scroller).toHaveFocus()
+    fireEvent.keyDown(scroller, { key: 'End' })
+
+    expect(scroller.scrollTop).toBeGreaterThan(0)
+    expect(within(scroller).getByRole('button', { name: 'Notification 45' }).tabIndex).toBe(0)
+    expect(screen.getByText('Notification 45').closest('[role="listitem"]')).toHaveAttribute(
+      'aria-posinset',
+      '45'
+    )
+  })
+
   it('renders groups and switches tabs', async () => {
     const items: NotificationItem[] = [
       { id: 1, title: '系统通知', type: '系统', read: false },

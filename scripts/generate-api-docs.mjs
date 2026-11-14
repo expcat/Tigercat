@@ -537,7 +537,7 @@ const COMPONENT_USAGE_NOTES = {
   ActivityFeed: {
     uses: ['Timeline', 'Avatar', 'Tag', 'Card', 'Text', 'Link', 'Loading'],
     notes:
-      '`groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`，时间线仍是 `list`，空态和加载态不自称 feed。已有条目时加载保留列表并写出加载说明。新的一条用组件自己的礼貌区域。`content` 只在标题和描述都空时当正文。默认显示时间时，首屏等客户端时区稳定后再写钟点。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。'
+      '`groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`，短列表时间线是 `list`；满 40 行后改为可聚焦的虚拟列表，方向键滚动后可用 Tab 进入后续动作。空态和加载态不自称 feed。已有条目时加载保留列表并写出加载说明。新的一条用组件自己的礼貌区域。`content` 只在标题和描述都空时当正文。默认显示时间时，首屏等客户端时区稳定后再写钟点。Vue 状态点走 `#dot`，React 走 `renderDot`。无 `href` 的动作是 Button。与命令式 toast 无关。'
   },
   CommentThread: {
     uses: ['Avatar', 'Tag', 'Button', 'Textarea', 'Text'],

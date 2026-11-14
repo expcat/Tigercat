@@ -437,7 +437,8 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             const item = group.items?.[row.itemIndex]
             return item ? renderDefaultItem(item, row.itemIndex, group) : null
           }}
-          role="presentation"
+          role="list"
+          ariaLabel={labels.listAriaLabel}
           footer={
             hasMore ? (
               <div ref={sentinelRef} className={infiniteScrollSentinelClasses} aria-hidden="true" />

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, within } from '@testing-library/vue'
 import { defineComponent, h, ref } from 'vue'
 import { CommentThread } from '@expcat/tigercat-vue/CommentThread'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -13,6 +13,26 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('CommentThread (Vue)', () => {
+  it('keeps the automatic virtual feed on the keyboard path', async () => {
+    const nodes: CommentNode[] = Array.from({ length: 45 }, (_, index) => ({
+      id: index + 1,
+      content: `Comment ${index + 1}`,
+      actions: [{ label: `Act ${index + 1}` }]
+    }))
+    render(CommentThread, { props: { nodes } })
+
+    const scroller = screen.getByRole('feed', { name: 'Comment thread' })
+    expect(scroller).toHaveAttribute('tabindex', '0')
+    expect(screen.queryByText('Comment 45')).not.toBeInTheDocument()
+    scroller.focus()
+    expect(scroller).toHaveFocus()
+    await fireEvent.keyDown(scroller, { key: 'End' })
+
+    expect(scroller.scrollTop).toBeGreaterThan(0)
+    expect(screen.getByText('Comment 45').closest('article')).toHaveAttribute('aria-posinset', '45')
+    expect(within(scroller).getByRole('button', { name: 'Act 45' }).tabIndex).toBe(0)
+  })
+
   it('renders nested replies when expanded', () => {
     const nodes: CommentNode[] = [
       {

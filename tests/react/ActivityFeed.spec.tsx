@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { ActivityFeed } from '@expcat/tigercat-react/ActivityFeed'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
@@ -12,6 +13,45 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 describe('ActivityFeed (React)', () => {
+  it('keeps the automatic virtual window and final action on the keyboard path', async () => {
+    const user = userEvent.setup()
+    const groups: ActivityGroup[] = [
+      {
+        key: 'today',
+        title: 'Today',
+        items: Array.from({ length: 45 }, (_, index) => ({
+          id: index + 1,
+          title: `Row ${index + 1}`,
+          actions: [{ label: `Act ${index + 1}` }]
+        }))
+      }
+    ]
+
+    render(<ActivityFeed groups={groups} />)
+
+    const scroller = screen.getByRole('list', { name: 'Activity' })
+    expect(scroller).toHaveAttribute('tabindex', '0')
+    expect(screen.queryByText('Row 45')).not.toBeInTheDocument()
+    await user.tab()
+    expect(scroller).toHaveFocus()
+
+    for (let index = 0; index < 45; index++) {
+      fireEvent.keyDown(scroller, { key: 'ArrowDown' })
+    }
+
+    expect(scroller.scrollTop).toBeGreaterThan(0)
+    expect(screen.getByText('Row 45').closest('[role="listitem"]')).toHaveAttribute(
+      'aria-posinset',
+      '46'
+    )
+    const finalAction = screen.getByRole('button', { name: 'Act 45' })
+    for (const button of within(scroller).getAllByRole('button')) {
+      await user.tab()
+      expect(button).toHaveFocus()
+    }
+    expect(finalAction).toHaveFocus()
+  })
+
   it('renders group title and items', () => {
     const groups: ActivityGroup[] = [
       {

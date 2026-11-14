@@ -16,25 +16,21 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ## 依赖与顺序
 
-- 自动开窗一组一起做：C170-F01（ActivityFeed）、C173-F01（ChatWindow），CommentThread、NotificationCenter 同验。共享代码在 `composite-list-utils.ts`。
 - action 结果共享旧数据（X01-F012）在 [02](02-core-theme-i18n.md)，先做。
 - 多份 composite 示例文档从第 26–28 行起混进了 DataTableWithToolbar 的 Custom Filters 一节，报告没有编号，见 [13](13-evidence.md) 的未立项观察。
 
 ## 概览
 
-本篇 59 条：P1 1、P2 39、P3 19。
-按波次：W1 1、W7 39、W9 19。
-
-本篇的 P1：C170-F01。
+本篇 58 条：P1 0、P2 39、P3 19。
+按波次：W1 0、W7 39、W9 19。
 
 ## 波及多个组件的条目
 
 这些条目的行在下面各组件的表里。修的时候把右列的组件一起验。
 
-| 条目                                                     | 归属         | 同验                                  |
-| -------------------------------------------------------- | ------------ | ------------------------------------- |
-| C170-F01 满 40 行开窗后键盘到不了后续条目，list 语义消失 | ActivityFeed | CommentThread、NotificationCenter     |
-| C179-F04 React 调用方 aria-label 被默认文案盖掉          | SchemaForm   | WorkflowDesigner、WorkflowDetailShell |
+| 条目                                            | 归属       | 同验                                  |
+| ----------------------------------------------- | ---------- | ------------------------------------- |
+| C179-F04 React 调用方 aria-label 被默认文案盖掉 | SchemaForm | WorkflowDesigner、WorkflowDetailShell |
 
 ## 条目
 
@@ -42,13 +38,12 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 报告 `groups/composite/ActivityFeed.md`，队列状态 needs-evidence。另受 S01、S04 影响。
 
-| 编号     | 级别 | 波次 | 端               | 类别 | 条目                                            | 验收                                                                                        |
-| -------- | ---- | ---- | ---------------- | ---- | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| C170-F01 | P1   | W1   | 双端+文档·生成器 | 键盘 | 满 40 行开窗后键盘到不了后续条目，list 语义消失 | 一组 45 条带动作按钮，聚焦窗口按 ArrowDown 后 scrollTop 变化，Row 45 与 Act 45 可进 Tab 序  |
-| C170-F02 | P2   | W7   | 双端             | 行为 | 开窗后自定义分组头消失，只渲染 group.title      | 自定义头 CUSTOM-HEADER 在渲染 2 条与 45 条时两端都显示                                      |
-| C170-F03 | P2   | W7   | Core+双端        | 行为 | groupByDate 忽略时区，section 不含条目          | UTC 下 2024-05-02T20:00:00.000Z（主机上海）归到 2024-05-02，section 含 Evening              |
-| C170-F04 | P2   | W7   | 双端+Core        | 行为 | loadError 重试两端不一致且文案写死              | zh-CN、hasMore 且 loadError 时两端有本地化重试控件，点一次 onLoadMore 调 1 次，失败说明可读 |
-| C170-F05 | P3   | W9   | 文档·生成器      | 文档 | 生成说明不实，示例混入数据表 Custom Filters     | 重跑后说明不提 #dot/renderDot、uses 含 VirtualList 与 Button，示例文件无数据表一节          |
+| 编号     | 级别 | 波次 | 端          | 类别 | 条目                                        | 验收                                                                                        |
+| -------- | ---- | ---- | ----------- | ---- | ------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| C170-F02 | P2   | W7   | 双端        | 行为 | 开窗后自定义分组头消失，只渲染 group.title  | 自定义头 CUSTOM-HEADER 在渲染 2 条与 45 条时两端都显示                                      |
+| C170-F03 | P2   | W7   | Core+双端   | 行为 | groupByDate 忽略时区，section 不含条目      | UTC 下 2024-05-02T20:00:00.000Z（主机上海）归到 2024-05-02，section 含 Evening              |
+| C170-F04 | P2   | W7   | 双端+Core   | 行为 | loadError 重试两端不一致且文案写死          | zh-CN、hasMore 且 loadError 时两端有本地化重试控件，点一次 onLoadMore 调 1 次，失败说明可读 |
+| C170-F05 | P3   | W9   | 文档·生成器 | 文档 | 生成说明不实，示例混入数据表 Custom Filters | 重跑后说明不提 #dot/renderDot、uses 含 VirtualList 与 Button，示例文件无数据表一节          |
 
 ### C171 AppShell
 
@@ -87,7 +82,7 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ### C174 CommentThread
 
-报告 `groups/composite/CommentThread.md`，队列状态 needs-evidence。另受 S01、S04、C170-F01 影响。
+报告 `groups/composite/CommentThread.md`，队列状态 needs-evidence。另受 S01、S04 影响。
 
 | 编号     | 级别 | 波次 | 端             | 类别   | 条目                                        | 验收                                                                                     |
 | -------- | ---- | ---- | -------------- | ------ | ------------------------------------------- | ---------------------------------------------------------------------------------------- |
@@ -137,7 +132,7 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ### C178 NotificationCenter
 
-报告 `groups/composite/NotificationCenter.md`，队列状态 needs-evidence。另受 S01、S04、C170-F01 影响。
+报告 `groups/composite/NotificationCenter.md`，队列状态 needs-evidence。另受 S01、S04 影响。
 
 | 编号     | 级别 | 波次 | 端        | 类别   | 条目                                             | 验收                                                                                           |
 | -------- | ---- | ---- | --------- | ------ | ------------------------------------------------ | ---------------------------------------------------------------------------------------------- |

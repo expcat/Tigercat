@@ -414,6 +414,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           getItemKey={(index) => notificationItemKey(listItems[index]?.id ?? index)}
           renderItem={({ index }) => renderItem(listItems[index], index)}
           role="list"
+          ariaLabel={labels.title}
         />
       )
     }

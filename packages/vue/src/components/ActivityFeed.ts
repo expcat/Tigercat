@@ -589,7 +589,8 @@ export const ActivityFeed = defineComponent({
                     estimatedItemHeight: COMPOSITE_LIST_ESTIMATED_ITEM_HEIGHT,
                     height: COMPOSITE_LIST_VIEWPORT,
                     getItemKey: (index: number) => windowRows.value[index]?.key ?? index,
-                    role: 'presentation'
+                    role: 'list',
+                    ariaLabel: labels.value.listAriaLabel
                   },
                   {
                     default: ({ index }: { index: number }) => {

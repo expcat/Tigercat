@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/vue'
 import { defineComponent, h } from 'vue'
 import { NotificationCenter } from '@expcat/tigercat-vue/NotificationCenter'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -12,6 +12,28 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
 describe('NotificationCenter (Vue)', () => {
+  it('keeps the automatic virtual list on the keyboard path', async () => {
+    const items: NotificationItem[] = Array.from({ length: 45 }, (_, index) => ({
+      id: index + 1,
+      title: `Notification ${index + 1}`
+    }))
+    render(NotificationCenter, { props: { items } })
+
+    const scroller = screen.getByRole('list', { name: 'Notifications' })
+    expect(scroller).toHaveAttribute('tabindex', '0')
+    expect(screen.queryByText('Notification 45')).not.toBeInTheDocument()
+    scroller.focus()
+    expect(scroller).toHaveFocus()
+    await fireEvent.keyDown(scroller, { key: 'End' })
+
+    expect(scroller.scrollTop).toBeGreaterThan(0)
+    expect(within(scroller).getByRole('button', { name: 'Notification 45' }).tabIndex).toBe(0)
+    expect(screen.getByText('Notification 45').closest('[role="listitem"]')).toHaveAttribute(
+      'aria-posinset',
+      '45'
+    )
+  })
+
   it('renders groups and switches tabs', async () => {
     const items: NotificationItem[] = [
       { id: 1, title: '系统通知', type: '系统', read: false },
