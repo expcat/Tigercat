@@ -28,7 +28,6 @@ import {
   getBreadcrumbSlots,
   getBreadcrumbCollapsedItems,
   breadcrumbCollapsedMenuItems,
-  resolveLinkHref,
   getSeparatorKind,
   getSeparatorContent,
   resolveBreadcrumbItemCurrent,
@@ -297,17 +296,23 @@ export const Breadcrumb = defineComponent({
                           href
                         }
                       })
-                    ).map((entry) =>
-                      h(
+                    ).map((entry) => {
+                      const childProps = items[Number(entry.key)]?.props
+                      const address = resolveLinkAddress({
+                        href: entry.href,
+                        target: childProps?.target
+                      })
+                      return h(
                         'a',
                         {
                           role: 'menuitem',
-                          href: resolveLinkHref(entry.href),
+                          ...address,
+                          onClick: childProps?.current ? undefined : childProps?.onClick,
                           key: entry.key
                         },
                         entry.label
                       )
-                    )
+                    })
                   )
                 : null
             ])

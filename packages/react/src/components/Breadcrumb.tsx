@@ -20,7 +20,6 @@ import {
   getBreadcrumbSlots,
   getBreadcrumbCollapsedItems,
   breadcrumbCollapsedMenuItems,
-  resolveLinkHref,
   getSeparatorKind,
   getSeparatorContent,
   resolveBreadcrumbItemCurrent,
@@ -244,11 +243,25 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                         : ''
                     return { key: itemIndex, label: text || href || String(itemIndex), href }
                   })
-                ).map((entry) => (
-                  <a key={entry.key} role="menuitem" href={resolveLinkHref(entry.href)}>
-                    {entry.label}
-                  </a>
-                ))}
+                ).map((entry) => {
+                  const child = items[Number(entry.key)]
+                  const childProps = React.isValidElement<BreadcrumbItemProps>(child)
+                    ? child.props
+                    : undefined
+                  const address = resolveLinkAddress({
+                    href: entry.href,
+                    target: childProps?.target
+                  })
+                  return (
+                    <a
+                      key={entry.key}
+                      role="menuitem"
+                      {...address}
+                      onClick={childProps?.current ? undefined : childProps?.onClick}>
+                      {entry.label}
+                    </a>
+                  )
+                })}
               </div>
             ) : null}
             {index !== slots.length - 1 ? <SeparatorMark separator={separator} /> : null}

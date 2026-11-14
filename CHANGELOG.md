@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Breadcrumb 折叠点击（Vue / React，C086-F01）**：折叠菜单保留原 BreadcrumbItem 的点击处理器与 target，并复用链接地址门禁补齐安全 rel。Demo03 点击「一级目录」与可见「首页」一样，在事件到达 body 前取消原生导航。
+
 - **Upload 预览来源（Core，C081-F05）**：白名单改为完整 origin 严格匹配。允许 `https://cdn.example` 的图片，同时拒绝 `https://cdn.example.evil.test/a.png`，不再把 URL 字符串前缀当成允许的来源。
 
 - **TreeSelect 搜索键盘（Core / Vue / React，C080-F01）**：展开后的搜索框保留普通输入、Backspace、Delete 和 Ctrl+A 的原生行为。输入 `Beta` 会更新查询并触发搜索，共享按键意图只把已有树导航键交给树处理。

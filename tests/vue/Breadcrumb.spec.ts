@@ -224,6 +224,42 @@ describe('Breadcrumb', () => {
       expect(ellipsis(container)).toHaveAttribute('aria-expanded', 'false')
     })
 
+    it('preserves collapsed item clicks and link targets before bubbling to body', async () => {
+      const user = userEvent.setup()
+      const stay = vi.fn((event: MouseEvent) => event.preventDefault())
+      const prevented: boolean[] = []
+      const observeClick = (event: MouseEvent) => {
+        if (!(event.target instanceof Element) || !event.target.closest('a')) return
+        prevented.push(event.defaultPrevented)
+        event.preventDefault()
+      }
+      const { container } = render(Breadcrumb, {
+        props: { maxItems: 3 },
+        slots: {
+          default: () => [
+            h(BreadcrumbItem, { href: '/', onClick: stay }, () => 'Home'),
+            h(BreadcrumbItem, { href: '/a', target: '_blank', onClick: stay }, () => 'A'),
+            h(BreadcrumbItem, { href: '/b' }, () => 'B'),
+            h(BreadcrumbItem, {}, () => 'Current')
+          ]
+        }
+      })
+      document.body.addEventListener('click', observeClick)
+      try {
+        await user.click(screen.getByText('Home'))
+        await user.click(ellipsis(container)!)
+        const item = screen.getByRole('menuitem', { name: 'A' })
+        await user.click(item)
+        expect(prevented).toEqual([true, true])
+        expect(stay).toHaveBeenCalledTimes(2)
+        expect(item).toHaveAttribute('href', '/a')
+        expect(item).toHaveAttribute('target', '_blank')
+        expect(item).toHaveAttribute('rel', 'noopener noreferrer')
+      } finally {
+        document.body.removeEventListener('click', observeClick)
+      }
+    })
+
     it('does not collapse when maxItems is >= the item count', () => {
       const { container } = render(Breadcrumb, {
         props: { maxItems: 10 },
