@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **图表系列 key（Core / Vue / React，X01-F005）**：共享去重工具同时保留最终分配的 key，生成后缀遇到已占用值时继续递增；系列名 `['x', 'x', 'x-2']` 得到三个不同 key，双端 LineChart、AreaChart、RadarChart 的渐变、节点和点查询身份不再冲突。
+
 - **Calendar 年视图键盘（Core / Vue / React，X01-F004）**：上下键按三列月网格移动一行，January 按 ArrowDown 到 April，April 按 ArrowUp 回到 January；禁用月不再压缩月份步长。
 
 - **Example 沙箱隔离（Vue / React，X05-F01）**：DemoBlock 不再授予 `allow-same-origin`；运行时模块及依赖和样式由父页取回后内联到 iframe，保留脚本、表单和既有权限。双端初始预览、编辑运行与重置正常，示例访问 `parent.document` 被浏览器拒绝。

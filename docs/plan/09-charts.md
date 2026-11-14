@@ -20,7 +20,6 @@ charts 组 21 个组件（C138–C158），视觉与键盘全部 blocked。很�
 - 先做 ChartTooltip（C145）和 AreaChart 上的共享条目（C138-F01、C138-F02），它们并入了 6 到 10 张图。
 - roving tabindex 一组一起做：C147-F01、C149-F01、C150-F03、C152-F01、C155-F02、C155-F03、C156-F02。共享代码在 `useCartesianSeriesPoints` 和各图的键盘处理里。
 - 默认可访问名称一组一起做：C149-F05、C150-F02、C153-F01、C155-F01、C156-F01、C157-F01，都是无 title 时没读 `*ChartAriaLabel`。
-- 图表系列 key 去重是 [02](02-core-theme-i18n.md) 的 X01-F005。
 - OrgChart 的节点全是 `tabindex=0`、方向键无效，TreeMapChart 的 `nextTreeMapNodeIndex` 没有调用方。这两处报告没有编号，见 [13](13-evidence.md) 的未立项观察。
 
 ## 概览

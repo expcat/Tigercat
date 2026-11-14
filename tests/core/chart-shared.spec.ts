@@ -127,6 +127,15 @@ describe('buildChartSeriesKeys', () => {
     ])
   })
 
+  it.each([{ names: ['x', 'x', 'x-2'] }, { names: ['x', 'x-2', 'x'] }])(
+    'keeps generated suffixes unique for $names',
+    ({ names }) => {
+      const keys = buildChartSeriesKeys(names.map((name) => ({ name })))
+
+      expect(new Set(keys).size).toBe(names.length)
+    }
+  )
+
   it('keeps existing identity keys stable when a new series is inserted before them', () => {
     const current = buildChartSeriesKeys([{ name: 'Alpha' }, { name: 'Beta' }])
     const next = buildChartSeriesKeys([{ name: 'Inserted' }, { name: 'Alpha' }, { name: 'Beta' }])

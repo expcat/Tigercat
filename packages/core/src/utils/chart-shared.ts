@@ -56,9 +56,14 @@ export function buildChartSeriesKeys<T>(
   return series.map((item, index) => {
     const identity = getIdentity?.(item, index) ?? getDefaultChartSeriesIdentity(item)
     const base = normalizeChartSeriesKeyPart(identity ?? `index-${index}`)
-    const duplicateIndex = seen.get(base) ?? 0
+    let duplicateIndex = seen.get(base) ?? 0
+    let uniqueBase = duplicateIndex === 0 ? base : `${base}-${duplicateIndex + 1}`
+    while (seen.has(uniqueBase)) {
+      duplicateIndex += 1
+      uniqueBase = `${base}-${duplicateIndex + 1}`
+    }
     seen.set(base, duplicateIndex + 1)
-    const uniqueBase = duplicateIndex === 0 ? base : `${base}-${duplicateIndex + 1}`
+    seen.set(uniqueBase, 1)
 
     return `${prefix}${uniqueBase}`
   })
