@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## VirtualList
 
-`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/12 props
+`packages/core/src/types/virtual-list.ts` · `VirtualListProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop          | Type                                           | Default | Notes                                                                                      |
 | ------------- | ---------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -19,3 +19,16 @@ description: Compact generated Tigercat Advanced props reference
 | `itemCount?`  | `number`                                       | `-`     | Total number of items                                                                      |
 | `itemHeight?` | `number`                                       | `-`     | Fixed item height in px. Used when `getItemHeight` and `estimatedItemHeight` are omitte... |
 | `height?`     | `number`                                       | `400`   | Visible container height in px (not `%`, not observed from the parent).                    |
+
+### Remaining props (complete public API)
+
+- `estimatedItemHeight?`: `number`; default `-`. Estimated item height for dynamic measurement. When set (and `getItemHeight` is not), t...
+- `getItemHeight?`: `(index: number) => number`; default `-`. Known height per index (variable mode). Takes precedence over estimated/fixed.
+- `sizeStrategy?`: `VirtualListSizeStrategy`; default `-`. Custom size strategy. Overrides `itemHeight` / `getItemHeight` / `estimatedItemHeight`....
+- `overscan?`: `number`; default `-`. Extra items to render above and below the viewport (each side, not doubled).
+- `getItemKey?`: `(index: number) => string | number`; default `-`. Stable key for an index. Defaults to the index.
+- `ariaLabel?`: `string`; default `-`. Accessible name for the scrollable list.
+- `className?`: `string`; default `-`. Custom class name
+- `footer?`: `React.ReactNode`; default `-`. Rendered inside the scroller after the window. Not an item and not measured. Use this f...
+
+Events/callback props: `onScroll?`.

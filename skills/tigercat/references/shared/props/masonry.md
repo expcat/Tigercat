@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Masonry
 
-`packages/core/src/types/masonry.ts` · `MasonryProps` · 4/6 props
+`packages/core/src/types/masonry.ts` · `MasonryProps` · 4/6 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 默认 `layout="source"` 用 CSS 多列保持源顺序。`layout="shortest"` 按最短列定位，容器说明视觉顺序与源顺序不同。
 
@@ -21,3 +21,10 @@ Note: 默认 `layout="source"` 用 CSS 多列保持源顺序。`layout="shortest
 | `gap?`           | `MasonryResponsiveValue` | `16`       | Gap between columns and items in px. Pass a breakpoint map for a responsive gap.          |
 | `layout?`        | `MasonryLayout`          | `'source'` | `source` (default) follows source order. `shortest` packs into the shortest column and... |
 | `itemClassName?` | `string`                 | `-`        | Additional CSS class name for every item wrapper element                                  |
+
+### Remaining props (complete public API)
+
+- `balance?`: `'shortest'`; default `-`. `shortest` packs by column height. Visual order then differs from source order. Omit to...
+- `className?`: `string`; default `-`. Additional CSS class name for the root element
+
+Events/callback props: `onLayout?`.

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## InputOTP
 
-`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 4/20 props
+`packages/core/src/types/input-otp.ts` · `InputOTPProps` · 4/20 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop      | Type           | Default     | Notes                                                                      |
 | --------- | -------------- | ----------- | -------------------------------------------------------------------------- |
@@ -19,3 +19,24 @@ description: Compact generated Tigercat Form props reference
 | `value?`  | `string`       | `-`         | Value (for controlled mode) — the joined characters, at most `length` long |
 | `type?`   | `InputOTPType` | `'numeric'` | Allowed character set; drives per-character filtering and `inputmode`      |
 | `masked?` | `boolean`      | `false`     | Hide entered characters — each filled slot renders `maskChar` instead      |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Input size
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `errorMessage?`: `string`; default `-`. Error message to display
+- `defaultValue?`: `string`; default `''`. Default value (for uncontrolled mode)
+- `pattern?`: `RegExp`; default `-`. Per-character validation regex; overrides `type` filtering when provided
+- `maskChar?`: `string`; default `'•'`. Character shown per filled slot when `masked` is enabled
+- `groups?`: `number[]`; default `-`. Visual slot grouping, e.g. `[3, 3]`; ignored (with a dev warning) unless the group size...
+- `separator?`: `string`; default `'-'`. Separator string rendered between groups
+- `disabled?`: `boolean`; default `false`. Whether the input is disabled
+- `readonly?`: `boolean`; default `false`. Whether the input is readonly
+- `autoFocus?`: `boolean`; default `false`. Whether to autofocus the first empty slot on mount
+- `name?`: `string`; default `-`. Name for the hidden input carrying the joined value (form submission)
+- `id?`: `string`; default `-`. Id attribute applied to the group element
+- `ariaLabel?`: `string`; default `-`. Accessible label for the slot group; overrides the locale `inputOtp.groupLabel`
+- `className?`: `string`; default `-`. -
+- `_shakeTrigger?`: `number`; default `-`. -
+
+Events/callback props: `onChange?`, `onComplete?`, `onFocus?`, `onBlur?`.

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## PieChart
 
-`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/42 props
+`packages/core/src/types/chart-radial.ts` · `PieChartProps` · 4/42 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。
 
@@ -21,3 +21,46 @@ Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`center
 | `innerRadiusRatio?` | `number`           | `-`     | Inner radius as a fraction of the resolved outer radius. Used by Donut when `innerRadiu... |
 | `centerValue?`      | `string \| number` | `-`     | Text shown as the main value in the hole (donut).                                          |
 | `centerLabel?`      | `string`           | `-`     | Descriptive label shown below centerValue.                                                 |
+
+### Remaining props (complete public API)
+
+- `innerRadius?`: `number`; default `0`. Inner radius for donut
+- `outerRadius?`: `number`; default `-`. Outer radius
+- `startAngle?`: `number`; default `-Math.PI / 2`. Start angle in radians. `0` is 3 o'clock; default is 12 o'clock. Sweep is clockwise bec...
+- `endAngle?`: `number`; default `-`. End angle in radians. Omitted means one full turn after `startAngle` (`startAngle + 2π`...
+- `padAngle?`: `number`; default `0`. Padding angle in radians
+- `colors?`: `string[]`; default `-`. Custom colors
+- `showLabels?`: `boolean`; default `false`. Whether to show labels
+- `labelFormatter?`: `(value: number, datum: PieChartDatum, index: number) => string`; default `-`. Label formatter
+- `tooltipFormatter?`: `(datum: PieChartDatum, index: number) => string`; default `-`. Tooltip formatter
+- `legendFormatter?`: `(datum: PieChartDatum, index: number) => string`; default `-`. Legend formatter
+- `borderWidth?`: `number`; default `2`. Border width between slices
+- `borderColor?`: `string`; default `'var(--tiger-surface)'`. Border color between slices
+- `hoverOffset?`: `number`; default `8`. Distance slices translate outward on hover (ECharts emphasis style)
+- `labelPosition?`: `'inside' | 'outside'`; default `'inside'`. Label position: inside the slice or outside with leader lines
+- `shadow?`: `boolean`; default `false`. Enable drop shadow on slices
+- `gradient?`: `boolean`; default `false`. Fill slices with a vertical alpha gradient in pie user space.
+- `animated?`: `boolean`; default `false`. Entrance animation on the pie SVG host (not the legend).
+- `width?`: `number`; default `320`. Chart width
+- `height?`: `number`; default `200`. Chart height
+- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `hoveredIndex?`: `number | null`; default `-`. Hovered index (controlled)
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered element
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive elements when one is active
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `selectedIndex?`: `number | null`; default `-`. Selected index (controlled)
+- `showLegend?`: `boolean`; default `false`. Whether to show legend
+- `legendPosition?`: `ChartLegendPosition`; default `'bottom'`. Legend position around the plot
+- `legendMarkerSize?`: `number`; default `10`. Legend marker size in px
+- `legendGap?`: `number`; default `8`. Legend item gap in px
+- `showTooltip?`: `boolean`; default `true`. Whether to show tooltip
+- `bind?`: `{ labels?: { index: number; x: number; y: number; width: number; height: number }[] values?: number[] base?: number max?: number rose?: boolean }`; default `-`. -
+
+Events/callback props: `onHoveredIndexChange?`, `onSelectedIndexChange?`, `onSliceClick?`, `onSliceHover?`, `onUpdate:hoveredIndex?`, `onUpdate:selectedIndex?`.

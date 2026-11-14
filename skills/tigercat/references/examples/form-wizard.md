@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## FormWizard
 
-Runnable modules: `examples/example/vue3/src/examples/form-wizard/` and `examples/example/react/src/examples/form-wizard/`.
+Runnable modules: `examples/example/vue3/src/examples/form-wizard/01/`, `examples/example/vue3/src/examples/form-wizard/02/`, `examples/example/react/src/examples/form-wizard/01/`, `examples/example/react/src/examples/form-wizard/02/`.
 
 Uses: `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`.
 

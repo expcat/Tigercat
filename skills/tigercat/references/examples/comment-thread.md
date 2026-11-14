@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## CommentThread
 
-Runnable modules: `examples/example/vue3/src/examples/comment-thread/` and `examples/example/react/src/examples/comment-thread/`.
+Runnable modules: `examples/example/vue3/src/examples/comment-thread/01/`, `examples/example/vue3/src/examples/comment-thread/02/`, `examples/example/react/src/examples/comment-thread/01/`, `examples/example/react/src/examples/comment-thread/02/`.
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 

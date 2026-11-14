@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## FloatButtonGroup
 
-`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 4/12 props
+`packages/core/src/types/float-button.ts` · `FloatButtonGroupProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type                 | Default          | Notes                                                                                      |
 | ------------ | -------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
@@ -20,4 +20,15 @@ description: Compact generated Tigercat Navigation props reference
 | `portal?`    | `boolean`            | `true`           | Whether to portal the group to `document.body`. When false, the group is positioned `ab... |
 | `placement?` | `ViewportPlacement`  | `'bottom-right'` | Viewport corner used for the group.                                                        |
 
-Events/callback props: `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `shape?`: `FloatButtonShape`; default `'circle'`. Shape applied to all child buttons
+- `defaultOpen?`: `boolean`; default `false`. Initial open state in uncontrolled mode.
+- `closeOnAction?`: `boolean`; default `true`. Close the group after an action button is activated.
+- `className?`: `string`; default `-`. Additional CSS class name
+- `offset?`: `ViewportOffset`; default `24`. Viewport offset used with placement.
+- `triggerNode?`: `React.ReactNode`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onUpdate:open?`.

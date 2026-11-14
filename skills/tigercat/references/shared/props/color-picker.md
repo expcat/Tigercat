@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## ColorPicker
 
-`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 4/25 props
+`packages/core/src/types/color-picker.ts` · `ColorPickerProps` · 4/25 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 文本在失焦或 Enter 时才按最终格式提交。解析失败留在草稿里并标成错误，不上屏，隐藏域提交空。饱和度、色相和透明度在拖动中只更新预览，松手再写入。触发按钮带 `aria-expanded`。只读用 `readOnly`。
 
@@ -22,4 +22,28 @@ Note: 文本在失焦或 Enter 时才按最终格式提交。解析失败留在�
 | `format?`       | `ColorFormat`    | `'hex'` | Format of committed values. Hue / SV / alpha / text / presets all emit this format. Hex... |
 | `showAlpha?`    | `boolean`        | `false` | -                                                                                          |
 
-Events/callback props: `onChange?`, `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider. Do not pass a language id.
+- `labels?`: `Partial<TigerLocaleColorPicker>`; default `-`. UI labels for trigger / panel title / clear and panel chrome. Takes precedence over `lo...
+- `disabled?`: `boolean`; default `false`. -
+- `readOnly?`: `boolean`; default `false`. Focusable and submittable, but the value cannot change.
+- `size?`: `ComponentSize`; default `'md'`. -
+- `presets?`: `string[]`; default `-`. Preset colors rendered with ColorSwatch
+- `open?`: `boolean`; default `-`. -
+- `defaultOpen?`: `boolean`; default `false`. -
+- `clearable?`: `boolean`; default `true`. -
+- `closeOnSelect?`: `boolean`; default `true`. Close the panel after picking a preset.
+- `name?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+- `status?`: `InputStatus`; default `-`. -
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. -
+- `offset?`: `number`; default `4`. -
+- `dropdownClassName?`: `string`; default `-`. -
+- `getPopupContainer?`: `() => HTMLElement | null`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `React.CSSProperties`; default `-`. -
+- `'aria-describedby'?`: `string`; default `-`. -
+- `'aria-labelledby'?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onOpenChange?`, `onBlur?`.

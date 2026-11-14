@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## WorkflowDetailShell
 
-Runnable modules: `examples/example/vue3/src/examples/workflow-detail-shell/` and `examples/example/react/src/examples/workflow-detail-shell/`.
+Runnable modules: `examples/example/vue3/src/examples/workflow-detail-shell/01/`, `examples/example/react/src/examples/workflow-detail-shell/01/`.
 
 Uses: `SchemaForm`, `Tabs`, `WorkflowTimeline`, `WorkflowViewer`, `WorkflowActionBar`.
 

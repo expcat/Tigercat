@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## PieChart
 
-Runnable modules: `examples/example/vue3/src/examples/pie-chart/` and `examples/example/react/src/examples/pie-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/pie-chart/01/`, `examples/example/vue3/src/examples/pie-chart/02/`, `examples/example/vue3/src/examples/pie-chart/03/`, `examples/example/vue3/src/examples/pie-chart/04/`, `examples/example/vue3/src/examples/pie-chart/05/`, `examples/example/vue3/src/examples/pie-chart/06/`, `examples/example/react/src/examples/pie-chart/01/`, `examples/example/react/src/examples/pie-chart/02/`, `examples/example/react/src/examples/pie-chart/03/`, `examples/example/react/src/examples/pie-chart/04/`, `examples/example/react/src/examples/pie-chart/05/`, `examples/example/react/src/examples/pie-chart/06/`.
 
 Note: `innerRadiusRatio` 做环形（0.6 为甜甜圈）。`centerValue`/`centerLabel` 写在洞里。
 

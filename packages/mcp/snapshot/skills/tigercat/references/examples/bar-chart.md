@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## BarChart
 
-Runnable modules: `examples/example/vue3/src/examples/bar-chart/` and `examples/example/react/src/examples/bar-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/bar-chart/01/`, `examples/example/vue3/src/examples/bar-chart/02/`, `examples/example/vue3/src/examples/bar-chart/03/`, `examples/example/react/src/examples/bar-chart/01/`, `examples/example/react/src/examples/bar-chart/02/`, `examples/example/react/src/examples/bar-chart/03/`.
 
 Vue: `<BarChart :data="data" />`
 

@@ -26,6 +26,7 @@ import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync } from 'fs
 import { dirname, join, relative, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import prettier from 'prettier'
+import ts from 'typescript'
 import {
   buildFrameworkPackageSubpathFacts,
   loadPublicComponentExports
@@ -135,30 +136,18 @@ function extractMembers(body) {
   return uniqSorted(names)
 }
 
-function splitTopLevelCommaList(text) {
-  const parts = []
-  let start = 0
-  let angleDepth = 0
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i]
-    if (ch === '<') angleDepth++
-    else if (ch === '>') angleDepth = Math.max(0, angleDepth - 1)
-    else if (ch === ',' && angleDepth === 0) {
-      parts.push(text.slice(start, i))
-      start = i + 1
-    }
-  }
-  parts.push(text.slice(start))
-  return parts
-}
-
 function parseHeritage(text) {
-  const m = text.match(/\bextends\s+([^{]+)/)
-  if (!m) return []
+  const source = ts.createSourceFile(
+    'heritage.ts',
+    `interface Baseline${text} {}`,
+    ts.ScriptTarget.Latest,
+    true
+  )
+  const declaration = source.statements[0]
   return uniqSorted(
-    splitTopLevelCommaList(m[1])
-      .map((s) => s.trim().replace(/\s+/g, ' ').split('<')[0].trim())
-      .filter(Boolean)
+    (declaration.heritageClauses || []).flatMap((clause) =>
+      clause.types.map((type) => type.expression.getText(source))
+    )
   )
 }
 

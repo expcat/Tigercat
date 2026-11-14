@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Highlight
 
-`packages/core/src/types/highlight.ts` · `HighlightProps` · 4/9 props
+`packages/core/src/types/highlight.ts` · `HighlightProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `keywords` 只收字符串，按字面量线性扫描，不执行正则。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。
 
@@ -21,3 +21,11 @@ Note: `keywords` 只收字符串，按字面量线性扫描，不执行正则。
 | `global?`             | `boolean`           | `true`  | Highlight every occurrence. When false, only the first match of each keyword.              |
 | `highlightClassName?` | `string`            | `-`     | Additional CSS classes on highlighted `mark` elements                                      |
 | `text?`               | `string`            | `-`     | Source text to search. When set, it wins over children/slot. When omitted, children/slo... |
+
+### Remaining props (complete public API)
+
+- `caseSensitive?`: `boolean`; default `false`. Match case.
+- `highlightStyle?`: `Record<string, unknown>`; default `-`. Inline styles on highlighted `mark` elements
+- `className?`: `string`; default `-`. Additional CSS classes on the root
+- `style?`: `Record<string, unknown>`; default `-`. Inline styles on the root
+- `children?`: `React.ReactNode`; default `-`. -

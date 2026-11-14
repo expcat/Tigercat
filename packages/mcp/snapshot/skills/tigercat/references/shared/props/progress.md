@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Progress
 
-`packages/core/src/types/progress.ts` · `ProgressProps` · 4/17 props
+`packages/core/src/types/progress.ts` · `ProgressProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`format` 进 `aria-valuetext`。`status="paused"` 会停条纹动画。条纹和过渡在样式表里，减少动效时停。
 
@@ -21,3 +21,19 @@ Note: 默认名是 locale「进度」，不含当前值。自定义 `text`/`form
 | `status?`     | `ProgressStatus` | `'normal'`                        | Progress status When set, overrides variant color                            |
 | `showText?`   | `boolean`        | `true for line, false for circle` | Whether to show progress text. Line: outside the bar. Circle: in the center. |
 | `type?`       | `ProgressType`   | `'line'`                          | Progress type (shape)                                                        |
+
+### Remaining props (complete public API)
+
+- `variant?`: `ProgressVariant`; default `'primary'`. Progress variant style
+- `size?`: `ProgressSize`; default `'md'`. Progress size
+- `text?`: `string`; default `-`. Custom text to display instead of percentage
+- `format?`: `(percentage: number) => string`; default `-`. Format function for custom text
+- `striped?`: `boolean`; default `false`. Whether to show striped animation Only applicable for line type
+- `stripedAnimation?`: `boolean`; default `false`. Whether the striped animation should be animated. `status="paused"` stops the stripes a...
+- `strokeWidth?`: `number`; default `6`. Stroke width for circle type (in pixels)
+- `width?`: `string | number`; default `'auto'`. Width of the progress bar for line type Auto for responsive, or specific value
+- `height?`: `number`; default `-`. Height of the progress bar for line type (in pixels) If not specified, uses size-based...
+- `className?`: `string`; default `-`. Additional CSS classes
+- `indeterminate?`: `boolean`; default `false`. Bar animates without a known value. An explicit success status still fills to 100.
+- `steps?`: `number`; default `-`. Render this many segments instead of one continuous bar.
+- `style?`: `Record<string, string | number>`; default `-`. -

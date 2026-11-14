@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## FormItem
 
-Runnable modules: `examples/example/vue3/src/examples/form-item/` and `examples/example/react/src/examples/form-item/`.
+Runnable modules: `examples/example/vue3/src/examples/auto-complete/01/`, `examples/example/vue3/src/examples/cascader/01/`, `examples/example/vue3/src/examples/color-picker/01/`, `examples/example/vue3/src/examples/color-swatch/01/`, `examples/example/vue3/src/examples/cron-editor/01/`, `examples/example/vue3/src/examples/datepicker/01/`, `examples/example/vue3/src/examples/form-wizard/01/`, `examples/example/vue3/src/examples/form/01/`, `examples/example/react/src/examples/auto-complete/01/`, `examples/example/react/src/examples/cascader/01/`, `examples/example/react/src/examples/color-picker/01/`, `examples/example/react/src/examples/color-swatch/01/`, `examples/example/react/src/examples/cron-editor/01/`, `examples/example/react/src/examples/datepicker/01/`, `examples/example/react/src/examples/form-wizard/01/`, `examples/example/react/src/examples/form/01/`.
 
 Note: 具名 FormItem 只把值和校验接到第一个控件。`required` 合并成一条规则。错误文本一直在文档里：字段校验是 `role="status"`，提交失败是 `role="alert"`。省略公开 value/`checked`/`fileList` 时从模型取值（boolean/list/tuple 不会把 `''` 当成字符串）。单颗 Radio 写入自己的选项值。
 

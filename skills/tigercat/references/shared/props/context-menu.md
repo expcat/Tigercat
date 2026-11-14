@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ContextMenu
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 4/12 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。
 
@@ -21,3 +21,16 @@ Note: 项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地�
 | `disabled?`     | `boolean` | `false` | Whether the context menu is disabled                                                       |
 | `portal?`       | `boolean` | `true`  | Portal the menu through the overlay target chain (overlay-host, then ConfigProvider roo... |
 | `closeOnClick?` | `boolean` | `true`  | Whether to close the menu on item click                                                    |
+
+### Remaining props (complete public API)
+
+- `asChild?`: `boolean`; default `false`. Merge trigger ARIA / handlers onto the unique focusable child.
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. Menu placement relative to the cursor point
+- `defaultOpen?`: `boolean`; default `false`. Default open state (uncontrolled mode)
+- `offset?`: `number`; default `0`. Distance (in pixels) between the cursor point and the menu
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -
+- `items?`: `PopupMenuItem[]`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onCheck?`, `onItemSelect?`, `onUpdate:open?`.

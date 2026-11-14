@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Header
 
-`packages/core/src/types/layout.ts` · `HeaderProps` · 3/6 props
+`packages/core/src/types/layout.ts` · `HeaderProps` · 3/6 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 未传 `height` 时默认 `h-16`，不写 inline height。`sticky` 是独立开关，`translucent` / `blur` 只改表面。`fullHeight` 壳里忽略 `sticky`。
 
@@ -20,3 +20,9 @@ Note: 未传 `height` 时默认 `h-16`，不写 inline height。`sticky` 是独�
 | `variant?`   | `HeaderVariant` | `'default'` | Header visual style.                                                                       |
 | `height?`    | `string`        | `-`         | Header height. When omitted, the stylesheet height is `4rem` for every surface so calle... |
 | `className?` | `string`        | `-`         | Additional CSS classes                                                                     |
+
+### Remaining props (complete public API)
+
+- `sticky?`: `boolean`; default `false`. Stick to the block start while the page scrolls. Ignored inside a `fullHeight` shell, w...
+- `as?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -

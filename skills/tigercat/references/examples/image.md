@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Image
 
-Runnable modules: `examples/example/vue3/src/examples/image/` and `examples/example/react/src/examples/image/`.
+Runnable modules: `examples/example/vue3/src/examples/image/01/`, `examples/example/vue3/src/examples/image/02/`, `examples/example/vue3/src/examples/image/03/`, `examples/example/vue3/src/examples/image/04/`, `examples/example/vue3/src/examples/image/06/`, `examples/example/react/src/examples/image/01/`, `examples/example/react/src/examples/image/02/`, `examples/example/react/src/examples/image/03/`, `examples/example/react/src/examples/image/04/`, `examples/example/react/src/examples/image/06/`.
 
 Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`zoomOnHover` 开启悬停 / focus 放大，点击仍打开全屏预览；组内由 ImageGroup 统一预览。lazy 使用原生 `loading="lazy"`。`onLoad` / `srcSet` 落在内层 `<img>`。
 

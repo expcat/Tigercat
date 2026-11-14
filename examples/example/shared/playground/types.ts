@@ -10,6 +10,8 @@ export interface DemoViewport {
 }
 
 export interface DemoModuleMeta {
+  /** Additional components rendered indirectly by a parent component. */
+  components?: string[]
   id: string
   title: string
   description?: string

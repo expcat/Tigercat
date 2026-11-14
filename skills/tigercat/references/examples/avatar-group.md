@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## AvatarGroup
 
-Runnable modules: `examples/example/vue3/src/examples/avatar-group/` and `examples/example/react/src/examples/avatar-group/`.
+Runnable modules: `examples/example/vue3/src/examples/avatar/03/`, `examples/example/vue3/src/examples/avatar/04/`, `examples/example/react/src/examples/avatar/03/`, `examples/example/react/src/examples/avatar/04/`.
 
 Note: `max` 是可见 Avatar 数，overflow 额外；`max={0}` 只出 +N。只计 Avatar 子节点。未传 `aria-label` 时组名来自 locale，可覆盖。
 

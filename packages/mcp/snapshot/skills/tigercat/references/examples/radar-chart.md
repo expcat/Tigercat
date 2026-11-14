@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## RadarChart
 
-Runnable modules: `examples/example/vue3/src/examples/radar-chart/` and `examples/example/react/src/examples/radar-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/radar-chart/01/`, `examples/example/vue3/src/examples/radar-chart/02/`, `examples/example/vue3/src/examples/radar-chart/03/`, `examples/example/react/src/examples/radar-chart/01/`, `examples/example/react/src/examples/radar-chart/02/`, `examples/example/react/src/examples/radar-chart/03/`.
 
 Vue: `<RadarChart :data="data" />`
 

@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## AppShell
 
-Runnable modules: `examples/example/vue3/src/examples/app-shell/` and `examples/example/react/src/examples/app-shell/`.
+Runnable modules: `examples/example/vue3/src/examples/app-shell/01/`, `examples/example/react/src/examples/app-shell/01/`.
 
 Uses: `Layout`, `Sidebar`, `Header`, `Content`, `Breadcrumb`, `Tabs`, `PageHeader`.
 

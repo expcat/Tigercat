@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## MenuItem
 
-Runnable modules: `examples/example/vue3/src/examples/menu-item/` and `examples/example/react/src/examples/menu-item/`.
+Runnable modules: `examples/example/vue3/src/examples/menu/03/`, `examples/example/react/src/examples/menu/03/`.
 
 Vue: `<Menu><MenuItem :item-key="itemKey">Home</MenuItem></Menu>`
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## AvatarGroup
 
-`packages/core/src/types/avatar.ts` · `AvatarGroupProps` · 4/7 props
+`packages/core/src/types/avatar.ts` · `AvatarGroupProps` · 4/7 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `max` 是可见 Avatar 数，overflow 额外；`max={0}` 只出 +N。只计 Avatar 子节点。未传 `aria-label` 时组名来自 locale，可覆盖。
 
@@ -21,3 +21,9 @@ Note: `max` 是可见 Avatar 数，overflow 额外；`max={0}` 只出 +N。只�
 | `size?`   | `AvatarSize`           | `'md'`     | Size applied to avatars that did not set their own size                                    |
 | `shape?`  | `AvatarShape`          | `'circle'` | Shape applied to avatars that did not set their own shape, and to overflow                 |
 | `locale?` | `Partial<TigerLocale>` | `-`        | -                                                                                          |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes
+- `children?`: `React.ReactNode`; default `-`. -
+- `labels?`: `Partial<TigerLocaleAvatarGroup>`; default `-`. -

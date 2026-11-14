@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## LineChart
 
-Runnable modules: `examples/example/vue3/src/examples/line-chart/` and `examples/example/react/src/examples/line-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/line-chart/01/`, `examples/example/vue3/src/examples/line-chart/02/`, `examples/example/vue3/src/examples/line-chart/03/`, `examples/example/react/src/examples/line-chart/01/`, `examples/example/react/src/examples/line-chart/02/`, `examples/example/react/src/examples/line-chart/03/`.
 
 Vue: `<LineChart :data="data" />`
 

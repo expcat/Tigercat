@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## ActivityFeed
 
-`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 4/22 props
+`packages/core/src/types/activity-feed.ts` · `ActivityFeedProps` · 4/22 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 
@@ -23,5 +23,26 @@ Note: `groups` 一旦传入（含 `[]`）不再回落 `items`。根是 `region`�
 | `groups?`     | `ActivityGroup[]`                | `-`     | Activity groups                                     |
 | `groupBy?`    | `(item: ActivityItem) => string` | `-`     | Group by function (used when `groups` not provided) |
 | `groupOrder?` | `string[]`                       | `-`     | Optional group order                                |
+
+### Remaining props (complete public API)
+
+- `loading?`: `boolean`; default `false`. Whether to show loading state
+- `loadingText?`: `string`; default `-`. Loading text
+- `emptyText?`: `string`; default `-`. Empty state text
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides for ActivityFeed UI text
+- `labels?`: `Partial<import('./locale').TigerLocaleActivityFeed>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `showAvatar?`: `boolean`; default `true`. Show avatar
+- `showTime?`: `boolean`; default `true`. Show time label
+- `timeZone?`: `string`; default `-`. IANA timezone. Without it, the first render omits clocks.
+- `showGroupTitle?`: `boolean`; default `true`. Show group title
+- `renderItem?`: `(item: ActivityItem, index: number, group?: ActivityGroup) => unknown`; default `-`. Custom render for activity item
+- `renderGroupHeader?`: `(group: ActivityGroup) => unknown`; default `-`. Custom render for group header
+- `hasMore?`: `boolean`; default `-`. Another page of items exists. The sentinel stays outside the feed and uses the single i...
+- `loadError?`: `boolean`; default `-`. The last page request failed.
+- `renderLoading?`: `() => React.ReactNode`; default `-`. -
+- `renderEmpty?`: `() => React.ReactNode`; default `-`. -
+- `groupByDate?`: `boolean`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
 
 Events/callback props: `onLoadMore?`.

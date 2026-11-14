@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Marquee
 
-Runnable modules: `examples/example/vue3/src/examples/marquee/` and `examples/example/react/src/examples/marquee/`.
+Runnable modules: `examples/example/vue3/src/examples/marquee/01/`, `examples/example/vue3/src/examples/marquee/02/`, `examples/example/vue3/src/examples/marquee/03/`, `examples/example/vue3/src/examples/marquee/04/`, `examples/example/react/src/examples/marquee/01/`, `examples/example/react/src/examples/marquee/02/`, `examples/example/react/src/examples/marquee/03/`, `examples/example/react/src/examples/marquee/04/`.
 
 Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。方向只用 `start` / `end` / `up` / `down`。
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Modal
 
-`packages/core/src/types/modal.ts` · `ModalProps` · 4/26 props
+`packages/core/src/types/modal.ts` · `ModalProps` · 4/26 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `open` 当帧出 dialog。打开时焦点进对话框或 `initialFocus`，先读标题。确定可返回 Promise 或 `preventDefault`：进行中不可再点，拒绝则不关闭。层本身不滚动，只有正文滚动。拖拽时过渡时长为 0。离开回调等这一层过渡结束；减少动效或没有过渡时立刻发。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。关闭名走 `locale.modal`。嵌套 Modal 进外层 overlay-host，Esc 先关里层。
 
@@ -21,3 +21,30 @@ Note: `open` 当帧出 dialog。打开时焦点进对话框或 `initialFocus`，
 | `maskClosable?`   | `boolean` | `true`  | Whether clicking the mask should close the modal                                  |
 | `destroyOnClose?` | `boolean` | `false` | Whether to destroy the modal content when closed                                  |
 | `mobileSheet?`    | `boolean` | `false` | Whether the modal should render as a mobile bottom sheet below the md breakpoint. |
+
+### Remaining props (complete public API)
+
+- `open?`: `boolean`; default `false`. Whether the modal is open
+- `size?`: `ModalSize`; default `'md'`. Modal size
+- `width?`: `string | number`; default `-`. Custom width (overrides size). Accepts CSS value like '600px' or '80%'.
+- `title?`: `string`; default `-`. Modal title
+- `mask?`: `boolean`; default `true`. Whether to show the mask (overlay)
+- `keyboard?`: `boolean`; default `true`. Whether Escape closes the modal. Independent of `closable`, which only shows or hides t...
+- `centered?`: `boolean`; default `false`. Whether the modal should be centered vertically
+- `zIndex?`: `number`; default `OVERLAY_Z_INDEX.modal`. z-index of the modal
+- `className?`: `string`; default `-`. Custom class name for modal content
+- `draggable?`: `boolean`; default `false`. Whether the modal can be dragged by its title bar
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides for common texts
+- `labels?`: `Partial<TigerLocaleModal>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `closeAriaLabel?`: `string`; default `-`. Close button accessible name. Defaults to `locale.modal.closeAriaLabel` (en-US `Close`).
+- `showDefaultFooter?`: `boolean`; default `false`. Whether to render a default footer when no `footer` is provided.
+- `okText?`: `string`; default `-`. Default OK button text. Defaults to `locale.modal.okText` (en-US `OK`).
+- `cancelText?`: `string`; default `-`. Default Cancel button text. Defaults to `locale.modal.cancelText` (en-US `Cancel`).
+- `initialFocus?`: `string`; default `-`. Element to focus when the dialog opens. Defaults to the dialog itself, so the title is...
+- `children?`: `React.ReactNode`; default `-`. Modal content
+- `titleContent?`: `React.ReactNode`; default `-`. Modal title content (alternative to title prop)
+- `footer?`: `React.ReactNode | ((actions: { ok: () => void; cancel: () => void }) => React.ReactNode)`; default `-`. Modal footer content, or a render function that receives `{ ok, cancel }`. Default OK a...
+- `showCancel?`: `boolean`; default `true`. Show the cancel button in the default footer.
+- `style?`: `Record<string, unknown>`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onClose?`, `onAfterClose?`, `onCancel?`, `onOk?`, `onUpdate:open?`.

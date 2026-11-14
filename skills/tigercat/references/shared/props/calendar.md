@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Calendar
 
-`packages/core/src/types/calendar.ts` · `CalendarProps` · 4/14 props
+`packages/core/src/types/calendar.ts` · `CalendarProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop            | Type                     | Default   | Notes                                                                   |
 | --------------- | ------------------------ | --------- | ----------------------------------------------------------------------- |
@@ -20,4 +20,17 @@ description: Compact generated Tigercat Data props reference
 | `mode?`         | `CalendarMode`           | `'month'` | Calendar display mode.                                                  |
 | `fullscreen?`   | `boolean`                | `false`   | Whether the calendar is full-screen or card-style                       |
 
-Events/callback props: `onChange?`, `onPanelChange?`.
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale
+- `defaultMode?`: `CalendarMode`; default `'month'`. Initial mode when `mode` is omitted.
+- `disabledDate?`: `(date: Date) => boolean`; default `-`. Function that determines if a date is disabled
+- `weekStartsOn?`: `WeekStartsOn`; default `-`. First column of the week. Defaults to the locale week start (en-US Sunday, zh/de Monday...
+- `now?`: `Date`; default `-`. Clock snapshot for “today” and the default panel month. Omit on the client to use the w...
+- `rangeValue?`: `[Date | null, Date | null]`; default `-`. Range highlight used by DatePicker. Calendar still emits one clicked date.
+- `events?`: `CalendarEvent[]`; default `-`. Events shown in month-view date cells. Matched by local calendar day (`yyyy-MM-dd`). Wi...
+- `dateCellRender?`: `(date: Date, extra: CalendarDateCellExtra) => unknown`; default `-`. -
+- `className?`: `string`; default `-`. Custom class name
+- `modelValue?`: `Date | string | null`; default `-`. -
+
+Events/callback props: `onChange?`, `onPanelChange?`, `onUpdate:modelValue?`, `onUpdate:mode?`.

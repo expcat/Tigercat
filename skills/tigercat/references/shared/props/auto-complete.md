@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## AutoComplete
 
-`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 4/28 props
+`packages/core/src/types/auto-complete.ts` · `AutoCompleteProps` · 4/28 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 关层（完成、点外面、受控关闭）提交或还原。原生 `name` 提交已提交的值，展示用提交时的标签。缺键、`null` 和 `''` 是未提交。空查询不命中 `value` 或 `label` 为 `''` 的选项。没有可选项时 Enter 提交查询。组合输入期间把键交给输入法。打开着的空列表 `aria-expanded` 仍是真。只读用 `readOnly`。
 
@@ -21,3 +21,32 @@ Note: 关层（完成、点外面、受控关闭）提交或还原。原生 `nam
 | `value?`        | `AutoCompleteValue`    | `-`     | Committed value. `undefined`, `null`, and `''` are not committed. Typing updates the qu... |
 | `defaultValue?` | `AutoCompleteValue`    | `-`     | Initial committed value when `value` is omitted.                                           |
 | `searchValue?`  | `string`               | `-`     | Controlled search input value                                                              |
+
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale
+- `placeholder?`: `string`; default `-`. Placeholder text
+- `readOnly?`: `boolean`; default `-`. Focusable and submittable, but the query and value cannot change.
+- `defaultSearchValue?`: `string`; default `-`. Initial query when unselected. Ignored once a value is committed.
+- `open?`: `boolean`; default `-`. Controlled open state. `undefined` is uncontrolled.
+- `defaultOpen?`: `boolean`; default `-`. Initial open state when `open` is omitted.
+- `size?`: `ComponentSize`; default `-`. Component size
+- `disabled?`: `boolean`; default `-`. Whether the component is disabled
+- `clearable?`: `boolean`; default `-`. Whether to show clear button
+- `emptyText?`: `string`; default `-`. Text shown when no options match. Defaults to ConfigProvider locale `empty.noResults`.
+- `filterOption?`: `AutoCompleteFilterOption`; default `-`. Whether to filter options locally based on input value (default: true)
+- `className?`: `string`; default `-`. Custom class name
+- `defaultActiveFirstOption?`: `boolean`; default `-`. Highlight the first enabled option when the list opens or the query changes. When true...
+- `allowFreeInput?`: `boolean`; default `-`. Allow committing text that is not an option (default: true). Typing always updates the...
+- `status?`: `InputStatus`; default `-`. Validation status. Also read from FormItem when omitted.
+- `name?`: `string`; default `-`. Native form field name.
+- `loading?`: `boolean`; default `-`. Remote-loading flag. Empty lists show `common.loadingText` instead of empty.
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. Overlay placement.
+- `offset?`: `number`; default `4`. Overlay offset in pixels.
+- `dropdownClassName?`: `string`; default `-`. Extra class names for the dropdown panel.
+- `getPopupContainer?`: `() => HTMLElement | null`; default `-`. Portal container. Defaults to the overlay-host → ConfigProvider → body chain.
+- `listHeight?`: `number`; default `256`. Height of the dropdown panel content area in pixels.
+- `id?`: `string`; default `-`. Combobox input id. Also read from FormItem when omitted.
+- `modelValue?`: `AutoCompleteValue`; default `-`. -
+
+Events/callback props: `onChange?`, `onSelect?`, `onSearchChange?`, `onOpenChange?`, `onFocus?`, `onBlur?`, `onUpdate:modelValue?`, `onUpdate:searchValue?`, `onUpdate:open?`.

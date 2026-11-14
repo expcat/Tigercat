@@ -13,7 +13,7 @@ description: Compact Tigercat Data Vue and React usage routes
 
 ## CollapsePanel
 
-Runnable modules: `examples/example/vue3/src/examples/collapse-panel/` and `examples/example/react/src/examples/collapse-panel/`.
+Runnable modules: `examples/example/vue3/src/examples/collapse/01/`, `examples/example/vue3/src/examples/collapse/02/`, `examples/example/vue3/src/examples/collapse/03/`, `examples/example/react/src/examples/collapse/01/`, `examples/example/react/src/examples/collapse/02/`, `examples/example/react/src/examples/collapse/03/`.
 
 Note: 必须写 `panelKey`，且必须包在 Collapse 里。disabled 留在 Tab 序并 `aria-disabled`。
 

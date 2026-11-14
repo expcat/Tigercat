@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## GaugeChart
 
-`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 4/27 props
+`packages/core/src/types/chart-radial.ts` · `GaugeChartProps` · 4/27 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop          | Type                                               | Default | Notes                                                                                      |
 | ------------- | -------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -19,3 +19,29 @@ description: Compact generated Tigercat Charts props reference
 | `startAngle?` | `number`                                           | `-135`  | Start angle in degrees. `0` is 12 o'clock; positive is clockwise. Default is a bottom-o... |
 | `endAngle?`   | `number`                                           | `135`   | End angle in degrees (same convention as `startAngle`)                                     |
 | `segments?`   | `Array<{ range: [number, number] color: string }>` | `-`     | Color segments along the arc. Array of { range: [from, to], color }                        |
+
+### Remaining props (complete public API)
+
+- `width?`: `number`; default `280`. Chart width
+- `height?`: `number`; default `200`. Chart height
+- `min?`: `number`; default `0`. Minimum value of the scale
+- `max?`: `number`; default `100`. Maximum value of the scale
+- `arcWidth?`: `number`; default `20`. Arc stroke width in px
+- `showTicks?`: `boolean`; default `true`. Whether to show tick marks
+- `tickCount?`: `number`; default `5`. Number of intervals between min and max (renders `tickCount + 1` marks).
+- `valueFormatter?`: `(value: number) => string`; default `-`. Value label format function
+- `tooltipFormatter?`: `(value: number) => string`; default `-`. Tooltip content formatter. Receives the current value; defaults to the formatted value...
+- `label?`: `string`; default `-`. Label shown below the value
+- `trackColor?`: `string`; default `'var(--tiger-border)'`. Default arc track color
+- `color?`: `string`; default `'var(--tiger-primary)'`. Default arc fill color
+- `gradient?`: `boolean`; default `false`. When true, the value arc is rendered with a vertical alpha gradient in gauge user space...
+- `animated?`: `boolean`; default `false`. Animate the needle when `value` changes. `prefers-reduced-motion` skips. Angles on this...
+- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `showTooltip?`: `boolean`; default `true`. Whether to show tooltip
+- `bind?`: `{ display?: 'pointer' | 'arc' }`; default `-`. -

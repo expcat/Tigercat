@@ -42,7 +42,7 @@ One component per page. This index only links to those pages.
 
 ## Form
 
-`packages/core/src/types/form.ts` · `FormProps` · 4/20 props
+`packages/core/src/types/form.ts` · `FormProps` · 4/20 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 值对象是 Vue `modelValue`（`v-model`）/ React `value`。父级要把 `update:modelValue` 写回自己的模型。`required` 会参与校验。一次 `validate()` 作废仍在飞的上一次。失败提交聚焦第一个可聚焦的无效控件。Wizard 步下标走 `onStepChange`。Form `size` 是 `sm|md|lg`。
 
@@ -52,3 +52,24 @@ Note: 值对象是 Vue `modelValue`（`v-model`）/ React `value`。父级要把
 | `conditions?` | `FormConditions` | `-`     | Conditional field behavior DSL for visibility, disabled state, and dynamic required rules. |
 | `disabled?`   | `boolean`        | `false` | Whether to disable the entire form                                                         |
 | `loading?`    | `boolean`        | `false` | Whether the form is in a loading state (prevents submit)                                   |
+
+### Remaining props (complete public API)
+
+- `value?`: `FormValues`; default `-`. Form values. Vue binds this as `modelValue` (`v-model`); React as `value`.
+- `labelWidth?`: `string | number`; default `-`. Label width (applies when labelPosition is 'left' or 'right')
+- `labelPosition?`: `FormLabelPosition`; default `'left'`. Label position relative to the control
+- `labelAlign?`: `FormLabelAlign`; default `'right'`. Label alignment
+- `size?`: `ComponentSize`; default `'md'`. Form size
+- `inlineMessage?`: `boolean`; default `true`. Whether to show validation messages inline
+- `showRequiredAsterisk?`: `boolean`; default `true`. Whether to show asterisk for required fields
+- `showErrorSummary?`: `boolean`; default `false`. List existing field errors. Activating an item focuses that field's control.
+- `controller?`: `FormController`; default `-`. Headless controller from `useFormController` / `createFormEngine`. When set, the contro...
+- `fieldDependencies?`: `FormFieldDependencies`; default `-`. Field dependency map: key is the dependent field, value is array of fields it depends o...
+- `validateDebounce?`: `number`; default `0`. Debounce delay for change-triggered field validation in milliseconds. Blur, submit, and...
+- `undoable?`: `boolean`; default `false`. Enable undo/redo for form values
+- `maxHistorySize?`: `number`; default `50`. Maximum undo history size
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override for built-in validation messages. Merged on top of the ConfigProvider l...
+- `children?`: `React.ReactNode`; default `-`. -
+- `modelValue?`: `FormValues`; default `-`. -
+
+Events/callback props: `onSubmit?`, `onValidate?`, `onChange?`.

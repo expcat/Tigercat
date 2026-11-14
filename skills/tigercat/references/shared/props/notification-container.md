@@ -11,13 +11,17 @@ description: Compact generated Tigercat Feedback props reference
 
 ## NotificationContainer
 
-`packages/react/src/components/NotificationContainer.tsx and packages/vue/src/components/NotificationContainer.ts` · `NotificationContainerProps / VueNotificationContainerProps` · 3/4 props
+`packages/react/src/components/NotificationContainer.tsx and packages/vue/src/components/NotificationContainer.ts` · `NotificationContainerProps / VueNotificationContainerProps` · 3/4 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop             | Type                     | Default | Notes |
 | ---------------- | ------------------------ | ------- | ----- |
 | `position?`      | `NotificationPosition`   | `-`     | -     |
 | `notifications?` | `NotificationInstance[]` | `-`     | -     |
 | `className?`     | `string`                 | `-`     | -     |
+
+### Remaining props (complete public API)
+
+- `portal?`: `boolean`; default `true`. Portal through the overlay-host chain. Imperative hosts pass `false`.
 
 Events/callback props: `onClose?`, `onPause?`, `onResume?`.
 

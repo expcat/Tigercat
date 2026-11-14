@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## LoadingBar
 
-`packages/core/src/types/loading-bar.ts` · `LoadingBarProps` · 4/7 props
+`packages/core/src/types/loading-bar.ts` · `LoadingBarProps` · 4/7 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `error` 和 `finish` 共用 `start` 计数。还有未结束的 `start` 时保持加载，全部结束再进入成功或失败然后隐藏。开始、失败、结束各说一次，百分比留在 `progressbar` 上。
 
@@ -21,3 +21,9 @@ Note: `error` 和 `finish` 共用 `start` 计数。还有未结束的 `start` �
 | `ariaLabel?` | `string`                | `locale \`common.loadingText\` (\`'Loading...'\`)` | Accessible name for the progressbar.                                                       |
 | `color?`     | `LoadingBarColor`       | `'primary'`                                        | Fill color while loading. Error status always uses danger.                                 |
 | `height?`    | `number`                | `2`                                                | Bar height in pixels.                                                                      |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes merged onto the track container.
+- `style?`: `Record<string, string | number>`; default `-`. Inline styles merged onto the track container.
+- `minimumDisplayMs?`: `number`; default `200`. Keep the bar visible at least this long so a fast finish still flashes.

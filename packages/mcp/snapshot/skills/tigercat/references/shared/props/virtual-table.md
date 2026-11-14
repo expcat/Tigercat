@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## VirtualTable
 
-`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 4/16 props
+`packages/core/src/types/virtual-table.ts` · `VirtualTableProps` · 4/16 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 
@@ -23,5 +23,20 @@ Note: 行窗口与 VirtualList/Table 同一份 `calculateVirtualRange`。复用 
 | `columns?`           | `TableColumn<T>[]` | `-`     | Column definitions. Reads `key` / `title` / `width` / `dataKey` / `fixed` / `render` /... |
 | `virtualHeight?`     | `number`           | `400`   | Viewport height in px                                                                     |
 | `virtualItemHeight?` | `number`           | `48`    | Fixed row height in px used by the window. Content is not clipped.                        |
+
+### Remaining props (complete public API)
+
+- `width?`: `number | 'auto'`; default `'auto'`. Viewport width in px or auto. Column virtualization requires a number.
+- `overscan?`: `number`; default `-`. Number of extra rows rendered above/below viewport
+- `stickyHeader?`: `boolean`; default `-`. Enable fixed (sticky) header
+- `virtualizeColumns?`: `boolean`; default `-`. Enable horizontal column virtualization. Requires a numeric `width` and no fixed column...
+- `rowKey?`: `keyof T | ((row: T, index: number) => string | number)`; default `'id'`. Unique row key field. Defaults to `id`, matching Table. Missing identities are not used...
+- `rowClassName?`: `string | ((row: T, index: number) => string)`; default `-`. Row class name
+- `loading?`: `boolean`; default `-`. Loading state
+- `emptyText?`: `string`; default `-`. Empty state text
+- `rowSelection?`: `RowSelectionConfig<T>`; default `-`. Row selection. Clicking a row toggles it; there is no checkbox column. Cell controls mu...
+- `striped?`: `boolean`; default `-`. Striped rows
+- `bordered?`: `boolean`; default `-`. Bordered variant
+- `className?`: `string`; default `-`. Additional CSS class
 
 Events/callback props: `onSelectionChange?`.

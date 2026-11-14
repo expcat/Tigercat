@@ -31,7 +31,7 @@ One component per page. This index only links to those pages.
 
 ## Layout
 
-`packages/core/src/types/layout.ts` · `LayoutProps` · 3/5 props
+`packages/core/src/types/layout.ts` · `LayoutProps` · 3/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSider` / `direction="horizontal"`）时改横排。嵌套内层 `flex-1 min-h-0`，`fullHeight` 只作用在最外层。最外层的跳转链接指向实际渲染成 `main` 的那个 Content 的 id（Fragment 或嵌套 Layout 里显式 `as="main"` 也算）；没有任何 `main` 时不输出链接。
 
@@ -40,3 +40,8 @@ Note: 默认列方向、没有 `min-h-screen`。直子有 Sidebar（或 `hasSide
 | `hasSider?`   | `boolean` | `-`     | Treat this Layout as having a sider even if Sidebar is wrapped. Omit to detect a direct... |
 | `fullHeight?` | `boolean` | `false` | Viewport-height app shell: `h-dvh overflow-hidden` so Content becomes the scroller. Nes... |
 | `className?`  | `string`  | `-`     | Additional CSS classes                                                                     |
+
+### Remaining props (complete public API)
+
+- `mode?`: `LayoutDirection`; default `-`. Force a horizontal shell (Sidebar beside Content). When omitted, a direct Sidebar child...
+- `style?`: `Record<string, string | number>`; default `-`. -

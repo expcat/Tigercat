@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## WaterfallChart
 
-`packages/core/src/types/chart-visualization.ts` · `WaterfallChartProps` · 4/11 props
+`packages/core/src/types/chart-visualization.ts` · `WaterfallChartProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop      | Type                                                       | Default | Notes                                          |
 | --------- | ---------------------------------------------------------- | ------- | ---------------------------------------------- |
@@ -19,3 +19,13 @@ description: Compact generated Tigercat Charts props reference
 | `height?` | `number`                                                   | `-`     | -                                              |
 | `colors?` | `{ increase?: string; decrease?: string; total?: string }` | `-`     | -                                              |
 | `locale?` | `Partial<TigerLocale>`                                     | `-`     | Locale object merged on top of ConfigProvider. |
+
+### Remaining props (complete public API)
+
+- `width?`: `number`; default `320`. Chart width
+- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.

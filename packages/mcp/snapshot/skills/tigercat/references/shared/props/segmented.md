@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Segmented
 
-`packages/core/src/types/segmented.ts` · `SegmentedProps` · 4/8 props
+`packages/core/src/types/segmented.ts` · `SegmentedProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labelledby`。空 `options` 不是完整控件。`icon` 渲染为装饰 SVG。指示条走逻辑边。
 
@@ -21,3 +21,12 @@ Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labell
 | `block?`    | `boolean`           | `false` | Whether the control fills full width  |
 | `disabled?` | `boolean`           | `false` | Whether the whole control is disabled |
 | `size?`     | `ComponentSize`     | `'md'`  | Component size                        |
+
+### Remaining props (complete public API)
+
+- `name?`: `string`; default `-`. Native form name. Writes a hidden input with the selected value.
+- `className?`: `string`; default `-`. Custom class name
+- `value?`: `string | number`; default `-`. -
+- `defaultValue?`: `string | number`; default `-`. -
+
+Events/callback props: `onChange?`.

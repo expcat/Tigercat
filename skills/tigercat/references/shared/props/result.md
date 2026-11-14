@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Result
 
-`packages/core/src/types/result.ts` · `ResultProps` · 4/9 props
+`packages/core/src/types/result.ts` · `ResultProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTTP 状态画数字，不自动补 “Not Found”。无 title 时只有装饰图标或 HTTP 数字。需要播报时自己写 `role` / `aria-live`。
 
@@ -21,3 +21,11 @@ Note: 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTT
 | `title?`        | `string`             | `-`      | Title. Rendered as a heading (`headingLevel`, default `h2`). Not the native HTML tooltip. |
 | `subTitle?`     | `string`             | `-`      | Subtitle / description text                                                               |
 | `headingLevel?` | `ResultHeadingLevel` | `2`      | Heading level used when `title` is set.                                                   |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS class name
+- `icon?`: `React.ReactNode`; default `-`. Custom icon node — overrides the default status icon
+- `extra?`: `React.ReactNode`; default `-`. Action buttons / links below the subtitle
+- `children?`: `React.ReactNode`; default `-`. Additional body content
+- `style?`: `Record<string, string | number>`; default `-`. -

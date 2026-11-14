@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## CommentThread
 
-`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 4/32 props
+`packages/core/src/types/comment-thread.ts` · `CommentThreadProps` · 4/32 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Avatar`, `Tag`, `Button`, `Textarea`, `Text`.
 
@@ -24,4 +24,35 @@ Note: `nodes` 一旦传入（含 `[]`）不再回落 `items`。输入框和空�
 | `maxReplies?`   | `number`                  | `3`     | Maximum replies to show per node |
 | `expandedKeys?` | `Array<string \| number>` | `-`     | Expanded reply keys (controlled) |
 
-Events/callback props: `onLike?`, `onReply?`, `onUserClick?`, `onMore?`, `onAction?`, `onExpandedChange?`, ....
+### Remaining props (complete public API)
+
+- `timeZone?`: `string`; default `-`. IANA timezone. Without it, the first render omits clocks.
+- `maxDepth?`: `number`; default `3`. Maximum nesting depth
+- `defaultExpandedKeys?`: `Array<string | number>`; default `-`. Default expanded reply keys
+- `emptyText?`: `string`; default `-`. Empty state text
+- `replyPlaceholder?`: `string`; default `-`. Reply input placeholder
+- `replyButtonText?`: `string`; default `-`. Reply submit button text
+- `cancelReplyText?`: `string`; default `-`. Reply cancel button text
+- `likeText?`: `string`; default `-`. Like button text
+- `likedText?`: `string`; default `-`. Liked button text
+- `replyText?`: `string`; default `-`. Reply action text
+- `moreText?`: `string`; default `-`. More action text
+- `loadMoreText?`: `string`; default `-`. Load more text
+- `collapseRepliesText?`: `string`; default `-`. Collapse replies button text
+- `expandRepliesText?`: `string`; default `-`. Expand replies button text. Template: supports {count}
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides for CommentThread UI text
+- `labels?`: `Partial<import('./locale').TigerLocaleCommentThread>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `showAvatar?`: `boolean`; default `true`. Show avatar
+- `showDivider?`: `boolean`; default `true`. Show divider
+- `showLike?`: `boolean`; default `true`. Show like action
+- `showReply?`: `boolean`; default `true`. Show reply action
+- `showMore?`: `boolean`; default `false`. Show more action. Default off; the control is rendered when `onMore` is present.
+- `showComposer?`: `boolean`; default `true`. Show the root composer (including empty state).
+- `hasMore?`: `boolean`; default `-`. Another page of root comments exists. The sentinel stays outside the feed and uses the...
+- `loadError?`: `boolean`; default `-`. The last root page request failed.
+- `editable?`: `boolean`; default `-`. -
+- `rich?`: `boolean`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onLike?`, `onReply?`, `onUserClick?`, `onMore?`, `onAction?`, `onExpandedChange?`, `onLoadMore?`, `onLoadRoot?`, `onEdit?`, `onDelete?`, `onUpdate:expandedKeys?`.

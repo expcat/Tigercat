@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## NotificationContainer
 
-Runnable modules: `examples/example/vue3/src/examples/notification-container/` and `examples/example/react/src/examples/notification-container/`.
+Runnable modules: `examples/example/vue3/src/examples/notification/05/`, `examples/example/react/src/examples/notification/05/`.
 
 Vue: `<NotificationContainer :notifications="items" />`
 

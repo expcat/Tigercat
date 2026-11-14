@@ -11,10 +11,14 @@ description: Compact generated Tigercat Navigation props reference
 
 ## NavigationMenuContent
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuContentProps` · 3/4 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuContentProps` · 3/4 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type                      | Default | Notes                                                    |
 | ------------ | ------------------------- | ------- | -------------------------------------------------------- |
 | `mega?`      | `boolean`                 | `false` | Wider MegaMenu panel with extra padding for rich content |
 | `className?` | `string`                  | `-`     | Additional CSS classes                                   |
 | `style?`     | `Record<string, unknown>` | `-`     | Custom styles                                            |
+
+### Remaining props (complete public API)
+
+- `children?`: `React.ReactNode`; default `-`. -

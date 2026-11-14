@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Radio
 
-Runnable modules: `examples/example/vue3/src/examples/radio/` and `examples/example/react/src/examples/radio/`.
+Runnable modules: `examples/example/vue3/src/examples/radio/01/`, `examples/example/vue3/src/examples/radio/02/`, `examples/example/vue3/src/examples/radio/03/`, `examples/example/react/src/examples/radio/01/`, `examples/example/react/src/examples/radio/02/`, `examples/example/react/src/examples/radio/03/`.
 
 Vue: `<Radio v-model="checked" value="a">A</Radio>`
 

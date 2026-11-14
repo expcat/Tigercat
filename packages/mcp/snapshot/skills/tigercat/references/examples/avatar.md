@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Avatar
 
-Runnable modules: `examples/example/vue3/src/examples/avatar/` and `examples/example/react/src/examples/avatar/`.
+Runnable modules: `examples/example/vue3/src/examples/avatar/01/`, `examples/example/vue3/src/examples/avatar/02/`, `examples/example/vue3/src/examples/avatar/03/`, `examples/example/vue3/src/examples/avatar/04/`, `examples/example/react/src/examples/avatar/01/`, `examples/example/react/src/examples/avatar/02/`, `examples/example/react/src/examples/avatar/03/`, `examples/example/react/src/examples/avatar/04/`.
 
 Note: `text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` 且有 `text` 时 `generateAvatarColor` 同名同色。`#`/`rgb()`/`var()` 走 style。组未传的 size/shape 跟组。
 

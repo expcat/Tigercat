@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Image
 
-`packages/core/src/types/image.ts` · `ImageProps` · 4/19 props
+`packages/core/src/types/image.ts` · `ImageProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `locale.image.previewAriaLabel`。`zoomOnHover` 开启悬停 / focus 放大，点击仍打开全屏预览；组内由 ImageGroup 统一预览。lazy 使用原生 `loading="lazy"`。`onLoad` / `srcSet` 落在内层 `<img>`。
 
@@ -21,3 +21,23 @@ Note: 默认 `preview=true` 时宿主是可聚焦 `<button>`，读屏名走 `loc
 | `alt?`     | `string`  | `-`     | Alternative text for image                                                                 |
 | `preview?` | `boolean` | `true`  | Whether an explicit preview action opens the fullscreen viewer. The host becomes a butt... |
 | `lazy?`    | `boolean` | `false` | Whether to lazy load the image with the native `loading="lazy"` attribute                  |
+
+### Remaining props (complete public API)
+
+- `width?`: `number | string`; default `-`. Image width (CSS value)
+- `height?`: `number | string`; default `-`. Image height (CSS value)
+- `fit?`: `ImageFit`; default `'cover'`. Object-fit behavior for the image
+- `fallbackSrc?`: `string`; default `-`. Fallback image source when loading fails
+- `zoomOnHover?`: `boolean`; default `false`. Enlarged floating overlay on hover. Independent of `preview`.
+- `srcSet?`: `string`; default `-`. Responsive image candidates. Lands on the inner `<img>`, not the host.
+- `sizes?`: `string`; default `-`. Sizes hint for `srcSet`. Lands on the inner `<img>`.
+- `crossOrigin?`: `'' | 'anonymous' | 'use-credentials'`; default `-`. CORS mode for the inner `<img>`.
+- `decoding?`: `'async' | 'auto' | 'sync'`; default `-`. Decode hint for the inner `<img>`.
+- `referrerPolicy?`: `ReferrerPolicyAttr`; default `-`. Referrer policy for the inner `<img>`.
+- `fetchPriority?`: `'high' | 'low' | 'auto'`; default `-`. Fetch priority for the inner `<img>` (LCP).
+- `className?`: `string`; default `-`. Additional CSS classes
+- `errorRender?`: `React.ReactNode`; default `-`. Custom error placeholder
+- `placeholderRender?`: `React.ReactNode`; default `-`. Custom loading placeholder
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onPreviewOpenChange?`, `onLoad?`, `onError?`, `onClick?`, `onKeydown?`, `onFocus?`, `onBlur?`.

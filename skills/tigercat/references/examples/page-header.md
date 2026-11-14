@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## PageHeader
 
-Runnable modules: `examples/example/vue3/src/examples/page-header/` and `examples/example/react/src/examples/page-header/`.
+Runnable modules: `examples/example/vue3/src/examples/page-header/01/`, `examples/example/vue3/src/examples/page-header/02/`, `examples/example/vue3/src/examples/page-header/03/`, `examples/example/vue3/src/examples/page-header/04/`, `examples/example/react/src/examples/page-header/01/`, `examples/example/react/src/examples/page-header/02/`, `examples/example/react/src/examples/page-header/03/`, `examples/example/react/src/examples/page-header/04/`.
 
 Note: 返回地址走 `Link`，因此同样只接受 `link-utils` 的协议。危险地址不输出 `href`。
 

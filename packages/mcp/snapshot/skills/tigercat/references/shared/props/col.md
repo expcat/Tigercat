@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Col
 
-`packages/core/src/types/grid.ts` · `ColProps` · 4/5 props
+`packages/core/src/types/grid.ts` · `ColProps` · 4/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 传入 `flex` 即走 flex 项，不必 `span={0}`。`span={0}` 是该断点隐藏。`order` 只改视觉，不改 Tab / 读屏顺序。offset 走逻辑边。
 
@@ -21,3 +21,7 @@ Note: 传入 `flex` 即走 flex 项，不必 `span={0}`。`span={0}` 是该断�
 | `flex?`   | `string \| number`                              | `-`     | Flex item (`flex-basis` / shorthand). When set, span width is not applied. `span={0}` m... |
 | `offset?` | `number \| Partial<Record<Breakpoint, number>>` | `0`     | Number of cells to offset                                                                  |
 | `order?`  | `number \| Partial<Record<Breakpoint, number>>` | `-`     | Visual flex `order` only. DOM / Tab / screen-reader order stay as written.                 |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. -

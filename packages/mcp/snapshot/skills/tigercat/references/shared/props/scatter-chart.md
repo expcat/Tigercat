@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ScatterChart
 
-`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 4/50 props
+`packages/core/src/types/chart-cartesian.ts` · `ScatterChartProps` · 4/50 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop          | Type                                              | Default                                        | Notes                                                                                   |
 | ------------- | ------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -19,3 +19,54 @@ description: Compact generated Tigercat Charts props reference
 | `pointSize?`  | `number`                                          | `6`                                            | Point size (radius)                                                                     |
 | `pointStyle?` | `'circle' \| 'square' \| 'triangle' \| 'diamond'` | `'circle'`                                     | Point shape                                                                             |
 | `padding?`    | `ChartPadding`                                    | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy). |
+
+### Remaining props (complete public API)
+
+- `pointColor?`: `string`; default `-`. Point color
+- `pointOpacity?`: `number`; default `-`. Point opacity
+- `gradient?`: `boolean`; default `false`. Enable radial gradient fill for points
+- `animated?`: `boolean`; default `false`. Enable entrance animation with stagger
+- `pointBorderWidth?`: `number`; default `0`. Point border (stroke) width
+- `pointBorderColor?`: `string`; default `surface token`. Point border (stroke) color
+- `sizeScale?`: `boolean | { minRadius?: number; maxRadius?: number }`; default `false`. Map `datum.size` through a radius scale instead of treating it as pixels.
+- `includeZero?`: `boolean`; default `false`. Include zero in domain
+- `colors?`: `string[]`; default `-`. Custom colors for points
+- `tooltipFormatter?`: `(datum: ScatterChartDatum, index: number) => string`; default `-`. Tooltip formatter
+- `legendFormatter?`: `(datum: ScatterChartDatum, index: number) => string`; default `-`. Legend formatter
+- `width?`: `number`; default `320`. Chart width
+- `height?`: `number`; default `200`. Chart height
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `hoveredIndex?`: `number | null`; default `-`. Hovered index (controlled)
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered element
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive elements when one is active
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `selectedIndex?`: `number | null`; default `-`. Selected index (controlled)
+- `showLegend?`: `boolean`; default `false`. Whether to show legend
+- `legendPosition?`: `ChartLegendPosition`; default `'bottom'`. Legend position around the plot
+- `legendMarkerSize?`: `number`; default `10`. Legend marker size in px
+- `legendGap?`: `number`; default `8`. Legend item gap in px
+- `showTooltip?`: `boolean`; default `true`. Whether to show tooltip
+- `xScale?`: `ChartScale`; default `-`. Custom x scale
+- `yScale?`: `ChartScale`; default `-`. Custom y scale
+- `showGrid?`: `boolean`; default `true`. Whether to show grid
+- `showAxis?`: `boolean`; default `true`. Whether to show axes
+- `showXAxis?`: `boolean`; default `true`. Whether to show X axis
+- `showYAxis?`: `boolean`; default `true`. Whether to show Y axis
+- `xAxisLabel?`: `string`; default `-`. X axis label
+- `yAxisLabel?`: `string`; default `-`. Y axis label
+- `xTicks?`: `number`; default `5`. X ticks
+- `yTicks?`: `number`; default `5`. Y ticks
+- `xTickValues?`: `ChartScaleValue[]`; default `-`. X tick values
+- `yTickValues?`: `ChartScaleValue[]`; default `-`. Y tick values
+- `xTickFormat?`: `(value: ChartScaleValue) => string`; default `-`. X tick format
+- `yTickFormat?`: `(value: ChartScaleValue) => string`; default `-`. Y tick format
+- `gridLineStyle?`: `ChartGridLineStyle`; default `'solid'`. Grid line style
+- `gridStrokeWidth?`: `number`; default `1`. Grid stroke width
+
+Events/callback props: `onHoveredIndexChange?`, `onSelectedIndexChange?`, `onPointClick?`, `onPointHover?`, `onUpdate:hoveredIndex?`, `onUpdate:selectedIndex?`.

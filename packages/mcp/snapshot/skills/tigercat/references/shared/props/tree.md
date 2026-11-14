@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Tree
 
-`packages/core/src/types/tree.ts` · `TreeProps` · 4/35 props
+`packages/core/src/types/tree.ts` · `TreeProps` · 4/35 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `checkStrictly` 默认 false（父子级联）。勾选只在 `treeitem` 上用 `aria-checked`，勾选标记不另做一颗复选框。`posinset` / `setsize` 按同一父节点下的兄弟。搜索零命中是空列表。每棵树有自己的拖拽容器。`height` 是页面窗口，不是 overlay `listHeight`。
 
@@ -22,4 +22,38 @@ Note: `checkStrictly` 默认 false（父子级联）。勾选只在 `treeitem` �
 | `selectedKeys?` | `TreeNodeKey[]` | `-`     | Selected node keys. `undefined` is uncontrolled; `[]` is controlled empty.                 |
 | `checkedKeys?`  | `TreeNodeKey[]` | `-`     | Checked node keys. Always an array. Indeterminate keys are computed inside the tree and... |
 
-Events/callback props: `onExpand?`, `onExpandedKeysChange?`, `onSelect?`, `onSelectedKeysChange?`, `onCheck?`, `onCheckedKeysChange?`, ....
+### Remaining props (complete public API)
+
+- `selectionMode?`: `TreeSelectionMode`; default `'single'`. Selection mode.
+- `checkable?`: `boolean`; default `false`. Whether to show checkboxes
+- `showIcon?`: `boolean`; default `true`. Whether to render `node.icon`. Chevron is always shown for expandable nodes.
+- `showLine?`: `boolean`; default `false`. Whether to show connecting lines. Same drawing in virtual and non-virtual.
+- `defaultExpandedKeys?`: `TreeNodeKey[]`; default `-`. Default expanded node keys (uncontrolled)
+- `defaultSelectedKeys?`: `TreeNodeKey[]`; default `-`. Default selected node keys (uncontrolled)
+- `defaultCheckedKeys?`: `TreeNodeKey[]`; default `-`. Default checked node keys (uncontrolled)
+- `defaultExpandAll?`: `boolean`; default `false`. Expand every current node. Combined with `defaultExpandedKeys` (union) when uncontrolle...
+- `checkStrictly?`: `boolean`; default `false`. Whether parent and children are independent when checked
+- `checkStrategy?`: `TreeCheckStrategy`; default `'all'`. Check strategy for returned keys
+- `allowDeselect?`: `boolean`; default `false`. Allow clicking a selected single-select node to clear it.
+- `expandOnClick?`: `boolean`; default `false`. Title click toggles expand. Selection still follows `selectionMode`.
+- `loadData?`: `TreeLoadDataFn`; default `-`. Whether to load data asynchronously. Must not mutate the incoming node.
+- `loadedKeys?`: `TreeNodeKey[]`; default `-`. Keys whose children have already been loaded (controlled overlay).
+- `searchValue?`: `string`; default `-`. Controlled search / filter query that hides unmatched nodes.
+- `defaultSearchValue?`: `string`; default `-`. Uncontrolled search / filter query.
+- `searchable?`: `boolean`; default `false`. Whether to show the built-in search input. Does not open a second query source; bind `s...
+- `filterFn?`: `TreeFilterFn`; default `-`. Custom filter function
+- `filterMode?`: `TreeFilterMode`; default `'subtree'`. `subtree` keeps children of a matched node; `match-only` keeps only matches and their a...
+- `autoExpandParent?`: `boolean`; default `true`. Whether to auto expand parent nodes when filtering. Controlled trees emit the extra key...
+- `virtual?`: `boolean`; default `false`. Enable virtualized rendering through `VirtualList`.
+- `height?`: `number`; default `400`. Pixel height of the virtualized scroll viewport.
+- `itemHeight?`: `number`; default `32`. Pixel height of each virtualized tree row.
+- `draggable?`: `boolean`; default `false`. Whether nodes are draggable. Uncontrolled trees reorder internally; controlled trees em...
+- `blockNode?`: `boolean`; default `false`. Block node style (full width selected background)
+- `className?`: `string`; default `-`. Additional CSS classes
+- `ariaLabel?`: `string`; default `-`. Accessible name. Falls back to `locale.tree.ariaLabel`. Omit when using `aria-labelledby`.
+- `selectable?`: `boolean`; default `-`. -
+- `multiple?`: `boolean`; default `-`. -
+- `emptyText?`: `string`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+
+Events/callback props: `onExpand?`, `onExpandedKeysChange?`, `onSelect?`, `onSelectedKeysChange?`, `onCheck?`, `onCheckedKeysChange?`, `onSearch?`, `onLoad?`, `onLoadedKeysChange?`, `onDrop?`, `onTreeDataChange?`, `onNodeClick?`, `onNodeExpand?`, `onNodeCollapse?`, `onUpdate:expandedKeys?`, `onUpdate:selectedKeys?`, `onUpdate:checkedKeys?`, `onUpdate:searchValue?`, `onUpdate:treeData?`, `onUpdate:loadedKeys?`.

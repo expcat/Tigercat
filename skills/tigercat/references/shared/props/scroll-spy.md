@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ScrollSpy
 
-`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 4/13 props
+`packages/core/src/types/scroll-spy.ts` · `ScrollSpyProps` · 4/13 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。
 
@@ -21,3 +21,17 @@ Note: 项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地�
 | `getContainer?` | `ScrollRootInput`      | `-`     | Scroll root: selector, element, window, or getter. When omitted, the nearest overflow a... |
 | `activeKey?`    | `ScrollSpyKey`         | `-`     | -                                                                                          |
 | `locale?`       | `Partial<TigerLocale>` | `-`     | -                                                                                          |
+
+### Remaining props (complete public API)
+
+- `defaultActiveKey?`: `ScrollSpyKey`; default `-`. -
+- `offsetTop?`: `number`; default `0`. Scroll offset from the container top. Also used as sticky `top` when `sticky` is set. `...
+- `targetOffset?`: `number`; default `-`. Alias of `offsetTop`.
+- `bounds?`: `number`; default `-`. -
+- `orientation?`: `ScrollSpyDirection`; default `-`. -
+- `sticky?`: `boolean`; default `-`. -
+- `ariaLabel?`: `string`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onActiveKeyChange?`, `onClick?`.

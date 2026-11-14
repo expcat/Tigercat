@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## RichTextEditor
 
-Runnable modules: `examples/example/vue3/src/examples/rich-text-editor/` and `examples/example/react/src/examples/rich-text-editor/`.
+Runnable modules: `examples/example/vue3/src/examples/rich-text-editor/01/`, `examples/example/vue3/src/examples/rich-text-editor/02/`, `examples/example/react/src/examples/rich-text-editor/01/`, `examples/example/react/src/examples/rich-text-editor/02/`.
 
 Vue: `<RichTextEditor v-model="html" />`
 

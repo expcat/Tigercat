@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Container
 
-`packages/core/src/types/container.ts` · `ContainerProps` · 4/5 props
+`packages/core/src/types/container.ts` · `ContainerProps` · 4/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `maxWidth={false}` 没有 max-width；`"full"` 是 `max-width: 100%`；命名尺寸读 `--tiger-breakpoint-*`。Vue 声明 `className`，不会盖掉基类。
 
@@ -21,3 +21,7 @@ Note: `maxWidth={false}` 没有 max-width；`"full"` 是 `max-width: 100%`；命
 | `center?`   | `boolean`                     | `true`  | Whether to center the container horizontally                          |
 | `padding?`  | `boolean`                     | `true`  | Whether to add horizontal padding                                     |
 | `as?`       | `keyof HTMLElementTagNameMap` | `'div'` | HTML element to render as                                             |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. -

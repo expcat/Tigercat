@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## RichTextEditor
 
-`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 4/17 props
+`packages/core/src/types/rich-text-editor.ts` · `RichTextEditorProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type                                                 | Default | Notes                                                                    |
 | ----------- | ---------------------------------------------------- | ------- | ------------------------------------------------------------------------ |
@@ -20,4 +20,20 @@ description: Compact generated Tigercat Advanced props reference
 | `mode?`     | `RichTextEditorMode`                                 | `-`     | Editing mode                                                             |
 | `engine?`   | `import('../utils/rich-text-engine').RichTextEngine` | `-`     | Pluggable editor engine. Default is the built-in contenteditable engine. |
 
-Events/callback props: `onRequestUrl?`.
+### Remaining props (complete public API)
+
+- `value?`: `string`; default `-`. Current HTML content (controlled)
+- `defaultValue?`: `string`; default `-`. Default content (uncontrolled)
+- `placeholder?`: `string`; default `-`. Placeholder text
+- `height?`: `number | string`; default `-`. Editor height
+- `disabled?`: `boolean`; default `-`. Disabled state
+- `className?`: `string`; default `-`. Additional CSS class
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides merged on top of ConfigProvider locale
+- `labels?`: `Partial<TigerLocaleRichTextEditor>`; default `-`. Text/aria label overrides
+- `ariaLabel?`: `string`; default `-`. Accessible name; falls back to locale then FormItem
+- `bind?`: `boolean`; default `-`. -
+- `name?`: `string`; default `-`. -
+- `modelValue?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+
+Events/callback props: `onRequestUrl?`, `onChange?`, `onUpdate:modelValue?`.

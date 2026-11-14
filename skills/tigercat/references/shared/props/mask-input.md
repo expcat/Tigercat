@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## MaskInput
 
-`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 4/18 props
+`packages/core/src/types/mask-input.ts` · `MaskInputProps` · 4/18 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type                        | Default | Notes                                                                                      |
 | ------------ | --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -19,3 +19,22 @@ description: Compact generated Tigercat Form props reference
 | `value?`     | `string`                    | `-`     | Raw (unmasked) value (for controlled mode)                                                 |
 | `tokens?`    | `Record<string, MaskToken>` | `-`     | Custom tokens merged over the built-ins                                                    |
 | `clearable?` | `boolean`                   | `false` | Whether to show a clear button when the input has value                                    |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Input size
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `errorMessage?`: `string`; default `-`. Error message to display
+- `defaultValue?`: `string`; default `''`. Default raw value (for uncontrolled mode)
+- `placeholder?`: `string`; default `-`. Placeholder text
+- `disabled?`: `boolean`; default `false`. Whether the input is disabled
+- `readonly?`: `boolean`; default `false`. Whether the input is readonly
+- `name?`: `string`; default `-`. Input name attribute. When set, a hidden input with this name submits the raw (unmasked...
+- `id?`: `string`; default `-`. Input id attribute
+- `autoComplete?`: `string`; default `-`. Input autocomplete attribute
+- `autoFocus?`: `boolean`; default `false`. Whether to autofocus on mount
+- `className?`: `string`; default `-`. -
+- `_shakeTrigger?`: `number`; default `-`. -
+- `readOnly?`: `boolean`; default `-`. -
+
+Events/callback props: `onChange?`, `onComplete?`, `onFocus?`, `onBlur?`, `onClear?`.

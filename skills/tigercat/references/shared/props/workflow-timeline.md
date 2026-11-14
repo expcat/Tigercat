@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## WorkflowTimeline
 
-`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/26 props
+`packages/core/src/types/workflow-timeline.ts` · `WorkflowTimelineProps` · 4/26 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Timeline`, `Button`, `Tag`, `WorkflowActionBar`.
 
@@ -23,3 +23,30 @@ Note: 把 `WorkflowTimelineStep[]` 经 `workflowStepsToTimelineItems` 映射到�
 | `actions?` | `WorkflowActionBarItem[]` | `-`      | Action-bar items. Shown when a step is `active` unless `showActions` overrides. |
 | `mode?`    | `TimelineMode`            | `'left'` | Timeline layout mode. Passed through to Timeline.                               |
 | `pending?` | `boolean`                 | `false`  | Append Timeline's pending item after the mapped steps.                          |
+
+### Remaining props (complete public API)
+
+- `tasks?`: `WorkflowTask[]`; default `-`. Instance-level per-actor tasks. When present, each person is a row (status / actedAt /...
+- `showActions?`: `boolean`; default `-`. Force the action bar on or off. Omitted: show when `actions` is non-empty and `getCurre...
+- `confirm?`: `boolean`; default `false`. Forwarded to the nested action bar confirm-dialog recipe.
+- `commentInput?`: `boolean`; default `-`. Forwarded to the nested action bar.
+- `commentRequired?`: `boolean`; default `-`. Forwarded to the nested action bar. Empty required comments are blocked.
+- `buttonPolicy?`: `WorkflowNodeButtonPolicy`; default `-`. Forwarded to the nested action bar when `actions` is omitted.
+- `returnTargets?`: `WorkflowReturnTarget[]`; default `-`. Forwarded to the nested action bar. Omitted: derived from `steps`.
+- `addsignPositions?`: `WorkflowAddsignPosition[]`; default `-`. Forwarded to the nested action bar.
+- `isStarter?`: `boolean`; default `-`. Forwarded to the nested action bar.
+- `viewerRole?`: `WorkflowActionBarViewerRole`; default `-`. Forwarded to the nested action bar.
+- `pendingDot?`: `unknown`; default `-`. Pending item dot content. Passed through to Timeline.
+- `reverse?`: `boolean`; default `false`. Reverse Timeline order. Pending still stays at the DOM end.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `labels?`: `Partial<TigerLocaleWorkflowTimeline>`; default `-`. Status-tag and aria-label overlay. Wins over `locale.workflowTimeline`.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `pendingContent?`: `React.ReactNode`; default `-`. -
+- `renderItem?`: `(item: TimelineItem, index: number) => React.ReactNode`; default `-`. -
+- `renderDot?`: `(item: TimelineItem, options: { pending: boolean }) => React.ReactNode`; default `-`. -
+- `renderActions?`: `(actions: WorkflowActionBarItem[]) => React.ReactNode`; default `-`. -
+- `renderReturnPicker?`: `(ctx: WorkflowReturnPickerContext) => React.ReactNode`; default `-`. -
+- `renderAssigneePicker?`: `(ctx: WorkflowAssigneePickerContext) => React.ReactNode`; default `-`. -
+- `style?`: `Record<string, unknown>`; default `-`. -
+
+Events/callback props: `onAction?`.

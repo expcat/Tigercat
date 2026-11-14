@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## AspectRatio
 
-Runnable modules: `examples/example/vue3/src/examples/aspect-ratio/` and `examples/example/react/src/examples/aspect-ratio/`.
+Runnable modules: `examples/example/vue3/src/examples/aspect-ratio/01/`, `examples/example/vue3/src/examples/aspect-ratio/02/`, `examples/example/vue3/src/examples/aspect-ratio/03/`, `examples/example/react/src/examples/aspect-ratio/01/`, `examples/example/react/src/examples/aspect-ratio/02/`, `examples/example/react/src/examples/aspect-ratio/03/`.
 
 Note: 默认保留媒体自然尺寸且不裁切。显式 `fit="contain"` / `"cover"` / `"fill"` 时，内容层填满比例盒，直系 `img`/`video`/`iframe` 按 fit 填充并裁进根元素圆角。
 

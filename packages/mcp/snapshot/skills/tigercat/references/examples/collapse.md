@@ -13,7 +13,7 @@ description: Compact Tigercat Data Vue and React usage routes
 
 ## Collapse
 
-Runnable modules: `examples/example/vue3/src/examples/collapse/` and `examples/example/react/src/examples/collapse/`.
+Runnable modules: `examples/example/vue3/src/examples/collapse/01/`, `examples/example/vue3/src/examples/collapse/02/`, `examples/example/vue3/src/examples/collapse/03/`, `examples/example/react/src/examples/collapse/01/`, `examples/example/react/src/examples/collapse/02/`, `examples/example/react/src/examples/collapse/03/`.
 
 Note: `onChange` / `v-model:activeKey` 永远是数组，空是 `[]`。accordion 多键只留最后一项。`1` 与 `"1"` 同一面板。header 是真 button；extra 是兄弟，不进可访问名。
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Tooltip
 
-`packages/core/src/types/tooltip.ts` · `TooltipProps` · 4/12 props
+`packages/core/src/types/tooltip.ts` · `TooltipProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 悬停只跟指针。点击、Enter、Space 不会把悬停层关掉。焦点还在触发器上时，指针离开也保持打开。`disabled` 立刻关闭。内容只接受纯文本，可聚焦后代在开发期报错；要交互用 Popover。显示延迟默认 100ms。
 
@@ -21,3 +21,16 @@ Note: 悬停只跟指针。点击、Enter、Space 不会把悬停层关掉。焦
 | `trigger?`   | `TooltipTrigger`    | `'hover'` | Trigger type. Hover listens to the pointer and to focus. A click opens and stays; it do... |
 | `placement?` | `FloatingPlacement` | `'top'`   | Placement relative to trigger                                                              |
 | `open?`      | `boolean`           | `-`       | Whether the popup is open (controlled mode)                                                |
+
+### Remaining props (complete public API)
+
+- `defaultOpen?`: `boolean`; default `false`. Default open state (uncontrolled mode)
+- `disabled?`: `boolean`; default `false`. Whether the popup is disabled
+- `offset?`: `number`; default `8`. Offset distance from trigger in pixels
+- `showDelay?`: `number`; default `100`. Hover show delay in milliseconds.
+- `hideDelay?`: `number`; default `100`. Hover hide delay in milliseconds.
+- `asChild?`: `boolean`; default `false`. Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but...
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `StyleValue`; default `-`. -
+
+Events/callback props: `onUpdate:open?`, `onOpenChange?`.

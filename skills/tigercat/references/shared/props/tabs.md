@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Tabs
 
-`packages/core/src/types/tabs.ts` · `TabsProps` · 4/19 props
+`packages/core/src/types/tabs.ts` · `TabsProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 溢出菜单按钮文案走 `locale.tabs.moreTabs`，组件 `labels.moreTabs` 优先于组件 locale、ConfigProvider locale 和 en-US 默认值。
 
@@ -21,3 +21,23 @@ Note: 溢出菜单按钮文案走 `locale.tabs.moreTabs`，组件 `labels.moreTa
 | `tabPosition?`            | `TabPosition`      | `'top'` | Tab position - top, bottom, left, or right                                                 |
 | `closable?`               | `boolean`          | `false` | Root close switch. Only draws close buttons when `type` is `'editable-card'`. Pane-leve... |
 | `destroyInactiveTabPane?` | `boolean`          | `false` | Whether to destroy inactive tab panes                                                      |
+
+### Remaining props (complete public API)
+
+- `defaultActiveKey?`: `string | number`; default `-`. Default active tab key (for uncontrolled mode)
+- `type?`: `TabType`; default `'line'`. Tab type: line, card, editable-card, or pills
+- `size?`: `TabSize`; default `'md'`. Tab size
+- `centered?`: `boolean`; default `false`. Whether tabs are centered
+- `lazy?`: `boolean`; default `false`. Whether to lazily render tab panes (only render when first activated)
+- `swipeable?`: `boolean`; default `false`. Whether touch swipes switch tabs. Off by default so nested scrollers keep their gesture...
+- `activation?`: `'automatic' | 'manual'`; default `'automatic'`. `manual`: arrows move focus and Enter selects. Default activates on arrow.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `id?`: `string`; default `-`. -
+- `'aria-label'?`: `string`; default `-`. -
+- `'aria-labelledby'?`: `string`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleTabs>`; default `-`. -
+
+Events/callback props: `onChange?`, `onTabClick?`, `onEdit?`, `onUpdate:activeKey?`.

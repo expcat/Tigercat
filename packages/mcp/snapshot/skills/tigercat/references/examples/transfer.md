@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Transfer
 
-Runnable modules: `examples/example/vue3/src/examples/transfer/` and `examples/example/react/src/examples/transfer/`.
+Runnable modules: `examples/example/vue3/src/examples/transfer/01/`, `examples/example/vue3/src/examples/transfer/02/`, `examples/example/react/src/examples/transfer/01/`, `examples/example/react/src/examples/transfer/02/`.
 
 Note: 目标只留 `value`，初始值只留 `defaultValue`。数据源按字符串键收成一条，`1` 和 `'1'` 是同一行。搜索、全选和移动只处理当前可见项。搜索框的 Enter 不提交外层表单。滤掉的已选项单独成条，可以一次清掉。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`。
 

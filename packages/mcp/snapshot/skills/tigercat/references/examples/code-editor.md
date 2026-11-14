@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## CodeEditor
 
-Runnable modules: `examples/example/vue3/src/examples/code-editor/` and `examples/example/react/src/examples/code-editor/`.
+Runnable modules: `examples/example/vue3/src/examples/code-editor/01/`, `examples/example/vue3/src/examples/code-editor/02/`, `examples/example/vue3/src/examples/code-editor/03/`, `examples/example/react/src/examples/code-editor/01/`, `examples/example/react/src/examples/code-editor/02/`, `examples/example/react/src/examples/code-editor/03/`.
 
 Vue: `<CodeEditor v-model="code" language="javascript" />`
 

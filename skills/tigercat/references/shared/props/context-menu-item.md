@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ContextMenuItem
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuItemProps` · 4/6 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuItemProps` · 4/6 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type               | Default | Notes                                                                 |
 | ----------- | ------------------ | ------- | --------------------------------------------------------------------- |
@@ -19,3 +19,10 @@ description: Compact generated Tigercat Navigation props reference
 | `divided?`  | `boolean`          | `false` | Whether the item is divided from the previous item                    |
 | `href?`     | `string`           | `-`     | When set, the item renders as a link (`<a role="menuitem">`).         |
 | `itemKey?`  | `string \| number` | `-`     | Stable item identity when rendering lists. Not a React/Vue vnode key. |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onClick?`.

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## ImageGroup
 
-`packages/core/src/types/image.ts` · `ImageGroupProps` · 3/4 props
+`packages/core/src/types/image.ts` · `ImageGroupProps` · 3/4 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。
 
@@ -20,3 +20,9 @@ Note: 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再
 | `open?`         | `boolean` | `-`     | Controlled lightbox open state. Omit to let the group own it. |
 | `preview?`      | `boolean` | `true`  | Whether to enable preview for all child images                |
 | `currentIndex?` | `number`  | `-`     | Controlled lightbox index. Omit to let the group own it.      |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes. Merged with the group base class.
+
+Events/callback props: `onPreviewOpenChange?`, `onOpenChange?`, `onCurrentIndexChange?`, `onUpdate:open?`, `onUpdate:currentIndex?`.

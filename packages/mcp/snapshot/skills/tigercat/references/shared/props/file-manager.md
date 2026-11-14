@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## FileManager
 
-`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 4/22 props
+`packages/core/src/types/file-manager.ts` · `FileManagerProps` · 4/22 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop            | Type                   | Default     | Notes                                                                                      |
 | --------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------------ |
@@ -20,4 +20,25 @@ description: Compact generated Tigercat Advanced props reference
 | `selectedKeys?` | `(string \| number)[]` | `-`         | Currently selected file keys (controlled)                                                  |
 | `searchable?`   | `boolean`              | `false`     | Searchable                                                                                 |
 
-Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysChange?`, `onCurrentPathChange?`, `onSearchTextChange?`, ....
+### Remaining props (complete public API)
+
+- `viewMode?`: `FileViewMode`; default `-`. View mode
+- `gridColumns?`: `number`; default `-`. Grid column count when `viewMode="grid"`
+- `defaultSelectedKeys?`: `(string | number)[]`; default `-`. Default selected file keys (uncontrolled). Used when `selectedKeys` is omitted.
+- `multiple?`: `boolean`; default `-`. Allow multiple selection
+- `columns?`: `FileColumn[]`; default `-`. Extra list-view columns (`size` / `type` / `modified`). Name is always shown.
+- `sortField?`: `FileSortField`; default `-`. Sort field. `'none'` keeps the current folder's `files` order. When drag is also on, th...
+- `sortOrder?`: `FileSortOrder`; default `-`. Sort order
+- `defaultCurrentPath?`: `(string | number)[]`; default `-`. Uncontrolled initial path (folder keys)
+- `showHidden?`: `boolean`; default `-`. Show hidden files (prefixed with .)
+- `draggable?`: `boolean`; default `-`. Reorder the current folder with the shared pointer session. A filter does not turn drag...
+- `loading?`: `boolean`; default `-`. Loading state
+- `emptyText?`: `string`; default `-`. Empty text
+- `searchText?`: `string`; default `-`. Search text (controlled). `''` is a real empty query. Matches names in the current fold...
+- `defaultSearchText?`: `string`; default `-`. Uncontrolled initial search text
+- `className?`: `string`; default `-`. Custom class
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale
+- `renderIcon?`: `(item: FileItem) => React.ReactNode`; default `-`. Custom icon renderer
+- `bind?`: `{ query?: string recursive?: boolean name?: string permission?: { readable?: boolean; writable?: boolean } }`; default `-`. -
+
+Events/callback props: `onSelect?`, `onOpen?`, `onNavigate?`, `onSelectedKeysChange?`, `onCurrentPathChange?`, `onSearchTextChange?`, `onReorder?`, `onFilesChange?`.

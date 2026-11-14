@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Resizable
 
-`packages/core/src/types/resizable.ts` · `ResizableProps` · 4/15 props
+`packages/core/src/types/resizable.ts` · `ResizableProps` · 4/15 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄选主轴。角手柄不进 Tab。`width`/`height` 传入即受控。
 
@@ -21,3 +21,19 @@ Note: `left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄�
 | `height?`        | `number` | `-`     | Controlled height in pixels. Omit to stay uncontrolled.                                   |
 | `defaultWidth?`  | `number` | `-`     | Default width in pixels                                                                   |
 | `defaultHeight?` | `number` | `-`     | Default height in pixels                                                                  |
+
+### Remaining props (complete public API)
+
+- `minWidth?`: `number`; default `0`. Minimum width in pixels
+- `minHeight?`: `number`; default `0`. Minimum height in pixels
+- `maxWidth?`: `number`; default `-`. Maximum width in pixels
+- `maxHeight?`: `number`; default `-`. Maximum height in pixels
+- `handles?`: `ResizeHandlePosition[]`; default `['right', 'bottom', 'bottom-right']`. Which handles to show
+- `axis?`: `ResizeAxis`; default `'both'`. Constraint axis. Handles that cannot move this axis are not rendered.
+- `disabled?`: `boolean`; default `false`. Whether resizing is disabled
+- `lockAspectRatio?`: `boolean | string`; default `false`. Whether to maintain aspect ratio. Edge handles follow that axis; corners follow the lar...
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles. Width/height written by the component win over `style.width` / `style.he...
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onResizeStart?`, `onResize?`, `onResizeEnd?`, `onWidthChange?`, `onHeightChange?`, `onUpdate:width?`, `onUpdate:height?`.

@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## FullscreenButton
 
-Runnable modules: `examples/example/vue3/src/examples/fullscreen-button/` and `examples/example/react/src/examples/fullscreen-button/`.
+Runnable modules: `examples/example/vue3/src/examples/fullscreen-button/01/`, `examples/example/react/src/examples/fullscreen-button/01/`.
 
 Vue: `<FullscreenButton />`
 

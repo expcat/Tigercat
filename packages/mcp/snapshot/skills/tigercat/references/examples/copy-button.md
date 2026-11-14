@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## CopyButton
 
-Runnable modules: `examples/example/vue3/src/examples/copy-button/` and `examples/example/react/src/examples/copy-button/`.
+Runnable modules: `examples/example/vue3/src/examples/copy-button/01/`, `examples/example/react/src/examples/copy-button/01/`.
 
 Note: 按钮文字优先 children / 默认插槽，再读 `label`，缺省与复制结果读 ConfigProvider 的 text 文案。复制失败保留焦点。
 

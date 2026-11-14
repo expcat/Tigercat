@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## TimePicker
 
-Runnable modules: `examples/example/vue3/src/examples/time-picker/` and `examples/example/react/src/examples/time-picker/`.
+Runnable modules: `examples/example/vue3/src/examples/timepicker/01/`, `examples/example/vue3/src/examples/timepicker/02/`, `examples/example/react/src/examples/timepicker/01/`, `examples/example/react/src/examples/timepicker/02/`.
 
 Note: 值是 24h `HH:mm`；`showSeconds` 为真才留秒。此刻、键入和确定共用 `minTime` / `maxTime` / `disabledTime`。结束早于开始会对调。半截区间留在元组里，空单值是 `null`。桌面列和手机 select 同时在文档里，用 CSS 切换。`name` 提交同一套字符串。只读用 `readOnly`。`locale` 只收官方对象。
 

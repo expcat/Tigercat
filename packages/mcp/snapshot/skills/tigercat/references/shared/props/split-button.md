@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## SplitButton
 
-`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 4/23 props
+`packages/core/src/types/split-button.ts` · `SplitButtonProps` · 4/23 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Button`, `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
@@ -23,3 +23,27 @@ Note: `type` 只写到主按钮，chevron 固定 `type="button"`。loading 时�
 | `size?`     | `ButtonSize`    | `'md'`      | Size applied to the primary action and the menu trigger                           |
 | `disabled?` | `boolean`       | `false`     | Whether both the primary action and the menu trigger are disabled                 |
 | `loading?`  | `boolean`       | `false`     | Whether the primary action is in a loading state. Also disables the menu trigger. |
+
+### Remaining props (complete public API)
+
+- `danger?`: `boolean`; default `false`. Whether to apply danger/destructive styling to both buttons
+- `block?`: `boolean`; default `false`. Whether the split control should take the full width of its parent
+- `type?`: `ButtonHtmlType`; default `'button'`. HTML button type for the primary action
+- `iconPosition?`: `ButtonIconPosition`; default `'start'`. Position of the icon relative to the primary action text
+- `open?`: `boolean`; default `-`. Whether the menu is open (controlled mode)
+- `defaultOpen?`: `boolean`; default `false`. Default open state (uncontrolled mode)
+- `closeOnClick?`: `boolean`; default `true`. Whether to close the menu when a menu item is clicked
+- `portal?`: `boolean`; default `true`. Render the menu into document.body (portal/Teleport)
+- `triggerAriaLabel?`: `string`; default `-`. Accessible name for the chevron menu trigger. Defaults to `locale.common.moreOptionsText`.
+- `primaryAriaLabel?`: `string`; default `-`. Accessible name for an icon-only primary action. Do not reuse the group `aria-label` fo...
+- `placement?`: `FloatingPlacement`; default `'bottom-end'`. Dropdown placement relative to the chevron trigger
+- `offset?`: `number`; default `4`. Offset distance from the chevron trigger
+- `className?`: `string`; default `-`. Additional CSS classes on the root group
+- `style?`: `Record<string, unknown>`; default `-`. Inline styles on the root group
+- `icon?`: `React.ReactNode`; default `-`. -
+- `loadingIcon?`: `React.ReactNode`; default `-`. -
+- `trigger?`: `React.ReactNode`; default `-`. -
+- `menu?`: `React.ReactNode`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onClick?`, `onOpenChange?`, `onUpdate:open?`.

@@ -18,3 +18,5 @@ description: Compact generated Tigercat Composite props reference
 | `options?`     | `AssigneePickerOption[]` | `-`     | Directory supplied by the caller. Empty shows an explanation. |
 | `locale?`      | `string`                 | `-`     | Locale id for empty and search copy.                          |
 | `selectedIds?` | `string[]`               | `-`     | Selected ids.                                                 |
+
+Events/callback props: `onChange?`.

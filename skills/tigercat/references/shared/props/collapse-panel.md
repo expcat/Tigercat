@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## CollapsePanel
 
-`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 4/8 props
+`packages/core/src/types/collapse.ts` · `CollapsePanelProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 必须写 `panelKey`，且必须包在 Collapse 里。disabled 留在 Tab 序并 `aria-disabled`。
 
@@ -21,3 +21,10 @@ Note: 必须写 `panelKey`，且必须包在 Collapse 里。disabled 留在 Tab 
 | `header?`    | `string`           | `-`     | Panel header/title                                               |
 | `extra?`     | `unknown`          | `-`     | Extra content rendered beside the header button (not inside it). |
 | `showArrow?` | `boolean`          | `true`  | Whether to show arrow icon                                       |
+
+### Remaining props (complete public API)
+
+- `disabled?`: `boolean`; default `false`. Whether the panel is disabled
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -

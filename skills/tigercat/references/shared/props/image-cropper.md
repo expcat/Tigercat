@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## ImageCropper
 
-`packages/core/src/types/image.ts` · `ImageCropperProps` · 4/14 props
+`packages/core/src/types/image.ts` · `ImageCropperProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `src` 必填。产出 `getCropResult()`。坏图错误态。比例、旋转和翻转在裁剪区上方的工具条里，比例是一组可切换按钮。未选手动比例时 `aspectRatio` 重算选区。
 
@@ -22,4 +22,17 @@ Note: `src` 必填。产出 `getCropResult()`。坏图错误态。比例、旋�
 | `minWidth?`    | `number`                                      | `20`          | Minimum crop width in pixels                                                               |
 | `outputType?`  | `'image/png' \| 'image/jpeg' \| 'image/webp'` | `'image/png'` | Output image MIME type                                                                     |
 
-Events/callback props: `onReady?`, `onError?`.
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `cropRect?`: `CropRect`; default `-`. Crop rectangle in display pixels (controlled mode).
+- `defaultCropRect?`: `CropRect`; default `-`. Initial crop rectangle (uncontrolled mode). When omitted, a centered rect is computed a...
+- `aspectPreset?`: `'1:1' | '4:3' | '16:9' | 'free'`; default `-`. Named crop ratio. `free` clears a numeric ratio.
+- `circular?`: `boolean`; default `false`. Circular crop mask on the selection and the output bitmap.
+- `minHeight?`: `number`; default `20`. Minimum crop height in pixels
+- `quality?`: `number`; default `0.92`. Output image quality (0-1, only for jpeg/webp)
+- `guides?`: `boolean`; default `true`. Whether to show crop guide lines (rule of thirds)
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `React.CSSProperties`; default `-`. -
+
+Events/callback props: `onReady?`, `onError?`, `onCropChange?`.

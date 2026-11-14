@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## Loading
 
-Runnable modules: `examples/example/vue3/src/examples/loading/` and `examples/example/react/src/examples/loading/`.
+Runnable modules: `examples/example/vue3/src/examples/loading/01/`, `examples/example/vue3/src/examples/loading/02/`, `examples/example/vue3/src/examples/loading/03/`, `examples/example/react/src/examples/loading/01/`, `examples/example/react/src/examples/loading/02/`, `examples/example/react/src/examples/loading/03/`.
 
 Note: 每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。
 

@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## StepsItem
 
-Runnable modules: `examples/example/vue3/src/examples/steps-item/` and `examples/example/react/src/examples/steps-item/`.
+Runnable modules: `examples/example/vue3/src/examples/steps/01/`, `examples/example/vue3/src/examples/steps/02/`, `examples/example/vue3/src/examples/steps/03/`, `examples/example/react/src/examples/steps/01/`, `examples/example/react/src/examples/steps/02/`, `examples/example/react/src/examples/steps/03/`.
 
 Vue: `<Steps><StepsItem title="填写" /></Steps>`
 

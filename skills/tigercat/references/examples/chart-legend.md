@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## ChartLegend
 
-Runnable modules: `examples/example/vue3/src/examples/chart-legend/` and `examples/example/react/src/examples/chart-legend/`.
+Runnable modules: `examples/example/vue3/src/examples/use-chart-interaction/01/`, `examples/example/vue3/src/examples/use-chart-interaction/02/`, `examples/example/react/src/examples/use-chart-interaction/01/`, `examples/example/react/src/examples/use-chart-interaction/02/`.
 
 Note: 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。
 

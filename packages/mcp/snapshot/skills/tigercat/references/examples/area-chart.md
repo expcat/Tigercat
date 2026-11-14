@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## AreaChart
 
-Runnable modules: `examples/example/vue3/src/examples/area-chart/` and `examples/example/react/src/examples/area-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/area-chart/01/`, `examples/example/vue3/src/examples/area-chart/02/`, `examples/example/vue3/src/examples/area-chart/03/`, `examples/example/react/src/examples/area-chart/01/`, `examples/example/react/src/examples/area-chart/02/`, `examples/example/react/src/examples/area-chart/03/`.
 
 Vue: `<AreaChart :data="data" />`
 

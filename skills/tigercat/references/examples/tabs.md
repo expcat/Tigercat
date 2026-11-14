@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## Tabs
 
-Runnable modules: `examples/example/vue3/src/examples/tabs/` and `examples/example/react/src/examples/tabs/`.
+Runnable modules: `examples/example/vue3/src/examples/tabs/01/`, `examples/example/vue3/src/examples/tabs/02/`, `examples/example/vue3/src/examples/tabs/03/`, `examples/example/vue3/src/examples/tabs/04/`, `examples/example/react/src/examples/tabs/01/`, `examples/example/react/src/examples/tabs/02/`, `examples/example/react/src/examples/tabs/03/`, `examples/example/react/src/examples/tabs/04/`.
 
 Note: 溢出菜单按钮文案走 `locale.tabs.moreTabs`，组件 `labels.moreTabs` 优先于组件 locale、ConfigProvider locale 和 en-US 默认值。
 

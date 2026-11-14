@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## MessageContainer
 
-Runnable modules: `examples/example/vue3/src/examples/message-container/` and `examples/example/react/src/examples/message-container/`.
+Runnable modules: `examples/example/vue3/src/examples/message/05/`, `examples/example/react/src/examples/message/05/`.
 
 Vue: `<MessageContainer :messages="messages" />`
 

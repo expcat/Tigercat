@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartLegend
 
-`packages/core/src/types/chart-core.ts` · `ChartLegendProps` · 4/9 props
+`packages/core/src/types/chart-core.ts` · `ChartLegendProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶图的 shell。`aria-pressed` 只表示选中。默认名走 `locale.chart.legendAriaLabel`。
 
@@ -21,3 +21,13 @@ Note: 必填 `items`。`orientation` 只排行/列；图四周的位置是高阶
 | `orientation?` | `ChartLegendOrientation` | `'horizontal'` | Row vs column layout                                                         |
 | `interactive?` | `boolean`                | `false`        | Whether items are buttons                                                    |
 | `ariaLabel?`   | `string`                 | `-`            | Accessible name. Overlay: dedicated `ariaLabel` → `labels` → `locale.chart`. |
+
+### Remaining props (complete public API)
+
+- `markerSize?`: `number`; default `10`. Marker size in px
+- `gap?`: `number`; default `8`. Item gap in px
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. -
+- `className?`: `string`; default `-`. Additional CSS classes
+
+Events/callback props: `onItemClick?`, `onItemHover?`, `onItemLeave?`.

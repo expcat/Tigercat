@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## BreadcrumbItem
 
-`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 4/10 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbItemProps` · 4/10 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type                  | Default | Notes                                                                                     |
 | ------------ | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
@@ -19,3 +19,14 @@ description: Compact generated Tigercat Navigation props reference
 | `current?`   | `boolean`             | `-`     | Marks the current page (`aria-current="page"`). When omitted, the last item is treated... |
 | `separator?` | `BreadcrumbSeparator` | `-`     | Custom separator for this item (overrides global separator)                               |
 | `icon?`      | `unknown`             | `-`     | Icon shown before the item content                                                        |
+
+### Remaining props (complete public API)
+
+- `target?`: `'_blank' | '_self' | '_parent' | '_top'`; default `-`. Link target attribute
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Inline styles
+- `children?`: `React.ReactNode`; default `-`. -
+- `isLast?`: `boolean`; default `-`. -
+- `trailing?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onClick?`.

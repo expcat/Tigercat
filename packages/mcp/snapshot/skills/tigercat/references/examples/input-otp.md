@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## InputOTP
 
-Runnable modules: `examples/example/vue3/src/examples/input-otp/` and `examples/example/react/src/examples/input-otp/`.
+Runnable modules: `examples/example/vue3/src/examples/input-otp/01/`, `examples/example/vue3/src/examples/input-otp/02/`, `examples/example/vue3/src/examples/input-otp/03/`, `examples/example/react/src/examples/input-otp/01/`, `examples/example/react/src/examples/input-otp/02/`, `examples/example/react/src/examples/input-otp/03/`.
 
 Vue: `<InputOTP v-model="value" />`
 

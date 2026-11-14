@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Textarea
 
-Runnable modules: `examples/example/vue3/src/examples/textarea/` and `examples/example/react/src/examples/textarea/`.
+Runnable modules: `examples/example/vue3/src/examples/textarea/01/`, `examples/example/vue3/src/examples/textarea/02/`, `examples/example/vue3/src/examples/textarea/03/`, `examples/example/react/src/examples/textarea/01/`, `examples/example/react/src/examples/textarea/02/`, `examples/example/react/src/examples/textarea/03/`.
 
 Note: React `onChange` 是字符串值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。
 

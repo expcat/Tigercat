@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## MenuItemGroup
 
-Runnable modules: `examples/example/vue3/src/examples/menu-item-group/` and `examples/example/react/src/examples/menu-item-group/`.
+Runnable modules: `examples/example/vue3/src/examples/menu/04/`, `examples/example/react/src/examples/menu/04/`.
 
 Vue: `<Menu><MenuItemGroup title="Team"><MenuItem :item-key="a">A</MenuItem></MenuItemGroup></Menu>`
 

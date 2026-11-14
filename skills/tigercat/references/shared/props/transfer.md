@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Transfer
 
-`packages/core/src/types/transfer.ts` · `TransferProps` · 4/20 props
+`packages/core/src/types/transfer.ts` · `TransferProps` · 4/20 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 目标只留 `value`，初始值只留 `defaultValue`。数据源按字符串键收成一条，`1` 和 `'1'` 是同一行。搜索、全选和移动只处理当前可见项。搜索框的 Enter 不提交外层表单。滤掉的已选项单独成条，可以一次清掉。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`。
 
@@ -21,3 +21,24 @@ Note: 目标只留 `value`，初始值只留 `defaultValue`。数据源按字符
 | `value?`        | `(string \| number)[]` | `-`     | Controlled target keys. `undefined` is uncontrolled; `[]` is a real empty target list.... |
 | `defaultValue?` | `(string \| number)[]` | `-`     | Uncontrolled initial target keys.                                                         |
 | `searchable?`   | `boolean`              | `false` | Whether to show search input in each panel                                                |
+
+### Remaining props (complete public API)
+
+- `readOnly?`: `boolean`; default `-`. Focusable and submittable, but selection and moves do not change the value.
+- `selectedKeys?`: `TransferSelectedKeys`; default `-`. Controlled checkbox selection in each panel. Search-hidden keys stay selected until cle...
+- `defaultSelectedKeys?`: `TransferSelectedKeys`; default `-`. Uncontrolled initial checkbox selection.
+- `name?`: `string`; default `-`. Native form field name. Each target key is one hidden input.
+- `status?`: `InputStatus`; default `-`. Visual validation status. Do not spread as a DOM attribute.
+- `size?`: `ComponentSize`; default `-`. Component size
+- `disabled?`: `boolean`; default `-`. Whether the component is disabled
+- `searchValue?`: `TransferSearchValue`; default `-`. Controlled search input values for source and target panels
+- `defaultSearchValue?`: `TransferSearchValue`; default `-`. Default search input values for source and target panels
+- `sourceTitle?`: `string`; default `-`. Title for left panel
+- `targetTitle?`: `string`; default `-`. Title for right panel
+- `emptyText?`: `string`; default `-`. Text shown when a panel has no items
+- `className?`: `string`; default `-`. Custom class name
+- `filterOption?`: `(inputValue: string, item: TransferItem) => boolean`; default `-`. Custom filter function
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overlay merged on ConfigProvider locale
+- `labels?`: `Partial<TigerLocaleTransfer>`; default `-`. Text/aria label overrides
+
+Events/callback props: `onChange?`, `onSelectChange?`, `onSearchChange?`.

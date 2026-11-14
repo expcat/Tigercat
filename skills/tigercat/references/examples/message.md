@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## Message
 
-Runnable modules: `examples/example/vue3/src/examples/message/` and `examples/example/react/src/examples/message/`.
+Runnable modules: `examples/example/vue3/src/examples/message/01/`, `examples/example/vue3/src/examples/message/02/`, `examples/example/vue3/src/examples/message/03/`, `examples/example/vue3/src/examples/message/04/`, `examples/example/react/src/examples/message/01/`, `examples/example/react/src/examples/message/02/`, `examples/example/react/src/examples/message/03/`, `examples/example/react/src/examples/message/04/`.
 
 Note: 命令式调用只改当前 ConfigProvider 里的队列。默认可关闭。指针或焦点在条目上时暂停计时。`loading` 不自动关。负时长和 `NaN` 不自动关。同一个 `key` 替换那一条。
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Spotlight
 
-`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 4/22 props
+`packages/core/src/types/spotlight.ts` · `SpotlightProps` · 4/22 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 打开后等待输入节点挂载并自动聚焦。焦点约束、关闭后的焦点返回和滚动锁由共享 focus scope 管理。
 
@@ -21,3 +21,26 @@ Note: 打开后等待输入节点挂载并自动聚焦。焦点约束、关闭�
 | `open?`   | `boolean`           | `-`     | -                                                                                          |
 | `hotkey?` | `boolean \| string` | `false` | Global toggle chord. Off by default. `true` is `Meta/Ctrl+K`; a string uses the same sh... |
 | `query?`  | `string`            | `-`     | -                                                                                          |
+
+### Remaining props (complete public API)
+
+- `defaultOpen?`: `boolean`; default `-`. -
+- `defaultQuery?`: `string`; default `-`. -
+- `title?`: `string`; default `-`. -
+- `placeholder?`: `string`; default `-`. -
+- `emptyText?`: `string`; default `-`. -
+- `inputAriaLabel?`: `string`; default `-`. -
+- `listboxLabel?`: `string`; default `-`. -
+- `closeOnSelect?`: `boolean`; default `-`. -
+- `mask?`: `boolean`; default `-`. -
+- `maskClosable?`: `boolean`; default `-`. -
+- `zIndex?`: `number`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `defaultActiveFirstItem?`: `boolean`; default `-`. -
+- `filterItem?`: `SpotlightItemFilter`; default `-`. -
+- `limit?`: `number`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `recentIds?`: `SpotlightItemKey[]`; default `-`. Ids shown ahead of the other filter results. The caller owns the list.
+- `icon?`: `(item: SpotlightItem) => React.ReactNode`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onQueryChange?`, `onSelect?`.

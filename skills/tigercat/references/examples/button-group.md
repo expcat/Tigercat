@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## ButtonGroup
 
-Runnable modules: `examples/example/vue3/src/examples/button-group/` and `examples/example/react/src/examples/button-group/`.
+Runnable modules: `examples/example/vue3/src/examples/button/03/`, `examples/example/react/src/examples/button/03/`.
 
 Note: 直子必须是 Button，组和 Button 之间不能插节点。需要 `aria-label` 或 `aria-labelledby`。子 `size` 覆盖组 size。SplitButton 不要塞进组。
 

@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## PrintLayout
 
-Runnable modules: `examples/example/vue3/src/examples/print-layout/` and `examples/example/react/src/examples/print-layout/`.
+Runnable modules: `examples/example/vue3/src/examples/print-layout/01/`, `examples/example/react/src/examples/print-layout/01/`.
 
 Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。
 

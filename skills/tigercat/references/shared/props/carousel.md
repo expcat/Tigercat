@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Carousel
 
-`packages/core/src/types/carousel.ts` · `CarouselProps` · 4/20 props
+`packages/core/src/types/carousel.ts` · `CarouselProps` · 4/20 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 子节点才是 slides，滚动窗口始终是同一批真实内容实例（无 clone），窗口内 slide 可交互、其余 `inert`（fade 仅 active 可见）。`infinite` 循环换页沿主轴滑动不倒带；finite 尾部窗口夹紧不留空。`axis=vertical` 默认高 16rem，可被内联样式或工具类高度覆盖，支持上下方向键与主轴触摸滑动。显式根 `dir` 优先于 ConfigProvider 的 `dir`。`speed<=0` 或 reduced-motion 时换页立即落地。无名不是 landmark。开 autoplay 时有可聚焦暂停；`autoplaySpeed<=0` 和 reduced-motion 都不自动播。
 
@@ -21,3 +21,24 @@ Note: 子节点才是 slides，滚动窗口始终是同一批真实内容实例�
 | `autoplaySpeed?` | `number`  | `3000`  | Time interval for auto-play in milliseconds |
 | `dots?`          | `boolean` | `true`  | Whether to show navigation dots             |
 | `arrows?`        | `boolean` | `false` | Whether to show prev/next arrows            |
+
+### Remaining props (complete public API)
+
+- `dotPosition?`: `CarouselDotPosition`; default `'bottom'`. Position of navigation dots
+- `effect?`: `CarouselEffect`; default `'scroll'`. Transition effect type
+- `infinite?`: `boolean`; default `true`. Whether to enable infinite loop
+- `speed?`: `number`; default `500`. Transition animation duration in milliseconds
+- `currentIndex?`: `number`; default `-`. Controlled current slide index (0-based)
+- `defaultCurrentIndex?`: `number`; default `0`. Initial current slide index for uncontrolled usage
+- `pauseOnHover?`: `boolean`; default `true`. Whether to pause autoplay on hover
+- `pauseOnFocus?`: `boolean`; default `true`. Whether to pause autoplay on focus
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `axis?`: `'horizontal' | 'vertical'`; default `'horizontal'`. Main axis. Displacement follows this axis.
+- `slidesPerView?`: `number`; default `1`. Slides visible along the main axis.
+- `children?`: `React.ReactNode`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleCarousel>`; default `-`. -
+- `thumbnails?`: `boolean`; default `-`. -
+
+Events/callback props: `onCurrentIndexChange?`, `onChange?`, `onBeforeChange?`.

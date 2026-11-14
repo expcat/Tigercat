@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## FunnelChart
 
-Runnable modules: `examples/example/vue3/src/examples/funnel-chart/` and `examples/example/react/src/examples/funnel-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/funnel-chart/01/`, `examples/example/vue3/src/examples/funnel-chart/02/`, `examples/example/vue3/src/examples/funnel-chart/03/`, `examples/example/react/src/examples/funnel-chart/01/`, `examples/example/react/src/examples/funnel-chart/02/`, `examples/example/react/src/examples/funnel-chart/03/`.
 
 Vue: `<FunnelChart :data="data" />`
 

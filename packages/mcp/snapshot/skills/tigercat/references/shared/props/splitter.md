@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Splitter
 
-`packages/core/src/types/splitter.ts` · `SplitterProps` · 4/10 props
+`packages/core/src/types/splitter.ts` · `SplitterProps` · 4/10 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值不会清拖拽）；百分比跟容器走。拖动 gutter 经 `update:sizes` / `onSizesChange` 回写，并保持各 pane 的单位（百分比仍是百分比，像素仍是像素），比例继续跟容器走。`resize` 事件里的 sizes 是像素。水平几何读 `dir`。gutter 是带名字的 `separator`。
 
@@ -21,3 +21,14 @@ Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值
 | `min?`        | `number \| number[]`   | `0`     | Minimum pane size in pixels. A number applies to every pane. An array is per pane (miss... |
 | `gutterSize?` | `number`               | `4`     | Width of the gutter/divider in pixels                                                      |
 | `disabled?`   | `boolean`              | `false` | Whether the splitter is disabled                                                           |
+
+### Remaining props (complete public API)
+
+- `orientation?`: `SplitDirection`; default `'horizontal'`. Orientation of the split (horizontal = left/right panes)
+- `max?`: `number | number[]`; default `-`. Maximum pane size in pixels. A number applies to every pane. An array is per pane.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -
+- `collapsible?`: `boolean`; default `-`. -
+
+Events/callback props: `onResizeStart?`, `onResize?`, `onResizeEnd?`, `onSizesChange?`, `onUpdate:sizes?`.

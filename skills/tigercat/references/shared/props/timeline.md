@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Timeline
 
-`packages/core/src/types/timeline.ts` · `TimelineProps` · 4/11 props
+`packages/core/src/types/timeline.ts` · `TimelineProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。审批配方 playground 在 `workflow-timeline` / `workflow-viewer` / `workflow-detail-shell`；本页 01–03 才是时间线骨架。
 
@@ -21,3 +21,13 @@ Note: 需要 `items`。`pending` 在（反转后的）列表末尾再插一项�
 | `mode?`    | `TimelineMode`   | `'left'` | Timeline mode/direction                                                                    |
 | `pending?` | `boolean`        | `false`  | Append a pending item after the (optionally reversed) list. Pending stays at the DOM en... |
 | `reverse?` | `boolean`        | `false`  | Whether to reverse the timeline order                                                      |
+
+### Remaining props (complete public API)
+
+- `pendingDot?`: `unknown`; default `-`. Pending item dot content. Wins over `renderDot` for the pending item.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `pendingContent?`: `React.ReactNode`; default `-`. -
+- `renderItem?`: `(item: TimelineItem, index: number) => React.ReactNode`; default `-`. -
+- `renderDot?`: `(item: TimelineItem, options: { pending: boolean }) => React.ReactNode`; default `-`. Custom dot. Pending items prefer `pendingDot` unless this renderer is the only source.
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `style?`: `Record<string, unknown>`; default `-`. -

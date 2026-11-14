@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## Affix
 
-Runnable modules: `examples/example/vue3/src/examples/affix/` and `examples/example/react/src/examples/affix/`.
+Runnable modules: `examples/example/vue3/src/examples/affix/01/`, `examples/example/vue3/src/examples/affix/02/`, `examples/example/react/src/examples/affix/01/`, `examples/example/react/src/examples/affix/02/`.
 
 Vue: `<Affix :offset-top="0"><div>Header</div></Affix>`
 

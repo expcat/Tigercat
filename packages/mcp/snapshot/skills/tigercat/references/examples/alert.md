@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## Alert
 
-Runnable modules: `examples/example/vue3/src/examples/alert/` and `examples/example/react/src/examples/alert/`.
+Runnable modules: `examples/example/vue3/src/examples/alert/01/`, `examples/example/vue3/src/examples/alert/02/`, `examples/example/vue3/src/examples/alert/03/`, `examples/example/vue3/src/examples/alert/04/`, `examples/example/react/src/examples/alert/01/`, `examples/example/react/src/examples/alert/02/`, `examples/example/react/src/examples/alert/03/`, `examples/example/react/src/examples/alert/04/`.
 
 Note: 省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦点从关闭按钮移到后面下一个可聚焦元素。传入 `open` 时只发事件。父级重渲染不重置剩余时间。`error` 保持 `role="alert"`。首屏之后新插入的 success / info / warning 用组件自己的 `role="status"`；静态条文不加实时区域。与 ImagePreview「省略即关」相反。
 

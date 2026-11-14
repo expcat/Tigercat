@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## ActivityFeed
 
-Runnable modules: `examples/example/vue3/src/examples/activity-feed/` and `examples/example/react/src/examples/activity-feed/`.
+Runnable modules: `examples/example/vue3/src/examples/activity-feed/01/`, `examples/example/vue3/src/examples/activity-feed/02/`, `examples/example/react/src/examples/activity-feed/01/`, `examples/example/react/src/examples/activity-feed/02/`.
 
 Uses: `Timeline`, `Avatar`, `Tag`, `Card`, `Text`, `Link`, `Loading`.
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## WorkflowDetailShell
 
-`packages/core/src/types/workflow-detail-shell.ts` · `WorkflowDetailShellProps` · 4/18 props
+`packages/core/src/types/workflow-detail-shell.ts` · `WorkflowDetailShellProps` · 4/18 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `SchemaForm`, `Tabs`, `WorkflowTimeline`, `WorkflowViewer`, `WorkflowActionBar`.
 
@@ -24,4 +24,21 @@ Note: 可选详情布局配方，不是第二套 Timeline / 表单设计器。�
 | `className?`   | `string`                  | `-`     | Additional CSS classes on the root.                                                     |
 | `style?`       | `Record<string, unknown>` | `-`     | Custom styles on the root.                                                              |
 
-Events/callback props: `onSubmit?`.
+### Remaining props (complete public API)
+
+- `originalValues?`: `FormValues`; default `-`. Server values. Hidden and readonly paths keep these on submit.
+- `values?`: `FormValues`; default `-`. Current client values. `submit()` uses these when called with no argument.
+- `schema?`: `SchemaFormSchema`; default `-`. Starter schema. Hidden fields stay hidden through the merge.
+- `fieldPermissions?`: `Record<string, FieldPermission>`; default `-`. Node field map. Missing paths use the single stricter default.
+- `permissionMode?`: `WorkflowFieldPermissionMode | string`; default `'readonly'`. View mode passed to the permission merge.
+- `nodeKind?`: `WorkflowStepKind`; default `-`. Current node kind. Combined with `permissionMode` by the single default.
+- `title?`: `string`; default `-`. Visible title. Omitted: locale `workflowDetailShell.title`, unless `header` is filled.
+- `instance?`: `WorkflowInstance`; default `-`. Runtime instance. `submitAction` reduces this with the action-bar opinion.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider.
+- `header?`: `React.ReactNode`; default `-`. -
+- `form?`: `React.ReactNode`; default `-`. -
+- `tabs?`: `React.ReactNode`; default `-`. -
+- `action?`: `React.ReactNode`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onSubmit?`, `onDetailAction?`.

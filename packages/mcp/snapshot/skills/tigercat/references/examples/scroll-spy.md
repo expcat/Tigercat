@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## ScrollSpy
 
-Runnable modules: `examples/example/vue3/src/examples/scroll-spy/` and `examples/example/react/src/examples/scroll-spy/`.
+Runnable modules: `examples/example/vue3/src/examples/scroll-spy/01/`, `examples/example/vue3/src/examples/scroll-spy/02/`, `examples/example/react/src/examples/scroll-spy/01/`, `examples/example/react/src/examples/scroll-spy/02/`.
 
 Note: 项上的 `href` 走 `link-utils`。危险协议和禁用项不输出地址。
 

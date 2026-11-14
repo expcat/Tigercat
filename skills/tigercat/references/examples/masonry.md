@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Masonry
 
-Runnable modules: `examples/example/vue3/src/examples/masonry/` and `examples/example/react/src/examples/masonry/`.
+Runnable modules: `examples/example/vue3/src/examples/masonry/01/`, `examples/example/vue3/src/examples/masonry/02/`, `examples/example/vue3/src/examples/masonry/03/`, `examples/example/react/src/examples/masonry/01/`, `examples/example/react/src/examples/masonry/02/`, `examples/example/react/src/examples/masonry/03/`.
 
 Note: 默认 `layout="source"` 用 CSS 多列保持源顺序。`layout="shortest"` 按最短列定位，容器说明视觉顺序与源顺序不同。
 

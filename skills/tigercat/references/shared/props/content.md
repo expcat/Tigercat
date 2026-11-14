@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Content
 
-`packages/core/src/types/layout.ts` · `ContentProps` · 3/4 props
+`packages/core/src/types/layout.ts` · `ContentProps` · 3/4 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 默认 `<main>`，一页只留一个。嵌套/预览用 `as="div"`。作为 Layout 直子时自己滚动（`flex-1 min-h-0 overflow-auto`）。React `ref` 是滚动根。
 
@@ -20,3 +20,7 @@ Note: 默认 `<main>`，一页只留一个。嵌套/预览用 `as="div"`。作�
 | `as?`        | `string`            | `'main'` | HTML tag. Default `main` — a document may only have one visible main. Nested / preview...  |
 | `padding?`   | `boolean \| string` | `true`   | Built-in content padding. true keeps the default p-6, false removes it, and a string is... |
 | `className?` | `string`            | `-`      | Additional CSS classes                                                                     |
+
+### Remaining props (complete public API)
+
+- `style?`: `Record<string, string | number>`; default `-`. -

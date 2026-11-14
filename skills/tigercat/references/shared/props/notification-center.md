@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## NotificationCenter
 
-`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 4/24 props
+`packages/core/src/types/notification-center.ts` · `NotificationCenterProps` · 4/24 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
 
@@ -24,4 +24,27 @@ Note: 只有 `groups` 或 `groupBy` 才开 Tabs；光 `items` 走 List。`groups
 | `groupBy?`         | `(item: NotificationItem) => string` | `-`     | Group by function (used when `groups` not provided)                                        |
 | `manageReadState?` | `boolean`                            | `false` | Whether to manage read state internally. When true, the component tracks read/unread st... |
 
-Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`, `onItemClick?`, `onItemReadChange?`.
+### Remaining props (complete public API)
+
+- `timeZone?`: `string`; default `-`. IANA timezone. Without it, the first render omits clocks.
+- `groupOrder?`: `string[]`; default `-`. Optional group order
+- `activeGroupKey?`: `string | number`; default `-`. Active group key (controlled)
+- `defaultActiveGroupKey?`: `string | number`; default `-`. Default active group key (uncontrolled)
+- `readFilter?`: `NotificationReadFilter`; default `'all'`. Read filter (controlled)
+- `defaultReadFilter?`: `NotificationReadFilter`; default `'all'`. Default read filter (uncontrolled)
+- `loading?`: `boolean`; default `false`. Loading state
+- `loadingText?`: `string`; default `-`. Loading text
+- `emptyText?`: `string`; default `-`. Empty state text
+- `title?`: `string`; default `-`. Title text
+- `allLabel?`: `string`; default `-`. Label for "all" filter
+- `unreadLabel?`: `string`; default `-`. Label for "unread" filter
+- `readLabel?`: `string`; default `-`. Label for "read" filter
+- `markAllReadText?`: `string`; default `-`. Mark all as read button text
+- `markReadText?`: `string`; default `-`. Mark as read button text
+- `markUnreadText?`: `string`; default `-`. Mark as unread button text
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides for NotificationCenter UI text
+- `labels?`: `Partial<import('./locale').TigerLocaleNotificationCenter>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onGroupChange?`, `onReadFilterChange?`, `onMarkAllRead?`, `onItemClick?`, `onItemReadChange?`, `onUpdate:activeGroupKey?`, `onUpdate:readFilter?`.

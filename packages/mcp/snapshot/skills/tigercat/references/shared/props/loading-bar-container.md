@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## LoadingBarContainer
 
-`packages/core/src/types/loading-bar.ts` · `LoadingBarContainerProps` · 4/9 props
+`packages/core/src/types/loading-bar.ts` · `LoadingBarContainerProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop          | Type               | Default                                            | Notes                                       |
 | ------------- | ------------------ | -------------------------------------------------- | ------------------------------------------- |
@@ -19,3 +19,11 @@ description: Compact generated Tigercat Feedback props reference
 | `status?`     | `LoadingBarStatus` | `'idle'`                                           | Visual status. Error uses the danger color. |
 | `height?`     | `number`           | `2`                                                | Bar height in pixels.                       |
 | `ariaLabel?`  | `string`           | `locale \`common.loadingText\` (\`'Loading...'\`)` | Accessible name for the progressbar.        |
+
+### Remaining props (complete public API)
+
+- `color?`: `LoadingBarColor`; default `'primary'`. Fill color while loading.
+- `className?`: `string`; default `-`. Additional CSS classes.
+- `style?`: `Record<string, string | number>`; default `-`. Inline styles.
+- `notice?`: `string`; default `-`. Spoken once for start, failure, or finish. Not the percentage.
+- `noticeToken?`: `number`; default `-`. Changes when a new notice should be read again.

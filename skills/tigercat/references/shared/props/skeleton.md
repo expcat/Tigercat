@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Skeleton
 
-`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 4/11 props
+`packages/core/src/types/skeleton.ts` · `SkeletonProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰默认 `aria-hidden`；有名字时是 `status`。加载态也可由父级 `aria-busy` 负责。
 
@@ -21,3 +21,13 @@ Note: `wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰
 | `paragraph?` | `boolean`       | `false`                             | Whether to render as a paragraph with varying widths (for text variant) |
 | `height?`    | `string`        | `undefined (uses variant defaults)` | Height of the skeleton Can be a CSS value (e.g., '20px', '100px')       |
 | `shape?`     | `SkeletonShape` | `'circle'`                          | Shape of the skeleton (for avatar variant)                              |
+
+### Remaining props (complete public API)
+
+- `variant?`: `SkeletonVariant`; default `'text'`. Skeleton variant - determines the placeholder shape
+- `animation?`: `SkeletonAnimation`; default `'pulse'`. Animation type
+- `width?`: `string`; default `undefined (uses variant defaults)`. Width of the skeleton Can be a CSS value (e.g., '100px', '50%', '100%')
+- `className?`: `string`; default `-`. Additional CSS classes
+- `loading?`: `boolean`; default `-`. `true` shows the placeholder. `false` shows children. Omit to always show the placeholder.
+- `preset?`: `'text' | 'avatar' | 'image' | 'button'`; default `-`. Shape and row preset. Not a separate control component.
+- `style?`: `Record<string, string | number>`; default `-`. -

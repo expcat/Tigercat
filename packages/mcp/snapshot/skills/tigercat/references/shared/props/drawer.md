@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Drawer
 
-`packages/core/src/types/drawer.ts` · `DrawerProps` · 4/24 props
+`packages/core/src/types/drawer.ts` · `DrawerProps` · 4/24 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 与 Modal 同一套在场、焦点栈和关场。打开时焦点进对话框或 `initialFocus`。`placement` 含 `start`/`end`，先换成物理边再决定滑动方向；`fullscreenOnMobile` 铺满后，关闭滑动跟铺满后的边。swipe 只在标题栏或对应轴滚到头时成立。面板类名只有 `className`。`bodyPadding={false}` 去掉默认内边距，自定义间距用 `bodyClassName`。离开回调等这一层过渡结束。关闭名走 `locale.drawer`。嵌套 Drawer 进外层 overlay-host，Esc 先关里层。
 
@@ -21,3 +21,28 @@ Note: 与 Modal 同一套在场、焦点栈和关场。打开时焦点进对话�
 | `placement?`    | `DrawerPlacement` | `'right'` | Drawer placement                        |
 | `closable?`     | `boolean`         | `true`    | Whether to show close button            |
 | `maskClosable?` | `boolean`         | `true`    | Whether clicking mask closes the drawer |
+
+### Remaining props (complete public API)
+
+- `size?`: `DrawerSize`; default `'md'`. Drawer size
+- `width?`: `string | number`; default `-`. Custom width/height (overrides size). Accepts CSS value like '400px' or '50%'. Applied...
+- `title?`: `string`; default `-`. Drawer title
+- `mask?`: `boolean`; default `true`. Whether to show mask/backdrop
+- `keyboard?`: `boolean`; default `true`. Whether Escape closes the drawer. Independent of `closable`, which only shows or hides...
+- `zIndex?`: `number`; default `OVERLAY_Z_INDEX.modal`. z-index of the drawer
+- `className?`: `string`; default `-`. Additional CSS class for the drawer panel.
+- `bodyClassName?`: `string`; default `-`. Additional CSS class for the drawer body. Custom spacing goes here.
+- `bodyPadding?`: `boolean`; default `-`. `false` removes the default body padding. Omit or pass `true` for `px-6 py-4`.
+- `destroyOnClose?`: `boolean`; default `false`. Whether to destroy content on close
+- `fullscreenOnMobile?`: `boolean`; default `true`. Whether the drawer panel should become fullscreen on mobile viewports.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides for common texts
+- `labels?`: `Partial<TigerLocaleDrawer>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `closeAriaLabel?`: `string`; default `-`. Close button accessible name. Defaults to `locale.drawer.closeAriaLabel` (en-US `Close`).
+- `initialFocus?`: `string`; default `-`. CSS selector for the node to focus when the drawer opens. Defaults to the dialog element.
+- `panelStyle?`: `Record<string, string | number>`; default `-`. Custom inline style for the drawer panel.
+- `resizable?`: `boolean`; default `false`. Drag the inner edge to change width (or height for top/bottom). No transition while the...
+- `header?`: `React.ReactNode`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+- `footer?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onClose?`, `onAfterEnter?`, `onAfterClose?`, `onUpdate:open?`.

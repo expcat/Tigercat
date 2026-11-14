@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## InputGroupAddon
 
-Runnable modules: `examples/example/vue3/src/examples/input-group-addon/` and `examples/example/react/src/examples/input-group-addon/`.
+Runnable modules: `examples/example/vue3/src/examples/input-group/02/`, `examples/example/vue3/src/examples/input-group/04/`, `examples/example/react/src/examples/input-group/02/`, `examples/example/react/src/examples/input-group/04/`.
 
 Vue: `<InputGroupAddon>https://</InputGroupAddon>`
 

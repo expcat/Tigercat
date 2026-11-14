@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## CropUpload
 
-Runnable modules: `examples/example/vue3/src/examples/crop-upload/` and `examples/example/react/src/examples/crop-upload/`.
+Runnable modules: `examples/example/vue3/src/examples/crop-upload/01/`, `examples/example/vue3/src/examples/crop-upload/02/`, `examples/example/react/src/examples/crop-upload/01/`, `examples/example/react/src/examples/crop-upload/02/`.
 
 Note: FormItem 写入的是裁切后的 `File`，不是媒体 id。需要上传后的 id 时由宿主替换（Users 页模式）。
 

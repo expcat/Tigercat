@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## BackTop
 
-`packages/core/src/types/back-top.ts` · `BackTopProps` · 4/11 props
+`packages/core/src/types/back-top.ts` · `BackTopProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop                | Type                | Default          | Notes                                                                                      |
 | ------------------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------ |
@@ -19,3 +19,15 @@ description: Compact generated Tigercat Navigation props reference
 | `target?`           | `ScrollRootInput`   | `-`              | Scroll container. Selector, Element, Window, or getter. When omitted, the nearest overf... |
 | `placement?`        | `ViewportPlacement` | `'bottom-right'` | Viewport corner used when position is auto or fixed.                                       |
 | `offset?`           | `ViewportOffset`    | `24`             | Viewport offset used when position is auto or fixed.                                       |
+
+### Remaining props (complete public API)
+
+- `behavior?`: `'auto' | 'smooth'`; default `'smooth'`. Native scroll behavior. Reduced motion forces `auto`.
+- `position?`: `BackTopPosition`; default `'auto'`. Positioning strategy. `auto` and `fixed` both pin to the viewport using `placement` / `...
+- `children?`: `React.ReactNode`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleBackTop>`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, unknown>`; default `-`. -
+
+Events/callback props: `onClick?`.

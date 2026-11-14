@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## TreeSelect
 
-`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/38 props
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/38 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 选中的是节点 `key`。空单选是 `null`，空多选是 `[]`。`''` 不是键，`0` 是合法键。勾选框表示级联，`checkStrategy` 只决定提交哪些键；`checkStrictly` 时不按策略过滤。搜索零命中是空列表。`defaultExpandAll` 只在树第一次有数据时生效。浮层高度只留 `listHeight`。文案在 `locale.treeSelect`。只读用 `readOnly`。
 
@@ -22,4 +22,41 @@ Note: 选中的是节点 `key`。空单选是 `null`，空多选是 `[]`。`''` 
 | `defaultValue?` | `TreeSelectValue` | `-`     | Initial value when `value` is omitted.                                                     |
 | `multiple?`     | `boolean`         | `false` | Multiple selection with checkboxes. Parent/child cascade follows `checkStrictly` / `che... |
 
-Events/callback props: `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `open?`: `boolean`; default `-`. Controlled open state. `undefined` is uncontrolled.
+- `defaultOpen?`: `boolean`; default `false`. Initial open state when `open` is omitted.
+- `placeholder?`: `string`; default `-`. Placeholder text when nothing is selected. Defaults to ConfigProvider locale `select.pl...
+- `size?`: `ComponentSize`; default `-`. Component size
+- `disabled?`: `boolean`; default `-`. Whether the component is disabled
+- `readOnly?`: `boolean`; default `-`. Focusable and submitted, but the value cannot change. `readonly` is not a prop.
+- `clearable?`: `boolean`; default `true`. Whether to show clear button. Same default as Select / Cascader.
+- `checkStrictly?`: `boolean`; default `false`. When true, checking a node does not cascade to parent/children.
+- `checkStrategy?`: `TreeCheckStrategy`; default `'all'`. Which keys to emit when `multiple` and not `checkStrictly`.
+- `searchable?`: `boolean`; default `-`. Whether to show search input in the trigger when open
+- `searchValue?`: `string`; default `-`. Controlled search input value
+- `defaultSearchValue?`: `string`; default `-`. Default search input value
+- `autoClearSearchValue?`: `boolean`; default `true`. Clear the search query after selecting in multiple mode.
+- `emptyText?`: `string`; default `-`. Text shown when the tree is empty or search has no matches. Defaults to ConfigProvider...
+- `defaultExpandAll?`: `boolean`; default `-`. Whether to expand all tree nodes by default
+- `expandedKeys?`: `(string | number)[]`; default `-`. Controlled expanded keys
+- `defaultExpandedKeys?`: `(string | number)[]`; default `-`. Initial expanded keys when `expandedKeys` is omitted
+- `virtual?`: `boolean`; default `false`. Enable virtualized rendering of the dropdown tree.
+- `listHeight?`: `number`; default `256`. Pixel height of the tree content area (virtual and non-virtual). Same job as Select/Cas...
+- `itemHeight?`: `number`; default `-`. Pixel height of each virtualized tree row. Defaults to the rendered size map (sm/md/lg).
+- `loading?`: `boolean`; default `false`. Remote-loading flag. Empty trees show `select.loadingText`.
+- `loadData?`: `TreeLoadDataFn`; default `-`. Load children for a non-leaf with empty `children`.
+- `filterFn?`: `TreeFilterFn`; default `-`. Custom node filter. Default matches label (case-insensitive).
+- `status?`: `InputStatus`; default `'default'`. Validation status. Also read from FormItem when omitted.
+- `name?`: `string`; default `-`. Native form field name. Serialized through hidden inputs.
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. Overlay placement.
+- `offset?`: `number`; default `4`. Overlay offset in pixels.
+- `dropdownClassName?`: `string`; default `-`. Extra class names for the dropdown panel.
+- `getPopupContainer?`: `() => HTMLElement | null`; default `-`. Portal container. Defaults to the overlay-host → ConfigProvider → body chain.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `labels?`: `Partial<TigerLocaleSelect & TigerLocaleTreeSelect>`; default `-`. UI labels for custom text. Takes precedence over `locale` and ConfigProvider text.
+- `className?`: `string`; default `-`. Custom class name
+- `modelValue?`: `TreeSelectValue`; default `-`. -
+- `height?`: `number`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onUpdate:modelValue?`, `onUpdate:searchValue?`, `onUpdate:open?`, `onUpdate:expandedKeys?`, `onExpand?`, `onBlur?`.

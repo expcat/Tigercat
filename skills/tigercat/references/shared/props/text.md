@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Text
 
-`packages/core/src/types/text.ts` · `TextProps` · 4/10 props
+`packages/core/src/types/text.ts` · `TextProps` · 4/10 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。copyable 保留指定标签，复制按钮可用 Tab + Enter / Space。`align` 只用 `start` / `center` / `end` / `justify`。`label` 需自备 `htmlFor`。
 
@@ -21,3 +21,12 @@ Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/sma
 | `align?`    | `TextAlign` | `-`         | Text alignment                         |
 | `color?`    | `TextColor` | `'default'` | Text color                             |
 | `truncate?` | `boolean`   | `false`     | Whether to truncate text with ellipsis |
+
+### Remaining props (complete public API)
+
+- `size?`: `TextSize`; default `'base'`. Text size
+- `weight?`: `TextWeight`; default `'normal'`. Text weight
+- `copyable?`: `TextCopyable`; default `false`. Show a keyboard-operable copy control. `true` copies the rendered text; an object can o...
+- `italic?`: `boolean`; default `false`. Whether text should be italic
+- `underline?`: `boolean`; default `false`. Whether text should have underline
+- `lineThrough?`: `boolean`; default `false`. Whether text should have line-through

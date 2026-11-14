@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Container
 
-Runnable modules: `examples/example/vue3/src/examples/container/` and `examples/example/react/src/examples/container/`.
+Runnable modules: `examples/example/vue3/src/examples/layout/02/`, `examples/example/react/src/examples/layout/02/`.
 
 Note: `maxWidth={false}` 没有 max-width；`"full"` 是 `max-width: 100%`；命名尺寸读 `--tiger-breakpoint-*`。Vue 声明 `className`，不会盖掉基类。
 

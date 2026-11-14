@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## Anchor
 
-Runnable modules: `examples/example/vue3/src/examples/anchor/` and `examples/example/react/src/examples/anchor/`.
+Runnable modules: `examples/example/vue3/src/examples/anchor/01/`, `examples/example/vue3/src/examples/anchor/02/`, `examples/example/vue3/src/examples/anchor/03/`, `examples/example/react/src/examples/anchor/01/`, `examples/example/react/src/examples/anchor/02/`, `examples/example/react/src/examples/anchor/03/`.
 
 Note: `href` 走 `link-utils`。`javascript:`、`data:`、`vbscript:` 不输出地址。
 

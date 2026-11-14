@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## DatePicker
 
-`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 4/29 props
+`packages/core/src/types/datepicker.ts` · `DatePickerProps` · 4/29 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 存储和 `name` 是公历日历日（`YYYY-MM-DD`，范围 `start|end`）。展示可以本地化，解析用生成这段文字的同一套历法和数字。点选、键入、快捷方式和确定走同一道禁用边界；结束早于开始会对调。区间第一次点选只预览，确定提交完整区间，未完成留在面板里。空是 `null`。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`，打开只有 `update:open`。
 
@@ -22,4 +22,32 @@ Note: 存储和 `name` 是公历日历日（`YYYY-MM-DD`，范围 `start|end`）
 | `range?`        | `boolean`                      | `false`        | -     |
 | `format?`       | `DateFormat`                   | `'yyyy-MM-dd'` | -     |
 
-Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider. Do not pass a language id string.
+- `labels?`: `Partial<DatePickerLabels>`; default `-`. -
+- `size?`: `ComponentSize`; default `'md'`. -
+- `placeholder?`: `string`; default `-`. -
+- `disabled?`: `boolean`; default `false`. -
+- `readOnly?`: `boolean`; default `false`. When true, the field can focus and submit but cannot change or open to edit.
+- `required?`: `boolean`; default `false`. -
+- `minDate?`: `DatePickerInputDate | null`; default `-`. -
+- `maxDate?`: `DatePickerInputDate | null`; default `-`. -
+- `disabledDate?`: `(date: Date) => boolean`; default `-`. -
+- `weekStartsOn?`: `WeekStartsOn`; default `-`. -
+- `now?`: `Date`; default `-`. -
+- `clearable?`: `boolean`; default `true`. -
+- `name?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+- `shortcuts?`: `DatePickerShortcut[]`; default `-`. -
+- `open?`: `boolean`; default `-`. -
+- `defaultOpen?`: `boolean`; default `false`. -
+- `status?`: `InputStatus`; default `-`. -
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. -
+- `offset?`: `number`; default `4`. -
+- `dropdownClassName?`: `string`; default `-`. -
+- `getPopupContainer?`: `() => HTMLElement | null`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `modelValue?`: `DatePickerModelValue`; default `-`. -
+
+Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`, `onUpdate:modelValue?`, `onUpdate:open?`, `onBlur?`.

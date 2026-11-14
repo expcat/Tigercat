@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## BackTop
 
-Runnable modules: `examples/example/vue3/src/examples/back-top/` and `examples/example/react/src/examples/back-top/`.
+Runnable modules: `examples/example/vue3/src/examples/backtop/01/`, `examples/example/vue3/src/examples/backtop/02/`, `examples/example/react/src/examples/backtop/01/`, `examples/example/react/src/examples/backtop/02/`.
 
 Vue: `<BackTop :visibility-height="400" />`
 

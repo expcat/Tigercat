@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## DropdownItem
 
-`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 4/7 props
+`packages/core/src/types/dropdown.ts` · `DropdownItemProps` · 4/7 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop            | Type      | Default | Notes                                                                                      |
 | --------------- | --------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -19,3 +19,11 @@ description: Compact generated Tigercat Navigation props reference
 | `divided?`      | `boolean` | `false` | Whether the item is divided from previous item                                             |
 | `closeOnClick?` | `boolean` | `-`     | When set, overrides the parent Dropdown `closeOnClick`. Omitted inherits the parent (de... |
 | `href?`         | `string`  | `-`     | When set, the item renders as a link (`<a role="menuitem">`).                              |
+
+### Remaining props (complete public API)
+
+- `itemKey?`: `string | number`; default `-`. Stable item identity when rendering lists. Not a React/Vue vnode key.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onClick?`.

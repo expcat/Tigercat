@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Resizable
 
-Runnable modules: `examples/example/vue3/src/examples/resizable/` and `examples/example/react/src/examples/resizable/`.
+Runnable modules: `examples/example/vue3/src/examples/resizable/01/`, `examples/example/vue3/src/examples/resizable/02/`, `examples/example/react/src/examples/resizable/01/`, `examples/example/react/src/examples/resizable/02/`.
 
 Note: `left`/`top` 手柄移动被抓的那条边。`lockAspectRatio` 按手柄选主轴。角手柄不进 Tab。`width`/`height` 传入即受控。
 

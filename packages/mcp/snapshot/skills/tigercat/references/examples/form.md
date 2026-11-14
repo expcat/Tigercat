@@ -42,7 +42,7 @@ One component per page. This index only links to those pages.
 
 ## Form
 
-Runnable modules: `examples/example/vue3/src/examples/form/` and `examples/example/react/src/examples/form/`.
+Runnable modules: `examples/example/vue3/src/examples/form/01/`, `examples/example/vue3/src/examples/form/02/`, `examples/example/vue3/src/examples/form/03/`, `examples/example/vue3/src/examples/form/04/`, `examples/example/react/src/examples/form/01/`, `examples/example/react/src/examples/form/02/`, `examples/example/react/src/examples/form/03/`, `examples/example/react/src/examples/form/04/`.
 
 Note: 值对象是 Vue `modelValue`（`v-model`）/ React `value`。父级要把 `update:modelValue` 写回自己的模型。`required` 会参与校验。一次 `validate()` 作废仍在飞的上一次。失败提交聚焦第一个可聚焦的无效控件。Wizard 步下标走 `onStepChange`。Form `size` 是 `sm|md|lg`。
 

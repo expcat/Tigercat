@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## GaugeChart
 
-Runnable modules: `examples/example/vue3/src/examples/gauge-chart/` and `examples/example/react/src/examples/gauge-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/gauge-chart/01/`, `examples/example/vue3/src/examples/gauge-chart/02/`, `examples/example/vue3/src/examples/gauge-chart/03/`, `examples/example/react/src/examples/gauge-chart/01/`, `examples/example/react/src/examples/gauge-chart/02/`, `examples/example/react/src/examples/gauge-chart/03/`.
 
 Vue: `<GaugeChart :value="72" />`
 

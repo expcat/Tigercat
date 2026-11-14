@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## Modal
 
-Runnable modules: `examples/example/vue3/src/examples/modal/` and `examples/example/react/src/examples/modal/`.
+Runnable modules: `examples/example/vue3/src/examples/modal/01/`, `examples/example/vue3/src/examples/modal/02/`, `examples/example/vue3/src/examples/modal/03/`, `examples/example/vue3/src/examples/modal/04/`, `examples/example/react/src/examples/modal/01/`, `examples/example/react/src/examples/modal/02/`, `examples/example/react/src/examples/modal/03/`, `examples/example/react/src/examples/modal/04/`.
 
 Note: `open` 当帧出 dialog。打开时焦点进对话框或 `initialFocus`，先读标题。确定可返回 Promise 或 `preventDefault`：进行中不可再点，拒绝则不关闭。层本身不滚动，只有正文滚动。拖拽时过渡时长为 0。离开回调等这一层过渡结束；减少动效或没有过渡时立刻发。默认关场会播过渡再 hidden/卸；`destroyOnClose` 等到关场结束。`mask={false}` 点得透。`closable={false}` 只藏 X，Esc 仍关，除非 `keyboard={false}`。无标题仍有 locale dialog 名。关闭名走 `locale.modal`。嵌套 Modal 进外层 overlay-host，Esc 先关里层。
 

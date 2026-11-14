@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Col
 
-Runnable modules: `examples/example/vue3/src/examples/col/` and `examples/example/react/src/examples/col/`.
+Runnable modules: `examples/example/vue3/src/examples/grid/01/`, `examples/example/vue3/src/examples/grid/02/`, `examples/example/vue3/src/examples/grid/03/`, `examples/example/react/src/examples/grid/01/`, `examples/example/react/src/examples/grid/02/`, `examples/example/react/src/examples/grid/03/`.
 
 Note: 传入 `flex` 即走 flex 项，不必 `span={0}`。`span={0}` 是该断点隐藏。`order` 只改视觉，不改 Tab / 读屏顺序。offset 走逻辑边。
 

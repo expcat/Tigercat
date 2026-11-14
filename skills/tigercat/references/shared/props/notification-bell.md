@@ -17,3 +17,5 @@ description: Compact generated Tigercat Composite props reference
 | --------- | ------------------------ | ------- | --------------------------------------------------- |
 | `items?`  | `NotificationBellItem[]` | `-`     | Inbox rows. The bell does not read the toast queue. |
 | `locale?` | `string`                 | `-`     | Locale id for unread copy.                          |
+
+Events/callback props: `onItemReadChange?`.

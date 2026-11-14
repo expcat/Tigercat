@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## OrgChart
 
-Runnable modules: `examples/example/vue3/src/examples/org-chart/` and `examples/example/react/src/examples/org-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/org-chart/01/`, `examples/example/vue3/src/examples/org-chart/02/`, `examples/example/react/src/examples/org-chart/01/`, `examples/example/react/src/examples/org-chart/02/`.
 
 Note: `avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`javascript:`、`data:`、`vbscript:` 不渲染 image。
 

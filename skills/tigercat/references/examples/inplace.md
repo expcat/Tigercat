@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Inplace
 
-Runnable modules: `examples/example/vue3/src/examples/inplace/` and `examples/example/react/src/examples/inplace/`.
+Runnable modules: `examples/example/vue3/src/examples/inplace/01/`, `examples/example/react/src/examples/inplace/01/`.
 
 Vue: `<Inplace />`
 

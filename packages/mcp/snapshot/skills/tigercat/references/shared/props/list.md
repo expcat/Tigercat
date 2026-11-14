@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## List
 
-`packages/core/src/types/list.ts` · `ListProps` · 4/25 props
+`packages/core/src/types/list.ts` · `ListProps` · 4/25 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 分页默认关（与 Table 默认开、`pageSize` 10 相反）。传入 `pagination` 才渲染 Pagination：页数大于 3 时自动展示可点击页码与跳页输入框，3 页及以内为上一页/下一页加页码指示的简洁模式，可用 `pagination.simple` / `pagination.showQuickJumper` 显式覆盖。服务端分页用 `pagination.remote: true`（与 Table `pagination.remote`、工具栏 `toolbar.searchMode: 'remote'` 是三套独立开关）：此时 `dataSource` 即当前页数据，组件跳过内部切片原样渲染，总页数与总数文案由 `pagination.total` 计算，`current`/`pageSize` 变为受控属性，业务侧监听 `page-change`（React `onPageChange`）后按新页码重新请求。虚拟窗高是 `virtualHeight`，不是 TreeSelect overlay `height` / Select `listHeight`。
 
@@ -21,3 +21,29 @@ Note: 分页默认关（与 Table 默认开、`pageSize` 10 相反）。传入 `
 | `pagination?` | `ListPaginationConfig \| false` | `false`        | Pagination configuration, set to false to disable. Omit or `false` leaves the list unpa... |
 | `grid?`       | `ListGrid`                      | `-`            | Grid configuration for grid layout                                                         |
 | `itemLayout?` | `ListItemLayout`                | `'horizontal'` | Item layout                                                                                |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. List size
+- `bordered?`: `boolean`; default `false`. Outer card frame. Split lines are `split`, not this flag.
+- `loading?`: `boolean`; default `false`. Loading state
+- `emptyText?`: `string`; default `locale.common.emptyText`. Empty state text
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overlay
+- `split?`: `boolean`; default `true`. Whether to show split line between items
+- `header?`: `unknown`; default `-`. List header content
+- `footer?`: `unknown`; default `-`. List footer content
+- `virtual?`: `boolean`; default `false`. Enable fixed-height virtual rendering via VirtualList. Mutually exclusive with `grid`.
+- `virtualHeight?`: `number`; default `400`. Virtual viewport height in pixels.
+- `virtualItemHeight?`: `number`; default `-`. Fixed virtual item height in pixels. Defaults to the size row height.
+- `virtualOverscan?`: `number`; default `5`. Number of extra virtual items to render above/below the viewport.
+- `rowKey?`: `ListRowKey<T>`; default `'id'`. Row identity. String form reads `item[rowKey]`.
+- `hoverable?`: `boolean`; default `false`. Hover background on items. Does not make the row a control.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `draggable?`: `boolean`; default `false`. Whether list items are draggable for reorder
+- `renderItem?`: `(item: T, index: number) => React.ReactNode`; default `-`. -
+- `item?`: `(item: T, index: number) => React.ReactNode`; default `-`. -
+- `meta?`: `(item: T, index: number) => React.ReactNode`; default `-`. -
+- `actions?`: `(item: T, index: number) => React.ReactNode`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onItemClick?`, `onPageChange?`, `onReorder?`.

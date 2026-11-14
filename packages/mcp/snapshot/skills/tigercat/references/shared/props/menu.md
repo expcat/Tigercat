@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Menu
 
-`packages/core/src/types/menu.ts` · `MenuProps` · 4/19 props
+`packages/core/src/types/menu.ts` · `MenuProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 项上的 `href` 和 schema 的 `path` / `href` / `iframeSrc` 走 `link-utils`。`path` 只作站内路径。危险协议和禁用项不输出 `href`。
 
@@ -21,5 +21,25 @@ Note: 项上的 `href` 和 schema 的 `path` / `href` / `iframeSrc` 走 `link-ut
 | `selectedKeys?` | `MenuKey[]`  | `-`     | Currently selected menu item keys. Selection is always single-key: the array is empty o... |
 | `openKeys?`     | `MenuKey[]`  | `-`     | Currently opened submenu keys (inline, vertical, and popup).                               |
 | `collapsed?`    | `boolean`    | `false` | Collapse vertical/inline menus to icons (or first letter) and popup submenus. Horizonta... |
+
+### Remaining props (complete public API)
+
+- `mode?`: `MenuMode`; default `'vertical'`. Menu mode - horizontal, vertical, or inline
+- `theme?`: `MenuTheme`; default `'light'`. Menu theme - light or dark
+- `defaultSelectedKeys?`: `MenuKey[]`; default `-`. Default selected menu item keys
+- `defaultOpenKeys?`: `MenuKey[]`; default `-`. Default opened submenu keys
+- `openMultiple?`: `boolean`; default `true`. Whether several submenus can stay open at once. Does not change item selection (always...
+- `inlineIndent?`: `number`; default `24`. Inline indentation for submenu items
+- `popupPortal?`: `boolean`; default `true`. Whether popup submenus are rendered through a portal.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `searchable?`: `boolean | 'auto'`; default `false`. Whether to render a built-in search field for filtering data-driven `items`. `'auto'` s...
+- `searchValue?`: `string`; default `-`. Controlled search value used to filter data-driven `items`.
+- `defaultSearchValue?`: `string`; default `-`. Default search value for uncontrolled searchable menus.
+- `searchPlaceholder?`: `string`; default `-`. Search input placeholder. Falls back to `locale.common.searchPlaceholder`.
+- `emptyText?`: `string`; default `-`. Empty text shown when `items` are filtered to no results. Falls back to `locale.common....
+- `filterMode?`: `MenuFilterMode`; default `'subtree'`. How a matching parent node treats unmatched children.
+
+Events/callback props: `onUpdate:selectedKeys?`, `onUpdate:openKeys?`, `onUpdate:searchValue?`, `onSelect?`, `onOpenChange?`, `onSearch?`.
 
 `collapsed` only applies to vertical/inline (horizontal `devWarn`s). Labels stay `sr-only`; text-only items show a first-letter glyph. `popupPortal` defaults true. Backend trees: `MenuSchemaNode` + `filterMenuByPermission` / `menuSchemaToMenuItems` / `schemaToRouteRecords` (schema-only fields stay off `MenuItem`; no `addRoute`).

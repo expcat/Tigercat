@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## NavigationMenuLink
 
-Runnable modules: `examples/example/vue3/src/examples/navigation-menu-link/` and `examples/example/react/src/examples/navigation-menu-link/`.
+Runnable modules: `examples/example/vue3/src/examples/navigation-menu/01/`, `examples/example/vue3/src/examples/navigation-menu/02/`, `examples/example/react/src/examples/navigation-menu/01/`, `examples/example/react/src/examples/navigation-menu/02/`.
 
 Vue: `<NavigationMenu><NavigationMenuItem><NavigationMenuLink href="/about">About</NavigationMenuLink></NavigationMenuItem></NavigationMenu>`
 

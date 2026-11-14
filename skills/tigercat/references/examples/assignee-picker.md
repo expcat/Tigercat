@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## AssigneePicker
 
-Runnable modules: `examples/example/vue3/src/examples/assignee-picker/` and `examples/example/react/src/examples/assignee-picker/`.
+Runnable modules: `examples/example/vue3/src/examples/assignee-picker/01/`, `examples/example/react/src/examples/assignee-picker/01/`.
 
 Vue: `<AssigneePicker />`
 

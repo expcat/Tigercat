@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## NumberKeyboard
 
-Runnable modules: `examples/example/vue3/src/examples/number-keyboard/` and `examples/example/react/src/examples/number-keyboard/`.
+Runnable modules: `examples/example/vue3/src/examples/number-keyboard/01/`, `examples/example/vue3/src/examples/number-keyboard/02/`, `examples/example/vue3/src/examples/number-keyboard/03/`, `examples/example/react/src/examples/number-keyboard/01/`, `examples/example/react/src/examples/number-keyboard/02/`, `examples/example/react/src/examples/number-keyboard/03/`.
 
 Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。打开后焦点在对话框里，当前键可见。进入的值先按模式收成合法串，收不干净当空。`phone` 默认 11 位，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。只读用 `readOnly`，只读键不可激活。
 

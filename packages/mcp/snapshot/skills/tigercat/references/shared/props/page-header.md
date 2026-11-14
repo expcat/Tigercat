@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## PageHeader
 
-`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 4/16 props
+`packages/core/src/types/page-header.ts` · `PageHeaderProps` · 4/16 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 返回地址走 `Link`，因此同样只接受 `link-utils` 的协议。危险地址不输出 `href`。
 
@@ -21,3 +21,20 @@ Note: 返回地址走 `Link`，因此同样只接受 `link-utils` 的协议。�
 | `subTitle?` | `string`  | `-`     | Secondary text shown beside the title                                                      |
 | `showBack?` | `boolean` | `-`     | Whether to show the back control. When omitted, the control is shown if `onBack` / `@ba... |
 | `backHref?` | `string`  | `-`     | Navigation URL for the default back control. Renders a Link instead of a Button when se... |
+
+### Remaining props (complete public API)
+
+- `backAriaLabel?`: `string`; default `-`. Accessible name for the default back control. Falls back to the locale `pageHeader.back...
+- `headingLevel?`: `1 | 2 | 3 | 4 | 5 | 6`; default `1`. Heading level for `title`.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Inline styles
+- `breadcrumb?`: `React.ReactNode`; default `-`. Breadcrumb row, typically a Breadcrumb component
+- `tabs?`: `React.ReactNode`; default `-`. -
+- `footer?`: `React.ReactNode`; default `-`. -
+- `actions?`: `React.ReactNode`; default `-`. Right-aligned action area
+- `back?`: `React.ReactNode`; default `-`. Custom back control. Replaces the default Button / Link when provided.
+- `children?`: `React.ReactNode`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocalePageHeader>`; default `-`. -
+
+Events/callback props: `onBack?`.

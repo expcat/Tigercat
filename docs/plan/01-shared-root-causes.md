@@ -2,7 +2,7 @@
 
 [路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
-同一个根因在很多组件的报告里重复出现。这里把它们收成 13 个任务（S01–S13），共 42 条发现加 1 条沿用任务（T01），全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
+同一个根因在很多组件的报告里重复出现。这里把它们收成 10 个任务（S04–S13），共 36 条发现加 1 条沿用任务（T01），全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
 
 ## 目标
 
@@ -12,11 +12,10 @@
 ## 非目标
 
 - 不在这一波处理各组件自己的条目，那些在 02–12。
-- 不手改生成物。S01–S03 改完重跑生成器。
+- 不手改生成物。
 
 ## 依赖与顺序
 
-- S01、S02、S03 改同一个生成器，一批做，只重跑一次 `pnpm docs:api` 和 `pnpm mcp:build`。各组件文档类条目里要重跑生成器的，等这一批之后再做。
 - S04、S05 改主题运行时和 token 生成器，一批做。
 - S06 先于各组件的 i18n 条目。
 - S07–S10 是两端的同一种写法问题，可以按组件分给多人并行，但每个 S 要先在主发现的组件上定好写法。
@@ -26,9 +25,6 @@
 
 | 任务 | 根因                                    | 主发现                                  | 波及组件数 |
 | ---- | --------------------------------------- | --------------------------------------- | ---------- |
-| S01  | 生成器：compact Props 表漏列公开字段    | C040-F01、X04-F02                       | 130        |
-| S02  | 生成器：示例目录靠组件名猜              | C025-F03、C006-F002                     | 49         |
-| S03  | 生成器：Events 行被丢                   | C162-F03、C160-F04                      | 6          |
 | S04  | 过渡 shorthand 只有最后一项拿到时长     | X02-F001                                | 50         |
 | S05  | 运行时主题 scope 盖掉辅助媒体偏好       | X02-F002                                | 7          |
 | S06  | W9 辅助文案绕过标准 locale              | X02-F003                                | 44         |
@@ -39,51 +35,6 @@
 | S11  | 运行时回退把原型继承键当成合法值        | C004-F001、C003-F003、C002-F002 等 5 条 | 10         |
 | S12  | Vue 动态 class 停在初始值               | C089-F01                                | 6          |
 | S13  | Vue 手写导出的 Props 类型与运行时不一致 | C022-F03、C034-F04、C048-F02 等 23 条   | 23         |
-
-## S01 生成器：compact Props 表漏列公开字段
-
-**现状。** `scripts/lib/docs-api.mjs` 里 `MAX_COMPACT_PROPS = 4`。必填之外只按手写的优先字段补到 4 行，其余公开 prop 不进 compact 表，MCP 回包跟着缺。`Pick` / `Omit` 的类型参数又被整份当成父接口合并，Space、Popconfirm、SchemaForm、Gantt、OrgChart 的分母偏大。
-
-**做法。** 改生成器的取行规则和 heritage 展开，不逐个组件补优先字段。规则要先定（见 [14](14-waves.md#开工前要先定方向的条目)）。改完重跑 `pnpm docs:api` 与 `pnpm mcp:build`，不手改生成物。
-
-**做完的标准。** 各报告点名的漏列字段能在生成页或它链到的完整页里查到；五个分母与下表一致；`pnpm docs:api:check` 通过。
-
-| 编号     | 级别 | 波次 | 端          | 类别 | 条目                                          | 验收                                                                  |
-| -------- | ---- | ---- | ----------- | ---- | --------------------------------------------- | --------------------------------------------------------------------- |
-| C040-F01 | P2   | W0   | 文档·生成器 | 文档 | compact props 与 MCP 未列出公开 size          | footer.md 与 MCP Footer 回包列出 size 的 default/compact 取值与默认值 |
-| X04-F02  | P2   | W0   | 文档·生成器 | 文档 | `Pick` / `Omit` 排除的字段仍计入 compact 分母 | 分母变为 Space 5、Popconfirm 17、SchemaForm 29、Gantt 33、OrgChart 25 |
-
-并入的组件（129）：ActivityFeed、Alert、Anchor、AppShell、AreaChart、AutoComplete、BackTop、BarChart、Breadcrumb、BreadcrumbItem、Calendar、Cascader、ChartAxis、ChartCanvas、ChartGrid、ChartLegend、ChartSeries、ChartTooltip、ChatWindow、Checkbox、CheckboxGroup、CodeEditor、Collapse、CollapsePanel、ColorPicker、ColorSwatch、CommentThread、ContextMenu、Countdown、CronEditor、DataExport、DataTableWithToolbar、DatePicker、Drag、Drawer、Dropdown、DropdownItem、FileManager、FloatButton、FloatButtonGroup、Form、FormItem、FormWizard、FullscreenButton、FunnelChart、Gantt、GaugeChart、Header、HeatmapChart、ImageAnnotation、InfiniteScroll、Input、InputNumber、InputOTP、Layout、LineChart、List、Loading、LoadingBar、LoadingBarContainer、MarkdownEditor、MaskInput、Masonry、Mentions、Menu、MenuItem、MenuItemGroup、Message、Modal、NavigationMenu、NavigationMenuItem、NavigationMenuLink、NavigationMenuTrigger、NotificationCenter、NotificationContainer、NumberKeyboard、OrgChart、PageHeader、Pagination、PieChart、Popconfirm、Popover、PrintLayout、Progress、RadarChart、Radio、RadioGroup、Resizable、RichTextEditor、SankeyChart、ScatterChart、SchemaForm、ScrollArea、ScrollSpy、Select、Sidebar、Signature、Skeleton、Slider、Space、Splitter、Spotlight、Steps、StepsItem、SubMenu、SunburstChart、Switch、TabPane、Table、Tabs、TagsInput、TaskBoard、Textarea、TimePicker、Timeline、Tooltip、Tour、Transfer、Tree、TreeMapChart、TreeSelect、VirtualList、VirtualTable、WaterfallChart、WorkflowActionBar、WorkflowDesigner、WorkflowDetailShell、WorkflowTimeline、WorkflowViewer。专题 X03、X04 的报告也并入了这一条。
-
-## S02 生成器：示例目录靠组件名猜
-
-**现状。** 生成器用 `pascalToKebab(组件名)` 拼示例目录，不读真实的 Demo 注册。X03 统计 185 条示例文档里 98 条路径不存在，涉及 49 个目录名：QRCode、DatePicker、BackTop、TimePicker、TreeMapChart 的目录名对不上，另外 44 个子组件本来就没有独立示例。
-
-**做法。** 路径取自现存的 Demo 注册事实；组合组件和子组件指向父组件里真实消费它的 Demo。不改示例目录名，不手改生成物。
-
-**做完的标准。** 示例文档与 MCP 回包里的 Runnable modules 路径全部存在。
-
-| 编号      | 级别 | 波次 | 端          | 类别 | 条目                                              | 验收                                                                        |
-| --------- | ---- | ---- | ----------- | ---- | ------------------------------------------------- | --------------------------------------------------------------------------- |
-| C025-F03  | P2   | W0   | 文档·生成器 | 文档 | 生成示例文档与 MCP 指向不存在的 qr-code Demo 目录 | 示例文档与 MCP 的 Runnable modules 指向实际存在的 src/examples/qrcode/ 目录 |
-| C006-F002 | P2   | W0   | 文档·生成器 | 文档 | 示例文档指向不存在的 avatar-group 目录            | avatar-group.md 的 runnable modules 指向两端真实存在的 avatar/03、avatar/04 |
-
-并入的组件（47）：AnchorLink、BackTop、BreadcrumbItem、ButtonGroup、ChartAxis、ChartCanvas、ChartGrid、ChartLegend、ChartSeries、ChartTooltip、CheckboxGroup、Col、CollapsePanel、Container、Content、ContextMenuItem、ContextMenuMenu、ContextMenuSub、DatePicker、DropdownItem、DropdownMenu、FloatButtonGroup、Footer、FormItem、Header、ImageGroup、InputGroupAddon、LoadingBarContainer、MenuItem、MenuItemGroup、MessageContainer、NavigationMenuContent、NavigationMenuItem、NavigationMenuLink、NavigationMenuList、NavigationMenuTrigger、NotificationContainer、PrintPageBreak、RadioGroup、Row、Sidebar、StepsItem、SubMenu、TabPane、TimePicker、TreeMapChart、WorkflowActionBar。专题 X03、X04 的报告也并入了这一条。
-
-## S03 生成器：Events 行被丢
-
-**现状。** `on*` 成员先被标成 event，`frameworkOwn` 又只留 prop，事件在合并前就丢了。生成器只索引以 `Props` 结尾的接口，拿不到 `UseDragOptions` 的成员；继承子句还把类型参数约束拼进了父类型名。
-
-**做法。** 事件成员保留到 `eventRows`；Vue 的 emits 写进导出类型，或由生成器读取。不靠改名绕过。
-
-**做完的标准。** 下表两页有 Events 行；InfiniteScroll、MarkdownEditor、WorkflowDetailShell、WorkflowTimeline 的生成页同样列出回调。
-
-| 编号     | 级别 | 波次 | 端          | 类别 | 条目                                          | 验收                                                                                         |
-| -------- | ---- | ---- | ----------- | ---- | --------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| C162-F03 | P2   | W0   | 文档·生成器 | 文档 | 生成 Props 页整段缺 Events 行，五个回调未列出 | 生成页有 Events 行，含 onChange、onSelect、onToolChange、onReady、onError                    |
-| C160-F04 | P2   | W0   | 文档·生成器 | 文档 | 生成 Props 页缺四个拖拽回调，基线继承文本拼坏 | Drag Props 页事件行含 onDragStart、onDragOver、onDrop、onDragEnd；基线继承文本不含拼坏的约束 |
-
-并入的组件（4）：InfiniteScroll、MarkdownEditor、WorkflowDetailShell、WorkflowTimeline。
 
 ## S04 过渡 shorthand 只有最后一项拿到时长
 

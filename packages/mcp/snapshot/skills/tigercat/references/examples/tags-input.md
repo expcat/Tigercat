@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## TagsInput
 
-Runnable modules: `examples/example/vue3/src/examples/tags-input/` and `examples/example/react/src/examples/tags-input/`.
+Runnable modules: `examples/example/vue3/src/examples/tags-input/01/`, `examples/example/vue3/src/examples/tags-input/02/`, `examples/example/vue3/src/examples/tags-input/03/`, `examples/example/react/src/examples/tags-input/01/`, `examples/example/react/src/examples/tags-input/02/`, `examples/example/react/src/examples/tags-input/03/`.
 
 Note: 只读用 `readOnly`。粘贴在光标处插入后再按分隔符切开。错误只走 FormItem。拒绝重复或超限时给一句实时说明。
 

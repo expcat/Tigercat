@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## CronEditor
 
-Runnable modules: `examples/example/vue3/src/examples/cron-editor/` and `examples/example/react/src/examples/cron-editor/`.
+Runnable modules: `examples/example/vue3/src/examples/cron-editor/01/`, `examples/example/vue3/src/examples/cron-editor/02/`, `examples/example/react/src/examples/cron-editor/01/`, `examples/example/react/src/examples/cron-editor/02/`.
 
 Note: 提交给表单的值是空，或一份通过 5 段规则的表达式。非法文本留在草稿里，错误走 FormItem，输入过程用 `polite`。空值的字段显示空，不画成五个 `*`。只读用 `readOnly`：可以聚焦和提交，不能改值。
 

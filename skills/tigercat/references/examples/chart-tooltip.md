@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## ChartTooltip
 
-Runnable modules: `examples/example/vue3/src/examples/chart-tooltip/` and `examples/example/react/src/examples/chart-tooltip/`.
+Runnable modules: `examples/example/vue3/src/examples/use-chart-interaction/01/`, `examples/example/vue3/src/examples/use-chart-interaction/02/`, `examples/example/react/src/examples/use-chart-interaction/01/`, `examples/example/react/src/examples/use-chart-interaction/02/`.
 
 Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。
 

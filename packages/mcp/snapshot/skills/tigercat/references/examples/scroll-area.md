@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## ScrollArea
 
-Runnable modules: `examples/example/vue3/src/examples/scroll-area/` and `examples/example/react/src/examples/scroll-area/`.
+Runnable modules: `examples/example/vue3/src/examples/scroll-area/01/`, `examples/example/vue3/src/examples/scroll-area/02/`, `examples/example/vue3/src/examples/scroll-area/03/`, `examples/example/react/src/examples/scroll-area/01/`, `examples/example/react/src/examples/scroll-area/02/`, `examples/example/react/src/examples/scroll-area/03/`.
 
 Vue: `<ScrollArea max-height="200" aria-label="Log"><slot /></ScrollArea>`
 

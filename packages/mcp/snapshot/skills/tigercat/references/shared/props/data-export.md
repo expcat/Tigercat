@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## DataExport
 
-`packages/core/src/types/data-export.ts` · `DataExportProps` · 4/12 props
+`packages/core/src/types/data-export.ts` · `DataExportProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
 
@@ -23,3 +23,16 @@ Note: 将 columns + dataSource 导出为真正的 .xlsx（零依赖、STORED zip
 | `dataSource` | `T[]`                | `-`                           | Records to export                                                                          |
 | `formats?`   | `DataExportFormat[]` | `['xlsx', 'csv', 'markdown']` | Formats offered to the user. A single format renders a plain button, multiple formats r... |
 | `fileName?`  | `string`             | `'export'`                    | Download file name. An existing matching suffix is kept; path characters are stripped....  |
+
+### Remaining props (complete public API)
+
+- `disabled?`: `boolean`; default `false`. Whether the export trigger is disabled
+- `customExport?`: `(info: { format: DataExportFormat columns: TableColumn<T>[] dataSource: T[] fileName: string }) => void | Promise<void>`; default `-`. When set, replaces the built-in serializer for that click (no zip import).
+- `sheetName?`: `string`; default `'Sheet1'`. Worksheet name used for xlsx output
+- `cellFormatter?`: `(value: unknown, column: TableColumn<T>, record: T) => unknown`; default `-`. Transform a cell value before serialization. Receives the raw `record[column.dataKey |...
+- `hiddenColumnKeys?`: `string[]`; default `-`. Column keys to omit. Hidden Table columns should be passed through here (or filtered by...
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides merged on top of ConfigProvider locale
+- `labels?`: `Partial<TigerLocaleDataExport>`; default `-`. UI labels for custom text. Takes precedence over locale and ConfigProvider text.
+- `className?`: `string`; default `-`. -
+
+Events/callback props: `onExport?`, `onError?`.

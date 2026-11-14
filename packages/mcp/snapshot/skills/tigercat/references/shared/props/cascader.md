@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Cascader
 
-`packages/core/src/types/cascader.ts` · `CascaderProps` · 4/31 props
+`packages/core/src/types/cascader.ts` · `CascaderProps` · 4/31 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 空路径是 `[]`。缺键、`null` 和 `''` 都是 `[]`。对不上的段保留原始键。浏览路径只在打开时初始化。懒加载的鼠标、Enter 和方向键走同一道。列、返回、展开文案在 `locale.cascader`，不在 `select`。只读用 `readOnly`。
 
@@ -22,4 +22,34 @@ Note: 空路径是 `[]`。缺键、`null` 和 `''` 都是 `[]`。对不上的段
 | `defaultValue?` | `CascaderModelValue`              | `-`     | Initial path when `value` is omitted.               |
 | `searchable?`   | `boolean \| CascaderSearchConfig` | `false` | Whether to allow search/filter                      |
 
-Events/callback props: `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `open?`: `boolean`; default `-`. Controlled open state. `undefined` is uncontrolled.
+- `defaultOpen?`: `boolean`; default `false`. Initial open state when `open` is omitted.
+- `placeholder?`: `string`; default `-`. Placeholder text when nothing is selected. Defaults to ConfigProvider locale `select.pl...
+- `size?`: `ComponentSize`; default `'md'`. Component size
+- `disabled?`: `boolean`; default `false`. Whether the cascader is disabled
+- `readOnly?`: `boolean`; default `-`. Focusable and submitted, but the value cannot change. `readonly` is not a prop.
+- `clearable?`: `boolean`; default `true`. Whether to allow clearing the selection
+- `searchValue?`: `string`; default `-`. Controlled search input value
+- `defaultSearchValue?`: `string`; default `-`. Default search input value
+- `expandTrigger?`: `CascaderExpandTrigger`; default `'click'`. Trigger type for expanding sub-options
+- `changeOnSelect?`: `boolean`; default `false`. Whether to select value on each level (not just leaf)
+- `separator?`: `string`; default `' / '`. Separator for display text (trigger and search rows)
+- `emptyText?`: `string`; default `-`. Text to display when no options match search, or options are empty. Defaults to ConfigP...
+- `virtual?`: `boolean`; default `false`. Whether to use virtual scrolling for large column / search lists.
+- `listHeight?`: `number`; default `256`. Height of each column panel (and the searchable flat list) in pixels. Applies to virtua...
+- `loading?`: `boolean`; default `false`. Remote-loading flag. Empty lists show `select.loadingText` instead of empty.
+- `loadData?`: `CascaderLoadDataFn`; default `-`. Load children for a non-leaf with empty `children`. Do not treat the option as a leaf u...
+- `status?`: `InputStatus`; default `'default'`. Validation status. Also read from FormItem when omitted.
+- `name?`: `string`; default `-`. Native form field name. Serialized through a hidden input.
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. Overlay placement.
+- `offset?`: `number`; default `4`. Overlay offset in pixels.
+- `dropdownClassName?`: `string`; default `-`. Extra class names for the dropdown panel.
+- `getPopupContainer?`: `() => HTMLElement | null`; default `-`. Portal container. Defaults to the overlay-host → ConfigProvider → body chain.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `labels?`: `Partial<TigerLocaleSelect & TigerLocaleCascader>`; default `-`. UI labels for custom text. Takes precedence over `locale` and ConfigProvider text.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `modelValue?`: `CascaderModelValue`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onUpdate:modelValue?`, `onUpdate:searchValue?`, `onUpdate:open?`, `onBlur?`.

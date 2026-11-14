@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## DatePicker
 
-Runnable modules: `examples/example/vue3/src/examples/date-picker/` and `examples/example/react/src/examples/date-picker/`.
+Runnable modules: `examples/example/vue3/src/examples/datepicker/01/`, `examples/example/vue3/src/examples/datepicker/02/`, `examples/example/vue3/src/examples/datepicker/03/`, `examples/example/react/src/examples/datepicker/01/`, `examples/example/react/src/examples/datepicker/02/`, `examples/example/react/src/examples/datepicker/03/`.
 
 Note: 存储和 `name` 是公历日历日（`YYYY-MM-DD`，范围 `start|end`）。展示可以本地化，解析用生成这段文字的同一套历法和数字。点选、键入、快捷方式和确定走同一道禁用边界；结束早于开始会对调。区间第一次点选只预览，确定提交完整区间，未完成留在面板里。空是 `null`。只读用 `readOnly`。Vue 值事件只有 `update:modelValue`，打开只有 `update:open`。
 

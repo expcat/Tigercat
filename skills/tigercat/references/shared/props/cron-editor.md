@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## CronEditor
 
-`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 4/14 props
+`packages/core/src/types/cron-editor.ts` · `CronEditorProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 提交给表单的值是空，或一份通过 5 段规则的表达式。非法文本留在草稿里，错误走 FormItem，输入过程用 `polite`。空值的字段显示空，不画成五个 `*`。只读用 `readOnly`：可以聚焦和提交，不能改值。
 
@@ -22,4 +22,17 @@ Note: 提交给表单的值是空，或一份通过 5 段规则的表达式。�
 | `presets?`      | `CronPreset[]`   | `-`     | -                                                              |
 | `disabled?`     | `boolean`        | `false` | -                                                              |
 
-Events/callback props: `onChange?`, `onValidate?`.
+### Remaining props (complete public API)
+
+- `readOnly?`: `boolean`; default `false`. Focusable and submittable. The expression field is read-only; other controls stay focus...
+- `size?`: `CronEditorSize`; default `'md'`. -
+- `ariaLabel?`: `string`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider. Do not pass a language id.
+- `labels?`: `Partial<TigerLocaleCronEditor>`; default `-`. -
+- `status?`: `InputStatus`; default `-`. -
+- `name?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+- `style?`: `React.CSSProperties`; default `-`. -
+
+Events/callback props: `onChange?`, `onValidate?`, `onBlur?`.

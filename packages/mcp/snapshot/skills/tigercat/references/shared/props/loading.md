@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Loading
 
-`packages/core/src/types/loading.ts` · `LoadingProps` · 4/14 props
+`packages/core/src/types/loading.ts` · `LoadingProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消。`fullscreen` 盖住视口，和有没有子节点分开，层高于模态，并占住焦点栈。区域遮罩把 `aria-busy` 放在被挡住的区域上，结束时若焦点没被移走就还回去。
 
@@ -21,3 +21,16 @@ Note: 每次 `spinning` 变为真都重新等 `delay`，中途转回假就取消
 | `fullscreen?` | `boolean` | `false` | Whether to show loading as fullscreen overlay                                              |
 | `spinning?`   | `boolean` | `true`  | Cover children / the default slot with a relative overlay. When `false`, only the conte... |
 | `delay?`      | `number`  | `0`     | Delay before showing the loading indicator (ms) Useful to prevent flashing on quick ope... |
+
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `variant?`: `LoadingVariant`; default `'spinner'`. Loading spinner variant - determines animation style
+- `size?`: `LoadingSize`; default `'md'`. Size of the loading indicator
+- `color?`: `LoadingColor`; default `'primary'`. Color variant
+- `background?`: `string`; default `'color-mix(in srgb, var(--tiger-surface) 90%, transparent)'`. Custom background color (for fullscreen / region overlay)
+- `customColor?`: `string`; default `-`. Custom spinner color (overrides color variant)
+- `lockScroll?`: `boolean`; default `true`. Whether fullscreen loading locks document scrolling
+- `className?`: `string`; default `-`. Additional CSS classes
+- `children?`: `React.ReactNode`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -

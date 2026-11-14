@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartTooltip
 
-`packages/core/src/types/chart-core.ts` · `ChartTooltipProps` · 4/7 props
+`packages/core/src/types/chart-core.ts` · `ChartTooltipProps` · 4/7 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay 层。跟随指针的例子见 useChartInteraction。
 
@@ -21,3 +21,11 @@ Note: `open` 为 false 时不挂节点。走 overlay-host 链，z 是 overlay �
 | `open?`    | `boolean` | `false` | Whether the tooltip is open                                                |
 | `x?`       | `number`  | `0`     | Viewport X position                                                        |
 | `y?`       | `number`  | `0`     | Viewport Y position                                                        |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes
+- `id?`: `string`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onDismiss?`.

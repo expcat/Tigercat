@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Avatar
 
-`packages/core/src/types/avatar.ts` · `AvatarProps` · 4/16 props
+`packages/core/src/types/avatar.ts` · `AvatarProps` · 4/16 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` 且有 `text` 时 `generateAvatarColor` 同名同色。`#`/`rgb()`/`var()` 走 style。组未传的 size/shape 跟组。
 
@@ -21,3 +21,20 @@ Note: `text` 既是破图回退也是缺 `alt` 时的名字。未传 `bgColor` �
 | `alt?`     | `string` | `-`     | Alternative text for the image. When omitted, `text` or `aria-label` is used as the acc... |
 | `text?`    | `string` | `-`     | Text content to display (e.g., initials) when src is missing or fails. Also used as the... |
 | `bgColor?` | `string` | `-`     | Background for text/icon avatars. A theme token name (`primary`) or a CSS color (`#rgb`... |
+
+### Remaining props (complete public API)
+
+- `size?`: `AvatarSize`; default `'md'`. Avatar size
+- `shape?`: `AvatarShape`; default `'circle'`. Avatar shape
+- `textColor?`: `string`; default `-`. Text color for text/icon avatars. A theme token name or a CSS color applied as `color`.
+- `srcSet?`: `string`; default `-`. -
+- `sizes?`: `string`; default `-`. -
+- `crossOrigin?`: `'' | 'anonymous' | 'use-credentials'`; default `-`. -
+- `referrerPolicy?`: `ReferrerPolicyAttr`; default `-`. -
+- `decoding?`: `'async' | 'auto' | 'sync'`; default `-`. -
+- `fetchPriority?`: `'high' | 'low' | 'auto'`; default `-`. -
+- `className?`: `string`; default `-`. Additional CSS classes
+- `children?`: `React.ReactNode`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onLoad?`, `onError?`.

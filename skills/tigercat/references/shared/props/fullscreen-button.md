@@ -11,10 +11,16 @@ description: Compact generated Tigercat Navigation props reference
 
 ## FullscreenButton
 
-`packages/core/src/types/fullscreen.ts` · `FullscreenButtonProps / VueFullscreenButtonProps` · 3/4 props
+`packages/core/src/types/fullscreen.ts` · `FullscreenButtonProps / VueFullscreenButtonProps` · 3/4 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop      | Type                                                      | Default | Notes |
 | --------- | --------------------------------------------------------- | ------- | ----- |
 | `locale?` | `Partial<TigerLocale>`                                    | `-`     | -     |
 | `target?` | `Element \| (() => Element \| null \| undefined) \| null` | `-`     | -     |
 | `labels?` | `Partial<TigerLocaleFullscreen>`                          | `-`     | -     |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onError?`.

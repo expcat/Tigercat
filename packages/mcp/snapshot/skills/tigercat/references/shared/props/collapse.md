@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Collapse
 
-`packages/core/src/types/collapse.ts` · `CollapseProps` · 4/10 props
+`packages/core/src/types/collapse.ts` · `CollapseProps` · 4/10 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `onChange` / `v-model:activeKey` 永远是数组，空是 `[]`。accordion 多键只留最后一项。`1` 与 `"1"` 同一面板。header 是真 button；extra 是兄弟，不进可访问名。
 
@@ -21,3 +21,14 @@ Note: `onChange` / `v-model:activeKey` 永远是数组，空是 `[]`。accordion
 | `accordion?`          | `boolean`                                  | `false`   | Accordion mode — only one panel can be expanded at a time. Extra keys in `activeKey` /... |
 | `expandIconPosition?` | `ExpandIconPosition`                       | `'start'` | Position of the expand icon                                                               |
 | `bordered?`           | `boolean`                                  | `true`    | Whether to show border                                                                    |
+
+### Remaining props (complete public API)
+
+- `defaultActiveKey?`: `string | number | (string | number)[]`; default `-`. Default active panel keys (uncontrolled mode)
+- `ghost?`: `boolean`; default `false`. Ghost mode - transparent without border
+- `headingLevel?`: `1 | 2 | 3 | 4 | 5 | 6`; default `3`. Heading level wrapping each panel title button.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onChange?`, `onUpdate:activeKey?`.

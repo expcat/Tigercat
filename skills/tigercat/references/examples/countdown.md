@@ -13,7 +13,7 @@ description: Compact Tigercat Data Vue and React usage routes
 
 ## Countdown
 
-Runnable modules: `examples/example/vue3/src/examples/countdown/` and `examples/example/react/src/examples/countdown/`.
+Runnable modules: `examples/example/vue3/src/examples/countdown/01/`, `examples/example/vue3/src/examples/countdown/02/`, `examples/example/react/src/examples/countdown/01/`, `examples/example/react/src/examples/countdown/02/`.
 
 Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后再算。`HH` 无 `D` 时是总小时。`ariaLabel` 打在根上，timer 名仍是时间。
 

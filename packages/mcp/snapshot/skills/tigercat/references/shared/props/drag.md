@@ -11,12 +11,18 @@ description: Compact generated Tigercat Advanced props reference
 
 ## Drag
 
-`packages/core/src/types/drag.ts` · `DragProps` · 3/6 props
+`packages/core/src/types/drag.ts` · `DragProps` · 3/6 compact props · [Complete props](#remaining-props-complete-public-api)
 
-| Prop         | Type                                                       | Default | Notes                                                            |
-| ------------ | ---------------------------------------------------------- | ------- | ---------------------------------------------------------------- |
-| `items?`     | `T[]`                                                      | `-`     | Items to reorder. Each item must have a stable `id` and `index`. |
-| `className?` | `string`                                                   | `-`     | Additional CSS classes on the list root                          |
-| `children?`  | `(item: T, context: DragRenderContext) => React.ReactNode` | `-`     | -                                                                |
+| Prop         | Type         | Default | Notes                                                            |
+| ------------ | ------------ | ------- | ---------------------------------------------------------------- |
+| `items?`     | `T[]`        | `-`     | Items to reorder. Each item must have a stable `id` and `index`. |
+| `className?` | `string`     | `-`     | Additional CSS classes on the list root                          |
+| `config?`    | `DragConfig` | `-`     | Drag configuration                                               |
 
-Events/callback props: `onItemsChange?`.
+### Remaining props (complete public API)
+
+- `containerId?`: `string`; default `-`. Container id for this list (cross-container drags compare these ids)
+- `children?`: `(item: T, context: DragRenderContext) => React.ReactNode`; default `-`. -
+- `renderItem?`: `(item: T, context: DragRenderContext) => React.ReactNode`; default `-`. -
+
+Events/callback props: `onItemsChange?`, `onDragStart?`, `onDragOver?`, `onDrop?`, `onDragEnd?`, `onUpdate:items?`.

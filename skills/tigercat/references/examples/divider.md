@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Divider
 
-Runnable modules: `examples/example/vue3/src/examples/divider/` and `examples/example/react/src/examples/divider/`.
+Runnable modules: `examples/example/vue3/src/examples/divider/01/`, `examples/example/vue3/src/examples/divider/02/`, `examples/example/vue3/src/examples/divider/03/`, `examples/example/vue3/src/examples/divider/04/`, `examples/example/react/src/examples/divider/01/`, `examples/example/react/src/examples/divider/02/`, `examples/example/react/src/examples/divider/03/`, `examples/example/react/src/examples/divider/04/`.
 
 Note: 竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradient 也生效。子节点是居中标签。
 

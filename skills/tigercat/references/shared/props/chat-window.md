@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## ChatWindow
 
-`packages/core/src/types/chat.ts` · `ChatWindowProps` · 4/33 props
+`packages/core/src/types/chat.ts` · `ChatWindowProps` · 4/33 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
 
@@ -23,5 +23,37 @@ Note: `messages` 全受控，`onSend` 不 push。不绑发送时发送钮禁用�
 | `virtual?`            | `boolean`       | `false` | Enable virtualized rendering for the message list. The VirtualList is the only scroller... |
 | `autoScrollToBottom?` | `boolean`       | `true`  | Follow the latest message only while the list is pinned to the bottom (within 32px) or...  |
 | `sendOnEnter?`        | `boolean`       | `true`  | Send on Enter                                                                              |
+
+### Remaining props (complete public API)
+
+- `timeZone?`: `string`; default `-`. IANA timezone for message clocks. Without it, the first render omits the clock and the...
+- `value?`: `string`; default `-`. Input value (controlled)
+- `defaultValue?`: `string`; default `-`. Default input value (uncontrolled)
+- `placeholder?`: `string`; default `-`. Input placeholder
+- `disabled?`: `boolean`; default `false`. Whether the input is disabled
+- `maxLength?`: `number`; default `-`. Maximum length of input
+- `emptyText?`: `string`; default `-`. Empty state text
+- `sendText?`: `string`; default `-`. Send button text
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides for ChatWindow UI text
+- `labels?`: `Partial<import('./locale').TigerLocaleChatWindow>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `messageListAriaLabel?`: `string`; default `-`. Aria label for message list container
+- `inputAriaLabel?`: `string`; default `-`. Aria label for input
+- `sendAriaLabel?`: `string`; default `-`. Aria label for send button
+- `statusText?`: `string`; default `-`. Status bar text (e.g. typing, delivered)
+- `statusVariant?`: `BadgeVariant`; default `'info'`. Status bar variant
+- `showAvatar?`: `boolean`; default `true`. Show avatar in message item
+- `showName?`: `boolean`; default `true`. Show user name in message item
+- `showTime?`: `boolean`; default `false`. Show time in message item
+- `inputType?`: `'input' | 'textarea'`; default `'textarea'`. Input type
+- `inputRows?`: `number`; default `3`. Textarea rows
+- `allowShiftEnter?`: `boolean`; default `true`. Allow Shift+Enter to create new line
+- `allowEmpty?`: `boolean`; default `false`. Allow sending empty content
+- `clearOnSend?`: `boolean`; default `true`. Clear input after send
+- `virtualItemHeight?`: `number`; default `88`. Estimated pixel height of each virtualized message row.
+- `virtualHeight?`: `number`; default `400`. Pixel height of the virtualized message list viewport. This is the only scroller when `...
+- `renderBubble?`: `(message: ChatMessage, index: number) => React.ReactNode`; default `-`. Custom render for the bubble body (not the whole row).
+- `modelValue?`: `string`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
 
 Events/callback props: `onChange?`, `onSend?`.

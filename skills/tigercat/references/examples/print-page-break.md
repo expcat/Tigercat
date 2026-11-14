@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## PrintPageBreak
 
-Runnable modules: `examples/example/vue3/src/examples/print-page-break/` and `examples/example/react/src/examples/print-page-break/`.
+Runnable modules: `examples/example/vue3/src/examples/print-layout/01/`, `examples/example/react/src/examples/print-layout/01/`.
 
 Vue: `<PrintPageBreak />`
 

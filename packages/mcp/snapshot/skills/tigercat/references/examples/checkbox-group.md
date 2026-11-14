@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## CheckboxGroup
 
-Runnable modules: `examples/example/vue3/src/examples/checkbox-group/` and `examples/example/react/src/examples/checkbox-group/`.
+Runnable modules: `examples/example/vue3/src/examples/checkbox/02/`, `examples/example/vue3/src/examples/checkbox/03/`, `examples/example/vue3/src/examples/checkbox/04/`, `examples/example/vue3/src/examples/menu/04/`, `examples/example/react/src/examples/checkbox/02/`, `examples/example/react/src/examples/checkbox/03/`, `examples/example/react/src/examples/checkbox/04/`, `examples/example/react/src/examples/menu/04/`.
 
 Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。
 

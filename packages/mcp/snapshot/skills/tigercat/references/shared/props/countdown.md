@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Countdown
 
-`packages/core/src/types/countdown.ts` · `CountdownProps` · 4/10 props
+`packages/core/src/types/countdown.ts` · `CountdownProps` · 4/10 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后再算。`HH` 无 `D` 时是总小时。`ariaLabel` 打在根上，timer 名仍是时间。
 
@@ -21,3 +21,14 @@ Note: `now` 只用于首屏/SSR；不传时服务端是 `00:00:00`，mount 后�
 | `now?`      | `CountdownValue` | `-`          | First-paint / SSR clock snapshot only. After mount, ticks use `Date.now()`. Changing `n... |
 | `format?`   | `string`         | `'HH:mm:ss'` | Display pattern. `HH` is total hours unless `D`/`DD` is present (then 24h remainder). `... |
 | `interval?` | `number`         | `1000`       | Tick period in ms. `<= 0` disables the timer.                                              |
+
+### Remaining props (complete public API)
+
+- `title?`: `unknown`; default `-`. Visible title above the value. Not an HTML tooltip.
+- `prefix?`: `unknown`; default `-`. -
+- `suffix?`: `unknown`; default `-`. -
+- `size?`: `CountdownSize`; default `-`. -
+- `ariaLabel?`: `string`; default `-`. Accessible name for the widget root. The timer node keeps the formatted time as its name.
+- `className?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onFinish?`.

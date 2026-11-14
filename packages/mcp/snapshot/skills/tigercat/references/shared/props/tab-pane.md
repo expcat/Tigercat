@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## TabPane
 
-`packages/core/src/types/tabs.ts` · `TabPaneProps` · 4/11 props
+`packages/core/src/types/tabs.ts` · `TabPaneProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type               | Default | Notes                                                            |
 | ----------- | ------------------ | ------- | ---------------------------------------------------------------- |
@@ -19,3 +19,13 @@ description: Compact generated Tigercat Navigation props reference
 | `label`     | `string`           | `-`     | Tab title text. A label slot or node replaces the visible title. |
 | `disabled?` | `boolean`          | `false` | Whether the tab is disabled                                      |
 | `closable?` | `boolean`          | `-`     | Whether the tab can be closed (overrides parent closable)        |
+
+### Remaining props (complete public API)
+
+- `icon?`: `unknown`; default `-`. Icon for the tab
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -
+- `renderMode?`: `'tab' | 'pane'`; default `-`. -
+- `tabId?`: `string`; default `-`. -
+- `panelId?`: `string`; default `-`. -

@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Link
 
-Runnable modules: `examples/example/vue3/src/examples/link/` and `examples/example/react/src/examples/link/`.
+Runnable modules: `examples/example/vue3/src/examples/link/01/`, `examples/example/vue3/src/examples/link/02/`, `examples/example/react/src/examples/link/01/`, `examples/example/react/src/examples/link/02/`.
 
 Note: 地址只接受 `link-utils` 的协议（`http:`、`https:`、`mailto:`、`tel:` 和无协议的站内路径）。`javascript:`、`data:`、`vbscript:` 和禁用都不输出 `href`。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。
 

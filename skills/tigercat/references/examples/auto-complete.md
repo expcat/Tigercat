@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## AutoComplete
 
-Runnable modules: `examples/example/vue3/src/examples/auto-complete/` and `examples/example/react/src/examples/auto-complete/`.
+Runnable modules: `examples/example/vue3/src/examples/auto-complete/01/`, `examples/example/vue3/src/examples/auto-complete/02/`, `examples/example/vue3/src/examples/auto-complete/03/`, `examples/example/react/src/examples/auto-complete/01/`, `examples/example/react/src/examples/auto-complete/02/`, `examples/example/react/src/examples/auto-complete/03/`.
 
 Note: 关层（完成、点外面、受控关闭）提交或还原。原生 `name` 提交已提交的值，展示用提交时的标签。缺键、`null` 和 `''` 是未提交。空查询不命中 `value` 或 `label` 为 `''` 的选项。没有可选项时 Enter 提交查询。组合输入期间把键交给输入法。打开着的空列表 `aria-expanded` 仍是真。只读用 `readOnly`。
 

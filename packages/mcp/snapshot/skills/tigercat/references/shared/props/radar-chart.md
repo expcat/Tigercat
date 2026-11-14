@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## RadarChart
 
-`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/59 props
+`packages/core/src/types/chart-radial.ts` · `RadarChartProps` · 4/59 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop          | Type                 | Default        | Notes                        |
 | ------------- | -------------------- | -------------- | ---------------------------- |
@@ -19,3 +19,63 @@ description: Compact generated Tigercat Charts props reference
 | `series?`     | `RadarChartSeries[]` | `-`            | Multiple series              |
 | `maxValue?`   | `number`             | `-`            | Max value for radius scaling |
 | `startAngle?` | `number`             | `-Math.PI / 2` | Start angle in radians       |
+
+### Remaining props (complete public API)
+
+- `indicators?`: `string[]`; default `-`. Shared angular domain. Defaults to the first series' labels (or indices).
+- `levels?`: `number`; default `5`. Grid levels. Values above 12 are capped.
+- `missing?`: `'center' | 'gap'`; default `'center'`. Where a missing indicator is drawn. `center` keeps the vertex on the axis origin. `gap`...
+- `showLevelLabels?`: `boolean`; default `false`. Whether to show level labels
+- `showGrid?`: `boolean`; default `true`. Whether to show grid
+- `showAxis?`: `boolean`; default `true`. Whether to show axis lines
+- `showLabels?`: `boolean`; default `true`. Whether to show labels
+- `labelOffset?`: `number`; default `12`. Label offset from outer radius
+- `labelFormatter?`: `(datum: RadarChartDatum, index: number) => string`; default `-`. Label formatter
+- `levelLabelFormatter?`: `(value: number, level: number) => string`; default `-`. Level label formatter
+- `levelLabelOffset?`: `number`; default `8`. Level label offset
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `hoveredIndex?`: `number | null`; default `-`. Hovered series index (controlled)
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered series
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive series
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `selectedIndex?`: `number | null`; default `-`. Selected series index (controlled)
+- `tooltipFormatter?`: `( datum: RadarChartDatum, seriesIndex: number, index: number, series?: RadarChartSeries ) => string`; default `-`. Tooltip formatter
+- `legendFormatter?`: `(series: RadarChartSeries, index: number) => string`; default `-`. Legend formatter
+- `colors?`: `string[]`; default `-`. Colors for series
+- `gridLineStyle?`: `ChartGridLineStyle`; default `'solid'`. Grid line style
+- `gridStrokeWidth?`: `number`; default `1`. Grid stroke width
+- `strokeColor?`: `string`; default `-`. Polygon stroke color
+- `strokeWidth?`: `number`; default `2`. Polygon stroke width
+- `fillColor?`: `string`; default `-`. Polygon fill color
+- `fillOpacity?`: `number`; default `0.2`. Polygon fill opacity
+- `showPoints?`: `boolean`; default `true`. Whether to show data points
+- `pointSize?`: `number`; default `3`. Point size
+- `pointColor?`: `string`; default `-`. Point color
+- `gridShape?`: `'polygon' | 'circle'`; default `'polygon'`. Grid shape: polygon (default) or circle (ECharts style)
+- `showSplitArea?`: `boolean`; default `false`. Show alternating split area fills between grid levels
+- `splitAreaOpacity?`: `number`; default `0.06`. Split area fill opacity
+- `splitAreaColors?`: `string[]`; default `-`. Split area colors (alternates between entries)
+- `pointBorderWidth?`: `number`; default `2`. Point border width (white ring around data points)
+- `pointBorderColor?`: `string`; default `'var(--tiger-surface)'`. Point border color
+- `pointHoverSize?`: `number`; default `-`. Point size when hovered (enlargement effect)
+- `labelAutoAlign?`: `boolean`; default `true`. Auto-align axis labels based on their angle position
+- `strokeGradient?`: `boolean`; default `false`. Render each series polygon stroke as a 3-stop vertical gradient (lighter → base → darke...
+- `pointGradient?`: `boolean`; default `false`. Render data point fill as a per-series `<radialGradient>` (bright center → series color...
+- `gradient?`: `boolean`; default `false`. Fill each series polygon with a vertical alpha gradient in radar user space.
+- `width?`: `number`; default `320`. Chart width
+- `height?`: `number`; default `200`. Chart height
+- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `showLegend?`: `boolean`; default `false`. Whether to show legend
+- `legendPosition?`: `ChartLegendPosition`; default `'bottom'`. Legend position around the plot
+- `legendMarkerSize?`: `number`; default `10`. Legend marker size in px
+- `legendGap?`: `number`; default `8`. Legend item gap in px
+- `showTooltip?`: `boolean`; default `true`. Whether to show tooltip
+- `bind?`: `{ values?: number[] indicators?: { name: string; max: number }[] }`; default `-`. -
+
+Events/callback props: `onHoveredIndexChange?`, `onSelectedIndexChange?`, `onSeriesClick?`, `onSeriesHover?`, `onUpdate:hoveredIndex?`, `onUpdate:selectedIndex?`.

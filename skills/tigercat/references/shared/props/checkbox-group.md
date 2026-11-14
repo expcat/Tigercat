@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## CheckboxGroup
 
-`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 4/11 props
+`packages/core/src/types/checkbox.ts` · `CheckboxGroupProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。
 
@@ -21,3 +21,15 @@ Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽
 | `defaultValue?` | `CheckboxGroupValue` | `[]`    | Default selected values (uncontrolled mode)   |
 | `disabled?`     | `boolean`            | `false` | Whether the checkbox group is disabled        |
 | `size?`         | `ComponentSize`      | `'md'`  | Checkbox size for all checkboxes in the group |
+
+### Remaining props (complete public API)
+
+- `orientation?`: `ChoiceGroupDirection`; default `'vertical'`. Layout orientation
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `options?`: `CheckboxGroupOption[]`; default `-`. Option list. Ignored when children / default slot are present.
+- `children?`: `React.ReactNode`; default `-`. -
+- `modelValue?`: `CheckboxGroupValue`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onChange?`.

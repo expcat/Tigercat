@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## InputGroup
 
-Runnable modules: `examples/example/vue3/src/examples/input-group/` and `examples/example/react/src/examples/input-group/`.
+Runnable modules: `examples/example/vue3/src/examples/input-group/01/`, `examples/example/vue3/src/examples/input-group/02/`, `examples/example/vue3/src/examples/input-group/03/`, `examples/example/vue3/src/examples/input-group/04/`, `examples/example/react/src/examples/input-group/01/`, `examples/example/react/src/examples/input-group/02/`, `examples/example/react/src/examples/input-group/03/`, `examples/example/react/src/examples/input-group/04/`.
 
 Note: 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。
 

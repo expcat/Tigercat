@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Empty
 
-`packages/core/src/types/empty.ts` · `EmptyProps` · 4/9 props
+`packages/core/src/types/empty.ts` · `EmptyProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `no-results` 各自有标）。自定义 `image` / 插槽不被 `showImage={false}` 丢掉。无 ConfigProvider 时默认英文。默认插图是装饰，`aria-hidden`。
 
@@ -21,3 +21,11 @@ Note: `preset` 只换默认文案和内置插图（`simple` 无图，`error` / `
 | `description?` | `string`               | `-`         | Description text below the illustration                                                    |
 | `showImage?`   | `boolean`              | `true`      | Whether to show the built-in illustration. A custom `image` / image slot still renders...  |
 | `locale?`      | `Partial<TigerLocale>` | `-`         | Locale override merged on top of ConfigProvider locale.                                    |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS class name
+- `image?`: `React.ReactNode`; default `-`. Custom image / illustration node
+- `extra?`: `React.ReactNode`; default `-`. Action buttons below description
+- `children?`: `React.ReactNode`; default `-`. Body content
+- `style?`: `Record<string, string | number>`; default `-`. -

@@ -13,7 +13,7 @@ description: Compact Tigercat Data Vue and React usage routes
 
 ## DataExport
 
-Runnable modules: `examples/example/vue3/src/examples/data-export/` and `examples/example/react/src/examples/data-export/`.
+Runnable modules: `examples/example/vue3/src/examples/data-export/01/`, `examples/example/react/src/examples/data-export/01/`.
 
 Uses: `Dropdown`, `DropdownMenu`, `DropdownItem`.
 

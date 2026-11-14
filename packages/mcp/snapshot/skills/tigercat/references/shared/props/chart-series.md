@@ -11,10 +11,17 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartSeries
 
-`packages/core/src/types/chart-core.ts` · `ChartSeriesProps` · 3/7 props
+`packages/core/src/types/chart-core.ts` · `ChartSeriesProps` · 3/7 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop    | Type              | Default | Notes            |
 | ------- | ----------------- | ------- | ---------------- |
 | `data`  | `T[]`             | `-`     | Series data      |
 | `type?` | `ChartSeriesType` | `-`     | Series type hint |
 | `name?` | `string`          | `-`     | Series name      |
+
+### Remaining props (complete public API)
+
+- `color?`: `string`; default `-`. Series color
+- `opacity?`: `number`; default `-`. Series opacity
+- `className?`: `string`; default `-`. Additional CSS classes
+- `children?`: `React.ReactNode | ((props: ChartSeriesRenderProps<T>) => React.ReactNode)`; default `-`. -

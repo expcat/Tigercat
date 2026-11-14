@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## ImageAnnotation
 
-`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 4/19 props
+`packages/core/src/types/image-annotation.ts` · `ImageAnnotationProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop          | Type                  | Default | Notes                                                                         |
 | ------------- | --------------------- | ------- | ----------------------------------------------------------------------------- |
@@ -19,3 +19,23 @@ description: Compact generated Tigercat Advanced props reference
 | `value?`      | `ImageAnnotation[]`   | `-`     | -                                                                             |
 | `tool?`       | `ImageAnnotationTool` | `-`     | -                                                                             |
 | `selectedId?` | `string`              | `-`     | Controlled selected id. `undefined` is uncontrolled; `''` is controlled none. |
+
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `alt?`: `string`; default `-`. -
+- `defaultValue?`: `ImageAnnotation[]`; default `-`. -
+- `defaultSelectedId?`: `string`; default `-`. -
+- `defaultTool?`: `ImageAnnotationTool`; default `-`. -
+- `tools?`: `ImageAnnotationTool[]`; default `-`. -
+- `disabled?`: `boolean`; default `-`. Disables drawing, selection, and tab stops on shapes. `readonly` still allows selection.
+- `readonly?`: `boolean`; default `-`. -
+- `minSize?`: `number`; default `-`. -
+- `strokeWidth?`: `number`; default `-`. -
+- `showLabels?`: `boolean`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `React.CSSProperties`; default `-`. -
+- `bind?`: `boolean`; default `-`. -
+- `modelValue?`: `CoreImageAnnotation[]`; default `-`. -
+
+Events/callback props: `onChange?`, `onSelect?`, `onToolChange?`, `onReady?`, `onError?`, `onUpdate:modelValue?`, `onUpdate:selectedId?`, `onUpdate:tool?`.

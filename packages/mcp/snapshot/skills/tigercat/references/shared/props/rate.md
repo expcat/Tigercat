@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Rate
 
-`packages/core/src/types/rate.ts` · `RateProps` · 4/12 props
+`packages/core/src/types/rate.ts` · `RateProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `readOnly` 与 `readonly` 是同一标志（冲突用 `readonly`）。可聚焦、不改值；`disabled` 才出 Tab。半星与方向键跟阅读方向。`valueText` 只替换 `{value}`。需要组名时传 `aria-label`。`size` 是 `sm|md|lg`（`RateSize` = `ComponentSize`）。
 
@@ -21,3 +21,16 @@ Note: `readOnly` 与 `readonly` 是同一标志（冲突用 `readonly`）。可�
 | `allowClear?` | `boolean` | `true`  | Whether to allow clearing by clicking the same value                         |
 | `character?`  | `string`  | `-`     | Character to use (text or emoji) — renders text instead of star icon         |
 | `readOnly?`   | `boolean` | `false` | Read-only: stays in tab order and exposes the value, but does not change it. |
+
+### Remaining props (complete public API)
+
+- `count?`: `number`; default `-`. Number of stars
+- `disabled?`: `boolean`; default `false`. Whether the component is disabled
+- `size?`: `RateSize`; default `'md'`. Component size
+- `className?`: `string`; default `-`. Custom class name
+- `value?`: `number`; default `-`. -
+- `defaultValue?`: `number`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleRate>`; default `-`. -
+
+Events/callback props: `onChange?`, `onHoverChange?`.

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## RadioGroup
 
-`packages/core/src/types/radio.ts` · `RadioGroupProps` · 4/12 props
+`packages/core/src/types/radio.ts` · `RadioGroupProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽时忽略 options。具名 FormItem 里的单颗 Radio 写入该选项的 `value`。
 
@@ -21,3 +21,16 @@ Note: 可传 `options[{ label, value, disabled }]`；有 children / 默认插槽
 | `defaultValue?` | `string \| number` | `-`     | Default selected value (uncontrolled mode)   |
 | `name?`         | `string`           | `-`     | Name attribute for radio inputs in the group |
 | `disabled?`     | `boolean`          | `false` | Whether all radios in the group are disabled |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Radio size for all radios in the group
+- `orientation?`: `ChoiceGroupDirection`; default `'vertical'`. Layout orientation
+- `options?`: `RadioGroupOption[]`; default `-`. Option list. Ignored when children / default slot are present.
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `children?`: `React.ReactNode`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `modelValue?`: `string | number`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onChange?`.

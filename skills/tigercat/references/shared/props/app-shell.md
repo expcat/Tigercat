@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## AppShell
 
-`packages/core/src/types/app-shell.ts` · `AppShellProps` · 3/19 props
+`packages/core/src/types/app-shell.ts` · `AppShellProps` · 3/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Layout`, `Sidebar`, `Header`, `Content`, `Breadcrumb`, `Tabs`, `PageHeader`.
 
@@ -22,5 +22,24 @@ Note: 一页应用壳。侧栏、菜单、面包屑、页签和页头仍是原�
 | `collapsed?`        | `boolean` | `-`     | -     |
 | `fullHeight?`       | `boolean` | `-`     | -     |
 | `defaultCollapsed?` | `boolean` | `-`     | -     |
+
+### Remaining props (complete public API)
+
+- `side?`: `LayoutSiderSide`; default `-`. -
+- `headerSticky?`: `boolean`; default `-`. Independent of header variant. Passed to Header.sticky.
+- `headerVariant?`: `HeaderVariant`; default `-`. -
+- `breadcrumb?`: `AppShellBreadcrumbItem[]`; default `-`. -
+- `tabs?`: `AppShellTab[]`; default `-`. Route titles supplied by the caller. The shell does not read a router.
+- `activeTab?`: `string`; default `-`. -
+- `defaultActiveTab?`: `string`; default `-`. -
+- `title?`: `string`; default `-`. -
+- `subTitle?`: `string`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `sidebar?`: `React.ReactNode`; default `-`. -
+- `header?`: `React.ReactNode`; default `-`. -
+- `breadcrumbExtra?`: `React.ReactNode`; default `-`. -
+- `tabsExtra?`: `React.ReactNode`; default `-`. -
+- `actions?`: `React.ReactNode`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
 
 Events/callback props: `onCollapsedChange?`, `onTabChange?`.

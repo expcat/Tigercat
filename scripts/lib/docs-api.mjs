@@ -844,9 +844,10 @@ export function uniqueMembers(lists) {
 }
 
 export function isDistinctRuntimeProps(frameworkHeritage, coreName) {
-  return !(frameworkHeritage || []).some(
-    (name) => name === coreName || name === `Core${coreName}` || name.endsWith(coreName)
-  )
+  return !(frameworkHeritage || []).some((parent) => {
+    const name = typeof parent === 'string' ? parent : parent.name
+    return name === coreName || name === `Core${coreName}` || name.endsWith(coreName)
+  })
 }
 
 export function shouldUseFrameworkRuntimeProps(
@@ -861,7 +862,9 @@ export function shouldUseFrameworkRuntimeProps(
     (detail) =>
       detail.name !== coreName &&
       publicComponentNames.has(propsInterfaceToComponentName(detail.name)) &&
-      (detail.heritage || []).includes(coreName)
+      (detail.heritage || []).some(
+        (parent) => (typeof parent === 'string' ? parent : parent.name) === coreName
+      )
   )
 
   return usedAsParent && isDistinctRuntimeProps(frameworkHeritage, coreName)
@@ -876,11 +879,15 @@ export function mergeHeritageMembers(name, detailsByName, seen = new Set()) {
 
   const inherited = []
   for (const parent of detail.heritage || []) {
+    const parentName = typeof parent === 'string' ? parent : parent.name
     inherited.push(
-      ...mergeHeritageMembers(parent, detailsByName, seen).map((member) => ({
-        ...member,
-        origin: 'inherited'
-      }))
+      ...mergeHeritageMembers(parentName, detailsByName, new Set(seen))
+        .filter((member) => {
+          if (typeof parent === 'string') return true
+          const included = parent.keys.includes(propStem(member.name))
+          return parent.utility === 'Pick' ? included : !included
+        })
+        .map((member) => ({ ...member, origin: 'inherited' }))
     )
   }
 

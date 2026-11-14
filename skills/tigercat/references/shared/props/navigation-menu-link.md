@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## NavigationMenuLink
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuLinkProps` · 4/8 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuLinkProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type      | Default | Notes                                                         |
 | ----------- | --------- | ------- | ------------------------------------------------------------- |
@@ -19,3 +19,12 @@ description: Compact generated Tigercat Navigation props reference
 | `disabled?` | `boolean` | `false` | Whether the link is disabled                                  |
 | `active?`   | `boolean` | `false` | Whether the link represents the current page                  |
 | `target?`   | `string`  | `-`     | Link target                                                   |
+
+### Remaining props (complete public API)
+
+- `rel?`: `string`; default `-`. Rel attribute. `noopener noreferrer` is added automatically for `_blank`.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onClick?`.

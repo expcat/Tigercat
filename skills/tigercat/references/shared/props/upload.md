@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Upload
 
-`packages/core/src/types/upload.ts` · `UploadProps` · 4/31 props
+`packages/core/src/types/upload.ts` · `UploadProps` · 4/31 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 界面、进度、`submit` 和表单写入用同一份列表。`name` 是表单字段，`fileFieldName` 是请求里的文件字段。成功时写回可用地址；没有地址不把 uid 当结果。`multiple` 为假时拖拽也只留第一个。失败行用同一把在途锁重试。只读用 `readOnly`。
 
@@ -22,4 +22,34 @@ Note: 界面、进度、`submit` 和表单写入用同一份列表。`name` 是�
 | `listType?`      | `UploadListType`                                                    | `'text'` | List type for displaying files                                                             |
 | `customRequest?` | `(options: UploadRequestOptions) => void \| { abort?: () => void }` | `-`      | Custom upload request. Return `{ abort }` or call `options.onAbort` in the same tick so... |
 
-Events/callback props: `onQueueChange?`, `onChunkProgress?`, `onChange?`, `onRemove?`, `onReject?`, `onPreview?`, ....
+### Remaining props (complete public API)
+
+- `accept?`: `string`; default `-`. Accepted file types (same as HTML accept attribute)
+- `multiple?`: `boolean`; default `false`. Whether to allow multiple file selection
+- `limit?`: `number`; default `-`. Maximum number of files
+- `maxSize?`: `number`; default `-`. Maximum file size in bytes. `undefined` or `0` means no limit.
+- `disabled?`: `boolean`; default `false`. Whether the upload is disabled
+- `defaultFileList?`: `UploadFile[]`; default `-`. Uncontrolled initial file list.
+- `name?`: `string`; default `-`. Native form field name. Successful files submit their URL, one hidden input each. An em...
+- `fileFieldName?`: `string`; default `'file'`. -
+- `allowedPreviewOrigins?`: `string[]`; default `-`. Origins (`https://cdn.example.com`) whose http(s) file URLs may be previewed. `blob:` o...
+- `readOnly?`: `boolean`; default `-`. Focusable and submittable, but files cannot be added or removed.
+- `status?`: `import('./input').InputStatus`; default `-`. Visual validation status. Do not spread as a DOM attribute.
+- `action?`: `string`; default `-`. Upload URL. Used when `customRequest` is omitted. Posts `FormData` with the file under...
+- `method?`: `string`; default `'POST'`. HTTP method for `action`.
+- `headers?`: `Record<string, string>`; default `-`. Extra headers for the default `action` request.
+- `data?`: `Record<string, string | Blob>`; default `-`. Extra `FormData` fields for the default `action` request.
+- `withCredentials?`: `boolean`; default `false`. Whether the default `action` request should send cookies.
+- `showFileList?`: `boolean`; default `true`. Whether to show the file list
+- `autoUpload?`: `boolean`; default `true`. Whether to start uploading as soon as files are accepted. When `false`, files stay `rea...
+- `queue?`: `boolean`; default `false`. Enable queued upload execution for selected files.
+- `maxConcurrent?`: `number`; default `2`. Maximum concurrent uploads when queue is enabled.
+- `chunkSize?`: `number`; default `-`. Chunk size in bytes. When set, customRequest is called once per chunk.
+- `resumable?`: `boolean`; default `false`. When true, pass `resumeKey` (`name:size:lastModified`) into `customRequest`. Does not s...
+- `beforeUpload?`: `(file: File) => boolean | Promise<boolean>`; default `-`. Before upload callback - return false to prevent upload
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides for Upload UI text.
+- `labels?`: `Partial<UploadLabels>`; default `-`. Upload UI labels for i18n. When provided, merges with locale-based defaults.
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onQueueChange?`, `onChunkProgress?`, `onChange?`, `onRemove?`, `onReject?`, `onPreview?`, `onProgress?`, `onSuccess?`, `onError?`, `onExceed?`.

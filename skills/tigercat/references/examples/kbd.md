@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Kbd
 
-Runnable modules: `examples/example/vue3/src/examples/kbd/` and `examples/example/react/src/examples/kbd/`.
+Runnable modules: `examples/example/vue3/src/examples/kbd/01/`, `examples/example/vue3/src/examples/kbd/02/`, `examples/example/vue3/src/examples/kbd/03/`, `examples/example/react/src/examples/kbd/01/`, `examples/example/react/src/examples/kbd/02/`, `examples/example/react/src/examples/kbd/03/`.
 
 Note: 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可读名。`variant` 的 default 是 Kbd 自己的底/边/字色，不是可点 Tag。
 

@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Switch
 
-Runnable modules: `examples/example/vue3/src/examples/switch/` and `examples/example/react/src/examples/switch/`.
+Runnable modules: `examples/example/vue3/src/examples/switch/01/`, `examples/example/vue3/src/examples/switch/02/`, `examples/example/vue3/src/examples/switch/03/`, `examples/example/react/src/examples/switch/01/`, `examples/example/react/src/examples/switch/02/`, `examples/example/react/src/examples/switch/03/`.
 
 Vue: `<Switch v-model="checked">Label</Switch>`
 

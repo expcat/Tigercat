@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## Drag
 
-Runnable modules: `examples/example/vue3/src/examples/drag/` and `examples/example/react/src/examples/drag/`.
+Runnable modules: `examples/example/vue3/src/examples/drag/01/`, `examples/example/react/src/examples/drag/01/`.
 
 Vue: `<Drag />`
 

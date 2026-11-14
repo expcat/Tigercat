@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Sidebar
 
-Runnable modules: `examples/example/vue3/src/examples/sidebar/` and `examples/example/react/src/examples/sidebar/`.
+Runnable modules: `examples/example/vue3/src/examples/layout/03/`, `examples/example/react/src/examples/layout/03/`.
 
 Note: `collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开 Tab。边框是 `border-inline-end`。未传 `width` 时默认宽走 class。未传名时 landmark 走 locale。内层未传 `collapsed` 的 Menu 跟随侧栏。
 

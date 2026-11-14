@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## InfiniteScroll
 
-Runnable modules: `examples/example/vue3/src/examples/infinite-scroll/` and `examples/example/react/src/examples/infinite-scroll/`.
+Runnable modules: `examples/example/vue3/src/examples/infinite-scroll/01/`, `examples/example/vue3/src/examples/infinite-scroll/02/`, `examples/example/react/src/examples/infinite-scroll/01/`, `examples/example/react/src/examples/infinite-scroll/02/`.
 
 Vue: `<InfiniteScroll :has-more="hasMore" :height="288" @load-more="loadMore">{{ items }}</InfiniteScroll>`
 

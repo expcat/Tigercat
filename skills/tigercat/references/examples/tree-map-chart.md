@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## TreeMapChart
 
-Runnable modules: `examples/example/vue3/src/examples/tree-map-chart/` and `examples/example/react/src/examples/tree-map-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/treemap-chart/01/`, `examples/example/vue3/src/examples/treemap-chart/02/`, `examples/example/react/src/examples/treemap-chart/01/`, `examples/example/react/src/examples/treemap-chart/02/`.
 
 Vue: `<TreeMapChart :data="data" />`
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## NumberKeyboard
 
-`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 4/20 props
+`packages/core/src/types/number-keyboard.ts` · `NumberKeyboardProps` · 4/20 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host 挂底栏；都不传则是常显 PIN 垫。打开后焦点在对话框里，当前键可见。进入的值先按模式收成合法串，收不干净当空。`phone` 默认 11 位，`id-card` 默认 18 位末位 X（无校验码）。Confirm 文案走 `common.okText`。只读用 `readOnly`，只读键不可激活。
 
@@ -22,4 +22,23 @@ Note: 配一个显示用 Input。传 `open`/`defaultOpen` 时经 overlay-host �
 | `mode?`         | `NumberKeyboardMode` | `'number'` | -                                                                                  |
 | `open?`         | `boolean`            | `-`        | Controlled sheet visibility. Passing `open` or `defaultOpen` selects overlay mode. |
 
-Events/callback props: `onChange?`, `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `maxLength?`: `number`; default `-`. -
+- `precision?`: `number`; default `2`. Fractional digits in `amount` mode.
+- `decimalSeparator?`: `string`; default `'.'`. -
+- `disabled?`: `boolean`; default `false`. -
+- `readOnly?`: `boolean`; default `false`. Focusable and submittable. Keys are not activatable. Distinct from `disabled`.
+- `confirmText?`: `string`; default `-`. -
+- `deleteText?`: `string`; default `-`. -
+- `ariaLabel?`: `string`; default `-`. -
+- `showConfirm?`: `boolean`; default `true`. -
+- `defaultOpen?`: `boolean`; default `-`. -
+- `name?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+- `status?`: `InputStatus`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleNumberKeyboard>`; default `-`. -
+- `className?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onOpenChange?`, `onKeyPress?`, `onDelete?`, `onConfirm?`, `onBlur?`.

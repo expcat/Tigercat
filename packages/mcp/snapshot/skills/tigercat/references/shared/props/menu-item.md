@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## MenuItem
 
-`packages/core/src/types/menu.ts` · `MenuItemProps` · 4/10 props
+`packages/core/src/types/menu.ts` · `MenuItemProps` · 4/10 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type      | Default | Notes                                                                        |
 | ------------ | --------- | ------- | ---------------------------------------------------------------------------- |
@@ -19,3 +19,12 @@ description: Compact generated Tigercat Navigation props reference
 | `href?`      | `string`  | `-`     | Render an `<a>` with this href. `aria-current="page"` only applies to links. |
 | `disabled?`  | `boolean` | `-`     | Whether the menu item is disabled                                            |
 | `collapsed?` | `boolean` | `-`     | -                                                                            |
+
+### Remaining props (complete public API)
+
+- `icon?`: `unknown`; default `-`. Icon for the menu item (node or registered icon name)
+- `className?`: `string`; default `-`. Additional CSS classes
+- `badge?`: `CoreMenuItem['badge']`; default `-`. -
+- `shortcut?`: `string`; default `-`. -
+- `level?`: `number`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -

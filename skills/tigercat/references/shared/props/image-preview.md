@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## ImagePreview
 
-`packages/core/src/types/image.ts` · `ImagePreviewProps` · 4/17 props
+`packages/core/src/types/image.ts` · `ImagePreviewProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。
 
@@ -21,3 +21,21 @@ Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（
 | `open?`     | `boolean`             | `false` | Whether the preview is open. Omit to keep the dialog closed (unlike Alert, which shows... |
 | `minScale?` | `number`              | `0.25`  | Minimum scale factor                                                                      |
 | `maxScale?` | `number`              | `5`     | Maximum scale factor                                                                      |
+
+### Remaining props (complete public API)
+
+- `zIndex?`: `number`; default `OVERLAY_Z_INDEX.modal`. Custom z-index for the preview overlay
+- `scaleStep?`: `number`; default `0.5`. Scale step for zoom in/out
+- `touchSwipeable?`: `boolean`; default `true`. Whether one-finger horizontal swipes navigate images while the preview is not zoomed in.
+- `touchSwipeThreshold?`: `number`; default `48`. Minimum horizontal movement in pixels before a one-finger swipe changes images.
+- `zoomable?`: `boolean`; default `true`. Whether zoom controls (toolbar, wheel, pinch, `+`/`-`) are enabled.
+- `rotatable?`: `boolean`; default `true`. Whether rotation controls (toolbar, `[`/`]`) are enabled.
+- `showNav?`: `boolean`; default `true`. Whether previous/next controls and arrow-key navigation are shown. Hidden for a single...
+- `showCounter?`: `boolean`; default `true`. Whether to show the "n / total" counter (multiple images only).
+- `className?`: `string`; default `-`. Additional CSS classes on the dialog root.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `currentIndex?`: `number`; default `0`. Current image index (for multi-image preview)
+- `maskClosable?`: `boolean`; default `true`. Whether clicking the mask closes the preview
+- `renderToolbarItem?`: `(item: ImagePreviewToolbarItemContext) => React.ReactNode`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onCurrentIndexChange?`, `onScaleChange?`, `onUpdate:open?`, `onUpdate:currentIndex?`.

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## BarChart
 
-`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 4/52 props
+`packages/core/src/types/chart-cartesian.ts` · `BarChartProps` · 4/52 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop          | Type              | Default                                        | Notes                                                                                   |
 | ------------- | ----------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -19,3 +19,56 @@ description: Compact generated Tigercat Charts props reference
 | `padding?`    | `ChartPadding`    | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy). |
 | `showLegend?` | `boolean`         | `false`                                        | Whether to show legend                                                                  |
 | `gradient?`   | `boolean`         | `false`                                        | Enable linear gradient fill on bars (top-to-bottom, lighter to full)                    |
+
+### Remaining props (complete public API)
+
+- `barColor?`: `string`; default `-`. Bar color
+- `colors?`: `string[]`; default `-`. Custom colors for bars
+- `barRadius?`: `number`; default `-`. Bar corner radius in px. When omitted, uses `--tiger-chart-bar-radius` (4px).
+- `barPaddingInner?`: `number`; default `0.2`. Inner padding ratio for bars
+- `barPaddingOuter?`: `number`; default `0.1`. Outer padding ratio for bars
+- `showValueLabels?`: `boolean`; default `false`. Show value labels above or inside bars
+- `valueLabelPosition?`: `BarValueLabelPosition`; default `'top'`. Value label position
+- `valueLabelFormatter?`: `(datum: BarChartDatum, index: number) => string`; default `-`. Value label formatter
+- `barMinHeight?`: `number`; default `0`. Minimum bar height in px (ensures near-zero values remain visible)
+- `barMaxWidth?`: `number`; default `-`. Maximum bar width in px (prevents overly wide bars with few data points)
+- `animated?`: `boolean`; default `false`. Enable CSS transitions for smooth bar updates
+- `tooltipFormatter?`: `(datum: BarChartDatum, index: number) => string`; default `-`. Tooltip formatter
+- `legendFormatter?`: `(datum: BarChartDatum, index: number) => string`; default `-`. Legend formatter
+- `width?`: `number`; default `320`. Chart width
+- `height?`: `number`; default `200`. Chart height
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `hoveredIndex?`: `number | null`; default `-`. Hovered index (controlled)
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered element
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive elements when one is active
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `selectedIndex?`: `number | null`; default `-`. Selected index (controlled)
+- `legendPosition?`: `ChartLegendPosition`; default `'bottom'`. Legend position around the plot
+- `legendMarkerSize?`: `number`; default `10`. Legend marker size in px
+- `legendGap?`: `number`; default `8`. Legend item gap in px
+- `showTooltip?`: `boolean`; default `true`. Whether to show tooltip
+- `xScale?`: `ChartScale`; default `-`. Custom x scale
+- `yScale?`: `ChartScale`; default `-`. Custom y scale
+- `showGrid?`: `boolean`; default `true`. Whether to show grid
+- `showAxis?`: `boolean`; default `true`. Whether to show axes
+- `showXAxis?`: `boolean`; default `true`. Whether to show X axis
+- `showYAxis?`: `boolean`; default `true`. Whether to show Y axis
+- `xAxisLabel?`: `string`; default `-`. X axis label
+- `yAxisLabel?`: `string`; default `-`. Y axis label
+- `xTicks?`: `number`; default `5`. X ticks
+- `yTicks?`: `number`; default `5`. Y ticks
+- `xTickValues?`: `ChartScaleValue[]`; default `-`. X tick values
+- `yTickValues?`: `ChartScaleValue[]`; default `-`. Y tick values
+- `xTickFormat?`: `(value: ChartScaleValue) => string`; default `-`. X tick format
+- `yTickFormat?`: `(value: ChartScaleValue) => string`; default `-`. Y tick format
+- `gridLineStyle?`: `ChartGridLineStyle`; default `'solid'`. Grid line style
+- `gridStrokeWidth?`: `number`; default `1`. Grid stroke width
+- `bind?`: `{ series?: { key: string; data: { x: string | number; y: number }[] }[] mode?: 'grouped' | 'stacked' line?: { y: number }[] }`; default `-`. -
+
+Events/callback props: `onHoveredIndexChange?`, `onSelectedIndexChange?`, `onBarClick?`, `onBarHover?`, `onUpdate:hoveredIndex?`, `onUpdate:selectedIndex?`.

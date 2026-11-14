@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## TagsInput
 
-`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 4/17 props
+`packages/core/src/types/tags-input.ts` · `TagsInputProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 只读用 `readOnly`。粘贴在光标处插入后再按分隔符切开。错误只走 FormItem。拒绝重复或超限时给一句实时说明。
 
@@ -21,3 +21,21 @@ Note: 只读用 `readOnly`。粘贴在光标处插入后再按分隔符切开。
 | `max?`             | `number`   | `-`     | Maximum number of tags; further adds are rejected while the input stays focusable for r... |
 | `delimiters?`      | `string[]` | `[',']` | Characters that commit the pending input while typing and split pasted text into multip... |
 | `allowDuplicates?` | `boolean`  | `false` | Whether the same tag may be added more than once (case-sensitive comparison). When dupl... |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Input size
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `defaultValue?`: `string[]`; default `[]`. Default tags (for uncontrolled mode)
+- `placeholder?`: `string`; default `-`. Placeholder for the inner text input
+- `addOnBlur?`: `boolean`; default `false`. Commit the pending input as a tag on blur
+- `beforeAdd?`: `(tag: string) => boolean | string`; default `-`. Validate/transform a candidate tag before it is added: return `false` to reject it, a s...
+- `clearable?`: `boolean`; default `false`. Whether to show a clear-all button when there are tags
+- `disabled?`: `boolean`; default `false`. Whether the input is disabled
+- `readOnly?`: `boolean`; default `false`. Whether the input is read-only. Read-only tags still submit.
+- `name?`: `string`; default `-`. Name for the hidden input carrying the joined value (form submission)
+- `id?`: `string`; default `-`. Id attribute applied to the inner text input
+- `removeTagAriaLabel?`: `string`; default `-`. Aria-label template for tag remove buttons; supports `{tag}`. Overrides the locale `tag...
+- `className?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onAdd?`, `onRemove?`, `onClear?`, `onFocus?`, `onBlur?`.

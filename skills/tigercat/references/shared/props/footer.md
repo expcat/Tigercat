@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Footer
 
-`packages/core/src/types/layout.ts` · `FooterProps` · 3/5 props
+`packages/core/src/types/layout.ts` · `FooterProps` · 3/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 未传 `height` 不写 inline height。预览/嵌套用 `as="div"`，避免多个 `contentinfo`。
 
@@ -20,3 +20,8 @@ Note: 未传 `height` 不写 inline height。预览/嵌套用 `as="div"`，避�
 | `as?`        | `string` | `'footer'` | HTML tag. Default `footer`. Nested / preview shells should use `div` so the page does n... |
 | `height?`    | `string` | `-`        | Footer height. When omitted, no inline height is written (`auto` is the CSS initial val... |
 | `className?` | `string` | `-`        | Additional CSS classes                                                                     |
+
+### Remaining props (complete public API)
+
+- `size?`: `'default' | 'compact'`; default `'default'`. Vertical density. `compact` shrinks padding for App Shell copyright bars.
+- `style?`: `Record<string, string | number>`; default `-`. -

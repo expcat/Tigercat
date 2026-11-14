@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Row
 
-`packages/core/src/types/grid.ts` · `RowProps` · 4/5 props
+`packages/core/src/types/grid.ts` · `RowProps` · 4/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 数字 `gutter` 只开横缝，双轴传 `[h, v]`。缝是 CSS gap，不是负 margin。`wrap={false}` 不折行。
 
@@ -21,3 +21,7 @@ Note: 数字 `gutter` 只开横缝，双轴传 `[h, v]`。缝是 CSS gap，不�
 | `wrap?`    | `boolean`           | `true`    | Whether to wrap                                                                            |
 | `align?`   | `ResponsiveAlign`   | `'top'`   | Vertical alignment of flex layout                                                          |
 | `justify?` | `ResponsiveJustify` | `'start'` | Horizontal arrangement of flex layout                                                      |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. -

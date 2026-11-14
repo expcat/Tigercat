@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Code
 
-`packages/core/src/types/code.ts` · `CodeProps` · 4/14 props
+`packages/core/src/types/code.ts` · `CodeProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。
 
@@ -21,3 +21,18 @@ Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider lo
 | `copyable?` | `boolean`                  | `true`  | -                                                                                          |
 | `locale?`   | `Partial<TigerLocale>`     | `-`     | Locale overrides for Code UI text                                                          |
 | `labels?`   | `Partial<TigerLocaleCode>` | `-`     | Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o... |
+
+### Remaining props (complete public API)
+
+- `language?`: `string`; default `-`. -
+- `highlighter?`: `CodeHighlighter`; default `-`. Optional pluggable highlighter. Returns tokens drawn as text. Omit to keep a plain-text...
+- `copyLabel?`: `string`; default `-`. -
+- `copiedLabel?`: `string`; default `-`. -
+- `copyFailedLabel?`: `string`; default `-`. -
+- `lineNumbers?`: `boolean`; default `false`. Gutter of line numbers beside the code. Numbers are not part of the copy.
+- `showLanguage?`: `boolean`; default `false`. Reserve a header row above the code for the `language` string. Copy and wrap controls m...
+- `wrapToggle?`: `boolean`; default `false`. Show a control that toggles soft wrapping. Copy stays the raw string.
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onCopy?`.

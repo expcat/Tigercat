@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## ChartGrid
 
-Runnable modules: `examples/example/vue3/src/examples/chart-grid/` and `examples/example/react/src/examples/chart-grid/`.
+Runnable modules: `examples/example/vue3/src/examples/use-chart-interaction/02/`, `examples/example/react/src/examples/use-chart-interaction/02/`.
 
 Vue: `<ChartGrid :x-scale="xScale" :y-scale="yScale" show="both" line-style="dashed" />`
 

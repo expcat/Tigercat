@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## NotificationBell
 
-Runnable modules: `examples/example/vue3/src/examples/notification-bell/` and `examples/example/react/src/examples/notification-bell/`.
+Runnable modules: `examples/example/vue3/src/examples/notification-bell/01/`, `examples/example/react/src/examples/notification-bell/01/`.
 
 Vue: `<NotificationBell />`
 

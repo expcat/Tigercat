@@ -20,3 +20,5 @@ Note: 按钮文字优先 children / 默认插槽，再读 `label`，缺省与复
 | `text`      | `string`  | `-`     | Text passed to the shared clipboard helper.                                     |
 | `disabled?` | `boolean` | `false` | When true the button does not write to the clipboard.                           |
 | `label?`    | `string`  | `-`     | Button text when no children are provided. Defaults to the locale's copy label. |
+
+Events/callback props: `onCopy?`.

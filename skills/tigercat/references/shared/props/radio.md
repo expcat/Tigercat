@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Radio
 
-`packages/core/src/types/radio.ts` · `RadioProps` · 4/12 props
+`packages/core/src/types/radio.ts` · `RadioProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type               | Default | Notes                                             |
 | ----------- | ------------------ | ------- | ------------------------------------------------- |
@@ -19,3 +19,16 @@ description: Compact generated Tigercat Form props reference
 | `checked?`  | `boolean`          | `-`     | Whether the radio is checked (controlled mode)    |
 | `name?`     | `string`           | `-`     | Name attribute for the radio input (for grouping) |
 | `disabled?` | `boolean`          | `false` | Whether the radio is disabled                     |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Radio size
+- `defaultChecked?`: `boolean`; default `false`. Default checked state (uncontrolled mode)
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `children?`: `React.ReactNode`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `modelValue?`: `boolean`; default `-`. -
+- `defaultValue?`: `boolean`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onChange?`.

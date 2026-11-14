@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## ChartAxis
 
-Runnable modules: `examples/example/vue3/src/examples/chart-axis/` and `examples/example/react/src/examples/chart-axis/`.
+Runnable modules: `examples/example/vue3/src/examples/use-chart-interaction/02/`, `examples/example/react/src/examples/use-chart-interaction/02/`.
 
 Vue: `<ChartAxis :scale="xScale" orientation="bottom" label="Month" />`
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## FormItem
 
-`packages/core/src/types/form.ts` · `FormItemProps` · 4/15 props
+`packages/core/src/types/form.ts` · `FormItemProps` · 4/15 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 具名 FormItem 只把值和校验接到第一个控件。`required` 合并成一条规则。错误文本一直在文档里：字段校验是 `role="status"`，提交失败是 `role="alert"`。省略公开 value/`checked`/`fileList` 时从模型取值（boolean/list/tuple 不会把 `''` 当成字符串）。单颗 Radio 写入自己的选项值。
 
@@ -21,3 +21,17 @@ Note: 具名 FormItem 只把值和校验接到第一个控件。`required` 合�
 | `label?`    | `string`                 | `-`     | Label text                                |
 | `required?` | `boolean`                | `-`     | Whether the field is required             |
 | `rules?`    | `FormRule \| FormRule[]` | `-`     | Validation rules for this field           |
+
+### Remaining props (complete public API)
+
+- `labelWidth?`: `string | number`; default `-`. Label width (overrides form's labelWidth)
+- `error?`: `string`; default `-`. Error message (controlled mode)
+- `showMessage?`: `boolean`; default `true`. Whether to show validation message
+- `size?`: `ComponentSize`; default `-`. Size (overrides form's size)
+- `errorDisplayMode?`: `FormErrorDisplayMode`; default `'inline'`. Error display mode - 'inline': shows error below the field (default) - 'popup': shows e...
+- `condition?`: `FormFieldCondition`; default `-`. Conditional behavior for this field. Merged over form-level `conditions[name]`.
+- `extra?`: `string`; default `-`. Help text rendered in the control column, under the field.
+- `disabled?`: `boolean`; default `-`. Disables the control and skips this field's rules, including required.
+- `children?`: `React.ReactNode`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `React.CSSProperties`; default `-`. -

@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## SankeyChart
 
-Runnable modules: `examples/example/vue3/src/examples/sankey-chart/` and `examples/example/react/src/examples/sankey-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/sankey-chart/01/`, `examples/example/react/src/examples/sankey-chart/01/`.
 
 Vue: `<SankeyChart :nodes="nodes" :links="links" />`
 

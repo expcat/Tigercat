@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## CropUpload
 
-`packages/core/src/types/image.ts` · `CropUploadProps` · 4/10 props
+`packages/core/src/types/image.ts` · `CropUploadProps` · 4/10 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: FormItem 写入的是裁切后的 `File`，不是媒体 id。需要上传后的 id 时由宿主替换（Users 页模式）。
 
@@ -21,5 +21,14 @@ Note: FormItem 写入的是裁切后的 `File`，不是媒体 id。需要上传�
 | `maxSize?`      | `number`                                  | `-`         | Maximum file size in bytes                                                                 |
 | `cropperProps?` | `Partial<Omit<ImageCropperProps, 'src'>>` | `-`         | Props passed to the internal ImageCropper (`src` is owned by CropUpload). Outer `locale... |
 | `disabled?`     | `boolean`                                 | `false`     | Whether the component is disabled                                                          |
+
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `modalTitle?`: `string`; default `-`. Title for the crop modal. Defaults to `locale.imageEditor.cropModalTitle`.
+- `modalWidth?`: `number`; default `520`. Width of the crop modal. Overrides Modal `size` when set.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `React.CSSProperties`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
 
 Events/callback props: `onCropComplete?`, `onError?`.

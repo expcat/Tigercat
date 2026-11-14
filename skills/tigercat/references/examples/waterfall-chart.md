@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## WaterfallChart
 
-Runnable modules: `examples/example/vue3/src/examples/waterfall-chart/` and `examples/example/react/src/examples/waterfall-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/waterfall-chart/01/`, `examples/example/react/src/examples/waterfall-chart/01/`.
 
 Vue: `<WaterfallChart :data="data" />`
 

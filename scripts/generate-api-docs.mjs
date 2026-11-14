@@ -33,6 +33,7 @@ import {
   buildPublicComponentEntries,
   formatComponentIndexType,
   getComponentPackageSubpath,
+  getComponentPackageTarget,
   loadPublicComponentExports,
   pascalToKebab
 } from './lib/public-components.mjs'
@@ -814,8 +815,6 @@ const COMPONENT_SNIPPETS = {
   }
 }
 
-const MAX_EVENTS_PER_COMPONENT = 6
-
 let prettierConfigPromise
 async function formatWithPrettier(content, parser) {
   prettierConfigPromise ??= prettier.resolveConfig(SKILL_REFERENCES_DIR)
@@ -885,34 +884,24 @@ function codeText(text) {
 }
 
 function collectHeritageIdentifiers(node, names) {
-  if (ts.isIdentifier(node)) {
-    names.push(node.text)
-    return
-  }
-
-  if (ts.isExpressionWithTypeArguments(node)) {
-    collectHeritageIdentifiers(node.expression, names)
-    node.typeArguments?.forEach((argument) => collectHeritageIdentifiers(argument, names))
-    return
-  }
-
-  if (ts.isTypeReferenceNode(node)) {
-    collectHeritageIdentifiers(node.typeName, names)
-    node.typeArguments?.forEach((argument) => collectHeritageIdentifiers(argument, names))
-    return
-  }
-
   if (ts.isIntersectionTypeNode(node) || ts.isUnionTypeNode(node)) {
     node.types.forEach((part) => collectHeritageIdentifiers(part, names))
     return
   }
-
-  if (ts.isQualifiedName(node)) {
-    collectHeritageIdentifiers(node.right, names)
+  const expression = node.expression || node.typeName || node
+  const name = expression.getText()
+  if (name === 'Pick' || name === 'Omit') {
+    const [base, selection] = node.typeArguments || []
+    if (!base || !selection) return
+    const keys = (ts.isUnionTypeNode(selection) ? selection.types : [selection])
+      .filter((part) => ts.isLiteralTypeNode(part) && ts.isStringLiteral(part.literal))
+      .map((part) => part.literal.text)
+    const parents = []
+    collectHeritageIdentifiers(base, parents)
+    names.push(...parents.map((parent) => ({ name: parent, utility: name, keys })))
     return
   }
-
-  ts.forEachChild(node, (child) => collectHeritageIdentifiers(child, names))
+  names.push(name)
 }
 
 function getHeritageTypeNames(node) {
@@ -969,12 +958,8 @@ function extractFileInfo(fileName, content, sourcePath = fileName) {
       }
     }
 
-    if (
-      ts.isInterfaceDeclaration(node) &&
-      hasExportModifier(node) &&
-      node.name.text.endsWith('Props')
-    ) {
-      propsInterfaces.push(node.name.text)
+    if (ts.isInterfaceDeclaration(node) && hasExportModifier(node)) {
+      if (node.name.text.endsWith('Props')) propsInterfaces.push(node.name.text)
       interfaceDetails.push({
         name: node.name.text,
         description: compactDescription(getJsDocText(node) || `${node.name.text} definition`),
@@ -988,6 +973,43 @@ function extractFileInfo(fileName, content, sourcePath = fileName) {
   }
 
   visit(sourceFile)
+  // Vue emits are public events even when the exported Props interface omits them.
+  function collectEmits(node) {
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer &&
+      ts.isCallExpression(node.initializer)
+    ) {
+      const options = node.initializer.arguments[0]
+      if (options && ts.isObjectLiteralExpression(options)) {
+        const emits = options.properties.find(
+          (property) => ts.isPropertyAssignment(property) && property.name.getText() === 'emits'
+        )
+        if (emits && ts.isArrayLiteralExpression(emits.initializer)) {
+          const detail = interfaceDetails.find((item) => item.name === `Vue${node.name.text}Props`)
+          if (detail) {
+            for (const event of emits.initializer.elements.filter(ts.isStringLiteral)) {
+              const callback = `on${event.text.replace(/(^|-)(\w)/g, (_, _separator, letter) =>
+                letter.toUpperCase()
+              )}?`
+              if (!detail.members.some((member) => member.name === callback)) {
+                detail.members.push({
+                  name: callback,
+                  type: '-',
+                  defaultValue: '-',
+                  description: `Vue event: ${event.text}`,
+                  kind: 'event'
+                })
+              }
+            }
+          }
+        }
+      }
+    }
+    ts.forEachChild(node, collectEmits)
+  }
+  if (sourcePath.startsWith('packages/vue/')) collectEmits(sourceFile)
   return {
     fileName,
     sourcePath,
@@ -1205,9 +1227,7 @@ function getResolvedComponentRows(entry, interfaceDetails, coreByName, publicCom
     coreDetails.map((detail) => mergeHeritageMembers(detail.name, coreByName))
   )
   const frameworkOwn = uniqueMembers(
-    [frameworkReact, frameworkVue]
-      .filter(Boolean)
-      .map((detail) => (detail.members || []).filter((member) => member.kind === 'prop'))
+    [frameworkReact, frameworkVue].filter(Boolean).map((detail) => detail.members || [])
   )
   const members = uniqueMembers([mergedCore, frameworkOwn])
 
@@ -1257,7 +1277,9 @@ function generatePublicPropsReference(
     const visiblePropRows = getVisiblePropRows(component, propRows)
     const shownCount = visiblePropRows.length
     const propsMeta =
-      propRows.length > shownCount ? ` · ${shownCount}/${propRows.length} props` : ''
+      propRows.length > shownCount
+        ? ` · ${shownCount}/${propRows.length} compact props · [Complete props](#remaining-props-complete-public-api)`
+        : ''
     const interfaceNames =
       details.map((detail) => detail.name).join(' / ') || entry.propsInterfaces?.join(' / ') || '-'
 
@@ -1272,17 +1294,23 @@ function generatePublicPropsReference(
         markdownText += `| \`${codeText(member.name)}\` | \`${codeText(member.type)}\` | \`${codeText(member.defaultValue)}\` | ${tableText(member.description)} |\n`
       }
       markdownText += '\n'
+      const additional = propRows.filter(
+        (member) => !visiblePropRows.some((visible) => visible.name === member.name)
+      )
+      if (additional.length > 0) {
+        markdownText += '### Remaining props (complete public API)\n\n'
+        for (const member of additional) {
+          markdownText += `- \`${member.name}\`: \`${member.type.replace(/`/g, '\\`')}\`; default \`${member.defaultValue}\`. ${member.description.replaceAll('\\|', '|')}\n`
+        }
+        markdownText += '\n'
+      }
     }
 
     if (entry.passThroughNote) markdownText += `${entry.passThroughNote}\n\n`
 
     if (eventRows.length > 0) {
       markdownText += 'Events/callback props: '
-      markdownText += eventRows
-        .slice(0, MAX_EVENTS_PER_COMPONENT)
-        .map((member) => `\`${member.name}\``)
-        .join(', ')
-      if (eventRows.length > MAX_EVENTS_PER_COMPONENT) markdownText += ', ...'
+      markdownText += eventRows.map((member) => `\`${member.name}\``).join(', ')
       markdownText += '.\n\n'
     }
 
@@ -1356,7 +1384,83 @@ function getReactSnippet(component, category, requiredNames) {
   return `<${component} />`
 }
 
-function generateExamples(category, componentEntries, interfaceDetails, publicComponentNames) {
+async function collectDemoModules(publicComponentNames) {
+  const modules = new Map()
+  for (const framework of ['vue3', 'react']) {
+    const sourceRoot = join(ROOT_DIR, 'examples/example', framework, 'src')
+    const ownRoutes = new Map()
+    for (const page of collectFiles(join(sourceRoot, 'pages'), ['.tsx', '.vue'])) {
+      const route = /getDemoModules\(\s*['"]([^'"]+)['"]\s*\)/.exec(
+        await readFile(page, 'utf8')
+      )?.[1]
+      if (route) ownRoutes.set(basename(page).replace(/Demo\.(tsx|vue)$/, ''), route)
+    }
+    const candidates = new Map()
+    for (const metadataFile of collectFiles(join(sourceRoot, 'examples'), ['.json']).sort()) {
+      if (basename(metadataFile) !== 'demo.json') continue
+      const metadata = JSON.parse(await readFile(metadataFile, 'utf8'))
+      const directory = dirname(metadataFile)
+      if (!existsSync(join(directory, metadata.entry))) {
+        throw new Error(`Missing registered Demo entry: ${metadataFile}`)
+      }
+      const components = new Set(metadata.components || [])
+      for (const file of collectFiles(directory, ['.ts', '.tsx', '.vue'])) {
+        const source = await readFile(file, 'utf8')
+        const script = file.endsWith('.vue')
+          ? [...source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)]
+              .map((match) => match[1])
+              .join('\n')
+          : source
+        const parsed = ts.createSourceFile(file, script, ts.ScriptTarget.Latest, true)
+        for (const statement of parsed.statements) {
+          if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier))
+            continue
+          if (!/^@expcat\/tigercat-(react|vue)(\/|$)/.test(statement.moduleSpecifier.text)) continue
+          const clause = statement.importClause
+          if (
+            !clause ||
+            clause.isTypeOnly ||
+            !clause.namedBindings ||
+            !ts.isNamedImports(clause.namedBindings)
+          )
+            continue
+          for (const imported of clause.namedBindings.elements) {
+            const name = (imported.propertyName || imported.name).text
+            if (!imported.isTypeOnly && publicComponentNames.has(name)) components.add(name)
+          }
+        }
+      }
+      for (const component of components) {
+        const list = candidates.get(component) || []
+        list.push(directory)
+        candidates.set(component, list)
+      }
+    }
+    for (const component of publicComponentNames) {
+      const directories =
+        candidates.get(component) || candidates.get(getComponentPackageTarget(component)) || []
+      const route = ownRoutes.get(component)
+      const own = directories.filter((directory) => basename(dirname(directory)) === route)
+      const selected = (own.length ? own : directories).slice(0, 8)
+      if (selected.length === 0)
+        throw new Error(`No registered ${framework} Demo consumes ${component}`)
+      const list = modules.get(component) || []
+      list.push(
+        ...selected.map((directory) => `${relative(ROOT_DIR, directory).split(sep).join('/')}/`)
+      )
+      modules.set(component, list)
+    }
+  }
+  return modules
+}
+
+function generateExamples(
+  category,
+  componentEntries,
+  interfaceDetails,
+  publicComponentNames,
+  demoModules
+) {
   const slug = CATEGORY_SLUGS[category] || category.toLowerCase()
   const coreByName = coreDetailsByName(interfaceDetails)
   const components = componentEntries.map((entry) => entry.component)
@@ -1381,7 +1485,8 @@ function generateExamples(category, componentEntries, interfaceDetails, publicCo
     const vue = getVueSnippet(component, category, requiredNames)
     const react = getReactSnippet(component, category, requiredNames)
     markdownText += `## ${component}\n\n`
-    markdownText += `Runnable modules: \`examples/example/vue3/src/examples/${pascalToKebab(component)}/\` and \`examples/example/react/src/examples/${pascalToKebab(component)}/\`.\n\n`
+    const modules = demoModules.get(component)
+    markdownText += `Runnable modules: ${modules.map((path) => `\`${path}\``).join(', ')}.\n\n`
     markdownText += getComponentUsageText(component)
     markdownText += `Vue: \`${codeText(vue)}\`\n\n`
     markdownText += `React: \`${codeText(react)}\`\n\n`
@@ -1430,6 +1535,7 @@ async function main() {
   const totalTypes = countExportedTypes(categorizedFiles)
   const publicExports = loadPublicComponentExports(ROOT_DIR)
   const publicComponentNames = new Set(publicExports.all)
+  const demoModules = await collectDemoModules(publicComponentNames)
   const componentRows = buildPublicComponentEntries(ROOT_DIR, fileInfoByName, publicExports)
   const frameworkSourceFiles = new Set(
     componentRows
@@ -1500,7 +1606,13 @@ async function main() {
       [EXAMPLES_DIR, 'examples', 'Examples', generateExamples]
     ]) {
       const embeddedSource = colliding.length
-        ? generateReference(category, colliding, interfaceDetails, publicComponentNames)
+        ? generateReference(
+            category,
+            colliding,
+            interfaceDetails,
+            publicComponentNames,
+            demoModules
+          )
         : ''
       const sectionStart = embeddedSource.search(/^## /m)
       const embedded = sectionStart >= 0 ? embeddedSource.slice(sectionStart) : ''
@@ -1535,7 +1647,7 @@ async function main() {
         await writeGeneratedFile(
           join(EXAMPLES_DIR, file),
           await formatMarkdown(
-            generateExamples(category, [entry], interfaceDetails, publicComponentNames)
+            generateExamples(category, [entry], interfaceDetails, publicComponentNames, demoModules)
           )
         )
       }

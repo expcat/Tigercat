@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartAxis
 
-`packages/core/src/types/chart-core.ts` · `ChartAxisProps` · 4/12 props
+`packages/core/src/types/chart-core.ts` · `ChartAxisProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop           | Type                                 | Default    | Notes                |
 | -------------- | ------------------------------------ | ---------- | -------------------- |
@@ -19,3 +19,14 @@ description: Compact generated Tigercat Charts props reference
 | `orientation?` | `ChartAxisOrientation`               | `'bottom'` | Axis orientation     |
 | `tickValues?`  | `ChartScaleValue[]`                  | `-`        | Explicit tick values |
 | `tickFormat?`  | `(value: ChartScaleValue) => string` | `-`        | Tick label formatter |
+
+### Remaining props (complete public API)
+
+- `ticks?`: `number`; default `5`. Number of ticks. Linear scales receive evenly spaced numeric ticks; point/band scales s...
+- `tickSize?`: `number`; default `6`. Tick size in px
+- `tickPadding?`: `number`; default `4`. Tick padding in px
+- `label?`: `string`; default `-`. Axis label
+- `labelOffset?`: `number`; default `28`. Label offset in px
+- `x?`: `number`; default `0`. X offset
+- `y?`: `number`; default `0`. Y offset
+- `className?`: `string`; default `-`. Additional CSS classes

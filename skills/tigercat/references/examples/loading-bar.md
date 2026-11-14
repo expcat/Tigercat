@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## LoadingBar
 
-Runnable modules: `examples/example/vue3/src/examples/loading-bar/` and `examples/example/react/src/examples/loading-bar/`.
+Runnable modules: `examples/example/vue3/src/examples/loading-bar/01/`, `examples/example/vue3/src/examples/loading-bar/02/`, `examples/example/vue3/src/examples/loading-bar/03/`, `examples/example/react/src/examples/loading-bar/01/`, `examples/example/react/src/examples/loading-bar/02/`, `examples/example/react/src/examples/loading-bar/03/`.
 
 Note: `error` 和 `finish` 共用 `start` 计数。还有未结束的 `start` 时保持加载，全部结束再进入成功或失败然后隐藏。开始、失败、结束各说一次，百分比留在 `progressbar` 上。
 

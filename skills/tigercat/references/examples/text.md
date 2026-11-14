@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Text
 
-Runnable modules: `examples/example/vue3/src/examples/text/` and `examples/example/react/src/examples/text/`.
+Runnable modules: `examples/example/vue3/src/examples/text/01/`, `examples/example/vue3/src/examples/text/02/`, `examples/example/vue3/src/examples/text/03/`, `examples/example/vue3/src/examples/text/04/`, `examples/example/react/src/examples/text/01/`, `examples/example/react/src/examples/text/02/`, `examples/example/react/src/examples/text/03/`, `examples/example/react/src/examples/text/04/`.
 
 Note: `tag` 只允许 TextTag 白名单（p/span/div/h1–h6/label/strong/em/small），非法回退 `p`。copyable 保留指定标签，复制按钮可用 Tab + Enter / Space。`align` 只用 `start` / `center` / `end` / `justify`。`label` 需自备 `htmlFor`。
 

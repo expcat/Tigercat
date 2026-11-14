@@ -11,10 +11,15 @@ description: Compact generated Tigercat Navigation props reference
 
 ## ContextMenuSub
 
-`packages/core/src/types/context-menu.ts` · `ContextMenuSubProps` · 3/5 props
+`packages/core/src/types/context-menu.ts` · `ContextMenuSubProps` · 3/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type      | Default | Notes                                   |
 | ------------ | --------- | ------- | --------------------------------------- |
 | `title?`     | `string`  | `-`     | Submenu trigger label                   |
 | `disabled?`  | `boolean` | `false` | Whether the submenu trigger is disabled |
 | `className?` | `string`  | `-`     | Additional CSS classes                  |
+
+### Remaining props (complete public API)
+
+- `style?`: `React.CSSProperties`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -

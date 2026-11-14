@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## Menu
 
-Runnable modules: `examples/example/vue3/src/examples/menu/` and `examples/example/react/src/examples/menu/`.
+Runnable modules: `examples/example/vue3/src/examples/menu/01/`, `examples/example/vue3/src/examples/menu/02/`, `examples/example/vue3/src/examples/menu/03/`, `examples/example/vue3/src/examples/menu/04/`, `examples/example/vue3/src/examples/menu/05/`, `examples/example/react/src/examples/menu/01/`, `examples/example/react/src/examples/menu/02/`, `examples/example/react/src/examples/menu/03/`, `examples/example/react/src/examples/menu/04/`, `examples/example/react/src/examples/menu/05/`.
 
 Note: 项上的 `href` 和 schema 的 `path` / `href` / `iframeSrc` 走 `link-utils`。`path` 只作站内路径。危险协议和禁用项不输出 `href`。
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Badge
 
-`packages/core/src/types/badge.ts` · `BadgeProps` · 4/11 props
+`packages/core/src/types/badge.ts` · `BadgeProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。`right`/`left` 跟阅读方向。
 
@@ -21,3 +21,13 @@ Note: 无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶�
 | `type?`       | `BadgeType`        | `'number'` | Badge display type                                                                         |
 | `standalone?` | `boolean`          | `true`     | Standalone (inline) or wrapping children. Overlay requires `standalone={false}`.           |
 | `max?`        | `number`           | `99`       | Maximum count (`type='number'` only). Exceeds shows 'max+'. Text badges are never capped.  |
+
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `variant?`: `BadgeVariant`; default `'danger'`. Badge variant style
+- `size?`: `BadgeSize`; default `'md'`. Badge size
+- `showZero?`: `boolean`; default `-`. Whether to show a number badge whose value is `0` or `'0'`. Defaults to `true` for stan...
+- `position?`: `BadgePosition`; default `'top-end'`. Overlay position. `end` follows the reading direction.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. -

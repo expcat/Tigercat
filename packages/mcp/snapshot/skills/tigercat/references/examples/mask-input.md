@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## MaskInput
 
-Runnable modules: `examples/example/vue3/src/examples/mask-input/` and `examples/example/react/src/examples/mask-input/`.
+Runnable modules: `examples/example/vue3/src/examples/mask-input/01/`, `examples/example/vue3/src/examples/mask-input/02/`, `examples/example/vue3/src/examples/mask-input/03/`, `examples/example/react/src/examples/mask-input/01/`, `examples/example/react/src/examples/mask-input/02/`, `examples/example/react/src/examples/mask-input/03/`.
 
 Vue: `<MaskInput v-model="value" mask="##/##/####" />`
 

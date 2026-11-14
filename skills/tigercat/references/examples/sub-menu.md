@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## SubMenu
 
-Runnable modules: `examples/example/vue3/src/examples/sub-menu/` and `examples/example/react/src/examples/sub-menu/`.
+Runnable modules: `examples/example/vue3/src/examples/menu/03/`, `examples/example/react/src/examples/menu/03/`.
 
 Vue: `<Menu><SubMenu :item-key="itemKey" title="More"><MenuItem :item-key="a">A</MenuItem></SubMenu></Menu>`
 

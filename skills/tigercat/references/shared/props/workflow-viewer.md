@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## WorkflowViewer
 
-`packages/core/src/types/workflow-viewer.ts` · `WorkflowViewerProps` · 4/8 props
+`packages/core/src/types/workflow-viewer.ts` · `WorkflowViewerProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Tag`.
 
@@ -23,3 +23,10 @@ Note: 只读审批拓扑，复用 `WorkflowTimelineStep`。顺序节点同一列
 | `highlightPath?`     | `boolean`                              | `true`  | Highlight the taken path from start to the current or rollback step.  |
 | `showRollbackPoint?` | `boolean`                              | `true`  | Show the reject rollback-point label when a rejected step exists.     |
 | `labels?`            | `Partial<TigerLocaleWorkflowTimeline>` | `-`     | Kind / sign-mode / path overlay. Wins over `locale.workflowTimeline`. |
+
+### Remaining props (complete public API)
+
+- `tasks?`: `WorkflowTask[]`; default `-`. Instance-level per-actor tasks. When present, each person is a row. Wins over `step.tas...
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. -

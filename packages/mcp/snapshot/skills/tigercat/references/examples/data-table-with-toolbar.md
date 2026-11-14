@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## DataTableWithToolbar
 
-Runnable modules: `examples/example/vue3/src/examples/data-table-with-toolbar/` and `examples/example/react/src/examples/data-table-with-toolbar/`.
+Runnable modules: `examples/example/vue3/src/examples/data-table-with-toolbar/01/`, `examples/example/vue3/src/examples/data-table-with-toolbar/02/`, `examples/example/vue3/src/examples/data-table-with-toolbar/03/`, `examples/example/vue3/src/examples/data-table-with-toolbar/04/`, `examples/example/vue3/src/examples/data-table-with-toolbar/05/`, `examples/example/vue3/src/examples/data-table-with-toolbar/06/`, `examples/example/react/src/examples/data-table-with-toolbar/01/`, `examples/example/react/src/examples/data-table-with-toolbar/02/`, `examples/example/react/src/examples/data-table-with-toolbar/03/`, `examples/example/react/src/examples/data-table-with-toolbar/04/`, `examples/example/react/src/examples/data-table-with-toolbar/05/`, `examples/example/react/src/examples/data-table-with-toolbar/06/`.
 
 Uses: `Table`, `Input`, `Select`, `Button`, `Popover`, `Checkbox`.
 

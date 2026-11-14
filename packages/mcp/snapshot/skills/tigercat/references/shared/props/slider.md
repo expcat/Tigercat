@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Slider
 
-`packages/core/src/types/slider.ts` · `SliderProps` · 4/19 props
+`packages/core/src/types/slider.ts` · `SliderProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: Vue 只认 `modelValue` / `update:modelValue`。方向读最近的 `dir`，否则读 ConfigProvider。拖动松手才写入表单，键盘立即写入。`marks` 过密时只标两端。
 
@@ -21,3 +21,23 @@ Note: Vue 只认 `modelValue` / `update:modelValue`。方向读最近的 `dir`�
 | `defaultValue?` | `number \| [number, number]` | `-`     | Default value                                                                             |
 | `min?`          | `number`                     | `0`     | Minimum value                                                                             |
 | `max?`          | `number`                     | `100`   | Maximum value                                                                             |
+
+### Remaining props (complete public API)
+
+- `step?`: `number`; default `1`. Step value for slider movement
+- `disabled?`: `boolean`; default `false`. Whether the slider is disabled
+- `readOnly?`: `boolean`; default `false`. Focusable, submitted, and visible, but drag and arrow keys do not change the value.
+- `pushApart?`: `boolean`; default `false`. When range thumbs meet, push the other thumb one step away.
+- `showRange?`: `boolean`; default `true`. Paint the selected portion of the track.
+- `formatTooltip?`: `(value: number) => string`; default `-`. Tooltip and `aria-valuetext` text.
+- `marks?`: `boolean | Record<number, string>`; default `false`. Whether to show marks on the slider
+- `tooltip?`: `boolean`; default `true`. Whether to show tooltip
+- `size?`: `ComponentSize`; default `'md'`. Slider size
+- `range?`: `boolean`; default `false`. Whether to enable range selection
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `name?`: `string`; default `-`. -
+- `modelValue?`: `number | string | [number, number] | null`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onChange?`, `onPointerDown?`.

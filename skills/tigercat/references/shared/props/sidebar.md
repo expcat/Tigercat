@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Sidebar
 
-`packages/core/src/types/layout.ts` · `SidebarProps` · 4/7 props
+`packages/core/src/types/layout.ts` · `SidebarProps` · 4/7 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开 Tab。边框是 `border-inline-end`。未传 `width` 时默认宽走 class。未传名时 landmark 走 locale。内层未传 `collapsed` 的 Menu 跟随侧栏。
 
@@ -21,3 +21,11 @@ Note: `collapsedWidth="0px"` 时 `inert` + `aria-hidden`，里面的控件离开
 | `width?`          | `string`          | `-`       | Sidebar width. When omitted, default width is `w-64` via class so caller `style.width`... |
 | `collapsedWidth?` | `string`          | `'64px'`  | Width when collapsed (mini mode). Set to '0px' to fully hide the sidebar when collapsed.  |
 | `side?`           | `LayoutSiderSide` | `'start'` | Logical side of the shell. `start` is inline-start (left in LTR).                         |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes
+- `landmark?`: `SidebarLandmark`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onUpdate:collapsed?`.

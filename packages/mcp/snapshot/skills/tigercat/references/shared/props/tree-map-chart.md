@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## TreeMapChart
 
-`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 4/29 props
+`packages/core/src/types/chart-visualization.ts` · `TreeMapChartProps` · 4/29 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop            | Type                  | Default | Notes                                                                    |
 | --------------- | --------------------- | ------- | ------------------------------------------------------------------------ |
@@ -19,3 +19,33 @@ description: Compact generated Tigercat Charts props reference
 | `gap?`          | `number`              | `2`     | Gap between nodes in px                                                  |
 | `showLabels?`   | `boolean`             | `true`  | Whether to show labels inside nodes                                      |
 | `minLabelSize?` | `number`              | `10`    | Minimum font size for labels (hide if cell too small)                    |
+
+### Remaining props (complete public API)
+
+- `width?`: `number`; default `400`. Chart width
+- `height?`: `number`; default `300`. Chart height
+- `padding?`: `ChartPadding`; default `8`. Gap around nodes, not cartesian axis padding
+- `nodeRadius?`: `number`; default `2`. Node corner radius in px. The SVG `rx` attribute wins over theme tokens.
+- `colors?`: `string[]`; default `-`. Palette of colors
+- `gradient?`: `boolean`; default `false`. Whether to apply a top-to-bottom alpha gradient in chart user space
+- `tooltipFormatter?`: `(datum: TreeMapChartDatum, index: number) => string`; default `-`. Tooltip formatter. Receives the node's original datum and layout index.
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `hoveredIndex?`: `number | null`; default `-`. Hovered index (controlled)
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered element
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive elements when one is active
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `selectedIndex?`: `number | null`; default `-`. Selected index (controlled)
+- `showLegend?`: `boolean`; default `false`. Whether to show legend
+- `legendPosition?`: `ChartLegendPosition`; default `'bottom'`. Legend position around the plot
+- `legendMarkerSize?`: `number`; default `10`. Legend marker size in px
+- `legendGap?`: `number`; default `8`. Legend item gap in px
+- `showTooltip?`: `boolean`; default `true`. Whether to show tooltip
+- `bind?`: `{ roots?: { id: string; children?: { id: string }[] }[] }`; default `-`. -
+
+Events/callback props: `onHoveredIndexChange?`, `onSelectedIndexChange?`, `onNodeClick?`, `onNodeHover?`, `onUpdate:hoveredIndex?`, `onUpdate:selectedIndex?`.

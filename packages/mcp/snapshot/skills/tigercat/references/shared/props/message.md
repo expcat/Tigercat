@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Message
 
-`packages/core/src/types/message.ts` · `MessageProps` · 4/9 props
+`packages/core/src/types/message.ts` · `MessageProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 命令式调用只改当前 ConfigProvider 里的队列。默认可关闭。指针或焦点在条目上时暂停计时。`loading` 不自动关。负时长和 `NaN` 不自动关。同一个 `key` 替换那一条。
 
@@ -21,5 +21,13 @@ Note: 命令式调用只改当前 ConfigProvider 里的队列。默认可关闭�
 | `content?`  | `string`          | `-`      | Message content                            |
 | `closable?` | `boolean`         | `true`   | Whether the message can be closed manually |
 | `position?` | `MessagePosition` | `'top'`  | Message position on screen                 |
+
+### Remaining props (complete public API)
+
+- `duration?`: `number`; default `3000`. Duration in milliseconds before auto-close (0 means no auto-close)
+- `icon?`: `string`; default `-`. Custom icon (overrides default type icon)
+- `className?`: `string`; default `-`. Additional CSS classes
+- `key?`: `string | number`; default `-`. Stable id. Calling again with the same key replaces that message and resets its timer.
+- `closeAriaLabel?`: `string`; default `locale `common.closeMessageAriaLabel``. Close button aria-label when `closable` is true.
 
 Events/callback props: `onClose?`.

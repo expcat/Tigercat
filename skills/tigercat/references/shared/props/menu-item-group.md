@@ -11,10 +11,15 @@ description: Compact generated Tigercat Navigation props reference
 
 ## MenuItemGroup
 
-`packages/core/src/types/menu.ts` · `MenuItemGroupProps` · 3/5 props
+`packages/core/src/types/menu.ts` · `MenuItemGroupProps` · 3/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type      | Default | Notes                  |
 | ------------ | --------- | ------- | ---------------------- |
 | `title?`     | `string`  | `-`     | Group title            |
 | `collapsed?` | `boolean` | `-`     | -                      |
 | `className?` | `string`  | `-`     | Additional CSS classes |
+
+### Remaining props (complete public API)
+
+- `level?`: `number`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -

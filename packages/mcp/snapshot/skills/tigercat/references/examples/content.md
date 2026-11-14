@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Content
 
-Runnable modules: `examples/example/vue3/src/examples/content/` and `examples/example/react/src/examples/content/`.
+Runnable modules: `examples/example/vue3/src/examples/layout/01/`, `examples/example/vue3/src/examples/layout/03/`, `examples/example/vue3/src/examples/layout/04/`, `examples/example/react/src/examples/layout/01/`, `examples/example/react/src/examples/layout/03/`, `examples/example/react/src/examples/layout/04/`.
 
 Note: 默认 `<main>`，一页只留一个。嵌套/预览用 `as="div"`。作为 Layout 直子时自己滚动（`flex-1 min-h-0 overflow-auto`）。React `ref` 是滚动根。
 

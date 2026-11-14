@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## SchemaForm
 
-Runnable modules: `examples/example/vue3/src/examples/schema-form/` and `examples/example/react/src/examples/schema-form/`.
+Runnable modules: `examples/example/vue3/src/examples/schema-form/01/`, `examples/example/vue3/src/examples/schema-form/02/`, `examples/example/vue3/src/examples/schema-form/03/`, `examples/example/react/src/examples/schema-form/01/`, `examples/example/react/src/examples/schema-form/02/`, `examples/example/react/src/examples/schema-form/03/`.
 
 Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
 

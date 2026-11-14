@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Breadcrumb
 
-`packages/core/src/types/breadcrumb.ts` · `BreadcrumbProps` · 4/8 props
+`packages/core/src/types/breadcrumb.ts` · `BreadcrumbProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。`href` 走 `link-utils`，危险协议不输出地址。
 
@@ -21,3 +21,10 @@ Note: `maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expan
 | `maxItems?`  | `number`               | `-`     | Maximum number of visible items before collapsing. When set, middle items are collapsed... |
 | `extra?`     | `unknown`              | `-`     | Extra content aligned to the end of the breadcrumb                                         |
 | `locale?`    | `Partial<TigerLocale>` | `-`     | -                                                                                          |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Inline styles
+- `children?`: `React.ReactNode`; default `-`. -
+- `labels?`: `Partial<TigerLocaleBreadcrumb>`; default `-`. -

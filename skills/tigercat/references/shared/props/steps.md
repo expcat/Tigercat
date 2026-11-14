@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Steps
 
-`packages/core/src/types/steps.ts` · `StepsProps` · 4/13 props
+`packages/core/src/types/steps.ts` · `StepsProps` · 4/13 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type         | Default     | Notes                                                       |
 | ------------ | ------------ | ----------- | ----------------------------------------------------------- |
@@ -19,3 +19,17 @@ description: Compact generated Tigercat Navigation props reference
 | `clickable?` | `boolean`    | `false`     | Whether steps are clickable for navigation                  |
 | `status?`    | `StepStatus` | `'process'` | Step status (for current step)                              |
 | `simple?`    | `boolean`    | `false`     | Whether to use simple style (no description, smaller icons) |
+
+### Remaining props (complete public API)
+
+- `orientation?`: `StepsDirection`; default `'horizontal'`. Steps orientation. Vertical/horizontal connector geometry ships via the Tailwind plugin...
+- `size?`: `StepSize`; default `'md'`. Step size
+- `progressDot?`: `boolean`; default `false`. Dot markers. Connectors still follow the step list.
+- `items?`: `StepItem[]`; default `-`. Data-driven items. When set, `StepsItem` children are optional.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Additional styles
+- `children?`: `React.ReactNode`; default `-`. Step items
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleSteps>`; default `-`. -
+
+Events/callback props: `onChange?`, `onUpdate:current?`.

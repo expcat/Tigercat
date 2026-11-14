@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartGrid
 
-`packages/core/src/types/chart-core.ts` · `ChartGridProps` · 4/16 props
+`packages/core/src/types/chart-core.ts` · `ChartGridProps` · 4/16 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type                 | Default   | Notes           |
 | ------------ | -------------------- | --------- | --------------- |
@@ -19,3 +19,18 @@ description: Compact generated Tigercat Charts props reference
 | `yScale?`    | `ChartScale`         | `-`       | Y axis scale    |
 | `show?`      | `ChartGridLine`      | `'both'`  | Show grid lines |
 | `lineStyle?` | `ChartGridLineStyle` | `'solid'` | Grid line style |
+
+### Remaining props (complete public API)
+
+- `xRange?`: `[number, number]`; default `-`. Explicit x extent when `yScale` is omitted (horizontal line endpoints)
+- `yRange?`: `[number, number]`; default `-`. Explicit y extent when `xScale` is omitted (vertical line endpoints)
+- `width?`: `number`; default `-`. Plot width used as `[0, width]` when `xRange` / `xScale.range` is missing
+- `height?`: `number`; default `-`. Plot height used as `[0, height]` when `yRange` / `yScale.range` is missing
+- `xTicks?`: `number`; default `5`. X axis tick count
+- `yTicks?`: `number`; default `5`. Y axis tick count
+- `xTickValues?`: `ChartScaleValue[]`; default `-`. Explicit X tick values
+- `yTickValues?`: `ChartScaleValue[]`; default `-`. Explicit Y tick values
+- `strokeWidth?`: `number`; default `1`. Line stroke width
+- `x?`: `number`; default `0`. X offset
+- `y?`: `number`; default `0`. Y offset
+- `className?`: `string`; default `-`. Additional CSS classes

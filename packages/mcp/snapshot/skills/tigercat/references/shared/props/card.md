@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Card
 
-`packages/core/src/types/card.ts` · `CardProps` · 4/19 props
+`packages/core/src/types/card.ts` · `CardProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根不再当按钮。有封面时 padding 在内容列。`coverAlt` 默认空（装饰）。原生 `title=` 是 HTML tooltip，不是视觉标题；视觉标题走 `#header` / `header`。
 
@@ -21,3 +21,23 @@ Note: `hoverable` 只抬起。`onClick`/`href` 才是控件；有 actions 时根
 | `cover?`     | `string`  | `-`     | Cover image URL. Framework layers also accept a custom node / `#cover` slot.               |
 | `coverAlt?`  | `string`  | `''`    | Accessible name for a URL cover. Empty by default (decorative).                            |
 | `href?`      | `string`  | `-`     | When set, the root is a link (`<a>` unless nested actions force a role).                   |
+
+### Remaining props (complete public API)
+
+- `variant?`: `CardVariant`; default `'default'`. Card variant style
+- `size?`: `CardSize`; default `'md'`. Card size (affects padding)
+- `padding?`: `boolean | string`; default `-`. Padding override for the card content sections. Takes precedence over the `size`-derive...
+- `orientation?`: `BaseLayoutProps['orientation']`; default `'vertical'`. Card layout orientation
+- `title?`: `string`; default `-`. Visual header text. Slot / `header` node wins when both are set. Native HTML tooltip is...
+- `htmlTitle?`: `string`; default `-`. Native HTML `title` tooltip. Not a visual header.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `titleLevel?`: `1 | 2 | 3 | 4 | 5 | 6`; default `2`. Heading level for the visible title. Defaults to 2 so the card does not take the page h1.
+- `children?`: `React.ReactNode`; default `-`. -
+- `header?`: `React.ReactNode`; default `-`. -
+- `footer?`: `React.ReactNode`; default `-`. -
+- `actions?`: `React.ReactNode`; default `-`. -
+- `target?`: `string`; default `-`. -
+- `rel?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onClick?`.

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Switch
 
-`packages/core/src/types/switch.ts` · `SwitchProps` · 4/12 props
+`packages/core/src/types/switch.ts` · `SwitchProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop              | Type            | Default | Notes                                     |
 | ----------------- | --------------- | ------- | ----------------------------------------- |
@@ -19,3 +19,16 @@ description: Compact generated Tigercat Form props reference
 | `defaultChecked?` | `boolean`       | `false` | Default checked state (uncontrolled mode) |
 | `disabled?`       | `boolean`       | `false` | Whether the switch is disabled            |
 | `size?`           | `ComponentSize` | `'md'`  | Switch size                               |
+
+### Remaining props (complete public API)
+
+- `name?`: `string`; default `-`. Native form name (hidden checkbox)
+- `value?`: `string`; default `'on'`. Native form value when checked
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `children?`: `React.ReactNode`; default `-`. -
+- `modelValue?`: `boolean`; default `-`. -
+- `defaultValue?`: `boolean`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onChange?`.

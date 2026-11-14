@@ -13,7 +13,7 @@ description: Compact Tigercat Data Vue and React usage routes
 
 ## Table
 
-Runnable modules: `examples/example/vue3/src/examples/table/` and `examples/example/react/src/examples/table/`.
+Runnable modules: `examples/example/vue3/src/examples/table/01/`, `examples/example/vue3/src/examples/table/02/`, `examples/example/vue3/src/examples/table/03/`, `examples/example/vue3/src/examples/table/04/`, `examples/example/vue3/src/examples/table/05/`, `examples/example/vue3/src/examples/table/06/`, `examples/example/vue3/src/examples/table/07/`, `examples/example/vue3/src/examples/table/08/`, `examples/example/react/src/examples/table/01/`, `examples/example/react/src/examples/table/02/`, `examples/example/react/src/examples/table/03/`, `examples/example/react/src/examples/table/04/`, `examples/example/react/src/examples/table/05/`, `examples/example/react/src/examples/table/06/`, `examples/example/react/src/examples/table/07/`, `examples/example/react/src/examples/table/08/`.
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 

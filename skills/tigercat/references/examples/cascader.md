@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Cascader
 
-Runnable modules: `examples/example/vue3/src/examples/cascader/` and `examples/example/react/src/examples/cascader/`.
+Runnable modules: `examples/example/vue3/src/examples/cascader/01/`, `examples/example/vue3/src/examples/cascader/02/`, `examples/example/vue3/src/examples/cascader/03/`, `examples/example/react/src/examples/cascader/01/`, `examples/example/react/src/examples/cascader/02/`, `examples/example/react/src/examples/cascader/03/`.
 
 Note: 空路径是 `[]`。缺键、`null` 和 `''` 都是 `[]`。对不上的段保留原始键。浏览路径只在打开时初始化。懒加载的鼠标、Enter 和方向键走同一道。列、返回、展开文案在 `locale.cascader`，不在 `select`。只读用 `readOnly`。
 

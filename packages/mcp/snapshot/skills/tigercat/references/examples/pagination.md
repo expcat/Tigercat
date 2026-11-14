@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## Pagination
 
-Runnable modules: `examples/example/vue3/src/examples/pagination/` and `examples/example/react/src/examples/pagination/`.
+Runnable modules: `examples/example/vue3/src/examples/pagination/01/`, `examples/example/vue3/src/examples/pagination/02/`, `examples/example/vue3/src/examples/pagination/03/`, `examples/example/vue3/src/examples/pagination/04/`, `examples/example/vue3/src/examples/pagination/05/`, `examples/example/react/src/examples/pagination/01/`, `examples/example/react/src/examples/pagination/02/`, `examples/example/react/src/examples/pagination/03/`, `examples/example/react/src/examples/pagination/04/`, `examples/example/react/src/examples/pagination/05/`.
 
 Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默认开并跟随 Table `size`；List 默认关。
 

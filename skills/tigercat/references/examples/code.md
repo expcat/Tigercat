@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Code
 
-Runnable modules: `examples/example/vue3/src/examples/code/` and `examples/example/react/src/examples/code/`.
+Runnable modules: `examples/example/vue3/src/examples/code/01/`, `examples/example/vue3/src/examples/code/02/`, `examples/example/vue3/src/examples/code/03/`, `examples/example/vue3/src/examples/code/04/`, `examples/example/react/src/examples/code/01/`, `examples/example/react/src/examples/code/02/`, `examples/example/react/src/examples/code/03/`, `examples/example/react/src/examples/code/04/`.
 
 Note: `code` 必填。`copyable` 默认 true。复制文案走 ConfigProvider locale / `labels`。
 

@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Select
 
-Runnable modules: `examples/example/vue3/src/examples/select/` and `examples/example/react/src/examples/select/`.
+Runnable modules: `examples/example/vue3/src/examples/select/01/`, `examples/example/vue3/src/examples/select/02/`, `examples/example/vue3/src/examples/select/03/`, `examples/example/vue3/src/examples/select/04/`, `examples/example/vue3/src/examples/select/05/`, `examples/example/react/src/examples/select/01/`, `examples/example/react/src/examples/select/02/`, `examples/example/react/src/examples/select/03/`, `examples/example/react/src/examples/select/04/`, `examples/example/react/src/examples/select/05/`.
 
 Note: 单选未选是 `null`（`undefined` 表示非受控），多选未选是 `[]`。`''` 是合法选项值。Clear 发出 `null` 或 `[]`。创建项留在列表里，直到 `options` 接过去；完全相同才不算新建。小屏列表仍锚在触发器上。搜索防抖读最新回调。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）。列、返回和展开文案不在 Select 语言包。
 

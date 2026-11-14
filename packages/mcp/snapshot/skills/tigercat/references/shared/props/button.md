@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Button
 
-`packages/core/src/types/button.ts` · `ButtonProps` · 4/12 props
+`packages/core/src/types/button.ts` · `ButtonProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `type` 是原生按钮类型（button / submit / reset），默认 button；3.0 不再提供 `htmlType`。`size` 未设时：组 size → `md`。纯图标用 icon prop / slot，并提供 `aria-label` 或 `aria-labelledby`；按钮按 size 为正方形。文字也可以来自子组件。loading 设置原生 disabled 和 `aria-busy`。
 
@@ -21,3 +21,16 @@ Note: `type` 是原生按钮类型（button / submit / reset），默认 button�
 | `size?`     | `ButtonSize`    | `-`         | Button size. When omitted, uses the enclosing ButtonGroup size, then `md`. Passing `und... |
 | `disabled?` | `boolean`       | `false`     | Whether the button is disabled                                                             |
 | `loading?`  | `boolean`       | `false`     | Whether the button is in loading state                                                     |
+
+### Remaining props (complete public API)
+
+- `block?`: `boolean`; default `false`. Whether the button should take full width of its parent
+- `iconPosition?`: `ButtonIconPosition`; default `'start'`. Position of the icon relative to button text. DOM order follows this value (`start` = i...
+- `type?`: `ButtonHtmlType`; default `'button'`. HTML `type` attribute.
+- `danger?`: `boolean`; default `false`. Whether to apply danger/destructive styling Overrides variant colors with error/danger...
+- `loadingIcon?`: `React.ReactNode`; default `-`. -
+- `icon?`: `React.ReactNode`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, unknown>`; default `-`. -
+
+Events/callback props: `onClick?`.

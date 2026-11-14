@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## FloatButtonGroup
 
-Runnable modules: `examples/example/vue3/src/examples/float-button-group/` and `examples/example/react/src/examples/float-button-group/`.
+Runnable modules: `examples/example/vue3/src/examples/float-button/02/`, `examples/example/react/src/examples/float-button/02/`.
 
 Vue: `<FloatButtonGroup trigger="hover"><FloatButton type="default" /></FloatButtonGroup>`
 

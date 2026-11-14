@@ -11,10 +11,15 @@ description: Compact generated Tigercat Navigation props reference
 
 ## NavigationMenuItem
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuItemProps` · 3/5 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuItemProps` · 3/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type                  | Default | Notes                                                                                      |
 | ------------ | --------------------- | ------- | ------------------------------------------------------------------------------------------ |
 | `value?`     | `NavigationMenuValue` | `-`     | Unique key used as the open `value` when this item has a panel. Auto-generated when omi... |
 | `disabled?`  | `boolean`             | `false` | Whether the item (trigger or top-level link) is disabled                                   |
 | `className?` | `string`              | `-`     | Additional CSS classes                                                                     |
+
+### Remaining props (complete public API)
+
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -

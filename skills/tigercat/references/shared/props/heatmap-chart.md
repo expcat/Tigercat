@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## HeatmapChart
 
-`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 4/32 props
+`packages/core/src/types/chart-visualization.ts` · `HeatmapChartProps` · 4/32 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type                  | Default     | Notes                                                                                      |
 | ----------- | --------------------- | ----------- | ------------------------------------------------------------------------------------------ |
@@ -19,3 +19,36 @@ description: Compact generated Tigercat Charts props reference
 | `xLabels`   | `string[]`            | `-`         | X-axis labels                                                                              |
 | `yLabels`   | `string[]`            | `-`         | Y-axis labels                                                                              |
 | `minColor?` | `string`              | `'#f0f9ff'` | Min color (for lowest value)                                                               |
+
+### Remaining props (complete public API)
+
+- `width?`: `number`; default `400`. Chart width
+- `height?`: `number`; default `300`. Chart height
+- `padding?`: `ChartPadding`; default `40`. Padding for self-drawn axis labels (not cartesian axis titles)
+- `maxColor?`: `string`; default `'#2563eb'`. Max color (for highest value)
+- `min?`: `number`; default `-`. Override the colour-domain minimum. Default is the data min (missing cells and non-fini...
+- `max?`: `number`; default `-`. Override the colour-domain maximum. Default is the data max.
+- `cellRadius?`: `number`; default `2`. Cell border radius in px. The SVG `rx` attribute wins over theme tokens.
+- `cellGap?`: `number`; default `1`. Gap between cells in px
+- `showValues?`: `boolean`; default `false`. Whether to show value labels inside cells
+- `valueFormatter?`: `(value: number) => string`; default `-`. Value format function
+- `tooltipFormatter?`: `(datum: HeatmapChartDatum | null, index: number) => string`; default `-`. Tooltip formatter. Receives the cell's original datum (or `null` for a missing cell) an...
+- `colorSpace?`: `'rgb' | 'oklch'`; default `'rgb'`. Colour interpolation space for cell fills. - `'rgb'` (default): linear hex interpolatio...
+- `renderMode?`: `'svg' | 'canvas' | 'auto'`; default `'auto'`. Rendering backend for heatmap cells. - `'svg'`: render one `<rect>` per cell. - `'canva...
+- `canvasThreshold?`: `number`; default `1000`. Cell count threshold used when `renderMode` is `'auto'`.
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `hoveredIndex?`: `number | null`; default `-`. Hovered index (controlled)
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered element
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive elements when one is active
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `selectedIndex?`: `number | null`; default `-`. Selected index (controlled)
+- `showTooltip?`: `boolean`; default `true`. Whether to show tooltip
+- `bind?`: `{ minColor?: string maxColor?: string value?: number min?: number max?: number calendar?: (number | Date)[] }`; default `-`. -
+
+Events/callback props: `onHoveredIndexChange?`, `onSelectedIndexChange?`, `onCellClick?`, `onCellHover?`, `onUpdate:hoveredIndex?`, `onUpdate:selectedIndex?`.

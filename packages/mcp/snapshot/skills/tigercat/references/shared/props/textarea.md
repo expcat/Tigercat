@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Textarea
 
-`packages/core/src/types/textarea.ts` · `TextareaProps` · 4/25 props
+`packages/core/src/types/textarea.ts` · `TextareaProps` · 4/25 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: React `onChange` 是字符串值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`。与 Input 同一套 status / showCount / autoResize / readonly。
 
@@ -21,3 +21,29 @@ Note: React `onChange` 是字符串值，不是 DOM 事件。Vue 是 `update:mod
 | `autoResize?` | `boolean`     | `false`     | Enable auto-resize to fit content |
 | `showCount?`  | `boolean`     | `false`     | Show character count              |
 | `status?`     | `InputStatus` | `'default'` | Validation status                 |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Textarea size
+- `errorMessage?`: `string`; default `-`. Error message to display below the field
+- `value?`: `string`; default `-`. Textarea value (for controlled mode)
+- `defaultValue?`: `string`; default `-`. Default value (for uncontrolled mode)
+- `disabled?`: `boolean`; default `false`. Whether the textarea is disabled
+- `readonly?`: `boolean`; default `false`. Whether the textarea is readonly
+- `required?`: `boolean`; default `false`. Whether the textarea is required
+- `placeholder?`: `string`; default `-`. Placeholder text
+- `maxRows?`: `number`; default `-`. Maximum number of rows when autoResize is enabled
+- `minRows?`: `number`; default `-`. Minimum number of rows when autoResize is enabled
+- `maxLength?`: `number`; default `-`. Maximum character length
+- `minLength?`: `number`; default `-`. Minimum character length
+- `name?`: `string`; default `-`. Textarea name attribute
+- `id?`: `string`; default `-`. Textarea id attribute
+- `autoComplete?`: `string`; default `-`. Autocomplete attribute
+- `autoFocus?`: `boolean`; default `false`. Whether to autofocus on mount
+- `className?`: `string`; default `-`. -
+- `readOnly?`: `boolean`; default `-`. -
+- `_shakeTrigger?`: `number`; default `-`. -
+- `modelValue?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onInput?`, `onChange?`, `onFocus?`, `onBlur?`.

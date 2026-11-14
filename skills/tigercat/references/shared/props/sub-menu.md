@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## SubMenu
 
-`packages/core/src/types/menu.ts` · `SubMenuProps` · 4/8 props
+`packages/core/src/types/menu.ts` · `SubMenuProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type      | Default | Notes                           |
 | ------------ | --------- | ------- | ------------------------------- |
@@ -19,3 +19,10 @@ description: Compact generated Tigercat Navigation props reference
 | `title?`     | `string`  | `-`     | Submenu title                   |
 | `disabled?`  | `boolean` | `-`     | Whether the submenu is disabled |
 | `collapsed?` | `boolean` | `-`     | -                               |
+
+### Remaining props (complete public API)
+
+- `icon?`: `unknown`; default `-`. Icon for the submenu (node or registered icon name)
+- `className?`: `string`; default `-`. Additional CSS classes
+- `level?`: `number`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -

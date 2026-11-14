@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Tag
 
-`packages/core/src/types/tag.ts` · `TagProps` · 4/9 props
+`packages/core/src/types/tag.ts` · `TagProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，父级卸载或 `open={false}`。关闭按钮可用 Tab + Enter / Space，关闭名走 locale。`pill` 全圆角。
 
@@ -22,4 +22,12 @@ Note: 默认不是 live region。`closable` 只发 close；组件不自己藏，
 | `variant?`  | `TagVariant` | `'default'` | Tag variant style             |
 | `size?`     | `TagSize`    | `'md'`      | Tag size                      |
 
-Events/callback props: `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `closeAriaLabel?`: `string`; default `-`. Accessible label for the close button (when `closable` is true). Defaults to the tag te...
+- `open?`: `boolean`; default `-`. When `false`, the tag is not rendered. Omitted / `true` keeps it shown. Closing emits o...
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onClose?`.

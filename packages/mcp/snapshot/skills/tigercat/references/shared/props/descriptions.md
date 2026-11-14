@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Descriptions
 
-`packages/core/src/types/descriptions.ts` · `DescriptionsProps` · 4/13 props
+`packages/core/src/types/descriptions.ts` · `DescriptionsProps` · 4/13 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop      | Type                                                      | Default        | Notes                                                                                      |
 | --------- | --------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------ |
@@ -19,3 +19,15 @@ description: Compact generated Tigercat Layout props reference
 | `column?` | `number \| Partial<Record<ResponsiveBreakpoint, number>>` | `3`            | Number of columns per row. A breakpoint map is resolved against the **container** width... |
 | `layout?` | `DescriptionsLayout`                                      | `'horizontal'` | Descriptions layout                                                                        |
 | `colon?`  | `boolean`                                                 | `true`         | Whether to show colon after label                                                          |
+
+### Remaining props (complete public API)
+
+- `title?`: `string`; default `-`. Descriptions title
+- `extra?`: `unknown`; default `-`. Extra content (actions, links, etc.)
+- `bordered?`: `boolean`; default `false`. Whether to show border
+- `size?`: `ComponentSize`; default `'md'`. Descriptions size
+- `labelStyle?`: `Record<string, string>`; default `-`. Label style (CSS properties object)
+- `contentStyle?`: `Record<string, string>`; default `-`. Content style (CSS properties object)
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overlay
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number> | string`; default `-`. -

@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## FloatButton
 
-Runnable modules: `examples/example/vue3/src/examples/float-button/` and `examples/example/react/src/examples/float-button/`.
+Runnable modules: `examples/example/vue3/src/examples/float-button/01/`, `examples/example/vue3/src/examples/float-button/02/`, `examples/example/vue3/src/examples/float-button/03/`, `examples/example/react/src/examples/float-button/01/`, `examples/example/react/src/examples/float-button/02/`, `examples/example/react/src/examples/float-button/03/`.
 
 Vue: `<FloatButton floating />`
 

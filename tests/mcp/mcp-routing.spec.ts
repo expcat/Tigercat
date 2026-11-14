@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises'
+import { access, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -67,7 +67,7 @@ describe('extractMarkdownSection', () => {
     expect(missing).toEqual([])
   })
 
-  it('finds an examples section for every indexed component', async () => {
+  it('finds an examples section with registered modules for every indexed component', async () => {
     const missing: string[] = []
     const cache = new Map<string, string>()
 
@@ -81,6 +81,11 @@ describe('extractMarkdownSection', () => {
       if (extractMarkdownSection(text, component.name) === undefined) {
         missing.push(`${component.name} (${path})`)
       }
+      const modules = [...text.matchAll(/`(examples\/example\/[^`]+)`/g)]
+      expect(modules.length, component.name).toBeGreaterThan(0)
+      for (const module of modules) {
+        await expect(access(join(REPO_ROOT, module[1], 'demo.json'))).resolves.toBeUndefined()
+      }
     }
 
     expect(missing).toEqual([])
@@ -88,6 +93,48 @@ describe('extractMarkdownSection', () => {
 })
 
 describe('getTigercatComponent', () => {
+  it('serves complete props, selected inheritance, public callbacks and registered demos', async () => {
+    const props = async (component: string): Promise<string> => {
+      const result = await getTigercatComponent(index, { component, framework: 'react' })
+      return result.matches[0].sources.find((source) => source.path.includes('/props/'))?.text || ''
+    }
+    const footer = await props('Footer')
+    expect(footer).toContain('[Complete props]')
+    expect(footer).toContain("`size?`: `'default' | 'compact'`; default `'default'`.")
+    for (const [component, count] of Object.entries({
+      Space: 5,
+      Popconfirm: 17,
+      SchemaForm: 29,
+      Gantt: 33,
+      OrgChart: 25
+    })) {
+      expect(await props(component)).toContain(`/${count} compact props`)
+    }
+    for (const [component, callbacks] of Object.entries({
+      ImageAnnotation: ['onChange', 'onSelect', 'onToolChange', 'onReady', 'onError'],
+      Drag: ['onDragStart', 'onDragOver', 'onDrop', 'onDragEnd'],
+      InfiniteScroll: ['onLoadMore'],
+      MarkdownEditor: ['onChange', 'onModeChange'],
+      WorkflowDetailShell: ['onSubmit', 'onDetailAction'],
+      WorkflowTimeline: ['onAction']
+    })) {
+      const events =
+        (await props(component))
+          .split('\n')
+          .find((line) => line.startsWith('Events/callback props:')) || ''
+      for (const callback of callbacks) expect(events, component).toContain(`\`${callback}?\``)
+    }
+    for (const [component, paths] of Object.entries({
+      QRCode: ['qrcode/01/'],
+      AvatarGroup: ['avatar/03/', 'avatar/04/']
+    })) {
+      const result = await getTigercatComponent(index, { component, framework: 'react' })
+      const examples =
+        result.matches[0].sources.find((source) => source.path.includes('/examples/'))?.text || ''
+      for (const path of paths) expect(examples).toContain(path)
+    }
+  })
+
   it('returns the requested component own props section, within budget', async () => {
     // Tag 的 props 落在 basic 分类文件 12KB 截断线之后,旧实现会把它整段切丢。
     const result = await getTigercatComponent(index, { component: 'Tag', framework: 'react' })

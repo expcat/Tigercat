@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## QRCode
 
-`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 4/9 props
+`packages/core/src/types/qrcode.ts` · `QRCodeProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Refresh 仅在绑定 `onRefresh` / `@refresh` 时是 button。默认色走 `--tiger-text` / `--tiger-surface`。
 
@@ -21,3 +21,13 @@ Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Ref
 | `status?` | `QRCodeStatus` | `'active'` | Overlay status. `expired` shows a refresh control when a handler is passed. `scanned` n... |
 | `size?`   | `number`       | `128`      | Size in pixels, including the quiet zone                                                   |
 | `color?`  | `string`       | `-`        | Foreground (module) color. Defaults to `--tiger-text`. Hex pairs with `bgColor` that fa... |
+
+### Remaining props (complete public API)
+
+- `bgColor?`: `string`; default `-`. Background color. Defaults to `--tiger-surface`.
+- `errorLevel?`: `QRCodeErrorLevel`; default `'M'`. Reed–Solomon level passed to the existing encoder.
+- `icon?`: `string`; default `-`. Center icon as SVG path data. A framework slot/node paints a component instead. The mat...
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `className?`: `string`; default `-`. Custom class name
+
+Events/callback props: `onRefresh?`.

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Mentions
 
-`packages/core/src/types/mentions.ts` · `MentionsProps` · 4/31 props
+`packages/core/src/types/mentions.ts` · `MentionsProps` · 4/31 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 插入读文本框当前值和选区。解析和插入共用同一套分隔符。搜索事件带上前缀。组合输入期间不插入。清除文案是 `common.clearText`。只读用 `readOnly`，不能从列表插入。不要把 `prefix` 当成 Input 的前缀槽。
 
@@ -21,3 +21,35 @@ Note: 插入读文本框当前值和选区。解析和插入共用同一套分�
 | `value?`        | `string`               | `-`     | Textarea value. `undefined` is uncontrolled; `''` is a legal empty body. |
 | `prefix?`       | `string \| string[]`   | `'@'`   | Trigger character(s). A single character or several (`['@', '#']`).      |
 | `filterOption?` | `MentionsFilterOption` | `true`  | Local filter. Default matches both `label` and `value`.                  |
+
+### Remaining props (complete public API)
+
+- `defaultValue?`: `string`; default `''`. Initial textarea value when `value` is omitted.
+- `open?`: `boolean`; default `-`. Controlled open state. `undefined` is uncontrolled.
+- `defaultOpen?`: `boolean`; default `false`. Initial open state when `open` is omitted.
+- `placeholder?`: `string`; default `-`. Placeholder text
+- `disabled?`: `boolean`; default `-`. Disabled state
+- `size?`: `ComponentSize`; default `-`. Size variant
+- `rows?`: `number`; default `-`. Number of visible rows
+- `autoResize?`: `boolean`; default `false`. Auto-resize the textarea to fit content.
+- `maxRows?`: `number`; default `-`. Maximum auto-resize rows
+- `minRows?`: `number`; default `-`. Minimum auto-resize rows
+- `maxLength?`: `number`; default `-`. Maximum character length
+- `showCount?`: `boolean`; default `false`. Show character count (requires maxLength to show current/max).
+- `readOnly?`: `boolean`; default `false`. Focusable and submittable. The suggestion list cannot insert.
+- `clearable?`: `boolean`; default `false`. Show a clear control. Default false.
+- `status?`: `InputStatus`; default `-`. Validation status
+- `errorMessage?`: `string`; default `-`. Error message rendered under the textarea
+- `name?`: `string`; default `-`. Native name attribute on the textarea
+- `id?`: `string`; default `-`. Native id attribute on the textarea
+- `loading?`: `boolean`; default `-`. Show a loading state instead of treating an empty list as no match
+- `placement?`: `FloatingPlacement`; default `-`. Overlay placement relative to the textarea
+- `offset?`: `number`; default `-`. Overlay offset in pixels
+- `dropdownClassName?`: `string`; default `-`. Extra class on the dropdown panel
+- `getPopupContainer?`: `() => HTMLElement | null`; default `-`. Override portal target (otherwise overlay-host → ConfigProvider → body)
+- `listHeight?`: `number`; default `256`. Dropdown list max height in pixels.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale
+- `className?`: `string`; default `-`. Custom class name
+- `modelValue?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onSelect?`, `onSearch?`, `onOpenChange?`, `onFocus?`, `onBlur?`, `onUpdate:modelValue?`, `onUpdate:open?`.

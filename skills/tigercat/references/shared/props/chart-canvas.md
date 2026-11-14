@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## ChartCanvas
 
-`packages/core/src/types/chart-core.ts` · `ChartCanvasProps` · 4/8 props
+`packages/core/src/types/chart-core.ts` · `ChartCanvasProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padding 盖住 ChartAxis 标签。有 `title` / `aria-label` 时 svg 是 `role="img"`。render props / 作用域槽给出 `innerRect`。
 
@@ -21,5 +21,12 @@ Note: `responsive` 观察画布自己的宿主，不是 legend 壳。默认 padd
 | `height?`     | `number`       | `200`                                          | SVG height                                                                                 |
 | `responsive?` | `boolean`      | `true`                                         | Observe the canvas host (not a legend sibling) and resize the SVG. Width and height bot... |
 | `padding?`    | `ChartPadding` | `{ top: 24, right: 24, bottom: 52, left: 52 }` | Inner padding for chart drawing area. Default covers ChartAxis labels.                     |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `children?`: `React.ReactNode | ((ctx: ChartCanvasRenderContext) => React.ReactNode)`; default `-`. -
 
 Events/callback props: `onResolvedSizeChange?`.

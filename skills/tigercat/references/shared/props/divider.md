@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Divider
 
-`packages/core/src/types/divider.ts` · `DividerProps` · 4/8 props
+`packages/core/src/types/divider.ts` · `DividerProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradient 也生效。子节点是居中标签。
 
@@ -21,3 +21,10 @@ Note: 竖线 `self-stretch`，不要外挂高度。`color`/`thickness` 对 gradi
 | `lineStyle?`   | `DividerLineStyle`   | `'solid'`                                                       | Line style of the divider                                             |
 | `color?`       | `string`             | `undefined (uses default border color)`                         | Custom color for the divider Can be a CSS color value or CSS variable |
 | `thickness?`   | `string`             | `undefined (uses default 1px for horizontal, 1px for vertical)` | Custom thickness of the divider line                                  |
+
+### Remaining props (complete public API)
+
+- `spacing?`: `DividerSpacing`; default `'md'`. Spacing (margin) around the divider
+- `className?`: `string`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -

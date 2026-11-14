@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Alert
 
-`packages/core/src/types/alert.ts` · `AlertProps` · 4/18 props
+`packages/core/src/types/alert.ts` · `AlertProps` · 4/18 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦点从关闭按钮移到后面下一个可聚焦元素。传入 `open` 时只发事件。父级重渲染不重置剩余时间。`error` 保持 `role="alert"`。首屏之后新插入的 success / info / warning 用组件自己的 `role="status"`；静态条文不加实时区域。与 ImagePreview「省略即关」相反。
 
@@ -22,4 +22,21 @@ Note: 省略 `open` 时展示，关闭按钮和到时由组件自己收起，焦
 | `closable?` | `boolean`   | `false`  | Whether the alert can be closed                                                            |
 | `duration?` | `number`    | `-`      | Auto-close duration in milliseconds. Set to 0 or undefined to disable auto-close. Indep... |
 
-Events/callback props: `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `size?`: `AlertSize`; default `'md'`. Alert size
+- `description?`: `string`; default `-`. Alert description (detailed content)
+- `showIcon?`: `boolean`; default `true`. Whether to show the type icon
+- `closeAriaLabel?`: `string`; default `-`. Accessible label for the close button (when `closable` is true). Defaults to ConfigProv...
+- `open?`: `boolean`; default `-`. Controlled visibility. Omit `open` and the alert hides itself on close and when `durati...
+- `banner?`: `boolean`; default `false`. Whether to display as full-width banner across the page
+- `showCountdown?`: `boolean`; default `false`. Whether to show countdown progress bar (requires `duration`)
+- `className?`: `string`; default `-`. Additional CSS classes
+- `children?`: `React.ReactNode`; default `-`. Alert content (React children). Rendered even when `title` is set.
+- `action?`: `React.ReactNode`; default `-`. -
+- `titleSlot?`: `React.ReactNode`; default `-`. Custom title content (overrides title prop)
+- `descriptionSlot?`: `React.ReactNode`; default `-`. Custom description content (overrides description prop)
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onClose?`, `onUpdate:open?`.

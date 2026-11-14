@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## FormWizard
 
-`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 4/22 props
+`packages/core/src/types/form-wizard.ts` · `FormWizardProps` · 4/22 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Steps/StepsItem`, `Button`, `Form`, `ConfigProvider`.
 
@@ -24,4 +24,25 @@ Note: 包在 Form 里时，当前步 `fields` 会交给 `validateFields`，没�
 | `beforeNext?` | `FormWizardValidator` | `-`     | Validation hook before moving to next step. `true` proceeds, `false` blocks, a string b... |
 | `clickable?`  | `boolean`             | `false` | Whether step titles are clickable. Only already-reached unskipped steps can be opened t... |
 
-Events/callback props: `onStepChange?`, `onFinish?`, `onClose?`.
+### Remaining props (complete public API)
+
+- `defaultCurrent?`: `number`; default `0`. Default step index (uncontrolled)
+- `orientation?`: `StepsDirection`; default `'horizontal'`. Steps orientation
+- `size?`: `StepSize`; default `'md'`. Steps size
+- `simple?`: `boolean`; default `false`. Whether to use simple steps style
+- `bordered?`: `boolean`; default `true`. Whether to show border around the wizard card
+- `showSteps?`: `boolean`; default `true`. Whether to show steps header
+- `showActions?`: `boolean`; default `true`. Whether to show action buttons
+- `prevText?`: `string`; default `-`. Previous button text
+- `nextText?`: `string`; default `-`. Next button text
+- `finishText?`: `string`; default `-`. Finish button text
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides for FormWizard UI text
+- `labels?`: `Partial<import('./locale').TigerLocaleFormWizard>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `autoSave?`: `(current: number, step: WizardStep) => void | Promise<void>`; default `-`. Called after a successful step change and after Finish. Awaited; a rejection stays on t...
+- `model?`: `unknown`; default `-`. Step model compared with the snapshot taken when the step was entered. A difference ask...
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+- `renderStep?`: `(step: WizardStep, index: number) => React.ReactNode`; default `-`. -
+- `children?`: `React.ReactNode | ((step: WizardStep, index: number) => React.ReactNode)`; default `-`. -
+
+Events/callback props: `onStepChange?`, `onFinish?`, `onClose?`, `onUpdate:current?`.

@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Descriptions
 
-Runnable modules: `examples/example/vue3/src/examples/descriptions/` and `examples/example/react/src/examples/descriptions/`.
+Runnable modules: `examples/example/vue3/src/examples/descriptions/01/`, `examples/example/vue3/src/examples/descriptions/02/`, `examples/example/react/src/examples/descriptions/01/`, `examples/example/react/src/examples/descriptions/02/`.
 
 Vue: `<Descriptions :items="items" />`
 

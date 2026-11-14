@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Icon
 
-Runnable modules: `examples/example/vue3/src/examples/icon/` and `examples/example/react/src/examples/icon/`.
+Runnable modules: `examples/example/vue3/src/examples/icon/01/`, `examples/example/vue3/src/examples/icon/02/`, `examples/example/vue3/src/examples/icon/03/`, `examples/example/react/src/examples/icon/01/`, `examples/example/react/src/examples/icon/02/`, `examples/example/react/src/examples/icon/03/`.
 
 Note: 内置图标集通过 `name` 属性指定；自定义 SVG 子元素仍享有更高优先级；图标注册表由 `@expcat/tigercat-core` 及其子路径 `@expcat/tigercat-core/icons/registry` 导出。未传 `color` 时继承 CSS `color`（含 `style.color`）；显式 `color` 胜出。`mode: "fill"` 为 `fill="currentColor"` + `stroke="none"`。
 

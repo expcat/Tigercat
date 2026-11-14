@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## StepsItem
 
-`packages/react/src/components/Steps.tsx and packages/vue/src/components/Steps.ts` · `StepsItemProps / VueStepsItemProps` · 4/9 props
+`packages/react/src/components/Steps.tsx and packages/vue/src/components/Steps.ts` · `StepsItemProps / VueStepsItemProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop           | Type         | Default | Notes                                    |
 | -------------- | ------------ | ------- | ---------------------------------------- |
@@ -19,3 +19,11 @@ description: Compact generated Tigercat Navigation props reference
 | `status?`      | `StepStatus` | `-`     | Step status (overrides automatic status) |
 | `disabled?`    | `boolean`    | `-`     | Whether the step is disabled             |
 | `description?` | `string`     | `-`     | Step description                         |
+
+### Remaining props (complete public API)
+
+- `icon?`: `React.ReactNode`; default `-`. Step icon (custom icon element)
+- `stepIndex?`: `number`; default `-`. Internal prop: step index (automatically set by parent)
+- `isLast?`: `boolean`; default `-`. Internal prop: is last step (automatically set by parent)
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, unknown>`; default `-`. -

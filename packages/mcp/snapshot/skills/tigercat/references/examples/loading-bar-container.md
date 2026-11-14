@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## LoadingBarContainer
 
-Runnable modules: `examples/example/vue3/src/examples/loading-bar-container/` and `examples/example/react/src/examples/loading-bar-container/`.
+Runnable modules: `examples/example/vue3/src/examples/loading-bar/04/`, `examples/example/react/src/examples/loading-bar/04/`.
 
 Vue: `<LoadingBarContainer :percentage="40" />`
 

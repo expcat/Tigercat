@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Checkbox
 
-`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 4/12 props
+`packages/core/src/types/checkbox.ts` · `CheckboxProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop             | Type            | Default | Notes                                          |
 | ---------------- | --------------- | ------- | ---------------------------------------------- |
@@ -19,3 +19,16 @@ description: Compact generated Tigercat Form props reference
 | `indeterminate?` | `boolean`       | `false` | Whether the checkbox is in indeterminate state |
 | `disabled?`      | `boolean`       | `false` | Whether the checkbox is disabled               |
 | `size?`          | `ComponentSize` | `'md'`  | Checkbox size                                  |
+
+### Remaining props (complete public API)
+
+- `defaultChecked?`: `boolean`; default `false`. Default checked state (uncontrolled mode)
+- `value?`: `CheckboxValue`; default `-`. Checkbox value (for use in checkbox groups)
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `children?`: `React.ReactNode`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `modelValue?`: `boolean`; default `-`. -
+- `defaultValue?`: `boolean`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onChange?`.

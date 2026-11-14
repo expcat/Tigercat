@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Footer
 
-Runnable modules: `examples/example/vue3/src/examples/footer/` and `examples/example/react/src/examples/footer/`.
+Runnable modules: `examples/example/vue3/src/examples/layout/01/`, `examples/example/vue3/src/examples/layout/04/`, `examples/example/react/src/examples/layout/01/`, `examples/example/react/src/examples/layout/04/`.
 
 Note: 未传 `height` 不写 inline height。预览/嵌套用 `as="div"`，避免多个 `contentinfo`。
 

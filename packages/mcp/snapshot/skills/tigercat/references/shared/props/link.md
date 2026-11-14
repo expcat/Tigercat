@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Link
 
-`packages/core/src/types/link.ts` · `LinkProps` · 4/8 props
+`packages/core/src/types/link.ts` · `LinkProps` · 4/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 地址只接受 `link-utils` 的协议（`http:`、`https:`、`mailto:`、`tel:` 和无协议的站内路径）。`javascript:`、`data:`、`vbscript:` 和禁用都不输出 `href`。`target="_blank"` 始终把 `noopener noreferrer` 并入 `rel`。`underline` 默认在静止态显示，不是 hover 才出现。
 
@@ -21,3 +21,12 @@ Note: 地址只接受 `link-utils` 的协议（`http:`、`https:`、`mailto:`、
 | `target?`    | `'_blank' \| '_self' \| '_parent' \| '_top'` | `undefined` | Where to open the linked document                                           |
 | `variant?`   | `LinkVariant`                                | `'primary'` | Link variant style                                                          |
 | `underline?` | `boolean`                                    | `true`      | Whether to underline at rest. Hover is not a substitute for the rest state. |
+
+### Remaining props (complete public API)
+
+- `size?`: `LinkSize`; default `'md'`. Link size
+- `disabled?`: `boolean`; default `false`. Whether the link is disabled
+- `rel?`: `string`; default `-`. Relationship between current document and linked document. `target="_blank"` always mer...
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onClick?`.

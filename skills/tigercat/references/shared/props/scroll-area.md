@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## ScrollArea
 
-`packages/core/src/types/scroll-area.ts` · `ScrollAreaProps` · 4/14 props
+`packages/core/src/types/scroll-area.ts` · `ScrollAreaProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type               | Default | Notes                                                                                      |
 | ------------ | ------------------ | ------- | ------------------------------------------------------------------------------------------ |
@@ -19,5 +19,18 @@ description: Compact generated Tigercat Layout props reference
 | `height?`    | `number \| string` | `-`     | Fixed viewport height. Numbers are treated as px.                                          |
 | `shadow?`    | `boolean`          | `false` | Render a gradient shadow on every edge that has content scrolled past it                   |
 | `ariaLabel?` | `string`           | `-`     | Accessible name for the scrollable region. When set, the viewport is exposed as `role="... |
+
+### Remaining props (complete public API)
+
+- `axis?`: `ScrollAreaDirection`; default `'vertical'`. Axes that may scroll
+- `scrollbar?`: `ScrollAreaScrollbarVisibility`; default `'auto'`. Custom scrollbar visibility strategy
+- `scrollbarSize?`: `ScrollAreaScrollbarSize`; default `'md'`. Custom scrollbar thickness
+- `minThumbSize?`: `number`; default `20`. Minimum thumb length in px, so long content keeps a grabbable thumb
+- `width?`: `number | string`; default `-`. Fixed viewport width. Numbers are treated as px.
+- `maxWidth?`: `number | string`; default `-`. Maximum viewport width. Numbers are treated as px.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overlay
+- `className?`: `string`; default `-`. Additional CSS class name for the root element
+- `viewportClassName?`: `string`; default `-`. Additional CSS class name for the scrolling viewport
+- `nativeBars?`: `boolean`; default `-`. -
 
 Events/callback props: `onScroll?`.

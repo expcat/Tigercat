@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## CodeEditor
 
-`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 4/23 props
+`packages/core/src/types/code-editor.ts` · `CodeEditorProps` · 4/23 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type                        | Default   | Notes                                                   |
 | ----------- | --------------------------- | --------- | ------------------------------------------------------- |
@@ -19,3 +19,27 @@ description: Compact generated Tigercat Advanced props reference
 | `theme?`    | `CodeEditorTheme \| 'auto'` | `-`       | Editor theme. Omit to follow the document color scheme. |
 | `wordWrap?` | `boolean`                   | `false`   | Whether to wrap long lines                              |
 | `minLines?` | `number`                    | `3`       | Minimum number of visible lines                         |
+
+### Remaining props (complete public API)
+
+- `value?`: `string`; default `-`. The code content
+- `defaultValue?`: `string`; default `-`. Default code content (uncontrolled mode)
+- `readOnly?`: `boolean`; default `false`. Whether the editor is read-only
+- `lineNumbers?`: `boolean`; default `true`. Whether to show line numbers
+- `highlightActiveLine?`: `boolean`; default `true`. Whether to highlight the current line
+- `tabSize?`: `number`; default `2`. Tab size in spaces
+- `placeholder?`: `string`; default `-`. Placeholder text when empty
+- `maxLines?`: `number`; default `0`. Maximum number of visible lines (0 = no limit)
+- `disabled?`: `boolean`; default `false`. Whether the editor is disabled
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `highlighter?`: `CodeHighlighter`; default `-`. Optional pluggable highlighter. Returns tokens drawn as text.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides merged on top of ConfigProvider locale
+- `labels?`: `Partial<TigerLocaleCodeEditor>`; default `-`. Text/aria label overrides
+- `ariaLabel?`: `string`; default `-`. Accessible name; falls back to locale then FormItem
+- `name?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+- `bind?`: `{ query?: string replacement?: string caret?: number scrollTop?: number viewportHeight?: number lineHeight?: number lineCount?: number language?: { id: string; keywords?: string[] } }`; default `-`. -
+- `modelValue?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onUpdate:modelValue?`.

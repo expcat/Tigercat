@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## ImageGroup
 
-Runnable modules: `examples/example/vue3/src/examples/image-group/` and `examples/example/react/src/examples/image-group/`.
+Runnable modules: `examples/example/vue3/src/examples/image/04/`, `examples/example/vue3/src/examples/image/06/`, `examples/example/react/src/examples/image/04/`, `examples/example/react/src/examples/image/06/`.
 
 Note: 只收集子 Image 的 URL 与 alt。组 `preview={false}` 时子图不再是按钮。重复 src 按实例登记。
 

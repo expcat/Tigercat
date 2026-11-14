@@ -11,10 +11,15 @@ description: Compact generated Tigercat Navigation props reference
 
 ## NavigationMenuTrigger
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuTriggerProps` · 3/5 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuTriggerProps` · 3/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type      | Default | Notes                                                               |
 | ------------ | --------- | ------- | ------------------------------------------------------------------- |
 | `disabled?`  | `boolean` | `false` | Whether the trigger is disabled                                     |
 | `showArrow?` | `boolean` | `-`     | Whether to show a chevron. Falls back to the root `showArrow` prop. |
 | `className?` | `string`  | `-`     | Additional CSS classes                                              |
+
+### Remaining props (complete public API)
+
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -

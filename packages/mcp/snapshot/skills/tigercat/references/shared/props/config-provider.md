@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## ConfigProvider
 
-`packages/core/src/types/config-provider.ts` · `ConfigProviderProps` · 4/6 props
+`packages/core/src/types/config-provider.ts` · `ConfigProviderProps` · 4/6 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop           | Type                   | Default | Notes                                                                                                   |
 | -------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
@@ -19,3 +19,8 @@ description: Compact generated Tigercat Basic props reference
 | `dir?`         | `TigerLocaleDirection` | `-`     | Explicit text direction. Wins over locale.direction and language-id inference.                          |
 | `theme?`       | `string`               | `-`     | Theme name applied to the document by the outermost provider                                            |
 | `colorScheme?` | `ColorScheme`          | `-`     | Color scheme. 'auto' follows the class/attr already on <html>; light when neither is set (SSR default). |
+
+### Remaining props (complete public API)
+
+- `document?`: `boolean`; default `-`. When false, this provider only supplies context and does not write <html>.
+- `iconRegistry?`: `IconRegistry`; default `-`. App-owned icon registry. Wins over the parent registry.

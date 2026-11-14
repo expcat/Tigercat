@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## QRCode
 
-Runnable modules: `examples/example/vue3/src/examples/qr-code/` and `examples/example/react/src/examples/qr-code/`.
+Runnable modules: `examples/example/vue3/src/examples/qrcode/01/`, `examples/example/vue3/src/examples/qrcode/02/`, `examples/example/vue3/src/examples/qrcode/03/`, `examples/example/vue3/src/examples/qrcode/04/`, `examples/example/react/src/examples/qrcode/01/`, `examples/example/react/src/examples/qrcode/02/`, `examples/example/react/src/examples/qrcode/03/`, `examples/example/react/src/examples/qrcode/04/`.
 
 Note: `value` 必填，编码为可扫描 QR（byte mode，ECC M）。过期 Refresh 仅在绑定 `onRefresh` / `@refresh` 时是 button。默认色走 `--tiger-text` / `--tiger-surface`。
 

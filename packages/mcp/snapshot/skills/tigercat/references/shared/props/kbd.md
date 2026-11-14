@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Kbd
 
-`packages/core/src/types/kbd.ts` · `KbdProps` · 4/7 props
+`packages/core/src/types/kbd.ts` · `KbdProps` · 4/7 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可读名。`variant` 的 default 是 Kbd 自己的底/边/字色，不是可点 Tag。
 
@@ -21,3 +21,9 @@ Note: 由 `keys` 生成的组合键把 `aria-label` 设成 `Ctrl + K` 这种可�
 | `separator?` | `string`     | `'+'`       | Separator between combo keys                                                               |
 | `size?`      | `KbdSize`    | `'md'`      | Visual size                                                                                |
 | `variant?`   | `KbdVariant` | `'default'` | Visual variant. `default` is Kbd chrome (bg/text/border); `subtle` is quieter.             |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Inline styles
+- `children?`: `React.ReactNode`; default `-`. -

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## TimePicker
 
-`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 4/31 props
+`packages/core/src/types/timepicker.ts` · `TimePickerProps` · 4/31 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 值是 24h `HH:mm`；`showSeconds` 为真才留秒。此刻、键入和确定共用 `minTime` / `maxTime` / `disabledTime`。结束早于开始会对调。半截区间留在元组里，空单值是 `null`。桌面列和手机 select 同时在文档里，用 CSS 切换。`name` 提交同一套字符串。只读用 `readOnly`。`locale` 只收官方对象。
 
@@ -22,4 +22,34 @@ Note: 值是 24h `HH:mm`；`showSeconds` 为真才留秒。此刻、键入和确
 | `range?`        | `boolean`                      | `false` | -                                                        |
 | `format?`       | `TimeFormat`                   | `'24'`  | Display / typed-parse clock. Stored value stays 24-hour. |
 
-Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider. Do not pass a language id string.
+- `labels?`: `Partial<TimePickerLabels>`; default `-`. -
+- `size?`: `ComponentSize`; default `'md'`. -
+- `showSeconds?`: `boolean`; default `false`. -
+- `hourStep?`: `number`; default `1`. -
+- `minuteStep?`: `number`; default `1`. -
+- `secondStep?`: `number`; default `1`. -
+- `placeholder?`: `string`; default `-`. -
+- `disabled?`: `boolean`; default `false`. -
+- `readOnly?`: `boolean`; default `false`. When true, the field can focus and submit but cannot change or open to edit.
+- `required?`: `boolean`; default `false`. -
+- `minTime?`: `string | null`; default `-`. -
+- `maxTime?`: `string | null`; default `-`. -
+- `disabledTime?`: `(time: string) => boolean`; default `-`. -
+- `now?`: `Date`; default `-`. -
+- `clearable?`: `boolean`; default `true`. -
+- `name?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+- `open?`: `boolean`; default `-`. -
+- `defaultOpen?`: `boolean`; default `false`. -
+- `status?`: `InputStatus`; default `-`. -
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. -
+- `offset?`: `number`; default `4`. -
+- `dropdownClassName?`: `string`; default `-`. -
+- `getPopupContainer?`: `() => HTMLElement | null`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `modelValue?`: `TimePickerModelValue | null`; default `-`. -
+
+Events/callback props: `onChange?`, `onClear?`, `onOpenChange?`, `onUpdate:modelValue?`, `onUpdate:open?`, `onBlur?`.

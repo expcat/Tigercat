@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## FileManager
 
-Runnable modules: `examples/example/vue3/src/examples/file-manager/` and `examples/example/react/src/examples/file-manager/`.
+Runnable modules: `examples/example/vue3/src/examples/file-manager/01/`, `examples/example/vue3/src/examples/file-manager/02/`, `examples/example/react/src/examples/file-manager/01/`, `examples/example/react/src/examples/file-manager/02/`.
 
 Vue: `<FileManager :files="files" />`
 

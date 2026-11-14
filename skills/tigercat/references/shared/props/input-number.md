@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## InputNumber
 
-`packages/core/src/types/input-number.ts` · `InputNumberProps` · 4/25 props
+`packages/core/src/types/input-number.ts` · `InputNumberProps` · 4/25 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: React `onChange` 收到 `number | null`。值可以是有限数字或数字字符串，`null` 和 `''` 是空。`controlsPosition="both"` 是两侧按钮；`snapToStep` 默认关闭，步长只约束按钮和方向键。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。可访问名来自标签或 `aria-label`。
 
@@ -21,3 +21,29 @@ Note: React `onChange` 收到 `number | null`。值可以是有限数字或数�
 | `max?`       | `number` | `Infinity`  | Maximum value            |
 | `step?`      | `number` | `1`         | Step increment           |
 | `precision?` | `number` | `-`         | Number of decimal places |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Input size
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `value?`: `number | string | null`; default `-`. Current value. Finite numbers and numeric strings are the same value. `null` and `''` a...
+- `defaultValue?`: `number | string | null`; default `-`. Default value (uncontrolled mode)
+- `disabled?`: `boolean`; default `false`. Whether the input is disabled
+- `readOnly?`: `boolean`; default `false`. Whether the input is read-only
+- `placeholder?`: `string`; default `-`. Placeholder text
+- `name?`: `string`; default `-`. Input name attribute
+- `id?`: `string`; default `-`. Input id attribute
+- `keyboard?`: `boolean`; default `true`. Whether to enable keyboard up/down arrow stepping
+- `controls?`: `boolean`; default `true`. Whether to show +/- step buttons
+- `controlsPosition?`: `'right' | 'both'`; default `'right'`. Position of step controls. `'right'` is the inline-end stack (trailing side).
+- `snapToStep?`: `boolean`; default `false`. Snap a committed number onto the `step` grid. Arrow keys and the step buttons always mo...
+- `formatter?`: `(value: number | undefined) => string`; default `-`. Format the display value (applied when the field is not focused)
+- `parser?`: `(displayValue: string) => number | null`; default `-`. Parse the displayed string back to number. Return `null` for empty/invalid.
+- `autoFocus?`: `boolean`; default `false`. Whether to auto-focus on mount
+- `incrementAriaLabel?`: `string`; default `'Increase'`. Accessible label for the increment button
+- `decrementAriaLabel?`: `string`; default `'Decrease'`. Accessible label for the decrement button
+- `className?`: `string`; default `-`. -
+- `_shakeTrigger?`: `number`; default `-`. -
+- `modelValue?`: `number | string | null`; default `-`. -
+
+Events/callback props: `onChange?`, `onFocus?`, `onBlur?`, `onUpdate:modelValue?`, `onKeydown?`.

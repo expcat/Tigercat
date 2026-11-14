@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## BreadcrumbItem
 
-Runnable modules: `examples/example/vue3/src/examples/breadcrumb-item/` and `examples/example/react/src/examples/breadcrumb-item/`.
+Runnable modules: `examples/example/vue3/src/examples/breadcrumb/01/`, `examples/example/vue3/src/examples/breadcrumb/02/`, `examples/example/vue3/src/examples/breadcrumb/03/`, `examples/example/vue3/src/examples/page-header/02/`, `examples/example/vue3/src/examples/page-header/04/`, `examples/example/react/src/examples/breadcrumb/01/`, `examples/example/react/src/examples/breadcrumb/02/`, `examples/example/react/src/examples/breadcrumb/03/`, `examples/example/react/src/examples/page-header/02/`, `examples/example/react/src/examples/page-header/04/`.
 
 Vue: `<Breadcrumb><BreadcrumbItem href="/" current>Home</BreadcrumbItem></Breadcrumb>`
 

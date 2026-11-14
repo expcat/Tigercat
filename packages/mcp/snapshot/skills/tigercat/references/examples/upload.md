@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Upload
 
-Runnable modules: `examples/example/vue3/src/examples/upload/` and `examples/example/react/src/examples/upload/`.
+Runnable modules: `examples/example/vue3/src/examples/upload/01/`, `examples/example/vue3/src/examples/upload/02/`, `examples/example/vue3/src/examples/upload/03/`, `examples/example/vue3/src/examples/upload/04/`, `examples/example/react/src/examples/upload/01/`, `examples/example/react/src/examples/upload/02/`, `examples/example/react/src/examples/upload/03/`, `examples/example/react/src/examples/upload/04/`.
 
 Note: 界面、进度、`submit` 和表单写入用同一份列表。`name` 是表单字段，`fileFieldName` 是请求里的文件字段。成功时写回可用地址；没有地址不把 uid 当结果。`multiple` 为假时拖拽也只留第一个。失败行用同一把在途锁重试。只读用 `readOnly`。
 

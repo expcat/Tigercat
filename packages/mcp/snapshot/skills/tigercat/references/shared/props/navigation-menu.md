@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## NavigationMenu
 
-`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 4/16 props
+`packages/core/src/types/navigation-menu.ts` · `NavigationMenuProps` · 4/16 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferrer`。危险协议和禁用项不输出 `href`。
 
@@ -21,3 +21,20 @@ Note: 链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferr
 | `portal?`       | `boolean`                     | `true`  | Portal panels through the overlay target chain (overlay-host, then ConfigProvider root,... |
 | `closeOnClick?` | `boolean`                     | `true`  | Whether to close the open panel when a link or item is clicked                             |
 | `disabled?`     | `boolean`                     | `false` | Whether the navigation menu is disabled                                                    |
+
+### Remaining props (complete public API)
+
+- `current?`: `NavigationMenuValue | null`; default `-`. Current page. The indicator follows this value on the logical axis.
+- `viewport?`: `boolean`; default `false`. Several triggers share one viewport. Switching replaces the content. `mega` panels stay...
+- `defaultValue?`: `NavigationMenuValue | null`; default `-`. Default open item key (uncontrolled mode)
+- `openOnHover?`: `boolean`; default `false`. Open the hovered trigger's panel after `delayDuration`. Focus never opens a panel; Ente...
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. Panel placement relative to the trigger
+- `delayDuration?`: `number`; default `100`. Hover delay (ms) before opening a panel. Subsequent opens within `skipDelayDuration` sk...
+- `skipDelayDuration?`: `number`; default `150`. Hover delay (ms) before closing a panel, and the window during which the next open skip...
+- `showArrow?`: `boolean`; default `true`. Whether to show a chevron on triggers that have a panel
+- `offset?`: `number`; default `4`. Distance (in pixels) between the trigger and the panel
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onValueChange?`, `onOpenChange?`, `onUpdate:value?`, `onUpdate:open?`.

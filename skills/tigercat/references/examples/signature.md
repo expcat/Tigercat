@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Signature
 
-Runnable modules: `examples/example/vue3/src/examples/signature/` and `examples/example/react/src/examples/signature/`.
+Runnable modules: `examples/example/vue3/src/examples/signature/01/`, `examples/example/vue3/src/examples/signature/02/`, `examples/example/vue3/src/examples/signature/03/`, `examples/example/react/src/examples/signature/01/`, `examples/example/react/src/examples/signature/02/`, `examples/example/react/src/examples/signature/03/`.
 
 Note: 受控值是空，或当前笔画导出的 SVG。解析不了的字符串当空，不提交原文。单点在画布、受控值和 `toDataURL()` 里是同一笔。Escape 和 `pointercancel` 丢掉当前笔。一次落笔写一次。只读用 `readOnly`：可聚焦、可提交、不能画。`disabled` 才离开 Tab 序。读 FormItem；id/aria 在画板 widget 上。
 

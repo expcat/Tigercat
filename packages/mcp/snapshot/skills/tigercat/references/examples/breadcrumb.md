@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## Breadcrumb
 
-Runnable modules: `examples/example/vue3/src/examples/breadcrumb/` and `examples/example/react/src/examples/breadcrumb/`.
+Runnable modules: `examples/example/vue3/src/examples/breadcrumb/01/`, `examples/example/vue3/src/examples/breadcrumb/02/`, `examples/example/vue3/src/examples/breadcrumb/03/`, `examples/example/react/src/examples/breadcrumb/01/`, `examples/example/react/src/examples/breadcrumb/02/`, `examples/example/react/src/examples/breadcrumb/03/`.
 
 Note: `maxItems` 溢出是本地 expand（无 v-model）；省略号 `aria-expanded` 跟随该状态。最后一项默认 current，除非 `current={false}`。`href` 走 `link-utils`，危险协议不输出地址。
 

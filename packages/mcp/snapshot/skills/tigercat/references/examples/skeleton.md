@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Skeleton
 
-Runnable modules: `examples/example/vue3/src/examples/skeleton/` and `examples/example/react/src/examples/skeleton/`.
+Runnable modules: `examples/example/vue3/src/examples/skeleton/01/`, `examples/example/vue3/src/examples/skeleton/02/`, `examples/example/react/src/examples/skeleton/01/`, `examples/example/react/src/examples/skeleton/02/`.
 
 Note: `wave` 是扫光，不是 pulse。未传宽高用 class 默认值。装饰默认 `aria-hidden`；有名字时是 `status`。加载态也可由父级 `aria-busy` 负责。
 

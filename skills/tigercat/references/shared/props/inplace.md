@@ -11,10 +11,18 @@ description: Compact generated Tigercat Basic props reference
 
 ## Inplace
 
-`packages/core/src/types/inplace.ts` · `InplaceProps` · 3/6 props
+`packages/core/src/types/inplace.ts` · `InplaceProps` · 3/6 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop              | Type      | Default | Notes                                                       |
 | ----------------- | --------- | ------- | ----------------------------------------------------------- |
 | `disabled?`       | `boolean` | `false` | When true the display control cannot enter editing.         |
 | `editing?`        | `boolean` | `-`     | Controlled editing state. Omit to let the component own it. |
 | `defaultEditing?` | `boolean` | `false` | Uncontrolled initial editing state.                         |
+
+### Remaining props (complete public API)
+
+- `display?`: `React.ReactNode`; default `-`. -
+- `input?`: `React.ReactNode`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onEditingChange?`.

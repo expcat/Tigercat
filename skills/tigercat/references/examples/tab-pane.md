@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## TabPane
 
-Runnable modules: `examples/example/vue3/src/examples/tab-pane/` and `examples/example/react/src/examples/tab-pane/`.
+Runnable modules: `examples/example/vue3/src/examples/page-header/04/`, `examples/example/vue3/src/examples/tabs/01/`, `examples/example/vue3/src/examples/tabs/02/`, `examples/example/vue3/src/examples/tabs/03/`, `examples/example/vue3/src/examples/tabs/04/`, `examples/example/vue3/src/examples/workflow-detail-shell/01/`, `examples/example/react/src/examples/page-header/04/`, `examples/example/react/src/examples/tabs/01/`, `examples/example/react/src/examples/tabs/02/`, `examples/example/react/src/examples/tabs/03/`, `examples/example/react/src/examples/tabs/04/`, `examples/example/react/src/examples/workflow-detail-shell/01/`.
 
 Vue: `<Tabs><TabPane tab-key="1" label="Overview">Panel</TabPane></Tabs>`
 

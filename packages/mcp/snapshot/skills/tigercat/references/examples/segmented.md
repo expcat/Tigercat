@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Segmented
 
-Runnable modules: `examples/example/vue3/src/examples/segmented/` and `examples/example/react/src/examples/segmented/`.
+Runnable modules: `examples/example/vue3/src/examples/segmented/01/`, `examples/example/vue3/src/examples/segmented/02/`, `examples/example/vue3/src/examples/segmented/03/`, `examples/example/react/src/examples/segmented/01/`, `examples/example/react/src/examples/segmented/02/`, `examples/example/react/src/examples/segmented/03/`.
 
 Note: 选项是 `button role="radio"`。必须给组 `aria-label` / `aria-labelledby`。空 `options` 不是完整控件。`icon` 渲染为装饰 SVG。指示条走逻辑边。
 

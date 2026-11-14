@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## PrintLayout
 
-`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 4/16 props
+`packages/core/src/types/print-layout.ts` · `PrintLayoutProps` · 4/16 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直接 `window.print()` 会打整页。`PrintPageBreak` 声明 `className` / `locale`，不是纯透传。
 
@@ -21,3 +21,18 @@ Note: `ref.print()` 把 `window.print()` 限制在这一份布局再恢复；直
 | `orientation?` | `PrintOrientation` | `'portrait'` | Page orientation                                         |
 | `showHeader?`  | `boolean`          | `false`      | Whether to show a repeating header on every printed page |
 | `showFooter?`  | `boolean`          | `false`      | Whether to show a repeating footer on every printed page |
+
+### Remaining props (complete public API)
+
+- `headerText?`: `string`; default `-`. Header text content (visible in the screen preview and on every printed page)
+- `footerText?`: `string`; default `-`. Footer text content (visible in the screen preview and on every printed page)
+- `showPageBreaks?`: `boolean`; default `true`. Whether to show page break indicators in screen view
+- `printBreaks?`: `boolean`; default `true`. Whether a page-break marker forces a printed page break. Independent of the on-screen m...
+- `pageWidth?`: `number | string`; default `-`. Custom page width (CSS length, or a number in mm). Used with `pageHeight` when no named...
+- `pageHeight?`: `number | string`; default `-`. Custom page height (CSS length, or a number in mm).
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overlay
+- `className?`: `string`; default `-`. Additional CSS classes
+- `headerRender?`: `React.ReactNode`; default `-`. -
+- `footerRender?`: `React.ReactNode`; default `-`. -
+- `children?`: `React.ReactNode`; default `-`. -
+- `bind?`: `{ contentHeightMm?: number pageHeightMm?: number marginMm?: number manualBreaks?: number }`; default `-`. -

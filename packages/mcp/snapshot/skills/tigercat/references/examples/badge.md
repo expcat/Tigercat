@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Badge
 
-Runnable modules: `examples/example/vue3/src/examples/badge/` and `examples/example/react/src/examples/badge/`.
+Runnable modules: `examples/example/vue3/src/examples/badge/01/`, `examples/example/vue3/src/examples/badge/02/`, `examples/example/vue3/src/examples/badge/03/`, `examples/example/react/src/examples/badge/01/`, `examples/example/react/src/examples/badge/02/`, `examples/example/react/src/examples/badge/03/`.
 
 Note: 无 content 的 number/text 不渲染。`type="text"` 不被 `max` 封顶。叠放必须 `standalone={false}`，计数写进宿主名字。默认不是 live region。`right`/`left` 跟阅读方向。
 

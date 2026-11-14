@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## OrgChart
 
-`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 4/27 props
+`packages/core/src/types/org-chart.ts` · `OrgChartProps` · 4/25 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`javascript:`、`data:`、`vbscript:` 不渲染 image。
 
@@ -21,3 +21,29 @@ Note: `avatar` 在写成 SVG image 之前走 `link-utils` 同一协议门。`jav
 | `nodeWidth?`  | `number`                         | `-`     | -     |
 | `nodeHeight?` | `number`                         | `-`     | -     |
 | `levelGap?`   | `number`                         | `-`     | -     |
+
+### Remaining props (complete public API)
+
+- `width?`: `number`; default `720`. Chart width. Grows to the laid-out tree when the tree is wider.
+- `height?`: `number`; default `420`. Chart height. Grows to the laid-out tree when the tree is taller.
+- `siblingGap?`: `number`; default `-`. -
+- `orientation?`: `OrgChartDirection`; default `'vertical'`. `horizontal` is left-to-right. Cards keep `nodeWidth` × `nodeHeight`.
+- `showAvatars?`: `boolean`; default `-`. -
+- `showSubtitles?`: `boolean`; default `-`. -
+- `colors?`: `string[]`; default `-`. -
+- `selectedId?`: `string | number | null`; default `-`. -
+- `ariaLabel?`: `string`; default `-`. -
+- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered element
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive elements when one is active
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `bind?`: `{ nodes?: { id: string; label: string; children?: { id: string; label: string }[] }[] collapsed?: string[] query?: string zoom?: number }`; default `-`. -
+
+Events/callback props: `onNodeClick?`, `onNodeHover?`, `onSelectedIdChange?`, `onUpdate:selectedId?`.

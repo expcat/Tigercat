@@ -6982,7 +6982,7 @@
       "props": ["color", "lineStyle", "orientation", "spacing", "thickness"]
     },
     "DragProps": {
-      "extends": ["DragItem = DragItem> extends UseDragOptions"],
+      "extends": ["UseDragOptions"],
       "props": ["className", "items", "onItemsChange"]
     },
     "DrawerProps": {
@@ -7265,7 +7265,7 @@
       "props": ["error", "label", "labelWidth", "name", "required", "rules", "showMessage", "size"]
     },
     "GenericSelectProps": {
-      "extends": ["string | number = string | number> extends Omit"],
+      "extends": ["Omit"],
       "props": ["defaultValue", "options", "value"]
     },
     "HeaderProps": {
@@ -7575,7 +7575,7 @@
       "props": ["disabled", "href", "rel", "size", "target", "underline", "variant"]
     },
     "ListProps": {
-      "extends": ["ListItem = ListItem>"],
+      "extends": [],
       "props": [
         "bordered",
         "className",

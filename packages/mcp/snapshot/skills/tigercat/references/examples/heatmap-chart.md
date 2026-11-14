@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## HeatmapChart
 
-Runnable modules: `examples/example/vue3/src/examples/heatmap-chart/` and `examples/example/react/src/examples/heatmap-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/heatmap-chart/01/`, `examples/example/vue3/src/examples/heatmap-chart/02/`, `examples/example/vue3/src/examples/heatmap-chart/03/`, `examples/example/react/src/examples/heatmap-chart/01/`, `examples/example/react/src/examples/heatmap-chart/02/`, `examples/example/react/src/examples/heatmap-chart/03/`.
 
 Vue: `<HeatmapChart :data="data" :x-labels="xLabels" :y-labels="yLabels" />`
 

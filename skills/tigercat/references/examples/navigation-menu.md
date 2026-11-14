@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## NavigationMenu
 
-Runnable modules: `examples/example/vue3/src/examples/navigation-menu/` and `examples/example/react/src/examples/navigation-menu/`.
+Runnable modules: `examples/example/vue3/src/examples/navigation-menu/01/`, `examples/example/vue3/src/examples/navigation-menu/02/`, `examples/example/react/src/examples/navigation-menu/01/`, `examples/example/react/src/examples/navigation-menu/02/`.
 
 Note: 链接走 `link-utils`。`target="_blank"` 带上 `noopener` 和 `noreferrer`。危险协议和禁用项不输出 `href`。
 

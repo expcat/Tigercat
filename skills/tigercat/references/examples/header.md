@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Header
 
-Runnable modules: `examples/example/vue3/src/examples/header/` and `examples/example/react/src/examples/header/`.
+Runnable modules: `examples/example/vue3/src/examples/layout/01/`, `examples/example/vue3/src/examples/layout/03/`, `examples/example/vue3/src/examples/layout/04/`, `examples/example/react/src/examples/layout/01/`, `examples/example/react/src/examples/layout/03/`, `examples/example/react/src/examples/layout/04/`.
 
 Note: 未传 `height` 时默认 `h-16`，不写 inline height。`sticky` 是独立开关，`translucent` / `blur` 只改表面。`fullHeight` 壳里忽略 `sticky`。
 

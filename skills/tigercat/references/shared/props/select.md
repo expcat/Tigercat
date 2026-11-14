@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Select
 
-`packages/core/src/types/select.ts` · `SelectProps` · 4/37 props
+`packages/core/src/types/select.ts` · `SelectProps` · 4/37 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 单选未选是 `null`（`undefined` 表示非受控），多选未选是 `[]`。`''` 是合法选项值。Clear 发出 `null` 或 `[]`。创建项留在列表里，直到 `options` 接过去；完全相同才不算新建。小屏列表仍锚在触发器上。搜索防抖读最新回调。打开的 combobox 才有 `aria-controls`。overlay 列表高是 `listHeight`（默认 256）。列、返回和展开文案不在 Select 语言包。
 
@@ -22,4 +22,40 @@ Note: 单选未选是 `null`（`undefined` 表示非受控），多选未选是 
 | `defaultValue?` | `SelectModelValue` | `-`     | Initial value when `value` is omitted.                                                |
 | `multiple?`     | `boolean`          | `false` | Whether to allow multiple selection                                                   |
 
-Events/callback props: `onOpenChange?`.
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Select size
+- `disabled?`: `boolean`; default `false`. Whether the select is disabled
+- `placeholder?`: `string`; default `-`. Placeholder text when no option is selected
+- `searchable?`: `boolean`; default `false`. Whether to allow search/filter
+- `searchValue?`: `string`; default `-`. Controlled search input value.
+- `defaultSearchValue?`: `string`; default `-`. Default search input value for uncontrolled search.
+- `clearable?`: `boolean`; default `true`. Whether to clear the selection
+- `open?`: `boolean`; default `-`. Controlled open state. `undefined` is uncontrolled.
+- `defaultOpen?`: `boolean`; default `-`. Initial open state when `open` is omitted.
+- `emptyText?`: `string`; default `-`. Text to display when the options list is empty or no search result matches. Defaults to...
+- `maxTagCount?`: `number`; default `-`. Maximum number of tags to display in multi-select mode. Remaining selections are shown...
+- `maxCount?`: `number`; default `-`. Maximum number of selected values. Further picks are ignored.
+- `readOnly?`: `boolean`; default `false`. Read-only: the list can open, the value cannot change, and the field still submits.
+- `optionFields?`: `SelectOptionFields`; default `-`. Keys on raw option records. Omit when options are already `{ label, value }`.
+- `virtual?`: `boolean`; default `false`. Whether to use virtual scrolling for large option lists. Groups are flattened into the...
+- `remote?`: `boolean`; default `false`. Whether search is handled remotely. When true, local option filtering is skipped.
+- `searchDebounce?`: `number`; default `0`. Debounce delay for the search callback in milliseconds. The search input itself updates...
+- `creatable?`: `boolean`; default `false`. Whether users can create a new option from the current search query.
+- `createOptionText?`: `string`; default `-`. Override for the creatable option sentence. `{label}` is replaced with the query. A val...
+- `listHeight?`: `number`; default `256`. Height of the dropdown panel content area in pixels.
+- `autoClearSearchValue?`: `boolean`; default `true`. Clear the search query after selecting in multiple mode.
+- `loading?`: `boolean`; default `false`. Remote-loading flag. Empty lists show `select.loadingText` instead of empty.
+- `status?`: `InputStatus`; default `'default'`. Validation status. Also read from FormItem when omitted.
+- `name?`: `string`; default `-`. Native form field name. Serialized through hidden inputs.
+- `filterOption?`: `SelectFilterOption`; default `-`. Custom option filter. Default matches label and value (case-insensitive). A matching gr...
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. Overlay placement.
+- `offset?`: `number`; default `4`. Overlay offset in pixels.
+- `dropdownClassName?`: `string`; default `-`. Extra class names for the dropdown panel.
+- `getPopupContainer?`: `() => HTMLElement | null`; default `-`. Portal container. Defaults to the overlay-host → ConfigProvider → body chain.
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `labels?`: `Partial<TigerLocaleSelect>`; default `-`. UI labels for custom text. Takes precedence over `locale` and global ConfigProvider text.
+- `modelValue?`: `SelectModelValue`; default `-`. -
+- `className?`: `string`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onUpdate:modelValue?`, `onUpdate:searchValue?`, `onUpdate:open?`, `onChange?`, `onSearchChange?`, `onCreate?`, `onBlur?`.

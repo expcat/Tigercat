@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## FunnelChart
 
-`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 4/28 props
+`packages/core/src/types/chart-visualization.ts` · `FunnelChartProps` · 4/28 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type                 | Default | Notes                                                                    |
 | ----------- | -------------------- | ------- | ------------------------------------------------------------------------ |
@@ -19,3 +19,32 @@ description: Compact generated Tigercat Charts props reference
 | `gap?`      | `number`             | `2`     | Gap between funnel segments in px                                        |
 | `pinch?`    | `boolean`            | `false` | Whether the last segment tapers to a point                               |
 | `gradient?` | `boolean`            | `false` | Render each segment with a vertical alpha gradient in funnel user space. |
+
+### Remaining props (complete public API)
+
+- `height?`: `number`; default `300`. Chart height
+- `orientation?`: `'vertical' | 'horizontal'`; default `'vertical'`. Vertical or horizontal layout. Horizontal grows along x; height follows value.
+- `colors?`: `string[]`; default `-`. Palette of colors
+- `showLabels?`: `boolean`; default `true`. Draw stage name, value and conversion percentage relative to the first stage.
+- `tooltipFormatter?`: `(datum: FunnelChartDatum, index: number) => string`; default `-`. Tooltip formatter. The default names conversion rates relative to the first and previou...
+- `width?`: `number`; default `320`. Chart width
+- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `hoveredIndex?`: `number | null`; default `-`. Hovered index (controlled)
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered element
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive elements when one is active
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `selectedIndex?`: `number | null`; default `-`. Selected index (controlled)
+- `showLegend?`: `boolean`; default `false`. Whether to show legend
+- `legendPosition?`: `ChartLegendPosition`; default `'bottom'`. Legend position around the plot
+- `legendMarkerSize?`: `number`; default `10`. Legend marker size in px
+- `legendGap?`: `number`; default `8`. Legend item gap in px
+- `showTooltip?`: `boolean`; default `true`. Whether to show tooltip
+
+Events/callback props: `onHoveredIndexChange?`, `onSelectedIndexChange?`, `onSegmentClick?`, `onSegmentHover?`, `onUpdate:hoveredIndex?`, `onUpdate:selectedIndex?`.

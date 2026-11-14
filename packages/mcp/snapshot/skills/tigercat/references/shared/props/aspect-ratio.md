@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## AspectRatio
 
-`packages/core/src/types/aspect-ratio.ts` · `AspectRatioProps` · 3/4 props
+`packages/core/src/types/aspect-ratio.ts` · `AspectRatioProps` · 3/4 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 默认保留媒体自然尺寸且不裁切。显式 `fit="contain"` / `"cover"` / `"fill"` 时，内容层填满比例盒，直系 `img`/`video`/`iframe` 按 fit 填充并裁进根元素圆角。
 
@@ -20,3 +20,7 @@ Note: 默认保留媒体自然尺寸且不裁切。显式 `fit="contain"` / `"co
 | `ratio?`     | `AspectRatioValue` | `'16/9'` | Width-to-height ratio. `16/9` and `16:9` are both accepted. |
 | `fit?`       | `AspectRatioFit`   | `-`      | How replaced children fill the box. Omitted does not crop.  |
 | `className?` | `string`           | `-`      | Additional CSS class name for the root element              |
+
+### Remaining props (complete public API)
+
+- `contentClassName?`: `string`; default `-`. Additional CSS class name for the content wrapper

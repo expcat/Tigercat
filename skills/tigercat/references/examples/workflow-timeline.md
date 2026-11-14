@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## WorkflowTimeline
 
-Runnable modules: `examples/example/vue3/src/examples/workflow-timeline/` and `examples/example/react/src/examples/workflow-timeline/`.
+Runnable modules: `examples/example/vue3/src/examples/workflow-timeline/01/`, `examples/example/react/src/examples/workflow-timeline/01/`.
 
 Uses: `Timeline`, `Button`, `Tag`, `WorkflowActionBar`.
 

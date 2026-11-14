@@ -13,7 +13,7 @@ description: Compact Tigercat Data Vue and React usage routes
 
 ## Timeline
 
-Runnable modules: `examples/example/vue3/src/examples/timeline/` and `examples/example/react/src/examples/timeline/`.
+Runnable modules: `examples/example/vue3/src/examples/timeline/01/`, `examples/example/vue3/src/examples/timeline/02/`, `examples/example/vue3/src/examples/timeline/03/`, `examples/example/react/src/examples/timeline/01/`, `examples/example/react/src/examples/timeline/02/`, `examples/example/react/src/examples/timeline/03/`.
 
 Note: 需要 `items`。`pending` 在（反转后的）列表末尾再插一项。pending 文案走 `locale.timeline.pendingText`。审批配方 playground 在 `workflow-timeline` / `workflow-viewer` / `workflow-detail-shell`；本页 01–03 才是时间线骨架。
 

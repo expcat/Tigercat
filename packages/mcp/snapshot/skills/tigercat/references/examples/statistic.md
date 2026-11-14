@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Statistic
 
-Runnable modules: `examples/example/vue3/src/examples/statistic/` and `examples/example/react/src/examples/statistic/`.
+Runnable modules: `examples/example/vue3/src/examples/statistic/01/`, `examples/example/vue3/src/examples/statistic/02/`, `examples/example/vue3/src/examples/statistic/03/`, `examples/example/react/src/examples/statistic/01/`, `examples/example/react/src/examples/statistic/02/`, `examples/example/react/src/examples/statistic/03/`.
 
 Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat` + ConfigProvider locale。`animated` 在 mount 之后播；`prefers-reduced-motion` 直接终值。SSR 始终终值。
 

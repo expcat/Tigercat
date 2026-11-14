@@ -13,7 +13,7 @@ description: Compact Tigercat Layout Vue and React usage routes
 
 ## Splitter
 
-Runnable modules: `examples/example/vue3/src/examples/splitter/` and `examples/example/react/src/examples/splitter/`.
+Runnable modules: `examples/example/vue3/src/examples/splitter/01/`, `examples/example/vue3/src/examples/splitter/02/`, `examples/example/vue3/src/examples/splitter/03/`, `examples/example/react/src/examples/splitter/01/`, `examples/example/react/src/examples/splitter/02/`, `examples/example/react/src/examples/splitter/03/`.
 
 Note: 子节点才是 pane。传入 `sizes` 按值受控（新数组同一组值不会清拖拽）；百分比跟容器走。拖动 gutter 经 `update:sizes` / `onSizesChange` 回写，并保持各 pane 的单位（百分比仍是百分比，像素仍是像素），比例继续跟容器走。`resize` 事件里的 sizes 是像素。水平几何读 `dir`。gutter 是带名字的 `separator`。
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Affix
 
-`packages/core/src/types/affix.ts` · `AffixProps` · 4/7 props
+`packages/core/src/types/affix.ts` · `AffixProps` · 4/7 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop            | Type              | Default | Notes                                                                                      |
 | --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
@@ -19,5 +19,11 @@ description: Compact generated Tigercat Navigation props reference
 | `offsetBottom?` | `number`          | `-`     | Distance from the bottom of the scroll root to trigger fixed positioning (px). When `ta... |
 | `target?`       | `ScrollRootInput` | `-`     | The scrollable container. Selector, Element, Window, or getter. When omitted, the neare... |
 | `zIndex?`       | `number`          | `10`    | Z-index of the affixed element                                                             |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS class name
+- `children?`: `React.ReactNode`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
 
 Events/callback props: `onChange?`.

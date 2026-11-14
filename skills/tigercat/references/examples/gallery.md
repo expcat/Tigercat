@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Gallery
 
-Runnable modules: `examples/example/vue3/src/examples/gallery/` and `examples/example/react/src/examples/gallery/`.
+Runnable modules: `examples/example/vue3/src/examples/gallery/01/`, `examples/example/react/src/examples/gallery/01/`.
 
 Uses: `Image`, `ImagePreview`.
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Dropdown
 
-`packages/core/src/types/dropdown.ts` · `DropdownProps` · 4/15 props
+`packages/core/src/types/dropdown.ts` · `DropdownProps` · 4/15 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `DropdownMenu`, `DropdownItem`.
 
@@ -23,3 +23,19 @@ Note: 默认 `trigger="click"`。`aria-haspopup` / `aria-expanded` / `aria-contr
 | `open?`     | `boolean`         | `-`       | Whether the dropdown is open (controlled mode)                                             |
 | `disabled?` | `boolean`         | `false`   | Whether the dropdown is disabled                                                           |
 | `portal?`   | `boolean`         | `true`    | Portal the menu through the overlay target chain (nearest overlay-host, then ConfigProv... |
+
+### Remaining props (complete public API)
+
+- `asChild?`: `boolean`; default `false`. Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but...
+- `placement?`: `FloatingPlacement`; default `'bottom-start'`. Dropdown placement relative to trigger
+- `offset?`: `number`; default `4`. Offset distance from trigger element
+- `defaultOpen?`: `boolean`; default `false`. Default open state (uncontrolled mode)
+- `closeOnClick?`: `boolean`; default `true`. Whether to close dropdown on menu item click
+- `showArrow?`: `boolean`; default `true`. Whether to show the dropdown arrow/chevron indicator
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -
+- `renderTrigger?`: `(state: { open: boolean }) => React.ReactNode`; default `-`. -
+- `items?`: `PopupMenuItem[]`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onCheck?`, `onItemSelect?`, `onUpdate:open?`, `onSelect?`.

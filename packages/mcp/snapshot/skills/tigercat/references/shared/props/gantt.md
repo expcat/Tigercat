@@ -11,7 +11,7 @@ description: Compact generated Tigercat Charts props reference
 
 ## Gantt
 
-`packages/core/src/types/gantt.ts` · `GanttProps` · 4/35 props
+`packages/core/src/types/gantt.ts` · `GanttProps` · 4/33 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type          | Default | Notes |
 | ------------ | ------------- | ------- | ----- |
@@ -19,3 +19,37 @@ description: Compact generated Tigercat Charts props reference
 | `scale?`     | `GanttScale`  | `-`     | -     |
 | `rowHeight?` | `number`      | `-`     | -     |
 | `barHeight?` | `number`      | `-`     | -     |
+
+### Remaining props (complete public API)
+
+- `width?`: `number`; default `760`. Chart width. Grows to the laid-out rows when they are wider.
+- `height?`: `number`; default `360`. Chart height. Grows to the laid-out rows when they are taller.
+- `taskLabelWidth?`: `number`; default `-`. -
+- `timelineHeight?`: `number`; default `-`. -
+- `minDate?`: `GanttDateValue`; default `-`. -
+- `maxDate?`: `GanttDateValue`; default `-`. -
+- `minBarWidth?`: `number`; default `-`. -
+- `showToday?`: `boolean`; default `-`. -
+- `now?`: `Date | number | string | null`; default `-`. Caller clock for the today line. `showToday` draws nothing until this is set. Render pa...
+- `showProgress?`: `boolean`; default `-`. -
+- `showDependencies?`: `boolean`; default `-`. -
+- `draggable?`: `boolean`; default `false`. Allow pointer-dragging bars. Callbacks do not turn dragging on. A drag does not keep a...
+- `dateFormatter?`: `(date: Date, scale: GanttScale) => string`; default `-`. -
+- `weekStartsOn?`: `0 | 1 | 2 | 3 | 4 | 5 | 6`; default `-`. -
+- `colors?`: `string[]`; default `-`. -
+- `selectedId?`: `string | number | null`; default `-`. -
+- `ariaLabel?`: `string`; default `-`. -
+- `padding?`: `ChartPadding`; default `{ top: 24, right: 24, bottom: 52, left: 52 }`. Chart padding. Default leaves room for ChartAxis labels (`labelOffset` 28 + tick + dy).
+- `responsive?`: `boolean`; default `false`. Whether the SVG should observe its container and resize responsively.
+- `title?`: `string`; default `-`. Accessible title for the SVG
+- `desc?`: `string`; default `-`. Accessible description for the SVG
+- `className?`: `string`; default `-`. Additional CSS classes
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleChart>`; default `-`. Chart copy overlay. Dedicated aria props win, then `labels`, then `locale.chart`.
+- `hoverable?`: `boolean`; default `false`. Enable hover highlight
+- `activeOpacity?`: `number`; default `1`. Opacity for active/hovered element
+- `inactiveOpacity?`: `number`; default `0.25`. Opacity for inactive elements when one is active
+- `selectable?`: `boolean`; default `false`. Enable click selection
+- `bind?`: `{ tasks?: { id: string; start: number; end: number }[] dependency?: 'FS' | 'SS' | 'FF' | 'SF' source?: { x: number; width: number } target?: { x: number; width: number } window?: { start: number; end: number } rowHeight?: number viewportHeight?: number }`; default `-`. -
+
+Events/callback props: `onTaskClick?`, `onTaskHover?`, `onSelectedIdChange?`, `onTaskChange?`, `onDataChange?`, `onUpdate:selectedId?`, `onUpdate:data?`.

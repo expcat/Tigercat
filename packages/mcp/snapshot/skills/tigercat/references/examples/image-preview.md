@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## ImagePreview
 
-Runnable modules: `examples/example/vue3/src/examples/image-preview/` and `examples/example/react/src/examples/image-preview/`.
+Runnable modules: `examples/example/vue3/src/examples/image-preview/01/`, `examples/example/vue3/src/examples/image-preview/02/`, `examples/example/vue3/src/examples/image-preview/03/`, `examples/example/react/src/examples/image-preview/01/`, `examples/example/react/src/examples/image-preview/02/`, `examples/example/react/src/examples/image-preview/03/`.
 
 Note: `images` 必填（`string | { src, alt? }`）。未传 `open` 视为关（Alert 相反：省略 `open` 是展示）。缩放用 `minScale`/`maxScale`。到头 disable；空列表关闭。
 

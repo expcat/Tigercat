@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## TaskBoard
 
-`packages/core/src/types/task-board.ts` · `TaskBoardProps` · 4/22 props
+`packages/core/src/types/task-board.ts` · `TaskBoardProps` · 4/22 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `ConfigProvider`, `task-board drag utilities`.
 
@@ -24,4 +24,25 @@ Note: 放下下标和指示线是同一个插入点，末尾是源数组长度�
 | `swimlaneField?` | `string`              | `-`         | Card field used to assign a swimlane (`card[swimlaneField] === lane.id`).                  |
 | `showCardCount?` | `boolean`             | `false`     | Show column card-count in the header. When true, a badge shows source `cards.length` (a... |
 
-Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`.
+### Remaining props (complete public API)
+
+- `defaultColumns?`: `TaskBoardColumn[]`; default `-`. Initial column data for uncontrolled usage.
+- `draggable?`: `boolean`; default `true`. Enable card drag-and-drop.
+- `columnDraggable?`: `boolean`; default `true`. Enable column (stage) drag-and-drop reordering.
+- `enforceWipLimit?`: `boolean`; default `false`. Enforce WIP limit — when `true`, cards cannot be dropped into a column that has already...
+- `beforeCardMove?`: `TaskBoardMoveValidator<TaskBoardCardMoveEvent>`; default `-`. Async / sync validation before a card move is committed. Return `false` to cancel the m...
+- `beforeColumnMove?`: `TaskBoardMoveValidator<TaskBoardColumnMoveEvent>`; default `-`. Async / sync validation before a column reorder is committed. Return `false` to cancel...
+- `renderCard?`: `(ctx: { card: TaskBoardCard column: TaskBoardColumn isDragging: boolean }) => unknown`; default `-`. Custom card renderer. Vue `#card` and React `renderCard` share this context object.
+- `renderColumnHeader?`: `(column: TaskBoardColumn) => unknown`; default `-`. Custom column header renderer.
+- `renderColumnFooter?`: `(column: TaskBoardColumn) => unknown`; default `-`. Custom column footer renderer (e.g. an "add card" form).
+- `renderEmptyColumn?`: `(column: TaskBoardColumn) => unknown`; default `-`. Custom empty-column placeholder renderer.
+- `filterText?`: `string`; default `-`. Quick filter / search term applied to card titles. When non-empty, only cards whose tit...
+- `hiddenColumns?`: `(string | number)[]`; default `-`. Column IDs to hide from the board (e.g. for saved views).
+- `allowAddCard?`: `boolean`; default `false`. Show an inline "add card" button in each column footer. Also shown when `onCardAdd` is...
+- `allowAddColumn?`: `boolean`; default `false`. Show an inline "add column" button after all columns. With no `onColumnAdd`, a locale d...
+- `locale?`: `Partial<import('./locale').TigerLocale>`; default `-`. Locale overrides for TaskBoard UI text
+- `labels?`: `Partial<import('./locale').TigerLocaleTaskBoard>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+
+Events/callback props: `onCardMove?`, `onColumnMove?`, `onColumnsChange?`, `onCardAdd?`, `onColumnAdd?`, `onSwimlaneCollapse?`, `onUpdate:columns?`.

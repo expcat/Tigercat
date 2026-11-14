@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## SplitButton
 
-Runnable modules: `examples/example/vue3/src/examples/split-button/` and `examples/example/react/src/examples/split-button/`.
+Runnable modules: `examples/example/vue3/src/examples/split-button/01/`, `examples/example/vue3/src/examples/split-button/02/`, `examples/example/vue3/src/examples/split-button/03/`, `examples/example/react/src/examples/split-button/01/`, `examples/example/react/src/examples/split-button/02/`, `examples/example/react/src/examples/split-button/03/`.
 
 Uses: `Button`, `Dropdown`, `DropdownMenu`, `DropdownItem`.
 

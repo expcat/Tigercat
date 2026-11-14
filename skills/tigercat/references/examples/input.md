@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Input
 
-Runnable modules: `examples/example/vue3/src/examples/input/` and `examples/example/react/src/examples/input/`.
+Runnable modules: `examples/example/vue3/src/examples/input/01/`, `examples/example/vue3/src/examples/input/02/`, `examples/example/vue3/src/examples/input/03/`, `examples/example/vue3/src/examples/input/04/`, `examples/example/vue3/src/examples/input/05/`, `examples/example/react/src/examples/input/01/`, `examples/example/react/src/examples/input/02/`, `examples/example/react/src/examples/input/03/`, `examples/example/react/src/examples/input/04/`, `examples/example/react/src/examples/input/05/`.
 
 Note: React `onChange` 是字符串/数字值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。
 

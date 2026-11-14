@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## SunburstChart
 
-Runnable modules: `examples/example/vue3/src/examples/sunburst-chart/` and `examples/example/react/src/examples/sunburst-chart/`.
+Runnable modules: `examples/example/vue3/src/examples/sunburst-chart/01/`, `examples/example/vue3/src/examples/sunburst-chart/02/`, `examples/example/react/src/examples/sunburst-chart/01/`, `examples/example/react/src/examples/sunburst-chart/02/`.
 
 Vue: `<SunburstChart :data="data" />`
 

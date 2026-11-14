@@ -13,7 +13,7 @@ description: Compact Tigercat Feedback Vue and React usage routes
 
 ## Popover
 
-Runnable modules: `examples/example/vue3/src/examples/popover/` and `examples/example/react/src/examples/popover/`.
+Runnable modules: `examples/example/vue3/src/examples/popover/01/`, `examples/example/vue3/src/examples/popover/02/`, `examples/example/react/src/examples/popover/01/`, `examples/example/react/src/examples/popover/02/`.
 
 Note: 打开时焦点留在触发器，Tab 离开即关闭。有标题时标题是名字，正文是描述。`width` 是有限正数像素，或一整条 CSS 长度；解析失败保持默认最大宽度。
 

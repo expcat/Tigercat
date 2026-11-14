@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## VirtualTable
 
-Runnable modules: `examples/example/vue3/src/examples/virtual-table/` and `examples/example/react/src/examples/virtual-table/`.
+Runnable modules: `examples/example/vue3/src/examples/virtual-table/01/`, `examples/example/vue3/src/examples/virtual-table/02/`, `examples/example/react/src/examples/virtual-table/01/`, `examples/example/react/src/examples/virtual-table/02/`.
 
 Uses: `TableColumn`, `virtual scroll range`, `fixed column offsets`.
 

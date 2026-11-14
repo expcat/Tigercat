@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Marquee
 
-`packages/core/src/types/marquee.ts` · `MarqueeProps` · 4/14 props
+`packages/core/src/types/marquee.ts` · `MarqueeProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃第一份内容。clone 再挂一份子树，inert 且不可聚焦。无 ariaLabel / aria-label / aria-labelledby 时不是 landmark。pauseOnHover 只管指针；焦点暂停是 pauseOnFocus（默认开）。受控 paused 停动画。短内容不够铺满时加大 repeat。方向只用 `start` / `end` / `up` / `down`。
 
@@ -21,3 +21,16 @@ Note: `repeat=1` 或 `< 2`（含 0）静态一份。纵向不设高时视口吃�
 | `duration?`     | `number`           | `20000`   | Time for one full loop, in milliseconds                                                   |
 | `pauseOnHover?` | `boolean`          | `true`    | Pause looping while hovered. Does not control focus-within pause.                         |
 | `pauseOnFocus?` | `boolean`          | `true`    | Pause looping while focus is inside the region. Independent of `pauseOnHover`; default... |
+
+### Remaining props (complete public API)
+
+- `paused?`: `boolean`; default `-`. Controlled pause. When set, hover/focus no longer derive the flag.
+- `gap?`: `MarqueeGap`; default `16`. Gap between items and between duplicated copies. A number is pixels; a string is a CSS...
+- `repeat?`: `number`; default `2`. How many copies of the content to render for a seamless loop. Omitted or non-finite → 2...
+- `ariaLabel?`: `string`; default `-`. Accessible name for the region. Uses `aria-label`, `ariaLabel`, or `labels.ariaLabel`....
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider.
+- `labels?`: `Partial<TigerLocaleMarquee>`; default `-`. -
+- `edgeFade?`: `boolean`; default `false`. Fade both edges. The fade does not receive clicks.
+- `className?`: `string`; default `-`. Additional CSS classes on the root
+- `style?`: `Record<string, unknown>`; default `-`. Inline styles on the root
+- `children?`: `React.ReactNode`; default `-`. -

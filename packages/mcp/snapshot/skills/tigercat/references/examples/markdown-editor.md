@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## MarkdownEditor
 
-Runnable modules: `examples/example/vue3/src/examples/markdown-editor/` and `examples/example/react/src/examples/markdown-editor/`.
+Runnable modules: `examples/example/vue3/src/examples/markdown-editor/01/`, `examples/example/vue3/src/examples/markdown-editor/02/`, `examples/example/react/src/examples/markdown-editor/01/`, `examples/example/react/src/examples/markdown-editor/02/`.
 
 Vue: `<MarkdownEditor v-model="md" />`
 

@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## ConfigProvider
 
-Runnable modules: `examples/example/vue3/src/examples/config-provider/` and `examples/example/react/src/examples/config-provider/`.
+Runnable modules: `examples/example/vue3/src/examples/config-provider/01/`, `examples/example/react/src/examples/config-provider/01/`.
 
 Vue: `<ConfigProvider />`
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Popconfirm
 
-`packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 4/18 props
+`packages/core/src/types/popconfirm.ts` · `PopconfirmProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 打开时焦点留在触发器，Tab 离开即关闭。确认返回的 Promise 在进行中时，Escape、点外面和再点触发器都关不掉；拒绝则留下。Vue 读返回值，不只看 `preventDefault`。
 
@@ -22,4 +22,20 @@ Note: 打开时焦点留在触发器，Tab 离开即关闭。确认返回的 Pro
 | `okText?`      | `string` | `-`     | Confirm button text. Defaults to `locale.common.okText`.                  |
 | `cancelText?`  | `string` | `-`     | Cancel button text. Defaults to `locale.common.cancelText`.               |
 
-Events/callback props: `onConfirm?`, `onCancel?`.
+### Remaining props (complete public API)
+
+- `icon?`: `PopconfirmIconType`; default `'warning'`. Icon type to display
+- `showIcon?`: `boolean`; default `true`. Whether to show icon
+- `okType?`: `'primary' | 'danger'`; default `'primary'`. Confirm button type
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `open?`: `boolean`; default `-`. Whether the popup is open (controlled mode)
+- `defaultOpen?`: `boolean`; default `false`. Default open state (uncontrolled mode)
+- `placement?`: `FloatingPlacement`; default `'top'`. Placement relative to trigger
+- `disabled?`: `boolean`; default `false`. Whether the popup is disabled
+- `offset?`: `number`; default `8`. Offset distance from trigger in pixels
+- `showDelay?`: `number`; default `100`. Hover show delay in milliseconds.
+- `hideDelay?`: `number`; default `100`. Hover hide delay in milliseconds.
+- `asChild?`: `boolean`; default `false`. Merge trigger ARIA / handlers onto the single child instead of rendering a wrapping but...
+- `className?`: `string`; default `-`. Additional CSS classes
+
+Events/callback props: `onConfirm?`, `onCancel?`, `onUpdate:open?`, `onOpenChange?`.

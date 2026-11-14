@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## InfiniteScroll
 
-`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 4/18 props
+`packages/core/src/types/infinite-scroll.ts` · `InfiniteScrollProps` · 4/18 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop        | Type      | Default | Notes                                                      |
 | ----------- | --------- | ------- | ---------------------------------------------------------- |
@@ -19,3 +19,22 @@ description: Compact generated Tigercat Advanced props reference
 | `loading?`  | `boolean` | `-`     | Whether a load is currently in progress                    |
 | `inverse?`  | `boolean` | `-`     | Inverse scroll (load at the start edge, e.g. chat history) |
 | `disabled?` | `boolean` | `-`     | Disable the infinite scroll trigger                        |
+
+### Remaining props (complete public API)
+
+- `error?`: `boolean`; default `-`. The last request failed. The error region stays until this is cleared or retried.
+- `errorText?`: `string`; default `-`. Accessible name and text for the error region.
+- `retryText?`: `string`; default `-`. Accessible name for the retry control shown with `error`.
+- `threshold?`: `number`; default `-`. Pixel `rootMargin` before the sentinel intersects (not the IO ratio). The padded edge f...
+- `loadingText?`: `string`; default `-`. Custom loading text
+- `endText?`: `string`; default `-`. Custom end text shown when !hasMore
+- `orientation?`: `'vertical' | 'horizontal'`; default `-`. Scroll orientation
+- `height?`: `number`; default `-`. Optional px height. The box must be a scroll container (this prop, class, or style). A...
+- `root?`: `Element | null | 'container'`; default `-`. IntersectionObserver root. `null` (default) uses the viewport. `'container'` uses this...
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `className?`: `string`; default `-`. Custom CSS class
+- `children?`: `React.ReactNode`; default `-`. -
+- `loader?`: `React.ReactNode`; default `-`. -
+- `end?`: `React.ReactNode`; default `-`. -
+
+Events/callback props: `onLoadMore?`.

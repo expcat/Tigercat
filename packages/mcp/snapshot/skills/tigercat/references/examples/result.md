@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Result
 
-Runnable modules: `examples/example/vue3/src/examples/result/` and `examples/example/react/src/examples/result/`.
+Runnable modules: `examples/example/vue3/src/examples/result/01/`, `examples/example/vue3/src/examples/result/02/`, `examples/example/vue3/src/examples/result/03/`, `examples/example/react/src/examples/result/01/`, `examples/example/react/src/examples/result/02/`, `examples/example/react/src/examples/result/03/`.
 
 Note: 默认不是 live region。有 `title` 时用 heading（默认 h2）。HTTP 状态画数字，不自动补 “Not Found”。无 title 时只有装饰图标或 HTTP 数字。需要播报时自己写 `role` / `aria-live`。
 

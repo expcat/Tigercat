@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Pagination
 
-`packages/core/src/types/pagination.ts` · `PaginationProps` · 4/24 props
+`packages/core/src/types/pagination.ts` · `PaginationProps` · 4/24 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默认开并跟随 Table `size`；List 默认关。
 
@@ -21,3 +21,28 @@ Note: `size` 是 `sm|md|lg`（与 Form/Button 相同）。Table 内置分页默�
 | `current?`  | `number`  | `1`     | Current page number (1-indexed)           |
 | `pageSize?` | `number`  | `10`    | Number of items per page                  |
 | `simple?`   | `boolean` | `false` | Simple mode - only show prev/next buttons |
+
+### Remaining props (complete public API)
+
+- `defaultCurrent?`: `number`; default `1`. Default current page (for uncontrolled mode)
+- `defaultPageSize?`: `number`; default `10`. Default page size (for uncontrolled mode)
+- `pageSizeOptions?`: `PaginationPageSizeOptionItem[]`; default `[10, 20, 50, 100]`. Available page size options
+- `showQuickJumper?`: `boolean`; default `false`. Whether to show quick jumper (input for page number)
+- `quickJumperValidation?`: `PaginationQuickJumperValidationOptions`; default `-`. Quick jumper delayed validation timing.
+- `showSizeChanger?`: `boolean`; default `false`. Whether to show page size selector
+- `showTotal?`: `boolean`; default `true`. Whether to show total count
+- `totalText?`: `(total: number, range: [number, number]) => string`; default `-`. Custom total text renderer
+- `pageIndicatorText?`: `(current: number, totalPages: number) => string`; default `-`. Custom text renderer for the simple-mode page indicator. Defaults to the locale `pageIn...
+- `size?`: `PaginationSize`; default `'medium'`. Size of pagination
+- `align?`: `PaginationAlign`; default `'center'`. Alignment of pagination
+- `disabled?`: `boolean`; default `false`. Whether pagination is disabled
+- `hideOnSinglePage?`: `boolean`; default `false`. Whether to hide pagination on single page
+- `showLessItems?`: `boolean`; default `false`. Whether to show fewer page buttons around current page
+- `ellipsisJump?`: `boolean`; default `false`. Ellipsis opens a page jump. The value is clamped with the quick jumper.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `locale?`: `TigerLocaleInput`; default `-`. Locale configuration. Accepts a sync locale, promise, or lazy loader.
+- `labels?`: `Partial<TigerLocalePagination>`; default `-`. Flat custom-text overrides for single-language use (no i18n needed). Takes precedence o...
+- `itemRender?`: `(page: number, kind: 'page') => React.ReactNode`; default `-`. -
+
+Events/callback props: `onChange?`, `onPageSizeChange?`, `onUpdate:current?`, `onUpdate:pageSize?`.

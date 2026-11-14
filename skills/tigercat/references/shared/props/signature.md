@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Signature
 
-`packages/core/src/types/signature.ts` · `SignatureProps` · 4/21 props
+`packages/core/src/types/signature.ts` · `SignatureProps` · 4/21 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 受控值是空，或当前笔画导出的 SVG。解析不了的字符串当空，不提交原文。单点在画布、受控值和 `toDataURL()` 里是同一笔。Escape 和 `pointercancel` 丢掉当前笔。一次落笔写一次。只读用 `readOnly`：可聚焦、可提交、不能画。`disabled` 才离开 Tab 序。读 FormItem；id/aria 在画板 widget 上。
 
@@ -22,4 +22,24 @@ Note: 受控值是空，或当前笔画导出的 SVG。解析不了的字符串�
 | `exportType?`   | `SignatureExportType` | `'image/png'` | Format for `toDataURL()`. The controlled `value` is always SVG.      |
 | `readOnly?`     | `boolean`             | `false`       | Focusable and submittable, not drawable. Distinct from `disabled`.   |
 
-Events/callback props: `onChange?`.
+### Remaining props (complete public API)
+
+- `width?`: `number`; default `-`. Logical canvas width in CSS pixels. Omit to follow the container (100%).
+- `height?`: `number`; default `180`. Logical canvas height in CSS pixels.
+- `penColor?`: `string`; default `-`. Stroke color. Defaults to `--tiger-text` (resolved from computed styles).
+- `backgroundColor?`: `string`; default `-`. -
+- `lineWidth?`: `number`; default `2`. -
+- `disabled?`: `boolean`; default `false`. -
+- `clearable?`: `boolean`; default `true`. -
+- `quality?`: `number`; default `0.92`. -
+- `ariaLabel?`: `string`; default `-`. -
+- `clearText?`: `string`; default `-`. -
+- `undoText?`: `string`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleSignature>`; default `-`. -
+- `name?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+- `status?`: `InputStatus`; default `-`. -
+- `className?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onBegin?`, `onEnd?`, `onClear?`, `onUndo?`, `onBlur?`.

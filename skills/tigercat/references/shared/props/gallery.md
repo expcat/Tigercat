@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Gallery
 
-`packages/core/src/types/image.ts` · `GalleryProps` · 3/4 props
+`packages/core/src/types/image.ts` · `GalleryProps` · 3/4 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Image`, `ImagePreview`.
 
@@ -22,3 +22,9 @@ Note: 缩略图是列表里的原生按钮，可用 Tab + Enter / Space 选择�
 | `items`                | `GalleryItem[]` | `-`     | -                            |
 | `currentIndex?`        | `number`        | `-`     | Controlled thumbnail index.  |
 | `defaultCurrentIndex?` | `number`        | `0`     | Uncontrolled starting index. |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. -
+
+Events/callback props: `onCurrentIndexChange?`, `onOpenChange?`, `onUpdate:currentIndex?`, `onUpdate:open?`.

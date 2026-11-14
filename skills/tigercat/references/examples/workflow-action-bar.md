@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## WorkflowActionBar
 
-Runnable modules: `examples/example/vue3/src/examples/workflow-action-bar/` and `examples/example/react/src/examples/workflow-action-bar/`.
+Runnable modules: `examples/example/vue3/src/examples/workflow-detail-shell/01/`, `examples/example/vue3/src/examples/workflow-viewer/01/`, `examples/example/react/src/examples/workflow-detail-shell/01/`, `examples/example/react/src/examples/workflow-viewer/01/`.
 
 Uses: `Button`, `Popconfirm`, `Textarea`, `Dropdown`, `Radio`.
 

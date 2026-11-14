@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## ChatWindow
 
-Runnable modules: `examples/example/vue3/src/examples/chat-window/` and `examples/example/react/src/examples/chat-window/`.
+Runnable modules: `examples/example/vue3/src/examples/chat-window/01/`, `examples/example/vue3/src/examples/chat-window/02/`, `examples/example/react/src/examples/chat-window/01/`, `examples/example/react/src/examples/chat-window/02/`.
 
 Uses: `Avatar`, `Textarea/Input`, `Button`, `VirtualList`, `Empty`.
 

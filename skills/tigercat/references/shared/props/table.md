@@ -11,7 +11,7 @@ description: Compact generated Tigercat Data props reference
 
 ## Table
 
-`packages/core/src/types/table.ts` · `TableProps` · 4/62 props
+`packages/core/src/types/table.ts` · `TableProps` · 4/62 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `TableColumn`, `Pagination`, `row selection`, `expandable rows`.
 
@@ -24,4 +24,65 @@ Note: `column.fixed` 钉列；`columnLockable` 是表头锁定钮（与 `hideabl
 | `pagination?` | `PaginationConfig \| false` | `{ pageSize: 10 }` | Pagination configuration. Omit to use the default pager (`pageSize` 10). Set to `false`... |
 | `sort?`       | `SortState`                 | `-`                | Controlled sort state. When provided, internal sort state will not be mutated.             |
 
-Events/callback props: `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSortChange?`, `onFilterChange?`, `onHiddenColumnKeysChange?`, ....
+### Remaining props (complete public API)
+
+- `columnLockable?`: `boolean`; default `false`. Whether to show a lock button in each column header. Clicking the lock toggles the colu...
+- `hiddenColumnKeys?`: `string[]`; default `-`. Controlled hidden column keys (matched against `columns[].key`). When provided, interna...
+- `defaultHiddenColumnKeys?`: `string[]`; default `-`. Default hidden column keys for uncontrolled mode.
+- `defaultSort?`: `SortState`; default `-`. Default sort state for uncontrolled mode.
+- `filters?`: `Record<string, unknown>`; default `-`. Controlled filters. When provided, internal filter state will not be mutated.
+- `defaultFilters?`: `Record<string, unknown>`; default `-`. Default filters for uncontrolled mode.
+- `size?`: `TableSize`; default `'md'`. Table size
+- `bordered?`: `boolean`; default `false`. Whether to show border
+- `striped?`: `boolean`; default `false`. Whether to show striped rows
+- `hoverable?`: `boolean`; default `true`. Whether to highlight row on hover
+- `loading?`: `boolean`; default `false`. Loading state
+- `locale?`: `TigerLocaleInput`; default `-`. Locale configuration for table text.
+- `labels?`: `Partial<TigerLocaleTable>`; default `-`. Flat table text overrides for this instance.
+- `emptyText?`: `string`; default `'No data'`. Empty state text
+- `rowSelection?`: `RowSelectionConfig<T>`; default `-`. Row selection configuration
+- `expandable?`: `ExpandableConfig<T>`; default `-`. Row expansion configuration. Adds an expand toggle column and renders expanded content...
+- `rowKey?`: `string | ((record: T) => string | number)`; default `'id'`. Row identity. String form reads `record[rowKey]`. Missing keys fall back to the dataSou...
+- `rowClassName?`: `string | ((record: T, index: number) => string)`; default `-`. Custom row class name
+- `stickyHeader?`: `boolean`; default `false`. Whether table head is sticky
+- `maxHeight?`: `string | number`; default `-`. Max height for scrollable table
+- `tableLayout?`: `'auto' | 'fixed'`; default `'auto'`. Table layout algorithm
+- `responsiveMode?`: `TableResponsiveMode`; default `'scroll'`. Mobile layout below the `cardBreakpoint` width (640px by default). `scroll` keeps the t...
+- `cardBreakpoint?`: `TableCardBreakpoint`; default `'sm'`. Viewport breakpoint below which `responsiveMode="card"` activates. `sm` = 640px, `md` =...
+- `cardClassName?`: `string | ((record: T, index: number) => string)`; default `-`. Additional class for mobile card rows, or a resolver per record.
+- `renderCard?`: `(context: TableCardRenderContext<T>) => unknown`; default `-`. Custom mobile card renderer for `responsiveMode="card"`.
+- `cardLayout?`: `TableCardLayoutItem[]`; default `-`. Dedicated layout definitions for card grid mode.
+- `cardSelectionPosition?`: `TableCardSelectionPosition`; default `'controls-row'`. Position of row selection controls in default card rendering.
+- `cardPadding?`: `string | false`; default `'p-3'`. Padding class for default card containers. Set to false to remove the built-in padding.
+- `cardFieldGap?`: `string`; default `'gap-3'`. Gap utility class applied between fields in the default `cardLayout` grid. Provide a fu...
+- `virtual?`: `boolean`; default `false`. Enable virtual scrolling for large datasets. Ignored when `expandable` or `groupBy` is...
+- `autoVirtual?`: `boolean`; default `false`. Automatically enable Table's virtual scroll container for very large **processed** row...
+- `virtualHeight?`: `number`; default `400`. Virtual scroll viewport height (px)
+- `virtualItemHeight?`: `number`; default `40`. Virtual scroll row height (px)
+- `virtualThreshold?`: `number`; default `1000`. Row count at which Table enables virtual mode automatically when `autoVirtual` is true....
+- `editable?`: `boolean`; default `false`. Enable cell editing
+- `editableCells?`: `Record<string, number[]>`; default `-`. Editable cells as `{ [columnKey]: dataSourceIndex[] }`. If omitted and `editable` is tr...
+- `filterMode?`: `'basic' | 'advanced'`; default `'basic'`. Filter mode
+- `advancedFilterRules?`: `FilterRule[]`; default `-`. Advanced filter rules (used when filterMode='advanced')
+- `columnDraggable?`: `boolean`; default `false`. Enable column drag reorder
+- `rowDraggable?`: `boolean`; default `false`. Enable row drag reorder.
+- `summaryRow?`: `{ show: boolean data?: Record<string, unknown> sum?: boolean | string[] }`; default `-`. Summary row. `data` is the caller row. `sum` adds per-column totals. Cells are text, ne...
+- `virtualizeColumns?`: `boolean`; default `false`. Virtualize only the unpinned middle columns. Requires measured widths.
+- `width?`: `number | 'auto'`; default `-`. Scrollport width used by column virtualization.
+- `overscan?`: `number`; default `5`. Extra rows or columns rendered outside the window.
+- `scrollToIndex?`: `number`; default `-`. Scroll the virtual window so this row index is visible.
+- `sorts?`: `{ key: string; direction: 'asc' | 'desc' }[]`; default `-`. Controlled multi-sort. Order is the priority order. Omitted keeps the single `sort` state.
+- `columnWidths?`: `Record<string, number>`; default `-`. Controlled column widths in px, shared with measurement.
+- `cardItemHeight?`: `number`; default `-`. Card-mode row height in px. A positive number virtualizes the card list. Unmeasured or...
+- `grid?`: `boolean`; default `false`. Grid keyboard. Default is the native table: header sort buttons, one row tab stop.
+- `collapsedGroupKeys?`: `string[]`; default `-`. Collapsed group keys. The header count stays the full group.
+- `groupBy?`: `string`; default `-`. Group rows by column key
+- `exportable?`: `boolean`; default `false`. Enable table export
+- `exportScope?`: `TableExportScope`; default `'all'`. Rows the CSV button writes: the current page, selected keys that are loaded, or every l...
+- `exportFilename?`: `string`; default `'export'`. Export filename. A trailing `.csv` is not duplicated.
+- `columnOrder?`: `string[]`; default `-`. Column key order. Omitted is uncontrolled. An array (including `[]`) is controlled.
+- `columnFixed?`: `Record<string, TableFixedPosition | false>`; default `-`. Per-column lock overrides. Omitted is uncontrolled. A map is controlled. Keys absent fr...
+- `cardViewport?`: `boolean`; default `-`. When the caller already knows the card viewport, pass it. Omitted: the first render is...
+- `ariaLabel?`: `string`; default `-`. Accessible name for the `<table>`. Defaults to the table locale name.
+
+Events/callback props: `onChange?`, `onRowClick?`, `onSelectionChange?`, `onSortChange?`, `onFilterChange?`, `onHiddenColumnKeysChange?`, `onPageChange?`, `onExpandChange?`, `onCellChange?`, `onSelectLoaded?`, `onColumnOrderChange?`, `onColumnFixedChange?`, `onRowOrderChange?`, `onExport?`.

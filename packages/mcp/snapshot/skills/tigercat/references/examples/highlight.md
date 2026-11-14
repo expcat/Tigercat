@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## Highlight
 
-Runnable modules: `examples/example/vue3/src/examples/highlight/` and `examples/example/react/src/examples/highlight/`.
+Runnable modules: `examples/example/vue3/src/examples/highlight/01/`, `examples/example/vue3/src/examples/highlight/02/`, `examples/example/vue3/src/examples/highlight/03/`, `examples/example/react/src/examples/highlight/01/`, `examples/example/react/src/examples/highlight/02/`, `examples/example/react/src/examples/highlight/03/`.
 
 Note: `keywords` 只收字符串，按字面量线性扫描，不执行正则。`global={false}` 是每个 keyword 的首次匹配，不是整段只亮一次。children/slot 里的元素节点会保留，匹配的文本包在 `mark` 里。
 

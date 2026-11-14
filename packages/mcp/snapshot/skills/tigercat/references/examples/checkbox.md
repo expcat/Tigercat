@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Checkbox
 
-Runnable modules: `examples/example/vue3/src/examples/checkbox/` and `examples/example/react/src/examples/checkbox/`.
+Runnable modules: `examples/example/vue3/src/examples/checkbox/01/`, `examples/example/vue3/src/examples/checkbox/02/`, `examples/example/vue3/src/examples/checkbox/03/`, `examples/example/react/src/examples/checkbox/01/`, `examples/example/react/src/examples/checkbox/02/`, `examples/example/react/src/examples/checkbox/03/`.
 
 Vue: `<Checkbox v-model="checked">Label</Checkbox>`
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Statistic
 
-`packages/core/src/types/statistic.ts` · `StatisticProps` · 4/11 props
+`packages/core/src/types/statistic.ts` · `StatisticProps` · 4/11 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat` + ConfigProvider locale。`animated` 在 mount 之后播；`prefers-reduced-motion` 直接终值。SSR 始终终值。
 
@@ -21,3 +21,13 @@ Note: `title` 是指标名，不是 HTML tooltip。分组走 `Intl.NumberFormat`
 | `value?`          | `string \| number` | `-`     | The numeric or text value                                 |
 | `groupSeparator?` | `boolean`          | `false` | Whether to show grouping separator (e.g. 1,000)           |
 | `animated?`       | `boolean`          | `false` | Whether to animate numeric values                         |
+
+### Remaining props (complete public API)
+
+- `precision?`: `number`; default `-`. Precision (decimal places) for numeric values
+- `prefix?`: `string`; default `-`. Prefix text or symbol before the value
+- `suffix?`: `string`; default `-`. Suffix text or symbol after the value
+- `animationDuration?`: `number`; default `-`. Numeric animation duration in milliseconds
+- `size?`: `ComponentSize`; default `-`. Component size
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `className?`: `string`; default `-`. Custom class name

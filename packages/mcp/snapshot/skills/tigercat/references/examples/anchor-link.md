@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## AnchorLink
 
-Runnable modules: `examples/example/vue3/src/examples/anchor-link/` and `examples/example/react/src/examples/anchor-link/`.
+Runnable modules: `examples/example/vue3/src/examples/anchor/01/`, `examples/example/vue3/src/examples/anchor/02/`, `examples/example/vue3/src/examples/anchor/03/`, `examples/example/react/src/examples/anchor/01/`, `examples/example/react/src/examples/anchor/02/`, `examples/example/react/src/examples/anchor/03/`.
 
 Vue: `<AnchorLink href="#intro" title="Intro" />`
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## SchemaForm
 
-`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/30 props
+`packages/core/src/types/schema-form.ts` · `SchemaFormProps` · 4/29 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Form`, `FormItem`, `Input`, `Select`, `Button`.
 
@@ -24,4 +24,32 @@ Note: 用 JSON schema 渲 Form / FormItem，不是表单设计器。字段 `name
 | `value?`      | `FormValues`       | `-`     | Form values. Controlled when passed (including `{}`). Vue: `modelValue` / `v-model`. Re... |
 | `conditions?` | `FormConditions`   | `-`     | Extra conditions merged over schema-derived conditions.                                    |
 
-Events/callback props: `onChange?`, `onSubmit?`, `onReset?`.
+### Remaining props (complete public API)
+
+- `defaultValue?`: `FormValues`; default `-`. Uncontrolled initial values, merged over schema defaults.
+- `source?`: `FormValues`; default `-`. Remote/DTO object run through field `mapIn` / `valuePath`. Form `value` still wins.
+- `showActions?`: `boolean`; default `true`. Show submit / reset actions.
+- `submitText?`: `string`; default `-`. Submit button text. Falls back to locale.
+- `resetText?`: `string`; default `-`. Reset button text. Falls back to locale.
+- `labels?`: `Partial<TigerLocaleSchemaForm>`; default `-`. Locale override merged on top of ConfigProvider locale.
+- `ariaLabel?`: `string`; default `-`. Accessible name for the form region.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, unknown>`; default `-`. Custom styles
+- `labelWidth?`: `string | number`; default `-`. Label width (applies when labelPosition is 'left' or 'right')
+- `labelPosition?`: `FormLabelPosition`; default `'left'`. Label position relative to the control
+- `labelAlign?`: `FormLabelAlign`; default `'right'`. Label alignment
+- `size?`: `ComponentSize`; default `'md'`. Form size
+- `inlineMessage?`: `boolean`; default `true`. Whether to show validation messages inline
+- `showRequiredAsterisk?`: `boolean`; default `true`. Whether to show asterisk for required fields
+- `disabled?`: `boolean`; default `false`. Whether to disable the entire form
+- `loading?`: `boolean`; default `false`. Whether the form is in a loading state (prevents submit)
+- `controller?`: `FormController`; default `-`. Headless controller from `useFormController` / `createFormEngine`. When set, the contro...
+- `fieldDependencies?`: `FormFieldDependencies`; default `-`. Field dependency map: key is the dependent field, value is array of fields it depends o...
+- `validateDebounce?`: `number`; default `0`. Debounce delay for change-triggered field validation in milliseconds. Blur, submit, and...
+- `undoable?`: `boolean`; default `false`. Enable undo/redo for form values
+- `maxHistorySize?`: `number`; default `50`. Maximum undo history size
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override for built-in validation messages. Merged on top of the ConfigProvider l...
+- `renderField?`: `(field: SchemaFormField) => React.ReactNode`; default `-`. -
+- `modelValue?`: `FormValues`; default `-`. -
+
+Events/callback props: `onChange?`, `onSubmit?`, `onReset?`, `onValidate?`.

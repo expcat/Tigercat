@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## Anchor
 
-`packages/core/src/types/anchor.ts` · `AnchorProps` · 4/14 props
+`packages/core/src/types/anchor.ts` · `AnchorProps` · 4/14 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `href` 走 `link-utils`。`javascript:`、`data:`、`vbscript:` 不输出地址。
 
@@ -21,5 +21,18 @@ Note: `href` 走 `link-utils`。`javascript:`、`data:`、`vbscript:` 不输出�
 | `targetOffset?` | `number`          | `-`     | Offset when scrolling to a target section                                                  |
 | `affix?`        | `boolean`         | `true`  | Whether to pin the anchor with Affix (placeholder + live geometry).                        |
 | `offsetTop?`    | `number`          | `0`     | Offset from top of the scroll root when Affix is on, and fallback scroll offset when `t... |
+
+### Remaining props (complete public API)
+
+- `bounds?`: `number`; default `5`. Anchor detection boundary in pixels
+- `showInkInFixed?`: `boolean`; default `true`. Whether to show the ink indicator when Affix is on.
+- `getCurrentAnchor?`: `(activeLink: string) => string`; default `-`. Transform the detected active href. This is not a controlled value.
+- `orientation?`: `AnchorDirection`; default `'vertical'`. Direction of the anchor navigation
+- `className?`: `string`; default `-`. Additional CSS classes
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `children?`: `React.ReactNode`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `labels?`: `Partial<TigerLocaleAnchor>`; default `-`. -
+- `'aria-label'?`: `string`; default `-`. -
 
 Events/callback props: `onClick?`, `onChange?`.

@@ -13,7 +13,7 @@ description: Compact Tigercat Charts Vue and React usage routes
 
 ## Gantt
 
-Runnable modules: `examples/example/vue3/src/examples/gantt/` and `examples/example/react/src/examples/gantt/`.
+Runnable modules: `examples/example/vue3/src/examples/gantt/01/`, `examples/example/vue3/src/examples/gantt/02/`, `examples/example/react/src/examples/gantt/01/`, `examples/example/react/src/examples/gantt/02/`.
 
 Vue: `<Gantt :data="tasks" />`
 

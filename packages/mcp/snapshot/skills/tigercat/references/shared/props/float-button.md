@@ -11,7 +11,7 @@ description: Compact generated Tigercat Navigation props reference
 
 ## FloatButton
 
-`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 4/15 props
+`packages/core/src/types/float-button.ts` · `FloatButtonProps` · 4/15 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop         | Type                | Default          | Notes                                                          |
 | ------------ | ------------------- | ---------------- | -------------------------------------------------------------- |
@@ -19,3 +19,19 @@ description: Compact generated Tigercat Navigation props reference
 | `placement?` | `ViewportPlacement` | `'bottom-right'` | Fixed viewport corner used when floating is true.              |
 | `offset?`    | `ViewportOffset`    | `24`             | Fixed viewport offset used when floating is true.              |
 | `ariaLabel?` | `string`            | `-`              | Accessible label                                               |
+
+### Remaining props (complete public API)
+
+- `shape?`: `FloatButtonShape`; default `'circle'`. Shape of the button
+- `size?`: `FloatButtonSize`; default `'md'`. Button size
+- `tooltip?`: `string`; default `-`. Tooltip text shown on hover
+- `href?`: `string`; default `-`. Link address. Gated by the link allowlist. Omitted renders a button.
+- `badge?`: `string | number`; default `-`. Badge content rendered with Badge. Not a count prop.
+- `type?`: `'primary' | 'default'`; default `'primary'`. Button type / variant
+- `disabled?`: `boolean`; default `false`. Whether the button is disabled
+- `className?`: `string`; default `-`. Additional CSS class name
+- `children?`: `React.ReactNode`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onClick?`.

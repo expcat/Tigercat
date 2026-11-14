@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## ContextMenuItem
 
-Runnable modules: `examples/example/vue3/src/examples/context-menu-item/` and `examples/example/react/src/examples/context-menu-item/`.
+Runnable modules: `examples/example/vue3/src/examples/context-menu/01/`, `examples/example/vue3/src/examples/context-menu/02/`, `examples/example/react/src/examples/context-menu/01/`, `examples/example/react/src/examples/context-menu/02/`.
 
 Vue: `<ContextMenuItem>Copy</ContextMenuItem>`
 

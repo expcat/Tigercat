@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## TreeSelect
 
-Runnable modules: `examples/example/vue3/src/examples/tree-select/` and `examples/example/react/src/examples/tree-select/`.
+Runnable modules: `examples/example/vue3/src/examples/tree-select/01/`, `examples/example/vue3/src/examples/tree-select/02/`, `examples/example/vue3/src/examples/tree-select/03/`, `examples/example/react/src/examples/tree-select/01/`, `examples/example/react/src/examples/tree-select/02/`, `examples/example/react/src/examples/tree-select/03/`.
 
 Note: 选中的是节点 `key`。空单选是 `null`，空多选是 `[]`。`''` 不是键，`0` 是合法键。勾选框表示级联，`checkStrategy` 只决定提交哪些键；`checkStrictly` 时不按策略过滤。搜索零命中是空列表。`defaultExpandAll` 只在树第一次有数据时生效。浮层高度只留 `listHeight`。文案在 `locale.treeSelect`。只读用 `readOnly`。
 

@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## NotificationCenter
 
-Runnable modules: `examples/example/vue3/src/examples/notification-center/` and `examples/example/react/src/examples/notification-center/`.
+Runnable modules: `examples/example/vue3/src/examples/notification-center/01/`, `examples/example/vue3/src/examples/notification-center/02/`, `examples/example/react/src/examples/notification-center/01/`, `examples/example/react/src/examples/notification-center/02/`.
 
 Uses: `Card`, `Tabs/TabPane`, `List`, `Text`, `Button`, `Loading`.
 

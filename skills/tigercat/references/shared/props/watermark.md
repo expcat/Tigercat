@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## Watermark
 
-`packages/core/src/types/watermark.ts` · `WatermarkProps` · 4/17 props
+`packages/core/src/types/watermark.ts` · `WatermarkProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `gapX`/`gapY` 是透明间距。默认墨水是 `--tiger-text` 的 15% 混合；画布绘制前解析成真实颜色，解析失败时用 `rgba(0,0,0,0.15)`，不会铺成不透明黑。图片水印按同样的 15% alpha 绘制。主题色变化会重绘。`image` 失败回退 `content`。打印带 print-color-adjust。直子 overlay 被卸或覆盖样式被剥才重挂，自身绘制不重挂。
 
@@ -21,3 +21,19 @@ Note: `gapX`/`gapY` 是透明间距。默认墨水是 `--tiger-text` 的 15% 混
 | `font?`    | `WatermarkFont`      | `-`     | Font configuration                              |
 | `gapX?`    | `number`             | `100`   | Horizontal gap between watermarks in px         |
 | `gapY?`    | `number`             | `100`   | Vertical gap between watermarks in px           |
+
+### Remaining props (complete public API)
+
+- `image?`: `string`; default `-`. Image URL to use as watermark (takes priority over content)
+- `width?`: `number`; default `120`. Watermark width in px
+- `height?`: `number`; default `64`. Watermark height in px
+- `rotate?`: `number`; default `-22`. Rotation angle in degrees
+- `zIndex?`: `number`; default `20`. Z-index of the watermark layer
+- `offsetX?`: `number`; default `0`. X-axis offset in px
+- `offsetY?`: `number`; default `0`. Y-axis offset in px
+- `rowGap?`: `number`; default `0`. Extra row spacing in px, applied as a CSS variable. Does not redraw the tile.
+- `density?`: `number`; default `1`. How tightly tiles repeat. `1` is the encoded tile; larger values pack tighter. CSS only.
+- `printVisible?`: `boolean`; default `true`. Whether the tile stays visible when printing.
+- `className?`: `string`; default `-`. Additional CSS class name
+- `children?`: `React.ReactNode`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -

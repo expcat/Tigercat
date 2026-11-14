@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Mentions
 
-Runnable modules: `examples/example/vue3/src/examples/mentions/` and `examples/example/react/src/examples/mentions/`.
+Runnable modules: `examples/example/vue3/src/examples/mentions/01/`, `examples/example/vue3/src/examples/mentions/02/`, `examples/example/vue3/src/examples/mentions/03/`, `examples/example/react/src/examples/mentions/01/`, `examples/example/react/src/examples/mentions/02/`, `examples/example/react/src/examples/mentions/03/`.
 
 Note: 插入读文本框当前值和选区。解析和插入共用同一套分隔符。搜索事件带上前缀。组合输入期间不插入。清除文案是 `common.clearText`。只读用 `readOnly`，不能从列表插入。不要把 `prefix` 当成 Input 的前缀槽。
 

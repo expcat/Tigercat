@@ -11,7 +11,7 @@ description: Compact generated Tigercat Advanced props reference
 
 ## MarkdownEditor
 
-`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 4/21 props
+`packages/core/src/types/markdown-editor.ts` · `MarkdownEditorProps` · 4/21 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop              | Type                             | Default | Notes                                                            |
 | ----------------- | -------------------------------- | ------- | ---------------------------------------------------------------- |
@@ -19,3 +19,25 @@ description: Compact generated Tigercat Advanced props reference
 | `renderer?`       | `MarkdownRenderer`               | `-`     | Optional markdown preview renderer                               |
 | `toolbar?`        | `MarkdownToolbarItem[] \| false` | `-`     | Toolbar items configuration, or false to hide formatting toolbar |
 | `showModeSwitch?` | `boolean`                        | `-`     | Whether to render the edit/split/preview mode switch             |
+
+### Remaining props (complete public API)
+
+- `value?`: `string`; default `-`. Current markdown content (controlled)
+- `defaultValue?`: `string`; default `-`. Default markdown content (uncontrolled)
+- `placeholder?`: `string`; default `-`. Placeholder text
+- `defaultMode?`: `MarkdownEditorMode`; default `-`. Default display mode (uncontrolled)
+- `height?`: `number | string`; default `-`. Editor height
+- `readOnly?`: `boolean`; default `-`. Read-only mode
+- `disabled?`: `boolean`; default `-`. Disabled state
+- `className?`: `string`; default `-`. Additional CSS class
+- `style?`: `Record<string, string | number>`; default `-`. Custom styles
+- `tabSize?`: `number`; default `-`. Tab width in spaces, integer ≥ 1
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale overrides merged on top of ConfigProvider locale
+- `labels?`: `Partial<TigerLocaleMarkdownEditor>`; default `-`. Text/aria label overrides
+- `ariaLabel?`: `string`; default `-`. Accessible name; falls back to locale then FormItem
+- `bind?`: `{ html?: string; lockScroll?: boolean }`; default `-`. -
+- `name?`: `string`; default `-`. -
+- `modelValue?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onModeChange?`, `onFocus?`, `onBlur?`, `onUpdate:modelValue?`, `onUpdate:mode?`.

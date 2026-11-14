@@ -11,7 +11,7 @@ description: Compact generated Tigercat Composite props reference
 
 ## WorkflowActionBar
 
-`packages/core/src/types/workflow-action-bar.ts` · `WorkflowActionBarProps` · 4/17 props
+`packages/core/src/types/workflow-action-bar.ts` · `WorkflowActionBarProps` · 4/17 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Uses: `Button`, `Popconfirm`, `Textarea`, `Dropdown`, `Radio`.
 
@@ -23,5 +23,21 @@ Note: 完整审批按钮条。默认视觉序同意→拒绝→转交→退回�
 | `buttonPolicy?`    | `WorkflowNodeButtonPolicy` | `-`     | Node button table used when `items` is omitted.                                            |
 | `confirm?`         | `boolean`                  | `false` | Enable the confirm-dialog recipe for confirming actions. Per-item `confirm` overrides t... |
 | `commentRequired?` | `boolean`                  | `-`     | Require a non-empty comment before `onAction` fires. Per-item `commentRequired` wins.      |
+
+### Remaining props (complete public API)
+
+- `disabled?`: `boolean`; default `-`. Disable every action, in addition to per-item `disabled`.
+- `ariaLabel?`: `string`; default `-`. Accessible name for the toolbar. Defaults to "Workflow actions".
+- `commentInput?`: `boolean`; default `-`. Show a comment field in the confirm dialog.
+- `returnTargets?`: `WorkflowReturnTarget[]`; default `-`. Eligible return-to nodes for the built-in radio list.
+- `addsignPositions?`: `WorkflowAddsignPosition[]`; default `-`. Add-sign positions offered in the confirm dialog.
+- `currentSignMode?`: `WorkflowSignMode`; default `-`. Current node sign mode.
+- `isStarter?`: `boolean`; default `-`. When true, `cancel` stays visible while deriving items from `buttonPolicy`.
+- `viewerRole?`: `WorkflowActionBarViewerRole`; default `'readonly'`. Viewer role used when deriving items from `buttonPolicy`.
+- `moreLabel?`: `string`; default `-`. Overflow menu trigger label.
+- `className?`: `string`; default `-`. Additional CSS classes
+- `renderReturnPicker?`: `(ctx: WorkflowReturnPickerContext) => React.ReactNode`; default `-`. -
+- `renderAssigneePicker?`: `(ctx: WorkflowAssigneePickerContext) => React.ReactNode`; default `-`. -
+- `style?`: `Record<string, unknown>`; default `-`. -
 
 Events/callback props: `onAction?`.

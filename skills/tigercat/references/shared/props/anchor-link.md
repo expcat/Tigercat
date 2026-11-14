@@ -11,10 +11,15 @@ description: Compact generated Tigercat Navigation props reference
 
 ## AnchorLink
 
-`packages/core/src/types/anchor.ts` · `AnchorLinkProps` · 3/5 props
+`packages/core/src/types/anchor.ts` · `AnchorLinkProps` · 3/5 compact props · [Complete props](#remaining-props-complete-public-api)
 
 | Prop      | Type     | Default | Notes                                                             |
 | --------- | -------- | ------- | ----------------------------------------------------------------- |
 | `href`    | `string` | `-`     | Target anchor ID (with #)                                         |
 | `title?`  | `string` | `-`     | Link title/text. Nested `AnchorLink` children go below the title. |
 | `target?` | `string` | `-`     | Link target attribute                                             |
+
+### Remaining props (complete public API)
+
+- `className?`: `string`; default `-`. Additional CSS classes
+- `children?`: `React.ReactNode`; default `-`. -

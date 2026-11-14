@@ -13,7 +13,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 ## ImageCompare
 
-Runnable modules: `examples/example/vue3/src/examples/image-compare/` and `examples/example/react/src/examples/image-compare/`.
+Runnable modules: `examples/example/vue3/src/examples/image-compare/01/`, `examples/example/vue3/src/examples/image-compare/02/`, `examples/example/vue3/src/examples/image-compare/03/`, `examples/example/vue3/src/examples/image-compare/04/`, `examples/example/vue3/src/examples/image-compare/05/`, `examples/example/react/src/examples/image-compare/01/`, `examples/example/react/src/examples/image-compare/02/`, `examples/example/react/src/examples/image-compare/03/`, `examples/example/react/src/examples/image-compare/04/`, `examples/example/react/src/examples/image-compare/05/`.
 
 Note: 受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare`。不传宽高且 after 无内容时高度为 0。
 

@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## ColorSwatch
 
-`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 4/19 props
+`packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex 与 `rgb()` 可以是同一支。解析不了的字符串不涂成颜色。只读用 `readOnly`。
 
@@ -22,4 +22,22 @@ Note: 选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex �
 | `colors?`       | `ColorSwatchOptionInput[]` | `-`     | -     |
 | `groups?`       | `ColorSwatchGroup[]`       | `-`     | -     |
 
-Events/callback props: `onChange?`.
+### Remaining props (complete public API)
+
+- `disabled?`: `boolean`; default `-`. -
+- `readOnly?`: `boolean`; default `false`. Focusable and submittable, but the selection cannot change.
+- `size?`: `ComponentSize`; default `-`. -
+- `columns?`: `number`; default `6`. Visual columns of the **current group** grid. ArrowUp/Down stay in that grid.
+- `ariaLabel?`: `string`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider. Do not pass a language id.
+- `labels?`: `Partial<TigerLocaleColorPicker>`; default `-`. -
+- `name?`: `string`; default `-`. -
+- `id?`: `string`; default `-`. -
+- `status?`: `InputStatus`; default `-`. -
+- `style?`: `React.CSSProperties`; default `-`. -
+- `'aria-describedby'?`: `string`; default `-`. -
+- `'aria-labelledby'?`: `string`; default `-`. -
+- `'aria-label'?`: `string`; default `-`. -
+
+Events/callback props: `onChange?`, `onBlur?`.

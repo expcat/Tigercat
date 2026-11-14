@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## ImageAnnotation
 
-Runnable modules: `examples/example/vue3/src/examples/image-annotation/` and `examples/example/react/src/examples/image-annotation/`.
+Runnable modules: `examples/example/vue3/src/examples/image-annotation/01/`, `examples/example/vue3/src/examples/image-annotation/02/`, `examples/example/react/src/examples/image-annotation/01/`, `examples/example/react/src/examples/image-annotation/02/`.
 
 Vue: `<ImageAnnotation src="..." v-model="value" />`
 

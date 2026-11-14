@@ -11,7 +11,7 @@ description: Compact generated Tigercat Basic props reference
 
 ## ImageCompare
 
-`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 4/19 props
+`packages/core/src/types/image-compare.ts` · `ImageCompareProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare`。不传宽高且 after 无内容时高度为 0。
 
@@ -21,3 +21,23 @@ Note: 受控 `position` / `v-model:position`。滑块名走 `locale.imageCompare
 | `afterSrc?`    | `string`                  | `-`            | After (ending) image URL. Vue `after` slot / React `after` node take precedence when pr... |
 | `position?`    | `number`                  | `-`            | Handle position as a percentage of the before image that is visible (controlled mode)      |
 | `orientation?` | `ImageCompareOrientation` | `'horizontal'` | Comparison axis                                                                            |
+
+### Remaining props (complete public API)
+
+- `beforeAlt?`: `string`; default `''`. Alternative text for the before image
+- `afterAlt?`: `string`; default `''`. Alternative text for the after image
+- `fit?`: `ImageFit`; default `'cover'`. Object-fit applied to the before/after `<img>` elements
+- `defaultPosition?`: `number`; default `50`. Initial handle position (uncontrolled mode)
+- `step?`: `number`; default `1`. Keyboard and pointer snap increment, in percentage points
+- `disabled?`: `boolean`; default `false`. Whether pointer and keyboard adjustment are disabled
+- `width?`: `number | string`; default `-`. Root width (CSS value). A number is treated as pixels.
+- `height?`: `number | string`; default `-`. Root height (CSS value). A number is treated as pixels.
+- `beforeTitle?`: `string`; default `-`. Short title for the before side. A slot/node overrides this string.
+- `afterTitle?`: `string`; default `-`. Short title for the after side. A slot/node overrides this string.
+- `ariaLabel?`: `string`; default `-`. Accessible name for the comparison handle. Empty or whitespace is treated as omitted; t...
+- `className?`: `string`; default `-`. Additional CSS classes on the root
+- `style?`: `Record<string, unknown>`; default `-`. Inline styles on the root
+- `before?`: `React.ReactNode`; default `-`. Before pane content. Takes precedence over `beforeSrc`.
+- `after?`: `React.ReactNode`; default `-`. After pane content. Takes precedence over `afterSrc`.
+
+Events/callback props: `onChange?`.

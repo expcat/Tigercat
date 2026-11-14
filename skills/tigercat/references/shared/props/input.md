@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## Input
 
-`packages/core/src/types/input.ts` · `InputProps` · 4/25 props
+`packages/core/src/types/input.ts` · `InputProps` · 4/25 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: React `onChange` 是字符串/数字值，不是 DOM 事件。Vue 是 `update:modelValue`。Vue 非受控可用 `defaultValue`（有 `modelValue` / FormItem 值时忽略）。React 的 `readonly` 与 `readOnly` 是同一标志（冲突用 `readonly`）。
 
@@ -21,3 +21,29 @@ Note: React `onChange` 是字符串/数字值，不是 DOM 事件。Vue 是 `upd
 | `clearable?`    | `boolean`   | `false`  | Whether to show a clear button when the input has value                      |
 | `showPassword?` | `boolean`   | `false`  | Whether to show a password toggle button (only works with type='password')   |
 | `showCount?`    | `boolean`   | `false`  | Whether to show a character count (requires maxLength to show "current/max") |
+
+### Remaining props (complete public API)
+
+- `size?`: `ComponentSize`; default `'md'`. Input size
+- `status?`: `InputStatus`; default `'default'`. Validation status
+- `errorMessage?`: `string`; default `-`. Error message to display
+- `value?`: `string | number`; default `-`. Input value (for controlled mode)
+- `defaultValue?`: `string | number`; default `-`. Default value (for uncontrolled mode)
+- `placeholder?`: `string`; default `-`. Placeholder text
+- `disabled?`: `boolean`; default `false`. Whether the input is disabled
+- `readOnly?`: `boolean`; default `false`. Whether the input is readonly
+- `required?`: `boolean`; default `false`. Whether the input is required
+- `maxLength?`: `number`; default `-`. Maximum length of input
+- `minLength?`: `number`; default `-`. Minimum length of input
+- `name?`: `string`; default `-`. Input name attribute
+- `id?`: `string`; default `-`. Input id attribute
+- `autoComplete?`: `string`; default `-`. Input autocomplete attribute
+- `autoFocus?`: `boolean`; default `false`. Whether to autofocus on mount
+- `prefix?`: `unknown`; default `-`. Leading affix inside the field chrome. Framework layers type this as a node; core only...
+- `suffix?`: `unknown`; default `-`. Trailing affix inside the field chrome. Shown beside clear / password actions when thos...
+- `className?`: `string`; default `-`. -
+- `_shakeTrigger?`: `number`; default `-`. -
+- `modelValue?`: `string | number`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -
+
+Events/callback props: `onInput?`, `onChange?`, `onFocus?`, `onBlur?`, `onClear?`.

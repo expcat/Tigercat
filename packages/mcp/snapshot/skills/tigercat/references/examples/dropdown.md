@@ -13,7 +13,7 @@ description: Compact Tigercat Navigation Vue and React usage routes
 
 ## Dropdown
 
-Runnable modules: `examples/example/vue3/src/examples/dropdown/` and `examples/example/react/src/examples/dropdown/`.
+Runnable modules: `examples/example/vue3/src/examples/dropdown/01/`, `examples/example/vue3/src/examples/dropdown/02/`, `examples/example/vue3/src/examples/dropdown/03/`, `examples/example/react/src/examples/dropdown/01/`, `examples/example/react/src/examples/dropdown/02/`, `examples/example/react/src/examples/dropdown/03/`.
 
 Uses: `DropdownMenu`, `DropdownItem`.
 

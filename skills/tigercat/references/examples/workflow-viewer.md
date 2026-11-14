@@ -13,7 +13,7 @@ description: Compact Tigercat Composite Vue and React usage routes
 
 ## WorkflowViewer
 
-Runnable modules: `examples/example/vue3/src/examples/workflow-viewer/` and `examples/example/react/src/examples/workflow-viewer/`.
+Runnable modules: `examples/example/vue3/src/examples/workflow-viewer/01/`, `examples/example/react/src/examples/workflow-viewer/01/`.
 
 Uses: `Tag`.
 

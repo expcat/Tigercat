@@ -13,7 +13,7 @@ description: Compact Tigercat Advanced Vue and React usage routes
 
 ## VirtualList
 
-Runnable modules: `examples/example/vue3/src/examples/virtual-list/` and `examples/example/react/src/examples/virtual-list/`.
+Runnable modules: `examples/example/vue3/src/examples/virtual-list/01/`, `examples/example/vue3/src/examples/virtual-list/02/`, `examples/example/react/src/examples/virtual-list/01/`, `examples/example/react/src/examples/virtual-list/02/`.
 
 Vue: `<VirtualList :item-count="count" :item-height="40"><template #default="{ index }">{{ index }}</template></VirtualList>`
 

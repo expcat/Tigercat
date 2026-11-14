@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Tour
 
-`packages/core/src/types/tour.ts` · `TourProps` · 4/19 props
+`packages/core/src/types/tour.ts` · `TourProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `current` 是 `steps` 的原始下标。关掉后非受控下标回到第一个未跳过的步骤；受控时发出回到该下标。同一次打开只加载一次 `loadSteps`，失败有可见状态，不先闪 `steps`。只在打开和换步时把目标滚进视口一次。默认洞只是视觉，点击落在遮罩上，目标保持 inert；`interact` 才把该目标排除在 inert 之外。换步时焦点回到气泡。`start` / `end` 按书写方向，left / right 是物理边。气泡沿边移入视口，首选与相反侧均放不下时尝试垂直侧；箭头跟随实际位置指向目标。`closable={false}` 只藏 X。无标题仍有 locale dialog 名。文案只读 `locale.tour`。
 
@@ -21,3 +21,23 @@ Note: `current` 是 `steps` 的原始下标。关掉后非受控下标回到第�
 | `open?`     | `boolean`    | `false` | Whether the tour is open                                                                   |
 | `current?`  | `number`     | `-`     | Current step index (controlled). This is the **original** index in `steps`, not the ind... |
 | `closable?` | `boolean`    | `true`  | Whether to show the close button. `false` only hides the X — Escape and mask click stil... |
+
+### Remaining props (complete public API)
+
+- `loadSteps?`: `TourStepLoader`; default `-`. Load tour steps asynchronously when the tour opens.
+- `nextText?`: `string`; default `locale `tour.nextText``. Text for the "Next" button
+- `prevText?`: `string`; default `locale `tour.prevText``. Text for the "Previous" button
+- `finishText?`: `string`; default `locale `tour.finishText``. Text for the "Finish" button (last step)
+- `maskClosable?`: `boolean`; default `true`. Whether clicking the mask closes the tour.
+- `keyboard?`: `boolean`; default `true`. Whether Escape closes the tour.
+- `showIndicators?`: `boolean`; default `true`. Whether to show step indicators (e.g. 1/3)
+- `locale?`: `Partial<TigerLocale>`; default `-`. Locale override; falls back to ConfigProvider locale
+- `className?`: `string`; default `-`. Additional CSS class name
+- `initialFocus?`: `string`; default `-`. CSS selector for the node to focus when the tour opens. Defaults to the step bubble.
+- `content?`: `React.ReactNode | ((ctx: TourStepContext) => React.ReactNode)`; default `-`. -
+- `renderTitle?`: `(ctx: TourStepContext) => React.ReactNode`; default `-`. -
+- `renderDescription?`: `(ctx: TourStepContext) => React.ReactNode`; default `-`. -
+- `renderFooter?`: `(ctx: TourStepContext) => React.ReactNode`; default `-`. -
+- `style?`: `Record<string, unknown>`; default `-`. -
+
+Events/callback props: `onOpenChange?`, `onClose?`, `onFinish?`, `onChange?`, `onUpdate:open?`, `onUpdate:current?`.

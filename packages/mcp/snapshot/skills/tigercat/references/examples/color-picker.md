@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## ColorPicker
 
-Runnable modules: `examples/example/vue3/src/examples/color-picker/` and `examples/example/react/src/examples/color-picker/`.
+Runnable modules: `examples/example/vue3/src/examples/color-picker/01/`, `examples/example/vue3/src/examples/color-picker/02/`, `examples/example/vue3/src/examples/color-picker/03/`, `examples/example/react/src/examples/color-picker/01/`, `examples/example/react/src/examples/color-picker/02/`, `examples/example/react/src/examples/color-picker/03/`.
 
 Note: 文本在失焦或 Enter 时才按最终格式提交。解析失败留在草稿里并标成错误，不上屏，隐藏域提交空。饱和度、色相和透明度在拖动中只更新预览，松手再写入。触发按钮带 `aria-expanded`。只读用 `readOnly`。
 

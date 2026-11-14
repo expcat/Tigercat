@@ -13,7 +13,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 ## Slider
 
-Runnable modules: `examples/example/vue3/src/examples/slider/` and `examples/example/react/src/examples/slider/`.
+Runnable modules: `examples/example/vue3/src/examples/slider/01/`, `examples/example/vue3/src/examples/slider/02/`, `examples/example/vue3/src/examples/slider/03/`, `examples/example/vue3/src/examples/slider/04/`, `examples/example/vue3/src/examples/slider/05/`, `examples/example/react/src/examples/slider/01/`, `examples/example/react/src/examples/slider/02/`, `examples/example/react/src/examples/slider/03/`, `examples/example/react/src/examples/slider/04/`, `examples/example/react/src/examples/slider/05/`.
 
 Note: Vue 只认 `modelValue` / `update:modelValue`。方向读最近的 `dir`，否则读 ConfigProvider。拖动松手才写入表单，键盘立即写入。`marks` 过密时只标两端。
 
