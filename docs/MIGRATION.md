@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+共享链接门禁现在拒绝 `/\outside.example/path`、`\/outside.example/path` 和 `\\outside.example/path`，与 `//outside.example/path` 一致。受门禁保护的链接不再输出这些 `href`，菜单 schema 也不再把它们视为站内 `path`。跨站地址请改用完整的 `https://outside.example/path`；站内地址请使用 `/path` 这类普通路径。
+
 React Gallery、Image、ImageGroup 与 ImagePreview 的预览挂到同源父文档时，Tab 现在按预览内的控件顺序前进。Gallery 选第二图后按 Enter 打开预览，第一次 Tab 从「关闭预览」移到「上一张图片」；此前跨 document 的焦点被误判为预览外部，Tab 会再次停在关闭按钮。调用方式不用改。
 
 `colorSchemeInitScript` 现在把内联脚本正文中的 `<` 写成 `\u003c`，再包进 `<script>`。`storageKey` 或 `attribute` 含有 `</script>` 时，插入页面后不再提前结束脚本，也不会多出脚本外面的元素。脚本运行时这两个字符串的值不变；不含 `<` 的配置生成的 HTML 与以前相同。调用方式不用改。

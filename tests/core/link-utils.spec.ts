@@ -59,6 +59,20 @@ describe('link-utils protocol gate', () => {
     expect(isInternalLinkPath('//cdn.example/a.png')).toBe(false)
   })
 
+  it('rejects protocol-relative addresses with slash and backslash combinations', () => {
+    for (const href of [
+      '//outside.example/path',
+      '/\\outside.example/path',
+      '\\/outside.example/path',
+      '\\\\outside.example/path'
+    ]) {
+      expect(isAllowedLinkUrl(href), href).toBe(false)
+      expect(isInternalLinkPath(href), href).toBe(false)
+      expect(resolveLinkHref(href), href).toBeUndefined()
+      expect(resolveLinkAddress({ href, target: '_blank' }), href).toEqual({})
+    }
+  })
+
   it('omits href when disabled or rejected, and secures _blank', () => {
     expect(resolveLinkHref('/ok', { disabled: true })).toBeUndefined()
     expect(resolveLinkAddress({ href: 'javascript:alert(1)', target: '_blank' })).toEqual({})

@@ -33,10 +33,11 @@ const ALLOWED_LINK_PROTOCOLS = new Set<string>(LINK_URL_PROTOCOLS)
 /**
  * Characters browsers ignore while parsing a URL scheme.
  * Stripping them before the protocol check closes `java\nscript:` and `java\tscript:`.
+ * Backslashes normalize to slashes so authority-relative addresses are rejected.
  */
 function stripSchemeNoise(value: string): string {
   // eslint-disable-next-line no-control-regex -- Match the control characters browsers ignore in URL schemes.
-  return value.replace(/[\u0000-\u0020\u007F\\]+/g, '')
+  return value.replace(/[\u0000-\u0020\u007F]+/g, '').replace(/\\/g, '/')
 }
 
 function schemeName(value: string): string | null {
@@ -46,7 +47,8 @@ function schemeName(value: string): string | null {
 
 /**
  * True when `value` is a relative path, query, hash, or an allowlisted protocol.
- * Protocol-relative `//` URLs are rejected. Empty strings are rejected.
+ * Protocol-relative URLs, including backslash variants of `//`, are rejected.
+ * Empty strings are rejected.
  */
 export function isAllowedLinkUrl(value: string | null | undefined): boolean {
   if (typeof value !== 'string') return false

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **链接地址门禁（Core，C023-F02）**：反斜杠按斜杠归一化后再检查地址；`/\outside.example/path`、`\/outside.example/path` 和 `\\outside.example/path` 与 `//` 形式一样被拒绝，不再输出链接地址，也不再被菜单 schema 视为站内路径。
+
 - **图片预览焦点（Core，C014-K01）**：焦点作用域按容器包含关系判断焦点是否在内部，移除跨 document 时错误的 `instanceof Node` 判断。React Gallery 选第二图后按 Enter 打开预览，第一次 Tab 从「关闭预览」前进到「上一张图片」，与 Vue 一致；同一预览修复同时作用于 Image、ImageGroup 与 ImagePreview。
 
 - **颜色方案初始化脚本（Core，X01-F021）**：`colorSchemeInitScript` 先把脚本正文里的 `<` 编成 `\u003c`，再包进 `<script>`。`storageKey` 含 `</script><p id=x01-breakout>` 时，按 HTML 插入后仍只有一个 script，不会多出一个 p。脚本执行时读到的 storageKey 和 attribute 仍是原来的字符串。
