@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Upload 预览来源（Core，C081-F05）**：白名单改为完整 origin 严格匹配。允许 `https://cdn.example` 的图片，同时拒绝 `https://cdn.example.evil.test/a.png`，不再把 URL 字符串前缀当成允许的来源。
+
 - **TreeSelect 搜索键盘（Core / Vue / React，C080-F01）**：展开后的搜索框保留普通输入、Backspace、Delete 和 Ctrl+A 的原生行为。输入 `Beta` 会更新查询并触发搜索，共享按键意图只把已有树导航键交给树处理。
 
 - **TagsInput 清空按钮（Vue / React，C076-F03）**：有标签且 `clearable=true` 时，清空按钮进入自然 Tab 顺序，Enter / Space 各触发一次清空并把焦点送回输入框。

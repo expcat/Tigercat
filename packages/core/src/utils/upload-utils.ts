@@ -493,8 +493,8 @@ export function readUploadResponseUrl(response: unknown): string | undefined {
 }
 
 /**
- * Preview only `blob:` URLs and http(s) origins the caller listed.
- * `allowedOrigins` entries are origins (`https://cdn.example`) or full URL prefixes.
+ * Preview `blob:` and http(s) URLs, restricting http(s) origins when a list is provided.
+ * `allowedOrigins` entries are complete origins (`https://cdn.example`).
  */
 export function filterUploadPreviewUrl(
   url: string | undefined,
@@ -510,10 +510,7 @@ export function filterUploadPreviewUrl(
   } catch {
     return undefined
   }
-  const allowed = allowedOrigins.some(
-    (entry) => entry === origin || entry === url || url.startsWith(entry)
-  )
-  return allowed ? url : undefined
+  return allowedOrigins.includes(origin) ? url : undefined
 }
 
 /** URLs that native submit should include. Uids are never submitted. */

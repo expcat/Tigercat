@@ -4,6 +4,7 @@ import {
   createUploadChunks,
   createUploadController,
   createUploadQueueItem,
+  filterUploadPreviewUrl,
   formatFileSize,
   getDragAreaClasses,
   getPictureCardClasses,
@@ -141,6 +142,17 @@ describe('upload-utils chunk and queue helpers', () => {
 })
 
 describe('upload-utils validation', () => {
+  it('matches preview allowlists by complete origin', () => {
+    const allowedOrigins = ['https://cdn.example']
+
+    expect(filterUploadPreviewUrl('https://cdn.example/a.png', allowedOrigins)).toBe(
+      'https://cdn.example/a.png'
+    )
+    expect(
+      filterUploadPreviewUrl('https://cdn.example.evil.test/a.png', allowedOrigins)
+    ).toBeUndefined()
+  })
+
   it('matches extensions and MIME types case-insensitively', () => {
     const png = new File(['x'], 'photo.png', { type: 'image/png' })
     expect(validateFileType(png, '.PNG')).toBe(true)
