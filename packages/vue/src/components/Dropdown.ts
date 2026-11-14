@@ -79,18 +79,13 @@ export const DropdownMenu = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
-    const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
-
-    const menuClasses = computed(() =>
-      classNames(getDropdownMenuClasses(), props.className, coerceClassValue(attrsClass))
-    )
 
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
     return () => {
       const {
-        class: _class,
+        class: attrsClass,
         style: _style,
         ...restAttrs
       } = attrsRecord as {
@@ -102,7 +97,11 @@ export const DropdownMenu = defineComponent({
         'div',
         {
           ...restAttrs,
-          class: menuClasses.value,
+          class: classNames(
+            getDropdownMenuClasses(),
+            props.className,
+            coerceClassValue(attrsClass)
+          ),
           role: 'menu',
           'data-tiger-dropdown-menu': '',
           style: mergedStyle.value
@@ -163,7 +162,6 @@ export const DropdownItem = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const tigerConfig = useTigerConfig()
     const attrsRecord = attrs as Record<string, unknown>
-    const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
     const context = inject<DropdownContext | null>(DropdownContextKey, null)
@@ -196,21 +194,11 @@ export const DropdownItem = defineComponent({
       emit('check', props.itemType === 'checkbox' ? !props.checked : true)
     }
 
-    const itemClasses = computed(() => {
-      return classNames(
-        props.danger || props.itemType === 'danger'
-          ? getPopupMenuItemClasses(props.disabled, true, props.divided)
-          : getDropdownItemClasses(props.disabled, props.divided),
-        props.className,
-        coerceClassValue(attrsClass)
-      )
-    })
-
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
     return () => {
       const {
-        class: _class,
+        class: attrsClass,
         style: _style,
         ...restAttrs
       } = attrsRecord as {
@@ -229,7 +217,13 @@ export const DropdownItem = defineComponent({
           ...(isLink
             ? { href: safeHref, rel: getSecureRel(target, rel) }
             : { type: 'button', href: undefined, rel: undefined }),
-          class: itemClasses.value,
+          class: classNames(
+            props.danger || props.itemType === 'danger'
+              ? getPopupMenuItemClasses(props.disabled, true, props.divided)
+              : getDropdownItemClasses(props.disabled, props.divided),
+            props.className,
+            coerceClassValue(attrsClass)
+          ),
           role:
             props.itemType === 'checkbox'
               ? 'menuitemcheckbox'
@@ -382,7 +376,6 @@ export const Dropdown = defineComponent({
   emits: ['update:open', 'open-change', 'check', 'select'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
-    const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
     const menuId = `tiger-dropdown-menu-${useId()}`
@@ -547,15 +540,6 @@ export const Dropdown = defineComponent({
 
     onBeforeUnmount(() => hoverController.dispose())
 
-    const containerClasses = computed(() =>
-      classNames(
-        getDropdownContainerClasses(),
-        'tiger-dropdown-container',
-        props.className,
-        coerceClassValue(attrsClass)
-      )
-    )
-
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
     const triggerClasses = computed(() => getDropdownTriggerClasses(props.disabled))
     const menuWrapperClasses = computed(() =>
@@ -689,7 +673,7 @@ export const Dropdown = defineComponent({
           : menuWrapper
 
       const {
-        class: _class,
+        class: attrsClass,
         style: _style,
         ...restAttrs
       } = attrsRecord as {
@@ -702,7 +686,12 @@ export const Dropdown = defineComponent({
         {
           ...restAttrs,
           ref: containerRef,
-          class: containerClasses.value,
+          class: classNames(
+            getDropdownContainerClasses(),
+            'tiger-dropdown-container',
+            props.className,
+            coerceClassValue(attrsClass)
+          ),
           style: mergedStyle.value
         },
         [trigger, menu]

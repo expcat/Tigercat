@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { h } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { Dropdown, DropdownItem, DropdownMenu } from '@expcat/tigercat-vue/Dropdown'
 import { expectNoA11yViolations } from '../utils'
 
@@ -287,6 +287,96 @@ describe('Dropdown', () => {
 
       const root = container.querySelector('.tiger-dropdown-container')
       expect(root?.className).toContain('my-dropdown')
+    })
+  })
+
+  describe('dynamic class', () => {
+    it('updates Dropdown class from attr-before to attr-after', async () => {
+      const rootClass = ref('attr-before')
+      const { container } = render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(
+                Dropdown,
+                { class: rootClass.value },
+                {
+                  default: () => [
+                    h('button', null, 'Trigger'),
+                    h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+                  ]
+                }
+              )
+          }
+        })
+      )
+
+      const root = container.querySelector('.tiger-dropdown-container')
+      expect(root?.className).toContain('attr-before')
+      rootClass.value = 'attr-after'
+      await nextTick()
+      expect(root?.className).toContain('attr-after')
+      expect(root?.className).not.toContain('attr-before')
+    })
+
+    it('updates DropdownItem class from attr-before to attr-after', async () => {
+      const itemClass = ref('attr-before')
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(
+                Dropdown,
+                { defaultOpen: true },
+                {
+                  default: () => [
+                    h('button', null, 'Trigger'),
+                    h(DropdownMenu, null, () => [
+                      h(DropdownItem, { class: itemClass.value }, () => 'Item 1')
+                    ])
+                  ]
+                }
+              )
+          }
+        })
+      )
+
+      const item = screen.getByRole('menuitem', { name: 'Item 1' })
+      expect(item.className).toContain('attr-before')
+      itemClass.value = 'attr-after'
+      await nextTick()
+      expect(item.className).toContain('attr-after')
+      expect(item.className).not.toContain('attr-before')
+    })
+
+    it('updates DropdownMenu class from attr-before to attr-after', async () => {
+      const menuClass = ref('attr-before')
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(
+                Dropdown,
+                { defaultOpen: true },
+                {
+                  default: () => [
+                    h('button', null, 'Trigger'),
+                    h(DropdownMenu, { class: menuClass.value }, () => [
+                      h(DropdownItem, null, () => 'Item 1')
+                    ])
+                  ]
+                }
+              )
+          }
+        })
+      )
+
+      const menu = screen.getByRole('menu')
+      expect(menu.className).toContain('attr-before')
+      menuClass.value = 'attr-after'
+      await nextTick()
+      expect(menu.className).toContain('attr-after')
+      expect(menu.className).not.toContain('attr-before')
     })
   })
 

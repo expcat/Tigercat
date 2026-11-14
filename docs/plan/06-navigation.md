@@ -16,7 +16,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ## 依赖与顺序
 
-- ContextMenu 与 Dropdown 共用实现：C088-F01、C088-F03、C088-F06 和 [02](02-core-theme-i18n.md) 的 X01-F016、X01-F017、S12 一起做。
+- ContextMenu 与 Dropdown 共用实现：C088-F01、C088-F03、C088-F06 和 [02](02-core-theme-i18n.md) 的 X01-F016、X01-F017 一起做。
 - Menu：先 C098-F01、C098-F02，再做 MenuItem、MenuItemGroup、SubMenu 的条目。
 - NavigationMenu：先 C102-F01、C102-F02、C102-F03，再做 Content、Item、Link、List、Trigger 的条目。
 - Breadcrumb：C086-F01 与 C087-F01 同批。
@@ -27,7 +27,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 本篇 79 条：P1 9、P2 54、P3 16。
 按波次：W1 9、W4 54、W9 16。
 
-已移到 [01](01-shared-root-causes.md) 的条目：C086-F03（S13）、C088-F05（S13）、C089-F01（S12）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
+已移到 [01](01-shared-root-causes.md) 的条目：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
 本篇的 P1：C086-F01、C087-F01、C088-F01、C088-F07、C096-F01、C098-F01、C098-F02、C102-F01、C102-F02。
 
@@ -125,7 +125,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C092 Dropdown
 
-报告 `groups/navigation/Dropdown.md`，队列状态 needs-evidence。另受 S01、S12、C088-F01、C088-F03、C088-F04、C088-F06、X01-F002、X01-F016、X01-F017 影响。
+报告 `groups/navigation/Dropdown.md`，队列状态 needs-evidence。另受 S01、C088-F01、C088-F03、C088-F04、C088-F06、X01-F002、X01-F016、X01-F017 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                   | 验收                                                                               |
 | -------- | ---- | ---- | ---- | ---- | ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
@@ -136,7 +136,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C093 DropdownItem
 
-报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02、S12、C088-F03、C088-F06、C092-F01 影响。
+报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02、C088-F03、C088-F06、C092-F01 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                                 | 验收                                                                              |
 | -------- | ---- | ---- | ----- | ---- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
@@ -336,11 +336,11 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 报告没有给这些组件立新的编号。右列是并入的既有条目，修那些条目时要在这里复验。
 
-| 任务 | 组件                  | 报告                                         | 并入的条目              |
-| ---- | --------------------- | -------------------------------------------- | ----------------------- |
-| C090 | ContextMenuMenu       | `groups/navigation/ContextMenuMenu.md`       | S02、S12                |
-| C091 | ContextMenuSub        | `groups/navigation/ContextMenuSub.md`        | S02、S07、S12、C088-F01 |
-| C094 | DropdownMenu          | `groups/navigation/DropdownMenu.md`          | S02、S12                |
-| C103 | NavigationMenuContent | `groups/navigation/NavigationMenuContent.md` | S02、S07、C102-F01      |
-| C112 | Steps                 | `groups/navigation/Steps.md`                 | S01、S04、S08           |
-| C113 | StepsItem             | `groups/navigation/StepsItem.md`             | S01、S02、S04、S08      |
+| 任务 | 组件                  | 报告                                         | 并入的条目         |
+| ---- | --------------------- | -------------------------------------------- | ------------------ |
+| C090 | ContextMenuMenu       | `groups/navigation/ContextMenuMenu.md`       | S02                |
+| C091 | ContextMenuSub        | `groups/navigation/ContextMenuSub.md`        | S02、S07、C088-F01 |
+| C094 | DropdownMenu          | `groups/navigation/DropdownMenu.md`          | S02                |
+| C103 | NavigationMenuContent | `groups/navigation/NavigationMenuContent.md` | S02、S07、C102-F01 |
+| C112 | Steps                 | `groups/navigation/Steps.md`                 | S01、S04、S08      |
+| C113 | StepsItem             | `groups/navigation/StepsItem.md`             | S01、S02、S04、S08 |

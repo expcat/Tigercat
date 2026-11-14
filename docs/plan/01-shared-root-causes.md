@@ -2,7 +2,7 @@
 
 [路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
-同一个根因在很多组件的报告里重复出现。这里把它们收成 2 个任务（S12–S13），共 24 条发现，全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
+同一个根因在很多组件的报告里重复出现。这里把它们收成 1 个任务（S13），共 23 条发现，全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
 
 ## 目标
 
@@ -22,22 +22,7 @@
 
 | 任务 | 根因                                    | 主发现                                | 波及组件数 |
 | ---- | --------------------------------------- | ------------------------------------- | ---------- |
-| S12  | Vue 动态 class 停在初始值               | C089-F01                              | 6          |
 | S13  | Vue 手写导出的 Props 类型与运行时不一致 | C022-F03、C034-F04、C048-F02 等 23 条 | 23         |
-
-## S12 Vue 动态 class 停在初始值
-
-**现状。** `setup` 里保存了第一次的 `attrs.class`，computed 一直合并旧值，render 又把当前 class 剔掉。
-
-**做法。** 每次 render 读当前 `attrs.class`，再用现有 helper 合并。
-
-**做完的标准。** 见下表；ContextMenuMenu、ContextMenuSub、Dropdown、DropdownItem、DropdownMenu 同样通过。
-
-| 编号     | 级别 | 波次 | 端  | 类别 | 条目                        | 验收                                                                   |
-| -------- | ---- | ---- | --- | ---- | --------------------------- | ---------------------------------------------------------------------- |
-| C089-F01 | P2   | W0   | Vue | 行为 | Vue 的动态 class 保留初始值 | Item 的 class 由 attr-before 改为 attr-after 后，DOM 类名为 attr-after |
-
-并入的组件（5）：ContextMenuMenu、ContextMenuSub、Dropdown、DropdownItem、DropdownMenu。
 
 ## S13 Vue 手写导出的 Props 类型与运行时不一致
 

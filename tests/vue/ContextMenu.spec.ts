@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { h } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import {
   ContextMenu,
   ContextMenuItem,
@@ -258,6 +258,91 @@ describe('ContextMenu', () => {
       const { container } = renderMenu({ className: 'my-context-menu' })
       const root = container.querySelector('.tiger-context-menu')
       expect(root?.className).toContain('my-context-menu')
+    })
+  })
+
+  describe('dynamic class', () => {
+    it('updates ContextMenuItem class from attr-before to attr-after', async () => {
+      const itemClass = ref('attr-before')
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ContextMenu, null, {
+                default: () => [
+                  h('div', null, 'Surface'),
+                  h(ContextMenuMenu, null, () => [
+                    h(ContextMenuItem, { class: itemClass.value }, () => 'Copy')
+                  ])
+                ]
+              })
+          }
+        })
+      )
+
+      await openMenu()
+      const item = screen.getByRole('menuitem', { name: 'Copy' })
+      expect(item.className).toContain('attr-before')
+      itemClass.value = 'attr-after'
+      await nextTick()
+      expect(item.className).toContain('attr-after')
+      expect(item.className).not.toContain('attr-before')
+    })
+
+    it('updates ContextMenuMenu class from attr-before to attr-after', async () => {
+      const menuClass = ref('attr-before')
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ContextMenu, null, {
+                default: () => [
+                  h('div', null, 'Surface'),
+                  h(ContextMenuMenu, { class: menuClass.value }, () => [
+                    h(ContextMenuItem, null, () => 'Copy')
+                  ])
+                ]
+              })
+          }
+        })
+      )
+
+      await openMenu()
+      const menu = screen.getByRole('menu')
+      expect(menu.className).toContain('attr-before')
+      menuClass.value = 'attr-after'
+      await nextTick()
+      expect(menu.className).toContain('attr-after')
+      expect(menu.className).not.toContain('attr-before')
+    })
+
+    it('updates ContextMenuSub class from attr-before to attr-after', async () => {
+      const subClass = ref('attr-before')
+      render(
+        defineComponent({
+          setup() {
+            return () =>
+              h(ContextMenu, null, {
+                default: () => [
+                  h('div', null, 'Surface'),
+                  h(ContextMenuMenu, null, () => [
+                    h(ContextMenuSub, { class: subClass.value, title: 'More' }, () => [
+                      h(ContextMenuItem, null, () => 'Share')
+                    ])
+                  ])
+                ]
+              })
+          }
+        })
+      )
+
+      await openMenu()
+      const trigger = document.querySelector('[data-tiger-context-menu-sub-trigger]')
+      expect(trigger?.className).toContain('attr-before')
+      subClass.value = 'attr-after'
+      await nextTick()
+      expect(trigger?.className).toContain('attr-after')
+      expect(trigger?.className).not.toContain('attr-before')
     })
   })
 })

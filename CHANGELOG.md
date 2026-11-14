@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **动态 class（Vue，S12 / C089-F01）**：ContextMenuItem、ContextMenuMenu、ContextMenuSub、Dropdown、DropdownItem 与 DropdownMenu 每次渲染读取当前 `class` 再合并。同一实例从 attr-before 改为 attr-after 后，DOM 类名为 attr-after。
+
 - **原型键回退（Core / Vue / React，S11）**：Button、Text、Icon、Result、Container、Card、AspectRatio、Avatar 与 AvatarGroup 的运行时映射只认自身的键。`toString`、`constructor`、`__proto__` 走既有未知值回退，不再输出函数文本或抛错；与这些名字相同的图标可以注册为自定义图标。
 
 - **受控显示（Vue / React，S10 / C056-F01）**：ColorPicker 与 CronEditor、Input、InputNumber、InputOTP、MaskInput、Mentions、Radio、RadioGroup、Signature、Switch、Textarea、Transfer、Upload 在受控时，已提交的显示跟随外部值。父级不回写时，色块、输入、hidden 和 checked 回到原值；拖动中的颜色预览、聚焦时未提交的数字文本、未完成的 Cron 字段和 Mentions 查询仍保留草稿。未传 value / modelValue 的非受控用法仍在输入后立即更新。

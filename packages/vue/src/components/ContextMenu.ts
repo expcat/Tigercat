@@ -88,18 +88,13 @@ export const ContextMenuMenu = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
-    const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
-
-    const menuClasses = computed(() =>
-      classNames(getContextMenuMenuClasses(), props.className, coerceClassValue(attrsClass))
-    )
 
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
     return () => {
       const {
-        class: _class,
+        class: attrsClass,
         style: _style,
         ...restAttrs
       } = attrsRecord as {
@@ -111,7 +106,11 @@ export const ContextMenuMenu = defineComponent({
         'div',
         {
           ...restAttrs,
-          class: menuClasses.value,
+          class: classNames(
+            getContextMenuMenuClasses(),
+            props.className,
+            coerceClassValue(attrsClass)
+          ),
           role: 'menu',
           style: mergedStyle.value
         },
@@ -160,7 +159,6 @@ export const ContextMenuItem = defineComponent({
   emits: ['click'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
-    const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
     const context = inject<ContextMenuContext | null>(ContextMenuContextKey, null)
@@ -178,19 +176,11 @@ export const ContextMenuItem = defineComponent({
       emit('click', event)
     }
 
-    const itemClasses = computed(() =>
-      classNames(
-        getContextMenuItemClasses(props.disabled, props.divided),
-        props.className,
-        coerceClassValue(attrsClass)
-      )
-    )
-
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
     return () => {
       const {
-        class: _class,
+        class: attrsClass,
         style: _style,
         ...restAttrs
       } = attrsRecord as {
@@ -209,7 +199,11 @@ export const ContextMenuItem = defineComponent({
           ...(isLink
             ? { href: safeHref, rel: getSecureRel(target, rel) }
             : { type: 'button', href: undefined, rel: undefined }),
-          class: itemClasses.value,
+          class: classNames(
+            getContextMenuItemClasses(props.disabled, props.divided),
+            props.className,
+            coerceClassValue(attrsClass)
+          ),
           role: 'menuitem',
           tabindex: -1,
           'aria-disabled': props.disabled || undefined,
@@ -252,7 +246,6 @@ export const ContextMenuSub = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
-    const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
     const context = inject<ContextMenuContext | null>(ContextMenuContextKey, null)
@@ -385,14 +378,6 @@ export const ContextMenuSub = defineComponent({
       event.preventDefault()
     }
 
-    const titleClasses = computed(() =>
-      classNames(
-        getContextMenuSubTriggerClasses(props.disabled),
-        props.className,
-        coerceClassValue(attrsClass)
-      )
-    )
-
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
     const popupClasses = computed(() =>
@@ -403,7 +388,7 @@ export const ContextMenuSub = defineComponent({
       if (!context) return null
 
       const {
-        class: _class,
+        class: attrsClass,
         style: _style,
         ...restAttrs
       } = attrsRecord as {
@@ -417,7 +402,11 @@ export const ContextMenuSub = defineComponent({
           ...restAttrs,
           ref: titleRef,
           type: 'button',
-          class: titleClasses.value,
+          class: classNames(
+            getContextMenuSubTriggerClasses(props.disabled),
+            props.className,
+            coerceClassValue(attrsClass)
+          ),
           style: mergedStyle.value,
           role: 'menuitem',
           tabindex: -1,
