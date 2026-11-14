@@ -3,7 +3,9 @@
  *
  * Hosts pass the initiate schema plus the current node's map, then render
  * SchemaForm. Hidden fields drop out of layout and required rules; readonly
- * fields render disabled. This is not a form designer.
+ * node permissions render disabled. Source schema `disabled` and `readOnly`
+ * stay locked: derivation does not clear them, and submit keeps the original
+ * value. This is not a form designer.
  */
 
 import type { FormValues } from '../types/form'
@@ -105,7 +107,7 @@ function applyPermissionToField(
   if (permission === 'readonly') {
     return { ...field, hidden: false, disabled: true }
   }
-  return { ...field, hidden: false, disabled: false }
+  return { ...field, hidden: false, disabled: Boolean(field.disabled) }
 }
 
 function mapGroups(
@@ -171,8 +173,9 @@ export function applyWorkflowFieldPermissionsFromStep(
 }
 
 /**
- * Visible, not-disabled field names after permission derivation.
- * Hosts should only accept client writes for these paths.
+ * Visible field names a client may overwrite after permission derivation.
+ * Source `disabled` / `readOnly`, and paths the node marks readonly or
+ * hidden, are omitted.
  */
 export function listWorkflowEditableFieldNames(
   schema: SchemaFormSchema | undefined,
@@ -182,14 +185,15 @@ export function listWorkflowEditableFieldNames(
 ): string[] {
   const derived = applyWorkflowFieldPermissions(schema, permissions, mode, kind)
   return flattenSchemaFormFields(derived)
-    .filter((field) => !field.disabled)
+    .filter((field) => !field.disabled && !field.readOnly)
     .map((field) => field.name)
 }
 
 /**
  * Merge a client submit over server `original`. Hidden and readonly paths
- * keep the original value; only editable paths overlay. Hosts should call
- * this before writing `formValues` so a client cannot post hidden fields.
+ * keep the original value; only editable paths overlay. Readonly covers the
+ * node permission and a source schema `readOnly` flag. Hosts should call
+ * this before writing `formValues` so a client cannot post locked fields.
  */
 export function mergeWorkflowFormValues(
   original: FormValues | undefined,

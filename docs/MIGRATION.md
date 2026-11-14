@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+工作流字段权限不再打开 schema 里已经禁用或只读的字段。`applyWorkflowFieldPermissions` 在 initiate 下保留源 `disabled: true`，节点 map 把该字段标成 editable 也不能重新打开。`listWorkflowEditableFieldNames`、`mergeWorkflowFormValues`，以及 WorkflowDetailShell 的 `submit()` / `submitAction()`，会同时排除 `disabled` 和 `readOnly`：这些路径提交时保留 original，客户端改写被丢掉。源 `readOnly` 仍渲染为文本，不会被改成禁用控件。节点权限的 readonly 仍把字段设为 disabled，hidden 仍隐藏。此前 initiate 会把 schema disabled 改成 false，并把 schema readOnly 算进可写名单。
+
 Vue 的 Tooltip、Popover、Popconfirm、Dropdown 和 ContextMenu 合并触发器时保留子按钮自己的 disabled。浮层本身未禁用时，包住的 `<button disabled>` 或 `disabled` 的 Button 仍然不可点击。此前合并会清掉子节点的 disabled，按钮变成可点。浮层自身的 disabled 仍会禁用触发器。
 
 表单引擎按时间比较 Date。字段已有某个 Date 时，`setFieldValue`、批量写入或替换模型中的另一个时间会更新值，并触发 `onValuesChange` 与 `subscribe`。此前两个 Date 没有可枚举键，会被当成相等，新值被丢弃且不通知。相同时间点的 Date 仍然不会重复通知，普通对象和数组的比较不变。直接调用 `formValuesEqual` 时，Date 与非 Date 不再相等。

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **工作流字段权限（Core，X01-F003）**：initiate 下 schema `disabled: true` 的字段保持禁用，不进入可写名单，提交保留 original。源 schema `readOnly: true` 同样不接受客户端覆盖，仍按文本渲染。节点权限把字段标成只读或隐藏的行为不变。
+
 - **浮层触发器（Vue，X01-F002）**：Tooltip、Popover、Popconfirm、Dropdown 与 ContextMenu 合并子按钮时保留 disabled。浮层未禁用时，子按钮的 `disabled: true` 和静态 `disabled` 仍保持禁用；浮层自身禁用时触发器继续禁用。
 
 - **表单 Date 字段（Core，X01-F001）**：表单值相等比较按时间区分 Date。字段已是 1 月 1 日时，`setFieldValue` 写入 2 月 1 日会更新模型，并各触发一次 `onValuesChange` 与订阅。相同时间点的 Date 仍视为未变化，不进入撤销历史。

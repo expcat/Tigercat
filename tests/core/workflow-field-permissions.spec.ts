@@ -162,4 +162,37 @@ describe('mergeWorkflowFormValues', () => {
       mergeWorkflowFormValues(original, undefined, schema, approvePermissions, 'approve')
     ).toEqual({ reason: 'Travel' })
   })
+
+  it('keeps schema disabled and readOnly fields locked during initiate', () => {
+    const locked: SchemaFormSchema = {
+      fields: [
+        { name: 'reason', label: 'Reason', required: true, disabled: true },
+        { name: 'note', label: 'Note', readOnly: true },
+        { name: 'amount', label: 'Amount', type: 'number' }
+      ]
+    }
+    const derived = applyWorkflowFieldPermissions(locked, undefined, 'initiate')
+    const fields = flattenSchemaFormFields(derived)
+    expect(fields.find((field) => field.name === 'reason')?.disabled).toBe(true)
+    expect(fields.find((field) => field.name === 'note')?.readOnly).toBe(true)
+    expect(fields.find((field) => field.name === 'note')?.disabled).not.toBe(true)
+    expect(listWorkflowEditableFieldNames(locked, undefined, 'initiate')).toEqual(['amount'])
+    const reopen: Record<string, FieldPermission> = { reason: 'editable', note: 'editable' }
+    expect(listWorkflowEditableFieldNames(locked, reopen, 'initiate')).toEqual(['amount'])
+    expect(
+      flattenSchemaFormFields(applyWorkflowFieldPermissions(locked, reopen, 'initiate')).find(
+        (field) => field.name === 'reason'
+      )?.disabled
+    ).toBe(true)
+    expect(
+      mergeWorkflowFormValues(
+        { reason: 'Travel', note: 'keep', amount: 100 },
+        { reason: 'hacked', note: 'changed', amount: 9 },
+        locked,
+        undefined,
+        'initiate'
+      )
+    ).toEqual({ reason: 'Travel', note: 'keep', amount: 9 })
+    expect(locked.fields?.map((field) => field.disabled)).toEqual([true, undefined, undefined])
+  })
 })

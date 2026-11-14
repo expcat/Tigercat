@@ -17,14 +17,13 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 - X01-F016、X01-F017 先于 06 里 ContextMenu、Dropdown 的 `items` 分支条目（C088-F03、C088-F06）。
 - X01-F015 与 [05](05-form.md) 的 TimePicker 条目同批。C078 的报告补充：Vue 桌面列同样只绑了 click。
-- X01-F003 的 readOnly 合并契约还没确认，见 [14](14-waves.md#开工前要先定方向的条目)。
 
 ## 概览
 
-本篇 20 条：P1 3、P2 15、P3 2。
-按波次：W1 4、W2 15、W9 1。
+本篇 19 条：P1 2、P2 15、P3 2。
+按波次：W1 3、W2 15、W9 1。
 
-本篇的 P1：X01-F003、X01-F015、X01-F016。
+本篇的 P1：X01-F015、X01-F016。
 
 ## 波及多个组件的条目
 
@@ -44,7 +43,6 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                | 验收                                                                                       |
 | -------- | ---- | ---- | ----- | ---- | --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| X01-F003 | P1   | W1   | Core  | 行为 | 工作流权限派生重新启用 schema 已禁用字段            | initiate 下 schema disabled:true 字段仍禁用、不在 editable names、提交保留 original        |
 | X01-F004 | P2   | W2   | Core  | 键盘 | Calendar 年视图上下键只移动一个月                   | 双端 Calendar 年视图 January 按下键到 April，April 按上键到 January                        |
 | X01-F005 | P2   | W2   | Core  | 行为 | 图表系列 key 的去重结果仍会重复                     | 系列名 ['x','x','x-2'] 生成三个互不相同的 key（LineChart/AreaChart/RadarChart）            |
 | X01-F006 | P2   | W2   | Core  | 行为 | Toast 自动编号覆盖显式数字 key 的条目               | 先加 key:1 再加未指定 key 的消息，队列保留两条（Message/NotificationContainer）            |
