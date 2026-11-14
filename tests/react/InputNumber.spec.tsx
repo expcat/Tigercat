@@ -73,6 +73,13 @@ describe('InputNumber (React)', () => {
       await userEvent.click(stepButton(label))
       expect(onChange).toHaveBeenCalledWith(expected)
     })
+    it('keeps the controlled display when the parent rejects a step', async () => {
+      const onChange = vi.fn()
+      const { container } = render(<InputNumber value={5} onChange={onChange} />)
+      await userEvent.click(stepButton('Increase'))
+      expect(onChange).toHaveBeenCalledWith(6)
+      expect(getInput(container)).toHaveValue('5')
+    })
     it('repeats increment while the Increase button is held', () => {
       vi.useFakeTimers()
       try {

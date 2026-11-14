@@ -194,6 +194,8 @@ export const Upload = defineComponent({
     )
 
     const localList = ref<UploadFile[]>([...(props.defaultFileList ?? [])])
+    let pendingList: UploadFile[] | undefined
+    let pendingClear = false
     const fileListValue = computed<UploadFile[]>(() => localList.value)
 
     function isMissingFormValue(raw: unknown) {
@@ -244,14 +246,26 @@ export const Upload = defineComponent({
     })
 
     const setFileList = (value: UploadFile[], _changed?: UploadFile) => {
-      localList.value = value
+      const controlled = props.fileList !== undefined || Boolean(formItemControl?.name.value)
+      if (controlled) {
+        pendingList = value
+        if (!pendingClear) {
+          pendingClear = true
+          queueMicrotask(() => {
+            pendingList = undefined
+            pendingClear = false
+          })
+        }
+      } else {
+        localList.value = value
+      }
       emit('update:fileList', value)
       formItemControl?.onChange(value)
     }
 
     const controller = createUploadController({
       host: {
-        getFileList: () => localList.value,
+        getFileList: () => pendingList ?? localList.value,
         setFileList
       },
       getConfig: () => ({

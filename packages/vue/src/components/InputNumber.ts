@@ -185,6 +185,7 @@ export const InputNumber = defineComponent({
     const wrapperRef = ref<HTMLDivElement | null>(null)
     const focused = ref(false)
     const displayValue = ref('')
+    let displayDirty = false
     const repeatController = createRafRepeatActionController()
     let repeatValue: number | string | null = null
     let suppressNextClick = false
@@ -233,7 +234,8 @@ export const InputNumber = defineComponent({
     watch(
       () => [currentValue.value, focused.value, props.formatter, props.precision] as const,
       () => {
-        if (!focused.value) displayValue.value = toDisplayValue(currentValue.value, false)
+        if (displayDirty && focused.value) return
+        displayValue.value = toDisplayValue(currentValue.value, focused.value)
       },
       { immediate: true }
     )
@@ -258,13 +260,14 @@ export const InputNumber = defineComponent({
         step: props.step,
         snapToStep: props.snapToStep
       })
+      displayDirty = false
       if (changed) {
         if (!isControlled.value) internalValue.value = next
         emit('update:modelValue', next)
         emit('change', next)
         formItemControl?.onChange(next)
       }
-      displayValue.value = toDisplayValue(next, nextFocused)
+      displayValue.value = toDisplayValue(currentValue.value, nextFocused)
       return next
     }
 
@@ -318,6 +321,7 @@ export const InputNumber = defineComponent({
     }
 
     function handleInput(e: Event) {
+      displayDirty = true
       displayValue.value = (e.target as HTMLInputElement).value
     }
 
@@ -330,6 +334,7 @@ export const InputNumber = defineComponent({
 
     function handleFocus(e: FocusEvent) {
       focused.value = true
+      displayDirty = false
       displayValue.value = toDisplayValue(currentValue.value, true)
       emit('focus', e)
     }

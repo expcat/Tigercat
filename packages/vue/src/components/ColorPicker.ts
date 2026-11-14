@@ -260,10 +260,14 @@ export const ColorPicker = defineComponent({
       if (effectiveDisabled.value || locked.value) return
       const resolved = resolveColorPickerDrag('commit', next, props.format, props.showAlpha)
       previewHsva.value = null
-      baseHsva.value = resolved.hsva
-      inputValue.value = resolved.value ?? ''
       inputInvalid.value = false
       textDirty.value = false
+      const controlled =
+        props.modelValue !== undefined || formItemControl?.value.value !== undefined
+      if (!controlled) {
+        baseHsva.value = resolved.hsva
+        inputValue.value = resolved.value ?? ''
+      }
       writeCommitted(resolved.value)
     }
 

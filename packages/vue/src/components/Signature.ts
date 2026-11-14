@@ -263,8 +263,10 @@ export const Signature = defineComponent({
 
     function emitPayload(next: SignatureSession, extra?: { clear?: boolean; undo?: boolean }) {
       const payload = createSignatureChangePayload(next.strokes, exportOptions())
-      session.value = createSignatureSession(next.strokes)
-      strokes.value = next.strokes
+      const controlled = props.modelValue !== undefined || Boolean(formItemControl?.name.value)
+      const shown = controlled ? signatureValueToStrokes(committed.value) : next.strokes
+      session.value = createSignatureSession(shown)
+      strokes.value = shown
       writeCommitted(payload)
       if (extra?.clear) emit('clear')
       if (extra?.undo) emit('undo')

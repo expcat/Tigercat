@@ -84,6 +84,12 @@ describe('InputNumber (Vue)', () => {
       await fireEvent.click(stepButton(label))
       expect(emitted()['update:modelValue'][0]).toEqual([expected])
     })
+    it('keeps the controlled display when the parent rejects a step', async () => {
+      const { container, emitted } = render(InputNumber, { props: { modelValue: 5 } })
+      await fireEvent.click(stepButton('Increase'))
+      expect(emitted()['update:modelValue'][0]).toEqual([6])
+      expect(getInput(container)).toHaveValue('5')
+    })
     it.each([
       ['Decrease', { modelValue: 0, min: 0 }],
       ['Increase', { modelValue: 10, max: 10 }]

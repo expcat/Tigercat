@@ -153,14 +153,17 @@ export const MaskInput = defineComponent({
     function applyValue(inputValue: string, caret: number) {
       const wasCompleted = formatted.value.completed
       const result = applyMaskInput(inputValue, caret, spec.value, maskedValue.value)
-      if (inputRef.value) inputRef.value.value = result.maskedValue
       commit(
         result.rawValue,
         { maskedValue: result.maskedValue, completed: result.completed },
         wasCompleted
       )
+      if (inputRef.value) inputRef.value.value = maskedValue.value
       nextTick(() => {
-        if (inputRef.value) inputRef.value.setSelectionRange(result.caret, result.caret)
+        const input = inputRef.value
+        if (input && input.value === result.maskedValue) {
+          input.setSelectionRange(result.caret, result.caret)
+        }
       })
     }
 

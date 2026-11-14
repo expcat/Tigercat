@@ -157,8 +157,11 @@ export const MaskInput = forwardRef<HTMLInputElement, MaskInputProps>(function M
   const applyValue = (inputValue: string, caret: number) => {
     const wasCompleted = formatted.completed
     const result = applyMaskInput(inputValue, caret, spec, maskedValue)
-    if (inputRef.current) inputRef.current.value = result.maskedValue
-    pendingCaret.current = result.caret
+    const controlled = resolvedValue !== undefined
+    if (inputRef.current) {
+      inputRef.current.value = controlled ? maskedValue : result.maskedValue
+    }
+    pendingCaret.current = controlled ? null : result.caret
     commit(
       result.rawValue,
       { maskedValue: result.maskedValue, completed: result.completed },

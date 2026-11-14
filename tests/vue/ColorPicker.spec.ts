@@ -130,6 +130,26 @@ describe('ColorPicker', () => {
     expect(onChange).toHaveBeenCalledWith('#ff0000')
   })
 
+  it('keeps the controlled color when the parent rejects a preset', async () => {
+    const onChange = vi.fn()
+    const { container } = render(ColorPicker, {
+      props: {
+        modelValue: '#ff0000',
+        name: 'color',
+        presets: ['#00ff00'],
+        closeOnSelect: false,
+        'onUpdate:modelValue': onChange
+      }
+    })
+    await fireEvent.click(trigger(container))
+    await fireEvent.click(screen.getByRole('radio', { name: '#00ff00' }))
+    expect(onChange).toHaveBeenCalledWith('#00ff00')
+    const swatch = trigger(container).firstElementChild as HTMLElement
+    expect(swatch.style.boxShadow).toMatch(/rgb\(255,\s*0,\s*0\)/)
+    expect(screen.getByRole('textbox', { name: 'Color value' })).toHaveValue('#ff0000')
+    expect(container.querySelector('input[type="hidden"]')).toHaveValue('#ff0000')
+  })
+
   it('paints the trigger from rgba instead of falling back to black', () => {
     const { container } = renderWithProps(ColorPicker, {
       modelValue: 'rgba(37, 99, 235, 0.8)',

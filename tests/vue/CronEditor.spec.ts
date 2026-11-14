@@ -27,6 +27,20 @@ describe('CronEditor', () => {
     expect(screen.getByLabelText('Hour mode')).toHaveValue('specific')
   })
 
+  it('keeps the controlled expression when the parent rejects a preset', async () => {
+    const onUpdate = vi.fn()
+    const { container } = render(CronEditor, {
+      props: { modelValue: '0 9 * * 1-5', name: 'job', 'onUpdate:modelValue': onUpdate }
+    })
+    await fireEvent.change(screen.getByLabelText('Cron preset'), {
+      target: { value: '0 0 * * *' }
+    })
+    expect(onUpdate).toHaveBeenCalledWith('0 0 * * *')
+    expect(screen.getByLabelText('Cron expression')).toHaveValue('0 9 * * 1-5')
+    expect(screen.getByLabelText('Cron preset')).toHaveValue('')
+    expect(container.querySelector('input[name="job"]')).toHaveValue('0 9 * * 1-5')
+  })
+
   it('emits update:modelValue when raw expression changes', async () => {
     const onUpdate = vi.fn()
     render(CronEditor, {

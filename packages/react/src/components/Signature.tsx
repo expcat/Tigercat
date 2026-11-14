@@ -264,14 +264,15 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
   const emitPayload = useCallback(
     (session: SignatureSession, extra?: { clear?: boolean; undo?: boolean }) => {
       const payload = createSignatureChangePayload(session.strokes, exportOptions())
-      sessionRef.current = createSignatureSession(session.strokes)
-      setStrokes(session.strokes)
+      const shown = sanitized ? signatureValueToStrokes(committed) : session.strokes
+      sessionRef.current = createSignatureSession(shown)
+      setStrokes(shown)
       setCommitted(payload.value, payload)
       if (extra?.clear) onClear?.()
       if (extra?.undo) onUndo?.()
       return payload
     },
-    [exportOptions, onClear, onUndo, setCommitted]
+    [committed, exportOptions, onClear, onUndo, sanitized, setCommitted]
   )
 
   const clear = useCallback(() => {

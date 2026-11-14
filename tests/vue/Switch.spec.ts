@@ -56,6 +56,17 @@ describe('Switch', () => {
       expect(onUpdate).toHaveBeenCalledWith(true)
       expect(onChange).toHaveBeenCalledWith(true)
     })
+    it('keeps the controlled checked state when the parent rejects the change', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Switch, {
+        props: { modelValue: false, 'onUpdate:modelValue': onUpdate }
+      })
+      const input = container.querySelector('input') as HTMLInputElement
+      await fireEvent.click(input)
+      expect(onUpdate).toHaveBeenCalledWith(true)
+      expect(input.checked).toBe(false)
+      expect(input).toHaveAttribute('aria-checked', 'false')
+    })
     it('toggles when Space is pressed', async () => {
       const onUpdate = vi.fn()
       const { container } = render(Switch, {

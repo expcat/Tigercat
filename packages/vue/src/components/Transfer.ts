@@ -88,8 +88,13 @@ function TransferCheckbox(options: {
       indeterminate: Boolean(options.indeterminate),
       disabled: options.disabled,
       'aria-checked': options.indeterminate ? 'mixed' : options.checked,
-      onChange: () => {
-        if (!options.disabled) options.onChange()
+      onChange: (event: Event) => {
+        if (options.disabled) return
+        options.onChange()
+        const input = event.target as HTMLInputElement
+        const aria = input.getAttribute('aria-checked')
+        if (aria === 'true') input.checked = true
+        else if (aria === 'false') input.checked = false
       }
     }),
     h(

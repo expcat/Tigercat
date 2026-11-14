@@ -128,6 +128,7 @@ export const Switch = defineComponent({
       emit('update:modelValue', next)
       emit('change', next)
       formItemControl?.onChange(next)
+      if (isControlled.value) (event.target as HTMLInputElement).checked = checked.value
     }
 
     const handleBlur = (event: FocusEvent) => {

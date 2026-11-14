@@ -144,6 +144,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     onChange
   })
   const [displayValue, setDisplayValue] = useState('')
+  const displayDirtyRef = useRef(false)
 
   const setInputRefs = (node: HTMLInputElement | null) => {
     inputRef.current = node
@@ -168,7 +169,8 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   }, [focused])
 
   useEffect(() => {
-    if (!focused) setDisplayValue(toDisplayValue(currentValue, false))
+    if (displayDirtyRef.current) return
+    setDisplayValue(toDisplayValue(currentValue, focused))
   }, [currentValue, focused, toDisplayValue])
 
   useEffect(() => () => repeatControllerRef.current.stop(), [])
@@ -196,11 +198,12 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
       step,
       snapToStep
     })
+    displayDirtyRef.current = false
     if (changed) {
       setValue(next)
       formItemControl?.onChange?.(next)
     }
-    setDisplayValue(toDisplayValue(next, nextFocused))
+    setDisplayValue(toDisplayValue(resolvedValue !== undefined ? currentValue : next, nextFocused))
     return next
   }
 
@@ -248,6 +251,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   }
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    displayDirtyRef.current = true
     setDisplayValue(e.target.value)
   }
 
@@ -262,6 +266,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   }
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    displayDirtyRef.current = false
     setFocused(true)
     setDisplayValue(toDisplayValue(currentValue, true))
     onFocus?.(e)

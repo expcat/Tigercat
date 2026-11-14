@@ -30,6 +30,15 @@ describe('Input', () => {
     expect(input).toHaveFocus()
     expect(input).toHaveValue('draft')
   })
+
+  it('keeps the controlled text when the parent rejects input', async () => {
+    const onUpdate = vi.fn()
+    render(Input, { props: { modelValue: 'keep', 'onUpdate:modelValue': onUpdate } })
+    const input = screen.getByRole('textbox')
+    await fireEvent.update(input, 'keep-more')
+    expect(onUpdate).toHaveBeenCalledWith('keep-more')
+    expect(input).toHaveValue('keep')
+  })
   describe('Rendering', () => {
     it('should render with placeholder', () => {
       const { getByPlaceholderText } = renderWithProps(Input, {

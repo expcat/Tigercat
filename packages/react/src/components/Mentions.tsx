@@ -307,12 +307,20 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
 
     const commitValue = useCallback(
       (next: string, caret?: number) => {
-        liveTextRef.current = next
-        if (textareaRef.current) textareaRef.current.value = next
-        if (caret !== undefined) pendingCaret.current = caret
+        const controlled = resolvedValue !== undefined
+        if (!controlled) {
+          liveTextRef.current = next
+          if (textareaRef.current) textareaRef.current.value = next
+          if (caret !== undefined) pendingCaret.current = caret
+        } else if (next === '') {
+          liveTextRef.current = currentValue
+          if (textareaRef.current && textareaRef.current.value !== currentValue) {
+            textareaRef.current.value = currentValue
+          }
+        }
         setCurrentValue(next)
       },
-      [setCurrentValue]
+      [currentValue, resolvedValue, setCurrentValue]
     )
 
     const selectOption = useCallback(

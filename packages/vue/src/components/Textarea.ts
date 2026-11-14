@@ -238,10 +238,16 @@ export const Textarea = defineComponent({
     const handleInput = (event: Event) => {
       const target = event.target as HTMLTextAreaElement
       const value = target.value
-      localValue.value = value
+      const controlled = props.modelValue !== undefined || Boolean(formItemControl?.name.value)
+      if (!controlled) localValue.value = value
       emit('update:modelValue', value)
       emit('input', event)
       formItemControl?.onChange(value)
+      if (!controlled) return
+      nextTick(() => {
+        const shown = localValue.value
+        if (target.value !== shown) target.value = shown
+      })
     }
 
     const handleChange = (event: Event) => emit('change', event)

@@ -131,6 +131,9 @@ export const CronEditor = markFormItemGroupControl(
         }
         return innerValue.value ?? ''
       })
+      const valueControlled = computed(
+        () => props.modelValue !== undefined || formItemControl?.value.value !== undefined
+      )
 
       watch(modelRaw, (next) => {
         if (echoed !== undefined && (echoed ?? '') === next) {
@@ -164,7 +167,6 @@ export const CronEditor = markFormItemGroupControl(
 
       function writeValue(nextValue: string) {
         if (effectiveDisabled.value || props.readOnly) return
-        expressionDraft.value = nextValue
         const stored = cronFormValue(nextValue)
         const nextValidation = validateCronExpressionWithLabels(
           nextValue,
@@ -172,9 +174,10 @@ export const CronEditor = markFormItemGroupControl(
           fieldLabels.value
         )
         const currentStored = cronFormValue(modelRaw.value)
+        if (!valueControlled.value) expressionDraft.value = nextValue
         if (currentStored !== stored) {
-          echoed = stored
-          if (props.modelValue === undefined && formItemControl?.value.value === undefined) {
+          if (!valueControlled.value) {
+            echoed = stored
             innerValue.value = stored
           }
           emit('update:modelValue', stored)
@@ -188,8 +191,10 @@ export const CronEditor = markFormItemGroupControl(
         for (const key of Object.keys(stickyModes) as CronFieldKey[]) {
           delete stickyModes[key]
         }
-        expressionDraft.value = nextValue
-        applyDrafts(nextValue)
+        if (!valueControlled.value) {
+          expressionDraft.value = nextValue
+          applyDrafts(nextValue)
+        }
         writeValue(nextValue)
       }
 
@@ -212,7 +217,7 @@ export const CronEditor = markFormItemGroupControl(
         if (effectiveDisabled.value || props.readOnly || !fieldsReady.value) return
         stickyModes[meta.key] = mode
         const next = applyCronFieldMode(drafts[meta.key], mode, meta)
-        drafts[meta.key] = next
+        if (!valueControlled.value) drafts[meta.key] = next
         writeField(meta, next)
       }
 
@@ -242,9 +247,13 @@ export const CronEditor = markFormItemGroupControl(
             'aria-label': formatCronControlLabel(labels.value.stepAriaLabel, meta.label),
             onInput: (event: Event) => {
               if (props.readOnly) return
-              const text = (event.target as HTMLInputElement).value
-              drafts[meta.key] = { ...draft, stepText: text, mode: 'every' }
-              if (parseOptionalInt(text) != null) writeField(meta, drafts[meta.key])
+              const input = event.target as HTMLInputElement
+              const text = input.value
+              const next = { ...draft, stepText: text, mode: 'every' as const }
+              const commitNow = parseOptionalInt(text) != null
+              if (!valueControlled.value || !commitNow) drafts[meta.key] = next
+              if (commitNow) writeField(meta, next)
+              if (valueControlled.value && commitNow) input.value = draft.stepText
             }
           })
         }
@@ -260,9 +269,13 @@ export const CronEditor = markFormItemGroupControl(
             'aria-label': formatCronControlLabel(labels.value.valueAriaLabel, meta.label),
             onInput: (event: Event) => {
               if (props.readOnly) return
-              const text = (event.target as HTMLInputElement).value
-              drafts[meta.key] = { ...draft, valueText: text, mode: 'specific' }
-              if (parseOptionalInt(text) != null) writeField(meta, drafts[meta.key])
+              const input = event.target as HTMLInputElement
+              const text = input.value
+              const next = { ...draft, valueText: text, mode: 'specific' as const }
+              const commitNow = parseOptionalInt(text) != null
+              if (!valueControlled.value || !commitNow) drafts[meta.key] = next
+              if (commitNow) writeField(meta, next)
+              if (valueControlled.value && commitNow) input.value = draft.valueText
             }
           })
         }
@@ -279,14 +292,14 @@ export const CronEditor = markFormItemGroupControl(
               'aria-label': formatCronControlLabel(labels.value.rangeStartAriaLabel, meta.label),
               onInput: (event: Event) => {
                 if (props.readOnly) return
-                const text = (event.target as HTMLInputElement).value
-                drafts[meta.key] = { ...draft, startText: text, mode: 'range' }
-                if (
-                  parseOptionalInt(text) != null &&
-                  parseOptionalInt(drafts[meta.key].endText) != null
-                ) {
-                  writeField(meta, drafts[meta.key])
-                }
+                const input = event.target as HTMLInputElement
+                const text = input.value
+                const next = { ...draft, startText: text, mode: 'range' as const }
+                const commitNow =
+                  parseOptionalInt(text) != null && parseOptionalInt(draft.endText) != null
+                if (!valueControlled.value || !commitNow) drafts[meta.key] = next
+                if (commitNow) writeField(meta, next)
+                if (valueControlled.value && commitNow) input.value = draft.startText
               }
             }),
             h('input', {
@@ -299,14 +312,14 @@ export const CronEditor = markFormItemGroupControl(
               'aria-label': formatCronControlLabel(labels.value.rangeEndAriaLabel, meta.label),
               onInput: (event: Event) => {
                 if (props.readOnly) return
-                const text = (event.target as HTMLInputElement).value
-                drafts[meta.key] = { ...draft, endText: text, mode: 'range' }
-                if (
-                  parseOptionalInt(drafts[meta.key].startText) != null &&
-                  parseOptionalInt(text) != null
-                ) {
-                  writeField(meta, drafts[meta.key])
-                }
+                const input = event.target as HTMLInputElement
+                const text = input.value
+                const next = { ...draft, endText: text, mode: 'range' as const }
+                const commitNow =
+                  parseOptionalInt(draft.startText) != null && parseOptionalInt(text) != null
+                if (!valueControlled.value || !commitNow) drafts[meta.key] = next
+                if (commitNow) writeField(meta, next)
+                if (valueControlled.value && commitNow) input.value = draft.endText
               }
             })
           ])
@@ -321,9 +334,12 @@ export const CronEditor = markFormItemGroupControl(
           'aria-label': formatCronControlLabel(labels.value.customValueAriaLabel, meta.label),
           onInput: (event: Event) => {
             if (props.readOnly) return
-            const text = (event.target as HTMLInputElement).value
-            drafts[meta.key] = { ...draft, raw: text, mode: 'custom' }
-            writeField(meta, drafts[meta.key])
+            const input = event.target as HTMLInputElement
+            const text = input.value
+            const next = { ...draft, raw: text, mode: 'custom' as const }
+            if (!valueControlled.value) drafts[meta.key] = next
+            writeField(meta, next)
+            if (valueControlled.value) input.value = draft.raw
           }
         })
       }
@@ -389,8 +405,12 @@ export const CronEditor = markFormItemGroupControl(
                 'aria-label': labels.value.expressionAriaLabel,
                 'aria-invalid': expressionInvalid || undefined,
                 'aria-describedby': expressionIssue ? errorId : describedBy,
-                onInput: (event: Event) =>
-                  handleRawExpressionChange((event.target as HTMLInputElement).value)
+                onInput: (event: Event) => {
+                  const input = event.target as HTMLInputElement
+                  const shown = expressionDraft.value
+                  handleRawExpressionChange(input.value)
+                  if (valueControlled.value) input.value = shown
+                }
               }),
               resolvedPresets.value.length > 0
                 ? h(
@@ -406,14 +426,24 @@ export const CronEditor = markFormItemGroupControl(
                       'aria-label': labels.value.presetAriaLabel,
                       onChange: (event: Event) => {
                         if (props.readOnly) return
-                        const nextValue = (event.target as HTMLSelectElement).value
+                        const select = event.target as HTMLSelectElement
+                        const nextValue = select.value
                         if (nextValue) {
                           for (const key of Object.keys(stickyModes) as CronFieldKey[]) {
                             delete stickyModes[key]
                           }
-                          expressionDraft.value = nextValue
-                          applyDrafts(nextValue)
+                          if (!valueControlled.value) {
+                            expressionDraft.value = nextValue
+                            applyDrafts(nextValue)
+                          }
                           writeValue(nextValue)
+                          if (valueControlled.value) {
+                            select.value = resolvedPresets.value.some(
+                              (preset) => preset.value === expressionDraft.value
+                            )
+                              ? expressionDraft.value
+                              : ''
+                          }
                         }
                       }
                     },
@@ -454,11 +484,12 @@ export const CronEditor = markFormItemGroupControl(
                       'aria-invalid': issue ? true : undefined,
                       'aria-describedby': issue ? fieldErrorId : undefined,
                       'aria-label': formatCronControlLabel(labels.value.modeAriaLabel, meta.label),
-                      onChange: (event: Event) =>
-                        handleModeChange(
-                          meta,
-                          (event.target as HTMLSelectElement).value as CronFieldMode
-                        )
+                      onChange: (event: Event) => {
+                        const select = event.target as HTMLSelectElement
+                        const shown = fieldsReady.value ? draft.mode : ''
+                        handleModeChange(meta, select.value as CronFieldMode)
+                        if (valueControlled.value) select.value = shown
+                      }
                     },
                     [
                       fieldsReady.value ? null : h('option', { value: '' }, '\u00a0'),

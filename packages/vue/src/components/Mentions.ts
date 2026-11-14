@@ -276,19 +276,27 @@ export const Mentions = defineComponent({
     }
 
     function commitValue(next: string, caret?: number) {
+      const controlled = props.modelValue !== undefined || typeof formValue.value === 'string'
       const changed = next !== currentValue.value
-      liveText.value = next
-      if (props.modelValue === undefined && typeof formValue.value !== 'string') {
+      if (!controlled) {
+        liveText.value = next
         localValue.value = next
+        if (textareaRef.value) textareaRef.value.value = next
+      } else if (next === '') {
+        liveText.value = currentValue.value
+        if (textareaRef.value && textareaRef.value.value !== currentValue.value) {
+          textareaRef.value.value = currentValue.value
+        }
       }
-      if (textareaRef.value) textareaRef.value.value = next
       if (changed) {
         emit('update:modelValue', next)
         formItemControl?.onChange(next)
       }
       if (caret !== undefined) {
         nextTick(() => {
-          textareaRef.value?.setSelectionRange(caret, caret)
+          if (textareaRef.value?.value === next) {
+            textareaRef.value.setSelectionRange(caret, caret)
+          }
         })
       }
     }

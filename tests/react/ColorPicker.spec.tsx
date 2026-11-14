@@ -154,6 +154,26 @@ describe('ColorPicker', () => {
     expect(onChange).toHaveBeenCalledWith('#ff0000')
   })
 
+  it('keeps the controlled color when the parent rejects a preset', () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <ColorPicker
+        value="#ff0000"
+        name="color"
+        presets={['#00ff00']}
+        closeOnSelect={false}
+        onChange={onChange}
+      />
+    )
+    open(container)
+    fireEvent.click(screen.getByRole('radio', { name: '#00ff00' }))
+    expect(onChange).toHaveBeenCalledWith('#00ff00')
+    const swatch = trigger(container).firstElementChild as HTMLElement
+    expect(swatch.style.boxShadow).toMatch(/rgb\(255,\s*0,\s*0\)/)
+    expect(screen.getByRole('textbox', { name: 'Color value' })).toHaveValue('#ff0000')
+    expect(container.querySelector('input[type="hidden"]')).toHaveValue('#ff0000')
+  })
+
   it('paints the trigger from rgba instead of falling back to black', () => {
     const { container } = render(<ColorPicker value="rgba(37, 99, 235, 0.8)" showAlpha />)
     const swatch = trigger(container).firstElementChild as HTMLElement

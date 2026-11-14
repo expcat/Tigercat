@@ -183,12 +183,12 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
 
   function commit(nextValue: string) {
     if (effectiveDisabled || readOnly) return
-    setExpressionDraft(nextValue)
     const stored = cronFormValue(nextValue)
     const nextValidation = validateCronExpressionWithLabels(nextValue, labels, fieldLabels)
     const currentStored = cronFormValue(valueControlled ? externalRaw : expression)
+    if (!valueControlled) setExpressionDraft(nextValue)
     if (currentStored !== stored) {
-      echoedRef.current = stored
+      if (!valueControlled) echoedRef.current = stored
       setExpression(stored, nextValidation)
       return
     }
@@ -199,7 +199,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     if (readOnly) return
     stickyModes.current = {}
     commit(nextValue)
-    setDrafts(seedCronFieldDrafts(nextValue, stickyModes.current))
+    if (!valueControlled) setDrafts(seedCronFieldDrafts(nextValue, stickyModes.current))
   }
 
   function writeField(meta: CronFieldMeta, draft: CronFieldDraft) {
@@ -221,14 +221,31 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     if (effectiveDisabled || readOnly || !fieldsReady) return
     stickyModes.current[meta.key] = mode
     const next = applyCronFieldMode(drafts[meta.key], mode, meta)
-    setDrafts((prev) => ({ ...prev, [meta.key]: next }))
+    if (!valueControlled) setDrafts((prev) => ({ ...prev, [meta.key]: next }))
     writeField(meta, next)
   }
 
-  function patchDraft(meta: CronFieldMeta, patch: Partial<CronFieldDraft>, commitNow: boolean) {
-    const next = { ...drafts[meta.key], ...patch }
-    setDrafts((prev) => ({ ...prev, [meta.key]: next }))
+  function patchDraft(
+    meta: CronFieldMeta,
+    patch: Partial<CronFieldDraft>,
+    commitNow: boolean,
+    input?: HTMLInputElement
+  ) {
+    const previous = drafts[meta.key]
+    const next = { ...previous, ...patch }
+    if (!valueControlled || !commitNow) setDrafts((prev) => ({ ...prev, [meta.key]: next }))
     if (commitNow) writeField(meta, next)
+    if (!valueControlled || !commitNow || !input) return
+    input.value =
+      patch.stepText !== undefined
+        ? previous.stepText
+        : patch.valueText !== undefined
+          ? previous.valueText
+          : patch.startText !== undefined
+            ? previous.startText
+            : patch.endText !== undefined
+              ? previous.endText
+              : previous.raw
   }
 
   function handleBlur(event: React.FocusEvent<HTMLElement>) {
@@ -255,7 +272,12 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
           onChange={(event) => {
             if (readOnly) return
             const text = event.target.value
-            patchDraft(meta, { stepText: text, mode: 'every' }, parseOptionalInt(text) != null)
+            patchDraft(
+              meta,
+              { stepText: text, mode: 'every' },
+              parseOptionalInt(text) != null,
+              event.target
+            )
           }}
         />
       )
@@ -274,7 +296,12 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
           onChange={(event) => {
             if (readOnly) return
             const text = event.target.value
-            patchDraft(meta, { valueText: text, mode: 'specific' }, parseOptionalInt(text) != null)
+            patchDraft(
+              meta,
+              { valueText: text, mode: 'specific' },
+              parseOptionalInt(text) != null,
+              event.target
+            )
           }}
         />
       )
@@ -297,7 +324,8 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
               patchDraft(
                 meta,
                 { startText: text, mode: 'range' },
-                parseOptionalInt(text) != null && parseOptionalInt(draft.endText) != null
+                parseOptionalInt(text) != null && parseOptionalInt(draft.endText) != null,
+                event.target
               )
             }}
           />
@@ -315,7 +343,8 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
               patchDraft(
                 meta,
                 { endText: text, mode: 'range' },
-                parseOptionalInt(draft.startText) != null && parseOptionalInt(text) != null
+                parseOptionalInt(draft.startText) != null && parseOptionalInt(text) != null,
+                event.target
               )
             }}
           />
@@ -333,7 +362,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
         aria-label={formatCronControlLabel(labels.customValueAriaLabel, meta.label)}
         onChange={(event) => {
           if (readOnly) return
-          patchDraft(meta, { raw: event.target.value, mode: 'custom' }, true)
+            patchDraft(meta, { raw: event.target.value, mode: 'custom' }, true, event.target)
         }}
       />
     )
@@ -376,7 +405,10 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
           aria-label={labels.expressionAriaLabel}
           aria-invalid={expressionInvalid || undefined}
           aria-describedby={expressionIssue ? errorId : describedBy}
-          onChange={(event) => handleRawExpressionChange(event.target.value)}
+          onChange={(event) => {
+            handleRawExpressionChange(event.target.value)
+            if (valueControlled) event.target.value = expressionDraft
+          }}
         />
         {resolvedPresets.length > 0 && (
           <select
@@ -393,7 +425,12 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
               stickyModes.current = {}
               const nextValue = event.target.value
               commit(nextValue)
-              setDrafts(seedCronFieldDrafts(nextValue, stickyModes.current))
+              if (!valueControlled) setDrafts(seedCronFieldDrafts(nextValue, stickyModes.current))
+              else {
+                event.target.value = resolvedPresets.some((preset) => preset.value === expressionDraft)
+                  ? expressionDraft
+                  : ''
+              }
             }}>
             <option value="">{labels.presetPlaceholder}</option>
             {resolvedPresets.map((preset) => (
@@ -431,7 +468,10 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
                 aria-invalid={issue ? true : undefined}
                 aria-describedby={issue ? fieldErrorId : undefined}
                 aria-label={formatCronControlLabel(labels.modeAriaLabel, meta.label)}
-                onChange={(event) => handleModeChange(meta, event.target.value as CronFieldMode)}>
+                onChange={(event) => {
+                  handleModeChange(meta, event.target.value as CronFieldMode)
+                  if (valueControlled) event.target.value = drafts[meta.key].mode
+                }}>
                 {fieldsReady ? null : <option value="">{'\u00a0'}</option>}
                 {cronFieldModes.map((mode) => (
                   <option key={mode} value={mode}>

@@ -271,13 +271,15 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         const resolved = resolveColorPickerDrag('commit', next, format, showAlpha)
         previewRef.current = null
         setPreviewHsva(null)
-        setBaseHsva(resolved.hsva)
-        setInputValue(resolved.value ?? '')
-        setInputInvalid(false)
         textDirtyRef.current = false
+        setInputInvalid(false)
+        if (!valueControlled) {
+          setBaseHsva(resolved.hsva)
+          setInputValue(resolved.value ?? '')
+        }
         writeCommitted(resolved.value)
       },
-      [effectiveDisabled, format, readOnly, showAlpha, writeCommitted]
+      [effectiveDisabled, format, readOnly, showAlpha, valueControlled, writeCommitted]
     )
 
     const commitTextDraft = useCallback(() => {

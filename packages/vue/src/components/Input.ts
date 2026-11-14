@@ -4,6 +4,7 @@ import {
   ref,
   watch,
   h,
+  nextTick,
   inject,
   getCurrentInstance,
   useId,
@@ -218,10 +219,16 @@ export const Input = defineComponent({
     const handleInput = (event: Event) => {
       const target = event.target as HTMLInputElement
       const value = parseInputValue(target, props.type)
-      localValue.value = value
+      const controlled = props.modelValue !== undefined || Boolean(formItemControl?.name.value)
+      if (!controlled) localValue.value = value
       emit('update:modelValue', value)
       emit('input', event)
       formItemControl?.onChange(value)
+      if (!controlled) return
+      nextTick(() => {
+        const shown = String(localValue.value ?? '')
+        if (target.value !== shown) target.value = shown
+      })
     }
 
     const handleChange = (event: Event) => emit('change', event)
@@ -236,10 +243,18 @@ export const Input = defineComponent({
     }
 
     const handleClear = () => {
-      localValue.value = ''
+      const controlled = props.modelValue !== undefined || Boolean(formItemControl?.name.value)
+      if (!controlled) localValue.value = ''
       emit('update:modelValue', '')
       emit('clear')
       formItemControl?.onChange('')
+      if (controlled) {
+        nextTick(() => {
+          const input = inputRef.value
+          const shown = String(localValue.value ?? '')
+          if (input && input.value !== shown) input.value = shown
+        })
+      }
       focusInput()
     }
 

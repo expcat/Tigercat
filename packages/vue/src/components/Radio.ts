@@ -182,17 +182,36 @@ export const Radio = defineComponent({
 
       if (isInGroup.value) {
         groupContext.value?.onChange(props.value)
+        restoreGroupRadios(target)
         return
       }
 
       if (formBound.value) {
         formItemControl?.onChange(props.value)
+        target.checked = !!isChecked.value
         return
       }
 
       if (!isCheckedControlled.value) internalChecked.value = true
       emit('update:modelValue', true)
       emit('change', true, event)
+      if (isCheckedControlled.value) target.checked = !!isChecked.value
+    }
+
+    function restoreGroupRadios(target: HTMLInputElement) {
+      const expected = groupContext.value?.value
+      const name = target.name
+      const root = target.getRootNode()
+      if (!name || !('querySelectorAll' in root)) {
+        target.checked = !!isChecked.value
+        return
+      }
+      const nodes = (root as ParentNode).querySelectorAll<HTMLInputElement>(
+        'input[type="radio"][name="' + CSS.escape(name) + '"]'
+      )
+      nodes.forEach((input) => {
+        input.checked = expected !== undefined && input.value === String(expected)
+      })
     }
 
     const handleBlur = (event: FocusEvent) => {
