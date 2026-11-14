@@ -55,8 +55,9 @@ export const FullscreenButton = forwardRef<HTMLButtonElement, FullscreenButtonPr
         aria-label={label}
         aria-pressed={fullscreen.isFullscreen}
         disabled={!fullscreen.supported}
-        onClick={() => {
+        onClick={(event) => {
           void fullscreen.toggle()
+          props.onClick?.(event)
         }}>
         <Glyph name={fullscreen.isFullscreen ? 'fullscreen-exit' : 'fullscreen'} />
       </button>

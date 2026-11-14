@@ -18,6 +18,7 @@ import {
   type VNode
 } from 'vue'
 import {
+  callUnknownEventHandler,
   applyNavigationMenuPanelKey,
   classNames,
   coerceClassValue,
@@ -345,10 +346,22 @@ export const NavigationMenuLink = defineComponent({
           'data-tiger-navigation-menu-link': '',
           'data-active': props.active ? 'true' : undefined,
           onClick: handleClick,
-          onPointerdown: keepTriggerFocus,
-          onMousedown: keepTriggerFocus,
-          onFocus: handleFocus,
-          onKeydown: handleKeyDown
+          onPointerdown: (event: PointerEvent) => {
+            keepTriggerFocus(event)
+            callUnknownEventHandler(restAttrs.onPointerdown, event)
+          },
+          onMousedown: (event: MouseEvent) => {
+            keepTriggerFocus(event)
+            callUnknownEventHandler(restAttrs.onMousedown, event)
+          },
+          onFocus: (event: FocusEvent) => {
+            handleFocus()
+            callUnknownEventHandler(restAttrs.onFocus, event)
+          },
+          onKeydown: (event: KeyboardEvent) => {
+            handleKeyDown(event)
+            callUnknownEventHandler(restAttrs.onKeydown, event)
+          }
         },
         slots.default?.()
       )
@@ -480,11 +493,26 @@ export const NavigationMenuTrigger = defineComponent({
           disabled: disabled.value,
           'data-state': item.isOpen.value ? 'open' : 'closed',
           'data-tiger-navigation-menu-trigger': '',
-          onMouseenter: handleMouseEnter,
-          onMouseleave: handleMouseLeave,
-          onFocus: () => root?.setTabStopValue(item.value),
-          onClick: handleClick,
-          onKeydown: handleKeyDown
+          onMouseenter: (event: MouseEvent) => {
+            handleMouseEnter()
+            callUnknownEventHandler(restAttrs.onMouseenter, event)
+          },
+          onMouseleave: (event: MouseEvent) => {
+            handleMouseLeave()
+            callUnknownEventHandler(restAttrs.onMouseleave, event)
+          },
+          onFocus: (event: FocusEvent) => {
+            root?.setTabStopValue(item.value)
+            callUnknownEventHandler(restAttrs.onFocus, event)
+          },
+          onClick: (event: MouseEvent) => {
+            handleClick(event)
+            callUnknownEventHandler(restAttrs.onClick, event)
+          },
+          onKeydown: (event: KeyboardEvent) => {
+            handleKeyDown(event)
+            callUnknownEventHandler(restAttrs.onKeydown, event)
+          }
         },
         [slots.default?.(), chevron]
       )
@@ -1144,7 +1172,10 @@ export const NavigationMenu = defineComponent({
           'data-tiger-navigation-menu': '',
           'data-tiger-navigation-viewport': props.viewport ? 'true' : undefined,
           'data-state': currentOpen.value ? 'open' : 'closed',
-          onFocusout: handleFocusLeave
+          onFocusout: (event: FocusEvent) => {
+            handleFocusLeave(event)
+            callUnknownEventHandler(restAttrs.onFocusout, event)
+          }
         },
         [
           ...children,

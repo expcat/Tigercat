@@ -1,5 +1,6 @@
 import { computed, defineComponent, h, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
 import {
+  callUnknownEventHandler,
   classNames,
   movePolygonVertex,
   nudgeAnnotationBox,
@@ -814,7 +815,10 @@ export const ImageAnnotation = defineComponent({
           ...forwardedAttrs,
           class: containerClasses.value,
           style: containerStyle.value,
-          onKeydown: handleKeyDown
+          onKeydown: (event: KeyboardEvent) => {
+            handleKeyDown(event)
+            callUnknownEventHandler(forwardedAttrs.onKeydown, event)
+          }
         },
         [
           props.bind

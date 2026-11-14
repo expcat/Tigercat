@@ -15,6 +15,7 @@ import {
   useId
 } from 'vue'
 import {
+  callUnknownEventHandler,
   classNames,
   getSecureRel,
   resolveLinkHref,
@@ -243,7 +244,10 @@ export const DropdownItem = defineComponent({
           'aria-disabled': props.disabled || undefined,
           disabled: isLink ? undefined : props.disabled,
           onClick: handleClick,
-          onKeydown: handleKeyDown,
+          onKeydown: (event: KeyboardEvent) => {
+            handleKeyDown(event)
+            callUnknownEventHandler(restAttrs.onKeydown, event)
+          },
           style: mergedStyle.value
         },
         [

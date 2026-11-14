@@ -1,5 +1,6 @@
 import { defineComponent, h, ref, computed, watch, inject, onMounted, PropType } from 'vue'
 import {
+  callUnknownEventHandler,
   classNames,
   coerceClassValue,
   getCodeEditorContainerClasses,
@@ -326,14 +327,26 @@ export const CodeEditor = defineComponent({
         onInput,
         onCompositionstart: onCompositionStart,
         onCompositionend: onCompositionEnd,
-        onKeydown: onKeyDown,
+        onKeydown: (event: KeyboardEvent) => {
+          onKeyDown(event)
+          callUnknownEventHandler(restAttrs.onKeydown, event)
+        },
         onSelect: () => {
           updateActiveLine()
           revealCaret()
         },
-        onClick: updateActiveLine,
-        onKeyup: updateActiveLine,
-        onBlur: () => formItemControl?.onBlur(),
+        onClick: (event: MouseEvent) => {
+          updateActiveLine()
+          callUnknownEventHandler(restAttrs.onClick, event)
+        },
+        onKeyup: (event: KeyboardEvent) => {
+          updateActiveLine()
+          callUnknownEventHandler(restAttrs.onKeyup, event)
+        },
+        onBlur: (event: FocusEvent) => {
+          formItemControl?.onBlur()
+          callUnknownEventHandler(restAttrs.onBlur, event)
+        },
         readonly: props.readOnly || effectiveDisabled.value,
         disabled: effectiveDisabled.value,
         placeholder: props.placeholder,

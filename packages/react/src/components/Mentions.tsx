@@ -469,20 +469,25 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
         aria-required={formItemControl?.required ? true : rest['aria-required']}
         aria-describedby={describedBy}
         onChange={handleInput}
-        onKeyDown={handleKeyDown}
+        onKeyDown={(event) => {
+          handleKeyDown(event)
+          rest.onKeyDown?.(event)
+        }}
         onKeyUp={(event) => {
-          if (isReadOnly || effectiveDisabled) return
-          syncFromField(event.currentTarget)
+          if (!isReadOnly && !effectiveDisabled) syncFromField(event.currentTarget)
+          rest.onKeyUp?.(event)
         }}
         onClick={(event) => {
-          if (isReadOnly || effectiveDisabled) return
-          syncFromField(event.currentTarget)
+          if (!isReadOnly && !effectiveDisabled) syncFromField(event.currentTarget)
+          rest.onClick?.(event)
         }}
-        onCompositionStart={() => {
+        onCompositionStart={(event) => {
           composingRef.current = true
+          rest.onCompositionStart?.(event)
         }}
-        onCompositionEnd={() => {
+        onCompositionEnd={(event) => {
           composingRef.current = false
+          rest.onCompositionEnd?.(event)
         }}
         onFocus={onFocus}
         onBlur={handleFocusOut}

@@ -136,7 +136,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C093 DropdownItem
 
-报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02、S09、S12、C088-F03、C088-F06、C092-F01 影响。
+报告 `groups/navigation/DropdownItem.md`，队列状态 needs-evidence。另受 S01、S02、S12、C088-F03、C088-F06、C092-F01 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                                 | 验收                                                                              |
 | -------- | ---- | ---- | ----- | ---- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
@@ -165,7 +165,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C097 FullscreenButton
 
-报告 `groups/navigation/FullscreenButton.md`，队列状态 needs-evidence。另受 S01、S07、S09 影响。
+报告 `groups/navigation/FullscreenButton.md`，队列状态 needs-evidence。另受 S01、S07 影响。
 
 | 编号     | 级别 | 波次 | 端          | 类别 | 条目                                         | 验收                                                                                       |
 | -------- | ---- | ---- | ----------- | ---- | -------------------------------------------- | ------------------------------------------------------------------------------------------ |
@@ -205,7 +205,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C101 SubMenu
 
-报告 `groups/navigation/SubMenu.md`，队列状态 needs-evidence。另受 S01、S02、S07、S09、C098-F01、C099-F01、C099-F02、C099-F03 影响。
+报告 `groups/navigation/SubMenu.md`，队列状态 needs-evidence。另受 S01、S02、S07、C098-F01、C099-F01、C099-F02、C099-F03 影响。
 
 | 编号     | 级别 | 波次 | 端  | 类别   | 条目                                        | 验收                                                                            |
 | -------- | ---- | ---- | --- | ------ | ------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -214,7 +214,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C102 NavigationMenu
 
-报告 `groups/navigation/NavigationMenu.md`，队列状态 needs-evidence。另受 S01、S04、S09 影响。
+报告 `groups/navigation/NavigationMenu.md`，队列状态 needs-evidence。另受 S01、S04 影响。
 
 | 编号     | 级别 | 波次 | 端        | 类别   | 条目                                                   | 验收                                                                                     |
 | -------- | ---- | ---- | --------- | ------ | ------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
@@ -233,7 +233,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C105 NavigationMenuLink
 
-报告 `groups/navigation/NavigationMenuLink.md`，队列状态 needs-evidence。另受 S01、S02、S09、C102-F01、C102-F02、C102-F03 影响。
+报告 `groups/navigation/NavigationMenuLink.md`，队列状态 needs-evidence。另受 S01、S02、C102-F01、C102-F02、C102-F03 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                  | 验收                                                                                    |
 | -------- | ---- | ---- | ---- | ---- | ------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -250,7 +250,7 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 ### C107 NavigationMenuTrigger
 
-报告 `groups/navigation/NavigationMenuTrigger.md`，队列状态 needs-evidence。另受 S01、S02、S04、S09、C102-F01、C102-F02 影响。
+报告 `groups/navigation/NavigationMenuTrigger.md`，队列状态 needs-evidence。另受 S01、S02、S04、C102-F01、C102-F02 影响。
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                 | 验收                                                                                |
 | -------- | ---- | ---- | ----- | ---- | ------------------------------------ | ----------------------------------------------------------------------------------- |
@@ -336,11 +336,11 @@ navigation 组 35 个组件（C082–C116）。P1 最多的一组。这一组同
 
 报告没有给这些组件立新的编号。右列是并入的既有条目，修那些条目时要在这里复验。
 
-| 任务 | 组件                  | 报告                                         | 并入的条目                   |
-| ---- | --------------------- | -------------------------------------------- | ---------------------------- |
-| C090 | ContextMenuMenu       | `groups/navigation/ContextMenuMenu.md`       | S02、S12                     |
-| C091 | ContextMenuSub        | `groups/navigation/ContextMenuSub.md`        | S02、S07、S09、S12、C088-F01 |
-| C094 | DropdownMenu          | `groups/navigation/DropdownMenu.md`          | S02、S12                     |
-| C103 | NavigationMenuContent | `groups/navigation/NavigationMenuContent.md` | S02、S07、C102-F01           |
-| C112 | Steps                 | `groups/navigation/Steps.md`                 | S01、S04、S08                |
-| C113 | StepsItem             | `groups/navigation/StepsItem.md`             | S01、S02、S04、S08           |
+| 任务 | 组件                  | 报告                                         | 并入的条目              |
+| ---- | --------------------- | -------------------------------------------- | ----------------------- |
+| C090 | ContextMenuMenu       | `groups/navigation/ContextMenuMenu.md`       | S02、S12                |
+| C091 | ContextMenuSub        | `groups/navigation/ContextMenuSub.md`        | S02、S07、S12、C088-F01 |
+| C094 | DropdownMenu          | `groups/navigation/DropdownMenu.md`          | S02、S12                |
+| C103 | NavigationMenuContent | `groups/navigation/NavigationMenuContent.md` | S02、S07、C102-F01      |
+| C112 | Steps                 | `groups/navigation/Steps.md`                 | S01、S04、S08           |
+| C113 | StepsItem             | `groups/navigation/StepsItem.md`             | S01、S02、S04、S08      |

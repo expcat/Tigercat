@@ -20,6 +20,7 @@ import type {
 } from '@expcat/tigercat-core'
 import {
   applyNumberKeyboardKey,
+  callUnknownEventHandler,
   classNames,
   coerceClassValue,
   getNumberKeyboardInteractiveIndexes,
@@ -392,8 +393,14 @@ export const NumberKeyboard = defineComponent({
           'aria-invalid': status.value === 'error' || invalidValue.value ? true : undefined,
           'aria-required': formItemControl?.required.value ? true : undefined,
           'data-tiger-number-keyboard': '',
-          onKeydown: handleGroupKeyDown,
-          onFocusout: handleFocusOut
+          onKeydown: (event: KeyboardEvent) => {
+            handleGroupKeyDown(event)
+            callUnknownEventHandler(forwardedAttrs.onKeydown, event)
+          },
+          onFocusout: (event: FocusEvent) => {
+            handleFocusOut(event)
+            callUnknownEventHandler(forwardedAttrs.onFocusout, event)
+          }
         },
         [
           !sheet && effectiveName.value

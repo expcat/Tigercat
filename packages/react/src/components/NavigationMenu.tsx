@@ -248,10 +248,22 @@ export const NavigationMenuLink = React.forwardRef<HTMLElement, NavigationMenuLi
       'data-tiger-navigation-menu-link': '',
       'data-active': active ? 'true' : undefined,
       onClick: handleClick,
-      onPointerDown: keepTriggerFocus,
-      onMouseDown: keepTriggerFocus,
-      onFocus: handleFocus,
-      onKeyDown: handleKeyDown
+      onPointerDown: (event: React.PointerEvent<HTMLElement>) => {
+        keepTriggerFocus(event)
+        rest.onPointerDown?.(event)
+      },
+      onMouseDown: (event: React.MouseEvent<HTMLElement>) => {
+        keepTriggerFocus(event)
+        rest.onMouseDown?.(event)
+      },
+      onFocus: (event: React.FocusEvent<HTMLElement>) => {
+        handleFocus()
+        rest.onFocus?.(event)
+      },
+      onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+        handleKeyDown(event)
+        rest.onKeyDown?.(event)
+      }
     }
 
     if (address.href) {
@@ -376,11 +388,26 @@ export const NavigationMenuTrigger = React.forwardRef<
       disabled={isDisabled}
       data-state={item.isOpen ? 'open' : 'closed'}
       data-tiger-navigation-menu-trigger=""
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onFocus={() => root?.setTabStopValue(item.value)}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}>
+      onMouseEnter={(event) => {
+        handleMouseEnter()
+        buttonProps.onMouseEnter?.(event)
+      }}
+      onMouseLeave={(event) => {
+        handleMouseLeave()
+        buttonProps.onMouseLeave?.(event)
+      }}
+      onFocus={(event) => {
+        root?.setTabStopValue(item.value)
+        buttonProps.onFocus?.(event)
+      }}
+      onClick={(event) => {
+        handleClick(event)
+        buttonProps.onClick?.(event)
+      }}
+      onKeyDown={(event) => {
+        handleKeyDown(event)
+        buttonProps.onKeyDown?.(event)
+      }}>
       {children}
       {arrow ? (
         <svg

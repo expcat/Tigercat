@@ -16,6 +16,21 @@ describe('VirtualList', () => {
     height: 400
   }
 
+  it.each([undefined, 'Items'])('chains native keydown with ariaLabel=%s', async (ariaLabel) => {
+    const onKeydown = vi.fn()
+    const secondListener = vi.fn()
+    const { container } = render(VirtualList, {
+      props: { ...defaultProps, ariaLabel },
+      attrs: { onKeydown: [onKeydown, secondListener] }
+    })
+    const outer = container.firstElementChild as HTMLElement
+    await fireEvent.keyDown(outer, { key: 'End' })
+    expect(onKeydown).toHaveBeenCalledTimes(1)
+    expect(secondListener).toHaveBeenCalledTimes(1)
+    expect(onKeydown.mock.calls[0][0].defaultPrevented).toBe(Boolean(ariaLabel))
+    expect(outer.scrollTop > 0).toBe(Boolean(ariaLabel))
+  })
+
   // --- Basic rendering ---
   it('renders with default props', () => {
     const { container } = renderWithProps(VirtualList, defaultProps)

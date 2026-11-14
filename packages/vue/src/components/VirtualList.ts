@@ -9,6 +9,7 @@ import {
   type CSSProperties
 } from 'vue'
 import {
+  callUnknownEventHandler,
   virtualListContainerClasses,
   virtualListInnerClasses,
   fixedSizeStrategy,
@@ -296,38 +297,37 @@ export const VirtualList = defineComponent({
           ),
           style: mergeStyleValues(attrStyle, { height: `${props.height}px` }) as CSSProperties,
           onScroll: handleScroll,
-          onKeydown: keyboardScroll
-            ? (event: KeyboardEvent) => {
-                if (event.target !== event.currentTarget) return
-                if (
-                  event.key !== 'ArrowDown' &&
-                  event.key !== 'ArrowUp' &&
-                  event.key !== 'Home' &&
-                  event.key !== 'End'
-                ) {
-                  return
-                }
-                event.preventDefault()
-                const next =
-                  event.key === 'End'
-                    ? Math.max(0, props.itemCount - 1)
-                    : event.key === 'Home'
-                      ? 0
-                      : event.key === 'ArrowDown'
-                        ? Math.min(Math.max(props.itemCount - 1, 0), activeIndex + 1)
-                        : Math.max(0, activeIndex - 1)
-                activeIndex = next
-                applyScrollTop(
-                  scrollTopForVirtualAlign({
-                    scrollTop: scrollTop.value,
-                    viewport: viewport.value,
-                    offset: currentStrategy.getItemOffset(next),
-                    size: currentStrategy.getItemHeight(next),
-                    align: 'auto'
-                  })
-                )
-              }
-            : undefined
+          onKeydown: (event: KeyboardEvent) => {
+            if (
+              keyboardScroll &&
+              event.target === event.currentTarget &&
+              (event.key === 'ArrowDown' ||
+                event.key === 'ArrowUp' ||
+                event.key === 'Home' ||
+                event.key === 'End')
+            ) {
+              event.preventDefault()
+              const next =
+                event.key === 'End'
+                  ? Math.max(0, props.itemCount - 1)
+                  : event.key === 'Home'
+                    ? 0
+                    : event.key === 'ArrowDown'
+                      ? Math.min(Math.max(props.itemCount - 1, 0), activeIndex + 1)
+                      : Math.max(0, activeIndex - 1)
+              activeIndex = next
+              applyScrollTop(
+                scrollTopForVirtualAlign({
+                  scrollTop: scrollTop.value,
+                  viewport: viewport.value,
+                  offset: currentStrategy.getItemOffset(next),
+                  size: currentStrategy.getItemHeight(next),
+                  align: 'auto'
+                })
+              )
+            }
+            callUnknownEventHandler(restAttrs.onKeydown, event)
+          }
         },
         [
           h(

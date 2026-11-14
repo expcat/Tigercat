@@ -1,5 +1,6 @@
 import { computed, defineComponent, h, PropType } from 'vue'
 import {
+  callUnknownEventHandler,
   classNames,
   coerceClassValue,
   fullscreenButtonClasses,
@@ -91,8 +92,9 @@ export const FullscreenButton = defineComponent({
           'aria-label': label,
           'aria-pressed': fullscreen.isFullscreen.value,
           disabled: fullscreen.supported.value ? undefined : true,
-          onClick: () => {
+          onClick: (event: MouseEvent) => {
             void fullscreen.toggle()
+            callUnknownEventHandler(attrs.onClick, event)
           }
         },
         renderGlyph(fullscreen.isFullscreen.value ? 'fullscreen-exit' : 'fullscreen')

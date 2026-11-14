@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+MaskInput 与本轮修复的 17 个组件现在会调用调用方传入的同名原生监听。内部处理先执行，因此监听收到的事件可能已经被 `preventDefault()`；组件行为、公开 props 和事件名不变。应用侧为绕过旧覆盖而增加的重复转发可以移除，调用方监听不能取消已经开始的内部处理。
+
 Descriptions 及本轮 S08 修复组件的内容槽现在保留数值 `0`，不再把它当作缺失内容或切换到后备内容；例如 `title={0}`、`extra={0}`、Input 前后缀以及自定义渲染返回 `0` 都会显示 0，React Descriptions 的 `children={0}` 会优先于 `items`。需要省略内容或使用默认值时，请传 `null` / `undefined`。
 
 FormItem 的 `labelWidth={0}` 与 Progress 的 `height={0}` 现在输出 `0px`；FileManager 的 `gridColumns={0}` 统一限制为 1 列，面包屑的数值 key `0` 保持为独立条目。此前借助这些零值触发默认尺寸或默认列数的调用点，请改为省略对应属性。

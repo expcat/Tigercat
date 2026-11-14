@@ -233,14 +233,19 @@ export const MaskInput = defineComponent({
           handleInput(event)
           callUnknownEventHandler(restAttrs.onInput, event)
         },
-        onPaste: handlePaste,
-        onCompositionstart: () => {
+        onPaste: (event: ClipboardEvent) => {
+          handlePaste(event)
+          callUnknownEventHandler(restAttrs.onPaste, event)
+        },
+        onCompositionstart: (event: CompositionEvent) => {
           isComposing.value = true
+          callUnknownEventHandler(restAttrs.onCompositionstart, event)
         },
         onCompositionend: (event: Event) => {
           isComposing.value = false
           const target = event.target as HTMLInputElement
           applyValue(target.value, target.selectionStart ?? target.value.length)
+          callUnknownEventHandler(restAttrs.onCompositionend, event)
         },
         onFocus: (event: FocusEvent) => emit('focus', event),
         onBlur: (event: FocusEvent) => {

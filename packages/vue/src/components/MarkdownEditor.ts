@@ -10,6 +10,7 @@ import {
   PropType
 } from 'vue'
 import {
+  callUnknownEventHandler,
   applyMarkdownToolbarAction,
   classNames,
   coerceClassValue,
@@ -430,8 +431,14 @@ export const MarkdownEditor = defineComponent({
               if (!shouldCommitEditorValue(composing.value || native.isComposing)) return
               commitValue((event.target as HTMLTextAreaElement).value)
             },
-            onKeydown: handleKeydown,
-            onBlur: () => formItemControl?.onBlur(),
+            onKeydown: (event: KeyboardEvent) => {
+              handleKeydown(event)
+              callUnknownEventHandler(restAttrs.onKeydown, event)
+            },
+            onBlur: (event: FocusEvent) => {
+              formItemControl?.onBlur()
+              callUnknownEventHandler(restAttrs.onBlur, event)
+            },
             onScroll: (event: Event) => {
               syncLockedPane(event.currentTarget as HTMLElement, previewRef.value)
             },

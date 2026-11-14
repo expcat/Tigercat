@@ -359,7 +359,10 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
       className={classNames(virtualListContainerClasses, className)}
       style={{ ...style, height: `${height}px` }}
       onScroll={handleScroll}
-      onKeyDown={keyboardScroll ? handleKeyDown : undefined}>
+      onKeyDown={(event) => {
+        if (keyboardScroll) handleKeyDown(event)
+        rest.onKeyDown?.(event)
+      }}>
       <div className={virtualListInnerClasses} style={{ height: `${totalHeight}px` }}>
         <div
           style={{

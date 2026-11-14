@@ -18,6 +18,7 @@ import type {
 } from '@expcat/tigercat-core'
 import {
   applyTransferSelectAll,
+  callUnknownEventHandler,
   canMoveTransferItems,
   checkboxCheckPathD,
   checkboxIconSizeClasses,
@@ -513,8 +514,10 @@ export const Transfer = markFormItemGroupControl(
             'aria-disabled': effectiveDisabled.value || undefined,
             onFocusout: (event: FocusEvent) => {
               const next = event.relatedTarget as Node | null
-              if (next && (event.currentTarget as Node).contains(next)) return
-              formItemControl?.onBlur()
+              if (!next || !(event.currentTarget as Node).contains(next)) {
+                formItemControl?.onBlur()
+              }
+              callUnknownEventHandler(attrs.onFocusout, event)
             }
           },
           [

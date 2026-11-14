@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { MaskInput } from '@expcat/tigercat-react/MaskInput'
@@ -23,6 +23,38 @@ describe('MaskInput', () => {
   })
 
   describe('Input behaviour', () => {
+    it('chains native paste and composition listeners after applying the mask', () => {
+      const onPaste = vi.fn()
+      const onCompositionStart = vi.fn()
+      const onCompositionEnd = vi.fn()
+      const onChange = vi.fn()
+      const { getByRole } = render(
+        <MaskInput
+          mask="##/##"
+          onPaste={onPaste}
+          onCompositionStart={onCompositionStart}
+          onCompositionEnd={onCompositionEnd}
+          onChange={onChange}
+        />
+      )
+      const input = getByRole('textbox') as HTMLInputElement
+      fireEvent.paste(input, { clipboardData: { getData: () => '12' } })
+      expect(input.value).toBe('12/')
+      fireEvent.compositionStart(input)
+      fireEvent.input(input, { target: { value: '34' } })
+      expect(onChange).toHaveBeenCalledTimes(1)
+      fireEvent.compositionEnd(input, { target: { value: '34' } })
+      expect(input.value).toBe('34/')
+      expect(onChange).toHaveBeenLastCalledWith('34', {
+        maskedValue: '34/',
+        completed: false
+      })
+      expect(onPaste).toHaveBeenCalledTimes(1)
+      expect(onPaste.mock.calls[0][0].defaultPrevented).toBe(true)
+      expect(onCompositionStart).toHaveBeenCalledTimes(1)
+      expect(onCompositionEnd).toHaveBeenCalledTimes(1)
+    })
+
     it('reports the raw value and masked detail on change', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()

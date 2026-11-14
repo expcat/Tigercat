@@ -228,14 +228,19 @@ export const MaskInput = forwardRef<HTMLInputElement, MaskInputProps>(function M
       aria-describedby={describedBy}
       onInput={handleInput}
       onChange={() => {}}
-      onPaste={handlePaste}
-      onCompositionStart={() => {
+      onPaste={(event) => {
+        handlePaste(event)
+        rest.onPaste?.(event)
+      }}
+      onCompositionStart={(event) => {
         isComposing.current = true
+        rest.onCompositionStart?.(event)
       }}
       onCompositionEnd={(event) => {
         isComposing.current = false
         const target = event.currentTarget
         applyValue(target.value, target.selectionStart ?? target.value.length)
+        rest.onCompositionEnd?.(event)
       }}
       onFocus={onFocus}
       onBlur={handleBlur}

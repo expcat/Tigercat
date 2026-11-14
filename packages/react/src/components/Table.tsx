@@ -531,22 +531,22 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       data-keyboard-mode={grid ? resolveTableKeyboardMode(true) : undefined}
       data-grid-cell={grid ? `${gridCell.row}-${gridCell.column}` : undefined}
       tabIndex={grid ? 0 : undefined}
-      onKeyDown={
-        grid
-          ? (event) => {
-              const next = nextGridCell({
-                row: gridCell.row,
-                column: gridCell.column,
-                rowCount: ctx.paginatedData.length,
-                columnCount: ctx.displayColumns.length,
-                key: event.key
-              })
-              if (!next || !event.key.startsWith('Arrow')) return
-              event.preventDefault()
-              setGridCell(next)
-            }
-          : undefined
-      }
+      onKeyDown={(event) => {
+        if (grid) {
+          const next = nextGridCell({
+            row: gridCell.row,
+            column: gridCell.column,
+            rowCount: ctx.paginatedData.length,
+            columnCount: ctx.displayColumns.length,
+            key: event.key
+          })
+          if (next && event.key.startsWith('Arrow')) {
+            event.preventDefault()
+            setGridCell(next)
+          }
+        }
+        ;(props as React.TableHTMLAttributes<HTMLTableElement>).onKeyDown?.(event)
+      }}
       aria-label={ariaLabel || tableLabels.tableAriaLabel}
       aria-rowcount={virtual ? ctx.paginatedData.length + 1 : undefined}
       aria-colcount={virtualizeColumns ? ctx.displayColumns.length : undefined}

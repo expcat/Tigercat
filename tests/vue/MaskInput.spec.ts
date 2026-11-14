@@ -26,6 +26,34 @@ describe('MaskInput', () => {
   })
 
   describe('Input behaviour', () => {
+    it('chains native paste and composition listeners after applying the mask', async () => {
+      const onPaste = vi.fn()
+      const onCompositionstart = vi.fn()
+      const onCompositionend = vi.fn()
+      const onChange = vi.fn()
+      const { getByRole } = render(MaskInput, {
+        props: { mask: '##/##', onChange },
+        attrs: { onPaste, onCompositionstart, onCompositionend }
+      })
+      const input = getByRole('textbox') as HTMLInputElement
+      await fireEvent.paste(input, { clipboardData: { getData: () => '12' } })
+      expect(input.value).toBe('12/')
+      await fireEvent.compositionStart(input)
+      input.value = '34'
+      await fireEvent.input(input)
+      expect(onChange).toHaveBeenCalledTimes(1)
+      await fireEvent.compositionEnd(input)
+      expect(input.value).toBe('34/')
+      expect(onChange).toHaveBeenLastCalledWith('34', {
+        maskedValue: '34/',
+        completed: false
+      })
+      expect(onPaste).toHaveBeenCalledTimes(1)
+      expect(onPaste.mock.calls[0][0].defaultPrevented).toBe(true)
+      expect(onCompositionstart).toHaveBeenCalledTimes(1)
+      expect(onCompositionend).toHaveBeenCalledTimes(1)
+    })
+
     it('emits update:modelValue (raw) and change (payload) on input', async () => {
       const onUpdate = vi.fn()
       const onChange = vi.fn()

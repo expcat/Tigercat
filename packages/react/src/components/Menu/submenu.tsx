@@ -439,8 +439,14 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         type="button"
         className={titleClasses}
         style={{ ...indentStyle, ...style }}
-        onClick={handleTitleClick}
-        onKeyDown={handleTitleKeyDown}
+        onClick={(event) => {
+          handleTitleClick(event)
+          rest.onClick?.(event)
+        }}
+        onKeyDown={(event) => {
+          handleTitleKeyDown(event)
+          rest.onKeyDown?.(event)
+        }}
         role={titleRole}
         data-tiger-menuitem="true"
         data-tiger-menuitem-key={menuKeyId(itemKey)}

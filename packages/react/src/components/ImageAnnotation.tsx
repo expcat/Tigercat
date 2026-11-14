@@ -724,7 +724,14 @@ export function ImageAnnotation({
         : labels.loadingAnnotationImageAriaLabel
 
   return (
-    <div {...rest} className={containerClasses} style={style} onKeyDown={handleKeyDown}>
+    <div
+      {...rest}
+      className={containerClasses}
+      style={style}
+      onKeyDown={(event) => {
+        handleKeyDown(event)
+        rest.onKeyDown?.(event)
+      }}>
       {bind ? (
         <div data-tiger-annotation-bind="">
           <button

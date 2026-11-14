@@ -559,18 +559,24 @@ export const Mentions = defineComponent({
         disabled: effectiveDisabled.value,
         readonly: isReadOnly.value || undefined,
         onKeyup: (event: KeyboardEvent) => {
-          if (isReadOnly.value || effectiveDisabled.value) return
-          syncFromField(event.target as HTMLTextAreaElement)
+          if (!isReadOnly.value && !effectiveDisabled.value) {
+            syncFromField(event.target as HTMLTextAreaElement)
+          }
+          callUnknownEventHandler(restAttrs.onKeyup, event)
         },
         onClick: (event: MouseEvent) => {
-          if (isReadOnly.value || effectiveDisabled.value) return
-          syncFromField(event.target as HTMLTextAreaElement)
+          if (!isReadOnly.value && !effectiveDisabled.value) {
+            syncFromField(event.target as HTMLTextAreaElement)
+          }
+          callUnknownEventHandler(restAttrs.onClick, event)
         },
-        onCompositionstart: () => {
+        onCompositionstart: (event: CompositionEvent) => {
           composing.value = true
+          callUnknownEventHandler(restAttrs.onCompositionstart, event)
         },
-        onCompositionend: () => {
+        onCompositionend: (event: CompositionEvent) => {
           composing.value = false
+          callUnknownEventHandler(restAttrs.onCompositionend, event)
         },
         maxlength: props.maxLength,
         rows: props.rows,
@@ -586,7 +592,10 @@ export const Mentions = defineComponent({
           handleInput(event)
           callUnknownEventHandler(restAttrs.onInput, event)
         },
-        onKeydown: handleKeydown,
+        onKeydown: (event: KeyboardEvent) => {
+          handleKeydown(event)
+          callUnknownEventHandler(restAttrs.onKeydown, event)
+        },
         onFocus: (event: FocusEvent) => emit('focus', event),
         onFocusout: (event: FocusEvent) => {
           handleFocusOut(event)

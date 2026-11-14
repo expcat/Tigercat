@@ -11,6 +11,7 @@ import {
   PropType
 } from 'vue'
 import {
+  callUnknownEventHandler,
   classNames,
   coerceArrayFormValue,
   coerceClassValue,
@@ -293,6 +294,26 @@ export const Upload = defineComponent({
       inputRef.value?.click()
     }
 
+    const handleDrop = async (event: DragEvent) => {
+      const result = handleUploadDrop(event, !canMutate.value)
+      if (!result.handled || !canMutate.value) {
+        isDragging.value = false
+        return
+      }
+      isDragging.value = false
+      const read = readUploadDropFiles(event.dataTransfer)
+      if (read.rejectedDirectories.length > 0) {
+        emit(
+          'reject',
+          read.rejectedDirectories.map((file) => ({
+            file,
+            reason: 'directory' as const
+          }))
+        )
+      }
+      await controller.processFiles(read.files)
+    }
+
     const previewUrlFor = (file: UploadFile) =>
       filterUploadPreviewUrl(previewUrls.get(file), props.allowedPreviewOrigins)
 
@@ -502,13 +523,16 @@ export const Upload = defineComponent({
               ...triggerAria,
               ref: triggerRef,
               class: getDragAreaClasses(isDragging.value, effectiveDisabled.value),
-              onClick: openPicker,
+              onClick: (event: MouseEvent) => {
+                openPicker()
+                callUnknownEventHandler(forwarded.onClick, event)
+              },
               onKeydown: (event: KeyboardEvent) => {
-                if (!canMutate.value) return
-                if (event.key === 'Enter' || event.key === ' ') {
+                if (canMutate.value && (event.key === 'Enter' || event.key === ' ')) {
                   event.preventDefault()
                   openPicker()
                 }
+                callUnknownEventHandler(forwarded.onKeydown, event)
               },
               onDragover: (event: DragEvent) => {
                 const result = handleUploadDragOver(event, !canMutate.value)
@@ -521,23 +545,9 @@ export const Upload = defineComponent({
                 isDragging.value = result.isDragging
               },
               onDrop: async (event: DragEvent) => {
-                const result = handleUploadDrop(event, !canMutate.value)
-                if (!result.handled || !canMutate.value) {
-                  isDragging.value = false
-                  return
-                }
-                isDragging.value = false
-                const read = readUploadDropFiles(event.dataTransfer)
-                if (read.rejectedDirectories.length > 0) {
-                  emit(
-                    'reject',
-                    read.rejectedDirectories.map((file) => ({
-                      file,
-                      reason: 'directory' as const
-                    }))
-                  )
-                }
-                await controller.processFiles(read.files)
+                const pending = handleDrop(event)
+                callUnknownEventHandler(forwarded.onDrop, event)
+                await pending
               },
               role: 'button',
               tabindex: effectiveDisabled.value ? -1 : 0,
@@ -586,7 +596,10 @@ export const Upload = defineComponent({
               variant: 'outline',
               size: 'sm',
               disabled: effectiveDisabled.value,
-              onClick: openPicker,
+              onClick: (event: MouseEvent) => {
+                openPicker()
+                callUnknownEventHandler(forwarded.onClick, event)
+              },
               'aria-label': slots.default ? undefined : labels.value.buttonAriaLabel
             },
             { default: () => (slots.default ? slots.default() : labels.value.selectFileText) }

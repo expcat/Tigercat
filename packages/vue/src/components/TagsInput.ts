@@ -2,6 +2,7 @@ import { computed, defineComponent, h, inject, ref, useId, watch, type PropType 
 import {
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
+  callUnknownEventHandler,
   classNames,
   coerceClassValue,
   commitTagCandidates,
@@ -444,7 +445,10 @@ export const TagsInput = defineComponent({
             : undefined,
           'data-state': isFull ? 'full' : undefined,
           [TIGER_CHROME_ATTR]: '',
-          onClick: handleContainerClick,
+          onClick: (event: MouseEvent) => {
+            handleContainerClick(event)
+            callUnknownEventHandler(restAttrs.onClick, event)
+          },
           onAnimationend: () => containerRef.value?.classList.remove(SHAKE_CLASS)
         },
         children

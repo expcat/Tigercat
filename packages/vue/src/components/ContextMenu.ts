@@ -16,6 +16,7 @@ import {
   type ComputedRef
 } from 'vue'
 import {
+  callUnknownEventHandler,
   classNames,
   getSecureRel,
   resolveLinkHref,
@@ -430,17 +431,25 @@ export const ContextMenuSub = defineComponent({
           onClick: (event: MouseEvent) => {
             event.preventDefault()
             event.stopPropagation()
-            if (props.disabled) return
-            if (isExpanded.value) {
-              isOpenByKeyboard.value = false
-              isHovered.value = false
-              return
+            if (!props.disabled) {
+              if (isExpanded.value) {
+                isOpenByKeyboard.value = false
+                isHovered.value = false
+              } else {
+                isOpenByKeyboard.value = true
+                isHovered.value = true
+              }
             }
-            isOpenByKeyboard.value = true
-            isHovered.value = true
+            callUnknownEventHandler(restAttrs.onClick, event)
           },
-          onMouseenter: handleMouseEnter,
-          onKeydown: handleTitleKeyDown
+          onMouseenter: (event: MouseEvent) => {
+            handleMouseEnter()
+            callUnknownEventHandler(restAttrs.onMouseenter, event)
+          },
+          onKeydown: (event: KeyboardEvent) => {
+            handleTitleKeyDown(event)
+            callUnknownEventHandler(restAttrs.onKeydown, event)
+          }
         },
         [
           h('span', { class: 'flex-1 text-start' }, props.title),
