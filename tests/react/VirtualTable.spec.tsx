@@ -154,6 +154,29 @@ describe('VirtualTable (React)', () => {
     expect(container.textContent).toContain('Row 501')
   })
 
+  it('moves arrow-key focus beyond the rendered virtual window', () => {
+    const { container } = render(
+      <VirtualTable
+        dataSource={makeData(200)}
+        columns={columns}
+        virtualItemHeight={40}
+        virtualHeight={160}
+        overscan={0}
+      />
+    )
+    const scroller = container.querySelector('table')?.parentElement as HTMLElement
+    const first = dataRowsOf(container)[0]
+    expect(first.getAttribute('data-tiger-table-page-index')).toBe('0')
+    first.focus()
+    for (let step = 1; step <= 9; step += 1) {
+      fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowDown' })
+    }
+    const focused = document.activeElement as HTMLElement
+    expect(focused.getAttribute('data-tiger-table-page-index')).toBe('9')
+    expect(focused.textContent).toContain('Row 10')
+    expect(scroller.scrollTop).toBeGreaterThan(0)
+  })
+
   it('virtualizes columns with a numeric width', () => {
     const wide: TableColumn[] = Array.from({ length: 10 }, (_, i) => ({
       key: `c${i}`,

@@ -15,17 +15,14 @@ advanced 组 11 个组件（C159–C169），视觉与键盘全部 blocked。
 
 ## 依赖与顺序
 
-- C168-F01（VirtualList）先于 C169-F01（VirtualTable）。Tree、TreeSelect、ChatWindow、NotificationCenter 是 VirtualList 的调用方，审查时没有重审，修完要回归。
 - RichTextEditor 的引擎 `rich-text-engine.ts` 主责是 X01；C164-F04 的改动落在 `w9-data.ts`。
 
 ## 概览
 
-本篇 31 条：P1 1、P2 25、P3 5。
-按波次：W1 1、W6 25、W9 5。
+本篇 30 条：P2 25、P3 5。
+按波次：W6 25、W9 5。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C160-F04（S03）、C162-F03（S03）。
-
-本篇的 P1：C169-F01。
 
 ## 条目
 
@@ -122,13 +119,12 @@ advanced 组 11 个组件（C159–C169），视觉与键盘全部 blocked。
 
 报告 `groups/advanced/VirtualTable.md`，队列状态 needs-evidence。另受 S01 影响。
 
-| 编号     | 级别 | 波次 | 端        | 类别 | 条目                                             | 验收                                                                                        |
-| -------- | ---- | ---- | --------- | ---- | ------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| C169-F01 | P1   | W1   | 双端      | 键盘 | 方向键走不出已渲染窗口，焦点停在窗口末行且不滚动 | 200 行、行高 40、容器高 160、overscan 0，连按 ArrowDown，焦点越过第 8 行且 scrollTop 大于 0 |
-| C169-F02 | P2   | W6   | 双端      | 行为 | overscan 没有传进行窗口，纵向始终按默认 5 渲染   | 200 行、行高 40、容器高 160 时，overscan 0 与 20 渲染的行数不同（不再都是 9 行）            |
-| C169-F03 | P2   | W6   | Core+双端 | 文档 | virtualItemHeight 默认写 48 实为 40              | 不传 virtualItemHeight 时行内联 height 与类型注释、生成 Props 页的 Default 是同一个数       |
-| C169-F04 | P2   | W6   | 双端      | 行为 | pagination 两端不一致，React 写死关闭            | 30 行、pageSize 5、容器高 400、行高 40 时两端渲染行数与是否出现分页导航一致                 |
-| C169-F05 | P3   | W9   | Core      | 文档 | 注释称缺行身份不参与选择，实际发 fallback key    | 两处注释写明缺 id 的行选择 key 是 tiger-row:索引 形式的 fallback，选择行为不变              |
+| 编号     | 级别 | 波次 | 端        | 类别 | 条目                                           | 验收                                                                                  |
+| -------- | ---- | ---- | --------- | ---- | ---------------------------------------------- | ------------------------------------------------------------------------------------- |
+| C169-F02 | P2   | W6   | 双端      | 行为 | overscan 没有传进行窗口，纵向始终按默认 5 渲染 | 200 行、行高 40、容器高 160 时，overscan 0 与 20 渲染的行数不同（不再都是 9 行）      |
+| C169-F03 | P2   | W6   | Core+双端 | 文档 | virtualItemHeight 默认写 48 实为 40            | 不传 virtualItemHeight 时行内联 height 与类型注释、生成 Props 页的 Default 是同一个数 |
+| C169-F04 | P2   | W6   | 双端      | 行为 | pagination 两端不一致，React 写死关闭          | 30 行、pageSize 5、容器高 400、行高 40 时两端渲染行数与是否出现分页导航一致           |
+| C169-F05 | P3   | W9   | Core      | 文档 | 注释称缺行身份不参与选择，实际发 fallback key  | 两处注释写明缺 id 的行选择 key 是 tiger-row:索引 形式的 fallback，选择行为不变        |
 
 ### 没有新增条目的组件
 

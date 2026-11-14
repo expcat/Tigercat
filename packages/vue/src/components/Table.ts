@@ -6,6 +6,7 @@ import {
   onBeforeUnmount,
   onMounted,
   onUpdated,
+  nextTick,
   ref,
   useId,
   watch,
@@ -93,6 +94,16 @@ export const Table = defineComponent({
     const measuredRowHeights = ref<Record<number, number>>({})
     const measuredContainerSize = ref({ width: 0, height: 0 })
     const virtualScrollerRef = ref<HTMLElement | null>(null)
+    const pendingVirtualFocusIndex = ref<number | null>(null)
+    watch(pendingVirtualFocusIndex, async (index) => {
+      if (index == null) return
+      await nextTick()
+      const row = virtualScrollerRef.value?.querySelector(
+        `tr[data-tiger-table-page-index="${index}"]`
+      )
+      ;(row as HTMLElement | null)?.focus()
+      pendingVirtualFocusIndex.value = null
+    })
     const virtualClientHeight = ref(0)
     const columnScrollLeft = ref(0)
     const uncontrolledCardViewport = ref(false)
@@ -431,6 +442,15 @@ export const Table = defineComponent({
             ctx.paginatedData.value.length
           )
         : undefined
+      const focusVirtualRow = (index: number, edge: 'down' | 'up') => {
+        const target =
+          edge === 'down'
+            ? Math.max(0, (index + 1) * declaredRowHeight - virtualViewport)
+            : index * declaredRowHeight
+        if (virtualScrollerRef.value) virtualScrollerRef.value.scrollTop = target
+        ctx.virtualScrollTop.value = target
+        pendingVirtualFocusIndex.value = index
+      }
       const columnSlice = virtualizeMiddleColumns({
         columns: ctx.displayColumns.value,
         widths: ctx.displayColumns.value.map((column) => parseWidthToPx(column.width)),
@@ -457,7 +477,8 @@ export const Table = defineComponent({
         activeRowIndex: activeRowIndex.value,
         onActiveRowIndex: (index: number) => {
           activeRowIndex.value = index
-        }
+        },
+        onVirtualRowFocus: focusVirtualRow
       } as TableInternalProps & {
         virtualWindow?: ReturnType<typeof getTableVirtualWindow>
         selectionName?: string

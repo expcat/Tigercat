@@ -75,6 +75,8 @@ export interface RenderBodyViewProps {
   selectionName?: string
   activeRowIndex?: number
   onActiveRowIndex?: (index: number) => void
+  /** Scrolls a row into the virtual window and focuses it after render. */
+  onVirtualRowFocus?: (index: number, edge: 'down' | 'up') => void
   grid?: boolean
 }
 
@@ -97,7 +99,8 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     selectionName,
     activeRowIndex = 0,
     grid = false,
-    onActiveRowIndex
+    onActiveRowIndex,
+    onVirtualRowFocus
   } = view
   const hasRowControls = hasTableSelectionColumn(rowSelection) || Boolean(expandable)
   const chrome = getTableChromeSlots({
@@ -271,7 +274,12 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
                   const row = (e.currentTarget.parentElement?.querySelector(
                     `tr[data-tiger-table-page-index="${next}"]`
                   ) ?? null) as HTMLTableRowElement | null
-                  row?.focus()
+                  if (row) {
+                    row.focus()
+                    return
+                  }
+                  if (virtualWindow)
+                    onVirtualRowFocus?.(next, e.key === 'ArrowDown' ? 'down' : 'up')
                 }
               }
         }

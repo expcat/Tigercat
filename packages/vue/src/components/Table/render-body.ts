@@ -61,6 +61,8 @@ export function renderTableBody(
     selectionName?: string
     activeRowIndex?: number
     onActiveRowIndex?: (index: number) => void
+    /** Scrolls a row into the virtual window and focuses it after render. */
+    onVirtualRowFocus?: (index: number, edge: 'down' | 'up') => void
   },
   slots: Slots,
   labels: Required<TigerLocaleTable>
@@ -449,7 +451,13 @@ export function renderTableBody(
               const row = (e.currentTarget as HTMLElement).parentElement?.querySelector(
                 `tr[data-tiger-table-page-index="${next}"]`
               ) as HTMLElement | null
-              row?.focus()
+              if (row) {
+                row.focus()
+                return
+              }
+              if (props.virtualWindow) {
+                props.onVirtualRowFocus?.(next, e.key === 'ArrowDown' ? 'down' : 'up')
+              }
             }
       },
       cells

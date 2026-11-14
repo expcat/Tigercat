@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   canUseTableVirtualWindow,
@@ -450,6 +450,27 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       ctx.paginatedData.length
     ]
   )
+  const [pendingVirtualFocusIndex, setPendingVirtualFocusIndex] = useState<number | null>(null)
+  const focusVirtualRow = useCallback(
+    (index: number, edge: 'down' | 'up') => {
+      const target =
+        edge === 'down'
+          ? Math.max(0, (index + 1) * declaredRowHeight - virtualViewport)
+          : index * declaredRowHeight
+      if (virtualScrollerRef.current) virtualScrollerRef.current.scrollTop = target
+      setVirtualScrollTop(target)
+      setPendingVirtualFocusIndex(index)
+    },
+    [declaredRowHeight, virtualViewport]
+  )
+  useEffect(() => {
+    if (pendingVirtualFocusIndex == null) return
+    const row = virtualScrollerRef.current?.querySelector(
+      `tr[data-tiger-table-page-index="${pendingVirtualFocusIndex}"]`
+    )
+    ;(row as HTMLElement | null)?.focus()
+    setPendingVirtualFocusIndex(null)
+  }, [pendingVirtualFocusIndex])
   const shouldObserveGeometry =
     effectiveVirtual ||
     columnLockable ||
@@ -613,6 +634,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         selectionName: selectionGroupName,
         activeRowIndex,
         onActiveRowIndex: setActiveRowIndex,
+        onVirtualRowFocus: focusVirtualRow,
         grid
       })}
       {renderSummaryRow(ctx, {
