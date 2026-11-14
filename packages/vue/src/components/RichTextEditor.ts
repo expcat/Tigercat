@@ -29,6 +29,7 @@ import {
   findHotkeyMatch,
   isContentEmpty,
   parseHeight,
+  mergeStyleValues,
   builtinRichTextEngine,
   isToolbarSeparator,
   mergeTigerLocale,
@@ -281,10 +282,7 @@ export const RichTextEditor = defineComponent({
 
     const containerStyle = computed(() => {
       const ht = parseHeight(props.height)
-      return {
-        ...(ht ? { height: ht } : {}),
-        ...(attrs.style as Record<string, string> | undefined)
-      }
+      return mergeStyleValues(ht ? { height: ht } : undefined, attrs.style)
     })
 
     return () => {

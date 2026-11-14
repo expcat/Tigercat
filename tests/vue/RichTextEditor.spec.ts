@@ -187,6 +187,16 @@ describe('RichTextEditor', () => {
       expect(wrapper.style.height).toBe('320px')
       expect(wrapper.style.marginTop).toBe('8px')
     })
+
+    it('accepts a string style without crashing', () => {
+      const { container } = renderEditor({
+        style: 'margin-top: 13px'
+      })
+      const wrapper = container.firstElementChild as HTMLElement
+      expect(wrapper).toBeTruthy()
+      expect(wrapper.style.height).toBe('300px')
+      expect(wrapper.style.marginTop).toBe('13px')
+    })
   })
 
   describe('Events', () => {

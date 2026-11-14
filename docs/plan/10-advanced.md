@@ -20,12 +20,12 @@ advanced 组 11 个组件（C159–C169），视觉与键盘全部 blocked。
 
 ## 概览
 
-本篇 33 条：P1 3、P2 25、P3 5。
-按波次：W1 3、W6 25、W9 5。
+本篇 32 条：P1 2、P2 25、P3 5。
+按波次：W1 2、W6 25、W9 5。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C160-F04（S03）、C162-F03（S03）。
 
-本篇的 P1：C167-F01、C168-F01、C169-F01。
+本篇的 P1：C168-F01、C169-F01。
 
 ## 条目
 
@@ -104,7 +104,6 @@ advanced 组 11 个组件（C159–C169），视觉与键盘全部 blocked。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                             | 验收                                                                                        |
 | -------- | ---- | ---- | ---- | ---- | ------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| C167-F01 | P1   | W1   | Vue  | 行为 | Vue 传入字符串 style 时渲染抛错，组件渲染不出来  | Vue 传字符串 style「margin-top: 13px」时正常渲染且根 margin-top 为 13px；对象 style 不变    |
 | C167-F02 | P2   | W6   | 双端 | i18n | 链接表单占位写死 https://，打开后不聚焦输入框    | zh-CN、不传 onRequestUrl 时触发链接表单，placeholder 为「输入链接地址」且活动元素是该 input |
 | C167-F03 | P2   | W6   | Core | 行为 | plain 模式受控回写后编辑区仍残留 strong 等格式   | mode=plain、编辑区含 strong 段落、受控值回写 Hello world 后，innerHTML 不再含 strong        |
 | C167-F04 | P2   | W6   | Core | 行为 | 只有图片的内容被判为空，placeholder 仍盖在图片上 | 正文只有 img 并传 placeholder 时 isContentEmpty 为 false、不显示占位；空段落仍算空          |

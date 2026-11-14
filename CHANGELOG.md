@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **RichTextEditor 字符串 style（Vue，C167-F01）**：根容器改用共享的 style 合并工具，模板或渲染函数传入字符串 style（如 `margin-top: 13px`）不再抛错并正常落到根节点；对象 style 的合并结果不变。
+
 - **NavigationMenu viewport 面板与数值键（Core / Vue / React，C102-F01、C102-F02）**：共享 viewport 下的普通面板现在带上 `aria-controls` 指向的 id、`role=menu`、ref 与键盘 / 焦点 / 悬停处理，Enter / ArrowDown 打开后焦点进入首项，面板内方向键、Escape 和焦点离开与普通面板一致。item value 写入 DOM 时改用带类型前缀的 id（数值为 `n:1`、字符串为 `s:1`）并在读取时解码，纯数值 value 的菜单仍有唯一 `tabindex=0` 入口，`current` 在 `1` 与 `"1"` 并存时只选中类型匹配的项。
 
 - **Menu 键盘入口与树语义（Core / Vue / React，C098-F01、C098-F02）**：items 根的 roving Tab 入口穿透顶层分组并跳过禁用项，组内只剩分组或首项禁用时双端仍恰有一个 enabled 项 `tabindex=0`。子菜单标题在菜单上下文中统一输出 `menuitem`，内容层输出 `role=group`，双端 filled-tree axe 用例（TIGER_A11Y=1）不再有可聚焦元素缺少可见焦点等违规。
