@@ -87,6 +87,25 @@ describe('FloatButtonGroup (React)', () => {
     expect(trigger).toHaveAttribute('aria-controls')
   })
 
+  it('wraps a non-interactive span trigger in a focusable button', async () => {
+    const user = userEvent.setup()
+    for (const key of ['{Enter}', ' '] as const) {
+      const view = render(
+        <FloatButtonGroup portal={false} triggerNode={<span>Open</span>}>
+          <FloatButton ariaLabel="Edit" />
+        </FloatButtonGroup>
+      )
+      const trigger = screen.getByRole('button', { name: 'Open' })
+      expect(trigger.tagName).toBe('BUTTON')
+      expect(trigger).toHaveAttribute('type', 'button')
+      trigger.focus()
+      expect(trigger).toHaveFocus()
+      await user.keyboard(key)
+      expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
+      view.unmount()
+    }
+  })
+
   it('opens from click when trigger is hover', async () => {
     const onOpenChange = vi.fn()
     render(

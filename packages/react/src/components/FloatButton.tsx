@@ -296,7 +296,9 @@ export const FloatButtonGroup = forwardRef<HTMLDivElement, FloatButtonGroupProps
     }
 
     let triggerEl: ReactNode
-    if (isValidElement(triggerNode) && shouldMergeOverlayTriggerChild(true, triggerNode.type)) {
+    // asChild would merge onto every node. Only native controls and components
+    // keep their own element; span and text are wrapped in a button.
+    if (isValidElement(triggerNode) && shouldMergeOverlayTriggerChild(false, triggerNode.type)) {
       const child = triggerNode as ReactElement<{
         onClick?: React.MouseEventHandler
         'aria-expanded'?: boolean

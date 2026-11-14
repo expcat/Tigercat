@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **FloatButtonGroup 自定义触发器（Vue / React，C096-F01）**：非交互自定义触发器现在渲染为可聚焦的 `button type="button"`。React 的 `triggerNode` 为 span，以及 Vue 的 trigger 插槽为文本或数值 `0` 时，Enter / Space 展开动作组。原生 button、链接和组件触发器仍合并到原元素。
+
 - **BreadcrumbItem 动作项（Vue，C087-F01）**：从组件 vnode 读取 click 监听器，无 href、非 current、带 `@click` 的子项现在输出 `button type="button"`，点击回调一次。
 
 - **Breadcrumb 折叠点击（Vue / React，C086-F01）**：折叠菜单保留原 BreadcrumbItem 的点击处理器与 target，并复用链接地址门禁补齐安全 rel。Demo03 点击「一级目录」与可见「首页」一样，在事件到达 body 前取消原生导航。

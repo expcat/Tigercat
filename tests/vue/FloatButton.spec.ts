@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
 import { VIEWPORT_FLOATING_FAB_OFFSET } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
@@ -75,6 +76,39 @@ describe('FloatButtonGroup (Vue)', () => {
     expect(trigger).toHaveAttribute('aria-expanded', 'true')
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(trigger).toHaveAttribute('aria-controls')
+  })
+
+  it('wraps span, text, and 0 triggers in a focusable button', async () => {
+    const user = userEvent.setup()
+    const cases = [
+      { trigger: () => h('span', 'Open'), name: 'Open' },
+      { trigger: () => 'Open', name: 'Open' },
+      { trigger: () => 0, name: '0' }
+    ]
+
+    for (const item of cases) {
+      for (const key of ['{Enter}', ' '] as const) {
+        const view = render({
+          setup: () => () =>
+            h(
+              FloatButtonGroup,
+              { portal: false },
+              {
+                trigger: item.trigger,
+                default: () => h(FloatButton, { ariaLabel: 'Edit' })
+              }
+            )
+        })
+        const trigger = screen.getByRole('button', { name: item.name })
+        expect(trigger.tagName).toBe('BUTTON')
+        expect(trigger).toHaveAttribute('type', 'button')
+        trigger.focus()
+        expect(trigger).toHaveFocus()
+        await user.keyboard(key)
+        expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
+        view.unmount()
+      }
+    }
   })
 
   it('opens from click when trigger is hover', async () => {

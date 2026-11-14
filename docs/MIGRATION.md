@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 FloatButtonGroup 的非交互自定义触发器现在渲染为可聚焦的 `button type="button"`。React 把 `triggerNode` 为 span 的内容包进按钮；Vue 的 trigger 插槽为文本或数值 `0` 时同样包进按钮，Enter / Space 可以展开动作组。此前这些内容保持 span 或文本节点，键盘无法打开。原生 `button`、`a` 和组件触发器（包括 FloatButton）仍合并到原元素，调用方的点击继续执行。依赖 span 或纯文本节点选择器的样式请改到这层 button。调用方式不用改。
+
 Vue BreadcrumbItem 在没有合法 `href`、非 current 且带 `@click` 时，现在输出 `button type="button"`，点击触发一次回调；此前输出不可交互的 span。调用方式不用改，依赖该项 span 标签的样式选择器请适配 button。
 
 双端 Breadcrumb 的折叠菜单现在保留原 BreadcrumbItem 的 `onClick` / `@click` 与 `target`，`target="_blank"` 同样补齐安全 `rel`。点击折叠项会执行原处理器，`preventDefault()` 可取消原生导航；Demo03 的「一级目录」与可见「首页」行为一致。调用方式不用改。

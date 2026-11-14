@@ -393,7 +393,9 @@ export const FloatButtonGroup = defineComponent({
 
       if (triggerNodes && triggerNodes.length === 1 && isVNode(triggerNodes[0])) {
         const single = triggerNodes[0]
-        if (shouldMergeOverlayTriggerChild(true, single.type)) {
+        // asChild would merge onto every node. Only native controls and components
+        // keep their own element; span, text, and 0 are wrapped in a button.
+        if (shouldMergeOverlayTriggerChild(false, single.type)) {
           trigger = cloneVNode(single, {
             ...triggerAria,
             onClick: onTriggerClick
