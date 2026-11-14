@@ -751,7 +751,7 @@ function onFocusScopeKeyDown(doc: Document, event: KeyboardEvent): void {
   const active = doc.activeElement
   if (isScopeExempt(entry, active)) return
   const focusables = getFocusableElements(entry.container)
-  const inside = active instanceof Node && entry.container.contains(active)
+  const inside = active !== null && entry.container.contains(active)
   if (!inside) {
     if (isExemptFromFocusScope(active)) return
     event.preventDefault()

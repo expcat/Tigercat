@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **图片预览焦点（Core，C014-K01）**：焦点作用域按容器包含关系判断焦点是否在内部，移除跨 document 时错误的 `instanceof Node` 判断。React Gallery 选第二图后按 Enter 打开预览，第一次 Tab 从「关闭预览」前进到「上一张图片」，与 Vue 一致；同一预览修复同时作用于 Image、ImageGroup 与 ImagePreview。
+
 - **颜色方案初始化脚本（Core，X01-F021）**：`colorSchemeInitScript` 先把脚本正文里的 `<` 编成 `\u003c`，再包进 `<script>`。`storageKey` 含 `</script><p id=x01-breakout>` 时，按 HTML 插入后仍只有一个 script，不会多出一个 p。脚本执行时读到的 storageKey 和 attribute 仍是原来的字符串。
 
 - **菜单 items 子菜单（React，X01-F016）**：Dropdown 与 ContextMenu 的 items 子菜单可用 ArrowRight 或点击展开。聚焦 More 后按 ArrowRight 或点击，expanded 为 true，子菜单出现，并把焦点送进第一项。RTL 下展开键是 ArrowLeft。悬停展开不变，禁用项不会展开。

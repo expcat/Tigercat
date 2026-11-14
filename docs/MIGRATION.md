@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React Gallery、Image、ImageGroup 与 ImagePreview 的预览挂到同源父文档时，Tab 现在按预览内的控件顺序前进。Gallery 选第二图后按 Enter 打开预览，第一次 Tab 从「关闭预览」移到「上一张图片」；此前跨 document 的焦点被误判为预览外部，Tab 会再次停在关闭按钮。调用方式不用改。
+
 `colorSchemeInitScript` 现在把内联脚本正文中的 `<` 写成 `\u003c`，再包进 `<script>`。`storageKey` 或 `attribute` 含有 `</script>` 时，插入页面后不再提前结束脚本，也不会多出脚本外面的元素。脚本运行时这两个字符串的值不变；不含 `<` 的配置生成的 HTML 与以前相同。调用方式不用改。
 
 React 的 Dropdown 与 ContextMenu 在 `items` 含 `type: 'submenu'` 时，聚焦该项后按 ArrowRight，或直接点击，就会展开子菜单。`aria-expanded` 变为 `true`，子菜单出现，键盘展开还会把焦点移到第一项可用子项。阅读方向为 RTL 时，展开键是 ArrowLeft。此前只有鼠标悬停能展开。悬停展开、移出关闭，以及禁用项不展开，都保持原样。Vue 的 items 子菜单仍只在悬停时展开。

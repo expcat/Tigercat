@@ -5,6 +5,21 @@ for (const { framework, baseUrl } of exampleApps) {
   test.describe(`${framework} — Interaction flows`, () => {
     // Overlay iframes plus page chrome need more than Playwright Desktop 1280x720.
     test.use({ viewport: { width: 1280, height: 1400 } })
+    test('gallery preview advances focus immediately after keyboard opening', async ({ page }) => {
+      const { preview } = await openDemo(page, baseUrl, 'gallery', 'gallery-01')
+      await preview.getByRole('button', { name: '湖面', exact: true }).focus()
+      await page.keyboard.press('Enter')
+      await page.keyboard.press('Shift+Tab')
+      await page.keyboard.press('Shift+Tab')
+      await expect(preview.getByRole('button', { name: '打开预览', exact: true })).toBeFocused()
+      await page.keyboard.press('Enter')
+      const dialog = page.getByRole('dialog', { name: '图片预览', exact: true })
+      await expect(dialog.locator('img')).toHaveAttribute('alt', '湖面')
+      await expect(dialog.getByRole('button', { name: '关闭预览', exact: true })).toBeFocused()
+      await page.keyboard.press('Tab')
+      await expect(dialog.getByRole('button', { name: '上一张图片', exact: true })).toBeFocused()
+    })
+
     test('modal form validates and submits', async ({ page }) => {
       const { moduleRoot, preview } = await openDemo(page, baseUrl, 'modal', 'modal-04')
       await preview.getByRole('button', { name: '编辑资料', exact: true }).click()
