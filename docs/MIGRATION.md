@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Mentions 在提及位置、前缀和查询内容未变化时，keyup 不再重置活动候选或重新打开面板。输入 `@` 后完整按松 ArrowDown 停在 Bob、End 停在 Charlie；Escape 关闭后保持关闭，继续输入新查询仍会打开候选。`search` / `onSearch` 不再随查询未变化的 keyup 重复触发。调用方式不用改。
+
 双端 List 的 `virtual` 容器现在是可 Tab 聚焦的命名列表，可用方向键滚动。名称优先读取调用方的 `aria-labelledby` / `aria-label`，缺省沿用 `locale.scrollArea.ariaLabel`（英文为 “Scrollable region”）；虚拟行由 VirtualList 提供一层 `listitem` 语义，不再嵌套 `li`。`renderItem` 与 `onItemClick` / `item-click` 组合时，行进入 Tab 顺序，Enter / Space 触发行回调，内部控件仍独立响应。`loading` 时内容保留在 DOM 中并设为 `inert`，内置行按钮和拖拽手柄禁用，`aria-busy` 保留；加载结束后恢复。调用方式不用改，依赖虚拟行 `li` 选择器的样式应改用 `[role="listitem"]`。
 
 SplitButton 与 Dropdown 的键盘焦点恢复正常：Vue 从 trigger 按 ArrowDown / ArrowUp 打开菜单后，等定位完成再聚焦首个 / 最后一个可用菜单项。双端菜单内按 Tab 会关闭菜单，并聚焦 trigger 之后的可聚焦控件；Shift+Tab 到 trigger 之前的控件。共享锚定浮层在没有 layer 祖先时使用 trigger 自己的 document，因此同源 iframe 的菜单 portal 到父页时也遵守此顺序。调用方式不用改。

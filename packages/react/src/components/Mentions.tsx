@@ -209,9 +209,16 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       (text: string, cursor: number) => {
         const result = extractMentionQuery(text, cursor, prefix)
         if (result) {
+          snapshotRef.current = { ...result, text, cursor }
+          if (
+            mentionStartRef.current === result.startPos &&
+            mentionPrefixRef.current === result.prefix &&
+            query === result.query
+          ) {
+            return
+          }
           mentionStartRef.current = result.startPos
           mentionPrefixRef.current = result.prefix
-          snapshotRef.current = { ...result, text, cursor }
           setQuery(result.query)
           onSearch?.(result.query, result.prefix)
           const nextFiltered = filterMentionOptions(
@@ -235,7 +242,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
         setOpen(false)
         setActiveIndex(-1)
       },
-      [filterOption, loading, onSearch, options, prefix, setOpen]
+      [filterOption, loading, onSearch, options, prefix, query, setOpen]
     )
 
     useEffect(() => {

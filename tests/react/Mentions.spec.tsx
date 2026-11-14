@@ -132,6 +132,33 @@ describe('Mentions', () => {
     expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ value: 'charlie' }))
   })
 
+  it('keeps navigation and Escape results after keyup', async () => {
+    const { getByRole, getByText } = render(
+      <Mentions options={defaultOptions} aria-label="Members" />
+    )
+    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    await openMention(textarea, '@')
+    await screen.findByRole('listbox')
+
+    for (const [key, label] of [
+      ['ArrowDown', 'Bob'],
+      ['End', 'Charlie']
+    ]) {
+      fireEvent.keyDown(textarea, { key })
+      fireEvent.keyUp(textarea, { key })
+      expect.soft(textarea).toHaveAttribute('aria-activedescendant', getByText(label).id)
+    }
+
+    fireEvent.keyDown(textarea, { key: 'Escape' })
+    fireEvent.keyUp(textarea, { key: 'Escape' })
+    expect.soft(screen.queryByRole('listbox', { hidden: true })).not.toBeInTheDocument()
+    expect.soft(textarea).toHaveAttribute('aria-expanded', 'false')
+
+    await openMention(textarea, '@b')
+    expect(await screen.findByText('Bob')).toBeInTheDocument()
+    expect(textarea).toHaveAttribute('aria-expanded', 'true')
+  })
+
   it('writes FormItem model on type and select, and focuses from the label', async () => {
     const user = userEvent.setup()
     const { getByLabelText, getByRole } = render(

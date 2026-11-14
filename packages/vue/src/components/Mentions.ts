@@ -304,10 +304,17 @@ export const Mentions = defineComponent({
     function applyQuery(text: string, cursor: number) {
       const result = extractMentionQuery(text, cursor, props.prefix)
       if (result) {
-        mentionStartPos.value = result.startPos
         mentionEndPos.value = cursor
-        mentionPrefix.value = result.prefix
         mentionSnapshot.value = { ...result, text, cursor }
+        if (
+          mentionStartPos.value === result.startPos &&
+          mentionPrefix.value === result.prefix &&
+          query.value === result.query
+        ) {
+          return
+        }
+        mentionStartPos.value = result.startPos
+        mentionPrefix.value = result.prefix
         query.value = result.query
         emit('search', result.query, result.prefix)
         const nextFiltered = filterMentionOptions(props.options, result.query, props.filterOption)

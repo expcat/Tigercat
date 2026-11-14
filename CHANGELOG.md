@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Mentions 键盘（Vue / React，C068-F01）**：提及位置、前缀与查询内容未变化时，keyup 保留当前候选和面板状态。输入 `@` 后完整按松 ArrowDown 停在 Bob、End 停在 Charlie，Escape 后面板保持关闭；继续输入新查询仍能打开候选。
+
 - **List 键盘与加载态（Vue / React，C043-F01、C043-F02、C043-F03）**：虚拟容器保留命名列表语义与 Tab / 方向键入口，每行仅输出一个列表项。`renderItem` 配行点击时可聚焦并用 Enter / Space 激活，内部按钮独立响应。加载内容区设为 inert、内置按钮禁用，保留 aria-busy，加载结束后恢复交互。
 
 - **SplitButton 键盘焦点（Core / Vue，C029-F02、C029-F03）**：Vue Dropdown 等浮层完成定位后再把 ArrowDown / ArrowUp 的焦点送到首项 / 末项。共享锚定浮层在没有 layer 祖先时按 trigger 所在 document 解析 Tab 后继；双端菜单关闭后前进到后继控件，Shift+Tab 返回前一控件，跨 iframe portal 也不再丢到 BODY。
