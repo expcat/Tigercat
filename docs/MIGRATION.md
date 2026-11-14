@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Upload 的 `customRequest` 同步抛错时，现在把文件标为 `error` 并触发一次 `onError`，随后可以重试；此前文件停在 `uploading`，重试不会再次发起请求。调用方式不用改。
+
 双端 Upload 的异步 `onRemove` 确认通过后，现在按当时的文件列表移除目标文件。移除 `a.txt` 等待期间加入 `b.txt`，确认后列表保留 `[b.txt]`；此前会被旧快照清空。调用方式不用改。
 
 双端 Table 的高级筛选现在在 AND/OR 组合前跳过空值规则（`undefined`、`null`、空字符串），`between` 缺少任一边界时同样跳过。已有 `name = Alice` 再添加空值 OR 条件仍只保留 Alice；筛选空单元格请使用 `isEmpty`。调用方式不用改。

@@ -10,7 +10,7 @@ import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
-import type { UploadFile } from '@expcat/tigercat-core'
+import type { UploadFile, UploadRequestOptions } from '@expcat/tigercat-core'
 import { defineComponent, h } from 'vue'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
@@ -262,6 +262,43 @@ describe('Upload', () => {
   })
 
   describe('Events', () => {
+    it('settles synchronous customRequest errors once and retries successfully', async () => {
+      const error = new Error('Request setup failed')
+      const onError = vi.fn()
+      const onSuccess = vi.fn()
+      const customRequest = vi
+        .fn(({ onSuccess }: UploadRequestOptions) => {
+          onSuccess?.({ url: '/retry.txt' })
+        })
+        .mockImplementationOnce(() => {
+          throw error
+        })
+      const { container, getByRole } = render(Upload, {
+        props: { customRequest, onError, onSuccess }
+      })
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(['content'], 'retry.txt', { type: 'text/plain' })
+
+      await fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => expect(onError).toHaveBeenCalledOnce())
+      expect(onError).toHaveBeenCalledWith(
+        error,
+        expect.objectContaining({ status: 'error', error: error.message, file })
+      )
+      expect(customRequest).toHaveBeenCalledOnce()
+
+      await fireEvent.click(getByRole('button', { name: 'Retry retry.txt' }))
+
+      await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce())
+      expect(onSuccess).toHaveBeenCalledWith(
+        { url: '/retry.txt' },
+        expect.objectContaining({ status: 'success', file })
+      )
+      expect(customRequest).toHaveBeenCalledTimes(2)
+      expect(onError).toHaveBeenCalledOnce()
+    })
+
     it('should emit change event when file is selected', async () => {
       const onChange = vi.fn()
       const { container } = render(Upload, {

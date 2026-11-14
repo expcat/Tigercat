@@ -210,7 +210,12 @@ export function createUploadController(options: {
 
       let abortHandle: { abort?: () => void } | void
       if (config.customRequest) {
-        abortHandle = config.customRequest(request)
+        try {
+          abortHandle = config.customRequest(request)
+        } catch (error) {
+          request.onError?.(error instanceof Error ? error : new Error(String(error)))
+          return
+        }
       } else if (config.action) {
         abortHandle = startXhrUpload({
           file,

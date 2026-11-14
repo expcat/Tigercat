@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Upload 同步请求错误（Core / Vue / React，X01-F009）**：`customRequest` 同步抛错时复用请求错误结算，文件进入 `error` 并触发一次 `onError`。失败后点击重试可再次发起请求并成功，不再停在 `uploading`。
+
 - **Upload 异步移除（Core / Vue / React，X01-F008）**：异步 `onRemove` 确认通过后，基于当前列表移除目标文件。移除 A 等待确认期间加入 B，确认后保留 `[b.txt]`，不再用等待前的快照清空列表。
 
 - **Table 空值高级筛选（Core / Vue / React，X01-F007）**：布尔组合前跳过空值规则及缺少边界的 `between`，已有 `name = Alice` 再添加空值 OR 条件仍只保留 Alice；`isEmpty` 与既有 AND/OR 优先级保持不变。

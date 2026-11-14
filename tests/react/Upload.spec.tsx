@@ -10,7 +10,7 @@ import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Upload, type UploadRef } from '@expcat/tigercat-react/Upload'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
-import type { UploadFile } from '@expcat/tigercat-core'
+import type { UploadFile, UploadRequestOptions } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { expectNoA11yViolations } from '../utils/react'
@@ -250,6 +250,45 @@ describe('Upload', () => {
   })
 
   describe('Events', () => {
+    it('settles synchronous customRequest errors once and retries successfully', async () => {
+      const error = new Error('Request setup failed')
+      const onError = vi.fn()
+      const onSuccess = vi.fn()
+      const customRequest = vi
+        .fn(({ onSuccess }: UploadRequestOptions) => {
+          onSuccess?.({ url: '/retry.txt' })
+        })
+        .mockImplementationOnce(() => {
+          throw error
+        })
+      const { container, getByRole } = render(
+        <Upload customRequest={customRequest} onError={onError} onSuccess={onSuccess} />
+      )
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(['content'], 'retry.txt', { type: 'text/plain' })
+
+      await dispatchUploadEvent(() => fireEvent.change(input, { target: { files: [file] } }))
+
+      await waitFor(() => expect(onError).toHaveBeenCalledOnce())
+      expect(onError).toHaveBeenCalledWith(
+        error,
+        expect.objectContaining({ status: 'error', error: error.message, file })
+      )
+      expect(customRequest).toHaveBeenCalledOnce()
+
+      await dispatchUploadEvent(() =>
+        fireEvent.click(getByRole('button', { name: 'Retry retry.txt' }))
+      )
+
+      await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce())
+      expect(onSuccess).toHaveBeenCalledWith(
+        { url: '/retry.txt' },
+        expect.objectContaining({ status: 'success', file })
+      )
+      expect(customRequest).toHaveBeenCalledTimes(2)
+      expect(onError).toHaveBeenCalledOnce()
+    })
+
     it('should call onChange when file is selected', async () => {
       const onChange = vi.fn()
       const { container } = render(<Upload onChange={onChange} />)
