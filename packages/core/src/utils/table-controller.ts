@@ -20,7 +20,6 @@ import { devWarn } from './dev-warn'
 import { filterDataAdvanced } from './table-filter-utils'
 import {
   buildTableGroupBlocks,
-  groupDataByColumn,
   resolveGroupCellValue,
   type TableGroupBlock
 } from './table-group-utils'
@@ -358,11 +357,6 @@ export function indexTableDataSource<T>(dataSource: T[]): TableIndexedRow<T>[] {
   return dataSource.map((record, sourceIndex) => ({ record, sourceIndex }))
 }
 
-function lookupSourceIndex<T>(dataSource: T[], record: T): number {
-  const index = dataSource.indexOf(record)
-  return index >= 0 ? index : 0
-}
-
 export interface TableViewInput<T = Record<string, unknown>> {
   columns: TableColumn<T>[]
   dataSource: T[]
@@ -409,9 +403,18 @@ export interface TableView<T = Record<string, unknown>> {
 }
 
 function toIndexedRows<T>(dataSource: T[], records: T[]): TableIndexedRow<T>[] {
+  const sourceIndices = new Map<T, number[]>()
+  // Pop source positions in order, retaining every occurrence of the same record.
+  for (let sourceIndex = dataSource.length - 1; sourceIndex >= 0; sourceIndex--) {
+    const record = dataSource[sourceIndex]
+    const indices = sourceIndices.get(record)
+    if (indices) indices.push(sourceIndex)
+    else sourceIndices.set(record, [sourceIndex])
+  }
+
   return records.map((record) => ({
     record,
-    sourceIndex: lookupSourceIndex(dataSource, record)
+    sourceIndex: sourceIndices.get(record)?.pop() ?? 0
   }))
 }
 
@@ -493,21 +496,14 @@ export function resolveTableView<T>(input: TableViewInput<T>): TableView<T> {
   })
 
   if (input.groupBy && !skipLocal) {
-    const grouped = groupDataByColumn(
-      processedRows.map((row) => row.record),
-      input.groupBy,
-      columns
-    )
-    const flattened: TableIndexedRow<T>[] = []
-    for (const groupRows of grouped.values()) {
-      for (const record of groupRows) {
-        flattened.push({
-          record,
-          sourceIndex: lookupSourceIndex(dataSource, record)
-        })
-      }
+    const grouped = new Map<string, TableIndexedRow<T>[]>()
+    for (const row of processedRows) {
+      const key = resolveGroupCellValue(row.record, input.groupBy, columns)
+      const groupRows = grouped.get(key)
+      if (groupRows) groupRows.push(row)
+      else grouped.set(key, [row])
     }
-    processedRows = flattened
+    processedRows = [...grouped.values()].flat()
   }
 
   const processedData = processedRows.map((row) => row.record)

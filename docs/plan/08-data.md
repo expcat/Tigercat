@@ -14,7 +14,7 @@ data 组 7 个组件（C131–C137）。视觉与键盘全部 blocked。
 
 ## 依赖与顺序
 
-- Table 的重复引用行（X01-F010）和 Vue 排序复位页码（X01-F011）在 [02](02-core-theme-i18n.md)。
+- Vue Table 排序复位页码（X01-F011）在 [02](02-core-theme-i18n.md)。
 
 ## 概览
 

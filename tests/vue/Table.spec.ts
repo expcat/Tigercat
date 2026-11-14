@@ -1279,23 +1279,27 @@ describe('Table', () => {
   })
 
   describe('Events', () => {
-    it('should emit row-click event when clicking a row', async () => {
+    it('emits each source index for repeated object references', async () => {
       const onRowClick = vi.fn()
+      const record = { name: 'Alice', age: 29 }
 
       const { container } = render(Table, {
         props: {
           columns,
-          dataSource
+          dataSource: [record, record],
+          pagination: false
         },
         attrs: {
           onRowClick
         }
       })
 
-      const firstRow = container.querySelector('tbody tr')!
-      await fireEvent.click(firstRow)
+      const tableRows = container.querySelectorAll('tbody tr')
+      await fireEvent.click(tableRows[0])
+      await fireEvent.click(tableRows[1])
 
-      expect(onRowClick).toHaveBeenCalledWith(dataSource[0], 0)
+      expect(onRowClick).toHaveBeenNthCalledWith(1, record, 0)
+      expect(onRowClick).toHaveBeenNthCalledWith(2, record, 1)
     })
 
     it('makes rows keyboard-activable when a row-click listener is bound (C21)', async () => {

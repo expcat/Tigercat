@@ -99,6 +99,26 @@ describe('table controller', () => {
     expect(view.pageSourceIndices).toEqual([1])
   })
 
+  it.each([undefined, 'dept'])(
+    'keeps each source index for repeated object references with groupBy=%s',
+    (groupBy) => {
+      const record = { name: 'Alice', department: 'Design' }
+      const view = resolveTableView({
+        columns,
+        dataSource: [record, record],
+        filters: { nameCol: 'Alice' },
+        sort: { key: 'nameCol', direction: 'asc' },
+        groupBy,
+        pagination: false,
+        currentPage: 1,
+        currentPageSize: 10
+      })
+
+      expect(view.pageSourceIndices).toEqual([0, 1])
+      expect(view.pageRowKeys).toEqual(['tiger-row:0', 'tiger-row:1'])
+    }
+  )
+
   it('groups the full processed set before paginating', () => {
     const data = Array.from({ length: 15 }, (_, index) => ({
       id: index + 1,
