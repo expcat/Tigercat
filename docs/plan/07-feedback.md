@@ -14,7 +14,7 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 
 ## 依赖与顺序
 
-- React FeedbackHost 的残留作用域是 X01-F022，Toast 编号是 X01-F006。
+- React FeedbackHost 的残留作用域是 X01-F022。
 - 动手前先在真实浏览器里复现，见 [13](13-evidence.md) 的 E09。
 
 ## 概览

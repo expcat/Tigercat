@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Toast 自动编号（Core / Vue / React，X01-F006）**：共享队列自动分配 ID 时跳过已占用值，先添加 `key: 1` 再添加无 key 的消息或通知会保留两条；显式相同 key 继续更新原条目。
+
 - **图表系列 key（Core / Vue / React，X01-F005）**：共享去重工具同时保留最终分配的 key，生成后缀遇到已占用值时继续递增；系列名 `['x', 'x', 'x-2']` 得到三个不同 key，双端 LineChart、AreaChart、RadarChart 的渐变、节点和点查询身份不再冲突。
 
 - **Calendar 年视图键盘（Core / Vue / React，X01-F004）**：上下键按三列月网格移动一行，January 按 ArrowDown 到 April，April 按 ArrowUp 回到 January；禁用月不再压缩月份步长。

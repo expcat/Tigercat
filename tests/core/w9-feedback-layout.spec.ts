@@ -26,6 +26,7 @@ import {
   dismissConfirmModal,
   enqueueConfirmModal,
   enqueueMessage,
+  enqueueNotification,
   settleMessage
 } from '../../packages/core/src/utils/feedback-scope'
 import {
@@ -89,6 +90,23 @@ describe('W9 feedback and layout core', () => {
     expect(drawerPushOffset(upper.id, 'right')).toEqual({ x: 0, y: 0 })
     upper.release()
     lower.release()
+  })
+
+  it('keeps explicit numeric keys when adding automatic messages and notifications', () => {
+    const scope = createFeedbackScope()
+    enqueueMessage(scope, { key: 1, content: 'Explicit message', duration: 0 }, 'info')
+    enqueueMessage(scope, { content: 'Automatic message', duration: 0 }, 'info')
+    enqueueNotification(scope, { key: 1, title: 'Explicit notification', duration: 0 }, 'info')
+    enqueueNotification(scope, { title: 'Automatic notification', duration: 0 }, 'info')
+
+    expect(scope.messages.getSnapshot()).toMatchObject([
+      { id: 1, content: 'Explicit message' },
+      { id: 2, content: 'Automatic message' }
+    ])
+    expect(scope.notifications.getSnapshot()).toMatchObject([
+      { id: 1, title: 'Explicit notification' },
+      { id: 2, title: 'Automatic notification' }
+    ])
   })
 
   it('replaces one message key through a promise', async () => {

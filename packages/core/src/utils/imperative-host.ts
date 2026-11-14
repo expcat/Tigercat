@@ -248,7 +248,11 @@ export function createToastQueue<T extends ToastQueueItem>(
 
   function add(item: Omit<T, 'id'> & { id?: string | number }): T | null {
     if (!canMutate()) return null
-    const instance = { ...item, id: item.id ?? nextId() } as T
+    let id = item.id ?? nextId()
+    while (item.id == null && items.some((entry) => entry.id === id)) {
+      id = nextId()
+    }
+    const instance = { ...item, id } as T
     const existing = items.findIndex((entry) => entry.id === instance.id)
     const holds = existing >= 0 ? (timers.get(instance.id)?.holds ?? 0) : 0
     if (existing >= 0) {
