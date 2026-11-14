@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **VirtualList 方向键锚点（Core / Vue / React，C168-F01）**：带可访问名称的列表在用户滚动后按方向键，不再用滚动不更新的隐藏索引跳回列表前部；基准索引在活动项离开视口时从当前滚动位置重算，活动项仍在视口内时保持连续递进。
+
 - **RichTextEditor 字符串 style（Vue，C167-F01）**：根容器改用共享的 style 合并工具，模板或渲染函数传入字符串 style（如 `margin-top: 13px`）不再抛错并正常落到根节点；对象 style 的合并结果不变。
 
 - **NavigationMenu viewport 面板与数值键（Core / Vue / React，C102-F01、C102-F02）**：共享 viewport 下的普通面板现在带上 `aria-controls` 指向的 id、`role=menu`、ref 与键盘 / 焦点 / 悬停处理，Enter / ArrowDown 打开后焦点进入首项，面板内方向键、Escape 和焦点离开与普通面板一致。item value 写入 DOM 时改用带类型前缀的 id（数值为 `n:1`、字符串为 `s:1`）并在读取时解码，纯数值 value 的菜单仍有唯一 `tabindex=0` 入口，`current` 在 `1` 与 `"1"` 并存时只选中类型匹配的项。

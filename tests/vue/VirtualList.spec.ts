@@ -102,6 +102,28 @@ describe('VirtualList', () => {
     expect(onScroll).toHaveBeenCalledWith(500)
   })
 
+  it('keeps arrow keys anchored to the scrolled window', async () => {
+    const { container } = render(VirtualList, {
+      props: {
+        ...defaultProps,
+        ariaLabel: 'Rows',
+        overscan: 0
+      }
+    })
+    const outer = container.firstElementChild as HTMLElement
+    outer.scrollTop = 800
+    await fireEvent.scroll(outer)
+
+    await fireEvent.keyDown(outer, { key: 'ArrowDown' })
+    expect(outer.scrollTop).toBe(800)
+
+    await fireEvent.keyDown(outer, { key: 'ArrowUp' })
+    expect(outer.scrollTop).toBe(800)
+
+    await fireEvent.keyDown(outer, { key: 'ArrowUp' })
+    expect(outer.scrollTop).toBe(760)
+  })
+
   // --- Variable size via getItemHeight ---
   it('renders variable-height items via getItemHeight prop', () => {
     const getItemHeight = (index: number) => (index % 2 === 0 ? 30 : 60)

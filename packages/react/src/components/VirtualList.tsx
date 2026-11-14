@@ -23,6 +23,7 @@ import {
   observeSize,
   readMarginBoxBlockSize,
   resolveScrollportViewport,
+  resolveVirtualListKeyboardIndex,
   scrollTopForVirtualAlign,
   warnFixedRowOverflow
 } from '@expcat/tigercat-core'
@@ -322,7 +323,14 @@ export const VirtualList = forwardRef<VirtualListHandle, VirtualListProps>(funct
       return
     }
     event.preventDefault()
-    const current = activeIndexRef.current
+    const current = resolveVirtualListKeyboardIndex({
+      activeIndex: activeIndexRef.current,
+      scrollTop,
+      viewport,
+      itemCount,
+      getItemOffset: strategy.getItemOffset,
+      getItemHeight: strategy.getItemHeight
+    })
     const next =
       event.key === 'End'
         ? Math.max(0, itemCount - 1)

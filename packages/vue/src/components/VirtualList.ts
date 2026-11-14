@@ -19,6 +19,7 @@ import {
   observeSize,
   readMarginBoxBlockSize,
   resolveScrollportViewport,
+  resolveVirtualListKeyboardIndex,
   scrollTopForVirtualAlign,
   warnFixedRowOverflow,
   type VirtualScrollAlign,
@@ -307,14 +308,22 @@ export const VirtualList = defineComponent({
                 event.key === 'End')
             ) {
               event.preventDefault()
+              const current = resolveVirtualListKeyboardIndex({
+                activeIndex,
+                scrollTop: scrollTop.value,
+                viewport: viewport.value,
+                itemCount: props.itemCount,
+                getItemOffset: currentStrategy.getItemOffset,
+                getItemHeight: currentStrategy.getItemHeight
+              })
               const next =
                 event.key === 'End'
                   ? Math.max(0, props.itemCount - 1)
                   : event.key === 'Home'
                     ? 0
                     : event.key === 'ArrowDown'
-                      ? Math.min(Math.max(props.itemCount - 1, 0), activeIndex + 1)
-                      : Math.max(0, activeIndex - 1)
+                      ? Math.min(Math.max(props.itemCount - 1, 0), current + 1)
+                      : Math.max(0, current - 1)
               activeIndex = next
               applyScrollTop(
                 scrollTopForVirtualAlign({

@@ -132,6 +132,49 @@ export function scrollTopForVirtualAlign(input: {
   return offset
 }
 
+/**
+ * Base index for arrow-key scrolling.
+ *
+ * Keeps `activeIndex` while it still intersects the viewport. When the user
+ * scrolled the window away from it, restart from the first item that
+ * intersects `scrollTop`, or the last item when scrolled past the end.
+ */
+export function resolveVirtualListKeyboardIndex(options: {
+  activeIndex: number
+  scrollTop: number
+  viewport: number
+  itemCount: number
+  getItemOffset: (index: number) => number
+  getItemHeight: (index: number) => number
+}): number {
+  const count = Number.isFinite(options.itemCount) ? Math.max(0, Math.floor(options.itemCount)) : 0
+  if (count === 0) return 0
+  const scrollTop = Number.isFinite(options.scrollTop) ? Math.max(0, options.scrollTop) : 0
+  const viewport = Number.isFinite(options.viewport) ? Math.max(0, options.viewport) : 0
+  const active = Math.max(0, Math.min(count - 1, Math.floor(options.activeIndex)))
+  const activeOffset = options.getItemOffset(active)
+  const activeSize = options.getItemHeight(active)
+  if (viewport > 0 && activeSize > 0) {
+    if (activeOffset < scrollTop + viewport && activeOffset + activeSize > scrollTop) {
+      return active
+    }
+  }
+
+  let first = count - 1
+  let lo = 0
+  let hi = count - 1
+  while (lo <= hi) {
+    const mid = (lo + hi) >>> 1
+    if (options.getItemOffset(mid) + options.getItemHeight(mid) > scrollTop) {
+      first = mid
+      hi = mid - 1
+    } else {
+      lo = mid + 1
+    }
+  }
+  return first
+}
+
 /** Block size including top and bottom margins. `0` when the element is missing. */
 export function readMarginBoxBlockSize(element: HTMLElement | null | undefined): number {
   if (!element || typeof getComputedStyle !== 'function') return 0
