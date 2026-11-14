@@ -1,6 +1,7 @@
 import { defineComponent, h, computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import {
   classNames,
+  mergeStyleValues,
   coerceClassValue,
   chartTooltipBaseClasses,
   chartTooltipLines,
@@ -156,12 +157,14 @@ export const ChartTooltip = defineComponent({
           ? h(
               'div',
               {
+                ...attrs,
                 ref: tooltipRef,
                 id: props.id,
                 class: tooltipClasses.value,
-                style: {
-                  transform: getChartTooltipTransform(adjustedPosition.value)
-                },
+                style: mergeStyleValues(
+                  { transform: getChartTooltipTransform(adjustedPosition.value) },
+                  attrs.style
+                ),
                 role: 'tooltip',
                 'data-chart-tooltip': 'true'
               },

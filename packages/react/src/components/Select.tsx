@@ -197,6 +197,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
 
   return (
     <div
+      {...ctx.rootProps}
       ref={rootRef}
       className={ctx.className}
       style={props.style}

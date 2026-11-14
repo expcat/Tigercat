@@ -128,7 +128,10 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
   )
 }
 
-export interface AnchorProps extends Omit<CoreAnchorProps, 'style' | 'onClick'> {
+export interface AnchorProps
+  extends
+    Omit<CoreAnchorProps, 'style' | 'onClick'>,
+    Omit<React.HTMLAttributes<HTMLElement>, keyof CoreAnchorProps | 'onChange'> {
   onClick?: (event: React.MouseEvent, href: string) => void
   onChange?: (activeLink: string) => void
   children?: React.ReactNode
@@ -159,7 +162,8 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
     children,
     locale,
     labels,
-    'aria-label': ariaLabel
+    'aria-label': ariaLabel,
+    ...rest
   },
   ref
 ) {
@@ -323,6 +327,7 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
 
   const nav = (
     <nav
+      {...rest}
       ref={setNavRef}
       className={wrapperClasses}
       style={style}

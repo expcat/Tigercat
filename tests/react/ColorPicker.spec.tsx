@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { ColorPicker } from '@expcat/tigercat-react/ColorPicker'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { Form } from '@expcat/tigercat-react/Form'
@@ -41,6 +42,14 @@ function clickSv(s = 80, v = 80) {
 }
 
 describe('ColorPicker', () => {
+  it('preserves root style and native attributes during SSR', () => {
+    const html = renderToStaticMarkup(<ColorPicker style={{ margin: '13px' }} data-probe="c056" />)
+    const container = document.createElement('div')
+    container.innerHTML = html
+    expect(container.firstElementChild).toHaveAttribute('data-probe', 'c056')
+    expect((container.firstElementChild as HTMLElement).style.margin).toBe('13px')
+  })
+
   it('applies className without dropping the wrapper', () => {
     const { container } = render(<ColorPicker className="my-picker" />)
     const root = container.querySelector('.my-picker') as HTMLElement

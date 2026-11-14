@@ -99,7 +99,12 @@ export function useTreeSelectController(props: TreeSelectProps) {
     name,
     locale,
     id,
-    onBlur
+    onBlur,
+    placement: _placement,
+    offset: _offset,
+    dropdownClassName: _dropdownClassName,
+    getPopupContainer: _getPopupContainer,
+    ...rootProps
   } = props
 
   const inputGroup = useInputGroupContext()
@@ -684,6 +689,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
   })
 
   return {
+    rootProps,
     rootRef,
     triggerRef,
     searchInputRef,

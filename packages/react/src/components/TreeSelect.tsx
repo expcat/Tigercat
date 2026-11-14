@@ -128,6 +128,7 @@ export const TreeSelect = forwardRef<TreeSelectRef, TreeSelectProps>(
 
     return (
       <div
+        {...ctx.rootProps}
         ref={rootRef}
         className={ctx.className}
         style={props.style}

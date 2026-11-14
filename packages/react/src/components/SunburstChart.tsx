@@ -30,7 +30,10 @@ import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 import { DrillHost } from './w9-chart-bind'
 
-export interface SunburstChartProps extends CoreSunburstChartProps {
+export interface SunburstChartProps
+  extends
+    CoreSunburstChartProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreSunburstChartProps> {
   data: SunburstChartDatum[]
   padding?: ChartPadding
   onHoveredIndexChange?: (index: number | null) => void
@@ -71,7 +74,8 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   onHoveredIndexChange,
   onSelectedIndexChange,
   onArcClick,
-  onArcHover
+  onArcHover,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -298,6 +302,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

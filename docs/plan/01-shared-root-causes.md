@@ -2,7 +2,7 @@
 
 [路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
-同一个根因在很多组件的报告里重复出现。这里把它们收成 7 个任务（S07–S13），共 33 条发现，全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
+同一个根因在很多组件的报告里重复出现。这里把它们收成 6 个任务（S08–S13），共 32 条发现，全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
 
 ## 目标
 
@@ -16,34 +16,19 @@
 
 ## 依赖与顺序
 
-- S07–S10 是两端的同一种写法问题，可以按组件分给多人并行，但每个 S 要先在主发现的组件上定好写法。
+- S08–S10 是两端的同一种写法问题，可以按组件分给多人并行，但每个 S 要先在主发现的组件上定好写法。
 - 「并入」的意思是那份组件报告确认了同一个问题。清单来自各报告的归并记录，个别组件只是部分适用，以报告原文为准。
 
 ## 总表
 
 | 任务 | 根因                                    | 主发现                                  | 波及组件数 |
 | ---- | --------------------------------------- | --------------------------------------- | ---------- |
-| S07  | 根节点 style 与原生属性没有透传         | C056-F04                                | 38         |
 | S08  | 数值 0 被真值判断吞掉                   | C039-F03                                | 28         |
 | S09  | 内部事件处理器盖掉调用方监听            | C067-F02                                | 18         |
 | S10  | 受控值被父级拒收后，显示和提交值分离    | C056-F01                                | 14         |
 | S11  | 运行时回退把原型继承键当成合法值        | C004-F001、C003-F003、C002-F002 等 5 条 | 10         |
 | S12  | Vue 动态 class 停在初始值               | C089-F01                                | 6          |
 | S13  | Vue 手写导出的 Props 类型与运行时不一致 | C022-F03、C034-F04、C048-F02 等 23 条   | 23         |
-
-## S07 根节点 style 与原生属性没有透传
-
-**现状。** Vue 侧 `inheritAttrs: false` 之后根节点只绑了 class，style 和其余 attrs 丢失；React 侧不转发剩余属性。
-
-**做法。** 先定每个组件的属性承载点（根或 trigger），再沿用现有的 attrs / style 合并 helper 转发。内部 ARIA 和事件的合并规则不动。
-
-**做完的标准。** 并入清单里的每个组件：两端传 `style` 与 `data-*` 后，承载节点保留二者。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                             | 验收                                                         |
-| -------- | ---- | ---- | ---- | ---- | -------------------------------- | ------------------------------------------------------------ |
-| C056-F04 | P2   | W0   | 双端 | 行为 | 根样式及原生属性未按公开契约透传 | 两端传 margin:13px 与 data-probe=c056 后，SSR 根节点保留二者 |
-
-并入的组件（37）：Anchor、AppShell、AreaChart、AssigneePicker、BarChart、Breadcrumb、ChartLegend、ChartTooltip、ColorSwatch、ContextMenuSub、CronEditor、DatePicker、FloatButton、FullscreenButton、FunnelChart、Gantt、GaugeChart、HeatmapChart、LineChart、MenuItemGroup、NavigationMenuContent、NavigationMenuItem、NotificationBell、NumberKeyboard、OrgChart、PieChart、RadarChart、ScatterChart、Select、SubMenu、SunburstChart、Switch、TabPane、TimePicker、Transfer、TreeMapChart、TreeSelect。
 
 ## S08 数值 0 被真值判断吞掉
 

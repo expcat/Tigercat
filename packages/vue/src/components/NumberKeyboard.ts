@@ -360,9 +360,7 @@ export const NumberKeyboard = defineComponent({
 
     function renderGroup(sheet: boolean) {
       const forwardedAttrs = Object.fromEntries(
-        Object.entries(attrs).filter(
-          ([key]) => key !== 'class' && key !== 'style' && key !== 'id' && !key.startsWith('aria-')
-        )
+        Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style' && key !== 'id')
       )
       const attrDescribedBy =
         typeof attrs['aria-describedby'] === 'string' ? attrs['aria-describedby'] : undefined
@@ -441,19 +439,26 @@ export const NumberKeyboard = defineComponent({
       if (!overlayMode.value) return renderGroup(false)
 
       const target = resolveAnchoredOverlayTarget(rootRef.value)
-      return h('div', { ref: rootRef, class: classNames('contents', props.className) }, [
-        renderAnchorInput(),
-        renderInvalidNote(),
-        overlayEnabled.value
-          ? renderVueOverlayTeleport(
-              [
-                h('div', { class: numberKeyboardScrimClasses, onClick: () => setOpenSafe(false) }),
-                renderGroup(true)
-              ],
-              target
-            )
-          : null
-      ])
+      return h(
+        'div',
+        { ref: rootRef, class: classNames('contents', props.className), style: rootStyle.value },
+        [
+          renderAnchorInput(),
+          renderInvalidNote(),
+          overlayEnabled.value
+            ? renderVueOverlayTeleport(
+                [
+                  h('div', {
+                    class: numberKeyboardScrimClasses,
+                    onClick: () => setOpenSafe(false)
+                  }),
+                  renderGroup(true)
+                ],
+                target
+              )
+            : null
+        ]
+      )
     }
   }
 })

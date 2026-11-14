@@ -160,6 +160,7 @@ export const GaugeChart = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           class: getCartesianChartShellClasses({
             showLegend: false,
             responsive: props.responsive,

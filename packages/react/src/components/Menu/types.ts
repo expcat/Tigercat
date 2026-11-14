@@ -62,7 +62,10 @@ export interface MenuItemProps
   shortcut?: string
 }
 
-export interface MenuItemGroupProps extends CoreMenuItemGroupProps {
+export interface MenuItemGroupProps
+  extends
+    CoreMenuItemGroupProps,
+    Omit<React.HTMLAttributes<HTMLUListElement>, keyof CoreMenuItemGroupProps> {
   children?: React.ReactNode
   level?: number
   collapsed?: boolean

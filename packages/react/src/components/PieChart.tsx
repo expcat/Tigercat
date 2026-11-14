@@ -39,7 +39,8 @@ import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 import { PieBind } from './w9-chart-bind'
 
-export interface PieChartProps extends CorePieChartProps {
+export interface PieChartProps
+  extends CorePieChartProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CorePieChartProps> {
   data: PieChartDatum[]
   padding?: ChartPadding
   onHoveredIndexChange?: (index: number | null) => void
@@ -101,7 +102,8 @@ export const PieChart: React.FC<PieChartProps> = ({
   onHoveredIndexChange,
   onSelectedIndexChange,
   onSliceClick,
-  onSliceHover
+  onSliceHover,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -474,6 +476,7 @@ export const PieChart: React.FC<PieChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

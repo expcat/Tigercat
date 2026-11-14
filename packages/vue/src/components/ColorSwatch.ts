@@ -194,6 +194,7 @@ export const ColorSwatch = markFormItemGroupControl(
 
         if (options.value.length === 0) {
           return h('div', {
+            ...attrs,
             ref: rootRef,
             class: classNames(
               colorSwatchBaseClasses,
@@ -207,6 +208,7 @@ export const ColorSwatch = markFormItemGroupControl(
         return h(
           'div',
           {
+            ...attrs,
             ref: rootRef,
             class: classNames(
               colorSwatchBaseClasses,

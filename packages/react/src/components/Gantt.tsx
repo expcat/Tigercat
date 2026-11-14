@@ -56,7 +56,10 @@ interface GanttBarDragSession {
   captureTarget: Element | null
 }
 
-export interface GanttProps extends Omit<CoreGanttProps, 'className'> {
+export interface GanttProps
+  extends
+    Omit<CoreGanttProps, 'className'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreGanttProps> {
   padding?: ChartPadding
   className?: string
   onTaskClick?: (task: GanttTask) => void
@@ -112,7 +115,9 @@ export function Gantt({
   onSelectedIdChange,
   onTaskChange,
   onDataChange,
-  bind
+  bind,
+  responsive: _responsive,
+  ...rest
 }: GanttProps): React.ReactElement {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -432,7 +437,7 @@ export function Gantt({
   }
 
   return (
-    <div className={getCartesianChartShellClasses({ showLegend: false, className })}>
+    <div {...rest} className={getCartesianChartShellClasses({ showLegend: false, className })}>
       <ChartCanvas
         width={plotWidth}
         height={plotHeight}

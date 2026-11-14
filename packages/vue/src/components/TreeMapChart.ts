@@ -339,6 +339,7 @@ export const TreeMapChart = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           class: getCartesianChartShellClasses({
             showLegend: props.showLegend,
             legendPosition: props.legendPosition,

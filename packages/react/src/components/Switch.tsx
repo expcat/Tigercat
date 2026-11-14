@@ -40,6 +40,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
     children,
     id,
     onBlur,
+    style,
     ...props
   },
   ref
@@ -95,7 +96,10 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
   )
 
   return (
-    <label ref={rootRef} className={getSwitchRootClasses(effectiveDisabled, className)}>
+    <label
+      ref={rootRef}
+      className={getSwitchRootClasses(effectiveDisabled, className)}
+      style={style}>
       <span className="relative inline-flex items-center">
         <input
           {...props}

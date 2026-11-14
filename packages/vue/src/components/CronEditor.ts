@@ -350,6 +350,7 @@ export const CronEditor = markFormItemGroupControl(
         return h(
           'div',
           {
+            ...attrs,
             class: classNames(
               cronEditorBaseClasses,
               props.className,

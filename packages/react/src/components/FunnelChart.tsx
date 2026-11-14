@@ -34,7 +34,10 @@ import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 
-export interface FunnelChartProps extends CoreFunnelChartProps {
+export interface FunnelChartProps
+  extends
+    CoreFunnelChartProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreFunnelChartProps> {
   data: FunnelChartDatum[]
   padding?: ChartPadding
   onHoveredIndexChange?: (index: number | null) => void
@@ -75,7 +78,8 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   onHoveredIndexChange,
   onSelectedIndexChange,
   onSegmentClick,
-  onSegmentHover
+  onSegmentHover,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -315,6 +319,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

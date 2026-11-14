@@ -446,6 +446,7 @@ export const HeatmapChart = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           class: getCartesianChartShellClasses({
             showLegend: false,
             responsive: props.responsive,

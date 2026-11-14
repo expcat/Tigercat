@@ -27,7 +27,10 @@ import { ChartCanvas } from './ChartCanvas'
 import { useTigerConfig } from './tiger-config'
 import { OrgBind } from './w9-chart-bind'
 
-export interface OrgChartProps extends Omit<CoreOrgChartProps, 'className'> {
+export interface OrgChartProps
+  extends
+    Omit<CoreOrgChartProps, 'className'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreOrgChartProps> {
   padding?: ChartPadding
   className?: string
   onNodeClick?: (node: OrgChartNode) => void
@@ -68,7 +71,9 @@ export function OrgChart({
   onNodeClick,
   onNodeHover,
   onSelectedIdChange,
-  bind
+  bind,
+  responsive: _responsive,
+  ...rest
 }: OrgChartProps): React.ReactElement {
   const config = useTigerConfig()
   const markerClipPrefix = getOrgChartNodeClipId(useId())
@@ -133,7 +138,7 @@ export function OrgChart({
   }
 
   return (
-    <div className={getCartesianChartShellClasses({ showLegend: false, className })}>
+    <div {...rest} className={getCartesianChartShellClasses({ showLegend: false, className })}>
       <ChartCanvas
         width={plotWidth}
         height={plotHeight}

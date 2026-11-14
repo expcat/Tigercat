@@ -62,7 +62,10 @@ import { useTigerConfig } from './tiger-config'
 import { FormItemControlProvider, useFormItemControlContext } from './FormItemContext'
 import { ColorSwatch } from './ColorSwatch'
 
-export interface ColorPickerProps extends CoreColorPickerProps {
+export interface ColorPickerProps
+  extends
+    CoreColorPickerProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreColorPickerProps | 'onChange'> {
   value?: string | null
   defaultValue?: string | null
   onChange?: (value: string | null) => void
@@ -103,7 +106,8 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
       onChange,
       onOpenChange,
       onBlur,
-      style
+      style,
+      ...rest
     } = props
 
     const config = useTigerConfig()
@@ -619,6 +623,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
 
     return (
       <div
+        {...rest}
         ref={rootRef}
         className={classNames(colorPickerBaseClasses, className, status === 'error' && SHAKE_CLASS)}
         style={style}

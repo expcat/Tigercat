@@ -43,7 +43,8 @@ import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 
-export interface AreaChartProps extends CoreAreaChartProps {
+export interface AreaChartProps
+  extends CoreAreaChartProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreAreaChartProps> {
   data?: LineChartDatum[]
   series?: AreaChartSeries[]
   padding?: ChartPadding
@@ -127,7 +128,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   onSeriesClick,
   onSeriesHover,
   onPointClick,
-  onPointHover
+  onPointHover,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -614,6 +616,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

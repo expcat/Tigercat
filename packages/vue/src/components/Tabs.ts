@@ -325,6 +325,7 @@ export const TabPane = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           class: classNames(
             getTabPaneClasses(isActive.value),
             props.className,

@@ -96,7 +96,17 @@ export function useSelectController(props: SelectProps) {
     locale,
     id,
     onBlur,
-    renderOption
+    renderOption,
+    multiple: _multiple,
+    panelHeader: _panelHeader,
+    panelFooter: _panelFooter,
+    panelEmpty: _panelEmpty,
+    maxTagPlaceholder: _maxTagPlaceholder,
+    placement: _placement,
+    offset: _offset,
+    dropdownClassName: _dropdownClassName,
+    getPopupContainer: _getPopupContainer,
+    ...rootProps
   } = props
 
   const inputGroup = useInputGroupContext()
@@ -526,6 +536,7 @@ export function useSelectController(props: SelectProps) {
   }, [commitSelected, effectiveDisabled, filteredOptions, maxCount, readOnly, selected])
 
   return {
+    rootProps,
     rootRef,
     triggerRef,
     searchInputRef,

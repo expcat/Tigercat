@@ -11,7 +11,8 @@ import { PageHeader } from './PageHeader'
 import { Breadcrumb, BreadcrumbItem } from './Breadcrumb'
 import { Tabs, TabPane } from './Tabs'
 
-export interface AppShellProps extends CoreAppShellProps {
+export interface AppShellProps
+  extends CoreAppShellProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreAppShellProps> {
   sidebar?: React.ReactNode
   header?: React.ReactNode
   breadcrumbExtra?: React.ReactNode
@@ -41,7 +42,8 @@ export function AppShell({
   breadcrumbExtra,
   tabsExtra,
   actions,
-  children
+  children,
+  ...rest
 }: AppShellProps) {
   const [localCollapsed, setLocalCollapsed] = useState(defaultCollapsed)
   const [localTab, setLocalTab] = useState(defaultActiveTab)
@@ -49,7 +51,7 @@ export function AppShell({
   const active = resolveAppShellActiveTab(tabs, activeTab, localTab)
 
   return (
-    <Layout fullHeight={fullHeight} className={className} data-tiger-app-shell="">
+    <Layout {...rest} fullHeight={fullHeight} className={className} data-tiger-app-shell="">
       <Sidebar
         side={side}
         collapsible

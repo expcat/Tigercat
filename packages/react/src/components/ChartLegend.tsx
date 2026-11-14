@@ -10,7 +10,10 @@ import {
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
 
-export interface ChartLegendProps extends CoreChartLegendProps {
+export interface ChartLegendProps
+  extends
+    CoreChartLegendProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreChartLegendProps> {
   onItemClick?: (index: number, item: ChartLegendItem) => void
   onItemHover?: (index: number, item: ChartLegendItem, event?: React.SyntheticEvent) => void
   onItemLeave?: () => void
@@ -28,7 +31,9 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
   className,
   onItemClick,
   onItemHover,
-  onItemLeave
+  onItemLeave,
+  style,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -83,10 +88,11 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
 
   return (
     <div
+      {...rest}
       className={containerClasses}
       role={interactive ? 'group' : 'list'}
       aria-label={resolvedAriaLabel}
-      style={{ gap: `${gap}px` }}
+      style={{ gap: `${gap}px`, ...style }}
       data-chart-legend="true"
       onMouseLeave={interactive ? handleLeave : undefined}
       onBlur={interactive ? handleLeave : undefined}>

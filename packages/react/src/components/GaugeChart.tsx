@@ -23,7 +23,10 @@ import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 import { GaugeBind } from './w9-chart-bind'
 
-export interface GaugeChartProps extends CoreGaugeChartProps {
+export interface GaugeChartProps
+  extends
+    CoreGaugeChartProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreGaugeChartProps> {
   padding?: ChartPadding
   bind?: { display?: 'pointer' | 'arc' }
 }
@@ -55,7 +58,8 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   locale,
   labels: labelsOverride,
   className,
-  bind
+  bind,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const labels = useMemo(
@@ -163,6 +167,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend: false,
         responsive,

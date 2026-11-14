@@ -1,6 +1,7 @@
 import { defineComponent, h, PropType, computed } from 'vue'
 import {
   classNames,
+  mergeStyleValues,
   coerceClassValue,
   chartLegendListClasses,
   getChartLabels,
@@ -94,8 +95,9 @@ export const ChartLegend = defineComponent({
       h(
         'div',
         {
+          ...attrs,
           class: containerClasses.value,
-          style: containerStyle.value,
+          style: mergeStyleValues(containerStyle.value, attrs.style),
           role: props.interactive ? 'group' : 'list',
           'aria-label': resolvedAriaLabel.value,
           'data-chart-legend': 'true',

@@ -507,12 +507,17 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
     const owner = String(item.value)
     root.setViewportContent(
       owner,
-      <div role="menu" data-tiger-navigation-menu-content="">
+      <div
+        {...divProps}
+        className={classNames(getNavigationMenuContentClasses(mega), className)}
+        style={style}
+        role="menu"
+        data-tiger-navigation-menu-content="">
         {panelChildren}
       </div>
     )
     return () => root.clearViewportContent(owner)
-  }, [root, mega, item, isOpen, panelChildren])
+  }, [root, mega, item, isOpen, panelChildren, divProps, className, style])
 
   if (!item || !root) return null
   if (root.viewport && !mega) return null
@@ -547,10 +552,10 @@ export const NavigationMenuContent: React.FC<NavigationMenuContentProps> = ({
   )
 }
 
-export interface NavigationMenuItemProps extends Omit<
-  CoreNavigationMenuItemProps,
-  'className' | 'style'
-> {
+export interface NavigationMenuItemProps
+  extends
+    Omit<CoreNavigationMenuItemProps, 'className' | 'style'>,
+    Omit<React.LiHTMLAttributes<HTMLLIElement>, keyof CoreNavigationMenuItemProps> {
   className?: string
   style?: React.CSSProperties
   children?: React.ReactNode
@@ -561,7 +566,8 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
   disabled = false,
   className,
   style,
-  children
+  children,
+  ...rest
 }) => {
   const root = useContext(NavigationMenuContext)
   const reactId = useId()
@@ -649,6 +655,7 @@ export const NavigationMenuItem: React.FC<NavigationMenuItemProps> = ({
   return (
     <NavigationMenuItemContext.Provider value={itemContext}>
       <li
+        {...rest}
         className={classNames(getNavigationMenuItemClasses(), className)}
         style={style}
         role="none"

@@ -146,29 +146,7 @@ export const FloatButton = forwardRef<HTMLButtonElement, FloatButtonProps>(funct
     value: _value,
     ...sharedProps
   } = props
-  const anchorProps: React.AnchorHTMLAttributes<HTMLAnchorElement> = {
-    id: sharedProps.id,
-    role: sharedProps.role,
-    tabIndex: sharedProps.tabIndex,
-    title: sharedProps.title,
-    lang: sharedProps.lang,
-    dir: sharedProps.dir,
-    hidden: sharedProps.hidden,
-    inert: sharedProps.inert,
-    autoFocus: sharedProps.autoFocus,
-    accessKey: sharedProps.accessKey,
-    draggable: sharedProps.draggable,
-    spellCheck: sharedProps.spellCheck,
-    translate: sharedProps.translate,
-    slot: sharedProps.slot,
-    contentEditable: sharedProps.contentEditable,
-    inputMode: sharedProps.inputMode,
-    enterKeyHint: sharedProps.enterKeyHint,
-    autoCapitalize: sharedProps.autoCapitalize,
-    autoCorrect: sharedProps.autoCorrect,
-    suppressContentEditableWarning: sharedProps.suppressContentEditableWarning,
-    suppressHydrationWarning: sharedProps.suppressHydrationWarning
-  }
+  const anchorProps = sharedProps as React.AnchorHTMLAttributes<HTMLAnchorElement>
   const control = safeHref ? (
     <a
       {...anchorProps}

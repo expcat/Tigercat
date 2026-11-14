@@ -145,6 +145,7 @@ export const DatePicker = forwardRef<DatePickerRef, DatePickerProps>(
 
     return (
       <div
+        {...ctx.rootProps}
         ref={ctx.rootRef}
         className={classNames('relative inline-block w-full', props.className)}
         {...{ [ctx.chromeAttr]: '' }}

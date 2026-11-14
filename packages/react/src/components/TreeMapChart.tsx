@@ -34,7 +34,10 @@ import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 import { DrillHost } from './w9-chart-bind'
 
-export interface TreeMapChartProps extends CoreTreeMapChartProps {
+export interface TreeMapChartProps
+  extends
+    CoreTreeMapChartProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreTreeMapChartProps> {
   data: TreeMapChartDatum[]
   padding?: ChartPadding
   onHoveredIndexChange?: (index: number | null) => void
@@ -77,7 +80,8 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   onHoveredIndexChange,
   onSelectedIndexChange,
   onNodeClick,
-  onNodeHover
+  onNodeHover,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -313,6 +317,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

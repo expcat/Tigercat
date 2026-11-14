@@ -30,7 +30,10 @@ import { useControlledState } from '../hooks/useControlledState'
 import { useTigerConfig } from './tiger-config'
 import { useFormItemControlContext } from './FormItemContext'
 
-export interface ColorSwatchProps extends CoreColorSwatchProps {
+export interface ColorSwatchProps
+  extends
+    CoreColorSwatchProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreColorSwatchProps | 'onChange'> {
   value?: string
   defaultValue?: string
   onChange?: (value: string, option: ColorSwatchNormalizedOption) => void
@@ -178,6 +181,7 @@ const ColorSwatchInner = forwardRef<HTMLDivElement, ColorSwatchProps>(function C
   if (options.length === 0) {
     return (
       <div
+        {...rest}
         ref={assignRoot}
         className={classNames(colorSwatchBaseClasses, className)}
         style={style}
@@ -190,6 +194,7 @@ const ColorSwatchInner = forwardRef<HTMLDivElement, ColorSwatchProps>(function C
 
   return (
     <div
+      {...rest}
       ref={assignRoot}
       className={classNames(colorSwatchBaseClasses, className)}
       style={style}

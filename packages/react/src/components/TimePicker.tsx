@@ -166,6 +166,7 @@ export const TimePicker = forwardRef<TimePickerRef, TimePickerProps>(
 
     return (
       <div
+        {...ctx.rootProps}
         ref={ctx.rootRef}
         className={classNames(timePickerBaseClasses, props.className)}
         {...{ [ctx.chromeAttr]: '' }}

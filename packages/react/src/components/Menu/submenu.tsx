@@ -60,6 +60,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   icon,
   disabled = false,
   className,
+  style,
   level = 0,
   children,
   collapsed: collapsedOverride,
@@ -437,7 +438,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         id={titleId}
         type="button"
         className={titleClasses}
-        style={indentStyle}
+        style={{ ...indentStyle, ...style }}
         onClick={handleTitleClick}
         onKeyDown={handleTitleKeyDown}
         role={titleRole}

@@ -644,6 +644,7 @@ export const ColorPicker = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           ref: rootRef,
           class: classNames(
             colorPickerBaseClasses,

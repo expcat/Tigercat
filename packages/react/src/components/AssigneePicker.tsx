@@ -18,7 +18,10 @@ import {
 
 import { useTigerConfig } from './tiger-config'
 
-export interface AssigneePickerProps {
+export interface AssigneePickerProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'onChange'
+> {
   options?: AssigneeOption[]
   selectedIds?: string[]
   locale?: Partial<TigerLocale>
@@ -29,7 +32,9 @@ export function AssigneePicker({
   options = [],
   selectedIds = [],
   locale,
-  onChange
+  onChange,
+  className,
+  ...rest
 }: AssigneePickerProps) {
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
@@ -57,7 +62,12 @@ export function AssigneePicker({
     }
   }
   return (
-    <div className={getSpaceClasses({ orientation: 'vertical', size: 'sm', align: 'stretch' })}>
+    <div
+      {...rest}
+      className={classNames(
+        getSpaceClasses({ orientation: 'vertical', size: 'sm', align: 'stretch' }),
+        className
+      )}>
       <input
         type="search"
         className={getInputClasses({ size: 'sm' })}

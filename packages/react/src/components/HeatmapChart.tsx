@@ -38,7 +38,10 @@ import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 import { HeatBind } from './w9-chart-bind'
 
-export interface HeatmapChartProps extends CoreHeatmapChartProps {
+export interface HeatmapChartProps
+  extends
+    CoreHeatmapChartProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreHeatmapChartProps> {
   padding?: ChartPadding
   onHoveredIndexChange?: (index: number | null) => void
   onSelectedIndexChange?: (index: number | null) => void
@@ -90,7 +93,8 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   onSelectedIndexChange,
   onCellClick,
   onCellHover,
-  bind
+  bind,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -378,6 +382,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend: false,
         responsive,

@@ -39,7 +39,10 @@ import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 import { RadarBind } from './w9-chart-bind'
 
-export interface RadarChartProps extends CoreRadarChartProps {
+export interface RadarChartProps
+  extends
+    CoreRadarChartProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreRadarChartProps> {
   data?: RadarChartDatum[]
   series?: RadarChartSeries[]
   padding?: ChartPadding
@@ -116,7 +119,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   locale,
   labels: labelsOverride,
   className,
-  bind
+  bind,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -701,6 +705,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

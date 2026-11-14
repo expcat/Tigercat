@@ -654,7 +654,17 @@ export const NavigationMenuContent = defineComponent({
         const target = root.viewportEl.value
         if (!target) return null
         return h(Teleport, { to: target }, [
-          h('div', { role: 'menu', 'data-tiger-navigation-menu-content': '' }, slots.default?.())
+          h(
+            'div',
+            {
+              ...restAttrs,
+              class: innerClasses.value,
+              style: mergedStyle.value,
+              role: 'menu',
+              'data-tiger-navigation-menu-content': ''
+            },
+            slots.default?.()
+          )
         ])
       }
 

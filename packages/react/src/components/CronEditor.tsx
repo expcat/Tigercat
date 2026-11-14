@@ -45,7 +45,10 @@ import { useTigerConfig } from './tiger-config'
 import { useControlledState } from '../hooks/useControlledState'
 import { useFormItemControlContext } from './FormItemContext'
 
-export interface CronEditorProps extends CoreCronEditorProps {
+export interface CronEditorProps
+  extends
+    CoreCronEditorProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreCronEditorProps | 'onChange'> {
   value?: string | null
   defaultValue?: string | null
   onChange?: (value: string | null, validation: CronValidationResult) => void
@@ -72,7 +75,8 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
     onChange,
     onValidate,
     onBlur,
-    style
+    style,
+    ...rest
   },
   ref
 ) {
@@ -341,6 +345,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
 
   return (
     <div
+      {...rest}
       className={classNames(cronEditorBaseClasses, className)}
       style={style}
       role="group"

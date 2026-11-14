@@ -44,7 +44,10 @@ import { useChartInteraction } from '../hooks/useChartInteraction'
 import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 
-export interface ScatterChartProps extends CoreScatterChartProps {
+export interface ScatterChartProps
+  extends
+    CoreScatterChartProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreScatterChartProps> {
   data: ScatterChartDatum[]
   padding?: ChartPadding
   xScale?: ChartScale
@@ -135,7 +138,8 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   desc,
   locale,
   labels: labelsOverride,
-  className
+  className,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const gradientId = useId()
@@ -438,6 +442,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

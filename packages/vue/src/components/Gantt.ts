@@ -415,6 +415,7 @@ export const Gantt = defineComponent({
       h(
         'div',
         {
+          ...attrs,
           class: getCartesianChartShellClasses({
             showLegend: false,
             className: classNames(coerceClassValue(attrs.class), props.className)

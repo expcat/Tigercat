@@ -59,7 +59,23 @@ export function useDatePickerController(props: DatePickerProps) {
     labels: labelsOverride,
     className,
     onClear,
-    onBlur
+    onBlur,
+    range: _range,
+    value: _value,
+    defaultValue: _defaultValue,
+    onChange: _onChange,
+    placeholder: _placeholder,
+    placement: _placement,
+    offset: _offset,
+    dropdownClassName: _dropdownClassName,
+    getPopupContainer: _getPopupContainer,
+    minDate: _minDate,
+    maxDate: _maxDate,
+    disabledDate: _disabledDate,
+    weekStartsOn: _weekStartsOn,
+    now: _now,
+    shortcuts: _shortcuts,
+    ...rootProps
   } = props
 
   const isReadOnly = readOnly === true
@@ -399,6 +415,7 @@ export function useDatePickerController(props: DatePickerProps) {
   const wrapperClasses = getInputWrapperClasses(status, { inGroup })
 
   return {
+    rootProps,
     rootRef,
     inputRef,
     panelRef,

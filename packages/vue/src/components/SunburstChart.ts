@@ -326,6 +326,7 @@ export const SunburstChart = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           class: getCartesianChartShellClasses({
             showLegend: props.showLegend,
             legendPosition: props.legendPosition,

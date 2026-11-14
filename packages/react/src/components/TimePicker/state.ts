@@ -67,7 +67,21 @@ export function useTimePickerController(props: TimePickerProps) {
     labels: labelsOverride,
     className,
     onClear,
-    onBlur
+    onBlur,
+    range: _range,
+    value: _value,
+    defaultValue: _defaultValue,
+    onChange: _onChange,
+    placeholder: _placeholder,
+    placement: _placement,
+    offset: _offset,
+    dropdownClassName: _dropdownClassName,
+    getPopupContainer: _getPopupContainer,
+    now: _now,
+    minTime: _minTime,
+    maxTime: _maxTime,
+    disabledTime: _disabledTime,
+    ...rootProps
   } = props
 
   const isReadOnly = readOnly === true
@@ -486,6 +500,7 @@ export function useTimePickerController(props: TimePickerProps) {
   const wrapperClasses = getInputWrapperClasses(status, { inGroup })
 
   return {
+    rootProps,
     rootRef,
     inputRef,
     panelRef,

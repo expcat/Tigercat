@@ -352,6 +352,7 @@ export const Breadcrumb = defineComponent({
       const nav = h(
         'nav',
         {
+          ...(hasExtra ? {} : attrs),
           'aria-label': ariaLabel,
           class: hasExtra ? undefined : rootClass,
           style: hasExtra ? undefined : mergeStyleValues(attrsRecord.style, props.style)
@@ -370,7 +371,7 @@ export const Breadcrumb = defineComponent({
       if (!hasExtra) return nav
       return h(
         'div',
-        { class: rootClass, style: mergeStyleValues(attrsRecord.style, props.style) },
+        { ...attrs, class: rootClass, style: mergeStyleValues(attrsRecord.style, props.style) },
         [nav, h('div', { class: breadcrumbExtraClasses }, extraContent.value ?? undefined)]
       )
     }

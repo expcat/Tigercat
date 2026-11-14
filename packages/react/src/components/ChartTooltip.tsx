@@ -13,7 +13,7 @@ import {
 } from '@expcat/tigercat-core'
 import { renderOverlayPortal, useOverlayPortalTarget } from '../utils/overlay'
 
-export interface ChartTooltipProps {
+export interface ChartTooltipProps extends React.HTMLAttributes<HTMLDivElement> {
   content?: string
   open?: boolean
   x?: number
@@ -32,7 +32,9 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   className,
   id,
   onDismiss,
-  children
+  children,
+  style,
+  ...rest
 }) => {
   const tooltipRef = useRef<HTMLDivElement>(null)
   // Track the real tooltip node: it may appear, be replaced, or disappear
@@ -125,11 +127,13 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
       {open && body
         ? renderOverlayPortal(
             <div
+              {...rest}
               ref={bindTooltipRef}
               id={tooltipId}
               className={tooltipClasses}
               style={{
-                transform: getChartTooltipTransform(adjustedPosition)
+                transform: getChartTooltipTransform(adjustedPosition),
+                ...style
               }}
               role="tooltip"
               data-chart-tooltip="true">

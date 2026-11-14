@@ -77,7 +77,7 @@ export function useTabsContext(): TabsContextValue | null {
   return useContext(TabsContext)
 }
 
-export interface TabPaneProps {
+export interface TabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
   tabKey: string | number
   label: React.ReactNode
   disabled?: boolean
@@ -113,7 +113,8 @@ export const TabPane: React.FC<TabPaneProps> = ({
   children,
   renderMode = 'pane',
   tabId,
-  panelId
+  panelId,
+  ...rest
 }) => {
   const tabsContext = useTabsContext()
 
@@ -252,6 +253,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
 
   return (
     <div
+      {...rest}
       className={tabPaneClasses}
       style={style}
       role="tabpanel"

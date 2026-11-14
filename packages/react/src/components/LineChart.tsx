@@ -46,7 +46,8 @@ import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 import { AxisBind } from './w9-chart-bind'
 
-export interface LineChartProps extends CoreLineChartProps {
+export interface LineChartProps
+  extends CoreLineChartProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLineChartProps> {
   data?: LineChartDatum[]
   series?: LineChartSeries[]
   padding?: ChartPadding
@@ -135,7 +136,8 @@ export const LineChart: React.FC<LineChartProps> = ({
   onSeriesClick,
   onSeriesHover,
   onPointClick,
-  onPointHover
+  onPointHover,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -598,6 +600,7 @@ export const LineChart: React.FC<LineChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

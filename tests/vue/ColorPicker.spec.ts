@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
+import { renderToString } from '@vue/server-renderer'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { ColorPicker } from '@expcat/tigercat-vue/ColorPicker'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
@@ -37,6 +38,16 @@ async function clickSv(s = 80, v = 80) {
 }
 
 describe('ColorPicker', () => {
+  it('preserves root style and native attributes during SSR', async () => {
+    const html = await renderToString(
+      h(ColorPicker, { style: { margin: '13px' }, 'data-probe': 'c056' })
+    )
+    const container = document.createElement('div')
+    container.innerHTML = html
+    expect(container.firstElementChild).toHaveAttribute('data-probe', 'c056')
+    expect((container.firstElementChild as HTMLElement).style.margin).toBe('13px')
+  })
+
   it('applies className without dropping the wrapper', () => {
     const { container } = renderWithProps(ColorPicker, { className: 'my-picker' })
     const root = container.querySelector('.my-picker') as HTMLElement

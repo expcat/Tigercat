@@ -42,7 +42,8 @@ import { useResponsiveChartSize } from '../hooks/useResponsiveChartSize'
 import { useTigerConfig } from './tiger-config'
 import { BarBind } from './w9-chart-bind'
 
-export interface BarChartProps extends CoreBarChartProps {
+export interface BarChartProps
+  extends CoreBarChartProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreBarChartProps> {
   data: BarChartDatum[]
   padding?: ChartPadding
   xScale?: ChartScale
@@ -114,7 +115,8 @@ export const BarChart: React.FC<BarChartProps> = ({
   onHoveredIndexChange,
   onSelectedIndexChange,
   onBarClick,
-  onBarHover
+  onBarHover,
+  ...rest
 }) => {
   const config = useTigerConfig()
   const mergedLocale = useMemo(
@@ -419,6 +421,7 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   return (
     <div
+      {...rest}
       className={getCartesianChartShellClasses({
         showLegend,
         legendPosition,

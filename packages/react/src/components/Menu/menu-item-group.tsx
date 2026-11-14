@@ -14,7 +14,9 @@ export const MenuItemGroup: React.FC<MenuItemGroupProps> = ({
   className,
   children,
   level = 0,
-  collapsed
+  collapsed,
+  style,
+  ...rest
 }) => {
   const menuContext = useMenuContext()
   const submenuScope = useSubMenuScope()
@@ -37,6 +39,8 @@ export const MenuItemGroup: React.FC<MenuItemGroupProps> = ({
         </div>
       ) : null}
       <ul
+        {...rest}
+        style={style}
         role={usesMenuRole ? 'group' : undefined}
         className={className}
         aria-labelledby={title ? titleId : undefined}>

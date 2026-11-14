@@ -138,7 +138,10 @@ export const ContextMenuItem: React.FC<ContextMenuItemProps> = ({
   )
 }
 
-export interface ContextMenuSubProps extends Omit<CoreContextMenuSubProps, 'className'> {
+export interface ContextMenuSubProps
+  extends
+    Omit<CoreContextMenuSubProps, 'className'>,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, keyof CoreContextMenuSubProps> {
   className?: string
   style?: React.CSSProperties
   children?: React.ReactNode
@@ -149,7 +152,8 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
   disabled = false,
   className,
   style,
-  children
+  children,
+  ...rest
 }) => {
   const context = useContext(ContextMenuContext)
   const [isHovered, setIsHovered] = useState(false)
@@ -309,6 +313,7 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
       onMouseLeave={handleMouseLeave}
       role="none">
       <button
+        {...rest}
         ref={titleRef}
         type="button"
         className={triggerClasses}

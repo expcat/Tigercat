@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+ColorPicker、图表以及本轮修复的表单、导航和组合组件现在将 `style` 与原生属性传到既定根节点或触发器。应用侧为这些属性另加的包装可按实际需要移除；React Switch 的 `style` 现在作用于外层 label，用于控制整个开关的布局。
+
 W9 辅助文案现在遵守标准覆盖顺序：组件 `labels` → 组件 `locale` → ConfigProvider → en-US。Select 全选、AvatarGroup 折叠名单、菜单危险提示、表格 / 图表工具、输入错误等会随 Provider 语言变化；zhTW 使用繁体，WorkflowDesigner 的重复 key 校验使用对应语言。
 
 `basicLabel`、`getW9FormLabels`、`getW9DataLabels`、`dragMoveAnnouncement` 以及 AssigneePicker / NotificationBell 的 `locale` 改为接收语言对象。将 `'zh-CN'` 等字符串替换为从 `@expcat/tigercat-core/locales/zh-CN` 导入的 `zhCN`，或传入已合并的 `Partial<TigerLocale>`；仅传 `{ locale: 'zh-CN' }` 不加载词典。新增的 `getNavLabels` / `getFeedbackLayoutLabels` 同样接收语言对象，原常量仍表示默认英语。

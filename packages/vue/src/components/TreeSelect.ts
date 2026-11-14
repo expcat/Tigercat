@@ -721,6 +721,7 @@ export const TreeSelect = defineComponent({
 
     return () => {
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
+      const { id: _id, ...rootAttrs } = restAttrs
       const ariaLabel =
         typeof restAttrs['aria-label'] === 'string' ? restAttrs['aria-label'] : undefined
       const attrLabelledby =
@@ -1040,6 +1041,7 @@ export const TreeSelect = defineComponent({
       return h(
         'div',
         {
+          ...rootAttrs,
           ref: rootRef,
           class: getTreeSelectRootClasses(
             inputGroup != null,

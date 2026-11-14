@@ -14,13 +14,18 @@ import { Icon } from './Icon'
 import { NotificationCenter } from './NotificationCenter'
 import { Popover } from './Popover'
 
-export interface NotificationBellProps {
+export interface NotificationBellProps extends React.HTMLAttributes<HTMLDivElement> {
   items?: NotificationItem[]
   locale?: Partial<TigerLocale>
   onItemReadChange?: (item: NotificationItem, read: boolean) => void
 }
 
-export function NotificationBell({ items = [], locale, onItemReadChange }: NotificationBellProps) {
+export function NotificationBell({
+  items = [],
+  locale,
+  onItemReadChange,
+  ...rest
+}: NotificationBellProps) {
   const [open, setOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const wasOpen = useRef(false)
@@ -42,7 +47,7 @@ export function NotificationBell({ items = [], locale, onItemReadChange }: Notif
   }, [open])
 
   return (
-    <div>
+    <div {...rest}>
       <div className="sr-only" aria-live="polite">
         {announced}
       </div>
