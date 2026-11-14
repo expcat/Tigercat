@@ -4,6 +4,8 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
+import { h } from 'vue'
 import { List } from '@expcat/tigercat-vue/List'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -47,17 +49,63 @@ describe('List', () => {
     expect(screen.getByText('No items')).toBeInTheDocument()
   })
 
-  it('sets aria-busy and keeps listitems mounted while loading', () => {
-    render(List, {
+  it('isolates mounted row controls while loading and restores them afterwards', async () => {
+    const user = userEvent.setup()
+    const onItemClick = vi.fn()
+    const { rerender } = render(List, {
       props: {
         dataSource: sampleData,
-        loading: true
+        loading: true,
+        onItemClick
       }
     })
 
     expect(document.querySelector('[aria-busy="true"]')).toBeTruthy()
     expect(screen.getByText('Item 1')).toBeInTheDocument()
     expect(screen.getAllByRole('listitem')).toHaveLength(3)
+    const rowButton = screen.getByRole('button', { name: 'Item 1 Description 1' })
+    expect(rowButton.closest('[inert]')).toBeTruthy()
+    expect(rowButton).toBeDisabled()
+    await user.tab()
+    expect(rowButton).not.toHaveFocus()
+    await user.click(rowButton)
+    expect(onItemClick).not.toHaveBeenCalled()
+
+    await rerender({ loading: false })
+    expect(rowButton.closest('[inert]')).toBeNull()
+    await user.tab()
+    expect(rowButton).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(onItemClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('activates custom rows by keyboard without activating their nested controls', async () => {
+    const user = userEvent.setup()
+    const onItemClick = vi.fn()
+    const onAction = vi.fn()
+    render(List, {
+      props: { dataSource: sampleData, onItemClick },
+      slots: {
+        renderItem: ({ item }: { item: (typeof sampleData)[number] }) => [
+          h('span', item.title),
+          h('button', { onClick: onAction }, `Action ${item.key}`)
+        ]
+      }
+    })
+    const row = screen.getAllByRole('listitem')[0]
+    expect(row).toHaveAttribute('tabindex', '0')
+    await user.tab()
+    expect(row).toHaveFocus()
+    await user.keyboard('{Enter} ')
+    expect(onItemClick).toHaveBeenCalledTimes(2)
+    expect(onItemClick).toHaveBeenLastCalledWith(sampleData[0], 0)
+    await user.tab()
+    await user.keyboard('{Enter} ')
+    expect(onAction).toHaveBeenCalledTimes(2)
+    expect(onItemClick).toHaveBeenCalledTimes(2)
+    expect(
+      screen.getByRole('button', { name: 'Action 1' }).parentElement?.closest('button')
+    ).toBeNull()
   })
 
   it('renders header and footer slots', () => {
@@ -175,7 +223,7 @@ describe('List', () => {
     expect(grid?.style.gap).toBe('12px')
   })
 
-  it('uses VirtualList when virtual mode is enabled', () => {
+  it('provides a named virtual list with keyboard scrolling and one semantic item per row', async () => {
     const largeDataSource = Array.from({ length: 100 }, (_, index) => ({
       key: index,
       title: `Item ${index}`
@@ -196,6 +244,16 @@ describe('List', () => {
     expect(renderedItems.length).toBeLessThan(largeDataSource.length)
     expect(screen.getByText('Item 0')).toBeInTheDocument()
     expect(screen.queryByText('Item 50')).not.toBeInTheDocument()
+    const list = screen.getByRole('list', { name: 'Scrollable region' })
+    expect(renderedItems).toHaveLength(4)
+    expect(renderedItems[0]).toHaveAttribute('aria-setsize', '100')
+    expect(renderedItems[0]).toHaveAttribute('aria-posinset', '1')
+    const user = userEvent.setup()
+    await user.tab()
+    expect(list).toHaveFocus()
+    await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}')
+    expect(list.scrollTop).toBe(20)
+    expect(screen.queryByText('Item 0')).not.toBeInTheDocument()
   })
 
   it('has no accessibility violations', async () => {

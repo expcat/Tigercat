@@ -43,6 +43,7 @@ import {
   resolvePaginationDisplayMode,
   getPaginationLabels,
   getListLabels,
+  getScrollAreaLabels,
   formatPaginationTotal,
   observeElementSize,
   reorderSequence,
@@ -319,13 +320,23 @@ export const List = defineComponent({
         : null
 
       return h(
-        'li',
+        props.virtual && !props.grid ? 'div' : 'li',
         {
           key,
           class: classNames(itemClasses, dragClass as string | undefined),
+          tabindex: clickable && slots.renderItem ? (props.loading ? -1 : 0) : undefined,
+          onKeydown:
+            clickable && slots.renderItem
+              ? (event: KeyboardEvent) => {
+                  if (props.loading || event.target !== event.currentTarget) return
+                  if (event.key !== 'Enter' && event.key !== ' ') return
+                  event.preventDefault()
+                  emit('item-click', item, sourceIndex)
+                }
+              : undefined,
           onClick: clickable
             ? (event: MouseEvent) => {
-                if (isInteractiveTarget(event.target)) return
+                if (props.loading || isInteractiveTarget(event.target)) return
                 emit('item-click', item, sourceIndex)
               }
             : undefined,
@@ -337,6 +348,7 @@ export const List = defineComponent({
                 'button',
                 {
                   type: 'button',
+                  disabled: props.loading,
                   'data-list-drag-handle': '',
                   class: listDragHandleClasses,
                   'aria-label': labels.value.dragHandleAriaLabel,
@@ -368,6 +380,7 @@ export const List = defineComponent({
                 'button',
                 {
                   type: 'button',
+                  disabled: props.loading,
                   class: 'flex min-w-0 flex-1 items-center text-start',
                   onClick: () => emit('item-click', item, sourceIndex)
                 },
@@ -418,7 +431,12 @@ export const List = defineComponent({
         return h(
           VirtualList,
           {
-            role: 'none',
+            role: 'list',
+            ariaLabel:
+              typeof attrs['aria-label'] === 'string'
+                ? attrs['aria-label']
+                : getScrollAreaLabels(mergedLocale.value).ariaLabel,
+            'aria-labelledby': attrs['aria-labelledby'],
             itemCount: paginatedData.value.length,
             itemHeight: itemHeight.value,
             height: props.virtualHeight,
@@ -491,7 +509,7 @@ export const List = defineComponent({
               )
             : null,
           h('div', { class: 'relative', 'aria-busy': props.loading || undefined }, [
-            renderItems(),
+            h('div', { inert: props.loading || undefined }, [renderItems()]),
             props.loading
               ? h(
                   'div',

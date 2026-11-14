@@ -29,6 +29,7 @@ import {
   resolvePaginationDisplayMode,
   getPaginationLabels,
   getListLabels,
+  getScrollAreaLabels,
   formatPaginationTotal,
   observeElementSize,
   devWarn,
@@ -275,22 +276,35 @@ function ListInner<T extends ListItem>(
       onReorder?.(reorderSequence(dataSource, sourceIndex, to), sourceIndex, to)
     }
 
+    const ItemTag = useVirtual ? 'div' : 'li'
     return (
-      <li
+      <ItemTag
         key={key}
         className={classNames(itemClasses, dragClassName as string | undefined)}
-        onClick={
-          clickable
+        tabIndex={clickable && renderItem ? (loading ? -1 : 0) : undefined}
+        onKeyDown={
+          clickable && renderItem
             ? (event) => {
-                if (isInteractiveTarget(event.target)) return
+                if (loading || event.target !== event.currentTarget) return
+                if (event.key !== 'Enter' && event.key !== ' ') return
+                event.preventDefault()
                 onItemClick?.(item, sourceIndex)
               }
             : undefined
         }
-        {...(dragRest as React.HTMLAttributes<HTMLLIElement>)}>
+        onClick={
+          clickable
+            ? (event) => {
+                if (loading || isInteractiveTarget(event.target)) return
+                onItemClick?.(item, sourceIndex)
+              }
+            : undefined
+        }
+        {...(dragRest as React.HTMLAttributes<HTMLElement>)}>
         {isDraggable ? (
           <button
             type="button"
+            disabled={loading}
             data-list-drag-handle=""
             className={listDragHandleClasses}
             aria-label={labels.dragHandleAriaLabel}
@@ -306,6 +320,7 @@ function ListInner<T extends ListItem>(
         {clickable && !renderItem ? (
           <button
             type="button"
+            disabled={loading}
             className="flex min-w-0 flex-1 items-center text-start"
             onClick={() => onItemClick?.(item, sourceIndex)}>
             {body}
@@ -318,7 +333,7 @@ function ListInner<T extends ListItem>(
             {actionsSlot(item, sourceIndex)}
           </div>
         ) : null}
-      </li>
+      </ItemTag>
     )
   }
 
@@ -361,7 +376,9 @@ function ListInner<T extends ListItem>(
     if (useVirtual) {
       return (
         <VirtualList
-          role="none"
+          role="list"
+          ariaLabel={divProps['aria-label'] ?? getScrollAreaLabels(mergedLocale).ariaLabel}
+          aria-labelledby={divProps['aria-labelledby']}
           itemCount={paginatedData.length}
           itemHeight={itemHeight}
           height={virtualHeight}
@@ -428,7 +445,7 @@ function ListInner<T extends ListItem>(
         <div className={getListHeaderFooterClasses(size, false)}>{header}</div>
       ) : null}
       <div className="relative" aria-busy={loading || undefined}>
-        {renderItems()}
+        <div inert={loading || undefined}>{renderItems()}</div>
         {loading ? (
           <div className={listLoadingOverlayClasses} data-tiger-list-skeleton="" aria-hidden="true">
             <div className="h-8 animate-pulse rounded bg-neutral-200" />
