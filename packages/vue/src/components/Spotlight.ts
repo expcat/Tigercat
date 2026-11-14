@@ -359,7 +359,7 @@ export const Spotlight = defineComponent({
             onClick: () => selectItem(result.item)
           },
           [
-            iconNode ? h('span', { class: 'shrink-0' }, iconNode) : null,
+            iconNode != null ? h('span', { class: 'shrink-0' }, iconNode) : null,
             h('span', { class: 'min-w-0 flex-1' }, [
               h('span', { class: 'block truncate text-sm font-medium' }, result.item.label),
               result.item.description

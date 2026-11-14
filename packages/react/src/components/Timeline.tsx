@@ -194,7 +194,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         {labelSide === 'start' ? labelNode : null}
         {rail}
         <div className={contentClasses}>
-          {(item.content as React.ReactNode) ? (
+          {item.content != null ? (
             <div className={timelineDescriptionClasses}>{item.content as React.ReactNode}</div>
           ) : null}
         </div>
@@ -227,7 +227,7 @@ export const Timeline: React.FC<TimelineProps> = ({
       <li key="pending" className={itemClasses} aria-busy="true">
         {rail}
         <div className={contentClasses}>
-          {pendingContent || <div className={timelineDescriptionClasses}>{pendingText}</div>}
+          {pendingContent ?? <div className={timelineDescriptionClasses}>{pendingText}</div>}
         </div>
       </li>
     )

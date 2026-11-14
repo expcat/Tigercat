@@ -17,6 +17,7 @@ import {
   applyFileManagerReorder,
   clampFileManagerFocusIndex,
   resolveFileManagerItemKeydown,
+  getFileManagerGridStyle,
   toFileDragItem,
   type FileItem
 } from '@expcat/tigercat-core'
@@ -41,6 +42,22 @@ const makeFolder = (
 })
 
 describe('file-manager-utils', () => {
+  it('clamps zero grid columns to one for layout and keyboard navigation', () => {
+    expect(getFileManagerGridStyle('grid', 0)?.gridTemplateColumns).toBe(
+      'repeat(1, minmax(0, 1fr))'
+    )
+    expect(
+      resolveFileManagerItemKeydown({
+        key: 'ArrowDown',
+        viewMode: 'grid',
+        gridColumns: 0,
+        currentIndex: 0,
+        items: [makeFile('a'), makeFile('b')],
+        currentPath: []
+      })
+    ).toEqual({ type: 'move', index: 1 })
+  })
+
   // ─── sortFileItems ────────────────────────────────────────
 
   describe('sortFileItems', () => {

@@ -189,9 +189,9 @@ export const Progress: React.FC<ProgressProps> = React.memo(
           className={classNames(
             progressLineBaseClasses,
             progressTrackBgClasses,
-            !height && progressLineSizeClasses[size]
+            height == null && progressLineSizeClasses[size]
           )}
-          style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>
+          style={{ flex: 1, ...(height != null ? { height: `${height}px` } : {}) }}>
           {view.steps > 1 ? (
             progressStepFilled(view.steps, view.percentage).map((filled, index) => (
               <div

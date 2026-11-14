@@ -23,6 +23,16 @@ describe('Descriptions (Vue)', () => {
     expect(screen.getByText('Edit')).toBeInTheDocument()
   })
 
+  it('preserves zero title and extra as content', async () => {
+    const { container, rerender } = render(Descriptions, {
+      props: { title: 0, extra: 0, items: basicItems }
+    })
+    expect(screen.getAllByText('0')).toHaveLength(2)
+
+    await rerender({ extra: undefined })
+    expect(container.querySelector('caption')).toHaveTextContent('0')
+  })
+
   it('hides header when no title or extra', () => {
     const { container } = render(Descriptions, { props: { items: basicItems } })
     expect(container.querySelector('[class*="justify-between"]')).toBeFalsy()

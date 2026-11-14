@@ -177,8 +177,8 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
   const iconPath = getAlertIconPath(type)
 
-  const hasTitle = !!(title || titleSlot)
-  const hasDescription = !!(description || descriptionSlot)
+  const hasTitle = title != null || titleSlot != null
+  const hasDescription = description != null || descriptionSlot != null
   const hasChildren = children != null && children !== false
   const hasContent = hasTitle || hasDescription || hasChildren || action != null
   const live = resolveAlertLive(type, hasContent, inserted)
@@ -208,11 +208,11 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
       {hasContent && (
         <div className={getAlertContentClasses(showIcon)}>
-          {hasTitle && <div className={titleClasses}>{titleSlot || title}</div>}
+          {hasTitle && <div className={titleClasses}>{titleSlot ?? title}</div>}
           {hasDescription && (
-            <div className={descriptionClasses}>{descriptionSlot || description}</div>
+            <div className={descriptionClasses}>{descriptionSlot ?? description}</div>
           )}
-          {action ? <div data-tiger-alert-action="">{action}</div> : null}
+          {action != null ? <div data-tiger-alert-action="">{action}</div> : null}
           {hasChildren && (
             <div className={hasTitle || hasDescription ? descriptionClasses : titleClasses}>
               {children}

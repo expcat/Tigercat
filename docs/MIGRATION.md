@@ -4,6 +4,10 @@
 
 ## v3.0.1（未发布）
 
+Descriptions 及本轮 S08 修复组件的内容槽现在保留数值 `0`，不再把它当作缺失内容或切换到后备内容；例如 `title={0}`、`extra={0}`、Input 前后缀以及自定义渲染返回 `0` 都会显示 0，React Descriptions 的 `children={0}` 会优先于 `items`。需要省略内容或使用默认值时，请传 `null` / `undefined`。
+
+FormItem 的 `labelWidth={0}` 与 Progress 的 `height={0}` 现在输出 `0px`；FileManager 的 `gridColumns={0}` 统一限制为 1 列，面包屑的数值 key `0` 保持为独立条目。此前借助这些零值触发默认尺寸或默认列数的调用点，请改为省略对应属性。
+
 ColorPicker、图表以及本轮修复的表单、导航和组合组件现在将 `style` 与原生属性传到既定根节点或触发器。应用侧为这些属性另加的包装可按实际需要移除；React Switch 的 `style` 现在作用于外层 label，用于控制整个开关的布局。
 
 W9 辅助文案现在遵守标准覆盖顺序：组件 `labels` → 组件 `locale` → ConfigProvider → en-US。Select 全选、AvatarGroup 折叠名单、菜单危险提示、表格 / 图表工具、输入错误等会随 Provider 语言变化；zhTW 使用繁体，WorkflowDesigner 的重复 key 校验使用对应语言。

@@ -62,7 +62,7 @@ export interface StepsItemProps extends Omit<
   /**
    * Step description
    */
-  description?: string
+  description?: string | number
 
   /**
    * Step icon (custom icon element)
@@ -122,11 +122,12 @@ export const StepsItem: React.FC<StepsItemProps> = ({
 
   const itemClasses = classNames(getStepItemClasses(stepsContext.orientation, isLast), className)
 
+  const hasCustomIcon = icon != null && icon !== false
   const iconClasses = getStepIconClasses(
     stepStatus,
     stepsContext.size,
     stepsContext.simple,
-    !!icon,
+    hasCustomIcon,
     stepsContext.progressDot
   )
 
@@ -153,7 +154,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
 
   const renderIcon = () => {
     let inner: React.ReactNode = null
-    if (icon) inner = icon
+    if (hasCustomIcon) inner = icon
     else if (!stepsContext.progressDot && stepStatus === 'finish') {
       inner = (
         <svg
@@ -181,7 +182,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   const renderContent = () => (
     <div className={contentClasses}>
       <div className={titleClasses}>{title}</div>
-      {!stepsContext.simple && description && (
+      {!stepsContext.simple && description != null && (
         <div className={descriptionClasses}>{description}</div>
       )}
     </div>

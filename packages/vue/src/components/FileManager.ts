@@ -320,7 +320,11 @@ export const FileManager = defineComponent({
       followBottom = followEnd
       const host = contentRef.value
       if (host && model.value.processedItems.length >= FILE_MANAGER_VIRTUAL_MIN_COUNT) {
-        const columns = Math.max(1, Math.floor(props.gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+        const requestedColumns = Math.floor(props.gridColumns)
+        const columns = Math.max(
+          1,
+          Number.isNaN(requestedColumns) ? DEFAULT_FILE_GRID_COLUMNS : requestedColumns
+        )
         const row = props.viewMode === 'grid' ? Math.floor(index / columns) : index
         const offset =
           props.viewMode === 'grid'
@@ -389,7 +393,11 @@ export const FileManager = defineComponent({
       ) {
         return
       }
-      const columns = Math.max(1, Math.floor(props.gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+      const requestedColumns = Math.floor(props.gridColumns)
+      const columns = Math.max(
+        1,
+        Number.isNaN(requestedColumns) ? DEFAULT_FILE_GRID_COLUMNS : requestedColumns
+      )
       if (followBottom) {
         const next = Math.max(0, host.scrollHeight - host.clientHeight)
         if (next !== host.scrollTop) {
@@ -435,30 +443,34 @@ export const FileManager = defineComponent({
           'ol',
           { class: fileManagerBreadcrumbListClasses },
           breadcrumbs.map((segment, index) =>
-            h('li', { key: segment.key || 'root', class: 'flex items-center gap-1' }, [
-              index > 0
-                ? h(
-                    'span',
-                    { class: fileManagerBreadcrumbSeparatorClasses, 'aria-hidden': 'true' },
-                    FILE_BREADCRUMB_SEPARATOR
-                  )
-                : null,
-              segment.current
-                ? h(
-                    'span',
-                    { class: fileManagerBreadcrumbCurrentClasses, 'aria-current': 'page' },
-                    segment.name
-                  )
-                : h(
-                    'button',
-                    {
-                      type: 'button',
-                      class: fileManagerBreadcrumbItemClasses,
-                      onClick: () => commitPath(segment.path)
-                    },
-                    segment.name
-                  )
-            ])
+            h(
+              'li',
+              { key: segment.key === '' ? 'root' : segment.key, class: 'flex items-center gap-1' },
+              [
+                index > 0
+                  ? h(
+                      'span',
+                      { class: fileManagerBreadcrumbSeparatorClasses, 'aria-hidden': 'true' },
+                      FILE_BREADCRUMB_SEPARATOR
+                    )
+                  : null,
+                segment.current
+                  ? h(
+                      'span',
+                      { class: fileManagerBreadcrumbCurrentClasses, 'aria-current': 'page' },
+                      segment.name
+                    )
+                  : h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: fileManagerBreadcrumbItemClasses,
+                        onClick: () => commitPath(segment.path)
+                      },
+                      segment.name
+                    )
+              ]
+            )
           )
         )
       )

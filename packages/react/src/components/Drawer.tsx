@@ -199,11 +199,11 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
     ...labels,
     ...(closeAriaLabel ? { closeAriaLabel } : {})
   })
-  const hasTitle = Boolean(title || header)
+  const hasTitle = title != null || header != null
   const ariaLabelledby =
     (rest as React.AriaAttributes)['aria-labelledby'] ?? (hasTitle ? titleId : undefined)
   const ariaLabel = ariaLabelFromRest ?? (hasTitle ? undefined : drawerLabels.dialogAriaLabel)
-  const ariaDescribedby = ariaDescribedbyFromRest ?? (children ? bodyId : undefined)
+  const ariaDescribedby = ariaDescribedbyFromRest ?? (children != null ? bodyId : undefined)
 
   const { anchorRef, target: portalTarget } = useOverlayPortalTarget('viewport')
   const dialogRef = useRef<HTMLDivElement | null>(null)
@@ -432,13 +432,13 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
         data-tiger-drawer="">
-        {(title || header || closable) && (
+        {(hasTitle || closable) && (
           <div className={headerClasses} {...{ [OVERLAY_SWIPE_HANDLE_ATTR]: '' }}>
-            {header ? (
+            {header != null ? (
               <div className={titleClasses} id={titleId}>
                 {header}
               </div>
-            ) : title ? (
+            ) : title != null ? (
               <h3 className={titleClasses} id={titleId}>
                 {title}
               </h3>
@@ -456,12 +456,12 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
           </div>
         )}
 
-        {children && (
+        {children != null && (
           <div className={bodyClasses} ref={bodyRef} id={bodyId} data-tiger-drawer-body="">
             {children}
           </div>
         )}
-        {footer && <div className={footerClasses}>{footer}</div>}
+        {footer != null && <div className={footerClasses}>{footer}</div>}
         {resizable ? (
           <div
             data-tiger-drawer-resize=""

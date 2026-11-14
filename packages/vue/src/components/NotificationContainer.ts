@@ -104,7 +104,7 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
             notification.description
           )
         )
-      } else if (notification.descriptionNode) {
+      } else if (notification.descriptionNode != null) {
         contentChildren.push(
           h(
             'div',
@@ -158,7 +158,7 @@ export const NotificationContainer = /* @__PURE__ */ defineComponent({
           )
         })
         contentChildren.push(h('div', { class: notificationActionsClasses }, actionButtons))
-      } else if (notification.actionNode) {
+      } else if (notification.actionNode != null) {
         contentChildren.push(
           h('div', { class: notificationActionsClasses }, notification.actionNode as never)
         )

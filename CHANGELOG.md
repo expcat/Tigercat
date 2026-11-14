@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **零值内容与尺寸（Core / Vue / React，S08 / C039-F03）**：Descriptions 与 27 个并入组件用存在性判断保留内容槽中的数值 `0`，包括标题、附加内容、前后缀、图标和自定义渲染；React Descriptions 的 `children=0` 优先于 items。FormItem 的标签宽度与 Progress 的轨道高度保留显式 `0`；FileManager 的零列数统一限制为 1，面包屑保留数值 key `0`。
+
 - **原生属性与根样式（Vue / React，S07 / C056-F04）**：ColorPicker 与 37 个并入组件按既定根节点或触发器保留调用方的 style 和原生属性；修复图表、选择器、菜单子组件及链接等分支的透传缺口。ColorPicker 双端 SSR 保留 margin 与 data 属性，React Switch 的 style 作用于外层 label。
 
 - **辅助文案与 Cron（Core / Vue / React，S06 / T01 / X02-F004）**：W9 辅助文案并入标准 TigerLocale，消费者读取 Provider 与组件覆盖后的标签；补齐 13 个语言包的按钮、辅助名称、输入错误及 WorkflowDesigner 重复 key 校验。Cron 摘要按原表达式保留范围、步长和日期 / 星期的 OR 语义，摘要与下次执行时间随语言变化，两端在 320px 下换行显示。

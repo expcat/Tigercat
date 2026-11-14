@@ -137,9 +137,9 @@ export const Progress = defineComponent({
               class: classNames(
                 progressLineBaseClasses,
                 progressTrackBgClasses,
-                !props.height && progressLineSizeClasses[props.size]
+                props.height == null && progressLineSizeClasses[props.size]
               ),
-              style: { flex: 1, ...(props.height ? { height: `${props.height}px` } : {}) }
+              style: { flex: 1, ...(props.height != null ? { height: `${props.height}px` } : {}) }
             },
             view.value.steps > 1
               ? progressStepFilled(view.value.steps, view.value.percentage).map((filled, index) =>

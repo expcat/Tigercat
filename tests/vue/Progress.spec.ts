@@ -16,6 +16,11 @@ function fillOf(container: HTMLElement): HTMLElement | null {
 }
 
 describe('Progress', () => {
+  it('preserves an explicit zero track height', () => {
+    const { container } = render(Progress, { props: { height: 0 } })
+    expect(fillOf(container)?.parentElement).toHaveStyle({ height: '0px' })
+  })
+
   it('renders a line progressbar with default ARIA', () => {
     const { container } = renderWithProps(Progress, {})
 

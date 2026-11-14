@@ -67,15 +67,15 @@ export const Countdown = defineComponent({
      * Visible title above the value. Not an HTML tooltip. Slot `title` wins.
      */
     title: {
-      type: String,
+      type: [String, Number],
       default: undefined
     },
     prefix: {
-      type: String,
+      type: [String, Number],
       default: undefined
     },
     suffix: {
-      type: String,
+      type: [String, Number],
       default: undefined
     },
     size: {
@@ -204,22 +204,22 @@ export const Countdown = defineComponent({
           'data-remaining-ratio': String(ratio.value)
         },
         [
-          titleNode
+          titleNode != null
             ? h('div', { id: titleId, class: getCountdownTitleClasses(props.size) }, titleNode)
             : null,
           h('div', { class: countdownValueWrapperClasses }, [
-            prefixNode ? h('span', { class: countdownPrefixClasses }, prefixNode) : null,
+            prefixNode != null ? h('span', { class: countdownPrefixClasses }, prefixNode) : null,
             h(
               'span',
               {
                 class: getCountdownValueClasses(props.size),
                 role: 'timer',
-                'aria-labelledby': titleNode ? titleId : undefined,
-                'aria-label': titleNode ? undefined : props.ariaLabel || 'Countdown'
+                'aria-labelledby': titleNode != null ? titleId : undefined,
+                'aria-label': titleNode != null ? undefined : props.ariaLabel || 'Countdown'
               },
               formatted.value
             ),
-            suffixNode ? h('span', { class: countdownSuffixClasses }, suffixNode) : null
+            suffixNode != null ? h('span', { class: countdownSuffixClasses }, suffixNode) : null
           ])
         ]
       )

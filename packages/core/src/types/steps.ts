@@ -34,7 +34,7 @@ export interface StepItem {
   /**
    * Step description
    */
-  description?: string
+  description?: string | number
   /**
    * Step icon (custom icon element)
    */

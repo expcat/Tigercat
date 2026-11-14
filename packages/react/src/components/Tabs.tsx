@@ -218,7 +218,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
         data-tiger-tab-key={formatTabKey(tabKey)}
         onClick={handleClick}
         onKeyDown={handleKeyDown}>
-        {icon && <span className="flex items-center">{icon}</span>}
+        {icon != null && <span className="flex items-center">{icon}</span>}
         <span id={`${tabId}-label`}>{label}</span>
         {isClosable && (
           <button

@@ -107,7 +107,7 @@ export const Tooltip = forwardRef<HTMLElement, TooltipProps>(function Tooltip(
     [actualPlacement, arrowX, arrowY]
   )
 
-  if (!children) return null
+  if (children == null || children === false || children === '') return null
 
   const triggerAria = getOverlayTriggerAria({
     kind: 'tooltip',

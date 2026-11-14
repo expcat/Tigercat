@@ -102,7 +102,10 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
   const popconfirmId = `tiger-popconfirm-${useId()}`
   const titleId = `${popconfirmId}-title`
   const descriptionId = `${popconfirmId}-description`
-  const describedBy = description || descriptionContent ? descriptionId : undefined
+  const resolvedDescription = descriptionContent ?? description
+  const hasDescription =
+    resolvedDescription != null && resolvedDescription !== false && resolvedDescription !== ''
+  const describedBy = hasDescription ? descriptionId : undefined
   const arrowRef = useRef<HTMLDivElement>(null)
   const [confirming, setConfirming] = useState(false)
   const confirmingRef = useRef(false)
@@ -235,11 +238,11 @@ export const Popconfirm = forwardRef<HTMLElement, PopconfirmProps>(function Popc
                 )}
                 <div className="flex-1">
                   <div id={titleId} className={titleClasses}>
-                    {titleContent || resolvedTitle}
+                    {titleContent ?? resolvedTitle}
                   </div>
-                  {(description || descriptionContent) && (
+                  {hasDescription && (
                     <div id={descriptionId} className={descriptionClasses}>
-                      {descriptionContent || description}
+                      {resolvedDescription}
                     </div>
                   )}
                 </div>

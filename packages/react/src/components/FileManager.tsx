@@ -249,7 +249,11 @@ export const FileManager: React.FC<FileManagerProps> = ({
       followBottomRef.current = followEnd
       const host = contentRef.current
       if (host && model.processedItems.length >= FILE_MANAGER_VIRTUAL_MIN_COUNT) {
-        const columns = Math.max(1, Math.floor(gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+        const requestedColumns = Math.floor(gridColumns)
+        const columns = Math.max(
+          1,
+          Number.isNaN(requestedColumns) ? DEFAULT_FILE_GRID_COLUMNS : requestedColumns
+        )
         const row = viewMode === 'grid' ? Math.floor(index / columns) : index
         const offset =
           viewMode === 'grid'
@@ -382,7 +386,11 @@ export const FileManager: React.FC<FileManagerProps> = ({
         setScrollTop(next)
       }
     }
-    const columns = Math.max(1, Math.floor(gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+    const requestedColumns = Math.floor(gridColumns)
+    const columns = Math.max(
+      1,
+      Number.isNaN(requestedColumns) ? DEFAULT_FILE_GRID_COLUMNS : requestedColumns
+    )
     const rowHeights = new Map<number, number>()
     let rowGap = 0
     let changed = false
@@ -491,7 +499,9 @@ export const FileManager: React.FC<FileManagerProps> = ({
         <nav className={fileManagerBreadcrumbClasses} aria-label={labels.pathAriaLabel}>
           <ol className={fileManagerBreadcrumbListClasses}>
             {breadcrumbs.map((segment, index) => (
-              <li key={segment.key || 'root'} className="flex items-center gap-1">
+              <li
+                key={segment.key === '' ? 'root' : segment.key}
+                className="flex items-center gap-1">
                 {index > 0 ? (
                   <span className={fileManagerBreadcrumbSeparatorClasses} aria-hidden="true">
                     {FILE_BREADCRUMB_SEPARATOR}

@@ -36,8 +36,8 @@ export interface VuePageHeaderProps {
   showBack?: boolean
   backHref?: string
   backAriaLabel?: string
-  title?: string
-  subTitle?: string
+  title?: string | number
+  subTitle?: string | number
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
   className?: string
   style?: Record<string, unknown>
@@ -103,14 +103,14 @@ export const PageHeader = defineComponent({
      * Page title
      */
     title: {
-      type: String,
+      type: [String, Number],
       default: undefined
     },
     /**
      * Secondary text shown beside the title
      */
     subTitle: {
-      type: String,
+      type: [String, Number],
       default: undefined
     },
     headingLevel: {
@@ -177,8 +177,8 @@ export const PageHeader = defineComponent({
       const hasBody = hasSlotContent(body)
       const titleContent = hasTitleSlot ? titleSlot : props.title
       const subTitleContent = hasSubTitleSlot ? subTitleSlot : props.subTitle
-      const hasTitle = hasTitleSlot || Boolean(props.title)
-      const hasSubtitle = hasSubTitleSlot || Boolean(props.subTitle)
+      const hasTitle = hasTitleSlot || (props.title != null && props.title !== '')
+      const hasSubtitle = hasSubTitleSlot || (props.subTitle != null && props.subTitle !== '')
 
       const showBack = resolvePageHeaderBackVisibility({
         showBack: props.showBack,

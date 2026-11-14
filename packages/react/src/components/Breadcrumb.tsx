@@ -113,14 +113,15 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
     )
 
     const address = resolveLinkAddress({ href, target })
-    const contentElements = icon ? (
-      <>
-        <span className="inline-flex">{icon}</span>
-        {children}
-      </>
-    ) : (
-      children
-    )
+    const contentElements =
+      icon != null ? (
+        <>
+          <span className="inline-flex">{icon}</span>
+          {children}
+        </>
+      ) : (
+        children
+      )
 
     let control: React.ReactNode
     if (isCurrent) {
@@ -205,7 +206,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       setExpanded(false)
     }, [itemSignature, maxItems])
 
-    const hasExtra = Boolean(extra)
+    const hasExtra = extra != null
     const containerClasses = classNames(breadcrumbContainerClasses, hasExtra && 'w-full', className)
     const contextValue = useMemo<BreadcrumbContextValue>(() => ({ separator }), [separator])
     const slots = getBreadcrumbSlots(items.length, maxItems, false)

@@ -93,7 +93,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   }, [name, formContext, condition])
 
   const actualLabelWidth = useMemo(() => {
-    const width = labelWidth || formContext?.labelWidth
+    const width = labelWidth ?? formContext?.labelWidth
     if (typeof width === 'number') {
       return `${width}px`
     }

@@ -220,9 +220,9 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(
             ) : null}
           </div>
         ) : null}
-        {tabs ? <div data-page-header-tabs="">{tabs}</div> : null}
+        {hasPageHeaderNode(tabs) ? <div data-page-header-tabs="">{tabs}</div> : null}
         {hasBody ? <div className={pageHeaderContentClasses}>{children}</div> : null}
-        {footer ? <div data-page-header-footer="">{footer}</div> : null}
+        {hasPageHeaderNode(footer) ? <div data-page-header-footer="">{footer}</div> : null}
       </header>
     )
   }

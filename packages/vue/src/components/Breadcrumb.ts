@@ -342,7 +342,7 @@ export const Breadcrumb = defineComponent({
 
       const attrsRecord = attrs as Record<string, unknown>
       const ariaLabel = (attrsRecord['aria-label'] as string | undefined) ?? labels.value.ariaLabel
-      const hasExtra = Boolean(extraContent.value)
+      const hasExtra = extraContent.value != null
       const rootClass = classNames(
         breadcrumbContainerClasses,
         hasExtra && 'w-full',

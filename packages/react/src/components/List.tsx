@@ -222,7 +222,7 @@ function ListInner<T extends ListItem>(
     return (
       <>
         {metaContent.length > 0 ? <div className={listItemMetaClasses}>{metaContent}</div> : null}
-        {item.extra ? (
+        {item.extra != null ? (
           <div
             className={getListItemExtraClasses(itemLayout)}
             onClick={(event) => event.stopPropagation()}
@@ -424,7 +424,9 @@ function ListInner<T extends ListItem>(
         listSizeClasses[size],
         className
       )}>
-      {header ? <div className={getListHeaderFooterClasses(size, false)}>{header}</div> : null}
+      {header != null ? (
+        <div className={getListHeaderFooterClasses(size, false)}>{header}</div>
+      ) : null}
       <div className="relative" aria-busy={loading || undefined}>
         {renderItems()}
         {loading ? (
@@ -434,7 +436,9 @@ function ListInner<T extends ListItem>(
           </div>
         ) : null}
       </div>
-      {footer ? <div className={getListHeaderFooterClasses(size, true)}>{footer}</div> : null}
+      {footer != null ? (
+        <div className={getListHeaderFooterClasses(size, true)}>{footer}</div>
+      ) : null}
       {renderPaginationBar()}
     </div>
   )

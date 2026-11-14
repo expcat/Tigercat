@@ -129,10 +129,11 @@ export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function Back
     return offsetStyle ? { ...offsetStyle, ...style } : style
   }, [position, placement, offset, style])
 
+  const hasChildren = children != null && children !== false && children !== ''
   const resolvedAriaLabel =
     typeof ariaLabel === 'string' && ariaLabel.trim()
       ? ariaLabel
-      : children
+      : hasChildren
         ? undefined
         : labelSet.ariaLabel
 
@@ -147,7 +148,7 @@ export const BackTop = forwardRef<HTMLButtonElement, BackTopProps>(function Back
       aria-hidden={visible ? undefined : true}
       tabIndex={visible ? 0 : -1}
       onClick={handleClick}>
-      {children || <DefaultIcon />}
+      {hasChildren ? children : <DefaultIcon />}
     </button>
   )
 })

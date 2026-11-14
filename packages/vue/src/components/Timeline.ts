@@ -224,9 +224,10 @@ export const Timeline = defineComponent({
             item.label
           )
         : null
-      const contentNode = item.content
-        ? h('div', { class: timelineDescriptionClasses }, item.content as unknown as HChildren)
-        : null
+      const contentNode =
+        item.content != null
+          ? h('div', { class: timelineDescriptionClasses }, item.content as unknown as HChildren)
+          : null
 
       return h(
         'li',

@@ -307,7 +307,7 @@ export const FloatButtonGroup = forwardRef<HTMLDivElement, FloatButtonGroupProps
         ...triggerAria,
         onClick: composeEventHandlers(child.props.onClick, handleTriggerClick)
       })
-    } else if (triggerNode) {
+    } else if (triggerNode != null && triggerNode !== false && triggerNode !== '') {
       triggerEl = (
         <button type="button" {...triggerAria} onClick={handleTriggerClick}>
           {triggerNode}

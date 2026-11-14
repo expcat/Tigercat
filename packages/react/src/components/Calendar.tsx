@@ -455,7 +455,8 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                   disabled: isDisabled
                 })
                 const customCell = dateCellRender?.(date, extra)
-                const hasExtra = Boolean(customCell) || extra.events.length > 0
+                const hasCustomCell = customCell != null && customCell !== false
+                const hasExtra = hasCustomCell || extra.events.length > 0
                 const eventTitles = extra.events
                   .map((event) => event.title)
                   .filter((title): title is string => Boolean(title))
@@ -465,9 +466,9 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                   labels.eventCountText
                 )
                 const cellBody =
-                  customCell || eventTitles.length > 0 ? (
+                  hasCustomCell || eventTitles.length > 0 ? (
                     <div className={calendarDateCellBodyClasses}>
-                      {customCell ? (
+                      {hasCustomCell ? (
                         <div className="w-full min-w-0 truncate">
                           {customCell as React.ReactNode}
                         </div>
@@ -514,7 +515,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
                       onClick={() => selectDay(date)}
                       onFocus={() => setActiveIso(iso)}>
                       {formatCalendarDayNumber(date, localeCode)}
-                      {!customCell && extra.events.length > 0 ? (
+                      {!hasCustomCell && extra.events.length > 0 ? (
                         <span className={calendarDateCellExtraClasses} aria-hidden="true">
                           {extra.events.map((event, index) => (
                             <span

@@ -85,14 +85,14 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     [columnProp, containerWidth]
   )
 
-  if (children && items.length > 0) {
+  if (children != null && items.length > 0) {
     devWarn(
       'Descriptions.children',
       '[Tigercat] Descriptions received both items and children. Children are used.'
     )
   }
   const rows = groupItemsIntoRows(items, column)
-  const labelledBy = title ? titleId : undefined
+  const labelledBy = title != null ? titleId : undefined
   const rootClasses = classNames(getDescriptionsClasses(size, bordered), className)
 
   const setRootRef = (node: HTMLDivElement | null) => {
@@ -101,7 +101,7 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     else if (ref) ref.current = node
   }
 
-  if (children) {
+  if (children != null) {
     return (
       <div
         ref={setRootRef}
@@ -241,19 +241,19 @@ export const Descriptions = forwardRef<HTMLDivElement, DescriptionsProps>(functi
     )
   }
 
-  const useCaption = Boolean(title && !extra && (layout === 'horizontal' || bordered))
-  const showHeader = Boolean(extra || (title && !useCaption))
+  const useCaption = title != null && extra == null && (layout === 'horizontal' || bordered)
+  const showHeader = extra != null || (title != null && !useCaption)
 
   return (
     <div ref={setRootRef} className={rootClasses} {...props}>
       {showHeader ? (
         <div className={descriptionsHeaderClasses}>
-          {title ? (
+          {title != null ? (
             <div className={descriptionsTitleClasses} id={titleId}>
               {title}
             </div>
           ) : null}
-          {extra ? <div className={descriptionsExtraClasses}>{extra}</div> : null}
+          {extra != null ? <div className={descriptionsExtraClasses}>{extra}</div> : null}
         </div>
       ) : null}
       {layout === 'horizontal' ? renderHorizontal() : renderVertical()}

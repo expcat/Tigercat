@@ -180,7 +180,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
     </span>
   )
 
-  if (!children) {
+  if (children == null || children === false || children === '') {
     return (
       <span
         ref={rootRef as React.RefObject<HTMLSpanElement>}

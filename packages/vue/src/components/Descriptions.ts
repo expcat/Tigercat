@@ -125,14 +125,19 @@ export const Descriptions = defineComponent({
     const rows = computed(() => groupItemsIntoRows(props.items, column.value))
     const useCaption = computed(() =>
       Boolean(
-        props.title &&
-        !props.extra &&
+        props.title != null &&
+        props.extra == null &&
         !slots.extra &&
         (props.layout === 'horizontal' || props.bordered)
       )
     )
     const showHeader = computed(() =>
-      Boolean(props.extra || slots.extra || slots.title || (props.title && !useCaption.value))
+      Boolean(
+        props.extra != null ||
+        slots.extra ||
+        slots.title ||
+        (props.title != null && !useCaption.value)
+      )
     )
 
     function labelText(item: DescriptionsItemModel): HChildren {
@@ -145,7 +150,7 @@ export const Descriptions = defineComponent({
         'table',
         {
           class: getDescriptionsTableClasses(props.bordered),
-          'aria-labelledby': props.title ? titleId : undefined
+          'aria-labelledby': props.title != null ? titleId : undefined
         },
         [
           useCaption.value
@@ -198,7 +203,7 @@ export const Descriptions = defineComponent({
           'table',
           {
             class: getDescriptionsTableClasses(true),
-            'aria-labelledby': props.title ? titleId : undefined
+            'aria-labelledby': props.title != null ? titleId : undefined
           },
           [
             useCaption.value
@@ -256,7 +261,7 @@ export const Descriptions = defineComponent({
         {
           class: 'grid w-full',
           style: getDescriptionsVerticalGridStyle(column.value),
-          'aria-labelledby': props.title ? titleId : undefined
+          'aria-labelledby': props.title != null ? titleId : undefined
         },
         rows.value.flatMap((rowItems) =>
           rowItems.map((item) =>
@@ -334,18 +339,18 @@ export const Descriptions = defineComponent({
         [
           showHeader.value
             ? h('div', { class: descriptionsHeaderClasses }, [
-                props.title || slots.title
+                props.title != null || slots.title
                   ? h(
                       'div',
                       { class: descriptionsTitleClasses, id: titleId },
-                      slots.title?.() || props.title
+                      slots.title?.() ?? props.title
                     )
                   : null,
-                props.extra || slots.extra
+                props.extra != null || slots.extra
                   ? h(
                       'div',
                       { class: descriptionsExtraClasses },
-                      slots.extra?.() || (props.extra as HChildren)
+                      slots.extra?.() ?? (props.extra as HChildren)
                     )
                   : null
               ])

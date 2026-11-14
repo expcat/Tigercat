@@ -13,12 +13,12 @@ description: Compact generated Tigercat Navigation props reference
 
 `packages/react/src/components/Steps.tsx and packages/vue/src/components/Steps.ts` · `StepsItemProps / VueStepsItemProps` · 4/9 compact props · [Complete props](#remaining-props-complete-public-api)
 
-| Prop           | Type         | Default | Notes                                    |
-| -------------- | ------------ | ------- | ---------------------------------------- |
-| `title`        | `string`     | `-`     | Step title                               |
-| `status?`      | `StepStatus` | `-`     | Step status (overrides automatic status) |
-| `disabled?`    | `boolean`    | `-`     | Whether the step is disabled             |
-| `description?` | `string`     | `-`     | Step description                         |
+| Prop           | Type               | Default | Notes                                    |
+| -------------- | ------------------ | ------- | ---------------------------------------- |
+| `title`        | `string`           | `-`     | Step title                               |
+| `status?`      | `StepStatus`       | `-`     | Step status (overrides automatic status) |
+| `disabled?`    | `boolean`          | `-`     | Whether the step is disabled             |
+| `description?` | `string \| number` | `-`     | Step description                         |
 
 ### Remaining props (complete public API)
 

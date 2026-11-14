@@ -259,7 +259,11 @@ export function getFileManagerGridStyle(
   gridColumns: number
 ): { gridTemplateColumns: string } | undefined {
   if (viewMode !== 'grid') return undefined
-  const columns = Math.max(1, Math.floor(gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+  const requestedColumns = Math.floor(gridColumns)
+  const columns = Math.max(
+    1,
+    Number.isNaN(requestedColumns) ? DEFAULT_FILE_GRID_COLUMNS : requestedColumns
+  )
   return { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }
 }
 
@@ -437,7 +441,11 @@ export function getFileManagerMoveIndex(
 ): number | null {
   const count = items.length
   if (count === 0) return null
-  const cols = Math.max(1, Math.floor(gridColumns) || DEFAULT_FILE_GRID_COLUMNS)
+  const requestedColumns = Math.floor(gridColumns)
+  const cols = Math.max(
+    1,
+    Number.isNaN(requestedColumns) ? DEFAULT_FILE_GRID_COLUMNS : requestedColumns
+  )
   let delta = 0
   switch (key) {
     case 'ArrowDown':

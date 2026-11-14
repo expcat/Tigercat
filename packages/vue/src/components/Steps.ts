@@ -84,7 +84,7 @@ export type StepsItemProps = VueStepsItemProps
 
 export interface VueStepsItemProps {
   title: string
-  description?: string
+  description?: string | number
   icon?: unknown
   status?: StepStatus
   disabled?: boolean
@@ -107,14 +107,14 @@ export const StepsItem = defineComponent({
      * Step description
      */
     description: {
-      type: String,
+      type: [String, Number],
       default: undefined
     },
     /**
      * Step icon (slot content or custom icon)
      */
     icon: {
-      type: [String, Object] as PropType<unknown>,
+      type: [String, Number, Object] as PropType<unknown>,
       default: undefined
     },
     /**
@@ -178,7 +178,7 @@ export const StepsItem = defineComponent({
     })
 
     const iconClasses = computed(() => {
-      const hasCustomIcon = !!(props.icon || slots.icon)
+      const hasCustomIcon = props.icon != null || slots.icon != null
       return getStepIconClasses(
         stepStatus.value,
         stepsContext.size,
@@ -226,7 +226,7 @@ export const StepsItem = defineComponent({
     const renderIcon = () => {
       let inner: unknown
       if (slots.icon) inner = slots.icon()
-      else if (props.icon) inner = props.icon
+      else if (props.icon != null) inner = props.icon
       else if (stepsContext.progressDot) inner = undefined
       else if (stepStatus.value === 'finish') {
         inner = h(
@@ -269,7 +269,7 @@ export const StepsItem = defineComponent({
 
     const renderContent = () => {
       const children = [h('div', { class: titleClasses.value }, props.title)]
-      if (!stepsContext.simple && (props.description || slots.description)) {
+      if (!stepsContext.simple && (props.description != null || slots.description)) {
         children.push(
           h(
             'div',

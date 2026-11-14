@@ -406,6 +406,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
     'aria-controls': inputId
   }
 
+  const hasChildren = children != null && children !== false && children !== ''
   const renderTrigger = () => {
     if (drag) {
       return (
@@ -448,9 +449,11 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
           role="button"
           tabIndex={effectiveDisabled ? -1 : 0}
           aria-disabled={effectiveDisabled}
-          aria-label={children ? undefined : labels.dragAreaAriaLabel}
+          aria-label={hasChildren ? undefined : labels.dragAreaAriaLabel}
           {...triggerAria}>
-          {children || (
+          {hasChildren ? (
+            children
+          ) : (
             <>
               <Icon
                 name="upload"
@@ -487,9 +490,9 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
         size="sm"
         disabled={effectiveDisabled}
         onClick={openPicker}
-        aria-label={children ? undefined : labels.buttonAriaLabel}
+        aria-label={hasChildren ? undefined : labels.buttonAriaLabel}
         {...triggerAria}>
-        {children || labels.selectFileText}
+        {hasChildren ? children : labels.selectFileText}
       </Button>
     )
   }

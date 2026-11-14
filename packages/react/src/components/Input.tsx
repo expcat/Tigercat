@@ -144,6 +144,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     wrapperRef.current?.classList.remove(SHAKE_CLASS)
   }, [])
 
+  const hasPrefix = prefix != null && prefix !== false
+  const hasSuffix = suffix != null && suffix !== false
   const currentValStr = String(inputValue)
   const trailing = resolveInputTrailingLayout({
     clearable,
@@ -152,7 +154,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     disabled: effectiveDisabled,
     readOnly: isReadOnly,
     valueLength: currentValStr.length,
-    hasCustomSuffix: !!suffix
+    hasCustomSuffix: hasSuffix
   })
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
@@ -195,7 +197,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const inputClasses = getInputFieldClasses({
     size: effectiveSize,
     status,
-    hasPrefix: !!prefix,
+    hasPrefix,
     hasSuffix: trailing.hasSuffix,
     hasDualSuffix: trailing.hasDualSuffix,
     hasTripleSuffix: trailing.hasTripleSuffix
@@ -207,7 +209,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {...{ [TIGER_CHROME_ATTR]: '' }}
       className={getInputWrapperClasses(status)}
       onAnimationEnd={handleAnimationEnd}>
-      {prefix ? (
+      {hasPrefix ? (
         <div className={getInputAffixClasses('prefix', effectiveSize)}>{prefix}</div>
       ) : null}
       <input

@@ -134,7 +134,7 @@ export const FormItem = defineComponent({
 
     const actualSize = computed(() => props.size || formContext.value?.size || 'md')
     const actualLabelWidth = computed(() => {
-      const width = props.labelWidth || formContext.value?.labelWidth
+      const width = props.labelWidth ?? formContext.value?.labelWidth
       if (typeof width === 'number') {
         return `${width}px`
       }

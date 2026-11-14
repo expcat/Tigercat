@@ -17,6 +17,20 @@ describe('Descriptions (React)', () => {
     expect(screen.getByText('Edit')).toBeInTheDocument()
   })
 
+  it('preserves zero title and extra as content', () => {
+    const { container, rerender } = render(<Descriptions title={0} extra={0} items={basicItems} />)
+    expect(screen.getAllByText('0')).toHaveLength(2)
+
+    rerender(<Descriptions title={0} items={basicItems} />)
+    expect(container.querySelector('caption')).toHaveTextContent('0')
+  })
+
+  it('uses zero children before items', () => {
+    const { container } = render(<Descriptions items={basicItems}>{0}</Descriptions>)
+    expect(container.textContent).toBe('0')
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument()
+  })
+
   it('hides header when no title or extra', () => {
     const { container } = render(<Descriptions items={basicItems} />)
     expect(container.querySelector('[class*="justify-between"]')).toBeFalsy()

@@ -162,7 +162,7 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
             {showArrow && collapseContext.expandIconPosition === 'end' && arrowIcon}
           </button>
         </Heading>
-        {extra ? <span className={collapseExtraClasses}>{extra}</span> : null}
+        {extra != null ? <span className={collapseExtraClasses}>{extra}</span> : null}
       </div>
 
       {isActive ? (

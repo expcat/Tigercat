@@ -105,8 +105,8 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
     []
   )
 
-  const header = showHeader ? headerRender || headerText : null
-  const footer = showFooter ? footerRender || footerText : null
+  const header = showHeader ? (headerRender ?? headerText) : null
+  const footer = showFooter ? (footerRender ?? footerText) : null
 
   return (
     <PrintLayoutContext.Provider value={{ showPageBreaks, printBreaks, locale }}>
@@ -133,7 +133,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
           </div>
         ) : null}
         <table className="w-full border-collapse">
-          {header ? (
+          {header != null ? (
             <thead>
               <tr>
                 <th className={printLayoutHeaderClasses}>{header}</th>
@@ -145,7 +145,7 @@ export const PrintLayout = forwardRef<PrintLayoutInstance, PrintLayoutProps>(fun
               <td className="tiger-print-content">{children}</td>
             </tr>
           </tbody>
-          {footer ? (
+          {footer != null ? (
             <tfoot>
               <tr>
                 <td className={printLayoutFooterClasses}>{footer}</td>

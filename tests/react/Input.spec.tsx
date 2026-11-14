@@ -72,6 +72,11 @@ describe('Input', () => {
   })
 
   describe('Affix', () => {
+    it('renders zero prefix and suffix', () => {
+      render(<Input prefix={0} suffix={0} />)
+      expect(screen.getAllByText('0')).toHaveLength(2)
+    })
+
     it('should render prefix', () => {
       const { getByText } = render(<Input prefix="Pre" />)
       expect(getByText('Pre')).toBeInTheDocument()

@@ -139,8 +139,9 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
   const resolvedChildren =
     typeof children === 'function' ? children({ open: Boolean(currentVisible) }) : children
 
-  const hasTitle = Boolean(title || titleContent)
-  const hasContent = Boolean(content)
+  const resolvedTitle = titleContent ?? title
+  const hasTitle = resolvedTitle != null && resolvedTitle !== false && resolvedTitle !== ''
+  const hasContent = content != null && content !== false && content !== ''
   const triggerAria = getOverlayTriggerAria({
     kind: 'dialog',
     open: Boolean(currentVisible),
@@ -193,7 +194,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
                 style={contentStyle}>
                 {hasTitle && (
                   <div id={titleId} className={POPOVER_TITLE_CLASSES}>
-                    {titleContent || title}
+                    {resolvedTitle}
                   </div>
                 )}
                 {hasContent && (
