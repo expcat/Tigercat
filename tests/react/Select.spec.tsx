@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { fireEvent, render, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useRef } from 'react'
 import { Select, type SelectRef } from '@expcat/tigercat-react/Select'
@@ -109,6 +109,41 @@ describe('Select', () => {
     await user.keyboard('{Enter}')
     expect(onChange).toHaveBeenCalledWith('1')
     expect(trigger).toHaveFocus()
+  })
+
+  it.each([false, true])(
+    'keeps focus on After after Tab and frames (searchable=%s)',
+    async (searchable) => {
+      const user = userEvent.setup()
+      const { getByRole, queryByRole } = render(
+        <>
+          <Select options={testOptions} searchable={searchable} aria-label="Tab select" />
+          <button type="button">After</button>
+        </>
+      )
+      await user.click(getByRole('combobox'))
+      expect(getByRole('listbox')).toBeInTheDocument()
+      await user.tab()
+      expect(queryByRole('listbox')).not.toBeInTheDocument()
+      await act(async () => {
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+        })
+      })
+      expect(getByRole('button', { name: 'After' })).toHaveFocus()
+    }
+  )
+
+  it('restores focus after closing a searchable select with Escape', async () => {
+    const user = userEvent.setup()
+    const { getByRole, queryByRole } = render(
+      <Select options={testOptions} searchable aria-label="Escape select" />
+    )
+    await user.click(getByRole('combobox'))
+    expect(getByRole('combobox').tagName).toBe('INPUT')
+    await user.keyboard('{Escape}')
+    expect(queryByRole('listbox')).not.toBeInTheDocument()
+    await waitFor(() => expect(getByRole('combobox')).toHaveFocus())
   })
 
   it('keeps the highlight on the clicked multiple option', async () => {

@@ -55,7 +55,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 | 任务 | 组件           | 队列           | 现状                                                                                                                                                                   |
 | ---- | -------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C001 | ConfigProvider | complete       | 8 格：视觉 6 finding（F005）/2 pass；键盘主路径 8 pass；27 张截图；测试 65 用例、a11y 49 用例通过；无 DOM SSR 通过，非 Next/Nuxt 构建；X01-F013 未复现也未排除         |
+| C001 | ConfigProvider | complete       | 8 格：视觉 6 finding（F005）/2 pass；键盘主路径 8 pass；27 张截图；测试 65 用例、a11y 49 用例通过；无 DOM SSR 通过，非 Next/Nuxt 构建                                  |
 | C002 | Icon           | complete       | 视觉 16 pass / 8 finding（均 C002-F003）；键盘 24/24 pass；Avatar 组合 2/2 pass；66 项测试通过；未跑 hydration/E2E；forced-colors 未测                                 |
 | C003 | Text           | complete       | 主责 32 格视觉 16 pass / 8 finding / 8 blocked，键盘 24 pass / 8 blocked；关联 8 pass / 40 blocked；31 项 spec 通过；04 tooltip、剪贴板仍阻塞                          |
 | C004 | Button         | complete       | 24 格：视觉 20 pass/4 finding（Vue 01，F002）/0 blocked；键盘 24 pass；160 图；测试 80 通过；F001 浏览器未复现；X01-F002 仅 SSR；对比度、读屏未验证                    |

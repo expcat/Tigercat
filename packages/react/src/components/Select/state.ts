@@ -432,9 +432,14 @@ export function useSelectController(props: SelectProps) {
         openDropdown()
         return
       case 'close':
-        if (event.key !== 'Tab') event.preventDefault()
-        closeDropdown()
-        focusAfterPaint(() => triggerRef.current)
+        if (event.key === 'Tab') {
+          // Let native Tab move focus before closing unmounts a searchable input.
+          setTimeout(closeDropdown, 0)
+        } else {
+          event.preventDefault()
+          closeDropdown()
+          focusAfterPaint(() => triggerRef.current)
+        }
         return
       case 'clear':
         event.preventDefault()

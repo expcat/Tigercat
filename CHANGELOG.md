@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Select Tab 关闭焦点（React，X01-F013）**：Tab 先完成原生焦点移动再关闭面板，关闭流程不再异步回焦 combobox。普通与 searchable Select 按 Tab 后，下拉关闭且等帧后焦点仍在后续 After 控件；Escape 关闭和选择后回焦保留。
+
 - **工作流实例快照（Core / Vue / React，X01-F012）**：成功 action 返回实例时深拷贝 `formValues`，复用表单值快照的克隆工具。成功 comment 后把新实例 `details.amount` 改为 999，旧实例仍保留 100；WorkflowDetailShell 与 WorkflowTimeline 宿主不再共享这部分嵌套数据。
 
 - **Table 排序分页事件（Vue，X01-F011）**：非受控分页从第 2 页排序复位到第 1 页时，按复位前的页码判断并发出一次 `page-change`，事件携带复位后的页码和每页条数，与 React 一致。

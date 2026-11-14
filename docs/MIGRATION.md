@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+React Select 打开后按 Tab 关闭面板时，焦点现在停在原生 Tab 移到的后续控件。搜索模式会先让 Tab 完成焦点移动，再卸载输入框；关闭后不再异步把焦点拉回 combobox。调用方式不用改，Escape 关闭和选项提交后的回焦不变。
+
 工作流成功 action 返回实例中的 `formValues` 现在与旧实例深隔离。成功 comment 后把新实例的 `formValues.details.amount` 从 100 改为 999，旧实例仍为 100。WorkflowDetailShell 与 WorkflowTimeline 宿主继续通过返回的新实例更新状态，调用方式不用改。
 
 同一无 id 对象在 `dataSource` 出现两次时，双端 Table 的本地处理与分组现在保留各自源索引 `[0,1]`，回退行 key 和行回调分别对应各自位置；此前两行都指向第 0 行。调用方式不用改。
