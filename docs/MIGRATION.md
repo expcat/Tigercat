@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+工作流成功 action 返回实例中的 `formValues` 现在与旧实例深隔离。成功 comment 后把新实例的 `formValues.details.amount` 从 100 改为 999，旧实例仍为 100。WorkflowDetailShell 与 WorkflowTimeline 宿主继续通过返回的新实例更新状态，调用方式不用改。
+
 同一无 id 对象在 `dataSource` 出现两次时，双端 Table 的本地处理与分组现在保留各自源索引 `[0,1]`，回退行 key 和行回调分别对应各自位置；此前两行都指向第 0 行。调用方式不用改。
 
 双端 Upload 的 `customRequest` 同步抛错时，现在把文件标为 `error` 并触发一次 `onError`，随后可以重试；此前文件停在 `uploading`，重试不会再次发起请求。调用方式不用改。

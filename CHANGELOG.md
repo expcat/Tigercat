@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **工作流实例快照（Core / Vue / React，X01-F012）**：成功 action 返回实例时深拷贝 `formValues`，复用表单值快照的克隆工具。成功 comment 后把新实例 `details.amount` 改为 999，旧实例仍保留 100；WorkflowDetailShell 与 WorkflowTimeline 宿主不再共享这部分嵌套数据。
+
 - **Table 排序分页事件（Vue，X01-F011）**：非受控分页从第 2 页排序复位到第 1 页时，按复位前的页码判断并发出一次 `page-change`，事件携带复位后的页码和每页条数，与 React 一致。
 
 - **Table 重复引用行（Core / Vue / React，X01-F010）**：共享索引解析为每次出现的记录保留各自源位置，分组继续携带该索引。同一无 id 对象出现在 `dataSource` 两处且启用本地处理时，源索引为 `[0,1]`，双端回退行 key 和行点击回调不再共用第 0 行。

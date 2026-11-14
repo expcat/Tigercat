@@ -598,6 +598,22 @@ describe('reduceWorkflowAction — purity and no-ops', () => {
     expect(JSON.stringify(src)).toBe(snapshot)
   })
 
+  it('isolates nested form values after a successful action', () => {
+    const src = instance({
+      cursor: { nodeKey: 'mgr' },
+      steps: [{ key: 'mgr', kind: 'approve', status: 'active', actor: lin }],
+      formValues: { details: { amount: 100 } }
+    })
+    const next = act(src, 'comment', { actorId: 'lin', comment: 'note' })
+    expect(next).not.toBe(src)
+    expect(next.history?.at(-1)).toMatchObject({ action: 'comment', comment: 'note' })
+
+    const details = next.formValues?.details as { amount: number }
+    details.amount = 999
+    expect(next.formValues?.details).toEqual({ amount: 999 })
+    expect(src.formValues?.details).toEqual({ amount: 100 })
+  })
+
   it('returns the same reference for illegal actions', () => {
     const src = instance({
       cursor: { nodeKey: 'mgr' },

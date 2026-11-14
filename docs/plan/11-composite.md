@@ -16,7 +16,6 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ## 依赖与顺序
 
-- action 结果共享旧数据（X01-F012）在 [02](02-core-theme-i18n.md)，先做。
 - 多份 composite 示例文档从第 26–28 行起混进了 DataTableWithToolbar 的 Custom Filters 一节，报告没有编号，见 [13](13-evidence.md) 的未立项观察。
 
 ## 概览

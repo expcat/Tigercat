@@ -21,6 +21,7 @@ import type {
   WorkflowTimelineActor,
   WorkflowTimelineStep
 } from '../types/workflow-timeline'
+import { cloneFormValues } from './form-validation'
 import { selectWorkflowConditionBranch } from './workflow-condition'
 import {
   getCurrentWorkflowStep,
@@ -147,7 +148,7 @@ export function cloneWorkflowInstance(instance: WorkflowInstance): WorkflowInsta
   const next: WorkflowInstance = {
     ...instance,
     steps: instance.steps.map(cloneRuntimeStep),
-    formValues: instance.formValues ? { ...instance.formValues } : instance.formValues,
+    formValues: instance.formValues ? cloneFormValues(instance.formValues) : instance.formValues,
     starter: instance.starter ? { ...instance.starter } : instance.starter,
     cursor: instance.cursor ? { ...instance.cursor } : instance.cursor,
     history: instance.history?.map((entry) => ({ ...entry }))

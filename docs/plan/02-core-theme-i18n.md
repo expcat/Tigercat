@@ -19,8 +19,8 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 ## 概览
 
-本篇 8 条：P1 0、P2 7、P3 1。
-按波次：W2 7、W9 1。
+本篇 7 条：P1 0、P2 6、P3 1。
+按波次：W2 6、W9 1。
 
 ## 波及多个组件的条目
 
@@ -39,7 +39,6 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 
 | 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                | 验收                                                                                       |
 | -------- | ---- | ---- | ----- | ---- | --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| X01-F012 | P2   | W2   | Core  | 行为 | 工作流成功 action 的结果共享旧实例嵌套数据          | 新实例 amount 改 999 后旧实例仍为 100（WorkflowDetailShell/WorkflowTimeline 宿主）         |
 | X01-F013 | P2   | W2   | React | 键盘 | React Select 关闭时把 Tab 已移出的焦点拉回          | 打开 React Select 后按 Tab，下拉关闭且等帧后焦点仍停在后续控件 After                       |
 | X01-F014 | P2   | W2   | React | 键盘 | React TreeSelect 可用 Enter 选中禁用节点            | defaultOpen 且首节点 disabled:true 时按 Enter 不触发 onChange，显示值不变                  |
 | X01-F017 | P2   | W2   | React | 键盘 | React popup typeahead 的数据索引与 DOM 索引错位     | React Dropdown items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu       |
