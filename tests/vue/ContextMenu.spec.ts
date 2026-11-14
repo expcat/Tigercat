@@ -177,9 +177,12 @@ describe('ContextMenu', () => {
       expect(document.activeElement).toHaveTextContent('Delete')
     })
 
-    it('opens a nested submenu with ArrowRight and closes it with Escape', async () => {
+    it('keeps ArrowDown inside an open submenu and opens a nested submenu with ArrowRight and closes it with Escape', async () => {
       renderMenu({}, [
-        h(ContextMenuSub, { title: 'More' }, () => [h(ContextMenuItem, null, () => 'Share')])
+        h(ContextMenuSub, { title: 'More' }, () => [
+          h(ContextMenuItem, null, () => 'Mail'),
+          h(ContextMenuItem, null, () => 'Link')
+        ])
       ])
       await openMenu()
 
@@ -188,9 +191,15 @@ describe('ContextMenu', () => {
       subTrigger.focus()
       await fireEvent.keyDown(subTrigger, { key: 'ArrowRight' })
       expect(subTrigger).toHaveAttribute('aria-expanded', 'true')
-      expect(screen.getByText('Share')).toBeInTheDocument()
+      expect(screen.getByText('Mail')).toBeInTheDocument()
 
+      const mail = screen.getByRole('menuitem', { name: 'Mail' })
+      mail.focus()
       const popup = document.querySelector('[data-tiger-context-menu-sub]')!
+      await fireEvent.keyDown(popup, { key: 'ArrowDown' })
+      expect(screen.getByRole('menuitem', { name: 'Link' })).toHaveFocus()
+      expect(screen.getByRole('menuitem', { name: 'Copy' })).not.toHaveFocus()
+
       await fireEvent.keyDown(popup, { key: 'Escape' })
       expect(subTrigger).toHaveAttribute('aria-expanded', 'false')
     })
@@ -266,6 +275,36 @@ describe('ContextMenu', () => {
       await fireEvent.mouseEnter(blocked.closest('.relative') as HTMLElement)
       expect(blocked).toHaveAttribute('aria-expanded', 'false')
       expect(screen.queryByText('Never')).not.toBeInTheDocument()
+    })
+
+    it('opens a More submenu with click or ArrowRight', async () => {
+      const items = [
+        {
+          key: 'more',
+          label: 'More',
+          children: [{ key: 'nested', label: 'Nested' }]
+        }
+      ]
+
+      const keyboard = render(ContextMenu, {
+        props: { defaultOpen: true, portal: false, items }
+      })
+      const more = screen.getByRole('menuitem', { name: 'More' })
+      more.focus()
+      expect(more).toHaveAttribute('aria-expanded', 'false')
+      await fireEvent.keyDown(more, { key: 'ArrowRight' })
+      expect(more).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByRole('menuitem', { name: 'Nested' })).toBeTruthy()
+      keyboard.unmount()
+
+      render(ContextMenu, {
+        props: { defaultOpen: true, portal: false, items }
+      })
+      const moreClick = screen.getByRole('menuitem', { name: 'More' })
+      expect(moreClick).toHaveAttribute('aria-expanded', 'false')
+      await fireEvent.click(moreClick)
+      expect(moreClick).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByRole('menuitem', { name: 'Nested' })).toBeTruthy()
     })
   })
 

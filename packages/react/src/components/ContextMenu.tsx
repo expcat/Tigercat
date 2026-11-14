@@ -266,6 +266,9 @@ export const ContextMenuSub: React.FC<ContextMenuSubProps> = ({
     if (popupRef.current) {
       handleMenuNavigation(popupRef.current, event.nativeEvent)
     }
+    if (event.nativeEvent.defaultPrevented) {
+      event.stopPropagation()
+    }
 
     const dir =
       event.currentTarget.closest('[dir]')?.getAttribute('dir') ??

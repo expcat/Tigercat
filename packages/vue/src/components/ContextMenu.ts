@@ -360,6 +360,9 @@ export const ContextMenuSub = defineComponent({
       if (popupRef.value) {
         handleMenuNavigation(popupRef.value, event)
       }
+      if (event.defaultPrevented) {
+        event.stopPropagation()
+      }
 
       const dir =
         (event.currentTarget as HTMLElement | null)?.closest('[dir]')?.getAttribute('dir') ??
@@ -526,6 +529,17 @@ const ContextMenuPopupBranch = defineComponent({
   setup(props) {
     const tigerConfig = useTigerConfig()
     const openKey = ref<string | number | null>(null)
+    const submenuRef = ref<HTMLElement | null>(null)
+    const focusSubmenuOnOpen = ref(false)
+
+    watch(openKey, () => {
+      if (!focusSubmenuOnOpen.value) return
+      focusSubmenuOnOpen.value = false
+      nextTick(() => {
+        const menu = submenuRef.value
+        if (menu) focusFirstMenuItem(menu)
+      })
+    })
 
     return (): VNode[] =>
       props.entries.map((item) => {
@@ -539,6 +553,15 @@ const ContextMenuPopupBranch = defineComponent({
         }
         if (type === 'submenu') {
           const expanded = openKey.value === item.key && !item.disabled
+          const openDirection =
+            (tigerConfig.value.direction ?? tigerConfig.value.locale?.direction) === 'rtl'
+              ? 'ArrowLeft'
+              : 'ArrowRight'
+          const openSubmenu = (focusChild: boolean) => {
+            if (item.disabled) return
+            if (focusChild) focusSubmenuOnOpen.value = true
+            openKey.value = item.key
+          }
           return h(
             'div',
             {
@@ -562,7 +585,18 @@ const ContextMenuPopupBranch = defineComponent({
                   'aria-disabled': item.disabled || undefined,
                   class: getPopupMenuItemClasses(Boolean(item.disabled), false),
                   'data-tiger-popup-item': '',
-                  disabled: item.disabled
+                  disabled: item.disabled,
+                  onClick: (event: MouseEvent) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    openSubmenu(false)
+                  },
+                  onKeydown: (event: KeyboardEvent) => {
+                    if (event.key !== openDirection) return
+                    event.preventDefault()
+                    event.stopPropagation()
+                    openSubmenu(true)
+                  }
                 },
                 item.label
               ),
@@ -571,6 +605,7 @@ const ContextMenuPopupBranch = defineComponent({
                     'div',
                     {
                       role: 'menu',
+                      ref: submenuRef,
                       'data-tiger-popup-submenu': '',
                       class: `absolute top-0 start-full z-10 min-w-40 ${POPUP_MENU_SUBMENU_SURFACE_CLASSES} p-1`
                     },

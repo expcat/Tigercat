@@ -4,7 +4,7 @@
 type: active-roadmap
 scope: 3.0.0 之后的修复阶段；本文件是入口，任务表在 docs/plan/
 input: .local/review/2026-11-05（全项目 Review，不进 git）
-tasks: 499 条 Review 发现 + 11 条证据任务
+tasks: 497 条 Review 发现 + 11 条证据任务
 verified-date: 2026-11-14
 -->
 
@@ -14,7 +14,7 @@ verified-date: 2026-11-14
 
 ## 现状
 
-- Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 499 条：P1 11、P2 388、P3 100。
+- Review 覆盖 185 个公开组件、841 个 Demo 和 7 份项目专题，共 564 条发现。已完成条目移入 [CHANGELOG.md](../CHANGELOG.md)，剩 497 条：P1 9、P2 388、P3 100。
 - 审查的总状态是 needs-evidence。3364 个视口格里，视觉 2772 格、键盘 2832 格没有浏览器证据。很多条目的依据只有源码和 happy-dom，动手前要先复现。
 
 ## 计划
@@ -28,7 +28,7 @@ verified-date: 2026-11-14
 | [03 基础组件](plan/03-basic.md)                         | C001–C032                                                     |   87 |
 | [04 布局组件](plan/04-layout.md)                        | C033–C051                                                     |   43 |
 | [05 表单组件](plan/05-form.md)                          | C052–C081                                                     |   77 |
-| [06 导航组件](plan/06-navigation.md)                    | C082–C116                                                     |   77 |
+| [06 导航组件](plan/06-navigation.md)                    | C082–C116                                                     |   75 |
 | [07 反馈组件](plan/07-feedback.md)                      | C117–C130                                                     |   24 |
 | [08 数据展示组件](plan/08-data.md)                      | C131–C137                                                     |   14 |
 | [09 图表组件](plan/09-charts.md)                        | C138–C158                                                     |   57 |
@@ -44,7 +44,7 @@ verified-date: 2026-11-14
 
 | 波次 | 内容                             | 条数 | 文档       |
 | ---- | -------------------------------- | ---: | ---------- |
-| W1   | 11 条 P1 和 1 条安全类条目       |   12 | 06、10–12  |
+| W1   | 9 条 P1 和 1 条安全类条目        |   10 | 06、10–12  |
 | W2   | 共享 Core、主题与 i18n 的 P2     |   15 | 02         |
 | W3   | 表单的 P2                        |   74 | 05         |
 | W4   | 导航与反馈的 P2                  |   69 | 06、07     |

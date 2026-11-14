@@ -176,12 +176,13 @@ describe('ContextMenu', () => {
       expect(document.activeElement).toHaveTextContent('Delete')
     })
 
-    it('opens a nested submenu with ArrowRight and closes it with Escape', async () => {
+    it('keeps ArrowDown inside an open submenu and opens a nested submenu with ArrowRight and closes it with Escape', async () => {
       render(
         <Demo
           extra={
             <ContextMenuSub title="More">
-              <ContextMenuItem>Share</ContextMenuItem>
+              <ContextMenuItem>Mail</ContextMenuItem>
+              <ContextMenuItem>Link</ContextMenuItem>
             </ContextMenuSub>
           }
         />
@@ -195,9 +196,15 @@ describe('ContextMenu', () => {
       subTrigger.focus()
       await fireEvent.keyDown(subTrigger, { key: 'ArrowRight' })
       expect(subTrigger).toHaveAttribute('aria-expanded', 'true')
-      expect(screen.getByText('Share')).toBeInTheDocument()
+      expect(screen.getByText('Mail')).toBeInTheDocument()
 
+      const mail = screen.getByRole('menuitem', { name: 'Mail' })
+      mail.focus()
       const popup = document.querySelector('[data-tiger-context-menu-sub]')!
+      await fireEvent.keyDown(popup, { key: 'ArrowDown' })
+      expect(screen.getByRole('menuitem', { name: 'Link' })).toHaveFocus()
+      expect(screen.getByRole('menuitem', { name: 'Copy' })).not.toHaveFocus()
+
       await fireEvent.keyDown(popup, { key: 'Escape' })
       expect(subTrigger).toHaveAttribute('aria-expanded', 'false')
     })

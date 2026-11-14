@@ -26,7 +26,9 @@ React Gallery、Image、ImageGroup 与 ImagePreview 的预览挂到同源父文�
 
 `colorSchemeInitScript` 现在把内联脚本正文中的 `<` 写成 `\u003c`，再包进 `<script>`。`storageKey` 或 `attribute` 含有 `</script>` 时，插入页面后不再提前结束脚本，也不会多出脚本外面的元素。脚本运行时这两个字符串的值不变；不含 `<` 的配置生成的 HTML 与以前相同。调用方式不用改。
 
-React 的 Dropdown 与 ContextMenu 在 `items` 含 `type: 'submenu'` 时，聚焦该项后按 ArrowRight，或直接点击，就会展开子菜单。`aria-expanded` 变为 `true`，子菜单出现，键盘展开还会把焦点移到第一项可用子项。阅读方向为 RTL 时，展开键是 ArrowLeft。此前只有鼠标悬停能展开。悬停展开、移出关闭，以及禁用项不展开，都保持原样。Vue 的 items 子菜单仍只在悬停时展开。
+双端 ContextMenu 的声明式子菜单现在把已处理的方向键留在当前层。聚焦「分享到」按 ArrowRight 打开后，在「邮件」上按 ArrowDown，焦点到「链接」，不再跳回根菜单的「刷新」。Vue ContextMenu 的 `items` 子菜单也可以用点击或 ArrowRight 展开：聚焦 More 后，`aria-expanded` 变为 `true`，Nested 出现；RTL 下展开键是 ArrowLeft。此前 Vue 只有悬停能展开。悬停展开、移出关闭和禁用项不展开保持原样。调用方式不用改。
+
+React 的 Dropdown 与 ContextMenu 在 `items` 含 `type: 'submenu'` 时，聚焦该项后按 ArrowRight，或直接点击，就会展开子菜单。`aria-expanded` 变为 `true`，子菜单出现，键盘展开还会把焦点移到第一项可用子项。阅读方向为 RTL 时，展开键是 ArrowLeft。此前只有鼠标悬停能展开。悬停展开、移出关闭，以及禁用项不展开，都保持原样。Vue ContextMenu 的 items 子菜单现在也可以点击或按 ArrowRight 展开，见本节上文。
 
 React TimePicker 的桌面列现在可以用 Enter 或 Space 把当前焦点选项写入草稿。初始值为 10:00 时，聚焦 10 Hour，按下键到 11 Hour 再按 Enter，然后确定，会提交 11:00 并触发 `onChange`。此前方向键只移动焦点，确定后仍是原来的时间。禁用选项仍然不会写入草稿。手机上的原生 select、鼠标点击，以及 Vue 桌面列的点击选择不变。
 
