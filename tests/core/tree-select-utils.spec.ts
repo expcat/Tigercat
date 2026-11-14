@@ -163,4 +163,23 @@ describe('tree-select helpers', () => {
       }).type
     ).toBe('open')
   })
+
+  it('routes only navigation keys to the tree while the search input is open', () => {
+    const options = {
+      open: true,
+      searchable: true,
+      clearable: true,
+      hasValue: true,
+      fromSearchInput: true
+    }
+    for (const key of ['B', 'a', ' ', 'Backspace', 'Delete', 'Shift']) {
+      expect(getTreeSelectTriggerKeyIntent({ ...options, key })).toEqual({ type: 'none' })
+    }
+    for (const key of ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Home', 'End']) {
+      expect(getTreeSelectTriggerKeyIntent({ ...options, key })).toEqual({ type: 'tree-key', key })
+    }
+    expect(getTreeSelectTriggerKeyIntent({ ...options, key: 'Enter' })).toEqual({
+      type: 'select-active'
+    })
+  })
 })

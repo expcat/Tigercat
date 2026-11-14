@@ -33,6 +33,34 @@ describe('TreeSelect', () => {
     )
   })
   afterEach(() => vi.restoreAllMocks())
+  it('keeps native text editing in the expanded search input', async () => {
+    const user = userEvent.setup()
+    const onSearchChange = vi.fn()
+    render(
+      <TreeSelect
+        treeData={[
+          { key: 'a', label: 'Alpha' },
+          { key: 'b', label: 'Beta' }
+        ]}
+        searchable
+        onSearch={onSearchChange}
+        aria-label="Search"
+      />
+    )
+    await user.click(screen.getByRole('combobox'))
+    const input = screen.getByRole('combobox')
+    await user.type(input, 'Beta')
+    expect(input).toHaveValue('Beta')
+    expect(onSearchChange).toHaveBeenLastCalledWith('Beta')
+    expect(screen.queryByRole('treeitem', { name: 'Alpha' })).not.toBeInTheDocument()
+    expect(screen.getByRole('treeitem', { name: 'Beta' })).toBeInTheDocument()
+    expect(fireEvent.keyDown(input, { key: 'Backspace' })).toBe(true)
+    expect(fireEvent.keyDown(input, { key: 'a', ctrlKey: true })).toBe(true)
+    await user.keyboard('{Backspace}')
+    expect(input).toHaveValue('Bet')
+    expect(onSearchChange).toHaveBeenLastCalledWith('Bet')
+  })
+
   it('closes an expanded searchable tree with Escape and restores the trigger', async () => {
     render(<TreeSelect treeData={treeData} defaultExpandAll searchable aria-label="Tree" />)
     await userEvent.click(screen.getByRole('combobox'))

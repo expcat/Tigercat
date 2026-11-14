@@ -459,7 +459,9 @@ export function getTreeSelectTriggerKeyIntent(options: {
   if (key === ' ' && fromSearchInput) {
     return { type: 'none' }
   }
-  return { type: 'tree-key', key }
+  return ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Home', 'End', ' '].includes(key)
+    ? { type: 'tree-key', key }
+    : { type: 'none' }
 }
 
 export function getTreeSelectTreeItemId(treeId: string, key: string | number): string {

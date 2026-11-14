@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 TreeSelect 的搜索框展开后，现在可以正常输入查询并用 Backspace / Delete 编辑，Ctrl+A 保留原生全选行为。输入 `Beta` 会更新搜索值并触发 React `onSearch` / Vue `update:searchValue`，此前这些按键被树导航处理器取消。调用方式不用改。
+
 双端 TagsInput 在有标签且 `clearable=true` 时，清空按钮现在进入自然 Tab 顺序。从输入框按 Tab 到清空按钮，按 Enter / Space 清空一次并返回输入框；清空后继续按 Tab 到后继控件。调用方式不用改，依赖旧 Tab 顺序的键盘脚本需加入这个清空按钮。
 
 双端 Mentions 在提及位置、前缀和查询内容未变化时，keyup 不再重置活动候选或重新打开面板。输入 `@` 后完整按松 ArrowDown 停在 Bob、End 停在 Charlie；Escape 关闭后保持关闭，继续输入新查询仍会打开候选。`search` / `onSearch` 不再随查询未变化的 keyup 重复触发。调用方式不用改。

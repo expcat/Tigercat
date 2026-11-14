@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **TreeSelect 搜索键盘（Core / Vue / React，C080-F01）**：展开后的搜索框保留普通输入、Backspace、Delete 和 Ctrl+A 的原生行为。输入 `Beta` 会更新查询并触发搜索，共享按键意图只把已有树导航键交给树处理。
+
 - **TagsInput 清空按钮（Vue / React，C076-F03）**：有标签且 `clearable=true` 时，清空按钮进入自然 Tab 顺序，Enter / Space 各触发一次清空并把焦点送回输入框。
 
 - **Mentions 键盘（Vue / React，C068-F01）**：提及位置、前缀与查询内容未变化时，keyup 保留当前候选和面板状态。输入 `@` 后完整按松 ArrowDown 停在 Bob、End 停在 Charlie，Escape 后面板保持关闭；继续输入新查询仍能打开候选。
