@@ -74,6 +74,19 @@ describe('filterDataAdvanced', () => {
     expect(result).toHaveLength(2) // Diana (Paris), Alice
   })
 
+  it.each<FilterRule>([
+    { column: 'name', operator: 'equals', value: '' },
+    { column: 'name', operator: 'equals', value: null },
+    { column: 'name', operator: 'equals' },
+    { column: 'age', operator: 'between', value: 20, valueTo: '' }
+  ])('should skip empty OR rules ($operator, $value, $valueTo)', (emptyRule) => {
+    const rules: FilterRule[] = [
+      { column: 'name', operator: 'equals', value: 'Alice' },
+      { ...emptyRule, logic: 'or' }
+    ]
+    expect(filterDataAdvanced(data, rules)).toEqual([data[0]])
+  })
+
   it('should be case-insensitive for equals', () => {
     const rules: FilterRule[] = [{ column: 'city', operator: 'equals', value: 'london' }]
     const result = filterDataAdvanced(data, rules)

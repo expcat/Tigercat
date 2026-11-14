@@ -56,18 +56,12 @@ function compareNumbers(
 
 /**
  * Apply a single filter rule to a cell value.
- *
- * Empty rule values are ignored (the rule does not filter), except `isEmpty`.
  */
 function applyRule(cellValue: unknown, rule: FilterRule): boolean {
   const { operator, value, valueTo } = rule
 
   if (operator === 'isEmpty') {
     return isEmptyCell(cellValue)
-  }
-
-  if (isEmptyRuleValue(value)) {
-    return true
   }
 
   switch (operator) {
@@ -87,7 +81,6 @@ function applyRule(cellValue: unknown, rule: FilterRule): boolean {
       return compareNumbers(cellValue, value, operator)
 
     case 'between': {
-      if (isEmptyRuleValue(valueTo)) return true
       const cell = toFiniteNumber(cellValue)
       const from = toFiniteNumber(value)
       const to = toFiniteNumber(valueTo)
@@ -134,6 +127,13 @@ export function filterDataAdvanced<T>(
 
     for (let i = 0; i < rules.length; i++) {
       const rule = rules[i]
+      if (
+        rule.operator !== 'isEmpty' &&
+        (isEmptyRuleValue(rule.value) ||
+          (rule.operator === 'between' && isEmptyRuleValue(rule.valueTo)))
+      ) {
+        continue
+      }
       const cellValue = resolveRuleCellValue(record, rule, columns)
       const matches = applyRule(cellValue, rule)
 

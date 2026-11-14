@@ -1463,7 +1463,10 @@ describe('Table', () => {
           columns={columns}
           dataSource={dataSource}
           filterMode="advanced"
-          advancedFilterRules={[{ column: 'name', operator: 'equals', value: 'John Doe' }]}
+          advancedFilterRules={[
+            { column: 'name', operator: 'equals', value: 'John Doe' },
+            { column: 'name', operator: 'equals', value: '', logic: 'or' }
+          ]}
           pagination={false}
         />
       )

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 Table 的高级筛选现在在 AND/OR 组合前跳过空值规则（`undefined`、`null`、空字符串），`between` 缺少任一边界时同样跳过。已有 `name = Alice` 再添加空值 OR 条件仍只保留 Alice；筛选空单元格请使用 `isEmpty`。调用方式不用改。
+
 `Message` 与 `notification` 的自动编号现在避开队列中已占用的数字 key。先添加 `key: 1` 再添加未指定 key 的条目会保留两条；此前自动条目可能覆盖显式 key 的条目。显式相同 key 仍更新原条目，调用方式不用改。
 
 `buildChartSeriesKeys` 现在对最终分配的 key 去重：系列名 `['x', 'x', 'x-2']` 得到 `['series-x', 'series-x-2', 'series-x-2-2']`。双端 LineChart、AreaChart、RadarChart 共用此规则，继续使用各自的前缀。调用方式不用改；直接使用生成 key 的测试或 DOM 选择器需按新后缀更新。
