@@ -435,7 +435,10 @@ export function createUploadController(options: {
     if (allowed === false) return false
     removedUids.add(file.uid)
     abort(file.uid)
-    emitList(next, file)
+    emitList(
+      liveList().filter((item) => item.uid !== file.uid),
+      file
+    )
     return true
   }
 

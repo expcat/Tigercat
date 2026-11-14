@@ -311,6 +311,42 @@ describe('Upload', () => {
       expect(onChange).not.toHaveBeenCalled()
     })
 
+    it('keeps files added while async removal is pending', async () => {
+      let allowRemove: ((allowed: boolean) => void) | undefined
+      const confirmation = new Promise<boolean>((resolve) => {
+        allowRemove = resolve
+      })
+      const onRemove = vi.fn(() => confirmation)
+      const onChange = vi.fn()
+      const { container, getByRole, getByText, queryByText } = render(
+        <Upload multiple autoUpload={false} onRemove={onRemove} onChange={onChange} />
+      )
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+
+      await dispatchUploadEvent(() =>
+        fireEvent.change(input, { target: { files: [new File(['a'], 'a.txt')] } })
+      )
+      await userEvent.click(getByRole('button', { name: 'Remove a.txt' }))
+      expect(onRemove).toHaveBeenCalledTimes(1)
+
+      await dispatchUploadEvent(() =>
+        fireEvent.change(input, { target: { files: [new File(['b'], 'b.txt')] } })
+      )
+      expect(getByText('a.txt')).toBeInTheDocument()
+      expect(getByText('b.txt')).toBeInTheDocument()
+
+      await act(async () => {
+        allowRemove?.(true)
+        await confirmation
+      })
+
+      expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ name: 'a.txt' }), [
+        expect.objectContaining({ name: 'b.txt' })
+      ])
+      expect(queryByText('a.txt')).not.toBeInTheDocument()
+      expect(getByText('b.txt')).toBeInTheDocument()
+    })
+
     it('should accumulate multiple selected files into fileList', async () => {
       const onChange = vi.fn()
       const { container } = render(<Upload multiple fileList={[]} onChange={onChange} />)

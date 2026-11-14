@@ -325,6 +325,41 @@ describe('Upload', () => {
       expect(container.textContent).toContain('test.jpg')
     })
 
+    it('keeps files added while async removal is pending', async () => {
+      let allowRemove: ((allowed: boolean) => void) | undefined
+      const confirmation = new Promise<boolean>((resolve) => {
+        allowRemove = resolve
+      })
+      const onRemove = vi.fn(() => confirmation)
+      const onFileListChange = vi.fn()
+      const { container, getByRole, getByText, queryByText } = render(Upload, {
+        props: {
+          multiple: true,
+          autoUpload: false,
+          onRemove,
+          'onUpdate:fileList': onFileListChange
+        }
+      })
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+
+      await fireEvent.change(input, { target: { files: [new File(['a'], 'a.txt')] } })
+      await waitFor(() => expect(getByText('a.txt')).toBeInTheDocument())
+      await fireEvent.click(getByRole('button', { name: 'Remove a.txt' }))
+      expect(onRemove).toHaveBeenCalledTimes(1)
+
+      await fireEvent.change(input, { target: { files: [new File(['b'], 'b.txt')] } })
+      await waitFor(() => expect(getByText('b.txt')).toBeInTheDocument())
+      expect(getByText('a.txt')).toBeInTheDocument()
+
+      allowRemove?.(true)
+      await waitFor(() => expect(queryByText('a.txt')).not.toBeInTheDocument())
+
+      expect(onFileListChange).toHaveBeenLastCalledWith([
+        expect.objectContaining({ name: 'b.txt' })
+      ])
+      expect(getByText('b.txt')).toBeInTheDocument()
+    })
+
     it('should emit exceed event when file limit is exceeded', async () => {
       const onExceed = vi.fn()
       const { container } = renderWithProps(Upload, {
