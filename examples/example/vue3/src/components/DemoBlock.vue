@@ -100,6 +100,7 @@ const sandbox = ref<{ channelId: string; document: string } | null>(null)
 const iframeHeight = ref(clampDemoFrameHeight(undefined, viewport.value))
 const themeVersion = ref(0)
 let latestRun = 0
+let latestSandbox = 0
 let intersectionObserver: IntersectionObserver | null = null
 let stopThemeObserver: (() => void) | null = null
 
@@ -117,11 +118,11 @@ const editorTheme = computed(() =>
     : 'light'
 )
 
-function rebuildSandbox(result: DemoCompileSuccess) {
+async function rebuildSandbox(result: DemoCompileSuccess): Promise<void> {
+  const sandboxId = ++latestSandbox
   const channelId = crypto.randomUUID()
-  sandbox.value = {
-    channelId,
-    document: createSandboxDocument({
+  try {
+    const nextDocument = await createSandboxDocument({
       framework: 'vue',
       meta: props.module.meta,
       js: result.js,
@@ -137,6 +138,12 @@ function rebuildSandbox(result: DemoCompileSuccess) {
       modules: result.modules,
       enableTailwindJit: isDirty.value
     })
+    if (sandboxId !== latestSandbox) return
+    sandbox.value = { channelId, document: nextDocument }
+  } catch (error) {
+    if (sandboxId !== latestSandbox) return
+    diagnostics.value = normalizeDiagnostics(error)
+    status.value = 'runtime-error'
   }
 }
 
@@ -149,7 +156,7 @@ async function run(bundle: DemoSourceBundle) {
     const result = await compileBundle(bundle)
     if (runId !== latestRun) return
     compiled.value = result
-    rebuildSandbox(result)
+    await rebuildSandbox(result)
   } catch (error) {
     if (runId !== latestRun) return
     diagnostics.value = normalizeDiagnostics(error)
@@ -244,10 +251,11 @@ onMounted(() => {
 
 watch([demoLang, themeVersion], () => {
   const result = compiled.value
-  if (result) rebuildSandbox(result)
+  if (result) void rebuildSandbox(result)
 })
 
 onBeforeUnmount(() => {
+  latestSandbox++
   intersectionObserver?.disconnect()
   stopThemeObserver?.()
   window.removeEventListener('message', onMessage)

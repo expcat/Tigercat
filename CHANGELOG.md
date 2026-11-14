@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Example 沙箱隔离（Vue / React，X05-F01）**：DemoBlock 不再授予 `allow-same-origin`；运行时模块及依赖和样式由父页取回后内联到 iframe，保留脚本、表单和既有权限。双端初始预览、编辑运行与重置正常，示例访问 `parent.document` 被浏览器拒绝。
+
 - **ActivityFeed 自动开窗键盘入口（Vue / React，C170-F01）**：满 40 行后的虚拟窗口恢复 `list` 语义并使用本地化名称进入 Tab 顺序，连续 ArrowDown 可滚到第 45 条，再用 Tab 聚焦其动作。共用开窗机制的 CommentThread 同步保留 `feed` 语义，NotificationCenter 同步补齐窗口名称与键盘入口；生成说明写明开窗阈值和方向键路径。
 
 - **VirtualTable 方向键越窗（Vue / React，C169-F01）**：方向键走到已渲染窗口末行时不再卡住——滚动容器对齐目标行、窗口重渲染后聚焦该行，连续 ArrowDown 可越过窗口末行继续往下走，ArrowUp 同理往回走。

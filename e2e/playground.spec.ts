@@ -10,6 +10,17 @@ for (const app of exampleApps) {
     const editedLabel = `${app.framework} 已编辑按钮`
     const sourceLabel = '小号'
 
+    await expect(moduleRoot.locator('iframe')).not.toHaveAttribute('sandbox', /allow-same-origin/)
+    expect(
+      await preview.locator('body').evaluate(() => {
+        try {
+          void parent.document
+          return false
+        } catch (error) {
+          return error instanceof DOMException && error.name === 'SecurityError'
+        }
+      })
+    ).toBe(true)
     await expect(preview.getByRole('button', { name: sourceLabel, exact: true })).toBeVisible()
     await moduleRoot.getByTestId('demo-edit-source').click()
     const editor = moduleRoot.getByRole('textbox', { name: /Code editor|代码编辑器/ })

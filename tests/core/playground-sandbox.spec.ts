@@ -2,10 +2,11 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createCompilerClient } from '../../examples/example/shared/playground/compiler-client'
 import {
   createSandboxDocument,
+  getSandboxAttribute,
   measureSandboxContentHeight,
   reserveSandboxToastClearance
 } from '../../examples/example/shared/playground/sandbox'
@@ -37,14 +38,14 @@ function sandboxOptions(enableTailwindJit?: boolean) {
     css: '',
     imports: [] as string[],
     runtimeUrls: {
-      framework: '/vue.js',
-      tigercat: '/tigercat.js',
-      core: '/core.js',
-      iconsRegistry: '/icons-registry.js',
-      shared: '/shared.js',
-      tailwind: '/tailwind.js'
+      framework: 'https://example.test/vue.js',
+      tigercat: 'https://example.test/tigercat.js',
+      core: 'https://example.test/core.js',
+      iconsRegistry: 'https://example.test/icons-registry.js',
+      shared: 'https://example.test/shared.js',
+      tailwind: 'https://example.test/tailwind.js'
     },
-    stylesheetUrl: '/parent.css',
+    stylesheetUrl: 'https://example.test/parent.css',
     channelId: 'channel-1',
     lang: 'zh-CN' as const,
     theme: 'classic',
@@ -55,6 +56,40 @@ function sandboxOptions(enableTailwindJit?: boolean) {
 }
 
 describe('example playground sandbox', () => {
+  beforeEach(() => {
+    const sources: Record<string, string> = {
+      '/parent.css': 'body { color: red }',
+      '/vue.js': 'export const framework = true',
+      '/tigercat.js': 'export { core } from "./core.js"',
+      '/core.js': 'export const core = true',
+      '/icons-registry.js': 'export const iconsRegistry = true',
+      '/shared.js': 'export const shared = true',
+      '/tailwind.js': 'globalThis.tailwindLoaded = true'
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        const source = sources[new URL(url).pathname]
+        return new Response(source ?? 'Not found', { status: source === undefined ? 404 : 200 })
+      })
+    )
+  })
+
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('keeps script and form support without granting access to the parent origin', () => {
+    const tokens = getSandboxAttribute({
+      ...sandboxOptions().meta,
+      permissions: ['downloads', 'modals', 'popups', 'fullscreen']
+    }).split(' ')
+    expect(tokens).toContain('allow-scripts')
+    expect(tokens).toContain('allow-forms')
+    expect(tokens).not.toContain('allow-same-origin')
+    expect(tokens).toContain('allow-downloads')
+    expect(tokens).toContain('allow-modals')
+    expect(tokens).toContain('allow-popups')
+  })
+
   it('treats Chrome ResizeObserver loop notices as benign', () => {
     expect(
       isBenignSandboxRuntimeError('ResizeObserver loop completed with undelivered notifications.')
@@ -329,8 +364,8 @@ describe('example playground sandbox', () => {
     expect(document.getElementById('root')?.style.paddingTop).toBe('128px')
   })
 
-  it('inlines the content-height measurement in the sandbox document', () => {
-    const stock = createSandboxDocument(sandboxOptions())
+  it('inlines the content-height measurement in the sandbox document', async () => {
+    const stock = await createSandboxDocument(sandboxOptions())
     expect(stock).toContain('function measureSandboxContentHeight')
     expect(stock).toContain('data-tiger-overlay-layer')
     expect(stock).toContain('data-tiger-modal')
@@ -347,21 +382,26 @@ describe('example playground sandbox', () => {
     expect(rocketIcon.viewBox).toBe('0 0 24 24')
     expect(rocketIcon.paths.length).toBeGreaterThan(0)
 
-    const doc = createSandboxDocument({
+    const doc = await createSandboxDocument({
       ...sandboxOptions(),
       imports: ['@expcat/tigercat-core/icons/registry', '@expcat/tigercat-core']
     })
-    expect(doc).toContain('"@expcat/tigercat-core/icons/registry":"/icons-registry.js"')
-    expect(doc).toContain('"@expcat/tigercat-core":"/core.js"')
+    expect(doc).toContain('"@expcat/tigercat-core/icons/registry"')
+    expect(doc).toContain('export const iconsRegistry = true')
+    expect(doc).toContain('"@expcat/tigercat-core"')
+    expect(doc).toContain('export const core = true')
   })
 
-  it('does not load Tailwind browser Wasm for stock demos', () => {
-    const stock = createSandboxDocument(sandboxOptions())
-    expect(stock).toContain('/parent.css')
-    expect(stock).not.toContain('/tailwind.js')
+  it('inlines runtime dependencies and styles, loading Tailwind only for edited demos', async () => {
+    const stock = await createSandboxDocument(sandboxOptions())
+    expect(stock).toContain('body { color: red }')
+    expect(stock).toContain('export const core = true')
+    expect(stock).not.toContain('https://example.test/')
+    expect(stock).not.toContain('tailwindLoaded')
 
-    const edited = createSandboxDocument(sandboxOptions(true))
-    expect(edited).toContain('/tailwind.js')
+    const edited = await createSandboxDocument(sandboxOptions(true))
+    expect(edited).toContain('globalThis.tailwindLoaded = true')
+    expect(edited).not.toContain('https://example.test/')
   })
 
   it('terminates the compiler worker and retries once after Wasm OOM', async () => {

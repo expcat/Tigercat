@@ -1,3 +1,4 @@
+import { init, parse } from 'es-module-lexer'
 import type { DemoLang } from '../app-config'
 import type { DemoFramework, DemoModuleMeta, DemoRuntimeUrls, DemoSandboxEvent } from './types'
 import { RESIZE_OBSERVER_LOOP } from './sandbox-errors'
@@ -219,7 +220,53 @@ function createImportMap(
   return Object.fromEntries(Object.entries(map).filter(([, value]) => value))
 }
 
-export function createSandboxDocument(options: SandboxDocumentOptions): string {
+async function readSandboxResource(url: string): Promise<string> {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`无法加载示例资源：${url} (${response.status})`)
+  return response.text()
+}
+
+/** Fetch in the host, then let the opaque-origin frame create its own module blobs. */
+async function inlineRuntimeModules(imports: Record<string, string>): Promise<{
+  imports: Record<string, string>
+  modules: Record<string, string>
+}> {
+  await init
+  const ids = new Map<string, string>()
+  const modules: Record<string, string> = {}
+  let pending: string[] = []
+  const enqueue = (url: string): string => {
+    const existing = ids.get(url)
+    if (existing) return existing
+    const id = `@demo-runtime/module-${ids.size}`
+    ids.set(url, id)
+    pending.push(url)
+    return id
+  }
+  const mappedImports = Object.fromEntries(
+    Object.entries(imports).map(([specifier, url]) => [specifier, enqueue(url)])
+  )
+  while (pending.length > 0) {
+    const batch = pending
+    pending = []
+    await Promise.all(
+      batch.map(async (url) => {
+        let source = await readSandboxResource(url)
+        const [records] = parse(source)
+        for (const record of [...records].reverse()) {
+          if (!record.n || !/^(?:[./]|https?:)/.test(record.n)) continue
+          const id = enqueue(new URL(record.n, url).href)
+          const replacement = record.d === -1 ? id : JSON.stringify(id)
+          source = `${source.slice(0, record.s)}${replacement}${source.slice(record.e)}`
+        }
+        modules[ids.get(url)!] = source
+      })
+    )
+  }
+  return { imports: mappedImports, modules }
+}
+
+export async function createSandboxDocument(options: SandboxDocumentOptions): Promise<string> {
   const importMap = createImportMap(options.framework, options.imports, options.runtimeUrls)
   const htmlClass = options.colorScheme === 'dark' ? 'dark' : ''
   const tigerStyleAttr = options.theme ? ` data-tiger-theme="${options.theme}"` : ''
@@ -228,9 +275,17 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
     options.framework === 'react' && options.runtimeUrls.framework.includes('/src/')
       ? new URL('/@react-refresh', options.runtimeUrls.framework).href
       : null
+  importMap['@demo-runtime/tigercat'] = options.runtimeUrls.tigercat
+  importMap['@demo-runtime/shared'] = options.runtimeUrls.shared
+  if (reactRefreshUrl) importMap['@demo-runtime/refresh'] = reactRefreshUrl
+  if (options.enableTailwindJit) importMap['@demo-runtime/tailwind'] = options.runtimeUrls.tailwind
+  const [runtime, stylesheet] = await Promise.all([
+    inlineRuntimeModules(importMap),
+    readSandboxResource(options.stylesheetUrl)
+  ])
   const reactRefreshPreamble = reactRefreshUrl
     ? `
-        const RefreshRuntime = (await import('${reactRefreshUrl}')).default
+        const RefreshRuntime = (await import('@demo-runtime/refresh')).default
         RefreshRuntime.injectIntoGlobalHook(window)
         window.$RefreshReg$ = () => {}
         window.$RefreshSig$ = () => (type) => type
@@ -243,8 +298,8 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
         const ReactModule = await import('react')
         const React = ReactModule.default ?? ReactModule
         const { createRoot } = await import('react-dom/client')
-        const Tiger = await import('${options.runtimeUrls.tigercat}')
-        const Shared = await import('${options.runtimeUrls.shared}')
+        const Tiger = await import('@demo-runtime/tigercat')
+        const Shared = await import('@demo-runtime/shared')
         const Context = await import('@demo-runtime/context')
         const root = createRoot(document.getElementById('root'), { identifierPrefix: channelId + '-' })
         root.render(
@@ -261,8 +316,8 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
       `
       : `
         const Vue = await import('vue')
-        const Tiger = await import('${options.runtimeUrls.tigercat}')
-        const Shared = await import('${options.runtimeUrls.shared}')
+        const Tiger = await import('@demo-runtime/tigercat')
+        const Shared = await import('@demo-runtime/shared')
         const Root = Vue.defineComponent({
           setup() {
             Vue.provide('demo-lang', Vue.ref(lang))
@@ -284,29 +339,26 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' blob: http: https:; style-src 'unsafe-inline' http: https:; img-src data: blob: http: https:; font-src data: http: https:; media-src data: blob: http: https:; connect-src http: https:;" />
-    <script type="importmap" id="demo-importmap">${safeJson({ imports: importMap })}</script>
     <script>
       ;(function () {
-        var mapEl = document.getElementById('demo-importmap')
-        if (!mapEl) return
-        var json = JSON.parse(mapEl.textContent || '{"imports":{}}')
-        var modules = ${safeJson(options.modules ?? {})}
+        var imports = ${safeJson(runtime.imports)}
+        var modules = ${safeJson({ ...runtime.modules, ...options.modules })}
+        var urls = {}
         for (var spec in modules) {
-          json.imports[spec] = URL.createObjectURL(
+          urls[spec] = URL.createObjectURL(
             new Blob([modules[spec]], { type: 'text/javascript' })
           )
         }
-        mapEl.textContent = JSON.stringify(json)
+        for (var spec in imports) imports[spec] = urls[imports[spec]]
+        var mapEl = document.createElement('script')
+        mapEl.type = 'importmap'
+        mapEl.textContent = JSON.stringify({ imports: { ...imports, ...urls } })
+        document.head.appendChild(mapEl)
       })()
     </script>
-    <link rel="stylesheet" href="${options.stylesheetUrl}" />
+    <style>${stylesheet}</style>
     <style>${options.css}</style>
     <style>html,body{margin:0;min-height:100%;background:transparent}body{padding:1rem;box-sizing:border-box}#root{min-height:1px}</style>
-    ${
-      options.enableTailwindJit
-        ? `<script type="module" src="${options.runtimeUrls.tailwind}"></script>`
-        : ''
-    }
   </head>
   <body>
     <div id="root"></div>
@@ -375,6 +427,7 @@ export function createSandboxDocument(options: SandboxDocumentOptions): string {
 
       try {
         ${reactRefreshPreamble}
+        ${options.enableTailwindJit ? "await import('@demo-runtime/tailwind')" : ''}
         const source = ${safeJson(options.js)}
         const url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }))
         const demo = await import(url)
@@ -402,7 +455,7 @@ export function isSandboxEvent(value: unknown): value is DemoSandboxEvent {
 }
 
 export function getSandboxAttribute(meta: DemoModuleMeta): string {
-  const tokens = new Set(['allow-scripts', 'allow-forms', 'allow-same-origin'])
+  const tokens = new Set(['allow-scripts', 'allow-forms'])
   for (const permission of meta.permissions ?? []) {
     if (permission === 'downloads') tokens.add('allow-downloads')
     if (permission === 'modals') tokens.add('allow-modals')

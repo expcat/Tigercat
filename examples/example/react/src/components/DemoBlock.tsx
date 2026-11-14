@@ -123,11 +123,11 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   }, [files, originalBundle])
 
   const rebuildSandbox = useCallback(
-    (result: DemoCompileSuccess) => {
+    async (result: DemoCompileSuccess) => {
       const channelId = crypto.randomUUID()
-      setSandbox({
+      return {
         channelId,
-        document: createSandboxDocument({
+        document: await createSandboxDocument({
           framework: 'react',
           meta: module.meta,
           js: result.js,
@@ -143,7 +143,7 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
           modules: result.modules,
           enableTailwindJit: isDirty
         })
-      })
+      }
     },
     [isDirty, lang, module.meta]
   )
@@ -188,8 +188,22 @@ export default function DemoBlock({ module, className }: DemoBlockProps) {
   }, [module, originalBundle, run, visible])
 
   useEffect(() => {
-    if (compiled) rebuildSandbox(compiled)
+    let cancelled = false
+    if (compiled) {
+      void rebuildSandbox(compiled)
+        .then((next) => {
+          if (!cancelled) setSandbox(next)
+        })
+        .catch((error: unknown) => {
+          if (cancelled) return
+          setDiagnostics(normalizeDiagnostics(error))
+          setStatus('runtime-error')
+        })
+    }
     // themeVersion intentionally invalidates the sandbox without recompiling source.
+    return () => {
+      cancelled = true
+    }
   }, [compiled, rebuildSandbox, themeVersion])
 
   useEffect(() => {
