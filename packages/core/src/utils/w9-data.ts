@@ -1304,7 +1304,11 @@ export function appendInfiniteIds<T extends string | number>(
   return appended
 }
 
-export function dragMoveAnnouncement(from: number, to: number, locale?: string): string {
+export function dragMoveAnnouncement(
+  from: number,
+  to: number,
+  locale?: Partial<import('../types/locale').TigerLocale>
+): string {
   return formatW9Label(getW9DataLabels(locale).dragFromTo, { from: from + 1, to: to + 1 })
 }
 

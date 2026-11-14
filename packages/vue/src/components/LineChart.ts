@@ -806,6 +806,7 @@ export const LineChart = defineComponent({
             : null,
           props.bind
             ? renderAxisBind({
+                exportText: labels.value.exportText,
                 ticks: props.bind.time,
                 reference:
                   props.bind.reference &&

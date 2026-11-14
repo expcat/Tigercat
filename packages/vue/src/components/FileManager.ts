@@ -16,7 +16,6 @@ import {
   classNames,
   fileToUploadFile,
   filterUploadPreviewUrl,
-  getW9DataLabels,
   isImageUploadFile,
   sanitizeFileDisplayName,
   searchFileTree,
@@ -670,7 +669,7 @@ export const FileManager = defineComponent({
                       if (canEmitFileOpen(props.bind?.permission)) emit('open', props.bind?.name)
                     }
                   },
-                  getW9DataLabels().preview
+                  labels.value.previewText
                 ),
                 h(
                   'button',
@@ -683,7 +682,7 @@ export const FileManager = defineComponent({
                       fileAction.value = sanitizeFileDisplayName(props.bind?.name ?? '')
                     }
                   },
-                  getW9DataLabels().rename
+                  labels.value.renameText
                 ),
                 h(
                   'button',
@@ -697,12 +696,12 @@ export const FileManager = defineComponent({
                       }
                     }
                   },
-                  getW9DataLabels().delete
+                  labels.value.deleteText
                 ),
                 h('input', {
                   type: 'file',
                   'data-tiger-file-upload': '',
-                  'aria-label': getW9DataLabels().upload,
+                  'aria-label': labels.value.uploadText,
                   onChange: (event: Event) => {
                     const file = (event.target as HTMLInputElement).files?.[0]
                     if (!file) return

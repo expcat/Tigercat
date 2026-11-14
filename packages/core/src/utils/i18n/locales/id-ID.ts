@@ -9,7 +9,16 @@ export const idID: TigerLocale = {
   locale: 'id-ID',
   direction: 'ltr',
   datePicker: ID_ID_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: 'Direktori kosong',
+    listAriaLabel: 'Penerima tugas'
+  },
   common: {
+    countdownTargetText: 'Hitung mundur mengikuti waktu target',
+    dangerText: 'Tindakan berbahaya',
+    sidebarCollapseText: 'Ciutkan bilah samping',
+    sidebarExpandText: 'Perluas bilah samping',
+    dragMoveText: 'Dari item {from} ke item {to}',
     okText: 'OK',
     cancelText: 'Batal',
     closeText: 'Tutup',
@@ -41,6 +50,7 @@ export const idID: TigerLocale = {
     dialogAriaLabel: 'Kotak dialog'
   },
   drawer: {
+    resizeAriaLabel: 'Ubah ukuran laci',
     closeAriaLabel: 'Tutup',
     dialogAriaLabel: 'Laci'
   },
@@ -48,6 +58,7 @@ export const idID: TigerLocale = {
     closeAriaLabel: 'Tutup peringatan'
   },
   qrcode: {
+    scannedText: 'Sudah dipindai',
     ariaLabel: 'Kode QR',
     expiredText: 'Kode QR kedaluwarsa',
     refreshText: 'Muat ulang',
@@ -58,6 +69,8 @@ export const idID: TigerLocale = {
     ariaLabel: 'Konten bergulir'
   },
   image: {
+    galleryListAriaLabel: 'Gambar mini',
+    galleryOpenAriaLabel: 'Buka pratinjau',
     previewAriaLabel: 'Pratinjau {alt}',
     previewFallbackAlt: 'gambar',
     groupAriaLabel: 'Grup gambar',
@@ -175,6 +188,7 @@ export const idID: TigerLocale = {
     assigneeRequired: 'Pilih penerima terlebih dahulu'
   },
   workflowDesigner: {
+    validationDuplicateKey: 'Kunci setiap simpul harus unik',
     ariaLabel: 'Perancang alur kerja',
     addStep: 'Tambah langkah',
     addChild: 'Tambah langkah anak',
@@ -252,12 +266,15 @@ export const idID: TigerLocale = {
     ariaLabel: 'Progres'
   },
   splitter: {
+    expandText: 'Perluas panel',
+    collapseText: 'Ciutkan panel',
     gutterAriaLabel: 'Ubah ukuran panel {index}'
   },
   resizable: {
     handleAriaLabel: 'Ubah ukuran {handle}'
   },
   upload: {
+    selectDirectoryText: 'Pilih folder',
     dragAreaAriaLabel: 'Unggah berkas dengan mengeklik atau menyeret',
     buttonAriaLabel: 'Unggah berkas',
     clickToUploadText: 'Klik untuk mengunggah',
@@ -276,6 +293,7 @@ export const idID: TigerLocale = {
     singleFileText: 'Hanya berkas pertama yang disimpan.'
   },
   pagination: {
+    jumpToPageAriaLabel: 'Buka halaman',
     totalText: 'Total {total} item',
     itemsPerPageText: '/halaman',
     jumpToText: 'Ke halaman',
@@ -288,6 +306,12 @@ export const idID: TigerLocale = {
     pageSizeAriaLabel: 'Item per halaman'
   },
   table: {
+    summaryText: 'Ringkasan',
+    filterApplyText: 'Terapkan filter',
+    columnDragAriaLabel: 'Seret kolom',
+    exportPageText: 'Ekspor halaman ini',
+    exportSelectedText: 'Ekspor pilihan',
+    exportAllText: 'Ekspor semua',
     emptyText: 'Tidak ada data',
     loadingText: 'Memuat',
     expandText: 'Bentangkan',
@@ -333,6 +357,11 @@ export const idID: TigerLocale = {
     errorText: 'Ekspor gagal'
   },
   timePicker: {
+    invalidTimeText: 'Masukkan waktu yang valid.',
+    unavailableTimeText: 'Waktu tersebut tidak tersedia.',
+    missingTimeText: 'Pilih waktu.',
+    missingStartText: 'Pilih waktu mulai.',
+    missingEndText: 'Pilih waktu akhir.',
     hour: 'Jam',
     minute: 'Menit',
     second: 'Detik',
@@ -348,6 +377,10 @@ export const idID: TigerLocale = {
     selectTimeRange: 'Pilih rentang waktu'
   },
   formWizard: {
+    leaveStepTitle: 'Tinggalkan langkah ini',
+    leaveStepMessage: 'Langkah ini memiliki perubahan yang belum disimpan',
+    stayText: 'Tetap di langkah ini',
+    leaveText: 'Tinggalkan',
     prevText: 'Sebelumnya',
     nextText: 'Selanjutnya',
     finishText: 'Selesai',
@@ -368,6 +401,7 @@ export const idID: TigerLocale = {
     loadErrorText: 'Tur ini tidak dapat dimuat.'
   },
   calendar: {
+    weekNumberText: 'Pekan',
     previousMonth: 'Bulan sebelumnya',
     nextMonth: 'Bulan berikutnya',
     previousYear: 'Tahun sebelumnya',
@@ -381,6 +415,12 @@ export const idID: TigerLocale = {
     exitAriaLabel: 'Keluar layar penuh'
   },
   fileManager: {
+    downloadText: 'Unduh',
+    newFolderText: 'Folder baru',
+    previewText: 'Pratinjau',
+    renameText: 'Ganti nama',
+    deleteText: 'Hapus',
+    uploadText: 'Unggah',
     rootText: 'Akar',
     pathAriaLabel: 'Jalur berkas',
     listboxAriaLabel: 'Berkas',
@@ -389,6 +429,9 @@ export const idID: TigerLocale = {
     resultCountText: '{count} item'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: 'Balik horizontal',
+    downloadAriaLabel: 'Unduh gambar saat ini',
+    originalSizeAriaLabel: 'Ukuran asli',
     dialogAriaLabel: 'Penampil gambar',
     previewDialogAriaLabel: 'Pratinjau gambar',
     closeAriaLabel: 'Tutup',
@@ -403,6 +446,11 @@ export const idID: TigerLocale = {
     previewImageAriaLabel: 'Gambar {index} dari {total}'
   },
   imageEditor: {
+    cropAspectAriaLabel: 'Rasio potong',
+    cropFreeText: 'Bebas',
+    cropRotateText: 'Putar',
+    cropFlipText: 'Balik',
+    cropCircleText: 'Lingkaran',
     selectImageText: 'Pilih gambar',
     selectImageAriaLabel: 'Pilih gambar untuk dipotong dan diunggah',
     cropModalTitle: 'Potong gambar',
@@ -471,6 +519,9 @@ export const idID: TigerLocale = {
     messageListAriaLabel: 'Daftar pesan'
   },
   code: {
+    wrapLabel: 'Bungkus baris',
+    nowrapLabel: 'Tanpa pembungkusan',
+    languageLabel: 'Bahasa',
     copyLabel: 'Salin',
     copiedLabel: 'Disalin',
     copyFailedLabel: 'Gagal menyalin',
@@ -519,6 +570,10 @@ export const idID: TigerLocale = {
     unreadCountText: '{count} belum dibaca'
   },
   select: {
+    maxCountText: 'Pilih paling banyak {count} item',
+    collapsedTagsText: 'Juga {names}',
+    selectAllText: 'Pilih semua hasil',
+    invalidValueText: 'Nilai ini tidak dapat ditampilkan.',
     doneText: 'Selesai',
     placeholder: 'Pilih opsi',
     emptyText: 'Tidak ada opsi',
@@ -541,6 +596,9 @@ export const idID: TigerLocale = {
     collapseAriaLabel: 'Ciutkan'
   },
   colorPicker: {
+    eyedropperText: 'Pipet warna',
+    recentColorsText: 'Terakhir digunakan',
+    invalidValueText: 'Masukkan warna yang valid.',
     trigger: 'Pilih warna',
     panelTitle: 'Warna',
     clear: 'Hapus',
@@ -570,6 +628,7 @@ export const idID: TigerLocale = {
     valueText: '{value} bintang'
   },
   avatarGroup: {
+    overflowListAriaLabel: 'Anggota tersembunyi',
     ariaLabel: 'Grup avatar',
     overflowAriaLabel: '{count} lainnya'
   },
@@ -586,6 +645,8 @@ export const idID: TigerLocale = {
     slideAriaLabel: 'Slide {index} dari {total}'
   },
   transfer: {
+    pageText: 'Halaman {page}',
+    hiddenSelectedText: '{count} pilihan disembunyikan oleh pencarian',
     sourceTitle: 'Sumber',
     targetTitle: 'Tujuan',
     searchAriaLabel: 'Cari {title}',
@@ -595,6 +656,7 @@ export const idID: TigerLocale = {
     selectAllAriaLabel: 'Pilih semua di {title}'
   },
   chart: {
+    exportText: 'Ekspor bagan',
     legendAriaLabel: 'Legenda bagan',
     pointAriaLabel: 'Titik {index}: ({x}, {y})',
     seriesName: 'Seri {index}',
@@ -626,10 +688,15 @@ export const idID: TigerLocale = {
     gaugeChartAriaLabel: 'Pengukur'
   },
   codeEditor: {
+    findText: 'Cari',
+    replaceText: 'Ganti',
+    bracketMatchText: 'Pasangan kurung',
+    replaceAllText: 'Ganti semua',
     editorAriaLabel: 'Editor kode'
   },
 
   markdownEditor: {
+    contentsText: 'Daftar isi',
     formattingToolbarAriaLabel: 'Pemformatan Markdown',
     modeToolbarAriaLabel: 'Mode tampilan Markdown',
     editorAriaLabel: 'Editor Markdown',
@@ -664,6 +731,8 @@ export const idID: TigerLocale = {
     placeholderTable: '| Kolom | Nilai |\n| --- | --- |\n| Nama | Tigercat |'
   },
   richTextEditor: {
+    previewText: 'Pratinjau',
+    tableText: 'Tabel',
     formattingToolbarAriaLabel: 'Pemformatan teks',
     editorAriaLabel: 'Editor teks kaya',
     bold: 'Tebal',
@@ -687,6 +756,16 @@ export const idID: TigerLocale = {
     imagePrompt: 'Masukkan URL gambar'
   },
   cronEditor: {
+    summaryEveryMinute: 'setiap menit',
+    summaryEveryHour: 'setiap jam',
+    summaryEveryMonth: 'setiap bulan',
+    summarySentence: 'Dijalankan pada {minute}, {hour}, {day}, {month}.',
+    summaryField: '{field}: {value}',
+    summaryEveryDay: 'Setiap hari',
+    summaryStep: 'Setiap {step} langkah',
+    summaryRangeStep: '{start}–{end}, setiap {step} langkah',
+    summaryOr: '{left} atau {right}',
+    nextRunText: 'Berikutnya {time}',
     ariaLabel: 'Editor Cron',
     expressionAriaLabel: 'Ekspresi Cron',
     presetAriaLabel: 'Prasetel Cron',
@@ -721,6 +800,7 @@ export const idID: TigerLocale = {
     invalidFieldError: '{field} harus *, angka, rentang, langkah, atau daftar dipisah koma'
   },
   formValidation: {
+    errorSummary: 'Perbaiki kesalahan berikut',
     required: 'Bidang ini wajib diisi',
     typeString: 'Nilai harus berupa string',
     typeNumber: 'Nilai harus berupa angka',
@@ -747,6 +827,7 @@ export const idID: TigerLocale = {
     slotLabel: 'Karakter {index} dari {total}'
   },
   tagsInput: {
+    rejectedText: '{tag} tidak ditambahkan',
     removeTagLabel: 'Hapus {tag}',
     clearAllLabel: 'Hapus semua tag',
     duplicateText: 'Sudah ditambahkan',
@@ -763,16 +844,21 @@ export const idID: TigerLocale = {
     emptyAriaValueText: 'Kosong'
   },
   slider: {
+    valueText: 'Nilai {value}',
     ariaLabel: 'Penggeser',
     minAriaLabel: 'Nilai terendah',
     maxAriaLabel: 'Nilai tertinggi'
   },
   signature: {
+    hasStrokesText: 'Ada goresan',
+    redoText: 'Ulangi',
+    invalidValueText: 'Tanda tangan ini tidak dapat ditampilkan.',
     ariaLabel: 'Pad tanda tangan',
     undoText: 'Urungkan',
     clearText: 'Hapus'
   },
   numberKeyboard: {
+    invalidValueText: 'Nilai tidak sesuai mode papan ketik dan telah dihapus.',
     ariaLabel: 'Papan tombol angka',
     deleteText: 'Hapus',
     decimalAriaLabel: 'Pemisah desimal',
@@ -809,6 +895,7 @@ export const idID: TigerLocale = {
     errorStatus: 'Kesalahan'
   },
   tree: {
+    directoryText: 'Direktori',
     ariaLabel: 'Pohon',
     selectNode: 'Pilih {label}',
     expand: 'Bentangkan',

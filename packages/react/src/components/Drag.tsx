@@ -7,6 +7,7 @@ import {
   type DragItem,
   type DragProps as CoreDragProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 import { useDrag } from '../hooks/useDrag'
 
 export interface DragRenderContext {
@@ -32,6 +33,7 @@ export function Drag<T extends DragItem = DragItem>({
   children,
   renderItem
 }: DragProps<T>) {
+  const tigerConfig = useTigerConfig()
   const itemsRef = React.useRef(items)
   itemsRef.current = items
   const onItemsChangeRef = React.useRef(onItemsChange)
@@ -47,7 +49,7 @@ export function Drag<T extends DragItem = DragItem>({
     onDragOver: (event) => {
       const from = items.findIndex((item) => item.id === event.item.id)
       const to = event.overItem ? items.findIndex((item) => item.id === event.overItem?.id) : from
-      setAnnouncement(dragMoveAnnouncement(Math.max(0, from), Math.max(0, to)))
+      setAnnouncement(dragMoveAnnouncement(Math.max(0, from), Math.max(0, to), tigerConfig.locale))
       onDragOver?.(event)
     },
     onDragEnd: (event) => {

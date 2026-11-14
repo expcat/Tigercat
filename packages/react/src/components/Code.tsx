@@ -1,6 +1,5 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  basicLabel,
   classNames,
   codeBlockCopyStatusLiveClasses,
   codeBlockHeaderActionsClasses,
@@ -119,7 +118,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
       className={codeBlockWrapButtonClasses}
       aria-pressed={wrapped}
       onClick={() => setWrapped((value) => !value)}>
-      {basicLabel(mergedLocale?.locale, 'code', wrapped ? 'nowrap' : 'wrap')}
+      {wrapped ? labels.nowrapLabel : labels.wrapLabel}
     </button>
   ) : null
   const copyButton = copyable ? (
@@ -133,9 +132,7 @@ export const Code = forwardRef<HTMLDivElement, CodeProps>(function Code(
       {showHeader ? (
         <div className={codeBlockHeaderClasses}>
           <span className={codeBlockLanguageClasses}>
-            {showLanguage && language
-              ? `${basicLabel(mergedLocale?.locale, 'code', 'language')}: ${language}`
-              : null}
+            {showLanguage && language ? `${labels.languageLabel}: ${language}` : null}
           </span>
           {wrapButton || copyButton ? (
             <div className={codeBlockHeaderActionsClasses}>

@@ -678,6 +678,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       data-tiger-table-layout={showCardTree ? 'card' : 'table'}
       aria-busy={loading}>
       <TableW9Panel
+        locale={{ ...tableLocale, table: tableLabels }}
         active={sorts !== undefined}
         columns={ctx.displayColumns}
         sorts={ctx.multiSort}

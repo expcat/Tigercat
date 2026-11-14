@@ -38,7 +38,6 @@ import {
   resolveEditorTabAction,
   nextToolbarRovingIndex,
   getMarkdownToolbarButtons,
-  getW9DataLabels,
   htmlToMarkdown,
   lockedPaneScroll,
   markdownHeadings,
@@ -351,7 +350,7 @@ export const MarkdownEditor = forwardRef<HTMLTextAreaElement, MarkdownEditorProp
               onClick={() =>
                 commitValue(`${currentValue}${htmlToMarkdown(sanitizeHtml(bind.html ?? ''))}`)
               }>
-              {getW9DataLabels().preview}
+              {labels.previewModeLabel}
             </button>
           </div>
         ) : null}

@@ -14,6 +14,10 @@ export type DatePickerModelValue =
   DatePickerInputDate | null | [DatePickerInputDate | null, DatePickerInputDate | null]
 
 export interface DatePickerLabels {
+  invalidDateText?: string
+  unavailableDateText?: string
+  missingStartText?: string
+  missingEndText?: string
   placeholder: string
   rangePlaceholder: string
   today: string

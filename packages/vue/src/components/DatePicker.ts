@@ -33,6 +33,7 @@ import {
   formatDatePickerDisplay,
   formDatePickerValue,
   getDatePickerLabels,
+  resolveDatePickerError,
   getDatePickerLocaleCode,
   getInputClearButtonClasses,
   getInputFieldClasses,
@@ -215,8 +216,9 @@ export const DatePicker = defineComponent({
     }
 
     function reportPickerError(reason: string) {
-      validationMessage.value = reason
-      formItemControl?.setError(reason)
+      const message = resolveDatePickerError(reason, labels.value)
+      validationMessage.value = message
+      formItemControl?.setError(message)
     }
 
     function writeCommitted(next: Date | null | RangeTuple) {

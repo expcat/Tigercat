@@ -4,6 +4,11 @@ import type { TimePickerLabels } from './timepicker'
 export type TigerLocaleDirection = 'ltr' | 'rtl'
 
 export interface TigerLocaleCommon {
+  countdownTargetText?: string
+  dangerText?: string
+  sidebarCollapseText?: string
+  sidebarExpandText?: string
+  dragMoveText?: string
   okText?: string
   cancelText?: string
   closeText?: string
@@ -51,6 +56,7 @@ export interface TigerLocaleModal {
 }
 
 export interface TigerLocaleDrawer {
+  resizeAriaLabel?: string
   closeAriaLabel?: string
   /** Accessible name when the drawer has no visible title */
   dialogAriaLabel?: string
@@ -62,6 +68,7 @@ export interface TigerLocaleAlert {
 }
 
 export interface TigerLocaleQRCode {
+  scannedText?: string
   ariaLabel?: string
   expiredText?: string
   refreshText?: string
@@ -76,6 +83,8 @@ export interface TigerLocaleMarquee {
 }
 
 export interface TigerLocaleImage {
+  galleryListAriaLabel?: string
+  galleryOpenAriaLabel?: string
   /** Preview control name. Template: supports {alt} */
   previewAriaLabel?: string
   /** Substituted for {alt} when the image has no alternative text */
@@ -426,6 +435,8 @@ export interface TigerLocaleProgress {
 }
 
 export interface TigerLocaleSplitter {
+  expandText?: string
+  collapseText?: string
   /** Accessible name for a gutter. Template: supports {index} (1-based) */
   gutterAriaLabel?: string
 }
@@ -436,6 +447,7 @@ export interface TigerLocaleResizable {
 }
 
 export interface TigerLocaleUpload {
+  selectDirectoryText?: string
   /** Drag area aria-label */
   dragAreaAriaLabel?: string
   /** Upload button aria-label (non-drag mode) */
@@ -483,6 +495,8 @@ export interface TigerLocalePagination {
   pageSizeAriaLabel?: string
   /** Quick jumper label */
   jumpToText?: string
+  /** Accessible name for the ellipsis page jumper */
+  jumpToPageAriaLabel?: string
   /** Page text (after number) */
   pageText?: string
   /** Previous page button aria-label */
@@ -498,6 +512,12 @@ export interface TigerLocalePagination {
 }
 
 export interface TigerLocaleTable {
+  summaryText?: string
+  filterApplyText?: string
+  columnDragAriaLabel?: string
+  exportPageText?: string
+  exportSelectedText?: string
+  exportAllText?: string
   emptyText?: string
   loadingText?: string
   expandText?: string
@@ -567,6 +587,10 @@ export interface TigerLocaleDataExport {
 }
 
 export interface TigerLocaleFormWizard {
+  leaveStepTitle?: string
+  leaveStepMessage?: string
+  stayText?: string
+  leaveText?: string
   prevText?: string
   nextText?: string
   finishText?: string
@@ -595,6 +619,7 @@ export interface TigerLocaleTour {
 }
 
 export interface TigerLocaleCalendar {
+  weekNumberText?: string
   previousMonth?: string
   nextMonth?: string
   previousYear?: string
@@ -613,6 +638,12 @@ export interface TigerLocaleFullscreen {
 }
 
 export interface TigerLocaleFileManager {
+  downloadText?: string
+  newFolderText?: string
+  previewText?: string
+  renameText?: string
+  deleteText?: string
+  uploadText?: string
   rootText?: string
   pathAriaLabel?: string
   listboxAriaLabel?: string
@@ -623,6 +654,9 @@ export interface TigerLocaleFileManager {
 }
 
 export interface TigerLocaleImageViewer {
+  flipHorizontalAriaLabel?: string
+  downloadAriaLabel?: string
+  originalSizeAriaLabel?: string
   dialogAriaLabel?: string
   previewDialogAriaLabel?: string
   closeAriaLabel?: string
@@ -639,6 +673,11 @@ export interface TigerLocaleImageViewer {
 }
 
 export interface TigerLocaleImageEditor {
+  cropAspectAriaLabel?: string
+  cropFreeText?: string
+  cropRotateText?: string
+  cropFlipText?: string
+  cropCircleText?: string
   selectImageText?: string
   selectImageAriaLabel?: string
   cropModalTitle?: string
@@ -732,6 +771,9 @@ export interface TigerLocaleChatWindow {
 }
 
 export interface TigerLocaleCode {
+  wrapLabel?: string
+  nowrapLabel?: string
+  languageLabel?: string
   copyLabel?: string
   copiedLabel?: string
   copyFailedLabel?: string
@@ -823,6 +865,10 @@ export interface TigerLocaleWorkflowDetailShell {
 }
 
 export interface TigerLocaleSelect {
+  maxCountText?: string
+  collapsedTagsText?: string
+  selectAllText?: string
+  invalidValueText?: string
   /** Mobile dropdown completion action text */
   doneText?: string
   /** Trigger placeholder when no option is selected */
@@ -870,6 +916,9 @@ export interface TigerLocaleTreeSelect {
 }
 
 export interface TigerLocaleColorPicker {
+  eyedropperText?: string
+  recentColorsText?: string
+  invalidValueText?: string
   /** Trigger aria-label / title. Default "Pick color". */
   trigger?: string
   /** Panel heading and dialog accessible name */
@@ -966,6 +1015,7 @@ export interface TigerLocaleRate {
 }
 
 export interface TigerLocaleAvatarGroup {
+  overflowListAriaLabel?: string
   ariaLabel?: string
   /** Template: supports {count} */
   overflowAriaLabel?: string
@@ -988,6 +1038,8 @@ export interface TigerLocaleCarousel {
 }
 
 export interface TigerLocaleTransfer {
+  pageText?: string
+  hiddenSelectedText?: string
   sourceTitle?: string
   targetTitle?: string
   /** Template: supports {title} */
@@ -1001,6 +1053,7 @@ export interface TigerLocaleTransfer {
 }
 
 export interface TigerLocaleChart {
+  exportText?: string
   legendAriaLabel?: string
   /** Template: supports {index}, {x}, {y} */
   pointAriaLabel?: string
@@ -1045,10 +1098,15 @@ export interface TigerLocaleChart {
 }
 
 export interface TigerLocaleCodeEditor {
+  findText?: string
+  replaceText?: string
+  bracketMatchText?: string
+  replaceAllText?: string
   editorAriaLabel?: string
 }
 
 export interface TigerLocaleMarkdownEditor {
+  contentsText?: string
   formattingToolbarAriaLabel?: string
   modeToolbarAriaLabel?: string
   editorAriaLabel?: string
@@ -1086,6 +1144,8 @@ export interface TigerLocaleMarkdownEditor {
 }
 
 export interface TigerLocaleRichTextEditor {
+  previewText?: string
+  tableText?: string
   formattingToolbarAriaLabel?: string
   editorAriaLabel?: string
   bold?: string
@@ -1110,6 +1170,16 @@ export interface TigerLocaleRichTextEditor {
 }
 
 export interface TigerLocaleCronEditor {
+  summaryEveryMinute?: string
+  summaryEveryHour?: string
+  summaryEveryMonth?: string
+  summarySentence?: string
+  summaryField?: string
+  summaryEveryDay?: string
+  summaryStep?: string
+  summaryRangeStep?: string
+  summaryOr?: string
+  nextRunText?: string
   ariaLabel?: string
   expressionAriaLabel?: string
   presetAriaLabel?: string
@@ -1152,6 +1222,7 @@ export interface TigerLocaleCronEditor {
  * these. Range messages support `{min}` / `{max}` placeholders.
  */
 export interface TigerLocaleFormValidation {
+  errorSummary?: string
   /** Required-field message */
   required?: string
   /** Type errors */
@@ -1202,6 +1273,7 @@ export interface TigerLocaleInputOTP {
  * @since 2.1.0
  */
 export interface TigerLocaleTagsInput {
+  rejectedText?: string
   /** Remove-tag button aria-label — template: supports {tag} */
   removeTagLabel?: string
   /** Clear-all button aria-label */
@@ -1229,6 +1301,7 @@ export interface TigerLocaleInputNumber {
 
 /** Slider thumb names. */
 export interface TigerLocaleSlider {
+  valueText?: string
   /** Default accessible name when none is passed */
   ariaLabel?: string
   /** Range thumb name for the lower value */
@@ -1238,6 +1311,9 @@ export interface TigerLocaleSlider {
 }
 
 export interface TigerLocaleSignature {
+  hasStrokesText?: string
+  redoText?: string
+  invalidValueText?: string
   /** Accessible name for the signature pad widget */
   ariaLabel?: string
   /** Undo-last-stroke control */
@@ -1247,6 +1323,7 @@ export interface TigerLocaleSignature {
 }
 
 export interface TigerLocaleNumberKeyboard {
+  invalidValueText?: string
   /** Accessible name for the keypad group / dialog */
   ariaLabel?: string
   deleteText?: string
@@ -1255,6 +1332,7 @@ export interface TigerLocaleNumberKeyboard {
 }
 
 export interface TigerLocaleTree {
+  directoryText?: string
   /** Default accessible name for the tree widget */
   ariaLabel?: string
   /** Checkbox name. Template: supports {label} */
@@ -1265,7 +1343,13 @@ export interface TigerLocaleTree {
   collapse?: string
 }
 
+export interface TigerLocaleAssigneePicker {
+  emptyText?: string
+  listAriaLabel?: string
+}
+
 export interface TigerLocale {
+  assigneePicker?: TigerLocaleAssigneePicker
   /** BCP 47 locale identifier, for Intl formatting and direction inference. */
   locale?: string
   /** Text/layout direction. RTL locales should set this to `rtl`. */

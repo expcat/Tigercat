@@ -9,7 +9,16 @@ export const jaJP: TigerLocale = {
   locale: 'ja-JP',
   direction: 'ltr',
   datePicker: JA_JP_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: 'ディレクトリが空です',
+    listAriaLabel: '担当者'
+  },
   common: {
+    countdownTargetText: '目標時刻に基づくカウントダウン',
+    dangerText: '危険な操作',
+    sidebarCollapseText: 'サイドバーを折りたたむ',
+    sidebarExpandText: 'サイドバーを展開',
+    dragMoveText: '項目 {from} から項目 {to} へ',
     okText: 'OK',
     cancelText: 'キャンセル',
     closeText: '閉じる',
@@ -41,6 +50,7 @@ export const jaJP: TigerLocale = {
     dialogAriaLabel: 'ダイアログ'
   },
   drawer: {
+    resizeAriaLabel: 'ドロワーのサイズを変更',
     closeAriaLabel: '閉じる',
     dialogAriaLabel: 'ドロワー'
   },
@@ -48,6 +58,7 @@ export const jaJP: TigerLocale = {
     closeAriaLabel: 'アラートを閉じる'
   },
   qrcode: {
+    scannedText: 'スキャン済み',
     ariaLabel: 'QRコード',
     expiredText: 'QRコードの有効期限が切れました',
     refreshText: '更新',
@@ -58,6 +69,8 @@ export const jaJP: TigerLocale = {
     ariaLabel: 'スクロール中のコンテンツ'
   },
   image: {
+    galleryListAriaLabel: 'サムネイル',
+    galleryOpenAriaLabel: 'プレビューを開く',
     previewAriaLabel: '{alt} をプレビュー',
     previewFallbackAlt: '画像',
     groupAriaLabel: '画像グループ',
@@ -175,6 +188,7 @@ export const jaJP: TigerLocale = {
     assigneeRequired: '担当者を選択してください'
   },
   workflowDesigner: {
+    validationDuplicateKey: 'ノードのキーは一意である必要があります',
     ariaLabel: 'ワークフロー設計',
     addStep: 'ステップを追加',
     addChild: '子ステップを追加',
@@ -252,12 +266,15 @@ export const jaJP: TigerLocale = {
     ariaLabel: '進捗'
   },
   splitter: {
+    expandText: 'パネルを展開',
+    collapseText: 'パネルを折りたたむ',
     gutterAriaLabel: 'ペイン {index} をリサイズ'
   },
   resizable: {
     handleAriaLabel: '{handle} をリサイズ'
   },
   upload: {
+    selectDirectoryText: 'フォルダーを選択',
     dragAreaAriaLabel: 'クリックまたはドラッグしてファイルをアップロード',
     buttonAriaLabel: 'ファイルをアップロード',
     clickToUploadText: 'クリックしてアップロード',
@@ -276,6 +293,7 @@ export const jaJP: TigerLocale = {
     singleFileText: '最初のファイルのみ保持しました。'
   },
   pagination: {
+    jumpToPageAriaLabel: 'ページへ移動',
     totalText: '全 {total} 件',
     itemsPerPageText: '件/ページ',
     jumpToText: '移動',
@@ -288,6 +306,12 @@ export const jaJP: TigerLocale = {
     pageSizeAriaLabel: 'ページあたりの件数'
   },
   table: {
+    summaryText: '合計',
+    filterApplyText: 'フィルターを適用',
+    columnDragAriaLabel: '列をドラッグ',
+    exportPageText: '現在のページをエクスポート',
+    exportSelectedText: '選択項目をエクスポート',
+    exportAllText: 'すべてエクスポート',
     emptyText: 'データなし',
     loadingText: '読み込み中',
     expandText: '展開',
@@ -333,6 +357,11 @@ export const jaJP: TigerLocale = {
     errorText: '書き出しに失敗しました'
   },
   timePicker: {
+    invalidTimeText: '有効な時刻を入力してください。',
+    unavailableTimeText: 'その時刻は選択できません。',
+    missingTimeText: '時刻を選択してください。',
+    missingStartText: '開始時刻を選択してください。',
+    missingEndText: '終了時刻を選択してください。',
     hour: '時',
     minute: '分',
     second: '秒',
@@ -348,6 +377,10 @@ export const jaJP: TigerLocale = {
     selectTimeRange: '時刻の範囲を選択'
   },
   formWizard: {
+    leaveStepTitle: 'このステップを離れる',
+    leaveStepMessage: '未保存の変更があります',
+    stayText: 'このステップに留まる',
+    leaveText: '離れる',
     prevText: '前へ',
     nextText: '次へ',
     finishText: '完了',
@@ -368,6 +401,7 @@ export const jaJP: TigerLocale = {
     loadErrorText: 'このツアーを読み込めませんでした。'
   },
   calendar: {
+    weekNumberText: '週番号',
     previousMonth: '前月',
     nextMonth: '翌月',
     previousYear: '前年',
@@ -381,6 +415,12 @@ export const jaJP: TigerLocale = {
     exitAriaLabel: '全画面表示を終了'
   },
   fileManager: {
+    downloadText: 'ダウンロード',
+    newFolderText: '新しいフォルダー',
+    previewText: 'プレビュー',
+    renameText: '名前を変更',
+    deleteText: '削除',
+    uploadText: 'アップロード',
     rootText: 'ルート',
     pathAriaLabel: 'ファイルパス',
     listboxAriaLabel: 'ファイル',
@@ -389,6 +429,9 @@ export const jaJP: TigerLocale = {
     resultCountText: '{count} 件'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: '左右反転',
+    downloadAriaLabel: '現在の画像をダウンロード',
+    originalSizeAriaLabel: '元のサイズ',
     dialogAriaLabel: '画像ビューア',
     previewDialogAriaLabel: '画像プレビュー',
     closeAriaLabel: '閉じる',
@@ -403,6 +446,11 @@ export const jaJP: TigerLocale = {
     previewImageAriaLabel: '画像 {index} / {total}'
   },
   imageEditor: {
+    cropAspectAriaLabel: '切り抜き比率',
+    cropFreeText: '自由比率',
+    cropRotateText: '回転',
+    cropFlipText: '反転',
+    cropCircleText: '円形',
     selectImageText: '画像を選択',
     selectImageAriaLabel: '切り抜いてアップロードする画像を選択',
     cropModalTitle: '画像を切り抜く',
@@ -471,6 +519,9 @@ export const jaJP: TigerLocale = {
     messageListAriaLabel: 'メッセージ一覧'
   },
   code: {
+    wrapLabel: '折り返す',
+    nowrapLabel: '折り返さない',
+    languageLabel: '言語',
     copyLabel: 'コピー',
     copiedLabel: 'コピーしました',
     copyFailedLabel: 'コピーに失敗しました',
@@ -519,6 +570,10 @@ export const jaJP: TigerLocale = {
     unreadCountText: '未読 {count} 件'
   },
   select: {
+    maxCountText: '最大 {count} 件まで選択',
+    collapsedTagsText: 'ほかに {names}',
+    selectAllText: '表示中の項目をすべて選択',
+    invalidValueText: 'この値を表示できません。',
     doneText: '完了',
     placeholder: '選択してください',
     emptyText: 'オプションがありません',
@@ -541,6 +596,9 @@ export const jaJP: TigerLocale = {
     collapseAriaLabel: '折りたたむ'
   },
   colorPicker: {
+    eyedropperText: 'スポイト',
+    recentColorsText: '最近使った色',
+    invalidValueText: '有効な色を入力してください。',
     trigger: '色を選択',
     panelTitle: '色',
     clear: 'クリア',
@@ -570,6 +628,7 @@ export const jaJP: TigerLocale = {
     valueText: '{value}つ星'
   },
   avatarGroup: {
+    overflowListAriaLabel: '非表示のメンバー',
     ariaLabel: 'アバターグループ',
     overflowAriaLabel: '他 {count} 人'
   },
@@ -586,6 +645,8 @@ export const jaJP: TigerLocale = {
     slideAriaLabel: 'スライド {index} / {total}'
   },
   transfer: {
+    pageText: '{page} ページ',
+    hiddenSelectedText: '選択済み {count} 件が検索で非表示',
     sourceTitle: 'ソース',
     targetTitle: 'ターゲット',
     searchAriaLabel: '{title} を検索',
@@ -595,6 +656,7 @@ export const jaJP: TigerLocale = {
     selectAllAriaLabel: '{title}をすべて選択'
   },
   chart: {
+    exportText: 'グラフをエクスポート',
     legendAriaLabel: 'グラフの凡例',
     pointAriaLabel: 'ポイント {index}: ({x}, {y})',
     seriesName: 'シリーズ {index}',
@@ -626,10 +688,15 @@ export const jaJP: TigerLocale = {
     gaugeChartAriaLabel: 'ゲージ'
   },
   codeEditor: {
+    findText: '検索',
+    replaceText: '置換',
+    bracketMatchText: '対応する括弧',
+    replaceAllText: 'すべて置換',
     editorAriaLabel: 'コードエディタ'
   },
 
   markdownEditor: {
+    contentsText: '目次',
     formattingToolbarAriaLabel: 'Markdown の書式',
     modeToolbarAriaLabel: 'Markdown の表示モード',
     editorAriaLabel: 'Markdown エディタ',
@@ -664,6 +731,8 @@ export const jaJP: TigerLocale = {
     placeholderTable: '| 列 | 値 |\n| --- | --- |\n| 名前 | Tigercat |'
   },
   richTextEditor: {
+    previewText: 'プレビュー',
+    tableText: '表',
     formattingToolbarAriaLabel: 'テキストの書式',
     editorAriaLabel: 'リッチテキストエディタ',
     bold: '太字',
@@ -687,6 +756,16 @@ export const jaJP: TigerLocale = {
     imagePrompt: '画像 URL を入力'
   },
   cronEditor: {
+    summaryEveryMinute: '毎分',
+    summaryEveryHour: '毎時',
+    summaryEveryMonth: '毎月',
+    summarySentence: '実行時刻：{minute}、{hour}、{day}、{month}。',
+    summaryField: '{field}：{value}',
+    summaryEveryDay: '毎日',
+    summaryStep: '{step} ごと',
+    summaryRangeStep: '{start}–{end}、{step} ごと',
+    summaryOr: '{left} または {right}',
+    nextRunText: '次回 {time}',
     ariaLabel: 'Cron エディタ',
     expressionAriaLabel: 'Cron 式',
     presetAriaLabel: 'Cron プリセット',
@@ -721,6 +800,7 @@ export const jaJP: TigerLocale = {
     invalidFieldError: '{field}は *、数値、範囲、間隔、またはカンマ区切りにしてください'
   },
   formValidation: {
+    errorSummary: '次のエラーを修正してください',
     required: 'この項目は必須です',
     typeString: '文字列を入力してください',
     typeNumber: '数値を入力してください',
@@ -747,6 +827,7 @@ export const jaJP: TigerLocale = {
     slotLabel: '{total} 文字中 {index} 文字目'
   },
   tagsInput: {
+    rejectedText: '{tag} は追加されませんでした',
     removeTagLabel: '{tag} を削除',
     clearAllLabel: 'すべてのタグをクリア',
     duplicateText: 'すでに追加されています',
@@ -763,16 +844,21 @@ export const jaJP: TigerLocale = {
     emptyAriaValueText: '空'
   },
   slider: {
+    valueText: '値 {value}',
     ariaLabel: 'スライダー',
     minAriaLabel: '最小値',
     maxAriaLabel: '最大値'
   },
   signature: {
+    hasStrokesText: '描画済み',
+    redoText: 'やり直す',
+    invalidValueText: 'この署名を表示できません。',
     ariaLabel: '署名パッド',
     undoText: '元に戻す',
     clearText: 'クリア'
   },
   numberKeyboard: {
+    invalidValueText: 'キーボードモードに合わない値のためクリアしました。',
     ariaLabel: '数字キーボード',
     deleteText: '削除',
     decimalAriaLabel: '小数点',
@@ -809,6 +895,7 @@ export const jaJP: TigerLocale = {
     errorStatus: 'エラー'
   },
   tree: {
+    directoryText: 'ディレクトリ',
     ariaLabel: 'ツリー',
     selectNode: '{label}を選択',
     expand: '展開',

@@ -24,7 +24,7 @@ import {
   cronFieldModes,
   formatCronControlLabel,
   describeCronExpression,
-  nextCronRun,
+  describeNextCronRun,
   getCronEditorControlClasses,
   getCronEditorLabels,
   getCronExpressionIssue,
@@ -445,9 +445,11 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
         })}
       </div>
       {validation.valid && !isCronExpressionEmpty(expressionDraft) ? (
-        <p className="text-sm text-[var(--tiger-text-secondary)]" data-tiger-cron-summary="">
-          {describeCronExpression(expressionDraft)}{' '}
-          {nextCronRun(expressionDraft)?.toISOString() ?? ''}
+        <p
+          className="min-w-0 break-words text-sm text-[var(--tiger-text-secondary)]"
+          data-tiger-cron-summary="">
+          {describeCronExpression(expressionDraft, mergedLocale, labels)}{' '}
+          {describeNextCronRun(expressionDraft, mergedLocale, labels)}
         </p>
       ) : null}
     </div>

@@ -5,7 +5,7 @@ import {
   classNames,
   createDocumentDragSession,
   defaultResizeHandles,
-  feedbackLayoutLabels,
+  getFeedbackLayoutLabels,
   formatResizableHandleLabel,
   formatResizableLiveText,
   resolveResizableAspectRatio,
@@ -353,7 +353,11 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
       aria-labelledby={typeof ariaLabelledby === 'string' ? ariaLabelledby : undefined}>
       {draggingHandle ? (
         <span aria-live="polite" data-tiger-resizable-live="">
-          {formatResizableLiveText(width ?? 0, height ?? 0, feedbackLayoutLabels.resizableLive)}
+          {formatResizableLiveText(
+            width ?? 0,
+            height ?? 0,
+            getFeedbackLayoutLabels(config.locale).resizableLive
+          )}
         </span>
       ) : null}
       {children}

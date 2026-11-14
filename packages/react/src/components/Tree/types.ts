@@ -97,6 +97,7 @@ export interface TreeContext {
   loadingText: string
   dragContainerId: string
   selectNodeLabel: (label: string) => string
+  directoryText: string
   view: TreeView
   loadingIds: Set<string>
   activeKey?: TreeNodeKey

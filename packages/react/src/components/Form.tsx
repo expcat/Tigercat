@@ -348,9 +348,7 @@ function FormInner<T extends FormValues>(
         {showErrorSummary && errors.length > 0 ? (
           <ul
             className="tiger-form__error-summary mb-3 list-disc ps-5 text-sm text-[var(--tiger-error)]"
-            aria-label={
-              getW9FormLabels(mergeTigerLocale(config.locale, locale)?.locale).errorSummary
-            }>
+            aria-label={getW9FormLabels(mergeTigerLocale(config.locale, locale)).errorSummary}>
             {formErrorSummary(errors).map((item) => (
               <li key={item.field}>
                 <button

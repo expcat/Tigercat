@@ -2,7 +2,7 @@
 
 [路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
-同一个根因在很多组件的报告里重复出现。这里把它们收成 8 个任务（S06–S13），共 34 条发现加 1 条沿用任务（T01），全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
+同一个根因在很多组件的报告里重复出现。这里把它们收成 7 个任务（S07–S13），共 33 条发现，全部排在 W0。修一处，再按并入清单逐个组件验，不在各组件里分别打补丁。
 
 ## 目标
 
@@ -16,7 +16,6 @@
 
 ## 依赖与顺序
 
-- S06 先于各组件的 i18n 条目。
 - S07–S10 是两端的同一种写法问题，可以按组件分给多人并行，但每个 S 要先在主发现的组件上定好写法。
 - 「并入」的意思是那份组件报告确认了同一个问题。清单来自各报告的归并记录，个别组件只是部分适用，以报告原文为准。
 
@@ -24,7 +23,6 @@
 
 | 任务 | 根因                                    | 主发现                                  | 波及组件数 |
 | ---- | --------------------------------------- | --------------------------------------- | ---------- |
-| S06  | W9 辅助文案绕过标准 locale              | X02-F003                                | 44         |
 | S07  | 根节点 style 与原生属性没有透传         | C056-F04                                | 38         |
 | S08  | 数值 0 被真值判断吞掉                   | C039-F03                                | 28         |
 | S09  | 内部事件处理器盖掉调用方监听            | C067-F02                                | 18         |
@@ -32,21 +30,6 @@
 | S11  | 运行时回退把原型继承键当成合法值        | C004-F001、C003-F003、C002-F002 等 5 条 | 10         |
 | S12  | Vue 动态 class 停在初始值               | C089-F01                                | 6          |
 | S13  | Vue 手写导出的 Props 类型与运行时不一致 | C022-F03、C034-F04、C048-F02 等 23 条   | 23         |
-
-## S06 W9 辅助文案绕过标准 locale
-
-**现状。** W9 文案按 locale ID 选词典，或者直接写死英文，不走 TigerLocale 的合并与覆盖链。Select、TagsInput、AvatarGroup 等 44 个组件的报告并入了这一条。原路线图的「Cron 中文范围摘要」是同一件事的一部分，记为 T01。
-
-**做法。** 把仍在用的文案纳入 TigerLocale，消费者读合并后的结果和标准覆盖规则，不再扩充按 locale ID 选词典的旁路。[02](02-core-theme-i18n.md) 的 X02-F004 同批看。
-
-**做完的标准。** 见下表；并入清单里的组件在中文、法语 Provider 下不出英文，zh-TW 不出简体。
-
-| 编号     | 级别 | 波次 | 端        | 类别 | 条目                                                                                                        | 验收                                                                                 |
-| -------- | ---- | ---- | --------- | ---- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| X02-F003 | P2   | W0   | Core+双端 | i18n | W9 辅助文案绕过标准 locale 与覆盖路径                                                                       | 中/法语 Provider 下 Select 全选按钮随之变化，zhTW 不出简体；TagsInput/AvatarGroup 同 |
-| T01      | P2   | W0   | 双端      | i18n | Cron 中文范围摘要：当前说明是英文，分钟范围会展开全部值；复用既有 locale 与解析能力给出中文的范围和步长摘要 | 任意、指定、范围、步长的含义准确，0–59 保留范围语义，320px 可读，Vue 与 React 一致   |
-
-并入的组件（44）：AssigneePicker、AutoComplete、Avatar、AvatarGroup、Badge、Calendar、Code、ColorPicker、ConfigProvider、ContextMenu、CronEditor、CropUpload、DatePicker、Drag、Drawer、Dropdown、DropdownItem、FileManager、Form、FormWizard、Gallery、Image、ImageCropper、ImageGroup、ImagePreview、LineChart、MarkdownEditor、NotificationBell、NumberKeyboard、Pagination、QRCode、RichTextEditor、SankeyChart、Select、Sidebar、Signature、Splitter、Table、TagsInput、TimePicker、Transfer、Tree、Upload、WaterfallChart。
 
 ## S07 根节点 style 与原生属性没有透传
 

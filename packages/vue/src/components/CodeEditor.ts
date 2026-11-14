@@ -14,7 +14,6 @@ import {
   resolveCodeEditorTheme,
   codeEditorLineWindow,
   findCodeMatches,
-  getW9DataLabels,
   matchBrackets,
   registerCodeEditorLanguage,
   registeredCodeEditorLanguage,
@@ -390,7 +389,7 @@ export const CodeEditor = defineComponent({
                       commitValue(next)
                     }
                   },
-                  getW9DataLabels().replaceAll
+                  resolvedLabels.value.replaceAllText
                 ),
                 h('span', {
                   'data-bracket': (() => {

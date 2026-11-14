@@ -9,10 +9,14 @@ import {
   classNames,
   focusRingInsetClasses,
   getW9DataLabels,
+  mergeTigerLocale,
+  type TigerLocale,
   nextListboxIndex,
   toggleAssignee,
   type AssigneeOption
 } from '@expcat/tigercat-core'
+
+import { useTigerConfig } from './tiger-config'
 
 export type VueAssigneePickerProps = InstanceType<typeof AssigneePicker>['$props']
 
@@ -21,7 +25,7 @@ export const AssigneePicker = defineComponent({
   props: {
     options: { type: Array as PropType<AssigneeOption[]>, default: () => [] },
     selectedIds: { type: Array as PropType<string[]>, default: () => [] },
-    locale: { type: String, default: undefined }
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
   emits: ['update:selectedIds', 'change'],
   setup(props, { emit }) {
@@ -38,7 +42,8 @@ export const AssigneePicker = defineComponent({
     const activeOption = computed(() =>
       activeIndex.value >= 0 ? filtered.value[activeIndex.value] : undefined
     )
-    const labels = () => getW9DataLabels(props.locale)
+    const config = useTigerConfig()
+    const labels = () => getW9DataLabels(mergeTigerLocale(config.value.locale, props.locale))
     const emitIds = (ids: string[]) => {
       emit('update:selectedIds', ids)
       emit('change', ids)

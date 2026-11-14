@@ -68,7 +68,6 @@ import {
   resolveLocaleText,
   mergeTigerLocale,
   getSelectLabels,
-  getW9FormLabels,
   collapsedTagSummary,
   normalizeSelectValue,
   pruneCreatedSelectOptions,
@@ -1053,7 +1052,7 @@ export const Select = defineComponent({
                           )
                         }
                       },
-                      getW9FormLabels(mergedLocale.value?.locale).selectAll
+                      labels.value.selectAllText
                     )
                   : null,
                 hasOptions ? listNode : (slots.empty?.() ?? listNode),

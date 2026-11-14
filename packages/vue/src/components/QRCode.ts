@@ -13,7 +13,6 @@ import {
   qrcodeRefreshClasses,
   QRCODE_DEFAULT_COLOR,
   QRCODE_DEFAULT_BG,
-  basicLabel,
   qrViewBoxSize,
   qrNeedsContrastWarning,
   devWarn,
@@ -62,7 +61,7 @@ export const QRCode = defineComponent({
       const failed = !result.ok
       const modules = result.ok ? result.matrix : []
       const viewBox = qrViewBoxSize(modules.length || 1)
-      const scannedText = basicLabel(mergedLocale.value?.locale, 'qrcode', 'scanned')
+      const scannedText = labels.value.scannedText
       const statusText = failed
         ? labels.value.errorText
         : props.status === 'expired'

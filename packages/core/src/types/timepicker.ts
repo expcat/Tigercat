@@ -11,6 +11,11 @@ export type TimePickerRangeTuple = [string | null, string | null]
 export type TimePickerModelValue = string | null | TimePickerRangeTuple
 
 export interface TimePickerLabels {
+  invalidTimeText?: string
+  unavailableTimeText?: string
+  missingTimeText?: string
+  missingStartText?: string
+  missingEndText?: string
   hour: string
   minute: string
   second: string

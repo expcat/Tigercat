@@ -15,7 +15,6 @@ function renderHighlightTokens(lines: HighlightToken[][]): VNodeChild[] {
 import {
   classNames,
   coerceClassValue,
-  basicLabel,
   codeBlockCopyStatusLiveClasses,
   codeBlockHeaderActionsClasses,
   codeBlockHeaderClasses,
@@ -166,7 +165,7 @@ export const Code = defineComponent({
                 wrapped.value = !wrapped.value
               }
             },
-            basicLabel(mergedLocale.value?.locale, 'code', wrapped.value ? 'nowrap' : 'wrap')
+            wrapped.value ? labels.value.nowrapLabel : labels.value.wrapLabel
           )
         : null
       const copyButton = props.copyable
@@ -195,7 +194,7 @@ export const Code = defineComponent({
                   'span',
                   { class: codeBlockLanguageClasses },
                   props.showLanguage && props.language
-                    ? `${basicLabel(mergedLocale.value?.locale, 'code', 'language')}: ${props.language}`
+                    ? `${labels.value.languageLabel}: ${props.language}`
                     : undefined
                 ),
                 wrapButton || copyButton

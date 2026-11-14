@@ -450,7 +450,9 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
           const clearText = mergedLocale?.common?.clearText ?? 'Clear'
           return (
             <div className="flex items-center justify-between gap-2 border-t border-[var(--tiger-border)] px-3 py-1 text-xs">
-              <span role="status">{hidden.length} selected hidden by search</span>
+              <span role="status">
+                {labels.hiddenSelectedText.replace('{count}', String(hidden.length))}
+              </span>
               <button
                 type="button"
                 className="text-[var(--tiger-primary)]"

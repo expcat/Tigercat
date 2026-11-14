@@ -1,3 +1,5 @@
+import { EN_US_DATEPICKER_LOCALE } from './i18n/datepicker-locales/en-US'
+import type { DatePickerLabels } from '../types/datepicker'
 /**
  * DatePicker selection / display helpers. Vue/React bind DOM and overlay.
  */
@@ -367,4 +369,15 @@ export function formDatePickerValue(
   if (!Array.isArray(value)) return null
   if (value[0] == null && value[1] == null) return null
   return value
+}
+
+export function resolveDatePickerError(reason: string, labels: Partial<DatePickerLabels>): string {
+  const fields: Record<string, keyof DatePickerLabels> = {
+    [datePickerInvalidReason]: 'invalidDateText',
+    [datePickerUnavailableReason]: 'unavailableDateText',
+    [datePickerMissingStartReason]: 'missingStartText',
+    [datePickerMissingEndReason]: 'missingEndText'
+  }
+  const key = Object.hasOwn(fields, reason) ? fields[reason] : undefined
+  return key ? (labels[key] ?? EN_US_DATEPICKER_LOCALE.labels[key]!) : reason
 }

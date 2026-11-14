@@ -1,3 +1,17 @@
+import { getUploadLabels } from '../../upload-labels'
+import type { TigerLocale } from '../../../types/locale'
+import {
+  getCommonLabels,
+  getSelectLabels,
+  getTagsInputLabels,
+  getFormValidationLabels,
+  getSliderLabels,
+  getCronEditorLabels,
+  getColorPickerLabels,
+  getSignatureLabels,
+  getTransferLabels
+} from '../../locale-utils'
+
 export interface W9FormLabels {
   selectAll: string
   maxCountReached: string
@@ -21,53 +35,33 @@ export interface W9FormLabels {
   transferPage: string
 }
 
-const zhCN: W9FormLabels = {
-  selectAll: '全选当前结果',
-  maxCountReached: '最多选择 {count} 项',
-  collapsedTags: '还有 {names}',
-  tagDuplicate: '{tag} 已存在',
-  tagMax: '{tag} 超出数量上限',
-  tagRejected: '{tag} 未添加',
-  errorSummary: '请修正以下错误',
-  sliderValue: '当前值 {value}',
-  cronSentence: '{sentence}',
-  cronNext: '下一次 {time}',
-  keyboardClose: '关闭',
-  eyedropper: '吸管',
-  recentColors: '最近使用',
-  colorHex: '十六进制',
-  colorRgb: 'RGB',
-  colorHsl: 'HSL',
-  signatureHasStrokes: '已有笔画',
-  signatureRedo: '重做',
-  uploadDirectory: '选择文件夹',
-  transferPage: '第 {page} 页'
-}
-
-const enUS: W9FormLabels = {
-  selectAll: 'Select filtered',
-  maxCountReached: 'Select at most {count}',
-  collapsedTags: 'Also {names}',
-  tagDuplicate: '{tag} is already added',
-  tagMax: '{tag} exceeds the limit',
-  tagRejected: '{tag} was not added',
-  errorSummary: 'Fix the following errors',
-  sliderValue: 'Value {value}',
-  cronSentence: '{sentence}',
-  cronNext: 'Next {time}',
-  keyboardClose: 'Close',
-  eyedropper: 'Eyedropper',
-  recentColors: 'Recent',
-  colorHex: 'Hex',
-  colorRgb: 'RGB',
-  colorHsl: 'HSL',
-  signatureHasStrokes: 'Has strokes',
-  signatureRedo: 'Redo',
-  uploadDirectory: 'Choose folder',
-  transferPage: 'Page {page}'
-}
-
-export function getW9FormLabels(locale?: string): W9FormLabels {
-  if (locale?.toLowerCase().startsWith('zh')) return zhCN
-  return enUS
+/** Reads standard locale sections from an already merged locale object. */
+export function getW9FormLabels(locale?: Partial<TigerLocale>): W9FormLabels {
+  const common = getCommonLabels(locale)
+  const select = getSelectLabels(locale)
+  const tags = getTagsInputLabels(locale)
+  const color = getColorPickerLabels(locale)
+  const signature = getSignatureLabels(locale)
+  return {
+    selectAll: select.selectAllText,
+    maxCountReached: select.maxCountText,
+    collapsedTags: select.collapsedTagsText,
+    tagDuplicate: tags.duplicateText,
+    tagMax: tags.limitText,
+    tagRejected: tags.rejectedText,
+    errorSummary: getFormValidationLabels(locale).errorSummary,
+    sliderValue: getSliderLabels(locale).valueText,
+    cronSentence: '{sentence}',
+    cronNext: getCronEditorLabels(locale).nextRunText,
+    keyboardClose: common.closeText,
+    eyedropper: color.eyedropperText,
+    recentColors: color.recentColorsText,
+    colorHex: color.formatHex,
+    colorRgb: color.formatRgb,
+    colorHsl: color.formatHsl,
+    signatureHasStrokes: signature.hasStrokesText,
+    signatureRedo: signature.redoText,
+    uploadDirectory: getUploadLabels(locale).selectDirectoryText,
+    transferPage: getTransferLabels(locale).pageText
+  }
 }

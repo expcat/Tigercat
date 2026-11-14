@@ -39,11 +39,11 @@ describe('W9 T02 Vue', () => {
     expect(img).toHaveAttribute('alt')
     expect(screen.getByRole('button', { name: 'custom-Zoom out' })).toBeInTheDocument()
     await fireEvent.click(
-      screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'flipHorizontal') })
+      screen.getByRole('button', { name: basicLabel(undefined, 'imagePreview', 'flipHorizontal') })
     )
     expect(img.style.transform).toContain('scaleX(-1)')
     await fireEvent.click(
-      screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'download') })
+      screen.getByRole('button', { name: basicLabel(undefined, 'imagePreview', 'download') })
     )
     expect(download).toHaveBeenCalled()
     await fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }))

@@ -6,7 +6,7 @@ import {
   drillInto,
   drillVisibleNodes,
   formatChartTimeTick,
-  getW9DataLabels,
+  getChartLabels,
   structuredTooltipRows,
   type LaidOutGroupedBar
 } from '@expcat/tigercat-core'
@@ -41,6 +41,7 @@ export function AxisBind({
   secondAxis,
   tooltip,
   tooltipTotal,
+  exportText,
   onExport
 }: {
   ticks?: readonly (number | Date)[]
@@ -49,9 +50,9 @@ export function AxisBind({
   secondAxis?: boolean
   tooltip?: { name: string; value: number }[]
   tooltipTotal?: number
+  exportText?: string
   onExport?: () => void
 }) {
-  const labels = getW9DataLabels()
   const rows = tooltip ? structuredTooltipRows(tooltip, tooltipTotal ?? 0) : []
   return (
     <div data-tiger-axis-bind="">
@@ -74,7 +75,7 @@ export function AxisBind({
       ))}
       {onExport ? (
         <button type="button" data-tiger-export-chart="" onClick={onExport}>
-          {labels.exportChart}
+          {exportText ?? getChartLabels().exportText}
         </button>
       ) : null}
     </div>

@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import {
   getW9DataLabels,
+  getTableLabels,
   resolveFormattedExportRows,
   resolveTableSelectLoadedKeys,
   selectionAnnouncement,
   shiftSelectTableKeys,
+  type TigerLocale,
   type TableColumn
 } from '@expcat/tigercat-core'
 
 export interface TableW9PanelProps {
+  locale?: Partial<TigerLocale>
   active?: boolean
   columns: TableColumn[]
   sorts?: { key: string; direction: 'asc' | 'desc' }[]
@@ -30,6 +33,7 @@ export interface TableW9PanelProps {
 
 export function TableW9Panel({
   active = false,
+  locale,
   columns,
   sorts = [],
   pageKeys,
@@ -52,8 +56,14 @@ export function TableW9Panel({
   const [previousCount, setPreviousCount] = useState<number | null>(null)
   const [live, setLive] = useState('')
   const [exportText, setExportText] = useState('')
-  const labels = getW9DataLabels()
+  const labels = getW9DataLabels(locale)
   if (!active) return null
+  const tableLabels = getTableLabels(locale)
+  const propsLabels = {
+    page: tableLabels.exportPageText,
+    selected: tableLabels.exportSelectedText,
+    all: tableLabels.exportAllText
+  }
   const filterKey = columns[0]?.key
 
   function announce(keys: (string | number)[]) {
@@ -179,7 +189,7 @@ export function TableW9Panel({
             })
             setExportText(formatted.rows.map((row) => row.join(',')).join('\n'))
           }}>
-          {scope}
+          {propsLabels[scope]}
         </button>
       ))}
       <div role="status" data-tiger-selection-live="">

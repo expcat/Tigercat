@@ -3,6 +3,10 @@ import type { DatePickerLocalePreset } from '../../../types/datepicker'
 export const VI_VN_DATEPICKER_LOCALE: DatePickerLocalePreset = {
   locale: 'vi-VN',
   labels: {
+    invalidDateText: 'Nhập ngày hợp lệ.',
+    unavailableDateText: 'Không thể chọn ngày đó.',
+    missingStartText: 'Chọn ngày bắt đầu.',
+    missingEndText: 'Chọn ngày kết thúc.',
     placeholder: 'Chọn ngày',
     rangePlaceholder: 'Chọn khoảng ngày',
     today: 'Hôm nay',

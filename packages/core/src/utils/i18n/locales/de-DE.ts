@@ -9,7 +9,16 @@ export const deDE: TigerLocale = {
   locale: 'de-DE',
   direction: 'ltr',
   datePicker: DE_DE_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: 'Das Verzeichnis ist leer',
+    listAriaLabel: 'Zuständige'
+  },
   common: {
+    countdownTargetText: 'Countdown richtet sich nach der Zielzeit',
+    dangerText: 'Gefährliche Aktion',
+    sidebarCollapseText: 'Seitenleiste einklappen',
+    sidebarExpandText: 'Seitenleiste ausklappen',
+    dragMoveText: 'Von Element {from} zu Element {to}',
     okText: 'OK',
     cancelText: 'Abbrechen',
     closeText: 'Schließen',
@@ -41,6 +50,7 @@ export const deDE: TigerLocale = {
     dialogAriaLabel: 'Dialogfenster'
   },
   drawer: {
+    resizeAriaLabel: 'Schubladengröße ändern',
     closeAriaLabel: 'Schließen',
     dialogAriaLabel: 'Schublade'
   },
@@ -48,6 +58,7 @@ export const deDE: TigerLocale = {
     closeAriaLabel: 'Warnung schließen'
   },
   qrcode: {
+    scannedText: 'Gescannt',
     ariaLabel: 'QR-Code',
     expiredText: 'QR-Code ist abgelaufen',
     refreshText: 'Aktualisieren',
@@ -58,6 +69,8 @@ export const deDE: TigerLocale = {
     ariaLabel: 'Laufender Inhalt'
   },
   image: {
+    galleryListAriaLabel: 'Vorschaubilder',
+    galleryOpenAriaLabel: 'Vorschau öffnen',
     previewAriaLabel: 'Vorschau von {alt}',
     previewFallbackAlt: 'Bild',
     groupAriaLabel: 'Bildgruppe',
@@ -176,6 +189,7 @@ export const deDE: TigerLocale = {
     assigneeRequired: 'Wählen Sie zuerst eine Person aus'
   },
   workflowDesigner: {
+    validationDuplicateKey: 'Jeder Knotenschlüssel muss eindeutig sein',
     ariaLabel: 'Workflow-Designer',
     addStep: 'Schritt hinzufügen',
     addChild: 'Unterschritt hinzufügen',
@@ -253,12 +267,15 @@ export const deDE: TigerLocale = {
     ariaLabel: 'Fortschritt'
   },
   splitter: {
+    expandText: 'Bereich ausklappen',
+    collapseText: 'Bereich einklappen',
     gutterAriaLabel: 'Bereiche {index} skalieren'
   },
   resizable: {
     handleAriaLabel: '{handle} skalieren'
   },
   upload: {
+    selectDirectoryText: 'Ordner auswählen',
     dragAreaAriaLabel: 'Datei per Klick oder Ziehen hochladen',
     buttonAriaLabel: 'Datei hochladen',
     clickToUploadText: 'Zum Hochladen klicken',
@@ -277,6 +294,7 @@ export const deDE: TigerLocale = {
     singleFileText: 'Nur die erste Datei wurde beibehalten.'
   },
   pagination: {
+    jumpToPageAriaLabel: 'Zu Seite springen',
     totalText: 'Gesamt {total} Einträge',
     itemsPerPageText: '/ Seite',
     jumpToText: 'Gehe zu',
@@ -289,6 +307,12 @@ export const deDE: TigerLocale = {
     pageSizeAriaLabel: 'Elemente pro Seite'
   },
   table: {
+    summaryText: 'Summe',
+    filterApplyText: 'Filter anwenden',
+    columnDragAriaLabel: 'Spalte ziehen',
+    exportPageText: 'Seite exportieren',
+    exportSelectedText: 'Auswahl exportieren',
+    exportAllText: 'Alles exportieren',
     emptyText: 'Keine Daten',
     loadingText: 'Wird geladen',
     expandText: 'Erweitern',
@@ -334,6 +358,11 @@ export const deDE: TigerLocale = {
     errorText: 'Export fehlgeschlagen'
   },
   timePicker: {
+    invalidTimeText: 'Gültige Uhrzeit eingeben.',
+    unavailableTimeText: 'Diese Uhrzeit ist nicht verfügbar.',
+    missingTimeText: 'Uhrzeit wählen.',
+    missingStartText: 'Startzeit wählen.',
+    missingEndText: 'Endzeit wählen.',
     hour: 'Stunde',
     minute: 'Minute',
     second: 'Sek',
@@ -349,6 +378,10 @@ export const deDE: TigerLocale = {
     selectTimeRange: 'Zeitbereich auswählen'
   },
   formWizard: {
+    leaveStepTitle: 'Diesen Schritt verlassen',
+    leaveStepMessage: 'Dieser Schritt enthält ungespeicherte Änderungen',
+    stayText: 'In diesem Schritt bleiben',
+    leaveText: 'Verlassen',
     prevText: 'Zurück',
     nextText: 'Weiter',
     finishText: 'Fertigstellen',
@@ -369,6 +402,7 @@ export const deDE: TigerLocale = {
     loadErrorText: 'Diese Tour konnte nicht geladen werden.'
   },
   calendar: {
+    weekNumberText: 'Woche',
     previousMonth: 'Vorheriger Monat',
     nextMonth: 'Nächster Monat',
     previousYear: 'Vorheriges Jahr',
@@ -382,6 +416,12 @@ export const deDE: TigerLocale = {
     exitAriaLabel: 'Vollbild beenden'
   },
   fileManager: {
+    downloadText: 'Herunterladen',
+    newFolderText: 'Neuer Ordner',
+    previewText: 'Vorschau',
+    renameText: 'Umbenennen',
+    deleteText: 'Löschen',
+    uploadText: 'Hochladen',
     rootText: 'Stammverzeichnis',
     pathAriaLabel: 'Dateipfad',
     listboxAriaLabel: 'Dateien',
@@ -390,6 +430,9 @@ export const deDE: TigerLocale = {
     resultCountText: '{count} Elemente'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: 'Horizontal spiegeln',
+    downloadAriaLabel: 'Aktuelles Bild herunterladen',
+    originalSizeAriaLabel: 'Originalgröße',
     dialogAriaLabel: 'Bildbetrachter',
     previewDialogAriaLabel: 'Bildvorschau',
     closeAriaLabel: 'Schließen',
@@ -404,6 +447,11 @@ export const deDE: TigerLocale = {
     previewImageAriaLabel: 'Bild {index} von {total}'
   },
   imageEditor: {
+    cropAspectAriaLabel: 'Zuschnittverhältnis',
+    cropFreeText: 'Frei',
+    cropRotateText: 'Drehen',
+    cropFlipText: 'Spiegeln',
+    cropCircleText: 'Kreis',
     selectImageText: 'Bild auswählen',
     selectImageAriaLabel: 'Bild zum Zuschneiden und Hochladen auswählen',
     cropModalTitle: 'Bild zuschneiden',
@@ -472,6 +520,9 @@ export const deDE: TigerLocale = {
     messageListAriaLabel: 'Nachrichtenliste'
   },
   code: {
+    wrapLabel: 'Zeilen umbrechen',
+    nowrapLabel: 'Kein Zeilenumbruch',
+    languageLabel: 'Sprache',
     copyLabel: 'Kopieren',
     copiedLabel: 'Kopiert',
     copyFailedLabel: 'Kopieren fehlgeschlagen',
@@ -520,6 +571,10 @@ export const deDE: TigerLocale = {
     unreadCountText: '{count} ungelesen'
   },
   select: {
+    maxCountText: 'Höchstens {count} auswählen',
+    collapsedTagsText: 'Außerdem {names}',
+    selectAllText: 'Gefilterte auswählen',
+    invalidValueText: 'Dieser Wert kann nicht angezeigt werden.',
     doneText: 'Fertigstellen',
     placeholder: 'Option auswählen',
     emptyText: 'Keine Optionen gefunden',
@@ -542,6 +597,9 @@ export const deDE: TigerLocale = {
     collapseAriaLabel: 'Einklappen'
   },
   colorPicker: {
+    eyedropperText: 'Pipette',
+    recentColorsText: 'Zuletzt verwendet',
+    invalidValueText: 'Gültige Farbe eingeben.',
     trigger: 'Farbe wählen',
     panelTitle: 'Farbe',
     clear: 'Löschen',
@@ -571,6 +629,7 @@ export const deDE: TigerLocale = {
     valueText: '{value} Sterne'
   },
   avatarGroup: {
+    overflowListAriaLabel: 'Ausgeblendete Mitglieder',
     ariaLabel: 'Avatargruppe',
     overflowAriaLabel: '{count} weitere'
   },
@@ -587,6 +646,8 @@ export const deDE: TigerLocale = {
     slideAriaLabel: 'Folie {index} von {total}'
   },
   transfer: {
+    pageText: 'Seite {page}',
+    hiddenSelectedText: '{count} ausgewählte Elemente durch Suche ausgeblendet',
     sourceTitle: 'Quelle',
     targetTitle: 'Ziel',
     searchAriaLabel: '{title} durchsuchen',
@@ -596,6 +657,7 @@ export const deDE: TigerLocale = {
     selectAllAriaLabel: 'Alles in {title} auswählen'
   },
   chart: {
+    exportText: 'Diagramm exportieren',
     legendAriaLabel: 'Diagrammlegende',
     pointAriaLabel: 'Punkt {index}: ({x}, {y})',
     seriesName: 'Reihe {index}',
@@ -627,10 +689,15 @@ export const deDE: TigerLocale = {
     gaugeChartAriaLabel: 'Messgerät'
   },
   codeEditor: {
+    findText: 'Suchen',
+    replaceText: 'Ersetzen',
+    bracketMatchText: 'Zugehörige Klammer',
+    replaceAllText: 'Alle ersetzen',
     editorAriaLabel: 'Code-Editor'
   },
 
   markdownEditor: {
+    contentsText: 'Inhaltsverzeichnis',
     formattingToolbarAriaLabel: 'Markdown-Formatierung',
     modeToolbarAriaLabel: 'Markdown-Ansichtsmodus',
     editorAriaLabel: 'Markdown-Editor',
@@ -665,6 +732,8 @@ export const deDE: TigerLocale = {
     placeholderTable: '| Spalte | Wert |\n| --- | --- |\n| Name | Tigercat |'
   },
   richTextEditor: {
+    previewText: 'Vorschau',
+    tableText: 'Tabelle',
     formattingToolbarAriaLabel: 'Textformatierung',
     editorAriaLabel: 'Rich-Text-Editor',
     bold: 'Fett',
@@ -688,6 +757,16 @@ export const deDE: TigerLocale = {
     imagePrompt: 'Bild-URL eingeben'
   },
   cronEditor: {
+    summaryEveryMinute: 'jede Minute',
+    summaryEveryHour: 'jede Stunde',
+    summaryEveryMonth: 'jeden Monat',
+    summarySentence: 'Ausführung: {minute}, {hour}, {day}, {month}.',
+    summaryField: '{field}: {value}',
+    summaryEveryDay: 'jeden Tag',
+    summaryStep: 'alle {step}',
+    summaryRangeStep: '{start}–{end}, alle {step}',
+    summaryOr: '{left} oder {right}',
+    nextRunText: 'Nächste Ausführung {time}',
     ariaLabel: 'Cron-Editor',
     expressionAriaLabel: 'Cron-Ausdruck',
     presetAriaLabel: 'Cron-Voreinstellung',
@@ -723,6 +802,7 @@ export const deDE: TigerLocale = {
       '{field} muss *, eine Zahl, ein Bereich, ein Schritt oder eine Kommaliste sein'
   },
   formValidation: {
+    errorSummary: 'Folgende Fehler beheben',
     required: 'Dieses Feld ist erforderlich',
     typeString: 'Wert muss eine Zeichenkette sein',
     typeNumber: 'Wert muss eine Zahl sein',
@@ -749,6 +829,7 @@ export const deDE: TigerLocale = {
     slotLabel: 'Zeichen {index} von {total}'
   },
   tagsInput: {
+    rejectedText: '{tag} wurde nicht hinzugefügt',
     removeTagLabel: '{tag} entfernen',
     clearAllLabel: 'Alle Tags löschen',
     duplicateText: 'Bereits hinzugefügt',
@@ -765,16 +846,21 @@ export const deDE: TigerLocale = {
     emptyAriaValueText: 'Leer'
   },
   slider: {
+    valueText: 'Wert {value}',
     ariaLabel: 'Schieberegler',
     minAriaLabel: 'Mindestwert',
     maxAriaLabel: 'Höchstwert'
   },
   signature: {
+    hasStrokesText: 'Striche vorhanden',
+    redoText: 'Wiederholen',
+    invalidValueText: 'Diese Unterschrift kann nicht angezeigt werden.',
     ariaLabel: 'Unterschriftenfeld',
     undoText: 'Rückgängig',
     clearText: 'Löschen'
   },
   numberKeyboard: {
+    invalidValueText: 'Der Wert passt nicht zum Tastaturmodus und wurde gelöscht.',
     ariaLabel: 'Ziffernblock',
     deleteText: 'Löschen',
     decimalAriaLabel: 'Dezimalzeichen',
@@ -811,6 +897,7 @@ export const deDE: TigerLocale = {
     errorStatus: 'Fehler'
   },
   tree: {
+    directoryText: 'Verzeichnis',
     ariaLabel: 'Baum',
     selectNode: '{label} auswählen',
     expand: 'Erweitern',

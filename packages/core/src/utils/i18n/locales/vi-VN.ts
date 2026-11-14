@@ -9,7 +9,16 @@ export const viVN: TigerLocale = {
   locale: 'vi-VN',
   direction: 'ltr',
   datePicker: VI_VN_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: 'Thư mục trống',
+    listAriaLabel: 'Người phụ trách'
+  },
   common: {
+    countdownTargetText: 'Đếm ngược theo thời gian đích',
+    dangerText: 'Thao tác nguy hiểm',
+    sidebarCollapseText: 'Thu gọn thanh bên',
+    sidebarExpandText: 'Mở rộng thanh bên',
+    dragMoveText: 'Từ mục {from} đến mục {to}',
     okText: 'Đồng ý',
     cancelText: 'Hủy',
     closeText: 'Đóng',
@@ -41,6 +50,7 @@ export const viVN: TigerLocale = {
     dialogAriaLabel: 'Hộp thoại'
   },
   drawer: {
+    resizeAriaLabel: 'Đổi kích thước ngăn kéo',
     closeAriaLabel: 'Đóng',
     dialogAriaLabel: 'Ngăn kéo'
   },
@@ -48,6 +58,7 @@ export const viVN: TigerLocale = {
     closeAriaLabel: 'Đóng cảnh báo'
   },
   qrcode: {
+    scannedText: 'Đã quét',
     ariaLabel: 'Mã QR',
     expiredText: 'Mã QR đã hết hạn',
     refreshText: 'Làm mới',
@@ -58,6 +69,8 @@ export const viVN: TigerLocale = {
     ariaLabel: 'Nội dung cuộn'
   },
   image: {
+    galleryListAriaLabel: 'Ảnh thu nhỏ',
+    galleryOpenAriaLabel: 'Mở xem trước',
     previewAriaLabel: 'Xem trước {alt}',
     previewFallbackAlt: 'hình ảnh',
     groupAriaLabel: 'Nhóm hình ảnh',
@@ -175,6 +188,7 @@ export const viVN: TigerLocale = {
     assigneeRequired: 'Hãy chọn người được giao trước'
   },
   workflowDesigner: {
+    validationDuplicateKey: 'Khóa của mỗi nút phải là duy nhất',
     ariaLabel: 'Trình thiết kế quy trình',
     addStep: 'Thêm bước',
     addChild: 'Thêm bước con',
@@ -252,12 +266,15 @@ export const viVN: TigerLocale = {
     ariaLabel: 'Tiến độ'
   },
   splitter: {
+    expandText: 'Mở rộng bảng',
+    collapseText: 'Thu gọn bảng',
     gutterAriaLabel: 'Chỉnh kích thước ngăn {index}'
   },
   resizable: {
     handleAriaLabel: 'Chỉnh kích thước {handle}'
   },
   upload: {
+    selectDirectoryText: 'Chọn thư mục',
     dragAreaAriaLabel: 'Nhấp hoặc kéo để tải tệp lên',
     buttonAriaLabel: 'Tải tệp lên',
     clickToUploadText: 'Nhấp để tải lên',
@@ -276,6 +293,7 @@ export const viVN: TigerLocale = {
     singleFileText: 'Chỉ giữ lại tệp đầu tiên.'
   },
   pagination: {
+    jumpToPageAriaLabel: 'Đi đến trang',
     totalText: 'Tổng {total} mục',
     itemsPerPageText: '/trang',
     jumpToText: 'Đi đến',
@@ -288,6 +306,12 @@ export const viVN: TigerLocale = {
     pageSizeAriaLabel: 'Số mục mỗi trang'
   },
   table: {
+    summaryText: 'Tổng cộng',
+    filterApplyText: 'Áp dụng bộ lọc',
+    columnDragAriaLabel: 'Kéo cột',
+    exportPageText: 'Xuất trang này',
+    exportSelectedText: 'Xuất mục đã chọn',
+    exportAllText: 'Xuất tất cả',
     emptyText: 'Không có dữ liệu',
     loadingText: 'Đang tải',
     expandText: 'Mở rộng',
@@ -333,6 +357,11 @@ export const viVN: TigerLocale = {
     errorText: 'Xuất thất bại'
   },
   timePicker: {
+    invalidTimeText: 'Nhập giờ hợp lệ.',
+    unavailableTimeText: 'Không thể chọn giờ đó.',
+    missingTimeText: 'Chọn giờ.',
+    missingStartText: 'Chọn giờ bắt đầu.',
+    missingEndText: 'Chọn giờ kết thúc.',
     hour: 'Giờ',
     minute: 'Phút',
     second: 'Giây',
@@ -348,6 +377,10 @@ export const viVN: TigerLocale = {
     selectTimeRange: 'Chọn khoảng giờ'
   },
   formWizard: {
+    leaveStepTitle: 'Rời bước này',
+    leaveStepMessage: 'Bước này có thay đổi chưa lưu',
+    stayText: 'Ở lại bước này',
+    leaveText: 'Rời đi',
     prevText: 'Trước',
     nextText: 'Tiếp',
     finishText: 'Hoàn thành',
@@ -368,6 +401,7 @@ export const viVN: TigerLocale = {
     loadErrorText: 'Không tải được hướng dẫn này.'
   },
   calendar: {
+    weekNumberText: 'Tuần',
     previousMonth: 'Tháng trước',
     nextMonth: 'Tháng sau',
     previousYear: 'Năm trước',
@@ -381,6 +415,12 @@ export const viVN: TigerLocale = {
     exitAriaLabel: 'Thoát toàn màn hình'
   },
   fileManager: {
+    downloadText: 'Tải xuống',
+    newFolderText: 'Thư mục mới',
+    previewText: 'Xem trước',
+    renameText: 'Đổi tên',
+    deleteText: 'Xóa',
+    uploadText: 'Tải lên',
     rootText: 'Gốc',
     pathAriaLabel: 'Đường dẫn tệp',
     listboxAriaLabel: 'Tệp',
@@ -389,6 +429,9 @@ export const viVN: TigerLocale = {
     resultCountText: '{count} mục'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: 'Lật ngang',
+    downloadAriaLabel: 'Tải ảnh hiện tại',
+    originalSizeAriaLabel: 'Kích thước gốc',
     dialogAriaLabel: 'Trình xem ảnh',
     previewDialogAriaLabel: 'Xem trước ảnh',
     closeAriaLabel: 'Đóng',
@@ -403,6 +446,11 @@ export const viVN: TigerLocale = {
     previewImageAriaLabel: 'Ảnh {index} / {total}'
   },
   imageEditor: {
+    cropAspectAriaLabel: 'Tỷ lệ cắt',
+    cropFreeText: 'Tự do',
+    cropRotateText: 'Xoay',
+    cropFlipText: 'Lật',
+    cropCircleText: 'Hình tròn',
     selectImageText: 'Chọn ảnh',
     selectImageAriaLabel: 'Chọn ảnh để cắt và tải lên',
     cropModalTitle: 'Cắt ảnh',
@@ -471,6 +519,9 @@ export const viVN: TigerLocale = {
     messageListAriaLabel: 'Danh sách tin nhắn'
   },
   code: {
+    wrapLabel: 'Ngắt dòng',
+    nowrapLabel: 'Không ngắt dòng',
+    languageLabel: 'Ngôn ngữ',
     copyLabel: 'Sao chép',
     copiedLabel: 'Đã sao chép',
     copyFailedLabel: 'Sao chép thất bại',
@@ -519,6 +570,10 @@ export const viVN: TigerLocale = {
     unreadCountText: '{count} chưa đọc'
   },
   select: {
+    maxCountText: 'Chọn tối đa {count} mục',
+    collapsedTagsText: 'Còn có {names}',
+    selectAllText: 'Chọn tất cả kết quả',
+    invalidValueText: 'Không thể hiển thị giá trị này.',
     doneText: 'Hoàn thành',
     placeholder: 'Chọn một tùy chọn',
     emptyText: 'Không có tùy chọn',
@@ -541,6 +596,9 @@ export const viVN: TigerLocale = {
     collapseAriaLabel: 'Thu gọn'
   },
   colorPicker: {
+    eyedropperText: 'Ống hút màu',
+    recentColorsText: 'Dùng gần đây',
+    invalidValueText: 'Nhập màu hợp lệ.',
     trigger: 'Chọn màu',
     panelTitle: 'Màu',
     clear: 'Xóa',
@@ -570,6 +628,7 @@ export const viVN: TigerLocale = {
     valueText: '{value} sao'
   },
   avatarGroup: {
+    overflowListAriaLabel: 'Thành viên bị ẩn',
     ariaLabel: 'Nhóm ảnh đại diện',
     overflowAriaLabel: 'còn {count} người'
   },
@@ -586,6 +645,8 @@ export const viVN: TigerLocale = {
     slideAriaLabel: 'Trang {index} / {total}'
   },
   transfer: {
+    pageText: 'Trang {page}',
+    hiddenSelectedText: '{count} mục đã chọn bị ẩn do tìm kiếm',
     sourceTitle: 'Nguồn',
     targetTitle: 'Đích',
     searchAriaLabel: 'Tìm {title}',
@@ -595,6 +656,7 @@ export const viVN: TigerLocale = {
     selectAllAriaLabel: 'Chọn tất cả trong {title}'
   },
   chart: {
+    exportText: 'Xuất biểu đồ',
     legendAriaLabel: 'Chú giải biểu đồ',
     pointAriaLabel: 'Điểm {index}: ({x}, {y})',
     seriesName: 'Chuỗi {index}',
@@ -626,10 +688,15 @@ export const viVN: TigerLocale = {
     gaugeChartAriaLabel: 'Đồng hồ đo'
   },
   codeEditor: {
+    findText: 'Tìm',
+    replaceText: 'Thay thế',
+    bracketMatchText: 'Dấu ngoặc tương ứng',
+    replaceAllText: 'Thay thế tất cả',
     editorAriaLabel: 'Trình soạn mã'
   },
 
   markdownEditor: {
+    contentsText: 'Mục lục',
     formattingToolbarAriaLabel: 'Định dạng Markdown',
     modeToolbarAriaLabel: 'Chế độ xem Markdown',
     editorAriaLabel: 'Trình soạn Markdown',
@@ -664,6 +731,8 @@ export const viVN: TigerLocale = {
     placeholderTable: '| Cột | Giá trị |\n| --- | --- |\n| Tên | Tigercat |'
   },
   richTextEditor: {
+    previewText: 'Xem trước',
+    tableText: 'Bảng',
     formattingToolbarAriaLabel: 'Định dạng văn bản',
     editorAriaLabel: 'Trình soạn văn bản phong phú',
     bold: 'Đậm',
@@ -687,6 +756,16 @@ export const viVN: TigerLocale = {
     imagePrompt: 'Nhập URL hình ảnh'
   },
   cronEditor: {
+    summaryEveryMinute: 'mỗi phút',
+    summaryEveryHour: 'mỗi giờ',
+    summaryEveryMonth: 'mỗi tháng',
+    summarySentence: 'Chạy lúc {minute}, {hour}, {day}, {month}.',
+    summaryField: '{field}: {value}',
+    summaryEveryDay: 'Hằng ngày',
+    summaryStep: 'Cách {step}',
+    summaryRangeStep: '{start}–{end}, cách {step}',
+    summaryOr: '{left} hoặc {right}',
+    nextRunText: 'Lần tới {time}',
     ariaLabel: 'Trình soạn Cron',
     expressionAriaLabel: 'Biểu thức Cron',
     presetAriaLabel: 'Cài đặt sẵn Cron',
@@ -721,6 +800,7 @@ export const viVN: TigerLocale = {
     invalidFieldError: '{field} phải là *, số, khoảng, bước hoặc danh sách cách nhau bởi dấu phẩy'
   },
   formValidation: {
+    errorSummary: 'Sửa các lỗi sau',
     required: 'Trường này là bắt buộc',
     typeString: 'Giá trị phải là chuỗi',
     typeNumber: 'Giá trị phải là số',
@@ -747,6 +827,7 @@ export const viVN: TigerLocale = {
     slotLabel: 'Ký tự {index} trong {total}'
   },
   tagsInput: {
+    rejectedText: 'Chưa thêm {tag}',
     removeTagLabel: 'Xóa {tag}',
     clearAllLabel: 'Xóa tất cả thẻ',
     duplicateText: 'Đã được thêm',
@@ -763,16 +844,21 @@ export const viVN: TigerLocale = {
     emptyAriaValueText: 'Trống'
   },
   slider: {
+    valueText: 'Giá trị {value}',
     ariaLabel: 'Thanh trượt',
     minAriaLabel: 'Giá trị tối thiểu',
     maxAriaLabel: 'Giá trị tối đa'
   },
   signature: {
+    hasStrokesText: 'Đã có nét vẽ',
+    redoText: 'Làm lại',
+    invalidValueText: 'Không thể hiển thị chữ ký này.',
     ariaLabel: 'Bảng chữ ký',
     undoText: 'Hoàn tác',
     clearText: 'Xóa'
   },
   numberKeyboard: {
+    invalidValueText: 'Giá trị không khớp chế độ bàn phím và đã bị xóa.',
     ariaLabel: 'Bàn phím số',
     deleteText: 'Xóa',
     decimalAriaLabel: 'Dấu thập phân',
@@ -809,6 +895,7 @@ export const viVN: TigerLocale = {
     errorStatus: 'Lỗi'
   },
   tree: {
+    directoryText: 'Thư mục',
     ariaLabel: 'Cây',
     selectNode: 'Chọn {label}',
     expand: 'Mở rộng',

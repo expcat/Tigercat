@@ -6,7 +6,7 @@ import {
   drillInto,
   drillVisibleNodes,
   formatChartTimeTick,
-  getW9DataLabels,
+  getChartLabels,
   heatBandLabel,
   structuredTooltipRows,
   type LaidOutGroupedBar
@@ -35,6 +35,7 @@ export function renderBarBind(
 }
 
 export function renderAxisBind(input: {
+  exportText?: string
   ticks?: readonly (number | Date)[]
   reference?: { axis?: 'y' | 'y2'; value: number; end?: number } | null
   brush?: { start: number; end: number } | null
@@ -43,7 +44,6 @@ export function renderAxisBind(input: {
   tooltipTotal?: number
   exportSvg?: SVGSVGElement | null
 }): VNode {
-  const labels = getW9DataLabels()
   const rows = input.tooltip ? structuredTooltipRows(input.tooltip, input.tooltipTotal ?? 0) : []
   return h('div', { 'data-tiger-axis-bind': '' }, [
     ...(input.ticks ?? []).map((tick, index) =>
@@ -77,7 +77,7 @@ export function renderAxisBind(input: {
             'data-tiger-export-chart': '',
             onClick: () => downloadChartSvg(input.exportSvg as SVGSVGElement, 'chart.svg')
           },
-          labels.exportChart
+          input.exportText ?? getChartLabels().exportText
         )
       : null
   ])

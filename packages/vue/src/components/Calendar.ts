@@ -10,12 +10,7 @@ import {
   type PropType,
   type VNodeChild
 } from 'vue'
-import {
-  calendarWeekNumber,
-  classNames,
-  coerceClassValue,
-  getW9DataLabels
-} from '@expcat/tigercat-core'
+import { calendarWeekNumber, classNames, coerceClassValue } from '@expcat/tigercat-core'
 import type {
   CalendarEvent,
   CalendarMode,
@@ -438,11 +433,7 @@ export const Calendar = defineComponent({
         const weekGridClass = getCalendarWeekGridClasses(!!props.fullscreen)
         const weekNumberClass = getCalendarWeekNumberClasses(!!props.fullscreen)
         const weekdayRow = h('div', { class: weekGridClass, role: 'row' }, [
-          h(
-            'div',
-            { class: weekNumberClass, role: 'columnheader' },
-            getW9DataLabels(localeCode.value).weekNumber
-          ),
+          h('div', { class: weekNumberClass, role: 'columnheader' }, labels.value.weekNumberText),
           ...weekdayNames.value.map((wd) =>
             h('div', { key: wd, class: calendarWeekdayClasses, role: 'columnheader' }, wd)
           )

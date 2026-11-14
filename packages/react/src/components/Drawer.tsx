@@ -15,7 +15,6 @@ import {
   drawerPushOffset,
   drawerResizeDelta,
   drawerShowsMask,
-  feedbackLayoutLabels,
   getDrawerMaskClasses,
   getDrawerContainerClasses,
   getDrawerPanelClasses,
@@ -472,7 +471,7 @@ export const Drawer = React.forwardRef<HTMLDivElement, DrawerProps>(function Dra
                 ? 'vertical'
                 : 'horizontal'
             }
-            aria-label={feedbackLayoutLabels.drawerResize}
+            aria-label={drawerLabels.resizeAriaLabel}
             style={{
               position: 'absolute',
               touchAction: 'none',

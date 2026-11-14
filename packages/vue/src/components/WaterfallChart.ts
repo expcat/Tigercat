@@ -7,6 +7,7 @@ import {
   type WaterfallChartProps as CoreWaterfallChartProps,
   type WaterfallDatum
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 import { ChartCanvas } from './ChartCanvas'
 
 export type WaterfallChartProps = CoreWaterfallChartProps
@@ -34,6 +35,7 @@ export const WaterfallChart = defineComponent({
     responsive: { type: Boolean, default: true }
   },
   setup(props, { attrs }) {
+    const config = useTigerConfig()
     const hostRef = ref<HTMLElement | null>(null)
     const exportChart = () => {
       const svg = hostRef.value?.querySelector('svg')
@@ -53,7 +55,7 @@ export const WaterfallChart = defineComponent({
             class: resolveButtonClasses({ variant: 'outline', size: 'sm' }),
             onClick: exportChart
           },
-          getW9DataLabels().exportChart
+          getW9DataLabels(config.value.locale).exportChart
         ),
         h(
           ChartCanvas,

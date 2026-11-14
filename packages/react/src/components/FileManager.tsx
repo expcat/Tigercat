@@ -6,7 +6,6 @@ import {
   classNames,
   fileToUploadFile,
   filterUploadPreviewUrl,
-  getW9DataLabels,
   isImageUploadFile,
   sanitizeFileDisplayName,
   searchFileTree,
@@ -441,7 +440,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
             onClick={() => {
               if (canEmitFileOpen(bind.permission)) onOpen?.(files?.[0] as FileItem)
             }}>
-            {getW9DataLabels().preview}
+            {labels.previewText}
           </button>
           <button
             type="button"
@@ -452,7 +451,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
                 setFileAction(sanitizeFileDisplayName(bind.name ?? ''))
               }
             }}>
-            {getW9DataLabels().rename}
+            {labels.renameText}
           </button>
           <button
             type="button"
@@ -463,12 +462,12 @@ export const FileManager: React.FC<FileManagerProps> = ({
                 setFileAction(`delete:${sanitizeFileDisplayName(bind.name ?? '')}`)
               }
             }}>
-            {getW9DataLabels().delete}
+            {labels.deleteText}
           </button>
           <input
             type="file"
             data-tiger-file-upload=""
-            aria-label={getW9DataLabels().upload}
+            aria-label={labels.uploadText}
             onChange={(event) => {
               const file = event.target.files?.[0]
               if (!file) return

@@ -39,6 +39,7 @@ import {
   getTimePickerItemClasses,
   snapTimeColumnScroll,
   getTimePickerLabels,
+  resolveTimePickerError,
   getTimePickerMobileSelectRowClasses,
   getTimePickerRangeTabButtonClasses,
   isSameTimePickerValue,
@@ -244,8 +245,9 @@ export const TimePicker = defineComponent({
     }
 
     function reportPickerError(reason: string) {
-      validationMessage.value = reason
-      formItemControl?.setError(reason)
+      const message = resolveTimePickerError(reason, labels.value)
+      validationMessage.value = message
+      formItemControl?.setError(message)
     }
 
     function writeCommitted(next: string | null | TimePickerRangeTuple) {

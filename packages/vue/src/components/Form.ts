@@ -402,9 +402,8 @@ export const Form = defineComponent({
                 {
                   class:
                     'tiger-form__error-summary mb-3 list-disc ps-5 text-sm text-[var(--tiger-error)]',
-                  'aria-label': getW9FormLabels(
-                    mergeTigerLocale(config.value.locale, props.locale)?.locale
-                  ).errorSummary
+                  'aria-label': getW9FormLabels(mergeTigerLocale(config.value.locale, props.locale))
+                    .errorSummary
                 },
                 formErrorSummary(errors.value).map((item) =>
                   h(

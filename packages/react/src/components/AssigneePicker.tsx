@@ -9,15 +9,19 @@ import {
   classNames,
   focusRingInsetClasses,
   getW9DataLabels,
+  mergeTigerLocale,
+  type TigerLocale,
   nextListboxIndex,
   toggleAssignee,
   type AssigneeOption
 } from '@expcat/tigercat-core'
 
+import { useTigerConfig } from './tiger-config'
+
 export interface AssigneePickerProps {
   options?: AssigneeOption[]
   selectedIds?: string[]
-  locale?: string
+  locale?: Partial<TigerLocale>
   onChange?: (ids: string[]) => void
 }
 
@@ -32,7 +36,9 @@ export function AssigneePicker({
   const instanceId = useId()
   const listboxId = `tiger-assignee-${instanceId}`
   const getOptionId = (id: string) => `${listboxId}-${id}`
-  const labels = getW9DataLabels(locale)
+  const config = useTigerConfig()
+  const mergedLocale = mergeTigerLocale(config.locale, locale)
+  const labels = getW9DataLabels(mergedLocale)
   const filtered = filterAssignees(options, query)
   const activeIndex =
     filtered.length === 0 ? -1 : Math.min(Math.max(active, 0), filtered.length - 1)

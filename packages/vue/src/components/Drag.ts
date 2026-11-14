@@ -12,6 +12,7 @@ import {
   type DragOverEvent,
   type DragStartEvent
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 import { useDrag } from '../composables/useDrag'
 
 export interface VueDragProps {
@@ -46,6 +47,7 @@ export const Drag = defineComponent({
   },
   emits: ['update:items', 'items-change', 'drag-start', 'drag-over', 'drop', 'drag-end'],
   setup(props, { emit, slots, attrs }) {
+    const tigerConfig = useTigerConfig()
     const announcement = ref('')
     const drag = useDrag(() => ({
       config: props.config,
@@ -56,7 +58,11 @@ export const Drag = defineComponent({
         const to = event.overItem
           ? props.items.findIndex((item) => item.id === event.overItem?.id)
           : from
-        announcement.value = dragMoveAnnouncement(Math.max(0, from), Math.max(0, to))
+        announcement.value = dragMoveAnnouncement(
+          Math.max(0, from),
+          Math.max(0, to),
+          tigerConfig.value.locale
+        )
         emit('drag-over', event)
       },
       onDragEnd: (event: DragEndEvent) => {

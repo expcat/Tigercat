@@ -7,6 +7,7 @@ import {
   type WaterfallChartProps as CoreWaterfallChartProps,
   type WaterfallDatum
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 import { ChartCanvas } from './ChartCanvas'
 
 export type WaterfallChartProps = CoreWaterfallChartProps
@@ -26,6 +27,7 @@ export function WaterfallChart({
   className,
   responsive = true
 }: WaterfallChartProps) {
+  const config = useTigerConfig()
   const hostRef = useRef<HTMLDivElement>(null)
   const laid = layoutWaterfall(data)
   const samples = laid.flatMap((bar) => [bar.y0, bar.y1])
@@ -42,7 +44,7 @@ export function WaterfallChart({
         type="button"
         className={resolveButtonClasses({ variant: 'outline', size: 'sm' })}
         onClick={exportChart}>
-        {getW9DataLabels().exportChart}
+        {getW9DataLabels(config.locale).exportChart}
       </button>
       <ChartCanvas width={width} height={height} title={title} responsive={responsive} padding={24}>
         {(ctx) => {

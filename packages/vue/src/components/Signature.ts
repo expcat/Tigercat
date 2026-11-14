@@ -23,7 +23,6 @@ import {
   appendSignaturePoint,
   beginSignatureStroke,
   classNames,
-  SIGNATURE_INVALID_VALUE,
   cancelSignatureStroke,
   clampSignatureLineWidth,
   clearSignatureStrokes,
@@ -149,10 +148,10 @@ export const Signature = defineComponent({
     })
 
     watch(
-      () => externalState.value?.invalid,
-      (invalid) => {
+      () => [externalState.value?.invalid, labels.value.invalidValueText] as const,
+      ([invalid]) => {
         if (invalid) {
-          formItemControl?.setError(SIGNATURE_INVALID_VALUE)
+          formItemControl?.setError(labels.value.invalidValueText)
           if (!explained.value) {
             explained.value = true
             emit('update:modelValue', '')

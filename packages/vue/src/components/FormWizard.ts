@@ -28,7 +28,6 @@ import {
   mergeTigerLocale,
   resolveLocaleText,
   runWizardAdvanceGate,
-  getW9DataLabels,
   stableModelSnapshot,
   wizardStepIsDirty,
   type WizardStep,
@@ -175,13 +174,13 @@ export const FormWizard = defineComponent({
     const snapshot = ref(stableModelSnapshot(props.model))
     const confirmLeave = async (): Promise<boolean> => {
       if (!wizardStepIsDirty(snapshot.value, props.model)) return true
-      const copy = getW9DataLabels(mergedLocale.value?.locale)
+      const copy = labels.value
       try {
         await confirmModal({
           title: copy.leaveStepTitle,
           content: copy.leaveStepMessage,
-          okText: copy.leave,
-          cancelText: copy.stay
+          okText: copy.leaveText,
+          cancelText: copy.stayText
         })
         return true
       } catch {

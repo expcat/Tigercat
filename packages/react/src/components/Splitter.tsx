@@ -23,7 +23,6 @@ import {
   isSplitterRtl,
   jumpSplitterGutter,
   collapseSplitterSizes,
-  feedbackLayoutLabels,
   layoutDeclaredPanes,
   measureSplitterContainer,
   normalizeSplitterBounds,
@@ -348,9 +347,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
                   type="button"
                   data-tiger-splitter-collapse={String(i)}
                   aria-label={
-                    collapsedPrevious[i] != null
-                      ? feedbackLayoutLabels.splitterExpand
-                      : feedbackLayoutLabels.splitterCollapse
+                    collapsedPrevious[i] != null ? labels.expandText : labels.collapseText
                   }
                   onClick={() => {
                     const available = splitterContentSize(containerSize, paneCount, gutterSize)
@@ -383,9 +380,7 @@ export const Splitter = forwardRef<HTMLDivElement, SplitterProps>(function Split
                       )
                     )
                   }}>
-                  {collapsedPrevious[i] != null
-                    ? feedbackLayoutLabels.splitterExpand
-                    : feedbackLayoutLabels.splitterCollapse}
+                  {collapsedPrevious[i] != null ? labels.expandText : labels.collapseText}
                 </button>
               ) : null}
               {collapsedPrevious[i] != null ? null : child}

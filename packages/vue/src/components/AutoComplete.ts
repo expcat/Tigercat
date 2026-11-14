@@ -32,7 +32,6 @@ import {
   autoCompleteEmptyStateClasses,
   autoCompleteListboxClasses,
   autoCompleteTrailingSlotClasses,
-  AUTO_COMPLETE_INVALID_VALUE,
   autoCompleteOptionIdentity,
   classNames,
   coerceClassValue,
@@ -263,10 +262,10 @@ export const AutoComplete = defineComponent({
     )
 
     watch(
-      () => sanitized.value?.invalid,
-      (invalid) => {
+      () => [sanitized.value?.invalid, selectLabels.value.invalidValueText] as const,
+      ([invalid]) => {
         if (invalid) {
-          formItemControl?.setError(AUTO_COMPLETE_INVALID_VALUE)
+          formItemControl?.setError(selectLabels.value.invalidValueText)
           if (!explained.value) {
             explained.value = true
             emit('update:modelValue', undefined)
@@ -761,7 +760,7 @@ export const AutoComplete = defineComponent({
               })
             : null,
           sanitized.value?.invalid && !formItemControl
-            ? h('p', { role: 'status', 'aria-live': 'polite' }, AUTO_COMPLETE_INVALID_VALUE)
+            ? h('p', { role: 'status', 'aria-live': 'polite' }, selectLabels.value.invalidValueText)
             : null,
           h('div', { class: 'relative' }, [
             h('input', {

@@ -620,6 +620,7 @@ export const LineChart: React.FC<LineChartProps> = ({
       ) : null}
       {bind ? (
         <AxisBind
+          exportText={labels.exportText}
           ticks={bind.time}
           reference={
             bind.reference &&

@@ -1,6 +1,5 @@
 import React, { forwardRef, useMemo } from 'react'
 import {
-  basicLabel,
   classNames,
   mergeTigerLocale,
   getQRCodeLabels,
@@ -53,7 +52,7 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
   const failed = !encoded.ok
   const matrix = encoded.ok ? encoded.matrix : []
   const viewBox = qrViewBoxSize(matrix.length || 1)
-  const scannedText = basicLabel(mergedLocale?.locale, 'qrcode', 'scanned')
+  const scannedText = labels.scannedText
   const iconPath = typeof icon === 'string' ? icon : undefined
   const iconNode = typeof icon === 'string' ? null : icon
   const statusText = failed

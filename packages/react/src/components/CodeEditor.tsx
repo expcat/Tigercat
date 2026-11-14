@@ -21,7 +21,6 @@ import {
   resolveCodeEditorTheme,
   codeEditorLineWindow,
   findCodeMatches,
-  getW9DataLabels,
   matchBrackets,
   registerCodeEditorLanguage,
   registeredCodeEditorLanguage,
@@ -296,7 +295,7 @@ export const CodeEditor = forwardRef<CodeEditorHandle, CodeEditorProps>(function
             onClick={() => {
               setCode(replaceCodeMatches(code, bind.query ?? '', bind.replacement ?? '', true))
             }}>
-            {getW9DataLabels().replaceAll}
+            {labels.replaceAllText}
           </button>
           <span
             data-bracket={(() => {

@@ -35,7 +35,7 @@ import {
   getContextMenuSubPlacement,
   createTypeaheadHighlight,
   markTypeaheadMatch,
-  navLabels,
+  getNavLabels,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
   handleMenuNavigation,
@@ -50,6 +50,7 @@ import {
   type DropdownTrigger,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 
 import type {
   DropdownProps as CoreDropdownProps,
@@ -159,6 +160,7 @@ export const DropdownItem = defineComponent({
   },
   emits: ['click', 'check'],
   setup(props, { slots, emit, attrs }) {
+    const tigerConfig = useTigerConfig()
     const attrsRecord = attrs as Record<string, unknown>
     const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
@@ -250,7 +252,11 @@ export const DropdownItem = defineComponent({
             ? h('span', { class: getPopupMenuShortcutClasses() }, props.shortcut)
             : null,
           props.danger || props.itemType === 'danger'
-            ? h('span', { class: 'sr-only' }, `, ${navLabels.dangerItem}`)
+            ? h(
+                'span',
+                { class: 'sr-only' },
+                `, ${getNavLabels(tigerConfig.value.locale).dangerItem}`
+              )
             : null
         ]
       )

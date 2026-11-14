@@ -339,7 +339,8 @@ describe('custom-text overrides on label resolvers', () => {
     it('falls back to official en-US Close, not Close drawer', () => {
       expect(getDrawerLabels()).toEqual({
         closeAriaLabel: 'Close',
-        dialogAriaLabel: 'Drawer'
+        dialogAriaLabel: 'Drawer',
+        resizeAriaLabel: 'Resize drawer'
       })
     })
 

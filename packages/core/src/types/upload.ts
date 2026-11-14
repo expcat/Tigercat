@@ -317,6 +317,7 @@ export interface UploadProps {
 }
 
 export interface UploadLabels {
+  selectDirectoryText?: string
   dragAreaAriaLabel: string
   buttonAriaLabel: string
   clickToUploadText: string

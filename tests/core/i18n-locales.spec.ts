@@ -17,6 +17,8 @@ import {
   defineText,
   formatColorPickerSelectPreset,
   getCodeLabels,
+  getSelectLabels,
+  getAvatarGroupLabels,
   getColorPickerLabels,
   getCronEditorLabels,
   getDataExportLabels,
@@ -32,6 +34,7 @@ import {
   resolveTigerLocale,
   TIGER_LOCALE_KEYS
 } from '@expcat/tigercat-core'
+import { workflowDesignerIssueMessage } from '@expcat/tigercat-core/workflow-designer'
 import { FR_FR_DATEPICKER_LOCALE } from '@expcat/tigercat-core/datepicker-locales/fr-FR'
 
 const locales = { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID, esES, frFR, deDE, ptBR, arSA }
@@ -63,6 +66,7 @@ const SAME_AS_ENGLISH_ALLOWLIST = new Set([
   'pt-BR:descriptions.colon',
   'ar-SA:descriptions.colon',
   'fr-FR:colorPicker.saturation',
+  'fr-FR:transfer.pageText',
   'fr-FR:colorPicker.accentGroup',
   ...[
     'zh-CN',
@@ -98,6 +102,27 @@ function leafEntries(value: unknown, prefix = ''): Array<{ path: string; value: 
 }
 
 describe('i18n locale presets', () => {
+  it('resolves auxiliary copy and duplicate-key validation through locale sections', () => {
+    for (const locale of [zhCN, zhTW, frFR]) {
+      expect(getSelectLabels(locale).selectAllText).toBe(locale.select?.selectAllText)
+      expect(getSelectLabels(locale).selectAllText).not.toBe(getSelectLabels().selectAllText)
+      expect(getAvatarGroupLabels(locale).overflowListAriaLabel).not.toBe(
+        getAvatarGroupLabels().overflowListAriaLabel
+      )
+      const duplicateKey = workflowDesignerIssueMessage(
+        { code: 'duplicate_key', path: [], blocking: true },
+        getWorkflowDesignerLabels(locale)
+      )
+      expect(duplicateKey).toBe(locale.workflowDesigner?.validationDuplicateKey)
+      expect(duplicateKey).toBeTruthy()
+      expect(duplicateKey).not.toBe('Each node key must be unique')
+    }
+    const merged = mergeTigerLocale(frFR, { select: { selectAllText: 'All visible' } })
+    expect(getSelectLabels(merged).selectAllText).toBe('All visible')
+    expect(getSelectLabels(merged, { selectAllText: 'Instance' }).selectAllText).toBe('Instance')
+    expect(getSelectLabels({ locale: 'zh-CN' }).selectAllText).toBe(getSelectLabels().selectAllText)
+  })
+
   it('every built-in pack has the same sections and leaves as en-US', () => {
     const skip = (path: string) =>
       path === 'locale' || path === 'direction' || path.startsWith('datePicker.')
@@ -304,7 +329,7 @@ describe('i18n locale presets', () => {
 
   it('getCodeLabels(undefined) is English Copy / Copied / Copy failed', () => {
     expect(getCodeLabels(undefined)).toEqual(enUS.code)
-    expect(getCodeLabels()).toEqual({
+    expect(getCodeLabels()).toMatchObject({
       copyLabel: 'Copy',
       copiedLabel: 'Copied',
       copyFailedLabel: 'Copy failed',
@@ -314,7 +339,7 @@ describe('i18n locale presets', () => {
 
   it('getCodeLabels reads Chinese from the zh-CN pack, not from locale: zh-CN', () => {
     expect(getCodeLabels({ locale: 'zh-CN' }).copyLabel).toBe('Copy')
-    expect(getCodeLabels(zhCN)).toEqual({
+    expect(getCodeLabels(zhCN)).toMatchObject({
       copyLabel: '复制',
       copiedLabel: '已复制',
       copyFailedLabel: '复制失败',

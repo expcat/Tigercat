@@ -51,7 +51,7 @@ import {
   updateCronExpressionField,
   validateCronExpressionWithLabels,
   describeCronExpression,
-  nextCronRun
+  describeNextCronRun
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './tiger-config'
 import { FORM_ITEM_CONTROL_INJECTION_KEY, type VueFormItemControlContext } from './FormItemContext'
@@ -477,13 +477,13 @@ export const CronEditor = markFormItemGroupControl(
               ? h(
                   'p',
                   {
-                    class: 'text-sm text-[var(--tiger-text-secondary)]',
+                    class: 'min-w-0 break-words text-sm text-[var(--tiger-text-secondary)]',
                     'data-tiger-cron-summary': ''
                   },
                   [
-                    describeCronExpression(expressionDraft.value),
+                    describeCronExpression(expressionDraft.value, mergedLocale.value, labels.value),
                     ' ',
-                    nextCronRun(expressionDraft.value)?.toISOString() ?? ''
+                    describeNextCronRun(expressionDraft.value, mergedLocale.value, labels.value)
                   ]
                 )
               : null

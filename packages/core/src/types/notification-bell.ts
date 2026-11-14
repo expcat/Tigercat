@@ -1,3 +1,5 @@
+import type { TigerLocale } from './locale'
+
 export interface NotificationBellItem {
   id: string
   title: string
@@ -7,6 +9,6 @@ export interface NotificationBellItem {
 export interface NotificationBellProps {
   /** Inbox rows. The bell does not read the toast queue. */
   items?: NotificationBellItem[]
-  /** Locale id for unread copy. */
-  locale?: string
+  /** Locale object for unread copy. */
+  locale?: Partial<TigerLocale>
 }

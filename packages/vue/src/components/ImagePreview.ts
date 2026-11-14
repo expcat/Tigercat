@@ -15,7 +15,6 @@ import {
   clampLightboxIndex,
   classNames,
   coerceClassValue,
-  basicLabel,
   createDefaultTransform,
   createLightboxGestureSession,
   downloadCurrentImageUrl,
@@ -450,7 +449,11 @@ export const ImagePreview = defineComponent({
       }
 
       const toolbarLabel = (key: 'flipHorizontal' | 'download' | 'resetScale') =>
-        basicLabel(mergedLocale.value?.locale, 'imagePreview', key)
+        ({
+          flipHorizontal: labels.value.flipHorizontalAriaLabel,
+          download: labels.value.downloadAriaLabel,
+          resetScale: labels.value.originalSizeAriaLabel
+        })[key]
 
       const toolbarButton = (
         item: ImagePreviewToolbarItemContext,

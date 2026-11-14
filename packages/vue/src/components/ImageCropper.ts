@@ -461,7 +461,7 @@ export const ImageCropper = defineComponent({
       )
 
     const renderToolbar = () => {
-      const localeId = mergedLocale.value?.locale
+      const locale = mergedLocale.value
       const pressed = resolvePressedCropAspectPreset(aspectChoice.value, props.aspectRatio)
       return h('div', { class: imageCropperToolbarClasses, 'data-crop-tools': '' }, [
         h(
@@ -469,7 +469,7 @@ export const ImageCropper = defineComponent({
           {
             class: imageCropperAspectGroupClasses,
             role: 'group',
-            'aria-label': basicLabel(localeId, 'imageCropper', 'aspect')
+            'aria-label': basicLabel(locale, 'imageCropper', 'aspect')
           },
           CROP_ASPECT_PRESETS.map((preset) =>
             h(
@@ -483,7 +483,7 @@ export const ImageCropper = defineComponent({
                   aspectChoice.value = preset
                 }
               },
-              basicLabel(localeId, 'imageCropper', cropAspectPresetLabelKey(preset))
+              basicLabel(locale, 'imageCropper', cropAspectPresetLabelKey(preset))
             )
           )
         ),
@@ -497,7 +497,7 @@ export const ImageCropper = defineComponent({
               rotation.value = (rotation.value + 90) % 360
             }
           },
-          basicLabel(localeId, 'imageCropper', 'rotate')
+          basicLabel(locale, 'imageCropper', 'rotate')
         ),
         h(
           'button',
@@ -510,7 +510,7 @@ export const ImageCropper = defineComponent({
               flipX.value = !flipX.value
             }
           },
-          basicLabel(localeId, 'imageCropper', 'flip')
+          basicLabel(locale, 'imageCropper', 'flip')
         )
       ])
     }

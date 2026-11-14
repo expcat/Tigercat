@@ -54,12 +54,12 @@ export const Gallery = defineComponent({
       )
       const current = items[index]
       const count = formatGalleryCount(
-        basicLabel(config.value.locale?.locale, 'gallery', 'count'),
+        basicLabel(config.value.locale, 'gallery', 'count'),
         items.length ? index + 1 : 0,
         items.length
       )
-      const openLabel = basicLabel(config.value.locale?.locale, 'gallery', 'open')
-      const listLabel = basicLabel(config.value.locale?.locale, 'gallery', 'list')
+      const openLabel = basicLabel(config.value.locale, 'gallery', 'open')
+      const listLabel = basicLabel(config.value.locale, 'gallery', 'list')
 
       return h(
         'div',
@@ -109,7 +109,7 @@ export const Gallery = defineComponent({
                     'aria-label':
                       item.alt ||
                       formatGalleryCount(
-                        basicLabel(config.value.locale?.locale, 'gallery', 'count'),
+                        basicLabel(config.value.locale, 'gallery', 'count'),
                         itemIndex + 1,
                         items.length
                       ),

@@ -20,7 +20,6 @@ import {
   getPageNumbers,
   paginationEllipsisPages,
   clampPaginationJump,
-  navLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
   normalizePaginationTotal,
@@ -541,7 +540,7 @@ export const Pagination = defineComponent({
                       {
                         type: 'button',
                         class: getPaginationEllipsisClasses(size),
-                        'aria-label': navLabels.paginationJump,
+                        'aria-label': labels.value.jumpToPageAriaLabel,
                         onClick: (event: MouseEvent) => {
                           const input = (
                             event.currentTarget as HTMLElement
@@ -554,7 +553,7 @@ export const Pagination = defineComponent({
                     h('input', {
                       type: 'number',
                       class: 'w-12',
-                      'aria-label': navLabels.paginationJump,
+                      'aria-label': labels.value.jumpToPageAriaLabel,
                       onKeydown: (event: KeyboardEvent) => {
                         if (event.key !== 'Enter') return
                         const next = clampPaginationJump(

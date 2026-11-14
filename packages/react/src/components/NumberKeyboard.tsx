@@ -20,7 +20,6 @@ import {
   numberKeyboardGridClasses,
   numberKeyboardRootClasses,
   numberKeyboardScrimClasses,
-  NUMBER_KEYBOARD_INVALID_VALUE_TEXT,
   numberKeyboardSheetClasses,
   postNumberKeyboardValue,
   resolveAnchoredOverlayTarget,
@@ -175,13 +174,13 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
 
     const reportedErrorRef = useRef<string | null>(null)
     useEffect(() => {
-      const message = invalidValue ? NUMBER_KEYBOARD_INVALID_VALUE_TEXT : null
+      const message = invalidValue ? labels.invalidValueText : null
       if (message === reportedErrorRef.current) return
       const previous = reportedErrorRef.current
       reportedErrorRef.current = message
       if (message) formItemControl?.setError?.(message)
       else if (previous) formItemControl?.setError?.(null)
-    }, [formItemControl, invalidValue])
+    }, [formItemControl, invalidValue, labels.invalidValueText])
 
     const overlayEnabled = overlayMode && isOpen && !effectiveDisabled
     useFocusTrap({
@@ -288,7 +287,7 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
         className="px-1 text-xs text-[var(--tiger-error)]"
         aria-live="polite"
         data-tiger-number-keyboard-error="">
-        {NUMBER_KEYBOARD_INVALID_VALUE_TEXT}
+        {labels.invalidValueText}
       </p>
     ) : null
 

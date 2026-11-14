@@ -11,7 +11,8 @@ import type {
   CronValidationIssue,
   CronValidationResult
 } from '../types/cron-editor'
-import type { TigerLocaleCronEditor } from '../types/locale'
+import { getCronEditorLabels } from './locale-utils'
+import type { TigerLocale, TigerLocaleCronEditor } from '../types/locale'
 
 export const CRON_FIELD_COUNT = 5
 
@@ -603,30 +604,81 @@ export function nextCronRun(expression: string, from: Date = new Date()): Date |
   return null
 }
 
-function listPhrase(values: number[], any: boolean): string {
-  if (any) return '*'
-  return [...values].sort((a, b) => a - b).join(',')
-}
-
-/** One sentence. Month numbers stay numbers; names, Quartz, and seconds are out of scope. */
-export function describeCronExpression(expression: string): string | null {
+/** Describes validated Unix cron fields without expanding ranges or steps. */
+export function describeCronExpression(
+  expression: string,
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCronEditor>
+): string | null {
   const schedule = parseCronSchedule(expression)
   if (!schedule) return null
+  const labels = getCronEditorLabels(locale, overrides)
   const parts = getCronExpressionParts(expression)
-  const minute =
-    parts[0].trim() === '*' ? 'every minute' : `minute ${listPhrase([...schedule.minute], false)}`
-  const hour =
-    parts[1].trim() === '*' ? 'every hour' : `hour ${listPhrase([...schedule.hour], false)}`
+  const format = (template: string, values: Record<string, string | number>): string =>
+    template.replace(/\{(\w+)\}/g, (match, key: string) => String(values[key] ?? match))
+  const fieldLabels = [
+    labels.minuteLabel,
+    labels.hourLabel,
+    labels.dayOfMonthLabel,
+    labels.monthLabel,
+    labels.dayOfWeekLabel
+  ]
+  const describeField = (index: number): string => {
+    const raw = parts[index]
+    const field = fieldLabels[index].toLowerCase()
+    if (raw === '*')
+      return [
+        labels.summaryEveryMinute,
+        labels.summaryEveryHour,
+        labels.summaryEveryDay,
+        labels.summaryEveryMonth,
+        labels.summaryEveryDay
+      ][index]
+    const value = raw
+      .split(',')
+      .map((part) => {
+        const [base, step] = part.split('/')
+        const control = parseCronFieldControl(base)
+        if (step) {
+          if (base === '*') return format(labels.summaryStep, { step })
+          const start = control.mode === 'range' ? control.start! : Number(base)
+          const end = control.mode === 'range' ? control.end! : cronFieldMetas[index].max
+          return format(labels.summaryRangeStep, { start, end, step })
+        }
+        return control.mode === 'range' ? `${control.start}–${control.end}` : base
+      })
+      .join(', ')
+    return format(labels.summaryField, { field, value })
+  }
   const day =
     schedule.dayOfMonthAny && schedule.dayOfWeekAny
-      ? 'every day'
-      : [
-          schedule.dayOfMonthAny ? '' : `day ${listPhrase([...schedule.dayOfMonth], false)}`,
-          schedule.dayOfWeekAny ? '' : `weekday ${listPhrase([...schedule.dayOfWeek], false)}`
-        ]
-          .filter(Boolean)
-          .join(' or ')
-  const month =
-    parts[3].trim() === '*' ? 'every month' : `month ${listPhrase([...schedule.month], false)}`
-  return `Runs at ${minute}, ${hour}, ${day}, ${month}.`
+      ? labels.summaryEveryDay
+      : schedule.dayOfMonthAny
+        ? describeField(4)
+        : schedule.dayOfWeekAny
+          ? describeField(2)
+          : format(labels.summaryOr, { left: describeField(2), right: describeField(4) })
+  return format(labels.summarySentence, {
+    minute: describeField(0),
+    hour: describeField(1),
+    day,
+    month: describeField(3)
+  })
+}
+
+export function describeNextCronRun(
+  expression: string,
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocaleCronEditor>
+): string {
+  const next = nextCronRun(expression)
+  if (!next) return ''
+  const labels = getCronEditorLabels(locale, overrides)
+  let time: string
+  try {
+    time = next.toLocaleString(locale?.locale)
+  } catch {
+    time = next.toLocaleString('en-US')
+  }
+  return labels.nextRunText.replace('{time}', time)
 }

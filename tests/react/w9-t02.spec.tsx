@@ -35,7 +35,7 @@ describe('W9 T02 React', () => {
     expect(img).toHaveAttribute('alt')
     expect(screen.getByRole('button', { name: 'zoom-slot' })).toBeInTheDocument()
     fireEvent.click(
-      screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'flipHorizontal') })
+      screen.getByRole('button', { name: basicLabel(undefined, 'imagePreview', 'flipHorizontal') })
     )
     expect(img.style.transform).toContain('scaleX(-1)')
     const download = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
@@ -44,7 +44,7 @@ describe('W9 T02 React', () => {
       expect(this.getAttribute('href')).toBe('/a.jpg')
     })
     fireEvent.click(
-      screen.getByRole('button', { name: basicLabel('en-US', 'imagePreview', 'download') })
+      screen.getByRole('button', { name: basicLabel(undefined, 'imagePreview', 'download') })
     )
     expect(download).toHaveBeenCalled()
     download.mockRestore()

@@ -1,11 +1,14 @@
-import { defineComponent, h, nextTick, ref, watch, type PropType } from 'vue'
+import { computed, defineComponent, h, nextTick, ref, watch, type PropType } from 'vue'
 import {
   formatW9Label,
   getW9DataLabels,
+  mergeTigerLocale,
+  type TigerLocale,
   notificationItemsPendingRead,
   resolveButtonClasses,
   type NotificationItem
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 import { Badge } from './Badge'
 import { Icon } from './Icon'
 import { NotificationCenter } from './NotificationCenter'
@@ -17,14 +20,15 @@ export const NotificationBell = defineComponent({
   name: 'TigerNotificationBell',
   props: {
     items: { type: Array as PropType<NotificationItem[]>, default: () => [] },
-    locale: { type: String, default: undefined }
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined }
   },
   emits: ['item-read-change', 'update:open'],
   setup(props, { emit }) {
     const open = ref(false)
     const buttonRef = ref<HTMLButtonElement | null>(null)
-    const labels = () => getW9DataLabels(props.locale)
-    const announced = ref(
+    const config = useTigerConfig()
+    const labels = () => getW9DataLabels(mergeTigerLocale(config.value.locale, props.locale))
+    const announced = computed(() =>
       formatW9Label(labels().unreadCount, {
         count: notificationItemsPendingRead(props.items).length
       })
@@ -82,6 +86,7 @@ export const NotificationBell = defineComponent({
               h('div', { 'data-tiger-notification-bell-panel': '' }, [
                 h(NotificationCenter, {
                   items: props.items,
+                  locale: mergeTigerLocale(config.value.locale, props.locale),
                   onItemReadChange: (item: NotificationItem, nextRead: boolean) => {
                     emit('item-read-change', item, nextRead)
                   }

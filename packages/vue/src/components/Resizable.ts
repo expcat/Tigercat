@@ -6,7 +6,7 @@ import {
   coerceClassValue,
   createDocumentDragSession,
   defaultResizeHandles,
-  feedbackLayoutLabels,
+  getFeedbackLayoutLabels,
   formatResizableHandleLabel,
   formatResizableLiveText,
   resolveResizableAspectRatio,
@@ -306,7 +306,7 @@ export const Resizable = defineComponent({
                 formatResizableLiveText(
                   width.value ?? 0,
                   height.value ?? 0,
-                  feedbackLayoutLabels.resizableLive
+                  getFeedbackLayoutLabels(config.value.locale).resizableLive
                 )
               )
             : null,

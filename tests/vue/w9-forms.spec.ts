@@ -4,6 +4,10 @@
 import { defineComponent, h, ref } from 'vue'
 import { describe, expect, it } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
+import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { frFR } from '@expcat/tigercat-core/locales/fr-FR'
 import { Select } from '@expcat/tigercat-vue/Select'
 import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
@@ -12,6 +16,23 @@ import { InputNumber } from '@expcat/tigercat-vue/InputNumber'
 import { Slider } from '@expcat/tigercat-vue/Slider'
 
 describe('W9 vue forms', () => {
+  it.each([
+    [zhCN, '全选当前结果'],
+    [zhTW, '全選目前結果'],
+    [frFR, 'Tout sélectionner']
+  ] as const)('inherits auxiliary Select copy from $0.locale Provider', async (locale, text) => {
+    const { getByRole } = render(
+      defineComponent({
+        setup: () => () =>
+          h(ConfigProvider, { locale }, () =>
+            h(Select, { multiple: true, options: [{ label: 'Ada', value: 'a' }] })
+          )
+      })
+    )
+    await fireEvent.click(getByRole('combobox'))
+    expect(getByRole('button', { name: text })).toBeInTheDocument()
+  })
+
   it('selects filtered options, caps the count, and shows omitted names', async () => {
     const value = ref<string[]>([])
     const Host = defineComponent({

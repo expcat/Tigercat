@@ -3,6 +3,10 @@ import type { DatePickerLocalePreset } from '../../../types/datepicker'
 export const ID_ID_DATEPICKER_LOCALE: DatePickerLocalePreset = {
   locale: 'id-ID',
   labels: {
+    invalidDateText: 'Masukkan tanggal yang valid.',
+    unavailableDateText: 'Tanggal tersebut tidak tersedia.',
+    missingStartText: 'Pilih tanggal mulai.',
+    missingEndText: 'Pilih tanggal akhir.',
     placeholder: 'Pilih tanggal',
     rangePlaceholder: 'Pilih rentang tanggal',
     today: 'Hari ini',

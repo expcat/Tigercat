@@ -35,7 +35,6 @@ import {
   numberKeyboardGridClasses,
   numberKeyboardRootClasses,
   numberKeyboardScrimClasses,
-  NUMBER_KEYBOARD_INVALID_VALUE_TEXT,
   numberKeyboardSheetClasses,
   postNumberKeyboardValue,
   resolveAnchoredOverlayTarget,
@@ -174,10 +173,10 @@ export const NumberKeyboard = defineComponent({
     })
 
     watch(
-      invalidValue,
-      (isInvalid, previous) => {
-        if (isInvalid) formItemControl?.setError(NUMBER_KEYBOARD_INVALID_VALUE_TEXT)
-        else if (previous) formItemControl?.setError(null)
+      () => [invalidValue.value, labels.value.invalidValueText] as const,
+      ([isInvalid], previous) => {
+        if (isInvalid) formItemControl?.setError(labels.value.invalidValueText)
+        else if (previous?.[0]) formItemControl?.setError(null)
       },
       { immediate: true }
     )
@@ -423,7 +422,7 @@ export const NumberKeyboard = defineComponent({
           'aria-live': 'polite',
           'data-tiger-number-keyboard-error': ''
         },
-        NUMBER_KEYBOARD_INVALID_VALUE_TEXT
+        labels.value.invalidValueText
       )
     }
 

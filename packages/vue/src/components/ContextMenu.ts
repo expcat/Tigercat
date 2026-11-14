@@ -47,7 +47,7 @@ import {
   getPopupMenuShortcutClasses,
   POPUP_MENU_SUBMENU_SURFACE_CLASSES,
   nextPopupMenuCheck,
-  navLabels,
+  getNavLabels,
   createTypeaheadHighlight,
   markTypeaheadMatch,
   type PopupMenuItem,
@@ -59,6 +59,7 @@ import {
   type ContextMenuPoint,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 
 import type {
   ContextMenuProps as CoreContextMenuProps,
@@ -525,6 +526,7 @@ const ContextMenuPopupBranch = defineComponent({
     }
   },
   setup(props) {
+    const tigerConfig = useTigerConfig()
     const openKey = ref<string | number | null>(null)
 
     return (): VNode[] =>
@@ -597,7 +599,9 @@ const ContextMenuPopupBranch = defineComponent({
             role: popupMenuItemRole(type),
             'aria-checked':
               type === 'checkbox' || type === 'radio' ? Boolean(item.checked) : undefined,
-            'aria-label': danger ? popupMenuAccessibleName(item) : undefined,
+            'aria-label': danger
+              ? popupMenuAccessibleName(item, getNavLabels(tigerConfig.value.locale).dangerItem)
+              : undefined,
             'aria-disabled': item.disabled || undefined,
             disabled: href ? undefined : item.disabled,
             class: getPopupMenuItemClasses(Boolean(item.disabled), danger),
@@ -621,7 +625,13 @@ const ContextMenuPopupBranch = defineComponent({
             item.shortcut
               ? h('span', { class: getPopupMenuShortcutClasses() }, item.shortcut)
               : null,
-            danger ? h('span', { class: 'sr-only' }, `, ${navLabels.dangerItem}`) : null
+            danger
+              ? h(
+                  'span',
+                  { class: 'sr-only' },
+                  `, ${getNavLabels(tigerConfig.value.locale).dangerItem}`
+                )
+              : null
           ]
         )
       })

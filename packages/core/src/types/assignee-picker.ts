@@ -1,3 +1,5 @@
+import type { TigerLocale } from './locale'
+
 export interface AssigneePickerOption {
   id: string
   name: string
@@ -9,6 +11,6 @@ export interface AssigneePickerProps {
   options?: AssigneePickerOption[]
   /** Selected ids. */
   selectedIds?: string[]
-  /** Locale id for empty and search copy. */
-  locale?: string
+  /** Locale object for empty and search copy. */
+  locale?: Partial<TigerLocale>
 }

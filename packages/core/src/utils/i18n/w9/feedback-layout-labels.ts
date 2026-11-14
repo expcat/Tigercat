@@ -1,7 +1,12 @@
-/**
- * W9 strings that are not in locale data files.
- * Modal confirm copy still comes from `locale.modal`.
- */
+import type { TigerLocale } from '../../../types/locale'
+import {
+  getCommonLabels,
+  getSplitterLabels,
+  getImageEditorLabels,
+  getDrawerLabels,
+  getProgressLabels,
+  getMasonryLabels
+} from '../../locale-utils'
 
 export interface FeedbackLayoutLabels {
   sidebarCollapse: string
@@ -16,18 +21,25 @@ export interface FeedbackLayoutLabels {
   masonryOrder: string
 }
 
-export const feedbackLayoutLabels: FeedbackLayoutLabels = {
-  sidebarCollapse: 'Collapse sidebar',
-  sidebarExpand: 'Expand sidebar',
-  skeletonBusy: 'Loading',
-  resizableLive: '{width} by {height}',
-  drawerResize: 'Resize drawer',
-  splitterExpand: 'Expand panel',
-  splitterCollapse: 'Collapse panel',
-  progressIndeterminate: 'In progress',
-  listLoading: 'Loading list',
-  masonryOrder: 'Visual order differs from source order'
+export function getFeedbackLayoutLabels(locale?: Partial<TigerLocale>): FeedbackLayoutLabels {
+  const common = getCommonLabels(locale)
+  const splitter = getSplitterLabels(locale)
+  return {
+    sidebarCollapse: common.sidebarCollapseText,
+    sidebarExpand: common.sidebarExpandText,
+    skeletonBusy: common.loadingText,
+    resizableLive: getImageEditorLabels(locale).cropSizeText,
+    drawerResize: getDrawerLabels(locale).resizeAriaLabel,
+    splitterExpand: splitter.expandText,
+    splitterCollapse: splitter.collapseText,
+    progressIndeterminate: getProgressLabels(locale).ariaLabel,
+    listLoading: common.loadingText,
+    masonryOrder: getMasonryLabels(locale).visualOrderText
+  }
 }
+
+/** English defaults for callers without a provider. */
+export const feedbackLayoutLabels: FeedbackLayoutLabels = getFeedbackLayoutLabels()
 
 export function formatFeedbackLayoutLabel(
   template: string,

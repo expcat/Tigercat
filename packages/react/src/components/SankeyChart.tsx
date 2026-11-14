@@ -7,6 +7,7 @@ import {
   readPageWritingDirection,
   type SankeyChartProps as CoreSankeyChartProps
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 import { ChartCanvas } from './ChartCanvas'
 
 export type SankeyChartProps = CoreSankeyChartProps
@@ -20,6 +21,7 @@ export function SankeyChart({
   className,
   responsive = true
 }: SankeyChartProps) {
+  const config = useTigerConfig()
   const hostRef = useRef<HTMLDivElement>(null)
   const direction = readPageWritingDirection() === 'rtl' ? 'rtl' : 'ltr'
   const exportChart = () => {
@@ -32,7 +34,7 @@ export function SankeyChart({
         type="button"
         className={resolveButtonClasses({ variant: 'outline', size: 'sm' })}
         onClick={exportChart}>
-        {getW9DataLabels().exportChart}
+        {getW9DataLabels(config.locale).exportChart}
       </button>
       <ChartCanvas width={width} height={height} title={title} responsive={responsive} padding={16}>
         {(ctx) => {

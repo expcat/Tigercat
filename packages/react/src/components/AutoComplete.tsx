@@ -9,7 +9,6 @@ import {
   classNames,
   SHAKE_CLASS,
   TIGER_CHROME_ATTR,
-  AUTO_COMPLETE_INVALID_VALUE,
   autoCompleteOptionIdentity,
   filterAutoCompleteOptions,
   getAutoCompleteInputClasses,
@@ -290,7 +289,7 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
 
     useEffect(() => {
       if (sanitized?.invalid) {
-        formItemControl?.setError?.(AUTO_COMPLETE_INVALID_VALUE)
+        formItemControl?.setError?.(selectLabels.invalidValueText)
         if (!explainedRef.current) {
           explainedRef.current = true
           onChange?.(undefined)
@@ -302,7 +301,13 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
         explainedRef.current = false
         formItemControl?.setError?.(null)
       }
-    }, [formItemControl, onChange, sanitized?.invalid, sanitized?.value])
+    }, [
+      formItemControl,
+      onChange,
+      sanitized?.invalid,
+      sanitized?.value,
+      selectLabels.invalidValueText
+    ])
 
     useEffect(() => {
       if (searchValue !== undefined) return
@@ -675,7 +680,7 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
         ) : null}
         {sanitized?.invalid && !formItemControl ? (
           <p role="status" aria-live="polite">
-            {AUTO_COMPLETE_INVALID_VALUE}
+            {selectLabels.invalidValueText}
           </p>
         ) : null}
         <div className="relative">

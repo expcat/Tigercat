@@ -1,3 +1,4 @@
+import { enUS } from './i18n/locales/en-US'
 /**
  * TimePicker selection / display helpers. Vue/React bind DOM and overlay.
  *
@@ -735,4 +736,16 @@ export function resolveTimePickerNow(
 export function snapTimeColumnScroll(scrollTop: number, itemHeight: number): number {
   if (!Number.isFinite(itemHeight) || itemHeight <= 0 || !Number.isFinite(scrollTop)) return 0
   return Math.max(0, Math.round(scrollTop / itemHeight) * itemHeight)
+}
+
+export function resolveTimePickerError(reason: string, labels: Partial<TimePickerLabels>): string {
+  const fields: Record<string, keyof TimePickerLabels> = {
+    [timePickerInvalidReason]: 'invalidTimeText',
+    [timePickerUnavailableReason]: 'unavailableTimeText',
+    [timePickerMissingReason]: 'missingTimeText',
+    [timePickerMissingStartReason]: 'missingStartText',
+    [timePickerMissingEndReason]: 'missingEndText'
+  }
+  const key = Object.hasOwn(fields, reason) ? fields[reason] : undefined
+  return key ? (labels[key] ?? enUS.timePicker![key]!) : reason
 }

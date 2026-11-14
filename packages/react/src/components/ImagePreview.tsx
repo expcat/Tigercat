@@ -8,7 +8,6 @@ import React, {
 } from 'react'
 import {
   applyWheelZoom,
-  basicLabel,
   classNames,
   createDefaultTransform,
   downloadCurrentImageUrl,
@@ -468,7 +467,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         {toolbarButton(
           {
             action: 'flip',
-            label: basicLabel(mergedLocale?.locale, 'imagePreview', 'flipHorizontal'),
+            label: labels.flipHorizontalAriaLabel,
             disabled: false
           },
           flipHorizontalIconPath,
@@ -477,7 +476,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
         {toolbarButton(
           {
             action: 'download',
-            label: basicLabel(mergedLocale?.locale, 'imagePreview', 'download'),
+            label: labels.downloadAriaLabel,
             disabled: false
           },
           downloadIconPath,

@@ -6,7 +6,7 @@ import {
   getPopupMenuShortcutClasses,
   POPUP_MENU_SUBMENU_SURFACE_CLASSES,
   markTypeaheadMatch,
-  navLabels,
+  getNavLabels,
   nextPopupMenuCheck,
   popupMenuAccessibleName,
   popupMenuItemCloses,
@@ -16,6 +16,8 @@ import {
   type PopupMenuCheckChange,
   type PopupMenuItem
 } from '@expcat/tigercat-core'
+
+import { useTigerConfig } from './tiger-config'
 
 export interface PopupMenuListProps {
   items: readonly PopupMenuItem[]
@@ -92,6 +94,8 @@ function PopupMenuNode({
   onSelect?: (item: PopupMenuItem) => void
   onClose?: () => void
 }) {
+  const config = useTigerConfig()
+  const navLabels = getNavLabels(config.locale)
   const type = resolvePopupMenuItemType(item)
   const [submenuOpen, setSubmenuOpen] = useState(false)
 
@@ -169,7 +173,7 @@ function PopupMenuNode({
     role,
     'aria-disabled': item.disabled || undefined,
     'aria-checked': type === 'checkbox' || type === 'radio' ? Boolean(item.checked) : undefined,
-    'aria-label': danger ? popupMenuAccessibleName(item) : undefined,
+    'aria-label': danger ? popupMenuAccessibleName(item, navLabels.dangerItem) : undefined,
     'data-tiger-popup-item': '' as const,
     'data-tiger-popup-key': String(item.key),
     className,

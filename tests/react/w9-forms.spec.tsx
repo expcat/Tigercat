@@ -4,6 +4,10 @@
 import React, { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/react'
+import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { frFR } from '@expcat/tigercat-core/locales/fr-FR'
 import { Select } from '@expcat/tigercat-react/Select'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
@@ -12,6 +16,20 @@ import { InputNumber } from '@expcat/tigercat-react/InputNumber'
 import { Slider } from '@expcat/tigercat-react/Slider'
 
 describe('W9 react forms', () => {
+  it.each([
+    [zhCN, '全选当前结果'],
+    [zhTW, '全選目前結果'],
+    [frFR, 'Tout sélectionner']
+  ] as const)('inherits auxiliary Select copy from $0.locale Provider', async (locale, text) => {
+    render(
+      <ConfigProvider locale={locale}>
+        <Select multiple options={[{ label: 'Ada', value: 'a' }]} />
+      </ConfigProvider>
+    )
+    fireEvent.click(screen.getByRole('combobox'))
+    expect(screen.getByRole('button', { name: text })).toBeInTheDocument()
+  })
+
   it('selects filtered options up to maxCount', () => {
     function Host() {
       const [value, setValue] = useState<string[]>([])

@@ -23,10 +23,21 @@ import {
   validateCronField
 } from '@expcat/tigercat-core'
 
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+
 const minuteMeta = cronFieldMetas[0]
 const hourMeta = cronFieldMetas[1]
 
 describe('cron-editor-utils', () => {
+  it('describes Chinese any, specific, range and step fields without expanding ranges', () => {
+    expect(describeCronExpression('* * * * *', zhCN)).toBe('执行时间：每分钟，每小时，每天，每月。')
+    expect(describeCronExpression('15 * * * *', zhCN)).toContain('分钟：15')
+    expect(describeCronExpression('0-59 * * * *', zhCN)).toContain('分钟：0–59')
+    expect(describeCronExpression('*/5 * * * *', zhCN)).toContain('分钟：每隔 5')
+    expect(describeCronExpression('1-9/2 3 * * 1,5', zhCN)).toContain('分钟：1–9，每隔 2')
+    expect(describeCronExpression('0 0 1 * 1', zhCN)).toContain('日期：1 或 星期：1')
+  })
+
   it('defines five cron fields', () => {
     expect(cronFieldMetas.map((field) => field.key)).toEqual([
       'minute',

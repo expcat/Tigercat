@@ -13,8 +13,6 @@ import {
   getTagsInputHighlightClasses,
   getTagsInputInnerInputClasses,
   getTagsInputLabels,
-  getW9FormLabels,
-  formatW9Label,
   mergeAriaDescribedBy,
   mergeStyleValues,
   moveTag,
@@ -151,11 +149,8 @@ export const TagsInput = defineComponent({
       }
       if (result.rejections.length > 0) {
         const first = result.rejections[0]
-        const labelsW9 = getW9FormLabels()
-        rejection.value = formatW9Label(
-          first.reason === 'max' ? labelsW9.tagMax : labelsW9.tagDuplicate,
-          { tag: first.tag }
-        )
+        rejection.value =
+          first.reason === 'max' ? labels.value.limitText : labels.value.duplicateText
       } else if (result.added.length > 0) {
         rejection.value = ''
       }

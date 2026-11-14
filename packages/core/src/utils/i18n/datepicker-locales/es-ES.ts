@@ -3,6 +3,10 @@ import type { DatePickerLocalePreset } from '../../../types/datepicker'
 export const ES_ES_DATEPICKER_LOCALE: DatePickerLocalePreset = {
   locale: 'es-ES',
   labels: {
+    invalidDateText: 'Introduce una fecha válida.',
+    unavailableDateText: 'Esa fecha no está disponible.',
+    missingStartText: 'Elige una fecha de inicio.',
+    missingEndText: 'Elige una fecha de fin.',
     placeholder: 'Seleccionar fecha',
     rangePlaceholder: 'Seleccionar intervalo',
     today: 'Hoy',

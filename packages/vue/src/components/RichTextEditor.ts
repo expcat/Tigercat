@@ -14,7 +14,6 @@ import {
   coerceClassValue,
   applyMarkdownShortcut,
   getRichTextContainerClasses,
-  getW9DataLabels,
   serializeRichText,
   setRichTextImageWidth,
   slashInsertBlock,
@@ -450,7 +449,7 @@ export const RichTextEditor = defineComponent({
                 h(
                   'span',
                   { 'data-shortcut': applyMarkdownShortcut('# Title')?.type ?? '' },
-                  getW9DataLabels().preview
+                  labels.value.previewText
                 )
               ])
             : null,

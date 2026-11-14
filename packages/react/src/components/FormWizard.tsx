@@ -21,7 +21,6 @@ import {
   mergeTigerLocale,
   resolveLocaleText,
   runWizardAdvanceGate,
-  getW9DataLabels,
   stableModelSnapshot,
   wizardStepIsDirty,
   clampStepIndex,
@@ -125,19 +124,19 @@ export const FormWizard = forwardRef<FormWizardHandle, FormWizardProps>(function
   const snapshot = useRef(stableModelSnapshot(model))
   const confirmLeave = useCallback(async () => {
     if (!wizardStepIsDirty(snapshot.current, model)) return true
-    const copy = getW9DataLabels(mergedLocale?.locale)
+    const copy = labels
     try {
       await confirmModal({
         title: copy.leaveStepTitle,
         content: copy.leaveStepMessage,
-        okText: copy.leave,
-        cancelText: copy.stay
+        okText: copy.leaveText,
+        cancelText: copy.stayText
       })
       return true
     } catch {
       return false
     }
-  }, [mergedLocale, model])
+  }, [labels, model])
   const setCurrent = useCallback(
     async (next: number) => {
       const prev = currentIndex

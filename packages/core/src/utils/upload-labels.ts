@@ -15,6 +15,6 @@ export function interpolateUploadLabel(template: string, params: Record<string, 
 export function getUploadLabels(
   locale?: Partial<TigerLocale>,
   overrides?: UploadLabelOverrides
-): UploadLabels {
-  return resolveLocaleSection(enUS.upload as UploadLabels, locale?.upload, overrides)
+): Required<UploadLabels> {
+  return resolveLocaleSection(enUS.upload as Required<UploadLabels>, locale?.upload, overrides)
 }

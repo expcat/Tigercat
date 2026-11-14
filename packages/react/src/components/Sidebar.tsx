@@ -1,7 +1,7 @@
 import React, { forwardRef, useMemo } from 'react'
 import {
   classNames,
-  feedbackLayoutLabels,
+  getFeedbackLayoutLabels,
   getLayoutSidebarClasses,
   getSidebarAriaLabel,
   getSidebarStyle,
@@ -90,8 +90,8 @@ export const Sidebar = forwardRef<HTMLDivElement, ReactSidebarProps>(function Si
   )
   if (!collapsible) return aside
   const triggerLabel = effectiveCollapsed
-    ? feedbackLayoutLabels.sidebarExpand
-    : feedbackLayoutLabels.sidebarCollapse
+    ? getFeedbackLayoutLabels(config.locale).sidebarExpand
+    : getFeedbackLayoutLabels(config.locale).sidebarCollapse
   return (
     <div data-tiger-sidebar-shell="" data-side={side}>
       {aside}

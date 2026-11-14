@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import {
   formatW9Label,
   getW9DataLabels,
+  mergeTigerLocale,
+  type TigerLocale,
   notificationItemsPendingRead,
   resolveButtonClasses,
   type NotificationItem
 } from '@expcat/tigercat-core'
+import { useTigerConfig } from './tiger-config'
 import { Badge } from './Badge'
 import { Icon } from './Icon'
 import { NotificationCenter } from './NotificationCenter'
@@ -13,7 +16,7 @@ import { Popover } from './Popover'
 
 export interface NotificationBellProps {
   items?: NotificationItem[]
-  locale?: string
+  locale?: Partial<TigerLocale>
   onItemReadChange?: (item: NotificationItem, read: boolean) => void
 }
 
@@ -21,9 +24,11 @@ export function NotificationBell({ items = [], locale, onItemReadChange }: Notif
   const [open, setOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const wasOpen = useRef(false)
-  const labels = getW9DataLabels(locale)
+  const config = useTigerConfig()
+  const mergedLocale = mergeTigerLocale(config.locale, locale)
+  const labels = getW9DataLabels(mergedLocale)
   const unread = notificationItemsPendingRead(items).length
-  const [announced] = useState(() => formatW9Label(labels.unreadCount, { count: unread }))
+  const announced = formatW9Label(labels.unreadCount, { count: unread })
 
   useEffect(() => {
     if (open) {
@@ -50,7 +55,11 @@ export function NotificationBell({ items = [], locale, onItemReadChange }: Notif
         onOpenChange={setOpen}
         content={
           <div data-tiger-notification-bell-panel="">
-            <NotificationCenter items={items} onItemReadChange={onItemReadChange} />
+            <NotificationCenter
+              locale={mergedLocale}
+              items={items}
+              onItemReadChange={onItemReadChange}
+            />
           </div>
         }>
         <button

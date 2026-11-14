@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { calendarWeekNumber, classNames, getW9DataLabels } from '@expcat/tigercat-core'
+import { calendarWeekNumber, classNames } from '@expcat/tigercat-core'
 import type { CalendarMode, CalendarProps as CoreCalendarProps } from '@expcat/tigercat-core'
 import {
   appendCalendarEventCountLabel,
@@ -417,7 +417,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(function Calen
           onKeyDown={handleDayGridKeyDown}>
           <div className={getCalendarWeekGridClasses(fullscreen)} role="row">
             <div className={getCalendarWeekNumberClasses(fullscreen)} role="columnheader">
-              {getW9DataLabels(localeCode).weekNumber}
+              {labels.weekNumberText}
             </div>
             {weekdayNames.map((wd) => (
               <div key={wd} className={calendarWeekdayClasses} role="columnheader">

@@ -16,7 +16,6 @@ import {
   getPageNumbers,
   paginationEllipsisPages,
   clampPaginationJump,
-  navLabels,
   formatPaginationTotal,
   formatPaginationPageIndicator,
   normalizePaginationTotal,
@@ -319,11 +318,11 @@ export const Pagination: React.FC<PaginationProps> = ({
               <button
                 type="button"
                 className={getPaginationEllipsisClasses(size)}
-                aria-label={navLabels.paginationJump}>
+                aria-label={labels.jumpToPageAriaLabel}>
                 ...
               </button>
               <input
-                aria-label={navLabels.paginationJump}
+                aria-label={labels.jumpToPageAriaLabel}
                 className="w-12"
                 onKeyDown={(event) => {
                   if (event.key !== 'Enter') return

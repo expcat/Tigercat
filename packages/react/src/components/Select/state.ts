@@ -566,6 +566,7 @@ export function useSelectController(props: SelectProps) {
     searchPlaceholder: resolveLocaleText(labels.searchPlaceholder),
     clearAriaLabel: labels.clearAriaLabel,
     doneText: labels.doneText,
+    selectAllText: labels.selectAllText,
     loading,
     size,
     className: getSelectRootClasses(inputGroup != null, className),

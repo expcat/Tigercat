@@ -22,7 +22,6 @@ import {
   shouldCommitEditorValue,
   syncEditorTextareaValue,
   getMarkdownContainerClasses,
-  getW9DataLabels,
   htmlToMarkdown,
   lockedPaneScroll,
   markdownHeadings,
@@ -532,7 +531,7 @@ export const MarkdownEditor = defineComponent({
                         commitValue(`${currentValue.value}${next}`)
                       }
                     },
-                    getW9DataLabels().preview
+                    labels.value.previewModeLabel
                   )
                 ]
               )

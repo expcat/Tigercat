@@ -1,3 +1,5 @@
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { frFR } from '@expcat/tigercat-core/locales/fr-FR'
 /**
  * @vitest-environment happy-dom
  */
@@ -72,9 +74,9 @@ describe('W9 basic helpers', () => {
   })
 
   it('reads zh-CN and en-US basic labels', () => {
-    expect(basicLabel('zh-CN', 'qrcode', 'scanned')).toBe('已扫描')
-    expect(basicLabel('en-US', 'qrcode', 'scanned')).toBe('Scanned')
-    expect(basicLabel('fr-FR', 'qrcode', 'scanned')).toBe('Scanned')
+    expect(basicLabel(zhCN, 'qrcode', 'scanned')).toBe('已扫描')
+    expect(basicLabel(undefined, 'qrcode', 'scanned')).toBe('Scanned')
+    expect(basicLabel(frFR, 'qrcode', 'scanned')).toBe('Scanné')
   })
 
   it('does not construct a MutationObserver while reading watermark vars', () => {

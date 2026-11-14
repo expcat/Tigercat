@@ -1021,6 +1021,7 @@ export const Table = defineComponent({
         },
         [
           h(TableW9Panel, {
+            locale: { ...tableLocale.value, table: tableLabels.value },
             active: resolvedProps.sorts !== undefined,
             columns: ctx.displayColumns.value,
             sorts: ctx.multiSort.value,

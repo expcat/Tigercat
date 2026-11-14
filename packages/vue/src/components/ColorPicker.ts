@@ -26,7 +26,6 @@ import {
   applyColorPickerHue,
   classNames,
   coerceClassValue,
-  COLOR_PICKER_INVALID_VALUE_TEXT,
   COLOR_PICKER_PRESET_COLUMNS,
   colorPickerBaseClasses,
   colorPickerCheckerboardStyle,
@@ -586,7 +585,7 @@ export const ColorPicker = defineComponent({
                           class: 'text-xs text-[var(--tiger-error)]',
                           'aria-live': 'polite'
                         },
-                        COLOR_PICKER_INVALID_VALUE_TEXT
+                        labels.value.invalidValueText
                       )
                     : null
                 ]),

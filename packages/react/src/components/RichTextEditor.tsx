@@ -12,7 +12,6 @@ import {
   classNames,
   applyMarkdownShortcut,
   getRichTextContainerClasses,
-  getW9DataLabels,
   serializeRichText,
   setRichTextImageWidth,
   slashInsertBlock,
@@ -325,7 +324,7 @@ export const RichTextEditor = forwardRef<HTMLDivElement, RichTextEditorProps>(
             </button>
             <pre data-tiger-rte-serial="">{serializeRichText(blocks)}</pre>
             <span data-shortcut={applyMarkdownShortcut('# Title')?.type ?? ''}>
-              {getW9DataLabels().preview}
+              {labels.previewText}
             </span>
           </div>
         ) : null}

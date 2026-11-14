@@ -1,7 +1,6 @@
 import React, { createContext, isValidElement, useMemo } from 'react'
 import {
   avatarOverflowName,
-  basicLabel,
   getAvatarGroupClasses,
   getAvatarGroupItemClasses,
   getAvatarGroupLabels,
@@ -111,7 +110,7 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
             trigger="click"
             placement="top"
             asChild
-            ariaLabel={basicLabel(mergedLocale?.locale, 'avatarGroup', 'overflowList')}
+            ariaLabel={labels.overflowListAriaLabel}
             content={
               <ul className="m-0 list-none p-0">
                 {collapsedNames.map((name) => (

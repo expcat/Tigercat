@@ -11,7 +11,6 @@ import {
 } from 'vue'
 import {
   avatarOverflowName,
-  basicLabel,
   coerceClassValue,
   getAvatarGroupClasses,
   getAvatarGroupItemClasses,
@@ -147,7 +146,7 @@ export const AvatarGroup = defineComponent({
                   trigger: 'click',
                   placement: 'top',
                   asChild: true,
-                  ariaLabel: basicLabel(mergedLocale.value?.locale, 'avatarGroup', 'overflowList')
+                  ariaLabel: labels.value.overflowListAriaLabel
                 },
                 {
                   default: () =>

@@ -8,7 +8,16 @@ import { ZH_CN_DATEPICKER_LOCALE } from '../datepicker-locales/zh-CN'
 export const zhCN: TigerLocale = {
   locale: 'zh-CN',
   direction: 'ltr',
+  assigneePicker: {
+    emptyText: '目录为空',
+    listAriaLabel: '受理人'
+  },
   common: {
+    countdownTargetText: '倒计时由目标时间控制',
+    dangerText: '危险操作',
+    sidebarCollapseText: '收起侧栏',
+    sidebarExpandText: '展开侧栏',
+    dragMoveText: '从第 {from} 项到第 {to} 项',
     okText: '确定',
     cancelText: '取消',
     closeText: '关闭',
@@ -40,6 +49,7 @@ export const zhCN: TigerLocale = {
     dialogAriaLabel: '对话框'
   },
   drawer: {
+    resizeAriaLabel: '调整抽屉大小',
     closeAriaLabel: '关闭',
     dialogAriaLabel: '抽屉'
   },
@@ -47,6 +57,7 @@ export const zhCN: TigerLocale = {
     closeAriaLabel: '关闭提示'
   },
   qrcode: {
+    scannedText: '已扫描',
     ariaLabel: '二维码',
     expiredText: '二维码已过期',
     refreshText: '刷新',
@@ -57,6 +68,8 @@ export const zhCN: TigerLocale = {
     ariaLabel: '滚动内容'
   },
   image: {
+    galleryListAriaLabel: '缩略图',
+    galleryOpenAriaLabel: '打开预览',
     previewAriaLabel: '预览 {alt}',
     previewFallbackAlt: '图片',
     groupAriaLabel: '图片组',
@@ -174,6 +187,7 @@ export const zhCN: TigerLocale = {
     assigneeRequired: '请选择办理人'
   },
   workflowDesigner: {
+    validationDuplicateKey: '每个节点的 key 必须唯一',
     ariaLabel: '流程设计器',
     addStep: '添加步骤',
     addChild: '添加子步骤',
@@ -251,12 +265,15 @@ export const zhCN: TigerLocale = {
     ariaLabel: '进度'
   },
   splitter: {
+    expandText: '展开面板',
+    collapseText: '收起面板',
     gutterAriaLabel: '调整分栏 {index}'
   },
   resizable: {
     handleAriaLabel: '调整大小：{handle}'
   },
   upload: {
+    selectDirectoryText: '选择文件夹',
     dragAreaAriaLabel: '点击或拖拽上传文件',
     buttonAriaLabel: '上传文件',
     clickToUploadText: '点击上传',
@@ -275,6 +292,7 @@ export const zhCN: TigerLocale = {
     singleFileText: '仅保留了第一个文件。'
   },
   pagination: {
+    jumpToPageAriaLabel: '跳转到页码',
     totalText: '共 {total} 条',
     itemsPerPageText: '条/页',
     jumpToText: '跳至',
@@ -287,6 +305,12 @@ export const zhCN: TigerLocale = {
     pageSizeAriaLabel: '每页条数'
   },
   table: {
+    summaryText: '合计',
+    filterApplyText: '应用筛选',
+    columnDragAriaLabel: '拖动列',
+    exportPageText: '导出本页',
+    exportSelectedText: '导出选中项',
+    exportAllText: '导出全部',
     emptyText: '暂无数据',
     loadingText: '加载中',
     expandText: '展开',
@@ -333,6 +357,11 @@ export const zhCN: TigerLocale = {
   },
   datePicker: ZH_CN_DATEPICKER_LOCALE,
   timePicker: {
+    invalidTimeText: '请输入有效时间。',
+    unavailableTimeText: '该时间不可用。',
+    missingTimeText: '请选择时间。',
+    missingStartText: '请选择开始时间。',
+    missingEndText: '请选择结束时间。',
     hour: '时',
     minute: '分',
     second: '秒',
@@ -348,6 +377,10 @@ export const zhCN: TigerLocale = {
     selectTimeRange: '请选择时间范围'
   },
   formWizard: {
+    leaveStepTitle: '离开此步骤',
+    leaveStepMessage: '当前步骤有未保存的修改',
+    stayText: '留在此步骤',
+    leaveText: '离开',
     prevText: '上一步',
     nextText: '下一步',
     finishText: '完成',
@@ -368,6 +401,7 @@ export const zhCN: TigerLocale = {
     loadErrorText: '无法加载这次引导。'
   },
   calendar: {
+    weekNumberText: '周',
     previousMonth: '上个月',
     nextMonth: '下个月',
     previousYear: '上一年',
@@ -381,6 +415,12 @@ export const zhCN: TigerLocale = {
     exitAriaLabel: '退出全屏'
   },
   fileManager: {
+    downloadText: '下载',
+    newFolderText: '新建文件夹',
+    previewText: '预览',
+    renameText: '重命名',
+    deleteText: '删除',
+    uploadText: '上传',
     rootText: '根目录',
     pathAriaLabel: '文件路径',
     listboxAriaLabel: '文件列表',
@@ -389,6 +429,9 @@ export const zhCN: TigerLocale = {
     resultCountText: '{count} 项'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: '水平翻转',
+    downloadAriaLabel: '下载当前图片',
+    originalSizeAriaLabel: '原始尺寸',
     dialogAriaLabel: '图片查看器',
     previewDialogAriaLabel: '图片预览',
     closeAriaLabel: '关闭',
@@ -403,6 +446,11 @@ export const zhCN: TigerLocale = {
     previewImageAriaLabel: '第 {index} 张，共 {total} 张'
   },
   imageEditor: {
+    cropAspectAriaLabel: '裁剪比例',
+    cropFreeText: '自由',
+    cropRotateText: '旋转',
+    cropFlipText: '翻转',
+    cropCircleText: '圆形',
     selectImageText: '选择图片',
     selectImageAriaLabel: '选择图片进行裁剪并上传',
     cropModalTitle: '裁剪图片',
@@ -471,6 +519,9 @@ export const zhCN: TigerLocale = {
     messageListAriaLabel: '消息列表'
   },
   code: {
+    wrapLabel: '自动换行',
+    nowrapLabel: '不换行',
+    languageLabel: '语言',
     copyLabel: '复制',
     copiedLabel: '已复制',
     copyFailedLabel: '复制失败',
@@ -519,6 +570,10 @@ export const zhCN: TigerLocale = {
     unreadCountText: '{count} 条未读'
   },
   select: {
+    maxCountText: '最多选择 {count} 项',
+    collapsedTagsText: '还有 {names}',
+    selectAllText: '全选当前结果',
+    invalidValueText: '此值无法显示。',
     doneText: '完成',
     placeholder: '请选择',
     emptyText: '暂无选项',
@@ -541,6 +596,9 @@ export const zhCN: TigerLocale = {
     collapseAriaLabel: '收起'
   },
   colorPicker: {
+    eyedropperText: '吸管',
+    recentColorsText: '最近使用',
+    invalidValueText: '请输入有效颜色。',
     trigger: '选择颜色',
     panelTitle: '颜色',
     clear: '清空',
@@ -570,6 +628,7 @@ export const zhCN: TigerLocale = {
     valueText: '{value} 星'
   },
   avatarGroup: {
+    overflowListAriaLabel: '折叠的成员',
     ariaLabel: '头像组',
     overflowAriaLabel: '还有 {count} 位'
   },
@@ -586,6 +645,8 @@ export const zhCN: TigerLocale = {
     slideAriaLabel: '第 {index} 张，共 {total} 张'
   },
   transfer: {
+    pageText: '第 {page} 页',
+    hiddenSelectedText: '{count} 个已选项被搜索隐藏',
     sourceTitle: '源列表',
     targetTitle: '目标列表',
     searchAriaLabel: '搜索{title}',
@@ -595,6 +656,7 @@ export const zhCN: TigerLocale = {
     selectAllAriaLabel: '全选{title}'
   },
   chart: {
+    exportText: '导出图表',
     legendAriaLabel: '图表图例',
     pointAriaLabel: '第 {index} 个点：({x}, {y})',
     seriesName: '系列 {index}',
@@ -626,10 +688,15 @@ export const zhCN: TigerLocale = {
     gaugeChartAriaLabel: '仪表盘'
   },
   codeEditor: {
+    findText: '查找',
+    replaceText: '替换',
+    bracketMatchText: '括号配对',
+    replaceAllText: '全部替换',
     editorAriaLabel: '代码编辑器'
   },
 
   markdownEditor: {
+    contentsText: '目录',
     formattingToolbarAriaLabel: 'Markdown 格式工具栏',
     modeToolbarAriaLabel: 'Markdown 视图模式',
     editorAriaLabel: 'Markdown 编辑器',
@@ -664,6 +731,8 @@ export const zhCN: TigerLocale = {
     placeholderTable: '| 列 | 值 |\n| --- | --- |\n| 名称 | Tigercat |'
   },
   richTextEditor: {
+    previewText: '预览',
+    tableText: '表格',
     formattingToolbarAriaLabel: '富文本格式工具栏',
     editorAriaLabel: '富文本编辑器',
     bold: '加粗',
@@ -687,6 +756,16 @@ export const zhCN: TigerLocale = {
     imagePrompt: '输入图片地址'
   },
   cronEditor: {
+    summaryEveryMinute: '每分钟',
+    summaryEveryHour: '每小时',
+    summaryEveryMonth: '每月',
+    summarySentence: '执行时间：{minute}，{hour}，{day}，{month}。',
+    summaryField: '{field}：{value}',
+    summaryEveryDay: '每天',
+    summaryStep: '每隔 {step}',
+    summaryRangeStep: '{start}–{end}，每隔 {step}',
+    summaryOr: '{left} 或 {right}',
+    nextRunText: '下一次 {time}',
     ariaLabel: 'Cron 表达式编辑器',
     expressionAriaLabel: 'Cron 表达式',
     presetAriaLabel: 'Cron 预设',
@@ -721,6 +800,7 @@ export const zhCN: TigerLocale = {
     invalidFieldError: '{field}必须是 *、数字、范围、步长或逗号列表'
   },
   formValidation: {
+    errorSummary: '请修正以下错误',
     required: '此字段为必填项',
     typeString: '值必须是字符串',
     typeNumber: '值必须是数字',
@@ -747,6 +827,7 @@ export const zhCN: TigerLocale = {
     slotLabel: '第 {index} 位，共 {total} 位'
   },
   tagsInput: {
+    rejectedText: '{tag} 未添加',
     removeTagLabel: '移除 {tag}',
     clearAllLabel: '清空全部标签',
     duplicateText: '已经添加',
@@ -763,16 +844,21 @@ export const zhCN: TigerLocale = {
     emptyAriaValueText: '空'
   },
   slider: {
+    valueText: '当前值 {value}',
     ariaLabel: '滑块',
     minAriaLabel: '最小值',
     maxAriaLabel: '最大值'
   },
   signature: {
+    hasStrokesText: '已有笔画',
+    redoText: '重做',
+    invalidValueText: '此签名无法显示。',
     ariaLabel: '签名板',
     undoText: '撤销',
     clearText: '清除'
   },
   numberKeyboard: {
+    invalidValueText: '此值不符合键盘模式，已清空。',
     ariaLabel: '数字键盘',
     deleteText: '删除',
     decimalAriaLabel: '小数点',
@@ -809,6 +895,7 @@ export const zhCN: TigerLocale = {
     errorStatus: '错误'
   },
   tree: {
+    directoryText: '目录',
     ariaLabel: '树',
     selectNode: '选择{label}',
     expand: '展开',

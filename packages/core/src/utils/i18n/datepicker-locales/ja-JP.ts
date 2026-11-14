@@ -3,6 +3,10 @@ import type { DatePickerLocalePreset } from '../../../types/datepicker'
 export const JA_JP_DATEPICKER_LOCALE: DatePickerLocalePreset = {
   locale: 'ja-JP',
   labels: {
+    invalidDateText: '有効な日付を入力してください。',
+    unavailableDateText: 'その日付は選択できません。',
+    missingStartText: '開始日を選択してください。',
+    missingEndText: '終了日を選択してください。',
     placeholder: '日付を選択',
     rangePlaceholder: '期間を選択',
     today: '今日',

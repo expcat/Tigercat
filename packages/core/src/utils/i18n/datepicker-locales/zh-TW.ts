@@ -3,6 +3,10 @@ import type { DatePickerLocalePreset } from '../../../types/datepicker'
 export const ZH_TW_DATEPICKER_LOCALE: DatePickerLocalePreset = {
   locale: 'zh-TW',
   labels: {
+    invalidDateText: '請輸入有效日期。',
+    unavailableDateText: '該日期無法使用。',
+    missingStartText: '請選擇開始日期。',
+    missingEndText: '請選擇結束日期。',
     placeholder: '請選擇日期',
     rangePlaceholder: '請選擇日期範圍',
     today: '今天',

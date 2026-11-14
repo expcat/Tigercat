@@ -1,16 +1,19 @@
-import { defineComponent, h, ref, type PropType } from 'vue'
+import { computed, defineComponent, h, ref, type PropType } from 'vue'
 import {
   getW9DataLabels,
+  getTableLabels,
   resolveFormattedExportRows,
   resolveTableSelectLoadedKeys,
   selectionAnnouncement,
   shiftSelectTableKeys,
+  type TigerLocale,
   type TableColumn
 } from '@expcat/tigercat-core'
 
 export const TableW9Panel = defineComponent({
   name: 'TigerTableW9Panel',
   props: {
+    locale: { type: Object as PropType<Partial<TigerLocale>>, default: undefined },
     active: { type: Boolean, default: false },
     columns: { type: Array as PropType<TableColumn[]>, default: () => [] },
     sorts: {
@@ -48,10 +51,15 @@ export const TableW9Panel = defineComponent({
     const previousCount = ref<number | null>(null)
     const live = ref('')
     const exportText = ref('')
-    const labels = getW9DataLabels()
+    const labels = computed(() => getW9DataLabels(props.locale))
+    const tableLabels = computed(() => getTableLabels(props.locale))
 
     function announce(keys: (string | number)[]) {
-      const text = selectionAnnouncement(previousCount.value, keys.length, labels.selectionCount)
+      const text = selectionAnnouncement(
+        previousCount.value,
+        keys.length,
+        labels.value.selectionCount
+      )
       previousCount.value = keys.length
       if (text) live.value = text
       props.onSelection?.(keys, live.value)
@@ -72,13 +80,13 @@ export const TableW9Panel = defineComponent({
           },
           [
             h('input', {
-              'aria-label': labels.filterMenu,
+              'aria-label': labels.value.filterMenu,
               value: draft.value,
               onInput: (event: Event) => {
                 draft.value = (event.target as HTMLInputElement).value
               }
             }),
-            h('button', { type: 'submit' }, labels.filterApply)
+            h('button', { type: 'submit' }, labels.value.filterApply)
           ]
         ),
         ...props.columns.map((column) =>
@@ -112,7 +120,7 @@ export const TableW9Panel = defineComponent({
             key: `resize-${column.key}`,
             type: 'range',
             'data-tiger-resize': column.key,
-            'aria-label': labels.columnDragHandle,
+            'aria-label': labels.value.columnDragHandle,
             min: '40',
             max: '400',
             value: '120',
@@ -131,7 +139,7 @@ export const TableW9Panel = defineComponent({
               announce(props.pageKeys.filter((key) => !disabled.has(String(key))))
             }
           },
-          labels.selectThisPage
+          labels.value.selectThisPage
         ),
         h(
           'button',
@@ -152,7 +160,7 @@ export const TableW9Panel = defineComponent({
               announce(result.keys)
             }
           },
-          labels.selectLoadedRows
+          labels.value.selectLoadedRows
         ),
         h(
           'button',
@@ -161,7 +169,7 @@ export const TableW9Panel = defineComponent({
             'data-tiger-select-remote': '',
             onClick: () => props.onRemoteSelect?.()
           },
-          labels.selectAllRemote
+          labels.value.selectAllRemote
         ),
         ...props.pageKeys.map((key) =>
           h(
@@ -209,7 +217,11 @@ export const TableW9Panel = defineComponent({
                 exportText.value = formatted.rows.map((row) => row.join(',')).join('\n')
               }
             },
-            scope
+            {
+              page: tableLabels.value.exportPageText,
+              selected: tableLabels.value.exportSelectedText,
+              all: tableLabels.value.exportAllText
+            }[scope]
           )
         ),
         h('div', { role: 'status', 'data-tiger-selection-live': '' }, live.value),

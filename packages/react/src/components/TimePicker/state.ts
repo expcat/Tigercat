@@ -20,6 +20,7 @@ import {
   getLocaleDirection,
   getTimePeriodLabels,
   getTimePickerLabels,
+  resolveTimePickerError,
   isSameTimePickerValue,
   isTimePickerValueEmpty,
   mergeAriaDescribedBy,
@@ -229,10 +230,11 @@ export function useTimePickerController(props: TimePickerProps) {
 
   const reportError = useCallback(
     (reason: string) => {
-      setValidationMessage(reason)
-      formItemControl?.setError?.(reason)
+      const message = resolveTimePickerError(reason, labels)
+      setValidationMessage(message)
+      formItemControl?.setError?.(message)
     },
-    [formItemControl]
+    [formItemControl, labels]
   )
 
   const clearError = useCallback(() => {

@@ -16,7 +16,6 @@ import {
   isSplitterRtl,
   jumpSplitterGutter,
   collapseSplitterSizes,
-  feedbackLayoutLabels,
   layoutDeclaredPanes,
   measureSplitterContainer,
   mergeStyleValues,
@@ -302,13 +301,13 @@ export const Splitter = defineComponent({
                       'data-tiger-splitter-collapse': String(i),
                       'aria-label':
                         collapsedPrevious.value[i] != null
-                          ? feedbackLayoutLabels.splitterExpand
-                          : feedbackLayoutLabels.splitterCollapse,
+                          ? labels.value.expandText
+                          : labels.value.collapseText,
                       onClick: () => toggleCollapse(i)
                     },
                     collapsedPrevious.value[i] != null
-                      ? feedbackLayoutLabels.splitterExpand
-                      : feedbackLayoutLabels.splitterCollapse
+                      ? labels.value.expandText
+                      : labels.value.collapseText
                   ),
                   collapsedPrevious.value[i] != null ? null : child
                 ]

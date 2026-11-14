@@ -3,6 +3,10 @@ import type { DatePickerLocalePreset } from '../../../types/datepicker'
 export const TH_TH_DATEPICKER_LOCALE: DatePickerLocalePreset = {
   locale: 'th-TH',
   labels: {
+    invalidDateText: 'ป้อนวันที่ที่ถูกต้อง',
+    unavailableDateText: 'ไม่สามารถเลือกวันที่นี้ได้',
+    missingStartText: 'เลือกวันที่เริ่มต้น',
+    missingEndText: 'เลือกวันที่สิ้นสุด',
     placeholder: 'เลือกวันที่',
     rangePlaceholder: 'เลือกช่วงวันที่',
     today: 'วันนี้',

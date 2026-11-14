@@ -4,6 +4,12 @@
 
 ## v3.0.1（未发布）
 
+W9 辅助文案现在遵守标准覆盖顺序：组件 `labels` → 组件 `locale` → ConfigProvider → en-US。Select 全选、AvatarGroup 折叠名单、菜单危险提示、表格 / 图表工具、输入错误等会随 Provider 语言变化；zhTW 使用繁体，WorkflowDesigner 的重复 key 校验使用对应语言。
+
+`basicLabel`、`getW9FormLabels`、`getW9DataLabels`、`dragMoveAnnouncement` 以及 AssigneePicker / NotificationBell 的 `locale` 改为接收语言对象。将 `'zh-CN'` 等字符串替换为从 `@expcat/tigercat-core/locales/zh-CN` 导入的 `zhCN`，或传入已合并的 `Partial<TigerLocale>`；仅传 `{ locale: 'zh-CN' }` 不加载词典。新增的 `getNavLabels` / `getFeedbackLayoutLabels` 同样接收语言对象，原常量仍表示默认英语。
+
+Cron 的说明与下次执行时间现在本地化；`0-59` 保留 `0–59`，不再展开为 60 个数字。摘要支持指定值、逗号列表、范围及步长，并保留日期和星期同时受限时的 OR 语义。覆盖摘要请使用 `cronEditor.summary*` 和 `nextRunText` 模板。
+
 主题过渡的每个属性现在分别使用配置的时长和缓动。`getTransitionClasses()` 仅设置 easing 时保留预设时长，`collapse` 的默认与自定义时长路径都包含 `max-height` 过渡。
 
 运行时及嵌套主题 scope 现在持续遵守减少动效、增强对比度和强制色彩偏好；辅助媒体变量优先于普通主题变量，主题应用、切换或释放不会取消这些偏好。

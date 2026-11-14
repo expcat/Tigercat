@@ -9,7 +9,16 @@ export const koKR: TigerLocale = {
   locale: 'ko-KR',
   direction: 'ltr',
   datePicker: KO_KR_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: '디렉터리가 비어 있습니다',
+    listAriaLabel: '담당자'
+  },
   common: {
+    countdownTargetText: '목표 시간에 따른 카운트다운',
+    dangerText: '위험한 작업',
+    sidebarCollapseText: '사이드바 접기',
+    sidebarExpandText: '사이드바 펼치기',
+    dragMoveText: '항목 {from}에서 항목 {to}(으)로',
     okText: '확인',
     cancelText: '취소',
     closeText: '닫기',
@@ -41,6 +50,7 @@ export const koKR: TigerLocale = {
     dialogAriaLabel: '대화 상자'
   },
   drawer: {
+    resizeAriaLabel: '드로어 크기 조절',
     closeAriaLabel: '닫기',
     dialogAriaLabel: '서랍'
   },
@@ -48,6 +58,7 @@ export const koKR: TigerLocale = {
     closeAriaLabel: '알림 닫기'
   },
   qrcode: {
+    scannedText: '스캔됨',
     ariaLabel: 'QR 코드',
     expiredText: 'QR 코드가 만료되었습니다',
     refreshText: '새로 고침',
@@ -58,6 +69,8 @@ export const koKR: TigerLocale = {
     ariaLabel: '스크롤 콘텐츠'
   },
   image: {
+    galleryListAriaLabel: '미리 보기 이미지',
+    galleryOpenAriaLabel: '미리 보기 열기',
     previewAriaLabel: '{alt} 미리보기',
     previewFallbackAlt: '이미지',
     groupAriaLabel: '이미지 그룹',
@@ -175,6 +188,7 @@ export const koKR: TigerLocale = {
     assigneeRequired: '담당자를 선택하세요'
   },
   workflowDesigner: {
+    validationDuplicateKey: '각 노드 키는 고유해야 합니다',
     ariaLabel: '워크플로 설계기',
     addStep: '단계 추가',
     addChild: '하위 단계 추가',
@@ -252,12 +266,15 @@ export const koKR: TigerLocale = {
     ariaLabel: '진행률'
   },
   splitter: {
+    expandText: '패널 펼치기',
+    collapseText: '패널 접기',
     gutterAriaLabel: '패널 {index} 크기 조절'
   },
   resizable: {
     handleAriaLabel: '{handle} 크기 조절'
   },
   upload: {
+    selectDirectoryText: '폴더 선택',
     dragAreaAriaLabel: '클릭하거나 끌어다 놓아 파일 업로드',
     buttonAriaLabel: '파일 업로드',
     clickToUploadText: '클릭하여 업로드',
@@ -276,6 +293,7 @@ export const koKR: TigerLocale = {
     singleFileText: '첫 번째 파일만 유지했습니다.'
   },
   pagination: {
+    jumpToPageAriaLabel: '페이지로 이동',
     totalText: '총 {total}개',
     itemsPerPageText: '개/페이지',
     jumpToText: '이동',
@@ -288,6 +306,12 @@ export const koKR: TigerLocale = {
     pageSizeAriaLabel: '페이지당 항목 수'
   },
   table: {
+    summaryText: '합계',
+    filterApplyText: '필터 적용',
+    columnDragAriaLabel: '열 끌기',
+    exportPageText: '현재 페이지 내보내기',
+    exportSelectedText: '선택 항목 내보내기',
+    exportAllText: '모두 내보내기',
     emptyText: '데이터 없음',
     loadingText: '로딩 중',
     expandText: '펼치기',
@@ -333,6 +357,11 @@ export const koKR: TigerLocale = {
     errorText: '내보내기 실패'
   },
   timePicker: {
+    invalidTimeText: '올바른 시간을 입력하세요.',
+    unavailableTimeText: '선택할 수 없는 시간입니다.',
+    missingTimeText: '시간을 선택하세요.',
+    missingStartText: '시작 시간을 선택하세요.',
+    missingEndText: '종료 시간을 선택하세요.',
     hour: '시',
     minute: '분',
     second: '초',
@@ -348,6 +377,10 @@ export const koKR: TigerLocale = {
     selectTimeRange: '시간 범위 선택'
   },
   formWizard: {
+    leaveStepTitle: '이 단계 나가기',
+    leaveStepMessage: '이 단계에 저장되지 않은 변경 사항이 있습니다',
+    stayText: '이 단계에 머무르기',
+    leaveText: '나가기',
     prevText: '이전',
     nextText: '다음',
     finishText: '완료',
@@ -368,6 +401,7 @@ export const koKR: TigerLocale = {
     loadErrorText: '이 투어를 불러오지 못했습니다.'
   },
   calendar: {
+    weekNumberText: '주',
     previousMonth: '이전 달',
     nextMonth: '다음 달',
     previousYear: '이전 해',
@@ -381,6 +415,12 @@ export const koKR: TigerLocale = {
     exitAriaLabel: '전체 화면 종료'
   },
   fileManager: {
+    downloadText: '다운로드',
+    newFolderText: '새 폴더',
+    previewText: '미리 보기',
+    renameText: '이름 바꾸기',
+    deleteText: '삭제',
+    uploadText: '업로드',
     rootText: '루트',
     pathAriaLabel: '파일 경로',
     listboxAriaLabel: '파일',
@@ -389,6 +429,9 @@ export const koKR: TigerLocale = {
     resultCountText: '{count}개'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: '좌우 뒤집기',
+    downloadAriaLabel: '현재 이미지 다운로드',
+    originalSizeAriaLabel: '원래 크기',
     dialogAriaLabel: '이미지 뷰어',
     previewDialogAriaLabel: '이미지 미리보기',
     closeAriaLabel: '닫기',
@@ -403,6 +446,11 @@ export const koKR: TigerLocale = {
     previewImageAriaLabel: '이미지 {index} / {total}'
   },
   imageEditor: {
+    cropAspectAriaLabel: '자르기 비율',
+    cropFreeText: '자유',
+    cropRotateText: '회전',
+    cropFlipText: '뒤집기',
+    cropCircleText: '원형',
     selectImageText: '이미지 선택',
     selectImageAriaLabel: '잘라 업로드할 이미지 선택',
     cropModalTitle: '이미지 자르기',
@@ -471,6 +519,9 @@ export const koKR: TigerLocale = {
     messageListAriaLabel: '메시지 목록'
   },
   code: {
+    wrapLabel: '줄 바꿈',
+    nowrapLabel: '줄 바꿈 안 함',
+    languageLabel: '언어',
     copyLabel: '복사',
     copiedLabel: '복사됨',
     copyFailedLabel: '복사 실패',
@@ -519,6 +570,10 @@ export const koKR: TigerLocale = {
     unreadCountText: '읽지 않음 {count}개'
   },
   select: {
+    maxCountText: '최대 {count}개 선택',
+    collapsedTagsText: '그 외 {names}',
+    selectAllText: '필터링된 항목 모두 선택',
+    invalidValueText: '이 값을 표시할 수 없습니다.',
     doneText: '완료',
     placeholder: '옵션 선택',
     emptyText: '옵션 없음',
@@ -541,6 +596,9 @@ export const koKR: TigerLocale = {
     collapseAriaLabel: '접기'
   },
   colorPicker: {
+    eyedropperText: '스포이트',
+    recentColorsText: '최근 사용',
+    invalidValueText: '올바른 색상을 입력하세요.',
     trigger: '색 선택',
     panelTitle: '색상',
     clear: '지우기',
@@ -570,6 +628,7 @@ export const koKR: TigerLocale = {
     valueText: '{value}점'
   },
   avatarGroup: {
+    overflowListAriaLabel: '숨겨진 구성원',
     ariaLabel: '아바타 그룹',
     overflowAriaLabel: '{count}명 더보기'
   },
@@ -586,6 +645,8 @@ export const koKR: TigerLocale = {
     slideAriaLabel: '슬라이드 {index} / {total}'
   },
   transfer: {
+    pageText: '{page} 페이지',
+    hiddenSelectedText: '선택한 {count}개 항목이 검색으로 숨겨짐',
     sourceTitle: '소스',
     targetTitle: '대상',
     searchAriaLabel: '{title} 검색',
@@ -595,6 +656,7 @@ export const koKR: TigerLocale = {
     selectAllAriaLabel: '{title} 모두 선택'
   },
   chart: {
+    exportText: '차트 내보내기',
     legendAriaLabel: '차트 범례',
     pointAriaLabel: '포인트 {index}: ({x}, {y})',
     seriesName: '시리즈 {index}',
@@ -626,10 +688,15 @@ export const koKR: TigerLocale = {
     gaugeChartAriaLabel: '게이지'
   },
   codeEditor: {
+    findText: '찾기',
+    replaceText: '바꾸기',
+    bracketMatchText: '일치하는 괄호',
+    replaceAllText: '모두 바꾸기',
     editorAriaLabel: '코드 편집기'
   },
 
   markdownEditor: {
+    contentsText: '목차',
     formattingToolbarAriaLabel: 'Markdown 서식',
     modeToolbarAriaLabel: 'Markdown 보기 모드',
     editorAriaLabel: 'Markdown 편집기',
@@ -664,6 +731,8 @@ export const koKR: TigerLocale = {
     placeholderTable: '| 열 | 값 |\n| --- | --- |\n| 이름 | Tigercat |'
   },
   richTextEditor: {
+    previewText: '미리 보기',
+    tableText: '표',
     formattingToolbarAriaLabel: '텍스트 서식',
     editorAriaLabel: '서식 있는 텍스트 편집기',
     bold: '굵게',
@@ -687,6 +756,16 @@ export const koKR: TigerLocale = {
     imagePrompt: '이미지 URL 입력'
   },
   cronEditor: {
+    summaryEveryMinute: '매분',
+    summaryEveryHour: '매시간',
+    summaryEveryMonth: '매월',
+    summarySentence: '실행 시간: {minute}, {hour}, {day}, {month}.',
+    summaryField: '{field}: {value}',
+    summaryEveryDay: '매일',
+    summaryStep: '{step} 간격',
+    summaryRangeStep: '{start}–{end}, {step} 간격',
+    summaryOr: '{left} 또는 {right}',
+    nextRunText: '다음 {time}',
     ariaLabel: 'Cron 편집기',
     expressionAriaLabel: 'Cron 식',
     presetAriaLabel: 'Cron 프리셋',
@@ -721,6 +800,7 @@ export const koKR: TigerLocale = {
     invalidFieldError: '{field}은(는) *, 숫자, 범위, 간격 또는 쉼표 목록이어야 합니다'
   },
   formValidation: {
+    errorSummary: '다음 오류를 수정하세요',
     required: '이 항목은 필수입니다',
     typeString: '문자열이어야 합니다',
     typeNumber: '숫자여야 합니다',
@@ -747,6 +827,7 @@ export const koKR: TigerLocale = {
     slotLabel: '총 {total}자 중 {index}번째'
   },
   tagsInput: {
+    rejectedText: '{tag}이(가) 추가되지 않았습니다',
     removeTagLabel: '{tag} 제거',
     clearAllLabel: '모든 태그 지우기',
     duplicateText: '이미 추가됨',
@@ -763,16 +844,21 @@ export const koKR: TigerLocale = {
     emptyAriaValueText: '비어 있음'
   },
   slider: {
+    valueText: '값 {value}',
     ariaLabel: '슬라이더',
     minAriaLabel: '최솟값',
     maxAriaLabel: '최댓값'
   },
   signature: {
+    hasStrokesText: '획이 있습니다',
+    redoText: '다시 실행',
+    invalidValueText: '이 서명을 표시할 수 없습니다.',
     ariaLabel: '서명 패드',
     undoText: '실행 취소',
     clearText: '지우기'
   },
   numberKeyboard: {
+    invalidValueText: '키보드 모드와 맞지 않아 값이 지워졌습니다.',
     ariaLabel: '숫자 키보드',
     deleteText: '삭제',
     decimalAriaLabel: '소수점',
@@ -809,6 +895,7 @@ export const koKR: TigerLocale = {
     errorStatus: '오류'
   },
   tree: {
+    directoryText: '디렉터리',
     ariaLabel: '트리',
     selectNode: '{label} 선택',
     expand: '펼치기',

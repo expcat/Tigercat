@@ -9,7 +9,16 @@ export const arSA: TigerLocale = {
   locale: 'ar-SA',
   direction: 'rtl',
   datePicker: AR_SA_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: 'الدليل فارغ',
+    listAriaLabel: 'المكلفون'
+  },
   common: {
+    countdownTargetText: 'يتبع العد التنازلي الوقت المستهدف',
+    dangerText: 'إجراء خطير',
+    sidebarCollapseText: 'طي الشريط الجانبي',
+    sidebarExpandText: 'توسيع الشريط الجانبي',
+    dragMoveText: 'من العنصر {from} إلى العنصر {to}',
     okText: 'موافق',
     cancelText: 'إلغاء',
     closeText: 'إغلاق',
@@ -41,6 +50,7 @@ export const arSA: TigerLocale = {
     dialogAriaLabel: 'حوار'
   },
   drawer: {
+    resizeAriaLabel: 'تغيير حجم الدرج',
     closeAriaLabel: 'إغلاق',
     dialogAriaLabel: 'درج'
   },
@@ -48,6 +58,7 @@ export const arSA: TigerLocale = {
     closeAriaLabel: 'إغلاق التنبيه'
   },
   qrcode: {
+    scannedText: 'تم المسح',
     ariaLabel: 'رمز QR',
     expiredText: 'انتهت صلاحية رمز QR',
     refreshText: 'تحديث',
@@ -58,6 +69,8 @@ export const arSA: TigerLocale = {
     ariaLabel: 'محتوى التمرير'
   },
   image: {
+    galleryListAriaLabel: 'الصور المصغرة',
+    galleryOpenAriaLabel: 'فتح المعاينة',
     previewAriaLabel: 'معاينة {alt}',
     previewFallbackAlt: 'صورة',
     groupAriaLabel: 'مجموعة الصور',
@@ -175,6 +188,7 @@ export const arSA: TigerLocale = {
     assigneeRequired: 'اختر المكلف أولاً'
   },
   workflowDesigner: {
+    validationDuplicateKey: 'يجب أن يكون مفتاح كل عقدة فريدًا',
     ariaLabel: 'مصمم سير العمل',
     addStep: 'إضافة خطوة',
     addChild: 'إضافة خطوة فرعية',
@@ -252,12 +266,15 @@ export const arSA: TigerLocale = {
     ariaLabel: 'التقدم'
   },
   splitter: {
+    expandText: 'توسيع اللوحة',
+    collapseText: 'طي اللوحة',
     gutterAriaLabel: 'تغيير حجم الأجزاء {index}'
   },
   resizable: {
     handleAriaLabel: 'تغيير الحجم {handle}'
   },
   upload: {
+    selectDirectoryText: 'اختيار مجلد',
     dragAreaAriaLabel: 'رفع ملف بالنقر أو السحب',
     buttonAriaLabel: 'رفع ملف',
     clickToUploadText: 'انقر للرفع',
@@ -276,6 +293,7 @@ export const arSA: TigerLocale = {
     singleFileText: 'تم الاحتفاظ بالملف الأول فقط.'
   },
   pagination: {
+    jumpToPageAriaLabel: 'انتقل إلى الصفحة',
     totalText: 'الإجمالي {total} عنصرًا',
     itemsPerPageText: '/ صفحة',
     jumpToText: 'انتقل إلى',
@@ -288,6 +306,12 @@ export const arSA: TigerLocale = {
     pageSizeAriaLabel: 'عناصر لكل صفحة'
   },
   table: {
+    summaryText: 'الإجمالي',
+    filterApplyText: 'تطبيق عامل التصفية',
+    columnDragAriaLabel: 'سحب العمود',
+    exportPageText: 'تصدير الصفحة',
+    exportSelectedText: 'تصدير المحدد',
+    exportAllText: 'تصدير الكل',
     emptyText: 'لا توجد بيانات',
     loadingText: 'جار التحميل',
     expandText: 'توسيع',
@@ -333,6 +357,11 @@ export const arSA: TigerLocale = {
     errorText: 'فشل التصدير'
   },
   timePicker: {
+    invalidTimeText: 'أدخل وقتًا صالحًا.',
+    unavailableTimeText: 'هذا الوقت غير متاح.',
+    missingTimeText: 'اختر وقتًا.',
+    missingStartText: 'اختر وقت البدء.',
+    missingEndText: 'اختر وقت الانتهاء.',
     hour: 'ساعة',
     minute: 'دقيقة',
     second: 'ثانية',
@@ -348,6 +377,10 @@ export const arSA: TigerLocale = {
     selectTimeRange: 'اختر نطاق الوقت'
   },
   formWizard: {
+    leaveStepTitle: 'مغادرة هذه الخطوة',
+    leaveStepMessage: 'تحتوي هذه الخطوة على تغييرات غير محفوظة',
+    stayText: 'البقاء في هذه الخطوة',
+    leaveText: 'مغادرة',
     prevText: 'السابق',
     nextText: 'التالي',
     finishText: 'إنهاء',
@@ -368,6 +401,7 @@ export const arSA: TigerLocale = {
     loadErrorText: 'تعذر تحميل هذه الجولة.'
   },
   calendar: {
+    weekNumberText: 'الأسبوع',
     previousMonth: 'الشهر السابق',
     nextMonth: 'الشهر التالي',
     previousYear: 'السنة السابقة',
@@ -381,6 +415,12 @@ export const arSA: TigerLocale = {
     exitAriaLabel: 'إنهاء ملء الشاشة'
   },
   fileManager: {
+    downloadText: 'تنزيل',
+    newFolderText: 'مجلد جديد',
+    previewText: 'معاينة',
+    renameText: 'إعادة تسمية',
+    deleteText: 'حذف',
+    uploadText: 'رفع',
     rootText: 'الجذر',
     pathAriaLabel: 'مسار الملف',
     listboxAriaLabel: 'الملفات',
@@ -389,6 +429,9 @@ export const arSA: TigerLocale = {
     resultCountText: '{count} عناصر'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: 'قلب أفقي',
+    downloadAriaLabel: 'تنزيل الصورة الحالية',
+    originalSizeAriaLabel: 'الحجم الأصلي',
     dialogAriaLabel: 'عارض الصور',
     previewDialogAriaLabel: 'معاينة الصورة',
     closeAriaLabel: 'إغلاق',
@@ -403,6 +446,11 @@ export const arSA: TigerLocale = {
     previewImageAriaLabel: 'صورة {index} من {total}'
   },
   imageEditor: {
+    cropAspectAriaLabel: 'نسبة الاقتصاص',
+    cropFreeText: 'حر',
+    cropRotateText: 'تدوير',
+    cropFlipText: 'قلب',
+    cropCircleText: 'دائرة',
     selectImageText: 'اختر صورة',
     selectImageAriaLabel: 'اختر صورة للقص والرفع',
     cropModalTitle: 'قص الصورة',
@@ -471,6 +519,9 @@ export const arSA: TigerLocale = {
     messageListAriaLabel: 'قائمة الرسائل'
   },
   code: {
+    wrapLabel: 'التفاف السطور',
+    nowrapLabel: 'دون التفاف',
+    languageLabel: 'اللغة',
     copyLabel: 'نسخ',
     copiedLabel: 'تم النسخ',
     copyFailedLabel: 'فشل النسخ',
@@ -519,6 +570,10 @@ export const arSA: TigerLocale = {
     unreadCountText: '{count} غير مقروء'
   },
   select: {
+    maxCountText: 'حدد {count} عناصر كحد أقصى',
+    collapsedTagsText: 'وأيضًا {names}',
+    selectAllText: 'تحديد النتائج',
+    invalidValueText: 'لا يمكن عرض هذه القيمة.',
     doneText: 'إنهاء',
     placeholder: 'اختر خياراً',
     emptyText: 'لا توجد خيارات',
@@ -541,6 +596,9 @@ export const arSA: TigerLocale = {
     collapseAriaLabel: 'طي'
   },
   colorPicker: {
+    eyedropperText: 'قطارة الألوان',
+    recentColorsText: 'المستخدمة مؤخرًا',
+    invalidValueText: 'أدخل لونًا صالحًا.',
     trigger: 'اختيار لون',
     panelTitle: 'اللون',
     clear: 'مسح',
@@ -570,6 +628,7 @@ export const arSA: TigerLocale = {
     valueText: '{value} نجوم'
   },
   avatarGroup: {
+    overflowListAriaLabel: 'الأعضاء المخفيون',
     ariaLabel: 'مجموعة الصور الرمزية',
     overflowAriaLabel: '{count} أكثر'
   },
@@ -586,6 +645,8 @@ export const arSA: TigerLocale = {
     slideAriaLabel: 'الشريحة {index} من {total}'
   },
   transfer: {
+    pageText: 'الصفحة {page}',
+    hiddenSelectedText: 'أخفى البحث {count} من العناصر المحددة',
     sourceTitle: 'المصدر',
     targetTitle: 'الهدف',
     searchAriaLabel: 'بحث {title}',
@@ -595,6 +656,7 @@ export const arSA: TigerLocale = {
     selectAllAriaLabel: 'تحديد الكل في {title}'
   },
   chart: {
+    exportText: 'تصدير المخطط',
     legendAriaLabel: 'مفتاح الرسم البياني',
     pointAriaLabel: 'النقطة {index}: ({x}, {y})',
     seriesName: 'السلسلة {index}',
@@ -626,10 +688,15 @@ export const arSA: TigerLocale = {
     gaugeChartAriaLabel: 'مقياس'
   },
   codeEditor: {
+    findText: 'بحث',
+    replaceText: 'استبدال',
+    bracketMatchText: 'القوس المطابق',
+    replaceAllText: 'استبدال الكل',
     editorAriaLabel: 'محرر التعليمات البرمجية'
   },
 
   markdownEditor: {
+    contentsText: 'المحتويات',
     formattingToolbarAriaLabel: 'تنسيق Markdown',
     modeToolbarAriaLabel: 'وضع عرض Markdown',
     editorAriaLabel: 'محرر Markdown',
@@ -664,6 +731,8 @@ export const arSA: TigerLocale = {
     placeholderTable: '| عمود | قيمة |\n| --- | --- |\n| اسم | Tigercat |'
   },
   richTextEditor: {
+    previewText: 'معاينة',
+    tableText: 'جدول',
     formattingToolbarAriaLabel: 'تنسيق النص',
     editorAriaLabel: 'محرر نص منسق',
     bold: 'عريض',
@@ -687,6 +756,16 @@ export const arSA: TigerLocale = {
     imagePrompt: 'أدخل رابط الصورة'
   },
   cronEditor: {
+    summaryEveryMinute: 'كل دقيقة',
+    summaryEveryHour: 'كل ساعة',
+    summaryEveryMonth: 'كل شهر',
+    summarySentence: 'يعمل عند {minute}، {hour}، {day}، {month}.',
+    summaryField: '{field}: {value}',
+    summaryEveryDay: 'كل يوم',
+    summaryStep: 'كل {step} وحدات',
+    summaryRangeStep: '{start}–{end}، كل {step} وحدات',
+    summaryOr: '{left} أو {right}',
+    nextRunText: 'التالي {time}',
     ariaLabel: 'محرر Cron',
     expressionAriaLabel: 'تعبير Cron',
     presetAriaLabel: 'إعداد مسبق لـ Cron',
@@ -721,6 +800,7 @@ export const arSA: TigerLocale = {
     invalidFieldError: 'يجب أن يكون {field} * أو رقمًا أو نطاقًا أو خطوة أو قائمة مفصولة بفواصل'
   },
   formValidation: {
+    errorSummary: 'صحح الأخطاء التالية',
     required: 'هذا الحقل مطلوب',
     typeString: 'يجب أن تكون القيمة نصًا',
     typeNumber: 'يجب أن تكون القيمة رقمًا',
@@ -747,6 +827,7 @@ export const arSA: TigerLocale = {
     slotLabel: 'الحرف {index} من {total}'
   },
   tagsInput: {
+    rejectedText: 'لم تتم إضافة {tag}',
     removeTagLabel: 'إزالة {tag}',
     clearAllLabel: 'مسح كل الوسوم',
     duplicateText: 'تمت الإضافة بالفعل',
@@ -763,16 +844,21 @@ export const arSA: TigerLocale = {
     emptyAriaValueText: 'فارغ'
   },
   slider: {
+    valueText: 'القيمة {value}',
     ariaLabel: 'شريط التمرير',
     minAriaLabel: 'الحد الأدنى',
     maxAriaLabel: 'الحد الأعلى'
   },
   signature: {
+    hasStrokesText: 'توجد خطوط',
+    redoText: 'إعادة',
+    invalidValueText: 'لا يمكن عرض هذا التوقيع.',
     ariaLabel: 'لوحة التوقيع',
     undoText: 'تراجع',
     clearText: 'مسح'
   },
   numberKeyboard: {
+    invalidValueText: 'تم مسح القيمة لأنها لا تطابق وضع لوحة المفاتيح.',
     ariaLabel: 'لوحة الأرقام',
     deleteText: 'حذف',
     decimalAriaLabel: 'فاصلة عشرية',
@@ -809,6 +895,7 @@ export const arSA: TigerLocale = {
     errorStatus: 'خطأ'
   },
   tree: {
+    directoryText: 'دليل',
     ariaLabel: 'الشجرة',
     selectNode: 'تحديد {label}',
     expand: 'توسيع',

@@ -9,7 +9,16 @@ export const zhTW: TigerLocale = {
   locale: 'zh-TW',
   direction: 'ltr',
   datePicker: ZH_TW_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: '目錄為空',
+    listAriaLabel: '受理人員'
+  },
   common: {
+    countdownTargetText: '倒數計時由目標時間控制',
+    dangerText: '危險操作',
+    sidebarCollapseText: '收合側欄',
+    sidebarExpandText: '展開側欄',
+    dragMoveText: '從第 {from} 項到第 {to} 項',
     okText: '確定',
     cancelText: '取消',
     closeText: '關閉',
@@ -41,6 +50,7 @@ export const zhTW: TigerLocale = {
     dialogAriaLabel: '對話框'
   },
   drawer: {
+    resizeAriaLabel: '調整抽屜大小',
     closeAriaLabel: '關閉',
     dialogAriaLabel: '抽屜'
   },
@@ -48,6 +58,7 @@ export const zhTW: TigerLocale = {
     closeAriaLabel: '關閉提示'
   },
   qrcode: {
+    scannedText: '已掃描',
     ariaLabel: 'QR 碼',
     expiredText: 'QR 碼已過期',
     refreshText: '重新整理',
@@ -58,6 +69,8 @@ export const zhTW: TigerLocale = {
     ariaLabel: '滾動內容'
   },
   image: {
+    galleryListAriaLabel: '縮圖',
+    galleryOpenAriaLabel: '開啟預覽',
     previewAriaLabel: '預覽 {alt}',
     previewFallbackAlt: '圖片',
     groupAriaLabel: '圖片組',
@@ -175,6 +188,7 @@ export const zhTW: TigerLocale = {
     assigneeRequired: '請選擇辦理人'
   },
   workflowDesigner: {
+    validationDuplicateKey: '每個節點的 key 必須唯一',
     ariaLabel: '流程設計器',
     addStep: '新增步驟',
     addChild: '新增子步驟',
@@ -252,12 +266,15 @@ export const zhTW: TigerLocale = {
     ariaLabel: '進度'
   },
   splitter: {
+    expandText: '展開面板',
+    collapseText: '收合面板',
     gutterAriaLabel: '調整分欄 {index}'
   },
   resizable: {
     handleAriaLabel: '調整大小：{handle}'
   },
   upload: {
+    selectDirectoryText: '選擇資料夾',
     dragAreaAriaLabel: '點擊或拖曳上傳檔案',
     buttonAriaLabel: '上傳檔案',
     clickToUploadText: '點擊上傳',
@@ -276,6 +293,7 @@ export const zhTW: TigerLocale = {
     singleFileText: '僅保留第一個檔案。'
   },
   pagination: {
+    jumpToPageAriaLabel: '跳轉至頁碼',
     totalText: '共 {total} 筆',
     itemsPerPageText: '筆/頁',
     jumpToText: '跳至',
@@ -288,6 +306,12 @@ export const zhTW: TigerLocale = {
     pageSizeAriaLabel: '每頁筆數'
   },
   table: {
+    summaryText: '合計',
+    filterApplyText: '套用篩選',
+    columnDragAriaLabel: '拖曳欄位',
+    exportPageText: '匯出本頁',
+    exportSelectedText: '匯出選取項目',
+    exportAllText: '匯出全部',
     emptyText: '暫無資料',
     loadingText: '載入中',
     expandText: '展開',
@@ -333,6 +357,11 @@ export const zhTW: TigerLocale = {
     errorText: '匯出失敗'
   },
   timePicker: {
+    invalidTimeText: '請輸入有效時間。',
+    unavailableTimeText: '該時間無法使用。',
+    missingTimeText: '請選擇時間。',
+    missingStartText: '請選擇開始時間。',
+    missingEndText: '請選擇結束時間。',
     hour: '時',
     minute: '分',
     second: '秒',
@@ -348,6 +377,10 @@ export const zhTW: TigerLocale = {
     selectTimeRange: '請選擇時間範圍'
   },
   formWizard: {
+    leaveStepTitle: '離開此步驟',
+    leaveStepMessage: '目前步驟有未儲存的修改',
+    stayText: '留在此步驟',
+    leaveText: '離開',
     prevText: '上一步',
     nextText: '下一步',
     finishText: '完成',
@@ -368,6 +401,7 @@ export const zhTW: TigerLocale = {
     loadErrorText: '無法載入這次導覽。'
   },
   calendar: {
+    weekNumberText: '週',
     previousMonth: '上個月',
     nextMonth: '下個月',
     previousYear: '上一年',
@@ -381,6 +415,12 @@ export const zhTW: TigerLocale = {
     exitAriaLabel: '結束全螢幕'
   },
   fileManager: {
+    downloadText: '下載',
+    newFolderText: '新增資料夾',
+    previewText: '預覽',
+    renameText: '重新命名',
+    deleteText: '刪除',
+    uploadText: '上傳',
     rootText: '根目錄',
     pathAriaLabel: '檔案路徑',
     listboxAriaLabel: '檔案列表',
@@ -389,6 +429,9 @@ export const zhTW: TigerLocale = {
     resultCountText: '{count} 項'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: '水平翻轉',
+    downloadAriaLabel: '下載目前圖片',
+    originalSizeAriaLabel: '原始尺寸',
     dialogAriaLabel: '圖片檢視器',
     previewDialogAriaLabel: '圖片預覽',
     closeAriaLabel: '關閉',
@@ -403,6 +446,11 @@ export const zhTW: TigerLocale = {
     previewImageAriaLabel: '第 {index} 張，共 {total} 張'
   },
   imageEditor: {
+    cropAspectAriaLabel: '裁切比例',
+    cropFreeText: '自由比例',
+    cropRotateText: '旋轉',
+    cropFlipText: '翻轉',
+    cropCircleText: '圓形',
     selectImageText: '選擇圖片',
     selectImageAriaLabel: '選擇圖片進行裁剪並上傳',
     cropModalTitle: '裁剪圖片',
@@ -471,6 +519,9 @@ export const zhTW: TigerLocale = {
     messageListAriaLabel: '訊息列表'
   },
   code: {
+    wrapLabel: '自動換行',
+    nowrapLabel: '不換行',
+    languageLabel: '語言',
     copyLabel: '複製',
     copiedLabel: '已複製',
     copyFailedLabel: '複製失敗',
@@ -519,6 +570,10 @@ export const zhTW: TigerLocale = {
     unreadCountText: '{count} 則未讀'
   },
   select: {
+    maxCountText: '最多選擇 {count} 項',
+    collapsedTagsText: '還有 {names}',
+    selectAllText: '全選目前結果',
+    invalidValueText: '此值無法顯示。',
     doneText: '完成',
     placeholder: '請選擇',
     emptyText: '暫無選項',
@@ -541,6 +596,9 @@ export const zhTW: TigerLocale = {
     collapseAriaLabel: '收合'
   },
   colorPicker: {
+    eyedropperText: '滴管',
+    recentColorsText: '最近使用',
+    invalidValueText: '請輸入有效顏色。',
     trigger: '選擇顏色',
     panelTitle: '顏色',
     clear: '清除',
@@ -570,6 +628,7 @@ export const zhTW: TigerLocale = {
     valueText: '{value} 顆星'
   },
   avatarGroup: {
+    overflowListAriaLabel: '收合的成員',
     ariaLabel: '頭像組',
     overflowAriaLabel: '還有 {count} 位'
   },
@@ -586,6 +645,8 @@ export const zhTW: TigerLocale = {
     slideAriaLabel: '第 {index} 張，共 {total} 張'
   },
   transfer: {
+    pageText: '第 {page} 頁',
+    hiddenSelectedText: '搜尋隱藏了 {count} 個已選項目',
     sourceTitle: '來源清單',
     targetTitle: '目標清單',
     searchAriaLabel: '搜尋{title}',
@@ -595,6 +656,7 @@ export const zhTW: TigerLocale = {
     selectAllAriaLabel: '全選{title}'
   },
   chart: {
+    exportText: '匯出圖表',
     legendAriaLabel: '圖表圖例',
     pointAriaLabel: '第 {index} 個點：({x}, {y})',
     seriesName: '系列 {index}',
@@ -626,10 +688,15 @@ export const zhTW: TigerLocale = {
     gaugeChartAriaLabel: '儀表板'
   },
   codeEditor: {
+    findText: '尋找',
+    replaceText: '取代',
+    bracketMatchText: '括號配對',
+    replaceAllText: '全部取代',
     editorAriaLabel: '程式碼編輯器'
   },
 
   markdownEditor: {
+    contentsText: '目錄',
     formattingToolbarAriaLabel: 'Markdown 格式工具列',
     modeToolbarAriaLabel: 'Markdown 檢視模式',
     editorAriaLabel: 'Markdown 編輯器',
@@ -664,6 +731,8 @@ export const zhTW: TigerLocale = {
     placeholderTable: '| 欄 | 值 |\n| --- | --- |\n| 名稱 | Tigercat |'
   },
   richTextEditor: {
+    previewText: '預覽',
+    tableText: '表格資料',
     formattingToolbarAriaLabel: '富文本格式工具列',
     editorAriaLabel: '富文本編輯器',
     bold: '粗體',
@@ -687,6 +756,16 @@ export const zhTW: TigerLocale = {
     imagePrompt: '輸入圖片網址'
   },
   cronEditor: {
+    summaryEveryMinute: '每分鐘',
+    summaryEveryHour: '每小時',
+    summaryEveryMonth: '每月',
+    summarySentence: '執行時間：{minute}，{hour}，{day}，{month}。',
+    summaryField: '{field}：{value}',
+    summaryEveryDay: '每日',
+    summaryStep: '每隔 {step}',
+    summaryRangeStep: '{start}–{end}，每隔 {step}',
+    summaryOr: '{left} 或 {right}',
+    nextRunText: '下次 {time}',
     ariaLabel: 'Cron 運算式編輯器',
     expressionAriaLabel: 'Cron 運算式',
     presetAriaLabel: 'Cron 預設',
@@ -721,6 +800,7 @@ export const zhTW: TigerLocale = {
     invalidFieldError: '{field}必須是 *、數字、範圍、步長或逗號清單'
   },
   formValidation: {
+    errorSummary: '請修正以下錯誤',
     required: '此欄位為必填項',
     typeString: '值必須是字串',
     typeNumber: '值必須是數字',
@@ -747,6 +827,7 @@ export const zhTW: TigerLocale = {
     slotLabel: '第 {index} 位，共 {total} 位'
   },
   tagsInput: {
+    rejectedText: '未新增 {tag}',
     removeTagLabel: '移除 {tag}',
     clearAllLabel: '清空全部標籤',
     duplicateText: '已經添加',
@@ -763,16 +844,21 @@ export const zhTW: TigerLocale = {
     emptyAriaValueText: '空白'
   },
   slider: {
+    valueText: '目前值 {value}',
     ariaLabel: '滑桿',
     minAriaLabel: '下限',
     maxAriaLabel: '上限'
   },
   signature: {
+    hasStrokesText: '已有筆畫',
+    redoText: '重做',
+    invalidValueText: '此簽名無法顯示。',
     ariaLabel: '簽名板',
     undoText: '復原',
     clearText: '清除'
   },
   numberKeyboard: {
+    invalidValueText: '此值不符合鍵盤模式，已清空。',
     ariaLabel: '數字鍵盤',
     deleteText: '刪除',
     decimalAriaLabel: '小數點',
@@ -809,6 +895,7 @@ export const zhTW: TigerLocale = {
     errorStatus: '錯誤'
   },
   tree: {
+    directoryText: '目錄',
     ariaLabel: '樹',
     selectNode: '選取{label}',
     expand: '展開',

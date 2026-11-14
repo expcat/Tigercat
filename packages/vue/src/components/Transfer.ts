@@ -456,7 +456,11 @@ export const Transfer = markFormItemGroupControl(
                   'flex items-center justify-between gap-2 border-t border-[var(--tiger-border)] px-3 py-1 text-xs'
               },
               [
-                h('span', { role: 'status' }, `${hidden.length} selected hidden by search`),
+                h(
+                  'span',
+                  { role: 'status' },
+                  labels.value.hiddenSelectedText.replace('{count}', String(hidden.length))
+                ),
                 h(
                   'button',
                   {

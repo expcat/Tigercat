@@ -2,7 +2,7 @@ import { defineComponent, h, PropType, computed, provide } from 'vue'
 import {
   classNames,
   coerceClassValue,
-  feedbackLayoutLabels,
+  getFeedbackLayoutLabels,
   getLayoutSidebarClasses,
   getSidebarAriaLabel,
   getSidebarStyle,
@@ -118,8 +118,8 @@ export const Sidebar = defineComponent({
       )
       if (!props.collapsible) return aside
       const triggerLabel = props.collapsed
-        ? feedbackLayoutLabels.sidebarExpand
-        : feedbackLayoutLabels.sidebarCollapse
+        ? getFeedbackLayoutLabels(config.value.locale).sidebarExpand
+        : getFeedbackLayoutLabels(config.value.locale).sidebarCollapse
       return h('div', { 'data-tiger-sidebar-shell': '', 'data-side': props.side }, [
         aside,
         h(

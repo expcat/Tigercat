@@ -11,7 +11,6 @@ import {
   applyColorPickerAlpha,
   applyColorPickerHue,
   classNames,
-  COLOR_PICKER_INVALID_VALUE_TEXT,
   COLOR_PICKER_PRESET_COLUMNS,
   colorPickerBaseClasses,
   colorPickerCheckerboardStyle,
@@ -569,7 +568,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           />
           {inputInvalid ? (
             <p id={inputErrorId} className="text-xs text-[var(--tiger-error)]" aria-live="polite">
-              {COLOR_PICKER_INVALID_VALUE_TEXT}
+              {labels.invalidValueText}
             </p>
           ) : null}
         </div>

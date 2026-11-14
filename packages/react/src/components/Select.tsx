@@ -1,7 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import {
   collapsedTagSummary,
-  getW9FormLabels,
   classNames,
   SHAKE_CLASS,
   runShakeAnimation,
@@ -181,7 +180,7 @@ export const Select = forwardRef<SelectRef, SelectProps>(function Select(props, 
           )}
           disabled={ctx.readOnly || ctx.effectiveDisabled}
           onClick={ctx.selectFiltered}>
-          {getW9FormLabels(props.locale?.locale).selectAll}
+          {ctx.selectAllText}
         </button>
       ) : null}
       {hasOptions

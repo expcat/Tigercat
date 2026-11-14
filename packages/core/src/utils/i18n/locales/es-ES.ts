@@ -9,7 +9,16 @@ export const esES: TigerLocale = {
   locale: 'es-ES',
   direction: 'ltr',
   datePicker: ES_ES_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: 'El directorio está vacío',
+    listAriaLabel: 'Responsables'
+  },
   common: {
+    countdownTargetText: 'La cuenta atrás sigue la hora objetivo',
+    dangerText: 'Acción peligrosa',
+    sidebarCollapseText: 'Contraer barra lateral',
+    sidebarExpandText: 'Expandir barra lateral',
+    dragMoveText: 'Del elemento {from} al {to}',
     okText: 'Aceptar',
     cancelText: 'Cancelar',
     closeText: 'Cerrar',
@@ -41,6 +50,7 @@ export const esES: TigerLocale = {
     dialogAriaLabel: 'Diálogo'
   },
   drawer: {
+    resizeAriaLabel: 'Cambiar tamaño del panel',
     closeAriaLabel: 'Cerrar',
     dialogAriaLabel: 'Cajón'
   },
@@ -48,6 +58,7 @@ export const esES: TigerLocale = {
     closeAriaLabel: 'Cerrar alerta'
   },
   qrcode: {
+    scannedText: 'Escaneado',
     ariaLabel: 'Código QR',
     expiredText: 'El código QR ha caducado',
     refreshText: 'Actualizar',
@@ -58,6 +69,8 @@ export const esES: TigerLocale = {
     ariaLabel: 'Contenido en desplazamiento'
   },
   image: {
+    galleryListAriaLabel: 'Miniaturas',
+    galleryOpenAriaLabel: 'Abrir vista previa',
     previewAriaLabel: 'Vista previa de {alt}',
     previewFallbackAlt: 'imagen',
     groupAriaLabel: 'Grupo de imágenes',
@@ -176,6 +189,7 @@ export const esES: TigerLocale = {
     assigneeRequired: 'Seleccione primero un destinatario'
   },
   workflowDesigner: {
+    validationDuplicateKey: 'La clave de cada nodo debe ser única',
     ariaLabel: 'Diseñador de flujo de trabajo',
     addStep: 'Añadir paso',
     addChild: 'Añadir hijo',
@@ -253,12 +267,15 @@ export const esES: TigerLocale = {
     ariaLabel: 'Progreso'
   },
   splitter: {
+    expandText: 'Expandir panel',
+    collapseText: 'Contraer panel',
     gutterAriaLabel: 'Redimensionar paneles {index}'
   },
   resizable: {
     handleAriaLabel: 'Redimensionar {handle}'
   },
   upload: {
+    selectDirectoryText: 'Elegir carpeta',
     dragAreaAriaLabel: 'Subir archivo haciendo clic o arrastrando',
     buttonAriaLabel: 'Subir archivo',
     clickToUploadText: 'Haz clic para subir',
@@ -277,6 +294,7 @@ export const esES: TigerLocale = {
     singleFileText: 'Solo se conservó el primer archivo.'
   },
   pagination: {
+    jumpToPageAriaLabel: 'Ir a la página',
     totalText: 'Total {total} elementos',
     itemsPerPageText: '/ página',
     jumpToText: 'Ir a',
@@ -289,6 +307,12 @@ export const esES: TigerLocale = {
     pageSizeAriaLabel: 'Elementos por página'
   },
   table: {
+    summaryText: 'Resumen',
+    filterApplyText: 'Aplicar filtro',
+    columnDragAriaLabel: 'Arrastrar columna',
+    exportPageText: 'Exportar página',
+    exportSelectedText: 'Exportar seleccionados',
+    exportAllText: 'Exportar todo',
     emptyText: 'Sin datos',
     loadingText: 'Cargando',
     expandText: 'Expandir',
@@ -334,6 +358,11 @@ export const esES: TigerLocale = {
     errorText: 'Error al exportar'
   },
   timePicker: {
+    invalidTimeText: 'Introduce una hora válida.',
+    unavailableTimeText: 'Esa hora no está disponible.',
+    missingTimeText: 'Elige una hora.',
+    missingStartText: 'Elige una hora de inicio.',
+    missingEndText: 'Elige una hora de fin.',
     hour: 'Hora',
     minute: 'Minuto',
     second: 'Seg',
@@ -349,6 +378,10 @@ export const esES: TigerLocale = {
     selectTimeRange: 'Seleccionar rango de horas'
   },
   formWizard: {
+    leaveStepTitle: 'Salir de este paso',
+    leaveStepMessage: 'Este paso tiene cambios sin guardar',
+    stayText: 'Permanecer en este paso',
+    leaveText: 'Salir',
     prevText: 'Anterior',
     nextText: 'Siguiente',
     finishText: 'Finalizar',
@@ -369,6 +402,7 @@ export const esES: TigerLocale = {
     loadErrorText: 'No se pudo cargar este recorrido.'
   },
   calendar: {
+    weekNumberText: 'Semana',
     previousMonth: 'Mes anterior',
     nextMonth: 'Mes siguiente',
     previousYear: 'Año anterior',
@@ -382,6 +416,12 @@ export const esES: TigerLocale = {
     exitAriaLabel: 'Salir de pantalla completa'
   },
   fileManager: {
+    downloadText: 'Descargar',
+    newFolderText: 'Nueva carpeta',
+    previewText: 'Vista previa',
+    renameText: 'Renombrar',
+    deleteText: 'Eliminar',
+    uploadText: 'Subir',
     rootText: 'Raíz',
     pathAriaLabel: 'Ruta de archivos',
     listboxAriaLabel: 'Archivos',
@@ -390,6 +430,9 @@ export const esES: TigerLocale = {
     resultCountText: '{count} elementos'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: 'Voltear horizontalmente',
+    downloadAriaLabel: 'Descargar imagen actual',
+    originalSizeAriaLabel: 'Tamaño original',
     dialogAriaLabel: 'Visor de imágenes',
     previewDialogAriaLabel: 'Vista previa de imagen',
     closeAriaLabel: 'Cerrar',
@@ -404,6 +447,11 @@ export const esES: TigerLocale = {
     previewImageAriaLabel: 'Imagen {index} de {total}'
   },
   imageEditor: {
+    cropAspectAriaLabel: 'Proporción de recorte',
+    cropFreeText: 'Libre',
+    cropRotateText: 'Girar',
+    cropFlipText: 'Voltear',
+    cropCircleText: 'Círculo',
     selectImageText: 'Seleccionar imagen',
     selectImageAriaLabel: 'Seleccionar imagen para recortar y subir',
     cropModalTitle: 'Recortar imagen',
@@ -472,6 +520,9 @@ export const esES: TigerLocale = {
     messageListAriaLabel: 'Lista de mensajes'
   },
   code: {
+    wrapLabel: 'Ajustar líneas',
+    nowrapLabel: 'Sin ajuste',
+    languageLabel: 'Idioma',
     copyLabel: 'Copiar',
     copiedLabel: 'Copiado',
     copyFailedLabel: 'Error al copiar',
@@ -520,6 +571,10 @@ export const esES: TigerLocale = {
     unreadCountText: '{count} no leídas'
   },
   select: {
+    maxCountText: 'Selecciona como máximo {count}',
+    collapsedTagsText: 'También {names}',
+    selectAllText: 'Seleccionar resultados',
+    invalidValueText: 'No se puede mostrar este valor.',
     doneText: 'Finalizar',
     placeholder: 'Seleccione una opción',
     emptyText: 'No hay opciones',
@@ -542,6 +597,9 @@ export const esES: TigerLocale = {
     collapseAriaLabel: 'Contraer'
   },
   colorPicker: {
+    eyedropperText: 'Cuentagotas',
+    recentColorsText: 'Recientes',
+    invalidValueText: 'Introduce un color válido.',
     trigger: 'Elegir color',
     panelTitle: 'Tono de color',
     clear: 'Borrar',
@@ -571,6 +629,7 @@ export const esES: TigerLocale = {
     valueText: '{value} estrellas'
   },
   avatarGroup: {
+    overflowListAriaLabel: 'Miembros ocultos',
     ariaLabel: 'Grupo de avatares',
     overflowAriaLabel: '{count} más'
   },
@@ -587,6 +646,8 @@ export const esES: TigerLocale = {
     slideAriaLabel: 'Diapositiva {index} de {total}'
   },
   transfer: {
+    pageText: 'Página {page}',
+    hiddenSelectedText: '{count} seleccionados ocultos por la búsqueda',
     sourceTitle: 'Origen',
     targetTitle: 'Destino',
     searchAriaLabel: 'Buscar {title}',
@@ -596,6 +657,7 @@ export const esES: TigerLocale = {
     selectAllAriaLabel: 'Seleccionar todo en {title}'
   },
   chart: {
+    exportText: 'Exportar gráfico',
     legendAriaLabel: 'Leyenda del gráfico',
     pointAriaLabel: 'Punto {index}: ({x}, {y})',
     seriesName: 'Serie {index}',
@@ -627,10 +689,15 @@ export const esES: TigerLocale = {
     gaugeChartAriaLabel: 'Medidor'
   },
   codeEditor: {
+    findText: 'Buscar',
+    replaceText: 'Reemplazar',
+    bracketMatchText: 'Paréntesis correspondiente',
+    replaceAllText: 'Reemplazar todo',
     editorAriaLabel: 'Editor de código'
   },
 
   markdownEditor: {
+    contentsText: 'Contenido',
     formattingToolbarAriaLabel: 'Formato Markdown',
     modeToolbarAriaLabel: 'Modo de vista Markdown',
     editorAriaLabel: 'Editor Markdown',
@@ -665,6 +732,8 @@ export const esES: TigerLocale = {
     placeholderTable: '| Columna | Valor |\n| --- | --- |\n| Nombre | Tigercat |'
   },
   richTextEditor: {
+    previewText: 'Vista previa',
+    tableText: 'Tabla',
     formattingToolbarAriaLabel: 'Formato de texto',
     editorAriaLabel: 'Editor de texto enriquecido',
     bold: 'Negrita',
@@ -688,6 +757,16 @@ export const esES: TigerLocale = {
     imagePrompt: 'Introducir URL de imagen'
   },
   cronEditor: {
+    summaryEveryMinute: 'cada minuto',
+    summaryEveryHour: 'cada hora',
+    summaryEveryMonth: 'cada mes',
+    summarySentence: 'Se ejecuta en {minute}, {hour}, {day}, {month}.',
+    summaryField: '{field}: {value}',
+    summaryEveryDay: 'cada día',
+    summaryStep: 'cada {step} unidades',
+    summaryRangeStep: '{start}–{end}, cada {step} unidades',
+    summaryOr: '{left} o {right}',
+    nextRunText: 'Siguiente {time}',
     ariaLabel: 'Editor Cron',
     expressionAriaLabel: 'Expresión Cron',
     presetAriaLabel: 'Preajuste Cron',
@@ -723,6 +802,7 @@ export const esES: TigerLocale = {
       '{field} debe ser *, un número, un rango, un paso o una lista separada por comas'
   },
   formValidation: {
+    errorSummary: 'Corrige los siguientes errores',
     required: 'Este campo es obligatorio',
     typeString: 'El valor debe ser una cadena',
     typeNumber: 'El valor debe ser un número',
@@ -749,6 +829,7 @@ export const esES: TigerLocale = {
     slotLabel: 'Carácter {index} de {total}'
   },
   tagsInput: {
+    rejectedText: 'No se añadió {tag}',
     removeTagLabel: 'Eliminar {tag}',
     clearAllLabel: 'Borrar todas las etiquetas',
     duplicateText: 'Ya se ha añadido',
@@ -765,16 +846,21 @@ export const esES: TigerLocale = {
     emptyAriaValueText: 'Vacío'
   },
   slider: {
+    valueText: 'Valor {value}',
     ariaLabel: 'Control deslizante',
     minAriaLabel: 'Valor mínimo',
     maxAriaLabel: 'Valor máximo'
   },
   signature: {
+    hasStrokesText: 'Hay trazos',
+    redoText: 'Rehacer',
+    invalidValueText: 'No se puede mostrar esta firma.',
     ariaLabel: 'Pad de firma',
     undoText: 'Deshacer',
     clearText: 'Borrar'
   },
   numberKeyboard: {
+    invalidValueText: 'El valor no coincide con el modo del teclado y se ha borrado.',
     ariaLabel: 'Teclado numérico',
     deleteText: 'Borrar',
     decimalAriaLabel: 'Separador decimal',
@@ -811,6 +897,7 @@ export const esES: TigerLocale = {
     errorStatus: 'Error de paso'
   },
   tree: {
+    directoryText: 'Directorio',
     ariaLabel: 'Árbol',
     selectNode: 'Seleccionar {label}',
     expand: 'Expandir',

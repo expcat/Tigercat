@@ -31,12 +31,12 @@ export const Gallery: React.FC<GalleryProps> = ({
   const index = clampGalleryIndex(currentIndex ?? internalIndex, items.length)
   const current = items[index]
   const count = formatGalleryCount(
-    basicLabel(config.locale?.locale, 'gallery', 'count'),
+    basicLabel(config.locale, 'gallery', 'count'),
     items.length ? index + 1 : 0,
     items.length
   )
-  const openLabel = basicLabel(config.locale?.locale, 'gallery', 'open')
-  const listLabel = basicLabel(config.locale?.locale, 'gallery', 'list')
+  const openLabel = basicLabel(config.locale, 'gallery', 'open')
+  const listLabel = basicLabel(config.locale, 'gallery', 'list')
 
   const select = (next: number) => {
     if (currentIndex === undefined) setInternalIndex(next)
@@ -70,7 +70,7 @@ export const Gallery: React.FC<GalleryProps> = ({
               aria-label={
                 item.alt ||
                 formatGalleryCount(
-                  basicLabel(config.locale?.locale, 'gallery', 'count'),
+                  basicLabel(config.locale, 'gallery', 'count'),
                   itemIndex + 1,
                   items.length
                 )

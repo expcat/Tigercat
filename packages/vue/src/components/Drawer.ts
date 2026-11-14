@@ -18,7 +18,6 @@ import {
   drawerPushOffset,
   drawerResizeDelta,
   drawerShowsMask,
-  feedbackLayoutLabels,
   prefersReducedMotion,
   registerDrawerLayer,
   resolveSheetReducedMotion,
@@ -662,7 +661,7 @@ export const Drawer = defineComponent({
                 'data-tiger-drawer-resize': '',
                 role: 'separator',
                 'aria-orientation': isHorizontal ? 'vertical' : 'horizontal',
-                'aria-label': feedbackLayoutLabels.drawerResize,
+                'aria-label': drawerLabels.value.resizeAriaLabel,
                 style: {
                   position: 'absolute',
                   touchAction: 'none',

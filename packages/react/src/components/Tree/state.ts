@@ -699,6 +699,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
       mergedLocale?.common?.searchPlaceholder,
       mergedLocale?.select?.searchPlaceholder
     ),
+    directoryText: labels.directoryText,
     selectNodeLabel: (label) => formatTreeSelectNodeLabel(labels.selectNode, label),
     loadingText: resolveLocaleText(
       'Loading...',

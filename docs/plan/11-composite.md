@@ -18,7 +18,6 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 - 自动开窗一组一起做：C170-F01（ActivityFeed）、C173-F01（ChatWindow），CommentThread、NotificationCenter 同验。共享代码在 `composite-list-utils.ts`。
 - 工作流权限派生（X01-F003）和 action 结果共享旧数据（X01-F012）在 [02](02-core-theme-i18n.md)，先做。
-- 重复 key 校验文案是 X02-F004。
 - 多份 composite 示例文档从第 26–28 行起混进了 DataTableWithToolbar 的 Custom Filters 一节，报告没有编号，见 [13](13-evidence.md) 的未立项观察。
 
 ## 概览
@@ -63,7 +62,7 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ### C172 AssigneePicker
 
-报告 `groups/composite/AssigneePicker.md`，队列状态 needs-evidence。另受 S04、S06、S07 影响。
+报告 `groups/composite/AssigneePicker.md`，队列状态 needs-evidence。另受 S04、S07 影响。
 
 | 编号     | 级别 | 波次 | 端          | 类别 | 条目                                            | 验收                                                                                   |
 | -------- | ---- | ---- | ----------- | ---- | ----------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -114,7 +113,7 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ### C176 FormWizard
 
-报告 `groups/composite/FormWizard.md`，队列状态 needs-evidence。另受 S01、S06 影响。
+报告 `groups/composite/FormWizard.md`，队列状态 needs-evidence。另受 S01 影响。
 
 | 编号     | 级别 | 波次 | 端               | 类别   | 条目                                      | 验收                                                                                     |
 | -------- | ---- | ---- | ---------------- | ------ | ----------------------------------------- | ---------------------------------------------------------------------------------------- |
@@ -127,7 +126,7 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ### C177 NotificationBell
 
-报告 `groups/composite/NotificationBell.md`，队列状态 needs-evidence。另受 S04、S06、S07 影响。
+报告 `groups/composite/NotificationBell.md`，队列状态 needs-evidence。另受 S04、S07 影响。
 
 | 编号     | 级别 | 波次 | 端               | 类别   | 条目                                           | 验收                                                                                     |
 | -------- | ---- | ---- | ---------------- | ------ | ---------------------------------------------- | ---------------------------------------------------------------------------------------- |
@@ -169,7 +168,7 @@ composite 组 16 个组件（C170–C185），视觉与键盘全部 blocked。
 
 ### C181 WorkflowDesigner
 
-报告 `groups/composite/WorkflowDesigner.md`，队列状态 needs-evidence。另受 S01、C179-F04、X02-F004 影响。
+报告 `groups/composite/WorkflowDesigner.md`，队列状态 needs-evidence。另受 S01、C179-F04 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                    | 验收                                                                                 |
 | -------- | ---- | ---- | ---- | ---- | --------------------------------------- | ------------------------------------------------------------------------------------ |

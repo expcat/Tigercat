@@ -844,6 +844,7 @@ export function getDrawerLabels(
 ): Required<TigerLocaleDrawer> {
   const en = enSection('drawer', locale)
   return {
+    ...resolveLocaleSection(en, locale?.drawer, overrides),
     closeAriaLabel: pickLocaleText(
       overrides?.closeAriaLabel,
       locale?.drawer?.closeAriaLabel,
@@ -983,4 +984,18 @@ export function getNumberKeyboardLabels(
     deleteText,
     confirmText
   }
+}
+
+export function getCommonLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocale['common']>
+): Required<NonNullable<TigerLocale['common']>> {
+  return resolveLocaleSection(enSection('common'), locale?.common, overrides)
+}
+
+export function getAssigneePickerLabels(
+  locale?: Partial<TigerLocale>,
+  overrides?: Partial<TigerLocale['assigneePicker']>
+): Required<NonNullable<TigerLocale['assigneePicker']>> {
+  return resolveLocaleSection(enSection('assigneePicker'), locale?.assigneePicker, overrides)
 }

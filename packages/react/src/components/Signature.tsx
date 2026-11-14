@@ -20,7 +20,6 @@ import {
   appendSignaturePoint,
   beginSignatureStroke,
   classNames,
-  SIGNATURE_INVALID_VALUE,
   cancelSignatureStroke,
   clampSignatureLineWidth,
   clearSignatureStrokes,
@@ -240,7 +239,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
 
   useEffect(() => {
     if (sanitized?.invalid) {
-      formItemControl?.setError?.(SIGNATURE_INVALID_VALUE)
+      formItemControl?.setError?.(labels.invalidValueText)
       if (!explainedRef.current) {
         explainedRef.current = true
         const payload = createSignatureChangePayload([], exportOptions())
@@ -253,7 +252,14 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
       explainedRef.current = false
       formItemControl?.setError?.(null)
     }
-  }, [committed, exportOptions, formItemControl, onChange, sanitized?.invalid])
+  }, [
+    committed,
+    exportOptions,
+    formItemControl,
+    onChange,
+    sanitized?.invalid,
+    labels.invalidValueText
+  ])
 
   const emitPayload = useCallback(
     (session: SignatureSession, extra?: { clear?: boolean; undo?: boolean }) => {
@@ -444,7 +450,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(function Signa
       ) : null}
       {sanitized?.invalid && !formItemControl ? (
         <p role="status" aria-live="polite">
-          {SIGNATURE_INVALID_VALUE}
+          {labels.invalidValueText}
         </p>
       ) : null}
       <div

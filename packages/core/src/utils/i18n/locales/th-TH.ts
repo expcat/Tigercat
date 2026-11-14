@@ -9,7 +9,16 @@ export const thTH: TigerLocale = {
   locale: 'th-TH',
   direction: 'ltr',
   datePicker: TH_TH_DATEPICKER_LOCALE,
+  assigneePicker: {
+    emptyText: 'ไดเรกทอรีว่างเปล่า',
+    listAriaLabel: 'ผู้รับมอบหมาย'
+  },
   common: {
+    countdownTargetText: 'นับถอยหลังตามเวลาเป้าหมาย',
+    dangerText: 'การดำเนินการอันตราย',
+    sidebarCollapseText: 'ยุบแถบด้านข้าง',
+    sidebarExpandText: 'ขยายแถบด้านข้าง',
+    dragMoveText: 'จากรายการ {from} ไปยังรายการ {to}',
     okText: 'ตกลง',
     cancelText: 'ยกเลิก',
     closeText: 'ปิด',
@@ -41,6 +50,7 @@ export const thTH: TigerLocale = {
     dialogAriaLabel: 'กล่องโต้ตอบ'
   },
   drawer: {
+    resizeAriaLabel: 'ปรับขนาดลิ้นชัก',
     closeAriaLabel: 'ปิด',
     dialogAriaLabel: 'ลิ้นชัก'
   },
@@ -48,6 +58,7 @@ export const thTH: TigerLocale = {
     closeAriaLabel: 'ปิดการแจ้งเตือน'
   },
   qrcode: {
+    scannedText: 'สแกนแล้ว',
     ariaLabel: 'คิวอาร์โค้ด',
     expiredText: 'คิวอาร์โค้ดหมดอายุแล้ว',
     refreshText: 'รีเฟรช',
@@ -58,6 +69,8 @@ export const thTH: TigerLocale = {
     ariaLabel: 'เนื้อหาเลื่อน'
   },
   image: {
+    galleryListAriaLabel: 'ภาพย่อ',
+    galleryOpenAriaLabel: 'เปิดตัวอย่าง',
     previewAriaLabel: 'ดูตัวอย่าง {alt}',
     previewFallbackAlt: 'รูปภาพ',
     groupAriaLabel: 'กลุ่มรูปภาพ',
@@ -175,6 +188,7 @@ export const thTH: TigerLocale = {
     assigneeRequired: 'เลือกผู้รับมอบหมายก่อน'
   },
   workflowDesigner: {
+    validationDuplicateKey: 'คีย์ของแต่ละโหนดต้องไม่ซ้ำกัน',
     ariaLabel: 'ตัวออกแบบเวิร์กโฟลว์',
     addStep: 'เพิ่มขั้นตอน',
     addChild: 'เพิ่มขั้นตอนย่อย',
@@ -252,12 +266,15 @@ export const thTH: TigerLocale = {
     ariaLabel: 'ความคืบหน้า'
   },
   splitter: {
+    expandText: 'ขยายแผง',
+    collapseText: 'ยุบแผง',
     gutterAriaLabel: 'ปรับขนาดแผง {index}'
   },
   resizable: {
     handleAriaLabel: 'ปรับขนาด {handle}'
   },
   upload: {
+    selectDirectoryText: 'เลือกโฟลเดอร์',
     dragAreaAriaLabel: 'คลิกหรือลากเพื่ออัปโหลดไฟล์',
     buttonAriaLabel: 'อัปโหลดไฟล์',
     clickToUploadText: 'คลิกเพื่ออัปโหลด',
@@ -276,6 +293,7 @@ export const thTH: TigerLocale = {
     singleFileText: 'เก็บเฉพาะไฟล์แรกไว้เท่านั้น'
   },
   pagination: {
+    jumpToPageAriaLabel: 'ไปที่หน้า',
     totalText: 'ทั้งหมด {total} รายการ',
     itemsPerPageText: '/หน้า',
     jumpToText: 'ไปที่',
@@ -288,6 +306,12 @@ export const thTH: TigerLocale = {
     pageSizeAriaLabel: 'รายการต่อหน้า'
   },
   table: {
+    summaryText: 'สรุป',
+    filterApplyText: 'ใช้ตัวกรอง',
+    columnDragAriaLabel: 'ลากคอลัมน์',
+    exportPageText: 'ส่งออกหน้านี้',
+    exportSelectedText: 'ส่งออกรายการที่เลือก',
+    exportAllText: 'ส่งออกทั้งหมด',
     emptyText: 'ไม่มีข้อมูล',
     loadingText: 'กำลังโหลด',
     expandText: 'ขยาย',
@@ -333,6 +357,11 @@ export const thTH: TigerLocale = {
     errorText: 'ส่งออกไม่สำเร็จ'
   },
   timePicker: {
+    invalidTimeText: 'ป้อนเวลาที่ถูกต้อง',
+    unavailableTimeText: 'ไม่สามารถเลือกเวลานี้ได้',
+    missingTimeText: 'เลือกเวลา',
+    missingStartText: 'เลือกเวลาเริ่มต้น',
+    missingEndText: 'เลือกเวลาสิ้นสุด',
     hour: 'ชั่วโมง',
     minute: 'นาที',
     second: 'วินาที',
@@ -348,6 +377,10 @@ export const thTH: TigerLocale = {
     selectTimeRange: 'เลือกช่วงเวลา'
   },
   formWizard: {
+    leaveStepTitle: 'ออกจากขั้นตอนนี้',
+    leaveStepMessage: 'ขั้นตอนนี้มีการเปลี่ยนแปลงที่ยังไม่บันทึก',
+    stayText: 'อยู่ในขั้นตอนนี้',
+    leaveText: 'ออก',
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
     finishText: 'เสร็จสิ้น',
@@ -368,6 +401,7 @@ export const thTH: TigerLocale = {
     loadErrorText: 'โหลดทัวร์นี้ไม่สำเร็จ'
   },
   calendar: {
+    weekNumberText: 'สัปดาห์',
     previousMonth: 'เดือนก่อนหน้า',
     nextMonth: 'เดือนถัดไป',
     previousYear: 'ปีก่อนหน้า',
@@ -381,6 +415,12 @@ export const thTH: TigerLocale = {
     exitAriaLabel: 'ออกจากเต็มหน้าจอ'
   },
   fileManager: {
+    downloadText: 'ดาวน์โหลด',
+    newFolderText: 'โฟลเดอร์ใหม่',
+    previewText: 'ดูตัวอย่าง',
+    renameText: 'เปลี่ยนชื่อ',
+    deleteText: 'ลบ',
+    uploadText: 'อัปโหลด',
     rootText: 'ราก',
     pathAriaLabel: 'เส้นทางไฟล์',
     listboxAriaLabel: 'ไฟล์',
@@ -389,6 +429,9 @@ export const thTH: TigerLocale = {
     resultCountText: '{count} รายการ'
   },
   imageViewer: {
+    flipHorizontalAriaLabel: 'พลิกแนวนอน',
+    downloadAriaLabel: 'ดาวน์โหลดภาพปัจจุบัน',
+    originalSizeAriaLabel: 'ขนาดต้นฉบับ',
     dialogAriaLabel: 'ตัวดูรูปภาพ',
     previewDialogAriaLabel: 'ดูตัวอย่างรูปภาพ',
     closeAriaLabel: 'ปิด',
@@ -403,6 +446,11 @@ export const thTH: TigerLocale = {
     previewImageAriaLabel: 'ภาพที่ {index} จาก {total}'
   },
   imageEditor: {
+    cropAspectAriaLabel: 'อัตราส่วนการครอบตัด',
+    cropFreeText: 'อิสระ',
+    cropRotateText: 'หมุน',
+    cropFlipText: 'พลิก',
+    cropCircleText: 'วงกลม',
     selectImageText: 'เลือกรูปภาพ',
     selectImageAriaLabel: 'เลือกรูปภาพเพื่อครอบตัดและอัปโหลด',
     cropModalTitle: 'ครอบตัดรูปภาพ',
@@ -471,6 +519,9 @@ export const thTH: TigerLocale = {
     messageListAriaLabel: 'รายการข้อความ'
   },
   code: {
+    wrapLabel: 'ตัดบรรทัด',
+    nowrapLabel: 'ไม่ตัดบรรทัด',
+    languageLabel: 'ภาษา',
     copyLabel: 'คัดลอก',
     copiedLabel: 'คัดลอกแล้ว',
     copyFailedLabel: 'คัดลอกไม่สำเร็จ',
@@ -519,6 +570,10 @@ export const thTH: TigerLocale = {
     unreadCountText: 'ยังไม่อ่าน {count} รายการ'
   },
   select: {
+    maxCountText: 'เลือกได้สูงสุด {count} รายการ',
+    collapsedTagsText: 'และ {names}',
+    selectAllText: 'เลือกผลลัพธ์ทั้งหมด',
+    invalidValueText: 'ไม่สามารถแสดงค่านี้ได้',
     doneText: 'เสร็จสิ้น',
     placeholder: 'เลือกตัวเลือก',
     emptyText: 'ไม่พบตัวเลือก',
@@ -541,6 +596,9 @@ export const thTH: TigerLocale = {
     collapseAriaLabel: 'ยุบ'
   },
   colorPicker: {
+    eyedropperText: 'หลอดดูดสี',
+    recentColorsText: 'ใช้ล่าสุด',
+    invalidValueText: 'ป้อนสีที่ถูกต้อง',
     trigger: 'เลือกสี',
     panelTitle: 'สี',
     clear: 'ล้าง',
@@ -570,6 +628,7 @@ export const thTH: TigerLocale = {
     valueText: '{value} ดาว'
   },
   avatarGroup: {
+    overflowListAriaLabel: 'สมาชิกที่ซ่อนอยู่',
     ariaLabel: 'กลุ่มรูปโปรไฟล์',
     overflowAriaLabel: 'อีก {count} คน'
   },
@@ -586,6 +645,8 @@ export const thTH: TigerLocale = {
     slideAriaLabel: 'สไลด์ {index} จาก {total}'
   },
   transfer: {
+    pageText: 'หน้า {page}',
+    hiddenSelectedText: 'ซ่อนรายการที่เลือก {count} รายการโดยการค้นหา',
     sourceTitle: 'ต้นทาง',
     targetTitle: 'ปลายทาง',
     searchAriaLabel: 'ค้นหา {title}',
@@ -595,6 +656,7 @@ export const thTH: TigerLocale = {
     selectAllAriaLabel: 'เลือกทั้งหมดใน {title}'
   },
   chart: {
+    exportText: 'ส่งออกแผนภูมิ',
     legendAriaLabel: 'คำอธิบายแผนภูมิ',
     pointAriaLabel: 'จุด {index}: ({x}, {y})',
     seriesName: 'ชุดข้อมูล {index}',
@@ -626,10 +688,15 @@ export const thTH: TigerLocale = {
     gaugeChartAriaLabel: 'เกจ'
   },
   codeEditor: {
+    findText: 'ค้นหา',
+    replaceText: 'แทนที่',
+    bracketMatchText: 'วงเล็บที่ตรงกัน',
+    replaceAllText: 'แทนที่ทั้งหมด',
     editorAriaLabel: 'ตัวแก้ไขโค้ด'
   },
 
   markdownEditor: {
+    contentsText: 'สารบัญ',
     formattingToolbarAriaLabel: 'จัดรูปแบบ Markdown',
     modeToolbarAriaLabel: 'โหมดมุมมอง Markdown',
     editorAriaLabel: 'ตัวแก้ไข Markdown',
@@ -664,6 +731,8 @@ export const thTH: TigerLocale = {
     placeholderTable: '| คอลัมน์ | ค่า |\n| --- | --- |\n| ชื่อ | Tigercat |'
   },
   richTextEditor: {
+    previewText: 'ดูตัวอย่าง',
+    tableText: 'ตาราง',
     formattingToolbarAriaLabel: 'จัดรูปแบบข้อความ',
     editorAriaLabel: 'ตัวแก้ไขข้อความแบบมีรูปแบบ',
     bold: 'ตัวหนา',
@@ -687,6 +756,16 @@ export const thTH: TigerLocale = {
     imagePrompt: 'ป้อน URL รูปภาพ'
   },
   cronEditor: {
+    summaryEveryMinute: 'ทุกนาที',
+    summaryEveryHour: 'ทุกชั่วโมง',
+    summaryEveryMonth: 'ทุกเดือน',
+    summarySentence: 'เรียกใช้ที่ {minute}, {hour}, {day}, {month}',
+    summaryField: '{field}: {value}',
+    summaryEveryDay: 'ทุกวัน',
+    summaryStep: 'ทุก {step} ครั้ง',
+    summaryRangeStep: '{start}–{end} ทุก {step} ครั้ง',
+    summaryOr: '{left} หรือ {right}',
+    nextRunText: 'ครั้งถัดไป {time}',
     ariaLabel: 'ตัวแก้ไข Cron',
     expressionAriaLabel: 'นิพจน์ Cron',
     presetAriaLabel: 'ชุดสำเร็จรูป Cron',
@@ -721,6 +800,7 @@ export const thTH: TigerLocale = {
     invalidFieldError: '{field} ต้องเป็น *, ตัวเลข, ช่วง, ขั้น หรือรายการคั่นด้วยจุลภาค'
   },
   formValidation: {
+    errorSummary: 'แก้ไขข้อผิดพลาดต่อไปนี้',
     required: 'ต้องกรอกช่องนี้',
     typeString: 'ค่าต้องเป็นข้อความ',
     typeNumber: 'ค่าต้องเป็นตัวเลข',
@@ -747,6 +827,7 @@ export const thTH: TigerLocale = {
     slotLabel: 'อักขระที่ {index} จาก {total}'
   },
   tagsInput: {
+    rejectedText: 'ไม่ได้เพิ่ม {tag}',
     removeTagLabel: 'ลบ {tag}',
     clearAllLabel: 'ล้างแท็กทั้งหมด',
     duplicateText: 'เพิ่มแล้ว',
@@ -763,16 +844,21 @@ export const thTH: TigerLocale = {
     emptyAriaValueText: 'ว่าง'
   },
   slider: {
+    valueText: 'ค่า {value}',
     ariaLabel: 'แถบเลื่อน',
     minAriaLabel: 'ค่าต่ำสุด',
     maxAriaLabel: 'ค่าสูงสุด'
   },
   signature: {
+    hasStrokesText: 'มีเส้นวาดแล้ว',
+    redoText: 'ทำซ้ำ',
+    invalidValueText: 'ไม่สามารถแสดงลายเซ็นนี้ได้',
     ariaLabel: 'แผ่นลายเซ็น',
     undoText: 'เลิกทำ',
     clearText: 'ล้าง'
   },
   numberKeyboard: {
+    invalidValueText: 'ล้างค่าที่ไม่ตรงกับโหมดแป้นพิมพ์แล้ว',
     ariaLabel: 'แป้นตัวเลข',
     deleteText: 'ลบ',
     decimalAriaLabel: 'จุดทศนิยม',
@@ -809,6 +895,7 @@ export const thTH: TigerLocale = {
     errorStatus: 'ข้อผิดพลาด'
   },
   tree: {
+    directoryText: 'ไดเรกทอรี',
     ariaLabel: 'ต้นไม้',
     selectNode: 'เลือก {label}',
     expand: 'ขยาย',

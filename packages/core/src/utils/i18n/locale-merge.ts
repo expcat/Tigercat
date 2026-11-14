@@ -18,6 +18,7 @@ export const TIGER_LOCALE_KEY_SET = {
   locale: true,
   direction: true,
   common: true,
+  assigneePicker: true,
   empty: true,
   modal: true,
   drawer: true,
