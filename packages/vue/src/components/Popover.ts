@@ -31,7 +31,11 @@ export interface VuePopoverProps {
   placement?: FloatingPlacement
   disabled?: boolean
   width?: number | string
+  ariaLabel?: string
+  showDelay?: number
+  hideDelay?: number
   offset?: number
+  closeOnScroll?: boolean
   asChild?: boolean
   className?: string
   style?: StyleValue

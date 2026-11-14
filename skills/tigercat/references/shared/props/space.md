@@ -11,7 +11,7 @@ description: Compact generated Tigercat Layout props reference
 
 ## Space
 
-`packages/core/src/types/space.ts` · `SpaceProps` · 3/5 compact props · [Complete props](#remaining-props-complete-public-api)
+`packages/core/src/types/space.ts` · `SpaceProps` · 3/8 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: `wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基类。
 
@@ -25,3 +25,6 @@ Note: `wrap` 只在窄容器里折行。Vue 声明 `className`，不会盖掉基
 
 - `orientation?`: `BaseLayoutProps['orientation']`; default `'horizontal'`. Space orientation
 - `verticalSize?`: `number`; default `-`. Vertical gap in pixels. Omit to use `size` on both axes when `size` is a preset. A nume...
+- `split?`: `boolean`; default `-`. -
+- `className?`: `string`; default `-`. -
+- `style?`: `Record<string, string | number>`; default `-`. -

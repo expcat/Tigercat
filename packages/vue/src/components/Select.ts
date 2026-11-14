@@ -160,6 +160,9 @@ export interface VueSelectProps {
   clearable?: boolean
   emptyText?: string
   maxTagCount?: number
+  maxCount?: number
+  readOnly?: boolean
+  optionFields?: SelectOptionFields
   virtual?: boolean
   remote?: boolean
   searchDebounce?: number

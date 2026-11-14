@@ -97,6 +97,8 @@ export interface VueTabsProps {
   lazy?: boolean
   swipeable?: boolean
   activation?: 'automatic' | 'manual'
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleTabs>
   className?: string
   style?: Record<string, string | number>
 }

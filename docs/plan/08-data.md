@@ -1,6 +1,6 @@
 # 08 数据展示组件
 
-[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
+[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
 data 组 7 个组件（C131–C137）。视觉与键盘全部 blocked。
 
@@ -21,7 +21,7 @@ data 组 7 个组件（C131–C137）。视觉与键盘全部 blocked。
 本篇 14 条：P1 0、P2 8、P3 6。
 按波次：W6 8、W9 6。
 
-已移到 [01](01-shared-root-causes.md) 的条目：C135-F03（S13）。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C135-F03（S13）。
 
 ## 条目
 

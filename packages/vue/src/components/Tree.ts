@@ -124,6 +124,7 @@ export interface VueTreeProps {
   selectable?: boolean
   multiple?: boolean
   allowDeselect?: boolean
+  expandOnClick?: boolean
   loadData?: TreeLoadDataFn
   loadedKeys?: TreeNodeKey[]
   searchValue?: string

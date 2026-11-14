@@ -74,6 +74,9 @@ export interface VueStepsProps {
   size?: StepSize
   simple?: boolean
   clickable?: boolean
+  progressDot?: boolean
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleSteps>
   items?: StepItem[]
   className?: string
   style?: Record<string, unknown>
@@ -88,6 +91,8 @@ export interface VueStepsItemProps {
   icon?: unknown
   status?: StepStatus
   disabled?: boolean
+  stepIndex?: number
+  isLast?: boolean
   className?: string
   style?: Record<string, unknown>
 }

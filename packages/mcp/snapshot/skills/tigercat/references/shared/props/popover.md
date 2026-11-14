@@ -11,7 +11,7 @@ description: Compact generated Tigercat Feedback props reference
 
 ## Popover
 
-`packages/core/src/types/popover.ts` · `PopoverProps` · 4/15 compact props · [Complete props](#remaining-props-complete-public-api)
+`packages/core/src/types/popover.ts` · `PopoverProps` · 4/16 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 打开时焦点留在触发器，Tab 离开即关闭。有标题时标题是名字，正文是描述。`width` 是有限正数像素，或一整条 CSS 长度；解析失败保持默认最大宽度。
 
@@ -27,6 +27,7 @@ Note: 打开时焦点留在触发器，Tab 离开即关闭。有标题时标题�
 - `title?`: `string`; default `-`. Popover title text
 - `width?`: `number | string`; default `-`. Width as a positive pixel number or one CSS length (`20rem`, `50%`). Invalid values kee...
 - `ariaLabel?`: `string`; default `-`. Accessible name when there is no title. The body is the description, not a second copy...
+- `closeOnScroll?`: `boolean`; default `false`. Close the popover when the page scrolls.
 - `style?`: `Record<string, string | number>`; default `-`. Custom styles
 - `defaultOpen?`: `boolean`; default `false`. Default open state (uncontrolled mode)
 - `disabled?`: `boolean`; default `false`. Whether the popup is disabled

@@ -57,6 +57,10 @@ export interface VueSliderProps {
   max?: number
   step?: number
   disabled?: boolean
+  readOnly?: boolean
+  pushApart?: boolean
+  showRange?: boolean
+  formatTooltip?: (value: number) => string
   marks?: boolean | Record<number, string>
   tooltip?: boolean
   size?: ComponentSize

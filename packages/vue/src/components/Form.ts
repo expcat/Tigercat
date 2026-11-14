@@ -105,6 +105,7 @@ export interface VueFormProps {
   undoable?: boolean
   maxHistorySize?: number
   locale?: Partial<TigerLocale>
+  showErrorSummary?: boolean
 }
 
 function isFormEngine(controller: FormController): controller is FormEngine {

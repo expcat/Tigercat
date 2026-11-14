@@ -8065,7 +8065,7 @@
     },
     "PopoverProps": {
       "extends": ["BaseFloatingPopupProps"],
-      "props": ["ariaLabel", "content", "style", "title", "trigger", "width"]
+      "props": ["ariaLabel", "closeOnScroll", "content", "style", "title", "trigger", "width"]
     },
     "PrintLayoutProps": {
       "extends": [],

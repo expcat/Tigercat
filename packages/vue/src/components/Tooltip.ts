@@ -28,6 +28,8 @@ export interface VueTooltipProps {
   placement?: FloatingPlacement
   disabled?: boolean
   offset?: number
+  showDelay?: number
+  hideDelay?: number
   asChild?: boolean
   className?: string
   style?: StyleValue

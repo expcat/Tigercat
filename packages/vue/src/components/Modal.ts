@@ -100,6 +100,7 @@ export interface VueModalProps {
   initialFocus?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleModal>
+  showCancel?: boolean
 }
 
 export type ModalProps = VueModalProps

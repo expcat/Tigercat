@@ -1,8 +1,8 @@
 # 12 工具链、文档与示例平台
 
-[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
+[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
-X03 到 X07 五份专题：CLI 与 MCP、API 文档与生成器、Example 平台与 SSR、构建测试与发布配置、项目级文档。X04-F02 已移到 [01](01-shared-root-causes.md) 的 S01。X07-F04（路线图文件头过期）在重写路线图时已经处理，不再排期。
+X03 到 X07 五份专题：CLI 与 MCP、API 文档与生成器、Example 平台与 SSR、构建测试与发布配置、项目级文档。X04-F02（S01）已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)。X07-F04（路线图文件头过期）在重写路线图时已经处理，不再排期。
 
 ## 目标
 
@@ -25,7 +25,7 @@ X03 到 X07 五份专题：CLI 与 MCP、API 文档与生成器、Example 平台
 本篇 12 条：P1 0、P2 8、P3 4。
 按波次：W1 1、W8 7、W9 4。
 
-已移到 [01](01-shared-root-causes.md) 的条目：X04-F02（S01）。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：X04-F02（S01）。
 
 ## 条目
 

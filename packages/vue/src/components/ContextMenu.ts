@@ -637,6 +637,7 @@ const ContextMenuPopupBranch = defineComponent({
 })
 
 export interface VueContextMenuProps extends CoreContextMenuProps {
+  items?: PopupMenuItem[]
   /**
    * Menu placement relative to the cursor point
    * @default 'bottom-start'

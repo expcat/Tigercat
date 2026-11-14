@@ -1,6 +1,6 @@
 # 10 高级组件
 
-[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
+[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
 advanced 组 11 个组件（C159–C169），视觉与键盘全部 blocked。
 
@@ -23,7 +23,7 @@ advanced 组 11 个组件（C159–C169），视觉与键盘全部 blocked。
 本篇 33 条：P1 3、P2 25、P3 5。
 按波次：W1 3、W6 25、W9 5。
 
-已移到 [01](01-shared-root-causes.md) 的条目：C160-F04（S03）、C162-F03（S03）。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C160-F04（S03）、C162-F03（S03）。
 
 本篇的 P1：C167-F01、C168-F01、C169-F01。
 

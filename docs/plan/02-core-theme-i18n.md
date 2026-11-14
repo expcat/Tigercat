@@ -1,8 +1,8 @@
 # 02 共享 Core、主题与 i18n
 
-[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
+[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
-X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份专题里，没有移到 [01](01-shared-root-causes.md) 的条目。这两份专题没有主责 Demo，证据是源码执行、happy-dom 和 Chromium 计算样式。
+X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份专题的未完成条目都在本篇。这两份专题没有主责 Demo，证据是源码执行、happy-dom 和 Chromium 计算样式。
 
 ## 目标
 

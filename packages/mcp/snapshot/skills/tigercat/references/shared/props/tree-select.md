@@ -11,7 +11,7 @@ description: Compact generated Tigercat Form props reference
 
 ## TreeSelect
 
-`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/38 compact props · [Complete props](#remaining-props-complete-public-api)
+`packages/core/src/types/tree-select.ts` · `TreeSelectProps` · 4/37 compact props · [Complete props](#remaining-props-complete-public-api)
 
 Note: 选中的是节点 `key`。空单选是 `null`，空多选是 `[]`。`''` 不是键，`0` 是合法键。勾选框表示级联，`checkStrategy` 只决定提交哪些键；`checkStrictly` 时不按策略过滤。搜索零命中是空列表。`defaultExpandAll` 只在树第一次有数据时生效。浮层高度只留 `listHeight`。文案在 `locale.treeSelect`。只读用 `readOnly`。
 
@@ -57,6 +57,5 @@ Note: 选中的是节点 `key`。空单选是 `null`，空多选是 `[]`。`''` 
 - `labels?`: `Partial<TigerLocaleSelect & TigerLocaleTreeSelect>`; default `-`. UI labels for custom text. Takes precedence over `locale` and ConfigProvider text.
 - `className?`: `string`; default `-`. Custom class name
 - `modelValue?`: `TreeSelectValue`; default `-`. -
-- `height?`: `number`; default `-`. -
 
 Events/callback props: `onOpenChange?`, `onUpdate:modelValue?`, `onUpdate:searchValue?`, `onUpdate:open?`, `onUpdate:expandedKeys?`, `onExpand?`, `onBlur?`.

@@ -69,6 +69,7 @@ export interface VueFormItemProps {
   errorDisplayMode?: FormErrorDisplayMode
   condition?: FormFieldCondition
   extra?: string
+  disabled?: boolean
 }
 
 export const FormItem = defineComponent({

@@ -37,6 +37,12 @@ export interface PopoverProps extends BaseFloatingPopupProps {
    */
   ariaLabel?: string
 
+  /**
+   * Close the popover when the page scrolls.
+   * @default false
+   */
+  closeOnScroll?: boolean
+
   /** Custom styles */
   style?: Record<string, string | number>
 }

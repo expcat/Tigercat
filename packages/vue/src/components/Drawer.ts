@@ -91,6 +91,7 @@ export interface VueDrawerProps {
   initialFocus?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleDrawer>
+  resizable?: boolean
 }
 
 export type DrawerProps = VueDrawerProps

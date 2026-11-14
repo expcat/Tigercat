@@ -35,6 +35,7 @@ export interface VueCardProps {
   target?: string
   rel?: string
   title?: string
+  titleLevel?: CoreCardProps['titleLevel']
   htmlTitle?: string
   padding?: boolean | string
   className?: string

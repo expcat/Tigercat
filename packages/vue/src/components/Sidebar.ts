@@ -20,6 +20,7 @@ export interface VueSidebarProps {
   width?: string
   collapsedWidth?: string
   collapsed?: boolean
+  collapsible?: boolean
   side?: LayoutSiderSide
   landmark?: SidebarLandmark
   style?: Record<string, string | number>

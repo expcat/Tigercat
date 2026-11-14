@@ -77,6 +77,8 @@ export interface VuePaginationProps {
   disabled?: boolean
   hideOnSinglePage?: boolean
   showLessItems?: boolean
+  ellipsisJump?: boolean
+  itemRender?: (page: number, kind: string) => VNodeChild
   className?: string
   style?: Record<string, unknown>
   /**

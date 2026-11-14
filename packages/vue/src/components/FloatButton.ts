@@ -98,6 +98,8 @@ export interface VueFloatButtonProps {
   size?: FloatButtonSize
   type?: 'primary' | 'default'
   tooltip?: string
+  href?: string
+  badge?: string | number
   disabled?: boolean
   ariaLabel?: string
   className?: string

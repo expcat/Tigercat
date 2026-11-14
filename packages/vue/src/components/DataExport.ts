@@ -46,6 +46,12 @@ export interface VueDataExportProps<T = Record<string, unknown>> {
   cellFormatter?: DataExportOptions<T>['cellFormatter']
   hiddenColumnKeys?: string[]
   disabled?: boolean
+  customExport?: (info: {
+    format: DataExportFormat
+    columns: TableColumn<T>[]
+    dataSource: T[]
+    fileName: string
+  }) => void | Promise<void>
   className?: string
   locale?: Partial<TigerLocale>
   labels?: Partial<TigerLocaleDataExport>

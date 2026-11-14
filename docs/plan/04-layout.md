@@ -1,6 +1,6 @@
 # 04 布局组件
 
-[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
+[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
 layout 组 19 个组件（C033–C051）。只有 AspectRatio、Card、Carousel 补采过浏览器证据，其余 16 个的视觉与键盘全部 blocked。
 
@@ -23,7 +23,7 @@ layout 组 19 个组件（C033–C051）。只有 AspectRatio、Card、Carousel 
 本篇 46 条：P1 3、P2 42、P3 1。
 按波次：W1 3、W5 42、W9 1。
 
-已移到 [01](01-shared-root-causes.md) 的条目：C034-F04（S13）、C037-F01（S11）、C039-F03（S08）、C040-F01（S01）、C048-F02（S13）、C050-F02（S13）、C051-F03（S13）。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C034-F04（S13）、C037-F01（S11）、C039-F03（S08）、C040-F01（S01）、C048-F02（S13）、C050-F02（S13）、C051-F03（S13）。
 
 本篇的 P1：C043-F01、C043-F02、C043-F03。
 

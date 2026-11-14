@@ -9,12 +9,13 @@ import {
   kbdSeparatorClasses,
   mergeStyleValues,
   resolveKbdAccessibleName,
+  type KbdKeys,
   type KbdSize,
   type KbdVariant
 } from '@expcat/tigercat-core'
 
 export interface VueKbdProps {
-  keys?: string | string[]
+  keys?: KbdKeys
   separator?: string
   size?: KbdSize
   variant?: KbdVariant
@@ -35,7 +36,7 @@ export const Kbd = defineComponent({
      * with `separator`. Combine with the default slot to append a final key.
      */
     keys: {
-      type: [String, Array] as PropType<string | string[]>,
+      type: [String, Array] as PropType<KbdKeys>,
       default: undefined
     },
     /**

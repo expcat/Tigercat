@@ -1,6 +1,6 @@
 # 07 反馈组件
 
-[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [共性根因](01-shared-root-causes.md) · [波次](14-waves.md) · [证据](13-evidence.md)
+[路线图](../ROADMAP.md) · [范围与口径](00-scope.md) · [波次](14-waves.md) · [证据](13-evidence.md)
 
 feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与键盘全部 blocked，条目的证据是源码和 happy-dom。
 
@@ -23,7 +23,7 @@ feedback 组 14 个组件（C117–C130）。这一组没有截图，视觉与�
 本篇 24 条：P1 0、P2 15、P3 9。
 按波次：W4 15、W9 9。
 
-已移到 [01](01-shared-root-causes.md) 的条目：C118-F04（S13）、C124-F03（S13）、C127-F01（S13）、C129-F01（S13）。
+已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C118-F04（S13）、C124-F03（S13）、C127-F01（S13）、C129-F01（S13）。
 
 ## 条目
 

@@ -40,6 +40,7 @@ export interface VueSplitterProps {
   max?: number | number[]
   gutterSize?: number
   disabled?: boolean
+  collapsible?: boolean
   className?: string
   style?: Record<string, string | number>
 }

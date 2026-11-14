@@ -4,6 +4,10 @@
 
 ## v3.0.1（未发布）
 
+Vue 的 TreeSelect 公开类型不再包含 `height`。`VueTreeSelectProps` 与 `TreeSelectProps` 改用 `listHeight`；`listHeight` 为 80 时，树列表的内联 `max-height` 仍是 `80px`。运行时原本就不读取 `height`。
+
+同一批导出类型补上了运行时已经接受的可选字段，Kbd 的 `keys` 同时接受只读数组。现有调用不用改。Core `PopoverProps` 增加可选 `closeOnScroll`（默认 `false`），页面滚动时关闭浮层；不传时行为与以前相同。
+
 Vue 的 ContextMenuItem、ContextMenuMenu、ContextMenuSub、Dropdown、DropdownItem 与 DropdownMenu 现在在每次渲染时合并当前的 `class`。同一实例把 class 从初始值改成新值后，DOM 类名跟着更新，不再停在第一次渲染的 class。`className` 和其他属性的合并方式不变；为了让 class 更新而整组件重挂的做法可以去掉。
 
 运行时的样式、尺寸和图标查找现在只认映射自身的键。`toString`、`constructor`、`__proto__` 与其他未知值一样走原有回退：Button 的 variant / size 回到 primary / md，Text 的 size / weight / color 回到 base / normal / default，Result 的未知 status 回到 info，Container 的未知 maxWidth 不输出 max-width。Card、AspectRatio、Avatar 与 AvatarGroup 会忽略这些键，不再把函数文本写进 class。与原型键同名的图标不再阻断自定义注册，注册后按该名称渲染。

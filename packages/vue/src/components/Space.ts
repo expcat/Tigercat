@@ -10,7 +10,11 @@ import {
   type SpaceSize
 } from '@expcat/tigercat-core'
 
-export type VueSpaceProps = SpaceProps
+export interface VueSpaceProps extends SpaceProps {
+  split?: boolean
+  className?: string
+  style?: Record<string, string | number>
+}
 
 export const Space = defineComponent({
   name: 'TigerSpace',

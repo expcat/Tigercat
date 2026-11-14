@@ -53,6 +53,8 @@ export function useBreadcrumbContext(): BreadcrumbContext | undefined {
 }
 
 export interface VueBreadcrumbProps {
+  locale?: Partial<TigerLocale>
+  labels?: Partial<TigerLocaleBreadcrumb>
   separator?: BreadcrumbSeparator
   maxItems?: number
   className?: string

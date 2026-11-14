@@ -152,7 +152,6 @@ export interface VueTreeSelectProps {
   expandedKeys?: (string | number)[]
   defaultExpandedKeys?: (string | number)[]
   virtual?: boolean
-  height?: number
   listHeight?: number
   itemHeight?: number
   loading?: boolean
