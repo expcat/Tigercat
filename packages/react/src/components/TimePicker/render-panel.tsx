@@ -64,6 +64,11 @@ export function TimePickerDesktopColumns({
                     className={getTimePickerItemClasses(selected, option.disabled)}
                     onClick={() => {
                       if (!option.disabled) onSelect(column.unit, option.value)
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key !== 'Enter' && event.key !== ' ') return
+                      event.preventDefault()
+                      if (!option.disabled) onSelect(column.unit, option.value)
                     }}>
                     {option.label}
                   </div>

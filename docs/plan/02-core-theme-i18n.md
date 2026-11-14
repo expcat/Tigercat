@@ -16,14 +16,13 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 ## 依赖与顺序
 
 - X01-F016、X01-F017 先于 06 里 ContextMenu、Dropdown 的 `items` 分支条目（C088-F03、C088-F06）。
-- X01-F015 与 [05](05-form.md) 的 TimePicker 条目同批。C078 的报告补充：Vue 桌面列同样只绑了 click。
 
 ## 概览
 
-本篇 19 条：P1 2、P2 15、P3 2。
-按波次：W1 3、W2 15、W9 1。
+本篇 18 条：P1 1、P2 15、P3 2。
+按波次：W1 2、W2 15、W9 1。
 
-本篇的 P1：X01-F015、X01-F016。
+本篇的 P1：X01-F016。
 
 ## 波及多个组件的条目
 
@@ -54,7 +53,6 @@ X01（共享 Core 与框架基础）和 X02（主题、样式与 i18n）两份�
 | X01-F012 | P2   | W2   | Core  | 行为 | 工作流成功 action 的结果共享旧实例嵌套数据          | 新实例 amount 改 999 后旧实例仍为 100（WorkflowDetailShell/WorkflowTimeline 宿主）         |
 | X01-F013 | P2   | W2   | React | 键盘 | React Select 关闭时把 Tab 已移出的焦点拉回          | 打开 React Select 后按 Tab，下拉关闭且等帧后焦点仍停在后续控件 After                       |
 | X01-F014 | P2   | W2   | React | 键盘 | React TreeSelect 可用 Enter 选中禁用节点            | defaultOpen 且首节点 disabled:true 时按 Enter 不触发 onChange，显示值不变                  |
-| X01-F015 | P1   | W1   | React | 键盘 | React TimePicker 桌面选项无法通过键盘选入草稿       | 初始 10:00，聚焦 10 Hour 按下键到 11 Hour 再 Enter、确定，提交 11:00 并触发 onChange       |
 | X01-F016 | P1   | W1   | React | 键盘 | React items 子菜单只有悬停打开路径                  | items 含 submenu 时，聚焦 More 后 ArrowRight 或 click 使 expanded 为 true、子菜单出现      |
 | X01-F017 | P2   | W2   | React | 键盘 | React popup typeahead 的数据索引与 DOM 索引错位     | React Dropdown items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu       |
 | X01-F018 | P2   | W2   | React | 行为 | React Tree 的 loaded keys 回调丢失先前完成项        | React Tree 先后完成 A、B 加载，第二次 onLoadedKeysChange 含 a 与 b；受控同批完成回写不丢键 |

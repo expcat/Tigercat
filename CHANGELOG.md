@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **TimePicker（React，X01-F015）**：桌面列的焦点选项可用 Enter 或 Space 写入草稿。初始 10:00，聚焦 10 Hour 按下键到 11 Hour 再 Enter、确定，提交 11:00 并触发 onChange。方向键仍只移动焦点，禁用选项不会被选中。
+
 - **工作流字段权限（Core，X01-F003）**：initiate 下 schema `disabled: true` 的字段保持禁用，不进入可写名单，提交保留 original。源 schema `readOnly: true` 同样不接受客户端覆盖，仍按文本渲染。节点权限把字段标成只读或隐藏的行为不变。
 
 - **浮层触发器（Vue，X01-F002）**：Tooltip、Popover、Popconfirm、Dropdown 与 ContextMenu 合并子按钮时保留 disabled。浮层未禁用时，子按钮的 `disabled: true` 和静态 `disabled` 仍保持禁用；浮层自身禁用时触发器继续禁用。

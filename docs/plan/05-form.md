@@ -16,7 +16,7 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 依赖与顺序
 
-- TimePicker 的键盘选入是 [02](02-core-theme-i18n.md) 的 X01-F015；Select 关闭抢焦点是 X01-F013；TreeSelect 选中禁用节点是 X01-F014；Upload 的两条是 X01-F008、X01-F009。
+- Select 关闭抢焦点是 X01-F013；TreeSelect 选中禁用节点是 X01-F014；Upload 的两条是 X01-F008、X01-F009。
 - S10 波及 13 个表单组件，先做 S10 再做这些组件里其余的受控条目。
 - InputGroup 的尺寸继承（C059-F01、C063-F01）一批做，Mentions、TimePicker、TreeSelect 同验。
 
@@ -311,9 +311,9 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 报告没有给这些组件立新的编号。右列是并入的既有条目，修那些条目时要在这里复验。
 
-| 任务 | 组件            | 报告                             | 并入的条目                                                 |
-| ---- | --------------- | -------------------------------- | ---------------------------------------------------------- |
-| C064 | InputGroupAddon | `groups/form/InputGroupAddon.md` | S02                                                        |
-| C066 | InputOTP        | `groups/form/InputOTP.md`        | S01、S04、S10                                              |
-| C070 | Radio           | `groups/form/Radio.md`           | S01、S04、S08、S10                                         |
-| C078 | TimePicker      | `groups/form/TimePicker.md`      | S01、S02、S04、S07、C059-F01、C059-F02、C065-F03、X01-F015 |
+| 任务 | 组件            | 报告                             | 并入的条目                                       |
+| ---- | --------------- | -------------------------------- | ------------------------------------------------ |
+| C064 | InputGroupAddon | `groups/form/InputGroupAddon.md` | S02                                              |
+| C066 | InputOTP        | `groups/form/InputOTP.md`        | S01、S04、S10                                    |
+| C070 | Radio           | `groups/form/Radio.md`           | S01、S04、S08、S10                               |
+| C078 | TimePicker      | `groups/form/TimePicker.md`      | S01、S02、S04、S07、C059-F01、C059-F02、C065-F03 |

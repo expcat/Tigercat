@@ -88,6 +88,25 @@ describe('TimePicker', () => {
     expect(screen.getByRole('textbox')).toHaveValue('11:00')
   })
 
+  it('commits 11:00 after ArrowDown and Enter on a desktop hour', async () => {
+    const onChange = vi.fn()
+    render(<TimePicker defaultOpen defaultValue="10:00" onChange={onChange} />)
+    const hour = document.querySelector<HTMLElement>('[aria-label="10 Hour"]')!
+    hour.focus()
+    expect(hour).toHaveFocus()
+    await userEvent.keyboard('{ArrowDown}')
+    const next = document.querySelector<HTMLElement>('[aria-label="11 Hour"]')!
+    expect(next).toHaveFocus()
+    expect(next).toHaveAttribute('aria-selected', 'false')
+    await userEvent.keyboard('{Enter}')
+    expect(next).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('textbox')).toHaveValue('11:00')
+    await userEvent.click(screen.getByRole('button', { name: 'OK' }))
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledWith('11:00')
+    expect(screen.getByRole('textbox')).toHaveValue('11:00')
+  })
+
   it('ignores panel commits and drafts after readOnly is set on an open picker', async () => {
     const onChange = vi.fn()
     const now = new Date(2024, 5, 15, 14, 25)
