@@ -313,6 +313,7 @@ export function useTableState(
     if (!isSortControlled.value) {
       uncontrolledSortState.value = nextSortState
     }
+    const previousPage = currentPage.value
     const nextPage = queryPage()
     emit('sort-change', nextSortState)
     emitChange({
@@ -322,7 +323,7 @@ export function useTableState(
           ? { current: nextPage, pageSize: currentPageSize.value }
           : null
     })
-    if (paginationMerged.value !== false && nextPage !== currentPage.value) {
+    if (paginationMerged.value !== false && nextPage !== previousPage) {
       emit('page-change', { current: nextPage, pageSize: currentPageSize.value })
     }
   }

@@ -12,10 +12,6 @@ data 组 7 个组件（C131–C137）。视觉与键盘全部 blocked。
 
 - 不做第二套 Timeline。
 
-## 依赖与顺序
-
-- Vue Table 排序复位页码（X01-F011）在 [02](02-core-theme-i18n.md)。
-
 ## 概览
 
 本篇 14 条：P1 0、P2 8、P3 6。

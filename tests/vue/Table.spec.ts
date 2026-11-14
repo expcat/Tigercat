@@ -629,6 +629,31 @@ describe('Table', () => {
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'ascending')
     })
 
+    it('emits page-change once when sorting resets an uncontrolled second page', async () => {
+      const { getByText, queryByText, emitted } = await renderSettled({
+        columns: [{ key: 'name', title: 'Name', sortable: true }],
+        dataSource,
+        pagination: { defaultCurrent: 2, defaultPageSize: 1, showSizeChanger: false }
+      })
+
+      expect(getByText('Jane Smith')).toBeInTheDocument()
+
+      const sortButton = getByText('Name').closest('th')!.querySelector('[data-tiger-table-sort]')!
+      await fireEvent.click(sortButton)
+
+      expect(getByText('Bob Johnson')).toBeInTheDocument()
+      expect(queryByText('Jane Smith')).not.toBeInTheDocument()
+      expect(emitted()['change']).toEqual([
+        [
+          expect.objectContaining({
+            sort: { key: 'name', direction: 'asc' },
+            pagination: { current: 1, pageSize: 1 }
+          })
+        ]
+      ])
+      expect(emitted()['page-change']).toEqual([[{ current: 1, pageSize: 1 }]])
+    })
+
     it('should toggle sort direction on multiple clicks', async () => {
       const sortableColumns = [{ key: 'name', title: 'Name', sortable: true }]
 
