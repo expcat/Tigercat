@@ -31,6 +31,7 @@ import {
   sliderRangeFillStyle,
   sliderSortRange,
   sliderDisplayValue,
+  sliderNormalizeValue,
   sliderBounds,
   shouldSubmitNativeField,
   resolveSliderThumbName,
@@ -140,6 +141,7 @@ const Thumb = memo<ThumbProps>(
     readOnly = false
   }) => {
     const pct = getPercentage(value)
+    const tooltipText = formatSliderTooltip(value, formatTooltip)
     const suffixId = suffix ? `${id ?? 'slider'}-suffix` : undefined
     const labelledBy = suffixId
       ? [ariaLabelledby, suffixId].filter(Boolean).join(' ')
@@ -168,7 +170,7 @@ const Thumb = memo<ThumbProps>(
         aria-labelledby={labelledBy}
         aria-describedby={ariaDescribedby}
         aria-invalid={ariaInvalid || undefined}
-        aria-valuetext={formatSliderTooltip(value, formatTooltip)}
+        aria-valuetext={tooltipText}
         aria-readonly={readOnly || undefined}
         onPointerDown={(e) => onPointerDown(e, thumbType)}
         onMouseEnter={() => onHoverChange(true)}
@@ -176,7 +178,7 @@ const Thumb = memo<ThumbProps>(
         onFocus={onFocus}
         onBlur={onBlur}
         onKeyDown={(e) => onKeyDown(e, value, thumbType)}>
-        {showThumbTooltip && <div className={tooltipClasses}>{value}</div>}
+        {showThumbTooltip && <div className={tooltipClasses}>{tooltipText}</div>}
         {suffix && suffixId ? (
           <span id={suffixId} className="sr-only">
             {suffix}
@@ -599,13 +601,12 @@ export const Slider = forwardRef<HTMLElement, SliderProps>(function Slider(
                 onClick={() => {
                   if (effectiveDisabled || readOnly) return
                   const current = valueRef.current
+                  const next = sliderNormalizeValue(markValue, min, max, step)
                   commit(
                     applyThumbProposal(
                       current,
-                      markValue,
-                      range && Array.isArray(current)
-                        ? sliderPickRangeThumb(current, markValue)
-                        : null
+                      next,
+                      range && Array.isArray(current) ? sliderPickRangeThumb(current, next) : null
                     )
                   )
                 }}>

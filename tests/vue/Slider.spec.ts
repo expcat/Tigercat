@@ -140,6 +140,32 @@ describe('Slider', () => {
   })
 
   describe('Range mode', () => {
+    it('should give unnamed range instances unique thumb IDs and existing label references', async () => {
+      const { container } = render({
+        components: { Slider },
+        template: `
+          <span id="volume-label">Volume</span>
+          <Slider range :default-value="[20, 80]" aria-labelledby="volume-label" />
+          <Slider range :default-value="[30, 70]" aria-labelledby="volume-label" />
+        `
+      })
+      const thumbs = Array.from(getThumbs(container))
+      const ids = thumbs.map((thumb) => thumb.id)
+      expect(thumbs).toHaveLength(4)
+      for (const thumb of thumbs) {
+        expect(thumb.id).not.toBe('')
+        const references = thumb.getAttribute('aria-labelledby')?.split(/\s+/) ?? []
+        expect(references).toContain('volume-label')
+        expect(references).toContain(`${thumb.id}-suffix`)
+        for (const reference of references) {
+          expect(document.getElementById(reference)).toBeInTheDocument()
+        }
+      }
+      expect(new Set(ids).size).toBe(4)
+      await fireEvent.keyDown(thumbs[0], { key: 'ArrowRight' })
+      expect(Array.from(getThumbs(container), (thumb) => thumb.id)).toEqual(ids)
+    })
+
     it('should render two thumbs with correct aria values', () => {
       const { container } = render(Slider, {
         props: { modelValue: [30, 70], range: true, min: 0, max: 100 }
@@ -254,6 +280,23 @@ describe('Slider', () => {
   })
 
   describe('Marks', () => {
+    it('should clamp an outside mark before committing its value', async () => {
+      const onUpdate = vi.fn()
+      const { container, getByRole } = render(Slider, {
+        props: {
+          defaultValue: 0,
+          min: 0,
+          max: 100,
+          step: 10,
+          marks: { 105: 'outside' },
+          'onUpdate:modelValue': onUpdate
+        }
+      })
+      await fireEvent.click(getByRole('button', { name: 'outside' }))
+      expect(onUpdate.mock.calls).toEqual([[100]])
+      expect(getThumb(container)).toHaveAttribute('aria-valuenow', '100')
+    })
+
     it('should render custom mark labels', () => {
       const { container } = render(Slider, {
         props: { marks: { 0: '0°C', 50: '50°C', 100: '100°C' } }

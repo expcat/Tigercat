@@ -292,6 +292,16 @@ describe('Slider', () => {
   })
 
   describe('Tooltip', () => {
+    it('should show the formatted tooltip text used by aria-valuetext', () => {
+      const { container } = render(<Slider value={30} formatTooltip={(value) => `${value}%`} />)
+      const thumb = getThumb(container)
+      fireEvent.mouseEnter(thumb)
+      const tooltip = thumb.querySelector('div')
+      expect(tooltip).toBeVisible()
+      expect(thumb).toHaveAttribute('aria-valuetext', '30%')
+      expect(tooltip?.textContent).toBe(thumb.getAttribute('aria-valuetext'))
+    })
+
     it('should show the tooltip on hover and hide it on leave when enabled', () => {
       const { container } = render(<Slider value={50} tooltip />)
       const thumb = getThumb(container)
@@ -310,6 +320,23 @@ describe('Slider', () => {
   })
 
   describe('Marks', () => {
+    it('should clamp an outside mark before committing its value', () => {
+      const onChange = vi.fn()
+      const { container, getByRole } = render(
+        <Slider
+          defaultValue={0}
+          min={0}
+          max={100}
+          step={10}
+          marks={{ 105: 'outside' }}
+          onChange={onChange}
+        />
+      )
+      fireEvent.click(getByRole('button', { name: 'outside' }))
+      expect(onChange.mock.calls).toEqual([[100]])
+      expect(getThumb(container)).toHaveAttribute('aria-valuenow', '100')
+    })
+
     it('should render custom mark labels', () => {
       const { container } = render(<Slider marks={{ 0: '0°C', 50: '50°C', 100: '100°C' }} />)
       expect(container.textContent).toContain('0°C')

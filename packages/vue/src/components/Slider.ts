@@ -7,6 +7,7 @@ import {
   onBeforeUnmount,
   onMounted,
   watch,
+  useId,
   type PropType
 } from 'vue'
 import {
@@ -35,6 +36,7 @@ import {
   sliderRangeFillStyle,
   sliderSortRange,
   sliderDisplayValue,
+  sliderNormalizeValue,
   sliderBounds,
   shouldSubmitNativeField,
   resolveSliderThumbName,
@@ -127,6 +129,7 @@ export const Slider = defineComponent({
       typeof value === 'number' || Array.isArray(value)
   },
   setup(props, { emit, attrs, expose }) {
+    const generatedId = `tiger-slider-${useId()}`
     const formItemControl = inject<VueFormItemControlContext | null>(
       FORM_ITEM_CONTROL_INJECTION_KEY,
       null
@@ -335,7 +338,7 @@ export const Slider = defineComponent({
         formItemControl?.describedBy.value
       )
       const attrId = typeof restAttrs.id === 'string' ? restAttrs.id : undefined
-      const effectiveId = attrId ?? formItemControl?.id.value
+      const effectiveId = attrId ?? formItemControl?.id.value ?? generatedId
       const directionRtl = rtl.value
       const bounds = sliderBounds(props.min, props.max)
       const getPercentage = (val: number) => sliderGetPercentage(val, props.min, props.max)
@@ -364,8 +367,9 @@ export const Slider = defineComponent({
         value: number,
         thumbType: 'min' | 'max' | null,
         name: { ariaLabel?: string; ariaLabelledby?: string; suffix?: string },
-        thumbId?: string
+        thumbId: string
       ) => {
+        const suffixId = name.suffix ? `${thumbId}-suffix` : undefined
         const focused =
           (thumbType === 'min' && focusedThumb.value === 'min') ||
           (thumbType === 'max' && focusedThumb.value === 'max') ||
@@ -394,8 +398,8 @@ export const Slider = defineComponent({
             'aria-disabled': effectiveDisabled.value || undefined,
             'aria-invalid': status.value === 'error' || undefined,
             'aria-label': name.suffix ? undefined : name.ariaLabel,
-            'aria-labelledby': name.suffix
-              ? `${name.ariaLabelledby ?? ''} ${thumbId ?? ''}-suffix`.trim()
+            'aria-labelledby': suffixId
+              ? [name.ariaLabelledby, suffixId].filter(Boolean).join(' ')
               : name.ariaLabelledby,
             'aria-describedby': describedBy,
             'aria-valuetext': formatSliderTooltip(value, props.formatTooltip),
@@ -443,9 +447,7 @@ export const Slider = defineComponent({
                   )
                 ]
               : []),
-            ...(name.suffix
-              ? [h('span', { id: `${thumbId ?? 'thumb'}-suffix`, class: 'sr-only' }, name.suffix)]
-              : [])
+            ...(name.suffix ? [h('span', { id: suffixId, class: 'sr-only' }, name.suffix)] : [])
           ]
         )
       }
@@ -476,12 +478,7 @@ export const Slider = defineComponent({
         props.range && Array.isArray(current)
           ? [
               createThumb(current[0], 'min', minName, effectiveId),
-              createThumb(
-                current[1],
-                'max',
-                maxName,
-                effectiveId ? `${effectiveId}-max` : 'slider-max'
-              )
+              createThumb(current[1], 'max', maxName, `${effectiveId}-max`)
             ]
           : createThumb(
               typeof current === 'number' ? current : current[0],
@@ -506,12 +503,18 @@ export const Slider = defineComponent({
                     disabled: effectiveDisabled.value || props.readOnly || undefined,
                     onClick: () => {
                       if (effectiveDisabled.value || props.readOnly) return
+                      const next = sliderNormalizeValue(
+                        Number(key),
+                        props.min,
+                        props.max,
+                        props.step
+                      )
                       commit(
                         applyThumbProposal(
                           displayed.value,
-                          Number(key),
+                          next,
                           props.range && Array.isArray(displayed.value)
-                            ? sliderPickRangeThumb(displayed.value, Number(key))
+                            ? sliderPickRangeThumb(displayed.value, next)
                             : null
                         )
                       )
