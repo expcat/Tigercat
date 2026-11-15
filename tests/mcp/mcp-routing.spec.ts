@@ -102,7 +102,7 @@ describe('getTigercatComponent', () => {
     expect(footer).toContain('[Complete props]')
     expect(footer).toContain("`size?`: `'default' | 'compact'`; default `'default'`.")
     for (const [component, count] of Object.entries({
-      Space: 5,
+      Space: 8,
       Popconfirm: 17,
       SchemaForm: 29,
       Gantt: 33,
