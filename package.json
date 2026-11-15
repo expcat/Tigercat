@@ -78,7 +78,7 @@
     "mcp:serve": "node ./packages/mcp/dist/index.js --root .",
     "tokens:build": "node ./packages/core/scripts/generate-tokens.mjs",
     "tokens:check": "node ./packages/core/scripts/generate-tokens.mjs --check",
-    "types:check": "node ./scripts/check-public-types.mjs && node ./scripts/check-vue-props-parity.mjs",
+    "types:check": "node ./scripts/check-public-types.mjs && node ./scripts/check-vue-props-parity.mjs && tsc --project tests/types/tsconfig.json",
     "example:vue": "pnpm --filter @expcat/tigercat-example-vue3 dev",
     "example:react": "pnpm --filter @expcat/tigercat-example-react dev",
     "example:build": "pnpm --filter @expcat/tigercat-example-react build && pnpm --filter @expcat/tigercat-example-vue3 build",

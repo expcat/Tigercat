@@ -160,8 +160,8 @@ export function useSelectController(props: SelectProps) {
           (Array.isArray(normalized) ? normalized : []) as SelectValue[]
         )
       } else {
-        ;(onChange as ((value: SelectValue | undefined) => void) | undefined)?.(
-          normalized as SelectValue | undefined
+        ;(onChange as ((value: SelectValue | null | undefined) => void) | undefined)?.(
+          normalized as SelectValue | null | undefined
         )
       }
       formItemControl?.onChange?.(normalized)
@@ -503,7 +503,8 @@ export function useSelectController(props: SelectProps) {
   const comboboxAria = getPickerComboboxAria({
     expanded: isOpen,
     listboxId,
-    activeIndex
+    activeIndex,
+    readOnly
   })
   const listboxAria = getPickerListboxAria({ id: listboxId })
 

@@ -15,6 +15,7 @@ export interface PickerComboboxAriaOptions {
   activeOptionId?: string
   haspopup?: 'listbox' | 'tree'
   autocomplete?: 'list' | 'none'
+  readOnly?: boolean
   /**
    * When false, the popup is open but no listbox node is mounted
    * (loading or empty status). `aria-expanded` stays true; controls and
@@ -174,6 +175,7 @@ export function getPickerComboboxAria({
   activeOptionId,
   haspopup = 'listbox',
   autocomplete,
+  readOnly,
   listMounted = true
 }: PickerComboboxAriaOptions): {
   role: 'combobox'
@@ -182,6 +184,7 @@ export function getPickerComboboxAria({
   'aria-controls': string | undefined
   'aria-activedescendant': string | undefined
   'aria-autocomplete'?: 'list' | 'none'
+  'aria-readonly'?: true
   'data-state': 'open' | 'closed'
 } {
   const pointAtList = expanded && listMounted
@@ -195,6 +198,7 @@ export function getPickerComboboxAria({
         (activeIndex >= 0 ? getPickerOptionId(listboxId, activeIndex) : undefined))
       : undefined,
     ...(autocomplete ? { 'aria-autocomplete': autocomplete } : {}),
+    ...(readOnly ? { 'aria-readonly': true as const } : {}),
     'data-state': expanded ? 'open' : 'closed'
   }
 }

@@ -12,12 +12,15 @@ tests/
 ├── react/    # React 渲染、事件、受控状态与生命周期绑定
 ├── vue/      # Vue 渲染、emits、响应式状态与生命周期绑定
 ├── mcp/      # MCP 路由契约
+├── types/    # TypeScript 编译期 API 契约（pnpm types:check）
 ├── utils/    # render、a11y、主题、observer 与 frame helpers
 └── setup.ts  # Vitest 全局环境
 ```
 
 `tests/utils` 只保留在用 helper。新增 helper 前先确认现有 render、a11y、theme、
 observer、frame 工具不能满足；不再被任何 spec 引用的 helper 应随改动一并删除。
+
+`tests/types` 由 `pnpm types:check` 调用 TypeScript 编译检查，Vitest 不执行这些文件。
 
 ## 常用命令
 

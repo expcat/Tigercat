@@ -136,7 +136,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C069 | NumberKeyboard  | needs-evidence | 视觉、键盘各 0/24 执行、24 blocked，截图 0；C069-F01–F05 happy-dom 回归通过，NumberKeyboard（含 Core）83 pass，Transfer / Upload 同验 143 pass（含 required axe）；类型检查通过；真实浏览器、读屏与 hydration 待补 |
 | C070 | Radio           | needs-evidence | 视觉 0/32、键盘 0/32 全 blocked，截图 0（IAB browsers: []）；定向测试 58 passed；SSR+happy-dom 探针；未跑全仓测试、build/typecheck、E2E、hydration、读屏                                                           |
 | C071 | RadioGroup      | needs-evidence | 视觉、真实键盘各 0/32 blocked，截图 0；必填 FormItem 的组容器 ARIA 继承与显式覆盖 happy-dom 回归通过，双端 6 文件 203 pass（含 axe、Radio 与 FormItem 组合）；类型检查通过；真实浏览器、读屏与 hydration 待补      |
-| C072 | Select          | needs-evidence | 视觉 0/40、键盘 0/40 全 blocked，截图 0（IAB browsers: []）；定向测试 55+238 pass；happy-dom 探针；未跑全仓测试、完整构建、E2E、读屏、hydration                                                                    |
+| C072 | Select          | needs-evidence | 视觉、真实键盘各 0/40 blocked，截图 0；C072-F01/F03 已修复，双端只读 ARIA/聚焦/打开/搜索/值保持回归通过；12 文件 259 pass（含 picker），null JSX 与类型检查通过；真实浏览器、读屏与 hydration 待补                 |
 | C073 | Signature       | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；定向测试 73 项通过；happy-dom 探针；未执行真实指针/手写、焦点顺序、亮暗主题、读屏                                                                     |
 | C074 | Slider          | needs-evidence | 视觉 0/40、键盘 0/40 全 blocked，截图 0（IAB browsers: []，Terra 无 CUA js）；定向测试 71 项通过；happy-dom 探针；未执行真实浏览器、读屏                                                                           |
 | C075 | Switch          | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；定向测试 5 文件 39 项通过；happy-dom 探针；未跑全仓测试、build/typecheck、E2E、hydration、读屏                                                        |

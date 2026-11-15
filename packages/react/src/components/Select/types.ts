@@ -33,9 +33,9 @@ export interface SelectBaseProps
 
 export interface SelectSingleProps extends SelectBaseProps {
   multiple?: false
-  value?: SelectValue
-  defaultValue?: SelectValue
-  onChange?: (value: SelectValue | undefined) => void
+  value?: SelectValue | null
+  defaultValue?: SelectValue | null
+  onChange?: (value: SelectValue | null | undefined) => void
 }
 
 export interface SelectMultipleProps extends SelectBaseProps {

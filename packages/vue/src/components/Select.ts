@@ -789,7 +789,8 @@ export const Select = defineComponent({
       const comboboxAria = getPickerComboboxAria({
         expanded: isOpen.value,
         listboxId,
-        activeIndex: activeIndex.value
+        activeIndex: activeIndex.value,
+        readOnly: isReadOnly.value
       })
       const searchOpen = props.searchable && isOpen.value
       const triggerClasses = getSelectTriggerClasses({

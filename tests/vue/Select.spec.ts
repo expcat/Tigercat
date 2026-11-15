@@ -250,6 +250,42 @@ describe('Select', () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 
+  it.each([false, true])(
+    'exposes readOnly state and opens without changing value (searchable=%s)',
+    async (searchable) => {
+      const onChange = vi.fn()
+      const { container, getByRole } = render(Select, {
+        props: {
+          options: testOptions,
+          defaultValue: '1',
+          name: 'readonly',
+          readOnly: true,
+          searchable,
+          'aria-label': 'Read only select',
+          onChange
+        }
+      })
+      const trigger = getByRole('combobox')
+      trigger.focus()
+      expect(trigger).toHaveFocus()
+      expect(trigger).toHaveAttribute('aria-readonly', 'true')
+      await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+      const combobox = getByRole('combobox')
+      expect(combobox).toHaveAttribute('aria-expanded', 'true')
+      expect(combobox).toHaveAttribute('aria-readonly', 'true')
+      await waitFor(() => expect(combobox).toHaveFocus())
+      await fireEvent.click(getByRole('option', { name: 'Option 2' }))
+      if (searchable) {
+        await fireEvent.input(combobox, { target: { value: 'Option 2' } })
+        expect(combobox).toHaveValue('Option 2')
+      } else {
+        expect(combobox).toHaveTextContent('Option 1')
+      }
+      expect(container.querySelector('input[type="hidden"]')).toHaveValue('1')
+      expect(onChange).not.toHaveBeenCalled()
+    }
+  )
+
   it('disables tag removal while the field is disabled', async () => {
     const onChange = vi.fn()
     const { getAllByRole } = render(Select, {

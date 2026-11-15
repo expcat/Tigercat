@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Select 空值类型与只读语义（Core / Vue / React，C072-F01、C072-F03）**：React 单选的 `value`、`defaultValue` 与 `onChange` 接受运行时已有的 `null` 空值，保留 `undefined` 的非受控语义。双端普通与可搜索 combobox 在只读时输出 `aria-readonly=true`，仍可聚焦、打开与搜索，选择值保持不变。
+
 - **RadioGroup 必填语义（Vue / React，C071-F01）**：双端从 FormItem 继承 required，在 `role="radiogroup"` 容器输出 `aria-required=true`；调用方显式传入的 `aria-required`（含 false）仍优先。
 
 - **NumberKeyboard 长度、值状态与必填语义（Core / Vue / React，C069-F01、C069-F02、C069-F03、C069-F04、C069-F05）**：金额补零小数点先检查完整候选值长度，`maxLength=1` 时不生成 `0.`。双端由当前原始值派生合法提交值与错误，Vue 切换模式后重新校验，纠正非法默认值再清空时不再恢复历史错误。React 原生 `onKeyDown` 与内部处理组合，保留 `preventDefault()` 取消约定。NumberKeyboard、Transfer、Upload 移除容器或触发按钮上不支持的 `aria-required`，必填校验、值、标签与错误关联继续由 FormItem 承担。

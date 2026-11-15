@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@expcat/tigercat-core": ["../../packages/core/src/index.ts"],
+      "react/jsx-runtime": ["../../packages/react/node_modules/@types/react/jsx-runtime.d.ts"]
+    }
+  },
+  "include": ["./select.tsx"]
+}
