@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import { renderToString } from 'react-dom/server'
 import { Checkbox } from '@expcat/tigercat-react/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
 import { Form } from '@expcat/tigercat-react/Form'
@@ -235,6 +236,31 @@ describe('Checkbox', () => {
   })
 
   describe('Accessibility', () => {
+    it('preserves aria-required="false" in the DOM and SSR output', () => {
+      const checkbox = <Checkbox aria-required="false">Optional</Checkbox>
+      const { container } = render(checkbox)
+
+      expect.soft(getBox(container)).toHaveAttribute('aria-required', 'false')
+      expect.soft(renderToString(checkbox)).toContain('aria-required="false"')
+    })
+
+    it('preserves each grouped checkbox description', () => {
+      const { container } = render(
+        <CheckboxGroup>
+          <Checkbox value="a" aria-describedby="help-a">
+            A
+          </Checkbox>
+          <Checkbox value="b" aria-describedby="help-b">
+            B
+          </Checkbox>
+        </CheckboxGroup>
+      )
+
+      const boxes = getBoxes(container)
+      expect(boxes[0]).toHaveAttribute('aria-describedby', 'help-a')
+      expect(boxes[1]).toHaveAttribute('aria-describedby', 'help-b')
+    })
+
     it('is focusable', () => {
       const { container } = render(<Checkbox>Checkbox</Checkbox>)
       const box = getBox(container)
@@ -259,6 +285,24 @@ describe('Checkbox', () => {
   })
 
   describe('FormItem', () => {
+    it('assigns distinct default ids to grouped checkboxes in a named FormItem', () => {
+      const { container } = render(
+        <Form value={{ tags: [] }}>
+          <FormItem name="tags" label="Tags">
+            <CheckboxGroup>
+              <Checkbox value="a">A</Checkbox>
+              <Checkbox value="b">B</Checkbox>
+            </CheckboxGroup>
+          </FormItem>
+        </Form>
+      )
+
+      const boxes = getBoxes(container)
+      expect(boxes[0].id).toBeTruthy()
+      expect(boxes[1].id).toBeTruthy()
+      expect(boxes[0].id).not.toBe(boxes[1].id)
+    })
+
     it('reads FormItem when checked is omitted', () => {
       const { container } = render(
         <Form value={{ agree: true }}>

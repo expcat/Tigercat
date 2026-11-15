@@ -345,6 +345,19 @@ describe('Checkbox', () => {
   })
 
   describe('Accessibility', () => {
+    it('preserves each grouped checkbox description', () => {
+      const { container } = renderGroup(`
+        <CheckboxGroup>
+          <Checkbox value="a" aria-describedby="help-a">A</Checkbox>
+          <Checkbox value="b" aria-describedby="help-b">B</Checkbox>
+        </CheckboxGroup>
+      `)
+
+      const boxes = getBoxes(container)
+      expect(boxes[0]).toHaveAttribute('aria-describedby', 'help-a')
+      expect(boxes[1]).toHaveAttribute('aria-describedby', 'help-b')
+    })
+
     it('is focusable', () => {
       const { container } = render(Checkbox, { slots: { default: 'Checkbox' } })
       const box = getBox(container)
@@ -369,6 +382,25 @@ describe('Checkbox', () => {
   })
 
   describe('FormItem', () => {
+    it('assigns distinct default ids to grouped checkboxes in a named FormItem', () => {
+      const { container } = render({
+        components: { Form, FormItem, Checkbox, CheckboxGroup },
+        template: `<Form :model-value="{ tags: [] }">
+          <FormItem name="tags" label="Tags">
+            <CheckboxGroup>
+              <Checkbox value="a">A</Checkbox>
+              <Checkbox value="b">B</Checkbox>
+            </CheckboxGroup>
+          </FormItem>
+        </Form>`
+      })
+
+      const boxes = getBoxes(container)
+      expect(boxes[0].id).toBeTruthy()
+      expect(boxes[1].id).toBeTruthy()
+      expect(boxes[0].id).not.toBe(boxes[1].id)
+    })
+
     it('reads FormItem when modelValue is omitted', () => {
       const { container } = render({
         components: { Form, FormItem, Checkbox },

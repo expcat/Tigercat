@@ -21,8 +21,8 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 概览
 
-本篇 68 条：P1 0、P2 65、P3 3。
-按波次：W3 65、W9 3。
+本篇 65 条：P1 0、P2 62、P3 3。
+按波次：W3 62、W9 3。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C056-F01（S10）、C056-F04（S07）、C060-F04（S13）、C061-F05（S13）、C072-F02（S13）、C074-F04（S13）、C080-F03（S13）。
 
@@ -59,17 +59,14 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 报告 `groups/form/Checkbox.md`，队列状态 needs-evidence。另受 S01、S04 影响。
 
-| 编号     | 级别 | 波次 | 端    | 类别   | 条目                                                  | 验收                                                                                   |
-| -------- | ---- | ---- | ----- | ------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| C054-F01 | P2   | W3   | React | 无障碍 | React 把 aria-required 的字符串 false 改成 true       | 非必填场景下 React Checkbox 传 aria-required='false'，DOM 与 SSR 输出均保留 false 语义 |
-| C054-F02 | P2   | W3   | 双端  | 无障碍 | 组内非错误 owner 子项丢失自己的帮助描述               | 组内 A/B 分别传 aria-describedby=help-a / help-b 时，两个 input 都保留各自的描述引用   |
-| C054-F03 | P2   | W3   | 双端  | 无障碍 | 具名 FormItem 下的多个组内 Checkbox 默认继承同一个 id | FormItem name=tags > CheckboxGroup 下两个无显式 id 的 Checkbox，input id 互不相同      |
-| C054-F04 | P2   | W3   | Vue   | 行为   | Vue 缺省 value 被转换为 false，混淆缺值与显式布尔值   | Group defaultValue=[false] 下未传 value 的 Vue Checkbox 不选中；显式 false 仍选中      |
-| C054-F05 | P2   | W3   | 双端  | 行为   | Checkbox 未消费组级错误状态                           | CheckboxGroup status='error'（无 FormItem）下子项呈错误样式，owner 带 aria-invalid     |
+| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                | 验收                                                                               |
+| -------- | ---- | ---- | ---- | ---- | --------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| C054-F04 | P2   | W3   | Vue  | 行为 | Vue 缺省 value 被转换为 false，混淆缺值与显式布尔值 | Group defaultValue=[false] 下未传 value 的 Vue Checkbox 不选中；显式 false 仍选中  |
+| C054-F05 | P2   | W3   | 双端 | 行为 | Checkbox 未消费组级错误状态                         | CheckboxGroup status='error'（无 FormItem）下子项呈错误样式，owner 带 aria-invalid |
 
 ### C055 CheckboxGroup
 
-报告 `groups/form/CheckboxGroup.md`，队列状态 needs-evidence。另受 S01、S02、S04、C054-F02、C054-F03、C054-F05 影响。
+报告 `groups/form/CheckboxGroup.md`，队列状态 needs-evidence。另受 S01、S02、S04、C054-F05 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                           | 验收                                                                             |
 | -------- | ---- | ---- | ---- | ------ | ------------------------------ | -------------------------------------------------------------------------------- |

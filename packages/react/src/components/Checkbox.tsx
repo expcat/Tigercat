@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
+import React, { useEffect, useId, useRef, forwardRef, useImperativeHandle } from 'react'
 import {
   classNames,
   checkboxCheckPathD,
@@ -56,6 +56,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   const groupContext = useCheckboxGroup()
   const formItemControl = useFormItemControlContext()
   const inGroup = Boolean(groupContext)
+  const generatedId = `tiger-checkbox-${useId()}`
 
   if (inGroup && value === undefined) {
     devWarn(
@@ -83,7 +84,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   )
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
   const shakeTrigger = formItemControl?.shakeTrigger
-  const effectiveId = id ?? formItemControl?.id
+  const effectiveId = id ?? (inGroup ? generatedId : formItemControl?.id)
   const effectiveName = name ?? formItemControl?.name
 
   useEffect(() => {
@@ -126,7 +127,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 
   const describedBy = mergeAriaDescribedBy(
     typeof props['aria-describedby'] === 'string' ? props['aria-describedby'] : undefined,
-    formItemControl?.describedBy
+    ownsInvalid ? formItemControl?.describedBy : undefined
   )
 
   const visual = (
@@ -167,8 +168,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
       value={typeof value === 'boolean' ? String(value) : (value as string | number | undefined)}
       aria-checked={indeterminate ? 'mixed' : checked}
       aria-invalid={status === 'error' && ownsInvalid ? true : props['aria-invalid']}
-      aria-required={formItemControl?.required || props['aria-required'] ? true : undefined}
-      aria-describedby={inGroup && !ownsInvalid ? undefined : describedBy}
+      aria-required={formItemControl?.required ? true : props['aria-required']}
+      aria-describedby={describedBy}
       onChange={handleChange}
       onBlur={handleBlur}
     />

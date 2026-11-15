@@ -5,6 +5,7 @@ import {
   ref,
   watch,
   inject,
+  useId,
   type PropType,
   type ComputedRef
 } from 'vue'
@@ -91,6 +92,7 @@ export const Checkbox = defineComponent({
     )
     const groupContext = computed(() => groupContextRef?.value)
     const inGroup = computed(() => !!groupContext.value)
+    const generatedId = `tiger-checkbox-${useId()}`
 
     watch(
       () => [inGroup.value, props.value] as const,
@@ -122,7 +124,10 @@ export const Checkbox = defineComponent({
     )
     const effectiveId = computed(() => {
       const attrId = attrs.id
-      return (typeof attrId === 'string' ? attrId : undefined) ?? formItemControl?.id.value
+      return (
+        (typeof attrId === 'string' ? attrId : undefined) ??
+        (inGroup.value ? generatedId : formItemControl?.id.value)
+      )
     })
     const effectiveName = computed(() => {
       const attrName = attrs.name
@@ -205,7 +210,7 @@ export const Checkbox = defineComponent({
         typeof restAttrs['aria-describedby'] === 'string'
           ? (restAttrs['aria-describedby'] as string)
           : undefined,
-        formItemControl?.describedBy.value
+        ownsInvalid.value ? formItemControl?.describedBy.value : undefined
       )
       const visual = h(
         'span',
@@ -256,7 +261,7 @@ export const Checkbox = defineComponent({
         'aria-invalid':
           status.value === 'error' && ownsInvalid.value ? true : restAttrs['aria-invalid'],
         'aria-required': formItemControl?.required.value ? true : restAttrs['aria-required'],
-        'aria-describedby': inGroup.value && !ownsInvalid.value ? undefined : describedBy,
+        'aria-describedby': describedBy,
         onChange: handleChange,
         onBlur: handleBlur
       })
