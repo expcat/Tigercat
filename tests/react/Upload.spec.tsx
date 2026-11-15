@@ -24,6 +24,27 @@ async function dispatchUploadEvent(action: () => Promise<boolean>): Promise<void
 
 describe('Upload', () => {
   describe('Rendering', () => {
+    it('includes only successful URLs in native form values', () => {
+      const files: UploadFile[] = (
+        ['ready', 'queued', 'uploading', 'error', 'success'] as const
+      ).map((status) => ({
+        uid: status,
+        name: `${status}.txt`,
+        status,
+        url: `https://cdn.example/${status}.txt`
+      }))
+      const { container, rerender } = render(<Upload name="files" fileList={files} />)
+
+      const values = () =>
+        Array.from(container.querySelectorAll<HTMLInputElement>('input[type="hidden"]')).map(
+          (input) => [input.name, input.value]
+        )
+      expect(values()).toEqual([['files', 'https://cdn.example/success.txt']])
+
+      rerender(<Upload name="files" fileList={files.slice(0, -1)} />)
+      expect(values()).toEqual([['files', '']])
+    })
+
     it('reads FormItem fileList when the public list is omitted', () => {
       const { getByText } = render(
         <Form
@@ -308,6 +329,29 @@ describe('Upload', () => {
       })
     })
 
+    it('does not call onChange after pending validation finishes following unmount', async () => {
+      let allowUpload!: (allowed: boolean) => void
+      const validation = new Promise<boolean>((resolve) => {
+        allowUpload = resolve
+      })
+      const beforeUpload = vi.fn(() => validation)
+      const onChange = vi.fn()
+      const { container, unmount } = render(
+        <Upload autoUpload={false} beforeUpload={beforeUpload} onChange={onChange} />
+      )
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(input, { target: { files: [new File(['a'], 'pending.txt')] } })
+      await waitFor(() => expect(beforeUpload).toHaveBeenCalledOnce())
+
+      unmount()
+      await act(async () => {
+        allowUpload(true)
+        await validation
+      })
+
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
     it('should call onRemove when file is removed', async () => {
       const onRemove = vi.fn()
       const onChange = vi.fn()
@@ -549,6 +593,33 @@ describe('Upload', () => {
   })
 
   describe('List Types', () => {
+    it('shows a local thumbnail and preview action on the first selection', async () => {
+      const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:local')
+      const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined)
+
+      try {
+        const { container, getByRole, unmount } = render(
+          <Upload autoUpload={false} listType="picture-card" />
+        )
+        const input = container.querySelector('input[type="file"]') as HTMLInputElement
+        await dispatchUploadEvent(() =>
+          fireEvent.change(input, {
+            target: { files: [new File(['image'], 'local.png', { type: 'image/png' })] }
+          })
+        )
+
+        await waitFor(() => expect(container.querySelectorAll('img')).toHaveLength(1))
+        expect(getByRole('img', { name: 'local.png' })).toHaveAttribute('src', 'blob:local')
+        expect(getByRole('button', { name: 'Preview local.png' })).toBeInTheDocument()
+        expect(createObjectURL).toHaveBeenCalledOnce()
+        unmount()
+        expect(revokeObjectURL).toHaveBeenCalledExactlyOnceWith('blob:local')
+      } finally {
+        createObjectURL.mockRestore()
+        revokeObjectURL.mockRestore()
+      }
+    })
+
     it('should render text list by default', () => {
       const fileList: UploadFile[] = [
         {

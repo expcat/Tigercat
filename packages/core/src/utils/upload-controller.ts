@@ -133,7 +133,7 @@ export function createUploadController(options: {
       totalChunks?: number
       resumeKey?: string
     } = {}
-  ): Promise<void> {
+  ): Promise<unknown> {
     const config = options.getConfig()
 
     return new Promise((resolve, reject) => {
@@ -165,22 +165,7 @@ export function createUploadController(options: {
         resumeKey: extra.resumeKey,
         onProgress: applyProgress,
         onSuccess: (response) => {
-          finish(() => {
-            if (removedUids.has(uploadFile.uid)) {
-              resolve()
-              return
-            }
-            if (!extra.chunk) {
-              const url = readUploadResponseUrl(response)
-              const current = patchUid(uploadFile.uid, {
-                status: 'success',
-                progress: 100,
-                ...(url ? { url } : {})
-              })
-              if (current) options.callbacks.onSuccess?.(response, current)
-            }
-            resolve()
-          })
+          finish(() => resolve(response))
         },
         onError: (error) => {
           finish(() => {
@@ -230,7 +215,7 @@ export function createUploadController(options: {
           onError: request.onError
         })
       } else {
-        finish(() => resolve())
+        finish(() => resolve(undefined))
         return
       }
 
@@ -259,35 +244,41 @@ export function createUploadController(options: {
       const resumeKey = config.resumable ? getUploadResumeKey(file) : undefined
       const done = resumeKey ? (completedChunks.get(resumeKey) ?? new Set<number>()) : null
 
+      let response: unknown
       if (chunks.length <= 1) {
-        await requestOne(file, uploadFile, { resumeKey })
-        if (resumeKey) completedChunks.delete(resumeKey)
-        return true
-      }
-
-      for (const chunk of chunks) {
-        if (disposed || removedUids.has(uploadFile.uid)) return false
-        if (done?.has(chunk.index)) continue
-        const chunkFile = new File([chunk.blob], file.name, {
-          type: file.type,
-          lastModified: file.lastModified
-        })
-        await requestOne(chunkFile, uploadFile, {
-          originalFile: file,
-          chunk,
-          totalChunks: chunks.length,
-          resumeKey
-        })
-        if (resumeKey) {
-          const set = completedChunks.get(resumeKey) ?? new Set<number>()
-          set.add(chunk.index)
-          completedChunks.set(resumeKey, set)
+        response = await requestOne(file, uploadFile, { resumeKey })
+      } else {
+        for (const chunk of chunks) {
+          if (disposed || removedUids.has(uploadFile.uid)) return false
+          if (done?.has(chunk.index)) continue
+          const chunkFile = new File([chunk.blob], file.name, {
+            type: file.type,
+            lastModified: file.lastModified
+          })
+          const chunkResponse = await requestOne(chunkFile, uploadFile, {
+            originalFile: file,
+            chunk,
+            totalChunks: chunks.length,
+            resumeKey
+          })
+          if (readUploadResponseUrl(chunkResponse)) response = chunkResponse
+          if (resumeKey) {
+            const set = completedChunks.get(resumeKey) ?? new Set<number>()
+            set.add(chunk.index)
+            completedChunks.set(resumeKey, set)
+          }
         }
+        response ??= { chunks: chunks.length, resumeKey }
       }
 
       if (resumeKey) completedChunks.delete(resumeKey)
-      const current = patchUid(uploadFile.uid, { status: 'success', progress: 100 })
-      if (current) options.callbacks.onSuccess?.({ chunks: chunks.length, resumeKey }, current)
+      const url = readUploadResponseUrl(response)
+      const current = patchUid(uploadFile.uid, {
+        status: 'success',
+        progress: 100,
+        ...(url ? { url } : {})
+      })
+      if (current) options.callbacks.onSuccess?.(response, current)
       return true
     } finally {
       inflightUids.delete(uploadFile.uid)
@@ -343,6 +334,7 @@ export function createUploadController(options: {
       multiple: config.multiple,
       beforeUpload: config.beforeUpload
     })
+    if (disposed) return
 
     if (prepared.rejectedExceedFiles.length > 0) {
       options.callbacks.onExceed?.(prepared.rejectedExceedFiles, currentList)

@@ -4,6 +4,10 @@
 
 ## v3.0.1（未发布）
 
+双端 Upload 在 `multiple=false` 时先保留首个文件，再应用 `limit`，已因单选被拒的文件不再进入接受集合。原生 `name` 隐藏域只提交 `status='success'` 且带合法 HTTP(S) URL 的文件；无可提交结果时仍输出一个空值隐藏域。分片上传保留最后一份含可用 URL 的响应，写入文件的 `url` 并传给 `onSuccess`；没有可用 URL 时仍返回 `chunks` / `resumeKey` 汇总。依赖分片成功回调旧汇总结构的调用点，应改为读取实际响应。
+
+React Upload 的本地图片首次加入后即显示缩略图与内置预览按钮，无需调用方额外重渲染。双端共享控制器在卸载后忽略待决 `beforeUpload` 的结果，不再写回列表或触发 change。调用方式不用改。
+
 双端 TreeSelect、Tree 与 Cascader 的懒加载节点在请求未结束时，重复激活同一节点不再重复调用 `loadData`，也不提前提交该节点。请求完成后正常显示子节点；失败后仍可重试。调用方式不用改。
 
 双端 Textarea 现在始终返回包住原生 textarea 的稳定 host，切换错误文案或计数时保留节点与焦点。`className` 和 Vue `class` 统一作用于 host；依赖组件根元素就是 textarea 的 CSS 或测试应改为查询内部原生 textarea。

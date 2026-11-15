@@ -16,6 +16,27 @@ import { axe, renderWithProps, expectNoA11yViolations } from '../utils'
 
 describe('Upload', () => {
   describe('Rendering', () => {
+    it('includes only successful URLs in native form values', async () => {
+      const files: UploadFile[] = (
+        ['ready', 'queued', 'uploading', 'error', 'success'] as const
+      ).map((status) => ({
+        uid: status,
+        name: `${status}.txt`,
+        status,
+        url: `https://cdn.example/${status}.txt`
+      }))
+      const { container, rerender } = render(Upload, { props: { name: 'files', fileList: files } })
+
+      const values = () =>
+        Array.from(container.querySelectorAll<HTMLInputElement>('input[type="hidden"]')).map(
+          (input) => [input.name, input.value]
+        )
+      expect(values()).toEqual([['files', 'https://cdn.example/success.txt']])
+
+      await rerender({ fileList: files.slice(0, -1) })
+      expect(values()).toEqual([['files', '']])
+    })
+
     it('reads FormItem fileList when the public list is omitted', () => {
       const { getByText } = render({
         components: { Form, FormItem, Upload },

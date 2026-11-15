@@ -15,6 +15,7 @@ import {
   handleUploadDrop,
   prepareUploadFiles,
   runUploadQueue,
+  uploadSubmitValues,
   validateFileType,
   type UploadDragEventLike,
   type UploadFile,
@@ -205,6 +206,40 @@ describe('upload-utils validation', () => {
     expect(prepared.rejectedExceedFiles).toEqual([])
     expect(prepared.rejectedFiles.map((item) => item.reason)).toEqual(['type'])
   })
+
+  it('keeps single-selection rejections out of the limit calculation', async () => {
+    const [first, second, third] = ['a', 'b', 'c'].map((name) => new File([name], `${name}.txt`))
+    const prepared = await prepareUploadFiles({
+      currentCount: 0,
+      incomingFiles: [first!, second!, third!],
+      multiple: false,
+      limit: 2
+    })
+
+    expect(prepared.acceptedFiles).toEqual([first])
+    expect(prepared.rejectedFiles).toEqual([
+      { file: second, reason: 'single' },
+      { file: third, reason: 'single' }
+    ])
+    expect(prepared.rejectedExceedFiles).toEqual([])
+    expect(prepared.rejectedFiles.some(({ file }) => prepared.acceptedFiles.includes(file))).toBe(
+      false
+    )
+  })
+
+  it('submits only successful files with usable URLs', () => {
+    const files: UploadFile[] = (['ready', 'queued', 'uploading', 'error', 'success'] as const).map(
+      (status) => ({
+        uid: status,
+        name: `${status}.txt`,
+        status,
+        url: `https://cdn.example/${status}.txt`
+      })
+    )
+
+    expect(uploadSubmitValues(files)).toEqual(['https://cdn.example/success.txt'])
+    expect(uploadSubmitValues([{ uid: 'local', name: 'local.txt', status: 'success' }])).toEqual([])
+  })
 })
 
 describe('createUploadController', () => {
@@ -263,6 +298,69 @@ describe('createUploadController', () => {
     expect(requests).toEqual(['hold.txt'])
     expect(host.snapshot()[0]?.status).toBe('success')
     controller.dispose()
+  })
+
+  it('settles chunk uploads with the successful response URL', async () => {
+    const host = createHost()
+    const response = { url: 'https://cdn.example/final.txt' }
+    const customRequest = vi.fn(({ onSuccess }: UploadRequestOptions) => onSuccess?.(response))
+    const onSuccess = vi.fn()
+    const controller = createUploadController({
+      host,
+      getConfig: () => ({
+        autoUpload: true,
+        queue: false,
+        maxConcurrent: 2,
+        resumable: false,
+        chunkSize: 2,
+        customRequest
+      }),
+      callbacks: { onSuccess }
+    })
+
+    await controller.processFiles([new File(['abcdef'], 'final.txt')])
+
+    expect(customRequest).toHaveBeenCalledTimes(3)
+    expect(host.snapshot()[0]).toMatchObject({
+      status: 'success',
+      progress: 100,
+      url: response.url
+    })
+    expect(uploadSubmitValues(host.snapshot())).toEqual([response.url])
+    expect(onSuccess).toHaveBeenCalledExactlyOnceWith(response, host.snapshot()[0])
+    controller.dispose()
+  })
+
+  it('ignores pending validation results after disposal', async () => {
+    const host = createHost()
+    const setFileList = vi.spyOn(host, 'setFileList')
+    let allowUpload!: (allowed: boolean) => void
+    const validation = new Promise<boolean>((resolve) => {
+      allowUpload = resolve
+    })
+    const beforeUpload = vi.fn(() => validation)
+    const onChange = vi.fn()
+    const controller = createUploadController({
+      host,
+      getConfig: () => ({
+        autoUpload: false,
+        queue: false,
+        maxConcurrent: 2,
+        resumable: false,
+        beforeUpload
+      }),
+      callbacks: { onChange }
+    })
+
+    const processing = controller.processFiles([new File(['a'], 'pending.txt')])
+    await vi.waitFor(() => expect(beforeUpload).toHaveBeenCalledOnce())
+    controller.dispose()
+    allowUpload(true)
+    await processing
+
+    expect(host.snapshot()).toEqual([])
+    expect(setFileList).not.toHaveBeenCalled()
+    expect(onChange).not.toHaveBeenCalled()
   })
 
   it('does not resurrect a file removed during upload', async () => {

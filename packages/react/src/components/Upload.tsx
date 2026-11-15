@@ -195,6 +195,7 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   const seededRef = useRef(false)
   const [isDragging, setIsDragging] = useState(false)
   const [previewSrc, setPreviewSrc] = useState<string | null>(null)
+  const [, refreshPreviewUrls] = useState(0)
   const [showSingleFileNote, setShowSingleFileNote] = useState(false)
 
   const [fileList, setFileList] = useControlledState<UploadFile[], [UploadFile?]>({
@@ -316,8 +317,12 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
     }
   }, [setFileList])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const previousUrls = fileList.map((file) => previewUrls.current.get(file))
     previewUrls.current.sync(fileList)
+    if (fileList.some((file, index) => previewUrls.current.get(file) !== previousUrls[index])) {
+      refreshPreviewUrls((version) => version + 1)
+    }
   }, [fileList])
 
   useEffect(() => {

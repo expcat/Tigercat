@@ -145,7 +145,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C078 | TimePicker      | needs-evidence | 视觉 0/16 blocked；键盘 0/16 blocked；截图 0（IAB browsers 为空）；定向测试 4 文件 56 通过；SSR、happy-dom 探针与 docs/exports/example-sources 检查退出 0；未跑 E2E、hydration、真实读屏                           |
 | C079 | Transfer        | needs-evidence | 视觉、真实键盘各 0/16 blocked，截图 0；F01–F03 已修复（F02 方向 A，接通 ARIA 模板）；双端 35 项、Core/文案 16 项通过（含 axe/SSR）；类型、API 文档与示例来源检查通过；浏览器、读屏与 hydration 待补                |
 | C080 | TreeSelect      | needs-evidence | 视觉、真实键盘各 0/24 blocked，截图 0；F02 已修复，挂起 Promise 下双击仅加载一次、完成后子节点可见；TreeSelect/Tree/Cascader/Core 8 文件 244 pass；类型检查通过；浏览器、读屏与 hydration 待补                     |
-| C081 | Upload          | needs-evidence | 视觉 0/32 blocked；键盘 0/32 blocked；截图 0（browsers=[]，未建视觉子代理）；定向测试 3 文件 129 通过；Core、happy-dom、限定 axe 与 SSR 诊断已跑；无 Upload 专属 SSR/E2E；未验 hydration、真实网络、分片合并、读屏 |
+| C081 | Upload          | needs-evidence | 视觉/真实键盘各 0/32 blocked，截图 0；F01–F04、F06 已修复，单选、分片 URL、表单值、React 预览与卸载校验回归通过；双端 Upload/CropUpload/Core 6 文件 172 pass；类型通过；真实网络、分片合并、读屏与 hydration 待补  |
 
 ### navigation
 
@@ -321,7 +321,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C056 | ColorPicker           | 契约澄清建议（未立项）：Core ColorPickerRef 为 focus/open/close，Vue expose 三方法，React forwardRef 实际返回 HTMLButtonElement；运行时模型未核验；恢复端口 8782/8783                                                                                   |
 | C079 | Transfer              | 已编号的 F01–F03 已修复；待验证观察：Vue focus() 带 name 时先命中 hidden input、React ref 返回无 tabindex 的根 div，真实聚焦未验；虚拟列表估算行高与真实 CSS、跨窗口 Tab、窄屏布局未验；默认不设 TIGER_A11Y 时组件内 axe 被跳过                         |
 | C080 | TreeSelect            | C080-F02/F03 已修复；SchemaForm 是遗漏的真实消费者；组件测试 axe 只扫 container，portal 树在外；待验证观察：popup tree 自身无 aria-label/aria-labelledby，未立项；懒加载在途时 React 树项 busy=true、Vue 无；勾选策略、加载失败、数据替换竞争未逐一执行 |
-| C081 | Upload                | PLAN 完成条件 false；Demo 04 双端 customRequest 不返回 abort handle、成功响应无 URL，记为示例能力限制未立项；未传 allowedPreviewOrigins 时放行其他 http(s)，该默认政策应写入文档；SchemaForm 与 form/01 是真实消费者                                    |
+| C081 | Upload                | C081-F01–F04、F06 已修复；Demo 04 双端 customRequest 不返回 abort handle、成功响应无 URL，记为示例能力限制未立项；未传 allowedPreviewOrigins 时放行其他 http(s)，该默认政策应写入文档；SchemaForm 与 form/01 是真实消费者                               |
 | C082 | Affix                 | INVENTORY 关联为空不完整：Anchor 启用 affix 时用 Affix 包裹 nav 且只传 offsetTop。待验证观察：自定义滚动根移动后仅发 window scroll 未更新固定 top，原生 IntersectionObserver 是否补通知未验证，未登记为缺陷                                             |
 | C091 | ContextMenuSub        | 待验证：展开后把 disabled 改为 true，4 组仍 aria-expanded=true 且 popup 保留（expanded 不含 disabled），Core 未定义预期，未立项。C088-F02 至 F06、X01-F017 原判保留未重演。Sub 用例只测开合键                                                           |
 | C092 | Dropdown              | X02-F001 只确认 chevron 消费链，未证可见失效；Vue 递归 schema 子菜单 role=null、ArrowRight 不展开且不继承外层 portal（未编号观察）；实际消费者含 SplitButton/DataExport/Tabs/WorkflowTimeline                                                           |

@@ -20,8 +20,8 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 概览
 
-本篇 7 条：P1 0、P2 5、P3 2。
-按波次：W3 5、W9 2。
+本篇 2 条：P1 0、P2 0、P3 2。
+按波次：W3 0、W9 2。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C056-F01（S10）、C056-F04（S07）、C060-F04（S13）、C061-F05（S13）、C072-F02（S13）、C074-F04（S13）、C080-F03（S13）。
 
@@ -77,18 +77,6 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 | 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
 | ---- | ---- | ---- | --- | ---- | ---- | ---- |
-
-### C081 Upload
-
-报告 `groups/form/Upload.md`，队列状态 needs-evidence。另受 S04、S08、S10、C011-F002、C011-F003 影响。
-
-| 编号     | 级别 | 波次 | 端    | 类别 | 条目                                                       | 验收                                                                                                                  |
-| -------- | ---- | ---- | ----- | ---- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| C081-F01 | P2   | W3   | Core  | 行为 | 单选裁剪被 limit 分支覆盖，同一文件同时接受与拒绝          | 空列表、multiple=false、limit=2 一次输入 a/b/c 时只接受 a，b/c 仅因 single 被拒，接受与拒绝集合互斥                   |
-| C081-F02 | P2   | W3   | React | 行为 | React 本地图片首次加入后缺少缩略图与内置预览操作           | 非受控、autoUpload=false、picture-card 选择 local.png 后，无额外重渲染即 img=1、preview button=1，与 Vue 一致         |
-| C081-F03 | P2   | W3   | Core  | 行为 | 分片请求成功响应中的 URL 被丢弃，成功文件无法形成提交结果  | 6 字节文件、chunkSize=2、三次均返回 {url:'https://cdn.example/final.txt'} 后，文件带该 url 且 uploadSubmitValues 非空 |
-| C081-F04 | P2   | W3   | Core  | 行为 | 原生表单提交包含未成功文件的 URL                           | name=files 且 ready/queued/uploading/error/success 各一条带合法 URL 时，双端只生成 success 对应的 1 个 hidden input   |
-| C081-F06 | P2   | W3   | Core  | 行为 | 卸载时未取消 pending beforeUpload，React 仍向父级发 change | beforeUpload 待决时选文件后卸载再放行校验，Core host 不再收到 ready 文件，React onChange 卸载后调用 0 次              |
 
 ### 没有新增条目的组件
 

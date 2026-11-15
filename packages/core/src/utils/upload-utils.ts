@@ -138,9 +138,9 @@ export async function prepareUploadFiles(
 
   if (limit !== undefined) {
     const remainingSlots = Math.max(0, limit - currentCount)
-    if (validated.length > remainingSlots) {
-      acceptedFiles = validated.slice(0, remainingSlots)
-      const exceed = validated.slice(remainingSlots)
+    if (acceptedFiles.length > remainingSlots) {
+      const exceed = acceptedFiles.slice(remainingSlots)
+      acceptedFiles = acceptedFiles.slice(0, remainingSlots)
       rejectedExceedFiles.push(...exceed)
       rejectedFiles.push(...exceed.map((file) => ({ file, reason: 'exceed' as const })))
     }
@@ -517,7 +517,9 @@ export function filterUploadPreviewUrl(
 export function uploadSubmitValues(files: readonly UploadFile[]): string[] {
   const values: string[] = []
   for (const file of files) {
-    if (file.url && isSubmittableUploadUrl(file.url)) values.push(file.url)
+    if (file.status === 'success' && file.url && isSubmittableUploadUrl(file.url)) {
+      values.push(file.url)
+    }
   }
   return values
 }

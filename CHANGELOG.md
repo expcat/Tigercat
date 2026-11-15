@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Upload 筛选、结果与生命周期（Core / React，C081-F01、C081-F02、C081-F03、C081-F04、C081-F06）**：单选后只在已接受集合内应用 limit，接受与拒绝互斥。分片与整文件共用成功结算，保留分片响应中的可用 URL 和响应；原生表单只提交成功文件的合法 URL，空结果仍提交空隐藏域。React 本地图片首次加入即显示缩略图与预览按钮；卸载后待决 `beforeUpload` 不再写回列表或触发 change。
+
 - **TreeSelect 懒加载去重（Core / Vue / React，C080-F02）**：共享节点 gate 拒绝加载中的节点，Vue 同步维护在途状态并在请求结束或失效时清理。双端挂起 Promise 下连续点击同一行只调用一次 `loadData`，完成后仍显示子节点；Tree 复用同一规则，Cascader 回归通过。
 
 - **Transfer 标题、ARIA 文案与选中计数（Vue / React，C079-F01、C079-F02、C079-F03）**：双端保留 `labels` 中的标题，仅由有值的专用 prop 覆盖，并继续按实例 locale、ConfigProvider 和英语逐字段回退。F02 采用方向 A，保留公开模板，将 `selectAllAriaLabel` 接到全选 checkbox、`itemsAriaLabel` 接到列表 group，均以当前标题替换 `{title}`；标题计数复用 Core 字符串键分区去重，`[1, '1']` 只计一项。
