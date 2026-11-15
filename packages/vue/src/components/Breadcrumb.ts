@@ -34,6 +34,9 @@ import {
   resolveBreadcrumbItemCurrent,
   mergeTigerLocale,
   getBreadcrumbLabels,
+  focusMenuItem,
+  getOverlayTriggerKeyboardAction,
+  handleMenuNavigation,
   type BreadcrumbSeparator,
   type TigerLocale,
   type TigerLocaleBreadcrumb
@@ -206,6 +209,70 @@ export const Breadcrumb = defineComponent({
     const labels = computed(() => getBreadcrumbLabels(mergedLocale.value, props.labels))
     const expanded = ref(false)
     const itemSignature = ref('')
+    const triggerRef = ref<HTMLButtonElement | null>(null)
+    const menuRef = ref<HTMLDivElement | null>(null)
+    let focusEdge: 'first' | 'last' = 'first'
+    let tabbingOut = false
+
+    watch(
+      expanded,
+      (open) => {
+        if (open && menuRef.value) focusMenuItem(menuRef.value, focusEdge)
+      },
+      { flush: 'post' }
+    )
+
+    const closeMenu = () => {
+      expanded.value = false
+      triggerRef.value?.focus()
+    }
+
+    const handleTriggerKeyDown = (event: KeyboardEvent) => {
+      const action = getOverlayTriggerKeyboardAction(event, {
+        kind: 'menu',
+        open: expanded.value
+      })
+      if (!action) return
+      event.preventDefault()
+      event.stopPropagation()
+      if (action === 'close') {
+        closeMenu()
+        return
+      }
+      focusEdge = action === 'open-last' ? 'last' : 'first'
+      if (expanded.value && menuRef.value) focusMenuItem(menuRef.value, focusEdge)
+      else expanded.value = true
+    }
+
+    const handleMenuKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        tabbingOut = true
+      } else if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        closeMenu()
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        const item = (event.target as HTMLElement).closest<HTMLElement>('[role="menuitem"]')
+        item?.click()
+      } else if (menuRef.value && handleMenuNavigation(menuRef.value, event)) {
+        event.stopPropagation()
+      }
+    }
+
+    const ellipsisAttrs = {
+      key: '__tiger-breadcrumb-ellipsis',
+      class: getBreadcrumbItemClasses(),
+      onFocusout: (event: FocusEvent) => {
+        if (
+          tabbingOut ||
+          !(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)
+        ) {
+          expanded.value = false
+          tabbingOut = false
+        }
+      }
+    }
 
     const extraContent = computed(() => {
       const slotValue = slots.extra?.()
@@ -246,16 +313,19 @@ export const Breadcrumb = defineComponent({
         let childSeparator: BreadcrumbSeparator | undefined
         if (slot.type === 'ellipsis') {
           nodes.push(
-            h('li', { key: '__tiger-breadcrumb-ellipsis', class: getBreadcrumbItemClasses() }, [
+            h('li', ellipsisAttrs, [
               h(
                 'button',
                 {
                   type: 'button',
+                  ref: triggerRef,
                   class: breadcrumbEllipsisClasses,
                   'aria-label': labels.value.expandAriaLabel,
                   'aria-expanded': expanded.value,
                   'aria-haspopup': 'menu',
+                  onKeydown: handleTriggerKeyDown,
                   onClick: () => {
+                    focusEdge = 'first'
                     expanded.value = !expanded.value
                   }
                 },
@@ -264,7 +334,13 @@ export const Breadcrumb = defineComponent({
               expanded.value
                 ? h(
                     'div',
-                    { role: 'menu', 'data-tiger-breadcrumb-menu': '' },
+                    {
+                      ref: menuRef,
+                      role: 'menu',
+                      'data-tiger-breadcrumb-menu': '',
+                      onKeydown: handleMenuKeyDown,
+                      onClick: closeMenu
+                    },
                     breadcrumbCollapsedMenuItems(
                       collapsed.map((itemIndex) => {
                         const child = items[itemIndex]
@@ -313,6 +389,7 @@ export const Breadcrumb = defineComponent({
                         'a',
                         {
                           role: 'menuitem',
+                          tabindex: -1,
                           ...address,
                           onClick: childProps?.current ? undefined : childProps?.onClick,
                           key: entry.key

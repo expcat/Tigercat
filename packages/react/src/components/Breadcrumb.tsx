@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   forwardRef
 } from 'react'
@@ -26,6 +27,9 @@ import {
   resolveLinkAddress,
   mergeTigerLocale,
   getBreadcrumbLabels,
+  focusMenuItem,
+  getOverlayTriggerKeyboardAction,
+  handleMenuNavigation,
   type BreadcrumbItemProps as CoreBreadcrumbItemProps,
   type BreadcrumbProps as CoreBreadcrumbProps,
   type BreadcrumbSeparator,
@@ -201,6 +205,52 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       .map((item) => (React.isValidElement(item) ? String(item.key ?? '') : ''))
       .join('|')
     const [expanded, setExpanded] = useState(false)
+    const triggerRef = useRef<HTMLButtonElement>(null)
+    const menuRef = useRef<HTMLDivElement>(null)
+    const focusEdgeRef = useRef<'first' | 'last'>('first')
+    const tabbingOutRef = useRef(false)
+
+    useEffect(() => {
+      if (expanded && menuRef.current) focusMenuItem(menuRef.current, focusEdgeRef.current)
+    }, [expanded])
+
+    const closeMenu = () => {
+      setExpanded(false)
+      triggerRef.current?.focus()
+    }
+
+    const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      const action = getOverlayTriggerKeyboardAction(event.nativeEvent, {
+        kind: 'menu',
+        open: expanded
+      })
+      if (!action) return
+      event.preventDefault()
+      event.stopPropagation()
+      if (action === 'close') {
+        closeMenu()
+        return
+      }
+      focusEdgeRef.current = action === 'open-last' ? 'last' : 'first'
+      if (expanded && menuRef.current) focusMenuItem(menuRef.current, focusEdgeRef.current)
+      else setExpanded(true)
+    }
+
+    const handleMenuKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Tab') {
+        tabbingOutRef.current = true
+      } else if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        closeMenu()
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        const item = (event.target as HTMLElement).closest<HTMLElement>('[role="menuitem"]')
+        item?.click()
+      } else if (menuRef.current && handleMenuNavigation(menuRef.current, event.nativeEvent)) {
+        event.stopPropagation()
+      }
+    }
 
     useEffect(() => {
       setExpanded(false)
@@ -216,18 +266,36 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       const nodes: React.ReactNode[] = []
       if (slot.type === 'ellipsis') {
         nodes.push(
-          <li key="__tiger-breadcrumb-ellipsis" className={getBreadcrumbItemClasses()}>
+          <li
+            key="__tiger-breadcrumb-ellipsis"
+            className={getBreadcrumbItemClasses()}
+            onBlur={(event) => {
+              if (tabbingOutRef.current || !event.currentTarget.contains(event.relatedTarget)) {
+                setExpanded(false)
+                tabbingOutRef.current = false
+              }
+            }}>
             <button
+              ref={triggerRef}
               type="button"
               className={breadcrumbEllipsisClasses}
               aria-label={labels.expandAriaLabel}
               aria-expanded={expanded}
               aria-haspopup="menu"
-              onClick={() => setExpanded((open) => !open)}>
+              onKeyDown={handleTriggerKeyDown}
+              onClick={() => {
+                focusEdgeRef.current = 'first'
+                setExpanded((open) => !open)
+              }}>
               ...
             </button>
             {expanded ? (
-              <div role="menu" data-tiger-breadcrumb-menu="">
+              <div
+                ref={menuRef}
+                role="menu"
+                data-tiger-breadcrumb-menu=""
+                onKeyDown={handleMenuKeyDown}
+                onClick={closeMenu}>
                 {breadcrumbCollapsedMenuItems(
                   collapsed.map((itemIndex) => {
                     const child = items[itemIndex]
@@ -258,6 +326,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                     <a
                       key={entry.key}
                       role="menuitem"
+                      tabIndex={-1}
                       {...address}
                       onClick={childProps?.current ? undefined : childProps?.onClick}>
                       {entry.label}

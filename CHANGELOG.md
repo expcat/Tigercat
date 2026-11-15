@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Breadcrumb 折叠菜单键盘（Vue / React，C086-F02）**：打开后聚焦首项，复用既有菜单方向键导航；Escape 关闭并回焦省略号，Tab 离开时关闭菜单。Enter / Space 激活原项并关闭菜单，触发器支持上下键打开首项或末项。
+
 - **AnchorLink 原生 rel 与规范化 href（Vue / React，C084-F01、C084-F02）**：双端保留调用方 rel，`_blank` 继续由现有 helper 补齐 `noopener noreferrer`；Breadcrumb 可见项与折叠项同步修复同一遗漏。Vue 注册、动态更新和注销统一使用规范化 href，首尾带空白的锚点也能被父级观察。
 
 - **Anchor 水平墨水方向与重新显示（Vue / React，C083-F01、C083-F02）**：双端向现有定位 helper 传入 nav 的实际文本方向，RTL 链接贴右缘时墨水起点为 0px。React 切换 `showInkInFixed` 重新显示墨水后恢复活动链接的位置与宽度。
