@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 AnchorLink 与 Breadcrumb 的可见及折叠链接现在保留调用方 `rel`：`target="_blank" rel="nofollow"` 输出 `nofollow noopener noreferrer`，`_self` 保留 `nofollow`。Vue AnchorLink 的注册、动态更新和注销与 DOM 共用规范化 href，`href=" #section1 "` 现在能观察到 `section1`。调用方式不用改。
+
 双端水平 Anchor 的墨水现在按 nav 的实际文本方向定位，RTL 链接贴右缘时逻辑起点为 0px。React 在 `showInkInFixed` 从 true→false→true 后恢复活动链接的墨水位置与宽度。调用方式不用改。
 
 双端 Affix 固定后现在跟随父级布局和内容尺寸更新固定宽度与占位。修改 `offsetTop` / `offsetBottom` 导致解除固定时，`onChange` / `change` 会通知一次 `false`，后续同状态观察不再重复通知。调用方式不用改。

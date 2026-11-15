@@ -78,13 +78,16 @@ describe('Breadcrumb', () => {
   })
 
   describe('BreadcrumbItem', () => {
-    it('renders a link with target/rel when href is set and not current', () => {
+    it.each([
+      ['_blank', 'nofollow noopener noreferrer'],
+      ['_self', 'nofollow']
+    ] as const)('preserves caller rel and secures target %s', (target, rel) => {
       const { container } = render(Breadcrumb, {
         slots: {
           default: () => [
             h(
               BreadcrumbItem,
-              { href: 'https://example.com', target: '_blank', current: false },
+              { href: 'https://example.com', target, rel: 'nofollow', current: false },
               () => 'External'
             )
           ]
@@ -92,8 +95,9 @@ describe('Breadcrumb', () => {
       })
       const link = container.querySelector('a')
       expect(link).toHaveAttribute('href', 'https://example.com')
-      expect(link).toHaveAttribute('target', '_blank')
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+      expect(link).toHaveAttribute('target', target)
+      expect(link).toHaveAttribute('rel', rel)
+      expect(container.querySelector('li')).not.toHaveAttribute('rel')
     })
 
     it('renders the current item as a span with aria-current="page"', () => {
@@ -255,7 +259,11 @@ describe('Breadcrumb', () => {
         slots: {
           default: () => [
             h(BreadcrumbItem, { href: '/', onClick: stay }, () => 'Home'),
-            h(BreadcrumbItem, { href: '/a', target: '_blank', onClick: stay }, () => 'A'),
+            h(
+              BreadcrumbItem,
+              { href: '/a', target: '_blank', rel: 'nofollow', onClick: stay },
+              () => 'A'
+            ),
             h(BreadcrumbItem, { href: '/b' }, () => 'B'),
             h(BreadcrumbItem, {}, () => 'Current')
           ]
@@ -271,7 +279,7 @@ describe('Breadcrumb', () => {
         expect(stay).toHaveBeenCalledTimes(2)
         expect(item).toHaveAttribute('href', '/a')
         expect(item).toHaveAttribute('target', '_blank')
-        expect(item).toHaveAttribute('rel', 'noopener noreferrer')
+        expect(item).toHaveAttribute('rel', 'nofollow noopener noreferrer')
       } finally {
         document.body.removeEventListener('click', observeClick)
       }

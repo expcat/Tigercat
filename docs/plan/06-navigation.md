@@ -22,8 +22,8 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ## 概览
 
-本篇 66 条：P2 50、P3 16。
-按波次：W4 50、W9 16。
+本篇 64 条：P2 48、P3 16。
+按波次：W4 48、W9 16。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C086-F03（S13）、C088-F05（S13）、C095-F02（S13）、C109-F06（S13）、C112-F01（S13）、C113-F01（S13）、C114-F04（S13）、C116-F05（S13）。
 
@@ -31,23 +31,13 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 这些条目的行在下面各组件的表里。修的时候把右列的组件一起验。
 
-| 条目                                                        | 归属           | 同验                                   |
-| ----------------------------------------------------------- | -------------- | -------------------------------------- |
-| C084-F01 两端丢弃调用方 rel，`_blank` 时自定义 token 也丢失 | AnchorLink     | Breadcrumb、BreadcrumbItem             |
-| C088-F03 React items 分支忽略 closeOnClick=false            | ContextMenu    | Dropdown、DropdownItem                 |
-| C088-F06 schema 菜单方向键跳过 checkbox 和 radio 项         | ContextMenu    | Dropdown、DropdownItem                 |
-| C102-F03 React 现有 axe 用例命中 menubar 必需子角色违规     | NavigationMenu | NavigationMenuLink、NavigationMenuList |
+| 条目                                                    | 归属           | 同验                                   |
+| ------------------------------------------------------- | -------------- | -------------------------------------- |
+| C088-F03 React items 分支忽略 closeOnClick=false        | ContextMenu    | Dropdown、DropdownItem                 |
+| C088-F06 schema 菜单方向键跳过 checkbox 和 radio 项     | ContextMenu    | Dropdown、DropdownItem                 |
+| C102-F03 React 现有 axe 用例命中 menubar 必需子角色违规 | NavigationMenu | NavigationMenuLink、NavigationMenuList |
 
 ## 条目
-
-### C084 AnchorLink
-
-报告 `groups/navigation/AnchorLink.md`，队列状态 needs-evidence。另受 S02 影响。
-
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                               | 验收                                                                         |
-| -------- | ---- | ---- | ---- | ---- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
-| C084-F01 | P2   | W4   | 双端 | 行为 | 两端丢弃调用方 rel，`_blank` 时自定义 token 也丢失 | 传 rel=nofollow：\_blank 得 nofollow noopener noreferrer，\_self 得 nofollow |
-| C084-F02 | P2   | W4   | Vue  | 行为 | Vue 用原始 href 注册，合法空白规范化后滚动监听失联 | Vue 传首尾带空格的 #section1 时观察目标包含 section1，与 React 一致          |
 
 ### C085 BackTop
 
@@ -59,7 +49,7 @@ navigation 组 35 个组件（C082–C116）。审查时这一组同样没有浏
 
 ### C086 Breadcrumb
 
-报告 `groups/navigation/Breadcrumb.md`，队列状态 needs-evidence。另受 S01、S07、S08、C084-F01 影响。
+报告 `groups/navigation/Breadcrumb.md`，队列状态 needs-evidence。另受 S01、S07、S08 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别 | 条目                                   | 验收                                                                                      |
 | -------- | ---- | ---- | ---- | ---- | -------------------------------------- | ----------------------------------------------------------------------------------------- |

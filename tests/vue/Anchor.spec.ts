@@ -197,16 +197,22 @@ describe('Anchor', () => {
       expect(link).toHaveAttribute('data-anchor-href', '#my-section')
     })
 
-    it('should have target attribute when provided', () => {
+    it.each([
+      ['_blank', 'nofollow noopener noreferrer'],
+      ['_self', 'nofollow']
+    ])('preserves caller rel and secures target %s', (target, rel) => {
       render(Anchor, {
         props: { getContainer: () => scrollContainer },
         slots: {
-          default: () => [h(AnchorLink, { href: '#section1', title: 'Link', target: '_blank' })]
+          default: () => [
+            h(AnchorLink, { href: '#section1', title: 'Link', target, rel: 'nofollow' })
+          ]
         }
       })
 
       const link = screen.getByText('Link')
-      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('target', target)
+      expect(link).toHaveAttribute('rel', rel)
     })
 
     it('should apply custom className', () => {
@@ -457,14 +463,18 @@ describe('Anchor', () => {
       return latest ? latest.observe.mock.calls.map((call) => (call[0] as Element).id) : []
     }
 
-    it('swaps the registered href in the observer when href changes dynamically', async () => {
-      const { rerender } = render(HrefWrapper, { props: { linkHref: '#section1' } })
+    it('observes normalized hrefs on mount and when href changes dynamically', async () => {
+      const { rerender } = render(HrefWrapper, { props: { linkHref: ' #section1 ' } })
+
+      expect(screen.getByRole('link', { name: 'Dynamic' })).toHaveAttribute('href', '#section1')
 
       await waitFor(() => {
         expect(latestObservedIds()).toContain('section1')
       })
 
-      await rerender({ linkHref: '#section2' })
+      await rerender({ linkHref: ' #section2 ' })
+
+      expect(screen.getByRole('link', { name: 'Dynamic' })).toHaveAttribute('href', '#section2')
 
       // After the change the observer tracks the new target, not the stale one
       await waitFor(() => {

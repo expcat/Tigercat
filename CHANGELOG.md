@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **AnchorLink 原生 rel 与规范化 href（Vue / React，C084-F01、C084-F02）**：双端保留调用方 rel，`_blank` 继续由现有 helper 补齐 `noopener noreferrer`；Breadcrumb 可见项与折叠项同步修复同一遗漏。Vue 注册、动态更新和注销统一使用规范化 href，首尾带空白的锚点也能被父级观察。
+
 - **Anchor 水平墨水方向与重新显示（Vue / React，C083-F01、C083-F02）**：双端向现有定位 helper 传入 nav 的实际文本方向，RTL 链接贴右缘时墨水起点为 0px。React 切换 `showInkInFixed` 重新显示墨水后恢复活动链接的位置与宽度。
 
 - **Affix 实时布局与重绑通知（Core，C082-F01、C082-F02）**：共享控制器从内容的当前流布局重测宽高，观察时跳过 `display: contents` 外壳。双端固定后父宽 200→400、内容高 40→80 时，固定宽度和占位同步更新；偏移量重绑导致解除固定时补发一次 `change(false)`，后续观察不重复通知。Anchor、AnchorLink 同验通过。

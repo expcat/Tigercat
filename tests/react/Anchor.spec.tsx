@@ -186,15 +186,19 @@ describe('Anchor', () => {
       expect(link).toHaveAttribute('data-anchor-href', '#my-section')
     })
 
-    it('should have target attribute when provided', () => {
+    it.each([
+      ['_blank', 'nofollow noopener noreferrer'],
+      ['_self', 'nofollow']
+    ])('preserves caller rel and secures target %s', (target, rel) => {
       render(
         <Anchor getContainer={() => scrollContainer}>
-          <AnchorLink href="#section1" title="Link" target="_blank" />
+          <AnchorLink href="#section1" title="Link" target={target} rel="nofollow" />
         </Anchor>
       )
 
       const link = screen.getByText('Link')
-      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('target', target)
+      expect(link).toHaveAttribute('rel', rel)
     })
 
     it('should apply custom className', () => {

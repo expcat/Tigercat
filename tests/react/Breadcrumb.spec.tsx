@@ -112,18 +112,22 @@ describe('Breadcrumb', () => {
   })
 
   describe('BreadcrumbItem', () => {
-    it('renders a link with target/rel when href is set and not current', () => {
+    it.each([
+      ['_blank', 'nofollow noopener noreferrer'],
+      ['_self', 'nofollow']
+    ] as const)('preserves caller rel and secures target %s', (target, rel) => {
       const { container } = render(
         <Breadcrumb>
-          <BreadcrumbItem href="https://example.com" target="_blank" current={false}>
+          <BreadcrumbItem href="https://example.com" target={target} rel="nofollow" current={false}>
             External
           </BreadcrumbItem>
         </Breadcrumb>
       )
       const link = container.querySelector('a')
       expect(link).toHaveAttribute('href', 'https://example.com')
-      expect(link).toHaveAttribute('target', '_blank')
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+      expect(link).toHaveAttribute('target', target)
+      expect(link).toHaveAttribute('rel', rel)
+      expect(container.querySelector('li')).not.toHaveAttribute('rel')
     })
 
     it('renders the current item as a span with aria-current="page"', () => {
@@ -264,7 +268,7 @@ describe('Breadcrumb', () => {
           <BreadcrumbItem href="/" onClick={stay}>
             Home
           </BreadcrumbItem>
-          <BreadcrumbItem href="/a" target="_blank" onClick={stay}>
+          <BreadcrumbItem href="/a" target="_blank" rel="nofollow" onClick={stay}>
             A
           </BreadcrumbItem>
           <BreadcrumbItem href="/b">B</BreadcrumbItem>
@@ -281,7 +285,7 @@ describe('Breadcrumb', () => {
         expect(stay).toHaveBeenCalledTimes(2)
         expect(item).toHaveAttribute('href', '/a')
         expect(item).toHaveAttribute('target', '_blank')
-        expect(item).toHaveAttribute('rel', 'noopener noreferrer')
+        expect(item).toHaveAttribute('rel', 'nofollow noopener noreferrer')
       } finally {
         document.body.removeEventListener('click', observeClick)
       }

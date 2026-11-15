@@ -108,9 +108,17 @@ export const AnchorLink = defineComponent({
   setup(props, { slots, attrs }) {
     const anchorContext = inject<AnchorContext | null>(AnchorContextKey, null)
     const linkRef = ref<HTMLElement | null>(null)
+    const address = computed(() =>
+      resolveLinkAddress({
+        href: props.href,
+        target: props.target,
+        rel: typeof attrs.rel === 'string' ? attrs.rel : undefined
+      })
+    )
 
     const register = () => {
-      if (linkRef.value) anchorContext?.registerLink(props.href, linkRef.value)
+      const safeHref = address.value.href
+      if (safeHref && linkRef.value) anchorContext?.registerLink(safeHref, linkRef.value)
     }
 
     onMounted(() => {
@@ -118,7 +126,7 @@ export const AnchorLink = defineComponent({
     })
 
     watch(
-      () => props.href,
+      () => address.value.href,
       (_next, prev) => {
         if (linkRef.value && prev) anchorContext?.unregisterLink(prev, linkRef.value)
         register()
@@ -126,10 +134,9 @@ export const AnchorLink = defineComponent({
     )
 
     onBeforeUnmount(() => {
-      if (linkRef.value) anchorContext?.unregisterLink(props.href, linkRef.value)
+      const safeHref = address.value.href
+      if (safeHref && linkRef.value) anchorContext?.unregisterLink(safeHref, linkRef.value)
     })
-
-    const address = computed(() => resolveLinkAddress({ href: props.href, target: props.target }))
 
     const handleClick = (event: Event) => {
       const userClick = (attrs as { onClick?: (event: Event) => void }).onClick

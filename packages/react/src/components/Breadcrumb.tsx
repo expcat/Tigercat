@@ -86,6 +86,7 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
     {
       href,
       target,
+      rel,
       current,
       separator: _separator,
       className,
@@ -111,7 +112,7 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
       [isCurrent, onClick]
     )
 
-    const address = resolveLinkAddress({ href, target })
+    const address = resolveLinkAddress({ href, target, rel })
     const contentElements =
       icon != null ? (
         <>
@@ -250,7 +251,8 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                     : undefined
                   const address = resolveLinkAddress({
                     href: entry.href,
-                    target: childProps?.target
+                    target: childProps?.target,
+                    rel: childProps?.rel
                   })
                   return (
                     <a

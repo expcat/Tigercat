@@ -131,7 +131,11 @@ export const BreadcrumbItem = defineComponent({
       const iconElement = props.icon ? h('span', { class: 'inline-flex' }, props.icon) : null
       const contentElements = iconElement ? [iconElement, ...children] : children
       const linkClasses = getBreadcrumbLinkClasses(isCurrent.value)
-      const address = resolveLinkAddress({ href: props.href, target: props.target })
+      const address = resolveLinkAddress({
+        href: props.href,
+        target: props.target,
+        rel: typeof attrs.rel === 'string' ? attrs.rel : undefined
+      })
       let control: VNode
       if (isCurrent.value) {
         control = h('span', { class: linkClasses, 'aria-current': 'page' }, contentElements)
@@ -161,6 +165,7 @@ export const BreadcrumbItem = defineComponent({
         class: attrClass,
         style: attrStyle,
         onClick: _onClick,
+        rel: _rel,
         ...rest
       } = attrs as Record<string, unknown>
 
@@ -301,7 +306,8 @@ export const Breadcrumb = defineComponent({
                       const childProps = items[Number(entry.key)]?.props
                       const address = resolveLinkAddress({
                         href: entry.href,
-                        target: childProps?.target
+                        target: childProps?.target,
+                        rel: childProps?.rel
                       })
                       return h(
                         'a',

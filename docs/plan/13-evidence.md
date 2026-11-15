@@ -153,7 +153,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | ---- | --------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | C082 | Affix                 | needs-evidence | 视觉/键盘各 0/16 blocked，截图 0；F01/F02 已修复，happy-dom 回归通过；Affix/Core/Anchor（含 AnchorLink）5 文件 95 pass、现有 axe 与类型通过；浏览器、读屏、hydration 待补 |
 | C083 | Anchor                | needs-evidence | 视觉 24 格、键盘 24 格均 blocked，截图 0；定向 Vitest 102 passed、W9 E13 1 passed；源码 SSR 探针成功，未验 hydration；未跑 E2E、build；真实 RTL、读屏未测                 |
-| C084 | AnchorLink            | needs-evidence | 视觉 24 格、键盘 24 格均 blocked（owner 为 C083），截图 0；定向 Vitest 53 passed；SSR 与 happy-dom 源码探针；未跑 E2E、build、hydration；读屏未测                         |
+| C084 | AnchorLink            | needs-evidence | 视觉/键盘各 24 格 blocked（owner 为 C083），截图 0；F01/F02 已修复，Anchor/Breadcrumb/Core 定向 166 passed、类型通过；E2E、build、hydration、读屏待补                     |
 | C085 | BackTop               | needs-evidence | 视觉 16 格、键盘 16 格均 blocked，截图 0；定向 Vitest 30 passed、a11y 25 passed；源码 SSR 探针成功；未跑 E2E、build、hydration；读屏、reduced-motion 未测                 |
 | C086 | Breadcrumb            | needs-evidence | 视觉 24 格、真实键盘 24 格均 blocked，截图 0；定向 Vitest 75 passed（axe 不覆盖打开的菜单）；SSR 与 happy-dom 探针；未跑 E2E、build、hydration；读屏未测                  |
 | C087 | BreadcrumbItem        | needs-evidence | 视觉 24 格、真实键盘 24 格均 blocked（owner 为 C086），截图 0；定向 Vitest 49 passed；SSR 与 happy-dom 点击探针；未跑 E2E、build、hydration；读屏未测                     |

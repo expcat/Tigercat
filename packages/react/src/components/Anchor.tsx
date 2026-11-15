@@ -72,6 +72,7 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
   href,
   title,
   target,
+  rel,
   className,
   children,
   onClick,
@@ -82,7 +83,7 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
   const register = anchorContext?.registerLink
   const unregister = anchorContext?.unregisterLink
 
-  const address = resolveLinkAddress({ href, target })
+  const address = resolveLinkAddress({ href, target, rel })
   const safeHref = address.href
 
   useLayoutEffect(() => {
