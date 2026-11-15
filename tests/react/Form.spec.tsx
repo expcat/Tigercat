@@ -12,7 +12,7 @@ import { useFormController } from '@expcat/tigercat-react/useFormController'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { Input } from '@expcat/tigercat-react/Input'
 import { Space } from '@expcat/tigercat-react/Space'
-import type { FormRule, FormRules } from '@expcat/tigercat-core'
+import { createFormEngine, type FormRule, type FormRules } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils/react'
@@ -488,6 +488,43 @@ describe('Form', () => {
 
         expect(onValidate).toHaveBeenCalledWith('name', false, 'Name must be at least 3 characters')
       } finally {
+        vi.useRealTimers()
+      }
+    })
+
+    it('preserves pending debounce validation with an external controller', async () => {
+      vi.useFakeTimers()
+      const controller = createFormEngine({ initialValues: { name: '' } })
+      const onValidate = vi.fn()
+
+      try {
+        render(
+          <Form
+            controller={controller}
+            rules={{
+              name: { min: 3, message: 'Name must be at least 3 characters', trigger: 'change' }
+            }}
+            validateDebounce={50}
+            onValidate={onValidate}>
+            <FormItem label="Name" name="name">
+              <Input aria-label="name" />
+            </FormItem>
+          </Form>
+        )
+
+        const input = screen.getByLabelText('name')
+        fireEvent.change(input, { target: { value: 'Jo' } })
+        expect(controller.getFieldValue('name')).toBe('Jo')
+        expect(onValidate).not.toHaveBeenCalled()
+
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(90)
+        })
+
+        expect(onValidate).toHaveBeenCalledWith('name', false, 'Name must be at least 3 characters')
+        expect(input).toHaveAttribute('aria-invalid', 'true')
+      } finally {
+        controller.dispose()
         vi.useRealTimers()
       }
     })

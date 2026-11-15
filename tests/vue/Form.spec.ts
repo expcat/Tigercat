@@ -10,12 +10,58 @@ import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { Input } from '@expcat/tigercat-vue/Input'
 import { Space } from '@expcat/tigercat-vue/Space'
-import type { FormRule, FormRules } from '@expcat/tigercat-core'
+import { createFormEngine, type FormRule, type FormRules } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { expectNoA11yViolations } from '../utils'
 
 describe('Form', () => {
+  describe('External controller lifecycle', () => {
+    it('initializes external controller rules on mount', async () => {
+      const controller = createFormEngine()
+      render(Form, {
+        props: {
+          controller,
+          rules: { name: { required: true, message: 'Name is required' } }
+        },
+        slots: {
+          default: () =>
+            h(FormItem, { label: 'Name', name: 'name' }, () => h(Input, { 'aria-label': 'name' }))
+        }
+      })
+
+      expect(await controller.validate()).toBe(false)
+      await nextTick()
+      expect(screen.getByLabelText('name')).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByText('Name is required')).toBeInTheDocument()
+    })
+
+    it('subscribes to the replacement controller and stops observing the previous one', async () => {
+      const first = createFormEngine({ initialValues: { name: 'first' } })
+      const second = createFormEngine({ initialValues: { name: 'second' } })
+      const { rerender } = render(Form, {
+        props: { controller: first },
+        slots: {
+          default: () =>
+            h(FormItem, { label: 'Name', name: 'name' }, () => h(Input, { 'aria-label': 'name' }))
+        }
+      })
+      const input = screen.getByLabelText('name')
+      expect(input).toHaveValue('first')
+
+      await rerender({ controller: second })
+      expect(input).toHaveValue('second')
+
+      second.setFieldValue('name', 'second-updated')
+      await nextTick()
+      expect(input).toHaveValue('second-updated')
+
+      first.setFieldValue('name', 'first-updated')
+      await nextTick()
+      expect(input).toHaveValue('second-updated')
+    })
+  })
+
   // ==================== Basic Functionality ====================
   describe('Basic Functionality', () => {
     it('renders a semantic form element', () => {

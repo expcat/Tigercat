@@ -230,13 +230,20 @@ export const Form = defineComponent({
     const canUndoNow = ref(engine().canUndo)
     const canRedoNow = ref(engine().canRedo)
     const errorAnnouncement = ref(engine().errorAnnouncement)
-    const stop = engine().subscribe(() => {
+    const syncState = (): void => {
       const current = engine()
       errors.value = current.getErrors()
       values.value = current.getValues()
       canUndoNow.value = current.canUndo
       canRedoNow.value = current.canRedo
       errorAnnouncement.value = current.errorAnnouncement
+    }
+    let stop = engine().subscribe(syncState)
+
+    watch(engine, () => {
+      stop()
+      syncState()
+      stop = engine().subscribe(syncState)
     })
 
     watch(
@@ -270,7 +277,8 @@ export const Form = defineComponent({
             messages: getFormValidationLabels(mergeTigerLocale(config.value.locale, props.locale))
           })
         }
-      }
+      },
+      { immediate: true }
     )
 
     onBeforeUnmount(() => {

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Form 外部 controller 生命周期（Core / Vue / React，C060-F01、C060-F02、C060-F03）**：共享引擎仅在 debounce 延时变化时重建校验调度，React 重渲染不再取消待执行校验。Vue 挂载时同步 Form 选项，切换 controller 时取消旧订阅、同步快照并订阅新引擎，后续值与错误更新跟随当前 controller。
+
 - **InputGroup 尺寸与面板失焦（Vue / React，C059-F01、C059-F02）**：DatePicker、Mentions、TimePicker、TreeSelect 省略 `size` 时先继承 InputGroup 的 sm/lg，再回退 md；显式 `size` 仍优先。React DatePicker 与 TimePicker 由根节点处理面板离开事件，从 Today / Now 按钮移到外部控件时只通知一次 blur。
 
 - **CronEditor 数字起点步长与只读选择器（Core / Vue / React，C058-F01、C058-F02）**：数字起点的步长（如 `5/2 * * * *`）从起点到字段上限展开，使校验、摘要和下次运行一致；Vue 只读预设与字段模式选择后还原当前显示，表达式与隐藏表单值不变且不触发更新或校验回调。

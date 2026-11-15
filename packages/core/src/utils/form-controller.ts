@@ -754,7 +754,7 @@ export function createFormEngine(options: FormEngineOptions = {}): FormEngine {
     if (patch.maxHistorySize !== undefined) maxHistorySize = patch.maxHistorySize
     if (patch.validateDebounce !== undefined) {
       debounceDelay = patch.validateDebounce
-      rebuildDebouncer()
+      ensureDebouncer()
     }
     if (patch.undoable !== undefined && patch.undoable !== undoable) {
       undoable = patch.undoable

@@ -20,8 +20,8 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 概览
 
-本篇 49 条：P1 0、P2 46、P3 3。
-按波次：W3 46、W9 3。
+本篇 46 条：P1 0、P2 43、P3 3。
+按波次：W3 43、W9 3。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C056-F01（S10）、C056-F04（S07）、C060-F04（S13）、C061-F05（S13）、C072-F02（S13）、C074-F04（S13）、C080-F03（S13）。
 
@@ -86,16 +86,6 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 | 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
 | ---- | ---- | ---- | --- | ---- | ---- | ---- |
-
-### C060 Form
-
-报告 `groups/form/Form.md`，队列状态 needs-evidence。另受 S01 影响。
-
-| 编号     | 级别 | 波次 | 端         | 类别 | 条目                                                 | 验收                                                                                |
-| -------- | ---- | ---- | ---------- | ---- | ---------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| C060-F01 | P2   | W3   | React+Core | 行为 | React 外部 controller 的 pending debounce 校验被取消 | 外部 controller+debounce 下输入 Jo 等 90ms 后 onValidate 触发并带 aria-invalid      |
-| C060-F02 | P2   | W3   | Vue        | 行为 | Vue 初次挂载不同步 Form 选项到外部 controller        | 空外部 controller 配 required rules 的 Vue Form 挂载后 validate() 返回 false        |
-| C060-F03 | P2   | W3   | Vue        | 行为 | Vue 动态切换 controller 后仍订阅旧引擎               | controller 从 A 切到 B 后，B 写入 second-updated 时 UI 随之更新；再写旧 A 不改变 UI |
 
 ### C061 FormItem
 
