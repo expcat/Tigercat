@@ -15,7 +15,7 @@ Vue 优先使用 `v-model`；React 使用 `value`/`checked` 搭配 `onChange`。
 
 Runnable modules: `examples/example/vue3/src/examples/input-number/01/`, `examples/example/vue3/src/examples/input-number/02/`, `examples/example/vue3/src/examples/input-number/03/`, `examples/example/react/src/examples/input-number/01/`, `examples/example/react/src/examples/input-number/02/`, `examples/example/react/src/examples/input-number/03/`.
 
-Note: React `onChange` 收到 `number | null`。值可以是有限数字或数字字符串，`null` 和 `''` 是空。`controlsPosition="both"` 是两侧按钮；`snapToStep` 默认关闭，步长只约束按钮和方向键。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。可访问名来自标签或 `aria-label`。
+Note: React `onChange` 收到 `number | string | null`。值可以是有限数字或数字字符串，`null` 和 `''` 是空。`controlsPosition="both"` 是两侧按钮；`snapToStep` 默认关闭，步长只约束按钮和方向键。`controlsPosition="right"` 是阅读方向的尾侧。聚焦时显示裸数字，失焦再套 formatter。可访问名来自标签或 `aria-label`。
 
 Vue: `<InputNumber v-model="value" />`
 

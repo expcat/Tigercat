@@ -129,7 +129,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C062 | Input           | needs-evidence | 视觉/真实键盘 0/40 blocked，截图 0；既有定向 143 项、a11y 131 项通过；SSR 无 hydration；本轮 Vue Input 与 Demo 探针 74 项通过，原生 readOnly=true、可聚焦且输入后保持「只读」；真实浏览器复验待补                  |
 | C063 | InputGroup      | needs-evidence | 视觉/键盘 0/32 blocked，截图 0；真实页面 0/8；按钮尺寸继承与显式/ButtonGroup 优先级 happy-dom 回归通过，双端定向测试 225 pass；稳定 host 文档同步检查通过；真实浏览器复验待补                                      |
 | C064 | InputGroupAddon | needs-evidence | 视觉 0/32、键盘 0/32 全 blocked，截图 0（IAB browsers: []）；真实页面 0/8；定向测试 5 passed/19 skipped；Node SSR 探针完成；无读屏与计算样式验收                                                                   |
-| C065 | InputNumber     | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；定向测试 71 pass；SSR+happy-dom 探针；未跑 E2E、全仓测试、完整构建、读屏、hydration                                                                   |
+| C065 | InputNumber     | needs-evidence | 视觉/真实键盘 0/24 blocked，截图 0；本轮必填 ARIA 继承与显式覆盖、React SSR 0 一致性回归通过，双端定向测试 240 pass；文档/MCP 生成及类型检查通过；真实浏览器、读屏与 InputNumber hydration 复验待补                |
 | C066 | InputOTP        | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；定向测试 48 pass；SSR+happy-dom 探针；未跑 E2E、全仓测试、完整构建、读屏、hydration                                                                   |
 | C067 | MaskInput       | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；定向测试 62/62 pass；SSR+happy-dom 探针；未跑 E2E、全仓测试、完整构建、读屏、hydration                                                                |
 | C068 | Mentions        | needs-evidence | 视觉、键盘各 0 执行/24 blocked，截图 0（IAB browsers: []）；Demo 运行 0/6；定向测试 48 pass；SSR+happy-dom 观测；未跑全量构建、生成闸、E2E、hydration、读屏                                                        |

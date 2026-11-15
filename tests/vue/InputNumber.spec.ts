@@ -4,6 +4,8 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { h } from 'vue'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { InputNumber } from '@expcat/tigercat-vue/InputNumber'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -147,6 +149,30 @@ describe('InputNumber (Vue)', () => {
   })
 
   describe('Accessibility', () => {
+    it('inherits aria-required from a required FormItem', () => {
+      render(FormItem, {
+        props: { label: 'Quantity', required: true },
+        slots: { default: () => h(InputNumber, { modelValue: 5 }) }
+      })
+
+      expect(screen.getByRole('spinbutton', { name: 'Quantity' })).toHaveAttribute(
+        'aria-required',
+        'true'
+      )
+    })
+
+    it('preserves explicit aria-required in a required FormItem', () => {
+      render(FormItem, {
+        props: { label: 'Quantity', required: true },
+        slots: { default: () => h(InputNumber, { modelValue: 5, 'aria-required': false }) }
+      })
+
+      expect(screen.getByRole('spinbutton', { name: 'Quantity' })).toHaveAttribute(
+        'aria-required',
+        'false'
+      )
+    })
+
     it('exposes aria value bounds only when finite', () => {
       const { container: bounded } = render(InputNumber, {
         props: { modelValue: 5, min: 0, max: 100 }

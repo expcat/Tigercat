@@ -15,7 +15,7 @@ Vue/React API 基本同名；React 使用 `className`，Vue 使用 `class` 或�
 
 Runnable modules: `examples/example/vue3/src/examples/button/01/`, `examples/example/vue3/src/examples/button/02/`, `examples/example/vue3/src/examples/button/03/`, `examples/example/react/src/examples/button/01/`, `examples/example/react/src/examples/button/02/`, `examples/example/react/src/examples/button/03/`.
 
-Note: `type` 是原生按钮类型（button / submit / reset），默认 button；3.0 不再提供 `htmlType`。`size` 未设时：组 size → `md`。纯图标用 icon prop / slot，并提供 `aria-label` 或 `aria-labelledby`；按钮按 size 为正方形。文字也可以来自子组件。loading 设置原生 disabled 和 `aria-busy`。
+Note: `type` 是原生按钮类型（button / submit / reset），默认 button；3.0 不再提供 `htmlType`。`size` 未设时：ButtonGroup size → InputGroup size → `md`。纯图标用 icon prop / slot，并提供 `aria-label` 或 `aria-labelledby`；按钮按 size 为正方形。文字也可以来自子组件。loading 设置原生 disabled 和 `aria-busy`。
 
 Vue: `<Button type="submit">Save</Button>`
 

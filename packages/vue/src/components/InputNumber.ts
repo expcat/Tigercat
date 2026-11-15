@@ -445,6 +445,8 @@ export const InputNumber = defineComponent({
           'aria-valuenow': currentValue.value ?? undefined,
           'aria-valuetext': valueText,
           ...(effectiveStatus.value === 'error' ? { 'aria-invalid': true } : {}),
+          'aria-required':
+            restAttrs['aria-required'] ?? (formItemControl?.required.value || undefined),
           'aria-describedby': mergeAriaDescribedBy(
             restAttrs['aria-describedby'] as string | undefined,
             formItemControl?.describedBy.value

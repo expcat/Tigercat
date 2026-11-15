@@ -13,12 +13,12 @@ description: Compact generated Tigercat Basic props reference
 
 `packages/core/src/types/button.ts` · `ButtonProps` · 4/12 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: `type` 是原生按钮类型（button / submit / reset），默认 button；3.0 不再提供 `htmlType`。`size` 未设时：组 size → `md`。纯图标用 icon prop / slot，并提供 `aria-label` 或 `aria-labelledby`；按钮按 size 为正方形。文字也可以来自子组件。loading 设置原生 disabled 和 `aria-busy`。
+Note: `type` 是原生按钮类型（button / submit / reset），默认 button；3.0 不再提供 `htmlType`。`size` 未设时：ButtonGroup size → InputGroup size → `md`。纯图标用 icon prop / slot，并提供 `aria-label` 或 `aria-labelledby`；按钮按 size 为正方形。文字也可以来自子组件。loading 设置原生 disabled 和 `aria-busy`。
 
 | Prop        | Type            | Default     | Notes                                                                                      |
 | ----------- | --------------- | ----------- | ------------------------------------------------------------------------------------------ |
 | `variant?`  | `ButtonVariant` | `'primary'` | Button variant style                                                                       |
-| `size?`     | `ButtonSize`    | `-`         | Button size. When omitted, uses the enclosing ButtonGroup size, then `md`. Passing `und... |
+| `size?`     | `ButtonSize`    | `-`         | Button size. When omitted, uses ButtonGroup size, then InputGroup size, then `md`. Pass... |
 | `disabled?` | `boolean`       | `false`     | Whether the button is disabled                                                             |
 | `loading?`  | `boolean`       | `false`     | Whether the button is in loading state                                                     |
 

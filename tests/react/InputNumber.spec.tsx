@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { InputNumber } from '@expcat/tigercat-react/InputNumber'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
@@ -133,6 +134,32 @@ describe('InputNumber (React)', () => {
   })
 
   describe('Accessibility', () => {
+    it('inherits aria-required from a required FormItem', () => {
+      render(
+        <FormItem label="Quantity" required>
+          <InputNumber value={5} />
+        </FormItem>
+      )
+
+      expect(screen.getByRole('spinbutton', { name: 'Quantity' })).toHaveAttribute(
+        'aria-required',
+        'true'
+      )
+    })
+
+    it('preserves explicit aria-required in a required FormItem', () => {
+      render(
+        <FormItem label="Quantity" required>
+          <InputNumber value={5} aria-required={false} />
+        </FormItem>
+      )
+
+      expect(screen.getByRole('spinbutton', { name: 'Quantity' })).toHaveAttribute(
+        'aria-required',
+        'false'
+      )
+    })
+
     it('exposes aria value bounds only when finite', () => {
       const { container: bounded } = render(<InputNumber value={5} min={0} max={100} />)
       const boundedInput = getInput(bounded)

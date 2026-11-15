@@ -13,7 +13,7 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/color-swatch.ts` · `ColorSwatchProps` · 4/19 compact props · [Complete props](#remaining-props-complete-public-api)
 
-Note: 选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex 与 `rgb()` 可以是同一支。解析不了的字符串不涂成颜色。只读用 `readOnly`。
+Note: 选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex 与 `rgb()` 可以是同一支，无 `#` 的 hex 也能涂色。解析不了的选项禁用，不提交。`columns` 小数截整，低于 1 用 1，非有限值用 6；布局与导航共用该列数。只读用 `readOnly`。
 
 | Prop            | Type                       | Default | Notes |
 | --------------- | -------------------------- | ------- | ----- |
@@ -27,7 +27,7 @@ Note: 选中比较走和取色器同一套解析。`#fff` 与 `#ffffff`、hex �
 - `disabled?`: `boolean`; default `-`. -
 - `readOnly?`: `boolean`; default `false`. Focusable and submittable, but the selection cannot change.
 - `size?`: `ComponentSize`; default `-`. -
-- `columns?`: `number`; default `6`. Visual columns of the **current group** grid. ArrowUp/Down stay in that grid.
+- `columns?`: `number`; default `6`. Visual columns of the **current group** grid. ArrowUp/Down stay in that grid. Fractions...
 - `ariaLabel?`: `string`; default `-`. -
 - `className?`: `string`; default `-`. -
 - `locale?`: `Partial<TigerLocale>`; default `-`. Locale object merged on top of ConfigProvider. Do not pass a language id.

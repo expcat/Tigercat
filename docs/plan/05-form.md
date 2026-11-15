@@ -20,8 +20,8 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 概览
 
-本篇 39 条：P1 0、P2 36、P3 3。
-按波次：W3 36、W9 3。
+本篇 36 条：P1 0、P2 33、P3 3。
+按波次：W3 33、W9 3。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C056-F01（S10）、C056-F04（S07）、C060-F04（S13）、C061-F05（S13）、C072-F02（S13）、C074-F04（S13）、C080-F03（S13）。
 
@@ -85,16 +85,6 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 | 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
 | ---- | ---- | ---- | --- | ---- | ---- | ---- |
-
-### C065 InputNumber
-
-报告 `groups/form/InputNumber.md`，队列状态 needs-evidence。另受 S01、S04、S10 影响。
-
-| 编号     | 级别 | 波次 | 端          | 类别   | 条目                                         | 验收                                                                           |
-| -------- | ---- | ---- | ----------- | ------ | -------------------------------------------- | ------------------------------------------------------------------------------ |
-| C065-F01 | P2   | W3   | 文档·生成器 | 文档   | React onChange 文档漏掉 string               | input-number 文档与 MCP 写明 React onChange 为 number \| string \| null        |
-| C065-F02 | P2   | W3   | 双端        | 无障碍 | FormItem required 未接到 spinbutton          | 必填 FormItem 内未手写 aria-required 的两端 spinbutton 输出 aria-required=true |
-| C065-F03 | P2   | W3   | React       | SSR    | React SSR 可见输入为空，模型和 hidden 已有值 | React SSR value=0 带 name 时可见 input 值为 0，与 aria-valuenow、hidden 一致   |
 
 ### C067 MaskInput
 
@@ -225,9 +215,9 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 报告没有给这些组件立新的编号。右列是并入的既有条目，修那些条目时要在这里复验。
 
-| 任务 | 组件            | 报告                             | 并入的条目                   |
-| ---- | --------------- | -------------------------------- | ---------------------------- |
-| C064 | InputGroupAddon | `groups/form/InputGroupAddon.md` | S02                          |
-| C066 | InputOTP        | `groups/form/InputOTP.md`        | S01、S04、S10                |
-| C070 | Radio           | `groups/form/Radio.md`           | S01、S04、S08、S10           |
-| C078 | TimePicker      | `groups/form/TimePicker.md`      | S01、S02、S04、S07、C065-F03 |
+| 任务 | 组件            | 报告                             | 并入的条目         |
+| ---- | --------------- | -------------------------------- | ------------------ |
+| C064 | InputGroupAddon | `groups/form/InputGroupAddon.md` | S02                |
+| C066 | InputOTP        | `groups/form/InputOTP.md`        | S01、S04、S10      |
+| C070 | Radio           | `groups/form/Radio.md`           | S01、S04、S08、S10 |
+| C078 | TimePicker      | `groups/form/TimePicker.md`      | S01、S02、S04、S07 |

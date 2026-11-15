@@ -143,7 +143,6 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     defaultValue: readStored(defaultValue),
     onChange
   })
-  const [displayValue, setDisplayValue] = useState('')
   const displayDirtyRef = useRef(false)
 
   const setInputRefs = (node: HTMLInputElement | null) => {
@@ -163,6 +162,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     },
     [formatter, precision]
   )
+  const [displayValue, setDisplayValue] = useState(() => toDisplayValue(currentValue, false))
 
   useEffect(() => {
     focusedRef.current = focused
@@ -376,6 +376,7 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
         aria-valuenow={numericInputNumber(currentValue) ?? undefined}
         aria-valuetext={valueText}
         aria-invalid={status === 'error' ? true : undefined}
+        aria-required={rest['aria-required'] ?? (formItemControl?.required || undefined)}
         aria-describedby={describedBy}
         className={inputClasses}
         value={displayValue}

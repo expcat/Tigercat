@@ -13,7 +13,7 @@ description: Compact generated Tigercat Form props reference
 
 `packages/core/src/types/input-group.ts` · `InputGroupProps`
 
-Note: 直子必须是 Input / Textarea / InputNumber / InputGroupAddon / Button 的 chrome 根。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。
+Note: 直子可为组件的 chrome 根，或包含 chrome 的稳定 host（如带计数的 Input）。无 `aria-label` / `aria-labelledby` 时不加 `role="group"`。compact 接缝打在 `data-tiger-chrome`。
 
 | Prop         | Type            | Default | Notes                                        |
 | ------------ | --------------- | ------- | -------------------------------------------- |
