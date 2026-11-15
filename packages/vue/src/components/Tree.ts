@@ -447,9 +447,13 @@ export const Tree = defineComponent({
       const node = lookupTreeNode(view.value.index, nodeKey)
       if (!node || node.disabled) return
       const expanded = computedExpanded.value.some((key) => sameTreeKey(key, nodeKey))
-      if (!expanded && loadGate(node) === 'load') {
-        requestLoad(node, 'expand')
-        return
+      if (!expanded) {
+        const gate = loadGate(node)
+        if (gate === 'reject') return
+        if (gate === 'load') {
+          requestLoad(node, 'expand')
+          return
+        }
       }
       const next = nextTreeExpandedKeys(computedExpanded.value, node.key, !expanded)
       commitExpanded(next, node, !expanded)
@@ -578,7 +582,9 @@ export const Tree = defineComponent({
       if (patch.expandKey !== undefined) handleExpand(patch.expandKey)
       if (patch.selectKey !== undefined) {
         const node = lookupTreeNode(view.value.index, patch.selectKey)
-        if (node && loadGate(node) === 'load') requestLoad(node, 'select')
+        const gate = node ? loadGate(node) : 'ready'
+        if (gate === 'reject') return
+        if (node && gate === 'load') requestLoad(node, 'select')
         else handleSelect(patch.selectKey)
       }
       if (patch.checkKey !== undefined && patch.checkChecked !== undefined) {
@@ -782,7 +788,9 @@ export const Tree = defineComponent({
             if (row.disabled) return
             activeKey.value = node.key
             emit('node-click', node, event)
-            if (loadGate(node) === 'load') {
+            const gate = loadGate(node)
+            if (gate === 'reject') return
+            if (gate === 'load') {
               requestLoad(node, 'select')
               return
             }

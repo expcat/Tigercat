@@ -436,6 +436,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
         loaded: loadedIdsRef.current.has(id),
         loading: loadingKeys.has(id)
       })
+      if (gate === 'reject') return
       if (gate === 'load') {
         void loadChildren(item.node, 'expand')
         return
@@ -556,6 +557,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
               loading: loadingKeys.has(treeKeyId(target.key))
             })
           : 'ready'
+        if (gate === 'reject') return true
         if (target && gate === 'load' && !treeSetHas(expandedSet, target.key)) {
           void loadChildren(target.node, 'expand')
         } else {
@@ -576,6 +578,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
               loading: loadingKeys.has(treeKeyId(target.key))
             })
           : 'ready'
+        if (gate === 'reject') return true
         if (target && gate === 'load') void loadChildren(target.node, 'select')
         else commitKey(action.key)
         return true

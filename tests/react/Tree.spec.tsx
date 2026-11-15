@@ -30,6 +30,32 @@ const sampleTreeData = [
 ]
 
 describe('Tree', () => {
+  it('keeps one lazy load in flight when the same row is clicked twice', async () => {
+    let resolveLoad!: (children: TreeNode[]) => void
+    const loadData = vi.fn(
+      () =>
+        new Promise<TreeNode[]>((resolve) => {
+          resolveLoad = resolve
+        })
+    )
+    const onSelect = vi.fn()
+    const { getByRole } = render(
+      <Tree
+        treeData={[{ key: 'lazy', label: 'Lazy', isLeaf: false }]}
+        loadData={loadData}
+        onSelect={onSelect}
+      />
+    )
+    const row = getByRole('treeitem', { name: 'Lazy' })
+    fireEvent.click(row)
+    fireEvent.click(row)
+    expect(loadData).toHaveBeenCalledTimes(1)
+    expect(onSelect).not.toHaveBeenCalled()
+
+    await act(async () => resolveLoad([{ key: 'leaf', label: 'Loaded leaf', isLeaf: true }]))
+    expect(getByRole('treeitem', { name: 'Loaded leaf' })).toBeInTheDocument()
+  })
+
   describe('Rendering', () => {
     it('should render tree roles', () => {
       render(<Tree treeData={sampleTreeData} />)

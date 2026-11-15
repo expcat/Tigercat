@@ -421,6 +421,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
           loaded: loadedIds.has(treeKeyId(node.key)),
           loading: loadingIds.has(treeKeyId(node.key))
         })
+        if (gate === 'reject') return
         if (gate === 'load') {
           requestLoad(node, 'expand')
           return
@@ -578,6 +579,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
               loading: loadingIds.has(treeKeyId(node.key))
             })
           : 'ready'
+        if (gate === 'reject') return
         if (node && gate === 'load') requestLoad(node, 'select')
         else handleSelect(patch.selectKey)
       }
@@ -740,6 +742,7 @@ export function useTreeState(props: TreeProps): TreeContext & {
         loaded: loadedIds.has(treeKeyId(node.key)),
         loading: loadingIds.has(treeKeyId(node.key))
       })
+      if (gate === 'reject') return
       if (gate === 'load') {
         requestLoad(node, 'select')
         return

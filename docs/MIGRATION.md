@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 TreeSelect、Tree 与 Cascader 的懒加载节点在请求未结束时，重复激活同一节点不再重复调用 `loadData`，也不提前提交该节点。请求完成后正常显示子节点；失败后仍可重试。调用方式不用改。
+
 双端 Textarea 现在始终返回包住原生 textarea 的稳定 host，切换错误文案或计数时保留节点与焦点。`className` 和 Vue `class` 统一作用于 host；依赖组件根元素就是 textarea 的 CSS 或测试应改为查询内部原生 textarea。
 
 React Slider 的可见气泡现在与 `aria-valuetext` 一样使用 `formatTooltip`。Vue Slider 未传 id 时生成稳定的实例 ID，范围 thumb 的后缀标签引用对应实际节点。双端自定义 mark 点击后按 `step` 对齐并限制在 min/max 内；例如 `min=0 max=100 step=10` 下，值为 105 的 mark 现在提交 100。调用方式不用改。

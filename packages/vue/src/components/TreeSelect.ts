@@ -242,6 +242,7 @@ export const TreeSelect = defineComponent({
 
     const loadGuard = createLoadGuard()
     const loadedIds = new Set<string>()
+    const loadingIds = new Set<string>()
     let seeded = false
     let seenTreeCount = 0
     const formNamed = Boolean(formItemControl?.name.value)
@@ -357,6 +358,7 @@ export const TreeSelect = defineComponent({
       () => {
         loadedData.value = null
         loadedIds.clear()
+        loadingIds.clear()
         loadGuard.invalidate()
       }
     )
@@ -366,7 +368,10 @@ export const TreeSelect = defineComponent({
       (blocked) => {
         if (blocked === commitBlocked) return
         commitBlocked = blocked
-        if (blocked) loadGuard.invalidate()
+        if (blocked) {
+          loadGuard.invalidate()
+          loadingIds.clear()
+        }
       }
     )
     onUnmounted(() => loadGuard.invalidate())
@@ -477,7 +482,7 @@ export const TreeSelect = defineComponent({
         hasChildren: nodeHasChildren(node),
         hasLoadData: hasLoadData.value,
         loaded: loadedIds.has(id),
-        loading: false
+        loading: loadingIds.has(id)
       })
     }
 
@@ -485,6 +490,7 @@ export const TreeSelect = defineComponent({
       if (!props.loadData || node.disabled) return
       const id = treeKeyId(node.key)
       const load = loadGuard.begin(id)
+      loadingIds.add(id)
       if (!treeSetHas(expandedSet.value, node.key)) {
         setExpanded(toggleTreeSelectExpandedKey(expandedSet.value, node.key))
       }
@@ -510,12 +516,16 @@ export const TreeSelect = defineComponent({
         if (decision.commit) commitKey(node.key)
       } catch {
         if (!loadGuard.isCurrent(load)) return
+      } finally {
+        if (loadGuard.isCurrent(load)) loadingIds.delete(id)
       }
     }
 
     function handleNodeSelect(item: VisibleTreeItem) {
       if (item.node.disabled || effectiveDisabled.value || isReadOnly.value) return
-      if (nodeGate(item.node) === 'load') {
+      const gate = nodeGate(item.node)
+      if (gate === 'reject') return
+      if (gate === 'load') {
         void loadChildren(item.node, 'select')
         return
       }
@@ -526,7 +536,9 @@ export const TreeSelect = defineComponent({
     function handleExpandClick(item: VisibleTreeItem, event: Event) {
       event.stopPropagation()
       if (item.node.disabled || isReadOnly.value) return
-      if (nodeGate(item.node) === 'load') {
+      const gate = nodeGate(item.node)
+      if (gate === 'reject') return
+      if (gate === 'load') {
         void loadChildren(item.node, 'expand')
         return
       }
@@ -573,11 +585,9 @@ export const TreeSelect = defineComponent({
       }
       if (action.type === 'toggleExpand') {
         const target = visibleItems.value.find((row) => sameTreeKey(row.key, action.key))
-        if (
-          target &&
-          nodeGate(target.node) === 'load' &&
-          !treeSetHas(expandedSet.value, target.key)
-        ) {
+        const gate = target ? nodeGate(target.node) : 'ready'
+        if (gate === 'reject') return true
+        if (target && gate === 'load' && !treeSetHas(expandedSet.value, target.key)) {
           void loadChildren(target.node, 'expand')
         } else {
           toggleExpand(action.key)
@@ -587,7 +597,9 @@ export const TreeSelect = defineComponent({
       }
       if (action.type === 'select' || action.type === 'check') {
         const target = visibleItems.value.find((row) => sameTreeKey(row.key, action.key))
-        if (target && nodeGate(target.node) === 'load') void loadChildren(target.node, 'select')
+        const gate = target ? nodeGate(target.node) : 'ready'
+        if (gate === 'reject') return true
+        if (target && gate === 'load') void loadChildren(target.node, 'select')
         else commitKey(action.key)
         return true
       }

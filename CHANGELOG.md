@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **TreeSelect 懒加载去重（Core / Vue / React，C080-F02）**：共享节点 gate 拒绝加载中的节点，Vue 同步维护在途状态并在请求结束或失效时清理。双端挂起 Promise 下连续点击同一行只调用一次 `loadData`，完成后仍显示子节点；Tree 复用同一规则，Cascader 回归通过。
+
 - **Transfer 标题、ARIA 文案与选中计数（Vue / React，C079-F01、C079-F02、C079-F03）**：双端保留 `labels` 中的标题，仅由有值的专用 prop 覆盖，并继续按实例 locale、ConfigProvider 和英语逐字段回退。F02 采用方向 A，保留公开模板，将 `selectAllAriaLabel` 接到全选 checkbox、`itemsAriaLabel` 接到列表 group，均以当前标题替换 `{title}`；标题计数复用 Core 字符串键分区去重，`[1, '1']` 只计一项。
 
 - **Textarea 数值初值、稳定节点与示例名称（Vue / React / Demo，C077-F01、C077-F02、C077-F03、C077-F04）**：Vue 初始化与后续更新复用同一 FormItem 文本解析，数值初值 123 在 SSR 首屏显示为 123。双端始终保留稳定 host，错误文案与计数出现或消失时保留 textarea 节点、值与焦点，错误描述继续合并；双端 Demo 03 初值改为 14/12，六个 Demo 均补上持久可访问名称。

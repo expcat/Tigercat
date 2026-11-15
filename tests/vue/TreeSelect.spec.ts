@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { defineComponent, h, ref } from 'vue'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
+import type { TreeNode } from '@expcat/tigercat-core'
 import { TreeSelect } from '@expcat/tigercat-vue/TreeSelect'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { Form } from '@expcat/tigercat-vue/Form'
@@ -32,6 +33,30 @@ describe('TreeSelect', () => {
     )
   })
   afterEach(() => vi.restoreAllMocks())
+
+  it('keeps one lazy load in flight when the same row is clicked twice', async () => {
+    let resolveLoad!: (children: TreeNode[]) => void
+    const loadData = vi.fn(
+      () =>
+        new Promise<TreeNode[]>((resolve) => {
+          resolveLoad = resolve
+        })
+    )
+    const { getByRole, findByRole, emitted } = render(TreeSelect, {
+      props: { treeData: [{ key: 'lazy', label: 'Lazy', isLeaf: false }], loadData }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    const row = getByRole('treeitem', { name: 'Lazy' })
+    await fireEvent.click(row)
+    await fireEvent.click(row)
+    expect(loadData).toHaveBeenCalledTimes(1)
+    expect(emitted()['update:modelValue']).toBeUndefined()
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'true')
+
+    resolveLoad([{ key: 'leaf', label: 'Loaded leaf', isLeaf: true }])
+    expect(await findByRole('treeitem', { name: 'Loaded leaf' })).toBeInTheDocument()
+  })
+
   it.each(['empty options', 'no search matches'])(
     'omits aria-controls for %s',
     async (emptyState) => {

@@ -118,7 +118,7 @@ export function isTreeNodeExpandable(node: TreeNode, hasLoadData = false): boole
 export type BranchLoadGate = 'reject' | 'load' | 'ready'
 
 /**
- * Shared lazy-load gate. Disabled nodes are rejected. A leaf (`isLeaf: true`,
+ * Shared lazy-load gate. Disabled or loading nodes are rejected. A leaf (`isLeaf: true`,
  * or no children when loadData is absent) is ready and must not be intercepted.
  * Empty children with `isLeaf !== true` and loadData still need a load until
  * that node has been loaded.
@@ -131,7 +131,7 @@ export function gateBranchLoad(options: {
   loaded: boolean
   loading: boolean
 }): BranchLoadGate {
-  if (options.disabled) return 'reject'
+  if (options.disabled || options.loading) return 'reject'
   const expandable = isTreeNodeExpandable(
     {
       key: '',

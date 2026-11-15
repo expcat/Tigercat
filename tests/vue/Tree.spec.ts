@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h, nextTick, reactive } from 'vue'
+import type { TreeNode } from '@expcat/tigercat-core'
 import { Tree } from '@expcat/tigercat-vue/Tree'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
@@ -27,6 +28,27 @@ const sampleTreeData = [
 ]
 
 describe('Tree', () => {
+  it('keeps one lazy load in flight when the same row is clicked twice', async () => {
+    let resolveLoad!: (children: TreeNode[]) => void
+    const loadData = vi.fn(
+      () =>
+        new Promise<TreeNode[]>((resolve) => {
+          resolveLoad = resolve
+        })
+    )
+    const { getByRole, findByRole, emitted } = render(Tree, {
+      props: { treeData: [{ key: 'lazy', label: 'Lazy', isLeaf: false }], loadData }
+    })
+    const row = getByRole('treeitem', { name: 'Lazy' })
+    await fireEvent.click(row)
+    await fireEvent.click(row)
+    expect(loadData).toHaveBeenCalledTimes(1)
+    expect(emitted().select).toBeUndefined()
+
+    resolveLoad([{ key: 'leaf', label: 'Loaded leaf', isLeaf: true }])
+    expect(await findByRole('treeitem', { name: 'Loaded leaf' })).toBeInTheDocument()
+  })
+
   describe('Rendering', () => {
     it('should render tree roles', () => {
       const { container } = render(Tree, {
