@@ -503,7 +503,7 @@ function cronTokenValues(token: string, min: number, max: number): number[] | nu
       end = Number(range[2])
     } else if (/^\d+$/.test(rangePart)) {
       start = Number(rangePart)
-      end = start
+      end = stepPart === undefined ? start : max
     } else return null
   }
   if (start < min || end > max || start > end) return null

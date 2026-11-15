@@ -424,8 +424,16 @@ export const CronEditor = markFormItemGroupControl(
                       disabled: effectiveDisabled.value,
                       'aria-label': labels.value.presetAriaLabel,
                       onChange: (event: Event) => {
-                        if (props.readOnly) return
                         const select = event.target as HTMLSelectElement
+                        const shown = resolvedPresets.value.some(
+                          (preset) => preset.value === expressionDraft.value
+                        )
+                          ? expressionDraft.value
+                          : ''
+                        if (props.readOnly) {
+                          select.value = shown
+                          return
+                        }
                         const nextValue = select.value
                         if (nextValue) {
                           for (const key of Object.keys(stickyModes) as CronFieldKey[]) {
@@ -436,13 +444,7 @@ export const CronEditor = markFormItemGroupControl(
                             applyDrafts(nextValue)
                           }
                           writeValue(nextValue)
-                          if (valueControlled.value) {
-                            select.value = resolvedPresets.value.some(
-                              (preset) => preset.value === expressionDraft.value
-                            )
-                              ? expressionDraft.value
-                              : ''
-                          }
+                          if (valueControlled.value) select.value = shown
                         }
                       }
                     },
@@ -487,7 +489,7 @@ export const CronEditor = markFormItemGroupControl(
                         const select = event.target as HTMLSelectElement
                         const shown = fieldsReady.value ? draft.mode : ''
                         handleModeChange(meta, select.value as CronFieldMode)
-                        if (valueControlled.value) select.value = shown
+                        if (props.readOnly || valueControlled.value) select.value = shown
                       }
                     },
                     [

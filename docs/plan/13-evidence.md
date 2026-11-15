@@ -122,7 +122,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C055 | CheckboxGroup   | needs-evidence | Vue 12 格+React 12 格视觉与真实键盘全部 blocked（browsers:[]），截图 0；Group 相关 23 项测试通过；有 happy-dom 与 SSR 探针；未跑 E2E、Example 编译、读屏                                                           |
 | C056 | ColorPicker     | needs-evidence | 视觉与真实键盘均 0/24 执行、24 blocked（browsers:[]），截图 0；既有 56 项测试通过；无独立 E2E；有 SSR 字符串与限定 axe 探针；hydration、读屏、原生 range、拖动未验证                                               |
 | C057 | ColorSwatch     | needs-evidence | 视觉 0/24、真实键盘 0/24 执行，24 blocked（browsers=[]）；截图 0；既有 44 项测试通过；Node SSR 探针已跑，无 hydration；无独立 E2E；RTL 全路径、读屏未测                                                            |
-| C058 | CronEditor      | needs-evidence | 视觉 0/16、真实键盘 0/16 执行，16 blocked（browsers=[]）；截图 0；既有 51 项测试及 locale 定向通过；SSR 探针无 hydration；无独立 E2E；C058-F02 待浏览器复验                                                        |
+| C058 | CronEditor      | needs-evidence | 视觉 0/16、真实键盘 0/16 执行，16 blocked（browsers=[]）；截图 0；既有 51 项测试及 locale 定向通过；SSR 探针无 hydration；无独立 E2E；只读选择器 happy-dom 回归通过，真实浏览器复验待补                            |
 | C059 | DatePicker      | needs-evidence | 视觉 0/24、真实键盘 0/24 执行，24 blocked（browsers=[]）；截图 0；既有 49 项测试通过；SSR 探针无 hydration；无独立 E2E；C059-F02 待浏览器复验                                                                      |
 | C060 | Form            | needs-evidence | 视觉 0/32、键盘 0/32、截图 0，全部 blocked（browsers: []）；8 个主责 Demo 真实操作 0/8；主测试 120 项、Core/W9 关联 121 项通过；未记录 E2E、SSR 执行                                                               |
 | C061 | FormItem        | needs-evidence | 真实视觉与键盘 0/32，32 blocked（browsers: []），截图 0；无独立 Demo，8 个组合 Demo owner 为 C060；相关 129 项测试通过；Node SSR 探针已跑，无水合/读屏；无 E2E 记录                                                |

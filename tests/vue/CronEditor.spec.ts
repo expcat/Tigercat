@@ -151,8 +151,15 @@ describe('CronEditor', () => {
 
     it('keeps read-only controls focusable without changing the value', async () => {
       const onUpdate = vi.fn()
-      render(CronEditor, {
-        props: { readOnly: true, modelValue: '* * * * *', 'onUpdate:modelValue': onUpdate }
+      const onValidate = vi.fn()
+      const { container } = render(CronEditor, {
+        props: {
+          readOnly: true,
+          defaultValue: '* * * * *',
+          name: 'job',
+          'onUpdate:modelValue': onUpdate,
+          onValidate
+        }
       })
 
       const group = screen.getByRole('group', { name: 'Cron editor' })
@@ -161,9 +168,14 @@ describe('CronEditor', () => {
       expect(screen.getByLabelText('Cron expression')).not.toBeDisabled()
       expect(screen.getByLabelText('Cron preset')).not.toBeDisabled()
       expect(screen.getByLabelText('Minute mode')).not.toBeDisabled()
+      await fireEvent.update(screen.getByLabelText('Cron preset'), '0 0 * * *')
+      expect.soft(screen.getByLabelText('Cron preset')).toHaveValue('* * * * *')
       await fireEvent.update(screen.getByLabelText('Minute mode'), 'every')
+      expect.soft(screen.getByLabelText('Minute mode')).toHaveValue('any')
       expect(onUpdate).not.toHaveBeenCalled()
+      expect(onValidate).not.toHaveBeenCalled()
       expect(screen.getByLabelText('Cron expression')).toHaveValue('* * * * *')
+      expect(container.querySelector('input[name="job"]')).toHaveValue('* * * * *')
       const results = await axe(group, { runOnly: ['aria-allowed-attr'] })
       expect(results.violations).toEqual([])
     })

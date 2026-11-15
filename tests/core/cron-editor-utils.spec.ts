@@ -106,6 +106,24 @@ describe('cron-editor-utils', () => {
     expect(validateCronExpression('').valid).toBe(true)
   })
 
+  it('expands numeric steps consistently with summaries and next runs', () => {
+    const expression = '5/2 * * * *'
+
+    expect(validateCronExpression(expression).valid).toBe(true)
+    expect([...parseCronSchedule(expression)!.minute]).toEqual([
+      5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51,
+      53, 55, 57, 59
+    ])
+    expect(describeCronExpression(expression, zhCN)).toContain('分钟：5–59，每隔 2')
+    expect(nextCronRun(expression, new Date(2026, 10, 15, 9, 5))).toEqual(
+      new Date(2026, 10, 15, 9, 7)
+    )
+    expect(nextCronRun(expression, new Date(2026, 10, 15, 9, 59))).toEqual(
+      new Date(2026, 10, 15, 10, 5)
+    )
+    expect([...parseCronSchedule('5 * * * *')!.minute]).toEqual([5])
+  })
+
   it('treats blank expressions as valid forms but unparseable schedules', () => {
     expect(validateCronExpression('   ').valid).toBe(true)
     for (const expression of ['', '   ']) {
