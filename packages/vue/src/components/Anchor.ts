@@ -20,6 +20,7 @@ import {
   mergeTigerLocale,
   getAnchorLabels,
   getAnchorWrapperClasses,
+  getElementTextDirection,
   getAnchorInkContainerClasses,
   getAnchorInkActiveClasses,
   getAnchorLinkClasses,
@@ -318,7 +319,8 @@ export const Anchor = defineComponent({
       const next = getAnchorInkStyle(
         props.orientation,
         activeLinkElement.getBoundingClientRect(),
-        anchorRef.value.getBoundingClientRect()
+        anchorRef.value.getBoundingClientRect(),
+        getElementTextDirection(anchorRef.value)
       )
       inkRef.value.style.top = next.top
       inkRef.value.style.height = next.height

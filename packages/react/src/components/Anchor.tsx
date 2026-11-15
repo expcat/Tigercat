@@ -26,6 +26,7 @@ import {
   getAnchorLinkListClasses,
   getAnchorTargetElement,
   getAnchorWrapperClasses,
+  getElementTextDirection,
   mergeTigerLocale,
   replaceAnchorHash,
   resolveActiveAnchorHref,
@@ -292,13 +293,14 @@ export const Anchor = forwardRef<AnchorHandle, AnchorProps>(function Anchor(
     const next = getAnchorInkStyle(
       orientation,
       activeLinkElement.getBoundingClientRect(),
-      root.getBoundingClientRect()
+      root.getBoundingClientRect(),
+      getElementTextDirection(root)
     )
     ink.style.top = next.top
     ink.style.height = next.height
     ink.style.insetInlineStart = next.insetInlineStart
     ink.style.width = next.width
-  }, [activeLink, orientation, links])
+  }, [activeLink, orientation, links, showInkInFixed])
 
   const wrapperClasses = classNames(getAnchorWrapperClasses(className))
   const showInk = !affix || showInkInFixed

@@ -308,6 +308,72 @@ describe('Anchor', () => {
   })
 
   describe('Ink Indicator', () => {
+    it('positions horizontal ink from the right edge in RTL', async () => {
+      render(
+        <Anchor
+          affix={false}
+          orientation="horizontal"
+          style={{ direction: 'rtl' }}
+          getContainer={() => scrollContainer}>
+          <AnchorLink href="#section1" title="Link 1" />
+          <AnchorLink href="#section2" title="Link 2" />
+        </Anchor>
+      )
+      const nav = screen.getByRole('navigation')
+      const link = screen.getByRole('link', { name: 'Link 2' })
+      vi.spyOn(nav, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 0, 300, 40))
+      vi.spyOn(link, 'getBoundingClientRect').mockReturnValue(new DOMRect(300, 0, 100, 40))
+
+      await fireEvent.click(link)
+
+      expect(link).toHaveAttribute('aria-current', 'location')
+      expect(nav.querySelector('div > div')).toHaveStyle({
+        insetInlineStart: '0px',
+        width: '100px'
+      })
+    })
+
+    it('restores horizontal ink geometry when showInkInFixed is re-enabled', async () => {
+      const props = {
+        affix: true,
+        orientation: 'horizontal' as const,
+        getContainer: () => scrollContainer
+      }
+      const children = (
+        <>
+          <AnchorLink href="#section1" title="Link 1" />
+          <AnchorLink href="#section2" title="Link 2" />
+        </>
+      )
+      const { rerender } = render(
+        <Anchor {...props} showInkInFixed>
+          {children}
+        </Anchor>
+      )
+      const nav = screen.getByRole('navigation')
+      const link = screen.getByRole('link', { name: 'Link 2' })
+      vi.spyOn(nav, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 0, 300, 40))
+      vi.spyOn(link, 'getBoundingClientRect').mockReturnValue(new DOMRect(300, 0, 100, 40))
+      await fireEvent.click(link)
+      const expectedStyle = { insetInlineStart: '200px', width: '100px' }
+      expect(nav.querySelector('div > div')).toHaveStyle(expectedStyle)
+
+      rerender(
+        <Anchor {...props} showInkInFixed={false}>
+          {children}
+        </Anchor>
+      )
+      expect(nav.querySelector('div > div')).not.toBeInTheDocument()
+      rerender(
+        <Anchor {...props} showInkInFixed>
+          {children}
+        </Anchor>
+      )
+
+      expect(link).toHaveAttribute('aria-current', 'location')
+      expect(nav.querySelector('div > div')).toHaveStyle(expectedStyle)
+    })
+
     it('should show ink indicator when affix is false', () => {
       const { container } = render(
         <Anchor affix={false} getContainer={() => scrollContainer}>
