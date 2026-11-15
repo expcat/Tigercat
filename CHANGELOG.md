@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Signature 独立非法值提示（Vue，C073-F01）**：无 FormItem 且 `modelValue="not-a-signature"` 时输出 `role="status"`、`aria-live="polite"` 的非法值提示，复用现有文案并在外部值恢复合法后移除；FormItem 内继续统一承载错误，不重复显示提示。
+
 - **Select 空值类型与只读语义（Core / Vue / React，C072-F01、C072-F03）**：React 单选的 `value`、`defaultValue` 与 `onChange` 接受运行时已有的 `null` 空值，保留 `undefined` 的非受控语义。双端普通与可搜索 combobox 在只读时输出 `aria-readonly=true`，仍可聚焦、打开与搜索，选择值保持不变。
 
 - **RadioGroup 必填语义（Vue / React，C071-F01）**：双端从 FormItem 继承 required，在 `role="radiogroup"` 容器输出 `aria-required=true`；调用方显式传入的 `aria-required`（含 false）仍优先。

@@ -475,6 +475,9 @@ export const Signature = defineComponent({
                 disabled: effectiveDisabled.value || undefined
               })
             : null,
+          externalState.value?.invalid && !formItemControl
+            ? h('p', { role: 'status', 'aria-live': 'polite' }, labels.value.invalidValueText)
+            : null,
           h(
             'div',
             {

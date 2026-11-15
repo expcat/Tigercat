@@ -133,6 +133,36 @@ describe('Signature', () => {
     expect(screen.getByRole('button', { name: enUS.common.clearText })).not.toBeDisabled()
   })
 
+  it('announces an invalid external value without FormItem', async () => {
+    const { rerender } = render(Signature, { props: { modelValue: 'not-a-signature' } })
+
+    expect(screen.getByRole('status')).toHaveTextContent(enUS.signature.invalidValueText)
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite')
+
+    await rerender({ modelValue: sampleValue })
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('keeps invalid external value feedback in FormItem without duplication', async () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(Form, null, () =>
+            h(FormItem, { name: 'sign', label: 'Sign' }, () =>
+              h(Signature, { modelValue: 'not-a-signature' })
+            )
+          )
+      }
+    })
+    render(Wrapper)
+
+    const feedback = await screen.findByRole('status')
+    expect(feedback).toHaveTextContent(enUS.signature.invalidValueText)
+    expect(screen.getAllByRole('status')).toHaveLength(1)
+    expect(pad()).toHaveAttribute('aria-invalid', 'true')
+    expect(pad()).toHaveAttribute('aria-describedby', feedback.id)
+  })
+
   it('does not draw while disabled', async () => {
     const { emitted } = render(Signature, { props: { disabled: true, width: 480 } })
 
