@@ -13,7 +13,7 @@ import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
-import { renderWithProps, expectNoA11yViolations } from '../utils'
+import { renderWithProps, axe, expectNoA11yViolations } from '../utils'
 
 function trigger(container: HTMLElement) {
   return container.querySelector('[data-tiger-colorpicker-trigger]') as HTMLButtonElement
@@ -97,15 +97,40 @@ describe('ColorPicker', () => {
     expect(onChange).toHaveBeenCalledWith('#ff00aa')
   })
 
-  it('does not paint or submit an unparseable color', async () => {
-    const { container } = renderWithProps(ColorPicker, { modelValue: 'foo', name: 'color' })
-    const swatch = trigger(container).firstElementChild as HTMLElement
-    expect(swatch.style.boxShadow).toBe('')
-    expect(container.querySelector('input[name="color"]')).toHaveValue('')
-    await fireEvent.click(trigger(container))
-    const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
-    expect(input).toHaveValue('foo')
-    expect(input).toHaveAttribute('aria-invalid', 'true')
+  it.each(['foo', 'hsl(1..2 100% 50%)', 'rgba(255, 0, 0, 1..2)'])(
+    'does not paint or submit an unparseable color: %s',
+    async (value) => {
+      const { container } = renderWithProps(ColorPicker, { modelValue: value, name: 'color' })
+      const swatch = trigger(container).firstElementChild as HTMLElement
+      expect(swatch.style.boxShadow).toBe('')
+      expect(container.querySelector('input[name="color"]')).toHaveValue('')
+      await fireEvent.click(trigger(container))
+      const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
+      expect(input).toHaveValue(value)
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+    }
+  )
+
+  it('opens read-only colors without unsupported button ARIA or value changes', async () => {
+    const onChange = vi.fn()
+    const { container } = renderWithProps(ColorPicker, {
+      readOnly: true,
+      modelValue: '#2563eb',
+      name: 'color',
+      presets: ['#ff0000'],
+      'onUpdate:modelValue': onChange
+    })
+    const button = trigger(container)
+    expect(button).not.toHaveAttribute('aria-readonly')
+    expect(button).not.toBeDisabled()
+    await fireEvent.click(button)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Color value' })).toHaveAttribute('readonly')
+    await fireEvent.click(screen.getByRole('radio', { name: '#ff0000' }))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(container.querySelector('input[name="color"]')).toHaveValue('#2563eb')
+    const results = await axe(document.body, { runOnly: ['aria-allowed-attr'] })
+    expect(results.violations).toEqual([])
   })
 
   it('emits rgb after an SV change when format is rgb', async () => {

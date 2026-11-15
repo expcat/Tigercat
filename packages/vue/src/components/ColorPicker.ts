@@ -686,7 +686,6 @@ export const ColorPicker = defineComponent({
               'aria-haspopup': 'dialog',
               'aria-expanded': isOpen.value,
               'aria-controls': panelId,
-              'aria-readonly': locked.value || undefined,
               'aria-invalid': status.value === 'error' ? true : undefined,
               'aria-required': formItemControl?.required.value || undefined,
               disabled: effectiveDisabled.value,

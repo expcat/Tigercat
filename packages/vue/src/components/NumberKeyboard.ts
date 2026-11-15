@@ -389,7 +389,6 @@ export const NumberKeyboard = defineComponent({
           'aria-labelledby': labelledby,
           'aria-describedby': describedBy,
           'aria-disabled': effectiveDisabled.value || undefined,
-          'aria-readonly': props.readOnly || undefined,
           'aria-invalid': status.value === 'error' || invalidValue.value ? true : undefined,
           'aria-required': formItemControl?.required.value ? true : undefined,
           'data-tiger-number-keyboard': '',

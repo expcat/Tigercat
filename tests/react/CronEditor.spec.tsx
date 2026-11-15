@@ -8,7 +8,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { CronEditor } from '@expcat/tigercat-react/CronEditor'
 import { zhCN } from '../../packages/core/src/utils/i18n/locales/zh-CN'
-import { expectNoA11yViolations } from '../utils/react'
+import { axe, expectNoA11yViolations } from '../utils/react'
 
 describe('CronEditor', () => {
   it('renders an empty unselected editor, not every-minute', () => {
@@ -158,10 +158,12 @@ describe('CronEditor', () => {
       expect(screen.queryByLabelText('Cron preset')).not.toBeInTheDocument()
     })
 
-    it('keeps read-only controls focusable without changing the value', () => {
+    it('keeps read-only controls focusable without changing the value', async () => {
       const onChange = vi.fn()
       render(<CronEditor readOnly value="* * * * *" onChange={onChange} />)
 
+      const group = screen.getByRole('group', { name: 'Cron editor' })
+      expect(group).not.toHaveAttribute('aria-readonly')
       expect(screen.getByLabelText('Cron expression')).toHaveAttribute('readonly')
       expect(screen.getByLabelText('Cron expression')).not.toBeDisabled()
       expect(screen.getByLabelText('Cron preset')).not.toBeDisabled()
@@ -169,6 +171,8 @@ describe('CronEditor', () => {
       fireEvent.change(screen.getByLabelText('Minute mode'), { target: { value: 'every' } })
       expect(onChange).not.toHaveBeenCalled()
       expect(screen.getByLabelText('Cron expression')).toHaveValue('* * * * *')
+      const results = await axe(group, { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
     })
 
     it('keeps custom mode when switching from any', () => {

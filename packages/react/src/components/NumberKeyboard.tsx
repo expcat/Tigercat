@@ -307,7 +307,6 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
         aria-labelledby={labelledby}
         aria-describedby={describedBy}
         aria-disabled={effectiveDisabled || undefined}
-        aria-readonly={readOnly || undefined}
         aria-invalid={status === 'error' || invalidValue ? true : undefined}
         aria-required={formItemControl?.required || undefined}
         data-tiger-number-keyboard=""

@@ -102,6 +102,28 @@ describe('color-picker-utils — format / parse', () => {
     expect(hsl?.r).toBe(255)
   })
 
+  it.each([
+    ['rgba(255, 0, 0, 2)', 1],
+    ['rgb(255 0 0 / 2)', 1],
+    ['rgba(255, 0, 0, 0)', 0],
+    ['rgb(255 0 0 / 0)', 0],
+    ['rgba(255, 0, 0, 50%)', 0.5],
+    ['rgb(255 0 0 / 50%)', 0.5]
+  ] as const)('clamps CSS alpha in %s to %s', (value, alpha) => {
+    expect(parseColorParts(value)).toEqual({ r: 255, g: 0, b: 0, a: alpha })
+  })
+
+  it.each([
+    'hsl(1..2 100% 50%)',
+    'hsl(1..2, 100%, 50%)',
+    'rgba(255, 0, 0, 1..2)',
+    'rgb(255 0 0 / 1..2)'
+  ])('rejects malformed decimal tokens in %s', (value) => {
+    expect(parseColorParts(value)).toBeNull()
+    expect(parseColorInput(value)).toBeNull()
+    expect(submittedColorPickerValue(value)).toBe('')
+  })
+
   it('expands 3-digit hex and formats in the requested format', () => {
     expect(parseColorInput('#fff')).toBe('#ffffff')
     expect(parseColorInput('#f00', 'rgb')).toBe('rgb(255, 0, 0)')

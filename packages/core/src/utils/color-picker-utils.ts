@@ -349,17 +349,13 @@ function formatAlpha(a: number): string {
   return String(rounded)
 }
 
-function parseOptionalAlpha(raw: string | undefined): number {
+function parseOptionalAlpha(raw: string | undefined): number | null {
   if (raw === undefined || raw === '') return 1
   const trimmed = raw.trim()
-  if (trimmed.endsWith('%')) {
-    const n = Number(trimmed.slice(0, -1))
-    if (!Number.isFinite(n)) return 1
-    return clampUnit(n / 100)
-  }
-  const n = Number(trimmed)
-  if (!Number.isFinite(n)) return 1
-  return n > 1 ? clampUnit(n / 255) : clampUnit(n)
+  const percent = trimmed.endsWith('%')
+  const n = Number(percent ? trimmed.slice(0, -1) : trimmed)
+  if (!Number.isFinite(n)) return null
+  return clampUnit(percent ? n / 100 : n)
 }
 
 function hslToRgb(h: number, s: number, l: number): RgbColor {
@@ -406,11 +402,12 @@ function hslToRgb(h: number, s: number, l: number): RgbColor {
   }
 }
 
-const COMMA_RGB = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+%?))?\s*\)\s*$/i
-const SPACE_RGB = /^rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)(?:\s*\/\s*([\d.]+%?))?\s*\)\s*$/i
+const COMMA_RGB = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*((?:\d*\.)?\d+%?))?\s*\)\s*$/i
+const SPACE_RGB = /^rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)(?:\s*\/\s*((?:\d*\.)?\d+%?))?\s*\)\s*$/i
 const COMMA_HSL =
-  /^hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+%?))?\s*\)\s*$/i
-const SPACE_HSL = /^hsla?\(\s*([\d.]+)\s+([\d.]+)%\s+([\d.]+)%(?:\s*\/\s*([\d.]+%?))?\s*\)\s*$/i
+  /^hsla?\(\s*((?:\d*\.)?\d+)\s*,\s*((?:\d*\.)?\d+)%\s*,\s*((?:\d*\.)?\d+)%(?:\s*,\s*((?:\d*\.)?\d+%?))?\s*\)\s*$/i
+const SPACE_HSL =
+  /^hsla?\(\s*((?:\d*\.)?\d+)\s+((?:\d*\.)?\d+)%\s+((?:\d*\.)?\d+)%(?:\s*\/\s*((?:\d*\.)?\d+%?))?\s*\)\s*$/i
 
 /**
  * Parse a CSS color string into RGB channels plus alpha in 0..1.
@@ -427,22 +424,32 @@ export function parseColorParts(raw: string): ParsedColorParts | null {
 
   const rgbMatch = value.match(COMMA_RGB) ?? value.match(SPACE_RGB)
   if (rgbMatch) {
+    const r = Number(rgbMatch[1])
+    const g = Number(rgbMatch[2])
+    const b = Number(rgbMatch[3])
+    const a = parseOptionalAlpha(rgbMatch[4])
+    if (![r, g, b].every(Number.isFinite) || a === null) return null
     return {
-      r: clampByte(Number(rgbMatch[1])),
-      g: clampByte(Number(rgbMatch[2])),
-      b: clampByte(Number(rgbMatch[3])),
-      a: parseOptionalAlpha(rgbMatch[4])
+      r: clampByte(r),
+      g: clampByte(g),
+      b: clampByte(b),
+      a
     }
   }
 
   const hslMatch = value.match(COMMA_HSL) ?? value.match(SPACE_HSL)
   if (hslMatch) {
-    const rgb = hslToRgb(Number(hslMatch[1]), Number(hslMatch[2]), Number(hslMatch[3]))
+    const h = Number(hslMatch[1])
+    const s = Number(hslMatch[2])
+    const l = Number(hslMatch[3])
+    const a = parseOptionalAlpha(hslMatch[4])
+    if (![h, s, l].every(Number.isFinite) || a === null) return null
+    const rgb = hslToRgb(h, s, l)
     return {
       r: rgb.r,
       g: rgb.g,
       b: rgb.b,
-      a: parseOptionalAlpha(hslMatch[4])
+      a
     }
   }
 

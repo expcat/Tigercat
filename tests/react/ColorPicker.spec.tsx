@@ -13,7 +13,7 @@ import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
-import { expectNoA11yViolations } from '../utils/react'
+import { axe, expectNoA11yViolations } from '../utils/react'
 
 function trigger(container: HTMLElement) {
   return container.querySelector('[data-tiger-colorpicker-trigger]') as HTMLButtonElement
@@ -75,6 +75,30 @@ describe('ColorPicker', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('opens read-only colors without unsupported button ARIA or value changes', async () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <ColorPicker
+        readOnly
+        value="#2563eb"
+        name="color"
+        presets={['#ff0000']}
+        onChange={onChange}
+      />
+    )
+    const button = trigger(container)
+    expect(button).not.toHaveAttribute('aria-readonly')
+    expect(button).not.toBeDisabled()
+    fireEvent.click(button)
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Color value' })).toHaveAttribute('readonly')
+    fireEvent.click(screen.getByRole('radio', { name: '#ff0000' }))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(container.querySelector('input[name="color"]')).toHaveValue('#2563eb')
+    const results = await axe(document.body, { runOnly: ['aria-allowed-attr'] })
+    expect(results.violations).toEqual([])
+  })
+
   it('renders presets as a ColorSwatch radiogroup', () => {
     const { container } = render(
       <ColorPicker value="#000000" presets={['#ff0000', '#00ff00', '#0000ff']} />
@@ -98,17 +122,20 @@ describe('ColorPicker', () => {
     expect(onChange).toHaveBeenCalledWith('#ff00aa')
   })
 
-  it('does not paint or submit an unparseable color', () => {
-    const { container } = render(<ColorPicker value="foo" name="color" />)
-    const swatch = trigger(container).firstElementChild as HTMLElement
-    expect(swatch.style.boxShadow).toBe('')
-    expect(swatch.style.backgroundColor).toBe('')
-    expect(container.querySelector('input[name="color"]')).toHaveValue('')
-    open(container)
-    const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
-    expect(input).toHaveValue('foo')
-    expect(input).toHaveAttribute('aria-invalid', 'true')
-  })
+  it.each(['foo', 'hsl(1..2 100% 50%)', 'rgba(255, 0, 0, 1..2)'])(
+    'does not paint or submit an unparseable color: %s',
+    (value) => {
+      const { container } = render(<ColorPicker value={value} name="color" />)
+      const swatch = trigger(container).firstElementChild as HTMLElement
+      expect(swatch.style.boxShadow).toBe('')
+      expect(swatch.style.backgroundColor).toBe('')
+      expect(container.querySelector('input[name="color"]')).toHaveValue('')
+      open(container)
+      const input = document.body.querySelector('input[type="text"]') as HTMLInputElement
+      expect(input).toHaveValue(value)
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+    }
+  )
 
   it('opens with Enter and Space on the trigger', () => {
     const { container } = render(<ColorPicker value="#2563eb" />)

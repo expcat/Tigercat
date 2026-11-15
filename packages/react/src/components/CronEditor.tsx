@@ -362,7 +362,7 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
         aria-label={formatCronControlLabel(labels.customValueAriaLabel, meta.label)}
         onChange={(event) => {
           if (readOnly) return
-            patchDraft(meta, { raw: event.target.value, mode: 'custom' }, true, event.target)
+          patchDraft(meta, { raw: event.target.value, mode: 'custom' }, true, event.target)
         }}
       />
     )
@@ -383,7 +383,6 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
       aria-labelledby={labelledby}
       aria-describedby={describedBy}
       aria-invalid={status === 'error' || expressionInvalid ? true : undefined}
-      aria-readonly={readOnly || undefined}
       onBlur={handleBlur}>
       {effectiveName ? (
         <input
@@ -427,7 +426,9 @@ const CronEditorInner = forwardRef<HTMLInputElement, CronEditorProps>(function C
               commit(nextValue)
               if (!valueControlled) setDrafts(seedCronFieldDrafts(nextValue, stickyModes.current))
               else {
-                event.target.value = resolvedPresets.some((preset) => preset.value === expressionDraft)
+                event.target.value = resolvedPresets.some(
+                  (preset) => preset.value === expressionDraft
+                )
                   ? expressionDraft
                   : ''
               }

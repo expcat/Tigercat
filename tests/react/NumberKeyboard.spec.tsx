@@ -12,7 +12,7 @@ import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
-import { expectNoA11yViolations } from '../utils/react'
+import { axe, expectNoA11yViolations } from '../utils/react'
 
 const deleteName = enUS.numberKeyboard!.deleteText!
 const confirmName = enUS.common!.okText!
@@ -104,14 +104,21 @@ describe('NumberKeyboard', () => {
     expect(keypad()).toHaveAttribute('tabIndex', '-1')
   })
 
-  it('does not emit when readOnly but stays focusable', () => {
-    const onChange = vi.fn()
-    render(<NumberKeyboard readOnly onChange={onChange} />)
-    fireEvent.click(screen.getByRole('button', { name: '1' }))
-    expect(onChange).not.toHaveBeenCalled()
-    expect(keypad()).toHaveAttribute('tabIndex', '0')
-    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-disabled', 'true')
-  })
+  it.each([false, true])(
+    'does not emit when readOnly but stays focusable (sheet=%s)',
+    async (sheet) => {
+      const onChange = vi.fn()
+      render(<NumberKeyboard readOnly defaultOpen={sheet || undefined} onChange={onChange} />)
+      expect(keypad()).not.toHaveAttribute('aria-readonly')
+      expect(keypad()).toHaveAttribute('role', sheet ? 'dialog' : 'group')
+      fireEvent.click(screen.getByRole('button', { name: '1' }))
+      expect(onChange).not.toHaveBeenCalled()
+      expect(keypad()).toHaveAttribute('tabIndex', '0')
+      expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-disabled', 'true')
+      const results = await axe(keypad(), { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
+    }
+  )
 
   it('supports custom labels and hidden confirm key', () => {
     render(<NumberKeyboard deleteText="Back" confirmText="OK" showConfirm={false} />)

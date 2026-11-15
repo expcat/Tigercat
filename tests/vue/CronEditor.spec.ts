@@ -8,7 +8,7 @@ import { h } from 'vue'
 import { ConfigProvider } from '@expcat/tigercat-vue/ConfigProvider'
 import { CronEditor } from '@expcat/tigercat-vue/CronEditor'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
-import { expectNoA11yViolations, renderWithProps } from '../utils'
+import { axe, expectNoA11yViolations, renderWithProps } from '../utils'
 
 describe('CronEditor', () => {
   it('renders an empty unselected editor, not every-minute', () => {
@@ -155,6 +155,8 @@ describe('CronEditor', () => {
         props: { readOnly: true, modelValue: '* * * * *', 'onUpdate:modelValue': onUpdate }
       })
 
+      const group = screen.getByRole('group', { name: 'Cron editor' })
+      expect(group).not.toHaveAttribute('aria-readonly')
       expect(screen.getByLabelText('Cron expression')).toHaveAttribute('readonly')
       expect(screen.getByLabelText('Cron expression')).not.toBeDisabled()
       expect(screen.getByLabelText('Cron preset')).not.toBeDisabled()
@@ -162,6 +164,8 @@ describe('CronEditor', () => {
       await fireEvent.update(screen.getByLabelText('Minute mode'), 'every')
       expect(onUpdate).not.toHaveBeenCalled()
       expect(screen.getByLabelText('Cron expression')).toHaveValue('* * * * *')
+      const results = await axe(group, { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
     })
 
     it('keeps custom mode when switching from any', async () => {

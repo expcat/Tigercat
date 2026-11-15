@@ -378,7 +378,6 @@ export const CronEditor = markFormItemGroupControl(
             'aria-labelledby': labelledby,
             'aria-describedby': describedBy,
             'aria-invalid': status.value === 'error' || expressionInvalid ? true : undefined,
-            'aria-readonly': props.readOnly || undefined,
             onFocusout: handleFocusout
           },
           [

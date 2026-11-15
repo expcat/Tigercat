@@ -12,7 +12,7 @@ import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
 import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
-import { expectNoA11yViolations } from '../utils'
+import { axe, expectNoA11yViolations } from '../utils'
 
 const deleteName = enUS.numberKeyboard!.deleteText!
 const confirmName = enUS.common!.okText!
@@ -98,13 +98,22 @@ describe('NumberKeyboard', () => {
     expect(keypad()).toHaveAttribute('aria-disabled', 'true')
   })
 
-  it('does not emit when readOnly but stays focusable', async () => {
-    const { emitted } = render(NumberKeyboard, { props: { readOnly: true } })
-    await fireEvent.click(screen.getByRole('button', { name: '1' }))
-    expect(emitted()['update:modelValue']).toBeUndefined()
-    expect(keypad()).toHaveAttribute('tabindex', '0')
-    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-disabled', 'true')
-  })
+  it.each([false, true])(
+    'does not emit when readOnly but stays focusable (sheet=%s)',
+    async (sheet) => {
+      const { emitted } = render(NumberKeyboard, {
+        props: { readOnly: true, ...(sheet ? { defaultOpen: true } : {}) }
+      })
+      expect(keypad()).not.toHaveAttribute('aria-readonly')
+      expect(keypad()).toHaveAttribute('role', sheet ? 'dialog' : 'group')
+      await fireEvent.click(screen.getByRole('button', { name: '1' }))
+      expect(emitted()['update:modelValue']).toBeUndefined()
+      expect(keypad()).toHaveAttribute('tabindex', '0')
+      expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-disabled', 'true')
+      const results = await axe(keypad(), { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
+    }
+  )
 
   it('types from the focused keypad', async () => {
     const { emitted } = render(NumberKeyboard)

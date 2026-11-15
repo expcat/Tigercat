@@ -651,7 +651,6 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
           aria-haspopup="dialog"
           aria-expanded={isOpen}
           aria-controls={panelId}
-          aria-readonly={readOnly || undefined}
           aria-invalid={status === 'error' ? true : undefined}
           aria-required={formItemControl?.required || undefined}
           disabled={effectiveDisabled}

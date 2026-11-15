@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+ColorPicker 与 ColorSwatch 共用的颜色解析现在把无单位 alpha 大于 1 的值钳制为 1，例如 `rgba(255, 0, 0, 2)` 是不透明红；需要半透明时请传 `0.5` 或 `50%`。`hsl(1..2 100% 50%)`、`rgba(255, 0, 0, 1..2)` 等畸形数值现在解析失败，ColorPicker 将其保留为错误草稿并提交空隐藏域。双端 ColorPicker 的触发按钮及 CronEditor、NumberKeyboard 的 group/dialog 不再输出不支持的 `aria-readonly`；继续使用 `readOnly` 控制只读。
+
 双端 CheckboxGroup 与 RadioGroup 的错误承载项现在随实际渲染的可用子项更新，移除或禁用旧 owner 后，错误标记与描述引用会转到可用项；被 children / slot 忽略的 options 不再占用 owner。首项禁用时，首次错误聚焦会到达后续可用项。RadioGroup 只在选中项仍可用时优先使用它。调用方式不用改。
 
 Vue Checkbox 未传 `value` 时不再匹配 CheckboxGroup 的 `[false]`；布尔选项请显式传 `:value="false"`。双端 CheckboxGroup / RadioGroup 的 `status="error"` 现在进入子项错误样式，并由既有 owner 输出 `aria-invalid`，子项显式 status 仍优先。组级错误无需再逐项设置。
