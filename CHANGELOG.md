@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **NumberKeyboard 长度、值状态与必填语义（Core / Vue / React，C069-F01、C069-F02、C069-F03、C069-F04、C069-F05）**：金额补零小数点先检查完整候选值长度，`maxLength=1` 时不生成 `0.`。双端由当前原始值派生合法提交值与错误，Vue 切换模式后重新校验，纠正非法默认值再清空时不再恢复历史错误。React 原生 `onKeyDown` 与内部处理组合，保留 `preventDefault()` 取消约定。NumberKeyboard、Transfer、Upload 移除容器或触发按钮上不支持的 `aria-required`，必填校验、值、标签与错误关联继续由 FormItem 承担。
+
 - **Mentions 长度上限、初次高度与编辑语义（Vue / React，C068-F02、C068-F03、C068-F04）**：双端选择候选时检查插入后的完整值，超出 `maxLength` 则拒绝整条提及，保留原文且不发选择回调；Vue `autoResize` 首次挂载后即复用共享 helper 计算高度。textarea 保留原生 textbox 语义，以 `aria-controls`、`aria-activedescendant` 关联建议列表，移除不合法的 combobox 角色、`aria-expanded` 与 axe 规则豁免。
 
 - **MaskInput 原生表单值规范化（Vue / React，C067-F01）**：双端 hidden 复用现有格式化结果中的 canonical raw；`mask="##"`、`name="canonical"`、外部 raw 为 `a12x3` 且未编辑时，可见输入、hidden 与 FormData 均为 `12`。受控值、默认值与 FormItem 路径一致，不改写外部值，受控拒收仍恢复已接受的显示值。

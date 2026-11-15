@@ -133,7 +133,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C066 | InputOTP        | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；定向测试 48 pass；SSR+happy-dom 探针；未跑 E2E、全仓测试、完整构建、读屏、hydration                                                                   |
 | C067 | MaskInput       | needs-evidence | 视觉 0/24、键盘 0/24 全 blocked，截图 0（IAB browsers: []）；raw 规范化、受控/默认值/FormItem 原生提交与受控拒收 happy-dom 回归通过，双端定向测试 43 pass；类型检查通过；真实浏览器、读屏与 hydration 复验待补     |
 | C068 | Mentions        | needs-evidence | 视觉/键盘各 0/24 blocked，截图 0；长度上限、Vue 首挂高度与合法 textarea 语义 happy-dom 回归通过，双端 44 pass（含未豁免 axe）；类型检查通过；真实浏览器、读屏与 hydration 待补                                     |
-| C069 | NumberKeyboard  | needs-evidence | 视觉、键盘各 0/24 执行、24 blocked，截图 0（IAB browsers: []）；定向测试 68+1 passed；SSR+happy-dom 探针；未跑全仓测试、构建、E2E、hydration、读屏                                                                 |
+| C069 | NumberKeyboard  | needs-evidence | 视觉、键盘各 0/24 执行、24 blocked，截图 0；C069-F01–F05 happy-dom 回归通过，NumberKeyboard（含 Core）83 pass，Transfer / Upload 同验 143 pass（含 required axe）；类型检查通过；真实浏览器、读屏与 hydration 待补 |
 | C070 | Radio           | needs-evidence | 视觉 0/32、键盘 0/32 全 blocked，截图 0（IAB browsers: []）；定向测试 58 passed；SSR+happy-dom 探针；未跑全仓测试、build/typecheck、E2E、hydration、读屏                                                           |
 | C071 | RadioGroup      | needs-evidence | 视觉 0/32、键盘 0/32 全 blocked，截图 0（IAB browsers: []）；定向测试 58 passed；SSR+happy-dom 探针；未跑全仓测试、build/typecheck、E2E、hydration、读屏                                                           |
 | C072 | Select          | needs-evidence | 视觉 0/40、键盘 0/40 全 blocked，截图 0（IAB browsers: []）；定向测试 55+238 pass；happy-dom 探针；未跑全仓测试、完整构建、E2E、读屏、hydration                                                                    |

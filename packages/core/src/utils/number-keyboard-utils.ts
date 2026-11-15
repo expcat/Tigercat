@@ -180,8 +180,9 @@ function appendAmountInput(
 
   if (key === separator) {
     if (precision === 0) return current
-    if (current.includes(separator) || current.length >= maxLength) return current
-    return current === '' ? `0${separator}` : `${current}${separator}`
+    if (current.includes(separator)) return current
+    const next = current === '' ? `0${separator}` : `${current}${separator}`
+    return next.length <= maxLength ? next : current
   }
 
   if (!isDigit(key) || current.length >= maxLength) return current

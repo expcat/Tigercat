@@ -515,7 +515,6 @@ export const Transfer = markFormItemGroupControl(
               formItemControl?.describedBy.value
             ),
             'aria-invalid': status.value === 'error' ? true : undefined,
-            'aria-required': formItemControl?.required.value ? true : undefined,
             'aria-disabled': effectiveDisabled.value || undefined,
             onFocusout: (event: FocusEvent) => {
               const next = event.relatedTarget as Node | null

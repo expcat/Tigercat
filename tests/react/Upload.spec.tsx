@@ -13,7 +13,7 @@ import { FormItem } from '@expcat/tigercat-react/FormItem'
 import type { UploadFile, UploadRequestOptions } from '@expcat/tigercat-core'
 import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
-import { expectNoA11yViolations } from '../utils/react'
+import { axe, expectNoA11yViolations } from '../utils/react'
 
 async function dispatchUploadEvent(action: () => Promise<boolean>): Promise<void> {
   await act(async () => {
@@ -1042,6 +1042,19 @@ describe('Upload', () => {
   })
 
   describe('Accessibility', () => {
+    it.each([false, true])('uses allowed ARIA in a required FormItem (drag=%s)', async (drag) => {
+      const { container, getByRole } = render(
+        <Form>
+          <FormItem name="files" label="Files" required>
+            <Upload drag={drag} />
+          </FormItem>
+        </Form>
+      )
+      expect(getByRole('button', { name: 'Files' })).toBeInTheDocument()
+      const results = await axe(container, { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
+    })
+
     it('should have proper ARIA attributes on upload button', () => {
       const { container } = render(<Upload />)
 

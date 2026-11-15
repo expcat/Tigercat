@@ -483,7 +483,6 @@ const TransferInner = forwardRef<HTMLDivElement, TransferProps>(function Transfe
       aria-labelledby={labelledby}
       aria-describedby={describedBy}
       aria-invalid={status === 'error' ? true : rest['aria-invalid']}
-      aria-required={formItemControl?.required || rest['aria-required'] ? true : undefined}
       aria-disabled={effectiveDisabled || undefined}
       className={classNames(
         transferBaseClasses,

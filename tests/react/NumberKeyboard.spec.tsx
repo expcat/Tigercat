@@ -135,6 +135,55 @@ describe('NumberKeyboard', () => {
     expect(onChange.mock.calls.map(([value]) => value)).toEqual(['5', ''])
   })
 
+  it.each([false, true])('composes native keydown handlers (cancel=%s)', (cancel) => {
+    const onKeyDown = vi.fn((event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (cancel) event.preventDefault()
+    })
+    const { container } = render(<NumberKeyboard name="pin" onKeyDown={onKeyDown} />)
+    fireEvent.keyDown(keypad(), { key: '5' })
+    expect(onKeyDown).toHaveBeenCalledTimes(1)
+    expect(container.querySelector('input[name="pin"]')).toHaveValue(cancel ? '' : '5')
+  })
+
+  it('does not report an overlong decimal candidate from an empty amount', () => {
+    const onKeyPress = vi.fn()
+    const { container } = render(
+      <NumberKeyboard name="amt" mode="amount" maxLength={1} onKeyPress={onKeyPress} />
+    )
+    fireEvent.click(screen.getByRole('button', { name: enUS.numberKeyboard!.decimalAriaLabel }))
+    expect(onKeyPress).toHaveBeenCalledWith(
+      expect.objectContaining({ value: '.' }),
+      expect.objectContaining({ value: '' })
+    )
+    expect(container.querySelector('input[name="amt"]')).toHaveValue('')
+  })
+
+  it('revalidates the uncontrolled value when the mode changes', () => {
+    const onChange = vi.fn()
+    const { container, rerender } = render(
+      <NumberKeyboard name="amt" defaultValue="12.34" mode="amount" onChange={onChange} />
+    )
+    expect(container.querySelector('input[name="amt"]')).toHaveValue('12.34')
+    rerender(<NumberKeyboard name="amt" defaultValue="12.34" mode="number" onChange={onChange} />)
+    expect(container.querySelector('input[name="amt"]')).toHaveValue('')
+    expect(keypad()).toHaveAttribute('aria-invalid', 'true')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).toBeInTheDocument()
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('does not restore an invalid default error after correcting and clearing the value', () => {
+    const { container } = render(<NumberKeyboard name="pin" defaultValue="bad" />)
+    expect(keypad()).toHaveAttribute('aria-invalid', 'true')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '1' }))
+    expect(container.querySelector('input[name="pin"]')).toHaveValue('1')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: deleteName }))
+    expect(container.querySelector('input[name="pin"]')).toHaveValue('')
+    expect(keypad()).not.toHaveAttribute('aria-invalid', 'true')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).not.toBeInTheDocument()
+  })
+
   it('does not append after a lowercase id-card x', () => {
     const onChange = vi.fn()
     render(<NumberKeyboard mode="id-card" value="12345678901234567x" onChange={onChange} />)
@@ -250,6 +299,20 @@ describe('NumberKeyboard', () => {
   })
 
   describe('Accessibility', () => {
+    it.each([false, true])('uses allowed ARIA in a required FormItem (sheet=%s)', async (sheet) => {
+      render(
+        <Form>
+          <FormItem name="pin" label="PIN" required>
+            <NumberKeyboard defaultOpen={sheet || undefined} />
+          </FormItem>
+        </Form>
+      )
+      expect(keypad()).toHaveAttribute('role', sheet ? 'dialog' : 'group')
+      expect(keypad()).toHaveAccessibleName('PIN')
+      const results = await axe(keypad(), { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
+    })
+
     it('has no accessibility violations', async () => {
       const { container } = render(<NumberKeyboard />)
       await expectNoA11yViolations(container)

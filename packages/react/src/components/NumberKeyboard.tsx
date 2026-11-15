@@ -76,6 +76,7 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
       onChange,
       onOpenChange,
       onKeyPress,
+      onKeyDown,
       onDelete,
       onConfirm,
       onBlur,
@@ -116,22 +117,16 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
       [decimalSeparator, maxLength, mode, precision]
     )
 
-    const [currentValue, setCurrentValue] = useControlledState<
-      string,
-      [NumberKeyboardChangePayload]
-    >({
+    const [rawValue, setCurrentValue] = useControlledState<string, [NumberKeyboardChangePayload]>({
       value: valueControlled ? parsedValue : undefined,
       defaultValue: defaultValue ?? '',
       onChange: (next, payload) => {
         onChange?.(next, payload)
         formItemControl?.onChange?.(next)
-      },
-      postState: (next) => postNumberKeyboardValue(next, mode, inputOptions)
+      }
     })
-    const invalidValue = valueControlled
-      ? isNumberKeyboardValueRejected(parsedValue, mode, inputOptions)
-      : isNumberKeyboardValueRejected(defaultValue, mode, inputOptions) &&
-        currentValue === postNumberKeyboardValue(defaultValue, mode, inputOptions)
+    const currentValue = postNumberKeyboardValue(rawValue, mode, inputOptions)
+    const invalidValue = isNumberKeyboardValueRejected(rawValue, mode, inputOptions)
     const [isOpen, setOpen] = useControlledState({
       value: open,
       defaultValue: defaultOpen ?? false,
@@ -232,7 +227,8 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
     }
 
     function handleGroupKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-      if (effectiveDisabled) return
+      onKeyDown?.(event)
+      if (event.defaultPrevented || effectiveDisabled) return
       if (
         event.key === 'ArrowLeft' ||
         event.key === 'ArrowRight' ||
@@ -308,7 +304,6 @@ export const NumberKeyboard = forwardRef<HTMLDivElement, NumberKeyboardProps>(
         aria-describedby={describedBy}
         aria-disabled={effectiveDisabled || undefined}
         aria-invalid={status === 'error' || invalidValue ? true : undefined}
-        aria-required={formItemControl?.required || undefined}
         data-tiger-number-keyboard=""
         onKeyDown={handleGroupKeyDown}
         onBlur={handleFocusOut}

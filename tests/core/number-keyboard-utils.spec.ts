@@ -83,6 +83,14 @@ describe('number-keyboard-utils', () => {
     expect(applyNumberKeyboardInput('12.', '3', { mode: 'amount' })).toBe('12.3')
   })
 
+  it('rejects a zero-prefixed decimal that would exceed maxLength', () => {
+    expect(applyNumberKeyboardKey('', '.', { mode: 'amount', maxLength: 1 })).toEqual({
+      nextValue: '',
+      action: 'input',
+      changed: false
+    })
+  })
+
   it('does not treat "." as decimal when the separator is ","', () => {
     expect(applyNumberKeyboardInput('12', '.', { mode: 'amount', decimalSeparator: ',' })).toBe(
       '12'

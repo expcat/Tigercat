@@ -523,7 +523,6 @@ export const Upload = defineComponent({
       const triggerAria = {
         id: triggerId.value,
         'aria-invalid': status.value === 'error' ? true : undefined,
-        'aria-required': formItemControl?.required.value ? true : undefined,
         'aria-describedby': describedBy.value,
         'aria-labelledby': formItemControl?.labelId.value,
         'aria-controls': inputId.value

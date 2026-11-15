@@ -400,7 +400,6 @@ export const Upload = forwardRef<UploadRef, UploadProps>(function Upload(
   const triggerAria = {
     id: triggerId,
     'aria-invalid': status === 'error' ? true : divProps['aria-invalid'],
-    'aria-required': formItemControl?.required || divProps['aria-required'] ? true : undefined,
     'aria-describedby': describedBy,
     'aria-labelledby': labelledby,
     'aria-controls': inputId

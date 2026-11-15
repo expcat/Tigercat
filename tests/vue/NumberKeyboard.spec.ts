@@ -122,6 +122,43 @@ describe('NumberKeyboard', () => {
     expect(emitted()['update:modelValue'][0][0]).toBe('5')
   })
 
+  it('does not submit an overlong decimal candidate from an empty amount', async () => {
+    const { container, emitted } = render(NumberKeyboard, {
+      props: { name: 'amt', mode: 'amount', maxLength: 1 }
+    })
+    await fireEvent.click(
+      screen.getByRole('button', { name: enUS.numberKeyboard!.decimalAriaLabel })
+    )
+    expect(emitted()['key-press'][0][1]).toMatchObject({ value: '' })
+    expect(container.querySelector('input[name="amt"]')).toHaveValue('')
+    expect(emitted()['update:modelValue']).toBeUndefined()
+  })
+
+  it('revalidates the uncontrolled value when the mode changes', async () => {
+    const { container, rerender, emitted } = render(NumberKeyboard, {
+      props: { name: 'amt', defaultValue: '12.34', mode: 'amount' }
+    })
+    expect(container.querySelector('input[name="amt"]')).toHaveValue('12.34')
+    await rerender({ mode: 'number' })
+    expect(container.querySelector('input[name="amt"]')).toHaveValue('')
+    expect(keypad()).toHaveAttribute('aria-invalid', 'true')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).toBeInTheDocument()
+    expect(emitted()['update:modelValue']).toBeUndefined()
+  })
+
+  it('does not restore an invalid default error after correcting and clearing the value', async () => {
+    const { container } = render(NumberKeyboard, { props: { name: 'pin', defaultValue: 'bad' } })
+    expect(keypad()).toHaveAttribute('aria-invalid', 'true')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: '1' }))
+    expect(container.querySelector('input[name="pin"]')).toHaveValue('1')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).not.toBeInTheDocument()
+    await fireEvent.click(screen.getByRole('button', { name: deleteName }))
+    expect(container.querySelector('input[name="pin"]')).toHaveValue('')
+    expect(keypad()).not.toHaveAttribute('aria-invalid', 'true')
+    expect(container.querySelector('[data-tiger-number-keyboard-error]')).not.toBeInTheDocument()
+  })
+
   it('clears an illegal amount instead of extending it', async () => {
     const onUpdate = vi.fn()
     const { container } = render(NumberKeyboard, {
@@ -199,6 +236,23 @@ describe('NumberKeyboard', () => {
   })
 
   describe('Accessibility', () => {
+    it.each([false, true])('uses allowed ARIA in a required FormItem (sheet=%s)', async (sheet) => {
+      render(
+        defineComponent({
+          setup: () => () =>
+            h(Form, null, () =>
+              h(FormItem, { name: 'pin', label: 'PIN', required: true }, () =>
+                h(NumberKeyboard, sheet ? { defaultOpen: true } : {})
+              )
+            )
+        })
+      )
+      expect(keypad()).toHaveAttribute('role', sheet ? 'dialog' : 'group')
+      expect(keypad()).toHaveAccessibleName('PIN')
+      const results = await axe(keypad(), { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
+    })
+
     it('has no accessibility violations', async () => {
       const { container } = render(NumberKeyboard)
       await expectNoA11yViolations(container)

@@ -121,34 +121,20 @@ export const NumberKeyboard = defineComponent({
       decimalSeparator: props.decimalSeparator
     }))
 
-    const innerValue = ref(
-      postNumberKeyboardValue(props.defaultValue, props.mode, inputOptions.value)
-    )
+    const innerValue = ref(props.defaultValue ?? '')
     const innerOpen = ref(props.defaultOpen ?? false)
 
-    const externalRaw = computed(() => {
+    const rawValue = computed(() => {
       if (props.modelValue !== undefined) return props.modelValue
       if (formItemControl?.value.value !== undefined) return formItemControl.value.value
-      return undefined
-    })
-    const currentValue = computed(() => {
-      if (externalRaw.value !== undefined) {
-        return postNumberKeyboardValue(externalRaw.value, props.mode, inputOptions.value)
-      }
       return innerValue.value
     })
-    const invalidValue = computed(() => {
-      if (externalRaw.value !== undefined) {
-        return isNumberKeyboardValueRejected(externalRaw.value, props.mode, inputOptions.value)
-      }
-      const sanitizedDefault = postNumberKeyboardValue(
-        props.defaultValue,
-        props.mode,
-        inputOptions.value
-      )
-      if (innerValue.value !== sanitizedDefault) return false
-      return isNumberKeyboardValueRejected(props.defaultValue, props.mode, inputOptions.value)
-    })
+    const currentValue = computed(() =>
+      postNumberKeyboardValue(rawValue.value, props.mode, inputOptions.value)
+    )
+    const invalidValue = computed(() =>
+      isNumberKeyboardValueRejected(rawValue.value, props.mode, inputOptions.value)
+    )
     const errorId = `${useId()}-error`
     const isOpen = computed(() => (props.open !== undefined ? props.open : innerOpen.value))
     const overlayEnabled = computed(
@@ -390,7 +376,6 @@ export const NumberKeyboard = defineComponent({
           'aria-describedby': describedBy,
           'aria-disabled': effectiveDisabled.value || undefined,
           'aria-invalid': status.value === 'error' || invalidValue.value ? true : undefined,
-          'aria-required': formItemControl?.required.value ? true : undefined,
           'data-tiger-number-keyboard': '',
           onKeydown: (event: KeyboardEvent) => {
             handleGroupKeyDown(event)

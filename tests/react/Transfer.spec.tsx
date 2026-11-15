@@ -11,7 +11,7 @@ import { Transfer } from '@expcat/tigercat-react/Transfer'
 import { Form } from '@expcat/tigercat-react/Form'
 import { FormItem } from '@expcat/tigercat-react/FormItem'
 import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
-import { expectNoA11yViolations } from '../utils/react'
+import { axe, expectNoA11yViolations } from '../utils/react'
 
 const dataSource = [
   { key: '1', label: 'Item 1' },
@@ -124,6 +124,19 @@ describe('Transfer', () => {
   })
 
   describe('Accessibility', () => {
+    it('uses allowed ARIA in a required FormItem', async () => {
+      const { container } = render(
+        <Form>
+          <FormItem name="keys" label="Move" required>
+            <Transfer dataSource={dataSource} />
+          </FormItem>
+        </Form>
+      )
+      expect(screen.getByRole('group', { name: 'Move' })).toBeInTheDocument()
+      const results = await axe(container, { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
+    })
+
     it('should have correct ARIA structure', () => {
       render(<Transfer dataSource={dataSource} />)
       expect(screen.getByRole('group', { name: 'Source' })).toBeInTheDocument()

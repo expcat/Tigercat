@@ -12,7 +12,7 @@ import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
 import { enUS } from '@expcat/tigercat-core/locales/en-US'
 import type { UploadFile, UploadRequestOptions } from '@expcat/tigercat-core'
 import { defineComponent, h } from 'vue'
-import { renderWithProps, expectNoA11yViolations } from '../utils'
+import { axe, renderWithProps, expectNoA11yViolations } from '../utils'
 
 describe('Upload', () => {
   describe('Rendering', () => {
@@ -936,6 +936,21 @@ describe('Upload', () => {
   })
 
   describe('Accessibility', () => {
+    it.each([false, true])('uses allowed ARIA in a required FormItem (drag=%s)', async (drag) => {
+      const { container, getByRole } = render({
+        components: { Form, FormItem, Upload },
+        setup: () => ({ drag }),
+        template: `<Form>
+          <FormItem name="files" label="Files" required>
+            <Upload :drag="drag" />
+          </FormItem>
+        </Form>`
+      })
+      expect(getByRole('button', { name: 'Files' })).toBeInTheDocument()
+      const results = await axe(container, { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
+    })
+
     it('should have proper ARIA attributes on upload button', () => {
       const { container } = renderWithProps(Upload, {})
 

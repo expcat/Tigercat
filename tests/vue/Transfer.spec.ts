@@ -7,7 +7,7 @@ import { render, fireEvent } from '@testing-library/vue'
 import { Transfer } from '@expcat/tigercat-vue/Transfer'
 import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
-import { expectNoA11yViolations } from '../utils'
+import { axe, expectNoA11yViolations } from '../utils'
 
 const dataSource = [
   { key: '1', label: 'Item 1' },
@@ -182,6 +182,21 @@ describe('Transfer', () => {
   })
 
   describe('Accessibility', () => {
+    it('uses allowed ARIA in a required FormItem', async () => {
+      const { container, getByRole } = render({
+        components: { Form, FormItem, Transfer },
+        setup: () => ({ dataSource }),
+        template: `<Form>
+          <FormItem name="keys" label="Move" required>
+            <Transfer :data-source="dataSource" />
+          </FormItem>
+        </Form>`
+      })
+      expect(getByRole('group', { name: 'Move' })).toBeInTheDocument()
+      const results = await axe(container, { runOnly: ['aria-allowed-attr'] })
+      expect(results.violations).toEqual([])
+    })
+
     it('should have correct ARIA structure', () => {
       const { container, getByLabelText } = render(Transfer, {
         props: { dataSource }
