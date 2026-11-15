@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useSyncExternalStore } from 'react'
+import React, { useLayoutEffect, useRef, useSyncExternalStore } from 'react'
 import {
   activateFeedbackScope,
   createFeedbackScope,
@@ -39,10 +39,12 @@ export function FeedbackHost() {
   const scopeRef = useRef<FeedbackScope | null>(null)
   if (scopeRef.current === null) scopeRef.current = createFeedbackScope(depth)
   const scope = scopeRef.current
-  scope.depth = depth
 
-  if (isBrowser()) activateFeedbackScope(document, scope)
-  useEffect(() => activateFeedbackScope(document, scope), [scope])
+  useLayoutEffect(() => {
+    if (!isBrowser()) return
+    scope.depth = depth
+    return activateFeedbackScope(document, scope)
+  }, [scope, depth])
 
   const messages = useSyncExternalStore(
     scope.messages.subscribe,

@@ -6,7 +6,12 @@ import { afterEach, describe, it, expect } from 'vitest'
 import { render, waitFor, act } from '@testing-library/react'
 import React from 'react'
 import { ConfigProvider, useTigerConfig } from '@expcat/tigercat-react/ConfigProvider'
-import { type TigerLocale } from '@expcat/tigercat-core'
+import {
+  activateFeedbackScope,
+  enqueueNotification,
+  getActiveFeedbackScope,
+  type TigerLocale
+} from '@expcat/tigercat-core'
 import { expectNoA11yViolationsIsolated } from '../utils/react'
 
 function LocaleDisplay() {
@@ -37,6 +42,60 @@ function resetDocument(): void {
 describe('ConfigProvider', () => {
   afterEach(() => {
     resetDocument()
+  })
+
+  describe('feedback scope lifecycle', () => {
+    it('does not retain an uncommitted Suspense feedback scope or queue its notifications', () => {
+      const pending = new Promise<never>(() => {})
+      function Suspend(): never {
+        throw pending
+      }
+
+      const { container, getByText, unmount } = render(
+        <React.Suspense fallback={<span>Waiting</span>}>
+          <ConfigProvider theme="minimal" locale={{ locale: 'ar-SA', direction: 'rtl' }}>
+            <span>Uncommitted</span>
+          </ConfigProvider>
+          <Suspend />
+        </React.Suspense>
+      )
+
+      expect(getByText('Waiting')).toBeInTheDocument()
+      expect(container.querySelector('[data-tiger-feedback-host]')).toBeNull()
+      const suspendedScope = getActiveFeedbackScope()
+      unmount()
+
+      try {
+        enqueueNotification(getActiveFeedbackScope(), { title: 'No renderer', duration: 0 }, 'info')
+        expect(suspendedScope?.notifications.getSnapshot() ?? []).toHaveLength(0)
+        expect(suspendedScope).toBeNull()
+        expect(getActiveFeedbackScope()).toBeNull()
+        expect(document.documentElement.getAttribute('data-tiger-theme')).toBeNull()
+        expect(document.documentElement.getAttribute('dir')).toBeNull()
+        expect(document.documentElement.getAttribute('lang')).toBeNull()
+      } finally {
+        if (suspendedScope) activateFeedbackScope(document, suspendedScope)()
+      }
+    })
+
+    it('renders notifications sent by a child effect on its first committed mount', () => {
+      function NotifyOnMount() {
+        React.useEffect(() => {
+          enqueueNotification(getActiveFeedbackScope(), { title: 'Mounted', duration: 0 }, 'info')
+        }, [])
+        return null
+      }
+
+      const { getByText, unmount } = render(
+        <ConfigProvider>
+          <NotifyOnMount />
+        </ConfigProvider>
+      )
+
+      expect(getByText('Mounted')).toBeInTheDocument()
+      unmount()
+      expect(getActiveFeedbackScope()).toBeNull()
+    })
   })
 
   describe('sync locale', () => {
