@@ -14,7 +14,7 @@ export default function App() {
   return (
     <div className="space-y-2">
       <p className="text-sm text-[var(--tiger-text-secondary)]">
-        打字只改 searchValue；点选或回车才改 value。
+        打字只改 searchValue；选择、Enter 或失焦/关层按规则提交或还原。
       </p>
       <AutoComplete
         value={value}

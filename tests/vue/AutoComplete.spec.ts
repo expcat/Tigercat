@@ -147,6 +147,43 @@ describe('AutoComplete', () => {
     expect(getByRole('combobox')).toHaveValue('q')
   })
 
+  it('does not commit a readonly draft on blur', async () => {
+    const { container, getByRole, emitted } = render(AutoComplete, {
+      props: {
+        options,
+        readOnly: true,
+        defaultSearchValue: 'draft',
+        name: 'query',
+        'aria-label': 'Query'
+      }
+    })
+    const input = getByRole('combobox')
+    const hidden = container.querySelector('input[type="hidden"][name="query"]')
+    expect(hidden).toHaveValue('')
+    input.focus()
+    await nextTick()
+    expect(input).toHaveFocus()
+    input.blur()
+    await nextTick()
+    expect(input).toHaveValue('draft')
+    expect(hidden).toHaveValue('')
+    expect(emitted()['update:modelValue']).toBeUndefined()
+  })
+
+  it('keeps a controlled empty value ahead of defaultValue', () => {
+    const { container, getByRole } = render(AutoComplete, {
+      props: {
+        options,
+        modelValue: '',
+        defaultValue: 'apple',
+        name: 'fruit',
+        'aria-label': 'Fruit'
+      }
+    })
+    expect(getByRole('combobox')).toHaveValue('')
+    expect(container.querySelector('input[type="hidden"][name="fruit"]')).toHaveValue('')
+  })
+
   it('does not clear the query when options get a new identity while typing', async () => {
     const { getByRole, rerender } = render(AutoComplete, {
       props: { options, 'aria-label': 'Fruit' }

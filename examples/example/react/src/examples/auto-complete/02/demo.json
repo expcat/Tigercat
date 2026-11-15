@@ -1,7 +1,7 @@
 {
   "id": "auto-complete-02",
   "title": "label 与 value 不同",
-  "description": "输入 beijing 框里仍是 beijing，点选项后才显示「北京 Beijing」。",
+  "description": "输入 beijing 时框里仍是 beijing；选择、Enter 或失焦/关层按规则提交或还原，匹配提交后显示「北京 Beijing」。",
   "entry": "App.tsx",
   "order": 2,
   "viewport": {

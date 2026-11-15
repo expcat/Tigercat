@@ -14,7 +14,7 @@ const options = [
 <template>
   <div class="space-y-2">
     <p class="text-sm text-[var(--tiger-text-secondary)]">
-      打字只改 searchValue；点选或回车才改 value。
+      打字只改 searchValue；选择、Enter 或失焦/关层按规则提交或还原。
     </p>
     <AutoComplete
       v-model="value"

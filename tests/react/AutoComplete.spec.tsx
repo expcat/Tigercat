@@ -154,6 +154,29 @@ describe('AutoComplete', () => {
     expect(getByRole('combobox')).toHaveValue('q')
   })
 
+  it('does not commit a readonly draft on blur', async () => {
+    const onChange = vi.fn()
+    const { container, getByRole } = render(
+      <AutoComplete
+        options={options}
+        readOnly
+        defaultSearchValue="draft"
+        name="query"
+        aria-label="Query"
+        onChange={onChange}
+      />
+    )
+    const input = getByRole('combobox')
+    const hidden = container.querySelector('input[type="hidden"][name="query"]')
+    expect(hidden).toHaveValue('')
+    await act(async () => input.focus())
+    expect(input).toHaveFocus()
+    await act(async () => input.blur())
+    expect(input).toHaveValue('draft')
+    expect(hidden).toHaveValue('')
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
   it('does not clear the query when options get a new identity while typing', async () => {
     const user = userEvent.setup()
     const { getByRole, rerender } = render(<AutoComplete options={options} aria-label="Fruit" />)

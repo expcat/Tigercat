@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 AutoComplete 在只读时跳过失焦与关层的查询提交。`readOnly` 配 `defaultSearchValue='draft'` 聚焦再失焦后，查询保持 draft，hidden 保持空且不发值变更。Vue 传 `modelValue=''` 和 `defaultValue='apple'` 时，可见 input 与 hidden 均为空，`defaultValue` 仅在未受控时使用。调用方式不用改。
+
 `getDatePickerLabels()` 现在返回完整英语文案，部分 locale 的缺项也会回退英语。locale labels 和 overrides 中的 `undefined` 不再抹掉下一层有效值；`getDatePickerLabels(zhCN, { today: undefined })` 的 `today` 仍为「今天」。调用方式不用改。
 
 React ConfigProvider 的反馈作用域现在只在提交后激活。Suspense 子树执行后因挂起未提交再卸载时，不再留下活动作用域，后续通知不会进入没有渲染者的队列。正常挂载后子节点 effect 发出的通知仍能显示，调用方式不用改。

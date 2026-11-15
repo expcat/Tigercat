@@ -379,6 +379,7 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
     )
 
     const commitCurrentQuery = useCallback(() => {
+      if (!canEdit) return
       const result = resolveAutoCompleteBlurCommit({
         query: queryRef.current,
         committed: committedRef.current,
@@ -396,7 +397,7 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
       writeNative(result.value)
       if (result.didCommit) commitValue(result.value, result.option)
       return result
-    }, [applyQuery, commitValue, rememberLabel, writeNative])
+    }, [applyQuery, canEdit, commitValue, rememberLabel, writeNative])
 
     const revertQuery = useCallback(() => {
       const committedNow = committedRef.current
@@ -413,10 +414,9 @@ export const AutoComplete = forwardRef<HTMLInputElement, AutoCompleteProps>(
 
     const finishEdit = useCallback(() => {
       isEditingRef.current = false
-      const result = commitCurrentQuery()
-      writeNative(result.value)
+      commitCurrentQuery()
       closeDropdown()
-    }, [closeDropdown, commitCurrentQuery, writeNative])
+    }, [closeDropdown, commitCurrentQuery])
 
     const handleDismiss = useCallback(
       (reason: 'outside' | 'escape') => {

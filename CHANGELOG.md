@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **AutoComplete 只读提交与受控空值（Vue / React，C052-F01、C052-F02、C052-F03）**：双端失焦与关层的提交入口遵守只读状态，`readOnly` 配 `defaultSearchValue='draft'` 聚焦再失焦后，hidden 保持空且不发值变更。Vue 的受控 `modelValue=''` 不再回退到 `defaultValue` 显示标签，可见 input 与 hidden 均为空；两端 01–03 Demo 说明选择、Enter 或失焦/关层会按规则提交或还原。
+
 - **DatePicker 文案兜底（Core，X02-F006）**：`getDatePickerLabels()` 无参时返回完整英语文案，部分 locale 的缺项也回退英语。合并 locale 与 overrides 时跳过 `undefined`，`getDatePickerLabels(zhCN, { today: undefined })` 仍返回「今天」。
 
 - **FeedbackHost 提交生命周期（React，X01-F022）**：活动作用域只在 layout effect 中登记，并在清理时移除。Suspense 中 host 已执行但随后因挂起未提交再卸载时，不再残留活动 scope，通知不会进入无渲染者的队列；正常挂载后子节点 effect 发出的通知仍能显示。

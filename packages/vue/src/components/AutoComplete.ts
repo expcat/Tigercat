@@ -188,9 +188,12 @@ export const AutoComplete = defineComponent({
         ? sanitizeAutoCompleteExternalValue(rawExternal.value)
         : undefined
     )
-    const initialCommitted = isAutoCompleteEmptyValue(sanitized.value?.value ?? props.defaultValue)
-      ? undefined
-      : (sanitized.value?.value ?? props.defaultValue)
+    const initialCommitted =
+      props.modelValue !== undefined || formBound.value
+        ? sanitized.value?.value
+        : isAutoCompleteEmptyValue(props.defaultValue)
+          ? undefined
+          : props.defaultValue
     const localValue = ref<AutoCompleteValue | undefined>(initialCommitted)
     const localOpen = ref(props.defaultOpen)
     const localSearch = ref(
@@ -396,6 +399,7 @@ export const AutoComplete = defineComponent({
     }
 
     function commitCurrentQuery() {
+      if (!canEdit.value) return
       const result = resolveAutoCompleteBlurCommit({
         query: searchQuery.value,
         committed: selected.value,
@@ -427,8 +431,7 @@ export const AutoComplete = defineComponent({
 
     function finishEdit() {
       isEditing.value = false
-      const result = commitCurrentQuery()
-      writeNative(result.value)
+      commitCurrentQuery()
       closeDropdown()
     }
 
