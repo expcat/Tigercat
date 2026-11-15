@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { TreeNode, TreeNodeKey } from '@expcat/tigercat-core'
 import { Tree } from '@expcat/tigercat-react/Tree'
 import { ConfigProvider } from '@expcat/tigercat-react/ConfigProvider'
 import { expectNoA11yViolations } from '../utils/react'
@@ -841,6 +842,79 @@ describe('Tree', () => {
       await user.keyboard('{ArrowLeft}')
       await waitFor(() => expect(screen.getByText('Child 1-1')).toBeInTheDocument())
     })
+  })
+
+  it('accumulates loaded keys after sequential async loads', async () => {
+    const onLoadedKeysChange = vi.fn()
+    render(
+      <Tree
+        treeData={[
+          { key: 'a', label: 'A', isLeaf: false },
+          { key: 'b', label: 'B', isLeaf: false }
+        ]}
+        loadData={async () => []}
+        selectionMode="single"
+        onLoadedKeysChange={onLoadedKeysChange}
+      />
+    )
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('treeitem', { name: 'A' }))
+    })
+    expect(onLoadedKeysChange).toHaveBeenNthCalledWith(1, ['a'])
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('treeitem', { name: 'B' }))
+    })
+    expect(onLoadedKeysChange).toHaveBeenCalledTimes(2)
+    expect(onLoadedKeysChange).toHaveBeenNthCalledWith(2, ['a', 'b'])
+  })
+
+  it('retains controlled loaded keys when async loads finish in one batch', async () => {
+    let resolveA!: (children: TreeNode[]) => void
+    let resolveB!: (children: TreeNode[]) => void
+    const loadData = vi.fn(
+      (node: TreeNode) =>
+        new Promise<TreeNode[]>((resolve) => {
+          if (node.key === 'a') resolveA = resolve
+          else resolveB = resolve
+        })
+    )
+    const onLoadedKeysChange = vi.fn()
+    const treeData = [
+      { key: 'a', label: 'A', isLeaf: false },
+      { key: 'b', label: 'B', isLeaf: false }
+    ]
+    function ControlledTree() {
+      const [loadedKeys, setLoadedKeys] = React.useState<TreeNodeKey[]>([])
+      return (
+        <>
+          <Tree
+            treeData={treeData}
+            loadData={loadData}
+            selectionMode="single"
+            loadedKeys={loadedKeys}
+            onLoadedKeysChange={(keys) => {
+              onLoadedKeysChange(keys)
+              setLoadedKeys(keys)
+            }}
+          />
+          <output aria-label="Loaded keys">{loadedKeys.join(',')}</output>
+        </>
+      )
+    }
+    render(<ControlledTree />)
+    fireEvent.click(screen.getByRole('treeitem', { name: 'A' }))
+    fireEvent.click(screen.getByRole('treeitem', { name: 'B' }))
+    expect(loadData).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      resolveA([])
+      resolveB([])
+    })
+
+    expect(onLoadedKeysChange.mock.calls).toEqual([[['a']], [['a', 'b']]])
+    expect(screen.getByLabelText('Loaded keys')).toHaveTextContent('a,b')
   })
 
   it('discards a completed lazy cache when treeData is replaced', async () => {

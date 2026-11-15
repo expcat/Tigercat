@@ -28,6 +28,7 @@ import {
   nextTreeRangeSelection,
   nextTreeSelectedKeys,
   nodeHasChildren,
+  parseTreeKeyId,
   createTypeaheadHighlight,
   reconcileUncontrolledExpandedKeys,
   resolveCheckedInput,
@@ -344,7 +345,12 @@ export function useTreeState(props: TreeProps): TreeContext & {
     })
     const nextTree = mergeLoadedChildren(sourceTree, applied)
     onLoad?.(node, children)
-    onLoadedKeysChange?.(uniqueTreeKeys([...(controlledLoadedKeys ?? []), node.key]))
+    onLoadedKeysChange?.(
+      uniqueTreeKeys([
+        ...(controlledLoadedKeys ?? []),
+        ...Array.from(applied.keys(), parseTreeKeyId)
+      ])
+    )
     lastEmittedTreeRef.current = nextTree
     onTreeDataChange?.(nextTree)
     const decision = decideAfterBranchLoad({

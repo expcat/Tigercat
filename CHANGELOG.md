@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Tree 已加载键累计（React，X01-F018）**：加载完成时从已完成的本地缓存合并受控 `loadedKeys`，不再只保留本次节点。先后完成 A、B 后，第二次 `onLoadedKeysChange` 包含 `a` 与 `b`；两个加载在同一批完成时，受控回写同样保留两个键。
+
 - **菜单 items 字符定位（React，X01-F017）**：Dropdown 与 ContextMenu 的 typeahead 从已渲染菜单项读取匹配文本和禁用状态，与焦点目标共用 DOM 索引。items 为 Alpha、separator、Zulu 时，聚焦 Alpha 输入 z 后焦点移到 Zulu，不再停在 Alpha。
 
 - **TreeSelect 禁用节点键盘（React，X01-F014）**：最终提交时检查节点的 disabled 状态。defaultOpen 且首节点禁用时，聚焦后按 Enter 不触发 onChange，显示值保持不变；方向键处理不变。
