@@ -114,7 +114,7 @@ export const Switch = defineComponent({
 
     const handleClick = (event: MouseEvent) => {
       callUnknownEventHandler(attrs.onClick, event)
-      if (event.defaultPrevented) skipToggle = true
+      skipToggle = event.defaultPrevented
     }
 
     const handleChange = (event: Event) => {

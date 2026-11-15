@@ -123,7 +123,7 @@ describe('Switch', () => {
       expect(handleChange).toHaveBeenCalledWith(true)
     })
 
-    it('skips onChange when onClick prevents default', async () => {
+    it('allows the next change after onClick prevents default', async () => {
       const user = userEvent.setup()
       const handleClick = vi.fn((e) => e.preventDefault())
       const handleChange = vi.fn()
@@ -133,6 +133,12 @@ describe('Switch', () => {
       await user.click(getSwitch(container))
       expect(handleClick).toHaveBeenCalled()
       expect(handleChange).not.toHaveBeenCalled()
+
+      handleClick.mockImplementation(() => undefined)
+      await user.click(getSwitch(container))
+      expect(handleChange).toHaveBeenCalledExactlyOnceWith(true)
+      expect(getSwitch(container)).not.toBeChecked()
+      expect(getSwitch(container)).toHaveAttribute('aria-checked', 'false')
     })
   })
 

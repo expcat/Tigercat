@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { Switch } from '@expcat/tigercat-vue/Switch'
 import { Form } from '@expcat/tigercat-vue/Form'
 import { FormItem } from '@expcat/tigercat-vue/FormItem'
@@ -108,6 +109,32 @@ describe('Switch', () => {
       await fireEvent.click(el)
       expect(el).toHaveAttribute('aria-checked', 'true')
     })
+
+    it.each([1, 2])(
+      'toggles after %i cancelled clicks without modelValue',
+      async (cancelledClicks) => {
+        const user = userEvent.setup()
+        const onClick = vi.fn((event: MouseEvent) => event.preventDefault())
+        const { getByRole, emitted } = render(Switch, { attrs: { onClick } })
+        const input = getByRole('switch') as HTMLInputElement
+
+        for (let click = 0; click < cancelledClicks; click++) {
+          await user.click(input)
+          expect(emitted()['update:modelValue']).toBeUndefined()
+          expect(emitted().change).toBeUndefined()
+          expect(input.checked).toBe(false)
+          expect(input).toHaveAttribute('aria-checked', 'false')
+        }
+
+        onClick.mockImplementation(() => undefined)
+        await user.click(input)
+
+        expect(emitted()['update:modelValue']).toEqual([[true]])
+        expect(emitted().change).toEqual([[true]])
+        expect(input.checked).toBe(true)
+        expect(input).toHaveAttribute('aria-checked', 'true')
+      }
+    )
 
     it('starts checked when defaultValue is true', () => {
       const { container } = renderWithProps(Switch, { defaultValue: true })

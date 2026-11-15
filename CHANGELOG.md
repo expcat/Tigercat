@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Switch 取消点击后恢复切换（Vue，C075-F01）**：每次点击按当前事件重置取消标记，首次 `onClick` 取消后，第二次正常点击会发出 `true` 并同步原生 checked 与 `aria-checked`；连续取消仍保持原值，不再吞掉后续正常切换。
+
 - **Slider 提示格式、范围标签与 mark 提交（Vue / React，C074-F01、C074-F02、C074-F03）**：React 可见气泡与 `aria-valuetext` 共用 `formatTooltip` 结果；Vue 无显式 id 的 Slider 为每个实例生成稳定 ID，范围 thumb 与后缀标签引用保持唯一且有效。双端自定义 mark 在提交前复用现有步进与边界归一化，`min=0 max=100 step=10 marks={105:'outside'}` 点击后只提交 100。
 
 - **Signature 独立非法值提示（Vue，C073-F01）**：无 FormItem 且 `modelValue="not-a-signature"` 时输出 `role="status"`、`aria-live="polite"` 的非法值提示，复用现有文案并在外部值恢复合法后移除；FormItem 内继续统一承载错误，不重复显示提示。
