@@ -18,6 +18,14 @@ import {
 const OK_ALLOWLIST = new Set(['ja-JP', 'fr-FR', 'de-DE', 'pt-BR', 'id-ID', 'vi-VN'])
 
 describe('datepicker-i18n', () => {
+  it('returns complete English labels without a locale', () => {
+    expect(getDatePickerLabels()).toEqual(enUS.datePicker?.labels)
+  })
+
+  it('keeps locale labels when an override is undefined', () => {
+    expect(getDatePickerLabels(zhCN, { today: undefined }).today).toBe('今天')
+  })
+
   it('resolves generic Chinese to Simplified and keeps exact zh-TW Traditional', () => {
     expect(getDatePickerLocalePreset('zh-CN')?.labels.placeholder).toBe('请选择日期')
     expect(getDatePickerLocalePreset('zh')?.locale).toBe('zh-CN')

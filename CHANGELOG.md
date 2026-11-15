@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **DatePicker 文案兜底（Core，X02-F006）**：`getDatePickerLabels()` 无参时返回完整英语文案，部分 locale 的缺项也回退英语。合并 locale 与 overrides 时跳过 `undefined`，`getDatePickerLabels(zhCN, { today: undefined })` 仍返回「今天」。
+
 - **FeedbackHost 提交生命周期（React，X01-F022）**：活动作用域只在 layout effect 中登记，并在清理时移除。Suspense 中 host 已执行但随后因挂起未提交再卸载时，不再残留活动 scope，通知不会进入无渲染者的队列；正常挂载后子节点 effect 发出的通知仍能显示。
 
 - **Tree 已加载键累计（React，X01-F018）**：加载完成时从已完成的本地缓存合并受控 `loadedKeys`，不再只保留本次节点。先后完成 A、B 后，第二次 `onLoadedKeysChange` 包含 `a` 与 `b`；两个加载在同一批完成时，受控回写同样保留两个键。

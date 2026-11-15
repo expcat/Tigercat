@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+`getDatePickerLabels()` 现在返回完整英语文案，部分 locale 的缺项也会回退英语。locale labels 和 overrides 中的 `undefined` 不再抹掉下一层有效值；`getDatePickerLabels(zhCN, { today: undefined })` 的 `today` 仍为「今天」。调用方式不用改。
+
 React ConfigProvider 的反馈作用域现在只在提交后激活。Suspense 子树执行后因挂起未提交再卸载时，不再留下活动作用域，后续通知不会进入没有渲染者的队列。正常挂载后子节点 effect 发出的通知仍能显示，调用方式不用改。
 
 React Tree 的 `onLoadedKeysChange` 现在合并已完成加载的本地键与受控 `loadedKeys`。先后完成 A、B，或两个加载在同一批完成时，第二次回调都包含 `a` 与 `b`，受控回写不再丢掉 `a`。调用方式不用改。

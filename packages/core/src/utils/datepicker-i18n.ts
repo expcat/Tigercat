@@ -4,7 +4,8 @@ import type {
   DatePickerLocalePreset
 } from '../types/datepicker'
 import type { TigerLocale } from '../types/locale'
-const EMPTY_DATE_LABELS = {} as DatePickerLabels
+import { EN_US_DATEPICKER_LOCALE } from './i18n/datepicker-locales/en-US'
+import { deepMergeLocale } from './i18n/locale-merge'
 
 export type DatePickerLocaleSource =
   Partial<TigerLocale> | DatePickerLocalePreset | DatePickerLocaleConfig
@@ -32,9 +33,8 @@ export function getDatePickerLabels(
   locale?: DatePickerLocaleSource,
   overrides?: Partial<DatePickerLabels>
 ): DatePickerLabels {
-  return {
-    ...EMPTY_DATE_LABELS,
-    ...(readPreset(locale).labels ?? {}),
-    ...(overrides ?? {})
-  }
+  return deepMergeLocale(
+    deepMergeLocale({ ...EN_US_DATEPICKER_LOCALE.labels }, readPreset(locale).labels),
+    overrides
+  ) as DatePickerLabels
 }
