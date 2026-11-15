@@ -6,6 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { ref, nextTick, defineComponent, h } from 'vue'
+import { focusFirstInvalidField } from '@expcat/tigercat-core'
 import { Radio } from '@expcat/tigercat-vue/Radio'
 import { RadioGroup } from '@expcat/tigercat-vue/RadioGroup'
 import { Form } from '@expcat/tigercat-vue/Form'
@@ -144,6 +145,78 @@ describe('Radio', () => {
   })
 
   describe('RadioGroup', () => {
+    it.each(['options', 'children'] as const)(
+      'moves the error owner after removing the selected first (%s)',
+      async (source) => {
+        const options = ref([
+          { label: 'A', value: 'a' },
+          { label: 'B', value: 'b' }
+        ])
+        const { container } = render({
+          setup: () => () =>
+            h(FormItem, { error: 'Choose an option' }, () =>
+              source === 'options'
+                ? h(RadioGroup, { defaultValue: 'a', options: options.value })
+                : h(RadioGroup, { defaultValue: 'a' }, () =>
+                    options.value.map((option) =>
+                      h(Radio, { key: option.value, value: option.value }, () => option.label)
+                    )
+                  )
+            )
+        })
+        await nextTick()
+        const [first, second] = getRadios(container)
+        const errorId = first.getAttribute('aria-describedby')
+        expect(first).toHaveAttribute('aria-invalid', 'true')
+        expect(second).not.toHaveAttribute('aria-invalid')
+        expect(errorId).toBeTruthy()
+
+        options.value = [{ label: 'B', value: 'b' }]
+        await nextTick()
+
+        expect(getRadios(container)).toHaveLength(1)
+        expect(getRadio(container)).toHaveAttribute('value', 'b')
+        expect(getRadio(container)).toHaveAttribute('aria-invalid', 'true')
+        expect(getRadio(container)).toHaveAttribute('aria-describedby', errorId)
+      }
+    )
+
+    it.each(['options', 'children'] as const)(
+      'focuses the first enabled error owner (%s)',
+      async (source) => {
+        const { container } = render({
+          setup: () => () =>
+            h(FormItem, { error: 'Choose an option' }, () =>
+              source === 'options'
+                ? h(RadioGroup, {
+                    defaultValue: 'a',
+                    options: [
+                      { label: 'A', value: 'a', disabled: true },
+                      { label: 'B', value: 'b' }
+                    ]
+                  })
+                : h(
+                    RadioGroup,
+                    { defaultValue: 'a', options: [{ label: 'Unused', value: 'unused' }] },
+                    () => [
+                      h(Radio, { value: 'a', disabled: true }, () => 'A'),
+                      h(Radio, { value: 'b' }, () => 'B')
+                    ]
+                  )
+            )
+        })
+        await nextTick()
+        const [first, second] = getRadios(container)
+
+        expect(first).toBeDisabled()
+        expect.soft(first).not.toHaveAttribute('aria-invalid')
+        expect.soft(second).toHaveAttribute('aria-invalid', 'true')
+        expect.soft(second).toHaveAccessibleDescription('Choose an option')
+        focusFirstInvalidField(container)
+        expect(second).toHaveFocus()
+      }
+    )
+
     it('inherits group errors without a FormItem and keeps a single invalid owner', () => {
       const { container } = renderGroup(`
         <div>

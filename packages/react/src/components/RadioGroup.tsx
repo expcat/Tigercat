@@ -37,7 +37,7 @@ interface RadioGroupContextValue {
   invalid: boolean
   describedBy?: string
   invalidValue?: string | number
-  claimInvalid: (value: string | number) => void
+  claimInvalid: (value: string | number) => () => void
   onChange: (value: string | number) => void
 }
 
@@ -77,11 +77,11 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
   const groupName = name || `tiger-radio-${reactId}`
   const effectiveDisabled = Boolean(disabled || formItemControl?.disabled)
   const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
-  const [claimedInvalid, setClaimedInvalid] = useState<string | number | undefined>(
-    options?.[0]?.value
-  )
+  const [invalidCandidates, setInvalidCandidates] = useState<{ value: string | number }[]>([])
   const claimInvalid = useCallback((optionValue: string | number) => {
-    setClaimedInvalid((current) => current ?? optionValue)
+    const candidate = { value: optionValue }
+    setInvalidCandidates((current) => [...current, candidate])
+    return () => setInvalidCandidates((current) => current.filter((item) => item !== candidate))
   }, [])
   const labelledby =
     typeof props['aria-labelledby'] === 'string' && props['aria-labelledby'].trim()
@@ -131,7 +131,14 @@ const RadioGroupInner: React.FC<RadioGroupProps> = ({
     nextInput.click()
   }
 
-  const invalidValue = currentValue ?? claimedInvalid ?? options?.[0]?.value
+  const invalidOptions = effectiveDisabled
+    ? []
+    : Children.count(children) > 0
+      ? invalidCandidates
+      : (options ?? []).filter((option) => !option.disabled)
+  const invalidValue =
+    invalidOptions.find((option) => option.value === currentValue)?.value ??
+    invalidOptions[0]?.value
   const contextValue = useMemo<RadioGroupContextValue>(
     () => ({
       value: currentValue,

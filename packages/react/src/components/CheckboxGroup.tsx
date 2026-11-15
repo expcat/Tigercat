@@ -23,7 +23,7 @@ export interface CheckboxGroupContext {
   invalid: boolean
   describedBy?: string
   invalidValue?: CheckboxGroupValue[number]
-  claimInvalid: (value: CheckboxGroupValue[number]) => void
+  claimInvalid: (value: CheckboxGroupValue[number]) => () => void
   updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void
 }
 
@@ -86,11 +86,13 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
     formItemControl?.describedBy
   )
 
-  const [claimedInvalid, setClaimedInvalid] = useState<CheckboxGroupValue[number] | undefined>(
-    options?.[0]?.value
-  )
+  const [invalidCandidates, setInvalidCandidates] = useState<
+    { value: CheckboxGroupValue[number] }[]
+  >([])
   const claimInvalid = useCallback((optionValue: CheckboxGroupValue[number]) => {
-    setClaimedInvalid((current) => current ?? optionValue)
+    const candidate = { value: optionValue }
+    setInvalidCandidates((current) => [...current, candidate])
+    return () => setInvalidCandidates((current) => current.filter((item) => item !== candidate))
   }, [])
   const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {
     if (effectiveDisabled) return
@@ -104,7 +106,11 @@ const CheckboxGroupInner: React.FC<CheckboxGroupProps> = ({
     size,
     invalid: status === 'error',
     describedBy,
-    invalidValue: claimedInvalid ?? options?.[0]?.value,
+    invalidValue: effectiveDisabled
+      ? undefined
+      : Children.count(children) > 0
+        ? invalidCandidates[0]?.value
+        : options?.find((option) => !option.disabled)?.value,
     claimInvalid,
     updateValue
   }

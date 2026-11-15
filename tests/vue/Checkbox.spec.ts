@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
 import { nextTick, defineComponent, h, ref } from 'vue'
+import { focusFirstInvalidField } from '@expcat/tigercat-core'
 import { Checkbox } from '@expcat/tigercat-vue/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-vue/CheckboxGroup'
 import { Form } from '@expcat/tigercat-vue/Form'
@@ -417,6 +418,73 @@ describe('Checkbox', () => {
   })
 
   describe('FormItem', () => {
+    it.each(['options', 'children'] as const)(
+      'moves the error owner after removing the first (%s)',
+      async (source) => {
+        const options = ref([
+          { label: 'A', value: 'a' },
+          { label: 'B', value: 'b' }
+        ])
+        const { container } = render({
+          setup: () => () =>
+            h(FormItem, { error: 'Choose an option' }, () =>
+              source === 'options'
+                ? h(CheckboxGroup, { options: options.value })
+                : h(CheckboxGroup, {}, () =>
+                    options.value.map((option) =>
+                      h(Checkbox, { key: option.value, value: option.value }, () => option.label)
+                    )
+                  )
+            )
+        })
+        await nextTick()
+        const [first, second] = getBoxes(container)
+        const errorId = first.getAttribute('aria-describedby')
+        expect(first).toHaveAttribute('aria-invalid', 'true')
+        expect(second).not.toHaveAttribute('aria-invalid')
+        expect(errorId).toBeTruthy()
+
+        options.value = [{ label: 'B', value: 'b' }]
+        await nextTick()
+
+        expect(getBoxes(container)).toHaveLength(1)
+        expect(getBox(container)).toHaveAttribute('value', 'b')
+        expect(getBox(container)).toHaveAttribute('aria-invalid', 'true')
+        expect(getBox(container)).toHaveAttribute('aria-describedby', errorId)
+      }
+    )
+
+    it.each(['options', 'children'] as const)(
+      'focuses the first enabled error owner (%s)',
+      async (source) => {
+        const { container } = render({
+          setup: () => () =>
+            h(FormItem, { error: 'Choose an option' }, () =>
+              source === 'options'
+                ? h(CheckboxGroup, {
+                    options: [
+                      { label: 'A', value: 'a', disabled: true },
+                      { label: 'B', value: 'b' }
+                    ]
+                  })
+                : h(CheckboxGroup, { options: [{ label: 'Unused', value: 'unused' }] }, () => [
+                    h(Checkbox, { value: 'a', disabled: true }, () => 'A'),
+                    h(Checkbox, { value: 'b' }, () => 'B')
+                  ])
+            )
+        })
+        await nextTick()
+        const [first, second] = getBoxes(container)
+
+        expect(first).toBeDisabled()
+        expect(first).not.toHaveAttribute('aria-invalid')
+        expect.soft(second).toHaveAttribute('aria-invalid', 'true')
+        expect.soft(second).toHaveAccessibleDescription('Choose an option')
+        focusFirstInvalidField(container)
+        expect(second).toHaveFocus()
+      }
+    )
+
     it('assigns distinct default ids to grouped checkboxes in a named FormItem', () => {
       const { container } = render({
         components: { Form, FormItem, Checkbox, CheckboxGroup },

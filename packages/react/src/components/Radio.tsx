@@ -88,10 +88,10 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
       : checkedState
   const ownsInvalid = status === 'error' && (!isInGroup || groupContext?.invalidValue === value)
 
+  const claimInvalid = groupContext?.claimInvalid
   useEffect(() => {
-    if (!isInGroup || value === undefined) return
-    groupContext?.claimInvalid(value)
-  }, [groupContext, isInGroup, value])
+    if (!actualDisabled && value !== undefined) return claimInvalid?.(value)
+  }, [claimInvalid, actualDisabled, value])
 
   const radioClasses = useMemo(
     () =>

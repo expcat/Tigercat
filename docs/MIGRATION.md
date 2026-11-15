@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 CheckboxGroup 与 RadioGroup 的错误承载项现在随实际渲染的可用子项更新，移除或禁用旧 owner 后，错误标记与描述引用会转到可用项；被 children / slot 忽略的 options 不再占用 owner。首项禁用时，首次错误聚焦会到达后续可用项。RadioGroup 只在选中项仍可用时优先使用它。调用方式不用改。
+
 Vue Checkbox 未传 `value` 时不再匹配 CheckboxGroup 的 `[false]`；布尔选项请显式传 `:value="false"`。双端 CheckboxGroup / RadioGroup 的 `status="error"` 现在进入子项错误样式，并由既有 owner 输出 `aria-invalid`，子项显式 status 仍优先。组级错误无需再逐项设置。
 
 双端 Cascader 与 TreeSelect 在空列表或搜索无结果时不再输出悬空的 `aria-controls`，组合输入期间的 Enter 不再提交选项或关闭面板。React Cascader 的 `title`、`data-*` 等原生属性传到根节点，`aria-details` 与 `tabIndex` 传到 combobox，切换为搜索输入框后仍然保留。调用方式不用改。

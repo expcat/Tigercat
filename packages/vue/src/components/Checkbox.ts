@@ -182,9 +182,11 @@ export const Checkbox = defineComponent({
     )
 
     watch(
-      () => [inGroup.value, props.value] as const,
-      ([grouped, optionValue]) => {
-        if (grouped && optionValue !== undefined) groupContext.value?.claimInvalid(optionValue)
+      [() => groupContext.value?.claimInvalid, () => props.value, () => effectiveDisabled.value],
+      ([claimInvalid, optionValue, disabled], _previous, onCleanup) => {
+        if (!disabled && optionValue !== undefined && claimInvalid) {
+          onCleanup(claimInvalid(optionValue))
+        }
       },
       { immediate: true }
     )

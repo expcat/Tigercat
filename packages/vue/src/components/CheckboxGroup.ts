@@ -1,4 +1,4 @@
-import { defineComponent, computed, provide, ref, h, inject, type PropType } from 'vue'
+import { defineComponent, computed, provide, ref, shallowRef, h, inject, type PropType } from 'vue'
 import {
   classNames,
   coerceArrayFormValue,
@@ -27,7 +27,7 @@ export interface CheckboxGroupContext {
   invalid: boolean
   describedBy?: string
   invalidValue?: CheckboxGroupValue[number]
-  claimInvalid: (value: CheckboxGroupValue[number]) => void
+  claimInvalid: (value: CheckboxGroupValue[number]) => () => void
   updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void
 }
 
@@ -107,9 +107,13 @@ export const CheckboxGroup = markFormItemGroupControl(
         () => props.disabled || (formItemControl?.disabled.value ?? false)
       )
 
-      const claimedInvalid = ref<CheckboxGroupValue[number] | undefined>(props.options?.[0]?.value)
+      const invalidCandidates = shallowRef<{ value: CheckboxGroupValue[number] }[]>([])
       const claimInvalid = (optionValue: CheckboxGroupValue[number]) => {
-        if (claimedInvalid.value === undefined) claimedInvalid.value = optionValue
+        const candidate = { value: optionValue }
+        invalidCandidates.value = [...invalidCandidates.value, candidate]
+        return () => {
+          invalidCandidates.value = invalidCandidates.value.filter((item) => item !== candidate)
+        }
       }
       const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {
         if (effectiveDisabled.value) return
@@ -128,7 +132,11 @@ export const CheckboxGroup = markFormItemGroupControl(
           size: props.size,
           invalid: (props.status ?? formItemControl?.status.value ?? 'default') === 'error',
           describedBy: formItemControl?.describedBy.value,
-          invalidValue: claimedInvalid.value ?? props.options?.[0]?.value,
+          invalidValue: effectiveDisabled.value
+            ? undefined
+            : slots.default
+              ? invalidCandidates.value[0]?.value
+              : props.options?.find((option) => !option.disabled)?.value,
           claimInvalid,
           updateValue
         }))

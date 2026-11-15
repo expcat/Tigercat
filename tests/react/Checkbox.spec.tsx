@@ -7,6 +7,7 @@ import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { renderToString } from 'react-dom/server'
+import { focusFirstInvalidField } from '@expcat/tigercat-core'
 import { Checkbox } from '@expcat/tigercat-react/Checkbox'
 import { CheckboxGroup } from '@expcat/tigercat-react/CheckboxGroup'
 import { Form } from '@expcat/tigercat-react/Form'
@@ -309,6 +310,78 @@ describe('Checkbox', () => {
   })
 
   describe('FormItem', () => {
+    it.each(['options', 'children'] as const)(
+      'moves the error owner after removing the first (%s)',
+      (source) => {
+        const field = (options: { label: string; value: string }[]) => (
+          <FormItem error="Choose an option">
+            {source === 'options' ? (
+              <CheckboxGroup options={options} />
+            ) : (
+              <CheckboxGroup>
+                {options.map((option) => (
+                  <Checkbox key={option.value} value={option.value}>
+                    {option.label}
+                  </Checkbox>
+                ))}
+              </CheckboxGroup>
+            )}
+          </FormItem>
+        )
+        const { container, rerender } = render(
+          field([
+            { label: 'A', value: 'a' },
+            { label: 'B', value: 'b' }
+          ])
+        )
+        const [first, second] = getBoxes(container)
+        const errorId = first.getAttribute('aria-describedby')
+        expect(first).toHaveAttribute('aria-invalid', 'true')
+        expect(second).not.toHaveAttribute('aria-invalid')
+        expect(errorId).toBeTruthy()
+
+        rerender(field([{ label: 'B', value: 'b' }]))
+
+        expect(getBoxes(container)).toHaveLength(1)
+        expect(getBox(container)).toHaveAttribute('value', 'b')
+        expect(getBox(container)).toHaveAttribute('aria-invalid', 'true')
+        expect(getBox(container)).toHaveAttribute('aria-describedby', errorId)
+      }
+    )
+
+    it.each(['options', 'children'] as const)(
+      'focuses the first enabled error owner (%s)',
+      (source) => {
+        const { container } = render(
+          <FormItem error="Choose an option">
+            {source === 'options' ? (
+              <CheckboxGroup
+                options={[
+                  { label: 'A', value: 'a', disabled: true },
+                  { label: 'B', value: 'b' }
+                ]}
+              />
+            ) : (
+              <CheckboxGroup options={[{ label: 'Unused', value: 'unused' }]}>
+                <Checkbox value="a" disabled>
+                  A
+                </Checkbox>
+                <Checkbox value="b">B</Checkbox>
+              </CheckboxGroup>
+            )}
+          </FormItem>
+        )
+        const [first, second] = getBoxes(container)
+
+        expect(first).toBeDisabled()
+        expect(first).not.toHaveAttribute('aria-invalid')
+        expect.soft(second).toHaveAttribute('aria-invalid', 'true')
+        expect.soft(second).toHaveAccessibleDescription('Choose an option')
+        focusFirstInvalidField(container)
+        expect(second).toHaveFocus()
+      }
+    )
+
     it('assigns distinct default ids to grouped checkboxes in a named FormItem', () => {
       const { container } = render(
         <Form value={{ tags: [] }}>

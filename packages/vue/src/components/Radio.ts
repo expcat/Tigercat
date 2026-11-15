@@ -223,9 +223,9 @@ export const Radio = defineComponent({
     }
 
     watch(
-      () => [isInGroup.value, props.value] as const,
-      ([grouped, optionValue]) => {
-        if (grouped) groupContext.value?.claimInvalid(optionValue)
+      [() => groupContext.value?.claimInvalid, () => props.value, () => actualDisabled.value],
+      ([claimInvalid, optionValue, disabled], _previous, onCleanup) => {
+        if (!disabled && claimInvalid) onCleanup(claimInvalid(optionValue))
       },
       { immediate: true }
     )

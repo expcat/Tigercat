@@ -88,9 +88,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   const effectiveId = id ?? (inGroup ? generatedId : formItemControl?.id)
   const effectiveName = name ?? formItemControl?.name
 
+  const claimInvalid = groupContext?.claimInvalid
   useEffect(() => {
-    if (inGroup && value !== undefined) groupContext?.claimInvalid(value)
-  }, [groupContext, inGroup, value])
+    if (!effectiveDisabled && value !== undefined) return claimInvalid?.(value)
+  }, [claimInvalid, effectiveDisabled, value])
 
   const ownsInvalid = !inGroup || groupContext?.invalidValue === value
   const checked = inGroup

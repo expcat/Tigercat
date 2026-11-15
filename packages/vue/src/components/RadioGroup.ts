@@ -1,6 +1,7 @@
 import {
   defineComponent,
   ref,
+  shallowRef,
   provide,
   computed,
   h,
@@ -41,7 +42,7 @@ export interface RadioGroupContext {
   describedBy?: string
   /** Option value that owns the single `aria-invalid`. */
   invalidValue?: string | number
-  claimInvalid: (value: string | number) => void
+  claimInvalid: (value: string | number) => () => void
   onChange: (value: string | number) => void
 }
 
@@ -121,15 +122,25 @@ export const RadioGroup = markFormItemGroupControl(
         )
         return seeded !== undefined ? seeded : internalValue.value
       })
-      const claimedInvalid = ref<string | number | undefined>(props.options?.[0]?.value)
-      const claimInvalid = (value: string | number) => {
-        if (claimedInvalid.value === undefined) claimedInvalid.value = value
+      const invalidCandidates = shallowRef<{ value: string | number }[]>([])
+      const claimInvalid = (optionValue: string | number) => {
+        const candidate = { value: optionValue }
+        invalidCandidates.value = [...invalidCandidates.value, candidate]
+        return () => {
+          invalidCandidates.value = invalidCandidates.value.filter((item) => item !== candidate)
+        }
       }
       const generatedName = `tiger-radio-${useId()}`
       const groupName = computed(() => props.name || generatedName)
       const effectiveDisabled = computed(
         () => props.disabled || (formItemControl?.disabled.value ?? false)
       )
+      const invalidOptions = computed(() => {
+        if (effectiveDisabled.value) return []
+        return slots.default
+          ? invalidCandidates.value
+          : (props.options ?? []).filter((option) => !option.disabled)
+      })
 
       const handleChange = (value: string | number) => {
         if (effectiveDisabled.value) return
@@ -153,7 +164,9 @@ export const RadioGroup = markFormItemGroupControl(
           size: props.size,
           invalid: groupInvalid.value,
           describedBy: formItemControl?.describedBy.value,
-          invalidValue: currentValue.value ?? claimedInvalid.value ?? props.options?.[0]?.value,
+          invalidValue:
+            invalidOptions.value.find((option) => option.value === currentValue.value)?.value ??
+            invalidOptions.value[0]?.value,
           claimInvalid,
           onChange: handleChange
         }))
