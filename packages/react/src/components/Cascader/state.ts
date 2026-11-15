@@ -8,6 +8,7 @@ import {
   coerceCascaderFormValue,
   createLoadGuard,
   decideAfterBranchLoad,
+  findFirstEnabledIndex,
   filterCascaderOptions,
   flattenCascaderOptions,
   formatSelectLevelLabel,
@@ -339,7 +340,7 @@ export function useCascaderController(props: CascaderProps) {
         return
       }
       const decision = decideAfterBranchLoad({
-        childCount: option.children?.length ?? 0,
+        childCount: isCascaderOptionExpandable(option) ? (option.children?.length ?? 0) : 0,
         intent,
         commitLoadedBranch: changeOnSelect
       })
@@ -455,6 +456,15 @@ export function useCascaderController(props: CascaderProps) {
       return initialCascaderColumnActiveIndices(columns)
     })
   }, [columns, isOpen, isSearchMode])
+
+  useEffect(() => {
+    if (!isOpen || !isSearchMode) return
+    setSearchActiveIndex((current) =>
+      searchResults[current] && !searchResults[current].disabled
+        ? current
+        : findFirstEnabledIndex(searchResults)
+    )
+  }, [isOpen, isSearchMode, searchResults])
 
   const getCurrentColumnIndex = useCallback(() => {
     const last = columns.length - 1
@@ -591,7 +601,8 @@ export function useCascaderController(props: CascaderProps) {
   const currentOpt = columnActiveIndices[colIndex] ?? -1
   const itemHeight = getCascaderVirtualItemHeight(size)
   const activeInWindow = (scrollTop: number, index: number, count: number) => {
-    if (!virtual || index < 0) return index >= 0
+    if (index < 0 || index >= count) return false
+    if (!virtual) return true
     const range = getCascaderVirtualRange(scrollTop, listHeight, count, itemHeight)
     return index >= range.startIndex && index <= range.endIndex
   }

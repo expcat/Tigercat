@@ -358,6 +358,14 @@ export const Mentions = defineComponent({
       }
     )
 
+    watch([filteredOptions, isOpen], () => {
+      if (!isOpen.value) return
+      const current = filteredOptions.value[activeIndex.value]
+      if (!current || current.disabled) {
+        activeIndex.value = getInitialMentionsActiveIndex(filteredOptions.value)
+      }
+    })
+
     function closeDropdown() {
       dismissed.value = true
       setOpen(false)
@@ -541,7 +549,7 @@ export const Mentions = defineComponent({
           expanded: expanded.value,
           listboxId,
           activeIndex:
-            filteredOptions.value.length > 0 && mentionWindow.activeInWindow.value
+            filteredOptions.value[activeIndex.value] && mentionWindow.activeInWindow.value
               ? activeIndex.value
               : -1,
           listMounted: filteredOptions.value.length > 0

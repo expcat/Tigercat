@@ -205,6 +205,15 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       count: filteredOptions.length
     })
 
+    useEffect(() => {
+      if (!expanded) return
+      setActiveIndex((current) =>
+        filteredOptions[current] && !filteredOptions[current].disabled
+          ? current
+          : getInitialMentionsActiveIndex(filteredOptions)
+      )
+    }, [expanded, filteredOptions])
+
     const applyQuery = useCallback(
       (text: string, cursor: number) => {
         const result = extractMentionQuery(text, cursor, prefix)
@@ -447,7 +456,10 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       ...getPickerComboboxAria({
         expanded,
         listboxId: listMounted ? listboxId : popupId,
-        activeIndex: listMounted && mentionWindow.activeInWindow ? activeIndex : -1,
+        activeIndex:
+          listMounted && filteredOptions[activeIndex] && mentionWindow.activeInWindow
+            ? activeIndex
+            : -1,
         listMounted
       }),
       'aria-controls': expanded ? (listMounted ? listboxId : popupId) : undefined,

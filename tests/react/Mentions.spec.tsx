@@ -39,6 +39,27 @@ async function expectMentionsA11y(container: HTMLElement): Promise<void> {
 }
 
 describe('Mentions', () => {
+  it('keeps an active suggestion when options shrink', async () => {
+    const onSelect = vi.fn()
+    const { getByRole, rerender } = render(
+      <Mentions options={defaultOptions} onSelect={onSelect} />
+    )
+    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    await openMention(textarea, '@')
+    fireEvent.mouseEnter(getByRole('option', { name: 'Charlie' }))
+    expect(textarea).toHaveAttribute(
+      'aria-activedescendant',
+      getByRole('option', { name: 'Charlie' }).id
+    )
+    rerender(<Mentions options={defaultOptions.slice(0, 1)} onSelect={onSelect} />)
+    expect
+      .soft(textarea)
+      .toHaveAttribute('aria-activedescendant', getByRole('option', { name: 'Alice' }).id)
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+    expect(onSelect).toHaveBeenCalledWith(defaultOptions[0])
+    expect(textarea).toHaveValue('@alice ')
+  })
+
   it('keeps typed text when value is omitted', async () => {
     const user = userEvent.setup()
     const { getByRole } = render(<Mentions options={defaultOptions} />)

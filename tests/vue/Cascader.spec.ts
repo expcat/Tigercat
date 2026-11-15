@@ -33,6 +33,88 @@ const simpleOptions = [
 ]
 
 describe('Cascader', () => {
+  it.each(['click', 'Enter'])('commits an explicit leaf with children via %s', async (action) => {
+    const { getByRole, emitted } = render(Cascader, {
+      props: {
+        options: [
+          {
+            label: 'Leaf',
+            value: 'leaf',
+            isLeaf: true,
+            children: [{ label: 'Hidden child', value: 'hidden' }]
+          }
+        ]
+      }
+    })
+    await fireEvent.keyDown(getByRole('combobox'), { key: 'ArrowDown' })
+    if (action === 'click') await fireEvent.click(getByRole('option', { name: 'Leaf' }))
+    else await fireEvent.keyDown(getByRole('combobox'), { key: 'Enter' })
+    expect(emitted()['update:modelValue']).toEqual([[['leaf']]])
+    expect(getByRole('combobox')).toHaveTextContent('Leaf')
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('commits the first child after opening and entering its column', async () => {
+    const { getByRole, emitted } = render(Cascader, {
+      props: {
+        options: [{ label: 'A', value: 'a', children: [{ label: 'A child', value: 'ac' }] }]
+      }
+    })
+    const trigger = getByRole('combobox')
+    await fireEvent.keyDown(trigger, { key: 'ArrowDown' })
+    await fireEvent.keyDown(trigger, { key: 'ArrowRight' })
+    expect
+      .soft(trigger)
+      .toHaveAttribute('aria-activedescendant', getByRole('option', { name: 'A child' }).id)
+    await fireEvent.keyDown(trigger, { key: 'Enter' })
+    expect(emitted()['update:modelValue']).toEqual([[['a', 'ac']]])
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('initializes an already open selected path and its active leaf', () => {
+    const { getByRole } = render(Cascader, {
+      props: {
+        options: [{ label: 'A', value: 'a', children: [{ label: 'A child', value: 'ac' }] }],
+        defaultOpen: true,
+        defaultValue: ['a', 'ac']
+      }
+    })
+    const parent = getByRole('option', { name: 'A' })
+    const child = getByRole('option', { name: 'A child' })
+    expect(parent).toBeVisible()
+    expect(child).toBeVisible()
+    expect(parent.parentElement).not.toBe(child.parentElement)
+    expect(getByRole('combobox')).toHaveAttribute('aria-activedescendant', child.id)
+  })
+
+  it('keeps an active search result after narrowing the query', async () => {
+    const { getByRole, emitted } = render(Cascader, {
+      props: {
+        options: [
+          { label: 'Alpha', value: 'a' },
+          { label: 'Beta', value: 'b' },
+          { label: 'Gamma', value: 'g' }
+        ],
+        searchable: true
+      }
+    })
+    await fireEvent.click(getByRole('combobox'))
+    const input = getByRole('combobox')
+    await fireEvent.update(input, 'a')
+    await fireEvent.keyDown(input, { key: 'End' })
+    expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      getByRole('option', { name: 'Gamma' }).id
+    )
+    await fireEvent.update(input, 'Alpha')
+    expect
+      .soft(input)
+      .toHaveAttribute('aria-activedescendant', getByRole('option', { name: 'Alpha' }).id)
+    await fireEvent.keyDown(input, { key: 'Enter' })
+    expect(emitted()['update:modelValue']).toEqual([[['a']]])
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
+  })
+
   it('keeps an uncontrolled selection after choosing a leaf', async () => {
     const { getByRole } = render(Cascader, {
       props: { options: simpleOptions, 'aria-label': 'Region' }

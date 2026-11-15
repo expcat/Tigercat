@@ -246,6 +246,14 @@ export function useTreeSelectController(props: TreeSelectProps) {
     [expandedSet, filterFn, searchQuery, treeData]
   )
 
+  useEffect(() => {
+    if (!isOpen) return
+    setActiveKey((current) => {
+      if (visibleItems.some((item) => sameTreeKey(item.key, current))) return current
+      return visibleItems.find((item) => !item.node.disabled)?.key
+    })
+  }, [isOpen, visibleItems])
+
   const displayLabel = getTreeSelectDisplayLabel(treeData, selected, labelCacheRef.current)
   const placeholderText = placeholder ?? selectLabels.placeholder
   const displayText = isTreeSelectValueEmpty(selected, multiple) ? placeholderText : displayLabel
@@ -303,8 +311,8 @@ export function useTreeSelectController(props: TreeSelectProps) {
     (key: string | number) => {
       if (isReadOnly || effectiveDisabled) return
       const node = visibleItems.find((item) => sameTreeKey(item.key, key))?.node
-      if (node?.disabled) return
-      if (node) rememberTreeSelectLabel(labelCacheRef.current, key, node.label)
+      if (!node || node.disabled) return
+      rememberTreeSelectLabel(labelCacheRef.current, key, node.label)
       const next = commitTreeSelectNode({
         treeData,
         key,
@@ -675,7 +683,7 @@ export function useTreeSelectController(props: TreeSelectProps) {
   const activeInWindow =
     !virtual || (activeIndex >= virtualRange.startIndex && activeIndex <= virtualRange.endIndex)
   const activeOptionId =
-    isOpen && activeKey !== undefined && activeInWindow
+    isOpen && activeIndex >= 0 && activeKey !== undefined && activeInWindow
       ? getTreeSelectTreeItemId(treeId, activeKey)
       : undefined
   const comboboxAria = getPickerComboboxAria({

@@ -33,6 +33,7 @@ import {
   createLoadGuard,
   coerceClassValue,
   decideAfterBranchLoad,
+  findFirstEnabledIndex,
   filterCascaderOptions,
   flattenCascaderOptions,
   formatSelectLevelLabel,
@@ -451,7 +452,7 @@ export const Cascader = defineComponent({
         return
       }
       const decision = decideAfterBranchLoad({
-        childCount: option.children?.length ?? 0,
+        childCount: isCascaderOptionExpandable(option) ? (option.children?.length ?? 0) : 0,
         intent,
         commitLoadedBranch: props.changeOnSelect
       })
@@ -630,20 +631,39 @@ export const Cascader = defineComponent({
     }
     maybeSeedCascader()
 
-    watch(isOpen, (open, previous) => {
-      if (!open || previous) return
-      const nextPath = nextCascaderBrowsePath({
-        open: true,
-        previousOpen: false,
-        activePath: activePath.value,
-        committed: selected.value
-      })
-      activePath.value = nextPath
-      const nextColumns = getCascaderColumns(options.value, nextPath, hasLoadData.value)
-      columnActiveIndices.value = initialCascaderColumnActiveIndices(nextColumns)
-      focusedColumnIndex.value = Math.max(0, nextColumns.length - 1)
-      searchActiveIndex.value = 0
-      if (props.searchable) nextTick(() => searchInputRef.value?.focus())
+    watch(
+      isOpen,
+      (open, previous) => {
+        if (!open || previous) return
+        const nextPath = nextCascaderBrowsePath({
+          open: true,
+          previousOpen: false,
+          activePath: activePath.value,
+          committed: selected.value
+        })
+        activePath.value = nextPath
+        const nextColumns = getCascaderColumns(options.value, nextPath, hasLoadData.value)
+        columnActiveIndices.value = initialCascaderColumnActiveIndices(nextColumns)
+        focusedColumnIndex.value = Math.max(0, nextColumns.length - 1)
+        searchActiveIndex.value = 0
+        if (props.searchable) nextTick(() => searchInputRef.value?.focus())
+      },
+      { immediate: true }
+    )
+
+    watch([columns, isOpen, isSearchMode], () => {
+      if (!isOpen.value || isSearchMode.value) return
+      if (columnActiveIndices.value.length !== columns.value.length) {
+        columnActiveIndices.value = initialCascaderColumnActiveIndices(columns.value)
+      }
+    })
+
+    watch([searchResults, isOpen, isSearchMode], () => {
+      if (!isOpen.value || !isSearchMode.value) return
+      const current = searchResults.value[searchActiveIndex.value]
+      if (!current || current.disabled) {
+        searchActiveIndex.value = findFirstEnabledIndex(searchResults.value)
+      }
     })
 
     watch(
@@ -687,7 +707,8 @@ export const Cascader = defineComponent({
     )
 
     function indexInVirtualWindow(scrollTop: number, index: number, count: number) {
-      if (!props.virtual || index < 0) return index >= 0
+      if (index < 0 || index >= count) return false
+      if (!props.virtual) return true
       const range = getCascaderVirtualRange(scrollTop, props.listHeight, count, itemHeight.value)
       return index >= range.startIndex && index <= range.endIndex
     }

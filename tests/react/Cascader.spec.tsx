@@ -41,6 +41,59 @@ describe('Cascader', () => {
     )
   })
   afterEach(() => vi.restoreAllMocks())
+  it.each(['click', 'Enter'])('commits an explicit leaf with children via %s', async (action) => {
+    const onChange = vi.fn()
+    const { getByRole } = render(
+      <Cascader
+        options={[
+          {
+            label: 'Leaf',
+            value: 'leaf',
+            isLeaf: true,
+            children: [{ label: 'Hidden child', value: 'hidden' }]
+          }
+        ]}
+        onChange={onChange}
+      />
+    )
+    fireEvent.keyDown(getByRole('combobox'), { key: 'ArrowDown' })
+    if (action === 'click') fireEvent.click(getByRole('option', { name: 'Leaf' }))
+    else fireEvent.keyDown(getByRole('combobox'), { key: 'Enter' })
+    expect(onChange).toHaveBeenCalledWith(['leaf'])
+    expect(getByRole('combobox')).toHaveTextContent('Leaf')
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('keeps an active search result after narrowing the query', () => {
+    const onChange = vi.fn()
+    const { getByRole } = render(
+      <Cascader
+        options={[
+          { label: 'Alpha', value: 'a' },
+          { label: 'Beta', value: 'b' },
+          { label: 'Gamma', value: 'g' }
+        ]}
+        searchable
+        onChange={onChange}
+      />
+    )
+    fireEvent.click(getByRole('combobox'))
+    const input = getByRole('combobox')
+    fireEvent.change(input, { target: { value: 'a' } })
+    fireEvent.keyDown(input, { key: 'End' })
+    expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      getByRole('option', { name: 'Gamma' }).id
+    )
+    fireEvent.change(input, { target: { value: 'Alpha' } })
+    expect
+      .soft(input)
+      .toHaveAttribute('aria-activedescendant', getByRole('option', { name: 'Alpha' }).id)
+    fireEvent.keyDown(input, { key: 'Enter' })
+    expect(onChange).toHaveBeenCalledWith(['a'])
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
+  })
+
   it('keeps an uncontrolled selection after choosing a leaf', async () => {
     const user = userEvent.setup()
     const { getByRole, rerender } = render(<Cascader options={simpleOptions} aria-label="Region" />)

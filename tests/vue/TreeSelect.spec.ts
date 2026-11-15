@@ -32,6 +32,33 @@ describe('TreeSelect', () => {
     )
   })
   afterEach(() => vi.restoreAllMocks())
+  it('keeps an active visible node after narrowing the search', async () => {
+    const { getByRole, rerender, emitted } = render(TreeSelect, {
+      props: {
+        treeData: [
+          { key: 'a', label: 'Alpha' },
+          { key: 'b', label: 'Beta' }
+        ],
+        searchable: true,
+        defaultOpen: true
+      }
+    })
+    const input = getByRole('combobox')
+    await fireEvent.keyDown(input, { key: 'End' })
+    expect(input).toHaveAttribute(
+      'aria-activedescendant',
+      getByRole('treeitem', { name: 'Beta' }).id
+    )
+    await rerender({ searchValue: 'Alpha' })
+    expect
+      .soft(input)
+      .toHaveAttribute('aria-activedescendant', getByRole('treeitem', { name: 'Alpha' }).id)
+    await fireEvent.keyDown(input, { key: 'Enter' })
+    expect(emitted()['update:modelValue']).toEqual([['a']])
+    expect(getByRole('combobox')).toHaveTextContent('Alpha')
+    expect(getByRole('combobox')).toHaveAttribute('aria-expanded', 'false')
+  })
+
   it('keeps native text editing in the expanded search input', async () => {
     const user = userEvent.setup()
     const onSearchChange = vi.fn()

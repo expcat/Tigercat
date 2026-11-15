@@ -298,6 +298,11 @@ export const TreeSelect = defineComponent({
         filterFn: props.filterFn
       })
     )
+    watch([visibleItems, isOpen], () => {
+      if (!isOpen.value) return
+      if (visibleItems.value.some((item) => sameTreeKey(item.key, activeKey.value))) return
+      activeKey.value = visibleItems.value.find((item) => !item.node.disabled)?.key
+    })
     const placeholderText = computed(() => props.placeholder ?? selectLabels.value.placeholder)
     const displayText = computed(() =>
       isTreeSelectValueEmpty(selected.value, props.multiple)
@@ -425,7 +430,8 @@ export const TreeSelect = defineComponent({
     function commitKey(key: string | number) {
       if (isReadOnly.value || effectiveDisabled.value) return
       const node = visibleItems.value.find((item) => sameTreeKey(item.key, key))?.node
-      if (node) rememberTreeSelectLabel(labelCache, key, node.label)
+      if (!node || node.disabled) return
+      rememberTreeSelectLabel(labelCache, key, node.label)
       const next = commitTreeSelectNode({
         treeData: treeData.value,
         key,
@@ -749,7 +755,7 @@ export const TreeSelect = defineComponent({
         !props.virtual ||
         (activeIndex >= virtualRange.startIndex && activeIndex <= virtualRange.endIndex)
       const activeOptionId =
-        isOpen.value && activeKey.value !== undefined && activeInWindow
+        isOpen.value && activeIndex >= 0 && activeKey.value !== undefined && activeInWindow
           ? getTreeSelectTreeItemId(treeId.value, activeKey.value)
           : undefined
       const comboboxAria = getPickerComboboxAria({
