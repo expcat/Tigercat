@@ -147,6 +147,41 @@ describe('Checkbox', () => {
   })
 
   describe('CheckboxGroup', () => {
+    it('distinguishes a missing value from an explicit false value', () => {
+      const { container } = renderGroup(`
+        <CheckboxGroup :default-value="[false]">
+          <Checkbox>Missing value</Checkbox>
+          <Checkbox :value="false">False value</Checkbox>
+        </CheckboxGroup>
+      `)
+      const [missing, explicitFalse] = getBoxes(container)
+
+      expect.soft(missing).not.toBeChecked()
+      expect(explicitFalse).toBeChecked()
+    })
+
+    it('inherits group errors without a FormItem and keeps a single invalid owner', () => {
+      const { container } = renderGroup(`
+        <div>
+          <Checkbox status="error">Error reference</Checkbox>
+          <CheckboxGroup status="error">
+            <Checkbox value="a">A</Checkbox>
+            <Checkbox value="b">B</Checkbox>
+            <Checkbox value="c" status="default">Default</Checkbox>
+          </CheckboxGroup>
+        </div>
+      `)
+      const [reference, first, second, explicitDefault] = getBoxes(container)
+      const errorVisual = reference.nextElementSibling?.className
+
+      expect.soft(first).toHaveAttribute('aria-invalid', 'true')
+      expect(second).not.toHaveAttribute('aria-invalid')
+      expect(explicitDefault).not.toHaveAttribute('aria-invalid')
+      expect.soft(first.nextElementSibling?.className).toBe(errorVisual)
+      expect.soft(second.nextElementSibling?.className).toBe(errorVisual)
+      expect(explicitDefault.nextElementSibling?.className).not.toBe(errorVisual)
+    })
+
     it('renders children checkboxes', () => {
       const { container } = renderGroup(`
         <CheckboxGroup>

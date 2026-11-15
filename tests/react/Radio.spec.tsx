@@ -132,6 +132,32 @@ describe('Radio', () => {
   })
 
   describe('RadioGroup', () => {
+    it('inherits group errors without a FormItem and keeps a single invalid owner', () => {
+      const { container } = render(
+        <>
+          <Radio value="reference" status="error">
+            Error reference
+          </Radio>
+          <RadioGroup status="error">
+            <Radio value="a">A</Radio>
+            <Radio value="b">B</Radio>
+            <Radio value="c" status="default">
+              Default
+            </Radio>
+          </RadioGroup>
+        </>
+      )
+      const [reference, first, second, explicitDefault] = getRadios(container)
+      const errorVisual = reference.nextElementSibling?.className
+
+      expect.soft(first).toHaveAttribute('aria-invalid', 'true')
+      expect(second).not.toHaveAttribute('aria-invalid')
+      expect(explicitDefault).not.toHaveAttribute('aria-invalid')
+      expect.soft(first.nextElementSibling?.className).toBe(errorVisual)
+      expect.soft(second.nextElementSibling?.className).toBe(errorVisual)
+      expect(explicitDefault.nextElementSibling?.className).not.toBe(errorVisual)
+    })
+
     it('should render children inside a radiogroup', () => {
       const { container } = render(
         <RadioGroup>

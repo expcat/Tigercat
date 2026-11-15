@@ -114,7 +114,10 @@ export const Radio = defineComponent({
     )
     const actualName = computed(() => resolveRadioInputName(props.name, groupContext.value?.name))
     const status = computed<InputStatus>(
-      () => props.status ?? formItemControl?.status.value ?? 'default'
+      () =>
+        props.status ??
+        (groupContext.value?.invalid ? 'error' : formItemControl?.status.value) ??
+        'default'
     )
 
     const formBound = computed(() => !isInGroup.value && Boolean(formItemControl?.name.value))

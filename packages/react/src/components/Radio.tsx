@@ -71,7 +71,8 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
   const actualSize = size || groupContext?.size || 'md'
   const actualDisabled = Boolean(disabled || groupContext?.disabled || formItemControl?.disabled)
   const actualName = resolveRadioInputName(name, groupContext?.name)
-  const status = statusProp ?? formItemControl?.status ?? 'default'
+  const status =
+    statusProp ?? (groupContext?.invalid ? 'error' : formItemControl?.status) ?? 'default'
   const shakeTrigger = formItemControl?.shakeTrigger
   const rootRef = useRef<HTMLElement>(null)
 

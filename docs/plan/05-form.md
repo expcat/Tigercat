@@ -21,8 +21,8 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 概览
 
-本篇 65 条：P1 0、P2 62、P3 3。
-按波次：W3 62、W9 3。
+本篇 63 条：P1 0、P2 60、P3 3。
+按波次：W3 60、W9 3。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C056-F01（S10）、C056-F04（S07）、C060-F04（S13）、C061-F05（S13）、C072-F02（S13）、C074-F04（S13）、C080-F03（S13）。
 
@@ -32,7 +32,6 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 | 条目                                                                  | 归属           | 同验                             |
 | --------------------------------------------------------------------- | -------------- | -------------------------------- |
-| C054-F05 Checkbox 未消费组级错误状态                                  | Checkbox       | CheckboxGroup、RadioGroup        |
 | C056-F05 readOnly 给原生按钮写入不支持的 aria-readonly                | ColorPicker    | CronEditor、NumberKeyboard       |
 | C059-F01 两端均忽略 InputGroup 的 size                                | DatePicker     | Mentions、TimePicker、TreeSelect |
 | C063-F02 生成文档的「直子必须是 chrome 根」与实际稳定 host 结构矛盾   | InputGroup     | MaskInput、Mentions、Textarea    |
@@ -59,14 +58,12 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 报告 `groups/form/Checkbox.md`，队列状态 needs-evidence。另受 S01、S04 影响。
 
-| 编号     | 级别 | 波次 | 端   | 类别 | 条目                                                | 验收                                                                               |
-| -------- | ---- | ---- | ---- | ---- | --------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| C054-F04 | P2   | W3   | Vue  | 行为 | Vue 缺省 value 被转换为 false，混淆缺值与显式布尔值 | Group defaultValue=[false] 下未传 value 的 Vue Checkbox 不选中；显式 false 仍选中  |
-| C054-F05 | P2   | W3   | 双端 | 行为 | Checkbox 未消费组级错误状态                         | CheckboxGroup status='error'（无 FormItem）下子项呈错误样式，owner 带 aria-invalid |
+| 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
+| ---- | ---- | ---- | --- | ---- | ---- | ---- |
 
 ### C055 CheckboxGroup
 
-报告 `groups/form/CheckboxGroup.md`，队列状态 needs-evidence。另受 S01、S02、S04、C054-F05 影响。
+报告 `groups/form/CheckboxGroup.md`，队列状态 needs-evidence。另受 S01、S02、S04 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                           | 验收                                                                             |
 | -------- | ---- | ---- | ---- | ------ | ------------------------------ | -------------------------------------------------------------------------------- |
@@ -194,7 +191,7 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ### C071 RadioGroup
 
-报告 `groups/form/RadioGroup.md`，队列状态 needs-evidence。另受 S01、S02、S04、S10、C054-F05、C055-F01 影响。
+报告 `groups/form/RadioGroup.md`，队列状态 needs-evidence。另受 S01、S02、S04、S10、C055-F01 影响。
 
 | 编号     | 级别 | 波次 | 端   | 类别   | 条目                                           | 验收                                                             |
 | -------- | ---- | ---- | ---- | ------ | ---------------------------------------------- | ---------------------------------------------------------------- |

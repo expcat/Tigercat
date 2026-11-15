@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Checkbox 缺值与组级错误（Vue / React，C054-F04、C054-F05）**：Vue Checkbox 未传 `value` 时保留缺值状态，`CheckboxGroup defaultValue=[false]` 不再误选中缺值项，显式 `value=false` 仍选中。双端 Checkbox 与 Radio 消费组级错误状态，`CheckboxGroup` / `RadioGroup status="error"` 无需 FormItem 即可呈现子项错误样式，并由既有 owner 输出 `aria-invalid`；子项显式 status 仍优先。
+
 - **Checkbox 无障碍属性与组内关联（Vue / React，C054-F01、C054-F02、C054-F03）**：React 保留调用方 `aria-required="false"` 的 DOM 与 SSR 语义，必填 FormItem 仍覆盖为 true。双端组内 Checkbox 各自保留 `aria-describedby` 帮助引用，共享错误描述仍只交给 owner；具名 FormItem 下的组内 input 使用稳定的独立默认 id，不再重复继承字段 id。
 
 - **Cascader 空态、原生属性与输入法键盘（Vue / React，C053-F04、C053-F05、C053-F06）**：Cascader 与 TreeSelect 空列表或搜索无结果时不再输出悬空的 `aria-controls`，组合输入期间的 Enter 不提交选项也不关闭面板。React Cascader 的 `title`、`data-*` 等原生属性透传到根节点，`aria-details` 与 `tabIndex` 保留在实际 combobox 上，打开搜索后仍然生效。

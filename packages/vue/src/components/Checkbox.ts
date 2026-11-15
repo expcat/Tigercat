@@ -54,7 +54,8 @@ export const Checkbox = defineComponent({
       default: undefined
     },
     value: {
-      type: [String, Number, Boolean] as PropType<string | number | boolean>
+      type: [String, Number, Boolean] as PropType<string | number | boolean>,
+      default: undefined
     },
     size: {
       type: String as PropType<ComponentSize>
@@ -120,7 +121,10 @@ export const Checkbox = defineComponent({
         Boolean(formItemControl?.disabled.value)
     )
     const status = computed<InputStatus>(
-      () => props.status ?? formItemControl?.status.value ?? 'default'
+      () =>
+        props.status ??
+        (groupContext.value?.invalid ? 'error' : formItemControl?.status.value) ??
+        'default'
     )
     const effectiveId = computed(() => {
       const attrId = attrs.id

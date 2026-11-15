@@ -82,7 +82,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   const effectiveDisabled = Boolean(
     propDisabled || groupContext?.disabled || formItemControl?.disabled
   )
-  const status: InputStatus = statusProp ?? formItemControl?.status ?? 'default'
+  const status: InputStatus =
+    statusProp ?? (groupContext?.invalid ? 'error' : formItemControl?.status) ?? 'default'
   const shakeTrigger = formItemControl?.shakeTrigger
   const effectiveId = id ?? (inGroup ? generatedId : formItemControl?.id)
   const effectiveName = name ?? formItemControl?.name
