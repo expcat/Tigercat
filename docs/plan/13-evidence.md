@@ -35,7 +35,7 @@
 | ---- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | E01  | W10  | 重跑 blocked 格：视觉 2772、键盘 2832。隐藏 IAB 环境恢复后，按下面「各组件证据现状」逐组件补                                                               | 每个组件的 `matrix.csv` 里没有 blocked；补到的格要么 pass，要么关联到已有或新立的编号                                |
 | E02  | W10  | 清掉 24 格 pending（视觉、键盘各 24）                                                                                                                      | `final-acceptance.md` 的 pending 行为 0                                                                              |
-| E03  | W10  | Affix 16 格视觉和键盘全部 blocked，整组没看过                                                                                                              | Affix 的 16 格有截图和按键记录；C082 的条目在浏览器里复现或撤回                                                      |
+| E03  | W10  | Affix 16 格视觉和键盘全部 blocked，整组没看过                                                                                                              | Affix 的 16 格有截图和按键记录，并覆盖已修复的固定尺寸更新与偏移重绑通知                                             |
 | E04  | W10  | picsum.photos 被区域封锁：Card 03/04 封面 16 格 blocked（iframe 内 `naturalWidth=0`），AspectRatio 01/03、ImageCompare 的 Demo 也用这个图源                | 这些 Demo 在连不上外网图源时仍能出图，16 格有封面维度的结论                                                          |
 | E05  | W10  | RTL 没有实测：Card、Carousel 的冻结协议要求 RTL 渲染和方向键，两个 Demo 都没设 RTL                                                                         | 两个组件在 `dir=rtl` 下有截图和方向键记录；[12](12-tooling-docs.md) 的 X07-F02 据此核对                              |
 | E06  | W10  | 真实读屏输出和 hover 悬停帧不在已有证据里                                                                                                                  | 标了「读屏未测」的 P1 条目各有一次读屏记录；Tooltip、Text 04 等依赖 hover 的格有悬停帧                               |
@@ -151,7 +151,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 
 | 任务 | 组件                  | 队列           | 现状                                                                                                                                                                      |
 | ---- | --------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C082 | Affix                 | needs-evidence | 视觉 16 格、键盘 16 格全部 blocked，截图 0（IAB browsers=[]）；定向 Vitest 3 文件 40 项通过；源码 SSR 探针保留属性，未做 hydration；未跑 E2E、build、全仓测试             |
+| C082 | Affix                 | needs-evidence | 视觉/键盘各 0/16 blocked，截图 0；F01/F02 已修复，happy-dom 回归通过；Affix/Core/Anchor（含 AnchorLink）5 文件 95 pass、现有 axe 与类型通过；浏览器、读屏、hydration 待补 |
 | C083 | Anchor                | needs-evidence | 视觉 24 格、键盘 24 格均 blocked，截图 0；定向 Vitest 102 passed、W9 E13 1 passed；源码 SSR 探针成功，未验 hydration；未跑 E2E、build；真实 RTL、读屏未测                 |
 | C084 | AnchorLink            | needs-evidence | 视觉 24 格、键盘 24 格均 blocked（owner 为 C083），截图 0；定向 Vitest 53 passed；SSR 与 happy-dom 源码探针；未跑 E2E、build、hydration；读屏未测                         |
 | C085 | BackTop               | needs-evidence | 视觉 16 格、键盘 16 格均 blocked，截图 0；定向 Vitest 30 passed、a11y 25 passed；源码 SSR 探针成功；未跑 E2E、build、hydration；读屏、reduced-motion 未测                 |
@@ -322,7 +322,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C079 | Transfer              | 已编号的 F01–F03 已修复；待验证观察：Vue focus() 带 name 时先命中 hidden input、React ref 返回无 tabindex 的根 div，真实聚焦未验；虚拟列表估算行高与真实 CSS、跨窗口 Tab、窄屏布局未验；默认不设 TIGER_A11Y 时组件内 axe 被跳过                         |
 | C080 | TreeSelect            | C080-F02/F03 已修复；SchemaForm 是遗漏的真实消费者；组件测试 axe 只扫 container，portal 树在外；待验证观察：popup tree 自身无 aria-label/aria-labelledby，未立项；懒加载在途时 React 树项 busy=true、Vue 无；勾选策略、加载失败、数据替换竞争未逐一执行 |
 | C081 | Upload                | C081-F01–F04、F06 已修复；Demo 04 双端 customRequest 不返回 abort handle、成功响应无 URL，记为示例能力限制未立项；未传 allowedPreviewOrigins 时放行其他 http(s)，该默认政策应写入文档；SchemaForm 与 form/01 是真实消费者                               |
-| C082 | Affix                 | INVENTORY 关联为空不完整：Anchor 启用 affix 时用 Affix 包裹 nav 且只传 offsetTop。待验证观察：自定义滚动根移动后仅发 window scroll 未更新固定 top，原生 IntersectionObserver 是否补通知未验证，未登记为缺陷                                             |
+| C082 | Affix                 | C082-F01/F02 已修复并同验 Anchor、AnchorLink；Anchor 启用 affix 时用 Affix 包裹 nav 且只传 offsetTop。待验证观察：自定义滚动根移动后仅发 window scroll 未更新固定 top，原生 IntersectionObserver 是否补通知未验证，未登记为缺陷                         |
 | C091 | ContextMenuSub        | 待验证：展开后把 disabled 改为 true，4 组仍 aria-expanded=true 且 popup 保留（expanded 不含 disabled），Core 未定义预期，未立项。C088-F02 至 F06、X01-F017 原判保留未重演。Sub 用例只测开合键                                                           |
 | C092 | Dropdown              | X02-F001 只确认 chevron 消费链，未证可见失效；Vue 递归 schema 子菜单 role=null、ArrowRight 不展开且不继承外层 portal（未编号观察）；实际消费者含 SplitButton/DataExport/Tabs/WorkflowTimeline                                                           |
 | C103 | NavigationMenuContent | 无独立主责文件与 Demo；4 个 Demo 均未开 viewport，恢复浏览器后仍需另行覆盖；C102-F02/F03 原判保留，失败目标不在 Content；React useFloating 在 floating ref 缺失时逐帧重试，无性能实测、未立项                                                           |

@@ -221,6 +221,8 @@ function readLayoutRect(el: HTMLElement | null): AffixLayoutRect | null {
  */
 export function createAffixController(options: AffixControllerOptions): AffixController {
   let affixed = false
+  const flowStyleKeys = ['position', 'top', 'bottom', 'left', 'width'] as const
+  let flowStyles: string[] = []
   let lastSerialized = ''
   let stopObserver: (() => void) | null = null
   let stopResize: Array<() => void> = []
@@ -229,10 +231,29 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
   let resolved: ResolvedScrollRoot | null = null
 
   const getFlowRect = (): AffixLayoutRect | null => {
-    if (affixed) {
-      return readLayoutRect(options.getPlaceholder()) ?? readLayoutRect(options.getContent())
+    const content = options.getContent()
+    if (!content) return null
+    const fixedStyles = flowStyleKeys.map((key) => content.style[key])
+    if (!affixed) {
+      flowStyles = fixedStyles
+      return readLayoutRect(content)
     }
-    return readLayoutRect(options.getContent())
+    const placeholder = options.getPlaceholder()
+    if (!placeholder) return readLayoutRect(content)
+
+    // Measure the content in its live flow, preserving authored sizing and margins.
+    // The placeholder's saved px dimensions cannot supply new layout dimensions.
+    const display = placeholder.style.display
+    placeholder.style.display = 'none'
+    flowStyleKeys.forEach((key, index) => {
+      content.style[key] = flowStyles[index] ?? ''
+    })
+    const flow = readLayoutRect(content)
+    flowStyleKeys.forEach((key, index) => {
+      content.style[key] = fixedStyles[index]
+    })
+    placeholder.style.display = display
+    return flow
   }
 
   const emitState = (next: AffixState, emitChange: boolean): void => {
@@ -295,7 +316,10 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
   const observeFlow = (): void => {
     const placeholder = options.getPlaceholder()
     const content = options.getContent()
-    const parent = (placeholder ?? content)?.parentElement ?? null
+    let parent = (placeholder ?? content)?.parentElement ?? null
+    while (parent && getComputedStyle(parent).display === 'contents') {
+      parent = parent.parentElement
+    }
     const next = [placeholder, content, parent].filter((el): el is HTMLElement => el != null)
     const same =
       stopResize.length > 0 && next.length === observed.size && next.every((el) => observed.has(el))
@@ -380,7 +404,7 @@ export function createAffixController(options: AffixControllerOptions): AffixCon
         options.getZIndex()
       )
       if (next.affixed) pinFromFlow(true)
-      else unpin(false)
+      else unpin(true)
     }
   }
 

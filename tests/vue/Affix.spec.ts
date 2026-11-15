@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/vue'
+import { nextTick } from 'vue'
 import { Affix } from '@expcat/tigercat-vue/Affix'
 import { MockIntersectionObserver, MockResizeObserver } from '../utils/mock-observers'
 
@@ -369,12 +370,25 @@ describe('Affix', () => {
     expect(latestIntersection().root).toBeNull()
   })
 
-  it('follows placeholder width after the parent grows while pinned', async () => {
-    const rectSpy = vi
-      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
-      .mockReturnValue(new DOMRect(0, 0, 180, 32))
-    render(Affix, {
-      props: { offsetTop: 0 },
+  it('follows live parent width and content height while pinned', async () => {
+    const flowWidth = (element: HTMLElement | null): number => {
+      if (!element) return 0
+      return element.style.width.endsWith('px')
+        ? parseFloat(element.style.width)
+        : flowWidth(element.parentElement)
+    }
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      if (this.style.display === 'contents') return new DOMRect()
+      return new DOMRect(24, 40, flowWidth(this), parseFloat(this.style.height) || 0)
+    })
+    const parent = document.createElement('div')
+    parent.style.width = '200px'
+    document.body.appendChild(parent)
+    const { unmount } = render(Affix, {
+      container: parent,
+      props: { offsetTop: 0, style: { height: '40px' } },
       attrs: { 'data-testid': 'affix-follow' },
       slots: { default: 'Header' }
     })
@@ -388,13 +402,57 @@ describe('Affix', () => {
     })
 
     await waitFor(() => expect(screen.getByTestId('affix-follow')).toHaveStyle('position: fixed'))
-    const placeholder = screen.getByTestId('affix-follow').previousElementSibling as HTMLElement
-    expect(placeholder).toHaveStyle({ width: '180px', height: '32px' })
+    const content = screen.getByTestId('affix-follow')
+    const placeholder = content.previousElementSibling as HTMLElement
+    expect(placeholder).toHaveStyle({ width: '200px', height: '40px' })
 
-    rectSpy.mockReturnValue(new DOMRect(0, 0, 400, 32))
-    MockResizeObserver.instances.at(-1)?.trigger(400, 32)
+    parent.style.width = '400px'
+    // A saved px width cannot grow just because the parent's box grew.
+    expect(placeholder.getBoundingClientRect().width).toBe(200)
+    MockResizeObserver.instances
+      .filter((observer) => !observer.disconnect.mock.calls.length)
+      .filter((observer) => observer.observe.mock.calls.some(([element]) => element === parent))
+      .forEach((observer) => observer.trigger(400, 40))
+    await nextTick()
+    expect.soft(content).toHaveStyle({ width: '400px' })
+    expect.soft(placeholder).toHaveStyle({ width: '400px', height: '40px' })
 
-    await waitFor(() => expect(screen.getByTestId('affix-follow')).toHaveStyle({ width: '400px' }))
+    content.style.height = '80px'
+    expect(placeholder.getBoundingClientRect().height).toBe(40)
+    MockResizeObserver.instances
+      .filter((observer) => !observer.disconnect.mock.calls.length)
+      .filter((observer) => observer.observe.mock.calls.some(([element]) => element === content))
+      .forEach((observer) => observer.trigger(400, 80))
+    await nextTick()
+    expect.soft(placeholder).toHaveStyle({ width: '400px', height: '80px' })
+
+    unmount()
+    parent.remove()
+  })
+
+  it('notifies once when an offset rebind unpins the content', async () => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement
+    ) {
+      return new DOMRect(24, this.style.position === 'fixed' ? 60 : 40, 200, 40)
+    })
+    const { rerender, emitted } = render(Affix, {
+      props: { offsetTop: 60 },
+      attrs: { 'data-testid': 'affix-rebind' },
+      slots: { default: 'Header' }
+    })
+    await waitFor(() => expect(screen.getByTestId('affix-rebind')).toHaveStyle('position: fixed'))
+    expect(emitted().change).toEqual([[true]])
+
+    await rerender({ offsetTop: 0 })
+    expect(screen.getByTestId('affix-rebind')).not.toHaveStyle('position: fixed')
+    expect.soft(emitted().change).toEqual([[true], [false]])
+    latestIntersection().trigger({
+      isIntersecting: true,
+      boundingClientRect: new DOMRect(24, 40, 0, 0)
+    })
+    window.dispatchEvent(new Event('resize'))
+    await waitFor(() => expect(emitted().change).toEqual([[true], [false]]))
   })
 
   it('updates z-index without rebuilding the observer', async () => {
