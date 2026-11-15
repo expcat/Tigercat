@@ -37,7 +37,6 @@ import {
   getMentionsPanelStyle,
   shouldVirtualizeAutoCompleteList,
   getMentionsTextareaClasses,
-  getPickerComboboxAria,
   isImeCompositionEvent,
   readMentionSnapshot,
   getPickerListboxAria,
@@ -355,6 +354,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
           prefix: snapshot.prefix,
           value: option.value
         })
+        if (maxLength !== undefined && result.value.length > maxLength) return
         commitValue(result.value, result.caret)
         onSelect?.(option)
         mentionStartRef.current = -1
@@ -368,6 +368,7 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
         currentValue,
         effectiveDisabled,
         isReadOnly,
+        maxLength,
         onSelect,
         prefix,
         setQuery
@@ -452,25 +453,22 @@ export const Mentions = forwardRef<HTMLTextAreaElement, MentionsProps>(
       formItemControl?.describedBy
     )
     const popupId = `${listboxId}-popup`
-    const comboboxAria = {
-      ...getPickerComboboxAria({
-        expanded,
-        listboxId: listMounted ? listboxId : popupId,
-        activeIndex:
-          listMounted && filteredOptions[activeIndex] && mentionWindow.activeInWindow
-            ? activeIndex
-            : -1,
-        listMounted
-      }),
+    const textareaAria = {
+      'aria-haspopup': 'listbox' as const,
       'aria-controls': expanded ? (listMounted ? listboxId : popupId) : undefined,
-      'aria-autocomplete': 'list' as const
+      'aria-activedescendant':
+        listMounted && filteredOptions[activeIndex] && mentionWindow.activeInWindow
+          ? getPickerOptionId(listboxId, activeIndex)
+          : undefined,
+      'aria-autocomplete': 'list' as const,
+      'data-state': expanded ? 'open' : 'closed'
     }
     const clearLabel = mergedLocale?.common?.clearText ?? 'Clear'
 
     const textarea = (
       <textarea
         {...rest}
-        {...comboboxAria}
+        {...textareaAria}
         ref={setRefs}
         className={classNames(
           getMentionsTextareaClasses({

@@ -31,11 +31,8 @@ async function openMention(
   await fireEvent.input(textarea)
 }
 
-/** textarea + combobox is the APG mentions pattern; axe-core still rejects that pairing. */
 async function expectMentionsA11y(container: HTMLElement): Promise<void> {
-  const results = await axe(container, {
-    rules: { 'aria-allowed-role': { enabled: false } }
-  })
+  const results = await axe(container)
   expect(results).toHaveNoViolations()
 }
 
@@ -44,7 +41,7 @@ describe('Mentions', () => {
     const { getByRole, rerender, emitted } = render(Mentions, {
       props: { options: defaultOptions }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await openMention(textarea, '@')
     await fireEvent.mouseEnter(getByRole('option', { name: 'Charlie' }))
     expect(textarea).toHaveAttribute(
@@ -62,7 +59,7 @@ describe('Mentions', () => {
 
   it('keeps typed text when modelValue is omitted', async () => {
     const { getByRole } = render(Mentions, { props: { options: defaultOptions } })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await fireEvent.update(textarea, 'hello')
     expect(textarea).toHaveValue('hello')
   })
@@ -71,22 +68,22 @@ describe('Mentions', () => {
     const { getByRole, rerender } = render(Mentions, {
       props: { options: defaultOptions, defaultValue: 'start ' }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await fireEvent.update(textarea, 'start more')
     await rerender({ options: defaultOptions, defaultValue: 'start ' })
     expect(textarea.value).toContain('more')
   })
 
-  it('opens a combobox listbox after @ and filters by label or value', async () => {
+  it('opens a suggestion listbox after @ and filters by label or value', async () => {
     const { getByRole, getByText, queryByText } = render(Mentions, {
       props: { options: namedOptions, 'aria-label': 'Members' }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await openMention(textarea, '@zhang')
     await screen.findByRole('listbox')
     expect(getByText('张三')).toBeInTheDocument()
     expect(queryByText('李四')).not.toBeInTheDocument()
-    expect(textarea).toHaveAttribute('aria-expanded', 'true')
+    expect(textarea).toHaveAttribute('aria-controls', getByRole('listbox', { hidden: true }).id)
     expect(textarea).toHaveAttribute('aria-autocomplete', 'list')
   })
 
@@ -94,7 +91,7 @@ describe('Mentions', () => {
     const { getByRole, getByText } = render(Mentions, {
       props: { options: defaultOptions, 'aria-label': 'Members' }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await openMention(textarea, '@z')
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
     await openMention(textarea, '@al')
@@ -110,7 +107,7 @@ describe('Mentions', () => {
         'aria-label': 'Members'
       }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await openMention(textarea, 'hello @al', 9)
     await screen.findByRole('listbox')
     await fireEvent.mouseDown(getByText('Alice'))
@@ -124,7 +121,7 @@ describe('Mentions', () => {
     const { getByRole, emitted } = render(Mentions, {
       props: { options: defaultOptions, 'aria-label': 'Members' }
     })
-    await fireEvent.keyDown(getByRole('combobox'), { key: 'Enter' })
+    await fireEvent.keyDown(getByRole('textbox'), { key: 'Enter' })
     expect(emitted().select).toBeUndefined()
   })
 
@@ -135,7 +132,7 @@ describe('Mentions', () => {
         'aria-label': 'Members'
       }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await openMention(textarea, '@')
     await screen.findByRole('listbox')
     await fireEvent.keyDown(textarea, { key: 'End' })
@@ -147,7 +144,7 @@ describe('Mentions', () => {
     const { getByRole, getByText } = render(Mentions, {
       props: { options: defaultOptions, 'aria-label': 'Members' }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await openMention(textarea, '@')
     await screen.findByRole('listbox')
 
@@ -163,11 +160,12 @@ describe('Mentions', () => {
     await fireEvent.keyDown(textarea, { key: 'Escape' })
     await fireEvent.keyUp(textarea, { key: 'Escape' })
     expect.soft(screen.queryByRole('listbox', { hidden: true })).not.toBeInTheDocument()
-    expect.soft(textarea).toHaveAttribute('aria-expanded', 'false')
+    expect.soft(textarea).not.toHaveAttribute('aria-controls')
+    expect.soft(textarea).not.toHaveAttribute('aria-activedescendant')
 
     await openMention(textarea, '@b')
     expect(await screen.findByText('Bob')).toBeInTheDocument()
-    expect(textarea).toHaveAttribute('aria-expanded', 'true')
+    expect(textarea).toHaveAttribute('aria-controls', getByRole('listbox', { hidden: true }).id)
   })
 
   it('writes FormItem model on type and select', async () => {
@@ -183,7 +181,7 @@ describe('Mentions', () => {
     })
     const { getByLabelText } = render(Wrapper)
     const textarea = getByLabelText('Note') as HTMLTextAreaElement
-    expect(textarea).toHaveAttribute('role', 'combobox')
+    expect(textarea).not.toHaveAttribute('role')
     await openMention(textarea, '@')
     await screen.findByRole('listbox')
     await fireEvent.keyDown(textarea, { key: 'Enter' })
@@ -196,7 +194,7 @@ describe('Mentions', () => {
     const { container, getByRole } = render(Mentions, {
       props: { options: defaultOptions, placeholder: 'Mention a teammate' }
     })
-    expect(getByRole('combobox')).toHaveAttribute('placeholder', 'Mention a teammate')
+    expect(getByRole('textbox')).toHaveAttribute('placeholder', 'Mention a teammate')
     await expectMentionsA11y(container)
   })
 
@@ -204,7 +202,7 @@ describe('Mentions', () => {
     const { container, getByRole } = render(Mentions, {
       props: { options: defaultOptions, 'aria-label': 'Members' }
     })
-    await openMention(getByRole('combobox') as HTMLTextAreaElement, '@')
+    await openMention(getByRole('textbox') as HTMLTextAreaElement, '@')
     await screen.findByRole('listbox')
     await expectMentionsA11y(container)
   })
@@ -213,7 +211,7 @@ describe('Mentions', () => {
     const { container, getByRole } = render(Mentions, {
       props: { options: defaultOptions, 'aria-label': 'Members' }
     })
-    await openMention(getByRole('combobox') as HTMLTextAreaElement, '@zzzz')
+    await openMention(getByRole('textbox') as HTMLTextAreaElement, '@zzzz')
     await expectMentionsA11y(container)
   })
 
@@ -229,7 +227,7 @@ describe('Mentions', () => {
       }
     })
     const { container, getByRole } = render(Wrapper)
-    await fireEvent.focus(getByRole('combobox'))
+    await fireEvent.focus(getByRole('textbox'))
     await expectMentionsA11y(container)
   })
 
@@ -244,14 +242,31 @@ describe('Mentions', () => {
     const { getByRole } = render(Mentions, {
       props: { options: defaultOptions, disabled: true, 'aria-label': 'Members' }
     })
-    expect(getByRole('combobox')).toBeDisabled()
+    expect(getByRole('textbox')).toBeDisabled()
   })
 
   it('applies rows', () => {
     const { getByRole } = render(Mentions, {
       props: { options: defaultOptions, rows: 5, 'aria-label': 'Members' }
     })
-    expect(getByRole('combobox')).toHaveAttribute('rows', '5')
+    expect(getByRole('textbox')).toHaveAttribute('rows', '5')
+  })
+
+  it('auto-resizes the initial multiline value after mounting', async () => {
+    const { getByLabelText } = render(Mentions, {
+      props: {
+        defaultValue: 'one\ntwo\nthree\nfour',
+        autoResize: true,
+        minRows: 5,
+        maxRows: 8,
+        'aria-label': 'Members'
+      }
+    })
+    const textarea = getByLabelText('Members') as HTMLTextAreaElement
+    await waitFor(() => {
+      expect(textarea.style.height).toMatch(/^\d+px$/)
+      expect(textarea.style.overflowY).toBe('hidden')
+    })
   })
 
   it('honors maxLength, showCount, and readOnly', async () => {
@@ -264,7 +279,7 @@ describe('Mentions', () => {
         'aria-label': 'Members'
       }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     expect(textarea).toHaveAttribute('maxlength', '10')
     expect(getByText('5 / 10')).toBeInTheDocument()
 
@@ -274,7 +289,32 @@ describe('Mentions', () => {
       readOnly: true,
       'aria-label': 'Members'
     })
-    expect(getByRole('combobox')).toHaveAttribute('readonly')
+    expect(getByRole('textbox')).toHaveAttribute('readonly')
+  })
+
+  it('rejects a whole mention that exceeds maxLength', async () => {
+    const { getByLabelText, getByRole, getByText, queryByText, emitted } = render(Mentions, {
+      props: {
+        options: defaultOptions,
+        maxLength: 5,
+        showCount: true,
+        'aria-label': 'Members'
+      }
+    })
+    const textarea = getByLabelText('Members') as HTMLTextAreaElement
+    await openMention(textarea, '@')
+    await fireEvent.click(getByRole('option', { name: 'Alice' }))
+    expect.soft(textarea).toHaveValue('@')
+    expect.soft(queryByText('1 / 5')).toBeInTheDocument()
+    expect.soft(queryByText('7 / 5')).not.toBeInTheDocument()
+    expect.soft(emitted()['update:modelValue']).toEqual([['@']])
+    expect.soft(emitted().select).toBeUndefined()
+
+    await fireEvent.keyDown(textarea, { key: 'ArrowDown' })
+    await fireEvent.keyDown(textarea, { key: 'Enter' })
+    expect(textarea).toHaveValue('@bob ')
+    expect(getByText('5 / 5')).toBeInTheDocument()
+    expect(emitted().select).toEqual([[defaultOptions[1]]])
   })
 
   it('clears the value when clearable', async () => {
@@ -286,16 +326,16 @@ describe('Mentions', () => {
         'aria-label': 'Members'
       }
     })
-    expect(getByRole('combobox')).toHaveValue('hello')
+    expect(getByRole('textbox')).toHaveValue('hello')
     await fireEvent.click(getByLabelText('Clear'))
-    expect(getByRole('combobox')).toHaveValue('')
+    expect(getByRole('textbox')).toHaveValue('')
   })
 
   it('closes on Escape', async () => {
     const { getByRole } = render(Mentions, {
       props: { options: defaultOptions, 'aria-label': 'Members' }
     })
-    const textarea = getByRole('combobox') as HTMLTextAreaElement
+    const textarea = getByRole('textbox') as HTMLTextAreaElement
     await openMention(textarea, '@')
     await screen.findByRole('listbox')
     await fireEvent.keyDown(textarea, { key: 'Escape' })

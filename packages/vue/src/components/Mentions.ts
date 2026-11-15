@@ -45,7 +45,6 @@ import {
   getMentionsPanelStyle,
   shouldVirtualizeAutoCompleteList,
   getMentionsTextareaClasses,
-  getPickerComboboxAria,
   getPickerListboxAria,
   getPickerNavigationIndex,
   getPickerOptionAria,
@@ -257,7 +256,8 @@ export const Mentions = defineComponent({
             maxRows: props.maxRows
           })
         })
-      }
+      },
+      { immediate: true }
     )
 
     watch(
@@ -402,6 +402,7 @@ export const Mentions = defineComponent({
         prefix: snapshot.prefix,
         value: option.value
       })
+      if (props.maxLength !== undefined && result.value.length > props.maxLength) return
       commitValue(result.value, result.caret)
       emit('select', option)
       mentionStartPos.value = -1
@@ -544,27 +545,26 @@ export const Mentions = defineComponent({
       const attrId = typeof restAttrs.id === 'string' ? restAttrs.id : undefined
       const effectiveId = attrId ?? formItemControl?.id.value
       const effectiveName = props.name ?? formItemControl?.name.value
-      const comboboxAria = {
-        ...getPickerComboboxAria({
-          expanded: expanded.value,
-          listboxId,
-          activeIndex:
-            filteredOptions.value[activeIndex.value] && mentionWindow.activeInWindow.value
-              ? activeIndex.value
-              : -1,
-          listMounted: filteredOptions.value.length > 0
-        }),
+      const textareaAria = {
+        'aria-haspopup': 'listbox' as const,
         'aria-controls': expanded.value
           ? filteredOptions.value.length > 0
             ? listboxId
             : `${listboxId}-popup`
           : undefined,
-        'aria-autocomplete': 'list' as const
+        'aria-activedescendant':
+          expanded.value &&
+          filteredOptions.value[activeIndex.value] &&
+          mentionWindow.activeInWindow.value
+            ? getPickerOptionId(listboxId, activeIndex.value)
+            : undefined,
+        'aria-autocomplete': 'list' as const,
+        'data-state': expanded.value ? 'open' : 'closed'
       }
 
       const textarea = h('textarea', {
         ...restAttrs,
-        ...comboboxAria,
+        ...textareaAria,
         ref: textareaRef,
         class: classNames(
           getMentionsTextareaClasses({

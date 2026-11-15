@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **Mentions 长度上限、初次高度与编辑语义（Vue / React，C068-F02、C068-F03、C068-F04）**：双端选择候选时检查插入后的完整值，超出 `maxLength` 则拒绝整条提及，保留原文且不发选择回调；Vue `autoResize` 首次挂载后即复用共享 helper 计算高度。textarea 保留原生 textbox 语义，以 `aria-controls`、`aria-activedescendant` 关联建议列表，移除不合法的 combobox 角色、`aria-expanded` 与 axe 规则豁免。
+
 - **MaskInput 原生表单值规范化（Vue / React，C067-F01）**：双端 hidden 复用现有格式化结果中的 canonical raw；`mask="##"`、`name="canonical"`、外部 raw 为 `a12x3` 且未编辑时，可见输入、hidden 与 FormData 均为 `12`。受控值、默认值与 FormItem 路径一致，不改写外部值，受控拒收仍恢复已接受的显示值。
 
 - **InputNumber 必填状态、SSR 与回调文档（Vue / React / 文档生成器，C065-F01、C065-F02、C065-F03）**：双端从 FormItem 继承 `aria-required`，显式 ARIA 仍优先。React 显示缓冲直接从已解析的初始值生成，SSR 的 `value=0` 可见输入与 ARIA、hidden 一致，保留聚焦与失焦缓冲规则。生成文档与 MCP 修正 React `onChange` 为 `number | string | null`。
