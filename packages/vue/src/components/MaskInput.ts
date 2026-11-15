@@ -276,7 +276,7 @@ export const MaskInput = defineComponent({
             ? h('input', {
                 type: 'hidden',
                 name: effectiveName.value,
-                value: rawValue.value,
+                value: formatted.value.rawValue,
                 disabled: effectiveDisabled.value
               })
             : null,

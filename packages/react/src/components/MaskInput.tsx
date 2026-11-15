@@ -262,7 +262,12 @@ export const MaskInput = forwardRef<HTMLInputElement, MaskInputProps>(function M
       onAnimationEnd={() => chromeRef.current?.classList.remove(SHAKE_CLASS)}>
       {field}
       {effectiveName ? (
-        <input type="hidden" name={effectiveName} value={rawValue} disabled={effectiveDisabled} />
+        <input
+          type="hidden"
+          name={effectiveName}
+          value={formatted.rawValue}
+          disabled={effectiveDisabled}
+        />
       ) : null}
       {showClear ? (
         <button

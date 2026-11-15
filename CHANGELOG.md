@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **MaskInput 原生表单值规范化（Vue / React，C067-F01）**：双端 hidden 复用现有格式化结果中的 canonical raw；`mask="##"`、`name="canonical"`、外部 raw 为 `a12x3` 且未编辑时，可见输入、hidden 与 FormData 均为 `12`。受控值、默认值与 FormItem 路径一致，不改写外部值，受控拒收仍恢复已接受的显示值。
+
 - **InputNumber 必填状态、SSR 与回调文档（Vue / React / 文档生成器，C065-F01、C065-F02、C065-F03）**：双端从 FormItem 继承 `aria-required`，显式 ARIA 仍优先。React 显示缓冲直接从已解析的初始值生成，SSR 的 `value=0` 可见输入与 ARIA、hidden 一致，保留聚焦与失焦缓冲规则。生成文档与 MCP 修正 React `onChange` 为 `number | string | null`。
 
 - **InputGroup 按钮尺寸与组成文档（Vue / React / 文档生成器，C063-F01、C063-F02）**：Button 省略 `size` 时继承 InputGroup 的 sm/lg，显式 `size` 与 ButtonGroup 尺寸仍优先。生成说明允许直子为 chrome 根或包含 chrome 的稳定 host，带计数的 Input 不再被错误排除；同验 MaskInput、Mentions、Textarea 文档。

@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 MaskInput 的原生表单隐藏域现在提交按 mask 过滤、截断后的 raw 值，与可见输入一致。例如 `mask="##"` 且传入 `a12x3` 时，hidden 与 FormData 均为 `12`，外部受控值保持不变。受控值、默认值和 FormItem 绑定均适用，调用方式不用改。
+
 双端 InputNumber 在必填 FormItem 中自动输出 `aria-required=true`，显式 `aria-required` 仍优先。React SSR 的可见输入现在显示已解析的初始值，`value={0}` 与 ARIA、hidden 一致。调用方式不用改。
 
 双端 Button 在 InputGroup 内省略 `size` 时，现在继承组的 sm/lg。需要保持 md 时请显式设置 `size="md"`；显式 Button size 与 ButtonGroup size 仍优先于 InputGroup size。

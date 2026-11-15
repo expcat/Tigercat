@@ -5,6 +5,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { h } from 'vue'
 import { render, fireEvent } from '@testing-library/vue'
+import { Form } from '@expcat/tigercat-vue/Form'
+import { FormItem } from '@expcat/tigercat-vue/FormItem'
 import { MaskInput } from '@expcat/tigercat-vue/MaskInput'
 import { expectNoA11yViolationsIsolated } from '../utils'
 
@@ -117,6 +119,48 @@ describe('MaskInput', () => {
   })
 
   describe('Native form submit', () => {
+    it.each(['controlled', 'uncontrolled', 'FormItem'] as const)(
+      'submits canonical raw from %s without editing the external value',
+      (source) => {
+        const values = { canonical: 'a12x3' }
+        const onChange = vi.fn()
+        const field = () =>
+          h(MaskInput, {
+            mask: '##',
+            name: source === 'FormItem' ? undefined : 'canonical',
+            modelValue: source === 'controlled' ? values.canonical : undefined,
+            defaultValue: source === 'uncontrolled' ? values.canonical : undefined,
+            onChange
+          })
+        const { getByRole, container } = render({
+          render: () =>
+            source === 'FormItem'
+              ? h(Form, { modelValue: values }, () => h(FormItem, { name: 'canonical' }, field))
+              : h('form', [field()])
+        })
+
+        expect(getByRole('textbox')).toHaveValue('12')
+        expect(container.querySelector('input[type="hidden"]')).toHaveValue('12')
+        expect(new FormData(container.querySelector('form')!).get('canonical')).toBe('12')
+        expect(values.canonical).toBe('a12x3')
+        expect(onChange).not.toHaveBeenCalled()
+      }
+    )
+
+    it('keeps visible and hidden values when the controlled parent rejects an edit', async () => {
+      const onChange = vi.fn()
+      const { getByRole, container } = render(MaskInput, {
+        props: { mask: '##/##', modelValue: '12', name: 'canonical', onChange }
+      })
+      const input = getByRole('textbox') as HTMLInputElement
+      input.value = '12/3'
+      await fireEvent.input(input)
+
+      expect(onChange).toHaveBeenCalledWith('123', { maskedValue: '12/3', completed: false })
+      expect(input).toHaveValue('12/')
+      expect(container.querySelector('input[type="hidden"]')).toHaveValue('12')
+    })
+
     it('renders a hidden input with the raw value when name is set (controlled)', () => {
       const { getByRole, getAllByRole, container } = render(MaskInput, {
         props: { mask: '##/##/####', modelValue: '12345678', name: 'date' }
