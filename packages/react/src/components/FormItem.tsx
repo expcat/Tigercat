@@ -80,6 +80,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   const labelId = `${baseId}-label`
   const fieldId = `${baseId}-field`
   const errorId = `${baseId}-error`
+  const extraId = `${baseId}-extra`
 
   const actualSize: ComponentSize = size || formContext?.size || 'md'
   const labelPosition = formContext?.labelPosition || 'left'
@@ -126,20 +127,31 @@ export const FormItem: React.FC<FormItemProps> = ({
   const controlDisabled = Boolean(
     disabled || formContext?.disabled || formContext?.loading || conditionState.disabled
   )
+  const registerFieldRules = formContext?.registerFieldRules
+  const registerFieldCondition = formContext?.registerFieldCondition
+  const registerFieldDisabled = formContext?.registerFieldDisabled
 
   useEffect(() => {
-    const ctx = formContextRef.current
-    if (!name || !ctx) return undefined
-    ctx.registerFieldRules(name, itemRules)
-    ctx.registerFieldCondition(name, condition)
-    ctx.registerFieldDisabled(name, controlDisabled)
-    return () => {
-      const current = formContextRef.current
-      current?.registerFieldRules(name, undefined)
-      current?.registerFieldCondition(name, undefined)
-      current?.registerFieldDisabled(name, null)
+    if (!name || !registerFieldRules || !registerFieldCondition || !registerFieldDisabled) {
+      return undefined
     }
-  }, [name, itemRules, condition, controlDisabled])
+    registerFieldRules(name, itemRules)
+    registerFieldCondition(name, condition)
+    registerFieldDisabled(name, controlDisabled)
+    return () => {
+      registerFieldRules(name, undefined)
+      registerFieldCondition(name, undefined)
+      registerFieldDisabled(name, null)
+    }
+  }, [
+    name,
+    itemRules,
+    condition,
+    controlDisabled,
+    registerFieldRules,
+    registerFieldCondition,
+    registerFieldDisabled
+  ])
 
   const handleBlur = useCallback(() => {
     const ctx = formContextRef.current
@@ -191,7 +203,11 @@ export const FormItem: React.FC<FormItemProps> = ({
     offset: 4
   })
 
-  const describedById = hasError ? errorId : undefined
+  const describedById = mergeAriaDescribedBy(
+    hasError ? errorId : undefined,
+    extra ? extraId : undefined
+  )
+  const hasFieldBinding = Boolean(name && formContext)
   const fieldValue = name ? formContext?.getFieldValue(name) : undefined
 
   const childArray = React.Children.toArray(children)
@@ -227,10 +243,11 @@ export const FormItem: React.FC<FormItemProps> = ({
       }
     }
 
-    if (nativeType === 'checkbox') {
-      nextProps.checked = Boolean(fieldValue)
-    } else if (nativeType === 'radio') {
-      nextProps.checked = onlyChild.props.value === fieldValue
+    if (nativeType === 'checkbox' || nativeType === 'radio') {
+      if (hasFieldBinding) {
+        nextProps.checked =
+          nativeType === 'checkbox' ? Boolean(fieldValue) : onlyChild.props.value === fieldValue
+      }
     } else {
       nextProps.value = coerceTextFormValue(fieldValue ?? onlyChild.props.value ?? '')
     }
@@ -247,6 +264,7 @@ export const FormItem: React.FC<FormItemProps> = ({
     describedById,
     handleBlur,
     handleNativeChange,
+    hasFieldBinding,
     fieldValue
   ])
 
@@ -383,6 +401,7 @@ export const FormItem: React.FC<FormItemProps> = ({
         </div>
         {extra ? (
           <p
+            id={extraId}
             className={classNames(
               'tiger-schema-form__extra',
               getFieldMessageClasses(actualSize, 'hint')

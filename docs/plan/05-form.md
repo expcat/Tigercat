@@ -20,8 +20,8 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 ## 概览
 
-本篇 46 条：P1 0、P2 43、P3 3。
-按波次：W3 43、W9 3。
+本篇 42 条：P1 0、P2 39、P3 3。
+按波次：W3 39、W9 3。
 
 已完成，记录在 [CHANGELOG.md](../../CHANGELOG.md)：C056-F01（S10）、C056-F04（S07）、C060-F04（S13）、C061-F05（S13）、C072-F02（S13）、C074-F04（S13）、C080-F03（S13）。
 
@@ -86,17 +86,6 @@ form 组 30 个组件（C052–C081）。这一组没有截图，视觉与键盘
 
 | 编号 | 级别 | 波次 | 端  | 类别 | 条目 | 验收 |
 | ---- | ---- | ---- | --- | ---- | ---- | ---- |
-
-### C061 FormItem
-
-报告 `groups/form/FormItem.md`，队列状态 needs-evidence。另受 S01、S02、S08 影响。
-
-| 编号     | 级别 | 波次 | 端   | 类别   | 条目                                                | 验收                                                                         |
-| -------- | ---- | ---- | ---- | ------ | --------------------------------------------------- | ---------------------------------------------------------------------------- |
-| C061-F01 | P2   | W3   | 双端 | 行为   | 切换 Form controller 后，两端均未迁移 FormItem 注册 | controller 切到 second 后 first 不再留 name，second.validate() 返回 false    |
-| C061-F02 | P2   | W3   | Vue  | 行为   | Vue 动态改名残留旧字段 disabled                     | a(disabled) 改名 b 后 mounted 为 [b]，validateFields(['a']) 返回 false       |
-| C061-F03 | P2   | W3   | 双端 | 行为   | 无名原生 checkbox 的显式 checked 被两端清除         | 无 name 的 FormItem 内原生 checkbox 传 checked=true 后 input.checked 为 true |
-| C061-F04 | P2   | W3   | 双端 | 无障碍 | extra 帮助文本未与控件建立描述关联                  | 有 extra 无 error 时，input 的 aria-describedby 引用带 id 的 extra 段落      |
 
 ### C062 Input
 

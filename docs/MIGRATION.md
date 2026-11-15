@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+双端 FormItem 随 Form controller 切换迁移规则、条件与 disabled 注册；Vue 字段改名后清理旧字段 disabled。无字段绑定的原生 checkbox/radio 保留显式 `checked`，具名控件继续由模型驱动。`extra` 帮助文本现在自动加入控件的 `aria-describedby`，并保留错误及调用方的描述引用。调用方式不用改。
+
 双端 DatePicker、Mentions、TimePicker、TreeSelect 在 InputGroup 内省略 `size` 时，现在继承组的 sm/lg。需要在组内保持 md 时，请显式设置 `size="md"`。React DatePicker 与 TimePicker 从面板离开时，`onBlur` 和 FormItem 失焦校验只通知一次。
 
 双端 ColorSwatch 的选中项禁用或焦点项被移除后，Tab 入口回退到当前可用项。垂直导航在本组同列没有可用候选时继续跨组；多个等价颜色（如 `#fff`、`#ffffff`、`rgb(255, 255, 255)`）只选中首个匹配项。调用方式不用改。

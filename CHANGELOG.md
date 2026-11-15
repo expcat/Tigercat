@@ -4,6 +4,8 @@
 
 ## v3.0.1（未发布）
 
+- **FormItem 注册与帮助文本（Vue / React，C061-F01、C061-F02、C061-F03、C061-F04）**：切换 Form controller 时，字段规则、条件与 disabled 注册从旧引擎完整迁移到新引擎，Vue 动态改名同步清理旧字段 disabled。无字段绑定的原生 checkbox/radio 保留显式 checked；extra 通过稳定 id 关联控件，并与错误及消费者的 `aria-describedby` 合并。
+
 - **Form 外部 controller 生命周期（Core / Vue / React，C060-F01、C060-F02、C060-F03）**：共享引擎仅在 debounce 延时变化时重建校验调度，React 重渲染不再取消待执行校验。Vue 挂载时同步 Form 选项，切换 controller 时取消旧订阅、同步快照并订阅新引擎，后续值与错误更新跟随当前 controller。
 
 - **InputGroup 尺寸与面板失焦（Vue / React，C059-F01、C059-F02）**：DatePicker、Mentions、TimePicker、TreeSelect 省略 `size` 时先继承 InputGroup 的 sm/lg，再回退 md；显式 `size` 仍优先。React DatePicker 与 TimePicker 由根节点处理面板离开事件，从 Today / Now 按钮移到外部控件时只通知一次 blur。

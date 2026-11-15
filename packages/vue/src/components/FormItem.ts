@@ -8,7 +8,6 @@ import {
   h,
   PropType,
   type ComputedRef,
-  onUnmounted,
   cloneVNode,
   isVNode,
   useId,
@@ -132,6 +131,7 @@ export const FormItem = defineComponent({
     const labelId = `${baseId}-label`
     const fieldId = `${baseId}-field`
     const errorId = `${baseId}-error`
+    const extraId = `${baseId}-extra`
 
     const actualSize = computed(() => props.size || formContext.value?.size || 'md')
     const actualLabelWidth = computed(() => {
@@ -182,8 +182,6 @@ export const FormItem = defineComponent({
       { immediate: true }
     )
 
-    const registeredName = ref<string | undefined>(undefined)
-
     const itemRules = () => (props.required ? withRequiredRule(props.rules) : props.rules)
     const controlDisabled = computed(() =>
       Boolean(
@@ -194,44 +192,36 @@ export const FormItem = defineComponent({
       )
     )
 
-    const unregisterName = (name: string | undefined) => {
-      const ctx = formContext.value
-      if (!name || !ctx) return
-      ctx.registerFieldRules(name, undefined)
-      ctx.registerFieldCondition(name, undefined)
-    }
-
     watch(
-      () => [props.name, props.rules, props.required, props.condition] as const,
-      ([name, rules, required, condition]) => {
-        const ctx = formContext.value
-        if (!ctx) return
-        if (registeredName.value && registeredName.value !== name) {
-          unregisterName(registeredName.value)
-        }
-        registeredName.value = name
-        if (!name) return
-        ctx.registerFieldRules(name, required ? withRequiredRule(rules) : rules)
-        ctx.registerFieldCondition(name, condition)
+      [
+        () => props.name,
+        () => props.rules,
+        () => props.required,
+        () => props.condition,
+        () => formContext.value?.registerFieldRules,
+        () => formContext.value?.registerFieldCondition
+      ] as const,
+      ([name, rules, required, condition, registerRules, registerCondition], _, onCleanup) => {
+        if (!name || !registerRules || !registerCondition) return
+        registerRules(name, required ? withRequiredRule(rules) : rules)
+        registerCondition(name, condition)
+        onCleanup(() => {
+          registerRules(name, undefined)
+          registerCondition(name, undefined)
+        })
       },
       { immediate: true }
     )
 
     watch(
-      () => [props.name, controlDisabled.value] as const,
-      ([name, disabled]) => {
-        const ctx = formContext.value
-        if (!ctx || !name) return
-        ctx.registerFieldDisabled(name, disabled)
+      [() => props.name, controlDisabled, () => formContext.value?.registerFieldDisabled] as const,
+      ([name, disabled, registerDisabled], _, onCleanup) => {
+        if (!name || !registerDisabled) return
+        registerDisabled(name, disabled)
+        onCleanup(() => registerDisabled(name, null))
       },
       { immediate: true }
     )
-
-    onUnmounted(() => {
-      const name = registeredName.value
-      unregisterName(name)
-      if (name) formContext.value?.registerFieldDisabled(name, null)
-    })
 
     const handleBlur = () => {
       const ctx = formContext.value
@@ -283,7 +273,9 @@ export const FormItem = defineComponent({
       offset: 4
     })
 
-    const describedById = computed(() => (hasError.value ? errorId : undefined))
+    const describedById = computed(() =>
+      mergeAriaDescribedBy(hasError.value ? errorId : undefined, props.extra ? extraId : undefined)
+    )
     const fieldValue = computed(() => {
       if (!props.name) return undefined
       return formContext.value?.getFieldValue(props.name) ?? ''
@@ -378,10 +370,13 @@ export const FormItem = defineComponent({
           onChange: handleNativeChange
         }
 
-        if (nativeType === 'checkbox') {
-          next.checked = Boolean(fieldValue.value)
-        } else if (nativeType === 'radio') {
-          next.checked = existingProps.value === fieldValue.value
+        if (nativeType === 'checkbox' || nativeType === 'radio') {
+          if (props.name && formContext.value) {
+            next.checked =
+              nativeType === 'checkbox'
+                ? Boolean(fieldValue.value)
+                : existingProps.value === fieldValue.value
+          }
         } else if (fieldValue.value !== undefined) {
           next.value = fieldValue.value
         }
@@ -483,6 +478,7 @@ export const FormItem = defineComponent({
             ? h(
                 'p',
                 {
+                  id: extraId,
                   class: classNames(
                     'tiger-schema-form__extra',
                     getFieldMessageClasses(actualSize.value, 'hint')

@@ -125,7 +125,7 @@ E04 的出图方式（换本地图源还是别的办法）开工时定，改 Dem
 | C058 | CronEditor      | needs-evidence | 视觉 0/16、真实键盘 0/16 执行，16 blocked（browsers=[]）；截图 0；既有 51 项测试及 locale 定向通过；SSR 探针无 hydration；无独立 E2E；只读选择器 happy-dom 回归通过，真实浏览器复验待补                            |
 | C059 | DatePicker      | needs-evidence | 视觉 0/24、真实键盘 0/24 执行，24 blocked（browsers=[]）；截图 0；既有 49 项测试通过；SSR 探针无 hydration；无独立 E2E；尺寸继承与失焦通知 happy-dom 回归通过，真实浏览器复验待补                                  |
 | C060 | Form            | needs-evidence | 视觉与键盘均 0/32，32 blocked（browsers:[]）；截图 0、主责 Demo 操作 0/8；Form 相关 373 项测试通过；未记录 E2E、SSR 执行；外部 controller debounce、挂载选项与切换订阅 happy-dom 回归通过，真实浏览器复验待补      |
-| C061 | FormItem        | needs-evidence | 真实视觉与键盘 0/32，32 blocked（browsers: []），截图 0；无独立 Demo，8 个组合 Demo owner 为 C060；相关 129 项测试通过；Node SSR 探针已跑，无水合/读屏；无 E2E 记录                                                |
+| C061 | FormItem        | needs-evidence | 视觉/键盘 0/32 blocked，截图 0；无独立 Demo（8 个组合 Demo owner=C060）；387 项测试通过；SSR 已跑，无水合/读屏/E2E；controller 迁移、改名清理、无名 checked 与 extra 关联 happy-dom 回归通过，真实浏览器复验待补   |
 | C062 | Input           | needs-evidence | 视觉 0/40、真实键盘 0/40 执行，40 blocked（browsers: []）；截图 0；定向测试 143 项、a11y 轮 131 项通过；SSR 探针无 hydration；docs/exports 检查未重跑，仅引基线                                                    |
 | C063 | InputGroup      | needs-evidence | 视觉 0/32、键盘 0/32 全 blocked，截图 0（IAB browsers: []）；真实页面 0/8；定向测试 30 pass；未跑 E2E、全仓测试、完整构建、读屏、hydration                                                                         |
 | C064 | InputGroupAddon | needs-evidence | 视觉 0/32、键盘 0/32 全 blocked，截图 0（IAB browsers: []）；真实页面 0/8；定向测试 5 passed/19 skipped；Node SSR 探针完成；无读屏与计算样式验收                                                                   |

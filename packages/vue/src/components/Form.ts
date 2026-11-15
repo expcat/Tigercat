@@ -337,12 +337,9 @@ export const Form = defineComponent({
       loading: props.loading,
       errors: errors.value,
       errorsByField: errorsByField.value,
-      registerFieldRules: (fieldName, nextRules) =>
-        engine().registerFieldRules(fieldName, nextRules),
-      registerFieldCondition: (fieldName, condition) =>
-        engine().registerFieldCondition(fieldName, condition),
-      registerFieldDisabled: (fieldName, disabled) =>
-        engine().registerFieldDisabled(fieldName, disabled),
+      registerFieldRules: engine().registerFieldRules,
+      registerFieldCondition: engine().registerFieldCondition,
+      registerFieldDisabled: engine().registerFieldDisabled,
       getMountedFieldNames: () => engine().getMountedFieldNames(),
       getFieldConditionState: (fieldName, override) =>
         engine().getFieldConditionState(fieldName, override),

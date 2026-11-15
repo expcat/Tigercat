@@ -1513,6 +1513,121 @@ describe('Form', () => {
     })
   })
 
+  describe('FormItem lifecycle and descriptions', () => {
+    it('moves field registration to the replacement controller and cleans up on unmount', async () => {
+      const first = createFormEngine({ initialValues: { name: '' } })
+      const second = createFormEngine({ initialValues: { name: '' } })
+      const rules: FormRule = { required: true, message: 'Name is required' }
+      const field = (
+        <FormItem name="name" label="Name" rules={rules}>
+          <Input />
+        </FormItem>
+      )
+      const { rerender, unmount } = render(<Form controller={first}>{field}</Form>)
+      const input = screen.getByRole('textbox', { name: 'Name' })
+      expect(first.getMountedFieldNames()).toEqual(['name'])
+
+      rerender(<Form controller={second}>{field}</Form>)
+      expect(first.getMountedFieldNames()).toEqual([])
+      expect(second.getMountedFieldNames()).toEqual(['name'])
+      expect(await first.validate()).toBe(true)
+      await act(async () => {
+        expect(await second.validate()).toBe(false)
+      })
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByText('Name is required')).toBeInTheDocument()
+
+      act(() => second.setFieldValue('name', 'second-updated'))
+      expect(input).toHaveValue('second-updated')
+      act(() => first.setFieldValue('name', 'first-updated'))
+      expect(input).toHaveValue('second-updated')
+
+      unmount()
+      expect(first.getMountedFieldNames()).toEqual([])
+      expect(second.getMountedFieldNames()).toEqual([])
+    })
+
+    it('clears the previous field disabled registration when its name changes', async () => {
+      const controller = createFormEngine({ initialValues: { a: '', b: '' } })
+      const rules: FormRules = { a: { required: true, message: 'A required' } }
+      const field = (name: string, disabled: boolean) => (
+        <Form controller={controller} rules={rules}>
+          <FormItem name={name} disabled={disabled}>
+            <Input aria-label="field" />
+          </FormItem>
+        </Form>
+      )
+      const { rerender } = render(field('a', true))
+      expect(controller.getMountedFieldNames()).toEqual(['a'])
+      expect(await controller.validateFields(['a'])).toBe(true)
+
+      rerender(field('b', false))
+      expect(controller.getMountedFieldNames()).toEqual(['b'])
+      await act(async () => {
+        expect(await controller.validateFields(['a'])).toBe(false)
+      })
+      expect(controller.getErrors()).toContainEqual({ field: 'a', message: 'A required' })
+    })
+
+    it.each(['checkbox', 'radio'])('preserves an unnamed native %s checked prop', (type) => {
+      const { rerender } = render(
+        <Form>
+          <FormItem label="Choice">
+            <input type={type} value="yes" checked readOnly />
+          </FormItem>
+        </Form>
+      )
+      expect(screen.getByLabelText('Choice')).toBeChecked()
+
+      rerender(
+        <Form value={{ choice: false }}>
+          <FormItem name="choice" label="Choice">
+            <input type={type} value="yes" checked readOnly />
+          </FormItem>
+        </Form>
+      )
+      expect(screen.getByLabelText('Choice')).not.toBeChecked()
+    })
+
+    it.each(['native', 'Input'])(
+      'links extra, error and consumer descriptions to %s controls',
+      (kind) => {
+        const Control = kind === 'native' ? 'input' : Input
+        const field = (error?: string, extra: string | undefined = 'Help text') => (
+          <Form>
+            <FormItem label="Name" extra={extra} error={error}>
+              <Control aria-describedby="consumer-help" />
+            </FormItem>
+            <p id="consumer-help">Consumer help</p>
+          </Form>
+        )
+        const { rerender } = render(field())
+        const input = screen.getByRole('textbox', { name: 'Name' })
+        const extra = screen.getByText('Help text')
+        const extraId = extra.id
+        expect(extra.tagName).toBe('P')
+        expect(extraId).not.toBe('')
+        expect(input.getAttribute('aria-describedby')?.split(/\s+/)).toEqual([
+          'consumer-help',
+          extraId
+        ])
+
+        rerender(field('Required'))
+        const error = screen.getByRole('status')
+        expect(extra).toHaveAttribute('id', extraId)
+        expect(input.getAttribute('aria-describedby')?.split(/\s+/)).toEqual([
+          'consumer-help',
+          error.id,
+          extraId
+        ])
+
+        rerender(field(undefined, ''))
+        expect(screen.queryByText('Help text')).not.toBeInTheDocument()
+        expect(input).toHaveAttribute('aria-describedby', 'consumer-help')
+      }
+    )
+  })
+
   describe('FormItem takeover', () => {
     it('owns an unbound Input so typing validates and resetFields clears the box', async () => {
       const formRef = React.createRef<FormHandle>()

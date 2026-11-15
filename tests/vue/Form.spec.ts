@@ -2004,6 +2004,130 @@ describe('Form', () => {
     })
   })
 
+  describe('FormItem lifecycle and descriptions', () => {
+    it('moves field registration to the replacement controller and cleans up on unmount', async () => {
+      const first = createFormEngine({ initialValues: { name: '' } })
+      const second = createFormEngine({ initialValues: { name: '' } })
+      const rules: FormRule = { required: true, message: 'Name is required' }
+      const { rerender, unmount } = render(Form, {
+        props: { controller: first },
+        slots: {
+          default: () => h(FormItem, { name: 'name', label: 'Name', rules }, () => h(Input))
+        }
+      })
+      const input = screen.getByRole('textbox', { name: 'Name' })
+      expect(first.getMountedFieldNames()).toEqual(['name'])
+
+      await rerender({ controller: second })
+      expect(first.getMountedFieldNames()).toEqual([])
+      expect(second.getMountedFieldNames()).toEqual(['name'])
+      expect(await first.validate()).toBe(true)
+      expect(await second.validate()).toBe(false)
+      await nextTick()
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByText('Name is required')).toBeInTheDocument()
+
+      second.setFieldValue('name', 'second-updated')
+      await nextTick()
+      expect(input).toHaveValue('second-updated')
+      first.setFieldValue('name', 'first-updated')
+      await nextTick()
+      expect(input).toHaveValue('second-updated')
+
+      unmount()
+      expect(first.getMountedFieldNames()).toEqual([])
+      expect(second.getMountedFieldNames()).toEqual([])
+    })
+
+    it('clears the previous field disabled registration when its name changes', async () => {
+      const controller = createFormEngine({ initialValues: { a: '', b: '' } })
+      const rules: FormRules = { a: { required: true, message: 'A required' } }
+      const name = ref('a')
+      const disabled = ref(true)
+      render(Form, {
+        props: { controller, rules },
+        slots: {
+          default: () =>
+            h(FormItem, { name: name.value, disabled: disabled.value }, () =>
+              h(Input, { 'aria-label': 'field' })
+            )
+        }
+      })
+      expect(controller.getMountedFieldNames()).toEqual(['a'])
+      expect(await controller.validateFields(['a'])).toBe(true)
+
+      name.value = 'b'
+      disabled.value = false
+      await nextTick()
+      expect(controller.getMountedFieldNames()).toEqual(['b'])
+      expect(await controller.validateFields(['a'])).toBe(false)
+      expect(controller.getErrors()).toContainEqual({ field: 'a', message: 'A required' })
+    })
+
+    it.each(['checkbox', 'radio'])('preserves an unnamed native %s checked prop', async (type) => {
+      const name = ref<string>()
+      render(Form, {
+        props: { modelValue: { choice: false } },
+        slots: {
+          default: () =>
+            h(FormItem, { name: name.value, label: 'Choice' }, () =>
+              h('input', { type, value: 'yes', checked: true })
+            )
+        }
+      })
+      expect(screen.getByLabelText('Choice')).toBeChecked()
+
+      name.value = 'choice'
+      await nextTick()
+      expect(screen.getByLabelText('Choice')).not.toBeChecked()
+    })
+
+    it.each(['native', 'Input'])(
+      'links extra, error and consumer descriptions to %s controls',
+      async (kind) => {
+        const error = ref<string>()
+        const extra = ref('Help text')
+        render(Form, {
+          slots: {
+            default: () => [
+              h(FormItem, { label: 'Name', extra: extra.value, error: error.value }, () =>
+                kind === 'native'
+                  ? h('input', { 'aria-describedby': 'consumer-help' })
+                  : h(Input, { 'aria-describedby': 'consumer-help' })
+              ),
+              h('p', { id: 'consumer-help' }, 'Consumer help')
+            ]
+          }
+        })
+        const input = screen.getByRole('textbox', { name: 'Name' })
+        const help = screen.getByText('Help text')
+        const extraId = help.id
+        expect(help.tagName).toBe('P')
+        expect(extraId).not.toBe('')
+        expect(input.getAttribute('aria-describedby')?.split(/\s+/)).toEqual([
+          'consumer-help',
+          extraId
+        ])
+
+        error.value = 'Required'
+        await nextTick()
+        const errorElement = screen.getByRole('status')
+        expect(help).toHaveAttribute('id', extraId)
+        expect(input.getAttribute('aria-describedby')?.split(/\s+/)).toEqual([
+          'consumer-help',
+          errorElement.id,
+          extraId
+        ])
+
+        error.value = undefined
+        extra.value = ''
+        await nextTick()
+        expect(screen.queryByText('Help text')).not.toBeInTheDocument()
+        expect(input).toHaveAttribute('aria-describedby', 'consumer-help')
+      }
+    )
+  })
+
   describe('FormItem takeover', () => {
     it('owns an unbound Input so typing validates and resetFields clears the box', async () => {
       let formApi: { validate: () => Promise<boolean>; resetFields: () => void } | undefined
